@@ -29,6 +29,7 @@ The timestamp is the moment the TE was first drafted (or, for TEs that pre-date 
 | TE-13 | 2026-04-27 18:12 | [Time-traveling break-witness](TE-20260427-181200-time-traveling-break-witness.md) |
 | TE-14 | 2026-04-28 08:00 | [A harness-spec change walks through the unified flow](TE-20260428-080000-harness-spec-change-walks-through-unified-flow.md) |
 | TE-15 | 2026-04-28 09:45 | [Should this design become `promisegrid/promisegrid/README.md`?](TE-20260428-094500-should-this-design-become-promisegrid-readme.md) |
+| TE-16 | 2026-04-29 03:32 | [Durable review feedback as contest artifact](TE-20260429-033208-review-feedback-as-contest-artifact.md) |
 
 The TE numbers (TE-1, TE-2, …) are stable identifiers used in the harness-spec; the timestamp slug is what makes the file content-addressable and chronologically sortable on disk.
 
