@@ -31,6 +31,9 @@ The timestamp is the moment the TE was first drafted (or, for TEs that pre-date 
 | TE-15 | 2026-04-28 09:45 | [Should this design become `promisegrid/promisegrid/README.md`?](TE-20260428-094500-should-this-design-become-promisegrid-readme.md) |
 | TE-16 | 2026-04-29 03:32 | [Durable review feedback as contest artifact](TE-20260429-033208-review-feedback-as-contest-artifact.md) |
 | TE-17 | 2026-04-29 16:22 | [Review reply as promise](TE-20260429-162212-review-reply-as-promise.md) |
+| TE-18 | 2026-04-29 16:51 | [Bot identity and branch prefix](TE-20260429-165101-bot-identity-and-branch-prefix.md) |
+| TE-19 | 2026-04-29 16:51 | [Branch-protection posture for `main`](TE-20260429-165102-branch-protection-posture.md) |
+| TE-20 | 2026-04-29 16:51 | [Bot review style](TE-20260429-165103-bot-review-style.md) |
 
 The TE numbers (TE-1, TE-2, …) are stable identifiers used in the harness-spec; the timestamp slug is what makes the file content-addressable and chronologically sortable on disk.
 

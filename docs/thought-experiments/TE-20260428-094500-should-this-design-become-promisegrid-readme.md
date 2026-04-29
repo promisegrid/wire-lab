@@ -24,7 +24,7 @@
 These are the places the README is no longer accurate, not just incomplete.
 
 1. **§"PromiseGrid Universal Protocol"** says "A message consists of a capability token followed by a payload" and conflates the capability token with the protocol-version identifier. The Wire Lab separates these: a capability token is a promise of action; a pCID is a separate hash naming the spec the payload conforms to. The README's framing is now wrong.
-2. **§"Capability-as-Promise"** treats trust implicitly. The Wire Lab introduces a per-peer durable trust ledger with per-burden-type scoring, relationship age, decay, and break-witnesses. The README is silent on this.
+2. **§"Capability-as-Promise"** treats trust implicitly. The Wire Lab introduces a per-peer durable trust ledger with per-assertion-type scoring, relationship age, decay, and break-witnesses. The README is silent on this.
 3. **§"Architecture"** describes the system as primarily a decentralized kernel with WASI as the portability target. The Wire Lab's K1–K5 explicitly de-thrones the kernel and treats WASM/WASI as one runtime among several (browser, native, MCU, container). The README is stale here.
 4. **§Milestones** has framings ("Write WASI target") that no longer match the multi-runtime stance.
 5. **The README has no methodology section.** It presents a finished-sounding system. The Wire Lab is fundamentally about how the design itself evolves: prose specs graduating to structured ones, proposals reviewed via the unified flow, the user's signing key as the single load-bearing lock. This is the most important missing piece and the one most worth eventually integrating.
