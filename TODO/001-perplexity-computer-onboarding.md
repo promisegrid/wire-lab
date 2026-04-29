@@ -9,9 +9,12 @@ The decisions below were made in chat on 2026-04-28; this TODO file captures the
 - [x] 001.1 Lock the bot's email identity and `<user>` branch prefix.
 - [x] 001.2 Lock the GitHub branch-protection posture for `main`.
 - [x] 001.3 Lock the bot's review/convergence style.
-- [ ] 001.4 Steve to remove the "Require a pull request before merging" rule from the `main` ruleset in repo Settings.
-- [ ] 001.5 Backfill DI provenance into existing `harness-spec.md` settled statements (separate task; do not block 001).
-- [ ] 001.6 Backfill DR records for the 18 open questions currently in `harness-spec.md` §11 (separate task; do not block 001).
+- [x] 001.4 Steve to remove the "Require a pull request before merging" rule from the `main` ruleset in repo Settings. (Done; confirmed by Steve in chat 2026-04-29.)
+
+The two follow-on items originally listed as 001.5 and 001.6 have been moved out of this TODO so that TODO 001 closes cleanly when its bootstrap subtasks land. They now live as:
+
+- TODO 006 — `TODO/006-backfill-di-provenance-harness-spec.md` (originally 001.5).
+- TODO 007 — `TODO/007-backfill-dr-harness-spec-section-11.md` (originally 001.6).
 
 ## Decision Intent Log
 
