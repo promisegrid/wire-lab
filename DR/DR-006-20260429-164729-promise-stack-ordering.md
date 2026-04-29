@@ -8,7 +8,7 @@ Question: Given a stack of promise frames in a single message, what is the canon
 Why this blocks progress: Senders, intermediate routers, and receivers all need a shared expectation about how a multi-frame `Promise` stack is read and acted upon. Without a shared convention, a v1 receiver and a v2 receiver can ratify the same wire bytes differently, partial-knowledge peers can act on stale assertions, and revocation/compliance frames added at one layer can be ignored by another. Locking a wire-and-evaluation convention is a prerequisite for harness conformance tests on §1.1 of `harness-spec.md`.
 Affects: `harness-spec.md` §1.1 (Promise frame shape); `harness-spec.md` §2 (trust ledger, per-assertion-type); future TE-6 (capability-token revocation propagation); future TE-12 (zero-knowledge envelopes).
 Unblocks: `TODO/005-te-promise-stack-ordering.md` subtasks; `harness-spec.md` §1.1 conformance tests; criticality-flag location decision; per-assertion-type position-convention authority.
-Waiting on: stevegt@t7a.org (Steve Traugott) for DF answers DF-1.1 through DF-1.4 in `docs/thought-experiments/TE-20260427-180000-promise-stack-ordering.md`.
+Waiting on: stevegt@t7a.org (Steve Traugott)
 
 ## Candidate alternatives considered
 
@@ -30,4 +30,9 @@ To be created in `TODO/005-te-promise-stack-ordering.md` after DF.
 ## Related commits
 
 - `0ec32d9` Expand TE-1 (Promise-stack ordering) into full scenario form
-- DR-006 first authored on `ppx/merge-all-20260429-164729`
+- `e0c00ff` Address TE-1 review conditions: add DR-006 and TODO 005 (DR-006 first authored)
+- `5990e24` Merge ppx/merge-all-20260429-164729 (Converge branch reviews)
+
+## Last updated
+
+2026-04-29 17:32:00
