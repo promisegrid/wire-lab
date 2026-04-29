@@ -374,18 +374,25 @@ Already-locked decisions, not under DF in this TE (carried from chat 2026-04-29)
 
 ## Decision status
 
-`needs DF` — awaiting Steve's choice on DF-22.1, DF-22.2, DF-22.3, DF-22.4, DF-22.5. After DF, the locked decisions become DI entries in a new TODO file (TODO number to be assigned when DF lands).
+`decided` — all five DFs locked by Steve in chat 2026-04-29. Locked answers are recorded as DI entries in `TODO/011-te-spec-doc-store-and-pcid-machinery.md`:
+
+- **DF-22.1: 1.a** — raw file bytes, no normalization. (Steve preferred transparency over editor-style robustness; the formatter from the recommended Alt-1.D was dropped.)
+- **DF-22.2: 2.b** — Go using `github.com/ipfs/go-cid`.
+- **DF-22.3: 3.d** — snapshot file + manifest entry, no git tag.
+- **DF-22.4: 4.d** — single Markdown file with fenced YAML inside.
+- **DF-22.5: same-binary variant** — freezer and checker are subcommands of one Go binary `tools/spec`. The trigger half of Alt-5.D (manual freeze + scheduled CI audit) is preserved; the structural half (two separate programs) is collapsed to one.
 
 Amendment history:
 
-- 2026-04-29 (initial): TE drafted with four DFs (hash input, freezing mechanic, manifest format, freezing trigger).
-- 2026-04-29 (amendment): DF-22.2 (tooling language) added after the bot verified that pure-bash CIDv1 is brittle. The original DFs assumed `tools/freeze-spec.sh` was a bash script; that assumption is now itself under DF. The bot initially mis-reported Go as unavailable, then corrected itself after testing that passwordless `sudo` lets it install Go 1.24 and that `github.com/ipfs/go-cid` produces the canonical CID for the test vector `"hello world\n"` matching `py-multiformats-cid`. Recommendation reflects Steve's stated Go preference (chat 2026-04-29).
+- 2026-04-29 (initial): TE drafted with four DFs (hash input, freezing mechanic, manifest format, freezing trigger). Recommended set: all-D.
+- 2026-04-29 (amendment): DF-22.2 (tooling language) added after the bot verified that pure-bash CIDv1 is brittle. The original DFs assumed `tools/freeze-spec.sh` was a bash script; that assumption itself was elevated to a DF. The bot initially mis-reported Go as unavailable, then corrected itself after testing that passwordless `sudo` lets it install Go 1.24 and that `github.com/ipfs/go-cid` produces the canonical CID for the test vector `"hello world\n"` matching `py-multiformats-cid`. Revised recommended set: (1.d, 2.b, 3.d, 4.d, 5.d).
+- 2026-04-29 (DF lock): Steve locked (1.a, 2.b, 3.d, 4.d, same-binary variant of 5). Two deviations from the bot's recommendation: (i) Alt-1.A over Alt-1.D — Steve preferred raw-byte transparency to the formatter's editor-style robustness; (ii) DF-22.5 same-binary variant — one Go binary with `freeze` and `check` subcommands instead of two separate programs.
 
 ## Implications for follow-on work
 
-- **TODO 011 (provisional, after DF):** Migrate `harness-spec.md` to `specs/harness-spec-draft.md`. Mint the genesis pCID. Add `specs/MANIFEST.md`. Add `tools/freeze-spec/` and `tools/check-spec-format/` Go modules. Update all in-repo references to the harness-spec path. This is the genesis-freeze ritual, executed once.
+- **TODO 011 (now in progress):** DIs locked for all five DFs and the four already-decided inputs. Remaining work: implement `tools/spec/` (single Go binary with `freeze`, `check`, `cid`, `ls` subcommands), perform the genesis freeze of `harness-spec.md`, add `specs/MANIFEST.md`, wire `go run ./tools/spec check` into CI.
 
-- **TODO 012 (provisional, after DF):** Add the CI audit step: `go run ./tools/check-spec-format` performs the format check + manifest-vs-disk consistency check + cross-ref-citation lint. The audit runs on every push to ppx/main and main; failures block the merge. Because the audit is a Go program, it runs identically under GitHub Actions, a self-hosted runner, or a git pre-receive hook on a non-GitHub host.
+- **TODO 012 (provisional):** Add the CI audit step: `go run ./tools/spec check` performs format checks (advisory CRLF/BOM warnings on drafts), manifest-vs-disk consistency, cross-ref-citation lint, and self-reference lint. The audit runs on every push to ppx/main and main; failures block the merge. Because the audit is a Go program, it runs identically under GitHub Actions, a self-hosted runner, or a git pre-receive hook on a non-GitHub host.
 
 - **TODO 010 (existing):** Drives TE-21 to DI. TE-21 + TE-22 together form the spec-doc-as-promise bundle: TE-21 says what a spec doc *is*; TE-22 says how the repo handles such docs. The DI entries from both TEs should land in the same revision of `harness-spec.md`'s vocabulary section.
 
