@@ -141,6 +141,18 @@
   errors explicitly.
 - Run `errcheck ./...` and keep it passing for Go changes.
 
+## DR/DI Source-of-Truth Protocol (Required)
+- In this repo, DR and DI logs are the primary source of truth for decisions and open questions.
+- Documents and code are outputs of that process and must link back to DR/DI records.
+- Person identity in DR/DI records must use full email with label format: `user@example.com (FirstName)`.
+- In DRs, `Asked by` and person-valued `Waiting on` fields must use that format.
+- In DIs, `Author` must use that format.
+- A settled statement in docs (or critical logic in code comments) must cite at least one DI ID.
+- An unresolved question or uncertainty must cite at least one DR ID.
+- If an unresolved question has no DR yet, create a DR before finalizing the change.
+- During TODO 025 migration, apply these rules incrementally as sections/files are brought under DR/DI tracking.
+
+
 ## Comment Preservation Protocol (Required)
 - Never remove existing code comments unless they are replaced in the same patch by equal-or-better explanatory comments near the same logic.
 - When rewriting or refactoring code, port old explanatory intent first, then improve wording.
@@ -185,6 +197,38 @@
   - `Constraints: <hard limits, dependencies, assumptions>`
   - `Affects: <paths, modules, commands, docs>`
   - `Supersedes: <old DI ID, optional>`
+
+# DR Records
+
+The DR/ directory stores Decision Request (DR) records for coordination work.
+
+Rules:
+- One DR per file.
+- DR files are append-only event logs.
+- Keep TODO files as snapshots; link TODOs to DR files for open questions.
+- Person identity format: `user@example.com (FirstName)`.
+
+Recommended file naming:
+- `DR-<TODO>-YYYYMMDD-HHMMSS-<slug>.md`
+
+Required DR fields:
+- `DR-ID`
+- `Date`
+- `Asked by` (person identity format above)
+- `State` (`open | decided | blocked | implemented | closed`)
+- `Question`
+- `Why this blocks progress`
+- `Affects` (repos/files/components)
+- `Unblocks` (TODO IDs/tasks)
+- `Waiting on` (person identity format above, or DI ID)
+- `Decision` (filled when decided)
+- `Linked DI`
+- `Related commits`
+- `Last updated`
+
+Reference pattern:
+- From TODO files: `../DR/<filename>.md`
+
 
 ## Testing Guidelines
 - Use Go's standard `testing` package with deterministic tests.
