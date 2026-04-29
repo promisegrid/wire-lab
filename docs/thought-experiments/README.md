@@ -35,6 +35,7 @@ The timestamp is the moment the TE was first drafted (or, for TEs that pre-date 
 | TE-19 | 2026-04-29 16:51 | [Branch-protection posture for `main`](TE-20260429-165102-branch-protection-posture.md) |
 | TE-20 | 2026-04-29 16:51 | [Bot review style](TE-20260429-165103-bot-review-style.md) |
 | TE-21 | 2026-04-29 17:35 | [Spec doc as promise](TE-20260429-173520-spec-doc-as-promise.md) |
+| TE-22 | 2026-04-29 17:55 | [Spec-doc store layout and pCID machinery](TE-20260429-175530-spec-doc-store-and-pcid-machinery.md) |
 
 The TE numbers (TE-1, TE-2, …) are stable identifiers used in the harness-spec; the timestamp slug is what makes the file content-addressable and chronologically sortable on disk.
 
