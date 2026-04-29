@@ -14,7 +14,7 @@ The harness exists to let us **discover** the right design, not to validate a pr
 
 A message is no longer `[pCID, payload, signature]`. It is a **promise stack** — an ordered set of nested promises, each made by a distinct promiser, each interpretable on its own and verifiable against that promiser's history.
 
-> **A note on what a pCID is.** A `pCID` is a *protocol* CID: the content hash of a spec document that defines a wire protocol. It is roughly equivalent to a TCP/UDP port number — an identifier that selects a protocol — except that no central registry is needed, because the spec's hash *is* the port number. Anyone can mint a pCID by writing a spec and publishing its CID. A pCID is **not** the hash of any particular payload; it is the hash of the rules that the payload follows. Two different messages can carry the same pCID and entirely different payloads, just as two TCP segments to port 443 can carry entirely different HTTPS streams. This distinction matters for the burden vocabulary below.
+> **A note on what a pCID is.** A `pCID` is a *protocol* CID: the content hash of a spec document that defines a wire protocol. It is roughly equivalent to a TCP/UDP port number — an identifier that selects a protocol — except that no central registry is needed, because the spec's hash *is* the port number. Anyone can mint a pCID by writing a spec and publishing its CID. A pCID is **not** the hash of any particular payload; it is the hash of the rules that the payload follows. Two different messages can carry the same pCID and entirely different payloads, just as two TCP segments to port 443 can carry entirely different HTTPS streams. This distinction matters for the assertion vocabulary below.
 
 ### 1.1 The promise-stack model
 
@@ -23,13 +23,13 @@ A message is `[]Promise`. A `Promise` is:
 ```
 Promise := {
     promiser:  AgentID | TransportID | RuntimeID | KernelID
-    burden:    "this payload conforms to the spec identified by pCID P"
+    assertion: "this payload conforms to the spec identified by pCID P"
               | "I authored this payload"        ; signature-style
               | "I forwarded this byte sequence unmodified from peer Q at time T"
               | "I will perform action X if you redeem this token"
               | "I commit not to issue another message numbered N for this stream"
               | "the payload below resolves at the CID I'm naming; fetch it elsewhere"
-              | ... (open set; new burden vocabularies are themselves content-addressed specs, i.e. their own pCIDs)
+              | ... (open set; new assertion vocabularies are themselves content-addressed specs, i.e. their own pCIDs)
     body:      bytes | promise-stack | nil
     evidence:  signature | MAC | "byte-arrival on authenticated channel" | nil
     ttl:       optional duration or revocation hook
@@ -55,7 +55,7 @@ The wire library (call it `promstack`) then has just three operations:
 - **Transport-as-promiser becomes legitimate.** A TCP connection authenticated at startup makes a continuing implicit promise about the source of every byte. We don't need to re-sign every message; we can track that the transport is *making* a multi-message promise, and the trust ledger updates if the transport keeps or breaks it.
 - **Routers and kernels can append their own promises** without modifying the inner content — exactly the chain-of-custody property we want for a centuries-long system where intermediaries come and go.
 - **The signature debate goes away.** Whether the signature covers `[pCID, payload]` or just `payload` becomes a choice of *which promise frame holds the signature*. Different protocols (different pCIDs) can choose differently and the wire format doesn't care.
-- **Capability tokens are just promises too.** A token is a promise burden of the form "I will perform X if you redeem this." It lives in the same stack as everything else.
+- **Capability tokens are just promises too.** A token is a promise whose assertion is of the form "I will perform X if you redeem this." It lives in the same stack as everything else.
 
 ### 1.3 What the simulator tests about layering
 
@@ -83,7 +83,7 @@ TrustLedger[promiserID] := {
     evidence_chain:       []EvidenceRef    // hashes of observed keep/break events
     open_promises:        []OpenPromise    // promises in flight, not yet decided
     score:                float            // current local trust scalar
-    score_components:     map[burden_type]float   // separable by what kind of promise
+    score_components:     map[assertion_type]float // separable by what kind of promise
     reputation_imports:   []ReputationImport      // 3rd-party attestations (down-weighted)
     relationship_age_ns:  int64
     last_drift_ns:        int64
@@ -109,14 +109,14 @@ Important: *the receiver of a break-witness must apply its own trust ledger to B
 ### 2.3 Durable relationship features the harness supports
 
 - **First-encounter rituals.** When two agents meet for the first time, both record a `first_seen` event. Several scenarios test what these rituals must contain (mutual challenge? exchange of references? trial transaction?).
-- **Reputation portability with provenance.** When agent C imports a reputation score for X from agent A, the import is itself a promise by A about X. C trusts the import only as much as it trusts A, and only for the burden types A vouched for.
-- **Trust decay vs. trust persistence.** Knob: do scores decay over absent-time? Two scenarios will show the difference — one where I haven't talked to my old friend Alice in 30 years (real years of simulated time) but our shared history still counts, vs. one where idle relationships fade. Probably we need *separate* decay rates per burden type.
+- **Reputation portability with provenance.** When agent C imports a reputation score for X from agent A, the import is itself a promise by A about X. C trusts the import only as much as it trusts A, and only for the assertion types A vouched for.
+- **Trust decay vs. trust persistence.** Knob: do scores decay over absent-time? Two scenarios will show the difference — one where I haven't talked to my old friend Alice in 30 years (real years of simulated time) but our shared history still counts, vs. one where idle relationships fade. Probably we need *separate* decay rates per assertion type.
 - **Defection cost.** What does it cost to walk away from a relationship and start over with a new identity? Sybil resistance lives here. The harness can vary the cost (free, computational, social-graph-attested, stake-based) and observe which costs deter selfish exit.
 - **Multi-generational handoff.** Scenarios where an agent's signing key is rotated, retired to a successor, or where a long-running agent dies and "wills" its reputation to another. The wire-level question: what kind of promise does that require, and who must witness it?
 
-### 2.4 Trust is per-burden-type
+### 2.4 Trust is per-assertion-type
 
-A given peer may be highly trusted to deliver bytes (transport burden), mildly trusted to attest authorship (signature burden), and totally untrusted to issue capability tokens that bind real resources (issuer burden). Lumping these into one scalar destroys information that matters in a long-lived system. Every entry in the ledger therefore tracks `score_components` keyed by burden type.
+A given peer may be highly trusted to deliver bytes (transport assertion), mildly trusted to attest authorship (signature assertion), and totally untrusted to issue capability tokens that bind real resources (issuer assertion). Lumping these into one scalar destroys information that matters in a long-lived system. Every entry in the ledger therefore tracks `score_components` keyed by assertion type.
 
 ---
 
@@ -371,7 +371,7 @@ Each TE is a falsifiable experiment whose outcome teaches us something about the
 
 ### For cross-runtime reality
 
-- **Microcontroller runtime profile.** Define a "minimal endpoint" subset: which promise burdens it must understand vs. which it must reject gracefully. Real MCUs in real scenarios validate it.
+- **Microcontroller runtime profile.** Define a "minimal endpoint" subset: which promise assertions it must understand vs. which it must reject gracefully. Real MCUs in real scenarios validate it.
 - **Browser-tab profile.** Same exercise. The browser is a hostile environment (CORS, mixed content, tab-suspension, storage quotas). Embrace it.
 - **JS-on-server profile.** Different from browser. Has its own wrinkles (event loop, fs access).
 - **Bare-metal native profile.** No allocator? Single-threaded? Define what that means for our wire library.
@@ -418,7 +418,7 @@ A secondary simplification, made in this revision: we are **not** locking the pr
 A pCID names a spec. The spec is a content-addressed object — typically a CBOR-encoded bundle, but its *content* can be anything readable: prose markdown, IPLD schema, executable test scenarios, code, diagrams, or any combination. Three observations matter:
 
 - **Prose is a legitimate spec form, especially in early drafts.** A new idea is usually clearer in English than in IPLD schema. Forcing schema-first stalls discussion. The first version of any proposal is allowed to be prose only, and the harness will route it the same way as a fully-structured one.
-- **Structure is earned, not required.** As a spec matures and acquires conformance tests, an IPLD schema, a burden vocabulary, and known-good handler implementations, it can be republished with those attached — a new pCID that supersedes the prose version. Proposals are encouraged to start prose, become structured, and converge.
+- **Structure is earned, not required.** As a spec matures and acquires conformance tests, an IPLD schema, an assertion vocabulary, and known-good handler implementations, it can be republished with those attached — a new pCID that supersedes the prose version. Proposals are encouraged to start prose, become structured, and converge.
 - **Specs declare what they contain.** A spec object's outer wrapper says which sections are present (prose, schema, tests, examples, etc.) so a reader — human, LLM, or program — knows what it is dealing with. An LLM-readable spec without an IPLD schema is fine; a programmatic conformance-checker reading the same spec will simply skip the schema-check phase and report "schema not present."
 - **Humans and LLMs are agents too.** A human author writing prose and signing it produces exactly the same artifact — a content-addressed spec at some pCID — as a code-generated one. The trust ledger evaluates the promiser, not the production method.
 
@@ -430,9 +430,9 @@ A proposal is a promise stack like any other message. We do **not** define a fro
 
 What we do instead:
 
-- A proposal is a message whose outermost burden is something like "this is a proposal to change pCID X / knob Y / the harness spec itself." The target is named, the proposer signs it. Everything else is body.
+- A proposal is a message whose outermost assertion is something like "this is a proposal to change pCID X / knob Y / the harness spec itself." The target is named, the proposer signs it. Everything else is body.
 - A *suggested* proposal shape — call it `proposal-checklist-v0`, published as a prose spec at its own pCID — describes the kinds of content reviewers tend to find useful: a diagnosis ("what's wrong, what I expected"), the proposed change, a predicted effect (how the proposer commits to being wrong), counter-evidence the proposer searched for, and a rollback sketch. This is a community convention, not a parser rule. Reviewers are free to ignore proposals that lack these. Better shapes will emerge by being reused, exactly the way pCIDs themselves accrue trust.
-- A proposer's prediction-quality history accrues to their trust ledger under a `design-judgment` burden type. Reviewers see it. An LLM analyst with a year of bad predictions becomes appropriately easy to ignore — without any schema enforcing it.
+- A proposer's prediction-quality history accrues to their trust ledger under a `design-judgment` assertion type. Reviewers see it. An LLM analyst with a year of bad predictions becomes appropriately easy to ignore — without any schema enforcing it.
 - Proposals can be entirely prose, entirely structured, or any mix. A prose proposal signed by an agent (human, LLM, or program), targeting the harness spec, is a first-class citizen of this system.
 
 What we explicitly defer: the exact field names, whether `predicted_effect` is mandatory at the parser level, what counts as adequate counter-evidence, and whether prose-only proposals get a quality discount. All of these are downstream decisions to be made once we have actual proposals to look at.
@@ -476,13 +476,13 @@ Correlation alone produces noise. To attribute outcomes to knobs, the harness wi
 1. **Sampling sweeps.** Latin-hypercube and factorial sampling that vary one knob at a time and several at once. Results saved per-study.
 2. **Counterfactual replay.** Re-execute a run with one knob changed and emit a delta report. The natural unit of attribution is the delta between two replayable runs that differ in exactly one knob value.
 
-A strong norm — not yet a parser rule — is that a causal claim ("knob X caused outcome Y") should cite a sweep or delta report. Reviewers are free to demand this and to discount proposals that don't supply it. Whether the harness eventually enforces this at envelope-parse time is a question for after we've watched a few iterations and seen where the norm actually fails.
+A strong norm — not yet a parser rule — is that a causal assertion ("knob X caused outcome Y") should cite a sweep or delta report. Reviewers are free to demand this and to discount proposals that don't supply it. Whether the harness eventually enforces this at envelope-parse time is a question for after we've watched a few iterations and seen where the norm actually fails.
 
 ### 10a.6 Counterfactual evidence for in-sim agents
 
 Agents inside a run cannot fork the world. But they can do something cheaper: **emit hypotheticals**.
 
-A new burden type, `"hypothesis: under spec P', message M would have been accepted"`, lets an agent record its private theories on the wire as ordinary promises. The agent commits to the hypothesis (signs it), and the harness's *adversarial-replay* harness then re-runs the scenario with spec P' substituted and emits a verdict: hypothesis confirmed, refuted, or unrelated. The verdict is filed back as a `hypothesis-result-v1` envelope.
+A new assertion type, `"hypothesis: under spec P', message M would have been accepted"`, lets an agent record its private theories on the wire as ordinary promises. The agent commits to the hypothesis (signs it), and the harness's *adversarial-replay* harness then re-runs the scenario with spec P' substituted and emits a verdict: hypothesis confirmed, refuted, or unrelated. The verdict is filed back as a `hypothesis-result-v1` envelope.
 
 This lets agents propose changes from inside the system *with* evidence — their hypothesis got tested, and the test result is part of their reputation now. Speculation without verification costs trust; speculation that pans out gains it.
 
@@ -584,7 +584,7 @@ The simulator does not answer this question. It produces traces, prices, scores,
 4. **Hardware-in-the-loop scope.** Required for every release, or quarterly? My instinct: quarterly, with one MCU and one browser tab, but the harness should support it on demand from day one.
 5. **Centuries-long simulated runs.** Is one overnight run per quarter enough, or do we need a continuous, perpetually-running "PromiseGrid in a tank" instance that we keep alive across releases as a long-term experiment? I think the latter would be enormously valuable — a simulated village that we never reset — but it's a real ops commitment.
 6. **Pcid for break-witnesses.** Do we want one canonical break-witness pCID (so any agent can publish a witness in a universally-understood format) or do we let each protocol define its own (so the witness carries protocol-specific evidence)? My instinct: one canonical envelope, with protocol-specific evidence inside.
-7. **Single trust score vs. per-burden-type vector everywhere.** Section 2 argues for the vector. Vectors are harder to compare across agents. Do we accept that as a feature (no global trust score is possible, only local per-burden ones) or build a default projection to a scalar for human consumption?
+7. **Single trust score vs. per-assertion-type vector everywhere.** Section 2 argues for the vector. Vectors are harder to compare across agents. Do we accept that as a feature (no global trust score is possible, only local per-assertion ones) or build a default projection to a scalar for human consumption?
 8. **Self-improvement cadence.** §10a proposes daily LLM passes and weekly human review of `proposals/pending/`. Too fast or too slow? My instinct: start weekly for both, tighten only after we've seen the LLM's proposal quality stabilize.
 9. **Is "your signature is the only lock" really enough?** §10a.8 reduces the constitutional set to one rule: the harness-spec pointer follows your signing key. No `invariants.cbor`, no envelope schema, no LLM-can't-touch-this list. Is there a failure mode you can picture where that's insufficient — e.g. an LLM that floods the queue with plausible-looking proposals, exhausting your attention until something bad slips through? If so, the right defense is probably a rate-limit on submissions per agent (a community norm, not a parser rule), not a return to constitutional documents.
 10. **Default trust for LLM analysts.** An LLM endorsing a proposal carries some weight by default — but how much? My instinct: very low at first (e.g. 0.05 of a human-elder endorsement), rising only as its prediction-quality history accumulates good calls. This means a fresh LLM cannot move proposals on its own; it can only summarize and recommend until it earns standing. Confirm?

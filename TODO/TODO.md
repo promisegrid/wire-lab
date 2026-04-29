@@ -4,3 +4,4 @@ This list is sorted by priority (not number). TODO numbers are stable; do not re
 
 - [x] 003 - Review reply as promise (`TODO/003-review-reply-as-promise.md`)
 - [x] 002 - Durable review feedback as contest artifact (`TODO/002-review-feedback-as-contest-artifact.md`)
+- [x] 004 - Eradicate the word `burden` (`TODO/004-eradicate-burden.md`)
