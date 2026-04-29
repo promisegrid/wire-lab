@@ -10,3 +10,4 @@ This list is sorted by priority (not number). TODO numbers are stable; do not re
 - [ ] 005 - TE-1 Promise-stack ordering: drive to DI (`TODO/005-te-promise-stack-ordering.md`)
 - [ ] 006 - Backfill DI provenance into harness-spec.md settled statements (`TODO/006-backfill-di-provenance-harness-spec.md`)
 - [ ] 007 - Backfill DR records for harness-spec.md §11 open questions (`TODO/007-backfill-dr-harness-spec-section-11.md`)
+- [x] 009 - ppx/main as long-lived bot integration branch (`TODO/009-ppx-main-integration-branch.md`)
