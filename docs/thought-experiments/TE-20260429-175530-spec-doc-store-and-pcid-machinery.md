@@ -43,7 +43,9 @@ This TE is the operational follow-on to TE-21. TE-21 said *what a spec doc is* (
 
 ## Alternatives
 
-This TE walks four DFs sequentially. Each DF has its own alternatives.
+This TE walks five DFs sequentially. Each DF has its own alternatives.
+
+DF-22.2 (tooling language) was added in an amendment after the bot verified in chat 2026-04-29 that pure-bash CIDv1 computation is brittle. The original DF list (1, 3, 4, 5) presupposed bash scripts; that presupposition is now itself under DF. The bot first guessed Go was not available, then on a follow-up check found it has passwordless `sudo` and successfully installed Go 1.24 + `github.com/ipfs/go-cid` and produced the canonical CID for the test vector `"hello world\n"` — `bafkreifjjcie6lypi6ny7amxnfftagclbuxndqonfipmb64f2km2devei4` — matching the result from Python `py-multiformats-cid` on the same input. Both libraries are therefore viable; the choice is now about preference, canonicality, and ergonomics, not feasibility.
 
 ### DF-22.1: Hash input
 
@@ -76,6 +78,38 @@ The CIDv1 hashes raw file bytes (Alt-1.A), but the repo enforces a single format
 
 - **Easier:** keeps the hash function trivial (raw bytes) while still defending against editor-style flapping. Formatter is a single concrete tool the repo can lock to a version.
 - **Harder:** formatter version is now part of the protocol. Two operators with different formatter versions can produce different bytes from the same input. Mitigated by pinning formatter version in `tools/freeze-spec.sh` and refusing to freeze if the working tree differs from a freshly-formatted run.
+
+### DF-22.2: Tooling language for freeze and audit
+
+Which language do `tools/freeze-spec.sh`-or-equivalent and `tools/check-spec-format.sh`-or-equivalent get written in? CIDv1 computation requires multihash header bytes + multibase encoding; the choice of language affects how robust, portable, and bot-runnable the freeze and audit rituals are.
+
+#### Alt-2.A: Pure bash + sha256sum + base32 + xxd
+
+Freeze and audit scripts are POSIX shell. Multihash header bytes are produced via `printf '\x12\x20'`, concatenated with the raw sha256, then base32-encoded with the `b` multibase prefix and lowercase, padding stripped.
+
+- **Easier:** zero non-default dependencies on most Linux systems. Same shell that does git operations does the freeze.
+- **Harder:** byte-level scripting in shell is brittle. Padding rules, lowercase conversion, and the `0x01 0x55` codec wrap are easy to get subtly wrong without a reference implementation. Hard to unit-test. The bot self-tested this in chat 2026-04-29: the encoding works but is one bug away from producing a wrong-but-plausible-looking CID.
+
+#### Alt-2.B: Go (using `github.com/ipfs/go-cid`)
+
+Freeze and audit scripts are Go programs that import the canonical reference implementation of CIDv1. Source lives at `tools/freeze-spec/main.go` and `tools/check-spec-format/main.go`; binaries are built on demand via `go run` or `go build`. No binary blob in git.
+
+- **Easier:** the canonical CIDv1 reference. No risk of multihash-encoding bugs; the library has been audited by the IPFS community for years. Familiar to anyone in the content-addressable-storage ecosystem. Steve's stated language of preference (chat 2026-04-29). The PromiseGrid `grid-poc` repo is already Go, so this keeps the wire-lab toolchain coherent with the rest of the ecosystem.
+- **Harder:** Go must be present on every machine that runs the freeze ritual. The bot's sandbox does not ship Go by default but `sudo apt-get install -y golang` works (verified 2026-04-29). The sandbox is ephemeral and may reset between sessions, so the freeze ritual's bootstrap step must idempotently install Go if missing. CI on a non-GitHub host needs Go available on the runner.
+
+#### Alt-2.C: Python with `py-multiformats-cid` (or equivalent)
+
+Freeze and audit scripts are Python 3 programs that import `multiformats_cid` (or `py-cid`, or `multiformats`). Python 3 is preinstalled on essentially every modern dev environment.
+
+- **Easier:** Python is available everywhere, including the bot's sandbox by default (no install step). Verified 2026-04-29: `pip install py-multiformats-cid` works and produces a CID that matches the Go reference exactly for the same byte input. The library handles the multihash + multibase + codec wrap correctly. Scripts are short, readable, and unit-testable.
+- **Harder:** adds a Python dependency for a repo that otherwise has no Python footprint and is otherwise Go-shaped (the wider PromiseGrid project is Go). The chosen library must itself be pinned (with a hash, ideally) because pip dependencies drift. Library quality varies — `py-multiformats-cid` works but is less mainstream than the Go reference; if it bitrots, the repo has to migrate. Conflicts with Steve's stated language preference (Go).
+
+#### Alt-2.D: Go primary, Python cross-check (belt and suspenders)
+
+Freeze and audit are Go programs (Alt-2.B). On developer machines that happen to have Python with `py-multiformats-cid` installed, an optional `tools/cross-check-cid.py` script can be run as a sanity test that reproduces the same CID for a given file. The Python cross-check is not part of the protocol; it's a manually-invoked second opinion that lets a developer catch a hypothetical bug in the Go library by comparing against an independent implementation.
+
+- **Easier:** combines Steve's preferred language (Go) on the critical path with a free independent-implementation check. Catches library bugs the way two independent witnesses catch testimony bugs.
+- **Harder:** redundant for a mature library like `go-cid`. Adds a Python dependency that is rarely exercised, which means it bitrots between exercises. For the scale this repo will reach (~10 specs over its lifetime), the cross-check is unlikely to ever fire.
 
 ### DF-22.3: Freezing mechanic
 
@@ -260,19 +294,21 @@ S6 verdict: chain-of-custody is the manifest's job. Alt-4.D shines here because 
 
 Across S1-S6, a coherent recommended set emerges:
 
-- **DF-22.1:** **Alt-1.D — raw bytes + machine-checked formatter.** The formatter is locked into `tools/freeze-spec.sh` and `tools/check-spec-format.sh`. Raw-byte hashing keeps the verification trivial (any CIDv1-aware tool reproduces the hash from the file as-is); the formatter eliminates editor-style flapping. Rejected: Alt-1.A is too fragile across editors; Alt-1.B silently diverges if normalization rules differ between operators; Alt-1.C is a parsing project we don't need yet. CIDv1 parameter set: `multibase=base32`, `multihash=sha2-256`, `codec=raw` (the spec is a byte stream). These three parameters are pinned in `specs/MANIFEST.md`.
+- **DF-22.1:** **Alt-1.D — raw bytes + machine-checked formatter.** The formatter is locked into the freeze and audit tools. Raw-byte hashing keeps the verification trivial (any CIDv1-aware tool reproduces the hash from the file as-is); the formatter eliminates editor-style flapping. Rejected: Alt-1.A is too fragile across editors; Alt-1.B silently diverges if normalization rules differ between operators; Alt-1.C is a parsing project we don't need yet. CIDv1 parameter set: `multibase=base32`, `multihash=sha2-256`, `codec=raw` (the spec is a byte stream). These three parameters are pinned in `specs/MANIFEST.md`.
+
+- **DF-22.2:** **Alt-2.B — Go using `github.com/ipfs/go-cid`.** The freeze and audit programs are Go (`tools/freeze-spec/main.go`, `tools/check-spec-format/main.go`). Go is Steve's stated language preference and matches the wider PromiseGrid Go ecosystem (`grid-poc`). The library is the canonical CIDv1 reference; correctness is inherited rather than re-derived. The bot's sandbox installs Go on demand via `sudo apt-get install -y golang`; the freeze script's bootstrap is idempotent so sandbox resets do not break the ritual. Rejected: Alt-2.A (bash) is brittle for byte-level multihash assembly; Alt-2.C (Python) conflicts with stated language preference and adds a non-Go dependency to a Go-shaped project; Alt-2.D (cross-check) is unlikely to fire at this scale and bitrots between exercises.
 
 - **DF-22.3:** **Alt-3.D — snapshot file + manifest entry, no git tag.** Snapshot file is the human-readable pointer (filename encodes pCID); manifest entry is the machine-readable record. Skip git tags: they duplicate the manifest's job, complicate the freeze ritual, and add a host-side concept that's confusing for readers who expect tags to mean "release." Rejected: Alt-3.A loses chain-of-custody (S6); Alt-3.B hides the frozen content behind tags (poor for browse-the-repo readers); Alt-3.C is double-bookkeeping with no clear win.
 
 - **DF-22.4:** **Alt-4.D — single Markdown file with fenced YAML inside.** Prose at top explains what the manifest is; one fenced ```yaml block carries the structured per-spec entries (pCID, slug, status, frozen-on, supersedes, superseded-by, depends-on, freezing-commit, notes). Tooling reads the YAML block; humans read the whole file. Rejected: Alt-4.A is too brittle for machine parsing as the manifest grows; Alt-4.B distorts the document shape; Alt-4.C requires two-file sync.
 
-- **DF-22.5:** **Alt-5.D — manual ritual via `tools/freeze-spec.sh` + scheduled CI audit.** Humans (and bots-acting-as-humans) decide when to freeze. CI's only role is to fail loudly if the manifest, the on-disk frozen files, and the cross-references disagree. Rejected: Alt-5.A alone is fine but skips the safety net; Alt-5.B over-freezes typo commits; Alt-5.C is host-bound. Alt-5.D matches the bot's "avoid GitHub lockin" rule because the audit is a script that can run anywhere; the trigger half (manual) doesn't need CI at all.
+- **DF-22.5:** **Alt-5.D — manual ritual + scheduled CI audit.** Humans (and bots-acting-as-humans) run `go run ./tools/freeze-spec <slug>` (or a built binary) when they decide a draft is freeze-worthy. CI's only role is to fail loudly if the manifest, the on-disk frozen files, and the cross-references disagree. Rejected: Alt-5.A alone is fine but skips the safety net; Alt-5.B over-freezes typo commits; Alt-5.C is host-bound. Alt-5.D matches the bot's "avoid GitHub lockin" rule because the audit is a Go program that can run anywhere with a Go toolchain; the trigger half (manual) doesn't need CI at all.
 
-The recommended set is therefore **(1.D, 3.D, 4.D, 5.D)** — a four-D answer, abbreviated as **all-D**.
+The full recommended set across the five DFs is **(1.d, 2.b, 3.d, 4.d, 5.d)** — four D answers and one B. Across the four original DFs, all-D wins; the addition of DF-22.2 (tooling language) introduces the one B because the canonical CIDv1 reference happens to live in the Go ecosystem (and Steve's stated language preference happens to be Go).
 
 ### Implications
 
-- **Two-tool pair in `tools/`.** `tools/freeze-spec.sh` formats the draft, computes the CIDv1, copies to `specs/<slug>-{cidv1}.md`, appends a manifest entry, stages a commit. `tools/check-spec-format.sh` verifies that all draft files match the formatter's output (used in CI audit). Both scripts pin the formatter version and the CIDv1 parameters.
+- **Two-program pair in `tools/`.** `tools/freeze-spec/` is a Go module: it formats the draft, computes the CIDv1 via `github.com/ipfs/go-cid`, copies to `specs/<slug>-{cidv1}.md`, appends a manifest entry, stages a commit. `tools/check-spec-format/` is a sibling Go module used by the CI audit: it verifies that all draft files match the formatter's output, that every frozen file has a manifest entry and vice versa, and that every cross-reference cites a frozen pCID. Both programs pin the formatter version and the CIDv1 parameters as Go constants. A thin `tools/freeze-spec.sh` wrapper may exist purely as an ergonomic shim that runs `go run ./tools/freeze-spec "$@"` with the right working directory; it carries no logic of its own.
 
 - **Three-state status field per spec entry.** Each manifest entry has `status: frozen | superseded | draft-ahead` (where "draft-ahead" means the draft has changed beyond this frozen version but no new freeze has been issued). This is the simplest status model that captures S2, S4, and S6.
 
@@ -299,6 +335,13 @@ DF-22.1: Hash input.
 - (c) Alt-1.C — abstract syntax (parsed Markdown AST canonical form).
 - (d) Alt-1.D — raw bytes + machine-checked formatter (recommended).
 
+DF-22.2: Tooling language.
+
+- (a) Alt-2.A — pure bash + sha256sum + base32 + xxd.
+- (b) Alt-2.B — Go (canonical `github.com/ipfs/go-cid`) (recommended; matches Steve's stated language preference and the wider PromiseGrid Go ecosystem).
+- (c) Alt-2.C — Python with `py-multiformats-cid`.
+- (d) Alt-2.D — Go primary, Python cross-check (belt and suspenders).
+
 DF-22.3: Freezing mechanic.
 
 - (a) Alt-3.A — snapshot file only.
@@ -320,7 +363,7 @@ DF-22.5: Freezing trigger.
 - (c) Alt-5.C — chat-or-PR command (`/freeze <slug>`).
 - (d) Alt-5.D — manual ritual + scheduled CI audit (recommended).
 
-The recommended set is **all-D: (1.d, 3.d, 4.d, 5.d)**. Reason: each D answer is the choice that (i) survives migration off GitHub, (ii) keeps the freeze act deliberate and auditable, and (iii) makes the manifest a machine-walkable structure rather than just a human convenience.
+The recommended set is **all-D except 2.b: (1.d, 2.b, 3.d, 4.d, 5.d)**. The four D answers survive migration off GitHub, keep the freeze act deliberate and auditable, and make the manifest a machine-walkable structure rather than just a human convenience. The B answer for tooling language is Go using the canonical `github.com/ipfs/go-cid` library: it matches Steve's stated language preference, aligns with the wider PromiseGrid Go ecosystem (`grid-poc`), and uses the audited reference implementation rather than a less-mainstream port. The bot's sandbox can `sudo apt-get install -y golang` on demand, so bot-side execution is not a blocker; the freeze ritual will include the install step idempotently.
 
 Already-locked decisions, not under DF in this TE (carried from chat 2026-04-29):
 
@@ -331,13 +374,18 @@ Already-locked decisions, not under DF in this TE (carried from chat 2026-04-29)
 
 ## Decision status
 
-`needs DF` — awaiting Steve's choice on DF-22.1, DF-22.3, DF-22.4, DF-22.5. After DF, the locked decisions become DI entries in a new TODO file (TODO number to be assigned when DF lands).
+`needs DF` — awaiting Steve's choice on DF-22.1, DF-22.2, DF-22.3, DF-22.4, DF-22.5. After DF, the locked decisions become DI entries in a new TODO file (TODO number to be assigned when DF lands).
+
+Amendment history:
+
+- 2026-04-29 (initial): TE drafted with four DFs (hash input, freezing mechanic, manifest format, freezing trigger).
+- 2026-04-29 (amendment): DF-22.2 (tooling language) added after the bot verified that pure-bash CIDv1 is brittle. The original DFs assumed `tools/freeze-spec.sh` was a bash script; that assumption is now itself under DF. The bot initially mis-reported Go as unavailable, then corrected itself after testing that passwordless `sudo` lets it install Go 1.24 and that `github.com/ipfs/go-cid` produces the canonical CID for the test vector `"hello world\n"` matching `py-multiformats-cid`. Recommendation reflects Steve's stated Go preference (chat 2026-04-29).
 
 ## Implications for follow-on work
 
-- **TODO 011 (provisional, after DF):** Migrate `harness-spec.md` to `specs/harness-spec-draft.md`. Mint the genesis pCID. Add `specs/MANIFEST.md`. Add `tools/freeze-spec.sh` and `tools/check-spec-format.sh`. Update all in-repo references to the harness-spec path. This is the genesis-freeze ritual, executed once.
+- **TODO 011 (provisional, after DF):** Migrate `harness-spec.md` to `specs/harness-spec-draft.md`. Mint the genesis pCID. Add `specs/MANIFEST.md`. Add `tools/freeze-spec/` and `tools/check-spec-format/` Go modules. Update all in-repo references to the harness-spec path. This is the genesis-freeze ritual, executed once.
 
-- **TODO 012 (provisional, after DF):** Add the CI audit step (`tools/check-spec-format.sh` + manifest-vs-disk consistency check + cross-ref-citation lint). The audit runs on every push to ppx/main and main; failures block the merge. The audit script is a single shell+Python(or jq) program in `tools/`.
+- **TODO 012 (provisional, after DF):** Add the CI audit step: `go run ./tools/check-spec-format` performs the format check + manifest-vs-disk consistency check + cross-ref-citation lint. The audit runs on every push to ppx/main and main; failures block the merge. Because the audit is a Go program, it runs identically under GitHub Actions, a self-hosted runner, or a git pre-receive hook on a non-GitHub host.
 
 - **TODO 010 (existing):** Drives TE-21 to DI. TE-21 + TE-22 together form the spec-doc-as-promise bundle: TE-21 says what a spec doc *is*; TE-22 says how the repo handles such docs. The DI entries from both TEs should land in the same revision of `harness-spec.md`'s vocabulary section.
 
