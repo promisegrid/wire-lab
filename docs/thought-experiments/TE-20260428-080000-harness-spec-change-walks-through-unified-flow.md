@@ -8,7 +8,7 @@
 
 **Walk.**
 
-1. Elder-7 emits a prose proposal in a wire message: outer burden "I propose a change to the spec at pCID <harness-spec-v7>," inner body in English, signed.
+1. Elder-7 emits a prose proposal in a wire message: outer assertion "I propose a change to the spec at pCID <harness-spec-v7>," inner body in English, signed.
 2. Claude-A independently drafts a more thorough proposal four hours later, signs with its low-trust key.
 3. Elder-12 endorses Claude-A's. Hostile-Prober-3 contests Elder-7's. Claude-B counter-proposes a cleaner alternative (delete the run dir entirely) referencing Claude-A's by ID.
 4. Steve reads Claude-A's queue summary (the LLM disclosed its conflict-of-interest as a proposer summarizing the queue), reads all three proposals, decides Claude-B's counter-propose is best, addresses Prober-3's contest by adding one line to the change.
