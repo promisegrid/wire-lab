@@ -2,6 +2,7 @@
 
 This list is sorted by priority (not number). TODO numbers are stable; do not renumber.
 
+- [x] 008 - Merge `ppx/merge-all-20260429-164729` (`TODO/008-merge-ppx-merge-all-20260429-164729.md`)
 - [x] 001 - Perplexity Computer onboarding (`TODO/001-perplexity-computer-onboarding.md`)
 - [x] 002 - Durable review feedback as contest artifact (`TODO/002-review-feedback-as-contest-artifact.md`)
 - [x] 003 - Review reply as promise (`TODO/003-review-reply-as-promise.md`)
