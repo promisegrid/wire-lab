@@ -1,12 +1,12 @@
 # TE-1: Promise-stack ordering
 
-*Thought experiment, part of the [PromiseGrid Wire Lab](../../harness-spec.md). This file is content-addressable; its hash is its pCID.*
+*Thought experiment, part of the [PromiseGrid Wire Lab](../../specs/harness-spec-draft.md). This file is content-addressable; its hash is its pCID.*
 
 ## TE ID
 
 TE-20260427-180000
 
-(Original TE-1 from `harness-spec.md` v2; first drafted at the time of v2 creation. Expanded into full scenario form on 2026-04-28 by the bot.)
+(Original TE-1 from `specs/harness-spec-draft.md` v2; first drafted at the time of v2 creation. Expanded into full scenario form on 2026-04-28 by the bot.)
 
 ## Decision under test
 
@@ -21,7 +21,7 @@ D1 and D2 are independent (encoding order and evaluation order can disagree if f
 
 ## Assumptions
 
-- The spec's `Promise` shape (§1.1 of `harness-spec.md`) is roughly right: each frame has a `promiser`, a `assertion`, optional `body`, optional `evidence`, optional `ttl`. We are not testing the shape; we are testing how a sequence of these is laid out and consumed.
+- The spec's `Promise` shape (§1.1 of `specs/harness-spec-draft.md`) is roughly right: each frame has a `promiser`, a `assertion`, optional `body`, optional `evidence`, optional `ttl`. We are not testing the shape; we are testing how a sequence of these is laid out and consumed.
 - The `promstack` library has three operations: `Wrap`, `Peel`, `Project` (§1.1).
 - A receiver is permitted to **accept**, **defer**, or **reject** each promise individually. Stack-level accept/reject is the conjunction of frame-level decisions plus a policy.
 - The transport may be a stream (TCP, TLS, Noise, in-process channel) or a datagram (UDP, capability port, hyperedge wire).
@@ -180,7 +180,7 @@ After scenario analysis:
   - `position-convention: "outermost" | "innermost" | "any"` declared in the assertion-type spec, not enforced by the wire library
 - **TE-12 (zero-knowledge promise frames):** Compatible with Alt-E — a ZK proof frame is just another promise type discovered by `Project`. The fact that it can sit anywhere in the stack is a feature.
 - **TE-13 (time-traveling break-witness):** Compatible with Alt-E — break-witnesses are critical-criticality outer frames. The "re-evaluation horizon" the TE-13 conclusion will need is not in conflict with Alt-E's peeling/projection model.
-- **§1.3 of harness-spec.md:** The four invariants (out-of-order handling, frame stripping, missing-body promises, loud failure on disagreement) all remain. This TE refines #1: out-of-order is handled by `Project`, not by attempted re-ordering at the wire level.
+- **§1.3 of specs/harness-spec-draft.md:** The four invariants (out-of-order handling, frame stripping, missing-body promises, loud failure on disagreement) all remain. This TE refines #1: out-of-order is handled by `Project`, not by attempted re-ordering at the wire level.
 - **Future work (downstream of locking this TE):**
   - DR for "criticality flag location: per-frame or per-assertion-type-spec?"
   - DR for "per-assertion-type position convention: who declares it and where?"

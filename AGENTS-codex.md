@@ -32,7 +32,7 @@ Read these files in this order before doing anything else:
      DR/DR-003-…-review-style.md                — the three DRs that
                                                   back the DIs in
                                                   TODO/001.
-  6. harness-spec.md                            — the canonical Wire Lab
+  6. specs/harness-spec-draft.md                            — the canonical Wire Lab
                                                   spec. Skim §0–§3 and
                                                   §10a; the rest is
                                                   reference.
@@ -114,7 +114,7 @@ Steps:
             alternatives, scenario analysis, conclusions, implications.
         - Verify it does not collapse to "short opinion / recommendation"
           — protocol explicitly forbids that.
-  h. For any code or harness-spec.md changes:
+  h. For any code or specs/harness-spec-draft.md changes:
         - Verify settled statements cite at least one DI ID.
         - Verify unresolved questions cite at least one DR ID.
         - Run a comment-delta audit on each touched file:
@@ -162,7 +162,7 @@ Steps:
   a. Determine if this is trivial or non-trivial.
 
      Trivial      = typo, broken link, formatting, no semantic change.
-     Non-trivial  = anything that touches harness-spec.md semantics,
+     Non-trivial  = anything that touches specs/harness-spec-draft.md semantics,
                     introduces a new concept, commits to an
                     implementation choice, or adds new files.
 

@@ -1,6 +1,6 @@
 # TE-21: Spec doc as promise
 
-*Thought experiment, part of the [PromiseGrid Wire Lab](../../harness-spec.md). This file is content-addressable; its hash is its pCID.*
+*Thought experiment, part of the [PromiseGrid Wire Lab](../../specs/harness-spec-draft.md). This file is content-addressable; its hash is its pCID.*
 
 ## TE ID
 
@@ -12,20 +12,20 @@ TE-20260429-173520
 
 In promise-theoretic terms, what *is* a wire-protocol spec document? Specifically: what kind of speech act does a spec doc perform, what is its promiser, what is its promisee, what is the temporal shape of the promise it encodes, and what are the implications for which content belongs in the spec versus outside it?
 
-This question is upstream of every other vocabulary and pCID question in this repo. If `pCID` is the content hash of "a spec document that defines a wire protocol" (per `harness-spec.md` §1's pCID note), then the nature of *spec document* is the load-bearing concept. Pinning down what a spec doc is determines:
+This question is upstream of every other vocabulary and pCID question in this repo. If `pCID` is the content hash of "a spec document that defines a wire protocol" (per `specs/harness-spec-draft.md` §1's pCID note), then the nature of *spec document* is the load-bearing concept. Pinning down what a spec doc is determines:
 
 - What content belongs inside the hashed file (and therefore changes the pCID when it changes).
 - What content belongs outside in a separate workshop/archaeology artifact (DR, TE, TODO).
 - Whether a spec doc with a §11-shaped open-questions section is "complete" or "incomplete" as a promise.
-- Whether `harness-spec.md` should be promoted into a sibling-protocol doc store with one pCID, or remain a single workshop doc that carries an embedded protocol.
+- Whether `specs/harness-spec-draft.md` should be promoted into a sibling-protocol doc store with one pCID, or remain a single workshop doc that carries an embedded protocol.
 
 ## Assumptions
 
-- A `Promise` (in this repo's vocabulary, per `harness-spec.md` §1.1 and the `assertion` rename) is an autonomous speech act by an agent: an assertion of state in the past, present, or future, often conditional. The cleanest examples in this repo: "I will deliver this byte stream"; "I attest authorship of this content"; "I promise that I, Steve, will accept revised work after named conditions are met."
+- A `Promise` (in this repo's vocabulary, per `specs/harness-spec-draft.md` §1.1 and the `assertion` rename) is an autonomous speech act by an agent: an assertion of state in the past, present, or future, often conditional. The cleanest examples in this repo: "I will deliver this byte stream"; "I attest authorship of this content"; "I promise that I, Steve, will accept revised work after named conditions are met."
 - A `pCID` is the content hash of a spec document. Two parties claim to "speak protocol pCID X" when they each implement the rules in the document whose hash is X.
 - The Wire Lab is a long-lived design environment, not a one-shot RFC. Open questions, assumptions, and known weaknesses persist throughout the life of any spec because no spec is ever truly finished — only frozen at a hash.
 - Steve's framing, surfaced in chat 2026-04-29: "a protocol spec is a prediction (an assertion of future state, a promise that the protocol will work as designed). Not listing assumptions and known issues is an incomplete promise."
-- This TE is a vocabulary/philosophy artifact. It does not propose moving `harness-spec.md` to a different directory or splitting it into multiple files. Layout questions are deferred to a follow-on TE.
+- This TE is a vocabulary/philosophy artifact. It does not propose moving `specs/harness-spec-draft.md` to a different directory or splitting it into multiple files. Layout questions are deferred to a follow-on TE.
 
 ## Alternatives
 
@@ -88,7 +88,7 @@ The two promises stack: doc-level "the protocol works as designed" plus peer-lev
 - **Promisee:** two layers (the doc promises to readers; the implementer promises to other peers).
 - **Temporal shape:** doc-level is prediction about future; peer-level is commitment about future.
 - **Open-questions section:** part of the doc-level promise. Because the doc lists its assumptions, peer-level adoption can cite them ("I implement pCID X; I rely on assumption A1 staying true"). This makes silent divergence visible: a peer that violates A1 can be flagged.
-- **Easier:** captures both the doc-as-agent insight and the implementer-makes-a-promise insight. Both feel right; both are described in different parts of `harness-spec.md`.
+- **Easier:** captures both the doc-as-agent insight and the implementer-makes-a-promise insight. Both feel right; both are described in different parts of `specs/harness-spec-draft.md`.
 - **Harder:** more conceptual machinery; two layers means more vocabulary to track. Worth the cost only if the layered structure produces real downstream payoff.
 
 ## Scenarios
@@ -195,7 +195,7 @@ The conclusion implies several things about how this repo handles spec docs.
 
 - **Therefore: a spec doc with no assumptions list, no open-questions list, and no known-issues list is making a stronger promise than it can keep.** Either those lists are empty (rare, only true after long maturation) or omitting them makes the spec dishonest. The honest move is to write the lists explicitly, even when they say "we don't yet know X."
 
-- **`harness-spec.md` is healthy under this framing.** Its §11 open-questions section is not pollution of the spec; it is part of the spec's promise. Promoting `harness-spec.md` into a sibling-protocol doc store does not require splitting workshop content from protocol content, because workshop content (assumptions, open questions, known issues) IS protocol content under Alt-E.
+- **`specs/harness-spec-draft.md` is healthy under this framing.** Its §11 open-questions section is not pollution of the spec; it is part of the spec's promise. Promoting `specs/harness-spec-draft.md` into a sibling-protocol doc store does not require splitting workshop content from protocol content, because workshop content (assumptions, open questions, known issues) IS protocol content under Alt-E.
 
 - **Each peer's adoption is a separate Alt-C promise.** When a peer claims to speak pCID X, the peer is promising "I will behave as the doc with hash X says I will." That promise can additionally cite which choices the peer made for any open questions in X. Peer-level adoption metadata is a real artifact worth designing.
 
@@ -219,10 +219,10 @@ DF-21.3: When a peer adopts a spec, is the peer's choice of answers to open ques
 - (b) Commentary only. Peers' answer choices are private; mismatches surface only when they cause concrete interop failures.
 - (c) Required as commentary, optional as structured metadata; structure is a future enhancement.
 
-DF-21.4: Does this TE imply any rename or restructure of `harness-spec.md` itself?
+DF-21.4: Does this TE imply any rename or restructure of `specs/harness-spec-draft.md` itself?
 
-- (a) No (recommended). `harness-spec.md` is already shaped consistently with Alt-E; the TE clarifies what was implicit, but the file's content and location are fine. Layout questions (sibling-protocol doc store, file naming) are a separate TE.
-- (b) Yes — `harness-spec.md` should be renamed to make its protocol-doc nature more obvious (e.g., `specs/wire-lab-spec.md`).
+- (a) No (recommended). `specs/harness-spec-draft.md` is already shaped consistently with Alt-E; the TE clarifies what was implicit, but the file's content and location are fine. Layout questions (sibling-protocol doc store, file naming) are a separate TE.
+- (b) Yes — `specs/harness-spec-draft.md` should be renamed to make its protocol-doc nature more obvious (e.g., `specs/wire-lab-spec.md`).
 - (c) Yes — the §11 open-questions section should be relocated or restructured to make its normative role obvious.
 
 The recommended set is (1.a, 2.a, 3.a, 4.a). Reason: lock the layered framing fully, make the three lists structural, give peer-level adoption first-class promise machinery, and defer layout questions to a follow-on TE.
@@ -233,6 +233,6 @@ The recommended set is (1.a, 2.a, 3.a, 4.a). Reason: lock the layered framing fu
 
 ## Implications for follow-on work
 
-- **TODO 010 (provisional, after DF):** Lock the spec-doc-as-promise vocabulary as DI entries. Update `harness-spec.md` to add (or formalize) the three normative sections: Assumptions, Open Questions, Known Issues. Surface them as required structure for any future sibling spec docs.
-- **TE-22 (planned):** Spec-doc-store layout — should sibling protocol docs live in a `specs/` directory? How do specs reference each other by pCID? Does `harness-spec.md` itself migrate? Deferred until TE-21 lands so the vocabulary is settled before the layout work.
-- **TODO 006 (existing):** DI-provenance backfill for `harness-spec.md` settled statements. The Alt-E framing reshapes this work: settled statements need DI provenance because they're load-bearing parts of the doc's promise; open questions need DR provenance for the same reason. The two existing TODOs (006 and 007) become two halves of "make the doc-level promise explicit and audit-able."
+- **TODO 010 (provisional, after DF):** Lock the spec-doc-as-promise vocabulary as DI entries. Update `specs/harness-spec-draft.md` to add (or formalize) the three normative sections: Assumptions, Open Questions, Known Issues. Surface them as required structure for any future sibling spec docs.
+- **TE-22 (planned):** Spec-doc-store layout — should sibling protocol docs live in a `specs/` directory? How do specs reference each other by pCID? Does `specs/harness-spec-draft.md` itself migrate? Deferred until TE-21 lands so the vocabulary is settled before the layout work.
+- **TODO 006 (existing):** DI-provenance backfill for `specs/harness-spec-draft.md` settled statements. The Alt-E framing reshapes this work: settled statements need DI provenance because they're load-bearing parts of the doc's promise; open questions need DR provenance for the same reason. The two existing TODOs (006 and 007) become two halves of "make the doc-level promise explicit and audit-able."

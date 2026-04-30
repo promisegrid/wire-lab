@@ -1,6 +1,6 @@
 # TE-14: A harness-spec change walks through the unified flow
 
-*Thought experiment, part of the [PromiseGrid Wire Lab](../../harness-spec.md). This file is content-addressable; its hash is its pCID.*
+*Thought experiment, part of the [PromiseGrid Wire Lab](../../specs/harness-spec-draft.md). This file is content-addressable; its hash is its pCID.*
 
 **Purpose.** Stress-test whether the single-flow design (§10a) holds up when the proposal targets the harness spec itself. Walked through end-to-end on 2026-04-28; full trace lives in `thought-experiments/TE-14-harness-spec-walkthrough.md` once split out, summary here.
 

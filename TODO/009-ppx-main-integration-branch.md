@@ -27,7 +27,7 @@ Date: 2026-04-29 17:33:59
 Status: active
 Author: stevegt@t7a.org (Steve Traugott)
 Decision: `pCID` is the abbreviation for "Protocol CID", not "Promise Content ID". A pCID is the content hash of a spec document that defines a wire protocol; it is analogous to a TCP/UDP port number but with no central registry, because the spec's hash IS the port number. A pCID is NOT the hash of any particular message, payload, or promise body.
-Intent: Lock the canonical definition so that future docs and bot output do not drift back to the old "Promise Content ID" gloss. The harness-spec.md \u00a71 note already carries this definition; AGENTS-ppx.md glossary previously used the wrong gloss and is now corrected.
+Intent: Lock the canonical definition so that future docs and bot output do not drift back to the old "Promise Content ID" gloss. The specs/harness-spec-draft.md \u00a71 note already carries this definition; AGENTS-ppx.md glossary previously used the wrong gloss and is now corrected.
 Constraints: Future references to `pCID` in any artifact (docs, TEs, DRs, commit messages, chat) must use the "Protocol CID" form. The bot must not write "Promise CID" or "Promise Content ID" anywhere.
 Affects: `AGENTS-ppx.md` glossary; future documentation that defines `pCID`; bot's vocabulary use in chat and commits.
 Linked DR: none (chat-directed correction; same status as DI-004 burden\u2192assertion).

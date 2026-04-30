@@ -1,6 +1,6 @@
 # TE-20: Bot review style
 
-*Thought experiment, part of the [PromiseGrid Wire Lab](../../harness-spec.md). This file is content-addressable; its hash is its pCID.*
+*Thought experiment, part of the [PromiseGrid Wire Lab](../../specs/harness-spec-draft.md). This file is content-addressable; its hash is its pCID.*
 
 ## TE ID
 
@@ -17,7 +17,7 @@ How should the bot's proposal-and-review ceremony be shaped so that the decision
 - The bot pushes to `ppx/{twig}` branches; Steve merges to `main`.
 - Branch protection is Alt-B from TE-19 (no GitHub PR requirement).
 - PromiseGrid is the long-term substrate; the workflow must port to it cleanly.
-- `harness-spec.md` already defines DR/DI as the in-repo record format.
+- `specs/harness-spec-draft.md` already defines DR/DI as the in-repo record format.
 
 ## Alternatives
 
