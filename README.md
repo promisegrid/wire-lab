@@ -9,6 +9,10 @@ The harness exists to **discover** the right design, not to validate a predeterm
 - **[`specs/harness-spec-draft.md`](specs/harness-spec-draft.md)** — the canonical spec. This is the single document the simulator, the production code generators, and human reviewers all key off. Its content hash is its pCID.
 - **[`docs/thought-experiments/`](docs/thought-experiments/)** — one file per thought experiment, each content-addressable and standing alone. The harness-spec links into them; the [index](docs/thought-experiments/README.md) lists them in chronological order.
 
+## Branch layout
+
+At the moment, the `ppx/main` branch is the active development branch, and the `main` branch is a review branch. The `ppx/main` branch contains the latest code and documentation.
+
 ## Status
 
 Provisional. Almost everything in the harness-spec is an experimental knob, not a commitment. The single load-bearing structural decision is that the canonical pointer to the harness-spec is whatever pCID Steve has most recently signed a `merge-harness-spec` promise for — the lock is the key, not a document.
