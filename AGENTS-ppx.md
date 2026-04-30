@@ -48,7 +48,7 @@ Read these files in this order before doing anything else:
      DR/DR-002-…-drop-require-pr.md
      DR/DR-003-…-review-style.md                — the three DRs that
                                                   back the DIs above.
-  7. harness-spec.md                            — the canonical Wire Lab
+  7. specs/harness-spec-draft.md                            — the canonical Wire Lab
                                                   spec.
   8. docs/thought-experiments/README.md         — TE index and filename
                                                   convention.
@@ -97,7 +97,7 @@ For Steve it is `Steve Traugott`.
                             as Steve) pushes here. You NEVER push here.
                             (Enforced today by GitHub branch protection;
                             in the long-run by PromiseGrid signing-key
-                            semantics — see harness-spec.md §10a.8.)
+                            semantics — see specs/harness-spec-draft.md §10a.8.)
 - ppx/main                : long-lived bot integration branch. You
                             merge `ppx/{twig}` working branches into
                             here, then push `ppx/main` to origin. Steve
@@ -153,7 +153,7 @@ Steps:
   b. Decide whether the task is trivial or non-trivial.
 
      Trivial      = typo, broken link, formatting, no semantic change.
-     Non-trivial  = anything that touches harness-spec.md semantics,
+     Non-trivial  = anything that touches specs/harness-spec-draft.md semantics,
                     introduces a new concept, commits to an
                     implementation choice, or adds new files (other
                     than docs that obviously belong to an existing DI).
@@ -190,7 +190,7 @@ Steps:
   f. For any non-trivial behavior change in code, add a comment:
         // Intent: <rationale>
         // Source: DI-NNN-YYYYMMDD-HHMMSS
-     For non-code (e.g., harness-spec.md), include a sentence-level
+     For non-code (e.g., specs/harness-spec-draft.md), include a sentence-level
      citation in prose: "(see DI-NNN-YYYYMMDD-HHMMSS)" or similar.
 
   g. Settled statements in docs must cite at least one DI ID. Open
@@ -308,7 +308,7 @@ Steps:
 ## Kind 4: open a DR without implementation
 
 Trigger: an open question surfaces that Steve hasn't decided, or you
-realize a settled statement in `harness-spec.md` lacks DI provenance.
+realize a settled statement in `specs/harness-spec-draft.md` lacks DI provenance.
 
 Steps:
   a. Make sure `ppx/main` is current (Kind 1 step a).
@@ -383,7 +383,7 @@ explicitly, don't omit.
 
 Stop and ask Steve as a multiple-choice question. The protocol prefers
 an extra round of clarification over a wrong commit. The bot's default
-trust per `harness-spec.md` is intentionally low (~0.05 of a human
+trust per `specs/harness-spec-draft.md` is intentionally low (~0.05 of a human
 elder); behave accordingly.
 
 # Identifying yourself in chat

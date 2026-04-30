@@ -1,6 +1,6 @@
 # TE-15: Should this design become `promisegrid/promisegrid/README.md`?
 
-*Thought experiment, part of the [PromiseGrid Wire Lab](../../harness-spec.md). This file is content-addressable; its hash is its pCID.*
+*Thought experiment, part of the [PromiseGrid Wire Lab](../../specs/harness-spec-draft.md). This file is content-addressable; its hash is its pCID.*
 
 **Purpose.** Decide whether the Wire Lab harness specification should eventually replace, augment, or be linked from the canonical PromiseGrid org-level README at [github.com/promisegrid/promisegrid](https://github.com/promisegrid/promisegrid). Run on 2026-04-28 with the actual current README in front of us.
 

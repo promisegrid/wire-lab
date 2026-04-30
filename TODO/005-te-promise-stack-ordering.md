@@ -9,7 +9,7 @@ Track the work to drive TE-1 (`docs/thought-experiments/TE-20260427-180000-promi
 - [ ] 005.3 Steve answers DF-1.3 (wire-encoding direction: outermost-first vs. innermost-first). Recommended: 1.3.a (outermost-first).
 - [ ] 005.4 Steve answers DF-1.4 (position-convention authority: who declares whether an assertion-type has a normative position). Recommended: 1.4.d (per-assertion-type — each assertion's spec declares it).
 - [ ] 005.5 Once 005.1-005.4 land, write a DI for each into this file.
-- [ ] 005.6 Update `harness-spec.md` §1.1 to reference the locked DIs and the position-convention rule.
+- [ ] 005.6 Update `specs/harness-spec-draft.md` §1.1 to reference the locked DIs and the position-convention rule.
 - [ ] 005.7 Update `DR/DR-006-20260429-164729-promise-stack-ordering.md` from `open` to `decided`.
 
 ## Decision Intent Log

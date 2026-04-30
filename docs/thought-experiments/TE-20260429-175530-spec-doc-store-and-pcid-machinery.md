@@ -1,6 +1,6 @@
 # TE-22: Spec-doc store layout and pCID machinery
 
-*Thought experiment, part of the [PromiseGrid Wire Lab](../../harness-spec.md). This file is content-addressable; its hash is its pCID.*
+*Thought experiment, part of the [PromiseGrid Wire Lab](../../specs/harness-spec-draft.md). This file is content-addressable; its hash is its pCID.*
 
 ## TE ID
 
@@ -32,9 +32,9 @@ This TE is the operational follow-on to TE-21. TE-21 said *what a spec doc is* (
 ## Assumptions
 
 - A `Promise` in this repo is an autonomous speech act — an assertion of state in the past, present, or future, often conditional. (Carried from TE-21.)
-- A `pCID` is a CIDv1 hash of a spec document's bytes. Two parties claim to "speak protocol pCID X" when each implements the rules in the document whose CIDv1 is X. (Carried from harness-spec.md §1 and TE-21.)
+- A `pCID` is a CIDv1 hash of a spec document's bytes. Two parties claim to "speak protocol pCID X" when each implements the rules in the document whose CIDv1 is X. (Carried from specs/harness-spec-draft.md §1 and TE-21.)
 - A spec doc is a layered promise (TE-21 Alt-E): the doc itself promises future interop conditional on its assumptions/open-questions/known-issues lists, and each peer separately promises to behave as the doc says.
-- The Wire Lab has, today, exactly one spec doc (`harness-spec.md`). It will likely grow to ~3-10 sibling spec docs over the lifetime of this repo (frame format, trust ledger, currency, eval rules, capability tokens, etc.). It will not grow to hundreds. Operational machinery should suit "a handful of long-lived spec families," not "an RFC index of thousands."
+- The Wire Lab has, today, exactly one spec doc (`specs/harness-spec-draft.md`). It will likely grow to ~3-10 sibling spec docs over the lifetime of this repo (frame format, trust ledger, currency, eval rules, capability tokens, etc.). It will not grow to hundreds. Operational machinery should suit "a handful of long-lived spec families," not "an RFC index of thousands."
 - The repo runs in git on GitHub today, but the design is meant to survive migration off GitHub. Anything that depends on GitHub-only features (Releases, Actions, Pages, branch protection) is a hazard for that migration.
 - pCID-as-port-number means peers MUST be able to compute the pCID of any given spec file with no out-of-band agreement other than "use CIDv1 with parameters P." That parameter set must itself be pinned somewhere in the repo.
 - "Frozen" means immutable on disk: a spec file whose content matches its filename's pCID will never be edited again. Edits move the content into a new draft and produce a new frozen file with a new pCID; the old file remains as historical evidence.
@@ -213,14 +213,14 @@ Six scenarios, each played against the alternatives. The bookkeeping convention 
 
 ### S1 (genesis): freezing the first spec
 
-Today: `harness-spec.md` is the only spec doc. It exists at the repo root, not under `specs/`. We want to mint its first pCID.
+Today: `specs/harness-spec-draft.md` is the only spec doc. It exists at the repo root, not under `specs/`. We want to mint its first pCID.
 
 Steps under the locked layout (flat, draft + frozen side-by-side):
-1. Move (or copy) `harness-spec.md` to `specs/harness-spec-draft.md`.
+1. Move (or copy) `specs/harness-spec-draft.md` to `specs/harness-spec-draft.md`.
 2. Compute pCID per DF-22.1.
 3. Freeze per DF-22.3 → produce `specs/harness-spec-{cidv1}.md`.
 4. Update manifest per DF-22.4.
-5. Update all in-repo references to `harness-spec.md` to point at the new path(s).
+5. Update all in-repo references to `specs/harness-spec-draft.md` to point at the new path(s).
 
 - **DF-22.1:** Alt-1.A (raw bytes) or Alt-1.D (raw bytes + formatter) both work; Alt-1.B requires committing to normalization rules; Alt-1.C is overkill for one file. Alt-1.D is the most robust without becoming a parsing project.
 - **DF-22.3:** Alt-3.A (snapshot only) or Alt-3.D (snapshot + manifest) both work; the latter is needed to make the manifest meaningful.
@@ -320,7 +320,7 @@ The full recommended set across the five DFs is **(1.d, 2.b, 3.d, 4.d, 5.d)** �
 
 - **Strict-draft cross-refs are honored by lint.** A draft file's cross-reference to another spec MUST cite a frozen pCID. CI audit script greps for cross-spec citations in `specs/*-draft.md` and verifies each cited pCID exists in the manifest as a frozen (or superseded) entry. A draft citing another draft fails the audit. This forces the dependency DAG to grow only by reference to frozen artifacts.
 
-- **`harness-spec.md` migrates.** Per S1, it moves to `specs/harness-spec-draft.md`. The genesis freeze produces `specs/harness-spec-{cidv1}.md`. All in-repo references to `harness-spec.md` are updated. This is a separate TODO (TODO 011 below); it is NOT included in this TE's commit, because the migration is a discrete, reviewable act of its own.
+- **`specs/harness-spec-draft.md` migrates.** Per S1, it moves to `specs/harness-spec-draft.md`. The genesis freeze produces `specs/harness-spec-{cidv1}.md`. All in-repo references to `specs/harness-spec-draft.md` are updated. This is a separate TODO (TODO 011 below); it is NOT included in this TE's commit, because the migration is a discrete, reviewable act of its own.
 
 - **Git tags remain available for human convenience.** The decision to skip git tags as a freeze artifact does not preclude humans from tagging meaningful commits for their own reasons (e.g., `v1-published` on the genesis-freeze commit). Such tags are not part of the protocol; they're just bookmarks.
 
@@ -390,10 +390,10 @@ Amendment history:
 
 ## Implications for follow-on work
 
-- **TODO 011 (now in progress):** DIs locked for all five DFs and the four already-decided inputs. Remaining work: implement `tools/spec/` (single Go binary with `freeze`, `check`, `cid`, `ls` subcommands), perform the genesis freeze of `harness-spec.md`, add `specs/MANIFEST.md`, wire `go run ./tools/spec check` into CI.
+- **TODO 011 (now in progress):** DIs locked for all five DFs and the four already-decided inputs. Remaining work: implement `tools/spec/` (single Go binary with `freeze`, `check`, `cid`, `ls` subcommands), perform the genesis freeze of `specs/harness-spec-draft.md`, add `specs/MANIFEST.md`, wire `go run ./tools/spec check` into CI.
 
 - **TODO 012 (provisional):** Add the CI audit step: `go run ./tools/spec check` performs format checks (advisory CRLF/BOM warnings on drafts), manifest-vs-disk consistency, cross-ref-citation lint, and self-reference lint. The audit runs on every push to ppx/main and main; failures block the merge. Because the audit is a Go program, it runs identically under GitHub Actions, a self-hosted runner, or a git pre-receive hook on a non-GitHub host.
 
-- **TODO 010 (existing):** Drives TE-21 to DI. TE-21 + TE-22 together form the spec-doc-as-promise bundle: TE-21 says what a spec doc *is*; TE-22 says how the repo handles such docs. The DI entries from both TEs should land in the same revision of `harness-spec.md`'s vocabulary section.
+- **TODO 010 (existing):** Drives TE-21 to DI. TE-21 + TE-22 together form the spec-doc-as-promise bundle: TE-21 says what a spec doc *is*; TE-22 says how the repo handles such docs. The DI entries from both TEs should land in the same revision of `specs/harness-spec-draft.md`'s vocabulary section.
 
 - **Future TE (planned):** Peer-level adoption metadata. TE-21 Alt-E said each peer's adoption is a separate promise that can name which answers it chose for open questions. TE-22 makes the doc-side machinery concrete; the peer side is still open. A follow-on TE will work out the wire-level shape of an adoption promise (likely a small structured payload referencing `pcid` + `open_question_choices: {Q7: yes, Q9: variant-B}`).

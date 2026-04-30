@@ -8,7 +8,7 @@ Each thought experiment is a falsifiable mental run of a Wire Lab design choice.
 TE-YYYYMMDD-HHMMSS-some-phrase.md
 ```
 
-The timestamp is the moment the TE was first drafted (or, for TEs that pre-date this convention, the revision of `harness-spec.md` in which they first appeared). The slug is a kebab-case rendering of the TE's title. Files are not renamed when the experiment is later refined — the timestamp pins origin, not last-edited.
+The timestamp is the moment the TE was first drafted (or, for TEs that pre-date this convention, the revision of `specs/harness-spec-draft.md` in which they first appeared). The slug is a kebab-case rendering of the TE's title. Files are not renamed when the experiment is later refined — the timestamp pins origin, not last-edited.
 
 ## Index
 
@@ -45,6 +45,6 @@ The TE numbers (TE-1, TE-2, …) are stable identifiers used in the harness-spec
 2. Pick a UTC timestamp — typically `date -u +%Y%m%d-%H%M%S`.
 3. Render the title to kebab-case for the slug.
 4. Create `TE-YYYYMMDD-HHMMSS-slug.md` in this directory.
-5. Add a one-line summary to `../../harness-spec.md` §8 with a link.
+5. Add a one-line summary to `../../specs/harness-spec-draft.md` §8 with a link.
 6. Add the row to this index.
 7. Open a PR.

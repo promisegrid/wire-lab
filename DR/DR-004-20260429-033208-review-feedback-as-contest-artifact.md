@@ -13,7 +13,7 @@ Waiting on: DI-002-20260429-033208
 ## Candidate alternatives considered
 
 - (a) Leave request-changes feedback in chat only. Fastest, but not durable, not branch-addressable in-repo, and not aligned with the proposal vocabulary.
-- (b) Write an ad hoc markdown note at the repo root on `main`. Durable, but it bypasses the queue shape emerging in `harness-spec.md` §10a.10 and will not scale when multiple proposals are pending.
+- (b) Write an ad hoc markdown note at the repo root on `main`. Durable, but it bypasses the queue shape emerging in `specs/harness-spec-draft.md` §10a.10 and will not scale when multiple proposals are pending.
 - (c) Record the feedback as a prose `contest-v1` artifact on `main` under `proposals/pending/<proposal-id>/`. Selected.
 
 ## Decision

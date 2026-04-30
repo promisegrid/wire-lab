@@ -33,7 +33,7 @@ Date: 2026-04-28 19:57:01
 Status: active
 Author: stevegt@t7a.org (Steve Traugott)
 Decision: Drop the "Require a pull request before merging" rule from the `main` branch ruleset on github.com/promisegrid/wire-lab. Keep the "Restrict who can push to matching branches → stevegt only" rule, plus "Block force pushes" and "Restrict deletions". Steve merges by direct push to `main`; the bot pushes only to `ppx/{twig}` branches.
-Intent: Avoid GitHub-specific lockin in the workflow. PromiseGrid will eventually replace GitHub as the substrate; the merge mechanism should be plain `git push` to a protected branch, not a forge-specific PR ceremony. The "only Steve can push to main" rule maps cleanly to PromiseGrid's eventual "the canonical pointer follows Steve's signing key" semantics (see `harness-spec.md` §10a.8).
+Intent: Avoid GitHub-specific lockin in the workflow. PromiseGrid will eventually replace GitHub as the substrate; the merge mechanism should be plain `git push` to a protected branch, not a forge-specific PR ceremony. The "only Steve can push to main" rule maps cleanly to PromiseGrid's eventual "the canonical pointer follows Steve's signing key" semantics (see `specs/harness-spec-draft.md` §10a.8).
 Constraints: Steve must remove the "Require PR" rule in repo Settings → Rules → Rulesets. The bot has no permission to modify rulesets (PAT scope deliberately excludes admin permissions). The bot must never attempt to push to `main` directly; only to `ppx/{twig}` branches.
 Affects: github.com/promisegrid/wire-lab branch ruleset on `main`; the bot's push targets; the convergence ceremony (no GitHub PR clicks).
 Linked DR: DR/DR-002-20260428-195700-drop-require-pr.md
