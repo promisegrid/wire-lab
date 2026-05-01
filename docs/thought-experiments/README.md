@@ -39,7 +39,8 @@ The timestamp is the moment the TE was first drafted (or, for TEs that pre-date 
 | TE-23 | 2026-04-30 06:43 | [Congruence/convergence duality and pCID framing](TE-20260430-064307-congruence-convergence-duality-and-pcid-framing.md) |
 | TE-24 | 2026-04-30 20:41 | [Repo-local `grid <pcid>` channel carrier](TE-20260430-204108-grid-pcid-channel-carrier.md) |
 | TE-25 | 2026-04-30 21:34 | [TE-21 numbering collision and harness-spec path](TE-20260430-213447-te-numbering-collision-and-harness-spec-path.md) |
-| TE-26 | 2026-04-30 21:56 | [Channel transport types, pCID-keyed channel paths, and DAG message graphs](TE-20260430-215624-channel-transport-types-and-threaded-replies.md) |
+| TE-26 | 2026-04-30 21:56 | [Transport-protocol types, pCID-keyed transport paths, and DAG message graphs](TE-20260430-215624-channel-transport-types-and-threaded-replies.md) (filename retains "channel" from original drafting; rewritten in place per TE-27) |
+| TE-27 | 2026-05-01 02:19 | [Transports rename and axes of transport-protocol differentiation](TE-20260501-021921-transports-rename-and-axes-of-differentiation.md) |
 
 The TE numbers (TE-1, TE-2, …) are stable identifiers used in the harness-spec; the timestamp slug is what makes the file content-addressable and chronologically sortable on disk.
 
