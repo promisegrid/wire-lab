@@ -10,6 +10,8 @@ This list is sorted by priority (not number). TODO numbers are stable; do not re
 - [ ] 012 - Group-transport envelope via `grid <pcid>` (`TODO/012-group-transport-envelope.md`)
 - [x] 013 - Transports carve-out: rename `channels/` -> `transports/`, split into outer transport-spec and group-transport-spec (`TODO/013-transports-carveout.md`)
 - [ ] 014 - Protocols-as-simulated-repos migration: relocate harness/group-transport specs and per-protocol TEs into `protocols/<slug>.d/` (`TODO/014-protocols-as-simulated-repos-migration.md`)
+- [ ] 018 - UDP-binding v0 reference implementation in Go, plus test vectors (`TODO/018-udp-binding-v0-reference-implementation.md`)
+- [ ] 019 - ns-3 harness scaffold for UDP-binding v0 (sibling of 018; mutually gating) (`TODO/019-ns3-harness-scaffold.md`)
 - [ ] 005 - TE-1 Promise-stack ordering: drive to DI (`TODO/005-te-promise-stack-ordering.md`)
 - [ ] 006 - Backfill DI provenance into specs/harness-spec-draft.md settled statements (`TODO/006-backfill-di-provenance-harness-spec.md`)
 - [ ] 007 - Backfill DR records for specs/harness-spec-draft.md §11 open questions (`TODO/007-backfill-dr-harness-spec-section-11.md`)
