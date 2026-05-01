@@ -339,18 +339,48 @@ OQ-29.8: **Test-harness simulation of network effects.** Does the
 wire-lab simulator also emulate loss, reordering, latency, partition?
 If yes, where does the emulation live in the directory shape? Lean:
 adversarial harness lives in `tools/` and produces test vectors that
-violate the binding's promises in controlled ways. ns-3 is a candidate
-for a more concrete iteration once protocols are prototyped (see
-OQ-29.9).
+violate the binding's promises in controlled ways. ns-3 is the
+leading candidate (see OQ-29.9 for empirical sandbox results).
 
 OQ-29.9: **External network simulator integration (ns-3, similar).**
 Once at least two binding specs and one session protocol have v0
 implementations in `tools/`, can the wire-lab harness drive ns-3 or a
 similar packet-level simulator to produce realistic loss/latency
-adversarial scenarios? Lean: yes, treat ns-3 as an external test
-fixture invoked from `tools/`, producing transport-level traces that
-get replayed through the binding layer's recv path. Worth a dedicated
-TE once we have something to test.
+adversarial scenarios?
+
+**Empirical sandbox results (added 2026-05-01, supersedes prior
+"start with tc netem" lean):** A separate session in the Perplexity
+Computer sandbox (Debian trixie, kernel 6.1.158, sudo available)
+tested every candidate from this TE. Findings:
+
+| Candidate          | Status in sandbox          | Notes                                                                       |
+|--------------------|----------------------------|-----------------------------------------------------------------------------|
+| ns-3 3.43          | **Working**                | Debian package; CMake+Ninja+pkg-config; UDP echo + PCAP smoke-tested.       |
+| `tc netem`         | **Unavailable**            | Kernel lacks `sch_netem`, `tbf`, `fq_codel` modules; only `pfifo_fast`.     |
+| Mininet 2.3.0      | Working with caveats       | Requires `PYTHONPATH=/usr/lib/python3/dist-packages`; LinuxBridge only.     |
+| netns + veth + br  | Working                    | sudo required; clean topology setup; no impairment available without netem. |
+| OMNeT++            | Not installed              | No Debian package found; would require source build.                        |
+| Shadow             | Not installed              | No usable Debian package; would require source build.                       |
+
+The practical consequence is that **packet-loss / latency / jitter
+adversarial scenarios run inside this sandbox have to live in ns-3**,
+not in `tc netem`-based emulation. Mininet remains useful for live
+topology experiments without impairment. Steve's local dev box (any
+normal Linux install) has `tc netem` and can use it; the sandbox does
+not. This is a sandbox-specific constraint, not a project-level
+recommendation reversal.
+
+Revised lean: **adopt ns-3 as the primary network-realism fixture**
+for adversarial scenarios in the wire-lab, with a small Mininet path
+for topology-only experiments. The integration shape (ns-3 emulates
+the wire; Go reference implementations run as applications above
+sockets via tap-bridge or DCE; PCAP output is post-processed into
+`transports/<wire>/<binding-pCID>/.../<msg-id>.msg` artifacts) is
+unchanged from the original lean. Worth a dedicated TE once the
+first Go binding+session implementations exist. Reference smoke-test
+artifacts from the sandbox session are recorded outside this repo;
+the wire-lab's own ns-3 scenarios will live under
+`tools/ns3-harness/` once authored.
 
 ## Reference to load-bearing constraints
 
