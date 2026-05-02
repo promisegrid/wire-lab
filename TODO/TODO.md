@@ -1,6 +1,22 @@
-# TODO Index
+# TODO Index (LEGACY: pending migration per TE-30)
 
-This list is sorted by priority (not number). TODO numbers are stable; do not renumber.
+This list is sorted by priority (not number).
+
+**This top-level integer-numbered TODO scheme is being retired.** Per
+TE-30 (`docs/thought-experiments/TE-20260502-002548-todo-numbering-and-per-protocol-shape.md`),
+the locked shape going forward is per-protocol `TODO/` subtrees inside
+each `protocols/<slug>.d/`, with timestamp-named TODO files matching
+the TE convention. The migration is delegated to TODO 014 steps 10
+and 11; once that lands, this top-level `TODO/` directory will be
+deleted in favor of:
+
+- `protocols/wire-lab.d/TODO/TODO.md` as the master cross-listed queue
+- `protocols/<slug>.d/TODO/TODO.md` as each protocol's local queue
+
+Until that migration runs, the integers below remain authoritative.
+Do not add new integer-numbered TODOs at this top level; new TODOs
+should go directly into the appropriate `protocols/<slug>.d/TODO/`
+with a timestamp filename, even before TODO 014 lands.
 
 - [x] 008 - Merge `ppx/merge-all-20260429-164729` (`TODO/008-merge-ppx-merge-all-20260429-164729.md`)
 - [x] 001 - Perplexity Computer onboarding (`TODO/001-perplexity-computer-onboarding.md`)
