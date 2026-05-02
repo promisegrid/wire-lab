@@ -31,7 +31,7 @@ How should the bot's proposal-and-review ceremony be shaped so that the decision
 
 ## Selection
 
-Alt-α as the base review style; Alt-δ as the durable-review-reply layer on top of it. The locked decision for Alt-α is `DI-001-20260428-195702` in `TODO/001-perplexity-computer-onboarding.md`, supporting DR `DR/DR-003-20260428-195700-review-style.md`. The Alt-δ layer is `DI-003-20260429-162212` / `DR-005`. Together they form the bot review ceremony in this repo.
+Alt-α as the base review style; Alt-δ as the durable-review-reply layer on top of it. The locked decision for Alt-α is `DI-001-20260428-195702` in `protocols/wire-lab.d/TODO/TODO-20260429-030146-perplexity-computer-onboarding.md`, supporting DR `DR/DR-003-20260428-195700-review-style.md`. The Alt-δ layer is `DI-003-20260429-162212` / `DR-005`. Together they form the bot review ceremony in this repo.
 
 ## Decision status
 

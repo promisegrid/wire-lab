@@ -149,8 +149,8 @@ out-of-scope items. Per TE-30, TODO 015 was retired (DR/DI directories
 never existed; harness-spec sections 11/12 already absorb decisions
 and open questions inline) and TODO 017's rename work was always
 covered by step 2 of this TODO. See
-`TODO/015-dr-todo-di-absorption-RETIRED.md` and
-`TODO/017-group-transport-rename-FOLDED.md` for the records.
+`protocols/wire-lab.d/TODO/TODO-20260501-230130-dr-todo-di-absorption-RETIRED.md` and
+`protocols/wire-lab.d/TODO/TODO-20260501-230132-group-transport-rename-FOLDED.md` for the records.
 
 ## Done when
 

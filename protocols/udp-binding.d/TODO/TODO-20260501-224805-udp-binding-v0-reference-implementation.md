@@ -16,8 +16,14 @@ abstraction defect, not just a UDP issue.
 
 ## Subtasks
 
-1. **Reference implementation** at `tools/udp-binding/` in Go (per
-   Steve's standing language preference).
+1. **Reference implementation** at
+   `implementations/go-udp-binding-reference/` in Go (per Steve's
+   standing language preference, and per TE-32 which locks B-side
+   implementation artifacts under `implementations/<impl-name>/`
+   rather than under any `protocols/<slug>.d/` subtree). The
+   implementation tree carries its own `CHANGELOG.md` recording
+   conformance claims (e.g. `claim: implements` with the upstream
+   `udp-binding-draft.md` doc-CID once frozen).
 
    - `Send(msg []byte, addr Addr) error` honoring promises 1, 2, 3,
      and 7 of the spec (one datagram per message, 1232 max, no
@@ -60,7 +66,7 @@ abstraction defect, not just a UDP issue.
 5. **TODO 019 — ns-3 harness scaffold for UDP-binding v0.** A
    minimal 2-node ns-3 scenario that proves round-trip works through
    the Go reference implementation talking over an ns-3-emulated
-   UDP wire. See `TODO/019-ns3-harness-scaffold.md` for full
+   UDP wire. See `protocols/wire-lab.d/TODO/TODO-20260501-224806-ns3-harness-scaffold.md` for full
    subtasks. Tracked as a sibling TODO rather than a subtask of this
    one because the scaffold has its own follow-on lifecycle (loss
    scenarios, multi-binding scenarios) that long outlives the v0

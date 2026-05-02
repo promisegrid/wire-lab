@@ -34,8 +34,18 @@ of the scaffold; they are TODO 020+ once the integration is solid.
 
 ## Scaffold layout
 
+Per TE-32, this scaffold is a B-side artifact and lives under the
+new top-level `implementations/` directory rather than under
+`tools/`. The wire-lab harness has both an A-side (design tree at
+`protocols/wire-lab.d/`) and a B-side (reference implementation
+including the ns-3 fixture). This TODO targets the B-side. The
+implementation tree carries its own `CHANGELOG.md` recording
+conformance claims against upstream spec doc-CIDs (the harness
+spec, the UDP-binding spec, and any session/message specs the
+fixture exercises).
+
 ```
-tools/ns3-harness/
+implementations/ns3-harness-fixture/
 ├── README.md                     setup, build, run, integration notes
 ├── CMakeLists.txt                pkg-config-driven build against Debian ns-3
 ├── scenarios/

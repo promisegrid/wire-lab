@@ -11,7 +11,7 @@ This TODO is the lock record for the carve-out. The substantive design decisions
 - [x] 013.3 Create `specs/group-transport-draft.md` (substantive v0 contract for the group-transport-protocol class: N≥2, all-see-all, multi-writer DAG, append-only).
 - [x] 013.4 Rewrite TE-24 in place under transport vocabulary; rename file to `TE-20260430-204108-group-transport-envelope.md`.
 - [x] 013.5 Rewrite DR-009 to transport vocabulary; rename file to `DR-009-20260430-204108-group-transport-envelope.md`.
-- [x] 013.6 Rewrite TODO 012 to transport vocabulary; rename file to `TODO/012-group-transport-envelope.md`; add freeze-gate subtasks (012.7, 012.8).
+- [x] 013.6 Rewrite TODO 012 to transport vocabulary; rename file to `protocols/group-session.d/TODO/TODO-20260501-045543-group-transport-envelope.md`; add freeze-gate subtasks (012.7, 012.8).
 - [x] 013.7 Update `TODO/TODO.md` to reference the renamed TODO 012.
 - [x] 013.8 Update `docs/thought-experiments/README.md` TE-24 row to use the new title and filename.
 - [x] 013.9 Update `specs/harness-spec-draft.md` §8 TE-24 bullet to transport vocabulary; refresh TE-26/TE-27 cross-references; rewrite Open Question #19 to use transport vocabulary and reference both the outer transport-spec and the group-transport-draft.

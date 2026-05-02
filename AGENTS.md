@@ -2,7 +2,7 @@
 
 ## Project Structure & Module Organization
 - Keep packages at module root or under purpose-named top-level directories (`contexts/`, `state/`, etc.); avoid `internal/` and `pkg/`.
-- Keep planning artifacts in `TODO/` and maintain `TODO/TODO.md` sorted by priority.
+- Keep planning artifacts in per-protocol `protocols/<slug>.d/TODO/` directories (harness-level under `protocols/wire-lab.d/TODO/`) and maintain the master cross-listed index at `protocols/wire-lab.d/TODO/TODO.md` sorted by priority. Each `protocols/<slug>.d/TODO/` also has its own per-protocol `TODO.md` queue.
 - Do not commit local state files (for example `.grok`, `.grok.lock`) or generated binaries.
 
 ## Build, Test, and Development Commands
@@ -12,7 +12,7 @@
 ## Decision-First Specification and Compliance Protocol (Required)
 - Decision-first means decisions must be locked before coding; it does not forbid pre-decision analysis such as required thought experiments.
 - The agent must collect and lock user decisions before making any code edits for a task.
-- Locked decisions must be recorded as Decision Intent Log entries in the relevant `TODO/*.md` file(s) with clear intent and rationale.
+- Locked decisions must be recorded as Decision Intent Log entries in the relevant `protocols/<slug>.d/TODO/TODO-<timestamp>-<slug>.md` file(s) with clear intent and rationale.
 - The agent must ask decision questions up front in a single intake round whenever possible.
 - Required decision categories are architecture, design/behavior, implementation approach, function naming, variable naming, and file/path decisions.
 - The agent must ask these as multiple-choice questions whenever practical.
@@ -55,7 +55,7 @@
 - Final DF questions must be framed from the surviving alternatives identified by the TE. The agent must not ask broad DF questions that ignore TE results.
 
 ### TE Artifacts
-- The agent must track required TEs in `TODO/*.md`.
+- The agent must track required TEs in the relevant `protocols/<slug>.d/TODO/TODO-<timestamp>-<slug>.md`.
 - For each completed TE, the agent must write a verbatim copy of the thought experiment into a standalone file under `docs/thought-experiments/`.
 - The doc filename must begin with the TE ID and then use a descriptive suffix.
 - The doc must stand on its own and include:
@@ -165,7 +165,7 @@
   - Optional: TODO file/section reference for faster lookup.
 - If a comment must be dropped with no replacement, stop and ask the user before proceeding.
 - Before editing a file, review existing comments in that file.
-- Maintain a `## Decision Intent Log` at the top of relevant `TODO/*.md` files.
+- Maintain a `## Decision Intent Log` at the top of relevant `protocols/<slug>.d/TODO/TODO-<timestamp>-<slug>.md` files.
 - Treat DI logs as append-only history. Do not rewrite or delete prior entries.
 - When intent evolves, add a new DI entry and set `Supersedes: <old-di-id>`.
 - DI entries must include:

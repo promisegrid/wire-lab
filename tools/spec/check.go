@@ -16,37 +16,40 @@ import (
 // summarizing all findings if anything is wrong. Advisory hints (e.g., CRLF
 // in drafts) are printed but do not produce an error return.
 //
-// Audit invariants:
+// Audit invariants (paths are relative to the wire-lab harness's specs
+// directory, SpecsDir = protocols/wire-lab.d/specs/, per TE-29 + TE-32):
 //
-//  1. Every frozen file in `specs/<slug>-{cidv1}.md` has a matching manifest
-//     entry, and the file's actual CIDv1 equals the filename's CIDv1.
+//  1. Every frozen file in `<SpecsDir>/<slug>-{cidv1}.md` has a matching
+//     manifest entry, and the file's actual CIDv1 equals the filename's CIDv1.
 //  2. Every manifest entry whose status is `frozen` or `superseded` has a
-//     matching on-disk file at `specs/<slug>-{pCID}.md`.
-//  3. Every cross-spec reference in any `specs/*-draft.md` cites a pCID that
-//     is present in the manifest with status `frozen` or `superseded`.
+//     matching on-disk file at `<SpecsDir>/<slug>-{pCID}.md`.
+//  3. Every cross-spec reference in any `<SpecsDir>/*-draft.md` cites a pCID
+//     that is present in the manifest with status `frozen` or `superseded`.
 //     A draft citing another draft is a failure.
-//  4. No `specs/*-draft.md` contains a self-reference placeholder.
+//  4. No `<SpecsDir>/*-draft.md` contains a self-reference placeholder.
 //  5. All `supersedes` and `superseded_by` links inside the manifest resolve
 //     to other manifest entries.
 //
 // Advisory checks (warn, don't fail):
 //
-//  - CRLF line endings in `specs/*-draft.md` (DI-011-20260429-184457 trades
-//    editor-style robustness for transparency, but a CRLF flip is still
-//    almost always an accident, so we flag it).
+//  - CRLF line endings in `<SpecsDir>/*-draft.md` (DI-011-20260429-184457
+//    trades editor-style robustness for transparency, but a CRLF flip is
+//    still almost always an accident, so we flag it).
 //  - UTF-8 BOM at the start of any draft.
 func cmdCheck() error {
 	repoRoot, err := findRepoRoot()
 	if err != nil {
 		return err
 	}
-	specsDir := filepath.Join(repoRoot, "specs")
+	specsDir := filepath.Join(repoRoot, SpecsDir)
 
-	// If specs/ doesn't exist, the audit is vacuously clean: there is nothing
-	// to check. This handles the pre-genesis state where wire-lab has not yet
-	// migrated harness-spec.md into specs/.
+	// If the specs directory doesn't exist, the audit is vacuously clean:
+	// there is nothing to check. After the TE-29/TE-32 migration the wire-lab
+	// harness's specs always live under SpecsDir, but we keep this guard for
+	// the bootstrap case (e.g., a freshly-cloned protocol-as-simrepo that has
+	// not yet drafted its first spec).
 	if _, err := os.Stat(specsDir); os.IsNotExist(err) {
-		fmt.Println("spec check: no specs/ directory; nothing to audit")
+		fmt.Printf("spec check: no %s directory; nothing to audit\n", SpecsDir)
 		return nil
 	} else if err != nil {
 		return err
@@ -103,8 +106,8 @@ func cmdCheck() error {
 		if e.Status == StatusFrozen || e.Status == StatusSuperseded {
 			if !frozenByPCID[e.PCID] {
 				problems = append(problems, fmt.Sprintf(
-					"manifest: entry %s (slug %s) status %s expects file specs/%s-%s.md but file is missing",
-					e.PCID, e.Slug, e.Status, e.Slug, e.PCID))
+					"manifest: entry %s (slug %s) status %s expects file %s/%s-%s.md but file is missing",
+					e.PCID, e.Slug, e.Status, SpecsDir, e.Slug, e.PCID))
 			}
 		}
 	}
@@ -211,7 +214,7 @@ func cmdCheck() error {
 	return nil
 }
 
-// frozenFile names a discovered `specs/<slug>-<pcid>.md` snapshot.
+// frozenFile names a discovered `<SpecsDir>/<slug>-<pcid>.md` snapshot.
 type frozenFile struct {
 	path string
 	slug string
@@ -224,8 +227,9 @@ type frozenFile struct {
 // before the pcid component is the boundary.
 var frozenNameRegexp = regexp.MustCompile(`^([a-z0-9][a-z0-9-]*?)-(b[a-z2-7]{50,})\.md$`)
 
-// listFrozenFiles enumerates `specs/*.md` excluding drafts and MANIFEST.md,
-// returning those whose filenames match the frozen-snapshot pattern.
+// listFrozenFiles enumerates `<SpecsDir>/*.md` excluding drafts and
+// MANIFEST.md, returning those whose filenames match the frozen-snapshot
+// pattern.
 func listFrozenFiles(specsDir string) ([]frozenFile, error) {
 	entries, err := os.ReadDir(specsDir)
 	if err != nil {
@@ -256,7 +260,7 @@ func listFrozenFiles(specsDir string) ([]frozenFile, error) {
 	return out, nil
 }
 
-// listDraftFiles enumerates `specs/*-draft.md`.
+// listDraftFiles enumerates `<SpecsDir>/*-draft.md`.
 func listDraftFiles(specsDir string) ([]string, error) {
 	entries, err := os.ReadDir(specsDir)
 	if err != nil {
@@ -278,19 +282,24 @@ func listDraftFiles(specsDir string) ([]string, error) {
 // extractSpecCrossRefs finds substrings of the form `<slug>-<something>.md`
 // in the text where the surrounding context suggests a sibling-spec
 // reference. We adopt a deliberately simple heuristic: any reference that
-// looks like a relative path inside `specs/` (either bare like
-// `harness-spec-bafk....md` or prefixed with `specs/` or `./` or `../`).
+// looks like a relative path inside the harness's specs directory (either
+// bare like `harness-spec-bafk....md` or prefixed with `specs/` or `./` or
+// `../`). The literal string `specs/` is matched as a bare prefix because
+// the citing draft itself lives under SpecsDir, so a relative link like
+// `./harness-spec-<pcid>.md` (or just `harness-spec-<pcid>.md`) is the
+// common shape.
 //
 // This is a lint, not a parser, so false positives are acceptable as long as
 // the canonical citation form (a relative-path Markdown link) is reliably
 // detected.
 func extractSpecCrossRefs(text string) []string {
 	// Match Markdown link targets pointing at `*.md` files that look like
-	// they live in `specs/`. We accept three shapes inside `(...)`:
+	// they live in the harness's specs directory. We accept three shapes
+	// inside `(...)`:
 	//
-	//   specs/<name>.md
-	//   ./<name>.md     (when the citing draft is also under specs/)
-	//   <name>.md       (same)
+	//   specs/<name>.md   (legacy bare prefix; tolerated for inbound links)
+	//   ./<name>.md       (when the citing draft is also under SpecsDir)
+	//   <name>.md         (same)
 	//
 	// And we further require the bare filename to look like one of:
 	//

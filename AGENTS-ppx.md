@@ -37,8 +37,11 @@ Read these files in this order before doing anything else:
                                                   side of your branch
                                                   expects.
   3. README.md                                  — repo orientation.
-  4. TODO/TODO.md                               — priority-sorted index.
-  5. TODO/001-perplexity-computer-onboarding.md — bootstrap decisions
+  4. protocols/wire-lab.d/TODO/TODO.md          — master cross-listed,
+                                                  priority-sorted index of
+                                                  TODOs across all
+                                                  protocols-as-simrepos.
+  5. protocols/wire-lab.d/TODO/TODO-20260429-030146-perplexity-computer-onboarding.md — bootstrap decisions
                                                   governing how you
                                                   participate. Note the
                                                   three DI IDs:
@@ -48,7 +51,7 @@ Read these files in this order before doing anything else:
      DR/DR-002-…-drop-require-pr.md
      DR/DR-003-…-review-style.md                — the three DRs that
                                                   back the DIs above.
-  7. specs/harness-spec-draft.md                            — the canonical Wire Lab
+  7. protocols/wire-lab.d/specs/harness-spec-draft.md                            — the canonical Wire Lab
                                                   spec.
   8. docs/thought-experiments/README.md         — TE index and filename
                                                   convention.
@@ -97,7 +100,7 @@ For Steve it is `Steve Traugott`.
                             as Steve) pushes here. You NEVER push here.
                             (Enforced today by GitHub branch protection;
                             in the long-run by PromiseGrid signing-key
-                            semantics — see specs/harness-spec-draft.md §10a.8.)
+                            semantics — see protocols/wire-lab.d/specs/harness-spec-draft.md §10a.8.)
 - ppx/main                : long-lived bot integration branch. You
                             merge `ppx/{twig}` working branches into
                             here, then push `ppx/main` to origin. Steve
@@ -153,7 +156,7 @@ Steps:
   b. Decide whether the task is trivial or non-trivial.
 
      Trivial      = typo, broken link, formatting, no semantic change.
-     Non-trivial  = anything that touches specs/harness-spec-draft.md semantics,
+     Non-trivial  = anything that touches protocols/wire-lab.d/specs/harness-spec-draft.md semantics,
                     introduces a new concept, commits to an
                     implementation choice, or adds new files (other
                     than docs that obviously belong to an existing DI).
@@ -173,7 +176,8 @@ Steps:
        alternatives the TE identified. Do not ask broad DF questions
        that ignore TE results.
      - When Steve answers, write the DI into the relevant
-       `TODO/NNN-*.md` (in `## Decision Intent Log`). DI ID is
+       `protocols/<slug>.d/TODO/TODO-<timestamp>-<slug>.md` (in
+       `## Decision Intent Log`). DI ID is
        `DI-NNN-YYYYMMDD-HHMMSS` where NNN is the TODO number. Required
        fields: ID, Date, Status, Decision, Intent, Constraints,
        Affects, Author. Optional: Supersedes.
@@ -190,7 +194,7 @@ Steps:
   f. For any non-trivial behavior change in code, add a comment:
         // Intent: <rationale>
         // Source: DI-NNN-YYYYMMDD-HHMMSS
-     For non-code (e.g., specs/harness-spec-draft.md), include a sentence-level
+     For non-code (e.g., protocols/wire-lab.d/specs/harness-spec-draft.md), include a sentence-level
      citation in prose: "(see DI-NNN-YYYYMMDD-HHMMSS)" or similar.
 
   g. Settled statements in docs must cite at least one DI ID. Open
@@ -206,10 +210,11 @@ Steps:
 
         Bootstrap Perplexity Computer onboarding (DR-001/002/003)
 
-        TODO/TODO.md:
-          Create priority-sorted index with TODO 001 marked done.
+        protocols/wire-lab.d/TODO/TODO.md:
+          Create priority-sorted, cross-listed index with TODO 001 marked
+          done.
 
-        TODO/001-perplexity-computer-onboarding.md:
+        protocols/wire-lab.d/TODO/TODO-20260429-030146-perplexity-computer-onboarding.md:
           New TODO file capturing locked decisions ...
 
   j. Write the review-and-converge DR for the branch as a whole, if
@@ -308,14 +313,17 @@ Steps:
 ## Kind 4: open a DR without implementation
 
 Trigger: an open question surfaces that Steve hasn't decided, or you
-realize a settled statement in `specs/harness-spec-draft.md` lacks DI provenance.
+realize a settled statement in `protocols/wire-lab.d/specs/harness-spec-draft.md` lacks DI provenance.
 
 Steps:
   a. Make sure `ppx/main` is current (Kind 1 step a).
   b. Create the working branch off `ppx/main`:
         git checkout -b ppx/dr-{twig} ppx/main
   c. Decide which TODO this DR will attach to. If no TODO fits, propose
-     a new TODO file in the same branch and update `TODO/TODO.md`.
+     a new TODO file in the same branch (under the relevant
+     `protocols/<slug>.d/TODO/`, harness-level under
+     `protocols/wire-lab.d/TODO/`) and update
+     `protocols/wire-lab.d/TODO/TODO.md`.
   d. Write `DR/DR-NNN-YYYYMMDD-HHMMSS-slug.md` with `State: open`,
      `Asked by: stevegt+ppx@t7a.org (stevegt-via-perplexity)`,
      `Waiting on: stevegt@t7a.org (Steve Traugott)`, all required
@@ -357,7 +365,7 @@ Steps:
 - Do not commit local state files (`.grok`, `.grok.lock`), generated
   binaries, or anything containing the PAT or other secrets.
 - Do not assume continuity from a prior session. Re-read AGENTS.md,
-  TODO/TODO.md, and the most recent DR/DI files at the start of every
+  protocols/wire-lab.d/TODO/TODO.md, and the most recent DR/DI files at the start of every
   session.
 - Do not credit yourself as `Author` of a DI when Steve actually made
   the decision. The bot can be `Asked by` on a DR; the bot can be
@@ -383,7 +391,7 @@ explicitly, don't omit.
 
 Stop and ask Steve as a multiple-choice question. The protocol prefers
 an extra round of clarification over a wrong commit. The bot's default
-trust per `specs/harness-spec-draft.md` is intentionally low (~0.05 of a human
+trust per `protocols/wire-lab.d/specs/harness-spec-draft.md` is intentionally low (~0.05 of a human
 elder); behave accordingly.
 
 # Identifying yourself in chat
@@ -417,7 +425,7 @@ After reading the orientation files at the top of this prompt:
         - which `ppx/{twig}` working branches exist on origin (should
           normally be empty, since twigs are deleted after merging
           into ppx/main),
-        - any TODO entries in TODO/TODO.md still marked `[ ]`,
+        - any TODO entries in protocols/wire-lab.d/TODO/TODO.md still marked `[ ]`,
         - any DRs in DR/ with State: open.
 
   5. Then ask Steve what he wants to work on, or wait for instructions.
@@ -431,11 +439,14 @@ After reading the orientation files at the top of this prompt:
         TODO number.
 - DI  : Decision Intent. Locked decision record.
         Lives inside `## Decision Intent Log` in
-        `TODO/NNN-*.md`. ID format `DI-NNN-YYYYMMDD-HHMMSS`.
+        `protocols/<slug>.d/TODO/TODO-<timestamp>-<slug>.md`. ID format
+        `DI-NNN-YYYYMMDD-HHMMSS`.
 - DF  : Decision Framing. The multiple-choice intake round you ask
         Steve before locking a DI.
-- TODO: Task tracking file. `TODO/NNN-slug.md` per task. The index is
-        `TODO/TODO.md`, priority-sorted, append-only by number.
+- TODO: Task tracking file. `protocols/<slug>.d/TODO/TODO-<timestamp>-<slug>.md` per task. The index is
+        `protocols/wire-lab.d/TODO/TODO.md`, the master cross-listed
+        index, priority-sorted, append-only by timestamp. Per-protocol
+        TODO.md queues live at `protocols/<slug>.d/TODO/TODO.md`.
 - twig: Short kebab-case task name. Branch name is `<user>/<twig>`;
         for the bot, `<user>` is `ppx`, so branches are `ppx/<twig>`.
 - pCID: Protocol CID. The content hash of a spec document that

@@ -217,4 +217,4 @@ The recommended set is (1.1.a, 1.2.c, 1.3.a, 1.4.d). Reason: maximally additive,
 
 ## Decision status
 
-`needs DF` — awaiting user choice on DF-1.1 through DF-1.4. After DF, the locked decisions become DI entries in `TODO/005-te-promise-stack-ordering.md`.
+`needs DF` — awaiting user choice on DF-1.1 through DF-1.4. After DF, the locked decisions become DI entries in `protocols/wire-lab.d/TODO/TODO-20260429-164955-te-promise-stack-ordering.md`.

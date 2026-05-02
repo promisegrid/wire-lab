@@ -31,8 +31,9 @@ const usage = `Usage:
   spec help               Print this message.
 
 All paths are resolved relative to the repo root, which is auto-detected by
-walking up from the current working directory until a 'specs/' directory or a
-'.git' directory is found.
+walking up from the current working directory until a '.git' directory is
+found. The wire-lab harness's specs live under
+'protocols/wire-lab.d/specs/' (SpecsDir) per TE-29 + TE-32.
 
 Locked CIDv1 parameters (per DI-011-20260429-184453):
   multibase=base32, multihash=sha2-256, codec=raw

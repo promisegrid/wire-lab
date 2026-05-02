@@ -288,7 +288,7 @@ are tracked as separate TODOs:
    elsewhere), and `TODO/` is correctly placed as harness-level meta-
    process. The harness spec sections §11 and §12 already absorb
    decisions and open questions inline. See
-   `TODO/015-dr-todo-di-absorption-RETIRED.md` for the full
+   `protocols/wire-lab.d/TODO/TODO-20260501-230130-dr-todo-di-absorption-RETIRED.md` for the full
    retirement record.
 
 3. **TODO 016: proposals as transport messages.** Move
@@ -300,7 +300,7 @@ are tracked as separate TODOs:
    prerequisites: TODO 014 (protocols/ migration), a frozen
    bootstrap-binding pCID, a frozen group-session pCID, and a drafted
    ppx-dr message-protocol spec. See
-   `TODO/016-proposals-as-transport-messages-BLOCKED.md` for the
+   `protocols/ppx-dr.d/TODO/TODO-20260501-230131-proposals-as-transport-messages-BLOCKED.md` for the
    stub.
 
 4. **TODO 017: group-transport -> group-session rename.**
@@ -308,14 +308,14 @@ are tracked as separate TODOs:
    **Folded into TODO 014 step 2 before filing** on review
    immediately after TE-29 landed. The rename is captured in
    TODO 014's mechanical migration; no separate TODO is needed.
-   See `TODO/017-group-transport-rename-FOLDED.md` for the folding
+   See `protocols/wire-lab.d/TODO/TODO-20260501-230132-group-transport-rename-FOLDED.md` for the folding
    record and notes on residual prose-vocabulary cleanup
    (intentionally kept inside TODO 014 step 6 rather than tracked
    separately).
 
 5. **TODO 018: write UDP-binding v0 reference and test vectors.**
-   Filed at `TODO/018-udp-binding-v0-reference-implementation.md`.
-   Sibling **TODO 019** (`TODO/019-ns3-harness-scaffold.md`) tracks
+   Filed at `protocols/udp-binding.d/TODO/TODO-20260501-224805-udp-binding-v0-reference-implementation.md`.
+   Sibling **TODO 019** (`protocols/wire-lab.d/TODO/TODO-20260501-224806-ns3-harness-scaffold.md`) tracks
    the ns-3 harness scaffold; 018 and 019 are mutually gating per
    the empirical sandbox findings recorded in OQ-29.9.
 

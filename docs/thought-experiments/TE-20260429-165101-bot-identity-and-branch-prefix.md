@@ -31,7 +31,7 @@ When an LLM-driven agent operating on a human's behalf participates in a mob-con
 
 ## Selection
 
-Alt-B. Bot identity is `stevegt+ppx@t7a.org (stevegt-via-perplexity)`; branch prefix is `ppx/{twig}`. This was selected by Steve in chat on 2026-04-28; the locked decision is recorded as `DI-001-20260428-195700` in `TODO/001-perplexity-computer-onboarding.md`, and the supporting DR is `DR/DR-001-20260428-195700-bot-identity.md`.
+Alt-B. Bot identity is `stevegt+ppx@t7a.org (stevegt-via-perplexity)`; branch prefix is `ppx/{twig}`. This was selected by Steve in chat on 2026-04-28; the locked decision is recorded as `DI-001-20260428-195700` in `protocols/wire-lab.d/TODO/TODO-20260429-030146-perplexity-computer-onboarding.md`, and the supporting DR is `DR/DR-001-20260428-195700-bot-identity.md`.
 
 ## Decision status
 

@@ -31,7 +31,7 @@ For a repo that will eventually migrate from GitHub to PromiseGrid, what branch-
 
 ## Selection
 
-Alt-B. The locked decision is recorded as `DI-001-20260428-195701` in `TODO/001-perplexity-computer-onboarding.md`, and the supporting DR is `DR/DR-002-20260428-195700-drop-require-pr.md`. Steve confirmed in chat on 2026-04-29 that the "Require PR" rule has been removed from the `main` ruleset.
+Alt-B. The locked decision is recorded as `DI-001-20260428-195701` in `protocols/wire-lab.d/TODO/TODO-20260429-030146-perplexity-computer-onboarding.md`, and the supporting DR is `DR/DR-002-20260428-195700-drop-require-pr.md`. Steve confirmed in chat on 2026-04-29 that the "Require PR" rule has been removed from the `main` ruleset.
 
 Alt-D may be revisited later as an additive layer — leaving Alt-B as the base posture and adding signed-commit enforcement when PromiseGrid's signing-key model is closer to landing.
 

@@ -24,7 +24,7 @@ func cmdFreeze(slug string) error {
 	if err != nil {
 		return err
 	}
-	draftPath := filepath.Join(repoRoot, "specs", slug+"-draft.md")
+	draftPath := filepath.Join(repoRoot, SpecsDir, slug+"-draft.md")
 	data, err := os.ReadFile(draftPath)
 	if err != nil {
 		return fmt.Errorf("read draft %q: %w", draftPath, err)
@@ -46,7 +46,7 @@ func cmdFreeze(slug string) error {
 	// Snapshot file: literal copy of the draft bytes (DI-011-20260429-184457
 	// says the bytes hashed are the bytes on disk; the snapshot file IS those
 	// hashed bytes, byte-for-byte).
-	snapPath := filepath.Join(repoRoot, "specs", slug+"-"+pcid+".md")
+	snapPath := filepath.Join(repoRoot, SpecsDir, slug+"-"+pcid+".md")
 	if _, err := os.Stat(snapPath); err == nil {
 		// Already frozen at this exact pCID; nothing to do, but still append
 		// a fresh manifest entry only if missing. Most likely this is a
@@ -95,11 +95,11 @@ func cmdFreeze(slug string) error {
 	}
 
 	// Stage both files in git.
-	gitStage(repoRoot, "specs/"+slug+"-"+pcid+".md")
+	gitStage(repoRoot, SpecsDir+"/"+slug+"-"+pcid+".md")
 	gitStage(repoRoot, ManifestPath)
 
-	fmt.Printf("Frozen: %s\n  pCID: %s\n  Snapshot: specs/%s-%s.md\n  Manifest: %s (entry appended)\n",
-		slug, pcid, slug, pcid, ManifestPath)
+	fmt.Printf("Frozen: %s\n  pCID: %s\n  Snapshot: %s/%s-%s.md\n  Manifest: %s (entry appended)\n",
+		slug, pcid, SpecsDir, slug, pcid, ManifestPath)
 	return nil
 }
 
@@ -128,10 +128,12 @@ func readManifestOrEmpty(repoRoot string) (*Manifest, error) {
 // already in place.
 const defaultPreamble = `# Spec-doc manifest
 
-This file is the authoritative index of frozen spec docs in the wire-lab.
-Drafts live alongside frozen snapshots under ` + "`specs/`" + ` (flat layout, per
-DI-011-20260429-184454). Each frozen spec doc is content-addressed by its pCID
-(a CIDv1 of the file's literal bytes, per DI-011-20260429-184457).
+This file is the authoritative index of frozen spec docs for the wire-lab
+harness. Drafts live alongside frozen snapshots under
+` + "`protocols/wire-lab.d/specs/`" + ` (flat layout per
+DI-011-20260429-184454, anchored at the harness's protocol-as-simrepo
+directory per TE-29 + TE-32). Each frozen spec doc is content-addressed by
+its pCID (a CIDv1 of the file's literal bytes, per DI-011-20260429-184457).
 
 CIDv1 parameter set (per DI-011-20260429-184453):
 
@@ -179,8 +181,10 @@ func scanSelfReferencePlaceholders(s string) []string {
 }
 
 // findRepoRoot walks up from the current working directory until it finds a
-// directory that contains both `.git` AND a `specs/` directory, OR a `.git`
-// directory if `specs/` doesn't exist yet (bootstrap case).
+// directory containing a `.git` entry. The wire-lab harness's specs live
+// under SpecsDir (= protocols/wire-lab.d/specs/) per TE-29 + TE-32, but
+// the spec tool only needs the .git ancestor to anchor SpecsDir resolution;
+// the specs directory itself may be absent in the bootstrap case.
 //
 // Used by all subcommands so they can be run from any subdirectory of the
 // repo. Returns an absolute path.
