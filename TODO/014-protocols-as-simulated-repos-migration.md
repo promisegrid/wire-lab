@@ -88,11 +88,60 @@ all at once rather than half-migrating.
       `protocols/wire-lab.d/TODO/TODO-<timestamp>-protocols-as-simulated-repos-migration.md`
       atomically with the rest of step 11.
 
+12. **(Added per TE-32) Create top-level `implementations/` directory
+    with stub `README.md`** explaining the spec-side vs
+    implementation-side split: `protocols/<slug>.d/` is design (TEs,
+    draft specs, design TODOs); `implementations/<impl-name>/` is
+    code, test vectors, and conformance fixtures. Each implementation
+    is its own free-standing tree with internal shape chosen by the
+    implementer; the only universal requirement is a `CHANGELOG.md`
+    at the implementation root recording conformance claims against
+    upstream spec-doc-CIDs. Multiple implementations of the same
+    protocol coexist as siblings; one implementation may implement
+    many protocols. Empty otherwise; no implementations exist yet at
+    migration time. README points at TE-31 (inversion) and TE-32
+    (split) for the rationale.
+
+13. **(Added per TE-32) Retarget TODO 018 (UDP-binding v0 reference
+    implementation)** to live under
+    `implementations/go-udp-binding-reference/` rather than any path
+    under `protocols/udp-binding.d/`. The protocol's spec-side TODOs
+    stay in `protocols/udp-binding.d/TODO/`; the implementation work
+    is a separate concern that does not migrate with the protocol's
+    design. Update the prose of the migrated TODO-018 file to
+    reflect this target path.
+
+14. **(Added per TE-32) Retarget TODO 019 (ns-3 harness scaffold)**
+    similarly: target `implementations/ns3-harness-fixture/` (or
+    whatever final slug is chosen at execution time). The wire-lab
+    harness reference impl is a B-side artifact, not a spec-side
+    one. Per TE-32 OQ-32.4, the harness has both a design tree
+    (already at `protocols/wire-lab.d/`) and a reference
+    implementation (at `implementations/wire-lab-harness-reference/`
+    or similar). TODO 019 belongs to the latter. Update the migrated
+    TODO-019 file's prose accordingly.
+
+15. **(Added per TE-32) Seed empty `CHANGELOG.md` stubs in each
+    migrated `protocols/<slug>.d/`** with a placeholder explanatory
+    header block describing the A-side semantics (`event: freeze`
+    entries authored by spec maintainers; doc-CID published when
+    the spec is frozen). Real `freeze` entries get added when the
+    first frozen sibling appears for that protocol. The B-side
+    `implementations/<impl-name>/CHANGELOG.md` files are not seeded
+    at migration time because no implementations exist yet.
+
 ## Out of scope for TODO 014
 
 - proposals -> transports/ migration (that's TODO 016, BLOCKED).
-- UDP-binding v0 reference implementation (that's TODO 018).
-- ns-3 harness scaffold (that's TODO 019).
+- UDP-binding v0 reference implementation (that's TODO 018; this
+  TODO retargets its destination per step 13 but does not implement
+  it).
+- ns-3 harness scaffold (that's TODO 019; this TODO retargets its
+  destination per step 14 but does not implement it).
+- Defining the precise CHANGELOG.md format (header block syntax
+  YAML/fenced/HTML-comment, schema for entries beyond what TE-31
+  and TE-32 sketch). Forthcoming TODO 020 will spec the format and
+  build a parser; this TODO only seeds empty stubs.
 
 Note: prior versions of this TODO listed TODO 015 (DR/TODO/DI
 absorption) and TODO 017 (group-transport -> group-session rename) as
@@ -115,6 +164,13 @@ covered by step 2 of this TODO. See
   the wire-lab.
 - The top-level `TODO/` directory is gone entirely (per TE-30; no
   integer-named TODO survivors).
+- Top-level `implementations/` exists with stub `README.md` (per
+  TE-32) explaining the A/B split.
+- Each `protocols/<slug>.d/` has an empty `CHANGELOG.md` stub (per
+  TE-32) ready to record `freeze` events.
+- TODO 018 and TODO 019 (after migration into
+  `protocols/<slug>.d/TODO/`) name `implementations/...` paths as
+  their target rather than `protocols/<slug>.d/...` paths.
 - All current in-tree references resolve to new paths (TODO
   references, spec bibliography, TE prose, DR/DI anchors).
 - `/tmp/spec check` reports OK.
