@@ -29,6 +29,7 @@ their owning protocol's section.
 | TODO 19 | 2026-05-01 22:48:06 | [TODO-20260501-224806-ns3-harness-scaffold.md](TODO-20260501-224806-ns3-harness-scaffold.md) |
 | TODO 15 | 2026-05-01 23:01:30 | [TODO-20260501-230130-dr-todo-di-absorption-RETIRED.md](TODO-20260501-230130-dr-todo-di-absorption-RETIRED.md) |
 | TODO 17 | 2026-05-01 23:01:32 | [TODO-20260501-230132-group-transport-rename-FOLDED.md](TODO-20260501-230132-group-transport-rename-FOLDED.md) |
+| TODO 20 | 2026-05-02 21:31:03 | [TODO-20260502-213103-te-editing-policy-and-holistic-corpus.md](TODO-20260502-213103-te-editing-policy-and-holistic-corpus.md) |
 
 ## group-session
 

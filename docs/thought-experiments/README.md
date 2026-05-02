@@ -8,7 +8,7 @@ Each thought experiment is a falsifiable mental run of a Wire Lab design choice.
 TE-YYYYMMDD-HHMMSS-some-phrase.md
 ```
 
-The timestamp is the moment the TE was first drafted (or, for TEs that pre-date this convention, the revision of `specs/harness-spec-draft.md` in which they first appeared). The slug is a kebab-case rendering of the TE's title. Files are not renamed when the experiment is later refined — the timestamp pins origin, not last-edited.
+The timestamp is the moment the TE was first drafted (or, for TEs that pre-date this convention, the revision of `protocols/wire-lab.d/specs/harness-spec-draft.md` in which they first appeared). The slug is a kebab-case rendering of the TE's title. Files are not renamed when the experiment is later refined — the timestamp pins origin, not last-edited.
 
 ## Index
 
@@ -47,8 +47,19 @@ The timestamp is the moment the TE was first drafted (or, for TEs that pre-date 
 | TE-31 | 2026-05-02 00:49 | [Spec-doc as upstream, simrepo as implementation: inverting the conformance reference](TE-20260502-004924-spec-doc-inversion-and-conformance-changelog.md) |
 | TE-32 | 2026-05-02 01:45 | [Spec-side vs implementation-side split, and the `implementations/` top-level](TE-20260502-014525-spec-vs-implementation-split.md) |
 | TE-33 | 2026-05-02 02:04 | [Spec-doc Informative References to its workshop, RFC-shaped](TE-20260502-020439-spec-doc-informative-references.md) |
+| TE-34 | 2026-05-02 21:28 | [TE editing policy and the TE corpus as one document with facets](TE-20260502-212810-te-editing-policy-and-holistic-corpus.md) |
 
 The TE numbers (TE-1, TE-2, …) are stable identifiers used in the harness-spec; the timestamp slug is what makes the file content-addressable and chronologically sortable on disk.
+
+## Editing policy
+
+Per [TE-34](TE-20260502-212810-te-editing-policy-and-holistic-corpus.md), TE filenames are immutable (the timestamp slug is the content-address anchor that pins the integer alias, locked in TE-25). TE contents are edited under three regimes by category:
+
+- **Mechanical edits** (path renames, vocabulary updates): edit in place. Vocabulary updates carry a top-of-file note pointing at the TE / TODO that drove the rewrite (the TE-24 / TE-26 pattern). Path renames need no note.
+- **Navigational edits** (forward-pointers to later TEs / DRs / DIs that resolved a future-work bullet, or back-pointers added after the fact): append-only `## Refinements` section at the bottom of the TE.
+- **Substantive edits** (recasting alternative analysis, reversing a locked decision, invalidating an assumption): not edits. Write a new TE that supersedes the old one; write a new DI that supersedes the old DI. Update only the old TE's `Decision status` line to point at the supersedence.
+
+The corpus is read holistically: the TE corpus is one document with many facets, not a collection of independent essays. When any TE is in scope, the first move is to scan TE titles + `Decision under test` sections across the corpus to find facets that share assumptions, vocabulary, or decisions.
 
 ## Adding a new TE
 
@@ -56,6 +67,6 @@ The TE numbers (TE-1, TE-2, …) are stable identifiers used in the harness-spec
 2. Pick a UTC timestamp — typically `date -u +%Y%m%d-%H%M%S`.
 3. Render the title to kebab-case for the slug.
 4. Create `TE-YYYYMMDD-HHMMSS-slug.md` in this directory.
-5. Add a one-line summary to `../../specs/harness-spec-draft.md` §8 with a link.
+5. Add a one-line summary to `../../protocols/wire-lab.d/specs/harness-spec-draft.md` §8 with a link.
 6. Add the row to this index.
 7. Open a PR.
