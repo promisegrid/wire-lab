@@ -44,6 +44,7 @@ The timestamp is the moment the TE was first drafted (or, for TEs that pre-date 
 | TE-28 | 2026-05-01 20:27 | [The 100-year goal as a load-bearing design constraint](TE-20260501-202713-100-year-goal-as-design-constraint.md) |
 | TE-29 | 2026-05-01 21:50 | [Protocols as simulated repos, and the L4-binding layer](TE-20260501-215027-protocols-as-simulated-repos-and-binding-layer.md) |
 | TE-30 | 2026-05-02 00:25 | [TODO numbering and per-protocol TODO shape](TE-20260502-002548-todo-numbering-and-per-protocol-shape.md) |
+| TE-31 | 2026-05-02 00:49 | [Spec-doc as upstream, simrepo as implementation: inverting the conformance reference](TE-20260502-004924-spec-doc-inversion-and-conformance-changelog.md) |
 
 The TE numbers (TE-1, TE-2, …) are stable identifiers used in the harness-spec; the timestamp slug is what makes the file content-addressable and chronologically sortable on disk.
 
