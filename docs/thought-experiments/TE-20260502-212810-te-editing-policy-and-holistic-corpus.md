@@ -233,6 +233,18 @@ Each DF question is a single paragraph below, with multiple-choice answers, reco
 
 The recommended set is **(34.1.c, 34.2.b, 34.3.b)**: categorized editing policy, per-protocol applicability, holistic reading by default.
 
+## Refinements
+
+### 2026-05-02 — scenario-play deficit (filed by bot, flagged by Steve)
+
+Steve has noted that this TE drifted from the wire-lab's TE shape. A TE in this repo is a tabletop simulation: named scenarios, named actors, explicit walkthroughs of each surviving alternative through each scenario, conclusion falling out of the scenario play. The earlier TEs (notably TE-1 promise-stack ordering, TE-3 currency-exchange-rate-equilibration, TE-4 sybil-under-double-auction, TE-9 generational-handoff) are exemplars of that shape. This TE has a section labeled "Scenario analysis" (S1-S6) but those scenarios are one-paragraph judgments of the form "under Alt-X this happens; under Alt-Y this happens" rather than tabletop play. There are no named actors, no concrete artifacts being edited in real time, no failure modes simulated.
+
+Consequence for the locked DIs: the three DIs (DI-020-20260502-213103/-213104/-213105) reflect Steve's actual choices and stand as locked decisions. The locking is not in question. What is in question is whether the alternative analysis was strong enough to surface every alternative the scenario play would have surfaced. A follow-on TE will tabletop the editing policy under 4-6 concrete scenarios (vocabulary sweep mid-stream, supersedence chain across three TEs, path-migration during an in-flight twig, contest-artifact-vs-TE adjacency, per-protocol-with-stricter-policy contact, holistic reading under a TE that quotes another TE) and either confirm Alt-1.C / Alt-2.A / Alt-3.C as written, or surface a refinement that supersedes one of the DIs.
+
+Until that follow-on TE lands, the AGENTS.md / AGENTS-codex.md / AGENTS-ppx.md updates that would have codified this policy as standing bot rules are deferred. The DIs apply to the wire-lab harness corpus today (the bot will edit TEs by category, will not claim the retired "do not back-edit" rule, and will read the corpus by the substantive / mechanical split), but those rules are not yet enshrined as forbidden-bullets in the bot orientation files.
+
+New subtask filed in TODO 020: 020.9 (write the follow-on tabletop TE; gate AGENTS rollout on it).
+
 ## Decision status
 
-`needs DF` — awaiting user choice on DF-34.1 through DF-34.3. After DF, the locked decisions become DI entries in `protocols/wire-lab.d/TODO/TODO-<timestamp>-te-editing-policy-and-holistic-corpus.md` (to be filed alongside this TE), and AGENTS.md / AGENTS-codex.md / AGENTS-ppx.md gain a new "TE editing policy" section.
+`decided, AGENTS rollout deferred` — locked per `DI-020-20260502-213103` (DF-34.1 -> Alt-1.C, categorized editing), `DI-020-20260502-213104` (DF-34.2 -> Alt-2.A, uniform applicability across all TE corpora; departs from this TE's recommendation of Alt-2.B), and `DI-020-20260502-213105` (DF-34.3 -> Alt-3.C, explicit holistic-substantive / single-TE-mechanical split; departs from this TE's recommendation of Alt-3.B). See `protocols/wire-lab.d/TODO/TODO-20260502-213103-te-editing-policy-and-holistic-corpus.md`. `docs/thought-experiments/README.md` already names TE-34 in its Editing policy section. AGENTS.md / AGENTS-codex.md / AGENTS-ppx.md updates are deferred until the follow-on tabletop TE confirms or revises the locked decisions; see `## Refinements` below.
