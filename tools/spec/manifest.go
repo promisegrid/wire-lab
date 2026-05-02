@@ -11,7 +11,16 @@ import (
 )
 
 // ManifestPath is the path of the manifest relative to the repo root.
-const ManifestPath = "specs/MANIFEST.md"
+// ManifestPath is the relative path to the spec manifest, anchored at
+// repo root. Per TE-29 + TE-32, the wire-lab harness's specs (including
+// the manifest) live under protocols/wire-lab.d/specs/. The legacy
+// top-level specs/ layout is no longer used.
+const ManifestPath = "protocols/wire-lab.d/specs/MANIFEST.md"
+
+// SpecsDir is the relative path to the wire-lab harness's specs
+// directory (formerly top-level specs/, now under the harness's own
+// protocol-as-simrepo directory per TE-29).
+const SpecsDir = "protocols/wire-lab.d/specs"
 
 // yamlFenceOpen and yamlFenceClose mark the boundaries of the authoritative
 // YAML block in MANIFEST.md. The opening fence MUST be exactly "```yaml" on a

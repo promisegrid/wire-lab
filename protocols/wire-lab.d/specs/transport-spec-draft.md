@@ -16,7 +16,7 @@ This spec is intentionally **thin.** It does not define:
 - subdirectory layout inside a transport,
 - canonical-bytes rules for messages.
 
-All of those are properties of individual transport-protocols, defined in their own spec docs (the first being `specs/group-transport-draft.md`).
+All of those are properties of individual transport-protocols, defined in their own spec docs (the first being `protocols/group-session.d/specs/group-session-draft.md`).
 
 ## Sources
 
@@ -112,7 +112,7 @@ If a future reader asks "where do I find out how to write a message for this tra
 
 This spec graduates to frozen status when:
 
-1. The repo has at least one transport-protocol spec frozen (currently anticipated to be `specs/group-transport-draft.md`).
+1. The repo has at least one transport-protocol spec frozen (currently anticipated to be `protocols/group-session.d/specs/group-session-draft.md`).
 2. Steve signs a `merge-transport-spec` promise authorizing the freeze.
 3. `tools/spec freeze transport-spec` mints the pCID, snapshots the file, and appends the manifest entry.
 

@@ -7,9 +7,9 @@ Track the work to drive TE-21 (`docs/thought-experiments/TE-20260429-173520-spec
 - [ ] 010.1 Steve answers DF-21.1 (layered Alt-E vs. doc-only Alt-D vs. other). Recommended: 1.a (Alt-E).
 - [ ] 010.2 Steve answers DF-21.2 (assumption / open-questions / known-issues lists: required sections, best-practice, or required-when-present). Recommended: 2.a (required).
 - [ ] 010.3 Steve answers DF-21.3 (peer adoption promises: structured metadata, commentary-only, or required-commentary-optional-structure). Recommended: 3.a (structured).
-- [ ] 010.4 Steve answers DF-21.4 (does this TE imply rename or restructure of `specs/harness-spec-draft.md`). Recommended: 4.a (no, defer to TE-22).
+- [ ] 010.4 Steve answers DF-21.4 (does this TE imply rename or restructure of `protocols/wire-lab.d/specs/harness-spec-draft.md`). Recommended: 4.a (no, defer to TE-22).
 - [ ] 010.5 Once 010.1-010.4 land, write a DI for each into this file.
-- [ ] 010.6 If 010.2 lands as 2.a (required), update `specs/harness-spec-draft.md` to add or formalize the three normative sections: Assumptions, Open Questions (already present as \u00a711), Known Issues. Cross-link them to TE-21 and the relevant DI(s).
+- [ ] 010.6 If 010.2 lands as 2.a (required), update `protocols/wire-lab.d/specs/harness-spec-draft.md` to add or formalize the three normative sections: Assumptions, Open Questions (already present as \u00a711), Known Issues. Cross-link them to TE-21 and the relevant DI(s).
 - [ ] 010.7 If 010.3 lands as 3.a (structured), surface the peer adoption metadata as a future TE (TE-23 placeholder) so the wire shape can be designed.
 - [ ] 010.8 Open TE-22 (spec-doc-store layout) on a fresh twig once TE-21 / TODO 010 vocabulary is locked.
 

@@ -374,7 +374,7 @@ Already-locked decisions, not under DF in this TE (carried from chat 2026-04-29)
 
 ## Decision status
 
-`decided` — all five DFs locked by Steve in chat 2026-04-29. Locked answers are recorded as DI entries in `TODO/011-te-spec-doc-store-and-pcid-machinery.md`:
+`decided` — all five DFs locked by Steve in chat 2026-04-29. Locked answers are recorded as DI entries in `protocols/wire-lab.d/TODO/TODO-20260429-180020-te-spec-doc-store-and-pcid-machinery.md`:
 
 - **DF-22.1: 1.a** — raw file bytes, no normalization. (Steve preferred transparency over editor-style robustness; the formatter from the recommended Alt-1.D was dropped.)
 - **DF-22.2: 2.b** — Go using `github.com/ipfs/go-cid`.

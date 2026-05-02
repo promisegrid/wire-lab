@@ -70,6 +70,6 @@ With a **queue-local contest artifact**, the contest can point at both the propo
 
 ## Implications for the repo's open TODOs and pending DIs
 
-- Lock the decision in `DI-002-20260429-033208` under `TODO/002-review-feedback-as-contest-artifact.md`.
+- Lock the decision in `DI-002-20260429-033208` under `protocols/wire-lab.d/TODO/TODO-20260429-033416-review-feedback-as-contest-artifact.md`.
 - Record the decision request and outcome in `DR/DR-004-20260429-033208-review-feedback-as-contest-artifact.md`.
 - Publish the first durable contest artifact for `ppx/dr-001-bootstrap` on `main`.

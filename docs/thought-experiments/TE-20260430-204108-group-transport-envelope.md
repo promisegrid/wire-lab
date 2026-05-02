@@ -118,7 +118,7 @@ The wire-lab's first transport-protocol should inform the canonical format witho
 ## Implications for the repo's open TODOs and pending DIs
 
 - These conclusions are properties of the **group-transport-protocol**, not of the outer wire-lab transport-spec. The outer transport-spec ([`specs/transport-spec-draft.md`](../../specs/transport-spec-draft.md)) is silent on envelope shape, header sets, canonical bytes, and body conventions. The substantive contract — including the locked decisions from the TODO 013 carve-out (`Parents:` header replacing `Prev-Message-CID:`/`IHave:`, no `Kind:` header, ack-in-body, flat subdirectory layout) — lives in [`specs/group-transport-draft.md`](../../specs/group-transport-draft.md).
-- `TODO/012-group-transport-envelope.md` locks this envelope choice for the group-transport-protocol separately from the broader promise-stack DIs tracked in `TODO/005-te-promise-stack-ordering.md`.
+- `protocols/group-session.d/TODO/TODO-20260501-045543-group-transport-envelope.md` locks this envelope choice for the group-transport-protocol separately from the broader promise-stack DIs tracked in `protocols/wire-lab.d/TODO/TODO-20260429-164955-te-promise-stack-ordering.md`.
 - `transports/README.md` points readers at both the outer transport-spec and the group-transport spec; this TE is the source document for the latter.
 - `specs/harness-spec-draft.md` acknowledges the TE in its §8 bibliography. The graduation question — does this envelope shape collapse into a more structured canonical wire object eventually? — remains open in `DR-009-20260430-204108`.
 

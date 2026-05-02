@@ -7,7 +7,7 @@ State: decided
 Question: In promise-theory terms, how should Steve's durable review reply to a bot-authored `ppx/{twig}` proposal branch be recorded on `main`?
 Why this blocks progress: The previously merged `contest` framing captured the durability goal, but not the right semantics for Steve's role. Steve's actual request-changes reply is a conditional commitment about his own future review behavior, so the repo needs a clearer promise-shaped record before more branches accumulate under the wrong model.
 Affects: `proposals/pending/`; Steve's review workflow on `main`; future bot/agent consumption of review outcomes; interpretation of the existing `ppx/dr-001-bootstrap` review artifact.
-Unblocks: `TODO/003-review-reply-as-promise.md` (all subtasks); the immediate durable reply for `ppx/te-20260428-202400-promise-stack-ordering`; the retrofit of `ppx/dr-001-bootstrap`.
+Unblocks: `protocols/wire-lab.d/TODO/TODO-20260429-162412-review-reply-as-promise.md` (all subtasks); the immediate durable reply for `ppx/te-20260428-202400-promise-stack-ordering`; the retrofit of `ppx/dr-001-bootstrap`.
 Waiting on: DI-003-20260429-162212
 
 ## Candidate alternatives considered
@@ -25,7 +25,7 @@ These review messages live under `proposals/pending/<proposal-id>/review-<timest
 
 ## Linked DI
 
-DI-003-20260429-162212 (in `TODO/003-review-reply-as-promise.md`)
+DI-003-20260429-162212 (in `protocols/wire-lab.d/TODO/TODO-20260429-162412-review-reply-as-promise.md`)
 
 ## Related commits
 

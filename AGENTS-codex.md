@@ -23,16 +23,19 @@ Read these files in this order before doing anything else:
                                                   - Commit & Pull Request
                                                     Guidelines
   2. README.md                                  — repo orientation.
-  3. TODO/TODO.md                               — priority-sorted index.
-  4. TODO/001-perplexity-computer-onboarding.md — bootstrap decisions
+  3. protocols/wire-lab.d/TODO/TODO.md          — master cross-listed,
+                                                  priority-sorted index of
+                                                  TODOs across all
+                                                  protocols-as-simrepos.
+  4. protocols/wire-lab.d/TODO/TODO-20260429-030146-perplexity-computer-onboarding.md — bootstrap decisions
                                                   governing how the bot
                                                   participates.
   5. DR/DR-001-…-bot-identity.md
      DR/DR-002-…-drop-require-pr.md
      DR/DR-003-…-review-style.md                — the three DRs that
                                                   back the DIs in
-                                                  TODO/001.
-  6. specs/harness-spec-draft.md                            — the canonical Wire Lab
+                                                  protocols/wire-lab.d/TODO/TODO-20260429-030146-perplexity-computer-onboarding.md.
+  6. protocols/wire-lab.d/specs/harness-spec-draft.md                            — the canonical Wire Lab
                                                   spec. Skim §0–§3 and
                                                   §10a; the rest is
                                                   reference.
@@ -105,7 +108,8 @@ Steps:
             Date, Status, Decision, Intent, Constraints, Affects,
             Author, optional Supersedes.
         - Verify the DI sits inside `## Decision Intent Log` of the
-          referenced TODO/NNN-*.md file.
+          referenced protocols/<slug>.d/TODO/TODO-<timestamp>-<slug>.md
+          file.
         - Verify Linked DR ↔ Linked DI back-references are consistent.
   g. For any TE files added under docs/thought-experiments/:
         - Verify filename: TE-YYYYMMDD-HHMMSS-slug.md
@@ -114,7 +118,7 @@ Steps:
             alternatives, scenario analysis, conclusions, implications.
         - Verify it does not collapse to "short opinion / recommendation"
           — protocol explicitly forbids that.
-  h. For any code or specs/harness-spec-draft.md changes:
+  h. For any code or protocols/wire-lab.d/specs/harness-spec-draft.md changes:
         - Verify settled statements cite at least one DI ID.
         - Verify unresolved questions cite at least one DR ID.
         - Run a comment-delta audit on each touched file:
@@ -162,7 +166,7 @@ Steps:
   a. Determine if this is trivial or non-trivial.
 
      Trivial      = typo, broken link, formatting, no semantic change.
-     Non-trivial  = anything that touches specs/harness-spec-draft.md semantics,
+     Non-trivial  = anything that touches protocols/wire-lab.d/specs/harness-spec-draft.md semantics,
                     introduces a new concept, commits to an
                     implementation choice, or adds new files.
 
@@ -172,9 +176,11 @@ Steps:
        doc under docs/thought-experiments/ with the right filename.
      - Ask Steve multiple-choice DF questions for the surviving
        alternatives.
-     - When Steve answers, write the DI into the relevant TODO/NNN-*.md.
-       If no TODO file fits, propose creating a new one (and update
-       TODO/TODO.md).
+     - When Steve answers, write the DI into the relevant
+       protocols/<slug>.d/TODO/TODO-<timestamp>-<slug>.md (harness-level
+       TODOs live under protocols/wire-lab.d/TODO/). If no TODO file
+       fits, propose creating a new one (and update
+       protocols/wire-lab.d/TODO/TODO.md).
      - Write a DR with State: decided (since Steve decided in chat),
        Linked DI, all required fields.
 
@@ -203,7 +209,7 @@ asks "what's our policy on X" and you can't find a citing DI.
 
 Steps:
   a. Search the repo for any existing DR or DI on the topic:
-        rg -i "<keyword>" DR/ TODO/
+        rg -i "<keyword>" DR/ protocols/*/TODO/
   b. If nothing exists, draft a new DR file:
         DR/DR-NNN-YYYYMMDD-HHMMSS-<slug>.md
      where NNN is the TODO number this DR will eventually be

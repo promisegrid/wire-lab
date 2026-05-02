@@ -7,7 +7,7 @@ State: decided
 Question: When Steve wants to request changes to a bot-authored `ppx/{twig}` branch, how should that review feedback be recorded in-repo?
 Why this blocks progress: Steve explicitly wants the review reply for `ppx/dr-001-bootstrap` written into a file on `main`. Without a locked artifact shape, the repo would gain a one-off note that does not fit the evolving PromiseGrid proposal vocabulary or scale to future proposal review traffic.
 Affects: `proposals/pending/`; Steve's review workflow on `main`; future bot/agent consumption of review outcomes; migration away from GitHub-specific review trails.
-Unblocks: `TODO/002-review-feedback-as-contest-artifact.md` (all subtasks); the immediate request-changes response to `ppx/dr-001-bootstrap`.
+Unblocks: `protocols/wire-lab.d/TODO/TODO-20260429-033416-review-feedback-as-contest-artifact.md` (all subtasks); the immediate request-changes response to `ppx/dr-001-bootstrap`.
 Waiting on: DI-002-20260429-033208
 
 ## Candidate alternatives considered
@@ -24,7 +24,7 @@ For the first use of this pattern, `ppx/dr-001-bootstrap` is normalized to `prop
 
 ## Linked DI
 
-DI-002-20260429-033208 (in `TODO/002-review-feedback-as-contest-artifact.md`)
+DI-002-20260429-033208 (in `protocols/wire-lab.d/TODO/TODO-20260429-033416-review-feedback-as-contest-artifact.md`)
 
 ## Related commits
 

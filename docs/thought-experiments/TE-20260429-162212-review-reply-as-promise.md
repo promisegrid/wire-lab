@@ -82,7 +82,7 @@ With a **counter-proposal**, the pending state of the original proposal becomes 
 
 ## Implications for the repo's open TODOs and pending DIs
 
-- Lock the semantic correction in `DI-003-20260429-162212` under `TODO/003-review-reply-as-promise.md`.
+- Lock the semantic correction in `DI-003-20260429-162212` under `protocols/wire-lab.d/TODO/TODO-20260429-162412-review-reply-as-promise.md`.
 - Record the question and decided answer in `DR/DR-005-20260429-162212-review-reply-as-promise.md`.
 - Publish a new promise-shaped review reply for `ppx/te-20260428-202400-promise-stack-ordering`.
 - Publish a superseding promise-shaped review reply for `ppx/dr-001-bootstrap` without deleting the earlier `contest` artifact.

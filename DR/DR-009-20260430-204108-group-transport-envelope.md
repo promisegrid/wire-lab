@@ -6,7 +6,7 @@ Asked by: stevegt@t7a.org (Steve Traugott)
 State: decided
 Question: For the wire-lab's first transport-protocol — small-finite-closed-group, N>=2 participants, all-see-all visibility, multi-writer DAG of messages — what envelope shape should select the protocol, support message-CID-linked references between messages, and stay easy for humans and LLMs to read, edit, and reason about?
 Why this blocks progress: The repo has converged on the idea that `transports/` is the wire-lab's simulation surface for the network being studied, with `transports/<pcid>--<slug>/` as the on-disk keying convention (transport-spec-draft.md). Without an envelope choice for the first transport-protocol, the work cannot advance beyond chat fragments. The project needs a concrete, auditable way to test protocol-selection-by-pCID, message-CID-linked references, and receipt semantics in real coordination traffic without pretending that the canonical PromiseGrid wire format is already frozen.
-Affects: `transports/README.md`; future `transports/*` artifacts; `TODO/012-group-transport-envelope.md`; `docs/thought-experiments/TE-20260430-204108-group-transport-envelope.md`; `specs/transport-spec-draft.md` (outer rule); `specs/group-transport-draft.md` (the substantive v0 contract); `specs/harness-spec-draft.md` references to the thought experiment.
+Affects: `transports/README.md`; future `transports/*` artifacts; `protocols/group-session.d/TODO/TODO-20260501-045543-group-transport-envelope.md`; `docs/thought-experiments/TE-20260430-204108-group-transport-envelope.md`; `specs/transport-spec-draft.md` (outer rule); `protocols/group-session.d/specs/group-session-draft.md` (the substantive v0 contract); `specs/harness-spec-draft.md` references to the thought experiment.
 Unblocks: TODO 012 subtasks; TODO 013 carve-out completion; future group-transport message artifacts; future Codex<->Perplexity message exchange experiments; later decision work on whether the wire-lab's transport envelope should graduate into the canonical wire format.
 Waiting on: DI-009-20260430-204108
 
@@ -25,7 +25,7 @@ The full scenario analysis lives in `docs/thought-experiments/TE-20260430-204108
 
 ## Decision
 
-For the wire-lab's first transport-protocol — the group-transport-protocol class defined in `specs/group-transport-draft.md` — choose the `grid <pcid>` first-line carrier. Canonicalize the message as UTF-8 text with LF line endings, a fixed header order, exactly one blank line between carrier and headers, exactly one blank line between headers and body, and a trailing newline at EOF. Compute the message CID as CIDv1 (`base32`, `sha2-256`, `raw`) over the full canonical file bytes. Keep `Message-ID` as a human-oriented convenience field; require the body to carry explicit promise prose. Use the `Parents:` header (single line, space-separated message CIDs, always optional) to express DAG links between messages. Express acknowledgement in message bodies, not in envelope headers.
+For the wire-lab's first transport-protocol — the group-transport-protocol class defined in `protocols/group-session.d/specs/group-session-draft.md` — choose the `grid <pcid>` first-line carrier. Canonicalize the message as UTF-8 text with LF line endings, a fixed header order, exactly one blank line between carrier and headers, exactly one blank line between headers and body, and a trailing newline at EOF. Compute the message CID as CIDv1 (`base32`, `sha2-256`, `raw`) over the full canonical file bytes. Keep `Message-ID` as a human-oriented convenience field; require the body to carry explicit promise prose. Use the `Parents:` header (single line, space-separated message CIDs, always optional) to express DAG links between messages. Express acknowledgement in message bodies, not in envelope headers.
 
 This decision is explicitly scoped to the group-transport-protocol class and does not settle the long-term canonical PromiseGrid wire format. The outer wire-lab transport-spec (`specs/transport-spec-draft.md`) remains silent on envelope shape; other transport-protocol classes (ring, gossip, hub-mediated, large-N, ephemeral, etc.) will produce their own envelope decisions in their own spec docs.
 
@@ -33,7 +33,7 @@ The earlier `Prev-Message-CID:` and `IHave:` headers from the original drafting 
 
 ## Linked DI
 
-- `DI-009-20260430-204108` in `TODO/012-group-transport-envelope.md`
+- `DI-009-20260430-204108` in `protocols/group-session.d/TODO/TODO-20260501-045543-group-transport-envelope.md`
 
 ## Related commits
 
