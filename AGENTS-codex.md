@@ -221,6 +221,70 @@ Steps:
   d. Commit on a branch. Push.
   e. Tell Steve the DR exists and what it's blocking.
 
+# TE editing policy (Required)
+
+Once a TE is filed in `docs/thought-experiments/`, it is no longer
+freely editable. Edits follow the categorized policy locked in:
+
+- DI-020-20260502-213103 (categorized editing regimes; Cat-1 clause
+  superseded by DI-020-20260502-232651)
+- DI-020-20260502-213104 (uniform applicability across all TE corpora)
+- DI-020-20260502-213105 (holistic reading by default; single-TE
+  reading only for obviously mechanical questions)
+- DI-020-20260502-232651 (Cat-1a / Cat-1b path-reference split)
+- TE-34 (`docs/thought-experiments/TE-20260502-212810-te-editing-policy-and-holistic-corpus.md`)
+  and its four Cat-3 Refinements: Cat-1a/Cat-1b split forward-pointer;
+  Cat-2 DI-enumeration discipline; Cat-2 cross-TE quotation grep;
+  top-of-file `## Status` header field.
+- TE-35 (`docs/thought-experiments/TE-20260502-232651-editing-policy-tabletop.md`)
+  is the tabletop simulation that produced those refinements.
+
+Read AGENTS.md "TE Editing Policy (Required)" for the canonical
+statement. The seven categories in operational form:
+
+- Cat-1a (current-pointer paths): mechanical sweep in place.
+- Cat-1b (historical-quotation paths): leave untouched. Quoted paths,
+  paths inside `## Refinements` / supersedence notes / past-tense
+  prose are Cat-1b. When in doubt, treat as Cat-1b.
+- Cat-2 (vocabulary updates): in place, with a top-of-file note that
+  enumerates by ID every DI in the affected TE and promises meaning
+  preservation. Mandatory pre-step: grep the corpus for the old term
+  inside quotation contexts and classify each match (Cat-2 sweep vs.
+  Cat-2-historical leave) before sweeping.
+- Cat-3 (navigational forward pointers): append a dated entry to the
+  TE's `## Refinements` section (created if absent, after
+  `## Decision status`). Body unchanged. No DI filed.
+- Cat-4 (resolved-implication forward pointers): same shape as Cat-3,
+  used when an Implications-and-future-work item resolves.
+- Cat-5 / Cat-6 / Cat-7 (substantive supersedence): file a new TE
+  that supersedes the affected one. Update the older TE's
+  `## Decision status` and top-of-file `## Status` field; otherwise
+  leave its body untouched.
+
+Every TE carries a top-of-file `## Status` field placed immediately
+after the TE ID line. Canonical values: `needs DF`, `decided`,
+`decided, refined`, `superseded by TE-<id> / DI-<id>`, `withdrawn`.
+Legacy values preserved during retrofit: `stub`, `open`,
+`recommended for immediate adoption`, `locked for the <protocol>`.
+New TEs prefer canonical values.
+
+The `## Refinements` section is append-only. Entries are dated
+(`### YYYY-MM-DD - <title>`) and ordered chronologically. The body
+of the TE above `## Refinements` is treated as historical evidence:
+Cat-1a / Cat-2 sweeps on the body are permitted under their category
+rules; Cat-3 / Cat-4 changes go in `## Refinements`; Cat-5–7 changes
+go in a new TE.
+
+Reading default: holistic. Read TE-34, TE-35, and the affected TE
+(plus any TEs they cite) before performing any TE edit. Single-TE
+reading is reserved for obviously mechanical questions and only
+after the holistic read confirms the question is mechanical.
+
+Applicability is uniform across every TE corpus in this repository
+(harness-level under `docs/thought-experiments/` and any per-protocol
+TE corpora under `protocols/<slug>.d/`). Per-protocol corpora may add
+stricter rules but may not relax these rules.
+
 # Things that are forbidden
 
 - Do not push to main yourself. Always go through Steve approving
