@@ -1,6 +1,6 @@
 # TE-26: Transport-protocol types, pCID-keyed transport paths, and DAG message graphs
 
-*Thought experiment, part of the [PromiseGrid Wire Lab](../../specs/harness-spec-draft.md) and the (forthcoming) `specs/transport-spec-draft.md`. This file is content-addressable; its hash is its pCID.*
+*Thought experiment, part of the [PromiseGrid Wire Lab](../../protocols/wire-lab.d/specs/harness-spec-draft.md) and the (forthcoming) `specs/transport-spec-draft.md`. This file is content-addressable; its hash is its pCID.*
 
 > **Vocabulary note (TE-27):** This TE was originally drafted using the word "channel" for what is now called "transport." Per [TE-27](TE-20260501-021921-transports-rename-and-axes-of-differentiation.md) (axes-of-differentiation analysis and `channels/` → `transports/` rename), the wire-lab vocabulary is now "transport" and "message"; "channel" is not used. This TE has been rewritten in place to use the new vocabulary; structure, DF labels, and locked decisions are unchanged. Where the original document referred to the "codex-perplexity channel-protocol," the rewrite refers to it as the codex-perplexity instance of the group-transport-protocol (TE-27 DF-27.5 Alt-5.B).
 

@@ -1,6 +1,6 @@
 # TE-27: `channels/` → `transports/` rename and axes of transport-protocol differentiation
 
-*Thought experiment, part of the [PromiseGrid Wire Lab](../../specs/harness-spec-draft.md) and the (forthcoming) `specs/transport-spec-draft.md`. This file is content-addressable; its hash is its pCID.*
+*Thought experiment, part of the [PromiseGrid Wire Lab](../../protocols/wire-lab.d/specs/harness-spec-draft.md) and the (forthcoming) `specs/transport-spec-draft.md`. This file is content-addressable; its hash is its pCID.*
 
 ## TE ID
 

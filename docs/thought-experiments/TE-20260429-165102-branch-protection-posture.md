@@ -1,6 +1,6 @@
 # TE-19: Branch-protection posture for `main`
 
-*Thought experiment, part of the [PromiseGrid Wire Lab](../../specs/harness-spec-draft.md). This file is content-addressable; its hash is its pCID.*
+*Thought experiment, part of the [PromiseGrid Wire Lab](../../protocols/wire-lab.d/specs/harness-spec-draft.md). This file is content-addressable; its hash is its pCID.*
 
 ## TE ID
 
@@ -27,7 +27,7 @@ For a repo that will eventually migrate from GitHub to PromiseGrid, what branch-
 
 - **Alt-A (require GitHub PR):** Keep "Require a pull request before merging" plus "Require approvals". **Easier:** uses GitHub's built-in review UI. **Harder:** ties the workflow to GitHub-specific PR semantics. PromiseGrid migration would have to invent a `git push`-shaped equivalent. The PR ceremony also lives outside the repo (PR descriptions, comments, approvals are not version-controlled).
 
-- **Alt-B (Git-native push restriction):** Drop "Require a pull request before merging". Keep "Restrict who can push to matching branches → stevegt only", "Block force pushes", and "Restrict deletions". Steve merges by `git merge --no-ff` plus `git push origin main`. **Easier:** the merge mechanism is plain Git; it ports cleanly to any future substrate where `main` is just a signed pointer. The "only Steve can push" rule maps to PromiseGrid's eventual "the canonical pointer follows Steve's signing key" semantics (`specs/harness-spec-draft.md` §10a.8). Decision-and-review record stays in-repo as DR/DI files. **Harder:** Steve has no GitHub UI walking him through the merge; he runs `git` commands locally.
+- **Alt-B (Git-native push restriction):** Drop "Require a pull request before merging". Keep "Restrict who can push to matching branches → stevegt only", "Block force pushes", and "Restrict deletions". Steve merges by `git merge --no-ff` plus `git push origin main`. **Easier:** the merge mechanism is plain Git; it ports cleanly to any future substrate where `main` is just a signed pointer. The "only Steve can push" rule maps to PromiseGrid's eventual "the canonical pointer follows Steve's signing key" semantics (`protocols/wire-lab.d/specs/harness-spec-draft.md` §10a.8). Decision-and-review record stays in-repo as DR/DI files. **Harder:** Steve has no GitHub UI walking him through the merge; he runs `git` commands locally.
 
 - **Alt-C (no protection):** Anyone with write access can push `main`. **Easier:** simplest. **Harder:** removes the only mechanism that keeps the canonical pointer following Steve's intent. Bot bugs or stray pushes can corrupt `main`.
 
