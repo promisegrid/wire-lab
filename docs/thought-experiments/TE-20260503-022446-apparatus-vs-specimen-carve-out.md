@@ -4,6 +4,8 @@
 
 **First-drafted:** 2026-05-03 02:24:46 UTC.
 
+**Vocabulary note (added during drafting per DF-36.4 framing):** The harness-spec inherited the words "contest" / `contest-v1` from earlier draft text. Per Steve's standing rule (no "contest"; no "burden"; "discrepancy" rather than "defect") and the directive in DF-36.4 to use Promise Theory (PT) vocabulary, this TE recasts the discourse vocabulary in PT terms throughout: a proposal is an **imposition** (PT term for an attempt to induce cooperation; degrees include hints, suggestions, requests, requirements, commands); endorsement and contestation collapse into **assessments** of polarity (positive / negative); a counter-proposal is another imposition that references a prior imposition; a hypothesis-result is an assessment of a hypothesis-promise (polarity: confirmed / refuted / unrelated). PT canon (Burgess, Bergstra) does not split endorse / contest into separate primitives — they are both assessments with different polarity. This vocabulary applies to the new pCIDs the carve-out produces. Historical references in older TEs (TE-14, TE-16, TE-29's prose, this TE's tabletop scenarios where actors quote past events) stay under TE-34 Cat-1b (historical-quotation paths, not swept). The frozen DI-003 contest-artifact at `proposals/pending/ppx-dr-001-bootstrap/contest-20260429-033208-steve-traugott.md` is immutable per the rules already in force.
+
 **Decision under test:** The wire-lab harness-spec currently prescribes specific wire shapes (the promise-stack envelope, the `Promise` struct, the `[]Promise` message form, the `promstack` Wrap/Peel/Project library API, the `TrustLedger` field set, the named discourse pCIDs `endorse-v1`/`contest-v1`/`counter-propose-v1`/`hypothesis-result-v1`, the transport-promise as outermost frame). Per Steve's correction on 2026-05-02 / 2026-05-03, the harness-spec is **lab apparatus**: it describes how scenarios run, how actors are named, how transports are simulated, how messages are injected and observed, how trust ledgers are scored, and how outputs are compared. It is NOT prescriptive about wire shape. Each candidate envelope, library API, ledger shape, and discourse vocabulary is a **specimen** — a hypothesis under study — and each must live in its own `protocols/<slug>.d/` directory with its own spec doc and TEs. This TE locks the carve-out shape: how strictly the carve-out is applied, where each currently-named specimen relocates, and how ambiguous or apparatus-adjacent material is handled. It is the prerequisite for sweep edits to harness-spec under the locked TE-34 editing policy (Cat-1a path renames + Cat-2 vocabulary updates citing the DI this TE will produce).
 
 **Source audit:** The classification table in [`protocols/wire-lab.d/docs/audit-20260503-015309-harness-spec-apparatus-vs-specimen.md`](../../protocols/wire-lab.d/docs/audit-20260503-015309-harness-spec-apparatus-vs-specimen.md) (committed 2026-05-03 at `4725b3e`) is this TE's primary input. It walks every section of `harness-spec-draft.md` and classifies as Apparatus / Specimen / Ambiguous with brief rationale.
@@ -114,19 +116,32 @@ Where does the promise-stack family live? §1.1 prescribes the `Promise` struct,
 
 **Bot recommendation: Alt-3.A.** Honors the transport-≠-envelope distinction Steve made this session. The grid envelope is a hypothesis on its own merits and may be adopted by transports that aren't group-session (per Steve's "we need to be able to experiment with different message envelopes" — the experiment is over the envelope axis, not the transport axis). The slug `grid-envelope` is unambiguous within the wire-lab context (no clash with `grid-poc`, no clash with PromiseGrid). Alt-3.B silently forecloses the transport-agnostic experiments. Alt-3.C creates vocabulary churn for marginal gain. Alt-3.D punts. After Alt-3.A lands, group-session's spec doc relocates its envelope claims to "carries the envelope specified at `protocols/grid-envelope.d/specs/grid-envelope-draft.md`" via TE-31's spec-doc-CID reference convention.
 
-### DF-36.4 — Apparatus-level vocabulary for proposals/discourse
+### DF-36.4 — Apparatus-level vocabulary for proposals/discourse (PT-recast)
 
-§10a.2 names a `proposal-checklist-v0` pCID. §10a.3 names `endorse-v1`, `contest-v1`, `counter-propose-v1`. §10a.6 names `hypothesis-result-v1`. These are wire-level discourse vocabulary embedded in harness-spec.
+§10a.2 names a `proposal-checklist-v0` pCID. §10a.3 names `endorse-v1`, `contest-v1`, `counter-propose-v1`. §10a.6 names `hypothesis-result-v1`. These are wire-level discourse vocabulary embedded in harness-spec. Per the vocabulary note at the top of this TE, the new pCID names will use Promise Theory primitives — `imposition` (with strength/polarity parameters) and `assessment` (with polarity parameter) — rather than the legacy endorse/contest pair.
 
-**Alt-4.A: Move all four to `protocols/ppx-dr.d/`.** ppx-dr is already created (TODO 014) for "proposals as messages on a transport." It is the natural home for the discourse vocabulary. ppx-dr's spec doc absorbs the proposal-checklist, endorse, contest, counter-propose, hypothesis-result vocabularies as one related family.
+The PT mapping the carve-out adopts:
 
-**Alt-4.B: New `protocols/discourse.d/` separate from ppx-dr.** Discourse (proposal/endorse/contest/counter-propose/hypothesis-result) is a distinct pattern from "proposals as messages on a transport" (which is what ppx-dr models — the transport-of-proposals, not the discourse-vocabulary). Cost: more directories; weaker coupling between two protocols that almost always travel together.
+| Legacy harness-spec name | PT-vocabulary recast | One-line semantic |
+|---|---|---|
+| `proposal` (§10a.2) | `imposition` (strength: request / proposal) | Q attempts to induce cooperation in re: change X |
+| `proposal-checklist-v0` | `imposition-checklist` (still a community convention) | Suggested prose shape for impositions |
+| `endorse-v1` (§10a.3) | `assessment` (polarity: positive) | Q assesses imposition P as kept-if-accepted |
+| `contest-v1` (§10a.3) | `assessment` (polarity: negative) | Q assesses imposition P as not-kept-if-accepted (with conflicting evidence) |
+| `counter-propose-v1` (§10a.3) | `imposition` (with `references:` pointer) | A new imposition explicitly referencing a prior imposition |
+| `hypothesis-result-v1` (§10a.6) | `assessment` (of a hypothesis-promise; polarity: confirmed / refuted / unrelated) | The harness reports the assessment of a hypothesis emitted in-sim |
 
-**Alt-4.C: Stay in harness-spec, reframed at apparatus-level.** Harness-spec declares "the harness studies discourse vocabularies; one candidate is `endorse-v1`/`contest-v1`/...". This is essentially Alt-1.B applied locally — privilege one vocabulary as the worked example. Same problem as Alt-1.B at the carve-out-strictness level.
+The `imposition` and `assessment` primitives collapse what were five named pCIDs into two parameterized PT primitives. This is also more honest about what the discourse actually is in PT terms: proposals are not promises (the proposer cannot keep a promise on behalf of the system), they are impositions; endorsements and contests are both polarities of the same assessment primitive.
 
-**Alt-4.D: Defer decision.** Leave §10a.2/.3/.6 as the only home for the vocabulary until ppx-dr's spec is fleshed out enough to absorb it.
+**Alt-4.A: Move PT-recast vocabulary to `protocols/ppx-dr.d/`.** ppx-dr is already created (TODO 014) for "proposals as messages on a transport." It is the natural home for the imposition + assessment vocabulary. ppx-dr's spec doc absorbs both primitives as the discourse layer carried by the protocol.
 
-**Bot recommendation: Alt-4.A.** ppx-dr already exists as a per-protocol simrepo; the discourse vocabulary fits its scope (proposals are the central object, endorse/contest/counter-propose are first-class operations on proposals, hypothesis-result is the experimental-evidence entry that closes a proposal-cycle). Alt-4.B over-divides; ppx-dr without a discourse vocabulary is anemic, and a discourse protocol without a transport for proposals is incoherent. Alt-4.C re-introduces the carve-out problem. Alt-4.D defers without solving anything.
+**Alt-4.B: New `protocols/discourse.d/` separate from ppx-dr.** Imposition + assessment is a distinct pattern from "messages on a transport"; ppx-dr could specialize to the transport while a separate `discourse.d/` carries the PT primitives generically. Cost: more directories; the two protocols are tightly coupled in practice.
+
+**Alt-4.C: Stay in harness-spec, PT-recast in place.** Harness-spec declares the PT primitives at apparatus level ("the harness studies systems in which agents make impositions and emit assessments"). Cost: conflicts with DF-36.1 Alt-1.A Strict — apparatus mentions PT primitives but specific wire encodings still constitute specimen prescription if left in harness-spec.
+
+**Alt-4.D: Defer decision.** Leave §10a.2/.3/.6 as the only home for the vocabulary until ppx-dr's spec is fleshed out.
+
+**Bot recommendation: Alt-4.A with PT-recast vocabulary.** ppx-dr exists as a per-protocol simrepo; PT primitives fit its scope (impositions are proposals on the wire; assessments are the receiver-side polarity-bearing observations). Apparatus-level invariant retained in harness-spec: "the harness records impositions and assessments per PT canon; specific wire encodings are specimen-level and live in `protocols/ppx-dr.d/`."
 
 ### DF-36.5 — §1.3 simulator-tests-about-layering disposition
 
