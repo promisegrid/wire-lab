@@ -120,7 +120,7 @@ Every PromiseGrid message file in the simulation lives at a path of
 the form:
 
 ```
-transports/<real-world-transport-name>/<L4-binding-pCID>/<session-pCID>/<message-pCID>/<message-id>.msg
+transports/<real-world-transport-name>/<L4-binding-pCID>/<session-pCID>/<message-pCID>/<message-id>.txt
 ```
 
 Five-level decomposition, each level corresponding to one layer's
@@ -132,7 +132,7 @@ identity:
 | 2     | L4-binding pCID               | PromiseGrid   | `udp-binding-bafkrei...U1`                     |
 | 3     | session-protocol pCID         | PromiseGrid   | `group-session-bafkreig...B2`                  |
 | 4     | message-protocol pCID         | PromiseGrid   | `ppx-dr-bafkrei...D4`                          |
-| 5     | message-id (filename)         | content-hash  | `<message-id>.msg`                             |
+| 5     | message-id (filename)         | content-hash  | `<message-id>.txt`                             |
 
 ### Why level 1 is a slug, not a pCID
 
@@ -234,7 +234,7 @@ to deliver a ppx-dr proposal.
    - Looks up peer address `198.51.100.7:4646`.
    - `udp_socket.sendto(SESSION_MESSAGE, addr)`.
    - Writes simulation artifact:
-     `transports/udp/udp-binding-bafkrei...U1/group-session-bafkreig...B2/ppx-dr-bafkrei...D4/<message-id>.msg`
+     `transports/udp/udp-binding-bafkrei...U1/group-session-bafkreig...B2/ppx-dr-bafkrei...D4/<message-id>.txt`
      with file content equal to the exact 612 bytes.
 5. OS prepends UDP+IP headers; bytes traverse the network. Out of
    scope for any PromiseGrid spec.
@@ -255,7 +255,7 @@ to deliver a ppx-dr proposal.
 - WebSocket-binding: one binary frame per message.
 - MQTT-binding: PUBLISH on topic `pgrid/<group-id>` at QoS configured
   by the binding spec.
-- File-drop-binding: write `<message-id>.msg` to a shared spool dir;
+- File-drop-binding: write `<message-id>.txt` to a shared spool dir;
   receiver watches with inotify.
 - SMTP-binding: base64-wrap as email body to a configured address;
   receiver polls IMAP.
@@ -295,9 +295,9 @@ are tracked as separate TODOs:
 
 3. **TODO 016: proposals as transport messages.** Move
    `proposals/pending/ppx-dr-001-bootstrap/` content to
-   `transports/<future-bootstrap-transport>/<bootstrap-binding-pCID>/<group-session-pCID>/<ppx-dr-pCID>/<message-id>.msg`.
+   `transports/<future-bootstrap-transport>/<bootstrap-binding-pCID>/<group-session-pCID>/<ppx-dr-pCID>/<message-id>.txt`.
    DI-003 protection follows the bytes, not the path. Renaming
-   `.md` to `.msg` is itself a one-time edit that must precede the
+   `.md` to `.txt` is itself a one-time edit that must precede the
    DI-003 anchor moving. **Filed as BLOCKED** on four upstream
    prerequisites: TODO 014 (protocols/ migration), a frozen
    bootstrap-binding pCID, a frozen group-session pCID, and a drafted
@@ -330,7 +330,7 @@ questions about (a) self-sufficiency of the spec doc taken alone and
 (b) doc-centric vs repo-centric simulation.
 
 OQ-29.2: **Filename inside transport leaves.** Content-hash, ULID, or
-both (`<ulid>-<hash>.msg`)? Hash gives free cross-transport
+both (`<ulid>-<hash>.txt`)? Hash gives free cross-transport
 deduplication; ULID makes ordering trivial. Lean: hash; ordering
 recovered from session-layer Parents header.
 
@@ -396,7 +396,7 @@ for adversarial scenarios in the wire-lab, with a small Mininet path
 for topology-only experiments. The integration shape (ns-3 emulates
 the wire; Go reference implementations run as applications above
 sockets via tap-bridge or DCE; PCAP output is post-processed into
-`transports/<wire>/<binding-pCID>/.../<msg-id>.msg` artifacts) is
+`transports/<wire>/<binding-pCID>/.../<msg-id>.txt` artifacts) is
 unchanged from the original lean. Worth a dedicated TE once the
 first Go binding+session implementations exist. Reference smoke-test
 artifacts from the sandbox session are recorded outside this repo;

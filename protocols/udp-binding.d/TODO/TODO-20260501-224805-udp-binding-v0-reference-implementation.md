@@ -38,7 +38,7 @@ abstraction defect, not just a UDP issue.
    under the wire-lab simulator, write each datagram payload to:
 
    ```
-   transports/udp/<this-binding-pCID>/<session-pCID>/<message-pCID>/<message-id>.msg
+   transports/udp/<this-binding-pCID>/<session-pCID>/<message-pCID>/<message-id>.txt
    ```
 
    The session-pCID, message-pCID, and message-id come from the
@@ -118,6 +118,6 @@ abstraction defect, not just a UDP issue.
   with concrete pointers replacing "to be added" placeholders.
 - TODO 019's ns-3 harness scenario runs the Go reference
   implementation end-to-end at least once and produces matching
-  PCAP and `.msg` artifacts.
+  PCAP and `.txt` artifacts.
 - `/tmp/spec check` (or its successor) reports OK with the spec
   recognized at its new path under `protocols/udp-binding.d/`.

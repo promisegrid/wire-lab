@@ -38,17 +38,17 @@ A transport directory under this protocol has **no subdirectories.** All message
 
 ```
 transports/<this-pcid>--<slug>/
-    <message-id-1>.msg
-    <message-id-2>.msg
-    <message-id-3>.msg
+    <message-id-1>.txt
+    <message-id-2>.txt
+    <message-id-3>.txt
     ...
 ```
 
 Rationale: the DAG of `Parents:` links carries all the ordering information any reader needs. Subdirectory structure (per-sender, per-direction, per-date, etc.) would either duplicate the DAG (redundant), pick a privileged axis the protocol does not have (sender or direction), or be presentational (and so belong in a viewer, not in the on-disk format). Flat is honest. (T6 in TODO 013 carve-out, locked Alt-T6.A.)
 
-### §2. Message filename: `<message-id>.msg`
+### §2. Message filename: `<message-id>.txt`
 
-Each message file is named by its `Message-ID` header value, with the `.msg` suffix appended. The `Message-ID` is a human-readable convenience identifier (see §4.3). It is NOT the message CID. Two facts follow:
+Each message file is named by its `Message-ID` header value, with the `.txt` suffix appended. The `.txt` extension reflects the canonical-bytes contract from §4 (UTF-8 text with LF line endings); it lets ordinary editors, viewers, and text-search tools work on message files without ceremony. The `Message-ID` is a human-readable convenience identifier (see §4.3). It is NOT the message CID. Two facts follow:
 
 - **Filename collisions are possible.** If two writers independently coin the same `Message-ID`, their files collide. This is treated as an authoring error to be resolved by either author renaming. The protocol does not attempt to enforce uniqueness of `Message-ID` cryptographically; that is what the message CID is for (see §3).
 - **The filename is presentational, not load-bearing.** Readers locate messages by message CID through the `Parents:` DAG; the filename is a navigation convenience for humans.
@@ -162,6 +162,24 @@ Membership is **closed and fixed at transport creation.** The set of `From:` val
 
 If membership changes — a participant leaves, a new participant joins — a new transport instance is created (a new directory under `transports/`, with a fresh slug). The old transport remains as immutable history.
 
+### §9. Per-author-branch git binding (non-normative)
+
+This section describes the conventional git binding used by transport instances of this protocol that ride a shared git remote as their wire. It is non-normative: the protocol's contract is the on-disk shape of `transports/<pcid>--<slug>/` plus the canonical bytes of each message file. The git binding is one way of placing those files in front of the participants such that the append-only and DAG-of-parents semantics are preserved across multiple writers.
+
+Under this binding:
+
+- **Each participant has their own write branch named `<author-id>/main`.** Examples: `alice/main`, `bob/main`, `carol/main`. The branch name is per-participant and stable across the lifetime of the transport.
+- **A participant writes only on their own `<author-id>/main` branch.** No participant ever writes a message file on another participant's branch. Concurrent writes from different participants therefore never produce git-level merge conflicts on message files: each branch only adds files in the directory that no other branch is adding.
+- **A reader fetches every participant's `<author-id>/main` branch and unions the message files** they find under `transports/<pcid>--<slug>/`. The union is the transport's complete message set. Because filenames include the author identity (typically as a `Message-ID:` prefix per §4.3) and because canonical bytes carry the author's `From:` header, two different authors cannot accidentally produce the same filename or the same message CID for distinct content.
+- **Ordering is reconstructed from the DAG**, not from branch topology. The git commit graph is incidental to the message graph; readers walk `Parents:` links per §4.6 to reconstruct causal ordering, and ignore the commit graph for that purpose.
+- **The infrastructure files** that are not protocol messages (`README.md` inside the transport directory, the directory itself) propagate from the branch on which the transport was originally bootstrapped. New participants typically fork their `<author-id>/main` from a branch that already has the directory, so the directory exists on every participant's branch automatically. Edits to infrastructure files are coordinated out-of-band; they are not protocol messages and do not participate in the DAG.
+- **Append-only is enforced socially.** Per §7, once a message file appears on any participant's `<author-id>/main` branch, neither that participant nor any other rewrites or removes it. Deleting a message file is treated as a protocol violation; the standing "never force-push" rule on `<author-id>/main` branches makes accidental deletion recoverable from the remote's reflog, and intentional deletion observable.
+- **Membership** under this binding is the set of `<author-id>/main` branches a participant is configured to fetch. The closed-and-fixed property of §8 is satisfied when participants share a fixed list of branches; an unrecognized branch name is, by convention, ignored on read until membership is explicitly extended.
+
+This binding does not change the on-disk shape; it changes who writes which file where. A receiver implementation under this binding does roughly: `git fetch --all && for branch in <known-author-branches>: list new transports/<pcid>--<slug>/*.txt files since last seen; verify each per §3 and §4; integrate into the local DAG view`.
+
+Other git bindings are possible and remain compatible with the protocol's on-disk contract. For example, a single shared write branch with merge-on-pull is workable but produces fast-forward rejections under concurrent writes; a per-thread branch binding is workable but loses the all-see-all property unless threads are merged. The per-author-branch binding above is the recommended starting point because it eliminates merge conflicts by construction.
+
 ## Worked example
 
 A two-participant transport between Codex and Perplexity, freshly created, before any messages exist:
@@ -174,10 +192,10 @@ After Codex posts the first message:
 
 ```
 transports/<group-transport-pcid>--codex-perplexity/
-    codex-20260430T203114Z-greeting.msg
+    codex-20260430T203114Z-greeting.txt
 ```
 
-Where `codex-20260430T203114Z-greeting.msg` contains:
+Where `codex-20260430T203114Z-greeting.txt` contains:
 
 ```
 grid <group-transport-pcid>
@@ -195,11 +213,11 @@ After Perplexity replies citing Codex's message as a parent:
 
 ```
 transports/<group-transport-pcid>--codex-perplexity/
-    codex-20260430T203114Z-greeting.msg
-    perplexity-20260430T203714Z-ack.msg
+    codex-20260430T203114Z-greeting.txt
+    perplexity-20260430T203714Z-ack.txt
 ```
 
-Where `perplexity-20260430T203714Z-ack.msg` contains:
+Where `perplexity-20260430T203714Z-ack.txt` contains:
 
 ```
 grid <group-transport-pcid>

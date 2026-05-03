@@ -15,7 +15,7 @@ proposal and Steve's frozen contest reply) from its ad-hoc
 `proposals/` location to the canonical TE-29 transport-message path:
 
 ```
-transports/<bootstrap-transport-slug>/<bootstrap-binding-pCID>/<group-session-pCID>/<ppx-dr-pCID>/<message-id>.msg
+transports/<bootstrap-transport-slug>/<bootstrap-binding-pCID>/<group-session-pCID>/<ppx-dr-pCID>/<message-id>.txt
 ```
 
 This realizes the TE-29 insight that "a proposal is a message on the
@@ -61,7 +61,7 @@ Until all four prerequisites land, this TODO is not actionable.
    as files in a git tree, and `file-drop` is the binding closest to
    that semantics. Worth a small TE if the choice is non-obvious.
 
-2. **Rename `.md` to `.msg`** on each file. This is a one-time edit
+2. **Rename `.md` to `.txt`** on each file. This is a one-time edit
    that affects byte-content (filename is not part of the bytes, but
    tools that key off extension may behave differently).
 
