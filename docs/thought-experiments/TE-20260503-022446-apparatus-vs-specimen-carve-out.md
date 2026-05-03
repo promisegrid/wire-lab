@@ -173,6 +173,8 @@ The `conditional-promise` and `assessment` primitives collapse what were five na
 
 **Bot recommendation: Alt-6.D.** Trust-ledger shape is less developed as a hypothesis than promise-stack or grid-envelope; only one struct exists, no peer hypotheses are queued, the struct itself was drafted as illustrative rather than load-bearing. Creating `protocols/trust-ledger.d/` now would be busywork — it would hold one example shape and no substantive content. The apparatus invariants (record kept/broken/open per peer pair; per-assertion vector; imports as down-weighted) are sufficient to constrain harness behavior without naming a struct. When a second candidate shape arrives (e.g. a Bayesian-only ledger that drops `evidence_chain`, or an Eigen-only ledger that drops local scores entirely), `protocols/trust-ledger.d/` materializes and the §2.1 struct migrates with the new candidate as company. Until then, harness-spec stays apparatus-clean and no empty directory exists.
 
+**LOCKED: Alt-6.D Lazy carve-out** (Steve, 2026-05-03). Lift §2.1 to apparatus-level invariants only in harness-spec; do not create `protocols/trust-ledger.d/` yet. The §2.1 struct field set is recorded in the audit memo as an example shape worth further study; sweep step 4 will not migrate it. The directory materializes when a second candidate shape is filed.
+
 ### DF-36.7 — §10 grid-poc directory table disposition
 
 §10 gives a directory table mapping wire-lab artifacts to `x/wire-v2/promstack/`, `x/wire-v2/trust/`, `x/sims/simkit/...`, `x/sims/scenarios/...`, etc. After the carve-out, the rows for `promstack` and `trust` (and any specimen-specific row) become **implementations** (per TE-32 B-side `implementations/<impl-name>/`) rather than apparatus components.
