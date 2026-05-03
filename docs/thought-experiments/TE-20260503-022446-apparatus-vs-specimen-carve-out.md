@@ -157,6 +157,8 @@ The `conditional-promise` and `assessment` primitives collapse what were five na
 
 **Bot recommendation: Alt-5.C.** Alt-5.A loses information that promise-stack readers want (the specimen-specific tests are real and testable). Alt-5.B leaves a gap in harness-spec where the apparatus-level claim should be. Alt-5.C honors both: apparatus-level invariants (every candidate envelope must survive these four scenarios) live in harness-spec; specimen-specific test details live with the specimen. This pattern generalizes to other ambiguous sections (§3.3 bullet 1, §7.1).
 
+**LOCKED: Alt-5.C Both** (Steve, 2026-05-03). Apparatus-level summary of the four layering-test scenarios stays in harness-spec under an envelope-agnostic title; specimen-specific detail (promise-frame vocabulary, top-down accept/defer/reject semantics) migrates to the promise-stack spec. Specimen-side migration is gated on OQ-36.6 — if promise-stack proves redundant with grid-pcid-payload, the specimen-detail target shifts accordingly, but the apparatus-level summary in harness-spec stands either way.
+
 ### DF-36.6 — TrustLedger struct shape disposition
 
 §2.1 prescribes a specific `TrustLedger` field set: `first_seen_ns`, `interactions`, `kept`, `broken`, `evidence_chain`, `open_promises`, `score`, `score_components`, `reputation_imports`, `relationship_age_ns`, `last_drift_ns`. The audit flagged this as half-apparatus / half-specimen: existence of a per-peer trust ledger is apparatus; the specific field set is one candidate shape.
