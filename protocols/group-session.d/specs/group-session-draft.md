@@ -14,7 +14,7 @@ The outer convention — that transport directories live under `transports/` key
 
 This spec is locked by the conclusions of:
 
-- [TE-24](../docs/thought-experiments/TE-20260430-204108-group-transport-envelope.md): the group-transport envelope: `grid <pcid>` carrier, canonical-bytes rules, explicit-promise body requirement, `Message-ID`/`Date`/`From` as conveniences. The TODO 013 carve-out supersedes the original `Prev-Message-CID:`, `IHave:`, and `Kind:` headers from the TE's first drafting; the locked v0 contract uses `Parents:` (DAG links), body-level acknowledgement (receipts), and no `Kind:` header.
+- [TE-24](../docs/thought-experiments/TE-20260430-204108-group-transport-envelope.md): the group-transport envelope: `grid <pcid>` carrier, canonical-bytes rules, explicit-promise body requirement, and `Date`/`From` as conveniences. The TODO 013 carve-out supersedes the original `Prev-Message-CID:`, `IHave:`, and `Kind:` headers from the TE's first drafting; the locked v0 contract uses `Parents:` (DAG links), body-level acknowledgement (receipts), and no `Kind:` header. The `Message-ID:` header described in TE-24 is also dropped: under §2 (filename = CID), the message CID is the message's identifier and a separate human-readable identifier creates two competing identities for the same message and is omitted.
 - [TE-26](../docs/thought-experiments/TE-20260430-215624-channel-transport-types-and-threaded-replies.md): the conceptual shift to DAG-shaped message graphs (zero-or-more parents per message).
 - [TE-27](../docs/thought-experiments/TE-20260501-021921-transports-rename-and-axes-of-differentiation.md): the per-axis meta-rule that locks small-finite-closed-group with N≥2 as a single protocol class (cardinality is a parameter, not a contract boundary, except at extremes).
 - [DR-009](../DR/DR-009-20260430-204108-group-transport-envelope.md): the active decision request governing the group-transport envelope and the freeze gate.
@@ -52,7 +52,7 @@ Each message file is named by its **message CID** (per §3), with the `.txt` suf
 
 Four properties follow from naming files by CID:
 
-- **Filename collisions are impossible by construction.** Two messages with the same canonical bytes have the same CID and are the same message; two messages with different canonical bytes have different CIDs and therefore different filenames. The earlier `Message-ID:` header (§4.3) is retained as a human-readable convenience but is not load-bearing for filename purposes.
+- **Filename collisions are impossible by construction.** Two messages with the same canonical bytes have the same CID and are the same message; two messages with different canonical bytes have different CIDs and therefore different filenames.
 - **Filenames are content-verifiable.** A reader can verify a message's integrity by re-computing the CID over the file's bytes and comparing it to the filename, without consulting any other file or header. The filename and the canonical bytes are mutually self-checking.
 - **Two writers cannot collide on the wire.** Under git bindings such as the per-author-branch binding (§9), two participants posting the same logical message produce identical bytes, identical CIDs, and identical filenames; git treats this as a clean union with no conflict. Two participants posting different messages produce different filenames in the same directory, also with no conflict.
 - **Append-only is structurally enforced.** Editing an existing message after the fact changes its canonical bytes and therefore its CID, which makes the edit a different file entirely. The original file remains; the edit appears as a sibling. Mutation of an existing message in place is not expressible.
@@ -86,9 +86,9 @@ The first line is `grid <pcid>` where `<pcid>` is this transport-protocol's pCID
 
 Headers are line-oriented. Each header is `Name: value\n`. Header names are case-sensitive. Header values do not span lines (no continuation lines). Trailing whitespace on a header value is significant and should be avoided; canonical encoders SHOULD strip trailing whitespace before computing the message CID.
 
-#### §4.3 `Message-ID:` (mandatory, single-valued)
+#### §4.3 No `Message-ID:` header
 
-A human-readable identifier the author chose for this message. Format is free-form printable-ASCII; recommended convention is `<sender>-<utc-timestamp>-<short-slug>` (e.g. `codex-20260430T203114Z-greeting`). The `Message-ID` is NOT cryptographic and is NOT load-bearing for receipts or DAG links — those use the message CID.
+This protocol does NOT have a `Message-ID:` header. The message CID (§3), which is also the filename (§2), is the message's identifier; a separate human-readable identifier creates two competing identities for the same message and is therefore omitted. Author identity lives in `From:` (§4.5); authoring time lives in `Date:` (§4.4); navigation aids that humans want (such as a short slug) belong in body prose, not in the envelope.
 
 #### §4.4 `Date:` (mandatory, single-valued)
 
@@ -114,10 +114,9 @@ The `Parents:` mechanism is how the DAG is realized on disk. A reader that walks
 
 In canonical bytes, headers MUST appear in this order, and any header that is absent simply does not appear (no placeholder line):
 
-1. `Message-ID:`
-2. `Date:`
-3. `From:`
-4. `Parents:` (if present)
+1. `Date:`
+2. `From:`
+3. `Parents:` (if present)
 
 Future versions of this spec MAY add headers; they will be inserted at locked positions in this order list. Unknown headers (from a hypothetical future revision) MUST NOT be silently dropped; readers MUST reject messages they cannot fully parse, since the message CID covers the unknown bytes and a reader that strips them changes the message identity.
 
@@ -148,8 +147,8 @@ A v0 acknowledgement has the shape of a normal message whose body explicitly cit
 ```
 I promise that I have observed and accepted the following message(s):
 
-- bafk...abc (Message-ID: codex-20260430T203114Z-greeting)
-- bafk...def (Message-ID: codex-20260430T203205Z-followup)
+- bafk...abc
+- bafk...def
 ```
 
 The acknowledgement message itself participates in the DAG: it cites the messages it acknowledges in its `Parents:` header (so graph-walkers see the relationship structurally) AND in its body prose (so humans and LLM readers see the relationship in plain text). The two MUST be consistent — every CID in the body acknowledgement list MUST also appear in `Parents:`, and conversely. (DF-T5.)
@@ -252,7 +251,6 @@ Where the file `bafkreigtaivld55rekcswfj26mo26e267m3ytzgflqb2qcclyiicpfzc6i.txt`
 ```
 grid <group-transport-pcid>
 
-Message-ID: codex-20260430T203114Z-greeting
 Date: 2026-04-30T20:31:14Z
 From: codex@promisegrid.example
 
@@ -274,7 +272,6 @@ Where the second file (the reply) contains:
 ```
 grid <group-transport-pcid>
 
-Message-ID: perplexity-20260430T203714Z-ack
 Date: 2026-04-30T20:37:14Z
 From: perplexity@promisegrid.example
 Parents: bafkreigtaivld55rekcswfj26mo26e267m3ytzgflqb2qcclyiicpfzc6i
@@ -282,7 +279,6 @@ Parents: bafkreigtaivld55rekcswfj26mo26e267m3ytzgflqb2qcclyiicpfzc6i
 I promise that I have observed and accepted the following message(s):
 
 - bafkreigtaivld55rekcswfj26mo26e267m3ytzgflqb2qcclyiicpfzc6i
-  (Message-ID: codex-20260430T203114Z-greeting)
 
 I promise to begin work on the group-transport-draft v0 contract.
 ```

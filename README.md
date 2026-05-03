@@ -14,6 +14,12 @@ the latest code and documentation.
 
 Provisional. Almost everything in the harness-spec is an experimental knob, not a commitment. 
 
+## How to contribute
+
+At the moment, the transports/ (formerly channels/) directory is
+shaping up to be a mechanism for inter-agent and interpersonal
+communications. See the README.md in that directory for more details.
+
 ## License
 
 GPL-3.0, matching the rest of [PromiseGrid](https://github.com/promisegrid/promisegrid).
