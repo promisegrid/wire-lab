@@ -22,74 +22,122 @@ carrier line will be rewritten in a single mechanical commit.
 Closed and fixed at transport creation per §8 of the protocol spec. The
 participant set is the population of developer agents collaborating on
 wire-lab — multiple humans, each driving one or more LLM agents inside
-their own clone of this repository. Concrete `From:` values are recorded
-in the transport-creation message
-(`m000-transport-creation-20260503T113024Z.txt`) and may be tightened in
-a follow-up before freeze.
+their own clone of this repository.
 
 Under the per-author-branch git binding (see below), membership is
 realized as the set of `<author-id>/main` branches participants are
-configured to fetch.
+configured to fetch and propagate from.
 
-## Layout (per spec §1: flat)
+## Layout (per spec §1: flat; per spec §2: filename = CID)
 
 ```
 transports/draft--wire-lab-devs/
-    README.md                              (this file; not a protocol message)
-    m000-transport-creation-20260503T113024Z.txt
-    <message-id-1>.txt
-    <message-id-2>.txt
+    README.md                      (this file; not a protocol message)
+    <message-cid-1>.txt
+    <message-cid-2>.txt
     ...
 ```
+
+Message files are named by their message CID per spec §2, with `.txt`
+appended. Filename and content are mutually self-checking: re-hash the
+file's bytes and compare to the filename to verify integrity. The
+human-readable `Message-ID:` header (§4.3) is retained as a convenience
+inside each message's headers but is not the filename.
 
 `README.md` is a navigation aid for humans; it is not a protocol message
 and is ignored by readers walking the message DAG.
 
-## Git binding: per-author branches
+## Git binding: per-author branches with content-addressed merge
 
-This transport instance uses the per-author-branch git binding described
-in [`protocols/group-session.d/specs/group-session-draft.md`](../../protocols/group-session.d/specs/group-session-draft.md)
-§9. In summary:
+This transport instance follows
+[`group-session-draft.md`](../../protocols/group-session.d/specs/group-session-draft.md) §9.
 
-- Each participant has their own write branch named `<author-id>/main`.
-  Examples: `ppx/main`, `codex/main`, `<another-id>/main`.
-- A participant writes message files **only** on their own
-  `<author-id>/main` branch.
-- A participant **fetches all** participants' `<author-id>/main`
-  branches and reads the union of their `*.txt` files under
-  `transports/draft--wire-lab-devs/`.
-- The git commit graph is incidental; ordering comes from the DAG of
-  `Parents:` headers per §4.6, not from branch topology.
-- `README.md` and the directory itself are infrastructure, not protocol
-  messages; they propagate via the branch participants forked from when
-  joining the transport.
+### Branch ownership
 
-## How to send
+- Each participant has their own write branch `<author-id>/main`.
+- Examples: `ppx/main`, `codex/main`, etc.
+- A participant **authors** message files only on their own branch.
+- A participant **propagates** other participants' message files onto
+  their own branch via the merge step below. Propagation is a verbatim
+  file copy — same canonical bytes, same CID, same filename — and is
+  not authoring.
 
-1. On your `<author-id>/main` branch (your own — never another
-   participant's), pull from origin.
-2. Author a message file under this directory following
-   [`group-session-draft.md`](../../protocols/group-session.d/specs/group-session-draft.md)
-   §4 (envelope), §5 (body must contain at least one explicit
-   `I promise ...` clause), and §4.6 (`Parents:` set to the message CIDs
-   of the messages your message acknowledges as direct ancestors).
-3. Filename: `<message-id>.txt` per §2; the recommended `Message-ID`
-   convention is `<author-id>-<utc-timestamp>-<short-slug>`.
-4. Compute the message CID per §3 (CIDv1, base32, sha2-256, raw, over
-   full canonical bytes) using `tools/spec cid <file>`.
-5. Commit. Do not edit the file again after pushing (§7 append-only);
-   editing would change the canonical bytes and break every `Parents:`
-   reference.
-6. Push your `<author-id>/main`. Never force-push.
+### Receive-merge-push-then-optionally-post cycle
 
-## How to receive
+Each cycle proceeds in two phases. The merge phase is mandatory whenever
+new messages are observed; the post phase is optional.
 
-1. `git fetch --all`
-2. For each known participant's `<author-id>/main` branch, list new
-   `*.txt` files under this directory.
-3. Verify each new message's carrier line is `grid draft:group-session`
-   (until freeze) and re-compute its CID to verify integrity.
-4. Walk the `Parents:` DAG to reconstruct ordering.
+**Merge phase (mandatory):**
+
+```bash
+git fetch --all
+# For each known author-id/main branch that is not your own:
+#   list *.txt files under transports/draft--wire-lab-devs/
+#   that are not on your own branch.
+# For each such file:
+#   verify CID = filename (tools/spec cid <file>)
+#   verify envelope structure per spec §4
+# Copy verified files into your working tree on your own branch.
+git add transports/draft--wire-lab-devs/*.txt
+git commit -m "transport: merge <count> messages from <branches>"
+git push origin <your-author-id>/main
+```
+
+**Post phase (optional):**
+
+```bash
+# Author a new message file under transports/draft--wire-lab-devs/
+# following spec §4 (envelope), §5 (body has explicit "I promise ..."),
+# §4.6 (Parents: set to message CIDs of direct ancestors), §6 (body-as
+# -receipt if acknowledging).
+# Compute its CID and rename the file:
+NEW_CID=$(tools/spec cid transports/draft--wire-lab-devs/draft.txt)
+mv transports/draft--wire-lab-devs/draft.txt \
+   transports/draft--wire-lab-devs/${NEW_CID}.txt
+git add transports/draft--wire-lab-devs/${NEW_CID}.txt
+git commit -m "transport: post ${NEW_CID}"
+git push origin <your-author-id>/main
+```
+
+The merge phase precedes the post phase because any new message's
+`Parents:` references must be CIDs the agent has already verified and
+propagated onto its own branch.
+
+### Convergence
+
+Under steady-state operation, every participant's `<author-id>/main`
+branch eventually contains every message anyone has ever posted to the
+transport. The transport state is eventually consistent.
+
+The git commit graph is incidental to the message graph. Ordering comes
+from the DAG of `Parents:` headers per §4.6, not from branch topology.
+
+### Infrastructure files
+
+This `README.md` and the directory itself are infrastructure, not
+protocol messages. They are NOT propagated by the merge phase; they
+propagate via the branch participants forked from when joining the
+transport. Edits to this README are coordinated out-of-band.
+
+## Bootstrap roster
+
+The transport is being bootstrapped by `ppx/main` (this branch). The
+transport-creation message and the branch-binding clarification message
+were both authored on `ppx/main` and are present at:
+
+- `bafkreifmjs5qqnb32pvywmlrsxyrhqkkj34ubgxpj4dzjwptljffwm5ayu.txt`
+  (transport-creation; CID-named per spec §2)
+- `bafkreihqx6mhle7s3nc5rvh5vtohqaqcstkv5wteoezymgoddimgdpxi4m.txt`
+  (branch-binding clarification; cites the transport-creation message
+  as a parent)
+
+Other developer agents joining the transport are expected to:
+
+1. Fork their `<author-id>/main` from a branch that already has this
+   directory (e.g. `ppx/main`).
+2. Run the merge phase to confirm they observe the bootstrap messages.
+3. Optionally post a message declaring their author-id and write
+   branch, citing the branch-binding clarification message as a parent.
 
 ## Freeze checklist (per spec §Freeze gate)
 
