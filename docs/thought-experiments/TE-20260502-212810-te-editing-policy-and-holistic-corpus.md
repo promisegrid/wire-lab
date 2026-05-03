@@ -245,6 +245,31 @@ Until that follow-on TE lands, the AGENTS.md / AGENTS-codex.md / AGENTS-ppx.md u
 
 New subtask filed in TODO 020: 020.9 (write the follow-on tabletop TE; gate AGENTS rollout on it).
 
+### 2026-05-02 — Cat-1 split into Cat-1a / Cat-1b (DI-020-20260502-232651 supersedes Cat-1 clause)
+
+The follow-on tabletop TE (TE-35, `docs/thought-experiments/TE-20260502-232651-editing-policy-tabletop.md`) ran six scenarios with named actors. Locked policy survived at the macro level. One refinement reached DI-supersedence weight: Scenario S3 (Dave's mid-twig path migration) and Scenarios S5 / S6 (Mallory's bad-faith Cat-2 attack and verbatim cross-TE quotation) showed that Cat-1 path renames cannot be a uniform mechanical sweep, because some path references in the corpus are historical quotations (in TE-30, TE-32, TE-33, and any future TE that quotes earlier path strings) rather than current pointers. Rewriting a quoted path silently falsifies the quotation and degrades the corpus's self-evidence — the property holistic reading (DI-020-20260502-213105) depends on.
+
+DI-020-20260502-232651 (in `protocols/wire-lab.d/TODO/TODO-20260502-213103-te-editing-policy-and-holistic-corpus.md`) supersedes the Cat-1 clause of DI-020-20260502-213103 only. Cat-1 splits into:
+
+- **Cat-1a (current-pointer paths)** — mechanically swept in place, no top-of-file note.
+- **Cat-1b (historical-quotation paths)** — left untouched; rewriting them would falsify the historical record.
+
+Classification is per match during a sweep, with five heuristics (quotation context, Refinements / supersedence framing, past tense, default Cat-1a, when-in-doubt-Cat-1b). Sweep tools may emit matches with surrounding context for human review but may not auto-rewrite. The Cat-2 / Cat-3 / Cat-4 / Cat-5 / Cat-6 / Cat-7 clauses of DI-020-20260502-213103 are unchanged.
+
+This is a Cat-3 forward-pointer entry; the TE body above is unchanged. Readers reaching the original Cat-1 description in the locked policy section should follow the chain to DI-020-20260502-232651 for the current rule.
+
+### 2026-05-02 — Cat-2 notes must enumerate unchanged DIs by ID (procedural tightening)
+
+TE-35 Scenario S5 (Mallory's bad-faith Cat-2 attack) showed that the Cat-2 top-of-file note as originally specified in DI-020-20260502-213103 — "a note pointing at the TE or TODO that drove the rewrite" — is not auditable enough. A sweeper acting in bad faith (or hurried good faith) could rename a vocabulary term whose meaning shifts inside one or more locked DIs in the affected TE, file the change as Cat-2, and the note would still look correct. A reader cannot tell from the note alone whether the rewrite preserved the meaning of the affected DIs without re-reading each TE holistically and re-verifying each DI — which is the work the "in place with a note" Cat-2 affordance was supposed to make cheap.
+
+**Refinement:** A Cat-2 top-of-file note must enumerate, by DI ID, every DI that lives in the affected TE, paired with an explicit promise that the rewrite preserves each DI's meaning. A TE without DIs gets a one-line "no DIs in this file" note. A TE with three DIs gets all three IDs listed. The form is roughly: "Cat-2 vocabulary update per `<driving TE or TODO>`: '<old term>' -> '<new term>'. The following DIs in this file are unchanged in meaning: DI-XXX-..., DI-YYY-..., DI-ZZZ-... ."
+
+The purpose is asymmetric: the sweeper pays a small bounded cost (enumerate 0–3 IDs per affected TE during the sweep) and the reader gains an auditable named claim. If a future Carol finds that the rewrite changed (say) DI-005-...'s meaning, she has a concrete promise that was broken, not a vague "did the sweep distort anything?" question. This converts the Mallory semantic-shift attack from a silent edit into an auditable claim.
+
+**This is a Cat-3 navigational refinement, not a new DI.** The locked Cat-2 procedure of DI-020-20260502-213103 is unchanged in shape — vocabulary updates still happen in place with a top-of-file note pointing at the driving TE or TODO. This refinement only specifies what the note must contain. The Cat-3 / Cat-5–7 boundary (navigational vs. substantive supersedence) is preserved by treating procedural tightening of a note's contents as Cat-3.
+
+DF-35.2 was answered Alt-2.a on 2026-05-02 (bot recommendation under Steve's `make a recommendation` directive). Future Cat-2 sweeps must follow this rule. The TODO 020 DI Log records DF-35.2 as decided in this Refinement entry, no separate DI is filed.
+
 ## Decision status
 
-`decided, AGENTS rollout deferred` — locked per `DI-020-20260502-213103` (DF-34.1 -> Alt-1.C, categorized editing), `DI-020-20260502-213104` (DF-34.2 -> Alt-2.A, uniform applicability across all TE corpora; departs from this TE's recommendation of Alt-2.B), and `DI-020-20260502-213105` (DF-34.3 -> Alt-3.C, explicit holistic-substantive / single-TE-mechanical split; departs from this TE's recommendation of Alt-3.B). See `protocols/wire-lab.d/TODO/TODO-20260502-213103-te-editing-policy-and-holistic-corpus.md`. `docs/thought-experiments/README.md` already names TE-34 in its Editing policy section. AGENTS.md / AGENTS-codex.md / AGENTS-ppx.md updates are deferred until the follow-on tabletop TE confirms or revises the locked decisions; see `## Refinements` below.
+`decided, AGENTS rollout deferred` — locked per `DI-020-20260502-213103` (DF-34.1 -> Alt-1.C, categorized editing), `DI-020-20260502-213104` (DF-34.2 -> Alt-2.A, uniform applicability across all TE corpora; departs from this TE's recommendation of Alt-2.B), and `DI-020-20260502-213105` (DF-34.3 -> Alt-3.C, explicit holistic-substantive / single-TE-mechanical split; departs from this TE's recommendation of Alt-3.B). See `protocols/wire-lab.d/TODO/TODO-20260502-213103-te-editing-policy-and-holistic-corpus.md`. `docs/thought-experiments/README.md` already names TE-34 in its Editing policy section. AGENTS.md / AGENTS-codex.md / AGENTS-ppx.md updates are deferred until the follow-on tabletop TE confirms or revises the locked decisions; see `## Refinements` below. The Cat-1 clause of `DI-020-20260502-213103` was superseded on 2026-05-02 by `DI-020-20260502-232651` (Cat-1a / Cat-1b split per DF-35.1); see TE-35 and the corresponding Refinements entry. DF-35.2 (Cat-2 notes must enumerate unchanged DIs by ID) was decided on 2026-05-02 as a Cat-3 procedural refinement; see the corresponding Refinements entry.
