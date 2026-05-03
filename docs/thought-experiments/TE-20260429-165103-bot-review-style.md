@@ -8,6 +8,10 @@ TE-20260429-165103
 
 (First drafted 2026-04-29 16:51:03 UTC, retrospective-style: this TE was authored after the corresponding DI was already locked, in response to the conditions on `review-20260429-162212-steve-traugott.md` for `ppx/dr-001-bootstrap`.)
 
+## Status
+
+decided
+
 ## Decision under test
 
 How should the bot's proposal-and-review ceremony be shaped so that the decision-and-review record stays in-repo, citable, and forge-portable, while still letting the human principal (Steve) review with whatever tools they prefer?

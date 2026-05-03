@@ -2,12 +2,14 @@
 
 ## Status
 
-DRAFT. Captures conversation locks from session of 2026-05-01 covering
+decided
+
+(Captures conversation locks from session of 2026-05-01 covering
 (a) the directory shape under which each protocol becomes its own
 simulated repo, (b) layered transport/session/message decomposition
 under `transports/`, and (c) the role of the L4-binding layer. Some
 sub-questions are explicitly deferred (see "Open questions" below) and
-will be answered in follow-on TEs.
+will be answered in follow-on TEs.)
 
 ## Why this TE
 

@@ -2,6 +2,10 @@
 
 *Thought experiment, part of the [PromiseGrid Wire Lab](../../specs/harness-spec-draft.md). This file is content-addressable; its hash is its pCID.*
 
+## Status
+
+decided
+
 **Purpose.** Stress-test whether the single-flow design (§10a) holds up when the proposal targets the harness spec itself. Walked through end-to-end on 2026-04-28; full trace lives in `thought-experiments/TE-14-harness-spec-walkthrough.md` once split out, summary here.
 
 **Setup.** Harness-spec at `harness-spec-v7`. Cast: Steve (`design-judgment` ~0.95), Elder-7 (~0.4), Claude-A (LLM, ~0.08), Hostile-Prober-3 (~0.01). Trigger: empty `transcript.cbor` files accumulating for crashed-setup runs.

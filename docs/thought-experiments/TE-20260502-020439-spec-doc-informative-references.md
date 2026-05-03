@@ -1,7 +1,10 @@
 # TE-33: Spec-doc Informative References to its workshop, RFC-shaped
 
-**Status:** Draft. Refines TE-31 and TE-32.
-**Drafted:** 2026-05-02 02:04 UTC
+## Status
+
+decided
+
+(Originally marked Draft. Refines TE-31 and TE-32. Drafted 2026-05-02 02:04 UTC. The body's Verdict adopts the RFC-shaped two-section bibliography.)
 
 ## Premise
 

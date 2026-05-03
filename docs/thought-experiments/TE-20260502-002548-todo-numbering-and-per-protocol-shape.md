@@ -2,10 +2,12 @@
 
 ## Status
 
-DRAFT. Locks the directory shape and naming convention for TODO
+decided
+
+(Locks the directory shape and naming convention for TODO
 records under the TE-29 protocols-as-simulated-repos layout. Closes
 out the TODO-numbering question that TE-29 named but did not resolve.
-Renumbers all existing TODOs as part of TODO 014.
+Renumbers all existing TODOs as part of TODO 014.)
 
 ## Why this TE
 

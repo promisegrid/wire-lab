@@ -8,6 +8,10 @@ TE-20260429-175530
 
 (First drafted 2026-04-29 17:55:30 UTC.)
 
+## Status
+
+decided
+
 ## Decision under test
 
 Given that TE-21 (Alt-E) framed a spec doc as a layered promise (doc-level prediction + per-peer adoption), and given Steve has locked the following in chat 2026-04-29:

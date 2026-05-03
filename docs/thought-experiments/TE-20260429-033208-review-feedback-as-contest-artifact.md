@@ -2,6 +2,10 @@
 
 TE ID: TE-20260429-033208
 
+## Status
+
+decided
+
 ## Decision under test
 
 How should Steve's request-changes review of a bot-authored proposal branch be persisted in-repo when he wants the response recorded on `main`?

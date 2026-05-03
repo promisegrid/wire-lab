@@ -1,7 +1,10 @@
 # TE-32: Spec-side vs implementation-side split, and the `implementations/` top-level
 
-**Status:** Draft. Amends TE-31 (does not retract). Refines TE-29.
-**Drafted:** 2026-05-02 01:45 UTC
+## Status
+
+decided
+
+(Originally marked Draft. Amends TE-31 (does not retract). Refines TE-29. Drafted 2026-05-02 01:45 UTC. The body's Verdict adopts the A/B split.)
 
 ## Premise
 

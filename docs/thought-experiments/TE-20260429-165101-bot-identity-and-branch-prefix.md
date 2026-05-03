@@ -8,6 +8,10 @@ TE-20260429-165101
 
 (First drafted 2026-04-29 16:51:01 UTC, retrospective-style: this TE was authored after the corresponding DI was already locked, in response to the conditions on `review-20260429-162212-steve-traugott.md` for `ppx/dr-001-bootstrap`.)
 
+## Status
+
+decided
+
 ## Decision under test
 
 When an LLM-driven agent operating on a human's behalf participates in a mob-consensus-style repo, what identity should the agent commit under, and what branch prefix should its proposal branches use?

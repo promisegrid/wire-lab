@@ -8,6 +8,10 @@ TE-20260430-064307
 
 (First drafted 2026-04-30 06:43:07 UTC.)
 
+## Status
+
+open
+
 ## Decision under test
 
 A small architectural question — *should the pCID be the hash of the spec document or the hash of the code that implements it?* — surfaced (in chat 2026-04-29) as the same question that splits the pre-DevOps configuration management world: Traugott's congruence camp (isconf, decomk, "Why Order Matters") versus Burgess's convergence camp (cfengine, Promise Theory, semantic spacetime). The conversation produced a framing essay at [`docs/essays/congruence-convergence-and-the-grid.md`](../essays/congruence-convergence-and-the-grid.md) (committed in `80cb8d3`) which argues, on its own terms:

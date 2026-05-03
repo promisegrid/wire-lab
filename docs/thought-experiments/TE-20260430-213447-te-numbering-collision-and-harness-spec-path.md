@@ -6,6 +6,10 @@
 
 TE-20260430-213447
 
+## Status
+
+decided
+
 ## Decision under test
 
 When `origin/stevegt/channels-grid-pcid` is reconciled with `ppx/main`, two surface conflicts arise that are not really about channels at all but about repo conventions. They are joined here because the same merge will resolve both, and they should be settled together so we have a single record:
