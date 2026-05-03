@@ -22,7 +22,7 @@ A minimal ns-3 harness that:
    path:
 
    ```
-   transports/udp/<udp-binding-pCID>/<session-pCID>/<message-pCID>/<message-id>.msg
+   transports/udp/<udp-binding-pCID>/<session-pCID>/<message-pCID>/<message-id>.txt
    ```
 
 5. Becomes the regression baseline for every later binding/session
@@ -52,8 +52,8 @@ implementations/ns3-harness-fixture/
 │   └── 001-udp-roundtrip/
 │       ├── scenario.cc           ns-3 topology + tap-bridge wiring
 │       ├── run.sh                build + launch driver
-│       └── expected/             reference PCAPs and .msg files for diff
-├── pcap-to-msg/                  Go tool: post-process PCAP into .msg files
+│       └── expected/             reference PCAPs and .txt files for diff
+├── pcap-to-msg/                  Go tool: post-process PCAP into .txt files
 │   ├── main.go
 │   └── README.md
 └── env.sh                        sourceable env: pkg-config paths, etc.
@@ -87,10 +87,10 @@ implementations/ns3-harness-fixture/
 
 4. **`pcap-to-msg/`**: a Go post-processor that reads a PCAP, filters
    to UDP datagrams matching the binding's ports, and writes one
-   `.msg` file per datagram to:
+   `.txt` file per datagram to:
 
    ```
-   transports/udp/<udp-binding-pCID>/<session-pCID>/<message-pCID>/<message-id>.msg
+   transports/udp/<udp-binding-pCID>/<session-pCID>/<message-pCID>/<message-id>.txt
    ```
 
    File contents = exact UDP payload bytes. The session-pCID and
@@ -101,7 +101,7 @@ implementations/ns3-harness-fixture/
    hash).
 
 5. **Reference outputs.** Commit a deterministic scenario seed and
-   reference PCAPs / `.msg` files under
+   reference PCAPs / `.txt` files under
    `scenarios/001-udp-roundtrip/expected/`. The scenario passes when
    re-running produces byte-identical output. Determinism is critical
    for C-2 (multi-generational durability) and for catching
@@ -148,8 +148,8 @@ implementations/ns3-harness-fixture/
 - `tools/ns3-harness/scenarios/001-udp-roundtrip/run.sh` exits 0.
 - The PCAP captured by ns-3 contains the expected number of UDP
   datagrams in the expected direction.
-- The post-processor produces the expected `.msg` files at the
-  canonical `transports/udp/.../*.msg` path.
+- The post-processor produces the expected `.txt` files at the
+  canonical `transports/udp/.../*.txt` path.
 - Re-running with the same seed produces byte-identical output.
 - The README is complete enough that a fresh contributor can
   reproduce the scenario in under 30 minutes on a fresh Debian

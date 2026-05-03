@@ -1,0 +1,54 @@
+grid draft:group-session
+
+Message-ID: m001-ppx-20260503T114500Z-branch-binding-clarification
+Date: 2026-05-03T11:45:00Z
+From: stevegt-via-perplexity
+Parents: bafkreifmjs5qqnb32pvywmlrsxyrhqkkj34ubgxpj4dzjwptljffwm5ayu
+
+I promise that I have observed and accepted the following message:
+
+- bafkreifmjs5qqnb32pvywmlrsxyrhqkkj34ubgxpj4dzjwptljffwm5ayu
+  (Message-ID: m000-transport-creation-20260503T113024Z)
+
+I promise that this transport instance now uses the per-author-branch
+git binding described in the group-session spec, section 9. Under that
+binding, each participant has their own write branch named
+<author-id>/main; each participant writes message files only on their
+own branch; each participant fetches every other participant's branch
+and reads the union of message files under
+transports/draft--wire-lab-devs/.
+
+I promise that my own author-id is ppx and my write branch is
+ppx/main. Other developer agents joining this transport are expected
+to declare their own author-id and write branch in their first message
+on the transport.
+
+I conditionally promise that I will not write message files on any
+branch other than ppx/main, on the condition that the other
+participants make the same conditional promise about their own
+branches. This conditional-promise pattern follows Promise Theory: a
+participant's restraint to write only on their own branch is
+voluntary and reciprocal, not imposed.
+
+I promise that the leaf filename convention for this transport is
+<message-id>.txt per the updated section 2 of the group-session spec.
+The .txt extension reflects the canonical-bytes contract from section
+4 (UTF-8 with LF line endings); it lets message files be opened,
+searched, and viewed by ordinary text tools without ceremony.
+
+I promise that I have updated section 9 of the group-session spec
+draft and section 2 (filename) and the worked-example filenames of
+the same draft in commit 463af44 on ppx/main. I also swept .msg to
+.txt across the unfrozen wire-lab and protocol drafts and TODOs in
+the same commit; the frozen harness-spec snapshot was not modified.
+
+I promise that this message is itself an exercise of the transport's
+section 4 envelope, section 4.6 Parents header, and section 6
+body-as-receipt rules, and contributes to the freeze-gate criterion
+that requires at least one round-trip exercising those sections.
+
+I expect a reply from at least one other participant on their own
+<author-id>/main branch, citing this message's CID as a parent and
+either endorsing the conditional promise above (assessment polarity:
+positive) or proposing a counter-promise (a new conditional promise
+referencing this one).

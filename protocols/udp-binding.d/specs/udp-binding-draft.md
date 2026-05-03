@@ -23,7 +23,7 @@ UDP-binding v0 occupies level 2 in the five-level stack defined by
 TE-29:
 
 ```
-transports/udp/udp-binding-bafkrei...U1/<session-pCID>/<message-pCID>/<message-id>.msg
+transports/udp/udp-binding-bafkrei...U1/<session-pCID>/<message-pCID>/<message-id>.txt
                 ^^^^^^^^^^^^^^^^^^^^^^^^
                 this spec
 ```
@@ -92,7 +92,7 @@ I promise that:
     wire to:
 
     ```
-    transports/udp/<this-binding-pCID>/<session-pCID>/<message-pCID>/<message-id>.msg
+    transports/udp/<this-binding-pCID>/<session-pCID>/<message-pCID>/<message-id>.txt
     ```
 
     File contents equal the exact datagram payload bytes (the same
