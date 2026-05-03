@@ -222,3 +222,13 @@ The recommended set is (1.1.a, 1.2.c, 1.3.a, 1.4.d). Reason: maximally additive,
 ## Decision status
 
 `needs DF` — awaiting user choice on DF-1.1 through DF-1.4. After DF, the locked decisions become DI entries in `protocols/wire-lab.d/TODO/TODO-20260429-164955-te-promise-stack-ordering.md`.
+
+## Refinements
+
+### 2026-05-03 — Recommended DF set tracked in TODO 5; DR-006 open
+
+Since this TE was first drafted on 2026-04-27 and expanded into full scenario form on 2026-04-28, the supporting infrastructure for closing it has been filed. The recommended set (1.1.a outermost-first wire ordering, 1.2.c assertion-stack-as-Project, 1.3.a outermost-first reflects wire order, 1.4.d per-assertion-type position normativity) is articulated in the body above and remains the bot's recommendation; it awaits Steve's DF answers before locking as DIs. Those answers are tracked as the open DF queue in `protocols/wire-lab.d/TODO/TODO-20260429-164955-te-promise-stack-ordering.md` (TODO 5), which is the canonical place to look for the current state of DF-1.1 through DF-1.4 and the eventual DI lockings.
+
+The related DR — `DR/DR-006-20260429-164729-promise-stack-ordering.md` — is open and is the proposal-side document for the same decision under test. TODO 5 is the lifecycle tracker for both this TE and DR-006; closing DF-1.1 through DF-1.4 on this TE is also what closes DR-006.
+
+This is a Cat-3 / Cat-4 navigational refinement under the editing policy locked in `DI-020-20260502-213103` (and its `## Refinements` chain on TE-34, including DI-020-20260502-232651 and the four Cat-3 Refinements). The TE body above is unchanged: the decision under test, the alternatives, the scenarios, the conclusions, and the recommended set all remain as first drafted. The Refinement only adds forward pointers to the open lifecycle items so a single-TE reader can find the current state without reading the full corpus. No DI is filed for this Refinement; the substantive DI work happens in TODO 5 once DF-1.1 through DF-1.4 are answered.
