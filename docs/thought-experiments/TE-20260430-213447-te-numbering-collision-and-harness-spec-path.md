@@ -1,6 +1,6 @@
 # TE-25: Reconciling the TE-21 numbering collision and the `harness-spec.md` path on the channels branch
 
-*Thought experiment, part of the [PromiseGrid Wire Lab](../../specs/harness-spec-draft.md). This file is content-addressable; its hash is its pCID.*
+*Thought experiment, part of the [PromiseGrid Wire Lab](../../protocols/wire-lab.d/specs/harness-spec-draft.md). This file is content-addressable; its hash is its pCID.*
 
 ## TE ID
 

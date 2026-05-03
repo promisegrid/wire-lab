@@ -1,6 +1,6 @@
 # TE-28: The 100-year goal as a load-bearing design constraint
 
-*Thought experiment, part of the [PromiseGrid Wire Lab](../../specs/harness-spec-draft.md). This file is content-addressable; its hash is its pCID.*
+*Thought experiment, part of the [PromiseGrid Wire Lab](../../protocols/wire-lab.d/specs/harness-spec-draft.md). This file is content-addressable; its hash is its pCID.*
 
 ## TE ID
 
@@ -76,7 +76,7 @@ This constraint is what makes pCIDs the right shape: they are content-addressabl
 
 This section walks each currently-locked artifact in the wire-lab through the six constraints. Where the artifact honors the constraint, that is recorded. Where it fails or is silent on the constraint, that is recorded as an open question or as a candidate for follow-on TE work.
 
-### `specs/harness-spec-draft.md` and the frozen `harness-spec-bafkrei...md`
+### `protocols/wire-lab.d/specs/harness-spec-draft.md` and the frozen `harness-spec-bafkrei...md`
 
 - **C-1:** Honored. The harness-spec explicitly says "there is no global pCID registry in production PromiseGrid (because it has to last centuries with no central authority), and the harness must not have one either." The harness-spec is consistent with C-1.
 - **C-2:** Honored in spirit (the "multi-generational handoff" subsection in §6, the "multi-generational durability" property under break-witnesses). Could be strengthened by explicitly naming the 100-year goal at the top of §1 or §2 so contributors see it before reading any prose. **Action: add a short subsection.**
@@ -85,7 +85,7 @@ This section walks each currently-locked artifact in the wire-lab through the si
 - **C-5:** Honored. Per-burden trust ledgers are first-class throughout the harness-spec.
 - **C-6:** Honored. The harness-spec is explicit that "the only durable anchor in the system is the signing key" and that "specs follow signing keys."
 
-### `specs/transport-spec-draft.md` (TE-26 / TE-27 outer rule)
+### `protocols/wire-lab.d/specs/transport-spec-draft.md` (TE-26 / TE-27 outer rule)
 
 - **C-1:** Honored. The pCID-keyed transport directory convention does not assume any registry. Each transport-protocol's pCID is mintable from its spec's bytes; no central authority blesses it.
 - **C-2:** Mostly honored. The four locked principles do not depend on any short-horizon institution. The slug component of `transports/<pcid>--<slug>/` is a human-readable convenience that may drift in meaning over decades; this is acknowledged in the spec as presentational rather than load-bearing.
@@ -94,7 +94,7 @@ This section walks each currently-locked artifact in the wire-lab through the si
 - **C-5:** Out of scope for the outer transport-spec. Trust over message receipts is a per-protocol concern; the transport-spec is silent.
 - **C-6:** Honored. The pCID is the only anchor; the slug is convention.
 
-### `specs/group-transport-draft.md` (TODO 013 carve-out)
+### `protocols/group-session.d/specs/group-session-draft.md` (TODO 013 carve-out)
 
 - **C-1:** Honored. The protocol's identity is its pCID, computed from the spec's bytes. Membership of any individual transport instance is closed and named by the slug, not by a registry.
 - **C-2:** Mostly honored. The append-only persistence property and the "membership change creates a new transport instance" rule mean the transport's history survives any individual member's departure or death. The `Date:` header in messages is informational; the protocol does not depend on synchronized clocks across the horizon.
@@ -142,7 +142,7 @@ This section walks each currently-locked artifact in the wire-lab through the si
 
 Adopt the 100-year goal as a named, citable constraint set. Specifically:
 
-- **Add a `## The 100-Year Goal` subsection to `specs/harness-spec-draft.md`** (placed between the abstract and §1 to make it visible before any concrete spec content) that states the goal in one paragraph, lists the six constraints C-1 through C-6 by name, and points readers at this TE for the pressure-test.
+- **Add a `## The 100-Year Goal` subsection to `protocols/wire-lab.d/specs/harness-spec-draft.md`** (placed between the abstract and §1 to make it visible before any concrete spec content) that states the goal in one paragraph, lists the six constraints C-1 through C-6 by name, and points readers at this TE for the pressure-test.
 - **Cite this TE** from the §8 TE bibliography in the harness-spec.
 - **Reference the constraint codes (C-1 through C-6) from future TEs** when those TEs are pressure-testing alternatives. This gives the wire-lab a shared shorthand and prevents each TE from re-deriving the constraint set.
 - **Open the five open questions** (OQ-100.1 through OQ-100.5) into the harness-spec's open-questions list (currently §12), each as its own DR or each as a candidate for a follow-on TE.

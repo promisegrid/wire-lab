@@ -15,7 +15,7 @@ How should Steve's request-changes review of a bot-authored proposal branch be p
 - Bot-authored work arrives on `ppx/{twig}` branches and is reviewed locally.
 - Steve wants the request-changes response for `ppx/dr-001-bootstrap` preserved on `main`, not only in chat.
 - The proposal envelope schema is intentionally not locked yet, so prose artifacts are valid.
-- The evolving discourse vocabulary in `specs/harness-spec-draft.md` §10a.3 already distinguishes endorsement, contest, and counter-proposal.
+- The evolving discourse vocabulary in `protocols/wire-lab.d/specs/harness-spec-draft.md` §10a.3 already distinguishes endorsement, contest, and counter-proposal.
 - GitHub PRs are not the desired long-term substrate for this repo's review history.
 
 ## Alternatives

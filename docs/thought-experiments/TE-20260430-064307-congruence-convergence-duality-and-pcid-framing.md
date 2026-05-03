@@ -1,6 +1,6 @@
 # TE-23: Congruence/convergence duality and pCID framing
 
-*Thought experiment, part of the [PromiseGrid Wire Lab](../../specs/harness-spec-draft.md). This file is content-addressable; its hash is its pCID.*
+*Thought experiment, part of the [PromiseGrid Wire Lab](../../protocols/wire-lab.d/specs/harness-spec-draft.md). This file is content-addressable; its hash is its pCID.*
 
 ## TE ID
 
@@ -34,7 +34,7 @@ The four open Decision Framing questions are:
 ## Assumptions
 
 - A `Promise` in this repo is an autonomous speech act — an assertion of state in the past, present, or future, often conditional. (Carried from TE-21; locked.)
-- A `pCID` is a CIDv1 hash of a spec document's bytes. Two parties claim to "speak protocol pCID X" when each implements the rules in the document whose CIDv1 is X. (Carried from `specs/harness-spec-draft.md` §1 and TE-22.)
+- A `pCID` is a CIDv1 hash of a spec document's bytes. Two parties claim to "speak protocol pCID X" when each implements the rules in the document whose CIDv1 is X. (Carried from `protocols/wire-lab.d/specs/harness-spec-draft.md` §1 and TE-22.)
 - Spec docs are layered promises (TE-21 Alt-E): the doc itself promises future interop conditional on its assumptions/open-questions/known-issues lists, and each peer separately promises to behave as the doc says.
 - TE-22 has locked the operational machinery for freezing, hashing, storing, citing, and replacing spec docs. The pCID-hashes-the-spec choice is therefore *already implemented* on disk; this TE asks whether to *acknowledge* that choice as foundational framing rather than incidental.
 - The framing essay at `docs/essays/congruence-convergence-and-the-grid.md` exists and is the source-of-truth document for the duality framing. This TE references it; it does not duplicate it.
@@ -180,7 +180,7 @@ Six scenarios, each played against the alternatives.
 
 ### S1 (genesis reading): a new contributor reads the harness-spec for the first time
 
-A new contributor (human or bot) reads `specs/harness-spec-draft.md` for the first time. They have no prior context.
+A new contributor (human or bot) reads `protocols/wire-lab.d/specs/harness-spec-draft.md` for the first time. They have no prior context.
 
 What does the harness-spec teach them about why pCID hashes a spec doc and not code?
 
@@ -260,7 +260,7 @@ The full recommended set across the four DFs is **(1.a + 1.c-as-permission, 2.b,
 
 ### Implications
 
-- **Harness-spec gets a brief Background subsection.** A new short subsection — proposed title "Background: congruence and convergence" — appears near the top of `specs/harness-spec-draft.md` (after §1 opening, before §2 vocabulary). One paragraph (3-5 sentences) summarizes the duality framing and links to the essay. The subsection is non-normative; it carries the explicit marker "*This subsection is informative, not normative. The design choices it describes are locked in TE-21, TE-22, and TE-23.*" When the next freeze of the harness-spec is cut, the Background subsection becomes part of the frozen pCID's content; the link to the essay is by relative path (`../docs/essays/congruence-convergence-and-the-grid.md`) so it survives a host migration.
+- **Harness-spec gets a brief Background subsection.** A new short subsection — proposed title "Background: congruence and convergence" — appears near the top of `protocols/wire-lab.d/specs/harness-spec-draft.md` (after §1 opening, before §2 vocabulary). One paragraph (3-5 sentences) summarizes the duality framing and links to the essay. The subsection is non-normative; it carries the explicit marker "*This subsection is informative, not normative. The design choices it describes are locked in TE-21, TE-22, and TE-23.*" When the next freeze of the harness-spec is cut, the Background subsection becomes part of the frozen pCID's content; the link to the essay is by relative path (`../docs/essays/congruence-convergence-and-the-grid.md`) so it survives a host migration.
 
 - **Harness-spec vocabulary stays small.** No "inner-CID," "hCID," "fCID," "cCID" entries are added. The harness-spec carries `pCID` (already present) and nothing else CID-shaped at the top level. Per-protocol specs are free to introduce their own inner-CID concepts under whatever name fits.
 
@@ -330,7 +330,7 @@ Amendment history:
 
 ## Implications for follow-on work
 
-- **TODO 012 (provisional):** Once Steve locks DF-23.3 as Alt-3.B (or stronger), draft the Background subsection for `specs/harness-spec-draft.md` and add the link to the essay. Re-freeze the harness-spec on the next freeze cycle. The Background subsection lands in the next pCID; the previous pCID remains as historical evidence per TE-22's append-only-log discipline.
+- **TODO 012 (provisional):** Once Steve locks DF-23.3 as Alt-3.B (or stronger), draft the Background subsection for `protocols/wire-lab.d/specs/harness-spec-draft.md` and add the link to the essay. Re-freeze the harness-spec on the next freeze cycle. The Background subsection lands in the next pCID; the previous pCID remains as historical evidence per TE-22's append-only-log discipline.
 
 - **TODO 013 (provisional):** Capture the essay-as-referenced-source open question raised under "Implications" above. Decide whether `docs/essays/*.md` files freeze the same way `specs/*.md` files do, and whether the manifest distinguishes `kind: spec` from `kind: essay`. Tentative answer in the conclusions; needs explicit decision.
 
