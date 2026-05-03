@@ -1,8 +1,10 @@
 # TE-31: Spec-doc as upstream, simrepo as implementation — inverting the conformance reference
 
-**Status:** Draft. Closes OQ-29.1.
-**Drafted:** 2026-05-02 00:49 UTC
-**Supersedes within OQ-29.1:** Alt-A through Alt-F enumerated in TE-29.
+## Status
+
+decided
+
+(Originally marked Draft. Closes OQ-29.1. Drafted 2026-05-02 00:49 UTC. Supersedes within OQ-29.1 Alt-A through Alt-F enumerated in TE-29. The body's Verdict adopts the inversion.)
 
 ## Premise
 

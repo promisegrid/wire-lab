@@ -2,6 +2,10 @@
 
 TE ID: TE-20260429-162212
 
+## Status
+
+decided
+
 ## Decision under test
 
 How should Steve's durable request-changes reply to a bot-authored proposal branch be expressed so that it fits the repo's promise-stack model, remains easy to read, and preserves a durable in-repo review record?

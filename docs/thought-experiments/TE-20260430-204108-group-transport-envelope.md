@@ -6,6 +6,10 @@
 
 TE-20260430-204108
 
+## Status
+
+locked for the group-transport-protocol
+
 ## Note on rename
 
 This TE was originally drafted under "channel" vocabulary (filename `TE-20260430-204108-grid-pcid-channel-carrier.md`, title "`grid <pcid>` as a repo-local channel-message carrier"). Per [TE-27](TE-20260501-021921-transports-rename-and-axes-of-differentiation.md), the wire-lab vocabulary is **transports** and **messages**; "channel" is not used. Per the TODO 013 carve-out, TE-24's load-bearing decisions are properties of the group-transport-protocol, not of the outer wire-lab transport-spec. The file has been renamed and the prose rewritten in place. The TE integer (24) and timestamp (20260430-204108) are preserved.

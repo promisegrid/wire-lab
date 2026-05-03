@@ -6,6 +6,10 @@
 
 TE-20260501-202713
 
+## Status
+
+recommended for immediate adoption
+
 ## Decision under test
 
 The wire-lab and PromiseGrid as a whole are designed against what Steve calls **the 100-year goal**: PromiseGrid must survive and remain useful as an open, decentralized community of free agents and humans across roughly a century of evolution, without depending on any central authority that might disappear inside that horizon. Every design choice the wire-lab makes — pCID conventions, transport-spec, group-transport-spec, harness-spec, freeze conventions, branching policy, TE numbering, and everything that comes later — must survive pressure-testing against the 100-year frame. The harness-spec gestures at this in places ("multiple human generations", "centuries-long", "multi-decade scenarios") but does not name the constraint set explicitly, and so does not give either future-Steve, future-LLM-readers, or future-contributors a single citable place where the constraints live.

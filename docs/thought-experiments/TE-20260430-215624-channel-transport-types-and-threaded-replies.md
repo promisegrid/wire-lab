@@ -8,6 +8,10 @@
 
 TE-20260430-215624
 
+## Status
+
+decided
+
 ## Decision under test
 
 The current `transports/` v0 contract (TE-24, `DR-009-20260430-204108`, `transports/README.md`) implicitly assumes one transport shape: a 1:1 message-based flow simulating something like a websocket between two named endpoints (Codex and Perplexity), with a single-writer per-direction append-only log and a `Prev-Message-CID` linking to the previous message **by the same sender**. Several pieces of that shape need to be re-examined before subdirectory layout is locked in:

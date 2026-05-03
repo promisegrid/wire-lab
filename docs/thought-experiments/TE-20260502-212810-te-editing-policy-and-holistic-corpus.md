@@ -6,6 +6,10 @@
 
 TE-20260502-212810
 
+## Status
+
+decided, refined
+
 ## Decision under test
 
 Two related questions about how the TE corpus is treated as a body of writing:
@@ -298,9 +302,13 @@ TE-35 Scenario S2 (three-deep supersedence chain) showed that the bottom-of-file
 
 **Refinement:** Every TE in the corpus carries a top-of-file `Status:` header field, placed immediately after the TE ID line and before any other section. The field's value is one of:
 
-- `Status: needs DF` — TE has been written but DFs are unanswered. The body's analysis is current; no decision yet.
+- `Status: stub` — TE is a one-paragraph placeholder, a single scenario sketch from a list, or otherwise not yet written in full TE form (no DFs, no decision under test, no alternative analysis). TE-2 through TE-13 from the original harness-spec §8 list are the canonical examples. The body, such as it is, is current; expansion into a full TE is future work.
+- `Status: needs DF` — TE has been written in full form (decision under test, alternatives, scenarios, conclusions, DFs articulated) but DFs are unanswered. The body's analysis is current; no decision yet.
 - `Status: decided` — DFs answered; one or more DIs locked; TE is the current authority on its decision under test. Body is current.
 - `Status: decided, refined` — DFs answered; one or more DIs locked; one or more `## Refinements` entries have been appended. Body is current; readers should also read Refinements.
+- `Status: open` — TE has been written, recommendations stated, but DFs are not yet answered and the bottom-of-file Decision status section explicitly uses `open` rather than `needs DF`. Operationally equivalent to `needs DF`; preserved for TEs that originally used this phrasing.
+- `Status: recommended for immediate adoption` — TE makes the implicit explicit and recommends adoption without a formal DF/DI lock; equivalent to `decided` for navigational purposes. Preserved for TEs that originally used this phrasing.
+- `Status: locked for the <protocol-name>` — TE locks a decision scoped to a single protocol via a DI named in the TE; equivalent to `decided` for that protocol. Preserved for TEs that originally used this phrasing.
 - `Status: superseded by TE-<id> / DI-<id>` — a later TE has overtaken this one. Body is historical; readers should follow the pointer to the superseding TE for the current authority. The bottom-of-file `## Decision status` section retains the long-form rationale and date.
 - `Status: withdrawn` — reserved for the rare case where a TE was filed in error and is not superseded by any later TE; body is invalid; included for completeness, not currently in use.
 
@@ -308,7 +316,7 @@ The field's purpose is single-TE reader discoverability of supersedence. The bot
 
 **Retrofit:** A subtask 020.10 sweep adds the field to all existing TEs (TE-1 through TE-35). Each TE gets the appropriate value based on its current state. This is a Cat-1a sweep under DI-020-20260502-232651 — the field is a current-pointer ("what does this TE currently claim about itself"), not a historical quotation. The DI-enumeration discipline (DF-35.2 Refinement) does not apply because this is not a Cat-2 vocabulary update. The cross-TE quotation grep (DF-35.3 Refinement) does not apply for the same reason. It is a clean Cat-1a sweep.
 
-**Convention for future TEs:** Every new TE drafted from this point forward carries the `Status:` field at the top, with the appropriate initial value (`needs DF` for a TE in DF state; `decided` for a TE that locks DIs in the same commit). The `## Decision status` section at the bottom of the file is retained for the long-form rationale.
+**Convention for future TEs:** Every new TE drafted from this point forward carries the `Status:` field at the top, with the appropriate initial value (`needs DF` for a TE in DF state; `decided` for a TE that locks DIs in the same commit). The `## Decision status` section at the bottom of the file is retained for the long-form rationale. New TEs should prefer the canonical values (`needs DF`, `decided`, `decided, refined`, `superseded by ...`, `withdrawn`) over the legacy values (`stub`, `open`, `recommended for immediate adoption`, `locked for the ...`); the legacy values exist to preserve the corpus's historical phrasing during the retrofit and should not be used for new work.
 
 **This is a Cat-3 navigational refinement, not a new DI.** It tightens discoverability of the existing locked policy without changing what any locked DI promises. The retrofit sweep is Cat-1a per DI-020-20260502-232651; subtask 020.10 will execute it as its own twig with a sweeper script that emits matches for human review.
 

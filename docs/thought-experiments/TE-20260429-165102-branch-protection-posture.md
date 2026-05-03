@@ -8,6 +8,10 @@ TE-20260429-165102
 
 (First drafted 2026-04-29 16:51:02 UTC, retrospective-style: this TE was authored after the corresponding DI was already locked, in response to the conditions on `review-20260429-162212-steve-traugott.md` for `ppx/dr-001-bootstrap`.)
 
+## Status
+
+decided
+
 ## Decision under test
 
 For a repo that will eventually migrate from GitHub to PromiseGrid, what branch-protection posture on `main` minimizes forge-specific lockin while keeping the human principal in control of merges?

@@ -8,6 +8,10 @@ TE-20260427-180000
 
 (Original TE-1 from `specs/harness-spec-draft.md` v2; first drafted at the time of v2 creation. Expanded into full scenario form on 2026-04-28 by the bot.)
 
+## Status
+
+needs DF
+
 ## Decision under test
 
 How is a promise stack ordered? Specifically:

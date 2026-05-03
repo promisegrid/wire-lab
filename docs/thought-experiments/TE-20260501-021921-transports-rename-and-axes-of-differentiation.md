@@ -6,6 +6,10 @@
 
 TE-20260501-021921
 
+## Status
+
+decided
+
 ## Decision under test
 
 TE-26 locked four principles for what was then called the `channels/` directory: pCID-keyed paths under `channels/<pcid>--<slug>/`, no `Channel:` header in messages, code-as-handler for each pCID, and a thin wire-lab spec deferring directory interiors to per-protocol specs. Drafting moved straight into the carve-out, with `specs/channel-spec-draft.md` (thin) and `specs/codex-perplexity-channel-draft.md` (full TE-24 contract) named as the next deliverables.

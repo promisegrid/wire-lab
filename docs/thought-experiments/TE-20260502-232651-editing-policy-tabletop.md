@@ -6,6 +6,10 @@
 
 TE-20260502-232651
 
+## Status
+
+decided
+
 ## Decision under test
 
 TE-34 locked an editing policy for the TE corpus (DI-020-20260502-213103: categorized edits — Cat-1 path renames in place, Cat-2 vocabulary updates in place with a top-of-file note, Cat-3 / Cat-4 forward / back-pointers in an append-only `## Refinements` section, Cat-5 / Cat-6 / Cat-7 substantive changes via supersedence). It also locked uniform applicability across all TE corpora (DI-020-20260502-213104) and an explicit substantive-vs-mechanical reading split (DI-020-20260502-213105). TE-34's own Refinements section (added 2026-05-02) admits that its scenario analysis was one-paragraph judgments, not tabletop play. This TE runs the tabletop the policy never got.

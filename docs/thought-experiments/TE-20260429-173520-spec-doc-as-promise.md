@@ -8,6 +8,10 @@ TE-20260429-173520
 
 (First drafted 2026-04-29 17:35:20 UTC.)
 
+## Status
+
+needs DF
+
 ## Decision under test
 
 In promise-theoretic terms, what *is* a wire-protocol spec document? Specifically: what kind of speech act does a spec doc perform, what is its promiser, what is its promisee, what is the temporal shape of the promise it encodes, and what are the implications for which content belongs in the spec versus outside it?
