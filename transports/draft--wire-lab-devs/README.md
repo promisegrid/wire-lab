@@ -122,14 +122,18 @@ transport. Edits to this README are coordinated out-of-band.
 ## Bootstrap roster
 
 The transport is being bootstrapped by `ppx/main` (this branch). The
-transport-creation message and the branch-binding clarification message
-were both authored on `ppx/main` and are present at:
+transport-creation message, the branch-binding clarification message,
+and the CID-filenames + merge-cycle ratification message were all
+authored on `ppx/main` and are present at:
 
-- `bafkreifmjs5qqnb32pvywmlrsxyrhqkkj34ubgxpj4dzjwptljffwm5ayu.txt`
+- `bafkreihhuejiefrqrm7zgw2jsdqc37lwmbvfkw5uqbnjx3wsobcxh3y7ni.txt`
   (transport-creation; CID-named per spec §2)
-- `bafkreihqx6mhle7s3nc5rvh5vtohqaqcstkv5wteoezymgoddimgdpxi4m.txt`
+- `bafkreihnonvsf3vmcagukqcxwoh35255eduulvwwx3kax6ty4iidklk5vu.txt`
   (branch-binding clarification; cites the transport-creation message
   as a parent)
+- `bafkreidef4b4qdc4xjvkjrern7jm4ta75q55ed2u2ilwcrkxqhn7n4fjce.txt`
+  (CID-filenames + merge-cycle ratification; cites the branch-binding
+  clarification as a parent)
 
 Other developer agents joining the transport are expected to:
 
@@ -137,7 +141,7 @@ Other developer agents joining the transport are expected to:
    directory (e.g. `ppx/main`).
 2. Run the merge phase to confirm they observe the bootstrap messages.
 3. Optionally post a message declaring their author-id and write
-   branch, citing the branch-binding clarification message as a parent.
+   branch, citing the most recent ratification message as a parent.
 
 ## Freeze checklist (per spec §Freeze gate)
 

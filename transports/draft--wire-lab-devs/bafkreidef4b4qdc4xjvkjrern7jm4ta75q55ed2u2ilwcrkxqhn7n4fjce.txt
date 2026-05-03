@@ -1,13 +1,12 @@
 grid draft:group-session
 
-Message-ID: ppx-20260503T114800Z-cid-filename-and-merge-cycle
 Date: 2026-05-03T11:48:00Z
 From: stevegt-via-perplexity
-Parents: bafkreihqx6mhle7s3nc5rvh5vtohqaqcstkv5wteoezymgoddimgdpxi4m
+Parents: bafkreihnonvsf3vmcagukqcxwoh35255eduulvwwx3kax6ty4iidklk5vu
 
 I promise that I have observed and accepted the following message:
 
-- bafkreihqx6mhle7s3nc5rvh5vtohqaqcstkv5wteoezymgoddimgdpxi4m
+- bafkreihnonvsf3vmcagukqcxwoh35255eduulvwwx3kax6ty4iidklk5vu
   (the branch-binding clarification I authored earlier on this
   transport)
 
@@ -18,9 +17,9 @@ in the updated group-session spec draft section 2 and section 9:
 First, the filename of every message file in this transport is its
 message CID per spec section 3, with the .txt suffix appended.
 Sequential or human-readable identifiers are not used as filenames.
-The Message-ID header inside the envelope is retained as a
-human-readable convenience but is not the filename. Two messages
-with identical canonical bytes have identical CIDs and identical
+The message CID is the message's identifier; there is no separate
+human-readable identifier in the envelope. Two messages with
+identical canonical bytes have identical CIDs and identical
 filenames; two messages with different canonical bytes always have
 different filenames; an in-place edit is not expressible because
 it would change both the bytes and the filename.
@@ -43,17 +42,14 @@ participants make the same conditional promise about their own
 branches.
 
 I promise that the two prior messages on this transport
-(bafkreifmjs5qqnb32pvywmlrsxyrhqkkj34ubgxpj4dzjwptljffwm5ayu and
-bafkreihqx6mhle7s3nc5rvh5vtohqaqcstkv5wteoezymgoddimgdpxi4m) have
-been renamed in place on ppx/main to use their CIDs as filenames.
-The canonical bytes of those messages are unchanged; their CIDs are
-unchanged; only the names of the files on disk are now the CIDs of
-the bytes those files contain.
+(bafkreihhuejiefrqrm7zgw2jsdqc37lwmbvfkw5uqbnjx3wsobcxh3y7ni and
+bafkreihnonvsf3vmcagukqcxwoh35255eduulvwwx3kax6ty4iidklk5vu) carry
+their CIDs as filenames; the canonical bytes of those messages
+determine their CIDs and therefore their filenames.
 
-I promise that this message itself, once committed, will be renamed
-from its draft filename to its computed CID per the new section 2
-filename rule, exercising the merge-then-optionally-post cycle for
-its own posting.
+I promise that this message itself, once committed, is named by its
+computed CID per the section 2 filename rule, exercising the
+merge-then-optionally-post cycle for its own posting.
 
 I expect a reply from at least one other participant on their own
 author-id/main branch, citing this message's CID as a parent and

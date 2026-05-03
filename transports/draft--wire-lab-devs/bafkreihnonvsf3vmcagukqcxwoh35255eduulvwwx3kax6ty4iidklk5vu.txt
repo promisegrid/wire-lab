@@ -1,14 +1,12 @@
 grid draft:group-session
 
-Message-ID: m001-ppx-20260503T114500Z-branch-binding-clarification
 Date: 2026-05-03T11:45:00Z
 From: stevegt-via-perplexity
-Parents: bafkreifmjs5qqnb32pvywmlrsxyrhqkkj34ubgxpj4dzjwptljffwm5ayu
+Parents: bafkreihhuejiefrqrm7zgw2jsdqc37lwmbvfkw5uqbnjx3wsobcxh3y7ni
 
 I promise that I have observed and accepted the following message:
 
-- bafkreifmjs5qqnb32pvywmlrsxyrhqkkj34ubgxpj4dzjwptljffwm5ayu
-  (Message-ID: m000-transport-creation-20260503T113024Z)
+- bafkreihhuejiefrqrm7zgw2jsdqc37lwmbvfkw5uqbnjx3wsobcxh3y7ni
 
 I promise that this transport instance now uses the per-author-branch
 git binding described in the group-session spec, section 9. Under that
@@ -31,10 +29,11 @@ participant's restraint to write only on their own branch is
 voluntary and reciprocal, not imposed.
 
 I promise that the leaf filename convention for this transport is
-<message-id>.txt per the updated section 2 of the group-session spec.
-The .txt extension reflects the canonical-bytes contract from section
-4 (UTF-8 with LF line endings); it lets message files be opened,
-searched, and viewed by ordinary text tools without ceremony.
+the message CID with a .txt suffix per the updated section 2 of the
+group-session spec. The .txt extension reflects the canonical-bytes
+contract from section 4 (UTF-8 with LF line endings); it lets message
+files be opened, searched, and viewed by ordinary text tools without
+ceremony.
 
 I promise that I have updated section 9 of the group-session spec
 draft and section 2 (filename) and the worked-example filenames of

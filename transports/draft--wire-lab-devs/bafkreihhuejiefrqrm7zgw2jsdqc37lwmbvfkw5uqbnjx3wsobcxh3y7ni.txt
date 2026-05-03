@@ -1,6 +1,5 @@
 grid draft:group-session
 
-Message-ID: m000-transport-creation-20260503T113024Z
 Date: 2026-05-03T11:30:24Z
 From: stevegt-via-perplexity
 
