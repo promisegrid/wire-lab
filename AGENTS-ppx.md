@@ -333,6 +333,95 @@ Steps:
      answering in chat (then you write the DI on a follow-up twig)
      or by editing the DR himself on `main` or on `stevegt/{twig}`.
 
+# TE editing policy (Required)
+
+Once a TE is filed in `docs/thought-experiments/` (or in any
+per-protocol TE corpus under `protocols/<slug>.d/`), it is no longer
+freely editable. Edits follow the categorized policy locked in:
+
+- DI-020-20260502-213103 (categorized editing regimes; Cat-1 clause
+  superseded by DI-020-20260502-232651)
+- DI-020-20260502-213104 (uniform applicability across all TE corpora)
+- DI-020-20260502-213105 (holistic reading by default; single-TE
+  reading only for obviously mechanical questions)
+- DI-020-20260502-232651 (Cat-1a / Cat-1b path-reference split)
+- TE-34 (`docs/thought-experiments/TE-20260502-212810-te-editing-policy-and-holistic-corpus.md`)
+  plus its four Cat-3 Refinements (Cat-1a/Cat-1b split forward-pointer;
+  Cat-2 DI-enumeration discipline; Cat-2 cross-TE quotation grep;
+  top-of-file `## Status` header field)
+- TE-35 (`docs/thought-experiments/TE-20260502-232651-editing-policy-tabletop.md`)
+  — the tabletop simulation that produced the four refinements.
+
+The canonical statement lives in AGENTS.md under "TE Editing Policy
+(Required)". The seven categories in operational form:
+
+- **Cat-1a (current-pointer paths).** Mechanical sweep in place; no
+  top-of-file note. Use for path renames where the affected reference
+  names the file's current location.
+- **Cat-1b (historical-quotation paths).** Leave untouched. Path
+  references inside markdown blockquotes, attributed to another TE
+  ("TE-N states ..."), in past tense ("TE-30 used the path ..."),
+  inside `## Refinements` sections, supersedence notes, or `Decision
+  status` lines are Cat-1b. Five heuristics: quotation context;
+  Refinements / supersedence framing; past tense; default Cat-1a;
+  when-in-doubt-Cat-1b. Sweep tools may emit matches with surrounding
+  context for human review but must not auto-rewrite.
+- **Cat-2 (vocabulary updates).** In place, with a top-of-file note
+  pointing at the driving TE or TODO. The note must enumerate by ID
+  every DI in the affected TE and promise that the rewrite preserves
+  each DI's meaning. A TE without DIs gets a one-line `no DIs in this
+  file` note. Mandatory pre-step: grep the corpus for the old term
+  inside quotation contexts (markdown blockquotes; fenced code blocks
+  presented as citations; single/double-quoted phrases attributed to
+  another TE via `TE-N states`, `TE-N reads`, `originally said`, `as
+  of TE-N`, `the corpus showed`); classify each match Cat-2 (sweep)
+  or Cat-2-historical (leave) per the same heuristics as
+  Cat-1a/Cat-1b before sweeping.
+- **Cat-3 (navigational forward pointers).** Append a dated entry to
+  the TE's `## Refinements` section (created if absent, placed after
+  `## Decision status`). The TE body above is unchanged. No DI is
+  filed. Procedural tightenings of an existing category's how-to are
+  Cat-3.
+- **Cat-4 (resolved-implication forward pointers).** Same shape as
+  Cat-3, used when an Implications-and-future-work item resolves
+  (a TODO filed; a DR opened; a downstream TE landed).
+- **Cat-5 / Cat-6 / Cat-7 (substantive supersedence).** A material
+  change to a locked DI's meaning, scope, or applicability requires
+  a new TE that supersedes the affected one. The new TE carries its
+  own DFs and DIs; the older TE's `## Decision status` is updated to
+  `superseded by TE-<id>` and its top-of-file `## Status` field is
+  updated to `superseded by TE-<id> / DI-<id>`. The older TE's body
+  is otherwise untouched.
+
+Every TE carries a top-of-file `## Status` field placed immediately
+after the TE ID line. Canonical values: `needs DF`, `decided`,
+`decided, refined`, `superseded by TE-<id> / DI-<id>`, `withdrawn`.
+Legacy values preserved during retrofit: `stub`, `open`,
+`recommended for immediate adoption`, `locked for the <protocol>`.
+New TEs use canonical values.
+
+The `## Refinements` section is append-only. Entries are dated
+(`### YYYY-MM-DD - <title>`) and ordered chronologically. The body
+of the TE above `## Refinements` is historical evidence: Cat-1a or
+Cat-2 sweeps on the body are permitted under their category rules;
+Cat-3 / Cat-4 forward-pointers are appended to `## Refinements`;
+Cat-5–7 substantive changes are filed as a new superseding TE rather
+than as an edit. The four Cat-3 Refinements on TE-34 are exemplars of
+this shape.
+
+Reading default is holistic. Before any TE edit, read TE-34, TE-35,
+the affected TE, and any TEs they cite or that cite them. Single-TE
+reading is reserved for obviously mechanical questions (a single
+typo; a path that has demonstrably moved; a `## Status` field
+retrofit) and only after the holistic read has confirmed the
+question is mechanical. When in doubt, read holistically.
+
+Applicability is uniform across every TE corpus in this repository,
+whether the TE lives at the harness level (`docs/thought-experiments/`)
+or inside a per-protocol directory (`protocols/<slug>.d/`).
+Per-protocol corpora may add stricter rules but may not relax these
+rules.
+
 # Things that are forbidden
 
 - Do not push to `main`. Ever. Even if branch protection didn't stop
