@@ -54,20 +54,29 @@ The TE numbers (TE-1, TE-2, …) are stable identifiers used in the harness-spec
 
 ## Editing policy
 
-Per [TE-34](TE-20260502-212810-te-editing-policy-and-holistic-corpus.md), TE filenames are immutable (the timestamp slug is the content-address anchor that pins the integer alias, locked in TE-25). TE contents are edited under three regimes by category:
+TE filenames are immutable: the timestamp slug is the content-address anchor that pins the integer alias (TE-1, TE-2, ...), locked in [TE-25](TE-20260430-213447-te-numbering-collision-and-harness-spec-path.md).
 
-- **Mechanical edits** (path renames, vocabulary updates): edit in place. Vocabulary updates carry a top-of-file note pointing at the TE / TODO that drove the rewrite (the TE-24 / TE-26 pattern). Path renames need no note.
-- **Navigational edits** (forward-pointers to later TEs / DRs / DIs that resolved a future-work bullet, or back-pointers added after the fact): append-only `## Refinements` section at the bottom of the TE.
-- **Substantive edits** (recasting alternative analysis, reversing a locked decision, invalidating an assumption): not edits. Write a new TE that supersedes the old one; write a new DI that supersedes the old DI. Update only the old TE's `Decision status` line to point at the supersedence.
+TE contents are edited under a categorized policy locked in [TE-34](TE-20260502-212810-te-editing-policy-and-holistic-corpus.md) and refined by [TE-35](TE-20260502-232651-editing-policy-tabletop.md). The locked DIs are `DI-020-20260502-213103` (categorized regimes), `DI-020-20260502-213104` (uniform applicability across all TE corpora), and `DI-020-20260502-213105` (holistic reading by default; single-TE reading only for obviously mechanical questions). The Cat-1 clause of `DI-020-20260502-213103` was superseded on 2026-05-02 by `DI-020-20260502-232651` (Cat-1a / Cat-1b split). Four Cat-3 navigational refinements appear in TE-34's `## Refinements` section. The canonical statement of the policy lives in `AGENTS.md` under "TE Editing Policy (Required)"; the seven categories in summary:
 
-The corpus is read holistically: the TE corpus is one document with many facets, not a collection of independent essays. When any TE is in scope, the first move is to scan TE titles + `Decision under test` sections across the corpus to find facets that share assumptions, vocabulary, or decisions.
+- **Cat-1a (current-pointer paths).** Mechanical sweep in place; no top-of-file note.
+- **Cat-1b (historical-quotation paths).** Left untouched. Path references inside markdown blockquotes, attributed to another TE ("TE-N states ..."), in past tense, inside `## Refinements` sections, supersedence notes, or `Decision status` lines are Cat-1b. When in doubt, treat as Cat-1b.
+- **Cat-2 (vocabulary updates).** Edit in place, with a top-of-file note pointing at the driving TE or TODO. The note must enumerate by ID every DI that lives in the affected TE, paired with an explicit promise that the rewrite preserves each DI's meaning. Mandatory pre-step: grep the corpus for the old term inside quotation contexts and classify each match Cat-2 (sweep) or Cat-2-historical (leave) before sweeping.
+- **Cat-3 (navigational forward pointers).** Append a dated entry to the TE's `## Refinements` section (created if absent, placed after `## Decision status`). The TE body above is unchanged. No DI is filed.
+- **Cat-4 (resolved-implication forward pointers).** Same shape as Cat-3, used when an Implications-and-future-work item resolves (a TODO filed; a DR opened; a downstream TE landed).
+- **Cat-5 / Cat-6 / Cat-7 (substantive supersedence).** Not edits. Write a new TE that supersedes the old one and a new DI that supersedes the old DI. Update the older TE's `## Decision status` to `superseded by TE-<id>` and its top-of-file `## Status` field to `superseded by TE-<id> / DI-<id>`; otherwise leave the body untouched.
+
+Every TE carries a top-of-file `## Status` field placed immediately after the TE ID line. Canonical values: `needs DF`, `decided`, `decided, refined`, `superseded by TE-<id> / DI-<id>`, `withdrawn`. Legacy values preserved during the 2026-05-02 retrofit: `stub`, `open`, `recommended for immediate adoption`, `locked for the <protocol>`. New TEs prefer canonical values.
+
+The corpus is read holistically by default: the TE corpus is one document with many facets, not a collection of independent essays. When any TE is in scope, the first move is to scan TE titles plus `## Status` fields and `Decision under test` sections across the corpus to find facets that share assumptions, vocabulary, or decisions. Single-TE reading is reserved for obviously mechanical questions (a single typo; a path that has demonstrably moved; a `## Status` field retrofit) and only after the holistic read has confirmed the question is mechanical.
+
+Applicability is uniform across every TE corpus in this repository, whether the TE lives at the harness level (this directory) or inside a per-protocol directory (`protocols/<slug>.d/`). Per-protocol corpora may add stricter rules but may not relax these rules.
 
 ## Adding a new TE
 
 1. Decide the title.
 2. Pick a UTC timestamp — typically `date -u +%Y%m%d-%H%M%S`.
 3. Render the title to kebab-case for the slug.
-4. Create `TE-YYYYMMDD-HHMMSS-slug.md` in this directory.
+4. Create `TE-YYYYMMDD-HHMMSS-slug.md` in this directory. Include a top-of-file `## Status` field placed immediately after the TE ID line, with the appropriate initial value (`needs DF` for a TE in DF state; `decided` for a TE that locks DIs in the same commit). Use canonical values; reserve legacy values for the retrofit corpus.
 5. Add a one-line summary to `../../protocols/wire-lab.d/specs/harness-spec-draft.md` §8 with a link.
 6. Add the row to this index.
 7. Open a PR.
