@@ -214,4 +214,4 @@ The recommended set is **(35.1.a, 35.2.a, 35.3.a, 35.4.a)**: promote Cat-1a / Ca
 
 ## Decision status
 
-`needs DF` — awaiting Steve's choice on DF-35.1 through DF-35.4. The locked decisions from TE-34 (DI-020-20260502-213103 / -213104 / -213105) remain in force; this TE confirms them at the macro level, refines Cat-1, and tightens Cat-2 procedure. After DF, a new DI supersedes DI-020-20260502-213103 (per DF-35.1.a) and TE-34 gets a `## Refinements` entry pointing at this TE.
+`partially decided` — DF-35.1 answered Alt-1.C on 2026-05-02 (bot recommendation under Steve's `make a recommendation` directive); DI-020-20260502-232651 in TODO 020 supersedes DI-020-20260502-213103's Cat-1 clause, splitting Cat-1 into Cat-1a (current-pointer, swept) and Cat-1b (historical-quotation, left). DF-35.2 / -35.3 / -35.4 remain pending. The locked decisions from TE-34 (DI-020-20260502-213104 / -213105 plus the residual Cat-2/3/4/5/6/7 clauses of -213103) remain in force.
