@@ -30,6 +30,7 @@ their owning protocol's section.
 | TODO 15 | 2026-05-01 23:01:30 | [TODO-20260501-230130-dr-todo-di-absorption-RETIRED.md](TODO-20260501-230130-dr-todo-di-absorption-RETIRED.md) |
 | TODO 17 | 2026-05-01 23:01:32 | [TODO-20260501-230132-group-transport-rename-FOLDED.md](TODO-20260501-230132-group-transport-rename-FOLDED.md) |
 | TODO 20 | 2026-05-02 21:31:03 | [TODO-20260502-213103-te-editing-policy-and-holistic-corpus.md](TODO-20260502-213103-te-editing-policy-and-holistic-corpus.md) |
+| TODO 21 | 2026-05-04 17:07:46 | [TODO-20260504-170746-session-replay-cleanup.md](TODO-20260504-170746-session-replay-cleanup.md) |
 
 ## group-session
 
