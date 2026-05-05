@@ -112,7 +112,7 @@ This thread proposed many things; **none of it was committed.** All discussion-o
 | pgmsg tool (thin CLI wrapper over promisebase libraries) | **DISCUSSED, NOT WRITTEN** |
 | Compatibility/coexistence with libp2p, IPFS, ATPROTO | **DISCUSSED, NOT WRITTEN** |
 | Multi-repo simulation: each simulated site is its own repo (or wire-lab-related messages stay in wire-lab, others in other repos) | **DISCUSSED, NOT WRITTEN** |
-| "Don't hardcode 'jj'" rule | **WRITTEN** (as a standing rule applied to the group slug; "wire-lab-devs" was chosen instead). |
+| "Don't hardcode '[redacted-collaborator]'" rule | **WRITTEN** (as a standing rule applied to the group slug; "wire-lab-devs" was chosen instead). |
 
 ---
 
