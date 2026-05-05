@@ -73,7 +73,7 @@ Source: `past_session_contexts/sessions/2026-05-04_2026-05-10/ea135ce8/conversat
 |---|---|---|
 | Initial TE-37 idea: design a new git-file-transport protocol | **REVERTED** | Twig `ppx/te-20260503-112348-git-file-transport` reset back to ppx/main HEAD `4725b3e`. **Realization:** group-session already covers this. |
 | `transports/draft--wire-lab-devs/` instance bootstrap (group-session N≥3) | **WRITTEN** | `a1c85f3` / merge `a1ecc72` on ppx/main. |
-| Slug choice "wire-lab-devs" (no people-names; JJ stays anonymous in committed docs) | **WRITTEN** | Same commit. |
+| Slug choice "wire-lab-devs" (no people-names; [redacted-collaborator] stays anonymous in committed docs) | **WRITTEN** | Same commit. |
 | Filename = message CID rule (drop sequential numbering) | **WRITTEN** | `19e9b37` / merge `7a903d4`. Existing two messages renamed in place; CIDs preserved. |
 | Receive-merge-push-then-optionally-post cycle (S2 + S9) | **WRITTEN** | Same commit. group-session §9 split into 9.1–9.8. |
 | Per-author-branch binding (each author writes to `<author-id>/main`; ppx/main is ppx's own write branch); fetch from all branches | **WRITTEN** | `463af44` + `ba9f2a6` / merge `ea3ce84`. group-session §9 includes S9. |
