@@ -1,4 +1,4 @@
-# Substrate precedent histories for federated message protocols
+# Historical networks: substrate precedent for federated message protocols
 
 **Date:** 2026-05-03
 **Status:** Research note. Source material for TE-38 (binding /
@@ -275,8 +275,8 @@ decentralized CAS" correction.)
 
 When TE-38 is drafted, its background section can cite:
 
-> See `docs/research/substrate-precedent-histories-20260503.md` for
-> the precedent enumeration grounding the binding-protocol-as-first-
+> See `docs/research/historical-networks-20260503.md` for the
+> precedent enumeration grounding the binding-protocol-as-first-
 > class architectural claim.
 
 This keeps the precedent material in one durable location, separate
