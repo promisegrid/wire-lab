@@ -8,7 +8,7 @@ TE-20260501-021921
 
 ## Status
 
-decided
+decided, refined
 
 ## Decision under test
 
@@ -302,6 +302,26 @@ This question is non-trivial and TE-27 does not lock answers to it. It is deferr
 - `specs/harness-spec-draft.md`'s TE-24 §8 bullet is rewritten to use "transport," and a TE-27 §8 entry is added.
 - DR-009 and TODO 012 are updated to use "transport."
 - The TODO for the carve-out (anticipated TODO 013) covers: creating `specs/transport-spec-draft.md` (thin), `specs/unicast-transport-draft.md` and `specs/group-transport-draft.md` (substantive), and updating all the cross-references.
+
+## Refinements
+
+### 2026-05-05 — Forward-pointers to TE-28..TE-32 dis-anchored; migration-semantics topic re-anchored to TE-37
+
+This Refinement does not change any DI in TE-27. It records that all five "anticipated TE-N" forward-pointers in `## Implications for follow-on work` and the matching item in `## Conclusions` line numbering were written under the pre-Cat-3-on-TE-25 authoring practice (naming an unallocated integer for a not-yet-drafted TE), and all five have since dis-anchored as their integer slots were claimed by unrelated topics. The 2026-05-05 Cat-3 Refinement on TE-25 forbids that construction going forward; this Refinement applies the new rule to TE-27 by recording where each of the five topics actually lives now.
+
+**Per-pointer disposition:**
+
+1. **"TE-28 (anticipated): transport-protocol migration semantics"** — the integer TE-28 was claimed by ["The 100-year goal as a load-bearing design constraint"](TE-20260501-202713-100-year-goal-as-design-constraint.md) (a different topic) and the migration-semantics question raised in § S7 of TE-27 went unanchored for several days. The topic is now anchored at [TE-37: Transport-protocol migration invariants](TE-20260506-041241-transport-protocol-migration-semantics.md), drafted on 2026-05-05 in response to a DT3 (dropped-thread) sweep. TE-37 locks three migration-contract invariants (audit-trail reconstructibility; no-silent-rewrite; no-unilateral-abandonment) and explicitly defers operational-shape questions (close-old-vs-overlap-vs-atomic-swap; back-reference format; etc.) to a future operational-shape TE tracked as `T-MIG-OPS` in `OPEN-THREADS.md`. **Readers of TE-27 § S7 should follow the pointer to TE-37, not to TE-28.**
+
+2. **"TE-29 (anticipated): ring-transport spec"** — the integer TE-29 was claimed by ["Protocols as simulated repos, and the L4-binding layer"](TE-20260501-215027-protocols-as-simulated-repos-and-binding-layer.md) (a different topic). The ring-transport-spec topic has not been drafted as of 2026-05-05; it is open work tracked as `T-RING-TRANSPORT` in `OPEN-THREADS.md`.
+
+3. **"TE-30 (anticipated): cluster-of-clusters transport"** — the integer TE-30 was claimed by ["TODO numbering and per-protocol TODO shape"](TE-20260502-002548-todo-numbering-and-per-protocol-shape.md) (a different topic). The cluster-of-clusters topic has not been drafted as of 2026-05-05; it is open work tracked as `T-CLUSTER-OF-CLUSTERS-TRANSPORT` in `OPEN-THREADS.md`.
+
+4. **"TE-31 (anticipated): gossip-transport spec"** — the integer TE-31 was claimed by ["Spec-doc as upstream, simrepo as implementation"](TE-20260502-004924-spec-doc-inversion-and-conformance-changelog.md) (a different topic). The gossip-transport-spec topic has not been drafted as of 2026-05-05; it is open work tracked as `T-GOSSIP-TRANSPORT` in `OPEN-THREADS.md`.
+
+5. **"TE-32 (anticipated): receipts at scale"** — the integer TE-32 was claimed by ["Spec-side vs implementation-side split"](TE-20260502-014525-spec-vs-implementation-split.md) (a different topic). The receipts-at-scale topic has not been drafted as of 2026-05-05; it is open work tracked as `T-RECEIPTS-AT-SCALE` in `OPEN-THREADS.md`.
+
+**Going forward** (per the 2026-05-05 Cat-3 on TE-25): any future TE that anticipates a not-yet-drafted TE must use either the timestamp+slug form of the future TE (if drafted but not indexed) or a thread-id from `OPEN-THREADS.md` (if only anticipated). Naming an unallocated integer is forbidden because it is the construction that produced the drift documented above.
 
 ## Decision status
 

@@ -106,7 +106,7 @@ If a future reader asks "where do I find out how to write a message for this tra
 
 - **OQ-1 (deferred):** Should the wire-lab spec define a small companion convention for transport-protocols to publish their own pCID on first use, so receivers can discover the protocol-spec from a stranger's first message? Raised and deferred in TE-26 DF-26.8 Alt-8.B; the locked Alt-8.C (code-as-handler) does not address this. May surface in a future TE.
 
-- **OQ-2 (deferred):** What does it mean for a group of participants to migrate from one transport-protocol-pCID to another transport-protocol-pCID? (S7 of TE-27.) Deferred to a future TE on transport-protocol migration semantics.
+- **OQ-2 (partially resolved 2026-05-05):** What does it mean for a group of participants to migrate from one transport-protocol-pCID to another transport-protocol-pCID? (S7 of TE-27.) The migration *invariants* are locked by [TE-37: Transport-protocol migration invariants](../../../docs/thought-experiments/TE-20260506-041241-transport-protocol-migration-semantics.md): audit-trail reconstructibility, no-silent-rewrite, and no-unilateral-abandonment. Any concrete migration contract must satisfy all three. The *operational shape* of migration (close-old-vs-overlap-vs-atomic-swap; back-reference format; message disposition; seal mechanics; group-identity continuity; trigger discipline; authorizing promise) is deferred to a future operational-shape TE tracked as `T-MIG-OPS` in `OPEN-THREADS.md`; that TE is gated on a concrete first migration to design against.
 
 ## Freeze gate
 
