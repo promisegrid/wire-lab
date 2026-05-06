@@ -422,6 +422,24 @@ or inside a per-protocol directory (`protocols/<slug>.d/`).
 Per-protocol corpora may add stricter rules but may not relax these
 rules.
 
+# TE authoring conventions
+
+- **Named actors follow the cryptography-literature alphabetical
+  convention.** Cooperative TE authors, readers, and scenario
+  participants are Alice, Bob, Carol, Dave, Ellen, Frank, ...
+  (extend further down the alphabet as needed). Mallory is the
+  adversary. Steve is named explicitly only when his role as repo
+  owner is load-bearing in the scenario; otherwise Steve does not
+  appear as a character. Use these names in TEs, scenario
+  analyses, tabletop simulations, DR / DI prose, and any worked
+  example in specs or docs that needs named actors. Do not
+  invent ad-hoc names (no "User1", no "the writer", no first
+  names drawn from outside the convention) when the alphabetical
+  list will serve. The convention is already in active use in
+  TE-35 (see `docs/thought-experiments/TE-20260502-232651-editing-policy-tabletop.md`,
+  Assumptions section); this bullet lifts it to a corpus-wide
+  authoring rule.
+
 # Things that are forbidden
 
 - Do not push to `main`. Ever. Even if branch protection didn't stop
