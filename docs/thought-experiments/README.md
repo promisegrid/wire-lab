@@ -49,6 +49,7 @@ The timestamp is the moment the TE was first drafted (or, for TEs that pre-date 
 | TE-33 | 2026-05-02 02:04 | [Spec-doc Informative References to its workshop, RFC-shaped](TE-20260502-020439-spec-doc-informative-references.md) |
 | TE-34 | 2026-05-02 21:28 | [TE editing policy and the TE corpus as one document with facets](TE-20260502-212810-te-editing-policy-and-holistic-corpus.md) |
 | TE-35 | 2026-05-02 23:26 | [Tabletop simulation of the TE editing policy](TE-20260502-232651-editing-policy-tabletop.md) |
+| TE-37 | 2026-05-06 04:12 | [Transport-protocol migration invariants](TE-20260506-041241-transport-protocol-migration-semantics.md) |
 
 The timestamp+slug filename (`TE-YYYYMMDD-HHMMSS-slug.md`) is the stable identifier of a TE: collision-free, content-addressable, and chronologically sortable on disk. The integer TE-N is a display nickname assigned at landing-on-`ppx/main` time and recorded in this index against the timestamp slug; it is the short form used in the harness-spec, in DF / DI / DR descendant numbering (`DF-25.1`, `DI-020-...`, `DR-009`), and in backward citations ("per TE-26 § S5"). The display nickname is assigned-after-the-fact and therefore MUST NOT appear in any artifact before its assignment is recorded; forward-pointers to a not-yet-drafted TE use the timestamp+slug form (if the TE has been drafted but not yet indexed) or a thread-id from `OPEN-THREADS.md` (if the TE is only anticipated). This framing is locked by the 2026-05-05 Cat-3 Refinement on [TE-25](TE-20260430-213447-te-numbering-collision-and-harness-spec-path.md).
 
