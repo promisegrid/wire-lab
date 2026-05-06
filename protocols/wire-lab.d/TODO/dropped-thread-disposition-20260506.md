@@ -50,6 +50,8 @@ Drafting order (dependency-sorted):
 
 ### TE-36 follow-on: OQ-36.6 + tabletop walk (5 UTs)
 
+*OPEN-THREADS map:* new thread T-TE36-FOLLOWON to be added (OQ-36.6 deferred investigation + audit-memo-style Alice-through-Mallory tabletop walk).
+
 - **UT-160.b** (T160): DF-36.4 PT-recast collapsed five named pCIDs into two PT primitives, baked into Alt-4.A rather than presented as its own DF.
 - **UT-160.c** (T160): TE-36's six tabletop scenarios used different framing than the audit memo's recommended Alice-through-Mallory walk.
 - **UT-161.a** (T161): The asymmetry between the two envelope hypotheses -- grid-pcid-payload can host promise-stack as one possible payload, but promise-stack cannot cleanly host grid-pcid-payload at envelope level -- is t...
@@ -57,6 +59,8 @@ Drafting order (dependency-sorted):
 - **UT-162.b** (T162): DF-36.2 is provisionally locked pending OQ-36.6, but the conditionality may not survive visual inspection of the TE file.
 
 ### TE-38: Substrate-agnostic layered model (52 UTs)
+
+*OPEN-THREADS map:* T-MIG-OPS (transport-protocol migration ops; gated on first concrete migration -- TE-38 + TE-39 close the gate) and T-021-CC-Q2 (TE-38 numbering / naming cross-cutting question).
 
 - **UT-170.a** (T170): (no bolded summary)
 - **UT-171.a** (T171): (no bolded summary)
@@ -113,6 +117,8 @@ Drafting order (dependency-sorted):
 
 ### TE-40: Apparatus-vs-specimen completion (18 UTs)
 
+*OPEN-THREADS map:* T-PROMSTACK-RETIRE-CASCADE (Cat-3 cascade from TE-36 promise-stack retirement; closes TE-1 + harness-spec apparatus/specimen carve-out).
+
 - **UT-155.a** (T155): DF-1.1 (TE-1 promise-stack ordering, Alt-E projection-mode) was never locked.
 - **UT-155.b** (T155): The most explicit `Project / Peel / Wrap` operation definitions in the corpus live only in the conversation, not in any committed file.
 - **UT-156.a** (T156): The Option 1 / Option 2 / Option 3 question for TE-1's structural role was abandoned, not answered.
@@ -134,6 +140,8 @@ Drafting order (dependency-sorted):
 
 ### TE-41: Group-session freeze procedure (15 UTs)
 
+*OPEN-THREADS map:* T-GROUP-SESSION-FREEZE (freeze chain for group-session/transport-spec; carved from T-021-TODO12 in turn-289-area work).
+
 - **UT-164.c** (T164): Genesis message m000 covers §3/§4/§5/§7 of group-session spec but NOT §4.6 Parents: or §6 body-as-receipt; turn-165's recap of the freeze gate requires §3/§4/§4.6/§6/§7.
 - **UT-164.d** (T164): The membership-by-posting convention -- "the membership list is whatever set of From: values appears in the transport's commit history before the spec is frozen" -- is a load-bearing semi-formal rule ...
 - **UT-164.e** (T164): The rename-at-freeze operation -- "directory will be renamed from `transports/draft--wire-lab-devs/` to `transports/<pcid>--wire-lab-devs/` in a single mechanical commit, and every message's carrier l...
@@ -152,6 +160,8 @@ Drafting order (dependency-sorted):
 
 ### TE-42: Filename/CID-cascade policy (7 UTs)
 
+*OPEN-THREADS map:* new thread T-FILENAME-CID-CASCADE to be added (Path A vs Path B for legacy-message rehash; Message-ID prohibition vs deprecation; strict-reader rule §4.7 interactions).
+
 - **UT-168.a** (T168): The Message-ID header was explicitly retained in turn 168's spec rewrite ("the Message-ID: header (§4.3) is retained as a human-readable convenience inside the envelope but is not the filename") in co...
 - **UT-168.e** (T168): m2 (CID-filename + merge-cycle ratification, then-CID `bafkreihnvl...`, current-CID `bafkreidef4b4qdc4xjvkjrern7jm4ta75q55ed2u2ilwcrkxqhn7n4fjce` after Message-ID removal) was authored without an expl...
 - **UT-168.f** (T168): All three CIDs claimed by turn 168's answer text and recorded in commit messages (`bafkreifmjs...`, `bafkreihqx6...`, `bafkreihnvl...`) were retroactively invalidated by turn 169's Message-ID removal ...
@@ -161,6 +171,8 @@ Drafting order (dependency-sorted):
 - **UT-169.e** (T169): §4.3's rewrite changes Message-ID from "mandatory" to "prohibited" -- a stronger enforcement than the deprecation the reasoning recommended.
 
 ### TE-43: Promisebase prior-art adoption (25 UTs)
+
+*OPEN-THREADS map:* new thread T-PROMISEBASE-ADOPTION to be added (prototype-not-canon stance; pitbase-as-L6 substrate prior art; kv branch on remote; Rabin/FastCDC chunking parameter mismatch).
 
 - **UT-179.c** (T179): Conditional-release promises ("send only if recipient promises onward-restraint") imply a recursive promise-graph that the protocol must track.
 - **UT-181.a** (T181): Bot's import-path claim github.com/t7a/pitbase/db is wrong; correct path is github.com/stevegt/promisebase/db.
@@ -189,6 +201,8 @@ Drafting order (dependency-sorted):
 - **UT-192.f** (T192): Bot's turn-192 framing introduces the implicit commitment that wire-lab and promisebase "will gradually merge" ("wire-lab and promisebase will be in the same codebase eventually") -- a major architect...
 
 ### TE-45: Conditional-release / geofencing / recursive promise-graph (1 UTs)
+
+*OPEN-THREADS map:* new thread T-CONDITIONAL-RELEASE to be added (recursive promise-graph; geofencing dimension; orthogonal to TE-38 layered model).
 
 - **UT-179.d** (T179): Geofencing requirement adds a constraint dimension orthogonal to group membership.
 
