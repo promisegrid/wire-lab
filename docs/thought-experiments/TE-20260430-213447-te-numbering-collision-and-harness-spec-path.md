@@ -8,7 +8,7 @@ TE-20260430-213447
 
 ## Status
 
-decided
+decided, refined
 
 ## Decision under test
 
@@ -226,6 +226,27 @@ Conditional on Alt-1.A.
 **Alt-1.A + Alt-2.B + Alt-3.B + Alt-4.C.**
 
 Rationale: this set is the only set that simultaneously honors the drafting-time invariant for TE numbering (Alt-1.A, Alt-2.B), respects branch ownership and the never-force-push rule (Alt-3.B), and avoids leaving a gap in the spec's open-questions list while active channel work is underway (Alt-4.C).
+
+## Refinements
+
+### 2026-05-05 — Integer TE-N is a display nickname; timestamp+slug is the stable identifier
+
+The original TE-25 prose, the `docs/thought-experiments/README.md` index, and the harness-spec all treated the integer TE-N (TE-1, TE-2, ...) as the stable identifier and the timestamp slug as a chronological convenience. The DT3 thread (the migration-semantics question first raised in TE-27 § S7 and resolved in TE-37 on 2026-05-05) demonstrated that this framing is unsafe in one specific construction: a forward-pointer that names an *unallocated* integer.
+
+TE-27 § S7 and its Implications-for-follow-on-work both wrote "anticipated TE-28: transport-protocol migration semantics." When TE-28 was actually drafted, it took the 100-year-goal slot — a different topic — and TE-27's forward-pointer silently dis-anchored. The corpus contained a stale promise to a reader who tried to follow the integer pointer and found a different TE there. TE-37 absorbed the migration-semantics topic and a Cat-3 Refinement on TE-27 redirects the stale pointer, but the underlying authoring practice that produced the drift had no rule against it.
+
+This Refinement does not change any DI in TE-25. It tightens the authoring practice that surrounds the numbering convention TE-25 locked, by reframing the two identifiers and by adding a forward-pointer rule:
+
+1. **Stable identifier.** The timestamp+slug filename (`TE-YYYYMMDD-HHMMSS-slug.md`) is the stable identifier of a TE. It is collision-free by construction (HHMMSS is unique on a single drafting machine; the slug disambiguates concurrent drafts on different machines), it encodes drafting time directly, and it survives any future renumbering of the integer alias because the file is content-addressable as written.
+2. **Display nickname.** The integer TE-N is a *display nickname* assigned at the moment a TE lands on `ppx/main` (or `main`), recorded in `docs/thought-experiments/README.md` against the timestamp slug. It is short, memorable, and the natural anchor for descendant DF/DI/DR numbering (DF-25.1, DI-020-..., DR-009). It is human-friendly but assigned-after-the-fact and therefore must not appear in any artifact before that assignment is recorded.
+3. **Forward-pointer rule.** Any TE, spec, or Implications list that needs to point at a *future* TE — one that has not yet been drafted and indexed — MUST use either the timestamp+slug form (when the future TE has been drafted but not yet indexed) or a thread-id (T-...) recorded in `OPEN-THREADS.md` (when the future TE is anticipated but not yet drafted). Naming an unallocated integer ("anticipated TE-28") is forbidden going forward; it is the construction that produced the DT3 drift.
+4. **Backward citations are unchanged.** Citations to *existing* indexed TEs ("per TE-26 § S5," "DF-25.1 = Alt-1.A," "DI-020-20260502-213103") continue to use the integer alias. The display nickname is the natural form for backward citation; the rule above only constrains forward-pointers to unallocated integers.
+5. **Renumbering remains rare and recordable.** TE-25's locked decision (DF-25.1 = Alt-1.A; integer assignments are sticky once on `ppx/main`) is reaffirmed. Renumbering an indexed TE is a Cat-2 vocabulary update or a Cat-5 supersedence depending on scope; it is never silent.
+
+Downstream artifacts updated in the same twig:
+
+- `docs/thought-experiments/README.md` — the prose claim that "TE numbers ... are stable identifiers" is rewritten to name the timestamp+slug as the stable identifier and the integer as the display nickname; the "Adding a new TE" procedure gains a step about forward-pointer hygiene.
+- A note is filed in `OPEN-THREADS.md` flagging that AGENTS.md's "Refinements ... placed after `## Decision status`" prose contradicts the canonical example in TE-34 (which places Refinements *before* Decision status). That contradiction is older than this Refinement and is left to a future Cat-3 on TE-34 or AGENTS.md.
 
 ## Decision status
 

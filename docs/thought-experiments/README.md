@@ -50,11 +50,11 @@ The timestamp is the moment the TE was first drafted (or, for TEs that pre-date 
 | TE-34 | 2026-05-02 21:28 | [TE editing policy and the TE corpus as one document with facets](TE-20260502-212810-te-editing-policy-and-holistic-corpus.md) |
 | TE-35 | 2026-05-02 23:26 | [Tabletop simulation of the TE editing policy](TE-20260502-232651-editing-policy-tabletop.md) |
 
-The TE numbers (TE-1, TE-2, …) are stable identifiers used in the harness-spec; the timestamp slug is what makes the file content-addressable and chronologically sortable on disk.
+The timestamp+slug filename (`TE-YYYYMMDD-HHMMSS-slug.md`) is the stable identifier of a TE: collision-free, content-addressable, and chronologically sortable on disk. The integer TE-N is a display nickname assigned at landing-on-`ppx/main` time and recorded in this index against the timestamp slug; it is the short form used in the harness-spec, in DF / DI / DR descendant numbering (`DF-25.1`, `DI-020-...`, `DR-009`), and in backward citations ("per TE-26 § S5"). The display nickname is assigned-after-the-fact and therefore MUST NOT appear in any artifact before its assignment is recorded; forward-pointers to a not-yet-drafted TE use the timestamp+slug form (if the TE has been drafted but not yet indexed) or a thread-id from `OPEN-THREADS.md` (if the TE is only anticipated). This framing is locked by the 2026-05-05 Cat-3 Refinement on [TE-25](TE-20260430-213447-te-numbering-collision-and-harness-spec-path.md).
 
 ## Editing policy
 
-TE filenames are immutable: the timestamp slug is the content-address anchor that pins the integer alias (TE-1, TE-2, ...), locked in [TE-25](TE-20260430-213447-te-numbering-collision-and-harness-spec-path.md).
+TE filenames are immutable: the timestamp slug is the content-address anchor and the stable identifier; the integer alias (TE-1, TE-2, ...) is the display nickname pinned to it, locked in [TE-25](TE-20260430-213447-te-numbering-collision-and-harness-spec-path.md) and refined by the 2026-05-05 Cat-3 Refinement on the same TE.
 
 TE contents are edited under a categorized policy locked in [TE-34](TE-20260502-212810-te-editing-policy-and-holistic-corpus.md) and refined by [TE-35](TE-20260502-232651-editing-policy-tabletop.md). The locked DIs are `DI-020-20260502-213103` (categorized regimes), `DI-020-20260502-213104` (uniform applicability across all TE corpora), and `DI-020-20260502-213105` (holistic reading by default; single-TE reading only for obviously mechanical questions). The Cat-1 clause of `DI-020-20260502-213103` was superseded on 2026-05-02 by `DI-020-20260502-232651` (Cat-1a / Cat-1b split). Four Cat-3 navigational refinements appear in TE-34's `## Refinements` section. The canonical statement of the policy lives in `AGENTS.md` under "TE Editing Policy (Required)"; the seven categories in summary:
 
@@ -77,6 +77,7 @@ Applicability is uniform across every TE corpus in this repository, whether the 
 2. Pick a UTC timestamp — typically `date -u +%Y%m%d-%H%M%S`.
 3. Render the title to kebab-case for the slug.
 4. Create `TE-YYYYMMDD-HHMMSS-slug.md` in this directory. Include a top-of-file `## Status` field placed immediately after the TE ID line, with the appropriate initial value (`needs DF` for a TE in DF state; `decided` for a TE that locks DIs in the same commit). Use canonical values; reserve legacy values for the retrofit corpus.
-5. Add a one-line summary to `../../protocols/wire-lab.d/specs/harness-spec-draft.md` §8 with a link.
-6. Add the row to this index.
-7. Open a PR.
+5. While drafting, write any forward-pointers (to TEs that do not yet exist) using either the timestamp+slug form of the future TE (if drafted but not indexed) or a thread-id from `OPEN-THREADS.md` (if only anticipated). Do not name an unallocated integer ("anticipated TE-28") — that is the construction that produced the DT3 drift; the rule is locked by the 2026-05-05 Cat-3 Refinement on TE-25.
+6. Add a one-line summary to `../../protocols/wire-lab.d/specs/harness-spec-draft.md` §8 with a link.
+7. Add the row to this index, assigning the next free integer at landing time.
+8. Open a PR.
