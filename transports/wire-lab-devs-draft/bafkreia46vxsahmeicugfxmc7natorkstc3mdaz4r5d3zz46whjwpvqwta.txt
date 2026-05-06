@@ -1,0 +1,68 @@
+grid draft:group-session
+
+Date: 2026-05-06T17:09:00Z
+From: alice
+Parents: bafkreidef4b4qdc4xjvkjrern7jm4ta75q55ed2u2ilwcrkxqhn7n4fjce
+
+I promise that I have observed and accepted the following message:
+
+- bafkreidef4b4qdc4xjvkjrern7jm4ta75q55ed2u2ilwcrkxqhn7n4fjce
+  (the CID-filenames and merge-cycle ratification authored by
+  stevegt-via-perplexity on 2026-05-03)
+
+I promise that I am alice, a TE-character second author introduced to
+this transport per DF-021-TODO12.2 Alt-F2 to satisfy the strict reading
+of the group-session spec freeze gate condition (2): "at least one
+round-trip of messages exercising sections 3, 4, 4.6, 6, and 7." This
+message is honest about being a single-instance mock in the sense of
+DI-009: the canonical bytes you are reading were authored by the
+perplexity bot acting as alice, not by an independent second LLM. The
+TE-character convention from the wire-lab corpus (Alice, Bob, Carol,
+Dave, Ellen, Frank) is being applied here for the first time inside
+a transport instance; alice as From: value sets that precedent.
+
+I conditionally promise that I will follow the receive-merge-push-then-
+optionally-post cycle described in the message above, on the condition
+that other participants on this transport make the same conditional
+promise about their own author-id slash main branches. This endorses
+the conditional-promise polarity positive per the assessment vocabulary
+implied by promise theory.
+
+I promise that this message is the second-sender entry that completes
+the strict round-trip required by the spec freeze gate condition (2).
+The DAG of this transport now has four messages forming a chain:
+  bafkreihhuejiefrqrm7zgw2jsdqc37lwmbvfkw5uqbnjx3wsobcxh3y7ni  (root, m000)
+  bafkreihnonvsf3vmcagukqcxwoh35255eduulvwwx3kax6ty4iidklk5vu  (m001)
+  bafkreidef4b4qdc4xjvkjrern7jm4ta75q55ed2u2ilwcrkxqhn7n4fjce  (m002)
+  this message                                                  (m003)
+The sender set is two: stevegt-via-perplexity authored m000, m001, m002;
+alice authors m003. Section 4.6 Parents is exercised three times in this
+chain: m001 cites m000, m002 cites m001, this message cites m002. Section
+3 CID computation is verifiable for all four files by tools/spec cid.
+Section 4 envelope structure is exercised by every message. Section 6
+body-as-receipt is exercised by m001 acknowledging m000, by m002
+acknowledging m001, and by this message acknowledging m002 above.
+Section 7 append-only is exercised by all four files coexisting with no
+modifications.
+
+I promise that this message acknowledges and ratifies the rename of
+this transport directory from transports/draft--wire-lab-devs/ to
+transports/wire-lab-devs-draft/, applied on 2026-05-06 per DF-38.5
+locked verbally in turn 176 and committed in this twig. The three
+prior messages reference the old directory path in their body text;
+those references should be read as historical and refer to this same
+directory at its current path. The CIDs and filenames of those messages
+are unchanged because the canonical bytes of the messages are unchanged;
+filenames are functions of bytes per section 3, not of containing
+directory.
+
+I promise that this message itself, once committed, is named by its
+computed CID per the section 2 filename rule, exercising the post phase
+of the merge-then-optionally-post cycle on the same branch where the
+rename was applied.
+
+I do not expect a reply to this message as a freeze-gate requirement;
+the round-trip is now strict. A reply from a third sender, or from
+stevegt-via-perplexity citing this message and continuing the chain,
+remains welcome and would extend the empirical evidence base for the
+v0 envelope.
