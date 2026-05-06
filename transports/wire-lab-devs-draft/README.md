@@ -133,18 +133,21 @@ transport. Edits to this README are coordinated out-of-band.
 ## Bootstrap roster
 
 The transport is being bootstrapped by `ppx/main` (this branch). The
-transport-creation message, the branch-binding clarification message,
-and the CID-filenames + merge-cycle ratification message were all
-authored on `ppx/main` and are present at:
+four bootstrap messages, all authored on `ppx/main`, are:
 
 - `bafkreihhuejiefrqrm7zgw2jsdqc37lwmbvfkw5uqbnjx3wsobcxh3y7ni.txt`
-  (transport-creation; CID-named per spec §2)
+  (m000: transport-creation; CID-named per spec §2; From:
+  stevegt-via-perplexity)
 - `bafkreihnonvsf3vmcagukqcxwoh35255eduulvwwx3kax6ty4iidklk5vu.txt`
-  (branch-binding clarification; cites the transport-creation message
-  as a parent)
+  (m001: branch-binding clarification; cites m000 as parent; From:
+  stevegt-via-perplexity)
 - `bafkreidef4b4qdc4xjvkjrern7jm4ta75q55ed2u2ilwcrkxqhn7n4fjce.txt`
-  (CID-filenames + merge-cycle ratification; cites the branch-binding
-  clarification as a parent)
+  (m002: CID-filenames + merge-cycle ratification; cites m001 as
+  parent; From: stevegt-via-perplexity)
+- `bafkreia46vxsahmeicugfxmc7natorkstc3mdaz4r5d3zz46whjwpvqwta.txt`
+  (m003: second-sender mock per Alt-F2 of DF-021-TODO12.2; cites m002
+  as parent; From: alice; closes 012.7 freeze-gate condition (2);
+  ratifies the DF-38.5 directory rename)
 
 Other developer agents joining the transport are expected to:
 
@@ -157,10 +160,10 @@ Other developer agents joining the transport are expected to:
 ## Freeze checklist (per spec §Freeze gate)
 
 - [ ] [`protocols/wire-lab.d/specs/transport-spec-draft.md`](../../protocols/wire-lab.d/specs/transport-spec-draft.md) frozen
-- [ ] At least one round-trip exercising §3 / §4 / §4.6 / §6 / §7
+- [x] At least one round-trip exercising §3 / §4 / §4.6 / §6 / §7 (closed 2026-05-06: four-message DAG, two distinct senders `stevegt-via-perplexity` and `alice`, all CIDs verified by `tools/spec cid`)
 - [ ] Steve signs `merge-group-transport-spec` promise
 - [ ] `tools/spec freeze group-transport-spec` mints pCID and snapshots
-- [ ] This directory and every message's carrier line rewritten to the
+- [ ] This directory and every message's grid envelope rewritten to the
       minted pCID
 
 ## Related
