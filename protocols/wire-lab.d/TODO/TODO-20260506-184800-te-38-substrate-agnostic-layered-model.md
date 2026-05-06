@@ -103,6 +103,56 @@ resulting product is committed and pushed.
     blocks: TE-38 -- whether the path scheme needs an L6 level or stays 5-deep
     alternatives: Alt-M.1 (L6 implicit; messages are leaf chunks) / Alt-M.2 (explicit L6 path level, 6-deep paths) / Alt-M.3 (cas/ subtree + pointer files, with Alt-M.1 as migration path)
     recommendation: Alt-M.3 long-term, Alt-M.1 today
+    note: 2026-05-06 -- explanation of all three alternatives delivered to Steve at 15:08 PT on his request; question stands open pending answer.
+
+- [ ] **Q-22.7** OPEN-THREADS.md migration scope: which deprecation shape?
+    opened: 2026-05-06 23:08 UTC
+    asked of: stevegt@t7a.org
+    blocks: deprecating OPEN-THREADS.md and consolidating thread tracking into TODO files
+    alternatives:
+      Alt-OT.A -- one-row-per-thread: each open T-* thread becomes its own
+                  TODO file under protocols/<owner>.d/TODO/ (17 new files);
+                  closed threads recorded in a single OPEN-THREADS-archive.md
+      Alt-OT.B -- one TODO file per topical bundle: group related threads
+                  (e.g. T-FILENAME-CID-CASCADE goes inside the TE-42 parent
+                  TODO; T-MIG-OPS inside the TE-39 parent TODO; etc.) using
+                  the same parent-TODO pattern as TODO 22 for TE-38
+      Alt-OT.C -- single new TODO 23 'thread index' that absorbs OPEN-THREADS
+                  verbatim as a question/thread log; existing closed entries
+                  carry over with [x] preserved
+    recommendation: Alt-OT.B -- it matches the structure already established
+                    by TODO 22 (TE-38) and the dependency-sorted TE roster
+                    in dropped-thread-disposition-20260506.md. Each TE that
+                    will be drafted (TE-39 through TE-45 plus TE-36-followon)
+                    gets its own parent TODO file with the relevant T-*
+                    threads merged in as content. Anticipated-future-TE
+                    threads (T-RING-TRANSPORT, T-CLUSTER-OF-CLUSTERS-TRANSPORT,
+                    T-GOSSIP-TRANSPORT, T-RECEIPTS-AT-SCALE) get a single
+                    'anticipated TEs' TODO since they're not yet scheduled.
+                    T-021-CC-Q3/Q4/Q5 are cross-cutting and stay in TODO 21
+                    (already there). The deprecation step renames
+                    OPEN-THREADS.md -> OPEN-THREADS-DEPRECATED.md with a
+                    pointer header explaining the migration.
+
+- [ ] **Q-22.8** OPEN-THREADS.md deprecation mechanics: rename or delete?
+    opened: 2026-05-06 23:08 UTC
+    asked of: stevegt@t7a.org
+    blocks: completion of OPEN-THREADS.md deprecation
+    alternatives:
+      Alt-D.A -- rename to OPEN-THREADS-DEPRECATED.md with a header pointing
+                 readers to the new TODO-based scheme; preserves git history
+                 and avoids breaking any reference that cites the old name
+      Alt-D.B -- delete OPEN-THREADS.md outright; rely on git history for
+                 the audit trail; smaller tree, less clutter
+      Alt-D.C -- replace contents with a tombstone pointer (1-page file
+                 explaining the deprecation, listing where each thread
+                 migrated to); keeps the filename live as a redirect
+    recommendation: Alt-D.C -- a tombstone is the most discoverable for
+                    anyone (human or bot) who searches for OPEN-THREADS.md
+                    and finds the new file, while keeping the audit trail
+                    in git. Alt-D.A keeps the renamed file but anyone
+                    citing 'OPEN-THREADS.md' will get a 404; Alt-D.B loses
+                    the redirect benefit entirely.
 
 ## Open questions retired by this TODO
 
