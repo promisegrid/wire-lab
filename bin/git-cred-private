@@ -1,0 +1,15 @@
+#!/bin/bash
+# Credential helper for the 'private' remote (stevegt/session-logs).
+# Reads PAT from ~/.creds/session-logs.pat.
+# Invoked by git via credential.https://github.com/stevegt/session-logs.git.helper
+set -euo pipefail
+PAT_FILE="$HOME/.creds/session-logs.pat"
+if [ "${1:-}" = "get" ]; then
+  if [ ! -f "$PAT_FILE" ]; then
+    echo "ERROR: $PAT_FILE not found" >&2
+    exit 1
+  fi
+  echo "username=stevegt-via-perplexity"
+  echo "password=$(cat "$PAT_FILE")"
+fi
+# 'store' and 'erase' are no-ops; we manage the PAT file manually.
