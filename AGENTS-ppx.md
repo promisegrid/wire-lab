@@ -498,7 +498,12 @@ After reading the orientation files at the top of this prompt:
   2. Verify the bot's git identity is set:
         git config user.name   # stevegt-via-perplexity
         git config user.email  # stevegt+ppx@t7a.org
-  3. Run:
+  3. Run the session-logging bootstrap (see Session Logging below):
+        bash /home/user/workspace/wire-lab/bin/ppx-bootstrap.sh
+     The script is idempotent. It sets up the private remote, mounts
+     the worktree at /home/user/workspace/wire-lab-logs, and is a
+     no-op on collaborator clones (gated by git config user.email).
+  4. Run:
         git fetch origin --prune
         git checkout main
         git pull --ff-only
@@ -507,7 +512,7 @@ After reading the orientation files at the top of this prompt:
         git log --oneline -10 origin/main
         git log --oneline -10 origin/ppx/main
         git branch -r | grep ppx/
-  4. Report to Steve:
+  5. Report to Steve:
         - what's currently on main (last 3-5 commits),
         - what's currently on ppx/main (last 3-5 commits) and how far
           ppx/main is ahead of / behind main,
@@ -517,7 +522,145 @@ After reading the orientation files at the top of this prompt:
         - any TODO entries in protocols/wire-lab.d/TODO/TODO.md still marked `[ ]`,
         - any DRs in DR/ with State: open.
 
-  5. Then ask Steve what he wants to work on, or wait for instructions.
+  6. Then ask Steve what he wants to work on, or wait for instructions.
+
+# Session Logging
+
+This section governs how each turn of a Perplexity Computer session
+working on wire-lab is captured to a private GitHub repository for
+durability and search.
+
+## Identity gate (required)
+
+The rules in this section apply ONLY when the bot's git identity is
+Steve's bot identity. Test:
+
+        git config user.email
+
+If the result is `stevegt+ppx@t7a.org` (or `stevegt@t7a.org` for
+direct-Steve testing), session logging is active. For any other
+identity, session logging is INACTIVE -- skip this entire section.
+This prevents collaborators who clone wire-lab from triggering pushes
+to a private repo they have no credentials for.
+
+## Architecture (locked decisions; do not relitigate)
+
+- Private remote: `https://github.com/stevegt/session-logs.git`,
+  added as `private` in the wire-lab clone. Reader-locked to Steve.
+- Orphan branch: `wire-lab` on the private remote. No shared history
+  with other branches; never merged.
+- Worktree mount: `/home/user/workspace/wire-lab-logs` -- a sibling
+  directory to the wire-lab clone, mounted on the `wire-lab` orphan
+  branch via `git worktree add`. Writes to it do not disturb the
+  active twig in /home/user/workspace/wire-lab.
+- Layout on the orphan branch:
+        README.md
+        OPEN-THREADS.md
+        sessions/<session-id>/000-meta.md
+        sessions/<session-id>/NNN-turn.md
+  where NNN is the zero-padded turn number.
+- Fidelity: full. Each NNN-turn.md contains the verbatim user prompt
+  and the verbatim bot response, including tool calls and outputs.
+- Append-only. Each turn file is written once and never edited. The
+  ONLY exception is the redact-last escape hatch (see below).
+- Force-push policy: force-push to `private wire-lab` is permitted
+  ONLY for the redact-last operation. No other force-push is
+  permitted on this branch.
+
+## Per-turn discipline (required)
+
+At the end of every turn while session logging is active:
+
+  1. Write `sessions/<session-id>/<NNN>-turn.md` containing this
+     turn's verbatim user prompt and verbatim bot response.
+  2. `git add` the new file. Commit with message:
+        wire-lab session <session-id> turn <NNN>
+  3. `git push private wire-lab`.
+
+If the bot misses a turn (commit fails, push fails, bot forgets), it
+MUST catch up at the next opportunity by writing the missing files
+before writing the current turn. The orphan branch must remain a
+complete record.
+
+## OPEN-THREADS.md discipline (required)
+
+The file `OPEN-THREADS.md` on the wire-lab orphan branch tracks open
+threads -- questions Steve asked, decisions expressed, or refactors
+implied that have not yet been committed to a file or resolved.
+
+Format: short topic-form (5-15 words), neutral tone, no quotes, no
+private context. Sensitive threads should not appear here. Each
+entry has an ID `T-YYYYMMDD-SLUG`, an opened date, and either a
+`blocking:` or `scope:` line.
+
+End-of-turn check (required): scan the turn for any unresolved
+question or expressed-but-uncommitted decision. If found, append a
+row to `OPEN-THREADS.md` under `## Open`.
+
+Resolution discipline (required): when a commit lands content that
+resolves an open thread, in the same commit cycle, mark the row
+`[x]` and append `resolved: <ISO date> @ <SHA>` to the entry. Move
+resolved entries to `## Closed` when convenient (not required
+immediately).
+
+## Redact-last escape hatch
+
+If Steve says `redact-last` (or equivalent), the bot:
+
+  1. Identifies the most recent turn file on the wire-lab orphan
+     branch.
+  2. `git rm` that file, commits with message
+        wire-lab session <session-id> redact turn <NNN>
+  3. `git push --force-with-lease private wire-lab`.
+
+Force-push is permitted in this case ONLY. The redacted turn is
+removed from the public-facing branch tip, but git's reflog and
+local clones may still hold the blob; this is acceptable for the
+use case (a private remote that only Steve can read).
+
+## Credentials
+
+The PAT for the private remote is stored at:
+
+        ~/.creds/session-logs.pat
+
+File permissions: `chmod 600`. Directory permissions: `chmod 700`.
+The PAT is read by the credential helper at
+`/home/user/workspace/wire-lab/bin/git-cred-private`, wired into
+git config via:
+
+        credential.https://github.com/stevegt/session-logs.git.helper
+
+The PAT MUST NOT be embedded in any URL in any git config file.
+Use only the credential helper.
+
+If `~/.creds/session-logs.pat` is missing on a fresh sandbox, the
+bootstrap script prompts Steve to paste it once, then writes it to
+the file with the correct permissions. Subsequent sessions on the
+same sandbox find it and proceed silently.
+
+## Bootstrap
+
+The bootstrap script `/home/user/workspace/wire-lab/bin/ppx-bootstrap.sh`
+performs (idempotently):
+
+  1. Identity gate check. If git config user.email is not Steve's
+     bot identity, log a notice and exit 0 without doing anything
+     else.
+  2. Verify or create `~/.creds/` directory (chmod 700).
+  3. Verify `~/.creds/session-logs.pat` exists; if missing, prompt
+     Steve to paste it.
+  4. Verify or add the `private` remote pointing at
+     https://github.com/stevegt/session-logs.git (no PAT in URL).
+  5. Verify or wire the credential helper.
+  6. Verify or create the worktree at
+     /home/user/workspace/wire-lab-logs on the wire-lab branch.
+  7. Fetch private/wire-lab to ensure the worktree is current.
+  8. Probe credentials with a dry-run push; if it fails, report
+     and exit non-zero.
+
+The bot runs this as step 3 of "First action of every session"
+(see above).
 
 # Glossary
 
