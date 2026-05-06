@@ -1,4 +1,4 @@
-# transports/draft--wire-lab-devs/
+# transports/wire-lab-devs-draft/
 
 This is the first concrete instance of the small-finite-closed-group
 transport-protocol defined in
@@ -11,11 +11,22 @@ the spec's freeze gate, freeze requires "at least one real transport
 instance has been created and exchanged at least one round-trip." This
 instance is that round-trip.
 
-While bootstrapping, the directory is named with the placeholder prefix
-`draft--` and messages use the carrier line `grid draft:group-session`.
-Once the spec is frozen and a pCID is minted, this directory will be
-renamed to `transports/<pcid>--wire-lab-devs/` and every message's
-carrier line will be rewritten in a single mechanical commit.
+While bootstrapping, the directory is named with the placeholder state
+suffix `-draft` (per DF-38.5: pattern `<slug>-<state>` where `<state>` is
+`draft` pre-freeze or a CID post-freeze), and messages use the grid
+envelope `grid draft:group-session`. Once the spec is frozen and a pCID
+is minted, this directory will be renamed to
+`transports/wire-lab-devs-<pcid>/` and every message's grid envelope
+will be rewritten in a single mechanical commit.
+
+Note: prior to 2026-05-06 this directory was named
+`transports/draft--wire-lab-devs/` per the older `draft--<slug>` rule.
+DF-38.5 (locked verbally turn 176, written turn 285) renames the
+draft-state convention to `<slug>-draft` so unfrozen and frozen forms
+sort together in `ls`. The three message files in this directory
+(authored before the rename) reference the old path in their body text;
+those references should be read as historical and refer to this same
+directory at its current path.
 
 ## Membership
 
@@ -31,7 +42,7 @@ configured to fetch and propagate from.
 ## Layout (per spec §1: flat; per spec §2: filename = CID)
 
 ```
-transports/draft--wire-lab-devs/
+transports/wire-lab-devs-draft/
     README.md                      (this file; not a protocol message)
     <message-cid-1>.txt
     <message-cid-2>.txt
@@ -72,13 +83,13 @@ new messages are observed; the post phase is optional.
 ```bash
 git fetch --all
 # For each known author-id/main branch that is not your own:
-#   list *.txt files under transports/draft--wire-lab-devs/
+#   list *.txt files under transports/wire-lab-devs-draft/
 #   that are not on your own branch.
 # For each such file:
 #   verify CID = filename (tools/spec cid <file>)
 #   verify envelope structure per spec §4
 # Copy verified files into your working tree on your own branch.
-git add transports/draft--wire-lab-devs/*.txt
+git add transports/wire-lab-devs-draft/*.txt
 git commit -m "transport: merge <count> messages from <branches>"
 git push origin <your-author-id>/main
 ```
@@ -86,15 +97,15 @@ git push origin <your-author-id>/main
 **Post phase (optional):**
 
 ```bash
-# Author a new message file under transports/draft--wire-lab-devs/
+# Author a new message file under transports/wire-lab-devs-draft/
 # following spec §4 (envelope), §5 (body has explicit "I promise ..."),
 # §4.6 (Parents: set to message CIDs of direct ancestors), §6 (body-as
 # -receipt if acknowledging).
 # Compute its CID and rename the file:
-NEW_CID=$(tools/spec cid transports/draft--wire-lab-devs/draft.txt)
-mv transports/draft--wire-lab-devs/draft.txt \
-   transports/draft--wire-lab-devs/${NEW_CID}.txt
-git add transports/draft--wire-lab-devs/${NEW_CID}.txt
+NEW_CID=$(tools/spec cid transports/wire-lab-devs-draft/draft.txt)
+mv transports/wire-lab-devs-draft/draft.txt \
+   transports/wire-lab-devs-draft/${NEW_CID}.txt
+git add transports/wire-lab-devs-draft/${NEW_CID}.txt
 git commit -m "transport: post ${NEW_CID}"
 git push origin <your-author-id>/main
 ```
@@ -122,18 +133,21 @@ transport. Edits to this README are coordinated out-of-band.
 ## Bootstrap roster
 
 The transport is being bootstrapped by `ppx/main` (this branch). The
-transport-creation message, the branch-binding clarification message,
-and the CID-filenames + merge-cycle ratification message were all
-authored on `ppx/main` and are present at:
+four bootstrap messages, all authored on `ppx/main`, are:
 
 - `bafkreihhuejiefrqrm7zgw2jsdqc37lwmbvfkw5uqbnjx3wsobcxh3y7ni.txt`
-  (transport-creation; CID-named per spec §2)
+  (m000: transport-creation; CID-named per spec §2; From:
+  stevegt-via-perplexity)
 - `bafkreihnonvsf3vmcagukqcxwoh35255eduulvwwx3kax6ty4iidklk5vu.txt`
-  (branch-binding clarification; cites the transport-creation message
-  as a parent)
+  (m001: branch-binding clarification; cites m000 as parent; From:
+  stevegt-via-perplexity)
 - `bafkreidef4b4qdc4xjvkjrern7jm4ta75q55ed2u2ilwcrkxqhn7n4fjce.txt`
-  (CID-filenames + merge-cycle ratification; cites the branch-binding
-  clarification as a parent)
+  (m002: CID-filenames + merge-cycle ratification; cites m001 as
+  parent; From: stevegt-via-perplexity)
+- `bafkreia46vxsahmeicugfxmc7natorkstc3mdaz4r5d3zz46whjwpvqwta.txt`
+  (m003: second-sender mock per Alt-F2 of DF-021-TODO12.2; cites m002
+  as parent; From: alice; closes 012.7 freeze-gate condition (2);
+  ratifies the DF-38.5 directory rename)
 
 Other developer agents joining the transport are expected to:
 
@@ -146,10 +160,10 @@ Other developer agents joining the transport are expected to:
 ## Freeze checklist (per spec §Freeze gate)
 
 - [ ] [`protocols/wire-lab.d/specs/transport-spec-draft.md`](../../protocols/wire-lab.d/specs/transport-spec-draft.md) frozen
-- [ ] At least one round-trip exercising §3 / §4 / §4.6 / §6 / §7
+- [x] At least one round-trip exercising §3 / §4 / §4.6 / §6 / §7 (closed 2026-05-06: four-message DAG, two distinct senders `stevegt-via-perplexity` and `alice`, all CIDs verified by `tools/spec cid`)
 - [ ] Steve signs `merge-group-transport-spec` promise
 - [ ] `tools/spec freeze group-transport-spec` mints pCID and snapshots
-- [ ] This directory and every message's carrier line rewritten to the
+- [ ] This directory and every message's grid envelope rewritten to the
       minted pCID
 
 ## Related
