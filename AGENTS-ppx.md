@@ -174,7 +174,10 @@ Steps:
        implications.
      - Ask Steve multiple-choice DF questions framed from the surviving
        alternatives the TE identified. Do not ask broad DF questions
-       that ignore TE results.
+       that ignore TE results. BEFORE asking, log each question to a
+       TODO file per the Question-logging discipline section below.
+       The question's `Q-<TODO-N>.<seq>` ID is what the eventual DR/DI
+       cites in `Linked Q`.
      - When Steve answers, write the DI into the relevant
        `protocols/<slug>.d/TODO/TODO-<timestamp>-<slug>.md` (in
        `## Decision Intent Log`). DI ID is
@@ -599,6 +602,81 @@ If the bot misses a turn (commit fails, push fails, bot forgets), it
 MUST catch up at the next opportunity by writing the missing files
 before writing the current turn. The orphan branch must remain a
 complete record.
+
+## Question-logging discipline (required)
+
+Whenever the bot is about to ask Steve a question -- a DF multiple-
+choice, a clarification, a scope confirmation, or any
+`ask_user_question` invocation -- the bot MUST first log the open
+thread to a TODO file BEFORE presenting the question. The thread is
+checked off (`[x]` plus `resolved: <ISO date> @ <SHA>`) ONLY after
+both conditions hold: (a) the question has been resolved by Steve,
+and (b) the resulting product (code edit, design doc edit, spec
+edit) has been written to disk and pushed to a remote.
+
+Mechanics:
+
+  1. Pick the right TODO file. If the question belongs to an active
+     TODO file (e.g., a TE in progress has a parent TODO), append to
+     that file under a `## Open questions` or `## Question log`
+     section. If no fitting TODO exists, create a new one at
+     `protocols/<slug>.d/TODO/TODO-YYYYMMDD-HHMMSS-<slug>.md` (in
+     the relevant protocol; harness-level questions go under
+     `protocols/wire-lab.d/TODO/`). Update
+     `protocols/wire-lab.d/TODO/TODO.md` with the new entry.
+
+  2. Write the entry as a single checklist row:
+
+        - [ ] Q-<TODO-N>.<seq> <one-line topic>
+            opened: <YYYY-MM-DD HH:MM UTC>
+            asked of: stevegt@t7a.org
+            blocks: <what is gated on the answer>
+            alternatives: <Alt-X.A / Alt-X.B / Alt-X.C names if multi-
+                          choice; otherwise omit>
+            recommendation: <bot recommendation if any>
+
+     `Q-<TODO-N>.<seq>` is the question ID, e.g. `Q-21.7` for the
+     7th question logged against TODO 21. Each TODO file owns its
+     own monotonically increasing sequence.
+
+  3. THEN call `ask_user_question` (or its equivalent in chat).
+
+  4. When Steve answers, do NOT check the row off yet. The row
+     stays open until the answer has been turned into committed and
+     pushed product (a TE doc, a spec edit, code, a Cat-3 entry,
+     etc.). Until then, append a sub-line:
+
+            answered: <YYYY-MM-DD HH:MM UTC> -- <one-line answer>
+
+  5. When the resulting product is committed and pushed, mark the
+     row `[x]` and append:
+
+            resolved: <YYYY-MM-DD> @ <SHA>
+            product: <path[, path...]>
+
+     in the same commit cycle that pushes the product. If multiple
+     commits compose the product, cite the merge commit SHA on
+     `ppx/main` (or the appropriate target branch).
+
+  6. If a question is retracted (e.g., a memory or prior-TE check
+     reveals the question is the wrong question, or that it was
+     already settled), do NOT delete the row. Mark it `[~]` and
+     append:
+
+            retracted: <YYYY-MM-DD> -- <one-line reason>
+
+     Retracted rows count as resolved for tracking purposes but
+     preserve the audit trail of what the bot considered asking.
+
+  7. The row is the question's stable record. It survives
+     compaction, branch deletion, and orphan-branch loss because it
+     lives on `ppx/main` in the wire-lab repo.
+
+This discipline supersedes the looser `OPEN-THREADS.md` end-of-turn
+rule for questions specifically: every question becomes a tracked
+TODO row at the moment of asking. `OPEN-THREADS.md` continues to
+hold longer-lived thread pointers (cross-cutting concerns, future
+TEs anticipated, etc.) that are not single questions.
 
 ## OPEN-THREADS.md discipline (required)
 
