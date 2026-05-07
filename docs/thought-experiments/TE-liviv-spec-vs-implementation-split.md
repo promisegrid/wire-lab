@@ -262,9 +262,9 @@ TE-zukug stands; this TE does not retract it. Specifically:
   Both indices are queries over known CHANGELOG sets; neither is
   embedded in the docs themselves.
 
-## TODO 014 impact
+## TODO-vuhuj impact
 
-TODO 014 (protocols-as-simulated-repos migration) was specified before
+TODO-vuhuj (protocols-as-simulated-repos migration) was specified before
 the A/B split was named. Its current steps either implicitly assume
 everything goes under `protocols/<slug>.d/` (which would land
 implementations there too) or are silent on category B. Steps to
@@ -274,14 +274,14 @@ add:
     `README.md`** explaining the A/B split, pointing at TE-liviv. Empty
     otherwise; no implementations exist yet at the time of migration.
 
-13. **Update TODO 018 (UDP-binding v0 reference implementation)** to
+13. **Update TODO-jodon (UDP-binding v0 reference implementation)** to
     target `implementations/go-udp-binding-reference/` rather than
     any path under `protocols/udp-binding.d/`. The protocol's
     spec-side TODOs stay in `protocols/udp-binding.d/TODO/`; the
     implementation work is a separate concern that does not migrate
     with the protocol's design.
 
-14. **Update TODO 019 (ns-3 harness scaffold)** similarly: target
+14. **Update TODO-bihon (ns-3 harness scaffold)** similarly: target
     `implementations/ns3-harness-fixture/` (or whatever final slug
     we choose). Wire-lab harness reference impl is a B-side artifact,
     not a spec-side one.
@@ -291,7 +291,7 @@ add:
     block. Real `freeze` events get added when the first frozen
     sibling appears.
 
-These additions are mechanical and stay inside TODO 014's "happens
+These additions are mechanical and stay inside TODO-vuhuj's "happens
 atomically with the migration" property.
 
 ## Surfaced questions
@@ -341,7 +341,7 @@ atomically with the migration" property.
 ## Closes / partially closes
 
 - **Closes nothing previously open.** TE-liviv's role is to amend TE-zukug
-  before downstream work (TODO 014, TODO 018, TODO 019) starts
+  before downstream work (TODO-vuhuj, TODO-jodon, TODO-bihon) starts
   implementing the wrong shape.
 
 - **Resolves TE-zukug OQ-31.3** (breaking-change flag): yes, explicit
@@ -357,7 +357,7 @@ atomically with the migration" property.
 ## Verdict
 
 Adopt the A/B split. Add `implementations/` as a top-level. Patch
-TODO 014 with steps 12-15. TE-zukug stays on the books with the explicit
+TODO-vuhuj with steps 12-15. TE-zukug stays on the books with the explicit
 amendment that "simrepo" was always the B-side; the spec-side has its
 own narrower CHANGELOG semantics (freeze history, not conformance
 claim).

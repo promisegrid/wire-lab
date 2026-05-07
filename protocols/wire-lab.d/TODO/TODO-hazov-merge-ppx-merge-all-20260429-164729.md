@@ -1,4 +1,4 @@
-# TODO 008 - Merge `ppx/merge-all-20260429-164729`
+# TODO-hazov - Merge `ppx/merge-all-20260429-164729`
 
 ## Prior aliases
 
@@ -24,7 +24,7 @@ Status: active
 Author: stevegt@t7a.org (Steve Traugott)
 Decision: Merge the convergence branch `origin/ppx/merge-all-20260429-164729` into `main`, record the acceptance as a durable review message on `main` under `proposals/approved/ppx-merge-all-20260429-164729/`, and retire the superseded topic branches after `main` advances.
 Intent: Make `main` the canonical integrated state, keep an auditable record of why the convergence branch was accepted, and remove obsolete review branches so future polling focuses on new work.
-Constraints: Preserve branch lineage with `--no-ff`. Preserve earlier pending review artifacts as historical record. Do not rewrite or delete the old `ppx/dr-001-bootstrap` contest/review files. The approval review message must name both the reviewed tip SHA and the merge commit SHA. Merge proceeds with Steve-approved exceptions for the remaining protocol/provenance gaps already tracked in TODO 005, TODO 006, and TODO 007.
+Constraints: Preserve branch lineage with `--no-ff`. Preserve earlier pending review artifacts as historical record. Do not rewrite or delete the old `ppx/dr-001-bootstrap` contest/review files. The approval review message must name both the reviewed tip SHA and the merge commit SHA. Merge proceeds with Steve-approved exceptions for the remaining protocol/provenance gaps already tracked in TODO-rivuk, TODO-misul, and TODO-diliz.
 Affects: `main`; `TODO/TODO.md`; `protocols/wire-lab.d/TODO/TODO-hazov-merge-ppx-merge-all-20260429-164729.md`; `proposals/approved/ppx-merge-all-20260429-164729/`; remote branches `origin/ppx/agents-ppx`, `origin/ppx/dr-001-bootstrap`, `origin/ppx/eradicate-burden`, `origin/ppx/te-20260428-202400-promise-stack-ordering`; local branch `ppx/bootstrap`.
 Linked DR: none (explicit merge instruction from Steve).
 

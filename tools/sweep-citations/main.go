@@ -54,6 +54,7 @@ type row struct {
 	handle   string
 	kind     string // TE | TODO
 	intAlias string // e.g. TE-38, TODO-22, or "" if none
+	intNum   string // bare integer portion of intAlias ("38", "22"); "" if none
 	tsAlias  string // e.g. TE-20260506-184800
 	newPath  string // e.g. docs/thought-experiments/TE-vunub-...md
 	oldPath  string // legacy path; "(new in this twig)" for TE-39
@@ -63,6 +64,17 @@ type row struct {
 type rep struct {
 	from string
 	to   string
+}
+
+// intRep is a regex-based integer-alias replacement that handles all
+// surface forms in the corpus: "TE-38", "TE 38", "TODO-022", "TODO 14",
+// "TODO  18" (multi-space, normalized via [\s-]+), and the leading-zero
+// variants ("TODO-014" with stripping). The regex is anchored on word
+// boundaries to avoid matching inside dates ("20260427-180000") or
+// proquint handles already in place.
+type intRep struct {
+	re *regexp.Regexp
+	to string
 }
 
 func main() {
@@ -78,16 +90,38 @@ func main() {
 
 	rows := loadMapping(filepath.Join(root, "tools/migrate-handles/mapping.tsv"))
 
-	// Build replacement lists. They are sorted longest-first to avoid
-	// prefix-match ambiguity (TE-3 vs TE-38).
-	var intReps, tsReps []rep
+	// Build replacement lists.
+	//
+	// intReps now uses a per-row regex that matches all surface forms of
+	// the integer alias: hyphen or space separator (one or more), with or
+	// without leading zeros, anchored on word boundaries. Examples that
+	// match for row {kind=TODO, intNum=18}:
+	//
+	//   TODO-18, TODO 18, TODO-018, TODO 018, TODO  18, TODO\t18
+	//
+	// All rewrite to "TODO-jodon" (the row's proquint handle). Examples
+	// that do NOT match (intentionally):
+	//
+	//   TODO-180 (different integer)
+	//   TODO-1800 (different integer)
+	//   20260501-180000 (date in timestamp)
+	//   TODO-jodon (already migrated)
+	var intReps []intRep
+	var tsReps []rep
 	pathReps := map[string]string{}
 	for _, r := range rows {
-		if r.intAlias != "" {
-			// "TE-38" -> "TE-vunub" ; "TODO-22" -> "TODO-vunub".
-			// Mapping rows already encode the kind in intAlias so the
-			// substitution preserves it.
-			intReps = append(intReps, rep{r.intAlias, r.kind + "-" + r.handle})
+		if r.intNum != "" {
+			// (?:^|[^\w-]) before, (?:$|[^\w-]) after to enforce token
+			// boundary that excludes hyphens (so "TE-3" does not match
+			// inside "TE-38"). Capture the leading boundary so we can
+			// preserve it in the replacement.
+			pattern := `(^|[^\w-])` + r.kind + `[\s-]+0*` + r.intNum + `(?:$|[^\w-])`
+			// We also need to capture the trailing boundary to preserve it.
+			// Go's regexp does not support lookahead, so we use a capture
+			// group and reconstruct in the replacement function.
+			pattern = `(^|[^\w-])` + r.kind + `[\s-]+0*` + r.intNum + `($|[^\w-])`
+			re := regexp.MustCompile(pattern)
+			intReps = append(intReps, intRep{re: re, to: r.kind + "-" + r.handle})
 		}
 		if r.tsAlias != "" {
 			tsReps = append(tsReps, rep{r.tsAlias, r.kind + "-" + r.handle})
@@ -99,12 +133,12 @@ func main() {
 		}
 	}
 
-	// Sort integer reps so longer aliases come first (TE-38 before TE-3).
+	// Sort intReps by integer descending so longer numbers come first
+	// (38 before 3, 19 before 1). This prevents "TE 1" from matching
+	// inside "TE 19". Order is irrelevant when patterns enforce strict
+	// boundaries via [^\w-], but we keep it for safety.
 	sort.Slice(intReps, func(i, j int) bool {
-		if len(intReps[i].from) != len(intReps[j].from) {
-			return len(intReps[i].from) > len(intReps[j].from)
-		}
-		return intReps[i].from > intReps[j].from
+		return len(intReps[i].re.String()) > len(intReps[j].re.String())
 	})
 
 	// Walk the repo and rewrite each eligible file.
@@ -173,10 +207,19 @@ func loadMapping(path string) []row {
 		if len(fields) < 6 {
 			continue
 		}
-		rows = append(rows, row{
+		row := row{
 			handle: fields[0], kind: fields[1], intAlias: fields[2],
 			tsAlias: fields[3], newPath: fields[4], oldPath: fields[5],
-		})
+		}
+		// Extract the bare integer ("38" from "TE-38") for surface-form
+		// matching downstream. Strip the leading "TE-" or "TODO-".
+		if row.intAlias != "" {
+			parts := strings.SplitN(row.intAlias, "-", 2)
+			if len(parts) == 2 {
+				row.intNum = parts[1]
+			}
+		}
+		rows = append(rows, row)
 	}
 	if err := sc.Err(); err != nil {
 		die("read mapping: %v", err)
@@ -234,7 +277,7 @@ func shouldSkipFile(rel string) bool {
 // sweep applies the three rewrite classes to body, skipping any "## Prior
 // aliases" section. Returns the new body and the count of substitutions
 // made.
-func sweep(body string, intReps, tsReps []rep, pathReps map[string]string) (string, int) {
+func sweep(body string, intReps []intRep, tsReps []rep, pathReps map[string]string) (string, int) {
 	// Split body into "regions" by Prior-aliases boundaries. Even-indexed
 	// regions are sweepable; odd-indexed are inside a Prior-aliases
 	// section and pass through verbatim.
@@ -281,30 +324,16 @@ func splitByPriorAliases(body string) []string {
 	return out
 }
 
-func applyReps(s string, intReps, tsReps []rep, pathReps map[string]string) (string, int) {
+func applyReps(s string, intReps []intRep, tsReps []rep, pathReps map[string]string) (string, int) {
 	var n int
-	// Class 1: integer aliases. Use word-boundary regex per replacement
-	// to avoid matching inside larger tokens (TE-3 inside TE-38, etc.).
+	// Class 1: integer aliases (all surface forms). Each intRep's regex
+	// captures the leading and trailing boundary characters so we can
+	// preserve them; only the "KIND<sep>NN" interior is replaced.
 	for _, r := range intReps {
-		re := regexp.MustCompile(`\b` + regexp.QuoteMeta(r.from) + `\b`)
-		s2 := re.ReplaceAllStringFunc(s, func(_ string) string {
+		s = r.re.ReplaceAllStringFunc(s, func(match string) string {
+			subs := r.re.FindStringSubmatch(match)
 			n++
-			return r.to
-		})
-		s = s2
-	}
-	// Also handle "TODO N" form (space instead of hyphen). The mapping
-	// stores "TODO-N" via the kind+integer concatenation; we also need
-	// to catch "TODO 22" prose.
-	for _, r := range intReps {
-		if !strings.HasPrefix(r.from, "TODO-") {
-			continue
-		}
-		spaceForm := strings.Replace(r.from, "TODO-", "TODO ", 1)
-		re := regexp.MustCompile(`\b` + regexp.QuoteMeta(spaceForm) + `\b`)
-		s = re.ReplaceAllStringFunc(s, func(_ string) string {
-			n++
-			return r.to
+			return subs[1] + r.to + subs[2]
 		})
 	}
 	// Class 2: timestamp aliases.

@@ -1,4 +1,4 @@
-# TODO 004 - Eradicate the word `burden`
+# TODO-gogom - Eradicate the word `burden`
 
 ## Prior aliases
 

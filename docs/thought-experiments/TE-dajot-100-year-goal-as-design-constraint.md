@@ -101,7 +101,7 @@ This section walks each currently-locked artifact in the wire-lab through the si
 - **C-5:** Out of scope for the outer transport-spec. Trust over message receipts is a per-protocol concern; the transport-spec is silent.
 - **C-6:** Honored. The pCID is the only anchor; the slug is convention.
 
-### `protocols/group-session.d/specs/group-session-draft.md` (TODO 013 carve-out)
+### `protocols/group-session.d/specs/group-session-draft.md` (TODO-motof carve-out)
 
 - **C-1:** Honored. The protocol's identity is its pCID, computed from the spec's bytes. Membership of any individual transport instance is closed and named by the slug, not by a registry.
 - **C-2:** Mostly honored. The append-only persistence property and the "membership change creates a new transport instance" rule mean the transport's history survives any individual member's departure or death. The `Date:` header in messages is informational; the protocol does not depend on synchronized clocks across the horizon.
@@ -110,10 +110,10 @@ This section walks each currently-locked artifact in the wire-lab through the si
 - **C-5:** Partially honored. The body-level acknowledgement scheme records *what* was acknowledged but not the trust score behind the acknowledgement. Trust is a reader-side concern. **Open question recorded as OQ-G2:** cumulative-prefix or frontier-style ack semantics under the DAG model. C-5 implies these semantics must be local-trust-vector-aware, not global.
 - **C-6:** Honored. The protocol's identity is its pCID; signing of individual messages is a v1 concern.
 
-### TE-hogus (group-transport envelope) and DR-009 / TODO 012
+### TE-hogus (group-transport envelope) and DR-009 / TODO-bisur
 
 - These are decision records for the group-transport contract. The constraints apply transitively: anything the group-transport spec gets right or gets wrong about the constraints is reflected here.
-- **Specific honor of C-2:** the rename TODO 013 just performed (channel→transport, channel-carrier→group-transport-envelope) demonstrates that the wire-lab is willing to refactor decision-record vocabulary when a clearer framing emerges. That willingness is a 100-year discipline: contributors arriving in 2046 should not have to decode 2026 vocabulary that turned out to be wrong.
+- **Specific honor of C-2:** the rename TODO-motof just performed (channel→transport, channel-carrier→group-transport-envelope) demonstrates that the wire-lab is willing to refactor decision-record vocabulary when a clearer framing emerges. That willingness is a 100-year discipline: contributors arriving in 2046 should not have to decode 2026 vocabulary that turned out to be wrong.
 
 ### TE-titur (numbering collision), TE-zalut (transport-protocol types), TE-junil (transports rename)
 
@@ -140,7 +140,7 @@ This section walks each currently-locked artifact in the wire-lab through the si
 3. **Several open questions surface from the pressure-test** and warrant follow-on TEs:
    - **OQ-100.1 — Protocol forking:** when an existing transport-protocol is forked (incompatible v2, or a community-specific variant), how is the new pCID expressed in `protocols/` and `transports/`? Cross-references to TE-junil per-axis meta-rule.
    - **OQ-100.2 — Cryptographic signing migration:** when v0 group-transport gains cryptographic signing in v1, how does the migration honor C-2 (existing v0 transports survive) and C-4 (v0 and v1 are siblings, not parent-and-child)?
-   - **OQ-100.3 — Cumulative-prefix ack and trust:** the deferred Q2 from TODO 013 (cumulative-prefix or frontier ack semantics) must be designed under C-5 — trust-vector-aware, not global.
+   - **OQ-100.3 — Cumulative-prefix ack and trust:** the deferred Q2 from TODO-motof (cumulative-prefix or frontier ack semantics) must be designed under C-5 — trust-vector-aware, not global.
    - **OQ-100.4 — Numbering wrap:** is the integer sequence for TEs and TODOs stable across centuries, or does it eventually need to be supplanted by purely timestamp-based or pCID-based identifiers?
    - **OQ-100.5 — Slug drift:** human-readable slugs in `transports/<pcid>--<slug>/` and `protocols/<slug>.d/` are presentational, but a 30-year-old slug whose meaning has drifted may mislead a future contributor more than it helps. Is there a discipline for retiring or redirecting drifted slugs without changing pCIDs?
 4. **No current lock fails a 100-year constraint outright.** Several locks are partial-honor or silent-on a constraint; those become open questions to address in subsequent TEs. The current design is consistent with the 100-year goal as far as it goes; the goal does not invalidate any prior decision.

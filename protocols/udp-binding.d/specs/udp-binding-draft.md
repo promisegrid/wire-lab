@@ -124,7 +124,7 @@ This binding does not promise:
 
 ## Test vectors (placeholder)
 
-To be added in TODO 018. At minimum:
+To be added in TODO-jodon. At minimum:
 
 - TV-1: a 612-byte session message round-trips byte-for-byte through
   loopback UDP/4646.
@@ -140,7 +140,7 @@ To be added in TODO 018. At minimum:
 
 ## Reference implementation
 
-To be authored in TODO 018 under
+To be authored in TODO-jodon under
 `tools/udp-binding/` with at minimum:
 
 - `Send(msg []byte, addr Addr) error`

@@ -14,7 +14,7 @@ decided
 (Locks the directory shape and naming convention for TODO
 records under the TE-vipir protocols-as-simulated-repos layout. Closes
 out the TODO-numbering question that TE-vipir named but did not resolve.
-Renumbers all existing TODOs as part of TODO 014.)
+Renumbers all existing TODOs as part of TODO-vuhuj.)
 
 ## Why this TE
 
@@ -22,7 +22,7 @@ TE-vipir locked the shape under which each protocol becomes its own
 simulated repo (`protocols/<slug>.d/`). It said decisions, open work,
 and don't-touch invariants belong inside protocol spec docs. It did
 not say what happens to the top-level `TODO/` directory or to its 19
-existing TODO records, beyond a vague "TODO 015: DR/TODO/DI
+existing TODO records, beyond a vague "TODO-bulaj: DR/TODO/DI
 absorption" that was retired before filing.
 
 That left two real problems:
@@ -81,7 +81,7 @@ was first authored, never updated. A TODO that moves between
 protocols (rare; see "Boundary changes" below) keeps its original
 timestamp.
 
-For TODOs that already exist and are being migrated under TODO 014,
+For TODOs that already exist and are being migrated under TODO-vuhuj,
 the canonical first-drafted-time is recovered from the git commit
 that introduced the file. Where a file was introduced via merge from
 a long-ago feature branch, the parent-commit date on the originating
@@ -143,7 +143,7 @@ harness's work, not any one protocol's.
 
 ### No integer survivors
 
-The full renumber means every existing TODO 001 through 019 migrates
+The full renumber means every existing TODO from TODO-dutaz through TODO-bihon migrates
 to a timestamp filename inside the appropriate `protocols/<slug>.d/TODO/`.
 No integer-named TODOs survive at the top level. RETIRED and FOLDED
 status records (currently 015 and 017) migrate as timestamped files
@@ -194,26 +194,26 @@ Three move into per-protocol homes:
 - 016 (proposals-as-transport-messages, BLOCKED) -> `ppx-dr.d/TODO/`
 - 018 (udp-binding-v0-reference-implementation) -> `udp-binding.d/TODO/`
 
-TODO 019 (ns-3 harness scaffold) is *harness-level*, not per-binding,
+TODO-bihon (ns-3 harness scaffold) is *harness-level*, not per-binding,
 because the scaffold lives under `tools/ns3-harness/` (top-level
 infrastructure that serves all bindings) and its first scenario
 proves UDP-binding only as a bring-up gate. Future binding-specific
 test scenarios may spawn protocol-local TODOs; the scaffold itself
 is harness.
 
-## Migration mechanics (delegated to TODO 014)
+## Migration mechanics (delegated to TODO-vuhuj)
 
 This TE locks shape but does not move files. The renumber is added
-as new subtasks 10 and 11 of TODO 014 (the protocols-as-simulated-
-repos migration). Doing it inside TODO 014 means the move happens
+as new subtasks 10 and 11 of TODO-vuhuj (the protocols-as-simulated-
+repos migration). Doing it inside TODO-vuhuj means the move happens
 atomically with the rest of the protocols/ migration; the wire-lab
 is never in a half-renumbered state.
 
-TODO 014 step 10: For each existing TODO, recover the canonical
+TODO-vuhuj step 10: For each existing TODO, recover the canonical
 first-drafted-time from git history. Output: a mapping of
 `<old-integer-filename>` -> `<new-timestamp-filename>`.
 
-TODO 014 step 11: Move each TODO into its destination
+TODO-vuhuj step 11: Move each TODO into its destination
 `protocols/<slug>.d/TODO/` directory under its new timestamp
 filename. Write each protocol's local `TODO.md`. Write the master
 cross-listed `TODO.md` at `protocols/wire-lab.d/TODO/TODO.md`.
@@ -242,7 +242,7 @@ into a future enhancement of `tools/spec`.
 
 OQ-30.3: **Do DRs and DIs follow the same shape?** TE-vipir said
 DR/DI/TODO would be absorbed into spec docs (as inline sections).
-TODO 015 retired the directory-absorption framing for DR/DI because
+TODO-bulaj retired the directory-absorption framing for DR/DI because
 those directories never existed. But this TE introduces a real
 per-protocol `TODO/` subdirectory shape; should there be parallel
 `DR/` and `DI/` subdirectories per protocol, or do DRs/DIs stay as
@@ -260,11 +260,11 @@ distinction is rarely useful; one less directory.
 
 OQ-30.5: **Top-level cleanup.** Once `TODO/` is gone from the top
 level, the only top-level directories are `protocols/`, `transports/`,
-`tools/`, `proposals/` (until TODO 016 unblocks), and the
+`tools/`, `proposals/` (until TODO-pozig unblocks), and the
 top-level files. This is much cleaner. Should `proposals/` retain
-its top-level position until TODO 016 unblocks, or should it move to
+its top-level position until TODO-pozig unblocks, or should it move to
 `transports/<bootstrap>/...` immediately as a one-off rename without
-the full freeze ceremony? Lean: keep it where it is. TODO 016 is
+the full freeze ceremony? Lean: keep it where it is. TODO-pozig is
 where that work belongs.
 
 ## Reference to load-bearing constraints
@@ -286,7 +286,6 @@ This TE relies on (TE-dajot):
 
 ## Recommendation
 
-Adopt the locked shape. Bake the full renumber into TODO 014 as
+Adopt the locked shape. Bake the full renumber into TODO-vuhuj as
 new subtasks 10 and 11. Update TODO/TODO.md and all cross-references
-during that migration. Top-level `TODO/` ceases to exist after TODO
-014 lands.
+during that migration. Top-level `TODO/` ceases to exist after TODO-vuhuj lands.

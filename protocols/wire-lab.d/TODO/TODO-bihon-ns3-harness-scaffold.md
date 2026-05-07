@@ -1,4 +1,4 @@
-# TODO 019 — ns-3 harness scaffold for UDP-binding v0
+# TODO-bihon — ns-3 harness scaffold for UDP-binding v0
 
 ## Prior aliases
 
@@ -22,7 +22,7 @@ end-to-end round trip at least once.
 A minimal ns-3 harness that:
 
 1. Stands up a 2-node UDP topology in ns-3.
-2. Lets the Go UDP-binding v0 reference implementation (TODO 018)
+2. Lets the Go UDP-binding v0 reference implementation (TODO-jodon)
    send and receive datagrams over that emulated wire.
 3. Captures PCAP for offline analysis.
 4. Produces simulation-artifact files at the wire-lab's canonical
@@ -37,7 +37,7 @@ A minimal ns-3 harness that:
 
 The scaffold's first scenario proves the integration works at all.
 Loss/latency/jitter scenarios are explicitly out of scope for v0
-of the scaffold; they are TODO 020+ once the integration is solid.
+of the scaffold; they are follow-on TODOs once the integration is solid (originally tracked as "TODO 020+" before the proquint migration).
 
 ## Scaffold layout
 
@@ -85,7 +85,7 @@ implementations/ns3-harness-fixture/
    - Brings up tap interfaces (sudo required).
    - Launches two instances of the Go binding (one sender, one
      receiver) bound to the tap interfaces.
-   - Sends N test messages from sender to receiver using TODO 018's
+   - Sends N test messages from sender to receiver using TODO-jodon's
      reference implementation.
    - Lets ns-3 simulate for enough wall-clock time to drain the
      queue.
@@ -102,7 +102,7 @@ implementations/ns3-harness-fixture/
 
    File contents = exact UDP payload bytes. The session-pCID and
    message-pCID are passed in as flags (the scaffold does not parse
-   session-layer headers; TODO 021 may change that once group-session
+   session-layer headers; TODO-lilar may change that once group-session
    is implemented). The `<message-id>` derives from a hash of the
    payload bytes (consistent with TE-vipir OQ-29.2 lean toward content
    hash).
@@ -120,15 +120,14 @@ implementations/ns3-harness-fixture/
    proves, (d) where output files land, (e) how to add a new
    scenario.
 
-7. **Integration with TODO 018.** TODO 018's done-criteria reference
+7. **Integration with TODO-jodon.** TODO-jodon's done-criteria reference
    this scaffold. Once both TODOs are mergeable, land them in the
    same merge twig (TE-vipir was a single coherent locking; the
    implementation that exercises TE-vipir should land coherently too).
 
-## Out of scope for TODO 019
+## Out of scope for TODO-bihon
 
-- Loss / latency / jitter / reordering scenarios. Tracked as TODO
-  020 once the v0 scaffold is proven.
+- Loss / latency / jitter / reordering scenarios. Tracked as TODO-dinub once the v0 scaffold is proven.
 - Multi-node (>2) scenarios. Tracked separately; will exercise
   group-session v0 once that exists.
 - Mininet path. Empirically Mininet works in the sandbox but is
@@ -140,7 +139,7 @@ implementations/ns3-harness-fixture/
 
 ## Dependencies
 
-- **TODO 018** for the Go UDP-binding v0 implementation. The
+- **TODO-jodon** for the Go UDP-binding v0 implementation. The
   scaffold cannot prove round trip without something to bind to the
   tap interface. TODOs 018 and 019 are mutually gating: 018's done
   criterion references 019's scenario; 019's scenario needs 018's
@@ -169,6 +168,6 @@ implementations/ns3-harness-fixture/
 - 004: 1-of-N receivers in a multicast group.
 - 005: Network partition (link drops to 0 percent for window W).
 - 006: Asymmetric loss (loss only in one direction).
-- 007: TCP-binding round trip (gates on TODO 020 second-binding spec).
+- 007: TCP-binding round trip (gates on TODO-dinub second-binding spec).
 - 008: group-session v0 over UDP-binding v0 with one Byzantine node
-  (gates on group-session v0 reference implementation, TODO 021).
+  (gates on group-session v0 reference implementation, TODO-lilar).

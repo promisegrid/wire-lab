@@ -35,4 +35,4 @@ This directory is just *our local* collection. Third parties' implementations li
 
 ## Currently empty
 
-No implementations exist yet. TODO 018 (UDP-binding v0 reference) and TODO 019 (ns-3 harness fixture) will populate this directory when their work begins.
+No implementations exist yet. TODO-jodon (UDP-binding v0 reference) and TODO-bihon (ns-3 harness fixture) will populate this directory when their work begins.

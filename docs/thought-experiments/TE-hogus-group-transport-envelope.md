@@ -19,7 +19,7 @@ locked for the group-transport-protocol
 
 ## Note on rename
 
-This TE was originally drafted under "channel" vocabulary (filename `TE-hogus-grid-pcid-channel-carrier.md`, title "`grid <pcid>` as a repo-local channel-message carrier"). Per [TE-junil](TE-junil-transports-rename-and-axes-of-differentiation.md), the wire-lab vocabulary is **transports** and **messages**; "channel" is not used. Per the TODO 013 carve-out, TE-hogus's load-bearing decisions are properties of the group-transport-protocol, not of the outer wire-lab transport-spec. The file has been renamed and the prose rewritten in place. The TE integer (24) and timestamp (20260430-204108) are preserved.
+This TE was originally drafted under "channel" vocabulary (filename `TE-hogus-grid-pcid-channel-carrier.md`, title "`grid <pcid>` as a repo-local channel-message carrier"). Per [TE-junil](TE-junil-transports-rename-and-axes-of-differentiation.md), the wire-lab vocabulary is **transports** and **messages**; "channel" is not used. Per the TODO-motof carve-out, TE-hogus's load-bearing decisions are properties of the group-transport-protocol, not of the outer wire-lab transport-spec. The file has been renamed and the prose rewritten in place. The TE integer (24) and timestamp (20260430-204108) are preserved.
 
 ## Decision under test
 
@@ -128,7 +128,7 @@ The wire-lab's first transport-protocol should inform the canonical format witho
 
 ## Implications for the repo's open TODOs and pending DIs
 
-- These conclusions are properties of the **group-transport-protocol**, not of the outer wire-lab transport-spec. The outer transport-spec ([`protocols/wire-lab.d/specs/transport-spec-draft.md`](../../protocols/wire-lab.d/specs/transport-spec-draft.md)) is silent on envelope shape, header sets, canonical bytes, and body conventions. The substantive contract — including the locked decisions from the TODO 013 carve-out (`Parents:` header replacing `Prev-Message-CID:`/`IHave:`, no `Kind:` header, ack-in-body, flat subdirectory layout) — lives in [`protocols/group-session.d/specs/group-session-draft.md`](../../protocols/group-session.d/specs/group-session-draft.md).
+- These conclusions are properties of the **group-transport-protocol**, not of the outer wire-lab transport-spec. The outer transport-spec ([`protocols/wire-lab.d/specs/transport-spec-draft.md`](../../protocols/wire-lab.d/specs/transport-spec-draft.md)) is silent on envelope shape, header sets, canonical bytes, and body conventions. The substantive contract — including the locked decisions from the TODO-motof carve-out (`Parents:` header replacing `Prev-Message-CID:`/`IHave:`, no `Kind:` header, ack-in-body, flat subdirectory layout) — lives in [`protocols/group-session.d/specs/group-session-draft.md`](../../protocols/group-session.d/specs/group-session-draft.md).
 - `protocols/group-session.d/TODO/TODO-bisur-group-transport-envelope.md` locks this envelope choice for the group-transport-protocol separately from the broader promise-stack DIs tracked in `protocols/wire-lab.d/TODO/TODO-rivuk-te-promise-stack-ordering.md`.
 - `transports/README.md` points readers at both the outer transport-spec and the group-transport spec; this TE is the source document for the latter.
 - `protocols/wire-lab.d/specs/harness-spec-draft.md` acknowledges the TE in its §8 bibliography. The graduation question — does this envelope shape collapse into a more structured canonical wire object eventually? — remains open in `DR-009-20260430-204108`.

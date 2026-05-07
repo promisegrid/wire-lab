@@ -1,4 +1,4 @@
-# TODO 015 — DR/TODO/DI absorption — RETIRED BEFORE FILING
+# TODO-bulaj — DR/TODO/DI absorption — RETIRED BEFORE FILING
 
 ## Prior aliases
 
@@ -50,7 +50,7 @@ On checking the actual repo state immediately after TE-vipir landed:
 
 4. **The harness spec already absorbs decisions and open questions
    inline.** Section 11 (Decisions) and section 12 (Open Questions)
-   of `specs/harness-spec-draft.md` already serve the role TODO 015
+   of `specs/harness-spec-draft.md` already serve the role TODO-bulaj
    would have created. They were authored before TE-vipir and continue
    to work after TE-vipir.
 
@@ -62,11 +62,11 @@ correctly placed as harness-level meta-process anyway.
 
 ## What was kept from this concern
 
-- TE-vipir step 4 of TODO 014 already moves per-protocol TEs out of the
+- TE-vipir step 4 of TODO-vuhuj already moves per-protocol TEs out of the
   top-level `docs/thought-experiments/` into the appropriate
   `protocols/<slug>.d/docs/thought-experiments/`. That captures the
   per-protocol-content-belongs-with-its-protocol intuition that
-  motivated TODO 015 in the first place.
+  motivated TODO-bulaj in the first place.
 - TODO/TODO.md remains at the top level as harness meta-process,
   intentionally. If a future TE re-opens this question (e.g.,
   per-protocol active TODOs become a real need), a new TODO with a
@@ -75,6 +75,6 @@ correctly placed as harness-level meta-process anyway.
 ## Provenance
 
 - TE-vipir first-drafted at 2026-05-01 21:50:27 UTC.
-- TODO 015 retirement decided 2026-05-01 22:58 UTC (same session).
+- TODO-bulaj retirement decided 2026-05-01 22:58 UTC (same session).
 - The TE-vipir prose at "Migrations triggered by this TE" item 2 has
   been annotated to point here.

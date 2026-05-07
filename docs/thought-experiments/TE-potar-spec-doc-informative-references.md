@@ -231,7 +231,7 @@ the harness can perform.
   has no mailing list; the equivalent is `proposals/` and
   (eventually) ppx-dr message exchanges. Should those exchanges be
   citable as Informative References? Lean: yes, via pCID once
-  proposals are migrated to ppx-dr message-protocol shape per TODO 016.
+  proposals are migrated to ppx-dr message-protocol shape per TODO-pozig.
   Until that migration, treat `proposals/` paths as not-yet-citable.
 
 - **OQ-33.4: Cross-repo informative references.** A spec doc in this

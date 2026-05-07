@@ -337,11 +337,11 @@ Amendment history:
 
 ## Implications for follow-on work
 
-- **TODO 012 (provisional):** Once Steve locks DF-23.3 as Alt-3.B (or stronger), draft the Background subsection for `protocols/wire-lab.d/specs/harness-spec-draft.md` and add the link to the essay. Re-freeze the harness-spec on the next freeze cycle. The Background subsection lands in the next pCID; the previous pCID remains as historical evidence per TE-rujak's append-only-log discipline.
+- **TODO-bisur (provisional):** Once Steve locks DF-23.3 as Alt-3.B (or stronger), draft the Background subsection for `protocols/wire-lab.d/specs/harness-spec-draft.md` and add the link to the essay. Re-freeze the harness-spec on the next freeze cycle. The Background subsection lands in the next pCID; the previous pCID remains as historical evidence per TE-rujak's append-only-log discipline.
 
-- **TODO 013 (provisional):** Capture the essay-as-referenced-source open question raised under "Implications" above. Decide whether `docs/essays/*.md` files freeze the same way `specs/*.md` files do, and whether the manifest distinguishes `kind: spec` from `kind: essay`. Tentative answer in the conclusions; needs explicit decision.
+- **TODO-motof (provisional):** Capture the essay-as-referenced-source open question raised under "Implications" above. Decide whether `docs/essays/*.md` files freeze the same way `specs/*.md` files do, and whether the manifest distinguishes `kind: spec` from `kind: essay`. Tentative answer in the conclusions; needs explicit decision.
 
-- **TODO 014 (provisional, becomes TE-hogus trigger):** Track the wire-lab's first congruence-shaped protocol (function-call shape) and first convergence-shaped protocol (desired-state shape) reaching freeze. When both exist, open TE-hogus to formally examine the promise-about-trajectory equivalence claim against concrete test material. Until then, the framing essay carries the thread.
+- **TODO-vuhuj (provisional, becomes TE-hogus trigger):** Track the wire-lab's first congruence-shaped protocol (function-call shape) and first convergence-shaped protocol (desired-state shape) reaching freeze. When both exist, open TE-hogus to formally examine the promise-about-trajectory equivalence claim against concrete test material. Until then, the framing essay carries the thread.
 
 - **No change required to TE-nibar or TE-rujak.** TE-nibar's spec-doc-as-promise framing and TE-rujak's pCID machinery are both consistent with this TE's recommendations; TE-lozip layers framing on top, not corrections to either.
 

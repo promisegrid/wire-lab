@@ -1,4 +1,4 @@
-# TODO 001 - Perplexity Computer onboarding
+# TODO-dutaz - Perplexity Computer onboarding
 
 ## Prior aliases
 
@@ -18,10 +18,10 @@ The decisions below were made in chat on 2026-04-28; this TODO file captures the
 - [x] 001.3 Lock the bot's review/convergence style.
 - [x] 001.4 Steve to remove the "Require a pull request before merging" rule from the `main` ruleset in repo Settings. (Done; confirmed by Steve in chat 2026-04-29.)
 
-The two follow-on items originally listed as 001.5 and 001.6 have been moved out of this TODO so that TODO 001 closes cleanly when its bootstrap subtasks land. They now live as:
+The two follow-on items originally listed as 001.5 and 001.6 have been moved out of this TODO so that TODO-dutaz closes cleanly when its bootstrap subtasks land. They now live as:
 
-- TODO 006 — `protocols/wire-lab.d/TODO/TODO-misul-backfill-di-provenance-harness-spec.md` (originally 001.5).
-- TODO 007 — `protocols/wire-lab.d/TODO/TODO-diliz-backfill-dr-harness-spec-section-11.md` (originally 001.6).
+- TODO-misul — `protocols/wire-lab.d/TODO/TODO-misul-backfill-di-provenance-harness-spec.md` (originally 001.5).
+- TODO-diliz — `protocols/wire-lab.d/TODO/TODO-diliz-backfill-dr-harness-spec-section-11.md` (originally 001.6).
 
 ## Decision Intent Log
 
@@ -59,4 +59,4 @@ Linked DR: DR/DR-003-20260428-195700-review-style.md
 
 This bootstrap was created by Perplexity Computer on `ppx/dr-001-bootstrap` and pushed for Steve to review and merge. The DR files for DR-001, DR-002, DR-003 are committed alongside this TODO file. Steve answered all three DR questions in chat before any file was written, so each DR is created with `State: decided` from the start.
 
-The "TODO 025 migration" referenced in `AGENTS.md` is from a prior repo and does not apply here; this repo starts TODO numbering at 001.
+The "TODO-kugod migration" referenced in `AGENTS.md` is from a prior repo and does not apply here; this repo starts TODO numbering at 001.

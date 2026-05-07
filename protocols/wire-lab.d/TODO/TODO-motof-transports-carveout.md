@@ -1,4 +1,4 @@
-# TODO 013 - Transports carve-out
+# TODO-motof - Transports carve-out
 
 ## Prior aliases
 
@@ -18,8 +18,8 @@ This TODO is the lock record for the carve-out. The substantive design decisions
 - [x] 013.3 Create `specs/group-transport-draft.md` (substantive v0 contract for the group-transport-protocol class: N≥2, all-see-all, multi-writer DAG, append-only).
 - [x] 013.4 Rewrite TE-hogus in place under transport vocabulary; rename file to `TE-hogus-group-transport-envelope.md`.
 - [x] 013.5 Rewrite DR-009 to transport vocabulary; rename file to `DR-009-20260430-204108-group-transport-envelope.md`.
-- [x] 013.6 Rewrite TODO 012 to transport vocabulary; rename file to `protocols/group-session.d/TODO/TODO-bisur-group-transport-envelope.md`; add freeze-gate subtasks (012.7, 012.8).
-- [x] 013.7 Update `TODO/TODO.md` to reference the renamed TODO 012.
+- [x] 013.6 Rewrite TODO-bisur to transport vocabulary; rename file to `protocols/group-session.d/TODO/TODO-bisur-group-transport-envelope.md`; add freeze-gate subtasks (012.7, 012.8).
+- [x] 013.7 Update `TODO/TODO.md` to reference the renamed TODO-bisur.
 - [x] 013.8 Update `docs/thought-experiments/README.md` TE-hogus row to use the new title and filename.
 - [x] 013.9 Update `specs/harness-spec-draft.md` §8 TE-hogus bullet to transport vocabulary; refresh TE-zalut/TE-junil cross-references; rewrite Open Question #19 to use transport vocabulary and reference both the outer transport-spec and the group-transport-draft.
 - [x] 013.10 Run `tools/spec check`; commit; merge `--no-ff` to `ppx/main`; push; delete twig.
@@ -30,16 +30,16 @@ This TODO does not introduce a new DI; it executes the locked decisions of TE-za
 
 ## Why a separate TODO
 
-The carve-out crosses too many files for the existing TODO 012 to absorb cleanly:
+The carve-out crosses too many files for the existing TODO-bisur to absorb cleanly:
 
-- TODO 012 is the lock record for the group-transport envelope decision (DI-009-20260430-204108). Its subtasks are about that decision and its freeze gate.
-- TODO 013 is the rename and spec-split mechanic. It does not introduce a new decision; it implements the consequences of TE-zalut and TE-junil.
+- TODO-bisur is the lock record for the group-transport envelope decision (DI-009-20260430-204108). Its subtasks are about that decision and its freeze gate.
+- TODO-motof is the rename and spec-split mechanic. It does not introduce a new decision; it implements the consequences of TE-zalut and TE-junil.
 
 Keeping the two records distinct lets the lock-of-decision (012) and the mechanical carve-out (013) be reasoned about independently.
 
 ## Notes
 
-- The TE-hogus / DR-009 / TODO-012 file renames went `grid-pcid-channel-carrier` → `group-transport-envelope` because those documents' load-bearing decisions are properties of the group-transport-protocol class, not of the outer wire-lab transport-spec. Future transport-protocol classes (ring, gossip, hub-mediated, large-N, ephemeral) will produce their own envelope decisions in their own spec docs, with their own TE / DR / TODO trios as needed.
+- The TE-hogus / DR-009 / TODO-bisur file renames went `grid-pcid-channel-carrier` → `group-transport-envelope` because those documents' load-bearing decisions are properties of the group-transport-protocol class, not of the outer wire-lab transport-spec. Future transport-protocol classes (ring, gossip, hub-mediated, large-N, ephemeral) will produce their own envelope decisions in their own spec docs, with their own TE / DR / TODO trios as needed.
 - TE-titur (numbering collision) and TE-zalut (transport-protocol types) retain "channel" in places: TE-titur is a historical record of the channels-branch reconciliation; TE-zalut has a vocabulary-note prefix explaining the rewrite and otherwise uses transport vocabulary throughout. Both filenames retain "channel" because the timestamp slugs are content-addressable identifiers and renaming them would break the integer-anchors-on-first-drafted-timestamp invariant from TE-titur.
 - A future TE will address cumulative-prefix / frontier-style acknowledgement (Q2 from this session). v0 of the group-transport-protocol uses per-message body-level acknowledgement; that scheme will likely need a compact form once message volumes grow.
 - Anticipated future transport-protocol specs per TE-junil: ring, star, cluster-of-clusters, gossip; plus a future TE on transport-protocol migration semantics.
