@@ -2,10 +2,10 @@
 
 ## Status
 
-DRAFT. One-page sketch authored alongside TE-29
-(`docs/thought-experiments/TE-20260501-215027-protocols-as-simulated-repos-and-binding-layer.md`).
+DRAFT. One-page sketch authored alongside TE-vipir
+(`docs/thought-experiments/TE-vipir-protocols-as-simulated-repos-and-binding-layer.md`).
 This is the first concrete L4-binding spec under the layer
-decomposition locked in TE-29. Subject to revision before freeze.
+decomposition locked in TE-vipir. Subject to revision before freeze.
 
 ## Abstract
 
@@ -20,7 +20,7 @@ PromiseGrid uses UDP and what a conformant implementation promises.
 ## Layer position
 
 UDP-binding v0 occupies level 2 in the five-level stack defined by
-TE-29:
+TE-vipir:
 
 ```
 transports/udp/udp-binding-bafkrei...U1/<session-pCID>/<message-pCID>/<message-id>.txt
@@ -151,7 +151,7 @@ Language: Go (per Steve's standing preference).
 
 ## Forking and versioning
 
-Per C-4 (forking is normal, TE-28), any author may publish a UDP
+Per C-4 (forking is normal, TE-dajot), any author may publish a UDP
 binding with different choices (e.g., different default port,
 different size limit, added framing). Such a fork takes a different
 pCID and lives as a sibling under `protocols/`. Two parties wishing
@@ -160,14 +160,14 @@ silently mix bindings.
 
 This binding may evolve to v1 if a load-bearing change is required
 (e.g., explicit fragmentation support, NAT-traversal hooks).
-Migration from v0 to v1 follows the rules in TE-28 OQ-100.2.
+Migration from v0 to v1 follows the rules in TE-dajot OQ-100.2.
 
 ## Bibliography
 
 - RFC 768 (UDP)
 - RFC 8200 (IPv6, for the 1232-byte size derivation)
-- TE-29 (this binding's layer position)
-- TE-28 (load-bearing constraints C-1 through C-6)
+- TE-vipir (this binding's layer position)
+- TE-dajot (load-bearing constraints C-1 through C-6)
 
 ## Open questions
 

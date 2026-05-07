@@ -1,13 +1,16 @@
 # TODO queue: ppx-dr
 
-Per-protocol TODO queue (per TE-30). Items in this file touch
+Per-protocol TODO queue (per TE-magup). Items in this file touch
 only files under `protocols/ppx-dr.d/`. Anything broader is
 harness-level and lives at `protocols/wire-lab.d/TODO/TODO.md`.
 
-Sorted by canonical first-drafted timestamp (recovered from git
-history). Integer aliases (TODO N) remain as stable identifiers
-per TE-25; the timestamped filename is the on-disk form.
+Per TE-mumuv (TE-39, locked 2026-05-07), each TODO is addressable
+by its proquint handle (TODO-<handle>). Prior integer / timestamp
+aliases survive in the `Prior alias` column and in each file's
+`## Prior aliases` section.
 
-| TODO | First drafted | File |
-|---|---|---|
-| TODO 16 | 2026-05-01 23:01:31 | [TODO-20260501-230131-proposals-as-transport-messages-BLOCKED.md](TODO-20260501-230131-proposals-as-transport-messages-BLOCKED.md) |
+## Index
+
+| Handle | Mint date | Title | Prior alias |
+|---|---|---|---|
+| [TODO-pozig](TODO-pozig-proposals-as-transport-messages-BLOCKED.md) | 2026-05-01 | TODO 016 — proposals as transport messages — BLOCKED | `TODO-16` / `TODO-20260501-230131` |

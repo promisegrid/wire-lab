@@ -41,7 +41,7 @@ Read these files in this order before doing anything else:
                                                   priority-sorted index of
                                                   TODOs across all
                                                   protocols-as-simrepos.
-  5. protocols/wire-lab.d/TODO/TODO-20260429-030146-perplexity-computer-onboarding.md — bootstrap decisions
+  5. protocols/wire-lab.d/TODO/TODO-dutaz-perplexity-computer-onboarding.md — bootstrap decisions
                                                   governing how you
                                                   participate. Note the
                                                   three DI IDs:
@@ -166,8 +166,9 @@ Steps:
   d. If non-trivial: follow the Decision-First flow.
      - Identify the decision being made.
      - If multiple plausible designs remain, run a TE BEFORE asking DF
-       questions. Write the TE doc to
-       `docs/thought-experiments/TE-YYYYMMDD-HHMMSS-slug.md`. The TE
+       questions. Mint a proquint handle with `tools/mint-handle` and
+       write the TE doc to
+       `docs/thought-experiments/TE-<handle>-<slug>.md`. The TE
        must explicitly model multiple scenarios — not collapse to a
        short opinion. Required content: title, TE ID, decision under
        test, assumptions, alternatives, scenario analysis, conclusions,
@@ -217,7 +218,7 @@ Steps:
           Create priority-sorted, cross-listed index with TODO 001 marked
           done.
 
-        protocols/wire-lab.d/TODO/TODO-20260429-030146-perplexity-computer-onboarding.md:
+        protocols/wire-lab.d/TODO/TODO-dutaz-perplexity-computer-onboarding.md:
           New TODO file capturing locked decisions ...
 
   j. Write the review-and-converge DR for the branch as a whole, if
@@ -348,11 +349,11 @@ freely editable. Edits follow the categorized policy locked in:
 - DI-020-20260502-213105 (holistic reading by default; single-TE
   reading only for obviously mechanical questions)
 - DI-020-20260502-232651 (Cat-1a / Cat-1b path-reference split)
-- TE-34 (`docs/thought-experiments/TE-20260502-212810-te-editing-policy-and-holistic-corpus.md`)
+- TE-dabol (`docs/thought-experiments/TE-dabol-te-editing-policy-and-holistic-corpus.md`)
   plus its four Cat-3 Refinements (Cat-1a/Cat-1b split forward-pointer;
   Cat-2 DI-enumeration discipline; Cat-2 cross-TE quotation grep;
   top-of-file `## Status` header field)
-- TE-35 (`docs/thought-experiments/TE-20260502-232651-editing-policy-tabletop.md`)
+- TE-vudaf (`docs/thought-experiments/TE-vudaf-editing-policy-tabletop.md`)
   — the tabletop simulation that produced the four refinements.
 
 The canonical statement lives in AGENTS.md under "TE Editing Policy
@@ -363,7 +364,7 @@ The canonical statement lives in AGENTS.md under "TE Editing Policy
   names the file's current location.
 - **Cat-1b (historical-quotation paths).** Leave untouched. Path
   references inside markdown blockquotes, attributed to another TE
-  ("TE-N states ..."), in past tense ("TE-30 used the path ..."),
+  ("TE-N states ..."), in past tense ("TE-magup used the path ..."),
   inside `## Refinements` sections, supersedence notes, or `Decision
   status` lines are Cat-1b. Five heuristics: quotation context;
   Refinements / supersedence framing; past tense; default Cat-1a;
@@ -409,10 +410,10 @@ of the TE above `## Refinements` is historical evidence: Cat-1a or
 Cat-2 sweeps on the body are permitted under their category rules;
 Cat-3 / Cat-4 forward-pointers are appended to `## Refinements`;
 Cat-5–7 substantive changes are filed as a new superseding TE rather
-than as an edit. The four Cat-3 Refinements on TE-34 are exemplars of
+than as an edit. The four Cat-3 Refinements on TE-dabol are exemplars of
 this shape.
 
-Reading default is holistic. Before any TE edit, read TE-34, TE-35,
+Reading default is holistic. Before any TE edit, read TE-dabol, TE-vudaf,
 the affected TE, and any TEs they cite or that cite them. Single-TE
 reading is reserved for obviously mechanical questions (a single
 typo; a path that has demonstrably moved; a `## Status` field
@@ -439,7 +440,7 @@ rules.
   invent ad-hoc names (no "User1", no "the writer", no first
   names drawn from outside the convention) when the alphabetical
   list will serve. The convention is already in active use in
-  TE-35 (see `docs/thought-experiments/TE-20260502-232651-editing-policy-tabletop.md`,
+  TE-vudaf (see `docs/thought-experiments/TE-vudaf-editing-policy-tabletop.md`,
   Assumptions section); this bullet lifts it to a corpus-wide
   authoring rule.
 
@@ -635,7 +636,7 @@ Mechanics:
             recommendation: <bot recommendation if any>
 
      `Q-<TODO-N>.<seq>` is the question ID, e.g. `Q-21.7` for the
-     7th question logged against TODO 21. Each TODO file owns its
+     7th question logged against TODO-lilar. Each TODO file owns its
      own monotonically increasing sequence.
 
   3. THEN call `ask_user_question` (or its equivalent in chat).
@@ -683,12 +684,12 @@ Where old threads went (for readers searching git history):
     SESSION-FREEZE, T-FILENAME-CID-CASCADE, T-PROMISEBASE-ADOPTION,
     T-WIRELAB-PROMISEBASE-MERGE, T-CONDITIONAL-RELEASE,
     T-TE36-FOLLOWON) -> their corresponding TE parent TODO files
-    (TODO 23 through TODO 30).
+    (TODO-lilok through TODO-ralud).
   - Anticipated future TEs (T-RING-TRANSPORT,
     T-CLUSTER-OF-CLUSTERS-TRANSPORT, T-GOSSIP-TRANSPORT,
-    T-RECEIPTS-AT-SCALE) -> TODO 31.
+    T-RECEIPTS-AT-SCALE) -> TODO-sinuv.
   - Cross-cutting questions (T-021-CC-Q1 through Q6) -> stay in
-    TODO 21 with their original numbering.
+    TODO-lilar with their original numbering.
   - Closed threads -> git history of the deleted OPEN-THREADS.md
     file on the wire-lab branch of stevegt/session-logs.
 
@@ -754,7 +755,10 @@ The bot runs this as step 3 of "First action of every session"
 # Glossary
 
 - TE  : Thought Experiment. Analysis doc.
-        Lives at `docs/thought-experiments/TE-YYYYMMDD-HHMMSS-slug.md`.
+        Lives at `docs/thought-experiments/TE-<handle>-<slug>.md` where
+        `<handle>` is a proquint minted by `tools/mint-handle` (locked
+        by TE-mumuv 2026-05-07; pre-2026-05-07 TEs carry a
+        `## Prior aliases` section with their prior integer + timestamp).
 - DR  : Decision Request. Open question / decision-tracking record.
         Lives at `DR/DR-NNN-YYYYMMDD-HHMMSS-slug.md` where NNN is the
         TODO number.

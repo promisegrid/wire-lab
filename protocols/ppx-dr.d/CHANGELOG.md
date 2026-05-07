@@ -1,6 +1,6 @@
 # CHANGELOG: ppx-dr
 
-A-side CHANGELOG (per TE-32) for the `ppx-dr` protocol's spec doc.
+A-side CHANGELOG (per TE-liviv) for the `ppx-dr` protocol's spec doc.
 
 This file records **freeze events** authored by the spec maintainers.
 Each entry names the doc-CID published at that moment. The format:
@@ -15,4 +15,4 @@ notes:        prose
 
 No entries yet; this protocol has not yet reached a first freeze.
 
-See [TE-31](../../docs/thought-experiments/TE-20260502-004924-spec-doc-inversion-and-conformance-changelog.md), [TE-32](../../docs/thought-experiments/TE-20260502-014525-spec-vs-implementation-split.md), and [TE-33](../../docs/thought-experiments/TE-20260502-020439-spec-doc-informative-references.md) for the rationale.
+See [TE-zukug](../../docs/thought-experiments/TE-zukug-spec-doc-inversion-and-conformance-changelog.md), [TE-liviv](../../docs/thought-experiments/TE-liviv-spec-vs-implementation-split.md), and [TE-potar](../../docs/thought-experiments/TE-potar-spec-doc-informative-references.md) for the rationale.
