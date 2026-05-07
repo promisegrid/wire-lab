@@ -1,6 +1,7 @@
 package main
 
 import (
+	"os"
 	"regexp"
 	"strings"
 	"testing"
@@ -189,6 +190,32 @@ func TestEdgeOfStringBoundary(t *testing.T) {
 		got, _ := sweep(c.in, intReps(), nil, nil)
 		if got != c.want {
 			t.Errorf("input %q -> got %q, want %q", c.in, got, c.want)
+		}
+	}
+}
+
+// TestCat1bHandoffPresent verifies the Cat-1b handoff file exists
+// alongside main.go and references each of the documented protected
+// files. The tool emits this handoff to stderr at startup so the LLM
+// driving a sweep knows which historical-quotation citations the
+// regex would re-damage.
+func TestCat1bHandoffPresent(t *testing.T) {
+	body, err := os.ReadFile("CAT-1B-HANDOFF.md")
+	if err != nil {
+		t.Fatalf("CAT-1B-HANDOFF.md must exist next to main.go: %v", err)
+	}
+	text := string(body)
+	required := []string{
+		"AGENTS.md",
+		"AGENTS-ppx.md",
+		"TE-titur",
+		"TE-vudaf",
+		"TODO-bihon",
+		"TODO-jodon",
+	}
+	for _, want := range required {
+		if !strings.Contains(text, want) {
+			t.Errorf("CAT-1B-HANDOFF.md missing reference to %q", want)
 		}
 	}
 }

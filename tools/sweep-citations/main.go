@@ -31,6 +31,15 @@
 // record). The section starts at "## Prior aliases" and ends at the
 // next "## " heading or end-of-file.
 //
+// Cat-1b handoff: the regex cannot tell a current pointer from a
+// historical quotation. CAT-1B-HANDOFF.md (in this directory) lists
+// the files that contain known Cat-1b false positives the regex will
+// re-damage on every run. The tool prints that handoff to stderr at
+// startup; the LLM driving the sweep is expected to read it and skip
+// the listed files. New entries should be added when a new Cat-1b
+// case is discovered; old entries removed when the prose is rewritten
+// to no longer match.
+//
 // Usage:
 //
 //	sweep-citations [-r REPO_ROOT] [-n] [-q]
@@ -87,6 +96,13 @@ func main() {
 	if err != nil {
 		die("repo root: %v", err)
 	}
+
+	// Emit the Cat-1b handoff first thing, before any walking. This
+	// file documents historical-quotation citations the regex would
+	// re-damage on every run; the LLM driving the sweep is expected to
+	// read it and skip those files. The tool itself does not parse the
+	// handoff -- it just makes sure it's loud and visible.
+	emitCat1bHandoff(root)
 
 	rows := loadMapping(filepath.Join(root, "tools/migrate-handles/mapping.tsv"))
 
@@ -185,6 +201,28 @@ func main() {
 	}
 	fmt.Fprintf(os.Stderr, "sweep-citations: scanned=%d, changed=%d, dry-run=%v\n",
 		scanned, changed, *dryRun)
+}
+
+// emitCat1bHandoff prints CAT-1B-HANDOFF.md to stderr verbatim before
+// the sweep starts walking, so the LLM driving the run sees the list
+// of known historical-quotation false positives. Missing handoff is a
+// warning, never a fatal error.
+func emitCat1bHandoff(root string) {
+	handoffPath := filepath.Join(root, "tools/sweep-citations/CAT-1B-HANDOFF.md")
+	body, err := os.ReadFile(handoffPath)
+	if err != nil {
+		fmt.Fprintf(os.Stderr,
+			"sweep-citations: WARNING: Cat-1b handoff not found at %s (%v); "+
+				"proceeding without it. Future sweeps may re-damage "+
+				"historical-quotation citations.\n\n", handoffPath, err)
+		return
+	}
+	fmt.Fprintln(os.Stderr, "=== Cat-1b handoff (read before letting the sweep write) ===")
+	fmt.Fprintln(os.Stderr)
+	os.Stderr.Write(body)
+	fmt.Fprintln(os.Stderr)
+	fmt.Fprintln(os.Stderr, "=== end Cat-1b handoff ===")
+	fmt.Fprintln(os.Stderr)
 }
 
 func loadMapping(path string) []row {
