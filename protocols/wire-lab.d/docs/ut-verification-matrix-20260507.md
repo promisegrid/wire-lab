@@ -256,3 +256,84 @@ When DF-V.2 and DF-V.3 are answered, a follow-on closure pass can
 flip the 45 closeable UT bullets in the disposition memo (and add the
 matching entries to TODO-lilar's tail or to a new TODO) under whatever
 mechanism the user picks.
+
+## DF-V.2 lock — Alt C (split Carry-cluster semantics) — 2026-05-07
+
+This section is an additive amendment to the read-only pass. It does
+not flip any UT checkbox, does not edit any earlier section of this
+file, does not touch `dropped-thread-disposition-20260506.md` bullets,
+and does not touch TODO-lilar walk notes. Per AGENTS.md the locked
+decision is recorded as `DI-021-20260507-204144` in
+`protocols/wire-lab.d/TODO/TODO-lilar-session-replay-cleanup.md`
+("Decision Intent Log"); this subsection is the docs-side reference
+back to that DI.
+
+**Locked decision (DF-V.2 Alt C, "split Carry-cluster semantics"):**
+The Carry cluster (cluster J, 55 UTs) does not have a single uniform
+closure semantic. It contains two distinct sub-classes that must be
+classified separately by any future closure pass:
+
+1. **Sub-class J1 — in-turn self-corrections and purely historical
+   observations.** UTs whose substantive content is fully captured by
+   the walk note itself; the note is the durable record and no
+   follow-up rule needs to land. These are **closeable** as resolved
+   or retired under the loose reading of Caveat 1.
+2. **Sub-class J2 — durable cross-session process rules.** UTs that
+   record procedural lessons, AGENTS-style cadence rules,
+   collaborator-anonymity discipline, foreground-DONE confirmation
+   discipline, redaction discipline, twig-naming discipline, etc.
+   These are **not closeable** by their walk-note record alone; they
+   remain in the **transferred** state, owned by an explicit
+   procedure home (typically `AGENTS-ppx.md` or the relevant
+   per-protocol procedure file).
+
+**What this lock authorizes (only this; nothing more):**
+
+- A future closure pass may classify each of the 55 Carry UTs into
+  J1 or J2 using the criteria above.
+- A future `AGENTS-ppx.md` (or other named procedure-home) edit may,
+  under a separate DF, transfer the J2 rules into that procedure
+  home using whatever wording the per-rule transfer-list DF locks.
+
+**What this lock does NOT authorize:**
+
+- It does **not** flip any UT checkbox in TODO-lilar or in
+  `dropped-thread-disposition-20260506.md`. Closure-mechanism choice
+  remains DF-V.3 and is still open.
+- It does **not** edit any UT bullet in
+  `dropped-thread-disposition-20260506.md`. Those bullets are the
+  append-only ledger and are out of scope for this DF.
+- It does **not** edit any walk note in TODO-lilar. TODO-lilar is
+  append-only history; the only edit landed by this DF in that file
+  is the new DI entry under "Decision Intent Log".
+- It does **not** retroactively alter the 25 resolved / 20 transferred
+  / 10 unclear Carry counts recorded by the read-only Alt-V.4 pass.
+  Those counts stand as the loose-reading snapshot. Any recount under
+  the J1/J2 split is a verification pass and is gated on DF-V.3.
+- It does **not** authorize promotion of any specific rule into
+  `AGENTS-ppx.md`. Which J2 rules transfer, in what wording, with
+  what enforcement, is a separate DF (not yet filed) that must lock
+  the transfer list before any AGENTS-ppx edit is made.
+- It does **not** infer that all Carry UTs are resolved just because
+  they were noted; that is the failure mode this DF rules out.
+
+**Caveat-1 update (additive):** Caveat 1 in the "Caveats and
+contested counts" section above remains as written for historical
+fidelity. The DF-V.2 Alt C lock supersedes the loose-vs-tight
+either/or framing of that caveat with a per-UT split: J1 follows the
+loose reading, J2 follows the tight reading. The recount is gated on
+DF-V.3 and is not performed here.
+
+**Outstanding DFs after this lock:**
+
+- **DF-V.3 (closure mechanism).** Still open. The closure pass that
+  applies the J1/J2 split and flips the 45 (loose-reading)
+  closeable-flagged UT bullets is gated on this DF.
+- **DF-V.4 (Carry-J2 transfer-list to AGENTS-ppx.md).** New DF
+  exposed by DF-V.2 Alt C. Locks which J2 rules transfer to
+  `AGENTS-ppx.md` (or another named procedure home), in what
+  wording, with what enforcement and ownership. Not yet filed; the
+  per-rule transfer is not authorized until this DF lands.
+
+Provenance: locked by user 2026-05-07; recorded as
+`DI-021-20260507-204144` in TODO-lilar.
