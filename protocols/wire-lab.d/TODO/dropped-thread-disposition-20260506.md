@@ -52,7 +52,7 @@ Drafting order (dependency-sorted):
 
 **Closed 2026-05-07 — verified-superseded under Alt-lilok.1.B.** All five UTs in this cluster were captured against the pre-Alt-B state of TE-havib. The 2026-05-05 Alt-B disposition path re-presentation locked DF-36.1, .2, .3, .7 and resolved OQ-36.6 in the negative before the cluster was filed. Verification walk at [`te-havib-followon-verification-walk-20260507.md`](../docs/te-havib-followon-verification-walk-20260507.md) confirmed all six tabletop scenarios hold against the locked state and all five UTs below are answered by the locks. The `T-TE36-FOLLOWON` open-thread placeholder is retired — do not add it.
 
-A read-only, index-only verification matrix covering all 186 UTs in this memo (closure-readiness state and owner per UT, no checkboxes flipped) is at [`ut-verification-matrix-20260507.md`](../docs/ut-verification-matrix-20260507.md). It is a cross-reference index, not a disposition rewrite; UT bullets in this memo are unchanged.
+A read-only, index-only verification matrix covering all 186 UTs in this memo (closure-readiness state and owner per UT, no checkboxes flipped) is at [`ut-verification-matrix-20260507.md`](../docs/ut-verification-matrix-20260507.md). It is the cross-reference index and (per DF-V.3 Alt C, `DI-021-20260507-210204`) the closure index of record; cluster-owner TODOs close their own UTs as they land. UT bullets in this memo are unchanged.
 
 *OPEN-THREADS map:* new thread T-TE36-FOLLOWON to be added (OQ-36.6 deferred investigation + audit-memo-style Alice-through-Mallory tabletop walk). — **RETIRED 2026-05-07; do not add.**
 

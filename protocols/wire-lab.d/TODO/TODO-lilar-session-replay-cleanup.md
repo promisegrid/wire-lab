@@ -138,6 +138,85 @@ This TODO is the response to that final instruction.
     Alt-V.4 from the read-only pass are the prior locked decisions in
     this verification line and remain in force.)
 
+- ID: DI-021-20260507-210204
+  Date: 2026-05-07 21:02:04
+  Status: active
+  Decision: DF-V.3 locked Alt C ("matrix-as-closure-index"). The closure
+    mechanism for the 45 (loose-reading) closeable-flagged UTs in
+    `protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md` is:
+    no UT checkbox flips now in any file; the UT verification matrix
+    itself IS the closure index of record; future successor TODOs (the
+    cluster-owner TODOs already enumerated in the matrix's "Owner and
+    pointer table") cite the matrix when they land their substantive
+    work, and at that point each successor TODO closes its own UTs as
+    part of its own DI / spec-edit / retire entry. No bulk closure
+    pass is performed against the disposition memo or against
+    TODO-lilar.
+  Intent: Stop treating closure as a separate sweep. The matrix already
+    records closure-readiness per UT; the cluster-owner TODOs already
+    own the substantive work; bundling closure into each successor
+    TODO's landing keeps the DI provenance attached to the work that
+    actually answered the UT, instead of inserting a synthetic
+    closure-only edit pass that would either re-touch append-only
+    history (the disposition memo bullets, the TODO-lilar walk notes)
+    or invent a new tracking artifact parallel to the matrix. Alt C
+    also defuses Caveat 1 / DF-V.2 J1-vs-J2 split as a per-UT decision
+    deferred until each Carry rule actually transfers (or doesn't) to
+    its procedure home — no global recount is required.
+  Constraints:
+    - This DI does NOT flip any UT checkbox in TODO-lilar or in
+      `dropped-thread-disposition-20260506.md`. Both files remain
+      append-only history; the only edit landed by this DI in
+      TODO-lilar is this DI entry itself.
+    - This DI does NOT edit any UT bullet in
+      `dropped-thread-disposition-20260506.md`. The disposition memo's
+      bullet structure stays as written.
+    - This DI does NOT edit, retitle, or recount the body of the
+      verification matrix. The lock is recorded as an additive
+      "DF-V.3 lock" subsection appended to the matrix's tail (parallel
+      in shape to the existing "DF-V.2 lock" subsection landed by
+      DI-021-20260507-204144), so the matrix's body and its
+      45-closeable / 141-not-closeable summary remain as recorded by
+      the read-only Alt-V.4 pass.
+    - This DI does NOT authorize any successor TODO to close UTs
+      outside its own cluster. Each successor TODO closes only the UTs
+      the matrix already attributes to its cluster (Clusters A–J in
+      the matrix's "Per-cluster breakdown"); cross-cluster closures
+      remain out of scope.
+    - This DI does NOT supersede DF-V.2 Alt C
+      (`DI-021-20260507-204144`). The J1/J2 Carry split still governs
+      how Cluster J UTs are classified at closure time; Alt C just
+      moves that classification into each Carry-rule transfer (or
+      explicit no-transfer note) instead of a global recount pass.
+    - DF-V.4 (Carry-J2 transfer-list to `AGENTS-ppx.md`, exposed by
+      DF-V.2 Alt C) remains open and is not addressed by this DI;
+      individual J2 UTs close only when their rule actually transfers
+      under DF-V.4's eventual lock.
+    - The matrix's existing 38 resolved / 7 retired / 114 transferred
+      / 5 blocked / 22 unclear / 186 total counts are NOT retroactively
+      altered by this DI. They remain the read-only Alt-V.4 snapshot.
+  Affects:
+    - `protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`
+      (this DI is referenced from a new "DF-V.3 lock — Alt C
+      (matrix-as-closure-index) — 2026-05-07" subsection appended to
+      that file, parallel in shape to the existing DF-V.2 lock
+      subsection).
+    - `protocols/wire-lab.d/TODO/dropped-thread-disposition-20260506.md`
+      pointer line (the existing one-paragraph pointer at the head of
+      the "TE-havib follow-on" section) is the only candidate site for
+      a one-word clarification noting the matrix's role as closure
+      index of record; if any clarification lands, it is minimal and
+      additive. UT bullets stay untouched.
+    - All cluster-owner TODOs enumerated in the matrix's "Owner and
+      pointer table" (TODO-vunub, TODO-kugod, TODO-turog, TODO-duvuk,
+      TODO-kituj, TODO-ralud, plus future Spec-edit / Retire / Carry
+      transfer DIs). Each will cite the matrix and close its own UTs
+      as part of its own substantive landing under its own DI(s); no
+      change is made to any of them by this DI.
+  Supersedes: (none — DF-V.3 was open after the DF-V.2 Alt C lock
+    `DI-021-20260507-204144`; this is its first lock. DF-V.1 Alt-C,
+    Alt-V.4, and DF-V.2 Alt C remain in force.)
+
 ## Unfinished threads ledger (per-turn carry-forwards)
 
 This section records concrete items that were started, discussed, or implied in a turn but not committed to the repo. Each item names the originating turn so it can be re-attached to its context later. Resolution paths (turn-N committed it / superseded by ... / dropped intentionally / folded into TE-X) get appended as the walk continues.
