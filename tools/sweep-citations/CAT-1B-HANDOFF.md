@@ -2,6 +2,10 @@
 
 **Read this before you let `sweep-citations` write to disk.**
 
+**See `tools/README.md` for the full sweep-citations runbook**
+(dry-run-first procedure, hazard notes, Cat-1b classification rule,
+and recovery steps if you forget `-n`).
+
 `sweep-citations` is a regex-based mechanical Cat-2 tool. It cannot
 distinguish a *current pointer* (Cat-2 -- sweep) from a *historical
 quotation* (Cat-1b -- leave) by looking at the surrounding text. The
