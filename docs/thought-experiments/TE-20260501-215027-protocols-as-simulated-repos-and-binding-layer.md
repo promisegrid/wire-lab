@@ -418,6 +418,48 @@ This TE relies on (TE-28):
   signing (OQ-29.5) is permitted but does not subsume session/message
   signing.
 
+## Refinements
+
+### 2026-05-07 -- Vocabulary refactor and L6 CAS subtree (TE-38)
+
+Three navigational forward-pointers, all locked in
+[TE-38](TE-20260506-184800-substrate-agnostic-layered-model.md)
+and its parent TODO
+(`protocols/wire-lab.d/TODO/TODO-20260506-184800-te-38-substrate-agnostic-layered-model.md`):
+
+1. **Path-level-2 vocabulary is now "feed" not "binding".** TE-29's
+   `<binding-pCID>` level is renamed to `<feed-pCID>`. Same level,
+   same role, same path position; the rename matches the L5/feed
+   layer naming locked in TE-38 and reflected in conversation
+   memory since 2026-05-04. Cat-1b applies to existing locked-DI
+   quotations elsewhere in the corpus: those keep "binding" inside
+   the quote. Forward-going text uses "feed".
+
+2. **Path-level-3 vocabulary is now "group" not "forum".** Same
+   role, same level. "Forum" remains acceptable in human prose;
+   path components and spec filenames use "group".
+
+3. **L6 CAS subtree extends the path scheme.** TE-38 locks the
+   shape `cas/<cas-protocol-pCID>/<chunk-cid>` as the canonical
+   chunk-storage location, and locks that every message file in
+   `transports/` is unconditionally a CBOR pointer
+   `{cas: <cas-protocol-pCID>, root: <chunk-cid>}`. There is no
+   size-based exception. TE-29's body above stops at five path
+   levels; TE-38 adds the L6 indirection without changing those
+   five. The `transports/wire-lab-devs-draft/` inline-message
+   files in the current tree are pre-CAS draft state; their
+   migration to pointer-and-CAS form is anticipated TE-43.
+
+This is a Cat-3 navigational refinement under the editing policy
+locked in `DI-020-20260502-213103` (and its `## Refinements` chain
+on TE-34). The TE-29 body above is unchanged: the locked shape,
+the layer decomposition, the binding-layer responsibilities, the
+send/receive walk-through, and the recommendation all remain as
+first drafted. The Refinement only adds forward pointers to the
+vocabulary and L6 extension so a single-TE reader can find the
+current state without reading TE-38. No DI is filed for this
+Refinement; the substantive lock lives in TE-38.
+
 ## Recommendation
 
 Adopt the locked shape and the layer decomposition. Track the five

@@ -97,7 +97,7 @@ resulting product is committed and pushed.
     resolved: 2026-05-06 @ 10ecc77
     product: this TODO file records the lock; TE-29 Cat-3 entry will be drafted in the TE-38 commit cycle
 
-- [ ] **Q-22.6** DF-38.M: where does L6 CAS fit in TE-29's path scheme?
+- [x] **Q-22.6** DF-38.M: where does L6 CAS fit in TE-29's path scheme?
     opened: 2026-05-06 22:58 UTC
     asked of: stevegt@t7a.org
     blocks: TE-38 -- whether the path scheme needs an L6 level or stays 5-deep
@@ -117,6 +117,11 @@ resulting product is committed and pushed.
           Steve flagged the small/large asymmetry at 17:54 PT;
           Alt-M.4 added with revised recommendation pending Steve's
           confirmation.
+    answered: 2026-05-07 01:00 UTC -- Alt-M.4
+    resolved: 2026-05-07 -- TE-38 drafted with locked Alt-M.4 shape;
+              TE-29 Cat-3 Refinement filed citing TE-38; TODO 22
+              Q-22.6 checked off.
+    product: docs/thought-experiments/TE-20260506-184800-substrate-agnostic-layered-model.md (new TE-38 doc), docs/thought-experiments/TE-20260501-215027-protocols-as-simulated-repos-and-binding-layer.md (Cat-3 Refinement section appended)
 
 - [x] **Q-22.7** OPEN-THREADS.md migration scope: which deprecation shape?
     opened: 2026-05-06 23:08 UTC
