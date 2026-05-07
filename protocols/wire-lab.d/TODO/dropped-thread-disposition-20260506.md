@@ -321,3 +321,17 @@ Item 011.10 — follow-on TE on peer-level adoption metadata. "Missing half of T
 ## Phase 2 next step
 
 Steve reviews this file, corrects dispositions where the bot got it wrong, and approves the TE drafting order. Then TE-sihih drafting begins (already-accumulated 30+ DFs from turns 172-178; needs scope reduction to 3-5 anchor DFs per the apparatus-vs-specimen / TE-editing-policy precedent).
+
+## Parked-twig disposition (turn 314, 2026-05-07)
+
+**Twig:** `ppx/te-20260504-170746-session-replay-cleanup` (55 commits ahead of merge-base `8d3bf04`; never pushed to remote)
+
+**Disposition:** **Abandon.** All substantive content from this twig is already present on `ppx/main` after the TE-mumuv (TE-39) proquint-handle migration completed on 2026-05-07.
+
+**Verification method:** Bot built a normalizer (`/tmp/normalize_v2.py`) that reads the `## Prior aliases` section of every TE and TODO file on `ppx/main` to build a complete alias map (71 integer/timestamp/zero-padded/space-form variants → proquint handles, plus full timestamp-style filenames → proquint-style filenames). The normalizer was applied to both sides of every changed file pair, then diffed.
+
+Across 100+ changed files: 28 pairs are byte-identical post-normalization; 52 pairs have only main-side additions (post-twig progress on `ppx/main`: TE-39 schema upgrades, the `## Prior aliases` sections themselves, the `wire-lab-devs-draft/` directory rename per DF-38.5, the master TODO.md schema upgrade, post-twig new TODO mints, AGENTS-codex/AGENTS-ppx convention updates, and the TE-titur 2026-05-07 Cat-3 Refinement); 14 pairs have small twig-only residuals, all of which were sampled and verified as either old-form metadata fields (`## TE ID:` body value, `decided` vs `decided, refined` status field) or unhandleable variant forms ("TODO-dinub+" range form, "TODO 020 once" prose) that have been replaced on main, never lost.
+
+Zero substantive twig-only authoring exists. The earlier-session work that lives on this twig — pre-149 audit (5 drops), pre-18 audit (0 drops), turns 149-192 chronological walk (186 UTs), the four large research/discussion docs (`historical-networks-20260503`, `nested-vs-stacked-envelopes-20260504`, `session-replay-72hr-ledger-20260504`, `congruence-convergence-and-the-grid` essay) — is byte-identical with `ppx/main` after normalization. The disposition output of that walk is captured in this very file.
+
+**Action (Alt-B, ceremonial closure):** Merge `ppx/te-20260504-170746-session-replay-cleanup` into `ppx/main` with `--no-ff`, resolving every conflict in favor of `ppx/main`'s version (recursive strategy `ours`). The merge produces a tree byte-identical to pre-merge `ppx/main` except for one orphan integer-form file (`TODO-20260504-170746-session-replay-cleanup.md`), which is removed in the immediately-following commit so the post-merge tree equals pre-merge `ppx/main` exactly. Then delete the twig locally. No remote refs to clean up.
