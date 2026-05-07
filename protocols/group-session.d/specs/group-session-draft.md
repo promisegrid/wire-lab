@@ -14,20 +14,20 @@ The outer convention — that transport directories live under `transports/` key
 
 This spec is locked by the conclusions of:
 
-- [TE-24](../docs/thought-experiments/TE-20260430-204108-group-transport-envelope.md): the group-transport envelope: `grid <pcid>` carrier, canonical-bytes rules, explicit-promise body requirement, and `Date`/`From` as conveniences. The TODO 013 carve-out supersedes the original `Prev-Message-CID:`, `IHave:`, and `Kind:` headers from the TE's first drafting; the locked v0 contract uses `Parents:` (DAG links), body-level acknowledgement (receipts), and no `Kind:` header. The `Message-ID:` header described in TE-24 is also dropped: under §2 (filename = CID), the message CID is the message's identifier and a separate human-readable identifier creates two competing identities for the same message and is omitted.
-- [TE-26](../docs/thought-experiments/TE-20260430-215624-channel-transport-types-and-threaded-replies.md): the conceptual shift to DAG-shaped message graphs (zero-or-more parents per message).
-- [TE-27](../docs/thought-experiments/TE-20260501-021921-transports-rename-and-axes-of-differentiation.md): the per-axis meta-rule that locks small-finite-closed-group with N≥2 as a single protocol class (cardinality is a parameter, not a contract boundary, except at extremes).
+- [TE-hogus](../docs/thought-experiments/TE-hogus-group-transport-envelope.md): the group-transport envelope: `grid <pcid>` carrier, canonical-bytes rules, explicit-promise body requirement, and `Date`/`From` as conveniences. The TODO 013 carve-out supersedes the original `Prev-Message-CID:`, `IHave:`, and `Kind:` headers from the TE's first drafting; the locked v0 contract uses `Parents:` (DAG links), body-level acknowledgement (receipts), and no `Kind:` header. The `Message-ID:` header described in TE-hogus is also dropped: under §2 (filename = CID), the message CID is the message's identifier and a separate human-readable identifier creates two competing identities for the same message and is omitted.
+- [TE-zalut](../docs/thought-experiments/TE-zalut-channel-transport-types-and-threaded-replies.md): the conceptual shift to DAG-shaped message graphs (zero-or-more parents per message).
+- [TE-junil](../docs/thought-experiments/TE-junil-transports-rename-and-axes-of-differentiation.md): the per-axis meta-rule that locks small-finite-closed-group with N≥2 as a single protocol class (cardinality is a parameter, not a contract boundary, except at extremes).
 - [DR-009](../DR/DR-009-20260430-204108-group-transport-envelope.md): the active decision request governing the group-transport envelope and the freeze gate.
 
 ## What this spec covers
 
 A **group transport** under this protocol class is:
 
-- **N≥2 participants.** Cardinality is a parameter; the contract does not change between N=2 and small-finite-closed-N. Very-large or unbounded membership is out of scope (see TE-27 axis A: it crosses a contract boundary).
+- **N≥2 participants.** Cardinality is a parameter; the contract does not change between N=2 and small-finite-closed-N. Very-large or unbounded membership is out of scope (see TE-junil axis A: it crosses a contract boundary).
 - **Closed.** Membership is fixed at transport creation. New members do not join an existing instance; if membership changes, a new transport instance is minted.
-- **All-see-all visibility.** Every participant observes every message. There is no hub mediation, no subset addressing, no topic filtering. (TE-27 axis B: visibility is a contract boundary; this protocol picks all-see-all.)
-- **Multi-writer DAG of messages.** Any participant may post at any time. Messages cite zero or more prior messages as parents, forming a DAG. There is no single-writer ordering. (TE-27 axis F: message-graph shape is a parameter within this spec.)
-- **Append-only persistence.** Once a message file is committed to a transport directory, it is not modified or deleted. Compaction, retention bounds, and ephemerality are out of scope. (TE-27 axis E: persistence is a parameter; this protocol picks append-only.)
+- **All-see-all visibility.** Every participant observes every message. There is no hub mediation, no subset addressing, no topic filtering. (TE-junil axis B: visibility is a contract boundary; this protocol picks all-see-all.)
+- **Multi-writer DAG of messages.** Any participant may post at any time. Messages cite zero or more prior messages as parents, forming a DAG. There is no single-writer ordering. (TE-junil axis F: message-graph shape is a parameter within this spec.)
+- **Append-only persistence.** Once a message file is committed to a transport directory, it is not modified or deleted. Compaction, retention bounds, and ephemerality are out of scope. (TE-junil axis E: persistence is a parameter; this protocol picks append-only.)
 - **Receipts in message bodies.** Acknowledgement is a kind of message body, not a header. There is no `IHave:` header. (See §6.)
 
 ## The v0 message contract
@@ -122,7 +122,7 @@ Future versions of this spec MAY add headers; they will be inserted at locked po
 
 #### §4.8 No `Kind:` header
 
-This protocol does NOT have a `Kind:` header. The original TE-24 sketch included one as a human-oriented convenience; on review, message kind is presentational and varies per use case, so it is left to body convention rather than an envelope field. (Q1 in TODO 013 carve-out, locked Alt-Q1.A.)
+This protocol does NOT have a `Kind:` header. The original TE-hogus sketch included one as a human-oriented convenience; on review, message kind is presentational and varies per use case, so it is left to body convention rather than an envelope field. (Q1 in TODO 013 carve-out, locked Alt-Q1.A.)
 
 #### §4.9 No `IHave:` header
 

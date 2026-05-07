@@ -15,20 +15,20 @@ review immediately after TE-29 landed, found to be substantially
 unnecessary. This file exists so the integer slot 015 is not orphaned
 and so a future contributor finds an explanation rather than a gap.
 
-## Original intent (from TE-29)
+## Original intent (from TE-vipir)
 
 > Inline current `DR/`, `TODO/`, `DI/` content as sections inside the
 > relevant protocol spec doc. Per-protocol DRs/TODOs go to that
 > protocol's spec; harness-level go to wire-lab harness spec.
 
 The premise was that three top-level directories (`DR/`, `TODO/`,
-`DI/`) needed to be absorbed into protocol spec docs to honor TE-29's
+`DI/`) needed to be absorbed into protocol spec docs to honor TE-vipir's
 locked shape, which puts decisions, open work, and don't-touch
 invariants inside the relevant protocol's spec.
 
 ## Why retired
 
-On checking the actual repo state immediately after TE-29 landed:
+On checking the actual repo state immediately after TE-vipir landed:
 
 1. **`DR/` does not exist as a top-level directory.** Decision-Record
    identifiers (DR-001, DR-009, etc.) live as filename prefixes
@@ -51,8 +51,8 @@ On checking the actual repo state immediately after TE-29 landed:
 4. **The harness spec already absorbs decisions and open questions
    inline.** Section 11 (Decisions) and section 12 (Open Questions)
    of `specs/harness-spec-draft.md` already serve the role TODO 015
-   would have created. They were authored before TE-29 and continue
-   to work after TE-29.
+   would have created. They were authored before TE-vipir and continue
+   to work after TE-vipir.
 
 Net: the original concern was real (top-level directories should not
 mix harness meta-process with protocol content) but the
@@ -62,7 +62,7 @@ correctly placed as harness-level meta-process anyway.
 
 ## What was kept from this concern
 
-- TE-29 step 4 of TODO 014 already moves per-protocol TEs out of the
+- TE-vipir step 4 of TODO 014 already moves per-protocol TEs out of the
   top-level `docs/thought-experiments/` into the appropriate
   `protocols/<slug>.d/docs/thought-experiments/`. That captures the
   per-protocol-content-belongs-with-its-protocol intuition that
@@ -74,7 +74,7 @@ correctly placed as harness-level meta-process anyway.
 
 ## Provenance
 
-- TE-29 first-drafted at 2026-05-01 21:50:27 UTC.
+- TE-vipir first-drafted at 2026-05-01 21:50:27 UTC.
 - TODO 015 retirement decided 2026-05-01 22:58 UTC (same session).
-- The TE-29 prose at "Migrations triggered by this TE" item 2 has
+- The TE-vipir prose at "Migrations triggered by this TE" item 2 has
   been annotated to point here.

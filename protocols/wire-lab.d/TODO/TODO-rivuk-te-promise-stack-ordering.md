@@ -1,4 +1,4 @@
-# TODO 005 - TE-1 Promise-stack ordering: drive to DI
+# TODO 005 - TE-famar Promise-stack ordering: drive to DI
 
 ## Prior aliases
 
@@ -25,6 +25,6 @@ Track the work to drive TE-1 (`docs/thought-experiments/TE-20260427-180000-promi
 
 ## Notes
 
-- TE-1 carries the full alternative analysis (Alt-A through Alt-E) and the six scenarios (S1-S6) that drove the recommended set. This file does not duplicate that analysis; it tracks the decision-driving work.
+- TE-famar carries the full alternative analysis (Alt-A through Alt-E) and the six scenarios (S1-S6) that drove the recommended set. This file does not duplicate that analysis; it tracks the decision-driving work.
 - The recommended set is `(1.1.a, 1.2.c, 1.3.a, 1.4.d)` per the TE. Reason: maximally additive, leaves room for assertion-type specialization, doesn't lock down what isn't yet known.
 - Linked DR: `DR/DR-006-20260429-164729-promise-stack-ordering.md`.

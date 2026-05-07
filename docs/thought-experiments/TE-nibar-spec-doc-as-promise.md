@@ -1,10 +1,10 @@
-# TE-21: Spec doc as promise
+# TE-nibar: Spec doc as promise
 
 *Thought experiment, part of the [PromiseGrid Wire Lab](../../protocols/wire-lab.d/specs/harness-spec-draft.md). This file is content-addressable; its hash is its pCID.*
 
 ## TE ID
 
-TE-20260429-173520
+TE-nibar
 
 (First drafted 2026-04-29 17:35:20 UTC.)
 
@@ -245,5 +245,5 @@ The recommended set is (1.a, 2.a, 3.a, 4.a). Reason: lock the layered framing fu
 ## Implications for follow-on work
 
 - **TODO 010 (provisional, after DF):** Lock the spec-doc-as-promise vocabulary as DI entries. Update `specs/harness-spec-draft.md` to add (or formalize) the three normative sections: Assumptions, Open Questions, Known Issues. Surface them as required structure for any future sibling spec docs.
-- **TE-22 (planned):** Spec-doc-store layout — should sibling protocol docs live in a `specs/` directory? How do specs reference each other by pCID? Does `specs/harness-spec-draft.md` itself migrate? Deferred until TE-21 lands so the vocabulary is settled before the layout work.
+- **TE-rujak (planned):** Spec-doc-store layout — should sibling protocol docs live in a `specs/` directory? How do specs reference each other by pCID? Does `specs/harness-spec-draft.md` itself migrate? Deferred until TE-nibar lands so the vocabulary is settled before the layout work.
 - **TODO 006 (existing):** DI-provenance backfill for `specs/harness-spec-draft.md` settled statements. The Alt-E framing reshapes this work: settled statements need DI provenance because they're load-bearing parts of the doc's promise; open questions need DR provenance for the same reason. The two existing TODOs (006 and 007) become two halves of "make the doc-level promise explicit and audit-able."

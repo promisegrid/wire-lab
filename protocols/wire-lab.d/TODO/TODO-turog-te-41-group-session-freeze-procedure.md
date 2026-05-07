@@ -1,4 +1,4 @@
-# TODO 26: TE-41 group-session freeze procedure
+# TODO-turog: TE-41 group-session freeze procedure
 
 ## Prior aliases
 
@@ -19,8 +19,8 @@ No twig yet.
 Freeze chain for group-session and outer transport-spec. Carved from
 T-021-TODO12 closure.
 
-Scope: TODO 12 subtask 012.8 lists this work but it is wider than
-TODO 12. Sequence:
+Scope: TODO-bisur subtask 012.8 lists this work but it is wider than
+TODO-bisur. Sequence:
   1. Freeze `protocols/wire-lab.d/specs/transport-spec-draft.md` (its
      own freeze gate must clear first).
   2. Freeze `protocols/group-session.d/specs/group-session-draft.md`
@@ -36,7 +36,7 @@ Blocking: outer transport-spec-draft.md has its own freeze gate;
 nothing else gates this thread today.
 
 Anchor: group-session-draft.md § Freeze gate; transport-spec-draft.md
-§ Freeze gate; TODO 12 subtask 012.8.
+§ Freeze gate; TODO-bisur subtask 012.8.
 Disposition-file pointer: `dropped-thread-disposition-20260506.md`
 § TE-41 cluster (15 UTs).
 

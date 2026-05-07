@@ -52,7 +52,7 @@ Per Steve's correction this session, the wire-lab harness is **lab apparatus**. 
 | §7.6 Adversarial-by-default review | 344–346 | Apparatus | Shadow-adversary acceptance gate. Stays. |
 | §8 Thought Experiments index | 350–387 | Apparatus | Cross-references to docs/thought-experiments/. Stays (entries themselves may need link updates as protocols carve out, but the index is apparatus-level). |
 | §9 Realism Suggestions | 391–421 | Apparatus | Cross-cutting realism advice. Stays. |
-| §10 grid-poc directory table | 425–440 | Ambiguous | Names `x/wire-v2/promstack/` as the home of the promise-stack library and `x/wire-v2/trust/` as the home of trust primitives. After the protocol carve-out, those become **implementations** of specimens, not harness components. Apparatus-level reframe: "harness fixtures live under `x/sims/...`; specimen implementations live alongside `implementations/<impl-name>/` per TE-32." Stays in some form, but rows for `promstack` and `trust` migrate. |
+| §10 grid-poc directory table | 425–440 | Ambiguous | Names `x/wire-v2/promstack/` as the home of the promise-stack library and `x/wire-v2/trust/` as the home of trust primitives. After the protocol carve-out, those become **implementations** of specimens, not harness components. Apparatus-level reframe: "harness fixtures live under `x/sims/...`; specimen implementations live alongside `implementations/<impl-name>/` per TE-liviv." Stays in some form, but rows for `promstack` and `trust` migrate. |
 | §10a.1 Specs may be prose, structured, or both | 454–463 | Apparatus | Methodology. Stays. |
 | §10a.2 Proposals are messages | 465–476 | **Specimen-leaning** | "A proposal is a promise stack like any other message" presumes promise-stack envelope. Reframe at apparatus-level: "a proposal is a message in whatever envelope the host transport carries; the proposal-checklist convention is content-level, not envelope-level." Move envelope-specific text out. |
 | §10a.3 Endorsement/contest/counter-propose | 478–488 | Specimen-leaning | "endorse-v1 / contest-v1 / counter-propose-v1" pCIDs; these are themselves protocols and belong in their own `protocols/...d/` directories (or in `protocols/ppx-dr.d/`). The discourse-vocabulary as a *requirement on the apparatus* (the harness must support proposal/endorse/contest workflows) stays; specific pCIDs and named handlers move out. |
@@ -72,7 +72,7 @@ Per Steve's correction this session, the wire-lab harness is **lab apparatus**. 
 
 The clearest specimen-level prescriptions, in priority order for migration:
 
-1. **§1.1 Promise struct + `[]Promise` message shape + `promstack` Wrap/Peel/Project library API.** Belongs in a (not-yet-existing) `protocols/promise-stack.d/specs/promise-stack-draft.md`. TE-1 (promise-stack ordering) already exists and would relocate to that protocol's TE corpus.
+1. **§1.1 Promise struct + `[]Promise` message shape + `promstack` Wrap/Peel/Project library API.** Belongs in a (not-yet-existing) `protocols/promise-stack.d/specs/promise-stack-draft.md`. TE-famar (promise-stack ordering) already exists and would relocate to that protocol's TE corpus.
 
 2. **§1.2 Why this is better than a fixed envelope.** Argument for the promise-stack hypothesis. Belongs in the same promise-stack spec doc or TE.
 
@@ -86,7 +86,7 @@ The clearest specimen-level prescriptions, in priority order for migration:
 
 7. **§7.1 transport-promise as outermost frame.** Reframe at apparatus-level (edge annotates with observed metadata; placement in the candidate envelope is the specimen's concern).
 
-8. **§10 grid-poc directory rows for `promstack` and `trust`.** Migrate to per-implementation table once `implementations/<impl-name>/` directories exist (per TE-32).
+8. **§10 grid-poc directory rows for `promstack` and `trust`.** Migrate to per-implementation table once `implementations/<impl-name>/` directories exist (per TE-liviv).
 
 9. **§10a.2/§10a.3/§10a.6 named pCIDs and assertion types** (`endorse-v1`, `contest-v1`, `counter-propose-v1`, `hypothesis-result-v1`, etc.). Move to whichever protocol owns the discourse vocabulary; likely `protocols/ppx-dr.d/`.
 
@@ -104,11 +104,11 @@ The clearest specimen-level prescriptions, in priority order for migration:
 
 Per the 6-step corrected plan, step 2 is to file a harness-level TE on the apparatus-vs-specimen split itself (alternatives: strict carve-out, mixed/hybrid, registry-of-knobs). That TE should reference this audit by tree-hash once committed and use the section-by-section table above as input. The TE's tabletop scenarios should walk Alice, Bob, Carol, Dave, Ellen, Frank, Mallory through (1) reading §1.1 today, (2) reading §1.1 after carve-out, (3) attempting to add a second envelope hypothesis that competes with the promise-stack, (4) attempting to fork the promise-stack hypothesis, (5) Mallory injecting a malicious envelope claim, (6) a 30-years-later contributor finding the harness-spec but not the carved-out protocol specs.
 
-After step 2 locks the carve-out shape, step 3 creates the protocol directory (`protocols/promise-stack.d/`), step 4 sweeps harness-spec under Cat-1a/Cat-2 of the editing policy citing the new DI, step 5 reframes TODO 5 under the promise-stack protocol's TODO/, step 6 files a parallel TODO for the `grid([pcid, payload])` envelope hypothesis.
+After step 2 locks the carve-out shape, step 3 creates the protocol directory (`protocols/promise-stack.d/`), step 4 sweeps harness-spec under Cat-1a/Cat-2 of the editing policy citing the new DI, step 5 reframes TODO-rivuk under the promise-stack protocol's TODO/, step 6 files a parallel TODO for the `grid([pcid, payload])` envelope hypothesis.
 
 ## Companion file pending audit
 
-`protocols/wire-lab.d/specs/transport-spec-draft.md` (≈9 KB) likely contains analogous specimen-vs-apparatus crossings (transport-spec is meant to be apparatus-level per TE-26/TE-27/TE-29, but probably names specific binding shapes inline). Not audited in this memo; flag for follow-on audit before step 4.
+`protocols/wire-lab.d/specs/transport-spec-draft.md` (≈9 KB) likely contains analogous specimen-vs-apparatus crossings (transport-spec is meant to be apparatus-level per TE-zalut/TE-junil/TE-vipir, but probably names specific binding shapes inline). Not audited in this memo; flag for follow-on audit before step 4.
 
 ## What is NOT recommended
 

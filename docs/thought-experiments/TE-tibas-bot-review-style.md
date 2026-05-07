@@ -1,10 +1,10 @@
-# TE-20: Bot review style
+# TE-tibas: Bot review style
 
 *Thought experiment, part of the [PromiseGrid Wire Lab](../../protocols/wire-lab.d/specs/harness-spec-draft.md). This file is content-addressable; its hash is its pCID.*
 
 ## TE ID
 
-TE-20260429-165103
+TE-tibas
 
 (First drafted 2026-04-29 16:51:03 UTC, retrospective-style: this TE was authored after the corresponding DI was already locked, in response to the conditions on `review-20260429-162212-steve-traugott.md` for `ppx/dr-001-bootstrap`.)
 
@@ -26,7 +26,7 @@ How should the bot's proposal-and-review ceremony be shaped so that the decision
 ## Setup
 
 - The bot pushes to `ppx/{twig}` branches; Steve merges to `main`.
-- Branch protection is Alt-B from TE-19 (no GitHub PR requirement).
+- Branch protection is Alt-B from TE-mipat (no GitHub PR requirement).
 - PromiseGrid is the long-term substrate; the workflow must port to it cleanly.
 - `protocols/wire-lab.d/specs/harness-spec-draft.md` already defines DR/DI as the in-repo record format.
 
@@ -42,7 +42,7 @@ How should the bot's proposal-and-review ceremony be shaped so that the decision
 
 ## Selection
 
-Alt-α as the base review style; Alt-δ as the durable-review-reply layer on top of it. The locked decision for Alt-α is `DI-001-20260428-195702` in `protocols/wire-lab.d/TODO/TODO-20260429-030146-perplexity-computer-onboarding.md`, supporting DR `DR/DR-003-20260428-195700-review-style.md`. The Alt-δ layer is `DI-003-20260429-162212` / `DR-005`. Together they form the bot review ceremony in this repo.
+Alt-α as the base review style; Alt-δ as the durable-review-reply layer on top of it. The locked decision for Alt-α is `DI-001-20260428-195702` in `protocols/wire-lab.d/TODO/TODO-dutaz-perplexity-computer-onboarding.md`, supporting DR `DR/DR-003-20260428-195700-review-style.md`. The Alt-δ layer is `DI-003-20260429-162212` / `DR-005`. Together they form the bot review ceremony in this repo.
 
 ## Decision status
 

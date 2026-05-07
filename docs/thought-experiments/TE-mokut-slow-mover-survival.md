@@ -1,4 +1,4 @@
-# TE-10: Slow-mover survival
+# TE-mokut: Slow-mover survival
 
 ## Prior aliases
 

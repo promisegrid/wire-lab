@@ -1,10 +1,10 @@
-# TE-23: Congruence/convergence duality and pCID framing
+# TE-lozip: Congruence/convergence duality and pCID framing
 
 *Thought experiment, part of the [PromiseGrid Wire Lab](../../protocols/wire-lab.d/specs/harness-spec-draft.md). This file is content-addressable; its hash is its pCID.*
 
 ## TE ID
 
-TE-20260430-064307
+TE-lozip
 
 (First drafted 2026-04-30 06:43:07 UTC.)
 
@@ -36,14 +36,14 @@ The four open Decision Framing questions are:
 - **DF-23.1 pCID hash content.** Is the grid's top-level pCID the hash of a spec doc, the hash of code, both, or neither?
 - **DF-23.2 Inner-CID slot at top level.** Does the harness-spec name an "inner-CID" slot (hCID, fCID, cCID, etc.) at the top level of the grid's vocabulary, or is naming such things deferred to per-protocol specs?
 - **DF-23.3 Duality framing in the harness-spec.** Does the harness-spec acknowledge the congruence/convergence duality as foundational framing, with the essay as a referenced source — and if so, with how much weight?
-- **DF-23.4 Equivalence-theorem follow-on.** Does the wire-lab open a separate research-flavored TE (TE-24) on the shape of a Church-Turing-equivalent congruence-convergence equivalence theorem, or does that work happen elsewhere (or not at all)?
+- **DF-23.4 Equivalence-theorem follow-on.** Does the wire-lab open a separate research-flavored TE (TE-hogus) on the shape of a Church-Turing-equivalent congruence-convergence equivalence theorem, or does that work happen elsewhere (or not at all)?
 
 ## Assumptions
 
-- A `Promise` in this repo is an autonomous speech act — an assertion of state in the past, present, or future, often conditional. (Carried from TE-21; locked.)
-- A `pCID` is a CIDv1 hash of a spec document's bytes. Two parties claim to "speak protocol pCID X" when each implements the rules in the document whose CIDv1 is X. (Carried from `protocols/wire-lab.d/specs/harness-spec-draft.md` §1 and TE-22.)
-- Spec docs are layered promises (TE-21 Alt-E): the doc itself promises future interop conditional on its assumptions/open-questions/known-issues lists, and each peer separately promises to behave as the doc says.
-- TE-22 has locked the operational machinery for freezing, hashing, storing, citing, and replacing spec docs. The pCID-hashes-the-spec choice is therefore *already implemented* on disk; this TE asks whether to *acknowledge* that choice as foundational framing rather than incidental.
+- A `Promise` in this repo is an autonomous speech act — an assertion of state in the past, present, or future, often conditional. (Carried from TE-nibar; locked.)
+- A `pCID` is a CIDv1 hash of a spec document's bytes. Two parties claim to "speak protocol pCID X" when each implements the rules in the document whose CIDv1 is X. (Carried from `protocols/wire-lab.d/specs/harness-spec-draft.md` §1 and TE-rujak.)
+- Spec docs are layered promises (TE-nibar Alt-E): the doc itself promises future interop conditional on its assumptions/open-questions/known-issues lists, and each peer separately promises to behave as the doc says.
+- TE-rujak has locked the operational machinery for freezing, hashing, storing, citing, and replacing spec docs. The pCID-hashes-the-spec choice is therefore *already implemented* on disk; this TE asks whether to *acknowledge* that choice as foundational framing rather than incidental.
 - The framing essay at `docs/essays/congruence-convergence-and-the-grid.md` exists and is the source-of-truth document for the duality framing. This TE references it; it does not duplicate it.
 - Steve has stated (chat 2026-04-29) that hCID/fCID/cCID names "stay inside the protocol that uses them, not promoted to harness-spec top-level vocabulary," following the principle "Let each protocol name its own internals." DF-23.2 records that decision rather than re-litigating it; the question under test is whether the harness-spec should *mention* the principle (as opposed to silently embodying it).
 - Steve has stated (chat 2026-04-29) that the pCID is "a protocol CID, not a promise CID" — content hash of a SPEC document. DF-23.1 records that decision; the question under test is whether the harness-spec should formally state this as foundational framing rather than as an in-passing definition.
@@ -59,9 +59,9 @@ What does a top-level pCID hash?
 
 #### Alt-1.A: Hash of the spec document (status quo, already implemented)
 
-A pCID is the CIDv1 hash of a spec document's bytes (per TE-22). Two peers "speak protocol pCID X" when each promises to behave according to the rules in the document whose CIDv1 is X. Multiple implementations of the same protocol can exist (Go, Rust, hand-rolled C); each is a separate piece of code that promises to honor the spec, not a separate protocol.
+A pCID is the CIDv1 hash of a spec document's bytes (per TE-rujak). Two peers "speak protocol pCID X" when each promises to behave according to the rules in the document whose CIDv1 is X. Multiple implementations of the same protocol can exist (Go, Rust, hand-rolled C); each is a separate piece of code that promises to honor the spec, not a separate protocol.
 
-- **Easier:** matches the formalism-neutral framing in the essay. The pCID is the agreement; the agreement is a thing autonomous agents can promise about, regardless of whether their promise is about trajectory (congruence-style: "I run the exact code at hash Y") or attractor (convergence-style: "I behave as the spec says, by whatever local means"). Multiple implementations are first-class. Already implemented in TE-22.
+- **Easier:** matches the formalism-neutral framing in the essay. The pCID is the agreement; the agreement is a thing autonomous agents can promise about, regardless of whether their promise is about trajectory (congruence-style: "I run the exact code at hash Y") or attractor (convergence-style: "I behave as the spec says, by whatever local means"). Multiple implementations are first-class. Already implemented in TE-rujak.
 - **Harder:** if a specific protocol genuinely requires byte-identical implementations (e.g., a deterministic-replay protocol where any deviation would corrupt the trajectory), that protocol must encode the requirement *inside* its spec, typically by saying "my payloads are addressed to inner code-hashes and my receivers run that exact code." The grid does not enforce code-identity at the top level; the protocol enforces it one level down. This is correct on the merits but is one extra step compared to "the protocol IS the code."
 
 #### Alt-1.B: Hash of the code that implements the protocol
@@ -137,7 +137,7 @@ The harness-spec adds a single short paragraph (in §1 or in a "Background" sect
 
 #### Alt-3.C: Vocabulary-only — duality acknowledged through term choice, no explicit section
 
-The harness-spec does not call out the duality explicitly, but its vocabulary choices reflect it: pCID hashes a spec doc (Alt-1.A); promises span past/present/future (already locked); peers are autonomous (already locked); spec-as-promise framing (TE-21). The essay exists at `docs/essays/congruence-convergence-and-the-grid.md` and is discoverable by anyone who reads the repo top-down, but the harness-spec does not link to it.
+The harness-spec does not call out the duality explicitly, but its vocabulary choices reflect it: pCID hashes a spec doc (Alt-1.A); promises span past/present/future (already locked); peers are autonomous (already locked); spec-as-promise framing (TE-nibar). The essay exists at `docs/essays/congruence-convergence-and-the-grid.md` and is discoverable by anyone who reads the repo top-down, but the harness-spec does not link to it.
 
 - **Easier:** keeps the harness-spec terse and protocol-mechanics-focused. The duality is "in the design" but not "on the page." Readers who want the framing find the essay through the docs/ tree.
 - **Harder:** readers of the harness-spec in isolation (which is how most spec readers arrive) get no clue that the framing exists. The deliberate formalism-neutrality of pCID-as-spec-hash looks arbitrary rather than principled. Misses the chance to plant a flag.
@@ -151,30 +151,30 @@ The harness-spec does not acknowledge the duality. The essay exists in the repo 
 
 ### DF-23.4: Equivalence-theorem follow-on
 
-Does the wire-lab open a separate research-flavored TE (TE-24) on the shape of a Church-Turing-equivalent congruence-convergence equivalence theorem?
+Does the wire-lab open a separate research-flavored TE (TE-hogus) on the shape of a Church-Turing-equivalent congruence-convergence equivalence theorem?
 
-#### Alt-4.A: Open TE-24 now, research-flavored
+#### Alt-4.A: Open TE-hogus now, research-flavored
 
-A follow-on TE — TE-24 — is opened immediately to work out: (i) candidate definitions of "effectively administrable infrastructure"; (ii) candidate formal models for the two formalisms (ordered journals replayed under host promise; autonomous-agent promise systems with convergence dynamics); (iii) the smallest cases in which the equivalence claim could be tested in simulation; (iv) the obstructions that would, if found, refute the equivalence.
+A follow-on TE — TE-hogus — is opened immediately to work out: (i) candidate definitions of "effectively administrable infrastructure"; (ii) candidate formal models for the two formalisms (ordered journals replayed under host promise; autonomous-agent promise systems with convergence dynamics); (iii) the smallest cases in which the equivalence claim could be tested in simulation; (iv) the obstructions that would, if found, refute the equivalence.
 
-- **Easier:** keeps the thread alive while the conversation is fresh. Aligns research effort with implementation work (TE-24 can run in parallel with concrete wire-lab development). Plants a stake the wire-lab can be held to.
+- **Easier:** keeps the thread alive while the conversation is fresh. Aligns research effort with implementation work (TE-hogus can run in parallel with concrete wire-lab development). Plants a stake the wire-lab can be held to.
 - **Harder:** research-flavored TEs may not converge to a DI for a long time, possibly never. They risk distracting from concrete wire-lab work. The wire-lab may not have the resources or the right contributors to push a theorem-shaped question to completion.
 
-#### Alt-4.B: Open TE-24 later, when the wire-lab has more concrete protocols to test against
+#### Alt-4.B: Open TE-hogus later, when the wire-lab has more concrete protocols to test against
 
-TE-24 is on the roadmap but not opened now. The reasoning: a formal equivalence claim is most testable when there are concrete protocols (one congruence-shaped, one convergence-shaped) to model in simulation. Until both shapes exist, the equivalence is a thought experiment without test material.
+TE-hogus is on the roadmap but not opened now. The reasoning: a formal equivalence claim is most testable when there are concrete protocols (one congruence-shaped, one convergence-shaped) to model in simulation. Until both shapes exist, the equivalence is a thought experiment without test material.
 
-- **Easier:** lets concrete wire-lab work generate the test material that TE-24 will need. Avoids opening a TE that has nothing actionable in it yet.
-- **Harder:** the thread may go cold. New conversations may overwrite the framing. The researcher who picks TE-24 up later must reload the essay and the original conversations.
+- **Easier:** lets concrete wire-lab work generate the test material that TE-hogus will need. Avoids opening a TE that has nothing actionable in it yet.
+- **Harder:** the thread may go cold. New conversations may overwrite the framing. The researcher who picks TE-hogus up later must reload the essay and the original conversations.
 
-#### Alt-4.C: Don't open TE-24 in the wire-lab; do this work elsewhere
+#### Alt-4.C: Don't open TE-hogus in the wire-lab; do this work elsewhere
 
 The equivalence theorem is too large for a wire-lab TE. It belongs in a separate research project — a paper, a thesis, a different repo — that cites the wire-lab as a substrate but does the formal work on its own footing.
 
 - **Easier:** keeps the wire-lab focused on what it can actually deliver (a working substrate). Avoids the impedance mismatch between TE-flavored design conversations and theorem-shaped formal work.
 - **Harder:** the equivalence work loses the wire-lab's test material (concrete protocols, real promise vocabulary) as a starting point. The researcher who eventually does this work has to re-derive the same framing the essay already articulates.
 
-#### Alt-4.D: Don't open TE-24 at all; treat the equivalence as folklore
+#### Alt-4.D: Don't open TE-hogus at all; treat the equivalence as folklore
 
 The framing essay exists; the equivalence claim is in it; that's enough. No formal follow-on. If someone later proves or refutes the equivalence, that work happens organically in whatever venue makes sense at the time.
 
@@ -227,7 +227,7 @@ A contributor wants to define a protocol where deterministic client code (refere
 - **DF-23.1:** Alt-1.A (top-level pCID hashes the spec) and Alt-1.C (inner CIDs allowed per-protocol) together capture this case cleanly. Alt-1.A says the protocol-as-a-whole is named by its spec's pCID; Alt-1.C says the protocol is free to declare that its payloads are themselves pCIDs (the system message) wrapped in an hCID context (the client code).
 - **DF-23.2:** Alt-2.B or Alt-2.C let the protocol author name its internals freely (some hCID-ish slot for the client code, the existing pCID for the system message).
 - **DF-23.3:** Alt-3.A or Alt-3.B explicitly recognize this as a hybrid shape — congruent code orchestrating a convergent receiver. Alt-3.C and Alt-3.D do not.
-- **DF-23.4:** This shape is one of the most concrete test cases for the equivalence-theorem framing (a deterministic harness orchestrating a non-deterministic responder, observably tracing the same agreement two different ways). Alt-4.A or Alt-4.B keep that test material reachable from a future TE-24.
+- **DF-23.4:** This shape is one of the most concrete test cases for the equivalence-theorem framing (a deterministic harness orchestrating a non-deterministic responder, observably tracing the same agreement two different ways). Alt-4.A or Alt-4.B keep that test material reachable from a future TE-hogus.
 
 S4 verdict: this case shows that DF-23.1's Alt-1.C (allowing inner CIDs per-protocol) is doing real work even when the inner CID is something other than "byte-identical implementation code." Alt-2.B or Alt-2.C handle the protocol's internal naming; Alt-3.A or Alt-3.B make the hybrid shape recognizable.
 
@@ -247,7 +247,7 @@ S5 verdict: Alt-3.A is the strongest defense against drift. Alt-3.B is acceptabl
 A researcher (could be Steve, could be a future contributor, could be a graduate student) wants to formally test or refute the equivalence theorem outlined in the essay. They want to know what the wire-lab's stated position is and what test material exists.
 
 - **DF-23.1, DF-23.2, DF-23.3:** these affect what the researcher finds in the harness-spec, but the researcher's primary object of study is the essay and any follow-on TEs.
-- **DF-23.4:** Alt-4.A gives them a TE-24 to walk into; Alt-4.B tells them to wait until concrete protocols exist (and gives them a roadmap stake to track); Alt-4.C tells them to do this work outside the wire-lab; Alt-4.D leaves them to reload the framing from the essay alone.
+- **DF-23.4:** Alt-4.A gives them a TE-hogus to walk into; Alt-4.B tells them to wait until concrete protocols exist (and gives them a roadmap stake to track); Alt-4.C tells them to do this work outside the wire-lab; Alt-4.D leaves them to reload the framing from the essay alone.
 
 S6 verdict: Alt-4.A is the most welcoming-to-research; Alt-4.B is a reasonable defer; Alt-4.C and Alt-4.D push the researcher away from the wire-lab's substrate. Given that the wire-lab has not yet produced concrete protocols of either shape, Alt-4.B may be the most honest answer: the test material does not yet exist.
 
@@ -255,31 +255,31 @@ S6 verdict: Alt-4.A is the most welcoming-to-research; Alt-4.B is a reasonable d
 
 Across S1-S6, a coherent recommended set emerges:
 
-- **DF-23.1: Alt-1.A** — pCID hashes the spec document. This is already implemented (TE-22 and prior) and is correct on the merits; this TE locks it as a foundational framing position rather than an incidental machinery choice. **Plus an explicit acknowledgement of Alt-1.C** as the way the grid hosts congruent protocols: the harness-spec records that specific protocols may declare inner code-hash addressing inside their own payloads (without naming the inner-CID at the harness level — see DF-23.2). Rejected: Alt-1.B (code-as-pCID) is a partisan choice the framing essay argues against; Alt-1.D (manifest pointing at both) adds an indirection layer that doesn't pay for itself.
+- **DF-23.1: Alt-1.A** — pCID hashes the spec document. This is already implemented (TE-rujak and prior) and is correct on the merits; this TE locks it as a foundational framing position rather than an incidental machinery choice. **Plus an explicit acknowledgement of Alt-1.C** as the way the grid hosts congruent protocols: the harness-spec records that specific protocols may declare inner code-hash addressing inside their own payloads (without naming the inner-CID at the harness level — see DF-23.2). Rejected: Alt-1.B (code-as-pCID) is a partisan choice the framing essay argues against; Alt-1.D (manifest pointing at both) adds an indirection layer that doesn't pay for itself.
 
 - **DF-23.2: Alt-2.B** — no inner-CID slot at the top level; defer naming entirely to per-protocol specs. Matches Steve's stated decision in chat 2026-04-29 ("Let each protocol name its own internals"). Rejected: Alt-2.A (pre-named slot) privileges one inner-CID semantics over others; Alt-2.C and Alt-2.D are weaker forms of the same defer-to-protocols answer, but Alt-2.B is the cleanest. Note: the essay's nesting taxonomy (pCID-in-pCID, hCID-in-pCID, hCID-in-hCID, pCID-in-hCID) is preserved as discoverable reasoning in `docs/essays/congruence-convergence-and-the-grid.md`; the harness-spec does not duplicate it.
 
-- **DF-23.3: Alt-3.B** — brief acknowledgement of the duality framing in the harness-spec (one paragraph in §1 or a short "Background" subsection), with a link to `docs/essays/congruence-convergence-and-the-grid.md`. The paragraph is explicitly framed as background context, not as a normative constraint; the design choices it informs (pCID hashes spec, autonomy-as-promise, past/present/future tenses) are themselves locked elsewhere (TE-21, TE-22, this TE). Rejected: Alt-3.A inflates the harness-spec with philosophy and risks promising more than the wire-lab can deliver; Alt-3.C and Alt-3.D leave the framing invisible to readers who arrive through the harness-spec rather than through the essay. The brief acknowledgement is the smallest move that defends against future drift (S5) while keeping the harness-spec's main text protocol-mechanics-focused.
+- **DF-23.3: Alt-3.B** — brief acknowledgement of the duality framing in the harness-spec (one paragraph in §1 or a short "Background" subsection), with a link to `docs/essays/congruence-convergence-and-the-grid.md`. The paragraph is explicitly framed as background context, not as a normative constraint; the design choices it informs (pCID hashes spec, autonomy-as-promise, past/present/future tenses) are themselves locked elsewhere (TE-nibar, TE-rujak, this TE). Rejected: Alt-3.A inflates the harness-spec with philosophy and risks promising more than the wire-lab can deliver; Alt-3.C and Alt-3.D leave the framing invisible to readers who arrive through the harness-spec rather than through the essay. The brief acknowledgement is the smallest move that defends against future drift (S5) while keeping the harness-spec's main text protocol-mechanics-focused.
 
-- **DF-23.4: Alt-4.B** — open TE-24 *later*, when the wire-lab has at least one congruence-shaped protocol and one convergence-shaped protocol to model in simulation. Track it as a roadmap stake in this TE's "Implications for follow-on work" section so the thread does not go cold; reload from the essay when ready. Rejected: Alt-4.A opens a research-flavored TE without test material, which risks stalling; Alt-4.C pushes the work out of the wire-lab and loses the test material the wire-lab will eventually generate; Alt-4.D abandons the most concrete reason to think the equivalence is reachable (the promise-about-trajectory thread) and treats the essay's load-bearing claim #5 as decoration.
+- **DF-23.4: Alt-4.B** — open TE-hogus *later*, when the wire-lab has at least one congruence-shaped protocol and one convergence-shaped protocol to model in simulation. Track it as a roadmap stake in this TE's "Implications for follow-on work" section so the thread does not go cold; reload from the essay when ready. Rejected: Alt-4.A opens a research-flavored TE without test material, which risks stalling; Alt-4.C pushes the work out of the wire-lab and loses the test material the wire-lab will eventually generate; Alt-4.D abandons the most concrete reason to think the equivalence is reachable (the promise-about-trajectory thread) and treats the essay's load-bearing claim #5 as decoration.
 
 The full recommended set across the four DFs is **(1.a + 1.c-as-permission, 2.b, 3.b, 4.b)**.
 
 ### Implications
 
-- **Harness-spec gets a brief Background subsection.** A new short subsection — proposed title "Background: congruence and convergence" — appears near the top of `protocols/wire-lab.d/specs/harness-spec-draft.md` (after §1 opening, before §2 vocabulary). One paragraph (3-5 sentences) summarizes the duality framing and links to the essay. The subsection is non-normative; it carries the explicit marker "*This subsection is informative, not normative. The design choices it describes are locked in TE-21, TE-22, and TE-23.*" When the next freeze of the harness-spec is cut, the Background subsection becomes part of the frozen pCID's content; the link to the essay is by relative path (`../docs/essays/congruence-convergence-and-the-grid.md`) so it survives a host migration.
+- **Harness-spec gets a brief Background subsection.** A new short subsection — proposed title "Background: congruence and convergence" — appears near the top of `protocols/wire-lab.d/specs/harness-spec-draft.md` (after §1 opening, before §2 vocabulary). One paragraph (3-5 sentences) summarizes the duality framing and links to the essay. The subsection is non-normative; it carries the explicit marker "*This subsection is informative, not normative. The design choices it describes are locked in TE-nibar, TE-rujak, and TE-lozip.*" When the next freeze of the harness-spec is cut, the Background subsection becomes part of the frozen pCID's content; the link to the essay is by relative path (`../docs/essays/congruence-convergence-and-the-grid.md`) so it survives a host migration.
 
 - **Harness-spec vocabulary stays small.** No "inner-CID," "hCID," "fCID," "cCID" entries are added. The harness-spec carries `pCID` (already present) and nothing else CID-shaped at the top level. Per-protocol specs are free to introduce their own inner-CID concepts under whatever name fits.
 
-- **Essay becomes a normatively-cited source from the harness-spec.** The Background subsection's link to `docs/essays/congruence-convergence-and-the-grid.md` makes the essay a referenced source, not a private note. The essay is therefore subject to the strict-cross-ref rule from TE-22 (a draft cross-reference must cite a frozen pCID; drafts may not cite other drafts) once the harness-spec next freezes. **Open question (becomes part of TE-23's TODO):** does an essay file in `docs/essays/` need to be frozen the same way a spec file does? Tentative answer: yes, treated as a non-protocol referenced source, freezing produces `docs/essays/congruence-convergence-and-the-grid-{cidv1}.md` and the manifest entry records `kind: essay` to distinguish from `kind: spec`. Sub-question: does the essay need its own pCID class, or does CIDv1 suffice for any referenced source? Recommendation: CIDv1 suffices; `kind` field in the manifest distinguishes essays from specs.
+- **Essay becomes a normatively-cited source from the harness-spec.** The Background subsection's link to `docs/essays/congruence-convergence-and-the-grid.md` makes the essay a referenced source, not a private note. The essay is therefore subject to the strict-cross-ref rule from TE-rujak (a draft cross-reference must cite a frozen pCID; drafts may not cite other drafts) once the harness-spec next freezes. **Open question (becomes part of TE-lozip's TODO):** does an essay file in `docs/essays/` need to be frozen the same way a spec file does? Tentative answer: yes, treated as a non-protocol referenced source, freezing produces `docs/essays/congruence-convergence-and-the-grid-{cidv1}.md` and the manifest entry records `kind: essay` to distinguish from `kind: spec`. Sub-question: does the essay need its own pCID class, or does CIDv1 suffice for any referenced source? Recommendation: CIDv1 suffices; `kind` field in the manifest distinguishes essays from specs.
 
-- **TE-24 is on the roadmap but not opened now.** The TODO directory carries an entry — say, `TODO/012-te-24-equivalence-theorem-shape.md` — that records: (i) the framing essay's promise-about-trajectory thread is the load-bearing claim that motivates TE-24; (ii) TE-24 cannot productively open until the wire-lab has at least one congruence-shaped protocol (function-call shape) and one convergence-shaped protocol (desired-state shape) to model in simulation; (iii) the trigger to open TE-24 is the first concrete protocol of either shape reaching freeze. Until then, the framing essay carries the thread.
+- **TE-hogus is on the roadmap but not opened now.** The TODO directory carries an entry — say, `TODO/012-te-24-equivalence-theorem-shape.md` — that records: (i) the framing essay's promise-about-trajectory thread is the load-bearing claim that motivates TE-hogus; (ii) TE-hogus cannot productively open until the wire-lab has at least one congruence-shaped protocol (function-call shape) and one convergence-shaped protocol (desired-state shape) to model in simulation; (iii) the trigger to open TE-hogus is the first concrete protocol of either shape reaching freeze. Until then, the framing essay carries the thread.
 
-- **The framing essay does not require revision.** The essay's claims (1) through (5) align with this TE's recommended decisions. No edits to `docs/essays/congruence-convergence-and-the-grid.md` are needed as a consequence of TE-23.
+- **The framing essay does not require revision.** The essay's claims (1) through (5) align with this TE's recommended decisions. No edits to `docs/essays/congruence-convergence-and-the-grid.md` are needed as a consequence of TE-lozip.
 
 - **Future spec readers have a stated principle to test proposals against.** "Does this proposal preserve formalism-neutrality?" and "Does this proposal preserve autonomy as common ground?" become readable, citable tests. A future maintainer who proposes code-as-pCID at the top level (S5) is asked to defend against the framing the harness-spec's Background subsection now carries.
 
-- **No tooling change.** TE-22's machinery (single Go binary `tools/spec` with `freeze`, `check`, `cid`, `ls` subcommands) requires no extension. The Background subsection is just additional spec text. The essay-as-referenced-source open question above may eventually require `tools/spec freeze` to accept a `--kind=essay` flag or accept any path under `specs/` or `docs/essays/`; that is deferred to the TODO that captures the open question.
+- **No tooling change.** TE-rujak's machinery (single Go binary `tools/spec` with `freeze`, `check`, `cid`, `ls` subcommands) requires no extension. The Background subsection is just additional spec text. The essay-as-referenced-source open question above may eventually require `tools/spec freeze` to accept a `--kind=essay` flag or accept any path under `specs/` or `docs/essays/`; that is deferred to the TODO that captures the open question.
 
 ## Decision Framing questions
 
@@ -306,30 +306,30 @@ DF-23.3: Duality framing in the harness-spec.
 
 DF-23.4: Equivalence-theorem follow-on.
 
-- (a) Alt-4.A — open TE-24 now, research-flavored.
-- (b) Alt-4.B — open TE-24 later, when the wire-lab has at least one congruence-shaped and one convergence-shaped protocol to model (recommended).
-- (c) Alt-4.C — don't open TE-24; do this work elsewhere.
-- (d) Alt-4.D — don't open TE-24 at all; treat the equivalence as folklore.
+- (a) Alt-4.A — open TE-hogus now, research-flavored.
+- (b) Alt-4.B — open TE-hogus later, when the wire-lab has at least one congruence-shaped and one convergence-shaped protocol to model (recommended).
+- (c) Alt-4.C — don't open TE-hogus; do this work elsewhere.
+- (d) Alt-4.D — don't open TE-hogus at all; treat the equivalence as folklore.
 
 The recommended set is **(1.a with 1.c-as-permission, 2.b, 3.b, 4.b)**. The pattern is:
 
-- *Lock what is already implemented and correct on the merits* (Alt-1.A: pCID hashes the spec; this is what TE-22 implemented).
+- *Lock what is already implemented and correct on the merits* (Alt-1.A: pCID hashes the spec; this is what TE-rujak implemented).
 - *Acknowledge the per-protocol freedom* that lets congruent protocols nest inside (Alt-1.C as a permission, not a requirement).
 - *Keep the harness-spec vocabulary minimal* (Alt-2.B: no inner-CID at the top).
 - *Plant the framing flag without inflating the harness-spec* (Alt-3.B: brief acknowledgement + link).
-- *Defer research work until test material exists* (Alt-4.B: TE-24 on the roadmap, not opened yet).
+- *Defer research work until test material exists* (Alt-4.B: TE-hogus on the roadmap, not opened yet).
 
 Already-locked decisions, not under DF in this TE (carried from chat 2026-04-29 and prior TEs):
 
-- **pCID format = CIDv1.** Multibase + multihash + codec wrap. (TE-22.)
-- **Spec doc as layered promise.** (TE-21 Alt-E.)
+- **pCID format = CIDv1.** Multibase + multihash + codec wrap. (TE-rujak.)
+- **Spec doc as layered promise.** (TE-nibar Alt-E.)
 - **"Let each protocol name its own internals."** Steve's stated principle in chat 2026-04-29 (this TE locks it as DF-23.2 Alt-2.B).
 - **pCID is "protocol CID, not promise CID."** Steve's correction in chat 2026-04-29 (this TE locks it as DF-23.1 Alt-1.A's framing).
 - **Promises are assertions of state in the past, present, or future, often conditional.** (Locked in harness-spec vocabulary; central to the essay's promise-about-trajectory thread.)
 
 ## Decision status
 
-`open` — recommendations stated, awaiting Steve's decision on the four DFs. The expected lock pattern is (1.a + 1.c-as-permission, 2.b, 3.b, 4.b) but Steve may diverge — particularly on DF-23.3 (the harness-spec footprint cost of acknowledging the framing) and DF-23.4 (whether to open TE-24 now versus later).
+`open` — recommendations stated, awaiting Steve's decision on the four DFs. The expected lock pattern is (1.a + 1.c-as-permission, 2.b, 3.b, 4.b) but Steve may diverge — particularly on DF-23.3 (the harness-spec footprint cost of acknowledging the framing) and DF-23.4 (whether to open TE-hogus now versus later).
 
 Amendment history:
 
@@ -337,12 +337,12 @@ Amendment history:
 
 ## Implications for follow-on work
 
-- **TODO 012 (provisional):** Once Steve locks DF-23.3 as Alt-3.B (or stronger), draft the Background subsection for `protocols/wire-lab.d/specs/harness-spec-draft.md` and add the link to the essay. Re-freeze the harness-spec on the next freeze cycle. The Background subsection lands in the next pCID; the previous pCID remains as historical evidence per TE-22's append-only-log discipline.
+- **TODO 012 (provisional):** Once Steve locks DF-23.3 as Alt-3.B (or stronger), draft the Background subsection for `protocols/wire-lab.d/specs/harness-spec-draft.md` and add the link to the essay. Re-freeze the harness-spec on the next freeze cycle. The Background subsection lands in the next pCID; the previous pCID remains as historical evidence per TE-rujak's append-only-log discipline.
 
 - **TODO 013 (provisional):** Capture the essay-as-referenced-source open question raised under "Implications" above. Decide whether `docs/essays/*.md` files freeze the same way `specs/*.md` files do, and whether the manifest distinguishes `kind: spec` from `kind: essay`. Tentative answer in the conclusions; needs explicit decision.
 
-- **TODO 014 (provisional, becomes TE-24 trigger):** Track the wire-lab's first congruence-shaped protocol (function-call shape) and first convergence-shaped protocol (desired-state shape) reaching freeze. When both exist, open TE-24 to formally examine the promise-about-trajectory equivalence claim against concrete test material. Until then, the framing essay carries the thread.
+- **TODO 014 (provisional, becomes TE-hogus trigger):** Track the wire-lab's first congruence-shaped protocol (function-call shape) and first convergence-shaped protocol (desired-state shape) reaching freeze. When both exist, open TE-hogus to formally examine the promise-about-trajectory equivalence claim against concrete test material. Until then, the framing essay carries the thread.
 
-- **No change required to TE-21 or TE-22.** TE-21's spec-doc-as-promise framing and TE-22's pCID machinery are both consistent with this TE's recommendations; TE-23 layers framing on top, not corrections to either.
+- **No change required to TE-nibar or TE-rujak.** TE-nibar's spec-doc-as-promise framing and TE-rujak's pCID machinery are both consistent with this TE's recommendations; TE-lozip layers framing on top, not corrections to either.
 
 - **Bot-side change:** when the bot drafts new TEs going forward, it should test design proposals against the two stated principles (formalism-neutrality and autonomy-as-common-ground) where relevant. This is a posture instruction, not a code change.

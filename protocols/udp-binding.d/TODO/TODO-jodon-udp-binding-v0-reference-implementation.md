@@ -25,7 +25,7 @@ abstraction defect, not just a UDP issue.
 
 1. **Reference implementation** at
    `implementations/go-udp-binding-reference/` in Go (per Steve's
-   standing language preference, and per TE-32 which locks B-side
+   standing language preference, and per TE-liviv which locks B-side
    implementation artifacts under `implementations/<impl-name>/`
    rather than under any `protocols/<slug>.d/` subtree). The
    implementation tree carries its own `CHANGELOG.md` recording
@@ -73,7 +73,7 @@ abstraction defect, not just a UDP issue.
 5. **TODO 019 — ns-3 harness scaffold for UDP-binding v0.** A
    minimal 2-node ns-3 scenario that proves round-trip works through
    the Go reference implementation talking over an ns-3-emulated
-   UDP wire. See `protocols/wire-lab.d/TODO/TODO-20260501-224806-ns3-harness-scaffold.md` for full
+   UDP wire. See `protocols/wire-lab.d/TODO/TODO-bihon-ns3-harness-scaffold.md` for full
    subtasks. Tracked as a sibling TODO rather than a subtask of this
    one because the scaffold has its own follow-on lifecycle (loss
    scenarios, multi-binding scenarios) that long outlives the v0
@@ -113,7 +113,7 @@ abstraction defect, not just a UDP issue.
 - TODO 014 (protocols-as-simulated-repos migration) ideally lands
   first so the spec lives at its final path. If TODO 014 has not
   landed, this TODO uses `protocols/udp-binding.d/specs/udp-binding-draft.md`
-  (already created in TE-29's commit).
+  (already created in TE-vipir's commit).
 - TODO 017 (group-session rename) is not required; UDP-binding does
   not depend on the session protocol's slug.
 

@@ -1,12 +1,12 @@
-# TE-1: Promise-stack ordering
+# TE-famar: Promise-stack ordering
 
 *Thought experiment, part of the [PromiseGrid Wire Lab](../../protocols/wire-lab.d/specs/harness-spec-draft.md). This file is content-addressable; its hash is its pCID.*
 
 ## TE ID
 
-TE-20260427-180000
+TE-famar
 
-(Original TE-1 from `specs/harness-spec-draft.md` v2; first drafted at the time of v2 creation. Expanded into full scenario form on 2026-04-28 by the bot.)
+(Original TE-famar from `specs/harness-spec-draft.md` v2; first drafted at the time of v2 creation. Expanded into full scenario form on 2026-04-28 by the bot.)
 
 ## Prior aliases
 
@@ -121,7 +121,7 @@ Two routers along the path; one runs `promstack` v1, one runs v2 with a new asse
 
 ### S4 — Long-horizon evolution and migration
 
-Year 1: messages have 3 frames typical. Year 50: messages have 8-frame stacks because new assertion types (capability tokens, ZK proofs from TE-12, jurisdiction tags) have proliferated. Old archives must still be readable.
+Year 1: messages have 3 frames typical. Year 50: messages have 8-frame stacks because new assertion types (capability tokens, ZK proofs from TE-muvuv, jurisdiction tags) have proliferated. Old archives must still be readable.
 
 - **Alt-A:** New assertion types are added at the outermost layer (most recent additions). Old messages have a short prefix of well-understood frames, and any "future-knowledge" frames sit outside. A year-1 receiver replaying a year-50 message can peel the recognizable inner frames and ignore the outer additions. **Easier:** old archives remain interpretable by old code. **Harder:** if a year-50 outer frame revokes a year-1 inner frame's authority, the year-1 replay reaches the wrong conclusion. **New obligation:** revocation frames must propagate backward into archives, not just forward.
 - **Alt-B:** Same archive interpretability as Alt-A but worse during streaming because outer additions sit at the beginning of the wire bytes — old code reading the start of a year-50 message hits unfamiliar frames first.
@@ -189,8 +189,8 @@ After scenario analysis:
 - **OQ-1 (Promise structure / §1.1):** This TE adds two required fields:
   - `criticality: "advisory" | "critical"` per frame, OR per assertion-type spec
   - `position-convention: "outermost" | "innermost" | "any"` declared in the assertion-type spec, not enforced by the wire library
-- **TE-12 (zero-knowledge promise frames):** Compatible with Alt-E — a ZK proof frame is just another promise type discovered by `Project`. The fact that it can sit anywhere in the stack is a feature.
-- **TE-13 (time-traveling break-witness):** Compatible with Alt-E — break-witnesses are critical-criticality outer frames. The "re-evaluation horizon" the TE-13 conclusion will need is not in conflict with Alt-E's peeling/projection model.
+- **TE-muvuv (zero-knowledge promise frames):** Compatible with Alt-E — a ZK proof frame is just another promise type discovered by `Project`. The fact that it can sit anywhere in the stack is a feature.
+- **TE-robub (time-traveling break-witness):** Compatible with Alt-E — break-witnesses are critical-criticality outer frames. The "re-evaluation horizon" the TE-robub conclusion will need is not in conflict with Alt-E's peeling/projection model.
 - **§1.3 of protocols/wire-lab.d/specs/harness-spec-draft.md:** The four invariants (out-of-order handling, frame stripping, missing-body promises, loud failure on disagreement) all remain. This TE refines #1: out-of-order is handled by `Project`, not by attempted re-ordering at the wire level.
 - **Future work (downstream of locking this TE):**
   - DR for "criticality flag location: per-frame or per-assertion-type-spec?"
@@ -228,14 +228,14 @@ The recommended set is (1.1.a, 1.2.c, 1.3.a, 1.4.d). Reason: maximally additive,
 
 ## Decision status
 
-`needs DF` — awaiting user choice on DF-1.1 through DF-1.4. After DF, the locked decisions become DI entries in `protocols/wire-lab.d/TODO/TODO-20260429-164955-te-promise-stack-ordering.md`.
+`needs DF` — awaiting user choice on DF-1.1 through DF-1.4. After DF, the locked decisions become DI entries in `protocols/wire-lab.d/TODO/TODO-rivuk-te-promise-stack-ordering.md`.
 
 ## Refinements
 
-### 2026-05-03 — Recommended DF set tracked in TODO 5; DR-006 open
+### 2026-05-03 — Recommended DF set tracked in TODO-rivuk; DR-006 open
 
-Since this TE was first drafted on 2026-04-27 and expanded into full scenario form on 2026-04-28, the supporting infrastructure for closing it has been filed. The recommended set (1.1.a outermost-first wire ordering, 1.2.c assertion-stack-as-Project, 1.3.a outermost-first reflects wire order, 1.4.d per-assertion-type position normativity) is articulated in the body above and remains the bot's recommendation; it awaits Steve's DF answers before locking as DIs. Those answers are tracked as the open DF queue in `protocols/wire-lab.d/TODO/TODO-20260429-164955-te-promise-stack-ordering.md` (TODO 5), which is the canonical place to look for the current state of DF-1.1 through DF-1.4 and the eventual DI lockings.
+Since this TE was first drafted on 2026-04-27 and expanded into full scenario form on 2026-04-28, the supporting infrastructure for closing it has been filed. The recommended set (1.1.a outermost-first wire ordering, 1.2.c assertion-stack-as-Project, 1.3.a outermost-first reflects wire order, 1.4.d per-assertion-type position normativity) is articulated in the body above and remains the bot's recommendation; it awaits Steve's DF answers before locking as DIs. Those answers are tracked as the open DF queue in `protocols/wire-lab.d/TODO/TODO-rivuk-te-promise-stack-ordering.md` (TODO-rivuk), which is the canonical place to look for the current state of DF-1.1 through DF-1.4 and the eventual DI lockings.
 
-The related DR — `DR/DR-006-20260429-164729-promise-stack-ordering.md` — is open and is the proposal-side document for the same decision under test. TODO 5 is the lifecycle tracker for both this TE and DR-006; closing DF-1.1 through DF-1.4 on this TE is also what closes DR-006.
+The related DR — `DR/DR-006-20260429-164729-promise-stack-ordering.md` — is open and is the proposal-side document for the same decision under test. TODO-rivuk is the lifecycle tracker for both this TE and DR-006; closing DF-1.1 through DF-1.4 on this TE is also what closes DR-006.
 
-This is a Cat-3 / Cat-4 navigational refinement under the editing policy locked in `DI-020-20260502-213103` (and its `## Refinements` chain on TE-34, including DI-020-20260502-232651 and the four Cat-3 Refinements). The TE body above is unchanged: the decision under test, the alternatives, the scenarios, the conclusions, and the recommended set all remain as first drafted. The Refinement only adds forward pointers to the open lifecycle items so a single-TE reader can find the current state without reading the full corpus. No DI is filed for this Refinement; the substantive DI work happens in TODO 5 once DF-1.1 through DF-1.4 are answered.
+This is a Cat-3 / Cat-4 navigational refinement under the editing policy locked in `DI-020-20260502-213103` (and its `## Refinements` chain on TE-dabol, including DI-020-20260502-232651 and the four Cat-3 Refinements). The TE body above is unchanged: the decision under test, the alternatives, the scenarios, the conclusions, and the recommended set all remain as first drafted. The Refinement only adds forward pointers to the open lifecycle items so a single-TE reader can find the current state without reading the full corpus. No DI is filed for this Refinement; the substantive DI work happens in TODO-rivuk once DF-1.1 through DF-1.4 are answered.

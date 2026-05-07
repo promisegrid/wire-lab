@@ -16,14 +16,14 @@ to be already covered by TODO 014 step 2. This file exists so the
 integer slot 017 is not orphaned and so a future contributor finds an
 explanation rather than a gap.
 
-## Original intent (from TE-29)
+## Original intent (from TE-vipir)
 
 > Pure renaming. DFs T1-T6 unchanged.
 
 The premise was that `group-transport` (the v0 carve-out from TODO
 013) needed to be renamed to `group-session` because its DFs T1-T6
 (Parents header, ack-in-body, flat per-leaf layout) are session-layer
-semantics, not L4 framing. TE-29's binding/session/message layer
+semantics, not L4 framing. TE-vipir's binding/session/message layer
 decomposition makes the slug `group-transport` actively misleading.
 
 ## Why folded into TODO 014
@@ -46,21 +46,21 @@ TODO 014 step 2 covers the spec file rename and in-tree reference
 updates. The following adjacent cleanups are explicitly *not* tracked
 under TODO 017:
 
-1. **TE-24's filename retains the `group-transport-envelope` slug.**
+1. **TE-hogus's filename retains the `group-transport-envelope` slug.**
    Per the standing rule that TE filenames are not renamed when
    content is later refined (the timestamp pins origin, not last-
    edited; see `docs/thought-experiments/README.md` line 11), the
    filename
-   `TE-20260430-204108-group-transport-envelope.md` stays as is.
+   `TE-hogus-group-transport-envelope.md` stays as is.
    The TE's *content* may use updated vocabulary; its filename does
-   not change. This is correct, not a defect. If TE-24's filename
+   not change. This is correct, not a defect. If TE-hogus's filename
    bothers a future contributor, the answer is to read the
    timestamp-anchoring rule, not to rename the file.
 
-2. **Prose references to "group-transport" in TE-26, TE-27, TE-28,
+2. **Prose references to "group-transport" in TE-zalut, TE-junil, TE-dajot,
    harness-spec section 8, and DR-009.** These are mostly historical
    or etymological ("the group-transport-envelope work landed under
-   TODO 013, and was later renamed to group-session per TE-29").
+   TODO 013, and was later renamed to group-session per TE-vipir").
    Updating them to "group-session" would erase context that helps
    future readers understand the project's history. Keep these as
    is unless a specific reference is actively confusing.
@@ -77,16 +77,16 @@ a new TODO with a fresh integer; do not reuse 017.
 ## Why this stub exists
 
 Per OQ-100.4 (numbering wrap, stable integers across centuries) and
-TE-25 (drafting-time anchoring of TE/TODO numbers), letting an
+TE-titur (drafting-time anchoring of TE/TODO numbers), letting an
 orphaned integer sit creates exactly the slug-drift / numbering-
 confusion problem we want to avoid. A future contributor finding
-TODO 017 referenced from TE-29 prose should land here and find a
+TODO 017 referenced from TE-vipir prose should land here and find a
 clear "folded into 014, here's why" record, rather than a missing
 file or an integer gap.
 
 ## Provenance
 
-- TE-29 first-drafted at 2026-05-01 21:50:27 UTC.
+- TE-vipir first-drafted at 2026-05-01 21:50:27 UTC.
 - TODO 017 folding decided 2026-05-01 22:58 UTC (same session).
-- The TE-29 prose at "Migrations triggered by this TE" item 4 has
+- The TE-vipir prose at "Migrations triggered by this TE" item 4 has
   been annotated to point here.

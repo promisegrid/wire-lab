@@ -1,4 +1,4 @@
-# TE-30: TODO numbering and per-protocol TODO shape
+# TE-magup: TODO numbering and per-protocol TODO shape
 
 ## Prior aliases
 
@@ -12,13 +12,13 @@ Before the TE-39 proquint migration, this file was known as:
 decided
 
 (Locks the directory shape and naming convention for TODO
-records under the TE-29 protocols-as-simulated-repos layout. Closes
-out the TODO-numbering question that TE-29 named but did not resolve.
+records under the TE-vipir protocols-as-simulated-repos layout. Closes
+out the TODO-numbering question that TE-vipir named but did not resolve.
 Renumbers all existing TODOs as part of TODO 014.)
 
 ## Why this TE
 
-TE-29 locked the shape under which each protocol becomes its own
+TE-vipir locked the shape under which each protocol becomes its own
 simulated repo (`protocols/<slug>.d/`). It said decisions, open work,
 and don't-touch invariants belong inside protocol spec docs. It did
 not say what happens to the top-level `TODO/` directory or to its 19
@@ -37,7 +37,7 @@ That left two real problems:
 2. **Global integer numbering does not scale.** As more protocols
    land, top-level `TODO/` grows linearly forever. By the time the
    wire-lab has 20 protocols, "TODO 137" carries no scope hint at
-   all. OQ-100.4 (numbering wrap across centuries, from TE-28) is
+   all. OQ-100.4 (numbering wrap across centuries, from TE-dajot) is
    the long-horizon version of this concern; it is already real at
    the small scale.
 
@@ -75,7 +75,7 @@ lives in its own.
 TODO-YYYYMMDD-HHMMSS-<slug>.md
 ```
 
-Identical to the TE convention (TE-20260501-215027-...). Timestamps
+Identical to the TE convention (TE-vipir-...). Timestamps
 are **first-drafted-time**, anchored at the moment the TODO record
 was first authored, never updated. A TODO that moves between
 protocols (rare; see "Boundary changes" below) keeps its original
@@ -88,7 +88,7 @@ a long-ago feature branch, the parent-commit date on the originating
 branch is used. Where unrecoverable (e.g. squash-merged), the
 earliest plausible timestamp from git's history of the file is used.
 Migration-time is never used as the canonical timestamp; that would
-violate TE-25's drafting-time-anchored invariant.
+violate TE-titur's drafting-time-anchored invariant.
 
 ### Local queue: per-protocol `TODO.md`
 
@@ -151,8 +151,8 @@ under `wire-lab.d/TODO/` with the same status content; they do not
 get a special exemption.
 
 The integer system is retired for TODOs from this point forward.
-TEs continue to use small integer aliases (TE-1, TE-2, ...) per
-TE-25, but TODO records do not. The asymmetry is deliberate:
+TEs continue to use small integer aliases (TE-famar, TE-jovoj, ...) per
+TE-titur, but TODO records do not. The asymmetry is deliberate:
 - TEs are a relatively small, slow-growing canonical sequence
   worth aliasing with short integers.
 - TODOs are a much larger, faster-growing per-protocol stream where
@@ -218,7 +218,7 @@ TODO 014 step 11: Move each TODO into its destination
 filename. Write each protocol's local `TODO.md`. Write the master
 cross-listed `TODO.md` at `protocols/wire-lab.d/TODO/TODO.md`.
 Delete the top-level `TODO/` directory entirely. Update all in-tree
-references (DR-009, DI-009, TE-24, TE-29, TE-30 itself, harness-spec
+references (DR-009, DI-009, TE-hogus, TE-vipir, TE-magup itself, harness-spec
 section 8, TE indexes, prior-TODO references) to point at new paths.
 
 ## Open questions
@@ -240,7 +240,7 @@ the master from the per-protocol TODO.md files. Lean: (a) for now,
 upgrade to (b) when manual drift becomes painful. Probably bundled
 into a future enhancement of `tools/spec`.
 
-OQ-30.3: **Do DRs and DIs follow the same shape?** TE-29 said
+OQ-30.3: **Do DRs and DIs follow the same shape?** TE-vipir said
 DR/DI/TODO would be absorbed into spec docs (as inline sections).
 TODO 015 retired the directory-absorption framing for DR/DI because
 those directories never existed. But this TE introduces a real
@@ -269,7 +269,7 @@ where that work belongs.
 
 ## Reference to load-bearing constraints
 
-This TE relies on (TE-28):
+This TE relies on (TE-dajot):
 
 - **C-1 no central registry:** TODO numbering across protocols was
   a soft form of central registry (a single integer sequence
@@ -279,9 +279,9 @@ This TE relies on (TE-28):
 - **C-4 forking is normal:** A protocol fork (under a different
   pCID) brings its own `TODO/` with it. There is no risk of TODO-
   number collision between forks because there are no TODO numbers.
-- **OQ-100.4 numbering wrap (from TE-28):** Per-protocol timestamping
+- **OQ-100.4 numbering wrap (from TE-dajot):** Per-protocol timestamping
   fully closes the TODO half of this question. The TE half remains
-  open (TEs still use integer aliases per TE-25); future TE may
+  open (TEs still use integer aliases per TE-titur); future TE may
   decide to extend the timestamp-only convention to TEs as well.
 
 ## Recommendation

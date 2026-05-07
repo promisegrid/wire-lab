@@ -1,4 +1,4 @@
-# TE-7: Human-novice onboarding under K4
+# TE-kuhog: Human-novice onboarding under K4
 
 ## Prior aliases
 

@@ -1,4 +1,4 @@
-# TE-29: Protocols as simulated repos, and the L4-binding layer
+# TE-vipir: Protocols as simulated repos, and the L4-binding layer
 
 ## Prior aliases
 
@@ -20,10 +20,10 @@ will be answered in follow-on TEs.)
 
 ## Why this TE
 
-TE-26 and TE-27 established that "transport" was the right vocabulary
+TE-zalut and TE-junil established that "transport" was the right vocabulary
 and surfaced axes along which transports differ. TODO 013 carved out
 the first concrete transport (then called group-transport) into its
-own draft spec. TE-28 named the 100-year goal and the six load-bearing
+own draft spec. TE-dajot named the 100-year goal and the six load-bearing
 constraints C-1 through C-6.
 
 Once those landed, three pressures converged:
@@ -292,12 +292,12 @@ are tracked as separate TODOs:
 2. **TODO 015: DR/TODO/DI absorption.** *Originally* intended to
    inline top-level `DR/`/`TODO/`/`DI/` directories into protocol
    spec docs. **Retired before filing** on review immediately after
-   TE-29 landed: `DR/` and `DI/` do not exist as top-level
+   TE-vipir landed: `DR/` and `DI/` do not exist as top-level
    directories (those identifiers live as filename prefixes
    elsewhere), and `TODO/` is correctly placed as harness-level meta-
    process. The harness spec sections §11 and §12 already absorb
    decisions and open questions inline. See
-   `protocols/wire-lab.d/TODO/TODO-20260501-230130-dr-todo-di-absorption-RETIRED.md` for the full
+   `protocols/wire-lab.d/TODO/TODO-bulaj-dr-todo-di-absorption-RETIRED.md` for the full
    retirement record.
 
 3. **TODO 016: proposals as transport messages.** Move
@@ -309,22 +309,22 @@ are tracked as separate TODOs:
    prerequisites: TODO 014 (protocols/ migration), a frozen
    bootstrap-binding pCID, a frozen group-session pCID, and a drafted
    ppx-dr message-protocol spec. See
-   `protocols/ppx-dr.d/TODO/TODO-20260501-230131-proposals-as-transport-messages-BLOCKED.md` for the
+   `protocols/ppx-dr.d/TODO/TODO-pozig-proposals-as-transport-messages-BLOCKED.md` for the
    stub.
 
 4. **TODO 017: group-transport -> group-session rename.**
    *Originally* intended as pure renaming, DFs T1-T6 unchanged.
    **Folded into TODO 014 step 2 before filing** on review
-   immediately after TE-29 landed. The rename is captured in
+   immediately after TE-vipir landed. The rename is captured in
    TODO 014's mechanical migration; no separate TODO is needed.
-   See `protocols/wire-lab.d/TODO/TODO-20260501-230132-group-transport-rename-FOLDED.md` for the folding
+   See `protocols/wire-lab.d/TODO/TODO-losoh-group-transport-rename-FOLDED.md` for the folding
    record and notes on residual prose-vocabulary cleanup
    (intentionally kept inside TODO 014 step 6 rather than tracked
    separately).
 
 5. **TODO 018: write UDP-binding v0 reference and test vectors.**
-   Filed at `protocols/udp-binding.d/TODO/TODO-20260501-224805-udp-binding-v0-reference-implementation.md`.
-   Sibling **TODO 019** (`protocols/wire-lab.d/TODO/TODO-20260501-224806-ns3-harness-scaffold.md`) tracks
+   Filed at `protocols/udp-binding.d/TODO/TODO-jodon-udp-binding-v0-reference-implementation.md`.
+   Sibling **TODO 019** (`protocols/wire-lab.d/TODO/TODO-bihon-ns3-harness-scaffold.md`) tracks
    the ns-3 harness scaffold; 018 and 019 are mutually gating per
    the empirical sandbox findings recorded in OQ-29.9.
 
@@ -412,7 +412,7 @@ the wire-lab's own ns-3 scenarios will live under
 
 ## Reference to load-bearing constraints
 
-This TE relies on (TE-28):
+This TE relies on (TE-dajot):
 
 - **C-1 no central registry:** Real-world transport slugs are external
   givens, not allocations. Default ports are conventions, not
@@ -427,17 +427,17 @@ This TE relies on (TE-28):
 
 ## Refinements
 
-### 2026-05-07 -- Vocabulary refactor and L6 CAS subtree (TE-38)
+### 2026-05-07 -- Vocabulary refactor and L6 CAS subtree (TE-sihih)
 
 Three navigational forward-pointers, all locked in
-[TE-38](TE-20260506-184800-substrate-agnostic-layered-model.md)
+[TE-sihih](TE-sihih-substrate-agnostic-layered-model.md)
 and its parent TODO
-(`protocols/wire-lab.d/TODO/TODO-20260506-184800-te-38-substrate-agnostic-layered-model.md`):
+(`protocols/wire-lab.d/TODO/TODO-vunub-te-38-substrate-agnostic-layered-model.md`):
 
-1. **Path-level-2 vocabulary is now "feed" not "binding".** TE-29's
+1. **Path-level-2 vocabulary is now "feed" not "binding".** TE-vipir's
    `<binding-pCID>` level is renamed to `<feed-pCID>`. Same level,
    same role, same path position; the rename matches the L5/feed
-   layer naming locked in TE-38 and reflected in conversation
+   layer naming locked in TE-sihih and reflected in conversation
    memory since 2026-05-04. Cat-1b applies to existing locked-DI
    quotations elsewhere in the corpus: those keep "binding" inside
    the quote. Forward-going text uses "feed".
@@ -446,26 +446,26 @@ and its parent TODO
    role, same level. "Forum" remains acceptable in human prose;
    path components and spec filenames use "group".
 
-3. **L6 CAS subtree extends the path scheme.** TE-38 locks the
+3. **L6 CAS subtree extends the path scheme.** TE-sihih locks the
    shape `cas/<cas-protocol-pCID>/<chunk-cid>` as the canonical
    chunk-storage location, and locks that every message file in
    `transports/` is unconditionally a CBOR pointer
    `{cas: <cas-protocol-pCID>, root: <chunk-cid>}`. There is no
-   size-based exception. TE-29's body above stops at five path
-   levels; TE-38 adds the L6 indirection without changing those
+   size-based exception. TE-vipir's body above stops at five path
+   levels; TE-sihih adds the L6 indirection without changing those
    five. The `transports/wire-lab-devs-draft/` inline-message
    files in the current tree are pre-CAS draft state; their
    migration to pointer-and-CAS form is anticipated TE-43.
 
 This is a Cat-3 navigational refinement under the editing policy
 locked in `DI-020-20260502-213103` (and its `## Refinements` chain
-on TE-34). The TE-29 body above is unchanged: the locked shape,
+on TE-dabol). The TE-vipir body above is unchanged: the locked shape,
 the layer decomposition, the binding-layer responsibilities, the
 send/receive walk-through, and the recommendation all remain as
 first drafted. The Refinement only adds forward pointers to the
 vocabulary and L6 extension so a single-TE reader can find the
-current state without reading TE-38. No DI is filed for this
-Refinement; the substantive lock lives in TE-38.
+current state without reading TE-sihih. No DI is filed for this
+Refinement; the substantive lock lives in TE-sihih.
 
 ## Recommendation
 

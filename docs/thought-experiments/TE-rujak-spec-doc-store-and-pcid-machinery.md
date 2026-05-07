@@ -1,10 +1,10 @@
-# TE-22: Spec-doc store layout and pCID machinery
+# TE-rujak: Spec-doc store layout and pCID machinery
 
 *Thought experiment, part of the [PromiseGrid Wire Lab](../../protocols/wire-lab.d/specs/harness-spec-draft.md). This file is content-addressable; its hash is its pCID.*
 
 ## TE ID
 
-TE-20260429-175530
+TE-rujak
 
 (First drafted 2026-04-29 17:55:30 UTC.)
 
@@ -21,7 +21,7 @@ decided
 
 ## Decision under test
 
-Given that TE-21 (Alt-E) framed a spec doc as a layered promise (doc-level prediction + per-peer adoption), and given Steve has locked the following in chat 2026-04-29:
+Given that TE-nibar (Alt-E) framed a spec doc as a layered promise (doc-level prediction + per-peer adoption), and given Steve has locked the following in chat 2026-04-29:
 
 - pCID format = **CIDv1** (multibase + multihash + codec; standard IPLD CID).
 - Cross-references between specs cite **the frozen pCID**, not a slug, not a slug-with-version.
@@ -38,13 +38,13 @@ The four still-open Decision Framing questions are:
 - **DF-22.4 Manifest format.** Is `specs/MANIFEST.md` machine-parseable structured data, prose with a table, or both?
 - **DF-22.5 Freezing trigger.** Who/what initiates a freeze — manual ritual, CI hook, or chat command?
 
-This TE is the operational follow-on to TE-21. TE-21 said *what a spec doc is* (a layered promise). TE-22 says *how the repo handles such docs in practice* — how the doc-level promise is captured as a content-addressed artifact, how peers cite which artifact they adopted, and how the next version of a spec relates to the previous one on disk.
+This TE is the operational follow-on to TE-nibar. TE-nibar said *what a spec doc is* (a layered promise). TE-rujak says *how the repo handles such docs in practice* — how the doc-level promise is captured as a content-addressed artifact, how peers cite which artifact they adopted, and how the next version of a spec relates to the previous one on disk.
 
 ## Assumptions
 
-- A `Promise` in this repo is an autonomous speech act — an assertion of state in the past, present, or future, often conditional. (Carried from TE-21.)
-- A `pCID` is a CIDv1 hash of a spec document's bytes. Two parties claim to "speak protocol pCID X" when each implements the rules in the document whose CIDv1 is X. (Carried from specs/harness-spec-draft.md §1 and TE-21.)
-- A spec doc is a layered promise (TE-21 Alt-E): the doc itself promises future interop conditional on its assumptions/open-questions/known-issues lists, and each peer separately promises to behave as the doc says.
+- A `Promise` in this repo is an autonomous speech act — an assertion of state in the past, present, or future, often conditional. (Carried from TE-nibar.)
+- A `pCID` is a CIDv1 hash of a spec document's bytes. Two parties claim to "speak protocol pCID X" when each implements the rules in the document whose CIDv1 is X. (Carried from specs/harness-spec-draft.md §1 and TE-nibar.)
+- A spec doc is a layered promise (TE-nibar Alt-E): the doc itself promises future interop conditional on its assumptions/open-questions/known-issues lists, and each peer separately promises to behave as the doc says.
 - The Wire Lab has, today, exactly one spec doc (`specs/harness-spec-draft.md`). It will likely grow to ~3-10 sibling spec docs over the lifetime of this repo (frame format, trust ledger, currency, eval rules, capability tokens, etc.). It will not grow to hundreds. Operational machinery should suit "a handful of long-lived spec families," not "an RFC index of thousands."
 - The repo runs in git on GitHub today, but the design is meant to survive migration off GitHub. Anything that depends on GitHub-only features (Releases, Actions, Pages, branch protection) is a hazard for that migration.
 - pCID-as-port-number means peers MUST be able to compute the pCID of any given spec file with no out-of-band agreement other than "use CIDv1 with parameters P." That parameter set must itself be pinned somewhere in the repo.
@@ -195,7 +195,7 @@ Who or what initiates a freeze?
 A human (or bot acting as human) decides a draft is ready, runs `tools/freeze-spec.sh <slug>`, and the script computes the pCID, copies the draft to `specs/<slug>-{cidv1}.md`, appends to the manifest, and stages a commit. The decision to freeze is a deliberate human (or agent-as-human) act.
 
 - **Easier:** zero infrastructure. Survives any host migration. Aligns with this repo's "small, deliberate, reviewable acts" posture. Matches the existing `tools/` directory pattern (if any) or establishes one cleanly.
-- **Harder:** depends on humans/bots remembering to run it. A draft can drift far from any frozen version if no one freezes for a while. Mitigated by adding "freeze" as a checkable item in the spec change workflow (TE-14).
+- **Harder:** depends on humans/bots remembering to run it. A draft can drift far from any frozen version if no one freezes for a while. Mitigated by adding "freeze" as a checkable item in the spec change workflow (TE-botom).
 
 #### Alt-5.B: CI hook on merge
 
@@ -220,7 +220,7 @@ Humans run `tools/freeze-spec.sh` (Alt-5.A). CI runs a periodic audit (e.g., on 
 
 ## Scenarios
 
-Six scenarios, each played against the alternatives. The bookkeeping convention follows the TE-21 pattern: each scenario calls out which DF-alternative combinations handle it best.
+Six scenarios, each played against the alternatives. The bookkeeping convention follows the TE-nibar pattern: each scenario calls out which DF-alternative combinations handle it best.
 
 ### S1 (genesis): freezing the first spec
 
@@ -385,7 +385,7 @@ Already-locked decisions, not under DF in this TE (carried from chat 2026-04-29)
 
 ## Decision status
 
-`decided` — all five DFs locked by Steve in chat 2026-04-29. Locked answers are recorded as DI entries in `protocols/wire-lab.d/TODO/TODO-20260429-180020-te-spec-doc-store-and-pcid-machinery.md`:
+`decided` — all five DFs locked by Steve in chat 2026-04-29. Locked answers are recorded as DI entries in `protocols/wire-lab.d/TODO/TODO-nivus-te-spec-doc-store-and-pcid-machinery.md`:
 
 - **DF-22.1: 1.a** — raw file bytes, no normalization. (Steve preferred transparency over editor-style robustness; the formatter from the recommended Alt-1.D was dropped.)
 - **DF-22.2: 2.b** — Go using `github.com/ipfs/go-cid`.
@@ -405,6 +405,6 @@ Amendment history:
 
 - **TODO 012 (provisional):** Add the CI audit step: `go run ./tools/spec check` performs format checks (advisory CRLF/BOM warnings on drafts), manifest-vs-disk consistency, cross-ref-citation lint, and self-reference lint. The audit runs on every push to ppx/main and main; failures block the merge. Because the audit is a Go program, it runs identically under GitHub Actions, a self-hosted runner, or a git pre-receive hook on a non-GitHub host.
 
-- **TODO 010 (existing):** Drives TE-21 to DI. TE-21 + TE-22 together form the spec-doc-as-promise bundle: TE-21 says what a spec doc *is*; TE-22 says how the repo handles such docs. The DI entries from both TEs should land in the same revision of `specs/harness-spec-draft.md`'s vocabulary section.
+- **TODO 010 (existing):** Drives TE-nibar to DI. TE-nibar + TE-rujak together form the spec-doc-as-promise bundle: TE-nibar says what a spec doc *is*; TE-rujak says how the repo handles such docs. The DI entries from both TEs should land in the same revision of `specs/harness-spec-draft.md`'s vocabulary section.
 
-- **Future TE (planned):** Peer-level adoption metadata. TE-21 Alt-E said each peer's adoption is a separate promise that can name which answers it chose for open questions. TE-22 makes the doc-side machinery concrete; the peer side is still open. A follow-on TE will work out the wire-level shape of an adoption promise (likely a small structured payload referencing `pcid` + `open_question_choices: {Q7: yes, Q9: variant-B}`).
+- **Future TE (planned):** Peer-level adoption metadata. TE-nibar Alt-E said each peer's adoption is a separate promise that can name which answers it chose for open questions. TE-rujak makes the doc-side machinery concrete; the peer side is still open. A follow-on TE will work out the wire-level shape of an adoption promise (likely a small structured payload referencing `pcid` + `open_question_choices: {Q7: yes, Q9: variant-B}`).

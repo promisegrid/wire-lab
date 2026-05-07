@@ -1,4 +1,4 @@
-# TE-39: Naming reconciliation -- proquint handles for TEs and TODOs
+# TE-mumuv: Naming reconciliation -- proquint handles for TEs and TODOs
 
 *Thought experiment, part of the [PromiseGrid Wire Lab](../../protocols/wire-lab.d/specs/harness-spec-draft.md). This file is content-addressable; its hash is its pCID.*
 
@@ -20,15 +20,15 @@ decided
 The wire-lab corpus has carried two parallel identifier namespaces for
 every TE and TODO file:
 
-- **Integer aliases** (TE-1 through TE-38, TODO 1 through TODO 31).
+- **Integer aliases** (TE-famar through TE-sihih, TODO-dutaz through TODO-sinuv).
   Stable, terse, easy to cite in conversation and in commit
   messages. Allocated by hand at draft time. The "primary key" used
   in the README index, the master TODO cross-list, and most prose
   citations.
-- **Timestamp prefixes** (TE-20260427-180000-...) embedded in the
-  filename. Introduced by TE-25 ("TE-21 numbering collision and
+- **Timestamp prefixes** (TE-famar-...) embedded in the
+  filename. Introduced by TE-titur ("TE-nibar numbering collision and
   harness-spec path", 2026-04-30) to defuse a real collision between
-  two TE-21 candidates that arrived from independent twigs. Sortable
+  two TE-nibar candidates that arrived from independent twigs. Sortable
   by drafting time, immune to re-numbering, but verbose and not
   citable in prose without copying a 16-character substring.
 
@@ -40,11 +40,11 @@ files, and session logs used integers almost exclusively; the
 timestamps showed up only in `git mv` operations and in the README's
 "First drafted" column.
 
-The collision risk that TE-25 was trying to prevent did not actually
+The collision risk that TE-titur was trying to prevent did not actually
 go away. It just moved up one layer: now the integer alias is the
 thing that two parallel twigs can collide on, because nothing in the
 file or its filename forces a draft-time allocator to pick a unique
-integer. TE-25's resolution depended on the bot remembering to look
+integer. TE-titur's resolution depended on the bot remembering to look
 at the README every time it picked a number, which is a
 precondition that no twig running in isolation can satisfy.
 
@@ -57,7 +57,7 @@ filesystem read at mint time and resolved by retry.
 
 ## Why this matters (the 100-year-goal lens)
 
-TE-28 (jamod, "100-year-goal as a load-bearing design constraint")
+TE-dajot (jamod, "100-year-goal as a load-bearing design constraint")
 locks the invariant that the wire protocol must work without any
 central authority for at least a century. Wire-lab is design notes
 ABOUT a system that has those constraints; wire-lab itself is a
@@ -72,7 +72,7 @@ ultimately documenting: collision-checked random allocation against
 a CAS-shaped registry, with the registry being the artifact set
 itself rather than a separate authority.
 
-Future wire-lab readers studying the binding/feed-layer design (TE-29
+Future wire-lab readers studying the binding/feed-layer design (TE-vipir
 gitap) will see the same pattern in this TE's resolution: identifiers
 are allocated by minting against a local view of the corpus, and the
 collision behavior under fork is the same as it will be under
@@ -94,7 +94,7 @@ Bot's first reading: the integer-and-timestamp redundancy. Steve's
 correction: the actual concern is the collision risk between the two
 namespaces -- specifically, the integer-alias namespace collides
 across forks because nothing in the file or filename forces uniqueness.
-TE-25 had patched the symptom by embedding a sortable timestamp; it
+TE-titur had patched the symptom by embedding a sortable timestamp; it
 had not addressed the underlying need for a fork-safe identifier.
 
 ### Step 2 -- gameout of dictionary-based handles (Alt-F)
@@ -162,7 +162,7 @@ registry equivalent?"
 Steve: "what if we just use proquint-1 but always check against
 existing to ensure no collision?"
 
-Bot raised the central-authority concern: TE-28 says no central
+Bot raised the central-authority concern: TE-dajot says no central
 authority for a century. Steve's clarification:
 
 > "wire-lab is design notes about a system that has those
@@ -293,7 +293,7 @@ before this commit.
   drafting batches (the `2026-05-07-002306` cluster in the existing
   corpus contains 9 TODOs that all share the same timestamp).
 - **Alt-B: keep integers, drop timestamps.** Rejected because it
-  re-introduces the cross-fork collision problem TE-25 was patching.
+  re-introduces the cross-fork collision problem TE-titur was patching.
 - **Alt-C: keep both.** The status quo. Rejected because the dual
   namespace is confusing and the integer-alias allocator has no
   fork-safe path.
@@ -316,7 +316,7 @@ before this commit.
   needed). Steve closed it off: "we don't need to be able to
   re-derive a handle -- the goal is to simply avoid collisions."
   Re-derivability would also collide with the editing-policy TEs
-  (TE-34, TE-35) which permit in-place edits, breaking the handle's
+  (TE-dabol, TE-vudaf) which permit in-place edits, breaking the handle's
   stability under any content-bound derivation.
 - **Alt-H: FAA-style 5LNC with central registry.** Rejected because
   wire-lab has no central authority equivalent. The registry-as-
@@ -332,12 +332,12 @@ same branch:
   `(TE|TODO)-<timestamp>-<slug>.md` to
   `(TE|TODO)-<proquint>-<slug>.md` and inject a `## Prior aliases`
   section in each renamed file body.
-- **Chunk B (this commit):** TE-39 itself.
+- **Chunk B (this commit):** TE-mumuv itself.
 - **Chunk C (pending):** corpus-wide citation sweep replacing
   integer and timestamp references with proquint handles. Touches
   ~200 individual references across TE bodies, TODOs, AGENTS files,
   the harness-spec, DR/DI files, and the README.
-- **Chunk D (pending):** TE-25 (titur) gets a Cat-3 Refinement
+- **Chunk D (pending):** TE-titur (titur) gets a Cat-3 Refinement
   recording the proquint adoption; the README index gains a
   `prior_alias` column and uses the proquint as the primary key;
   the master TODO cross-list is rebuilt the same way; the twig
@@ -352,19 +352,19 @@ aliases stay; future readers cross-reference via the README
 
 ## Cross-references
 
-- **Predecessor:** TE-25 (titur), "TE-21 numbering collision and
+- **Predecessor:** TE-titur (titur), "TE-nibar numbering collision and
   harness-spec path" (2026-04-30), introduced the dual-identifier
-  scheme that this TE retires. A Cat-3 Refinement on TE-25 (added
+  scheme that this TE retires. A Cat-3 Refinement on TE-titur (added
   in chunk D) records the proquint adoption.
-- **Foundation:** TE-28 (jamod), "100-year goal as a load-bearing
+- **Foundation:** TE-dajot (jamod), "100-year goal as a load-bearing
   design constraint", cited above for the no-central-authority
   invariant that wire-lab's documentary corpus is design notes
   ABOUT (not bound by).
-- **Sibling:** TE-29 (gitap), "Protocols as simulated repos and the
+- **Sibling:** TE-vipir (gitap), "Protocols as simulated repos and the
   L4-binding layer", uses the same collision-checked allocation
   pattern at the protocol level. The handle scheme in this TE is
   the corpus-management instance of that pattern.
-- **Editing-policy interaction:** TE-34 (dabol) and TE-35 (vudaf)
+- **Editing-policy interaction:** TE-dabol (dabol) and TE-vudaf (vudaf)
   permit in-place edits of TE bodies. Handles must therefore be
   stable under content edits, which rules out content-derived
   handles (Alt-G above).

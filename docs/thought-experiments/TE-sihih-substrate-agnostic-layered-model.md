@@ -1,10 +1,10 @@
-# TE-38: Substrate-agnostic layered model (L5/L6/L7) and L6 CAS subtree
+# TE-sihih: Substrate-agnostic layered model (L5/L6/L7) and L6 CAS subtree
 
 *Thought experiment, part of the [PromiseGrid Wire Lab](../../protocols/wire-lab.d/specs/harness-spec-draft.md). This file is content-addressable; its hash is its pCID.*
 
 ## TE ID
 
-TE-20260506-184800
+TE-sihih
 
 ## Prior aliases
 
@@ -17,10 +17,10 @@ Before the TE-39 proquint migration, this file was known as:
 
 decided
 
-(Vocabulary refactor over the architecture already locked in TE-29.
+(Vocabulary refactor over the architecture already locked in TE-vipir.
 The locked path scheme, simulated-repo shape, layer
 decomposition, and instance-feed-declaration mechanism are all
-unchanged from TE-29. This TE renames the layers, cites the
+unchanged from TE-vipir. This TE renames the layers, cites the
 100-year goal as the foundation those layers are answering to,
 and extends the path scheme with an L6 CAS subtree so every
 chunk lives in content-addressable storage with no
@@ -28,7 +28,7 @@ size-conditioned exception.)
 
 ## Why this TE now
 
-TE-29 locked the architecture but used the framing "L4-binding
+TE-vipir locked the architecture but used the framing "L4-binding
 layer" carried over from session-of-2026-05-01 vocabulary. Two
 problems surfaced as later TEs and conversations accumulated:
 
@@ -39,32 +39,32 @@ problems surfaced as later TEs and conversations accumulated:
    with the active subscription (what an instance actually
    reads). Memory-of-record (`projects.wire_lab` and the
    2026-05-04/05/06 sessions) reflects the rename to "feed";
-   TE-29 is the last place still saying "binding".
+   TE-vipir is the last place still saying "binding".
 
 2. **The layered model was never named foundationally.** The
    L5/L6/L7 split — feed protocols / CAS protocols / group
    (forum) protocols — exists in conversation memory and in
    the dependency-sorted TE roster, but no TE cites it as a
-   foundational consequence of the 100-year goal (TE-28).
+   foundational consequence of the 100-year goal (TE-dajot).
    Without that citation, future-Steve and future-LLM readers
    cannot reconstruct *why* the layers carve where they do
    without rereading the entire conversational history.
 
 In addition, conversation on 2026-05-06 raised one substantive
-question over and above vocabulary: TE-29 stops at
+question over and above vocabulary: TE-vipir stops at
 five path levels and is silent on where *chunks* live. An
 earlier draft (Alt-M.1) tried to make "small messages are leaf
 chunks; large messages get pointer files" work, but Steve flagged
 on 2026-05-06 17:54 PT that "all chunks should go into CAS;
 exceptions make it complicated." This TE locks the no-exception
-shape (Alt-M.4 in TODO 22, Q-22.6) as the L6 layer of the
+shape (Alt-M.4 in TODO-vunub, Q-22.6) as the L6 layer of the
 substrate-agnostic model.
 
 ## Decision under test
 
 DUT-38: **Adopt L5/L6/L7 as the named, citable layered model
 under the 100-year goal, rename "binding" to "feed" in current
-and future spec language, and extend TE-29's path scheme with an
+and future spec language, and extend TE-vipir's path scheme with an
 L6 CAS subtree (`cas/<cas-protocol-pCID>/<chunk-cid>`) such that
 every message file in `transports/` is unconditionally a CBOR
 pointer into CAS.**
@@ -75,12 +75,12 @@ Three independent sub-decisions, each treated below:
   introduce L5/L6/L7 as canonical layer names.
 - **DF-38.M** (CAS subtree): all messages are CBOR pointers; no
   size-based exception.
-- **DF-38.G** (citation): cite the 100-year goal (TE-28) as the
+- **DF-38.G** (citation): cite the 100-year goal (TE-dajot) as the
   load-bearing constraint each layer is answering to.
 
-## Foundational invariants (citing TE-28)
+## Foundational invariants (citing TE-dajot)
 
-The 100-year goal (TE-28) names a constraint set the layered
+The 100-year goal (TE-dajot) names a constraint set the layered
 model exists to answer. The L5/L6/L7 split is not a conventional
 networking-stack layering; it is a substrate-agnostic split
 chosen so that each layer can survive independent obsolescence
@@ -95,7 +95,7 @@ of every other layer. The invariants the layers honor:
    reconstructible from on-disk artifacts after every named
    participant has left the project. Specs are content-
    addressable; instances declare themselves through paths
-   (TE-29's path-as-declaration); chunks are addressable
+   (TE-vipir's path-as-declaration); chunks are addressable
    independent of the wire that delivered them.
 
 3. **Adversarial-by-default.** Every layer assumes Mallory
@@ -111,7 +111,7 @@ of every other layer. The invariants the layers honor:
    below. The path scheme makes the choice mechanical: each
    level is a pCID that names exactly which spec is in force.
 
-5. **Trust accrues per-burden.** TE-29's guarantee that
+5. **Trust accrues per-burden.** TE-vipir's guarantee that
    trust attaches to a (party, promise) pair, not to a party
    alone, holds across all three layers. Each layer asserts
    only what it can keep.
@@ -123,7 +123,7 @@ of every other layer. The invariants the layers honor:
 
 These six invariants are the load-bearing reason layers carve
 where they do. They are restated here, not introduced; the
-canonical home is TE-28.
+canonical home is TE-dajot.
 
 ## Locked shape: L5/L6/L7
 
@@ -183,11 +183,11 @@ messages (that is L7).
 
 ## Locked shape: extended path scheme with L6 CAS subtree
 
-TE-29 locked the message-side path:
+TE-vipir locked the message-side path:
 
     transports/<wire>/<feed-pCID>/<group-pCID>/<msg-pCID>/<msg-id>.txt
 
-(TE-29 wrote `<binding-pCID>`; this TE renames the level to
+(TE-vipir wrote `<binding-pCID>`; this TE renames the level to
 `<feed-pCID>` to match the L5 / "feed" vocabulary. The shape
 is otherwise unchanged.)
 
@@ -238,7 +238,7 @@ one does, the inline files are a known transient.
 
 ## Vocabulary table (rename map)
 
-| Old (in TE-29 and earlier) | New (TE-38 and forward) | Notes |
+| Old (in TE-vipir and earlier) | New (TE-sihih and forward) | Notes |
 |---|---|---|
 | L4 / L4 binding | L5 / feed | "L4" was inherited from OSI counting and never quite matched; layers in this model are L5/L6/L7 by explicit choice, not by analogy to OSI. |
 | binding spec | feed spec | The spec sense. |
@@ -253,11 +253,11 @@ The Cat-1b quotation rule applies: any TE that already locked
 a DI using the old vocabulary keeps the old word inside the
 quotation. Forward-going text uses the new vocabulary.
 
-## What changes in TE-29
+## What changes in TE-vipir
 
-This TE does not supersede TE-29. The architecture TE-29
+This TE does not supersede TE-vipir. The architecture TE-vipir
 locked is the architecture this TE inherits. Three navigational
-forward-pointers belong on TE-29 (filed as a Cat-3 Refinement
+forward-pointers belong on TE-vipir (filed as a Cat-3 Refinement
 in this TE's commit set):
 
 - The path-level-2 vocabulary is "feed" not "binding"; the
@@ -267,12 +267,12 @@ in this TE's commit set):
   is the canonical chunk-storage shape; messages in
   `transports/` are CBOR pointers.
 
-TE-29's body text, locked DIs, and recommendation are unchanged.
+TE-vipir's body text, locked DIs, and recommendation are unchanged.
 
 ## Implications and future work
 
-1. **TE-39 through TE-45 inherit this vocabulary.** The
-   dependency-sorted TE roster (in TODO 22 and the
+1. **TE-mumuv through TE-45 inherit this vocabulary.** The
+   dependency-sorted TE roster (in TODO-vunub and the
    dropped-thread-disposition file) uses "feed" and "group"
    throughout. No TE is blocked on this rename; this TE
    exists so a single-TE reader of any successor TE can
@@ -289,7 +289,7 @@ TE-29's body text, locked DIs, and recommendation are unchanged.
 
 3. **Spec directory renames** (`udp-binding.d/` →
    `udp-feed.d/`, etc.) are deferred to the per-feed TEs
-   (TE-39 family). The current draft directories keep
+   (TE-mumuv family). The current draft directories keep
    their old names until those TEs re-cut them under the
    new vocabulary; this avoids a sweep that would touch
    files in flight.
@@ -304,35 +304,35 @@ TE-29's body text, locked DIs, and recommendation are unchanged.
 `decided`. Sub-decisions:
 
 - DF-38.1 = Alt-1.A (L5 protocols are top-level under
-  `protocols/`, not nested) — locked in TODO 22 Q-22.2.
+  `protocols/`, not nested) — locked in TODO-vunub Q-22.2.
 - DF-38.M = Alt-M.4 (all messages are CBOR pointers; no
-  exception) — locked in TODO 22 Q-22.6 on 2026-05-07.
-- DF-38.G = adopted (TE-28 cited as foundation in the
+  exception) — locked in TODO-vunub Q-22.6 on 2026-05-07.
+- DF-38.G = adopted (TE-dajot cited as foundation in the
   "Foundational invariants" section above).
 
-Retracted sub-decisions (logged in TODO 22 with `[~]`):
+Retracted sub-decisions (logged in TODO-vunub with `[~]`):
 
 - DF-38.A — layered-model foundation as a separate question;
   retracted because L5/L6/L7 was already settled in memory.
 - DF-38.2 — instance feed-declaration mechanism; retracted
-  because TE-29 already locked path-as-declaration.
+  because TE-vipir already locked path-as-declaration.
 
 ## Reference to load-bearing constraints
 
-- TE-28 (`docs/thought-experiments/TE-20260501-202713-100-year-goal-as-design-constraint.md`)
+- TE-dajot (`docs/thought-experiments/TE-dajot-100-year-goal-as-design-constraint.md`)
   — the 100-year goal that the L5/L6/L7 split answers.
-- TE-29 (`docs/thought-experiments/TE-20260501-215027-protocols-as-simulated-repos-and-binding-layer.md`)
+- TE-vipir (`docs/thought-experiments/TE-vipir-protocols-as-simulated-repos-and-binding-layer.md`)
   — the architecture this TE renames and extends.
-- TE-34 / TE-35 — TE editing policy under which this TE's
-  Cat-3 Refinement on TE-29 is filed.
-- TODO 22 (`protocols/wire-lab.d/TODO/TODO-20260506-184800-te-38-substrate-agnostic-layered-model.md`)
+- TE-dabol / TE-vudaf — TE editing policy under which this TE's
+  Cat-3 Refinement on TE-vipir is filed.
+- TODO-vunub (`protocols/wire-lab.d/TODO/TODO-vunub-te-38-substrate-agnostic-layered-model.md`)
   — parent TODO with the question log (Q-22.1 through
   Q-22.8).
 
 ## Recommendation
 
 Lock the vocabulary and the L6 CAS subtree as written.
-Apply the Cat-3 Refinement to TE-29 in the same commit set.
+Apply the Cat-3 Refinement to TE-vipir in the same commit set.
 Defer spec-directory renames and the
 `transports/wire-lab-devs-draft/` rewrite to the per-feed TEs
 and TE-43 respectively.

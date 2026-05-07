@@ -1,4 +1,4 @@
-# TODO 28: TE-43 promisebase prior-art adoption
+# TODO-kituj: TE-43 promisebase prior-art adoption
 
 ## Prior aliases
 
@@ -9,14 +9,14 @@ Before the TE-39 proquint migration, this file was known as:
 
 ## Status
 
-Open. Depends on TE-38 (substrate-agnostic layered model) L6
+Open. Depends on TE-sihih (substrate-agnostic layered model) L6
 substrate definition. No twig yet.
 
 ## Threads absorbed from OPEN-THREADS.md
 
 ### T-PROMISEBASE-ADOPTION (formerly OPEN-THREADS, opened 2026-05-06)
 
-Largest cluster after TE-38 (25 UTs).
+Largest cluster after TE-sihih (25 UTs).
 
 Scope:
   - Ratify the prototype-not-canon stance (Steve turn-191: "prototype
@@ -31,7 +31,7 @@ Scope:
     stevegt/promisebase).
   - Address fuse/ test failures and cmd/pb Docker SDK rot (UT-184.e/g).
 
-Blocking: TE-38 (substrate-agnostic layered model) L6 substrate
+Blocking: TE-sihih (substrate-agnostic layered model) L6 substrate
 definition must land first.
 
 Anchor: turn-191 canon rule; pitbase main + kv branch on

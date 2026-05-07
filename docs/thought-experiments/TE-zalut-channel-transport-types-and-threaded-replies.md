@@ -1,12 +1,12 @@
-# TE-26: Transport-protocol types, pCID-keyed transport paths, and DAG message graphs
+# TE-zalut: Transport-protocol types, pCID-keyed transport paths, and DAG message graphs
 
 *Thought experiment, part of the [PromiseGrid Wire Lab](../../protocols/wire-lab.d/specs/harness-spec-draft.md) and the (forthcoming) `specs/transport-spec-draft.md`. This file is content-addressable; its hash is its pCID.*
 
-> **Vocabulary note (TE-27):** This TE was originally drafted using the word "channel" for what is now called "transport." Per [TE-27](TE-20260501-021921-transports-rename-and-axes-of-differentiation.md) (axes-of-differentiation analysis and `channels/` → `transports/` rename), the wire-lab vocabulary is now "transport" and "message"; "channel" is not used. This TE has been rewritten in place to use the new vocabulary; structure, DF labels, and locked decisions are unchanged. Where the original document referred to the "codex-perplexity channel-protocol," the rewrite refers to it as the codex-perplexity instance of the group-transport-protocol (TE-27 DF-27.5 Alt-5.B).
+> **Vocabulary note (TE-junil):** This TE was originally drafted using the word "channel" for what is now called "transport." Per [TE-junil](TE-junil-transports-rename-and-axes-of-differentiation.md) (axes-of-differentiation analysis and `channels/` → `transports/` rename), the wire-lab vocabulary is now "transport" and "message"; "channel" is not used. This TE has been rewritten in place to use the new vocabulary; structure, DF labels, and locked decisions are unchanged. Where the original document referred to the "codex-perplexity channel-protocol," the rewrite refers to it as the codex-perplexity instance of the group-transport-protocol (TE-junil DF-27.5 Alt-5.B).
 
 ## TE ID
 
-TE-20260430-215624
+TE-zalut
 
 ## Prior aliases
 
@@ -21,7 +21,7 @@ decided
 
 ## Decision under test
 
-The current `transports/` v0 contract (TE-24, `DR-009-20260430-204108`, `transports/README.md`) implicitly assumes one transport shape: a 1:1 message-based flow simulating something like a websocket between two named endpoints (Codex and Perplexity), with a single-writer per-direction append-only log and a `Prev-Message-CID` linking to the previous message **by the same sender**. Several pieces of that shape need to be re-examined before subdirectory layout is locked in:
+The current `transports/` v0 contract (TE-hogus, `DR-009-20260430-204108`, `transports/README.md`) implicitly assumes one transport shape: a 1:1 message-based flow simulating something like a websocket between two named endpoints (Codex and Perplexity), with a single-writer per-direction append-only log and a `Prev-Message-CID` linking to the previous message **by the same sender**. Several pieces of that shape need to be re-examined before subdirectory layout is locked in:
 
 1. **Transport-type taxonomy.** What other transport shapes are first-class enough to deserve their own structural support in `transports/`? At minimum: 1:1 unicast, group/broadcast, subgroup multicast, pub/sub by topic, anycast, request-reply, broadcast-with-receipts, single-writer log, and general DAG.
 2. **Reply graph shape.** The current `Prev-Message-CID` is a single CID linking only to the previous message **by the same sender** in the same transport. That suffices for a single-writer log, but it cannot represent **threaded discussion** — i.e., a message that has multiple ancestors, possibly from multiple senders. The honest framing is a git-like DAG of messages within a transport, where any message can have zero or more parents; "reply" is just one reason a message might cite a parent.
@@ -32,13 +32,13 @@ Settling these together is appropriate because each one's answer reshapes the ot
 
 ## Assumptions
 
-- The repo-local carrier remains `grid <pcid>` first-line + canonical text headers + explicit `I promise ...` body (TE-24, locked).
-- The carrier is meant to teach the project something about wire-format and transport choices before the canonical PromiseGrid wire format is frozen. Over-locking transport assumptions in v0 has the same downside as over-locking parser-level envelopes did in TE-14.
-- "Single-writer append-only log" is a useful invariant for some transports but not all. Whatever shape replaces it must still let a receiver acknowledge a contiguous prefix without a mutable read ledger (TE-24's argument for `IHave`).
+- The repo-local carrier remains `grid <pcid>` first-line + canonical text headers + explicit `I promise ...` body (TE-hogus, locked).
+- The carrier is meant to teach the project something about wire-format and transport choices before the canonical PromiseGrid wire format is frozen. Over-locking transport assumptions in v0 has the same downside as over-locking parser-level envelopes did in TE-botom.
+- "Single-writer append-only log" is a useful invariant for some transports but not all. Whatever shape replaces it must still let a receiver acknowledge a contiguous prefix without a mutable read ledger (TE-hogus's argument for `IHave`).
 - A message's CID is computed over its full canonical bytes and is the authoritative identity. Anything else (`Message-ID`, headers, file path) is a convenience layer built on top.
 - Promise-theory framing: the body still says `I promise ...`. Headers are conveniences for indexing, dispatch, and receipt math; they are not where the load-bearing semantics live.
 - The repo's prior `transports/codex-perplexity/` directional layout has not actually been created yet — `transports/README.md` says "this change does not create any subdirectories under `transports/` yet." So the layout question is genuinely open and not blocked by existing committed files under per-direction paths.
-- "Let each protocol name its own internals" (standing rule from TE-14) applies recursively: just as the wire-lab carrier names its own internals via its pCID, each transport-protocol names its own internals via its own pCID.
+- "Let each protocol name its own internals" (standing rule from TE-botom) applies recursively: just as the wire-lab carrier names its own internals via its pCID, each transport-protocol names its own internals via its own pCID.
 
 ## Transport-type catalogue
 
@@ -88,7 +88,7 @@ The most general case. Each message has a list of zero or more parent CIDs in th
 
 3. **The wire-lab transport-spec stays thin.** It defines: the outer convention (transports live at `transports/<pcid>--<slug>/`), the rule that messages do not declare their transport via a header, and the requirement that each transport-protocol's pCID names a spec defining everything inside the directory. It does **not** define `Parents`, `In-Reply-To`, header grammar for parent lists, transport vocabulary, or receipt format — those are named by individual transport-protocols.
 
-These three principles together collapse several of the original DFs (26.1, 26.2, 26.3, 26.5, 26.6) into delegations to the per-transport-pCID protocol. The DFs that remain at the wire-lab level concern (a) the path-keying convention, (b) the timing of carve-out, (c) the operational meaning of "the pCID defines the structure," and (d) what to do with TE-24's existing v0 contract. Within the codex-perplexity instance of the group-transport-protocol *specifically*, an additional DF concerns the parent-header naming.
+These three principles together collapse several of the original DFs (26.1, 26.2, 26.3, 26.5, 26.6) into delegations to the per-transport-pCID protocol. The DFs that remain at the wire-lab level concern (a) the path-keying convention, (b) the timing of carve-out, (c) the operational meaning of "the pCID defines the structure," and (d) what to do with TE-hogus's existing v0 contract. Within the codex-perplexity instance of the group-transport-protocol *specifically*, an additional DF concerns the parent-header naming.
 
 ## Decision Forks (DFs)
 
@@ -98,7 +98,7 @@ The wire-lab spec does not pick a layout for a transport's interior. Each transp
 
 ### DF-26.2 — Parent-link header *(withdrawn — delegated to each transport-pCID)*
 
-Whether a parent-link header exists at all, what it is named, and whether it accepts one or many CIDs are all properties of each transport-protocol's spec. TE-26 surfaces only the conceptual shift toward DAG parent semantics; it does not pick header shapes for any specific transport-protocol.
+Whether a parent-link header exists at all, what it is named, and whether it accepts one or many CIDs are all properties of each transport-protocol's spec. TE-zalut surfaces only the conceptual shift toward DAG parent semantics; it does not pick header shapes for any specific transport-protocol.
 
 ### DF-26.3 — How a message declares its transport *(withdrawn — layer inversion)*
 
@@ -108,12 +108,12 @@ A message does not declare its transport. The transport itself (in repo-local te
 
 #### Alt-4.A: Apply to `specs/transport-spec-draft.md` immediately, before any real transport traffic *(LOCKED — recommended)*
 
-The new transport-spec carve-out, when written, embeds these conclusions directly: pCID-keyed transport paths, no `Transport:` header, parent-link semantics delegated to each transport-pCID. The TE-24 v0 contract (parents, receipts, message-id, etc.) is reframed at the same time as the contract of one specific transport-protocol-pCID, documented in a separate `specs/group-transport-draft.md` (per TE-27 DF-27.5 Alt-5.B; the codex-perplexity case is the N=2 instance of the group-transport).
+The new transport-spec carve-out, when written, embeds these conclusions directly: pCID-keyed transport paths, no `Transport:` header, parent-link semantics delegated to each transport-pCID. The TE-hogus v0 contract (parents, receipts, message-id, etc.) is reframed at the same time as the contract of one specific transport-protocol-pCID, documented in a separate `specs/group-transport-draft.md` (per TE-junil DF-27.5 Alt-5.B; the codex-perplexity case is the N=2 instance of the group-transport).
 
 - **Easier**: the new wire-lab transport-spec doesn't carry vestigial 1:1 / single-writer assumptions or vestigial header definitions that would need to be moved later.
 - **Harder**: the transport-spec carve-out is now blocked behind these decisions, but those decisions are now made.
 
-#### Alt-4.B: Carve out the transport-spec now (using current TE-24 v0 contract), apply this TE's recommendations as the transport-spec's first revision
+#### Alt-4.B: Carve out the transport-spec now (using current TE-hogus v0 contract), apply this TE's recommendations as the transport-spec's first revision
 
 Land the transport-spec carve-out as the existing v0 (Prev-Message-CID, no transport taxonomy, no pCID keying). Then immediately revise the draft to apply this TE's recommendations. Two commits.
 
@@ -129,11 +129,11 @@ Don't change anything until at least one real message has been written under the
 
 ### DF-26.5 — Multi-CID parent-list serialization *(withdrawn — delegated to each transport-pCID)*
 
-How a parent-link header (whatever it is named) serializes one or many CIDs is a property of each transport-protocol's spec. The wire-lab spec does not constrain it, and TE-26 does not survey the alternatives.
+How a parent-link header (whatever it is named) serializes one or many CIDs is a property of each transport-protocol's spec. The wire-lab spec does not constrain it, and TE-zalut does not survey the alternatives.
 
 ### DF-26.6 — Receipts (`IHave`) cross-transport naming *(withdrawn — delegated to each transport-pCID)*
 
-The TE-24 contract's `IHave: <transport>:<cid>` form references a possibly-different transport from the one carrying the receipt. Whether the receipt names the referenced transport by pCID, slug, or something else is a property of the transport-protocol that defines the receipt format. The wire-lab spec does not constrain it.
+The TE-hogus contract's `IHave: <transport>:<cid>` form references a possibly-different transport from the one carrying the receipt. Whether the receipt names the referenced transport by pCID, slug, or something else is a property of the transport-protocol that defines the receipt format. The wire-lab spec does not constrain it.
 
 ### DF-26.7 — How is a transport directory keyed under `transports/`?
 
@@ -184,25 +184,25 @@ Each transport-protocol comes with its own reader/writer code. The pCID identifi
 
 ### DF-26.9 — Parent-link header *(withdrawn — delegated to each transport-pCID)*
 
-Whether a transport-protocol exposes a parent-link header at all, what it is named, what it accepts, how it serializes, and whether it is optional are all properties of that transport-protocol's own spec. The wire-lab transport-spec does not mention parent-link headers. TE-26 surfaces only the *conceptual* shift toward a DAG-shaped message graph; it does not pick header names.
+Whether a transport-protocol exposes a parent-link header at all, what it is named, what it accepts, how it serializes, and whether it is optional are all properties of that transport-protocol's own spec. The wire-lab transport-spec does not mention parent-link headers. TE-zalut surfaces only the *conceptual* shift toward a DAG-shaped message graph; it does not pick header names.
 
-### DF-26.10 — What happens to TE-24's existing v0 contract?
+### DF-26.10 — What happens to TE-hogus's existing v0 contract?
 
-#### Alt-10.A: Reframe TE-24's contract now as one specific transport-protocol's contract *(LOCKED — chosen)*
+#### Alt-10.A: Reframe TE-hogus's contract now as one specific transport-protocol's contract *(LOCKED — chosen)*
 
-The wire-lab `specs/transport-spec-draft.md` is the *thin* outer rule (pCID-keyed paths, no `Transport:` header, code-as-handler principle). The TE-24 v0 contract (parents, receipts, message-id, message kinds, `IHave`, canonical-bytes) is documented separately as the contract of one specific transport-protocol — the group-transport (per TE-27 DF-27.5 Alt-5.B), of which the Codex↔Perplexity case is the N=2 instance — in a draft spec doc. That spec doc has its own pCID once frozen.
+The wire-lab `specs/transport-spec-draft.md` is the *thin* outer rule (pCID-keyed paths, no `Transport:` header, code-as-handler principle). The TE-hogus v0 contract (parents, receipts, message-id, message kinds, `IHave`, canonical-bytes) is documented separately as the contract of one specific transport-protocol — the group-transport (per TE-junil DF-27.5 Alt-5.B), of which the Codex↔Perplexity case is the N=2 instance — in a draft spec doc. That spec doc has its own pCID once frozen.
 
 - **Easier**: clean separation between wire-lab-level rules and transport-protocol-level contracts. Future transport-protocols can reuse the wire-lab outer rules without inheriting group-transport-specific assumptions.
 - **Harder**: two new spec docs to maintain (the thin wire-lab one and the group-transport one) instead of one fat one.
 
-#### Alt-10.B: Keep TE-24's contract as wire-lab-global default
+#### Alt-10.B: Keep TE-hogus's contract as wire-lab-global default
 
 Keep the contract at the wire-lab level until a second transport-protocol shows up demanding different rules.
 
 - **Easier**: one document; no premature splitting.
 - **Harder**: bakes in single-transport-protocol assumptions; future second-protocol arrival is a more disruptive split.
 
-#### Alt-10.C: Reframe TE-24 now (Alt-10.A) AND freeze the group-transport-protocol pCID immediately
+#### Alt-10.C: Reframe TE-hogus now (Alt-10.A) AND freeze the group-transport-protocol pCID immediately
 
 Eat the dogfood.
 
@@ -221,7 +221,7 @@ A "status update" is conceptually broadcast (T2 / T7), not unicast.
 
 Three senders in one transport, each citing prior messages by others.
 
-- Under DAG parent semantics: Codex's reply names Perplexity's message as a parent. Steve's reply names Perplexity's message as a parent and possibly also Codex's. The DAG handles this naturally without a single-writer-log assumption. The exact header used is a property of the group-transport-protocol's spec, not TE-26.
+- Under DAG parent semantics: Codex's reply names Perplexity's message as a parent. Steve's reply names Perplexity's message as a parent and possibly also Codex's. The DAG handles this naturally without a single-writer-log assumption. The exact header used is a property of the group-transport-protocol's spec, not TE-zalut.
 
 ### S3 — A long-running 1:1 between Codex and Perplexity occasionally gets a third participant
 
@@ -257,16 +257,16 @@ Standard "completeness check" case.
 3. **Each transport-protocol-pCID names a spec that defines the directory's interior:** layout, headers (including any parent-link header), parent semantics, receipt format, message-kind vocabulary, etc. The wire-lab transport-spec does not define these. (DF-26.1, 26.2, 26.5, 26.6 — all withdrawn / delegated.)
 4. **The code that reads the directory structure is the handler for that pCID** (DF-26.8 Alt-8.C). There is no machine-readable companion file at the wire-lab level.
 5. **A transport's message graph is conceptually a DAG.** Each message can have zero or more parent messages within the same transport. The single-writer-log shape (every message has exactly one parent in its own log) is a special case. How any transport-protocol expresses this — header names, serialization, optionality, or whether a parent-link header exists at all — is delegated to that transport-protocol's spec.
-6. **TE-24's v0 contract is reframed now as the group-transport-protocol's contract** (DF-26.10 Alt-10.A), in a separate draft spec. The wire-lab transport-spec ships thin.
+6. **TE-hogus's v0 contract is reframed now as the group-transport-protocol's contract** (DF-26.10 Alt-10.A), in a separate draft spec. The wire-lab transport-spec ships thin.
 7. **Apply these conclusions in the transport-spec carve-out itself** (DF-26.4 Alt-4.A). No two-step revision dance; no vestigial 1:1 assumption in the new wire-lab spec.
 
 ## Implications
 
-- **The single-CID `Prev-Message-CID` of TE-24 is conceptually subsumed by DAG parent semantics**, but its concrete shape (header name, serialization, list-vs-singleton, optionality) in the group-transport-protocol's contract is a decision belonging to that transport-protocol's spec, not to TE-26.
+- **The single-CID `Prev-Message-CID` of TE-hogus is conceptually subsumed by DAG parent semantics**, but its concrete shape (header name, serialization, list-vs-singleton, optionality) in the group-transport-protocol's contract is a decision belonging to that transport-protocol's spec, not to TE-zalut.
 - **No `Transport:` header anywhere.** Existing references in `transports/README.md`, the harness-spec-draft, and DR-009 must be removed in the carve-out commit.
-- **Transports live at `transports/<pcid>--<slug>/`.** The codex-perplexity transport's directory will, once the group-transport-protocol-pCID is minted, become `transports/<that-pcid>--codex-perplexity/`. Until then, no on-disk directory is created (consistent with TE-24's "no subdirectories yet" stance).
+- **Transports live at `transports/<pcid>--<slug>/`.** The codex-perplexity transport's directory will, once the group-transport-protocol-pCID is minted, become `transports/<that-pcid>--codex-perplexity/`. Until then, no on-disk directory is created (consistent with TE-hogus's "no subdirectories yet" stance).
 - **Wire-lab transport-spec is thin.** It defines: pCID-keyed directory naming under `transports/`, the absence-of-`Transport:`-header rule, the requirement that each transport-protocol-pCID names a spec defining everything inside the directory, and the code-as-handler principle. That is roughly all.
-- **The group-transport-protocol draft spec is its own document** (`specs/group-transport-draft.md` per TE-27 DF-27.5 Alt-5.B), inheriting the full TE-24 v0 contract. Whether and how it adopts DAG parent semantics (replacing the single-CID `Prev-Message-CID`) is a decision that lives inside that spec doc, not in TE-26.
+- **The group-transport-protocol draft spec is its own document** (`specs/group-transport-draft.md` per TE-junil DF-27.5 Alt-5.B), inheriting the full TE-hogus v0 contract. Whether and how it adopts DAG parent semantics (replacing the single-CID `Prev-Message-CID`) is a decision that lives inside that spec doc, not in TE-zalut.
 - **Transport-spec freeze and group-transport-spec freeze are independent** future events, each minting their own pCID under Steve's signature on a corresponding `merge-<slug>-spec` promise.
 - **TODO 012's scope expands** to cover the carve-out plus the group-transport draft spec (subtasks 012.7+).
 
@@ -281,14 +281,14 @@ LOCKED:
 - DF-26.6 — withdrawn (delegated to each transport-pCID).
 - DF-26.7 — Alt-7.C (`transports/<pcid>--<slug>/`).
 - DF-26.8 — Alt-8.C (code-as-handler; no machine-readable companion).
-- DF-26.9 — withdrawn (delegated to each transport-pCID; TE-26 surfaces the DAG concept only).
-- DF-26.10 — Alt-10.A (reframe TE-24's contract now as the group-transport-protocol's contract).
+- DF-26.9 — withdrawn (delegated to each transport-pCID; TE-zalut surfaces the DAG concept only).
+- DF-26.10 — Alt-10.A (reframe TE-hogus's contract now as the group-transport-protocol's contract).
 
 Recorded principle: *transport identity, layout, and message structure are named by the pCID; the wire-lab spec defines only the outer envelope and the `transports/<pcid>--<slug>/` convention. The handler for a pCID is the code that reads its directory structure.*
 
 ## Implications for follow-on work
 
-- **TODO 013 (anticipated)**: drive these locked alts to a DR; carve out `specs/transport-spec-draft.md` (thin) and `specs/group-transport-draft.md` (the full TE-24 v0 contract, with any DAG-related revisions decided inside that spec, not by TE-26); rename `channels/` → `transports/`; update `transports/README.md`; remove transport material from `specs/harness-spec-draft.md`; update DR-009 and TODO 012.
+- **TODO 013 (anticipated)**: drive these locked alts to a DR; carve out `specs/transport-spec-draft.md` (thin) and `specs/group-transport-draft.md` (the full TE-hogus v0 contract, with any DAG-related revisions decided inside that spec, not by TE-zalut); rename `channels/` → `transports/`; update `transports/README.md`; remove transport material from `specs/harness-spec-draft.md`; update DR-009 and TODO 012.
 - **TODO 014 (anticipated)**: first real transport-message exchange under the new contract, exercising the group-transport-protocol's parent-link mechanism in both single-writer and multi-writer paths.
-- **TE-27 (anticipated → drafted)**: axes-of-differentiation analysis and the `channels/` → `transports/` rename. (Originally framed in TE-26 as "should the wire-lab spec define a small companion convention for transport-protocols to publish their own pCID on first use?" — that question, raised by DF-26.8 Alt-8.B, remains deferred and may surface in a later TE.)
-- **TE-32 (anticipated)**: receipts under multi-writer transports — does `IHave: <transport-pcid>:<cid>` need to become a vector to acknowledge a frontier rather than a single tip? (Decision belongs in each transport-protocol's spec, but the question is general enough to warrant a TE. Renumbered from TE-28 in TE-26's original anticipated-work list because TE-27 introduced intervening anticipated TEs.)
+- **TE-junil (anticipated → drafted)**: axes-of-differentiation analysis and the `channels/` → `transports/` rename. (Originally framed in TE-zalut as "should the wire-lab spec define a small companion convention for transport-protocols to publish their own pCID on first use?" — that question, raised by DF-26.8 Alt-8.B, remains deferred and may surface in a later TE.)
+- **TE-liviv (anticipated)**: receipts under multi-writer transports — does `IHave: <transport-pcid>:<cid>` need to become a vector to acknowledge a frontier rather than a single tip? (Decision belongs in each transport-protocol's spec, but the question is general enough to warrant a TE. Renumbered from TE-dajot in TE-zalut's original anticipated-work list because TE-junil introduced intervening anticipated TEs.)

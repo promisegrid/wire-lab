@@ -1,4 +1,4 @@
-# TODO 30: TE-45 conditional-release / geofencing / recursive promise-graph
+# TODO-ralud: TE-45 conditional-release / geofencing / recursive promise-graph
 
 ## Prior aliases
 
@@ -9,7 +9,7 @@ Before the TE-39 proquint migration, this file was known as:
 
 ## Status
 
-Open. Orthogonal to TE-38 layered model; can land independently.
+Open. Orthogonal to TE-sihih layered model; can land independently.
 No twig yet.
 
 ## Threads absorbed from OPEN-THREADS.md
@@ -25,7 +25,7 @@ dimension as a first-class property of group membership and message
 dispatch (UT-179.d); establish whether this lives in transport-spec,
 group-session, or a new conditional-release.d/ protocol family.
 
-Blocking: orthogonal to TE-38 layered model; can land independently.
+Blocking: orthogonal to TE-sihih layered model; can land independently.
 
 Anchor: turn 179 framing.
 Disposition-file pointer: `dropped-thread-disposition-20260506.md`

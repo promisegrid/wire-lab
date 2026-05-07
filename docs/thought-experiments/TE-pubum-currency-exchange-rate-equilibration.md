@@ -1,4 +1,4 @@
-# TE-3: Currency exchange-rate equilibration
+# TE-pubum: Currency exchange-rate equilibration
 
 ## Prior aliases
 

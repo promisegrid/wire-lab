@@ -1,4 +1,4 @@
-# TE-6: Capability-token revocation propagation
+# TE-fijub: Capability-token revocation propagation
 
 ## Prior aliases
 

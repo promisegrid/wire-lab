@@ -1,4 +1,4 @@
-# TE-12: Promise-stack as zero-knowledge envelope
+# TE-muvuv: Promise-stack as zero-knowledge envelope
 
 ## Prior aliases
 

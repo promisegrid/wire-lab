@@ -1,10 +1,10 @@
-# TE-25: Reconciling the TE-21 numbering collision and the `harness-spec.md` path on the channels branch
+# TE-titur: Reconciling the TE-nibar numbering collision and the `harness-spec.md` path on the channels branch
 
 *Thought experiment, part of the [PromiseGrid Wire Lab](../../protocols/wire-lab.d/specs/harness-spec-draft.md). This file is content-addressable; its hash is its pCID.*
 
 ## TE ID
 
-TE-20260430-213447
+TE-titur
 
 ## Prior aliases
 
@@ -21,14 +21,14 @@ decided, refined
 
 When `origin/stevegt/channels-grid-pcid` is reconciled with `ppx/main`, two surface conflicts arise that are not really about channels at all but about repo conventions. They are joined here because the same merge will resolve both, and they should be settled together so we have a single record:
 
-1. The channels branch labels its TE as **TE-21**, but `ppx/main` already has a different TE-21 (`docs/thought-experiments/TE-20260429-173520-spec-doc-as-promise.md`). One of them has to be renumbered.
+1. The channels branch labels its TE as **TE-nibar**, but `ppx/main` already has a different TE-nibar (`docs/thought-experiments/TE-nibar-spec-doc-as-promise.md`). One of them has to be renumbered.
 2. The channels branch edits a top-level `harness-spec.md`, but on `ppx/main` the spec was renamed to `specs/harness-spec-draft.md` during the genesis-freeze work in TODO 011. The patch cannot apply cleanly without translation.
 
 In addition, the channels branch adds an "Open Question #19" at the bottom of the harness-spec, and that bullet must end up at the correct slot in the renamed file.
 
 ## Assumptions
 
-- The TE numbering convention is recorded in `docs/thought-experiments/README.md`: "The TE numbers (TE-1, TE-2, …) are stable identifiers used in the harness-spec; the timestamp slug is what makes the file content-addressable and chronologically sortable on disk."
+- The TE numbering convention is recorded in `docs/thought-experiments/README.md`: "The TE numbers (TE-famar, TE-jovoj, …) are stable identifiers used in the harness-spec; the timestamp slug is what makes the file content-addressable and chronologically sortable on disk."
 - The "first drafted" timestamp is the integer-anchoring fact. Two TEs first drafted at different moments cannot share an integer.
 - Once a TE integer has appeared in `ppx/main` and been merged through, it is sticky for that TE: renumbering a TE that already exists in committed history is more disruptive than renumbering a TE that is still confined to a working branch.
 - The genesis-freeze rename of `harness-spec.md` to `specs/harness-spec-draft.md` is locked as of TODO 011, with the bot-frozen pCID `bafkreigtaivld55rekcswfj26mo26e267m3ytzgflqb2qcclyiicpfzc6i`.
@@ -42,35 +42,35 @@ Sorted by first-drafted timestamp, the relevant TEs are:
 
 | Integer | Timestamp slug | Title | Where it lives today |
 |---|---|---|---|
-| TE-21 | 20260429-173520 | Spec doc as promise | `ppx/main` |
-| TE-22 | 20260429-175530 | Spec-doc store layout and pCID machinery | `ppx/main` |
-| TE-23 | 20260430-064307 | Congruence/convergence duality and pCID framing | `ppx/main` |
-| (claimed TE-21 on channels branch) | 20260430-204108 | `grid <pcid>` as a repo-local channel-message carrier | `origin/stevegt/channels-grid-pcid` |
-| TE-25 | **20260430-213447** | This TE (numbering collision and harness-spec path) | (drafting now) |
+| TE-nibar | 20260429-173520 | Spec doc as promise | `ppx/main` |
+| TE-rujak | 20260429-175530 | Spec-doc store layout and pCID machinery | `ppx/main` |
+| TE-lozip | 20260430-064307 | Congruence/convergence duality and pCID framing | `ppx/main` |
+| (claimed TE-nibar on channels branch) | 20260430-204108 | `grid <pcid>` as a repo-local channel-message carrier | `origin/stevegt/channels-grid-pcid` |
+| TE-titur | **20260430-213447** | This TE (numbering collision and harness-spec path) | (drafting now) |
 
-By drafting time, the channel-carrier TE is **earlier** than this TE and would naturally land at TE-24 once both are integrated; this TE then lands at TE-25.
+By drafting time, the channel-carrier TE is **earlier** than this TE and would naturally land at TE-hogus once both are integrated; this TE then lands at TE-titur.
 
 ## Alternatives
 
 ### DF-25.1 — Which TE keeps the integer 21?
 
-#### Alt-1.A: `ppx/main`'s existing TE-21 keeps the number
+#### Alt-1.A: `ppx/main`'s existing TE-nibar keeps the number
 
-The TE titled "Spec doc as promise" remains TE-21. The channel-carrier TE is renumbered to its drafting-time-correct position.
+The TE titled "Spec doc as promise" remains TE-nibar. The channel-carrier TE is renumbered to its drafting-time-correct position.
 
 - **Easier**: no rewrites of any committed `ppx/main` history; the spec's TE-index keeps its existing 21. The channel-carrier branch is the one with rewrites, but the only changes are the integer label, the in-spec bullet, and the TE-index row. The timestamped filename does not change. Editing one branch is cheaper than editing many committed-and-merged commits across both branches.
 - **Harder**: requires touching the channel-carrier branch's TE doc, harness-spec patch, TODO 009 file, DR-009 file, and DI-009 entry to substitute the correct integer. None of these are large edits, but they must all be consistent before the channels branch merges into `ppx/main`.
 
-#### Alt-1.B: The channel-carrier TE keeps TE-21
+#### Alt-1.B: The channel-carrier TE keeps TE-nibar
 
-The channel-carrier TE remains TE-21. The spec-doc-as-promise TE on `ppx/main` is renumbered.
+The channel-carrier TE remains TE-nibar. The spec-doc-as-promise TE on `ppx/main` is renumbered.
 
-- **Easier**: the channel-carrier branch already references TE-21 in five files (TE itself, harness-spec patch, DR-009, DI-009, TODO 009, and channels/README.md). Leaving those alone means fewer edits on that branch.
-- **Harder**: TE-21 ("Spec doc as promise") is referenced not just in `docs/thought-experiments/README.md` but in committed harness-spec text, TE-22, TE-23, and the framing essay. Renumbering it would require rewriting several merged commits or carrying a forward-referencing patch into a new merge commit. It also breaks the "first-drafted-timestamp anchors the integer" invariant by giving a younger TE the older integer.
+- **Easier**: the channel-carrier branch already references TE-nibar in five files (TE itself, harness-spec patch, DR-009, DI-009, TODO 009, and channels/README.md). Leaving those alone means fewer edits on that branch.
+- **Harder**: TE-nibar ("Spec doc as promise") is referenced not just in `docs/thought-experiments/README.md` but in committed harness-spec text, TE-rujak, TE-lozip, and the framing essay. Renumbering it would require rewriting several merged commits or carrying a forward-referencing patch into a new merge commit. It also breaks the "first-drafted-timestamp anchors the integer" invariant by giving a younger TE the older integer.
 
-#### Alt-1.C: Both TEs keep TE-21, distinguished only by timestamp slug
+#### Alt-1.C: Both TEs keep TE-nibar, distinguished only by timestamp slug
 
-Treat TE-21 as a non-unique handle and rely on the timestamp slug for disambiguation.
+Treat TE-nibar as a non-unique handle and rely on the timestamp slug for disambiguation.
 
 - **Easier**: zero rewrites.
 - **Harder**: violates the TE-index README's "stable identifier" promise; collapses the human-friendly integer label; makes spec text and conversation ambiguous; defeats the entire reason integers exist alongside slugs.
@@ -79,18 +79,18 @@ Treat TE-21 as a non-unique handle and rely on the timestamp slug for disambigua
 
 Conditional on Alt-1.A.
 
-#### Alt-2.A: The channel-carrier TE becomes TE-25, this TE keeps a tentative TE-24 label
+#### Alt-2.A: The channel-carrier TE becomes TE-titur, this TE keeps a tentative TE-hogus label
 
 Disrecommended; included only for completeness. The channel-carrier TE was drafted 53 minutes earlier than this TE, so by drafting-time order this assignment is backwards.
 
-#### Alt-2.B: The channel-carrier TE becomes TE-24; this TE becomes TE-25
+#### Alt-2.B: The channel-carrier TE becomes TE-hogus; this TE becomes TE-titur
 
 By strict drafting-time order, the channel-carrier TE was drafted 53 minutes earlier than this one, so it gets the smaller integer.
 
 - **Easier**: directly applies the existing rule. No subjective judgement.
-- **Harder**: this TE is being authored with a TE-25 title; the channel-carrier TE's existing references to TE-21 are rewritten to TE-24 during integration. Both edits are mechanical.
+- **Harder**: this TE is being authored with a TE-titur title; the channel-carrier TE's existing references to TE-nibar are rewritten to TE-hogus during integration. Both edits are mechanical.
 
-#### Alt-2.C: The channel-carrier TE becomes TE-25; this TE keeps a tentative TE-24 label
+#### Alt-2.C: The channel-carrier TE becomes TE-titur; this TE keeps a tentative TE-hogus label
 
 Treat the reconciliation TE as logically prior because its merge has to land before the channels branch merges, even though it was drafted later.
 
@@ -147,7 +147,7 @@ Bot does not carry the open question on `ppx/main`; it lands organically when St
 
 #### Alt-4.C: Carry the question on `ppx/main` as Open Question #19, scoped to repo-local
 
-Add the bullet at the next free integer with explicit scoping: "For the repo-local `channels/` experiment only…" plus a pointer to TE-24 (the channel-carrier TE) and DR-009.
+Add the bullet at the next free integer with explicit scoping: "For the repo-local `channels/` experiment only…" plus a pointer to TE-hogus (the channel-carrier TE) and DR-009.
 
 - **Easier**: keeps the question visible while channel work continues.
 - **Harder**: when Steve merges his branch into `main` later, his version of the question will collide with this one and need to be deduped.
@@ -158,7 +158,7 @@ Add the bullet at the next free integer with explicit scoping: "For the repo-loc
 
 The bot needs to begin channel work today.
 
-- **Alt-1.A + Alt-2.B + Alt-3.B + Alt-4.C**: bot translates the channel-carrier commit onto a `ppx/` twig, renumbers TE-21 to TE-24, fixes the path to `specs/harness-spec-draft.md`, adds the open question scoped to repo-local. Channel work can begin as soon as that lands.
+- **Alt-1.A + Alt-2.B + Alt-3.B + Alt-4.C**: bot translates the channel-carrier commit onto a `ppx/` twig, renumbers TE-nibar to TE-hogus, fixes the path to `specs/harness-spec-draft.md`, adds the open question scoped to repo-local. Channel work can begin as soon as that lands.
 - **Alt-3.C**: bot is blocked.
 - **Alt-1.B**: bot has to renumber three TEs of committed history for low gain, then begin work.
 
@@ -172,7 +172,7 @@ Steve eventually lands `stevegt/channels-grid-pcid` on `main`. The bot then reco
 
 ### S3 — A future TE refers to the channel-carrier TE by integer
 
-Someone writes "see TE-21" or "see TE-24" in a future TE or essay.
+Someone writes "see TE-nibar" or "see TE-hogus" in a future TE or essay.
 
 - **Alt-1.A + Alt-2.B**: the integer is unambiguous and matches the drafting-time invariant.
 - **Alt-1.C**: the reference is ambiguous and the reader has to disambiguate by slug or context.
@@ -186,10 +186,10 @@ Two long-running branches each draft their own TE-NN before either merges.
 ## Conclusions
 
 1. **TE numbering invariant**: integers are anchored on first-drafted timestamp, not on merge order or branch of origin. When two branches collide on the same integer, the later-drafted TE is renumbered, never the earlier one. This generalizes from the present case.
-2. **For the present case**: the spec-doc-as-promise TE on `ppx/main` keeps TE-21. The channel-carrier TE becomes TE-24 (it was drafted at 20260430-204108, before this reconciliation TE at 20260430-213447). This reconciliation TE is TE-25.
+2. **For the present case**: the spec-doc-as-promise TE on `ppx/main` keeps TE-nibar. The channel-carrier TE becomes TE-hogus (it was drafted at 20260430-204108, before this reconciliation TE at 20260430-213447). This reconciliation TE is TE-titur.
 3. **Path translation**: the bot does not edit Steve's branch. Instead, the bot brings the channel-carrier change into `ppx/main` via a `ppx/` integration twig that translates the patch onto `specs/harness-spec-draft.md` and applies the renumbering. Steve's `stevegt/channels-grid-pcid` branch is left untouched and remains his to land on `main` whenever he chooses.
 4. **Future reconciliation**: when Steve eventually merges his branch into `main`, the next `origin/main` → `ppx/main` merge will see overlapping content. The resolution rule is "prefer the renamed-path version; dedupe duplicate spec bullets and TE-index rows; keep `ppx/main`'s renumbered integer."
-5. **Open Question #19 is carried on `ppx/main` immediately**, scoped to repo-local channels and pointing at TE-24 and DR-009. Duplicate-removal at next reconciliation is acceptable.
+5. **Open Question #19 is carried on `ppx/main` immediately**, scoped to repo-local channels and pointing at TE-hogus and DR-009. Duplicate-removal at next reconciliation is acceptable.
 
 ## Implications
 
@@ -201,19 +201,19 @@ Two long-running branches each draft their own TE-NN before either merges.
 
 ### DF-25.1 — Which TE keeps the integer 21?
 
-The TE labeled TE-21 on `ppx/main` is "Spec doc as promise" (drafted 20260429-173520). The TE labeled TE-21 on `origin/stevegt/channels-grid-pcid` is "`grid <pcid>` as a repo-local channel-message carrier" (drafted 20260430-204108). Only one can keep the integer.
+The TE labeled TE-nibar on `ppx/main` is "Spec doc as promise" (drafted 20260429-173520). The TE labeled TE-nibar on `origin/stevegt/channels-grid-pcid` is "`grid <pcid>` as a repo-local channel-message carrier" (drafted 20260430-204108). Only one can keep the integer.
 
-- **Alt-1.A**: `ppx/main`'s existing TE-21 keeps the integer; channel-carrier TE is renumbered. Recommended.
-- **Alt-1.B**: channel-carrier TE keeps the integer; `ppx/main`'s TE-21 is renumbered. Disrecommended (would rewrite committed history and violate the drafting-time invariant).
-- **Alt-1.C**: both keep TE-21, distinguished by slug only. Disrecommended (defeats the integer-as-handle convention).
+- **Alt-1.A**: `ppx/main`'s existing TE-nibar keeps the integer; channel-carrier TE is renumbered. Recommended.
+- **Alt-1.B**: channel-carrier TE keeps the integer; `ppx/main`'s TE-nibar is renumbered. Disrecommended (would rewrite committed history and violate the drafting-time invariant).
+- **Alt-1.C**: both keep TE-nibar, distinguished by slug only. Disrecommended (defeats the integer-as-handle convention).
 
 ### DF-25.2 — What integer does the channel-carrier TE become?
 
 Conditional on Alt-1.A.
 
-- **Alt-2.A**: TE-25. Disrecommended (drafted earlier than this reconciliation TE).
-- **Alt-2.B**: TE-24. Recommended (matches drafting-time order).
-- **Alt-2.C**: TE-25, with this TE staying at TE-24. Disrecommended (introduces double-renumbering churn).
+- **Alt-2.A**: TE-titur. Disrecommended (drafted earlier than this reconciliation TE).
+- **Alt-2.B**: TE-hogus. Recommended (matches drafting-time order).
+- **Alt-2.C**: TE-titur, with this TE staying at TE-hogus. Disrecommended (introduces double-renumbering churn).
 
 ### DF-25.3 — How is the channels branch reconciled with the renamed spec?
 
@@ -226,7 +226,7 @@ Conditional on Alt-1.A.
 
 - **Alt-4.A**: append at the next free integer with the channel-carrier branch's existing wording. Acceptable but slightly worse than C.
 - **Alt-4.B**: drop the question on `ppx/main`; let it land via Steve's branch later. Disrecommended (leaves a gap during active channel work).
-- **Alt-4.C**: carry as Open Question #19 with explicit "repo-local only" scoping and a pointer to TE-24 and DR-009. Recommended.
+- **Alt-4.C**: carry as Open Question #19 with explicit "repo-local only" scoping and a pointer to TE-hogus and DR-009. Recommended.
 
 ## Recommended set
 
@@ -238,34 +238,34 @@ Rationale: this set is the only set that simultaneously honors the drafting-time
 
 ### 2026-05-05 — Integer TE-N is a display nickname; timestamp+slug is the stable identifier
 
-The original TE-25 prose, the `docs/thought-experiments/README.md` index, and the harness-spec all treated the integer TE-N (TE-1, TE-2, ...) as the stable identifier and the timestamp slug as a chronological convenience. The DT3 thread (the migration-semantics question first raised in TE-27 § S7 and resolved in TE-37 on 2026-05-05) demonstrated that this framing is unsafe in one specific construction: a forward-pointer that names an *unallocated* integer.
+The original TE-titur prose, the `docs/thought-experiments/README.md` index, and the harness-spec all treated the integer TE-N (TE-famar, TE-jovoj, ...) as the stable identifier and the timestamp slug as a chronological convenience. The DT3 thread (the migration-semantics question first raised in TE-junil § S7 and resolved in TE-numan on 2026-05-05) demonstrated that this framing is unsafe in one specific construction: a forward-pointer that names an *unallocated* integer.
 
-TE-27 § S7 and its Implications-for-follow-on-work both wrote "anticipated TE-28: transport-protocol migration semantics." When TE-28 was actually drafted, it took the 100-year-goal slot — a different topic — and TE-27's forward-pointer silently dis-anchored. The corpus contained a stale promise to a reader who tried to follow the integer pointer and found a different TE there. TE-37 absorbed the migration-semantics topic and a Cat-3 Refinement on TE-27 redirects the stale pointer, but the underlying authoring practice that produced the drift had no rule against it.
+TE-junil § S7 and its Implications-for-follow-on-work both wrote "anticipated TE-dajot: transport-protocol migration semantics." When TE-dajot was actually drafted, it took the 100-year-goal slot — a different topic — and TE-junil's forward-pointer silently dis-anchored. The corpus contained a stale promise to a reader who tried to follow the integer pointer and found a different TE there. TE-numan absorbed the migration-semantics topic and a Cat-3 Refinement on TE-junil redirects the stale pointer, but the underlying authoring practice that produced the drift had no rule against it.
 
-This Refinement does not change any DI in TE-25. It tightens the authoring practice that surrounds the numbering convention TE-25 locked, by reframing the two identifiers and by adding a forward-pointer rule:
+This Refinement does not change any DI in TE-titur. It tightens the authoring practice that surrounds the numbering convention TE-titur locked, by reframing the two identifiers and by adding a forward-pointer rule:
 
 1. **Stable identifier.** The timestamp+slug filename (`TE-YYYYMMDD-HHMMSS-slug.md`) is the stable identifier of a TE. It is collision-free by construction (HHMMSS is unique on a single drafting machine; the slug disambiguates concurrent drafts on different machines), it encodes drafting time directly, and it survives any future renumbering of the integer alias because the file is content-addressable as written.
 2. **Display nickname.** The integer TE-N is a *display nickname* assigned at the moment a TE lands on `ppx/main` (or `main`), recorded in `docs/thought-experiments/README.md` against the timestamp slug. It is short, memorable, and the natural anchor for descendant DF/DI/DR numbering (DF-25.1, DI-020-..., DR-009). It is human-friendly but assigned-after-the-fact and therefore must not appear in any artifact before that assignment is recorded.
-3. **Forward-pointer rule.** Any TE, spec, or Implications list that needs to point at a *future* TE — one that has not yet been drafted and indexed — MUST use either the timestamp+slug form (when the future TE has been drafted but not yet indexed) or a thread-id (T-...) recorded in `OPEN-THREADS.md` (when the future TE is anticipated but not yet drafted). Naming an unallocated integer ("anticipated TE-28") is forbidden going forward; it is the construction that produced the DT3 drift.
-4. **Backward citations are unchanged.** Citations to *existing* indexed TEs ("per TE-26 § S5," "DF-25.1 = Alt-1.A," "DI-020-20260502-213103") continue to use the integer alias. The display nickname is the natural form for backward citation; the rule above only constrains forward-pointers to unallocated integers.
-5. **Renumbering remains rare and recordable.** TE-25's locked decision (DF-25.1 = Alt-1.A; integer assignments are sticky once on `ppx/main`) is reaffirmed. Renumbering an indexed TE is a Cat-2 vocabulary update or a Cat-5 supersedence depending on scope; it is never silent.
+3. **Forward-pointer rule.** Any TE, spec, or Implications list that needs to point at a *future* TE — one that has not yet been drafted and indexed — MUST use either the timestamp+slug form (when the future TE has been drafted but not yet indexed) or a thread-id (T-...) recorded in `OPEN-THREADS.md` (when the future TE is anticipated but not yet drafted). Naming an unallocated integer ("anticipated TE-dajot") is forbidden going forward; it is the construction that produced the DT3 drift.
+4. **Backward citations are unchanged.** Citations to *existing* indexed TEs ("per TE-zalut § S5," "DF-25.1 = Alt-1.A," "DI-020-20260502-213103") continue to use the integer alias. The display nickname is the natural form for backward citation; the rule above only constrains forward-pointers to unallocated integers.
+5. **Renumbering remains rare and recordable.** TE-titur's locked decision (DF-25.1 = Alt-1.A; integer assignments are sticky once on `ppx/main`) is reaffirmed. Renumbering an indexed TE is a Cat-2 vocabulary update or a Cat-5 supersedence depending on scope; it is never silent.
 
 Downstream artifacts updated in the same twig:
 
 - `docs/thought-experiments/README.md` — the prose claim that "TE numbers ... are stable identifiers" is rewritten to name the timestamp+slug as the stable identifier and the integer as the display nickname; the "Adding a new TE" procedure gains a step about forward-pointer hygiene.
-- A note is filed in `OPEN-THREADS.md` flagging that AGENTS.md's "Refinements ... placed after `## Decision status`" prose contradicts the canonical example in TE-34 (which places Refinements *before* Decision status). That contradiction is older than this Refinement and is left to a future Cat-3 on TE-34 or AGENTS.md.
+- A note is filed in `OPEN-THREADS.md` flagging that AGENTS.md's "Refinements ... placed after `## Decision status`" prose contradicts the canonical example in TE-dabol (which places Refinements *before* Decision status). That contradiction is older than this Refinement and is left to a future Cat-3 on TE-dabol or AGENTS.md.
 
 ## Decision status
 
 **Locked 2026-04-30 by Steve Traugott.** Recommended set adopted: **Alt-1.A + Alt-2.B + Alt-3.B + Alt-4.C.**
 
-- DF-25.1 = Alt-1.A: `ppx/main`'s existing TE-21 ("Spec doc as promise") keeps the integer.
-- DF-25.2 = Alt-2.B: the channel-carrier TE becomes TE-24.
+- DF-25.1 = Alt-1.A: `ppx/main`'s existing TE-nibar ("Spec doc as promise") keeps the integer.
+- DF-25.2 = Alt-2.B: the channel-carrier TE becomes TE-hogus.
 - DF-25.3 = Alt-3.B: bot integrates via a `ppx/` twig that translates the path; `origin/stevegt/channels-grid-pcid` is not touched.
-- DF-25.4 = Alt-4.C: Open Question #19 is carried on `ppx/main` with explicit "repo-local channels only" scoping and pointers to TE-24 and DR-009.
+- DF-25.4 = Alt-4.C: Open Question #19 is carried on `ppx/main` with explicit "repo-local channels only" scoping and pointers to TE-hogus and DR-009.
 
 ## Implications for follow-on work
 
-- After this TE lands, the next bot work item is to translate `f9dfd1e Record Channel Carrier V0` from `origin/stevegt/channels-grid-pcid` onto a `ppx/` integration twig with the integer renumbered (TE-21 → TE-24), the spec edit retargeted to `specs/harness-spec-draft.md`, the TE-index row updated, the open-question integer set, and the open-question text scoped to repo-local. Then the bot can begin actual channel work.
+- After this TE lands, the next bot work item is to translate `f9dfd1e Record Channel Carrier V0` from `origin/stevegt/channels-grid-pcid` onto a `ppx/` integration twig with the integer renumbered (TE-nibar → TE-hogus), the spec edit retargeted to `specs/harness-spec-draft.md`, the TE-index row updated, the open-question integer set, and the open-question text scoped to repo-local. Then the bot can begin actual channel work.
 - TODO 011 and the `tools/spec` workflow stay unchanged. The spec on `ppx/main` will be re-frozen once the channel-carrier change is integrated, producing a new pCID for the post-channels spec.
-- A follow-on TE (TE-26 or later) may be needed if Steve's eventual merge into `main` lands a meaningfully different version of the channel-carrier text.
+- A follow-on TE (TE-zalut or later) may be needed if Steve's eventual merge into `main` lands a meaningfully different version of the channel-carrier text.

@@ -1,7 +1,7 @@
 # Historical networks: substrate precedent for federated message protocols
 
 **Date:** 2026-05-03
-**Status:** Research note. Source material for TE-38 (binding /
+**Status:** Research note. Source material for TE-sihih (binding /
 substrate / feed protocols as a first-class family). The naming
 question itself ("binding" vs. "substrate" vs. "feed" vs. other) is
 unresolved as of this writing; this document uses "substrate" as the
@@ -189,7 +189,7 @@ If wire-lab adopts the same architecture:
   `binding`, `feed`, `substrate`, ...)
 - Pattern B -> a per-instance declaration of which substrates this
   instance is mirrored over (a `bindings/` subdirectory, or
-  equivalent, with one entry per active substrate; see TE-38 DF-38.2)
+  equivalent, with one entry per active substrate; see TE-sihih DF-38.2)
 - Pattern C -> message CIDs are already substrate-agnostic by
   construction. The canonical bytes (group-session §3, §4) do not
   include any substrate-specific addressing -- so the CID is invariant
@@ -219,7 +219,7 @@ substrates later under load.
 This document does not yet include a search for *negative* precedent
 -- a system that explicitly tried substrate-as-first-class and
 abandoned it. The current six-positive enumeration is structurally a
-yes-bias. Candidates worth checking before TE-38 lands:
+yes-bias. Candidates worth checking before TE-sihih lands:
 
 - BITNET store-and-forward (mentioned but not analyzed)
 - XMPP (federated, separated, generally successful but with complex
@@ -231,7 +231,7 @@ yes-bias. Candidates worth checking before TE-38 lands:
   count as a soft negative
 
 If no convincing negative precedent exists, that finding should be
-stated explicitly when TE-38 is drafted, so the search-for-counter-
+stated explicitly when TE-sihih is drafted, so the search-for-counter-
 evidence is documented even when it returns null.
 
 ## Naming question (DF-38.5 input)
@@ -273,7 +273,7 @@ decentralized CAS" correction.)
 
 ## Citing this doc
 
-When TE-38 is drafted, its background section can cite:
+When TE-sihih is drafted, its background section can cite:
 
 > See `docs/research/historical-networks-20260503.md` for the
 > precedent enumeration grounding the binding-protocol-as-first-

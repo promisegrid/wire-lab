@@ -1,4 +1,4 @@
-# TE-11: Ostrom's principles audit
+# TE-rotim: Ostrom's principles audit
 
 ## Prior aliases
 

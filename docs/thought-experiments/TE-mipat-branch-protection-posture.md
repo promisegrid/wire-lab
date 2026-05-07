@@ -1,10 +1,10 @@
-# TE-19: Branch-protection posture for `main`
+# TE-mipat: Branch-protection posture for `main`
 
 *Thought experiment, part of the [PromiseGrid Wire Lab](../../protocols/wire-lab.d/specs/harness-spec-draft.md). This file is content-addressable; its hash is its pCID.*
 
 ## TE ID
 
-TE-20260429-165102
+TE-mipat
 
 (First drafted 2026-04-29 16:51:02 UTC, retrospective-style: this TE was authored after the corresponding DI was already locked, in response to the conditions on `review-20260429-162212-steve-traugott.md` for `ppx/dr-001-bootstrap`.)
 
@@ -42,7 +42,7 @@ For a repo that will eventually migrate from GitHub to PromiseGrid, what branch-
 
 ## Selection
 
-Alt-B. The locked decision is recorded as `DI-001-20260428-195701` in `protocols/wire-lab.d/TODO/TODO-20260429-030146-perplexity-computer-onboarding.md`, and the supporting DR is `DR/DR-002-20260428-195700-drop-require-pr.md`. Steve confirmed in chat on 2026-04-29 that the "Require PR" rule has been removed from the `main` ruleset.
+Alt-B. The locked decision is recorded as `DI-001-20260428-195701` in `protocols/wire-lab.d/TODO/TODO-dutaz-perplexity-computer-onboarding.md`, and the supporting DR is `DR/DR-002-20260428-195700-drop-require-pr.md`. Steve confirmed in chat on 2026-04-29 that the "Require PR" rule has been removed from the `main` ruleset.
 
 Alt-D may be revisited later as an additive layer — leaving Alt-B as the base posture and adding signed-commit enforcement when PromiseGrid's signing-key model is closer to landing.
 

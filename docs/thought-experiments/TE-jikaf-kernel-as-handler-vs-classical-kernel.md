@@ -1,4 +1,4 @@
-# TE-5: Kernel-as-handler vs. classical kernel
+# TE-jikaf: Kernel-as-handler vs. classical kernel
 
 ## Prior aliases
 

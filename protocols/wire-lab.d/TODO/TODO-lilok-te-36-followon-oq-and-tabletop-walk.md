@@ -1,4 +1,4 @@
-# TODO 23: TE-36 follow-on: OQ-36.6 + tabletop walk
+# TODO-lilok: TE-havib follow-on: OQ-36.6 + tabletop walk
 
 ## Prior aliases
 
@@ -9,7 +9,7 @@ Before the TE-39 proquint migration, this file was known as:
 
 ## Status
 
-In progress (deferred from TE-36 close-out). No twig yet.
+In progress (deferred from TE-havib close-out). No twig yet.
 
 ## Threads absorbed from OPEN-THREADS.md
 
@@ -17,16 +17,16 @@ In progress (deferred from TE-36 close-out). No twig yet.
 
 OQ-36.6 deferred investigation (provisional DF-36.2 lock pending full
 evidence review); audit-memo-style Alice-through-Mallory tabletop walk
-that TE-36 did not run (UT-159.c / UT-160.c).
+that TE-havib did not run (UT-159.c / UT-160.c).
 
-5 UTs in the dropped-thread-disposition file under the "TE-36 follow-on"
+5 UTs in the dropped-thread-disposition file under the "TE-havib follow-on"
 cluster.
 
 Blocking: nothing today; pure follow-on refinement.
 
-Anchor: TE-36 § OQ-36.6; audit memo at `4725b3e`.
+Anchor: TE-havib § OQ-36.6; audit memo at `4725b3e`.
 Disposition-file pointer: `dropped-thread-disposition-20260506.md`
-§ TE-36 follow-on cluster (5 UTs).
+§ TE-havib follow-on cluster (5 UTs).
 
 ## Question log
 

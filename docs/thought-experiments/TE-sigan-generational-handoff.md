@@ -1,4 +1,4 @@
-# TE-8: Generational handoff
+# TE-sigan: Generational handoff
 
 ## Prior aliases
 

@@ -1,4 +1,4 @@
-# TODO 32: TE-39 naming reconciliation (proquint filenames)
+# TODO-bahaf: TE-mumuv naming reconciliation (proquint filenames)
 
 ## Prior aliases
 
@@ -33,20 +33,20 @@ In progress. Twig: `ppx/te-20260507-025627-naming-reconciliation`.
   (the union of filenames in `docs/thought-experiments/` and
   `protocols/wire-lab.d/TODO/`) for collision-checking handle mints.
 
-- **The 100-year-goal invariants** themselves remain unchanged (TE-28;
-  see TODO 22 for cite chain).
+- **The 100-year-goal invariants** themselves remain unchanged (TE-dajot;
+  see TODO-vunub for cite chain).
 
 - **Parallel-namespace structural risk** (Steve, 2026-05-06 turn 296):
   "the timestamp filenames gain us nothing if we're still risking
   collision with integer numbers. we either need to stop using integer
   numbers, or we need to rename all of the TE files to match their
-  integer numbers." TE-39 takes the first option, eliminating both the
+  integer numbers." TE-mumuv takes the first option, eliminating both the
   integer alias and the timestamp prefix in favor of proquint-1.
 
 ## Question log
 
 Per the AGENTS-ppx Question-logging discipline, every question asked of
-Steve in TE-39 work is logged here at the moment of asking and checked
+Steve in TE-mumuv work is logged here at the moment of asking and checked
 off only after the resulting product is committed and pushed.
 
 These questions were asked verbally during gameout in turns 297-309
@@ -59,7 +59,7 @@ gave in chat.
       or some third option?
     opened: 2026-05-06 19:03 PT (turn 297)
     asked of: stevegt@t7a.org
-    blocks: TE-39 scope
+    blocks: TE-mumuv scope
     alternatives: Alt-A (drop integers, keep timestamp filenames) /
       Alt-B (rename all TE files to integer-N filenames) /
       Alt-F (replace both with a third identifier scheme)
@@ -73,7 +73,7 @@ gave in chat.
       curated wordlist, heroku-style adjective-noun, military-concat?
     opened: 2026-05-06 19:08 PT (turn 299)
     asked of: stevegt@t7a.org
-    blocks: TE-39 handle scheme
+    blocks: TE-mumuv handle scheme
     alternatives: Alt-F.bip39 / Alt-F.proquint / Alt-F.curated /
       Alt-F.heroku / Alt-F.milconcat (military-style concat like
       COMSUBPAC) / Alt-F.specops (HAVE BLUE / PAVE LOW)
@@ -89,7 +89,7 @@ gave in chat.
       space)?
     opened: 2026-05-06 19:14 PT (turn 301)
     asked of: stevegt@t7a.org
-    blocks: TE-39 handle width
+    blocks: TE-mumuv handle width
     alternatives: pq1 (5ch fixed) / pq2 (11ch fixed)
     recommendation: pq1 -- comfortable for ~300 entries before birthday
       paradox forces retries; wire-lab corpus is 66 entries today and
@@ -105,7 +105,7 @@ gave in chat.
       time_ns, or something else?
     opened: 2026-05-06 19:17 PT (turn 303)
     asked of: stevegt@t7a.org
-    blocks: TE-39 mint algorithm
+    blocks: TE-mumuv mint algorithm
     alternatives: hash(slug+ts) / hash(time_ns) /
       hash(last_commit, time_ns) / random with collision check
     recommendation: random with collision check -- once derivability is
@@ -122,7 +122,7 @@ gave in chat.
       maintained registry file, or filename glob?
     opened: 2026-05-06 19:43 PT (turn 305)
     asked of: stevegt@t7a.org
-    blocks: TE-39 mint implementation
+    blocks: TE-mumuv mint implementation
     alternatives: repo-wide grep / structured frontmatter scan /
       registry file / filename glob
     recommendation: filename glob -- once the proquint replaces both
@@ -140,7 +140,7 @@ gave in chat.
       (`TE-vapoj.md`)?
     opened: 2026-05-06 19:49 PT (turn 307)
     asked of: stevegt@t7a.org
-    blocks: TE-39 filename format
+    blocks: TE-mumuv filename format
     alternatives: keep slug / drop slug
     recommendation: keep slug -- filenames remain human-scannable in
       `ls`; matches prior pattern (TE-<timestamp>-<slug>.md) with only
@@ -156,7 +156,7 @@ gave in chat.
       shell, Go, or Rust?
     opened: 2026-05-06 19:51 PT (turn 309)
     asked of: stevegt@t7a.org
-    blocks: TE-39 tool deliverable
+    blocks: TE-mumuv tool deliverable
     alternatives: Python / shell / Go / Rust
     recommendation: Go -- matches Steve's primary preference and the
       existing tools/spec/ binary's language
@@ -170,7 +170,7 @@ gave in chat.
       multiple handles in one process?
     opened: 2026-05-06 19:55 PT (turn 311)
     asked of: stevegt@t7a.org
-    blocks: TE-39 migration script
+    blocks: TE-mumuv migration script
     alternatives: shell loop (66 invocations) / `-batch N` mode
     recommendation: shell loop -- simpler, exercises the same code
       path the eventual single-mint usage will hit, no special-case
@@ -187,7 +187,7 @@ gave in chat.
     asked of: stevegt@t7a.org
     blocks: README index format
     alternatives: README column "prior alias" / per-file frontmatter
-      `prior_alias: TE-38` / NOTES.md migration table / no record
+      `prior_alias: TE-sihih` / NOTES.md migration table / no record
     recommendation: README column "prior alias" -- single-source-of-
       truth, sortable, easy to grep for stale citations during the
       Cat-2 sweep, can be dropped later when the migration is far in
@@ -213,8 +213,8 @@ gave in chat.
       section"
     resolved: 2026-05-07 @ this commit
     product: rename script appends a new `## Prior aliases` section
-      (after `## TE ID`) carrying both the integer alias (e.g. TE-38)
-      and the timestamp alias (e.g. TE-20260506-184800) for each
+      (after `## TE ID`) carrying both the integer alias (e.g. TE-sihih)
+      and the timestamp alias (e.g. TE-sihih) for each
       renamed file.
 
 ## Locked decisions (from Q-23.1 through Q-23.10 above)
@@ -295,17 +295,17 @@ Future readers of historical session logs can cross-reference either.
 
 ## Driving TE
 
-TE-39 is the driving TE for this work. Filename will be
+TE-mumuv is the driving TE for this work. Filename will be
 `TE-<proquint>-naming-reconciliation.md`, minted by tools/mint-handle/
 during this twig's drafting commit.
 
 ## Cross-references
 
-- Predecessor: TE-25 (taluj) "te-numbering-collision-and-harness-spec-
+- Predecessor: TE-titur (taluj) "te-numbering-collision-and-harness-spec-
   path" (2026-04-30) introduced the dual-identifier scheme that this
-  TE retires. A Cat-3 Refinement on TE-25 records the proquint
+  TE retires. A Cat-3 Refinement on TE-titur records the proquint
   adoption.
-- Foundation: TE-28 (fivas) "100-year-goal-as-design-constraint" --
+- Foundation: TE-dajot (fivas) "100-year-goal-as-design-constraint" --
   cited for the no-central-authority invariant that wire-lab itself
   is design notes ABOUT (not bound by).
 - Vocabulary touch: AGENTS.md and AGENTS-ppx.md gain a "handle"

@@ -29,4 +29,4 @@ Linked DR: DR/DR-004-20260429-033208-review-feedback-as-contest-artifact.md
 
 ## Notes
 
-Steve approved this model in chat after reviewing the alternatives narrowed by `TE-20260429-033208-review-feedback-as-contest-artifact.md`.
+Steve approved this model in chat after reviewing the alternatives narrowed by `TE-lodar-review-feedback-as-contest-artifact.md`.

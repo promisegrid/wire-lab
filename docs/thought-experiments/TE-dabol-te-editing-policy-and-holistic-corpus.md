@@ -1,10 +1,10 @@
-# TE-34: TE editing policy and the TE corpus as one document with facets
+# TE-dabol: TE editing policy and the TE corpus as one document with facets
 
 *Thought experiment, part of the [PromiseGrid Wire Lab](../../protocols/wire-lab.d/specs/harness-spec-draft.md). This file is content-addressable; its hash is its pCID.*
 
 ## TE ID
 
-TE-20260502-212810
+TE-dabol
 
 ## Prior aliases
 
@@ -21,7 +21,7 @@ decided, refined
 
 Two related questions about how the TE corpus is treated as a body of writing:
 
-1. **Editing policy.** Under what conditions may a TE's contents be modified after it is first committed? The repo currently has uneven precedent: TE-24 and TE-26 were rewritten in place when vocabulary changed (with top-of-file notes); other TEs have been left strictly alone. The bot has at times claimed there is a blanket "do not back-edit TEs" rule, but no such rule actually exists in any AGENTS file or in `docs/thought-experiments/README.md`. The only locked invariant is from TE-25: TE filenames are immutable because the timestamp slug is the content-address anchor that pins the integer alias.
+1. **Editing policy.** Under what conditions may a TE's contents be modified after it is first committed? The repo currently has uneven precedent: TE-hogus and TE-zalut were rewritten in place when vocabulary changed (with top-of-file notes); other TEs have been left strictly alone. The bot has at times claimed there is a blanket "do not back-edit TEs" rule, but no such rule actually exists in any AGENTS file or in `docs/thought-experiments/README.md`. The only locked invariant is from TE-titur: TE filenames are immutable because the timestamp slug is the content-address anchor that pins the integer alias.
 
 2. **Reading discipline.** Should the bot read each TE as a self-contained artifact, or should it read the TE corpus holistically — as one large multi-faceted thought experiment in which any new TE can refine, contradict, or extend any earlier TE? The user has now stated explicitly: *"don't be afraid to view the entire corpus of TEs as one big TE with lots of facets — be holistic."* This TE locks that framing and works out the consequences for how TEs are written, edited, and cited.
 
@@ -29,27 +29,27 @@ These are joined here because the answers compose: if the corpus is one document
 
 ## Assumptions
 
-- TE filenames are immutable. This is locked by TE-25's "timestamp slugs are content-addressable identifiers" and "first-drafted-timestamp anchors the integer." Renaming a TE file would re-key the corpus; we do not do that.
-- TE integer aliases (TE-1, TE-2, …) are also stable per TE-25, anchored on first-drafted timestamp. Renumbering happens only when two TEs collide on the same integer; the younger one moves.
-- There is no general rule that TE *contents* are immutable. The two existing precedents (TE-24, TE-26) explicitly rewrite contents in place with top-of-file notes, and TE-27 lists those rewrites as part of its own conclusions.
+- TE filenames are immutable. This is locked by TE-titur's "timestamp slugs are content-addressable identifiers" and "first-drafted-timestamp anchors the integer." Renaming a TE file would re-key the corpus; we do not do that.
+- TE integer aliases (TE-famar, TE-jovoj, …) are also stable per TE-titur, anchored on first-drafted timestamp. Renumbering happens only when two TEs collide on the same integer; the younger one moves.
+- There is no general rule that TE *contents* are immutable. The two existing precedents (TE-hogus, TE-zalut) explicitly rewrite contents in place with top-of-file notes, and TE-junil lists those rewrites as part of its own conclusions.
 - The contest-artifact immutability rule (DI-003: `proposals/pending/<branch>/contest-*.md` and `review-*.md` are immutable) applies to adversarial review records. TEs are not adversarial; they are the author's own thinking. The rationale for contest immutability does not transfer.
-- TE-30 made the harness itself a protocol-as-simrepo and TE-32 split spec-side from implementation-side. The TE corpus is spec-side material for the wire-lab harness specifically. Per-protocol simrepos under `protocols/<slug>.d/docs/thought-experiments/` would have their own corpora, each with its own editing policy following the rule this TE locks.
-- The user's "100-year goal" framing (TE-28) and the audit-trail framing (TE-21 + TE-23) both demand that any rewrite be traceable: a future reader must be able to reconstruct what a TE said before any later refinement.
+- TE-magup made the harness itself a protocol-as-simrepo and TE-liviv split spec-side from implementation-side. The TE corpus is spec-side material for the wire-lab harness specifically. Per-protocol simrepos under `protocols/<slug>.d/docs/thought-experiments/` would have their own corpora, each with its own editing policy following the rule this TE locks.
+- The user's "100-year goal" framing (TE-dajot) and the audit-trail framing (TE-nibar + TE-lozip) both demand that any rewrite be traceable: a future reader must be able to reconstruct what a TE said before any later refinement.
 - Git is the audit substrate. Any in-place rewrite of a TE preserves the prior version in git history; `git log -p <file>` gives byte-for-byte diff. The rewrite policy can therefore lean on git rather than requiring duplicate copies inside the file.
 
 ## What "one big TE with facets" actually means
 
 The user's instruction is short but consequential. Working out what it means in practice:
 
-**A facet is a TE.** Each TE is a focused look at one decision under test. The corpus is not the union of independent essays; it is the simulation of a single design problem (a wire lab that must survive 100 years) viewed from many sides. TEs that look unrelated at first reading often turn out to share assumptions and constraints — TE-1 (promise-stack ordering) and TE-29 (protocols-as-simrepos and the L4-binding layer) are both, fundamentally, about *who names what and where the boundary lives*. TE-21 (spec doc as promise) and TE-31 (spec-doc inversion) are the same question asked at different scales.
+**A facet is a TE.** Each TE is a focused look at one decision under test. The corpus is not the union of independent essays; it is the simulation of a single design problem (a wire lab that must survive 100 years) viewed from many sides. TEs that look unrelated at first reading often turn out to share assumptions and constraints — TE-famar (promise-stack ordering) and TE-vipir (protocols-as-simrepos and the L4-binding layer) are both, fundamentally, about *who names what and where the boundary lives*. TE-nibar (spec doc as promise) and TE-zukug (spec-doc inversion) are the same question asked at different scales.
 
-**Reading one TE in isolation is a category error.** When I (the bot) want to know whether TE-1's recommended set still stands, I should not just re-read TE-1; I should ask "what later facets touch this question?" That is what I did when the user asked about TE-1, and the answer was "very little touches the substance, but the layout work makes locking TE-1 more pressing, not less." That kind of cross-TE reading should be the default, not an extra step.
+**Reading one TE in isolation is a category error.** When I (the bot) want to know whether TE-famar's recommended set still stands, I should not just re-read TE-famar; I should ask "what later facets touch this question?" That is what I did when the user asked about TE-famar, and the answer was "very little touches the substance, but the layout work makes locking TE-famar more pressing, not less." That kind of cross-TE reading should be the default, not an extra step.
 
 **Citation crosses freely.** Later TEs cite earlier ones explicitly; earlier TEs do not need to forward-cite later ones to remain accurate. But a *path* in an early TE that points at a now-moved file is a real defect against the corpus's navigability — the corpus is meant to be readable end-to-end at any point in time, and stale paths break that. Same for vocabulary that has been deprecated repo-wide.
 
 **Holistic does not mean unified.** The corpus does not need a single thesis. TEs are allowed to disagree, even with later TEs. When they disagree, the resolution lives in the later TE's conclusions and DI; the earlier TE keeps its alternative analysis intact. What gets refined is the *framing*, not the *judgment*.
 
-**The corpus has a temporal axis.** A TE was written at a moment with a particular set of locked-in assumptions. Reading TE-1 today, the reader needs to know that TE-1 was written before TE-29 reframed protocols-as-simrepos. The corpus carries this implicitly via timestamps, but a reader following links from `harness-spec-draft.md §8` to TE-1 may not know that the §1.1 path reference inside TE-1's conclusions section is from before the migration. A path-update sweep is the cheap fix; a vocabulary-shift sweep is the expensive one.
+**The corpus has a temporal axis.** A TE was written at a moment with a particular set of locked-in assumptions. Reading TE-famar today, the reader needs to know that TE-famar was written before TE-vipir reframed protocols-as-simrepos. The corpus carries this implicitly via timestamps, but a reader following links from `harness-spec-draft.md §8` to TE-famar may not know that the §1.1 path reference inside TE-famar's conclusions section is from before the migration. A path-update sweep is the cheap fix; a vocabulary-shift sweep is the expensive one.
 
 ## Categories of post-hoc edit
 
@@ -61,7 +61,7 @@ A TE refers to `specs/harness-spec-draft.md` but the file is now at `protocols/w
 
 ### Cat-2: Vocabulary updates
 
-A TE uses "channel" but the repo-wide term is now "transport." The TE's analysis and decisions are unchanged in substance, but the words have shifted. **Recommended treatment**: rewrite in place with a top-of-file vocabulary note (the TE-26 pattern). The note explains the rewrite, points at the TE that drove the rename, and asserts that structure / DF labels / locked decisions are unchanged. Future readers see the new vocabulary plus a marker that lets them go look up the old wording in git.
+A TE uses "channel" but the repo-wide term is now "transport." The TE's analysis and decisions are unchanged in substance, but the words have shifted. **Recommended treatment**: rewrite in place with a top-of-file vocabulary note (the TE-zalut pattern). The note explains the rewrite, points at the TE that drove the rename, and asserts that structure / DF labels / locked decisions are unchanged. Future readers see the new vocabulary plus a marker that lets them go look up the old wording in git.
 
 ### Cat-3: Reference updates to deferred follow-ons
 
@@ -94,7 +94,7 @@ The pattern is: **mechanical updates (Cat-1, Cat-2) edit in place; substantive u
 A TE's contents are byte-frozen once committed. Path renames, vocabulary changes, and stale references are accepted as artifacts of when the TE was written. New TEs supersede old ones for any substantive change.
 
 - **Easier**: clean audit trail; no risk of silently rewriting design history; no top-of-file notes accumulate; no rule about what counts as "mechanical" vs. "substantive" is needed.
-- **Harder**: the corpus accumulates stale paths and deprecated vocabulary that increase friction for every future reader. TE-26 and TE-24 would have to be reverted or split into superseding TEs. The forty-cell vocabulary update from "channel" → "transport" would have produced four new TEs that say nothing new.
+- **Harder**: the corpus accumulates stale paths and deprecated vocabulary that increase friction for every future reader. TE-zalut and TE-hogus would have to be reverted or split into superseding TEs. The forty-cell vocabulary update from "channel" → "transport" would have produced four new TEs that say nothing new.
 - **New obligation**: a discipline of writing new "vocabulary update" or "path update" TEs whenever any sweep happens. Most of those TEs would carry no real content beyond "this TE updates references; it locks no new decision."
 
 #### Alt-1.B: Permissive — any in-place edit is fine, git carries the history
@@ -102,14 +102,14 @@ A TE's contents are byte-frozen once committed. Path renames, vocabulary changes
 A TE's contents are editable freely; git log preserves the prior versions. No top-of-file notes required.
 
 - **Easier**: no rule overhead; sweeping is cheap; corpus stays current.
-- **Harder**: a reader cannot see at a glance whether the TE in front of them is the original draft, a vocabulary refresh, or a substantive rewrite. The audit trail exists in git but is not visible in the rendered file. Cross-TE citations become ambiguous: does TE-29 cite TE-1's original framing or its refreshed framing?
+- **Harder**: a reader cannot see at a glance whether the TE in front of them is the original draft, a vocabulary refresh, or a substantive rewrite. The audit trail exists in git but is not visible in the rendered file. Cross-TE citations become ambiguous: does TE-vipir cite TE-famar's original framing or its refreshed framing?
 - **New obligation**: every reader must check git log to know whether they are reading the original.
 
 #### Alt-1.C: Categorized — mechanical edits in place, substantive edits via supersedence, navigational edits via append-only refinements (the proposed policy in this TE)
 
 Split the question by category. Cat-1 and Cat-2 edit in place (with a vocabulary note for Cat-2). Cat-3 and Cat-4 append. Cat-5 through Cat-7 write a new TE or DI. The corpus is current and navigable; substantive history is preserved by writing new artifacts rather than overwriting.
 
-- **Easier**: matches the precedents already in the repo (TE-24 and TE-26 are Cat-2 edits with vocabulary notes; TE-25 is a Cat-5 superseding rewrite that produced a new TE rather than rewriting the channels-branch TE). The categories give the bot a checklist for any proposed edit.
+- **Easier**: matches the precedents already in the repo (TE-hogus and TE-zalut are Cat-2 edits with vocabulary notes; TE-titur is a Cat-5 superseding rewrite that produced a new TE rather than rewriting the channels-branch TE). The categories give the bot a checklist for any proposed edit.
 - **Harder**: requires a category judgment for every edit. Edge cases between Cat-2 (vocabulary) and Cat-5 (recasting analysis) will need adjudication. The user is the ultimate arbiter when a category is in doubt.
 - **New obligation**: a top-of-file vocabulary note for Cat-2 edits (one-paragraph header pointing at the TE / TODO that drove the rewrite); a "## Refinements" append-only section convention for Cat-3 and Cat-4.
 
@@ -134,9 +134,9 @@ Whatever DF-34.1 locks applies uniformly across the harness corpus and all per-p
 
 #### Alt-2.B: Each protocol picks its own policy in its protocol-specific equivalent of this TE
 
-The wire-lab harness locks DF-34.1's answer for its own corpus. Each per-protocol simrepo writes its own version of TE-34 (or cites this one) when it sets up its `docs/thought-experiments/`.
+The wire-lab harness locks DF-34.1's answer for its own corpus. Each per-protocol simrepo writes its own version of TE-dabol (or cites this one) when it sets up its `docs/thought-experiments/`.
 
-- **Easier**: matches the standing rule "let each protocol name its own internals" (TE-23 DI-23.2 Alt-2.B). A security-critical protocol can pick Alt-1.A; an exploratory protocol can pick Alt-1.C; a long-stable protocol can change its mind by writing its own superseding TE.
+- **Easier**: matches the standing rule "let each protocol name its own internals" (TE-lozip DI-23.2 Alt-2.B). A security-critical protocol can pick Alt-1.A; an exploratory protocol can pick Alt-1.C; a long-stable protocol can change its mind by writing its own superseding TE.
 - **Harder**: more decisions to make per protocol; new authors may forget to make this decision and end up with no policy.
 
 ### DF-34.3 — How should the bot read the corpus?
@@ -146,7 +146,7 @@ The wire-lab harness locks DF-34.1's answer for its own corpus. Each per-protoco
 When a TE is referenced, read just that TE. Cross-references are followed only when the user asks.
 
 - **Easier**: less context loaded; faster responses; matches how most readers approach long technical corpora.
-- **Harder**: the bot misses the "TE-1 is more pressing now, not less" kind of insight that requires holding several TEs in working memory at once. The user has now explicitly named this failure mode.
+- **Harder**: the bot misses the "TE-famar is more pressing now, not less" kind of insight that requires holding several TEs in working memory at once. The user has now explicitly named this failure mode.
 
 #### Alt-3.B: Holistic reading by default
 
@@ -166,7 +166,7 @@ Use Alt-3.B when the question is about decisions, framing, or design tradeoffs; 
 
 ### S1 — Vocabulary sweep ("channel" → "transport")
 
-**Alt-1.A** forces four new TEs that say nothing beyond "this TE renames N references." **Alt-1.B** rewrites silently and the next reader has no marker that vocabulary has changed. **Alt-1.C** rewrites with a top-of-file note (which is what the repo already did for TE-24 and TE-26). Alt-1.C is the actual current practice and matches the user's existing instinct.
+**Alt-1.A** forces four new TEs that say nothing beyond "this TE renames N references." **Alt-1.B** rewrites silently and the next reader has no marker that vocabulary has changed. **Alt-1.C** rewrites with a top-of-file note (which is what the repo already did for TE-hogus and TE-zalut). Alt-1.C is the actual current practice and matches the user's existing instinct.
 
 ### S2 — Path migration (top-level `specs/` → `protocols/wire-lab.d/specs/`)
 
@@ -190,7 +190,7 @@ Under **Alt-1.A** this can never happen because no edit is allowed. Under **Alt-
 
 ## Surviving alternatives
 
-DF-34.1 Alt-1.A is rejected: it produces too much boilerplate and contradicts the existing TE-24 and TE-26 precedents already in the repo. Alt-1.B is rejected: it loses the navigational marker that lets readers tell mechanical updates from substantive ones. Alt-1.D is rejected: the wire-lab has no natural "draft" → "published" transition. **Alt-1.C survives.**
+DF-34.1 Alt-1.A is rejected: it produces too much boilerplate and contradicts the existing TE-hogus and TE-zalut precedents already in the repo. Alt-1.B is rejected: it loses the navigational marker that lets readers tell mechanical updates from substantive ones. Alt-1.D is rejected: the wire-lab has no natural "draft" → "published" transition. **Alt-1.C survives.**
 
 DF-34.2 Alt-2.A and Alt-2.B both work; Alt-2.B aligns with "let each protocol name its own internals." **Alt-2.B is recommended.** This TE locks the policy for the wire-lab harness corpus; per-protocol simrepos can adopt or override.
 
@@ -198,10 +198,10 @@ DF-34.3 Alt-3.A is the failure mode the user named. Alt-3.B is the explicit inst
 
 ## Conclusions
 
-1. **TE filenames remain immutable.** TE-25's invariant stands.
+1. **TE filenames remain immutable.** TE-titur's invariant stands.
 
 2. **TE contents are edited under three regimes**, by category:
-   - **Mechanical edits** (path renames, vocabulary updates) edit in place. Vocabulary updates carry a top-of-file note pointing at the TE / TODO that drove the rewrite (the TE-24 / TE-26 pattern). Path renames need no note.
+   - **Mechanical edits** (path renames, vocabulary updates) edit in place. Vocabulary updates carry a top-of-file note pointing at the TE / TODO that drove the rewrite (the TE-hogus / TE-zalut pattern). Path renames need no note.
    - **Navigational edits** (forward-pointers to later TEs / DRs / DIs that resolved a future-work bullet, or back-pointers added after the fact) go in an append-only "## Refinements" section at the bottom of the TE.
    - **Substantive edits** (recasting alternative analysis, reversing a locked decision, invalidating an assumption) are not edits. Write a new TE that supersedes the old one; write a new DI that supersedes the old DI. Update only the old TE's "Decision status" line to point at the supersedence.
 
@@ -213,25 +213,25 @@ DF-34.3 Alt-3.A is the failure mode the user named. Alt-3.B is the explicit inst
 
 ## Implications for the repo's open TODOs and pending DIs
 
-- **TODO 5 (TE-1 promise-stack ordering, drive to DI):** When this lands, the DI work updates TE-1's "Decision status" line from `needs DF` to `decided per DI-005-NN-…`, and the "Implications" section gets a "## Refinements" append-only block listing which downstream items were filed (DR-006 normalization, the harness-spec §1.1 update, etc.). TE-1's body is otherwise untouched.
-- **TODO 014 (just landed):** The path references inside TE files were intentionally left stale because the bot was applying the now-retired "do not back-edit" rule. Under TE-34's Cat-1, those paths should be updated in place. A follow-on TODO under `protocols/wire-lab.d/TODO/` will sweep them. (To be filed alongside the DI for this TE.)
-- **TODO 6 + TODO 7 (provenance backfill):** The retrospective DIs / DRs under these TODOs do not modify TEs; they modify the harness-spec and DR/. Unaffected by this policy.
-- **All future TEs:** The "## Refinements" section convention is new; it does not appear in TEs 1–33. Adding it to existing TEs is itself a Cat-3 / Cat-4 edit and is permitted under this TE's own rule. The convention will be exercised when TODO 5 lands its DI.
+- **TODO-rivuk (TE-famar promise-stack ordering, drive to DI):** When this lands, the DI work updates TE-famar's "Decision status" line from `needs DF` to `decided per DI-005-NN-…`, and the "Implications" section gets a "## Refinements" append-only block listing which downstream items were filed (DR-006 normalization, the harness-spec §1.1 update, etc.). TE-famar's body is otherwise untouched.
+- **TODO 014 (just landed):** The path references inside TE files were intentionally left stale because the bot was applying the now-retired "do not back-edit" rule. Under TE-dabol's Cat-1, those paths should be updated in place. A follow-on TODO under `protocols/wire-lab.d/TODO/` will sweep them. (To be filed alongside the DI for this TE.)
+- **TODO-misul + TODO-diliz (provenance backfill):** The retrospective DIs / DRs under these TODOs do not modify TEs; they modify the harness-spec and DR/. Unaffected by this policy.
+- **All future TEs:** The "## Refinements" section convention is new; it does not appear in TEs 1–33. Adding it to existing TEs is itself a Cat-3 / Cat-4 edit and is permitted under this TE's own rule. The convention will be exercised when TODO-rivuk lands its DI.
 - **AGENTS.md / AGENTS-codex.md / AGENTS-ppx.md:** Need a new "## TE editing policy" section that codifies the conclusions above. This TE's DI, when locked, drives that AGENTS update.
-- **`docs/thought-experiments/README.md`:** The current text is silent on contents (it only mentions filenames). Add a "## Editing policy" section pointing at TE-34, summarizing the three regimes, and naming the "## Refinements" convention.
+- **`docs/thought-experiments/README.md`:** The current text is silent on contents (it only mentions filenames). Add a "## Editing policy" section pointing at TE-dabol, summarizing the three regimes, and naming the "## Refinements" convention.
 
 ## Decision Framing — questions for the user
 
 Each DF question is a single paragraph below, with multiple-choice answers, recommended choice marked.
 
-**DF-34.1**: How permissive is TE editing after first commit? **Alt-1.A** treats TE contents as byte-frozen — any change requires a new superseding TE, even path renames and vocabulary updates. This is clean but produces boilerplate and contradicts the TE-24 / TE-26 precedent already in the repo. **Alt-1.B** allows any in-place edit and lets git carry the history; this is cheap but loses the navigational marker that distinguishes mechanical edits from substantive ones. **Alt-1.C** (recommended) categorizes edits: mechanical edits (paths, vocabulary) in place, with a vocabulary note for Cat-2; navigational edits (forward-pointers) in an append-only "## Refinements" section; substantive edits (recasting analysis, reversing decisions) write new TEs and supersede. **Alt-1.D** would make TEs mutable for a fixed wall-clock window then lock; the wire-lab has no natural "draft → published" boundary that anchors such a window.
+**DF-34.1**: How permissive is TE editing after first commit? **Alt-1.A** treats TE contents as byte-frozen — any change requires a new superseding TE, even path renames and vocabulary updates. This is clean but produces boilerplate and contradicts the TE-hogus / TE-zalut precedent already in the repo. **Alt-1.B** allows any in-place edit and lets git carry the history; this is cheap but loses the navigational marker that distinguishes mechanical edits from substantive ones. **Alt-1.C** (recommended) categorizes edits: mechanical edits (paths, vocabulary) in place, with a vocabulary note for Cat-2; navigational edits (forward-pointers) in an append-only "## Refinements" section; substantive edits (recasting analysis, reversing decisions) write new TEs and supersede. **Alt-1.D** would make TEs mutable for a fixed wall-clock window then lock; the wire-lab has no natural "draft → published" boundary that anchors such a window.
 
 - (a) Alt-1.A — strict immutability.
 - (b) Alt-1.B — permissive in-place edits; git carries history.
 - (c) Alt-1.C — categorized: mechanical-in-place, navigational-append, substantive-supersede. **(Recommended.)**
 - (d) Alt-1.D — time-windowed mutability.
 
-**DF-34.2**: Does this TE's editing policy apply to per-protocol simrepos' TE corpora, or do they pick their own? **Alt-2.A** locks one policy for all corpora — simpler to remember but assumes the wire-lab's policy is universally appropriate. **Alt-2.B** (recommended) lets each protocol set its own policy in a protocol-specific equivalent of this TE, matching the standing "let each protocol name its own internals" rule (TE-23 DI-23.2 Alt-2.B); the wire-lab harness locks the policy in DF-34.1's answer for its own corpus.
+**DF-34.2**: Does this TE's editing policy apply to per-protocol simrepos' TE corpora, or do they pick their own? **Alt-2.A** locks one policy for all corpora — simpler to remember but assumes the wire-lab's policy is universally appropriate. **Alt-2.B** (recommended) lets each protocol set its own policy in a protocol-specific equivalent of this TE, matching the standing "let each protocol name its own internals" rule (TE-lozip DI-23.2 Alt-2.B); the wire-lab harness locks the policy in DF-34.1's answer for its own corpus.
 
 - (a) Alt-2.A — uniform policy across all TE corpora.
 - (b) Alt-2.B — per-protocol; wire-lab harness locks its own; others adopt or override. **(Recommended.)**
@@ -248,7 +248,7 @@ The recommended set is **(34.1.c, 34.2.b, 34.3.b)**: categorized editing policy,
 
 ### 2026-05-02 — scenario-play deficit (filed by bot, flagged by Steve)
 
-Steve has noted that this TE drifted from the wire-lab's TE shape. A TE in this repo is a tabletop simulation: named scenarios, named actors, explicit walkthroughs of each surviving alternative through each scenario, conclusion falling out of the scenario play. The earlier TEs (notably TE-1 promise-stack ordering, TE-3 currency-exchange-rate-equilibration, TE-4 sybil-under-double-auction, TE-9 generational-handoff) are exemplars of that shape. This TE has a section labeled "Scenario analysis" (S1-S6) but those scenarios are one-paragraph judgments of the form "under Alt-X this happens; under Alt-Y this happens" rather than tabletop play. There are no named actors, no concrete artifacts being edited in real time, no failure modes simulated.
+Steve has noted that this TE drifted from the wire-lab's TE shape. A TE in this repo is a tabletop simulation: named scenarios, named actors, explicit walkthroughs of each surviving alternative through each scenario, conclusion falling out of the scenario play. The earlier TEs (notably TE-famar promise-stack ordering, TE-pubum currency-exchange-rate-equilibration, TE-himug sybil-under-double-auction, TE-morid generational-handoff) are exemplars of that shape. This TE has a section labeled "Scenario analysis" (S1-S6) but those scenarios are one-paragraph judgments of the form "under Alt-X this happens; under Alt-Y this happens" rather than tabletop play. There are no named actors, no concrete artifacts being edited in real time, no failure modes simulated.
 
 Consequence for the locked DIs: the three DIs (DI-020-20260502-213103/-213104/-213105) reflect Steve's actual choices and stand as locked decisions. The locking is not in question. What is in question is whether the alternative analysis was strong enough to surface every alternative the scenario play would have surfaced. A follow-on TE will tabletop the editing policy under 4-6 concrete scenarios (vocabulary sweep mid-stream, supersedence chain across three TEs, path-migration during an in-flight twig, contest-artifact-vs-TE adjacency, per-protocol-with-stricter-policy contact, holistic reading under a TE that quotes another TE) and either confirm Alt-1.C / Alt-2.A / Alt-3.C as written, or surface a refinement that supersedes one of the DIs.
 
@@ -258,9 +258,9 @@ New subtask filed in TODO 020: 020.9 (write the follow-on tabletop TE; gate AGEN
 
 ### 2026-05-02 — Cat-1 split into Cat-1a / Cat-1b (DI-020-20260502-232651 supersedes Cat-1 clause)
 
-The follow-on tabletop TE (TE-35, `docs/thought-experiments/TE-20260502-232651-editing-policy-tabletop.md`) ran six scenarios with named actors. Locked policy survived at the macro level. One refinement reached DI-supersedence weight: Scenario S3 (Dave's mid-twig path migration) and Scenarios S5 / S6 (Mallory's bad-faith Cat-2 attack and verbatim cross-TE quotation) showed that Cat-1 path renames cannot be a uniform mechanical sweep, because some path references in the corpus are historical quotations (in TE-30, TE-32, TE-33, and any future TE that quotes earlier path strings) rather than current pointers. Rewriting a quoted path silently falsifies the quotation and degrades the corpus's self-evidence — the property holistic reading (DI-020-20260502-213105) depends on.
+The follow-on tabletop TE (TE-vudaf, `docs/thought-experiments/TE-vudaf-editing-policy-tabletop.md`) ran six scenarios with named actors. Locked policy survived at the macro level. One refinement reached DI-supersedence weight: Scenario S3 (Dave's mid-twig path migration) and Scenarios S5 / S6 (Mallory's bad-faith Cat-2 attack and verbatim cross-TE quotation) showed that Cat-1 path renames cannot be a uniform mechanical sweep, because some path references in the corpus are historical quotations (in TE-magup, TE-liviv, TE-potar, and any future TE that quotes earlier path strings) rather than current pointers. Rewriting a quoted path silently falsifies the quotation and degrades the corpus's self-evidence — the property holistic reading (DI-020-20260502-213105) depends on.
 
-DI-020-20260502-232651 (in `protocols/wire-lab.d/TODO/TODO-20260502-213103-te-editing-policy-and-holistic-corpus.md`) supersedes the Cat-1 clause of DI-020-20260502-213103 only. Cat-1 splits into:
+DI-020-20260502-232651 (in `protocols/wire-lab.d/TODO/TODO-dinub-te-editing-policy-and-holistic-corpus.md`) supersedes the Cat-1 clause of DI-020-20260502-213103 only. Cat-1 splits into:
 
 - **Cat-1a (current-pointer paths)** — mechanically swept in place, no top-of-file note.
 - **Cat-1b (historical-quotation paths)** — left untouched; rewriting them would falsify the historical record.
@@ -271,7 +271,7 @@ This is a Cat-3 forward-pointer entry; the TE body above is unchanged. Readers r
 
 ### 2026-05-02 — Cat-2 notes must enumerate unchanged DIs by ID (procedural tightening)
 
-TE-35 Scenario S5 (Mallory's bad-faith Cat-2 attack) showed that the Cat-2 top-of-file note as originally specified in DI-020-20260502-213103 — "a note pointing at the TE or TODO that drove the rewrite" — is not auditable enough. A sweeper acting in bad faith (or hurried good faith) could rename a vocabulary term whose meaning shifts inside one or more locked DIs in the affected TE, file the change as Cat-2, and the note would still look correct. A reader cannot tell from the note alone whether the rewrite preserved the meaning of the affected DIs without re-reading each TE holistically and re-verifying each DI — which is the work the "in place with a note" Cat-2 affordance was supposed to make cheap.
+TE-vudaf Scenario S5 (Mallory's bad-faith Cat-2 attack) showed that the Cat-2 top-of-file note as originally specified in DI-020-20260502-213103 — "a note pointing at the TE or TODO that drove the rewrite" — is not auditable enough. A sweeper acting in bad faith (or hurried good faith) could rename a vocabulary term whose meaning shifts inside one or more locked DIs in the affected TE, file the change as Cat-2, and the note would still look correct. A reader cannot tell from the note alone whether the rewrite preserved the meaning of the affected DIs without re-reading each TE holistically and re-verifying each DI — which is the work the "in place with a note" Cat-2 affordance was supposed to make cheap.
 
 **Refinement:** A Cat-2 top-of-file note must enumerate, by DI ID, every DI that lives in the affected TE, paired with an explicit promise that the rewrite preserves each DI's meaning. A TE without DIs gets a one-line "no DIs in this file" note. A TE with three DIs gets all three IDs listed. The form is roughly: "Cat-2 vocabulary update per `<driving TE or TODO>`: '<old term>' -> '<new term>'. The following DIs in this file are unchanged in meaning: DI-XXX-..., DI-YYY-..., DI-ZZZ-... ."
 
@@ -283,7 +283,7 @@ DF-35.2 was answered Alt-2.a on 2026-05-02 (bot recommendation under Steve's `ma
 
 ### 2026-05-02 — Cat-2 sweeps must grep the corpus for old-term-in-quotation contexts (cross-TE quotation protection)
 
-TE-35 Scenario S6 (verbatim cross-TE quotation) revealed a class of Cat-2 hazard the locked policy did not address. TE-X (some earlier TE) quotes TE-Y verbatim — "TE-Y states: 'the outermost-first ordering ...'" with the old vocabulary reproduced inside quotation marks. Later, a Cat-2 sweep on TE-Y renames "outermost-first" to "first-listed." Even with the DF-35.2 enumeration discipline (the sweep correctly preserves TE-Y's DIs in meaning), TE-X's quoted string is now a falsified quotation: TE-X claims TE-Y said "first-listed" when at the moment TE-X was written TE-Y actually said "outermost-first." The Cat-1b discipline from DI-020-20260502-232651 protects historical *path* quotations from path-rename sweeps; this Refinement extends the same shape of protection to historical *vocabulary* quotations from Cat-2 sweeps.
+TE-vudaf Scenario S6 (verbatim cross-TE quotation) revealed a class of Cat-2 hazard the locked policy did not address. TE-X (some earlier TE) quotes TE-Y verbatim — "TE-Y states: 'the outermost-first ordering ...'" with the old vocabulary reproduced inside quotation marks. Later, a Cat-2 sweep on TE-Y renames "outermost-first" to "first-listed." Even with the DF-35.2 enumeration discipline (the sweep correctly preserves TE-Y's DIs in meaning), TE-X's quoted string is now a falsified quotation: TE-X claims TE-Y said "first-listed" when at the moment TE-X was written TE-Y actually said "outermost-first." The Cat-1b discipline from DI-020-20260502-232651 protects historical *path* quotations from path-rename sweeps; this Refinement extends the same shape of protection to historical *vocabulary* quotations from Cat-2 sweeps.
 
 **Refinement:** Any Cat-2 vocabulary update sweep must, as a mandatory pre-step, grep the entire corpus for the old term inside quotation contexts — markdown blockquotes (`> ...`), fenced code blocks presented as citations, single-backtick or double-quoted phrases attributed to another TE via phrasing like "TE-N states," "TE-N reads," "originally said," "as of TE-N," "the corpus showed." Each match is human-classified per match: current-vocabulary use of the old term in flowing prose is Cat-2 (sweep it); historical attribution of the old term to an earlier TE or to a prior corpus state is Cat-2-historical (leave it alone, by analogy with Cat-1b). Sweep tools may emit matches with surrounding context for human review but may not auto-rewrite.
 
@@ -291,7 +291,7 @@ Classification heuristics (apply per match, parallel to the Cat-1a / Cat-1b heur
 
 1. If the old term appears inside a markdown blockquote (`> ...`), a fenced code block presented as a citation, or single/double quotes attributed to another TE ("TE-N states," "TE-N reads," "originally said," "at the time of writing," "as of timestamp T"), it is Cat-2-historical. Leave it.
 2. If the old term appears inside a `## Refinements` section, a supersedence note, a `Decision status` line, or any other historical-record framing, it is Cat-2-historical. Leave it.
-3. If the old term appears in a sentence whose tense is past or perfect with respect to the corpus state ("TE-30 used the term X"), it is Cat-2-historical. Leave it.
+3. If the old term appears in a sentence whose tense is past or perfect with respect to the corpus state ("TE-magup used the term X"), it is Cat-2-historical. Leave it.
 4. Otherwise it is Cat-2 (current vocabulary). Sweep it.
 5. When in doubt, treat as Cat-2-historical and leave it. False negatives produce a single stale string easy to fix later; false positives silently falsify the historical record.
 
@@ -305,11 +305,11 @@ DF-35.3 was answered Alt-3.a on 2026-05-02 (bot recommendation under Steve's `ma
 
 ### 2026-05-02 — `Status:` top-of-file header field across the TE corpus (supersedence discoverability)
 
-TE-35 Scenario S2 (three-deep supersedence chain) showed that the bottom-of-file `## Decision status` line, while it does record supersedence under the locked Alt-1.C rule, is reached only after a 200-line read. A reader who short-circuits to a single-TE read for what they judge to be a mechanical question can form a conclusion based on the body and never reach the supersedence marker. This makes the substantive / mechanical reading split (Alt-3.C in DI-020-20260502-213105) brittle: a misclassified mechanical question becomes a stale-decision action.
+TE-vudaf Scenario S2 (three-deep supersedence chain) showed that the bottom-of-file `## Decision status` line, while it does record supersedence under the locked Alt-1.C rule, is reached only after a 200-line read. A reader who short-circuits to a single-TE read for what they judge to be a mechanical question can form a conclusion based on the body and never reach the supersedence marker. This makes the substantive / mechanical reading split (Alt-3.C in DI-020-20260502-213105) brittle: a misclassified mechanical question becomes a stale-decision action.
 
 **Refinement:** Every TE in the corpus carries a top-of-file `Status:` header field, placed immediately after the TE ID line and before any other section. The field's value is one of:
 
-- `Status: stub` — TE is a one-paragraph placeholder, a single scenario sketch from a list, or otherwise not yet written in full TE form (no DFs, no decision under test, no alternative analysis). TE-2 through TE-13 from the original harness-spec §8 list are the canonical examples. The body, such as it is, is current; expansion into a full TE is future work.
+- `Status: stub` — TE is a one-paragraph placeholder, a single scenario sketch from a list, or otherwise not yet written in full TE form (no DFs, no decision under test, no alternative analysis). TE-jovoj through TE-robub from the original harness-spec §8 list are the canonical examples. The body, such as it is, is current; expansion into a full TE is future work.
 - `Status: needs DF` — TE has been written in full form (decision under test, alternatives, scenarios, conclusions, DFs articulated) but DFs are unanswered. The body's analysis is current; no decision yet.
 - `Status: decided` — DFs answered; one or more DIs locked; TE is the current authority on its decision under test. Body is current.
 - `Status: decided, refined` — DFs answered; one or more DIs locked; one or more `## Refinements` entries have been appended. Body is current; readers should also read Refinements.
@@ -321,20 +321,20 @@ TE-35 Scenario S2 (three-deep supersedence chain) showed that the bottom-of-file
 
 The field's purpose is single-TE reader discoverability of supersedence. The bottom-of-file `## Decision status` section is unchanged in shape and continues to hold the long-form rationale and the link to any superseding TE; the top-of-file field is a one-line summary that a reader sees before reading any body.
 
-**Retrofit:** A subtask 020.10 sweep adds the field to all existing TEs (TE-1 through TE-35). Each TE gets the appropriate value based on its current state. This is a Cat-1a sweep under DI-020-20260502-232651 — the field is a current-pointer ("what does this TE currently claim about itself"), not a historical quotation. The DI-enumeration discipline (DF-35.2 Refinement) does not apply because this is not a Cat-2 vocabulary update. The cross-TE quotation grep (DF-35.3 Refinement) does not apply for the same reason. It is a clean Cat-1a sweep.
+**Retrofit:** A subtask 020.10 sweep adds the field to all existing TEs (TE-famar through TE-vudaf). Each TE gets the appropriate value based on its current state. This is a Cat-1a sweep under DI-020-20260502-232651 — the field is a current-pointer ("what does this TE currently claim about itself"), not a historical quotation. The DI-enumeration discipline (DF-35.2 Refinement) does not apply because this is not a Cat-2 vocabulary update. The cross-TE quotation grep (DF-35.3 Refinement) does not apply for the same reason. It is a clean Cat-1a sweep.
 
 **Convention for future TEs:** Every new TE drafted from this point forward carries the `Status:` field at the top, with the appropriate initial value (`needs DF` for a TE in DF state; `decided` for a TE that locks DIs in the same commit). The `## Decision status` section at the bottom of the file is retained for the long-form rationale. New TEs should prefer the canonical values (`needs DF`, `decided`, `decided, refined`, `superseded by ...`, `withdrawn`) over the legacy values (`stub`, `open`, `recommended for immediate adoption`, `locked for the ...`); the legacy values exist to preserve the corpus's historical phrasing during the retrofit and should not be used for new work.
 
 **This is a Cat-3 navigational refinement, not a new DI.** It tightens discoverability of the existing locked policy without changing what any locked DI promises. The retrofit sweep is Cat-1a per DI-020-20260502-232651; subtask 020.10 will execute it as its own twig with a sweeper script that emits matches for human review.
 
-DF-35.4 was answered Alt-4.a on 2026-05-02 (bot recommendation under Steve's `make a recommendation` directive). The TODO 020 DI Log records DF-35.4 as decided in this Refinement entry, no separate DI is filed. Subtask 020.10 (the retrofit sweep) is now ready to execute and is no longer pending DF-35.4. With DF-35.1 / -35.2 / -35.3 / -35.4 all answered, subtasks 020.5 (AGENTS rollout), 020.6 (path-reference sweep), and 020.7 (TE-1 Refinements) are also unblocked.
+DF-35.4 was answered Alt-4.a on 2026-05-02 (bot recommendation under Steve's `make a recommendation` directive). The TODO 020 DI Log records DF-35.4 as decided in this Refinement entry, no separate DI is filed. Subtask 020.10 (the retrofit sweep) is now ready to execute and is no longer pending DF-35.4. With DF-35.1 / -35.2 / -35.3 / -35.4 all answered, subtasks 020.5 (AGENTS rollout), 020.6 (path-reference sweep), and 020.7 (TE-famar Refinements) are also unblocked.
 
 ### 2026-05-03 — AGENTS rollout complete (Cat-4 resolved-implication forward pointer)
 
-The AGENTS.md / AGENTS-codex.md / AGENTS-ppx.md updates flagged as deferred in the first Refinements entry (`### 2026-05-02 — scenario-play deficit`) and as unblocked in the four DF-35 Refinements entries above (subtask 020.5) have landed. AGENTS.md gained a "TE Editing Policy (Required)" section inside its Thought Experiment Protocol block, between TE Final Handoff Requirements and Naming Decisions, codifying the seven categories (Cat-1a / Cat-1b / Cat-2 / Cat-3 / Cat-4 / Cat-5–7), the canonical and legacy `## Status` field values, the append-only nature of `## Refinements`, the holistic-by-default reading rule, and the uniform applicability across every TE corpus. AGENTS-codex.md and AGENTS-ppx.md gained parallel "TE editing policy (Required)" sections placed before each file's "Things that are forbidden" block; both delegate the canonical statement to AGENTS.md and present operational summaries of the same rules. Each of the three files cites this TE (TE-34), TE-35, the four locked DIs (DI-020-20260502-213103 / -213104 / -213105 / -232651), and the four Cat-3 Refinements above (Cat-1a/Cat-1b split forward-pointer; Cat-2 DI-enumeration; Cat-2 cross-TE quotation grep; top-of-file `## Status` field).
+The AGENTS.md / AGENTS-codex.md / AGENTS-ppx.md updates flagged as deferred in the first Refinements entry (`### 2026-05-02 — scenario-play deficit`) and as unblocked in the four DF-35 Refinements entries above (subtask 020.5) have landed. AGENTS.md gained a "TE Editing Policy (Required)" section inside its Thought Experiment Protocol block, between TE Final Handoff Requirements and Naming Decisions, codifying the seven categories (Cat-1a / Cat-1b / Cat-2 / Cat-3 / Cat-4 / Cat-5–7), the canonical and legacy `## Status` field values, the append-only nature of `## Refinements`, the holistic-by-default reading rule, and the uniform applicability across every TE corpus. AGENTS-codex.md and AGENTS-ppx.md gained parallel "TE editing policy (Required)" sections placed before each file's "Things that are forbidden" block; both delegate the canonical statement to AGENTS.md and present operational summaries of the same rules. Each of the three files cites this TE (TE-dabol), TE-vudaf, the four locked DIs (DI-020-20260502-213103 / -213104 / -213105 / -232651), and the four Cat-3 Refinements above (Cat-1a/Cat-1b split forward-pointer; Cat-2 DI-enumeration; Cat-2 cross-TE quotation grep; top-of-file `## Status` field).
 
-This is a Cat-4 resolved-implication forward pointer: an item from this TE's Implications-and-future-work list (the AGENTS rollout deferral noted in the first Refinements entry) has resolved, and that resolution is recorded here as a dated `## Refinements` entry without rewriting the body or the earlier Refinement above. The locked DIs are unchanged. The TE-34 `## Decision status` section's `decided, AGENTS rollout deferred` phrasing is left in place as historical evidence of the deferral state at the time of TE-35's filing; the top-of-file `## Status: decided, refined` field is the current single-line summary. Subtask 020.5 is marked `[x]` in `protocols/wire-lab.d/TODO/TODO-20260502-213103-te-editing-policy-and-holistic-corpus.md`.
+This is a Cat-4 resolved-implication forward pointer: an item from this TE's Implications-and-future-work list (the AGENTS rollout deferral noted in the first Refinements entry) has resolved, and that resolution is recorded here as a dated `## Refinements` entry without rewriting the body or the earlier Refinement above. The locked DIs are unchanged. The TE-dabol `## Decision status` section's `decided, AGENTS rollout deferred` phrasing is left in place as historical evidence of the deferral state at the time of TE-vudaf's filing; the top-of-file `## Status: decided, refined` field is the current single-line summary. Subtask 020.5 is marked `[x]` in `protocols/wire-lab.d/TODO/TODO-dinub-te-editing-policy-and-holistic-corpus.md`.
 
 ## Decision status
 
-`decided, AGENTS rollout deferred` — locked per `DI-020-20260502-213103` (DF-34.1 -> Alt-1.C, categorized editing), `DI-020-20260502-213104` (DF-34.2 -> Alt-2.A, uniform applicability across all TE corpora; departs from this TE's recommendation of Alt-2.B), and `DI-020-20260502-213105` (DF-34.3 -> Alt-3.C, explicit holistic-substantive / single-TE-mechanical split; departs from this TE's recommendation of Alt-3.B). See `protocols/wire-lab.d/TODO/TODO-20260502-213103-te-editing-policy-and-holistic-corpus.md`. `docs/thought-experiments/README.md` already names TE-34 in its Editing policy section. AGENTS.md / AGENTS-codex.md / AGENTS-ppx.md updates are deferred until the follow-on tabletop TE confirms or revises the locked decisions; see `## Refinements` below. The Cat-1 clause of `DI-020-20260502-213103` was superseded on 2026-05-02 by `DI-020-20260502-232651` (Cat-1a / Cat-1b split per DF-35.1); see TE-35 and the corresponding Refinements entry. DF-35.2 (Cat-2 notes must enumerate unchanged DIs by ID) was decided on 2026-05-02 as a Cat-3 procedural refinement; see the corresponding Refinements entry. DF-35.3 (Cat-2 sweeps must grep for old-term-in-quotation contexts before proceeding) was decided on 2026-05-02 as a Cat-3 procedural refinement; see the corresponding Refinements entry. DF-35.4 (top-of-file `Status:` header field across the corpus) was decided on 2026-05-02 as a Cat-3 procedural refinement; the retrofit sweep is subtask 020.10 (Cat-1a, ready to execute). With DF-35.1 / -35.2 / -35.3 / -35.4 all settled, subtasks 020.5 / 020.6 / 020.7 / 020.10 are all unblocked; AGENTS rollout may proceed.
+`decided, AGENTS rollout deferred` — locked per `DI-020-20260502-213103` (DF-34.1 -> Alt-1.C, categorized editing), `DI-020-20260502-213104` (DF-34.2 -> Alt-2.A, uniform applicability across all TE corpora; departs from this TE's recommendation of Alt-2.B), and `DI-020-20260502-213105` (DF-34.3 -> Alt-3.C, explicit holistic-substantive / single-TE-mechanical split; departs from this TE's recommendation of Alt-3.B). See `protocols/wire-lab.d/TODO/TODO-dinub-te-editing-policy-and-holistic-corpus.md`. `docs/thought-experiments/README.md` already names TE-dabol in its Editing policy section. AGENTS.md / AGENTS-codex.md / AGENTS-ppx.md updates are deferred until the follow-on tabletop TE confirms or revises the locked decisions; see `## Refinements` below. The Cat-1 clause of `DI-020-20260502-213103` was superseded on 2026-05-02 by `DI-020-20260502-232651` (Cat-1a / Cat-1b split per DF-35.1); see TE-vudaf and the corresponding Refinements entry. DF-35.2 (Cat-2 notes must enumerate unchanged DIs by ID) was decided on 2026-05-02 as a Cat-3 procedural refinement; see the corresponding Refinements entry. DF-35.3 (Cat-2 sweeps must grep for old-term-in-quotation contexts before proceeding) was decided on 2026-05-02 as a Cat-3 procedural refinement; see the corresponding Refinements entry. DF-35.4 (top-of-file `Status:` header field across the corpus) was decided on 2026-05-02 as a Cat-3 procedural refinement; the retrofit sweep is subtask 020.10 (Cat-1a, ready to execute). With DF-35.1 / -35.2 / -35.3 / -35.4 all settled, subtasks 020.5 / 020.6 / 020.7 / 020.10 are all unblocked; AGENTS rollout may proceed.

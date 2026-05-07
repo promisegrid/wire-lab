@@ -1,10 +1,10 @@
-# TE-28: The 100-year goal as a load-bearing design constraint
+# TE-dajot: The 100-year goal as a load-bearing design constraint
 
 *Thought experiment, part of the [PromiseGrid Wire Lab](../../protocols/wire-lab.d/specs/harness-spec-draft.md). This file is content-addressable; its hash is its pCID.*
 
 ## TE ID
 
-TE-20260501-202713
+TE-dajot
 
 ## Prior aliases
 
@@ -65,7 +65,7 @@ This constraint is the reason every layer must be auditable in isolation, every 
 
 Over a century, protocols will be forked into bilingual variants, contested, declared deprecated by sub-communities, rediscovered, adapted to new substrates. The design must treat forking as a normal life-cycle event, not an exceptional one. Forks must be representable, distinguishable, and individually subject to trust scoring. A pCID identifies a *spec*, not the *use* of a spec; multiple competing pCIDs for analogous protocols is the steady state, not the failure case.
 
-The wire-lab's existing per-axis meta-rule from TE-27 (visibility and routing topology warrant distinct pCIDs; cardinality is a parameter except at extremes; etc.) is partially shaped by this constraint: it's the discipline that prevents one protocol from quietly becoming several without a fork-event being visible. The release machinery TE that follows this one will need to address how forks get expressed in `protocols/`.
+The wire-lab's existing per-axis meta-rule from TE-junil (visibility and routing topology warrant distinct pCIDs; cardinality is a parameter except at extremes; etc.) is partially shaped by this constraint: it's the discipline that prevents one protocol from quietly becoming several without a fork-event being visible. The release machinery TE that follows this one will need to address how forks get expressed in `protocols/`.
 
 ### C-5: Trust accrues per-burden
 
@@ -92,7 +92,7 @@ This section walks each currently-locked artifact in the wire-lab through the si
 - **C-5:** Honored. Per-burden trust ledgers are first-class throughout the harness-spec.
 - **C-6:** Honored. The harness-spec is explicit that "the only durable anchor in the system is the signing key" and that "specs follow signing keys."
 
-### `protocols/wire-lab.d/specs/transport-spec-draft.md` (TE-26 / TE-27 outer rule)
+### `protocols/wire-lab.d/specs/transport-spec-draft.md` (TE-zalut / TE-junil outer rule)
 
 - **C-1:** Honored. The pCID-keyed transport directory convention does not assume any registry. Each transport-protocol's pCID is mintable from its spec's bytes; no central authority blesses it.
 - **C-2:** Mostly honored. The four locked principles do not depend on any short-horizon institution. The slug component of `transports/<pcid>--<slug>/` is a human-readable convenience that may drift in meaning over decades; this is acknowledged in the spec as presentational rather than load-bearing.
@@ -110,17 +110,17 @@ This section walks each currently-locked artifact in the wire-lab through the si
 - **C-5:** Partially honored. The body-level acknowledgement scheme records *what* was acknowledged but not the trust score behind the acknowledgement. Trust is a reader-side concern. **Open question recorded as OQ-G2:** cumulative-prefix or frontier-style ack semantics under the DAG model. C-5 implies these semantics must be local-trust-vector-aware, not global.
 - **C-6:** Honored. The protocol's identity is its pCID; signing of individual messages is a v1 concern.
 
-### TE-24 (group-transport envelope) and DR-009 / TODO 012
+### TE-hogus (group-transport envelope) and DR-009 / TODO 012
 
 - These are decision records for the group-transport contract. The constraints apply transitively: anything the group-transport spec gets right or gets wrong about the constraints is reflected here.
 - **Specific honor of C-2:** the rename TODO 013 just performed (channel→transport, channel-carrier→group-transport-envelope) demonstrates that the wire-lab is willing to refactor decision-record vocabulary when a clearer framing emerges. That willingness is a 100-year discipline: contributors arriving in 2046 should not have to decode 2026 vocabulary that turned out to be wrong.
 
-### TE-25 (numbering collision), TE-26 (transport-protocol types), TE-27 (transports rename)
+### TE-titur (numbering collision), TE-zalut (transport-protocol types), TE-junil (transports rename)
 
 - These are repo-mechanics and outer-spec TEs. C-2 dominates: future-readers must be able to follow the numbering and rename mechanics without living institutional memory.
-- **TE-25** locks the drafting-time invariant for TE numbering. This works under C-2 because the timestamp slug is content-addressable in the same sense as a pCID — any reader can recover the intended numbering by reading the timestamps.
-- **TE-26** locks four principles for `transports/`. Honored under C-1, C-3, C-6. Partial under C-4 (silent on forks).
-- **TE-27** locks the transports rename and the per-axis meta-rule. Honored under C-1, C-3, C-6. The per-axis rule indirectly addresses C-4 by giving a discipline for *when* a fork is warranted vs. when a parameter suffices.
+- **TE-titur** locks the drafting-time invariant for TE numbering. This works under C-2 because the timestamp slug is content-addressable in the same sense as a pCID — any reader can recover the intended numbering by reading the timestamps.
+- **TE-zalut** locks four principles for `transports/`. Honored under C-1, C-3, C-6. Partial under C-4 (silent on forks).
+- **TE-junil** locks the transports rename and the per-axis meta-rule. Honored under C-1, C-3, C-6. The per-axis rule indirectly addresses C-4 by giving a discipline for *when* a fork is warranted vs. when a parameter suffices.
 
 ### Branching policy and ppx/main convention
 
@@ -130,7 +130,7 @@ This section walks each currently-locked artifact in the wire-lab through the si
 
 ### TE numbering and TODO numbering
 
-- Both are integer sequences anchored on first-drafted timestamps (TE-25). Under C-1, no registry is needed; the integers are derived from sortable timestamps.
+- Both are integer sequences anchored on first-drafted timestamps (TE-titur). Under C-1, no registry is needed; the integers are derived from sortable timestamps.
 - Under C-2, the sequences will eventually wrap or become unwieldy over the horizon. **Open question for very-long-term TE: is the integer sequence stable across centuries, or does it eventually need to be supplanted by purely timestamp-based or pCID-based identifiers?**
 
 ## Conclusions
@@ -138,7 +138,7 @@ This section walks each currently-locked artifact in the wire-lab through the si
 1. **The 100-year goal is real and is already shaping the locked design** — pCIDs, content-addressed specs, per-burden trust ledgers, multi-generational handoff scenarios. The harness-spec's existing "multiple human generations" and "centuries-long" prose is a soft surface on a hard underlying constraint set.
 2. **Naming the constraint set explicitly costs almost nothing and prevents short-horizon assumptions** from being smuggled in by future-LLM-readers, future-contributors, or future-Steve under time pressure. The current implicit framing is sufficient when Steve is reading every PR; it is insufficient over the horizon the design is for.
 3. **Several open questions surface from the pressure-test** and warrant follow-on TEs:
-   - **OQ-100.1 — Protocol forking:** when an existing transport-protocol is forked (incompatible v2, or a community-specific variant), how is the new pCID expressed in `protocols/` and `transports/`? Cross-references to TE-27 per-axis meta-rule.
+   - **OQ-100.1 — Protocol forking:** when an existing transport-protocol is forked (incompatible v2, or a community-specific variant), how is the new pCID expressed in `protocols/` and `transports/`? Cross-references to TE-junil per-axis meta-rule.
    - **OQ-100.2 — Cryptographic signing migration:** when v0 group-transport gains cryptographic signing in v1, how does the migration honor C-2 (existing v0 transports survive) and C-4 (v0 and v1 are siblings, not parent-and-child)?
    - **OQ-100.3 — Cumulative-prefix ack and trust:** the deferred Q2 from TODO 013 (cumulative-prefix or frontier ack semantics) must be designed under C-5 — trust-vector-aware, not global.
    - **OQ-100.4 — Numbering wrap:** is the integer sequence for TEs and TODOs stable across centuries, or does it eventually need to be supplanted by purely timestamp-based or pCID-based identifiers?

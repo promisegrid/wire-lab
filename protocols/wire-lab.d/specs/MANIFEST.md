@@ -28,6 +28,6 @@ entries:
     freezing_commit: 33920e004bd533a07e7b043a3d291d4d76d86ffa
 ```
 
-See `docs/thought-experiments/TE-20260429-175530-spec-doc-store-and-pcid-machinery.md`
+See `docs/thought-experiments/TE-rujak-spec-doc-store-and-pcid-machinery.md`
 for the full reasoning behind the layout, hash input, manifest format, and
 the single-binary freeze-and-check tool.

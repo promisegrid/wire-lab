@@ -2,7 +2,7 @@
 
 *An essay on why PromiseGrid's choice of spec-as-pCID is formalism-neutral, why congruence and convergence are dual rather than opposed, and on a thread to pull on for the missing equivalence theorem.*
 
-— Drafted 2026-04-29 in conversation between Steve Traugott and stevegt-via-perplexity, ahead of TE-23. This is a framing essay, not a normative spec. Nothing here is yet locked as a Decision Intent.
+— Drafted 2026-04-29 in conversation between Steve Traugott and stevegt-via-perplexity, ahead of TE-lozip. This is a framing essay, not a normative spec. Nothing here is yet locked as a Decision Intent.
 
 ---
 
@@ -211,4 +211,4 @@ This is a working essay drafted in conversation, not a polished paper, so I want
 
 - §6 (claims and non-claims) is meant to be re-readable as a standalone summary.
 
-This essay is a draft and will probably change. It is being saved as `docs/essays/congruence-convergence-and-the-grid.md` rather than as a TE because it is framing rather than a decision request. If we want to lock any of its claims as DIs, those will be in TE-23 and possibly TE-24, with this essay as a referenced source.
+This essay is a draft and will probably change. It is being saved as `docs/essays/congruence-convergence-and-the-grid.md` rather than as a TE because it is framing rather than a decision request. If we want to lock any of its claims as DIs, those will be in TE-lozip and possibly TE-hogus, with this essay as a referenced source.

@@ -27,14 +27,14 @@ Read these files in this order before doing anything else:
                                                   priority-sorted index of
                                                   TODOs across all
                                                   protocols-as-simrepos.
-  4. protocols/wire-lab.d/TODO/TODO-20260429-030146-perplexity-computer-onboarding.md — bootstrap decisions
+  4. protocols/wire-lab.d/TODO/TODO-dutaz-perplexity-computer-onboarding.md — bootstrap decisions
                                                   governing how the bot
                                                   participates.
   5. DR/DR-001-…-bot-identity.md
      DR/DR-002-…-drop-require-pr.md
      DR/DR-003-…-review-style.md                — the three DRs that
                                                   back the DIs in
-                                                  protocols/wire-lab.d/TODO/TODO-20260429-030146-perplexity-computer-onboarding.md.
+                                                  protocols/wire-lab.d/TODO/TODO-dutaz-perplexity-computer-onboarding.md.
   6. protocols/wire-lab.d/specs/harness-spec-draft.md                            — the canonical Wire Lab
                                                   spec. Skim §0–§3 and
                                                   §10a; the rest is
@@ -232,11 +232,11 @@ freely editable. Edits follow the categorized policy locked in:
 - DI-020-20260502-213105 (holistic reading by default; single-TE
   reading only for obviously mechanical questions)
 - DI-020-20260502-232651 (Cat-1a / Cat-1b path-reference split)
-- TE-34 (`docs/thought-experiments/TE-20260502-212810-te-editing-policy-and-holistic-corpus.md`)
+- TE-dabol (`docs/thought-experiments/TE-dabol-te-editing-policy-and-holistic-corpus.md`)
   and its four Cat-3 Refinements: Cat-1a/Cat-1b split forward-pointer;
   Cat-2 DI-enumeration discipline; Cat-2 cross-TE quotation grep;
   top-of-file `## Status` header field.
-- TE-35 (`docs/thought-experiments/TE-20260502-232651-editing-policy-tabletop.md`)
+- TE-vudaf (`docs/thought-experiments/TE-vudaf-editing-policy-tabletop.md`)
   is the tabletop simulation that produced those refinements.
 
 Read AGENTS.md "TE Editing Policy (Required)" for the canonical
@@ -275,7 +275,7 @@ Cat-1a / Cat-2 sweeps on the body are permitted under their category
 rules; Cat-3 / Cat-4 changes go in `## Refinements`; Cat-5–7 changes
 go in a new TE.
 
-Reading default: holistic. Read TE-34, TE-35, and the affected TE
+Reading default: holistic. Read TE-dabol, TE-vudaf, and the affected TE
 (plus any TEs they cite) before performing any TE edit. Single-TE
 reading is reserved for obviously mechanical questions and only
 after the holistic read confirms the question is mechanical.

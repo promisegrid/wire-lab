@@ -1,10 +1,10 @@
-# TE-27: `channels/` → `transports/` rename and axes of transport-protocol differentiation
+# TE-junil: `channels/` → `transports/` rename and axes of transport-protocol differentiation
 
 *Thought experiment, part of the [PromiseGrid Wire Lab](../../protocols/wire-lab.d/specs/harness-spec-draft.md) and the (forthcoming) `specs/transport-spec-draft.md`. This file is content-addressable; its hash is its pCID.*
 
 ## TE ID
 
-TE-20260501-021921
+TE-junil
 
 ## Prior aliases
 
@@ -19,7 +19,7 @@ decided, refined
 
 ## Decision under test
 
-TE-26 locked four principles for what was then called the `channels/` directory: pCID-keyed paths under `channels/<pcid>--<slug>/`, no `Channel:` header in messages, code-as-handler for each pCID, and a thin wire-lab spec deferring directory interiors to per-protocol specs. Drafting moved straight into the carve-out, with `specs/channel-spec-draft.md` (thin) and `specs/codex-perplexity-channel-draft.md` (full TE-24 contract) named as the next deliverables.
+TE-zalut locked four principles for what was then called the `channels/` directory: pCID-keyed paths under `channels/<pcid>--<slug>/`, no `Channel:` header in messages, code-as-handler for each pCID, and a thin wire-lab spec deferring directory interiors to per-protocol specs. Drafting moved straight into the carve-out, with `specs/channel-spec-draft.md` (thin) and `specs/codex-perplexity-channel-draft.md` (full TE-hogus contract) named as the next deliverables.
 
 Two related observations have surfaced since:
 
@@ -31,10 +31,10 @@ These two observations together ask three questions: what should the directory b
 
 ## Assumptions
 
-- TE-26's four principles carry forward unchanged in substance; only the vocabulary may shift. pCID-keyed paths, no transport-naming header in messages, code-as-handler, and a thin outer spec all remain locked.
+- TE-zalut's four principles carry forward unchanged in substance; only the vocabulary may shift. pCID-keyed paths, no transport-naming header in messages, code-as-handler, and a thin outer spec all remain locked.
 - The wire lab's purpose is to learn what wire-format and topology choices produce desirable behavior in a simulated network. Therefore the directory under study is the simulation surface; its contents are observable artifacts of message flow, not abstractions hiding the network.
 - "Let each protocol name its own internals" applies. A transport-protocol-pCID's spec defines its own directory layout, headers, parents, receipts, kinds, persistence rules, etc. The wire-lab spec stays thin.
-- The TE-24 v0 contract (parents, receipts, message-id, message kinds, IHave, canonical-bytes) is a candidate transport-protocol's contract, not a wire-lab-global contract. It graduates to the carve-out as one transport-protocol among potentially several.
+- The TE-hogus v0 contract (parents, receipts, message-id, message kinds, IHave, canonical-bytes) is a candidate transport-protocol's contract, not a wire-lab-global contract. It graduates to the carve-out as one transport-protocol among potentially several.
 - Cardinality (N=2 vs. N>2) is a candidate axis of differentiation, but whether different cardinalities warrant distinct transport-pCIDs is itself a question this TE addresses, not one to assume.
 
 ## Vocabulary shift
@@ -43,7 +43,7 @@ This TE renames `channels/` to `transports/` throughout the repo. The rationale:
 
 - A directory at `transports/<pcid>--<slug>/` represents one simulated transport instance: a particular way bytes-shaped-as-messages traverse a particular set of participants under a particular set of routing rules. The pCID identifies the *class* of transport-protocol; the slug identifies *this instance*.
 - "Channel" is reserved (not introduced) as a possible future above-transport concept (logical addressing, multiplexing, group naming) that some later TE may define if a use case forces it. For now there is nothing at the channel layer; the wire-lab vocabulary is **transports** and **messages**.
-- TE-26's prose, locked decisions, and follow-on TODO references all migrate from "channel" to "transport." TE-26's substance (no transport-declaration header, pCID-keyed paths, code-as-handler, thin outer spec) carries forward unchanged.
+- TE-zalut's prose, locked decisions, and follow-on TODO references all migrate from "channel" to "transport." TE-zalut's substance (no transport-declaration header, pCID-keyed paths, code-as-handler, thin outer spec) carries forward unchanged.
 
 ## Axes of transport-protocol differentiation
 
@@ -118,7 +118,7 @@ The DAG structure messages form within the transport.
 - F.4: Synchronized frontier (every new message must name the current frontier as parents; no forks).
 - F.5: Vector-clock / causal (parents are a vector of CIDs giving causal context).
 
-F.2 is TE-24's current shape. F.3 is the natural generalization for groups. F.4 is the strongest ordering guarantee. F.5 is what most CRDT-style systems use.
+F.2 is TE-hogus's current shape. F.3 is the natural generalization for groups. F.4 is the strongest ordering guarantee. F.5 is what most CRDT-style systems use.
 
 ### Axis G — Direction
 
@@ -138,22 +138,22 @@ Whether and how delivery is acknowledged.
 - H.3: Frontier receipts (a receipt acknowledges a contiguous prefix or a frontier vector).
 - H.4: Cryptographic receipts (the receipt itself is signed and storable as an independent message).
 
-TE-24 specified H.2/H.4 (`IHave` records signed by the receiver, naming a CID).
+TE-hogus specified H.2/H.4 (`IHave` records signed by the receiver, naming a CID).
 
 ## Decision Forks (DFs)
 
 ### DF-27.1 — Rename `channels/` to `transports/`?
 
-#### Alt-1.A: Yes, rename now in TE-27's carve-out commits *(LOCKED — chosen)*
+#### Alt-1.A: Yes, rename now in TE-junil's carve-out commits *(LOCKED — chosen)*
 
-The directory becomes `transports/`. All references in `channels/README.md`, `specs/harness-spec-draft.md`, `DR/DR-009-...md`, `TODO/012-...md`, TE-24, and TE-26 migrate. The previously-locked phrasing "`channels/<pcid>--<slug>/`" becomes "`transports/<pcid>--<slug>/`". A redirect note is left in TE-24 and TE-26 explaining the rename so future readers can follow the trail.
+The directory becomes `transports/`. All references in `channels/README.md`, `specs/harness-spec-draft.md`, `DR/DR-009-...md`, `TODO/012-...md`, TE-hogus, and TE-zalut migrate. The previously-locked phrasing "`channels/<pcid>--<slug>/`" becomes "`transports/<pcid>--<slug>/`". A redirect note is left in TE-hogus and TE-zalut explaining the rename so future readers can follow the trail.
 
-- **Easier**: vocabulary is consistent across the repo from the moment TE-27 lands; no half-renamed corpus.
-- **Harder**: more files touched in one TE-27 landing.
+- **Easier**: vocabulary is consistent across the repo from the moment TE-junil lands; no half-renamed corpus.
+- **Harder**: more files touched in one TE-junil landing.
 
 #### Alt-1.B: Defer the rename to a TODO
 
-Lock the principle here; do the migration in a follow-on TODO commit so TE-27 stays focused on the axis analysis.
+Lock the principle here; do the migration in a follow-on TODO commit so TE-junil stays focused on the axis analysis.
 
 #### Alt-1.C: Don't rename; use "channel" and "transport" as synonyms
 
@@ -172,30 +172,30 @@ If a logical addressing/grouping concept above transports is later needed, a fut
 
 "Channel" is held in reserve; not used for now, not used for transports, but documented as a potential future layer.
 
-#### Alt-2.C: Yes, redefine TE-26's locked terms now
+#### Alt-2.C: Yes, redefine TE-zalut's locked terms now
 
-Split TE-26's contract: physical routing is "transport," parents/receipts/kinds are "channel." Two specs, two layers. Significant churn.
+Split TE-zalut's contract: physical routing is "transport," parents/receipts/kinds are "channel." Two specs, two layers. Significant churn.
 
-### DF-27.3 — TE-27 framing scope
+### DF-27.3 — TE-junil framing scope
 
 #### Alt-3.A: Axes-of-differentiation analysis (broad) *(LOCKED — chosen)*
 
-TE-27 enumerates the axes (A-H above), assigns a per-axis recommendation about whether different values warrant distinct pCIDs or are parameters within one spec, and produces a starter catalogue of named transport-protocols.
+TE-junil enumerates the axes (A-H above), assigns a per-axis recommendation about whether different values warrant distinct pCIDs or are parameters within one spec, and produces a starter catalogue of named transport-protocols.
 
 - **Easier**: gives the project a meta-rule applicable to every future transport-protocol question.
 - **Harder**: longer document; more decisions to make in one place.
 
 #### Alt-3.B: Pair-vs-group only (narrow)
 
-Just answer whether `unicast-channel-draft.md` and `group-channel-draft.md` should both exist. Defer the broader axis analysis to TE-28.
+Just answer whether `unicast-channel-draft.md` and `group-channel-draft.md` should both exist. Defer the broader axis analysis to TE-dajot.
 
 #### Alt-3.C: Two TEs in parallel
 
-TE-27 = rename only. TE-28 = axes analysis. Cleanly separated.
+TE-junil = rename only. TE-dajot = axes analysis. Cleanly separated.
 
 ### DF-27.4 — Per-axis: distinct pCID or parameter within a spec?
 
-For each axis A-H, the meta-rule TE-27 establishes:
+For each axis A-H, the meta-rule TE-junil establishes:
 
 #### Axis A (Cardinality) → parameter within a spec
 
@@ -231,7 +231,7 @@ Receipt scheme is a per-transport choice. Each transport-protocol's spec defines
 
 ### DF-27.5 — Starter catalogue of named transport-protocols
 
-Given the per-axis meta-rule — cardinality within all-see-all is a parameter, not a contract boundary — a separate pair-shape spec would violate the meta-rule that TE-27 just locked. The N=2 case is just N=2 in a small-finite-closed-group transport-protocol's spec, not a separate protocol.
+Given the per-axis meta-rule — cardinality within all-see-all is a parameter, not a contract boundary — a separate pair-shape spec would violate the meta-rule that TE-junil just locked. The N=2 case is just N=2 in a small-finite-closed-group transport-protocol's spec, not a separate protocol.
 
 #### Alt-5.A: start with two specs now (rejected)
 
@@ -239,11 +239,11 @@ A `specs/unicast-transport-draft.md` (pair-only) and a `specs/group-transport-dr
 
 #### Alt-5.B (LOCKED — chosen): start with one spec
 
-- **`specs/group-transport-draft.md`** — Small-finite-closed-group (Axis A: A.1 and A.2 together; N≥2), all-see-all (B.1), direct (C.1), invite-only or open-read membership (D.2/D.3), append-only (E.1), multi-writer DAG (F.3), symmetric (G.1), per-message or frontier receipts (H.2/H.3/H.4). Inherits TE-24's v0 contract; the spec doc decides parent-header shape, receipt scope, and other interior details. The N=2 case (Codex↔Perplexity, the original TE-24 instance) is a documented common case of this spec, not a separate spec.
+- **`specs/group-transport-draft.md`** — Small-finite-closed-group (Axis A: A.1 and A.2 together; N≥2), all-see-all (B.1), direct (C.1), invite-only or open-read membership (D.2/D.3), append-only (E.1), multi-writer DAG (F.3), symmetric (G.1), per-message or frontier receipts (H.2/H.3/H.4). Inherits TE-hogus's v0 contract; the spec doc decides parent-header shape, receipt scope, and other interior details. The N=2 case (Codex↔Perplexity, the original TE-hogus instance) is a documented common case of this spec, not a separate spec.
 
 #### Alt-5.C: defer all spec carve-outs until a future TODO
 
-TE-27 records the rename and the meta-rule; the carve-out spec comes later.
+TE-junil records the rename and the meta-rule; the carve-out spec comes later.
 
 ### DF-27.6 — Topology specs to draft next (after the immediate carve-out)
 
@@ -254,7 +254,7 @@ Anticipated next transport-protocol specs to draft once the group-transport spec
 - `specs/cluster-cluster-transport-draft.md` (Axis C: C.7) — small close-knit groups bridged into a larger network; matches the project's working hypothesis that the grid may be made of overlapping close-knit groups.
 - `specs/gossip-transport-draft.md` (Axis B: B.6) — eventual-consistent flood; per-message latency is statistical.
 
-These are not part of the TE-27 carve-out and are listed here only as the anticipated next TEs/TODOs.
+These are not part of the TE-junil carve-out and are listed here only as the anticipated next TEs/TODOs.
 
 ## Scenario analysis
 
@@ -288,7 +288,7 @@ Messages disappear on delivery. The transport directory holds only the live mess
 
 When a group of participants needs to move from one transport-protocol-pCID to a different one (e.g., from the small-finite-closed-group spec to a future cluster-of-clusters spec because the group has grown beyond what the original spec's contract supports), what does that migration look like operationally? Is it the closing of one transport instance and the opening of another? Does the new transport carry a back-reference to the prior one? Do prior messages migrate in-place, get re-anchored as parents, or stay where they were?
 
-This question is non-trivial and TE-27 does not lock answers to it. It is deferred to a future TE on transport-protocol migration semantics.
+This question is non-trivial and TE-junil does not lock answers to it. It is deferred to a future TE on transport-protocol migration semantics.
 
 ## Conclusions
 
@@ -296,44 +296,44 @@ This question is non-trivial and TE-27 does not lock answers to it. It is deferr
 2. **The wire-lab vocabulary is "transports" and "messages."** "Channel" is not used; if a logical-addressing layer is later needed, a future TE introduces it. (DF-27.2 Alt-2.A.)
 3. **Frame this TE as the axes-of-differentiation analysis.** (DF-27.3 Alt-3.A.)
 4. **Per-axis meta-rule for distinct-pCID-vs-parameter:** axes B (visibility) and C (routing topology) warrant distinct pCIDs per class. Axis A (cardinality) is a parameter except at large-N or unbounded. Axes D (membership), E (persistence), F (message-graph), G (direction), H (receipts) are parameters within a spec, with narrow exceptions noted. (DF-27.4.)
-5. **Start with one transport-protocol spec**: `specs/group-transport-draft.md` (multi-writer DAG, all-see-all, small-finite-closed-group, N≥2). The N=2 case (Codex↔Perplexity) is a documented common case of this spec, not a separate spec; per the cardinality meta-rule a pair-only spec would duplicate the contract for no reason. TE-24's v0 contract migrates into this spec. (DF-27.5 Alt-5.B.)
+5. **Start with one transport-protocol spec**: `specs/group-transport-draft.md` (multi-writer DAG, all-see-all, small-finite-closed-group, N≥2). The N=2 case (Codex↔Perplexity) is a documented common case of this spec, not a separate spec; per the cardinality meta-rule a pair-only spec would duplicate the contract for no reason. TE-hogus's v0 contract migrates into this spec. (DF-27.5 Alt-5.B.)
 6. **Subsequent transport-protocol specs anticipated** (each its own future TE or TODO): ring, star, cluster-of-clusters, gossip. (DF-27.6.)
-7. **The wire-lab's thin outer spec is `specs/transport-spec-draft.md`** (renamed from the previously-anticipated `channel-spec-draft.md`). It carries TE-26's four locked principles with "channel" → "transport" applied throughout. The TE-26 substance is not redone; only the vocabulary changes.
+7. **The wire-lab's thin outer spec is `specs/transport-spec-draft.md`** (renamed from the previously-anticipated `channel-spec-draft.md`). It carries TE-zalut's four locked principles with "channel" → "transport" applied throughout. The TE-zalut substance is not redone; only the vocabulary changes.
 
 ## Implications
 
-- All TE-26 prose, decisions, and follow-on references migrate from "channel" to "transport." TE-26's locked decisions remain locked under the new vocabulary.
+- All TE-zalut prose, decisions, and follow-on references migrate from "channel" to "transport." TE-zalut's locked decisions remain locked under the new vocabulary.
 - `channels/README.md` is renamed and rewritten as `transports/README.md` to point at `specs/transport-spec-draft.md` and the catalogue of transport-protocol specs. The transport-shape commitments (single-writer log, 1:1) are removed; that material moves into `specs/unicast-transport-draft.md`.
-- Existing TE-24 prose retains its original "channel" wording inline (the document is part of the historical record), with a top note explaining the rename and pointing readers at TE-27.
-- TE-26 retains its original "channel" wording inline with a similar top note.
-- `specs/harness-spec-draft.md`'s TE-24 §8 bullet is rewritten to use "transport," and a TE-27 §8 entry is added.
+- Existing TE-hogus prose retains its original "channel" wording inline (the document is part of the historical record), with a top note explaining the rename and pointing readers at TE-junil.
+- TE-zalut retains its original "channel" wording inline with a similar top note.
+- `specs/harness-spec-draft.md`'s TE-hogus §8 bullet is rewritten to use "transport," and a TE-junil §8 entry is added.
 - DR-009 and TODO 012 are updated to use "transport."
 - The TODO for the carve-out (anticipated TODO 013) covers: creating `specs/transport-spec-draft.md` (thin), `specs/unicast-transport-draft.md` and `specs/group-transport-draft.md` (substantive), and updating all the cross-references.
 
 ## Refinements
 
-### 2026-05-05 — Forward-pointers to TE-28..TE-32 dis-anchored; migration-semantics topic re-anchored to TE-37
+### 2026-05-05 — Forward-pointers to TE-dajot..TE-liviv dis-anchored; migration-semantics topic re-anchored to TE-numan
 
-This Refinement does not change any DI in TE-27. It records that all five "anticipated TE-N" forward-pointers in `## Implications for follow-on work` and the matching item in `## Conclusions` line numbering were written under the pre-Cat-3-on-TE-25 authoring practice (naming an unallocated integer for a not-yet-drafted TE), and all five have since dis-anchored as their integer slots were claimed by unrelated topics. The 2026-05-05 Cat-3 Refinement on TE-25 forbids that construction going forward; this Refinement applies the new rule to TE-27 by recording where each of the five topics actually lives now.
+This Refinement does not change any DI in TE-junil. It records that all five "anticipated TE-N" forward-pointers in `## Implications for follow-on work` and the matching item in `## Conclusions` line numbering were written under the pre-Cat-3-on-TE-titur authoring practice (naming an unallocated integer for a not-yet-drafted TE), and all five have since dis-anchored as their integer slots were claimed by unrelated topics. The 2026-05-05 Cat-3 Refinement on TE-titur forbids that construction going forward; this Refinement applies the new rule to TE-junil by recording where each of the five topics actually lives now.
 
 **Per-pointer disposition:**
 
-1. **"TE-28 (anticipated): transport-protocol migration semantics"** — the integer TE-28 was claimed by ["The 100-year goal as a load-bearing design constraint"](TE-20260501-202713-100-year-goal-as-design-constraint.md) (a different topic) and the migration-semantics question raised in § S7 of TE-27 went unanchored for several days. The topic is now anchored at [TE-37: Transport-protocol migration invariants](TE-20260506-041241-transport-protocol-migration-semantics.md), drafted on 2026-05-05 in response to a DT3 (dropped-thread) sweep. TE-37 locks three migration-contract invariants (audit-trail reconstructibility; no-silent-rewrite; no-unilateral-abandonment) and explicitly defers operational-shape questions (close-old-vs-overlap-vs-atomic-swap; back-reference format; etc.) to a future operational-shape TE tracked as `T-MIG-OPS` in `OPEN-THREADS.md`. **Readers of TE-27 § S7 should follow the pointer to TE-37, not to TE-28.**
+1. **"TE-dajot (anticipated): transport-protocol migration semantics"** — the integer TE-dajot was claimed by ["The 100-year goal as a load-bearing design constraint"](TE-dajot-100-year-goal-as-design-constraint.md) (a different topic) and the migration-semantics question raised in § S7 of TE-junil went unanchored for several days. The topic is now anchored at [TE-numan: Transport-protocol migration invariants](TE-numan-transport-protocol-migration-semantics.md), drafted on 2026-05-05 in response to a DT3 (dropped-thread) sweep. TE-numan locks three migration-contract invariants (audit-trail reconstructibility; no-silent-rewrite; no-unilateral-abandonment) and explicitly defers operational-shape questions (close-old-vs-overlap-vs-atomic-swap; back-reference format; etc.) to a future operational-shape TE tracked as `T-MIG-OPS` in `OPEN-THREADS.md`. **Readers of TE-junil § S7 should follow the pointer to TE-numan, not to TE-dajot.**
 
-2. **"TE-29 (anticipated): ring-transport spec"** — the integer TE-29 was claimed by ["Protocols as simulated repos, and the L4-binding layer"](TE-20260501-215027-protocols-as-simulated-repos-and-binding-layer.md) (a different topic). The ring-transport-spec topic has not been drafted as of 2026-05-05; it is open work tracked as `T-RING-TRANSPORT` in `OPEN-THREADS.md`.
+2. **"TE-vipir (anticipated): ring-transport spec"** — the integer TE-vipir was claimed by ["Protocols as simulated repos, and the L4-binding layer"](TE-vipir-protocols-as-simulated-repos-and-binding-layer.md) (a different topic). The ring-transport-spec topic has not been drafted as of 2026-05-05; it is open work tracked as `T-RING-TRANSPORT` in `OPEN-THREADS.md`.
 
-3. **"TE-30 (anticipated): cluster-of-clusters transport"** — the integer TE-30 was claimed by ["TODO numbering and per-protocol TODO shape"](TE-20260502-002548-todo-numbering-and-per-protocol-shape.md) (a different topic). The cluster-of-clusters topic has not been drafted as of 2026-05-05; it is open work tracked as `T-CLUSTER-OF-CLUSTERS-TRANSPORT` in `OPEN-THREADS.md`.
+3. **"TE-magup (anticipated): cluster-of-clusters transport"** — the integer TE-magup was claimed by ["TODO numbering and per-protocol TODO shape"](TE-magup-todo-numbering-and-per-protocol-shape.md) (a different topic). The cluster-of-clusters topic has not been drafted as of 2026-05-05; it is open work tracked as `T-CLUSTER-OF-CLUSTERS-TRANSPORT` in `OPEN-THREADS.md`.
 
-4. **"TE-31 (anticipated): gossip-transport spec"** — the integer TE-31 was claimed by ["Spec-doc as upstream, simrepo as implementation"](TE-20260502-004924-spec-doc-inversion-and-conformance-changelog.md) (a different topic). The gossip-transport-spec topic has not been drafted as of 2026-05-05; it is open work tracked as `T-GOSSIP-TRANSPORT` in `OPEN-THREADS.md`.
+4. **"TE-zukug (anticipated): gossip-transport spec"** — the integer TE-zukug was claimed by ["Spec-doc as upstream, simrepo as implementation"](TE-zukug-spec-doc-inversion-and-conformance-changelog.md) (a different topic). The gossip-transport-spec topic has not been drafted as of 2026-05-05; it is open work tracked as `T-GOSSIP-TRANSPORT` in `OPEN-THREADS.md`.
 
-5. **"TE-32 (anticipated): receipts at scale"** — the integer TE-32 was claimed by ["Spec-side vs implementation-side split"](TE-20260502-014525-spec-vs-implementation-split.md) (a different topic). The receipts-at-scale topic has not been drafted as of 2026-05-05; it is open work tracked as `T-RECEIPTS-AT-SCALE` in `OPEN-THREADS.md`.
+5. **"TE-liviv (anticipated): receipts at scale"** — the integer TE-liviv was claimed by ["Spec-side vs implementation-side split"](TE-liviv-spec-vs-implementation-split.md) (a different topic). The receipts-at-scale topic has not been drafted as of 2026-05-05; it is open work tracked as `T-RECEIPTS-AT-SCALE` in `OPEN-THREADS.md`.
 
-**Going forward** (per the 2026-05-05 Cat-3 on TE-25): any future TE that anticipates a not-yet-drafted TE must use either the timestamp+slug form of the future TE (if drafted but not indexed) or a thread-id from `OPEN-THREADS.md` (if only anticipated). Naming an unallocated integer is forbidden because it is the construction that produced the drift documented above.
+**Going forward** (per the 2026-05-05 Cat-3 on TE-titur): any future TE that anticipates a not-yet-drafted TE must use either the timestamp+slug form of the future TE (if drafted but not indexed) or a thread-id from `OPEN-THREADS.md` (if only anticipated). Naming an unallocated integer is forbidden because it is the construction that produced the drift documented above.
 
 ## Decision status
 
 LOCKED:
-- DF-27.1 — Alt-1.A (rename `channels/` → `transports/` now in TE-27's carve-out commits).
+- DF-27.1 — Alt-1.A (rename `channels/` → `transports/` now in TE-junil's carve-out commits).
 - DF-27.2 — Alt-2.A (no "channel" in the wire-lab vocabulary; transport and message only).
 - DF-27.3 — Alt-3.A (axes-of-differentiation analysis).
 - DF-27.4 — per-axis meta-rule as recorded above.
@@ -344,10 +344,10 @@ Recorded principle: *the wire-lab's `transports/` directory is a simulation surf
 
 ## Implications for follow-on work
 
-- **TODO 013 (anticipated)**: drive these locked alts to a DR; carve out `specs/transport-spec-draft.md` (thin) plus `specs/group-transport-draft.md` (substantive, inheriting TE-24's v0 contract); rename `channels/` → `transports/`; update `channels/README.md` → `transports/README.md`; rewrite TE-26 in place with vocabulary swap; update DR-009, TODO 012, TE-24, and `specs/harness-spec-draft.md` to use the new vocabulary.
+- **TODO 013 (anticipated)**: drive these locked alts to a DR; carve out `specs/transport-spec-draft.md` (thin) plus `specs/group-transport-draft.md` (substantive, inheriting TE-hogus's v0 contract); rename `channels/` → `transports/`; update `channels/README.md` → `transports/README.md`; rewrite TE-zalut in place with vocabulary swap; update DR-009, TODO 012, TE-hogus, and `specs/harness-spec-draft.md` to use the new vocabulary.
 - **TODO 014 (anticipated)**: first real message exchange under a group-transport instance (likely N=2, Codex↔Perplexity), exercising the group-transport-draft.md spec end-to-end.
-- **TE-28 (anticipated)**: transport-protocol migration semantics — what does it mean for a group of participants to move from one transport-protocol-pCID to another? (Question raised in S7 above; deferred from TE-27.)
-- **TE-29 (anticipated)**: ring-transport spec — token-passing semantics, per-hop artifacts, link-failure handling.
-- **TE-30 (anticipated)**: cluster-of-clusters transport — small close-knit groups bridged into a larger network. The most representative of the project's working hypothesis about real-world grid structure.
-- **TE-31 (anticipated)**: gossip-transport — eventual-consistent flood, statistical latency, infection rules.
-- **TE-32 (anticipated)**: receipts at scale — does `IHave: <transport-pcid>:<cid>` need to become a vector at multi-writer or large-N transports? (This was previously listed as TE-28 in TE-26 anticipated work; TE-27's introduction of intervening anticipated TEs renumbers it.)
+- **TE-dajot (anticipated)**: transport-protocol migration semantics — what does it mean for a group of participants to move from one transport-protocol-pCID to another? (Question raised in S7 above; deferred from TE-junil.)
+- **TE-vipir (anticipated)**: ring-transport spec — token-passing semantics, per-hop artifacts, link-failure handling.
+- **TE-magup (anticipated)**: cluster-of-clusters transport — small close-knit groups bridged into a larger network. The most representative of the project's working hypothesis about real-world grid structure.
+- **TE-zukug (anticipated)**: gossip-transport — eventual-consistent flood, statistical latency, infection rules.
+- **TE-liviv (anticipated)**: receipts at scale — does `IHave: <transport-pcid>:<cid>` need to become a vector at multi-writer or large-N transports? (This was previously listed as TE-dajot in TE-zalut anticipated work; TE-junil's introduction of intervening anticipated TEs renumbers it.)

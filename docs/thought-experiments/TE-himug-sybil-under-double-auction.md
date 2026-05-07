@@ -1,4 +1,4 @@
-# TE-4: Sybil under double auction
+# TE-himug: Sybil under double auction
 
 ## Prior aliases
 

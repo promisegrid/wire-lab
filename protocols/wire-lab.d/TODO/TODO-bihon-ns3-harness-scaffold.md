@@ -41,7 +41,7 @@ of the scaffold; they are TODO 020+ once the integration is solid.
 
 ## Scaffold layout
 
-Per TE-32, this scaffold is a B-side artifact and lives under the
+Per TE-liviv, this scaffold is a B-side artifact and lives under the
 new top-level `implementations/` directory rather than under
 `tools/`. The wire-lab harness has both an A-side (design tree at
 `protocols/wire-lab.d/`) and a B-side (reference implementation
@@ -104,7 +104,7 @@ implementations/ns3-harness-fixture/
    message-pCID are passed in as flags (the scaffold does not parse
    session-layer headers; TODO 021 may change that once group-session
    is implemented). The `<message-id>` derives from a hash of the
-   payload bytes (consistent with TE-29 OQ-29.2 lean toward content
+   payload bytes (consistent with TE-vipir OQ-29.2 lean toward content
    hash).
 
 5. **Reference outputs.** Commit a deterministic scenario seed and
@@ -122,8 +122,8 @@ implementations/ns3-harness-fixture/
 
 7. **Integration with TODO 018.** TODO 018's done-criteria reference
    this scaffold. Once both TODOs are mergeable, land them in the
-   same merge twig (TE-29 was a single coherent locking; the
-   implementation that exercises TE-29 should land coherently too).
+   same merge twig (TE-vipir was a single coherent locking; the
+   implementation that exercises TE-vipir should land coherently too).
 
 ## Out of scope for TODO 019
 
@@ -147,7 +147,7 @@ implementations/ns3-harness-fixture/
   binary. They land together.
 - ns-3 Debian package and tap-bridge support must work in whatever
   environment runs the harness. Confirmed working in the Perplexity
-  Computer sandbox (TE-29 OQ-29.9 empirics). Should also work on
+  Computer sandbox (TE-vipir OQ-29.9 empirics). Should also work on
   any modern Debian/Ubuntu dev box.
 
 ## Done when

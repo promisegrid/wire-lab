@@ -20,8 +20,8 @@ The decisions below were made in chat on 2026-04-28; this TODO file captures the
 
 The two follow-on items originally listed as 001.5 and 001.6 have been moved out of this TODO so that TODO 001 closes cleanly when its bootstrap subtasks land. They now live as:
 
-- TODO 006 — `protocols/wire-lab.d/TODO/TODO-20260429-165252-backfill-di-provenance-harness-spec.md` (originally 001.5).
-- TODO 007 — `protocols/wire-lab.d/TODO/TODO-20260429-165253-backfill-dr-harness-spec-section-11.md` (originally 001.6).
+- TODO 006 — `protocols/wire-lab.d/TODO/TODO-misul-backfill-di-provenance-harness-spec.md` (originally 001.5).
+- TODO 007 — `protocols/wire-lab.d/TODO/TODO-diliz-backfill-dr-harness-spec-section-11.md` (originally 001.6).
 
 ## Decision Intent Log
 

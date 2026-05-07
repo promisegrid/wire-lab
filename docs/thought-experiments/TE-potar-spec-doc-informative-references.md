@@ -1,4 +1,4 @@
-# TE-33: Spec-doc Informative References to its workshop, RFC-shaped
+# TE-potar: Spec-doc Informative References to its workshop, RFC-shaped
 
 ## Prior aliases
 
@@ -11,11 +11,11 @@ Before the TE-39 proquint migration, this file was known as:
 
 decided
 
-(Originally marked Draft. Refines TE-31 and TE-32. Drafted 2026-05-02 02:04 UTC. The body's Verdict adopts the RFC-shaped two-section bibliography.)
+(Originally marked Draft. Refines TE-zukug and TE-liviv. Drafted 2026-05-02 02:04 UTC. The body's Verdict adopts the RFC-shaped two-section bibliography.)
 
 ## Premise
 
-In the conversation drafting TE-31 and TE-32, the bot initially
+In the conversation drafting TE-zukug and TE-liviv, the bot initially
 asserted that a spec doc must not reference its workshop at all.
 Steve pushed back: "are you SURE that RFCs can't in any way reference
 the background or workshop docs that produced them? how does the
@@ -84,7 +84,7 @@ A normative reference MUST NOT be:
 - A workshop tree-hash, branch ref, or commit ID.
 - A live `protocols/<slug>.d/` path.
 - A draft spec doc that has not yet had a freeze event recorded in
-  its A-side CHANGELOG (per TE-32).
+  its A-side CHANGELOG (per TE-liviv).
 - A URL to a moveable resource.
 
 The intent: a normative reference is part of the spec's promise.
@@ -119,18 +119,18 @@ An informative reference MUST NOT be:
 
 Note that the IETF allows non-content-addressed mailing-list URLs and
 ephemeral Internet-Draft references; PromiseGrid is stricter because
-the inversion (TE-31) and the long-time-horizon constraint (C-2 in
-TE-28) require that spec docs remain meaningfully resolvable
+the inversion (TE-zukug) and the long-time-horizon constraint (C-2 in
+TE-dajot) require that spec docs remain meaningfully resolvable
 decades from now.
 
 ## Bidirectional pointers, finally
 
-Combining TE-32 and this TE produces a clean two-way trail between
+Combining TE-liviv and this TE produces a clean two-way trail between
 spec and workshop, both directions content-addressed:
 
 - **Workshop -> spec:** A-side `CHANGELOG.md` `freeze` entry records
   the doc-CID produced. This is machine-checkable: each freeze is
-  a row with a pCID. (TE-32, locked.)
+  a row with a pCID. (TE-liviv, locked.)
 - **Spec -> workshop:** Informative References section in the spec
   doc may record a workshop tree-hash or frozen `.d/` pCID. This is
   human-readable and auditable but not load-bearing. (This TE.)
@@ -145,7 +145,7 @@ authority:
 
 Neither direction is load-bearing for implementation conformance
 (B-side CHANGELOG entries reference the spec doc-CID upstream; that
-is the only conformance-critical reference per TE-31).
+is the only conformance-critical reference per TE-zukug).
 
 ## Why not just one direction?
 
@@ -155,7 +155,7 @@ We considered three options before locking the bidirectional shape:
   via Acknowledgments and Informative References). Loses
   machine-checkability of the freeze trail.
 - **Option B: workshop -> spec only** (the bot's first wrong answer
-  in conversation; was the implicit shape of TE-32 alone). Loses
+  in conversation; was the implicit shape of TE-liviv alone). Loses
   the human-readable provenance trail that helps a future
   contributor understand where a spec came from.
 - **Option C: bidirectional with different authority levels**
@@ -186,13 +186,13 @@ A future `udp-binding` v1 spec doc, reaching freeze:
 
 ## Informative References
 
-- [TE-29: Protocols as simulated repos and the L4-binding layer](bafkrei...te-29-cid) -
+- [TE-vipir: Protocols as simulated repos and the L4-binding layer](bafkrei...te-29-cid) -
   The thought experiment that established the binding layer concept.
 - Workshop tree at freeze: git tree-hash
   `sha256:abc123def456...` (snapshot of `protocols/udp-binding.d/`
   at the moment the v1 doc-CID was produced; recorded also in the
   A-side CHANGELOG entry for cross-checking).
-- [TE-31: Spec-doc as upstream, simrepo as implementation](bafkrei...te-31-cid) -
+- [TE-zukug: Spec-doc as upstream, simrepo as implementation](bafkrei...te-31-cid) -
   The conformance-direction inversion.
 - [draft-carpenter-rfc-citation-recs-01](https://datatracker.ietf.org/doc/html/draft-carpenter-rfc-citation-recs-01) -
   IETF practice for citing workshop output, which this spec follows.
@@ -208,7 +208,7 @@ the harness can perform.
 
 - **Closes nothing previously open.** This TE adds capability without
   retracting prior decisions.
-- **Refines TE-31 and TE-32.** Adds the spec-side half of the
+- **Refines TE-zukug and TE-liviv.** Adds the spec-side half of the
   bidirectional trail; preserves the A-side CHANGELOG as the
   authoritative freeze record.
 

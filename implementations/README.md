@@ -1,6 +1,6 @@
 # implementations/
 
-B-side trees per [TE-32](../docs/thought-experiments/TE-20260502-014525-spec-vs-implementation-split.md).
+B-side trees per [TE-liviv](../docs/thought-experiments/TE-liviv-spec-vs-implementation-split.md).
 
 This top-level directory holds reference implementations of PromiseGrid
 protocols. Each implementation lives in its own subdirectory:
@@ -27,11 +27,11 @@ breaking-change: true | false
 notes:           prose
 ```
 
-See [TE-31](../docs/thought-experiments/TE-20260502-004924-spec-doc-inversion-and-conformance-changelog.md) for the inversion thesis (conformance reference goes implementation -> spec, never spec -> implementation) and [TE-32](../docs/thought-experiments/TE-20260502-014525-spec-vs-implementation-split.md) for the spec-side vs implementation-side split.
+See [TE-zukug](../docs/thought-experiments/TE-zukug-spec-doc-inversion-and-conformance-changelog.md) for the inversion thesis (conformance reference goes implementation -> spec, never spec -> implementation) and [TE-liviv](../docs/thought-experiments/TE-liviv-spec-vs-implementation-split.md) for the spec-side vs implementation-side split.
 
 ## External implementations
 
-This directory is just *our local* collection. Third parties' implementations live in their own external repos with the same `CHANGELOG.md` convention; the shape is location-independent. A registry of known external implementations is out of scope for v0 (see TE-32 OQ-32.1).
+This directory is just *our local* collection. Third parties' implementations live in their own external repos with the same `CHANGELOG.md` convention; the shape is location-independent. A registry of known external implementations is out of scope for v0 (see TE-liviv OQ-32.1).
 
 ## Currently empty
 

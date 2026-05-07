@@ -1,4 +1,4 @@
-# TE-32: Spec-side vs implementation-side split, and the `implementations/` top-level
+# TE-liviv: Spec-side vs implementation-side split, and the `implementations/` top-level
 
 ## Prior aliases
 
@@ -11,11 +11,11 @@ Before the TE-39 proquint migration, this file was known as:
 
 decided
 
-(Originally marked Draft. Amends TE-31 (does not retract). Refines TE-29. Drafted 2026-05-02 01:45 UTC. The body's Verdict adopts the A/B split.)
+(Originally marked Draft. Amends TE-zukug (does not retract). Refines TE-vipir. Drafted 2026-05-02 01:45 UTC. The body's Verdict adopts the A/B split.)
 
 ## Premise
 
-TE-31 closed OQ-29.1 with Alt-G ("the simrepo's CHANGELOG names the
+TE-zukug closed OQ-29.1 with Alt-G ("the simrepo's CHANGELOG names the
 spec-doc-CID; no tree hash, no bundle"), but it conflated two
 categories of file that both could plausibly live in a "simrepo":
 
@@ -30,26 +30,26 @@ categories of file that both could plausibly live in a "simrepo":
   upstream; they make a promise about behaving consistently with that
   upstream.
 
-TE-29 only contemplated category A under `protocols/<slug>.d/`. TE-31
+TE-vipir only contemplated category A under `protocols/<slug>.d/`. TE-zukug
 introduced a CHANGELOG aimed at category B without saying where
 category B lives, and used "simrepo" as if it covered both. This TE
 fixes the conflation.
 
 ## The split
 
-### Category A lives in `protocols/<slug>.d/` (unchanged from TE-29)
+### Category A lives in `protocols/<slug>.d/` (unchanged from TE-vipir)
 
 ```
 protocols/<slug>.d/
 ├── docs/thought-experiments/      (per-protocol TEs)
 ├── specs/<slug>-draft.md          (the WIP draft spec)
-├── TODO/                          (per-protocol TODOs, per TE-30)
+├── TODO/                          (per-protocol TODOs, per TE-magup)
 ├── manifest.json                  (per-protocol release manifest)
 └── CHANGELOG.md                   (freeze history of THIS spec's doc-CIDs)
 ```
 
 When a freeze happens, the immutable sibling pair appears next to it
-exactly as TE-29 §74-83 specified:
+exactly as TE-vipir §74-83 specified:
 
 ```
 protocols/<slug>-<pcid>.md          (frozen spec doc, immutable)
@@ -181,13 +181,13 @@ its relationship to one or more spec-doc-CIDs.
   remains supported.
 ```
 
-`claim` values (TE-31's set, unchanged):
+`claim` values (TE-zukug's set, unchanged):
 - `implements`
 - `partially-implements`
 - `extends`
 - `deprecates`
 
-Plus the new **`breaking-change`** boolean (resolves TE-31 OQ-31.3 in
+Plus the new **`breaking-change`** boolean (resolves TE-zukug OQ-31.3 in
 the affirmative — explicit flag is cleaner than inferring from a
 preceding `deprecates`).
 
@@ -209,14 +209,14 @@ The two sides have a clean duality:
 
 Neither side names the other directly. Discovery from spec to
 implementations (or vice versa) is a query over a known set of
-CHANGELOGs, not a direct reference. This preserves TE-31's
+CHANGELOGs, not a direct reference. This preserves TE-zukug's
 universally-quantified promise property: a spec-doc-CID promises
 behavior universally; an impl-CHANGELOG-entry accepts the promise on
 behalf of one specific implementation.
 
-## Amendment to TE-31
+## Amendment to TE-zukug
 
-TE-31 stands; this TE does not retract it. Specifically:
+TE-zukug stands; this TE does not retract it. Specifically:
 
 - **The inversion thesis stands.** The reference goes
   implementation-to-spec, never spec-to-implementation. Both
@@ -237,26 +237,26 @@ TE-31 stands; this TE does not retract it. Specifically:
   implementation to exist before the spec is "frozen" — RFC 768 was
   frozen on publication, not on first BSD release.
 
-- **Where TE-31 said "simrepo," read "implementation."** Specifically
+- **Where TE-zukug said "simrepo," read "implementation."** Specifically
   these passages: lines 26-27 ("The simrepo points at the spec-doc
   CID"), lines 47-51 ("Each simrepo carries a CHANGELOG"), lines 142-
   149 (harness conformance check loop). The CHANGELOG-and-conformance
   language was always about the B-side; the A-side was conflated in
   by accident.
 
-- **TE-31 OQ-31.2 (CHANGELOG location and format).** Refined here: the
+- **TE-zukug OQ-31.2 (CHANGELOG location and format).** Refined here: the
   format is per side as specified above. Open sub-question: should the
   header block be YAML front-matter, fenced code, or HTML comment?
   Lean unchanged: fenced code with a `changelog-entry` info string.
 
-- **TE-31 OQ-31.3 (breaking-change flag).** Resolved: yes, explicit
+- **TE-zukug OQ-31.3 (breaking-change flag).** Resolved: yes, explicit
   flag on the B-side. See B-side schema above.
 
-- **TE-31 OQ-31.4 (CHANGELOG entries as promises).** Stands; applies
+- **TE-zukug OQ-31.4 (CHANGELOG entries as promises).** Stands; applies
   to both sides. Each entry is canonicalizable to bytes that have a
   pCID; v0 may skip cryptographic signing.
 
-- **TE-31 OQ-31.5 (reverse index).** Refined: the index goes both
+- **TE-zukug OQ-31.5 (reverse index).** Refined: the index goes both
   directions — given a spec-doc-CID, find all B-side CHANGELOGs that
   reference it; given an implementation, find which specs it claims.
   Both indices are queries over known CHANGELOG sets; neither is
@@ -271,7 +271,7 @@ implementations there too) or are silent on category B. Steps to
 add:
 
 12. **Create top-level `implementations/` directory with stub
-    `README.md`** explaining the A/B split, pointing at TE-32. Empty
+    `README.md`** explaining the A/B split, pointing at TE-liviv. Empty
     otherwise; no implementations exist yet at the time of migration.
 
 13. **Update TODO 018 (UDP-binding v0 reference implementation)** to
@@ -316,7 +316,7 @@ atomically with the migration" property.
 
 - **OQ-32.3: Test vectors as A or B.** Test vectors referenced from
   inside the spec doc by pCID are part of the doc's content (per the
-  user's 2.C answer in TE-31). They are A-side. Test vectors written
+  user's 2.C answer in TE-zukug). They are A-side. Test vectors written
   *by an implementation* to demonstrate its own behavior are B-side.
   No conflict, but worth naming to forestall confusion. Open: do we
   need a third top-level for "shared conformance vectors not yet
@@ -325,10 +325,10 @@ atomically with the migration" property.
   `<slug>.d/` until promoted.
 
 - **OQ-32.4: Harness as protocol vs. harness as implementation.**
-  TE-30 treated the wire-lab harness itself as a protocol
+  TE-magup treated the wire-lab harness itself as a protocol
   (`protocols/wire-lab.d/`). The harness has both a design (A) and a
   reference implementation (B). The reference impl belongs in
-  `implementations/wire-lab-harness-reference/`. Confirms TE-30's
+  `implementations/wire-lab-harness-reference/`. Confirms TE-magup's
   framing rather than complicating it.
 
 - **OQ-32.5: Frozen-sibling tree size.** When a frozen
@@ -340,24 +340,24 @@ atomically with the migration" property.
 
 ## Closes / partially closes
 
-- **Closes nothing previously open.** TE-32's role is to amend TE-31
+- **Closes nothing previously open.** TE-liviv's role is to amend TE-zukug
   before downstream work (TODO 014, TODO 018, TODO 019) starts
   implementing the wrong shape.
 
-- **Resolves TE-31 OQ-31.3** (breaking-change flag): yes, explicit
+- **Resolves TE-zukug OQ-31.3** (breaking-change flag): yes, explicit
   flag on the B-side.
 
-- **Refines TE-31 OQ-31.2** (CHANGELOG location and format): per side
+- **Refines TE-zukug OQ-31.2** (CHANGELOG location and format): per side
   as specified above; format question (YAML / fenced / HTML comment)
   remains open.
 
-- **Refines TE-31 OQ-31.5** (reverse index): bidirectional indices;
+- **Refines TE-zukug OQ-31.5** (reverse index): bidirectional indices;
   neither embedded in docs themselves.
 
 ## Verdict
 
 Adopt the A/B split. Add `implementations/` as a top-level. Patch
-TODO 014 with steps 12-15. TE-31 stays on the books with the explicit
+TODO 014 with steps 12-15. TE-zukug stays on the books with the explicit
 amendment that "simrepo" was always the B-side; the spec-side has its
 own narrower CHANGELOG semantics (freeze history, not conformance
 claim).

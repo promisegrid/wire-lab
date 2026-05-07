@@ -1,10 +1,10 @@
-# TE-37: Transport-protocol migration invariants
+# TE-numan: Transport-protocol migration invariants
 
 *Thought experiment, part of the [PromiseGrid Wire Lab](../../protocols/wire-lab.d/specs/harness-spec-draft.md). This file is content-addressable; its hash is its pCID.*
 
 ## TE ID
 
-TE-20260506-041241
+TE-numan
 
 ## Prior aliases
 
@@ -21,20 +21,20 @@ decided
 
 When a group of participants writes messages under one transport-protocol-pCID and later needs to operate under a different transport-protocol-pCID, the act of switching between them is a **migration**. This TE does not lock the migration's *operational shape* — close-old + open-new vs. overlap window vs. atomic-swap, the back-reference format, the disposition of pre-migration messages, the seal mechanics. Those are speculative without a concrete migration to design against and are explicitly deferred to a follow-on TE that will be written when (or if) a real migration becomes imminent.
 
-Instead, this TE locks the **invariants** that any future migration-contract TE must satisfy: audit-trail reconstructibility, no silent rewrite of pre-migration history, and no unilateral abandonment of the old transport. These invariants are direct consequences of TE-26 § S5 (frozen pCID contract is stable for the lifetime of the transport instance), TE-28's 100-year goal (the corpus must be reconstructible from on-disk artifacts and git history), and the audit-substrate framing locked across TE-21 / TE-23 / TE-34. They are load-bearing now, before any migration has happened, because the cost of retrofitting them onto migrations that already happened under no contract is much higher than the cost of locking them while the corpus is small.
+Instead, this TE locks the **invariants** that any future migration-contract TE must satisfy: audit-trail reconstructibility, no silent rewrite of pre-migration history, and no unilateral abandonment of the old transport. These invariants are direct consequences of TE-zalut § S5 (frozen pCID contract is stable for the lifetime of the transport instance), TE-dajot's 100-year goal (the corpus must be reconstructible from on-disk artifacts and git history), and the audit-substrate framing locked across TE-nibar / TE-lozip / TE-dabol. They are load-bearing now, before any migration has happened, because the cost of retrofitting them onto migrations that already happened under no contract is much higher than the cost of locking them while the corpus is small.
 
-The motivating fact is mostly housekeeping. TE-27 § S7 raised the migration question and deferred it as "anticipated TE-28." TE-28 was then occupied by the 100-year-goal TE, leaving TE-27's forward-pointer stale. `protocols/wire-lab.d/specs/transport-spec-draft.md` § OQ-2 raises the same question against an unnamed future TE. This TE is the new anchor for both pointers; a Cat-3 Refinement on TE-27 in the same twig dis-anchors the stale pointer. The transport-spec OQ-2 is updated to point here.
+The motivating fact is mostly housekeeping. TE-junil § S7 raised the migration question and deferred it as "anticipated TE-dajot." TE-dajot was then occupied by the 100-year-goal TE, leaving TE-junil's forward-pointer stale. `protocols/wire-lab.d/specs/transport-spec-draft.md` § OQ-2 raises the same question against an unnamed future TE. This TE is the new anchor for both pointers; a Cat-3 Refinement on TE-junil in the same twig dis-anchors the stale pointer. The transport-spec OQ-2 is updated to point here.
 
 The migration question is fundamentally a PromiseGrid-level question (what happens when a group of participants must change the contract their transport is bound to), not a wire-lab artifact. The wire-lab is the simulation harness in which migrations would be observed; the on-disk encoding of a migration (directory keying, close-message format, back-reference layout) is wire-lab-specific. The semantic invariants this TE locks are PromiseGrid-level and would apply under any production substrate.
 
 ## Assumptions
 
-- TE-26's four locked principles are in force: messages do not declare their transport; transport directories are keyed `transports/<pcid>--<slug>/`; each transport-protocol-pCID names its own spec; the code that reads the directory is the handler for that pCID.
-- TE-26 § S5 is in force: a frozen transport-protocol-pCID's contract is stable for the lifetime of the transport instance. Migration mints a new pCID; it does not edit the old contract. This TE accepts that and locks the invariants that follow.
-- TE-27's per-axis meta-rule (cardinality is a parameter except at extremes; visibility and routing topology warrant distinct pCIDs; etc.) is in force. The trigger conditions that legitimately motivate a migration are predominantly the axes that warrant distinct pCIDs. Parameter-level changes within the same pCID are not migrations and are out of scope.
-- TE-28 (the 100-year goal as a load-bearing design constraint) is in force: a reader who joins the corpus a year (or a century) later, with only on-disk contents and git history, must be able to reconstruct the design state. Migration must not break that property.
-- TE-29 (protocols-as-simulated-repos) is in force: each transport instance is a simrepo whose interior is governed by the spec named by its pCID. Migration is the act of switching which simrepo a group is writing under, not editing one in place.
-- The audit-substrate framing locked across TE-21 (spec-doc as promise), TE-23 (congruence / convergence duality), and TE-34 (TE editing policy) is in force. Pre-migration messages are part of the audit record; migration must respect that.
+- TE-zalut's four locked principles are in force: messages do not declare their transport; transport directories are keyed `transports/<pcid>--<slug>/`; each transport-protocol-pCID names its own spec; the code that reads the directory is the handler for that pCID.
+- TE-zalut § S5 is in force: a frozen transport-protocol-pCID's contract is stable for the lifetime of the transport instance. Migration mints a new pCID; it does not edit the old contract. This TE accepts that and locks the invariants that follow.
+- TE-junil's per-axis meta-rule (cardinality is a parameter except at extremes; visibility and routing topology warrant distinct pCIDs; etc.) is in force. The trigger conditions that legitimately motivate a migration are predominantly the axes that warrant distinct pCIDs. Parameter-level changes within the same pCID are not migrations and are out of scope.
+- TE-dajot (the 100-year goal as a load-bearing design constraint) is in force: a reader who joins the corpus a year (or a century) later, with only on-disk contents and git history, must be able to reconstruct the design state. Migration must not break that property.
+- TE-vipir (protocols-as-simulated-repos) is in force: each transport instance is a simrepo whose interior is governed by the spec named by its pCID. Migration is the act of switching which simrepo a group is writing under, not editing one in place.
+- The audit-substrate framing locked across TE-nibar (spec-doc as promise), TE-lozip (congruence / convergence duality), and TE-dabol (TE editing policy) is in force. Pre-migration messages are part of the audit record; migration must respect that.
 - Cooperative actors follow the alphabetical convention (Alice, Bob, Carol, Dave, Ellen, Frank). Mallory is the adversary. Steve is named explicitly only where his repo-owner role is load-bearing.
 - Promise-theory vocabulary applies to the migration act itself: agreements among participants to perform a migration are conditional-promises and reciprocal-promises in the PT sense. The exact promise shape is downstream (operational-shape TE) and not locked here.
 - Network and disk are reliable in this TE. Migration semantics under partition or data loss are out of scope.
@@ -102,7 +102,7 @@ The scenario *does* surface a discrepancy that the operational-shape TE will nee
 
 2. **Together the three invariants form the floor for any future migration-contract TE.** The operational-shape TE that eventually locks how migrations are encoded on disk (close-old + open-new vs. overlap window vs. atomic swap; back-reference format; seal mechanics; group-identity continuity; trigger-condition discipline; authorizing-promise shape) must satisfy all three. The operational-shape TE may add further constraints; it may not relax any of these three.
 
-3. **The invariants are PromiseGrid-level, not wire-lab-specific.** The wire-lab is the simulation harness in which these invariants are first observable, but they are direct consequences of TE-26 § S5, TE-28's 100-year goal, and the audit-substrate framing locked across TE-21 / TE-23 / TE-34 / TE-35. Any production substrate that calls itself PromiseGrid would inherit them with whatever encoding fits its on-disk-equivalent.
+3. **The invariants are PromiseGrid-level, not wire-lab-specific.** The wire-lab is the simulation harness in which these invariants are first observable, but they are direct consequences of TE-zalut § S5, TE-dajot's 100-year goal, and the audit-substrate framing locked across TE-nibar / TE-lozip / TE-dabol / TE-vudaf. Any production substrate that calls itself PromiseGrid would inherit them with whatever encoding fits its on-disk-equivalent.
 
 4. **The operational-shape TE is anticipated, not scheduled.** Locking it now would design against scenarios we are guessing at. It will be written when (or if) a concrete migration becomes imminent. Its scope is the seven DFs originally drafted in this TE's first scope (operational shape, back-reference, message disposition, authorizing promise, seal, group-identity continuity, trigger-condition discipline) plus whatever the imminent migration surfaces.
 
@@ -117,6 +117,6 @@ Recorded principle: *transport-protocol migrations must produce reconstructible-
 
 ## Implications for follow-on work
 
-- **Cat-3 Refinement on TE-27** dis-anchoring the "TE-28 (anticipated): transport-protocol migration semantics" forward-pointer in TE-27's Implications-for-follow-on-work and § S7, replacing it with a forward-pointer to this TE (TE-37). The Refinement is appended to TE-27's `## Refinements` section per the TE editing policy locked in TE-34.
+- **Cat-3 Refinement on TE-junil** dis-anchoring the "TE-dajot (anticipated): transport-protocol migration semantics" forward-pointer in TE-junil's Implications-for-follow-on-work and § S7, replacing it with a forward-pointer to this TE (TE-numan). The Refinement is appended to TE-junil's `## Refinements` section per the TE editing policy locked in TE-dabol.
 - **Update to `protocols/wire-lab.d/specs/transport-spec-draft.md`** resolving `OQ-2 (deferred)` against this TE's locked invariants, with a forward-pointer to the future operational-shape TE for the rest.
 - **Future TE (slot-TBD): transport-protocol migration operational shape.** The substantive operational decisions (close-old + open-new vs. overlap window vs. atomic swap; back-reference format; disposition of pre-migration messages; seal mechanics; group-identity continuity; trigger-condition discipline; authorizing-promise shape) are deferred to that TE. It is anticipated, not scheduled, and will be written when a concrete migration is imminent.

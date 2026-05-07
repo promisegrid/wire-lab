@@ -1,4 +1,4 @@
-# TE-2: Trust-ledger merge after partition
+# TE-jovoj: Trust-ledger merge after partition
 
 ## Prior aliases
 

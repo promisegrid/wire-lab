@@ -19,13 +19,13 @@ without resolving each.
 
 Move `proposals/pending/ppx-dr-001-bootstrap/` content (the bootstrap
 proposal and Steve's frozen contest reply) from its ad-hoc
-`proposals/` location to the canonical TE-29 transport-message path:
+`proposals/` location to the canonical TE-vipir transport-message path:
 
 ```
 transports/<bootstrap-transport-slug>/<bootstrap-binding-pCID>/<group-session-pCID>/<ppx-dr-pCID>/<message-id>.txt
 ```
 
-This realizes the TE-29 insight that "a proposal is a message on the
+This realizes the TE-vipir insight that "a proposal is a message on the
 ppx-dr transport, and a contest is a reply." Treating these files as
 wire messages in a transport leaf directory makes the model uniform:
 every wire artifact is a message in some transport.
@@ -81,7 +81,7 @@ Until all four prerequisites land, this TODO is not actionable.
    that does the move, not after, to avoid any window where the
    contest file is unprotected.
 
-4. **Compute a `<message-id>` for each file.** Per TE-29 OQ-29.2 lean,
+4. **Compute a `<message-id>` for each file.** Per TE-vipir OQ-29.2 lean,
    the message-id is a content hash of the message bytes. Use the
    same hashing convention that the eventual ppx-dr spec mandates;
    if ppx-dr v0 picks a different hash, this work re-runs.
@@ -123,15 +123,15 @@ Until all four prerequisites land, this TODO is not actionable.
 ## Why this is filed despite being blocked
 
 Per OQ-100.4 (numbering wrap, stable integers across centuries) and
-TE-25 (drafting-time anchoring of TE/TODO numbers), filing the integer
+TE-titur (drafting-time anchoring of TE/TODO numbers), filing the integer
 now keeps TODO numbering stable in fact, not just in promise. A
-future contributor finding TODO 016 referenced from TE-29 prose
+future contributor finding TODO 016 referenced from TE-vipir prose
 should land here and find a clear "blocked, why, what unblocks it,
 what to do" record, rather than a missing file or an integer gap.
 
 ## Provenance
 
-- TE-29 first-drafted at 2026-05-01 21:50:27 UTC.
+- TE-vipir first-drafted at 2026-05-01 21:50:27 UTC.
 - TODO 016 filed as BLOCKED stub at 2026-05-01 22:58 UTC (same
   session).
 - Will be reactivated when all four prerequisites land.

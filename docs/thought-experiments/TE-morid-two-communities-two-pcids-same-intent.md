@@ -1,4 +1,4 @@
-# TE-9: Two communities, two pCIDs, same intent
+# TE-morid: Two communities, two pCIDs, same intent
 
 ## Prior aliases
 

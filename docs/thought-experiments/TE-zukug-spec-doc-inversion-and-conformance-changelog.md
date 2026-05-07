@@ -1,4 +1,4 @@
-# TE-31: Spec-doc as upstream, simrepo as implementation — inverting the conformance reference
+# TE-zukug: Spec-doc as upstream, simrepo as implementation — inverting the conformance reference
 
 ## Prior aliases
 
@@ -11,12 +11,12 @@ Before the TE-39 proquint migration, this file was known as:
 
 decided
 
-(Originally marked Draft. Closes OQ-29.1. Drafted 2026-05-02 00:49 UTC. Supersedes within OQ-29.1 Alt-A through Alt-F enumerated in TE-29. The body's Verdict adopts the inversion.)
+(Originally marked Draft. Closes OQ-29.1. Drafted 2026-05-02 00:49 UTC. Supersedes within OQ-29.1 Alt-A through Alt-F enumerated in TE-vipir. The body's Verdict adopts the inversion.)
 
 ## Premise
 
-TE-21 framed the spec doc as a promise. TE-22 sketched a content-addressed
-store for spec docs. TE-29 promoted each protocol to a simulated repo
+TE-nibar framed the spec doc as a promise. TE-rujak sketched a content-addressed
+store for spec docs. TE-vipir promoted each protocol to a simulated repo
 ("simrepo") under `protocols/<slug>.d/` and deferred the freeze ceremony
 question. The clarifying answers from the user are:
 
@@ -26,7 +26,7 @@ question. The clarifying answers from the user are:
   ABNF) live inline in the doc; larger artifacts (test vectors, example
   pcaps) are companion files referenced **by pCID** from inside the doc.
 
-Together, those answers force a structural inversion that TE-29's
+Together, those answers force a structural inversion that TE-vipir's
 Alt-A..Alt-F enumeration did not contemplate. This TE makes the
 inversion explicit and uses it to close OQ-29.1.
 
@@ -37,7 +37,7 @@ inversion explicit and uses it to close OQ-29.1.
 
 ## The two mental models
 
-### Old mental model (implicit in TE-29 Alt-A through Alt-F)
+### Old mental model (implicit in TE-vipir Alt-A through Alt-F)
 
 ```
 spec-doc ──(embeds)──▶ tree-hash ──(names)──▶ simrepo
@@ -87,7 +87,7 @@ exist.
    transitive content. Anyone resolving the doc-CID can resolve its
    companions. No separate bundle hash is required.
 
-5. **The spec doc becomes a proper promise object.** TE-21 said the
+5. **The spec doc becomes a proper promise object.** TE-nibar said the
    spec doc is a promise. A promise that names its own implementations
    is not a promise — it is a release record. By keeping the doc
    ignorant of implementations, it stays a clean
@@ -135,20 +135,20 @@ Conformance verbs are deliberately limited. "Loosely inspired by" and
 > least one simrepo CHANGELOG entry references it. There is no tree
 > hash. There is no bundle. The doc-CID alone is the freeze.
 
-This supersedes Alt-A through Alt-F as enumerated in TE-29 §326.
+This supersedes Alt-A through Alt-F as enumerated in TE-vipir §326.
 Alt-A..Alt-F all assumed the doc-and-repo bundle as the unit of
 release; once the inversion is accepted, the bundle ceases to exist
 and the freeze ceremony collapses to "publish the doc."
 
 The doc-CID is, by content addressing, immutable. "Publish" here means
-"resolvable from the spec-doc store described in TE-22." A draft doc
+"resolvable from the spec-doc store described in TE-rujak." A draft doc
 with a tentative pCID is not yet published; once any simrepo writes a
 CHANGELOG entry naming that pCID, the pCID is effectively frozen
 because the conformance claim now exists in the world.
 
 ## How the harness checks conformance
 
-The harness (itself a protocol per TE-30) loads the simrepo, reads its
+The harness (itself a protocol per TE-magup) loads the simrepo, reads its
 CHANGELOG, fetches each spec-doc-CID named under `implements`, parses
 the doc's machine-checkable bits (state tables, schemas, ABNF, test
 vector references), and runs them against the simrepo's code. The
@@ -209,14 +209,14 @@ The conformance reference is itself a promise relationship. That is
 satisfyingly self-consistent — the meta-protocol (how we describe
 protocols) uses the same primitive as the protocols it describes.
 
-## Relationship to TE-22 (spec-doc store) and TE-30 (per-protocol TODOs)
+## Relationship to TE-rujak (spec-doc store) and TE-magup (per-protocol TODOs)
 
-TE-22 stands; the spec-doc store described there is exactly the
+TE-rujak stands; the spec-doc store described there is exactly the
 mechanism by which doc-CIDs become resolvable. The inversion does not
 change the store, only the direction of reference at the simrepo
 boundary.
 
-TE-30 stands; per-protocol `TODO/` subtrees are orthogonal to the
+TE-magup stands; per-protocol `TODO/` subtrees are orthogonal to the
 conformance-reference direction. A simrepo's TODO/ tracks its work;
 the CHANGELOG tracks its public conformance claims. They do not
 overlap.
@@ -229,7 +229,7 @@ overlap.
 
 ## Surfaces
 
-- **OQ-31.1: Harness self-application.** TE-30 made the harness itself
+- **OQ-31.1: Harness self-application.** TE-magup made the harness itself
   a protocol (`protocols/wire-lab.d/`). Under the inversion, the
   harness has a spec-doc and a simrepo, and the simrepo's CHANGELOG
   names the harness-spec-doc-CID. That is meta but not paradoxical;
@@ -260,7 +260,7 @@ overlap.
 
 - **OQ-31.5: Spec-doc author's awareness of implementations.** The
   inversion says the doc is oblivious to implementations, but the
-  spec-doc store (TE-22) could optionally maintain a reverse index
+  spec-doc store (TE-rujak) could optionally maintain a reverse index
   for human convenience: "which CHANGELOGs name this doc-CID?" That
   index is metadata, not part of the doc's content, so it does not
   contaminate the doc's promise. Lean: build the reverse index as a
@@ -279,7 +279,7 @@ mechanism.
 
 W3C RECs do name implementations (via implementation reports), which
 is closer to the old mental model. PromiseGrid does not adopt that
-because the spec-doc-as-promise framing (TE-21) prefers the doc to be
+because the spec-doc-as-promise framing (TE-nibar) prefers the doc to be
 universally quantified over implementations; naming specific
 implementations weakens the universal quantifier into an existential
 one and forces the doc to be republished whenever the implementation
@@ -287,18 +287,18 @@ list changes.
 
 ## Implementation impact
 
-TE-31 is design-only; no immediate code changes. Follow-on work:
+TE-zukug is design-only; no immediate code changes. Follow-on work:
 
 1. **TODO 020 (forthcoming).** Define the CHANGELOG.md format
    precisely (resolve OQ-31.2 and OQ-31.3) and write the harness
    parser for it.
 2. **TODO 014.** Continue as-is; the per-protocol simrepo migration
-   does not depend on TE-31. Once 014 lands, each simrepo gets a
+   does not depend on TE-zukug. Once 014 lands, each simrepo gets a
    stub CHANGELOG.md with the first `implements` entry pointing at
    the current draft spec-doc.
 3. **Harness spec §8.** Add this TE to the bibliography (chronological
-   order, after TE-30).
-4. **TE-22 update.** Note that the spec-doc store gains an optional
+   order, after TE-magup).
+4. **TE-rujak update.** Note that the spec-doc store gains an optional
    reverse index per OQ-31.5; do not block on it.
 
 ## Verdict

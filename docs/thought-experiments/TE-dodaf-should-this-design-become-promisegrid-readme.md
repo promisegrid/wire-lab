@@ -1,4 +1,4 @@
-# TE-15: Should this design become `promisegrid/promisegrid/README.md`?
+# TE-dodaf: Should this design become `promisegrid/promisegrid/README.md`?
 
 ## Prior aliases
 
@@ -73,7 +73,7 @@ The first non-trivial use of the unified proposal flow on a document that *truly
 - The canonical PromiseGrid README stays under Steve's hands directly until the harness produces findings worth integrating.
 - The eventual Phase 3 README rewrite is the natural validation milestone for the unified flow.
 
-## Open questions promoted from TE-15
+## Open questions promoted from TE-dodaf
 
 - See harness-spec §12 #17 (when does Phase 2 trigger?).
 - See harness-spec §12 #18 (does the canonical README get its own pCID, signed by Steve, distinct from the Wire Lab harness-spec pCID?).
