@@ -337,3 +337,79 @@ DF-V.3 and is not performed here.
 
 Provenance: locked by user 2026-05-07; recorded as
 `DI-021-20260507-204144` in TODO-lilar.
+
+## DF-V.3 lock — Alt C (matrix-as-closure-index) — 2026-05-07
+
+This section is an additive amendment to the read-only pass and to the
+DF-V.2 lock subsection above. It does not flip any UT checkbox, does
+not edit any earlier section of this file, does not touch
+`dropped-thread-disposition-20260506.md` bullets, and does not touch
+TODO-lilar walk notes. Per AGENTS.md the locked decision is recorded
+as `DI-021-20260507-210204` in
+`protocols/wire-lab.d/TODO/TODO-lilar-session-replay-cleanup.md`
+("Decision Intent Log"); this subsection is the docs-side reference
+back to that DI.
+
+**Locked decision (DF-V.3 Alt C, "matrix-as-closure-index"):**
+The closure mechanism for the 45 (loose-reading) closeable-flagged UTs
+is: no UT checkbox flips now in any file; this matrix IS the closure
+index of record; future cluster-owner TODOs (already enumerated in
+"Owner and pointer table" above) cite this matrix when their
+substantive work lands and close their own UTs as part of their own
+DI / spec-edit / retire entry. No bulk closure pass is performed
+against the disposition memo or against TODO-lilar.
+
+**What this lock authorizes (only this; nothing more):**
+
+- Future cluster-owner TODOs (TODO-vunub for Cluster B / TE-sihih,
+  TODO-kugod for Cluster C / TE-40, TODO-turog for Cluster D / TE-41,
+  TODO-duvuk for Cluster E / TE-42, TODO-kituj for Cluster F / TE-43,
+  TODO-ralud for Cluster G / TE-45, plus future Spec-edit / Retire /
+  Carry-J2-transfer TODOs) MAY, when they land their substantive work
+  under their own DIs, mark the UTs that the matrix already attributes
+  to their cluster as closed in that successor TODO's own ledger,
+  citing back to this matrix and to the DI that lands the work.
+- This matrix MAY accumulate Cat-3 / Cat-4 forward-pointer entries in
+  a future `## Refinements` section if specific UT closures need
+  navigational pointers; substantive recounts, classification edits,
+  or summary-table changes remain out of scope and require a
+  superseding TE per the TE editing policy.
+
+**What this lock does NOT authorize:**
+
+- It does **not** flip any UT checkbox in TODO-lilar or in
+  `dropped-thread-disposition-20260506.md`. Both files remain
+  append-only history.
+- It does **not** edit any UT bullet in
+  `dropped-thread-disposition-20260506.md`. The disposition memo's
+  bullet structure is the append-only ledger and stays as written.
+- It does **not** edit, retitle, or recount the body of this matrix.
+  The 45-closeable / 141-not-closeable summary, the per-cluster
+  breakdown, and the "Owner and pointer table" remain as recorded by
+  the read-only Alt-V.4 pass.
+- It does **not** authorize a single bulk closure pass parallel to
+  the dispositions memo. Closure is bundled into each successor
+  TODO's substantive landing; there is no separate closure-only
+  artifact.
+- It does **not** authorize cross-cluster closures. Each successor
+  TODO closes only the UTs the matrix already attributes to its
+  cluster (Clusters A–J).
+- It does **not** supersede `DI-021-20260507-204144` (DF-V.2 Alt C).
+  The J1/J2 Carry split still governs Cluster J classification at
+  closure time; Alt C moves that classification into each Carry-rule
+  transfer (or explicit no-transfer note) instead of a global recount
+  pass.
+- It does **not** address DF-V.4 (Carry-J2 transfer-list to
+  `AGENTS-ppx.md`, exposed by DF-V.2 Alt C). Individual J2 UTs close
+  only when their rule actually transfers under DF-V.4's eventual
+  lock.
+
+**Outstanding DFs after this lock:**
+
+- **DF-V.4 (Carry-J2 transfer-list to `AGENTS-ppx.md`).** Still open;
+  exposed by DF-V.2 Alt C. Locks which J2 rules transfer to
+  `AGENTS-ppx.md` (or another named procedure home), in what wording,
+  with what enforcement and ownership.
+
+Provenance: locked by user 2026-05-07; recorded as
+`DI-021-20260507-210204` in TODO-lilar.
