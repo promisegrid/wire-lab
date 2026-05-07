@@ -21,7 +21,7 @@ per-turn coverage and grep evidence.
 
 ## Coverage check
 - Turn 1 harness/protocol-prototyping direction is anchored by the harness-spec TE corpus and related draft spec files, not a drop.
-- Turn 2 pCID/payload/signature envelope concerns are reflected later in TE-24 / harness-spec / transport docs, not a drop.
+- Turn 2 pCID/payload/signature envelope concerns are reflected later in TE-hogus / harness-spec / transport docs, not a drop.
 - Turn 3 logging/evidence requirements are anchored in harness-spec and related TODO/DR material, not a drop.
 - Turn 4 specs-may-but-need-not-be-IPLD-objects is covered by the spec docs and later TE corpus, not a drop.
 - Turn 5/6 proposal envelope schema lock/over-locked areas are superseded by later harness-spec and TE revisions, not a drop.
@@ -36,7 +36,7 @@ per-turn coverage and grep evidence.
 - TE filename convention is explicit: `docs/thought-experiments/README.md:L5-L12` says `TE-YYYYMMDD-HHMMSS-some-phrase.md`, timestamp pins origin, and files are not renamed.
 - TE creation workflow is explicit: `AGENTS-ppx.md:L167-L174` requires TE docs in `docs/thought-experiments/TE-YYYYMMDD-HHMMSS-slug.md` with assumptions, alternatives, scenario analysis, conclusions, and implications.
 - TE corpus immutability/editing policy is explicit: `docs/thought-experiments/README.md:L55-L72` and `AGENTS-ppx.md:L166-L203` define the corpus as one document with facets and specify citation/edit rules.
-- Current corpus contains early TEs corresponding to the first-day design directives, e.g. `docs/thought-experiments/TE-20260428-080000-harness-spec-change-walks-through-unified-flow.md`, `TE-20260428-094500-should-this-design-become-promisegrid-readme.md`, and the later TE index entries.
+- Current corpus contains early TEs corresponding to the first-day design directives, e.g. `docs/thought-experiments/TE-botom-harness-spec-change-walks-through-unified-flow.md`, `TE-dodaf-should-this-design-become-promisegrid-readme.md`, and the later TE index entries.
 - AGENTS-ppx.md also locks the bot workflow, branch model, and review/merge path, covering turn 15-16 logistics and the broader repo-handling decisions.
 
 ## What was checked

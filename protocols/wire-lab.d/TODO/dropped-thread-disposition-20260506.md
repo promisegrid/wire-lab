@@ -1,12 +1,12 @@
-# Dropped-thread disposition — TODO 21 walk notes (turns 155-192)
+# Dropped-thread disposition — TODO-lilar walk notes (turns 155-192)
 
 **Date:** 2026-05-06
 **Author:** stevegt-via-perplexity (proposed; awaits Steve review)
-**Source:** `protocols/wire-lab.d/TODO/TODO-20260504-170746-session-replay-cleanup.md` — 186 UT entries spanning turns 155-192
+**Source:** `protocols/wire-lab.d/TODO/TODO-lilar-session-replay-cleanup.md` — 186 UT entries spanning turns 155-192
 
 ## Purpose
 
-This file is the Phase 1 output of the dropped-thread classification pass approved by Steve at turn 288. Each UT (unfinished thread) gets a proposed disposition. Phase 2 — drafting TEs in dependency order, starting with TE-38 — is gated on Steve's review of the dispositions below.
+This file is the Phase 1 output of the dropped-thread classification pass approved by Steve at turn 288. Each UT (unfinished thread) gets a proposed disposition. Phase 2 — drafting TEs in dependency order, starting with TE-sihih — is gated on Steve's review of the dispositions below.
 
 **Vocabulary correction (turn 287):** "plurality" / "pluralism" is bot coinage from turn 172; never endorsed by Steve. Steve endorsed **"feed"** and **"substrate"** at turn 175. Going forward use **"substrate-agnostic"**. Walk notes are not retroactively edited — they are append-only history.
 
@@ -14,13 +14,13 @@ This file is the Phase 1 output of the dropped-thread classification pass approv
 
 | Disposition | Count |
 | --- | ---: |
-| TE-38 | 52 |
+| TE-sihih | 52 |
 | TE-40 | 18 |
 | TE-41 | 15 |
 | TE-42 | 7 |
 | TE-43 | 25 |
 | TE-45 | 1 |
-| TE-36-followon | 5 |
+| TE-havib-followon | 5 |
 | Spec-edit | 5 |
 | Retire | 3 |
 | Carry | 55 |
@@ -30,15 +30,15 @@ This file is the Phase 1 output of the dropped-thread classification pass approv
 
 Drafting order (dependency-sorted):
 
-1. **TE-38** Substrate-agnostic layered model — foundational; vocabulary, layer numbers, substrate naming flow downstream from this.
-2. **TE-39** wire-lab-devs migration plan — depends on TE-38 layer naming. (Carved out at turn 177; not in this UT inventory because turns 175-178's migration DFs were folded into TE-38 walk notes.)
-3. **TE-40** Apparatus-vs-specimen completion — independent of TE-38; closes TE-1 limbo and finishes the harness-spec sweep.
+1. **TE-sihih** Substrate-agnostic layered model — foundational; vocabulary, layer numbers, substrate naming flow downstream from this.
+2. **TE-mumuv** wire-lab-devs migration plan — depends on TE-sihih layer naming. (Carved out at turn 177; not in this UT inventory because turns 175-178's migration DFs were folded into TE-sihih walk notes.)
+3. **TE-40** Apparatus-vs-specimen completion — independent of TE-sihih; closes TE-famar limbo and finishes the harness-spec sweep.
 4. **TE-41** Group-session freeze procedure — depends on TE-40 (apparatus/specimen distinction); ratifies the freeze gate, membership-by-posting, merge-group-transport-spec signature, §8/§9 detail.
 5. **TE-42** Filename / CID-cascade policy — depends on TE-41 (filename convention); when do we cascade vs deprecate vs grandfather? Covers Message-ID removal precedent and future Rabin-chunking cascade.
-6. **TE-43** Promisebase prior-art adoption — depends on TE-38 layered model (decides which promisebase pieces wire-lab depends on at L6).
+6. **TE-43** Promisebase prior-art adoption — depends on TE-sihih layered model (decides which promisebase pieces wire-lab depends on at L6).
 7. **TE-44** wire-lab/promisebase merge trajectory — depends on TE-43; ratifies or rejects Steve's turn-192 implicit "will gradually merge" commitment.
-8. **TE-45** Conditional-release / geofencing / recursive promise-graph — orthogonal to TE-38 layered model; can land independently.
-9. **TE-36 follow-on** — OQ-36.6 nine-axis comparison + Alice-through-Mallory tabletop walk; closes TE-36's deferred work.
+8. **TE-45** Conditional-release / geofencing / recursive promise-graph — orthogonal to TE-sihih layered model; can land independently.
+9. **TE-havib follow-on** — OQ-36.6 nine-axis comparison + Alice-through-Mallory tabletop walk; closes TE-havib's deferred work.
 
 **Spec-edits** are small enough to land directly without a TE.
 **Carry** items are procedural lessons / AGENTS-rule reminders / cadence notes — they belong in AGENTS-ppx.md or per-turn discipline, not in TEs.
@@ -48,19 +48,19 @@ Drafting order (dependency-sorted):
 
 ## Disposition by cluster
 
-### TE-36 follow-on: OQ-36.6 + tabletop walk (5 UTs)
+### TE-havib follow-on: OQ-36.6 + tabletop walk (5 UTs)
 
 *OPEN-THREADS map:* new thread T-TE36-FOLLOWON to be added (OQ-36.6 deferred investigation + audit-memo-style Alice-through-Mallory tabletop walk).
 
 - **UT-160.b** (T160): DF-36.4 PT-recast collapsed five named pCIDs into two PT primitives, baked into Alt-4.A rather than presented as its own DF.
-- **UT-160.c** (T160): TE-36's six tabletop scenarios used different framing than the audit memo's recommended Alice-through-Mallory walk.
+- **UT-160.c** (T160): TE-havib's six tabletop scenarios used different framing than the audit memo's recommended Alice-through-Mallory walk.
 - **UT-161.a** (T161): The asymmetry between the two envelope hypotheses -- grid-pcid-payload can host promise-stack as one possible payload, but promise-stack cannot cleanly host grid-pcid-payload at envelope level -- is t...
 - **UT-162.a** (T162): The deferred OQ-36.6 investigation is itself a major unfinished thread.
 - **UT-162.b** (T162): DF-36.2 is provisionally locked pending OQ-36.6, but the conditionality may not survive visual inspection of the TE file.
 
-### TE-38: Substrate-agnostic layered model (52 UTs)
+### TE-sihih: Substrate-agnostic layered model (52 UTs)
 
-*OPEN-THREADS map:* T-MIG-OPS (transport-protocol migration ops; gated on first concrete migration -- TE-38 + TE-39 close the gate) and T-021-CC-Q2 (TE-38 numbering / naming cross-cutting question).
+*OPEN-THREADS map:* T-MIG-OPS (transport-protocol migration ops; gated on first concrete migration -- TE-sihih + TE-mumuv close the gate) and T-021-CC-Q2 (TE-sihih numbering / naming cross-cutting question).
 
 - **UT-170.a** (T170): (no bolded summary)
 - **UT-171.a** (T171): (no bolded summary)
@@ -72,7 +72,7 @@ Drafting order (dependency-sorted):
 - **UT-172.e** (T172): The bot's "clean spec evolution" claim -- that §9 can be replaced with a single short clause once binding protocols exist -- assumes the binding-protocol family is in place before any spec edit lands;...
 - **UT-173.a** (T173): The wire-lab-as-content-addressed-Usenet framing is load-bearing for many downstream decisions but has not been ratified.
 - **UT-173.b** (T173): DF-38.5's "binding" recommendation rests on W3C/WSDL precedent and conflict-avoidance with existing wire-lab vocabulary; turn 174 rejects it on different grounds (Usenet-gateway-vocabulary precedent),...
-- **UT-173.c** (T173): Bot's closing question dropped its framing-component (single-part "want me to draft TE-38 now?") rather than the two-part action+framing pattern of turns 171 and 172. This is a cadence shift, not a ca...
+- **UT-173.c** (T173): Bot's closing question dropped its framing-component (single-part "want me to draft TE-sihih now?") rather than the two-part action+framing pattern of turns 171 and 172. This is a cadence shift, not a ca...
 - **UT-173.d** (T173): (no bolded summary)
 - **UT-173.e** (T173): The git-itself-as-precedent observation is striking and may have non-obvious implications -- if git's own object/transport separation is the precedent, then wire-lab is in some sense building "git sem...
 - **UT-174.a** (T174): The historical-networks-20260503 research doc just committed in the turn-173 cluster (commit `6890592`) used "binding" as one of multiple candidate terms with explicit non-recommendation, so it remain...
@@ -81,7 +81,7 @@ Drafting order (dependency-sorted):
 - **UT-174.d** (T174): The encapsulation-not-layering reframe is structurally important but introduces vocabulary ambiguity: encapsulation has its own connotations including OSI's PDU-encapsulation and tunneling-protocol en...
 - **UT-174.e** (T174): Turn-173's three-pattern map A/B/C onto the wire-lab tree partially needs revision -- Pattern B mapped to a `bindings/` subdirectory which is now rejected; the new mapping is Pattern B -> INSTANCE.md ...
 - **UT-175.a** (T175): m000 transport-creation will undergo a SECOND CID cascade triggered by Steve's carrier-line -> grid-envelope correction -- replaying the strict-reader contradiction first surfaced in UT-169.b.
-- **UT-175.b** (T175): TE-38 scope doubled in one turn (5 DFs in turn 172 -> 10 DFs in turn 175); bot's single-TE lean carries real coupling-vs-decomposition risk and Steve's answer to meta-question 1 is the gating decision...
+- **UT-175.b** (T175): TE-sihih scope doubled in one turn (5 DFs in turn 172 -> 10 DFs in turn 175); bot's single-TE lean carries real coupling-vs-decomposition risk and Steve's answer to meta-question 1 is the gating decision...
 - **UT-175.c** (T175): Bot's recommendation to use "headers" for the From/Date/Parents block (replacing inner-block "envelope") imports email/HTTP convention but those have MIME-loaded specifications wire-lab may not want t...
 - **UT-175.d** (T175): Steve's joint endorsement of "feed" + "substrate" + "forum" + "site" pulls the wire-lab vocabulary firmly into the Usenet/FidoNet lineage and ratifies UT-173.a's wire-lab-as-content-addressed-Usenet f...
 - **UT-175.e** (T175): (no bolded summary)
@@ -90,12 +90,12 @@ Drafting order (dependency-sorted):
 - **UT-176.a** (T176): The slug-state naming convention's affected scope is wider than bot enumerated -- bot identified only `transports/draft--wire-lab-devs/` as needing rename, but the rule "<slug>-<state>" should be chec...
 - **UT-176.b** (T176): Layer numbering not fully resolved -- bot offered three options (internal 1/2/3, OSI 8/9/10, original 0-3 corrected to 4-7) and recommended internal 1/2/3 but Steve's "4-7" suggestion was not directly...
 - **UT-176.c** (T176): "groups" vocabulary collides with `group-session` protocol family name -- bot acknowledged in turn 175 ("meshes with group-session but conflates protocol-name with directory-name") that this risks con...
-- **UT-176.d** (T176): PromiseGrid-as-Usenet+git successor framing changes the project's stated scope and goals -- this may be a TE-by-itself decision rather than background material that TE-38 inherits.
+- **UT-176.d** (T176): PromiseGrid-as-Usenet+git successor framing changes the project's stated scope and goals -- this may be a TE-by-itself decision rather than background material that TE-sihih inherits.
 - **UT-176.e** (T176): The body-can-be-anything realization affects §4.7 strict-reader rule again -- if body can be a nested grid envelope, strict readers must recursively parse, which is a third strict-reader-rule complica...
 - **UT-176.f** (T176): Foundational CID promise as constitutive vs voluntary -- bot characterizes it as "a site cannot be a CAS without making this promise" but Promise Theory typically treats promises as voluntary, not con...
-- **UT-176.h** (T176): Symlinks-into-CAS deferred to later TE creates a future-coupling problem -- if TE-38 lands without symlinks and a later TE adds them, the transition requires moving messages from groups/<slug>-draft/<...
+- **UT-176.h** (T176): Symlinks-into-CAS deferred to later TE creates a future-coupling problem -- if TE-sihih lands without symlinks and a later TE adds them, the transition requires moving messages from groups/<slug>-draft/<...
 - **UT-177.a** (T177): Layer inversion contradicts the turn-175 layered-stack model that was just locked in.
-- **UT-177.c** (T177): CBOR adoption is now baked into TE-38 (DF-38.11) but the implications cascade further than the DF text acknowledges.
+- **UT-177.c** (T177): CBOR adoption is now baked into TE-sihih (DF-38.11) but the implications cascade further than the DF text acknowledges.
 - **UT-177.d** (T177): Rabin chunking creates a third potential CID cascade beyond the foundational-CID-promise concern.
 - **UT-177.e** (T177): Promise economy reframed from background framing to foundational invariant -- the practical implication is that every protocol spec must now contain a promise vocabulary section.
 - **UT-177.f** (T177): The 100-year goal is now an explicit design constraint but no DF operationalizes it.
@@ -106,10 +106,10 @@ Drafting order (dependency-sorted):
 - **UT-178.b** (T178): The 'decides' word is the load-bearing point of the entire layered model and bot's turn-177 description glossed it.
 - **UT-178.c** (T178): Layered accounting question is unanswered: does promise accounting live at L7, or per-layer at L5/L6/L7?
 - **UT-178.d** (T178): PromiseGrid-replaces-BGP is a major application Steve flagged as future consideration.
-- **UT-178.e** (T178): TE-38 opening section is now mandated to be the capture narrative, not background.
+- **UT-178.e** (T178): TE-sihih opening section is now mandated to be the capture narrative, not background.
 - **UT-178.f** (T178): Anonymity-is-pathology is now a stated design stance with implications for group identity.
-- **UT-178.g** (T178): Dogfooding pressure now constrains TE-38's deliverable.
-- **UT-178.h** (T178): Promisebase surfacing is the largest single context expansion of the session and changes TE-38's nature.
+- **UT-178.g** (T178): Dogfooding pressure now constrains TE-sihih's deliverable.
+- **UT-178.h** (T178): Promisebase surfacing is the largest single context expansion of the session and changes TE-sihih's nature.
 - **UT-178.i** (T178): Interop constraint with libp2p/IPFS/ATPROTO restricts CIDv1/multihash/multibase choices.
 - **UT-178.j** (T178): Multi-repo question is unanswered and structurally significant.
 - **UT-178.k** (T178): Bot's turn-178 answer was unusually terse (4 lines, three meta-questions) -- a cadence inversion from prior turns.
@@ -117,25 +117,25 @@ Drafting order (dependency-sorted):
 
 ### TE-40: Apparatus-vs-specimen completion (18 UTs)
 
-*OPEN-THREADS map:* T-PROMSTACK-RETIRE-CASCADE (Cat-3 cascade from TE-36 promise-stack retirement; closes TE-1 + harness-spec apparatus/specimen carve-out).
+*OPEN-THREADS map:* T-PROMSTACK-RETIRE-CASCADE (Cat-3 cascade from TE-havib promise-stack retirement; closes TE-famar + harness-spec apparatus/specimen carve-out).
 
-- **UT-155.a** (T155): DF-1.1 (TE-1 promise-stack ordering, Alt-E projection-mode) was never locked.
+- **UT-155.a** (T155): DF-1.1 (TE-famar promise-stack ordering, Alt-E projection-mode) was never locked.
 - **UT-155.b** (T155): The most explicit `Project / Peel / Wrap` operation definitions in the corpus live only in the conversation, not in any committed file.
-- **UT-156.a** (T156): The Option 1 / Option 2 / Option 3 question for TE-1's structural role was abandoned, not answered.
-- **UT-156.b** (T156): TE-1 is miscategorized in the corpus and the misclassification has not been repaired.
+- **UT-156.a** (T156): The Option 1 / Option 2 / Option 3 question for TE-famar's structural role was abandoned, not answered.
+- **UT-156.b** (T156): TE-famar is miscategorized in the corpus and the misclassification has not been repaired.
 - **UT-156.c** (T156): The bot's "harness-spec is wire-envelope-agnostic" claim is wrong and must be retracted, not committed.
 - **UT-157.a** (T157): The five candidate envelopes (Env-1 through Env-5) are named in the conversation but uncommitted.
-- **UT-157.b** (T157): Reading 1 / Reading 2 / Reading 3 question for TE-1's status was abandoned, not answered.
+- **UT-157.b** (T157): Reading 1 / Reading 2 / Reading 3 question for TE-famar's status was abandoned, not answered.
 - **UT-157.c** (T157): The "`grid([pcid, payload])` is the working hypothesis but not yet proven" framing is asserted but uncommitted.
 - **UT-158.b** (T158): Three apparatus-vs-specimen TE scopes were named but never picked.
 - **UT-158.c** (T158): Harness-spec §1.1 carve-out is identified but not yet executed.
 - **UT-158.d** (T158): Harness-spec §1.3 invariants classification (apparatus vs specimen) was named but not committed.
-- **UT-158.e** (T158): TE-1 should move from `docs/thought-experiments/` (harness-level) to a promise-stack protocol directory (specimen-level).
+- **UT-158.e** (T158): TE-famar should move from `docs/thought-experiments/` (harness-level) to a promise-stack protocol directory (specimen-level).
 - **UT-158.f** (T158): `grid([pcid, payload])` needs its own protocol directory and spec doc.
-- **UT-158.g** (T158): TODO 5 should move to the promise-stack protocol's TODO directory and be reframed.
+- **UT-158.g** (T158): TODO-rivuk should move to the promise-stack protocol's TODO directory and be reframed.
 - **UT-159.a** (T159): The audit at `4725b3e` identified NINE specimen-bearing items in harness-spec; UT-158.c/d only flagged §1.1 and §1.3.
 - **UT-159.b** (T159): `protocols/wire-lab.d/specs/transport-spec-draft.md` companion audit was flagged but not done.
-- **UT-159.c** (T159): The audit memo recommended six tabletop scenarios for the apparatus-vs-specimen step-2 TE; TE-36 (turns 160-167) did not use them.
+- **UT-159.c** (T159): The audit memo recommended six tabletop scenarios for the apparatus-vs-specimen step-2 TE; TE-havib (turns 160-167) did not use them.
 - **UT-159.d** (T159): Two of the three audit-flagged ambiguous areas have not been resolved by any TE.
 
 ### TE-41: Group-session freeze procedure (15 UTs)
@@ -183,15 +183,15 @@ Drafting order (dependency-sorted):
 - **UT-181.f** (T181): Bot's offer to "dig into chunker_test.go:106" was an in-line decision-point that Steve answered terse-positive in turn 182 ("That used to work"); cadence preserved.
 - **UT-182.b** (T182): Bot's "open a PR / leave the commit ready for you to push" phrasing is procedurally loose given bot has no promisebase PAT yet.
 - **UT-183.a** (T183): Bot prepared a commit (d98b5d3) on a local-only promisebase clone with no persistence path if the session reset before PAT grant.
-- **UT-183.b** (T183): Bot's recommendation "option 2: read more of promisebase before drafting TE-38" sets a new procedural default that should be made canonical.
-- **UT-183.c** (T183): The 17/17 test result establishes pitbase's chunker-merkle-builder integration path as operationally green and unblocks the L6-substrate working framing for TE-38.
+- **UT-183.b** (T183): Bot's recommendation "option 2: read more of promisebase before drafting TE-sihih" sets a new procedural default that should be made canonical.
+- **UT-183.c** (T183): The 17/17 test result establishes pitbase's chunker-merkle-builder integration path as operationally green and unblocks the L6-substrate working framing for TE-sihih.
 - **UT-184.d** (T184): The kv/fs/ refactor (Oct 2025, scanner-to-Options-struct) interacts non-trivially with the L6-substrate framing -- if kv/fs/ becomes pitbase's new bottom layer with db/'s CAS logic moving up, the wire...
-- **UT-184.e** (T184): The Docker SDK rot in cmd/pb/ (6 errors against newer Docker SDK, types renamed in Docker v28) is a second regression that may also need fixing on a separate twig before TE-38 drafting.
+- **UT-184.e** (T184): The Docker SDK rot in cmd/pb/ (6 errors against newer Docker SDK, types renamed in Docker v28) is a second regression that may also need fixing on a separate twig before TE-sihih drafting.
 - **UT-184.f** (T184): RFC-1005 Option 2 (content-addressable test-driven fabric: test tree CID + executable tree CID + args; cache only when test passes) is the explicit prior-art seed of the promise-economy and is dated J...
 - **UT-184.g** (T184): The fuse/ test failures and the cmd/pb Docker rot together suggest pitbase's main is currently in a partial-rot state -- multiple modules are broken, only db/ and kv/fs/ are green.
 - **UT-187.c** (T187): Bot's proposed twig name promisebase-adoption-and-federation-layer omits two of the three substantive scope axes from the proposed title.
 - **UT-190.a** (T190): Bot reported remote-branch enumeration as a narrated finding ("only main exists on the remote") rather than as raw command output, and the narrated finding was wrong -- the kv branch on stevegt/promis...
-- **UT-190.b** (T190): Bot concluded "the TE-38 plan I laid out doesn't need to account for any active collaborator branches in promisebase" based on a wrong enumeration -- the kv branch contains 7 commits of in-progress wo...
+- **UT-190.b** (T190): Bot concluded "the TE-sihih plan I laid out doesn't need to account for any active collaborator branches in promisebase" based on a wrong enumeration -- the kv branch contains 7 commits of in-progress wo...
 - **UT-190.c** (T190): Steve's question used the plural "branches" -- "Can you examine the other promisebase branches?" -- which itself implied an expectation that multiple branches exist; bot answered "only main exists" wi...
 - **UT-190.d** (T190): The kv branch on stevegt/promisebase is undiscovered in the conversation history through turn 192; turn-190 walk-time enumeration is the first record of its existence in this collaboration's working m...
 - **UT-191.a** (T191): Bot's response to Steve's canon rule ("prototype at best; prefer wire-lab in conflict") was a scope-level self-correction ("My earlier scope was tilted toward 'adopt promisebase wholesale.' That was w...
@@ -202,7 +202,7 @@ Drafting order (dependency-sorted):
 
 ### TE-45: Conditional-release / geofencing / recursive promise-graph (1 UTs)
 
-*OPEN-THREADS map:* new thread T-CONDITIONAL-RELEASE to be added (recursive promise-graph; geofencing dimension; orthogonal to TE-38 layered model).
+*OPEN-THREADS map:* new thread T-CONDITIONAL-RELEASE to be added (recursive promise-graph; geofencing dimension; orthogonal to TE-sihih layered model).
 
 - **UT-179.d** (T179): Geofencing requirement adds a constraint dimension orthogonal to group membership.
 
@@ -212,37 +212,37 @@ Drafting order (dependency-sorted):
 - **UT-163.a** (T163): The four envelope-agnostic rephrasings of §1.3 simulator tests constitute a vocabulary template that lives only in the bot's reply text, not in any committed file.
 - **UT-165.d** (T165): OQ-G4 ("Should there be a canonical 'transport-creation' or 'genesis' message at the root of every transport's DAG?") was implicitly answered "yes" by construction for the wire-lab-devs instance witho...
 - **UT-165.e** (T165): Group-session-draft.md still uses `codex-perplexity` in five places as the example/canonical slug, but the live transport instance is `wire-lab-devs`.
-- **UT-167.d** (T167): The .msg->.txt sweep across six unfrozen documents was performed without the cross-TE quotation grep that DF-35.3 / TE-34 Cat-2 sweep policy requires.
+- **UT-167.d** (T167): The .msg->.txt sweep across six unfrozen documents was performed without the cross-TE quotation grep that DF-35.3 / TE-dabol Cat-2 sweep policy requires.
 
 ### Retire (superseded; no action) (3 UTs)
 
-- **UT-170.b** (T170): "DF-37.1" uses TE-37 numbering for a TE document that does not exist.
+- **UT-170.b** (T170): "DF-37.1" uses TE-numan numbering for a TE document that does not exist.
 - **UT-170.c** (T170): The continuity-summary "completed items" list at the top of recent session-summaries shows three items as completed -- "Create protocols/git-file-transport.d/ skeleton," "Draft specs/git-file-transpor...
 - **UT-170.d** (T170): DF-37.1 framing is structurally incomplete: it asks "how should the protocol-slug level be added?" but the actual missing dimension -- the substrate axis (git, rsync, uucp, udp, ...) -- is not surface...
 
 ### Carry (procedural / AGENTS-rule / cadence notes) (55 UTs)
 
-- **UT-158.a** (T158): The bot's six-step plan was offered as an ordered sequence with dependencies; only step 1 (audit) executed before the conversation pivoted into TE-36 directly.
-- **UT-158.h** (T158): A parallel TODO for the grid hypothesis (same shape as the reframed TODO 5) was named but not filed.
-- **UT-160.d** (T160): At end of session corpus, five of TE-36's seven DFs remain unlocked.
+- **UT-158.a** (T158): The bot's six-step plan was offered as an ordered sequence with dependencies; only step 1 (audit) executed before the conversation pivoted into TE-havib directly.
+- **UT-158.h** (T158): A parallel TODO for the grid hypothesis (same shape as the reframed TODO-rivuk) was named but not filed.
+- **UT-160.d** (T160): At end of session corpus, five of TE-havib's seven DFs remain unlocked.
 - **UT-161.b** (T161): The nine-axis comparison table between promise-stack and grid-pcid-payload lives only in conversation, not in any committed file.
 - **UT-161.c** (T161): Bot's turn-161 list of `assertion` types is a finer-grained taxonomy than the five named pCIDs from harness-spec section 10a.
-- **UT-163.b** (T163): FOUR commits on the TE-36 twig land in conversation-file gaps with no captured Steve authorization turn.
+- **UT-163.b** (T163): FOUR commits on the TE-havib twig land in conversation-file gaps with no captured Steve authorization turn.
 - **UT-164.a** (T164): Bot's pause text said "a 4-DF-locked TE" but only 2 DFs were actually locked at the time.
-- **UT-164.b** (T164): Turn 165's answer text said TE-37 git-file-transport twig was "reverted cleanly to 4725b3e" but the reflog shows the twig was MERGED into ppx/main as `a1ecc72` and then deleted.
+- **UT-164.b** (T164): Turn 165's answer text said TE-numan git-file-transport twig was "reverted cleanly to 4725b3e" but the reflog shows the twig was MERGED into ppx/main as `a1ecc72` and then deleted.
 - **UT-165.a** (T165): The bot's slug-naming proposals violated the collaborator-anonymity rule the same turn the rule was installed.
 - **UT-165.c** (T165): The bot's "Saving [redacted-collaborator] collaborator context" memory write inferred a pronoun ("she") not present in Steve's prompt.
 - **UT-166.d** (T166): Stale branch name `ppx/te-20260503-112348-git-file-transport` was used for the bootstrap commit and is preserved in reflog and merge-commit metadata.
 - **UT-169.c** (T169): The reasoning text explicitly ended with intent to ASK Steve before acting ("Let me give him the reasoning and a recommendation, with one short clarifying question (Path A vs Path B), so he can answer...
 - **UT-171.c** (T171): Bot's caveat (b) "defer until a second binding actually exists" applies a YAGNI rule whose triggering condition turn 172 immediately satisfies -- so the YAGNI deferral lasts exactly three minutes.
 - **UT-171.d** (T171): Bot's recommendation question at the end ("Want me to proceed with Alt-1.A as the move, or does the substrate question still feel unresolved?") is structurally a two-part question that foregrounds Alt...
-- **UT-176.g** (T176): TE-38 now has 12 DFs and bot has asked three meta-questions in three consecutive turns (174/175/176) -- the DF list keeps growing because Steve's cadence is correction-plus-elaboration, not draft-then...
+- **UT-176.g** (T176): TE-sihih now has 12 DFs and bot has asked three meta-questions in three consecutive turns (174/175/176) -- the DF list keeps growing because Steve's cadence is correction-plus-elaboration, not draft-then...
 - **UT-176.i** (T176): The duplicate `021.176` line in this TODO was introduced by MY OWN turn-175 walk commit `47009f1`, not by a "prior continuity summary defect" as turn-176 commit message `09f92d7` claimed.
-- **UT-177.b** (T177): TE-38 DF count has grown 5 -> 10 -> 12 -> 15 across four turns.
+- **UT-177.b** (T177): TE-sihih DF count has grown 5 -> 10 -> 12 -> 15 across four turns.
 - **UT-178.m** (T178): Procedural defect during the turn-178 walk -- spurious duplicate forward-preview block introduced and self-corrected.
 - **UT-179.a** (T179): Bot's wholesale-adoption pivot was based on reading design documentation, not implementation code, and bot acknowledged the doc-vs-code uncertainty in passing without acting on it.
 - **UT-179.b** (T179): The promise-economy spectrum (pure-social trust scoring to typed-fungible-capability-token marketplace) is now stated explicitly but the protocol-stays-agnostic constraint is not yet captured as a DF.
-- **UT-179.e** (T179): Bot's TE-38 sketch named "DF-38.7: Vocabulary fixes (grid envelope vs carrier line, groups vs transports, slug-state naming)" as a single DF, but each of these is a separate locked correction from ear...
+- **UT-179.e** (T179): Bot's TE-sihih sketch named "DF-38.7: Vocabulary fixes (grid envelope vs carrier line, groups vs transports, slug-state naming)" as a single DF, but each of these is a separate locked correction from ear...
 - **UT-179.f** (T179): Bot's three-meta-questions ending recovers the cadence pattern that was inverted in turn 178.
 - **UT-179.g** (T179): (no bolded summary)
 - **UT-180.a** (T180): Bot's turn-179 wholesale-adoption pivot was a structurally bad design decision and the corrective procedure is now established as canon.
@@ -269,53 +269,53 @@ Drafting order (dependency-sorted):
 - **UT-189.a** (T189): Bot's response to a truncated/fragment message was "Answer skipped" with no acknowledgement to Steve that the fragment had been received.
 - **UT-189.b** (T189): The string "Answer skipped" cannot be definitively attributed to bot-generated text vs platform/transcript convention from the conversation log evidence alone.
 - **UT-189.c** (T189): Walk-note convention for fragment+completion turn-pairs: treat the fragment as procedural-only with cross-reference to the completion turn for substance.
-- **UT-191.b** (T191): TE-38's DF count reduction (10 -> 6, or 5 with fold) is the structural consequence of bot's scope-level self-correction in UT-191.a -- and the first time in this session's TE-38 history that the DF co...
-- **UT-191.e** (T191): Bot's claim "RFCs 1003-1007 are 5 years old and predate the promise framing" should be ground-truthed before TE-38 cites it.
+- **UT-191.b** (T191): TE-sihih's DF count reduction (10 -> 6, or 5 with fold) is the structural consequence of bot's scope-level self-correction in UT-191.a -- and the first time in this session's TE-sihih history that the DF co...
+- **UT-191.e** (T191): Bot's claim "RFCs 1003-1007 are 5 years old and predate the promise framing" should be ground-truthed before TE-sihih cites it.
 - **UT-191.f** (T191): Bot interpreted Steve's "discuss the conflict ... should prefer wire-lab" as requiring documentation of the discussion in the relevant TE.
-- **UT-192.a** (T192): Bot performed its third TE-38 reframe in three consecutive turns (187 wholesale-adoption -> 191 salvage-source -> 192 active-prototype-graduating-into-promisegrid), each time re-deriving the DF list f...
+- **UT-192.a** (T192): Bot performed its third TE-sihih reframe in three consecutive turns (187 wholesale-adoption -> 191 salvage-source -> 192 active-prototype-graduating-into-promisegrid), each time re-deriving the DF list f...
 - **UT-192.c** (T192): Steve's word "ref" in "ref, factor, modernize, and use" is ambiguous and bot did not flag the ambiguity.
-- **UT-192.d** (T192): Multiple DF lists for TE-38 coexist in the conversation without explicit supersession.
-- **UT-192.e** (T192): Twig-name proposals for TE-38 have accumulated across turns without resolution.
+- **UT-192.d** (T192): Multiple DF lists for TE-sihih coexist in the conversation without explicit supersession.
+- **UT-192.e** (T192): Twig-name proposals for TE-sihih have accumulated across turns without resolution.
 - **UT-192.x** (T192): The pre-walk placeholder line for 021.192 conflated turns 192 and 193 into a single quotation.
 
 ---
 
-## Other active TODOs (open items not in TODO 21)
+## Other active TODOs (open items not in TODO-lilar)
 
-In addition to TODO 21's 186 UTs, five other TODO files have open items totaling ~24. These pre-date the TE-38 cluster (most are from April 29) and reference earlier TE work (TE-1, TE-21, TE-22).
+In addition to TODO-lilar's 186 UTs, five other TODO files have open items totaling ~24. These pre-date the TE-sihih cluster (most are from April 29) and reference earlier TE work (TE-famar, TE-nibar, TE-rujak).
 
-### TODO-20260429-164955-te-promise-stack-ordering.md (7 open)
+### TODO-rivuk-te-promise-stack-ordering.md (7 open)
 
-DF-1.1 through DF-1.4 (TE-1 promise-stack ordering decisions). All four DFs await Steve's "yes" — none locked.
+DF-1.1 through DF-1.4 (TE-famar promise-stack ordering decisions). All four DFs await Steve's "yes" — none locked.
 
-**Disposition:** **TE-40 / Apparatus-vs-specimen completion.** TE-1 is in limbo per UT-155.a/156.a/156.b/158.e. TE-40 should explicitly close TE-1 — either lock the four DFs as Alt-E hybrid (bot's recommendations) or formally retire TE-1 and move promise-stack-ordering work to a successor TE.
+**Disposition:** **TE-40 / Apparatus-vs-specimen completion.** TE-famar is in limbo per UT-155.a/156.a/156.b/158.e. TE-40 should explicitly close TE-famar — either lock the four DFs as Alt-E hybrid (bot's recommendations) or formally retire TE-famar and move promise-stack-ordering work to a successor TE.
 
-### TODO-20260429-165252-backfill-di-provenance-harness-spec.md (4 open)
+### TODO-misul-backfill-di-provenance-harness-spec.md (4 open)
 
 Four steps to backfill DI (Decision Implementation) provenance into harness-spec for settled statements that lack it.
 
 **Disposition:** **TE-40 / Apparatus-vs-specimen completion.** The harness-spec sweep that TE-40 would do should also do this DI-provenance backfill in the same pass — both touch the same file, both classify the same content.
 
-### TODO-20260429-165253-backfill-dr-harness-spec-section-11.md (4 open)
+### TODO-diliz-backfill-dr-harness-spec-section-11.md (4 open)
 
 Four steps to lift harness-spec §11 open-questions into DR (Decision Register) entries.
 
 **Disposition:** **TE-40 / Apparatus-vs-specimen completion.** Same rationale: ride along with the harness-spec sweep.
 
-### TODO-20260429-173837-te-spec-doc-as-promise.md (8 open)
+### TODO-kulih-te-spec-doc-as-promise.md (8 open)
 
-DF-21.1 through DF-21.4 (TE-21 spec-doc-as-promise) plus TE-22 / TE-23 placeholder follow-ons. All four DF-21 decisions await Steve's "yes" — none locked.
+DF-21.1 through DF-21.4 (TE-nibar spec-doc-as-promise) plus TE-rujak / TE-lozip placeholder follow-ons. All four DF-21 decisions await Steve's "yes" — none locked.
 
-**Disposition:** **Carry / Re-evaluate.** TE-21 is older work whose conclusions may be partially absorbed by the TE-38 substrate-agnostic layered model and the eventual freeze procedure (TE-41). Bot recommends: do not pick up TE-21 work until TE-38 lands; then re-evaluate whether TE-21 is still coherent or has been overtaken.
+**Disposition:** **Carry / Re-evaluate.** TE-nibar is older work whose conclusions may be partially absorbed by the TE-sihih substrate-agnostic layered model and the eventual freeze procedure (TE-41). Bot recommends: do not pick up TE-nibar work until TE-sihih lands; then re-evaluate whether TE-nibar is still coherent or has been overtaken.
 
-### TODO-20260429-180020-te-spec-doc-store-and-pcid-machinery.md (1 open)
+### TODO-nivus-te-spec-doc-store-and-pcid-machinery.md (1 open)
 
-Item 011.10 — follow-on TE on peer-level adoption metadata. "Missing half of TE-21 Alt-E that TE-22 did not address."
+Item 011.10 — follow-on TE on peer-level adoption metadata. "Missing half of TE-nibar Alt-E that TE-rujak did not address."
 
-**Disposition:** **Carry.** Same logic as TE-21 above — wait for TE-38 to land.
+**Disposition:** **Carry.** Same logic as TE-nibar above — wait for TE-sihih to land.
 
 ---
 
 ## Phase 2 next step
 
-Steve reviews this file, corrects dispositions where the bot got it wrong, and approves the TE drafting order. Then TE-38 drafting begins (already-accumulated 30+ DFs from turns 172-178; needs scope reduction to 3-5 anchor DFs per the apparatus-vs-specimen / TE-editing-policy precedent).
+Steve reviews this file, corrects dispositions where the bot got it wrong, and approves the TE drafting order. Then TE-sihih drafting begins (already-accumulated 30+ DFs from turns 172-178; needs scope reduction to 3-5 anchor DFs per the apparatus-vs-specimen / TE-editing-policy precedent).
