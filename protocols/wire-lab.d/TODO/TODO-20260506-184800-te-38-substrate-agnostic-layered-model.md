@@ -105,7 +105,7 @@ resulting product is committed and pushed.
     recommendation: Alt-M.3 long-term, Alt-M.1 today
     note: 2026-05-06 -- explanation of all three alternatives delivered to Steve at 15:08 PT on his request; question stands open pending answer.
 
-- [ ] **Q-22.7** OPEN-THREADS.md migration scope: which deprecation shape?
+- [x] **Q-22.7** OPEN-THREADS.md migration scope: which deprecation shape?
     opened: 2026-05-06 23:08 UTC
     asked of: stevegt@t7a.org
     blocks: deprecating OPEN-THREADS.md and consolidating thread tracking into TODO files
@@ -133,8 +133,11 @@ resulting product is committed and pushed.
                     (already there). The deprecation step renames
                     OPEN-THREADS.md -> OPEN-THREADS-DEPRECATED.md with a
                     pointer header explaining the migration.
+    answered: 2026-05-07 00:22 UTC -- Alt-OT.B
+    resolved: 2026-05-07 @ 5670eca (wire-lab) and 3bed63a (session-logs)
+    product: protocols/wire-lab.d/TODO/TODO-20260507-002306-te-{36-followon,39,40,41,42,43,44,45}-*.md, TODO-20260507-002306-anticipated-future-tes-transport-family.md, AGENTS-ppx.md (deprecation note)
 
-- [ ] **Q-22.8** OPEN-THREADS.md deprecation mechanics: rename or delete?
+- [x] **Q-22.8** OPEN-THREADS.md deprecation mechanics: rename or delete?
     opened: 2026-05-06 23:08 UTC
     asked of: stevegt@t7a.org
     blocks: completion of OPEN-THREADS.md deprecation
@@ -153,6 +156,9 @@ resulting product is committed and pushed.
                     in git. Alt-D.A keeps the renamed file but anyone
                     citing 'OPEN-THREADS.md' will get a 404; Alt-D.B loses
                     the redirect benefit entirely.
+    answered: 2026-05-07 00:22 UTC -- Alt-D.B (delete outright)
+    resolved: 2026-05-07 @ 3bed63a (session-logs wire-lab branch)
+    product: deletion commit on stevegt/session-logs wire-lab branch; AGENTS-ppx.md (commit 5670eca on wire-lab ppx/main) deprecation note explains where each thread went so readers searching git history can find them
 
 ## Open questions retired by this TODO
 
