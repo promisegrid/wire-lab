@@ -1,7 +1,9 @@
 # TODO Index
 
-This list is sorted by priority (not number). TODO numbers are stable; do not renumber.
+This list is sorted by priority. Existing TODO numbers are historical and
+stable; new TODOs use proquint handles.
 
+- [x] TODO-fonuz - Proquint IDs for new coordination artifacts (`TODO/TODO-fonuz-proquint-id-upgrade.md`)
 - [x] 008 - Merge `ppx/merge-all-20260429-164729` (`TODO/008-merge-ppx-merge-all-20260429-164729.md`)
 - [x] 001 - Perplexity Computer onboarding (`TODO/001-perplexity-computer-onboarding.md`)
 - [x] 002 - Durable review feedback as contest artifact (`TODO/002-review-feedback-as-contest-artifact.md`)

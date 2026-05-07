@@ -98,17 +98,22 @@ Steps:
             Decision (if State is decided/implemented/closed),
             Linked DI, Related commits, Last updated.
         - Verify person identity format is `email (FirstName)`.
-        - Verify the DR-ID timestamp matches the filename.
+        - Verify new DRs use `DR-<handle>-<slug>.md` and
+          `DR-ID: DR-<handle>` with a proquint handle minted by
+          `tools/mint-handle`. Legacy timestamp DRs may remain unchanged.
   f. For each DI added or modified on the branch:
         - Verify required fields:
-            ID (DI-NNN-YYYYMMDD-HHMMSS where NNN is the TODO number),
+            ID (`DI-<handle>` for new DIs; legacy timestamp DIs may
+            remain unchanged),
             Date, Status, Decision, Intent, Constraints, Affects,
             Author, optional Supersedes.
         - Verify the DI sits inside `## Decision Intent Log` of the
-          referenced TODO/NNN-*.md file.
+          referenced TODO file.
         - Verify Linked DR ↔ Linked DI back-references are consistent.
   g. For any TE files added under docs/thought-experiments/:
-        - Verify filename: TE-YYYYMMDD-HHMMSS-slug.md
+        - Verify filename: `TE-<handle>-<slug>.md` for new TEs, where
+          `<handle>` is a proquint minted by `tools/mint-handle`.
+          Legacy timestamp TE files may remain unchanged.
         - Verify the TE doc stands on its own and includes:
             title, TE ID, decision under test, assumptions,
             alternatives, scenario analysis, conclusions, implications.
@@ -172,7 +177,7 @@ Steps:
        doc under docs/thought-experiments/ with the right filename.
      - Ask Steve multiple-choice DF questions for the surviving
        alternatives.
-     - When Steve answers, write the DI into the relevant TODO/NNN-*.md.
+     - When Steve answers, write the DI into the relevant TODO file.
        If no TODO file fits, propose creating a new one (and update
        TODO/TODO.md).
      - Write a DR with State: decided (since Steve decided in chat),
@@ -182,7 +187,7 @@ Steps:
 
   d. For any non-trivial behavior change, add a comment with:
         // Intent: <rationale>
-        // Source: DI-NNN-YYYYMMDD-HHMMSS
+        // Source: DI-<handle>
 
   e. Stage files explicitly. Do not use `git add .` or `git add -A`.
 
@@ -205,10 +210,9 @@ Steps:
   a. Search the repo for any existing DR or DI on the topic:
         rg -i "<keyword>" DR/ TODO/
   b. If nothing exists, draft a new DR file:
-        DR/DR-NNN-YYYYMMDD-HHMMSS-<slug>.md
-     where NNN is the TODO number this DR will eventually be
-     attached to. If no TODO yet, ask Steve which TODO to attach
-     it to (or to create a new TODO).
+        DR/DR-<handle>-<slug>.md
+     where `<handle>` is minted by `tools/mint-handle`. If no TODO yet,
+     ask Steve which TODO to attach it to (or to create a new TODO).
   c. Set State: open. Fill in Asked by (Steve's identity, since
      you act as Steve), Question, Why this blocks progress, Affects,
      Unblocks, Waiting on.

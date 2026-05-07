@@ -138,7 +138,8 @@ Steps:
      - Identify the decision being made.
      - If multiple plausible designs remain, run a TE BEFORE asking DF
        questions. Write the TE doc to
-       `docs/thought-experiments/TE-YYYYMMDD-HHMMSS-slug.md`. The TE
+       `docs/thought-experiments/TE-<handle>-<slug>.md`, where
+       `<handle>` is minted by `tools/mint-handle`. The TE
        must explicitly model multiple scenarios — not collapse to a
        short opinion. Required content: title, TE ID, decision under
        test, assumptions, alternatives, scenario analysis, conclusions,
@@ -146,13 +147,14 @@ Steps:
      - Ask Steve multiple-choice DF questions framed from the surviving
        alternatives the TE identified. Do not ask broad DF questions
        that ignore TE results.
-     - When Steve answers, write the DI into the relevant
-       `TODO/NNN-*.md` (in `## Decision Intent Log`). DI ID is
-       `DI-NNN-YYYYMMDD-HHMMSS` where NNN is the TODO number. Required
+     - When Steve answers, write the DI into the relevant TODO file
+       (in `## Decision Intent Log`). DI ID is `DI-<handle>`, where
+       `<handle>` is minted by `tools/mint-handle` from the global
+       TODO/TE/DR/DI namespace. Required
        fields: ID, Date, Status, Decision, Intent, Constraints,
        Affects, Author. Optional: Supersedes.
      - Write a DR file for the same decision:
-       `DR/DR-NNN-YYYYMMDD-HHMMSS-slug.md`. Required fields: DR-ID,
+       `DR/DR-<handle>-<slug>.md`. Required fields: DR-ID,
        Date, Asked by, State, Question, Why this blocks progress,
        Affects, Unblocks, Waiting on, Decision (when decided),
        Linked DI, Related commits, Last updated.
@@ -163,9 +165,9 @@ Steps:
 
   f. For any non-trivial behavior change in code, add a comment:
         // Intent: <rationale>
-        // Source: DI-NNN-YYYYMMDD-HHMMSS
+        // Source: DI-<handle>
      For non-code (e.g., harness-spec.md), include a sentence-level
-     citation in prose: "(see DI-NNN-YYYYMMDD-HHMMSS)" or similar.
+     citation in prose: "(see DI-<handle>)" or similar.
 
   g. Settled statements in docs must cite at least one DI ID. Open
      questions must cite at least one DR ID. If a settled statement has
@@ -265,7 +267,7 @@ Steps:
   a. Create `ppx/dr-{twig}` branch.
   b. Decide which TODO this DR will attach to. If no TODO fits, propose
      a new TODO file in the same branch and update `TODO/TODO.md`.
-  c. Write `DR/DR-NNN-YYYYMMDD-HHMMSS-slug.md` with `State: open`,
+  c. Write `DR/DR-<handle>-<slug>.md` with `State: open`,
      `Asked by: stevegt+ppx@t7a.org (stevegt-via-perplexity)`,
      `Waiting on: stevegt@t7a.org (Steve Traugott)`, all required
      fields filled.
@@ -362,17 +364,16 @@ After reading the orientation files at the top of this prompt:
 # Glossary
 
 - TE  : Thought Experiment. Analysis doc.
-        Lives at `docs/thought-experiments/TE-YYYYMMDD-HHMMSS-slug.md`.
+        New TEs live at `docs/thought-experiments/TE-<handle>-<slug>.md`.
 - DR  : Decision Request. Open question / decision-tracking record.
-        Lives at `DR/DR-NNN-YYYYMMDD-HHMMSS-slug.md` where NNN is the
-        TODO number.
+        New DRs live at `DR/DR-<handle>-<slug>.md`.
 - DI  : Decision Intent. Locked decision record.
         Lives inside `## Decision Intent Log` in
-        `TODO/NNN-*.md`. ID format `DI-NNN-YYYYMMDD-HHMMSS`.
+        the relevant TODO file. New DI ID format is `DI-<handle>`.
 - DF  : Decision Framing. The multiple-choice intake round you ask
         Steve before locking a DI.
-- TODO: Task tracking file. `TODO/NNN-slug.md` per task. The index is
-        `TODO/TODO.md`, priority-sorted, append-only by number.
+- TODO: Task tracking file. New TODOs live at `TODO/TODO-<handle>-<slug>.md`.
+        The index is `TODO/TODO.md`, priority-sorted.
 - twig: Short kebab-case task name. Branch name is `<user>/<twig>`;
         for the bot, `<user>` is `ppx`, so branches are `ppx/<twig>`.
 - pCID: Promise Content ID. Hash of a spec document. The canonical
