@@ -32,6 +32,15 @@ their owning protocol's section.
 | TODO 20 | 2026-05-02 21:31:03 | [TODO-20260502-213103-te-editing-policy-and-holistic-corpus.md](TODO-20260502-213103-te-editing-policy-and-holistic-corpus.md) |
 | TODO 21 | 2026-05-04 17:07:46 | [TODO-20260504-170746-session-replay-cleanup.md](TODO-20260504-170746-session-replay-cleanup.md) |
 | TODO 22 | 2026-05-06 18:48:00 | [TODO-20260506-184800-te-38-substrate-agnostic-layered-model.md](TODO-20260506-184800-te-38-substrate-agnostic-layered-model.md) |
+| TODO 23 | 2026-05-07 00:23:06 | [TODO-20260507-002306-te-36-followon-oq-and-tabletop-walk.md](TODO-20260507-002306-te-36-followon-oq-and-tabletop-walk.md) |
+| TODO 24 | 2026-05-07 00:23:06 | [TODO-20260507-002306-te-39-wire-lab-devs-migration.md](TODO-20260507-002306-te-39-wire-lab-devs-migration.md) |
+| TODO 25 | 2026-05-07 00:23:06 | [TODO-20260507-002306-te-40-apparatus-vs-specimen-completion.md](TODO-20260507-002306-te-40-apparatus-vs-specimen-completion.md) |
+| TODO 26 | 2026-05-07 00:23:06 | [TODO-20260507-002306-te-41-group-session-freeze-procedure.md](TODO-20260507-002306-te-41-group-session-freeze-procedure.md) |
+| TODO 27 | 2026-05-07 00:23:06 | [TODO-20260507-002306-te-42-filename-cid-cascade-policy.md](TODO-20260507-002306-te-42-filename-cid-cascade-policy.md) |
+| TODO 28 | 2026-05-07 00:23:06 | [TODO-20260507-002306-te-43-promisebase-prior-art-adoption.md](TODO-20260507-002306-te-43-promisebase-prior-art-adoption.md) |
+| TODO 29 | 2026-05-07 00:23:06 | [TODO-20260507-002306-te-44-wire-lab-promisebase-merge-trajectory.md](TODO-20260507-002306-te-44-wire-lab-promisebase-merge-trajectory.md) |
+| TODO 30 | 2026-05-07 00:23:06 | [TODO-20260507-002306-te-45-conditional-release-geofencing.md](TODO-20260507-002306-te-45-conditional-release-geofencing.md) |
+| TODO 31 | 2026-05-07 00:23:06 | [TODO-20260507-002306-anticipated-future-tes-transport-family.md](TODO-20260507-002306-anticipated-future-tes-transport-family.md) |
 
 ## group-session
 
