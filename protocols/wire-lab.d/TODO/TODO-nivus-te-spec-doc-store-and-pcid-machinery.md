@@ -1,4 +1,4 @@
-# TODO 011 - TE-rujak Spec-doc store layout and pCID machinery: drive to DI
+# TODO-nivus - TE-rujak Spec-doc store layout and pCID machinery: drive to DI
 
 ## Prior aliases
 
@@ -132,5 +132,5 @@ Linked DR: none; pre-cursor TE: TE-rujak DF-22.5.
 - The recommended set is `(1.d, 2.b, 3.d, 4.d, 5.d)` per the amended TE. The four D answers survive migration off GitHub, keep the freeze act deliberate and auditable, and make the manifest a machine-walkable structure rather than just a human convenience. The B answer for tooling language is Go using the canonical `github.com/ipfs/go-cid`: it matches Steve's stated language preference, aligns with the wider PromiseGrid Go ecosystem, and uses the audited reference implementation. Bot-side execution is not a blocker because the bot's sandbox has passwordless `sudo` and can install Go on demand (verified 2026-04-29). Both `go-cid` and `py-multiformats-cid` agree on the test vector `"hello world\n"` — `bafkreifjjcie6lypi6ny7amxnfftagclbuxndqonfipmb64f2km2devei4` — confirming the canonical encoding.
 - TE-rujak is the operational follow-on to TE-nibar. TE-nibar said *what* a spec doc is (a layered promise); TE-rujak says *how* the repo handles such docs (freeze, hash, store, cite, supersede). The DI entries from both TEs should land in the same revision of `specs/harness-spec-draft.md`'s vocabulary section.
 - Linked DR: to be created as DR-011 once subtasks 011.1-011.4 begin landing. For now, the TE itself stands as the open-question record.
-- Companion TODOs: TODO 006 (DI-provenance backfill) and TODO 007 (DR backfill for §11) become more concrete after TE-rujak locks because the genesis freeze produces the first content-addressed reference points for those backfills.
+- Companion TODOs: TODO-misul (DI-provenance backfill) and TODO-diliz (DR backfill for §11) become more concrete after TE-rujak locks because the genesis freeze produces the first content-addressed reference points for those backfills.
 - The "External-only self-reference" lock has a subtle implication: the freeze ritual must produce a frozen file whose bytes do not reference its own pCID. The simplest implementation is to ensure no pCID-of-self placeholder exists in `specs/<slug>-draft.md` at freeze time. Document this as an explicit step in `tools/freeze-spec/main.go`.

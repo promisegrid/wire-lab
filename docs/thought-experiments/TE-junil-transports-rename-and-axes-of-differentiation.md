@@ -307,8 +307,8 @@ This question is non-trivial and TE-junil does not lock answers to it. It is def
 - Existing TE-hogus prose retains its original "channel" wording inline (the document is part of the historical record), with a top note explaining the rename and pointing readers at TE-junil.
 - TE-zalut retains its original "channel" wording inline with a similar top note.
 - `specs/harness-spec-draft.md`'s TE-hogus §8 bullet is rewritten to use "transport," and a TE-junil §8 entry is added.
-- DR-009 and TODO 012 are updated to use "transport."
-- The TODO for the carve-out (anticipated TODO 013) covers: creating `specs/transport-spec-draft.md` (thin), `specs/unicast-transport-draft.md` and `specs/group-transport-draft.md` (substantive), and updating all the cross-references.
+- DR-009 and TODO-bisur are updated to use "transport."
+- The TODO for the carve-out (anticipated TODO-motof) covers: creating `specs/transport-spec-draft.md` (thin), `specs/unicast-transport-draft.md` and `specs/group-transport-draft.md` (substantive), and updating all the cross-references.
 
 ## Refinements
 
@@ -344,8 +344,8 @@ Recorded principle: *the wire-lab's `transports/` directory is a simulation surf
 
 ## Implications for follow-on work
 
-- **TODO 013 (anticipated)**: drive these locked alts to a DR; carve out `specs/transport-spec-draft.md` (thin) plus `specs/group-transport-draft.md` (substantive, inheriting TE-hogus's v0 contract); rename `channels/` → `transports/`; update `channels/README.md` → `transports/README.md`; rewrite TE-zalut in place with vocabulary swap; update DR-009, TODO 012, TE-hogus, and `specs/harness-spec-draft.md` to use the new vocabulary.
-- **TODO 014 (anticipated)**: first real message exchange under a group-transport instance (likely N=2, Codex↔Perplexity), exercising the group-transport-draft.md spec end-to-end.
+- **TODO-motof (anticipated)**: drive these locked alts to a DR; carve out `specs/transport-spec-draft.md` (thin) plus `specs/group-transport-draft.md` (substantive, inheriting TE-hogus's v0 contract); rename `channels/` → `transports/`; update `channels/README.md` → `transports/README.md`; rewrite TE-zalut in place with vocabulary swap; update DR-009, TODO-bisur, TE-hogus, and `specs/harness-spec-draft.md` to use the new vocabulary.
+- **TODO-vuhuj (anticipated)**: first real message exchange under a group-transport instance (likely N=2, Codex↔Perplexity), exercising the group-transport-draft.md spec end-to-end.
 - **TE-dajot (anticipated)**: transport-protocol migration semantics — what does it mean for a group of participants to move from one transport-protocol-pCID to another? (Question raised in S7 above; deferred from TE-junil.)
 - **TE-vipir (anticipated)**: ring-transport spec — token-passing semantics, per-hop artifacts, link-failure handling.
 - **TE-magup (anticipated)**: cluster-of-clusters transport — small close-knit groups bridged into a larger network. The most representative of the project's working hypothesis about real-world grid structure.

@@ -171,7 +171,7 @@ Applicability: this policy applies uniformly to every TE corpus in this reposito
 - A settled statement in docs (or critical logic in code comments) must cite at least one DI ID.
 - An unresolved question or uncertainty must cite at least one DR ID.
 - If an unresolved question has no DR yet, create a DR before finalizing the change.
-- During TODO 025 migration, apply these rules incrementally as sections/files are brought under DR/DI tracking.
+- During TODO-kugod migration, apply these rules incrementally as sections/files are brought under DR/DI tracking.
 
 
 ## Comment Preservation Protocol (Required)

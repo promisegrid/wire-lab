@@ -14,7 +14,7 @@ The outer convention — that transport directories live under `transports/` key
 
 This spec is locked by the conclusions of:
 
-- [TE-hogus](../docs/thought-experiments/TE-hogus-group-transport-envelope.md): the group-transport envelope: `grid <pcid>` carrier, canonical-bytes rules, explicit-promise body requirement, and `Date`/`From` as conveniences. The TODO 013 carve-out supersedes the original `Prev-Message-CID:`, `IHave:`, and `Kind:` headers from the TE's first drafting; the locked v0 contract uses `Parents:` (DAG links), body-level acknowledgement (receipts), and no `Kind:` header. The `Message-ID:` header described in TE-hogus is also dropped: under §2 (filename = CID), the message CID is the message's identifier and a separate human-readable identifier creates two competing identities for the same message and is omitted.
+- [TE-hogus](../docs/thought-experiments/TE-hogus-group-transport-envelope.md): the group-transport envelope: `grid <pcid>` carrier, canonical-bytes rules, explicit-promise body requirement, and `Date`/`From` as conveniences. The TODO-motof carve-out supersedes the original `Prev-Message-CID:`, `IHave:`, and `Kind:` headers from the TE's first drafting; the locked v0 contract uses `Parents:` (DAG links), body-level acknowledgement (receipts), and no `Kind:` header. The `Message-ID:` header described in TE-hogus is also dropped: under §2 (filename = CID), the message CID is the message's identifier and a separate human-readable identifier creates two competing identities for the same message and is omitted.
 - [TE-zalut](../docs/thought-experiments/TE-zalut-channel-transport-types-and-threaded-replies.md): the conceptual shift to DAG-shaped message graphs (zero-or-more parents per message).
 - [TE-junil](../docs/thought-experiments/TE-junil-transports-rename-and-axes-of-differentiation.md): the per-axis meta-rule that locks small-finite-closed-group with N≥2 as a single protocol class (cardinality is a parameter, not a contract boundary, except at extremes).
 - [DR-009](../DR/DR-009-20260430-204108-group-transport-envelope.md): the active decision request governing the group-transport envelope and the freeze gate.
@@ -44,7 +44,7 @@ transports/<this-pcid>--<slug>/
     ...
 ```
 
-Rationale: the DAG of `Parents:` links carries all the ordering information any reader needs. Subdirectory structure (per-sender, per-direction, per-date, etc.) would either duplicate the DAG (redundant), pick a privileged axis the protocol does not have (sender or direction), or be presentational (and so belong in a viewer, not in the on-disk format). Flat is honest. (T6 in TODO 013 carve-out, locked Alt-T6.A.)
+Rationale: the DAG of `Parents:` links carries all the ordering information any reader needs. Subdirectory structure (per-sender, per-direction, per-date, etc.) would either duplicate the DAG (redundant), pick a privileged axis the protocol does not have (sender or direction), or be presentational (and so belong in a viewer, not in the on-disk format). Flat is honest. (T6 in TODO-motof carve-out, locked Alt-T6.A.)
 
 ### §2. Message filename: `<message-cid>.txt`
 
@@ -122,7 +122,7 @@ Future versions of this spec MAY add headers; they will be inserted at locked po
 
 #### §4.8 No `Kind:` header
 
-This protocol does NOT have a `Kind:` header. The original TE-hogus sketch included one as a human-oriented convenience; on review, message kind is presentational and varies per use case, so it is left to body convention rather than an envelope field. (Q1 in TODO 013 carve-out, locked Alt-Q1.A.)
+This protocol does NOT have a `Kind:` header. The original TE-hogus sketch included one as a human-oriented convenience; on review, message kind is presentational and varies per use case, so it is left to body convention rather than an envelope field. (Q1 in TODO-motof carve-out, locked Alt-Q1.A.)
 
 #### §4.9 No `IHave:` header
 
@@ -153,7 +153,7 @@ I promise that I have observed and accepted the following message(s):
 
 The acknowledgement message itself participates in the DAG: it cites the messages it acknowledges in its `Parents:` header (so graph-walkers see the relationship structurally) AND in its body prose (so humans and LLM readers see the relationship in plain text). The two MUST be consistent — every CID in the body acknowledgement list MUST also appear in `Parents:`, and conversely. (DF-T5.)
 
-This v0 receipt scheme is per-message: each acknowledgement explicitly lists the message CIDs it accepts. There is no compact "I have everything up to frontier F" form in v0; cumulative-prefix or frontier-style acknowledgement is deferred to a future TE (Q2 in TODO 013 carve-out, deferred).
+This v0 receipt scheme is per-message: each acknowledgement explicitly lists the message CIDs it accepts. There is no compact "I have everything up to frontier F" form in v0; cumulative-prefix or frontier-style acknowledgement is deferred to a future TE (Q2 in TODO-motof carve-out, deferred).
 
 ### §7. Persistence
 
@@ -298,7 +298,7 @@ I promise to begin work on the group-transport-draft v0 contract.
 ## Open questions
 
 - **OQ-G1 (deferred):** Should `From:` be tightened to a key, a pCID, or some other structured identity in a future revision? Raised but not closed in v0.
-- **OQ-G2 (deferred):** What does cumulative-prefix or frontier acknowledgement look like under this protocol's DAG model? Q2 in TODO 013 carve-out, deferred to its own future TE.
+- **OQ-G2 (deferred):** What does cumulative-prefix or frontier acknowledgement look like under this protocol's DAG model? Q2 in TODO-motof carve-out, deferred to its own future TE.
 - **OQ-G3 (deferred):** When two writers concurrently extend the same parent set, the DAG fans out; subsequent messages typically cite both leaves to converge. Should the protocol prescribe any fan-in obligation, or is this entirely a writer convention? v0 leaves it to convention.
 - **OQ-G4 (deferred):** Should there be a canonical "transport-creation" or "genesis" message at the root of every transport's DAG, naming the participants and the slug? v0 does not require one; first message is whatever the first writer produces.
 - **OQ-G5 (deferred):** For N>2 instances, are there observability or fairness considerations (e.g., should the protocol require that every participant's `From:` actually appear before some milestone)? v0 is silent.

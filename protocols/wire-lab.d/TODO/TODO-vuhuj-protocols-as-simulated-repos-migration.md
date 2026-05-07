@@ -1,4 +1,4 @@
-# TODO 014 — protocols-as-simulated-repos migration
+# TODO-vuhuj — protocols-as-simulated-repos migration
 
 ## Prior aliases
 
@@ -72,10 +72,10 @@ all at once rather than half-migrating.
 
     - Harness-level TODOs (001 through 011, 013, 014, 015, 017, 019)
       move to `protocols/wire-lab.d/TODO/TODO-<timestamp>-<slug>.md`.
-    - TODO 012 -> `protocols/group-session.d/TODO/`.
-    - TODO 016 -> `protocols/ppx-dr.d/TODO/` (BLOCKED status
+    - TODO-bisur -> `protocols/group-session.d/TODO/`.
+    - TODO-pozig -> `protocols/ppx-dr.d/TODO/` (BLOCKED status
       preserved verbatim).
-    - TODO 018 -> `protocols/udp-binding.d/TODO/`.
+    - TODO-jodon -> `protocols/udp-binding.d/TODO/`.
 
     Then:
 
@@ -90,7 +90,7 @@ all at once rather than half-migrating.
       DR-009, DI-009, TE-hogus, TE-vipir, TE-magup, harness-spec section 8
       bibliography, prior-TODO cross-references inside other TODO
       files (e.g. 014's references to 015/017/018/019).
-    - Update the original TODO 014 file's own location: it moves
+    - Update the original TODO-vuhuj file's own location: it moves
       from `TODO/014-...md` to
       `protocols/wire-lab.d/TODO/TODO-<timestamp>-protocols-as-simulated-repos-migration.md`
       atomically with the rest of step 11.
@@ -109,24 +109,24 @@ all at once rather than half-migrating.
     migration time. README points at TE-zukug (inversion) and TE-liviv
     (split) for the rationale.
 
-13. **(Added per TE-liviv) Retarget TODO 018 (UDP-binding v0 reference
+13. **(Added per TE-liviv) Retarget TODO-jodon (UDP-binding v0 reference
     implementation)** to live under
     `implementations/go-udp-binding-reference/` rather than any path
     under `protocols/udp-binding.d/`. The protocol's spec-side TODOs
     stay in `protocols/udp-binding.d/TODO/`; the implementation work
     is a separate concern that does not migrate with the protocol's
-    design. Update the prose of the migrated TODO-018 file to
+    design. Update the prose of the migrated TODO-jodon file to
     reflect this target path.
 
-14. **(Added per TE-liviv) Retarget TODO 019 (ns-3 harness scaffold)**
+14. **(Added per TE-liviv) Retarget TODO-bihon (ns-3 harness scaffold)**
     similarly: target `implementations/ns3-harness-fixture/` (or
     whatever final slug is chosen at execution time). The wire-lab
     harness reference impl is a B-side artifact, not a spec-side
     one. Per TE-liviv OQ-32.4, the harness has both a design tree
     (already at `protocols/wire-lab.d/`) and a reference
     implementation (at `implementations/wire-lab-harness-reference/`
-    or similar). TODO 019 belongs to the latter. Update the migrated
-    TODO-019 file's prose accordingly.
+    or similar). TODO-bihon belongs to the latter. Update the migrated
+    TODO-bihon file's prose accordingly.
 
 15. **(Added per TE-liviv) Seed empty `CHANGELOG.md` stubs in each
     migrated `protocols/<slug>.d/`** with a placeholder explanatory
@@ -137,24 +137,24 @@ all at once rather than half-migrating.
     `implementations/<impl-name>/CHANGELOG.md` files are not seeded
     at migration time because no implementations exist yet.
 
-## Out of scope for TODO 014
+## Out of scope for TODO-vuhuj
 
-- proposals -> transports/ migration (that's TODO 016, BLOCKED).
-- UDP-binding v0 reference implementation (that's TODO 018; this
+- proposals -> transports/ migration (that's TODO-pozig, BLOCKED).
+- UDP-binding v0 reference implementation (that's TODO-jodon; this
   TODO retargets its destination per step 13 but does not implement
   it).
-- ns-3 harness scaffold (that's TODO 019; this TODO retargets its
+- ns-3 harness scaffold (that's TODO-bihon; this TODO retargets its
   destination per step 14 but does not implement it).
 - Defining the precise CHANGELOG.md format (header block syntax
   YAML/fenced/HTML-comment, schema for entries beyond what TE-zukug
-  and TE-liviv sketch). Forthcoming TODO 020 will spec the format and
+  and TE-liviv sketch). Forthcoming TODO-dinub will spec the format and
   build a parser; this TODO only seeds empty stubs.
 
-Note: prior versions of this TODO listed TODO 015 (DR/TODO/DI
-absorption) and TODO 017 (group-transport -> group-session rename) as
-out-of-scope items. Per TE-magup, TODO 015 was retired (DR/DI directories
+Note: prior versions of this TODO listed TODO-bulaj (DR/TODO/DI
+absorption) and TODO-losoh (group-transport -> group-session rename) as
+out-of-scope items. Per TE-magup, TODO-bulaj was retired (DR/DI directories
 never existed; harness-spec sections 11/12 already absorb decisions
-and open questions inline) and TODO 017's rename work was always
+and open questions inline) and TODO-losoh's rename work was always
 covered by step 2 of this TODO. See
 `protocols/wire-lab.d/TODO/TODO-bulaj-dr-todo-di-absorption-RETIRED.md` and
 `protocols/wire-lab.d/TODO/TODO-losoh-group-transport-rename-FOLDED.md` for the records.
@@ -175,7 +175,7 @@ covered by step 2 of this TODO. See
   TE-liviv) explaining the A/B split.
 - Each `protocols/<slug>.d/` has an empty `CHANGELOG.md` stub (per
   TE-liviv) ready to record `freeze` events.
-- TODO 018 and TODO 019 (after migration into
+- TODO-jodon and TODO-bihon (after migration into
   `protocols/<slug>.d/TODO/`) name `implementations/...` paths as
   their target rather than `protocols/<slug>.d/...` paths.
 - All current in-tree references resolve to new paths (TODO

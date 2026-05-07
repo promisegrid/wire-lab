@@ -170,7 +170,7 @@ Use Alt-3.B when the question is about decisions, framing, or design tradeoffs; 
 
 ### S2 — Path migration (top-level `specs/` → `protocols/wire-lab.d/specs/`)
 
-**Alt-1.A** would have required either leaving stale paths inside TEs (degrading navigability) or writing a rename TE for every TE touched (boilerplate). **Alt-1.B** would have updated paths silently, indistinguishable from a substantive rewrite. **Alt-1.C** treats path renames as Cat-1 and updates in place with no header note required, because the diff is mechanical and self-explanatory. The just-completed TODO 014 migration intentionally *did not* update paths inside TEs because of my (the bot's) overgeneralized "do not back-edit" rule; under Alt-1.C those edits would have been correct.
+**Alt-1.A** would have required either leaving stale paths inside TEs (degrading navigability) or writing a rename TE for every TE touched (boilerplate). **Alt-1.B** would have updated paths silently, indistinguishable from a substantive rewrite. **Alt-1.C** treats path renames as Cat-1 and updates in place with no header note required, because the diff is mechanical and self-explanatory. The just-completed TODO-vuhuj migration intentionally *did not* update paths inside TEs because of my (the bot's) overgeneralized "do not back-edit" rule; under Alt-1.C those edits would have been correct.
 
 ### S3 — Decision is later overturned
 
@@ -214,7 +214,7 @@ DF-34.3 Alt-3.A is the failure mode the user named. Alt-3.B is the explicit inst
 ## Implications for the repo's open TODOs and pending DIs
 
 - **TODO-rivuk (TE-famar promise-stack ordering, drive to DI):** When this lands, the DI work updates TE-famar's "Decision status" line from `needs DF` to `decided per DI-005-NN-…`, and the "Implications" section gets a "## Refinements" append-only block listing which downstream items were filed (DR-006 normalization, the harness-spec §1.1 update, etc.). TE-famar's body is otherwise untouched.
-- **TODO 014 (just landed):** The path references inside TE files were intentionally left stale because the bot was applying the now-retired "do not back-edit" rule. Under TE-dabol's Cat-1, those paths should be updated in place. A follow-on TODO under `protocols/wire-lab.d/TODO/` will sweep them. (To be filed alongside the DI for this TE.)
+- **TODO-vuhuj (just landed):** The path references inside TE files were intentionally left stale because the bot was applying the now-retired "do not back-edit" rule. Under TE-dabol's Cat-1, those paths should be updated in place. A follow-on TODO under `protocols/wire-lab.d/TODO/` will sweep them. (To be filed alongside the DI for this TE.)
 - **TODO-misul + TODO-diliz (provenance backfill):** The retrospective DIs / DRs under these TODOs do not modify TEs; they modify the harness-spec and DR/. Unaffected by this policy.
 - **All future TEs:** The "## Refinements" section convention is new; it does not appear in TEs 1–33. Adding it to existing TEs is itself a Cat-3 / Cat-4 edit and is permitted under this TE's own rule. The convention will be exercised when TODO-rivuk lands its DI.
 - **AGENTS.md / AGENTS-codex.md / AGENTS-ppx.md:** Need a new "## TE editing policy" section that codifies the conclusions above. This TE's DI, when locked, drives that AGENTS update.
@@ -254,7 +254,7 @@ Consequence for the locked DIs: the three DIs (DI-020-20260502-213103/-213104/-2
 
 Until that follow-on TE lands, the AGENTS.md / AGENTS-codex.md / AGENTS-ppx.md updates that would have codified this policy as standing bot rules are deferred. The DIs apply to the wire-lab harness corpus today (the bot will edit TEs by category, will not claim the retired "do not back-edit" rule, and will read the corpus by the substantive / mechanical split), but those rules are not yet enshrined as forbidden-bullets in the bot orientation files.
 
-New subtask filed in TODO 020: 020.9 (write the follow-on tabletop TE; gate AGENTS rollout on it).
+New subtask filed in TODO-dinub: 020.9 (write the follow-on tabletop TE; gate AGENTS rollout on it).
 
 ### 2026-05-02 — Cat-1 split into Cat-1a / Cat-1b (DI-020-20260502-232651 supersedes Cat-1 clause)
 
@@ -279,7 +279,7 @@ The purpose is asymmetric: the sweeper pays a small bounded cost (enumerate 0–
 
 **This is a Cat-3 navigational refinement, not a new DI.** The locked Cat-2 procedure of DI-020-20260502-213103 is unchanged in shape — vocabulary updates still happen in place with a top-of-file note pointing at the driving TE or TODO. This refinement only specifies what the note must contain. The Cat-3 / Cat-5–7 boundary (navigational vs. substantive supersedence) is preserved by treating procedural tightening of a note's contents as Cat-3.
 
-DF-35.2 was answered Alt-2.a on 2026-05-02 (bot recommendation under Steve's `make a recommendation` directive). Future Cat-2 sweeps must follow this rule. The TODO 020 DI Log records DF-35.2 as decided in this Refinement entry, no separate DI is filed.
+DF-35.2 was answered Alt-2.a on 2026-05-02 (bot recommendation under Steve's `make a recommendation` directive). Future Cat-2 sweeps must follow this rule. The TODO-dinub DI Log records DF-35.2 as decided in this Refinement entry, no separate DI is filed.
 
 ### 2026-05-02 — Cat-2 sweeps must grep the corpus for old-term-in-quotation contexts (cross-TE quotation protection)
 
@@ -301,7 +301,7 @@ Why not a superseding DI by symmetry with DI-020-20260502-232651 (the Cat-1a/Cat
 
 A Cat-2 sweeper's protocol is now two steps: (1) per the DF-35.2 Refinement, enumerate the DIs in each affected TE in the top-of-file note and promise meaning preservation; (2) per this Refinement, grep the corpus for old-term-in-quotation contexts and classify each match before sweeping. The two checks are independent and orthogonal; both must succeed for a Cat-2 sweep to be correct.
 
-DF-35.3 was answered Alt-3.a on 2026-05-02 (bot recommendation under Steve's `make a recommendation` directive). The TODO 020 DI Log records DF-35.3 as decided in this Refinement entry, no separate DI is filed.
+DF-35.3 was answered Alt-3.a on 2026-05-02 (bot recommendation under Steve's `make a recommendation` directive). The TODO-dinub DI Log records DF-35.3 as decided in this Refinement entry, no separate DI is filed.
 
 ### 2026-05-02 — `Status:` top-of-file header field across the TE corpus (supersedence discoverability)
 
@@ -327,7 +327,7 @@ The field's purpose is single-TE reader discoverability of supersedence. The bot
 
 **This is a Cat-3 navigational refinement, not a new DI.** It tightens discoverability of the existing locked policy without changing what any locked DI promises. The retrofit sweep is Cat-1a per DI-020-20260502-232651; subtask 020.10 will execute it as its own twig with a sweeper script that emits matches for human review.
 
-DF-35.4 was answered Alt-4.a on 2026-05-02 (bot recommendation under Steve's `make a recommendation` directive). The TODO 020 DI Log records DF-35.4 as decided in this Refinement entry, no separate DI is filed. Subtask 020.10 (the retrofit sweep) is now ready to execute and is no longer pending DF-35.4. With DF-35.1 / -35.2 / -35.3 / -35.4 all answered, subtasks 020.5 (AGENTS rollout), 020.6 (path-reference sweep), and 020.7 (TE-famar Refinements) are also unblocked.
+DF-35.4 was answered Alt-4.a on 2026-05-02 (bot recommendation under Steve's `make a recommendation` directive). The TODO-dinub DI Log records DF-35.4 as decided in this Refinement entry, no separate DI is filed. Subtask 020.10 (the retrofit sweep) is now ready to execute and is no longer pending DF-35.4. With DF-35.1 / -35.2 / -35.3 / -35.4 all answered, subtasks 020.5 (AGENTS rollout), 020.6 (path-reference sweep), and 020.7 (TE-famar Refinements) are also unblocked.
 
 ### 2026-05-03 — AGENTS rollout complete (Cat-4 resolved-implication forward pointer)
 

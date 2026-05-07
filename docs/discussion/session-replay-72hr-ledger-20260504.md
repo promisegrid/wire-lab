@@ -13,11 +13,11 @@ Source: `past_session_contexts/sessions/2026-05-04_2026-05-10/ea135ce8/conversat
 | `channels/` → `transports/` rename | **WRITTEN** | TE-junil (`a20bbc4` / merge `5115f12`). Migration done in same commit. |
 | TE-junil axes-of-transport-differentiation analysis | **WRITTEN** | TE-junil same commit. DF-27.1..27.6 all locked at "use your recommendations." |
 | Rewrite TE-zalut in place to drop `channel` vocabulary | **WRITTEN** | Same TE-junil commit (`a20bbc4`). |
-| `unicast-transport-draft.md` and `group-transport-draft.md` carve-outs | **WRITTEN** as TE-junil anticipated specs; later folded into the protocols-as-simrepos migration (TODO 014) so the actual spec files land under `protocols/group-session.d/specs/group-session-draft.md`. |
+| `unicast-transport-draft.md` and `group-transport-draft.md` carve-outs | **WRITTEN** as TE-junil anticipated specs; later folded into the protocols-as-simrepos migration (TODO-vuhuj) so the actual spec files land under `protocols/group-session.d/specs/group-session-draft.md`. |
 | S7 transport migration (closing one transport, opening a new one) | **DROPPED** as a TE-junil lock, **WRITTEN** as a deferred open question (Alt-T6.A). |
 | `ack` in body vs headers | **WRITTEN** | TE-junil follow-on TODO. Body. |
-| protocols-as-simrepos shape (`protocols/<slug>.d/`) | **WRITTEN** | TE-vipir (`d4c82fc`) + TODO 014 migration (`d957ef9`). |
-| Protocol-as-simrepo: each `<slug>.d/` is a simulated git repo with its own `specs/`, `implementations/`, `DR/`, `TODO/`, `DI/`, `proposals/` | **WRITTEN** | TE-vipir + TODO 014. |
+| protocols-as-simrepos shape (`protocols/<slug>.d/`) | **WRITTEN** | TE-vipir (`d4c82fc`) + TODO-vuhuj migration (`d957ef9`). |
+| Protocol-as-simrepo: each `<slug>.d/` is a simulated git repo with its own `specs/`, `implementations/`, `DR/`, `TODO/`, `DI/`, `proposals/` | **WRITTEN** | TE-vipir + TODO-vuhuj. |
 | DR/TODO/DI absorption into harness vs into per-protocol simrepos | **WRITTEN** | TE-vipir settled it: per-protocol simrepos own their DRs/TODOs/DIs; harness keeps cross-cutting ones. |
 | Five-level transports path `transports/<wire>/<L4-binding-pCID>/<session-pCID>/<message-pCID>/<msg-id>.msg` | **WRITTEN** | TE-vipir §architecture. **Locked.** |
 | L4 binding-layer concept (UDP example walked through) | **WRITTEN** | TE-vipir §binding-layer. |
@@ -25,7 +25,7 @@ Source: `past_session_contexts/sessions/2026-05-04_2026-05-10/ea135ce8/conversat
 | OQ-29.1 group-session freeze ceremony | **WRITTEN** as TE-vipir OQ; later **resolved** in TE-zukug (spec-doc inversion). |
 | OQ-29.9 simulator empirics (ns-3, mininet, tc netem) | **WRITTEN** as OQ then **revised** with sandbox data (`be6dcbf`). |
 | TODOs 015/016/017 (RETIRED/BLOCKED/FOLDED stubs) | **WRITTEN** | `65455c5`. |
-| TODO 018 UDP-binding v0 reference impl + TODO 019 ns-3 harness scaffold | **WRITTEN** as TODO stubs only | `18cc0f9`. The actual code is **not yet written.** |
+| TODO-jodon UDP-binding v0 reference impl + TODO-bihon ns-3 harness scaffold | **WRITTEN** as TODO stubs only | `18cc0f9`. The actual code is **not yet written.** |
 
 ---
 
@@ -37,9 +37,9 @@ Source: `past_session_contexts/sessions/2026-05-04_2026-05-10/ea135ce8/conversat
 | TE-zukug spec-doc inversion (spec-doc upstream, simrepo as implementation, closes OQ-29.1) | **WRITTEN** | `c95c112` / merge `a8f85e1`. |
 | TE-liviv spec-side vs implementation-side split, `implementations/` top-level | **WRITTEN** | `1522e5e` / merge `f23b89c`. |
 | TE-potar spec-doc Informative References to its workshop, RFC-shaped | **WRITTEN** | `414d706` / merge `e5f3c6a`. |
-| TODO 014 protocols-as-simrepos migration | **WRITTEN** | `d957ef9` / merge `ecc75fc`. |
+| TODO-vuhuj protocols-as-simrepos migration | **WRITTEN** | `d957ef9` / merge `ecc75fc`. |
 | TE-dabol TE editing policy and the TE corpus as one document with facets (Cat-1/Cat-2/Cat-3/Cat-5) | **WRITTEN** | `ca92000` / merge `d841526`. |
-| TODO 020 — lock TE-dabol DIs (1.C/2.A/3.C); defer AGENTS rollout behind 020.9 tabletop TE | **WRITTEN** | `ff87f31` / merge `910b58e`. |
+| TODO-dinub — lock TE-dabol DIs (1.C/2.A/3.C); defer AGENTS rollout behind 020.9 tabletop TE | **WRITTEN** | `ff87f31` / merge `910b58e`. |
 | TE-vudaf tabletop simulation of the TE editing policy (Alice/Bob/Carol/Dave/Ellen/Frank/Mallory) | **WRITTEN** | `8f7143e` / merge `6be8ea0`. |
 | Cat-1a (current-pointer paths) vs Cat-1b (historical-quotation paths) split | **WRITTEN** as new DI | `cd82c19` / merge `d8c3e93`. |
 | DF-35.2 Cat-2 enumeration of unchanged DIs (mandatory) | **WRITTEN** | `8f8cbba` / merge `394c187`. |

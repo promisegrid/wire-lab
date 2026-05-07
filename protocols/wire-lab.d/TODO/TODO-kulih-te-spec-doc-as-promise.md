@@ -1,4 +1,4 @@
-# TODO 010 - TE-nibar Spec doc as promise: drive to DI
+# TODO-kulih - TE-nibar Spec doc as promise: drive to DI
 
 ## Prior aliases
 
@@ -18,7 +18,7 @@ Track the work to drive TE-21 (`docs/thought-experiments/TE-20260429-173520-spec
 - [ ] 010.5 Once 010.1-010.4 land, write a DI for each into this file.
 - [ ] 010.6 If 010.2 lands as 2.a (required), update `protocols/wire-lab.d/specs/harness-spec-draft.md` to add or formalize the three normative sections: Assumptions, Open Questions (already present as \u00a711), Known Issues. Cross-link them to TE-nibar and the relevant DI(s).
 - [ ] 010.7 If 010.3 lands as 3.a (structured), surface the peer adoption metadata as a future TE (TE-lozip placeholder) so the wire shape can be designed.
-- [ ] 010.8 Open TE-rujak (spec-doc-store layout) on a fresh twig once TE-nibar / TODO 010 vocabulary is locked.
+- [ ] 010.8 Open TE-rujak (spec-doc-store layout) on a fresh twig once TE-nibar / TODO-kulih vocabulary is locked.
 
 ## Decision Intent Log
 
@@ -29,4 +29,4 @@ Track the work to drive TE-21 (`docs/thought-experiments/TE-20260429-173520-spec
 - TE-nibar carries the full alternative analysis (Alt-A through Alt-E) and six scenarios (S1-S6). This file does not duplicate that analysis; it tracks the decision-driving work.
 - The recommended set is `(1.a, 2.a, 3.a, 4.a)` per the TE. Reason: lock the layered framing fully, make the three lists structural, give peer-level adoption first-class promise machinery, defer layout questions to a follow-on TE.
 - Linked DR: to be created as DR-010 once subtasks 010.1-010.4 begin landing. For now, the TE itself stands as the open-question record.
-- Companion TODOs: TODO 006 (DI-provenance backfill) and TODO 007 (DR backfill for \u00a711) become more concrete after TE-nibar locks; consider revising their scope statements after DF lands.
+- Companion TODOs: TODO-misul (DI-provenance backfill) and TODO-diliz (DR backfill for \u00a711) become more concrete after TE-nibar locks; consider revising their scope statements after DF lands.

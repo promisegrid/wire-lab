@@ -1,4 +1,4 @@
-# TODO 018 — UDP-binding v0 reference implementation
+# TODO-jodon — UDP-binding v0 reference implementation
 
 ## Prior aliases
 
@@ -70,23 +70,23 @@ abstraction defect, not just a UDP issue.
    only walks `specs/`. Update it (or write its successor) to walk
    `protocols/<slug>.d/specs/` so this draft is recognized.
 
-5. **TODO 019 — ns-3 harness scaffold for UDP-binding v0.** A
+5. **TODO-bihon — ns-3 harness scaffold for UDP-binding v0.** A
    minimal 2-node ns-3 scenario that proves round-trip works through
    the Go reference implementation talking over an ns-3-emulated
    UDP wire. See `protocols/wire-lab.d/TODO/TODO-bihon-ns3-harness-scaffold.md` for full
    subtasks. Tracked as a sibling TODO rather than a subtask of this
    one because the scaffold has its own follow-on lifecycle (loss
    scenarios, multi-binding scenarios) that long outlives the v0
-   binding implementation. TODO 018 is done when the scaffold from
-   TODO 019 successfully runs the v0 reference implementation
+   binding implementation. TODO-jodon is done when the scaffold from
+   TODO-bihon successfully runs the v0 reference implementation
    end-to-end at least once.
 
 6. **Update `protocols/udp-binding.d/specs/udp-binding-draft.md`**
    to reference (a) the implementation path under `tools/`, (b) the
    test-vector files, (c) the ns-3 harness scenario name. Replace
-   "to be added in TODO 018" placeholders with concrete pointers.
+   "to be added in TODO-jodon" placeholders with concrete pointers.
 
-## Out of scope for TODO 018
+## Out of scope for TODO-jodon
 
 - Multiple concurrent UDP bindings on different ports (use case:
   one binding per protocol stack on a host). Possible v1 extension.
@@ -104,17 +104,17 @@ abstraction defect, not just a UDP issue.
   binding-layer abstraction is exercised across at least two
   qualitatively different real-world transports. This is when the
   per-binding-pCID forking property at C-4 actually starts paying
-  off. Likely TODO 020.
+  off. (Originally hedged as "Likely TODO 020" before the TODO 020 slot was claimed by an unrelated TE-editing-policy item; this is a future TODO not yet filed.)
 - A Go reference implementation of group-session v0 to ride above
-  UDP-binding v0 and prove the layer composition. Likely TODO 021.
+  UDP-binding v0 and prove the layer composition. (Originally hedged as "Likely TODO 021" before that slot was claimed by session-replay-cleanup; this is a future TODO not yet filed.)
 
 ## Dependencies
 
-- TODO 014 (protocols-as-simulated-repos migration) ideally lands
-  first so the spec lives at its final path. If TODO 014 has not
+- TODO-vuhuj (protocols-as-simulated-repos migration) ideally lands
+  first so the spec lives at its final path. If TODO-vuhuj has not
   landed, this TODO uses `protocols/udp-binding.d/specs/udp-binding-draft.md`
   (already created in TE-vipir's commit).
-- TODO 017 (group-session rename) is not required; UDP-binding does
+- TODO-losoh (group-session rename) is not required; UDP-binding does
   not depend on the session protocol's slug.
 
 ## Done when
@@ -123,7 +123,7 @@ abstraction defect, not just a UDP issue.
   vectors.
 - `protocols/udp-binding.d/specs/udp-binding-draft.md` is updated
   with concrete pointers replacing "to be added" placeholders.
-- TODO 019's ns-3 harness scenario runs the Go reference
+- TODO-bihon's ns-3 harness scenario runs the Go reference
   implementation end-to-end at least once and produces matching
   PCAP and `.txt` artifacts.
 - `/tmp/spec check` (or its successor) reports OK with the spec

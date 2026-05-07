@@ -1,15 +1,25 @@
 package main
 
 import (
+	"regexp"
 	"strings"
 	"testing"
 )
 
-func intReps() []rep {
-	return []rep{
-		{"TE-38", "TE-vunub"},
-		{"TE-3", "TE-pubum"},
-		{"TODO-22", "TODO-vunub"},
+// makeIntRep mirrors main.go's pattern construction for tests.
+func makeIntRep(kind, intNum, handle string) intRep {
+	pattern := `(^|[^\w-])` + kind + `[\s-]+0*` + intNum + `($|[^\w-])`
+	return intRep{re: regexp.MustCompile(pattern), to: kind + "-" + handle}
+}
+
+func intReps() []intRep {
+	return []intRep{
+		makeIntRep("TE", "38", "vunub"),
+		makeIntRep("TE", "3", "pubum"),
+		makeIntRep("TODO", "22", "vunub"),
+		makeIntRep("TODO", "18", "jodon"),
+		makeIntRep("TODO", "14", "vuhuj"),
+		makeIntRep("TE", "25", "titur"),
 	}
 }
 
@@ -88,5 +98,97 @@ func TestTimestampPriorAliasSkipped(t *testing.T) {
 	}
 	if !strings.Contains(got, "first drafted at TE-vunub") {
 		t.Errorf("body timestamp not rewritten: %q", got)
+	}
+}
+
+// TestSpaceFormVariants verifies "TODO 18", "TODO  18" (double space),
+// "TODO\t18", "TE 25" all rewrite correctly.
+func TestSpaceFormVariants(t *testing.T) {
+	cases := []struct {
+		in, want string
+	}{
+		{"under TODO 18 today", "under TODO-jodon today"},
+		{"under TODO  18 today", "under TODO-jodon today"},
+		{"under TODO\t18 today", "under TODO-jodon today"},
+		{"per TE 25 section S5", "per TE-titur section S5"},
+		{"per TE-25 section S5", "per TE-titur section S5"},
+	}
+	for _, c := range cases {
+		got, _ := sweep(c.in, intReps(), nil, nil)
+		if got != c.want {
+			t.Errorf("input %q -> got %q, want %q", c.in, got, c.want)
+		}
+	}
+}
+
+// TestLeadingZeroForm verifies "TODO 011", "TODO-014", "TODO-018"
+// rewrite correctly (the leading zero is stripped via 0* in the regex).
+func TestLeadingZeroForm(t *testing.T) {
+	cases := []struct {
+		in, want string
+	}{
+		{"TODO 014 was the migration", "TODO-vuhuj was the migration"},
+		{"TODO-014 was the migration", "TODO-vuhuj was the migration"},
+		{"TODO 018 v0 reference", "TODO-jodon v0 reference"},
+		{"TODO-018 v0 reference", "TODO-jodon v0 reference"},
+	}
+	for _, c := range cases {
+		got, _ := sweep(c.in, intReps(), nil, nil)
+		if got != c.want {
+			t.Errorf("input %q -> got %q, want %q", c.in, got, c.want)
+		}
+	}
+}
+
+// TestNoOvermatchOnLargerInteger verifies "TODO-180" is not matched as
+// "TODO-18" (the trailing 0 is part of the integer, not a separator).
+func TestNoOvermatchOnLargerInteger(t *testing.T) {
+	cases := []string{
+		"see TODO-180 for context",
+		"see TODO 180 for context",
+		"see TODO-1800 for context",
+		"see TE-380 for context", // would over-match TE-38 if guard fails
+	}
+	for _, c := range cases {
+		got, n := sweep(c, intReps(), nil, nil)
+		if got != c {
+			t.Errorf("input %q was rewritten to %q (should be unchanged)", c, got)
+		}
+		if n != 0 {
+			t.Errorf("input %q got %d substitutions, want 0", c, n)
+		}
+	}
+}
+
+// TestNoMatchOnTimestampDigits verifies the integer rewriter does not
+// match digits inside ISO timestamps (the timestamp rewriter is the only
+// path that should touch those).
+func TestNoMatchOnTimestampDigits(t *testing.T) {
+	in := "drafted at 20260427-180000 then refined"
+	got, n := sweep(in, intReps(), nil, nil)
+	if got != in {
+		t.Errorf("input %q was rewritten to %q", in, got)
+	}
+	if n != 0 {
+		t.Errorf("got %d substitutions, want 0", n)
+	}
+}
+
+// TestEdgeOfStringBoundary verifies the leading/trailing boundary
+// captures handle start-of-string and end-of-string correctly.
+func TestEdgeOfStringBoundary(t *testing.T) {
+	cases := []struct {
+		in, want string
+	}{
+		{"TODO 18", "TODO-jodon"},
+		{"TODO-18", "TODO-jodon"},
+		{"TE-38", "TE-vunub"},
+		{"see TE 25", "see TE-titur"},
+	}
+	for _, c := range cases {
+		got, _ := sweep(c.in, intReps(), nil, nil)
+		if got != c.want {
+			t.Errorf("input %q -> got %q, want %q", c.in, got, c.want)
+		}
 	}
 }

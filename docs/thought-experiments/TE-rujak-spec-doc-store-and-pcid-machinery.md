@@ -331,7 +331,7 @@ The full recommended set across the five DFs is **(1.d, 2.b, 3.d, 4.d, 5.d)** â€
 
 - **Strict-draft cross-refs are honored by lint.** A draft file's cross-reference to another spec MUST cite a frozen pCID. CI audit script greps for cross-spec citations in `specs/*-draft.md` and verifies each cited pCID exists in the manifest as a frozen (or superseded) entry. A draft citing another draft fails the audit. This forces the dependency DAG to grow only by reference to frozen artifacts.
 
-- **`specs/harness-spec-draft.md` migrates.** Per S1, it moves to `specs/harness-spec-draft.md`. The genesis freeze produces `specs/harness-spec-{cidv1}.md`. All in-repo references to `specs/harness-spec-draft.md` are updated. This is a separate TODO (TODO 011 below); it is NOT included in this TE's commit, because the migration is a discrete, reviewable act of its own.
+- **`specs/harness-spec-draft.md` migrates.** Per S1, it moves to `specs/harness-spec-draft.md`. The genesis freeze produces `specs/harness-spec-{cidv1}.md`. All in-repo references to `specs/harness-spec-draft.md` are updated. This is a separate TODO (TODO-nivus below); it is NOT included in this TE's commit, because the migration is a discrete, reviewable act of its own.
 
 - **Git tags remain available for human convenience.** The decision to skip git tags as a freeze artifact does not preclude humans from tagging meaningful commits for their own reasons (e.g., `v1-published` on the genesis-freeze commit). Such tags are not part of the protocol; they're just bookmarks.
 
@@ -401,10 +401,10 @@ Amendment history:
 
 ## Implications for follow-on work
 
-- **TODO 011 (now in progress):** DIs locked for all five DFs and the four already-decided inputs. Remaining work: implement `tools/spec/` (single Go binary with `freeze`, `check`, `cid`, `ls` subcommands), perform the genesis freeze of `specs/harness-spec-draft.md`, add `specs/MANIFEST.md`, wire `go run ./tools/spec check` into CI.
+- **TODO-nivus (now in progress):** DIs locked for all five DFs and the four already-decided inputs. Remaining work: implement `tools/spec/` (single Go binary with `freeze`, `check`, `cid`, `ls` subcommands), perform the genesis freeze of `specs/harness-spec-draft.md`, add `specs/MANIFEST.md`, wire `go run ./tools/spec check` into CI.
 
-- **TODO 012 (provisional):** Add the CI audit step: `go run ./tools/spec check` performs format checks (advisory CRLF/BOM warnings on drafts), manifest-vs-disk consistency, cross-ref-citation lint, and self-reference lint. The audit runs on every push to ppx/main and main; failures block the merge. Because the audit is a Go program, it runs identically under GitHub Actions, a self-hosted runner, or a git pre-receive hook on a non-GitHub host.
+- **TODO-bisur (provisional):** Add the CI audit step: `go run ./tools/spec check` performs format checks (advisory CRLF/BOM warnings on drafts), manifest-vs-disk consistency, cross-ref-citation lint, and self-reference lint. The audit runs on every push to ppx/main and main; failures block the merge. Because the audit is a Go program, it runs identically under GitHub Actions, a self-hosted runner, or a git pre-receive hook on a non-GitHub host.
 
-- **TODO 010 (existing):** Drives TE-nibar to DI. TE-nibar + TE-rujak together form the spec-doc-as-promise bundle: TE-nibar says what a spec doc *is*; TE-rujak says how the repo handles such docs. The DI entries from both TEs should land in the same revision of `specs/harness-spec-draft.md`'s vocabulary section.
+- **TODO-kulih (existing):** Drives TE-nibar to DI. TE-nibar + TE-rujak together form the spec-doc-as-promise bundle: TE-nibar says what a spec doc *is*; TE-rujak says how the repo handles such docs. The DI entries from both TEs should land in the same revision of `specs/harness-spec-draft.md`'s vocabulary section.
 
 - **Future TE (planned):** Peer-level adoption metadata. TE-nibar Alt-E said each peer's adoption is a separate promise that can name which answers it chose for open questions. TE-rujak makes the doc-side machinery concrete; the peer side is still open. A follow-on TE will work out the wire-level shape of an adoption promise (likely a small structured payload referencing `pcid` + `open_question_choices: {Q7: yes, Q9: variant-B}`).

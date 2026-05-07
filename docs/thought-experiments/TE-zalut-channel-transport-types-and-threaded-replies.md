@@ -268,7 +268,7 @@ Standard "completeness check" case.
 - **Wire-lab transport-spec is thin.** It defines: pCID-keyed directory naming under `transports/`, the absence-of-`Transport:`-header rule, the requirement that each transport-protocol-pCID names a spec defining everything inside the directory, and the code-as-handler principle. That is roughly all.
 - **The group-transport-protocol draft spec is its own document** (`specs/group-transport-draft.md` per TE-junil DF-27.5 Alt-5.B), inheriting the full TE-hogus v0 contract. Whether and how it adopts DAG parent semantics (replacing the single-CID `Prev-Message-CID`) is a decision that lives inside that spec doc, not in TE-zalut.
 - **Transport-spec freeze and group-transport-spec freeze are independent** future events, each minting their own pCID under Steve's signature on a corresponding `merge-<slug>-spec` promise.
-- **TODO 012's scope expands** to cover the carve-out plus the group-transport draft spec (subtasks 012.7+).
+- **TODO-bisur's scope expands** to cover the carve-out plus the group-transport draft spec (subtasks 012.7+).
 
 ## Decision status
 
@@ -288,7 +288,7 @@ Recorded principle: *transport identity, layout, and message structure are named
 
 ## Implications for follow-on work
 
-- **TODO 013 (anticipated)**: drive these locked alts to a DR; carve out `specs/transport-spec-draft.md` (thin) and `specs/group-transport-draft.md` (the full TE-hogus v0 contract, with any DAG-related revisions decided inside that spec, not by TE-zalut); rename `channels/` → `transports/`; update `transports/README.md`; remove transport material from `specs/harness-spec-draft.md`; update DR-009 and TODO 012.
-- **TODO 014 (anticipated)**: first real transport-message exchange under the new contract, exercising the group-transport-protocol's parent-link mechanism in both single-writer and multi-writer paths.
+- **TODO-motof (anticipated)**: drive these locked alts to a DR; carve out `specs/transport-spec-draft.md` (thin) and `specs/group-transport-draft.md` (the full TE-hogus v0 contract, with any DAG-related revisions decided inside that spec, not by TE-zalut); rename `channels/` → `transports/`; update `transports/README.md`; remove transport material from `specs/harness-spec-draft.md`; update DR-009 and TODO-bisur.
+- **TODO-vuhuj (anticipated)**: first real transport-message exchange under the new contract, exercising the group-transport-protocol's parent-link mechanism in both single-writer and multi-writer paths.
 - **TE-junil (anticipated → drafted)**: axes-of-differentiation analysis and the `channels/` → `transports/` rename. (Originally framed in TE-zalut as "should the wire-lab spec define a small companion convention for transport-protocols to publish their own pCID on first use?" — that question, raised by DF-26.8 Alt-8.B, remains deferred and may surface in a later TE.)
 - **TE-liviv (anticipated)**: receipts under multi-writer transports — does `IHave: <transport-pcid>:<cid>` need to become a vector to acknowledge a frontier rather than a single tip? (Decision belongs in each transport-protocol's spec, but the question is general enough to warrant a TE. Renumbered from TE-dajot in TE-zalut's original anticipated-work list because TE-junil introduced intervening anticipated TEs.)

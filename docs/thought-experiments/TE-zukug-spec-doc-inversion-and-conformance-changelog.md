@@ -289,10 +289,10 @@ list changes.
 
 TE-zukug is design-only; no immediate code changes. Follow-on work:
 
-1. **TODO 020 (forthcoming).** Define the CHANGELOG.md format
+1. **TODO-dinub (forthcoming).** Define the CHANGELOG.md format
    precisely (resolve OQ-31.2 and OQ-31.3) and write the harness
    parser for it.
-2. **TODO 014.** Continue as-is; the per-protocol simrepo migration
+2. **TODO-vuhuj.** Continue as-is; the per-protocol simrepo migration
    does not depend on TE-zukug. Once 014 lands, each simrepo gets a
    stub CHANGELOG.md with the first `implements` entry pointing at
    the current draft spec-doc.
@@ -304,4 +304,4 @@ TE-zukug is design-only; no immediate code changes. Follow-on work:
 ## Verdict
 
 Adopt the inversion. Close OQ-29.1 with Alt-G. Defer the CHANGELOG
-format details to TODO 020 and a follow-on TE if needed.
+format details to TODO-dinub and a follow-on TE if needed.

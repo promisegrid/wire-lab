@@ -1,4 +1,4 @@
-# TODO 017 — group-transport -> group-session rename — FOLDED INTO TODO 014
+# TODO-losoh — group-transport -> group-session rename — FOLDED INTO TODO-vuhuj
 
 ## Prior aliases
 
@@ -20,15 +20,14 @@ explanation rather than a gap.
 
 > Pure renaming. DFs T1-T6 unchanged.
 
-The premise was that `group-transport` (the v0 carve-out from TODO
-013) needed to be renamed to `group-session` because its DFs T1-T6
+The premise was that `group-transport` (the v0 carve-out from TODO-motof) needed to be renamed to `group-session` because its DFs T1-T6
 (Parents header, ack-in-body, flat per-leaf layout) are session-layer
 semantics, not L4 framing. TE-vipir's binding/session/message layer
 decomposition makes the slug `group-transport` actively misleading.
 
-## Why folded into TODO 014
+## Why folded into TODO-vuhuj
 
-TODO 014 step 2 already says:
+TODO-vuhuj step 2 already says:
 
 > Create `protocols/group-session.d/` (new slug; renames
 > `group-transport`) and move `specs/group-transport-draft.md` into
@@ -36,15 +35,15 @@ TODO 014 step 2 already says:
 > all in-tree references. DFs T1.A through T6.A do not change; only
 > the slug.
 
-That **is** the rename. There is no separate work for TODO 017 to do;
+That **is** the rename. There is no separate work for TODO-losoh to do;
 filing it as its own TODO would create two records of one change and
 risk drift between them.
 
-## What residual work is not in TODO 014 (and where it goes instead)
+## What residual work is not in TODO-vuhuj (and where it goes instead)
 
-TODO 014 step 2 covers the spec file rename and in-tree reference
+TODO-vuhuj step 2 covers the spec file rename and in-tree reference
 updates. The following adjacent cleanups are explicitly *not* tracked
-under TODO 017:
+under TODO-losoh:
 
 1. **TE-hogus's filename retains the `group-transport-envelope` slug.**
    Per the standing rule that TE filenames are not renamed when
@@ -60,17 +59,17 @@ under TODO 017:
 2. **Prose references to "group-transport" in TE-zalut, TE-junil, TE-dajot,
    harness-spec section 8, and DR-009.** These are mostly historical
    or etymological ("the group-transport-envelope work landed under
-   TODO 013, and was later renamed to group-session per TE-vipir").
+   TODO-motof, and was later renamed to group-session per TE-vipir").
    Updating them to "group-session" would erase context that helps
    future readers understand the project's history. Keep these as
    is unless a specific reference is actively confusing.
 
 3. **`tools/spec` and any test code** that refers to "group-transport"
-   as an identifier. If such code exists at the time TODO 014 lands,
-   it is updated under TODO 014 step 6 (`/tmp/spec` walks the new
+   as an identifier. If such code exists at the time TODO-vuhuj lands,
+   it is updated under TODO-vuhuj step 6 (`/tmp/spec` walks the new
    `protocols/<slug>.d/` layout). No separate TODO needed.
 
-If, after TODO 014 lands, there is a meaningful residual prose-
+If, after TODO-vuhuj lands, there is a meaningful residual prose-
 vocabulary cleanup that a contributor wants to track separately, file
 a new TODO with a fresh integer; do not reuse 017.
 
@@ -80,13 +79,13 @@ Per OQ-100.4 (numbering wrap, stable integers across centuries) and
 TE-titur (drafting-time anchoring of TE/TODO numbers), letting an
 orphaned integer sit creates exactly the slug-drift / numbering-
 confusion problem we want to avoid. A future contributor finding
-TODO 017 referenced from TE-vipir prose should land here and find a
+TODO-losoh referenced from TE-vipir prose should land here and find a
 clear "folded into 014, here's why" record, rather than a missing
 file or an integer gap.
 
 ## Provenance
 
 - TE-vipir first-drafted at 2026-05-01 21:50:27 UTC.
-- TODO 017 folding decided 2026-05-01 22:58 UTC (same session).
+- TODO-losoh folding decided 2026-05-01 22:58 UTC (same session).
 - The TE-vipir prose at "Migrations triggered by this TE" item 4 has
   been annotated to point here.

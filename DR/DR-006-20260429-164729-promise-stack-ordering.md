@@ -30,7 +30,7 @@ To be created in `protocols/wire-lab.d/TODO/TODO-rivuk-te-promise-stack-ordering
 ## Related commits
 
 - `0ec32d9` Expand TE-famar (Promise-stack ordering) into full scenario form
-- `e0c00ff` Address TE-famar review conditions: add DR-006 and TODO 005 (DR-006 first authored)
+- `e0c00ff` Address TE-famar review conditions: add DR-006 and TODO-rivuk (DR-006 first authored)
 - `5990e24` Merge ppx/merge-all-20260429-164729 (Converge branch reviews)
 
 ## Last updated

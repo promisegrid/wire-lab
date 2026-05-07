@@ -119,18 +119,18 @@ Locked in AGENTS-ppx.md "Things that are forbidden."
 
 **Turns 107-120 -- protocols/ directory as simrepos, transports/{t-pcid}/{msg-pcid}
 layering, UDP-binding binding layer, ns-3 simulation tooling**
-Captured in TE-vipir (committed d4c82fc), TODO 018 (UDP-binding implementation),
-TODO 019 (ns-3 harness scaffold, committed 18cc0f9).
+Captured in TE-vipir (committed d4c82fc), TODO-jodon (UDP-binding implementation),
+TODO-bihon (ns-3 harness scaffold, committed 18cc0f9).
 
 **Turns 122-135 -- per-protocol TODO numbering, TE-magup/31/32/33 cluster**
 All committed. TE-magup (renumbering, 9d037fc), TE-zukug (spec-doc inversion, c95c112),
 TE-liviv (spec vs implementation split, 1522e5e), TE-potar (informative references,
 e5f3c6a). OQ-100.3 (cumulative-ack) carried to TE-dajot and deferred notes in
-TODO-013.
+TODO-motof.
 
 **Turns 139-148 -- TE editing policy, holistic corpus reading, tabletop TE**
 TE-dabol committed at d841526, TE-vudaf committed at 6be8ea0. Three DIs locked
-(DI-020-20260502-213103/-213104/-213105). TODO 020 filed with subtasks including
+(DI-020-20260502-213103/-213104/-213105). TODO-dinub filed with subtasks including
 020.9 (the Alice/Bob/Carol tabletop scenario list). AGENTS edits explicitly HELD
 pending 020.9 outcome (turn 143-144 choice A).
 
@@ -332,11 +332,11 @@ is captured.
 CONVERSATIONAL clarification about tooling. No design decision.
 
 **Turns 99-101 -- Cumulative-prefix ack (Q2)**
-WRITTEN as a deferral. OQ-100.3 in TE-dajot (100-year) and a deferred note in TODO-013.
+WRITTEN as a deferral. OQ-100.3 in TE-dajot (100-year) and a deferred note in TODO-motof.
 The decision was to defer, and the deferral is recorded.
 
 **Turn 113 -- "Proposals should move into transports"**
-WRITTEN. Captured in TODO 016 (BLOCKED) and TE-vipir (ppx-dr as simulated protocol
+WRITTEN. Captured in TODO-pozig (BLOCKED) and TE-vipir (ppx-dr as simulated protocol
 under the protocols/ layout). The proposal is tracked.
 
 **Turn 110 -- git commit hash in spec doc before computing pCID**

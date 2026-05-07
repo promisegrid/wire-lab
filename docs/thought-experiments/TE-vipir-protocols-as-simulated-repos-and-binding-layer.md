@@ -21,7 +21,7 @@ will be answered in follow-on TEs.)
 ## Why this TE
 
 TE-zalut and TE-junil established that "transport" was the right vocabulary
-and surfaced axes along which transports differ. TODO 013 carved out
+and surfaced axes along which transports differ. TODO-motof carved out
 the first concrete transport (then called group-transport) into its
 own draft spec. TE-dajot named the 100-year goal and the six load-bearing
 constraints C-1 through C-6.
@@ -277,7 +277,7 @@ layer preserves.
 This TE locks shape but does not move files. The following migrations
 are tracked as separate TODOs:
 
-1. **TODO 014: protocols-as-simulated-repos migration.** Move
+1. **TODO-vuhuj: protocols-as-simulated-repos migration.** Move
    `specs/harness-spec-draft.md` to
    `protocols/wire-lab.d/specs/harness-spec-draft.md`. Move
    `specs/group-transport-draft.md` (renamed) to
@@ -289,7 +289,7 @@ are tracked as separate TODOs:
    `wire-lab.d/`; the group-transport-envelope/transport-axes TEs go
    under `group-session.d/`).
 
-2. **TODO 015: DR/TODO/DI absorption.** *Originally* intended to
+2. **TODO-bulaj: DR/TODO/DI absorption.** *Originally* intended to
    inline top-level `DR/`/`TODO/`/`DI/` directories into protocol
    spec docs. **Retired before filing** on review immediately after
    TE-vipir landed: `DR/` and `DI/` do not exist as top-level
@@ -300,31 +300,31 @@ are tracked as separate TODOs:
    `protocols/wire-lab.d/TODO/TODO-bulaj-dr-todo-di-absorption-RETIRED.md` for the full
    retirement record.
 
-3. **TODO 016: proposals as transport messages.** Move
+3. **TODO-pozig: proposals as transport messages.** Move
    `proposals/pending/ppx-dr-001-bootstrap/` content to
    `transports/<future-bootstrap-transport>/<bootstrap-binding-pCID>/<group-session-pCID>/<ppx-dr-pCID>/<message-id>.txt`.
    DI-003 protection follows the bytes, not the path. Renaming
    `.md` to `.txt` is itself a one-time edit that must precede the
    DI-003 anchor moving. **Filed as BLOCKED** on four upstream
-   prerequisites: TODO 014 (protocols/ migration), a frozen
+   prerequisites: TODO-vuhuj (protocols/ migration), a frozen
    bootstrap-binding pCID, a frozen group-session pCID, and a drafted
    ppx-dr message-protocol spec. See
    `protocols/ppx-dr.d/TODO/TODO-pozig-proposals-as-transport-messages-BLOCKED.md` for the
    stub.
 
-4. **TODO 017: group-transport -> group-session rename.**
+4. **TODO-losoh: group-transport -> group-session rename.**
    *Originally* intended as pure renaming, DFs T1-T6 unchanged.
-   **Folded into TODO 014 step 2 before filing** on review
+   **Folded into TODO-vuhuj step 2 before filing** on review
    immediately after TE-vipir landed. The rename is captured in
-   TODO 014's mechanical migration; no separate TODO is needed.
+   TODO-vuhuj's mechanical migration; no separate TODO is needed.
    See `protocols/wire-lab.d/TODO/TODO-losoh-group-transport-rename-FOLDED.md` for the folding
    record and notes on residual prose-vocabulary cleanup
-   (intentionally kept inside TODO 014 step 6 rather than tracked
+   (intentionally kept inside TODO-vuhuj step 6 rather than tracked
    separately).
 
-5. **TODO 018: write UDP-binding v0 reference and test vectors.**
+5. **TODO-jodon: write UDP-binding v0 reference and test vectors.**
    Filed at `protocols/udp-binding.d/TODO/TODO-jodon-udp-binding-v0-reference-implementation.md`.
-   Sibling **TODO 019** (`protocols/wire-lab.d/TODO/TODO-bihon-ns3-harness-scaffold.md`) tracks
+   Sibling **TODO-bihon** (`protocols/wire-lab.d/TODO/TODO-bihon-ns3-harness-scaffold.md`) tracks
    the ns-3 harness scaffold; 018 and 019 are mutually gating per
    the empirical sandbox findings recorded in OQ-29.9.
 

@@ -31,5 +31,5 @@ No transport directories are created yet. The wire-lab is still in design mode; 
 - [TE-zalut: Transport-protocol types, pCID-keyed transport paths, and DAG message graphs](../docs/thought-experiments/TE-zalut-channel-transport-types-and-threaded-replies.md) — the four locked principles for what's in `transports/`.
 - [TE-junil: Transports rename and axes of transport-protocol differentiation](../docs/thought-experiments/TE-junil-transports-rename-and-axes-of-differentiation.md) — the per-axis meta-rule for distinguishing transport-protocols and the rationale for the rename.
 - [DR-009](../DR/DR-009-20260430-204108-group-transport-envelope.md) — the active decision request governing the group-transport envelope.
-- [TODO 012](../protocols/group-session.d/TODO/TODO-bisur-group-transport-envelope.md) — the active TODO tracking group-session (formerly group-transport) envelope work.
-- [TODO 013](../protocols/wire-lab.d/TODO/TODO-motof-transports-carveout.md) — the carve-out TODO that performed the `channels/` → `transports/` rename and the spec carve-out.
+- [TODO-bisur](../protocols/group-session.d/TODO/TODO-bisur-group-transport-envelope.md) — the active TODO tracking group-session (formerly group-transport) envelope work.
+- [TODO-motof](../protocols/wire-lab.d/TODO/TODO-motof-transports-carveout.md) — the carve-out TODO that performed the `channels/` → `transports/` rename and the spec carve-out.

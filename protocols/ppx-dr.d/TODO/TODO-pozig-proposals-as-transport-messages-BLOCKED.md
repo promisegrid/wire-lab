@@ -1,4 +1,4 @@
-# TODO 016 — proposals as transport messages — BLOCKED
+# TODO-pozig — proposals as transport messages — BLOCKED
 
 ## Prior aliases
 
@@ -32,7 +32,7 @@ every wire artifact is a message in some transport.
 
 ## Prerequisites (all four must land first)
 
-1. **TODO 014 — protocols-as-simulated-repos migration.**
+1. **TODO-vuhuj — protocols-as-simulated-repos migration.**
    `protocols/` must exist as the canonical location for protocol
    specs before this TODO has anywhere to point its pCIDs at.
 
@@ -41,7 +41,7 @@ every wire artifact is a message in some transport.
    `protocols/udp-binding.d/specs/udp-binding-draft.md`. The path in
    `transports/` requires a frozen binding pCID, not a draft slug.
    This depends on:
-   - TODO 018 (UDP-binding v0 reference implementation) landing
+   - TODO-jodon (UDP-binding v0 reference implementation) landing
    - The freeze ceremony itself being decided (OQ-29.1, currently
      deferred pending Steve's answers on doc-centric vs repo-centric
      and on spec-doc-self-sufficiency)
@@ -99,7 +99,7 @@ Until all four prerequisites land, this TODO is not actionable.
    it migrates to a more appropriate path or stays under a renamed
    parent.
 
-## Out of scope for TODO 016
+## Out of scope for TODO-pozig
 
 - Drafting the ppx-dr message-protocol spec (that is a prerequisite,
   to be filed as its own TODO when it becomes the next-actionable
@@ -125,13 +125,13 @@ Until all four prerequisites land, this TODO is not actionable.
 Per OQ-100.4 (numbering wrap, stable integers across centuries) and
 TE-titur (drafting-time anchoring of TE/TODO numbers), filing the integer
 now keeps TODO numbering stable in fact, not just in promise. A
-future contributor finding TODO 016 referenced from TE-vipir prose
+future contributor finding TODO-pozig referenced from TE-vipir prose
 should land here and find a clear "blocked, why, what unblocks it,
 what to do" record, rather than a missing file or an integer gap.
 
 ## Provenance
 
 - TE-vipir first-drafted at 2026-05-01 21:50:27 UTC.
-- TODO 016 filed as BLOCKED stub at 2026-05-01 22:58 UTC (same
+- TODO-pozig filed as BLOCKED stub at 2026-05-01 22:58 UTC (same
   session).
 - Will be reactivated when all four prerequisites land.

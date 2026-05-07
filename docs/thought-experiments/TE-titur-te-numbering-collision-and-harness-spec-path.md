@@ -22,7 +22,7 @@ decided, refined
 When `origin/stevegt/channels-grid-pcid` is reconciled with `ppx/main`, two surface conflicts arise that are not really about channels at all but about repo conventions. They are joined here because the same merge will resolve both, and they should be settled together so we have a single record:
 
 1. The channels branch labels its TE as **TE-nibar**, but `ppx/main` already has a different TE-nibar (`docs/thought-experiments/TE-nibar-spec-doc-as-promise.md`). One of them has to be renumbered.
-2. The channels branch edits a top-level `harness-spec.md`, but on `ppx/main` the spec was renamed to `specs/harness-spec-draft.md` during the genesis-freeze work in TODO 011. The patch cannot apply cleanly without translation.
+2. The channels branch edits a top-level `harness-spec.md`, but on `ppx/main` the spec was renamed to `specs/harness-spec-draft.md` during the genesis-freeze work in TODO-nivus. The patch cannot apply cleanly without translation.
 
 In addition, the channels branch adds an "Open Question #19" at the bottom of the harness-spec, and that bullet must end up at the correct slot in the renamed file.
 
@@ -31,7 +31,7 @@ In addition, the channels branch adds an "Open Question #19" at the bottom of th
 - The TE numbering convention is recorded in `docs/thought-experiments/README.md`: "The TE numbers (TE-famar, TE-jovoj, …) are stable identifiers used in the harness-spec; the timestamp slug is what makes the file content-addressable and chronologically sortable on disk."
 - The "first drafted" timestamp is the integer-anchoring fact. Two TEs first drafted at different moments cannot share an integer.
 - Once a TE integer has appeared in `ppx/main` and been merged through, it is sticky for that TE: renumbering a TE that already exists in committed history is more disruptive than renumbering a TE that is still confined to a working branch.
-- The genesis-freeze rename of `harness-spec.md` to `specs/harness-spec-draft.md` is locked as of TODO 011, with the bot-frozen pCID `bafkreigtaivld55rekcswfj26mo26e267m3ytzgflqb2qcclyiicpfzc6i`.
+- The genesis-freeze rename of `harness-spec.md` to `specs/harness-spec-draft.md` is locked as of TODO-nivus, with the bot-frozen pCID `bafkreigtaivld55rekcswfj26mo26e267m3ytzgflqb2qcclyiicpfzc6i`.
 - The channels branch was forked from `aabfa52` (the Apr 29 review-merged tip on `main`), which predates both the rename and TEs 21, 22, and 23.
 - The bot owns the integration work on `ppx/main`; Steve owns the eventual merge into `main`.
 - Renumbering only changes the integer label and references to it; it does not require renaming the timestamped file (which is the actual content-address anchor).
@@ -59,13 +59,13 @@ By drafting time, the channel-carrier TE is **earlier** than this TE and would n
 The TE titled "Spec doc as promise" remains TE-nibar. The channel-carrier TE is renumbered to its drafting-time-correct position.
 
 - **Easier**: no rewrites of any committed `ppx/main` history; the spec's TE-index keeps its existing 21. The channel-carrier branch is the one with rewrites, but the only changes are the integer label, the in-spec bullet, and the TE-index row. The timestamped filename does not change. Editing one branch is cheaper than editing many committed-and-merged commits across both branches.
-- **Harder**: requires touching the channel-carrier branch's TE doc, harness-spec patch, TODO 009 file, DR-009 file, and DI-009 entry to substitute the correct integer. None of these are large edits, but they must all be consistent before the channels branch merges into `ppx/main`.
+- **Harder**: requires touching the channel-carrier branch's TE doc, harness-spec patch, TODO-golad file, DR-009 file, and DI-009 entry to substitute the correct integer. None of these are large edits, but they must all be consistent before the channels branch merges into `ppx/main`.
 
 #### Alt-1.B: The channel-carrier TE keeps TE-nibar
 
 The channel-carrier TE remains TE-nibar. The spec-doc-as-promise TE on `ppx/main` is renumbered.
 
-- **Easier**: the channel-carrier branch already references TE-nibar in five files (TE itself, harness-spec patch, DR-009, DI-009, TODO 009, and channels/README.md). Leaving those alone means fewer edits on that branch.
+- **Easier**: the channel-carrier branch already references TE-nibar in five files (TE itself, harness-spec patch, DR-009, DI-009, TODO-golad, and channels/README.md). Leaving those alone means fewer edits on that branch.
 - **Harder**: TE-nibar ("Spec doc as promise") is referenced not just in `docs/thought-experiments/README.md` but in committed harness-spec text, TE-rujak, TE-lozip, and the framing essay. Renumbering it would require rewriting several merged commits or carrying a forward-referencing patch into a new merge commit. It also breaks the "first-drafted-timestamp anchors the integer" invariant by giving a younger TE the older integer.
 
 #### Alt-1.C: Both TEs keep TE-nibar, distinguished only by timestamp slug
@@ -293,5 +293,5 @@ See TE-mumuv (TE-39) for the full gameout, the eight locked decisions, and the e
 ## Implications for follow-on work
 
 - After this TE lands, the next bot work item is to translate `f9dfd1e Record Channel Carrier V0` from `origin/stevegt/channels-grid-pcid` onto a `ppx/` integration twig with the integer renumbered (TE-nibar → TE-hogus), the spec edit retargeted to `specs/harness-spec-draft.md`, the TE-index row updated, the open-question integer set, and the open-question text scoped to repo-local. Then the bot can begin actual channel work.
-- TODO 011 and the `tools/spec` workflow stay unchanged. The spec on `ppx/main` will be re-frozen once the channel-carrier change is integrated, producing a new pCID for the post-channels spec.
+- TODO-nivus and the `tools/spec` workflow stay unchanged. The spec on `ppx/main` will be re-frozen once the channel-carrier change is integrated, producing a new pCID for the post-channels spec.
 - A follow-on TE (TE-zalut or later) may be needed if Steve's eventual merge into `main` lands a meaningfully different version of the channel-carrier text.
