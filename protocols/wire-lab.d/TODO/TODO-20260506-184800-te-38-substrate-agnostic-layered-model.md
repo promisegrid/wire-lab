@@ -101,9 +101,22 @@ resulting product is committed and pushed.
     opened: 2026-05-06 22:58 UTC
     asked of: stevegt@t7a.org
     blocks: TE-38 -- whether the path scheme needs an L6 level or stays 5-deep
-    alternatives: Alt-M.1 (L6 implicit; messages are leaf chunks) / Alt-M.2 (explicit L6 path level, 6-deep paths) / Alt-M.3 (cas/ subtree + pointer files, with Alt-M.1 as migration path)
-    recommendation: Alt-M.3 long-term, Alt-M.1 today
-    note: 2026-05-06 -- explanation of all three alternatives delivered to Steve at 15:08 PT on his request; question stands open pending answer.
+    alternatives: Alt-M.1 (L6 implicit; messages are leaf chunks) / Alt-M.2 (explicit L6 path level, 6-deep paths) / Alt-M.3 (cas/ subtree + pointer files, with Alt-M.1 as migration path) / Alt-M.4 (cas/ subtree, all messages are CBOR pointers, no exceptions -- bot recommendation revised)
+    recommendation: Alt-M.4 -- per Steve's 2026-05-06 17:54 PT note 'all
+                    chunks should go into CAS; exceptions make it
+                    complicated', the small-message-is-leaf exception in
+                    Alt-M.1 / Alt-M.3 is dropped. Every message file in
+                    transports/ is unconditionally a CBOR pointer file
+                    {cas: <cas-protocol-pCID>, root: <chunk-cid>}; every
+                    chunk lives in cas/<cas-protocol-pCID>/<chunk-cid>.
+                    Today's inline-message files (transports/wire-lab-
+                    devs-draft/ and similar) are migrated to pointer
+                    form when the first L6 CAS spec lands (likely
+                    TE-43 promisebase adoption).
+    note: 2026-05-06 -- Alt-M explanation delivered at 15:08 PT;
+          Steve flagged the small/large asymmetry at 17:54 PT;
+          Alt-M.4 added with revised recommendation pending Steve's
+          confirmation.
 
 - [x] **Q-22.7** OPEN-THREADS.md migration scope: which deprecation shape?
     opened: 2026-05-06 23:08 UTC
