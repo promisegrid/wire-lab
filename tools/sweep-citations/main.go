@@ -205,19 +205,20 @@ func shouldSkipDir(path, root string) bool {
 func shouldSkipFile(rel string) bool {
 	bn := filepath.Base(rel)
 	switch {
-	case strings.HasPrefix(bn, "pre18-audit-report-"),
-		strings.HasPrefix(bn, "pre149-audit-report-"),
-		strings.HasPrefix(bn, "dropped-thread-disposition-"),
-		strings.HasPrefix(bn, "harness-spec-bafk"):
+	// Skip pcid-pinned spec snapshots (filename embeds CID; rewriting it
+	// would invalidate the snapshot's own pcid).
+	case strings.HasPrefix(bn, "harness-spec-bafk"):
 		return true
 	}
-	// Self-declared append-only files (per their own frontmatter/forward
-	// pointer). TODO-lilar declares: "this file is append-only history and
-	// is not retroactively rewritten" (forward pointer added 2026-05-06).
-	switch filepath.Base(rel) {
-	case "TODO-lilar-session-replay-cleanup.md":
-		return true
-	}
+	// NOTE on frozen-history files: pre18-audit-report-*, pre149-audit-report-*,
+	// dropped-thread-disposition-*, and TODO-lilar-session-replay-cleanup.md
+	// each carry a self-declared "do not edit / append-only history" rule.
+	// Per Steve's 2026-05-07 ruling, that rule was about authoring discipline
+	// (do not backdate UT walk-notes; append corrections instead) -- not about
+	// freezing citation tokens against mechanical Cat-2 renames. The TE-39
+	// proquint sweep rewrites only citation tokens (integer alias, timestamp
+	// alias, link basenames); walk-note prose and UT entries are untouched
+	// because they contain no such tokens. These files are now in scope.
 	// Index files are rebuilt in chunk D, not swept here.
 	switch rel {
 	case "docs/thought-experiments/README.md",

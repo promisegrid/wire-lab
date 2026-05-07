@@ -4,9 +4,9 @@
 > **Status:** Reference document. Audit performed 2026-05-05 to address Steve's
 > concern about lost threads from compressed context in the period before turn
 > 149. Five drops identified (DT-1 through DT-5); each is captured as a
-> `UT-pre149.dtN` entry in `TODO-20260504-170746-session-replay-cleanup.md`
+> `UT-pre149.dtN` entry in `TODO-lilar-session-replay-cleanup.md`
 > with cross-reference to this report for full detail. This document is the
-> primary source for the meta-observations (TE-28 slot collision pattern;
+> primary source for the meta-observations (TE-dajot slot collision pattern;
 > AGENTS edit freeze spillover) that would lose narrative coherence if
 > inlined into the ledger.
 >
@@ -20,7 +20,7 @@
 **Scope:** Conversation turns 18-148 (approximately 7,200 lines of conversation.md)  
 **Sources consulted:**
 - `past_session_contexts/sessions/2026-05-04_2026-05-10/ea135ce8/conversation.md` (turns 18-148)
-- `wire-lab/protocols/wire-lab.d/TODO/TODO-20260504-170746-session-replay-cleanup.md` (UT-* ledger)
+- `wire-lab/protocols/wire-lab.d/TODO/TODO-lilar-session-replay-cleanup.md` (UT-* ledger)
 - Git log spanning 2026-04-28 through 2026-05-03 (93 commits)
 - Corpus snapshot (all committed TE, DI, DR, TODO, spec files at end of session)
 
@@ -47,7 +47,7 @@ Conservatism rule applied: if a thread is even partially captured in a TE's ## R
 | WRITTEN       | ~95 turns         |
 | CONVERSATIONAL| ~35 turns         |
 | DROPPED       | 5 threads         |
-| PARKED        | 0 (TE-36 twig is turns 149+, out of scope) |
+| PARKED        | 0 (TE-havib twig is turns 149+, out of scope) |
 | REVERTED      | 0                 |
 
 Total accounted: ~135 turns across 148-18+1 = 131 turns. (Some turns contribute multiple threads; a few turns are pure plumbing with no new content.)
@@ -72,35 +72,35 @@ after the ASCII-only cleanup) is acknowledged in that same section. Not a droppe
 thread.
 
 **Turn 39 -- pCID = protocol CID, not promise CID**
-Captured in AGENTS-ppx.md Glossary. Also appears in TE-22, TE-23, harness-spec
+Captured in AGENTS-ppx.md Glossary. Also appears in TE-rujak, TE-lozip, harness-spec
 preamble.
 
 **Turn 39 -- "discrepancy" not "defect"**
-Captured in TE-17, harness-spec sec.10a, AGENTS-ppx.md vocabulary rules.
+Captured in TE-mirah, harness-spec sec.10a, AGENTS-ppx.md vocabulary rules.
 
 **Turn 41 -- "I promise that..." claim wording**
-Captured in TE-17 (review reply as promise), DI-009 (group-session spec), and
+Captured in TE-mirah (review reply as promise), DI-009 (group-session spec), and
 harness-spec sec.10a. The basic first-person promise form is WRITTEN.
 
 **Turn 42 -- Promises as assertions of state (past/present/future)**
-Captured in TE-21 (spec-doc-as-promise), TE-22 (spec-doc-store), TE-23
+Captured in TE-nibar (spec-doc-as-promise), TE-rujak (spec-doc-store), TE-lozip
 (congruence-convergence), harness-spec sec.2. The foundational past/present/future
 tense framing is WRITTEN.
 
 **Turns 44-46 -- "assertion/assert" not "burden/claim"**
-Committed at 218a00e in the eradicate-burden twig. Harness-spec and TE-17 both
+Committed at 218a00e in the eradicate-burden twig. Harness-spec and TE-mirah both
 use assertion vocabulary.
 
 **Turn 50 -- Merge own branches to ppx/main, delete branch after merge**
 Captured in AGENTS-ppx.md ppx/main lifecycle section.
 
-**Turns 54-62 -- harness-spec as protocol doc, TE-21/22/23 cluster**
-All committed: TE-21 at dd69e3a area, TE-22, TE-23. Freeze ceremony (Alt-G
-simrepo CHANGELOG approach) resolved by TE-31. CID computation tooling (DF-22.2
+**Turns 54-62 -- harness-spec as protocol doc, TE-nibar/22/23 cluster**
+All committed: TE-nibar at dd69e3a area, TE-rujak, TE-lozip. Freeze ceremony (Alt-G
+simrepo CHANGELOG approach) resolved by TE-zukug. CID computation tooling (DF-22.2
 Go with go-cid, DF-22.5 freezer+checker same binary) captured in DI-011.
 
 **Turn 66 -- hCID/fCID decision (per-protocol internal naming)**
-Captured in TE-23 DF-23.2 Alt-2.B: names are protocol-internal. Not a dropped
+Captured in TE-lozip DF-23.2 Alt-2.B: names are protocol-internal. Not a dropped
 thread.
 
 **Turns 68-72 -- congruence/convergence essay**
@@ -108,37 +108,37 @@ Committed at d784057. Essay at docs/essays/congruence-convergence-and-the-grid.m
 
 **Turns 82-101 -- channels->transports rename, Parents header, DAG message graph,
 topology axes, T1.A/T2.A/T3.B/T4.A/Q1.A decisions**
-Entire cluster committed. TE-24 (numbering), TE-25 (numbering collision), TE-26
-(transport types, committed with in-place rewrite), TE-27 (rename and axes,
+Entire cluster committed. TE-hogus (numbering), TE-titur (numbering collision), TE-zalut
+(transport types, committed with in-place rewrite), TE-junil (rename and axes,
 committed at 5115f12). Decisions T1.A (Parents header), T2.A (space-separated),
 T3.B (optional), T4.A (only), Q1.A (drop Kind), Q2 (cumulative-ack deferred to
-OQ-100.3) all in DI-009 in TODO-20260501-045543 and group-session-draft spec.
+OQ-100.3) all in DI-009 in TODO-bisur and group-session-draft spec.
 
 **Turn 78 -- ASCII-only commit messages**
 Locked in AGENTS-ppx.md "Things that are forbidden."
 
 **Turns 107-120 -- protocols/ directory as simrepos, transports/{t-pcid}/{msg-pcid}
 layering, UDP-binding binding layer, ns-3 simulation tooling**
-Captured in TE-29 (committed d4c82fc), TODO 018 (UDP-binding implementation),
+Captured in TE-vipir (committed d4c82fc), TODO 018 (UDP-binding implementation),
 TODO 019 (ns-3 harness scaffold, committed 18cc0f9).
 
-**Turns 122-135 -- per-protocol TODO numbering, TE-30/31/32/33 cluster**
-All committed. TE-30 (renumbering, 9d037fc), TE-31 (spec-doc inversion, c95c112),
-TE-32 (spec vs implementation split, 1522e5e), TE-33 (informative references,
-e5f3c6a). OQ-100.3 (cumulative-ack) carried to TE-28 and deferred notes in
+**Turns 122-135 -- per-protocol TODO numbering, TE-magup/31/32/33 cluster**
+All committed. TE-magup (renumbering, 9d037fc), TE-zukug (spec-doc inversion, c95c112),
+TE-liviv (spec vs implementation split, 1522e5e), TE-potar (informative references,
+e5f3c6a). OQ-100.3 (cumulative-ack) carried to TE-dajot and deferred notes in
 TODO-013.
 
 **Turns 139-148 -- TE editing policy, holistic corpus reading, tabletop TE**
-TE-34 committed at d841526, TE-35 committed at 6be8ea0. Three DIs locked
+TE-dabol committed at d841526, TE-vudaf committed at 6be8ea0. Three DIs locked
 (DI-020-20260502-213103/-213104/-213105). TODO 020 filed with subtasks including
 020.9 (the Alice/Bob/Carol tabletop scenario list). AGENTS edits explicitly HELD
 pending 020.9 outcome (turn 143-144 choice A).
 
 **Turn 111 -- 100-year goal**
-TE-28 filed as TE-20260501-202713-100-year-goal-as-design-constraint.md.
+TE-dajot filed as TE-dajot-100-year-goal-as-design-constraint.md.
 
 **Turn 129-130 -- spec-CID in simrepo CHANGELOG (Alt-G, OQ-29.1 resolved)**
-TE-31 closes OQ-29.1 with the CHANGELOG inversion approach.
+TE-zukug closes OQ-29.1 with the CHANGELOG inversion approach.
 
 ---
 
@@ -163,8 +163,8 @@ when it's time, is one discourse-protocol spec document, prose-first, as if it's
 RFC. One spec, one (eventual) pCID."
 
 **What was captured.** The basic "I promise that I..." first-person form is WRITTEN
-in TE-17 and harness-spec sec.10a. Mentions of past/present/future tense framing appear
-in TE-21 and TE-23 (in the context of spec-doc temporal shape, not the six-field claim
+in TE-mirah and harness-spec sec.10a. Mentions of past/present/future tense framing appear
+in TE-nibar and TE-lozip (in the context of spec-doc temporal shape, not the six-field claim
 form). The harness-spec sec.10a.2 names endorse-v1 / contest-v1 / counter-propose-v1 as
 pCIDs but does not structure them around the six-field claim form.
 
@@ -172,32 +172,32 @@ pCIDs but does not structure them around the six-field claim form.
 or TODO. The commitment to "eventually write one prose-first discourse-protocol spec
 document" was made but was never filed as a backlog item. No UT-* entry exists.
 
-**Recommended action.** Add to the TE-36 unpark checklist or create a standalone
+**Recommended action.** Add to the TE-havib unpark checklist or create a standalone
 TODO: "Discourse protocol RFC spec: single prose-first document covering the six-field
 claim form (promiser / tense / state / condition / evidence / assessability) as a
 formal protocol with a pCID. Predecessor to the endorse/contest/counter-propose
-vocabulary currently in harness-spec sec.10a." Cross-reference: TE-36 DF-36.4
+vocabulary currently in harness-spec sec.10a." Cross-reference: TE-havib DF-36.4
 (discourse vocabulary home) was supposed to address where this vocabulary lives, but
 DF-36.4 is still unlocked on the parked twig (UT-TE36-PARKED, UT-160.d).
 
 ---
 
-### DT-2: Layer-pertinence indexing TE (proposed as TE-28, displaced)
+### DT-2: Layer-pertinence indexing TE (proposed as TE-dajot, displaced)
 
 **Turns:** 105-106  
-**Status:** DROPPED -- no TE filed, no UT-* entry, only partial mitigation in TE-29 layout.
+**Status:** DROPPED -- no TE filed, no UT-* entry, only partial mitigation in TE-vipir layout.
 
 **What was discussed.** Turn 105 (Steve): "I'm starting to wonder if we need to
 somehow tag, index, or move the various TE, DR, DI, TODO etc. files according to
-which protocol (pCID) they pertain to." The bot caught the concrete trigger: TE-24
-had just been discovered to be layer-ambiguous. Bot proposed "Spawn a TE: TE-28
+which protocol (pCID) they pertain to." The bot caught the concrete trigger: TE-hogus
+had just been discovered to be layer-ambiguous. Bot proposed "Spawn a TE: TE-dajot
 (anticipated): Indexing TE/DR/DI/TODO files by layer and protocol-pertinence." The
 proposal included YAML frontmatter / docs/INDEX.md / "pertains-to" tagging as
 candidate mechanisms.
 
 **What happened instead.** Turn 107 shows Steve switching to critique of the
-protocols/ tree layout. Turn 111 permanently claimed TE-28 as the 100-year goal TE.
-The protocols-as-simrepos layout (TE-29) addresses the concern partially: per-protocol
+protocols/ tree layout. Turn 111 permanently claimed TE-dajot as the 100-year goal TE.
+The protocols-as-simrepos layout (TE-vipir) addresses the concern partially: per-protocol
 .d/ directories (wire-lab.d/TE/, wire-lab.d/DR/, etc.) provide natural containment of
 TEs by protocol. But the explicit YAML frontmatter / docs/INDEX.md / cross-protocol
 pertinence-tagging idea was never written as a TE or TODO.
@@ -206,7 +206,7 @@ pertinence-tagging idea was never written as a TE or TODO.
 original concern, or whether a cross-protocol index is still needed, was never formally
 settled. No UT-* entry.
 
-**Recommended action.** Evaluate whether TE-29's per-protocol .d/ layout closes the
+**Recommended action.** Evaluate whether TE-vipir's per-protocol .d/ layout closes the
 concern. If yes, file a DI noting the resolution. If not, file a TE for "cross-protocol
 TE/DR/DI pertinence tagging and indexing discipline."
 
@@ -214,30 +214,30 @@ TE/DR/DI pertinence tagging and indexing discipline."
 
 ### DT-3: Transport-protocol migration semantics TE
 
-**Turns:** 87, 95, TE-27 anticipated work section  
-**Status:** DROPPED -- anticipated as TE-28 in TE-27; slot displaced; no replacement filed; no UT-* entry.
+**Turns:** 87, 95, TE-junil anticipated work section  
+**Status:** DROPPED -- anticipated as TE-dajot in TE-junil; slot displaced; no replacement filed; no UT-* entry.
 
 **What was discussed.** Turn 87: "Migration between transport-protocol-pCIDs is
 closing one transport and opening a new one... a real commitment with operational
-implications." TE-27 (committed 5115f12) explicitly named an anticipated follow-on at
-S7: "This question is non-trivial and TE-27 does not lock answers to it. It is deferred
-to a future TE on transport-protocol migration semantics" and listed it as "TE-28
+implications." TE-junil (committed 5115f12) explicitly named an anticipated follow-on at
+S7: "This question is non-trivial and TE-junil does not lock answers to it. It is deferred
+to a future TE on transport-protocol migration semantics" and listed it as "TE-dajot
 (anticipated): transport-protocol migration semantics -- what does it mean for a group
 of participants to move from one transport-protocol-pCID to another?"
 
-**What happened instead.** TE-28 was claimed by the 100-year goal (turn 111).
-TE-29 (protocols-as-simrepos) became the next numbered TE. TE-27's S7 open question
+**What happened instead.** TE-dajot was claimed by the 100-year goal (turn 111).
+TE-vipir (protocols-as-simrepos) became the next numbered TE. TE-junil's S7 open question
 now points at a numbered slot that holds unrelated content. OQ-100.1 and OQ-100.2 in
-TE-28 (100-year) touch adjacent forking questions but do not answer S7 (what does
+TE-dajot (100-year) touch adjacent forking questions but do not answer S7 (what does
 migration mean operationally for participants already using a transport-protocol-pCID).
 
 **What is missing.** The S7 question is open. No TE has been filed. No TODO or UT-*
-entry tracks it. TE-27's anticipated-work pointer is stale.
+entry tracks it. TE-junil's anticipated-work pointer is stale.
 
 **Recommended action.** File a new anticipated TE entry (the next available number
-in the TE sequence is above TE-35) for transport-protocol migration semantics. Update
-TE-27 S7's "deferred to TE-28" note to point at the new anticipated number. Cross-
-reference: TE-28 OQ-100.1 (protocol forking) and OQ-100.2 (signing migration) are
+in the TE sequence is above TE-vudaf) for transport-protocol migration semantics. Update
+TE-junil S7's "deferred to TE-dajot" note to point at the new anticipated number. Cross-
+reference: TE-dajot OQ-100.1 (protocol forking) and OQ-100.2 (signing migration) are
 adjacent topics that may merge into the same TE.
 
 ---
@@ -255,7 +255,7 @@ design rule with real implications for how the ledger counts interactions and co
 trust scores.
 
 **What was captured.** The basic conditional promise framing appears in harness-spec
-sec.2 and TE-21/TE-22 in the sense that promises can be future-tense and conditional.
+sec.2 and TE-nibar/TE-rujak in the sense that promises can be future-tense and conditional.
 However, the specific rule that unfired conditionals are unassessed (neither kept nor
 broken, no ledger movement) is not present in any committed document.
 
@@ -270,7 +270,7 @@ case, and how break-witnesses interact with unfired conditionals. None of this i
 written. No UT-* entry.
 
 **Recommended action.** File as a DI candidate against harness-spec sec.2.2 or as an
-OQ in TE-21/TE-22 (via Cat-3 Refinements per the locked TE-34 policy). The rule is:
+OQ in TE-nibar/TE-rujak (via Cat-3 Refinements per the locked TE-dabol policy). The rule is:
 "A conditional promise whose triggering condition never fires is unassessed: the
 promiser's kept and broken counts do not change; the promise remains in open_promises
 until the condition's evaluation deadline passes, at which point it is removed without
@@ -281,7 +281,7 @@ ledger movement." This needs a DF before locking.
 ### DT-5: Alice/Bob/Carol/Dave/Ellen/Frank convention in AGENTS-ppx.md
 
 **Turns:** 145, 148  
-**Status:** DROPPED from AGENTS-ppx.md specifically. Convention is implemented in TE-35
+**Status:** DROPPED from AGENTS-ppx.md specifically. Convention is implemented in TE-vudaf
 but not enshrined in standing rules for future bot sessions. Minor; not a design
 decision.
 
@@ -289,18 +289,18 @@ decision.
 characters in TEs when characters are needed or useful." The bot acknowledged this
 as a going-forward rule: "Saved. Going forward, TE tabletops on this repo use Alice /
 Bob / Carol / Dave / Ellen / Frank / Grace / Heidi / Ivan / Judy / etc. for cooperative
-actors, with Mallory reserved for adversaries." TE-35 (committed 6be8ea0) correctly
+actors, with Mallory reserved for adversaries." TE-vudaf (committed 6be8ea0) correctly
 implements this convention in its scenario actors section (line 27: "Actors in the
 tabletop follow the cryptography-literature alphabetical convention").
 
 **What is missing.** AGENTS-ppx.md does not contain this convention. The bot said
-"Going forward" -- implying a standing rule -- but the AGENTS edits for TE-34 policy
+"Going forward" -- implying a standing rule -- but the AGENTS edits for TE-dabol policy
 were explicitly held (turn 143-144 choice A), and the Alice/Bob rule was never
 separately committed to AGENTS-ppx.md as its own change. A future bot session
 will not see this rule in AGENTS-ppx.md.
 
 **Why this was held.** The AGENTS edit freeze from turn 143-144 was specifically
-for the TE-34 editing policy rules; the Alice/Bob convention is independent and
+for the TE-dabol editing policy rules; the Alice/Bob convention is independent and
 would not have been blocked by that freeze. It was simply not committed separately.
 
 **Recommended action.** Add one bullet to AGENTS-ppx.md "Conventions" or
@@ -319,12 +319,12 @@ CONVERSATIONAL. Steve asked whether the bot could simulate multiple peer agents 
 a session. The bot answered descriptively. No design decision was made.
 
 **Turn 55 -- "pCIDs change when uncertainty changes"**
-WRITTEN. Captured in TE-21's spec-doc-as-promise framing: the pCID hash over the
+WRITTEN. Captured in TE-nibar's spec-doc-as-promise framing: the pCID hash over the
 spec content means any change to the spec produces a new pCID. The conceptual point
 is encoded in the freeze machinery.
 
 **Turn 66 -- Freeze ceremony deep-dive (chicken-and-egg)**
-WRITTEN at the decision level. TE-31 closes OQ-29.1 with Alt-G (simrepo CHANGELOG
+WRITTEN at the decision level. TE-zukug closes OQ-29.1 with Alt-G (simrepo CHANGELOG
 approach). The multi-alternative analysis was only in conversation, but the decision
 is captured.
 
@@ -332,15 +332,15 @@ is captured.
 CONVERSATIONAL clarification about tooling. No design decision.
 
 **Turns 99-101 -- Cumulative-prefix ack (Q2)**
-WRITTEN as a deferral. OQ-100.3 in TE-28 (100-year) and a deferred note in TODO-013.
+WRITTEN as a deferral. OQ-100.3 in TE-dajot (100-year) and a deferred note in TODO-013.
 The decision was to defer, and the deferral is recorded.
 
 **Turn 113 -- "Proposals should move into transports"**
-WRITTEN. Captured in TODO 016 (BLOCKED) and TE-29 (ppx-dr as simulated protocol
+WRITTEN. Captured in TODO 016 (BLOCKED) and TE-vipir (ppx-dr as simulated protocol
 under the protocols/ layout). The proposal is tracked.
 
 **Turn 110 -- git commit hash in spec doc before computing pCID**
-WRITTEN at the decision level by TE-31 Alt-G (CHANGELOG inversion). The
+WRITTEN at the decision level by TE-zukug Alt-G (CHANGELOG inversion). The
 multi-alternative freeze ceremony analysis was conversational, but the chosen
 alternative is recorded.
 
@@ -353,24 +353,24 @@ starting at turn 154 and walks forward from there. It has zero entries covering
 turns 18-148. The present audit is the first systematic coverage of that range.
 If the ledger is later extended backward, this report should be the primary source.
 
-**TE-28 slot collision caused two dropped threads (DT-2 and DT-3).** Both the
+**TE-dajot slot collision caused two dropped threads (DT-2 and DT-3).** Both the
 layer-pertinence indexing TE and the transport migration TE were anticipated as
-TE-28 before that slot was claimed by the 100-year goal. When a numbered slot is
+TE-dajot before that slot was claimed by the 100-year goal. When a numbered slot is
 claimed by a different topic, anticipated follow-ons pointing at that slot are
 silently orphaned. Recommendation: when a numbered slot is reassigned, the prior
 anticipation references should be updated in the same commit (Cat-3 Refinement on the
 TEs that contained the stale anticipated-TE pointers).
 
 **AGENTS edit freeze spillover (DT-5).** The decision in turn 143-144 to hold
-all AGENTS edits pending the 020.9 tabletop TE was correct for the TE-34 editing
+all AGENTS edits pending the 020.9 tabletop TE was correct for the TE-dabol editing
 policy rules. However, it inadvertently captured an independent unrelated rule
 (Alice/Bob/Carol convention) in the same freeze. Independent AGENTS additions should
 be committed separately rather than bundled with policy updates under a hold.
 
-**TE-36 twig (out of scope but relevant).** The parked TE-36 twig contains DF-36.4
+**TE-havib twig (out of scope but relevant).** The parked TE-havib twig contains DF-36.4
 (discourse vocabulary home), which is the intended resolution vehicle for DT-1 (the
 discourse protocol RFC spec and six-field claim form). Resolution of DT-1 is therefore
-gated on the TE-36 unpark process (UT-TE36-PARKED in the ledger).
+gated on the TE-havib unpark process (UT-TE36-PARKED in the ledger).
 
 ---
 
@@ -378,9 +378,9 @@ gated on the TE-36 unpark process (UT-TE36-PARKED in the ledger).
 
 | ID   | Thread                                              | Turns   | Recommended action                                     |
 |------|-----------------------------------------------------|---------|--------------------------------------------------------|
-| DT-1 | Six-field tense-aware claim form + discourse RFC    | 41-43   | Add TODO; cross-ref TE-36 DF-36.4 unpark              |
-| DT-2 | Layer-pertinence indexing TE (TE-28 displaced)      | 105-106 | Evaluate TE-29 sufficiency; file TE or DI              |
-| DT-3 | Transport migration semantics TE (TE-27 S7)         | 87, 95  | File new anticipated TE; update TE-27 S7 pointer       |
+| DT-1 | Six-field tense-aware claim form + discourse RFC    | 41-43   | Add TODO; cross-ref TE-havib DF-36.4 unpark              |
+| DT-2 | Layer-pertinence indexing TE (TE-dajot displaced)      | 105-106 | Evaluate TE-vipir sufficiency; file TE or DI              |
+| DT-3 | Transport migration semantics TE (TE-junil S7)         | 87, 95  | File new anticipated TE; update TE-junil S7 pointer       |
 | DT-4 | Conditional promise / unfired conditionals rule     | 41-42   | File as OQ / DI candidate against harness-spec sec.2.2   |
 | DT-5 | Alice/Bob convention not in AGENTS-ppx.md           | 145     | One-bullet AGENTS-ppx.md edit, Cat-1, no DF needed    |
 
