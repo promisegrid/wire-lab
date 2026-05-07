@@ -55,6 +55,11 @@ Read these files in this order before doing anything else:
                                                   spec.
   8. docs/thought-experiments/README.md         — TE index and filename
                                                   convention.
+  9. tools/README.md                            — corpus-maintenance
+                                                  tools you may need to
+                                                  run yourself, with
+                                                  per-tool runbooks and
+                                                  hazard notes.
 
 Do not skip these. Subsequent instructions assume you have read them.
 
