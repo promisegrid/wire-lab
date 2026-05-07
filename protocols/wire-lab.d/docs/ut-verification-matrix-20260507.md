@@ -413,3 +413,98 @@ against the disposition memo or against TODO-lilar.
 
 Provenance: locked by user 2026-05-07; recorded as
 `DI-021-20260507-210204` in TODO-lilar.
+
+## DF-V.4 lock — Alt B (per-bundle transfer to AGENTS-ppx.md) — 2026-05-07
+
+This section is an additive amendment to the read-only pass and to the
+DF-V.2 / DF-V.3 lock subsections above. It does not flip any UT
+checkbox, does not edit any earlier section of this file, does not
+touch `dropped-thread-disposition-20260506.md` bullets, and does not
+touch TODO-lilar walk notes. Per AGENTS.md the locked decisions are
+recorded as one DI per bundle in
+`protocols/wire-lab.d/TODO/TODO-lilar-session-replay-cleanup.md`
+("Decision Intent Log"); this subsection is the docs-side reference
+back to those DIs and the per-bundle transfer-status ledger
+authorized by the DF-V.3 Alt C "matrix-as-closure-index" mechanism.
+
+**Locked decision (DF-V.4 Alt B, "per-bundle transfer to
+AGENTS-ppx.md"):** the J2 sub-class of the Carry cluster (Cluster J)
+identified by DF-V.2 Alt C is transferred to `AGENTS-ppx.md` one
+bundle at a time, with one DI in TODO-lilar per bundle. Seven bundles
+were locked in this pass, in the priority order Steve approved:
+B1 → B3 → B4 → B2 → B5 → B6 → B7. All seven bundles have a single
+named destination: `AGENTS-ppx.md`, under the new top-level section
+"Carry-J2 procedural discipline (durable cross-session rules)".
+
+**Per-bundle transfer status ledger.** Per the DF-V.3 Alt C
+mechanism, each bundle's substantive landing under its own DI is
+what marks the bundle as transferred for matrix purposes. The
+seven bundles below are recorded as transferred by this pass:
+
+| Bundle | Title | Destination | DI in TODO-lilar | Status |
+| --- | --- | --- | --- | --- |
+| B1 | Foreground authorization (separate authorization from execution) | `AGENTS-ppx.md` § "Carry-J2 procedural discipline" → "B1 — Foreground authorization (separate authorization from execution)" | `DI-021-20260507-212249` | transferred |
+| B3 | Collaborator anonymity / non-mention | `AGENTS-ppx.md` § "Carry-J2 procedural discipline" → "B3 — Collaborator anonymity / non-mention" | `DI-021-20260507-212250` | transferred |
+| B4 | PAT redaction and credential hygiene | `AGENTS-ppx.md` § "Carry-J2 procedural discipline" → "B4 — PAT redaction and credential hygiene" | `DI-021-20260507-212251` | transferred |
+| B2 | Foreground DONE confirmation | `AGENTS-ppx.md` § "Carry-J2 procedural discipline" → "B2 — Foreground DONE confirmation" | `DI-021-20260507-212252` | transferred |
+| B5 | One-DF-at-a-time discipline | `AGENTS-ppx.md` § "Carry-J2 procedural discipline" → "B5 — One-DF-at-a-time discipline" | `DI-021-20260507-212253` | transferred |
+| B6 | Apologize, audit, invalidate, propose | `AGENTS-ppx.md` § "Carry-J2 procedural discipline" → "B6 — Apologize, audit, invalidate, propose" | `DI-021-20260507-212254` | transferred |
+| B7 | Ground-truthing before citation | `AGENTS-ppx.md` § "Carry-J2 procedural discipline" → "B7 — Ground-truthing before citation" | `DI-021-20260507-212255` | transferred |
+
+**What this lock authorizes (only this; nothing more):**
+
+- The seven AGENTS-ppx.md edits enumerated above (one new top-level
+  section with seven subsections, one per bundle).
+- The seven DI entries in TODO-lilar enumerated above.
+- This subsection's own existence as the per-bundle transfer-status
+  ledger of record, parallel in shape to the DF-V.2 and DF-V.3 lock
+  subsections.
+
+**What this lock does NOT authorize:**
+
+- It does **not** flip any UT checkbox in TODO-lilar or in
+  `dropped-thread-disposition-20260506.md`. Both files remain
+  append-only history. The matrix-as-closure-index mechanism locked
+  by `DI-021-20260507-210204` (DF-V.3 Alt C) governs closure; the
+  per-bundle transfer status above is the index entry for these
+  bundles, not a closure-flavored edit to either append-only file.
+- It does **not** edit any UT bullet in
+  `dropped-thread-disposition-20260506.md`, or any walk note in
+  TODO-lilar. The disposition memo's bullet structure stays as
+  written; TODO-lilar's only edits in this pass are the seven new
+  DI entries.
+- It does **not** edit, retitle, or recount the body of this matrix
+  above this subsection. The 45-closeable / 141-not-closeable
+  summary, the per-cluster breakdown, and the "Owner and pointer
+  table" remain as recorded by the read-only Alt-V.4 pass and the
+  DF-V.2 / DF-V.3 locks.
+- It does **not** authorize per-J2-UT recount of the 55 Carry items
+  into B1–B7 buckets. The DF-V.3 Alt C "matrix-as-closure-index"
+  mechanism explicitly defers per-UT classification into each
+  Carry-rule transfer; this DF-V.4 lock records bundle-level
+  transfer status, not per-UT closure.
+- It does **not** authorize edits to AGENTS.md, AGENTS-codex.md, or
+  any per-protocol procedure file. The destination locked by Alt B
+  is `AGENTS-ppx.md` for all seven bundles.
+- It does **not** authorize back-pointers from TODO-lilar walk notes
+  or from `dropped-thread-disposition-20260506.md` to this
+  subsection. Both are append-only; the seven new DI entries in
+  TODO-lilar's Decision Intent Log are the only landed edits to
+  TODO-lilar by this pass.
+- It does **not** supersede `DI-021-20260507-204144` (DF-V.2 Alt C)
+  or `DI-021-20260507-210204` (DF-V.3 Alt C). The J1/J2 split and
+  the matrix-as-closure-index mechanism remain in force.
+
+**Outstanding DFs after this lock:**
+
+- None exposed by this DF that are required for the seven bundles
+  above to land. Per-J2-UT classification (which of the 55 Carry
+  walk-note UTs each bundle covers) remains a future verification
+  pass and is gated on the matrix-as-closure-index mechanism rather
+  than on a new DF.
+
+Provenance: locked by user 2026-05-07; recorded as
+`DI-021-20260507-212249` (B1), `DI-021-20260507-212250` (B3),
+`DI-021-20260507-212251` (B4), `DI-021-20260507-212252` (B2),
+`DI-021-20260507-212253` (B5), `DI-021-20260507-212254` (B6), and
+`DI-021-20260507-212255` (B7) in TODO-lilar.
