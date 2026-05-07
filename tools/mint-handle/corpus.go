@@ -8,20 +8,31 @@ import (
 	"strings"
 )
 
-// scanDirs are the wire-lab directories scanned for existing handles.
-// A file in any of these whose name matches handleFileRE is treated as
-// owning its handle. The corpus union of those handles is the collision
-// check set for new mints.
+// scanLiteralDirs are the wire-lab directories scanned literally for
+// existing handles. scanGlobs are glob patterns expanded against repoRoot;
+// every directory matching any glob is also scanned. A file in any scanned
+// directory whose name matches handleFileRE is treated as owning its
+// handle. The corpus union of those handles is the collision check set for
+// new mints.
 //
 // Convention-based rather than registry-based: there is no separate
 // HANDLES.md or registry file. Filenames are the ground truth. To add a
-// new artifact type that also bears handles, add its directory here.
+// new artifact type that also bears handles, add its directory (or a
+// matching glob) here.
+//
+// scanGlobs uses Go filepath.Glob semantics, which match path components
+// individually. "protocols/*/TODO" therefore matches protocols/wire-lab.d/
+// TODO, protocols/group-session.d/TODO, protocols/ppx-dr.d/TODO, etc., as
+// new protocol subtrees are added.
 //
 // See TE-39 for the lock decision and TE-vapoj (substrate-agnostic
 // layered model) for the broader rationale.
-var scanDirs = []string{
+var scanLiteralDirs = []string{
 	"docs/thought-experiments",
-	"protocols/wire-lab.d/TODO",
+}
+
+var scanGlobs = []string{
+	"protocols/*/TODO",
 }
 
 // handleFileRE matches a wire-lab handle-bearing filename and captures the
@@ -60,7 +71,21 @@ var handleFileRE = regexp.MustCompile(
 // in scanDirs rather than silently scanning nothing.
 func scanCorpus(repoRoot string) (map[string]string, error) {
 	handles := make(map[string]string)
-	for _, dir := range scanDirs {
+	dirs := append([]string(nil), scanLiteralDirs...)
+	for _, glob := range scanGlobs {
+		matches, err := filepath.Glob(filepath.Join(repoRoot, glob))
+		if err != nil {
+			return nil, fmt.Errorf("glob %s: %w", glob, err)
+		}
+		for _, m := range matches {
+			rel, err := filepath.Rel(repoRoot, m)
+			if err != nil {
+				return nil, fmt.Errorf("relpath %s: %w", m, err)
+			}
+			dirs = append(dirs, rel)
+		}
+	}
+	for _, dir := range dirs {
 		full := filepath.Join(repoRoot, dir)
 		entries, err := os.ReadDir(full)
 		if err != nil {

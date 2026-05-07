@@ -71,11 +71,19 @@ func TestMintDryRunCollidesErrors(t *testing.T) {
 	}
 }
 
+// scanDirsForTests is the combined literal-plus-glob-instantiated set used
+// by tests to pre-create the directories scanCorpus walks. The mint tool
+// itself uses scanLiteralDirs and scanGlobs.
+var scanDirsForTests = []string{
+	"docs/thought-experiments",
+	"protocols/wire-lab.d/TODO",
+}
+
 // TestScanCorpusEmpty verifies an empty repo scan returns an empty corpus
 // (not a nil-map error). This pins the "fresh repo" boundary case.
 func TestScanCorpusEmpty(t *testing.T) {
 	root := t.TempDir()
-	for _, dir := range scanDirs {
+	for _, dir := range scanDirsForTests {
 		if err := os.MkdirAll(filepath.Join(root, dir), 0o755); err != nil {
 			t.Fatal(err)
 		}
@@ -93,7 +101,7 @@ func TestScanCorpusEmpty(t *testing.T) {
 // and verifies both handles are recovered with their relative paths.
 func TestScanCorpusFindsHandles(t *testing.T) {
 	root := t.TempDir()
-	for _, dir := range scanDirs {
+	for _, dir := range scanDirsForTests {
 		if err := os.MkdirAll(filepath.Join(root, dir), 0o755); err != nil {
 			t.Fatal(err)
 		}
@@ -129,7 +137,7 @@ func TestScanCorpusFindsHandles(t *testing.T) {
 // collision check until they are renamed.
 func TestScanCorpusIgnoresLegacyFilenames(t *testing.T) {
 	root := t.TempDir()
-	for _, dir := range scanDirs {
+	for _, dir := range scanDirsForTests {
 		if err := os.MkdirAll(filepath.Join(root, dir), 0o755); err != nil {
 			t.Fatal(err)
 		}
@@ -169,7 +177,7 @@ func TestScanCorpusIgnoresLegacyFilenames(t *testing.T) {
 // handle.
 func TestScanCorpusDetectsDuplicateHandles(t *testing.T) {
 	root := t.TempDir()
-	for _, dir := range scanDirs {
+	for _, dir := range scanDirsForTests {
 		if err := os.MkdirAll(filepath.Join(root, dir), 0o755); err != nil {
 			t.Fatal(err)
 		}

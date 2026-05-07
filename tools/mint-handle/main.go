@@ -12,7 +12,7 @@
 //	     canonical width per TE-39. Use proquint-2 only if the corpus
 //	     ever grows past ~1000 entries (see Saturation Watch in TE-39).
 //	-r   repo root (default: current directory). The tool walks
-//	     scanDirs from this root to build the collision set.
+//	     scanLiteralDirs and scanGlobs from this root to build the collision set.
 //	-n   dry-run: print what would be minted without contacting the
 //	     clock multiple times. (Mostly useful for tests.)
 //	-s   override the entropy seed source. By default the seed is
@@ -41,7 +41,7 @@
 //     filename of the artifact that owns them; the filename is the
 //     registry of record. There is no central HANDLES.md.
 //   - The check is "does any tracked file already use this proquint?"
-//     This is satisfied today by globbing scanDirs for files matching
+//     This is satisfied today by walking scanLiteralDirs and scanGlobs for files matching
 //     handleFileRE. Forks diverge naturally because each fork's
 //     filename set is distinct; there is no global ICARD-style registry
 //     and no attempt to guarantee global uniqueness. The 100-year
