@@ -50,7 +50,9 @@ Drafting order (dependency-sorted):
 
 ### TE-havib follow-on: OQ-36.6 + tabletop walk (5 UTs)
 
-*OPEN-THREADS map:* new thread T-TE36-FOLLOWON to be added (OQ-36.6 deferred investigation + audit-memo-style Alice-through-Mallory tabletop walk).
+**Closed 2026-05-07 — verified-superseded under Alt-lilok.1.B.** All five UTs in this cluster were captured against the pre-Alt-B state of TE-havib. The 2026-05-05 Alt-B disposition path re-presentation locked DF-36.1, .2, .3, .7 and resolved OQ-36.6 in the negative before the cluster was filed. Verification walk at [`te-havib-followon-verification-walk-20260507.md`](../docs/te-havib-followon-verification-walk-20260507.md) confirmed all six tabletop scenarios hold against the locked state and all five UTs below are answered by the locks. The `T-TE36-FOLLOWON` open-thread placeholder is retired — do not add it.
+
+*OPEN-THREADS map:* new thread T-TE36-FOLLOWON to be added (OQ-36.6 deferred investigation + audit-memo-style Alice-through-Mallory tabletop walk). — **RETIRED 2026-05-07; do not add.**
 
 - **UT-160.b** (T160): DF-36.4 PT-recast collapsed five named pCIDs into two PT primitives, baked into Alt-4.A rather than presented as its own DF.
 - **UT-160.c** (T160): TE-havib's six tabletop scenarios used different framing than the audit memo's recommended Alice-through-Mallory walk.
