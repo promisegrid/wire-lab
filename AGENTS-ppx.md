@@ -576,7 +576,6 @@ to a private repo they have no credentials for.
   active twig in /home/user/workspace/wire-lab.
 - Layout on the orphan branch:
         README.md
-        OPEN-THREADS.md
         sessions/<session-id>/000-meta.md
         sessions/<session-id>/NNN-turn.md
   where NNN is the zero-padded turn number.
@@ -672,32 +671,26 @@ Mechanics:
      compaction, branch deletion, and orphan-branch loss because it
      lives on `ppx/main` in the wire-lab repo.
 
-This discipline supersedes the looser `OPEN-THREADS.md` end-of-turn
-rule for questions specifically: every question becomes a tracked
-TODO row at the moment of asking. `OPEN-THREADS.md` continues to
-hold longer-lived thread pointers (cross-cutting concerns, future
-TEs anticipated, etc.) that are not single questions.
+This discipline replaces the prior `OPEN-THREADS.md` mechanism
+outright. Every open question, every cross-cutting concern, every
+anticipated future TE, and every parked thread now lives in a TODO
+file under `protocols/<slug>.d/TODO/`, indexed in
+`protocols/wire-lab.d/TODO/TODO.md`. `OPEN-THREADS.md` was deleted
+from the wire-lab orphan branch on 2026-05-07; do not recreate it.
 
-## OPEN-THREADS.md discipline (required)
-
-The file `OPEN-THREADS.md` on the wire-lab orphan branch tracks open
-threads -- questions Steve asked, decisions expressed, or refactors
-implied that have not yet been committed to a file or resolved.
-
-Format: short topic-form (5-15 words), neutral tone, no quotes, no
-private context. Sensitive threads should not appear here. Each
-entry has an ID `T-YYYYMMDD-SLUG`, an opened date, and either a
-`blocking:` or `scope:` line.
-
-End-of-turn check (required): scan the turn for any unresolved
-question or expressed-but-uncommitted decision. If found, append a
-row to `OPEN-THREADS.md` under `## Open`.
-
-Resolution discipline (required): when a commit lands content that
-resolves an open thread, in the same commit cycle, mark the row
-`[x]` and append `resolved: <ISO date> @ <SHA>` to the entry. Move
-resolved entries to `## Closed` when convenient (not required
-immediately).
+Where old threads went (for readers searching git history):
+  - Per-TE threads (T-MIG-OPS, T-PROMSTACK-RETIRE-CASCADE, T-GROUP-
+    SESSION-FREEZE, T-FILENAME-CID-CASCADE, T-PROMISEBASE-ADOPTION,
+    T-WIRELAB-PROMISEBASE-MERGE, T-CONDITIONAL-RELEASE,
+    T-TE36-FOLLOWON) -> their corresponding TE parent TODO files
+    (TODO 23 through TODO 30).
+  - Anticipated future TEs (T-RING-TRANSPORT,
+    T-CLUSTER-OF-CLUSTERS-TRANSPORT, T-GOSSIP-TRANSPORT,
+    T-RECEIPTS-AT-SCALE) -> TODO 31.
+  - Cross-cutting questions (T-021-CC-Q1 through Q6) -> stay in
+    TODO 21 with their original numbering.
+  - Closed threads -> git history of the deleted OPEN-THREADS.md
+    file on the wire-lab branch of stevegt/session-logs.
 
 ## Redact-last escape hatch
 
