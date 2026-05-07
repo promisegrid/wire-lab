@@ -585,6 +585,14 @@ to a private repo they have no credentials for.
         sessions/<session-id>/000-meta.md
         sessions/<session-id>/NNN-turn.md
   where NNN is the zero-padded turn number.
+- WRONG: `turns/turn-NNN.md` or any path outside `sessions/<id>/`.
+  Prior bots drifted into a loose `turns/` layout (see
+  `wire-lab-logs/TURNOVER-20260507-2300PDT.md` for the remediation
+  trail); the `turns/` directory on the orphan branch is frozen
+  historical evidence and must not be written to. If you find
+  yourself about to write outside `sessions/<id>/`, stop and re-read
+  this section. The `wire-lab-logs` worktree carries
+  `tools/check-layout.sh`; run it before every commit.
 - Fidelity: full. Each NNN-turn.md contains the verbatim user prompt
   and the verbatim bot response, including tool calls and outputs.
 - Append-only. Each turn file is written once and never edited. The
