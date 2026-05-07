@@ -166,8 +166,9 @@ Steps:
   d. If non-trivial: follow the Decision-First flow.
      - Identify the decision being made.
      - If multiple plausible designs remain, run a TE BEFORE asking DF
-       questions. Write the TE doc to
-       `docs/thought-experiments/TE-YYYYMMDD-HHMMSS-slug.md`. The TE
+       questions. Mint a proquint handle with `tools/mint-handle` and
+       write the TE doc to
+       `docs/thought-experiments/TE-<handle>-<slug>.md`. The TE
        must explicitly model multiple scenarios — not collapse to a
        short opinion. Required content: title, TE ID, decision under
        test, assumptions, alternatives, scenario analysis, conclusions,
@@ -754,7 +755,10 @@ The bot runs this as step 3 of "First action of every session"
 # Glossary
 
 - TE  : Thought Experiment. Analysis doc.
-        Lives at `docs/thought-experiments/TE-YYYYMMDD-HHMMSS-slug.md`.
+        Lives at `docs/thought-experiments/TE-<handle>-<slug>.md` where
+        `<handle>` is a proquint minted by `tools/mint-handle` (locked
+        by TE-mumuv 2026-05-07; pre-2026-05-07 TEs carry a
+        `## Prior aliases` section with their prior integer + timestamp).
 - DR  : Decision Request. Open question / decision-tracking record.
         Lives at `DR/DR-NNN-YYYYMMDD-HHMMSS-slug.md` where NNN is the
         TODO number.

@@ -1,4 +1,30 @@
-# Thought Experiments
+#!/usr/bin/env python3
+"""write_index.py - Apply build_index output by rewriting:
+  - docs/thought-experiments/README.md  (replace existing index table + filename-convention prose)
+  - protocols/<slug>.d/TODO/TODO.md     (rebuild index + brief preamble for each protocol)
+
+This is one-shot, run from chunk D of the TE-39 (TE-mumuv) migration twig.
+"""
+import os, sys, re, importlib.util, subprocess
+
+REPO = sys.argv[1] if len(sys.argv) > 1 else "/home/user/workspace/wire-lab"
+
+# Load build_index module
+spec = importlib.util.spec_from_file_location(
+    "build_index", os.path.join(REPO, "tools/build-index/build_index.py"))
+bi = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(bi)
+bi.REPO = REPO
+bi.MAP = os.path.join(REPO, "tools/migrate-handles/mapping.tsv")
+
+# ---- Load mapping ----
+rows = bi.load_mapping()
+print(f"Loaded {len(rows)} mapping rows", file=sys.stderr)
+
+# ---- Build TE README.md ----
+te_table = bi.build_te_index(rows)
+
+new_readme = f"""# Thought Experiments
 
 Each thought experiment is a falsifiable mental run of a Wire Lab design choice. Each lives in its own file.
 
@@ -14,47 +40,7 @@ The proquint handle replaces both the integer alias (TE-1, TE-2, ...) and the ti
 
 ## Index
 
-| Handle | Mint date | Title | Prior alias |
-|---|---|---|---|
-| [TE-famar](TE-famar-promise-stack-ordering.md) | 2026-04-28 | Promise-stack ordering | `TE-1` / `TE-20260427-180000` |
-| [TE-jovoj](TE-jovoj-trust-ledger-merge-after-partition.md) | 2026-04-28 | Trust-ledger merge after partition | `TE-2` / `TE-20260427-180100` |
-| [TE-pubum](TE-pubum-currency-exchange-rate-equilibration.md) | 2026-04-28 | Currency exchange-rate equilibration | `TE-3` / `TE-20260427-180200` |
-| [TE-himug](TE-himug-sybil-under-double-auction.md) | 2026-04-28 | Sybil under double auction | `TE-4` / `TE-20260427-180300` |
-| [TE-jikaf](TE-jikaf-kernel-as-handler-vs-classical-kernel.md) | 2026-04-28 | Kernel-as-handler vs. classical kernel | `TE-5` / `TE-20260427-180400` |
-| [TE-fijub](TE-fijub-capability-token-revocation-propagation.md) | 2026-04-28 | Capability-token revocation propagation | `TE-6` / `TE-20260427-180500` |
-| [TE-kuhog](TE-kuhog-human-novice-onboarding-under-k4.md) | 2026-04-28 | Human-novice onboarding under K4 | `TE-7` / `TE-20260427-180600` |
-| [TE-sigan](TE-sigan-generational-handoff.md) | 2026-04-28 | Generational handoff | `TE-8` / `TE-20260427-180700` |
-| [TE-morid](TE-morid-two-communities-two-pcids-same-intent.md) | 2026-04-28 | Two communities, two pCIDs, same intent | `TE-9` / `TE-20260427-180800` |
-| [TE-mokut](TE-mokut-slow-mover-survival.md) | 2026-04-28 | Slow-mover survival | `TE-10` / `TE-20260427-180900` |
-| [TE-rotim](TE-rotim-ostroms-principles-audit.md) | 2026-04-28 | Ostrom's principles audit | `TE-11` / `TE-20260427-181000` |
-| [TE-muvuv](TE-muvuv-promise-stack-as-zero-knowledge-envelope.md) | 2026-04-28 | Promise-stack as zero-knowledge envelope | `TE-12` / `TE-20260427-181100` |
-| [TE-robub](TE-robub-time-traveling-break-witness.md) | 2026-04-28 | Time-traveling break-witness | `TE-13` / `TE-20260427-181200` |
-| [TE-botom](TE-botom-harness-spec-change-walks-through-unified-flow.md) | 2026-04-28 | A harness-spec change walks through the unified flow | `TE-14` / `TE-20260428-080000` |
-| [TE-dodaf](TE-dodaf-should-this-design-become-promisegrid-readme.md) | 2026-04-28 | Should this design become `promisegrid/promisegrid/README.md`? | `TE-15` / `TE-20260428-094500` |
-| [TE-lodar](TE-lodar-review-feedback-as-contest-artifact.md) | 2026-04-28 | Thought Experiment - Durable review feedback as contest artifact | `TE-16` / `TE-20260429-033208` |
-| [TE-mirah](TE-mirah-review-reply-as-promise.md) | 2026-04-29 | Thought Experiment - Review reply as promise | `TE-17` / `TE-20260429-162212` |
-| [TE-lusut](TE-lusut-bot-identity-and-branch-prefix.md) | 2026-04-29 | Bot identity and branch prefix | `TE-18` / `TE-20260429-165101` |
-| [TE-mipat](TE-mipat-branch-protection-posture.md) | 2026-04-29 | Branch-protection posture for `main` | `TE-19` / `TE-20260429-165102` |
-| [TE-tibas](TE-tibas-bot-review-style.md) | 2026-04-29 | Bot review style | `TE-20` / `TE-20260429-165103` |
-| [TE-nibar](TE-nibar-spec-doc-as-promise.md) | 2026-04-29 | Spec doc as promise | `TE-21` / `TE-20260429-173520` |
-| [TE-rujak](TE-rujak-spec-doc-store-and-pcid-machinery.md) | 2026-04-29 | Spec-doc store layout and pCID machinery | `TE-22` / `TE-20260429-175530` |
-| [TE-lozip](TE-lozip-congruence-convergence-duality-and-pcid-framing.md) | 2026-04-30 | Congruence/convergence duality and pCID framing | `TE-23` / `TE-20260430-064307` |
-| [TE-hogus](TE-hogus-group-transport-envelope.md) | 2026-05-01 | Group-transport envelope: `grid <pcid>` carrier, canonical bytes, and explicit promise body | `TE-24` / `TE-20260430-204108` |
-| [TE-titur](TE-titur-te-numbering-collision-and-harness-spec-path.md) | 2026-04-30 | Reconciling the TE-nibar numbering collision and the `harness-spec.md` path on the channels branch | `TE-25` / `TE-20260430-213447` |
-| [TE-zalut](TE-zalut-channel-transport-types-and-threaded-replies.md) | 2026-05-01 | Transport-protocol types, pCID-keyed transport paths, and DAG message graphs | `TE-26` / `TE-20260430-215624` |
-| [TE-junil](TE-junil-transports-rename-and-axes-of-differentiation.md) | 2026-05-01 | `channels/` → `transports/` rename and axes of transport-protocol differentiation | `TE-27` / `TE-20260501-021921` |
-| [TE-dajot](TE-dajot-100-year-goal-as-design-constraint.md) | 2026-05-01 | The 100-year goal as a load-bearing design constraint | `TE-28` / `TE-20260501-202713` |
-| [TE-vipir](TE-vipir-protocols-as-simulated-repos-and-binding-layer.md) | 2026-05-01 | Protocols as simulated repos, and the L4-binding layer | `TE-29` / `TE-20260501-215027` |
-| [TE-magup](TE-magup-todo-numbering-and-per-protocol-shape.md) | 2026-05-02 | TODO numbering and per-protocol TODO shape | `TE-30` / `TE-20260502-002548` |
-| [TE-zukug](TE-zukug-spec-doc-inversion-and-conformance-changelog.md) | 2026-05-02 | Spec-doc as upstream, simrepo as implementation — inverting the conformance reference | `TE-31` / `TE-20260502-004924` |
-| [TE-liviv](TE-liviv-spec-vs-implementation-split.md) | 2026-05-02 | Spec-side vs implementation-side split, and the `implementations/` top-level | `TE-32` / `TE-20260502-014525` |
-| [TE-potar](TE-potar-spec-doc-informative-references.md) | 2026-05-02 | Spec-doc Informative References to its workshop, RFC-shaped | `TE-33` / `TE-20260502-020439` |
-| [TE-dabol](TE-dabol-te-editing-policy-and-holistic-corpus.md) | 2026-05-02 | TE editing policy and the TE corpus as one document with facets | `TE-34` / `TE-20260502-212810` |
-| [TE-vudaf](TE-vudaf-editing-policy-tabletop.md) | 2026-05-02 | Tabletop simulation of the TE editing policy | `TE-35` / `TE-20260502-232651` |
-| [TE-havib](TE-havib-apparatus-vs-specimen-carve-out.md) | 2026-05-06 | Apparatus vs. specimen — carving the harness-spec apart from the wire/envelope/ledger hypotheses it studies | `TE-36` / `TE-20260503-022446` |
-| [TE-numan](TE-numan-transport-protocol-migration-semantics.md) | 2026-05-06 | Transport-protocol migration invariants | `TE-37` / `TE-20260506-041241` |
-| [TE-sihih](TE-sihih-substrate-agnostic-layered-model.md) | 2026-05-07 | Substrate-agnostic layered model (L5/L6/L7) and L6 CAS subtree | `TE-38` / `TE-20260506-184800` |
-| [TE-mumuv](TE-mumuv-naming-reconciliation.md) | 2026-05-07 | Naming reconciliation -- proquint handles for TEs and TODOs | `TE-39` (newly minted in TE-39 twig) |
+{te_table}
 
 The proquint handle is **both** the stable identifier and the display nickname. It is collision-free at mint time, fork-stable across branches (each fork mints its own handles; collisions at merge time are handled by re-minting), and short enough to use directly in prose ("per TE-titur S5"). DF / DI / DR descendant numbering still uses the handle root: DF-titur.1, DI-titur-..., DR-009 (DR has its own numbering scheme). Backward citations to integer aliases (e.g., "per TE-25 S5") remain valid; readers may consult the cited file's `## Prior aliases` section or the `Prior alias` column above to recover the integer.
 
@@ -95,3 +81,97 @@ Applicability is uniform across every TE corpus in this repository, whether the 
 - **2026-05-07.** TE-mumuv (TE-39, formerly TE-39) locks proquint handles. Migration tool `tools/migrate-handles/` renamed 38 TEs and 32 TODOs in a single commit (`85766f0`); each renamed file gained a `## Prior aliases` section. Citation sweep `tools/sweep-citations/` rewrote 1,451 references across 94 files. The integer alias (TE-N) and the timestamp alias (TE-YYYYMMDD-HHMMSS) survive only as `Prior alias` entries in this index and in each file's `## Prior aliases` section.
 - **2026-05-05.** TE-titur Cat-3 Refinement (chained on the same TE) split TE identity into a stable identifier (timestamp+slug filename) and a display nickname (integer TE-N). Superseded on 2026-05-07 by the proquint adoption above; the 2026-05-05 forward-pointer rule is reaffirmed and tightened in the 2026-05-07 Refinement.
 - **2026-04-30.** TE-titur (formerly TE-25) locked the integer-alias display-nickname convention.
+"""
+
+readme_path = os.path.join(REPO, "docs/thought-experiments/README.md")
+with open(readme_path, "w") as f:
+    f.write(new_readme)
+print(f"Wrote {readme_path}", file=sys.stderr)
+
+# ---- Build per-protocol TODO.md files ----
+# wire-lab.d/TODO/TODO.md is the MASTER CROSS-LIST showing all protocols.
+# The other three are per-protocol queues only.
+
+def build_master_crosslist(rows):
+    """wire-lab.d/TODO/TODO.md content: master with sections per protocol."""
+    out = []
+    out.append("# TODO master cross-list")
+    out.append("")
+    out.append("Master cross-listed queue per TE-magup. Lists every TODO across the")
+    out.append("wire-lab. The wire-lab harness is itself a protocol; its TODOs")
+    out.append("appear under the **wire-lab (harness)** section below alongside")
+    out.append("every other protocol's per-protocol queue.")
+    out.append("")
+    out.append("Per TE-mumuv (TE-39, locked 2026-05-07), each TODO is addressable by")
+    out.append("its proquint handle (TODO-<handle>). The integer alias (TODO-N) and")
+    out.append("the timestamp alias (TODO-YYYYMMDD-HHMMSS) survive as `Prior alias`")
+    out.append("entries here and in each file's `## Prior aliases` section. New TODOs")
+    out.append("minted after that date carry only the proquint handle.")
+    out.append("")
+    sections = [
+        ("wire-lab (harness)", "wire-lab", "./"),
+        ("group-session", "group-session", "../../group-session.d/TODO/"),
+        ("ppx-dr", "ppx-dr", "../../ppx-dr.d/TODO/"),
+        ("udp-binding", "udp-binding", "../../udp-binding.d/TODO/"),
+    ]
+    for label, slug, prefix in sections:
+        out.append(f"## {label}")
+        out.append("")
+        out.append("| Handle | Mint date | Title | Prior alias |")
+        out.append("|---|---|---|---|")
+        proto_rows = [r for r in rows if r["kind"] == "TODO"
+                      and f"protocols/{slug}.d/TODO" in r["new_path"]]
+        proto_rows.sort(key=lambda r: int(re.match(r"TODO-(\d+)", r["int_alias"]).group(1))
+                        if re.match(r"TODO-(\d+)", r["int_alias"]) else 99999)
+        for r in proto_rows:
+            handle = f"TODO-{r['handle']}"
+            new_path = r["new_path"]
+            mint = bi.git_first_date(new_path) or "(uncommitted)"
+            title = bi.title_from_file(new_path) or "(no title)"
+            ts = r.get("ts_alias", "")
+            if ts and not ts.endswith("-mint"):
+                prior = f"`{r['int_alias']}` / `{ts}`"
+            else:
+                prior = f"`{r['int_alias']}`"
+            link = prefix + os.path.basename(new_path)
+            out.append(f"| [{handle}]({link}) | {mint} | {title} | {prior} |")
+        out.append("")
+    return "\n".join(out)
+
+
+def build_per_protocol(rows, slug, label):
+    """Per-protocol TODO.md (group-session, ppx-dr, udp-binding)."""
+    out = []
+    out.append(f"# TODO queue: {slug}")
+    out.append("")
+    out.append(f"Per-protocol TODO queue (per TE-magup). Items in this file touch")
+    out.append(f"only files under `protocols/{slug}.d/`. Anything broader is")
+    out.append("harness-level and lives at `protocols/wire-lab.d/TODO/TODO.md`.")
+    out.append("")
+    out.append("Per TE-mumuv (TE-39, locked 2026-05-07), each TODO is addressable")
+    out.append("by its proquint handle (TODO-<handle>). Prior integer / timestamp")
+    out.append("aliases survive in the `Prior alias` column and in each file's")
+    out.append("`## Prior aliases` section.")
+    out.append("")
+    out.append("## Index")
+    out.append("")
+    out.append(bi.build_todo_index(rows, slug))
+    return "\n".join(out) + "\n"
+
+
+# Master cross-list
+master_path = os.path.join(REPO, "protocols/wire-lab.d/TODO/TODO.md")
+with open(master_path, "w") as f:
+    f.write(build_master_crosslist(rows))
+print(f"Wrote {master_path}", file=sys.stderr)
+
+# Per-protocol queues
+for slug in ["group-session", "ppx-dr", "udp-binding"]:
+    path = os.path.join(REPO, f"protocols/{slug}.d/TODO/TODO.md")
+    if not os.path.exists(os.path.dirname(path)):
+        continue
+    with open(path, "w") as f:
+        f.write(build_per_protocol(rows, slug, slug))
+    print(f"Wrote {path}", file=sys.stderr)
+
+print("Done.", file=sys.stderr)

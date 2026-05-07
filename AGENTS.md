@@ -23,8 +23,8 @@
 - Before locking any non-trivial decision that will require DF questions and answers, the agent must run a thought experiment (TE) if multiple plausible designs remain.
 - A TE happens before final DF questions. Its purpose is to narrow the design space so DF questions and answers are informed by explicit scenario analysis.
 - The agent must not collapse a TE into a short opinion or recommendation. The agent must explicitly model concrete scenarios and consequences.
-- Each TE must have a unique ID in the format `TE-YYYYMMDD-HHMMSS`.
-- The TE doc filename must start with the TE ID and live under `docs/thought-experiments/`, for example: `docs/thought-experiments/TE-20260425-183100-handler-abi.md`.
+- Each TE has a unique proquint handle (5 lowercase characters, Wilkerson 2009 alphabet `bdfghjklmnprstvz` x `aiou` x `bdfghjklmnprstvz` x `aiou` x `bdfghjklmnprstvz`). Mint with `tools/mint-handle` (Go); the tool scans `docs/thought-experiments/` and `protocols/*/TODO/` for existing handles and retries on collision. Locked by TE-mumuv (formerly TE-39) on 2026-05-07.
+- The TE doc filename must be `TE-<handle>-<slug>.md` and live under `docs/thought-experiments/`, for example: `docs/thought-experiments/TE-mumuv-naming-reconciliation.md`. The slug is informational and may be edited; the proquint handle is permanent. Pre-2026-05-07 TEs were renamed in commit `85766f0`; each carries a `## Prior aliases` section recording its prior integer (TE-N) and timestamp (TE-YYYYMMDD-HHMMSS) aliases.
 
 ### TE Intake Requirements
 - Before locking decisions or asking final DF questions, the agent must identify:

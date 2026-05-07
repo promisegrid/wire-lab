@@ -108,11 +108,12 @@ Steps:
             Date, Status, Decision, Intent, Constraints, Affects,
             Author, optional Supersedes.
         - Verify the DI sits inside `## Decision Intent Log` of the
-          referenced protocols/<slug>.d/TODO/TODO-<timestamp>-<slug>.md
-          file.
+          referenced protocols/<slug>.d/TODO/TODO-<handle>-<slug>.md
+          file (proquint handle; locked by TE-mumuv 2026-05-07).
         - Verify Linked DR ↔ Linked DI back-references are consistent.
   g. For any TE files added under docs/thought-experiments/:
-        - Verify filename: TE-YYYYMMDD-HHMMSS-slug.md
+        - Verify filename: TE-<handle>-<slug>.md (proquint handle minted
+          by tools/mint-handle; locked by TE-mumuv 2026-05-07)
         - Verify the TE doc stands on its own and includes:
             title, TE ID, decision under test, assumptions,
             alternatives, scenario analysis, conclusions, implications.

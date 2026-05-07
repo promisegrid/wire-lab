@@ -255,6 +255,32 @@ Downstream artifacts updated in the same twig:
 - `docs/thought-experiments/README.md` — the prose claim that "TE numbers ... are stable identifiers" is rewritten to name the timestamp+slug as the stable identifier and the integer as the display nickname; the "Adding a new TE" procedure gains a step about forward-pointer hygiene.
 - A note is filed in `OPEN-THREADS.md` flagging that AGENTS.md's "Refinements ... placed after `## Decision status`" prose contradicts the canonical example in TE-dabol (which places Refinements *before* Decision status). That contradiction is older than this Refinement and is left to a future Cat-3 on TE-dabol or AGENTS.md.
 
+### 2026-05-07 — Proquint handles supersede integer aliases as the display nickname
+
+The 2026-05-05 Refinement above split TE identity into two roles: timestamp+slug as the stable identifier, integer TE-N as the display nickname assigned at index time. That split was correct as far as it went, but TE-39 (TE-mumuv, *Naming reconciliation*, locked 2026-05-07) demonstrated that the integer-alias *display nickname* role is itself unsafe: integers carry no entropy, must be assigned in strict sequence by an indexer, collide trivially across forks, and require a centralized renumber whenever two branches both mint a new TE. The same pathology affected TODO numbering (TE-titur's lock said nothing about TODO integers, and TODOs duplicated the problem at the per-protocol level).
+
+TE-mumuv adopts **proquint-1 handles** (Wilkerson 2009: 5-character pronounceable strings drawn from the alphabet `bdfghjklmnprstvz` × `aiou` × `bdfghjklmnprstvz` × `aiou` × `bdfghjklmnprstvz`, 65,536 distinct values) as the new display nickname for both TEs and TODOs. Handles are minted from `time_ns → SHA-256 → first 2 bytes → proquint-1` with collision-retry against the directory glob; this gives ~32,000 minted handles before saturation forces an upgrade to proquint-2 (10 chars, ≈4.3 billion values). The minting tool is `tools/mint-handle/` and is steady-state; the one-shot migration tool is `tools/migrate-handles/`. The 2026-05-07 corpus migration renamed 38 TEs and 32 TODOs in a single commit (chunk A, `85766f0`), drafted TE-mumuv itself (chunk B, `b85974c`), and swept 1,451 citations across 94 files (chunk C, `549b480`).
+
+This Refinement supersedes the **display nickname** half of the 2026-05-05 split. The stable-identifier half remains in force in spirit, but the encoding changes: filenames are now `(TE|TODO)-<proquint>-<slug>.md` (no timestamp). The proquint handle is *both* the display nickname and the persistent on-disk identifier, because the handle is assigned at file-creation time, is collision-free against the existing claim set, and is short enough to be human-readable. The drafting timestamp is preserved in git history (the file's first commit `git log --format=%ad --date=short -- <path> | tail -1`) and surfaces in `docs/thought-experiments/README.md` as a `mint date` column rather than as a filename component.
+
+Updates to the locked DFs:
+
+1. **DF-25.1 (which TE keeps integer 21)** is now moot in the proquint world. Both pre-migration TE-nibars retain their proquint handles (TE-nibar = `nibar` for *Spec doc as promise*; the channel-carrier TE became TE-hogus = `hogus`). The DF-25.1 lock holds for the historical record; it does not need to be re-litigated.
+2. **DF-25.2 (channel-carrier integer)** is similarly historical. TE-hogus retains the `hogus` proquint.
+3. **The 2026-05-05 forward-pointer rule (rule 3 above)** is reaffirmed and tightened. Forward-pointers to unminted future TEs MUST use a thread-id (T-...) in `OPEN-THREADS.md` until the future TE is actually drafted (at which point the proquint is minted and a real handle is available). Naming a future *integer* is forbidden; naming a future *proquint* is impossible (proquints are minted, not predicted). The DT3 drift class is closed.
+4. **Backward citations** continue to be the natural form, but the integer-alias backward citation ("per TE-25 § S5") is now a *prior-alias* citation; readers may need to consult the `## Prior aliases` section in the cited file or the `prior_alias` column in `docs/thought-experiments/README.md` to recover it. The preferred form going forward is the proquint handle ("per TE-titur § S5").
+5. **Renumbering becomes minting.** The 2026-05-05 lock said "renumbering an indexed TE is a Cat-2 vocabulary update or a Cat-5 supersedence depending on scope; it is never silent." Under proquint handles, true renumbering is rare — handles are minted once and persist. The migration of 70 historical files in commit `85766f0` is a single Cat-2 sweep recorded in TE-mumuv and in each file's new `## Prior aliases` section.
+
+Downstream artifacts updated in the TE-39 twig (`ppx/te-20260507-025627-naming-reconciliation`):
+
+- `docs/thought-experiments/README.md` — index reformatted with `Handle | Mint date | Title | Prior alias` columns; handle is the primary key; mint date extracted from `git log` first-commit-date; prior_alias records the integer + timestamp the file carried before the migration.
+- `protocols/wire-lab.d/TODO/TODO.md` and the per-protocol `TODO.md` files — same column reformat applied.
+- `AGENTS.md`, `AGENTS-ppx.md`, `AGENTS-codex.md` — vocabulary updates to refer to proquint handles instead of integers; the "Adding a new TE" procedure now invokes `tools/mint-handle` rather than "pick the next integer."
+- Each renamed file gains a `## Prior aliases` section immediately after `## TE ID` listing its integer alias and timestamp alias (Q-23.9 + Q-23.10 lock, dual-record).
+- TE-titur's filename is now `TE-titur-te-numbering-collision-and-harness-spec-path.md`; its prior aliases (`TE-25`, `TE-20260430-213447`) are recorded in this file's `## Prior aliases` section.
+
+See TE-mumuv (TE-39) for the full gameout, the eight locked decisions, and the eight rejected alternatives.
+
 ## Decision status
 
 **Locked 2026-04-30 by Steve Traugott.** Recommended set adopted: **Alt-1.A + Alt-2.B + Alt-3.B + Alt-4.C.**
