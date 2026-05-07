@@ -34,7 +34,7 @@ minted after that date carry only the proquint handle.
 | [TODO-dinub](./TODO-dinub-te-editing-policy-and-holistic-corpus.md) | 2026-05-02 | TODO 020 - TE-dabol TE editing policy and holistic corpus reading: drive to DI | `TODO-20` / `TODO-20260502-213103` |
 | [TODO-lilar](./TODO-lilar-session-replay-cleanup.md) | 2026-05-06 | TODO 021 - Session-replay cleanup: walk turns 149-192 chronologically and reconcile dropped threads | `TODO-21` / `TODO-20260504-170746` |
 | [TODO-vunub](./TODO-vunub-te-38-substrate-agnostic-layered-model.md) | 2026-05-06 | TE-sihih substrate-agnostic layered model | `TODO-22` / `TODO-20260506-184800` |
-| [TODO-lilok](./TODO-lilok-te-36-followon-oq-and-tabletop-walk.md) | 2026-05-07 | TE-havib follow-on: OQ-36.6 + tabletop walk | `TODO-23` / `TODO-20260507-002306` |
+| [TODO-lilok](./TODO-lilok-te-36-followon-oq-and-tabletop-walk.md) | 2026-05-07 | TE-havib follow-on: OQ-36.6 + tabletop walk **(closed 2026-05-07: verified-superseded)** | `TODO-23` / `TODO-20260507-002306` |
 | [TODO-pipus](./TODO-pipus-te-39-wire-lab-devs-migration.md) | 2026-05-07 | TE-mumuv wire-lab-devs migration | `TODO-24` / `TODO-20260507-002306` |
 | [TODO-kugod](./TODO-kugod-te-40-apparatus-vs-specimen-completion.md) | 2026-05-07 | TE-40 apparatus-vs-specimen completion + TE-famar closure | `TODO-25` / `TODO-20260507-002306` |
 | [TODO-turog](./TODO-turog-te-41-group-session-freeze-procedure.md) | 2026-05-07 | TE-41 group-session freeze procedure | `TODO-26` / `TODO-20260507-002306` |

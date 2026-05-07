@@ -234,7 +234,16 @@ The `conditional-promise` and `assessment` primitives collapse what were five na
 
 ## Refinements
 
-(Reserved for forward-pointer / back-pointer additions per TE-dabol Cat-3 policy.)
+### 2026-05-07: Tabletop scenario narrative recast under DF-36.2 retirement
+
+Under Alt-lilok.1.B verification walk (memo at [`protocols/wire-lab.d/docs/te-havib-followon-verification-walk-20260507.md`](../../protocols/wire-lab.d/docs/te-havib-followon-verification-walk-20260507.md)), scenarios S2 (Bob the second-implementer) and S4 (Dave the promise-stack forker) reference promise-stack vocabulary in their narrative prose that is now retired under DF-36.2 Alt-2.A revised. Under TE-dabol's Cat-1b historical-quotation policy the scenario prose stays as written — the scenarios remain valid as illustrations of the structural property each tests (S2: tightly-scoped CHANGELOG conformance per TE-liviv; S4: per-protocol-directory as unit of fork per C-4). The architecturally-equivalent rephrasing under DF-36.2 retirement is:
+
+- **S2 Bob (rephrased):** Bob writes a second `grid-envelope` implementation in a different language and references `protocols/grid-envelope.d/specs/grid-envelope-draft.md@<pCID>` in his B-side `implementations/bob-grid-envelope/CHANGELOG.md`. The structural test (tightly-scoped conformance, not whole-harness conformance) is unchanged.
+- **S4 Dave (rephrased):** Dave wants a `grid-envelope` variant with a different inner-payload-recursion convention. He creates `protocols/grid-envelope-dave.d/specs/...` (or equivalent slug per TE-vipir per-protocol-simrepo shape). The structural test (per-protocol directory is the unit of fork) is unchanged.
+
+The verification walk also confirmed that S6 Ellen remains the deciding scenario for DF-36.1's strict lock and that DF-36.2's retirement does not create a Mallory loophole in S5 (the §1.1 promise-stack content is replaced by pointers to TE-lozip §3.1 + framing essay §3.1, not deleted into a void).
+
+Closed TODO-lilok (TE-havib follow-on) as verified-superseded; retired the `T-TE36-FOLLOWON` open-thread placeholder.
 
 ## Source
 

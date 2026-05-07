@@ -9,7 +9,11 @@ Before the TE-39 proquint migration, this file was known as:
 
 ## Status
 
-In progress (deferred from TE-havib close-out). No twig yet.
+Closed 2026-05-07 — **verified-superseded** under Alt-lilok.1.B disposition path. See verification walk memo at [`protocols/wire-lab.d/docs/te-havib-followon-verification-walk-20260507.md`](../../wire-lab.d/docs/te-havib-followon-verification-walk-20260507.md).
+
+All five UTs in this cluster were captured 2026-05-06 against the pre-Alt-B state of TE-havib. The 2026-05-05 Alt-B disposition path re-presentation locked DF-36.1, .2, .3, .7 (and resolved OQ-36.6 in the negative) before the cluster was filed. The verification walk confirmed all six tabletop scenarios hold against the locked state and all five UTs are answered by the locks (UT-160.b is procedural-meta, UT-160.c was wrong on inspection, UT-161.a is moot under DF-36.2 retirement, UT-162.a is resolved by OQ-36.6 negative resolution, UT-162.b is resolved by Alt-B re-presentation).
+
+No live work remains. The actual harness-spec sweep edits (§1.1, §2.1, §7.1, §10a.2/.3/.6, §10 table) are tracked under TODO-vuhuj's leftover sweep per DF-36.7 lock annotation, not here.
 
 ## Threads absorbed from OPEN-THREADS.md
 
