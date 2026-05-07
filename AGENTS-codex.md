@@ -322,6 +322,24 @@ When you finish a task, give Steve:
 These are the AGENTS.md "Required final handoff artifacts". For
 review-only tasks (Kind 1) most are N/A — say so, don't omit them.
 
+# Session-logging review note
+
+Branches that touch session-logging discipline land on `ppx/main` in
+this repo with paired changes on the `wire-lab` orphan branch of
+`stevegt/session-logs`. As of DI-033-20260507-150000 (TODO-topit /
+DR-010), the canonical record on the orphan branch is
+`sessions/<session-id>/conversation.md` -- a periodic snapshot of
+the harness-produced transcript -- plus a small
+`TURNOVER-YYYYMMDD-HHMMTZ[-suffix].md` at the worktree root. New
+sessions do NOT write per-turn `<NNN>-turn.md` files. When you
+review a snapshot-procedure change, expect the wire-lab side to
+edit `AGENTS-ppx.md` Session Logging and the session-logs side to
+edit `README.md`, `tools/check-layout.sh` (which gains a
+default-reject rule for new per-turn files plus an
+`--allow-per-turn` audit-only flag), and to add a TURNOVER cutover
+note. Existing per-turn files under `sessions/ea135ce8/` and frozen
+files under `turns/` must remain unedited.
+
 # When in doubt
 
 Stop and ask Steve as a multiple-choice question. The protocol
