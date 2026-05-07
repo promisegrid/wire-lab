@@ -217,6 +217,275 @@ This TODO is the response to that final instruction.
     `DI-021-20260507-204144`; this is its first lock. DF-V.1 Alt-C,
     Alt-V.4, and DF-V.2 Alt C remain in force.)
 
+- ID: DI-021-20260507-212249
+  Date: 2026-05-07 21:22:49
+  Status: active
+  Decision: DF-V.4 locked Alt B ("transfer J2 Carry rules per bundle
+    into AGENTS-ppx.md, one DI per bundle"). Bundle B1
+    (Foreground authorization — separate authorization from execution)
+    transferred to `AGENTS-ppx.md` under section "Carry-J2 procedural
+    discipline (durable cross-session rules)". Rule wording: if the
+    bot's reasoning in a turn says "ask Steve" before a non-trivial
+    commit, merge, or push, the bot must not execute that
+    commit/merge/push in the same turn; authorization and execution
+    must be in separate turns. Trivial typo/formatting fixes are
+    excluded; the rule applies whether the action is local-only or
+    pushed.
+  Intent: Stop conflating authorization and execution. Past sessions
+    showed the bot reasoning toward "I should ask Steve first" and
+    then executing in the same turn anyway, which collapses the
+    Decision-First gate.
+  Constraints:
+    - This DI authorizes only the AGENTS-ppx.md text under section
+      "Carry-J2 procedural discipline" → "B1 — Foreground
+      authorization (separate authorization from execution)". It does
+      not authorize edits to AGENTS.md, AGENTS-codex.md, or any
+      per-protocol procedure file.
+    - This DI does not flip any UT checkbox in TODO-lilar or in
+      `dropped-thread-disposition-20260506.md`. UT closure follows
+      the matrix-as-closure-index mechanism locked by
+      `DI-021-20260507-210204` (DF-V.3 Alt C); the matrix's
+      `## DF-V.4 lock` subsection records that the B1 J2 UTs
+      transferred under this DI are now owned by AGENTS-ppx.md.
+    - This DI does not edit any walk note in TODO-lilar; the only
+      edit to TODO-lilar landed by this DI is this DI entry.
+    - The exact J2 UT IDs that this bundle covers are recorded in
+      the matrix's DF-V.4 lock subsection rather than enumerated in
+      this DI; per DF-V.3 Alt C the matrix is the closure index.
+  Affects:
+    - `AGENTS-ppx.md` (new section "Carry-J2 procedural discipline
+      (durable cross-session rules)" → "B1 — Foreground
+      authorization (separate authorization from execution)").
+    - `protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`
+      (new "DF-V.4 lock" subsection records the per-bundle transfer
+      status; B1 marked as transferred).
+  Author: stevegt+ppx@t7a.org (stevegt-via-perplexity)
+  Supersedes: (none — DF-V.4 was open after the DF-V.2 Alt C lock
+    `DI-021-20260507-204144` and the DF-V.3 Alt C lock
+    `DI-021-20260507-210204`; this is its first per-bundle lock.)
+
+- ID: DI-021-20260507-212250
+  Date: 2026-05-07 21:22:50
+  Status: active
+  Decision: DF-V.4 locked Alt B, bundle B3 (Collaborator anonymity /
+    non-mention) transferred to `AGENTS-ppx.md` under section
+    "Carry-J2 procedural discipline (durable cross-session rules)" →
+    "B3 — Collaborator anonymity / non-mention". Rule wording: the
+    bot must not name third-party collaborators or infer details
+    (pronouns, gender, employment, school enrollment, location, or
+    any biographical attribute) in any artifact (DR, DI, TE, walk
+    note, TURNOVER, commit message, chat) without explicit
+    session-scope authorization from Steve. The placeholder
+    `[redacted-collaborator]` is the canonical reference form when
+    a collaborator must be mentioned. Authorization is per-session
+    and does not carry across sessions.
+  Intent: Past sessions showed the bot inferring biographical detail
+    about people Steve mentioned only in passing (school enrollment,
+    pronouns, role) and propagating those inferences into committed
+    artifacts. The rule eliminates the inference path and forces an
+    explicit authorization gate.
+  Constraints:
+    - This DI authorizes only the AGENTS-ppx.md text under section
+      "Carry-J2 procedural discipline" → "B3 — Collaborator
+      anonymity / non-mention". It does not authorize edits to
+      AGENTS.md, AGENTS-codex.md, or any per-protocol procedure
+      file.
+    - This DI does not flip any UT checkbox in TODO-lilar or in
+      `dropped-thread-disposition-20260506.md`. UT closure follows
+      the matrix-as-closure-index mechanism locked by
+      `DI-021-20260507-210204`.
+    - This DI does not retroactively rewrite earlier artifacts that
+      named collaborators; those are append-only history. Going
+      forward the placeholder applies.
+  Affects:
+    - `AGENTS-ppx.md` (new B3 subsection).
+    - `protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`
+      (DF-V.4 lock subsection records B3 as transferred).
+  Author: stevegt+ppx@t7a.org (stevegt-via-perplexity)
+  Supersedes: (none.)
+
+- ID: DI-021-20260507-212251
+  Date: 2026-05-07 21:22:51
+  Status: active
+  Decision: DF-V.4 locked Alt B, bundle B4 (PAT redaction and
+    credential hygiene) transferred to `AGENTS-ppx.md` under section
+    "Carry-J2 procedural discipline (durable cross-session rules)" →
+    "B4 — PAT redaction and credential hygiene". Rule wording: the
+    bot must redact secrets in every summary, walk note, TURNOVER,
+    commit message, DR, DI, and TE; placeholder form is
+    `{{SECRET:<short-name>}}` (e.g., `{{SECRET:gh-pat}}`); PAT bytes,
+    OAuth tokens, signing keys, and other credential material must
+    never be echoed into any artifact. Before any operation that
+    requires a write-scope token, the bot must verify the token's
+    scope and expiry; filename suffixes are documentation, not
+    enforcement. Insufficient scope or expiry triggers a stop-and-ask,
+    not a retry.
+  Intent: Past sessions showed PAT bytes and similar material leaking
+    into walk notes and TURNOVER files because the bot relied on
+    filename suffixes (`*-redacted.md`) as enforcement rather than
+    redacting at write time. The rule moves redaction to the write
+    path and adds an explicit token-scope verification step.
+  Constraints:
+    - This DI authorizes only the AGENTS-ppx.md text under section
+      "Carry-J2 procedural discipline" → "B4 — PAT redaction and
+      credential hygiene".
+    - This DI does not flip any UT checkbox in TODO-lilar or in
+      `dropped-thread-disposition-20260506.md`. UT closure follows
+      the matrix-as-closure-index mechanism.
+    - This DI does not authorize the bot to fabricate or rotate
+      credentials; scope/expiry verification is read-only against
+      whatever credential the harness has provided.
+  Affects:
+    - `AGENTS-ppx.md` (new B4 subsection).
+    - `protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`
+      (DF-V.4 lock subsection records B4 as transferred).
+  Author: stevegt+ppx@t7a.org (stevegt-via-perplexity)
+  Supersedes: (none.)
+
+- ID: DI-021-20260507-212252
+  Date: 2026-05-07 21:22:52
+  Status: active
+  Decision: DF-V.4 locked Alt B, bundle B2 (Foreground DONE
+    confirmation) transferred to `AGENTS-ppx.md` under section
+    "Carry-J2 procedural discipline (durable cross-session rules)" →
+    "B2 — Foreground DONE confirmation". Rule wording: when a push,
+    merge, fix, or test run completes, the bot must report an
+    explicit `DONE` line at the top of its reply that names the
+    action and the ref (branch/SHA/file/test name) involved, rather
+    than burying the completion under a multi-paragraph summary. The
+    canonical form is `DONE: <action> on <ref>` (e.g., `DONE: pushed
+    ppx/main at a1b2c3d`).
+  Intent: Past sessions showed completion status buried mid-summary,
+    forcing Steve to scan for whether the action actually finished.
+    The rule moves completion status to the foreground.
+  Constraints:
+    - This DI authorizes only the AGENTS-ppx.md text under section
+      "Carry-J2 procedural discipline" → "B2 — Foreground DONE
+      confirmation".
+    - This DI does not flip any UT checkbox in TODO-lilar or in
+      `dropped-thread-disposition-20260506.md`.
+    - The DONE-line discipline applies to the bot's chat reply; it
+      does not require an additional file artifact.
+  Affects:
+    - `AGENTS-ppx.md` (new B2 subsection).
+    - `protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`
+      (DF-V.4 lock subsection records B2 as transferred).
+  Author: stevegt+ppx@t7a.org (stevegt-via-perplexity)
+  Supersedes: (none.)
+
+- ID: DI-021-20260507-212253
+  Date: 2026-05-07 21:22:53
+  Status: active
+  Decision: DF-V.4 locked Alt B, bundle B5 (One-DF-at-a-time
+    discipline) transferred to `AGENTS-ppx.md` under section
+    "Carry-J2 procedural discipline (durable cross-session rules)" →
+    "B5 — One-DF-at-a-time discipline". Rule wording: the bot must
+    present DFs to Steve one at a time. Each DF must list the
+    surviving alternatives identified by its TE (when a TE is
+    required), a consideration paragraph naming what each alternative
+    makes easier or harder, and an explicit recommendation. The bot
+    must not bundle multiple DFs into a single multiple-choice
+    question, and must not ask Steve to override this discipline.
+    When multiple DFs are open, the bot queues them and asks the
+    next one only after the current one is locked.
+  Intent: Past sessions showed the bot bundling several open DFs into
+    one prompt and asking Steve to "pick one of the following sets",
+    which collapsed the Decision-First gate and produced poorly-
+    framed locks. The rule restores per-DF framing.
+  Constraints:
+    - This DI authorizes only the AGENTS-ppx.md text under section
+      "Carry-J2 procedural discipline" → "B5 — One-DF-at-a-time
+      discipline".
+    - This DI does not flip any UT checkbox in TODO-lilar or in
+      `dropped-thread-disposition-20260506.md`.
+    - This DI does not redefine what "alternatives", "consideration",
+      or "recommendation" mean in a DF; those are governed by
+      AGENTS.md's Decision-First and TE protocols.
+  Affects:
+    - `AGENTS-ppx.md` (new B5 subsection).
+    - `protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`
+      (DF-V.4 lock subsection records B5 as transferred).
+  Author: stevegt+ppx@t7a.org (stevegt-via-perplexity)
+  Supersedes: (none.)
+
+- ID: DI-021-20260507-212254
+  Date: 2026-05-07 21:22:54
+  Status: active
+  Decision: DF-V.4 locked Alt B, bundle B6 (Apologize, audit,
+    invalidate, propose) transferred to `AGENTS-ppx.md` under
+    section "Carry-J2 procedural discipline (durable cross-session
+    rules)" → "B6 — Apologize, audit, invalidate, propose". Rule
+    wording: when Steve identifies a structural error (wrong
+    classification, contaminated artifact, misapplied protocol), the
+    bot must respond in this order: (1) acknowledge the error
+    explicitly; (2) audit the contamination — identify every
+    artifact (commits, files, DIs, TEs, walk notes, summaries) that
+    depended on or was influenced by the error; (3) invalidate the
+    affected artifacts (mark superseded; flag for re-derivation; do
+    not silently retain); (4) propose recovery paths with an
+    explicit recommendation. Steps must not be skipped or collapsed
+    into a one-line apology.
+  Intent: Past sessions showed the bot accepting a correction with a
+    single sentence ("good catch — I'll fix it") and continuing
+    without auditing what else the error had contaminated. The rule
+    forces a contamination audit and an explicit invalidation step
+    before recovery.
+  Constraints:
+    - This DI authorizes only the AGENTS-ppx.md text under section
+      "Carry-J2 procedural discipline" → "B6 — Apologize, audit,
+      invalidate, propose".
+    - This DI does not authorize the bot to retroactively edit
+      append-only artifacts (DIs, walk notes, disposition memos).
+      Invalidation in step (3) means appending a supersession
+      marker or filing a new DI with `Supersedes:`, not rewriting
+      history.
+    - This DI does not flip any UT checkbox in TODO-lilar or in
+      `dropped-thread-disposition-20260506.md`.
+  Affects:
+    - `AGENTS-ppx.md` (new B6 subsection).
+    - `protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`
+      (DF-V.4 lock subsection records B6 as transferred).
+  Author: stevegt+ppx@t7a.org (stevegt-via-perplexity)
+  Supersedes: (none.)
+
+- ID: DI-021-20260507-212255
+  Date: 2026-05-07 21:22:55
+  Status: active
+  Decision: DF-V.4 locked Alt B, bundle B7 (Ground-truthing before
+    citation) transferred to `AGENTS-ppx.md` under section
+    "Carry-J2 procedural discipline (durable cross-session rules)" →
+    "B7 — Ground-truthing before citation". Rule wording: before
+    citing any external artifact (branch, commit, tag, RFC, TE,
+    TODO, DR, file path), the bot must verify it exists in the form
+    being cited. For absence claims ("no such branch", "no such
+    commit on origin", "no open DR for X"), the bot must show the
+    raw enumeration that establishes the absence (e.g., the
+    `git branch -r` output, the `gh api` listing) rather than
+    assert the absence without evidence. Cached or remembered
+    citations from earlier turns do not satisfy ground-truthing;
+    the bot re-verifies each session.
+  Intent: Past sessions showed the bot citing branch names, commit
+    SHAs, and TE handles that no longer existed (or never existed
+    in the form cited) because the citation was carried over from
+    an earlier session's memory. The rule forces enumeration-based
+    verification at use time.
+  Constraints:
+    - This DI authorizes only the AGENTS-ppx.md text under section
+      "Carry-J2 procedural discipline" → "B7 — Ground-truthing
+      before citation".
+    - This DI does not require the bot to enumerate every artifact
+      mentioned in passing; it requires verification of citations
+      that the bot is putting forward as load-bearing references
+      for a decision, claim, or absence assertion.
+    - This DI does not flip any UT checkbox in TODO-lilar or in
+      `dropped-thread-disposition-20260506.md`.
+  Affects:
+    - `AGENTS-ppx.md` (new B7 subsection).
+    - `protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`
+      (DF-V.4 lock subsection records B7 as transferred).
+  Author: stevegt+ppx@t7a.org (stevegt-via-perplexity)
+  Supersedes: (none.)
+
 ## Unfinished threads ledger (per-turn carry-forwards)
 
 This section records concrete items that were started, discussed, or implied in a turn but not committed to the repo. Each item names the originating turn so it can be re-attached to its context later. Resolution paths (turn-N committed it / superseded by ... / dropped intentionally / folded into TE-X) get appended as the walk continues.

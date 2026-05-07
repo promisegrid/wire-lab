@@ -488,6 +488,100 @@ rules.
   `Author` of a DI only if Steve has explicitly delegated the decision
   to the bot. Default: Steve is `Author` of every DI.
 
+# Carry-J2 procedural discipline (durable cross-session rules)
+
+These are durable cross-session process rules transferred from the
+Carry cluster (sub-class J2) of `protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`
+under DF-V.4. They are listed in the priority order Steve locked
+(B1, B3, B4, B2, B5, B6, B7). Each bundle cites its DI in TODO-lilar.
+These rules apply to every bot session and every twig.
+
+## B1 — Foreground authorization (separate authorization from execution)
+
+If your reasoning in a turn says "ask Steve" before a non-trivial
+commit, merge, or push, do not execute that commit/merge/push in the
+same turn. Authorization and execution must be in separate turns: you
+ask in turn N, Steve answers in turn N+1, you execute in turn N+2 (or
+later). This applies to anything beyond trivial typo/formatting fixes
+and applies whether the action is local-only or pushed. (See
+DI-021-20260507-212249 in TODO-lilar.)
+
+## B3 — Collaborator anonymity / non-mention
+
+Do not name third-party collaborators or infer details about them
+(including pronouns, gender, employment, school enrollment, location,
+or any biographical attribute) in any artifact — DR, DI, TE, walk
+note, TURNOVER, commit message, or chat — without explicit
+session-scope authorization from Steve. When a collaborator must be
+referenced, use the placeholder `[redacted-collaborator]`. Authorization
+is per-session and does not carry across sessions. (See
+DI-021-20260507-212250 in TODO-lilar.)
+
+## B4 — PAT redaction and credential hygiene
+
+Redact secrets in every summary, walk note, TURNOVER, commit message,
+DR, DI, and TE. Use the placeholder form `{{SECRET:<short-name>}}`
+(for example, `{{SECRET:gh-pat}}`) — never echo PAT bytes, OAuth
+tokens, signing keys, or other credential material into any artifact.
+Before any operation that requires a write-scope token, verify the
+token's scope and expiry; filename suffixes are documentation, not
+enforcement. If a token has insufficient scope or has expired, stop
+and ask Steve rather than retry. (See DI-021-20260507-212251 in
+TODO-lilar.)
+
+## B2 — Foreground DONE confirmation
+
+When a push, merge, fix, or test run completes, report an explicit
+`DONE` line at the top of your reply that names the action and the
+ref (branch / SHA / file / test name) involved. Do not bury the
+completion under a multi-paragraph summary. Form:
+
+    DONE: <action> on <ref>
+
+For example: `DONE: pushed ppx/main at a1b2c3d`. (See
+DI-021-20260507-212252 in TODO-lilar.)
+
+## B5 — One-DF-at-a-time discipline
+
+Present DFs to Steve one at a time. Each DF must list the surviving
+alternatives identified by its TE (when a TE is required), a
+consideration paragraph naming what each alternative makes easier or
+harder, and an explicit recommendation. Do not bundle multiple DFs
+into a single multiple-choice question, and do not ask Steve to
+override this discipline. If multiple DFs are open, queue them and
+ask the next one only after the current one is locked. (See
+DI-021-20260507-212253 in TODO-lilar.)
+
+## B6 — Apologize, audit, invalidate, propose
+
+When Steve identifies a structural error in your work — a wrong
+classification, a contaminated artifact, a misapplied protocol —
+respond in this order:
+
+  1. Acknowledge the error explicitly.
+  2. Audit the contamination: identify every artifact (commits,
+     files, DIs, TEs, walk notes, summaries) that depended on or
+     was influenced by the error.
+  3. Invalidate the affected artifacts (mark superseded; flag for
+     re-derivation; do not silently retain).
+  4. Propose recovery paths with an explicit recommendation among
+     them.
+
+Do not skip steps; do not collapse them into a one-line apology.
+(See DI-021-20260507-212254 in TODO-lilar.)
+
+## B7 — Ground-truthing before citation
+
+Before citing any external artifact — a branch, a commit, a tag, an
+RFC, a TE, a TODO, a DR, or a file path — verify it exists in the
+form you are about to cite. For absence claims ("no such branch",
+"no such commit on origin", "no open DR for X"), show the raw
+enumeration that establishes the absence (e.g., the `git branch -r`
+output, the `gh api` listing) rather than asserting the absence
+without evidence. Cached or remembered citations from earlier turns
+do not satisfy ground-truthing; re-verify each session. (See
+DI-021-20260507-212255 in TODO-lilar.)
+
 # Reporting style (final handoff)
 
 When you finish a task, give Steve the AGENTS.md "Required final
