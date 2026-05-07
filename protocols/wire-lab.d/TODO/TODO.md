@@ -44,6 +44,7 @@ minted after that date carry only the proquint handle.
 | [TODO-ralud](./TODO-ralud-te-45-conditional-release-geofencing.md) | 2026-05-07 | TE-45 conditional-release / geofencing / recursive promise-graph | `TODO-30` / `TODO-20260507-002306` |
 | [TODO-sinuv](./TODO-sinuv-anticipated-future-tes-transport-family.md) | 2026-05-07 | Anticipated future TEs: ring / cluster-of-clusters / gossip / receipts-at-scale | `TODO-31` / `TODO-20260507-002306` |
 | [TODO-bahaf](./TODO-bahaf-te-39-naming-reconciliation.md) | 2026-05-07 | TE-mumuv naming reconciliation (proquint filenames) | `TODO-32` / `TODO-20260507-025635` |
+| [TODO-topit](./TODO-topit-transcript-snapshot-procedure.md) | 2026-05-07 | Transcript-snapshot procedure replaces per-turn session-logging discipline | `TODO-33` / `TODO-20260507-150000` |
 
 ## group-session
 

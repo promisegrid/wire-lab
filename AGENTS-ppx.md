@@ -580,41 +580,109 @@ to a private repo they have no credentials for.
   directory to the wire-lab clone, mounted on the `wire-lab` orphan
   branch via `git worktree add`. Writes to it do not disturb the
   active twig in /home/user/workspace/wire-lab.
-- Layout on the orphan branch:
-        README.md
-        sessions/<session-id>/000-meta.md
-        sessions/<session-id>/NNN-turn.md
-  where NNN is the zero-padded turn number.
-- WRONG: `turns/turn-NNN.md` or any path outside `sessions/<id>/`.
-  Prior bots drifted into a loose `turns/` layout (see
-  `wire-lab-logs/TURNOVER-20260507-2300PDT.md` for the remediation
-  trail); the `turns/` directory on the orphan branch is frozen
-  historical evidence and must not be written to. If you find
-  yourself about to write outside `sessions/<id>/`, stop and re-read
-  this section. The `wire-lab-logs` worktree carries
-  `tools/check-layout.sh`; run it before every commit.
-- Fidelity: full. Each NNN-turn.md contains the verbatim user prompt
-  and the verbatim bot response, including tool calls and outputs.
-- Append-only. Each turn file is written once and never edited. The
-  ONLY exception is the redact-last escape hatch (see below).
+- Canonical record: `sessions/<session-id>/conversation.md` -- a
+  full-fidelity copy of the harness-produced `conversation.md` for
+  the active session. The bot copies this file in at session
+  checkpoints (turnover, redact-last, end-of-day, or any explicit
+  Steve request) and at minimum once per session. Each commit is a
+  full file replace; the orphan branch accumulates the file's
+  history through normal git history. The harness's
+  `conversation.md` is the verbatim transcript -- the bot does NOT
+  reconstruct it from memory. (See DI-033-20260507-150000 in
+  `protocols/wire-lab.d/TODO/TODO-topit-transcript-snapshot-procedure.md`.)
+- Live resume point: `TURNOVER-YYYYMMDD-HHMMTZ[-suffix].md` at the
+  worktree root. Short (one screen of text). Captures the in-flight
+  context the next bot needs to resume on a cold start. TURNOVER
+  files are append-only at the file-system level: existing TURNOVER
+  files are NEVER edited or moved. Each new session writes a new
+  TURNOVER file rather than updating an old one.
+- Per-turn files retired by default. New sessions do NOT write
+  `sessions/<session-id>/<NNN>-turn.md`. Existing
+  `sessions/ea135ce8/NNN-turn.md` files and the frozen
+  `turns/turn-NNN.md` files remain in place as historical evidence
+  and must not be edited or moved. The `tools/check-layout.sh` guard
+  in the orphan branch rejects new per-turn files by default; the
+  `--allow-per-turn` flag is the audit-only opt-in for the rare case
+  where a specific audit needs reconstructed per-turn files.
+- WRONG paths: `turns/turn-NNN.md` (frozen historical only) or any
+  path outside `sessions/<id>/`. The `wire-lab-logs` worktree
+  carries `tools/check-layout.sh`; run it before every commit.
+- Fidelity: full. The canonical record is the verbatim
+  harness-produced transcript file, copied unmodified except for
+  redact-last edits.
+- Append-only at the file-system level for TURNOVER files. The
+  `conversation.md` snapshot is overwritten in place at each
+  checkpoint commit; full history is preserved through git, not
+  through filename versioning.
 - Force-push policy: force-push to `private wire-lab` is permitted
-  ONLY for the redact-last operation. No other force-push is
-  permitted on this branch.
+  ONLY for the redact-last operation, which now operates on the
+  snapshot file (see below). No other force-push is permitted on
+  this branch.
 
-## Per-turn discipline (required)
+## Snapshot discipline (required)
 
-At the end of every turn while session logging is active:
+At each session checkpoint -- turnover, redact-last, end-of-day, or
+any explicit Steve request -- and at minimum once per session while
+session logging is active:
 
-  1. Write `sessions/<session-id>/<NNN>-turn.md` containing this
-     turn's verbatim user prompt and verbatim bot response.
-  2. `git add` the new file. Commit with message:
-        wire-lab session <session-id> turn <NNN>
-  3. `git push private wire-lab`.
+  1. Copy the harness-produced `conversation.md` for the active
+     session to `sessions/<session-id>/conversation.md` in the
+     `wire-lab-logs` worktree. The destination directory is created
+     if missing; the file is overwritten in place if present.
+  2. If this is the first commit of the session, also write
+     `sessions/<session-id>/000-meta.md` with the session ID, the
+     bot identity, the date the session opened, and any other
+     metadata the harness prescribes.
+  3. Run `bash tools/check-layout.sh` in the `wire-lab-logs`
+     worktree. The guard rejects per-turn files by default; if any
+     `<NNN>-turn.md` files are present from earlier sessions, that
+     is fine -- the guard only flags NEW additions. If the guard
+     fails, stop and resolve before committing.
+  4. `git add` the snapshot path explicitly (no `git add .` /
+     `git add -A`). Commit with message:
+        wire-lab session <session-id>: transcript snapshot @ turn <NNN>
+     where `<NNN>` is the bot's best estimate of the current turn
+     count for sequencing convenience; precision is not load-bearing
+     because the snapshot itself carries the verbatim history.
+  5. `git push private wire-lab`.
 
-If the bot misses a turn (commit fails, push fails, bot forgets), it
-MUST catch up at the next opportunity by writing the missing files
-before writing the current turn. The orphan branch must remain a
-complete record.
+If the bot is unable to access the harness-produced
+`conversation.md` for any reason -- the file is missing, the path
+has changed, or the harness has not yet flushed -- the bot reports
+the gap to Steve and does NOT attempt to reconstruct the transcript
+from memory. Reconstruction is what the per-turn discipline failed
+at; the snapshot procedure exists to retire that failure mode.
+
+## TURNOVER discipline (required)
+
+At each session checkpoint, in addition to the snapshot:
+
+  1. Write a new `TURNOVER-YYYYMMDD-HHMMTZ[-suffix].md` file at the
+     worktree root. Do NOT edit or move existing TURNOVER files;
+     they are the historical record of past handoffs.
+  2. The file is short -- one screen of text. It captures:
+        - what this session did (3-6 bullets),
+        - the repo state at handoff (branches, tips, pushed?),
+        - any standing rules added or modified this session,
+        - any carryover threads still open from prior sessions,
+        - cold-start bootstrap reminder pointers for the next bot.
+  3. `git add` the TURNOVER path explicitly. Commit with message:
+        wire-lab session <session-id>: turnover <YYYYMMDD-HHMMTZ>
+  4. `git push private wire-lab`.
+
+The TURNOVER file is the live resume point. The next bot reads the
+most recent TURNOVER as its first action after the canonical
+orientation files (AGENTS.md, AGENTS-ppx.md, README.md, the master
+TODO index, any DR/DI files cited).
+
+## Optional generated index
+
+A consumer may build a per-turn index over a snapshot by parsing
+turn boundaries inside `conversation.md` and emitting an index
+file. The index is generated, not committed: the snapshot itself is
+canonical and any index is reproducible from it. If a future audit
+pins an index into history, that pin lives on a separate
+non-canonical branch, not on `wire-lab` orphan.
 
 ## Question-logging discipline (required)
 
@@ -710,16 +778,26 @@ Where old threads went (for readers searching git history):
 
 If Steve says `redact-last` (or equivalent), the bot:
 
-  1. Identifies the most recent turn file on the wire-lab orphan
-     branch.
-  2. `git rm` that file, commits with message
-        wire-lab session <session-id> redact turn <NNN>
-  3. `git push --force-with-lease private wire-lab`.
+  1. Identifies the offending span in
+     `sessions/<session-id>/conversation.md` (most-recent turn or
+     specific span Steve names).
+  2. Edits the snapshot file in place to remove that span. The
+     replacement is a `[redacted]` marker that preserves the
+     surrounding turn boundaries for the optional index generator.
+  3. Commits with message:
+        wire-lab session <session-id> redact snapshot
+  4. `git push --force-with-lease private wire-lab`.
 
-Force-push is permitted in this case ONLY. The redacted turn is
-removed from the public-facing branch tip, but git's reflog and
-local clones may still hold the blob; this is acceptable for the
-use case (a private remote that only Steve can read).
+Force-push is permitted in this case ONLY. The redacted span is
+removed from the public-facing snapshot file, but git's reflog and
+local clones may still hold the prior blob; this is acceptable for
+the use case (a private remote that only Steve can read).
+
+For sessions that still carry per-turn `<NNN>-turn.md` files from
+the pre-snapshot regime, the legacy redact-last form -- `git rm`
+the most recent turn file and force-push -- remains valid for
+those files. New sessions on the snapshot procedure use the
+snapshot form above.
 
 ## Credentials
 

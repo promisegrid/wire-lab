@@ -4,6 +4,14 @@
 # Idempotent session-logging bootstrap for the wire-lab Perplexity Computer
 # environment. See AGENTS-ppx.md "Session Logging" section for context.
 #
+# As of DI-033-20260507-150000 (TODO-topit / DR-010), the canonical record
+# on the wire-lab orphan branch is sessions/<session-id>/conversation.md
+# -- a periodic snapshot of the harness-produced transcript -- plus a
+# small TURNOVER-YYYYMMDD-HHMMTZ[-suffix].md at the worktree root. This
+# script's responsibility is unchanged: provision the worktree, the
+# private remote, and the credential helper. Per-turn discipline is
+# retired by default; the snapshot procedure runs from AGENTS-ppx.md.
+#
 # Steps (each is a no-op if already satisfied):
 #   1. Identity gate: only run when git config user.email is Steve's bot.
 #   2. Verify or create ~/.creds/ directory (chmod 700).
