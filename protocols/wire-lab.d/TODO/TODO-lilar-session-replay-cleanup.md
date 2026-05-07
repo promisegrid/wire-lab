@@ -83,7 +83,60 @@ This TODO is the response to that final instruction.
 
 ## Decision Intent Log
 
-(empty until turns are walked and DIs are filed)
+- ID: DI-021-20260507-204144
+  Date: 2026-05-07 20:41:44
+  Status: active
+  Decision: DF-V.2 locked Alt C ("split Carry-cluster semantics"). The Carry
+    cluster (cluster J in `protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`,
+    55 UTs in `dropped-thread-disposition-20260506.md` § "Carry (procedural /
+    AGENTS-rule / cadence notes) (55 UTs)") does not have a single uniform
+    closure semantic. Two sub-classes exist and must be classified separately:
+    (1) in-turn self-corrections and purely historical observations whose
+    substantive content is already captured by the walk note itself —
+    eligible for the **resolved/retired** state under the loose reading of
+    Caveat 1 (the walk note is the durable record); and (2) durable
+    cross-session process rules (procedural lessons, AGENTS-style cadence
+    rules, collaborator-anonymity discipline, foreground-DONE confirmation
+    discipline, etc.) — these remain **transferred**, owned by an explicit
+    procedure home (typically `AGENTS-ppx.md` or the relevant per-protocol
+    procedure file), and are NOT considered resolved merely because the
+    walk note recorded them.
+  Intent: Stop conflating "the walk note noted it" with "the rule has
+    landed." The split prevents both (a) leaving every Carry UT permanently
+    transferred and (b) the looser failure mode of treating every Carry
+    note as resolved just because it was observed.
+  Constraints:
+    - This DI locks ONLY the classification semantics. It does not
+      authorize closure mechanics (no UT checkbox flips, no edits to the
+      disposition memo's bullets, no edits to TODO-lilar's append-only
+      walk notes). The closure-mechanism DF (currently DF-V.3 in the
+      matrix) remains open and is required before any UT bullet is
+      flipped.
+    - This DI does not authorize the actual transfer of any specific rule
+      into `AGENTS-ppx.md`. Which durable rules transfer, in what wording,
+      with what enforcement, is a separate DF that must lock the per-rule
+      transfer list before any AGENTS-ppx.md edit is made.
+    - The Carry-cluster recount (how many of the 55 fall into sub-class 1
+      vs sub-class 2) is a verification pass, not part of this DI; it is
+      out of scope for this lock and is gated behind DF-V.3 along with
+      the rest of the closure mechanics.
+    - The matrix's existing 25 resolved / 20 transferred / 10 unclear
+      Carry counts (loose reading) are NOT retroactively altered by this
+      DI; they remain as recorded by the read-only Alt-V.4 pass. Any
+      recount happens in the future closure pass under DF-V.3.
+    - Append-only protections: `dropped-thread-disposition-20260506.md`
+      bullets, TODO-lilar walk notes, and any pre-existing append-only
+      audit memos remain untouched by this DI.
+  Affects:
+    - `protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`
+      (this DI is referenced from a new "DF-V.2 lock" subsection appended
+      to that file under "Provenance and follow-on DFs").
+    - Future closure pass for the 55 Carry UTs (gated on DF-V.3).
+    - Future `AGENTS-ppx.md` rule transfers (gated on a separate
+      transfer-list DF; not authorized here).
+  Supersedes: (none — this is the first DF-V.2 lock; DF-V.1 Alt-C and
+    Alt-V.4 from the read-only pass are the prior locked decisions in
+    this verification line and remain in force.)
 
 ## Unfinished threads ledger (per-turn carry-forwards)
 
