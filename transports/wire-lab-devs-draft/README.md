@@ -51,9 +51,11 @@ transports/wire-lab-devs-draft/
 
 Message files are named by their message CID per spec §2, with `.txt`
 appended. Filename and content are mutually self-checking: re-hash the
-file's bytes and compare to the filename to verify integrity. The
-human-readable `Message-ID:` header (§4.3) is retained as a convenience
-inside each message's headers but is not the filename.
+file's bytes and compare to the filename to verify integrity. Per
+DI-012-20260508-033513, canonical messages do not include `Message-ID:`.
+Readers may tolerate exactly one legacy `Message-ID:` header before `Date:`
+for historical compatibility, but the value is ignored semantically and
+the message CID remains the only protocol identifier.
 
 `README.md` is a navigation aid for humans; it is not a protocol message
 and is ignored by readers walking the message DAG.

@@ -36,6 +36,17 @@ Constraints: The decision applies only to the group-transport-protocol class. Ot
 Affects: `TODO/TODO.md`; `protocols/group-session.d/TODO/TODO-bisur-group-transport-envelope.md`; `DR/DR-009-20260430-204108-group-transport-envelope.md`; `docs/thought-experiments/TE-hogus-group-transport-envelope.md`; `docs/thought-experiments/README.md`; `specs/harness-spec-draft.md`; `specs/transport-spec-draft.md`; `specs/group-transport-draft.md`; `transports/README.md`; future group-transport messages between Codex and Perplexity.
 Linked DR: `DR/DR-009-20260430-204108-group-transport-envelope.md`
 
+ID: DI-012-20260508-033513
+Date: 2026-05-08 03:35:13
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Group-session v0 canonical writers must not emit `Message-ID:`. The message CID remains the only protocol identifier. Readers may accept exactly one legacy `Message-ID:` header when it appears before `Date:`, but they must ignore its value semantically.
+Intent: Keep identity content-addressed while preserving enough backward compatibility to read the early `wire-lab-devs` transport messages that were drafted before the `Message-ID:` conflict was settled.
+Constraints: The compatibility allowance is reader-only; canonical encoders must omit `Message-ID:`. If a legacy `Message-ID:` header is present, its bytes are still part of the message file and therefore part of CID verification. The header must not be used for `Parents:`, receipts, indexing, deduplication, API identity, or any other load-bearing protocol role. Unknown headers remain rejected except for this explicitly tolerated legacy slot.
+Affects: `protocols/group-session.d/specs/group-session-draft.md`; `transports/wire-lab-devs-draft/README.md`; `DR/DR-suhod-mihip-merge-blockers-partial-fix.md`; future group-session readers and canonical encoders.
+Supersedes: DI-009-20260430-204108 (`Message-ID` convenience-field clause only)
+Linked DR: `DR/DR-suhod-mihip-merge-blockers-partial-fix.md`
+
 ## Notes
 
 - This TODO scopes the decision to the group-transport-protocol class. Whether the same envelope shape should survive into the canonical PromiseGrid wire format remains open in `DR/DR-009-20260430-204108-group-transport-envelope.md`.
