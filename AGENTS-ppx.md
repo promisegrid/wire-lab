@@ -173,7 +173,8 @@ Steps:
      - If multiple plausible designs remain, run a TE BEFORE asking DF
        questions. Mint a proquint handle with `tools/mint-handle` and
        write the TE doc to
-       `docs/thought-experiments/TE-<handle>-<slug>.md`. The TE
+       `docs/thought-experiments/TE-<handle>-<slug>.md`, where
+       `<handle>` is minted by `tools/mint-handle`. The TE
        must explicitly model multiple scenarios — not collapse to a
        short opinion. Required content: title, TE ID, decision under
        test, assumptions, alternatives, scenario analysis, conclusions,
@@ -182,16 +183,17 @@ Steps:
        alternatives the TE identified. Do not ask broad DF questions
        that ignore TE results. BEFORE asking, log each question to a
        TODO file per the Question-logging discipline section below.
-       The question's `Q-<TODO-N>.<seq>` ID is what the eventual DR/DI
+       The question's `Q-<TODO-handle>.<seq>` ID is what the eventual DR/DI
        cites in `Linked Q`.
      - When Steve answers, write the DI into the relevant
        `protocols/<slug>.d/TODO/TODO-<handle>-<slug>.md` (in
-       `## Decision Intent Log`). DI ID is
-       `DI-NNN-YYYYMMDD-HHMMSS` where NNN is the TODO number. Required
+       `## Decision Intent Log`). DI ID is `DI-<handle>`, where
+       `<handle>` is minted by `tools/mint-handle` from the global
+       TODO/TE/DR/DI namespace. Required
        fields: ID, Date, Status, Decision, Intent, Constraints,
        Affects, Author. Optional: Supersedes.
      - Write a DR file for the same decision:
-       `DR/DR-NNN-YYYYMMDD-HHMMSS-slug.md`. Required fields: DR-ID,
+       `DR/DR-<handle>-<slug>.md`. Required fields: DR-ID,
        Date, Asked by, State, Question, Why this blocks progress,
        Affects, Unblocks, Waiting on, Decision (when decided),
        Linked DI, Related commits, Last updated.
@@ -202,9 +204,9 @@ Steps:
 
   f. For any non-trivial behavior change in code, add a comment:
         // Intent: <rationale>
-        // Source: DI-NNN-YYYYMMDD-HHMMSS
+        // Source: DI-<handle>
      For non-code (e.g., protocols/wire-lab.d/specs/harness-spec-draft.md), include a sentence-level
-     citation in prose: "(see DI-NNN-YYYYMMDD-HHMMSS)" or similar.
+     citation in prose: "(see DI-<handle>)" or similar.
 
   g. Settled statements in docs must cite at least one DI ID. Open
      questions must cite at least one DR ID. If a settled statement has
@@ -333,7 +335,7 @@ Steps:
      `protocols/<slug>.d/TODO/`, harness-level under
      `protocols/wire-lab.d/TODO/`) and update
      `protocols/wire-lab.d/TODO/TODO.md`.
-  d. Write `DR/DR-NNN-YYYYMMDD-HHMMSS-slug.md` with `State: open`,
+  d. Write `DR/DR-<handle>-<slug>.md` with `State: open`,
      `Asked by: stevegt+ppx@t7a.org (stevegt-via-perplexity)`,
      `Waiting on: stevegt@t7a.org (Steve Traugott)`, all required
      fields filled.
@@ -694,7 +696,7 @@ Mechanics:
 
   2. Write the entry as a single checklist row:
 
-        - [ ] Q-<TODO-N>.<seq> <one-line topic>
+        - [ ] Q-<TODO-handle>.<seq> <one-line topic>
             opened: <YYYY-MM-DD HH:MM UTC>
             asked of: stevegt@t7a.org
             blocks: <what is gated on the answer>
@@ -702,8 +704,8 @@ Mechanics:
                           choice; otherwise omit>
             recommendation: <bot recommendation if any>
 
-     `Q-<TODO-N>.<seq>` is the question ID, e.g. `Q-21.7` for the
-     7th question logged against TODO-lilar. Each TODO file owns its
+     `Q-<TODO-handle>.<seq>` is the question ID, e.g. `Q-lilar.7` for
+     the 7th question logged against TODO-lilar. Each TODO file owns its
      own monotonically increasing sequence.
 
   3. THEN call `ask_user_question` (or its equivalent in chat).

@@ -10,25 +10,26 @@ import (
 
 // scanLiteralDirs are the wire-lab directories scanned literally for
 // existing handles. scanGlobs are glob patterns expanded against repoRoot;
-// every directory matching any glob is also scanned. A file in any scanned
-// directory whose name matches handleFileRE is treated as owning its
-// handle. The corpus union of those handles is the collision check set for
-// new mints.
+// every directory matching any glob is also scanned. Missing directories are
+// skipped so the tool works on both main's historical root layout and
+// ppx/main's protocolized TODO layout.
 //
-// Convention-based rather than registry-based: there is no separate
-// HANDLES.md or registry file. Filenames are the ground truth. To add a
-// new artifact type that also bears handles, add its directory (or a
-// matching glob) here.
+// Convention-based rather than registry-based: filenames and DI owner lines
+// are the ground truth. There is no separate HANDLES.md registry. To add a
+// new artifact type that owns handles, add its directory, filename grammar,
+// or owner-line scanner here.
 //
 // scanGlobs uses Go filepath.Glob semantics, which match path components
 // individually. "protocols/*/TODO" therefore matches protocols/wire-lab.d/
 // TODO, protocols/group-session.d/TODO, protocols/ppx-dr.d/TODO, etc., as
 // new protocol subtrees are added.
 //
-// See TE-39 for the lock decision and TE-vapoj (substrate-agnostic
-// layered model) for the broader rationale.
+// Intent: Collision-check the shared TODO, TE, DR, and DI handle namespace
+// across the layouts main and ppx/main need to merge. Source: DI-nisam
 var scanLiteralDirs = []string{
 	"docs/thought-experiments",
+	"TODO",
+	"DR",
 }
 
 var scanGlobs = []string{
@@ -44,7 +45,7 @@ var scanGlobs = []string{
 //
 // where:
 //
-//	<KIND>   = TE | TODO
+//	<KIND>   = TE | TODO | DR
 //	<HANDLE> = proquint-1 (5 chars, CVCVC, alphabets in proquint.go)
 //	         | proquint-2 (5 + '-' + 5 = 11 chars)
 //	<SLUG>   = lower-kebab-case description, may include digits
@@ -52,7 +53,7 @@ var scanGlobs = []string{
 // The regex is anchored so it does not match files whose names happen to
 // contain proquint-shaped substrings inside the slug.
 var handleFileRE = regexp.MustCompile(
-	`^(?:TE|TODO)-(` +
+	`^(?:TE|TODO|DR)-(` +
 		// proquint-2 must come first so the alternation prefers it
 		// over the proquint-1 prefix it begins with.
 		`[bdfghjklmnprstvz][aiou][bdfghjklmnprstvz][aiou][bdfghjklmnprstvz]` +
@@ -62,58 +63,140 @@ var handleFileRE = regexp.MustCompile(
 		`[bdfghjklmnprstvz][aiou][bdfghjklmnprstvz][aiou][bdfghjklmnprstvz]` +
 		`)-`)
 
-// scanCorpus returns the set of handles currently in use across scanDirs,
-// rooted at repoRoot. It is the collision check set for mint().
+// diOwnerRE matches DI owner lines, not ordinary references to DI IDs. This
+// distinction lets DRs and docs cite a DI without being treated as owning a
+// second copy of that handle.
+var diOwnerRE = regexp.MustCompile(`(?m)^ID:\s*DI-(` +
+	`[bdfghjklmnprstvz][aiou][bdfghjklmnprstvz][aiou][bdfghjklmnprstvz]` +
+	`(?:-[bdfghjklmnprstvz][aiou][bdfghjklmnprstvz][aiou][bdfghjklmnprstvz])?` +
+	`)\s*$`)
+
+// scanCorpus returns the set of handles currently in use across the
+// configured directories rooted at repoRoot. It is the collision check set
+// for mint.
 //
-// Files whose names do not match handleFileRE are silently ignored. This
-// includes README.md, TODO.md (the master cross-list), pre-migration files
-// still using the integer/timestamp scheme, and any non-handle-bearing
-// markdown.
-//
-// Returns an error if a scan directory does not exist; this surfaces typos
-// in scanDirs rather than silently scanning nothing.
+// Files whose names do not match handleFileRE are ignored for filename-owned
+// handles. Markdown files in TODO directories are additionally scanned for
+// "ID: DI-<handle>" owner lines. Legacy integer and timestamp filenames are
+// intentionally ignored because this task only changes newly-created
+// artifacts.
 func scanCorpus(repoRoot string) (map[string]string, error) {
 	handles := make(map[string]string)
-	dirs := append([]string(nil), scanLiteralDirs...)
+	dirs, err := scanDirs(repoRoot)
+	if err != nil {
+		return nil, err
+	}
+	for _, dir := range dirs {
+		if err := scanDir(repoRoot, dir, handles); err != nil {
+			return nil, err
+		}
+	}
+	return handles, nil
+}
+
+// scanDirs resolves the configured literal directories and globbed
+// directories. Missing directories are skipped because main and ppx/main do
+// not yet share the same coordination layout.
+func scanDirs(repoRoot string) ([]string, error) {
+	dirs := make([]string, 0, len(scanLiteralDirs)+len(scanGlobs))
+	for _, dir := range scanLiteralDirs {
+		full := filepath.Join(repoRoot, dir)
+		info, err := os.Stat(full)
+		switch {
+		case err == nil && info.IsDir():
+			dirs = append(dirs, dir)
+		case err == nil:
+			return nil, fmt.Errorf("scan path %s is not a directory", dir)
+		case os.IsNotExist(err):
+			continue
+		default:
+			return nil, fmt.Errorf("stat %s: %w", dir, err)
+		}
+	}
 	for _, glob := range scanGlobs {
 		matches, err := filepath.Glob(filepath.Join(repoRoot, glob))
 		if err != nil {
 			return nil, fmt.Errorf("glob %s: %w", glob, err)
 		}
-		for _, m := range matches {
-			rel, err := filepath.Rel(repoRoot, m)
+		for _, match := range matches {
+			info, err := os.Stat(match)
 			if err != nil {
-				return nil, fmt.Errorf("relpath %s: %w", m, err)
+				return nil, fmt.Errorf("stat glob match %s: %w", match, err)
+			}
+			if !info.IsDir() {
+				continue
+			}
+			rel, err := filepath.Rel(repoRoot, match)
+			if err != nil {
+				return nil, fmt.Errorf("relpath %s: %w", match, err)
 			}
 			dirs = append(dirs, rel)
 		}
 	}
-	for _, dir := range dirs {
-		full := filepath.Join(repoRoot, dir)
-		entries, err := os.ReadDir(full)
-		if err != nil {
-			return nil, fmt.Errorf("scan %s: %w", dir, err)
+	return dirs, nil
+}
+
+// scanDir records filename-owned handles and DI-owner handles from one
+// configured directory.
+func scanDir(repoRoot, dir string, handles map[string]string) error {
+	full := filepath.Join(repoRoot, dir)
+	entries, err := os.ReadDir(full)
+	if err != nil {
+		return fmt.Errorf("scan %s: %w", dir, err)
+	}
+	for _, entry := range entries {
+		if entry.IsDir() {
+			continue
 		}
-		for _, e := range entries {
-			if e.IsDir() {
-				continue
+		name := entry.Name()
+		if !strings.HasSuffix(name, ".md") {
+			continue
+		}
+		relPath := filepath.Join(dir, name)
+		if match := handleFileRE.FindStringSubmatch(name); match != nil {
+			if err := rememberHandle(handles, match[1], relPath); err != nil {
+				return err
 			}
-			name := e.Name()
-			if !strings.HasSuffix(name, ".md") {
-				continue
+		}
+		if isTODODir(dir) {
+			if err := scanDIHandles(filepath.Join(full, name), relPath, handles); err != nil {
+				return err
 			}
-			m := handleFileRE.FindStringSubmatch(name)
-			if m == nil {
-				continue
-			}
-			h := m[1]
-			if prev, dup := handles[h]; dup {
-				return nil, fmt.Errorf(
-					"corpus already contains duplicate handle %q in %s and %s",
-					h, prev, filepath.Join(dir, name))
-			}
-			handles[h] = filepath.Join(dir, name)
 		}
 	}
-	return handles, nil
+	return nil
+}
+
+// isTODODir recognizes both the historical root TODO layout and ppx/main's
+// per-protocol TODO directories.
+func isTODODir(dir string) bool {
+	return dir == "TODO" || strings.HasSuffix(filepath.ToSlash(dir), "/TODO")
+}
+
+// scanDIHandles records the handles owned by Decision Intent Log entries in
+// TODO files. A DI handle is global, so it must not duplicate any filename
+// handle or any other DI owner.
+func scanDIHandles(path, relPath string, handles map[string]string) error {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return fmt.Errorf("read %s: %w", relPath, err)
+	}
+	for _, match := range diOwnerRE.FindAllStringSubmatch(string(data), -1) {
+		if err := rememberHandle(handles, match[1], relPath+"#DI-"+match[1]); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// rememberHandle inserts one owned handle into the corpus and reports a clear
+// error if the repo already contains a duplicate owner.
+func rememberHandle(handles map[string]string, handle, owner string) error {
+	if previous, duplicate := handles[handle]; duplicate {
+		return fmt.Errorf(
+			"corpus already contains duplicate handle %q in %s and %s",
+			handle, previous, owner)
+	}
+	handles[handle] = owner
+	return nil
 }

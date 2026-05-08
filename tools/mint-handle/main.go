@@ -1,5 +1,5 @@
 // Command mint-handle allocates a unique wire-lab handle for a new
-// thought-experiment (TE) or TODO file.
+// coordination artifact.
 //
 // Usage:
 //
@@ -8,15 +8,15 @@
 // Flags:
 //
 //	-w   handle width: 1 for proquint-1 (5 chars, default) or 2 for
-//	     proquint-2 (11 chars). proquint-1 is locked as the wire-lab
-//	     canonical width per TE-39. Use proquint-2 only if the corpus
-//	     ever grows past ~1000 entries (see Saturation Watch in TE-39).
-//	-r   repo root (default: current directory). The tool walks
-//	     scanLiteralDirs and scanGlobs from this root to build the collision set.
+//	     proquint-2 (11 chars). proquint-1 is the canonical width for
+//	     new TODO, TE, DR, and DI artifacts.
+//	-r   repo root (default: current directory). The tool walks the
+//	     configured coordination directories from this root to build the
+//	     collision set.
 //	-n   dry-run: print what would be minted without contacting the
-//	     clock multiple times. (Mostly useful for tests.)
+//	     clock multiple times. Mostly useful for tests.
 //	-s   override the entropy seed source. By default the seed is
-//	     time.Now().UnixNano() at the moment mint() decides it needs a
+//	     time.Now().UnixNano() at the moment mint decides it needs a
 //	     fresh attempt. -s SEED forces the first attempt to use SEED;
 //	     subsequent retries fall back to the clock. Useful for tests
 //	     and for deterministic re-mints under a fixed seed.
@@ -30,27 +30,27 @@
 //
 //	gapip-munav
 //
-// Exit code 0 on success, non-zero on any error (including failure to
-// scan the corpus or, in the absurd case, exhausting the proquint-1
-// space without finding a free handle).
+// Exit code 0 on success, non-zero on any error, including failure to
+// scan the corpus or exhausting the requested proquint space.
 //
-// Why this design (see TE-39 for full rationale):
+// Why this design:
 //
 //   - Handles are mint-time-allocated random labels, not derivable from
 //     filename or content. They are persisted by being included in the
-//     filename of the artifact that owns them; the filename is the
-//     registry of record. There is no central HANDLES.md.
-//   - The check is "does any tracked file already use this proquint?"
-//     This is satisfied today by walking scanLiteralDirs and scanGlobs for files matching
-//     handleFileRE. Forks diverge naturally because each fork's
-//     filename set is distinct; there is no global ICARD-style registry
-//     and no attempt to guarantee global uniqueness. The 100-year
-//     no-central-authority invariant holds at the protocol layer; this
-//     tool operates one layer up (design notes about the protocol).
-//   - The entropy source is the wall clock at mint time. The hash
-//     function (SHA-256) folds that into 16 (or 32) bits. The choice
-//     of entropy source is operationally irrelevant; the collision
-//     check is what guarantees uniqueness.
+//     filename or DI owner line of the artifact that owns them; those owners
+//     are the registry of record. There is no central HANDLES.md.
+//   - The check is "does any tracked artifact already own this proquint?"
+//     This is satisfied by walking the configured coordination directories
+//     for files matching handleFileRE and DI owner lines matching diOwnerRE.
+//     Forks diverge naturally because each fork's owner set is distinct; the
+//     collision check is local and merge-time, not a central registry.
+//   - The entropy source is the wall clock at mint time. The hash function
+//     (SHA-256) folds that into 16 or 32 bits. The choice of entropy source
+//     is operationally secondary; the collision check is what guarantees
+//     uniqueness within the scanned corpus.
+//
+// Intent: Provide one local, collision-checked minting path for all new
+// coordination artifact IDs. Source: DI-nisam
 package main
 
 import (
@@ -96,14 +96,13 @@ func main() {
 //
 // If seed != 0 the first attempt uses seed as the entropy source. In
 // dryRun mode no retries are performed; the function returns whatever the
-// first attempt produced even on collision (returning an error in that
-// case so callers know the dry-run hit a collision).
+// first attempt produced even on collision, returning an error in that
+// collision case so callers know the dry-run hit an occupied handle.
 //
-// In production mode the function will retry up to maxAttempts times
-// before giving up. At 50% saturation of proquint-1 (about 32,000
-// handles) average retries are 2; at 99% saturation (about 65,000
-// handles) average retries are 100; at 100% saturation no handle exists
-// and we return an error.
+// In production mode the function retries up to maxAttempts before giving
+// up. At 50% saturation of proquint-1, about 32,000 handles, average
+// retries are 2; at 99% saturation, about 65,000 handles, average retries
+// are 100; at 100% saturation no handle exists and an error is returned.
 func mint(width int, corpus map[string]string, seed int64, dryRun bool) (string, error) {
 	const maxAttempts = 1_000_000
 	for attempt := 0; attempt < maxAttempts; attempt++ {
@@ -117,25 +116,24 @@ func mint(width int, corpus map[string]string, seed int64, dryRun bool) (string,
 		binary.BigEndian.PutUint64(buf[:], uint64(ns))
 		sum := sha256.Sum256(buf[:])
 
-		var cand string
+		var candidate string
 		switch width {
 		case 1:
-			cand = proquint1FromBytes(sum[:2])
+			candidate = proquint1FromBytes(sum[:2])
 		case 2:
-			cand = proquint2FromBytes(sum[:4])
+			candidate = proquint2FromBytes(sum[:4])
 		}
 
-		if _, taken := corpus[cand]; !taken {
-			return cand, nil
+		if _, taken := corpus[candidate]; !taken {
+			return candidate, nil
 		}
 		if dryRun {
-			return "", fmt.Errorf(
-				"dry-run: first attempt %q collides with corpus", cand)
+			return "", fmt.Errorf("dry-run: first attempt %q collides with corpus", candidate)
 		}
-		// Tiny sleep advances the nanosecond clock so the next attempt
-		// produces different entropy. On systems whose clock resolution
-		// is coarser than 1us this still works because the sleep is
-		// strictly monotonic with respect to time.Now().UnixNano().
+
+		// The short sleep advances coarse clocks enough that the next
+		// time-derived seed is different on systems with low timestamp
+		// resolution, while keeping normal minting latency negligible.
 		time.Sleep(time.Microsecond)
 	}
 	return "", fmt.Errorf(

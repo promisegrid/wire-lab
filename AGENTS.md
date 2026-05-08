@@ -27,8 +27,8 @@
 - Before locking any non-trivial decision that will require DF questions and answers, the agent must run a thought experiment (TE) if multiple plausible designs remain.
 - A TE happens before final DF questions. Its purpose is to narrow the design space so DF questions and answers are informed by explicit scenario analysis.
 - The agent must not collapse a TE into a short opinion or recommendation. The agent must explicitly model concrete scenarios and consequences.
-- Each TE has a unique proquint handle (5 lowercase characters, Wilkerson 2009 alphabet `bdfghjklmnprstvz` x `aiou` x `bdfghjklmnprstvz` x `aiou` x `bdfghjklmnprstvz`). Mint with `tools/mint-handle` (Go); the tool scans `docs/thought-experiments/` and `protocols/*/TODO/` for existing handles and retries on collision. Locked by TE-mumuv (formerly TE-39) on 2026-05-07.
-- The TE doc filename must be `TE-<handle>-<slug>.md` and live under `docs/thought-experiments/`, for example: `docs/thought-experiments/TE-mumuv-naming-reconciliation.md`. The slug is informational and may be edited; the proquint handle is permanent. Pre-2026-05-07 TEs were renamed in commit `85766f0`; each carries a `## Prior aliases` section recording its prior integer (TE-N) and timestamp (TE-YYYYMMDD-HHMMSS) aliases.
+- Each new TE must have a unique proquint handle in the format `TE-<handle>`, where `<handle>` is minted by `tools/mint-handle` from the global TODO/TE/DR/DI handle namespace. Existing pre-upgrade TE handles and prior aliases remain historical records.
+- The TE doc filename must be `TE-<handle>-<slug>.md` and live under `docs/thought-experiments/`, for example: `docs/thought-experiments/TE-mumuv-naming-reconciliation.md`. The slug is informational and may be edited; the proquint handle is permanent.
 
 ### TE Intake Requirements
 - Before locking decisions or asking final DF questions, the agent must identify:
@@ -36,7 +36,7 @@
   - the candidate alternatives,
   - the assumptions and threat/trust model,
   - the scope and systems affected.
-- If the TE relates to an existing TODO, the agent must reference the TODO number and subtask number (for example, `002.10`).
+- If the TE relates to an existing TODO, the agent must reference the TODO handle and subtask handle (for example, `fonuz.1`).
 
 ### TE Execution Requirements
 - Each TE must evaluate the same decision across multiple concrete scenarios.
@@ -180,6 +180,7 @@ Applicability: this policy applies uniformly to every TE corpus in this reposito
 - An unresolved question or uncertainty must cite at least one DR ID.
 - If an unresolved question has no DR yet, create a DR before finalizing the change.
 - During TODO-kugod migration, apply these rules incrementally as sections/files are brought under DR/DI tracking.
+- Intent: New coordination artifacts use a single proquint handle namespace so TODO, TE, DR, and DI references do not depend on timestamp or integer allocation. Source: DI-nisam
 
 
 ## Comment Preservation Protocol (Required)
@@ -189,8 +190,8 @@ Applicability: this policy applies uniformly to every TE corpus in this reposito
 - Do not treat shorter comments as better unless they preserve all important intent.
 - For any non-trivial behavior change, include a behavior-level comment with:
   - `Intent:` a short, clear rationale (a sentence or a few; no hard cap if more is needed for clarity).
-  - `Source:` a DI ID in the format `DI-NNN-YYYYMMDD-HHMMSS`.
-  - `NNN` is the TODO number of the TODO file where that DI entry resides.
+  - `Source:` a DI ID in the format `DI-<handle>`.
+  - `<handle>` is minted by `tools/mint-handle` and is globally unique across TODO, TE, DR, and DI owners.
   - Optional: TODO file/section reference for faster lookup.
 - If a comment must be dropped with no replacement, stop and ask the user before proceeding.
 - Before editing a file, review existing comments in that file.
@@ -198,7 +199,7 @@ Applicability: this policy applies uniformly to every TE corpus in this reposito
 - Treat DI logs as append-only history. Do not rewrite or delete prior entries.
 - When intent evolves, add a new DI entry and set `Supersedes: <old-di-id>`.
 - DI entries must include:
-  - `ID: DI-NNN-YYYYMMDD-HHMMSS`
+  - `ID: DI-<handle>`
   - `Date: YYYY-MM-DD HH:MM:SS`
   - `Status: active|superseded`
   - `Decision:`
@@ -216,9 +217,9 @@ Applicability: this policy applies uniformly to every TE corpus in this reposito
 
 ### Comment + DI Examples
 - Comment format example:
-  - `// Intent: Keep context resolution stable across workspace scans to avoid target drift between plan and run. Source: DI-002-20260309-093000`
+  - `// Intent: Keep context resolution stable across workspace scans to avoid target drift between plan and run. Source: DI-vapoj`
 - Decision Intent Log entry template (for TODO files):
-  - `ID: DI-NNN-YYYYMMDD-HHMMSS`
+  - `ID: DI-<handle>`
   - `Date: YYYY-MM-DD HH:MM:SS`
   - `Status: active`
   - `Decision: <what was decided>`
@@ -238,7 +239,7 @@ Rules:
 - Person identity format: `user@example.com (FirstName)`.
 
 Recommended file naming:
-- `DR-<TODO>-YYYYMMDD-HHMMSS-<slug>.md`
+- `DR-<handle>-<slug>.md`, where `<handle>` is minted by `tools/mint-handle`.
 
 Required DR fields:
 - `DR-ID`
@@ -275,9 +276,9 @@ Reference pattern:
 
 ## Glossary
 - **TE**: Thought Experiment. Analysis doc under `docs/thought-experiments/TE-<handle>-<slug>.md` or an approved per-protocol TE corpus. The handle is a proquint minted by `tools/mint-handle`. (DI-034-20260508-060134)
-- **DR**: Decision Request. Open question or decision-tracking record under `DR/DR-NNN-YYYYMMDD-HHMMSS-<slug>.md`, where `NNN` is the TODO number. (DI-034-20260508-060134)
-- **DI**: Decision Intent. Locked decision record inside a `## Decision Intent Log` in a protocol TODO file. ID format is `DI-NNN-YYYYMMDD-HHMMSS`. (DI-034-20260508-060134)
+- **DR**: Decision Request. Open question or decision-tracking record under `DR/DR-<handle>-<slug>.md`, where `<handle>` is minted by `tools/mint-handle`. (DI-nisam; DI-034-20260508-060134)
+- **DI**: Decision Intent. Locked decision record inside a `## Decision Intent Log` in a protocol TODO file. New DI ID format is `DI-<handle>`, where `<handle>` is minted by `tools/mint-handle`. (DI-nisam; DI-034-20260508-060134)
 - **DF**: Decision Framing. The multiple-choice intake round used to lock a decision after any required TE narrows the alternatives. (DI-034-20260508-060134)
-- **TODO**: Task-tracking file under `protocols/<slug>.d/TODO/TODO-<handle>-<slug>.md`. The master cross-listed index is `protocols/wire-lab.d/TODO/TODO.md`; per-protocol queues live at `protocols/<slug>.d/TODO/TODO.md`. (DI-034-20260508-060134)
+- **TODO**: Task-tracking file under `protocols/<slug>.d/TODO/TODO-<handle>-<slug>.md`, where `<handle>` is minted by `tools/mint-handle`. The master cross-listed index is `protocols/wire-lab.d/TODO/TODO.md`; per-protocol queues live at `protocols/<slug>.d/TODO/TODO.md`. (DI-nisam; DI-034-20260508-060134)
 - **twig**: Short kebab-case task name used in branch names, usually as `<user>/<twig>` such as `ppx/<twig>` or `stevegt/<twig>`. (DI-034-20260508-060134)
 - **pCID**: Protocol CID. A pCID is the content hash of a spec document that defines a wire protocol; it is analogous to a TCP/UDP port number with no central registry because the spec hash is the port number. A pCID is not the hash of a particular message, payload, or promise body. (DI-009-20260429-173359; DI-034-20260508-060134)
