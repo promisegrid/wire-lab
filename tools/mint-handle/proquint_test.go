@@ -5,7 +5,8 @@ import "testing"
 // TestUint16ToProquintKnownVectors pins the proquint encoding to the
 // canonical values from Wilkerson 2009 sec. 3, "Encoding Examples". These
 // are the load-bearing vectors that lock the consonant/vowel ordering and
-// bit-shift layout.
+// bit-shift layout. If anyone ever changes the alphabets or bit packing,
+// these tests will catch it.
 func TestUint16ToProquintKnownVectors(t *testing.T) {
 	cases := []struct {
 		in   uint16
@@ -27,20 +28,21 @@ func TestUint16ToProquintKnownVectors(t *testing.T) {
 	for _, c := range cases {
 		got := uint16ToProquint(c.in)
 		if got != c.want {
-			t.Errorf("uint16ToProquint(0x%04X) = %q, want %q", c.in, got, c.want)
+			t.Errorf("uint16ToProquint(0x%04x) = %q, want %q", c.in, got, c.want)
 		}
 	}
 }
 
 // TestProquintLengths verifies the structural invariants: a proquint-1 is
-// exactly 5 characters and a proquint-2 is exactly 11.
+// always exactly 5 characters and a proquint-2 is always exactly 11 (5 + '-'
+// + 5). These are filename-shape contracts.
 func TestProquintLengths(t *testing.T) {
 	b := []byte{0x12, 0x34, 0x56, 0x78}
 	if got := proquint1FromBytes(b); len(got) != 5 {
-		t.Errorf("proquint1 length = %d, want 5 (%q)", len(got), got)
+		t.Fatalf("proquint1FromBytes len = %d, want 5 (%q)", len(got), got)
 	}
 	if got := proquint2FromBytes(b); len(got) != 11 {
-		t.Errorf("proquint2 length = %d, want 11 (%q)", len(got), got)
+		t.Fatalf("proquint2FromBytes len = %d, want 11 (%q)", len(got), got)
 	}
 }
 
@@ -57,6 +59,9 @@ func TestProquintAlphabetMembership(t *testing.T) {
 	}
 	for n := 0; n < 65536; n++ {
 		q := uint16ToProquint(uint16(n))
+		if len(q) != 5 {
+			t.Fatalf("n=%d: length=%d", n, len(q))
+		}
 		positions := []struct {
 			pos      int
 			alphabet string
@@ -89,6 +94,6 @@ func TestProquintFullSpaceUniqueness(t *testing.T) {
 		seen[q] = uint16(n)
 	}
 	if len(seen) != 65536 {
-		t.Errorf("unique proquints = %d, want 65536", len(seen))
+		t.Fatalf("seen size = %d, want 65536", len(seen))
 	}
 }

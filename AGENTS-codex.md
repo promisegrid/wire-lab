@@ -23,16 +23,19 @@ Read these files in this order before doing anything else:
                                                   - Commit & Pull Request
                                                     Guidelines
   2. README.md                                  — repo orientation.
-  3. TODO/TODO.md                               — priority-sorted index.
-  4. TODO/001-perplexity-computer-onboarding.md — bootstrap decisions
+  3. protocols/wire-lab.d/TODO/TODO.md          — master cross-listed,
+                                                  priority-sorted index of
+                                                  TODOs across all
+                                                  protocols-as-simrepos.
+  4. protocols/wire-lab.d/TODO/TODO-dutaz-perplexity-computer-onboarding.md — bootstrap decisions
                                                   governing how the bot
                                                   participates.
   5. DR/DR-001-…-bot-identity.md
      DR/DR-002-…-drop-require-pr.md
      DR/DR-003-…-review-style.md                — the three DRs that
                                                   back the DIs in
-                                                  TODO/001.
-  6. harness-spec.md                            — the canonical Wire Lab
+                                                  protocols/wire-lab.d/TODO/TODO-dutaz-perplexity-computer-onboarding.md.
+  6. protocols/wire-lab.d/specs/harness-spec-draft.md                            — the canonical Wire Lab
                                                   spec. Skim §0–§3 and
                                                   §10a; the rest is
                                                   reference.
@@ -108,7 +111,8 @@ Steps:
             Date, Status, Decision, Intent, Constraints, Affects,
             Author, optional Supersedes.
         - Verify the DI sits inside `## Decision Intent Log` of the
-          referenced TODO file.
+          referenced protocols/<slug>.d/TODO/TODO-<handle>-<slug>.md
+          file for protocol TODOs.
         - Verify Linked DR ↔ Linked DI back-references are consistent.
   g. For any TE files added under docs/thought-experiments/:
         - Verify filename: `TE-<handle>-<slug>.md` for new TEs, where
@@ -119,7 +123,7 @@ Steps:
             alternatives, scenario analysis, conclusions, implications.
         - Verify it does not collapse to "short opinion / recommendation"
           — protocol explicitly forbids that.
-  h. For any code or harness-spec.md changes:
+  h. For any code or protocols/wire-lab.d/specs/harness-spec-draft.md changes:
         - Verify settled statements cite at least one DI ID.
         - Verify unresolved questions cite at least one DR ID.
         - Run a comment-delta audit on each touched file:
@@ -167,7 +171,7 @@ Steps:
   a. Determine if this is trivial or non-trivial.
 
      Trivial      = typo, broken link, formatting, no semantic change.
-     Non-trivial  = anything that touches harness-spec.md semantics,
+     Non-trivial  = anything that touches protocols/wire-lab.d/specs/harness-spec-draft.md semantics,
                     introduces a new concept, commits to an
                     implementation choice, or adds new files.
 
@@ -177,9 +181,11 @@ Steps:
        doc under docs/thought-experiments/ with the right filename.
      - Ask Steve multiple-choice DF questions for the surviving
        alternatives.
-     - When Steve answers, write the DI into the relevant TODO file.
-       If no TODO file fits, propose creating a new one (and update
-       TODO/TODO.md).
+     - When Steve answers, write the DI into the relevant
+       protocols/<slug>.d/TODO/TODO-<handle>-<slug>.md (harness-level
+       TODOs live under protocols/wire-lab.d/TODO/). If no TODO file
+       fits, propose creating a new one (and update
+       protocols/wire-lab.d/TODO/TODO.md).
      - Write a DR with State: decided (since Steve decided in chat),
        Linked DI, all required fields.
 
@@ -208,7 +214,7 @@ asks "what's our policy on X" and you can't find a citing DI.
 
 Steps:
   a. Search the repo for any existing DR or DI on the topic:
-        rg -i "<keyword>" DR/ TODO/
+        rg -i "<keyword>" DR/ protocols/*/TODO/
   b. If nothing exists, draft a new DR file:
         DR/DR-<handle>-<slug>.md
      where `<handle>` is minted by `tools/mint-handle`. If no TODO yet,
@@ -219,27 +225,33 @@ Steps:
   d. Commit on a branch. Push.
   e. Tell Steve the DR exists and what it's blocking.
 
+# TE editing policy (Required)
+
+`AGENTS.md` is the canonical statement of the TE editing policy and TE
+authoring conventions. Before performing or reviewing a TE edit, read
+`AGENTS.md` "TE Editing Policy (Required)" plus TE-dabol
+(`docs/thought-experiments/TE-dabol-te-editing-policy-and-holistic-corpus.md`)
+and TE-vudaf
+(`docs/thought-experiments/TE-vudaf-editing-policy-tabletop.md`), including
+their `## Refinements` sections. (DI-034-20260508-060134)
+
+Codex-specific review duty: when reviewing bot work that touches a TE,
+verify that the branch follows AGENTS.md's category rules, uses the
+top-of-file `## Status` field correctly, leaves historical quotations
+untouched, and cites the relevant DR/DI provenance.
+
 # Things that are forbidden
 
-- Do not push to main yourself. Always go through Steve approving
-  the push, and have Steve be the one logged in if his identity
-  matters at the wire level.
-- Do not open GitHub pull requests. (DR-003 / DI-001-20260428-195702.)
-- Do not edit DR or DI fields in already-merged history. Both are
-  append-only. To change a DI, write a new DI with
-  Supersedes: <old-id>.
-- Do not invent function names, variable names, or file paths that
-  are not covered by a locked DI. If naming is needed, stop and
-  ask Steve as multiple-choice.
-- Do not collapse a TE into "my recommendation is X". The TE must
-  explicitly model multiple scenarios.
-- Do not use `git add .` or `git add -A`. Stage explicitly.
-- Do not use `|| true` or silent error suppression in any script
-  or commit. (AGENTS.md Error Handling Policy.)
-- Do not remove existing code comments without an equal-or-better
-  replacement in the same patch. (Comment Preservation Protocol.)
-- Do not commit local state files (.grok, .grok.lock, generated
-  binaries, secrets).
+In addition to AGENTS.md's repo-wide prohibitions:
+
+- Do not use the bot's git identity. You act as Steve; commits you make
+  on Steve's behalf use Steve's identity. (DI-001-20260428-195700)
+- Do not push to `main` without Steve's explicit approval for that
+  action. When identity matters at the wire level, Steve must be the
+  logged-in actor. (DI-001-20260428-195701)
+- Do not commit directly on an inbound `ppx/{twig}` branch. Review
+  comments go back to the bot as chat or as Steve-authored follow-up
+  work, not as edits to the bot's branch. (DI-034-20260508-060134)
 
 # Reporting style
 
@@ -254,6 +266,24 @@ When you finish a task, give Steve:
 
 These are the AGENTS.md "Required final handoff artifacts". For
 review-only tasks (Kind 1) most are N/A — say so, don't omit them.
+
+# Session-logging review note
+
+Branches that touch session-logging discipline land on `ppx/main` in
+this repo with paired changes on the `wire-lab` orphan branch of
+`stevegt/session-logs`. As of DI-033-20260507-150000 (TODO-topit /
+DR-010), the canonical record on the orphan branch is
+`sessions/<session-id>/conversation.md` -- a periodic snapshot of
+the harness-produced transcript -- plus a small
+`TURNOVER-YYYYMMDD-HHMMTZ[-suffix].md` at the worktree root. New
+sessions do NOT write per-turn `<NNN>-turn.md` files. When you
+review a snapshot-procedure change, expect the wire-lab side to
+edit `AGENTS-ppx.md` Session Logging and the session-logs side to
+edit `README.md`, `tools/check-layout.sh` (which gains a
+default-reject rule for new per-turn files plus an
+`--allow-per-turn` audit-only flag), and to add a TURNOVER cutover
+note. Existing per-turn files under `sessions/ea135ce8/` and frozen
+files under `turns/` must remain unedited.
 
 # When in doubt
 

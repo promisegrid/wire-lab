@@ -7,14 +7,18 @@ import (
 	"testing"
 )
 
-// TestMintWidthOne checks that proquint-1 mints are 5 chars.
+// TestMintWidthOne checks that proquint-1 mints are 5 chars and pass the
+// proquint shape regex.
 func TestMintWidthOne(t *testing.T) {
 	got, err := mint(1, map[string]string{}, 0, false)
 	if err != nil {
 		t.Fatalf("mint: %v", err)
 	}
 	if len(got) != 5 {
-		t.Errorf("mint width=1 length = %d, want 5 (%q)", len(got), got)
+		t.Fatalf("len(%q) = %d, want 5", got, len(got))
+	}
+	if !handleFileRE.MatchString("TE-" + got + "-x.md") {
+		t.Fatalf("mint %q does not match handle regex", got)
 	}
 }
 
@@ -26,17 +30,17 @@ func TestMintWidthTwo(t *testing.T) {
 		t.Fatalf("mint: %v", err)
 	}
 	if len(got) != 11 {
-		t.Errorf("mint width=2 length = %d, want 11 (%q)", len(got), got)
+		t.Fatalf("len(%q) = %d, want 11", got, len(got))
 	}
 	if strings.Count(got, "-") != 1 {
-		t.Errorf("mint width=2 hyphens = %d, want 1 (%q)",
-			strings.Count(got, "-"), got)
+		t.Fatalf("hyphen count in %q = %d, want 1", got, strings.Count(got, "-"))
 	}
 }
 
 // TestMintAvoidsCollision pre-populates the corpus with the value that
 // seed=42 would produce on first attempt, then mints with a clock-based
-// retry. The returned handle must be different from the seeded one.
+// retry. The returned handle must be different from the seeded one, proving
+// that the retry path actually fires.
 func TestMintAvoidsCollision(t *testing.T) {
 	corpus := map[string]string{}
 	first, err := mint(1, corpus, 42, false)
@@ -44,17 +48,17 @@ func TestMintAvoidsCollision(t *testing.T) {
 		t.Fatalf("seed mint: %v", err)
 	}
 	corpus[first] = "fake/path.md"
-	second, err := mint(1, corpus, 42, false)
+	got, err := mint(1, corpus, 42, false)
 	if err != nil {
-		t.Fatalf("retry mint: %v", err)
+		t.Fatalf("mint after collision: %v", err)
 	}
-	if second == first {
-		t.Errorf("retry returned same handle %q despite collision", second)
+	if got == first {
+		t.Fatalf("mint returned colliding handle %q", got)
 	}
 }
 
-// TestMintDryRunCollidesErrors checks that dry-run mode reports a clear
-// error when its single attempt hits a collision.
+// TestMintDryRunCollidesErrors verifies dry-run is deterministic and reports
+// a collision instead of retrying with wall-clock entropy.
 func TestMintDryRunCollidesErrors(t *testing.T) {
 	first, err := mint(1, map[string]string{}, 42, true)
 	if err != nil {
@@ -85,7 +89,7 @@ func TestScanCorpusEmpty(t *testing.T) {
 		t.Fatalf("scan: %v", err)
 	}
 	if len(corpus) != 0 {
-		t.Errorf("empty repo corpus size = %d, want 0", len(corpus))
+		t.Fatalf("corpus size = %d, want 0", len(corpus))
 	}
 }
 
@@ -145,7 +149,7 @@ func TestScanCorpusIgnoresLegacyFilenames(t *testing.T) {
 		t.Fatalf("scan: %v", err)
 	}
 	if len(corpus) != 0 {
-		t.Errorf("legacy-only corpus = %d, want 0 (%v)", len(corpus), corpus)
+		t.Fatalf("legacy corpus size = %d, want 0 (%v)", len(corpus), corpus)
 	}
 }
 

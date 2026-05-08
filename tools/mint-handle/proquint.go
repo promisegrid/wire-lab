@@ -1,6 +1,6 @@
 package main
 
-// Proquint encoding per Wilkerson 2009, "Proquints: Identifiers that are
+// Proquint encoding per Daniel Wilkerson, "A Proposal for Proquints:
 // Readable, Spellable, and Pronounceable" (https://arxiv.org/html/0901.4016).
 //
 // A proquint is a sequence of consonant-vowel quintuplets where each quint
@@ -22,6 +22,10 @@ package main
 // proquint-2 is two quints joined by '-' (10 chars + hyphen, 32-bit space,
 // 4.29 billion values).
 //
+// We use proquint as the wire-lab handle encoding because it is short,
+// pronounceable, and trivially derivable from any 16- or 32-bit hash output
+// without a curated wordlist or central registry.
+//
 // Intent: Keep new coordination artifact IDs short and collision-checkable
 // without relying on central integer or timestamp allocation. Source: DI-nisam
 const (
@@ -29,29 +33,32 @@ const (
 	proquintVows = "aiou"
 )
 
-// uint16ToProquint encodes a 16-bit value as a 5-character proquint string.
+// uint16ToProquint encodes one 16-bit value as a single CVCVC proquint. The
+// bit layout follows Wilkerson's original paper exactly.
 func uint16ToProquint(n uint16) string {
-	out := []byte{
-		proquintCons[(n>>12)&0xF],
-		proquintVows[(n>>10)&0x3],
-		proquintCons[(n>>6)&0xF],
-		proquintVows[(n>>4)&0x3],
-		proquintCons[n&0xF],
+	buf := []byte{
+		proquintCons[(n>>12)&0x0f],
+		proquintVows[(n>>10)&0x03],
+		proquintCons[(n>>6)&0x0f],
+		proquintVows[(n>>4)&0x03],
+		proquintCons[n&0x0f],
 	}
-	return string(out)
+	return string(buf)
 }
 
-// proquint1FromBytes returns the proquint-1 (5 chars) derived from the first
-// two bytes of b. Caller must ensure len(b) >= 2.
+// proquint1FromBytes converts the first two bytes into one proquint. The
+// caller is responsible for passing at least two bytes; mint() always passes
+// SHA-256 output, so that precondition is controlled locally.
 func proquint1FromBytes(b []byte) string {
 	n := uint16(b[0])<<8 | uint16(b[1])
 	return uint16ToProquint(n)
 }
 
-// proquint2FromBytes returns the proquint-2 (5 + '-' + 5 = 11 chars) derived
-// from the first four bytes of b. Caller must ensure len(b) >= 4.
+// proquint2FromBytes converts the first four bytes into two hyphen-separated
+// proquints. It is available for future corpus-size growth beyond the
+// proquint-1 comfort range.
 func proquint2FromBytes(b []byte) string {
-	q1 := proquint1FromBytes(b[0:2])
-	q2 := proquint1FromBytes(b[2:4])
-	return q1 + "-" + q2
+	a := uint16(b[0])<<8 | uint16(b[1])
+	c := uint16(b[2])<<8 | uint16(b[3])
+	return uint16ToProquint(a) + "-" + uint16ToProquint(c)
 }

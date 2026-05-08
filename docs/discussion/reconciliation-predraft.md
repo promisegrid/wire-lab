@@ -54,7 +54,7 @@ Three observations, in order of confidence:
 My lean is now option 4 (don't name it at the grid level). This matches the "introduce hCID only in the function-call protocol's spec, not in harness-spec" lean from my last message, and the reasoning is now stronger: naming inner-CIDs at the grid level forces a vocabulary commitment about what kinds of things can be nested, and that commitment will reproduce the congruence/convergence tribal war at the wrong layer. Let each protocol name its own internals.
 
 What I'd actually do
-I'd write TE-23 as "spec-as-pCID is the formalism-neutral top-level choice; convergence and congruence both express as protocols nested inside," with these DFs:
+I'd write TE-lozip as "spec-as-pCID is the formalism-neutral top-level choice; convergence and congruence both express as protocols nested inside," with these DFs:
 
 23.1: What does pCID hash? Lean: spec doc (as already locked). The new framing says this is also the formalism-neutral choice.
 
@@ -62,7 +62,7 @@ I'd write TE-23 as "spec-as-pCID is the formalism-neutral top-level choice; conv
 
 23.3: Do we acknowledge congruence/convergence as a duality the grid is meant to host? Lean: yes, in the harness-spec, as a foundational framing note. Not as a normative section yet — as a stated aspiration with a known-issue note that the equivalence theorem is conjectural.
 
-23.4: Do we open a follow-on TE for "what would the equivalence theorem look like"? Lean: yes, as TE-24 or later, explicitly scoped as research-flavored. It's the Church-Turing-thesis-equivalent question and it deserves its own home.
+23.4: Do we open a follow-on TE for "what would the equivalence theorem look like"? Lean: yes, as TE-hogus or later, explicitly scoped as research-flavored. It's the Church-Turing-thesis-equivalent question and it deserves its own home.
 
 I am not claiming I've reconciled the camps. I'm claiming: the layout you already proposed (spec-as-pCID, with code-hashing as a per-protocol feature) is the design that lets the reconciliation happen, even if neither of us has the proof yet. The grid becomes the substrate where the equivalence can be discovered, rather than the substrate that pre-commits to one side.
 

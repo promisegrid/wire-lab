@@ -9,7 +9,7 @@
 //
 //	-w   handle width: 1 for proquint-1 (5 chars, default) or 2 for
 //	     proquint-2 (11 chars). proquint-1 is the canonical width for
-//	     new TODO, TE, DR, and DI artifacts on main.
+//	     new TODO, TE, DR, and DI artifacts.
 //	-r   repo root (default: current directory). The tool walks the
 //	     configured coordination directories from this root to build the
 //	     collision set.
@@ -32,6 +32,22 @@
 //
 // Exit code 0 on success, non-zero on any error, including failure to
 // scan the corpus or exhausting the requested proquint space.
+//
+// Why this design:
+//
+//   - Handles are mint-time-allocated random labels, not derivable from
+//     filename or content. They are persisted by being included in the
+//     filename or DI owner line of the artifact that owns them; those owners
+//     are the registry of record. There is no central HANDLES.md.
+//   - The check is "does any tracked artifact already own this proquint?"
+//     This is satisfied by walking the configured coordination directories
+//     for files matching handleFileRE and DI owner lines matching diOwnerRE.
+//     Forks diverge naturally because each fork's owner set is distinct; the
+//     collision check is local and merge-time, not a central registry.
+//   - The entropy source is the wall clock at mint time. The hash function
+//     (SHA-256) folds that into 16 or 32 bits. The choice of entropy source
+//     is operationally secondary; the collision check is what guarantees
+//     uniqueness within the scanned corpus.
 //
 // Intent: Provide one local, collision-checked minting path for all new
 // coordination artifact IDs. Source: DI-nisam
@@ -85,8 +101,8 @@ func main() {
 //
 // In production mode the function retries up to maxAttempts before giving
 // up. At 50% saturation of proquint-1, about 32,000 handles, average
-// retries are 2; at 100% saturation no handle exists and an error is
-// returned.
+// retries are 2; at 99% saturation, about 65,000 handles, average retries
+// are 100; at 100% saturation no handle exists and an error is returned.
 func mint(width int, corpus map[string]string, seed int64, dryRun bool) (string, error) {
 	const maxAttempts = 1_000_000
 	for attempt := 0; attempt < maxAttempts; attempt++ {

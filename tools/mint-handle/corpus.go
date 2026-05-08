@@ -11,8 +11,18 @@ import (
 // scanLiteralDirs are the wire-lab directories scanned literally for
 // existing handles. scanGlobs are glob patterns expanded against repoRoot;
 // every directory matching any glob is also scanned. Missing directories are
-// skipped so the tool works on both current main's root layout and ppx/main's
-// protocolized TODO layout.
+// skipped so the tool works on both main's historical root layout and
+// ppx/main's protocolized TODO layout.
+//
+// Convention-based rather than registry-based: filenames and DI owner lines
+// are the ground truth. There is no separate HANDLES.md registry. To add a
+// new artifact type that owns handles, add its directory, filename grammar,
+// or owner-line scanner here.
+//
+// scanGlobs uses Go filepath.Glob semantics, which match path components
+// individually. "protocols/*/TODO" therefore matches protocols/wire-lab.d/
+// TODO, protocols/group-session.d/TODO, protocols/ppx-dr.d/TODO, etc., as
+// new protocol subtrees are added.
 //
 // Intent: Collision-check the shared TODO, TE, DR, and DI handle namespace
 // across the layouts main and ppx/main need to merge. Source: DI-nisam
@@ -157,7 +167,7 @@ func scanDir(repoRoot, dir string, handles map[string]string) error {
 	return nil
 }
 
-// isTODODir recognizes both the current root TODO layout and ppx/main's
+// isTODODir recognizes both the historical root TODO layout and ppx/main's
 // per-protocol TODO directories.
 func isTODODir(dir string) bool {
 	return dir == "TODO" || strings.HasSuffix(filepath.ToSlash(dir), "/TODO")
