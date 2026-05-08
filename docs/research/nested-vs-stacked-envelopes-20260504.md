@@ -1,8 +1,8 @@
 # Nested vs Stacked Envelopes: How Long-Lived Decentralized Protocols Resolved This Design Question
 
-**File:** `wire-lab/docs/research/nested-vs-stacked-envelopes-20260504.md`  
-**Date:** 2026-05-04  
-**Context:** PromiseGrid wire-lab — candidate envelope shape research  
+**File:** `wire-lab/docs/research/nested-vs-stacked-envelopes-20260504.md`
+**Date:** 2026-05-04
+**Context:** PromiseGrid wire-lab — candidate envelope shape research
 **Status:** Reference material for design decision
 
 ---

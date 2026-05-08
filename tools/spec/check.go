@@ -32,10 +32,10 @@ import (
 //
 // Advisory checks (warn, don't fail):
 //
-//  - CRLF line endings in `<SpecsDir>/*-draft.md` (DI-011-20260429-184457
-//    trades editor-style robustness for transparency, but a CRLF flip is
-//    still almost always an accident, so we flag it).
-//  - UTF-8 BOM at the start of any draft.
+//   - CRLF line endings in `<SpecsDir>/*-draft.md` (DI-011-20260429-184457
+//     trades editor-style robustness for transparency, but a CRLF flip is
+//     still almost always an accident, so we flag it).
+//   - UTF-8 BOM at the start of any draft.
 func cmdCheck() error {
 	repoRoot, err := findRepoRoot()
 	if err != nil {
