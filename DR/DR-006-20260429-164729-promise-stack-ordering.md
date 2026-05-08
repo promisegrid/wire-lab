@@ -3,12 +3,12 @@
 DR-ID: DR-006-20260429-164729
 Date: 2026-04-29 16:47:29
 Asked by: stevegt@t7a.org (Steve Traugott)
-State: open
-Question: Given a stack of promise frames in a single message, what is the canonical evaluation order, what is the canonical wire-encoding order, and what is the placement convention for different assertion types?
-Why this blocks progress: Senders, intermediate routers, and receivers all need a shared expectation about how a multi-frame `Promise` stack is read and acted upon. Without a shared convention, a v1 receiver and a v2 receiver can ratify the same wire bytes differently, partial-knowledge peers can act on stale assertions, and revocation/compliance frames added at one layer can be ignored by another. Locking a wire-and-evaluation convention is a prerequisite for harness conformance tests on §1.1 of `specs/harness-spec-draft.md`.
-Affects: `specs/harness-spec-draft.md` §1.1 (Promise frame shape); `specs/harness-spec-draft.md` §2 (trust ledger, per-assertion-type); future TE-fijub (capability-token revocation propagation); future TE-muvuv (zero-knowledge envelopes).
-Unblocks: `protocols/wire-lab.d/TODO/TODO-rivuk-te-promise-stack-ordering.md` subtasks; `specs/harness-spec-draft.md` §1.1 conformance tests; criticality-flag location decision; per-assertion-type position-convention authority.
-Waiting on: stevegt@t7a.org (Steve Traugott)
+State: closed
+Question: Historical question: given a stack of promise frames in a single message, what is the canonical evaluation order, what is the canonical wire-encoding order, and what is the placement convention for different assertion types?
+Why this blocks progress: No longer blocks progress as a standalone decision. TE-havib DF-36.2 Alt-2.A revised retired promise-stack as a separate hypothesis before the DF-1.* queue landed; payload recursion under `grid <pcid> <payload>` is the active framing.
+Affects: Historical: `protocols/wire-lab.d/specs/harness-spec-draft.md` §1.1 (Promise frame shape); `protocols/wire-lab.d/specs/harness-spec-draft.md` §2 (trust ledger, per-assertion-type); future TE-fijub (capability-token revocation propagation); TE-muvuv (zero-knowledge envelopes). Current forward pointer: TE-havib DF-36.2, TE-lozip, and `docs/essays/congruence-convergence-and-the-grid.md` §3.1.
+Unblocks: Closed by TODO-kugod DI-runuh. No promise-stack ordering DIs are emitted; downstream work should use payload-recursion/grid-envelope framing.
+Waiting on: DI-runuh
 
 ## Candidate alternatives considered
 
@@ -21,11 +21,14 @@ The full alternative analysis (Alt-A through Alt-E) lives in `docs/thought-exper
 
 ## Decision
 
-Pending. Awaiting DF answers from Steve. Once DF lands, this DR transitions to `decided` and emits DI entries into `protocols/wire-lab.d/TODO/TODO-rivuk-te-promise-stack-ordering.md`.
+Closed as superseded/no-longer-applicable on 2026-05-08. TE-havib DF-36.2
+Alt-2.A revised retired promise-stack as a separate hypothesis, so the
+DF-1.* promise-stack ordering questions should not be answered and should not
+emit DIs. TODO-kugod DI-runuh records the closure cascade.
 
 ## Linked DI
 
-To be created in `protocols/wire-lab.d/TODO/TODO-rivuk-te-promise-stack-ordering.md` after DF.
+DI-runuh in `protocols/wire-lab.d/TODO/TODO-kugod-te-40-apparatus-vs-specimen-completion.md`.
 
 ## Related commits
 
@@ -35,4 +38,12 @@ To be created in `protocols/wire-lab.d/TODO/TODO-rivuk-te-promise-stack-ordering
 
 ## Last updated
 
-2026-04-29 17:32:00
+2026-05-08 23:41:08
+
+## Resolution event — 2026-05-08
+
+TODO-kugod implemented the Cat-3 promise-stack retirement cascade. TE-famar,
+TE-muvuv, and TE-robub now carry forward-pointer refinements; TODO-rivuk is
+closed as superseded; this DR is closed as no-longer-applicable rather than
+decided. The original candidate alternatives above remain historical evidence
+for why promise-stack ordering was considered.

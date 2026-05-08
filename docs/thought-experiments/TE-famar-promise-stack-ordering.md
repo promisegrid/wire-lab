@@ -239,3 +239,20 @@ Since this TE was first drafted on 2026-04-27 and expanded into full scenario fo
 The related DR — `DR/DR-006-20260429-164729-promise-stack-ordering.md` — is open and is the proposal-side document for the same decision under test. TODO-rivuk is the lifecycle tracker for both this TE and DR-006; closing DF-1.1 through DF-1.4 on this TE is also what closes DR-006.
 
 This is a Cat-3 / Cat-4 navigational refinement under the editing policy locked in `DI-020-20260502-213103` (and its `## Refinements` chain on TE-dabol, including DI-020-20260502-232651 and the four Cat-3 Refinements). The TE body above is unchanged: the decision under test, the alternatives, the scenarios, the conclusions, and the recommended set all remain as first drafted. The Refinement only adds forward pointers to the open lifecycle items so a single-TE reader can find the current state without reading the full corpus. No DI is filed for this Refinement; the substantive DI work happens in TODO-rivuk once DF-1.1 through DF-1.4 are answered.
+
+### 2026-05-08 — Promise-stack ordering queue superseded by payload-recursion framing
+
+TE-havib DF-36.2 Alt-2.A revised retired promise-stack as a separate
+hypothesis. The `Promise` struct, `[]Promise` shape, CBOR array encoding,
+and `promstack` Wrap/Peel/Project library are now treated as invented
+machinery that re-implements payload recursion at the wrong layer. Current
+readers should follow TE-havib's DF-36.2 lock, TE-lozip's pCID framing, and
+`docs/essays/congruence-convergence-and-the-grid.md` §3.1 instead of
+answering this TE's DF-1.1 through DF-1.4 queue.
+
+TODO-kugod records this cascade in DI-runuh. TODO-rivuk and DR-006 now close
+the old promise-stack-ordering work as superseded/no-longer-applicable rather
+than creating promise-stack ordering DIs. The body above remains unchanged as
+historical analysis: it is still useful evidence of why ordered frame stacks
+were considered, but it is no longer the active decision path for the wire-lab
+harness or for a separate `protocols/promise-stack.d/` specimen.
