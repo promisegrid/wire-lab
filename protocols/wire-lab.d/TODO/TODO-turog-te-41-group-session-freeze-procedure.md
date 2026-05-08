@@ -9,8 +9,8 @@ Before the TE-39 proquint migration, this file was known as:
 
 ## Status
 
-Open. Depends on TE-40 (apparatus-vs-specimen completion) landing.
-No twig yet.
+Open. Depends on TE-40 (apparatus-vs-specimen completion) landing and
+TE-nijab's transport-layering / freeze-boundary DFs. No twig yet.
 
 ## Threads absorbed from OPEN-THREADS.md
 
@@ -32,6 +32,11 @@ TODO-bisur. Sequence:
      message's grid envelope from `grid draft:group-session` to
      `grid <pcid>` in a single mechanical commit.
 
+Note: step 5 is now explicitly under review by TE-nijab. TE-nijab tests
+whether this is a category error: specs freeze, while transport message
+directories are append-only specimen data. Do not execute step 5 until
+DF-nijab.1 through DF-nijab.3 are locked.
+
 Blocking: outer transport-spec-draft.md has its own freeze gate;
 nothing else gates this thread today.
 
@@ -42,7 +47,28 @@ Disposition-file pointer: `dropped-thread-disposition-20260506.md`
 
 ## Question log
 
-(Per AGENTS-ppx Question-logging discipline. No questions logged yet.)
+Per AGENTS-ppx Question-logging discipline.
+
+- [ ] **DF-nijab.1** What is `transports/`?
+    opened: 2026-05-08 05:29 UTC
+    asked of: stevegt@t7a.org (Steve Traugott)
+    blocks: DR-suhod B/C/D cleanup and the group-session freeze procedure
+    alternatives: 1.A lower-layer simulation surface / 1.B single-protocol directory
+    recommendation: 1.A
+
+- [ ] **DF-nijab.2** What happens to `wire-lab-devs-draft`?
+    opened: 2026-05-08 05:29 UTC
+    asked of: stevegt@t7a.org (Steve Traugott)
+    blocks: transport-data migration and any freeze-time rewrite plan
+    alternatives: 2.A preserve and supersede / 2.B derived rewrite only
+    recommendation: 2.A
+
+- [ ] **DF-nijab.3** How should freeze docs be corrected?
+    opened: 2026-05-08 05:29 UTC
+    asked of: stevegt@t7a.org (Steve Traugott)
+    blocks: TODO-turog step 5, DR-suhod B/C/D, and stale spec references
+    alternatives: 3.A correct now after DF / 3.B park behind TODO-pipus/TE-43
+    recommendation: 3.A
 
 ## Decision Intent Log
 
