@@ -302,3 +302,25 @@ Correction to the `Unblocks` field above: the earlier statement that
 item 2 closed outright referred only to the validation/gofmt half of
 that item. The `Message-ID:` semantic half remained open until
 DI-012-20260508-033513.
+
+## 2026-05-08 — TE-nijab DFs answered; B/C/D reframed
+
+Steve answered the three TE-nijab DFs that cover the remaining DR-suhod
+B/C/D cluster. The locked answers are recorded in
+`protocols/wire-lab.d/TODO/TODO-turog-te-41-group-session-freeze-procedure.md`:
+
+- DF-nijab.1 -> 1.A, DI-026-20260508-054722: `transports/` is a
+  lower-layer network/feed simulation surface, not a namespace owned by
+  one frozen higher-layer protocol.
+- DF-nijab.2 -> 2.A, DI-026-20260508-054723:
+  `transports/wire-lab-devs-draft/` remains historical pre-layered
+  specimen data; future migration or supersession is additive.
+- DF-nijab.3 -> 3.B, DI-026-20260508-054724: freeze-doc cleanup is
+  parked behind TODO-pipus/TE-43 instead of being executed now.
+
+Effect on this DR: B/C/D are reframed, but not closed. The `tools/spec`
+manifest-scope question is now downstream of the spec-vs-transport-data
+boundary; the transport directory naming question is now a layered
+path/metadata question; and stale spec references remain parked until
+TODO-pipus/TE-43 designs the first CAS/feed migration. TODO-turog step 5
+must not be executed as written.

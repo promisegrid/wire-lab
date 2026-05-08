@@ -8,7 +8,7 @@ TE-nijab
 
 ## Status
 
-needs DF
+decided
 
 ## Decision under test
 
@@ -185,4 +185,4 @@ Surviving alternatives:
 
 ## Decision status
 
-`needs DF`. This TE has narrowed the alternatives but does not yet lock them. The recommended path is DF-nijab.1 = 1.A, DF-nijab.2 = 2.A, and DF-nijab.3 = 3.A.
+`decided` — Steve answered the DFs on 2026-05-08. DF-nijab.1 -> 1.A, recorded in DI-026-20260508-054722: `transports/` is a lower-layer network/feed simulation surface. DF-nijab.2 -> 2.A, recorded in DI-026-20260508-054723: `transports/wire-lab-devs-draft/` remains historical specimen data and future migration is additive. DF-nijab.3 -> 3.B, recorded in DI-026-20260508-054724: freeze-doc cleanup is parked behind TODO-pipus/TE-43, so this TE's 3.A recommendation is not executed in this pass.
