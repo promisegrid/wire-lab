@@ -14,7 +14,7 @@ The outer convention — that transport directories live under `transports/` key
 
 This spec is locked by the conclusions of:
 
-- [TE-hogus](../../../docs/thought-experiments/TE-hogus-group-transport-envelope.md): the group-transport envelope: `grid <pcid>` carrier, canonical-bytes rules, explicit-promise body requirement, and `Date`/`From` as conveniences. The TODO-motof carve-out supersedes the original `Prev-Message-CID:`, `IHave:`, and `Kind:` headers from the TE's first drafting; the locked v0 contract uses `Parents:` (DAG links), body-level acknowledgement (receipts), and no `Kind:` header. The `Message-ID:` header described in TE-hogus is also dropped: under §2 (filename = CID), the message CID is the message's identifier and a separate human-readable identifier creates two competing identities for the same message and is omitted.
+- [TE-hogus](../../../docs/thought-experiments/TE-hogus-group-transport-envelope.md): the group-transport envelope: `grid <pcid>` carrier, canonical-bytes rules, explicit-promise body requirement, and `Date`/`From` as conveniences. The TODO-motof carve-out supersedes the original `Prev-Message-CID:`, `IHave:`, and `Kind:` headers from the TE's first drafting; the locked v0 contract uses `Parents:` (DAG links), body-level acknowledgement (receipts), and no `Kind:` header. The `Message-ID:` header described in TE-hogus is also omitted by canonical writers: under §2 (filename = CID), the message CID is the message's identifier and a separate human-readable identifier creates two competing identities for the same message. DI-012-20260508-033513 adds the reader-side compatibility rule in §4.3 for historical messages that already contain `Message-ID:`.
 - [TE-zalut](../../../docs/thought-experiments/TE-zalut-channel-transport-types-and-threaded-replies.md): the conceptual shift to DAG-shaped message graphs (zero-or-more parents per message).
 - [TE-junil](../../../docs/thought-experiments/TE-junil-transports-rename-and-axes-of-differentiation.md): the per-axis meta-rule that locks small-finite-closed-group with N≥2 as a single protocol class (cardinality is a parameter, not a contract boundary, except at extremes).
 - [DR-009](../../../DR/DR-009-20260430-204108-group-transport-envelope.md): the active decision request governing the group-transport envelope and the freeze gate.
@@ -86,9 +86,11 @@ The first line is `grid <pcid>` where `<pcid>` is this transport-protocol's pCID
 
 Headers are line-oriented. Each header is `Name: value\n`. Header names are case-sensitive. Header values do not span lines (no continuation lines). Trailing whitespace on a header value is significant and should be avoided; canonical encoders SHOULD strip trailing whitespace before computing the message CID.
 
-#### §4.3 No `Message-ID:` header
+#### §4.3 Deprecated legacy `Message-ID:` compatibility header
 
-This protocol does NOT have a `Message-ID:` header. The message CID (§3), which is also the filename (§2), is the message's identifier; a separate human-readable identifier creates two competing identities for the same message and is therefore omitted. Author identity lives in `From:` (§4.5); authoring time lives in `Date:` (§4.4); navigation aids that humans want (such as a short slug) belong in body prose, not in the envelope.
+Canonical writers MUST NOT emit `Message-ID:`. The message CID (§3), which is also the filename (§2), is the message's identifier; a separate human-readable identifier creates two competing identities for the same message and is therefore omitted. Author identity lives in `From:` (§4.5); authoring time lives in `Date:` (§4.4); navigation aids that humans want (such as a short slug) belong in body prose, not in the envelope. This omission is locked by DI-012-20260508-033513.
+
+Readers MAY accept exactly one legacy `Message-ID:` header when it appears before `Date:` in a historical message, but they MUST ignore its value semantically. The legacy value MUST NOT be used in `Parents:`, receipts, indexing, deduplication, API identity, or any other load-bearing protocol role. If the legacy header is present, its bytes remain part of the canonical message file and therefore part of CID verification; readers MUST NOT strip or rewrite it before recomputing the message CID.
 
 #### §4.4 `Date:` (mandatory, single-valued)
 
@@ -118,7 +120,9 @@ In canonical bytes, headers MUST appear in this order, and any header that is ab
 2. `From:`
 3. `Parents:` (if present)
 
-Future versions of this spec MAY add headers; they will be inserted at locked positions in this order list. Unknown headers (from a hypothetical future revision) MUST NOT be silently dropped; readers MUST reject messages they cannot fully parse, since the message CID covers the unknown bytes and a reader that strips them changes the message identity.
+A reader that accepts the legacy compatibility header from §4.3 MUST treat `Message-ID:` as occupying a special pre-`Date:` slot. Canonical writers still MUST NOT emit that slot.
+
+Future versions of this spec MAY add headers; they will be inserted at locked positions in this order list. Unknown headers (from a hypothetical future revision) MUST NOT be silently dropped; readers MUST reject messages they cannot fully parse, since the message CID covers the unknown bytes and a reader that strips them changes the message identity. The only tolerated field outside canonical writer output is the single legacy `Message-ID:` slot defined in §4.3.
 
 #### §4.8 No `Kind:` header
 

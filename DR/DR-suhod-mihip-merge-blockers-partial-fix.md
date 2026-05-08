@@ -278,3 +278,27 @@ When all four DF intakes have locked DIs and the corresponding edits
 have merged to `ppx/main`, the bot will append `State: decided` to
 both DR-mihip and this DR-suhod, and Codex's merge preview should
 re-run with no validation or semantic blockers.
+
+## 2026-05-08 — DF intake A answered
+
+Steve answered DF intake A with the `Message-ID:` drop semantics plus a
+reader-side legacy compatibility allowance, recorded as
+DI-012-20260508-033513 in
+`protocols/group-session.d/TODO/TODO-bisur-group-transport-envelope.md`.
+
+Locked result:
+
+- Canonical group-session v0 writers MUST NOT emit `Message-ID:`.
+- The message CID remains the only protocol identifier.
+- Readers MAY accept exactly one legacy `Message-ID:` header before
+  `Date:` and MUST ignore its value semantically.
+- If the legacy header is present, its bytes remain part of the message
+  file and therefore part of CID verification.
+
+This closes the semantic part of DR-mihip item 2 once the linked spec and
+transport README edits land. DF intakes B, C, and D remain open.
+
+Correction to the `Unblocks` field above: the earlier statement that
+item 2 closed outright referred only to the validation/gofmt half of
+that item. The `Message-ID:` semantic half remained open until
+DI-012-20260508-033513.
