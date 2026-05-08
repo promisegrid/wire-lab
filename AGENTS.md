@@ -9,10 +9,14 @@
 - `go test ./...` runs the test suite.
 - `gofmt -w .` (or `go fmt ./...`) formats Go code.
 
+## Agent Instruction Architecture (Required)
+- `AGENTS.md` is the canonical home for repo-wide protocol, workflow, and vocabulary rules. Role-specific files such as `AGENTS-codex.md` and `AGENTS-ppx.md` are overlays: they may add stricter role constraints, environment setup, and role-specific procedures, but they must not duplicate or relax canonical repo-wide rules. (DI-034-20260508-060134)
+- When a rule applies to every agent or every repo artifact, move it here and replace role-file copies with pointers. When a rule applies only to one agent's runtime environment, identity, credentials, branch lifecycle, or private logging system, keep it in that role overlay. (DI-034-20260508-060134)
+
 ## Decision-First Specification and Compliance Protocol (Required)
 - Decision-first means decisions must be locked before coding; it does not forbid pre-decision analysis such as required thought experiments.
 - The agent must collect and lock user decisions before making any code edits for a task.
-- Locked decisions must be recorded as Decision Intent Log entries in the relevant `protocols/<slug>.d/TODO/TODO-<timestamp>-<slug>.md` file(s) with clear intent and rationale.
+- Locked decisions must be recorded as Decision Intent Log entries in the relevant `protocols/<slug>.d/TODO/TODO-<handle>-<slug>.md` file(s) with clear intent and rationale.
 - The agent must ask decision questions up front in a single intake round whenever possible.
 - Required decision categories are architecture, design/behavior, implementation approach, function naming, variable naming, and file/path decisions.
 - The agent must ask these as multiple-choice questions whenever practical.
@@ -46,6 +50,9 @@
 - The agent must compare alternatives under the same assumptions instead of switching assumptions mid-analysis.
 - The agent must state what each alternative makes easier, what it makes harder, and what new obligations it creates.
 
+### TE Authoring Conventions
+- Named actors follow the cryptography-literature alphabetical convention. Use Alice, Bob, Carol, Dave, Ellen, Frank, and so on for cooperative actors; use Mallory for adversaries; name Steve explicitly only when his repo-owner role is load-bearing in the scenario. Use this convention in TEs, scenario analyses, tabletop simulations, DR/DI prose, and worked examples in specs or docs when named actors are useful. Do not invent ad-hoc names when the convention fits. (DI-034-20260508-060134)
+
 ### TE Output to DF
 - After the TE, the agent must identify:
   - rejected alternatives,
@@ -55,7 +62,7 @@
 - Final DF questions must be framed from the surviving alternatives identified by the TE. The agent must not ask broad DF questions that ignore TE results.
 
 ### TE Artifacts
-- The agent must track required TEs in the relevant `protocols/<slug>.d/TODO/TODO-<timestamp>-<slug>.md`.
+- The agent must track required TEs in the relevant `protocols/<slug>.d/TODO/TODO-<handle>-<slug>.md`.
 - For each completed TE, the agent must write a verbatim copy of the thought experiment into a standalone file under `docs/thought-experiments/`.
 - The doc filename must begin with the TE ID and then use a descriptive suffix.
 - The doc must stand on its own and include:
@@ -168,6 +175,7 @@ Applicability: this policy applies uniformly to every TE corpus in this reposito
 - Person identity in DR/DI records must use full email with label format: `user@example.com (FirstName)`.
 - In DRs, `Asked by` and person-valued `Waiting on` fields must use that format.
 - In DIs, `Author` must use that format.
+- A DI `Author` is the decision-maker, not merely the recorder. If an agent records a DI for Steve's chat decision, Steve is the `Author`; an agent may be `Author` only when Steve explicitly delegates that decision authority to that agent. (DI-034-20260508-060134)
 - A settled statement in docs (or critical logic in code comments) must cite at least one DI ID.
 - An unresolved question or uncertainty must cite at least one DR ID.
 - If an unresolved question has no DR yet, create a DR before finalizing the change.
@@ -186,7 +194,7 @@ Applicability: this policy applies uniformly to every TE corpus in this reposito
   - Optional: TODO file/section reference for faster lookup.
 - If a comment must be dropped with no replacement, stop and ask the user before proceeding.
 - Before editing a file, review existing comments in that file.
-- Maintain a `## Decision Intent Log` at the top of relevant `protocols/<slug>.d/TODO/TODO-<timestamp>-<slug>.md` files.
+- Maintain a `## Decision Intent Log` at the top of relevant `protocols/<slug>.d/TODO/TODO-<handle>-<slug>.md` files.
 - Treat DI logs as append-only history. Do not rewrite or delete prior entries.
 - When intent evolves, add a new DI entry and set `Supersedes: <old-di-id>`.
 - DI entries must include:
@@ -261,4 +269,15 @@ Reference pattern:
 - Use short, imperative, capitalized commit subjects.
 - Summarize changes per file in commit bodies.
 - Stage files explicitly (avoid `git add .` / `git add -A`).
-- PRs should include a concise summary, test commands run, and behavior notes for CLI output changes.
+- Do not open GitHub pull requests for normal wire-lab convergence. Steve explicitly dropped the require-PR merge rule; merge by the role-specific direct-push workflow instead. (DI-001-20260428-195702; DI-034-20260508-060134)
+- Do not force-push repo branches unless a scoped DI/DR explicitly authorizes the exception. Role overlays may add stricter no-force-push rules for their branches or may document a narrow private-remote exception, but the repo-wide default is no history rewrites. (DI-034-20260508-060134)
+- Do not commit local state files, generated binaries, credentials, tokens, signing keys, or other secrets. (DI-034-20260508-060134)
+
+## Glossary
+- **TE**: Thought Experiment. Analysis doc under `docs/thought-experiments/TE-<handle>-<slug>.md` or an approved per-protocol TE corpus. The handle is a proquint minted by `tools/mint-handle`. (DI-034-20260508-060134)
+- **DR**: Decision Request. Open question or decision-tracking record under `DR/DR-NNN-YYYYMMDD-HHMMSS-<slug>.md`, where `NNN` is the TODO number. (DI-034-20260508-060134)
+- **DI**: Decision Intent. Locked decision record inside a `## Decision Intent Log` in a protocol TODO file. ID format is `DI-NNN-YYYYMMDD-HHMMSS`. (DI-034-20260508-060134)
+- **DF**: Decision Framing. The multiple-choice intake round used to lock a decision after any required TE narrows the alternatives. (DI-034-20260508-060134)
+- **TODO**: Task-tracking file under `protocols/<slug>.d/TODO/TODO-<handle>-<slug>.md`. The master cross-listed index is `protocols/wire-lab.d/TODO/TODO.md`; per-protocol queues live at `protocols/<slug>.d/TODO/TODO.md`. (DI-034-20260508-060134)
+- **twig**: Short kebab-case task name used in branch names, usually as `<user>/<twig>` such as `ppx/<twig>` or `stevegt/<twig>`. (DI-034-20260508-060134)
+- **pCID**: Protocol CID. A pCID is the content hash of a spec document that defines a wire protocol; it is analogous to a TCP/UDP port number with no central registry because the spec hash is the port number. A pCID is not the hash of a particular message, payload, or promise body. (DI-009-20260429-173359; DI-034-20260508-060134)

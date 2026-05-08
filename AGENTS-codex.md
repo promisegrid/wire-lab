@@ -178,7 +178,7 @@ Steps:
      - Ask Steve multiple-choice DF questions for the surviving
        alternatives.
      - When Steve answers, write the DI into the relevant
-       protocols/<slug>.d/TODO/TODO-<timestamp>-<slug>.md (harness-level
+       protocols/<slug>.d/TODO/TODO-<handle>-<slug>.md (harness-level
        TODOs live under protocols/wire-lab.d/TODO/). If no TODO file
        fits, propose creating a new one (and update
        protocols/wire-lab.d/TODO/TODO.md).
@@ -224,89 +224,31 @@ Steps:
 
 # TE editing policy (Required)
 
-Once a TE is filed in `docs/thought-experiments/`, it is no longer
-freely editable. Edits follow the categorized policy locked in:
+`AGENTS.md` is the canonical statement of the TE editing policy and TE
+authoring conventions. Before performing or reviewing a TE edit, read
+`AGENTS.md` "TE Editing Policy (Required)" plus TE-dabol
+(`docs/thought-experiments/TE-dabol-te-editing-policy-and-holistic-corpus.md`)
+and TE-vudaf
+(`docs/thought-experiments/TE-vudaf-editing-policy-tabletop.md`), including
+their `## Refinements` sections. (DI-034-20260508-060134)
 
-- DI-020-20260502-213103 (categorized editing regimes; Cat-1 clause
-  superseded by DI-020-20260502-232651)
-- DI-020-20260502-213104 (uniform applicability across all TE corpora)
-- DI-020-20260502-213105 (holistic reading by default; single-TE
-  reading only for obviously mechanical questions)
-- DI-020-20260502-232651 (Cat-1a / Cat-1b path-reference split)
-- TE-dabol (`docs/thought-experiments/TE-dabol-te-editing-policy-and-holistic-corpus.md`)
-  and its four Cat-3 Refinements: Cat-1a/Cat-1b split forward-pointer;
-  Cat-2 DI-enumeration discipline; Cat-2 cross-TE quotation grep;
-  top-of-file `## Status` header field.
-- TE-vudaf (`docs/thought-experiments/TE-vudaf-editing-policy-tabletop.md`)
-  is the tabletop simulation that produced those refinements.
-
-Read AGENTS.md "TE Editing Policy (Required)" for the canonical
-statement. The seven categories in operational form:
-
-- Cat-1a (current-pointer paths): mechanical sweep in place.
-- Cat-1b (historical-quotation paths): leave untouched. Quoted paths,
-  paths inside `## Refinements` / supersedence notes / past-tense
-  prose are Cat-1b. When in doubt, treat as Cat-1b.
-- Cat-2 (vocabulary updates): in place, with a top-of-file note that
-  enumerates by ID every DI in the affected TE and promises meaning
-  preservation. Mandatory pre-step: grep the corpus for the old term
-  inside quotation contexts and classify each match (Cat-2 sweep vs.
-  Cat-2-historical leave) before sweeping.
-- Cat-3 (navigational forward pointers): append a dated entry to the
-  TE's `## Refinements` section (created if absent, after
-  `## Decision status`). Body unchanged. No DI filed.
-- Cat-4 (resolved-implication forward pointers): same shape as Cat-3,
-  used when an Implications-and-future-work item resolves.
-- Cat-5 / Cat-6 / Cat-7 (substantive supersedence): file a new TE
-  that supersedes the affected one. Update the older TE's
-  `## Decision status` and top-of-file `## Status` field; otherwise
-  leave its body untouched.
-
-Every TE carries a top-of-file `## Status` field placed immediately
-after the TE ID line. Canonical values: `needs DF`, `decided`,
-`decided, refined`, `superseded by TE-<id> / DI-<id>`, `withdrawn`.
-Legacy values preserved during retrofit: `stub`, `open`,
-`recommended for immediate adoption`, `locked for the <protocol>`.
-New TEs prefer canonical values.
-
-The `## Refinements` section is append-only. Entries are dated
-(`### YYYY-MM-DD - <title>`) and ordered chronologically. The body
-of the TE above `## Refinements` is treated as historical evidence:
-Cat-1a / Cat-2 sweeps on the body are permitted under their category
-rules; Cat-3 / Cat-4 changes go in `## Refinements`; Cat-5–7 changes
-go in a new TE.
-
-Reading default: holistic. Read TE-dabol, TE-vudaf, and the affected TE
-(plus any TEs they cite) before performing any TE edit. Single-TE
-reading is reserved for obviously mechanical questions and only
-after the holistic read confirms the question is mechanical.
-
-Applicability is uniform across every TE corpus in this repository
-(harness-level under `docs/thought-experiments/` and any per-protocol
-TE corpora under `protocols/<slug>.d/`). Per-protocol corpora may add
-stricter rules but may not relax these rules.
+Codex-specific review duty: when reviewing bot work that touches a TE,
+verify that the branch follows AGENTS.md's category rules, uses the
+top-of-file `## Status` field correctly, leaves historical quotations
+untouched, and cites the relevant DR/DI provenance.
 
 # Things that are forbidden
 
-- Do not push to main yourself. Always go through Steve approving
-  the push, and have Steve be the one logged in if his identity
-  matters at the wire level.
-- Do not open GitHub pull requests. (DR-003 / DI-001-20260428-195702.)
-- Do not edit DR or DI fields in already-merged history. Both are
-  append-only. To change a DI, write a new DI with
-  Supersedes: <old-id>.
-- Do not invent function names, variable names, or file paths that
-  are not covered by a locked DI. If naming is needed, stop and
-  ask Steve as multiple-choice.
-- Do not collapse a TE into "my recommendation is X". The TE must
-  explicitly model multiple scenarios.
-- Do not use `git add .` or `git add -A`. Stage explicitly.
-- Do not use `|| true` or silent error suppression in any script
-  or commit. (AGENTS.md Error Handling Policy.)
-- Do not remove existing code comments without an equal-or-better
-  replacement in the same patch. (Comment Preservation Protocol.)
-- Do not commit local state files (.grok, .grok.lock, generated
-  binaries, secrets).
+In addition to AGENTS.md's repo-wide prohibitions:
+
+- Do not use the bot's git identity. You act as Steve; commits you make
+  on Steve's behalf use Steve's identity. (DI-001-20260428-195700)
+- Do not push to `main` without Steve's explicit approval for that
+  action. When identity matters at the wire level, Steve must be the
+  logged-in actor. (DI-001-20260428-195701)
+- Do not commit directly on an inbound `ppx/{twig}` branch. Review
+  comments go back to the bot as chat or as Steve-authored follow-up
+  work, not as edits to the bot's branch. (DI-034-20260508-060134)
 
 # Reporting style
 

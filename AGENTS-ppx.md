@@ -185,7 +185,7 @@ Steps:
        The question's `Q-<TODO-N>.<seq>` ID is what the eventual DR/DI
        cites in `Linked Q`.
      - When Steve answers, write the DI into the relevant
-       `protocols/<slug>.d/TODO/TODO-<timestamp>-<slug>.md` (in
+       `protocols/<slug>.d/TODO/TODO-<handle>-<slug>.md` (in
        `## Decision Intent Log`). DI ID is
        `DI-NNN-YYYYMMDD-HHMMSS` where NNN is the TODO number. Required
        fields: ID, Date, Status, Decision, Intent, Constraints,
@@ -342,151 +342,42 @@ Steps:
      answering in chat (then you write the DI on a follow-up twig)
      or by editing the DR himself on `main` or on `stevegt/{twig}`.
 
-# TE editing policy (Required)
+# TE editing policy and authoring conventions (Required)
 
-Once a TE is filed in `docs/thought-experiments/` (or in any
-per-protocol TE corpus under `protocols/<slug>.d/`), it is no longer
-freely editable. Edits follow the categorized policy locked in:
+`AGENTS.md` is the canonical statement of the TE editing policy and TE
+authoring conventions. Before any TE edit, read `AGENTS.md` "TE Editing
+Policy (Required)" plus TE-dabol
+(`docs/thought-experiments/TE-dabol-te-editing-policy-and-holistic-corpus.md`)
+and TE-vudaf
+(`docs/thought-experiments/TE-vudaf-editing-policy-tabletop.md`), including
+their `## Refinements` sections. (DI-034-20260508-060134)
 
-- DI-020-20260502-213103 (categorized editing regimes; Cat-1 clause
-  superseded by DI-020-20260502-232651)
-- DI-020-20260502-213104 (uniform applicability across all TE corpora)
-- DI-020-20260502-213105 (holistic reading by default; single-TE
-  reading only for obviously mechanical questions)
-- DI-020-20260502-232651 (Cat-1a / Cat-1b path-reference split)
-- TE-dabol (`docs/thought-experiments/TE-dabol-te-editing-policy-and-holistic-corpus.md`)
-  plus its four Cat-3 Refinements (Cat-1a/Cat-1b split forward-pointer;
-  Cat-2 DI-enumeration discipline; Cat-2 cross-TE quotation grep;
-  top-of-file `## Status` header field)
-- TE-vudaf (`docs/thought-experiments/TE-vudaf-editing-policy-tabletop.md`)
-  — the tabletop simulation that produced the four refinements.
-
-The canonical statement lives in AGENTS.md under "TE Editing Policy
-(Required)". The seven categories in operational form:
-
-- **Cat-1a (current-pointer paths).** Mechanical sweep in place; no
-  top-of-file note. Use for path renames where the affected reference
-  names the file's current location.
-- **Cat-1b (historical-quotation paths).** Leave untouched. Path
-  references inside markdown blockquotes, attributed to another TE
-  ("TE-N states ..."), in past tense ("TE-magup used the path ..."),
-  inside `## Refinements` sections, supersedence notes, or `Decision
-  status` lines are Cat-1b. Five heuristics: quotation context;
-  Refinements / supersedence framing; past tense; default Cat-1a;
-  when-in-doubt-Cat-1b. Sweep tools may emit matches with surrounding
-  context for human review but must not auto-rewrite.
-- **Cat-2 (vocabulary updates).** In place, with a top-of-file note
-  pointing at the driving TE or TODO. The note must enumerate by ID
-  every DI in the affected TE and promise that the rewrite preserves
-  each DI's meaning. A TE without DIs gets a one-line `no DIs in this
-  file` note. Mandatory pre-step: grep the corpus for the old term
-  inside quotation contexts (markdown blockquotes; fenced code blocks
-  presented as citations; single/double-quoted phrases attributed to
-  another TE via `TE-N states`, `TE-N reads`, `originally said`, `as
-  of TE-N`, `the corpus showed`); classify each match Cat-2 (sweep)
-  or Cat-2-historical (leave) per the same heuristics as
-  Cat-1a/Cat-1b before sweeping.
-- **Cat-3 (navigational forward pointers).** Append a dated entry to
-  the TE's `## Refinements` section (created if absent, placed after
-  `## Decision status`). The TE body above is unchanged. No DI is
-  filed. Procedural tightenings of an existing category's how-to are
-  Cat-3.
-- **Cat-4 (resolved-implication forward pointers).** Same shape as
-  Cat-3, used when an Implications-and-future-work item resolves
-  (a TODO filed; a DR opened; a downstream TE landed).
-- **Cat-5 / Cat-6 / Cat-7 (substantive supersedence).** A material
-  change to a locked DI's meaning, scope, or applicability requires
-  a new TE that supersedes the affected one. The new TE carries its
-  own DFs and DIs; the older TE's `## Decision status` is updated to
-  `superseded by TE-<id>` and its top-of-file `## Status` field is
-  updated to `superseded by TE-<id> / DI-<id>`. The older TE's body
-  is otherwise untouched.
-
-Every TE carries a top-of-file `## Status` field placed immediately
-after the TE ID line. Canonical values: `needs DF`, `decided`,
-`decided, refined`, `superseded by TE-<id> / DI-<id>`, `withdrawn`.
-Legacy values preserved during retrofit: `stub`, `open`,
-`recommended for immediate adoption`, `locked for the <protocol>`.
-New TEs use canonical values.
-
-The `## Refinements` section is append-only. Entries are dated
-(`### YYYY-MM-DD - <title>`) and ordered chronologically. The body
-of the TE above `## Refinements` is historical evidence: Cat-1a or
-Cat-2 sweeps on the body are permitted under their category rules;
-Cat-3 / Cat-4 forward-pointers are appended to `## Refinements`;
-Cat-5–7 substantive changes are filed as a new superseding TE rather
-than as an edit. The four Cat-3 Refinements on TE-dabol are exemplars of
-this shape.
-
-Reading default is holistic. Before any TE edit, read TE-dabol, TE-vudaf,
-the affected TE, and any TEs they cite or that cite them. Single-TE
-reading is reserved for obviously mechanical questions (a single
-typo; a path that has demonstrably moved; a `## Status` field
-retrofit) and only after the holistic read has confirmed the
-question is mechanical. When in doubt, read holistically.
-
-Applicability is uniform across every TE corpus in this repository,
-whether the TE lives at the harness level (`docs/thought-experiments/`)
-or inside a per-protocol directory (`protocols/<slug>.d/`).
-Per-protocol corpora may add stricter rules but may not relax these
-rules.
-
-# TE authoring conventions
-
-- **Named actors follow the cryptography-literature alphabetical
-  convention.** Cooperative TE authors, readers, and scenario
-  participants are Alice, Bob, Carol, Dave, Ellen, Frank, ...
-  (extend further down the alphabet as needed). Mallory is the
-  adversary. Steve is named explicitly only when his role as repo
-  owner is load-bearing in the scenario; otherwise Steve does not
-  appear as a character. Use these names in TEs, scenario
-  analyses, tabletop simulations, DR / DI prose, and any worked
-  example in specs or docs that needs named actors. Do not
-  invent ad-hoc names (no "User1", no "the writer", no first
-  names drawn from outside the convention) when the alphabetical
-  list will serve. The convention is already in active use in
-  TE-vudaf (see `docs/thought-experiments/TE-vudaf-editing-policy-tabletop.md`,
-  Assumptions section); this bullet lifts it to a corpus-wide
-  authoring rule.
+Perplexity-specific duty: because the bot works from a fresh sandbox and
+low-trust role, re-ground every TE edit from the files on disk. Do not
+rely on remembered category classifications, old path strings, or prior
+session summaries when deciding whether a TE edit is Cat-1a, Cat-1b,
+Cat-2, Cat-3, Cat-4, or Cat-5/6/7.
 
 # Things that are forbidden
 
-- Do not push to `main`. Ever. Even if branch protection didn't stop
-  you, this would violate DI-001-20260428-195701.
-- Do not force-push to any branch — not `main`, not `ppx/main`, not
-  any `ppx/{twig}` working branch. The `ppx/main` workflow exists
-  partly so that the bot never needs to force-push: keeping a long-
-  lived integration branch current is done by merging `origin/main`
-  INTO `ppx/main`, never by rebase.
-- Do not open GitHub pull requests. (DI-001-20260428-195702.) If you
-  accidentally invoke `gh pr create`, abort and tell Steve. The merge
-  ceremony is `git push` to `main` by Steve, not a PR.
-- Do not edit DR or DI fields in already-merged history. Both are
-  append-only. To change a DI, write a new DI with
-  `Supersedes: <old-id>`. To change a DR's state, append a new dated
-  entry to the DR file (or update only the `Last updated` and `State`
-  fields).
-- Do not invent function names, variable names, or file paths that
-  aren't covered by a locked DI. If naming is needed, stop and ask
-  Steve as multiple-choice.
-- Do not collapse a TE into "my recommendation is X". The TE must
-  explicitly model multiple scenarios across the dimensions AGENTS.md
-  prescribes (normal, failure, concurrent, long-horizon, trust
-  boundary, scale).
-- Do not use `git add .` or `git add -A`. Stage explicitly.
-- Do not use `|| true` or silent error suppression in any script,
-  template, or commit. (AGENTS.md Error Handling Policy.)
-- Do not remove existing code comments without an equal-or-better
-  replacement in the same patch. (Comment Preservation Protocol.)
-- Do not commit local state files (`.grok`, `.grok.lock`), generated
-  binaries, or anything containing the PAT or other secrets.
-- Do not assume continuity from a prior session. Re-read AGENTS.md,
-  protocols/wire-lab.d/TODO/TODO.md, and the most recent DR/DI files at the start of every
-  session.
-- Do not credit yourself as `Author` of a DI when Steve actually made
-  the decision. The bot can be `Asked by` on a DR; the bot can be
-  `Author` of a DI only if Steve has explicitly delegated the decision
-  to the bot. Default: Steve is `Author` of every DI.
+In addition to AGENTS.md's repo-wide prohibitions:
+
+- Do not push to `main`. Ever. Even if branch protection did not stop
+  you, this would violate the bot/main separation. (DI-001-20260428-195701)
+- Do not force-push to `ppx/main` or any `ppx/{twig}` working branch.
+  Keep `ppx/main` current by merging `origin/main` INTO `ppx/main`,
+  never by rebase. (DI-009-20260429-173358)
+- Do not open GitHub pull requests from the bot side. If you
+  accidentally invoke `gh pr create`, abort and tell Steve. (DI-001-20260428-195702)
+- Do not assume continuity from a prior session. Re-read `AGENTS.md`,
+  this overlay, `protocols/wire-lab.d/TODO/TODO.md`, and the most
+  recent DR/DI files at the start of every session. (DI-021-20260507-212255)
+- Do not commit the PAT, private remote credentials, session-log
+  secrets, or any file containing those values. Use the credential
+  helper and redaction rules in the Session Logging section below. (DI-021-20260507-212251)
+- Do not credit the bot as `Author` of a DI when Steve actually made
+  the decision. AGENTS.md's authorship rule is canonical; the bot is
+  `Author` only when Steve explicitly delegates decision authority. (DI-034-20260508-060134)
 
 # Carry-J2 procedural discipline (durable cross-session rules)
 
@@ -795,9 +686,10 @@ Mechanics:
      TODO file (e.g., a TE in progress has a parent TODO), append to
      that file under a `## Open questions` or `## Question log`
      section. If no fitting TODO exists, create a new one at
-     `protocols/<slug>.d/TODO/TODO-YYYYMMDD-HHMMSS-<slug>.md` (in
+     `protocols/<slug>.d/TODO/TODO-<handle>-<slug>.md` (in
      the relevant protocol; harness-level questions go under
-     `protocols/wire-lab.d/TODO/`). Update
+     `protocols/wire-lab.d/TODO/`). Mint the handle with
+     `tools/mint-handle` before creating the file. Update
      `protocols/wire-lab.d/TODO/TODO.md` with the new entry.
 
   2. Write the entry as a single checklist row:
@@ -939,31 +831,16 @@ The bot runs this as step 3 of "First action of every session"
 
 # Glossary
 
-- TE  : Thought Experiment. Analysis doc.
-        Lives at `docs/thought-experiments/TE-<handle>-<slug>.md` where
-        `<handle>` is a proquint minted by `tools/mint-handle` (locked
-        by TE-mumuv 2026-05-07; pre-2026-05-07 TEs carry a
-        `## Prior aliases` section with their prior integer + timestamp).
-- DR  : Decision Request. Open question / decision-tracking record.
-        Lives at `DR/DR-NNN-YYYYMMDD-HHMMSS-slug.md` where NNN is the
-        TODO number.
-- DI  : Decision Intent. Locked decision record.
-        Lives inside `## Decision Intent Log` in
-        `protocols/<slug>.d/TODO/TODO-<timestamp>-<slug>.md`. ID format
-        `DI-NNN-YYYYMMDD-HHMMSS`.
-- DF  : Decision Framing. The multiple-choice intake round you ask
-        Steve before locking a DI.
-- TODO: Task tracking file. `protocols/<slug>.d/TODO/TODO-<timestamp>-<slug>.md` per task. The index is
-        `protocols/wire-lab.d/TODO/TODO.md`, the master cross-listed
-        index, priority-sorted, append-only by timestamp. Per-protocol
-        TODO.md queues live at `protocols/<slug>.d/TODO/TODO.md`.
-- twig: Short kebab-case task name. Branch name is `<user>/<twig>`;
-        for the bot, `<user>` is `ppx`, so branches are `ppx/<twig>`.
-- pCID: Protocol CID. The content hash of a spec document that
-        defines a wire protocol; analogous to a TCP/UDP port number
-        but with no central registry, because the spec's hash IS the
-        port number. A pCID is NOT the hash of any particular
-        message, payload, or promise body. The canonical Wire Lab
-        spec is identified by its current pCID; the lock on the
-        canonical pointer is Steve's signing key, not any particular
-        pCID.
+Shared terms live in AGENTS.md "Glossary". Perplexity-specific terms:
+
+- **Bot**: stevegt+ppx@t7a.org (stevegt-via-perplexity), the Perplexity
+  Computer role governed by this overlay.
+- **Codex**: Steve's local agent and reviewer on Steve's machine; Codex
+  acts as Steve, not as the bot.
+- **ppx/main**: long-lived bot integration branch. The bot merges
+  `ppx/{twig}` branches into it and pushes it; Steve/Codex merges
+  `origin/ppx/main` to `main`.
+- **ppx/{twig}**: short-lived Perplexity working branch created off
+  `ppx/main`, merged back to `ppx/main`, then deleted.
+- **private remote**: the `stevegt/session-logs` remote used only by
+  the Perplexity session-logging procedure below.
