@@ -16,8 +16,8 @@
 > this report.
 
 
-**Audit date:** 2026-05-05  
-**Scope:** Conversation turns 18-148 (approximately 7,200 lines of conversation.md)  
+**Audit date:** 2026-05-05
+**Scope:** Conversation turns 18-148 (approximately 7,200 lines of conversation.md)
 **Sources consulted:**
 - `past_session_contexts/sessions/2026-05-04_2026-05-10/ea135ce8/conversation.md` (turns 18-148)
 - `wire-lab/protocols/wire-lab.d/TODO/TODO-lilar-session-replay-cleanup.md` (UT-* ledger)
@@ -150,7 +150,7 @@ Five threads have no repo trace and no UT-* ledger entry.
 
 ### DT-1: Six-field tense-aware claim form and discourse protocol RFC spec
 
-**Turns:** 41-43  
+**Turns:** 41-43
 **Status:** DROPPED -- no TE, no DR, no DI, no TODO, no UT-* entry.
 
 **What was discussed.** Turn 41 established "I promise that I..." as the claim form.
@@ -184,7 +184,7 @@ DF-36.4 is still unlocked on the parked twig (UT-TE36-PARKED, UT-160.d).
 
 ### DT-2: Layer-pertinence indexing TE (proposed as TE-dajot, displaced)
 
-**Turns:** 105-106  
+**Turns:** 105-106
 **Status:** DROPPED -- no TE filed, no UT-* entry, only partial mitigation in TE-vipir layout.
 
 **What was discussed.** Turn 105 (Steve): "I'm starting to wonder if we need to
@@ -214,7 +214,7 @@ TE/DR/DI pertinence tagging and indexing discipline."
 
 ### DT-3: Transport-protocol migration semantics TE
 
-**Turns:** 87, 95, TE-junil anticipated work section  
+**Turns:** 87, 95, TE-junil anticipated work section
 **Status:** DROPPED -- anticipated as TE-dajot in TE-junil; slot displaced; no replacement filed; no UT-* entry.
 
 **What was discussed.** Turn 87: "Migration between transport-protocol-pCIDs is
@@ -244,7 +244,7 @@ adjacent topics that may merge into the same TE.
 
 ### DT-4: Conditional promise trust-ledger rule ("unfired conditionals do not move the ledger")
 
-**Turns:** 41-42  
+**Turns:** 41-42
 **Status:** DROPPED -- no TE, no DI, no harness-spec section captures this rule; no UT-* entry.
 
 **What was discussed.** Turn 42 (Steve): "promises are assertions of state in the
@@ -280,7 +280,7 @@ ledger movement." This needs a DF before locking.
 
 ### DT-5: Alice/Bob/Carol/Dave/Ellen/Frank convention in AGENTS-ppx.md
 
-**Turns:** 145, 148  
+**Turns:** 145, 148
 **Status:** DROPPED from AGENTS-ppx.md specifically. Convention is implemented in TE-vudaf
 but not enshrined in standing rules for future bot sessions. Minor; not a design
 decision.

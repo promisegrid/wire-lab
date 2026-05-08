@@ -94,9 +94,18 @@ func cmdFreeze(slug string) error {
 		}
 	}
 
-	// Stage both files in git.
-	gitStage(repoRoot, SpecsDir+"/"+slug+"-"+pcid+".md")
-	gitStage(repoRoot, ManifestPath)
+	// Stage both files in git. A staging failure is reported but does not
+	// roll back the freeze: the snapshot and manifest are already written
+	// to the working tree, so the user can stage them manually if `git add`
+	// failed (e.g., outside a git checkout). Reporting it satisfies the
+	// AGENTS.md Error Handling Policy: handle, propagate, or report —
+	// never silently ignore. (See DR-mihip blocker #6.)
+	if err := gitStage(repoRoot, SpecsDir+"/"+slug+"-"+pcid+".md"); err != nil {
+		fmt.Fprintf(os.Stderr, "warning: git add %s/%s-%s.md failed: %v\n", SpecsDir, slug, pcid, err)
+	}
+	if err := gitStage(repoRoot, ManifestPath); err != nil {
+		fmt.Fprintf(os.Stderr, "warning: git add %s failed: %v\n", ManifestPath, err)
+	}
 
 	fmt.Printf("Frozen: %s\n  pCID: %s\n  Snapshot: %s/%s-%s.md\n  Manifest: %s (entry appended)\n",
 		slug, pcid, SpecsDir, slug, pcid, ManifestPath)
@@ -217,10 +226,13 @@ func gitHeadCommit(repoRoot string) string {
 	return strings.TrimSpace(string(out))
 }
 
-// gitStage runs `git add <path>` in the repo. Errors are ignored: staging is
-// a convenience, not a correctness requirement. The freeze ritual still
-// produces a correct working tree even if `git add` fails (the user can
-// stage manually).
-func gitStage(repoRoot, path string) {
-	exec.Command("git", "-C", repoRoot, "add", path).Run()
+// gitStage runs `git add <path>` in the repo and returns any error from the
+// underlying `git` invocation. Staging is a convenience, not a correctness
+// requirement — the freeze ritual still produces a correct working tree even
+// if `git add` fails (the user can stage manually) — but per AGENTS.md
+// Error Handling Policy the error must be reported, not silently dropped.
+// The caller decides whether to warn, propagate, or otherwise act on the
+// failure. (See DR-mihip blocker #6.)
+func gitStage(repoRoot, path string) error {
+	return exec.Command("git", "-C", repoRoot, "add", path).Run()
 }

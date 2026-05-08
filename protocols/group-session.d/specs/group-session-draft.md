@@ -14,10 +14,10 @@ The outer convention — that transport directories live under `transports/` key
 
 This spec is locked by the conclusions of:
 
-- [TE-hogus](../docs/thought-experiments/TE-hogus-group-transport-envelope.md): the group-transport envelope: `grid <pcid>` carrier, canonical-bytes rules, explicit-promise body requirement, and `Date`/`From` as conveniences. The TODO-motof carve-out supersedes the original `Prev-Message-CID:`, `IHave:`, and `Kind:` headers from the TE's first drafting; the locked v0 contract uses `Parents:` (DAG links), body-level acknowledgement (receipts), and no `Kind:` header. The `Message-ID:` header described in TE-hogus is also dropped: under §2 (filename = CID), the message CID is the message's identifier and a separate human-readable identifier creates two competing identities for the same message and is omitted.
-- [TE-zalut](../docs/thought-experiments/TE-zalut-channel-transport-types-and-threaded-replies.md): the conceptual shift to DAG-shaped message graphs (zero-or-more parents per message).
-- [TE-junil](../docs/thought-experiments/TE-junil-transports-rename-and-axes-of-differentiation.md): the per-axis meta-rule that locks small-finite-closed-group with N≥2 as a single protocol class (cardinality is a parameter, not a contract boundary, except at extremes).
-- [DR-009](../DR/DR-009-20260430-204108-group-transport-envelope.md): the active decision request governing the group-transport envelope and the freeze gate.
+- [TE-hogus](../../../docs/thought-experiments/TE-hogus-group-transport-envelope.md): the group-transport envelope: `grid <pcid>` carrier, canonical-bytes rules, explicit-promise body requirement, and `Date`/`From` as conveniences. The TODO-motof carve-out supersedes the original `Prev-Message-CID:`, `IHave:`, and `Kind:` headers from the TE's first drafting; the locked v0 contract uses `Parents:` (DAG links), body-level acknowledgement (receipts), and no `Kind:` header. The `Message-ID:` header described in TE-hogus is also dropped: under §2 (filename = CID), the message CID is the message's identifier and a separate human-readable identifier creates two competing identities for the same message and is omitted.
+- [TE-zalut](../../../docs/thought-experiments/TE-zalut-channel-transport-types-and-threaded-replies.md): the conceptual shift to DAG-shaped message graphs (zero-or-more parents per message).
+- [TE-junil](../../../docs/thought-experiments/TE-junil-transports-rename-and-axes-of-differentiation.md): the per-axis meta-rule that locks small-finite-closed-group with N≥2 as a single protocol class (cardinality is a parameter, not a contract boundary, except at extremes).
+- [DR-009](../../../DR/DR-009-20260430-204108-group-transport-envelope.md): the active decision request governing the group-transport envelope and the freeze gate.
 
 ## What this spec covers
 

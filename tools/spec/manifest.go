@@ -37,9 +37,9 @@ const (
 type Status string
 
 const (
-	StatusFrozen      Status = "frozen"
-	StatusSuperseded  Status = "superseded"
-	StatusDraftAhead  Status = "draft-ahead"
+	StatusFrozen     Status = "frozen"
+	StatusSuperseded Status = "superseded"
+	StatusDraftAhead Status = "draft-ahead"
 )
 
 // Entry is one frozen spec's record in the manifest.
@@ -50,15 +50,15 @@ const (
 //
 // YAML keys use snake_case to match the prose convention.
 type Entry struct {
-	PCID            string   `yaml:"pcid"`
-	Slug            string   `yaml:"slug"`
-	Status          Status   `yaml:"status"`
-	FrozenOn        string   `yaml:"frozen_on"`
-	Supersedes      string   `yaml:"supersedes,omitempty"`
-	SupersededBy    string   `yaml:"superseded_by,omitempty"`
-	DependsOn       []string `yaml:"depends_on,omitempty"`
-	FreezingCommit  string   `yaml:"freezing_commit,omitempty"`
-	Notes           string   `yaml:"notes,omitempty"`
+	PCID           string   `yaml:"pcid"`
+	Slug           string   `yaml:"slug"`
+	Status         Status   `yaml:"status"`
+	FrozenOn       string   `yaml:"frozen_on"`
+	Supersedes     string   `yaml:"supersedes,omitempty"`
+	SupersededBy   string   `yaml:"superseded_by,omitempty"`
+	DependsOn      []string `yaml:"depends_on,omitempty"`
+	FreezingCommit string   `yaml:"freezing_commit,omitempty"`
+	Notes          string   `yaml:"notes,omitempty"`
 }
 
 // Manifest is the parsed, in-memory form of MANIFEST.md.

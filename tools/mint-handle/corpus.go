@@ -39,12 +39,15 @@ var scanGlobs = []string{
 // handle in group 1.
 //
 // Filename grammar:
-//   <KIND>-<HANDLE>-<SLUG>.md
+//
+//	<KIND>-<HANDLE>-<SLUG>.md
+//
 // where:
-//   <KIND>   = TE | TODO
-//   <HANDLE> = proquint-1 (5 chars, CVCVC, alphabets in proquint.go)
-//            | proquint-2 (5 + '-' + 5 = 11 chars)
-//   <SLUG>   = lower-kebab-case description, may include digits
+//
+//	<KIND>   = TE | TODO
+//	<HANDLE> = proquint-1 (5 chars, CVCVC, alphabets in proquint.go)
+//	         | proquint-2 (5 + '-' + 5 = 11 chars)
+//	<SLUG>   = lower-kebab-case description, may include digits
 //
 // The regex is anchored so it does not match files whose names happen to
 // contain proquint-shaped substrings inside the slug.
