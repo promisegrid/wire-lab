@@ -3,7 +3,7 @@
 DR-ID: DR-010-20260507-150000
 Date: 2026-05-07 15:00:00
 Asked by: stevegt+ppx@t7a.org (stevegt-via-perplexity)
-State: decided
+State: blocked
 Question: Should the wire-lab Perplexity Computer session logging continue to require per-turn `sessions/<session-id>/<NNN>-turn.md` files, or should it switch to periodic snapshots of the harness-produced `conversation.md` plus a small live-resume `TURNOVER-*.md`?
 Why this blocks progress: Two reinforcing failures have shown up under the per-turn discipline. First, the bot does not have reliable in-process access to its own verbatim response bytes, so per-turn writes drift into paraphrase or truncation; the loose-`turns/` drift remediated on `93802eb` was a downstream symptom of the same root cause. Second, the orphan branch on `stevegt/session-logs` accumulates one commit per turn dominated by reconstruction churn rather than primary signal. The harness already retains a verbatim `conversation.md` for the active session, so the simplest and most fidelity-preserving fix is to copy that file periodically rather than reconstruct it turn by turn.
 Affects:
@@ -17,7 +17,7 @@ Affects:
 - `protocols/wire-lab.d/TODO/TODO-topit-transcript-snapshot-procedure.md` — parent TODO.
 - `protocols/wire-lab.d/TODO/TODO.md` — master cross-list gains the TODO-topit row.
 Unblocks: future sessions on this and successor sandboxes; clean session-logs orphan branch with low-volume, full-fidelity history; future audit tooling that prefers a single-file transcript over per-turn reconstruction.
-Waiting on: DI-033-20260507-150000 (in `protocols/wire-lab.d/TODO/TODO-topit-transcript-snapshot-procedure.md`).
+Waiting on: Perplexity operation resuming, or a later DI superseding `DI-nifih`.
 
 ## Candidate alternatives considered
 
@@ -55,6 +55,7 @@ The Identity gate (snapshot writes only fire when git config user.email is the b
 ## Linked DI
 
 - `DI-033-20260507-150000` in `protocols/wire-lab.d/TODO/TODO-topit-transcript-snapshot-procedure.md`
+- `DI-nifih` in `protocols/wire-lab.d/TODO/TODO-topit-transcript-snapshot-procedure.md`
 
 ## Related commits
 
@@ -65,7 +66,12 @@ The Identity gate (snapshot writes only fire when git config user.email is the b
 
 ## Last updated
 
-2026-05-07 15:00:00 UTC. Filed with `State: decided` because the
-decision was reached in chat before the file was written, per
-AGENTS-ppx.md "DRs that Steve answered in chat before the file was
-written may be created with State: decided directly."
+2026-05-09 10:29:14. Moved to `State: blocked` by `DI-nifih`: the
+transcript-snapshot decision remains historical / Perplexity-only context,
+but implementation is deferred indefinitely while wire-lab is not using
+Perplexity.
+
+## Event log
+
+- 2026-05-07 15:00:00 UTC — Filed with `State: decided` because the decision was reached in chat before the file was written, per AGENTS-ppx.md "DRs that Steve answered in chat before the file was written may be created with State: decided directly."
+- 2026-05-09 10:29:14 — Deferred indefinitely by `DI-nifih` because session-log, TURNOVER, redact-last, and transcript-snapshot work is specific to Perplexity operation and wire-lab is not currently using Perplexity. No session-logs worktree changes, TURNOVER cutover notes, or snapshot tooling should be implemented until a later DI reactivates the Perplexity workflow.

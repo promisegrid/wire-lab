@@ -36,6 +36,15 @@ The transcript-snapshot procedure substitutes a periodic copy of
 `TURNOVER-*.md` file as the live resume point and an optional
 generated index over the snapshot.
 
+## Deferral note
+
+As of `DI-nifih`, this TODO is deferred indefinitely because session-log,
+TURNOVER, redact-last, and transcript-snapshot work is specific to the
+Perplexity Computer operating procedure. The current Codex workflow is not
+using Perplexity, so no agent should implement this TODO, write
+`stevegt/session-logs`, or create TURNOVER cutover artifacts unless a later
+decision explicitly reactivates Perplexity operation.
+
 ## Locked decisions (from DR-010-20260507-150000)
 
 1. **Canonical artifact:** the full session transcript is the file the
@@ -136,6 +145,22 @@ generated index over the snapshot.
       cutover note.
 - Author: stevegt@t7a.org (Steve Traugott)
 
+### DI-nifih
+
+- ID: DI-nifih
+- Date: 2026-05-09 10:29:14
+- Status: active
+- Author: stevegt@t7a.org (Steve Traugott)
+- Decision: Defer `TODO-topit`, `DR-010`, and all session-log / TURNOVER / transcript-snapshot implementation work indefinitely while wire-lab is not using Perplexity. Session-log and turnover machinery are Perplexity-specific operational concerns, not current Codex work.
+- Intent: Prevent Codex or other non-Perplexity agents from spending effort on dormant Perplexity support or writing to `stevegt/session-logs` while preserving the prior transcript-snapshot design as historical context for a possible future Perplexity reactivation.
+- Constraints:
+    - Do not write to `/home/stevegt/lab/session-logs` under this deferral.
+    - Do not create `tools/check-layout.sh`, TURNOVER cutover notes, or new session snapshots as part of this TODO.
+    - Do not delete or rewrite historical per-turn/session-log artifacts.
+    - Reactivation requires a later explicit decision that Perplexity operation has resumed and that `DI-nifih` is superseded.
+- Affects: `protocols/wire-lab.d/TODO/TODO-topit-transcript-snapshot-procedure.md`; `protocols/wire-lab.d/TODO/TODO.md`; `DR/DR-010-20260507-150000-transcript-snapshot.md`.
+- Supersedes: `DI-033-20260507-150000` for current implementation priority; the transcript-snapshot design remains historical / Perplexity-only context.
+
 ## Cross-references
 
 - DR-010-20260507-150000-transcript-snapshot.md — the DR backing
@@ -150,4 +175,5 @@ generated index over the snapshot.
 
 ## Status
 
-In progress. Twig: `ppx/topit-transcript-snapshot-procedure`.
+Deferred indefinitely — Perplexity-specific; reactivate only if Perplexity
+operation resumes and a later DI supersedes `DI-nifih`.
