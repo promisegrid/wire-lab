@@ -95,3 +95,9 @@ row below is closed by a DI, DR, or successor TODO.
 | UT-159.b | transferred-open | DR-nugog plus TODO-kugod | The transport-spec companion audit is blocked on the transport-tree structure/ownership decision. |
 | UT-159.c | resolved-retired | TE-havib follow-on verification | The six-scenario mismatch is recorded; no redo is required before residual checklist cleanup proceeds. |
 | UT-159.d | open | TODO-kugod | The remaining ambiguous audit areas still need resolution or explicit retirement. |
+
+### 2026-05-09 transport-tree TE tracking
+
+- [ ] kugod.1 Resolve TE-domat (`docs/thought-experiments/TE-domat-transports-groups-reconciliation.md`) and DR-nugog before closing UT-159.b. TE-domat reframes the question from "flat vs. protocol-slug nesting under `transports/`" to "whether `groups/` becomes the L7 group registry/view while `transports/` remains lower-layer feed/transport specimen data."
+- [ ] kugod.2 Resolve TE-pahah (`docs/thought-experiments/TE-pahah-wire-lab-simulation-first-structure.md`) before implementing any root-level `transports/` or `groups/` migration. TE-pahah reframes the current question around whether concrete experiment worlds should live under `simulations/<sim>/world/` instead of root-level layer trees.
+- [ ] kugod.3 Resolve TE-nizor (`docs/thought-experiments/TE-nizor-pahah-implementation-sufficiency.md`) before closing residual recovery for turns 149-208. TE-nizor tests whether implementing TE-pahah with a simulation contract is sufficient to carry the recovered concerns without prematurely deciding root-level layer trees, artifact-message shape, CBOR/text representation, or CAS/feed details.

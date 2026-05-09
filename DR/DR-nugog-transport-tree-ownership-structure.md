@@ -12,7 +12,7 @@ Waiting on: stevegt@t7a.org (Steve Traugott)
 Decision:
 Linked DI: DI-vopim
 Related commits:
-Last updated: 2026-05-09 18:21:29 UTC
+Last updated: 2026-05-09 19:57:57 UTC
 
 ## Evidence
 
@@ -32,3 +32,39 @@ Last updated: 2026-05-09 18:21:29 UTC
 ## Notes
 
 This DR intentionally does not move `transports/wire-lab-devs-draft/`, rewrite specs, or choose an alternative. It exists so the next edit can cite a concrete decision record instead of relitigating turn 170 from session logs.
+
+## 2026-05-09 update - TE-domat reframes the question
+
+TE-domat (`docs/thought-experiments/TE-domat-transports-groups-reconciliation.md`) shows that this DR's original alternatives are too narrow. The original question asks only whether instances should nest under `transports/<protocol-slug>/` or remain flat. That omits turn 176's explicit `groups` choice and the later TE-nijab decision that `transports/` is lower-layer feed/transport specimen data.
+
+Updated reading: this DR should be answered after DF-domat, or amended to ask the split-tree question directly:
+
+- whether `groups/` should become the L7 group registry/view tree,
+- whether `transports/` should remain lower-layer feed/transport simulation evidence,
+- and how `transports/wire-lab-devs-draft/` is preserved as historical pre-layered specimen data until an additive migration exists.
+
+TE-domat recommends the split-tree interpretation, not a naive whole-tree `transports/` -> `groups/` rename.
+
+## 2026-05-09 update - TE-pahah reframes around simulation-first structure
+
+Steve clarified that backward compatibility with the current experimental paths is not required because none of this is production or active use yet. TE-pahah (`docs/thought-experiments/TE-pahah-wire-lab-simulation-first-structure.md`) therefore asks a broader question: what structure best serves wire-lab's simulation and decision-making goals?
+
+Updated reading after TE-pahah: this DR should not lock a root-level `transports/` vs. `groups/` answer until DF-pahah decides whether concrete worlds belong under a top-level `simulations/` tree. TE-pahah recommends `simulations/<sim>/world/{sites,groups,cas,feeds,wires}/` as the primary experiment home, with root-level `groups/` or `transports/` deferred unless a later dogfood/reference layout needs them.
+
+## 2026-05-09 update - TE-vilot combines simulation structure and promise artifacts
+
+TE-vilot (`docs/thought-experiments/TE-vilot-promise-shaped-simulation-artifacts.md`) strengthens the TE-pahah reading. It treats `simulations/` as the safe boundary for testing promise-shaped artifact protocols without forcing every apparatus document to become a PT promise.
+
+Updated reading after TE-vilot: this DR should avoid deciding root-level transport/group layout or universal promise-artifact templates in isolation. If the current `transports/wire-lab-devs-draft/` evidence is migrated, the likely target is a named simulation world. If promise-shaped metadata is desired for that migration, it should be tested as a simulation artifact protocol or commitment-specific template, not as a blanket rewrite of TEs, DRs, TODOs, or guide-resource notes.
+
+## 2026-05-09 update - TE-hirap adds artifact-as-message representation concerns
+
+TE-hirap (`docs/thought-experiments/TE-hirap-artifacts-as-promisegrid-messages.md`) extends TE-vilot from promise-shaped prose to full PromiseGrid-message-shaped artifacts. It distinguishes plain-text `grid <pcid>` specimens, CBOR promise-stack candidates, dual-view identity hazards, and commitment/specimen-only graduation.
+
+Updated reading after TE-hirap: if `transports/wire-lab-devs-draft/` evidence moves into a simulation, the migration should not silently convert every surrounding apparatus file into a PromiseGrid message. Any message-shaped artifact protocol should live inside the named simulation or a commitment/specimen class, state whether text or CBOR is canonical, and avoid two competing CIDs for the same logical artifact.
+
+## 2026-05-09 update - TE-nizor tests whether Pahah is sufficient
+
+TE-nizor (`docs/thought-experiments/TE-nizor-pahah-implementation-sufficiency.md`) examines TE-pahah, TE-vilot, TE-hirap, and turns 149-208 together. It concludes that Pahah can satisfy the recovered concerns only if implemented as `simulations/` plus a minimal simulation contract, not as a bare directory or a root-level `groups/`/`transports` migration.
+
+Updated reading after TE-nizor: this DR should wait for DF-nizor.1 and DF-nizor.2 before any root-level tree migration. If those DFs lock the recommendation, the next transport/group action is likely to seed a named recovery/dogfood simulation from current `transports/wire-lab-devs-draft/` evidence, with any eventual root-level `groups/`, `feeds/`, `cas/`, or `sites/` paths treated as downstream results rather than prerequisites.

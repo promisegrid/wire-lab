@@ -21,6 +21,20 @@ PromiseGrid design choices are derived, tested, and recorded. Source:
 - Do not present draft TEs, TODOs, DRs, or transport specimens as final
   PromiseGrid APIs. Use them only as evidence for why a guide claim exists or
   remains unsettled. Source: `DI-nunut`.
+- `docs/thought-experiments/TE-gurov-promise-shaped-artifacts.md`,
+  `docs/thought-experiments/TE-vilot-promise-shaped-simulation-artifacts.md`,
+  `docs/thought-experiments/TE-hirap-artifacts-as-promisegrid-messages.md`, and
+  `docs/thought-experiments/TE-nizor-pahah-implementation-sufficiency.md`
+  are open design evidence about whether coordination artifacts should be
+  written as PT-style promises or full PromiseGrid-message-shaped artifacts. Do
+  not teach "all docs are promises" or "all artifacts are PromiseGrid messages"
+  as settled guide prose until their DF questions are answered and a DI locks the
+  result. Source: `DI-nunut`.
+- `docs/thought-experiments/TE-nizor-pahah-implementation-sufficiency.md`
+  is also open design evidence that `simulations/` may become the primary
+  wire-lab evidence boundary. Do not teach simulation directory shapes as final
+  PromiseGrid node layout; treat them as wire-lab apparatus until a frozen spec
+  or guide-side decision says otherwise. Source: `DI-nunut`.
 
 ## How writers should use this file
 
