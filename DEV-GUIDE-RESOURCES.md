@@ -34,6 +34,19 @@ as one of three states:
   warn that design work is still in progress.
 - **Blocked by DR:** do not write settled guide prose until the cited DR closes.
 
+## Audience Readiness Matrix
+
+This matrix answers the current guide-writer feedback items `FB-gigit`,
+`FB-rivot`, `FB-vitih`, `FB-mulaj`, and `FB-rigod` at wire-lab scope. It is
+writer guidance, not a final PromiseGrid product/API freeze. Source:
+`DI-zalak`.
+
+| Guide audience | Current readiness | What can be written now | What remains provisional or blocked | Likely first normative citations |
+|---|---|---|---|---|
+| Laypeople | Ready for careful guide prose | PromiseGrid is designed for long-lived decentralized communities of autonomous/free agents; no central registry is a design constraint; protocol forking is normal; multi-generational durability is a first-order requirement. | Specific trust-ledger scoring, final wire format, app APIs, and kernel shape remain out of layperson settled prose. `DR-napum` remains open for final public wording. | The guide itself after stabilization; wire-lab sources stay provenance. |
+| App Devs | Provisional | The minimum current contract is: choose an explicit protocol spec, use its pCID when frozen, let that spec define payload/handler semantics, and publish implementation conformance claims rather than relying on branch paths. | No stable SDK, handler ABI, universal app message API, or app protocol subset is frozen yet. `DR-tuhaz` remains open. | Future frozen `protocols/*/specs/*.md` docs by pCID, plus B-side `CHANGELOG.md` conformance claims. |
+| Kernel Devs | Provisional / blocked for final porting instructions | The porting target is not wire-lab. A porter should expect to implement pCID-selected protocol handlers, substrate/binding/session/message layers claimed by the port, and conformance records for those claims. | The first required frozen spec set, runtime expectations, and implementation obligations are not locked yet. `DR-davod` remains open. | Future frozen binding/session/message specs by pCID, implementation `CHANGELOG.md` conformance claims, and guide prose once stabilized. |
+
 ## Laypeople
 
 Use this section for the guide's Laypeople / Intro and Laypeople / Goals
@@ -63,8 +76,11 @@ sections.
 - Avoid promising a final wire format, app API, or kernel shape in layperson
   prose. Those belong to App Dev and Kernel Dev sections after the relevant
   DRs close.
-- Treat final public narrative wording as blocked by `DR-napum` if a claim must
-  be presented as settled rather than provisional.
+- Safe settled claims for current guide prose: the 100-year goal, autonomous
+  agents, no central registry, protocol forking as normal lifecycle, and
+  multi-generational durability. Repairable trust is safe as a design goal;
+  specific trust-ledger mechanics remain provisional. Source: `DI-zalak`;
+  final public wording remains tracked by `DR-napum`.
 
 ## App Devs
 
@@ -91,9 +107,12 @@ Use this section for the guide's App Devs / How to write a grid app section.
   not by whatever wire-lab experiment happened to produce the current evidence.
 - Keep pCID language: a pCID identifies the protocol/spec being spoken, while
   payload content and capability promises live at the layer that spec defines.
+- The minimum stable app-developer contract is currently a discipline, not an
+  SDK: select a protocol spec, cite/use its pCID after freeze, follow that
+  spec's payload and handler rules, and publish conformance claims for code.
+  Source: `DI-zalak`.
 - Do not invent a stable app SDK, handler ABI, or application message API from
-  wire-lab notes. The guide may describe the direction, but settled app-dev
-  instructions are blocked by `DR-tuhaz`.
+  wire-lab notes. Settled app-dev instructions remain blocked by `DR-tuhaz`.
 - If the guide cites a frozen protocol spec by pCID, that citation can be
   normative for app developers. Draft paths without pCIDs are provenance or
   provisional orientation only.
@@ -131,8 +150,33 @@ section.
 - Do not tell kernel developers to implement every wire-lab draft artifact.
   Frozen pCID specs, conformance claims, and implementation CHANGELOGs are the
   relevant authority path once they exist.
+- The current porting target is a pCID-selected protocol stack plus explicit
+  conformance claims, not the wire-lab harness. A port implements the frozen
+  binding/session/message specs it claims, and records those claims in an
+  implementation CHANGELOG. Source: `DI-zalak`.
 - Settled porting guidance is blocked by `DR-davod` until the stable kernel
   boundary, runtime expectations, and conformance obligations are explicit.
+
+## Likely Normative Citation Path
+
+These are early pointers for `FB-rigod`; they are expected citation paths, not
+final normative references. Source: `DI-zalak`.
+
+- **Laypeople:** once the PromiseGrid Development Guide stabilizes, cite the
+  guide itself for public narrative claims. Use wire-lab TEs and essays only as
+  provenance unless the guide explicitly points readers there.
+- **App Devs:** likely first normative references are frozen protocol specs
+  under `protocols/*/specs/` by pCID, followed by B-side implementation
+  `CHANGELOG.md` conformance claims. Until freeze, cite draft specs only as
+  provisional orientation.
+- **Kernel Devs:** likely first normative references are frozen binding,
+  session, and message specs by pCID, plus implementation conformance records.
+  `protocols/udp-binding.d/specs/udp-binding-draft.md` and
+  `protocols/group-session.d/specs/group-session-draft.md` are likely early
+  ancestors, but they are not final normative citations until frozen.
+- **Non-normative provenance:** TEs, DRs, TODOs, `transports/README.md`,
+  `implementations/README.md`, and the harness spec explain how decisions were
+  derived; they do not become app or porting APIs merely by being informative.
 
 ## Open DRs that block settled guide prose
 

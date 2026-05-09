@@ -28,6 +28,21 @@ Resource map implemented. The only remaining subtask is the future review after 
     - Treat exploratory TEs, TODOs, and DRs as provenance once the guide has stabilized corresponding PromiseGrid claims.
 - Affects: `docs/thought-experiments/TE-david-promisegrid-dev-guide-resources.md`; `docs/thought-experiments/README.md`; `protocols/wire-lab.d/TODO/TODO-rozas-promisegrid-dev-guide-resources.md`; `protocols/wire-lab.d/TODO/TODO.md`; future `DEV-GUIDE-RESOURCES.md`; future `README.md` pointer.
 
+### DI-zalak
+
+- ID: DI-zalak
+- Date: 2026-05-08 20:32:35
+- Status: active
+- Author: stevegt@t7a.org (Steve Traugott)
+- Decision: Wire-lab will answer PromiseGrid Development Guide feedback with an audience readiness matrix and likely normative citation paths in `DEV-GUIDE-RESOURCES.md`. The matrix may identify current settled design commitments for guide prose, but it must keep final app-developer APIs and kernel porting boundaries open where no frozen spec or DR/DI closure exists.
+- Intent: Give guide writers a compact current answer to feedback items `FB-gigit`, `FB-rivot`, `FB-vitih`, `FB-mulaj`, and `FB-rigod` without over-promising unstable PromiseGrid APIs or treating wire-lab provenance as final guide authority.
+- Constraints:
+    - Do not modify `/home/stevegt/lab/promisegrid-dev-guide`.
+    - Keep `DR-napum`, `DR-tuhaz`, and `DR-davod` open unless a future DI settles their final PromiseGrid decisions.
+    - Use `DEV-GUIDE-RESOURCES.md` for writer guidance, not full guide prose.
+    - Treat frozen pCID specs and implementation conformance records as likely future normative citations; treat TEs, TODOs, DRs, and harness docs as provenance unless the guide later cites them otherwise.
+- Affects: `DEV-GUIDE-RESOURCES.md`; `DR/DR-napum-promisegrid-layperson-guide-claims.md`; `DR/DR-tuhaz-promisegrid-app-dev-guide-contract.md`; `DR/DR-davod-promisegrid-kernel-dev-porting-boundary.md`; `protocols/wire-lab.d/TODO/TODO-rozas-promisegrid-dev-guide-resources.md`.
+
 ## Context
 
 The PromiseGrid Development Guide currently has three locked audiences:
@@ -42,6 +57,14 @@ guide's claims.
 - `DR/DR-napum-promisegrid-layperson-guide-claims.md` blocks settled Laypeople / Intro and Goals prose.
 - `DR/DR-tuhaz-promisegrid-app-dev-guide-contract.md` blocks settled App Dev / How to write a grid app prose.
 - `DR/DR-davod-promisegrid-kernel-dev-porting-boundary.md` blocks settled Kernel Dev / How to port the infrastructure prose.
+
+## Feedback responses
+
+- `FB-gigit` is answered at current wire-lab scope by the Laypeople row in `DEV-GUIDE-RESOURCES.md` and the 2026-05-08 `DR-napum` event.
+- `FB-rivot` is answered at current wire-lab scope by the App Devs row in `DEV-GUIDE-RESOURCES.md` and the 2026-05-08 `DR-tuhaz` event.
+- `FB-vitih` is answered at current wire-lab scope by the Kernel Devs row in `DEV-GUIDE-RESOURCES.md` and the 2026-05-08 `DR-davod` event.
+- `FB-mulaj` is answered by the new audience readiness matrix in `DEV-GUIDE-RESOURCES.md`.
+- `FB-rigod` is answered by the likely normative citation path in `DEV-GUIDE-RESOURCES.md`.
 
 ## Subtasks
 
