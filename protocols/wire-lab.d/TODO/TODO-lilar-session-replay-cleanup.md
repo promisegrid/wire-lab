@@ -9,7 +9,7 @@ Before the TE-39 proquint migration, this file was known as:
 
 **Forward pointer (added 2026-05-06):** As of 2026-05-06, the 186 UT entries in this file have been classified into proposed dispositions in `dropped-thread-disposition-20260506.md` (sibling file in this directory). Consult that file for the current TE-cluster mapping (TE-38 substrate-agnostic layered model, TE-39 wire-lab-devs migration, TE-40 apparatus-vs-specimen completion, TE-41 group-session freeze, TE-42 filename/CID-cascade policy, TE-43 promisebase prior-art adoption, TE-44 wire-lab/promisebase merge trajectory, TE-45 conditional-release/geofencing, plus TE-36 follow-on / spec-edits / retires / carries). UTs in this file remain unedited; this file is append-only history and is not retroactively rewritten. Vocabulary note: "plurality"/"pluralism" appearing in walk notes is bot coinage from turn 172 that Steve never endorsed; future TEs use "substrate-agnostic" per Steve's turn-175 endorsement of "feed" and "substrate."
 
-**Closure pointer (added 2026-05-07):** TODO-lilar's directly actionable scope is now closed. The chronological walk (021.149 through 021.192-end), the pre-149 audit (021.pre149), the pre-18 audit (021.pre18), the TODO-bisur investigation (021.todo12), and the parked TE-havib twig disposition (021.te36-twig) are all `[x]`. The six cross-cutting questions are forwarded to the successor TEs that own them. The 186 UT-* entries remain checkboxes by design — each is owned by a downstream TE/TODO per `dropped-thread-disposition-20260506.md`, and they will be closed transitively as those TEs land (TE-38 already merged at `0ca0c8d`; TE-36 follow-on closed verified-superseded at `84c781d`; TE-39 / TE-mumuv proquint migration completed 2026-05-07). Do not re-open this file to drive new work — file successor TODOs against the relevant downstream TE instead. The parked TODO-lilar twig itself was abandoned per Alt-B (verified-redundant) at commit `e7bc446`; this file landed on `ppx/main` via the canonical chronological-walk path.
+**Status correction (added 2026-05-09):** TODO-lilar remains **open** while any UT-* entries in this file are unresolved. The chronological walk (021.149 through 021.192-end), the pre-149 audit (021.pre149), the pre-18 audit (021.pre18), the TODO-bisur investigation (021.todo12), and the parked TE-havib twig disposition (021.te36-twig) are complete, but those completed replay-walk subtasks are not the same thing as TODO closure. The six cross-cutting questions are forwarded to successor TEs/TODOs, and the 186 UT-* entries remain checkboxes by design — each is owned by a downstream TE/TODO per `dropped-thread-disposition-20260506.md`, and each closes through the matrix-as-closure-index mechanism as its owner lands substantive work. Do not mark TODO-lilar closed until every UT-* entry is resolved, retired, or explicitly transferred under a later DI. The parked TODO-lilar twig itself was abandoned per Alt-B (verified-redundant) at commit `e7bc446`; this file landed on `ppx/main` via the canonical chronological-walk path.
 
 Track the work to walk session `ea135ce8` chronologically from turn 149 (2026-05-03 00:05 UTC) through turn 192 (2026-05-04 16:00 UTC), one turn at a time, capturing every dropped thread, open question, and verbal-but-uncommitted decision into the repo BEFORE moving to the next thread. The session compressed context once (around the promisebase pivot at turn 180-187), and at least one earlier rename rule (`draft--<slug>` -> `<slug>-draft`) and one vocabulary correction (`grid envelope` not `carrier line`) were locked verbally but never committed.
 
@@ -485,6 +485,35 @@ This TODO is the response to that final instruction.
       (DF-V.4 lock subsection records B7 as transferred).
   Author: stevegt+ppx@t7a.org (stevegt-via-perplexity)
   Supersedes: (none.)
+
+- ID: DI-miloh
+  Date: 2026-05-09 17:34:39
+  Status: active
+  Decision: TODO-lilar remains open while any UT-* entry in its
+    unfinished-thread ledger remains unresolved. Completed replay-walk
+    subtasks prove that the inventory pass landed; they do not close
+    the parent TODO while downstream UT work remains.
+  Intent: Preserve the user's tracking invariant that a TODO with
+    unfinished work stays open. The earlier 2026-05-07 closure pointer
+    conflated "chronological replay walk complete" with "all replay
+    work complete"; this DI separates those states so future readers do
+    not skip the remaining replay-derived work.
+  Constraints:
+    - Do not flip any UT checkbox in TODO-lilar or in
+      `dropped-thread-disposition-20260506.md` as part of this
+      correction.
+    - Keep the matrix-as-closure-index mechanism from
+      `DI-021-20260507-210204`; downstream owner TODOs still close
+      their own UTs when substantive work lands.
+    - Preserve the completed `[x]` state of replay-walk subtasks
+      021.149 through 021.192-end, 021.pre149, 021.pre18,
+      021.todo12, and 021.te36-twig.
+  Affects:
+    - `protocols/wire-lab.d/TODO/TODO-lilar-session-replay-cleanup.md`
+    - `protocols/wire-lab.d/TODO/TODO.md`
+  Author: stevegt@t7a.org (Steve Traugott)
+  Supersedes: (none; corrects status wording without changing
+    closure mechanics locked by DI-021-20260507-210204.)
 
 ## Unfinished threads ledger (per-turn carry-forwards)
 
