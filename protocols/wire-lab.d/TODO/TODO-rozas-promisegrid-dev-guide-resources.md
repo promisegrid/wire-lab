@@ -8,7 +8,7 @@ integer or timestamp alias.
 
 ## Status
 
-Open. This TODO tracks the wire-lab-side resource map that will help humans and LLMs write the PromiseGrid Development Guide without confusing PromiseGrid with wire-lab.
+Resource map implemented. The only remaining subtask is the future review after the PromiseGrid Development Guide stabilizes.
 
 ## Decision Intent Log
 
@@ -37,15 +37,21 @@ guide itself. The guide should explain PromiseGrid. Wire-lab should explain
 which experiments, DIs, DRs, protocol specs, and TODOs support or block the
 guide's claims.
 
+## Related DRs
+
+- `DR/DR-napum-promisegrid-layperson-guide-claims.md` blocks settled Laypeople / Intro and Goals prose.
+- `DR/DR-tuhaz-promisegrid-app-dev-guide-contract.md` blocks settled App Dev / How to write a grid app prose.
+- `DR/DR-davod-promisegrid-kernel-dev-porting-boundary.md` blocks settled Kernel Dev / How to port the infrastructure prose.
+
 ## Subtasks
 
 - [x] rozas.1 Run TE-david with Alice, Bob, and Carol to test what guide writers need to see.
 - [x] rozas.2 Lock the writer-resource decision in `DI-nunut`.
-- [ ] rozas.3 Create top-level `DEV-GUIDE-RESOURCES.md` as a source map plus writer notes, not guide prose.
-- [ ] rozas.4 Add a concise top-level `README.md` pointer to `DEV-GUIDE-RESOURCES.md`.
-- [ ] rozas.5 Map Laypeople guide needs to current wire-lab sources, stable claims, unsettled claims, and provenance.
-- [ ] rozas.6 Map App Dev guide needs to current wire-lab sources, stable claims, unsettled claims, and provenance.
-- [ ] rozas.7 Map Kernel Dev guide needs to current wire-lab sources, stable claims, unsettled claims, and provenance.
-- [ ] rozas.8 Add authority-transition notes explaining when stabilized guide prose supersedes exploratory wire-lab notes.
-- [ ] rozas.9 Identify unresolved guide-writing gaps and file or link DRs for any question that blocks a settled guide claim.
+- [x] rozas.3 Create top-level `DEV-GUIDE-RESOURCES.md` as a source map plus writer notes, not guide prose.
+- [x] rozas.4 Add a concise top-level `README.md` pointer to `DEV-GUIDE-RESOURCES.md`.
+- [x] rozas.5 Map Laypeople guide needs to current wire-lab sources, stable claims, unsettled claims, and provenance.
+- [x] rozas.6 Map App Dev guide needs to current wire-lab sources, stable claims, unsettled claims, and provenance.
+- [x] rozas.7 Map Kernel Dev guide needs to current wire-lab sources, stable claims, unsettled claims, and provenance.
+- [x] rozas.8 Add authority-transition notes explaining when stabilized guide prose supersedes exploratory wire-lab notes.
+- [x] rozas.9 Identify unresolved guide-writing gaps and file or link DRs for any question that blocks a settled guide claim.
 - [ ] rozas.10 After guide prose stabilizes, review `DEV-GUIDE-RESOURCES.md` and downgrade superseded wire-lab material to provenance pointers.

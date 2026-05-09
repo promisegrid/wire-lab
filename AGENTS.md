@@ -13,6 +13,10 @@
 - `AGENTS.md` is the canonical home for repo-wide protocol, workflow, and vocabulary rules. Role-specific files such as `AGENTS-codex.md` and `AGENTS-ppx.md` are overlays: they may add stricter role constraints, environment setup, and role-specific procedures, but they must not duplicate or relax canonical repo-wide rules. (DI-034-20260508-060134)
 - When a rule applies to every agent or every repo artifact, move it here and replace role-file copies with pointers. When a rule applies only to one agent's runtime environment, identity, credentials, branch lifecycle, or private logging system, keep it in that role overlay. (DI-034-20260508-060134)
 
+## DEV-GUIDE-RESOURCES.md
+
+- Update DEV-GUIDE-RESOURCES.md file when a cited or relevant DR, DI, TE, or TODO is updated, when a cited draft spec freezes, or when the PromiseGrid Development Guide (https://github.com/ciwg/promisegrid-dev-guide) settles prose that supersedes a wire-lab note. Source: `DI-nunut`.
+
 ## Decision-First Specification and Compliance Protocol (Required)
 - Decision-first means decisions must be locked before coding; it does not forbid pre-decision analysis such as required thought experiments.
 - The agent must collect and lock user decisions before making any code edits for a task.

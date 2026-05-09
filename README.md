@@ -10,9 +10,14 @@ At the moment, the ppx/main branch is the active development branch,
 and the main branch is a review branch. The ppx/main branch contains
 the latest code and documentation.
 
+PromiseGrid Development Guide writers should start with
+[`DEV-GUIDE-RESOURCES.md`](DEV-GUIDE-RESOURCES.md). Per `DI-nunut`, the
+guide is about PromiseGrid; wire-lab is experimental design provenance,
+not the guide itself.
+
 ## Status
 
-Provisional. Almost everything in the harness-spec is an experimental knob, not a commitment. 
+Provisional. Almost everything in the harness-spec is an experimental knob, not a commitment.
 
 ## How to contribute
 
