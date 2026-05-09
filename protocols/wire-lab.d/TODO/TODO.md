@@ -47,6 +47,7 @@ minted after that date carry only the proquint handle.
 | [TODO-topit](./TODO-topit-transcript-snapshot-procedure.md) | 2026-05-07 | Transcript-snapshot procedure replaces per-turn session-logging discipline | `TODO-33` / `TODO-20260507-150000` |
 | [TODO-fonuz](./TODO-fonuz-proquint-id-upgrade.md) | 2026-05-07 | Proquint IDs for new coordination artifacts | — |
 | [TODO-milum](./TODO-milum-agent-instruction-consolidation.md) | 2026-05-08 | Agent instruction consolidation | `TODO-34` |
+| [TODO-rozas](./TODO-rozas-promisegrid-dev-guide-resources.md) | 2026-05-08 | PromiseGrid dev-guide writer resources | — |
 
 ## group-session
 

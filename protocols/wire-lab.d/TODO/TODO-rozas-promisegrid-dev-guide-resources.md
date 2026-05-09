@@ -1,0 +1,51 @@
+# TODO-rozas: PromiseGrid dev-guide writer resources
+
+## Prior aliases
+
+This TODO is being filed after the TE-mumuv proquint migration locked
+2026-05-07, so it is minted directly under `TODO-rozas`. No prior
+integer or timestamp alias.
+
+## Status
+
+Open. This TODO tracks the wire-lab-side resource map that will help humans and LLMs write the PromiseGrid Development Guide without confusing PromiseGrid with wire-lab.
+
+## Decision Intent Log
+
+### DI-nunut
+
+- ID: DI-nunut
+- Date: 2026-05-08 17:15:32
+- Status: active
+- Author: stevegt@t7a.org (Steve Traugott)
+- Decision: Wire-lab will provide a future top-level `DEV-GUIDE-RESOURCES.md` as a PromiseGrid-facing source map plus short writer notes for PromiseGrid Development Guide authors. The guide is about PromiseGrid, not wire-lab; wire-lab is experimental simulation evidence and design provenance. After the PromiseGrid Development Guide stabilizes, stable guide prose becomes the higher-level developer source of truth, except where the guide cites hashed, frozen protocol specs by pCID.
+- Intent: Give human and LLM guide writers enough curated context to write accurate PromiseGrid guide prose while preventing experimental wire-lab mechanics from being mistaken for product commitments or final developer APIs.
+- Constraints:
+    - Do not edit `/home/stevegt/lab/promisegrid-dev-guide` under this TODO until a later task explicitly asks for cross-repo guide changes.
+    - Keep `DEV-GUIDE-RESOURCES.md` focused on source mapping and writer notes; do not duplicate full guide prose or large excerpts.
+    - Organize resources around the guide's locked audiences: Laypeople, App Devs, and Kernel Devs.
+    - Preserve pCID authority: a frozen protocol spec cited by pCID remains authoritative for that protocol regardless of whether it is hosted in wire-lab or another repo.
+    - Treat exploratory TEs, TODOs, and DRs as provenance once the guide has stabilized corresponding PromiseGrid claims.
+- Affects: `docs/thought-experiments/TE-david-promisegrid-dev-guide-resources.md`; `docs/thought-experiments/README.md`; `protocols/wire-lab.d/TODO/TODO-rozas-promisegrid-dev-guide-resources.md`; `protocols/wire-lab.d/TODO/TODO.md`; future `DEV-GUIDE-RESOURCES.md`; future `README.md` pointer.
+
+## Context
+
+The PromiseGrid Development Guide currently has three locked audiences:
+Laypeople, App Devs, and Kernel Devs. Wire-lab needs to make its
+PromiseGrid-relevant evidence easy to find, but it must not become the
+guide itself. The guide should explain PromiseGrid. Wire-lab should explain
+which experiments, DIs, DRs, protocol specs, and TODOs support or block the
+guide's claims.
+
+## Subtasks
+
+- [x] rozas.1 Run TE-david with Alice, Bob, and Carol to test what guide writers need to see.
+- [x] rozas.2 Lock the writer-resource decision in `DI-nunut`.
+- [ ] rozas.3 Create top-level `DEV-GUIDE-RESOURCES.md` as a source map plus writer notes, not guide prose.
+- [ ] rozas.4 Add a concise top-level `README.md` pointer to `DEV-GUIDE-RESOURCES.md`.
+- [ ] rozas.5 Map Laypeople guide needs to current wire-lab sources, stable claims, unsettled claims, and provenance.
+- [ ] rozas.6 Map App Dev guide needs to current wire-lab sources, stable claims, unsettled claims, and provenance.
+- [ ] rozas.7 Map Kernel Dev guide needs to current wire-lab sources, stable claims, unsettled claims, and provenance.
+- [ ] rozas.8 Add authority-transition notes explaining when stabilized guide prose supersedes exploratory wire-lab notes.
+- [ ] rozas.9 Identify unresolved guide-writing gaps and file or link DRs for any question that blocks a settled guide claim.
+- [ ] rozas.10 After guide prose stabilizes, review `DEV-GUIDE-RESOURCES.md` and downgrade superseded wire-lab material to provenance pointers.
