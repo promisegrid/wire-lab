@@ -8,7 +8,9 @@ integer or timestamp alias.
 
 ## Status
 
-Resource map implemented. The only remaining subtask is the future review after the PromiseGrid Development Guide stabilizes.
+Running. The resource map is implemented, but `DEV-GUIDE-RESOURCES.md`
+remains a periodically maintained writer-resource file and `rozas.10`
+stays open for the future post-stabilization review.
 
 ## Decision Intent Log
 
@@ -42,6 +44,17 @@ Resource map implemented. The only remaining subtask is the future review after 
     - Use `DEV-GUIDE-RESOURCES.md` for writer guidance, not full guide prose.
     - Treat frozen pCID specs and implementation conformance records as likely future normative citations; treat TEs, TODOs, DRs, and harness docs as provenance unless the guide later cites them otherwise.
 - Affects: `DEV-GUIDE-RESOURCES.md`; `DR/DR-napum-promisegrid-layperson-guide-claims.md`; `DR/DR-tuhaz-promisegrid-app-dev-guide-contract.md`; `DR/DR-davod-promisegrid-kernel-dev-porting-boundary.md`; `protocols/wire-lab.d/TODO/TODO-rozas-promisegrid-dev-guide-resources.md`.
+
+### DI-kizav
+
+ID: DI-kizav
+Date: 2026-05-09 10:58:02
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Keep TODO-rozas running while `DEV-GUIDE-RESOURCES.md` remains under periodic maintenance and while `rozas.10` waits for PromiseGrid Development Guide prose to stabilize.
+Intent: Prevent the TODO status from implying full closure when the file has both an ongoing AGENTS.md maintenance rule and a future post-stabilization review checkpoint.
+Constraints: Keep `AGENTS.md` as the recurring instruction source for when `DEV-GUIDE-RESOURCES.md` must be updated. Keep `rozas.10` open as a future milestone rather than copying it into `AGENTS.md`. Do not edit `/home/stevegt/lab/promisegrid-dev-guide` under this status correction.
+Affects: `protocols/wire-lab.d/TODO/TODO-rozas-promisegrid-dev-guide-resources.md`; `AGENTS.md`; `DEV-GUIDE-RESOURCES.md`.
 
 ## Context
 

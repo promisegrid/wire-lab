@@ -9,10 +9,11 @@ Before the TE-39 proquint migration, this file was known as:
 
 ## Status
 
-Closed 2026-05-08. Cat-3 cascade work from TE-havib promise-stack
-retirement has been applied to TE-famar, TE-muvuv, and TE-robub.
-TODO-rivuk and DR-006 now point readers at the TE-havib DF-36.2
-retirement instead of inviting stale promise-stack DF answers.
+Open. Promise-stack retirement cascade complete; residual TE-40 recovery
+still open. Cat-3 cascade work from TE-havib promise-stack retirement
+has been applied to TE-famar, TE-muvuv, and TE-robub. TODO-rivuk and
+DR-006 now point readers at the TE-havib DF-36.2 retirement instead of
+inviting stale promise-stack DF answers.
 
 ## Threads absorbed from OPEN-THREADS.md
 
@@ -48,3 +49,12 @@ Decision: Execute TODO-kugod as a narrow Cat-3/Cat-4 retirement cascade. Append 
 Intent: Preserve the historical promise-stack analyses while making the current corpus navigable after TE-havib DF-36.2 retired promise-stack as a separate hypothesis. Readers should follow payload-recursion under `grid <pcid> <payload>` via TE-havib, TE-lozip, and the congruence/convergence essay instead of answering stale TE-famar DF-1.* questions.
 Constraints: This is a navigational cleanup only. Cat-3 refinements append to `## Refinements`; historical TE bodies remain untouched under TE-dabol/TE-vudaf Cat-1b/Cat-3 rules. DR-006 and TODO-rivuk may be updated to stop stale work queues, but no promise-stack ordering DIs are created.
 Affects: `docs/thought-experiments/TE-famar-promise-stack-ordering.md`; `docs/thought-experiments/TE-muvuv-promise-stack-as-zero-knowledge-envelope.md`; `docs/thought-experiments/TE-robub-time-traveling-break-witness.md`; `protocols/wire-lab.d/TODO/TODO-rivuk-te-promise-stack-ordering.md`; `DR/DR-006-20260429-164729-promise-stack-ordering.md`; `protocols/wire-lab.d/TODO/TODO-kugod-te-40-apparatus-vs-specimen-completion.md`.
+
+ID: DI-somuj
+Date: 2026-05-09 17:43:30
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Reopen TODO-kugod as the TE-40 owner artifact while preserving the completed promise-stack retirement cascade.
+Intent: The cascade completed under DI-runuh, but the broader TE-40 recovery cluster still has residual apparatus-vs-specimen work. The TODO status must not imply full closure while unresolved UT-* items remain assigned to TE-40.
+Constraints: Do not reopen TODO-rivuk or DR-006 as promise-stack-ordering work; those remain superseded by TE-havib DF-36.2. Keep the completed cascade recorded as complete, and use TODO-kugod for residual TE-40 recovery visibility.
+Affects: `protocols/wire-lab.d/TODO/TODO-kugod-te-40-apparatus-vs-specimen-completion.md`; `protocols/wire-lab.d/TODO/TODO.md`; `protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`; `protocols/wire-lab.d/TODO/dropped-thread-disposition-20260506.md`.

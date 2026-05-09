@@ -34,9 +34,10 @@ minted after that date carry only the proquint handle.
 | [TODO-dinub](./TODO-dinub-te-editing-policy-and-holistic-corpus.md) | 2026-05-02 | TODO 020 - TE-dabol TE editing policy and holistic corpus reading: drive to DI | `TODO-20` / `TODO-20260502-213103` |
 | [TODO-lilar](./TODO-lilar-session-replay-cleanup.md) | 2026-05-06 | TODO 021 - Session-replay cleanup: walk turns 149-192 chronologically and reconcile dropped threads **(open: replay walk complete, but unresolved UT-* entries remain owned by downstream TEs/TODOs per `dropped-thread-disposition-20260506.md` and DI-miloh)** | `TODO-21` / `TODO-20260504-170746` |
 | [TODO-vunub](./TODO-vunub-te-38-substrate-agnostic-layered-model.md) | 2026-05-06 | TE-sihih substrate-agnostic layered model | `TODO-22` / `TODO-20260506-184800` |
-| [TODO-lilok](./TODO-lilok-te-36-followon-oq-and-tabletop-walk.md) | 2026-05-07 | TE-havib follow-on: OQ-36.6 + tabletop walk **(closed 2026-05-07: verified-superseded)** | `TODO-23` / `TODO-20260507-002306` |
+| [TODO-lilok](./TODO-lilok-te-36-followon-oq-and-tabletop-walk.md) | 2026-05-07 | TE-havib follow-on: OQ-36.6 + tabletop walk **(open: harness-spec sweep handoff not found in TODO-vuhuj)** | `TODO-23` / `TODO-20260507-002306` |
 | [TODO-pipus](./TODO-pipus-te-39-wire-lab-devs-migration.md) | 2026-05-07 | TE-mumuv wire-lab-devs migration | `TODO-24` / `TODO-20260507-002306` |
-| [TODO-kugod](./TODO-kugod-te-40-apparatus-vs-specimen-completion.md) | 2026-05-07 | TE-40 apparatus-vs-specimen completion + TE-famar closure | `TODO-25` / `TODO-20260507-002306` |
+| [TODO-jivam](./TODO-jivam-turns-149-170-recovery-completion.md) | 2026-05-09 | Turns 149-170 recovery completion monitor **(open: shall not close until all recovery is complete)** | — |
+| [TODO-kugod](./TODO-kugod-te-40-apparatus-vs-specimen-completion.md) | 2026-05-07 | TE-40 apparatus-vs-specimen completion + TE-famar closure **(open: promise-stack retirement cascade complete; residual TE-40 recovery still open)** | `TODO-25` / `TODO-20260507-002306` |
 | [TODO-turog](./TODO-turog-te-41-group-session-freeze-procedure.md) | 2026-05-07 | TE-41 group-session freeze procedure | `TODO-26` / `TODO-20260507-002306` |
 | [TODO-duvuk](./TODO-duvuk-te-42-filename-cid-cascade-policy.md) | 2026-05-07 | TE-42 filename / CID-cascade policy | `TODO-27` / `TODO-20260507-002306` |
 | [TODO-kituj](./TODO-kituj-te-43-promisebase-prior-art-adoption.md) | 2026-05-07 | TE-43 promisebase prior-art adoption | `TODO-28` / `TODO-20260507-002306` |
@@ -47,7 +48,7 @@ minted after that date carry only the proquint handle.
 | [TODO-topit](./TODO-topit-transcript-snapshot-procedure.md) | 2026-05-07 | Transcript-snapshot procedure replaces per-turn session-logging discipline **(deferred indefinitely: Perplexity-specific)** | `TODO-33` / `TODO-20260507-150000` |
 | [TODO-fonuz](./TODO-fonuz-proquint-id-upgrade.md) | 2026-05-07 | Proquint IDs for new coordination artifacts | — |
 | [TODO-milum](./TODO-milum-agent-instruction-consolidation.md) | 2026-05-08 | Agent instruction consolidation | `TODO-34` |
-| [TODO-rozas](./TODO-rozas-promisegrid-dev-guide-resources.md) | 2026-05-08 | PromiseGrid dev-guide writer resources | — |
+| [TODO-rozas](./TODO-rozas-promisegrid-dev-guide-resources.md) | 2026-05-08 | PromiseGrid dev-guide writer resources **(running: periodic `DEV-GUIDE-RESOURCES.md` maintenance; rozas.10 open)** | — |
 
 ## group-session
 

@@ -9,11 +9,16 @@ Before the TE-39 proquint migration, this file was known as:
 
 ## Status
 
-Closed 2026-05-07 — **verified-superseded** under Alt-lilok.1.B disposition path. See verification walk memo at [`protocols/wire-lab.d/docs/te-havib-followon-verification-walk-20260507.md`](../../wire-lab.d/docs/te-havib-followon-verification-walk-20260507.md).
+Open. Reopened 2026-05-09 because the file's prior closure depended on
+a claimed TODO-vuhuj handoff for harness-spec sweep edits that was not
+found in TODO-vuhuj during follow-up audit. The verified-superseded
+disposition for the five original UTs remains historical context, but
+TODO-lilok stays open until the harness-spec sweep ownership is either
+explicitly tracked elsewhere or confirmed unnecessary.
 
 All five UTs in this cluster were captured 2026-05-06 against the pre-Alt-B state of TE-havib. The 2026-05-05 Alt-B disposition path re-presentation locked DF-36.1, .2, .3, .7 (and resolved OQ-36.6 in the negative) before the cluster was filed. The verification walk confirmed all six tabletop scenarios hold against the locked state and all five UTs are answered by the locks (UT-160.b is procedural-meta, UT-160.c was wrong on inspection, UT-161.a is moot under DF-36.2 retirement, UT-162.a is resolved by OQ-36.6 negative resolution, UT-162.b is resolved by Alt-B re-presentation).
 
-No live work remains. The actual harness-spec sweep edits (§1.1, §2.1, §7.1, §10a.2/.3/.6, §10 table) are tracked under TODO-vuhuj's leftover sweep per DF-36.7 lock annotation, not here.
+The original five-UT cluster has no live work remaining, but the actual harness-spec sweep edits (§1.1, §2.1, §7.1, §10a.2/.3/.6, §10 table) remain unresolved here because the claimed TODO-vuhuj leftover-sweep tracker was not found during follow-up audit.
 
 ## Threads absorbed from OPEN-THREADS.md
 
@@ -26,7 +31,7 @@ that TE-havib did not run (UT-159.c / UT-160.c).
 5 UTs in the dropped-thread-disposition file under the "TE-havib follow-on"
 cluster.
 
-Blocking: nothing today; pure follow-on refinement.
+Blocking: harness-spec sweep ownership remains unresolved until a later pass either tracks the sweep explicitly or confirms it is unnecessary.
 
 Anchor: TE-havib § OQ-36.6; audit memo at `4725b3e`.
 Disposition-file pointer: `dropped-thread-disposition-20260506.md`
@@ -38,4 +43,11 @@ Disposition-file pointer: `dropped-thread-disposition-20260506.md`
 
 ## Decision Intent Log
 
-(Will be populated as DFs lock and product lands.)
+ID: DI-fahak
+Date: 2026-05-09 10:58:02
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Reopen TODO-lilok despite the verified-superseded disposition of its original five-UT cluster.
+Intent: A TODO should not be marked closed when it still points to unfinished harness-spec sweep work and the claimed downstream tracker is not evident in TODO-vuhuj.
+Constraints: Preserve the 2026-05-07 verification-walk result as historical evidence; do not mark the original five UTs live again unless a later audit finds that their locks failed; track or retire the harness-spec sweep explicitly before closing TODO-lilok again.
+Affects: `protocols/wire-lab.d/TODO/TODO-lilok-te-36-followon-oq-and-tabletop-walk.md`; `protocols/wire-lab.d/TODO/TODO.md`; `protocols/wire-lab.d/TODO/TODO-vuhuj-protocols-as-simulated-repos-migration.md`; `protocols/wire-lab.d/specs/harness-spec-draft.md`.
