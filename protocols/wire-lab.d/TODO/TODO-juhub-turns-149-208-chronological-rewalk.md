@@ -609,6 +609,21 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
   envelope belongs in the harness-spec as a single harness-wide decision. I did
   not find any later artifact claiming the turn-157 framing was itself the final
   answer.
+- `Related UTs / owners` `UT-157.a` and `UT-157.c` remain
+  `transferred-open` in `TODO-kugod` until a grid-envelope successor owner
+  exists; `UT-157.b` is retired under `TODO-rivuk` / `DI-runuh`. The current
+  owner table keeps the candidate-envelope inventory and the
+  `grid([pcid, payload])` working-hypothesis prose attached to future
+  grid-envelope/specimen work rather than to promise-stack.
+- `Owner/doc cleanup` No new turn-local cleanup was performed here. The replay
+  confirms that the owner chain is already correct: the abandoned Reading-1/2/3
+  question is retired, while the candidate-envelope inventory and the
+  "working but not yet proven" grid framing still need a dedicated successor
+  owner outside this turn. No correction note is needed in `TODO-lilar`.
+- `Remaining decisions or work` Yes. The grid-envelope successor/home is still
+  missing, so the five-envelope inventory and the `grid([pcid, payload])`
+  working-hypothesis wording are still open carry-forward from this turn.
+- `Work pending` `yes`
 - `Proposed disposition` `already captured correctly`
 - `Write needed? yes/no` `yes` for this rewalk entry and checklist closure in
   `TODO-juhub`; `no` correction note is needed in `TODO-lilar`.
