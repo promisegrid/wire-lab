@@ -95,6 +95,25 @@ Intent: Keep the 149-208 replay moving after the simulation migration instead of
 Constraints: Do not mark TE-domat, TE-pahah, or TE-nizor globally decided. Do not change harness-spec wording, create grid-envelope files, or run the transport-spec companion audit in this reconciliation pass. Preserve `simulations/SIM-piloh-turns-149-208-recovery/` as the current specimen home under `DI-fakin`.
 Affects: `protocols/wire-lab.d/TODO/TODO-kugod-te-40-apparatus-vs-specimen-completion.md`; `protocols/wire-lab.d/TODO/TODO.md`; `docs/thought-experiments/TE-domat-transports-groups-reconciliation.md`; `docs/thought-experiments/TE-pahah-wire-lab-simulation-first-structure.md`; `docs/thought-experiments/TE-nizor-pahah-implementation-sufficiency.md`; `docs/thought-experiments/TE-mupoz-root-protocol-migration-scope-under-simulations.md`; `DR/DR-nugog-transport-tree-ownership-structure.md`.
 
+ID: DI-lajod
+Date: 2026-05-10 13:56:58
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Execute turn-156 cleanup as a narrow apparatus/specimen sweep in `protocols/wire-lab.d/specs/harness-spec-draft.md`: replace the remaining harness-level promise-stack framing in §1.1 and the specimen-specific wording in §1.3 with apparatus-level language, and close `UT-156.c` without claiming the broader TE-40 harness-spec audit is complete.
+Intent: Retract the stale turn-156 claim that the harness-spec is "wire-envelope-agnostic" by stating the correct relationship: the harness is apparatus that compares candidate envelopes and adjacent layer choices. This resolves the turn-156 slice while keeping the larger §1.1 / §1.3 carve-out and the wider nine-item audit visible as separate TE-40 work.
+Constraints: Do not reopen TE-havib DFs, create new specimen directories, or pretend §1.2, §3.3, §7.1, or the nine `UT-159.a` audit items are finished. Use the current simulation-local specimen surface from `DI-fakin` for forward pointers. Leave `TODO-lilar`, the disposition memo, and the UT verification matrix untouched unless a factual error is found.
+Affects: `protocols/wire-lab.d/TODO/TODO-kugod-te-40-apparatus-vs-specimen-completion.md`; `protocols/wire-lab.d/specs/harness-spec-draft.md`; `protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewalk.md`.
+
+ID: DI-sujan
+Date: 2026-05-10 14:04:03
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Tighten the turn-156 harness-spec cleanup so apparatus-level prose points generically at named simulations under `simulations/` rather than treating `simulations/SIM-piloh-turns-149-208-recovery/` as the harness-wide specimen home. Keep `SIM-piloh` only as a scoped example where the current recovery/dogfood specimen set is relevant.
+Intent: Prevent the apparatus spec from silently promoting one current simulation into the preferred or canonical specimen surface. The harness should describe how named simulations provide specimen sets, not imply that one currently-populated simulation is the normative home for all candidate specimens.
+Constraints: Do not rewrite historical TE summary sections that name `SIM-piloh` as the current location of specific specimen evidence. Limit this pass to apparatus-level overreach in `harness-spec-draft.md` and the narrow owner/provenance wording that tracks turn-156 cleanup.
+Affects: `protocols/wire-lab.d/TODO/TODO-kugod-te-40-apparatus-vs-specimen-completion.md`; `protocols/wire-lab.d/specs/harness-spec-draft.md`.
+Supersedes: DI-lajod (simulation-specific forward-pointer wording only)
+
 ## Residual TE-40 checklist
 
 This checklist maps the TE-40 UT inventory from
@@ -108,13 +127,13 @@ row below is closed by a DI, DR, or successor TODO.
 | UT-155.b | retired | TODO-rivuk / DI-runuh | `Project` / `Peel` / `Wrap` remain historical promise-stack vocabulary, not current apparatus work. |
 | UT-156.a | retired | TODO-rivuk / DI-runuh | The abandoned TE-famar structural-role question is superseded by promise-stack retirement. |
 | UT-156.b | resolved-retired | TODO-kugod / DI-runuh | TE-famar stays in the historical TE corpus with Cat-3 forward pointers instead of moving. |
-| UT-156.c | open | TODO-kugod | The bad "harness-spec is wire-envelope-agnostic" claim still needs harness-spec cleanup in a later scoped pass. |
+| UT-156.c | resolved | TODO-kugod / DI-lajod + DI-sujan | The stale "wire-envelope-agnostic" claim is superseded by the apparatus-level §1.1 / §1.3 rewrite in `harness-spec-draft.md`, with simulation references tightened so the harness does not privilege `SIM-piloh`; broader §1.1 / §1.3 carve-out work continues separately under `UT-158.c` and `UT-158.d`. |
 | UT-157.a | transferred-open | TODO-kugod until grid-envelope successor exists | Candidate envelope inventory belongs with the future grid-envelope/specimen home, not with promise-stack. |
 | UT-157.b | retired | TODO-rivuk / DI-runuh | The abandoned TE-famar status-reading DF is no longer live. |
 | UT-157.c | transferred-open | TODO-kugod until grid-envelope successor exists | The `grid([pcid, payload])` working-hypothesis prose needs a grid-envelope home or successor TODO. |
 | UT-158.b | resolved | TE-havib DF-36.1 | The apparatus-vs-specimen scope is strict carve-out; no new TE-40 scope choice remains. |
-| UT-158.c | open | TODO-kugod | Harness-spec §1.1 carve-out remains unexecuted. |
-| UT-158.d | open | TODO-kugod | Harness-spec §1.3 apparatus/specimen classification remains unexecuted. |
+| UT-158.c | open | TODO-kugod | Harness-spec §1.1 now has an apparatus-level rewrite under `DI-lajod`, but the broader carve-out still remains incomplete. |
+| UT-158.d | open | TODO-kugod | Harness-spec §1.3 now has an apparatus-level rewrite under `DI-lajod`, but specimen-side migration and the broader classification sweep still remain incomplete. |
 | UT-158.e | retired | TODO-kugod / DI-runuh | TE-famar is not moved into a promise-stack protocol directory because promise-stack is retired as a separate hypothesis. |
 | UT-158.f | transferred-open | TODO-kugod until grid-envelope successor exists | The grid-envelope protocol directory/spec work remains outside this pass and needs a successor owner. |
 | UT-158.g | retired | TODO-rivuk / DI-runuh | TODO-rivuk is closed as superseded instead of moved under a promise-stack protocol directory. |
@@ -130,7 +149,7 @@ row below is closed by a DI, DR, or successor TODO.
 - [x] kugod.3 Resolve the current TE-nizor (`docs/thought-experiments/TE-nizor-pahah-implementation-sufficiency.md`) blocker before closing residual recovery for turns 149-208. Closed for the current recovery specimen by `DI-fakin` and `DI-mahim`; TE-nizor remains open as broader analysis for root-level layer trees, artifact-message shape, CBOR/text representation, and CAS/feed details.
 - [x] kugod.4 Resolve TE-mupoz (`docs/thought-experiments/TE-mupoz-root-protocol-migration-scope-under-simulations.md`) before moving existing root-level or `protocols/` content under `simulations/`. TE-mupoz tests whether root `protocols/` should retain only `wire-lab.d`, and whether candidate protocol drafts, proposal records, and transport specimens should move into the first simulation as specimens when TE-nizor is implemented. Closed by `DI-pakid` and `DI-fakin`; implementation target is `simulations/SIM-piloh-turns-149-208-recovery/`.
 - [ ] kugod.5 Inventory the harness-spec claims that still mix harness apparatus with candidate PromiseGrid specimens, including the nine UT-159.a audit items and the ambiguous UT-159.d areas.
-- [ ] kugod.6 Amend the harness spec so §1.1 and §1.3 state the apparatus/specimen boundary cleanly and remove or supersede the stale "wire-envelope-agnostic" claim from UT-156.c, UT-158.c, and UT-158.d.
+- [ ] kugod.6 Finish the harness-spec §1.1 / §1.3 apparatus/specimen cleanup for `UT-158.c` and `UT-158.d`; `UT-156.c`'s stale turn-156 phrasing is already superseded by `DI-lajod`.
 - [ ] kugod.7 Create or identify the successor owner for grid-envelope work, candidate envelope inventory, and the `grid([pcid, payload])` working hypothesis from UT-157.a, UT-157.c, and UT-158.f.
 - [ ] kugod.8 Run the transport-spec companion audit after the Mupoz migration, distinguishing rooted wire-lab apparatus claims from simulation-local transport specimens for UT-159.b.
 - [ ] kugod.9 Update TODO-jivam and the TE-40 disposition matrix after kugod.5 through kugod.8 are resolved, transferred, or explicitly retired.

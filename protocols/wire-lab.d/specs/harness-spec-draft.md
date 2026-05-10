@@ -12,7 +12,7 @@ The harness exists to let us **discover** the right design, not to validate a pr
 
 ## The 100-Year Goal
 
-PromiseGrid is designed against an explicit **100-year goal**: it must survive and remain useful as an open, decentralized community of free agents and humans across roughly a century of evolution, without depending on any central authority that might disappear inside that horizon. Every design choice in this harness-spec, in subordinate protocol specs (`specs/transport-spec-draft.md`, simulation-local candidate specimens such as `simulations/SIM-piloh-turns-149-208-recovery/protocols/group-session.d/specs/group-session-draft.md`, future protocol specs), and in every TE/DR/DI/TODO record must be pressure-tested against the constraints below. Short-horizon assumptions that look fine over months or years routinely fail at the 100-year horizon; the constraint set exists to prevent them from being smuggled in unnoticed.
+PromiseGrid is designed against an explicit **100-year goal**: it must survive and remain useful as an open, decentralized community of free agents and humans across roughly a century of evolution, without depending on any central authority that might disappear inside that horizon. Every design choice in this harness-spec, in subordinate protocol specs (`specs/transport-spec-draft.md`, simulation-local candidate specimens under `simulations/`, future protocol specs), and in every TE/DR/DI/TODO record must be pressure-tested against the constraints below. Short-horizon assumptions that look fine over months or years routinely fail at the 100-year horizon; the constraint set exists to prevent them from being smuggled in unnoticed. Source for simulation-local specimen placement: `DI-sujan`; migration source: `DI-fakin`.
 
 The constraint set:
 
@@ -29,59 +29,83 @@ The full pressure-test of every currently-locked artifact in the wire-lab agains
 
 ---
 
-## 1. The Core Reframe: Messages Are Layered Promises
+## 1. The Core Reframe: The Harness Compares Candidate Message Shapes
 
-A message is no longer `[pCID, payload, signature]`. It is a **promise stack** — an ordered set of nested promises, each made by a distinct promiser, each interpretable on its own and verifiable against that promiser's history.
+The harness does not lock one message envelope as canonical. Its job is to run
+the same scenarios against competing message-shape and layer-boundary
+hypotheses, then record what each candidate makes easier, harder, or impossible
+over the 100-year horizon. Candidate wire grammars therefore live with
+specimen docs; this harness-spec keeps only the apparatus-level requirements
+needed to compare them. Source: `DI-lajod`.
 
 > **A note on what a pCID is.** A `pCID` is a *protocol* CID: the content hash of a spec document that defines a wire protocol. It is roughly equivalent to a TCP/UDP port number — an identifier that selects a protocol — except that no central registry is needed, because the spec's hash *is* the port number. Anyone can mint a pCID by writing a spec and publishing its CID. A pCID is **not** the hash of any particular payload; it is the hash of the rules that the payload follows. Two different messages can carry the same pCID and entirely different payloads, just as two TCP segments to port 443 can carry entirely different HTTPS streams. This distinction matters for the assertion vocabulary below.
 
-### 1.1 The promise-stack model
+### 1.1 Apparatus-level message-shape requirements
 
-A message is `[]Promise`. A `Promise` is:
+For harness purposes, a candidate message shape is acceptable only if the
+apparatus can inject it, observe it, replay it, and score its outcomes without
+baking that candidate's concrete wire grammar into the apparatus spec. Envelope
+shape, frame ordering, and message-body organization are specimen concerns; the
+harness keeps only the cross-specimen requirements here. Source: `DI-lajod`.
 
-```
-Promise := {
-    promiser:  AgentID | TransportID | RuntimeID | KernelID
-    assertion: "this payload conforms to the spec identified by pCID P"
-              | "I authored this payload"        ; signature-style
-              | "I forwarded this byte sequence unmodified from peer Q at time T"
-              | "I will perform action X if you redeem this token"
-              | "I commit not to issue another message numbered N for this stream"
-              | "the payload below resolves at the CID I'm naming; fetch it elsewhere"
-              | ... (open set; new assertion vocabularies are themselves content-addressed specs, i.e. their own pCIDs)
-    body:      bytes | promise-stack | nil
-    evidence:  signature | MAC | "byte-arrival on authenticated channel" | nil
-    ttl:       optional duration or revocation hook
-}
-```
+A candidate under test must give the apparatus enough structure to:
 
-The on-the-wire encoding of a message is a CBOR array of promise frames, innermost first or outermost first (the simulator tests both). A receiver consumes promises top-down, deciding for each whether to **accept**, **defer** (cache pending more evidence), or **reject**.
+- identify which specimen rules apply to the bytes or object under test;
+- preserve enough provenance for receivers and auditors to reason about
+  authorship, forwarding, and other relevant claims;
+- represent deferred or partial evaluation cleanly when a receiver lacks enough
+  evidence to decide immediately;
+- refer to external or content-addressed body material when the scenario
+  requires large payloads, delayed fetch, or Merkle-style indirection.
 
-Some realizations of the same logical message in this model:
+Candidate specimen sets live under named simulations in `simulations/`. Each
+run, replay, or analysis must say which simulation-local specimen set is in
+scope; the harness itself does not privilege any one simulation as canonical.
+For the current recovery/dogfood specimen set, see
+`simulations/SIM-piloh-turns-149-208-recovery/protocol-set.md`. Source:
+`DI-sujan`; example-location source: `DI-fakin`.
 
-- **`[pCID, payload, signature]`** — pCID names the protocol the payload conforms to; signature frame asserts authorship. Two promises, one outermost frame.
-- **`[pCID, payload]` + transport promise** — sender promises the payload conforms to the spec at pCID; the transport (TLS, Noise, an authenticated channel kept alive across many messages) carries a continuing implicit promise of sender identity. Signature lives **inside** payload only when the receiver demands non-repudiable evidence.
-- **`[transport-promise, [routing-promise, [authorship-promise, [content-promise, payload]]]]`** — a fully nested form where the kernel/router has appended its own promise after receiving from the network, so a downstream handler can verify *which router forwarded this and when*.
-- **`[bare-payload]`** — within a single trusted process, the only promise is implicit ("the function caller asserts this argument is correct"). Still a promise stack of length one.
+This retracts the earlier turn-156 wording that described the harness-spec as
+"wire-envelope-agnostic." The harness is not ignoring envelopes; it is
+apparatus for comparing candidate envelopes and adjacent layer choices under
+shared scenarios. Source: `DI-lajod`.
 
-The wire library (call it `promstack`) then has just three operations:
-1. `Wrap(msg, promise) → msg'` — push a new promise on the outside.
-2. `Peel(msg) → (outermost-promise, inner-msg)` — consume the top promise.
-3. `Project(msg, predicate) → []Promise` — pull out all promises matching a predicate (e.g. "all signature promises by Alice").
+### 1.2 Historical rationale from the earlier promise-stack hypothesis
 
-### 1.2 Why this is better than a fixed envelope
+The bullets below preserve why the earlier promise-stack specimen looked
+attractive. They are historical rationale, not current harness-level wire
+guidance, and the broader specimen-bearing argument sweep remains tracked under
+TE-40 residual work. Source: `DI-lajod`.
 
 - **Transport-as-promiser becomes legitimate.** A TCP connection authenticated at startup makes a continuing implicit promise about the source of every byte. We don't need to re-sign every message; we can track that the transport is *making* a multi-message promise, and the trust ledger updates if the transport keeps or breaks it.
 - **Routers and kernels can append their own promises** without modifying the inner content — exactly the chain-of-custody property we want for a centuries-long system where intermediaries come and go.
 - **The signature debate goes away.** Whether the signature covers `[pCID, payload]` or just `payload` becomes a choice of *which promise frame holds the signature*. Different protocols (different pCIDs) can choose differently and the wire format doesn't care.
 - **Capability tokens are just promises too.** A token is a promise whose assertion is of the form "I will perform X if you redeem this." It lives in the same stack as everything else.
 
-### 1.3 What the simulator tests about layering
+### 1.3 Apparatus-level layering-test scenarios
 
-- That a receiver can correctly handle **out-of-order promise stacks** (some protocols want signature outermost, some want it innermost; a long-lived system needs both).
-- That a forwarding node can **strip its own promise on the way out** (so I don't accumulate a 200-promise tail after 100 hops over 50 years).
-- That a promise **about a missing inner body** (e.g. "I attest the CID below resolves to legal payload but I'm not shipping it; fetch it") works as a first-class case. This is the "merkle reference" pattern we'll need for huge messages and for the hypergraph.
-- That two agents who disagree about which promise frame to evaluate first **fail loudly and recoverably**, not silently.
+The harness keeps the following as apparatus-level test scenarios that any
+candidate message shape or adjacent layer design must survive. The point is not
+to prescribe one frame discipline, but to give the apparatus a stable set of
+situations for comparison and scoring. Source: `DI-lajod`.
+
+- That a receiver can correctly handle semantically relevant ordering
+  disagreements without silent divergence. Different candidates may surface the
+  disagreement through different envelope or parsing rules; the harness cares
+  that the failure is loud and recoverable.
+- That a forwarding or relay step can add, remove, or summarize hop-local
+  evidence without corrupting the underlying message history that the scenario
+  is testing.
+- That a message can refer to content not carried inline (for example by CID or
+  equivalent external reference) when the scenario requires large bodies or
+  delayed fetch.
+- That two agents who apply incompatible interpretation rules fail visibly
+  enough for the harness to record the failure mode and compare recovery
+  behavior.
+
+Specimen-specific vocabulary, frame mechanics, and test vectors belong with the
+relevant specimen docs rather than in this apparatus description. Source:
+`DI-lajod`; specimen-location source: `DI-fakin`.
 
 ---
 

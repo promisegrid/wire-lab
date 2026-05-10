@@ -47,6 +47,11 @@ The one-turn-at-a-time raw-log rewalk for turns 149-208 is owned by
 `TODO-juhub` (`protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewalk.md`).
 Evidence for `jivam.1`, `jivam.2`, `jivam.9`, `jivam.10`, and `jivam.11`
 should come from that successor TODO and the owner artifacts it updates.
+Per `DI-gudap` in `TODO-juhub`, the `149-174` slice is not considered
+reconciled merely because the turn notes exist: the rewalk evidence for that
+slice must also identify each turn's related `UT-*` owner state and either
+show the loose ends closed in the proper owner artifact or explicitly name the
+remaining owner/work item.
 
 ## Closure rule
 

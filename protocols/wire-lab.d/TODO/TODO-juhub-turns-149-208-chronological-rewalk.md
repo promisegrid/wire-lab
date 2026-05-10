@@ -64,6 +64,67 @@ Affects: `protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewal
 `simulations/README.md`;
 `simulations/SIM-hugoj-cas-usenetlike-gitlike/README.md`.
 
+ID: DI-gudap
+Date: 2026-05-10 13:16:35
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Strengthen the `TODO-juhub` replay discipline so each turn
+reconciliation also resolves or explicitly calls out its related loose ends.
+Intent: Prevent the 149-208 replay from becoming a second narrative-only pass.
+The rewalk must reduce relitigation by reconciling each turn's `TODO-lilar`
+`UT-*` fallout against the current owner TODOs and by promoting any
+load-bearing insight that is still trapped only in replay artifacts.
+Constraints: Do not flip `TODO-lilar` checkboxes directly. Respect the
+matrix-as-closure-index rule in `ut-verification-matrix-20260507.md`; close,
+retire, or transfer loose ends only in the proper owner artifact. Update
+`TODO-lilar` only with additive correction notes when its historical walk note
+is actually wrong. Direct design/spec/research/simulation docs are touched only
+when a specific turn exposes a load-bearing statement that is still missing
+from those docs. Update `DEV-GUIDE-RESOURCES.md` only when such a cited or
+relevant source changes.
+Affects: `protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewalk.md`;
+`protocols/wire-lab.d/TODO/TODO-jivam-turns-149-170-recovery-completion.md`;
+`protocols/wire-lab.d/TODO/TODO-lilar-session-replay-cleanup.md`;
+`protocols/wire-lab.d/TODO/dropped-thread-disposition-20260506.md`;
+`protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`;
+current owner TODOs for the turns being replayed; directly implicated
+spec/design/research/simulation docs when needed.
+
+ID: DI-vanak
+Date: 2026-05-10 13:36:01
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: During the `TODO-juhub` replay, Steve's single-word reply `turn`
+counts as approval of the currently presented turn analysis and authorizes
+rewriting that turn's note in the stronger `TODO-juhub` format before
+advancing.
+Intent: Remove repetitive confirmation chatter so the replay can proceed one
+turn at a time while still preserving the explicit approval boundary.
+Constraints: `turn` approves only the currently presented turn; it does not
+skip turns. It authorizes rewriting the current turn's `TODO-juhub` note and
+any already-described turn-local owner, correction-note, or direct-doc cleanup
+required by that approved analysis. The replay still stops after the next turn
+is presented for review.
+Affects: `protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewalk.md`;
+this session's `TODO-juhub` replay cadence.
+
+ID: DI-nijod
+Date: 2026-05-10 13:45:42
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Every per-turn replay response must include an explicit `Work
+pending` line near the bottom.
+Intent: Make it immediately obvious whether a turn still leaves live `UT-*`,
+owner TODO, spec-edit, DR/DI, or other substantive follow-on work, so the
+replay steadily burns down loose ends instead of forcing Steve to infer status.
+Constraints: `Work pending: yes` when any open `UT`, owner TODO item,
+spec-edit, DR/DI, or other substantive work still stems from the turn.
+`Work pending: no` only when the turn is fully reconciled and no live owner
+work remains because the related loose ends are absent, closed, retired, or
+transferred. This line is a report field; it does not itself close work.
+Affects: `protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewalk.md`;
+this session's `TODO-juhub` replay responses.
+
 ## Why a separate TODO
 
 `TODO-lilar` already records the original historical walk through turn 192 and
@@ -79,24 +140,108 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
    `DR`, `TODO`, specs, matrix/disposition docs, essays, and research notes)
    for whether the current turn's questions, decisions, or plans were later
    settled, corrected, superseded, contradicted, or abandoned.
-3. Compare the result against existing replay artifacts, especially
-   `TODO-lilar`, `dropped-thread-disposition-20260506.md`,
-   `ut-verification-matrix-20260507.md`, and any current owner TODOs.
-4. Classify the turn as exactly one of: `clean`, `already captured`,
-   `captured but correction needed`, `missing owner artifact`, or
-   `new contradiction`.
-5. Report the turn back to Steve using the fixed report format below and stop.
-6. After approval, write the turn result here and make any linked owner or
-   correction-note updates before moving to the next turn.
+3. Collect every related loose end for that turn from `TODO-lilar`,
+   `dropped-thread-disposition-20260506.md`,
+   `ut-verification-matrix-20260507.md`, and the current owner TODOs.
+4. Determine whether each loose end is already resolved, retired, transferred,
+   still open, or missing a proper owner.
+5. Compare the turn plus its loose ends against the existing replay artifacts
+   and decide whether any historical correction note is actually needed.
+6. Report the turn back to Steve using the fixed report format below and stop.
+7. After approval, write the turn result here and make any linked owner,
+   correction-note, or direct-doc updates required by the turn.
+8. Do not advance until each related loose end is either closed, retired, or
+   transferred in its proper owner artifact, or explicitly called out here as
+   still needing a named decision or work item.
+
+## Interaction shorthand
+
+- `turn` means: approve the currently presented turn, rewrite that turn's note
+  in the stronger `TODO-juhub` format, perform any already-described turn-local
+  cleanup authorized by the approved analysis, then present the next turn.
+- The `Write needed? yes/no` line in the turn report is informational. During
+  this replay, it does not require a separate confirmation from Steve before
+  rewriting the current turn note in `TODO-juhub`.
 
 ## Turn report format
 
 - `Turn N summary`
 - `Existing capture`
 - `Gaps or contradictions`
+- `Related UTs / owners`
+- `Owner/doc cleanup`
+- `Remaining decisions or work`
+- `Work pending: yes|no`
 - `Proposed disposition`
 - `Write needed? yes/no`
 - `Next: wait for approval before turn N+1`
+
+## Loose-end backfill through turn 174
+
+- `Turns 149-154` No related `UT-*` entries were filed for this block. No
+  downstream owner or direct-doc cleanup is currently needed beyond the
+  already-landed TE-editing-policy and TODO-020 artifacts.
+- `Turn 155` `UT-155.a` and `UT-155.b` are now retired in `TODO-kugod` /
+  `TODO-rivuk` under `DI-runuh`; no live turn-local owner work remains.
+- `Turn 156` `UT-156.a` and `UT-156.b` are retired / resolved-retired.
+  `UT-156.c` remains open in `TODO-kugod` and is now concretely queued under
+  `kugod.5` and `kugod.6`.
+- `Turn 157` `UT-157.b` is retired. `UT-157.a` and `UT-157.c` remain
+  transferred-open in `TODO-kugod` pending a future grid-envelope successor,
+  currently surfaced by `kugod.7`.
+- `Turn 158` `UT-158.b` is resolved; `UT-158.e` and `UT-158.g` are retired;
+  `UT-158.c` and `UT-158.d` remain open in `TODO-kugod` via `kugod.6`;
+  `UT-158.f` remains transferred-open via `kugod.7`. Carry items `UT-158.a`
+  and `UT-158.h` still need explicit downstream wording or owner cleanup.
+- `Turn 159` `UT-159.c` is resolved-retired. `UT-159.a` and `UT-159.d` remain
+  open in `TODO-kugod` via `kugod.5`. `UT-159.b` remains open-scoped under
+  `TODO-kugod` plus `DR-nugog` via `kugod.8`.
+- `Turn 160` `UT-160.b` and `UT-160.c` are answered by the TE-havib follow-on
+  verification path. `UT-160.a` remains a spec-edit loose end, and `UT-160.d`
+  remains a carry note about the still-unlocked TE-havib DFs. `TODO-lilok`
+  still needs its reopened harness-spec-sweep note reconciled against current
+  `TODO-kugod` ownership.
+- `Turn 161` `UT-161.a` is answered by the TE-havib follow-on disposition.
+  Carry items `UT-161.b` and `UT-161.c` remain conversation-only lineage /
+  taxonomy notes and still need explicit downstream placement if reused.
+- `Turn 162` `UT-162.a` and `UT-162.b` are answered by the later TE-havib
+  disposition path. No additional turn-local owner update has landed yet
+  because `TODO-lilok` still carries the reopened sweep-handoff note.
+- `Turn 163` `UT-163.a` remains a spec-edit loose end for the envelope-agnostic
+  `§1.3` wording template. `UT-163.b` remains a carry/procedural note about
+  uncaptured TE-havib twig commits.
+- `Turn 164` `UT-164.c`, `UT-164.d`, and `UT-164.e` remain open under
+  `TODO-turog`. Carry items `UT-164.a` and `UT-164.b` remain procedural /
+  historical corrections only.
+- `Turn 165` `UT-165.b` remains open under `TODO-turog`. `UT-165.d` and
+  `UT-165.e` remain spec-edit loose ends. Carry items `UT-165.a` and
+  `UT-165.c` remain process/privacy notes rather than live design work.
+- `Turn 166` `UT-166.a`, `UT-166.b`, `UT-166.c`, and `UT-166.e` remain open
+  under `TODO-turog`. Carry item `UT-166.d` remains historical metadata only.
+- `Turn 167` `UT-167.a`, `UT-167.b`, `UT-167.c`, and `UT-167.e` remain open
+  under `TODO-turog`. `UT-167.d` remains an open spec-edit item for the
+  missing Cat-2 quotation grep.
+- `Turn 168` `UT-168.b`, `UT-168.c`, and `UT-168.d` remain open under
+  `TODO-turog`. `UT-168.a`, `UT-168.e`, and `UT-168.f` remain open under
+  `TODO-duvuk`.
+- `Turn 169` `UT-169.a`, `UT-169.b`, `UT-169.d`, and `UT-169.e` remain open
+  under `TODO-duvuk`. Carry item `UT-169.c` remains a procedural cadence note.
+- `Turn 170` `UT-170.b`, `UT-170.c`, and `UT-170.d` are retired. `UT-170.a`
+  remains live in the TE-sihih / `TODO-vunub` cluster and must close there, not
+  in replay history.
+- `Turn 171` `UT-171.a` and `UT-171.b` remain live in TE-sihih /
+  `TODO-vunub`. Carry items `UT-171.c` and `UT-171.d` remain historical
+  cadence / design-process notes.
+- `Turn 172` `UT-172.a`, `UT-172.b`, `UT-172.c`, `UT-172.d`, and `UT-172.e`
+  remain live in TE-sihih / `TODO-vunub`.
+- `Turn 173` `UT-173.a` has partial downstream doc promotion via `DI-pijun`,
+  but it is not fully closed as a protocol-identity claim. `UT-173.b`,
+  `UT-173.c`, `UT-173.d`, and `UT-173.e` remain live in TE-sihih /
+  `TODO-vunub`.
+- `Turn 174` `UT-174.a`, `UT-174.b`, `UT-174.c`, `UT-174.d`, and `UT-174.e`
+  remain live in TE-sihih / `TODO-vunub`. The historical-lineage correction is
+  captured, but the vocabulary/layout fallout still needs substantive owner
+  work.
 
 ## Subtasks
 
@@ -125,7 +270,7 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - [x] juhub.171 Turn 171 raw-log rewalk plus later-turn and later-artifact sweep.
 - [x] juhub.172 Turn 172 raw-log rewalk plus later-turn and later-artifact sweep.
 - [x] juhub.173 Turn 173 raw-log rewalk plus later-turn and later-artifact sweep.
-- [ ] juhub.174 Turn 174 raw-log rewalk plus later-turn and later-artifact sweep.
+- [x] juhub.174 Turn 174 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.175 Turn 175 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.176 Turn 176 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.177 Turn 177 raw-log rewalk plus later-turn and later-artifact sweep.
@@ -179,6 +324,12 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
   retract, narrow, or correct the turn-149 decision. Turn 197's replay
   instructions even classify the early 149-153 block as straightforward
   confirmations of already-landed TODO-020 work.
+- `Related UTs / owners` None. The replay/disposition chain begins its `UT-*`
+  inventory at turn 155, so turn 149 has no downstream owner TODO to reconcile.
+- `Owner/doc cleanup` None needed. The TE-editing-policy artifacts already carry
+  this decision, and no later spec, research, simulation, or owner TODO is
+  missing a load-bearing statement from this turn.
+- `Remaining decisions or work` None.
 - `Proposed disposition` `already captured correctly`
 - `Write needed? yes/no` `yes` for this rewalk entry and checklist closure in
   `TODO-juhub`; `no` correction note is needed in `TODO-lilar`.
@@ -207,6 +358,14 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
   nuance is that `TODO-lilar` phrases the turn boundary in a slightly shifted
   way, because the old walk grouped the DF confirmation block as a tight series
   of approvals. Substantively, the landing is still correct.
+- `Related UTs / owners` None. The replay/disposition chain does not file any
+  `UT-*` entries for turns 149-154, so there is no downstream owner TODO to
+  reconcile for this turn.
+- `Owner/doc cleanup` None needed. The TE-editing-policy artifacts already
+  carry the rule family this turn confirmed, and no later owner or direct
+  design/spec/research/simulation doc appears to be missing a load-bearing
+  statement from this turn.
+- `Remaining decisions or work` None.
 - `Proposed disposition` `already captured correctly`
 - `Write needed? yes/no` `yes` for this rewalk entry and checklist closure in
   `TODO-juhub`; `no` correction note is needed in `TODO-lilar`.
@@ -232,6 +391,13 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
   artifact that narrows, retracts, or contradicts the turn-151 decision. The
   later TE-35 summary still lists DF-35.3 as settled and merged, with the
   quotation-grep safeguard intact.
+- `Related UTs / owners` None. The replay/disposition chain does not file any
+  `UT-*` entries for turns 149-154, so there is no downstream owner TODO to
+  reconcile for this turn.
+- `Owner/doc cleanup` None needed. The TE-editing-policy corpus already carries
+  this safeguard, and no later owner or direct design/spec/research/simulation
+  doc appears to be missing a load-bearing statement from this turn.
+- `Remaining decisions or work` None.
 - `Proposed disposition` `already captured correctly`
 - `Write needed? yes/no` `yes` for this rewalk entry and checklist closure in
   `TODO-juhub`; `no` correction note is needed in `TODO-lilar`.
@@ -260,6 +426,13 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
   DIs plus four Cat-3 Refinements, with the remaining work reduced to rollout
   and mechanical sweeps. No later artifact disputes the turn boundary or the
   meaning of the `Status:` field decision.
+- `Related UTs / owners` None. The replay/disposition chain does not file any
+  `UT-*` entries for turns 149-154, so there is no downstream owner TODO to
+  reconcile for this turn.
+- `Owner/doc cleanup` None needed. The TE-editing-policy corpus already carries
+  this decision, and no later owner or direct design/spec/research/simulation
+  doc appears to be missing a load-bearing statement from this turn.
+- `Remaining decisions or work` None.
 - `Proposed disposition` `already captured correctly`
 - `Write needed? yes/no` `yes` for this rewalk entry and checklist closure in
   `TODO-juhub`; `no` correction note is needed in `TODO-lilar`.
@@ -285,6 +458,14 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
   interpretation: after this turn, only 020.8 remained open in TODO-020. I did
   not find any later correction saying the turn-153 batch was narrower than
   `TODO-lilar` records.
+- `Related UTs / owners` None. The replay/disposition chain does not file any
+  `UT-*` entries for turns 149-154, so there is no downstream owner TODO to
+  reconcile for this turn.
+- `Owner/doc cleanup` None needed. TODO-020 already carries the landing state
+  of the rollout batch, and no later owner or direct
+  design/spec/research/simulation doc appears to be missing a load-bearing
+  statement from this turn.
+- `Remaining decisions or work` None for turn 153 itself.
 - `Proposed disposition` `already captured correctly`
 - `Write needed? yes/no` `yes` for this rewalk entry and checklist closure in
   `TODO-juhub`; `no` correction note is needed in `TODO-lilar`.
@@ -310,6 +491,15 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
   TE-havib / apparatus-vs-specimen sequence begins only after Steve's next
   response and the scope challenge that follows. I found no later artifact that
   reclassifies turn 154 as a substantive design decision.
+- `Related UTs / owners` None. The replay/disposition chain does not file any
+  `UT-*` entries for turns 149-154, so there is no downstream owner TODO to
+  reconcile for this turn.
+- `Owner/doc cleanup` None needed. This turn is a queue snapshot rather than a
+  turn where a missing design/spec/research/simulation statement needs to be
+  promoted, and there is no turn-local owner cleanup beyond the already-listed
+  queue artifacts themselves.
+- `Remaining decisions or work` None for turn 154 itself. The queue items named
+  here remained open, but that is not a replay loose end created by this turn.
 - `Proposed disposition` `already captured correctly`
 - `Write needed? yes/no` `yes` for this rewalk entry and checklist closure in
   `TODO-juhub`; `no` correction note is needed in `TODO-lilar`.
@@ -337,6 +527,17 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
   conversation. The wording "projection mode" is also recognized later as a bad
   phrase that should not propagate into committed text; the real issue was
   whether `Project` is part of the spec contract.
+- `Related UTs / owners` `UT-155.a` and `UT-155.b` are the turn-local loose
+  ends. Both are now retired in `TODO-kugod`: DF-1.1 is no longer live
+  promise-stack work, and the `Project / Peel / Wrap` vocabulary remains
+  historical rather than active apparatus work.
+- `Owner/doc cleanup` None needed now. The owner chain already retired the old
+  TE-famar line correctly, and there is no direct-doc promotion needed from
+  this turn unless that vocabulary is deliberately revived under a new active
+  owner later.
+- `Remaining decisions or work` None for turn 155 itself. The conversation text
+  remains useful historical evidence, but there is no still-open replay owner
+  action attached to this turn after the later retirement.
 - `Proposed disposition` `already captured correctly`
 - `Write needed? yes/no` `yes` for this rewalk entry and checklist closure in
   `TODO-juhub`; `no` correction note is needed in `TODO-lilar`.
@@ -363,6 +564,20 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
   be "wire-envelope-agnostic" is itself later corrected as wrong. The later
   apparatus-vs-specimen framing says the harness is not envelope-agnostic; it is
   the apparatus that compares candidate envelopes and other layer choices.
+- `Related UTs / owners` `UT-156.a` is retired and `UT-156.b` is
+  resolved-retired under `TODO-rivuk` / `DI-runuh`; `UT-156.c` is now resolved
+  in `TODO-kugod` under `DI-lajod`, which rewrites `harness-spec-draft.md §1.1`
+  and `§1.3` at apparatus level and explicitly retracts the stale
+  "wire-envelope-agnostic" wording.
+- `Owner/doc cleanup` Done. `TODO-kugod` now records `UT-156.c` as resolved, and
+  `harness-spec-draft.md` now states that the harness compares candidate
+  envelopes rather than defining one canonical envelope. No correction note is
+  needed in `TODO-lilar`, and the broader `UT-158.c` / `UT-158.d` / `UT-159.*`
+  sweep remains with `TODO-kugod`.
+- `Remaining decisions or work` None for turn `156` itself. The broader
+  apparatus/specimen cleanup is still open, but it belongs to later turns and
+  their owner items rather than to the turn-156 stale-claim residue.
+- `Work pending` `no`
 - `Proposed disposition` `already captured correctly`
 - `Write needed? yes/no` `yes` for this rewalk entry and checklist closure in
   `TODO-juhub`; `no` correction note is needed in `TODO-lilar`.
@@ -850,4 +1065,37 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - `Write needed? yes/no` `yes` for this rewalk entry and checklist closure in
   `TODO-juhub`; `no` correction note is needed in `TODO-lilar`.
 - `Next: wait for approval before turn N+1` Turn 174 is next and remains
+  pending approval.
+
+### Turn 174 — 2026-05-03 17:13 UTC
+
+- `Turn 174 summary` Steve does not accept the turn-173 proposal as ready to
+  draft. Instead he raises three objections at once: `binding` does not sound
+  like real Usenet/email vocabulary, the idea seems to conflict with OSI, and
+  putting a substrate-spec file inside the messages directory feels inverted.
+  In plain English, this is the turn where the proposal is pulled away from a
+  W3C/RPC-style framing and re-anchored in the messaging lineage Steve had in
+  mind.
+- `Existing capture` `TODO-lilar` already captures the turn correctly. The raw
+  answer accepts all three objections and revises the proposal in three
+  matching ways: `binding` is rejected in favor of `feed`; the relationship is
+  reframed as alternative delivery/encapsulation rather than OSI-style vertical
+  layering; and the nested `bindings/` idea is replaced with an instance-root
+  `INSTANCE.md` manifest. This is also the turn where the bot explicitly
+  admits that it imported `binding` from WSDL/CORBA/RPC lineage and that the
+  more honest historical lineage for this problem is Usenet/FidoNet/email.
+  Later residual notes correctly preserve the follow-on consequences: the
+  historical-networks note stays accurate but needs vocabulary-aware reading,
+  `udp-binding` now looks retroactively misnamed, `INSTANCE.md` may be
+  overloading feed facts and governance facts, and the turn-173 Pattern-B map
+  must change from `bindings/` to an instance-manifest shape.
+- `Gaps or contradictions` None that overturn the existing capture. The main
+  later limit is that the encapsulation-not-layering framing introduced here is
+  itself not stable for long: turn 175 will immediately swing back toward a
+  four-layer model. But that later reversal is already preserved in the UT
+  ledger; it does not mean turn 174 was miscaptured.
+- `Proposed disposition` `already captured correctly`
+- `Write needed? yes/no` `yes` for this rewalk entry and checklist closure in
+  `TODO-juhub`; `no` correction note is needed in `TODO-lilar`.
+- `Next: wait for approval before turn N+1` Turn 175 is next and remains
   pending approval.
