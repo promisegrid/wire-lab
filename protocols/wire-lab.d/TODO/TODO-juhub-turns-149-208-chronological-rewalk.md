@@ -87,10 +87,10 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - [x] juhub.157 Turn 157 raw-log rewalk plus later-turn and later-artifact sweep. **Done 2026-05-10.** Raw turn corrected the transport-vs-envelope confusion and proposed a higher-level envelope-shape TE; existing capture was correct; no later contradiction found. See `## Turn notes`.
 - [x] juhub.158 Turn 158 raw-log rewalk plus later-turn and later-artifact sweep.
 - [x] juhub.159 Turn 159 raw-log rewalk plus later-turn and later-artifact sweep.
-- [ ] juhub.160 Turn 160 raw-log rewalk plus later-turn and later-artifact sweep.
-- [ ] juhub.161 Turn 161 raw-log rewalk plus later-turn and later-artifact sweep.
-- [ ] juhub.162 Turn 162 raw-log rewalk plus later-turn and later-artifact sweep.
-- [ ] juhub.163 Turn 163 raw-log rewalk plus later-turn and later-artifact sweep.
+- [x] juhub.160 Turn 160 raw-log rewalk plus later-turn and later-artifact sweep.
+- [x] juhub.161 Turn 161 raw-log rewalk plus later-turn and later-artifact sweep.
+- [x] juhub.162 Turn 162 raw-log rewalk plus later-turn and later-artifact sweep.
+- [x] juhub.163 Turn 163 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.164 Turn 164 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.165 Turn 165 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.166 Turn 166 raw-log rewalk plus later-turn and later-artifact sweep.
@@ -429,4 +429,116 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - `Write needed? yes/no` `yes` for this rewalk entry and checklist closure in
   `TODO-juhub`; `no` correction note is needed in `TODO-lilar`.
 - `Next: wait for approval before turn N+1` Turn 160 is next and remains
+  pending approval.
+
+### Turn 160 — 2026-05-03 02:24 UTC
+
+- `Turn 160 summary` Steve's `do it and continue` authorized two separate
+  actions: first, commit the audit memo from turn 159, and second, continue
+  into step 2 by drafting the apparatus-vs-specimen TE. In plain English, this
+  is the turn where the work stops being just an audit and becomes a formal DF
+  program on a dedicated TE twig.
+- `Existing capture` `TODO-lilar` already captures the turn correctly. The raw
+  turn says the audit memo was committed at `4725b3e`, the new TE-havib work
+  was drafted on twig `ppx/te-20260503-022446-apparatus-vs-specimen`, and the
+  TE already contained seven drafted DFs plus six tabletop scenarios. Just as
+  importantly, the answer text presented only `DF-36.1` to Steve in this turn,
+  following the standing one-DF-at-a-time rule; the other six drafted DFs
+  existed in the TE file but were not yet exposed in conversation.
+- `Gaps or contradictions` None that overturn the existing capture. The later
+  carry-forward items already preserve the important weaknesses introduced here:
+  the audit count in the answer text said eight specimen-bearing items while
+  the audit itself listed nine; the PT vocabulary collapse was baked into
+  `DF-36.4` rather than framed as its own decision; the TE's six scenarios only
+  partially align with the audit's recommended scenario set; and most of the
+  seven drafted DFs remained unlocked at end-of-corpus.
+- `Proposed disposition` `already captured correctly`
+- `Write needed? yes/no` `yes` for this rewalk entry and checklist closure in
+  `TODO-juhub`; `no` correction note is needed in `TODO-lilar`.
+- `Next: wait for approval before turn N+1` Turn 161 is next and remains
+  pending approval.
+
+### Turn 161 — 2026-05-03 02:57 UTC
+
+- `Turn 161 summary` Steve asked the key redundancy question: what is the
+  actual difference between `promise-stack` and `grid-pcid-payload`? In plain
+  English, this is where the bot is forced to explain whether these are truly
+  two peer envelope hypotheses or whether one is really just a special case of
+  the other.
+- `Existing capture` `TODO-lilar` already captures the turn correctly. The raw
+  turn contains the most detailed side-by-side comparison in this whole replay
+  slice: `promise-stack` is presented as a recursive CBOR array of promise
+  frames whose trust and layering semantics live in the envelope itself, while
+  `grid-pcid-payload` is presented as a thin dispatch envelope where the pCID
+  is the top-level selector and the payload shape is left to the protocol it
+  names. The most important point is the asymmetry the bot exposed: a
+  `grid-pcid-payload` message can carry a promise-stack inside its payload, but
+  a promise-stack message does not cleanly host `grid-pcid-payload` as a peer
+  outer envelope. That asymmetry is the conceptual seed of `OQ-36.6`.
+- `Gaps or contradictions` None that overturn the existing capture. Later
+  artifacts already preserve the two main carry-forwards from this turn: the
+  asymmetry may not have survived cleanly into the later committed OQ text, and
+  the nine-axis comparison table plus the richer open-set assertion taxonomy
+  still live only in conversation rather than in a committed doc.
+- `Proposed disposition` `already captured correctly`
+- `Write needed? yes/no` `yes` for this rewalk entry and checklist closure in
+  `TODO-juhub`; `no` correction note is needed in `TODO-lilar`.
+- `Next: wait for approval before turn N+1` Turn 162 is next and remains
+  pending approval.
+
+### Turn 162 — 2026-05-03 03:12 UTC
+
+- `Turn 162 summary` Steve sharpened the redundancy concern from turn 161 into
+  an explicit suspicion: promise-stack may be overcomplicated machinery
+  invented from a misunderstanding of how nested messages already work inside
+  `grid-pcid-payload`. He then gave two procedural instructions: note that
+  concern for later, and keep going on `DF-36.5`. In plain English, this is
+  the turn where the redundancy issue stops being just an implication and
+  becomes an explicitly parked open question.
+- `Existing capture` `TODO-lilar` already captures the turn correctly. The raw
+  turn's visible reply is minimal, but the substantive effect is preserved in
+  later artifacts: the concern is recorded on the TE-havib twig as `OQ-36.6`,
+  and from this point on the promise-stack-home path becomes provisional rather
+  than cleanly settled. If the later investigation concludes that promise-stack
+  is really just one payload-shape under `grid-pcid-payload`, then the earlier
+  promise-stack-home direction either retires or stays only as a minimal
+  placeholder pending that decision.
+- `Gaps or contradictions` None that overturn the existing capture. The later
+  residual notes already preserve the two important nuances from this turn:
+  the committed `OQ-36.6` text may not preserve the cleaner asymmetry from turn
+  161 as clearly as the conversation did, and the provisional nature of the
+  earlier promise-stack-home direction may not be visually obvious to a later
+  reader of the TE twig.
+- `Proposed disposition` `already captured correctly`
+- `Write needed? yes/no` `yes` for this rewalk entry and checklist closure in
+  `TODO-juhub`; `no` correction note is needed in `TODO-lilar`.
+- `Next: wait for approval before turn N+1` Turn 163 is next and remains
+  pending approval.
+
+### Turn 163 — 2026-05-03 03:34 UTC
+
+- `Turn 163 summary` Steve rejected the prior presentation of `DF-36.5` as
+  unreadable and told the bot to format it better. In plain English, this is
+  not just a meta-turn about presentation; it is the first readable,
+  substantive walk of `DF-36.5`.
+- `Existing capture` `TODO-lilar` already captures the turn correctly. The raw
+  turn re-presents the real decision about `§1.3` of `harness-spec`: whether
+  the four simulator tests written in promise-stack vocabulary should stay in
+  the harness envelope-agnostically, move wholesale to a specimen spec, or be
+  split across the two abstraction levels. The bot recommends `Alt-5.C`: keep
+  an apparatus-level summary in the harness and move specimen-specific details
+  out. This is also the first DF in TE-havib where the parked `OQ-36.6`
+  uncertainty is built explicitly into the recommendation: the apparatus-level
+  summary survives either way, but the specimen-side destination depends on
+  whether promise-stack later survives as a distinct specimen.
+- `Gaps or contradictions` None that overturn the existing capture. The main
+  carry-forward from this turn is that the bot effectively created an
+  envelope-agnostic rewrite template for the four `§1.3` tests and implied
+  that the same pattern should apply to other ambiguous sections such as `§3.3`
+  and `§7.1`. That template lives only in conversation, not in a committed
+  artifact.
+- `Proposed disposition` `already captured correctly`
+- `Write needed? yes/no` `yes` for this rewalk entry and checklist closure in
+  `TODO-juhub`; `no` correction note is needed in `TODO-lilar`.
+- `Next: wait for approval before turn N+1` Turn 164 is next and remains
   pending approval.
