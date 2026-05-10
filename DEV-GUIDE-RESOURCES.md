@@ -35,6 +35,16 @@ PromiseGrid design choices are derived, tested, and recorded. Source:
   wire-lab evidence boundary. Do not teach simulation directory shapes as final
   PromiseGrid node layout; treat them as wire-lab apparatus until a frozen spec
   or guide-side decision says otherwise. Source: `DI-nunut`.
+- `docs/thought-experiments/TE-mupoz-root-protocol-migration-scope-under-simulations.md`
+  is open design evidence that root `protocols/` may remain only the wire-lab
+  harness apparatus home (`protocols/wire-lab.d/`), while candidate PromiseGrid
+  protocol drafts move into simulations as specimens until they graduate. Do not
+  teach simulation-local protocol specimens as authoritative PromiseGrid protocol
+  roots unless a later DF/DI, frozen spec, or guide-side decision explicitly
+  graduates them. DF-mupoz.3 is locked as Alt 3.A by `DI-pakid`. TE-mupoz also
+  treats concrete transport/world specimens as
+  movable into simulations; do not treat the old root `transports/` path as a
+  PromiseGrid layout commitment. Source: `DI-nunut`.
 
 ## How writers should use this file
 
@@ -112,8 +122,10 @@ Use this section for the guide's App Devs / How to write a grid app section.
   the A-side spec/design versus B-side implementation split.
 - `implementations/README.md` records the current local shape for reference
   implementations and conformance claims.
-- `protocols/*/specs/*.md` are the current draft or frozen protocol specs that
-  app-facing guidance may eventually cite.
+- `protocols/*/specs/*.md` are current draft protocol specs in the pre-Mupoz
+  layout; TE-mupoz may move non-wire-lab candidate specs into simulations as
+  specimens. App-facing guidance should cite frozen pCIDs or guide-side stable
+  prose, not the transient repo path.
 
 ### Writer notes
 
@@ -179,15 +191,16 @@ final normative references. Source: `DI-zalak`.
 - **Laypeople:** once the PromiseGrid Development Guide stabilizes, cite the
   guide itself for public narrative claims. Use wire-lab TEs and essays only as
   provenance unless the guide explicitly points readers there.
-- **App Devs:** likely first normative references are frozen protocol specs
-  under `protocols/*/specs/` by pCID, followed by B-side implementation
-  `CHANGELOG.md` conformance claims. Until freeze, cite draft specs only as
-  provisional orientation.
+- **App Devs:** likely first normative references are frozen protocol specs by
+  pCID, followed by B-side implementation `CHANGELOG.md` conformance claims.
+  Until freeze, cite draft specs only as provisional orientation and include
+  their current repo path or simulation-local path.
 - **Kernel Devs:** likely first normative references are frozen binding,
   session, and message specs by pCID, plus implementation conformance records.
   `protocols/udp-binding.d/specs/udp-binding-draft.md` and
   `protocols/group-session.d/specs/group-session-draft.md` are likely early
-  ancestors, but they are not final normative citations until frozen.
+  ancestors in the current pre-Mupoz layout, but they are not final normative
+  citations until frozen and may move into a simulation as specimens.
 - **Non-normative provenance:** TEs, DRs, TODOs, `transports/README.md`,
   `implementations/README.md`, and the harness spec explain how decisions were
   derived; they do not become app or porting APIs merely by being informative.

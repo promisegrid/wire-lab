@@ -68,6 +68,15 @@ Intent: TODO-kugod needs to remain open with a precise map from each TE-40 UT to
 Constraints: Do not modify `protocols/wire-lab.d/specs/transport-spec-draft.md`, `protocols/group-session.d/specs/group-session-draft.md`, or `transports/wire-lab-devs-draft/` in this pass. The checklist is a coordination artifact, not a behavior change. DR-nugog asks the question; it does not decide whether the tree becomes `transports/<protocol-slug>/<instance-dir>/` or stays flat.
 Affects: `protocols/wire-lab.d/TODO/TODO-kugod-te-40-apparatus-vs-specimen-completion.md`; `DR/DR-nugog-transport-tree-ownership-structure.md`; `protocols/wire-lab.d/TODO/TODO-turog-te-41-group-session-freeze-procedure.md`; future transport-spec/group-session-spec cleanup.
 
+ID: DI-pakid
+Date: 2026-05-10 01:27:27
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Lock DF-mupoz.3 as Alt 3.A: root `protocols/` contains only `wire-lab.d`; candidate PromiseGrid protocols move under simulations as specimens.
+Intent: Keep root `protocols/` from mixing wire-lab apparatus with candidate PromiseGrid protocols under test. `protocols/wire-lab.d/` remains the harness apparatus home, while `group-session`, `udp-binding`, `ppx-dr`, and similar candidate protocols are tested inside named simulations until a later graduation path is decided.
+Constraints: This locks only DF-mupoz.3. It does not yet lock the first simulation path, the physical migration timing, proposal-record treatment, transport specimen move, or the final graduation destination for candidate protocol specs.
+Affects: `docs/thought-experiments/TE-mupoz-root-protocol-migration-scope-under-simulations.md`; `protocols/wire-lab.d/TODO/TODO-kugod-te-40-apparatus-vs-specimen-completion.md`; `DR/DR-nugog-transport-tree-ownership-structure.md`; `protocols/wire-lab.d/specs/harness-spec-draft.md`; `DEV-GUIDE-RESOURCES.md`; future simulation migration TODO.
+
 ## Residual TE-40 checklist
 
 This checklist maps the TE-40 UT inventory from
@@ -101,3 +110,4 @@ row below is closed by a DI, DR, or successor TODO.
 - [ ] kugod.1 Resolve TE-domat (`docs/thought-experiments/TE-domat-transports-groups-reconciliation.md`) and DR-nugog before closing UT-159.b. TE-domat reframes the question from "flat vs. protocol-slug nesting under `transports/`" to "whether `groups/` becomes the L7 group registry/view while `transports/` remains lower-layer feed/transport specimen data."
 - [ ] kugod.2 Resolve TE-pahah (`docs/thought-experiments/TE-pahah-wire-lab-simulation-first-structure.md`) before implementing any root-level `transports/` or `groups/` migration. TE-pahah reframes the current question around whether concrete experiment worlds should live under `simulations/<sim>/world/` instead of root-level layer trees.
 - [ ] kugod.3 Resolve TE-nizor (`docs/thought-experiments/TE-nizor-pahah-implementation-sufficiency.md`) before closing residual recovery for turns 149-208. TE-nizor tests whether implementing TE-pahah with a simulation contract is sufficient to carry the recovered concerns without prematurely deciding root-level layer trees, artifact-message shape, CBOR/text representation, or CAS/feed details.
+- [ ] kugod.4 Resolve TE-mupoz (`docs/thought-experiments/TE-mupoz-root-protocol-migration-scope-under-simulations.md`) before moving existing root-level or `protocols/` content under `simulations/`. TE-mupoz tests whether root `protocols/` should retain only `wire-lab.d`, and whether candidate protocol drafts, proposal records, and transport specimens should move into the first simulation as specimens when TE-nizor is implemented.

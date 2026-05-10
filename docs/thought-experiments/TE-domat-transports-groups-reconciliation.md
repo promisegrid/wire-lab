@@ -249,3 +249,7 @@ Surviving alternatives:
 ### 2026-05-09 — Simulation-first reframing
 
 TE-pahah (`docs/thought-experiments/TE-pahah-wire-lab-simulation-first-structure.md`) reframes this TE's root-level `transports/` / `groups/` question under Steve's clarification that current wire-lab artifacts are brainstorming experiments, not production or active-use compatibility commitments. TE-pahah should be read before answering DF-domat: if concrete worlds move under `simulations/<sim>/world/`, then root-level `transports/` versus root-level `groups/` becomes a secondary question rather than the main structure decision.
+
+### 2026-05-10 — Preserve evidence, not the root `transports/` path
+
+TE-mupoz (`docs/thought-experiments/TE-mupoz-root-protocol-migration-scope-under-simulations.md`) further narrows this TE's preservation language. Steve clarified that `transports/` does not need to remain in its current location. The current reading is therefore: preserve the historical evidence, source path, source commit, and message CIDs, but allow the concrete `transports/wire-lab-devs-draft/` specimen to move into the first Pahah simulation with an explicit migration manifest. The root path itself is not a compatibility constraint.

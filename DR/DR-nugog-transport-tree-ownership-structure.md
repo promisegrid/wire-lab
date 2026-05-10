@@ -12,7 +12,7 @@ Waiting on: stevegt@t7a.org (Steve Traugott)
 Decision:
 Linked DI: DI-vopim
 Related commits:
-Last updated: 2026-05-09 19:57:57 UTC
+Last updated: 2026-05-10 01:27:27 UTC
 
 ## Evidence
 
@@ -68,3 +68,11 @@ Updated reading after TE-hirap: if `transports/wire-lab-devs-draft/` evidence mo
 TE-nizor (`docs/thought-experiments/TE-nizor-pahah-implementation-sufficiency.md`) examines TE-pahah, TE-vilot, TE-hirap, and turns 149-208 together. It concludes that Pahah can satisfy the recovered concerns only if implemented as `simulations/` plus a minimal simulation contract, not as a bare directory or a root-level `groups/`/`transports` migration.
 
 Updated reading after TE-nizor: this DR should wait for DF-nizor.1 and DF-nizor.2 before any root-level tree migration. If those DFs lock the recommendation, the next transport/group action is likely to seed a named recovery/dogfood simulation from current `transports/wire-lab-devs-draft/` evidence, with any eventual root-level `groups/`, `feeds/`, `cas/`, or `sites/` paths treated as downstream results rather than prerequisites.
+
+## 2026-05-10 update - TE-mupoz narrows physical migration scope
+
+TE-mupoz (`docs/thought-experiments/TE-mupoz-root-protocol-migration-scope-under-simulations.md`) asks how much existing root-level and `protocols/` content should move if TE-nizor is implemented. It now recommends a wire-lab-only root protocols plus specimen-migration policy: keep `protocols/wire-lab.d/` rooted as harness apparatus, move candidate protocol trees such as `group-session`, `udp-binding`, and `ppx-dr` into the first simulation as specimens, move `transports/wire-lab-devs-draft/` into that simulation with source-path/source-commit/CID evidence, and write new concrete world state under `simulations/<sim>/world/`.
+
+Updated reading after TE-mupoz: this DR should not request a broad physical move of apparatus docs under `simulations/`, but it also should not preserve the root `transports/` location or non-wire-lab root protocol trees as compatibility constraints. The live question narrows to the first simulation target path, the migration manifest requirements, and whether future group/transport/feed/CAS/protocol trees appear first inside simulation worlds before any root-level reference layout is adopted.
+
+DF-mupoz.3 is locked by `DI-pakid`: root `protocols/` contains only `wire-lab.d`; candidate PromiseGrid protocols move under simulations as specimens.
