@@ -80,9 +80,9 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - [x] juhub.150 Turn 150 raw-log rewalk plus later-turn and later-artifact sweep. **Done 2026-05-10.** Raw turn confirmed the cross-TE quotation-grep safeguard for future Cat-2 vocabulary sweeps; existing capture was correct; no later contradiction found. See `## Turn notes`.
 - [x] juhub.151 Turn 151 raw-log rewalk plus later-turn and later-artifact sweep. **Done 2026-05-10.** Raw turn confirmed the Cat-2 cross-TE quotation-grep safeguard; existing capture was correct; no later contradiction found. See `## Turn notes`.
 - [x] juhub.152 Turn 152 raw-log rewalk plus later-turn and later-artifact sweep. **Done 2026-05-10.** Raw turn confirmed the top-of-file `Status:` field rule and the immediate unblocking of the follow-on TE-policy sweeps; existing capture was correct; no later contradiction found. See `## Turn notes`.
-- [ ] juhub.153 Turn 153 raw-log rewalk plus later-turn and later-artifact sweep.
-- [ ] juhub.154 Turn 154 raw-log rewalk plus later-turn and later-artifact sweep.
-- [ ] juhub.155 Turn 155 raw-log rewalk plus later-turn and later-artifact sweep.
+- [x] juhub.153 Turn 153 raw-log rewalk plus later-turn and later-artifact sweep. **Done 2026-05-10.** Raw turn authorized execution of the already-unblocked TODO-020 rollout work; existing capture was correct; no later contradiction found. See `## Turn notes`.
+- [x] juhub.154 Turn 154 raw-log rewalk plus later-turn and later-artifact sweep. **Done 2026-05-10.** Raw turn was a queue-status and recommendation checkpoint, not a new design turn; existing capture was correct; no later contradiction found. See `## Turn notes`.
+- [x] juhub.155 Turn 155 raw-log rewalk plus later-turn and later-artifact sweep. **Done 2026-05-10.** Raw turn clarified the stalled DF-1.1 proposal but did not lock it; existing capture was correct; no later contradiction found. See `## Turn notes`.
 - [ ] juhub.156 Turn 156 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.157 Turn 157 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.158 Turn 158 raw-log rewalk plus later-turn and later-artifact sweep.
@@ -240,4 +240,81 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - `Write needed? yes/no` `yes` for this rewalk entry and checklist closure in
   `TODO-juhub`; `no` correction note is needed in `TODO-lilar`.
 - `Next: wait for approval before turn N+1` Turn 153 is next and remains
+  pending approval.
+
+### Turn 153 — 2026-05-03 00:44 UTC
+
+- `Turn 153 summary` Steve's `do it` was not another policy choice. It was
+  authorization to execute the rollout work that turn 152 had just unblocked.
+  In plain English, the TE-editing policy debate was over, and this turn is the
+  bot reporting what it actually landed from that now-settled queue.
+- `Existing capture` `TODO-lilar` already captures the important nuance
+  correctly. The raw turn itself explicitly described two landed items: 020.7
+  (the TE-famar `## Refinements` forward pointer) and 020.5 (the AGENTS
+  rollout). But the same raw turn also said all four previously unblocked
+  subtasks were now done, and the later TODO-020 state confirms the full batch
+  included 020.6 (the Cat-1a/Cat-1b path-reference sweep) and 020.10 (the
+  top-of-file `Status:` retrofit across all 35 TEs). So the raw turn's prose
+  named two items in detail, while the later artifacts confirm the larger
+  completion set.
+- `Gaps or contradictions` None found. Later artifacts preserve the same
+  interpretation: after this turn, only 020.8 remained open in TODO-020. I did
+  not find any later correction saying the turn-153 batch was narrower than
+  `TODO-lilar` records.
+- `Proposed disposition` `already captured correctly`
+- `Write needed? yes/no` `yes` for this rewalk entry and checklist closure in
+  `TODO-juhub`; `no` correction note is needed in `TODO-lilar`.
+- `Next: wait for approval before turn N+1` Turn 154 is next and remains
+  pending approval.
+
+### Turn 154 — 2026-05-03 01:17 UTC
+
+- `Turn 154 summary` Steve's `next?` did not open a new design thread by
+  itself. The bot replied with a queue-status snapshot: here are the open
+  TODOs, here is the recommended next move, and here is the suggested order.
+  In plain English, this was a planning checkpoint between the now-finished
+  TE-editing-policy rollout and the next substantive decision work.
+- `Existing capture` `TODO-lilar` already records the turn correctly as a pure
+  queue / recommendation boundary. The raw turn lists 020.8 as the small
+  cleanup item, TODO-rivuk as the high-leverage next DF work, and several other
+  open items ranging from DI/DR backfill to implementation scaffolding. The
+  later replay notes correctly preserve two important nuances: this turn is not
+  the start of TE-havib, and TODO-bisur was still visibly alive in the queue
+  here with two open subtasks.
+- `Gaps or contradictions` None found. Later notes explicitly correct the turn
+  boundary in the same way: turn 154 is the queue-status turn, while the
+  TE-havib / apparatus-vs-specimen sequence begins only after Steve's next
+  response and the scope challenge that follows. I found no later artifact that
+  reclassifies turn 154 as a substantive design decision.
+- `Proposed disposition` `already captured correctly`
+- `Write needed? yes/no` `yes` for this rewalk entry and checklist closure in
+  `TODO-juhub`; `no` correction note is needed in `TODO-lilar`.
+- `Next: wait for approval before turn N+1` Turn 155 is next and remains
+  pending approval.
+
+### Turn 155 — 2026-05-03 01:38 UTC
+
+- `Turn 155 summary` Steve picked the TE-famar path from the queue, but he did
+  not lock DF-1.1. Instead he pushed back on two missing pieces: what exactly
+  `Project` means, and where any resulting decision would actually live. In
+  plain English, this turn is the bot trying to rescue the old promise-stack
+  DF flow by explaining the terms more concretely before asking for a lock.
+- `Existing capture` `TODO-lilar` already captures the turn correctly. The raw
+  answer defines `Project(msg, predicate)` as a non-consuming, order-independent
+  query over frames, contrasts it with `Peel(msg)`, and says the old intended
+  lifecycle was: lock DI-005-1.1 in TODO-rivuk, later cite the resulting DIs
+  from `harness-spec-draft.md §1.1`, then close DR-006. Later artifacts also
+  preserve the crucial outcome: none of this actually locked, because turn 156
+  immediately reframed the scope before Steve answered yes.
+- `Gaps or contradictions` None found. The later corpus consistently treats two
+  things as the important leftovers from this turn: first, DF-1.1 was never
+  locked and the old TODO-rivuk queue was later superseded; second, the clearest
+  `Project / Peel / Wrap` definitions in the corpus still live only in this
+  conversation. The wording "projection mode" is also recognized later as a bad
+  phrase that should not propagate into committed text; the real issue was
+  whether `Project` is part of the spec contract.
+- `Proposed disposition` `already captured correctly`
+- `Write needed? yes/no` `yes` for this rewalk entry and checklist closure in
+  `TODO-juhub`; `no` correction note is needed in `TODO-lilar`.
+- `Next: wait for approval before turn N+1` Turn 156 is next and remains
   pending approval.
