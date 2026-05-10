@@ -83,7 +83,7 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - [x] juhub.153 Turn 153 raw-log rewalk plus later-turn and later-artifact sweep. **Done 2026-05-10.** Raw turn authorized execution of the already-unblocked TODO-020 rollout work; existing capture was correct; no later contradiction found. See `## Turn notes`.
 - [x] juhub.154 Turn 154 raw-log rewalk plus later-turn and later-artifact sweep. **Done 2026-05-10.** Raw turn was a queue-status and recommendation checkpoint, not a new design turn; existing capture was correct; no later contradiction found. See `## Turn notes`.
 - [x] juhub.155 Turn 155 raw-log rewalk plus later-turn and later-artifact sweep. **Done 2026-05-10.** Raw turn clarified the stalled DF-1.1 proposal but did not lock it; existing capture was correct; no later contradiction found. See `## Turn notes`.
-- [ ] juhub.156 Turn 156 raw-log rewalk plus later-turn and later-artifact sweep.
+- [x] juhub.156 Turn 156 raw-log rewalk plus later-turn and later-artifact sweep. **Done 2026-05-10.** Raw turn interrupted the old TE-famar DF path with a scope correction; existing capture was correct; no later contradiction found. See `## Turn notes`.
 - [ ] juhub.157 Turn 157 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.158 Turn 158 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.159 Turn 159 raw-log rewalk plus later-turn and later-artifact sweep.
@@ -317,4 +317,30 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - `Write needed? yes/no` `yes` for this rewalk entry and checklist closure in
   `TODO-juhub`; `no` correction note is needed in `TODO-lilar`.
 - `Next: wait for approval before turn N+1` Turn 156 is next and remains
+  pending approval.
+
+### Turn 156 — 2026-05-03 01:39 UTC
+
+- `Turn 156 summary` Steve cut off the old promise-stack DF flow before any
+  lock happened. His point was that the topic under discussion was not a
+  harness-level invariant; it was only one candidate wire-envelope design. In
+  plain English, this turn is where the bot first admits the old TE-famar /
+  TODO-rivuk framing is scoped wrong.
+- `Existing capture` `TODO-lilar` already records the turn correctly as a
+  mid-DF scope correction. The raw turn shows the bot responding by offering
+  three structural choices for what to do with TE-famar's analysis: make it a
+  harness-level default, demote it to a per-envelope concern, or split it into
+  harness-level vocabulary plus per-envelope lockings. The later corpus also
+  preserves the key outcome: none of those three options was actually locked,
+  because turn 157 reframed the question again before Steve chose among them.
+- `Gaps or contradictions` None found. Later artifacts preserve two critical
+  follow-on facts consistently: first, the Option 1 / 2 / 3 menu was abandoned
+  rather than answered; second, the bot's wording that the harness-spec should
+  be "wire-envelope-agnostic" is itself later corrected as wrong. The later
+  apparatus-vs-specimen framing says the harness is not envelope-agnostic; it is
+  the apparatus that compares candidate envelopes and other layer choices.
+- `Proposed disposition` `already captured correctly`
+- `Write needed? yes/no` `yes` for this rewalk entry and checklist closure in
+  `TODO-juhub`; `no` correction note is needed in `TODO-lilar`.
+- `Next: wait for approval before turn N+1` Turn 157 is next and remains
   pending approval.
