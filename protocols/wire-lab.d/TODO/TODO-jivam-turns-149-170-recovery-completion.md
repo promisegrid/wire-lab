@@ -32,6 +32,22 @@ Constraints: Preserve the existing filename unless a later explicit decision aut
 Affects: `protocols/wire-lab.d/TODO/TODO-jivam-turns-149-170-recovery-completion.md`; `protocols/wire-lab.d/TODO/TODO.md`; `/home/stevegt/lab/session-logs/sessions/ea135ce8/149-turn.md` through `/home/stevegt/lab/session-logs/sessions/ea135ce8/208-turn.md`; `protocols/wire-lab.d/TODO/TODO-lilar-session-replay-cleanup.md`; `protocols/wire-lab.d/TODO/dropped-thread-disposition-20260506.md`; `protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`.
 Supersedes: (none — `DI-jivam` remains the creation decision and historical 149-170 monitor snapshot; this DI expands the live closure boundary.)
 
+ID: DI-pupol
+Date: 2026-05-10 17:11:46
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: File `TODO-juhub` as the successor one-turn-at-a-time rewalk ledger for turns 149-208. `TODO-jivam` remains the recovery completion monitor and consumes the rewalk evidence instead of hosting turn-by-turn notes itself.
+Intent: Keep the closure gate readable while giving the raw-log rewalk a dedicated home that can stop after every turn, sweep later turns and later artifacts, and record corrections without collapsing the historical and live narratives together.
+Constraints: Do not use `TODO-jivam` as the turn ledger. Keep `TODO-lilar` as historical evidence; any correction there must be additive and provenance-bearing. `jivam.*` items close only when owner artifacts and the rewalk evidence support closure.
+Affects: `protocols/wire-lab.d/TODO/TODO-jivam-turns-149-170-recovery-completion.md`; `protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewalk.md`; `protocols/wire-lab.d/TODO/TODO-lilar-session-replay-cleanup.md`; `protocols/wire-lab.d/TODO/TODO.md`.
+
+## Rewalk owner
+
+The one-turn-at-a-time raw-log rewalk for turns 149-208 is owned by
+`TODO-juhub` (`protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewalk.md`).
+Evidence for `jivam.1`, `jivam.2`, `jivam.9`, `jivam.10`, and `jivam.11`
+should come from that successor TODO and the owner artifacts it updates.
+
 ## Closure rule
 
 This TODO may close only after all of the following are true:
