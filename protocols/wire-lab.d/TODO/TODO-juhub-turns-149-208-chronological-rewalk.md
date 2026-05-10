@@ -79,7 +79,7 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - [x] juhub.149 Turn 149 raw-log rewalk plus later-turn and later-artifact sweep. **Done 2026-05-10.** Raw turn confirmed the Cat-1a/Cat-1b split recommendation; existing capture was correct; no later contradiction found. See `## Turn notes`.
 - [x] juhub.150 Turn 150 raw-log rewalk plus later-turn and later-artifact sweep. **Done 2026-05-10.** Raw turn confirmed the cross-TE quotation-grep safeguard for future Cat-2 vocabulary sweeps; existing capture was correct; no later contradiction found. See `## Turn notes`.
 - [x] juhub.151 Turn 151 raw-log rewalk plus later-turn and later-artifact sweep. **Done 2026-05-10.** Raw turn confirmed the Cat-2 cross-TE quotation-grep safeguard; existing capture was correct; no later contradiction found. See `## Turn notes`.
-- [ ] juhub.152 Turn 152 raw-log rewalk plus later-turn and later-artifact sweep.
+- [x] juhub.152 Turn 152 raw-log rewalk plus later-turn and later-artifact sweep. **Done 2026-05-10.** Raw turn confirmed the top-of-file `Status:` field rule and the immediate unblocking of the follow-on TE-policy sweeps; existing capture was correct; no later contradiction found. See `## Turn notes`.
 - [ ] juhub.153 Turn 153 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.154 Turn 154 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.155 Turn 155 raw-log rewalk plus later-turn and later-artifact sweep.
@@ -212,4 +212,32 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - `Write needed? yes/no` `yes` for this rewalk entry and checklist closure in
   `TODO-juhub`; `no` correction note is needed in `TODO-lilar`.
 - `Next: wait for approval before turn N+1` Turn 152 is next and remains
+  pending approval.
+
+### Turn 152 — 2026-05-03 00:35 UTC
+
+- `Turn 152 summary` Steve's `yes` closed the last open DF from TE-vudaf. The
+  substance was the new top-of-file `Status:` field on every TE, placed where a
+  reader sees it before reading the body. The problem being solved was stale
+  supersedence discoverability: if the only "this TE is superseded" marker lives
+  at the very bottom, a reader can miss it and act on stale reasoning. This
+  turn approved the fix and immediately reframed the next work as execution
+  tasks, not more policy debate.
+- `Existing capture` `TODO-lilar` already records the turn correctly as the
+  confirmation of DF-35.4 Alt-4.a: a uniform top-of-file `Status:` header field
+  on every TE. The raw turn itself is mostly a summary table, but it clearly
+  states the outcome: DF-35.4 landed as a Cat-3 Refinement on TE-dabol, the
+  retrofit is subtask 020.10, and subtasks 020.5 / 020.6 / 020.7 / 020.10 moved
+  from deferred to ready-to-execute. Later artifacts preserve exactly that
+  framing. TE-dabol's Refinements define the field shape and purpose, and
+  `TODO-dinub` records that 020.10 later added the field to all 35 existing TEs.
+- `Gaps or contradictions` None found. The later corpus consistently treats
+  this turn as the point where the TE-editing policy became fully settled: four
+  DIs plus four Cat-3 Refinements, with the remaining work reduced to rollout
+  and mechanical sweeps. No later artifact disputes the turn boundary or the
+  meaning of the `Status:` field decision.
+- `Proposed disposition` `already captured correctly`
+- `Write needed? yes/no` `yes` for this rewalk entry and checklist closure in
+  `TODO-juhub`; `no` correction note is needed in `TODO-lilar`.
+- `Next: wait for approval before turn N+1` Turn 153 is next and remains
   pending approval.
