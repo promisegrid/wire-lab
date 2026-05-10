@@ -40,6 +40,30 @@ Affects: `protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewal
 `/home/stevegt/lab/session-logs/sessions/ea135ce8/149-turn.md` through
 `/home/stevegt/lab/session-logs/sessions/ea135ce8/208-turn.md`.
 
+ID: DI-pijun
+Date: 2026-05-10 19:37:26
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Promote the turn-173 Usenet-lineage insight into two non-TE docs
+with distinct roles: the research note keeps the historical-precedent
+evidence, and a new simulation README explores the broader CAS /
+Usenet-like / git-like design line. `group-session` is one current specimen in
+that broader line, not the identity of the simulation itself.
+Intent: Preserve the strongest historical analogy in a design-visible place
+without pretending it is already a frozen protocol decision, while giving the
+broader architectural framing a simulation-local home that can grow beyond the
+current `group-session` specimen.
+Constraints: Do not file a new TE for this promotion. Put the research-doc
+wording in the Usenet section of
+`docs/research/historical-networks-20260503.md`. Use the phrase
+`content-addressed Usenet`. Create `simulations/SIM-hugoj-cas-usenetlike-gitlike/README.md`
+only; do not create a fuller simulation scaffold in this pass. Add the new
+simulation to `simulations/README.md`.
+Affects: `protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewalk.md`;
+`docs/research/historical-networks-20260503.md`;
+`simulations/README.md`;
+`simulations/SIM-hugoj-cas-usenetlike-gitlike/README.md`.
+
 ## Why a separate TODO
 
 `TODO-lilar` already records the original historical walk through turn 192 and
@@ -91,15 +115,15 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - [x] juhub.161 Turn 161 raw-log rewalk plus later-turn and later-artifact sweep.
 - [x] juhub.162 Turn 162 raw-log rewalk plus later-turn and later-artifact sweep.
 - [x] juhub.163 Turn 163 raw-log rewalk plus later-turn and later-artifact sweep.
-- [ ] juhub.164 Turn 164 raw-log rewalk plus later-turn and later-artifact sweep.
-- [ ] juhub.165 Turn 165 raw-log rewalk plus later-turn and later-artifact sweep.
-- [ ] juhub.166 Turn 166 raw-log rewalk plus later-turn and later-artifact sweep.
-- [ ] juhub.167 Turn 167 raw-log rewalk plus later-turn and later-artifact sweep.
-- [ ] juhub.168 Turn 168 raw-log rewalk plus later-turn and later-artifact sweep.
-- [ ] juhub.169 Turn 169 raw-log rewalk plus later-turn and later-artifact sweep.
-- [ ] juhub.170 Turn 170 raw-log rewalk plus later-turn and later-artifact sweep.
-- [ ] juhub.171 Turn 171 raw-log rewalk plus later-turn and later-artifact sweep.
-- [ ] juhub.172 Turn 172 raw-log rewalk plus later-turn and later-artifact sweep.
+- [x] juhub.164 Turn 164 raw-log rewalk plus later-turn and later-artifact sweep.
+- [x] juhub.165 Turn 165 raw-log rewalk plus later-turn and later-artifact sweep.
+- [x] juhub.166 Turn 166 raw-log rewalk plus later-turn and later-artifact sweep.
+- [x] juhub.167 Turn 167 raw-log rewalk plus later-turn and later-artifact sweep.
+- [x] juhub.168 Turn 168 raw-log rewalk plus later-turn and later-artifact sweep.
+- [x] juhub.169 Turn 169 raw-log rewalk plus later-turn and later-artifact sweep.
+- [x] juhub.170 Turn 170 raw-log rewalk plus later-turn and later-artifact sweep.
+- [x] juhub.171 Turn 171 raw-log rewalk plus later-turn and later-artifact sweep.
+- [x] juhub.172 Turn 172 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.173 Turn 173 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.174 Turn 174 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.175 Turn 175 raw-log rewalk plus later-turn and later-artifact sweep.
@@ -541,4 +565,256 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - `Write needed? yes/no` `yes` for this rewalk entry and checklist closure in
   `TODO-juhub`; `no` correction note is needed in `TODO-lilar`.
 - `Next: wait for approval before turn N+1` Turn 164 is next and remains
+  pending approval.
+
+### Turn 164 — 2026-05-03 11:20 UTC
+
+- `Turn 164 summary` This is the hard pivot away from the TE-havib DF walk and
+  toward an urgent operational problem: Steve needs file-based transport
+  working so he and another human collaborator can use the repo itself to
+  collaborate. In plain English, the raw turn does not implement the bootstrap
+  yet; it marks the urgency boundary and the point where the bot pauses to
+  confirm scope before switching threads.
+- `Existing capture` `TODO-lilar` already captures the turn correctly. The raw
+  answer is a pause, not a solution: the bot says it should not assume who the
+  collaborator is and explicitly notes that pivoting away from TE-havib is a
+  consequential choice. Later artifacts correctly treat this as the major
+  thread boundary where TE-havib becomes parked and the transport-bootstrap
+  work begins immediately afterward.
+- `Gaps or contradictions` None that overturn the existing capture. The key
+  later carry-forwards are already preserved elsewhere: the bot overclaimed
+  TE-havib as "4-DF-locked" when only two DFs were actually locked, it drafted
+  the unnecessary TE-numan in the gap immediately after this turn, and the
+  remaining unfinished TE-havib threads had to be carried forward before the
+  transport work took over.
+- `Proposed disposition` `already captured correctly`
+- `Write needed? yes/no` `yes` for this rewalk entry and checklist closure in
+  `TODO-juhub`; `no` correction note is needed in `TODO-lilar`.
+- `Next: wait for approval before turn N+1` Turn 165 is next and remains
+  pending approval.
+
+### Turn 165 — 2026-05-03 11:21 UTC
+
+- `Turn 165 summary` Steve disclosed that the collaborator is a real human
+  using Claude in another clone and imposed a privacy constraint: the
+  collaborator's name must not appear in committed docs. In plain English, this
+  is the turn where the transport-bootstrap problem becomes a real coordination
+  problem with an explicit anonymity rule attached to it.
+- `Existing capture` `TODO-lilar` already captures the turn correctly. The raw
+  answer stacks four distinct moves: it records the collaborator context as a
+  side effect, corrects the bot's architectural misread by admitting that a new
+  git-file-transport TE was unnecessary because the existing transport and
+  group-session drafts already cover the use case, claims the mistaken TE twig
+  was "reverted cleanly," and then lays out the concrete bootstrap
+  chicken-and-egg with three options and a recommendation for the draft-
+  directory approach (`Option A`).
+- `Gaps or contradictions` None that overturn the existing capture. The later
+  residual notes already preserve the important problems introduced here: the
+  "reverted cleanly" claim conflicts with the later reflog evidence, the slug
+  examples in the answer were still not fully aligned with the anonymity rule,
+  the `merge-group-transport-spec` step was treated as operationally defined
+  when it was not, and the turn may have triggered a memory write that inferred
+  facts not actually present in Steve's prompt.
+- `Proposed disposition` `already captured correctly`
+- `Write needed? yes/no` `yes` for this rewalk entry and checklist closure in
+  `TODO-juhub`; `no` correction note is needed in `TODO-lilar`.
+- `Next: wait for approval before turn N+1` Turn 166 is next and remains
+  pending approval.
+
+### Turn 166 — 2026-05-03 11:29 UTC
+
+- `Turn 166 summary` Steve corrected two things at once: the transport group is
+  at least three developer agents, not a two-party collaboration, and the slug
+  must be generic and identity-free rather than derived from people-names. In
+  plain English, this is the turn where the bootstrap stops being a hypothetical
+  plan and becomes the executed `wire-lab-devs` instance under urgency.
+- `Existing capture` `TODO-lilar` already captures the turn correctly. The raw
+  answer updates the group model, proposes generic slug candidates, chooses
+  `wire-lab-devs`, raises the membership-pinning issue from `§8`, and then
+  reports the bootstrap as already live and pushed. Later timeline evidence
+  confirms that the bootstrap commit and merge landed as part of this same
+  response, not before it, so this is a high-effects execution turn rather than
+  just a naming correction.
+- `Gaps or contradictions` None that overturn the existing capture. The later
+  residual notes already preserve the important problems introduced here: the
+  bot speculated about one participant who Steve had not explicitly enrolled,
+  raised but did not resolve the `§8` membership-pinning requirement before
+  executing, reported through a stale branch name, and offered two reply-paths
+  while immediately executing one of them.
+- `Proposed disposition` `already captured correctly`
+- `Write needed? yes/no` `yes` for this rewalk entry and checklist closure in
+  `TODO-juhub`; `no` correction note is needed in `TODO-lilar`.
+- `Next: wait for approval before turn N+1` Turn 167 is next and remains
+  pending approval.
+
+### Turn 167 — 2026-05-03 11:37 UTC
+
+- `Turn 167 summary` Steve gave two directives at once: switch message files
+  from `.msg` to `.txt`, and require members to fetch all branches but post
+  only on their own `<author-id>/main`. In plain English, this is both a
+  presentational cleanup turn and the first committed transport-binding turn
+  that maps the abstract group-session protocol onto an actual Git branch
+  discipline.
+- `Existing capture` `TODO-lilar` already captures the turn correctly. The raw
+  answer shows that the bot treated both directives as immediately executable:
+  it rewrote the docs, renamed the bootstrap message file without changing its
+  bytes, added new non-normative `§9` to describe the per-author-branch
+  binding, and authored `m001` as the first on-wire ratification of that
+  branch-binding rule. This is the turn where the transport instance becomes
+  "in flight" with an explicit Git discipline: read from all known branches,
+  write only to your own branch, and let `Parents:` rather than branch topology
+  carry ordering.
+- `Gaps or contradictions` None that overturn the existing capture. The later
+  residual notes already preserve the important problems introduced here: the
+  sequential `m<N>` naming convention is locked here and reversed one turn
+  later, `§9` quietly leans toward extensible-by-posting despite the stronger
+  `§8` language, the meaning of `{name}` was not fully nailed down in Steve's
+  prompt but the bot chose an interpretation in the spec, the six-document
+  sweep appears to have happened without the quotation-aware Cat-2 grep
+  discipline, and this is another execute-on-directive turn rather than a
+  recommend-and-wait turn.
+- `Proposed disposition` `already captured correctly`
+- `Write needed? yes/no` `yes` for this rewalk entry and checklist closure in
+  `TODO-juhub`; `no` correction note is needed in `TODO-lilar`.
+- `Next: wait for approval before turn N+1` Turn 168 is next and remains
+  pending approval.
+
+### Turn 168 — 2026-05-03 11:45 UTC
+
+- `Turn 168 summary` Steve corrected the new branch-binding model from turn
+  167 in two important ways: message files must not use sequential numbers, and
+  before posting, each agent must first merge all observed messages from all
+  branches into the directory on their own branch and push that merged state.
+  In plain English, this turns each participant's branch from "my outbound
+  posts" into "my current replicated view of the message set, plus optionally a
+  new post," and it makes the message CID, not a human numbering scheme, the
+  stable on-disk identity.
+- `Existing capture` `TODO-lilar` already captures the turn correctly. The raw
+  answer shows the bot treated both directives as immediately executable: it
+  rewrote the spec so filenames are CIDs, expanded `§9` into a fuller
+  receive/merge/push/optionally-post cycle, renamed the existing bootstrap
+  files to their CIDs, and authored a new on-wire ratification message for the
+  new rules. This is the turn that fixes the global-sequence mistake from turn
+  167 and defines the first actual replication model for the Git-backed
+  channel.
+- `Gaps or contradictions` None that overturn the existing capture. The later
+  residual notes already preserve the important follow-ons from this turn: the
+  `Message-ID` header is still retained here and then challenged immediately in
+  turn 169, `§9` grows substantially while still labeled non-normative, and the
+  CIDs reported in this turn are historically correct for this moment but do
+  not remain the current on-disk CIDs after turn 169's rehash.
+- `Proposed disposition` `already captured correctly`
+- `Write needed? yes/no` `yes` for this rewalk entry and checklist closure in
+  `TODO-juhub`; `no` correction note is needed in `TODO-lilar`.
+- `Next: wait for approval before turn N+1` Turn 169 is next and remains
+  pending approval.
+
+### Turn 169 — 2026-05-03 11:54 UTC
+
+- `Turn 169 summary` Steve asked whether `Message-ID` is still needed now that
+  the canonical identifier is the message CID. In plain English, the raw turn
+  is a careful reasoning memo, not an execution turn: the bot walks through
+  every plausible use of `Message-ID`, concludes that it mostly creates
+  confusion once filename = CID, and then reasons about how to remove it
+  without breaking the existing bootstrap messages.
+- `Existing capture` `TODO-lilar` already captures the turn correctly. The raw
+  reasoning lands on the conservative answer: keep legacy messages parseable,
+  deprecate `Message-ID` for new messages, and ask Steve to choose between soft
+  deprecation and hard removal. The key compatibility issue the bot itself
+  identifies is `§4.7`: if strict readers reject unknown headers, then old
+  bootstrap messages containing `Message-ID` become a problem under a spec that
+  simply forbids the header. The turn matters because it recommends `Path A`
+  and explicitly says it should ask before acting.
+- `Gaps or contradictions` None that overturn the existing capture. The main
+  carry-forward is the reasoning-versus-action split already preserved in
+  `TODO-lilar`: the raw turn recommends deprecate-and-ask, while the later repo
+  history performs hard removal plus rehash. That later divergence belongs to
+  the subsequent commit history, not to the content of this raw turn itself.
+- `Proposed disposition` `already captured correctly`
+- `Write needed? yes/no` `yes` for this rewalk entry and checklist closure in
+  `TODO-juhub`; `no` correction note is needed in `TODO-lilar`.
+- `Next: wait for approval before turn N+1` Turn 170 is next and remains
+  pending approval.
+
+### Turn 170 — 2026-05-03 16:53 UTC
+
+- `Turn 170 summary` Steve shifted back from execution to design review and
+  asked whether the flat `transports/draft--wire-lab-devs/` layout should gain
+  a protocol-grouping layer so a second group or a second transport protocol
+  would not make the tree ambiguous. In plain English, this is a pure
+  DF-opening turn, not an implementation turn.
+- `Existing capture` `TODO-lilar` already captures the turn correctly. The raw
+  answer identifies two structural weaknesses in the flat layout: it gives no
+  protocol grouping by path, and it leaves future multi-instance layouts human-
+  ambiguous even if the freeze-time naming rules still technically work. The
+  bot then frames `DF-37.1` with three alternatives -- a protocol-slug layer,
+  recursive draft/pCID nesting, or defer/status quo -- and recommends the
+  protocol-slug solution (`Alt-1.A`) because protocol slugs are already the
+  stable human-readable handles used elsewhere in the repo.
+- `Gaps or contradictions` None that overturn the existing capture. The later
+  residual notes already preserve the important follow-ons from this turn: no
+  implementation happened here, the original `DF-37.1` was never directly
+  answered as posed, and later turns reframed the problem along the substrate
+  axis instead of resolving the protocol-grouping question cleanly on its own
+  terms.
+- `Proposed disposition` `already captured correctly`
+- `Write needed? yes/no` `yes` for this rewalk entry and checklist closure in
+  `TODO-juhub`; `no` correction note is needed in `TODO-lilar`.
+- `Next: wait for approval before turn N+1` Turn 171 is next and remains
+  pending approval.
+
+### Turn 171 — 2026-05-03 16:56 UTC
+
+- `Turn 171 summary` Steve refined the tree question from "should there be
+  protocol grouping?" to "should there also be a separate path layer meaning
+  git file transfer?" In plain English, this is the first turn where the bot
+  cleanly separates protocol identity from delivery substrate in the directory
+  discussion.
+- `Existing capture` `TODO-lilar` already captures the turn correctly. The raw
+  answer argues that `group-session` answers "what protocol governs these wire
+  bytes?" while `git` answers "how do those bytes move between collaborators?"
+  and that putting both on the same tree axis would mix two different kinds of
+  things. On that basis, the bot rejects a `git/` path layer for now, keeps the
+  protocol-slug recommendation from turn 170, and says that if substrate later
+  needs first-class representation it should become another axis or per-instance
+  metadata rather than another protocol-tree path segment.
+- `Gaps or contradictions` None that overturn the existing capture. The later
+  residual notes already preserve the important limits of this turn: it is the
+  clearest early statement of the protocol-vs-substrate distinction, but it is
+  only locally stable because turn 172 immediately expands the substrate
+  question from one substrate (`git`) to many and partially overturns the
+  "§9 already captures it" comfort.
+- `Proposed disposition` `already captured correctly`
+- `Write needed? yes/no` `yes` for this rewalk entry and checklist closure in
+  `TODO-juhub`; `no` correction note is needed in `TODO-lilar`.
+- `Next: wait for approval before turn N+1` Turn 172 is next and remains
+  pending approval.
+
+### Turn 172 — 2026-05-03 17:01 UTC
+
+- `Turn 172 summary` Steve blew up the narrow `git` question by listing
+  multiple peer substrates: `rsync`, `unison`, `uucp`, `udp`, `svn`, `cvs`,
+  and `git`. In plain English, this is the turn where the bot stops treating
+  substrate as a side detail and starts treating it as a first-class design
+  axis.
+- `Existing capture` `TODO-lilar` already captures the turn correctly. The raw
+  answer responds with a substrate-pluralism reframe: if the same
+  `group-session` instance might run over several different ways of moving
+  bytes, then git-specific rules do not belong buried inside `group-session` as
+  if they were part of the transport protocol itself. The bot's big structural
+  move is to propose three families -- carrier protocol, transport protocol,
+  and substrate-mapping protocol -- and to say that `§9` should eventually move
+  out of `group-session` into its own substrate-specific spec. The bot does not
+  implement anything here; it proposes a new TE/DF program because the change
+  is too large to patch directly.
+- `Gaps or contradictions` None that overturn the existing capture. The later
+  residual notes already preserve the important nuances: some vocabulary and
+  layout specifics from this turn do not survive unchanged, but the deeper idea
+  introduced here -- substrate as its own first-class axis rather than a hidden
+  appendix inside `group-session` -- remains the load-bearing contribution of
+  the turn.
+- `Proposed disposition` `already captured correctly`
+- `Write needed? yes/no` `yes` for this rewalk entry and checklist closure in
+  `TODO-juhub`; `no` correction note is needed in `TODO-lilar`.
+- `Next: wait for approval before turn N+1` Turn 173 is next and remains
   pending approval.

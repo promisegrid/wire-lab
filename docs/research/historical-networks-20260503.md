@@ -80,6 +80,15 @@ This is one source of the naming-question tension: W3C-style formal
 vocabulary (binding) vs. store-and-forward operational vocabulary
 (feed).
 
+The same precedent also supports a broader PromiseGrid design reading: current
+`group-session` can be read as one early specimen on a
+content-addressed-Usenet successor line, especially when paired with git's own
+object/transport separation as a modern substrate precedent. This remains an
+exploratory framing rather than a frozen protocol identity claim; the point of
+the analogy is to surface which structural invariants aged well, not to assert
+that PromiseGrid must import every Usenet mechanism unchanged. Source:
+`DI-pijun`.
+
 ### 3. FidoNet -- same pattern, different substrate set
 
 FidoNet messages had a fixed format
