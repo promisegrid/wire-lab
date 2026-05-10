@@ -84,9 +84,9 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - [x] juhub.154 Turn 154 raw-log rewalk plus later-turn and later-artifact sweep. **Done 2026-05-10.** Raw turn was a queue-status and recommendation checkpoint, not a new design turn; existing capture was correct; no later contradiction found. See `## Turn notes`.
 - [x] juhub.155 Turn 155 raw-log rewalk plus later-turn and later-artifact sweep. **Done 2026-05-10.** Raw turn clarified the stalled DF-1.1 proposal but did not lock it; existing capture was correct; no later contradiction found. See `## Turn notes`.
 - [x] juhub.156 Turn 156 raw-log rewalk plus later-turn and later-artifact sweep. **Done 2026-05-10.** Raw turn interrupted the old TE-famar DF path with a scope correction; existing capture was correct; no later contradiction found. See `## Turn notes`.
-- [ ] juhub.157 Turn 157 raw-log rewalk plus later-turn and later-artifact sweep.
-- [ ] juhub.158 Turn 158 raw-log rewalk plus later-turn and later-artifact sweep.
-- [ ] juhub.159 Turn 159 raw-log rewalk plus later-turn and later-artifact sweep.
+- [x] juhub.157 Turn 157 raw-log rewalk plus later-turn and later-artifact sweep. **Done 2026-05-10.** Raw turn corrected the transport-vs-envelope confusion and proposed a higher-level envelope-shape TE; existing capture was correct; no later contradiction found. See `## Turn notes`.
+- [x] juhub.158 Turn 158 raw-log rewalk plus later-turn and later-artifact sweep.
+- [x] juhub.159 Turn 159 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.160 Turn 160 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.161 Turn 161 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.162 Turn 162 raw-log rewalk plus later-turn and later-artifact sweep.
@@ -343,4 +343,90 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - `Write needed? yes/no` `yes` for this rewalk entry and checklist closure in
   `TODO-juhub`; `no` correction note is needed in `TODO-lilar`.
 - `Next: wait for approval before turn N+1` Turn 157 is next and remains
+  pending approval.
+
+### Turn 157 — 2026-05-03 01:42 UTC
+
+- `Turn 157 summary` Steve corrected the bot again: transports and envelopes
+  are different things, the goal is one transport-agnostic message envelope,
+  and `grid([pcid, payload])` is only the current working hypothesis, not a
+  proven answer. In plain English, this turn forces the bot to step back from
+  the old promise-stack-only framing and admit that the envelope decision
+  itself is still under study.
+- `Existing capture` `TODO-lilar` already records the turn correctly. The raw
+  turn names five candidate envelope shapes, explains why TE-famar jumped ahead
+  by assuming the promise-stack family was already the right abstraction, and
+  recommends "Reading 2": file a higher-level envelope-shape TE, treat TE-famar
+  as misframed input to that larger decision, and gate the old TODO-rivuk DF
+  queue behind the new envelope-shape work. Later owner cleanup also preserves
+  the two load-bearing carry-forwards from this turn: the candidate-envelope
+  inventory and the `grid([pcid, payload])` working-hypothesis prose move to the
+  future grid-envelope successor work rather than staying attached to
+  promise-stack.
+- `Gaps or contradictions` None found. Later artifacts preserve this as a
+  transitional correction, not as a final settled architecture. The five
+  candidate envelopes and the Reading-2 recommendation are kept as historical
+  evidence, but turn 158 immediately rejects the remaining assumption that the
+  envelope belongs in the harness-spec as a single harness-wide decision. I did
+  not find any later artifact claiming the turn-157 framing was itself the final
+  answer.
+- `Proposed disposition` `already captured correctly`
+- `Write needed? yes/no` `yes` for this rewalk entry and checklist closure in
+  `TODO-juhub`; `no` correction note is needed in `TODO-lilar`.
+- `Next: wait for approval before turn N+1` Turn 158 is next and remains
+  pending approval.
+
+### Turn 158 — 2026-05-03 01:46 UTC
+
+- `Turn 158 summary` This is the real apparatus-vs-specimen break. Steve
+  pointed out that even calling the envelope "harness-wide" smuggles in the
+  wrong assumption, because wire-lab exists to test multiple hypotheses at all
+  layers, not to bake one answer into the harness. In plain English, this is
+  the turn where the bot finally accepts that the harness-spec is the lab
+  apparatus and the candidate envelopes are specimens under study.
+- `Existing capture` `TODO-lilar` already captures the turn correctly as the
+  foundational apparatus-vs-specimen reframe. The raw turn lays out the six
+  step sequence that follows from that correction: audit the harness-spec,
+  file the harness-level TE on the split, give each candidate envelope its own
+  protocol home, sweep specimen material out of the harness-spec, reframe the
+  old promise-stack TODO under protocol ownership, and file a parallel TODO for
+  the grid-envelope hypothesis. Later residual owner work also preserves the
+  two load-bearing carry-forwards from this turn: the harness-spec carve-outs
+  still open under `TODO-kugod`, and the future grid-envelope successor work
+  also still open there.
+- `Gaps or contradictions` None found. Later artifacts continue to treat this
+  as the foundational TE-havib turn. The insight itself stands, while the
+  downstream cleanup remains only partially complete. I did not find any later
+  artifact that reverts to the old claim that the harness-spec should define a
+  single envelope specimen.
+- `Proposed disposition` `already captured correctly`
+- `Write needed? yes/no` `yes` for this rewalk entry and checklist closure in
+  `TODO-juhub`; `no` correction note is needed in `TODO-lilar`.
+- `Next: wait for approval before turn N+1` Turn 159 is next and remains
+  pending approval.
+
+### Turn 159 — 2026-05-03 01:50 UTC
+
+- `Turn 159 summary` Steve confirmed the apparatus-vs-specimen reframe and
+  told the bot to proceed with step 1 of the six-step plan. In plain English,
+  this is the turn where the bot turns the reframe into a concrete inventory:
+  it audits the harness-spec section by section and sorts what stays in the
+  harness, what must move out as specimen-specific material, and what remains
+  ambiguous.
+- `Existing capture` `TODO-lilar` already captures the turn correctly. The
+  raw turn shows the bot produced an audit memo as an untracked working
+  document, not yet a commit, and that memo listed the concrete specimen-
+  bearing material in the harness-spec plus the ambiguous areas needing later
+  TE or DF work. Later residual owner work in `TODO-kugod` directly carries
+  this turn forward: the nine specimen-bearing audit items remain live as
+  `UT-159.a`, the transport-spec companion audit remains live as `UT-159.b`,
+  and the unresolved ambiguous areas remain live as `UT-159.d`.
+- `Gaps or contradictions` None found. The only important timing nuance is
+  that the audit memo existed in the workspace at the end of turn 159 but was
+  not committed until Steve's turn-160 authorization. `TODO-lilar` already
+  preserves that nuance, and later artifacts align with it.
+- `Proposed disposition` `already captured correctly`
+- `Write needed? yes/no` `yes` for this rewalk entry and checklist closure in
+  `TODO-juhub`; `no` correction note is needed in `TODO-lilar`.
+- `Next: wait for approval before turn N+1` Turn 160 is next and remains
   pending approval.
