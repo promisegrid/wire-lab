@@ -10,7 +10,7 @@ TE-mupoz
 
 ## Status
 
-needs DF
+decided
 
 First drafted 2026-05-10 00:22:21 UTC.
 
@@ -727,14 +727,15 @@ active specimen location.
 
 ### DF-mupoz.1 -- What is the default migration scope when Pahah is implemented?
 
-Recommended answer: Alt E.
+Locked answer: 1.A per `DI-fakin`.
 
 Surviving alternatives:
 
-- **1.A -- Wire-lab-only root protocols plus specimen migration
-  (recommended).** Keep apparatus and `protocols/wire-lab.d/` rooted; move
-  candidate protocol trees and concrete transport/world specimens into the first
-  simulation with migration notes; write new world state under simulations.
+- **1.A -- Wire-lab-only root protocols plus specimen migration.** Keep
+  apparatus and `protocols/wire-lab.d/` rooted; move candidate protocol trees
+  and concrete transport/world specimens into the first simulation with
+  migration notes; write new world state under simulations. **Locked by
+  `DI-fakin` on 2026-05-10.**
 - **1.B -- Move only concrete specimens.** Physically move existing root
   transport specimens into the first simulation, but without the broader
   `protocol-set.md` and graduation rules.
@@ -745,13 +746,14 @@ Surviving alternatives:
 
 ### DF-mupoz.2 -- What happens to `transports/wire-lab-devs-draft/`?
 
-Recommended answer: migrate with an audit trail.
+Locked answer: 2.A per `DI-fakin`.
 
 Surviving alternatives:
 
-- **2.A -- Migrate with source manifest (recommended).** `git mv` the directory
-  into the first simulation, create a seed/migration manifest, verify message
-  CIDs, and update current pointers while leaving historical references honest.
+- **2.A -- Migrate with source manifest.** `git mv` the directory into the
+  first simulation, create a seed/migration manifest, verify message CIDs, and
+  update current pointers while leaving historical references honest. **Locked
+  by `DI-fakin` on 2026-05-10.**
 - **2.B -- Read-only seed copy.** Keep the original and copy message bytes into
   the first simulation for replay, with CID verification and source-path notes.
 - **2.C -- Preserve in place.** Keep `transports/wire-lab-devs-draft/` rooted
@@ -775,39 +777,42 @@ Surviving alternatives:
 
 ### DF-mupoz.4 -- What happens to `proposals/`?
 
-Recommended answer: keep rooted by default.
+Locked answer: 4.C per `DI-fakin`.
 
 Surviving alternatives:
 
-- **4.A -- Keep proposal records rooted (recommended).** Treat them as review
-  apparatus unless a simulation explicitly uses them as message specimens.
+- **4.A -- Keep proposal records rooted.** Rejected after Steve clarified that
+  the legacy proposal mechanism has been replaced by `DEV-GUIDE-RESOURCES.md`
+  and the PromiseGrid dev-guide feedback process.
 - **4.B -- Copy selected proposals into a ppx-dr simulation.** Acceptable for a
   proposal-as-message test.
-- **4.C -- Move all proposals under simulations.** Rejected because historical
-  review records are not automatically simulation state.
+- **4.C -- Move all proposals under simulations.** Move the legacy proposal
+  records into the first simulation archive as historical evidence, not active
+  world state. **Locked by `DI-fakin` on 2026-05-10.**
 
 ### DF-mupoz.5 -- What is the graduation rule?
 
-Recommended answer: simulation results do not directly rewrite apparatus.
+Locked answer: 5.A per `DI-fakin`.
 
 Surviving alternatives:
 
-- **5.A -- Results feed DR/DI/spec handoff (recommended).** Simulation results
-  point to DRs, DIs, frozen specs, dev-guide prose, or a future PromiseGrid spec
-  corpus; rooted apparatus changes only through the normal decision process.
+- **5.A -- Results feed DR/DI/spec handoff.** Simulation results point to DRs,
+  DIs, frozen specs, dev-guide prose, or a future PromiseGrid spec corpus;
+  rooted apparatus changes only through the normal decision process. **Locked by
+  `DI-fakin` on 2026-05-10.**
 - **5.B -- Results can directly become root protocols.** Rejected because it lets
   simulation-local evidence bypass decision provenance and recreates the
   apparatus/specimen ambiguity.
 - **5.C -- Results are illustrative only.** Rejected because simulations need to
   produce actionable design evidence.
 
-## Recommended implementation sequence if DF locks Alt E
+## Locked implementation sequence
 
 1. Create `simulations/README.md` explaining that simulations are experiment
    worlds and may contain candidate protocol specimens; root `protocols/` is for
    the wire-lab apparatus protocol.
-2. Create the first named recovery/dogfood simulation with TE-nizor's minimal
-   contract.
+2. Create `simulations/SIM-piloh-turns-149-208-recovery/` with TE-nizor's
+   minimal contract.
 3. Add `seed/protocol-tree-migrations.md` that records old paths, source
    commits, destinations, and pCID status for `group-session`, `udp-binding`,
    and `ppx-dr`.
@@ -822,9 +827,11 @@ Surviving alternatives:
 8. Add `concerns.md` mapping turns 149-208 concerns to world elements,
    observations, results, and unresolved DFs.
 9. Put any new dogfood world state under `simulations/<sim>/world/`.
-10. Leave top-level `protocols/wire-lab.d/`, `docs/`, `DR/`, `tools/`, and
+10. Move all tracked legacy `proposals/` records into the first simulation's
+    archive; leave no tracked root `proposals/` path.
+11. Leave top-level `protocols/wire-lab.d/`, `docs/`, `DR/`, `tools/`, and
    `implementations/` in place.
-11. File or update DR/DI/spec records only after simulation results justify an
+12. File or update DR/DI/spec records only after simulation results justify an
    apparatus, dev-guide, or external spec-corpus change.
 
 ## Implications for open TODOs, DRs, and DIs
@@ -833,9 +840,9 @@ Surviving alternatives:
   not "move the repo under simulations."
 - **TE-pahah:** remains the structural umbrella, but needs this migration-scope
   DF before any broad path movement.
-- **TE-vipir:** remains valid in its repo-like protocol-tree insight, but if
-  `DI-pakid` locks DF-mupoz.3 Alt 3.A, its root-level placement for non-wire-lab
-  protocols is superseded by simulation-local placement.
+- **TE-vipir:** remains valid in its repo-like protocol-tree insight, but
+  `DI-pakid` and `DI-fakin` supersede root-level placement for non-wire-lab
+  candidate protocols with simulation-local placement.
 - **TE-domat / DR-nugog:** root `transports` preservation becomes less
   important once the transport specimen migrates into a simulation; the remaining
   question is how future group/feed/CAS semantics graduate from simulation
@@ -848,21 +855,24 @@ Surviving alternatives:
 - **DEV-GUIDE-RESOURCES.md:** should warn guide writers that simulation-local
   protocol specimens produce evidence; they are not themselves final PromiseGrid
   API layout.
-- **Future implementation TODO:** if DF-mupoz.1/2/3 lock the recommendation,
-  file or update a TODO for the first simulation skeleton, candidate protocol
-  migrations, migration manifests, and transport-specimen move.
+- **Future implementation TODO:** after this first simulation migration, file or
+  update successor TODOs only for results that need further DR/DI/spec or
+  guide-resource handoff.
 
 ## Decision status
 
-`needs DF`. DF-mupoz.3 is locked as Alt 3.A by `DI-pakid`; the remaining DFs
-still need answers. This TE recommends the wire-lab-only root protocols plus
+`decided`. DF-mupoz.3 is locked as Alt 3.A by `DI-pakid`; DF-mupoz.1,
+DF-mupoz.2, DF-mupoz.4, DF-mupoz.5, and the first simulation path are locked by
+`DI-fakin`. The decided policy is the wire-lab-only root protocols plus
 specimen-migration policy:
 
 - keep apparatus and `protocols/wire-lab.d/` rooted;
 - move candidate protocol trees such as `group-session`, `udp-binding`, and
   `ppx-dr` into the first simulation that tests them;
 - move existing `transports/wire-lab-devs-draft/` into the first simulation
-  after DF locks the target path;
+  with CID verification and migration evidence;
+- move legacy `proposals/` records into the first simulation archive because
+  the live guide-feedback mechanism has moved elsewhere;
 - preserve historical evidence with source-path, source-commit, and CID
   migration records rather than preserving the old root location;
 - write new concrete world state under `simulations/<sim>/world/`;

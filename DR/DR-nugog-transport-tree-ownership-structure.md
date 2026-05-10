@@ -3,16 +3,16 @@
 DR-ID: DR-nugog
 Date: 2026-05-09 11:21:29
 Asked by: stevegt@t7a.org (Steve Traugott)
-State: open
+State: implemented
 Question: Should the outer `transports/` tree group transport instances under a protocol slug, as `transports/<protocol-slug>/<instance-dir>/`, or keep the current flat/spec-worded shape where each transport instance is directly under `transports/`; and should the cleanup owner be TODO-kugod, TODO-turog, or split between them?
 Why this blocks progress: The current drafts and live data disagree with the turn-170 design pressure. The flat tree is easy to leave untouched, but it gives no structural grouping for multiple group-session instances or future transport protocols. The nested tree would clarify ownership and navigation, but changing it affects both the outer apparatus/specimen cleanup and the group-session freeze/migration procedure. This DR records the unresolved question before any spec text or transport path is changed.
-Affects: `protocols/wire-lab.d/specs/transport-spec-draft.md`; `protocols/group-session.d/specs/group-session-draft.md`; `transports/wire-lab-devs-draft/`; `protocols/wire-lab.d/TODO/TODO-kugod-te-40-apparatus-vs-specimen-completion.md`; `protocols/wire-lab.d/TODO/TODO-turog-te-41-group-session-freeze-procedure.md`.
+Affects: `protocols/wire-lab.d/specs/transport-spec-draft.md`; `simulations/SIM-piloh-turns-149-208-recovery/protocols/group-session.d/specs/group-session-draft.md`; `simulations/SIM-piloh-turns-149-208-recovery/world/transports/wire-lab-devs-draft/`; `protocols/wire-lab.d/TODO/TODO-kugod-te-40-apparatus-vs-specimen-completion.md`; `protocols/wire-lab.d/TODO/TODO-turog-te-41-group-session-freeze-procedure.md`.
 Unblocks: TODO-kugod UT-159.b; TODO-turog freeze-path cleanup; any future edit that reconciles flat `transports/<instance-dir>/` wording with a protocol-grouped tree.
 Waiting on: stevegt@t7a.org (Steve Traugott)
-Decision:
-Linked DI: DI-vopim
+Decision: Superseded for the current specimen by `DI-fakin`: do not choose flat-vs-nested root `transports/` for the current `wire-lab-devs-draft` evidence. Move the specimen into `simulations/SIM-piloh-turns-149-208-recovery/world/transports/wire-lab-devs-draft/`, preserve CID evidence, and let any future root group/feed/CAS/transport layout graduate through later DR/DI/spec work.
+Linked DI: DI-vopim; DI-fakin
 Related commits:
-Last updated: 2026-05-10 01:27:27 UTC
+Last updated: 2026-05-10 04:42:05 UTC
 
 ## Evidence
 
@@ -76,3 +76,17 @@ TE-mupoz (`docs/thought-experiments/TE-mupoz-root-protocol-migration-scope-under
 Updated reading after TE-mupoz: this DR should not request a broad physical move of apparatus docs under `simulations/`, but it also should not preserve the root `transports/` location or non-wire-lab root protocol trees as compatibility constraints. The live question narrows to the first simulation target path, the migration manifest requirements, and whether future group/transport/feed/CAS/protocol trees appear first inside simulation worlds before any root-level reference layout is adopted.
 
 DF-mupoz.3 is locked by `DI-pakid`: root `protocols/` contains only `wire-lab.d`; candidate PromiseGrid protocols move under simulations as specimens.
+
+## 2026-05-10 update - implemented by DI-fakin
+
+`DI-fakin` implements the current-specimen part of this DR through TE-mupoz:
+root `transports/` is no longer an active tracked specimen path, and
+`transports/wire-lab-devs-draft/` moved to
+`simulations/SIM-piloh-turns-149-208-recovery/world/transports/wire-lab-devs-draft/`
+with CID verification and migration manifests. The old root
+`transports/README.md` moved to the simulation archive as historical evidence.
+
+This does not freeze a future PromiseGrid node layout. If simulation results
+justify root-level `groups/`, `feeds`, `cas`, or transport reference trees, they
+must graduate through a later DR, DI, frozen spec, guide prose, or external
+PromiseGrid spec corpus.

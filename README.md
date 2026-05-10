@@ -21,9 +21,12 @@ Provisional. Almost everything in the harness-spec is an experimental knob, not 
 
 ## How to contribute
 
-At the moment, the transports/ (formerly channels/) directory is
-shaping up to be a mechanism for inter-agent and interpersonal
-communications. See the README.md in that directory for more details.
+Current inter-agent and interpersonal communication evidence lives inside the
+first recovery simulation at
+`simulations/SIM-piloh-turns-149-208-recovery/world/transports/wire-lab-devs-draft/`.
+The old root `transports/` and `proposals/` paths were moved under that
+simulation per `DI-fakin`; use `DEV-GUIDE-RESOURCES.md` for the current
+guide-writer source map.
 
 ## License
 

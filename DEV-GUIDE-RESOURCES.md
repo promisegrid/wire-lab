@@ -36,15 +36,15 @@ PromiseGrid design choices are derived, tested, and recorded. Source:
   PromiseGrid node layout; treat them as wire-lab apparatus until a frozen spec
   or guide-side decision says otherwise. Source: `DI-nunut`.
 - `docs/thought-experiments/TE-mupoz-root-protocol-migration-scope-under-simulations.md`
-  is open design evidence that root `protocols/` may remain only the wire-lab
+  is decided design evidence that root `protocols/` remains only the wire-lab
   harness apparatus home (`protocols/wire-lab.d/`), while candidate PromiseGrid
   protocol drafts move into simulations as specimens until they graduate. Do not
   teach simulation-local protocol specimens as authoritative PromiseGrid protocol
   roots unless a later DF/DI, frozen spec, or guide-side decision explicitly
-  graduates them. DF-mupoz.3 is locked as Alt 3.A by `DI-pakid`. TE-mupoz also
-  treats concrete transport/world specimens as
-  movable into simulations; do not treat the old root `transports/` path as a
-  PromiseGrid layout commitment. Source: `DI-nunut`.
+  graduates them. DF-mupoz.3 is locked as Alt 3.A by `DI-pakid`; the remaining
+  Mupoz decisions and the first recovery simulation path are locked by
+  `DI-fakin`. Do not treat the old root `transports/` or `proposals/` paths as
+  PromiseGrid layout commitments. Source: `DI-nunut`; `DI-fakin`.
 
 ## How writers should use this file
 
@@ -57,6 +57,45 @@ as one of three states:
 - **Write as provisional:** useful for orientation, but final wording should
   warn that design work is still in progress.
 - **Blocked by DR:** do not write settled guide prose until the cited DR closes.
+
+## Mupoz Relocation Map
+
+The PromiseGrid Development Guide is about PromiseGrid, not wire-lab. After
+Mupoz, guide writers should usually focus on one or more named simulations
+because simulations show concrete PromiseGrid design questions under test. Root
+wire-lab machinery is still useful provenance, but it should not dominate guide
+prose unless the claim is about how wire-lab itself derives evidence. Source:
+`DI-fakin`.
+
+The relocation table below exists so humans and LLMs can find moved evidence
+without treating old root paths as still-current design commitments. The
+reasoning is:
+
+- `protocols/wire-lab.d/` stays rooted because it is harness apparatus, not a
+  candidate PromiseGrid protocol specimen. Source: `DI-pakid`.
+- Candidate protocol trees move with their TODO queues so each simulation can
+  test a coherent repo-like specimen rather than detached draft files. Source:
+  `DI-fakin`; `docs/thought-experiments/TE-vipir-protocols-as-simulated-repos-and-binding-layer.md`.
+- Concrete transport evidence moves into `world/` because it is active
+  simulation state with verifiable message CIDs. Source: `DI-fakin`;
+  `simulations/SIM-piloh-turns-149-208-recovery/seed/wire-lab-devs-draft-migration.md`.
+- Legacy proposals move into `archive/` because the old proposal mechanism has
+  been replaced by this resource map plus the external guide feedback process.
+  Source: `DI-fakin`.
+- Simulation-local artifacts are evidence. They become authoritative
+  PromiseGrid guidance only after DR/DI/spec/dev-guide handoff. Source:
+  `DI-fakin`.
+
+| Old path | New path | Guide-writer status | Reasoning |
+|---|---|---|---|
+| `protocols/group-session.d/` | `simulations/SIM-piloh-turns-149-208-recovery/protocols/group-session.d/` | Candidate protocol specimen; cite as provisional evidence only. | Group-session remains an important envelope/session draft, but root `protocols/` is now reserved for `wire-lab.d` apparatus until graduation. |
+| `protocols/udp-binding.d/` | `simulations/SIM-piloh-turns-149-208-recovery/protocols/udp-binding.d/` | Candidate binding specimen; cite as provisional evidence only. | UDP-binding is useful for porting/binding discussion, but no frozen binding pCID or stable kernel-dev contract exists yet. |
+| `protocols/ppx-dr.d/` | `simulations/SIM-piloh-turns-149-208-recovery/protocols/ppx-dr.d/` | Legacy proposal/review protocol specimen. | Proposal-as-message thinking remains evidence, but the old proposal queue is not the live guide-feedback mechanism. |
+| `transports/wire-lab-devs-draft/` | `simulations/SIM-piloh-turns-149-208-recovery/world/transports/wire-lab-devs-draft/` | Active simulation specimen with verified message CIDs. | The bytes are useful for replay and CID examples; the old root `transports/` path is not a PromiseGrid API. |
+| `transports/README.md` | `simulations/SIM-piloh-turns-149-208-recovery/archive/transports/README.md` | Historical wire-lab design note. | Preserve as provenance for why the transport surface existed, not as current guide layout. |
+| `proposals/approved/` | `simulations/SIM-piloh-turns-149-208-recovery/archive/proposals/approved/` | Historical review evidence. | Approved proposal records are useful history; current guide feedback belongs outside wire-lab in the guide process. |
+| `proposals/pending/` | `simulations/SIM-piloh-turns-149-208-recovery/archive/proposals/pending/` | Historical pending/contested review evidence. | Pending proposal records are not a live queue after the dev-guide resource/feedback process replaced proposals. |
+| `protocols/wire-lab.d/` | unchanged | Harness apparatus. | Use for wire-lab process/provenance claims, not as a PromiseGrid app/kernel API. |
 
 ## Audience Readiness Matrix
 
@@ -122,10 +161,9 @@ Use this section for the guide's App Devs / How to write a grid app section.
   the A-side spec/design versus B-side implementation split.
 - `implementations/README.md` records the current local shape for reference
   implementations and conformance claims.
-- `protocols/*/specs/*.md` are current draft protocol specs in the pre-Mupoz
-  layout; TE-mupoz may move non-wire-lab candidate specs into simulations as
-  specimens. App-facing guidance should cite frozen pCIDs or guide-side stable
-  prose, not the transient repo path.
+- `simulations/SIM-piloh-turns-149-208-recovery/protocols/*/specs/*.md` are
+  current draft protocol specimens after Mupoz. App-facing guidance should cite
+  frozen pCIDs or guide-side stable prose, not the transient simulation path.
 
 ### Writer notes
 
@@ -164,7 +202,10 @@ section.
   records the protocols-as-simulated-repos and binding-layer model.
 - `protocols/wire-lab.d/specs/harness-spec-draft.md` describes the harness
   apparatus used to study candidates.
-- `transports/README.md` describes the current transport simulation surface.
+- `simulations/SIM-piloh-turns-149-208-recovery/world/transports/wire-lab-devs-draft/`
+  contains current transport-message specimen evidence with verified CIDs.
+- `simulations/SIM-piloh-turns-149-208-recovery/archive/transports/README.md`
+  preserves the old root transport design surface as historical evidence.
 
 ### Writer notes
 
@@ -197,11 +238,12 @@ final normative references. Source: `DI-zalak`.
   their current repo path or simulation-local path.
 - **Kernel Devs:** likely first normative references are frozen binding,
   session, and message specs by pCID, plus implementation conformance records.
-  `protocols/udp-binding.d/specs/udp-binding-draft.md` and
-  `protocols/group-session.d/specs/group-session-draft.md` are likely early
-  ancestors in the current pre-Mupoz layout, but they are not final normative
-  citations until frozen and may move into a simulation as specimens.
-- **Non-normative provenance:** TEs, DRs, TODOs, `transports/README.md`,
+  `simulations/SIM-piloh-turns-149-208-recovery/protocols/udp-binding.d/specs/udp-binding-draft.md`
+  and
+  `simulations/SIM-piloh-turns-149-208-recovery/protocols/group-session.d/specs/group-session-draft.md`
+  are likely early ancestors, but they are not final normative citations until
+  frozen.
+- **Non-normative provenance:** TEs, DRs, TODOs, simulation archives,
   `implementations/README.md`, and the harness spec explain how decisions were
   derived; they do not become app or porting APIs merely by being informative.
 

@@ -47,6 +47,7 @@ minted after that date carry only the proquint handle.
 | [TODO-bahaf](./TODO-bahaf-te-39-naming-reconciliation.md) | 2026-05-07 | TE-mumuv naming reconciliation (proquint filenames) | `TODO-32` / `TODO-20260507-025635` |
 | [TODO-topit](./TODO-topit-transcript-snapshot-procedure.md) | 2026-05-07 | Transcript-snapshot procedure replaces per-turn session-logging discipline **(deferred indefinitely: Perplexity-specific)** | `TODO-33` / `TODO-20260507-150000` |
 | [TODO-fonuz](./TODO-fonuz-proquint-id-upgrade.md) | 2026-05-07 | Proquint IDs for new coordination artifacts | — |
+| [TODO-zofan](./TODO-zofan-di-record-files.md) | 2026-05-10 | Move DI records to first-class files | — |
 | [TODO-milum](./TODO-milum-agent-instruction-consolidation.md) | 2026-05-08 | Agent instruction consolidation | `TODO-34` |
 | [TODO-rozas](./TODO-rozas-promisegrid-dev-guide-resources.md) | 2026-05-08 | PromiseGrid dev-guide writer resources **(running: periodic `DEV-GUIDE-RESOURCES.md` maintenance; rozas.10 open)** | — |
 
@@ -54,16 +55,16 @@ minted after that date carry only the proquint handle.
 
 | Handle | Mint date | Title | Prior alias |
 |---|---|---|---|
-| [TODO-bisur](../../group-session.d/TODO/TODO-bisur-group-transport-envelope.md) | 2026-05-01 | TODO 012 - Group-transport envelope via `grid <pcid>` | `TODO-12` / `TODO-20260501-045543` |
+| [TODO-bisur](../../../simulations/SIM-piloh-turns-149-208-recovery/protocols/group-session.d/TODO/TODO-bisur-group-transport-envelope.md) | 2026-05-01 | TODO 012 - Group-transport envelope via `grid <pcid>` | `TODO-12` / `TODO-20260501-045543` |
 
 ## ppx-dr
 
 | Handle | Mint date | Title | Prior alias |
 |---|---|---|---|
-| [TODO-pozig](../../ppx-dr.d/TODO/TODO-pozig-proposals-as-transport-messages-BLOCKED.md) | 2026-05-01 | TODO 016 — proposals as transport messages — BLOCKED | `TODO-16` / `TODO-20260501-230131` |
+| [TODO-pozig](../../../simulations/SIM-piloh-turns-149-208-recovery/protocols/ppx-dr.d/TODO/TODO-pozig-proposals-as-transport-messages-BLOCKED.md) | 2026-05-01 | TODO 016 — proposals as transport messages — BLOCKED | `TODO-16` / `TODO-20260501-230131` |
 
 ## udp-binding
 
 | Handle | Mint date | Title | Prior alias |
 |---|---|---|---|
-| [TODO-jodon](../../udp-binding.d/TODO/TODO-jodon-udp-binding-v0-reference-implementation.md) | 2026-05-01 | TODO 018 — UDP-binding v0 reference implementation | `TODO-18` / `TODO-20260501-224805` |
+| [TODO-jodon](../../../simulations/SIM-piloh-turns-149-208-recovery/protocols/udp-binding.d/TODO/TODO-jodon-udp-binding-v0-reference-implementation.md) | 2026-05-01 | TODO 018 — UDP-binding v0 reference implementation | `TODO-18` / `TODO-20260501-224805` |

@@ -2,66 +2,12 @@ package main
 
 import (
 	"fmt"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
 )
-
-// scanLiteralDirs are the wire-lab directories scanned literally for
-// existing handles. scanGlobs are glob patterns expanded against repoRoot;
-// every directory matching any glob is also scanned. Missing directories are
-// skipped so the tool works on both main's historical root layout and
-// ppx/main's protocolized TODO layout.
-//
-// Convention-based rather than registry-based: filenames and DI owner lines
-// are the ground truth. There is no separate HANDLES.md registry. To add a
-// new artifact type that owns handles, add its directory, filename grammar,
-// or owner-line scanner here.
-//
-// scanGlobs uses Go filepath.Glob semantics, which match path components
-// individually. "protocols/*/TODO" therefore matches protocols/wire-lab.d/
-// TODO, protocols/group-session.d/TODO, protocols/ppx-dr.d/TODO, etc., as
-// new protocol subtrees are added.
-//
-// Intent: Collision-check the shared TODO, TE, DR, and DI handle namespace
-// across the layouts main and ppx/main need to merge. Source: DI-nisam
-var scanLiteralDirs = []string{
-	"docs/thought-experiments",
-	"TODO",
-	"DR",
-}
-
-var scanGlobs = []string{
-	"protocols/*/TODO",
-}
-
-// handleFileRE matches a wire-lab handle-bearing filename and captures the
-// handle in group 1.
-//
-// Filename grammar:
-//
-//	<KIND>-<HANDLE>-<SLUG>.md
-//
-// where:
-//
-//	<KIND>   = TE | TODO | DR
-//	<HANDLE> = proquint-1 (5 chars, CVCVC, alphabets in proquint.go)
-//	         | proquint-2 (5 + '-' + 5 = 11 chars)
-//	<SLUG>   = lower-kebab-case description, may include digits
-//
-// The regex is anchored so it does not match files whose names happen to
-// contain proquint-shaped substrings inside the slug.
-var handleFileRE = regexp.MustCompile(
-	`^(?:TE|TODO|DR)-(` +
-		// proquint-2 must come first so the alternation prefers it
-		// over the proquint-1 prefix it begins with.
-		`[bdfghjklmnprstvz][aiou][bdfghjklmnprstvz][aiou][bdfghjklmnprstvz]` +
-		`-` +
-		`[bdfghjklmnprstvz][aiou][bdfghjklmnprstvz][aiou][bdfghjklmnprstvz]` +
-		`|` +
-		`[bdfghjklmnprstvz][aiou][bdfghjklmnprstvz][aiou][bdfghjklmnprstvz]` +
-		`)-`)
 
 // diOwnerRE matches DI owner lines, not ordinary references to DI IDs. This
 // distinction lets DRs and docs cite a DI without being treated as owning a
@@ -71,132 +17,145 @@ var diOwnerRE = regexp.MustCompile(`(?m)^ID:\s*DI-(` +
 	`(?:-[bdfghjklmnprstvz][aiou][bdfghjklmnprstvz][aiou][bdfghjklmnprstvz])?` +
 	`)\s*$`)
 
-// scanCorpus returns the set of handles currently in use across the
-// configured directories rooted at repoRoot. It is the collision check set
-// for mint.
+// scanCorpus returns the occupied handle set under repoRoot. It is deliberately
+// path-agnostic: every file and directory name in the working tree reserves any
+// proquint-shaped substring it contains, and every exact DI owner line reserves
+// its DI handle.
 //
-// Files whose names do not match handleFileRE are ignored for filename-owned
-// handles. Markdown files in TODO directories are additionally scanned for
-// "ID: DI-<handle>" owner lines. Legacy integer and timestamp filenames are
-// intentionally ignored because this task only changes newly-created
-// artifacts.
+// Intent: Make mint-handle a whole-working-tree occupied-set guard rather than
+// a layout-specific artifact parser, so future paths cannot accidentally hide a
+// handle-looking name from collision checks. Source: DI-sazud
 func scanCorpus(repoRoot string) (map[string]string, error) {
 	handles := make(map[string]string)
-	dirs, err := scanDirs(repoRoot)
+	root, err := filepath.Abs(repoRoot)
 	if err != nil {
 		return nil, err
 	}
-	for _, dir := range dirs {
-		if err := scanDir(repoRoot, dir, handles); err != nil {
-			return nil, err
-		}
+	if err := scanPathNames(root, handles); err != nil {
+		return nil, err
+	}
+	if err := scanDIHandles(root, handles); err != nil {
+		return nil, err
 	}
 	return handles, nil
 }
 
-// scanDirs resolves the configured literal directories and globbed
-// directories. Missing directories are skipped because main and ppx/main do
-// not yet share the same coordination layout.
-func scanDirs(repoRoot string) ([]string, error) {
-	dirs := make([]string, 0, len(scanLiteralDirs)+len(scanGlobs))
-	for _, dir := range scanLiteralDirs {
-		full := filepath.Join(repoRoot, dir)
-		info, err := os.Stat(full)
-		switch {
-		case err == nil && info.IsDir():
-			dirs = append(dirs, dir)
-		case err == nil:
-			return nil, fmt.Errorf("scan path %s is not a directory", dir)
-		case os.IsNotExist(err):
-			continue
-		default:
-			return nil, fmt.Errorf("stat %s: %w", dir, err)
+// scanPathNames walks the whole working tree and records every proquint-shaped
+// substring in each visited entry name. The scan uses entry basenames, not full
+// relative paths, so an ancestor directory handle-looking name is recorded once
+// for that directory instead of once for every descendant.
+//
+// Intent: Avoid hard-coded path allowlists; any future repo path can reserve a
+// candidate handle simply by containing that handle-looking string. Source:
+// DI-sazud
+func scanPathNames(repoRoot string, handles map[string]string) error {
+	return filepath.WalkDir(repoRoot, func(path string, entry fs.DirEntry, walkErr error) error {
+		if walkErr != nil {
+			return fmt.Errorf("walk %s: %w", path, walkErr)
 		}
-	}
-	for _, glob := range scanGlobs {
-		matches, err := filepath.Glob(filepath.Join(repoRoot, glob))
+		if path == repoRoot {
+			return nil
+		}
+		if entry.Name() == ".git" {
+			if entry.IsDir() {
+				return filepath.SkipDir
+			}
+			return nil
+		}
+		relPath, err := filepath.Rel(repoRoot, path)
 		if err != nil {
-			return nil, fmt.Errorf("glob %s: %w", glob, err)
+			return fmt.Errorf("relpath %s: %w", path, err)
 		}
-		for _, match := range matches {
-			info, err := os.Stat(match)
-			if err != nil {
-				return nil, fmt.Errorf("stat glob match %s: %w", match, err)
-			}
-			if !info.IsDir() {
-				continue
-			}
-			rel, err := filepath.Rel(repoRoot, match)
-			if err != nil {
-				return nil, fmt.Errorf("relpath %s: %w", match, err)
-			}
-			dirs = append(dirs, rel)
-		}
-	}
-	return dirs, nil
+		rememberNameHandles(handles, entry.Name(), filepath.ToSlash(relPath))
+		return nil
+	})
 }
 
-// scanDir records filename-owned handles and DI-owner handles from one
-// configured directory.
-func scanDir(repoRoot, dir string, handles map[string]string) error {
-	full := filepath.Join(repoRoot, dir)
-	entries, err := os.ReadDir(full)
-	if err != nil {
-		return fmt.Errorf("scan %s: %w", dir, err)
-	}
-	for _, entry := range entries {
-		if entry.IsDir() {
-			continue
+// scanDIHandles walks readable regular files across the working tree and
+// records exact DI owner lines. It intentionally does not treat arbitrary
+// proquint-looking body text as occupied, because ordinary prose may cite or
+// discuss handles without owning them.
+//
+// Intent: Keep DI handles in the same occupied set as name-derived handles
+// without reintroducing TODO-directory path assumptions. Source: DI-sazud
+func scanDIHandles(repoRoot string, handles map[string]string) error {
+	return filepath.WalkDir(repoRoot, func(path string, entry fs.DirEntry, walkErr error) error {
+		if walkErr != nil {
+			return fmt.Errorf("walk %s: %w", path, walkErr)
 		}
-		name := entry.Name()
-		if !strings.HasSuffix(name, ".md") {
-			continue
+		if path == repoRoot {
+			return nil
 		}
-		relPath := filepath.Join(dir, name)
-		if match := handleFileRE.FindStringSubmatch(name); match != nil {
-			if err := rememberHandle(handles, match[1], relPath); err != nil {
-				return err
+		if entry.Name() == ".git" {
+			if entry.IsDir() {
+				return filepath.SkipDir
 			}
+			return nil
 		}
-		if isTODODir(dir) {
-			if err := scanDIHandles(filepath.Join(full, name), relPath, handles); err != nil {
-				return err
-			}
+		if !entry.Type().IsRegular() {
+			return nil
 		}
-	}
-	return nil
+		relPath, err := filepath.Rel(repoRoot, path)
+		if err != nil {
+			return fmt.Errorf("relpath %s: %w", path, err)
+		}
+		data, err := os.ReadFile(path)
+		if err != nil {
+			return fmt.Errorf("read %s: %w", filepath.ToSlash(relPath), err)
+		}
+		for _, match := range diOwnerRE.FindAllStringSubmatch(string(data), -1) {
+			rememberHandle(handles, match[1], filepath.ToSlash(relPath)+"#DI-"+match[1])
+		}
+		return nil
+	})
 }
 
-// isTODODir recognizes both the historical root TODO layout and ppx/main's
-// per-protocol TODO directories.
-func isTODODir(dir string) bool {
-	return dir == "TODO" || strings.HasSuffix(filepath.ToSlash(dir), "/TODO")
-}
-
-// scanDIHandles records the handles owned by Decision Intent Log entries in
-// TODO files. A DI handle is global, so it must not duplicate any filename
-// handle or any other DI owner.
-func scanDIHandles(path, relPath string, handles map[string]string) error {
-	data, err := os.ReadFile(path)
-	if err != nil {
-		return fmt.Errorf("read %s: %w", relPath, err)
-	}
-	for _, match := range diOwnerRE.FindAllStringSubmatch(string(data), -1) {
-		if err := rememberHandle(handles, match[1], relPath+"#DI-"+match[1]); err != nil {
-			return err
+// rememberNameHandles records all proquint-1 and proquint-2 substrings in one
+// file or directory name. The loops advance one byte at a time so overlapping
+// CVCVC substrings are not missed.
+func rememberNameHandles(handles map[string]string, name, relPath string) {
+	for start := 0; start+5 <= len(name); start++ {
+		candidate := name[start : start+5]
+		if isProquint1String(candidate) {
+			owner := fmt.Sprintf("%s#name[%d:%d]", relPath, start, start+5)
+			rememberHandle(handles, candidate, owner)
 		}
 	}
-	return nil
+	for start := 0; start+11 <= len(name); start++ {
+		candidate := name[start : start+11]
+		if isProquint2String(candidate) {
+			owner := fmt.Sprintf("%s#name[%d:%d]", relPath, start, start+11)
+			rememberHandle(handles, candidate, owner)
+		}
+	}
 }
 
-// rememberHandle inserts one owned handle into the corpus and reports a clear
-// error if the repo already contains a duplicate owner.
-func rememberHandle(handles map[string]string, handle, owner string) error {
-	if previous, duplicate := handles[handle]; duplicate {
-		return fmt.Errorf(
-			"corpus already contains duplicate handle %q in %s and %s",
-			handle, previous, owner)
+// isProquint1String reports whether candidate is exactly one CVCVC proquint
+// using the local alphabet in proquint.go.
+func isProquint1String(candidate string) bool {
+	return len(candidate) == 5 &&
+		strings.ContainsRune(proquintCons, rune(candidate[0])) &&
+		strings.ContainsRune(proquintVows, rune(candidate[1])) &&
+		strings.ContainsRune(proquintCons, rune(candidate[2])) &&
+		strings.ContainsRune(proquintVows, rune(candidate[3])) &&
+		strings.ContainsRune(proquintCons, rune(candidate[4]))
+}
+
+// isProquint2String reports whether candidate is exactly two proquint-1 words
+// joined by a single hyphen.
+func isProquint2String(candidate string) bool {
+	return len(candidate) == 11 &&
+		candidate[5] == '-' &&
+		isProquint1String(candidate[:5]) &&
+		isProquint1String(candidate[6:])
+}
+
+// rememberHandle inserts one occupied handle into the corpus. Repeated
+// occurrences are expected under whole-name substring scanning, so the first
+// owner is kept as useful diagnostic context and later owners are ignored.
+func rememberHandle(handles map[string]string, handle, owner string) {
+	if _, duplicate := handles[handle]; duplicate {
+		return
 	}
 	handles[handle] = owner
-	return nil
 }

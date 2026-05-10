@@ -10,9 +10,10 @@
 //	-w   handle width: 1 for proquint-1 (5 chars, default) or 2 for
 //	     proquint-2 (11 chars). proquint-1 is the canonical width for
 //	     new TODO, TE, DR, and DI artifacts.
-//	-r   repo root (default: current directory). The tool walks the
-//	     configured coordination directories from this root to build the
-//	     collision set.
+//	     SIM artifacts also use proquint-1 handles when minted.
+//	-r   repo root (default: current directory). The tool walks the whole
+//	     working tree from this root, excluding only .git internals, to build
+//	     the occupied handle set.
 //	-n   dry-run: print what would be minted without contacting the
 //	     clock multiple times. Mostly useful for tests.
 //	-s   override the entropy seed source. By default the seed is
@@ -36,13 +37,12 @@
 // Why this design:
 //
 //   - Handles are mint-time-allocated random labels, not derivable from
-//     filename or content. They are persisted by being included in the
-//     filename or DI owner line of the artifact that owns them; those owners
-//     are the registry of record. There is no central HANDLES.md.
-//   - The check is "does any tracked artifact already own this proquint?"
-//     This is satisfied by walking the configured coordination directories
-//     for files matching handleFileRE and DI owner lines matching diOwnerRE.
-//     Forks diverge naturally because each fork's owner set is distinct; the
+//     filename or content. They are persisted by being included in file names,
+//     directory names, or DI owner lines. There is no central HANDLES.md.
+//   - The check is "does this proquint-looking string already appear in a
+//     working-tree file or directory name, or as an exact DI owner line?" This
+//     whole-tree occupied-set scan avoids hard-coded layout blind spots. Forks
+//     diverge naturally because each fork's occupied set is distinct; the
 //     collision check is local and merge-time, not a central registry.
 //   - The entropy source is the wall clock at mint time. The hash function
 //     (SHA-256) folds that into 16 or 32 bits. The choice of entropy source
@@ -51,6 +51,7 @@
 //
 // Intent: Provide one local, collision-checked minting path for all new
 // coordination artifact IDs. Source: DI-nisam
+// Whole-working-tree occupied-set coverage source: DI-sazud
 package main
 
 import (
