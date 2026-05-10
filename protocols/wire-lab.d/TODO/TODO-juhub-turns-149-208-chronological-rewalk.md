@@ -124,7 +124,7 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - [x] juhub.170 Turn 170 raw-log rewalk plus later-turn and later-artifact sweep.
 - [x] juhub.171 Turn 171 raw-log rewalk plus later-turn and later-artifact sweep.
 - [x] juhub.172 Turn 172 raw-log rewalk plus later-turn and later-artifact sweep.
-- [ ] juhub.173 Turn 173 raw-log rewalk plus later-turn and later-artifact sweep.
+- [x] juhub.173 Turn 173 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.174 Turn 174 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.175 Turn 175 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.176 Turn 176 raw-log rewalk plus later-turn and later-artifact sweep.
@@ -817,4 +817,37 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - `Write needed? yes/no` `yes` for this rewalk entry and checklist closure in
   `TODO-juhub`; `no` correction note is needed in `TODO-lilar`.
 - `Next: wait for approval before turn N+1` Turn 173 is next and remains
+  pending approval.
+
+### Turn 173 — 2026-05-03 17:06 UTC
+
+- `Turn 173 summary` Steve did not answer the proposed TE directly. Instead he
+  asked for precedent: is this architecture grounded in real systems, RFCs, and
+  historical networks? In plain English, this is a validation turn. Steve is
+  testing whether the substrate-pluralism / separate-feed-family idea is a real
+  historical pattern or just a fresh bot abstraction.
+- `Existing capture` `TODO-lilar` already captures the turn correctly. The raw
+  answer responds with a long precedent survey -- email over SMTP/UUCP/X.400,
+  Usenet over NNTP/UUCP, FidoNet, CORBA GIOP/IIOP, SOAP/WSDL, and modern systems
+  such as gRPC, libp2p, Matrix, and git itself -- and extracts three recurring
+  patterns: separate substrate specs parallel to the protocol, per-instance
+  substrate declarations, and message identity invariant across substrates. The
+  strongest framing move is the Usenet comparison: the bot argues that
+  `group-session` can be read as a very small content-addressed-Usenet-like
+  design, with Usenet's substrate pluralism as the closest historical analog.
+  The strongest later non-TE design-visible carry-forward is now
+  `docs/research/historical-networks-20260503.md`, and the broader design line
+  is now explicitly explored in
+  `simulations/SIM-hugoj-cas-usenetlike-gitlike/README.md`.
+- `Gaps or contradictions` None that overturn the existing capture. The exact
+  phrase from the raw turn was initially preserved only in replay artifacts and
+  not in a design doc; that gap has now been narrowed by the later doc
+  promotion work under `DI-pijun`. The remaining important limit is that the
+  analogy is still exploratory rather than a frozen protocol identity claim, so
+  the later docs preserve the lineage and precedent without silently locking
+  "PromiseGrid is Usenet" as settled fact.
+- `Proposed disposition` `already captured correctly`
+- `Write needed? yes/no` `yes` for this rewalk entry and checklist closure in
+  `TODO-juhub`; `no` correction note is needed in `TODO-lilar`.
+- `Next: wait for approval before turn N+1` Turn 174 is next and remains
   pending approval.

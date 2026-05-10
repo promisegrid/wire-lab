@@ -1,9 +1,10 @@
 # SIM-hugoj: CAS / Usenet-like / Git-like lineage
 
-This simulation explores whether part of PromiseGrid should be understood as a
-content-addressed-Usenet successor line with git-like object/transport
-separation. It is a broad design exploration, not a frozen protocol claim and
-not a claim that PromiseGrid simply *is* Usenet or git. Source: `DI-pijun`.
+This simulation explores whether part of PromiseGrid should be
+understood as a content-addressed-Usenet successor line with git-like
+hashed and hash-chained objects and transport separation. It is a
+broad design exploration, not a frozen protocol claim and not a claim
+that PromiseGrid simply *is* Usenet or git. Source: `DI-pijun`.
 
 `group-session` is the current worked specimen inside this simulation, not the
 identity of the simulation itself. The point of the simulation is to ask which
