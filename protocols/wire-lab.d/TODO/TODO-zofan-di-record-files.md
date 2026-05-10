@@ -8,9 +8,21 @@ timestamp alias.
 
 ## Status
 
-Open. This TODO must run before removing DI-specific content scanning from
-`tools/mint-handle`, because DIs currently live as inline records inside TODO
-files and therefore do not yet have their own handle-bearing pathnames.
+Deferred. This TODO remains the prerequisite for removing DI-specific content
+scanning from `tools/mint-handle`, but the work is not next in the recovery
+queue. Finish the 149-208 replay cleanup priorities before resuming this DI
+file migration.
+
+## Decision Intent Log
+
+ID: DI-fakub
+Date: 2026-05-10 05:43:44
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Defer TODO-zofan until higher-priority 149-208 replay cleanup work is complete enough to resume DI-file migration deliberately.
+Intent: Avoid letting the DI-file refactor distract from the recovery thread. The scanner cleanup remains valid, but first-class DI files are structural coordination work rather than the next replay cleanup step.
+Constraints: Do not remove DI-specific `tools/mint-handle` scanning while TODO-zofan is deferred. Keep TODO-zofan open as the required follow-up before name-only scanner cleanup.
+Affects: `protocols/wire-lab.d/TODO/TODO-zofan-di-record-files.md`; `protocols/wire-lab.d/TODO/TODO.md`; `tools/mint-handle/`.
 
 ## Context
 

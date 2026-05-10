@@ -86,6 +86,15 @@ Intent: Complete the TE-mupoz apparatus/specimen split without preserving obsole
 Constraints: Do not edit `/home/stevegt/lab/promisegrid-dev-guide`. Preserve history with `git mv` for tracked moves and with migration manifests that record old paths, new paths, source commit, CID status where applicable, and graduation limits. Simulation results must feed DR/DI/spec/dev-guide handoff rather than directly becoming authoritative PromiseGrid layout.
 Affects: `simulations/SIM-piloh-turns-149-208-recovery/`; `protocols/group-session.d/`; `protocols/ppx-dr.d/`; `protocols/udp-binding.d/`; `transports/`; `proposals/`; `DEV-GUIDE-RESOURCES.md`; `docs/thought-experiments/TE-mupoz-root-protocol-migration-scope-under-simulations.md`; `docs/thought-experiments/README.md`; `protocols/wire-lab.d/specs/harness-spec-draft.md`; `DR/DR-nugog-transport-tree-ownership-structure.md`; `protocols/wire-lab.d/TODO/TODO.md`; `protocols/wire-lab.d/TODO/TODO-kugod-te-40-apparatus-vs-specimen-completion.md`.
 
+ID: DI-mahim
+Date: 2026-05-10 05:49:06
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Treat TE-mupoz and `DI-fakin` as resolving TODO-kugod's current transport-tree and simulation-first blockers for the turns 149-208 recovery specimen, without globally deciding TE-domat, TE-pahah, or TE-nizor. Continue TODO-kugod with a narrower residual path: harness-spec apparatus/specimen cleanup, grid-envelope successor ownership, and transport-spec companion audit.
+Intent: Keep the 149-208 replay moving after the simulation migration instead of re-litigating the root-level `transports/` and candidate-protocol placement questions that Mupoz already answered for the current recovery specimen.
+Constraints: Do not mark TE-domat, TE-pahah, or TE-nizor globally decided. Do not change harness-spec wording, create grid-envelope files, or run the transport-spec companion audit in this reconciliation pass. Preserve `simulations/SIM-piloh-turns-149-208-recovery/` as the current specimen home under `DI-fakin`.
+Affects: `protocols/wire-lab.d/TODO/TODO-kugod-te-40-apparatus-vs-specimen-completion.md`; `protocols/wire-lab.d/TODO/TODO.md`; `docs/thought-experiments/TE-domat-transports-groups-reconciliation.md`; `docs/thought-experiments/TE-pahah-wire-lab-simulation-first-structure.md`; `docs/thought-experiments/TE-nizor-pahah-implementation-sufficiency.md`; `docs/thought-experiments/TE-mupoz-root-protocol-migration-scope-under-simulations.md`; `DR/DR-nugog-transport-tree-ownership-structure.md`.
+
 ## Residual TE-40 checklist
 
 This checklist maps the TE-40 UT inventory from
@@ -110,13 +119,18 @@ row below is closed by a DI, DR, or successor TODO.
 | UT-158.f | transferred-open | TODO-kugod until grid-envelope successor exists | The grid-envelope protocol directory/spec work remains outside this pass and needs a successor owner. |
 | UT-158.g | retired | TODO-rivuk / DI-runuh | TODO-rivuk is closed as superseded instead of moved under a promise-stack protocol directory. |
 | UT-159.a | open | TODO-kugod | The nine specimen-bearing harness-spec audit items still need a later sweep or explicit retirement. |
-| UT-159.b | transferred-open | DR-nugog plus TODO-kugod | The transport-spec companion audit is blocked on the transport-tree structure/ownership decision. |
+| UT-159.b | open-scoped | TODO-kugod plus DR-nugog | The current transport-tree blocker is resolved for this specimen by `DI-fakin`; the remaining work is the transport-spec companion audit against rooted apparatus versus simulation-local specimens. |
 | UT-159.c | resolved-retired | TE-havib follow-on verification | The six-scenario mismatch is recorded; no redo is required before residual checklist cleanup proceeds. |
 | UT-159.d | open | TODO-kugod | The remaining ambiguous audit areas still need resolution or explicit retirement. |
 
-### 2026-05-09 transport-tree TE tracking
+### 2026-05-09/10 transport-tree and post-Mupoz tracking
 
-- [ ] kugod.1 Resolve TE-domat (`docs/thought-experiments/TE-domat-transports-groups-reconciliation.md`) and DR-nugog before closing UT-159.b. TE-domat reframes the question from "flat vs. protocol-slug nesting under `transports/`" to "whether `groups/` becomes the L7 group registry/view while `transports/` remains lower-layer feed/transport specimen data."
-- [ ] kugod.2 Resolve TE-pahah (`docs/thought-experiments/TE-pahah-wire-lab-simulation-first-structure.md`) before implementing any root-level `transports/` or `groups/` migration. TE-pahah reframes the current question around whether concrete experiment worlds should live under `simulations/<sim>/world/` instead of root-level layer trees.
-- [ ] kugod.3 Resolve TE-nizor (`docs/thought-experiments/TE-nizor-pahah-implementation-sufficiency.md`) before closing residual recovery for turns 149-208. TE-nizor tests whether implementing TE-pahah with a simulation contract is sufficient to carry the recovered concerns without prematurely deciding root-level layer trees, artifact-message shape, CBOR/text representation, or CAS/feed details.
+- [x] kugod.1 Resolve the current TE-domat (`docs/thought-experiments/TE-domat-transports-groups-reconciliation.md`) and DR-nugog blocker before closing UT-159.b. Closed for the current recovery specimen by `DI-fakin` and `DI-mahim`; TE-domat remains useful background for future root-level transport or group-tree decisions.
+- [x] kugod.2 Resolve the current TE-pahah (`docs/thought-experiments/TE-pahah-wire-lab-simulation-first-structure.md`) blocker before implementing any root-level `transports/` or `groups/` migration. Closed for the current recovery specimen by `DI-fakin` and `DI-mahim`; the candidate artifacts moved under `simulations/SIM-piloh-turns-149-208-recovery/` instead of becoming root-level layer trees.
+- [x] kugod.3 Resolve the current TE-nizor (`docs/thought-experiments/TE-nizor-pahah-implementation-sufficiency.md`) blocker before closing residual recovery for turns 149-208. Closed for the current recovery specimen by `DI-fakin` and `DI-mahim`; TE-nizor remains open as broader analysis for root-level layer trees, artifact-message shape, CBOR/text representation, and CAS/feed details.
 - [x] kugod.4 Resolve TE-mupoz (`docs/thought-experiments/TE-mupoz-root-protocol-migration-scope-under-simulations.md`) before moving existing root-level or `protocols/` content under `simulations/`. TE-mupoz tests whether root `protocols/` should retain only `wire-lab.d`, and whether candidate protocol drafts, proposal records, and transport specimens should move into the first simulation as specimens when TE-nizor is implemented. Closed by `DI-pakid` and `DI-fakin`; implementation target is `simulations/SIM-piloh-turns-149-208-recovery/`.
+- [ ] kugod.5 Inventory the harness-spec claims that still mix harness apparatus with candidate PromiseGrid specimens, including the nine UT-159.a audit items and the ambiguous UT-159.d areas.
+- [ ] kugod.6 Amend the harness spec so §1.1 and §1.3 state the apparatus/specimen boundary cleanly and remove or supersede the stale "wire-envelope-agnostic" claim from UT-156.c, UT-158.c, and UT-158.d.
+- [ ] kugod.7 Create or identify the successor owner for grid-envelope work, candidate envelope inventory, and the `grid([pcid, payload])` working hypothesis from UT-157.a, UT-157.c, and UT-158.f.
+- [ ] kugod.8 Run the transport-spec companion audit after the Mupoz migration, distinguishing rooted wire-lab apparatus claims from simulation-local transport specimens for UT-159.b.
+- [ ] kugod.9 Update TODO-jivam and the TE-40 disposition matrix after kugod.5 through kugod.8 are resolved, transferred, or explicitly retired.

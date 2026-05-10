@@ -37,7 +37,7 @@ minted after that date carry only the proquint handle.
 | [TODO-lilok](./TODO-lilok-te-36-followon-oq-and-tabletop-walk.md) | 2026-05-07 | TE-havib follow-on: OQ-36.6 + tabletop walk **(open: harness-spec sweep handoff not found in TODO-vuhuj)** | `TODO-23` / `TODO-20260507-002306` |
 | [TODO-pipus](./TODO-pipus-te-39-wire-lab-devs-migration.md) | 2026-05-07 | TE-mumuv wire-lab-devs migration | `TODO-24` / `TODO-20260507-002306` |
 | [TODO-jivam](./TODO-jivam-turns-149-170-recovery-completion.md) | 2026-05-09 | Turns 149-208 recovery completion monitor **(open: expanded from 149-170; shall not close until all bounded recovery is complete)** | — |
-| [TODO-kugod](./TODO-kugod-te-40-apparatus-vs-specimen-completion.md) | 2026-05-07 | TE-40 apparatus-vs-specimen completion + TE-famar closure **(open: promise-stack retirement cascade complete; residual TE-40 recovery still open)** | `TODO-25` / `TODO-20260507-002306` |
+| [TODO-kugod](./TODO-kugod-te-40-apparatus-vs-specimen-completion.md) | 2026-05-07 | TE-40 apparatus-vs-specimen completion + TE-famar closure **(open: post-Mupoz harness-spec, grid-envelope, and transport-spec residuals)** | `TODO-25` / `TODO-20260507-002306` |
 | [TODO-turog](./TODO-turog-te-41-group-session-freeze-procedure.md) | 2026-05-07 | TE-41 group-session freeze procedure | `TODO-26` / `TODO-20260507-002306` |
 | [TODO-duvuk](./TODO-duvuk-te-42-filename-cid-cascade-policy.md) | 2026-05-07 | TE-42 filename / CID-cascade policy | `TODO-27` / `TODO-20260507-002306` |
 | [TODO-kituj](./TODO-kituj-te-43-promisebase-prior-art-adoption.md) | 2026-05-07 | TE-43 promisebase prior-art adoption | `TODO-28` / `TODO-20260507-002306` |
@@ -47,7 +47,7 @@ minted after that date carry only the proquint handle.
 | [TODO-bahaf](./TODO-bahaf-te-39-naming-reconciliation.md) | 2026-05-07 | TE-mumuv naming reconciliation (proquint filenames) | `TODO-32` / `TODO-20260507-025635` |
 | [TODO-topit](./TODO-topit-transcript-snapshot-procedure.md) | 2026-05-07 | Transcript-snapshot procedure replaces per-turn session-logging discipline **(deferred indefinitely: Perplexity-specific)** | `TODO-33` / `TODO-20260507-150000` |
 | [TODO-fonuz](./TODO-fonuz-proquint-id-upgrade.md) | 2026-05-07 | Proquint IDs for new coordination artifacts | — |
-| [TODO-zofan](./TODO-zofan-di-record-files.md) | 2026-05-10 | Move DI records to first-class files | — |
+| [TODO-zofan](./TODO-zofan-di-record-files.md) | 2026-05-10 | Move DI records to first-class files **(deferred: resume after replay cleanup)** | — |
 | [TODO-milum](./TODO-milum-agent-instruction-consolidation.md) | 2026-05-08 | Agent instruction consolidation | `TODO-34` |
 | [TODO-rozas](./TODO-rozas-promisegrid-dev-guide-resources.md) | 2026-05-08 | PromiseGrid dev-guide writer resources **(running: periodic `DEV-GUIDE-RESOURCES.md` maintenance; rozas.10 open)** | — |
 
