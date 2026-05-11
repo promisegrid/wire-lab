@@ -75,6 +75,16 @@ Constraints: Use `git mv` for all moved tracked files. Create only the destinati
 Affects: `protocols/wire-lab.d/TODO/TODO-rusis-simulation-split-and-specimen-relocation.md`; `simulations/SIM-ludut-wire-lab-devs/world/`; `simulations/SIM-ludut-wire-lab-devs/seed/wire-lab-devs-draft-migration.md`; `simulations/SIM-piloh-turns-149-208-recovery/world/`; `simulations/SIM-piloh-turns-149-208-recovery/seed/wire-lab-devs-draft-migration.md`.
 Supersedes: DI-rugig (`rusis.4` transport-archive timing only)
 
+ID: DI-firiv
+Date: 2026-05-11 10:29:25
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Execute `rusis.5` by moving the complete `group-session.d` lineage tree from `SIM-piloh` into `SIM-rakot-group-session/protocols/group-session.d/`, and add one lineage-local migration note at `simulations/SIM-rakot-group-session/seed/protocol-migration.md`.
+Intent: The `group-session` tree is already a coherent lineage-owned unit in the `rusis.1` table. `rusis.5` should relocate that unit intact, then preserve the old mixed-sim provenance in a short local note so later passes do not depend on the obsolete umbrella inventory.
+Constraints: Use `git mv` for the entire tracked `group-session.d` tree. Create only the destination parent `protocols/` and `seed/` directories plus the new `seed/protocol-migration.md` file. Do not edit rooted mixed artifacts, `simulations/README.md`, or any non-`group-session` lineage content in this pass.
+Affects: `protocols/wire-lab.d/TODO/TODO-rusis-simulation-split-and-specimen-relocation.md`; `simulations/SIM-rakot-group-session/protocols/group-session.d/`; `simulations/SIM-rakot-group-session/seed/protocol-migration.md`; `simulations/SIM-piloh-turns-149-208-recovery/protocols/group-session.d/`.
+Supersedes: DI-rugig (`rusis.5` execution details only)
+
 ## Context
 
 The current simulation layout still reflects the recovery process that
@@ -181,7 +191,7 @@ with `git mv`, because their filenames depend on their byte content.
   provenance into the `wire-lab-devs` lineage according to the
   disposition table, and defer `archive/transports/*` again for a later
   `rusis.*` pass.
-- [ ] rusis.5 Move `group-session.d` and `TODO-bisur` into the
+- [x] rusis.5 Move `group-session.d` and `TODO-bisur` into the
   `group-session` lineage, preserving them as local lineage state rather
   than treating them as a shared protocol home.
 - [ ] rusis.6 Move `udp-binding.d` into the UDP feed lineage, rename it
