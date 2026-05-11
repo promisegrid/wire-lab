@@ -65,6 +65,16 @@ Constraints: Create `simulations/SIM-ludut-wire-lab-devs/`, `simulations/SIM-rak
 Affects: `protocols/wire-lab.d/TODO/TODO-rusis-simulation-split-and-specimen-relocation.md`; `protocols/wire-lab.d/archive/README.md`; `protocols/wire-lab.d/archive/migrations/SIM-piloh-turns-149-208-recovery/README.md`; `protocols/wire-lab.d/archive/retired/ppx-dr/README.md`; `simulations/SIM-ludut-wire-lab-devs/README.md`; `simulations/SIM-ludut-wire-lab-devs/QUESTION.md`; `simulations/SIM-rakot-group-session/README.md`; `simulations/SIM-rakot-group-session/QUESTION.md`; `simulations/SIM-ludaf-udp-feed/README.md`; `simulations/SIM-ludaf-udp-feed/QUESTION.md`; `simulations/SIM-labit-feed-outer/README.md`; `simulations/SIM-labit-feed-outer/QUESTION.md`; `simulations/SIM-kurim-grid-envelope/README.md`; `simulations/SIM-kurim-grid-envelope/QUESTION.md`.
 Supersedes: DI-rugig (`rusis.3` execution details only)
 
+ID: DI-lilov
+Date: 2026-05-11 10:18:23
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Execute `rusis.4` by moving only the concrete `wire-lab-devs` `world/` subtree and `seed/wire-lab-devs-draft-migration.md` from `SIM-piloh` into `SIM-ludut-wire-lab-devs/`. Defer `SIM-piloh/archive/transports/*` again for a later `rusis.*` pass instead of moving it now.
+Intent: The world/evidence slice is already a clean lineage-owned unit, but the transport archive still has unresolved placement between lineage-local provenance and the rooted migration archive. `rusis.4` should move the concrete world now without forcing an archive decision prematurely.
+Constraints: Use `git mv` for all moved tracked files. Create only the destination `seed/` directory needed for the moved migration note. Do not touch `SIM-piloh/archive/transports/*`, rooted mixed artifacts, or `simulations/README.md` in this pass. Preserve the moved `.txt` message files byte-for-byte.
+Affects: `protocols/wire-lab.d/TODO/TODO-rusis-simulation-split-and-specimen-relocation.md`; `simulations/SIM-ludut-wire-lab-devs/world/`; `simulations/SIM-ludut-wire-lab-devs/seed/wire-lab-devs-draft-migration.md`; `simulations/SIM-piloh-turns-149-208-recovery/world/`; `simulations/SIM-piloh-turns-149-208-recovery/seed/wire-lab-devs-draft-migration.md`.
+Supersedes: DI-rugig (`rusis.4` transport-archive timing only)
+
 ## Context
 
 The current simulation layout still reflects the recovery process that
@@ -167,9 +177,10 @@ with `git mv`, because their filenames depend on their byte content.
 - [x] rusis.3 Create the rooted archive skeleton and the five successor
   sim roots described by `rusis.2`, without yet splitting rooted mixed
   artifacts.
-- [ ] rusis.4 Move the concrete `wire-lab-devs` world state, local
-  provenance, and transport archive material into the `wire-lab-devs`
-  lineage according to the disposition table.
+- [x] rusis.4 Move the concrete `wire-lab-devs` world state and local
+  provenance into the `wire-lab-devs` lineage according to the
+  disposition table, and defer `archive/transports/*` again for a later
+  `rusis.*` pass.
 - [ ] rusis.5 Move `group-session.d` and `TODO-bisur` into the
   `group-session` lineage, preserving them as local lineage state rather
   than treating them as a shared protocol home.
