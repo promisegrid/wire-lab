@@ -184,14 +184,15 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - `Turn 155` `UT-155.a` and `UT-155.b` are now retired in `TODO-kugod` /
   `TODO-rivuk` under `DI-runuh`; no live turn-local owner work remains.
 - `Turn 156` `UT-156.a` and `UT-156.b` are retired / resolved-retired.
-  `UT-156.c` remains open in `TODO-kugod` and is now concretely queued under
-  `kugod.5` and `kugod.6`.
+  `UT-156.c` is resolved under `DI-lajod`, `DI-sujan`, and `DI-kinad`;
+  broader TE-40 audit work continues under the later turn-159 rows.
 - `Turn 157` `UT-157.b` is retired. `UT-157.a` and `UT-157.c` are resolved in
   the grid-envelope successor owner under `DI-joroh`.
 - `Turn 158` `UT-158.b` is resolved; `UT-158.e` and `UT-158.g` are retired;
-  `UT-158.c` and `UT-158.d` remain open in `TODO-kugod` via `kugod.6`;
-  `UT-158.f` remains transferred-open via `kugod.7`. Carry items `UT-158.a`
-  and `UT-158.h` still need explicit downstream wording or owner cleanup.
+  `UT-158.a` is resolved-decomposed and `UT-158.h` is resolved-routed under
+  `DI-sotuk`; `UT-158.c`, `UT-158.d`, and `UT-158.f` are closed for
+  turn-158 scope under `DI-kinad` and `DI-fanah`. Broader TE-40 work begins
+  with turn 159 and remains under `UT-159.*`.
 - `Turn 159` `UT-159.c` is resolved-retired. `UT-159.a` and `UT-159.d` remain
   open in `TODO-kugod` via `kugod.5`. `UT-159.b` remains open-scoped under
   `TODO-kugod` plus `DR-nugog` via `kugod.8`.
@@ -571,8 +572,9 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - `Owner/doc cleanup` Done. `TODO-kugod` now records `UT-156.c` as resolved, and
   `harness-spec-draft.md` now states that the harness compares candidate
   envelopes rather than defining one canonical envelope. No correction note is
-  needed in `TODO-lilar`, and the broader `UT-158.c` / `UT-158.d` / `UT-159.*`
-  sweep remains with `TODO-kugod`.
+  needed in `TODO-lilar`; the former turn-158 slice is now closed, and the
+  remaining broader sweep lives under the later `UT-159.*` rows in
+  `TODO-kugod`.
 - `Remaining decisions or work` None for turn `156` itself. The broader
   apparatus/specimen cleanup is still open, but it belongs to later turns and
   their owner items rather than to the turn-156 stale-claim residue.
@@ -619,8 +621,8 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
   hypothesis rather than a canonical harness rule. No correction note is needed
   in `TODO-lilar`.
 - `Remaining decisions or work` None for turn 157 itself. The later
-  grid-envelope protocol directory/spec work remains open under turn 158 /
-  `UT-158.f` and `tujad.3`.
+  grid-envelope protocol directory/spec work that had remained under turn 158 /
+  `UT-158.f` and `tujad.3` is now closed for turn-158 scope by `DI-fanah`.
 - `Work pending` `no`
 - `Proposed disposition` `reconciled after successor-owner capture`
 - `Write needed? yes/no` `yes` for this rewalk update in `TODO-juhub`; `no`
@@ -634,26 +636,39 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
   pointed out that even calling the envelope "harness-wide" smuggles in the
   wrong assumption, because wire-lab exists to test multiple hypotheses at all
   layers, not to bake one answer into the harness. In plain English, this is
-  the turn where the bot finally accepts that the harness-spec is the lab
-  apparatus and the candidate envelopes are specimens under study.
+  the turn where the bot finally accepts that the harness-spec is lab
+  apparatus and candidate envelopes are specimens under study.
 - `Existing capture` `TODO-lilar` already captures the turn correctly as the
-  foundational apparatus-vs-specimen reframe. The raw turn lays out the six
-  step sequence that follows from that correction: audit the harness-spec,
-  file the harness-level TE on the split, give each candidate envelope its own
-  protocol home, sweep specimen material out of the harness-spec, reframe the
-  old promise-stack TODO under protocol ownership, and file a parallel TODO for
-  the grid-envelope hypothesis. Later residual owner work also preserves the
-  two load-bearing carry-forwards from this turn: the harness-spec carve-outs
-  still open under `TODO-kugod`, and the future grid-envelope successor work
-  also still open there.
-- `Gaps or contradictions` None found. Later artifacts continue to treat this
-  as the foundational TE-havib turn. The insight itself stands, while the
-  downstream cleanup remains only partially complete. I did not find any later
-  artifact that reverts to the old claim that the harness-spec should define a
-  single envelope specimen.
-- `Proposed disposition` `already captured correctly`
-- `Write needed? yes/no` `yes` for this rewalk entry and checklist closure in
-  `TODO-juhub`; `no` correction note is needed in `TODO-lilar`.
+  foundational apparatus-vs-specimen reframe. The raw turn lays out a six-step
+  sequence: audit the harness-spec, file the harness-level TE on the split,
+  give each candidate envelope its own protocol home, sweep specimen material
+  out of the harness-spec, reframe the old promise-stack TODO under protocol
+  ownership, and file a parallel TODO for the grid-envelope hypothesis.
+- `Gaps or contradictions` The insight itself stands; no later artifact reverts
+  to the old claim that the harness-spec should define a single envelope
+  specimen. The gap was bookkeeping: the six-step sequence and the parallel
+  grid-hypothesis TODO were still represented as loose carry items even though
+  later artifacts had decomposed, routed, or materialized them as successor
+  simulations.
+- `Related UTs / owners` `UT-158.a` is resolved-decomposed in `TODO-kugod`
+  under `DI-sotuk`; `UT-158.b` is resolved by TE-havib DF-36.1; `UT-158.e`
+  and `UT-158.g` are retired under `TODO-rivuk` / `DI-runuh`; `UT-158.h` is
+  resolved-routed to `simulations/SIM-kurim-grid-envelope/TODO/TODO-tujad-grid-envelope-successor-owner.md`
+  under `DI-sotuk`. `UT-158.c` and `UT-158.d` are resolved for turn-158 scope
+  under `DI-kinad`; `UT-158.f` is resolved-transferred under `DI-fanah`.
+- `Owner/doc cleanup` Done. `TODO-kugod` now has explicit `UT-158.a`,
+  `UT-158.c`, `UT-158.d`, `UT-158.f`, and `UT-158.h` disposition rows, and
+  `TODO-tujad` now closes `tujad.3` by pointing to the 24 standalone
+  positional grid-envelope successor simulations.
+  No correction note is needed in `TODO-lilar`.
+- `Remaining decisions or work` None for turn 158 itself. Broader TE-40 audit
+  work remains under later turn-159 rows (`UT-159.a`, `UT-159.b`, `UT-159.d`,
+  `kugod.5`, and `kugod.8`), not as turn-158-local residue.
+- `Work pending` `no`
+- `Proposed disposition` `reconciled after positional variant split`
+- `Write needed? yes/no` `yes` for this rewalk update in `TODO-juhub` and the
+  owner-routing updates in `TODO-kugod` / `TODO-tujad`; `no` correction note is
+  needed in `TODO-lilar`.
 - `Next: wait for approval before turn N+1` Turn 159 is next and remains
   pending approval.
 

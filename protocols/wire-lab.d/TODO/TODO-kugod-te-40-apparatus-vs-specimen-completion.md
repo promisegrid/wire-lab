@@ -114,6 +114,35 @@ Constraints: Do not rewrite historical TE summary sections that name `SIM-piloh`
 Affects: `protocols/wire-lab.d/TODO/TODO-kugod-te-40-apparatus-vs-specimen-completion.md`; `protocols/wire-lab.d/specs/harness-spec-draft.md`.
 Supersedes: DI-lajod (simulation-specific forward-pointer wording only)
 
+ID: DI-sotuk
+Date: 2026-05-12 08:57:44
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Resolve the turn-158 replay bookkeeping gap by decomposing `UT-158.a` into the existing TE-40 owner rows and routing `UT-158.h` to the grid-envelope successor owner. Keep `UT-158.c`, `UT-158.d`, and `UT-158.f` open under their current owners.
+Intent: Turn 158 introduced the apparatus-vs-specimen correction and a six-step cleanup sequence. Later work already split that sequence across concrete artifacts, but the replay ledger still showed two carry items without explicit disposition. This decision closes the bookkeeping gap without pretending the remaining apparatus/specimen and grid-envelope protocol/spec work is complete.
+Constraints: Do not edit harness specs, TE files, raw logs, `TODO-lilar`, or create new protocol/simulation directories in this pass. Do not make `grid([pcid, payload])` canonical. Do not close `kugod.6` or `tujad.3`.
+Affects: `protocols/wire-lab.d/TODO/TODO-kugod-te-40-apparatus-vs-specimen-completion.md`; `protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewalk.md`; `simulations/SIM-kurim-grid-envelope/TODO/TODO-tujad-grid-envelope-successor-owner.md`.
+
+ID: DI-kinad
+Date: 2026-05-12 09:23:15
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Close the remaining turn-158 rows `UT-158.c`, `UT-158.d`, and
+`UT-158.f` after the apparatus-level §1.1/§1.3 wording was already rewritten
+under `DI-lajod` and `DI-sujan`, and after the grid-envelope successor path was
+materialized as 24 standalone positional variant simulations under `DI-fanah`.
+Intent: The replay should not keep turn-158-local residue open after the work
+has been either landed or transferred into concrete successor artifacts. Broader
+TE-40 audit work remains visible under the later turn-159 rows, but turn 158 no
+longer needs to carry its own loose-end queue.
+Constraints: Close only turn-158 residue. Do not close `UT-159.a`,
+`UT-159.b`, `UT-159.d`, `kugod.5`, `kugod.8`, `kugod.9`, or the broader TE-40
+backlog. Do not declare a winning grid-envelope variant.
+Affects: `protocols/wire-lab.d/TODO/TODO-kugod-te-40-apparatus-vs-specimen-completion.md`;
+`protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewalk.md`;
+`simulations/SIM-kurim-grid-envelope/TODO/TODO-tujad-grid-envelope-successor-owner.md`;
+`simulations/SIM-*-grid-envelope-enc-<cbor|dag-cbor>-unknown-<opaque|hard-reject|best-effort>-sig-<wrapper-pcid|unsigned-v0|mandatory-opaque-bytes|mandatory-sig-pcid-payload>/`.
+
 ## Residual TE-40 checklist
 
 This checklist maps the TE-40 UT inventory from
@@ -127,16 +156,18 @@ row below is closed by a DI, DR, or successor TODO.
 | UT-155.b | retired | TODO-rivuk / DI-runuh | `Project` / `Peel` / `Wrap` remain historical promise-stack vocabulary, not current apparatus work. |
 | UT-156.a | retired | TODO-rivuk / DI-runuh | The abandoned TE-famar structural-role question is superseded by promise-stack retirement. |
 | UT-156.b | resolved-retired | TODO-kugod / DI-runuh | TE-famar stays in the historical TE corpus with Cat-3 forward pointers instead of moving. |
-| UT-156.c | resolved | TODO-kugod / DI-lajod + DI-sujan | The stale "wire-envelope-agnostic" claim is superseded by the apparatus-level §1.1 / §1.3 rewrite in `harness-spec-draft.md`, with simulation references tightened so the harness does not privilege `SIM-piloh`; broader §1.1 / §1.3 carve-out work continues separately under `UT-158.c` and `UT-158.d`. |
+| UT-156.c | resolved | TODO-kugod / DI-lajod + DI-sujan + DI-kinad | The stale "wire-envelope-agnostic" claim is superseded by the apparatus-level §1.1 / §1.3 rewrite in `harness-spec-draft.md`, with simulation references tightened so the harness does not privilege `SIM-piloh`; later turn-158 local residue is now closed, while broader TE-40 audit work continues under the turn-159 rows. |
 | UT-157.a | resolved | `simulations/SIM-kurim-grid-envelope/TODO/TODO-tujad-grid-envelope-successor-owner.md` / DI-joroh | Candidate envelope inventory is captured in the grid-envelope successor owner, not promise-stack. |
 | UT-157.b | retired | TODO-rivuk / DI-runuh | The abandoned TE-famar status-reading DF is no longer live. |
 | UT-157.c | resolved | `simulations/SIM-kurim-grid-envelope/TODO/TODO-tujad-grid-envelope-successor-owner.md` / DI-joroh | The `grid([pcid, payload])` working-hypothesis prose is captured in the concrete grid-envelope successor TODO. |
+| UT-158.a | resolved-decomposed | TODO-kugod / DI-sotuk + DI-kinad | The raw six-step sequence is no longer a standalone work item: the audit memo and TE-havib captured the apparatus/specimen split, promise-stack relocation was retired under `DI-runuh`, grid-envelope ownership is routed through `TODO-tujad`, and the remaining turn-158 rows are now closed by `DI-kinad` and `DI-fanah`. |
 | UT-158.b | resolved | TE-havib DF-36.1 | The apparatus-vs-specimen scope is strict carve-out; no new TE-40 scope choice remains. |
-| UT-158.c | open | TODO-kugod | Harness-spec §1.1 now has an apparatus-level rewrite under `DI-lajod`, but the broader carve-out still remains incomplete. |
-| UT-158.d | open | TODO-kugod | Harness-spec §1.3 now has an apparatus-level rewrite under `DI-lajod`, but specimen-side migration and the broader classification sweep still remain incomplete. |
+| UT-158.c | resolved | TODO-kugod / DI-lajod + DI-sujan + DI-kinad | Harness-spec §1.1 has the apparatus-level rewrite and neutral simulation wording required for the turn-158 slice; broader nine-item audit work remains under `UT-159.a` and `kugod.5`. |
+| UT-158.d | resolved | TODO-kugod / DI-lajod + DI-sujan + DI-kinad | Harness-spec §1.3 has the apparatus-level layering-test rewrite required for the turn-158 slice; broader classification and specimen-audit work remains under `UT-159.a`, `UT-159.d`, `kugod.5`, and `kugod.8`. |
 | UT-158.e | retired | TODO-kugod / DI-runuh | TE-famar is not moved into a promise-stack protocol directory because promise-stack is retired as a separate hypothesis. |
-| UT-158.f | transferred-open | `simulations/SIM-kurim-grid-envelope/TODO/TODO-tujad-grid-envelope-successor-owner.md` | The grid-envelope protocol directory/spec work remains open, but it now has a concrete successor owner record. |
+| UT-158.f | resolved-transferred | `simulations/SIM-kurim-grid-envelope/TODO/TODO-tujad-grid-envelope-successor-owner.md` / DI-fanah + DI-kinad | The grid-envelope protocol/spec successor path is materialized as 24 standalone positional variant simulations; no single preferred specimen is selected. |
 | UT-158.g | retired | TODO-rivuk / DI-runuh | TODO-rivuk is closed as superseded instead of moved under a promise-stack protocol directory. |
+| UT-158.h | resolved-routed | `simulations/SIM-kurim-grid-envelope/TODO/TODO-tujad-grid-envelope-successor-owner.md` / DI-sotuk + DI-joroh + DI-fanah | The requested parallel TODO for the grid hypothesis is satisfied by the grid-envelope successor owner; the concrete protocol/spec successor path is now closed for turn-158 scope by the 24 variant simulations. |
 | UT-159.a | open | TODO-kugod | The nine specimen-bearing harness-spec audit items still need a later sweep or explicit retirement. |
 | UT-159.b | open-scoped | TODO-kugod plus DR-nugog | The current transport-tree blocker is resolved for this specimen by `DI-fakin`; the remaining work is the transport-spec companion audit against rooted apparatus versus simulation-local specimens. |
 | UT-159.c | resolved-retired | TE-havib follow-on verification | The six-scenario mismatch is recorded; no redo is required before residual checklist cleanup proceeds. |
@@ -149,7 +180,7 @@ row below is closed by a DI, DR, or successor TODO.
 - [x] kugod.3 Resolve the current TE-nizor (`docs/thought-experiments/TE-nizor-pahah-implementation-sufficiency.md`) blocker before closing residual recovery for turns 149-208. Closed for the current recovery specimen by `DI-fakin` and `DI-mahim`; TE-nizor remains open as broader analysis for root-level layer trees, artifact-message shape, CBOR/text representation, and CAS/feed details.
 - [x] kugod.4 Resolve TE-mupoz (`docs/thought-experiments/TE-mupoz-root-protocol-migration-scope-under-simulations.md`) before moving existing root-level or `protocols/` content under `simulations/`. TE-mupoz tests whether root `protocols/` should retain only `wire-lab.d`, and whether candidate protocol drafts, proposal records, and transport specimens should move into the first simulation as specimens when TE-nizor is implemented. Closed by `DI-pakid` and `DI-fakin`; implementation target is `simulations/SIM-piloh-turns-149-208-recovery/`.
 - [ ] kugod.5 Inventory the harness-spec claims that still mix harness apparatus with candidate PromiseGrid specimens, including the nine UT-159.a audit items and the ambiguous UT-159.d areas.
-- [ ] kugod.6 Finish the harness-spec §1.1 / §1.3 apparatus/specimen cleanup for `UT-158.c` and `UT-158.d`; `UT-156.c`'s stale turn-156 phrasing is already superseded by `DI-lajod`.
+- [x] kugod.6 Finish the harness-spec §1.1 / §1.3 apparatus/specimen cleanup for `UT-158.c` and `UT-158.d`; `UT-156.c`'s stale turn-156 phrasing is already superseded by `DI-lajod`. Closed for turn-158 scope by `DI-kinad`; broader turn-159 audit work remains under `kugod.5` and `kugod.8`.
 - [x] kugod.7 Create or identify the successor owner for grid-envelope work, candidate envelope inventory, and the `grid([pcid, payload])` working hypothesis from UT-157.a, UT-157.c, and UT-158.f. Closed by routing to `simulations/SIM-kurim-grid-envelope/TODO/TODO-tujad-grid-envelope-successor-owner.md` in `DI-mosor`.
 - [ ] kugod.8 Run the transport-spec companion audit after the Mupoz migration, distinguishing rooted wire-lab apparatus claims from simulation-local transport specimens for UT-159.b.
 - [ ] kugod.9 Update TODO-jivam and the TE-40 disposition matrix after kugod.5 through kugod.8 are resolved, transferred, or explicitly retired.

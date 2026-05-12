@@ -1,5 +1,6 @@
 # Question
 
-Does the `grid([pcid, payload])` hypothesis remain worth carrying as a live
-PromiseGrid lineage once it is compared against other envelope candidates?
-Source: `DI-limom`, `DI-rugig`.
+Which positional grid-envelope variant or variants, if any, survive comparison
+across encoding, unknown-pCID behavior, and signature placement?
+
+Source: `DI-limom`, `DI-rugig`, `DI-fanah`.
