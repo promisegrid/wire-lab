@@ -128,9 +128,9 @@ row below is closed by a DI, DR, or successor TODO.
 | UT-156.a | retired | TODO-rivuk / DI-runuh | The abandoned TE-famar structural-role question is superseded by promise-stack retirement. |
 | UT-156.b | resolved-retired | TODO-kugod / DI-runuh | TE-famar stays in the historical TE corpus with Cat-3 forward pointers instead of moving. |
 | UT-156.c | resolved | TODO-kugod / DI-lajod + DI-sujan | The stale "wire-envelope-agnostic" claim is superseded by the apparatus-level §1.1 / §1.3 rewrite in `harness-spec-draft.md`, with simulation references tightened so the harness does not privilege `SIM-piloh`; broader §1.1 / §1.3 carve-out work continues separately under `UT-158.c` and `UT-158.d`. |
-| UT-157.a | transferred-open | `simulations/SIM-kurim-grid-envelope/TODO/TODO-tujad-grid-envelope-successor-owner.md` | Candidate envelope inventory belongs with the grid-envelope successor owner, not with promise-stack. |
+| UT-157.a | resolved | `simulations/SIM-kurim-grid-envelope/TODO/TODO-tujad-grid-envelope-successor-owner.md` / DI-joroh | Candidate envelope inventory is captured in the grid-envelope successor owner, not promise-stack. |
 | UT-157.b | retired | TODO-rivuk / DI-runuh | The abandoned TE-famar status-reading DF is no longer live. |
-| UT-157.c | transferred-open | `simulations/SIM-kurim-grid-envelope/TODO/TODO-tujad-grid-envelope-successor-owner.md` | The `grid([pcid, payload])` working-hypothesis prose is now routed to a concrete grid-envelope successor TODO. |
+| UT-157.c | resolved | `simulations/SIM-kurim-grid-envelope/TODO/TODO-tujad-grid-envelope-successor-owner.md` / DI-joroh | The `grid([pcid, payload])` working-hypothesis prose is captured in the concrete grid-envelope successor TODO. |
 | UT-158.b | resolved | TE-havib DF-36.1 | The apparatus-vs-specimen scope is strict carve-out; no new TE-40 scope choice remains. |
 | UT-158.c | open | TODO-kugod | Harness-spec §1.1 now has an apparatus-level rewrite under `DI-lajod`, but the broader carve-out still remains incomplete. |
 | UT-158.d | open | TODO-kugod | Harness-spec §1.3 now has an apparatus-level rewrite under `DI-lajod`, but specimen-side migration and the broader classification sweep still remain incomplete. |
