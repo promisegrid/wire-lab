@@ -2,7 +2,7 @@
 
 This is the first concrete instance of the small-finite-closed-group
 transport-protocol defined in
-[`protocols/group-session.d/specs/group-session-draft.md`](../../../protocols/group-session.d/specs/group-session-draft.md).
+[`group-session-draft.md`](../../../../SIM-rakot-group-session/protocols/group-session.d/specs/group-session-draft.md).
 
 This directory moved from root `transports/wire-lab-devs-draft/` into this
 simulation's `world/transports/` tree per `DI-fakin`. The message files are
@@ -45,7 +45,7 @@ configured to fetch and propagate from.
 ## Layout (per spec §1: flat; per spec §2: filename = CID)
 
 ```
-simulations/SIM-piloh-turns-149-208-recovery/world/transports/wire-lab-devs-draft/
+simulations/SIM-ludut-wire-lab-devs/world/transports/wire-lab-devs-draft/
     README.md                      (this file; not a protocol message)
     <message-cid-1>.txt
     <message-cid-2>.txt
@@ -88,13 +88,13 @@ new messages are observed; the post phase is optional.
 ```bash
 git fetch --all
 # For each known author-id/main branch that is not your own:
-#   list *.txt files under simulations/SIM-piloh-turns-149-208-recovery/world/transports/wire-lab-devs-draft/
+#   list *.txt files under simulations/SIM-ludut-wire-lab-devs/world/transports/wire-lab-devs-draft/
 #   that are not on your own branch.
 # For each such file:
 #   verify CID = filename (tools/spec cid <file>)
 #   verify envelope structure per spec §4
 # Copy verified files into your working tree on your own branch.
-git add simulations/SIM-piloh-turns-149-208-recovery/world/transports/wire-lab-devs-draft/*.txt
+git add simulations/SIM-ludut-wire-lab-devs/world/transports/wire-lab-devs-draft/*.txt
 git commit -m "transport: merge <count> messages from <branches>"
 git push origin <your-author-id>/main
 ```
@@ -102,15 +102,15 @@ git push origin <your-author-id>/main
 **Post phase (optional):**
 
 ```bash
-# Author a new message file under simulations/SIM-piloh-turns-149-208-recovery/world/transports/wire-lab-devs-draft/
+# Author a new message file under simulations/SIM-ludut-wire-lab-devs/world/transports/wire-lab-devs-draft/
 # following spec §4 (envelope), §5 (body has explicit "I promise ..."),
 # §4.6 (Parents: set to message CIDs of direct ancestors), §6 (body-as
 # -receipt if acknowledging).
 # Compute its CID and rename the file:
-NEW_CID=$(tools/spec cid simulations/SIM-piloh-turns-149-208-recovery/world/transports/wire-lab-devs-draft/draft.txt)
-mv simulations/SIM-piloh-turns-149-208-recovery/world/transports/wire-lab-devs-draft/draft.txt \
-   simulations/SIM-piloh-turns-149-208-recovery/world/transports/wire-lab-devs-draft/${NEW_CID}.txt
-git add simulations/SIM-piloh-turns-149-208-recovery/world/transports/wire-lab-devs-draft/${NEW_CID}.txt
+NEW_CID=$(tools/spec cid simulations/SIM-ludut-wire-lab-devs/world/transports/wire-lab-devs-draft/draft.txt)
+mv simulations/SIM-ludut-wire-lab-devs/world/transports/wire-lab-devs-draft/draft.txt \
+   simulations/SIM-ludut-wire-lab-devs/world/transports/wire-lab-devs-draft/${NEW_CID}.txt
+git add simulations/SIM-ludut-wire-lab-devs/world/transports/wire-lab-devs-draft/${NEW_CID}.txt
 git commit -m "transport: post ${NEW_CID}"
 git push origin <your-author-id>/main
 ```

@@ -21,11 +21,11 @@ Provisional. Almost everything in the harness-spec is an experimental knob, not 
 
 ## How to contribute
 
-Current inter-agent and interpersonal communication evidence lives inside the
-first recovery simulation at
-`simulations/SIM-piloh-turns-149-208-recovery/world/transports/wire-lab-devs-draft/`.
-The old root `transports/` and `proposals/` paths were moved under that
-simulation per `DI-fakin`; use `DEV-GUIDE-RESOURCES.md` for the current
+Current inter-agent and interpersonal communication evidence lives in the
+`wire-lab-devs` lineage at
+`simulations/SIM-ludut-wire-lab-devs/world/transports/wire-lab-devs-draft/`.
+Earlier mixed-simulation and root-path records are preserved under rooted
+archive/provenance paths; use `DEV-GUIDE-RESOURCES.md` for the current
 guide-writer source map.
 
 ## License

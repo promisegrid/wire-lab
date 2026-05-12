@@ -7,7 +7,7 @@ so it can be replayed and evaluated as specimen data without preserving root
 | Field | Value |
 |---|---|
 | Original path | `transports/wire-lab-devs-draft/` |
-| New path | `simulations/SIM-piloh-turns-149-208-recovery/world/transports/wire-lab-devs-draft/` |
+| New path | `simulations/SIM-ludut-wire-lab-devs/world/transports/wire-lab-devs-draft/` |
 | Method | `git mv` |
 | Source commit | `780f56525a8d528d3d5caf58ab18f9a7f41da892` |
 | CID parameters | CIDv1, raw codec, sha2-256 multihash, base32 multibase |

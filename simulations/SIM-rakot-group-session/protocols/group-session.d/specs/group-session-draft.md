@@ -4,10 +4,11 @@
 
 > **Status: DRAFT.** Not frozen. The pCID for this spec is not yet minted. Cross-references to it in other repo files use `specs/group-transport-draft.md` (path) until freeze; after freeze they will use the pCID.
 
-> **Simulation note:** This draft moved from `protocols/group-session.d/` into
-> `simulations/SIM-piloh-turns-149-208-recovery/protocols/group-session.d/`
-> as a specimen per `DI-fakin`. The protocol language below remains draft
-> evidence under test, not final PromiseGrid API layout.
+> **Simulation note:** This draft now lives at
+> `simulations/SIM-rakot-group-session/protocols/group-session.d/` (moved in
+> `rusis.5`, `DI-firiv`). Earlier paths under `protocols/group-session.d/` and
+> `SIM-piloh` are preserved as historical provenance only. The protocol language
+> below remains draft evidence under test, not final PromiseGrid API layout.
 
 ## Purpose
 

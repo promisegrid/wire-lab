@@ -57,16 +57,17 @@ minted after that date carry only the proquint handle.
 
 | Handle | Mint date | Title | Prior alias |
 |---|---|---|---|
-| [TODO-bisur](../../../simulations/SIM-piloh-turns-149-208-recovery/protocols/group-session.d/TODO/TODO-bisur-group-transport-envelope.md) | 2026-05-01 | TODO 012 - Group-transport envelope via `grid <pcid>` | `TODO-12` / `TODO-20260501-045543` |
+| [TODO-bisur](../../../simulations/SIM-rakot-group-session/protocols/group-session.d/TODO/TODO-bisur-group-transport-envelope.md) | 2026-05-01 | TODO 012 - Group-transport envelope via `grid <pcid>` | `TODO-12` / `TODO-20260501-045543` |
+| [TODO-gapab](../../../simulations/SIM-rakot-group-session/protocols/group-session.d/TODO/TODO-gapab-group-session-freeze-and-cid-cascade-follow-on.md) | 2026-05-11 | Group-session freeze + CID-cascade follow-on owner split from rooted TODOs | — |
 
-## ppx-dr
-
-| Handle | Mint date | Title | Prior alias |
-|---|---|---|---|
-| [TODO-pozig](../../../simulations/SIM-piloh-turns-149-208-recovery/protocols/ppx-dr.d/TODO/TODO-pozig-proposals-as-transport-messages-BLOCKED.md) | 2026-05-01 | TODO 016 — proposals as transport messages — BLOCKED | `TODO-16` / `TODO-20260501-230131` |
-
-## udp-binding
+## ppx-dr (retired archive lineage)
 
 | Handle | Mint date | Title | Prior alias |
 |---|---|---|---|
-| [TODO-jodon](../../../simulations/SIM-piloh-turns-149-208-recovery/protocols/udp-binding.d/TODO/TODO-jodon-udp-binding-v0-reference-implementation.md) | 2026-05-01 | TODO 018 — UDP-binding v0 reference implementation | `TODO-18` / `TODO-20260501-224805` |
+| [TODO-pozig](../archive/retired/ppx-dr/protocols/ppx-dr.d/TODO/TODO-pozig-proposals-as-transport-messages-BLOCKED.md) | 2026-05-01 | TODO 016 — proposals as transport messages — BLOCKED (retired archive record) | `TODO-16` / `TODO-20260501-230131` |
+
+## udp-feed
+
+| Handle | Mint date | Title | Prior alias |
+|---|---|---|---|
+| [TODO-jodon](../../../simulations/SIM-ludaf-udp-feed/protocols/udp-feed.d/TODO/TODO-jodon-udp-binding-v0-reference-implementation.md) | 2026-05-01 | TODO 018 — UDP-feed v0 reference implementation (historical alias: UDP-binding) | `TODO-18` / `TODO-20260501-224805` |

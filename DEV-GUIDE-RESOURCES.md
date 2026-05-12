@@ -78,7 +78,7 @@ reasoning is:
   `DI-fakin`; `docs/thought-experiments/TE-vipir-protocols-as-simulated-repos-and-binding-layer.md`.
 - Concrete transport evidence moves into `world/` because it is active
   simulation state with verifiable message CIDs. Source: `DI-fakin`;
-  `simulations/SIM-piloh-turns-149-208-recovery/seed/wire-lab-devs-draft-migration.md`.
+  `simulations/SIM-ludut-wire-lab-devs/seed/wire-lab-devs-draft-migration.md`.
 - Legacy proposals move into `archive/` because the old proposal mechanism has
   been replaced by this resource map plus the external guide feedback process.
   Source: `DI-fakin`.
@@ -88,13 +88,13 @@ reasoning is:
 
 | Old path | New path | Guide-writer status | Reasoning |
 |---|---|---|---|
-| `protocols/group-session.d/` | `simulations/SIM-piloh-turns-149-208-recovery/protocols/group-session.d/` | Candidate protocol specimen; cite as provisional evidence only. | Group-session remains an important envelope/session draft, but root `protocols/` is now reserved for `wire-lab.d` apparatus until graduation. |
-| `protocols/udp-binding.d/` | `simulations/SIM-piloh-turns-149-208-recovery/protocols/udp-binding.d/` | Candidate binding specimen; cite as provisional evidence only. | UDP-binding is useful for porting/binding discussion, but no frozen binding pCID or stable kernel-dev contract exists yet. |
-| `protocols/ppx-dr.d/` | `simulations/SIM-piloh-turns-149-208-recovery/protocols/ppx-dr.d/` | Legacy proposal/review protocol specimen. | Proposal-as-message thinking remains evidence, but the old proposal queue is not the live guide-feedback mechanism. |
-| `transports/wire-lab-devs-draft/` | `simulations/SIM-piloh-turns-149-208-recovery/world/transports/wire-lab-devs-draft/` | Active simulation specimen with verified message CIDs. | The bytes are useful for replay and CID examples; the old root `transports/` path is not a PromiseGrid API. |
-| `transports/README.md` | `simulations/SIM-piloh-turns-149-208-recovery/archive/transports/README.md` | Historical wire-lab design note. | Preserve as provenance for why the transport surface existed, not as current guide layout. |
-| `proposals/approved/` | `simulations/SIM-piloh-turns-149-208-recovery/archive/proposals/approved/` | Historical review evidence. | Approved proposal records are useful history; current guide feedback belongs outside wire-lab in the guide process. |
-| `proposals/pending/` | `simulations/SIM-piloh-turns-149-208-recovery/archive/proposals/pending/` | Historical pending/contested review evidence. | Pending proposal records are not a live queue after the dev-guide resource/feedback process replaced proposals. |
+| `protocols/group-session.d/` | `simulations/SIM-rakot-group-session/protocols/group-session.d/` | Candidate protocol specimen; cite as provisional evidence only. | Group-session remains an important envelope/session draft, but root `protocols/` is now reserved for `wire-lab.d` apparatus until graduation. |
+| `protocols/udp-binding.d/` | `simulations/SIM-ludaf-udp-feed/protocols/udp-feed.d/` | Candidate binding specimen; cite as provisional evidence only. | The active lineage path is `udp-feed`; old `udp-binding` naming is historical provenance in retained draft filenames and prior records. |
+| `protocols/ppx-dr.d/` | `protocols/wire-lab.d/archive/retired/ppx-dr/protocols/ppx-dr.d/` | Retired proposal/review protocol archive. | Proposal-as-message thinking remains evidence, but the old proposal queue is retired and not a live guide-feedback mechanism. |
+| `transports/wire-lab-devs-draft/` | `simulations/SIM-ludut-wire-lab-devs/world/transports/wire-lab-devs-draft/` | Active simulation specimen with verified message CIDs. | The bytes are useful for replay and CID examples; the old root `transports/` path is not a PromiseGrid API. |
+| `transports/README.md` | `protocols/wire-lab.d/archive/migrations/SIM-piloh-turns-149-208-recovery/archive/transports/README.md` | Historical wire-lab design note. | Preserve as provenance for why the transport surface existed, not as current guide layout. |
+| `proposals/approved/` | `protocols/wire-lab.d/archive/migrations/SIM-piloh-turns-149-208-recovery/archive/proposals/approved/` | Historical review evidence. | Approved proposal records are useful history; current guide feedback belongs outside wire-lab in the guide process. |
+| `proposals/pending/` | `protocols/wire-lab.d/archive/migrations/SIM-piloh-turns-149-208-recovery/archive/proposals/pending/` | Historical pending/contested review evidence. | Pending proposal records are not a live queue after the dev-guide resource/feedback process replaced proposals. |
 | `protocols/wire-lab.d/` | unchanged | Harness apparatus. | Use for wire-lab process/provenance claims, not as a PromiseGrid app/kernel API. |
 
 ## Audience Readiness Matrix
@@ -161,9 +161,11 @@ Use this section for the guide's App Devs / How to write a grid app section.
   the A-side spec/design versus B-side implementation split.
 - `implementations/README.md` records the current local shape for reference
   implementations and conformance claims.
-- `simulations/SIM-piloh-turns-149-208-recovery/protocols/*/specs/*.md` are
-  current draft protocol specimens after Mupoz. App-facing guidance should cite
-  frozen pCIDs or guide-side stable prose, not the transient simulation path.
+- `simulations/SIM-rakot-group-session/protocols/group-session.d/specs/*.md`
+  and `simulations/SIM-ludaf-udp-feed/protocols/udp-feed.d/specs/*.md` are
+  current draft protocol specimens after the rusis split. App-facing guidance
+  should cite frozen pCIDs or guide-side stable prose, not transient simulation
+  paths.
 
 ### Writer notes
 
@@ -202,9 +204,9 @@ section.
   records the protocols-as-simulated-repos and binding-layer model.
 - `protocols/wire-lab.d/specs/harness-spec-draft.md` describes the harness
   apparatus used to study candidates.
-- `simulations/SIM-piloh-turns-149-208-recovery/world/transports/wire-lab-devs-draft/`
+- `simulations/SIM-ludut-wire-lab-devs/world/transports/wire-lab-devs-draft/`
   contains current transport-message specimen evidence with verified CIDs.
-- `simulations/SIM-piloh-turns-149-208-recovery/archive/transports/README.md`
+- `protocols/wire-lab.d/archive/migrations/SIM-piloh-turns-149-208-recovery/archive/transports/README.md`
   preserves the old root transport design surface as historical evidence.
 
 ### Writer notes
@@ -238,9 +240,9 @@ final normative references. Source: `DI-zalak`.
   their current repo path or simulation-local path.
 - **Kernel Devs:** likely first normative references are frozen binding,
   session, and message specs by pCID, plus implementation conformance records.
-  `simulations/SIM-piloh-turns-149-208-recovery/protocols/udp-binding.d/specs/udp-binding-draft.md`
+  `simulations/SIM-ludaf-udp-feed/protocols/udp-feed.d/specs/udp-binding-draft.md`
   and
-  `simulations/SIM-piloh-turns-149-208-recovery/protocols/group-session.d/specs/group-session-draft.md`
+  `simulations/SIM-rakot-group-session/protocols/group-session.d/specs/group-session-draft.md`
   are likely early ancestors, but they are not final normative citations until
   frozen.
 - **Non-normative provenance:** TEs, DRs, TODOs, simulation archives,

@@ -85,6 +85,91 @@ Constraints: Use `git mv` for the entire tracked `group-session.d` tree. Create 
 Affects: `protocols/wire-lab.d/TODO/TODO-rusis-simulation-split-and-specimen-relocation.md`; `simulations/SIM-rakot-group-session/protocols/group-session.d/`; `simulations/SIM-rakot-group-session/seed/protocol-migration.md`; `simulations/SIM-piloh-turns-149-208-recovery/protocols/group-session.d/`.
 Supersedes: DI-rugig (`rusis.5` execution details only)
 
+ID: DI-loluk
+Date: 2026-05-11 10:38:24
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Execute `rusis.6` by moving the complete UDP lineage tree from `SIM-piloh` into `SIM-ludaf-udp-feed/protocols/udp-feed.d/`, renaming the active lineage tree from `udp-binding.d` to `udp-feed.d` during the move, and adding one local migration note at `simulations/SIM-ludaf-udp-feed/seed/protocol-migration.md`.
+Intent: The `rusis.1` table already treats the UDP tree as a coherent lineage unit, and `DI-rugig` locked the active rename to `udp-feed`. `rusis.6` should perform the physical tree rename now while keeping the old `udp-binding` name alive only as historical provenance.
+Constraints: Use `git mv` for the whole tracked UDP tree. Create only the destination parent `protocols/` and `seed/` directories plus the new `seed/protocol-migration.md` file. Do not rewrite internal file titles or prose in this pass; preserve the old `udp-binding` name there until a later cleanup pass. Do not edit rooted mixed artifacts, `simulations/README.md`, or any non-UDP lineage content in this pass.
+Affects: `protocols/wire-lab.d/TODO/TODO-rusis-simulation-split-and-specimen-relocation.md`; `simulations/SIM-ludaf-udp-feed/protocols/udp-feed.d/`; `simulations/SIM-ludaf-udp-feed/seed/protocol-migration.md`; `simulations/SIM-piloh-turns-149-208-recovery/protocols/udp-binding.d/`.
+Supersedes: DI-rugig (`rusis.6` execution details only)
+
+ID: DI-ludaz
+Date: 2026-05-11 22:38:57
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Execute `rusis.7` by creating `simulations/SIM-labit-feed-outer/seed/extraction-sources.md` as the feed-outer extraction source note, while keeping `protocols/wire-lab.d/specs/transport-spec-draft.md` rooted and unchanged until the later extraction pass.
+Intent: The feed-outer lineage needs a concrete seed record before the rooted transport draft is split. This note makes the later extraction source explicit without prematurely copying, rewriting, or moving rooted apparatus material.
+Constraints: Create only the `seed/` directory and `seed/extraction-sources.md` under `SIM-labit-feed-outer`. Do not create a `protocols/feed-outer.d/` tree in this pass. Do not edit `transport-spec-draft.md`, rooted mixed TODOs, `simulations/README.md`, or other lineage content.
+Affects: `protocols/wire-lab.d/TODO/TODO-rusis-simulation-split-and-specimen-relocation.md`; `simulations/SIM-labit-feed-outer/seed/extraction-sources.md`.
+Supersedes: DI-rugig (`rusis.7` execution details only)
+
+ID: DI-nijon
+Date: 2026-05-11 23:07:39
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Execute `rusis.8` by creating `simulations/SIM-kurim-grid-envelope/seed/extraction-sources.md` as the grid-envelope extraction source note, while keeping protocol-tree creation and specimen prose extraction deferred for a later pass.
+Intent: Make the grid-envelope successor owner explicit for the transferred-open `TODO-kugod` rows (`UT-157.a`, `UT-157.c`, `UT-158.f`) without prematurely copying or rewriting rooted or cross-lineage protocol text.
+Constraints: Create only `seed/` and `seed/extraction-sources.md` under `SIM-kurim-grid-envelope` in this pass. Do not create `protocols/grid-envelope.d/` yet. Do not edit rooted harness docs, `TODO-kugod`, `group-session` draft text, or `simulations/README.md` in this pass.
+Affects: `protocols/wire-lab.d/TODO/TODO-rusis-simulation-split-and-specimen-relocation.md`; `simulations/SIM-kurim-grid-envelope/seed/extraction-sources.md`.
+Supersedes: DI-rugig (`rusis.8` execution details only)
+
+ID: DI-turud
+Date: 2026-05-11 23:20:11
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Execute `rusis.9` by archiving whole-file `SIM-piloh` historical artifacts into the rooted migration archive and retiring the active `ppx-dr` lineage tree into the rooted retired archive.
+Intent: Retire `SIM-piloh` umbrella-history and `ppx-dr` active-lineage residue without deleting evidence, while keeping mixed files that need section-level decomposition for later passes.
+Constraints: Move only whole-file archive targets in this pass: `QUESTION.md`, `archive/proposals/*`, and `archive/transports/*` from `SIM-piloh` into `protocols/wire-lab.d/archive/migrations/SIM-piloh-turns-149-208-recovery/`; move `protocols/ppx-dr.d/*` from `SIM-piloh` into `protocols/wire-lab.d/archive/retired/ppx-dr/`. Do not split `README.md`, `concerns.md`, `decisions.md`, `protocol-set.md`, `seed/protocol-tree-migrations.md`, or rooted mixed-owner TODO/spec artifacts in this pass.
+Affects: `protocols/wire-lab.d/TODO/TODO-rusis-simulation-split-and-specimen-relocation.md`; `protocols/wire-lab.d/archive/migrations/SIM-piloh-turns-149-208-recovery/`; `protocols/wire-lab.d/archive/retired/ppx-dr/`; `simulations/SIM-piloh-turns-149-208-recovery/`.
+Supersedes: DI-rugig (`rusis.9` execution details only)
+
+ID: DI-nubun
+Date: 2026-05-11 23:22:16
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Clarify `rusis.13` validation wording so it checks deprecated-name cleanup and neutrality constraints rather than implying any preferred simulation home.
+Intent: Keep the split model explicitly lineage-neutral while still enforcing the `udp-binding` -> `udp-feed` active-name migration outside historical quotations.
+Constraints: Update only `rusis.13` wording in this pass. Preserve the existing `rusis.13` goals about retiring active `SIM-piloh` and `ppx-dr` trees and running `git diff --check`.
+Affects: `protocols/wire-lab.d/TODO/TODO-rusis-simulation-split-and-specimen-relocation.md`.
+
+ID: DI-mosor
+Date: 2026-05-11 23:24:03
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Execute `rusis.10` by routing specimen-owned follow-on work from rooted `TODO-turog` and `TODO-duvuk` into concrete sim-local successor TODO artifacts, and by updating `TODO-kugod` open/transferred UT rows to reference concrete successor records instead of placeholders.
+Intent: Keep rooted TODOs as historical coordination memory while making active lineage-owned work explicit inside independent simulation trees, so later replay does not depend on ambiguous "until successor exists" wording.
+Constraints: Keep rooted `TODO-turog` and `TODO-duvuk` files as historical records; do not delete their thread history or DI logs. Create successor owner artifacts under `SIM-rakot-group-session`, `SIM-labit-feed-outer`, and `SIM-kurim-grid-envelope`. Update only ownership/status pointers in `TODO-kugod`; do not claim those UTs are resolved by this routing pass.
+Affects: `protocols/wire-lab.d/TODO/TODO-rusis-simulation-split-and-specimen-relocation.md`; `protocols/wire-lab.d/TODO/TODO-turog-te-41-group-session-freeze-procedure.md`; `protocols/wire-lab.d/TODO/TODO-duvuk-te-42-filename-cid-cascade-policy.md`; `protocols/wire-lab.d/TODO/TODO-kugod-te-40-apparatus-vs-specimen-completion.md`; `simulations/SIM-rakot-group-session/protocols/group-session.d/TODO/TODO.md`; `simulations/SIM-rakot-group-session/protocols/group-session.d/TODO/TODO-gapab-group-session-freeze-and-cid-cascade-follow-on.md`; `simulations/SIM-labit-feed-outer/TODO/TODO.md`; `simulations/SIM-labit-feed-outer/TODO/TODO-kakaz-feed-outer-freeze-and-cid-cascade-follow-on.md`; `simulations/SIM-kurim-grid-envelope/TODO/TODO.md`; `simulations/SIM-kurim-grid-envelope/TODO/TODO-tujad-grid-envelope-successor-owner.md`.
+
+ID: DI-huzor
+Date: 2026-05-12 08:29:13
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Execute `rusis.11` by extracting specimen-side outer-feed sections from rooted `transport-spec-draft.md` into `SIM-labit-feed-outer` as `protocols/feed-outer.d/specs/feed-outer-draft.md`, while preserving rooted apparatus/governance residue in place.
+Intent: Complete the locked apparatus-vs-specimen split for the rooted transport draft without deleting provenance, and make the feed-outer lineage carry its own candidate-specimen draft.
+Constraints: Move the specimen-side units (`## Purpose`, `## The four locked principles`, `## What this spec does NOT specify`) into the feed-outer sim-local draft. Keep rooted units (`## Sources`, `## The per-axis meta-rule`, `## Open questions`, `## Freeze gate`) in rooted `transport-spec-draft.md` with explicit supersession notes. Do not treat the rooted draft as feed-outer's active specimen home after extraction.
+Affects: `protocols/wire-lab.d/TODO/TODO-rusis-simulation-split-and-specimen-relocation.md`; `protocols/wire-lab.d/specs/transport-spec-draft.md`; `simulations/SIM-labit-feed-outer/protocols/feed-outer.d/specs/feed-outer-draft.md`; `simulations/SIM-labit-feed-outer/seed/extraction-sources.md`.
+
+ID: DI-jugub
+Date: 2026-05-12 08:29:13
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Execute `rusis.12` as a deep split of the remaining `SIM-piloh` shell files: move those mixed shell artifacts into rooted migration archive storage, route live ownership to concrete successor artifacts, and update rooted current-pointer docs/indexes/resources to content-named lineage homes.
+Intent: Retire the mixed umbrella simulation as an active specimen surface while preserving all historical evidence and avoiding any implied preferred simulation home.
+Constraints: No deletion of historical shell content; preserve by `git mv` under rooted archive migration paths plus explicit supersession mapping. Update active pointers in `simulations/README.md`, rooted TODO index links, guide-resource mappings, and harness current-pointer prose; leave historical quotations and archived evidence wording intact.
+Affects: `protocols/wire-lab.d/TODO/TODO-rusis-simulation-split-and-specimen-relocation.md`; `protocols/wire-lab.d/archive/migrations/SIM-piloh-turns-149-208-recovery/`; `simulations/README.md`; `protocols/wire-lab.d/TODO/TODO.md`; `DEV-GUIDE-RESOURCES.md`; `protocols/wire-lab.d/specs/harness-spec-draft.md`; successor lineage seed/docs touched by supersession routing.
+
+ID: DI-patoz
+Date: 2026-05-12 08:29:13
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Execute `rusis.13` validation as a hard gate over active docs and trees after `rusis.11`/`rusis.12`: no active `SIM-piloh`/`ppx-dr` tree, no deprecated `udp-binding` in active contexts except historical/archive usage, no privileged simulation-home wording, and `git diff --check` pass.
+Intent: Close the split pass with explicit neutrality and naming-hygiene checks so replay cleanup does not regress into process-named or privileged-home phrasing.
+Constraints: Historical TE narrative, DI logs, and archive/provenance files may retain legacy names and paths as historical evidence. Active pointers and owner records must use current lineage homes.
+Affects: `protocols/wire-lab.d/TODO/TODO-rusis-simulation-split-and-specimen-relocation.md`; all active current-pointer docs swept in `rusis.12`/`rusis.13`.
+
 ## Context
 
 The current simulation layout still reflects the recovery process that
@@ -194,31 +279,32 @@ with `git mv`, because their filenames depend on their byte content.
 - [x] rusis.5 Move `group-session.d` and `TODO-bisur` into the
   `group-session` lineage, preserving them as local lineage state rather
   than treating them as a shared protocol home.
-- [ ] rusis.6 Move `udp-binding.d` into the UDP feed lineage, rename it
+- [x] rusis.6 Move `udp-binding.d` into the UDP feed lineage, rename it
   to `udp-feed.d`, keep `TODO-jodon` with the renamed local state, and
   record the old-name provenance in lineage seed notes.
-- [ ] rusis.7 Create the `feed-outer` lineage root docs and
+- [x] rusis.7 Create the `feed-outer` lineage root docs and
   `seed/extraction-sources.md`, but defer extraction from rooted
   `transport-spec-draft.md` until the later split pass.
-- [ ] rusis.8 Create the `grid-envelope` lineage root docs and
+- [x] rusis.8 Create the `grid-envelope` lineage root docs and
   `seed/extraction-sources.md`, but defer creation of a protocol tree
   until the later extraction pass.
-- [ ] rusis.9 Archive the dissolved umbrella-sim material and retire the
+- [x] rusis.9 Archive the dissolved umbrella-sim material and retire the
   active `ppx-dr` tree under `protocols/wire-lab.d/archive/`, preserving
   the mixed umbrella files whole where the disposition table calls for
   historical archive rather than per-lineage decomposition.
-- [ ] rusis.10 Split specimen-owned follow-on work out of rooted
+- [x] rusis.10 Split specimen-owned follow-on work out of rooted
   `TODO-turog` and `TODO-duvuk`, and update `TODO-kugod` so open UT rows
   point to concrete lineage/disposition records instead of placeholders.
-- [ ] rusis.11 Extract the specimen-side `feed-outer` material out of
+- [x] rusis.11 Extract the specimen-side `feed-outer` material out of
   rooted `transport-spec-draft.md`, while preserving or superseding the
   rooted apparatus residue in place.
-- [ ] rusis.12 Update rooted current-pointer docs, indexes, and guide
+- [x] rusis.12 Update rooted current-pointer docs, indexes, and guide
   resources after `SIM-piloh` is retired and the active sim set is no
   longer transitional, leaving historical quotations untouched.
-- [ ] rusis.13 Validate that no active `SIM-piloh` or `ppx-dr` tree
-  remains, that active docs use `udp-feed`, and that `git diff --check`
-  passes.
+- [x] rusis.13 Validate that no active `SIM-piloh` or `ppx-dr` tree
+  remains, that active docs do not use deprecated `udp-binding` except
+  historical quotations, that active docs do not imply a privileged
+  simulation home, and that `git diff --check` passes.
 
 ## `rusis.2` first concrete split-pass blueprint
 

@@ -1,16 +1,18 @@
-# UDP-binding v0 (draft)
+# UDP-feed v0 (draft)
 
 ## Status
 
 DRAFT. One-page sketch authored alongside TE-vipir
 (`docs/thought-experiments/TE-vipir-protocols-as-simulated-repos-and-binding-layer.md`).
-This is the first concrete L4-binding spec under the layer
+This is the first concrete L4 feed/binding spec under the layer
 decomposition locked in TE-vipir. Subject to revision before freeze.
 
-Simulation note: this draft moved from `protocols/udp-binding.d/` into
-`simulations/SIM-piloh-turns-149-208-recovery/protocols/udp-binding.d/`
-as a specimen per `DI-fakin`. The path examples below remain draft evidence
-under test, not final PromiseGrid API layout.
+Simulation note: this draft now lives at
+`simulations/SIM-ludaf-udp-feed/protocols/udp-feed.d/` (moved in
+`rusis.6`, `DI-loluk`). Earlier `protocols/udp-binding.d/` and
+`SIM-piloh` paths remain historical provenance only. The path examples
+below remain draft evidence under test, not final PromiseGrid API
+layout.
 
 ## Abstract
 
@@ -24,11 +26,11 @@ PromiseGrid uses UDP and what a conformant implementation promises.
 
 ## Layer position
 
-UDP-binding v0 occupies level 2 in the five-level stack defined by
+UDP-feed v0 occupies level 2 in the five-level stack defined by
 TE-vipir:
 
 ```
-transports/udp/udp-binding-bafkrei...U1/<session-pCID>/<message-pCID>/<message-id>.txt
+transports/udp/udp-feed-bafkrei...U1/<session-pCID>/<message-pCID>/<message-id>.txt
                 ^^^^^^^^^^^^^^^^^^^^^^^^
                 this spec
 ```
@@ -146,7 +148,7 @@ To be added in TODO-jodon. At minimum:
 ## Reference implementation
 
 To be authored in TODO-jodon under
-`tools/udp-binding/` with at minimum:
+`tools/udp-feed/` with at minimum:
 
 - `Send(msg []byte, addr Addr) error`
 - a recv loop that reads from a configured UDP socket and invokes a
@@ -160,10 +162,10 @@ Per C-4 (forking is normal, TE-dajot), any author may publish a UDP
 binding with different choices (e.g., different default port,
 different size limit, added framing). Such a fork takes a different
 pCID and lives as a sibling under `protocols/`. Two parties wishing
-to interoperate must agree on the same UDP-binding pCID; they cannot
+to interoperate must agree on the same UDP-feed pCID; they cannot
 silently mix bindings.
 
-This binding may evolve to v1 if a load-bearing change is required
+This feed may evolve to v1 if a load-bearing change is required
 (e.g., explicit fragmentation support, NAT-traversal hooks).
 Migration from v0 to v1 follows the rules in TE-dajot OQ-100.2.
 

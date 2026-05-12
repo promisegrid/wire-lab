@@ -11,6 +11,9 @@ Before the TE-39 proquint migration, this file was known as:
 
 Open. Depends on TE-41 (group-session freeze) to establish the
 freeze-and-rename mechanic. No twig yet.
+Per `DI-mosor` (`rusis.10`), active specimen-owned follow-on now routes
+to sim-local successor TODOs while this rooted file remains historical
+coordination memory.
 
 ## Threads absorbed from OPEN-THREADS.md
 
@@ -30,6 +33,16 @@ Anchor: transport-spec-draft.md § 4.3, § 4.7; group-session-draft.md
 § 9.
 Disposition-file pointer: `dropped-thread-disposition-20260506.md`
 § TE-42 cluster (7 UTs).
+
+## Rusis.10 successor owner routing
+
+- Group-session envelope-side follow-on now lives at
+  `simulations/SIM-rakot-group-session/protocols/group-session.d/TODO/TODO-gapab-group-session-freeze-and-cid-cascade-follow-on.md`.
+- Feed-outer transport-side follow-on now lives at
+  `simulations/SIM-labit-feed-outer/TODO/TODO-kakaz-feed-outer-freeze-and-cid-cascade-follow-on.md`.
+- This rooted file keeps the original thread narrative and provenance
+  as a historical record; active specimen-side ownership is transferred
+  to those sim-local artifacts.
 
 ## Question log
 

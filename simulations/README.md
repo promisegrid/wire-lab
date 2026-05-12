@@ -16,5 +16,9 @@ prose, or a future PromiseGrid spec corpus. Source: `DI-pakid`; `DI-fakin`.
 
 | Simulation | Purpose | Status |
 |---|---|---|
-| `SIM-piloh-turns-149-208-recovery/` | Recovery/dogfood simulation for the turns 149-208 context-loss recovery slice, candidate protocol specimens, legacy proposal records, and wire-lab-devs transport evidence. | Active specimen boundary |
+| `SIM-ludut-wire-lab-devs/` | Concrete wire-lab-devs world evidence and transport specimen state for replay and migration provenance. | Active concrete-world lineage |
+| `SIM-rakot-group-session/` | Independent group-session lineage carrying session-envelope protocol drafts and TODO ownership. | Active protocol lineage |
+| `SIM-ludaf-udp-feed/` | Independent UDP feed lineage (renamed from legacy `udp-binding` active-tree naming). | Active protocol lineage |
+| `SIM-labit-feed-outer/` | Independent thin outer-feed lineage, including extracted feed-outer draft material. | Active protocol lineage |
+| `SIM-kurim-grid-envelope/` | Independent `grid([pcid, payload])` lineage and successor-owner queue. | Active protocol lineage |
 | `SIM-hugoj-cas-usenetlike-gitlike/` | Broad design exploration of a CAS + Usenet-like + git-like PromiseGrid lineage, with `group-session` treated as one current specimen rather than the whole subject. Source: `DI-pijun`. | Active design exploration |

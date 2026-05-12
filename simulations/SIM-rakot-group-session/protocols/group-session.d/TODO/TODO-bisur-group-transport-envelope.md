@@ -15,10 +15,11 @@ Originally tracked as `TODO/012-grid-pcid-channel-carrier.md` under the wire-lab
 
 ## Simulation note
 
-This TODO moved with the `group-session` protocol specimen into
-`simulations/SIM-piloh-turns-149-208-recovery/protocols/group-session.d/`
-per `DI-fakin`. Historical path references below remain evidence of the
-pre-Mupoz layout unless a line explicitly names the simulation-local path.
+This TODO now lives with the `group-session` protocol specimen at
+`simulations/SIM-rakot-group-session/protocols/group-session.d/` per
+`DI-firiv`. Historical path references below (including earlier
+`SIM-piloh` locations) remain evidence of the pre-split layout unless a
+line explicitly names the simulation-local path.
 
 ## Subtasks
 

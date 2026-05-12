@@ -13,6 +13,9 @@ Open. Depends on TE-40 (apparatus-vs-specimen completion) landing and
 the TODO-pipus/TE-43 CAS/feed migration design. TE-nijab's
 transport-layering / freeze-boundary DFs are locked, but DF-nijab.3
 parks freeze-doc cleanup instead of executing it now.
+Per `DI-mosor` (`rusis.10`), active specimen-owned follow-on now routes
+to sim-local successor TODOs while this rooted file remains historical
+coordination memory.
 
 ## Threads absorbed from OPEN-THREADS.md
 
@@ -47,6 +50,16 @@ Anchor: group-session-draft.md § Freeze gate; transport-spec-draft.md
 § Freeze gate; TODO-bisur subtask 012.8.
 Disposition-file pointer: `dropped-thread-disposition-20260506.md`
 § TE-41 cluster (15 UTs).
+
+## Rusis.10 successor owner routing
+
+- Group-session-owned follow-on for this thread now lives at
+  `simulations/SIM-rakot-group-session/protocols/group-session.d/TODO/TODO-gapab-group-session-freeze-and-cid-cascade-follow-on.md`.
+- Feed-outer-owned follow-on for this thread now lives at
+  `simulations/SIM-labit-feed-outer/TODO/TODO-kakaz-feed-outer-freeze-and-cid-cascade-follow-on.md`.
+- This rooted file keeps the original thread narrative, question log,
+  and DI history for provenance; it no longer serves as the active
+  owner record for specimen-side execution slices.
 
 ## Question log
 

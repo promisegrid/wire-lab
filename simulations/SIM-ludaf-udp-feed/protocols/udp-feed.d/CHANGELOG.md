@@ -1,6 +1,6 @@
-# CHANGELOG: udp-binding
+# CHANGELOG: udp-feed
 
-A-side CHANGELOG (per TE-liviv) for the `udp-binding` protocol's spec doc.
+A-side CHANGELOG (per TE-liviv) for the `udp-feed` protocol's spec doc.
 
 This file records **freeze events** authored by the spec maintainers.
 Each entry names the doc-CID published at that moment. The format:

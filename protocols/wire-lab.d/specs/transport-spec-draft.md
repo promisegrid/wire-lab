@@ -6,74 +6,27 @@
 
 ## Purpose
 
-This spec defines the **outer convention** for the wire-lab's `transports/` directory: how transport instances are named on disk, the rule that messages do not declare their transport via a header, and the requirement that each transport-protocol's pCID names a separate spec defining the directory's interior.
+This rooted harness draft now tracks the **apparatus/governance residue** that
+remains after `rusis.11` extracted the specimen-side outer feed convention into
+`simulations/SIM-labit-feed-outer/protocols/feed-outer.d/specs/feed-outer-draft.md`.
 
-This spec is intentionally **thin.** It does not define:
-- header sets,
-- parent-link semantics,
-- receipt formats,
-- message-kind vocabulary,
-- subdirectory layout inside a transport,
-- canonical-bytes rules for messages.
+The extracted specimen-side sections are:
 
-All of those are properties of individual transport-protocols, defined in their own spec docs (the first being `protocols/group-session.d/specs/group-session-draft.md`).
+- `## Purpose`
+- `## The four locked principles (TE-zalut)`
+- `## What this spec does NOT specify`
+
+This rooted file retains the source/governance context and freeze/open-question
+memory that still belongs to harness-side ownership. Source: `DI-huzor`.
 
 ## Sources
 
 This spec is locked by the conclusions of:
 
 - [TE-hogus](../docs/thought-experiments/TE-hogus-group-transport-envelope.md): `grid <pcid>` as the group-transport envelope; canonical-bytes rules; explicit-promise body requirement. (Source for the group-transport-protocol's contract; not a constraint on this outer spec.)
-- [TE-zalut](../docs/thought-experiments/TE-zalut-channel-transport-types-and-threaded-replies.md): transport-protocol types, pCID-keyed transport paths, and DAG message graphs. Establishes the four principles below.
+- [TE-zalut](../docs/thought-experiments/TE-zalut-channel-transport-types-and-threaded-replies.md): transport-protocol types, pCID-keyed transport paths, and DAG message graphs. Establishes the extracted thin-outer principles now tracked in `SIM-labit-feed-outer`.
 - [TE-junil](../docs/thought-experiments/TE-junil-transports-rename-and-axes-of-differentiation.md): transports rename and axes of transport-protocol differentiation. Establishes the per-axis meta-rule for distinguishing transport-protocols.
 - [DR-009](../DR/DR-009-20260430-204108-group-transport-envelope.md): the active decision request governing the group-transport envelope and its graduation.
-
-## The four locked principles (TE-zalut)
-
-### Principle 1: a message does not declare its transport
-
-A message envelope contains no `Transport:` header, no `Transport-Type:` header, and no per-message reference to which transport it belongs to. The transport carrying a message is identified by the transport itself: in the repo-local case, by the directory the message file lives in.
-
-Asking a message to declare its transport is layer inversion. The transport is the carrier; the message is the cargo; the cargo does not name the carrier.
-
-If a message needs to *reference* a different transport (e.g., a receipt acknowledging a message that arrived on another transport), the referencing protocol's spec defines how to do that. This outer spec is silent.
-
-### Principle 2: transport directories are keyed `transports/<pcid>--<slug>/`
-
-The directory name is structured:
-
-```
-transports/<pcid>--<slug>/
-```
-
-where:
-
-- **`<pcid>`** is the canonical pCID of the transport-protocol that transport speaks. This is the load-bearing identifier: it tells any reader which protocol's contract governs the directory's interior.
-- **`<slug>`** is a human-readable suffix that tools ignore (or use only for display). It exists so humans can navigate `transports/` without parsing pCIDs and so commit-log entries are legible.
-- **`--`** (double hyphen) separates the two. The double hyphen is unlikely to appear inside a CIDv1 base32 string.
-
-The pCID is canonical; the slug is a convenience. Two directories with the same pCID and different slugs are **two different transport instances** of the same protocol. Two directories with different pCIDs are different transport-protocols and may have entirely different interior structure.
-
-### Principle 3: each transport-protocol-pCID names a spec defining its directory's interior
-
-The pCID *is* the protocol's identity. The protocol gets to define everything inside `transports/<its-pcid>--<slug>/`:
-- subdirectory layout (flat, per-direction, per-participant, sharded by date, etc.),
-- message file naming conventions,
-- header set,
-- parent-link semantics (whether messages cite parents at all, what header names them, how multiple parents serialize, optionality),
-- receipt format,
-- message-kind vocabulary,
-- canonical-bytes rules,
-- persistence rules (append-only, bounded retention, compactable, ephemeral),
-- visibility rules (all-see-all, hub-mediated, ring-propagated, etc.),
-- membership rules (closed, open, invite-only, capability-token, etc.).
-
-The wire-lab transport-spec does not constrain any of these. They live in the transport-protocol's own spec doc.
-
-### Principle 4: code-as-handler
-
-The code that reads a transport directory's structure *is* the handler for that pCID. Each transport-protocol comes with its own reader/writer code; the pCID identifies the protocol; the protocol identifies (by convention or naming) the code that speaks it. There is no machine-readable companion file (no `transport.yaml` schema). The frozen markdown spec is the human-readable contract that the code must implement.
-
-Tools that want to display N transport-instances of M different transport-protocols need M handlers. That is the cost of polymorphism, not a flaw of this design.
 
 ## The per-axis meta-rule (TE-junil)
 
@@ -91,16 +44,6 @@ When deciding whether a new transport-protocol warrants a distinct pCID (and the
 | H. Reliability / receipts (none, per-message, frontier, cryptographic) | Parameter | Different receipt schemes within one transport-protocol. |
 
 This rule is not exhaustive; it is the working policy that survives until experience teaches a better one.
-
-## What this spec does NOT specify
-
-- The first line of a message (`grid <pcid>` is one carrier choice; not all transport-protocols must use it).
-- Header names (`Message-ID`, `Date`, `From`, `To`, `Parents`, `IHave`, etc. — all defined per-protocol).
-- Canonical-bytes encoding (UTF-8/LF discipline is one choice; not all protocols must use it).
-- File-naming inside a transport directory.
-- Subdirectory structure inside a transport directory.
-
-If a future reader asks "where do I find out how to write a message for this transport?" the answer is always: read the spec named by that transport's pCID. The wire-lab transport-spec is silent on the message format.
 
 ## Open questions
 
