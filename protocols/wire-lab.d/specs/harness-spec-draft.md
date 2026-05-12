@@ -2,11 +2,11 @@
 
 *This is the canonical Wire Lab harness specification. Thought experiments are kept as separate content-addressable files in [`docs/thought-experiments/`](docs/thought-experiments/). The repo-level [`README.md`](README.md) gives a one-page orientation.*
 
-A simulation harness for discovering the wire formats, ingress models, and trust mechanics that let PromiseGrid survive and evolve as an open, decentralized community of free agents and humans across multiple human generations. v2 supersedes v1 in five places: the message is now a stack of promises rather than a fixed envelope; trust is a first-class durable relationship rather than a per-message check; capability tokens may operate as personal currencies in a continuous double auction; "kernel" is just a role that any agent can play; and not every agent simulates a deterministic program — some simulate humans and other non-deterministic actors.
+A simulation harness for discovering the wire formats, ingress models, and peer-local promise-accounting mechanics that let PromiseGrid survive and evolve as an open, decentralized community of free agents and humans across multiple human generations. v2 supersedes v1 in five places: message shape is a specimen under test rather than a fixed envelope; promise accounting is a first-class durable relationship practice each peer keeps for itself rather than a per-message central check; capability tokens may operate as personal currencies in a continuous double auction; "kernel" is just a role that any agent can play; and not every agent simulates a deterministic program — some simulate humans and other non-deterministic actors.
 
 The harness exists to let us **discover** the right design, not to validate a predetermined one. Every choice in this document is an experimental knob the simulator can change between runs.
 
-> **Read this document as provisional throughout.** Concrete shapes appear inline — struct definitions, schemas, directory layouts, taxonomies, numeric thresholds. They are *examples of one workable starting point*, not commitments. The only structural commitment we are confident in this early is the one in §10a.8: the canonical harness-spec pointer follows the user's signing key. Everything else — the `Promise` field set, the `TrustLedger` shape, the K1–K5 ingress taxonomy, the seven C-scenarios, the 30%-at-month-12 pass line, the grid-poc directory table, the proposal shape, the convergence formula — is presented in concrete form to make the design discussable, but is expected to evolve. §12 calls out which of these are most likely over-locked and asks which to revisit next.
+> **Read this document as provisional throughout.** Concrete shapes appear inline — schemas, directory layouts, taxonomies, numeric thresholds. They are *examples of one workable starting point*, not commitments. The only structural commitment we are confident in this early is the one in §10a.8: the canonical harness-spec pointer follows the user's signing key. Everything else — candidate message shapes, candidate promise-accounting record shapes, the K1–K5 ingress taxonomy, the seven C-scenarios, the 30%-at-month-12 pass line, the grid-poc directory table, the proposal/feedback flow, the convergence formula — is presented in concrete form to make the design discussable, but is expected to evolve. §12 calls out which of these are most likely over-locked and asks which to revisit next.
 
 ---
 
@@ -18,9 +18,9 @@ The constraint set:
 
 - **C-1 — No central registry.** No global registry exists at the 100-year horizon for any naming or coordination function. Any centralized registry that exists today (DNS, ICANN, IANA, GitHub, npm, the PromiseGrid project itself, this wire-lab repo) is presumed gone or untrustworthy at some point inside the horizon. Naming, discovery, and trust must work without one.
 - **C-2 — Multi-generational durability.** The design must support handoff across multiple human generations. Signing keys rotate, retire, get inherited, get lost, get compromised. Communities of interest fragment, merge, fork, fall silent for decades, return. Artifacts must be self-explanatory to a contributor who arrives 30 years later with no living mentor.
-- **C-3 — Adversarial-by-default.** The design must assume adversaries are present at every layer at all times. No mode where "we trust each other so this part is fine" is acceptable, even temporarily. Every layer must be auditable in isolation, every promise must carry its own signature chain, every receipt must be verifiable against locally-held trust ledgers.
-- **C-4 — Protocol forking is normal.** Over a century, protocols will be forked into bilingual variants, contested, declared deprecated by sub-communities, rediscovered, adapted to new substrates. Forking is a normal life-cycle event, not an exceptional one. A pCID identifies a *spec*, not the *use* of a spec; multiple competing pCIDs for analogous protocols is the steady state.
-- **C-5 — Trust accrues per-burden.** Trust is not a global scalar attached to an identity. It is a per-promise-type, per-relationship, per-context vector that each agent maintains in its own local trust ledger. Any design that produces or relies on a global trust score fails this constraint.
+- **C-3 — Adversarial-by-default.** The design must assume adversaries are present at every layer at all times. No mode where "we trust each other so this part is fine" is acceptable, even temporarily. Every layer must be auditable in isolation, every promise must carry its own signature chain, every receipt must be verifiable against locally-held promise accounting records.
+- **C-4 — Protocol forking is normal.** Over a century, protocols will be forked into bilingual variants, assessed, declared deprecated by sub-communities, rediscovered, adapted to new substrates. Forking is a normal life-cycle event, not an exceptional one. A pCID identifies a *spec*, not the *use* of a spec; multiple competing pCIDs for analogous protocols is the steady state.
+- **C-5 — Trust accrues per-promise-type.** Trust is not a global scalar attached to an identity. It is a per-promise-type, per-relationship, per-context vector that each peer derives from its own local promise accounting records. Any design that produces or relies on a global trust score fails this constraint.
 - **C-6 — Signing key is the only structural lock.** The only durable anchor in the system is the signing key of an individual agent. Specs follow signing keys. Trust ledgers follow signing keys. Histories follow signing keys. Every other "fixed point" — repository URLs, registry names, organizational identities, project websites — is convention, and conventions evolve, decay, or get attacked over the horizon.
 
 The constraints are filters, not goals. A design that satisfies all of them may still be wrong; a design that violates any of them is wrong. Subsequent TEs that pressure-test alternatives reference these constraints by code (C-1 through C-6) so the wire-lab has a shared shorthand and each TE does not re-derive the constraint set.
@@ -78,7 +78,7 @@ attractive. They are historical rationale, not current harness-level wire
 guidance, and the broader specimen-bearing argument sweep remains tracked under
 TE-40 residual work. Source: `DI-lajod`.
 
-- **Transport-as-promiser becomes legitimate.** A TCP connection authenticated at startup makes a continuing implicit promise about the source of every byte. We don't need to re-sign every message; we can track that the transport is *making* a multi-message promise, and the trust ledger updates if the transport keeps or breaks it.
+- **Transport-as-promiser becomes legitimate.** A TCP connection authenticated at startup makes a continuing implicit promise about the source of every byte. We don't need to re-sign every message; a peer can track that the transport is *making* a multi-message promise, and that peer's promise accounting records can reflect whether the transport keeps or breaks it.
 - **Routers and kernels can append their own promises** without modifying the inner content — exactly the chain-of-custody property we want for a centuries-long system where intermediaries come and go.
 - **The signature debate goes away.** Whether the signature covers `[pCID, payload]` or just `payload` becomes a choice of *which promise frame holds the signature*. Different protocols (different pCIDs) can choose differently and the wire format doesn't care.
 - **Capability tokens are just promises too.** A token is a promise whose assertion is of the form "I will perform X if you redeem this." It lives in the same stack as everything else.
@@ -110,29 +110,22 @@ relevant specimen docs rather than in this apparatus description. Source:
 
 ---
 
-## 2. Trust as Durable Relationship: The Keep/Break Ledger
+## 2. Promise Accounting as Durable Relationship
 
-Steve called this out as key: peers know each other and build trust over time in durable relationships. The harness must make this a first-class subject of experimentation.
+Steve called this out as key: peers know each other and build trust over time in durable relationships. Alice, Bob, Carol, and every other peer keep their own promise accounting records for the relationships they participate in. The harness must make those peer-local accounting strategies a first-class subject of experimentation without turning them into a central or harness-owned ledger. Source: `DI-mugar`.
 
-### 2.1 Per-agent trust ledger
+### 2.1 Peer-local promise accounting records
 
-Every agent maintains, for every other promiser it has ever interacted with (peers, signers, transports, kernels, named protocols), a `TrustLedger` entry:
+Every peer maintains its own promise accounting records for other promisers it has interacted with: peers, signers, transports, kernels, named protocols, and any other actor that makes assessable promises. The harness cares about the minimum information a candidate accounting strategy must preserve; it does not prescribe one struct or shared database. Source: `DI-mugar`.
 
-```
-TrustLedger[promiserID] := {
-    first_seen_ns:        int64
-    interactions:         counter
-    kept:                 counter
-    broken:               counter
-    evidence_chain:       []EvidenceRef    // hashes of observed keep/break events
-    open_promises:        []OpenPromise    // promises in flight, not yet decided
-    score:                float            // current local trust scalar
-    score_components:     map[assertion_type]float // separable by what kind of promise
-    reputation_imports:   []ReputationImport      // 3rd-party attestations (down-weighted)
-    relationship_age_ns:  int64
-    last_drift_ns:        int64
-}
-```
+A candidate promise accounting strategy must let each peer record enough local evidence to:
+
+- distinguish kept, broken, open, expired, and unassessed promises;
+- link accounting entries to evidence the peer observed or imported;
+- keep relationship history scoped to the peer doing the accounting;
+- separate scores or assessments by promise type, context, and relationship;
+- import third-party reputation evidence only as down-weighted evidence, never
+  as a global truth source.
 
 The harness lets us swap the **scoring function** between runs without changing agent code. Three families to compare:
 
@@ -142,25 +135,25 @@ The harness lets us swap the **scoring function** between runs without changing 
 | **Worldline-weighted** (current sim4 sketch) | `trust *= weight × (actual − predicted)` along a chain | Captures hypergraph branch quality; goes negative; hard to interpret as probability |
 | **EigenTrust-like** (P2P literature) | global fixed-point over local ratings | Strong against simple sybils; centralizing pull; fragile against collusion |
 
-A run produces a transcript that includes every trust-ledger update, so we can replay a different scoring function on the same byte-level history and compare.
+A run produces a transcript that includes every peer-local promise accounting update, so we can replay a different scoring function on the same byte-level history and compare.
 
-### 2.2 The "broken promise" event is itself a promise
+### 2.2 Broken-promise evidence travels as candidate messages
 
-When agent B observes that A failed to keep promise X (e.g. issued a token, never responded to redemption), B emits a *witnessed-break* promise: "I, B, observed A break promise X at time T, evidence is the redemption-message-CID I sent and the lack of response by deadline D." This break-witness travels the network as ordinary messages.
+When Bob observes that Alice failed to keep promise X (e.g. issued a token, never responded to redemption), Bob can emit a break-witness message: "I, Bob, observed Alice break promise X at time T, evidence is the redemption-message-CID I sent and the lack of response by deadline D." The candidate message envelope decides how that evidence travels; the harness studies whether receivers can account for it.
 
-Important: *the receiver of a break-witness must apply its own trust ledger to B before believing B*. This is how slander attacks and Sybil-by-witnessing collapse: a low-trust peer's witnessing carries low weight. This is also what gives the system its multi-generational durability — old break-witnesses signed by long-dead agents still carry weight if their signing keys remain in the chain of custody, but only as much as their reputation at the time of signing earned.
+Important: *the receiver of a break-witness applies its own promise accounting records to Bob before believing Bob*. This is how slander attacks and Sybil-by-witnessing collapse: a low-trust peer's witnessing carries low weight in the receiver's local accounting. This is also what gives the system its multi-generational durability — old break-witnesses signed by long-dead agents can still carry weight if their signing keys remain in the chain of custody, but only as much as the receiver's local records and imported evidence justify.
 
 ### 2.3 Durable relationship features the harness supports
 
 - **First-encounter rituals.** When two agents meet for the first time, both record a `first_seen` event. Several scenarios test what these rituals must contain (mutual challenge? exchange of references? trial transaction?).
-- **Reputation portability with provenance.** When agent C imports a reputation score for X from agent A, the import is itself a promise by A about X. C trusts the import only as much as it trusts A, and only for the assertion types A vouched for.
+- **Reputation portability with provenance.** When Carol imports a reputation score for Alice from Bob, the import is itself a promise by Bob about Alice. Carol trusts the import only as much as Carol trusts Bob, and only for the assertion types Bob vouched for.
 - **Trust decay vs. trust persistence.** Knob: do scores decay over absent-time? Two scenarios will show the difference — one where I haven't talked to my old friend Alice in 30 years (real years of simulated time) but our shared history still counts, vs. one where idle relationships fade. Probably we need *separate* decay rates per assertion type.
 - **Defection cost.** What does it cost to walk away from a relationship and start over with a new identity? Sybil resistance lives here. The harness can vary the cost (free, computational, social-graph-attested, stake-based) and observe which costs deter selfish exit.
 - **Multi-generational handoff.** Scenarios where an agent's signing key is rotated, retired to a successor, or where a long-running agent dies and "wills" its reputation to another. The wire-level question: what kind of promise does that require, and who must witness it?
 
-### 2.4 Trust is per-assertion-type
+### 2.4 Promise accounting is per-assertion-type
 
-A given peer may be highly trusted to deliver bytes (transport assertion), mildly trusted to attest authorship (signature assertion), and totally untrusted to issue capability tokens that bind real resources (issuer assertion). Lumping these into one scalar destroys information that matters in a long-lived system. Every entry in the ledger therefore tracks `score_components` keyed by assertion type.
+A given peer may be highly trusted to deliver bytes (transport assertion), mildly trusted to attest authorship (signature assertion), and totally untrusted to issue capability tokens that bind real resources (issuer assertion). Lumping these into one scalar destroys information that matters in a long-lived system. Promise accounting records therefore need per-assertion-type components or equivalent separations.
 
 ---
 
@@ -184,10 +177,10 @@ A key insight: this gives PromiseGrid a **quantitative, decentralized, continuou
 
 ### 3.3 What the simulator must verify
 
-- That the wire-level encoding of orders, fills, and redemptions composes from the same `Promise` primitive (no special "market protocol" envelope).
+- That the candidate message shape can carry orders, fills, and redemptions without forcing a separate market-only envelope.
 - That double-spend prevention works without a global ledger: Alice can issue 100 tokens, but if she issues 200 by speculating on parallel hypergraph branches, the merging mechanism must catch it and the witnesses must be able to publish a break-witness.
 - That **price discovery** is real. Run two scenarios — one where every peer has perfect information and one where information is patchy — and confirm that prices converge to the same equilibrium in the first, and to clusters in the second.
-- That an **adversary cannot pump-and-dump** by issuing many cheap tokens, building reputation, then suddenly issuing many expensive tokens and defaulting. (The honest-market scenario should pass; the adversarial scenario should produce visible defaults that the trust ledger records.)
+- That an **adversary cannot pump-and-dump** by issuing many cheap tokens, building reputation, then suddenly issuing many expensive tokens and defaulting. (The honest-market scenario should pass; the adversarial scenario should produce visible defaults that peers can record in their promise accounting records.)
 - That the system **does not require a single market**. Many local markets (per-handler, per-region, per-community) should be able to run in parallel and bridge through arbitrageurs.
 
 ### 3.4 Alternative economic models the harness will also try
@@ -200,7 +193,7 @@ The double auction is one experiment. Run it against:
 4. **Quadratic funding for shared resources.** Communities pool contributions for common-pool resources (a shared cache, a shared time-server). Tests whether commons can be funded without coercion.
 5. **Auctioning the right to host a kernel-role.** Periodic auctions for "I will be the router of pCID X for the next epoch." Tests rotation of privileged roles.
 
-Each is a different scenario set in the harness. The point is not to pick the winner; the point is that **the wire format and trust ledger must support all of them** because a centuries-long open system will see all of them tried, often simultaneously, by different sub-communities.
+Each is a different scenario set in the harness. The point is not to pick the winner; the point is that **candidate wire formats and peer-local promise accounting strategies must support all of them** because a centuries-long open system will see all of them tried, often simultaneously, by different sub-communities.
 
 ---
 
@@ -274,12 +267,12 @@ Each profile is implemented as a small policy module that decides actions based 
 
 - **Onboarding scenarios.** Drop a `user-novice` into an existing community and see how many messages it takes for them to do something useful. Measures the protocol's accessibility, not just its correctness.
 - **Governance scenarios.** A community of `community-elder` + `user-expert` debates a protocol upgrade (a new pCID), votes, and rolls it out. Measures the protocol's evolvability.
-- **Long-running scenarios.** Mix all profiles, run for the equivalent of simulated months. Measure trust-ledger drift, market price stability, kernel-role rotation, and rate of break-witnesses. Detect tragedy-of-the-commons emergence.
+- **Long-running scenarios.** Mix all profiles, run for the equivalent of simulated months. Measure promise-accounting drift, market price stability, kernel-role rotation, and rate of break-witnesses. Detect tragedy-of-the-commons emergence.
 - **Generation-handoff scenarios.** A `community-elder` retires, hands keys to a successor. Does their reputation transfer? Should it? At what discount?
 
-### 5.4 Crucially: stochastic agents talk the same wire as deterministic ones
+### 5.4 Crucially: stochastic agents use the same candidate wires as deterministic ones
 
-The harness does not give stochastic agents a special channel. They produce real `Promise` stacks, on real edges, and their messages get the same trust-ledger treatment. This is the only way to test that the protocol survives contact with humans (and human-like agents) at all.
+The harness does not give stochastic agents a special channel. They produce candidate messages on real edges, and peers account for those messages using the same peer-local promise accounting strategies they use for deterministic agents. This is the only way to test that the protocol survives contact with humans (and human-like agents) at all. Source: `DI-mugar`.
 
 ---
 
@@ -294,7 +287,7 @@ You said the goal is to discover the design that **avoids tragedy of the commons
 | **C1 — Bandwidth flood** | Shared transport capacity | Spam high-bandwidth pCIDs; let neighbors pay relay cost |
 | **C2 — Storage parasite** | Shared content-addressed cache | Pin lots of data; serve none to others |
 | **C3 — Compute leech** | A community of capability-token issuers | Redeem freely; never issue; collect refunds via market arbitrage |
-| **C4 — Reputation harvester** | The trust ledger itself | Build trust on cheap promises, then issue one big bad promise and exit |
+| **C4 — Reputation harvester** | Peer-local promise accounting records | Build trust on cheap promises, then issue one big bad promise and exit |
 | **C5 — Naming squatter** | The pCID space (handler descriptors) | Register popular names; sell back; never serve |
 | **C6 — Governance capture** | A community's protocol-change process | Vote-stuff; push self-serving pCID upgrade; lock out dissenters |
 | **C7 — Liability dodge** | The break-witness system | Default; deny; counter-witness; collude with allies to drown out witnesses |
@@ -324,9 +317,9 @@ Passing C1-C7 is necessary but not sufficient. It's the operational definition o
 
 Most of v1's three-layer design (scenario driver, edge fabric, agents) survives. Here are the v2 refinements.
 
-### 7.1 Edges carry promises, not bytes
+### 7.1 Edges carry observed metadata
 
-Every edge in Layer B annotates inbound traffic with a **transport-promise** describing what it observed: source endpoint, time of arrival, integrity of the byte stream (was it TLS? was it Noise? was it raw TCP?), liveness of the upstream peer. This promise becomes the outermost frame on the message handed to Layer C. Handlers are free to consume or ignore the transport promise; the trust ledger uses it.
+Every edge in Layer B annotates inbound traffic with observed metadata: source endpoint, time of arrival, integrity of the byte stream (was it TLS? was it Noise? was it raw TCP?), and liveness of the upstream peer. Candidate envelope specimens decide how, or whether, that metadata is represented in messages handed to Layer C. Peers may use the metadata in their own promise accounting records. Source: `DI-mugar`.
 
 ### 7.2 The pCID registry is itself a commons
 
@@ -334,7 +327,7 @@ There is no global pCID registry in production PromiseGrid (because it has to la
 
 - Two communities independently coin the same human-readable name for different pCIDs and learn to bridge them.
 - A widely-used pCID is forked: half the community moves on to a v2 pCID, the other half stays on v1. The harness shows what bilingualism looks like at the wire level.
-- An adversary publishes a pCID that *looks* like a popular one (typo squat) and the trust ledger discounts it appropriately.
+- An adversary publishes a pCID that *looks* like a popular one (typo squat) and peers' promise accounting strategies discount it appropriately.
 
 ### 7.3 Time is multi-clock
 
@@ -438,9 +431,9 @@ Each TE is a falsifiable experiment whose outcome teaches us something about the
 ### Across the board
 
 - **Run for simulated centuries on at least one design candidate.** Even at 1000× wall-clock acceleration, a centuries-long run is days of compute. The signal it produces about long-term protocol drift is irreplaceable. One overnight run per quarter is enough.
-- **Recruit real second-implementer.** Have someone who is not Steve write a second `promstack` implementation in a different language from a separate reading of the spec. Their bugs are the spec's ambiguities. This is the single highest-leverage realism move available.
+- **Recruit real second-implementer.** Have someone who is not Steve write a second implementation of a candidate message-shape spec in a different language from a separate reading of the spec. Their bugs are the spec's ambiguities. This is the single highest-leverage realism move available.
 - **Adversarial bounty program inside the harness.** Pin a small budget; let outside contributors submit `griefer` agents that try to break running scenarios. Pay for new failure modes.
-- **Embed a TLA+ specification of the trust-ledger merge rule and the promise-stack semantics.** Not the whole system; just those two. Gives us a formal object to point at when we argue.
+- **Embed a TLA+ specification of promise-accounting merge rules and candidate message-shape semantics.** Not the whole system; just those two. Gives us a formal object to point at when we argue.
 - **Use real corporate / community networks for some scenarios.** Run the harness across two or three actual VPSes in different countries with real BGP paths; not just localhost. Catches MTU, NAT, RTT, timezone, and DST surprises.
 - **Build the visualization first.** A 3D or graph-style real-time view of agents, edges, message flows, trust scores, and market prices. Bugs invisible in transcripts become obvious visually. This pays for itself within the first month.
 
@@ -467,12 +460,13 @@ Each TE is a falsifiable experiment whose outcome teaches us something about the
 
 ---
 
-## 10. Where This Lives in `grid-poc`
+## 10. Where Apparatus and Specimens Live
 
 | New thing | Lives in |
 |---|---|
-| `promstack` Go library | `x/wire-v2/promstack/` |
-| Trust ledger primitives | `x/wire-v2/trust/` |
+| Harness apparatus draft | `protocols/wire-lab.d/specs/harness-spec-draft.md` |
+| Grid-envelope variants | `simulations/SIM-*-grid-envelope-enc-*/protocols/grid-envelope.d/specs/grid-envelope-draft.md` |
+| Promise accounting strategy notes | Harness scenarios and future simulation-local specimens; no central accounting-protocol directory exists yet. |
 | Stochastic agent SDK | `x/sims/simkit/stochastic/` |
 | Currency / DA market handler | `x/sims/agents/market/` |
 | Ingress models K1–K5 | `x/sims/simkit/ingress/` |
@@ -482,15 +476,15 @@ Each TE is a falsifiable experiment whose outcome teaches us something about the
 | Ostrom report generator | `x/sims/simkit/reports/` |
 | Real-MCU and browser harnesses | `x/sims/simkit/realruntimes/` |
 
-This sits alongside, not in front of, existing `x/wire`, `x/testbed`, `x/sim4`, `x/kernel1`. v2 is an additional experiment, not a rewrite. If a v2 design wins, the winning pieces graduate to the unprefixed locations.
+This sits alongside, not in front of, existing `x/wire`, `x/testbed`, `x/sim4`, `x/kernel1`. v2 is an additional experiment, not a rewrite. If a v2 design wins, the winning pieces graduate through DR/DI, frozen specs, and guide handoff rather than by becoming canonical just because they appear in this table. Source: `DI-mugar`.
 
 ---
 
 ## 10a. The Self-Improvement Loop: One Flow, Many Agents (Including You)
 
-v2 produces enough logs to **diagnose** problems but not yet enough to let an agent — or the harness paired with an LLM, or you — actually **evolve a better design and propose it**. This section closes that gap.
+v2 produces enough logs to **diagnose** problems but not yet enough to let an agent — or the harness paired with an LLM, or you — actually **evolve a better design and propose it**. This section records the current apparatus-level feedback shape while leaving wire-level proposal vocabularies as specimens or external guide-process details.
 
-The key simplification: there is **one** proposal flow, not two. Whether the target of a proposal is an in-sim protocol pCID or the harness spec itself, the same trust ledger and the same review queue apply. You are an agent in this system: a uniquely-trusted one whose signature on a merge promise re-issues the harness spec, but mechanically just another agent. An LLM helping you read proposals is also an agent — lower trust by default, but it can earn trust by making good predictions over time, exactly like any other peer.
+The current simplification is that wire-lab guide-facing feedback flows through `DEV-GUIDE-RESOURCES.md` plus the external PromiseGrid development-guide feedback process, while legacy proposal records remain archived. You are an agent in this system: a uniquely-trusted one whose signature on a merge promise re-issues the harness spec, but mechanically just another agent. An LLM helping you read feedback is also an agent — lower trust by default, but it can earn trust by making good predictions over time, exactly like any other peer. Source: `DI-mugar`; guide-feedback source: `DI-fakin`.
 
 This works because the harness spec is itself a spec at some pCID (call it `harness-spec-vN`), so a proposal to change the harness is just a proposal whose target is that pCID. No second proposal type is needed.
 
@@ -503,32 +497,28 @@ A pCID names a spec. The spec is a content-addressed object — typically a CBOR
 - **Prose is a legitimate spec form, especially in early drafts.** A new idea is usually clearer in English than in IPLD schema. Forcing schema-first stalls discussion. The first version of any proposal is allowed to be prose only, and the harness will route it the same way as a fully-structured one.
 - **Structure is earned, not required.** As a spec matures and acquires conformance tests, an IPLD schema, an assertion vocabulary, and known-good handler implementations, it can be republished with those attached — a new pCID that supersedes the prose version. Proposals are encouraged to start prose, become structured, and converge.
 - **Specs declare what they contain.** A spec object's outer wrapper says which sections are present (prose, schema, tests, examples, etc.) so a reader — human, LLM, or program — knows what it is dealing with. An LLM-readable spec without an IPLD schema is fine; a programmatic conformance-checker reading the same spec will simply skip the schema-check phase and report "schema not present."
-- **Humans and LLMs are agents too.** A human author writing prose and signing it produces exactly the same artifact — a content-addressed spec at some pCID — as a code-generated one. The trust ledger evaluates the promiser, not the production method.
+- **Humans and LLMs are agents too.** A human author writing prose and signing it produces exactly the same artifact — a content-addressed spec at some pCID — as a code-generated one. Receivers' promise accounting records evaluate the promiser, not the production method.
 
 A handler library still names which (pCID, role) pairs it implements; if the spec has only prose, the handler library can declare "implements pCID P per author's reading of the prose at <date>." Disagreements about the prose's interpretation surface as `contest` messages on the wire — useful diagnostic signal.
 
-### 10a.2 Proposals are messages, not a locked envelope
+### 10a.2 Feedback is evidence, not a locked envelope
 
-A proposal is a promise stack like any other message. We do **not** define a frozen `Proposal` schema this early; we don't yet know enough about what proposals will need to carry, and locking a parser-level shape now would force every later refinement to amend the schema or work around it.
+Feedback about a spec, simulation, or guide draft is evidence that agents can read, assess, and respond to. We do **not** define a frozen feedback-envelope schema this early; we don't yet know enough about what feedback needs to carry, and locking a parser-level shape now would force every later refinement to amend the schema or work around it. Source: `DI-mugar`.
 
 What we do instead:
 
-- A proposal is a message whose outermost assertion is something like "this is a proposal to change pCID X / knob Y / the harness spec itself." The target is named, the proposer signs it. Everything else is body.
-- A *suggested* proposal shape — call it `proposal-checklist-v0`, published as a prose spec at its own pCID — describes the kinds of content reviewers tend to find useful: a diagnosis ("what's wrong, what I expected"), the proposed change, a predicted effect (how the proposer commits to being wrong), counter-evidence the proposer searched for, and a rollback sketch. This is a community convention, not a parser rule. Reviewers are free to ignore proposals that lack these. Better shapes will emerge by being reused, exactly the way pCIDs themselves accrue trust.
-- A proposer's prediction-quality history accrues to their trust ledger under a `design-judgment` assertion type. Reviewers see it. An LLM analyst with a year of bad predictions becomes appropriately easy to ignore — without any schema enforcing it.
-- Proposals can be entirely prose, entirely structured, or any mix. A prose proposal signed by an agent (human, LLM, or program), targeting the harness spec, is a first-class citizen of this system.
+- A feedback item names its target: a spec pCID or draft path, a guide-resource section, a simulation result, or the harness spec itself.
+- Useful feedback usually includes a diagnosis ("what's wrong, what I expected"), the proposed change, a predicted effect, counter-evidence the reviewer searched for, and a rollback sketch. This is a community convention, not a parser rule.
+- A reviewer's prediction-quality history accrues in each receiver's own promise accounting records under whatever assertion type that receiver uses for design judgment.
+- Feedback can be entirely prose, entirely structured, or any mix. A prose feedback item signed by an agent (human, LLM, or program), targeting the harness spec or the dev guide, is a first-class evidence item.
 
-What we explicitly defer: the exact field names, whether `predicted_effect` is mandatory at the parser level, what counts as adequate counter-evidence, and whether prose-only proposals get a quality discount. All of these are downstream decisions to be made once we have actual proposals to look at.
+What we explicitly defer: the exact field names, whether `predicted_effect` is mandatory at the parser level, what counts as adequate counter-evidence, and whether prose-only feedback gets a quality discount. All of these are downstream decisions to be made once we have actual feedback to look at.
 
-### 10a.3 Endorsement, contest, counter-proposal — same vocabulary for everything
+### 10a.3 Assessment and follow-up — same workflow for everything
 
-Three more pCIDs round out the discourse layer:
+Feedback can be followed by positive assessments, negative assessments, requested changes, replacement suggestions, or superseding feedback. The exact wire vocabulary for those actions is not locked here; the current repo-level guide flow uses `DEV-GUIDE-RESOURCES.md` as the local resource map and the external guide feedback process as the active feedback venue. Source: `DI-mugar`.
 
-- `endorse-v1`: "I, peer Q, endorse proposal P; here is my evidence (prose or run-IDs)." Endorsements are promises; their weight depends on Q's trust score for design-judgment.
-- `contest-v1`: "I, peer Q, contest proposal P; here is the conflicting observation (prose or run-IDs)." Contests must point at *something* — a specific prediction the proposal made, a specific run the proposer didn't cite — not bare disagreement.
-- `counter-propose-v1`: a proposal that explicitly references another and supersedes it. Forms a DAG of design-evolution attempts.
-
-All three accept prose or structured content. All three apply to harness-spec proposals exactly as they apply to in-sim protocol proposals. The harness has no built-in voting mechanism; communities (and you, for harness-spec changes) define their own decision rules, themselves encoded as `governance-v1` specs at whatever pCID the community chose.
+All of these actions accept prose or structured content. They apply to harness-spec feedback exactly as they apply to in-sim protocol feedback. The harness has no built-in voting mechanism; communities (and you, for harness-spec changes) define their own decision rules.
 
 For harness-spec proposals specifically, the decision rule is simple by default: **your signature is what merges the change**. An LLM analyst can read, summarize, contest, and endorse — its endorsement is just another promise weighed by its (low) trust score — but only your signature on a "merge" promise re-issues the harness spec at a new pCID. This isn't a configured rule; it's a property of which signing key controls the canonical harness-spec pointer. It is the one and only structural lock the design relies on at this stage.
 
@@ -565,9 +555,9 @@ A strong norm — not yet a parser rule — is that a causal assertion ("knob X 
 
 Agents inside a run cannot fork the world. But they can do something cheaper: **emit hypotheticals**.
 
-A new assertion type, `"hypothesis: under spec P', message M would have been accepted"`, lets an agent record its private theories on the wire as ordinary promises. The agent commits to the hypothesis (signs it), and the harness's *adversarial-replay* harness then re-runs the scenario with spec P' substituted and emits a verdict: hypothesis confirmed, refuted, or unrelated. The verdict is filed back as a `hypothesis-result-v1` envelope.
+A candidate hypothesis message can let an agent record its private theory: "under spec P', message M would have been accepted." The agent commits to the hypothesis by signing it, and the harness's *adversarial-replay* harness can then re-run the scenario with spec P' substituted and emit a verdict: hypothesis confirmed, refuted, or unrelated. The verdict format is a downstream specimen decision, not a harness-level pCID named here. Source: `DI-mugar`.
 
-This lets agents propose changes from inside the system *with* evidence — their hypothesis got tested, and the test result is part of their reputation now. Speculation without verification costs trust; speculation that pans out gains it.
+This lets agents propose changes from inside the system *with* evidence — their hypothesis got tested, and the test result can affect how peers account for the agent's future promises. Speculation without verification costs trust; speculation that pans out gains it.
 
 ### 10a.7 Durable cross-run agent memory
 
@@ -575,7 +565,7 @@ For an agent to learn across runs, it must persist state across scenario boundar
 
 The harness provides each agent identity (not each agent instance) with a `personal-archive/<agent-id>/` directory that survives runs. Default contents:
 
-- The agent's trust ledger (extended across runs, with run-id provenance per entry).
+- The agent's promise accounting records (extended across runs, with run-id provenance per entry).
 - The agent's pending and resolved hypotheses.
 - The agent's outgoing proposals and their fate.
 - The agent's predicted-vs-actual scoreboard (their prediction-quality score over time).
@@ -584,7 +574,7 @@ Agents that elect not to use the archive run as before. Agents that do can begin
 
 ### 10a.8 What's actually load-bearing: your signature
 
-An earlier draft of this section proposed a global `invariants.cbor` file enumerating properties "that must hold under every change." On reflection, the examples I wrote turned out to be a mix of (a) target metrics whose right values are exactly what the harness is supposed to discover, (b) consequences of other definitions (the trust ledger, content addressing) that don't need restating, and (c) parser-level rules that disappear once we drop the proposal-envelope schema. None of them were genuinely constitutional; they were guesses about what the future system would need to defend.
+An earlier draft of this section proposed a global `invariants.cbor` file enumerating properties "that must hold under every change." On reflection, the examples I wrote turned out to be a mix of (a) target metrics whose right values are exactly what the harness is supposed to discover, (b) consequences of other definitions (promise accounting records, content addressing) that don't need restating, and (c) parser-level rules that disappear once we drop the proposal-envelope schema. None of them were genuinely constitutional; they were guesses about what the future system would need to defend.
 
 So there is no `invariants.cbor`. The one mechanism that *is* load-bearing — the only thing that prevents a runaway from agents or LLMs editing the system into incoherence — is much simpler:
 
@@ -612,11 +602,11 @@ Proposals — whether targeting in-sim pCIDs or the harness spec itself — orig
 The shape that matters is the workflow, not the filesystem. **Your job is to act as an agent reading this queue**, with these supports:
 
 - **LLM as reading aid.** An LLM analyst can be invoked at any time to summarize a proposal, surface its prediction-quality history, list its endorsers and contesters by trust score, run cross-run queries against the harness's accumulated logs, and (for harness-spec proposals) explain in plain language what the change would do. The LLM produces prose; you read it and decide. The LLM does not move proposals between states on its own.
-- **Multi-LLM optional.** You can ask several LLMs to read the same proposal independently and surface their disagreements. This is just multiple agents endorsing or contesting; the trust ledger handles weighting.
+- **Multi-LLM optional.** You can ask several LLMs to read the same feedback item independently and surface their disagreements. This is just multiple agents recording assessments; each receiver's promise accounting records handle weighting.
 - **Your decision is itself a wire message.** When you decide a proposal, you sign a promise — "I, Steve, approve/reject proposal P, my reasoning is …" — that becomes part of the public record. Future LLM analysts read this record and learn what kinds of proposals you find convincing or unconvincing.
 - **Approved harness-spec proposals re-issue the harness-spec pointer.** A new harness spec at a new pCID becomes the one your signing key now points at; the next run starts on the new baseline. Every prior run remains associated with the harness-spec version that produced it, by content hash, for replay purposes.
 - **Approved in-sim proposals re-issue the targeted spec or update the named knob.** Same mechanism, different target.
-- **Rejected proposals are durable.** They remain visible with your reasoning attached, both as input to future LLM analysis and as evidence in trust-ledger updates for the proposer.
+- **Rejected feedback is durable.** It remains visible with your reasoning attached, both as input to future LLM analysis and as evidence in peer-local promise accounting for the proposer.
 
 This keeps you in the loop without putting you in the hot path. LLMs read voluminously, run queries, and write summaries; you spend your attention on the small set of well-prepared proposals that survive prior filtering.
 
@@ -653,7 +643,7 @@ Cadence is an open question — see §12. Continuous in-sim activity is fine; th
 
 Restated as a single question:
 
-> **What stack of promises, traveling on what mix of transports, evaluated by what trust ledger, gated at what kind of ingress, settled in what kind of market, can let an open community of free agents and humans continue to find each other and trade value across centuries — without succumbing to tragedy of the commons, governance capture, or the thousand other ways open systems quietly die?**
+> **What candidate message shape, traveling on what mix of transports, evaluated by what peer-local promise accounting strategy, gated at what kind of ingress, settled in what kind of market, can let an open community of free agents and humans continue to find each other and trade value across centuries — without succumbing to tragedy of the commons, governance capture, or the thousand other ways open systems quietly die?**
 
 The simulator does not answer this question. It produces traces, prices, scores, and Ostrom reports. We — the humans designing PromiseGrid — answer it by reading those artifacts and arguing about them. The simulator's job is to keep us honest.
 
@@ -671,7 +661,7 @@ The simulator does not answer this question. It produces traces, prices, scores,
 8. **Self-improvement cadence.** §10a originally proposed daily LLM passes and weekly human review of `proposals/pending/`. That root queue is now historical archive material under `protocols/wire-lab.d/archive/migrations/SIM-piloh-turns-149-208-recovery/archive/proposals/`; current guide-resource feedback flows through `DEV-GUIDE-RESOURCES.md` and the external PromiseGrid dev-guide feedback process. The cadence question still applies to whatever current review surface replaces the old queue. Source: `DI-fakin`.
 9. **Is "your signature is the only lock" really enough?** §10a.8 reduces the constitutional set to one rule: the harness-spec pointer follows your signing key. No `invariants.cbor`, no envelope schema, no LLM-can't-touch-this list. Is there a failure mode you can picture where that's insufficient — e.g. an LLM that floods the queue with plausible-looking proposals, exhausting your attention until something bad slips through? If so, the right defense is probably a rate-limit on submissions per agent (a community norm, not a parser rule), not a return to constitutional documents.
 10. **Default trust for LLM analysts.** An LLM endorsing a proposal carries some weight by default — but how much? My instinct: very low at first (e.g. 0.05 of a human-elder endorsement), rising only as its prediction-quality history accumulates good calls. This means a fresh LLM cannot move proposals on its own; it can only summarize and recommend until it earns standing. Confirm?
-11. **What else are we still over-locking?** This pass softened the proposal envelope, the invariants file, the design-entropy formula, the review-queue layout, and a number of supporting structures. The `Promise` shape in §1.1, the `TrustLedger` shape in §2.1, the agent binary in §5.1, the K1–K5 ingress taxonomy, the seven C-scenarios, the 30%-at-month-12 pass line, and the grid-poc directory table in §10 are all still presented as more settled than they really are. Which of these do you want to revisit next, and which are stable enough that committing to them is acceptable?
+11. **What else are we still over-locking?** This pass softened the proposal envelope, the invariants file, the design-entropy formula, the review-queue layout, and a number of supporting structures. Candidate message-shape rules, promise accounting record shapes, the agent binary in §5.1, the K1–K5 ingress taxonomy, the seven C-scenarios, the 30%-at-month-12 pass line, and the directory table in §10 are all still presented as more settled than they really are. Which of these do you want to revisit next, and which are stable enough that committing to them is acceptable?
 12. **Proposal-collector matching (from TE-botom).** With no envelope schema, what does the handler that files messages into the review queue actually pattern-match on? Likely an LLM-as-router in the early phase. Acceptable, or do we want a minimal structural marker (one CBOR tag, say) on proposal-shaped messages just to make routing deterministic? My instinct: accept the LLM-router for now; revisit when the LLM mis-classifies enough to be annoying.
 13. **Pointer storage semantics (from TE-botom).** "The harness-spec pointer follows your signing key" is true at the crypto level but the pointer has to physically live somewhere. Options: (a) a workspace file you `git push`, (b) a CRDT replicated to all participants, (c) a DNS-like lookup against your pubkey. Which? My instinct: (a) for now (matches the multi-file workspace structure), (b) eventually for the production system.
 14. **Settlement-window convention (from TE-botom).** Proposers should declare a predicted-falsification window ("check my prediction in 7 days / 3 months / one full simulated year"). Should this be part of the proposal-checklist convention from §10a.2, or left entirely to reviewer discretion? My instinct: in the checklist; reviewers strongly prefer proposals that specify when they'd know they were wrong.
@@ -681,7 +671,7 @@ The simulator does not answer this question. It produces traces, prices, scores,
 18. **Does the canonical PromiseGrid README get its own pCID, signed by Steve, distinct from the Wire Lab harness-spec pCID (from TE-dodaf)?** Probably yes — they have different scopes and different cadences. The README is the org-level identity statement; the harness-spec is one experiment within. Two pCIDs, two signatures, both following Steve's key. Confirm?
 19. **Should the group-transport envelope graduate into the canonical PromiseGrid wire format (from TE-hogus / DR-009)?** *Scoped to the wire-lab's first transport-protocol (the group-transport-protocol class).* The group-transport-protocol uses a textual `grid <pcid>` carrier so humans and LLMs can exercise protocol selection, message-CID-linked DAG references, and explicit promise bodies in real coordination traffic. That envelope choice is locked for the protocol class in `DI-009-20260430-204108` and the substantive contract is now a simulation-local specimen at `simulations/SIM-rakot-group-session/protocols/group-session.d/specs/group-session-draft.md`, but whether the eventual canonical wire format should keep the same visible first-line carrier or collapse into a more structured promise-stack object remains open. See `DR-009-20260430-204108`.
 20. **OQ-100.1 — Protocol forking representation (from TE-dajot / C-4).** When an existing transport-protocol is forked (incompatible v2 of group-transport, or a community-specific variant of any protocol), how is the new pCID expressed in `protocols/` and in `transports/`? The per-axis meta-rule in TE-junil covers when *new* protocol classes warrant distinct pCIDs, but is silent on intra-class forks. Candidate follow-on TE.
-21. **OQ-100.2 — Cryptographic signing migration (from TE-dajot / C-2 + C-4).** When v0 group-transport gains cryptographic signing in v1, how does the migration honor C-2 (existing v0 transports survive untouched) and C-4 (v0 and v1 are siblings, not parent-and-child)? The transition affects `From:` semantics, message-CID computation, ack semantics, and the trust ledger's interpretation of pre-signing messages.
+21. **OQ-100.2 — Cryptographic signing migration (from TE-dajot / C-2 + C-4).** When v0 group-transport gains cryptographic signing in v1, how does the migration honor C-2 (existing v0 transports survive untouched) and C-4 (v0 and v1 are siblings, not parent-and-child)? The transition affects `From:` semantics, message-CID computation, ack semantics, and how peer-local promise accounting records interpret pre-signing messages.
 22. **OQ-100.3 — Cumulative-prefix ack and trust (from TE-dajot / C-5; deferred Q2 from TODO-motof).** The deferred cumulative-prefix or frontier ack semantics for group-transport must be designed under C-5 — trust-vector-aware, not global. The shape of "I have observed everything up to frontier F" is constrained by the requirement that *each receiver* maintains its own per-burden trust scoring of *each sender's* ack claims.
 23. **OQ-100.4 — Numbering wrap (from TE-dajot / C-2).** Is the integer sequence for TEs and TODOs stable across centuries, or does it eventually need to be supplanted by purely timestamp-based or pCID-based identifiers? The drafting-time invariant from TE-titur keeps integers usable for now, but a contributor in 2096 with TE-9847 may find the integers more noise than signal.
 24. **OQ-100.5 — Slug drift (from TE-dajot / C-2).** Human-readable slugs in `transports/<pcid>--<slug>/` and `protocols/<slug>.d/` (anticipated) are presentational, but a 30-year-old slug whose meaning has drifted may mislead a future contributor more than it helps. Is there a discipline for retiring or redirecting drifted slugs without changing pCIDs, or is the right answer to lean harder on pCIDs and ignore slug drift?

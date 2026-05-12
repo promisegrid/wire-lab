@@ -45,6 +45,14 @@ PromiseGrid design choices are derived, tested, and recorded. Source:
   Mupoz decisions and the first recovery simulation path are locked by
   `DI-fakin`. Do not treat the old root `transports/` or `proposals/` paths as
   PromiseGrid layout commitments. Source: `DI-nunut`; `DI-fakin`.
+- Active guide prose should use **promise accounting records** for peer-local
+  relationship accounting. Alice, Bob, Carol, and other
+  peers each keep their own records; wire-lab does not define a central or
+  harness-owned ledger. Source: `DI-mugar`.
+- The live guide-feedback route is this resource map plus the external
+  PromiseGrid Development Guide feedback process. Retired `ppx-dr` and archived
+  proposal records remain provenance, not a live guide-feedback mechanism.
+  Source: `DI-mugar`; `DI-fakin`.
 
 ## How writers should use this file
 
@@ -106,7 +114,7 @@ writer guidance, not a final PromiseGrid product/API freeze. Source:
 
 | Guide audience | Current readiness | What can be written now | What remains provisional or blocked | Likely first normative citations |
 |---|---|---|---|---|
-| Laypeople | Ready for careful guide prose | PromiseGrid is designed for long-lived decentralized communities of autonomous/free agents; no central registry is a design constraint; protocol forking is normal; multi-generational durability is a first-order requirement. | Specific trust-ledger scoring, final wire format, app APIs, and kernel shape remain out of layperson settled prose. `DR-napum` remains open for final public wording. | The guide itself after stabilization; wire-lab sources stay provenance. |
+| Laypeople | Ready for careful guide prose | PromiseGrid is designed for long-lived decentralized communities of autonomous/free agents; no central registry is a design constraint; protocol forking is normal; multi-generational durability is a first-order requirement. | Specific promise-accounting scoring, final wire format, app APIs, and kernel shape remain out of layperson settled prose. `DR-napum` remains open for final public wording. | The guide itself after stabilization; wire-lab sources stay provenance. |
 | App Devs | Provisional | The minimum current contract is: choose an explicit protocol spec, use its pCID when frozen, let that spec define payload/handler semantics, and publish implementation conformance claims rather than relying on branch paths. | No stable SDK, handler ABI, universal app message API, or app protocol subset is frozen yet. `DR-tuhaz` remains open. | Future frozen `protocols/*/specs/*.md` docs by pCID, plus B-side `CHANGELOG.md` conformance claims. |
 | Kernel Devs | Provisional / blocked for final porting instructions | The porting target is not wire-lab. A porter should expect to implement pCID-selected protocol handlers, substrate/binding/session/message layers claimed by the port, and conformance records for those claims. | The first required frozen spec set, runtime expectations, and implementation obligations are not locked yet. `DR-davod` remains open. | Future frozen binding/session/message specs by pCID, implementation `CHANGELOG.md` conformance claims, and guide prose once stabilized. |
 
@@ -142,7 +150,7 @@ sections.
 - Safe settled claims for current guide prose: the 100-year goal, autonomous
   agents, no central registry, protocol forking as normal lifecycle, and
   multi-generational durability. Repairable trust is safe as a design goal;
-  specific trust-ledger mechanics remain provisional. Source: `DI-zalak`;
+  specific promise-accounting mechanics remain provisional. Source: `DI-zalak`;
   final public wording remains tracked by `DR-napum`.
 
 ## App Devs
@@ -216,6 +224,8 @@ section.
 - Use the apparatus/specimen split: harness mechanics are evidence-gathering
   apparatus; per-protocol specs and implementations are the candidate contracts
   that may become porting targets.
+- Use promise-accounting wording for peer-local relationship records. Do not
+  describe a global or harness-owned accounting ledger.
 - Do not tell kernel developers to implement every wire-lab draft artifact.
   Frozen pCID specs, conformance claims, and implementation CHANGELOGs are the
   relevant authority path once they exist.

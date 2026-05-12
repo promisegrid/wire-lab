@@ -9,11 +9,11 @@ Before the TE-39 proquint migration, this file was known as:
 
 ## Status
 
-Open. Promise-stack retirement cascade complete; residual TE-40 recovery
-still open. Cat-3 cascade work from TE-havib promise-stack retirement
-has been applied to TE-famar, TE-muvuv, and TE-robub. TODO-rivuk and
-DR-006 now point readers at the TE-havib DF-36.2 retirement instead of
-inviting stale promise-stack DF answers.
+Closed. Promise-stack retirement cascade is complete, turn-158 grid-envelope
+successor routing is complete, and the turn-159 harness-spec / transport-spec
+residual cleanup is closed under `DI-mugar`. TODO-rivuk and DR-006 point
+readers at the TE-havib DF-36.2 retirement instead of inviting stale
+promise-stack DF answers.
 
 ## Threads absorbed from OPEN-THREADS.md
 
@@ -143,12 +143,42 @@ Affects: `protocols/wire-lab.d/TODO/TODO-kugod-te-40-apparatus-vs-specimen-compl
 `simulations/SIM-kurim-grid-envelope/TODO/TODO-tujad-grid-envelope-successor-owner.md`;
 `simulations/SIM-*-grid-envelope-enc-<cbor|dag-cbor>-unknown-<opaque|hard-reject|best-effort>-sig-<wrapper-pcid|unsigned-v0|mandatory-opaque-bytes|mandatory-sig-pcid-payload>/`.
 
+ID: DI-mugar
+Date: 2026-05-12 15:18:34
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Close turn-159 TE-40 residual work by sweeping the remaining active
+specimen-bearing `harness-spec-draft.md` prose to apparatus-level language,
+renaming active `trust ledger` vocabulary to peer-local `promise accounting
+records`, recording that the transport-spec companion audit is satisfied by
+`DI-huzor` plus the 2026-05-12 companion audit note, and routing active guide
+feedback through `DEV-GUIDE-RESOURCES.md` plus the external guide feedback
+process rather than reviving `ppx-dr`.
+Intent: Turn 159 surfaced the full apparatus/specimen audit list. The replay
+cleanup should not leave that turn's loose ends open once the remaining
+specimen claims have been rewritten, the transport-spec suspicion has been
+verified, and later corpus decisions have replaced the old proposal-message
+lineage with the dev-guide resources/feedback flow.
+Constraints: Do not edit `TODO-lilar`, `dropped-thread-disposition-20260506.md`,
+or historical TE/audit/DI bodies. Do not create `trust-ledger.d`, revive
+`ppx-dr`, declare a winning grid-envelope variant, or treat promise accounting
+records as central/harness-owned state. Historical references to `TrustLedger`,
+`trust ledger`, and `ppx-dr` stay historical.
+Affects: `protocols/wire-lab.d/specs/harness-spec-draft.md`;
+`protocols/wire-lab.d/docs/audit-20260512-transport-spec-apparatus-vs-specimen.md`;
+`protocols/wire-lab.d/TODO/TODO-kugod-te-40-apparatus-vs-specimen-completion.md`;
+`protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewalk.md`;
+`protocols/wire-lab.d/TODO/TODO-lilok-te-36-followon-oq-and-tabletop-walk.md`;
+`protocols/wire-lab.d/TODO/TODO-jivam-turns-149-170-recovery-completion.md`;
+`protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`;
+`protocols/wire-lab.d/TODO/TODO.md`; `DEV-GUIDE-RESOURCES.md`.
+
 ## Residual TE-40 checklist
 
 This checklist maps the TE-40 UT inventory from
 `protocols/wire-lab.d/TODO/dropped-thread-disposition-20260506.md` to
-current ownership. TODO-kugod stays open until every open or transferred
-row below is closed by a DI, DR, or successor TODO.
+current ownership. All rows below are now resolved, retired, or transferred
+under a DI, DR, or successor TODO.
 
 | UT | Status | Owner / next artifact | Disposition |
 | --- | --- | --- | --- |
@@ -168,10 +198,10 @@ row below is closed by a DI, DR, or successor TODO.
 | UT-158.f | resolved-transferred | `simulations/SIM-kurim-grid-envelope/TODO/TODO-tujad-grid-envelope-successor-owner.md` / DI-fanah + DI-kinad | The grid-envelope protocol/spec successor path is materialized as 24 standalone positional variant simulations; no single preferred specimen is selected. |
 | UT-158.g | retired | TODO-rivuk / DI-runuh | TODO-rivuk is closed as superseded instead of moved under a promise-stack protocol directory. |
 | UT-158.h | resolved-routed | `simulations/SIM-kurim-grid-envelope/TODO/TODO-tujad-grid-envelope-successor-owner.md` / DI-sotuk + DI-joroh + DI-fanah | The requested parallel TODO for the grid hypothesis is satisfied by the grid-envelope successor owner; the concrete protocol/spec successor path is now closed for turn-158 scope by the 24 variant simulations. |
-| UT-159.a | open | TODO-kugod | The nine specimen-bearing harness-spec audit items still need a later sweep or explicit retirement. |
-| UT-159.b | open-scoped | TODO-kugod plus DR-nugog | The current transport-tree blocker is resolved for this specimen by `DI-fakin`; the remaining work is the transport-spec companion audit against rooted apparatus versus simulation-local specimens. |
-| UT-159.c | resolved-retired | TE-havib follow-on verification | The six-scenario mismatch is recorded; no redo is required before residual checklist cleanup proceeds. |
-| UT-159.d | open | TODO-kugod | The remaining ambiguous audit areas still need resolution or explicit retirement. |
+| UT-159.a | resolved | TODO-kugod / DI-mugar | The nine specimen-bearing harness-spec audit items have been swept or explicitly retired from active harness prose; historical TE/audit references remain untouched. |
+| UT-159.b | resolved | TODO-kugod / DI-huzor + DI-mugar | The rooted transport draft's specimen-side outer-feed material was already extracted under `DI-huzor`; the 2026-05-12 companion audit verifies no additional turn-159 transport-spec edit is needed. |
+| UT-159.c | resolved-retired | TE-havib follow-on verification / DI-mugar | The six-scenario mismatch is recorded; the later verification walk found the concern wrong on inspection, and no redo is required. |
+| UT-159.d | resolved | TODO-kugod / DI-mugar | The ambiguous §1.3, §10, and §10a areas are resolved for turn-159 scope: §1.3 stays apparatus-level, §10 points at simulations/specimen homes without promstack or central-accounting assumptions, and §10a routes active feedback through dev-guide resources rather than active ppx-dr. |
 
 ### 2026-05-09/10 transport-tree and post-Mupoz tracking
 
@@ -179,8 +209,8 @@ row below is closed by a DI, DR, or successor TODO.
 - [x] kugod.2 Resolve the current TE-pahah (`docs/thought-experiments/TE-pahah-wire-lab-simulation-first-structure.md`) blocker before implementing any root-level `transports/` or `groups/` migration. Closed for the current recovery specimen by `DI-fakin` and `DI-mahim`; the candidate artifacts moved under `simulations/SIM-piloh-turns-149-208-recovery/` instead of becoming root-level layer trees.
 - [x] kugod.3 Resolve the current TE-nizor (`docs/thought-experiments/TE-nizor-pahah-implementation-sufficiency.md`) blocker before closing residual recovery for turns 149-208. Closed for the current recovery specimen by `DI-fakin` and `DI-mahim`; TE-nizor remains open as broader analysis for root-level layer trees, artifact-message shape, CBOR/text representation, and CAS/feed details.
 - [x] kugod.4 Resolve TE-mupoz (`docs/thought-experiments/TE-mupoz-root-protocol-migration-scope-under-simulations.md`) before moving existing root-level or `protocols/` content under `simulations/`. TE-mupoz tests whether root `protocols/` should retain only `wire-lab.d`, and whether candidate protocol drafts, proposal records, and transport specimens should move into the first simulation as specimens when TE-nizor is implemented. Closed by `DI-pakid` and `DI-fakin`; implementation target is `simulations/SIM-piloh-turns-149-208-recovery/`.
-- [ ] kugod.5 Inventory the harness-spec claims that still mix harness apparatus with candidate PromiseGrid specimens, including the nine UT-159.a audit items and the ambiguous UT-159.d areas.
+- [x] kugod.5 Inventory and resolve the harness-spec claims that still mix harness apparatus with candidate PromiseGrid specimens, including the nine UT-159.a audit items and the ambiguous UT-159.d areas. Closed by `DI-mugar`.
 - [x] kugod.6 Finish the harness-spec §1.1 / §1.3 apparatus/specimen cleanup for `UT-158.c` and `UT-158.d`; `UT-156.c`'s stale turn-156 phrasing is already superseded by `DI-lajod`. Closed for turn-158 scope by `DI-kinad`; broader turn-159 audit work remains under `kugod.5` and `kugod.8`.
 - [x] kugod.7 Create or identify the successor owner for grid-envelope work, candidate envelope inventory, and the `grid([pcid, payload])` working hypothesis from UT-157.a, UT-157.c, and UT-158.f. Closed by routing to `simulations/SIM-kurim-grid-envelope/TODO/TODO-tujad-grid-envelope-successor-owner.md` in `DI-mosor`.
-- [ ] kugod.8 Run the transport-spec companion audit after the Mupoz migration, distinguishing rooted wire-lab apparatus claims from simulation-local transport specimens for UT-159.b.
-- [ ] kugod.9 Update TODO-jivam and the TE-40 disposition matrix after kugod.5 through kugod.8 are resolved, transferred, or explicitly retired.
+- [x] kugod.8 Run the transport-spec companion audit after the Mupoz migration, distinguishing rooted wire-lab apparatus claims from simulation-local transport specimens for UT-159.b. Closed by `DI-mugar` via `protocols/wire-lab.d/docs/audit-20260512-transport-spec-apparatus-vs-specimen.md`.
+- [x] kugod.9 Update TODO-jivam and the TE-40 disposition matrix after kugod.5 through kugod.8 are resolved, transferred, or explicitly retired. Closed by `DI-mugar`.

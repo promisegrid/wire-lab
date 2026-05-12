@@ -60,7 +60,7 @@ This TODO may close only after all of the following are true:
 - [ ] jivam.1 Source coverage for turns 149-208 remains verified against `/home/stevegt/lab/session-logs/sessions/ea135ce8/149-turn.md` through `/home/stevegt/lab/session-logs/sessions/ea135ce8/208-turn.md`.
 - [ ] jivam.2 Turns 149-154 remain verified as walked with no leftover threads, or any later contradiction is filed as a new UT/DR with provenance.
 - [ ] jivam.3 All turn-155-through-192 UTs in `dropped-thread-disposition-20260506.md` have owner artifacts and closure evidence in the verification matrix.
-- [ ] jivam.4 TODO-kugod closes or transfers all residual TE-40 recovery work after the apparatus-vs-specimen sweep, grid-envelope home, transport-spec companion audit, and stale TE-famar status/path issues are resolved or explicitly retired.
+- [x] jivam.4 TODO-kugod closes or transfers all residual TE-40 recovery work after the apparatus-vs-specimen sweep, grid-envelope home, transport-spec companion audit, and stale TE-famar status/path issues are resolved or explicitly retired. Closed by `DI-mugar` in `TODO-kugod`.
 - [ ] jivam.5 TODO-turog closes or transfers all TE-41 group-session freeze work after its TE-40 and migration-design blockers are resolved.
 - [ ] jivam.6 TODO-duvuk closes or transfers all TE-42 Message-ID / filename / CID-cascade policy work after TE-41 no longer blocks it.
 - [ ] jivam.7 Adjacent turn-149-through-192 items outside TE-40/41/42 are resolved or explicitly transferred: TE-havib follow-on, TE-sihih, TODO-kituj/TE-43, TODO-ralud/TE-45, Spec-edit, Retire, and Carry entries.

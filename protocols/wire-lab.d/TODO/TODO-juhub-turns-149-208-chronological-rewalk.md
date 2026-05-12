@@ -192,10 +192,10 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
   `UT-158.a` is resolved-decomposed and `UT-158.h` is resolved-routed under
   `DI-sotuk`; `UT-158.c`, `UT-158.d`, and `UT-158.f` are closed for
   turn-158 scope under `DI-kinad` and `DI-fanah`. Broader TE-40 work begins
-  with turn 159 and remains under `UT-159.*`.
-- `Turn 159` `UT-159.c` is resolved-retired. `UT-159.a` and `UT-159.d` remain
-  open in `TODO-kugod` via `kugod.5`. `UT-159.b` remains open-scoped under
-  `TODO-kugod` plus `DR-nugog` via `kugod.8`.
+  with turn 159 and is now closed under `DI-mugar`.
+- `Turn 159` `UT-159.a`, `UT-159.b`, and `UT-159.d` are resolved in
+  `TODO-kugod` under `DI-mugar`; `UT-159.c` remains resolved-retired by the
+  TE-havib follow-on verification walk.
 - `Turn 160` `UT-160.b` and `UT-160.c` are answered by the TE-havib follow-on
   verification path. `UT-160.a` remains a spec-edit loose end, and `UT-160.d`
   remains a carry note about the still-unlocked TE-havib DFs. `TODO-lilok`
@@ -205,8 +205,8 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
   Carry items `UT-161.b` and `UT-161.c` remain conversation-only lineage /
   taxonomy notes and still need explicit downstream placement if reused.
 - `Turn 162` `UT-162.a` and `UT-162.b` are answered by the later TE-havib
-  disposition path. No additional turn-local owner update has landed yet
-  because `TODO-lilok` still carries the reopened sweep-handoff note.
+  disposition path. The former `TODO-lilok` reopened sweep-handoff note is
+  now closed through `TODO-kugod` / `DI-mugar`.
 - `Turn 163` `UT-163.a` remains a spec-edit loose end for the envelope-agnostic
   `§1.3` wording template. `UT-163.b` remains a carry/procedural note about
   uncaptured TE-havib twig commits.
@@ -662,8 +662,7 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
   positional grid-envelope successor simulations.
   No correction note is needed in `TODO-lilar`.
 - `Remaining decisions or work` None for turn 158 itself. Broader TE-40 audit
-  work remains under later turn-159 rows (`UT-159.a`, `UT-159.b`, `UT-159.d`,
-  `kugod.5`, and `kugod.8`), not as turn-158-local residue.
+  work moved to later turn-159 rows and is now closed under `DI-mugar`.
 - `Work pending` `no`
 - `Proposed disposition` `reconciled after positional variant split`
 - `Write needed? yes/no` `yes` for this rewalk update in `TODO-juhub` and the
@@ -684,15 +683,26 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
   raw turn shows the bot produced an audit memo as an untracked working
   document, not yet a commit, and that memo listed the concrete specimen-
   bearing material in the harness-spec plus the ambiguous areas needing later
-  TE or DF work. Later residual owner work in `TODO-kugod` directly carries
-  this turn forward: the nine specimen-bearing audit items remain live as
-  `UT-159.a`, the transport-spec companion audit remains live as `UT-159.b`,
-  and the unresolved ambiguous areas remain live as `UT-159.d`.
+  TE or DF work. Later residual owner work in `TODO-kugod` carried this turn
+  forward as `UT-159.a`, `UT-159.b`, and `UT-159.d`; those rows are now closed
+  under `DI-mugar`.
 - `Gaps or contradictions` None found. The only important timing nuance is
   that the audit memo existed in the workspace at the end of turn 159 but was
   not committed until Steve's turn-160 authorization. `TODO-lilar` already
   preserves that nuance, and later artifacts align with it.
-- `Proposed disposition` `already captured correctly`
+- `Related UTs / owners` `UT-159.a` is resolved by the `DI-mugar`
+  harness-spec sweep; `UT-159.b` is resolved by the `DI-huzor` feed-outer
+  extraction plus the 2026-05-12 transport companion audit; `UT-159.c` is
+  resolved-retired by the TE-havib follow-on verification walk; `UT-159.d` is
+  resolved by the `DI-mugar` treatment of §1.3, §10, and §10a.
+- `Owner/doc cleanup` Done. `TODO-kugod` closes `kugod.5`, `kugod.8`, and
+  `kugod.9`; `TODO-lilok` no longer needs a separate harness-spec-sweep
+  handoff; `TODO-jivam` and the UT verification matrix now point at this
+  closure. No correction note is needed in `TODO-lilar`.
+- `Remaining decisions or work` None for turn 159 itself. Later turns may
+  still carry their own UTs, but the turn-159 audit/sweep residue is closed.
+- `Work pending` `no`
+- `Proposed disposition` `reconciled after apparatus/specimen sweep`
 - `Write needed? yes/no` `yes` for this rewalk entry and checklist closure in
   `TODO-juhub`; `no` correction note is needed in `TODO-lilar`.
 - `Next: wait for approval before turn N+1` Turn 160 is next and remains

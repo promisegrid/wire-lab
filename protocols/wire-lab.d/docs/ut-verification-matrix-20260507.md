@@ -508,3 +508,15 @@ Provenance: locked by user 2026-05-07; recorded as
 `DI-021-20260507-212251` (B4), `DI-021-20260507-212252` (B2),
 `DI-021-20260507-212253` (B5), `DI-021-20260507-212254` (B6), and
 `DI-021-20260507-212255` (B7) in TODO-lilar.
+
+## Refinements
+
+### 2026-05-12 — TE-40 owner closure pointer
+
+Cluster C / TE-40 remains counted as originally recorded above; this refinement
+does not recount or edit the read-only matrix body. The owner artifact
+`protocols/wire-lab.d/TODO/TODO-kugod-te-40-apparatus-vs-specimen-completion.md`
+now records TE-40 residual closure under `DI-mugar`, including the turn-159
+`UT-159.a`, `UT-159.b`, and `UT-159.d` rows and the previously verified
+`UT-159.c` row. This is the Cat-3 / Cat-4 forward pointer authorized by the
+matrix-as-closure-index rule.
