@@ -1,5 +1,9 @@
 # TE-havib: Apparatus vs. specimen — carving the harness-spec apart from the wire/envelope/ledger hypotheses it studies
 
+## Status
+
+decided, refined
+
 ## Prior aliases
 
 Before the TE-39 proquint migration, this file was known as:
@@ -244,6 +248,22 @@ Under Alt-lilok.1.B verification walk (memo at [`protocols/wire-lab.d/docs/te-ha
 The verification walk also confirmed that S6 Ellen remains the deciding scenario for DF-36.1's strict lock and that DF-36.2's retirement does not create a Mallory loophole in S5 (the §1.1 promise-stack content is replaced by pointers to TE-lozip §3.1 + framing essay §3.1, not deleted into a void).
 
 Closed TODO-lilok (TE-havib follow-on) as verified-superseded; retired the `T-TE36-FOLLOWON` open-thread placeholder.
+
+### 2026-05-12: Audit item count correction and turn-160 closure pointer
+
+Turn 160 and DF-36.1's Alt-1.A prose said the source audit identified eight
+specimen-bearing items. The audit at
+[`protocols/wire-lab.d/docs/audit-20260503-015309-harness-spec-apparatus-vs-specimen.md`](../../protocols/wire-lab.d/docs/audit-20260503-015309-harness-spec-apparatus-vs-specimen.md)
+actually enumerated nine concrete items: §1.1, §1.2, §1.3, §2.1, §2.2,
+§3.3 bullet 1, §7.1, §10, and §10a.2/.3/.6. The historical body text above is
+left unchanged under TE-dabol's append-only refinement policy; readers should
+use this refinement and the later `TODO-kugod` closure under `DI-mugar` as the
+current pointer. `TODO-kugod` records that all nine active harness-spec audit
+items were swept or explicitly retired from active harness prose, while
+historical TE/audit references remain historical. This closes the turn-160
+count-mismatch item `UT-160.a`; the separate end-of-corpus "five DFs unlocked"
+item `UT-160.d` is resolved by the final TE-havib status above: all seven DFs
+are now locked after the Alt-B re-presentation path.
 
 ## Source
 

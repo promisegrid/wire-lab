@@ -196,11 +196,12 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - `Turn 159` `UT-159.a`, `UT-159.b`, and `UT-159.d` are resolved in
   `TODO-kugod` under `DI-mugar`; `UT-159.c` remains resolved-retired by the
   TE-havib follow-on verification walk.
-- `Turn 160` `UT-160.b` and `UT-160.c` are answered by the TE-havib follow-on
-  verification path. `UT-160.a` remains a spec-edit loose end, and `UT-160.d`
-  remains a carry note about the still-unlocked TE-havib DFs. `TODO-lilok`
-  still needs its reopened harness-spec-sweep note reconciled against current
-  `TODO-kugod` ownership.
+- `Turn 160` `UT-160.a` is resolved by the TE-havib Cat-3 refinement and
+  `TODO-kugod` / `DI-mugar` nine-item sweep closure. `UT-160.b` and
+  `UT-160.c` are answered by the TE-havib follow-on verification path.
+  `UT-160.d` is resolved by TE-havib's final all-seven-DF locked status.
+  `TODO-lilok`'s former reopened harness-spec-sweep note is now reconciled
+  through `TODO-kugod` / `DI-mugar`.
 - `Turn 161` `UT-161.a` is answered by the TE-havib follow-on disposition.
   Carry items `UT-161.b` and `UT-161.c` remain conversation-only lineage /
   taxonomy notes and still need explicit downstream placement if reused.
@@ -330,6 +331,7 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
   this decision, and no later spec, research, simulation, or owner TODO is
   missing a load-bearing statement from this turn.
 - `Remaining decisions or work` None.
+- `Work pending` `no`
 - `Proposed disposition` `already captured correctly`
 - `Write needed? yes/no` `yes` for this rewalk entry and checklist closure in
   `TODO-juhub`; `no` correction note is needed in `TODO-lilar`.
@@ -366,6 +368,7 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
   design/spec/research/simulation doc appears to be missing a load-bearing
   statement from this turn.
 - `Remaining decisions or work` None.
+- `Work pending` `no`
 - `Proposed disposition` `already captured correctly`
 - `Write needed? yes/no` `yes` for this rewalk entry and checklist closure in
   `TODO-juhub`; `no` correction note is needed in `TODO-lilar`.
@@ -729,7 +732,22 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
   `DF-36.4` rather than framed as its own decision; the TE's six scenarios only
   partially align with the audit's recommended scenario set; and most of the
   seven drafted DFs remained unlocked at end-of-corpus.
-- `Proposed disposition` `already captured correctly`
+- `Related UTs / owners` `UT-160.a` is resolved by the 2026-05-12 Cat-3
+  refinement in TE-havib plus `TODO-kugod` / `DI-mugar`, which confirms the
+  nine audit items were swept or explicitly retired. `UT-160.b` is answered by
+  the TODO-lilok verification walk as procedural-meta, not a live DF split.
+  `UT-160.c` is answered by the same verification walk as wrong on inspection.
+  `UT-160.d` is resolved by the final TE-havib state: all seven DFs are locked
+  after the Alt-B re-presentation path.
+- `Owner/doc cleanup` Done. TE-havib now has a Cat-3 refinement that preserves
+  the historical "eight" wording but points readers at the nine-item audit
+  count and `DI-mugar` closure. `TODO-lilok` is closed; `TODO-lilar` remains
+  append-only historical evidence and does not need a correction note.
+- `Remaining decisions or work` None for turn 160 itself. Later turns still
+  carry their own UTs, but the turn-160 count mismatch, PT/tabletop concerns,
+  and end-of-corpus DF-lock concern are reconciled.
+- `Work pending` `no`
+- `Proposed disposition` `reconciled after TE-havib closure`
 - `Write needed? yes/no` `yes` for this rewalk entry and checklist closure in
   `TODO-juhub`; `no` correction note is needed in `TODO-lilar`.
 - `Next: wait for approval before turn N+1` Turn 161 is next and remains

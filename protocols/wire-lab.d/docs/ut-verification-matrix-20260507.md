@@ -520,3 +520,13 @@ now records TE-40 residual closure under `DI-mugar`, including the turn-159
 `UT-159.a`, `UT-159.b`, and `UT-159.d` rows and the previously verified
 `UT-159.c` row. This is the Cat-3 / Cat-4 forward pointer authorized by the
 matrix-as-closure-index rule.
+
+### 2026-05-12 — Turn-160 TE-havib closure pointer
+
+`docs/thought-experiments/TE-havib-apparatus-vs-specimen-carve-out.md` now
+has a Cat-3 refinement preserving the historical "eight specimen-bearing items"
+wording while pointing readers at the nine-item audit count and the `DI-mugar`
+harness-spec sweep closure. That closes `UT-160.a`. The same TE's final status
+records all seven DFs locked after the Alt-B re-presentation path, closing
+`UT-160.d`. `UT-160.b` and `UT-160.c` remain covered by the earlier
+TODO-lilok verification walk.
