@@ -105,6 +105,44 @@ reasoning is:
 | `proposals/pending/` | `protocols/wire-lab.d/archive/migrations/SIM-piloh-turns-149-208-recovery/archive/proposals/pending/` | Historical pending/contested review evidence. | Pending proposal records are not a live queue after the dev-guide resource/feedback process replaced proposals. |
 | `protocols/wire-lab.d/` | unchanged | Harness apparatus. | Use for wire-lab process/provenance claims, not as a PromiseGrid app/kernel API. |
 
+## Grid-Envelope Variant Simulations
+
+`DI-fanah` split the grid-envelope successor path into 24 standalone positional
+variant simulations. These are candidate specimens for comparison, not a
+preferred envelope family and not final PromiseGrid guide prose. Guide writers
+may cite them as evidence that encoding, unknown-pCID handling, and signature
+placement are still under active bakeoff. The parent owner lineage is
+`simulations/SIM-kurim-grid-envelope/`; the 24 child simulations below are the
+actual independently evolvable specimens. Source: `DI-fanah`;
+`simulations/SIM-kurim-grid-envelope/TODO/TODO-tujad-grid-envelope-successor-owner.md`.
+
+| Simulation | What it is for | Encoding | Unknown-pCID policy | Signature policy |
+|---|---|---|---|---|
+| `simulations/SIM-mahih-grid-envelope-enc-cbor-unknown-opaque-sig-wrapper-pcid/` | Tests a positional CBOR envelope that stores unknown protocol payloads opaquely and identifies signature semantics through the wrapper pCID. | CBOR | Opaque store/forward | Wrapper pCID |
+| `simulations/SIM-gasus-grid-envelope-enc-cbor-unknown-opaque-sig-unsigned-v0/` | Tests a positional CBOR envelope that stores unknown protocol payloads opaquely and allows an unsigned v0 baseline. | CBOR | Opaque store/forward | Unsigned v0 |
+| `simulations/SIM-vutar-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-opaque-bytes/` | Tests a positional CBOR envelope that stores unknown protocol payloads opaquely and requires opaque signature bytes. | CBOR | Opaque store/forward | Mandatory opaque bytes |
+| `simulations/SIM-vamaz-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-sig-pcid-payload/` | Tests a positional CBOR envelope that stores unknown protocol payloads opaquely and requires a signature pCID plus signature payload. | CBOR | Opaque store/forward | Mandatory signature pCID + payload |
+| `simulations/SIM-dorut-grid-envelope-enc-cbor-unknown-hard-reject-sig-wrapper-pcid/` | Tests a positional CBOR envelope that rejects unknown protocol payloads and identifies signature semantics through the wrapper pCID. | CBOR | Hard reject | Wrapper pCID |
+| `simulations/SIM-gazan-grid-envelope-enc-cbor-unknown-hard-reject-sig-unsigned-v0/` | Tests a positional CBOR envelope that rejects unknown protocol payloads and allows an unsigned v0 baseline. | CBOR | Hard reject | Unsigned v0 |
+| `simulations/SIM-hupir-grid-envelope-enc-cbor-unknown-hard-reject-sig-mandatory-opaque-bytes/` | Tests a positional CBOR envelope that rejects unknown protocol payloads and requires opaque signature bytes. | CBOR | Hard reject | Mandatory opaque bytes |
+| `simulations/SIM-kovis-grid-envelope-enc-cbor-unknown-hard-reject-sig-mandatory-sig-pcid-payload/` | Tests a positional CBOR envelope that rejects unknown protocol payloads and requires a signature pCID plus signature payload. | CBOR | Hard reject | Mandatory signature pCID + payload |
+| `simulations/SIM-vivus-grid-envelope-enc-cbor-unknown-best-effort-sig-wrapper-pcid/` | Tests a positional CBOR envelope that attempts best-effort inspection of unknown protocol payloads and identifies signature semantics through the wrapper pCID. | CBOR | Best-effort inspection | Wrapper pCID |
+| `simulations/SIM-fonig-grid-envelope-enc-cbor-unknown-best-effort-sig-unsigned-v0/` | Tests a positional CBOR envelope that attempts best-effort inspection of unknown protocol payloads and allows an unsigned v0 baseline. | CBOR | Best-effort inspection | Unsigned v0 |
+| `simulations/SIM-guhor-grid-envelope-enc-cbor-unknown-best-effort-sig-mandatory-opaque-bytes/` | Tests a positional CBOR envelope that attempts best-effort inspection of unknown protocol payloads and requires opaque signature bytes. | CBOR | Best-effort inspection | Mandatory opaque bytes |
+| `simulations/SIM-jokak-grid-envelope-enc-cbor-unknown-best-effort-sig-mandatory-sig-pcid-payload/` | Tests a positional CBOR envelope that attempts best-effort inspection of unknown protocol payloads and requires a signature pCID plus signature payload. | CBOR | Best-effort inspection | Mandatory signature pCID + payload |
+| `simulations/SIM-gojot-grid-envelope-enc-dag-cbor-unknown-opaque-sig-wrapper-pcid/` | Tests a positional DAG-CBOR envelope that stores unknown protocol payloads opaquely and identifies signature semantics through the wrapper pCID. | DAG-CBOR | Opaque store/forward | Wrapper pCID |
+| `simulations/SIM-hagom-grid-envelope-enc-dag-cbor-unknown-opaque-sig-unsigned-v0/` | Tests a positional DAG-CBOR envelope that stores unknown protocol payloads opaquely and allows an unsigned v0 baseline. | DAG-CBOR | Opaque store/forward | Unsigned v0 |
+| `simulations/SIM-ruzil-grid-envelope-enc-dag-cbor-unknown-opaque-sig-mandatory-opaque-bytes/` | Tests a positional DAG-CBOR envelope that stores unknown protocol payloads opaquely and requires opaque signature bytes. | DAG-CBOR | Opaque store/forward | Mandatory opaque bytes |
+| `simulations/SIM-riliz-grid-envelope-enc-dag-cbor-unknown-opaque-sig-mandatory-sig-pcid-payload/` | Tests a positional DAG-CBOR envelope that stores unknown protocol payloads opaquely and requires a signature pCID plus signature payload. | DAG-CBOR | Opaque store/forward | Mandatory signature pCID + payload |
+| `simulations/SIM-nipoh-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-wrapper-pcid/` | Tests a positional DAG-CBOR envelope that rejects unknown protocol payloads and identifies signature semantics through the wrapper pCID. | DAG-CBOR | Hard reject | Wrapper pCID |
+| `simulations/SIM-hiviv-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-unsigned-v0/` | Tests a positional DAG-CBOR envelope that rejects unknown protocol payloads and allows an unsigned v0 baseline. | DAG-CBOR | Hard reject | Unsigned v0 |
+| `simulations/SIM-tohol-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-mandatory-opaque-bytes/` | Tests a positional DAG-CBOR envelope that rejects unknown protocol payloads and requires opaque signature bytes. | DAG-CBOR | Hard reject | Mandatory opaque bytes |
+| `simulations/SIM-sivus-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-mandatory-sig-pcid-payload/` | Tests a positional DAG-CBOR envelope that rejects unknown protocol payloads and requires a signature pCID plus signature payload. | DAG-CBOR | Hard reject | Mandatory signature pCID + payload |
+| `simulations/SIM-johum-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-wrapper-pcid/` | Tests a positional DAG-CBOR envelope that attempts best-effort inspection of unknown protocol payloads and identifies signature semantics through the wrapper pCID. | DAG-CBOR | Best-effort inspection | Wrapper pCID |
+| `simulations/SIM-zifik-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-unsigned-v0/` | Tests a positional DAG-CBOR envelope that attempts best-effort inspection of unknown protocol payloads and allows an unsigned v0 baseline. | DAG-CBOR | Best-effort inspection | Unsigned v0 |
+| `simulations/SIM-fonol-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-mandatory-opaque-bytes/` | Tests a positional DAG-CBOR envelope that attempts best-effort inspection of unknown protocol payloads and requires opaque signature bytes. | DAG-CBOR | Best-effort inspection | Mandatory opaque bytes |
+| `simulations/SIM-rakir-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-mandatory-sig-pcid-payload/` | Tests a positional DAG-CBOR envelope that attempts best-effort inspection of unknown protocol payloads and requires a signature pCID plus signature payload. | DAG-CBOR | Best-effort inspection | Mandatory signature pCID + payload |
+
 ## Audience Readiness Matrix
 
 This matrix answers the current guide-writer feedback items `FB-gigit`,
