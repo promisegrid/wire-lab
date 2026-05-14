@@ -530,3 +530,32 @@ harness-spec sweep closure. That closes `UT-160.a`. The same TE's final status
 records all seven DFs locked after the Alt-B re-presentation path, closing
 `UT-160.d`. `UT-160.b` and `UT-160.c` remain covered by the earlier
 TODO-lilok verification walk.
+
+### 2026-05-12 — Turn-161 TE-havib closure pointer
+
+`docs/thought-experiments/TE-havib-apparatus-vs-specimen-carve-out.md` now
+also records the turn-161 nine-axis `promise-stack` vs `grid-pcid-payload`
+comparison and the assertion-taxonomy examples as historical inputs to the
+final DF-36.2 / OQ-36.6 retirement path. That closes `UT-161.b` and
+`UT-161.c` as captured historical inputs. `UT-161.a` remains covered by the
+earlier TODO-lilok verification walk.
+
+### 2026-05-12 — Turn-162 TE-havib closure pointer
+
+The TODO-lilok verification walk records `UT-162.a` as resolved by TE-havib's
+`OQ-36.6` negative-resolution path and `UT-162.b` as resolved by the Alt-B
+re-presentation of `DF-36.2`. TE-havib's current status and final `DF-36.2`
+lock make both outcomes visible, so no separate turn-162 work remains.
+
+### 2026-05-13 — Turn-163 DF-36.5 closure pointer
+
+`UT-163.a` is resolved by the active `§1.3` apparatus-level layering-scenarios
+rewrite in `protocols/wire-lab.d/specs/harness-spec-draft.md` under
+`DI-lajod`, with the wider turn-159 harness sweep later closed by `DI-mugar`.
+`UT-163.b` is closed for future-process purposes by `AGENTS-ppx.md` B1
+(`DI-021-20260507-212249`); commit-specific residue remains with the named
+commit UTs rather than with turn 163. `UT-cbf7f41-fallback` is retired for the
+active `§1.3` path because OQ-36.6 resolved in the negative, DF-36.2 retired
+promise-stack as a separate hypothesis, and the active harness prose now keeps
+the layering scenarios at apparatus level without a specimen-side fallback
+target.

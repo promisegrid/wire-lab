@@ -265,6 +265,27 @@ count-mismatch item `UT-160.a`; the separate end-of-corpus "five DFs unlocked"
 item `UT-160.d` is resolved by the final TE-havib status above: all seven DFs
 are now locked after the Alt-B re-presentation path.
 
+### 2026-05-12: Turn-161 comparison and assertion taxonomy disposition
+
+Turn 161 supplied the clearest conversation-only comparison between
+`promise-stack` and `grid-pcid-payload`: a nine-axis table covering envelope
+cardinality, pCID role, sender identity, signature placement, forwarding
+chain-of-custody, receiver behavior, library API, encoding, and composition.
+Its load-bearing result was the asymmetry later resolved by DF-36.2:
+`grid-pcid-payload` can carry a promise-stack-like payload under a pCID, while
+promise-stack cannot cleanly host `grid-pcid-payload` as a peer outer envelope.
+That comparison is now historical input to the final DF-36.2 retirement of
+promise-stack as a separate envelope hypothesis, not a separate open work item.
+
+The same turn also named frame-level assertion examples such as payload
+conformance, authorship, forwarding, and future-action promises. Those examples
+remain useful vocabulary evidence, but they no longer drive a promise-stack
+protocol home because DF-36.2 retired that home. Future assertion-taxonomy work,
+if needed, should be filed as its own protocol/vocabulary decision rather than
+as a leftover TE-havib blocker. This closes the turn-161 carry items
+`UT-161.b` and `UT-161.c` as captured historical inputs; `UT-161.a` was already
+answered by the DF-36.2 / OQ-36.6 negative-resolution path.
+
 ## Source
 
 This TE is the formal carve-out decision corresponding to step 2 of the 6-step corrected plan from session 2026-05-02. Step 1 (audit) is the input at [`protocols/wire-lab.d/docs/audit-20260503-015309-harness-spec-apparatus-vs-specimen.md`](../../protocols/wire-lab.d/docs/audit-20260503-015309-harness-spec-apparatus-vs-specimen.md). Steps 3-6 (per-protocol directory creation, harness-spec sweep, TODO-rivuk reframe, parallel TODO for grid envelope) are gated on the DI this TE produces.

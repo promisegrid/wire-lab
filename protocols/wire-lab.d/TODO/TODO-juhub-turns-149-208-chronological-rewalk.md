@@ -203,14 +203,17 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
   `TODO-lilok`'s former reopened harness-spec-sweep note is now reconciled
   through `TODO-kugod` / `DI-mugar`.
 - `Turn 161` `UT-161.a` is answered by the TE-havib follow-on disposition.
-  Carry items `UT-161.b` and `UT-161.c` remain conversation-only lineage /
-  taxonomy notes and still need explicit downstream placement if reused.
+  `UT-161.b` and `UT-161.c` are now captured as historical inputs by the
+  2026-05-12 TE-havib refinement; they are no longer turn-local live work.
 - `Turn 162` `UT-162.a` and `UT-162.b` are answered by the later TE-havib
   disposition path. The former `TODO-lilok` reopened sweep-handoff note is
   now closed through `TODO-kugod` / `DI-mugar`.
-- `Turn 163` `UT-163.a` remains a spec-edit loose end for the envelope-agnostic
-  `§1.3` wording template. `UT-163.b` remains a carry/procedural note about
-  uncaptured TE-havib twig commits.
+- `Turn 163` `UT-163.a` is resolved by the apparatus-level `§1.3` rewrite in
+  `harness-spec-draft.md` under `DI-lajod` / `DI-mugar`. `UT-163.b` is closed
+  as a future-process rule by `AGENTS-ppx.md` B1 / `DI-021-20260507-212249`;
+  the commit-specific concerns it cross-referenced live in their own UT rows.
+  `UT-cbf7f41-fallback` is retired by the final OQ-36.6 / DF-36.2 negative
+  path plus the active `§1.3` apparatus rewrite.
 - `Turn 164` `UT-164.c`, `UT-164.d`, and `UT-164.e` remain open under
   `TODO-turog`. Carry items `UT-164.a` and `UT-164.b` remain procedural /
   historical corrections only.
@@ -770,12 +773,25 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
   `grid-pcid-payload` message can carry a promise-stack inside its payload, but
   a promise-stack message does not cleanly host `grid-pcid-payload` as a peer
   outer envelope. That asymmetry is the conceptual seed of `OQ-36.6`.
-- `Gaps or contradictions` None that overturn the existing capture. Later
-  artifacts already preserve the two main carry-forwards from this turn: the
-  asymmetry may not have survived cleanly into the later committed OQ text, and
-  the nine-axis comparison table plus the richer open-set assertion taxonomy
-  still live only in conversation rather than in a committed doc.
-- `Proposed disposition` `already captured correctly`
+- `Gaps or contradictions` None that overturn the existing capture. The two
+  main carry-forwards from this turn are now reconciled: the asymmetry is
+  resolved by TE-havib DF-36.2's retirement of promise-stack as a separate
+  envelope hypothesis, and the nine-axis comparison plus richer open-set
+  assertion taxonomy are captured as historical inputs in the TE-havib
+  2026-05-12 refinement.
+- `Related UTs / owners` `UT-161.a` is answered by TE-havib DF-36.2 and the
+  TODO-lilok verification path: promise-stack is retired as a separate envelope
+  hypothesis, so the asymmetry concern is moot as a live OQ. `UT-161.b` and
+  `UT-161.c` are captured by the 2026-05-12 TE-havib refinement as historical
+  inputs rather than live downstream requirements.
+- `Owner/doc cleanup` Done. TE-havib now records the nine-axis comparison's
+  load-bearing result and the assertion-taxonomy examples. No correction note
+  is needed in `TODO-lilar`.
+- `Remaining decisions or work` None for turn 161 itself. Future assertion
+  taxonomy work can still be filed if a later protocol needs it, but that would
+  be new work rather than a turn-161 loose end.
+- `Work pending` `no`
+- `Proposed disposition` `reconciled after TE-havib refinement`
 - `Write needed? yes/no` `yes` for this rewalk entry and checklist closure in
   `TODO-juhub`; `no` correction note is needed in `TODO-lilar`.
 - `Next: wait for approval before turn N+1` Turn 162 is next and remains
@@ -793,18 +809,24 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - `Existing capture` `TODO-lilar` already captures the turn correctly. The raw
   turn's visible reply is minimal, but the substantive effect is preserved in
   later artifacts: the concern is recorded on the TE-havib twig as `OQ-36.6`,
-  and from this point on the promise-stack-home path becomes provisional rather
-  than cleanly settled. If the later investigation concludes that promise-stack
-  is really just one payload-shape under `grid-pcid-payload`, then the earlier
-  promise-stack-home direction either retires or stays only as a minimal
-  placeholder pending that decision.
-- `Gaps or contradictions` None that overturn the existing capture. The later
-  residual notes already preserve the two important nuances from this turn:
-  the committed `OQ-36.6` text may not preserve the cleaner asymmetry from turn
-  161 as clearly as the conversation did, and the provisional nature of the
-  earlier promise-stack-home direction may not be visually obvious to a later
-  reader of the TE twig.
-- `Proposed disposition` `already captured correctly`
+  and the promise-stack-home path is later re-presented under Alt-B rather than
+  left as a cleanly settled direction. The final TE-havib lock resolves the
+  suspicion in the negative by retiring `promise-stack` as a separate protocol
+  hypothesis instead of treating it as the active specimen home.
+- `Gaps or contradictions` None remaining for turn 162. The two former
+  residual concerns are now reconciled: `OQ-36.6` is visibly resolved in
+  TE-havib, and `DF-36.2` was re-presented under Alt-B as Alt-2.A revised
+  rather than left as a provisional promise-stack-home decision.
+- `Related UTs / owners` `UT-162.a` is resolved by TE-havib's `OQ-36.6`
+  negative-resolution path and the TODO-lilok verification walk. `UT-162.b` is
+  resolved by the Alt-B re-presentation of `DF-36.2` and the final Alt-2.A
+  revised lock.
+- `Owner/doc cleanup` Done. TE-havib already carries the final `OQ-36.6` and
+  `DF-36.2` resolution text; TODO-lilok is closed; the verification matrix now
+  has a turn-162 closure pointer.
+- `Remaining decisions or work` None for turn 162 itself.
+- `Work pending` `no`
+- `Proposed disposition` `reconciled after TE-havib final lock`
 - `Write needed? yes/no` `yes` for this rewalk entry and checklist closure in
   `TODO-juhub`; `no` correction note is needed in `TODO-lilar`.
 - `Next: wait for approval before turn N+1` Turn 163 is next and remains
@@ -826,13 +848,28 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
   uncertainty is built explicitly into the recommendation: the apparatus-level
   summary survives either way, but the specimen-side destination depends on
   whether promise-stack later survives as a distinct specimen.
-- `Gaps or contradictions` None that overturn the existing capture. The main
-  carry-forward from this turn is that the bot effectively created an
-  envelope-agnostic rewrite template for the four `§1.3` tests and implied
-  that the same pattern should apply to other ambiguous sections such as `§3.3`
-  and `§7.1`. That template lives only in conversation, not in a committed
-  artifact.
-- `Proposed disposition` `already captured correctly`
+- `Gaps or contradictions` None remaining for turn 163. The turn's
+  envelope-agnostic `§1.3` template no longer lives only in conversation:
+  active `harness-spec-draft.md` now carries an apparatus-level
+  layering-scenarios section under `DI-lajod`, later completed for the wider
+  turn-159 audit by `DI-mugar`. The uncaptured-commit concern is also no longer
+  a turn-local work item: its future-process lesson is captured in
+  `AGENTS-ppx.md` B1, while any commit-specific residue is carried by the
+  separately named UT rows.
+- `Related UTs / owners` `UT-163.a` is resolved by the `§1.3` apparatus-level
+  rewrite in `protocols/wire-lab.d/specs/harness-spec-draft.md`. `UT-163.b` is
+  closed as a procedural rule by `AGENTS-ppx.md` B1 / `DI-021-20260507-212249`.
+  `UT-cbf7f41-fallback` is retired for turn-163 purposes by OQ-36.6's negative
+  resolution, DF-36.2's promise-stack retirement, and the active `§1.3`
+  apparatus rewrite.
+- `Owner/doc cleanup` Done. The verification matrix now has a turn-163 closure
+  pointer. No `TODO-lilar` checkbox is flipped; the matrix remains the closure
+  index.
+- `Remaining decisions or work` None for turn 163 itself. Commit-specific rows
+  not owned by this turn remain under their own UT identifiers if later replay
+  reaches them.
+- `Work pending` `no`
+- `Proposed disposition` `reconciled after §1.3 rewrite and B1 transfer`
 - `Write needed? yes/no` `yes` for this rewalk entry and checklist closure in
   `TODO-juhub`; `no` correction note is needed in `TODO-lilar`.
 - `Next: wait for approval before turn N+1` Turn 164 is next and remains
