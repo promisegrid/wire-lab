@@ -608,3 +608,16 @@ docs using `stevegt-via-perplexity` as the committed `From:` identity.
 `UT-166.e` is closed by `DI-rurab`, which supersedes membership-by-posting with
 fixed configured branch membership, passive-observer non-membership, and no
 self-admission from unknown branches.
+
+### 2026-05-14 — Turn-167 closure pointer
+
+Turn 167 has no remaining open UT work. `UT-167.a` is closed by active
+filename=CID docs: no active sequential `m<N>-...` filename rule remains.
+`UT-167.b` and `UT-167.c` are closed by `DI-rurab`, which defines fixed
+configured `<author-id>/main` branch membership and resolves `{name}` as
+author-id for the git-bound specimen. `UT-167.d` is closed by the
+2026-05-14 corpus audit for `\.msg\b`; remaining matches are historical
+replay/disposition notes or message-body evidence, not active spec guidance.
+`UT-167.e` is closed for future-process purposes by the current decision-first
+protocol plus `DI-vanak`; later execute-on-directive rows keep their own
+turn-specific reconciliation work.

@@ -230,9 +230,11 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
   decision-first protocol and `DI-vanak`; `UT-166.b`, `UT-166.c`, and
   `UT-166.e` are closed by active `DI-rurab` / specimen wording; `UT-166.d`
   is closed as historical git metadata that must not be rewritten.
-- `Turn 167` `UT-167.a`, `UT-167.b`, `UT-167.c`, and `UT-167.e` remain open
-  under `TODO-turog`. `UT-167.d` remains an open spec-edit item for the
-  missing Cat-2 quotation grep.
+- `Turn 167` `UT-167.a` is closed by active filename=CID docs; `UT-167.b` and
+  `UT-167.c` are closed by `DI-rurab` branch-membership wording; `UT-167.d`
+  is closed by the 2026-05-14 `.msg` corpus audit; `UT-167.e` is closed for
+  future-process purposes by the current decision-first protocol and
+  `DI-vanak`.
 - `Turn 168` `UT-168.b`, `UT-168.c`, and `UT-168.d` remain open under
   `TODO-turog`. `UT-168.a`, `UT-168.e`, and `UT-168.f` remain open under
   `TODO-duvuk`.
@@ -1018,20 +1020,30 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
   "in flight" with an explicit Git discipline: read from all known branches,
   write only to your own branch, and let `Parents:` rather than branch topology
   carry ordering.
-- `Gaps or contradictions` None that overturn the existing capture. The later
-  residual notes already preserve the important problems introduced here: the
-  sequential `m<N>` naming convention is locked here and reversed one turn
-  later, `§9` quietly leans toward extensible-by-posting despite the stronger
-  `§8` language, the meaning of `{name}` was not fully nailed down in Steve's
-  prompt but the bot chose an interpretation in the spec, the six-document
-  sweep appears to have happened without the quotation-aware Cat-2 grep
-  discipline, and this is another execute-on-directive turn rather than a
-  recommend-and-wait turn.
-- `Proposed disposition` `already captured correctly`
-- `Write needed? yes/no` `yes` for this rewalk entry and checklist closure in
-  `TODO-juhub`; `no` correction note is needed in `TODO-lilar`.
-- `Next: wait for approval before turn N+1` Turn 168 is next and remains
-  pending approval.
+- `Gaps or contradictions` Captured and now resolved for turn-167 cleanup
+  purposes. `UT-167.a` is closed because current active docs use filename = CID
+  and no active sequential `m<N>-...` filename rule remains. `UT-167.b` is
+  closed by `DI-rurab`, which rejects membership-by-posting for active wording
+  and uses fixed configured `<author-id>/main` membership. `UT-167.c` is
+  closed by the same `DI-rurab` wording: `{name}` now means author-id, not
+  group name. `UT-167.d` is closed by the 2026-05-14 corpus audit for
+  `\.msg\b`; remaining matches are historical replay/disposition notes or
+  message-body evidence, not active spec guidance. `UT-167.e` is closed for
+  future-process purposes by the current decision-first protocol plus
+  `DI-vanak`; later execute-on-directive rows keep their own turn-specific
+  reconciliation work.
+- `Related UTs / owners` `UT-167.a`, `UT-167.b`, `UT-167.c`, `UT-167.d`, and
+  `UT-167.e` are now checked off in `TODO-lilar`. The active group-session
+  and wire-lab-devs docs already carry the filename, branch-membership, and
+  passive-observer wording needed for this turn.
+- `Owner/doc cleanup` Done. `TODO-lilar` turn-167 UT rows are closed;
+  `TODO-juhub` carries this stronger note; the verification matrix has a
+  turn-167 closure pointer. No active `.msg` spec-edit target was found.
+- `Remaining decisions or work` None for turn 167.
+- `Work pending` `no`
+- `Proposed disposition` `reconciled after lilar UT closure and .msg audit`
+- `Write needed? yes/no` `no`
+- `Next` Turn 168 is next.
 
 ### Turn 168 — 2026-05-03 11:45 UTC
 
