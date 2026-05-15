@@ -40,8 +40,8 @@ minted after that date carry only the proquint handle.
 | [TODO-juhub](./TODO-juhub-turns-149-208-chronological-rewalk.md) | 2026-05-10 | Turns 149-208 chronological rewalk **(open: one turn at a time; sweep later turns and later artifacts before advancing)** | — |
 | [TODO-kugod](./TODO-kugod-te-40-apparatus-vs-specimen-completion.md) | 2026-05-07 | TE-40 apparatus-vs-specimen completion + TE-famar closure **(closed: post-Mupoz harness-spec, grid-envelope, and transport-spec residuals resolved by DI-mugar)** | `TODO-25` / `TODO-20260507-002306` |
 | [TODO-rusis](./TODO-rusis-simulation-split-and-specimen-relocation.md) | 2026-05-10 | Simulation split and specimen relocation **(open: dissolve `SIM-piloh` into independent lineage sims; retire active `ppx-dr`; preserve every existing artifact by move, archive, rooted retention, or supersession)** | — |
-| [TODO-turog](./TODO-turog-te-41-group-session-freeze-procedure.md) | 2026-05-07 | TE-41 group-session freeze procedure | `TODO-26` / `TODO-20260507-002306` |
-| [TODO-duvuk](./TODO-duvuk-te-42-filename-cid-cascade-policy.md) | 2026-05-07 | TE-42 filename / CID-cascade policy | `TODO-27` / `TODO-20260507-002306` |
+| [TODO-turog](./TODO-turog-te-41-group-session-freeze-procedure.md) | 2026-05-07 | TE-41 group-session freeze procedure **(closed: active successor work closed by DI-rurab / DI-bomud)** | `TODO-26` / `TODO-20260507-002306` |
+| [TODO-duvuk](./TODO-duvuk-te-42-filename-cid-cascade-policy.md) | 2026-05-07 | TE-42 filename / CID-cascade policy **(closed: active successor work closed by DI-rurab / DI-bomud)** | `TODO-27` / `TODO-20260507-002306` |
 | [TODO-kituj](./TODO-kituj-te-43-promisebase-prior-art-adoption.md) | 2026-05-07 | TE-43 promisebase prior-art adoption | `TODO-28` / `TODO-20260507-002306` |
 | [TODO-dozak](./TODO-dozak-te-44-wire-lab-promisebase-merge-trajectory.md) | 2026-05-07 | TE-44 wire-lab/promisebase merge trajectory | `TODO-29` / `TODO-20260507-002306` |
 | [TODO-ralud](./TODO-ralud-te-45-conditional-release-geofencing.md) | 2026-05-07 | TE-45 conditional-release / geofencing / recursive promise-graph | `TODO-30` / `TODO-20260507-002306` |
@@ -58,7 +58,13 @@ minted after that date carry only the proquint handle.
 | Handle | Mint date | Title | Prior alias |
 |---|---|---|---|
 | [TODO-bisur](../../../simulations/SIM-rakot-group-session/protocols/group-session.d/TODO/TODO-bisur-group-transport-envelope.md) | 2026-05-01 | TODO 012 - Group-transport envelope via `grid <pcid>` | `TODO-12` / `TODO-20260501-045543` |
-| [TODO-gapab](../../../simulations/SIM-rakot-group-session/protocols/group-session.d/TODO/TODO-gapab-group-session-freeze-and-cid-cascade-follow-on.md) | 2026-05-11 | Group-session freeze + CID-cascade follow-on owner split from rooted TODOs | — |
+| [TODO-gapab](../../../simulations/SIM-rakot-group-session/protocols/group-session.d/TODO/TODO-gapab-group-session-freeze-and-cid-cascade-follow-on.md) | 2026-05-11 | Group-session freeze + CID-cascade follow-on owner split from rooted TODOs **(closed: DI-rurab)** | — |
+
+## feed-outer
+
+| Handle | Mint date | Title | Prior alias |
+|---|---|---|---|
+| [TODO-kakaz](../../../simulations/SIM-labit-feed-outer/TODO/TODO-kakaz-feed-outer-freeze-and-cid-cascade-follow-on.md) | 2026-05-11 | Feed-outer freeze + CID-cascade follow-on owner split from rooted TODOs **(closed: DI-bomud)** | — |
 
 ## ppx-dr (retired archive lineage)
 

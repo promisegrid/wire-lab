@@ -559,3 +559,52 @@ active `§1.3` path because OQ-36.6 resolved in the negative, DF-36.2 retired
 promise-stack as a separate hypothesis, and the active harness prose now keeps
 the layering scenarios at apparatus level without a specimen-side fallback
 target.
+
+### 2026-05-13 — Turn-164 routing pointer
+
+Turn 164 initially routed successor work as follows. `UT-164.a` and
+`UT-164.b` are historical corrections rather than live implementation work:
+current TE-havib status corrects the lock count, and the TE-numan scope
+question was later settled by the TE-39 / TODO-lilar cross-cutting
+disposition. `UT-164.c` is resolved by `TODO-bisur` 012.7's four-message
+round-trip, which exercises §3, §4, §4.6, §6, and §7 of the group-session
+draft. The same-day closure pointer below supersedes the initial `UT-164.d`
+and `UT-164.e` routing state.
+
+### 2026-05-13 — Turn-164 successor closure pointer
+
+This supersedes the routing pointer immediately above for turn-164 closure
+state. `UT-164.d` is closed by sim-local `TODO-gapab` / `DI-rurab`, which
+locks fixed configured `<author-id>/main` membership, passive-observer
+non-membership, git-binding scope, and legacy `Message-ID:` reader/writer
+behavior for the group-session specimen. `UT-164.e` is closed by `TODO-gapab`
+/ `DI-rurab` plus `TODO-kakaz` / `DI-bomud`, which keeps spec freeze additive,
+rejects historical transport-message rewrites, and keeps message-level CID and
+header policy out of feed-outer. Turn 164 has no remaining open UT work.
+
+### 2026-05-14 — Turn-165 closure pointer
+
+Turn 165 has no remaining open UT work. `UT-165.a` is closed as an
+observational privacy/slug lesson because the active specimen uses the generic
+`wire-lab-devs` slug and active examples use neutral Alice/Bob prose.
+`UT-165.b` is closed by `DI-rurab`, which defines the interim
+`merge-group-transport-spec` shape as a Steve-authored DI until cryptographic
+promise tooling exists. `UT-165.c` was already closed by the neutral-memory
+update. `UT-165.d` is closed by keeping OQ-G4 deferred while treating m000 as
+valid specimen evidence rather than a v0 genesis-message mandate. `UT-165.e`
+is closed by the group-session example and freeze-gate cleanup under
+`DI-rurab`.
+
+### 2026-05-14 — Turn-166 closure pointer
+
+Turn 166 has no remaining open UT work. `UT-166.a` is closed for
+future-process purposes by the current decision-first protocol plus
+`DI-vanak`'s explicit replay approval shorthand; the historical bootstrap
+commits are preserved. `UT-166.b` is closed by `DI-rurab`: active membership is
+the fixed configured set of exact `<author-id>/main` branches, so guessed
+actors are not enrolled by speculation. `UT-166.c` is closed by active specimen
+docs using `stevegt-via-perplexity` as the committed `From:` identity.
+`UT-166.d` is closed as historical git metadata that must not be rewritten.
+`UT-166.e` is closed by `DI-rurab`, which supersedes membership-by-posting with
+fixed configured branch membership, passive-observer non-membership, and no
+self-admission from unknown branches.

@@ -9,13 +9,11 @@ Before the TE-39 proquint migration, this file was known as:
 
 ## Status
 
-Open. Depends on TE-40 (apparatus-vs-specimen completion) landing and
-the TODO-pipus/TE-43 CAS/feed migration design. TE-nijab's
-transport-layering / freeze-boundary DFs are locked, but DF-nijab.3
-parks freeze-doc cleanup instead of executing it now.
-Per `DI-mosor` (`rusis.10`), active specimen-owned follow-on now routes
-to sim-local successor TODOs while this rooted file remains historical
-coordination memory.
+Closed as historical coordination memory. The active group-session successor
+slice is closed by `TODO-gapab` / `DI-rurab`; the active feed-outer successor
+slice is closed by `TODO-kakaz` / `DI-bomud`. This rooted file preserves the
+original TE-41 thread narrative and DI history; it is no longer an active
+execution owner.
 
 ## Threads absorbed from OPEN-THREADS.md
 
@@ -42,6 +40,12 @@ TE-nijab found that this is a category error: specs freeze, while
 transport message directories are append-only specimen data. Do not
 execute step 5 as written; DF-nijab.3 parks freeze-doc cleanup behind
 TODO-pipus/TE-43 instead of rewriting this checklist now.
+
+Closure note, 2026-05-13: the parked successor wording is now resolved in the
+simulation-local owners. Group-session membership, git-binding, legacy
+`Message-ID:`, and `merge-group-transport-spec` wording are closed by
+`DI-rurab`; feed-outer freeze-boundary and no-rewrite wording are closed by
+`DI-bomud`.
 
 Blocking: outer transport-spec-draft.md has its own freeze gate;
 nothing else gates this thread today.

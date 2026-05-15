@@ -21,6 +21,9 @@ suffix `-draft` (per DF-38.5: pattern `<slug>-<state>` where `<state>` is
 envelope `grid draft:group-session`. Once the spec is frozen and a pCID
 is minted, a later DR/DI/spec handoff must decide whether this simulation-local
 specimen graduates, stays as evidence, or produces a new frozen successor.
+Spec freeze does not rewrite this directory or any message bytes. If a frozen
+successor or derived mirror is needed, it is additive and cites this specimen
+as source evidence. Source: `DI-bomud`.
 
 Note: prior to 2026-05-06 this directory was named
 `transports/draft--wire-lab-devs/` per the older `draft--<slug>` rule.
@@ -39,8 +42,10 @@ wire-lab — multiple humans, each driving one or more LLM agents inside
 their own clone of this repository.
 
 Under the per-author-branch git binding (see below), membership is
-realized as the set of `<author-id>/main` branches participants are
-configured to fetch and propagate from.
+realized as the fixed configured set of exact `<author-id>/main` branches
+participants are configured to fetch and propagate from. Unknown branches are
+ignored until a successor transport instance or future DI explicitly admits
+them. Passive read-only observers are not members. Source: `DI-rurab`.
 
 ## Layout (per spec §1: flat; per spec §2: filename = CID)
 
@@ -66,7 +71,9 @@ and is ignored by readers walking the message DAG.
 ## Git binding: per-author branches with content-addressed merge
 
 This transport instance follows
-[`group-session-draft.md`](../../../protocols/group-session.d/specs/group-session-draft.md) §9.
+[`group-session-draft.md`](../../../../SIM-rakot-group-session/protocols/group-session.d/specs/group-session-draft.md) §9.
+That §9 git binding is normative for this specimen's readers and writers.
+Source: `DI-rurab`.
 
 ### Branch ownership
 
@@ -166,10 +173,10 @@ Other developer agents joining the transport are expected to:
 
 - [ ] [`protocols/wire-lab.d/specs/transport-spec-draft.md`](../../../../../protocols/wire-lab.d/specs/transport-spec-draft.md) frozen
 - [x] At least one round-trip exercising §3 / §4 / §4.6 / §6 / §7 (closed 2026-05-06: four-message DAG, two distinct senders `stevegt-via-perplexity` and `alice`, all CIDs verified by `tools/spec cid`)
-- [ ] Steve signs `merge-group-transport-spec` promise
+- [ ] Steve records a `merge-group-transport-spec` DI promise
 - [ ] `tools/spec freeze group-transport-spec` mints pCID and snapshots
-- [ ] This directory and every message's grid envelope rewritten to the
-      minted pCID
+- [x] Existing message bytes preserved across freeze; any frozen successor or
+      derived mirror is additive (`DI-bomud`)
 
 ## Related
 

@@ -93,6 +93,12 @@ reasoning is:
 - Simulation-local artifacts are evidence. They become authoritative
   PromiseGrid guidance only after DR/DI/spec/dev-guide handoff. Source:
   `DI-fakin`.
+- Turn-164 cleanup closed the group-session/feed-outer freeze-boundary split:
+  group-session owns fixed configured `<author-id>/main` membership,
+  git-binding scope, and legacy `Message-ID:` compatibility in the specimen;
+  feed-outer stays thin and spec freeze does not rewrite historical
+  transport/feed data. Treat these as provisional simulation evidence, not
+  final PromiseGrid API prose. Source: `DI-rurab`; `DI-bomud`.
 
 | Old path | New path | Guide-writer status | Reasoning |
 |---|---|---|---|

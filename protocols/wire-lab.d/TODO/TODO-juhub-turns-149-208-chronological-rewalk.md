@@ -214,14 +214,22 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
   the commit-specific concerns it cross-referenced live in their own UT rows.
   `UT-cbf7f41-fallback` is retired by the final OQ-36.6 / DF-36.2 negative
   path plus the active `§1.3` apparatus rewrite.
-- `Turn 164` `UT-164.c`, `UT-164.d`, and `UT-164.e` remain open under
-  `TODO-turog`. Carry items `UT-164.a` and `UT-164.b` remain procedural /
-  historical corrections only.
-- `Turn 165` `UT-165.b` remains open under `TODO-turog`. `UT-165.d` and
-  `UT-165.e` remain spec-edit loose ends. Carry items `UT-165.a` and
-  `UT-165.c` remain process/privacy notes rather than live design work.
-- `Turn 166` `UT-166.a`, `UT-166.b`, `UT-166.c`, and `UT-166.e` remain open
-  under `TODO-turog`. Carry item `UT-166.d` remains historical metadata only.
+- `Turn 164` `UT-164.a` and `UT-164.b` are historical corrections, not live
+  implementation work. `UT-164.c` is resolved by `TODO-bisur` 012.7's
+  four-message round-trip. `UT-164.d` is closed by sim-local `TODO-gapab` /
+  `DI-rurab`. `UT-164.e` is closed by `TODO-gapab` / `DI-rurab` and
+  `TODO-kakaz` / `DI-bomud`; rewrite-at-freeze remains rejected, and turn 164
+  now has zero open successor work.
+- `Turn 165` `UT-165.a` is closed as an observational privacy/slug lesson;
+  `UT-165.b` is closed by the Steve-authored DI promise shape in `DI-rurab`;
+  `UT-165.c` was already closed by the neutral-memory update; `UT-165.d` is
+  closed by keeping OQ-G4 deferred while treating m000 as valid specimen
+  evidence; `UT-165.e` is closed by the group-session example/freeze-gate
+  cleanup under `DI-rurab`.
+- `Turn 166` `UT-166.a` is closed for future-process purposes by the current
+  decision-first protocol and `DI-vanak`; `UT-166.b`, `UT-166.c`, and
+  `UT-166.e` are closed by active `DI-rurab` / specimen wording; `UT-166.d`
+  is closed as historical git metadata that must not be rewritten.
 - `Turn 167` `UT-167.a`, `UT-167.b`, `UT-167.c`, and `UT-167.e` remain open
   under `TODO-turog`. `UT-167.d` remains an open spec-edit item for the
   missing Cat-2 quotation grep.
@@ -890,16 +898,27 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
   thread boundary where TE-havib becomes parked and the transport-bootstrap
   work begins immediately afterward.
 - `Gaps or contradictions` None that overturn the existing capture. The key
-  later carry-forwards are already preserved elsewhere: the bot overclaimed
-  TE-havib as "4-DF-locked" when only two DFs were actually locked, it drafted
-  the unnecessary TE-numan in the gap immediately after this turn, and the
-  remaining unfinished TE-havib threads had to be carried forward before the
-  transport work took over.
-- `Proposed disposition` `already captured correctly`
-- `Write needed? yes/no` `yes` for this rewalk entry and checklist closure in
-  `TODO-juhub`; `no` correction note is needed in `TODO-lilar`.
-- `Next: wait for approval before turn N+1` Turn 165 is next and remains
-  pending approval.
+  later carry-forwards are now split by owner and closed: the "4-DF-locked"
+  overclaim and TE-numan revert/merge discrepancy are historical corrections;
+  the group-session round-trip coverage issue was later closed by the
+  four-message `TODO-bisur` 012.7 artifact; membership-by-posting is closed by
+  `DI-rurab`; freeze-rewrite is rejected by `DI-bomud`.
+- `Related UTs / owners` `UT-164.a` is a historical correction against the
+  current TE-havib status. `UT-164.b` is a historical correction; TE-numan
+  scope was later settled by the TE-39 / TODO-lilar cross-cutting disposition.
+  `UT-164.c` is resolved by `TODO-bisur` 012.7. `UT-164.d` is closed by
+  sim-local `TODO-gapab` / `DI-rurab`. `UT-164.e` is closed by
+  `TODO-gapab` / `DI-rurab` and `TODO-kakaz` / `DI-bomud`; the no-rewrite
+  freeze boundary is now explicit in the feed-outer and wire-lab-devs docs.
+- `Owner/doc cleanup` Done. The verification matrix has a turn-164 closure
+  pointer. Rooted `TODO-turog` and `TODO-duvuk` remain historical coordination
+  memory; active specimen-owned successor work is closed in the sim-local
+  TODOs.
+- `Remaining decisions or work` None for turn 164.
+- `Work pending` `no`
+- `Proposed disposition` `reconciled after successor closure`
+- `Write needed? yes/no` `no`
+- `Next` Turn 165 processed by the next chronological replay step.
 
 ### Turn 165 — 2026-05-03 11:21 UTC
 
@@ -916,18 +935,31 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
   was "reverted cleanly," and then lays out the concrete bootstrap
   chicken-and-egg with three options and a recommendation for the draft-
   directory approach (`Option A`).
-- `Gaps or contradictions` None that overturn the existing capture. The later
-  residual notes already preserve the important problems introduced here: the
-  "reverted cleanly" claim conflicts with the later reflog evidence, the slug
-  examples in the answer were still not fully aligned with the anonymity rule,
-  the `merge-group-transport-spec` step was treated as operationally defined
-  when it was not, and the turn may have triggered a memory write that inferred
-  facts not actually present in Steve's prompt.
-- `Proposed disposition` `already captured correctly`
-- `Write needed? yes/no` `yes` for this rewalk entry and checklist closure in
-  `TODO-juhub`; `no` correction note is needed in `TODO-lilar`.
-- `Next: wait for approval before turn N+1` Turn 166 is next and remains
-  pending approval.
+- `Gaps or contradictions` Captured and now resolved for turn-165 cleanup
+  purposes. The "reverted cleanly" claim remains owned by `UT-164.b`, already
+  reconciled as historical evidence. `UT-165.a` is closed as an observational
+  privacy/slug lesson because the active specimen uses the generic
+  `wire-lab-devs` slug and current group-session examples use neutral
+  Alice/Bob prose. `UT-165.b` is closed by `DI-rurab`, which defines the
+  interim `merge-group-transport-spec` shape as a Steve-authored DI until
+  cryptographic promise tooling exists. `UT-165.c` was already closed by the
+  neutral-memory update. `UT-165.d` is closed without a spec edit: OQ-G4 remains
+  deferred, and m000 is one valid first-message pattern rather than a v0
+  genesis-message mandate. `UT-165.e` is closed by the group-session spec
+  cleanup that removed `codex-perplexity` examples and names the
+  wire-lab-devs specimen as the freeze-gate evidence.
+- `Related UTs / owners` `UT-165.a`, `UT-165.b`, `UT-165.d`, and
+  `UT-165.e` are now checked off in `TODO-lilar`; `UT-165.c` was already
+  checked off. No active owner TODO remains for turn 165.
+- `Owner/doc cleanup` Done. `TODO-lilar` UT rows are closed; `TODO-juhub`
+  carries the stronger turn note; `group-session-draft.md` and
+  `wire-lab-devs-draft/README.md` already carry the resulting active wording
+  from the `DI-rurab` / `DI-bomud` cleanup.
+- `Remaining decisions or work` None for turn 165.
+- `Work pending` `no`
+- `Proposed disposition` `reconciled after lilar UT closure`
+- `Write needed? yes/no` `no`
+- `Next` Turn 166 is next.
 
 ### Turn 166 — 2026-05-03 11:29 UTC
 
@@ -943,17 +975,31 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
   confirms that the bootstrap commit and merge landed as part of this same
   response, not before it, so this is a high-effects execution turn rather than
   just a naming correction.
-- `Gaps or contradictions` None that overturn the existing capture. The later
-  residual notes already preserve the important problems introduced here: the
-  bot speculated about one participant who Steve had not explicitly enrolled,
-  raised but did not resolve the `§8` membership-pinning requirement before
-  executing, reported through a stale branch name, and offered two reply-paths
-  while immediately executing one of them.
-- `Proposed disposition` `already captured correctly`
-- `Write needed? yes/no` `yes` for this rewalk entry and checklist closure in
-  `TODO-juhub`; `no` correction note is needed in `TODO-lilar`.
-- `Next: wait for approval before turn N+1` Turn 167 is next and remains
-  pending approval.
+- `Gaps or contradictions` Captured and now resolved for turn-166 cleanup
+  purposes. `UT-166.a` is closed for future-process purposes by the current
+  decision-first protocol plus `DI-vanak`'s explicit replay approval shorthand;
+  historical bootstrap commits remain preserved and are not rewritten.
+  `UT-166.b` is closed by `DI-rurab`: active membership is the fixed configured
+  set of exact `<author-id>/main` branches, so guessed actors are not enrolled
+  by speculation. `UT-166.c` is closed by active specimen docs that use
+  `stevegt-via-perplexity` as the committed `From:` identity. `UT-166.d` is
+  closed as historical git metadata; rewriting the stale twig name would be a
+  history rewrite. `UT-166.e` is closed by `DI-rurab`, which supersedes
+  membership-by-posting with fixed configured branch membership, passive
+  observer non-membership, and no self-admission from unknown branches.
+- `Related UTs / owners` `UT-166.a`, `UT-166.b`, `UT-166.c`, `UT-166.d`, and
+  `UT-166.e` are now checked off in `TODO-lilar`. Later turn rows that cite
+  `UT-166.a` remain future-turn work only where their own turn-specific
+  execution pattern still needs reconciliation.
+- `Owner/doc cleanup` Done. `TODO-lilar` turn-166 UT rows are closed;
+  stale future-row references to `UT-166.a` as "pending" were updated to point
+  at the resolved process baseline; active group-session and wire-lab-devs
+  docs already carry the `DI-rurab` membership and identity-safe wording.
+- `Remaining decisions or work` None for turn 166.
+- `Work pending` `no`
+- `Proposed disposition` `reconciled after lilar UT closure`
+- `Write needed? yes/no` `no`
+- `Next` Turn 167 is next.
 
 ### Turn 167 — 2026-05-03 11:37 UTC
 

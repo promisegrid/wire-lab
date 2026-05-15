@@ -1,8 +1,8 @@
 # Group Transport Spec (DRAFT)
 
-*This is the wire-lab's first transport-protocol spec. It defines the small-finite-closed-group transport-protocol: N≥2 participants, all-see-all visibility, multi-writer DAG of messages, append-only persistence. The Codex↔Perplexity exchange is the N=2 instance, not a separate spec. This file is a draft and is subject to revision; once frozen, its pCID will name this protocol class for all time. See `specs/MANIFEST.md` for freeze status.*
+*This is the wire-lab's first transport-protocol spec. It defines the small-finite-closed-group transport-protocol: N≥2 participants, all-see-all visibility, multi-writer DAG of messages, append-only persistence. Concrete N=2 exchanges are instances of this protocol, not separate specs. This file is a draft and is subject to revision; once frozen, its pCID will name this protocol class for all time. See `specs/MANIFEST.md` for freeze status.*
 
-> **Status: DRAFT.** Not frozen. The pCID for this spec is not yet minted. Cross-references to it in other repo files use `specs/group-transport-draft.md` (path) until freeze; after freeze they will use the pCID.
+> **Status: DRAFT.** Not frozen. The pCID for this spec is not yet minted. Cross-references to it in other repo files use this draft path until freeze; after freeze they use the pCID. Source: `DI-rurab`.
 
 > **Simulation note:** This draft now lives at
 > `simulations/SIM-rakot-group-session/protocols/group-session.d/` (moved in
@@ -173,13 +173,13 @@ The protocol does not specify retention bounds; transports under this protocol a
 
 ### §8. Membership
 
-Membership is **closed and fixed at transport creation.** The set of `From:` values that may appear in a transport instance is determined by the social/organizational context of the transport's creation; the protocol does not enforce a membership list cryptographically in v0. A transport's slug typically names the participants (e.g. `codex-perplexity`).
+Membership is **closed and fixed at transport creation.** For the git-bound specimen in §9, membership is the configured set of exact `<author-id>/main` branches whose messages participants fetch and propagate. Membership is not inferred from arbitrary branch discovery, from first posting, or from a human-readable slug. A passive read-only observer can fetch or inspect a transport without becoming a member. Source: `DI-rurab`.
 
-If membership changes — a participant leaves, a new participant joins — a new transport instance is created (a new directory under `transports/`, with a fresh slug). The old transport remains as immutable history.
+If membership changes — a participant leaves, a new participant joins, or an observer becomes an active participant — a new transport instance is created, or a future DI defines an explicit successor/admission mechanism. The old transport remains as immutable history.
 
-### §9. Per-author-branch git binding with content-addressed merge (non-normative)
+### §9. Per-author-branch git binding with content-addressed merge
 
-This section describes the conventional git binding used by transport instances of this protocol that ride a shared git remote as their wire. It is non-normative: the protocol's contract is the on-disk shape of `transports/<pcid>--<slug>/` plus the canonical bytes of each message file. The git binding is one way of placing those files in front of the participants such that the append-only and DAG-of-parents semantics are preserved across multiple writers.
+This section defines the git binding used by the wire-lab-devs specimen. It is normative for that git-bound specimen's readers and writers, but it does not prevent future group-session bindings that preserve the same on-disk message contract. Source: `DI-rurab`.
 
 #### §9.1 Branch ownership
 
@@ -198,6 +198,8 @@ Under §2, every message file's name is its message CID. This has three conseque
 #### §9.3 Receive-merge-push-then-optionally-post cycle
 
 A participant's transport interaction proceeds in two phases per cycle. The merge phase is mandatory whenever new messages are observed; the post phase is optional.
+
+A passive read-only observer that fetches without authoring or propagating is outside membership and is not required to run the merge phase. The mandatory merge phase applies to configured members participating in this git binding. Source: `DI-rurab`.
 
 **Merge phase (mandatory when new messages are observed):**
 
@@ -233,7 +235,7 @@ Per §7 and the filename-equals-CID rule of §2, mutation of an existing message
 
 #### §9.7 Membership
 
-Membership under this binding is the set of `<author-id>/main` branches a participant is configured to fetch and propagate from. The closed-and-fixed property of §8 is satisfied when participants share a fixed list of branches; an unrecognized branch name is, by convention, ignored on read until membership is explicitly extended.
+Membership under this binding is the fixed configured set of `<author-id>/main` branches a participant is configured to fetch and propagate from. The closed-and-fixed property of §8 is satisfied when participants share that exact list of branches; an unrecognized branch name is ignored on read until membership is explicitly extended through a successor transport instance or future DI. Source: `DI-rurab`.
 
 #### §9.8 Other bindings remain compatible
 
@@ -241,16 +243,16 @@ Other git bindings are possible and remain compatible with the protocol's on-dis
 
 ## Worked example
 
-A two-participant transport between Codex and Perplexity, freshly created, before any messages exist:
+A two-participant transport between Alice and Bob, freshly created, before any messages exist:
 
 ```
-transports/<group-transport-pcid>--codex-perplexity/
+transports/<group-transport-pcid>--example-devs/
 ```
 
-After Codex posts the first message:
+After Alice posts the first message:
 
 ```
-transports/<group-transport-pcid>--codex-perplexity/
+transports/<group-transport-pcid>--example-devs/
     bafkreigtaivld55rekcswfj26mo26e267m3ytzgflqb2qcclyiicpfzc6i.txt
 ```
 
@@ -262,17 +264,17 @@ Where the file `bafkreigtaivld55rekcswfj26mo26e267m3ytzgflqb2qcclyiicpfzc6i.txt`
 grid <group-transport-pcid>
 
 Date: 2026-04-30T20:31:14Z
-From: codex@promisegrid.example
+From: alice@example
 
-Hello, Perplexity. I promise to coordinate with you on the
+Hello, Bob. I promise to coordinate with you on the
 group-transport-spec carve-out work and to record decisions in
 DI-009-derived intent records.
 ```
 
-After Perplexity replies citing Codex's message as a parent:
+After Bob replies citing Alice's message as a parent:
 
 ```
-transports/<group-transport-pcid>--codex-perplexity/
+transports/<group-transport-pcid>--example-devs/
     bafkreigtaivld55rekcswfj26mo26e267m3ytzgflqb2qcclyiicpfzc6i.txt
     bafkreih5xxxxx2example2cid2for2reply2filename2placeholder2onlyaa.txt
 ```
@@ -283,7 +285,7 @@ Where the second file (the reply) contains:
 grid <group-transport-pcid>
 
 Date: 2026-04-30T20:37:14Z
-From: perplexity@promisegrid.example
+From: bob@example
 Parents: bafkreigtaivld55rekcswfj26mo26e267m3ytzgflqb2qcclyiicpfzc6i
 
 I promise that I have observed and accepted the following message(s):
@@ -317,9 +319,10 @@ I promise to begin work on the group-transport-draft v0 contract.
 
 This spec graduates to frozen status when:
 
-1. `specs/transport-spec-draft.md` is itself frozen (this spec depends on its outer rules).
-2. At least one real transport instance under this protocol has been created and exchanged at least one round-trip of messages, exercising §3 (CID computation), §4 (envelope), §4.6 (`Parents:` DAG link), §6 (body-as-receipt), and §7 (append-only). The codex-perplexity instance is the anticipated first.
-3. Steve signs a `merge-group-transport-spec` promise authorizing the freeze.
+1. The applicable outer feed convention is frozen, or a Steve-authored DI explicitly accepts the draft feed-outer dependency for this freeze. Source: `DI-bomud`.
+2. At least one real transport instance under this protocol has been created and exchanged at least one round-trip of messages, exercising §3 (CID computation), §4 (envelope), §4.6 (`Parents:` DAG link), §6 (body-as-receipt), and §7 (append-only). The wire-lab-devs specimen satisfies this evidence requirement through the four-message round-trip tracked by `TODO-bisur` 012.7. Source: `DI-rurab`.
+3. Steve records a `merge-group-transport-spec` DI authorizing the freeze. Until cryptographic promise tooling exists, that DI is the authoritative merge promise. Source: `DI-rurab`.
 4. `tools/spec freeze group-transport-spec` mints the pCID, snapshots the file, and appends the manifest entry.
+5. Freeze does not rewrite existing transport data; any frozen successor or migration is additive. Source: `DI-bomud`.
 
-Until then, the spec lives at `specs/group-transport-draft.md` and is a working draft.
+Until then, the spec lives at `specs/group-session-draft.md` and is a working draft.

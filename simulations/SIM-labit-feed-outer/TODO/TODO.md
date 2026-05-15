@@ -7,4 +7,4 @@ was split out of rooted mixed-owner TODOs.
 
 | Handle | Mint date | Title | Prior alias |
 |---|---|---|---|
-| [TODO-kakaz](TODO-kakaz-feed-outer-freeze-and-cid-cascade-follow-on.md) | 2026-05-11 | Feed-outer freeze + CID-cascade follow-on owner split from rooted TODOs | none |
+| [TODO-kakaz](TODO-kakaz-feed-outer-freeze-and-cid-cascade-follow-on.md) | 2026-05-11 | Feed-outer freeze + CID-cascade follow-on owner split from rooted TODOs **(closed: DI-bomud)** | none |

@@ -9,11 +9,11 @@ Before the TE-39 proquint migration, this file was known as:
 
 ## Status
 
-Open. Depends on TE-41 (group-session freeze) to establish the
-freeze-and-rename mechanic. No twig yet.
-Per `DI-mosor` (`rusis.10`), active specimen-owned follow-on now routes
-to sim-local successor TODOs while this rooted file remains historical
-coordination memory.
+Closed as historical coordination memory. The active group-session successor
+slice is closed by `TODO-gapab` / `DI-rurab`; the active feed-outer successor
+slice is closed by `TODO-kakaz` / `DI-bomud`. This rooted file preserves the
+original TE-42 thread narrative and provenance; it is no longer an active
+execution owner.
 
 ## Threads absorbed from OPEN-THREADS.md
 
@@ -33,6 +33,11 @@ Anchor: transport-spec-draft.md § 4.3, § 4.7; group-session-draft.md
 § 9.
 Disposition-file pointer: `dropped-thread-disposition-20260506.md`
 § TE-42 cluster (7 UTs).
+
+Closure note, 2026-05-13: group-session message filename/CID,
+`Message-ID:`, and reader/writer compatibility are closed by `DI-rurab`.
+Feed-outer explicitly owns no message-header or rehash/deprecation rule and
+keeps historical specimens immutable under `DI-bomud`.
 
 ## Rusis.10 successor owner routing
 

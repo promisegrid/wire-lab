@@ -29,6 +29,17 @@ All of those are properties of individual transport-protocols, defined in their
 own spec docs (the first being
 `simulations/SIM-rakot-group-session/protocols/group-session.d/specs/group-session-draft.md`).
 
+## Freeze boundary and historical data
+
+Spec freeze publishes a pCID for a spec. It does not rename, rehash, or rewrite
+existing transport/feed specimens. Draft-era directories remain historical
+evidence; any frozen successor or derived mirror is additive and must cite the
+source evidence it derives from. Source: `DI-bomud`.
+
+Until cryptographic promise tooling exists, a Steve-authored DI is the
+operative `merge-transport-spec` promise for this feed-outer lineage. Source:
+`DI-bomud`.
+
 ## The four locked principles (TE-zalut)
 
 ### Principle 1: a message does not declare its transport
@@ -68,6 +79,9 @@ The pCID is canonical; the slug is a convenience. Two directories with the same
 pCID and different slugs are **two different transport instances** of the same
 protocol. Two directories with different pCIDs are different
 transport-protocols and may have entirely different interior structure.
+Draft or pre-freeze specimens may use explicit draft-state names such as
+`wire-lab-devs-draft`; those names are not rewritten when a spec pCID is
+minted. Source: `DI-bomud`.
 
 ### Principle 3: each transport-protocol-pCID names a spec defining its directory's interior
 
@@ -112,8 +126,10 @@ flaw of this design.
 - Canonical-bytes encoding (UTF-8/LF discipline is one choice; not all protocols
   must use it).
 - File-naming inside a transport directory.
+- Message-CID cascade rules, legacy `Message-ID:` compatibility, and any
+  reader-side rehash/deprecation policy.
 - Subdirectory structure inside a transport directory.
 
 If a future reader asks "where do I find out how to write a message for this
 transport?" the answer is always: read the spec named by that transport's pCID.
-The feed-outer spec is silent on the message format.
+The feed-outer spec is silent on the message format. Source: `DI-bomud`.
