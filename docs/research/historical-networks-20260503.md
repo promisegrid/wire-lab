@@ -223,25 +223,33 @@ The implicit argument: a system designed for multiple substrates from
 day one is structurally cheaper than one that retrofits additional
 substrates later under load.
 
-## Negative-precedent search (TODO)
+## Negative-precedent check
 
-This document does not yet include a search for *negative* precedent
--- a system that explicitly tried substrate-as-first-class and
-abandoned it. The current six-positive enumeration is structurally a
-yes-bias. Candidates worth checking before TE-sihih lands:
+Turn-173 recovery revisited the obvious counter-evidence candidates.
+The result is mixed cautionary precedent, not a direct disproof of the
+substrate-as-first-class shape. Source: `DI-pijun`.
 
-- BITNET store-and-forward (mentioned but not analyzed)
-- XMPP (federated, separated, generally successful but with complex
-  deployment) -- positive or mixed?
-- Early P2P systems (Freenet, Kademlia variants) -- did they separate
-  substrate from protocol cleanly?
-- JMS (Java Message Service) -- Java-only abstract protocol over
-  multiple JMS-provider substrates; commercial fragmentation might
-  count as a soft negative
+- **XMPP** is not a negative case. [RFC 6120](https://www.rfc-editor.org/rfc/rfc6120)
+  defines the TCP binding, [BOSH](https://xmpp.org/extensions/xep-0124.html)
+  and [RFC 7395](https://www.rfc-editor.org/rfc/rfc7395) add HTTP/WebSocket
+  options, and the protocol did not abandon the idea that one message protocol
+  can have multiple connection methods.
+- **JMS / Jakarta Messaging** is a caution, not a match. The
+  [Jakarta Messaging specification](https://jakarta.ee/specifications/messaging/3.1/jakarta-messaging-spec-3.1.html)
+  standardizes an API and explicitly does not define a wire protocol, so it
+  shows the portability limits of an API-only abstraction across providers
+  rather than failure of a federated wire protocol with explicit substrate
+  specs.
+- **BITNET, early P2P systems, and other store-and-forward systems**
+  remain useful cautionary comparisons, but this note does not record a
+  known system that cleanly tried the wire-lab target shape -- stable
+  message identity plus first-class substrate specs plus per-site
+  substrate declarations -- and then abandoned that shape as unworkable.
 
-If no convincing negative precedent exists, that finding should be
-stated explicitly when TE-sihih is drafted, so the search-for-counter-
-evidence is documented even when it returns null.
+The conclusion is deliberately bounded: no convincing negative precedent
+is recorded in this note, but future TEs should still treat the analogy as
+evidence to test, not as proof that every Usenet, XMPP, or JMS mechanism
+belongs in PromiseGrid. Source: `DI-pijun`.
 
 ## Naming question (DF-38.5 input)
 

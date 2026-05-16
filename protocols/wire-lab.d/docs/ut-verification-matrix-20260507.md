@@ -686,3 +686,16 @@ is closed by TE-sihih's L5/L6/L7 taxonomy replacing the turn-172
 carrier/transport/binding sketch. `UT-172.e` is closed for current recovery by
 `DI-rurab`, which keeps group-session §9 inline for the current specimen while
 deferring any future feed-spec extraction to successor work.
+
+### 2026-05-16 — Turn-173 closure pointer
+
+Turn 173 has no remaining open UT work. `UT-173.a` is closed by `DI-pijun`,
+`docs/research/historical-networks-20260503.md`, and
+`simulations/SIM-hugoj-cas-usenetlike-gitlike/README.md`, which preserve the
+content-addressed-Usenet line as exploratory design evidence rather than a
+frozen protocol-identity claim. `UT-173.b` is closed by TE-sihih's `feed`
+vocabulary and the historical-networks naming table. `UT-173.c` is closed as a
+cadence lesson refined by turn 174: external precedent can ground a broad
+concept without settling naming or layout. `UT-173.d` is closed by the bounded
+negative-precedent check in the research note. `UT-173.e` is closed by the
+research note's git/CAS-cardinality entry plus TE-sihih's L5/L6/L7 split.

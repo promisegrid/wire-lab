@@ -165,7 +165,10 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 
 ## Turn report format
 
-- `Turn N summary`
+- `Turn N plain-English recap`: summarize the user's prompt and the assistant's
+  response for the turn, conclusions reached during the turn, later updates or
+  modifications to those conclusions found in later turns, and any loose ends or
+  open questions that remained as of the end of the turn.
 - `Existing capture`
 - `Gaps or contradictions`
 - `Related UTs / owners`
@@ -264,10 +267,13 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
   is closed by TE-sihih's L5/L6/L7 replacement taxonomy; `UT-172.e` is closed
   by `DI-rurab` keeping §9 inline for the current specimen and deferring any
   future feed-spec extraction to successor work.
-- `Turn 173` `UT-173.a` has partial downstream doc promotion via `DI-pijun`,
-  but it is not fully closed as a protocol-identity claim. `UT-173.b`,
-  `UT-173.c`, `UT-173.d`, and `UT-173.e` remain live in TE-sihih /
-  `TODO-vunub`.
+- `Turn 173` `UT-173.a` is closed by `DI-pijun`, the historical-networks note,
+  and `SIM-hugoj` preserving the content-addressed-Usenet line as exploratory
+  design evidence; `UT-173.b` is closed by TE-sihih's `feed` vocabulary;
+  `UT-173.c` is closed as a cadence lesson refined by turn 174; `UT-173.d` is
+  closed by the bounded negative-precedent check added to the research note;
+  `UT-173.e` is closed by the research note's CAS-cardinality entry and
+  TE-sihih's L5/L6/L7 split.
 - `Turn 174` `UT-174.a`, `UT-174.b`, `UT-174.c`, `UT-174.d`, and `UT-174.e`
   remain live in TE-sihih / `TODO-vunub`. The historical-lineage correction is
   captured, but the vocabulary/layout fallout still needs substantive owner
@@ -1231,36 +1237,43 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 
 ### Turn 173 — 2026-05-03 17:06 UTC
 
-- `Turn 173 summary` Steve did not answer the proposed TE directly. Instead he
-  asked for precedent: is this architecture grounded in real systems, RFCs, and
-  historical networks? In plain English, this is a validation turn. Steve is
-  testing whether the substrate-pluralism / separate-feed-family idea is a real
-  historical pattern or just a fresh bot abstraction.
-- `Existing capture` `TODO-lilar` already captures the turn correctly. The raw
-  answer responds with a long precedent survey -- email over SMTP/UUCP/X.400,
-  Usenet over NNTP/UUCP, FidoNet, CORBA GIOP/IIOP, SOAP/WSDL, and modern systems
-  such as gRPC, libp2p, Matrix, and git itself -- and extracts three recurring
-  patterns: separate substrate specs parallel to the protocol, per-instance
-  substrate declarations, and message identity invariant across substrates. The
-  strongest framing move is the Usenet comparison: the bot argues that
-  `group-session` can be read as a very small content-addressed-Usenet-like
-  design, with Usenet's substrate pluralism as the closest historical analog.
-  The strongest later non-TE design-visible carry-forward is now
-  `docs/research/historical-networks-20260503.md`, and the broader design line
-  is now explicitly explored in
+- `Turn 173 plain-English recap` Steve did not answer the proposed TE directly.
+  He asked whether the substrate-pluralism idea had precedent in practice,
+  RFCs, and historical networks. The assistant answered with a precedent survey
+  covering email over SMTP/UUCP/X.400, Usenet over NNTP/UUCP, FidoNet, CORBA
+  GIOP/IIOP, SOAP/WSDL, modern pluggable-transport systems, and git itself. The
+  turn's conclusion was that the broad concept is well precedented: message
+  identity can stay stable while different substrates move the same bytes. The
+  strongest plain-English insight was that `group-session` looks like a tiny
+  content-addressed Usenet, but later turns modify the details: `binding` is
+  rejected in favor of `feed`, the `bindings/` layout sketch is retracted, and
+  the Usenet line is captured as exploratory design evidence rather than a
+  frozen claim that PromiseGrid is Usenet. At the end of the turn, the open
+  questions were naming, layout, negative counter-precedent, and git/CAS
+  cardinality.
+- `Existing capture` `TODO-lilar` captures the raw turn and its five residual
+  rows. Later promotion work under `DI-pijun` puts the historical survey in
+  `docs/research/historical-networks-20260503.md` and the broader design line in
   `simulations/SIM-hugoj-cas-usenetlike-gitlike/README.md`.
-- `Gaps or contradictions` None that overturn the existing capture. The exact
-  phrase from the raw turn was initially preserved only in replay artifacts and
-  not in a design doc; that gap has now been narrowed by the later doc
-  promotion work under `DI-pijun`. The remaining important limit is that the
-  analogy is still exploratory rather than a frozen protocol identity claim, so
-  the later docs preserve the lineage and precedent without silently locking
-  "PromiseGrid is Usenet" as settled fact.
-- `Proposed disposition` `already captured correctly`
-- `Write needed? yes/no` `yes` for this rewalk entry and checklist closure in
-  `TODO-juhub`; `no` correction note is needed in `TODO-lilar`.
-- `Next: wait for approval before turn N+1` Turn 174 is next and remains
-  pending approval.
+- `Gaps or contradictions` Captured and now resolved for turn-173 recovery. The
+  exact Usenet analogy is now design-visible, the later vocabulary correction is
+  recorded, and the negative-precedent gap has been narrowed by a bounded check
+  in the research note. The analogy remains deliberately exploratory; future
+  TEs may import or reject specific Usenet mechanisms one at a time.
+- `Related UTs / owners` `UT-173.a` through `UT-173.e` are checked off in
+  `TODO-lilar`. `TODO-vunub` records the turn-173 historical-precedent questions
+  as retired by `DI-pijun`, the historical-networks note, `SIM-hugoj`, and
+  TE-sihih's feed/CAS/layering decisions.
+- `Owner/doc cleanup` Done. Updated `TODO-lilar`, `TODO-vunub`, the
+  historical-networks research note, this turn note, and the UT verification
+  matrix. No active spec or transport-message bytes were changed.
+- `Remaining decisions or work` None for turn 173. Later feed-vocabulary,
+  site/CAS, and simulation-layout decisions remain with their own later turns
+  and owner artifacts.
+- `Work pending` no.
+- `Proposed disposition` `reconciled after DI-pijun / historical-networks / SIM-hugoj / TE-sihih audit`
+- `Write needed? yes/no` `no` further turn-173 write is needed after this pass.
+- `Next` Turn 174 is next.
 
 ### Turn 174 — 2026-05-03 17:13 UTC
 

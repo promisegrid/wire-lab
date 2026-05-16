@@ -209,6 +209,13 @@ resulting product is committed and pushed.
   concerns into L6 rather than leaving them as an unmodeled fourth family.
   Future extraction of the current git feed prose from group-session §9 is
   per-feed successor work, not open turn-172 recovery work.
+- The turn-173 historical-precedent questions are retired for this TODO by
+  `DI-pijun`, `docs/research/historical-networks-20260503.md`, and
+  `simulations/SIM-hugoj-cas-usenetlike-gitlike/README.md`: the Usenet/git
+  lineage is captured as exploratory design evidence, the rejected `binding`
+  vocabulary is replaced by `feed`, the negative-precedent check is recorded,
+  and CAS-cardinality is carried by the L5/L6/L7 model plus successor
+  simulation work.
 - Backfilled DF questions Q-22.1 through Q-22.8 are recorded above with their
   actual asked-and-answered or retracted timeline.
 
