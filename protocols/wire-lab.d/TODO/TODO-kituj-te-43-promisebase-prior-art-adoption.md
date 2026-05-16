@@ -9,8 +9,10 @@ Before the TE-39 proquint migration, this file was known as:
 
 ## Status
 
-Open. Depends on TE-sihih (substrate-agnostic layered model) L6
-substrate definition. No twig yet.
+Open. TE-sihih's L5/L6/L7 layer model and L6 CAS subtree have landed, so the
+old TE-sihih prerequisite is satisfied. This TODO still owns the concrete
+promisebase / pitbase prior-art adoption question for the first L6 CAS spec and
+remains undrafted. Source: TE-sihih; TODO-vunub Q-22.6. No twig yet.
 
 ## Threads absorbed from OPEN-THREADS.md
 
@@ -23,6 +25,14 @@ Scope:
     at best; prefer wire-lab in conflict").
   - Document pitbase as L6 substrate prior art with 17/17 chunker-
     merkle tests green (UT-183.c).
+  - Specify the concrete CBOR profile for L6 pointer and CAS-object bytes:
+    deterministic/canonical encoding, allowed tags, and text-string versus
+    byte-string boundaries (UT-177.c).
+  - Lock CAS object typing through CIDv1 codec / multicodec choices for raw
+    chunks, Merkle nodes, and pointer objects rather than filename suffixes
+    (UT-177.h, refined by UT-178.l).
+  - Decide chunking algorithm and full parameter set, including the turn-177
+    FastCDC/Rabin-size proposal and the later pitbase mismatch.
   - Reconcile the kv branch on the remote (UT-190.d -- undiscovered
     through turn 192).
   - Resolve the Rabin-vs-FastCDC chunking parameter mismatch (UT-181.b:

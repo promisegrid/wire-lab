@@ -125,6 +125,23 @@ transferred. This line is a report field; it does not itself close work.
 Affects: `protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewalk.md`;
 this session's `TODO-juhub` replay responses.
 
+ID: DI-vumir
+Date: 2026-05-16 10:17:35
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Every per-turn replay final response must visibly include the full
+`Turn N plain-English recap` text for the turn, not merely a path/line pointer
+to the rewritten note.
+Intent: Keep each `turn` handoff self-contained enough for Steve to confirm the
+actual prompt/response/conclusion summary without opening the file, while still
+allowing file references as supporting evidence.
+Constraints: A path/line reference is allowed only as an addition, never as a
+substitute for the recap text. The visible recap must be the full recap field
+from the rewritten note or a faithful same-detail rendering of it. This rule
+applies to every bare-`turn` response before the assistant yields.
+Affects: `protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewalk.md`;
+this session's `TODO-juhub` replay responses.
+
 ## Why a separate TODO
 
 `TODO-lilar` already records the original historical walk through turn 192 and
@@ -147,9 +164,12 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
    still open, or missing a proper owner.
 5. Compare the turn plus its loose ends against the existing replay artifacts
    and decide whether any historical correction note is actually needed.
-6. Report the turn back to Steve using the fixed report format below and stop.
-7. After approval, write the turn result here and make any linked owner,
-   correction-note, or direct-doc updates required by the turn.
+6. Report the turn back to Steve using the fixed report format below, visibly
+   include the full `Turn N plain-English recap` text, and stop; do not advance
+   another turn in the same response.
+7. A subsequent bare `turn` approves the next turn's `TODO-juhub` rewrite and
+   any linked owner, correction-note, or direct-doc updates required by that
+   turn.
 8. Do not advance until each related loose end is either closed, retired, or
    transferred in its proper owner artifact, or explicitly called out here as
    still needing a named decision or work item.
@@ -158,7 +178,9 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 
 - `turn` means: approve the currently presented turn, rewrite that turn's note
   in the stronger `TODO-juhub` format, perform any already-described turn-local
-  cleanup authorized by the approved analysis, then present the next turn.
+  cleanup authorized by the approved analysis, then report the completed turn
+  with the full plain-English recap text visible and name the next chronological
+  turn.
 - The `Write needed? yes/no` line in the turn report is informational. During
   this replay, it does not require a separate confirmation from Steve before
   rewriting the current turn note in `TODO-juhub`.
@@ -168,7 +190,9 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - `Turn N plain-English recap`: summarize the user's prompt and the assistant's
   response for the turn, conclusions reached during the turn, later updates or
   modifications to those conclusions found in later turns, and any loose ends or
-  open questions that remained as of the end of the turn.
+  open questions that remained as of the end of the turn. The final response to
+  Steve must include this full recap text inline; a filepath/line reference alone
+  is not compliant.
 - `Existing capture`
 - `Gaps or contradictions`
 - `Related UTs / owners`
@@ -177,9 +201,10 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - `Work pending: yes|no`
 - `Proposed disposition`
 - `Write needed? yes/no`
-- `Next: wait for approval before turn N+1`
+- `Next`: name the next chronological turn; do not request separate approval
+  beyond Steve's next bare `turn`.
 
-## Loose-end backfill through turn 174
+## Loose-end backfill through turn 177
 
 - `Turns 149-154` No related `UT-*` entries were filed for this block. No
   downstream owner or direct-doc cleanup is currently needed beyond the
@@ -274,10 +299,37 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
   closed by the bounded negative-precedent check added to the research note;
   `UT-173.e` is closed by the research note's CAS-cardinality entry and
   TE-sihih's L5/L6/L7 split.
-- `Turn 174` `UT-174.a`, `UT-174.b`, `UT-174.c`, `UT-174.d`, and `UT-174.e`
-  remain live in TE-sihih / `TODO-vunub`. The historical-lineage correction is
-  captured, but the vocabulary/layout fallout still needs substantive owner
-  work.
+- `Turn 174` `UT-174.a` is closed by TE-sihih's forward vocabulary and the
+  historical-networks current-reading note; `UT-174.b` is closed by the
+  `udp-feed` simulation lineage; `UT-174.c` is closed by TODO-vunub Q-22.3's
+  path-as-declaration retraction of per-instance feed manifests; `UT-174.d` is
+  closed by TE-sihih's L5/L6/L7 model and `feed` vocabulary; `UT-174.e` is
+  closed by the revised Pattern A/B/C current-reading note.
+- `Turn 175` `UT-175.a` is closed/transferred by the no-rewrite freeze/CID
+  decisions and grid-envelope simulation owners; `UT-175.b` is closed for
+  TODO-vunub by TE-sihih's actual smaller landing scope and transferred
+  migration/CAS work; `UT-175.c` is closed by active group-session header rules;
+  `UT-175.d` is closed by the historical-networks / SIM-hugoj Usenet-lineage
+  capture; `UT-175.e` is closed by TE-sihih's L5/L6/L7 model; `UT-175.f` is
+  closed as a recorded reversal/cadence lesson; `UT-175.g` is closed by the
+  TE-sihih and historical-networks `feed` / `substrate` convention. Successor
+  work remains open in TODO-pipus, TODO-kituj / TE-43, and root/simulation layout
+  owners such as DR-nugog / TE-domat / later simulation-structure TEs.
+- `Turn 176` `UT-176.i` is closed as a corrected provenance defect with no data
+  loss. `UT-176.a`, `UT-176.b`, `UT-176.c`, `UT-176.g`, and `UT-176.h` are
+  resolved or transferred by TE-sihih / TODO-vunub's actual L5-L6-L7,
+  slug-state, `group`, and no-exception L6-CAS-pointer decisions. `UT-176.d`,
+  `UT-176.e`, and `UT-176.f` are transferred to successor owners: SIM-hugoj /
+  historical-network framing, TE-domat / DR-nugog root layout, grid-envelope /
+  body-semantics work, TODO-pipus operational migration, and TODO-kituj / TE-43
+  concrete L6 CAS adoption.
+- `Turn 177` `UT-177.a` and `UT-177.b` are closed for TODO-vunub by TE-sihih's
+  actual L5/L6/L7 and smaller-scope landing. `UT-177.g` is closed as a positive
+  cadence lesson. `UT-177.c`, `UT-177.d`, and `UT-177.h` are transferred to
+  TODO-kituj / TE-43's concrete L6 CAS adoption work, with TODO-pipus retaining
+  operational migration. `UT-177.e`, `UT-177.f`, and `UT-177.i` are transferred
+  to TODO-kulih / TE-nibar spec-doc-shape work and TE-dajot 100-year-goal
+  pressure testing.
 
 ## Subtasks
 
@@ -307,9 +359,9 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - [x] juhub.172 Turn 172 raw-log rewalk plus later-turn and later-artifact sweep.
 - [x] juhub.173 Turn 173 raw-log rewalk plus later-turn and later-artifact sweep.
 - [x] juhub.174 Turn 174 raw-log rewalk plus later-turn and later-artifact sweep.
-- [ ] juhub.175 Turn 175 raw-log rewalk plus later-turn and later-artifact sweep.
-- [ ] juhub.176 Turn 176 raw-log rewalk plus later-turn and later-artifact sweep.
-- [ ] juhub.177 Turn 177 raw-log rewalk plus later-turn and later-artifact sweep.
+- [x] juhub.175 Turn 175 raw-log rewalk plus later-turn and later-artifact sweep.
+- [x] juhub.176 Turn 176 raw-log rewalk plus later-turn and later-artifact sweep.
+- [x] juhub.177 Turn 177 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.178 Turn 178 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.179 Turn 179 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.180 Turn 180 raw-log rewalk plus later-turn and later-artifact sweep.
@@ -1277,13 +1329,23 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 
 ### Turn 174 — 2026-05-03 17:13 UTC
 
-- `Turn 174 summary` Steve does not accept the turn-173 proposal as ready to
-  draft. Instead he raises three objections at once: `binding` does not sound
-  like real Usenet/email vocabulary, the idea seems to conflict with OSI, and
-  putting a substrate-spec file inside the messages directory feels inverted.
-  In plain English, this is the turn where the proposal is pulled away from a
-  W3C/RPC-style framing and re-anchored in the messaging lineage Steve had in
-  mind.
+- `Turn 174 plain-English recap` Steve did not accept the turn-173 proposal as
+  ready to draft. He raised three objections at once: `binding` did not sound
+  like real Usenet/email vocabulary, the idea seemed to conflict with OSI, and
+  putting a substrate-spec file inside the messages directory felt inverted.
+  The response accepted those objections: it rejected `binding` in favor of
+  `feed`, reframed the relationship as alternative delivery/encapsulation
+  rather than OSI-style vertical layering, and replaced the nested `bindings/`
+  idea with an instance-root `INSTANCE.md` manifest. Later turns and owner
+  artifacts keep the `feed` correction but modify the layout and layering
+  conclusions: TE-sihih uses `feed` for the L5 protocol role and `substrate`
+  for prose, TE-vipir / TODO-vunub Q-22.3 retract `INSTANCE.md` and
+  `bindings/` feed declarations in favor of path-as-declaration, the temporary
+  "horizontal encapsulation" wording is replaced by the L5/L6/L7 model, and
+  the old `udp-binding` line is carried forward as the `udp-feed` simulation
+  lineage. The loose ends at the end of the turn were naming, the
+  `udp-binding` draft name, `INSTANCE.md` authority, the encapsulation term,
+  and the Pattern-B mapping.
 - `Existing capture` `TODO-lilar` already captures the turn correctly. The raw
   answer accepts all three objections and revises the proposal in three
   matching ways: `binding` is rejected in favor of `feed`; the relationship is
@@ -1298,12 +1360,187 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
   overloading feed facts and governance facts, and the turn-173 Pattern-B map
   must change from `bindings/` to an instance-manifest shape.
 - `Gaps or contradictions` None that overturn the existing capture. The main
-  later limit is that the encapsulation-not-layering framing introduced here is
-  itself not stable for long: turn 175 will immediately swing back toward a
-  four-layer model. But that later reversal is already preserved in the UT
-  ledger; it does not mean turn 174 was miscaptured.
-- `Proposed disposition` `already captured correctly`
-- `Write needed? yes/no` `yes` for this rewalk entry and checklist closure in
-  `TODO-juhub`; `no` correction note is needed in `TODO-lilar`.
-- `Next: wait for approval before turn N+1` Turn 175 is next and remains
-  pending approval.
+  later limit is that two details changed after the turn: the
+  encapsulation-not-layering framing was replaced by the L5/L6/L7 model, and
+  the `INSTANCE.md` / `bindings/` mechanism was retracted by
+  path-as-declaration. Those are later modifications to the turn's conclusions,
+  not evidence that the raw turn was miscaptured.
+- `Related UTs / owners` `UT-174.a`, `UT-174.b`, `UT-174.c`, `UT-174.d`, and
+  `UT-174.e` are closed in `TODO-lilar`. Owner evidence now lives in
+  TE-sihih, TE-vipir, `TODO-vunub` Q-22.3, `SIM-ludaf-udp-feed`, and the
+  historical-networks research note.
+- `Owner/doc cleanup` Done for this turn. The historical-networks note now
+  carries the current-reading vocabulary and Pattern A/B/C mapping. TODO-vunub
+  records that the turn-174 vocabulary/layout corrections are retired by the
+  landed TE-sihih / TE-vipir combination. No active spec or transport-message
+  bytes were changed.
+- `Remaining decisions or work` None for turn 174. Later turn-175 and newer
+  site/CAS/layering/procedural rows remain their own later-turn work.
+- `Work pending` no.
+- `Proposed disposition` `reconciled after TE-sihih / TE-vipir / TODO-vunub / historical-networks / udp-feed simulation audit`
+- `Write needed? yes/no` `no` further turn-174 write is needed after this pass.
+- `Next` Turn 175 is next.
+
+### Turn 175 — 2026-05-03 17:25 UTC
+
+- `Turn 175 plain-English recap` Steve delivered four corrections instead of
+  answering the turn-174 questions: `grid <pcid>` should be understood as the
+  grid envelope, not a carrier line; both `feed` and `substrate` were acceptable
+  words; `transports/` looked misnamed; and the simulation was missing first-
+  class sites and decentralized CAS. The response accepted the corrections and
+  sketched a much larger model: grid envelope plus headers, forum/feed/site/CAS
+  vocabulary, and a vertical layer stack where named message spaces sit above
+  feeds and CAS. Later updates modify several conclusions: `forum` becomes
+  forward path vocabulary `group`; TE-sihih lands as a smaller vocabulary /
+  L5-L6-L7 / L6-CAS-pointer TE rather than the full 10-DF migration TE; historic
+  message bytes are not rewritten for vocabulary sweeps; operational migration
+  and the first concrete L6 CAS spec move to TODO-pipus and TODO-kituj / TE-43;
+  root `transports/` versus `groups/` work moves through DR-nugog, TE-domat, and
+  later simulation-structure TEs.
+- `Existing capture` `TODO-lilar` captured the turn's core correctly: Steve's
+  prompt is a locked correction batch, not an answer to the previous bot
+  question, and the bot's response expanded TE-sihih scope by adding grid
+  envelope vocabulary, sites, CAS, and a layered model.
+- `Gaps or contradictions` The existing capture needed later-owner context.
+  The response's predicted second CID cascade did not become the active plan;
+  later freeze/CID decisions keep historical specimen bytes immutable. The
+  response's `forums/` recommendation was replaced by `groups`. The response's
+  broad TE-sihih scope was later contracted, with migration/CAS adoption split
+  into successor owners. The turn also silently reversed turn 174's
+  encapsulation-not-layering frame; the rewalk now records that reversal
+  explicitly.
+- `Related UTs / owners` `UT-175.a` through `UT-175.g` are checked off in
+  `TODO-lilar` as resolved/transferred. Current owner evidence is split across
+  TODO-vunub / TE-sihih, TODO-pipus, TODO-kituj / TE-43, TODO-turog /
+  TODO-duvuk plus their sim-local successors TODO-gapab / TODO-kakaz, DR-nugog /
+  TE-domat / later simulation-structure TEs, SIM-kurim grid-envelope variants,
+  `docs/research/historical-networks-20260503.md`, and SIM-hugoj.
+- `Owner/doc cleanup` Done for this pass. TODO-vunub now states the turn-175
+  corrections are retired or transferred for that owner; TODO-pipus and
+  TODO-kituj no longer claim they are blocked merely on TE-sihih landing; the
+  historical-networks naming table now says `grid envelope`, not `carrier line`;
+  the UT matrix has a turn-175 closure pointer. No transport message bytes were
+  edited.
+- `Remaining decisions or work` TODO-pipus remains open for the operational
+  wire-lab-devs migration. TODO-kituj / TE-43 remains open for the first
+  concrete L6 CAS / promisebase adoption decision. DR-nugog / TE-domat and later
+  simulation-structure TEs still own root/simulation layout graduation. The
+  grid-envelope simulations remain competing specimens rather than a chosen
+  canonical envelope.
+- `Work pending` yes.
+- `Proposed disposition` `resolved/transferred after TE-sihih scope contraction, no-rewrite freeze/CID decisions, and simulation-owner split`
+- `Write needed? yes/no` `no` further turn-175 write is needed after this pass.
+- `Next` Turn 176 is next.
+
+### Turn 176 — 2026-05-03 18:05 UTC
+
+- `Turn 176 plain-English recap` Steve accepted some of the previous layering
+  direction but corrected the details: PromiseGrid layers should not be numbered
+  below ordinary networking layers; `groups` is better than `forums`; 1:1
+  ephemeral flows still need to fit; PromiseGrid-over-Usenet and
+  Usenet-over-PromiseGrid both matter; nested grid envelopes are expected;
+  draft/frozen names should be `<slug>-draft` and `<slug>-<cid>`; CAS content
+  might eventually use symlinks, Merkle roots, and Rabin chunking; and the broad
+  strategic analogy is that PromiseGrid can become a content-addressed
+  Usenet-plus-git successor. The response expanded TE-sihih again into a large
+  multi-DF plan. Later updates narrow that expansion: TE-sihih lands as a
+  smaller L5/L6/L7 vocabulary and L6-CAS-pointer decision, TE-domat owns the
+  later root `groups/` versus `transports/` reconciliation, SIM-hugoj and the
+  historical-networks note capture the Usenet/git analogy, and concrete CAS /
+  migration work moves to TODO-kituj / TE-43 and TODO-pipus.
+- `Existing capture` `TODO-lilar` captured the turn's substance well. It
+  preserved the seven corrections, the symlink/CAS/chunking considerations, the
+  Usenet-plus-git framing, the body-can-be-anything realization, and the bot's
+  risky TE-sihih scope growth. TE-domat later also captured the turn's `groups`
+  vocabulary, 1:1-flow test, nested-envelope allowance, slug-state naming, and
+  mapping from the old transport path to a group-session path.
+- `Gaps or contradictions` The capture needed later-owner reconciliation. The
+  turn-176 response treated several ideas as TE-sihih scope, but TE-sihih later
+  explicitly contracted to L5/L6/L7 vocabulary, L6 CAS subtree, and 100-year-goal
+  citation work. The literal root rename from `transports/` to `groups/` is not
+  settled; TE-domat rejects a naive whole-tree rename and keeps the decision open
+  for DF. Nested-envelope strict-reader behavior is not settled by turn 176; it
+  moved out of TODO-duvuk into later body-semantics / grid-envelope successors.
+  The "foundational promise" wording also needs assessment-oriented Promise
+  Theory phrasing in successor CAS work rather than a central or constitutive
+  harness rule.
+- `Related UTs / owners` `UT-176.a` through `UT-176.i` are checked off in
+  `TODO-lilar` as resolved, closed, or transferred. Current owner evidence lives
+  in TE-sihih / TODO-vunub for L5/L6/L7, slug-state, group vocabulary, and
+  no-exception L6 CAS pointers; TE-domat / DR-nugog for the root `groups/` /
+  `transports/` split; SIM-hugoj and `docs/research/historical-networks-20260503.md`
+  for the content-addressed-Usenet/git analogy; TODO-pipus for operational
+  migration; TODO-kituj / TE-43 for concrete L6 CAS adoption; and grid-envelope /
+  body-semantics successor work for nested envelopes.
+- `Owner/doc cleanup` Done for this pass. TODO-vunub now says turn-176 items are
+  retired for its closed scope or transferred to successor owners. The UT matrix
+  has a turn-176 closure / transfer pointer. No transport message bytes or TE
+  bodies were edited.
+- `Remaining decisions or work` TODO-pipus remains open for operational migration
+  from pre-CAS inline specimens to CAS / pointer / feed shape. TODO-kituj / TE-43
+  remains open for the first concrete L6 CAS / promisebase adoption decision.
+  TE-domat / DR-nugog still own root layout and the `groups/` / `transports/`
+  split. Nested-envelope body semantics and grid-envelope variant convergence
+  remain successor simulation/spec work.
+- `Work pending` yes.
+- `Proposed disposition` `resolved/transferred after TE-sihih scope contraction, TE-domat root-layout analysis, and successor CAS/migration/body-semantics owner split`
+- `Write needed? yes/no` `no` further turn-176 write is needed after this pass.
+- `Next` Turn 177 is next.
+
+### Turn 177 — 2026-05-03 18:34 UTC
+
+- `Turn 177 plain-English recap` Steve corrected and expanded the layered model
+  again. He preferred L5/L6/L7 names, asked for a concrete explanation of sites,
+  made the promise economy foundational at every layer, made the 100-year goal
+  explicit, corrected JSON to CBOR, asked whether feeds and CAS were inverted,
+  preferred pointer files over filesystem symlinks, and asked whether Rabin
+  chunking should be included now. The response did the right thing on the major
+  structural question: it gamed out both layer orders and conceded the inversion.
+  The corrected model became L7 groups define message semantics, L6 CAS stores
+  and resolves chunks, and L5 feeds advertise/request/replicate chunks between
+  sites. Later artifacts mostly keep that model: TE-sihih lands L5/L6/L7 and
+  no-exception CBOR pointers into L6 CAS, TE-domat cites turn 177 as the reason a
+  naive `transports/` to `groups/` rename is wrong, TODO-kituj / TE-43 keeps the
+  concrete CBOR, chunking, CIDv1-codec, pointer-file, and promisebase questions,
+  and TODO-kulih / TE-nibar is the better owner for any rule that every spec must
+  expose promise vocabulary, 100-year pressure tests, or easy mental models.
+- `Existing capture` `TODO-lilar` captured the turn's core correctly: the layer
+  inversion was explicit, the promise economy and 100-year framing became
+  load-bearing, CBOR displaced JSON, pointer files displaced symlinks, Rabin /
+  FastCDC chunking entered active design pressure, and TE-sihih scope growth was
+  becoming unmanageable.
+- `Gaps or contradictions` The existing capture needed current-owner routing.
+  The turn-177 response grew TE-sihih to 15 DFs and proposed stuffing migration,
+  concrete CAS encoding, promise vocabulary, and easy mental-model obligations
+  into the same TE. Later work contradicts that scope: TE-sihih lands smaller,
+  TODO-kituj / TE-43 owns concrete L6 CAS choices, TODO-pipus owns operational
+  migration, and TODO-kulih / TE-nibar is the spec-shape owner for per-spec
+  promise-vocabulary / mental-model requirements. Turn 178 also refines
+  `UT-177.h`: CIDv1 codec fields are the right object-type discriminator for
+  raw chunks, Merkle nodes, and pointer objects.
+- `Related UTs / owners` `UT-177.a` through `UT-177.i` are checked off in
+  `TODO-lilar` as resolved, closed, or transferred. TE-sihih / TODO-vunub owns
+  the layer-order resolution and scope contraction; TODO-kituj / TE-43 owns
+  deterministic CBOR, tags, chunking parameters, CIDv1 codec/object typing, and
+  promisebase prior-art adoption; TODO-pipus owns the eventual migration from
+  pre-CAS inline specimens to pointer-and-CAS form; TODO-kulih / TE-nibar owns
+  spec-doc-shape questions such as promise-vocabulary and easy mental-model
+  sections; TE-dajot remains the citable 100-year-goal constraint; TE-domat /
+  DR-nugog owns the root `groups/` / `transports/` split.
+- `Owner/doc cleanup` Done for this pass. TODO-vunub now records that turn-177
+  items are retired for its closed scope or transferred to successor owners.
+  TODO-kituj now explicitly carries the turn-177 concrete CAS obligations.
+  TODO-kulih now carries the turn-177 per-spec promise-vocabulary / 100-year /
+  mental-model obligations. The UT matrix has a turn-177 closure / transfer
+  pointer. No transport message bytes or TE bodies were edited.
+- `Remaining decisions or work` TODO-kituj / TE-43 remains open for concrete L6
+  CAS adoption: deterministic CBOR profile, allowed tags, chunking algorithm and
+  parameters, CIDv1 codec/object typing, and promisebase prior-art stance.
+  TODO-pipus remains open for operational migration to pointer-and-CAS shape.
+  TODO-kulih / TE-nibar remains open for spec-doc structure decisions, now
+  including promise vocabulary, 100-year pressure-test, and easy mental-model
+  obligations. TE-domat / DR-nugog remains open for root layout.
+- `Work pending` yes.
+- `Proposed disposition` `resolved/transferred after TE-sihih scope contraction, TE-43 CAS-owner routing, and TODO-kulih spec-shape routing`
+- `Write needed? yes/no` `no` further turn-177 write is needed after this pass.
+- `Next` Turn 178 is next.

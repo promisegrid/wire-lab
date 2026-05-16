@@ -216,6 +216,42 @@ resulting product is committed and pushed.
   vocabulary is replaced by `feed`, the negative-precedent check is recorded,
   and CAS-cardinality is carried by the L5/L6/L7 model plus successor
   simulation work.
+- The turn-174 vocabulary/layout corrections are retired for this TODO by the
+  landed TE-sihih / TE-vipir combination: `binding` becomes `feed`,
+  `udp-binding` is carried forward as the `udp-feed` simulation lineage,
+  `INSTANCE.md` / `bindings/` feed declarations are retracted in favor of
+  path-as-declaration, and the temporary "horizontal encapsulation" wording is
+  replaced by the L5/L6/L7 model without making that phrase a protocol term.
+- The turn-175 layer/vocabulary corrections are retired or transferred for this
+  TODO by the landed TE-sihih / TE-vipir combination and successor owners:
+  `feed` is the L5 protocol word, `substrate` is explanatory prose, `grid
+  envelope` replaces the old `carrier line` term in forward vocabulary, L5/L6/L7
+  is the citable layer model, and Q-22.6 / Alt-M.4 locks the no-exception L6 CAS
+  pointer shape. Operational migration, first concrete L6 CAS adoption, root
+  layout, and grid-envelope extraction remain successor work under TODO-pipus,
+  TODO-kituj, DR-nugog / TE-domat / later simulation-structure TEs, and the
+  grid-envelope simulations rather than open TODO-vunub work.
+- The turn-176 corrections are also retired or transferred for this TODO by the
+  same landed products and successor owners. Slug-state naming is bounded here to
+  draft/frozen lifecycle artifacts (`<slug>-draft`, then `<slug>-<cid>`), not TE
+  / TODO proquint filenames. L5/L6/L7 replaces the earlier 4-7 and 0-3
+  discussion without claiming OSI-layer numbering. `Group` is the forward L7
+  vocabulary, while the root `groups/` versus `transports/` placement remains
+  TE-domat / DR-nugog work. Q-22.6 / Alt-M.4 closes the symlink-vs-inline concern
+  for this TODO by choosing unconditional CBOR pointer files into L6 CAS; concrete
+  migration still belongs to TODO-pipus and the first CAS spec to TODO-kituj /
+  TE-43. Nested-envelope / body semantics and the Usenet-plus-git project framing
+  are successor simulation/spec/research work, not open TODO-vunub execution work.
+- The turn-177 layer inversion and scope-growth questions are retired or
+  transferred for this TODO. TE-sihih's landed L5/L6/L7 shape is the corrected
+  turn-177 model: L7 groups define semantics, L6 CAS stores and resolves chunks,
+  and L5 feeds advertise/request/replicate chunks between sites. The 15-DF
+  turn-177 TE-sihih expansion did not land; it was superseded by Q-22.4's smaller
+  scope and by Q-22.6 / Alt-M.4's target L6 pointer shape. Concrete CBOR,
+  chunking-parameter, CIDv1-codec, and promisebase prior-art decisions belong to
+  TODO-kituj / TE-43; operational migration belongs to TODO-pipus; per-spec
+  promise-vocabulary, 100-year-pressure-test, and easy-mental-model obligations
+  belong to TODO-kulih / TE-nibar plus TE-dajot rather than this closed TODO.
 - Backfilled DF questions Q-22.1 through Q-22.8 are recorded above with their
   actual asked-and-answered or retracted timeline.
 

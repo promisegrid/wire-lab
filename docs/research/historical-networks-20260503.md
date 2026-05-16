@@ -8,6 +8,11 @@ unresolved as of this writing; this document uses "substrate" as the
 neutral working term for the carrier mechanism (git, rsync, NNTP,
 UUCP, ...) and notes where specific precedents use specific words.
 
+Current reading after TE-sihih: forward-going wire-lab vocabulary is
+`feed` for the L5 protocol role and `substrate` for explanatory prose.
+The old `binding` wording remains historical precedent vocabulary, not
+the active wire-lab term. Source: `DI-pijun`; TE-sihih.
+
 ## Question being grounded
 
 Wire-lab's group-session transport currently spells out a git-shaped
@@ -204,6 +209,14 @@ If wire-lab adopts the same architecture:
   include any substrate-specific addressing -- so the CID is invariant
   whether the file arrived over git, rsync, UUCP, etc.
 
+Current reading after TE-sihih: Pattern A maps to L5 feed specs, using
+`feed` rather than `binding`. Pattern B does not require the abandoned
+turn-172/174 `bindings/` directory or `INSTANCE.md` feed-manifest
+sketch; TODO-vunub Q-22.3 retracts that mechanism because TE-vipir's
+path-as-declaration already identifies the wire/feed/group/message stack.
+Pattern C remains unchanged. Source: `DI-pijun`; TODO-vunub Q-22.3;
+TE-sihih.
+
 ## Counterfactual: systems that did NOT separate protocol from substrate
 
 The systems that conflated protocol with substrate from the start
@@ -263,7 +276,7 @@ depend on which precedent set is weighted most heavily:
 | CORBA / libp2p / gRPC | transport | Conflicts with existing wire-lab "transport protocol" usage |
 | Usenet / FidoNet operational | feed | Store-and-forward heritage; per-site `newsfeeds` file |
 | Generic / informal | substrate | Architecture-neutral; describes the carrier mechanism |
-| PromiseGrid existing | (carrier) | Already taken: `grid <pcid>` is the carrier line |
+| PromiseGrid existing | grid envelope | Already reserved for the `grid <pcid>` selector/envelope, not for feed naming |
 
 Bot's turn-173 recommendation was "binding" (W3C-precedent-weighted).
 Steve's turn-174 challenge will be that Usenet-gateway operational
@@ -293,8 +306,8 @@ decentralized CAS" correction.)
 When TE-sihih is drafted, its background section can cite:
 
 > See `docs/research/historical-networks-20260503.md` for the
-> precedent enumeration grounding the binding-protocol-as-first-
-> class architectural claim.
+> precedent enumeration grounding the feed-protocol-as-first-class
+> architectural claim.
 
 This keeps the precedent material in one durable location, separate
 from any specific TE's argument structure, so it can be re-cited from

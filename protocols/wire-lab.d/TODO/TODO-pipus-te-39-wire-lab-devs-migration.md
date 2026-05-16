@@ -9,7 +9,12 @@ Before the TE-39 proquint migration, this file was known as:
 
 ## Status
 
-Open. Depends on TE-sihih (substrate-agnostic layered model) landing.
+Open. TE-sihih has landed, and the current `wire-lab-devs` specimen has moved
+into simulation-local world state, but the operational migration from the
+pre-CAS inline specimen to the TE-sihih-aligned CAS / pointer / feed shape
+remains open. Current blockers are a concrete L6 CAS spec / TE-43 promisebase
+adoption path and an additive migration contract; historical specimen messages
+must not be rewritten. Source: TE-sihih; `DI-fakin`; `DI-rurab`; `DI-bomud`.
 No twig yet.
 
 ## Threads absorbed from OPEN-THREADS.md

@@ -699,3 +699,64 @@ cadence lesson refined by turn 174: external precedent can ground a broad
 concept without settling naming or layout. `UT-173.d` is closed by the bounded
 negative-precedent check in the research note. `UT-173.e` is closed by the
 research note's git/CAS-cardinality entry plus TE-sihih's L5/L6/L7 split.
+
+### 2026-05-16 — Turn-174 closure pointer
+
+Turn 174 has no remaining open UT work. `UT-174.a` is closed by TE-sihih's
+forward `feed` vocabulary and the current-reading note in
+`docs/research/historical-networks-20260503.md`. `UT-174.b` is closed by
+TE-sihih's rename map plus the `SIM-ludaf-udp-feed` lineage. `UT-174.c` is
+closed by TODO-vunub Q-22.3 and TE-vipir's path-as-declaration retraction of
+per-instance feed manifests. `UT-174.d` is closed by TE-sihih's L5/L6/L7 model
+and `feed` vocabulary, with the turn-175 layering reversal separately owned by
+turn-175 rows. `UT-174.e` is closed by the current-reading Pattern A/B/C note in
+the historical-networks research note.
+
+### 2026-05-16 — Turn-175 closure / transfer pointer
+
+Turn 175 has no remaining open `TODO-lilar` UT row, but it does have successor
+work. `UT-175.a` is closed/transferred by the no-rewrite freeze/CID decisions
+and the grid-envelope simulation owners: the predicted second historical-message
+rewrite is not the active path. `UT-175.b` is closed for TODO-vunub by the actual
+TE-sihih landing scope, with operational migration transferred to TODO-pipus and
+first concrete L6 CAS adoption transferred to TODO-kituj / TE-43. `UT-175.c` is
+closed by active group-session header rules. `UT-175.d` is closed by the
+historical-networks / SIM-hugoj content-addressed-Usenet capture, with later
+forward vocabulary corrected from `forum` to `group`. `UT-175.e` is closed by
+TE-sihih's L5/L6/L7 model. `UT-175.f` is closed as an explicit rewalk cadence
+lesson. `UT-175.g` is closed by TE-sihih and the historical-networks
+current-reading note: `feed` is the L5 protocol word and `substrate` is
+explanatory prose.
+
+### 2026-05-16 — Turn-176 closure / transfer pointer
+
+Turn 176 has no remaining open `TODO-lilar` UT row, but it does have successor
+work. `UT-176.i` is closed as a provenance correction: the duplicate line was a
+rewalk-edit defect with no data loss. `UT-176.a` is closed by TODO-vunub /
+TE-sihih bounding slug-state naming to draft/frozen lifecycle artifacts.
+`UT-176.b` is closed by TE-sihih's L5/L6/L7 model, which replaces the 0-3 and
+4-7 discussion without borrowing OSI numbering. `UT-176.c` is closed for
+vocabulary by TE-sihih's `group` term and transferred for root placement to
+TE-domat / DR-nugog. `UT-176.d` is closed/transferred by the historical-networks
+and SIM-hugoj Usenet/git framing plus later simulation work. `UT-176.e` is
+transferred to nested-envelope / body-semantics and grid-envelope successor
+work. `UT-176.f` is transferred to successor CAS / promise-economy phrasing,
+especially TODO-kituj / TE-43. `UT-176.g` is closed by TE-sihih's actual smaller
+landing scope and retracted broader DFs. `UT-176.h` is closed/transferred by
+TODO-vunub Q-22.6 / Alt-M.4's no-exception CBOR-pointer shape, with operational
+migration still owned by TODO-pipus.
+
+### 2026-05-16 — Turn-177 closure / transfer pointer
+
+Turn 177 has no remaining open `TODO-lilar` UT row, but it does have successor
+work. `UT-177.a` is closed for TODO-vunub by TE-sihih's actual L5/L6/L7 model:
+L7 groups define semantics, L6 CAS stores and resolves chunks, and L5 feeds
+advertise/request/replicate chunks. `UT-177.b` is closed as a scope-growth
+lesson by TE-sihih's later smaller landing and TODO-vunub's Q-22.4 scope lock.
+`UT-177.c`, `UT-177.d`, and `UT-177.h` are transferred to TODO-kituj / TE-43 for
+concrete L6 CAS decisions: deterministic CBOR, allowed tags, chunking parameters,
+CIDv1 codec / object typing, and promisebase prior-art adoption. `UT-177.e`,
+`UT-177.f`, and `UT-177.i` are transferred to TODO-kulih / TE-nibar for
+spec-doc-shape requirements, with TE-dajot remaining the citable 100-year
+constraint. `UT-177.g` is closed as a positive cadence lesson: the layer
+inversion was accepted only after gameout, not by unreasoned reversal.
