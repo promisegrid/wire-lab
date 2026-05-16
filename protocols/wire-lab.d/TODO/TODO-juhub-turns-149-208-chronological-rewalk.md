@@ -235,9 +235,12 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
   is closed by the 2026-05-14 `.msg` corpus audit; `UT-167.e` is closed for
   future-process purposes by the current decision-first protocol and
   `DI-vanak`.
-- `Turn 168` `UT-168.b`, `UT-168.c`, and `UT-168.d` remain open under
-  `TODO-turog`. `UT-168.a`, `UT-168.e`, and `UT-168.f` remain open under
-  `TODO-duvuk`.
+- `Turn 168` `UT-168.a` is closed by active `Message-ID:` compatibility
+  wording; `UT-168.b`, `UT-168.c`, and `UT-168.d` are closed by `DI-rurab`,
+  current §8/§9 wording, and the infrastructure/message-file distinction;
+  `UT-168.e` is closed for future-process purposes by decision-first plus
+  `DI-vanak`; `UT-168.f` is closed for active docs because current
+  wire-lab-devs docs use post-turn-169 CIDs and stale CIDs are historical-only.
 - `Turn 169` `UT-169.a`, `UT-169.b`, `UT-169.d`, and `UT-169.e` remain open
   under `TODO-duvuk`. Carry item `UT-169.c` remains a procedural cadence note.
 - `Turn 170` `UT-170.b`, `UT-170.c`, and `UT-170.d` are retired. `UT-170.a`
@@ -1051,29 +1054,33 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
   167 in two important ways: message files must not use sequential numbers, and
   before posting, each agent must first merge all observed messages from all
   branches into the directory on their own branch and push that merged state.
-  In plain English, this turns each participant's branch from "my outbound
-  posts" into "my current replicated view of the message set, plus optionally a
-  new post," and it makes the message CID, not a human numbering scheme, the
+  In plain English, each participant's branch becomes "my replicated view of
+  the message set, plus optionally a new post," and the message CID becomes the
   stable on-disk identity.
-- `Existing capture` `TODO-lilar` already captures the turn correctly. The raw
-  answer shows the bot treated both directives as immediately executable: it
-  rewrote the spec so filenames are CIDs, expanded `§9` into a fuller
-  receive/merge/push/optionally-post cycle, renamed the existing bootstrap
-  files to their CIDs, and authored a new on-wire ratification message for the
-  new rules. This is the turn that fixes the global-sequence mistake from turn
+- `Existing capture` `TODO-lilar` captures the turn correctly. The bot treated
+  both directives as executable: it rewrote filename rules to CID filenames,
+  expanded §9 into a receive/merge/push/optionally-post cycle, renamed the
+  existing bootstrap files to then-current CIDs, and authored the m2 on-wire
+  ratification message. The turn fixes the global-sequence mistake from turn
   167 and defines the first actual replication model for the Git-backed
-  channel.
-- `Gaps or contradictions` None that overturn the existing capture. The later
-  residual notes already preserve the important follow-ons from this turn: the
-  `Message-ID` header is still retained here and then challenged immediately in
-  turn 169, `§9` grows substantially while still labeled non-normative, and the
-  CIDs reported in this turn are historically correct for this moment but do
-  not remain the current on-disk CIDs after turn 169's rehash.
-- `Proposed disposition` `already captured correctly`
-- `Write needed? yes/no` `yes` for this rewalk entry and checklist closure in
-  `TODO-juhub`; `no` correction note is needed in `TODO-lilar`.
-- `Next: wait for approval before turn N+1` Turn 169 is next and remains
-  pending approval.
+  specimen.
+- `Gaps or contradictions` Captured and now resolved for active docs. The
+  `Message-ID:` retention is closed by the active §4.3/§4.7 compatibility
+  rule, §9's old non-normative status is closed by `DI-rurab`, passive-reader
+  ambiguity is closed by current §8/§9.3, infrastructure/message-file
+  boundaries are explicit enough for the current specimen, and stale turn-168
+  CIDs are historical-only after turn 169's rehash.
+- `Related UTs / owners` `UT-168.a` through `UT-168.f` are checked off in
+  `TODO-lilar`. The only deeper rehash-continuity questions continue under the
+  turn-169 rows, not as turn-168 work.
+- `Owner/doc cleanup` Done. Updated the active `TODO-bisur` 012.7 note so it no
+  longer calls §9 explicitly non-normative or keeps a stale open §9 OQ. No
+  transport message files were changed.
+- `Remaining decisions or work` None for turn 168.
+- `Work pending` no.
+- `Proposed disposition` `reconciled after lilar UT closure and active-doc CID/status audit`
+- `Write needed? yes/no` `no` further turn-168 write is needed after this pass.
+- `Next` Turn 169 is next.
 
 ### Turn 169 — 2026-05-03 11:54 UTC
 

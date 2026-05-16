@@ -621,3 +621,17 @@ replay/disposition notes or message-body evidence, not active spec guidance.
 `UT-167.e` is closed for future-process purposes by the current decision-first
 protocol plus `DI-vanak`; later execute-on-directive rows keep their own
 turn-specific reconciliation work.
+
+### 2026-05-14 — Turn-168 closure pointer
+
+Turn 168 has no remaining open UT work. `UT-168.a` is closed by active
+`Message-ID:` compatibility wording in group-session §4.3 / §4.7. `UT-168.b`
+is closed by `DI-rurab` and current §9 wording, which makes the git binding
+normative for the wire-lab-devs specimen without making it the only possible
+future binding. `UT-168.c` is closed by the passive-observer / configured-member
+split in current §8 / §9.3. `UT-168.d` is closed by the active message-file
+verification and infrastructure-file distinction in §2, §4, §9.3, and §9.5.
+`UT-168.e` is closed for future-process purposes by decision-first plus
+`DI-vanak`. `UT-168.f` is closed for active docs because the wire-lab-devs README
+uses the post-turn-169 CIDs; turn-168-era CIDs remain historical-only, with the
+broader rehash-continuity question retained under turn 169.
