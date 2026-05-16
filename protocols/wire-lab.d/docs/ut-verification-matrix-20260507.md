@@ -92,7 +92,7 @@ relabeled A–J:
 | Code | Cluster (per disposition memo) | Owner type | Items |
 | --- | --- | --- | ---: |
 | A | TE-havib follow-on (OQ-36.6 + tabletop) | TE-havib (already decided 2026-05-05) | 5 |
-| B | TE-sihih (substrate-agnostic layered model) | TE-sihih (drafting; depends on TE-mumuv) | 52 |
+| B | TE-sihih (substrate-agnostic layered model) | TE-sihih decided; TODO-vunub closed | 52 |
 | C | TE-40 (apparatus-vs-specimen completion) | TE-40 (drafting) | 18 |
 | D | TE-41 (group-session freeze procedure) | TE-41 (depends on TE-40) | 15 |
 | E | TE-42 (filename / CID-cascade policy) | TE-42 (depends on TE-41) | 7 |
@@ -187,7 +187,7 @@ matrix does not duplicate it. Per-cluster owners and onward pointers:
 | Cluster | Disposition-memo section | Owner artifact (current) | Status of owner |
 | --- | --- | --- | --- |
 | A — TE-havib follow-on | "TE-havib follow-on: OQ-36.6 + tabletop walk (5 UTs)" | `docs/thought-experiments/TE-havib-apparatus-vs-specimen-carve-out.md` and verification walk `protocols/wire-lab.d/docs/te-havib-followon-verification-walk-20260507.md` | TE decided 2026-05-05; walk landed 2026-05-07 |
-| B — TE-sihih | "TE-sihih: Substrate-agnostic layered model (52 UTs)" | `protocols/wire-lab.d/TODO/TODO-vunub-te-38-substrate-agnostic-layered-model.md` | TE drafting; depends on TE-mumuv |
+| B — TE-sihih | "TE-sihih: Substrate-agnostic layered model (52 UTs)" | `protocols/wire-lab.d/TODO/TODO-vunub-te-38-substrate-agnostic-layered-model.md` | TE-sihih decided; TODO-vunub closed; successor migration/root-layout questions tracked separately |
 | C — TE-40 | "TE-40: Apparatus-vs-specimen completion (18 UTs)" | `protocols/wire-lab.d/TODO/TODO-kugod-te-40-apparatus-vs-specimen-completion.md` | TE drafting |
 | D — TE-41 | "TE-41: Group-session freeze procedure (15 UTs)" | `protocols/wire-lab.d/TODO/TODO-turog-te-41-group-session-freeze-procedure.md` | depends on TE-40 |
 | E — TE-42 | "TE-42: Filename/CID-cascade policy (7 UTs)" | `protocols/wire-lab.d/TODO/TODO-duvuk-te-42-filename-cid-cascade-policy.md` | depends on TE-41 |
@@ -635,3 +635,54 @@ verification and infrastructure-file distinction in §2, §4, §9.3, and §9.5.
 `DI-vanak`. `UT-168.f` is closed for active docs because the wire-lab-devs README
 uses the post-turn-169 CIDs; turn-168-era CIDs remain historical-only, with the
 broader rehash-continuity question retained under turn 169.
+
+### 2026-05-15 — Turn-169 closure pointer
+
+Turn 169 has no remaining open UT work. `UT-169.a` is closed by explicitly
+recording the Path-A-vs-Path-B reasoning/action divergence and by the active
+settled policy in `DI-012-20260508-033513` / `DI-rurab`: canonical writers omit
+`Message-ID:`, while readers may tolerate exactly one legacy pre-`Date:` header
+without giving it semantic identity. `UT-169.b` is closed by the explicit §4.7
+legacy-header carve-out. `UT-169.c` is closed for future-process purposes by the
+current decision-first stop rule plus `DI-vanak`. `UT-169.d` is closed as
+historical branch metadata because active twig rules require `ppx/{twig}`
+kebab-case, not `ppx/te-<utc>-<slug>`. `UT-169.e` is closed by the active
+writer-prohibition / reader-tolerance split in §4.3.
+
+### 2026-05-15 — Turn-170 closure pointer
+
+Turn 170 has no remaining open UT work. `UT-170.a` is closed because the
+original `DF-37.1` flat-versus-nested root `transports/` framing was superseded
+by the later substrate/feed/CAS/site/simulation reframing: TE-sihih landed the
+L5/L6/L7 model, TE-domat and DR-nugog reframed the tree question, and `DI-fakin`
+implemented the current-specimen answer by moving the evidence into a simulation
+world rather than choosing any root-level turn-170 alternative. `UT-170.b` is
+retired as orphan DF-numbering history, `UT-170.c` is retired as stale
+continuity-summary history for the abandoned `git-file-transport` plan, and
+`UT-170.d` is retired because the substrate axis is now explicit in later owner
+artifacts.
+
+### 2026-05-16 — Turn-171 closure pointer
+
+Turn 171 has no remaining open UT work. `UT-171.a` is closed by the combination
+of TE-sihih / TODO-vunub Q-22.2, which makes L5 feeds first-class, and
+`DI-rurab`, which keeps group-session §9 inline as the normative git binding for
+the current wire-lab-devs specimen. `UT-171.b` is closed by TODO-vunub Q-22.3,
+which retracts the per-instance manifest-field idea in favor of path-as-
+declaration. `UT-171.c` is closed as a recorded design-cadence lesson about
+YAGNI during active framing, and `UT-171.d` is closed as a recorded positive
+pattern for two-part action-plus-framing questions.
+
+### 2026-05-16 — Turn-172 closure pointer
+
+Turn 172 has no remaining open UT work. `UT-172.a` is closed as a documented
+framing-stability lesson: the old `git-file-transport` wording was neither a
+transport-protocol name to keep nor a meaningless working label, but an early
+misclassified hint of the later L5 feed axis. `UT-172.b` is closed by TE-sihih's
+forward vocabulary (`feed`, with `substrate` as the descriptive prose term).
+`UT-172.c` is closed by TODO-vunub Q-22.3 and TE-vipir path-as-declaration,
+which retract the proposed `bindings/` / `messages/` instance layouts. `UT-172.d`
+is closed by TE-sihih's L5/L6/L7 taxonomy replacing the turn-172
+carrier/transport/binding sketch. `UT-172.e` is closed for current recovery by
+`DI-rurab`, which keeps group-session §9 inline for the current specimen while
+deferring any future feed-spec extraction to successor work.

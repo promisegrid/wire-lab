@@ -19,15 +19,18 @@ execution owner.
 
 ### T-FILENAME-CID-CASCADE (formerly OPEN-THREADS, opened 2026-05-06)
 
-Codify the Path-A-vs-Path-B policy for legacy-message rehash on
-envelope-changing edits (UT-169.a recommended Path A but commit
-executed Path B); revisit Message-ID prohibition vs deprecation
-(UT-169.e); resolve interaction with strict-reader rule § 4.7
-(UT-169.b) and recursive-body parsing (UT-176.e); document the
-CID-as-filename convention's stability properties.
+Historical original scope: codify the Path-A-vs-Path-B policy for
+legacy-message rehash on envelope-changing edits (UT-169.a recommended Path A
+but commit executed Path B); revisit Message-ID prohibition vs deprecation
+(UT-169.e); resolve interaction with strict-reader rule § 4.7 (UT-169.b) and
+recursive-body parsing (UT-176.e); document the CID-as-filename convention's
+stability properties. The Message-ID / legacy-CID portion is closed by the
+closure note below and by the active group-session successor. The later
+recursive-body parsing concern is no longer active TODO-duvuk execution work;
+it remains with later nested-envelope/body-semantics rows.
 
-Blocking: TE-41 (group-session freeze) lands first to establish the
-freeze-and-rename mechanic this policy generalizes.
+Blocking: none for this rooted historical file; it is no longer an execution
+owner.
 
 Anchor: transport-spec-draft.md § 4.3, § 4.7; group-session-draft.md
 § 9.
@@ -55,4 +58,4 @@ keeps historical specimens immutable under `DI-bomud`.
 
 ## Decision Intent Log
 
-(Will be populated as DFs lock and product lands.)
+(No local DI entries were added before this file became historical; active closure DIs live in the simulation-local successor TODOs named above.)

@@ -241,16 +241,29 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
   `UT-168.e` is closed for future-process purposes by decision-first plus
   `DI-vanak`; `UT-168.f` is closed for active docs because current
   wire-lab-devs docs use post-turn-169 CIDs and stale CIDs are historical-only.
-- `Turn 169` `UT-169.a`, `UT-169.b`, `UT-169.d`, and `UT-169.e` remain open
-  under `TODO-duvuk`. Carry item `UT-169.c` remains a procedural cadence note.
-- `Turn 170` `UT-170.b`, `UT-170.c`, and `UT-170.d` are retired. `UT-170.a`
-  remains live in the TE-sihih / `TODO-vunub` cluster and must close there, not
-  in replay history.
-- `Turn 171` `UT-171.a` and `UT-171.b` remain live in TE-sihih /
-  `TODO-vunub`. Carry items `UT-171.c` and `UT-171.d` remain historical
-  cadence / design-process notes.
-- `Turn 172` `UT-172.a`, `UT-172.b`, `UT-172.c`, `UT-172.d`, and `UT-172.e`
-  remain live in TE-sihih / `TODO-vunub`.
+- `Turn 169` `UT-169.a`, `UT-169.b`, and `UT-169.e` are closed by
+  `DI-012-20260508-033513` / `DI-rurab` and active group-session §4.3 / §4.7
+  compatibility wording; `UT-169.c` is closed for future-process purposes by
+  decision-first plus `DI-vanak`; `UT-169.d` is closed as historical branch
+  metadata because active twig rules require `ppx/{twig}` kebab-case, not the
+  historical `ppx/te-<utc>-<slug>` pattern.
+- `Turn 170` `UT-170.a` is closed by TE-sihih / TODO-vunub landing the
+  L5/L6/L7 substrate-agnostic model and by DR-nugog / `DI-fakin` superseding
+  the original flat-versus-nested root `transports/` question for the current
+  specimen. `UT-170.b`, `UT-170.c`, and `UT-170.d` are retired and checked off
+  as historical naming / stale-summary / superseded-framing records.
+- `Turn 171` `UT-171.a` is closed by TE-sihih / TODO-vunub Q-22.2
+  plus `DI-rurab` keeping §9 as the current specimen's inline normative git
+  binding; `UT-171.b` is closed by TODO-vunub Q-22.3 retracting the manifest
+  field idea in favor of path-as-declaration; `UT-171.c` and `UT-171.d` are
+  closed as recorded design-cadence lessons.
+- `Turn 172` `UT-172.a` is closed as a framing-stability lesson;
+  `UT-172.b` is closed by TE-sihih's forward vocabulary (`feed` with
+  `substrate` as prose term); `UT-172.c` is closed by TODO-vunub Q-22.3's
+  path-as-declaration retraction of per-instance feed manifests; `UT-172.d`
+  is closed by TE-sihih's L5/L6/L7 replacement taxonomy; `UT-172.e` is closed
+  by `DI-rurab` keeping §9 inline for the current specimen and deferring any
+  future feed-spec extraction to successor work.
 - `Turn 173` `UT-173.a` has partial downstream doc promotion via `DI-pijun`,
   but it is not fully closed as a protocol-identity claim. `UT-173.b`,
   `UT-173.c`, `UT-173.d`, and `UT-173.e` remain live in TE-sihih /
@@ -1084,113 +1097,137 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 
 ### Turn 169 — 2026-05-03 11:54 UTC
 
-- `Turn 169 summary` Steve asked whether `Message-ID` is still needed now that
-  the canonical identifier is the message CID. In plain English, the raw turn
-  is a careful reasoning memo, not an execution turn: the bot walks through
-  every plausible use of `Message-ID`, concludes that it mostly creates
-  confusion once filename = CID, and then reasons about how to remove it
-  without breaking the existing bootstrap messages.
-- `Existing capture` `TODO-lilar` already captures the turn correctly. The raw
-  reasoning lands on the conservative answer: keep legacy messages parseable,
-  deprecate `Message-ID` for new messages, and ask Steve to choose between soft
-  deprecation and hard removal. The key compatibility issue the bot itself
-  identifies is `§4.7`: if strict readers reject unknown headers, then old
-  bootstrap messages containing `Message-ID` become a problem under a spec that
-  simply forbids the header. The turn matters because it recommends `Path A`
-  and explicitly says it should ask before acting.
-- `Gaps or contradictions` None that overturn the existing capture. The main
-  carry-forward is the reasoning-versus-action split already preserved in
-  `TODO-lilar`: the raw turn recommends deprecate-and-ask, while the later repo
-  history performs hard removal plus rehash. That later divergence belongs to
-  the subsequent commit history, not to the content of this raw turn itself.
-- `Proposed disposition` `already captured correctly`
-- `Write needed? yes/no` `yes` for this rewalk entry and checklist closure in
-  `TODO-juhub`; `no` correction note is needed in `TODO-lilar`.
-- `Next: wait for approval before turn N+1` Turn 170 is next and remains
-  pending approval.
+- `Turn 169 summary` Steve asked whether `Message-ID:` is still needed now that
+  the canonical identifier is the message CID. In plain English, the raw turn is
+  a careful reasoning memo: the bot audits every plausible use of `Message-ID:`,
+  concludes that it creates competing identity once filename = CID, and then
+  reasons about compatibility for the already-authored bootstrap messages.
+- `Existing capture` `TODO-lilar` captures the turn correctly. The raw reasoning
+  recommended the conservative Path A (deprecate / preserve legacy bytes / ask
+  Steve), while later repo history executed Path B (hard remove / rehash). The
+  later active policy is no longer the unqualified Path-B-only state: current
+  group-session §4.3 / §4.7, under `DI-012-20260508-033513`, says canonical
+  writers MUST NOT emit `Message-ID:`, but readers MAY tolerate exactly one
+  legacy pre-`Date:` header and MUST ignore its value semantically.
+- `Gaps or contradictions` Captured and now resolved for active docs. The
+  reasoning/action inversion is explicitly recorded; the strict-reader problem
+  has an explicit legacy-header carve-out; the writer-side prohibition versus
+  reader-side deprecation split is now deliberate; and the twig-name issue is
+  historical metadata because active branch rules require only `ppx/{twig}` with
+  a short kebab-case task phrase.
+- `Related UTs / owners` `UT-169.a` through `UT-169.e` are checked off in
+  `TODO-lilar`. `TODO-duvuk` is closed as historical coordination memory and no
+  longer owns active execution for these Message-ID / CID-cascade rows.
+- `Owner/doc cleanup` Done. Updated `TODO-duvuk` so its original
+  T-FILENAME-CID-CASCADE scope is visibly historical and updated `TODO-jivam`
+  so its live TE-42 closure condition no longer appears open. Historical quoted monitor snapshots remain unchanged as evidence.
+- `Remaining decisions or work` None for turn 169. Later nested-body and
+  grid-envelope cascade questions remain with their own later-turn rows, not as
+  turn-169 work.
+- `Work pending` no.
+- `Proposed disposition` `reconciled after lilar UT closure and active Message-ID compatibility audit`
+- `Write needed? yes/no` `no` further turn-169 write is needed after this pass.
+- `Next` Turn 170 is next.
 
 ### Turn 170 — 2026-05-03 16:53 UTC
 
 - `Turn 170 summary` Steve shifted back from execution to design review and
   asked whether the flat `transports/draft--wire-lab-devs/` layout should gain
-  a protocol-grouping layer so a second group or a second transport protocol
-  would not make the tree ambiguous. In plain English, this is a pure
-  DF-opening turn, not an implementation turn.
-- `Existing capture` `TODO-lilar` already captures the turn correctly. The raw
-  answer identifies two structural weaknesses in the flat layout: it gives no
-  protocol grouping by path, and it leaves future multi-instance layouts human-
-  ambiguous even if the freeze-time naming rules still technically work. The
-  bot then frames `DF-37.1` with three alternatives -- a protocol-slug layer,
-  recursive draft/pCID nesting, or defer/status quo -- and recommends the
-  protocol-slug solution (`Alt-1.A`) because protocol slugs are already the
-  stable human-readable handles used elsewhere in the repo.
-- `Gaps or contradictions` None that overturn the existing capture. The later
-  residual notes already preserve the important follow-ons from this turn: no
-  implementation happened here, the original `DF-37.1` was never directly
-  answered as posed, and later turns reframed the problem along the substrate
-  axis instead of resolving the protocol-grouping question cleanly on its own
-  terms.
-- `Proposed disposition` `already captured correctly`
-- `Write needed? yes/no` `yes` for this rewalk entry and checklist closure in
-  `TODO-juhub`; `no` correction note is needed in `TODO-lilar`.
-- `Next: wait for approval before turn N+1` Turn 171 is next and remains
-  pending approval.
+  a protocol/grouping layer, especially if a second named group appears. In
+  plain English, this opened the directory-axis question that later turns
+  broadened into protocol identity, feed/substrate, site, CAS, and simulation
+  placement.
+- `Existing capture` `TODO-lilar` captures the turn correctly. The raw answer
+  framed `DF-37.1` with three alternatives: protocol-slug nesting, recursive
+  draft/pCID nesting, or status quo deferral. It recommended protocol-slug
+  nesting, but no implementation happened and Steve did not answer that DF as
+  posed.
+- `Gaps or contradictions` Captured and now resolved. `DF-37.1` is not still an
+  actionable open DF: turns 171-176 reframed the missing axis, TE-sihih / TODO-
+  vunub landed the L5/L6/L7 substrate-agnostic model, TE-domat and DR-nugog
+  reframed the root `transports/` / `groups/` question, and `DI-fakin` resolved
+  the current specimen by moving it into a simulation world instead of choosing
+  any of the original root flat/nested alternatives.
+- `Related UTs / owners` `UT-170.a` through `UT-170.d` are checked off in
+  `TODO-lilar`. `TODO-vunub` is now marked closed because TE-sihih is decided;
+  DR-nugog is implemented for the current specimen and has an append-only note
+  naming the current `SIM-ludut-wire-lab-devs` path after the later rusis split.
+- `Owner/doc cleanup` Done. Updated TODO-vunub status, the master TODO row, the
+  verification matrix owner/closure notes, and DR-nugog current-path provenance.
+- `Remaining decisions or work` None for turn 170. Later root/reference-layout
+  questions, if any, are downstream graduation questions rather than turn-170
+  recovery loose ends.
+- `Work pending` no.
+- `Proposed disposition` `reconciled after TE-sihih / DR-nugog / simulation-path audit`
+- `Write needed? yes/no` `no` further turn-170 write is needed after this pass.
+- `Next` Turn 171 is next.
 
 ### Turn 171 — 2026-05-03 16:56 UTC
 
-- `Turn 171 summary` Steve refined the tree question from "should there be
-  protocol grouping?" to "should there also be a separate path layer meaning
-  git file transfer?" In plain English, this is the first turn where the bot
-  cleanly separates protocol identity from delivery substrate in the directory
-  discussion.
-- `Existing capture` `TODO-lilar` already captures the turn correctly. The raw
-  answer argues that `group-session` answers "what protocol governs these wire
-  bytes?" while `git` answers "how do those bytes move between collaborators?"
-  and that putting both on the same tree axis would mix two different kinds of
-  things. On that basis, the bot rejects a `git/` path layer for now, keeps the
-  protocol-slug recommendation from turn 170, and says that if substrate later
-  needs first-class representation it should become another axis or per-instance
-  metadata rather than another protocol-tree path segment.
-- `Gaps or contradictions` None that overturn the existing capture. The later
-  residual notes already preserve the important limits of this turn: it is the
-  clearest early statement of the protocol-vs-substrate distinction, but it is
-  only locally stable because turn 172 immediately expands the substrate
-  question from one substrate (`git`) to many and partially overturns the
-  "§9 already captures it" comfort.
-- `Proposed disposition` `already captured correctly`
-- `Write needed? yes/no` `yes` for this rewalk entry and checklist closure in
-  `TODO-juhub`; `no` correction note is needed in `TODO-lilar`.
-- `Next: wait for approval before turn N+1` Turn 172 is next and remains
-  pending approval.
+- `Turn 171 summary` Steve refined the turn-170 tree question from "should
+  there be protocol grouping?" to "should there also be a separate path layer
+  meaning git file transfer?" In plain English, this is where the replay first
+  separates protocol identity from delivery substrate, before turn 172 expands
+  the substrate axis beyond git.
+- `Existing capture` `TODO-lilar` captures the turn correctly. The raw answer
+  rejects a `git/` path layer for the current one-substrate case, keeps the
+  protocol-slug recommendation from turn 170, and says substrate facts should
+  become another axis or per-instance metadata if they later need first-class
+  representation.
+- `Gaps or contradictions` Captured and now resolved. The "§9 captures git"
+  comfort is superseded by TE-sihih's L5 feed model, but the active
+  group-session specimen is also intentionally allowed to keep §9 inline as the
+  normative wire-lab-devs git binding under `DI-rurab`. The manifest-field hook
+  is closed by TODO-vunub Q-22.3, which retracts manifest schema work in favor
+  of TE-vipir path-as-declaration.
+- `Related UTs / owners` `UT-171.a` through `UT-171.d` are checked off in
+  `TODO-lilar`. `TODO-vunub` records the retired turn-171 substrate/manifest
+  framing; cadence-only rows are preserved as lessons, not live implementation
+  owners.
+- `Owner/doc cleanup` Done. Updated TODO-vunub's retired-question and DI-log
+  notes. No active spec or transport-message bytes were changed.
+- `Remaining decisions or work` None for turn 171. Later feed-vocabulary,
+  groups/transports, and nested-envelope questions remain with their own later
+  turns, not with turn 171.
+- `Work pending` no.
+- `Proposed disposition` `reconciled after TE-sihih / TODO-vunub / DI-rurab audit`
+- `Write needed? yes/no` `no` further turn-171 write is needed after this pass.
+- `Next` Turn 172 is next.
 
 ### Turn 172 — 2026-05-03 17:01 UTC
 
 - `Turn 172 summary` Steve blew up the narrow `git` question by listing
   multiple peer substrates: `rsync`, `unison`, `uucp`, `udp`, `svn`, `cvs`,
-  and `git`. In plain English, this is the turn where the bot stops treating
-  substrate as a side detail and starts treating it as a first-class design
-  axis.
-- `Existing capture` `TODO-lilar` already captures the turn correctly. The raw
-  answer responds with a substrate-pluralism reframe: if the same
-  `group-session` instance might run over several different ways of moving
-  bytes, then git-specific rules do not belong buried inside `group-session` as
-  if they were part of the transport protocol itself. The bot's big structural
-  move is to propose three families -- carrier protocol, transport protocol,
-  and substrate-mapping protocol -- and to say that `§9` should eventually move
-  out of `group-session` into its own substrate-specific spec. The bot does not
-  implement anything here; it proposes a new TE/DF program because the change
-  is too large to patch directly.
-- `Gaps or contradictions` None that overturn the existing capture. The later
-  residual notes already preserve the important nuances: some vocabulary and
-  layout specifics from this turn do not survive unchanged, but the deeper idea
-  introduced here -- substrate as its own first-class axis rather than a hidden
-  appendix inside `group-session` -- remains the load-bearing contribution of
-  the turn.
-- `Proposed disposition` `already captured correctly`
-- `Write needed? yes/no` `yes` for this rewalk entry and checklist closure in
-  `TODO-juhub`; `no` correction note is needed in `TODO-lilar`.
-- `Next: wait for approval before turn N+1` Turn 173 is next and remains
-  pending approval.
+  and `git`. In plain English, this is the turn where the replay stops
+  treating delivery substrate as a side detail and starts treating it as a
+  first-class design axis.
+- `Existing capture` `TODO-lilar` captures the turn correctly. The raw answer
+  proposes a new TE/DF program because if one `group-session` can move over
+  multiple byte-moving substrates, then git-specific rules cannot be treated as
+  timeless core group semantics. The answer's specific words and layout are
+  transitional: it says `binding`, sketches `bindings/` and `messages/`
+  subdirectories, and imagines extracting `§9` into a separate git-specific
+  spec.
+- `Gaps or contradictions` Captured and now resolved. The load-bearing
+  insight survives, but the exact turn-172 taxonomy does not. TE-sihih replaces
+  `binding` with L5 `feed`, adds L6 CAS and L7 group as the citable layer
+  split, retracts per-instance feed manifests in favor of TE-vipir
+  path-as-declaration, and leaves current wire-lab-devs git rules inline in
+  group-session `§9` under `DI-rurab`.
+- `Related UTs / owners` `UT-172.a` through `UT-172.e` are checked off in
+  `TODO-lilar`. `TODO-vunub` records the turn-172 proposal as retired by
+  TE-sihih / Q-22.2 / Q-22.3 / Q-22.6, with future feed-spec extraction owned
+  by successor work rather than this replay turn.
+- `Owner/doc cleanup` Done. Updated `TODO-lilar`, `TODO-vunub`, this turn note,
+  and the UT verification matrix. No active spec or transport-message bytes
+  were changed.
+- `Remaining decisions or work` None for turn 172. Later historical-analog,
+  feed-vocabulary, CAS/site, and simulation-layout details belong to their own
+  later turns and owner artifacts.
+- `Work pending` no.
+- `Proposed disposition` `reconciled after TE-sihih / TODO-vunub / DI-rurab audit`
+- `Write needed? yes/no` `no` further turn-172 write is needed after this pass.
+- `Next` Turn 173 is next.
 
 ### Turn 173 — 2026-05-03 17:06 UTC
 

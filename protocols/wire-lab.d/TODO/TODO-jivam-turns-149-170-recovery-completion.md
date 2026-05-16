@@ -62,7 +62,7 @@ This TODO may close only after all of the following are true:
 - [ ] jivam.3 All turn-155-through-192 UTs in `dropped-thread-disposition-20260506.md` have owner artifacts and closure evidence in the verification matrix.
 - [x] jivam.4 TODO-kugod closes or transfers all residual TE-40 recovery work after the apparatus-vs-specimen sweep, grid-envelope home, transport-spec companion audit, and stale TE-famar status/path issues are resolved or explicitly retired. Closed by `DI-mugar` in `TODO-kugod`.
 - [ ] jivam.5 TODO-turog closes or transfers all TE-41 group-session freeze work after its TE-40 and migration-design blockers are resolved.
-- [ ] jivam.6 TODO-duvuk closes or transfers all TE-42 Message-ID / filename / CID-cascade policy work after TE-41 no longer blocks it.
+- [x] jivam.6 TODO-duvuk closes or transfers all TE-42 Message-ID / filename / CID-cascade policy work after TE-41 no longer blocks it. Closed 2026-05-15: rooted TODO-duvuk is historical memory, its group-session Message-ID / filename / CID-cascade slice is closed by `TODO-gapab` / `DI-rurab` and `DI-012-20260508-033513`, and its feed-outer slice is closed by `TODO-kakaz` / `DI-bomud`.
 - [ ] jivam.7 Adjacent turn-149-through-192 items outside TE-40/41/42 are resolved or explicitly transferred: TE-havib follow-on, TE-sihih, TODO-kituj/TE-43, TODO-ralud/TE-45, Spec-edit, Retire, and Carry entries.
 - [ ] jivam.8 TODO-lilar remains open until every relevant downstream owner has completed, retired, or transferred its UTs under the matrix-as-closure-index rule.
 - [ ] jivam.9 Turns 193-208 are explicitly accounted for as post-lilar session-log boundary material: either no additional recovery item is required, or each item is filed in an owner artifact with DI/DR provenance.

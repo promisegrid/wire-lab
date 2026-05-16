@@ -90,3 +90,14 @@ This does not freeze a future PromiseGrid node layout. If simulation results
 justify root-level `groups/`, `feeds`, `cas`, or transport reference trees, they
 must graduate through a later DR, DI, frozen spec, guide prose, or external
 PromiseGrid spec corpus.
+
+## 2026-05-15 update - current simulation path after rusis split
+
+The 2026-05-10 implementation note above records the then-current
+`SIM-piloh-turns-149-208-recovery` path. Later rusis simulation-split work moved
+the concrete wire-lab-devs world into
+`simulations/SIM-ludut-wire-lab-devs/world/transports/wire-lab-devs-draft/`.
+That move does not reopen this DR: the root-level flat-versus-nested
+`transports/` question remains superseded for the current specimen, and any
+future root-level `groups/`, `feeds`, `cas`, or transport reference layout still
+requires a later DR/DI/spec graduation path.

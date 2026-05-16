@@ -14,7 +14,12 @@ a redesign (per the 2026-05-06 scope confirmation; see Q-22.3 below).
 
 ## Status
 
-In progress. Twig: `ppx/te-20260506-184800-substrate-agnostic-layered-model`.
+Closed. TE-sihih is decided and the product landed at
+`docs/thought-experiments/TE-sihih-substrate-agnostic-layered-model.md`;
+TE-vipir received the companion Cat-3 refinement. The historical working twig
+was `ppx/te-20260506-184800-substrate-agnostic-layered-model`. Later migration
+or root-layout questions are owned by successor TEs, DRs, and simulation-local
+TODOs rather than by this parent TODO.
 
 ## Foundational invariants (referenced, not redecided)
 
@@ -187,9 +192,26 @@ resulting product is committed and pushed.
 
 ## Open questions retired by this TODO
 
-(None yet; backfilled DF questions Q-22.1 through Q-22.5 are recorded
-above with their actual asked-and-answered timeline.)
+- The turn-170 `DF-37.1` flat-versus-nested root `transports/` framing is
+  superseded for the current specimen by TE-sihih's L5/L6/L7 model, DR-nugog,
+  and `DI-fakin`; future root/reference layout questions graduate through later
+  DR/DI/spec work rather than through this TODO.
+- The turn-171 substrate-path-layer and instance-manifest hooks are retired by
+  Q-22.2 and Q-22.3: L5 feeds are first-class protocol families, while
+  per-instance feed declarations remain path-as-declaration rather than a new
+  manifest field for this TODO's scope. The current wire-lab-devs git binding
+  remains inline in group-session §9 under `DI-rurab` until a later feed-spec
+  graduation chooses otherwise.
+- The turn-172 substrate-pluralism / `binding`-family proposal is retired by
+  the same landed TE-sihih products: DF-38.1 / Q-22.2 locks L5 feed protocols
+  as first-class, DF-38.2 / Q-22.3 retracts the per-instance feed-manifest
+  mechanism in favor of path-as-declaration, and Q-22.6 / Alt-M.4 moves CAS
+  concerns into L6 rather than leaving them as an unmodeled fourth family.
+  Future extraction of the current git feed prose from group-session §9 is
+  per-feed successor work, not open turn-172 recovery work.
+- Backfilled DF questions Q-22.1 through Q-22.8 are recorded above with their
+  actual asked-and-answered or retracted timeline.
 
 ## Decision Intent Log
 
-(Will be populated as DFs lock and product lands.)
+(No local DI entries were added before this file closed; the locks are recorded in the question log above and in the landed TE-sihih / TE-vipir products.)
