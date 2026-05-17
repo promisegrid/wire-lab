@@ -24,6 +24,12 @@ same codebase eventually" architectural commitment as a deliberate DF;
 name the merge endpoint, the staging mechanic, and the canonical-vs-
 prototype policy at merge time.
 
+Turn 179's proposal to add PromiseGrid narrative material to promisebase docs is
+treated here as a scope-creep warning, not an authorization. Cross-repo
+promisebase documentation, merge, or convergence work needs its own later DF or
+explicit task; it must not be inferred from TE-sihih or from the invalidated
+wholesale-adoption pivot. Source: `DI-vabij`.
+
 Blocking: TE-43 (promisebase prior-art adoption) lands first.
 
 Anchor: UT-192.f; TE-43 future cross-reference.
@@ -32,7 +38,15 @@ Disposition-file pointer: `dropped-thread-disposition-20260506.md`
 
 ## Question log
 
-(Per AGENTS-ppx Question-logging discipline. No questions logged yet.)
+- 2026-05-17: Turn 179's cross-repo promisebase-docs proposal is routed here as
+  merge-trajectory / scope-boundary pressure. This does not authorize any
+  promisebase edit. Source: `DI-vabij`.
+
+## Subtasks
+
+- [ ] dozak.1 Decide whether wire-lab and promisebase should converge, merge, or
+  stay independent before any cross-repo promisebase documentation or code
+  trajectory is treated as PromiseGrid plan of record. Source: `DI-vabij`.
 
 ## Decision Intent Log
 

@@ -258,6 +258,35 @@ Affects: `protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewal
 `simulations/SIM-ligan-promisebase-reference-naming/`.
 Supersedes: DI-lusum (BGP and promisebase-reference simulation-home routing only)
 
+ID: DI-vabij
+Date: 2026-05-17 13:35:22
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Reconcile turn 179 by routing promise-economy mechanism agnosticism
+to a standalone simulation, conditional release / geofencing to existing
+TODO-ralud and SIM-zarud owners, and the promisebase wholesale-adoption /
+cross-repo-scope lessons to existing process and promisebase-trajectory owners.
+Intent: Turn 179 introduced a real PromiseGrid design question that was still
+too broad for `SIM-rusap`: the protocol must be able to test a spectrum from
+peer-local social assessment to capability-token marketplaces without baking in
+one economics model. It also introduced a procedural failure: the assistant read
+promisebase design docs as if they were implementation evidence and proposed
+cross-repo promisebase documentation scope without authorization. The replay must
+preserve those lessons without reviving the invalid wholesale-adoption pivot.
+Constraints: Do not answer the economics-model question in this pass. Do not
+make promisebase authoritative. Do not create cross-repo work. Keep
+conditional-release / geofencing with TODO-ralud and SIM-zarud, keep
+promisebase adoption and prototype-vs-canon with TODO-kituj / TODO-dozak, and
+use `SIM-haros-promise-economy-spectrum/` for the standalone mechanism-spectrum
+question.
+Affects: `protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewalk.md`;
+`protocols/wire-lab.d/TODO/TODO-lilar-session-replay-cleanup.md`;
+`protocols/wire-lab.d/TODO/TODO-dozak-te-44-wire-lab-promisebase-merge-trajectory.md`;
+`protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`;
+`simulations/README.md`;
+`simulations/SIM-haros-promise-economy-spectrum/`;
+`DEV-GUIDE-RESOURCES.md`.
+
 ## Why a separate TODO
 
 `TODO-lilar` already records the original historical walk through turn 192 and
@@ -489,7 +518,7 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - [x] juhub.176 Turn 176 raw-log rewalk plus later-turn and later-artifact sweep.
 - [x] juhub.177 Turn 177 raw-log rewalk plus later-turn and later-artifact sweep.
 - [x] juhub.178 Turn 178 raw-log rewalk plus later-turn and later-artifact sweep.
-- [ ] juhub.179 Turn 179 raw-log rewalk plus later-turn and later-artifact sweep.
+- [x] juhub.179 Turn 179 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.180 Turn 180 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.181 Turn 181 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.182 Turn 182 raw-log rewalk plus later-turn and later-artifact sweep.
@@ -1806,3 +1835,82 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - `Proposed disposition` `resolved/transferred after sparse-CAS, promise-accounting, promisebase, interop, guide-claim, and multi-repo simulation-owner routing`
 - `Write needed? yes/no` `no` further turn-178 write is needed after this pass.
 - `Next` Turn 179 is next.
+
+### Turn 179 — 2026-05-03 19:49 UTC
+
+- `Turn 179 plain-English recap` Steve confirmed that discovery and transport of
+  chunks are both promise-mediated in a promise economy. He added that the design
+  needs multi-hop discovery and fetch, geofencing, permissioned groups, and
+  conditional release, with the concrete example that Alice may send a chunk to
+  Bob only if Bob promises not to send it outside group X. He then widened the
+  promise-economy design space: "promise economy" might mean a real economy with
+  promises issued as capability tokens, possibly transferable or permissioned,
+  possibly with floating exchange rates where everyone is effectively their own
+  central bank. He explicitly warned that this is only one possible model, must
+  be tested in wire-lab, and could degenerate into cryptocurrency toxicity. He
+  also asked to be reminded to connect the assistant to the promisebase GitHub
+  repo with a PAT, while asking whether the assistant could pull it read-only for
+  now. The assistant responded by reading promisebase but over-trusted design
+  docs rather than implementation code. It pivoted TE-sihih toward "adopt
+  promisebase wholesale," proposed eleven DFs around promisebase message format,
+  layering, gitlike refs, grid CIDs, module dependency, migration, and `pgmsg`,
+  and suggested PromiseGrid narrative material should live in promisebase docs.
+  Later turns correct most of that response. Turn 180 identifies the doc-vs-code
+  mistake and forces a git-log/code audit. Turns 181-184 show that only the lower
+  CAS/Merkle/Rabin pieces are real enough to consider, while much of the
+  promisebase layering and message-format material is design-only. Turn 191 locks
+  the stance that promisebase is prototype evidence and wire-lab should be
+  preferred in design conflicts. The valid turn-179 conclusions that remain are:
+  conditional release and geofencing need their own owner, promise-economy
+  mechanism neutrality needs testing, read-only/PAT and cross-repo work need
+  explicit authorization, and promisebase cannot be treated as authority without
+  code-first evidence.
+- `Existing capture` `TODO-lilar` captured the raw turn in detail and flagged
+  seven related UT rows. Later artifacts now capture the substance: TODO-ralud
+  and `SIM-zarud` own conditional release, onward-restraint, geofencing, and
+  recursive promise-graph ownership; `SIM-haros` owns promise-economy mechanism
+  neutrality; AGENTS-ppx B7 owns the ground-truth-before-citation process lesson;
+  TODO-kituj and `DR-tumus` own concrete promisebase prior-art adoption; TODO-dozak
+  owns wire-lab / promisebase merge-trajectory and scope-boundary questions; and
+  TE-nizor records the later synthesis that promisebase is prototype evidence,
+  not authority.
+- `Gaps or contradictions` The historical turn-179 response was wrong in the
+  specific way Steve later identified: it read promisebase docs as if they were
+  implementation evidence and tried to turn wire-lab into a downstream adopter of
+  a mostly design-only stack. It also bundled previously locked vocabulary fixes
+  into a fresh DF and proposed cross-repo promisebase documentation scope without
+  authorization. The remaining uncaptured design gap before this pass was the
+  promise-economy mechanism spectrum: it was too specific and risky to hide under
+  generic promise accounting records. `DI-vabij` fixes that by adding
+  `SIM-haros-promise-economy-spectrum`.
+- `Related UTs / owners` `UT-179.a` is closed for recovery by the later
+  turn-180 / turn-184 correction path plus AGENTS-ppx B7 and TE-nizor C8: future
+  external-repo claims need code-first evidence, not doc-only adoption. `UT-179.b`
+  is captured by `SIM-haros-promise-economy-spectrum`, which asks how to test
+  social assessment, reciprocal promises, capability tokens, transferability,
+  floating exchange rates, and cryptocurrency-toxicity failure modes without
+  forcing one economics model into the base protocol. `UT-179.c` and `UT-179.d`
+  are captured by TODO-ralud and `SIM-zarud-conditional-release-geofencing`.
+  `UT-179.e` is closed against TODO-vunub / TE-sihih's actual small landing and
+  foundational vocabulary invariants: the vocabulary corrections from turns 175
+  and 176 are background, not a reopened bundled DF. `UT-179.f` is closed as a
+  historical cadence observation. `UT-179.g` is captured by TODO-dozak's
+  merge-trajectory / scope-boundary owner and by existing cross-repo authorization
+  discipline; no promisebase edit is authorized by the old sketch.
+- `Owner/doc cleanup` Done. Added `DI-vabij`; added
+  `SIM-haros-promise-economy-spectrum`; updated `simulations/README.md` and
+  `DEV-GUIDE-RESOURCES.md`; added a scope-boundary subtask and question-log entry
+  to TODO-dozak; added a turn-179 closure pointer to the UT matrix; and checked
+  off `UT-179.a` through `UT-179.g` in TODO-lilar with an additive closure
+  summary.
+- `Remaining decisions or work` Downstream work remains open, but it is captured:
+  `SIM-haros` holds promise-economy mechanism-neutrality questions; TODO-ralud /
+  `SIM-zarud` hold conditional-release and geofencing ownership questions;
+  TODO-kituj / `DR-tumus` hold concrete promisebase prior-art adoption; TODO-dozak
+  holds wire-lab / promisebase merge or independence decisions; and AGENTS-ppx
+  carries the code-first / authorization process lessons. For recovery-walkthrough
+  purposes, turn 179 has no uncaptured loose end.
+- `Work pending` no.
+- `Proposed disposition` `resolved/transferred after code-first correction, promise-economy-spectrum simulation routing, conditional-release/geofencing routing, and promisebase scope-boundary routing`
+- `Write needed? yes/no` `no` further turn-179 write is needed after this pass.
+- `Next` Turn 180 is next.

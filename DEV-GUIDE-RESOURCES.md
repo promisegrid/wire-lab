@@ -133,6 +133,7 @@ promise-accounting scheme from their existence. Source: `DI-navod`.
 | `simulations/SIM-jurar-cas-backed-group-session/` | Tests a successor group-session shape where L7 group semantics point at L6 CAS roots and pointer objects without rewriting historical `.txt` specimens. | Provisional design-point evidence. |
 | `simulations/SIM-rusap-promise-accounting-records/` | Tests peer-local promise accounting records for pull, keep, advertise, refusal, and 100-year mental-model pressure without defining a central accounting authority. | Provisional design-point evidence. |
 | `simulations/SIM-punaz-bgp-class-routing-app/` | Tests turn-178 BGP-class routing-policy application pressure as a standalone L7 app question rather than a generic promise-accounting example. | Provisional design-point evidence. |
+| `simulations/SIM-haros-promise-economy-spectrum/` | Tests turn-179 promise-economy mechanism neutrality across peer-local assessment, capability tokens, transferability, floating exchange rates, and cryptocurrency-toxicity failure modes. | Provisional design-point evidence. |
 
 Open turn-177 decision records: `DR-tumus` owns the concrete L6 CAS adoption
 question, `DR-gabif` owns additive CAS-backed group-session migration, and
@@ -153,6 +154,13 @@ question now have their own standalone sims rather than living under
 promise-accounting or CAS-object-model surfaces. Guide writers should treat
 those as exploratory evidence until the relevant DRs and guide decisions close.
 Source: `DI-vaguf`; `DI-lusum`; `DI-tibis`.
+
+Turn 179 adds a separate economics-model warning. `DI-vabij` routes the
+promise-economy spectrum into its own simulation, keeps conditional-release /
+geofencing with TODO-ralud and `SIM-zarud`, and treats the promisebase
+wholesale-adoption pivot as invalidated by later code-first review. Guide
+writers should not describe transferable promise tokens, floating rates, or
+promisebase adoption as settled PromiseGrid design. Source: `DI-vabij`.
 
 ## Protocol/Specimen TODO Question Simulations
 

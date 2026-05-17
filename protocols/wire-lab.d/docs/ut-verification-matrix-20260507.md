@@ -847,3 +847,19 @@ layperson-narrative pressure is routed to `DR-napum` and guide-resource notes.
 The turn-178 `pgmsg` and collaborator-permission meta-questions are routed to
 TODO-rohub. This does not answer the downstream design questions and does not
 reopen `TODO-lilar` rows.
+
+### 2026-05-17 — Turn-179 closure / transfer pointer
+
+`DI-vabij` reconciles turn 179 after the later promisebase code-first
+correction. `UT-179.a` is closed for recovery by the turn-180 / turn-184
+correction path plus AGENTS-ppx B7 and TE-nizor's promisebase-as-prototype
+synthesis. `UT-179.b` is captured by standalone
+`SIM-haros-promise-economy-spectrum`, which keeps mechanism neutrality and
+cryptocurrency-toxicity pressure visible without choosing an economics model.
+`UT-179.c` and `UT-179.d` are captured by TODO-ralud and
+`SIM-zarud-conditional-release-geofencing`. `UT-179.e` is closed by TODO-vunub /
+TE-sihih's actual small scope and already-locked vocabulary invariants.
+`UT-179.f` is closed as a historical cadence observation. `UT-179.g` is captured
+by TODO-dozak's merge-trajectory / scope-boundary owner and existing cross-repo
+authorization discipline. This does not answer the downstream design questions
+and does not reopen `TODO-lilar` rows.
