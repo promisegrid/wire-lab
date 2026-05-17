@@ -142,6 +142,24 @@ through the three `DI-bukoh` bakeoff sims, then synthesized by `DI-molah` into
 the current answerable packet. Source: `DI-davov`; `DI-majib`; `DI-bukoh`;
 `DI-molah`.
 
+## Protocol/Specimen TODO Question Simulations
+
+`DI-pukap` created six standalone question-home simulations for
+protocol/specimen TODO questions that were still visible only as TODO prose.
+These are unsettled design workspaces, not final PromiseGrid APIs, not active
+protocol homes, and not guide-ready normative text. Guide writers may cite them
+as evidence that the questions are being explored independently before a TE, DR,
+DI, frozen spec, or guide section settles the answer. Source: `DI-pukap`.
+
+| Simulation | Source question | Guide-writer status |
+|---|---|---|
+| `simulations/SIM-zarud-conditional-release-geofencing/` | Conditional-release, onward-restraint, geofencing, and recursive promise-graph ownership from TODO-ralud. | Provisional design-point evidence. |
+| `simulations/SIM-narok-transport-family-bakeoff/` | Future ring, cluster-of-clusters, gossip, and receipts-at-scale transport-family pressure from TODO-sinuv. | Provisional design-point evidence. |
+| `simulations/SIM-dihiz-peer-adoption-metadata/` | Peer-level pCID adoption metadata and open-question answer bindings from TODO-nivus. | Provisional design-point evidence. |
+| `simulations/SIM-ranib-spec-requirement-sections/` | Promise-vocabulary, 100-year, and layperson/easy-implementation spec-section requirements from TODO-kulih / DR-robon. | Provisional design-point evidence. |
+| `simulations/SIM-bohof-group-session-freeze-promise/` | Group-session freeze evidence and `merge-group-transport-spec` promise shape from TODO-bisur. | Provisional design-point evidence. |
+| `simulations/SIM-kuful-udp-feed-v0-conformance/` | UDP-feed v0 reference implementation, test-vector, artifact-writer, and ns-3 conformance evidence from TODO-jodon. | Provisional design-point evidence. |
+
 ## Grid-Envelope Variant Simulations
 
 `DI-fanah` split the grid-envelope successor path into 24 standalone positional

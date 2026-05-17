@@ -816,3 +816,15 @@ profile, CID codec authority with path suffixes rejected, raw-only first
 profile, and promisebase / pitbase as prior art only. This does not answer or
 close `DR-tumus`; it removes the sim-review blocker so Steve can answer the
 packet directly.
+
+### 2026-05-17 — Protocol/specimen TODO question simulation capture
+
+`DI-pukap` adds standalone simulation question homes for protocol/specimen TODO
+questions that were still only captured in TODO prose: conditional release /
+geofencing (`SIM-zarud-conditional-release-geofencing`), future transport-family
+pressure (`SIM-narok-transport-family-bakeoff`), peer adoption metadata
+(`SIM-dihiz-peer-adoption-metadata`), protocol spec-section requirements
+(`SIM-ranib-spec-requirement-sections`), group-session freeze promises
+(`SIM-bohof-group-session-freeze-promise`), and UDP-feed v0 conformance
+(`SIM-kuful-udp-feed-v0-conformance`). This does not reopen closed `TODO-lilar`
+rows, answer the source TODOs/DRs, or make any sim canonical.

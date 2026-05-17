@@ -20,6 +20,10 @@ only unless a line explicitly names a historical reference.
 Flesh out UDP-feed v0 from one-page sketch into a usable v0
 artifact: Go reference implementation, conformance test vectors, and
 a minimal ns-3 harness scaffold that proves end-to-end round trip.
+The protocol/specimen question about what evidence should count as a usable v0
+conformance surface is now captured in
+`simulations/SIM-kuful-udp-feed-v0-conformance/`, without implementing or
+closing this TODO. Source: `DI-pukap`.
 
 This is the first concrete binding implementation under the TE-29
 layer decomposition, so it doubles as the proving ground for the

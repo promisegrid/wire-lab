@@ -342,6 +342,42 @@ Affects: `protocols/wire-lab.d/TODO/TODO-rusis-simulation-split-and-specimen-rel
 `protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`;
 `DEV-GUIDE-RESOURCES.md`.
 
+ID: DI-pukap
+Date: 2026-05-17 11:30:40
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Create six standalone, root-only simulation question homes for
+protocol/specimen TODO questions that were not yet captured as simulation
+questions: conditional release / geofencing, future transport-family bakeoffs,
+peer adoption metadata, protocol spec requirement sections, group-session freeze
+promises, and UDP-feed v0 conformance.
+Intent: PromiseGrid design questions should not remain hidden only in TODO prose
+when the active workflow expects sims to evolve and compete independently. These
+question homes preserve the open TODO ownership while giving each
+protocol/specimen question a concrete simulation surface that can produce later
+evidence without promoting any existing specimen to canonical status.
+Constraints: Documentation-only pass. Create only root `README.md`,
+`QUESTION.md`, and `SCENARIOS.md` files under each new sim. Do not create
+protocol trees, world fixtures, manifests, local TODO queues, shared protocol
+bundles, or sim-local result files. Do not answer or close the source TODOs,
+DRs, or future TEs. Treat every new sim as provisional design pressure, not a
+PromiseGrid API, frozen spec, or preferred harness home.
+Affects: `protocols/wire-lab.d/TODO/TODO-rusis-simulation-split-and-specimen-relocation.md`;
+`protocols/wire-lab.d/TODO/TODO-ralud-te-45-conditional-release-geofencing.md`;
+`protocols/wire-lab.d/TODO/TODO-sinuv-anticipated-future-tes-transport-family.md`;
+`protocols/wire-lab.d/TODO/TODO-nivus-te-spec-doc-store-and-pcid-machinery.md`;
+`protocols/wire-lab.d/TODO/TODO-kulih-te-spec-doc-as-promise.md`;
+`simulations/SIM-rakot-group-session/protocols/group-session.d/TODO/TODO-bisur-group-transport-envelope.md`;
+`simulations/SIM-ludaf-udp-feed/protocols/udp-feed.d/TODO/TODO-jodon-udp-binding-v0-reference-implementation.md`;
+`simulations/README.md`; `DEV-GUIDE-RESOURCES.md`;
+`protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`;
+`simulations/SIM-zarud-conditional-release-geofencing/`;
+`simulations/SIM-narok-transport-family-bakeoff/`;
+`simulations/SIM-dihiz-peer-adoption-metadata/`;
+`simulations/SIM-ranib-spec-requirement-sections/`;
+`simulations/SIM-bohof-group-session-freeze-promise/`;
+`simulations/SIM-kuful-udp-feed-v0-conformance/`.
+
 ## Context
 
 The current simulation layout still reflects the recovery process that
@@ -494,6 +530,9 @@ with `git mv`, because their filenames depend on their byte content.
   DF-tumus.1 through DF-tumus.3.
 - [x] rusis.19 Synthesize the three `DR-tumus` bakeoff simulations into a final
   answerable packet, while leaving `DR-tumus` open for Steve's decision.
+- [x] rusis.20 Create standalone simulation question homes for uncovered
+  protocol/specimen TODO questions from TODO-ralud, TODO-sinuv, TODO-nivus,
+  TODO-kulih, TODO-bisur, and TODO-jodon.
 
 ## `rusis.2` first concrete split-pass blueprint
 

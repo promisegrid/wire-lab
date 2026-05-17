@@ -12,6 +12,8 @@ Before the TE-39 proquint migration, this file was known as:
 Parked. Each thread is an anticipated future TE that has been
 forward-pointed from existing TEs but is not yet scheduled. Bundled
 into one TODO since none are imminent.
+Simulation question home: `simulations/SIM-narok-transport-family-bakeoff/`.
+Source: `DI-pukap`.
 
 ## Threads absorbed from OPEN-THREADS.md
 
@@ -54,7 +56,11 @@ Anchor: TE-junil Refinements 2026-05-05 (item 5).
 
 ## Question log
 
-(Per AGENTS-ppx Question-logging discipline. No questions logged yet.)
+- 2026-05-17: The parked ring, cluster-of-clusters, gossip, and
+  receipts-at-scale transport-family questions are now captured together as a
+  standalone simulation question in
+  `simulations/SIM-narok-transport-family-bakeoff/`. This does not schedule or
+  answer the future TEs. Source: `DI-pukap`.
 
 ## Decision Intent Log
 

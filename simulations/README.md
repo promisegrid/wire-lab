@@ -29,6 +29,12 @@ prose, or a future PromiseGrid spec corpus. Source: `DI-pakid`; `DI-fakin`.
 | `SIM-zazit-chunk-feed-replication/` | Turn-177 L5 feed exploration where feeds advertise, request, and replicate CAS chunks between sparse sites rather than carrying group messages. Source: `DI-navod`. | Active design-point exploration |
 | `SIM-jurar-cas-backed-group-session/` | Turn-177 successor exploration for group-session semantics over CAS roots and pointer objects, without rewriting the existing `.txt` specimen. Source: `DI-navod`. | Active design-point exploration |
 | `SIM-rusap-promise-accounting-records/` | Turn-177 promise-economy exploration for peer-local promise accounting records that inform pull, keep, advertise, and refusal decisions. Source: `DI-navod`. | Active design-point exploration |
+| `SIM-zarud-conditional-release-geofencing/` | Question home for conditional-release, onward-restraint, geofencing, and recursive promise-graph ownership from TODO-ralud. Source: `DI-pukap`. | Active design-point exploration |
+| `SIM-narok-transport-family-bakeoff/` | Question home for future ring, cluster-of-clusters, gossip, and receipts-at-scale transport-family pressure from TODO-sinuv. Source: `DI-pukap`. | Active design-point exploration |
+| `SIM-dihiz-peer-adoption-metadata/` | Question home for peer-level pCID adoption metadata and open-question answer bindings from TODO-nivus. Source: `DI-pukap`. | Active design-point exploration |
+| `SIM-ranib-spec-requirement-sections/` | Question home for protocol spec promise-vocabulary, 100-year, and layperson/easy-implementation section requirements from TODO-kulih / DR-robon. Source: `DI-pukap`. | Active design-point exploration |
+| `SIM-bohof-group-session-freeze-promise/` | Question home for group-session freeze evidence and `merge-group-transport-spec` promise shape from TODO-bisur. Source: `DI-pukap`. | Active design-point exploration |
+| `SIM-kuful-udp-feed-v0-conformance/` | Question home for UDP-feed v0 reference implementation, test-vector, artifact-writer, and ns-3 conformance evidence from TODO-jodon. Source: `DI-pukap`. | Active design-point exploration |
 
 ## Grid-envelope positional variant matrix
 
