@@ -772,3 +772,12 @@ for group-session semantics over CAS roots and pointer objects; and
 `SIM-rusap-promise-accounting-records` for peer-local promise accounting
 records. These charters are simulation pressure, not final decisions; TODO-kituj
 / TE-43, TODO-pipus, and TODO-kulih / TE-nibar remain the decision owners.
+
+### 2026-05-17 — Turn-177 scenario-matrix backfill
+
+`DI-pator` adds `SCENARIOS.md` files under the four turn-177 simulations. The
+scenario matrices make the successor work testable without changing ownership:
+TODO-kituj / TE-43 still owns concrete CAS decisions; TODO-pipus still owns
+additive migration to pointer-and-CAS shape; TODO-kulih / TE-nibar still owns
+spec-doc-shape requirements. This backfill does not reopen any `TODO-lilar`
+`UT-177.*` row and does not mark turn 177 fully complete.

@@ -18,8 +18,11 @@ must not be rewritten. `SIM-jurar-cas-backed-group-session` now carries the
 simulation-facing successor shape for group semantics over CAS roots and pointer
 objects, with `SIM-jomag-cas-object-model` and
 `SIM-zazit-chunk-feed-replication` carrying the object and feed pressures that
-the migration must respect. Source: TE-sihih; `DI-fakin`; `DI-rurab`;
-`DI-bomud`; `DI-navod`. No twig yet.
+the migration must respect. Their scenario matrices now give TODO-pipus
+concrete cases for additive migration, group-visible identity, parent links
+through CAS, missing pointees, and feed-side sparse replication. Source:
+TE-sihih; `DI-fakin`; `DI-rurab`; `DI-bomud`; `DI-navod`; `DI-pator`. No twig
+yet.
 
 ## Threads absorbed from OPEN-THREADS.md
 
@@ -35,7 +38,10 @@ mechanics, group-identity continuity, trigger discipline).
 Turn-177 simulation input: `SIM-jurar-cas-backed-group-session` is the
 successor-specimen charter for CAS-backed group-session migration. It does not
 authorize rewriting historical `.txt` evidence; it gives TODO-pipus a
-simulation-facing target to design against. Source: `DI-navod`.
+simulation-facing target to design against. Its `SCENARIOS.md` file, plus the
+chunk-feed scenarios in `SIM-zazit-chunk-feed-replication`, are the current
+scenario inputs for the first additive migration design. Source: `DI-navod`;
+`DI-pator`.
 
 Blocking: nothing today; gated on a concrete first migration to design
 against. TE-sihih + TE-mumuv close the gate.

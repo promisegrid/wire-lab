@@ -205,6 +205,35 @@ Affects: `protocols/wire-lab.d/TODO/TODO-rusis-simulation-split-and-specimen-rel
 `protocols/wire-lab.d/TODO/TODO-kulih-te-spec-doc-as-promise.md`;
 `protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`.
 
+ID: DI-pator
+Date: 2026-05-17 09:22:51
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Add docs-only `SCENARIOS.md` matrices to the four turn-177
+simulation charters created under `DI-navod`.
+Intent: The root charters make the turn-177 design points visible, but cleanup
+still needs concrete scenario pressure so successor owners can act without
+re-litigating what each simulation is for. Scenario files make CAS object
+typing, chunk-feed replication, CAS-backed group semantics, and peer-local
+promise accounting testable while preserving the actual DF/DI decisions for
+TODO-kituj / TE-43, TODO-pipus, and TODO-kulih / TE-nibar.
+Constraints: Documentation-only pass. Create only `SCENARIOS.md` files under
+the four existing turn-177 simulation roots and update rooted owner pointers.
+Do not create protocol trees, world fixtures, manifests, local TODO queues, or
+shared protocol bundles. Do not edit the 24 grid-envelope variants. Do not
+choose CBOR profile, chunking parameters, CID codec assignments, migration
+mechanics, or spec-doc requirements in this pass.
+Affects: `protocols/wire-lab.d/TODO/TODO-rusis-simulation-split-and-specimen-relocation.md`;
+`simulations/SIM-jomag-cas-object-model/SCENARIOS.md`;
+`simulations/SIM-zazit-chunk-feed-replication/SCENARIOS.md`;
+`simulations/SIM-jurar-cas-backed-group-session/SCENARIOS.md`;
+`simulations/SIM-rusap-promise-accounting-records/SCENARIOS.md`;
+`protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewalk.md`;
+`protocols/wire-lab.d/TODO/TODO-kituj-te-43-promisebase-prior-art-adoption.md`;
+`protocols/wire-lab.d/TODO/TODO-pipus-te-39-wire-lab-devs-migration.md`;
+`protocols/wire-lab.d/TODO/TODO-kulih-te-spec-doc-as-promise.md`;
+`protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`.
+
 ## Context
 
 The current simulation layout still reflects the recovery process that
@@ -343,6 +372,9 @@ with `git mv`, because their filenames depend on their byte content.
 - [x] rusis.14 Backfill turn-177 successor work into standalone
   simulation charters for CAS object modeling, chunk-feed replication,
   CAS-backed group-session semantics, and peer-local promise accounting.
+- [x] rusis.15 Add scenario matrices to the four turn-177 simulations so
+  TODO-kituj / TE-43, TODO-pipus, and TODO-kulih / TE-nibar have concrete
+  simulation pressure without moving decisions into the simulation charters.
 
 ## `rusis.2` first concrete split-pass blueprint
 

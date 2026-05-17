@@ -15,8 +15,10 @@ promisebase / pitbase prior-art adoption question for the first L6 CAS spec and
 remains undrafted. The simulation-facing CAS object-model pressure from turn
 177 now lives in `simulations/SIM-jomag-cas-object-model/`, with feed-side
 chunk movement pressure in `simulations/SIM-zazit-chunk-feed-replication/`;
-those simulations are inputs to this TODO, not replacements for TE-43's DF/DI
-path. Source: TE-sihih; TODO-vunub Q-22.6; `DI-navod`. No twig yet.
+their `SCENARIOS.md` files make the object-model and chunk-replication pressure
+concrete. Those simulations are inputs to this TODO, not replacements for
+TE-43's DF/DI path. Source: TE-sihih; TODO-vunub Q-22.6; `DI-navod`;
+`DI-pator`. No twig yet.
 
 ## Threads absorbed from OPEN-THREADS.md
 
@@ -44,7 +46,10 @@ Scope:
   - Use `SIM-jomag-cas-object-model` and
     `SIM-zazit-chunk-feed-replication` as simulation-facing pressure tests for
     the object-model and chunk-movement consequences of TE-43 decisions
-    (DI-navod).
+    (DI-navod). Their `SCENARIOS.md` files add concrete cases for deterministic
+    CBOR agreement, DAG-CBOR interop, CIDv1 object typing, pointer-object
+    identity, chunker parameter mismatch, sparse advertisement, partial Merkle
+    fetch, corrupt chunks, and carrier independence (DI-pator).
   - Fix the import-path error (UT-181.a: t7a/pitbase ->
     stevegt/promisebase).
   - Address fuse/ test failures and cmd/pb Docker SDK rot (UT-184.e/g).
