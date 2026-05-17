@@ -388,6 +388,34 @@ Affects: `protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewal
 `protocols/wire-lab.d/TODO/TODO-lilar-session-replay-cleanup.md`;
 `AGENTS-ppx.md`.
 
+ID: DI-kegar
+Date: 2026-05-17 14:14:05
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Route turn-183's promisebase randStream fix evidence to the existing
+promisebase prior-art owner while creating a separate harness TODO for
+local-only cross-repo work persistence before PAT-gated pushes.
+Intent: Turn 183 completed useful cross-repo repair work and made the
+promisebase `db/` chunker/Merkle path green, but its durable replay loose ends
+split into two classes: PromiseGrid design evidence for TODO-kituj / `DR-tumus`,
+and a harness/process risk that a local-only commit could be lost before
+authentication allowed it to be pushed. The replay should preserve the evidence
+without treating promisebase as authoritative, and should not leave the
+persistence rule only in a closed turn note.
+Constraints: Do not touch promisebase in this replay pass. Do not answer
+`DR-tumus`. Do not flip TODO-lilar UT checkboxes. Route the `db/` test evidence
+and adoption threshold to TODO-kituj / `DR-tumus`; route code-first external-repo
+claims to AGENTS-ppx B7 and the replay notes; route local-only work persistence
+to `TODO-fapev`.
+Affects: `protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewalk.md`;
+`protocols/wire-lab.d/TODO/TODO-fapev-cross-repo-work-persistence.md`;
+`protocols/wire-lab.d/TODO/TODO.md`;
+`protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`;
+`protocols/wire-lab.d/TODO/TODO-lilar-session-replay-cleanup.md`;
+`protocols/wire-lab.d/TODO/TODO-kituj-te-43-promisebase-prior-art-adoption.md`;
+`DR/DR-tumus-turn-177-l6-cas-adoption.md`;
+`AGENTS-ppx.md`.
+
 ## Why a separate TODO
 
 `TODO-lilar` already records the original historical walk through turn 192 and
@@ -625,7 +653,7 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - [x] juhub.180 Turn 180 raw-log rewalk plus later-turn and later-artifact sweep.
 - [x] juhub.181 Turn 181 raw-log rewalk plus later-turn and later-artifact sweep.
 - [x] juhub.182 Turn 182 raw-log rewalk plus later-turn and later-artifact sweep.
-- [ ] juhub.183 Turn 183 raw-log rewalk plus later-turn and later-artifact sweep.
+- [x] juhub.183 Turn 183 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.184 Turn 184 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.185 Turn 185 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.186 Turn 186 raw-log rewalk plus later-turn and later-artifact sweep.
@@ -2223,3 +2251,65 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - `Proposed disposition` `resolved/transferred after diagnostic-transparency, auth-requirement, implicit-yes cadence, and later-fix routing`
 - `Write needed? yes/no` `no` further turn-182 write is needed after this pass.
 - `Next` Turn 183 is next.
+
+### Turn 183 — 2026-05-04 05:27 UTC
+
+- `Turn 183 plain-English recap` Steve said "Do it," selecting the turn-182
+  option to apply the promisebase randStream fix locally. The assistant applied
+  the fix on the promisebase twig `ppx/fix-randstream-go120`, and turn 183 is
+  where the previously missing diagnostic finally became visible: after
+  promisebase moved from Go 1.15-era behavior to a Go 1.24 toolchain path,
+  `math/rand.Seed(42)` no longer made the global random generator deterministic
+  for the tests, so `TestPutStreamBig` and `TestPutStreamSmall` failed. The fix
+  replaced the old `rand.Seed(42)` plus global `rand.Read` pattern with a
+  per-`randStream` `*rand.Rand` seeded from `rand.NewSource(42)`, which made the
+  test stream hermetic. The assistant reported the one-file patch, the local
+  commit `d98b5d3`, and all 17 promisebase `db/` tests passing. Because no
+  promisebase PAT existed yet, the commit was only local at this point; turn 186
+  later grants the PAT and pushes/merges the fix, and turn 188 later shows that
+  the push confirmation needed to be more visible. Turn 183 also recommended
+  reading more of shipped promisebase before drafting TE-sihih, rather than
+  relying on old `x/*.md` notes; turn 184 accepts that recommendation and then
+  finds broader partial rot outside `db/`. The lasting conclusions are therefore
+  bounded: the `db/` chunker/Merkle path was green after the fix, promisebase
+  should still be treated as prior art rather than canon, external-repo
+  architecture claims require code-first verification, and cross-repo local-only
+  commits need a persistence rule before PAT-gated push work can be considered
+  operationally safe.
+- `Existing capture` `TODO-lilar` records `UT-183.a` for the local-only
+  promisebase commit with no session-survivable persistence path, `UT-183.b` for
+  the read-shipped-code-before-claims procedural default, and `UT-183.c` for the
+  17/17 `db/` test result plus the unresolved dependency-test threshold. TODO-kituj
+  already records the 17/17 green `db/` evidence as prior-art input for TE-43, and
+  `DR-tumus` asks the later promisebase / pitbase stance question without
+  treating promisebase as authoritative. AGENTS-ppx B7 covers ground-truthing
+  before citation, and the new `TODO-fapev` owns the missing local-only
+  cross-repo persistence rule.
+- `Gaps or contradictions` The fix result is real evidence, but it applies only
+  to promisebase `db/` tests, not to the whole promisebase repo. Turn 184 later
+  finds Docker SDK, FUSE, server, and daemon uncertainty, so turn 183 must not be
+  read as "promisebase is green" or "wire-lab should adopt promisebase." The other
+  gap is procedural: a local-only cross-repo commit waiting on PAT access could
+  have been lost on reset, and that risk was not owned by the existing PAT or
+  foreground-DONE rules.
+- `Related UTs / owners` `UT-183.a` is routed to `TODO-fapev`, which will decide
+  whether the durable mechanism is a private patch file, bundle, private mirror,
+  or another approved persistence path. `UT-183.b` is captured by AGENTS-ppx B7
+  and this replay note as the code-first external-repo evidence rule. `UT-183.c`
+  is routed to TODO-kituj / `DR-tumus`: the `db/` path is green evidence, but the
+  broader promisebase adoption stance and required test-status threshold remain
+  downstream decisions.
+- `Owner/doc cleanup` Done. Added `DI-kegar`; created `TODO-fapev`; indexed
+  `TODO-fapev` in the master TODO list; added this turn-183 report; marked
+  `juhub.183` complete; and added a turn-183 transfer pointer to the UT
+  verification matrix. No `TODO-lilar` UT checkbox was flipped.
+- `Remaining decisions or work` Downstream work remains open, but it is captured:
+  `TODO-fapev` owns the harness persistence mechanism for local-only cross-repo
+  commits pending auth; TODO-kituj / `DR-tumus` own the PromiseGrid-facing
+  promisebase / pitbase stance and test-threshold decisions; AGENTS-ppx B7 owns
+  the general ground-truthing rule for external artifact claims. For
+  recovery-walkthrough purposes, turn 183 has no uncaptured loose end.
+- `Work pending` no.
+- `Proposed disposition` `resolved/transferred after randStream fix evidence, code-first external-repo rule, local-only persistence owner, and TE-43 prior-art routing`
+- `Write needed? yes/no` `no` further turn-183 write is needed after this pass.
+- `Next` Turn 184 is next.

@@ -899,3 +899,15 @@ lesson is preserved in TODO-juhub. `UT-182.c` is captured as a positive cadence
 lesson paired with `UT-181.f`, bounded to cases where Steve is responding to an
 already-offered concrete next step. This does not create new promisebase work and
 does not use `TODO-lilar` checkboxes as closure authority.
+
+### 2026-05-17 — Turn-183 closure / transfer pointer
+
+`DI-kegar` reconciles turn 183's promisebase randStream fix and routing. `UT-183.a`
+is routed to `TODO-fapev`, which owns the missing rule for preserving local-only
+cross-repo commits before PAT-gated pushes. `UT-183.b` is captured by AGENTS-ppx
+B7 plus the turn-183 replay note as the code-first / ground-truthed external-repo
+claim discipline. `UT-183.c` is routed to TODO-kituj / `DR-tumus`: the 17/17
+promisebase `db/` result is green evidence for the chunker/Merkle path, but the
+broader adoption stance and test-status threshold remain downstream decisions.
+This does not make promisebase authoritative and does not use `TODO-lilar`
+checkboxes as closure authority.
