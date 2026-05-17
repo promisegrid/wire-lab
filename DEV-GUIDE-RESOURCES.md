@@ -111,6 +111,24 @@ reasoning is:
 | `proposals/pending/` | `protocols/wire-lab.d/archive/migrations/SIM-piloh-turns-149-208-recovery/archive/proposals/pending/` | Historical pending/contested review evidence. | Pending proposal records are not a live queue after the dev-guide resource/feedback process replaced proposals. |
 | `protocols/wire-lab.d/` | unchanged | Harness apparatus. | Use for wire-lab process/provenance claims, not as a PromiseGrid app/kernel API. |
 
+## Turn-177 CAS / Feed / Group Simulations
+
+`DI-navod` created four standalone simulation charters so turn 177's CAS,
+feed, group-session, and promise-economy conclusions are visible as simulation
+specimens instead of living only in replay cleanup notes. These simulations are
+design-point workspaces, not final PromiseGrid APIs and not shared protocol
+homes. Guide writers may cite them as evidence that the L5/L6/L7 implications
+of turn 177 are under active exploration. Do not infer a canonical
+grid-envelope, CAS object model, feed wire format, group message shape, or
+promise-accounting scheme from their existence. Source: `DI-navod`.
+
+| Simulation | What it is for | Guide-writer status |
+|---|---|---|
+| `simulations/SIM-jomag-cas-object-model/` | Tests L6 CAS object-model questions: deterministic CBOR / DAG-CBOR, pointer objects, chunking parameters, CIDv1 codec object typing, and promisebase / pitbase prior-art pressure. | Provisional design-point evidence. |
+| `simulations/SIM-zazit-chunk-feed-replication/` | Tests the turn-177 inversion where L5 feeds advertise, request, and replicate CAS chunks between sparse sites rather than carrying group messages. | Provisional design-point evidence. |
+| `simulations/SIM-jurar-cas-backed-group-session/` | Tests a successor group-session shape where L7 group semantics point at L6 CAS roots and pointer objects without rewriting historical `.txt` specimens. | Provisional design-point evidence. |
+| `simulations/SIM-rusap-promise-accounting-records/` | Tests peer-local promise accounting records for pull, keep, advertise, refusal, and 100-year mental-model pressure without defining a central accounting authority. | Provisional design-point evidence. |
+
 ## Grid-Envelope Variant Simulations
 
 `DI-fanah` split the grid-envelope successor path into 24 standalone positional

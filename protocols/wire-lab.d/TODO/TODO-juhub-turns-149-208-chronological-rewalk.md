@@ -1532,14 +1532,21 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
   TODO-kituj now explicitly carries the turn-177 concrete CAS obligations.
   TODO-kulih now carries the turn-177 per-spec promise-vocabulary / 100-year /
   mental-model obligations. The UT matrix has a turn-177 closure / transfer
-  pointer. No transport message bytes or TE bodies were edited.
+  pointer. A later simulation backfill added standalone charters for CAS object
+  modeling, chunk-feed replication, CAS-backed group-session, and promise
+  accounting records so the turn's conclusions can evolve inside simulations
+  without contaminating the grid-envelope variants or rewriting historical
+  message bytes. No transport message bytes or TE bodies were edited. Source:
+  `DI-navod`.
 - `Remaining decisions or work` TODO-kituj / TE-43 remains open for concrete L6
   CAS adoption: deterministic CBOR profile, allowed tags, chunking algorithm and
   parameters, CIDv1 codec/object typing, and promisebase prior-art stance.
   TODO-pipus remains open for operational migration to pointer-and-CAS shape.
   TODO-kulih / TE-nibar remains open for spec-doc structure decisions, now
   including promise vocabulary, 100-year pressure-test, and easy mental-model
-  obligations. TE-domat / DR-nugog remains open for root layout.
+  obligations. The new `DI-navod` simulations make these workstreams visible as
+  specimen pressure, but the concrete TE/DF/DI decisions remain open in their
+  owner TODOs. TE-domat / DR-nugog remains open for root layout.
 - `Work pending` yes.
 - `Proposed disposition` `resolved/transferred after TE-sihih scope contraction, TE-43 CAS-owner routing, and TODO-kulih spec-shape routing`
 - `Write needed? yes/no` `no` further turn-177 write is needed after this pass.

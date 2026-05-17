@@ -760,3 +760,15 @@ CIDv1 codec / object typing, and promisebase prior-art adoption. `UT-177.e`,
 spec-doc-shape requirements, with TE-dajot remaining the citable 100-year
 constraint. `UT-177.g` is closed as a positive cadence lesson: the layer
 inversion was accepted only after gameout, not by unreasoned reversal.
+
+### 2026-05-17 — Turn-177 simulation-facing backfill
+
+`DI-navod` adds four standalone simulation charters so the turn-177 successor
+work is represented in simulation space without reopening `TODO-lilar` UT rows:
+`SIM-jomag-cas-object-model` for deterministic CBOR / DAG-CBOR, pointer
+objects, chunking, and CIDv1 object typing; `SIM-zazit-chunk-feed-replication`
+for feeds that move CAS chunks between sparse sites; `SIM-jurar-cas-backed-group-session`
+for group-session semantics over CAS roots and pointer objects; and
+`SIM-rusap-promise-accounting-records` for peer-local promise accounting
+records. These charters are simulation pressure, not final decisions; TODO-kituj
+/ TE-43, TODO-pipus, and TODO-kulih / TE-nibar remain the decision owners.

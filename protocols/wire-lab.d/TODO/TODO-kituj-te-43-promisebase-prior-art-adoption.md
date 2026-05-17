@@ -12,7 +12,11 @@ Before the TE-39 proquint migration, this file was known as:
 Open. TE-sihih's L5/L6/L7 layer model and L6 CAS subtree have landed, so the
 old TE-sihih prerequisite is satisfied. This TODO still owns the concrete
 promisebase / pitbase prior-art adoption question for the first L6 CAS spec and
-remains undrafted. Source: TE-sihih; TODO-vunub Q-22.6. No twig yet.
+remains undrafted. The simulation-facing CAS object-model pressure from turn
+177 now lives in `simulations/SIM-jomag-cas-object-model/`, with feed-side
+chunk movement pressure in `simulations/SIM-zazit-chunk-feed-replication/`;
+those simulations are inputs to this TODO, not replacements for TE-43's DF/DI
+path. Source: TE-sihih; TODO-vunub Q-22.6; `DI-navod`. No twig yet.
 
 ## Threads absorbed from OPEN-THREADS.md
 
@@ -37,6 +41,10 @@ Scope:
     through turn 192).
   - Resolve the Rabin-vs-FastCDC chunking parameter mismatch (UT-181.b:
     pitbase 512 KiB min / 8 MiB max vs turn-177 ~16 KiB average).
+  - Use `SIM-jomag-cas-object-model` and
+    `SIM-zazit-chunk-feed-replication` as simulation-facing pressure tests for
+    the object-model and chunk-movement consequences of TE-43 decisions
+    (DI-navod).
   - Fix the import-path error (UT-181.a: t7a/pitbase ->
     stevegt/promisebase).
   - Address fuse/ test failures and cmd/pb Docker SDK rot (UT-184.e/g).

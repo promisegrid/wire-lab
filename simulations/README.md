@@ -22,6 +22,10 @@ prose, or a future PromiseGrid spec corpus. Source: `DI-pakid`; `DI-fakin`.
 | `SIM-labit-feed-outer/` | Independent thin outer-feed lineage, including extracted feed-outer draft material. | Active protocol lineage |
 | `SIM-kurim-grid-envelope/` | Parent seed and successor-owner lineage for positional grid-envelope variants. | Split parent / successor-owner lineage |
 | `SIM-hugoj-cas-usenetlike-gitlike/` | Broad design exploration of a CAS + Usenet-like + git-like PromiseGrid lineage, with `group-session` treated as one current specimen rather than the whole subject. Source: `DI-pijun`. | Active design exploration |
+| `SIM-jomag-cas-object-model/` | Turn-177 CAS object-model exploration for deterministic CBOR / DAG-CBOR, pointer objects, chunking parameters, and CIDv1 object typing. Source: `DI-navod`. | Active design-point exploration |
+| `SIM-zazit-chunk-feed-replication/` | Turn-177 L5 feed exploration where feeds advertise, request, and replicate CAS chunks between sparse sites rather than carrying group messages. Source: `DI-navod`. | Active design-point exploration |
+| `SIM-jurar-cas-backed-group-session/` | Turn-177 successor exploration for group-session semantics over CAS roots and pointer objects, without rewriting the existing `.txt` specimen. Source: `DI-navod`. | Active design-point exploration |
+| `SIM-rusap-promise-accounting-records/` | Turn-177 promise-economy exploration for peer-local promise accounting records that inform pull, keep, advertise, and refusal decisions. Source: `DI-navod`. | Active design-point exploration |
 
 ## Grid-envelope positional variant matrix
 

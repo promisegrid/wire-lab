@@ -170,6 +170,41 @@ Intent: Close the split pass with explicit neutrality and naming-hygiene checks 
 Constraints: Historical TE narrative, DI logs, and archive/provenance files may retain legacy names and paths as historical evidence. Active pointers and owner records must use current lineage homes.
 Affects: `protocols/wire-lab.d/TODO/TODO-rusis-simulation-split-and-specimen-relocation.md`; all active current-pointer docs swept in `rusis.12`/`rusis.13`.
 
+ID: DI-navod
+Date: 2026-05-17 00:06:19
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Backfill turn-177 successor work into four standalone, root-only
+simulation charters: `SIM-jomag-cas-object-model`,
+`SIM-zazit-chunk-feed-replication`,
+`SIM-jurar-cas-backed-group-session`, and
+`SIM-rusap-promise-accounting-records`.
+Intent: Turn 177's conclusions should evolve as simulation specimens instead
+of remaining only in replay notes or being forced into existing grid-envelope,
+group-session, feed, or wire-lab-devs lineages. Separate simulations preserve
+independent evolution across CAS object modeling, chunk-feed replication,
+CAS-backed group semantics, and peer-local promise accounting.
+Constraints: Create only root `README.md` and `QUESTION.md` files in this pass.
+Do not create protocol trees, world fixtures, manifests, local TODO queues, or
+shared protocol bundles. Do not edit the 24 grid-envelope variants. Treat the
+new simulations as provisional design-point workspaces, not canonical
+PromiseGrid APIs or preferred outcomes.
+Affects: `protocols/wire-lab.d/TODO/TODO-rusis-simulation-split-and-specimen-relocation.md`;
+`simulations/README.md`; `DEV-GUIDE-RESOURCES.md`;
+`simulations/SIM-jomag-cas-object-model/README.md`;
+`simulations/SIM-jomag-cas-object-model/QUESTION.md`;
+`simulations/SIM-zazit-chunk-feed-replication/README.md`;
+`simulations/SIM-zazit-chunk-feed-replication/QUESTION.md`;
+`simulations/SIM-jurar-cas-backed-group-session/README.md`;
+`simulations/SIM-jurar-cas-backed-group-session/QUESTION.md`;
+`simulations/SIM-rusap-promise-accounting-records/README.md`;
+`simulations/SIM-rusap-promise-accounting-records/QUESTION.md`;
+`protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewalk.md`;
+`protocols/wire-lab.d/TODO/TODO-kituj-te-43-promisebase-prior-art-adoption.md`;
+`protocols/wire-lab.d/TODO/TODO-pipus-te-39-wire-lab-devs-migration.md`;
+`protocols/wire-lab.d/TODO/TODO-kulih-te-spec-doc-as-promise.md`;
+`protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`.
+
 ## Context
 
 The current simulation layout still reflects the recovery process that
@@ -305,6 +340,9 @@ with `git mv`, because their filenames depend on their byte content.
   remains, that active docs do not use deprecated `udp-binding` except
   historical quotations, that active docs do not imply a privileged
   simulation home, and that `git diff --check` passes.
+- [x] rusis.14 Backfill turn-177 successor work into standalone
+  simulation charters for CAS object modeling, chunk-feed replication,
+  CAS-backed group-session semantics, and peer-local promise accounting.
 
 ## `rusis.2` first concrete split-pass blueprint
 

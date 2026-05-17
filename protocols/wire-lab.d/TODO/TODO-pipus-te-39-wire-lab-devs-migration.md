@@ -14,8 +14,12 @@ into simulation-local world state, but the operational migration from the
 pre-CAS inline specimen to the TE-sihih-aligned CAS / pointer / feed shape
 remains open. Current blockers are a concrete L6 CAS spec / TE-43 promisebase
 adoption path and an additive migration contract; historical specimen messages
-must not be rewritten. Source: TE-sihih; `DI-fakin`; `DI-rurab`; `DI-bomud`.
-No twig yet.
+must not be rewritten. `SIM-jurar-cas-backed-group-session` now carries the
+simulation-facing successor shape for group semantics over CAS roots and pointer
+objects, with `SIM-jomag-cas-object-model` and
+`SIM-zazit-chunk-feed-replication` carrying the object and feed pressures that
+the migration must respect. Source: TE-sihih; `DI-fakin`; `DI-rurab`;
+`DI-bomud`; `DI-navod`. No twig yet.
 
 ## Threads absorbed from OPEN-THREADS.md
 
@@ -27,6 +31,11 @@ follow-on from TE-numan invariants-only TE.
 Scope: 7 DFs (operational shape close-old-vs-overlap-vs-atomic-swap,
 back-reference format, message disposition, authorizing promise, seal
 mechanics, group-identity continuity, trigger discipline).
+
+Turn-177 simulation input: `SIM-jurar-cas-backed-group-session` is the
+successor-specimen charter for CAS-backed group-session migration. It does not
+authorize rewriting historical `.txt` evidence; it gives TODO-pipus a
+simulation-facing target to design against. Source: `DI-navod`.
 
 Blocking: nothing today; gated on a concrete first migration to design
 against. TE-sihih + TE-mumuv close the gate.
