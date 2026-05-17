@@ -864,3 +864,15 @@ TE-sihih's actual small scope and already-locked vocabulary invariants.
 by TODO-dozak's merge-trajectory / scope-boundary owner and existing cross-repo
 authorization discipline. This does not answer the downstream design questions
 and does not use `TODO-lilar` checkboxes as closure authority.
+
+### 2026-05-17 — Turn-180 closure / transfer pointer
+
+`DI-zotol` reconciles turn 180 after the promisebase code-first correction.
+`UT-180.a` is captured by TODO-kituj / `DR-tumus`, TE-nizor C8, AGENTS-ppx B7,
+and the corrected turn-179 / turn-180 replay notes. `UT-180.b` is captured by
+TODO-dozak's convergence-or-independence subtask and TE-nizor C8, with turn 191
+supplying the later prefer-wire-lab rule. `UT-180.c` is closed for replay
+purposes by the corrected turn-180 note in TODO-juhub. `UT-180.d` is captured by
+AGENTS-ppx B6 and `DI-021-20260507-212254`. This does not answer downstream
+promisebase adoption or convergence questions and does not use `TODO-lilar`
+checkboxes as closure authority.

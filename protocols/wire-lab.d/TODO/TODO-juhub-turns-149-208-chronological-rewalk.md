@@ -312,6 +312,32 @@ Affects: `protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewal
 `simulations/SIM-haros-promise-economy-spectrum/`;
 `DEV-GUIDE-RESOURCES.md`.
 
+ID: DI-zotol
+Date: 2026-05-17 14:02:41
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Route turn-180's promisebase correction lessons to existing process,
+prior-art, prototype-canon, and replay-owner artifacts without creating new
+PromiseGrid design work.
+Intent: Turn 180 corrected the invalid turn-179 wholesale-adoption pivot by
+making the assistant audit promisebase code and git history before making
+architecture claims. The durable work is procedural and routing-oriented:
+code-first / ground-truthed citation, apology-audit-invalidate-propose recovery,
+promisebase-as-prototype rather than authority, and the independent-design path
+that later turn 191 makes explicit.
+Constraints: Do not treat promisebase as authoritative. Do not reopen the
+turn-179 invalid DFs. Do not flip TODO-lilar UT checkboxes. Keep open
+PromiseGrid design questions with TODO-kituj, TODO-dozak, TODO-rajig, TODO-ralud,
+`DR-tumus`, TE-nizor, and related simulations; keep procedural lessons with
+AGENTS-ppx B6/B7 and the replay matrix.
+Affects: `protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewalk.md`;
+`protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`;
+`protocols/wire-lab.d/TODO/TODO-lilar-session-replay-cleanup.md`;
+`AGENTS-ppx.md`;
+`docs/thought-experiments/TE-nizor-pahah-implementation-sufficiency.md`;
+`protocols/wire-lab.d/TODO/TODO-kituj-te-43-promisebase-prior-art-adoption.md`;
+`protocols/wire-lab.d/TODO/TODO-dozak-te-44-wire-lab-promisebase-merge-trajectory.md`.
+
 ## Why a separate TODO
 
 `TODO-lilar` already records the original historical walk through turn 192 and
@@ -546,7 +572,7 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - [x] juhub.177 Turn 177 raw-log rewalk plus later-turn and later-artifact sweep.
 - [x] juhub.178 Turn 178 raw-log rewalk plus later-turn and later-artifact sweep.
 - [x] juhub.179 Turn 179 raw-log rewalk plus later-turn and later-artifact sweep.
-- [ ] juhub.180 Turn 180 raw-log rewalk plus later-turn and later-artifact sweep.
+- [x] juhub.180 Turn 180 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.181 Turn 181 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.182 Turn 182 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.183 Turn 183 raw-log rewalk plus later-turn and later-artifact sweep.
@@ -1943,3 +1969,69 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - `Proposed disposition` `resolved/transferred after code-first correction, promise-economy-spectrum simulation routing, conditional-release/geofencing routing, and promisebase scope-boundary routing`
 - `Write needed? yes/no` `no` further turn-179 write is needed after this pass.
 - `Next` Turn 180 is next.
+
+### Turn 180 — 2026-05-03 20:21 UTC
+
+- `Turn 180 plain-English recap` Steve stopped the turn-179 promisebase pivot with
+  the correction: the assistant had read promisebase markdown files as if they
+  were implemented code, and those files might be refactoring plans rather than
+  finished work. The assistant acknowledged the mistake, audited promisebase more
+  carefully, and separated implemented pieces from design-only claims. The
+  corrected findings were that promisebase had real lower-level storage pieces
+  such as filesystem key-value storage and some command/client/server scaffolding,
+  but the five-element CBOR message format, layered `KV -> HashKV -> Message ->
+  Refs -> Streaming` model, gitlike refs, grid CIDs, hypergraph refs, and much of
+  the federation story were design plans rather than code wire-lab could adopt.
+  The assistant invalidated the turn-179 "adopt promisebase wholesale" framing,
+  listed which proposed DFs were no longer safe, and proposed two immediate
+  recovery paths: treat promisebase docs as shared vocabulary only, or read the
+  actual code and RFC series before deciding anything. It recommended reading
+  code first. Later turns refine this correction. Turn 181 follows the code-first
+  path but contains a wrong import-path claim that is later captured separately.
+  Turns 183-184 show that `db/` and `kv/fs/` are the useful implemented evidence,
+  while other promisebase surfaces remain broken or design-only. Turn 191 adds the
+  missing third path that turn 180 should have surfaced: wire-lab may design
+  independently and converge with promisebase only when useful, with wire-lab
+  preferred in conflicts. The loose ends from turn 180 are therefore procedural
+  and routing issues, not new protocol decisions by themselves: require
+  code-first / ground-truthed evidence for external-repo claims; use the
+  apologize-audit-invalidate-propose pattern after structural errors; do not
+  describe promisebase as authority; preserve independent design with optional
+  convergence as an available path; and correct the earlier replay summary that
+  misdescribed turn 180 as context compression rather than context anchoring.
+- `Existing capture` `TODO-lilar` records four related rows: `UT-180.a` for the
+  structurally bad turn-179 pivot and corrective procedure, `UT-180.b` for the
+  missing independent-design path, `UT-180.c` for the bad pending-line summary
+  about context compression, and `UT-180.d` for the reusable
+  apologize-audit-invalidate-propose recovery pattern. The UT matrix records that
+  B6 and B7 landed in `AGENTS-ppx.md` under `DI-021-20260507-212254` and
+  `DI-021-20260507-212255`. TE-nizor C8 records the later
+  promisebase-as-prototype synthesis. TODO-kituj owns concrete promisebase /
+  pitbase prior-art adoption and `DR-tumus`; TODO-dozak owns the separate
+  wire-lab / promisebase convergence-or-independence question.
+- `Gaps or contradictions` The raw turn correctly invalidated the wholesale
+  promisebase adoption path, but it still framed recovery as two promisebase-
+  centered options: shared vocabulary or read-code-first. Later turn 191 supplies
+  the omitted independent-design path and makes promisebase prototype evidence,
+  not authority. The old `TODO-lilar` pending-line characterization that turn 180
+  caused context compression is also wrong: turn 180 re-anchored the replay by
+  demoting invalid turn-179 claims and re-elevating the turn-170s design points.
+- `Related UTs / owners` `UT-180.a` is captured by TODO-kituj / `DR-tumus`,
+  TE-nizor C8, AGENTS-ppx B7, and the turn-179 / turn-180 replay notes. `UT-180.b`
+  is captured by TODO-dozak's convergence-or-independence subtask and TE-nizor C8,
+  with turn 191 supplying the stronger prefer-wire-lab rule. `UT-180.c` is closed
+  for replay purposes by this corrected turn-180 note. `UT-180.d` is captured by
+  AGENTS-ppx B6 and `DI-021-20260507-212254`.
+- `Owner/doc cleanup` Done. Added `DI-zotol`; added this turn-180 report; marked
+  `juhub.180` complete; and added a turn-180 transfer pointer to the UT
+  verification matrix. No `TODO-lilar` UT checkbox was flipped.
+- `Remaining decisions or work` Downstream work remains open, but it is captured:
+  TODO-kituj / `DR-tumus` own concrete promisebase prior-art adoption; TODO-dozak
+  owns whether wire-lab and promisebase converge, merge, or remain independent;
+  TE-nizor records the promisebase-as-prototype / prefer-wire-lab synthesis; and
+  AGENTS-ppx B6/B7 own the reusable process lessons. For recovery-walkthrough
+  purposes, turn 180 has no uncaptured loose end.
+- `Work pending` no.
+- `Proposed disposition` `resolved/transferred after code-first correction, prototype-not-authority routing, independent-design-path routing, and process-rule capture`
+- `Write needed? yes/no` `no` further turn-180 write is needed after this pass.
+- `Next` Turn 181 is next.
