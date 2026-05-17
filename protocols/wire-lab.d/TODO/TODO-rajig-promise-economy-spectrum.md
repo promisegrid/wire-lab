@@ -23,6 +23,10 @@ of the base protocol, and does not make promisebase authoritative. Source:
   peer-local records inform pull, keep, advertise, or refusal decisions, while
   keeping transferable-token questions separate until a later DF explicitly
   accepts them.
+- Compare RFC-1005's content-addressable test-driven fabric pattern -- test tree
+  CID, executable tree CID, arguments, and cache-on-pass semantics -- as prior
+  art without making it the base PromiseGrid economics model. Source:
+  `DI-nulak`.
 
 ## Subtasks
 
@@ -36,6 +40,9 @@ of the base protocol, and does not make promisebase authoritative. Source:
   simulations show a mechanism avoids cryptocurrency-like failure modes.
 - [ ] rajig.4 Route any surviving mechanism-specific design into successor sims,
   TEs, DRs, or protocol TODOs before closing this owner.
+- [ ] rajig.5 Map RFC-1005's test-tree / executable-tree / cache-on-pass
+  vocabulary against PromiseGrid promise-economy terms before adopting or
+  rejecting any of it.
 
 ## Routed Elsewhere
 
@@ -53,6 +60,9 @@ of the base protocol, and does not make promisebase authoritative. Source:
   `SIM-haros-promise-economy-spectrum/` has a TODO owner and the design question
   does not live only in a simulation directory or closed replay notes. Source:
   `DI-pidag`.
+- 2026-05-17: Turn 184 routes RFC-1005 Option 2's test-driven fabric as
+  promise-economy prior art into this TODO and `SIM-haros`, without treating it
+  as settled PromiseGrid economics. Source: `DI-nulak`.
 
 ## Decision Intent Log
 

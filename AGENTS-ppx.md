@@ -475,6 +475,12 @@ without evidence. Cached or remembered citations from earlier turns
 do not satisfy ground-truthing; re-verify each session. (See
 DI-021-20260507-212255 in TODO-lilar.)
 
+Pattern-count claims are ground-truth claims. When reporting "N
+occurrences" or similar counts, name the exact literal string, regex,
+path/corpus, and count basis (matches, lines, files, or records).
+Do not use opaque labels such as "boilerplate" unless the label is
+defined well enough for the count to be reproduced. Source: DI-nulak.
+
 # Reporting style (final handoff)
 
 When you finish a task, give Steve the AGENTS.md "Required final

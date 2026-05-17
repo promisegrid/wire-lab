@@ -43,6 +43,10 @@ PromiseGrid protocol-design question home. Source: `DI-lusum`.
 - 2026-05-17: Turn 178's `pgmsg` tool-name question and collaborator
   permission constraint are routed here so `UT-178.k` does not close solely as a
   tactical-deferral lesson. Source: `DI-lusum`.
+- 2026-05-17: Turn 184 and turn 186 show the same collaborator-permission issue
+  as a propagation hazard: a protected collaborator name can leak when an open
+  question is written, persisted, or re-quoted. This TODO owns that constraint
+  until explicit permission and a chosen handle exist. Source: `DI-nulak`.
 
 ## Decision Intent Log
 

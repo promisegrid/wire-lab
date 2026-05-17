@@ -911,3 +911,15 @@ promisebase `db/` result is green evidence for the chunker/Merkle path, but the
 broader adoption stance and test-status threshold remain downstream decisions.
 This does not make promisebase authoritative and does not use `TODO-lilar`
 checkboxes as closure authority.
+
+### 2026-05-17 — Turn-184 closure / transfer pointer
+
+`DI-nulak` reconciles turn 184's full promisebase audit and process defects.
+`UT-184.a` is captured by AGENTS-ppx B5 and later TE-sihih scope contraction.
+`UT-184.b` is routed to TODO-rohub and AGENTS-ppx B3. `UT-184.c` is captured by
+the expanded AGENTS-ppx B7 reproducible-pattern-count rule. `UT-184.d`,
+`UT-184.e`, and `UT-184.g` are routed to TODO-kituj / `DR-tumus` as `kv/fs`
+refactor, partial-rot, dependency-target, and test-threshold inputs. `UT-184.f`
+is routed to TODO-rajig and `SIM-haros` as RFC-1005 promise-economy prior-art
+pressure. This does not lock any of the turn-184 flat DF list and does not use
+`TODO-lilar` checkboxes as closure authority.

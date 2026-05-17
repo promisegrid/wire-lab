@@ -416,6 +416,41 @@ Affects: `protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewal
 `DR/DR-tumus-turn-177-l6-cas-adoption.md`;
 `AGENTS-ppx.md`.
 
+ID: DI-nulak
+Date: 2026-05-17 14:20:14
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Route turn-184's promisebase full-code audit, RFC-1005 prior-art
+pressure, and process defects to their current owners without treating the
+turn-184 ten-DF list as locked design.
+Intent: Turn 184 corrected the earlier promisebase-docs overreach by auditing
+actual code, tests, RFCs, and ROADMAP state. The durable result is bounded
+evidence: promisebase `db/` and `kv/fs` are useful implemented prior art,
+several other promisebase surfaces were partially rotten or unfinished, RFC-1005
+is a promise-economy prior-art seed, and the assistant still violated process by
+listing ten DFs flat, surfacing a collaborator name in a question, and making an
+opaque pattern-count claim. Each class needs a durable owner so the replay can
+move on without losing the lesson or converting the audit into plan-of-record
+PromiseGrid design.
+Constraints: Do not touch promisebase in this replay pass. Do not answer
+`DR-tumus`. Do not reopen TE-sihih's later-contracted scope. Do not flip
+TODO-lilar UT checkboxes. Keep promisebase / pitbase as prior art unless the
+later TE-43 / `DR-tumus` path decides otherwise. Route one-DF cadence to
+AGENTS-ppx B5, collaborator propagation to TODO-rohub / AGENTS-ppx B3,
+pattern-count reproducibility to AGENTS-ppx B7, promisebase partial-rot and
+kv/fs dependency-target questions to TODO-kituj / `DR-tumus`, and RFC-1005
+promise-economy prior art to TODO-rajig / `SIM-haros`.
+Affects: `protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewalk.md`;
+`protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`;
+`protocols/wire-lab.d/TODO/TODO-lilar-session-replay-cleanup.md`;
+`protocols/wire-lab.d/TODO/TODO-rohub-dogfood-tool-name-and-collaborator-permission.md`;
+`protocols/wire-lab.d/TODO/TODO-kituj-te-43-promisebase-prior-art-adoption.md`;
+`protocols/wire-lab.d/TODO/TODO-rajig-promise-economy-spectrum.md`;
+`simulations/SIM-haros-promise-economy-spectrum/QUESTION.md`;
+`simulations/SIM-haros-promise-economy-spectrum/SCENARIOS.md`;
+`DEV-GUIDE-RESOURCES.md`;
+`AGENTS-ppx.md`.
+
 ## Why a separate TODO
 
 `TODO-lilar` already records the original historical walk through turn 192 and
@@ -654,7 +689,7 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - [x] juhub.181 Turn 181 raw-log rewalk plus later-turn and later-artifact sweep.
 - [x] juhub.182 Turn 182 raw-log rewalk plus later-turn and later-artifact sweep.
 - [x] juhub.183 Turn 183 raw-log rewalk plus later-turn and later-artifact sweep.
-- [ ] juhub.184 Turn 184 raw-log rewalk plus later-turn and later-artifact sweep.
+- [x] juhub.184 Turn 184 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.185 Turn 185 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.186 Turn 186 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.187 Turn 187 raw-log rewalk plus later-turn and later-artifact sweep.
@@ -2313,3 +2348,81 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - `Proposed disposition` `resolved/transferred after randStream fix evidence, code-first external-repo rule, local-only persistence owner, and TE-43 prior-art routing`
 - `Write needed? yes/no` `no` further turn-183 write is needed after this pass.
 - `Next` Turn 184 is next.
+
+### Turn 184 — 2026-05-04 05:29 UTC
+
+- `Turn 184 plain-English recap` Steve answered "Do 2," choosing the turn-183
+  recommendation to read the rest of promisebase code before drafting TE-sihih.
+  The assistant then produced the largest promisebase audit in this replay slice:
+  it surveyed `db/`, `kv/fs/`, `cmd/pb/`, `cmd/pitd/`, `fuse/`, `server/`, the
+  RFC series, the `x/` design notes, ROADMAP items, current vocabulary, sensible
+  wire-lab / promisebase coupling, near-term promisebase fixes, and a ten-item
+  TE-sihih DF list. The useful technical conclusions were bounded. `db/` was the
+  mature CAS / Rabin / Merkle / stream module and was green after the randStream
+  fix; `kv/fs/` was a small working KV layer and looked like the intended new
+  bottom of a future refactor; `cmd/pb/` contained useful exec-by-CID prior art
+  but was broken against newer Docker SDK APIs; `fuse/`, `server/`, and daemon
+  surfaces showed unfinished or failing work; current promisebase code used
+  algo/hexhash rather than CIDv1; and the "promise economy" itself was not
+  implemented in promisebase, with RFC-1005's test tree CID + executable tree CID
+  + cache-on-pass idea serving only as prior-art seed. The audit reframed the
+  earlier invalid wholesale-adoption idea into a more defensible split:
+  promisebase supplies prior art for local CAS/KV/execution pieces, while wire-lab
+  owns federation, sparse-CAS feeds, groups, promise economics, partition
+  tolerance, multi-hop discovery, conditional release, and protocol simulations.
+  The assistant then listed ten TE-sihih decision areas, but did not actually
+  walk any one DF with alternatives, consideration paragraphs, and a
+  recommendation. It also asked whether promisebase should be treated as a solo
+  Steve project or as having a broader active community; turn 187 later answers
+  that Steve is solo in promisebase right now. Later artifacts further narrow the
+  conclusions: TE-sihih lands as a smaller substrate-agnostic layered-model TE,
+  TODO-kituj / `DR-tumus` own concrete promisebase / pitbase adoption, TODO-dozak
+  owns merge-trajectory questions, TODO-rajig / `SIM-haros` own promise-economy
+  mechanism pressure, and AGENTS-ppx now owns the process defects exposed by the
+  turn.
+- `Existing capture` `TODO-lilar` records seven turn-184 rows: `UT-184.a` for the
+  flat ten-DF list violating one-DF-at-a-time discipline; `UT-184.b` for the
+  collaborator-name propagation risk; `UT-184.c` for the undefined "grokker
+  boilerplate" count; `UT-184.d` for the `kv/fs` refactor / dependency-target
+  ambiguity; `UT-184.e` for Docker SDK rot in `cmd/pb`; `UT-184.f` for RFC-1005
+  as promise-economy prior art; and `UT-184.g` for the broader partial-rot finding
+  outside `db/` and `kv/fs`. Existing AGENTS-ppx B5 covers one-DF-at-a-time
+  discipline; AGENTS-ppx B3 and TODO-rohub cover collaborator permission;
+  AGENTS-ppx B7 now explicitly covers reproducible pattern-count claims;
+  TODO-kituj / `DR-tumus` cover promisebase prior-art adoption, partial rot,
+  `kv/fs` layering, and test-threshold consequences; TODO-rajig and `SIM-haros`
+  now include the RFC-1005 prior-art pressure.
+- `Gaps or contradictions` Turn 184 was the right corrective audit after the
+  turn-179 promisebase-doc overread, but it still mixed several abstraction
+  levels. The ten-DF list was a scope inventory, not actual DF walking. The audit
+  proved that some local promisebase components are useful prior art; it did not
+  prove that promisebase is ready to be a PromiseGrid substrate or that wire-lab
+  should depend on all of it. The collaborator question should have been phrased
+  without naming a protected collaborator, and the `x/discussion.md` count needed
+  the counted pattern defined.
+- `Related UTs / owners` `UT-184.a` is closed for replay by AGENTS-ppx B5 and the
+  later TE-sihih contraction in TODO-vunub; no flat DF list from turn 184 is
+  treated as a locked decision. `UT-184.b` is routed to TODO-rohub and AGENTS-ppx
+  B3. `UT-184.c` is routed to the expanded AGENTS-ppx B7 pattern-count rule.
+  `UT-184.d`, `UT-184.e`, and `UT-184.g` are routed to TODO-kituj / `DR-tumus`
+  as promisebase / pitbase prior-art, dependency-target, partial-rot, and
+  test-threshold inputs; later turn 187 explicitly holds other promisebase fix
+  work rather than making it the next replay task. `UT-184.f` is routed to
+  TODO-rajig and `SIM-haros`, where RFC-1005's test-driven fabric is treated as
+  a prior-art seed to compare against promise-economy mechanisms, not as settled
+  PromiseGrid economics.
+- `Owner/doc cleanup` Done. Added `DI-nulak`; updated AGENTS-ppx B7; updated
+  TODO-rohub, TODO-kituj, TODO-rajig, `SIM-haros`, and DEV-GUIDE-RESOURCES.md;
+  added this turn-184 report; marked `juhub.184` complete; and added a turn-184
+  transfer pointer to the UT verification matrix. No `TODO-lilar` UT checkbox was
+  flipped.
+- `Remaining decisions or work` Downstream work remains open, but it is captured:
+  TODO-kituj / `DR-tumus` own the concrete promisebase / pitbase adoption and
+  test-threshold questions; TODO-rajig / `SIM-haros` own RFC-1005 as
+  promise-economy prior-art pressure; TODO-rohub owns collaborator permission;
+  AGENTS-ppx owns the process rules. For recovery-walkthrough purposes, turn 184
+  has no uncaptured loose end.
+- `Work pending` no.
+- `Proposed disposition` `resolved/transferred after code-first promisebase audit, process-rule routing, RFC-1005 sim capture, and TE-43 prior-art routing`
+- `Write needed? yes/no` `no` further turn-184 write is needed after this pass.
+- `Next` Turn 185 is next.

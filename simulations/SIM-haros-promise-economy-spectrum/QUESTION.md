@@ -20,3 +20,6 @@ Open decision points:
   permissioned promise tokens in any first-class protocol?
 - What must remain out of scope until the simulations show that a proposed
   mechanism avoids cryptocurrency-like failure modes?
+- How should RFC-1005's content-addressable test-driven fabric -- test tree CID,
+  executable tree CID, arguments, and cache-on-pass semantics -- map into or stay
+  separate from PromiseGrid promise-economy vocabulary? Source: `DI-nulak`.

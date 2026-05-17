@@ -50,6 +50,9 @@ Scope:
     simulation question lives in
     `simulations/SIM-ligan-promisebase-reference-naming/`. Source: `DI-lusum`;
     `DI-tibis`.
+  - Account for turn 184's `kv/fs` refactor pressure before choosing a concrete
+    promisebase / pitbase dependency target: pinned `db/`, future `db` on
+    `kv/fs`, or `kv/fs` plus wire-lab-owned CAS/tree logic. Source: `DI-nulak`.
   - Reconcile the kv branch on the remote (UT-190.d -- undiscovered
     through turn 192).
   - Resolve the Rabin-vs-FastCDC chunking parameter mismatch (UT-181.b:
@@ -70,7 +73,9 @@ Scope:
     leaving the actual decision to Steve (DI-bukoh; DI-molah).
   - Fix the import-path error (UT-181.a: t7a/pitbase ->
     stevegt/promisebase).
-  - Address fuse/ test failures and cmd/pb Docker SDK rot (UT-184.e/g).
+  - Address fuse/ test failures, cmd/pb Docker SDK rot, server/daemon
+    uncertainty, and the resulting partial-rot / test-threshold question
+    (UT-184.e/g). Source: `DI-nulak`.
 
 Blocking: TE-sihih (substrate-agnostic layered model) L6 substrate
 definition must land first. The remaining decision gate is `DR-tumus`.
@@ -126,6 +131,10 @@ since it locks the prototype-not-canon stance.
   loose end is routed here as `kituj.5` and into
   `SIM-ligan-promisebase-reference-naming/QUESTION.md`, separate from CBOR,
   chunking, and CID object-typing work. Source: `DI-lusum`; `DI-tibis`.
+- 2026-05-17: Turn 184's full promisebase audit routes `kv/fs` refactor
+  pressure, `cmd/pb` Docker SDK rot, FUSE/server/daemon uncertainty, and the
+  resulting "what test status is enough?" question here and to `DR-tumus`.
+  Source: `DI-nulak`.
 
 ## Decision Intent Log
 
