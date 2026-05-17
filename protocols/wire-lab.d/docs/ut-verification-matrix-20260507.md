@@ -945,3 +945,14 @@ TODO-rohub and AGENTS-ppx B3 as collaborator-sensitive re-quote handling. The
 Docker SDK and FUSE deferrals remain with TODO-kituj / `DR-tumus`. This does not
 touch runtime secret paths and does not use `TODO-lilar` checkboxes as closure
 authority.
+
+### 2026-05-17 — Turn-187 closure / transfer pointer
+
+`DI-nezis` reconciles turn 187's TE-sihih setup gate. `UT-187.a` is closed for
+replay by TODO-vunub's actual smaller TE-sihih landing and successor owner split.
+`UT-187.b` is routed to AGENTS-ppx B5, which now also covers bundled
+meta-questions and standing-rule cadence exceptions. `UT-187.c` is routed to the
+AGENTS-ppx twig naming rule; the proposed promisebase-adoption twig was never
+used. `UT-187.d` is routed to TODO-rohub and AGENTS-ppx B3 as
+collaborator-rule meta-discussion hygiene. This does not reopen the old ten-DF
+TE-sihih scope and does not use `TODO-lilar` checkboxes as closure authority.

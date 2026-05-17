@@ -137,7 +137,13 @@ For Steve it is `Steve Traugott`.
 `{twig}` is a kebab-case noun phrase describing the task: e.g.,
 `agents-ppx`, `dr-001-bootstrap`, `te-20260513-handler-abi`,
 `harness-spec-typo-fix`. Keep it short. The twig is part of the branch
-name, not a file or a separate identifier.
+name, not a file or a separate identifier. If a task has multiple
+substantive scope axes, choose a concise twig that names the dominant
+axis or an umbrella term that honestly covers the scope; do not trim a
+twig so far that it implies a narrower or different task. If neither a
+long nor a short draft twig preserves the scope, propose better
+scope-faithful alternatives rather than asking a binary long-vs-short
+question. Source: DI-nezis.
 
 # What you do for Steve
 
@@ -410,6 +416,12 @@ referenced, use the placeholder `[redacted-collaborator]`. Authorization
 is per-session and does not carry across sessions. (See
 DI-021-20260507-212250 in TODO-lilar.)
 
+When discussing this rule itself, avoid re-surfacing protected names,
+handles, or placeholders unless exact quoted evidence is required.
+Prefer phrases such as "the collaborator-non-mention rule" or
+"the protected collaborator placeholder" in new prose. Source:
+DI-nezis.
+
 ## B4 — PAT redaction and credential hygiene
 
 Redact secrets in every summary, walk note, TURNOVER, commit message,
@@ -452,6 +464,14 @@ into a single multiple-choice question, and do not ask Steve to
 override this discipline. If multiple DFs are open, queue them and
 ask the next one only after the current one is locked. (See
 DI-021-20260507-212253 in TODO-lilar.)
+
+Do not bundle several confirmation or meta-questions at the end of an
+answer when only one answer is blocking the next action. Ask the next
+blocking question, then record or route lower-priority questions to the
+appropriate owner for later. If a standing rule already answers a
+cadence question, apply the rule; propose a scoped exception only when
+there is a concrete reason the standing rule is wrong for the current
+context. Source: DI-nezis.
 
 ## B6 — Apologize, audit, invalidate, propose
 

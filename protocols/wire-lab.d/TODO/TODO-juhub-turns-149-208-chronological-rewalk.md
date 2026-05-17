@@ -503,6 +503,35 @@ Affects: `AGENTS-ppx.md`;
 `protocols/wire-lab.d/TODO/TODO-kituj-te-43-promisebase-prior-art-adoption.md`;
 `protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`.
 
+ID: DI-nezis
+Date: 2026-05-17 14:36:09
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Route turn-187's unanswered TE-sihih setup questions to later
+TE-sihih scope contraction and tighten process rules for bundled meta-questions,
+cadence exceptions, scope-faithful twig names, and collaborator-rule
+meta-discussion.
+Intent: Turn 187 answered two substantive questions -- promisebase is currently
+a solo Steve project, and other promisebase fix work should be held -- but the
+assistant then asked three simultaneous confirmation/meta questions and proposed
+a twig name that did not reflect the proposed TE title's full scope. Later work
+made those questions historical rather than currently blocking: TE-sihih landed
+smaller under TODO-vunub, promisebase adoption moved to TODO-kituj / `DR-tumus`,
+and the old twig proposal was not used. The durable work is therefore process
+routing, not another PromiseGrid design owner.
+Constraints: Do not reopen TE-sihih's old ten-DF promisebase-adoption scope. Do
+not touch TE files. Do not flip TODO-lilar UT checkboxes. Route old TE-sihih
+scope questions to TODO-vunub's smaller landed scope and successor owners; route
+the cadence question to AGENTS-ppx B5; route the twig-name lesson to the
+AGENTS-ppx twig rule; route collaborator-rule meta-discussion to TODO-rohub and
+AGENTS-ppx B3.
+Affects: `AGENTS-ppx.md`;
+`protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewalk.md`;
+`protocols/wire-lab.d/TODO/TODO-rohub-dogfood-tool-name-and-collaborator-permission.md`;
+`protocols/wire-lab.d/TODO/TODO-vunub-te-38-substrate-agnostic-layered-model.md`;
+`protocols/wire-lab.d/TODO/TODO-kituj-te-43-promisebase-prior-art-adoption.md`;
+`protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`.
+
 ## Why a separate TODO
 
 `TODO-lilar` already records the original historical walk through turn 192 and
@@ -744,7 +773,7 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - [x] juhub.184 Turn 184 raw-log rewalk plus later-turn and later-artifact sweep.
 - [x] juhub.185 Turn 185 raw-log rewalk plus later-turn and later-artifact sweep.
 - [x] juhub.186 Turn 186 raw-log rewalk plus later-turn and later-artifact sweep.
-- [ ] juhub.187 Turn 187 raw-log rewalk plus later-turn and later-artifact sweep.
+- [x] juhub.187 Turn 187 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.188 Turn 188 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.189 Turn 189 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.190 Turn 190 raw-log rewalk plus later-turn and later-artifact sweep.
@@ -2594,3 +2623,66 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - `Proposed disposition` `resolved/transferred after redacted PAT handling, promisebase fix push evidence, GOTOOLCHAIN hazard owner, and collaborator re-quote routing`
 - `Write needed? yes/no` `no` further turn-186 write is needed after this pass.
 - `Next` Turn 187 is next.
+
+### Turn 187 — 2026-05-04 14:32 UTC
+
+- `Turn 187 plain-English recap` Steve answered the open promisebase framing and
+  sequencing questions with one directive: he was solo in promisebase at that
+  time, other promisebase fix work should be held, and the assistant should go
+  back to TE-sihih. That settled the turn-184 / turn-186 solo-vs-broader-community
+  question and deferred the Docker SDK / FUSE promisebase fixes without losing
+  them; those fix/readiness issues remain with TODO-kituj / `DR-tumus`. The
+  assistant responded by restating what it thought TE-sihih should be: a TE about
+  promisebase `db/` as L6 substrate, wire-lab's L5/L7 contributions, vocabulary
+  coordination, and ten refined DFs covering module dependency, vocabulary, CID
+  format, tree encoding, message-envelope ownership, RFC numbering, contribution
+  loop, promise-economy ownership, federation simulation, and L7 group ownership.
+  The response was useful as a scope inventory, but it did not actually restart
+  TE-sihih drafting. Instead, it asked three questions at once: whether the DF
+  list looked right, whether recommendations should be shorter or fuller, and
+  whether a long promisebase-adoption twig name was acceptable or should be
+  trimmed. Turn 188 then interrupted with a push-status check, and turns 189-192
+  moved through more promisebase review and then away from TE-sihih toward
+  dogfooding. Later work makes the old turn-187 setup historical: TE-sihih
+  eventually lands as the smaller substrate-agnostic layered-model TE under
+  TODO-vunub, concrete promisebase / pitbase adoption moves to TODO-kituj /
+  `DR-tumus`, and the turn-187 twig name is not used. The durable conclusions are
+  process-level: don't bundle multiple setup questions, don't ask Steve to
+  override an existing cadence rule, choose twig names that match scope, and do
+  not re-surface protected collaborator placeholders in meta-discussion.
+- `Existing capture` `TODO-lilar` records four turn-187 rows: `UT-187.a` for the
+  three unanswered confirmation questions, `UT-187.b` for the shorter-vs-fuller
+  cadence question conflicting with the standing DF rule, `UT-187.c` for the
+  proposed twig name dropping two of the proposed TE title's scope axes, and
+  `UT-187.d` for meta-discussion of the collaborator-non-mention rule re-surfacing
+  the protected placeholder. TODO-vunub records TE-sihih's actual smaller landed
+  scope and historical twig; TODO-kituj / `DR-tumus` own concrete promisebase /
+  pitbase adoption; AGENTS-ppx B5 now covers bundled meta-questions and cadence
+  exceptions; the AGENTS-ppx twig rule now covers scope-faithful twig names; and
+  TODO-rohub plus AGENTS-ppx B3 cover collaborator-rule meta-discussion.
+- `Gaps or contradictions` Turn 187 correctly answered the solo-vs-community and
+  hold-other-promisebase-work questions. The contradiction is that the assistant
+  said it was going back to TE-sihih, but ended by asking a bundle of
+  pre-drafting meta-questions that were easy to lose when turn 188 raised a
+  higher-priority status check. The old ten-DF TE-sihih frame is also contradicted
+  by the later smaller TE-sihih landing, so it must be treated as historical
+  scope inventory rather than current work.
+- `Related UTs / owners` `UT-187.a` is closed for replay by TODO-vunub's actual
+  TE-sihih landing and successor owner split; the unanswered Q1/Q2/Q3 bundle is
+  not re-asked because its old scope is no longer current. `UT-187.b` is routed to
+  AGENTS-ppx B5. `UT-187.c` is routed to the AGENTS-ppx twig naming rule and
+  closed historically because the proposed twig was never used. `UT-187.d` is
+  routed to TODO-rohub and AGENTS-ppx B3.
+- `Owner/doc cleanup` Done. Added `DI-nezis`; expanded AGENTS-ppx B3, B5, and the
+  twig rule; updated TODO-rohub; added this turn-187 report; marked `juhub.187`
+  complete; and added a turn-187 transfer pointer to the UT verification matrix.
+  No `TODO-lilar` UT checkbox was flipped.
+- `Remaining decisions or work` Downstream work remains open, but it is captured:
+  TODO-kituj / `DR-tumus` own promisebase / pitbase adoption and deferred
+  readiness fixes; TODO-rohub owns collaborator permission; AGENTS-ppx owns the
+  process rules; TODO-vunub is already closed with the actual TE-sihih product.
+  For recovery-walkthrough purposes, turn 187 has no uncaptured loose end.
+- `Work pending` no.
+- `Proposed disposition` `resolved/transferred after TE-sihih scope contraction, process-rule tightening, twig-scope naming capture, and collaborator meta-discussion routing`
+- `Write needed? yes/no` `no` further turn-187 write is needed after this pass.
+- `Next` Turn 188 is next.

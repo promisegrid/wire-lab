@@ -47,6 +47,10 @@ PromiseGrid protocol-design question home. Source: `DI-lusum`.
   as a propagation hazard: a protected collaborator name can leak when an open
   question is written, persisted, or re-quoted. This TODO owns that constraint
   until explicit permission and a chosen handle exist. Source: `DI-nulak`.
+- 2026-05-17: Turn 187 adds the meta-discussion variant: even a parenthetical
+  acknowledging the collaborator-non-mention rule can re-surface the protected
+  placeholder. Future dogfood/tooling prose should discuss the rule generically
+  unless exact quoted evidence is required. Source: `DI-nezis`.
 
 ## Decision Intent Log
 
