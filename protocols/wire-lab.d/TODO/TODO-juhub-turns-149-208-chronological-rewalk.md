@@ -366,6 +366,28 @@ Affects: `protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewal
 `simulations/SIM-bobud-l6-cas-starting-profile-bakeoff/`;
 `simulations/SIM-kohad-cas-object-type-binding-bakeoff/`.
 
+ID: DI-lumal
+Date: 2026-05-17 14:08:32
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Route turn-182's promisebase regression-fix proposal lessons to the
+existing replay, authorization, PAT, diagnostic-transparency, and later
+turn-183/186 execution evidence instead of creating new PromiseGrid design work.
+Intent: Turn 182 was the bridge between the turn-181 `db/` audit and the
+turn-183 randStream fix. Its durable lessons are procedural: terse user replies
+can confirm both a regression hypothesis and a prior concrete offer; fix
+proposals should show the diagnostic reasoning in the same answer; and cross-repo
+work proposals must separate local preparation, PAT-gated push/PR operations, and
+user-push alternatives.
+Constraints: Do not answer `DR-tumus` here. Do not flip TODO-lilar UT
+checkboxes. Do not create promisebase work from this replay pass. Treat the
+actual fix, test result, local-only commit, PAT grant, push, and status-visibility
+concerns as later-turn evidence owned by turns 183, 185, 186, and 188.
+Affects: `protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewalk.md`;
+`protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`;
+`protocols/wire-lab.d/TODO/TODO-lilar-session-replay-cleanup.md`;
+`AGENTS-ppx.md`.
+
 ## Why a separate TODO
 
 `TODO-lilar` already records the original historical walk through turn 192 and
@@ -602,7 +624,7 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - [x] juhub.179 Turn 179 raw-log rewalk plus later-turn and later-artifact sweep.
 - [x] juhub.180 Turn 180 raw-log rewalk plus later-turn and later-artifact sweep.
 - [x] juhub.181 Turn 181 raw-log rewalk plus later-turn and later-artifact sweep.
-- [ ] juhub.182 Turn 182 raw-log rewalk plus later-turn and later-artifact sweep.
+- [x] juhub.182 Turn 182 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.183 Turn 183 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.184 Turn 184 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.185 Turn 185 raw-log rewalk plus later-turn and later-artifact sweep.
@@ -2137,3 +2159,67 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - `Proposed disposition` `resolved/transferred after promisebase db audit routing, import-path correction, CAS-profile owner routing, and later regression-fix evidence`
 - `Write needed? yes/no` `no` further turn-181 write is needed after this pass.
 - `Next` Turn 182 is next.
+
+### Turn 182 — 2026-05-04 05:05 UTC
+
+- `Turn 182 plain-English recap` Steve replied to the turn-181 failing-test report
+  with the short statement "That used to work." In context, that did two things:
+  it confirmed the `TestPutStreamBig` and `TestPutStreamSmall` failures were
+  regressions rather than known old failures, and it implicitly accepted the
+  assistant's prior offer to dig into `chunker_test.go:106`. The assistant's
+  response jumped ahead to a fix proposal: it offered to apply a one-file,
+  roughly six-line change in `db/stream_test.go`, on a
+  `ppx/fix-randstream-go120` twig in promisebase, verify the tests green, and
+  either open a PR or leave the commit ready for Steve to push. It also offered a
+  defer path: merely note the issue in the TE-sihih draft as a known-fixable
+  regression if Steve wanted to postpone promisebase write access and scope
+  decisions. Later turns fill in what turn 182 omitted. Turn 183 shows the actual
+  diagnosis: Go 1.20 made `math/rand.Seed` a no-op for the global generator, and
+  promisebase's Go 1.15-to-1.24 toolchain bump in commit `9a5634f` silently broke
+  tests that expected deterministic global-rand output. The fix was to replace
+  `rand.Seed(42)` plus global `rand.Read` with a per-`randStream` `*rand.Rand`
+  seeded from `rand.NewSource(42)`, making the tests hermetic. Turn 183 applies
+  the fix locally and reports 17/17 tests green; turn 186 later gets PAT access
+  and pushes the work; turn 188 surfaces that the push confirmation was not
+  visible enough. The loose ends from turn 182 are therefore process lessons, not
+  PromiseGrid design questions: show the diagnostic when proposing a fix, state
+  cross-repo auth requirements precisely, and recognize Steve's terse replies as
+  possible implicit approval only when they answer a concrete offer already on
+  the table.
+- `Existing capture` `TODO-lilar` records three related rows: `UT-182.a` for the
+  missing diagnostic in the turn-182 answer, `UT-182.b` for the loose "open a PR /
+  leave the commit ready" phrasing before a promisebase PAT existed, and
+  `UT-182.c` for the positive implicit-yes / regression-confirmation cadence
+  lesson. Later rows also cover the actual fix (`UT-183.c`), local-only commit
+  persistence risk (`UT-183.a`), PAT handling (`UT-185.*` / `UT-186.*`), and the
+  foreground DONE visibility gap (`UT-188.a`). AGENTS-ppx B1 covers separate
+  authorization from execution when a turn says "ask Steve"; B4 covers PAT scope
+  and expiry checks; B2 covers foreground DONE reporting; B6/B7 cover structural
+  error recovery and ground-truthed evidence.
+- `Gaps or contradictions` The assistant's turn-182 fix proposal was probably
+  correct, but it was under-narrated: readers could not see how the assistant got
+  from "tests fail" to "one-file randStream fix" until turn 183. The offer also
+  bundled operations with different authorization requirements: preparing a local
+  commit, pushing to promisebase, and opening a PR are not equivalent when no
+  promisebase PAT exists yet. The replay should preserve that distinction without
+  retroactively pretending turn 182 already said it cleanly.
+- `Related UTs / owners` `UT-182.a` is captured by this turn note, the turn-183
+  diagnostic, and the replay/matrix lesson that fix proposals should show root
+  cause in the same answer. `UT-182.b` is captured by AGENTS-ppx B1/B4 plus the
+  later PAT and push-status turns; the precise lesson is recorded here and in the
+  matrix. `UT-182.c` is captured as a positive cadence lesson paired with
+  `UT-181.f`; it does not require a new durable rule beyond the per-turn replay
+  because it applies only when a prior concrete offer is already on the table and
+  the reply is not a no or redirect.
+- `Owner/doc cleanup` Done. Added `DI-lumal`; added this turn-182 report; marked
+  `juhub.182` complete; and added a turn-182 transfer pointer to the UT
+  verification matrix. No `TODO-lilar` UT checkbox was flipped.
+- `Remaining decisions or work` Downstream process and cross-repo work remains
+  open in later turns, but it is captured: turn 183 owns the actual randStream fix
+  evidence and local-only persistence concern; turns 185-186 own PAT handling and
+  push mechanics; turn 188 owns foreground DONE visibility. For
+  recovery-walkthrough purposes, turn 182 has no uncaptured loose end.
+- `Work pending` no.
+- `Proposed disposition` `resolved/transferred after diagnostic-transparency, auth-requirement, implicit-yes cadence, and later-fix routing`
+- `Write needed? yes/no` `no` further turn-182 write is needed after this pass.
+- `Next` Turn 183 is next.

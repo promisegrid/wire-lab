@@ -888,3 +888,14 @@ promisebase fix while remaining evidence for TODO-kituj / `DR-tumus` test-status
 threshold decisions. `UT-181.f` is a recorded cadence lesson paired with
 `UT-182.c`. This does not answer `DR-tumus` and does not use `TODO-lilar`
 checkboxes as closure authority.
+
+### 2026-05-17 — Turn-182 closure / transfer pointer
+
+`DI-lumal` reconciles turn 182's promisebase regression-fix proposal. `UT-182.a`
+is captured by the corrected turn-182 replay note and the turn-183 diagnostic
+that explains the Go 1.20 randStream regression. `UT-182.b` is captured by
+AGENTS-ppx B1/B4 plus the later PAT and push-status turns; the exact auth-wording
+lesson is preserved in TODO-juhub. `UT-182.c` is captured as a positive cadence
+lesson paired with `UT-181.f`, bounded to cases where Steve is responding to an
+already-offered concrete next step. This does not create new promisebase work and
+does not use `TODO-lilar` checkboxes as closure authority.
