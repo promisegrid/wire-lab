@@ -956,3 +956,16 @@ AGENTS-ppx twig naming rule; the proposed promisebase-adoption twig was never
 used. `UT-187.d` is routed to TODO-rohub and AGENTS-ppx B3 as
 collaborator-rule meta-discussion hygiene. This does not reopen the old ten-DF
 TE-sihih scope and does not use `TODO-lilar` checkboxes as closure authority.
+
+### 2026-05-17 — Turn-188 closure / transfer pointer
+
+`DI-ruvop` reconciles turn 188's promisebase push-status confusion.
+`UT-188.a` is routed to AGENTS-ppx B2, which now requires cross-repo state
+changes to be foregrounded before diagnostics and to name the repo/remote, ref,
+SHA, fast-forward status, and deleted twig refs. `UT-188.b` is routed to the
+AGENTS-ppx no-force-push section, which now requires rollback discussion for
+published work to start from `git revert` or forward-fix commits rather than
+reset-plus-force-push. `UT-188.c` is routed to AGENTS-ppx B2 as a one-time
+rule-compliant offer-to-revert practice after unilateral cross-repo state
+changes. This does not touch promisebase and does not use `TODO-lilar`
+checkboxes as closure authority.

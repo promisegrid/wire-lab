@@ -532,6 +532,29 @@ Affects: `AGENTS-ppx.md`;
 `protocols/wire-lab.d/TODO/TODO-kituj-te-43-promisebase-prior-art-adoption.md`;
 `protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`.
 
+ID: DI-ruvop
+Date: 2026-05-17 15:02:12
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Route turn-188's promisebase push-status confusion, force-push
+self-correction, and offer-to-revert pattern to AGENTS-ppx process rules without
+touching promisebase.
+Intent: Turn 188 shows that the turn-186 promisebase push was real but buried
+under diagnostic prose, so Steve reasonably had to ask whether the change had
+actually been pushed. The same turn also shows the assistant correcting away from
+a reset-plus-force-push idea toward `git revert`, which should be the baked-in
+default rather than an after-the-fact override. The healthy part of the exchange
+is the explicit offer to undo a unilateral cross-repo state change; that pattern
+should remain, but it must name a rule-compliant forward revert path and expire
+once Steve moves on.
+Constraints: Do not touch promisebase. Do not rewrite TODO-lilar or flip
+TODO-lilar UT checkboxes. Route `UT-188.a` to AGENTS-ppx B2 cross-repo DONE
+reporting, `UT-188.b` to the no-force-push / revert-default rule, and
+`UT-188.c` to a one-time rule-compliant offer-to-revert practice.
+Affects: `AGENTS-ppx.md`;
+`protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewalk.md`;
+`protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`.
+
 ## Why a separate TODO
 
 `TODO-lilar` already records the original historical walk through turn 192 and
@@ -774,7 +797,7 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - [x] juhub.185 Turn 185 raw-log rewalk plus later-turn and later-artifact sweep.
 - [x] juhub.186 Turn 186 raw-log rewalk plus later-turn and later-artifact sweep.
 - [x] juhub.187 Turn 187 raw-log rewalk plus later-turn and later-artifact sweep.
-- [ ] juhub.188 Turn 188 raw-log rewalk plus later-turn and later-artifact sweep.
+- [x] juhub.188 Turn 188 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.189 Turn 189 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.190 Turn 190 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.191 Turn 191 raw-log rewalk plus later-turn and later-artifact sweep.
@@ -2686,3 +2709,55 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - `Proposed disposition` `resolved/transferred after TE-sihih scope contraction, process-rule tightening, twig-scope naming capture, and collaborator meta-discussion routing`
 - `Write needed? yes/no` `no` further turn-187 write is needed after this pass.
 - `Next` Turn 188 is next.
+
+### Turn 188 — 2026-05-04 15:12 UTC
+
+- `Turn 188 plain-English recap` Steve stopped the thread to ask whether the
+  promisebase changes had actually been pushed. The answer was yes: the
+  randStream fix from the local promisebase twig had landed on promisebase
+  `main` at `d98b5d3`, the local and remote `ppx/fix-randstream-go120` twig had
+  been deleted, and the push was a fast-forward from `aedaac2` to `d98b5d3`.
+  The problem was not that the work was missing; the problem was that the
+  earlier confirmation was buried inside diagnostic and side-channel prose, so
+  Steve had to reconstruct whether the cross-repo state change had happened.
+  The assistant then explained the state, gave Steve a verification command,
+  and offered to undo the change if it had overstepped. That offer was
+  directionally correct, but the assistant also briefly started to describe a
+  reset-plus-force-push rollback before catching the standing no-force-push rule
+  and switching to the correct forward `git revert d98b5d3` shape. Later turn
+  189 moved on to branch inspection instead of requesting a revert, so the
+  pushed promisebase state was implicitly accepted. The durable conclusions are
+  process-level: cross-repo pushes, merges, and twig deletions need an explicit
+  top-of-response DONE block; published-work rollback discussion must start with
+  `git revert` or a forward-fix, not reset-plus-force-push; and one-time
+  rule-compliant revert offers are useful after unilateral cross-repo actions.
+- `Existing capture` `TODO-lilar` records `UT-188.a` for the buried push-status
+  confirmation, `UT-188.b` for the mid-sentence force-push self-correction, and
+  `UT-188.c` for the healthy but improvable offer-to-revert pattern. AGENTS-ppx
+  already had B2 foreground DONE confirmation and no-force-push rules; this pass
+  expands those rules with the specific turn-188 cross-repo and forward-revert
+  lessons.
+- `Gaps or contradictions` The push itself was not wrong, and no PromiseGrid
+  design question comes out of this turn. The contradiction is procedural: the
+  assistant had actually performed the requested cross-repo work but reported it
+  in a way that made the completed state easy to miss. The rollback offer also
+  mixed a forbidden primitive into the prose before self-correcting, which is
+  weaker than having the no-force-push rule shape the first proposal.
+- `Related UTs / owners` `UT-188.a` is routed to AGENTS-ppx B2's expanded
+  cross-repo DONE-block rule. `UT-188.b` is routed to the AGENTS-ppx
+  no-force-push section, which now requires published-work rollback discussion
+  to start from `git revert` or forward-fix commits. `UT-188.c` is routed to
+  AGENTS-ppx B2 as a one-time rule-compliant offer-to-revert practice after
+  unilateral cross-repo state changes.
+- `Owner/doc cleanup` Done. Added `DI-ruvop`; expanded AGENTS-ppx B2 and the
+  no-force-push rule; added this turn-188 report; marked `juhub.188` complete;
+  and added a turn-188 transfer pointer to the UT verification matrix. No
+  promisebase file was touched, and no `TODO-lilar` UT checkbox was flipped.
+- `Remaining decisions or work` None for this turn. The pushed promisebase
+  commit was implicitly accepted by the next turn's forward movement, and the
+  loose ends are process rules now captured in AGENTS-ppx and the verification
+  matrix.
+- `Work pending` no.
+- `Proposed disposition` `resolved/transferred after cross-repo DONE visibility, revert-default, and one-time revert-offer routing`
+- `Write needed? yes/no` `no` further turn-188 write is needed after this pass.
+- `Next` Turn 189 is next.

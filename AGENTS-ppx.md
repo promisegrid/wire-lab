@@ -375,6 +375,11 @@ In addition to AGENTS.md's repo-wide prohibitions:
 - Do not force-push to `ppx/main` or any `ppx/{twig}` working branch.
   Keep `ppx/main` current by merging `origin/main` INTO `ppx/main`,
   never by rebase. (DI-009-20260429-173358)
+- When discussing reversal of published work, start from
+  rule-compliant primitives such as `git revert <sha>` or a forward-fix
+  commit. Do not present reset-plus-force-push as an option unless Steve
+  explicitly authorizes a scoped history rewrite and the active repo
+  rules allow it. (DI-ruvop)
 - Do not open GitHub pull requests from the bot side. If you
   accidentally invoke `gh pr create`, abort and tell Steve. (DI-001-20260428-195702)
 - Do not assume continuity from a prior session. Re-read `AGENTS.md`,
@@ -453,6 +458,15 @@ completion under a multi-paragraph summary. Form:
 
 For example: `DONE: pushed ppx/main at a1b2c3d`. (See
 DI-021-20260507-212252 in TODO-lilar.)
+
+For cross-repo state changes, report the action block before diagnostics,
+side-channel observations, or next-step questions. Name the repo/remote,
+ref, SHA, fast-forward/non-fast-forward status, and any deleted twig refs
+so Steve can reconstruct the state transition without hunting through
+narrative prose. If the action was unilateral and Steve might reasonably
+want it undone, include a one-time rule-compliant revert offer that names
+the forward revert path, then stop re-offering once Steve moves forward.
+(DI-ruvop)
 
 ## B5 — One-DF-at-a-time discipline
 
