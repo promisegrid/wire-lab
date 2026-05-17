@@ -261,6 +261,87 @@ Affects: `DR/DR-tumus-turn-177-l6-cas-adoption.md`;
 `protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`;
 `DEV-GUIDE-RESOURCES.md`.
 
+ID: DI-majib
+Date: 2026-05-17 09:44:46
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Add unanswered next-DF packets and acceptance criteria to the three
+turn-177 DRs, and add owner TODO subtasks that route each packet to its
+decision owner.
+Intent: The DRs filed under `DI-davov` make the open decisions explicit, but
+the next cleanup step should make them answerable without another replay pass.
+DF packets keep the decisions open while giving TODO-kituj / TE-43, TODO-pipus,
+and TODO-kulih / TE-nibar concrete next actions.
+Constraints: Do not answer `DR-tumus`, `DR-gabif`, or `DR-robon` in this pass.
+Do not create new simulations, protocol trees, or world fixtures. Do not mark
+turn 177 fully closed.
+Affects: `DR/DR-tumus-turn-177-l6-cas-adoption.md`;
+`DR/DR-gabif-turn-177-cas-backed-group-session-migration.md`;
+`DR/DR-robon-turn-177-spec-shape-requirements.md`;
+`protocols/wire-lab.d/TODO/TODO-kituj-te-43-promisebase-prior-art-adoption.md`;
+`protocols/wire-lab.d/TODO/TODO-pipus-te-39-wire-lab-devs-migration.md`;
+`protocols/wire-lab.d/TODO/TODO-kulih-te-spec-doc-as-promise.md`;
+`protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewalk.md`;
+`protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`.
+
+ID: DI-bukoh
+Date: 2026-05-17 09:55:11
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Route `DR-tumus` DF-tumus.1 through DF-tumus.3 through three new
+standalone bakeoff simulations before asking for final TE-43 decisions: one
+for the L6 CAS starting profile, one for CAS object type binding, and one for
+chunking identity.
+Intent: Steve rejected a direct answer to those DF items and asked for sims to
+answer them. The new simulations keep the evidence-producing work independent
+from the broad `SIM-jomag-cas-object-model` charter while preserving `DR-tumus`
+as the decision owner and avoiding any shared simulation home.
+Constraints: Create only root `README.md`, `QUESTION.md`, and `SCENARIOS.md`
+files for the new simulations. Do not create protocol trees, world fixtures,
+manifests, local TODO queues, or shared protocol bundles. Do not edit
+grid-envelope variants. Treat pCID-driven chunking, chunking-CID, and `cCID`
+as exploratory alternatives, not locked terminology or final protocol APIs.
+Affects: `protocols/wire-lab.d/TODO/TODO-rusis-simulation-split-and-specimen-relocation.md`;
+`DR/DR-tumus-turn-177-l6-cas-adoption.md`;
+`protocols/wire-lab.d/TODO/TODO-kituj-te-43-promisebase-prior-art-adoption.md`;
+`protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewalk.md`;
+`protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`;
+`DEV-GUIDE-RESOURCES.md`; `simulations/README.md`;
+`simulations/SIM-bobud-l6-cas-starting-profile-bakeoff/README.md`;
+`simulations/SIM-bobud-l6-cas-starting-profile-bakeoff/QUESTION.md`;
+`simulations/SIM-bobud-l6-cas-starting-profile-bakeoff/SCENARIOS.md`;
+`simulations/SIM-kohad-cas-object-type-binding-bakeoff/README.md`;
+`simulations/SIM-kohad-cas-object-type-binding-bakeoff/QUESTION.md`;
+`simulations/SIM-kohad-cas-object-type-binding-bakeoff/SCENARIOS.md`;
+`simulations/SIM-gobaz-chunking-identity-bakeoff/README.md`;
+`simulations/SIM-gobaz-chunking-identity-bakeoff/QUESTION.md`;
+`simulations/SIM-gobaz-chunking-identity-bakeoff/SCENARIOS.md`.
+
+ID: DI-molah
+Date: 2026-05-17 10:09:28
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Synthesize the three `DI-bukoh` bakeoff simulations into a final
+answerable `DR-tumus` packet, while keeping `DR-tumus` open for Steve's actual
+decision. Use minimal pointer/raw as the recommended starting profile, CID
+codec authority with rejected path suffixes as the recommended type-binding
+stance, raw-only first profile as the recommended chunking stance, and
+promisebase / pitbase as prior art only for the first L6 CAS spec.
+Intent: The bakeoff sims have done their immediate job once they turn the broad
+turn-177 pressure into a concrete DR packet. The repo should not make sim-local
+results authoritative or leave `DR-tumus` blocked on rereading the sims; the
+synthesis belongs in the DR/DI path where TE-43 can consume it.
+Constraints: Do not answer or close `DR-tumus` in this pass. Do not create
+sim-local `RESULTS.md` files, protocol trees, world fixtures, or new chunking
+DRs. Keep pCID-driven chunking, chunking-CID, and `cCID` as follow-on design
+pressure unless Steve later locks one. Do not edit grid-envelope variants.
+Affects: `protocols/wire-lab.d/TODO/TODO-rusis-simulation-split-and-specimen-relocation.md`;
+`DR/DR-tumus-turn-177-l6-cas-adoption.md`;
+`protocols/wire-lab.d/TODO/TODO-kituj-te-43-promisebase-prior-art-adoption.md`;
+`protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewalk.md`;
+`protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`;
+`DEV-GUIDE-RESOURCES.md`.
+
 ## Context
 
 The current simulation layout still reflects the recovery process that
@@ -405,6 +486,14 @@ with `git mv`, because their filenames depend on their byte content.
 - [x] rusis.16 File scoped DRs for the three remaining turn-177 decision
   clusters: concrete L6 CAS adoption, additive CAS-backed group-session
   migration, and spec-shape requirements.
+- [x] rusis.17 Add unanswered next-DF packets and acceptance criteria to
+  `DR-tumus`, `DR-gabif`, and `DR-robon`, with owner TODO subtasks for each
+  packet.
+- [x] rusis.18 Add standalone `DR-tumus` bakeoff simulations for starting
+  profile, object type binding, and chunking identity before answering
+  DF-tumus.1 through DF-tumus.3.
+- [x] rusis.19 Synthesize the three `DR-tumus` bakeoff simulations into a final
+  answerable packet, while leaving `DR-tumus` open for Steve's decision.
 
 ## `rusis.2` first concrete split-pass blueprint
 

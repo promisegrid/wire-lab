@@ -10,13 +10,14 @@ Affects: `protocols/wire-lab.d/TODO/TODO-pipus-te-39-wire-lab-devs-migration.md`
 Unblocks: TODO-pipus T-MIG-OPS; additive CAS-backed group-session specimen design; any later migration from historical transport evidence into pointer-and-CAS form.
 Waiting on: stevegt@t7a.org (Steve Traugott)
 Decision:
-Linked DI: DI-navod; DI-pator; DI-davov
+Linked DI: DI-navod; DI-pator; DI-davov; DI-majib
 Related commits:
-Last updated: 2026-05-17 09:28:02
+Last updated: 2026-05-17 09:44:46
 
 ## Event log
 
 - 2026-05-17 09:28:02 — Opened during turn-177 cleanup so TODO-pipus has a DR for the concrete additive migration contract instead of relying on replay notes and scenario docs alone.
+- 2026-05-17 09:44:46 — Added unanswered next-DF packet and acceptance criteria under `DI-majib`.
 
 ## Evidence
 
@@ -30,6 +31,32 @@ Last updated: 2026-05-17 09:28:02
 - **Alt-A: additive overlap.** Keep historical `.txt` evidence immutable, add a new CAS-backed specimen beside it, and publish explicit provenance/back-reference links from successor records to the historical evidence.
 - **Alt-B: sealed successor cutover.** Keep old evidence immutable, seal it with a final migration promise, then start a new CAS-backed group-session instance with continuity metadata.
 - **Alt-C: defer migration until L6 profile locks.** Keep only scenario docs for now and do not create any CAS-backed group-session specimen until DR-tumus / TE-43 answers the concrete CAS profile.
+
+## Next DF packet
+
+This is the next user-answerable decision packet for TODO-pipus. It is not
+answered here. Source: DI-majib.
+
+- **DF-gabif.1 — Migration shape.** Choose Alt-A additive overlap
+  (recommended once a minimal L6 profile exists), Alt-B sealed successor
+  cutover, or Alt-C defer until DR-tumus closes.
+- **DF-gabif.2 — Historical reference.** Choose explicit back-reference from
+  new CAS-backed records to historical `.txt` CIDs, a separate migration
+  manifest, or both.
+- **DF-gabif.3 — Group-visible identity.** Choose pointer-object CID,
+  message-root CID, or envelope/wrapper CID as the identifier that group tools
+  and parent links cite.
+- **DF-gabif.4 — Trigger discipline.** Choose manual migration after DF/DI,
+  migration only after first frozen L6 pCID, or migration only after dogfood
+  tooling exists.
+
+## Acceptance criteria
+
+- Historical message bytes remain immutable.
+- Old and new identities have a documented relationship.
+- The first CAS-backed group-session specimen can be created without implying
+  that grid-envelope variants or existing `.txt` specimens have been selected
+  or superseded.
 
 ## Notes
 

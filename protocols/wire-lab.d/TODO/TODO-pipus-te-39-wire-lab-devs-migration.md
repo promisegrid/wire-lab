@@ -55,12 +55,26 @@ What goes into TE-numan? Now answered by 2026-05-05 TE-numan merge: TE-numan
 became transport-protocol migration invariants; the
 promisebase-integration scope moved to TE-43.
 
+## Subtasks
+
+- [ ] pipus.1 Answer `DR-gabif` / DF-gabif.1 through DF-gabif.4 before drafting
+  the first additive CAS-backed group-session migration contract. Source:
+  `DI-majib`.
+- [ ] pipus.2 If `DR-gabif` selects a migration shape that depends on concrete
+  L6 profile details, block execution on `DR-tumus` rather than inventing a
+  placeholder CAS profile.
+- [ ] pipus.3 After `DR-gabif` is decided, update
+  `SIM-jurar-cas-backed-group-session` with the chosen migration disposition
+  and preserve existing `.txt` message bytes unchanged.
+
 ## Question log
 
 - 2026-05-17: `DR-gabif` asks what additive migration contract TODO-pipus
   should use to move from historical inline `.txt` evidence to a CAS-backed
   group-session specimen without rewriting existing message bytes. Source:
   `DI-davov`.
+- 2026-05-17: `DR-gabif` now has an unanswered next-DF packet and acceptance
+  criteria for the first migration decision pass. Source: `DI-majib`.
 
 ## Decision Intent Log
 

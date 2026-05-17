@@ -125,6 +125,9 @@ promise-accounting scheme from their existence. Source: `DI-navod`.
 | Simulation | What it is for | Guide-writer status |
 |---|---|---|
 | `simulations/SIM-jomag-cas-object-model/` | Tests L6 CAS object-model questions: deterministic CBOR / DAG-CBOR, pointer objects, chunking parameters, CIDv1 codec object typing, and promisebase / pitbase prior-art pressure. | Provisional design-point evidence. |
+| `simulations/SIM-bobud-l6-cas-starting-profile-bakeoff/` | Tests which first L6 CAS starting profile should be evaluated; its synthesis now feeds the answerable `DR-tumus` packet. | Provisional design-point evidence. |
+| `simulations/SIM-kohad-cas-object-type-binding-bakeoff/` | Tests CAS object type-binding choices, including path suffixes as a negative control; its synthesis now feeds the answerable `DR-tumus` packet. | Provisional design-point evidence. |
+| `simulations/SIM-gobaz-chunking-identity-bakeoff/` | Tests chunking identity choices, including pCID-driven and chunking-CID / cCID-style alternatives as exploratory terms; its synthesis now feeds the answerable `DR-tumus` packet. | Provisional design-point evidence. |
 | `simulations/SIM-zazit-chunk-feed-replication/` | Tests the turn-177 inversion where L5 feeds advertise, request, and replicate CAS chunks between sparse sites rather than carrying group messages. | Provisional design-point evidence. |
 | `simulations/SIM-jurar-cas-backed-group-session/` | Tests a successor group-session shape where L7 group semantics point at L6 CAS roots and pointer objects without rewriting historical `.txt` specimens. | Provisional design-point evidence. |
 | `simulations/SIM-rusap-promise-accounting-records/` | Tests peer-local promise accounting records for pull, keep, advertise, refusal, and 100-year mental-model pressure without defining a central accounting authority. | Provisional design-point evidence. |
@@ -133,7 +136,11 @@ Open turn-177 decision records: `DR-tumus` owns the concrete L6 CAS adoption
 question, `DR-gabif` owns additive CAS-backed group-session migration, and
 `DR-robon` owns the turn-177 spec-shape requirement question. Guide prose should
 treat those areas as unsettled until the DRs close and their linked DIs land.
-Source: `DI-davov`.
+Each DR now has an unanswered next-DF packet and acceptance criteria for its
+owner TODO. `DR-tumus` DF-tumus.1 through DF-tumus.3 were additionally routed
+through the three `DI-bukoh` bakeoff sims, then synthesized by `DI-molah` into
+the current answerable packet. Source: `DI-davov`; `DI-majib`; `DI-bukoh`;
+`DI-molah`.
 
 ## Grid-Envelope Variant Simulations
 
@@ -336,7 +343,8 @@ final normative references. Source: `DI-zalak`.
 - `DR-davod` — decides the stable kernel-developer porting boundary and
   conformance target.
 - `DR-tumus` — decides the concrete L6 CAS adoption profile exposed by turn
-  177.
+  177; DF-tumus.1 through DF-tumus.3 now include the `DI-molah` synthesis of
+  the `DI-bukoh` bakeoff simulations.
 - `DR-gabif` — decides additive migration from historical inline group-session
   evidence to CAS-backed group-session specimens.
 - `DR-robon` — decides whether turn-177 promise-vocabulary, 100-year, and

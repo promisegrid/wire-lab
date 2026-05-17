@@ -789,3 +789,30 @@ spec-doc-shape requirements. This backfill does not reopen any `TODO-lilar`
 group-session migration, and `DR-robon` for spec-shape requirements. This keeps
 `TODO-lilar` closed for `UT-177.*` rows while preserving explicit open decision
 records for the successor owners.
+
+### 2026-05-17 — Turn-177 DF-packet backfill
+
+`DI-majib` adds unanswered next-DF packets and acceptance criteria to
+`DR-tumus`, `DR-gabif`, and `DR-robon`, then adds owner TODO subtasks under
+TODO-kituj, TODO-pipus, and TODO-kulih. This does not answer the DRs or close
+turn 177; it makes the remaining cleanup work directly actionable.
+
+### 2026-05-17 — Turn-177 DR-tumus simulation expansion
+
+`DI-bukoh` routes `DR-tumus` DF-tumus.1 through DF-tumus.3 through three
+standalone bakeoff simulations before the final TE-43 answers are requested:
+`SIM-bobud-l6-cas-starting-profile-bakeoff`,
+`SIM-kohad-cas-object-type-binding-bakeoff`, and
+`SIM-gobaz-chunking-identity-bakeoff`. This preserves the closed `TODO-lilar`
+state for `UT-177.*`, keeps the concrete decision in `DR-tumus`, and records
+Steve's pCID / chunking-CID / cCID question as exploratory simulation pressure
+rather than settled terminology.
+
+### 2026-05-17 — Turn-177 DR-tumus synthesis
+
+`DI-molah` synthesizes the three `DI-bukoh` bakeoff simulations into the current
+answerable `DR-tumus` packet. The synthesis recommends minimal pointer/raw first
+profile, CID codec authority with path suffixes rejected, raw-only first
+profile, and promisebase / pitbase as prior art only. This does not answer or
+close `DR-tumus`; it removes the sim-review blocker so Steve can answer the
+packet directly.

@@ -110,7 +110,7 @@ this session's `TODO-juhub` replay cadence.
 
 ID: DI-nijod
 Date: 2026-05-10 13:45:42
-Status: active
+Status: superseded
 Author: stevegt@t7a.org (Steve Traugott)
 Decision: Every per-turn replay response must include an explicit `Work
 pending` line near the bottom.
@@ -124,6 +124,26 @@ work remains because the related loose ends are absent, closed, retired, or
 transferred. This line is a report field; it does not itself close work.
 Affects: `protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewalk.md`;
 this session's `TODO-juhub` replay responses.
+
+ID: DI-firap
+Date: 2026-05-17 10:49:50
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Interpret `Work pending` as recovery-walkthrough pending work, not as
+all downstream design work. If a turn's loose ends are fully captured in sim
+questions for PromiseGrid design or TODOs for harness work, mark `Work pending:
+no`.
+Intent: The recovery walkthrough should close replay accountability once the
+right downstream container exists. Running sims, answering PromiseGrid design
+questions, or completing harness TODOs is follow-on work; it should not force
+the same historical turn to remain pending after capture.
+Constraints: `Work pending: yes` only when the recovery walkthrough still lacks
+a sufficient downstream container or still needs a turn-local cleanup decision.
+`Work pending: no` does not mean downstream design or harness work is done; it
+means the loose end has been captured in the proper sim question or TODO owner.
+Affects: `protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewalk.md`;
+this session's `TODO-juhub` replay responses.
+Supersedes: DI-nijod (`Work pending` yes/no semantics only)
 
 ID: DI-vumir
 Date: 2026-05-16 10:17:35
@@ -198,7 +218,9 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - `Related UTs / owners`
 - `Owner/doc cleanup`
 - `Remaining decisions or work`
-- `Work pending: yes|no`
+- `Work pending: yes|no` — use `no` when loose ends are fully captured in sim
+  questions for PromiseGrid design or TODOs for harness work; use `yes` only
+  when replay cleanup still needs a downstream container or turn-local decision.
 - `Proposed disposition`
 - `Write needed? yes/no`
 - `Next`: name the next chronological turn; do not request separate approval
@@ -1542,7 +1564,15 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
   message bytes or TE bodies were edited. A third cleanup pass filed scoped DRs:
   `DR-tumus` for concrete L6 CAS adoption, `DR-gabif` for additive CAS-backed
   group-session migration, and `DR-robon` for turn-177 spec-shape requirements.
-  Source: `DI-navod`; `DI-pator`; `DI-davov`.
+  A fourth pass added unanswered next-DF packets and acceptance criteria to
+  those DRs, then added owner TODO subtasks so the next cleanup does not need to
+  re-derive the question shape. A fifth pass routed `DR-tumus` DF-tumus.1
+  through DF-tumus.3 through three standalone bakeoff simulations for starting
+  profile, CAS object type binding, and chunking identity after Steve asked for
+  sims instead of direct answers. A sixth pass synthesized those bakeoff sims
+  back into `DR-tumus` as a final answerable packet with recommended defaults,
+  but did not answer or close the DR. Source: `DI-navod`; `DI-pator`;
+  `DI-davov`; `DI-majib`; `DI-bukoh`; `DI-molah`.
 - `Remaining decisions or work` TODO-kituj / TE-43 remains open for concrete L6
   CAS adoption: deterministic CBOR profile, allowed tags, chunking algorithm and
   parameters, CIDv1 codec/object typing, and promisebase prior-art stance.
@@ -1552,8 +1582,14 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
   obligations. The new `DI-navod` simulations make these workstreams visible as
   specimen pressure, and `DI-pator` scenario matrices make them actionable, but
   the concrete TE/DF/DI decisions remain open through `DR-tumus`, `DR-gabif`,
-  and `DR-robon`. TE-domat / DR-nugog remains open for root layout.
-- `Work pending` yes.
+  and `DR-robon`; `DI-majib` makes each DR answerable with explicit DF packets.
+  `DI-bukoh` added the evidence step for `DR-tumus` DF-tumus.1 through
+  DF-tumus.3, and `DI-molah` removes that sim-review blocker by synthesizing
+  the bakeoffs into the current `DR-tumus` packet. For recovery-walkthrough
+  purposes, these loose ends are captured in sim questions or TODO owners even
+  though the downstream design work remains open. TE-domat / DR-nugog remains
+  open for root layout.
+- `Work pending` no.
 - `Proposed disposition` `resolved/transferred after TE-sihih scope contraction, TE-43 CAS-owner routing, and TODO-kulih spec-shape routing`
 - `Write needed? yes/no` `no` further turn-177 write is needed after this pass.
 - `Next` Turn 178 is next.

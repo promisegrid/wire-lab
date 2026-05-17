@@ -17,8 +17,12 @@ remains undrafted. The simulation-facing CAS object-model pressure from turn
 chunk movement pressure in `simulations/SIM-zazit-chunk-feed-replication/`;
 their `SCENARIOS.md` files make the object-model and chunk-replication pressure
 concrete. Those simulations are inputs to this TODO, not replacements for
-TE-43's DF/DI path. Source: TE-sihih; TODO-vunub Q-22.6; `DI-navod`;
-`DI-pator`. The concrete decision request is now `DR-tumus`. No twig yet.
+TE-43's DF/DI path. Three narrower `DR-tumus` bakeoff sims now test the
+starting-profile, object-type-binding, and chunking-identity choices before the
+DF is asked again, and their synthesis now lives in the final answerable
+`DR-tumus` packet. Source: TE-sihih; TODO-vunub Q-22.6; `DI-navod`;
+`DI-pator`; `DI-bukoh`; `DI-molah`. The concrete decision request is now
+`DR-tumus`. No twig yet.
 
 ## Threads absorbed from OPEN-THREADS.md
 
@@ -50,6 +54,13 @@ Scope:
     CBOR agreement, DAG-CBOR interop, CIDv1 object typing, pointer-object
     identity, chunker parameter mismatch, sparse advertisement, partial Merkle
     fetch, corrupt chunks, and carrier independence (DI-pator).
+  - Use `SIM-bobud-l6-cas-starting-profile-bakeoff`,
+    `SIM-kohad-cas-object-type-binding-bakeoff`, and
+    `SIM-gobaz-chunking-identity-bakeoff` before answering `DR-tumus`
+    DF-tumus.1 through DF-tumus.3. Their synthesis now recommends minimal
+    pointer/raw first profile, CID codec authority with path suffixes rejected,
+    raw-only first profile, and promisebase / pitbase as prior art only, while
+    leaving the actual decision to Steve (DI-bukoh; DI-molah).
   - Fix the import-path error (UT-181.a: t7a/pitbase ->
     stevegt/promisebase).
   - Address fuse/ test failures and cmd/pb Docker SDK rot (UT-184.e/g).
@@ -69,12 +80,36 @@ prototype" -- needs to be either ratified by a TE or formalized as a
 canon rule somewhere readers will find. TE-43 is the natural home
 since it locks the prototype-not-canon stance.
 
+## Subtasks
+
+- [ ] kituj.1 Answer `DR-tumus` / DF-tumus.1 through DF-tumus.4 before drafting
+  TE-43's concrete L6 CAS profile. The current answerable packet is in
+  `DR-tumus` after `DI-molah` synthesis. Source: `DI-majib`; `DI-bukoh`;
+  `DI-molah`.
+- [ ] kituj.2 After `DR-tumus` is decided, write the TE-43 DI(s) for CBOR /
+  DAG-CBOR profile, CIDv1 object typing, pointer-object shape, chunking scope,
+  and promisebase / pitbase stance.
+- [ ] kituj.3 Update `SIM-jomag-cas-object-model` and
+  `SIM-zazit-chunk-feed-replication` with forward pointers to the TE-43 result
+  once the DR/DI path lands.
+- [x] kituj.4 Review `SIM-bobud-l6-cas-starting-profile-bakeoff`,
+  `SIM-kohad-cas-object-type-binding-bakeoff`, and
+  `SIM-gobaz-chunking-identity-bakeoff`, then revise `DR-tumus` DF-tumus.1
+  through DF-tumus.3 into final answerable choices. Done via `DI-molah`.
+
 ## Question log
 
 - 2026-05-17: `DR-tumus` asks which concrete L6 CAS profile TE-43 should lock:
   CBOR / DAG-CBOR profile, CIDv1 codec object typing, pointer-object shape,
   chunking algorithm and parameters, and promisebase / pitbase adoption stance.
   Source: `DI-davov`.
+- 2026-05-17: `DR-tumus` now has an unanswered next-DF packet and acceptance
+  criteria for the first TE-43 decision pass. Source: `DI-majib`.
+- 2026-05-17: DF-tumus.1 through DF-tumus.3 are routed through three standalone
+  bakeoff simulations before final answers are requested. Source: `DI-bukoh`.
+- 2026-05-17: The three bakeoff simulations were synthesized into final
+  answerable `DR-tumus` choices, but `DR-tumus` remains open for Steve's actual
+  decision. Source: `DI-molah`.
 
 ## Decision Intent Log
 

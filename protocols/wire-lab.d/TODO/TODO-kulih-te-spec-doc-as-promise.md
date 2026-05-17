@@ -20,6 +20,8 @@ Track the work to drive TE-21 (`docs/thought-experiments/TE-20260429-173520-spec
 - [ ] 010.7 If 010.3 lands as 3.a (structured), surface the peer adoption metadata as a future TE (TE-lozip placeholder) so the wire shape can be designed.
 - [ ] 010.8 Open TE-rujak (spec-doc-store layout) on a fresh twig once TE-nibar / TODO-kulih vocabulary is locked.
 - [ ] 010.9 Decide whether protocol specs require layer-specific promise-vocabulary sections, 100-year pressure-test sections, and layperson-readable mental-model / easy-implementation summaries. This absorbs turn-177's `UT-177.e`, `UT-177.f`, and `UT-177.i` spec-shape fallout; TE-dajot remains the citable 100-year constraint while this TODO owns whether those obligations become required spec sections. `SIM-rusap-promise-accounting-records` now carries the simulation-facing peer-local promise-accounting and mental-model pressure that should inform this decision, without replacing TE-nibar's DF/DI path. Its `SCENARIOS.md` file adds concrete cases for kept promises, refusal, corruption, cross-layer decisions, sparse retention, identity rotation, and layperson explanation. `DR-robon` now owns the explicit decision request for this turn-177 spec-shape addition. Source: `DI-navod`; `DI-pator`; `DI-davov`.
+- [ ] 010.10 Answer `DR-robon` / DF-robon.1 through DF-robon.4 before closing
+  010.9. Source: `DI-majib`.
 
 ## Question log
 
@@ -27,6 +29,8 @@ Track the work to drive TE-21 (`docs/thought-experiments/TE-20260429-173520-spec
   require layer-specific promise-vocabulary sections, 100-year pressure-test
   sections, and layperson-readable mental-model / easy-implementation
   summaries. Source: `DI-davov`.
+- 2026-05-17: `DR-robon` now has an unanswered next-DF packet and acceptance
+  criteria for deciding 010.9. Source: `DI-majib`.
 
 ## Decision Intent Log
 
