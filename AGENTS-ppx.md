@@ -415,12 +415,20 @@ DI-021-20260507-212250 in TODO-lilar.)
 Redact secrets in every summary, walk note, TURNOVER, commit message,
 DR, DI, and TE. Use the placeholder form `{{SECRET:<short-name>}}`
 (for example, `{{SECRET:gh-pat}}`) — never echo PAT bytes, OAuth
-tokens, signing keys, or other credential material into any artifact.
+tokens, signing keys, or other credential material into any artifact,
+including carry-over and handoff summaries. Before emitting a summary,
+redact known token patterns and preserve only a stable marker that can
+be re-resolved from the secret store. Keep credentials separated by
+remote/repo: store each token under a distinct secret name/path, source
+only the intended token for the current remote, and use a per-invocation
+credential helper or equivalent isolation so credentials do not leak
+between remotes. When requesting or recommending a fine-grained PAT,
+ask for the shortest practical expiry and smallest practical scope.
 Before any operation that requires a write-scope token, verify the
-token's scope and expiry; filename suffixes are documentation, not
-enforcement. If a token has insufficient scope or has expired, stop
-and ask Steve rather than retry. (See DI-021-20260507-212251 in
-TODO-lilar.)
+token's actual scope and expiry; filename suffixes such as `readonly`
+are documentation, not enforcement. If a token has insufficient scope
+or has expired, stop and ask Steve rather than retry. (See
+DI-021-20260507-212251 in TODO-lilar; DI-lifub.)
 
 ## B2 — Foreground DONE confirmation
 

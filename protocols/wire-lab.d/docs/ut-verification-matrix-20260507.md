@@ -923,3 +923,13 @@ refactor, partial-rot, dependency-target, and test-threshold inputs. `UT-184.f`
 is routed to TODO-rajig and `SIM-haros` as RFC-1005 promise-economy prior-art
 pressure. This does not lock any of the turn-184 flat DF list and does not use
 `TODO-lilar` checkboxes as closure authority.
+
+### 2026-05-17 — Turn-185 closure / transfer pointer
+
+`DI-lifub` reconciles turn 185's two-PAT operational pattern. `UT-185.a`,
+`UT-185.b`, and `UT-185.c` are routed to AGENTS-ppx B4, which now requires
+per-remote credential separation, shortest-practical expiry guidance for
+fine-grained PATs, actual scope/expiry verification rather than filename-based
+read-only assumptions, and redaction of known token patterns before carry-over or
+handoff summaries are emitted. This does not touch runtime secret paths and does
+not use `TODO-lilar` checkboxes as closure authority.

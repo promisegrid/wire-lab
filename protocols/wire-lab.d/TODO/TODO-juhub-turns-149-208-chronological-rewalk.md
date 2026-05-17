@@ -451,6 +451,29 @@ Affects: `protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewal
 `DEV-GUIDE-RESOURCES.md`;
 `AGENTS-ppx.md`.
 
+ID: DI-lifub
+Date: 2026-05-17 14:27:25
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Route turn-185's two-PAT operational pattern and credential-hygiene
+loose ends into AGENTS-ppx B4 rather than leaving them only in replay notes.
+Intent: Turn 185 correctly established that separate wire-lab and promisebase
+PATs can be held and used in one session, but the answer under-specified three
+durable safeguards: short expiry as part of fine-grained PAT guidance, actual
+scope/expiry verification rather than filename-based read-only conventions, and
+redaction of secret bytes from carry-over or handoff summaries. The credential
+rule needs to say those things directly because later turns depend on the
+two-token pattern.
+Constraints: Do not record or echo PAT bytes. Do not touch `.secrets/` or any
+runtime credential path in this replay pass. Do not flip TODO-lilar UT
+checkboxes. Treat per-remote token separation, short practical expiry, actual
+scope/expiry verification, filename suffixes as non-enforcement, and summary
+redaction as the closed process rule for turn 185.
+Affects: `AGENTS-ppx.md`;
+`protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewalk.md`;
+`protocols/wire-lab.d/TODO/TODO-lilar-session-replay-cleanup.md`;
+`protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`.
+
 ## Why a separate TODO
 
 `TODO-lilar` already records the original historical walk through turn 192 and
@@ -690,7 +713,7 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - [x] juhub.182 Turn 182 raw-log rewalk plus later-turn and later-artifact sweep.
 - [x] juhub.183 Turn 183 raw-log rewalk plus later-turn and later-artifact sweep.
 - [x] juhub.184 Turn 184 raw-log rewalk plus later-turn and later-artifact sweep.
-- [ ] juhub.185 Turn 185 raw-log rewalk plus later-turn and later-artifact sweep.
+- [x] juhub.185 Turn 185 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.186 Turn 186 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.187 Turn 187 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.188 Turn 188 raw-log rewalk plus later-turn and later-artifact sweep.
@@ -2426,3 +2449,56 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - `Proposed disposition` `resolved/transferred after code-first promisebase audit, process-rule routing, RFC-1005 sim capture, and TE-43 prior-art routing`
 - `Write needed? yes/no` `no` further turn-184 write is needed after this pass.
 - `Next` Turn 185 is next.
+
+### Turn 185 — 2026-05-04 14:28 UTC
+
+- `Turn 185 plain-English recap` Steve asked whether the assistant could hold and
+  use two different GitHub PATs in the same session, one for wire-lab and one for
+  promisebase. The assistant answered yes and described a concrete operating
+  pattern: keep separate secret files or secret names for each repo, use the
+  correct token only for the matching remote, invoke the Git credential helper
+  per command rather than installing a shared credential, and keep the same bot
+  identity while separating the token material by repo. The assistant also
+  recommended fine-grained PATs scoped narrowly to the target repo, especially for
+  promisebase where the immediate need was to push the already-prepared
+  randStream fix. The answer was directionally right and turn 186 uses the
+  pattern successfully, but it missed three durable safeguards. First, when
+  recommending a fine-grained PAT, the assistant should also recommend a short
+  practical expiry so leaked or echoed context becomes stale quickly. Second,
+  labeling a file `readonly` is only a convention; actual token scope and expiry
+  need to be verified before a write operation. Third, the assistant acknowledged
+  that a wire-lab PAT had appeared in carry-over context, but did not state the
+  redaction mechanism that should apply to all summaries, handoffs, walk notes,
+  and commit messages. Later turn 186 confirms the redaction lesson by recording
+  the promisebase PAT only as a secret marker, not as literal bytes. The durable
+  conclusion is process-level: multiple repo-scoped credentials are allowed only
+  with per-remote separation, shortest-practical expiry, actual scope/expiry
+  verification, and strict secret redaction.
+- `Existing capture` `TODO-lilar` records `UT-185.a` for missing short-expiry
+  guidance, `UT-185.b` for the non-enforced read-only filename convention, and
+  `UT-185.c` for PAT bytes echoing into carry-over summaries without a stated
+  redaction mechanism. AGENTS-ppx B4 already covered secret redaction and
+  scope/expiry checks, but it did not yet say per-remote separation,
+  shortest-practical expiry, summary redaction before emission, or filename
+  suffixes as non-enforcement as explicitly as turn 185 requires.
+- `Gaps or contradictions` The assistant's operational answer worked in practice,
+  because turn 186 uses the promisebase PAT without intentionally crossing it
+  with the wire-lab token. The gap was defensive rigor, not functional capability:
+  token separation must be enforced by command structure and verification, not by
+  memory or filenames, and persistent context must never carry literal token
+  bytes forward.
+- `Related UTs / owners` `UT-185.a`, `UT-185.b`, and `UT-185.c` are all routed to
+  AGENTS-ppx B4 as a closed process rule. `UT-186.a` will later be processed as
+  the first concrete application of this redaction rule, but it does not need a
+  separate turn-185 owner.
+- `Owner/doc cleanup` Done. Added `DI-lifub`; expanded AGENTS-ppx B4; added this
+  turn-185 report; marked `juhub.185` complete; and added a turn-185 transfer
+  pointer to the UT verification matrix. No `TODO-lilar` UT checkbox was flipped.
+- `Remaining decisions or work` No downstream decision remains for turn 185:
+  credential storage path choices and actual PAT use are runtime operations, and
+  the durable policy is now captured in AGENTS-ppx B4. For
+  recovery-walkthrough purposes, turn 185 has no uncaptured loose end.
+- `Work pending` no.
+- `Proposed disposition` `resolved/transferred after two-PAT process rule, short-expiry guidance, scope verification, and redaction-rule capture`
+- `Write needed? yes/no` `no` further turn-185 write is needed after this pass.
+- `Next` Turn 186 is next.
