@@ -338,6 +338,34 @@ Affects: `protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewal
 `protocols/wire-lab.d/TODO/TODO-kituj-te-43-promisebase-prior-art-adoption.md`;
 `protocols/wire-lab.d/TODO/TODO-dozak-te-44-wire-lab-promisebase-merge-trajectory.md`.
 
+ID: DI-zarok
+Date: 2026-05-17 14:05:30
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Route turn-181's promisebase `db/` audit findings to the existing
+TE-43 / `DR-tumus` CAS-profile owner, the CAS-object and chunking simulations,
+and the later promisebase regression-fix evidence.
+Intent: Turn 181 produced useful code-first evidence about pitbase's implemented
+CAS/Merkle/Rabin primitives, but it also introduced a wrong import path and an
+over-strong working frame that wire-lab could adopt promisebase `db/` directly as
+L6 substrate. The replay must preserve the evidence while routing unresolved
+choices to the current owner artifacts and later corrections: correct repo path,
+chunking parameters, type binding, pointer-object shape, test-status threshold,
+and promisebase-as-prior-art rather than authority.
+Constraints: Do not answer `DR-tumus` here. Do not make promisebase or pitbase
+authoritative. Do not flip TODO-lilar UT checkboxes. Treat turn 181's
+`github.com/t7a/pitbase/db` import-path claim as wrong; use
+`github.com/stevegt/promisebase/db` when an import path is actually needed.
+Affects: `protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewalk.md`;
+`protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`;
+`protocols/wire-lab.d/TODO/TODO-lilar-session-replay-cleanup.md`;
+`protocols/wire-lab.d/TODO/TODO-kituj-te-43-promisebase-prior-art-adoption.md`;
+`DR/DR-tumus-turn-177-l6-cas-adoption.md`;
+`simulations/SIM-jomag-cas-object-model/`;
+`simulations/SIM-gobaz-chunking-identity-bakeoff/`;
+`simulations/SIM-bobud-l6-cas-starting-profile-bakeoff/`;
+`simulations/SIM-kohad-cas-object-type-binding-bakeoff/`.
+
 ## Why a separate TODO
 
 `TODO-lilar` already records the original historical walk through turn 192 and
@@ -573,7 +601,7 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - [x] juhub.178 Turn 178 raw-log rewalk plus later-turn and later-artifact sweep.
 - [x] juhub.179 Turn 179 raw-log rewalk plus later-turn and later-artifact sweep.
 - [x] juhub.180 Turn 180 raw-log rewalk plus later-turn and later-artifact sweep.
-- [ ] juhub.181 Turn 181 raw-log rewalk plus later-turn and later-artifact sweep.
+- [x] juhub.181 Turn 181 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.182 Turn 182 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.183 Turn 183 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.184 Turn 184 raw-log rewalk plus later-turn and later-artifact sweep.
@@ -2035,3 +2063,77 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - `Proposed disposition` `resolved/transferred after code-first correction, prototype-not-authority routing, independent-design-path routing, and process-rule capture`
 - `Write needed? yes/no` `no` further turn-180 write is needed after this pass.
 - `Next` Turn 181 is next.
+
+### Turn 181 — 2026-05-04 05:00 UTC
+
+- `Turn 181 plain-English recap` Steve selected the code-first path from turn 180
+  and narrowed the scope with the instruction to read the code and focus on the
+  `db/` directory. The assistant audited promisebase `db/` and reported that it
+  is pitbase: a real content-addressable, deduplicating Merkle storage layer with
+  blocks, trees, streams, path handling, WORM files, and Rabin content-defined
+  chunking. The audit found concrete pieces: an on-disk `Db` rooted in `block/`,
+  `tree/`, and `stream/`; WORM files whose hash covers a class header plus body;
+  blocks as leaf bytes; trees as newline-separated child paths; streams as
+  symlinks to tree roots rewritten atomically; path parsing and 3-hex fanout;
+  Rabin chunking defaults of 512 KiB minimum and 8 MiB maximum; and an object
+  interface shared by blocks and trees. It also found important absences:
+  pitbase does not implement CIDv1 / multibase / multihash codec fields,
+  deterministic CBOR or DAG-CBOR tree objects, the five-element CBOR message
+  format, networking, group semantics, or content-addressed pointer files. The
+  assistant reported 15 of 17 tests passing, with `TestPutStreamBig` and
+  `TestPutStreamSmall` failing in the chunker / Merkle-builder integration path.
+  It ended by offering to dig into `chunker_test.go:106`. Later turns update this
+  turn in several ways. Turn 182 confirms the failing tests were regressions;
+  turn 183 fixes them in promisebase and gets the relevant `db/` path to 17/17
+  green; turn 184 broadens the audit beyond `db/` and shows that `db/` and
+  `kv/fs/` are the useful implemented evidence while several other promisebase
+  surfaces are broken or design-only; turn 191 makes promisebase prototype
+  evidence rather than authority; and the current `DR-tumus` packet recommends
+  using promisebase / pitbase as prior art only for the first L6 CAS spec rather
+  than adopting it as substrate before the PromiseGrid pointer/raw profile is
+  decided. The turn-181 answer also contained a concrete error: it suggested
+  `github.com/t7a/pitbase/db`, but the correct repository path is
+  `github.com/stevegt/promisebase/db`.
+- `Existing capture` `TODO-lilar` records six related rows. `UT-181.a` flags the
+  bad import path. `UT-181.b` flags the chunking-parameter mismatch between
+  pitbase Rabin defaults and the earlier FastCDC-style small-chunk proposal.
+  `UT-181.c` flags the two failing tests in the exact `PutStream` path wire-lab
+  would care about. `UT-181.d` flags pitbase's class-header hashing as analogous
+  to CIDv1 codec type binding. `UT-181.e` flags pitbase streams-as-symlinks as
+  prior art for the pointer-file design. `UT-181.f` records the positive cadence
+  lesson that the assistant offered a concrete next step and Steve's next terse
+  response implicitly accepted it. TODO-kituj already owns the concrete TE-43
+  promisebase / pitbase prior-art adoption question; `DR-tumus` is open with
+  answerable DFs for starting profile, type binding, chunking lock scope, and
+  promisebase stance; `SIM-jomag`, `SIM-gobaz`, `SIM-bobud`, and `SIM-kohad`
+  contain the relevant simulation pressure.
+- `Gaps or contradictions` The main contradiction is that turn 181's working
+  frame was still too adoption-heavy. It correctly distinguished real `db/` code
+  from design-only promisebase docs, but it treated direct `db/` dependency as a
+  likely L6 substrate path. Later turn 191 and `DR-tumus` narrow that: pitbase is
+  useful evidence, but the first PromiseGrid CAS profile should decide pointer
+  objects, type binding, chunking scope, and adoption stance before treating
+  promisebase as a substrate. The wrong import path must also be suppressed in
+  later TE/DR prose.
+- `Related UTs / owners` `UT-181.a` is routed to TODO-kituj's import-path
+  correction and this turn note's explicit correction. `UT-181.b`, `UT-181.d`,
+  and `UT-181.e` are routed to TODO-kituj / `DR-tumus` plus `SIM-jomag`,
+  `SIM-gobaz`, `SIM-bobud`, and `SIM-kohad`. `UT-181.c` is satisfied for replay
+  by the turn-183 promisebase fix and remains as evidence in TODO-kituj /
+  `DR-tumus` for deciding what test-status threshold is enough before adoption.
+  `UT-181.f` is a recorded cadence lesson paired with `UT-182.c`; it does not need
+  a new owner before turn 182 is processed.
+- `Owner/doc cleanup` Done. Added `DI-zarok`; added this turn-181 report; marked
+  `juhub.181` complete; and added a turn-181 transfer pointer to the UT
+  verification matrix. No `TODO-lilar` UT checkbox was flipped.
+- `Remaining decisions or work` Downstream work remains open, but it is captured:
+  TODO-kituj / `DR-tumus` own the CAS profile, chunking, type-binding,
+  pointer-object, test-threshold, and promisebase / pitbase stance decisions; the
+  CAS and chunking simulations preserve the design pressure; turn 183 supplies
+  the regression-fix evidence; and turn 182 will separately process the
+  implicit-yes cadence lesson. For recovery-walkthrough purposes, turn 181 has no
+  uncaptured loose end.
+- `Work pending` no.
+- `Proposed disposition` `resolved/transferred after promisebase db audit routing, import-path correction, CAS-profile owner routing, and later regression-fix evidence`
+- `Write needed? yes/no` `no` further turn-181 write is needed after this pass.
+- `Next` Turn 182 is next.

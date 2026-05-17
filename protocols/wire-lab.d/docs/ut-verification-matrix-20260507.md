@@ -876,3 +876,15 @@ purposes by the corrected turn-180 note in TODO-juhub. `UT-180.d` is captured by
 AGENTS-ppx B6 and `DI-021-20260507-212254`. This does not answer downstream
 promisebase adoption or convergence questions and does not use `TODO-lilar`
 checkboxes as closure authority.
+
+### 2026-05-17 — Turn-181 closure / transfer pointer
+
+`DI-zarok` reconciles turn 181's promisebase `db/` audit. `UT-181.a` is routed
+to TODO-kituj's import-path correction and the corrected turn-181 replay note.
+`UT-181.b`, `UT-181.d`, and `UT-181.e` are captured by TODO-kituj / `DR-tumus`
+and the CAS-object / chunking / starting-profile / object-type-binding
+simulations. `UT-181.c` is satisfied for replay by the later turn-183
+promisebase fix while remaining evidence for TODO-kituj / `DR-tumus` test-status
+threshold decisions. `UT-181.f` is a recorded cadence lesson paired with
+`UT-182.c`. This does not answer `DR-tumus` and does not use `TODO-lilar`
+checkboxes as closure authority.
