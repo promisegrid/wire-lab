@@ -5,6 +5,8 @@ from peer-local social assessment to transferable capability-token marketplaces
 with floating exchange rates, and that the cryptocurrency-like end of that
 spectrum could go badly wrong. It is a standalone design-point simulation, not a
 final economics mechanism and not a central trust ledger. Source: `DI-vabij`.
+TODO owner: `protocols/wire-lab.d/TODO/TODO-rajig-promise-economy-spectrum.md`.
+Source: `DI-pidag`.
 
 ## Question
 

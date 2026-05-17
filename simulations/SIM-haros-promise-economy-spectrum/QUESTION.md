@@ -4,6 +4,9 @@ How can PromiseGrid test different promise-economy mechanisms without making
 the wire format, group semantics, feed behavior, or CAS policy prematurely
 commit to one economic model? Source: `DI-vabij`.
 
+TODO owner: `protocols/wire-lab.d/TODO/TODO-rajig-promise-economy-spectrum.md`.
+Source: `DI-pidag`.
+
 Open decision points:
 
 - What is the minimum protocol surface that supports peer-local promise
