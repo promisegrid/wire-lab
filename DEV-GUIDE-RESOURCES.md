@@ -125,12 +125,14 @@ promise-accounting scheme from their existence. Source: `DI-navod`.
 | Simulation | What it is for | Guide-writer status |
 |---|---|---|
 | `simulations/SIM-jomag-cas-object-model/` | Tests L6 CAS object-model questions: deterministic CBOR / DAG-CBOR, pointer objects, chunking parameters, CIDv1 codec object typing, and promisebase / pitbase prior-art pressure. | Provisional design-point evidence. |
+| `simulations/SIM-ligan-promisebase-reference-naming/` | Tests the turn-178 promisebase human-readable reference-symbol / hash-name-resolution question as its own reference-naming lineage, separate from CAS byte-shape decisions. | Provisional design-point evidence. |
 | `simulations/SIM-bobud-l6-cas-starting-profile-bakeoff/` | Tests which first L6 CAS starting profile should be evaluated; its synthesis now feeds the answerable `DR-tumus` packet. | Provisional design-point evidence. |
 | `simulations/SIM-kohad-cas-object-type-binding-bakeoff/` | Tests CAS object type-binding choices, including path suffixes as a negative control; its synthesis now feeds the answerable `DR-tumus` packet. | Provisional design-point evidence. |
 | `simulations/SIM-gobaz-chunking-identity-bakeoff/` | Tests chunking identity choices, including pCID-driven and chunking-CID / cCID-style alternatives as exploratory terms; its synthesis now feeds the answerable `DR-tumus` packet. | Provisional design-point evidence. |
 | `simulations/SIM-zazit-chunk-feed-replication/` | Tests the turn-177 inversion where L5 feeds advertise, request, and replicate CAS chunks between sparse sites rather than carrying group messages. | Provisional design-point evidence. |
 | `simulations/SIM-jurar-cas-backed-group-session/` | Tests a successor group-session shape where L7 group semantics point at L6 CAS roots and pointer objects without rewriting historical `.txt` specimens. | Provisional design-point evidence. |
 | `simulations/SIM-rusap-promise-accounting-records/` | Tests peer-local promise accounting records for pull, keep, advertise, refusal, and 100-year mental-model pressure without defining a central accounting authority. | Provisional design-point evidence. |
+| `simulations/SIM-punaz-bgp-class-routing-app/` | Tests turn-178 BGP-class routing-policy application pressure as a standalone L7 app question rather than a generic promise-accounting example. | Provisional design-point evidence. |
 
 Open turn-177 decision records: `DR-tumus` owns the concrete L6 CAS adoption
 question, `DR-gabif` owns additive CAS-backed group-session migration, and
@@ -141,6 +143,16 @@ owner TODO. `DR-tumus` DF-tumus.1 through DF-tumus.3 were additionally routed
 through the three `DI-bukoh` bakeoff sims, then synthesized by `DI-molah` into
 the current answerable packet. Source: `DI-davov`; `DI-majib`; `DI-bukoh`;
 `DI-molah`.
+
+Turn 178 adds guide-facing pressure but does not make new guide prose settled.
+`DI-vaguf` / `DI-lusum` / `DI-tibis` route sparse-CAS, pull-decision,
+BGP-class app, group-identity, promisebase reference-naming, multi-repo
+site-topology, and capture-resistance narrative points into sims, TODO owners,
+and `DR-napum`. The BGP-class app question and promisebase reference-naming
+question now have their own standalone sims rather than living under
+promise-accounting or CAS-object-model surfaces. Guide writers should treat
+those as exploratory evidence until the relevant DRs and guide decisions close.
+Source: `DI-vaguf`; `DI-lusum`; `DI-tibis`.
 
 ## Protocol/Specimen TODO Question Simulations
 

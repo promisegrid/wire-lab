@@ -828,3 +828,22 @@ pressure (`SIM-narok-transport-family-bakeoff`), peer adoption metadata
 (`SIM-bohof-group-session-freeze-promise`), and UDP-feed v0 conformance
 (`SIM-kuful-udp-feed-v0-conformance`). This does not reopen closed `TODO-lilar`
 rows, answer the source TODOs/DRs, or make any sim canonical.
+
+### 2026-05-17 — Turn-178 closure / transfer pointer
+
+`DI-vaguf` reconciles turn 178 after the later TE-sihih scope contraction,
+`DI-lusum` repairs the review gaps by adding explicit downstream question or
+TODO homes, and `DI-tibis` splits two oversized homes into standalone sims.
+Sparse-CAS, pull-decision, cross-layer accounting, interop, promisebase prior
+art, and CIDv1 object typing are captured by TODO-vunub, TODO-kituj /
+`DR-tumus`, and the existing CAS/feed/promise-accounting simulations.
+BGP-class routing app pressure is now in standalone
+`SIM-punaz-bgp-class-routing-app`; multi-repo sparse-site topology is
+represented in `SIM-zazit`; group-identity / anti-default-anonymity pressure is
+now in `SIM-jurar-cas-backed-group-session/QUESTION.md`; promisebase reference
+naming is separately routed to TODO-kituj `kituj.5` and standalone
+`SIM-ligan-promisebase-reference-naming`; and capture-resistance /
+layperson-narrative pressure is routed to `DR-napum` and guide-resource notes.
+The turn-178 `pgmsg` and collaborator-permission meta-questions are routed to
+TODO-rohub. This does not answer the downstream design questions and does not
+reopen `TODO-lilar` rows.

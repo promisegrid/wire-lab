@@ -4,7 +4,7 @@ This simulation explores the L6 CAS object-model questions exposed by turn
 177. It asks how PromiseGrid should encode pointer objects, raw chunks, and
 Merkle nodes so independent sites compute the same CIDs for the same bytes. It
 is a standalone design-point simulation, not a frozen L6 CAS spec and not a
-shared protocol bundle for other simulations. Source: `DI-navod`.
+shared protocol bundle for other simulations. Source: `DI-navod`; `DI-tibis`.
 
 ## Question
 
@@ -26,7 +26,7 @@ Turn 177 made several CAS details load-bearing rather than cosmetic:
 
 This simulation keeps those questions visible as specimen pressure while
 `TODO-kituj` / TE-43 owns the actual concrete L6 CAS decision path. Source:
-`DI-navod`.
+`DI-navod`; `DI-tibis`.
 
 ## Decision axes
 
@@ -46,4 +46,4 @@ This simulation does not choose a winning grid-envelope variant, does not
 rewrite existing `.txt` specimens, and does not assert that all PromiseGrid CAS
 implementations must use one specific local directory layout. It exists so
 CAS-object design can evolve independently before any frozen pCID spec or guide
-prose claims a stable answer. Source: `DI-navod`.
+prose claims a stable answer. Source: `DI-navod`; `DI-tibis`.

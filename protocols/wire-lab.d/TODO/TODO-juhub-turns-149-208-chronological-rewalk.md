@@ -162,6 +162,102 @@ applies to every bare-`turn` response before the assistant yields.
 Affects: `protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewalk.md`;
 this session's `TODO-juhub` replay responses.
 
+ID: DI-vaguf
+Date: 2026-05-17 12:01:50
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Reconcile turn 178 by routing its remaining loose ends into existing
+simulation, DR, resource, and replay-owner artifacts rather than opening a new
+TE or creating new simulation roots.
+Intent: Turn 178 mixed several design constraints with a deliberately terse bot
+deferral. The replay should make those constraints visible without treating the
+old 15-DF TE-sihih expansion as current scope. Sparse CAS, pull-decision
+accounting, interop, promisebase prior art, CIDv1 object typing, group identity,
+BGP-class app pressure, multi-repo site topology, and dogfood urgency each need
+a downstream container so the recovery walkthrough can advance without forcing
+the historical turn to stay open.
+Constraints: Do not answer the open design questions in this pass. Do not create
+new protocol trees, world fixtures, manifests, local TODO queues, or simulation
+roots. Preserve the later TE-sihih scope contraction: turn-178 material is routed
+to successor sims, DRs, and guide-resource notes instead of backloading the
+broad capture narrative into TE-sihih.
+Affects: `protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewalk.md`;
+`protocols/wire-lab.d/TODO/TODO-lilar-session-replay-cleanup.md`;
+`protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`;
+`DR/DR-napum-promisegrid-layperson-guide-claims.md`;
+`simulations/SIM-zazit-chunk-feed-replication/`;
+`simulations/SIM-rusap-promise-accounting-records/`;
+`simulations/SIM-jurar-cas-backed-group-session/`;
+`DEV-GUIDE-RESOURCES.md`.
+
+ID: DI-lusum
+Date: 2026-05-17 13:04:21
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Repair the turn-178 routing by adding explicit question homes and
+TODO owners for the gaps found in review, while preserving append-only DR
+history.
+Intent: Turn-178 recovery is complete only when BGP-class app pressure, group
+identity / anti-default-anonymity pressure, `pgmsg` tool naming,
+collaborator-permission constraints, and promisebase human-readable reference
+naming are discoverable from their downstream owners rather than only from
+scenario rows or closed replay notes. The DR event log must keep historical
+event wording and append terminology clarifications instead of rewriting older
+events.
+Constraints: Do not answer the open design questions in this pass. Do not
+create new simulation roots. Route BGP and group identity into simulation
+`QUESTION.md` files, route `pgmsg` / collaborator-permission meta work to a
+root harness TODO, route promisebase reference naming separately from CBOR,
+chunking, and CIDv1 object typing, and keep `Work pending` semantics tied to
+whether each loose end has a downstream sim question or TODO owner.
+Affects: `protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewalk.md`;
+`protocols/wire-lab.d/TODO/TODO-lilar-session-replay-cleanup.md`;
+`protocols/wire-lab.d/TODO/TODO-rohub-dogfood-tool-name-and-collaborator-permission.md`;
+`protocols/wire-lab.d/TODO/TODO-kituj-te-43-promisebase-prior-art-adoption.md`;
+`protocols/wire-lab.d/TODO/TODO.md`;
+`protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`;
+`DR/DR-napum-promisegrid-layperson-guide-claims.md`;
+`simulations/SIM-rusap-promise-accounting-records/QUESTION.md`;
+`simulations/SIM-jurar-cas-backed-group-session/QUESTION.md`;
+`simulations/SIM-jomag-cas-object-model/QUESTION.md`;
+`simulations/SIM-jomag-cas-object-model/SCENARIOS.md`;
+`simulations/README.md`;
+`DEV-GUIDE-RESOURCES.md`.
+Supersedes: DI-vaguf (routing-completeness and append-only DR repair only)
+
+ID: DI-tibis
+Date: 2026-05-17 13:23:58
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Split the turn-178 BGP-class routing question and promisebase
+reference-naming question into their own standalone simulations.
+Intent: BGP-class routing is not merely an example row inside peer-local promise
+accounting; it is its own application-pressure experiment. Promisebase
+human-readable reference naming is not merely part of the L6 CAS object-model
+bundle; it is its own reference-resolution experiment. Each needs an
+independent simulation root so the competing design lineages can evolve without
+being hidden under broader accounting or object-model sims.
+Constraints: Do not answer either question in this pass. Keep `SIM-rusap`
+focused on generic peer-local promise accounting records. Keep `SIM-jomag`
+focused on CAS object bytes, object typing, pointer objects, CBOR, and chunking.
+Route BGP-class routing to `SIM-punaz-bgp-class-routing-app/` and promisebase
+reference naming to `SIM-ligan-promisebase-reference-naming/`.
+Affects: `protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewalk.md`;
+`protocols/wire-lab.d/TODO/TODO-lilar-session-replay-cleanup.md`;
+`protocols/wire-lab.d/TODO/TODO-kituj-te-43-promisebase-prior-art-adoption.md`;
+`protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`;
+`DEV-GUIDE-RESOURCES.md`;
+`simulations/README.md`;
+`simulations/SIM-rusap-promise-accounting-records/README.md`;
+`simulations/SIM-rusap-promise-accounting-records/QUESTION.md`;
+`simulations/SIM-rusap-promise-accounting-records/SCENARIOS.md`;
+`simulations/SIM-jomag-cas-object-model/README.md`;
+`simulations/SIM-jomag-cas-object-model/QUESTION.md`;
+`simulations/SIM-jomag-cas-object-model/SCENARIOS.md`;
+`simulations/SIM-punaz-bgp-class-routing-app/`;
+`simulations/SIM-ligan-promisebase-reference-naming/`.
+Supersedes: DI-lusum (BGP and promisebase-reference simulation-home routing only)
+
 ## Why a separate TODO
 
 `TODO-lilar` already records the original historical walk through turn 192 and
@@ -352,6 +448,14 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
   operational migration. `UT-177.e`, `UT-177.f`, and `UT-177.i` are transferred
   to TODO-kulih / TE-nibar spec-doc-shape work and TE-dajot 100-year-goal
   pressure testing.
+- `Turn 178` `UT-178.a`, `UT-178.b`, `UT-178.c`, `UT-178.i`, and `UT-178.l`
+  are captured by existing CAS/feed/promise-accounting sims plus TODO-kituj /
+  `DR-tumus`; `UT-178.h` is captured by TODO-kituj / TODO-dozak and the
+  promisebase bakeoff sims; `UT-178.j` is captured by the chunk-feed multi-repo
+  site-topology scenario; `UT-178.d` is captured as BGP-class routing app
+  pressure in `SIM-rusap`; `UT-178.e` and `UT-178.f` are routed to
+  `DR-napum`, `SIM-rusap`, and `SIM-jurar`; `UT-178.g`, `UT-178.k`, and
+  `UT-178.m` close as dogfood/procedural replay lessons.
 
 ## Subtasks
 
@@ -384,7 +488,7 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - [x] juhub.175 Turn 175 raw-log rewalk plus later-turn and later-artifact sweep.
 - [x] juhub.176 Turn 176 raw-log rewalk plus later-turn and later-artifact sweep.
 - [x] juhub.177 Turn 177 raw-log rewalk plus later-turn and later-artifact sweep.
-- [ ] juhub.178 Turn 178 raw-log rewalk plus later-turn and later-artifact sweep.
+- [x] juhub.178 Turn 178 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.179 Turn 179 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.180 Turn 180 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.181 Turn 181 raw-log rewalk plus later-turn and later-artifact sweep.
@@ -1593,3 +1697,112 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - `Proposed disposition` `resolved/transferred after TE-sihih scope contraction, TE-43 CAS-owner routing, and TODO-kulih spec-shape routing`
 - `Write needed? yes/no` `no` further turn-177 write is needed after this pass.
 - `Next` Turn 178 is next.
+
+### Turn 178 — 2026-05-03 19:14 UTC
+
+- `Turn 178 plain-English recap` Steve gave the largest combined confirmation
+  and expansion of the L5/L6/L7 discussion. He made sparse CAS a foundational
+  assumption: no site should be assumed to have all objects, and every protocol
+  or simulation must work when each site has only a subset. He pointed out that
+  the word "decides" in "Bob's CAS decides it wants the chunk" is load-bearing:
+  that is where consensus, promises, trust relationships, costs, refusal,
+  policy, and incentives enter the system. He also questioned whether promise
+  accounting belongs independently at each layer or mostly at L7 with L5/L6
+  taking directions about what to pull, keep, and advertise. He floated a
+  BGP-class future application: could a PromiseGrid app replace BGP's vulnerable
+  inter-domain routing trust model? He confirmed that the capture-resistance
+  narrative from turn 177 should lead the explanatory story: email, web, and
+  social systems were captured partly because their upper layers lacked
+  decentralized promise economies. He also confirmed the simple layperson model:
+  sites make promises, keep them or do not, peers decide whom to trust, bad
+  actors get cut off by peers, and no central authority is needed. He stated a
+  design stance against pure anonymity as the default: group members know each
+  other in some way, trust relationships exist, and this has implications for
+  group identity. He asked whether to switch messages to CBOR and chunking now,
+  under dogfood pressure from the developer/agent team. He surfaced promisebase
+  as prior art for chunking, Merkle trees, streaming bytes into CAS, FUSE/container
+  attempts, and reference/hash naming problems. He asked whether CIDv1 codec
+  fields can distinguish Merkle roots from raw content hashes; the answer is the
+  design direction now carried by TE-43 / DR-tumus and the CAS object-type sims:
+  use codec / multicodec identity rather than filename suffixes. He required
+  continued optional interop with libp2p, IPFS, and ATPROTO. Finally, he raised
+  the multi-repo question: actual message content, especially large test files,
+  may need to live in separate repos or one repo per simulated site rather than
+  always in wire-lab. The assistant response was unusually terse: it recorded
+  memory and asked only three meta-questions about reading promisebase, keeping
+  TE-sihih together or split, and whether `pgmsg` was an acceptable tool name.
+  Later work changes the routing: TE-sihih landed much smaller, so turn-178's
+  broad material is now successor pressure for TODO-kituj / DR-tumus, TODO-pipus
+  / DR-gabif, TODO-kulih / DR-robon, DR-napum, and the relevant simulations
+  rather than a mandate to stuff everything into TE-sihih.
+- `Existing capture` `TODO-lilar` captured the raw turn in detail and correctly
+  flagged that the bot's response was a tactical deferral rather than an answer.
+  Later artifacts now capture most of the substance: TODO-vunub records sparse
+  CAS as a foundational invariant; `SIM-zazit` carries sparse chunk-feed and
+  "decides" pressure; `SIM-rusap` carries peer-local promise accounting and
+  cross-layer decision pressure; `SIM-punaz` carries the BGP-class routing app
+  question; TODO-kituj / `DR-tumus`, `SIM-jomag`, `SIM-bobud`, `SIM-kohad`, and
+  `SIM-gobaz` own promisebase prior art, interop, chunking, CIDv1 object typing,
+  and pointer-object shape; `SIM-ligan` carries the separately-routed
+  promisebase reference-naming question; `SIM-jurar` owns CAS-backed
+  group-session identity pressure through an explicit question; TODO-rohub owns
+  `pgmsg` tool-name and collaborator-permission meta-questions; DR-napum owns
+  final public layperson claims.
+- `Gaps or contradictions` The historical turn note was written before the
+  later TE-sihih scope contraction, before the turn-177 simulation backfill, and
+  before the protocol/specimen sim-question sweep. It therefore treated many
+  questions as "TE-sihih must decide" even though later work deliberately routes
+  them to TE-43 / DR-tumus, TODO-pipus / DR-gabif, TODO-kulih / DR-robon,
+  DR-napum, or simulation questions. Review found that BGP-class routing app
+  pressure and group identity / anti-anonymity pressure were visible in scenario
+  rows but not in `QUESTION.md` homes, that promisebase reference naming was
+  being conflated with CBOR / chunking / CID object typing, and that `UT-178.k`
+  still needed an explicit `pgmsg` / collaborator-permission TODO owner. The
+  next correction was that BGP-class routing and promisebase reference naming
+  should not merely be questions inside broader sims; `DI-tibis` splits them
+  into standalone simulations.
+- `Related UTs / owners` `UT-178.a` is captured by TODO-vunub's sparse-CAS
+  invariant and the sparse scenarios in `SIM-zazit` / `SIM-rusap`.
+  `UT-178.b` and `UT-178.c` are captured by the `SIM-zazit` pull-decision
+  scenario and the `SIM-rusap` cross-layer decision/accounting scenarios.
+  `UT-178.d` is captured as BGP-class routing app pressure in standalone
+  `SIM-punaz-bgp-class-routing-app`.
+  `UT-178.e` is routed to DR-napum and DEV-GUIDE-RESOURCES rather than to the
+  now-smaller TE-sihih. `UT-178.f` is captured by `SIM-jurar`'s explicit
+  group-membership / identity question and DR-napum public-claims caution.
+  `UT-178.g` is closed as dogfood pressure already reflected in TE-pahah /
+  TE-nizor and the `SIM-ludut-wire-lab-devs` world, with concrete tool-name and
+  collaborator-permission follow-up routed to TODO-rohub. `UT-178.h`,
+  `UT-178.i`, and `UT-178.l` are split: CBOR, chunking, CIDv1 object typing,
+  pointer-object shape, and interop are captured by TODO-kituj / DR-tumus and
+  the CAS object-model / bakeoff sims, while promisebase human-readable
+  reference-symbol / hash-name-resolution naming is separately routed to
+  TODO-kituj `kituj.5` and standalone
+  `SIM-ligan-promisebase-reference-naming`. `UT-178.j` is captured by the new
+  multi-repo sparse-site scenario in `SIM-zazit`.
+  `UT-178.k` is closed only after routing its meta-questions: promisebase review
+  to TODO-kituj / DR-tumus and later promisebase work, TE-sihih scope to
+  TODO-vunub and successor owners, and `pgmsg` / collaborator-permission
+  follow-up to TODO-rohub. `UT-178.m` is closed as a caught-before-commit
+  edit-defect lesson.
+- `Owner/doc cleanup` Done. Added `DI-vaguf`; updated the three existing
+  simulation surfaces that naturally own the turn-178 pressure; updated
+  DR-napum and DEV-GUIDE-RESOURCES for the capture narrative / layperson claim
+  routing; added a turn-178 closure pointer to the UT matrix; closed the
+  `TODO-lilar` turn-178 UT rows with an additive closure summary, then repaired
+  the review gaps under `DI-lusum` by adding explicit `QUESTION.md`, TODO, and
+  reference-naming owner entries; then split BGP-class routing and promisebase
+  reference naming into standalone sims under `DI-tibis`.
+- `Remaining decisions or work` Downstream design remains open, but it is now
+  containerized: `DR-tumus` / TODO-kituj for concrete L6 CAS adoption,
+  `DR-gabif` / TODO-pipus for additive CAS-backed group-session migration,
+  `DR-robon` / TODO-kulih for spec-section requirements, DR-napum for final
+  public layperson claims, TODO-rohub for dogfood message-tool naming and
+  collaborator permission, and the sim questions for BGP-class app pressure
+  (`SIM-punaz`), group identity, promisebase reference naming (`SIM-ligan`),
+  sparse chunk-feed decisions, and multi-repo site topology. For
+  recovery-walkthrough purposes, turn 178 has no uncaptured loose end.
+- `Work pending` no.
+- `Proposed disposition` `resolved/transferred after sparse-CAS, promise-accounting, promisebase, interop, guide-claim, and multi-repo simulation-owner routing`
+- `Write needed? yes/no` `no` further turn-178 write is needed after this pass.
+- `Next` Turn 179 is next.

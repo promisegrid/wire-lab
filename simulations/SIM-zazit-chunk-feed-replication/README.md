@@ -23,6 +23,11 @@ Turn 177 corrected the model from "CAS below feeds that carry messages" to
 - Pull/keep/advertise decisions need inputs from peer-local promise accounting
   records without making L5 itself a central accounting authority.
 
+Turn 178 adds two more pressures to this simulation: every site should be sparse
+by default, and some realistic experiments may put each simulated site or large
+content corpus in a different repository rather than assuming all message bytes
+live in wire-lab. Source: `DI-vaguf`.
+
 This simulation owns the feed-side consequences of that inversion. The
 `SIM-jomag` CAS object-model simulation owns object typing and chunking
 parameters; this simulation asks how those objects move between sites. Source:
@@ -38,6 +43,8 @@ parameters; this simulation asks how those objects move between sites. Source:
   storage, retransmission, integrity, and refusal.
 - **Carrier fit:** how UDP, git, libp2p, IPFS, ATPROTO, or other substrates
   might carry the same feed role without becoming the protocol meaning.
+- **Site topology:** whether a simulation site is a directory, a separate repo,
+  a remote peer, or an imported fixture when testing sparse large-object flows.
 - **Failure behavior:** duplicate advertisements, missing chunks, partial
   Merkle trees, corrupt chunks, and peer-specific refusal.
 

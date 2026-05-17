@@ -43,6 +43,13 @@ Scope:
     (UT-177.h, refined by UT-178.l).
   - Decide chunking algorithm and full parameter set, including the turn-177
     FastCDC/Rabin-size proposal and the later pitbase mismatch.
+  - Decide promisebase's human-readable reference-symbol / hash-name-resolution
+    lesson separately from CBOR profile, chunking, and CIDv1 object typing:
+    adopt it as L6 reference objects, route it to L7 group/session metadata,
+    or reject/defer custom syntax in favor of CID-backed pointers. The
+    simulation question lives in
+    `simulations/SIM-ligan-promisebase-reference-naming/`. Source: `DI-lusum`;
+    `DI-tibis`.
   - Reconcile the kv branch on the remote (UT-190.d -- undiscovered
     through turn 192).
   - Resolve the Rabin-vs-FastCDC chunking parameter mismatch (UT-181.b:
@@ -96,6 +103,11 @@ since it locks the prototype-not-canon stance.
   `SIM-kohad-cas-object-type-binding-bakeoff`, and
   `SIM-gobaz-chunking-identity-bakeoff`, then revise `DR-tumus` DF-tumus.1
   through DF-tumus.3 into final answerable choices. Done via `DI-molah`.
+- [ ] kituj.5 Decide the promisebase human-readable reference-symbol /
+  hash-name-resolution lesson separately from CBOR, chunking, CIDv1 object
+  typing, and pointer-object-shape decisions, using
+  `simulations/SIM-ligan-promisebase-reference-naming/` as the standalone
+  question home. Source: `DI-lusum`; `DI-tibis`.
 
 ## Question log
 
@@ -110,6 +122,10 @@ since it locks the prototype-not-canon stance.
 - 2026-05-17: The three bakeoff simulations were synthesized into final
   answerable `DR-tumus` choices, but `DR-tumus` remains open for Steve's actual
   decision. Source: `DI-molah`.
+- 2026-05-17: Turn 178's promisebase reference-symbol / hash-name-resolution
+  loose end is routed here as `kituj.5` and into
+  `SIM-ligan-promisebase-reference-naming/QUESTION.md`, separate from CBOR,
+  chunking, and CID object-typing work. Source: `DI-lusum`; `DI-tibis`.
 
 ## Decision Intent Log
 

@@ -12,6 +12,7 @@ group-session draft and not a frozen PromiseGrid message format. Source:
 |---|---|---|---|
 | Additive successor specimen | Existing `.txt` messages remain historical while a new CAS-backed specimen is added beside them. | Whether migration can be additive without rewriting historical message bytes or invalidating existing CIDs. | TODO-pipus must design overlap / successor mechanics rather than mutate old evidence. |
 | Group-visible identity | Alice posts a group message whose visible identifier could be a pointer-object CID, message-root CID, or envelope CID. | Which CID humans, tools, parent links, and acknowledgements should cite. | The migration must avoid two competing identities for one logical message. |
+| Known-member group | Alice, Bob, and Carol participate with known relationship identities while Mallory attempts anonymous or unrecognized participation. | Whether group-session semantics require member-authenticated provenance, permit pseudonyms, or explicitly represent anonymous participation as a policy exception. | Turn 178's anti-anonymity stance should become group-identity pressure without silently banning every future privacy-preserving design. |
 | Parent links through CAS | Bob replies to Alice by referencing a parent that may be a pointer object or Merkle root. | Whether parent semantics survive when the parent is no longer an inline text file. | Group-session successor work must distinguish L7 parent meaning from L6 object resolution. |
 | Arbitrary body shape | Alice's message body is a CBOR text string, CBOR map, encrypted blob, signed payload, or large file root. | Whether group semantics can stay stable while body bytes vary. | TODO-pipus and TE-43 must agree on what the group layer sees versus what CAS stores. |
 | Missing pointee | Bob sees pointer object CID Y but lacks root CID X or some child chunks. | Whether the group view can show pending / unresolved state without treating the message as invalid. | Sparse-CAS behavior must be a normal group-session state. |
@@ -24,5 +25,7 @@ group-session draft and not a frozen PromiseGrid message format. Source:
   specimens.
 - A TE-43 interface requirement describing what the group layer receives after
   resolving pointer objects and CAS roots.
+- A group-identity pressure case for deciding how known membership,
+  pseudonymity, and anonymous participation are represented.
 - A guardrail that grid-envelope variants remain separate envelope specimens,
   not hidden dependencies of this group-session successor.

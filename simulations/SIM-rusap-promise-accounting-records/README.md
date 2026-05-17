@@ -4,7 +4,7 @@ This simulation explores peer-local promise accounting records for the
 turn-177 promise-economy requirement. Alice, Bob, Carol, and other peers each
 keep their own records for relationships and observations; this simulation
 does not define a central record store, harness-owned accounting authority, or
-global trust database. Source: `DI-navod`.
+global trust database. Source: `DI-navod`; `DI-tibis`.
 
 ## Question
 
@@ -12,7 +12,7 @@ What should a peer record locally so it can decide which chunks to pull, keep,
 advertise, or refuse while preserving PromiseGrid's 100-year, peer-relative
 trust model? Source: `DI-navod`.
 
-## Turn 177 pressure
+## Turn 177 and 178 pressure
 
 Turn 177 made the promise economy load-bearing at every layer:
 
@@ -24,6 +24,12 @@ Turn 177 made the promise economy load-bearing at every layer:
   models.
 - Long-lived deployment needs local, repairable records rather than central
   enforcement.
+
+Turn 178 made the cross-layer decision point explicit: when Bob chooses whether
+to pull, keep, advertise, or refuse a chunk, L7 group value, L6 object
+availability, L5 offers, and Bob's peer-local records all meet at the decision
+boundary. This simulation remains focused on generic peer-local promise
+accounting records. Source: `DI-vaguf`; `DI-tibis`.
 
 This simulation uses the phrase **promise accounting records** deliberately.
 The intended model is peer-local accounting maintained by each actor for its

@@ -3,7 +3,8 @@
 These scenarios test peer-local promise accounting records for turn 177's
 promise-economy requirement. They are inputs for TODO-kulih / TE-nibar and for
 later cross-layer decisions; they do not define a central accounting authority,
-global reputation database, or final economics mechanism. Source: `DI-pator`.
+global reputation database, or final economics mechanism. Source: `DI-pator`;
+`DI-tibis`.
 
 ## Scenario Matrix
 

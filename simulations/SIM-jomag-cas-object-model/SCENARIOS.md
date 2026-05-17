@@ -2,7 +2,7 @@
 
 These scenarios make the turn-177 L6 CAS object-model pressure concrete. They
 are simulation inputs for `TODO-kituj` / TE-43, not decisions and not a frozen
-CAS spec. Source: `DI-pator`.
+CAS spec. Source: `DI-pator`; `DI-tibis`.
 
 ## Scenario Matrix
 

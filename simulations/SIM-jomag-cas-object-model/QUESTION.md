@@ -2,7 +2,8 @@
 
 Which L6 CAS object model should PromiseGrid test first for pointer objects,
 raw chunks, Merkle nodes, deterministic CBOR / DAG-CBOR encoding, Rabin or
-FastCDC chunking, and CIDv1 codec-based object typing? Source: `DI-navod`.
+FastCDC chunking, and CIDv1 codec-based object typing? Source: `DI-navod`;
+`DI-tibis`.
 
 Open decision points:
 

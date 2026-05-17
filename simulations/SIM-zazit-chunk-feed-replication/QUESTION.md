@@ -10,5 +10,7 @@ Open decision points:
 - Which layer decides that an advertised chunk is worth pulling or retaining?
 - What feed behavior remains substrate-neutral across UDP, git, libp2p, IPFS,
   ATPROTO, and future carriers?
+- When do sparse sites need separate repos or external content corpora rather
+  than directories inside one wire-lab checkout?
 - How are corrupt, missing, duplicate, or refused chunks represented without
   leaking group-session semantics into L5?

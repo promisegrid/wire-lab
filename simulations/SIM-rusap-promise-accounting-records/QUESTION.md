@@ -3,7 +3,7 @@
 Which peer-local promise accounting records should PromiseGrid simulations
 include so Alice, Bob, Carol, and other peers can make sparse-CAS pull, keep,
 advertise, and refusal decisions without a central accounting authority?
-Source: `DI-navod`.
+Source: `DI-navod`; `DI-tibis`.
 
 Open decision points:
 
