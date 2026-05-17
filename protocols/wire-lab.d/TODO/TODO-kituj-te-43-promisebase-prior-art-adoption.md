@@ -18,7 +18,7 @@ chunk movement pressure in `simulations/SIM-zazit-chunk-feed-replication/`;
 their `SCENARIOS.md` files make the object-model and chunk-replication pressure
 concrete. Those simulations are inputs to this TODO, not replacements for
 TE-43's DF/DI path. Source: TE-sihih; TODO-vunub Q-22.6; `DI-navod`;
-`DI-pator`. No twig yet.
+`DI-pator`. The concrete decision request is now `DR-tumus`. No twig yet.
 
 ## Threads absorbed from OPEN-THREADS.md
 
@@ -55,7 +55,7 @@ Scope:
   - Address fuse/ test failures and cmd/pb Docker SDK rot (UT-184.e/g).
 
 Blocking: TE-sihih (substrate-agnostic layered model) L6 substrate
-definition must land first.
+definition must land first. The remaining decision gate is `DR-tumus`.
 
 Anchor: turn-191 canon rule; pitbase main + kv branch on
 stevegt/promisebase.
@@ -71,7 +71,10 @@ since it locks the prototype-not-canon stance.
 
 ## Question log
 
-(Per AGENTS-ppx Question-logging discipline. No questions logged yet.)
+- 2026-05-17: `DR-tumus` asks which concrete L6 CAS profile TE-43 should lock:
+  CBOR / DAG-CBOR profile, CIDv1 codec object typing, pointer-object shape,
+  chunking algorithm and parameters, and promisebase / pitbase adoption stance.
+  Source: `DI-davov`.
 
 ## Decision Intent Log
 

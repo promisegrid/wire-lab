@@ -781,3 +781,11 @@ TODO-kituj / TE-43 still owns concrete CAS decisions; TODO-pipus still owns
 additive migration to pointer-and-CAS shape; TODO-kulih / TE-nibar still owns
 spec-doc-shape requirements. This backfill does not reopen any `TODO-lilar`
 `UT-177.*` row and does not mark turn 177 fully complete.
+
+### 2026-05-17 — Turn-177 DR backfill
+
+`DI-davov` files scoped DRs for the three remaining turn-177 decision clusters:
+`DR-tumus` for concrete L6 CAS adoption, `DR-gabif` for additive CAS-backed
+group-session migration, and `DR-robon` for spec-shape requirements. This keeps
+`TODO-lilar` closed for `UT-177.*` rows while preserving explicit open decision
+records for the successor owners.

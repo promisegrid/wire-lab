@@ -129,6 +129,12 @@ promise-accounting scheme from their existence. Source: `DI-navod`.
 | `simulations/SIM-jurar-cas-backed-group-session/` | Tests a successor group-session shape where L7 group semantics point at L6 CAS roots and pointer objects without rewriting historical `.txt` specimens. | Provisional design-point evidence. |
 | `simulations/SIM-rusap-promise-accounting-records/` | Tests peer-local promise accounting records for pull, keep, advertise, refusal, and 100-year mental-model pressure without defining a central accounting authority. | Provisional design-point evidence. |
 
+Open turn-177 decision records: `DR-tumus` owns the concrete L6 CAS adoption
+question, `DR-gabif` owns additive CAS-backed group-session migration, and
+`DR-robon` owns the turn-177 spec-shape requirement question. Guide prose should
+treat those areas as unsettled until the DRs close and their linked DIs land.
+Source: `DI-davov`.
+
 ## Grid-Envelope Variant Simulations
 
 `DI-fanah` split the grid-envelope successor path into 24 standalone positional
@@ -329,6 +335,12 @@ final normative references. Source: `DI-zalak`.
   fallback for "How to write a grid app."
 - `DR-davod` — decides the stable kernel-developer porting boundary and
   conformance target.
+- `DR-tumus` — decides the concrete L6 CAS adoption profile exposed by turn
+  177.
+- `DR-gabif` — decides additive migration from historical inline group-session
+  evidence to CAS-backed group-session specimens.
+- `DR-robon` — decides whether turn-177 promise-vocabulary, 100-year, and
+  mental-model requirements become required protocol-spec sections.
 
 ## Maintenance promises
 

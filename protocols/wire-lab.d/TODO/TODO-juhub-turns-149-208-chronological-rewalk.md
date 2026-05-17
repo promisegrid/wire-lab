@@ -1539,7 +1539,10 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
   message bytes. A second simulation pass added `SCENARIOS.md` matrices to make
   the turn-177 pressure concrete for successor owners while leaving decisions in
   TODO-kituj / TE-43, TODO-pipus, and TODO-kulih / TE-nibar. No transport
-  message bytes or TE bodies were edited. Source: `DI-navod`; `DI-pator`.
+  message bytes or TE bodies were edited. A third cleanup pass filed scoped DRs:
+  `DR-tumus` for concrete L6 CAS adoption, `DR-gabif` for additive CAS-backed
+  group-session migration, and `DR-robon` for turn-177 spec-shape requirements.
+  Source: `DI-navod`; `DI-pator`; `DI-davov`.
 - `Remaining decisions or work` TODO-kituj / TE-43 remains open for concrete L6
   CAS adoption: deterministic CBOR profile, allowed tags, chunking algorithm and
   parameters, CIDv1 codec/object typing, and promisebase prior-art stance.
@@ -1548,8 +1551,8 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
   including promise vocabulary, 100-year pressure-test, and easy mental-model
   obligations. The new `DI-navod` simulations make these workstreams visible as
   specimen pressure, and `DI-pator` scenario matrices make them actionable, but
-  the concrete TE/DF/DI decisions remain open in their owner TODOs. TE-domat /
-  DR-nugog remains open for root layout.
+  the concrete TE/DF/DI decisions remain open through `DR-tumus`, `DR-gabif`,
+  and `DR-robon`. TE-domat / DR-nugog remains open for root layout.
 - `Work pending` yes.
 - `Proposed disposition` `resolved/transferred after TE-sihih scope contraction, TE-43 CAS-owner routing, and TODO-kulih spec-shape routing`
 - `Write needed? yes/no` `no` further turn-177 write is needed after this pass.

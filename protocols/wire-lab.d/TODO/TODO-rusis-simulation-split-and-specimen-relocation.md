@@ -234,6 +234,33 @@ Affects: `protocols/wire-lab.d/TODO/TODO-rusis-simulation-split-and-specimen-rel
 `protocols/wire-lab.d/TODO/TODO-kulih-te-spec-doc-as-promise.md`;
 `protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`.
 
+ID: DI-davov
+Date: 2026-05-17 09:28:02
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: File three scoped DRs for the remaining turn-177 cleanup decisions:
+`DR-tumus` for concrete L6 CAS adoption, `DR-gabif` for additive
+CAS-backed group-session migration, and `DR-robon` for turn-177 spec-shape
+requirements.
+Intent: The turn-177 simulation charters and scenarios make the design pressure
+visible, but the remaining work is now blocked on explicit decisions. Filing
+DRs gives TODO-kituj / TE-43, TODO-pipus, and TODO-kulih / TE-nibar concrete
+question records so replay cleanup does not have to re-derive the same loose
+ends from raw turn notes.
+Constraints: Do not answer the DRs in this pass. Do not mark turn 177 fully
+closed. Preserve existing `TODO-lilar` closure state; the DRs are successor
+decision records, not reopened UT rows.
+Affects: `DR/DR-tumus-turn-177-l6-cas-adoption.md`;
+`DR/DR-gabif-turn-177-cas-backed-group-session-migration.md`;
+`DR/DR-robon-turn-177-spec-shape-requirements.md`;
+`protocols/wire-lab.d/TODO/TODO-rusis-simulation-split-and-specimen-relocation.md`;
+`protocols/wire-lab.d/TODO/TODO-kituj-te-43-promisebase-prior-art-adoption.md`;
+`protocols/wire-lab.d/TODO/TODO-pipus-te-39-wire-lab-devs-migration.md`;
+`protocols/wire-lab.d/TODO/TODO-kulih-te-spec-doc-as-promise.md`;
+`protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewalk.md`;
+`protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`;
+`DEV-GUIDE-RESOURCES.md`.
+
 ## Context
 
 The current simulation layout still reflects the recovery process that
@@ -375,6 +402,9 @@ with `git mv`, because their filenames depend on their byte content.
 - [x] rusis.15 Add scenario matrices to the four turn-177 simulations so
   TODO-kituj / TE-43, TODO-pipus, and TODO-kulih / TE-nibar have concrete
   simulation pressure without moving decisions into the simulation charters.
+- [x] rusis.16 File scoped DRs for the three remaining turn-177 decision
+  clusters: concrete L6 CAS adoption, additive CAS-backed group-session
+  migration, and spec-shape requirements.
 
 ## `rusis.2` first concrete split-pass blueprint
 

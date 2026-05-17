@@ -22,7 +22,7 @@ the migration must respect. Their scenario matrices now give TODO-pipus
 concrete cases for additive migration, group-visible identity, parent links
 through CAS, missing pointees, and feed-side sparse replication. Source:
 TE-sihih; `DI-fakin`; `DI-rurab`; `DI-bomud`; `DI-navod`; `DI-pator`. No twig
-yet.
+yet. The additive migration decision request is now `DR-gabif`.
 
 ## Threads absorbed from OPEN-THREADS.md
 
@@ -44,7 +44,8 @@ scenario inputs for the first additive migration design. Source: `DI-navod`;
 `DI-pator`.
 
 Blocking: nothing today; gated on a concrete first migration to design
-against. TE-sihih + TE-mumuv close the gate.
+against. TE-sihih + TE-mumuv close the gate; `DR-gabif` now owns the
+turn-177 additive CAS-backed group-session migration question.
 
 Anchor: TE-numan § Implications, transport-spec § OQ-2.
 
@@ -56,7 +57,10 @@ promisebase-integration scope moved to TE-43.
 
 ## Question log
 
-(Per AGENTS-ppx Question-logging discipline. No questions logged yet.)
+- 2026-05-17: `DR-gabif` asks what additive migration contract TODO-pipus
+  should use to move from historical inline `.txt` evidence to a CAS-backed
+  group-session specimen without rewriting existing message bytes. Source:
+  `DI-davov`.
 
 ## Decision Intent Log
 
