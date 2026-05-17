@@ -474,6 +474,35 @@ Affects: `AGENTS-ppx.md`;
 `protocols/wire-lab.d/TODO/TODO-lilar-session-replay-cleanup.md`;
 `protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`.
 
+ID: DI-zagus
+Date: 2026-05-17 14:33:29
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Route turn-186's promisebase PAT application, randStream push,
+redaction application, collaborator re-quote hazard, and GOTOOLCHAIN diagnostic
+to process owners without starting new promisebase fix work.
+Intent: Turn 186 completed the first end-to-end cross-repo fix in this replay
+slice and proved the two-PAT pattern works, but it also exposed three durable
+process lessons: redaction must be applied when a turn contains literal secret
+bytes, collaborator-sensitive questions must be paraphrased when re-quoted, and
+cross-repo build/toolchain diagnostics such as `GOTOOLCHAIN=auto` drift need a
+discoverable owner. The replay should preserve those lessons without recording
+secret bytes, touching promisebase, or letting deferred Docker/FUSE fixes distract
+from the recovery walkthrough.
+Constraints: Do not record or echo PAT bytes. Do not touch `.secrets/`, runtime
+credential files, or promisebase. Do not flip TODO-lilar UT checkboxes. Route
+redaction to AGENTS-ppx B4 and the turn-185 rule, collaborator re-quote handling
+to TODO-rohub / AGENTS-ppx B3, the GOTOOLCHAIN diagnostic to `TODO-nasat` and
+AGENTS-ppx B7, and deferred Docker/FUSE work to existing TODO-kituj / `DR-tumus`
+routing.
+Affects: `AGENTS-ppx.md`;
+`protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewalk.md`;
+`protocols/wire-lab.d/TODO/TODO-nasat-cross-repo-build-hazard-capture.md`;
+`protocols/wire-lab.d/TODO/TODO.md`;
+`protocols/wire-lab.d/TODO/TODO-rohub-dogfood-tool-name-and-collaborator-permission.md`;
+`protocols/wire-lab.d/TODO/TODO-kituj-te-43-promisebase-prior-art-adoption.md`;
+`protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`.
+
 ## Why a separate TODO
 
 `TODO-lilar` already records the original historical walk through turn 192 and
@@ -714,7 +743,7 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - [x] juhub.183 Turn 183 raw-log rewalk plus later-turn and later-artifact sweep.
 - [x] juhub.184 Turn 184 raw-log rewalk plus later-turn and later-artifact sweep.
 - [x] juhub.185 Turn 185 raw-log rewalk plus later-turn and later-artifact sweep.
-- [ ] juhub.186 Turn 186 raw-log rewalk plus later-turn and later-artifact sweep.
+- [x] juhub.186 Turn 186 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.187 Turn 187 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.188 Turn 188 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.189 Turn 189 raw-log rewalk plus later-turn and later-artifact sweep.
@@ -2502,3 +2531,66 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - `Proposed disposition` `resolved/transferred after two-PAT process rule, short-expiry guidance, scope verification, and redaction-rule capture`
 - `Write needed? yes/no` `no` further turn-185 write is needed after this pass.
 - `Next` Turn 186 is next.
+
+### Turn 186 — 2026-05-04 14:29 UTC
+
+- `Turn 186 plain-English recap` Steve supplied the promisebase PAT; the replay
+  records it only as a secret marker, not as literal token bytes. The assistant
+  saved it as the promisebase-specific credential, used it only for the
+  promisebase remote, and kept it separate from the wire-lab credential. The
+  assistant then pushed and fast-forwarded the promisebase randStream fix: the
+  local `ppx/fix-randstream-go120` work from turn 183 landed on promisebase main
+  at commit `d98b5d3`, the twig was deleted locally and remotely, and `db/` tests
+  were green on main. This completed the first end-to-end cross-repo contribution
+  in the replay slice: failing tests found in turn 181, regression confirmed in
+  turn 182, fix prepared locally in turn 183, two-PAT handling established in
+  turn 185, and push/merge/delete completed in turn 186. The assistant also
+  noticed a side-channel build hazard: `GOTOOLCHAIN=auto` plus a newer installed
+  Go toolchain can lazily rewrite `go.mod` with a higher `toolchain` line during
+  `go test`; the assistant checked out that drift before pushing so promisebase
+  main kept Steve's existing Go version/toolchain setting. Finally, the assistant
+  pivoted back toward TE-sihih by re-asking the solo-vs-broader-community question
+  from turn 184 and by asking whether to tackle Docker SDK / FUSE rot or hold it.
+  Turn 187 answers both: Steve is solo in promisebase right now, and other
+  promisebase work should be held while returning to TE-sihih. The durable
+  conclusions are process-level: PAT redaction was correctly applied, foreground
+  cross-repo completion needed clearer reporting, collaborator-sensitive questions
+  must be paraphrased when re-quoted, and operational build diagnostics need a
+  durable owner.
+- `Existing capture` `TODO-lilar` records `UT-186.a` for first application of the
+  PAT-redaction discipline, `UT-186.b` for the GOTOOLCHAIN auto-bump diagnostic
+  not yet having a persistent home, and `UT-186.c` for the collaborator-name
+  propagation caused by re-quoting the turn-184 question. AGENTS-ppx B4 now owns
+  secret redaction and per-remote credential separation; TODO-rohub and
+  AGENTS-ppx B3 own collaborator permission / non-mention constraints; the new
+  `TODO-nasat` owns cross-repo build-hazard capture; and TODO-kituj / `DR-tumus`
+  already own the Docker SDK, FUSE, partial-rot, and promisebase-readiness
+  consequences.
+- `Gaps or contradictions` The cross-repo fix was successful, but the assistant
+  mixed too many things into one response: credential storage, push/merge/delete,
+  db test status, GOTOOLCHAIN drift, TE-sihih pivot, and two new questions. Turn
+  188 later shows that Steve did not register the push status, so turn 186's
+  completion should have been foregrounded with a clear DONE line. The
+  GOTOOLCHAIN observation was useful, but it needed a durable owner. The
+  collaborator question should have been paraphrased instead of re-quoting the
+  protected name from the earlier question.
+- `Related UTs / owners` `UT-186.a` is captured by AGENTS-ppx B4 and the redacted
+  turn-186 replay note. `UT-186.b` is routed to `TODO-nasat` and the expanded
+  AGENTS-ppx B7 cross-repo hazard-capture rule. `UT-186.c` is routed to TODO-rohub
+  and AGENTS-ppx B3. The deferred Docker SDK / FUSE fixes remain routed to
+  TODO-kituj / `DR-tumus`; turn 187's "hold other promisebase work" confirms they
+  should not interrupt the recovery walkthrough.
+- `Owner/doc cleanup` Done. Added `DI-zagus`; created `TODO-nasat`; indexed
+  `TODO-nasat`; expanded AGENTS-ppx B7; added this turn-186 report; marked
+  `juhub.186` complete; and added a turn-186 transfer pointer to the UT
+  verification matrix. No `TODO-lilar` UT checkbox was flipped.
+- `Remaining decisions or work` Downstream work remains open, but it is captured:
+  `TODO-nasat` owns where cross-repo build hazards should live permanently;
+  TODO-rohub owns collaborator permission; AGENTS-ppx B4/B7 own credential
+  redaction and hazard-capture process; TODO-kituj / `DR-tumus` own the
+  promisebase partial-rot and adoption-readiness questions. For
+  recovery-walkthrough purposes, turn 186 has no uncaptured loose end.
+- `Work pending` no.
+- `Proposed disposition` `resolved/transferred after redacted PAT handling, promisebase fix push evidence, GOTOOLCHAIN hazard owner, and collaborator re-quote routing`
+- `Write needed? yes/no` `no` further turn-186 write is needed after this pass.
+- `Next` Turn 187 is next.

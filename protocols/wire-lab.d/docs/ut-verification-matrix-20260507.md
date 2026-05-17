@@ -933,3 +933,15 @@ fine-grained PATs, actual scope/expiry verification rather than filename-based
 read-only assumptions, and redaction of known token patterns before carry-over or
 handoff summaries are emitted. This does not touch runtime secret paths and does
 not use `TODO-lilar` checkboxes as closure authority.
+
+### 2026-05-17 — Turn-186 closure / transfer pointer
+
+`DI-zagus` reconciles turn 186's promisebase PAT application and randStream push.
+`UT-186.a` is captured by AGENTS-ppx B4 and the redacted turn-186 replay note.
+`UT-186.b` is routed to `TODO-nasat` and AGENTS-ppx B7 as the first explicit
+cross-repo build-hazard capture item: `GOTOOLCHAIN=auto` plus a newer Go
+toolchain can lazily rewrite `go.mod` during tests. `UT-186.c` is routed to
+TODO-rohub and AGENTS-ppx B3 as collaborator-sensitive re-quote handling. The
+Docker SDK and FUSE deferrals remain with TODO-kituj / `DR-tumus`. This does not
+touch runtime secret paths and does not use `TODO-lilar` checkboxes as closure
+authority.

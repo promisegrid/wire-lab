@@ -489,6 +489,14 @@ path/corpus, and count basis (matches, lines, files, or records).
 Do not use opaque labels such as "boilerplate" unless the label is
 defined well enough for the count to be reproduced. Source: DI-nulak.
 
+When cross-repo work surfaces an operational build, dependency, or
+toolchain hazard, record it in a discoverable owner before handoff:
+the affected repo's troubleshooting docs when available, otherwise a
+wire-lab TODO or coordination note. The record must include the trigger,
+observed symptom, suspected cause, mitigation used, and whether it
+affects protocol/design readiness or only local operations. Source:
+DI-zagus.
+
 # Reporting style (final handoff)
 
 When you finish a task, give Steve the AGENTS.md "Required final
