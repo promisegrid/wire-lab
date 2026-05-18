@@ -576,6 +576,13 @@ observed symptom, suspected cause, mitigation used, and whether it
 affects protocol/design readiness or only local operations. Source:
 DI-zagus.
 
+Treat discussion ledgers and status inventories as date-bound snapshots unless
+a current DI, DR, TODO, simulation, spec, or git check re-verifies their claims.
+Preserve the snapshot's historical body, add dated caveats or routing notes
+when later work supersedes it, and do not cite old paths, old TE numbers, or old
+"not yet committed" lists as current truth without re-grounding them. Source:
+DI-pazum.
+
 ## Incomplete input acknowledgement
 
 When Steve's message is visibly truncated or too incomplete to act on,

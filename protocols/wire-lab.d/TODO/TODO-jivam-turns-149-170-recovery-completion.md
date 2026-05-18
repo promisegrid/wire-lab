@@ -163,7 +163,9 @@ transports, TODO-kugod, or DR-nugog.
   `<slug>-draft` rename, `grid envelope` vocabulary, the transports to
   groups direction, first-class sites, CBOR/CIDv1 message format,
   wire-lab-as-canon versus promisebase-as-prototype, and dogfooding
-  pressure.
+  pressure. TODO-juhub now records turn 196 under `DI-pazum` as the
+  date-bound 72-hour ledger product: useful boundary evidence, but not a
+  current backlog after later replay, `rusis`, simulation, TODO, and DR routing.
 - **Turn 197:** Steve gave the concrete recovery procedure: create a TODO
   file with one line item per turn starting at 149, walk chronologically,
   write outstanding questions/answers/unfinished threads to the repo

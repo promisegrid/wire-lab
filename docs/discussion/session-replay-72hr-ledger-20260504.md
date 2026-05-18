@@ -2,6 +2,13 @@
 
 Source: `past_session_contexts/sessions/2026-05-04_2026-05-10/ea135ce8/conversation.md` turns 87–192. Cross-referenced against `wire-lab` git log (60 commits in window) and `promisebase` git log (1 commit in window). Status legend: **WRITTEN** = committed to a repo; **PARKED** = on a twig, not merged; **DROPPED** = abandoned in conversation; **REVERTED** = drafted then rolled back.
 
+Replay caveat added 2026-05-17: this file is a 2026-05-04 status snapshot, not
+a current backlog or design lock. Later chronological replay and simulation
+split work route or supersede many items below; use TODO-juhub, TODO-jivam,
+current simulation roots, DRs, DIs, and DEV-GUIDE-RESOURCES for current owner
+state before acting on old paths, TE numbers, or "not yet committed" labels.
+Source: `DI-pazum`.
+
 ---
 
 ## May 1 (turns 87–116)

@@ -754,6 +754,33 @@ Affects: `AGENTS-ppx.md`;
 `protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewalk.md`;
 `protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`.
 
+ID: DI-pazum
+Date: 2026-05-17 22:58:18
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Reconcile turn 196 as the date-bound 72-hour ledger product from
+turn 195's context-compression correction, while treating its
+verbal-rules-not-yet-committed list as a 2026-05-04 status snapshot that later
+replay, simulation, and TODO owners may supersede.
+Intent: Turn 196 produced the requested topic/status inventory and clarified the
+TE-numan / TE-37 confusion, but the ledger cannot remain an implicit current
+backlog after later turns and later `rusis` / simulation work moved or routed
+many of those items. Future agents need the ledger as historical evidence, not
+as permission to revive stale paths, stale TE numbering, or an obsolete
+dogfood-first / sweep-second plan without checking current owners.
+Constraints: Do not rewrite the historical ledger body as if the old statuses
+were current. Add dated caveats and owner routing instead. Do not edit
+promisebase, reopen TE-sihih, start dogfood implementation, or flip
+`TODO-lilar` checkboxes. Treat `transports/draft--wire-lab-devs/`, the
+`groups/group-session/...` target, and TE-37 / TE-numan numbering as
+date-bound ledger claims unless a current owner artifact re-verifies them.
+Affects: `AGENTS-ppx.md`;
+`DEV-GUIDE-RESOURCES.md`;
+`docs/discussion/session-replay-72hr-ledger-20260504.md`;
+`protocols/wire-lab.d/TODO/TODO-jivam-turns-149-170-recovery-completion.md`;
+`protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewalk.md`;
+`protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`.
+
 ## Why a separate TODO
 
 `TODO-lilar` already records the original historical walk through turn 192 and
@@ -1013,7 +1040,7 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - [x] juhub.193 Turn 193 raw-log rewalk plus later-turn and later-artifact sweep.
 - [x] juhub.194 Turn 194 raw-log rewalk plus later-turn and later-artifact sweep.
 - [x] juhub.195 Turn 195 raw-log rewalk plus later-turn and later-artifact sweep.
-- [ ] juhub.196 Turn 196 raw-log rewalk plus later-turn and later-artifact sweep.
+- [x] juhub.196 Turn 196 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.197 Turn 197 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.198 Turn 198 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.199 Turn 199 raw-log rewalk plus later-turn and later-artifact sweep.
@@ -3403,3 +3430,82 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - `Proposed disposition` `resolved/transferred after context-compression boundary capture, bounded-history-review process routing, and wire-lab-devs-draft naming owner reuse`
 - `Write needed? yes/no` `no` further turn-195 write is needed after this pass.
 - `Next` Turn 196 is next.
+
+### Turn 196 — 2026-05-04 16:42 UTC
+
+- `Turn 196 plain-English recap` Steve said the situation was getting more
+  confusing and asked the assistant to examine the last 72 hours of session
+  history one chunk at a time, list every topic discussed, say whether each
+  topic was dropped or written to the repo, and include the related TE number
+  when something was written. The assistant answered by saying a ledger had been
+  shared, then summarized three findings. First, TE-37 / TE-numan had been used
+  for three different uncommitted ideas: a reverted git-file-transport TE, a
+  conversation-only promisebase / layered-model sketch with eleven DFs, and an
+  off-base on-disk wire-lab-canon / promisebase draft that was deleted before
+  commit. Second, through TE-35 plus the old
+  `transports/draft--wire-lab-devs/` bootstrap, the repo had written the
+  per-author-branch binding, filename-equals-CID rule, and
+  receive-merge-push-then-optionally-post cycle at HEAD `8d3bf04`. Third, the
+  ledger had twelve "verbal rules not yet committed," including the
+  `<slug>-draft` naming convention, `grid envelope` vocabulary, a
+  `transports/` to `groups/` direction with a protocol-slug layer, first-class
+  `sites/`, CBOR / CIDv1 messages, wire-lab as canon and promisebase as
+  prototype, and dogfooding now so the developer group could collaborate. The
+  assistant recommended dogfood first, vocabulary/path sweep second, and a big
+  TE later, then asked whether to do step 1. Later replay changes the meaning of
+  that answer: the ledger is useful historical evidence and the actual turn-195
+  review product, but it is not a current backlog or design lock. Many listed
+  items were later captured in simulations, TODOs, DRs, and process rules, and
+  later `rusis` work moved the active specimen surface under independent
+  simulations rather than the old root transport path.
+- `Existing capture` The 72-hour inventory exists at
+  `docs/discussion/session-replay-72hr-ledger-20260504.md`. TODO-jivam already
+  names turn 196 as a boundary turn because it is the review product produced in
+  response to turn 195. The turn-170-through-195 reports in TODO-juhub and the
+  UT verification matrix now route the ledger's substantive items to current
+  owners: TE-sihih / TODO-vunub for the L5/L6/L7 model, TODO-rusis and the
+  simulation split for active specimen placement, `SIM-ludut` / TODO-rohub /
+  TODO-pipus / `DR-gabif` for dogfood and migration pressure, grid-envelope
+  simulations for envelope variants, TODO-kituj / `DR-tumus` and CAS sims for
+  L6 CAS and promisebase prior-art questions, and DEV-GUIDE-RESOURCES for
+  guide-writer cautions.
+- `Gaps or contradictions` The ledger's table and recommendation were correct
+  as a 2026-05-04 snapshot, but stale as a current task list. It still names old
+  paths such as `transports/draft--wire-lab-devs/`, records a proposed future
+  `groups/group-session/wire-lab-devs-draft/` target, and describes TE-37 /
+  TE-numan ambiguities that should not be treated as committed TE facts. The
+  dogfood-first / sweep-second / big-TE-last ordering was an assistant
+  recommendation, not a locked plan. Later turn 197 replaced the ad-hoc ledger
+  with chronological replay discipline, and later `rusis` / simulation work made
+  independent simulations the active discovery mechanism rather than a single
+  shared active specimen home.
+- `Related loose ends / owners` `UT-196.a` is the requested 72-hour review
+  product; it is captured by the discussion ledger and TODO-jivam's boundary
+  gate. `UT-196.b` is the TE-37 / TE-numan ambiguity; it is captured by the
+  ledger's "Where TE-numan stands today" section and AGENTS-ppx B7's
+  ground-truth-before-citation rule as extended for date-bound snapshots.
+  `UT-196.c` is the verbal-rules-not-yet-committed list; it is captured as
+  historical input by this turn report plus the current owner routing from turns
+  170-195, not as a new omnibus TODO. `UT-196.d` is the assistant's
+  dogfood-first / sweep-second recommendation; dogfood urgency is already routed
+  through `DI-vuzot`, `SIM-ludut`, TODO-rohub, TODO-pipus, and `DR-gabif`, while
+  sweep and placement questions are routed through TODO-rusis, grid-envelope
+  sims, and successor design owners. `UT-196.e` is the risk that a future reader
+  treats snapshot status as current truth; it is routed to AGENTS-ppx B7,
+  DEV-GUIDE-RESOURCES, and a dated caveat in the ledger itself.
+- `Owner/doc cleanup` Done. Added `DI-pazum`; expanded AGENTS-ppx B7 with a
+  date-bound status-snapshot rule; added a dated replay caveat to the 72-hour
+  ledger; updated DEV-GUIDE-RESOURCES so guide writers do not treat discussion
+  ledgers as final API/layout evidence; updated TODO-jivam's turn-196 boundary
+  note; added this turn-196 report; marked `juhub.196` complete; and added a
+  turn-196 transfer pointer to the UT verification matrix. No promisebase file
+  was touched, no TE was edited, no dogfood implementation was started, and no
+  `TODO-lilar` UT checkbox was flipped.
+- `Remaining decisions or work` The downstream design work named by the 72-hour
+  ledger continues in simulations, TODOs, and DRs, and TODO-jivam remains open
+  for the full 149-208 recovery monitor. The turn-196 loose ends themselves are
+  captured in durable owners and no longer require turn-local replay work.
+- `Work pending` no.
+- `Proposed disposition` `resolved/transferred after 72-hour-ledger capture, TE-numan ambiguity preservation, status-snapshot caveat, and current-owner routing`
+- `Write needed? yes/no` `no` further turn-196 write is needed after this pass.
+- `Next` Turn 197 is next.

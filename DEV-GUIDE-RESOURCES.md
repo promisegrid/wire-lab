@@ -21,6 +21,10 @@ PromiseGrid design choices are derived, tested, and recorded. Source:
 - Do not present draft TEs, TODOs, DRs, or transport specimens as final
   PromiseGrid APIs. Use them only as evidence for why a guide claim exists or
   remains unsettled. Source: `DI-nunut`.
+- Treat discussion ledgers and session-status inventories as dated provenance,
+  not as current API or layout guidance. Re-check current DIs, DRs, TODOs,
+  simulations, and specs before turning an old "not yet committed" list or path
+  name into guide prose. Source: `DI-pazum`.
 - `docs/thought-experiments/TE-gurov-promise-shaped-artifacts.md`,
   `docs/thought-experiments/TE-vilot-promise-shaped-simulation-artifacts.md`,
   `docs/thought-experiments/TE-hirap-artifacts-as-promisegrid-messages.md`, and

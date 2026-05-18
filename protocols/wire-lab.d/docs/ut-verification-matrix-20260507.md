@@ -1060,3 +1060,20 @@ history review before asking fresh design questions. `UT-195.c` is routed to
 TODO-jivam's boundary-turn closure gate and the turn-196 72-hour ledger product.
 This does not touch promisebase and does not use `TODO-lilar` checkboxes as
 closure authority.
+
+### 2026-05-17 — Turn-196 closure / transfer pointer
+
+`DI-pazum` reconciles turn 196 as the 72-hour ledger product and a
+date-bound-status-snapshot lesson. `UT-196.a` is captured by
+`docs/discussion/session-replay-72hr-ledger-20260504.md` and TODO-jivam's
+boundary-turn gate. `UT-196.b` is captured by the ledger's TE-numan ambiguity
+section plus AGENTS-ppx B7's ground-truthing rule. `UT-196.c` is captured as
+historical input by the current TODO-juhub turn-170-through-195 owner routing,
+not as a new omnibus backlog. `UT-196.d` is routed through `DI-vuzot`,
+`SIM-ludut`, TODO-rohub, TODO-pipus, `DR-gabif`, TODO-rusis, and successor
+simulation owners rather than treated as a locked dogfood-first / sweep-second
+plan. `UT-196.e` is routed to AGENTS-ppx B7, DEV-GUIDE-RESOURCES, and the
+ledger's dated caveat so old paths, old TE numbers, and old "not yet committed"
+labels are not cited as current truth without re-verification. This does not
+touch promisebase, edit TEs, start dogfood implementation, or use TODO-lilar
+checkboxes as closure authority.
