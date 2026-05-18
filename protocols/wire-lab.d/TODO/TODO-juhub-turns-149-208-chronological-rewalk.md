@@ -898,6 +898,28 @@ Affects: `protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewal
 `protocols/wire-lab.d/TODO/TODO-lilar-session-replay-cleanup.md`;
 `protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`.
 
+ID: DI-jofib
+Date: 2026-05-17 23:06:50
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Reconcile turn 202 as the old replay's turn-154 queue-status checkoff
+and preserve the remaining correction that turn 155 is TE-famar / TODO-rivuk
+setup, not the actual TE-havib breakthrough.
+Intent: Turn 202 correctly corrected the old line label by saying turn 154 is
+queue status rather than the start of TE-36, and it preserved the useful TODO 12
+/ TODO-bisur evidence for the later `021.todo12` investigation. It still said
+the TE-36 walk "actually begins" at turn 155, which current raw-turn and owner
+records narrow: turn 155 is TE-famar Project setup, turn 156 starts the
+scope challenge, turn 157 fixes the transport-vs-envelope frame, and turn 158 is
+the apparatus-vs-specimen breakthrough.
+Constraints: Do not rewrite TODO-lilar's historical walk notes or flip its UT
+checkboxes. Do not reopen TODO-bisur, TODO-020, TE-famar, or TE-havib. Treat the
+turn-202 handoff phrasing as historical replay narration corrected by current
+owner records.
+Affects: `protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewalk.md`;
+`protocols/wire-lab.d/TODO/TODO-lilar-session-replay-cleanup.md`;
+`protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`.
+
 ## Why a separate TODO
 
 `TODO-lilar` already records the original historical walk through turn 192 and
@@ -1163,7 +1185,7 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - [x] juhub.199 Turn 199 raw-log rewalk plus later-turn and later-artifact sweep.
 - [x] juhub.200 Turn 200 raw-log rewalk plus later-turn and later-artifact sweep.
 - [x] juhub.201 Turn 201 raw-log rewalk plus later-turn and later-artifact sweep.
-- [ ] juhub.202 Turn 202 raw-log rewalk plus later-turn and later-artifact sweep.
+- [x] juhub.202 Turn 202 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.203 Turn 203 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.204 Turn 204 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.205 Turn 205 raw-log rewalk plus later-turn and later-artifact sweep.
@@ -3886,3 +3908,53 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - `Proposed disposition` `resolved after batch-checkpoint preservation, TE-36 boundary correction, and stale parked-twig status routing`
 - `Write needed? yes/no` `no` further turn-201 write is needed after this pass.
 - `Next` Turn 202 is next.
+
+### Turn 202 — 2026-05-04 17:24 UTC
+
+- `Turn 202 plain-English recap` Steve typed `154`, asking the old replay to
+  walk turn 154. The assistant answered that turn 154 had been checked off and
+  explicitly corrected the old line label: turn 154 was purely a queue-status
+  turn, not the start of TE-36. That part is correct. Raw turn 154 was just the
+  assistant listing the open queue after TODO-020 work and recommending 020.8
+  first, then TODO 5 / TE-famar DFs. The assistant also flagged that TODO 12 /
+  TODO-bisur was still alive as of turn 154, which later became useful evidence
+  for `021.todo12`. The remaining imprecision is that the assistant said the
+  TE-36 walk "actually begins" at turn 155 when Steve picked option A. Current
+  raw-turn and owner records narrow that: turn 155 is still TE-famar /
+  TODO-rivuk Project setup and destination clarification; turn 156 starts the
+  scope challenge; turn 157 corrects the transport-vs-envelope framing; and turn
+  158 is the actual apparatus-vs-specimen breakthrough. Later TODO-lilar and
+  TODO-juhub notes already preserve this corrected boundary, and TODO-bisur's
+  later state is captured by `021.todo12`.
+- `Existing capture` TODO-lilar's `021.154` row correctly records turn 154 as a
+  queue-status / recommendation turn, includes TODO-bisur as live with two open
+  subtasks, and says no leftover threads existed at the turn boundary. TODO-lilar
+  `021.155` explicitly says the prior label was wrong and that turn 155 is
+  TE-famar / TODO-rivuk DF-1.1 setup, not TE-havib. TODO-lilar `021.156` through
+  `021.158` then capture the scope challenge, transport-vs-envelope correction,
+  and apparatus-vs-specimen reframe. TODO-juhub's earlier turn-154-through-158
+  reports match that sequence.
+- `Gaps or contradictions` The old turn-202 answer fixed one boundary error
+  while leaving a smaller one: it correctly removed turn 154 from TE-36, but
+  still put the TE-36 start at turn 155 instead of treating turn 155 as
+  TE-famar setup and turn 158 as the real apparatus-vs-specimen breakthrough.
+  The TODO 12 / TODO-bisur evidence is not a gap; it is now captured and closed
+  for TODO-lilar scope by `021.todo12`, with substantive freeze work owned
+  downstream.
+- `Related loose ends / owners` `UT-202.a` is the turn-154 queue-status
+  correction; it is closed by TODO-lilar `021.154` and TODO-juhub turn-154
+  records. `UT-202.b` is the turn-155-as-TE-36-start imprecision; it is closed
+  by TODO-lilar / TODO-juhub turn-155-through-158 boundary records. `UT-202.c`
+  is the TODO 12 / TODO-bisur alive-as-of-turn-154 evidence; it is captured by
+  TODO-lilar `021.todo12` and current downstream freeze owners. `UT-202.d` is
+  the handoff to turn 155; it has no standalone owner work.
+- `Owner/doc cleanup` Done. Added `DI-jofib`; added this turn-202 report; marked
+  `juhub.202` complete; and added a turn-202 transfer pointer to the UT
+  verification matrix. No TODO-lilar walk note or UT checkbox was changed.
+- `Remaining decisions or work` None for turn 202. The queue-status correction,
+  TE-36 boundary correction, and TODO-bisur evidence are captured in current
+  owner records.
+- `Work pending` no.
+- `Proposed disposition` `resolved after queue-status checkoff capture, TE-36 boundary correction, and TODO-bisur evidence routing`
+- `Write needed? yes/no` `no` further turn-202 write is needed after this pass.
+- `Next` Turn 203 is next.

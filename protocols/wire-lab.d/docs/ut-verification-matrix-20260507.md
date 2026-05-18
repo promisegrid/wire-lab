@@ -1134,3 +1134,15 @@ later TE-havib landing, TODO-lilok verification, TODO-kugod / matrix routing,
 and current turn-160-through-164 closure pointers. `UT-201.d` is ordinary replay
 handoff with no standalone owner work. This does not edit TODO-lilar walk notes
 or use TODO-lilar checkboxes as closure authority.
+
+### 2026-05-17 — Turn-202 closure / transfer pointer
+
+`DI-jofib` reconciles turn 202 as the turn-154 queue-status checkoff plus the
+remaining TE-36 boundary correction. `UT-202.a` is closed by TODO-lilar `021.154`
+and TODO-juhub's turn-154 record. `UT-202.b` is closed by current TODO-lilar and
+TODO-juhub records that keep turn 155 with TE-famar / TODO-rivuk and place the
+actual apparatus-vs-specimen breakthrough at turn 158. `UT-202.c` is captured by
+TODO-lilar `021.todo12` and downstream TODO-bisur / group-session freeze owners.
+`UT-202.d` is ordinary replay handoff with no standalone owner work. This does
+not edit TODO-lilar walk notes or use TODO-lilar checkboxes as closure
+authority.
