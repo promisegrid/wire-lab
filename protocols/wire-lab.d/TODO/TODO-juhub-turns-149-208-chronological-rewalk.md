@@ -997,6 +997,32 @@ Affects: `protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewal
 `protocols/wire-lab.d/specs/harness-spec-draft.md`;
 `protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`.
 
+ID: DI-vajuz
+Date: 2026-05-17 23:19:16
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Reconcile turn 206 as the old replay's turn-157 transport-vs-envelope
+correction, with candidate-envelope inventory and the `grid([pcid, payload])`
+working hypothesis routed to the grid-envelope successor simulations.
+Intent: Turn 206 preserved Steve's correction that transports are not envelope
+families and that `grid([pcid, payload])` was only a working hypothesis. The old
+answer still treated the result as a likely harness-level envelope-shape TE,
+which turn 158 immediately corrected into the apparatus-vs-specimen model.
+Current replay should keep turn 157's useful candidate inventory and
+working-hypothesis language while routing it to simulation-local specimen owners
+instead of making grid-envelope a canonical harness rule.
+Constraints: Do not rewrite TODO-lilar or flip TODO-lilar UT checkboxes. Do not
+make `grid([pcid, payload])` canonical. Do not reopen TE-famar, TODO-rivuk,
+DR-006, or the retired promise-stack hypothesis. Treat the turn-157
+Reading-1/2/3 menu as abandoned historical scaffolding and treat later
+grid-envelope work as standalone simulation specimens under `DI-joroh` and
+`DI-fanah`.
+Affects: `protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewalk.md`;
+`protocols/wire-lab.d/TODO/TODO-lilar-session-replay-cleanup.md`;
+`protocols/wire-lab.d/TODO/TODO-kugod-te-40-apparatus-vs-specimen-completion.md`;
+`simulations/SIM-kurim-grid-envelope/TODO/TODO-tujad-grid-envelope-successor-owner.md`;
+`protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`.
+
 ## Why a separate TODO
 
 `TODO-lilar` already records the original historical walk through turn 192 and
@@ -1266,7 +1292,7 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - [x] juhub.203 Turn 203 raw-log rewalk plus later-turn and later-artifact sweep.
 - [x] juhub.204 Turn 204 raw-log rewalk plus later-turn and later-artifact sweep.
 - [x] juhub.205 Turn 205 raw-log rewalk plus later-turn and later-artifact sweep.
-- [ ] juhub.206 Turn 206 raw-log rewalk plus later-turn and later-artifact sweep.
+- [x] juhub.206 Turn 206 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.207 Turn 207 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.208 Turn 208 raw-log rewalk plus later-turn and later-artifact sweep.
 
@@ -4190,3 +4216,57 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - `Proposed disposition` `resolved after turn-156 owner verification and historical batch-commit capture`
 - `Write needed? yes/no` `no` further turn-205 write is needed after this pass.
 - `Next` Turn 206 is next.
+
+### Turn 206 — 2026-05-04 22:36 UTC
+
+- `Turn 206 plain-English recap` Steve typed `157`, asking the old replay to
+  walk raw turn 157. The old assistant summarized Steve's correction that the
+  bot had conflated transports with envelopes: UDP-binding, group-session,
+  in-process channels, and other carriers are transports, while the message
+  envelope is the thing carried over them. Steve also stated that
+  `grid([pcid, payload])` was the working hypothesis, not a proven answer. The
+  old assistant then proposed "Reading 2," where TE-famar / TE-1 would be
+  superseded by a new harness-level envelope-shape TE, and it named five
+  candidate envelope alternatives: `grid([pcid, payload])`, a promise stack of
+  grid frames, bare CBOR, a capability-port triplet, and a tagged union over
+  single-grid and stack-of-grid forms. It logged three loose ends: the candidate
+  inventory was uncommitted, the Reading 1 / 2 / 3 status question was abandoned,
+  and the "grid is working but not proven" framing was uncommitted. Later turn
+  158 corrected the remaining assumption that a single harness-level envelope
+  should be locked in the harness-spec at all. Current artifacts preserve the
+  useful turn-157 inventory and grid-hypothesis language under
+  `simulations/SIM-kurim-grid-envelope/TODO/TODO-tujad-grid-envelope-successor-owner.md`
+  and its successor variant simulations, while the abandoned TE-famar status
+  question is retired with the promise-stack path.
+- `Existing capture` TODO-lilar `021.157` records the transport-vs-envelope
+  correction, the five candidate envelopes, and the three UTs. TODO-kugod marks
+  `UT-157.a` and `UT-157.c` resolved through the SIM-kurim grid-envelope
+  successor owner and marks `UT-157.b` retired through TODO-rivuk / `DI-runuh`.
+  SIM-kurim's TODO-tujad records the candidate envelope inventory and the
+  `grid([pcid, payload])` working hypothesis under `DI-joroh`, then closes the
+  concrete successor path by splitting into 24 standalone positional
+  grid-envelope simulations under `DI-fanah`.
+- `Gaps or contradictions` The old turn-206 answer is correct as a
+  transport-vs-envelope correction, but it is still transitional. Its "one
+  harness-level envelope-shape TE" framing was superseded one turn later by the
+  apparatus-vs-specimen model: the harness compares candidate envelope
+  specimens and should not make `grid([pcid, payload])` canonical up front.
+- `Related loose ends / owners` `UT-206.a` is the candidate-envelope inventory;
+  it is resolved by SIM-kurim TODO-tujad / `DI-joroh`. `UT-206.b` is the
+  abandoned Reading 1 / 2 / 3 question for TE-famar's status; it is retired
+  under TODO-rivuk / `DI-runuh`. `UT-206.c` is the `grid([pcid, payload])`
+  working-hypothesis framing; it is resolved by SIM-kurim TODO-tujad /
+  `DI-joroh` and by the 24 variant simulations under `DI-fanah`. `UT-206.d` is
+  the old batch-commit deferral and handoff to turn 158; it has no standalone
+  owner work.
+- `Owner/doc cleanup` Done. Added `DI-vajuz`; added this turn-206 report; marked
+  `juhub.206` complete; and added a turn-206 transfer pointer to the UT
+  verification matrix. No TODO-lilar walk note, TODO-lilar UT checkbox, TE body,
+  simulation file, or commit state was changed.
+- `Remaining decisions or work` None for turn 206. The turn-157 design residue
+  is fully captured in simulation-local grid-envelope owners or retired with the
+  promise-stack path.
+- `Work pending` no.
+- `Proposed disposition` `resolved after turn-157 successor-owner verification and grid-hypothesis routing`
+- `Write needed? yes/no` `no` further turn-206 write is needed after this pass.
+- `Next` Turn 207 is next.

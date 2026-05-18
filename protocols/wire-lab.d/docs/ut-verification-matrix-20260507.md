@@ -1183,3 +1183,16 @@ claim, resolved by TODO-kugod's `UT-156.c` row and the later harness-spec
 apparatus cleanup. `UT-205.e` is ordinary replay handoff to turn 157. This does
 not edit TODO-lilar walk notes, use TODO-lilar checkboxes as closure authority,
 or create a commit.
+
+### 2026-05-17 — Turn-206 closure / transfer pointer
+
+`DI-vajuz` reconciles turn 206 as the old replay's turn-157
+transport-vs-envelope correction. `UT-206.a` is the five-candidate envelope
+inventory, resolved by SIM-kurim TODO-tujad / `DI-joroh`. `UT-206.b` is the
+abandoned Reading 1 / 2 / 3 status question for TE-famar, retired under
+TODO-rivuk / `DI-runuh`. `UT-206.c` is the `grid([pcid, payload])`
+working-hypothesis framing, resolved by SIM-kurim TODO-tujad / `DI-joroh` and
+the 24 standalone positional variant simulations under `DI-fanah`. `UT-206.d`
+is ordinary batch-deferral / replay handoff with no owner work. This does not
+edit TODO-lilar walk notes, use TODO-lilar checkboxes as closure authority, make
+grid-envelope canonical, or create a commit.
