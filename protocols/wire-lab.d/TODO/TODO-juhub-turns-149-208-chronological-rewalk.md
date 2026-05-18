@@ -639,6 +639,37 @@ Affects: `AGENTS-ppx.md`;
 `DEV-GUIDE-RESOURCES.md`;
 `protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`.
 
+ID: DI-rupuh
+Date: 2026-05-17 22:09:26
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Reconcile turn 192 by preserving the raw-log correction that turn 192
+is only Steve's promisebase-modernization sentence, routing the active-prototype
+graduation frame to TE-43 / `DR-tumus` and TE-44, and routing the ambiguous
+`ref` shorthand, DF-list supersession, and twig-name churn to existing process
+and promisebase owners.
+Intent: Turn 192 refines the turn-191 canon rule without revoking it:
+promisebase is still prototype evidence under wire-lab canon, but Steve intends
+to reference, factor, modernize, and use promisebase as one possible PromiseGrid
+layer. The replay must keep that future-facing pressure visible while preventing
+three errors: folding the later dogfood directive from turn 193 into turn 192,
+treating the historical five-DF / six-DF / ten-DF lists as current without
+supersession, or silently interpreting `ref` as settled architecture.
+Constraints: Do not process turn 193 in this pass. Do not edit TODO-lilar or flip
+TODO-lilar UT checkboxes. Do not reopen or edit TE-sihih. Do not touch
+promisebase. Route `UT-192.x` to TODO-juhub raw-log authority, `UT-192.a` to
+AGENTS-ppx B6 / `DI-sapiv`, `UT-192.b` to TODO-kituj / `DR-tumus` and the
+`DI-mivap` kv-branch owners, `UT-192.c` and `UT-192.d` to AGENTS-ppx B5 plus
+TODO-kituj, `UT-192.e` to the AGENTS-ppx twig rule plus TODO-kituj / TODO-dozak,
+and `UT-192.f` to TODO-dozak.
+Affects: `AGENTS-ppx.md`;
+`protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewalk.md`;
+`protocols/wire-lab.d/TODO/TODO-kituj-te-43-promisebase-prior-art-adoption.md`;
+`protocols/wire-lab.d/TODO/TODO-dozak-te-44-wire-lab-promisebase-merge-trajectory.md`;
+`DR/DR-tumus-turn-177-l6-cas-adoption.md`;
+`DEV-GUIDE-RESOURCES.md`;
+`protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`.
+
 ## Why a separate TODO
 
 `TODO-lilar` already records the original historical walk through turn 192 and
@@ -650,6 +681,10 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 ## Per-turn discipline
 
 1. Read the raw session log for the current turn.
+   Raw turn files are authoritative over placeholder rows, continuity
+   summaries, and prior walk-note labels. If a placeholder conflates adjacent
+   turns, split the material by the raw turn files and keep out-of-scope later
+   directives with their own turn. Source: DI-rupuh.
 2. Sweep every later turn log and every later relevant artifact (`TE`, `DI`,
    `DR`, `TODO`, specs, matrix/disposition docs, essays, and research notes)
    for whether the current turn's questions, decisions, or plans were later
@@ -890,7 +925,7 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - [x] juhub.189 Turn 189 raw-log rewalk plus later-turn and later-artifact sweep.
 - [x] juhub.190 Turn 190 raw-log rewalk plus later-turn and later-artifact sweep.
 - [x] juhub.191 Turn 191 raw-log rewalk plus later-turn and later-artifact sweep.
-- [ ] juhub.192 Turn 192 raw-log rewalk plus later-turn and later-artifact sweep.
+- [x] juhub.192 Turn 192 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.193 Turn 193 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.194 Turn 194 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.195 Turn 195 raw-log rewalk plus later-turn and later-artifact sweep.
@@ -3033,3 +3068,78 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - `Proposed disposition` `resolved/transferred after prototype-not-canon canon-rule routing, scope-contraction process rule, chronology ground-truthing, and documented-conflict owner routing`
 - `Write needed? yes/no` `no` further turn-191 write is needed after this pass.
 - `Next` Turn 192 is next.
+
+### Turn 192 — 2026-05-04 16:00 UTC
+
+- `Turn 192 plain-English recap` Steve's actual turn-192 prompt was only the
+  sentence: "I do intend to ref, factor, modernize, and use promisebase as one
+  possible layer in promisegrid." The later dogfood-first sentence belongs to
+  turn 193, eight minutes later, and must not be folded into this turn. The
+  assistant interpreted Steve's sentence as a third promisebase framing: turn
+  187 had treated promisebase as a possible wholesale L6 substrate, turn 191 had
+  corrected that to promisebase-as-prototype under wire-lab canon, and turn 192
+  clarified that the prototype may still graduate into PromiseGrid as one
+  possible layer after refactoring and modernization. The assistant's synthesis
+  was: wire-lab owns the design canon; promisebase is a prototype that may become
+  PromiseGrid's L6 CAS substrate; wire-lab work should drive promisebase
+  modernization rather than promisebase's current design driving wire-lab. That
+  reframe reduced the promisebase-related decision list again, this time to five
+  questions: today's coupling model, modernization scope, eventual merge
+  mechanism, contribution flow, and naming/identity through transition. Later
+  turn 193 says "Those are all the right questions" before pivoting to dogfood
+  urgency, so turn 193 confirms the questions are relevant but does not answer
+  the choices. The unresolved pieces from turn 192 are: `ref` was ambiguous and
+  the assistant silently read it as "reference"; the separate promisebase `kv`
+  branch was still missing from the assistant's model; several historical DF
+  lists still needed explicit supersession; old twig-name proposals accumulated
+  without a chosen current twig; and the possible wire-lab / promisebase merge
+  path needed its own owner rather than being treated as already decided.
+- `Existing capture` `TODO-lilar` records `UT-192.x` for the placeholder
+  conflation of turns 192 and 193, `UT-192.a` for the positive third TE-sihih
+  reframe / DF-count contraction, `UT-192.b` for still missing the `kv` branch
+  under the active-prototype framing, `UT-192.c` for the ambiguous `ref`
+  shorthand, `UT-192.d` for multiple historical DF lists lacking explicit
+  supersession, `UT-192.e` for accumulating twig-name proposals, and `UT-192.f`
+  for the implicit wire-lab / promisebase merge or convergence commitment. The
+  disposition memo already classifies `UT-192.b` and `UT-192.f` under TE-43 /
+  TE-44 and `UT-192.a`, `UT-192.c`, `UT-192.d`, `UT-192.e`, and `UT-192.x` under
+  carry/process.
+- `Gaps or contradictions` The old TODO-lilar placeholder line was wrong where
+  it folded the turn-193 dogfood directive into turn 192; the raw log fixes the
+  boundary. Turn 192 does not revoke turn 191's prototype-not-canon rule; it adds
+  future modernization pressure on top of it. The assistant's "wire-lab and
+  promisebase will be in the same codebase eventually" language is stronger than
+  Steve's "one possible layer" wording, so the merge/convergence claim must stay
+  with TODO-dozak as a future DF, not as a settled fact. The `kv` branch remains
+  a later replay correction routed through `DI-mivap`; under turn 192 it becomes
+  a potential modernization/evidence target, not just a branch-enumeration
+  cleanup.
+- `Related UTs / owners` `UT-192.x` is routed to TODO-juhub's raw-log authority
+  rule. `UT-192.a` is already covered by AGENTS-ppx B6 / `DI-sapiv` as the
+  rederive-not-graft pattern for polarity-changing canon rules. `UT-192.b` is
+  routed to TODO-kituj / `DR-tumus`, plus the `DI-mivap` CAS simulation branch
+  target owners, as a requirement that TE-43 account for `main`, `kv`, merged
+  state, or no promisebase branch when judging modernization evidence. `UT-192.c`
+  is routed to AGENTS-ppx's new ambiguous-shorthand rule and to TODO-kituj so
+  `ref` is clarified or quoted as unresolved before TE-43 relies on it.
+  `UT-192.d` is routed to TODO-kituj as a canonical-list / supersession-history
+  requirement for the promisebase decision packet. `UT-192.e` is routed to the
+  existing AGENTS-ppx twig rule and to TODO-kituj / TODO-dozak's "no twig yet"
+  state. `UT-192.f` is routed to TODO-dozak, which owns whether wire-lab and
+  promisebase converge, merge, or remain independent.
+- `Owner/doc cleanup` Done. Added `DI-rupuh`; expanded AGENTS-ppx with an
+  ambiguous-shorthand rule; expanded TODO-juhub's raw-log authority rule; updated
+  TODO-kituj with turn-192 modernization, `ref`, DF-list supersession, and twig
+  carry requirements; updated TODO-dozak with the turn-192 "possible layer" /
+  convergence boundary; updated `DR-tumus` with the turn-192 future-layer
+  pressure; updated DEV-GUIDE-RESOURCES; added this turn-192 report; marked
+  `juhub.192` complete; and added a turn-192 transfer pointer to the UT
+  verification matrix. No promisebase file was touched, and no `TODO-lilar` UT
+  checkbox was flipped.
+- `Remaining decisions or work` TE-43 / `DR-tumus` and TE-44 still have open
+  downstream choices, but the turn-192 loose ends are captured in their proper
+  PromiseGrid design and replay-process owners.
+- `Work pending` no.
+- `Proposed disposition` `resolved/transferred after raw-log boundary correction, active-prototype modernization routing, shorthand/supersession/twig process routing, and merge-trajectory owner routing`
+- `Write needed? yes/no` `no` further turn-192 write is needed after this pass.
+- `Next` Turn 193 is next.

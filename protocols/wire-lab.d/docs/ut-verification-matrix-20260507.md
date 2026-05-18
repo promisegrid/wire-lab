@@ -1007,3 +1007,18 @@ captured by TODO-kituj, TODO-dozak, and `DR-tumus` as the documented-conflict
 default: prefer wire-lab unless Steve locks an exception. This does not answer
 downstream TE-43 / TE-44 choices and does not use `TODO-lilar` checkboxes as
 closure authority.
+
+### 2026-05-17 — Turn-192 closure / transfer pointer
+
+`DI-rupuh` reconciles turn 192's active-prototype modernization framing.
+`UT-192.x` is routed to TODO-juhub's raw-log authority rule: turn 192 is only
+the promisebase-modernization sentence, while the dogfood directive belongs to
+turn 193. `UT-192.a` is covered by AGENTS-ppx B6 / `DI-sapiv` as another
+rederive-not-graft example. `UT-192.b` is routed to TODO-kituj / `DR-tumus` and
+the `DI-mivap` kv-branch owners. `UT-192.c` is routed to AGENTS-ppx's
+ambiguous-shorthand rule and TODO-kituj. `UT-192.d` is routed to TODO-kituj's
+DF-list supersession requirement. `UT-192.e` is routed to the existing AGENTS-ppx
+twig rule plus TODO-kituj / TODO-dozak's no-current-twig state. `UT-192.f` is
+routed to TODO-dozak as the convergence / merge / independence decision. This
+does not answer downstream TE-43 / TE-44 choices and does not use `TODO-lilar`
+checkboxes as closure authority.

@@ -9,8 +9,9 @@ Before the TE-39 proquint migration, this file was known as:
 
 ## Status
 
-Open. Depends on TE-43 (promisebase prior-art adoption). No twig
-yet.
+Open. Depends on TE-43 (promisebase prior-art adoption). No twig yet. Turn 192's
+"one possible layer" wording is pressure for this TODO, not a settled merge
+decision. Source: `DI-rupuh`.
 
 ## Threads absorbed from OPEN-THREADS.md
 
@@ -23,6 +24,12 @@ Scope: surface the implicit "wire-lab and promisebase will be in the
 same codebase eventually" architectural commitment as a deliberate DF;
 name the merge endpoint, the staging mechanic, and the canonical-vs-
 prototype policy at merge time.
+
+Turn 192's wording is the positive future-pressure source: Steve intends to
+reference, factor, modernize, and use promisebase as one possible PromiseGrid
+layer. This TODO must decide whether that becomes convergence, merge,
+rename/rehome, or permanent separate repos after TE-43 decides the L6 CAS stance.
+Source: `DI-rupuh`.
 
 Turn 191's canon rule applies to merge-time decisions too: any convergence,
 merge, or long-lived divergence path must preserve wire-lab as design canon
@@ -49,13 +56,16 @@ Disposition-file pointer: `dropped-thread-disposition-20260506.md`
 - 2026-05-17: Turn 191's prototype-not-canon rule is routed here as the
   merge-time canon boundary: convergence must document conflicts and keep
   wire-lab authoritative unless Steve locks an exception. Source: `DI-sapiv`.
+- 2026-05-17: Turn 192's "one possible layer" wording is routed here as future
+  convergence pressure, but the merge endpoint remains undecided until a TE-44
+  DF locks it. Source: `DI-rupuh`.
 
 ## Subtasks
 
 - [ ] dozak.1 Decide whether wire-lab and promisebase should converge, merge, or
   stay independent before any cross-repo promisebase documentation or code
   trajectory is treated as PromiseGrid plan of record. Source: `DI-vabij`;
-  `DI-sapiv`.
+  `DI-sapiv`; `DI-rupuh`.
 
 ## Decision Intent Log
 

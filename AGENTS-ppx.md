@@ -487,6 +487,12 @@ cadence question, apply the rule; propose a scoped exception only when
 there is a concrete reason the standing rule is wrong for the current
 context. Source: DI-nezis.
 
+When Steve uses terse or ambiguous shorthand that changes a design frame,
+state the interpretation you are using before building further on it. If the
+interpretation affects a live TE, DR, or TODO, either ask the blocking
+clarifying question or route the ambiguity to that owner instead of silently
+turning the shorthand into architecture. Source: DI-rupuh.
+
 ## B6 — Apologize, audit, invalidate, propose
 
 When Steve identifies a structural error in your work — a wrong

@@ -59,6 +59,11 @@ Scope:
     through turn 192) by deciding whether TE-43 / `DR-tumus` evaluates
     promisebase `main`, `kv`, a merged state, or no promisebase branch as the
     prior-art / adoption target. Source: `DI-mivap`.
+  - Preserve turn 192's future-facing modernization pressure without treating
+    current promisebase design as canon: Steve intends to reference, factor,
+    modernize, and use promisebase as one possible PromiseGrid layer, so TE-43 /
+    `DR-tumus` must distinguish today's L6 CAS profile from any later
+    promisebase modernization or adoption path. Source: `DI-rupuh`.
   - When citing promisebase RFC age or provenance, use exact git-history dates:
     RFC-1003 / RFC-1004 / RFC-1005 trace to 2021-04-28; RFC-1003 and
     RFC-1005 were edited on 2021-07-08; RFC-1006 traces from 2021-06-23
@@ -92,6 +97,7 @@ definition must land first. The remaining decision gate is `DR-tumus`.
 
 Anchor: turn-191 canon rule; pitbase main + kv branch on
 stevegt/promisebase.
+Turn 192 adds future-layer pressure, but not a settled adoption mandate.
 Disposition-file pointer: `dropped-thread-disposition-20260506.md`
 § TE-43 cluster (25 UTs).
 
@@ -130,6 +136,11 @@ since it locks the prototype-not-canon stance.
   material conflict between wire-lab design choices and promisebase prior art,
   state the wire-lab-preferred default, and cite exact RFC/prototype dates
   instead of loose rounded-age claims. Source: `DI-sapiv`.
+- [ ] kituj.8 Before drafting TE-43, reconcile the historical promisebase DF
+  lists from turns 187, 191, and 192 into the current `DR-tumus` packet; state
+  which list supersedes which, clarify or quote Steve's ambiguous `ref` wording,
+  and pick a fresh concise twig only when the actual TE-43 work starts. Source:
+  `DI-rupuh`.
 
 ## Question log
 
@@ -159,6 +170,11 @@ since it locks the prototype-not-canon stance.
   stance here: TE-43 / `DR-tumus` should discuss material conflicts, prefer
   wire-lab unless Steve locks an exception, and use exact RFC/prototype dates
   when chronology supports the prior-art argument. Source: `DI-sapiv`.
+- 2026-05-17: Turn 192's active-prototype framing is routed here: promisebase may
+  become one possible PromiseGrid layer after reference/factoring/modernization,
+  but TE-43 must keep current promisebase design non-authoritative, account for
+  the `kv` branch as potential modernization evidence, and preserve the
+  `ref`/DF-list/twig loose ends until the actual TE-43 pass. Source: `DI-rupuh`.
 
 ## Decision Intent Log
 

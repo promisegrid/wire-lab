@@ -176,8 +176,11 @@ prototype-not-canon rule: guide writers must not present promisebase design as
 PromiseGrid canon, should document material promisebase-vs-wire-lab conflicts,
 should prefer wire-lab unless a later locked decision says otherwise, and should
 cite exact 2021 RFC/prototype dates and 2025 PromiseGrid message-format dates
-rather than loose rounded-age claims when chronology matters. Source:
-`DI-nulak`; `DI-mivap`; `DI-sapiv`.
+rather than loose rounded-age claims when chronology matters. Turn 192 adds that
+promisebase may become one possible PromiseGrid layer after reference,
+factoring, and modernization, but guide writers should not describe that as a
+settled merge or settled L6 substrate until `DR-tumus` and TODO-dozak close.
+Source: `DI-nulak`; `DI-mivap`; `DI-sapiv`; `DI-rupuh`.
 
 ## Protocol/Specimen TODO Question Simulations
 
@@ -401,7 +404,8 @@ final normative references. Source: `DI-zalak`.
   177; DF-tumus.1 through DF-tumus.3 now include the `DI-molah` synthesis of
   the `DI-bukoh` bakeoff simulations, and DF-tumus.4 now includes the
   promisebase `main`/`kv`/merged/no-branch evidence-target choice plus the
-  turn-191 prototype-not-canon / documented-conflict constraint.
+  turn-191 prototype-not-canon / documented-conflict constraint and turn-192
+  active-prototype modernization pressure.
 - `DR-gabif` — decides additive migration from historical inline group-session
   evidence to CAS-backed group-session specimens.
 - `DR-robon` — decides whether turn-177 promise-vocabulary, 100-year, and
