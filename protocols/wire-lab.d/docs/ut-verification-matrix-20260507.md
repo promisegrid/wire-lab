@@ -1196,3 +1196,17 @@ the 24 standalone positional variant simulations under `DI-fanah`. `UT-206.d`
 is ordinary batch-deferral / replay handoff with no owner work. This does not
 edit TODO-lilar walk notes, use TODO-lilar checkboxes as closure authority, make
 grid-envelope canonical, or create a commit.
+
+### 2026-05-17 — Turn-207 closure / transfer pointer
+
+`DI-guboj` reconciles turn 207 as the old replay's promise-stack provenance and
+ledger-placement checkpoint. `UT-207.a` is the promise-stack provenance audit,
+captured by TODO-lilar `UT-PSTK-origin`, TODO-lilar cross-cutting question 6,
+and `docs/research/nested-vs-stacked-envelopes-20260504.md`. `UT-207.b` is the
+unfinished-thread ledger location question, closed by turn 208's instruction to
+keep the ledger in TODO 021 and by the current TODO-lilar / TODO-juhub split.
+`UT-207.c` is the abandoned ledger-split recommendation, rejected by Steve in
+turn 208. `UT-207.d` is the nested-vs-stacked research handoff; the completed
+research doc exists, and its user-facing questions are turn-208 cleanup scope.
+This does not edit TODO-lilar walk notes, use TODO-lilar checkboxes as closure
+authority, edit TE bodies, or create a commit.

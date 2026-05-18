@@ -1023,6 +1023,31 @@ Affects: `protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewal
 `simulations/SIM-kurim-grid-envelope/TODO/TODO-tujad-grid-envelope-successor-owner.md`;
 `protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`.
 
+ID: DI-guboj
+Date: 2026-05-17 23:21:20
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Reconcile turn 207 as the old replay's promise-stack provenance and
+unfinished-thread-ledger placement checkpoint.
+Intent: Turn 207 surfaced two process/design risks: "promise stack" may have
+been a bot mistranslation of Steve's "promises all the way down" recursion
+framing, and the unfinished-thread ledger might have needed its own TODO file.
+Later turn 208 settled the ledger-placement question by keeping the ledger in
+TODO-lilar / TODO 021, and then completed the provenance search and launched the
+nested-vs-stacked research. Current replay should preserve that sequence without
+splitting TODO-lilar, rewriting historical UT rows, or reopening promise-stack
+as a live envelope model.
+Constraints: Do not rewrite TODO-lilar or flip TODO-lilar UT checkboxes. Do not
+split the unfinished-thread ledger into a new TODO because turn 208 explicitly
+rejected that recommendation. Do not edit the nested-vs-stacked research doc or
+TE-famar in this pass. Treat the five user-facing questions in the research doc
+as turn-208 follow-on scope, not unresolved turn-207 routing work.
+Affects: `protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewalk.md`;
+`protocols/wire-lab.d/TODO/TODO-lilar-session-replay-cleanup.md`;
+`docs/research/nested-vs-stacked-envelopes-20260504.md`;
+`docs/thought-experiments/TE-famar-promise-stack-ordering.md`;
+`protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`.
+
 ## Why a separate TODO
 
 `TODO-lilar` already records the original historical walk through turn 192 and
@@ -1293,7 +1318,7 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - [x] juhub.204 Turn 204 raw-log rewalk plus later-turn and later-artifact sweep.
 - [x] juhub.205 Turn 205 raw-log rewalk plus later-turn and later-artifact sweep.
 - [x] juhub.206 Turn 206 raw-log rewalk plus later-turn and later-artifact sweep.
-- [ ] juhub.207 Turn 207 raw-log rewalk plus later-turn and later-artifact sweep.
+- [x] juhub.207 Turn 207 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.208 Turn 208 raw-log rewalk plus later-turn and later-artifact sweep.
 
 ## Turn notes
@@ -4270,3 +4295,58 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - `Proposed disposition` `resolved after turn-157 successor-owner verification and grid-hypothesis routing`
 - `Write needed? yes/no` `no` further turn-206 write is needed after this pass.
 - `Next` Turn 207 is next.
+
+### Turn 207 — 2026-05-04 22:39 UTC
+
+- `Turn 207 plain-English recap` Steve asked where "promise stack" came from,
+  suspecting it was a misunderstanding of an earlier "envelopes of promises can
+  be nested" / "promises all the way down" point. He also asked where the
+  unfinished-thread ledger was stored, whether it was on disk in the repo, and
+  whether it should be a TODO file. The old assistant answered that "promise
+  stack" appeared as an axiomatic term in the early TE-famar / TE-1 line and had
+  propagated through related TEs, harness-spec language, and TODOs without a
+  cited origin. It accepted Steve's hypothesis as plausible: recursive
+  containment is different from an ordered frame sequence that gets peeled, and
+  those concepts had likely been conflated. The assistant also said the ledger
+  lived on disk in the repo inside the then-current TODO 021 replay file and
+  recommended splitting the ledger into a sibling TODO. Later turn 208 rejected
+  that split: Steve said to keep the ledger in TODO 021. Turn 208 then traced
+  the phrase to the bot's turn-2 mistranslation of "layered set of promises,"
+  logged `UT-PSTK-origin`, and launched the nested-vs-stacked research. Current
+  artifacts preserve the provenance in TODO-lilar and
+  `docs/research/nested-vs-stacked-envelopes-20260504.md`, while TE-famar is
+  retired as the wrong envelope-level position for promise-stack machinery.
+- `Existing capture` TODO-lilar contains `UT-PSTK-origin`, which records the
+  turn-2 mistranslation and the distinction between recursive containment and
+  ordered stacking. TODO-lilar cross-cutting question 6 is checked and points to
+  the completed nested-vs-stacked research doc plus Steve's later synthesis.
+  The research doc concludes that recursive nesting with a mandatory
+  content-addressed type token ages better at the message-envelope layer, while
+  ordered frame sequences fit transport / handshake layers. TE-famar's
+  2026-05-08 refinement points current readers away from promise-stack DFs and
+  toward payload-recursion framing.
+- `Gaps or contradictions` The old turn-207 answer correctly identified the
+  ledger location and the conceptual risk, but its recommendation to split the
+  ledger was explicitly rejected in turn 208. Its initial provenance claim was
+  also incomplete: turn 208 later traced the concrete origin to turn 2, not just
+  to TE-famar / TE-1.
+- `Related loose ends / owners` `UT-207.a` is the promise-stack provenance
+  audit; it is captured by TODO-lilar `UT-PSTK-origin`, TODO-lilar cross-cutting
+  question 6, and `docs/research/nested-vs-stacked-envelopes-20260504.md`.
+  `UT-207.b` is the ledger-location question; it is closed by turn 208's "keep
+  the ledger in TODO 021" correction and by current TODO-lilar / TODO-juhub
+  replay structure. `UT-207.c` is the abandoned recommendation to split the
+  ledger; it is closed as rejected by Steve in turn 208. `UT-207.d` is the
+  research-doc follow-on; the completed research doc exists, and its later
+  user-facing questions belong to turn-208 cleanup rather than this turn.
+- `Owner/doc cleanup` Done. Added `DI-guboj`; added this turn-207 report; marked
+  `juhub.207` complete; and added a turn-207 transfer pointer to the UT
+  verification matrix. No TODO-lilar walk note, TODO-lilar UT checkbox, research
+  doc, TE body, simulation file, or commit state was changed.
+- `Remaining decisions or work` None for turn 207. The provenance thread and
+  ledger-placement question are captured, and the remaining nested-vs-stacked
+  research questions are handled as turn-208 follow-on scope.
+- `Work pending` no.
+- `Proposed disposition` `resolved after promise-stack provenance capture and ledger-split rejection`
+- `Write needed? yes/no` `no` further turn-207 write is needed after this pass.
+- `Next` Turn 208 is next.
