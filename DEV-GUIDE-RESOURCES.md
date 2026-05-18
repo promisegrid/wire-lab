@@ -111,6 +111,10 @@ Turn 193 is the urgency source for the `wire-lab-devs` dogfood lineage: the
 developer group needed message-transport dogfooding ASAP so Steve was not
 working solo. Guide writers should point to `SIM-ludut` as dogfood evidence, not
 as a final PromiseGrid group layout or CAS migration answer. Source: `DI-vuzot`.
+Turn 194 is the naming/context caution for that same lineage: preserve the
+current `wire-lab-devs-draft` specimen name when citing dogfood evidence, and
+do not let adjacent promisebase framing erase the current wire-lab-devs path.
+Source: `DI-fugod`.
 | `transports/README.md` | `protocols/wire-lab.d/archive/migrations/SIM-piloh-turns-149-208-recovery/archive/transports/README.md` | Historical wire-lab design note. | Preserve as provenance for why the transport surface existed, not as current guide layout. |
 | `proposals/approved/` | `protocols/wire-lab.d/archive/migrations/SIM-piloh-turns-149-208-recovery/archive/proposals/approved/` | Historical review evidence. | Approved proposal records are useful history; current guide feedback belongs outside wire-lab in the guide process. |
 | `proposals/pending/` | `protocols/wire-lab.d/archive/migrations/SIM-piloh-turns-149-208-recovery/archive/proposals/pending/` | Historical pending/contested review evidence. | Pending proposal records are not a live queue after the dev-guide resource/feedback process replaced proposals. |

@@ -703,6 +703,32 @@ Affects: `AGENTS-ppx.md`;
 `DEV-GUIDE-RESOURCES.md`;
 `protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`.
 
+ID: DI-fugod
+Date: 2026-05-17 22:37:12
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Reconcile turn 194 by treating Steve's "commit and push" request plus
+wrong-name correction as a foreground repo-state / artifact-integrity request,
+not as permission to restart an unrelated promisebase-slot design question.
+Intent: Turn 194 is the immediate escalation of the turn-193 miss. Steve asked
+for commit and push, but also flagged that the wire-lab draft name was wrong.
+The assistant should have answered whether it could commit/push, fixed or
+routed the naming error around `wire-lab-devs-draft`, and then stopped or
+continued with the requested dogfood path. Instead it asked a broad
+promisebase-framing question, which deepened the context-compression failure
+turn 195 then diagnosed explicitly.
+Constraints: Do not actually commit or push as part of this replay pass. Do not
+edit promisebase, reopen TE-sihih, start dogfood implementation, or flip
+`TODO-lilar` checkboxes. Route the missed commit/push action and direct-action
+ordering to AGENTS-ppx B2 / B1, route the `wire-lab-devs-draft` name correction
+to `SIM-ludut` / current resource pointers, and route the promisebase role
+question back to TODO-kituj / TODO-dozak via `DI-rupuh` rather than treating it
+as a new turn-194 blocker.
+Affects: `AGENTS-ppx.md`;
+`DEV-GUIDE-RESOURCES.md`;
+`protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewalk.md`;
+`protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`.
+
 ## Why a separate TODO
 
 `TODO-lilar` already records the original historical walk through turn 192 and
@@ -960,7 +986,7 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - [x] juhub.191 Turn 191 raw-log rewalk plus later-turn and later-artifact sweep.
 - [x] juhub.192 Turn 192 raw-log rewalk plus later-turn and later-artifact sweep.
 - [x] juhub.193 Turn 193 raw-log rewalk plus later-turn and later-artifact sweep.
-- [ ] juhub.194 Turn 194 raw-log rewalk plus later-turn and later-artifact sweep.
+- [x] juhub.194 Turn 194 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.195 Turn 195 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.196 Turn 196 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.197 Turn 197 raw-log rewalk plus later-turn and later-artifact sweep.
@@ -3239,3 +3265,63 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - `Proposed disposition` `resolved/transferred after dogfood-pivot routing, repo-state-condition process rule, stale-ledger correction, and downstream owner capture`
 - `Write needed? yes/no` `no` further turn-193 write is needed after this pass.
 - `Next` Turn 194 is next.
+
+### Turn 194 — 2026-05-04 16:16 UTC
+
+- `Turn 194 plain-English recap` Steve told the assistant to commit and push,
+  but also said the assistant had forgotten conclusions about the wire-lab draft
+  and had the name wrong. In context, this was the concrete correction following
+  turn 193's missed dogfood pivot: the relevant live name was
+  `wire-lab-devs-draft`, not an older or invented draft path, and the immediate
+  task was repo-state/action handling. The assistant did not commit, push, or
+  answer why it could not. It also did not fix or route the wrong-name issue.
+  Instead it reframed the conversation into three promisebase-integration
+  possibilities: promisebase as CAS storage substrate, promisebase as one
+  possible PromiseGrid layer, or some third role. That promisebase question was
+  not useless in isolation, but it was the wrong response to this turn. It
+  repeated the same failure class as turn 193: substituting adjacent design
+  analysis for the user's foreground repo-state/action request and losing the
+  current wire-lab-devs naming context. Turn 195 then made that failure explicit,
+  saying the assistant still had the `wire-lab-devs-draft` directory name wrong
+  and asking for a detailed history review from TE-35 through the first
+  promisebase mention. Turn 196 turned that review into the 72-hour ledger, and
+  turn 197 created the chronological replay process. The useful conclusion from
+  turn 194 is procedural: when Steve says "commit and push" while flagging a
+  concrete naming error, answer the commit/push state and the exact artifact name
+  first; do not wander into a fresh design-clarification question before that is
+  settled.
+- `Existing capture` `TODO-lilar` is out of scope after turn 192, so it has no
+  turn-194 UT row. Turn 193's `DI-vuzot` already captures the prior dogfood
+  pivot miss, and turn 195 / TODO-jivam identify the context-loss boundary. The
+  current resource map and `SIM-ludut-wire-lab-devs` preserve the
+  `wire-lab-devs-draft` specimen path. TODO-kituj and TODO-dozak already own the
+  promisebase-as-prototype / possible-layer / convergence questions through
+  `DI-rupuh`.
+- `Gaps or contradictions` The assistant's promisebase A/B/C question should
+  not be treated as a new turn-194 design decision. It was a misplaced question:
+  the underlying promisebase-role uncertainty remains real, but it was already
+  routed by turns 191-193. The turn-194-specific gap is the unhandled
+  commit/push request and the unhandled wrong-name correction.
+- `Related loose ends / owners` `UT-194.a` is the direct commit/push miss; it is
+  routed to AGENTS-ppx B2's foreground DONE / repo-state rule and B1's
+  authorization/execution split. `UT-194.b` is the wrong-name correction; it is
+  routed to the current `SIM-ludut-wire-lab-devs` specimen/resource pointers and
+  to DEV-GUIDE-RESOURCES so future guide prose keeps `wire-lab-devs-draft`
+  straight. `UT-194.c` is the promisebase role question; it remains routed to
+  TODO-kituj / `DR-tumus` and TODO-dozak through `DI-rupuh`, not to a new
+  turn-local owner. `UT-194.d` is the action-request-to-design-question process
+  failure; it is routed to AGENTS-ppx B2's new direct commit/push ordering rule.
+- `Owner/doc cleanup` Done. Added `DI-fugod`; expanded AGENTS-ppx B2 with a
+  direct commit/push plus correction ordering rule; updated DEV-GUIDE-RESOURCES
+  with the turn-194 naming/context caution; added this turn-194 report; marked
+  `juhub.194` complete; and added a turn-194 transfer pointer to the UT
+  verification matrix. No promisebase file was touched, no dogfood
+  implementation was started, and no `TODO-lilar` UT checkbox was flipped.
+- `Remaining decisions or work` Actual dogfood implementation, tool naming,
+  additive migration, and promisebase-role choices remain open downstream, but
+  turn 194's loose ends are captured in process, resource, sim, TODO, and DR
+  owners.
+- `Work pending` no.
+- `Proposed disposition` `resolved/transferred after direct-action process routing, wire-lab-devs-draft naming capture, and promisebase-role owner re-use`
+- `Write needed? yes/no` `no` further turn-194 write is needed after this pass.
+- `Next` Turn 195 is next.

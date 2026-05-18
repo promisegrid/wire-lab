@@ -1035,3 +1035,16 @@ rule. Dogfood urgency is routed to `SIM-ludut`, TODO-rohub, TODO-pipus, and
 `DR-tumus` and TODO-dozak through `DI-rupuh`; and the stale 72-hour ledger turn
 number is corrected. This does not start dogfood implementation and does not use
 `TODO-lilar` checkboxes as closure authority.
+
+### 2026-05-17 — Turn-194 closure / transfer pointer
+
+`DI-fugod` reconciles turn 194's direct "commit and push" request and
+wrong-name correction. `UT-194.a` is routed to AGENTS-ppx B2 / B1: a direct
+commit/push instruction must be performed or explicitly blocked before adjacent
+design analysis. `UT-194.b` is routed to `SIM-ludut` and DEV-GUIDE-RESOURCES as
+the current `wire-lab-devs-draft` naming/resource pointer. `UT-194.c` is not a
+new promisebase decision owner; the promisebase-role question remains with
+TODO-kituj / `DR-tumus` and TODO-dozak through `DI-rupuh`. `UT-194.d` is routed
+to the AGENTS-ppx B2 direct-action ordering rule. This does not commit/push
+retroactively, does not touch promisebase, and does not use `TODO-lilar`
+checkboxes as closure authority.

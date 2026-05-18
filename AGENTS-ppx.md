@@ -474,6 +474,13 @@ with exact artifacts, refs, or "not committed yet." Do not substitute adjacent
 numbering, naming, or history analysis for the state answer before addressing
 the requested pivot. Source: DI-vuzot.
 
+When Steve directly asks to "commit and push" while also flagging a concrete
+artifact correction, report the requested action state first: either perform the
+authorized commit/push and give the DONE line, or state the exact blocker before
+any design clarification. Resolve or route the concrete correction next,
+including the exact current file/path/name. Do not replace the requested action
+with a broad adjacent design question. Source: DI-fugod.
+
 ## B5 — One-DF-at-a-time discipline
 
 Present DFs to Steve one at a time. Each DF must list the surviving
