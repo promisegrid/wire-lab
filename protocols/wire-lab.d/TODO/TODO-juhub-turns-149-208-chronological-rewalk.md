@@ -781,6 +781,32 @@ Affects: `AGENTS-ppx.md`;
 `protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewalk.md`;
 `protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`.
 
+ID: DI-ropad
+Date: 2026-05-17 23:00:11
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Reconcile turn 197 as the original chronological replay-procedure
+creation turn: it created the predecessor TODO-lilar artifact and locked the
+write-before-thread-change discipline, while later replay rules and TODO-juhub
+own the current 193-208 rewalk mechanics.
+Intent: Turn 197 is the bridge from the 72-hour status ledger to durable
+context-loss cleanup. The answer successfully put the ledger and a per-turn TODO
+into the repo, but it also asked whether to batch early turns and used the old
+timestamp TODO filename and twig state. Later turns and artifacts resolved those
+details: turn 198 chose rigorous chronological walking and added TODO-bisur /
+pre-149 checks, turn 208 kept the unfinished-thread ledger inside TODO-lilar,
+TODO-lilar became the historical 149-192 walk plus open UT store, and
+TODO-juhub became the successor one-turn-at-a-time authority for this rewalk.
+Constraints: Do not rewrite TODO-lilar's historical walk notes or flip its UT
+checkboxes. Do not resurrect the old timestamp filename as current. Treat the
+turn-197 A/B question, old twig name, and batch-mode details as historical
+setup that later turns resolved or superseded. Keep TODO-jivam as the closure
+monitor, not the per-turn ledger.
+Affects: `protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewalk.md`;
+`protocols/wire-lab.d/TODO/TODO-jivam-turns-149-170-recovery-completion.md`;
+`protocols/wire-lab.d/TODO/TODO-lilar-session-replay-cleanup.md`;
+`protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`.
+
 ## Why a separate TODO
 
 `TODO-lilar` already records the original historical walk through turn 192 and
@@ -1041,7 +1067,7 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - [x] juhub.194 Turn 194 raw-log rewalk plus later-turn and later-artifact sweep.
 - [x] juhub.195 Turn 195 raw-log rewalk plus later-turn and later-artifact sweep.
 - [x] juhub.196 Turn 196 raw-log rewalk plus later-turn and later-artifact sweep.
-- [ ] juhub.197 Turn 197 raw-log rewalk plus later-turn and later-artifact sweep.
+- [x] juhub.197 Turn 197 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.198 Turn 198 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.199 Turn 199 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.200 Turn 200 raw-log rewalk plus later-turn and later-artifact sweep.
@@ -3509,3 +3535,63 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - `Proposed disposition` `resolved/transferred after 72-hour-ledger capture, TE-numan ambiguity preservation, status-snapshot caveat, and current-owner routing`
 - `Write needed? yes/no` `no` further turn-196 write is needed after this pass.
 - `Next` Turn 197 is next.
+
+### Turn 197 — 2026-05-04 17:07 UTC
+
+- `Turn 197 plain-English recap` Steve said there was a mess to clean up and a
+  lot of dropped threads. He gave the concrete recovery procedure: write the
+  prior report to a new TODO file, one line item per turn starting at turn 149;
+  walk the session chronologically one turn at a time; for each turn describe
+  the turn, ask any outstanding questions, write results to the repo, and always
+  write all outstanding questions, answers, and unfinished threads to the repo
+  before changing threads; and check off each line item as the walk proceeded.
+  The assistant created the predecessor replay TODO using the old timestamp
+  filename, committed the 72-hour ledger, pushed the twig, and checked off
+  `021.0`. It then restated the per-turn discipline and asked whether to walk
+  all 44 turns with full rigor or batch-acknowledge turns 149-163 before walking
+  164-192 individually. Later turns resolved that question: turn 198 answered
+  A yes and B no, added TODO-bisur and pre-149 investigation items, and the
+  historical TODO-lilar walk proceeded through 192; turn 208 kept the
+  unfinished-thread ledger inside TODO-lilar instead of splitting it out. Later
+  recovery work changed the active authority: TODO-lilar is now historical
+  evidence plus the open UT store for turns 149-192, TODO-jivam is the closure
+  monitor, and TODO-juhub is the successor one-turn-at-a-time rewalk ledger for
+  turns 149-208 with the stronger report format.
+- `Existing capture` TODO-lilar preserves the original turn-197 product. Its
+  prior aliases identify the old integer and timestamp names, its status
+  correction says the chronological walk is complete but UT closure remains open
+  through successor owners, and its body preserves the per-turn discipline and
+  turn-198 / turn-208 follow-ons. TODO-jivam already names turn 197 as a
+  boundary turn because it created the replay procedure and the predecessor
+  TODO-lilar artifact. TODO-juhub now carries the current stronger replay
+  procedure through `DI-nagat`, `DI-gudap`, `DI-vanak`, `DI-firap`, and
+  `DI-vumir`.
+- `Gaps or contradictions` The turn-197 answer was useful but not final. It
+  used the old timestamp filename and twig state, both now historical aliases.
+  It asked a batching question even though Steve had said "one turn at a time";
+  turn 198 resolved that by choosing the full-rigor path. It described committing
+  and pushing the setup, but later recovery concluded that a completed walk is
+  not the same thing as closed recovery, so TODO-lilar remains open until its
+  UTs are closed, retired, or transferred through proper owners. The current
+  replay also extends beyond TODO-lilar's original 149-192 scope, so TODO-juhub
+  is the current per-turn mechanism for 193-208.
+- `Related loose ends / owners` `UT-197.a` is the durable-replay-procedure
+  instruction; it is captured by TODO-lilar's original discipline and
+  superseded-for-current-use by TODO-juhub's stronger per-turn discipline.
+  `UT-197.b` is the new-TODO-file product; it is captured by TODO-lilar's prior
+  aliases and status correction. `UT-197.c` is the write-before-thread-change
+  rule; it is captured by TODO-lilar and TODO-juhub. `UT-197.d` is the A/B
+  batching question; it is resolved by turn 198's "A: yes. B: no." `UT-197.e`
+  is the scope boundary: TODO-lilar covers 149-192, while TODO-juhub and
+  TODO-jivam account for 193-208 boundary/replay work.
+- `Owner/doc cleanup` Done. Added `DI-ropad`; added this turn-197 report;
+  marked `juhub.197` complete; updated TODO-jivam's turn-197 boundary note; and
+  added a turn-197 transfer pointer to the UT verification matrix. No
+  TODO-lilar walk note or UT checkbox was changed.
+- `Remaining decisions or work` TODO-lilar, TODO-jivam, and downstream owner
+  TODOs/DRs still carry recovery work, but turn 197's own process loose ends are
+  captured in the proper replay and monitor owners.
+- `Work pending` no.
+- `Proposed disposition` `resolved/transferred after original replay-procedure capture, turn-198 batching resolution, turn-208 ledger-location resolution, and TODO-juhub successor routing`
+- `Write needed? yes/no` `no` further turn-197 write is needed after this pass.
+- `Next` Turn 198 is next.

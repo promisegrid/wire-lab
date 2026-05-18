@@ -170,7 +170,10 @@ transports, TODO-kugod, or DR-nugog.
   file with one line item per turn starting at 149, walk chronologically,
   write outstanding questions/answers/unfinished threads to the repo
   before changing threads, and check off line items. The answer created
-  the predecessor TODO-lilar artifact with a 149-192 scope.
+  the predecessor TODO-lilar artifact with a 149-192 scope. TODO-juhub now
+  records turn 197 under `DI-ropad`: TODO-lilar remains the historical walk and
+  open UT store, while TODO-juhub owns the stronger current per-turn rewalk
+  mechanics for turns 149-208.
 - **Turn 208:** Steve corrected the storage location with "keep the
   ledger in TODO 021" and then requested promise-stack provenance plus
   nested-vs-stacked research. The answer says `UT-PSTK-origin` was

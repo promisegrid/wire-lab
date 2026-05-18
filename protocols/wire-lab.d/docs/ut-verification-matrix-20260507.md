@@ -1077,3 +1077,15 @@ ledger's dated caveat so old paths, old TE numbers, and old "not yet committed"
 labels are not cited as current truth without re-verification. This does not
 touch promisebase, edit TEs, start dogfood implementation, or use TODO-lilar
 checkboxes as closure authority.
+
+### 2026-05-17 — Turn-197 closure / transfer pointer
+
+`DI-ropad` reconciles turn 197 as the original chronological replay-procedure
+creation turn. `UT-197.a` and `UT-197.c` are captured by TODO-lilar's original
+per-turn/write-before-thread-change discipline and by TODO-juhub's stronger
+successor discipline. `UT-197.b` is captured by TODO-lilar's prior aliases and
+status correction. `UT-197.d` is resolved by turn 198's "A: yes. B: no."
+answer, and `UT-197.e` is routed through the scope split where TODO-lilar covers
+149-192 while TODO-juhub / TODO-jivam account for the 193-208 boundary and
+successor rewalk. This does not edit TODO-lilar walk notes or use TODO-lilar
+checkboxes as closure authority.
