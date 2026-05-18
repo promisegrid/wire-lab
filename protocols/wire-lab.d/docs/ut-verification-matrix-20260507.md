@@ -1122,3 +1122,15 @@ underlying DF-35.4 / top-of-file `Status:` field substance, already captured by
 TODO-lilar, TODO-juhub, and the landed TE-editing-policy artifacts. This does
 not edit TODO-lilar walk notes or use TODO-lilar checkboxes as closure
 authority.
+
+### 2026-05-17 — Turn-201 closure / transfer pointer
+
+`DI-safon` reconciles turn 201 as the old replay's first batch-commit
+checkpoint plus a stale TE-36 boundary preview. `UT-201.a` is historical commit
+checkpoint evidence only. `UT-201.b` is closed by current TODO-lilar and
+TODO-juhub records that place turn 155 in TE-famar / TODO-rivuk and the actual
+apparatus-vs-specimen breakthrough at turn 158. `UT-201.c` is closed by the
+later TE-havib landing, TODO-lilok verification, TODO-kugod / matrix routing,
+and current turn-160-through-164 closure pointers. `UT-201.d` is ordinary replay
+handoff with no standalone owner work. This does not edit TODO-lilar walk notes
+or use TODO-lilar checkboxes as closure authority.

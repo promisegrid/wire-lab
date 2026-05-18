@@ -875,6 +875,29 @@ Affects: `protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewal
 `protocols/wire-lab.d/TODO/TODO-lilar-session-replay-cleanup.md`;
 `protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`.
 
+ID: DI-safon
+Date: 2026-05-17 23:03:54
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Reconcile turn 201 as the old replay's first batch-commit checkpoint
+and correct its TE-36 boundary summary against the current raw-turn and owner
+records.
+Intent: Turn 201 reports that turns 149-153 were batch committed and pushed,
+then previews turns 154-163 as the TE-36 walk. The batch-commit checkpoint is
+historical, but the TE-36 preview is imprecise: raw turn 154 is only queue
+status, raw turn 155 is TE-famar / TODO-rivuk Project setup, turn 156 begins the
+scope challenge, turn 157 corrects transport-vs-envelope framing, and turn 158
+is the actual apparatus-vs-specimen breakthrough. Later artifacts also make the
+old parked-TE-havib state stale because TE-havib and its follow-on disposition
+have since landed and been routed.
+Constraints: Do not rewrite TODO-lilar's historical walk notes or flip its UT
+checkboxes. Do not reopen TODO-020 or TE-havib. Treat commit `276ee67` and the
+old parked twig state as historical replay-checkpoint evidence, not current
+branch or TE status.
+Affects: `protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewalk.md`;
+`protocols/wire-lab.d/TODO/TODO-lilar-session-replay-cleanup.md`;
+`protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`.
+
 ## Why a separate TODO
 
 `TODO-lilar` already records the original historical walk through turn 192 and
@@ -1139,7 +1162,7 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - [x] juhub.198 Turn 198 raw-log rewalk plus later-turn and later-artifact sweep.
 - [x] juhub.199 Turn 199 raw-log rewalk plus later-turn and later-artifact sweep.
 - [x] juhub.200 Turn 200 raw-log rewalk plus later-turn and later-artifact sweep.
-- [ ] juhub.201 Turn 201 raw-log rewalk plus later-turn and later-artifact sweep.
+- [x] juhub.201 Turn 201 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.202 Turn 202 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.203 Turn 203 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.204 Turn 204 raw-log rewalk plus later-turn and later-artifact sweep.
@@ -3812,3 +3835,54 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - `Proposed disposition` `resolved after batch-commit cadence capture, silent-checkoff correction, and turn-152 owner-record verification`
 - `Write needed? yes/no` `no` further turn-200 write is needed after this pass.
 - `Next` Turn 201 is next.
+
+### Turn 201 — 2026-05-04 17:21 UTC
+
+- `Turn 201 plain-English recap` Steve typed `153`, asking the old replay to
+  continue to turn 153. The assistant answered that Batch 1 had been committed
+  and pushed as `276ee67`, with turns 149-153 walked and checked off. It then
+  previewed the next batch as the "TE-36 walk" for turns 154-163, saying turn
+  154 was a queue-status turn, turn 155 began the TE-36 DF walk in earnest, and
+  the apparatus-vs-specimen carve-out lived on the parked
+  `ppx/te-20260503-022446-apparatus-vs-specimen` twig at `0230c20`, with
+  DF-36.5/36.6 locked, DF-36.7 open, and OQ-36.6 raised at turns 161-162. The
+  batch-commit part is a historical checkpoint in the old TODO-lilar process.
+  The TE-36 preview is now known to be imprecise. Raw turn 153 is the TODO-020
+  execution turn; raw turn 154 is only queue status; raw turn 155 is still
+  TE-famar / TODO-rivuk Project setup, not TE-havib; turn 156 begins the
+  harness-locality challenge; turn 157 corrects the transport-vs-envelope frame;
+  and turn 158 is the actual apparatus-vs-specimen breakthrough. Later artifacts
+  also supersede the old parked-twig status because TE-havib and its follow-on
+  verification/disposition have since landed and been routed.
+- `Existing capture` TODO-lilar's `021.153` row records the TODO-020 execution
+  work and notes the later full-batch interpretation for 020.5 / 020.6 / 020.7 /
+  020.10. TODO-lilar's `021.154` row correctly records queue status and says the
+  actual TE-36 walk begins later, with TODO-bisur still live. TODO-lilar's
+  `021.155` row explicitly corrects the old label: turn 155 is not TE-havib; it
+  is TE-famar / TODO-rivuk DF-1.1 setup. TODO-juhub's turn-154-through-158
+  reports preserve the same corrected boundary, and the matrix routes later
+  TE-havib fallout through TE-havib, TODO-kugod, and successor owners.
+- `Gaps or contradictions` The old turn-201 answer's main contradiction is the
+  phrase "turn 155 begins the TE-36 DF walk in earnest." It compressed the
+  transition from TODO-020 / TE-famar queue work into the later
+  apparatus-vs-specimen sequence. The old statement that TE-havib was parked at
+  `0230c20` was true as a 2026-05-04 replay checkpoint, but it is not current
+  status after later TE-havib landing and closure routing.
+- `Related loose ends / owners` `UT-201.a` is the Batch 1 commit/push checkpoint;
+  it is historical and requires no current repo action. `UT-201.b` is the
+  turn-155-as-TE-36-boundary error; it is closed by TODO-lilar and TODO-juhub
+  corrected turn-154/155/158 records. `UT-201.c` is the stale parked-TE-havib
+  status; it is closed by the later TE-havib landing, TODO-lilok verification,
+  TODO-kugod / matrix routing, and the current turn-160-through-164 closure
+  pointers. `UT-201.d` is the next-turn handoff to 154; it remains ordinary
+  replay flow and has no standalone owner work.
+- `Owner/doc cleanup` Done. Added `DI-safon`; added this turn-201 report; marked
+  `juhub.201` complete; and added a turn-201 transfer pointer to the UT
+  verification matrix. No TODO-lilar walk note or UT checkbox was changed.
+- `Remaining decisions or work` None for turn 201. The old replay checkpoint is
+  preserved, and its stale TE-36 boundary/status claims are corrected by current
+  owner records.
+- `Work pending` no.
+- `Proposed disposition` `resolved after batch-checkpoint preservation, TE-36 boundary correction, and stale parked-twig status routing`
+- `Write needed? yes/no` `no` further turn-201 write is needed after this pass.
+- `Next` Turn 202 is next.
