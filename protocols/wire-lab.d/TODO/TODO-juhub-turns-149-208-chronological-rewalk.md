@@ -853,6 +853,28 @@ Affects: `protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewal
 `protocols/wire-lab.d/TODO/TODO-lilar-session-replay-cleanup.md`;
 `protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`.
 
+ID: DI-lobiv
+Date: 2026-05-17 23:02:15
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Reconcile turn 200 as the operational batch-commit cadence answer,
+while recording that the assistant also silently checked off turn 152 without a
+visible turn-152 recap in that old replay exchange.
+Intent: Steve's `B` in turn 200 answered the commit-cadence question from turn
+199: batch commits at natural breakpoints. It did not revoke the full-rigor
+per-turn walk choice from turn 198. The assistant's answer compressed that
+cadence choice together with a turn-152 checkoff, but current TODO-lilar and
+TODO-juhub records already preserve the correct turn-152 substance: DF-35.4
+landed the uniform top-of-file `Status:` field and unblocked the TODO-020
+follow-on sweeps.
+Constraints: Do not rewrite TODO-lilar's historical walk notes or flip its UT
+checkboxes. Do not reopen TODO-020 / TE-dabol policy work. Treat batch commits
+as commit grouping only, never as permission to skip visible per-turn recaps or
+owner routing in the current replay.
+Affects: `protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewalk.md`;
+`protocols/wire-lab.d/TODO/TODO-lilar-session-replay-cleanup.md`;
+`protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`.
+
 ## Why a separate TODO
 
 `TODO-lilar` already records the original historical walk through turn 192 and
@@ -1116,7 +1138,7 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - [x] juhub.197 Turn 197 raw-log rewalk plus later-turn and later-artifact sweep.
 - [x] juhub.198 Turn 198 raw-log rewalk plus later-turn and later-artifact sweep.
 - [x] juhub.199 Turn 199 raw-log rewalk plus later-turn and later-artifact sweep.
-- [ ] juhub.200 Turn 200 raw-log rewalk plus later-turn and later-artifact sweep.
+- [x] juhub.200 Turn 200 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.201 Turn 201 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.202 Turn 202 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.203 Turn 203 raw-log rewalk plus later-turn and later-artifact sweep.
@@ -3744,3 +3766,49 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - `Proposed disposition` `resolved after DF-35.2/DF-35.3 off-by-one correction and commit-cadence routing`
 - `Write needed? yes/no` `no` further turn-199 write is needed after this pass.
 - `Next` Turn 200 is next.
+
+### Turn 200 — 2026-05-04 17:21 UTC
+
+- `Turn 200 plain-English recap` Steve replied `B`, answering the workflow
+  question the assistant had just asked at the end of turn 199. In that context,
+  `B` meant "batch-commit at natural breakpoints" rather than committing every
+  replay checkoff individually. It was an operational commit-cadence choice, not
+  permission to batch-acknowledge turns without full per-turn work. The assistant
+  answered by saying turn 152 was checked off and that turn 153 was next. That
+  answer compressed two things: it accepted the batch-commit rhythm, and it
+  silently advanced/checklisted turn 152 without showing a visible turn-152
+  recap in this old replay exchange. Raw turn 152 itself is clean: Steve's `yes`
+  locked DF-35.4, the uniform top-of-file `Status:` field across the TE corpus,
+  and the assistant summarized that all four TE-35 DFs were settled and merged,
+  with TODO-020 follow-on sweeps unblocked. Current TODO-lilar and TODO-juhub
+  records already preserve that correct turn-152 substance, so the remaining
+  turn-200 lesson is procedural: batch commits can group filesystem commits, but
+  they do not relax the one-turn-at-a-time visible recap and routing discipline.
+- `Existing capture` TODO-lilar's `021.152` row correctly records DF-35.4,
+  commit `a6295fc`, merge `3b65766`, the later 020.10 status-field retrofit,
+  and no leftover threads. TODO-juhub's turn-152 report also confirms the
+  top-of-file `Status:` field decision and the unblocked TE-policy rollout. The
+  commit-cadence choice is already referenced by turn 199/198 routing as
+  operational-only.
+- `Gaps or contradictions` The old turn-200 answer omitted the actual
+  plain-English recap for turn 152 even though the replay procedure required a
+  visible description before moving on. That omission is repaired by current
+  TODO-lilar and TODO-juhub records, and current `DI-vumir` prevents repeating it
+  in this replay by requiring the full recap in every final response. There is
+  no substantive contradiction in the TE-editing-policy outcome.
+- `Related loose ends / owners` `UT-200.a` is the batch-commit cadence choice;
+  it is resolved as an operational preference that does not change per-turn
+  rigor. `UT-200.b` is the silent turn-152 checkoff / missing visible recap; it
+  is closed by current TODO-lilar and TODO-juhub turn-152 records plus
+  `DI-vumir`'s current visible-recap rule. `UT-200.c` is the underlying turn-152
+  DF-35.4 substance; it is already captured by TODO-lilar, TODO-juhub, and the
+  landed TE-editing-policy artifacts.
+- `Owner/doc cleanup` Done. Added `DI-lobiv`; added this turn-200 report;
+  marked `juhub.200` complete; and added a turn-200 transfer pointer to the UT
+  verification matrix. No TODO-lilar walk note or UT checkbox was changed.
+- `Remaining decisions or work` None for turn 200. Batch commit cadence is
+  operational history, and the turn-152 substance is already captured.
+- `Work pending` no.
+- `Proposed disposition` `resolved after batch-commit cadence capture, silent-checkoff correction, and turn-152 owner-record verification`
+- `Write needed? yes/no` `no` further turn-200 write is needed after this pass.
+- `Next` Turn 201 is next.

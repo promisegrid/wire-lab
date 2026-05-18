@@ -1111,3 +1111,14 @@ DF-35.3. `UT-199.b` is historical old-twig / old-line-number context, not a
 current path owner. `UT-199.c` is resolved by turn 200's batch-commit cadence
 answer and does not alter the full-rigor per-turn walk rule. This does not edit
 TODO-lilar walk notes or use TODO-lilar checkboxes as closure authority.
+
+### 2026-05-17 — Turn-200 closure / transfer pointer
+
+`DI-lobiv` reconciles turn 200 as the batch-commit cadence answer plus a
+historical silent-checkoff lesson. `UT-200.a` is resolved as operational commit
+grouping only. `UT-200.b` is closed by current TODO-lilar and TODO-juhub
+turn-152 records plus `DI-vumir`'s visible-recap rule. `UT-200.c` is the
+underlying DF-35.4 / top-of-file `Status:` field substance, already captured by
+TODO-lilar, TODO-juhub, and the landed TE-editing-policy artifacts. This does
+not edit TODO-lilar walk notes or use TODO-lilar checkboxes as closure
+authority.
