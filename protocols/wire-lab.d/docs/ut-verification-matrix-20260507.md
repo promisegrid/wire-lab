@@ -1170,3 +1170,16 @@ body text. `UT-204.c` is the future-propagation risk, captured by TODO-lilar
 `UT-155.b` plus the promise-stack retirement under TODO-kugod `DI-runuh`. This
 does not edit TODO-lilar walk notes, use TODO-lilar checkboxes as closure
 authority, or rewrite a TE body.
+
+### 2026-05-17 — Turn-205 closure / transfer pointer
+
+`DI-fobug` reconciles turn 205 as the old replay's turn-156 walk plus historical
+batch-commit deferral. `UT-205.a` is the raw commit request, preserved as
+history and not executed in this current replay. `UT-205.b` is the abandoned
+Option 1 / 2 / 3 structural menu, retired through TODO-rivuk / `DI-runuh`.
+`UT-205.c` is TE-famar miscategorization, resolved-retired by TODO-kugod /
+`DI-runuh`. `UT-205.d` is the stale "harness-spec is wire-envelope-agnostic"
+claim, resolved by TODO-kugod's `UT-156.c` row and the later harness-spec
+apparatus cleanup. `UT-205.e` is ordinary replay handoff to turn 157. This does
+not edit TODO-lilar walk notes, use TODO-lilar checkboxes as closure authority,
+or create a commit.

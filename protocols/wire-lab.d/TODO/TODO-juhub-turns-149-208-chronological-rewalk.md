@@ -971,6 +971,32 @@ Affects: `protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewal
 `docs/thought-experiments/TE-famar-promise-stack-ordering.md`;
 `protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`.
 
+ID: DI-fobug
+Date: 2026-05-17 23:16:57
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Reconcile turn 205 as the old replay's turn-156 walk and preserve the
+historical batch-commit handling without committing during the current
+one-turn-at-a-time replay.
+Intent: Turn 205 answered Steve's "commit and go to 156" by walking raw turn
+156, capturing the abandoned Option 1 / 2 / 3 structural menu, the TE-famar
+miscategorization issue, and the stale "harness-spec is wire-envelope-agnostic"
+claim. The old assistant deferred the commit under the previously selected batch
+commit cadence. Current replay should preserve that history, but the live loose
+ends are already routed: `UT-156.a` and `UT-156.b` are retired through
+TODO-rivuk / `DI-runuh`, while `UT-156.c` is resolved by the later
+apparatus-level harness-spec cleanup under TODO-kugod.
+Constraints: Do not commit merely because raw turn 205 asked the old assistant
+to commit. Do not rewrite TODO-lilar or flip TODO-lilar UT checkboxes. Do not
+reopen TE-famar, TODO-rivuk, DR-006, or the retired promise-stack hypothesis.
+Treat the "wire-envelope-agnostic" wording as historical error superseded by
+apparatus-vs-specimen framing.
+Affects: `protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewalk.md`;
+`protocols/wire-lab.d/TODO/TODO-lilar-session-replay-cleanup.md`;
+`protocols/wire-lab.d/TODO/TODO-kugod-te-40-apparatus-vs-specimen-completion.md`;
+`protocols/wire-lab.d/specs/harness-spec-draft.md`;
+`protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`.
+
 ## Why a separate TODO
 
 `TODO-lilar` already records the original historical walk through turn 192 and
@@ -1239,7 +1265,7 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - [x] juhub.202 Turn 202 raw-log rewalk plus later-turn and later-artifact sweep.
 - [x] juhub.203 Turn 203 raw-log rewalk plus later-turn and later-artifact sweep.
 - [x] juhub.204 Turn 204 raw-log rewalk plus later-turn and later-artifact sweep.
-- [ ] juhub.205 Turn 205 raw-log rewalk plus later-turn and later-artifact sweep.
+- [x] juhub.205 Turn 205 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.206 Turn 206 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.207 Turn 207 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.208 Turn 208 raw-log rewalk plus later-turn and later-artifact sweep.
@@ -4112,3 +4138,55 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - `Proposed disposition` `resolved after Project vocabulary correction, stale committed-file claim correction, and retired-artifact routing`
 - `Write needed? yes/no` `no` further turn-204 write is needed after this pass.
 - `Next` Turn 205 is next.
+
+### Turn 205 — 2026-05-04 22:33 UTC
+
+- `Turn 205 plain-English recap` Steve said "commit and go to 156." The old
+  assistant did not make a commit; it held the commit under the earlier
+  batch-at-natural-breakpoints cadence and instead walked raw turn 156. The raw
+  turn-156 substance was Steve stopping the TE-famar DF flow by saying the topic
+  was not harness-specific and was only one possible wire envelope. The old
+  assistant admitted the harness-level promise-stack framing was wrong, proposed
+  three structural options for TE-famar's role, recommended a two-tier
+  vocabulary-plus-per-envelope-locking structure, and then logged three loose
+  ends: the abandoned Option 1 / 2 / 3 menu, TE-famar's miscategorization, and
+  the bot's incorrect "harness-spec is wire-envelope-agnostic" claim. Later work
+  supersedes that entire promise-stack path: `UT-156.a` and `UT-156.b` are
+  retired through TODO-rivuk / `DI-runuh`, and `UT-156.c` is resolved by the
+  apparatus-vs-specimen harness-spec cleanup under TODO-kugod. The correct
+  current framing is not that the harness is envelope-agnostic; it is that the
+  harness is apparatus that compares candidate envelope and layer specimens.
+  The raw "commit" request remains historical context and does not authorize a
+  commit in this current replay turn.
+- `Existing capture` TODO-lilar `021.156` records the old turn-156 walk and the
+  three carried loose ends. TODO-lilar `UT-156.a`, `UT-156.b`, and `UT-156.c`
+  remain historical open rows there, but TODO-juhub and TODO-kugod now provide
+  the current closure owners. TODO-kugod records `UT-156.a` as retired,
+  `UT-156.b` as resolved-retired, and `UT-156.c` as resolved under later
+  apparatus-level DIs. TODO-rivuk and DR-006 are closed through the
+  promise-stack retirement path rather than by answering the abandoned DF queue.
+- `Gaps or contradictions` The old turn-205 answer correctly captured that
+  turn 156 blocked the old DF-1.1 path, but its proposed Option 3 was still too
+  early in the sequence: turn 157 and turn 158 further corrected the assistant's
+  assumptions before the apparatus-vs-specimen framing emerged. Its
+  "harness-spec wire-envelope-agnosticism" thread is explicitly wrong in the
+  current corpus and is superseded by harness-as-apparatus language.
+- `Related loose ends / owners` `UT-205.a` is the historical commit request and
+  batch deferral; it requires no current commit. `UT-205.b` is the abandoned
+  Option 1 / 2 / 3 menu; it is retired by TODO-rivuk / `DI-runuh`. `UT-205.c` is
+  TE-famar miscategorization; it is resolved-retired by TODO-kugod / `DI-runuh`.
+  `UT-205.d` is the wrong wire-envelope-agnostic claim; it is resolved by
+  TODO-kugod's `UT-156.c` row and its later harness-spec apparatus cleanup.
+  `UT-205.e` is the handoff to turn 157; it is ordinary replay flow with no
+  standalone owner work.
+- `Owner/doc cleanup` Done. Added `DI-fobug`; added this turn-205 report; marked
+  `juhub.205` complete; and added a turn-205 transfer pointer to the UT
+  verification matrix. No TODO-lilar walk note, TODO-lilar UT checkbox, TE body,
+  or commit state was changed.
+- `Remaining decisions or work` None for turn 205. The old turn-156 loose ends
+  are routed or resolved by current owner artifacts, and the raw commit request
+  is preserved only as historical replay context.
+- `Work pending` no.
+- `Proposed disposition` `resolved after turn-156 owner verification and historical batch-commit capture`
+- `Write needed? yes/no` `no` further turn-205 write is needed after this pass.
+- `Next` Turn 206 is next.
