@@ -807,6 +807,30 @@ Affects: `protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewal
 `protocols/wire-lab.d/TODO/TODO-lilar-session-replay-cleanup.md`;
 `protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`.
 
+ID: DI-vahod
+Date: 2026-05-17 22:58:29
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Reconcile turn 198 as the confirmation that the recovery walk should
+use full per-turn rigor, plus the instruction to add TODO-lilar work items for
+TODO-bisur and pre-149 dropped-thread investigation.
+Intent: Turn 198 answered the turn-197 A/B question by choosing the rigorous
+one-turn-at-a-time walk and rejecting early batch acknowledgement, then expanded
+TODO-lilar's recovery scope with two concrete investigations. The assistant's
+answer walked turn 149 but did not foreground the two requested TODO additions
+and introduced a separate commit-cadence question. Later artifacts show the
+requested work landed and closed: `021.todo12`, `021.pre149`, and the related
+`021.pre18` follow-up are now complete in TODO-lilar, while the commit-cadence
+question remained only operational and does not change the per-turn walk rule.
+Constraints: Do not rewrite TODO-lilar's historical walk notes or flip its UT
+checkboxes. Do not treat the later batch-commit preference as permission to
+batch-acknowledge turns without full walk notes. Keep TODO-bisur and pre-149 /
+pre-18 findings with their existing downstream owners rather than reopening
+them from turn 198.
+Affects: `protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewalk.md`;
+`protocols/wire-lab.d/TODO/TODO-lilar-session-replay-cleanup.md`;
+`protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`.
+
 ## Why a separate TODO
 
 `TODO-lilar` already records the original historical walk through turn 192 and
@@ -1068,7 +1092,7 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - [x] juhub.195 Turn 195 raw-log rewalk plus later-turn and later-artifact sweep.
 - [x] juhub.196 Turn 196 raw-log rewalk plus later-turn and later-artifact sweep.
 - [x] juhub.197 Turn 197 raw-log rewalk plus later-turn and later-artifact sweep.
-- [ ] juhub.198 Turn 198 raw-log rewalk plus later-turn and later-artifact sweep.
+- [x] juhub.198 Turn 198 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.199 Turn 199 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.200 Turn 200 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.201 Turn 201 raw-log rewalk plus later-turn and later-artifact sweep.
@@ -3595,3 +3619,59 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - `Proposed disposition` `resolved/transferred after original replay-procedure capture, turn-198 batching resolution, turn-208 ledger-location resolution, and TODO-juhub successor routing`
 - `Write needed? yes/no` `no` further turn-197 write is needed after this pass.
 - `Next` Turn 198 is next.
+
+### Turn 198 — 2026-05-04 17:13 UTC
+
+- `Turn 198 plain-English recap` Steve answered the assistant's turn-197
+  workflow question directly: A yes, B no. In context, that meant use the more
+  rigorous path of walking all 44 turns one at a time, including turns that
+  appeared to have no leftover threads, and do not batch-acknowledge turns
+  149-163 as already safe. Steve also added two concrete TODO-lilar scope
+  requests: add an item to investigate what happened to TODO 12 / TODO-bisur,
+  and add an item to investigate turns before 149 for any other dropped threads.
+  The assistant responded by walking turn 149 and saying it had no outstanding
+  questions and no repo writes needed beyond checking off the line. That matched
+  the full-rigor walk choice for turn 149, but it did not foreground the two new
+  requested TODO items. The assistant then asked another rhythm question about
+  whether to batch commits or commit per turn. Later artifacts resolve the turn:
+  TODO-lilar now contains and has completed `021.todo12`, `021.pre149`, and the
+  related `021.pre18` follow-up; turn 149 is walked as `021.149` with no
+  leftover threads; and the later batch-commit preference affects commit
+  cadence only, not the required per-turn rigor.
+- `Existing capture` TODO-lilar captures the chosen rigorous walk by preserving
+  individual checked-off rows beginning at `021.149`. It also captures Steve's
+  new requested investigations: `021.todo12` verifies TODO-bisur's current
+  state and routes its remaining freeze work to downstream group-session /
+  TODO-turog owners; `021.pre149` audits turns 18-148, finds five dropped
+  threads, and records them as `UT-pre149.*`; and `021.pre18` later audits
+  turns 1-17 with zero dropped threads. TODO-juhub's stronger replay discipline
+  now continues the same full-rigor principle for the successor 149-208 rewalk.
+- `Gaps or contradictions` The turn-198 answer was incomplete as a direct
+  response because it did not say "I added the TODO-bisur item" or "I added the
+  pre-149 audit item" even though Steve explicitly asked for both. That gap is
+  closed by TODO-lilar's current rows and completed audit records. The answer's
+  new commit-cadence question should not be confused with the already-settled
+  A/B choice from turn 197: Steve rejected batch acknowledgement of early turns,
+  while later operational batching only controlled when TODO edits were
+  committed.
+- `Related loose ends / owners` `UT-198.a` is the A/B workflow choice; it is
+  captured by TODO-lilar's individual per-turn rows and TODO-juhub's current
+  one-turn-at-a-time discipline. `UT-198.b` is the TODO 12 / TODO-bisur
+  investigation; it is captured and completed by `021.todo12`, with any
+  remaining substantive freeze work owned downstream rather than by TODO-lilar.
+  `UT-198.c` is the pre-149 dropped-thread investigation; it is captured and
+  completed by `021.pre149`, with dropped threads recorded as `UT-pre149.*` and
+  the turns-1-through-17 follow-up handled by `021.pre18`. `UT-198.d` is the
+  assistant's commit-cadence question; later turn-200 batch preference resolves
+  cadence without changing the no-batch-acknowledgement rule.
+- `Owner/doc cleanup` Done. Added `DI-vahod`; added this turn-198 report;
+  marked `juhub.198` complete; and added a turn-198 transfer pointer to the UT
+  verification matrix. No TODO-lilar walk note or UT checkbox was changed.
+- `Remaining decisions or work` The pre-149 `UT-pre149.*` rows still have their
+  own downstream owner paths, and TODO-lilar remains open until all UTs close or
+  transfer, but turn 198's own requests are captured and do not require
+  additional turn-local replay work.
+- `Work pending` no.
+- `Proposed disposition` `resolved/transferred after full-rigor replay choice, TODO-bisur investigation capture, pre-149/pre-18 audit capture, and commit-cadence separation`
+- `Write needed? yes/no` `no` further turn-198 write is needed after this pass.
+- `Next` Turn 199 is next.

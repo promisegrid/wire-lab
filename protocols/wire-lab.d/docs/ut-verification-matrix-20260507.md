@@ -1089,3 +1089,15 @@ answer, and `UT-197.e` is routed through the scope split where TODO-lilar covers
 149-192 while TODO-juhub / TODO-jivam account for the 193-208 boundary and
 successor rewalk. This does not edit TODO-lilar walk notes or use TODO-lilar
 checkboxes as closure authority.
+
+### 2026-05-17 — Turn-198 closure / transfer pointer
+
+`DI-vahod` reconciles turn 198 as the full-rigor replay choice plus the
+TODO-bisur and pre-149 audit expansion. `UT-198.a` is captured by TODO-lilar's
+individual per-turn rows and TODO-juhub's current one-turn-at-a-time discipline.
+`UT-198.b` is captured and completed by TODO-lilar `021.todo12`, with remaining
+freeze substance routed downstream. `UT-198.c` is captured and completed by
+TODO-lilar `021.pre149` plus the later `021.pre18` follow-up. `UT-198.d` is
+resolved as an operational commit-cadence question that does not alter the
+full-rigor walk rule. This does not edit TODO-lilar walk notes or use
+TODO-lilar checkboxes as closure authority.
