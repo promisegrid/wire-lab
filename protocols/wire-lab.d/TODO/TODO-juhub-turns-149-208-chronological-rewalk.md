@@ -1048,6 +1048,32 @@ Affects: `protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewal
 `docs/thought-experiments/TE-famar-promise-stack-ordering.md`;
 `protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`.
 
+ID: DI-kabuk
+Date: 2026-05-17 23:23:08
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Reconcile turn 208 as the promise-stack origin audit plus
+nested-vs-stacked research launch, and route the research doc's remaining
+grid-envelope design questions into the SIM-kurim question home.
+Intent: Turn 208 locked two replay-process points: keep the unfinished-thread
+ledger in TODO 021 / TODO-lilar, and ground-truth the "promise stack" phrase from
+the beginning of the session log. The later completed research doc answered the
+major nesting-vs-stacking question but left five concrete grid-envelope
+subquestions: recursion depth, pCID shape, capability references, canonical
+serialization, and onion-routing needs. Those are PromiseGrid design questions,
+so current replay should capture them in a simulation question home rather than
+leave them only in TODO-lilar or the research doc.
+Constraints: Do not split TODO-lilar. Do not flip TODO-lilar UT checkboxes. Do
+not make grid-envelope canonical or choose a winning positional variant. Do not
+edit the nested-vs-stacked research doc or TE bodies in this pass. Route the
+remaining open research questions to `SIM-kurim-grid-envelope/QUESTION.md` as
+cross-cutting questions that any surviving variant must answer.
+Affects: `protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewalk.md`;
+`protocols/wire-lab.d/TODO/TODO-lilar-session-replay-cleanup.md`;
+`docs/research/nested-vs-stacked-envelopes-20260504.md`;
+`simulations/SIM-kurim-grid-envelope/QUESTION.md`;
+`protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`.
+
 ## Why a separate TODO
 
 `TODO-lilar` already records the original historical walk through turn 192 and
@@ -1319,7 +1345,7 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - [x] juhub.205 Turn 205 raw-log rewalk plus later-turn and later-artifact sweep.
 - [x] juhub.206 Turn 206 raw-log rewalk plus later-turn and later-artifact sweep.
 - [x] juhub.207 Turn 207 raw-log rewalk plus later-turn and later-artifact sweep.
-- [ ] juhub.208 Turn 208 raw-log rewalk plus later-turn and later-artifact sweep.
+- [x] juhub.208 Turn 208 raw-log rewalk plus later-turn and later-artifact sweep.
 
 ## Turn notes
 
@@ -4350,3 +4376,66 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - `Proposed disposition` `resolved after promise-stack provenance capture and ledger-split rejection`
 - `Write needed? yes/no` `no` further turn-207 write is needed after this pass.
 - `Next` Turn 208 is next.
+
+### Turn 208 — 2026-05-04 22:48 UTC
+
+- `Turn 208 plain-English recap` Steve rejected the old assistant's suggestion
+  to split the unfinished-thread ledger and said to keep it in TODO 021. He then
+  asked for two things: first, search from the beginning of the session log for
+  "stack" to determine where the "promise stack" phrase originated; second,
+  research how long-lived decentralized protocol projects handled recursive
+  nesting versus ordered frame sequences, including capability systems,
+  content-addressed networks, and peer-to-peer trust systems. The old assistant
+  reported that `UT-PSTK-origin` had been logged, that the provenance was traced
+  to a bot mistranslation of Steve's turn-2 phrase "layered set of promises,"
+  and that a research subagent was running to produce
+  `docs/research/nested-vs-stacked-envelopes-20260504.md`. It also listed the
+  then-current ledger entries and recommended committing the current batch while
+  the research ran. Later artifacts complete the substantive work: TODO-lilar
+  keeps the ledger, `UT-PSTK-origin` records the turn-2 origin, the
+  nested-vs-stacked research doc lands, and Steve's synthesis at the end of that
+  doc says recursive grid-style containment is the envelope-level model while
+  ordered stacks are candidate payload organizations or transport/session
+  mechanisms. The remaining research questions are now routed into
+  `simulations/SIM-kurim-grid-envelope/QUESTION.md` so they are visible as
+  grid-envelope simulation questions rather than buried only in the research doc.
+- `Existing capture` TODO-lilar `UT-PSTK-origin` records the exact
+  mistranslation path from "layered set of promises" to "ordered stack of
+  Promise frames." TODO-lilar cross-cutting question 6 points to the completed
+  nested-vs-stacked research and Steve's synthesis. The research doc concludes
+  that recursive nesting with a mandatory content-addressed type token ages
+  better at the message-envelope layer, while frame sequences belong at the
+  transport / handshake layer. SIM-kurim's `QUESTION.md` now captures the five
+  remaining grid-envelope questions from the research doc: recursion depth,
+  pCID shape, capability references, canonical serialization, and onion-routing
+  needs.
+- `Gaps or contradictions` The old turn-208 answer was a progress report, not
+  the final research result. It said the research was still running and
+  recommended a commit; current replay does not create that historical commit.
+  The important later update is that the research completed and produced
+  concrete design questions. Those questions were previously only in the
+  research doc and TODO-lilar, so this pass routes them into a simulation
+  question home.
+- `Related loose ends / owners` `UT-208.a` is the ledger-placement decision; it
+  is closed by Steve's explicit "keep the ledger in TODO 021" instruction and
+  by current TODO-lilar / TODO-juhub structure. `UT-208.b` is the
+  promise-stack-origin audit; it is captured by TODO-lilar `UT-PSTK-origin` and
+  the nested-vs-stacked research doc. `UT-208.c` is the completed research
+  deliverable; it is captured by
+  `docs/research/nested-vs-stacked-envelopes-20260504.md`. `UT-208.d` is the
+  research doc's five open grid-envelope questions; it is now captured by
+  `simulations/SIM-kurim-grid-envelope/QUESTION.md`. `UT-208.e` is the old commit
+  recommendation; it is historical replay context and does not require a commit
+  in this pass.
+- `Owner/doc cleanup` Done. Added `DI-kabuk`; added this turn-208 report; marked
+  `juhub.208` complete; added the research-derived subquestions to SIM-kurim's
+  `QUESTION.md`; and added a turn-208 transfer pointer to the UT verification
+  matrix. No TODO-lilar walk note, TODO-lilar UT checkbox, research doc, TE body,
+  or commit state was changed.
+- `Remaining decisions or work` None for turn 208. The replay slice's
+  turn-local loose ends are captured in TODO-lilar, the research doc, and the
+  SIM-kurim grid-envelope question home.
+- `Work pending` no.
+- `Proposed disposition` `resolved after origin-audit capture, nested-vs-stacked research routing, and sim-question backfill`
+- `Write needed? yes/no` `no` further turn-208 write is needed after this pass.
+- `Next` None in the 149-208 chronological rewalk.

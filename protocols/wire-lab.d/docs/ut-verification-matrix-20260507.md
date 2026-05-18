@@ -1210,3 +1210,18 @@ turn 208. `UT-207.d` is the nested-vs-stacked research handoff; the completed
 research doc exists, and its user-facing questions are turn-208 cleanup scope.
 This does not edit TODO-lilar walk notes, use TODO-lilar checkboxes as closure
 authority, edit TE bodies, or create a commit.
+
+### 2026-05-17 — Turn-208 closure / transfer pointer
+
+`DI-kabuk` reconciles turn 208 as the promise-stack origin audit plus
+nested-vs-stacked research launch. `UT-208.a` is the ledger-placement decision,
+closed by Steve's instruction to keep the ledger in TODO 021 and by the current
+TODO-lilar / TODO-juhub structure. `UT-208.b` is the promise-stack origin audit,
+captured by TODO-lilar `UT-PSTK-origin` and the nested-vs-stacked research doc.
+`UT-208.c` is the completed research deliverable, captured by
+`docs/research/nested-vs-stacked-envelopes-20260504.md`. `UT-208.d` is the
+research doc's five open grid-envelope questions, now captured by
+`simulations/SIM-kurim-grid-envelope/QUESTION.md`. `UT-208.e` is the old commit
+recommendation, preserved as historical context with no current commit required.
+This does not edit TODO-lilar walk notes, use TODO-lilar checkboxes as closure
+authority, edit TE bodies, or make grid-envelope canonical.
