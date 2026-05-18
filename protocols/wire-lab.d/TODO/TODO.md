@@ -38,6 +38,7 @@ minted after that date carry only the proquint handle.
 | [TODO-pipus](./TODO-pipus-te-39-wire-lab-devs-migration.md) | 2026-05-07 | TE-mumuv wire-lab-devs migration | `TODO-24` / `TODO-20260507-002306` |
 | [TODO-jivam](./TODO-jivam-turns-149-170-recovery-completion.md) | 2026-05-09 | Turns 149-208 recovery completion monitor **(open: expanded from 149-170; shall not close until all bounded recovery is complete)** | — |
 | [TODO-juhub](./TODO-juhub-turns-149-208-chronological-rewalk.md) | 2026-05-10 | Turns 149-208 chronological rewalk **(open: one turn at a time; sweep later turns and later artifacts before advancing)** | — |
+| [TODO-tavit](./TODO-tavit-turns-209-311-quality-audit.md) | 2026-05-17 | Turns 209-311 quality audit **(open: fast-screen suspected low-quality Perplexity/Claude slice before deciding whether a full successor rewalk is warranted)** | — |
 | [TODO-rohub](./TODO-rohub-dogfood-tool-name-and-collaborator-permission.md) | 2026-05-17 | Dogfood message tool naming and collaborator permission constraints | — |
 | [TODO-fapev](./TODO-fapev-cross-repo-work-persistence.md) | 2026-05-17 | Cross-repo work persistence before PAT-gated pushes | — |
 | [TODO-nasat](./TODO-nasat-cross-repo-build-hazard-capture.md) | 2026-05-17 | Cross-repo build hazard capture | — |
