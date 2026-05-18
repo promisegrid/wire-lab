@@ -4,7 +4,10 @@
 
 Open. This TODO owns turn-178 meta-questions that should not remain only in
 closed replay notes. It is a harness / dogfood coordination owner, not a
-PromiseGrid protocol-design question home. Source: `DI-lusum`.
+PromiseGrid protocol-design question home. Turn 193 makes dogfood messaging
+urgent again after the promisebase framing pause; this TODO owns the tool-name
+and collaborator-permission constraints that must travel into any implementation
+work opened from that urgency. Source: `DI-lusum`; `DI-vuzot`.
 
 ## Scope
 
@@ -51,6 +54,10 @@ PromiseGrid protocol-design question home. Source: `DI-lusum`.
   acknowledging the collaborator-non-mention rule can re-surface the protected
   placeholder. Future dogfood/tooling prose should discuss the rule generically
   unless exact quoted evidence is required. Source: `DI-nezis`.
+- 2026-05-17: Turn 193's "dogfood ASAP so Steve is not working solo" directive
+  is routed here for dogfood tool-name and collaborator-permission constraints.
+  This TODO does not implement dogfood messaging; it preserves the constraints
+  that any implementation TODO must inherit. Source: `DI-vuzot`.
 
 ## Decision Intent Log
 

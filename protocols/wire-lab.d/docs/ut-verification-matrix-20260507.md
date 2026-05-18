@@ -1022,3 +1022,16 @@ twig rule plus TODO-kituj / TODO-dozak's no-current-twig state. `UT-192.f` is
 routed to TODO-dozak as the convergence / merge / independence decision. This
 does not answer downstream TE-43 / TE-44 choices and does not use `TODO-lilar`
 checkboxes as closure authority.
+
+### 2026-05-17 — Turn-193 closure / transfer pointer
+
+`DI-vuzot` reconciles turn 193's dogfood pivot and wrong-context assistant
+answer. Steve confirmed the turn-192 promisebase questions were the right
+questions but asked to pause after durable capture and return to dogfooding
+message transport ASAP. The assistant answered a TE-numbering question instead,
+so the repo-state condition is routed to AGENTS-ppx B2's committed/pushed-state
+rule. Dogfood urgency is routed to `SIM-ludut`, TODO-rohub, TODO-pipus, and
+`DR-gabif`; the accepted promisebase question set remains with TODO-kituj /
+`DR-tumus` and TODO-dozak through `DI-rupuh`; and the stale 72-hour ledger turn
+number is corrected. This does not start dogfood implementation and does not use
+`TODO-lilar` checkboxes as closure authority.

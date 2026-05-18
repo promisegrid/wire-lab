@@ -10,14 +10,15 @@ Affects: `protocols/wire-lab.d/TODO/TODO-pipus-te-39-wire-lab-devs-migration.md`
 Unblocks: TODO-pipus T-MIG-OPS; additive CAS-backed group-session specimen design; any later migration from historical transport evidence into pointer-and-CAS form.
 Waiting on: stevegt@t7a.org (Steve Traugott)
 Decision:
-Linked DI: DI-navod; DI-pator; DI-davov; DI-majib
+Linked DI: DI-navod; DI-pator; DI-davov; DI-majib; DI-vuzot
 Related commits:
-Last updated: 2026-05-17 09:44:46
+Last updated: 2026-05-17 22:15:24
 
 ## Event log
 
 - 2026-05-17 09:28:02 — Opened during turn-177 cleanup so TODO-pipus has a DR for the concrete additive migration contract instead of relying on replay notes and scenario docs alone.
 - 2026-05-17 09:44:46 — Added unanswered next-DF packet and acceptance criteria under `DI-majib`.
+- 2026-05-17 22:15:24 — Added turn-193 dogfood urgency under `DI-vuzot`; DF-gabif.4 must account for the need to dogfood developer messaging ASAP without rewriting historical `.txt` evidence or blocking on full CAS migration.
 
 ## Evidence
 
@@ -25,6 +26,7 @@ Last updated: 2026-05-17 09:44:46
 - `simulations/SIM-jurar-cas-backed-group-session/SCENARIOS.md` records the migration pressure cases: additive successor specimen, group-visible identity, parent links through CAS, arbitrary body shape, missing pointee, envelope independence, and historical compatibility.
 - `simulations/SIM-zazit-chunk-feed-replication/SCENARIOS.md` records the feed pressure that any migration must respect: feeds move chunks, not group messages, and sparse-CAS behavior is normal.
 - `TODO-pipus` owns the operational migration scope and still lists close-old-vs-overlap-vs-atomic-swap, back-reference format, message disposition, authorizing promise, seal mechanics, group-identity continuity, and trigger discipline as open DFs.
+- Turn 193 makes developer-message dogfooding urgent again after the promisebase pause. That urgency is evidence for trigger discipline, not authorization to rewrite historical inline `.txt` messages or skip the additive migration decision. Source: DI-vuzot.
 
 ## Candidate decisions
 
@@ -48,7 +50,8 @@ answered here. Source: DI-majib.
   and parent links cite.
 - **DF-gabif.4 — Trigger discipline.** Choose manual migration after DF/DI,
   migration only after first frozen L6 pCID, or migration only after dogfood
-  tooling exists.
+  tooling exists. Any answer should say how near-term dogfood proceeds while the
+  CAS-backed successor is still undecided. Source: DI-vuzot.
 
 ## Acceptance criteria
 

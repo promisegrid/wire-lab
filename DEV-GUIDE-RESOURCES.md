@@ -106,6 +106,11 @@ reasoning is:
 | `protocols/udp-binding.d/` | `simulations/SIM-ludaf-udp-feed/protocols/udp-feed.d/` | Candidate binding specimen; cite as provisional evidence only. | The active lineage path is `udp-feed`; old `udp-binding` naming is historical provenance in retained draft filenames and prior records. |
 | `protocols/ppx-dr.d/` | `protocols/wire-lab.d/archive/retired/ppx-dr/protocols/ppx-dr.d/` | Retired proposal/review protocol archive. | Proposal-as-message thinking remains evidence, but the old proposal queue is retired and not a live guide-feedback mechanism. |
 | `transports/wire-lab-devs-draft/` | `simulations/SIM-ludut-wire-lab-devs/world/transports/wire-lab-devs-draft/` | Active simulation specimen with verified message CIDs. | The bytes are useful for replay and CID examples; the old root `transports/` path is not a PromiseGrid API. |
+
+Turn 193 is the urgency source for the `wire-lab-devs` dogfood lineage: the
+developer group needed message-transport dogfooding ASAP so Steve was not
+working solo. Guide writers should point to `SIM-ludut` as dogfood evidence, not
+as a final PromiseGrid group layout or CAS migration answer. Source: `DI-vuzot`.
 | `transports/README.md` | `protocols/wire-lab.d/archive/migrations/SIM-piloh-turns-149-208-recovery/archive/transports/README.md` | Historical wire-lab design note. | Preserve as provenance for why the transport surface existed, not as current guide layout. |
 | `proposals/approved/` | `protocols/wire-lab.d/archive/migrations/SIM-piloh-turns-149-208-recovery/archive/proposals/approved/` | Historical review evidence. | Approved proposal records are useful history; current guide feedback belongs outside wire-lab in the guide process. |
 | `proposals/pending/` | `protocols/wire-lab.d/archive/migrations/SIM-piloh-turns-149-208-recovery/archive/proposals/pending/` | Historical pending/contested review evidence. | Pending proposal records are not a live queue after the dev-guide resource/feedback process replaced proposals. |
@@ -407,7 +412,8 @@ final normative references. Source: `DI-zalak`.
   turn-191 prototype-not-canon / documented-conflict constraint and turn-192
   active-prototype modernization pressure.
 - `DR-gabif` — decides additive migration from historical inline group-session
-  evidence to CAS-backed group-session specimens.
+  evidence to CAS-backed group-session specimens; turn 193 adds dogfood urgency
+  that the trigger discipline must preserve without rewriting historical bytes.
 - `DR-robon` — decides whether turn-177 promise-vocabulary, 100-year, and
   mental-model requirements become required protocol-spec sections.
 

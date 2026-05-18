@@ -468,6 +468,12 @@ want it undone, include a one-time rule-compliant revert offer that names
 the forward revert path, then stop re-offering once Steve moves forward.
 (DI-ruvop)
 
+When Steve conditions a pivot on repo state, such as "if those questions are
+committed" or "if that branch is pushed", answer the repo-state condition first
+with exact artifacts, refs, or "not committed yet." Do not substitute adjacent
+numbering, naming, or history analysis for the state answer before addressing
+the requested pivot. Source: DI-vuzot.
+
 ## B5 — One-DF-at-a-time discipline
 
 Present DFs to Steve one at a time. Each DF must list the surviving

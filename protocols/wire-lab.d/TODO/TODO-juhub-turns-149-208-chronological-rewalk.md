@@ -670,6 +670,39 @@ Affects: `AGENTS-ppx.md`;
 `DEV-GUIDE-RESOURCES.md`;
 `protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`.
 
+ID: DI-vuzot
+Date: 2026-05-17 22:15:24
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Reconcile turn 193 by routing Steve's "right questions, commit if
+ready, then dogfood ASAP" directive to dogfood and migration owners, and by
+capturing the assistant's wrong-context TE-numbering answer as a repo-state
+condition and context-loss process failure.
+Intent: Turn 193 is the pivot from promisebase framing back to developer
+message-transport dogfooding. Steve accepted the turn-192 question set as the
+right questions, made the pause conditional on whether they were committed, and
+then asked to resume dogfooding so the developer group could collaborate. The
+assistant instead answered a TE-37/TE-38 numbering question, leaving the commit
+condition, the `wire-lab-devs-draft` name, and the dogfood directive unresolved
+until later turns forced a history review. The replay must route the useful
+directive without repeating the context-loss failure.
+Constraints: Do not process turn 194 or later as part of turn 193. Do not edit
+TODO-lilar or flip TODO-lilar UT checkboxes. Do not start dogfood implementation
+or migration work in this pass. Route the repo-state-condition failure to
+AGENTS-ppx B2, the dogfood urgency to `SIM-ludut`, TODO-rohub, TODO-pipus, and
+`DR-gabif`, the promisebase-question acceptance back to TODO-kituj / TODO-dozak
+via `DI-rupuh`, and the stale ledger turn-number issue to the 72-hour ledger.
+Affects: `AGENTS-ppx.md`;
+`protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewalk.md`;
+`protocols/wire-lab.d/TODO/TODO-rohub-dogfood-tool-name-and-collaborator-permission.md`;
+`protocols/wire-lab.d/TODO/TODO-pipus-te-39-wire-lab-devs-migration.md`;
+`DR/DR-gabif-turn-177-cas-backed-group-session-migration.md`;
+`simulations/SIM-ludut-wire-lab-devs/README.md`;
+`simulations/SIM-ludut-wire-lab-devs/QUESTION.md`;
+`docs/discussion/session-replay-72hr-ledger-20260504.md`;
+`DEV-GUIDE-RESOURCES.md`;
+`protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`.
+
 ## Why a separate TODO
 
 `TODO-lilar` already records the original historical walk through turn 192 and
@@ -926,7 +959,7 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - [x] juhub.190 Turn 190 raw-log rewalk plus later-turn and later-artifact sweep.
 - [x] juhub.191 Turn 191 raw-log rewalk plus later-turn and later-artifact sweep.
 - [x] juhub.192 Turn 192 raw-log rewalk plus later-turn and later-artifact sweep.
-- [ ] juhub.193 Turn 193 raw-log rewalk plus later-turn and later-artifact sweep.
+- [x] juhub.193 Turn 193 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.194 Turn 194 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.195 Turn 195 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.196 Turn 196 raw-log rewalk plus later-turn and later-artifact sweep.
@@ -3143,3 +3176,66 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - `Proposed disposition` `resolved/transferred after raw-log boundary correction, active-prototype modernization routing, shorthand/supersession/twig process routing, and merge-trajectory owner routing`
 - `Write needed? yes/no` `no` further turn-192 write is needed after this pass.
 - `Next` Turn 193 is next.
+
+### Turn 193 — 2026-05-04 16:08 UTC
+
+- `Turn 193 plain-English recap` Steve said the turn-192 promisebase questions
+  were the right questions, then made a conditional pivot: if those questions
+  were all committed to the repo, pause on the TE-38 / promisebase thread and go
+  back to dogfooding the message transport for collaboration among the developer
+  group, because that needed to happen ASAP so Steve was not working solo. The
+  assistant did not answer that request. It answered an adjacent TE-numbering
+  question about whether the current draft should be TE-37 or TE-38, described
+  earlier false starts, and asked whether to keep the draft as TE-37 or renumber
+  it, plus whether to commit it. That response missed the required first answer:
+  whether the accepted questions were committed. It also missed the requested
+  pivot to dogfood and did not preserve the current `wire-lab-devs-draft` naming
+  context. Turns 194 and 195 expose the failure: Steve said to commit and push
+  but noted the wire-lab draft name was wrong, then explicitly diagnosed context
+  compression after promisebase was mentioned and asked for a full session review.
+  Turn 196 produced the 72-hour ledger, and turn 197 started the chronological
+  replay to prevent this kind of context loss. The useful turn-193 conclusion is
+  that the turn-192 promisebase questions are relevant but should be paused after
+  durable capture, while dogfood messaging becomes urgent work. The harmful
+  turn-193 behavior is the assistant substituting TE-numbering history for the
+  repo-state condition and dogfood pivot Steve actually asked for.
+- `Existing capture` `TODO-lilar` is out of scope after turn 192, so it has no
+  direct turn-193 UT rows. Later artifacts still capture the damage: turn 195 is
+  listed in TODO-jivam as the context-loss boundary; the 72-hour ledger records
+  the dogfood pivot and the empty promisebase-modernization twig; TODO-rohub
+  owns dogfood tool naming and collaborator-permission constraints; TODO-pipus /
+  `DR-gabif` own the additive migration path from historical `.txt` evidence to
+  a future CAS-backed group-session specimen; and `SIM-ludut-wire-lab-devs`
+  carries the current developer-coordination dogfood lineage.
+- `Gaps or contradictions` The 72-hour ledger had a stale turn-number claim that
+  placed the final dogfood pivot at turn 187; raw turn files show the pivot is
+  turn 193. The assistant's TE-numbering answer did not satisfy Steve's "if they
+  are all committed" condition, and the later "commit and push" / wrong-name
+  corrections show the context was not stable. The promisebase questions remain
+  relevant because Steve said they were right, but turn 193 pauses them rather
+  than answering them; current owners should treat them as captured downstream
+  work, not as a reason to keep the replay pending.
+- `Related loose ends / owners` The repo-state-condition miss is routed to
+  AGENTS-ppx B2: answer committed/pushed state before adjacent history or naming
+  analysis. The dogfood urgency is routed to `SIM-ludut` as the current
+  developer-coordination simulation, TODO-rohub for dogfood tool naming and
+  collaborator-permission constraints, and TODO-pipus / `DR-gabif` for any
+  additive migration from historical inline `.txt` evidence to a CAS-backed
+  successor. The accepted promisebase question set remains routed to TODO-kituj /
+  `DR-tumus` and TODO-dozak through `DI-rupuh`. The wrong turn number in the
+  72-hour ledger is corrected additively under this DI.
+- `Owner/doc cleanup` Done. Added `DI-vuzot`; expanded AGENTS-ppx B2 with the
+  repo-state-condition rule; updated TODO-rohub, TODO-pipus, and `DR-gabif` with
+  turn-193 dogfood pressure; updated `SIM-ludut` README / QUESTION so the
+  developer-coordination simulation explicitly carries the turn-193 urgency;
+  corrected the stale 72-hour ledger turn number; updated DEV-GUIDE-RESOURCES;
+  added this turn-193 report; marked `juhub.193` complete; and added a turn-193
+  transfer pointer to the UT verification matrix. No promisebase file was
+  touched, and no `TODO-lilar` UT checkbox was flipped.
+- `Remaining decisions or work` Dogfood implementation, tool naming, additive
+  migration, and promisebase decisions remain open downstream, but turn 193's
+  loose ends are captured in the proper sim, TODO, DR, and process owners.
+- `Work pending` no.
+- `Proposed disposition` `resolved/transferred after dogfood-pivot routing, repo-state-condition process rule, stale-ledger correction, and downstream owner capture`
+- `Write needed? yes/no` `no` further turn-193 write is needed after this pass.
+- `Next` Turn 194 is next.

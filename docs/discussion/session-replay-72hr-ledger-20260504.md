@@ -128,7 +128,7 @@ This thread proposed many things; **none of it was committed.** All discussion-o
 | Steve's design-skepticism rule: wire-lab is canon; promisebase is a prototype | **VERBAL RULE** — not yet committed to any spec. |
 | TE-numan numbering investigation | **DONE** — confirmed TE-numan has never been committed; there were two prior false-start drafts (the May 3 git-file-transport one, reverted; and an earlier in-this-session draft, removed before commit). |
 | Current twig `ppx/te-20260504-090842-wire-lab-canon-pb-modernization` | **EMPTY** — has no commits beyond ppx/main HEAD `8d3bf04`. The off-base TE-numan draft was deleted before any commit. |
-| Steve's final pivot: pause promisebase; pivot to message-transport dogfooding ASAP so wire-lab devs can collaborate without one person carrying solo | **VERBAL DIRECTIVE** at turn 187 — not yet acted on. |
+| Steve's final pivot: pause promisebase; pivot to message-transport dogfooding ASAP so wire-lab devs can collaborate without one person carrying solo | **CORRECTED 2026-05-17** — this directive is turn 193 (2026-05-04 16:08 UTC), not turn 187. It is now routed to `SIM-ludut`, TODO-rohub, TODO-pipus, and `DR-gabif`. Source: `DI-vuzot`. |
 
 ---
 
@@ -159,7 +159,7 @@ These are decisions Steve has stated but which have **not yet been swept into th
 9. **Layer numbering 4–7 (or 5–7)** above the L4 binding layer; nothing committed yet that uses these numbers.
 10. **promisegrid uses CBOR + CIDv1**; messages eventually `{CID}.cbor` not `{CID}.txt`.
 11. **Wire-lab is design canon; promisebase is a prototype** — when they conflict, wire-lab wins; promisebase will be refactored/modernized to align.
-12. **Pivot now to dogfooding** so the dev group is exchanging messages over the live `wire-lab-devs` instance (Steve's most recent verbal directive).
+12. **Pivot now to dogfooding** so the dev group is exchanging messages over the live `wire-lab-devs` instance (Steve's turn-193 directive, later routed by `DI-vuzot`).
 
 ---
 

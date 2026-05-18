@@ -22,7 +22,10 @@ the migration must respect. Their scenario matrices now give TODO-pipus
 concrete cases for additive migration, group-visible identity, parent links
 through CAS, missing pointees, and feed-side sparse replication. Source:
 TE-sihih; `DI-fakin`; `DI-rurab`; `DI-bomud`; `DI-navod`; `DI-pator`. No twig
-yet. The additive migration decision request is now `DR-gabif`.
+yet. The additive migration decision request is now `DR-gabif`. Turn 193's
+dogfood urgency should bias this TODO toward additive, non-blocking migration
+choices: preserve the working developer-coordination specimen and avoid making a
+full CAS migration a prerequisite for near-term dogfood use. Source: `DI-vuzot`.
 
 ## Threads absorbed from OPEN-THREADS.md
 
@@ -75,6 +78,10 @@ promisebase-integration scope moved to TE-43.
   `DI-davov`.
 - 2026-05-17: `DR-gabif` now has an unanswered next-DF packet and acceptance
   criteria for the first migration decision pass. Source: `DI-majib`.
+- 2026-05-17: Turn 193's dogfood pivot is routed here as urgency pressure on the
+  migration trigger: near-term developer messaging should not be blocked on a
+  full CAS-backed migration, but any successor must remain additive and preserve
+  historical message bytes. Source: `DI-vuzot`.
 
 ## Decision Intent Log
 
