@@ -831,6 +831,28 @@ Affects: `protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewal
 `protocols/wire-lab.d/TODO/TODO-lilar-session-replay-cleanup.md`;
 `protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`.
 
+ID: DI-fivak
+Date: 2026-05-17 23:00:14
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Reconcile turn 199 as a historical replay-walk step for turn 150,
+with its DF-35.3 off-by-one description corrected by the current TODO-lilar and
+TODO-juhub turn-150 records.
+Intent: Turn 199 continued the recovery walk after Steve typed `150`, but the
+assistant described turn 150 as if it had locked DF-35.3. Raw turn 150 shows it
+landed DF-35.2 and introduced DF-35.3; raw turn 151 is the DF-35.3 lock. Current
+TODO-lilar and TODO-juhub entries already preserve the correct sequence, so the
+turn-199 cleanup should record the old answer's mismatch without mutating the
+historical TODO-lilar walk. The turn's commit-cadence question is operational
+and is resolved by later turns without changing the full-rigor replay rule.
+Constraints: Do not rewrite TODO-lilar's historical walk notes or flip its UT
+checkboxes. Do not reopen TODO-020 / TE-dabol policy work. Treat the old
+"TODO line 14" and twig-state language as historical pre-proquint context, not
+current file/line guidance.
+Affects: `protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewalk.md`;
+`protocols/wire-lab.d/TODO/TODO-lilar-session-replay-cleanup.md`;
+`protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`.
+
 ## Why a separate TODO
 
 `TODO-lilar` already records the original historical walk through turn 192 and
@@ -1093,7 +1115,7 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - [x] juhub.196 Turn 196 raw-log rewalk plus later-turn and later-artifact sweep.
 - [x] juhub.197 Turn 197 raw-log rewalk plus later-turn and later-artifact sweep.
 - [x] juhub.198 Turn 198 raw-log rewalk plus later-turn and later-artifact sweep.
-- [ ] juhub.199 Turn 199 raw-log rewalk plus later-turn and later-artifact sweep.
+- [x] juhub.199 Turn 199 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.200 Turn 200 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.201 Turn 201 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.202 Turn 202 raw-log rewalk plus later-turn and later-artifact sweep.
@@ -3675,3 +3697,50 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - `Proposed disposition` `resolved/transferred after full-rigor replay choice, TODO-bisur investigation capture, pre-149/pre-18 audit capture, and commit-cadence separation`
 - `Write needed? yes/no` `no` further turn-198 write is needed after this pass.
 - `Next` Turn 199 is next.
+
+### Turn 199 — 2026-05-04 17:14 UTC
+
+- `Turn 199 plain-English recap` Steve typed `150`, continuing the newly
+  rigorous chronological replay by asking the assistant to walk turn 150. The
+  assistant responded with a turn-walk note, but it described the wrong DF: it
+  said turn 150 locked DF-35.3, the mandatory cross-TE quotation-grep rule, and
+  cited commit `04126ac` / merge `795a846`. Raw turn 150 shows the correct
+  sequence is one step earlier: turn 150 says "DF-35.2 landed. Now DF-35.3" and
+  introduces the DF-35.3 question; raw turn 151 is where Steve's `yes` locks
+  DF-35.3. Current TODO-lilar and TODO-juhub records already have the correct
+  turn-150 interpretation: turn 150 confirmed DF-35.2 and then presented
+  DF-35.3; turn 151 confirmed DF-35.3 and then presented DF-35.4. The assistant
+  also noted no outstanding questions, said the repo work was already committed
+  and pushed, and asked a separate workflow question about committing per turn
+  versus batching at natural breakpoints. Later turn 200 answered that
+  commit-cadence question with batch mode, and later turn 198 / TODO-juhub
+  preserve the distinction that batching commits does not mean
+  batch-acknowledging turns without full walk notes.
+- `Existing capture` TODO-lilar's `021.150` row correctly records DF-35.2,
+  commit `8f8cbba`, and merge `394c187`, then says DF-35.3 is what turn 151
+  confirmed. TODO-lilar's `021.151` row correctly records DF-35.3, commit
+  `04126ac`, and merge `795a846`. TODO-juhub's turn-150 and turn-151 reports
+  also preserve that sequence. The old turn-199 answer's "TODO line 14" and
+  timestamp-twig language are historical setup details rather than current
+  source locations.
+- `Gaps or contradictions` The substantive contradiction is the DF off-by-one in
+  the turn-199 answer. It did not damage the current corpus because TODO-lilar
+  and TODO-juhub now both carry the corrected turn-150/151 sequence. The
+  separate commit-cadence question is not a replay-design contradiction; it was
+  resolved operationally by turn 200 and remains subordinate to the already
+  chosen full-rigor per-turn walk.
+- `Related loose ends / owners` `UT-199.a` is the turn-150 / turn-151 DF
+  off-by-one; it is closed by the corrected TODO-lilar rows and TODO-juhub
+  reports. `UT-199.b` is the stale "TODO line 14" / old twig-state reference; it
+  is historical pre-proquint context and is not a current path owner. `UT-199.c`
+  is the commit-cadence question; it is resolved by turn 200's batch-mode answer
+  and does not alter the full-rigor replay rule from turn 198.
+- `Owner/doc cleanup` Done. Added `DI-fivak`; added this turn-199 report; marked
+  `juhub.199` complete; and added a turn-199 transfer pointer to the UT
+  verification matrix. No TODO-lilar walk note or UT checkbox was changed.
+- `Remaining decisions or work` None for turn 199. The old replay-walk answer's
+  DF attribution is now explicitly corrected by current owner records.
+- `Work pending` no.
+- `Proposed disposition` `resolved after DF-35.2/DF-35.3 off-by-one correction and commit-cadence routing`
+- `Write needed? yes/no` `no` further turn-199 write is needed after this pass.
+- `Next` Turn 200 is next.

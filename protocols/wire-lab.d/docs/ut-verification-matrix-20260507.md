@@ -1101,3 +1101,13 @@ TODO-lilar `021.pre149` plus the later `021.pre18` follow-up. `UT-198.d` is
 resolved as an operational commit-cadence question that does not alter the
 full-rigor walk rule. This does not edit TODO-lilar walk notes or use
 TODO-lilar checkboxes as closure authority.
+
+### 2026-05-17 — Turn-199 closure / transfer pointer
+
+`DI-fivak` reconciles turn 199 as a historical replay-walk step whose answer
+mis-described turn 150 as the DF-35.3 lock. `UT-199.a` is closed by the current
+TODO-lilar and TODO-juhub records: turn 150 is DF-35.2, while turn 151 is
+DF-35.3. `UT-199.b` is historical old-twig / old-line-number context, not a
+current path owner. `UT-199.c` is resolved by turn 200's batch-commit cadence
+answer and does not alter the full-rigor per-turn walk rule. This does not edit
+TODO-lilar walk notes or use TODO-lilar checkboxes as closure authority.
