@@ -2379,8 +2379,9 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
   concrete L6 CAS / promisebase adoption decision. DR-nugog / TE-domat and later
   simulation-structure TEs still own root/simulation layout graduation. The
   grid-envelope simulations remain competing specimens rather than a chosen
-  canonical envelope.
-- `Work pending` yes.
+  canonical envelope. Under `DI-firap`, these are captured successor-owner
+  items, not remaining turn-local replay cleanup.
+- `Work pending` no.
 - `Proposed disposition` `resolved/transferred after TE-sihih scope contraction, no-rewrite freeze/CID decisions, and simulation-owner split`
 - `Write needed? yes/no` `no` further turn-175 write is needed after this pass.
 - `Next` Turn 176 is next.
@@ -2434,8 +2435,9 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
   remains open for the first concrete L6 CAS / promisebase adoption decision.
   TE-domat / DR-nugog still own root layout and the `groups/` / `transports/`
   split. Nested-envelope body semantics and grid-envelope variant convergence
-  remain successor simulation/spec work.
-- `Work pending` yes.
+  remain successor simulation/spec work. Under `DI-firap`, these are captured
+  successor-owner items, not remaining turn-local replay cleanup.
+- `Work pending` no.
 - `Proposed disposition` `resolved/transferred after TE-sihih scope contraction, TE-domat root-layout analysis, and successor CAS/migration/body-semantics owner split`
 - `Write needed? yes/no` `no` further turn-176 write is needed after this pass.
 - `Next` Turn 177 is next.

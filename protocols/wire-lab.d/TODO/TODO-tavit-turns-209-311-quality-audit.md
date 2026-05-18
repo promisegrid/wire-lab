@@ -37,6 +37,29 @@ Affects: `protocols/wire-lab.d/TODO/TODO-tavit-turns-209-311-quality-audit.md`;
 `/home/stevegt/lab/session-logs/sessions/ea135ce8/209-turn.md` through
 `/home/stevegt/lab/session-logs/sessions/ea135ce8/311-turn.md`.
 
+ID: DI-rapom
+Date: 2026-05-18 10:19:51
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Add a source-fidelity gate before the fast quality screen for turns
+209-311. The audit must classify each turn source as raw, reconstructed,
+summary-only, bundled, or indirect, and must resolve required bundle pointers
+before interpreting any reconstructed turn.
+Intent: A file named `NNN-turn.md` can exist while still being insufficient
+evidence. Turns 308-311 are the concrete hazard: their per-turn files are
+reconstructed summaries that point at the loose bundled response
+`/home/stevegt/lab/session-logs/turns/turn-314.md`. The quality audit must not
+mistake such summaries for full raw exchange evidence.
+Constraints: Do not treat source-file presence as source fidelity. If a turn
+points at a bundle, transcript, loose file, or other indirect source, verify the
+target path exists, verify which turns it covers, and use it alongside the
+per-turn summary before classifying quality or closure. If a required source is
+missing, mark the turn source-blocked instead of safe.
+Affects: `protocols/wire-lab.d/TODO/TODO-tavit-turns-209-311-quality-audit.md`;
+`/home/stevegt/lab/session-logs/sessions/ea135ce8/209-turn.md` through
+`/home/stevegt/lab/session-logs/sessions/ea135ce8/311-turn.md`;
+`/home/stevegt/lab/session-logs/turns/turn-314.md`.
+
 ## Decision lock summary
 
 - `D-tavit-architecture`: use a standalone TODO owner rather than extending
@@ -57,6 +80,26 @@ Are turns 209-311 low-quality enough that they need a full chronological rewalk,
 or can the repo safely close only the specific weak claims, stale pointers,
 unowned decisions, and overreaches found by a targeted audit?
 
+## Source-fidelity gate
+
+Before `tavit.2` fast-screening begins, `tavit.1` must build a source-fidelity
+table for every turn 209-311:
+
+- Classify the available evidence as `raw`, `reconstructed`, `summary-only`,
+  `bundled`, or `indirect`.
+- Record the exact source path or bundle path used for the turn.
+- For reconstructed or summary-only turns, identify the full source that the
+  summary points to and verify that it exists before interpreting the turn.
+- For bundled turns, record the covered turn range and verify alignment between
+  the per-turn summary and the bundle.
+- If a required source is absent or ambiguous, mark the turn `source-blocked`
+  and escalate it instead of treating it as safe.
+
+Known source-fidelity hazard: turns 308-311 are reconstructed summaries under
+`/home/stevegt/lab/session-logs/sessions/ea135ce8/` and point to the loose
+bundle `/home/stevegt/lab/session-logs/turns/turn-314.md`; the audit must read
+that bundle before classifying those turns.
+
 ## Quality screen criteria
 
 Flag a turn or artifact for escalation when it shows any of these patterns:
@@ -75,8 +118,10 @@ Flag a turn or artifact for escalation when it shows any of these patterns:
 
 ## Subtasks
 
-- [ ] tavit.1 Verify source coverage for turns 209-311 and record any missing
-  raw turn logs before interpreting the slice.
+- [ ] tavit.1 Verify source coverage and source fidelity for turns 209-311:
+  record missing files, reconstructed summaries, summary-only turns, bundled
+  sources, indirect-source pointers, bundle coverage ranges, and any
+  source-blocked turns before interpreting the slice.
 - [ ] tavit.2 Fast-screen turns 209-311 for low-quality reasoning, unsupported
   closure, stale routing, specimen/harness conflation, and unowned design
   decisions.

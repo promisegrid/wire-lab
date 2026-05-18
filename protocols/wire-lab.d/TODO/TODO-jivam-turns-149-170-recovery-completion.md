@@ -1,15 +1,15 @@
-# TODO-jivam: Turns 149-208 recovery completion monitor
+# TODO-jivam: Turns 149-208 passive recovery closure checklist
 
 ## Status
 
-Open. This TODO shall not close until all recovery represented by the
-turns 149-208 bounded slice is complete: each source turn is accounted
-for, each UT or equivalent recovery item is resolved, retired, or
-explicitly transferred under its owner artifact, and the owner artifacts
-that block recovery are closed or superseded under DI/DR provenance. The
-original turns 149-170 monitor report remains preserved below as history;
-`DI-zufar` expands the live closure gate through turn 208 without
-renaming this file.
+Open, but passive. No separate recovery-monitor agent or background monitoring
+process is required. This TODO remains useful only as a recovery closure
+checklist until the remaining non-boundary owner checks below are closed,
+transferred, or retired under DI/DR provenance. The original turns 149-170
+monitor report remains preserved below as history; `DI-zufar` expanded the live
+closure gate through turn 208 without renaming this file, and `DI-razol`
+narrowed the file after the completed `TODO-juhub` 149-208 rewalk consumed the
+193-208 boundary evidence.
 
 ## Decision Intent Log
 
@@ -41,12 +41,53 @@ Intent: Keep the closure gate readable while giving the raw-log rewalk a dedicat
 Constraints: Do not use `TODO-jivam` as the turn ledger. Keep `TODO-lilar` as historical evidence; any correction there must be additive and provenance-bearing. `jivam.*` items close only when owner artifacts and the rewalk evidence support closure.
 Affects: `protocols/wire-lab.d/TODO/TODO-jivam-turns-149-170-recovery-completion.md`; `protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewalk.md`; `protocols/wire-lab.d/TODO/TODO-lilar-session-replay-cleanup.md`; `protocols/wire-lab.d/TODO/TODO.md`.
 
-## Rewalk owner
+ID: DI-razol
+Date: 2026-05-18 10:19:51
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Consume the completed `TODO-juhub` turn-193-through-208 rewalk as the
+successor-walk evidence for `jivam.9` and `jivam.10`, while keeping
+`TODO-jivam` open only for the remaining non-boundary recovery closure checks.
+Intent: The monitor should not keep reporting the 193-208 successor-walk
+question as unresolved after `juhub.193` through `juhub.208` are checked and
+the verification matrix contains closure or transfer pointers through turn 208.
+At the same time, the monitor still has value as a final closure gate for
+remaining owner-artifact checks that are not answered merely by completing the
+per-turn rewalk.
+Constraints: Do not flip `TODO-lilar` UT checkboxes. Do not use `TODO-jivam` as
+a per-turn ledger. Do not close `TODO-jivam` until the remaining open `jivam.*`
+criteria are resolved, transferred, or retired with owner evidence.
+Affects: `protocols/wire-lab.d/TODO/TODO-jivam-turns-149-170-recovery-completion.md`;
+`protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewalk.md`;
+`protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`;
+`protocols/wire-lab.d/TODO/TODO-lilar-session-replay-cleanup.md`.
+
+ID: DI-tasar
+Date: 2026-05-18 10:52:54
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Treat `TODO-jivam` as a passive recovery closure checklist, not as a
+separate recovery-monitor agent, background process, or standing workstream.
+Intent: Avoid preserving an unnecessary "monitor agent" concept after the
+actual per-turn recovery evidence moved to `TODO-juhub` and the 193-208
+boundary evidence was consumed. Future work should close this file through an
+ordinary explicit cleanup pass, not by spawning or maintaining a separate
+monitoring role.
+Constraints: Do not close `TODO-jivam` until the remaining open checklist rows
+are resolved, transferred, or retired with owner evidence. Do not use this file
+as a per-turn ledger. Do not flip `TODO-lilar` historical UT checkboxes as the
+closure mechanism.
+Affects: `protocols/wire-lab.d/TODO/TODO-jivam-turns-149-170-recovery-completion.md`;
+`protocols/wire-lab.d/TODO/TODO.md`.
+
+## Evidence owner
 
 The one-turn-at-a-time raw-log rewalk for turns 149-208 is owned by
 `TODO-juhub` (`protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewalk.md`).
 Evidence for `jivam.1`, `jivam.2`, `jivam.9`, `jivam.10`, and `jivam.11`
 should come from that successor TODO and the owner artifacts it updates.
+No separate recovery-monitor agent owns this work; ordinary explicit cleanup
+passes may consume this evidence and update the checklist.
 Per `DI-gudap` in `TODO-juhub`, the `149-174` slice is not considered
 reconciled merely because the turn notes exist: the rewalk evidence for that
 slice must also identify each turn's related `UT-*` owner state and either
@@ -65,8 +106,8 @@ This TODO may close only after all of the following are true:
 - [x] jivam.6 TODO-duvuk closes or transfers all TE-42 Message-ID / filename / CID-cascade policy work after TE-41 no longer blocks it. Closed 2026-05-15: rooted TODO-duvuk is historical memory, its group-session Message-ID / filename / CID-cascade slice is closed by `TODO-gapab` / `DI-rurab` and `DI-012-20260508-033513`, and its feed-outer slice is closed by `TODO-kakaz` / `DI-bomud`.
 - [ ] jivam.7 Adjacent turn-149-through-192 items outside TE-40/41/42 are resolved or explicitly transferred: TE-havib follow-on, TE-sihih, TODO-kituj/TE-43, TODO-ralud/TE-45, Spec-edit, Retire, and Carry entries.
 - [ ] jivam.8 TODO-lilar remains open until every relevant downstream owner has completed, retired, or transferred its UTs under the matrix-as-closure-index rule.
-- [ ] jivam.9 Turns 193-208 are explicitly accounted for as post-lilar session-log boundary material: either no additional recovery item is required, or each item is filed in an owner artifact with DI/DR provenance.
-- [ ] jivam.10 Boundary turns 195, 196, 197, and 208 receive explicit final-review evidence because they define the context-loss correction, the 72-hour ledger request, the TODO-lilar creation boundary, and the later "keep the ledger in TODO 021" instruction.
+- [x] jivam.9 Turns 193-208 are explicitly accounted for as post-lilar session-log boundary material: either no additional recovery item is required, or each item is filed in an owner artifact with DI/DR provenance. Closed by `DI-razol`: `TODO-juhub` now checks off `juhub.193` through `juhub.208`, and the verification matrix carries closure/transfer pointers through turn 208.
+- [x] jivam.10 Boundary turns 195, 196, 197, and 208 receive explicit final-review evidence because they define the context-loss correction, the 72-hour ledger request, the TODO-lilar creation boundary, and the later "keep the ledger in TODO 021" instruction. Closed by `DI-razol`: the final-review evidence is in the stronger `TODO-juhub` turn notes plus the turn-195-through-208 verification-matrix pointers.
 - [ ] jivam.11 A final recovery monitor pass confirms no closed owner artifact still contains unfinished recovery work for turns 149-208.
 
 ## Monitor report snapshot
@@ -181,18 +222,16 @@ transports, TODO-kugod, or DR-nugog.
   makes turn 208 a recovery/session-log boundary point even though it is
   outside TODO-lilar's original 149-192 chronological walk.
 
-### Open monitor questions
+### Current monitor questions
 
-- Whether turns 193-208 need their own successor walk remains unresolved
-  for TODO-jivam closure. The closure rule above requires each of those
-  turns to be explicitly accounted as no-op boundary material or filed in
-  an owner artifact with DI/DR provenance.
-- `UT-PSTK-origin` is reported in the turn-208 answer as logged in TODO
-  021, but the current disposition/matrix artifacts cited by the
-  historical monitor are centered on turns 155-192. A final pass must
-  verify whether that post-192 entry is already represented in the
-  appropriate owner artifact or needs a new pointer.
-- The turn-195/196 correction sequence and turn-197 recovery-procedure
-  sequence should be reviewed together during final closure, because
-  they define the handoff from session-log evidence to TODO-lilar rather
-  than a normal in-scope UT cluster.
+- Resolved by `DI-razol`: turns 193-208 no longer need an additional successor
+  walk for TODO-jivam closure. `TODO-juhub` is the successor walk, and it now
+  checks off `juhub.193` through `juhub.208`.
+- Resolved by `DI-razol`: `UT-PSTK-origin` and the turn-208 research handoff are
+  represented by TODO-lilar, the nested-vs-stacked research doc, SIM-kurim's
+  follow-up questions, the stronger TODO-juhub turn-208 note, and the matrix's
+  turn-208 closure pointer.
+- Still open: the final recovery monitor pass must decide whether the remaining
+  non-boundary closure checks (`jivam.1`, `jivam.2`, `jivam.3`, `jivam.5`,
+  `jivam.7`, `jivam.8`, and `jivam.11`) are already closed by owner evidence or
+  still need additional owner-artifact work.
