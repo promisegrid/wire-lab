@@ -37,10 +37,50 @@ PRIVATE_URL="https://github.com/stevegt/session-logs.git"
 HELPER_PATH="$REPO_DIR/bin/git-cred-private"
 EXPECTED_EMAILS=("stevegt+ppx@t7a.org" "stevegt@t7a.org")
 
+print_fetch_output() {
+  local output="$1"
+  local line
+
+  while IFS= read -r line; do
+    case "$line" in
+      From\ *) ;;
+      *) printf '%s\n' "$line" ;;
+    esac
+  done <<< "$output"
+}
+
+fetch_private_or_exit() {
+  local purpose="$1"
+  local fetch_output
+  local fetch_status
+
+  # Intent: Preserve the bootstrap exit-code contract by treating filtered
+  # fetch output as diagnostic text only; the real git status decides whether
+  # the script may continue with private refs. Source: DI-fepag
+  if fetch_output="$(git fetch private 2>&1)"; then
+    fetch_status=0
+  else
+    fetch_status=$?
+  fi
+
+  if [ -n "$fetch_output" ]; then
+    print_fetch_output "$fetch_output"
+  fi
+
+  if [ "$fetch_status" -ne 0 ]; then
+    echo "ppx-bootstrap: git fetch private failed during $purpose (exit $fetch_status)." >&2
+    exit 2
+  fi
+}
+
 cd "$REPO_DIR"
 
 # Step 1: identity gate
-CURRENT_EMAIL="$(git config user.email 2>/dev/null || true)"
+if CURRENT_EMAIL="$(git config user.email 2>/dev/null)"; then
+  :
+else
+  CURRENT_EMAIL=""
+fi
 GATE_OK=0
 for e in "${EXPECTED_EMAILS[@]}"; do
   if [ "$CURRENT_EMAIL" = "$e" ]; then
@@ -107,7 +147,7 @@ if [ -d "$LOGS_DIR/.git" ] || [ -f "$LOGS_DIR/.git" ]; then
   echo "ppx-bootstrap: worktree at $LOGS_DIR already exists"
 else
   # Need to fetch first so private/wire-lab is known locally
-  git fetch private 2>&1 | grep -v "^From " || true
+  fetch_private_or_exit "worktree setup"
   if git rev-parse --verify --quiet private/wire-lab >/dev/null; then
     git worktree add "$LOGS_DIR" -B wire-lab private/wire-lab
     echo "ppx-bootstrap: created worktree at $LOGS_DIR on wire-lab branch"
@@ -118,7 +158,7 @@ else
 fi
 
 # Step 7: fetch
-git fetch private 2>&1 | grep -v "^From " || true
+fetch_private_or_exit "final refresh"
 
 # Step 8: dry-run push probe
 if git -C "$LOGS_DIR" push --dry-run private wire-lab >/dev/null 2>&1; then

@@ -97,7 +97,7 @@ Applicability is uniform across every TE corpus in this repository, whether the 
 5. While drafting, write any forward-pointers (to TEs that do not yet exist) using a thread-id from `OPEN-THREADS.md`. Naming an unminted future proquint is impossible (proquints are minted, not predicted); naming a future integer alias is forbidden (the DT3 drift class, locked closed by the 2026-05-07 Cat-3 Refinement on TE-titur).
 6. Add a one-line summary to `../../protocols/wire-lab.d/specs/harness-spec-draft.md` Section 8 with a link.
 7. Add the row to this index. The mint date is the date the file is committed (column auto-fills from `git log --format=%ad --date=short -- <path> | tail -1`); leave the `Prior alias` column blank for new TEs that never carried an integer alias.
-8. Open a PR.
+8. Commit and hand off through the role-specific direct-push workflow; do not open a GitHub PR for normal wire-lab convergence. Source: `DI-001-20260428-195702`; `DI-034-20260508-060134`.
 
 ## Migration history
 

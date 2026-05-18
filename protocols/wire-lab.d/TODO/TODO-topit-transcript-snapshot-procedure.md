@@ -168,6 +168,21 @@ transcript tooling can fix. Source: DI-datuz.
 - Affects: `protocols/wire-lab.d/TODO/TODO-topit-transcript-snapshot-procedure.md`; `protocols/wire-lab.d/TODO/TODO.md`; `DR/DR-010-20260507-150000-transcript-snapshot.md`.
 - Supersedes: `DI-033-20260507-150000` for current implementation priority; the transcript-snapshot design remains historical / Perplexity-only context.
 
+### DI-fepag
+
+- ID: DI-fepag
+- Date: 2026-05-17 22:30:58
+- Status: active
+- Author: stevegt@t7a.org (Steve Traugott)
+- Decision: Keep the Perplexity bootstrap script dormant under `DI-nifih`, but still fix its local error-handling hygiene so `git fetch private` failures are reported explicitly instead of being masked.
+- Intent: Review fixes should not reactivate session-log or TURNOVER work, but a checked-in operational script must not continue with stale remote refs after a failed fetch or violate the repo-wide ban on `|| true`.
+- Constraints:
+    - Do not write to `/home/stevegt/lab/session-logs`.
+    - Do not create session snapshots, TURNOVER files, or new session-log tooling.
+    - Preserve the identity gate and existing exit-code contract: identity mismatch exits 0, missing PAT exits 1, bootstrap failures exit 2.
+    - Treat filtered `git fetch private` output as diagnostic only; the fetch command's real exit status decides success or failure.
+- Affects: `bin/ppx-bootstrap.sh`; `protocols/wire-lab.d/TODO/TODO-topit-transcript-snapshot-procedure.md`.
+
 ## Cross-references
 
 - DR-010-20260507-150000-transcript-snapshot.md — the DR backing

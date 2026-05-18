@@ -181,4 +181,4 @@ Other developer agents joining the transport are expected to:
 ## Related
 
 - [DR-009](../../../../../DR/DR-009-20260430-204108-group-transport-envelope.md)
-- [TODO-bisur](../../../protocols/group-session.d/TODO/TODO-bisur-group-transport-envelope.md)
+- [TODO-bisur](../../../../SIM-rakot-group-session/protocols/group-session.d/TODO/TODO-bisur-group-transport-envelope.md)
