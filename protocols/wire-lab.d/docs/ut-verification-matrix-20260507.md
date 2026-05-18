@@ -993,3 +993,17 @@ appears to contradict. `UT-190.b` and `UT-190.d` are routed to TODO-kituj /
 choice for TE-43: `main`, `kv`, a merged state, or no promisebase branch. The
 stale 72-hour discussion ledger is corrected. This does not touch promisebase
 files and does not use `TODO-lilar` checkboxes as closure authority.
+
+### 2026-05-17 — Turn-191 closure / transfer pointer
+
+`DI-sapiv` reconciles turn 191's promisebase prototype-not-canon rule. `UT-191.a`
+and `UT-191.b` are routed to AGENTS-ppx B6 as the canon-rule polarity-change
+pattern: re-derive affected TE/DF frames and remove or fold moot questions
+instead of grafting the rule on. `UT-191.c` is routed to the existing AGENTS-ppx
+twig-naming rule from `DI-nezis`. `UT-191.d` is already captured by the
+`DI-mivap` promisebase `kv` branch routing. `UT-191.e` is captured by AGENTS-ppx
+B7 and TODO-kituj / `DR-tumus` exact-date provenance requirements. `UT-191.f` is
+captured by TODO-kituj, TODO-dozak, and `DR-tumus` as the documented-conflict
+default: prefer wire-lab unless Steve locks an exception. This does not answer
+downstream TE-43 / TE-44 choices and does not use `TODO-lilar` checkboxes as
+closure authority.

@@ -610,6 +610,35 @@ Affects: `AGENTS-ppx.md`;
 `docs/discussion/session-replay-72hr-ledger-20260504.md`;
 `protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`.
 
+ID: DI-sapiv
+Date: 2026-05-17 22:03:56
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Route turn-191's promisebase prototype-not-canon rule, healthy
+TE-scope contraction, twig-name carry, kv-branch follow-on, RFC chronology
+ground-truthing, and documented-conflict interpretation to process and
+PromiseGrid design owners.
+Intent: Turn 191 is the canon rule for promisebase: promisebase is prototype
+evidence, not design authority, and wire-lab should win conflicts by default
+after the conflict is discussed. The assistant's useful behavior was a
+scope-level self-correction from "adopt promisebase wholesale" to "pull useful
+prototype evidence into wire-lab"; the replay should preserve that pattern
+while routing the remaining design details without reopening old TE-sihih
+scope.
+Constraints: Do not reopen or edit TE-sihih here. Do not touch promisebase or
+fetch promisebase state. Do not modify TODO-lilar or flip TODO-lilar UT
+checkboxes. Route `UT-191.a` and `UT-191.b` to AGENTS-ppx B6, `UT-191.c` to
+the AGENTS-ppx twig rule, `UT-191.d` to `DI-mivap` owners, `UT-191.e` to
+AGENTS-ppx B7 plus TODO-kituj / `DR-tumus`, and `UT-191.f` to TODO-kituj /
+TODO-dozak / `DR-tumus`.
+Affects: `AGENTS-ppx.md`;
+`protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewalk.md`;
+`protocols/wire-lab.d/TODO/TODO-kituj-te-43-promisebase-prior-art-adoption.md`;
+`protocols/wire-lab.d/TODO/TODO-dozak-te-44-wire-lab-promisebase-merge-trajectory.md`;
+`DR/DR-tumus-turn-177-l6-cas-adoption.md`;
+`DEV-GUIDE-RESOURCES.md`;
+`protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`.
+
 ## Why a separate TODO
 
 `TODO-lilar` already records the original historical walk through turn 192 and
@@ -860,7 +889,7 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - [x] juhub.188 Turn 188 raw-log rewalk plus later-turn and later-artifact sweep.
 - [x] juhub.189 Turn 189 raw-log rewalk plus later-turn and later-artifact sweep.
 - [x] juhub.190 Turn 190 raw-log rewalk plus later-turn and later-artifact sweep.
-- [ ] juhub.191 Turn 191 raw-log rewalk plus later-turn and later-artifact sweep.
+- [x] juhub.191 Turn 191 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.192 Turn 192 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.193 Turn 193 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.194 Turn 194 raw-log rewalk plus later-turn and later-artifact sweep.
@@ -2929,3 +2958,78 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - `Proposed disposition` `resolved/transferred after raw-output process rule, presupposition-mismatch rule, kv-branch target routing, and stale-ledger correction`
 - `Write needed? yes/no` `no` further turn-190 write is needed after this pass.
 - `Next` Turn 191 is next.
+
+### Turn 191 — 2026-05-04 15:54 UTC
+
+- `Turn 191 plain-English recap` Steve established a canon rule for using
+  promisebase in the PromiseGrid work: be skeptical of promisebase design,
+  treat promisebase as a prototype at best, and discuss conflicts between
+  promisebase and wire-lab while preferring wire-lab by default. The assistant
+  correctly registered this as a scope-level correction, saying its earlier
+  framing had been tilted toward "adopt promisebase wholesale" and that this
+  was wrong. It reframed TE-sihih as "pull what works from the promisebase
+  prototype into wire-lab; let wire-lab define the design canon." That reframe
+  made several old decision-framing questions disappear or collapse: wire-lab's
+  vocabulary, CIDv1 direction, DAG-CBOR direction, L5/L6/L7 ownership, promise
+  economy framing, and group-protocol naming were no longer negotiations with
+  promisebase; they were wire-lab-owned choices, with promisebase material only
+  useful as prior-art evidence or salvageable implementation seed. The assistant
+  reduced the earlier ten-question TE-sihih list to six questions, or five if
+  rejected promisebase terms are folded into the salvage catalog. That reduction
+  is important because it shows the assistant responded to a canon rule by
+  contracting the frame rather than adding yet another question. The remaining
+  loose ends were procedural and evidentiary: the proposed twig
+  `promisebase-as-prototype-source` was still too long and never answered; the
+  assistant still did not know about the separate promisebase `kv` branch found
+  later in the replay; the claim that RFCs 1003-1007 were five years old and
+  predated promise framing needed exact-date verification before use; and the
+  assistant silently interpreted "conflicts should be discussed" as "document
+  the conflict in the TE", which is probably the right durable reading but was
+  stronger than Steve's literal wording. Later turns modify the turn-191 result
+  by making promisebase modernization / possible eventual convergence a future
+  TE-43 / TE-44 concern, but they do not revoke the core canon rule: promisebase
+  remains prototype evidence unless a later locked decision says otherwise.
+- `Existing capture` `TODO-lilar` records `UT-191.a` for the healthy
+  scope-level self-correction, `UT-191.b` for the healthy DF-count contraction,
+  `UT-191.c` for the too-long unanswered twig name, `UT-191.d` for the still
+  missed `kv` branch, `UT-191.e` for the unverified RFC chronology claim, and
+  `UT-191.f` for the unflagged ambiguity between chat-only discussion and
+  documented conflict discussion. TODO-kituj already owns TE-43 promisebase
+  prior-art adoption and the prototype-not-canon stance, TODO-dozak owns the
+  later merge/convergence trajectory, and `DR-tumus` owns the current answerable
+  CAS-profile / promisebase-stance decision packet.
+- `Gaps or contradictions` The old "adopt promisebase wholesale" framing is
+  invalidated by this turn and must not be treated as current. The `kv` branch
+  issue remains a turn-190 correction routed through `DI-mivap`; turn 191
+  constrains that later choice toward wire-lab canon but does not choose
+  `main`, `kv`, merged state, or no branch. The RFC chronology claim is now
+  ground-truthed: promisebase RFC-1003 / RFC-1004 / RFC-1005 trace to
+  2021-04-28, RFC-1003 and RFC-1005 were edited on 2021-07-08, RFC-1006 traces
+  from 2021-06-23 through 2021-07-06, RFC-1007 image artifacts trace to
+  2021-07-10 and 2021-08-13, and the PromiseGrid message-format draft in
+  promisebase `x/message-format.md` appears on 2025-09-24. The loose "five
+  years old" claim is directionally fair as of May 2026, but owner docs should
+  cite exact dates rather than rounded age when using chronology as evidence.
+- `Related UTs / owners` `UT-191.a` and `UT-191.b` are routed to AGENTS-ppx B6
+  as the rule for canon-rule polarity changes: re-derive the affected TE/DF
+  frame and remove or fold moot questions. `UT-191.c` is routed to the existing
+  AGENTS-ppx twig-naming rule from `DI-nezis`; the specific proposed twig was
+  not adopted. `UT-191.d` is routed through `DI-mivap` to TODO-kituj,
+  `DR-tumus`, SIM-jomag, and SIM-bobud. `UT-191.e` is routed to AGENTS-ppx B7
+  and to TODO-kituj / `DR-tumus` exact-date provenance notes. `UT-191.f` is
+  routed to TODO-kituj, TODO-dozak, and `DR-tumus` as a documented-conflict
+  default: wire-lab wins unless Steve explicitly locks an exception.
+- `Owner/doc cleanup` Done. Added `DI-sapiv`; expanded AGENTS-ppx B6 and B7;
+  updated TODO-kituj with the documented-conflict and exact-date provenance
+  requirements; updated TODO-dozak with the merge-time prototype/canon boundary;
+  updated `DR-tumus` with the documented-conflict and exact-date constraints;
+  updated DEV-GUIDE-RESOURCES; added this turn-191 report; marked `juhub.191`
+  complete; and added a turn-191 transfer pointer to the UT verification matrix.
+  No promisebase file was touched, and no `TODO-lilar` UT checkbox was flipped.
+- `Remaining decisions or work` The downstream TE-43 / `DR-tumus` and TE-44
+  choices still need to be answered, but the turn-191 loose ends are captured in
+  the proper PromiseGrid design and process owners.
+- `Work pending` no.
+- `Proposed disposition` `resolved/transferred after prototype-not-canon canon-rule routing, scope-contraction process rule, chronology ground-truthing, and documented-conflict owner routing`
+- `Write needed? yes/no` `no` further turn-191 write is needed after this pass.
+- `Next` Turn 192 is next.

@@ -505,6 +505,12 @@ respond in this order:
 Do not skip steps; do not collapse them into a one-line apology.
 (See DI-021-20260507-212254 in TODO-lilar.)
 
+When Steve gives a canon rule that changes the polarity of multiple
+prior assumptions, re-derive the affected TE or DF framing under that
+rule instead of grafting the rule on as one more question. Remove or
+fold questions made moot by the rule, and state which earlier framing
+is invalidated. Source: DI-sapiv.
+
 ## B7 — Ground-truthing before citation
 
 Before citing any external artifact — a branch, a commit, a tag, an
@@ -523,6 +529,12 @@ interpreting it. If Steve's question presupposes a state and the
 verified output appears to contradict that presupposition, flag the
 mismatch explicitly instead of silently overriding Steve's frame. Source:
 DI-mivap.
+
+For chronology or precedence claims such as "five years old" or
+"predates X", verify the exact dates from file bodies or git history
+before citing the claim. Report the exact dates and source basis rather
+than a rounded age when the chronology supports a design conclusion.
+Source: DI-sapiv.
 
 Pattern-count claims are ground-truth claims. When reporting "N
 occurrences" or similar counts, name the exact literal string, regex,

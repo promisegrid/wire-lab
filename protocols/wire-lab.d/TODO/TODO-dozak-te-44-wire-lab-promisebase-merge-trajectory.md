@@ -24,6 +24,11 @@ same codebase eventually" architectural commitment as a deliberate DF;
 name the merge endpoint, the staging mechanic, and the canonical-vs-
 prototype policy at merge time.
 
+Turn 191's canon rule applies to merge-time decisions too: any convergence,
+merge, or long-lived divergence path must preserve wire-lab as design canon
+unless Steve explicitly locks a different outcome, and must document conflicts
+rather than silently importing promisebase design. Source: `DI-sapiv`.
+
 Turn 179's proposal to add PromiseGrid narrative material to promisebase docs is
 treated here as a scope-creep warning, not an authorization. Cross-repo
 promisebase documentation, merge, or convergence work needs its own later DF or
@@ -41,12 +46,16 @@ Disposition-file pointer: `dropped-thread-disposition-20260506.md`
 - 2026-05-17: Turn 179's cross-repo promisebase-docs proposal is routed here as
   merge-trajectory / scope-boundary pressure. This does not authorize any
   promisebase edit. Source: `DI-vabij`.
+- 2026-05-17: Turn 191's prototype-not-canon rule is routed here as the
+  merge-time canon boundary: convergence must document conflicts and keep
+  wire-lab authoritative unless Steve locks an exception. Source: `DI-sapiv`.
 
 ## Subtasks
 
 - [ ] dozak.1 Decide whether wire-lab and promisebase should converge, merge, or
   stay independent before any cross-repo promisebase documentation or code
-  trajectory is treated as PromiseGrid plan of record. Source: `DI-vabij`.
+  trajectory is treated as PromiseGrid plan of record. Source: `DI-vabij`;
+  `DI-sapiv`.
 
 ## Decision Intent Log
 

@@ -171,8 +171,13 @@ Turn 190 adds the corrective `kv` branch target issue: guide writers must not
 talk about promisebase as a single-branch prior-art source until `DR-tumus`
 decides whether TE-43 evaluates `main`, `kv`, a merged state, or no
 promisebase branch. Guide writers should cite that material as prior-art
-pressure only until the relevant DR/DI path lands. Source: `DI-nulak`;
-`DI-mivap`.
+pressure only until the relevant DR/DI path lands. Turn 191 adds the
+prototype-not-canon rule: guide writers must not present promisebase design as
+PromiseGrid canon, should document material promisebase-vs-wire-lab conflicts,
+should prefer wire-lab unless a later locked decision says otherwise, and should
+cite exact 2021 RFC/prototype dates and 2025 PromiseGrid message-format dates
+rather than loose rounded-age claims when chronology matters. Source:
+`DI-nulak`; `DI-mivap`; `DI-sapiv`.
 
 ## Protocol/Specimen TODO Question Simulations
 
@@ -395,7 +400,8 @@ final normative references. Source: `DI-zalak`.
 - `DR-tumus` — decides the concrete L6 CAS adoption profile exposed by turn
   177; DF-tumus.1 through DF-tumus.3 now include the `DI-molah` synthesis of
   the `DI-bukoh` bakeoff simulations, and DF-tumus.4 now includes the
-  promisebase `main`/`kv`/merged/no-branch evidence-target choice.
+  promisebase `main`/`kv`/merged/no-branch evidence-target choice plus the
+  turn-191 prototype-not-canon / documented-conflict constraint.
 - `DR-gabif` — decides additive migration from historical inline group-session
   evidence to CAS-backed group-session specimens.
 - `DR-robon` — decides whether turn-177 promise-vocabulary, 100-year, and

@@ -32,7 +32,9 @@ Largest cluster after TE-sihih (25 UTs).
 
 Scope:
   - Ratify the prototype-not-canon stance (Steve turn-191: "prototype
-    at best; prefer wire-lab in conflict").
+    at best; prefer wire-lab in conflict") and document concrete
+    wire-lab-vs-promisebase conflicts before applying the wire-lab default.
+    Source: `DI-sapiv`.
   - Document pitbase as L6 substrate prior art with 17/17 chunker-
     merkle tests green (UT-183.c).
   - Specify the concrete CBOR profile for L6 pointer and CAS-object bytes:
@@ -57,6 +59,12 @@ Scope:
     through turn 192) by deciding whether TE-43 / `DR-tumus` evaluates
     promisebase `main`, `kv`, a merged state, or no promisebase branch as the
     prior-art / adoption target. Source: `DI-mivap`.
+  - When citing promisebase RFC age or provenance, use exact git-history dates:
+    RFC-1003 / RFC-1004 / RFC-1005 trace to 2021-04-28; RFC-1003 and
+    RFC-1005 were edited on 2021-07-08; RFC-1006 traces from 2021-06-23
+    through 2021-07-06; RFC-1007 image artifacts trace to 2021-07-10 and
+    2021-08-13; promisebase `x/message-format.md` introduces the PromiseGrid
+    message-format draft on 2025-09-24. Source: `DI-sapiv`.
   - Resolve the Rabin-vs-FastCDC chunking parameter mismatch (UT-181.b:
     pitbase 512 KiB min / 8 MiB max vs turn-177 ~16 KiB average).
   - Use `SIM-jomag-cas-object-model` and
@@ -118,6 +126,10 @@ since it locks the prototype-not-canon stance.
 - [ ] kituj.6 Before TE-43 uses promisebase evidence for the L6 CAS stance,
   decide which promisebase tree state is the evidence/adoption target:
   `main`, `kv`, a merged state, or no branch. Source: `DI-mivap`.
+- [ ] kituj.7 When drafting TE-43 or answering `DR-tumus`, document each
+  material conflict between wire-lab design choices and promisebase prior art,
+  state the wire-lab-preferred default, and cite exact RFC/prototype dates
+  instead of loose rounded-age claims. Source: `DI-sapiv`.
 
 ## Question log
 
@@ -143,6 +155,10 @@ since it locks the prototype-not-canon stance.
 - 2026-05-17: Turn 190's branch-enumeration correction routes the promisebase
   `kv` branch target question here, to `DR-tumus`, and to the CAS simulation
   questions. Source: `DI-mivap`.
+- 2026-05-17: Turn 191's canon rule routes the promisebase prototype-not-canon
+  stance here: TE-43 / `DR-tumus` should discuss material conflicts, prefer
+  wire-lab unless Steve locks an exception, and use exact RFC/prototype dates
+  when chronology supports the prior-art argument. Source: `DI-sapiv`.
 
 ## Decision Intent Log
 
