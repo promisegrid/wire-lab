@@ -531,6 +531,15 @@ observed symptom, suspected cause, mitigation used, and whether it
 affects protocol/design readiness or only local operations. Source:
 DI-zagus.
 
+## Incomplete input acknowledgement
+
+When Steve's message is visibly truncated or too incomplete to act on,
+do not infer the missing object or predicate. Reply with a minimal
+acknowledgement instead: quote the fragment, say it appears truncated,
+and ask Steve to resend the full question or instruction. If Steve
+immediately sends a completed follow-up, treat the fragment as context
+for that follow-up rather than as a separate task. Source: DI-datuz.
+
 # Reporting style (final handoff)
 
 When you finish a task, give Steve the AGENTS.md "Required final

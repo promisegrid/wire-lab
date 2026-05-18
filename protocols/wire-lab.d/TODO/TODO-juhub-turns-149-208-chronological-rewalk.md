@@ -555,6 +555,29 @@ Affects: `AGENTS-ppx.md`;
 `protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewalk.md`;
 `protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`.
 
+ID: DI-datuz
+Date: 2026-05-17 15:34:21
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Route turn-189's truncated-message handling, skipped-answer
+attribution uncertainty, and fragment-plus-completion replay convention to
+process owners without treating the fragment as a PromiseGrid design turn.
+Intent: Turn 189 contains only the fragment "Can you examine the other" and a
+skipped answer marker; turn 190 supplies the completed question one minute
+later. The right durable behavior is procedural: assistants should acknowledge
+visibly incomplete input instead of guessing, transcript tooling should
+distinguish platform skip markers from bot-authored prose if that tooling is
+reactivated, and the chronological rewalk should count fragment-plus-completion
+pairs as one substantive user intent carried by the completed turn.
+Constraints: Do not invent substance for turn 189. Do not modify TODO-lilar or
+flip TODO-lilar UT checkboxes. Route `UT-189.a` to AGENTS-ppx incomplete-input
+acknowledgement, `UT-189.b` to TODO-topit's deferred transcript-format note, and
+`UT-189.c` to this TODO's rewalk convention.
+Affects: `AGENTS-ppx.md`;
+`protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewalk.md`;
+`protocols/wire-lab.d/TODO/TODO-topit-transcript-snapshot-procedure.md`;
+`protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`.
+
 ## Why a separate TODO
 
 `TODO-lilar` already records the original historical walk through turn 192 and
@@ -586,6 +609,11 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 8. Do not advance until each related loose end is either closed, retired, or
    transferred in its proper owner artifact, or explicitly called out here as
    still needing a named decision or work item.
+9. For fragment-plus-completion pairs, treat the visibly truncated turn as
+   procedural-only when the answer is empty/skipped and a near-immediate
+   same-author follow-up completes the same sentence or request. Do not invent a
+   separate substantive question for the fragment; cross-reference the completed
+   turn for substance. Source: DI-datuz.
 
 ## Interaction shorthand
 
@@ -798,7 +826,7 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - [x] juhub.186 Turn 186 raw-log rewalk plus later-turn and later-artifact sweep.
 - [x] juhub.187 Turn 187 raw-log rewalk plus later-turn and later-artifact sweep.
 - [x] juhub.188 Turn 188 raw-log rewalk plus later-turn and later-artifact sweep.
-- [ ] juhub.189 Turn 189 raw-log rewalk plus later-turn and later-artifact sweep.
+- [x] juhub.189 Turn 189 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.190 Turn 190 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.191 Turn 191 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.192 Turn 192 raw-log rewalk plus later-turn and later-artifact sweep.
@@ -2761,3 +2789,52 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - `Proposed disposition` `resolved/transferred after cross-repo DONE visibility, revert-default, and one-time revert-offer routing`
 - `Write needed? yes/no` `no` further turn-188 write is needed after this pass.
 - `Next` Turn 189 is next.
+
+### Turn 189 — 2026-05-04 15:23 UTC
+
+- `Turn 189 plain-English recap` Steve sent a truncated fragment: "Can you
+  examine the other". The recorded assistant side is only "Answer skipped," and
+  one minute later turn 190 supplies the completed question: "Can you examine
+  the other promisebase branches?" That makes turn 189 procedural-only rather
+  than a separate PromiseGrid or promisebase design question. The assistant was
+  right not to guess what "the other" meant, because completing that fragment
+  could have produced the wrong action. The gap is that the skipped answer gave
+  Steve no explicit acknowledgement that the fragment had been received and was
+  too incomplete to act on. There is also an attribution uncertainty: the phrase
+  "Answer skipped" may be bot-authored text or may be a platform/transcript
+  placeholder, and the turn evidence alone cannot distinguish those. Later turn
+  190 resolves the user intent by supplying the complete prompt, so the
+  substantive branch-inspection work belongs to turn 190. The durable
+  conclusions are process-level: acknowledge incomplete user input instead of
+  silently skipping it, preserve transcript-marker uncertainty for any future
+  transcript tooling, and treat fragment-plus-completion pairs as one
+  substantive intent anchored at the completed turn.
+- `Existing capture` `TODO-lilar` records `UT-189.a` for the missing
+  acknowledgement on truncated input, `UT-189.b` for the uncertainty about
+  whether "Answer skipped" was bot text or platform text, and `UT-189.c` for the
+  fragment-plus-completion replay convention. Turn 190 already carries the
+  completed substantive question and the later branch-enumeration issues.
+- `Gaps or contradictions` There is no PromiseGrid design conclusion in turn
+  189. The contradiction is purely procedural: "Answer skipped" avoided a bad
+  guess but failed to close the loop with Steve. Because the transcript does not
+  identify whether that string was generated by the assistant or by the
+  platform, the bot-side rule can only cover future visible incomplete-input
+  cases; transcript-format hardening remains reactivation-only under TODO-topit.
+- `Related UTs / owners` `UT-189.a` is routed to AGENTS-ppx's incomplete-input
+  acknowledgement rule. `UT-189.b` is routed to TODO-topit's deferred
+  transcript-format note so it is preserved if Perplexity transcript tooling is
+  ever reactivated. `UT-189.c` is routed to this TODO's rewalk rule for
+  fragment-plus-completion pairs.
+- `Owner/doc cleanup` Done. Added `DI-datuz`; added the AGENTS-ppx
+  incomplete-input acknowledgement rule; added the `TODO-juhub`
+  fragment-plus-completion convention; added a deferred TODO-topit note; added
+  this turn-189 report; marked `juhub.189` complete; and added a turn-189
+  transfer pointer to the UT verification matrix. No `TODO-lilar` UT checkbox
+  was flipped.
+- `Remaining decisions or work` None for this turn. If Perplexity transcript
+  tooling is reactivated later, TODO-topit now carries the skip-marker
+  distinction as deferred context; it is not current Codex work.
+- `Work pending` no.
+- `Proposed disposition` `resolved/transferred after incomplete-input acknowledgement, transcript-marker deferral, and fragment-pair replay routing`
+- `Write needed? yes/no` `no` further turn-189 write is needed after this pass.
+- `Next` Turn 190 is next.

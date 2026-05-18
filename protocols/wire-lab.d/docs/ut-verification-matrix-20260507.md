@@ -969,3 +969,15 @@ reset-plus-force-push. `UT-188.c` is routed to AGENTS-ppx B2 as a one-time
 rule-compliant offer-to-revert practice after unilateral cross-repo state
 changes. This does not touch promisebase and does not use `TODO-lilar`
 checkboxes as closure authority.
+
+### 2026-05-17 — Turn-189 closure / transfer pointer
+
+`DI-datuz` reconciles turn 189's truncated-fragment turn. `UT-189.a` is routed
+to AGENTS-ppx's incomplete-input acknowledgement rule: do not guess the missing
+object, acknowledge the fragment, and ask Steve to resend the full request.
+`UT-189.b` is routed to TODO-topit's deferred transcript-format note, preserving
+the bot-authored-vs-platform-generated "Answer skipped" distinction without
+reactivating Perplexity session-log work. `UT-189.c` is routed to TODO-juhub's
+fragment-plus-completion rewalk convention, so the fragment is procedural-only
+and the completed turn carries the substance. This does not use `TODO-lilar`
+checkboxes as closure authority.

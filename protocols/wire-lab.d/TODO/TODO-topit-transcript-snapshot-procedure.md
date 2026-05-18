@@ -45,6 +45,13 @@ using Perplexity, so no agent should implement this TODO, write
 `stevegt/session-logs`, or create TURNOVER cutover artifacts unless a later
 decision explicitly reactivates Perplexity operation.
 
+Deferred transcript-format hardening note: if Perplexity transcript or snapshot
+work is reactivated, distinguish bot-authored response text from
+platform-generated skip markers such as "Answer skipped." Turn 189 shows why
+that distinction matters: a skipped-answer marker may represent either a bot
+choice that future agents can improve or a platform convention that only the
+transcript tooling can fix. Source: DI-datuz.
+
 ## Locked decisions (from DR-010-20260507-150000)
 
 1. **Canonical artifact:** the full session transcript is the file the
