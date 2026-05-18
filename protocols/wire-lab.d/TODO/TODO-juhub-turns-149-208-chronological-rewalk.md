@@ -920,6 +920,31 @@ Affects: `protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewal
 `protocols/wire-lab.d/TODO/TODO-lilar-session-replay-cleanup.md`;
 `protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`.
 
+ID: DI-pokut
+Date: 2026-05-17 23:09:51
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Reconcile turn 203 as the old replay's turn-155 walk, with the
+Project/projection wording corrected and the turn-155 loose ends routed to the
+existing TODO-kugod / DI-runuh retirement record.
+Intent: Turn 203 correctly preserved two turn-155 loose ends: the unclosed
+TE-famar DF-1.1 path and the Project / Peel / Wrap definitions that lived only
+in the chat. Its wording also repeated the bad "projection mode" phrase and
+previewed turn 156 as kicking off TE-36. Later turn 204 corrected the vocabulary
+to the `Project` operation rather than a mode, while current turn-156-through-158
+records distinguish the scope challenge from the later apparatus-vs-specimen
+breakthrough. The replay should preserve the historical evidence while closing
+the turn-local loose ends against the already-landed retirement owners.
+Constraints: Do not rewrite TODO-lilar's historical walk notes or flip its UT
+checkboxes. Do not reopen TODO-rivuk, DR-006, TE-famar, or the retired
+promise-stack hypothesis. Treat Project / Peel / Wrap as historical
+promise-stack vocabulary unless a future simulation or TODO explicitly revives
+that design line.
+Affects: `protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewalk.md`;
+`protocols/wire-lab.d/TODO/TODO-lilar-session-replay-cleanup.md`;
+`protocols/wire-lab.d/TODO/TODO-kugod-te-40-apparatus-vs-specimen-completion.md`;
+`protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`.
+
 ## Why a separate TODO
 
 `TODO-lilar` already records the original historical walk through turn 192 and
@@ -1186,7 +1211,7 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - [x] juhub.200 Turn 200 raw-log rewalk plus later-turn and later-artifact sweep.
 - [x] juhub.201 Turn 201 raw-log rewalk plus later-turn and later-artifact sweep.
 - [x] juhub.202 Turn 202 raw-log rewalk plus later-turn and later-artifact sweep.
-- [ ] juhub.203 Turn 203 raw-log rewalk plus later-turn and later-artifact sweep.
+- [x] juhub.203 Turn 203 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.204 Turn 204 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.205 Turn 205 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.206 Turn 206 raw-log rewalk plus later-turn and later-artifact sweep.
@@ -3958,3 +3983,55 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - `Proposed disposition` `resolved after queue-status checkoff capture, TE-36 boundary correction, and TODO-bisur evidence routing`
 - `Write needed? yes/no` `no` further turn-202 write is needed after this pass.
 - `Next` Turn 203 is next.
+
+### Turn 203 — 2026-05-04 17:27 UTC
+
+- `Turn 203 plain-English recap` Steve typed `155`, asking the old replay to
+  walk turn 155. The assistant answered that turn 155 had been walked and that
+  two unfinished threads were captured in the ledger. It summarized Steve's raw
+  turn-155 prompt as choosing the TE-famar / TE-1 DF path while pushing back on
+  what the assistant had called "projection mode" and on which protocol doc
+  would receive the decision. It then said the turn-155 answer defined the
+  Project / Peel / Wrap operations, pointed the destination at the old TODO 5 /
+  TODO-rivuk path, harness-spec §1.1, and DR-006, and left DF-1.1 unlocked
+  because turn 156 reframed the scope. The old answer's useful content was the
+  capture of `UT-155.a` for the orphaned DF and `UT-155.b` for the operation
+  definitions living only in conversation. Later turn 204 corrected the
+  vocabulary: there is no "projection mode"; the operation is `Project`, and it
+  is either part of a spec contract or it is not. Current artifacts retire those
+  turn-155 loose ends under TODO-kugod / TODO-rivuk `DI-runuh`, leaving
+  Project / Peel / Wrap as historical promise-stack vocabulary rather than
+  current apparatus/specimen work. The old handoff sentence saying turn 156
+  "kicks off TE-36" should be read narrowly as the start of Steve's scope
+  challenge; the actual apparatus-vs-specimen breakthrough is turn 158.
+- `Existing capture` TODO-lilar `021.155` records the raw turn-155 exchange and
+  explicitly warns that "projection mode" was a bad coinage. TODO-lilar
+  `UT-155.a` and `UT-155.b` preserve the historical loose ends without being
+  flipped closed. TODO-juhub's turn-155 report records the same correction and
+  says the live owner work is retired rather than reopened. TODO-kugod's
+  `DI-runuh` retirement table marks `UT-155.a` and `UT-155.b` retired through
+  TODO-rivuk / DI-runuh.
+- `Gaps or contradictions` The old turn-203 answer repeated "projection-mode
+  definition" even though turn 204 corrected that phrasing. It also used old
+  TODO 5 / harness-spec / DR-006 destination names that are historical
+  pre-retirement context, not current routing instructions. Its "TE-36 kicks
+  off" phrasing compressed the boundary between turn 156's scope challenge and
+  turn 158's actual apparatus-vs-specimen breakthrough.
+- `Related loose ends / owners` `UT-203.a` is the projection-mode vocabulary
+  risk; it is closed by turn 204's correction plus TODO-lilar `UT-155.b` and
+  `DI-pokut`. `UT-203.b` is the orphaned DF-1.1 / TODO-rivuk path; it is retired
+  by TODO-kugod / `DI-runuh`. `UT-203.c` is the Project / Peel / Wrap definition
+  evidence; it is preserved in TODO-lilar and retired as historical
+  promise-stack vocabulary under `DI-runuh`. `UT-203.d` is the turn-156/TE-36
+  boundary shorthand; it is closed by the corrected turn-156-through-158
+  records.
+- `Owner/doc cleanup` Done. Added `DI-pokut`; added this turn-203 report; marked
+  `juhub.203` complete; and added a turn-203 transfer pointer to the UT
+  verification matrix. No TODO-lilar walk note or UT checkbox was changed.
+- `Remaining decisions or work` None for turn 203. The historical evidence is
+  preserved, the vocabulary correction is captured, and the retired turn-155
+  loose ends have current owner records.
+- `Work pending` no.
+- `Proposed disposition` `resolved after Project/projection vocabulary correction and turn-155 retirement-owner verification`
+- `Write needed? yes/no` `no` further turn-203 write is needed after this pass.
+- `Next` Turn 204 is next.

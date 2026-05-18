@@ -1146,3 +1146,15 @@ TODO-lilar `021.todo12` and downstream TODO-bisur / group-session freeze owners.
 `UT-202.d` is ordinary replay handoff with no standalone owner work. This does
 not edit TODO-lilar walk notes or use TODO-lilar checkboxes as closure
 authority.
+
+### 2026-05-17 — Turn-203 closure / transfer pointer
+
+`DI-pokut` reconciles turn 203 as the old replay's turn-155 walk. `UT-203.a` is
+closed by the turn-204 correction that the operation is `Project`, not
+"projection mode", plus TODO-lilar `UT-155.b` and `DI-pokut`. `UT-203.b` is the
+orphaned TE-famar DF-1.1 / TODO-rivuk path, retired by TODO-kugod / `DI-runuh`.
+`UT-203.c` is the Project / Peel / Wrap definition evidence, preserved in
+TODO-lilar and retired as historical promise-stack vocabulary under `DI-runuh`.
+`UT-203.d` is the turn-156/TE-36 boundary shorthand, closed by the corrected
+turn-156-through-158 records. This does not edit TODO-lilar walk notes or use
+TODO-lilar checkboxes as closure authority.
