@@ -981,3 +981,15 @@ reactivating Perplexity session-log work. `UT-189.c` is routed to TODO-juhub's
 fragment-plus-completion rewalk convention, so the fragment is procedural-only
 and the completed turn carries the substance. This does not use `TODO-lilar`
 checkboxes as closure authority.
+
+### 2026-05-17 — Turn-190 closure / transfer pointer
+
+`DI-mivap` reconciles turn 190's missed promisebase `kv` branch. `UT-190.a` is
+routed to AGENTS-ppx B7's expanded raw-output rule for repo-state queries.
+`UT-190.c` is routed to the same B7 expansion as a presupposition-mismatch rule
+for cases where Steve's question implies a state that the reported evidence
+appears to contradict. `UT-190.b` and `UT-190.d` are routed to TODO-kituj /
+`DR-tumus`, SIM-jomag, and SIM-bobud as the explicit promisebase branch-target
+choice for TE-43: `main`, `kv`, a merged state, or no promisebase branch. The
+stale 72-hour discussion ledger is corrected. This does not touch promisebase
+files and does not use `TODO-lilar` checkboxes as closure authority.

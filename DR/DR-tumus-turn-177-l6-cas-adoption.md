@@ -10,9 +10,9 @@ Affects: `protocols/wire-lab.d/TODO/TODO-kituj-te-43-promisebase-prior-art-adopt
 Unblocks: TODO-kituj / TE-43 drafting; TODO-pipus additive pointer-and-CAS migration planning; TODO-dozak wire-lab / promisebase merge trajectory framing.
 Waiting on: stevegt@t7a.org (Steve Traugott)
 Decision:
-Linked DI: DI-navod; DI-pator; DI-davov; DI-majib; DI-bukoh; DI-molah
+Linked DI: DI-navod; DI-pator; DI-davov; DI-majib; DI-bukoh; DI-molah; DI-mivap
 Related commits:
-Last updated: 2026-05-17 10:09:28
+Last updated: 2026-05-17 21:58:40
 
 ## Event log
 
@@ -20,6 +20,7 @@ Last updated: 2026-05-17 10:09:28
 - 2026-05-17 09:44:46 — Added unanswered next-DF packet and acceptance criteria under `DI-majib`.
 - 2026-05-17 09:55:11 — Routed DF-tumus.1 through DF-tumus.3 through standalone bakeoff simulations after Steve asked for sims instead of direct answers.
 - 2026-05-17 10:09:28 — Synthesized the three bakeoff simulations into a final answerable DR packet while leaving the DR open for Steve's decision.
+- 2026-05-17 21:58:40 — Added turn-190 kv-branch target pressure under `DI-mivap`; DF-tumus.4 must identify whether promisebase `main`, `kv`, a merged state, or no promisebase branch is the evidence/adoption target.
 
 ## Evidence
 
@@ -30,6 +31,7 @@ Last updated: 2026-05-17 10:09:28
 - `simulations/SIM-kohad-cas-object-type-binding-bakeoff/SCENARIOS.md` tests CID codec-only typing, codec-plus-kind typing, and path suffixes as a negative control.
 - `simulations/SIM-gobaz-chunking-identity-bakeoff/SCENARIOS.md` tests pCID-driven chunking, chunking-CID / cCID-style descriptors, profile negotiation, and raw-only deferral as exploratory alternatives.
 - `TODO-kituj` owns TE-43 and already lists deterministic CBOR, allowed tags, chunking parameters, CIDv1 object typing, pointer-object shape, and promisebase prior-art adoption as scope.
+- Turn 190 correction found that promisebase branch enumeration was wrong: local verification of `/home/stevegt/lab/promisebase` shows `remotes/origin/kv` at `a4c20fa`, with a kv-package extraction relative to `remotes/origin/main`. TE-43 must decide whether that branch, main, a merged state, or no promisebase branch is the promisebase evidence target before relying on promisebase as L6 CAS prior art. Source: DI-mivap.
 
 ## Bakeoff synthesis
 
@@ -83,7 +85,9 @@ DI-bukoh; DI-molah.
 - **DF-tumus.4 — Promisebase stance.** Choose Alt-4A use promisebase / pitbase
   as prior art only for the first L6 CAS spec (recommended), Alt-4B
   adopt-as-substrate-with-adapter, Alt-4C defer until TODO-dozak
-  merge-trajectory work, or Alt-4D a refined alternative.
+  merge-trajectory work, or Alt-4D a refined alternative. Any answer must also
+  name the promisebase evidence/adoption target: `main`, `kv`, a merged state,
+  or no promisebase branch. Source: DI-mivap.
 
 ## Acceptance criteria
 

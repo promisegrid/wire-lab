@@ -54,7 +54,9 @@ Scope:
     promisebase / pitbase dependency target: pinned `db/`, future `db` on
     `kv/fs`, or `kv/fs` plus wire-lab-owned CAS/tree logic. Source: `DI-nulak`.
   - Reconcile the kv branch on the remote (UT-190.d -- undiscovered
-    through turn 192).
+    through turn 192) by deciding whether TE-43 / `DR-tumus` evaluates
+    promisebase `main`, `kv`, a merged state, or no promisebase branch as the
+    prior-art / adoption target. Source: `DI-mivap`.
   - Resolve the Rabin-vs-FastCDC chunking parameter mismatch (UT-181.b:
     pitbase 512 KiB min / 8 MiB max vs turn-177 ~16 KiB average).
   - Use `SIM-jomag-cas-object-model` and
@@ -113,6 +115,9 @@ since it locks the prototype-not-canon stance.
   typing, and pointer-object-shape decisions, using
   `simulations/SIM-ligan-promisebase-reference-naming/` as the standalone
   question home. Source: `DI-lusum`; `DI-tibis`.
+- [ ] kituj.6 Before TE-43 uses promisebase evidence for the L6 CAS stance,
+  decide which promisebase tree state is the evidence/adoption target:
+  `main`, `kv`, a merged state, or no branch. Source: `DI-mivap`.
 
 ## Question log
 
@@ -135,6 +140,9 @@ since it locks the prototype-not-canon stance.
   pressure, `cmd/pb` Docker SDK rot, FUSE/server/daemon uncertainty, and the
   resulting "what test status is enough?" question here and to `DR-tumus`.
   Source: `DI-nulak`.
+- 2026-05-17: Turn 190's branch-enumeration correction routes the promisebase
+  `kv` branch target question here, to `DR-tumus`, and to the CAS simulation
+  questions. Source: `DI-mivap`.
 
 ## Decision Intent Log
 

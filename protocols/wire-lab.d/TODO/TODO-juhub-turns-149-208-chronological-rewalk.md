@@ -578,6 +578,38 @@ Affects: `AGENTS-ppx.md`;
 `protocols/wire-lab.d/TODO/TODO-topit-transcript-snapshot-procedure.md`;
 `protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`.
 
+ID: DI-mivap
+Date: 2026-05-17 21:58:40
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Route turn-190's missed promisebase `kv` branch and narrated
+branch-enumeration failure into process rules, TE-43 / DR-tumus branch-target
+decision points, CAS simulations, guide-resource warnings, and the stale
+72-hour ledger correction.
+Intent: Turn 190 answered Steve's completed branch-inspection question with an
+incorrect "only main exists" conclusion, then used that wrong enumeration to say
+TE-sihih did not need to account for active promisebase branch work. The later
+walk found `kv` on the promisebase remote and local verification still shows a
+remote-tracking `origin/kv` at `a4c20fa`, with a substantial kv-package
+extraction relative to `origin/main`. The durable work is to prevent narrated
+state-query errors, preserve Steve's plural-question presupposition as a signal
+to check the evidence, and make TE-43 / DR-tumus decide which promisebase tree
+state is evidence or adoption target before using promisebase as L6 prior art.
+Constraints: Do not touch promisebase. Do not fetch or mutate promisebase state
+as part of the replay. Do not modify TODO-lilar or flip TODO-lilar UT
+checkboxes. Route `UT-190.a` and `UT-190.c` to AGENTS-ppx B7, route
+`UT-190.b` and `UT-190.d` to TODO-kituj / DR-tumus and the CAS simulation
+question homes, and correct stale guide/discussion artifacts additively.
+Affects: `AGENTS-ppx.md`;
+`protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewalk.md`;
+`protocols/wire-lab.d/TODO/TODO-kituj-te-43-promisebase-prior-art-adoption.md`;
+`DR/DR-tumus-turn-177-l6-cas-adoption.md`;
+`simulations/SIM-jomag-cas-object-model/QUESTION.md`;
+`simulations/SIM-bobud-l6-cas-starting-profile-bakeoff/QUESTION.md`;
+`DEV-GUIDE-RESOURCES.md`;
+`docs/discussion/session-replay-72hr-ledger-20260504.md`;
+`protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`.
+
 ## Why a separate TODO
 
 `TODO-lilar` already records the original historical walk through turn 192 and
@@ -827,7 +859,7 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - [x] juhub.187 Turn 187 raw-log rewalk plus later-turn and later-artifact sweep.
 - [x] juhub.188 Turn 188 raw-log rewalk plus later-turn and later-artifact sweep.
 - [x] juhub.189 Turn 189 raw-log rewalk plus later-turn and later-artifact sweep.
-- [ ] juhub.190 Turn 190 raw-log rewalk plus later-turn and later-artifact sweep.
+- [x] juhub.190 Turn 190 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.191 Turn 191 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.192 Turn 192 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.193 Turn 193 raw-log rewalk plus later-turn and later-artifact sweep.
@@ -2838,3 +2870,62 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - `Proposed disposition` `resolved/transferred after incomplete-input acknowledgement, transcript-marker deferral, and fragment-pair replay routing`
 - `Write needed? yes/no` `no` further turn-189 write is needed after this pass.
 - `Next` Turn 190 is next.
+
+### Turn 190 — 2026-05-04 15:24 UTC
+
+- `Turn 190 plain-English recap` Steve completed the truncated turn-189 prompt
+  by asking the assistant to examine the other promisebase branches. The
+  assistant answered as if it had verified the remote and said only `main`
+  existed, with no tags, and that the historical `fskv`-line branches had been
+  merged and deleted. It then concluded that promisebase was a solo,
+  single-branch repo and that the then-current TE-sihih plan did not need to
+  account for active promisebase branch work. That conclusion was wrong. The
+  later walk found that `kv` existed on the promisebase remote at `a4c20fa`, and
+  local verification in `/home/stevegt/lab/promisebase` still shows
+  `remotes/origin/kv` at `a4c20fa` with a large kv-package extraction relative
+  to `remotes/origin/main`: `kv/fs/*` files are deleted, `kv/kv.go`,
+  `kv_test.go`, and `kv_bench_test.go` are added, and README / diagram /
+  discussion material changed. The assistant's process failure was reporting a
+  narrated branch summary instead of showing raw command output, and then
+  failing to notice that Steve's plural "branches" presupposed there should be
+  more than `main`. Later turns 191 and 192 changed the promisebase framing:
+  promisebase is prototype evidence, wire-lab owns design canon, and promisebase
+  may later be modernized into a PromiseGrid layer. Those later rules constrain
+  the answer but do not erase the kv-branch issue: TE-43 / DR-tumus still needs
+  to decide whether promisebase `main`, `kv`, a merged state, or no promisebase
+  branch is the evidence/adoption target for L6 CAS prior art.
+- `Existing capture` `TODO-lilar` records `UT-190.a` for narrated branch
+  enumeration without raw output, `UT-190.b` for the wrong design conclusion
+  caused by missing `kv`, `UT-190.c` for failing to flag the plural-branches
+  presupposition mismatch, and `UT-190.d` for the corrective discovery that `kv`
+  was missing from the conversation's working memory through turn 192.
+  TODO-kituj already owns promisebase prior-art adoption and names the kv branch
+  in scope; `DR-tumus` owns the current L6 CAS adoption profile decision;
+  SIM-jomag and SIM-bobud already test promisebase / pitbase prior-art pressure.
+- `Gaps or contradictions` The branch inspection answer contradicted both the
+  remote evidence captured by the later walk and Steve's plural framing. Its
+  downstream "no active branch work to account for" conclusion must be treated
+  as invalidated. Later turns 191 and 192 do not correct the enumeration; they
+  only establish that promisebase is prototype evidence and wire-lab is canon.
+- `Related UTs / owners` `UT-190.a` is routed to AGENTS-ppx B7's expanded
+  raw-output requirement for repo-state queries. `UT-190.c` is routed to the
+  same B7 expansion as a presupposition-mismatch rule. `UT-190.b` and
+  `UT-190.d` are routed to TODO-kituj / `DR-tumus`, SIM-jomag, and SIM-bobud as
+  the explicit branch-target decision: promisebase `main`, `kv`, a merged state,
+  or no promisebase branch must be identified before promisebase evidence is
+  used for TE-43's L6 CAS adoption stance.
+- `Owner/doc cleanup` Done. Added `DI-mivap`; expanded AGENTS-ppx B7; added a
+  TODO-kituj subtask and question-log entry; updated `DR-tumus` with an event,
+  evidence, and DF-tumus.4 branch-target language; added branch-target questions
+  to SIM-jomag and SIM-bobud; corrected the stale 72-hour discussion ledger;
+  updated DEV-GUIDE-RESOURCES; added this turn-190 report; marked `juhub.190`
+  complete; and added a turn-190 transfer pointer to the UT verification matrix.
+  No promisebase file was touched, and no `TODO-lilar` UT checkbox was flipped.
+- `Remaining decisions or work` The actual branch-target choice is still open,
+  but it is captured in PromiseGrid design owners: TODO-kituj / `DR-tumus` and
+  the relevant CAS simulation questions. For recovery-walkthrough purposes,
+  there is no uncaptured turn-local loose end.
+- `Work pending` no.
+- `Proposed disposition` `resolved/transferred after raw-output process rule, presupposition-mismatch rule, kv-branch target routing, and stale-ledger correction`
+- `Write needed? yes/no` `no` further turn-190 write is needed after this pass.
+- `Next` Turn 191 is next.

@@ -517,6 +517,13 @@ without evidence. Cached or remembered citations from earlier turns
 do not satisfy ground-truthing; re-verify each session. (See
 DI-021-20260507-212255 in TODO-lilar.)
 
+For repo-state queries such as branch, tag, log, or remote-metadata
+inspection, report the command and the relevant raw output before
+interpreting it. If Steve's question presupposes a state and the
+verified output appears to contradict that presupposition, flag the
+mismatch explicitly instead of silently overriding Steve's frame. Source:
+DI-mivap.
+
 Pattern-count claims are ground-truth claims. When reporting "N
 occurrences" or similar counts, name the exact literal string, regex,
 path/corpus, and count basis (matches, lines, files, or records).

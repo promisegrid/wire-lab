@@ -167,8 +167,12 @@ Turn 184 adds promisebase code-audit evidence but still does not settle guide
 prose. `DI-nulak` routes RFC-1005's test tree CID + executable tree CID +
 cache-on-pass pattern to TODO-rajig / `SIM-haros`, and routes promisebase
 `db/`/`kv/fs`/Docker/FUSE partial-rot evidence to TODO-kituj / `DR-tumus`.
-Guide writers should cite that material as prior-art pressure only until the
-relevant DR/DI path lands. Source: `DI-nulak`.
+Turn 190 adds the corrective `kv` branch target issue: guide writers must not
+talk about promisebase as a single-branch prior-art source until `DR-tumus`
+decides whether TE-43 evaluates `main`, `kv`, a merged state, or no
+promisebase branch. Guide writers should cite that material as prior-art
+pressure only until the relevant DR/DI path lands. Source: `DI-nulak`;
+`DI-mivap`.
 
 ## Protocol/Specimen TODO Question Simulations
 
@@ -390,7 +394,8 @@ final normative references. Source: `DI-zalak`.
   conformance target.
 - `DR-tumus` — decides the concrete L6 CAS adoption profile exposed by turn
   177; DF-tumus.1 through DF-tumus.3 now include the `DI-molah` synthesis of
-  the `DI-bukoh` bakeoff simulations.
+  the `DI-bukoh` bakeoff simulations, and DF-tumus.4 now includes the
+  promisebase `main`/`kv`/merged/no-branch evidence-target choice.
 - `DR-gabif` — decides additive migration from historical inline group-session
   evidence to CAS-backed group-session specimens.
 - `DR-robon` — decides whether turn-177 promise-vocabulary, 100-year, and

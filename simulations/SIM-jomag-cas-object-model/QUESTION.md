@@ -2,8 +2,9 @@
 
 Which L6 CAS object model should PromiseGrid test first for pointer objects,
 raw chunks, Merkle nodes, deterministic CBOR / DAG-CBOR encoding, Rabin or
-FastCDC chunking, and CIDv1 codec-based object typing? Source: `DI-navod`;
-`DI-tibis`.
+FastCDC chunking, CIDv1 codec-based object typing, and branch-specific
+promisebase / pitbase prior-art evidence? Source: `DI-navod`; `DI-tibis`;
+`DI-mivap`.
 
 Open decision points:
 
@@ -15,3 +16,5 @@ Open decision points:
   protocol contract?
 - Which promisebase / pitbase lessons become PromiseGrid design inputs, and
   which remain prototype history?
+- If promisebase is used as prior-art evidence, which tree state is being
+  evaluated: `main`, `kv`, a merged state, or no promisebase branch?
