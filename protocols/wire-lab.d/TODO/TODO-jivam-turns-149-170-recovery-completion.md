@@ -154,7 +154,9 @@ transports, TODO-kugod, or DR-nugog.
 - **Turn 195:** Steve corrected the directory-name/context-loss problem
   and instructed a detailed review from TE-35 through the first
   promisebase mention. This is the direct context-loss boundary that
-  motivated the replay work.
+  motivated the replay work. TODO-juhub now records the turn-195 rewalk and
+  routes the bounded-history-review process rule through `DI-gavup`; this
+  does not by itself close the overall jivam monitor.
 - **Turn 196:** Steve requested a one-chunk-at-a-time review of the last
   72 hours with topic status and related TE numbers. The answer
   identifies verbal rules not yet committed, including the

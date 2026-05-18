@@ -729,6 +729,31 @@ Affects: `AGENTS-ppx.md`;
 `protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewalk.md`;
 `protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`.
 
+ID: DI-gavup
+Date: 2026-05-17 22:52:34
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Reconcile turn 195 as the explicit context-compression boundary:
+Steve's `wire-lab-devs-draft` correction and bounded-history-review request
+must stop adjacent design work until the affected session slice is reviewed and
+written to durable recovery artifacts.
+Intent: Turn 195 names the failure class directly: after promisebase entered the
+conversation, the assistant compressed away the live wire-lab-devs draft context.
+The recovery rule is not just "remember the right path"; it is "when Steve
+flags context compression, audit the bounded history and write durable findings
+before changing threads." Turn 196's 72-hour ledger and turn 197's chronological
+replay are the downstream products of this correction.
+Constraints: Do not restart the promisebase design question in this pass. Do not
+edit promisebase, reopen TE-sihih, start dogfood implementation, or flip
+`TODO-lilar` checkboxes. Treat `wire-lab-devs-draft` naming as already captured
+by `DI-fugod` / `SIM-ludut` / DEV-GUIDE-RESOURCES; route the new turn-195 value
+to AGENTS-ppx B6 as the bounded-history-review rule and to TODO-jivam as the
+recovery-monitor boundary.
+Affects: `AGENTS-ppx.md`;
+`protocols/wire-lab.d/TODO/TODO-jivam-turns-149-170-recovery-completion.md`;
+`protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewalk.md`;
+`protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`.
+
 ## Why a separate TODO
 
 `TODO-lilar` already records the original historical walk through turn 192 and
@@ -987,7 +1012,7 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - [x] juhub.192 Turn 192 raw-log rewalk plus later-turn and later-artifact sweep.
 - [x] juhub.193 Turn 193 raw-log rewalk plus later-turn and later-artifact sweep.
 - [x] juhub.194 Turn 194 raw-log rewalk plus later-turn and later-artifact sweep.
-- [ ] juhub.195 Turn 195 raw-log rewalk plus later-turn and later-artifact sweep.
+- [x] juhub.195 Turn 195 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.196 Turn 196 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.197 Turn 197 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.198 Turn 198 raw-log rewalk plus later-turn and later-artifact sweep.
@@ -3325,3 +3350,56 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - `Proposed disposition` `resolved/transferred after direct-action process routing, wire-lab-devs-draft naming capture, and promisebase-role owner re-use`
 - `Write needed? yes/no` `no` further turn-194 write is needed after this pass.
 - `Next` Turn 195 is next.
+
+### Turn 195 — 2026-05-04 16:24 UTC
+
+- `Turn 195 plain-English recap` Steve corrected the assistant again: the
+  current developer transport directory name was `wire-lab-devs-draft`, and the
+  assistant was still getting it wrong. Steve then identified the deeper failure:
+  as soon as promisebase entered the conversation, the assistant appeared to
+  compress context and forget the wire-lab work that had just been discussed.
+  Steve asked for a thorough review of the entire session history between TE-35
+  and the first mention of promisebase. The assistant's response was not a real
+  user-facing review; it was a short internal-progress statement saying the
+  working tree was clean and that it would write findings and ask Steve to
+  clarify scope. Later turn 196 is the actual product: the 72-hour ledger that
+  lists each topic, whether it was written or dropped, and related TE numbers.
+  Later turn 197 turns the same concern into the chronological replay process.
+  The conclusion from turn 195 is that this was the explicit
+  context-compression boundary: the right recovery was not another promisebase
+  clarification, but a bounded history audit written to the repo before changing
+  threads.
+- `Existing capture` TODO-jivam already names turn 195 as the direct context-loss
+  boundary that motivated the replay work. The 72-hour ledger created from turn
+  196 captures the requested topic/status inventory. Turn 197 creates the
+  original chronological replay artifact. `DI-fugod` and the current
+  DEV-GUIDE-RESOURCES / `SIM-ludut` pointers already preserve the
+  `wire-lab-devs-draft` naming correction.
+- `Gaps or contradictions` The turn-195 answer itself is inadequate if read as
+  the final product, because it only says a review will be written. That gap is
+  closed by later turn 196's ledger and turn 197's replay setup. The remaining
+  process lesson is that a context-compression diagnosis must trigger bounded
+  source review before fresh design clarification.
+- `Related loose ends / owners` `UT-195.a` is the repeated
+  `wire-lab-devs-draft` naming correction; it stays with `DI-fugod`,
+  `SIM-ludut`, and DEV-GUIDE-RESOURCES. `UT-195.b` is the context-compression
+  recovery rule; it is routed to AGENTS-ppx B6 as a bounded-history-review
+  requirement. `UT-195.c` is the requested TE-35-to-promisebase source review;
+  it is routed to TODO-jivam's boundary-turn closure gate and the 72-hour ledger
+  produced at turn 196. `UT-195.d` is the assistant's non-answer / internal-note
+  response; it is routed to the same AGENTS-ppx B6 rule because the recovery
+  product must be written or explicitly blocked, not merely promised.
+- `Owner/doc cleanup` Done. Added `DI-gavup`; expanded AGENTS-ppx B6 with a
+  context-compression / bounded-history-review rule; added a TODO-jivam boundary
+  pointer; added this turn-195 report; marked `juhub.195` complete; and added a
+  turn-195 transfer pointer to the UT verification matrix. No promisebase file
+  was touched, no dogfood implementation was started, and no `TODO-lilar` UT
+  checkbox was flipped.
+- `Remaining decisions or work` The 149-208 recovery monitor remains open until
+  its full closure criteria are met, but turn 195's loose ends are captured in
+  TODO-jivam, AGENTS-ppx, the 72-hour ledger, and the current
+  `wire-lab-devs-draft` resource pointers.
+- `Work pending` no.
+- `Proposed disposition` `resolved/transferred after context-compression boundary capture, bounded-history-review process routing, and wire-lab-devs-draft naming owner reuse`
+- `Write needed? yes/no` `no` further turn-195 write is needed after this pass.
+- `Next` Turn 196 is next.

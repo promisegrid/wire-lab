@@ -530,6 +530,13 @@ rule instead of grafting the rule on as one more question. Remove or
 fold questions made moot by the rule, and state which earlier framing
 is invalidated. Source: DI-sapiv.
 
+When Steve diagnoses context compression, says you forgot the active thread, or
+asks for a bounded history review before continuing, stop adjacent design work
+and perform the requested source review first. The review must name the bounded
+turn/file range, list what was written versus dropped or only discussed, and be
+written or explicitly routed to a durable repo artifact before changing threads
+or asking a fresh design-clarification question. Source: DI-gavup.
+
 ## B7 — Ground-truthing before citation
 
 Before citing any external artifact — a branch, a commit, a tag, an

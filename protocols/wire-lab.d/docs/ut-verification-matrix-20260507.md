@@ -1048,3 +1048,15 @@ TODO-kituj / `DR-tumus` and TODO-dozak through `DI-rupuh`. `UT-194.d` is routed
 to the AGENTS-ppx B2 direct-action ordering rule. This does not commit/push
 retroactively, does not touch promisebase, and does not use `TODO-lilar`
 checkboxes as closure authority.
+
+### 2026-05-17 — Turn-195 closure / transfer pointer
+
+`DI-gavup` reconciles turn 195 as the explicit context-compression boundary.
+`UT-195.a` is routed to the already-current `wire-lab-devs-draft` resource
+pointers under `DI-fugod`, `SIM-ludut`, and DEV-GUIDE-RESOURCES. `UT-195.b` and
+`UT-195.d` are routed to AGENTS-ppx B6: when Steve diagnoses context compression,
+the bot must stop adjacent design work and write or route the requested bounded
+history review before asking fresh design questions. `UT-195.c` is routed to
+TODO-jivam's boundary-turn closure gate and the turn-196 72-hour ledger product.
+This does not touch promisebase and does not use `TODO-lilar` checkboxes as
+closure authority.
