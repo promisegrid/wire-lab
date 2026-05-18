@@ -1158,3 +1158,15 @@ TODO-lilar and retired as historical promise-stack vocabulary under `DI-runuh`.
 `UT-203.d` is the turn-156/TE-36 boundary shorthand, closed by the corrected
 turn-156-through-158 records. This does not edit TODO-lilar walk notes or use
 TODO-lilar checkboxes as closure authority.
+
+### 2026-05-17 — Turn-204 closure / transfer pointer
+
+`DI-buzor` reconciles turn 204 as Steve's correction that `Project` is an
+operation, not "projection mode." `UT-204.a` is closed by TODO-lilar `UT-155.b`,
+`DI-buzor`, and `DI-pokut`. `UT-204.b` is the old answer's stale claim that the
+phrase was not in committed files; current corpus occurrences are explicitly
+routed as historical TODO-lilar / dropped-thread evidence or retired TE-famar
+body text. `UT-204.c` is the future-propagation risk, captured by TODO-lilar
+`UT-155.b` plus the promise-stack retirement under TODO-kugod `DI-runuh`. This
+does not edit TODO-lilar walk notes, use TODO-lilar checkboxes as closure
+authority, or rewrite a TE body.

@@ -945,6 +945,32 @@ Affects: `protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewal
 `protocols/wire-lab.d/TODO/TODO-kugod-te-40-apparatus-vs-specimen-completion.md`;
 `protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`.
 
+ID: DI-buzor
+Date: 2026-05-17 23:14:14
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Reconcile turn 204 as Steve's correction that `Project` is an
+operation, not "projection mode", and treat any remaining phrase occurrences in
+retired historical artifacts as evidence rather than live PromiseGrid guidance.
+Intent: Turn 204 is an important vocabulary correction. The old answer correctly
+accepted that "projection mode" was a sloppy bot coinage and that future work
+must say `Project` when it means the operation. Its claim that the phrase never
+made it into committed files is no longer true in the current corpus: historical
+TODO-lilar notes, the dropped-thread disposition memo, and the retired
+TE-famar body include the phrase. Those occurrences are not live spec guidance
+because TODO-lilar is append-only replay evidence and TE-famar's 2026-05-08
+refinement / TODO-kugod `DI-runuh` retire the old promise-stack path.
+Constraints: Do not rewrite TODO-lilar or flip TODO-lilar UT checkboxes. Do not
+edit TE-famar in this per-turn replay pass; its body remains historical evidence
+under the TE editing policy and its current readers are pointed to the later
+retirement refinement. Do not reopen TODO-rivuk, DR-006, or the promise-stack
+hypothesis.
+Affects: `protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewalk.md`;
+`protocols/wire-lab.d/TODO/TODO-lilar-session-replay-cleanup.md`;
+`protocols/wire-lab.d/TODO/dropped-thread-disposition-20260506.md`;
+`docs/thought-experiments/TE-famar-promise-stack-ordering.md`;
+`protocols/wire-lab.d/docs/ut-verification-matrix-20260507.md`.
+
 ## Why a separate TODO
 
 `TODO-lilar` already records the original historical walk through turn 192 and
@@ -1212,7 +1238,7 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - [x] juhub.201 Turn 201 raw-log rewalk plus later-turn and later-artifact sweep.
 - [x] juhub.202 Turn 202 raw-log rewalk plus later-turn and later-artifact sweep.
 - [x] juhub.203 Turn 203 raw-log rewalk plus later-turn and later-artifact sweep.
-- [ ] juhub.204 Turn 204 raw-log rewalk plus later-turn and later-artifact sweep.
+- [x] juhub.204 Turn 204 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.205 Turn 205 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.206 Turn 206 raw-log rewalk plus later-turn and later-artifact sweep.
 - [ ] juhub.207 Turn 207 raw-log rewalk plus later-turn and later-artifact sweep.
@@ -4035,3 +4061,54 @@ rewalk mechanics while the older artifacts remain evidence and closure logic.
 - `Proposed disposition` `resolved after Project/projection vocabulary correction and turn-155 retirement-owner verification`
 - `Write needed? yes/no` `no` further turn-203 write is needed after this pass.
 - `Next` Turn 204 is next.
+
+### Turn 204 — 2026-05-04 22:30 UTC
+
+- `Turn 204 plain-English recap` Steve objected that `Project` had been turned
+  into "projection mode" and asked what the assistant was thinking. The old
+  assistant accepted the correction and said the bad phrase came from the
+  original turn-155 bot text, where `Project` was an operation but the assistant
+  had stretched it into "Projection mode first-class" / "projection-mode." The
+  assistant also said it had propagated that bad phrase into the replay notes
+  instead of catching it. The useful conclusion is clear: there is no
+  "projection mode"; there is the `Project` operation, which is either part of a
+  spec contract or not. The old answer also claimed the phrase had not made it
+  into committed files and only existed in the transcript / walk notes at that
+  moment. In the current corpus, that claim is no longer literally true:
+  historical TODO-lilar notes, the dropped-thread disposition memo, and the
+  retired TE-famar body contain the phrase. Those occurrences are now treated as
+  historical evidence or retired-promise-stack text, not live PromiseGrid
+  guidance. Future live design work should use `Project` and should not copy
+  "projection mode" into active specs, simulations, TODOs, or DIs.
+- `Existing capture` TODO-lilar `UT-155.b` already records Steve's vocabulary
+  correction and says not to propagate "projection mode" / "projection-mode
+  first-class" into later work. TODO-juhub turn 203 and `DI-pokut` already use
+  turn 204 to close the turn-203 vocabulary risk. TODO-kugod `DI-runuh` retires
+  `UT-155.a` and `UT-155.b` through the promise-stack retirement cascade.
+  TE-famar itself contains a 2026-05-08 refinement saying current readers should
+  follow TE-havib / TE-lozip / congruence essay framing instead of answering
+  TE-famar's DF queue.
+- `Gaps or contradictions` The old turn-204 answer's "no committed file" claim
+  is stale for the current repository because the phrase is visible in committed
+  historical artifacts. That does not require an immediate TE edit in this
+  replay pass: TODO-lilar is append-only history, the dropped-thread disposition
+  memo is historical disposition evidence, and TE-famar's body is superseded by
+  its later refinement plus TODO-kugod `DI-runuh`.
+- `Related loose ends / owners` `UT-204.a` is the vocabulary correction itself;
+  it is closed by TODO-lilar `UT-155.b`, `DI-buzor`, and `DI-pokut`. `UT-204.b`
+  is the stale "no committed file" claim; it is closed by this report's current
+  corpus check and by treating existing phrase occurrences as historical or
+  retired artifacts. `UT-204.c` is the risk that future live specs copy the bad
+  phrase; it is captured by TODO-lilar `UT-155.b`, `DI-buzor`, and the
+  promise-stack retirement under TODO-kugod `DI-runuh`.
+- `Owner/doc cleanup` Done. Added `DI-buzor`; added this turn-204 report; marked
+  `juhub.204` complete; and added a turn-204 transfer pointer to the UT
+  verification matrix. No TODO-lilar walk note, TODO-lilar UT checkbox, or TE
+  body was changed.
+- `Remaining decisions or work` None for turn 204. The correction is captured,
+  the stale committed-file claim is corrected in the replay record, and the
+  remaining occurrences are historical / retired rather than live design owners.
+- `Work pending` no.
+- `Proposed disposition` `resolved after Project vocabulary correction, stale committed-file claim correction, and retired-artifact routing`
+- `Write needed? yes/no` `no` further turn-204 write is needed after this pass.
+- `Next` Turn 205 is next.
