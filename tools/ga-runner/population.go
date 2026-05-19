@@ -31,6 +31,13 @@ func runInit(args []string, stdout io.Writer) error {
 	fs := flag.NewFlagSet("init", flag.ContinueOnError)
 	repoRoot := commonRepoFlag(fs)
 	dryRun := fs.Bool("dry-run", false, "print tracked simulation population without writing GA state")
+	modelID := fs.String("model", "", "model ID for read-only generation planning")
+	runGroupID := fs.String("run-group-id", "", "run group ID for read-only generation planning")
+	shuffleSeed := fs.String("shuffle-seed", "", "deterministic shuffle seed for parent and scenario sampling")
+	parentCount := fs.Int("parent-count", defaultParentCount, "number of parent sims to select for planning")
+	scenarioCount := fs.Int("scenario-count", defaultScenarioCount, "number of root scenarios to sample uniformly")
+	childCount := fs.Int("child-count", defaultChildCount, "number of planned child sims")
+	maxPromotions := fs.Int("max-promotions", defaultMaxPromotions, "maximum accepted children for this planned generation")
 	if err := fs.Parse(args); err != nil {
 		return err
 	}
@@ -50,6 +57,56 @@ func runInit(args []string, stdout io.Writer) error {
 	}
 	for _, sim := range population {
 		if err := writeFormat(stdout, "%s files=%d tree_hash=%s path=%s\n", sim.SimID, len(sim.Files), sim.TreeHash, sim.Path); err != nil {
+			return err
+		}
+	}
+	if *modelID == "" {
+		return nil
+	}
+	scenarios, err := discoverScenarios(repo)
+	if err != nil {
+		return err
+	}
+	options := PlanOptions{
+		RunGroupID:    *runGroupID,
+		ModelID:       *modelID,
+		ShuffleSeed:   *shuffleSeed,
+		ParentCount:   *parentCount,
+		ScenarioCount: *scenarioCount,
+		ChildCount:    *childCount,
+		MaxPromotions: *maxPromotions,
+	}
+	plan, err := buildGenerationPlan(population, scenarios, options)
+	if err != nil {
+		return err
+	}
+	return printGenerationPlan(stdout, plan)
+}
+
+func printGenerationPlan(stdout io.Writer, plan GenerationPlan) error {
+	if err := writeFormat(stdout, "plan run_group_id=%s model=%s parents=%d scenarios=%d children=%d max_promotions=%d parent_score_cells=%d child_score_cells=%d\n",
+		plan.RunGroupID,
+		plan.ModelID,
+		len(plan.Parents),
+		len(plan.Scenarios),
+		len(plan.Children),
+		plan.MaxPromotions,
+		len(plan.ParentScoreCells),
+		len(plan.ChildScoreCells)); err != nil {
+		return err
+	}
+	for index, parent := range plan.Parents {
+		if err := writeFormat(stdout, "parent %d %s tree_hash=%s\n", index+1, parent.SimID, parent.TreeHash); err != nil {
+			return err
+		}
+	}
+	for index, scenario := range plan.Scenarios {
+		if err := writeFormat(stdout, "scenario %d %s path=%s\n", index+1, scenario.ScenarioID, scenario.Path); err != nil {
+			return err
+		}
+	}
+	for index, child := range plan.Children {
+		if err := writeFormat(stdout, "child %d %s operation=%s parents=%s path=%s\n", index+1, child.ChildID, child.Operation, strings.Join(child.ParentIDs, ","), child.ResultPath); err != nil {
 			return err
 		}
 	}

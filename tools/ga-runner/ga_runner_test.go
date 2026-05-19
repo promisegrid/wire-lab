@@ -169,6 +169,120 @@ func TestRunInitDryRunPrintsTrackedPopulation(t *testing.T) {
 	}
 }
 
+func TestDiscoverScenariosFindsRootScenarioFiles(t *testing.T) {
+	repo := newTestRepo(t)
+	writeTestFile(t, repo.Path("scenarios", "scenario-b", "scenario-b.md"), "# B\n")
+	writeTestFile(t, repo.Path("scenarios", "scenario-a", "scenario-a.md"), "# A\n")
+	writeTestFile(t, repo.Path("scenarios", "scenario-c", "README.md"), "# ignored\n")
+
+	scenarios, err := discoverScenarios(repo)
+	if err != nil {
+		t.Fatalf("discover scenarios: %v", err)
+	}
+	if got := scenarioIDs(scenarios); strings.Join(got, ",") != "scenario-a,scenario-b" {
+		t.Fatalf("unexpected scenarios: %#v", got)
+	}
+}
+
+func TestBuildGenerationPlanIsDeterministic(t *testing.T) {
+	population := []PopulationSim{
+		{SimID: "SIM-a", Path: "simulations/SIM-a/", TreeHash: "a"},
+		{SimID: "SIM-b", Path: "simulations/SIM-b/", TreeHash: "b"},
+		{SimID: "SIM-c", Path: "simulations/SIM-c/", TreeHash: "c"},
+	}
+	scenarios := []Scenario{
+		{ScenarioID: "scenario-a", Path: "scenarios/scenario-a/scenario-a.md"},
+		{ScenarioID: "scenario-b", Path: "scenarios/scenario-b/scenario-b.md"},
+		{ScenarioID: "scenario-c", Path: "scenarios/scenario-c/scenario-c.md"},
+	}
+	options := PlanOptions{
+		RunGroupID:    "ga-test",
+		ModelID:       "model-a",
+		ShuffleSeed:   "42",
+		ParentCount:   2,
+		ScenarioCount: 2,
+		ChildCount:    3,
+		MaxPromotions: 1,
+	}
+	first, err := buildGenerationPlan(population, scenarios, options)
+	if err != nil {
+		t.Fatalf("build first plan: %v", err)
+	}
+	second, err := buildGenerationPlan(population, scenarios, options)
+	if err != nil {
+		t.Fatalf("build second plan: %v", err)
+	}
+	if strings.Join(parentIDs(first.Parents), ",") != strings.Join(parentIDs(second.Parents), ",") {
+		t.Fatalf("parent selection should be deterministic: %#v vs %#v", first.Parents, second.Parents)
+	}
+	if strings.Join(scenarioIDs(first.Scenarios), ",") != strings.Join(scenarioIDs(second.Scenarios), ",") {
+		t.Fatalf("scenario selection should be deterministic: %#v vs %#v", first.Scenarios, second.Scenarios)
+	}
+	if len(first.ParentScoreCells) != 4 || len(first.ChildScoreCells) != 6 {
+		t.Fatalf("unexpected cell counts: parent=%d child=%d", len(first.ParentScoreCells), len(first.ChildScoreCells))
+	}
+	if first.Children[0].Operation != "mutation" || first.Children[1].Operation != "crossover" {
+		t.Fatalf("unexpected child operations: %#v", first.Children)
+	}
+}
+
+func TestBuildGenerationPlanValidatesCounts(t *testing.T) {
+	population := []PopulationSim{{SimID: "SIM-a", TreeHash: "a"}}
+	scenarios := []Scenario{{ScenarioID: "scenario-a"}}
+	options := PlanOptions{
+		ModelID:       "model-a",
+		ParentCount:   1,
+		ScenarioCount: 1,
+		ChildCount:    1,
+		MaxPromotions: 2,
+	}
+	_, err := buildGenerationPlan(population, scenarios, options)
+	if err == nil || !strings.Contains(err.Error(), "max-promotions cannot exceed child-count") {
+		t.Fatalf("expected max-promotions validation error, got %v", err)
+	}
+	options.MaxPromotions = 0
+	options.ParentCount = 0
+	_, err = buildGenerationPlan(population, scenarios, options)
+	if err == nil || !strings.Contains(err.Error(), "parent-count must be positive") {
+		t.Fatalf("expected parent-count validation error, got %v", err)
+	}
+}
+
+func TestRunInitDryRunPrintsGenerationPlan(t *testing.T) {
+	repo := newGitTestRepo(t)
+	writeTestFile(t, repo.Path("simulations", "SIM-parent", "README.md"), "# Parent\n")
+	writeTestFile(t, repo.Path("simulations", "SIM-child-untracked", "README.md"), "# Child\n")
+	writeTestFile(t, repo.Path("scenarios", "scenario-one", "scenario-one.md"), "# One\n")
+	writeTestFile(t, repo.Path("scenarios", "scenario-two", "scenario-two.md"), "# Two\n")
+	gitAdd(t, repo, "simulations/SIM-parent/README.md", "scenarios/scenario-one/scenario-one.md", "scenarios/scenario-two/scenario-two.md")
+
+	var out strings.Builder
+	err := runMain([]string{
+		"ga-runner", "init",
+		"-repo-root", repo.Root,
+		"-dry-run",
+		"-model", "model-a",
+		"-run-group-id", "ga-test",
+		"-shuffle-seed", "7",
+		"-parent-count", "1",
+		"-scenario-count", "2",
+		"-child-count", "2",
+		"-max-promotions", "1",
+	}, &out, &out)
+	if err != nil {
+		t.Fatalf("init dry-run plan: %v", err)
+	}
+	text := out.String()
+	for _, want := range []string{"population=1", "plan run_group_id=ga-test model=model-a", "parent_score_cells=2", "child_score_cells=4", "planned-child-0001"} {
+		if !strings.Contains(text, want) {
+			t.Fatalf("expected %q in output:\n%s", want, text)
+		}
+	}
+	if strings.Contains(text, "SIM-child-untracked") {
+		t.Fatalf("untracked child should not appear in plan output:\n%s", text)
+	}
+}
+
 func newTestRepo(t *testing.T) Repo {
 	t.Helper()
 	root := t.TempDir()
@@ -208,6 +322,22 @@ func runGit(t *testing.T, root string, args ...string) {
 	if err != nil {
 		t.Fatalf("git %v failed: %v\n%s", args, err, string(output))
 	}
+}
+
+func parentIDs(parents []PopulationSim) []string {
+	var ids []string
+	for _, parent := range parents {
+		ids = append(ids, parent.SimID)
+	}
+	return ids
+}
+
+func scenarioIDs(scenarios []Scenario) []string {
+	var ids []string
+	for _, scenario := range scenarios {
+		ids = append(ids, scenario.ScenarioID)
+	}
+	return ids
 }
 
 func validResult(repo Repo, path string) FitnessResult {

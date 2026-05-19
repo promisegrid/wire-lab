@@ -132,6 +132,27 @@ through `results/state/<run-group-id>.json` remains later work.
 Affects: `tools/ga-runner/`;
 `protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`.
 
+ID: DI-zusit
+Date: 2026-05-19 10:35:07
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Implement conservative read-only generation planning in
+`tools/ga-runner init -dry-run`: uniformly sample root scenarios, select a small
+tracked parent set, plan a small child batch, cap promotions, and leave explicit
+scenario tagging as later TODO work before serious GA runs.
+Intent: The first GA planning pass should be cheap and deterministic without
+pretending that `Source type` is a semantic tag system. Uniform sampling is good
+enough for early scaffolding; a later scenario-tag pass can add domain,
+pressure, layer, and risk metadata for serious search.
+Constraints: Do not write GA state, result files, child sims, or scenario tags
+in this pass. Defaults remain conservative: 3 parents, 5 scenarios, 4 children,
+and 2 maximum promotions. Reject invalid counts. Scenario sampling is uniform
+over `scenarios/<id>/<id>.md` entries and deterministic when `-shuffle-seed` is
+provided.
+Affects: `tools/ga-runner/`;
+`protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`;
+future scenario-tag TODO work.
+
 ## Scope
 
 - Define and implement a new GA/search runner without changing
@@ -311,10 +332,10 @@ status in the GA state file.
   committed/tracked `simulations/SIM-*` trees, while pending untracked children
   are included only through the active GA manifest. Source: `DI-ramar`;
   `DI-bagih`.
-- [ ] tapur.7 Implement conservative generation sizing: score existing sims,
+- [x] tapur.7 Implement conservative generation sizing: score existing sims,
   choose a small parent set, generate a small child batch, score each child
-  against a stratified scenario sample, and promote at most a small number of
-  children per generation. Source: `DI-ramar`.
+  against a uniform scenario sample, and promote at most a small number of
+  children per generation. Source: `DI-ramar`; `DI-zusit`.
 - [ ] tapur.8 Implement review and promotion: accepted children are staged from
   their existing `simulations/SIM-*` paths and committed with selected JSON
   result evidence; rejected children remain uncommitted. Source: `DI-ramar`.
@@ -325,6 +346,13 @@ status in the GA state file.
   docs so GA-runner JSON results, Markdown canary-result exclusion, child-sim
   generation, review, promotion, and culling are documented from the same
   decision source. Source: `DI-ramar`.
+- [ ] tapur.11 Add explicit scenario tags before serious GA runs. Candidate tag
+  families: `domain` (for example logistics, governance, aviation, CAS,
+  group-session, promisebase), `pressure` (sparse knowledge, adversarial trust,
+  migration, auditability, naming, transport loss), `layer` (application,
+  promise/accounting, group/session, CAS, envelope, transport), and `risk`
+  (safety-critical, financial, governance, privacy, low-stakes). Source:
+  `DI-zusit`.
 
 ## Predecessor context
 
