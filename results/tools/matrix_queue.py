@@ -254,58 +254,6 @@ def should_skip_record(record: dict, args: argparse.Namespace) -> Tuple[bool, st
     return False, ""
 
 
-def run_cell(
-    cell: MatrixCell,
-    record: dict,
-    job_dir: Path,
-    runner_command: str,
-    update_matrix: bool,
-    dry_run: bool,
-) -> str:
-    """Run one queue cell and return the resulting status."""
-
-    result_path = repo_relative_path(cell.result_path)
-
-    if dry_run:
-        print(f"dry-run: {cell.cell_id} -> {cell.result_path}")
-        return record.get("status", "queued")
-
-    prompt_path = write_prompt(job_dir, cell)
-    existing_issues = validate_result_path(result_path)
-    if not existing_issues:
-        if update_matrix:
-            update_matrix_for_result(result_path)
-        mark(record, "done", "existing valid result")
-        return "done"
-
-    if not runner_command:
-        mark(record, "failed", "missing --runner-command and no valid existing result")
-        return "failed"
-
-    record["attempts"] = int(record.get("attempts", 0)) + 1
-    mark(record, "running", "runner command started")
-    argv = command_argv(runner_command, cell, prompt_path, result_path)
-    completed = subprocess.run(
-        argv,
-        cwd=REPO_ROOT,
-        env=runner_environment(cell, prompt_path, result_path),
-        check=False,
-    )
-    if completed.returncode != 0:
-        mark(record, "failed", f"runner exited {completed.returncode}")
-        return "failed"
-
-    issues = validate_result_path(result_path)
-    if issues:
-        mark(record, "failed", "; ".join(issues))
-        return "failed"
-
-    if update_matrix:
-        update_matrix_for_result(result_path)
-    mark(record, "done", "validated result")
-    return "done"
-
-
 def run_queue(args: argparse.Namespace) -> int:
     manifest_path = Path(args.manifest).resolve()
     cells = read_manifest(manifest_path)
@@ -327,6 +275,8 @@ def run_queue(args: argparse.Namespace) -> int:
         status = run_cell(
             cell,
             record,
+            state,
+            state_path,
             job_dir,
             args.runner_command,
             update_matrix=not args.no_matrix_update,
@@ -343,6 +293,67 @@ def run_queue(args: argparse.Namespace) -> int:
         save_state(state_path, state)
     print(f"processed={processed} failed={failed} state={state_path}")
     return 1 if failed else 0
+
+
+def run_cell(
+    cell: MatrixCell,
+    record: dict,
+    state: dict,
+    state_path: Path,
+    job_dir: Path,
+    runner_command: str,
+    update_matrix: bool,
+    dry_run: bool,
+) -> str:
+    """Run one cell and persist `running` before external LLM launch.
+
+    Intent: If the process is interrupted while an LLM call is in flight, the
+    checkpoint should name the active cell instead of leaving it indistinguishably
+    queued. Source: DI-bujiv
+    """
+
+    result_path = repo_relative_path(cell.result_path)
+
+    if dry_run:
+        print(f"dry-run: {cell.cell_id} -> {cell.result_path}")
+        return record.get("status", "queued")
+
+    prompt_path = write_prompt(job_dir, cell)
+    existing_issues = validate_result_path(result_path)
+    if not existing_issues:
+        if update_matrix:
+            update_matrix_for_result(result_path)
+        mark(record, "done", "existing valid result")
+        return "done"
+
+    if not runner_command:
+        mark(record, "failed", "missing --runner-command and no valid existing result")
+        return "failed"
+
+    record["attempts"] = int(record.get("attempts", 0)) + 1
+    mark(record, "running", "runner command started")
+    save_state(state_path, state)
+
+    argv = command_argv(runner_command, cell, prompt_path, result_path)
+    completed = subprocess.run(
+        argv,
+        cwd=REPO_ROOT,
+        env=runner_environment(cell, prompt_path, result_path),
+        check=False,
+    )
+    if completed.returncode != 0:
+        mark(record, "failed", f"runner exited {completed.returncode}")
+        return "failed"
+
+    issues = validate_result_path(result_path)
+    if issues:
+        mark(record, "failed", "; ".join(issues))
+        return "failed"
+
+    if update_matrix:
+        update_matrix_for_result(result_path)
+    mark(record, "done", "validated result")
+    return "done"
 
 
 def show_progress(args: argparse.Namespace) -> int:

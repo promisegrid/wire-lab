@@ -167,6 +167,23 @@ Affects: `results/tools/matrix_common.py`; `results/tools/generate_matrix_manife
 `results/tools/update_matrix_rows.py`; `results/tools/validate_results.py`;
 `results/tools/README.md`; `results/RUN-PROTOCOL.md`; `scenarios/*/MATRIX.md`.
 
+ID: DI-bujiv
+Date: 2026-05-18 21:05:50
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: The unattended matrix queue must persist a cell's `running` state
+before launching the external LLM runner, not only after the runner exits.
+Intent: If a long unattended run is killed, loses power, or the terminal dies
+while an LLM cell is in flight, the checkpoint file should identify the exact
+in-flight cell instead of making the run appear to have stopped cleanly before
+that cell began.
+Constraints: Keep checkpointing at cell granularity; do not attempt partial
+checkpointing inside a single LLM response. On restart, `done` cells remain
+skipped by default, while interrupted `running` cells may be retried explicitly
+by the queue's normal retry path once reviewed.
+Affects: `results/tools/matrix_queue.py`;
+`protocols/wire-lab.d/TODO/TODO-dadub-root-scenario-skeleton-and-seed-catalog.md`.
+
 ## Scope
 
 - Define the root scenario-entry contract implied by `DI-faros`: a root scenario
@@ -220,6 +237,9 @@ Affects: `results/tools/matrix_common.py`; `results/tools/generate_matrix_manife
 - [x] dadub.11 Add unattended full-matrix run support with concrete manifest
   paths, checkpointed queue state, per-cell LLM prompt generation, validation,
   and scenario matrix row updates. Done under `DI-nuhon`.
+- [x] dadub.12 Persist `running` queue state before invoking the external LLM
+  runner so interrupted unattended runs expose the in-flight cell. Done under
+  `DI-bujiv`.
 
 ## Candidate scenario entries
 
