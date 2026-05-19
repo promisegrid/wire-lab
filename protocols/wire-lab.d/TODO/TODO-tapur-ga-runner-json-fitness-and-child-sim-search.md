@@ -337,6 +337,30 @@ Affects: `tools/ga-runner/run-canary.sh`; `tools/ga-runner/README.md`;
 `protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`.
 Supersedes: `DI-simag` canary model default only.
 
+ID: DI-zikag
+Date: 2026-05-19 20:55:19
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Add continuation controls for GA/canary scoring and generation:
+retry empty or incomplete OpenAI Responses results through the existing bounded
+provider retry loop, add `score -skip-failed-cells`, add
+`generate -skip-failed-children`, and make the terminal canary pass both skip
+flags so a partial provider anomaly does not stop the whole cycle.
+Intent: The canary log at
+`/tmp/wire-lab-ga-canary-ga-canary-20260519-184045.log` showed one parent score
+cell ending with `openai response contained no output text` after most parent
+cells had succeeded. The runner should preserve that failed-cell evidence, skip
+the unusable cell after bounded retries, and keep going so child generation and
+child scoring can exercise the full GA loop.
+Constraints: Do not hide failures silently: skipped cells/children must keep
+validation messages in state. Do not fallback from Flex to `default`. Do not
+create synthetic fitness JSON for skipped cells. Child scoring should only select
+generated or accepted child simulation trees so failed/skipped child-generation
+plans do not produce missing-source failures.
+Affects: `tools/ga-runner/`; `tools/ga-runner/run-canary.sh`;
+`tools/ga-runner/README.md`; `results/RUN-PROTOCOL.md`;
+`protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`.
+
 ## Scope
 
 - Define and implement a new GA/search runner without changing
@@ -413,8 +437,8 @@ Required top-level fields:
   reason, and cull timestamp.
 
 Child statuses are `generated`, `queued`, `running`, `scored`, `accepted`,
-`culled`, or `failed`. Cell statuses are `queued`, `running`, `done`, `failed`,
-or `skipped`.
+`culled`, `failed`, or `skipped`. Cell statuses are `queued`, `running`, `done`,
+`failed`, or `skipped`.
 
 ### `tools/ga-runner` command surface
 
@@ -427,11 +451,14 @@ The v1 CLI commands are:
   `results/<sim>/<scenario>/<model>/<timestamp>.json`, validate each result, and
   checkpoint state after every cell. Provider-backed scoring sends explicit
   `-service-tier flex` by default; `default` requires explicit operator choice,
-  and `priority` is rejected.
+  and `priority` is rejected. `-skip-failed-cells` marks unusable cells as
+  `skipped` after retries so later GA phases can continue.
 - `generate`: use selected parent sims and scenario pressure to write normal
   untracked child sim trees directly under `simulations/SIM-<handle>-<slug>/`,
   then record their paths and tree hashes in state. Provider-backed child
   generation uses the same explicit service-tier policy as scoring.
+  `-skip-failed-children` marks unusable child plans as `skipped` after retries
+  so child scoring can proceed for generated children.
 - `validate`: validate GA state, child sim tree shape, JSON result path shape,
   schema fields, source hashes, and score ranges; ignore all `results/**/*.md`
   files.
@@ -557,6 +584,10 @@ status in the GA state file.
 - [x] tapur.15 Change the terminal canary's default model to `gpt-5.4` /
   `openai-gpt-5.4-xhigh` after the `gpt-5.3-codex` canary failed because Flex
   was not available for that model. Source: `DI-mokom`.
+- [x] tapur.16 Add retry/skip continuation for provider anomalies so the canary
+  can finish parent scoring, child generation, child scoring, and validation even
+  when individual cells or children are unusable after bounded retries. Source:
+  `DI-zikag`.
 
 ## Predecessor context
 

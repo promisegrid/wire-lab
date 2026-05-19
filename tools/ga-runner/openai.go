@@ -133,7 +133,10 @@ func (provider OpenAIProvider) generateOnce(ctx context.Context, request Provide
 		text = parsed.JoinOutputText()
 	}
 	if strings.TrimSpace(text) == "" {
-		return ProviderResponse{}, fmt.Errorf("openai response contained no output text")
+		// Intent: Empty successful Responses payloads are transient provider
+		// anomalies in canary evidence; retry before the caller skips the cell.
+		// Source: DI-zikag
+		return ProviderResponse{}, openAIResponseError{Message: "openai response contained no output text", Retryable: true}
 	}
 	usageJSON := ""
 	if len(parsed.Usage) > 0 {
@@ -144,7 +147,13 @@ func (provider OpenAIProvider) generateOnce(ctx context.Context, request Provide
 		usageJSON = string(usageBytes)
 	}
 	if parsed.Status != "" && parsed.Status != "completed" {
-		return ProviderResponse{}, fmt.Errorf("openai response status %q with output text length %d", parsed.Status, len(text))
+		// Intent: Incomplete Responses payloads may succeed on retry and should
+		// not abort an unattended GA cycle until bounded retries are exhausted.
+		// Source: DI-zikag
+		return ProviderResponse{}, openAIResponseError{
+			Message:   fmt.Sprintf("openai response status %q with output text length %d", parsed.Status, len(text)),
+			Retryable: parsed.Status == "incomplete",
+		}
 	}
 	return ProviderResponse{
 		Text:        strings.TrimSpace(text) + "\n",
@@ -197,9 +206,22 @@ func (err openAIHTTPError) Error() string {
 	return fmt.Sprintf("openai status %d: %s", err.StatusCode, err.Body)
 }
 
+type openAIResponseError struct {
+	Message   string
+	Retryable bool
+}
+
+func (err openAIResponseError) Error() string {
+	return err.Message
+}
+
 func shouldRetryOpenAIError(ctx context.Context, err error) bool {
 	if ctx.Err() != nil {
 		return false
+	}
+	var responseErr openAIResponseError
+	if errors.As(err, &responseErr) {
+		return responseErr.Retryable
 	}
 	var httpErr openAIHTTPError
 	if errors.As(err, &httpErr) {

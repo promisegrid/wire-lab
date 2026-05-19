@@ -368,6 +368,36 @@ func TestRunScoreWritesValidatedFitnessResult(t *testing.T) {
 	}
 }
 
+func TestRunScoreSkipsFailedCellWhenRequested(t *testing.T) {
+	repo := newGAFixtureRepo(t)
+	initGAStateForTest(t, repo, "ga-score-skip")
+	provider := fakeGAProvider{
+		generate: func(ctx context.Context, request ProviderRequest) (ProviderResponse, error) {
+			return ProviderResponse{}, fmt.Errorf("provider returned empty usable output")
+		},
+	}
+	var out strings.Builder
+	err := runScoreWithProvider(context.Background(), repo, provider, scoreOptions{
+		RunGroupID:       "ga-score-skip",
+		Target:           "parents",
+		ProviderName:     "fake",
+		APIModel:         "model-a",
+		ReasoningEffort:  "xhigh",
+		MaxOutputTokens:  4000,
+		InputPrice:       defaultInputUSDPerMTok,
+		CachedInputPrice: defaultCachedInputUSDPerMTok,
+		OutputPrice:      defaultOutputUSDPerMTok,
+		SkipFailedCells:  true,
+	}, &out)
+	if err != nil {
+		t.Fatalf("score with skip failed cells: %v\n%s", err, out.String())
+	}
+	state := mustReadGAState(t, repo, "ga-score-skip")
+	if state.Cells[0].Status != "skipped" || !strings.Contains(state.Cells[0].ValidationMessage, "provider returned empty usable output") {
+		t.Fatalf("score failure was not preserved as skipped: %#v", state.Cells[0])
+	}
+}
+
 func TestRunGenerateWritesChildTree(t *testing.T) {
 	repo := newGAFixtureRepo(t)
 	initGAStateForTest(t, repo, "ga-generate")
@@ -410,6 +440,50 @@ func TestRunGenerateWritesChildTree(t *testing.T) {
 	}
 	assertExists(t, repo.Path("simulations", childID, "README.md"))
 	assertExists(t, repo.Path("simulations", childID, "QUESTION.md"))
+}
+
+func TestRunGenerateSkipsFailedChildAndChildScoreNoOps(t *testing.T) {
+	repo := newGAFixtureRepo(t)
+	initGAStateForTest(t, repo, "ga-generate-skip")
+	provider := fakeGAProvider{
+		generate: func(ctx context.Context, request ProviderRequest) (ProviderResponse, error) {
+			return ProviderResponse{}, fmt.Errorf("provider returned no child bundle")
+		},
+	}
+	var out strings.Builder
+	err := runGenerateWithProvider(context.Background(), repo, provider, generateOptions{
+		RunGroupID:         "ga-generate-skip",
+		ProviderName:       "fake",
+		APIModel:           "model-a",
+		ReasoningEffort:    "xhigh",
+		MaxOutputTokens:    6000,
+		InputPrice:         defaultInputUSDPerMTok,
+		CachedInputPrice:   defaultCachedInputUSDPerMTok,
+		OutputPrice:        defaultOutputUSDPerMTok,
+		SkipFailedChildren: true,
+	}, &out)
+	if err != nil {
+		t.Fatalf("generate with skip failed child: %v\n%s", err, out.String())
+	}
+	state := mustReadGAState(t, repo, "ga-generate-skip")
+	if state.Children[0].Status != "skipped" || !strings.Contains(state.Children[0].ValidationMessage, "provider returned no child bundle") {
+		t.Fatalf("child failure was not preserved as skipped: %#v", state.Children[0])
+	}
+	out.Reset()
+	err = runScoreWithProvider(context.Background(), repo, provider, scoreOptions{
+		RunGroupID:      "ga-generate-skip",
+		Target:          "children",
+		ProviderName:    "fake",
+		APIModel:        "model-a",
+		ReasoningEffort: "xhigh",
+		SkipFailedCells: true,
+	}, &out)
+	if err != nil {
+		t.Fatalf("child scoring should no-op when all child generation was skipped: %v\n%s", err, out.String())
+	}
+	if !strings.Contains(out.String(), "processed=0") {
+		t.Fatalf("expected child scoring no-op output, got %q", out.String())
+	}
 }
 
 func TestServiceTierOptionsDefaultToFlexAndRejectPriority(t *testing.T) {
@@ -509,6 +583,34 @@ func TestOpenAIProviderRetriesFlex429WithoutChangingTier(t *testing.T) {
 		if serviceTier != serviceTierFlex {
 			t.Fatalf("retry changed service tier: %v", observedServiceTiers)
 		}
+	}
+}
+
+func TestOpenAIProviderRetriesEmptyOutput(t *testing.T) {
+	attempts := 0
+	transport := roundTripFunc(func(request *http.Request) (*http.Response, error) {
+		attempts++
+		if attempts == 1 {
+			return openAITestHTTPResponse(request, http.StatusOK, "", `{"id":"resp-empty","status":"completed","usage":{"input_tokens":10,"input_tokens_details":{"cached_tokens":0},"output_tokens":0}}`), nil
+		}
+		return openAITestHTTPResponse(request, http.StatusOK, "", openAITestSuccessBody(serviceTierFlex)), nil
+	})
+	provider := OpenAIProvider{
+		APIKey:  "test-key",
+		BaseURL: "https://example.test/responses",
+		Client:  &http.Client{Transport: transport},
+		RetryPolicy: ProviderRetryPolicy{
+			MaxAttempts:    2,
+			MaxElapsed:     time.Second,
+			InitialBackoff: time.Millisecond,
+			MaxBackoff:     time.Millisecond,
+		},
+	}
+	if _, err := provider.Generate(context.Background(), ProviderRequest{APIModel: "model-a", ServiceTier: serviceTierFlex, Prompt: "retry empty"}); err != nil {
+		t.Fatalf("generate after empty-output retry: %v", err)
+	}
+	if attempts != 2 {
+		t.Fatalf("attempts = %d, want 2", attempts)
 	}
 }
 

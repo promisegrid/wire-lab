@@ -194,6 +194,7 @@ run_step_with_monitor "score parent cells" \
 		-api-model "$api_model" \
 		-reasoning-effort "$reasoning_effort" \
 		-service-tier "$service_tier" \
+		-skip-failed-cells \
 		-max-run-cost-usd "$max_run_cost_usd" \
 		-max-cell-estimate-usd "$max_cell_usd"
 
@@ -204,6 +205,7 @@ run_step_with_monitor "generate child simulations" \
 		-api-model "$api_model" \
 		-reasoning-effort "$reasoning_effort" \
 		-service-tier "$service_tier" \
+		-skip-failed-children \
 		-max-run-cost-usd "$max_run_cost_usd" \
 		-max-child-estimate-usd "$max_child_usd"
 
@@ -215,6 +217,7 @@ run_step_with_monitor "score child cells" \
 		-api-model "$api_model" \
 		-reasoning-effort "$reasoning_effort" \
 		-service-tier "$service_tier" \
+		-skip-failed-cells \
 		-max-run-cost-usd "$max_run_cost_usd" \
 		-max-cell-estimate-usd "$max_cell_usd"
 

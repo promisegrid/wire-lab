@@ -66,6 +66,12 @@ standard processing is desired, and Priority is rejected. Flex `429` and timeout
 failures use bounded exponential backoff rather than silently falling back to a
 higher-cost tier. Source: `DI-mopob`.
 
+Unattended canary-style GA runs may continue past unusable individual cells by
+using `score -skip-failed-cells` and `generate -skip-failed-children`. Skipped
+items keep their failure messages in state, do not create synthetic result JSON,
+and do not block child generation or child scoring of generated children. Source:
+`DI-zikag`.
+
 Allowed result-producing run modes:
 
 - `codex-manual-blind`
@@ -178,9 +184,9 @@ Use `tools/ga-runner` for JSON-fitness GA/search work. Implemented commands are:
 - Create state for one GA/search generation:
   `cd tools/ga-runner && go run . init -repo-root ../.. -model <model-id> -run-group-id <run-group-id>`
 - Score parent or child cells with provider-backed reasoning:
-  `cd tools/ga-runner && go run . score -repo-root ../.. -run-group-id <run-group-id> -target parents -api-model <provider-model> -reasoning-effort <effort> -service-tier flex -max-run-cost-usd <budget>`
+  `cd tools/ga-runner && go run . score -repo-root ../.. -run-group-id <run-group-id> -target parents -api-model <provider-model> -reasoning-effort <effort> -service-tier flex -skip-failed-cells -max-run-cost-usd <budget>`
 - Generate untracked child simulation trees from the active state:
-  `cd tools/ga-runner && go run . generate -repo-root ../.. -run-group-id <run-group-id> -api-model <provider-model> -reasoning-effort <effort> -service-tier flex -max-run-cost-usd <budget>`
+  `cd tools/ga-runner && go run . generate -repo-root ../.. -run-group-id <run-group-id> -api-model <provider-model> -reasoning-effort <effort> -service-tier flex -skip-failed-children -max-run-cost-usd <budget>`
 - Record reviewed promotion candidates without staging or committing:
   `cd tools/ga-runner && go run . accept -repo-root ../.. -run-group-id <run-group-id> -child <SIM-id> -result <json-result-path> -reviewer-note '<note>'`
 - Cull rejected generated children and matching result trees through state:

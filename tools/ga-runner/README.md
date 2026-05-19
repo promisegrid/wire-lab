@@ -27,6 +27,7 @@ go run . validate -repo-root ../..
     -api-model gpt-5.4 \
     -reasoning-effort xhigh \
     -service-tier flex \
+    -skip-failed-cells \
     -max-run-cost-usd <budget>
 
   go run . generate -repo-root ../.. \
@@ -34,6 +35,7 @@ go run . validate -repo-root ../..
     -api-model gpt-5.4 \
     -reasoning-effort xhigh \
     -service-tier flex \
+    -skip-failed-children \
     -max-run-cost-usd <budget>
 
 go run . accept -repo-root ../.. \
@@ -69,6 +71,13 @@ standard processing is intentionally worth the cost, and `priority` is rejected.
 Flex `429` resource-unavailable responses and request timeouts retry with
 bounded exponential backoff before the cell is checkpointed as failed. Source:
 `DI-mopob`.
+
+For unattended canary-style runs, `score -skip-failed-cells` and
+`generate -skip-failed-children` preserve per-cell or per-child failure messages
+as `skipped` state entries while allowing later phases to continue. The terminal
+canary uses these flags so a single unusable provider response does not prevent
+child generation or child scoring from exercising the full loop. Source:
+`DI-zikag`.
 
 ## Planned Commands
 

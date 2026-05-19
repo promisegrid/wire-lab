@@ -29,6 +29,7 @@ type scoreOptions struct {
 	OutputPrice      float64
 	RetryFailed      bool
 	RerunDone        bool
+	SkipFailedCells  bool
 	DryRun           bool
 	JobDir           string
 }
@@ -76,6 +77,9 @@ func parseScoreOptions(args []string) (scoreOptions, error) {
 	outputPrice := fs.Float64("cost-output-usd-per-mtok", defaultOutputUSDPerMTok, "output price in USD per million tokens")
 	retryFailed := fs.Bool("retry-failed", false, "retry failed cells")
 	rerunDone := fs.Bool("rerun-done", false, "rerun done cells")
+	// Intent: Let unattended canaries preserve individual cell failures as
+	// skipped evidence instead of aborting the whole GA cycle. Source: DI-zikag
+	skipFailedCells := fs.Bool("skip-failed-cells", false, "mark failed cells skipped and keep the score command successful")
 	dryRun := fs.Bool("dry-run", false, "show selected work without writing state/results")
 	jobDir := fs.String("job-dir", "", "prompt audit directory; defaults to results/jobs/<run-group-id>")
 	if err := fs.Parse(args); err != nil {
@@ -112,6 +116,7 @@ func parseScoreOptions(args []string) (scoreOptions, error) {
 		OutputPrice:      *outputPrice,
 		RetryFailed:      *retryFailed,
 		RerunDone:        *rerunDone,
+		SkipFailedCells:  *skipFailedCells,
 		DryRun:           *dryRun,
 		JobDir:           *jobDir,
 	}, nil
@@ -136,6 +141,12 @@ func runScoreWithProvider(ctx context.Context, repo Repo, provider Provider, opt
 	}
 	cells := selectedScoreCellIndexes(state, options)
 	if len(cells) == 0 {
+		// Intent: A canary may have no child score cells when all child generation
+		// plans were skipped; treat that as a successful no-op only when the
+		// caller explicitly asked to skip failed cells. Source: DI-zikag
+		if options.SkipFailedCells {
+			return writeFormat(stdout, "processed=0 failed=0 skipped=0 state=%s\n", repo.Rel(stateFile))
+		}
 		return fmt.Errorf("no score cells matched target %s", options.Target)
 	}
 	jobDir := options.JobDir
@@ -153,6 +164,7 @@ func runScoreWithProvider(ctx context.Context, repo Repo, provider Provider, opt
 	}
 	processed := 0
 	failed := 0
+	skipped := 0
 	for _, index := range cells {
 		if cost.MaxRunUSD > 0 && stateActualCostUSD(state) >= cost.MaxRunUSD {
 			if err := writeFormat(stdout, "budget-stop: actual_cost_usd=%.6f max_run_cost_usd=%.6f\n", stateActualCostUSD(state), cost.MaxRunUSD); err != nil {
@@ -163,7 +175,18 @@ func runScoreWithProvider(ctx context.Context, repo Repo, provider Provider, opt
 		status := scoreOneCell(ctx, repo, provider, &state, stateFile, jobDir, index, options, cost, stdout)
 		processed++
 		if status == "failed" {
-			failed++
+			// Intent: Preserve the failure message in state while allowing the
+			// terminal canary to continue into child generation and child scoring.
+			// Source: DI-zikag
+			if options.SkipFailedCells {
+				skipGACellAfterFailure(&state.Cells[index])
+				status = "skipped"
+			} else {
+				failed++
+			}
+		}
+		if status == "skipped" {
+			skipped++
 		}
 		if !options.DryRun {
 			state.UpdatedAt = time.Now().UTC().Format(time.RFC3339)
@@ -175,7 +198,7 @@ func runScoreWithProvider(ctx context.Context, repo Repo, provider Provider, opt
 			break
 		}
 	}
-	if err := writeFormat(stdout, "processed=%d failed=%d state=%s\n", processed, failed, repo.Rel(stateFile)); err != nil {
+	if err := writeFormat(stdout, "processed=%d failed=%d skipped=%d state=%s\n", processed, failed, skipped, repo.Rel(stateFile)); err != nil {
 		return err
 	}
 	if failed > 0 {
@@ -191,7 +214,12 @@ func selectedScoreCellIndexes(state GAState, options scoreOptions) []int {
 	}
 	childIDs := map[string]bool{}
 	for _, child := range state.Children {
-		childIDs[child.ID()] = true
+		// Intent: Score only materialized child simulation trees so skipped or
+		// failed child-generation plans do not become missing-source failures.
+		// Source: DI-zikag
+		if child.Status == "generated" || child.Status == "accepted" || child.Status == "scored" {
+			childIDs[child.ID()] = true
+		}
 	}
 	var indexes []int
 	for index, cell := range state.Cells {
@@ -445,4 +473,12 @@ func markGACell(cell *GACell, status string, message string) {
 	cell.Status = status
 	cell.ValidationMessage = message
 	cell.UpdatedAt = time.Now().UTC().Format(time.RFC3339)
+}
+
+func skipGACellAfterFailure(cell *GACell) {
+	message := strings.TrimSpace(cell.ValidationMessage)
+	if message == "" {
+		message = "cell failed"
+	}
+	markGACell(cell, "skipped", "skipped after cell failure: "+message)
 }

@@ -14,24 +14,25 @@ import (
 )
 
 type generateOptions struct {
-	RepoRoot         string
-	RunGroupID       string
-	ChildIDs         []string
-	ProviderName     string
-	APIModel         string
-	ReasoningEffort  string
-	ServiceTier      string
-	APIKeyEnv        string
-	OpenAIBaseURL    string
-	MaxOutputTokens  int
-	MaxRunCostUSD    float64
-	MaxChildCostUSD  float64
-	InputPrice       float64
-	CachedInputPrice float64
-	OutputPrice      float64
-	RetryFailed      bool
-	DryRun           bool
-	JobDir           string
+	RepoRoot           string
+	RunGroupID         string
+	ChildIDs           []string
+	ProviderName       string
+	APIModel           string
+	ReasoningEffort    string
+	ServiceTier        string
+	APIKeyEnv          string
+	OpenAIBaseURL      string
+	MaxOutputTokens    int
+	MaxRunCostUSD      float64
+	MaxChildCostUSD    float64
+	InputPrice         float64
+	CachedInputPrice   float64
+	OutputPrice        float64
+	RetryFailed        bool
+	SkipFailedChildren bool
+	DryRun             bool
+	JobDir             string
 }
 
 type childBundle struct {
@@ -80,6 +81,10 @@ func parseGenerateOptions(args []string) (generateOptions, error) {
 	cachedInputPrice := fs.Float64("cost-cached-input-usd-per-mtok", defaultCachedInputUSDPerMTok, "cached input price in USD per million tokens")
 	outputPrice := fs.Float64("cost-output-usd-per-mtok", defaultOutputUSDPerMTok, "output price in USD per million tokens")
 	retryFailed := fs.Bool("retry-failed", false, "retry failed child generation")
+	// Intent: Let unattended canaries preserve individual child-generation
+	// failures as skipped evidence instead of aborting the whole GA cycle.
+	// Source: DI-zikag
+	skipFailedChildren := fs.Bool("skip-failed-children", false, "mark failed child generation skipped and keep the generate command successful")
 	dryRun := fs.Bool("dry-run", false, "show selected children without writing state/trees")
 	jobDir := fs.String("job-dir", "", "prompt audit directory; defaults to results/jobs/<run-group-id>")
 	var childIDs stringListFlag
@@ -98,24 +103,25 @@ func parseGenerateOptions(args []string) (generateOptions, error) {
 		return generateOptions{}, errUsage("generate: " + err.Error())
 	}
 	return generateOptions{
-		RepoRoot:         *repoRoot,
-		RunGroupID:       *runGroupID,
-		ChildIDs:         []string(childIDs),
-		ProviderName:     *providerName,
-		APIModel:         *apiModel,
-		ReasoningEffort:  *reasoningEffort,
-		ServiceTier:      normalizedServiceTier,
-		APIKeyEnv:        *apiKeyEnv,
-		OpenAIBaseURL:    *openAIBaseURL,
-		MaxOutputTokens:  *maxOutputTokens,
-		MaxRunCostUSD:    *maxRunCost,
-		MaxChildCostUSD:  *maxChildCost,
-		InputPrice:       *inputPrice,
-		CachedInputPrice: *cachedInputPrice,
-		OutputPrice:      *outputPrice,
-		RetryFailed:      *retryFailed,
-		DryRun:           *dryRun,
-		JobDir:           *jobDir,
+		RepoRoot:           *repoRoot,
+		RunGroupID:         *runGroupID,
+		ChildIDs:           []string(childIDs),
+		ProviderName:       *providerName,
+		APIModel:           *apiModel,
+		ReasoningEffort:    *reasoningEffort,
+		ServiceTier:        normalizedServiceTier,
+		APIKeyEnv:          *apiKeyEnv,
+		OpenAIBaseURL:      *openAIBaseURL,
+		MaxOutputTokens:    *maxOutputTokens,
+		MaxRunCostUSD:      *maxRunCost,
+		MaxChildCostUSD:    *maxChildCost,
+		InputPrice:         *inputPrice,
+		CachedInputPrice:   *cachedInputPrice,
+		OutputPrice:        *outputPrice,
+		RetryFailed:        *retryFailed,
+		SkipFailedChildren: *skipFailedChildren,
+		DryRun:             *dryRun,
+		JobDir:             *jobDir,
 	}, nil
 }
 
@@ -138,6 +144,12 @@ func runGenerateWithProvider(ctx context.Context, repo Repo, provider Provider, 
 	}
 	indexes := selectedGenerateChildIndexes(state, options)
 	if len(indexes) == 0 {
+		// Intent: Treat all-skipped child generation as a successful no-op only
+		// when the caller explicitly chose skip-and-continue semantics.
+		// Source: DI-zikag
+		if options.SkipFailedChildren {
+			return writeFormat(stdout, "processed=0 failed=0 skipped=0 state=%s\n", repo.Rel(stateFile))
+		}
 		return fmt.Errorf("no child plans matched generation selection")
 	}
 	jobDir := options.JobDir
@@ -155,6 +167,7 @@ func runGenerateWithProvider(ctx context.Context, repo Repo, provider Provider, 
 	}
 	processed := 0
 	failed := 0
+	skipped := 0
 	for _, index := range indexes {
 		if cost.MaxRunUSD > 0 && stateActualCostUSD(state) >= cost.MaxRunUSD {
 			if err := writeFormat(stdout, "budget-stop: actual_cost_usd=%.6f max_run_cost_usd=%.6f\n", stateActualCostUSD(state), cost.MaxRunUSD); err != nil {
@@ -165,7 +178,18 @@ func runGenerateWithProvider(ctx context.Context, repo Repo, provider Provider, 
 		status := generateOneChild(ctx, repo, provider, &state, stateFile, jobDir, index, options, cost, stdout)
 		processed++
 		if status == "failed" {
-			failed++
+			// Intent: Preserve failed child-generation messages in state while
+			// letting generated siblings continue through the GA cycle.
+			// Source: DI-zikag
+			if options.SkipFailedChildren {
+				skipGAChildAfterFailure(&state.Children[index])
+				status = "skipped"
+			} else {
+				failed++
+			}
+		}
+		if status == "skipped" {
+			skipped++
 		}
 		if !options.DryRun {
 			state.UpdatedAt = time.Now().UTC().Format(time.RFC3339)
@@ -177,7 +201,7 @@ func runGenerateWithProvider(ctx context.Context, repo Repo, provider Provider, 
 			break
 		}
 	}
-	if err := writeFormat(stdout, "processed=%d failed=%d state=%s\n", processed, failed, repo.Rel(stateFile)); err != nil {
+	if err := writeFormat(stdout, "processed=%d failed=%d skipped=%d state=%s\n", processed, failed, skipped, repo.Rel(stateFile)); err != nil {
 		return err
 	}
 	if failed > 0 {
@@ -197,7 +221,7 @@ func selectedGenerateChildIndexes(state GAState, options generateOptions) []int 
 		if len(selected) > 0 && !selected[childID] {
 			continue
 		}
-		if child.Status == "generated" || child.Status == "accepted" || child.Status == "culled" {
+		if child.Status == "generated" || child.Status == "accepted" || child.Status == "culled" || child.Status == "skipped" {
 			continue
 		}
 		if child.Status == "failed" && !options.RetryFailed {
@@ -469,6 +493,14 @@ func markGAChild(child *GAChild, status string, message string) {
 	child.Status = status
 	child.ValidationMessage = message
 	child.UpdatedAt = time.Now().UTC().Format(time.RFC3339)
+}
+
+func skipGAChildAfterFailure(child *GAChild) {
+	message := strings.TrimSpace(child.ValidationMessage)
+	if message == "" {
+		message = "child generation failed"
+	}
+	markGAChild(child, "skipped", "skipped after child generation failure: "+message)
 }
 
 func containsString(values []string, want string) bool {
