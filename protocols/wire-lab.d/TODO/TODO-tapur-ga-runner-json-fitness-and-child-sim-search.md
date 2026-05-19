@@ -221,6 +221,23 @@ Affects: `results/README.md`; `results/RUN-PROTOCOL.md`;
 `results/tools/README.md`; `tools/ga-runner/README.md`;
 `protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`.
 
+ID: DI-pibuh
+Date: 2026-05-19 11:00:13
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Defer explicit scenario-tag design until after the project has some
+real GA/search run results to inspect.
+Intent: Early tagging would be premature taxonomy work. Initial run evidence
+should reveal which domains, pressures, layers, and risks actually matter for
+sampling and search, so the tag vocabulary is grounded in observed comparison
+needs rather than speculation.
+Constraints: Do not let scenario-tagging block the current GA runner path.
+Revisit the tag families before serious GA runs or once enough initial
+JSON-fitness results exist to guide the taxonomy.
+Affects:
+`protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`;
+future scenario metadata work.
+
 ## Scope
 
 - Define and implement a new GA/search runner without changing
@@ -416,13 +433,13 @@ status in the GA state file.
   docs so GA-runner JSON results, Markdown canary-result exclusion, child-sim
   generation, review, promotion, and culling are documented from the same
   decision source. Source: `DI-ramar`; `DI-ruzaj`.
-- [ ] tapur.11 Add explicit scenario tags before serious GA runs. Candidate tag
-  families: `domain` (for example logistics, governance, aviation, CAS,
-  group-session, promisebase), `pressure` (sparse knowledge, adversarial trust,
-  migration, auditability, naming, transport loss), `layer` (application,
-  promise/accounting, group/session, CAS, envelope, transport), and `risk`
-  (safety-critical, financial, governance, privacy, low-stakes). Source:
-  `DI-zusit`.
+- [ ] tapur.11 Deferred until initial GA/search run results exist: add explicit
+  scenario tags before serious GA runs. Candidate tag families: `domain` (for
+  example logistics, governance, aviation, CAS, group-session, promisebase),
+  `pressure` (sparse knowledge, adversarial trust, migration, auditability,
+  naming, transport loss), `layer` (application, promise/accounting,
+  group/session, CAS, envelope, transport), and `risk` (safety-critical,
+  financial, governance, privacy, low-stakes). Source: `DI-zusit`; `DI-pibuh`.
 
 ## Predecessor context
 
