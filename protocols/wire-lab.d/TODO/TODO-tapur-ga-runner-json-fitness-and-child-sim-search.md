@@ -314,6 +314,29 @@ Affects: `tools/ga-runner/`; `tools/ga-runner/run-canary.sh`;
 `results/RUN-PROTOCOL.md`; `results/README.md`;
 `protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`.
 
+ID: DI-mokom
+Date: 2026-05-19 20:48:23
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Change the terminal GA canary's default model from
+`gpt-5.3-codex` / `openai-gpt-5.3-codex-xhigh` to `gpt-5.4` /
+`openai-gpt-5.4-xhigh`.
+Intent: The canary log at
+`/tmp/wire-lab-ga-canary-ga-canary-20260519-204545.log` showed every parent
+score cell failing with `Flex is not available for this model` while using
+`gpt-5.3-codex`. The canary should remain a Flex-default unattended workload, so
+its default model must be one intended for the Flex service tier rather than
+requiring operators to override the service tier or model by hand.
+Constraints: Preserve the existing `xhigh` reasoning default, 3x3x2 canary
+shape, cost caps, checkpoint paths, `/tmp` log behavior, and explicit
+`GA_CANARY_*` overrides. This supersedes only the canary model default recorded
+in `DI-simag`; `DI-simag` remains active for the wrapper shape and operational
+behavior.
+Affects: `tools/ga-runner/run-canary.sh`; `tools/ga-runner/README.md`;
+`results/RUN-PROTOCOL.md`;
+`protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`.
+Supersedes: `DI-simag` canary model default only.
+
 ## Scope
 
 - Define and implement a new GA/search runner without changing
@@ -531,6 +554,9 @@ status in the GA state file.
 - [x] tapur.14 Add explicit service-tier controls and bounded Flex retry handling
   so GA/canary runs default to `flex`, reject `priority`, and never inherit an
   expensive tier by accident. Source: `DI-mopob`.
+- [x] tapur.15 Change the terminal canary's default model to `gpt-5.4` /
+  `openai-gpt-5.4-xhigh` after the `gpt-5.3-codex` canary failed because Flex
+  was not available for that model. Source: `DI-mokom`.
 
 ## Predecessor context
 

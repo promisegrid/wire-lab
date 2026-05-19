@@ -14,8 +14,8 @@ Usage:
 Environment overrides:
   GA_CANARY_RUN_GROUP          default: ga-canary-<UTC timestamp>
   GA_CANARY_TIMESTAMP          default: current UTC YYYYMMDD-HHMMSS
-  GA_CANARY_MODEL_ID           default: openai-gpt-5.3-codex-xhigh
-  GA_CANARY_API_MODEL          default: gpt-5.3-codex
+  GA_CANARY_MODEL_ID           default: openai-gpt-5.4-xhigh
+  GA_CANARY_API_MODEL          default: gpt-5.4
   GA_CANARY_REASONING_EFFORT   default: xhigh
   GA_CANARY_SERVICE_TIER       default: flex
   GA_CANARY_MAX_RUN_COST_USD   default: 5.00
@@ -48,8 +48,8 @@ ga_dir="$repo_root/tools/ga-runner"
 
 timestamp="${GA_CANARY_TIMESTAMP:-$(date -u +%Y%m%d-%H%M%S)}"
 run_group="${GA_CANARY_RUN_GROUP:-ga-canary-$timestamp}"
-model_id="${GA_CANARY_MODEL_ID:-openai-gpt-5.3-codex-xhigh}"
-api_model="${GA_CANARY_API_MODEL:-gpt-5.3-codex}"
+model_id="${GA_CANARY_MODEL_ID:-openai-gpt-5.4-xhigh}"
+api_model="${GA_CANARY_API_MODEL:-gpt-5.4}"
 reasoning_effort="${GA_CANARY_REASONING_EFFORT:-xhigh}"
 service_tier="${GA_CANARY_SERVICE_TIER:-flex}"
 max_run_cost_usd="${GA_CANARY_MAX_RUN_COST_USD:-5.00}"

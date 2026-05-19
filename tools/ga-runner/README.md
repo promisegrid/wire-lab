@@ -13,25 +13,25 @@ Run commands from this directory and pass `-repo-root ../..` when needed:
 ```bash
 go run . validate -repo-root ../..
 
-go run . init -repo-root ../.. -dry-run \
-  -model openai-gpt-5.3-codex-xhigh \
-  -run-group-id <run-group-id>
+  go run . init -repo-root ../.. -dry-run \
+    -model openai-gpt-5.4-xhigh \
+    -run-group-id <run-group-id>
 
-go run . init -repo-root ../.. \
-  -model openai-gpt-5.3-codex-xhigh \
-  -run-group-id <run-group-id>
+  go run . init -repo-root ../.. \
+    -model openai-gpt-5.4-xhigh \
+    -run-group-id <run-group-id>
 
   go run . score -repo-root ../.. \
     -run-group-id <run-group-id> \
     -target parents \
-    -api-model gpt-5.3-codex \
+    -api-model gpt-5.4 \
     -reasoning-effort xhigh \
     -service-tier flex \
     -max-run-cost-usd <budget>
 
   go run . generate -repo-root ../.. \
     -run-group-id <run-group-id> \
-    -api-model gpt-5.3-codex \
+    -api-model gpt-5.4 \
     -reasoning-effort xhigh \
     -service-tier flex \
     -max-run-cost-usd <budget>

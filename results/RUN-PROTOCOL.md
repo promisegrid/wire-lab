@@ -22,8 +22,8 @@ comparable across models and timestamps.
 - `scenario-id` and scenario docs:
   - `scenarios/README.md` for the shared scenario contract
   - `scenarios/<scenario-id>/<scenario-id>.md`
-- `model-id` must be explicit and path-safe
-  (for example `openai-gpt-5.3-codex-xhigh`).
+  - `model-id` must be explicit and path-safe
+    (for example `openai-gpt-5.4-xhigh`).
 
 ## LLM Reasoning Requirement
 
