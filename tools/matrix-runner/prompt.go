@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-func pathOnlyPrompt(cell MatrixCell) string {
+func pathOnlyPrompt(cell MatrixCell, resultStyle string) string {
 	var out strings.Builder
 	fmt.Fprintln(&out, "# LLM Matrix Cell Job")
 	fmt.Fprintln(&out)
@@ -47,6 +47,10 @@ func pathOnlyPrompt(cell MatrixCell) string {
 	fmt.Fprintln(&out, "  auditability, and migration pressures expose weaknesses,")
 	fmt.Fprintln(&out, "- which open questions remain.")
 	fmt.Fprintln(&out)
+	fmt.Fprintln(&out, "## Result Style")
+	fmt.Fprintln(&out)
+	fmt.Fprintln(&out, resultStyleInstruction(resultStyle))
+	fmt.Fprintln(&out)
 	fmt.Fprintln(&out, "Write the result file at:")
 	fmt.Fprintln(&out)
 	fmt.Fprintf(&out, "`%s`\n", cell.ResultPath)
@@ -66,7 +70,8 @@ type SourceDocument struct {
 }
 
 type PromptBuilder struct {
-	Repo Repo
+	Repo        Repo
+	ResultStyle string
 }
 
 func (b PromptBuilder) BuildAPIPrompt(cell MatrixCell) (string, error) {
@@ -77,6 +82,12 @@ func (b PromptBuilder) BuildAPIPrompt(cell MatrixCell) (string, error) {
 	var out strings.Builder
 	fmt.Fprintf(&out, "# Matrix Cell API Evaluation\n\n")
 	fmt.Fprintf(&out, "Return only the complete Markdown result file. Do not wrap it in a code fence. Do not ask for confirmation.\n\n")
+	fmt.Fprintf(&out, "## Result Style\n\n")
+	fmt.Fprintf(&out, "%s\n\n", resultStyleInstruction(b.ResultStyle))
+	fmt.Fprintf(&out, "## Required Result Contract\n\n")
+	fmt.Fprintf(&out, "The Markdown result must contain exactly the required sections from `results/RUN-PROTOCOL.md`, include `- Run mode: llm-doc-eval-blind`, include one line starting with `Evidence verdict:`, and include an explicit `Authority Boundary` section.\n\n")
+	fmt.Fprintf(&out, "## Evaluation Task\n\n")
+	fmt.Fprintf(&out, "Evaluate the simulation against the scenario. Explain what the simulation covers, what it pushes to another layer, how the scenario's 100-year durability, sparse knowledge, no central authority, auditability, and migration pressures expose weaknesses, and which open questions remain.\n\n")
 	fmt.Fprintf(&out, "## Required Output Coordinates\n\n")
 	fmt.Fprintf(&out, "- Result path: `%s`\n", cell.ResultPath)
 	fmt.Fprintf(&out, "- Header: `# Result: %s / %s / %s / %s`\n", cell.SimID, cell.ScenarioID, cell.ModelID, cell.Timestamp)
@@ -88,16 +99,26 @@ func (b PromptBuilder) BuildAPIPrompt(cell MatrixCell) (string, error) {
 	fmt.Fprintf(&out, "- Simulation commit: `%s`\n", b.Repo.GitCommit())
 	fmt.Fprintf(&out, "- Model ID: `%s`\n", cell.ModelID)
 	fmt.Fprintf(&out, "- Run timestamp UTC: `%s`\n\n", cell.Timestamp)
-	fmt.Fprintf(&out, "## Required Result Contract\n\n")
-	fmt.Fprintf(&out, "The Markdown result must contain exactly the required sections from `results/RUN-PROTOCOL.md`, include `- Run mode: llm-doc-eval-blind`, include one line starting with `Evidence verdict:`, and include an explicit `Authority Boundary` section.\n\n")
-	fmt.Fprintf(&out, "## Evaluation Task\n\n")
-	fmt.Fprintf(&out, "Evaluate the simulation against the scenario using deeper reasoning. Explain what the simulation covers, what it pushes to another layer, how the scenario's 100-year durability, sparse knowledge, no central authority, auditability, and migration pressures expose weaknesses, and which open questions remain.\n\n")
 	fmt.Fprintf(&out, "## Source Documents\n\n")
 	for _, doc := range docs {
 		fmt.Fprintf(&out, "### `%s`\n\n", doc.Path)
 		fmt.Fprintf(&out, "```markdown\n%s\n```\n\n", strings.TrimSpace(doc.Text))
 	}
 	return out.String(), nil
+}
+
+func validResultStyle(style string) bool {
+	return style == "" || style == "concise" || style == "standard"
+}
+
+func resultStyleInstruction(style string) string {
+	if style == "standard" {
+		return "Use standard evidence prose. Keep the result focused, but include enough detail to audit the fit."
+	}
+	// Intent: Default API jobs to shorter, audit-focused results so full-matrix
+	// runs spend fewer output tokens while preserving comparison evidence.
+	// Source: DI-nugiv
+	return "Use concise evidence prose. Keep each narrative section to 1-3 bullets or short paragraphs, avoid restating source documents, target roughly 700-1100 visible words, and prefer specific fit/weakness/open-question bullets over long exposition. Source: DI-nugiv"
 }
 
 func (b PromptBuilder) sourceDocuments(cell MatrixCell) ([]SourceDocument, error) {

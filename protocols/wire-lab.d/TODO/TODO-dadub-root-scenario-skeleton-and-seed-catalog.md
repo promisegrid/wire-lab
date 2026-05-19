@@ -229,6 +229,27 @@ Affects: `docs/thought-experiments/TE-lizuh-results-canonical-no-scenario-matrix
 `tools/matrix-runner/`; `tools/README.md`;
 `protocols/wire-lab.d/TODO/TODO-dadub-root-scenario-skeleton-and-seed-catalog.md`.
 
+ID: DI-nugiv
+Date: 2026-05-18 23:08:33
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Add cost controls to `tools/matrix-runner` before any full-matrix API
+run: token-price flags, actual-cost accounting from provider usage metadata,
+budget stops, preflight per-cell cost estimates from prompt length and output
+caps, and concise result prompts/outputs as the default API run style.
+Intent: The first three-cell canary showed the full matrix would be dominated by
+output-token cost at current `gpt-5.3-codex` pricing. The runner should make
+cost visible, stop unattended runs before a budget blowout, and reduce prompt and
+result verbosity without losing the required evidence sections.
+Constraints: Preserve `DI-moduf`'s requirement that result prose come from LLM
+or human reasoning, not scripts. Preserve the `results/` path shape from
+`DI-miror` and the generated-view source-of-truth rule from `DI-zamin`. Do not
+delete existing canary evidence. Keep CLI flags explicit so later provider
+pricing changes do not require code edits.
+Affects: `tools/matrix-runner/`; `tools/README.md`; `results/RUN-PROTOCOL.md`;
+`results/README.md`;
+`protocols/wire-lab.d/TODO/TODO-dadub-root-scenario-skeleton-and-seed-catalog.md`.
+
 ## Scope
 
 - Define the root scenario-entry contract implied by `DI-faros`: a root scenario
@@ -292,6 +313,8 @@ Affects: `docs/thought-experiments/TE-lizuh-results-canonical-no-scenario-matrix
 - [x] dadub.14 Remove committed scenario `MATRIX.md` state, make `results/`
   canonical for completed runs, and replace matrix updates with generated views.
   Done under `DI-zamin`.
+- [x] dadub.15 Add cost controls and concise API result mode before a full matrix
+  run. Done under `DI-nugiv`.
 
 ## Candidate scenario entries
 

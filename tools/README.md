@@ -170,12 +170,13 @@ Generate and run a canary first:
 
 ```
 go run . manifest -repo-root ../.. -models openai-gpt-5.3-codex-xhigh -run-group-id canary-<ts> -timestamp <ts> -shuffle-seed 42 -limit-cells 3
-go run . run -repo-root ../.. -manifest ../../results/manifests/matrix-manifest-canary-<ts>.csv -provider openai -api-model <openai-api-model> -reasoning-effort xhigh
-go run . validate -repo-root ../.. -manifest ../../results/manifests/matrix-manifest-canary-<ts>.csv
+go run . run -repo-root ../.. -manifest results/manifests/matrix-manifest-canary-<ts>.csv -provider openai -api-model <openai-api-model> -reasoning-effort xhigh -result-style concise -max-output-tokens 6000 -max-run-cost-usd <budget> -max-cell-estimate-usd <cell-cap>
+go run . validate -repo-root ../.. -manifest results/manifests/matrix-manifest-canary-<ts>.csv
 go run . view -repo-root ../.. -model openai-gpt-5.3-codex-xhigh
 ```
 
-Only start the full manifest after canary validation passes.
+Only start the full manifest after canary validation passes and the state file's
+token/cost totals are acceptable. Source: `DI-nugiv`.
 
 ## spec runbook
 

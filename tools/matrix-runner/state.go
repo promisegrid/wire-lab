@@ -34,7 +34,14 @@ type CellState struct {
 	ReasoningEffort string `json:"reasoning_effort,omitempty"`
 	RequestID       string `json:"request_id,omitempty"`
 	ResponseID      string `json:"response_id,omitempty"`
-	UsageJSON       string `json:"usage_json,omitempty"`
+	// Intent: Keep measured provider usage with each cell so budget restarts,
+	// progress checks, and run audits do not depend on re-reading result prose.
+	// Source: DI-nugiv
+	UsageJSON    string  `json:"usage_json,omitempty"`
+	InputTokens  int     `json:"input_tokens,omitempty"`
+	CachedTokens int     `json:"cached_input_tokens,omitempty"`
+	OutputTokens int     `json:"output_tokens,omitempty"`
+	CostUSD      float64 `json:"cost_usd,omitempty"`
 }
 
 func utcISO() string {

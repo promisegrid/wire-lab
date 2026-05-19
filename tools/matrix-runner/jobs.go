@@ -15,11 +15,15 @@ func runJobs(args []string, stdout io.Writer) error {
 	timestamp := fs.String("timestamp", timestampPlaceholder, "optional fixed timestamp override")
 	maxCells := fs.Int("max-cells", -1, "optional maximum generated prompt count")
 	startIndex := fs.Int("start-index", 0, "zero-based start index")
+	resultStyle := fs.String("result-style", "concise", "result style: concise or standard")
 	if err := fs.Parse(args); err != nil {
 		return err
 	}
 	if *manifest == "" {
 		return errUsage("jobs: --manifest is required")
+	}
+	if !validResultStyle(*resultStyle) {
+		return errUsage("jobs: --result-style must be concise or standard")
 	}
 	repo, err := openRepo(*repoRoot)
 	if err != nil {
@@ -52,7 +56,7 @@ func runJobs(args []string, stdout io.Writer) error {
 	for _, cell := range selected {
 		name := promptFilename(cell)
 		path := filepath.Join(outDir, name)
-		if err := writeFile(path, pathOnlyPrompt(cell)); err != nil {
+		if err := writeFile(path, pathOnlyPrompt(cell, *resultStyle)); err != nil {
 			return err
 		}
 		indexLines = append(indexLines, fmt.Sprintf("- [%s](%s)", name, name))

@@ -19,7 +19,13 @@ func runQueue(ctx context.Context, args []string, stdout io.Writer) error {
 	reasoningEffort := fs.String("reasoning-effort", "xhigh", "provider reasoning effort")
 	apiKeyEnv := fs.String("api-key-env", "OPENAI_API_KEY", "environment variable holding provider API key")
 	openAIBaseURL := fs.String("openai-base-url", "", "optional OpenAI Responses API URL override")
-	maxOutputTokens := fs.Int("max-output-tokens", 12000, "maximum provider output tokens")
+	maxOutputTokens := fs.Int("max-output-tokens", 6000, "maximum provider output tokens")
+	resultStyle := fs.String("result-style", "concise", "result style: concise or standard")
+	maxRunCost := fs.Float64("max-run-cost-usd", 0, "stop before starting a cell that would exceed this run budget; 0 disables")
+	maxCellEstimate := fs.Float64("max-cell-estimate-usd", 0, "skip cells whose preflight worst-case cost estimate exceeds this amount; 0 disables")
+	inputPrice := fs.Float64("cost-input-usd-per-mtok", defaultInputUSDPerMTok, "uncached input price in USD per million tokens")
+	cachedInputPrice := fs.Float64("cost-cached-input-usd-per-mtok", defaultCachedInputUSDPerMTok, "cached input price in USD per million tokens")
+	outputPrice := fs.Float64("cost-output-usd-per-mtok", defaultOutputUSDPerMTok, "output price in USD per million tokens")
 	stateFlag := fs.String("state", "", "queue state JSON path")
 	jobDirFlag := fs.String("job-dir", "", "prompt audit directory")
 	startIndex := fs.Int("start-index", 0, "zero-based queue start index")
@@ -35,6 +41,9 @@ func runQueue(ctx context.Context, args []string, stdout io.Writer) error {
 	}
 	if *apiModel == "" && !*dryRun {
 		return errUsage("run: --api-model is required for non-dry runs")
+	}
+	if !validResultStyle(*resultStyle) {
+		return errUsage("run: --result-style must be concise or standard")
 	}
 	repo, err := openRepo(*repoRoot)
 	if err != nil {
@@ -75,11 +84,28 @@ func runQueue(ctx context.Context, args []string, stdout io.Writer) error {
 		APIModel:        *apiModel,
 		ReasoningEffort: *reasoningEffort,
 		MaxOutputTokens: *maxOutputTokens,
+		ResultStyle:     *resultStyle,
 		RetryFailed:     *retryFailed,
 		RerunDone:       *rerunDone,
 		DryRun:          *dryRun,
+		Cost: CostConfig{
+			InputUSDPerMTok:       *inputPrice,
+			CachedInputUSDPerMTok: *cachedInputPrice,
+			OutputUSDPerMTok:      *outputPrice,
+			MaxRunUSD:             *maxRunCost,
+			MaxCellEstimateUSD:    *maxCellEstimate,
+		},
 	}
 	for _, cell := range cells {
+		// Intent: Stop unattended batches before the next provider call when the
+		// already-recorded usage reaches the user-approved run budget.
+		// Source: DI-nugiv
+		if options.Cost.MaxRunUSD > 0 && stateActualCostUSD(state) >= options.Cost.MaxRunUSD {
+			if err := writeFormat(stdout, "budget-stop: actual_cost_usd=%.6f max_run_cost_usd=%.6f\n", stateActualCostUSD(state), options.Cost.MaxRunUSD); err != nil {
+				return err
+			}
+			break
+		}
 		record := state.Cells[cell.CellID]
 		if skip, reason := shouldSkip(record, options); skip {
 			if err := writeFormat(stdout, "skip: %s: %s\n", cell.CellID, reason); err != nil {
@@ -99,6 +125,12 @@ func runQueue(ctx context.Context, args []string, stdout io.Writer) error {
 		}
 		if err := writeLine(stdout, formatCounts(state)); err != nil {
 			return err
+		}
+		if err := writeFormat(stdout, "cost actual_usd=%.6f\n", stateActualCostUSD(state)); err != nil {
+			return err
+		}
+		if status == "budget-stop" {
+			break
 		}
 	}
 	if !options.DryRun {
@@ -120,9 +152,11 @@ type RunOptions struct {
 	APIModel        string
 	ReasoningEffort string
 	MaxOutputTokens int
+	ResultStyle     string
 	RetryFailed     bool
 	RerunDone       bool
 	DryRun          bool
+	Cost            CostConfig
 }
 
 func buildProvider(providerName, apiModel, apiKeyEnv, openAIBaseURL string, dryRun bool) (Provider, error) {
@@ -167,10 +201,25 @@ func runOneCell(ctx context.Context, repo Repo, provider Provider, state *QueueS
 		}
 		return record.Status
 	}
-	prompt, err := PromptBuilder{Repo: repo}.BuildAPIPrompt(cell)
+	prompt, err := PromptBuilder{Repo: repo, ResultStyle: options.ResultStyle}.BuildAPIPrompt(cell)
 	if err != nil {
 		markCell(record, "failed", err.Error())
 		return "failed"
+	}
+	// Intent: Use a conservative per-cell estimate before spending API tokens;
+	// actual accounting is recorded later from provider usage metadata.
+	// Source: DI-nugiv
+	estimate := options.Cost.EstimatePromptCost(prompt, options.MaxOutputTokens)
+	if options.Cost.MaxCellEstimateUSD > 0 && estimate.CostUSD > options.Cost.MaxCellEstimateUSD {
+		markCell(record, "skipped", fmt.Sprintf("estimated cell cost %.6f exceeds max %.6f", estimate.CostUSD, options.Cost.MaxCellEstimateUSD))
+		return "skipped"
+	}
+	if options.Cost.MaxRunUSD > 0 && stateActualCostUSD(state)+estimate.CostUSD > options.Cost.MaxRunUSD {
+		if err := writeFormat(stdout, "budget-stop: actual_cost_usd=%.6f estimated_next_cell_usd=%.6f max_run_cost_usd=%.6f\n", stateActualCostUSD(state), estimate.CostUSD, options.Cost.MaxRunUSD); err != nil {
+			markCell(record, "failed", err.Error())
+			return "failed"
+		}
+		return "budget-stop"
 	}
 	if err := writeFile(filepath.Join(jobDir, promptFilename(cell)), prompt); err != nil {
 		markCell(record, "failed", err.Error())
@@ -206,6 +255,23 @@ func runOneCell(ctx context.Context, repo Repo, provider Provider, state *QueueS
 	record.RequestID = response.RequestID
 	record.ResponseID = response.ResponseID
 	record.UsageJSON = response.UsageJSON
+	// Intent: Persist actual provider usage so resumed runs and post-run reviews
+	// can reason from measured cost instead of prompt-size estimates.
+	// Source: DI-nugiv
+	if response.UsageJSON != "" {
+		usageCost, err := options.Cost.ParseUsage(response.UsageJSON)
+		if err != nil {
+			markCell(record, "failed", err.Error())
+			return "failed"
+		}
+		record.InputTokens = usageCost.InputTokens
+		record.CachedTokens = usageCost.CachedInputTokens
+		record.OutputTokens = usageCost.OutputTokens
+		record.CostUSD = usageCost.CostUSD
+	} else if options.Cost.BudgetEnabled() {
+		markCell(record, "failed", "missing provider usage metadata for cost-controlled run")
+		return "failed"
+	}
 	if err := writeFile(resultPath, response.Text); err != nil {
 		markCell(record, "failed", err.Error())
 		return "failed"
@@ -214,7 +280,11 @@ func runOneCell(ctx context.Context, repo Repo, provider Provider, state *QueueS
 		markCell(record, "failed", strings.Join(issues, "; "))
 		return "failed"
 	}
-	markCell(record, "done", "validated result")
+	if record.CostUSD > 0 {
+		markCell(record, "done", fmt.Sprintf("validated result; cost_usd=%.6f", record.CostUSD))
+	} else {
+		markCell(record, "done", "validated result")
+	}
 	return "done"
 }
 
@@ -248,6 +318,9 @@ func runProgress(args []string, stdout io.Writer) error {
 		return err
 	}
 	if err := writeLine(stdout, formatCounts(state)); err != nil {
+		return err
+	}
+	if err := writeFormat(stdout, "cost actual_usd=%.6f\n", stateActualCostUSD(state)); err != nil {
 		return err
 	}
 	return writeFormat(stdout, "state=%s\n", statePath)

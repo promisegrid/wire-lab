@@ -1,0 +1,62 @@
+{
+  "manifest": "results/manifests/matrix-manifest-canary-20260519-054830.csv",
+  "run_group_id": "canary-20260519-054830",
+  "created_at": "2026-05-19T05:49:14Z",
+  "updated_at": "2026-05-19T05:54:44Z",
+  "cells": {
+    "canary-20260519-054830-000001-SIM-nipoh-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-wrapper-pcid--conditional-release-geofencing-opaque-lower-layer-carriage--openai-gpt-5.3-codex-xhigh": {
+      "cell_id": "canary-20260519-054830-000001-SIM-nipoh-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-wrapper-pcid--conditional-release-geofencing-opaque-lower-layer-carriage--openai-gpt-5.3-codex-xhigh",
+      "ordinal": 1,
+      "sim_id": "SIM-nipoh-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-wrapper-pcid",
+      "scenario_id": "conditional-release-geofencing-opaque-lower-layer-carriage",
+      "model_id": "openai-gpt-5.3-codex-xhigh",
+      "result_path": "results/SIM-nipoh-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-wrapper-pcid/conditional-release-geofencing-opaque-lower-layer-carriage/openai-gpt-5.3-codex-xhigh/20260519-054830.md",
+      "status": "done",
+      "attempts": 2,
+      "last_message": "validated result",
+      "updated_at": "2026-05-19T05:51:46Z",
+      "provider": "openai",
+      "api_model": "gpt-5.3-codex",
+      "reasoning_effort": "xhigh",
+      "request_id": "req_21fea8762696430f8338bcc21bf5c4f7",
+      "response_id": "resp_0fa71bf91d87cc57006a0bf9f5183c819691b8306a82d510ee",
+      "usage_json": "{\"input_tokens\":5107,\"input_tokens_details\":{\"cached_tokens\":0},\"output_tokens\":7173,\"output_tokens_details\":{\"reasoning_tokens\":5289},\"total_tokens\":12280}"
+    },
+    "canary-20260519-054830-000002-SIM-vutar-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-opaque-bytes--cas-object-model-deterministic-cbor-agreement--openai-gpt-5.3-codex-xhigh": {
+      "cell_id": "canary-20260519-054830-000002-SIM-vutar-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-opaque-bytes--cas-object-model-deterministic-cbor-agreement--openai-gpt-5.3-codex-xhigh",
+      "ordinal": 2,
+      "sim_id": "SIM-vutar-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-opaque-bytes",
+      "scenario_id": "cas-object-model-deterministic-cbor-agreement",
+      "model_id": "openai-gpt-5.3-codex-xhigh",
+      "result_path": "results/SIM-vutar-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-opaque-bytes/cas-object-model-deterministic-cbor-agreement/openai-gpt-5.3-codex-xhigh/20260519-054830.md",
+      "status": "done",
+      "attempts": 2,
+      "last_message": "validated result",
+      "updated_at": "2026-05-19T05:53:17Z",
+      "provider": "openai",
+      "api_model": "gpt-5.3-codex",
+      "reasoning_effort": "xhigh",
+      "request_id": "req_4d05065299fb4ad784ea0ccb52d7c50e",
+      "response_id": "resp_09fd9127f0afd962006a0bfa7396a481a0a28bc4abcaa7584e",
+      "usage_json": "{\"input_tokens\":5097,\"input_tokens_details\":{\"cached_tokens\":0},\"output_tokens\":5581,\"output_tokens_details\":{\"reasoning_tokens\":3983},\"total_tokens\":10678}"
+    },
+    "canary-20260519-054830-000003-SIM-fonig-grid-envelope-enc-cbor-unknown-best-effort-sig-unsigned-v0--cas-object-model-deterministic-cbor-agreement--openai-gpt-5.3-codex-xhigh": {
+      "cell_id": "canary-20260519-054830-000003-SIM-fonig-grid-envelope-enc-cbor-unknown-best-effort-sig-unsigned-v0--cas-object-model-deterministic-cbor-agreement--openai-gpt-5.3-codex-xhigh",
+      "ordinal": 3,
+      "sim_id": "SIM-fonig-grid-envelope-enc-cbor-unknown-best-effort-sig-unsigned-v0",
+      "scenario_id": "cas-object-model-deterministic-cbor-agreement",
+      "model_id": "openai-gpt-5.3-codex-xhigh",
+      "result_path": "results/SIM-fonig-grid-envelope-enc-cbor-unknown-best-effort-sig-unsigned-v0/cas-object-model-deterministic-cbor-agreement/openai-gpt-5.3-codex-xhigh/20260519-054830.md",
+      "status": "done",
+      "attempts": 2,
+      "last_message": "validated result",
+      "updated_at": "2026-05-19T05:54:44Z",
+      "provider": "openai",
+      "api_model": "gpt-5.3-codex",
+      "reasoning_effort": "xhigh",
+      "request_id": "req_35af92189dbe41d5ac606646171a4cff",
+      "response_id": "resp_077d7f3e223390a0006a0bfacdb0308194907d5342f56e4716",
+      "usage_json": "{\"input_tokens\":5049,\"input_tokens_details\":{\"cached_tokens\":0},\"output_tokens\":5030,\"output_tokens_details\":{\"reasoning_tokens\":3332},\"total_tokens\":10079}"
+    }
+  }
+}

@@ -14,13 +14,17 @@ go run . manifest -repo-root ../.. \
   -models openai-gpt-5.3-codex-xhigh
 
 go run . run -repo-root ../.. \
-  -manifest ../../results/manifests/<manifest>.csv \
+  -manifest results/manifests/<manifest>.csv \
   -provider openai \
   -api-model <openai-api-model> \
-  -reasoning-effort xhigh
+  -reasoning-effort xhigh \
+  -result-style concise \
+  -max-output-tokens 6000 \
+  -max-run-cost-usd <budget> \
+  -max-cell-estimate-usd <cell-cap>
 
 go run . validate -repo-root ../.. \
-  -manifest ../../results/manifests/<manifest>.csv
+  -manifest results/manifests/<manifest>.csv
 
 go run . view -repo-root ../.. \
   -model openai-gpt-5.3-codex-xhigh
@@ -28,7 +32,9 @@ go run . view -repo-root ../.. \
 
 The Go runner bundles local source documents for API-backed runs, checkpoints
 under `results/state/`, validates result files, and generates read-only result
-views from `results/`. Source: `DI-lulom`; `DI-zamin`.
+views from `results/`. Cost-controlled runs also record token/cost metadata in
+state and stop before starting over-budget cells. Source: `DI-lulom`;
+`DI-zamin`; `DI-nugiv`.
 
 ## Legacy Python Tools
 

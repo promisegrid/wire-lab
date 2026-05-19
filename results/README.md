@@ -104,8 +104,12 @@ Before kicking off a large matrix run:
 1. Follow `results/RUN-PROTOCOL.md`.
 2. Generate a deterministic manifest with `tools/matrix-runner`.
 3. Run a small API-backed canary with `tools/matrix-runner run`.
-4. Validate canary output with `tools/matrix-runner validate`.
-5. Run the full manifest only after canary validation passes.
+4. Review `results/state/<run-group-id>.json` token/cost fields and tune
+   `-result-style`, `-max-output-tokens`, `-max-run-cost-usd`, and
+   `-max-cell-estimate-usd`.
+5. Validate canary output with `tools/matrix-runner validate`.
+6. Run the full manifest only after canary validation and cost review pass.
+Source: `DI-nugiv`.
 
 The old Python scripts under `results/tools/` remain legacy/reference tools;
 the Go runner is preferred for unattended API-backed runs because it bundles

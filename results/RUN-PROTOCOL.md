@@ -37,6 +37,12 @@ The preferred runner is now the Go `tools/matrix-runner` CLI. For API-backed
 runs it bundles local source document contents into the provider prompt, because
 remote APIs cannot read repo-local paths. Source: `DI-lulom`.
 
+API-backed runs must use explicit cost controls before any large batch. The
+runner defaults to concise result style and a lower output cap, records provider
+usage in queue state, prints actual accumulated cost, and can stop before a
+cell whose preflight estimate would exceed the configured budget. Source:
+`DI-nugiv`.
+
 Allowed result-producing run modes:
 
 - `codex-manual-blind`
@@ -59,6 +65,9 @@ Source: `DI-moduf`.
 - Every blind run result file should include:
   - `- Run mode: codex-manual-blind` for manually produced Codex runs.
   - `- Run mode: llm-doc-eval-blind` for external LLM API/batch runs.
+- API-backed blind runs should use concise evidence prose by default: keep every
+  required section, but avoid source restatement and prefer short fit,
+  weakness, and open-question bullets. Source: `DI-nugiv`.
 
 ## Result File Contract
 
@@ -87,6 +96,9 @@ Each result must include one line starting with `Evidence verdict:`.
   `cell_id` fields for unattended runs.
 - Use checkpoint state under `results/state/` for any long run that should
   resume without operator prompts.
+- Set an explicit `-max-run-cost-usd` for unattended API-backed batches, and use
+  `-max-cell-estimate-usd` plus `-max-output-tokens` to prevent accidentally
+  starting cells whose worst-case estimate is too high.
 - Treat `results/` as the only canonical result evidence. Generate result views
   from `results/` instead of committing scenario-side summaries.
 - Keep old result files; never rewrite or delete prior runs.
@@ -117,22 +129,25 @@ Each result must include one line starting with `Evidence verdict:`.
 ## Recommended Preflight
 
 1. Generate a canary manifest (20-30 cells).
-2. Generate canary LLM job prompts.
-3. Run canary prompts through an LLM evaluator.
-4. Validate canary output.
+2. Generate canary LLM job prompts or run the API queue with explicit budget
+   flags.
+3. Validate canary output.
+4. Review token/cost fields in the state file and tune output caps or result
+   style.
 5. Review drift/comparison report.
-6. Run the full manifest.
+6. Run the full manifest only with an explicit budget. Source: `DI-nugiv`.
 
 ## Unattended Full-Run Shape
 
 1. Generate a manifest with a fixed model ID and concrete timestamp:
    `cd tools/matrix-runner && go run . manifest -repo-root ../.. -models <model-id>`.
 2. Start the queue with OpenAI API-backed execution:
-   `cd tools/matrix-runner && go run . run -repo-root ../.. -manifest <manifest.csv> -provider openai -api-model <api-model> -reasoning-effort xhigh`.
+   `cd tools/matrix-runner && go run . run -repo-root ../.. -manifest <manifest.csv> -provider openai -api-model <api-model> -reasoning-effort xhigh -result-style concise -max-output-tokens 6000 -max-run-cost-usd <budget> -max-cell-estimate-usd <cell-cap>`.
 3. Let the queue process one cell at a time. Each cell writes or refreshes its
    prompt under `results/jobs/<run-group-id>/`, invokes the runner command,
-   validates `result_path`, and checkpoints `results/state/<run-group-id>.json`.
-   Source: `DI-nuhon`; `DI-lulom`; `DI-zamin`.
+   validates `result_path`, records token/cost usage, and checkpoints
+   `results/state/<run-group-id>.json`. Source: `DI-nuhon`; `DI-lulom`;
+   `DI-zamin`; `DI-nugiv`.
 4. If the process is interrupted, rerun the same command with the same manifest
    and state path. Completed cells are skipped by default.
 5. When the queue completes, validate the manifest:

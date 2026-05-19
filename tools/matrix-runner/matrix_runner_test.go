@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"math"
 	"os"
 	"path/filepath"
 	"strings"
@@ -75,33 +76,79 @@ func TestManifestJobsViewAndValidate(t *testing.T) {
 	}
 }
 
-func TestRunCellPersistsRunningBeforeProviderCall(t *testing.T) {
+func TestRunCellRecordsUsageCost(t *testing.T) {
 	repo := makeTestRepo(t)
-	cell := MatrixCell{
-		RunGroupID:   "rg",
-		Ordinal:      1,
-		CellID:       "rg-000001-SIM-alpha--scenario-one--openai-test-xhigh",
-		SimID:        "SIM-alpha",
-		ScenarioID:   "scenario-one",
-		ModelID:      "openai-test-xhigh",
-		SimPath:      "simulations/SIM-alpha/",
-		ScenarioPath: "scenarios/scenario-one/scenario-one.md",
-		Timestamp:    "20260519-000000",
-		ResultPath:   "results/SIM-alpha/scenario-one/openai-test-xhigh/20260519-000000.md",
-		Status:       "queued",
+	cell := testCell()
+	state := testState(cell)
+	statePath := filepath.Join(repo.Root, "results", "state", "rg.json")
+	provider := fakeProvider{
+		text:  validResult(cell),
+		usage: `{"input_tokens":1000,"input_tokens_details":{"cached_tokens":100},"output_tokens":2000}`,
 	}
-	state := &QueueState{
-		Manifest:   "manifest.csv",
-		RunGroupID: "rg",
-		CreatedAt:  utcISO(),
-		Cells: map[string]*CellState{
-			cell.CellID: {
-				CellID:     cell.CellID,
-				Status:     "queued",
-				ResultPath: cell.ResultPath,
-			},
+	var stdout bytes.Buffer
+	options := RunOptions{
+		ProviderName:    "openai",
+		APIModel:        "gpt-test",
+		ReasoningEffort: "xhigh",
+		MaxOutputTokens: 6000,
+		ResultStyle:     "concise",
+		Cost:            defaultCostConfig(),
+	}
+	status := runOneCell(context.Background(), repo, provider, state, statePath, filepath.Join(repo.Root, "results", "jobs", "rg"), cell, state.Cells[cell.CellID], options, &stdout)
+	if status != "done" {
+		t.Fatalf("status=%s state=%+v output=%s", status, state.Cells[cell.CellID], stdout.String())
+	}
+	record := state.Cells[cell.CellID]
+	wantCost := (900*defaultInputUSDPerMTok + 100*defaultCachedInputUSDPerMTok + 2000*defaultOutputUSDPerMTok) / 1_000_000
+	if math.Abs(record.CostUSD-wantCost) > 0.000000001 {
+		t.Fatalf("cost=%f want %f", record.CostUSD, wantCost)
+	}
+	if record.InputTokens != 1000 || record.CachedTokens != 100 || record.OutputTokens != 2000 {
+		t.Fatalf("unexpected tokens: %+v", record)
+	}
+}
+
+func TestRunCellSkipsOverMaxCellEstimate(t *testing.T) {
+	repo := makeTestRepo(t)
+	cell := testCell()
+	state := testState(cell)
+	statePath := filepath.Join(repo.Root, "results", "state", "rg.json")
+	provider := fakeProvider{
+		text: validResult(cell),
+		check: func() {
+			t.Fatal("provider should not be called for an over-budget estimated cell")
 		},
 	}
+	var stdout bytes.Buffer
+	options := RunOptions{
+		ProviderName:    "openai",
+		APIModel:        "gpt-test",
+		ReasoningEffort: "xhigh",
+		MaxOutputTokens: 6000,
+		ResultStyle:     "concise",
+		Cost: CostConfig{
+			InputUSDPerMTok:       defaultInputUSDPerMTok,
+			CachedInputUSDPerMTok: defaultCachedInputUSDPerMTok,
+			OutputUSDPerMTok:      defaultOutputUSDPerMTok,
+			MaxCellEstimateUSD:    0.000001,
+		},
+	}
+	status := runOneCell(context.Background(), repo, provider, state, statePath, filepath.Join(repo.Root, "results", "jobs", "rg"), cell, state.Cells[cell.CellID], options, &stdout)
+	if status != "skipped" {
+		t.Fatalf("status=%s state=%+v output=%s", status, state.Cells[cell.CellID], stdout.String())
+	}
+	if got := state.Cells[cell.CellID].Status; got != "skipped" {
+		t.Fatalf("record status=%s want skipped", got)
+	}
+	if _, err := os.Stat(repo.Abs(cell.ResultPath)); !os.IsNotExist(err) {
+		t.Fatalf("result should not exist after budget skip: %v", err)
+	}
+}
+
+func TestRunCellPersistsRunningBeforeProviderCall(t *testing.T) {
+	repo := makeTestRepo(t)
+	cell := testCell()
+	state := testState(cell)
 	statePath := filepath.Join(repo.Root, "results", "state", "rg.json")
 	provider := fakeProvider{
 		text: validResult(cell),
@@ -125,6 +172,7 @@ func TestRunCellPersistsRunningBeforeProviderCall(t *testing.T) {
 		APIModel:        "gpt-test",
 		ReasoningEffort: "xhigh",
 		MaxOutputTokens: 1000,
+		ResultStyle:     "concise",
 	}, &stdout)
 	if status != "done" {
 		t.Fatalf("status=%s state=%+v output=%s", status, state.Cells[cell.CellID], stdout.String())
@@ -133,6 +181,7 @@ func TestRunCellPersistsRunningBeforeProviderCall(t *testing.T) {
 
 type fakeProvider struct {
 	text  string
+	usage string
 	check func()
 }
 
@@ -140,7 +189,38 @@ func (f fakeProvider) Generate(ctx context.Context, request ProviderRequest) (Pr
 	if f.check != nil {
 		f.check()
 	}
-	return ProviderResponse{Text: f.text, RequestID: "req_test", ResponseID: "resp_test"}, nil
+	return ProviderResponse{Text: f.text, RequestID: "req_test", ResponseID: "resp_test", UsageJSON: f.usage}, nil
+}
+
+func testCell() MatrixCell {
+	return MatrixCell{
+		RunGroupID:   "rg",
+		Ordinal:      1,
+		CellID:       "rg-000001-SIM-alpha--scenario-one--openai-test-xhigh",
+		SimID:        "SIM-alpha",
+		ScenarioID:   "scenario-one",
+		ModelID:      "openai-test-xhigh",
+		SimPath:      "simulations/SIM-alpha/",
+		ScenarioPath: "scenarios/scenario-one/scenario-one.md",
+		Timestamp:    "20260519-000000",
+		ResultPath:   "results/SIM-alpha/scenario-one/openai-test-xhigh/20260519-000000.md",
+		Status:       "queued",
+	}
+}
+
+func testState(cell MatrixCell) *QueueState {
+	return &QueueState{
+		Manifest:   "manifest.csv",
+		RunGroupID: "rg",
+		CreatedAt:  utcISO(),
+		Cells: map[string]*CellState{
+			cell.CellID: {
+				CellID:     cell.CellID,
+				Status:     "queued",
+				ResultPath: cell.ResultPath,
+			},
+		},
+	}
 }
 
 func makeTestRepo(t *testing.T) Repo {
