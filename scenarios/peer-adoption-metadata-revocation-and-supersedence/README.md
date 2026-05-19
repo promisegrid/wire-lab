@@ -1,0 +1,16 @@
+# Revocation and supersedence
+
+This root scenario entry was mined from `simulations/SIM-dihiz-peer-adoption-metadata/SCENARIOS.md`. It is shared wire-lab
+comparison apparatus, not PromiseGrid node layout or final design authority.
+Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-nanih`.
+
+## Scenario Files
+
+- [`peer-adoption-metadata-revocation-and-supersedence.md`](peer-adoption-metadata-revocation-and-supersedence.md)
+- [`MATRIX.md`](MATRIX.md)
+
+## Source
+
+- Source simulation: `SIM-dihiz-peer-adoption-metadata/`
+- Source file: `simulations/SIM-dihiz-peer-adoption-metadata/SCENARIOS.md`
+- Source row title: Revocation and supersedence

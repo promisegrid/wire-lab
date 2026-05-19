@@ -78,6 +78,24 @@ why. Do not create scenario entries in this pass.
 Affects: `protocols/wire-lab.d/TODO/TODO-dadub-root-scenario-skeleton-and-seed-catalog.md`;
 `scenarios/README.md`.
 
+ID: DI-nanih
+Date: 2026-05-18 19:17:55
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Execute the first mining pass by transforming every row from the
+existing simulation-local `SCENARIOS.md` sources into a root scenario entry, one
+directory per source row, with README, MATRIX, and scenario markdown files.
+Intent: Existing simulation scenario rows already encode concrete design
+pressure and provenance. Moving them into root scenario entries gives future
+model runs an apples-to-apples comparison surface without deleting or rewriting
+the simulation-local sources.
+Constraints: Preserve source path and source row/title in every mined scenario.
+Apply the `DI-botup` overarching goal checks to every scenario. Keep every
+matrix in `not-run` state until a real run exists. Do not create fake result
+run files. Do not populate application seed entries in this pass.
+Affects: `protocols/wire-lab.d/TODO/TODO-dadub-root-scenario-skeleton-and-seed-catalog.md`;
+`scenarios/`.
+
 ## Scope
 
 - Define the root scenario-entry contract implied by `DI-faros`: a root scenario
@@ -104,11 +122,12 @@ Affects: `protocols/wire-lab.d/TODO/TODO-dadub-root-scenario-skeleton-and-seed-c
 - [ ] dadub.3 Create one root scenario entry for every application listed in the
   seed application catalog below, using one `scenarios/<entry-id>/` directory per
   application rather than broad application-family grouping.
-- [ ] dadub.4 Mine every row from every existing simulation-local `SCENARIOS.md`
+- [x] dadub.4 Mine every row from every existing simulation-local `SCENARIOS.md`
   source listed below and create one transformed root scenario entry per row.
-- [ ] dadub.5 For each mined scenario entry, record the source simulation path,
+  Done for 95 rows under `DI-nanih`.
+- [x] dadub.5 For each mined scenario entry, record the source simulation path,
   source row title, original decision pressure, and what cross-sim comparisons
-  the root entry is meant to enable.
+  the root entry is meant to enable. Done under `DI-nanih`.
 - [x] dadub.6 Create `results/README.md` documenting the locked path
   `results/<sim-id>/<scenario-id>/<model-id>/<YYYYMMDD-HHMMSS>.md`, UTC
   timestamp rule, model-ID rule, and evidence-only authority boundary. Source:
@@ -119,11 +138,12 @@ Affects: `protocols/wire-lab.d/TODO/TODO-dadub-root-scenario-skeleton-and-seed-c
 - [x] dadub.8 Update `simulations/README.md` and `DEV-GUIDE-RESOURCES.md` after
   root `scenarios/` and `results/` skeletons exist, so readers know where
   cross-sim scenario matrices and run evidence live. Done under `DI-dimas`.
-- [ ] dadub.9 Validate that every root scenario entry preserves provenance,
+- [x] dadub.9 Validate that every root scenario entry preserves provenance,
   avoids direct design authority claims, has a stable kebab-case entry ID, and
-  addresses the overarching PromiseGrid goal checks from `DI-botup`.
-- [ ] dadub.10 Run stale-layout checks for old one-file-per-cell result paths and
-  run `git diff --check`.
+  addresses the overarching PromiseGrid goal checks from `DI-botup`. Done for
+  mined entries under `DI-nanih`.
+- [x] dadub.10 Run stale-layout checks for old one-file-per-cell result paths and
+  run `git diff --check`. Done for the mined-entry pass under `DI-nanih`.
 
 ## Candidate scenario entries
 

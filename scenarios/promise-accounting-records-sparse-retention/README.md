@@ -1,0 +1,16 @@
+# Sparse retention
+
+This root scenario entry was mined from `simulations/SIM-rusap-promise-accounting-records/SCENARIOS.md`. It is shared wire-lab
+comparison apparatus, not PromiseGrid node layout or final design authority.
+Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-nanih`.
+
+## Scenario Files
+
+- [`promise-accounting-records-sparse-retention.md`](promise-accounting-records-sparse-retention.md)
+- [`MATRIX.md`](MATRIX.md)
+
+## Source
+
+- Source simulation: `SIM-rusap-promise-accounting-records/`
+- Source file: `simulations/SIM-rusap-promise-accounting-records/SCENARIOS.md`
+- Source row title: Sparse retention
