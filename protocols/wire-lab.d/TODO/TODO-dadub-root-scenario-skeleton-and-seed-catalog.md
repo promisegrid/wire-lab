@@ -39,6 +39,45 @@ Affects: `protocols/wire-lab.d/TODO/TODO-dadub-root-scenario-skeleton-and-seed-c
 `protocols/wire-lab.d/TODO/TODO.md`; future `scenarios/`; future `results/`;
 future `simulations/README.md`; future `DEV-GUIDE-RESOURCES.md`.
 
+ID: DI-dimas
+Date: 2026-05-18 19:09:34
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Execute the first root scenario/result skeleton pass by creating root
+`scenarios/README.md` and `results/README.md`, embedding the scenario-entry,
+matrix, and result-run templates there, and updating current-pointer docs after
+the skeleton exists.
+Intent: The repo now has locked root scenario/result apparatus decisions and a
+TODO owner, but agents need concrete root entry and result-run contracts before
+they can safely populate application scenarios or mine sim-local scenario rows.
+Keeping templates in README files avoids extra root template files and avoids
+fake result evidence.
+Constraints: Do not create root scenario entries yet. Do not create fake
+`results/<sim-id>/<scenario-id>/<model-id>/<YYYYMMDD-HHMMSS>.md` run files.
+Keep root scenarios and results as wire-lab harness comparison apparatus with
+evidence-only authority.
+Affects: `protocols/wire-lab.d/TODO/TODO-dadub-root-scenario-skeleton-and-seed-catalog.md`;
+`scenarios/README.md`; `results/README.md`; `simulations/README.md`;
+`DEV-GUIDE-RESOURCES.md`.
+
+ID: DI-botup
+Date: 2026-05-18 19:14:07
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Require every root scenario to include overarching PromiseGrid goal
+checks, including the 100-year durability goal, sparse partial knowledge, no
+central authority or registry, peer-local promise accounting, adversarial or
+failure pressure, human/LLM auditability, and migration/evolution pressure.
+Intent: Root scenarios are supposed to compare simulations against the reasons
+PromiseGrid exists, not just against narrow application happy paths. Making the
+goal checks explicit prevents scenario authors from accidentally assuming away
+long-horizon, sparse, decentralized, adversarial, or human-auditable constraints.
+Constraints: Record the gate in `scenarios/README.md` rather than duplicating it
+in every current TODO. A scenario may mark a gate not relevant only by saying
+why. Do not create scenario entries in this pass.
+Affects: `protocols/wire-lab.d/TODO/TODO-dadub-root-scenario-skeleton-and-seed-catalog.md`;
+`scenarios/README.md`.
+
 ## Scope
 
 - Define the root scenario-entry contract implied by `DI-faros`: a root scenario
@@ -56,12 +95,12 @@ future `simulations/README.md`; future `DEV-GUIDE-RESOURCES.md`.
 
 ## Subtasks
 
-- [ ] dadub.1 Define the root scenario-entry template, including required
+- [x] dadub.1 Define the root scenario-entry template, including required
   fields, source/provenance field, applicability field, evaluation questions,
-  and authority boundary.
-- [ ] dadub.2 Create `scenarios/README.md` explaining that root scenarios are
+  and authority boundary. Done in `scenarios/README.md` under `DI-dimas`.
+- [x] dadub.2 Create `scenarios/README.md` explaining that root scenarios are
   shared comparison apparatus governed by `DI-faros`, not shared protocol
-  components or PromiseGrid deployment layout.
+  components or PromiseGrid deployment layout. Done under `DI-dimas`.
 - [ ] dadub.3 Create one root scenario entry for every application listed in the
   seed application catalog below, using one `scenarios/<entry-id>/` directory per
   application rather than broad application-family grouping.
@@ -70,18 +109,19 @@ future `simulations/README.md`; future `DEV-GUIDE-RESOURCES.md`.
 - [ ] dadub.5 For each mined scenario entry, record the source simulation path,
   source row title, original decision pressure, and what cross-sim comparisons
   the root entry is meant to enable.
-- [ ] dadub.6 Create `results/README.md` documenting the locked path
+- [x] dadub.6 Create `results/README.md` documenting the locked path
   `results/<sim-id>/<scenario-id>/<model-id>/<YYYYMMDD-HHMMSS>.md`, UTC
   timestamp rule, model-ID rule, and evidence-only authority boundary. Source:
-  `DI-miror`; `DI-faros`.
-- [ ] dadub.7 Add a result-run template without creating any fake run-result
+  `DI-miror`; `DI-faros`. Done under `DI-dimas`.
+- [x] dadub.7 Add a result-run template without creating any fake run-result
   files. The template may live in `results/README.md` or a template file chosen
-  in the implementation pass.
-- [ ] dadub.8 Update `simulations/README.md` and `DEV-GUIDE-RESOURCES.md` after
+  in the implementation pass. Done in `results/README.md` under `DI-dimas`.
+- [x] dadub.8 Update `simulations/README.md` and `DEV-GUIDE-RESOURCES.md` after
   root `scenarios/` and `results/` skeletons exist, so readers know where
-  cross-sim scenario matrices and run evidence live.
+  cross-sim scenario matrices and run evidence live. Done under `DI-dimas`.
 - [ ] dadub.9 Validate that every root scenario entry preserves provenance,
-  avoids direct design authority claims, and has a stable kebab-case entry ID.
+  avoids direct design authority claims, has a stable kebab-case entry ID, and
+  addresses the overarching PromiseGrid goal checks from `DI-botup`.
 - [ ] dadub.10 Run stale-layout checks for old one-file-per-cell result paths and
   run `git diff --check`.
 

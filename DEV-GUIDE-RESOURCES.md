@@ -58,6 +58,11 @@ PromiseGrid design choices are derived, tested, and recorded. Source:
   `DF-dojab.1` through `DF-dojab.5` are locked by `DI-faros`. Treat those
   paths as wire-lab comparison apparatus, not PromiseGrid node layout or final
   guide-facing API structure.
+- `scenarios/README.md` and `results/README.md` are the current root skeleton
+  contracts for shared scenario entries and per-run result evidence. Scenario
+  population is still owned by TODO-dadub; until real run files exist, guide
+  writers should treat these as apparatus templates and not as PromiseGrid API
+  examples. Source: `DI-vabor`; `DI-dimas`.
 - Active guide prose should use **promise accounting records** for peer-local
   relationship accounting. Alice, Bob, Carol, and other
   peers each keep their own records; wire-lab does not define a central or

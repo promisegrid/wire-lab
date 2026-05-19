@@ -12,6 +12,13 @@ while candidate PromiseGrid protocol trees and concrete specimens move into a
 named simulation until results graduate through DR, DI, frozen specs, guide
 prose, or a future PromiseGrid spec corpus. Source: `DI-pakid`; `DI-fakin`.
 
+Cross-simulation pressure lives at root `scenarios/`, and cross-simulation run
+evidence lives at root `results/`. Simulation-local `SCENARIOS.md` files remain
+lineage-local pressure sources; `TODO-dadub` owns mining those rows into root
+scenario entries. Root results use
+`results/<sim-id>/<scenario-id>/<model-id>/<YYYYMMDD-HHMMSS>.md` and remain
+evidence only. Source: `DI-faros`; `DI-miror`; `DI-vabor`; `DI-dimas`.
+
 ## Current simulations
 
 | Simulation | Purpose | Status |
