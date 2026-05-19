@@ -111,6 +111,27 @@ score work but is exercised only in tests during this pass.
 Affects: `tools/ga-runner/`;
 `protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`.
 
+ID: DI-bagih
+Date: 2026-05-19 10:25:10
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Implement `tools/ga-runner init -dry-run` as the first stable
+population scanner: it discovers ordinary GA population members from
+`git ls-files -z -- simulations`, groups tracked files by
+`simulations/SIM-*`, computes deterministic tree hashes, and excludes untracked
+child simulation directories by default.
+Intent: Generated child sims are written directly under `simulations/`, so
+ordinary scans must not treat every directory on disk as accepted population.
+Using git-tracked files makes committed/tracked sims the default evaluation
+surface while preserving the later ability to include pending children through
+the active GA state file.
+Constraints: This pass is read-only for GA runs: `init -dry-run` prints the
+tracked population and does not write state. Missing/deleted tracked files and
+non-`SIM-*` paths are ignored during population grouping. Pending child inclusion
+through `results/state/<run-group-id>.json` remains later work.
+Affects: `tools/ga-runner/`;
+`protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`.
+
 ## Scope
 
 - Define and implement a new GA/search runner without changing
@@ -286,9 +307,10 @@ status in the GA state file.
 - [x] tapur.5 Implement JSON-only fitness result writing and validation for
   `tools/ga-runner`, and make the runner ignore `results/**/*.md` canary files.
   Source: `DI-ramar`; `DI-pobus`.
-- [ ] tapur.6 Implement stable-population scanning so ordinary scans use
+- [x] tapur.6 Implement stable-population scanning so ordinary scans use
   committed/tracked `simulations/SIM-*` trees, while pending untracked children
-  are included only through the active GA manifest. Source: `DI-ramar`.
+  are included only through the active GA manifest. Source: `DI-ramar`;
+  `DI-bagih`.
 - [ ] tapur.7 Implement conservative generation sizing: score existing sims,
   choose a small parent set, generate a small child batch, score each child
   against a stratified scenario sample, and promote at most a small number of

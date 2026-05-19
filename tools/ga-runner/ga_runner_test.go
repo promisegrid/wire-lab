@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -126,6 +127,48 @@ func TestWriteFitnessResultAtomicRoundTrip(t *testing.T) {
 	}
 }
 
+func TestDiscoverTrackedPopulationExcludesUntrackedChildren(t *testing.T) {
+	repo := newGitTestRepo(t)
+	writeTestFile(t, repo.Path("simulations", "SIM-parent", "README.md"), "# Parent\n")
+	writeTestFile(t, repo.Path("simulations", "SIM-parent", "QUESTION.md"), "# Question\n")
+	writeTestFile(t, repo.Path("simulations", "SIM-child-untracked", "README.md"), "# Child\n")
+	writeTestFile(t, repo.Path("simulations", "not-a-sim", "README.md"), "# Not a sim\n")
+	gitAdd(t, repo, "simulations/SIM-parent/README.md", "simulations/SIM-parent/QUESTION.md", "simulations/not-a-sim/README.md")
+
+	population, err := discoverTrackedPopulation(repo)
+	if err != nil {
+		t.Fatalf("discover tracked population: %v", err)
+	}
+	if len(population) != 1 {
+		t.Fatalf("expected one tracked SIM population member, got %#v", population)
+	}
+	if population[0].SimID != "SIM-parent" {
+		t.Fatalf("expected SIM-parent, got %s", population[0].SimID)
+	}
+	if len(population[0].Files) != 2 {
+		t.Fatalf("expected two tracked files, got %#v", population[0].Files)
+	}
+	if population[0].TreeHash == "" {
+		t.Fatalf("expected tree hash")
+	}
+}
+
+func TestRunInitDryRunPrintsTrackedPopulation(t *testing.T) {
+	repo := newGitTestRepo(t)
+	writeTestFile(t, repo.Path("simulations", "SIM-parent", "README.md"), "# Parent\n")
+	gitAdd(t, repo, "simulations/SIM-parent/README.md")
+
+	var out strings.Builder
+	err := runMain([]string{"ga-runner", "init", "-repo-root", repo.Root, "-dry-run"}, &out, &out)
+	if err != nil {
+		t.Fatalf("init dry-run: %v", err)
+	}
+	text := out.String()
+	if !strings.Contains(text, "population=1") || !strings.Contains(text, "SIM-parent") {
+		t.Fatalf("unexpected dry-run output: %s", text)
+	}
+}
+
 func newTestRepo(t *testing.T) Repo {
 	t.Helper()
 	root := t.TempDir()
@@ -133,6 +176,38 @@ func newTestRepo(t *testing.T) Repo {
 		t.Fatalf("make .git: %v", err)
 	}
 	return Repo{Root: root}
+}
+
+func newGitTestRepo(t *testing.T) Repo {
+	t.Helper()
+	root := t.TempDir()
+	runGit(t, root, "init")
+	return Repo{Root: root}
+}
+
+func writeTestFile(t *testing.T, path string, text string) {
+	t.Helper()
+	if err := ensureParent(path); err != nil {
+		t.Fatalf("make parent for %s: %v", path, err)
+	}
+	if err := os.WriteFile(path, []byte(text), 0o644); err != nil {
+		t.Fatalf("write %s: %v", path, err)
+	}
+}
+
+func gitAdd(t *testing.T, repo Repo, paths ...string) {
+	t.Helper()
+	args := append([]string{"add", "--"}, paths...)
+	runGit(t, repo.Root, args...)
+}
+
+func runGit(t *testing.T, root string, args ...string) {
+	t.Helper()
+	command := exec.Command("git", append([]string{"-C", root}, args...)...)
+	output, err := command.CombinedOutput()
+	if err != nil {
+		t.Fatalf("git %v failed: %v\n%s", args, err, string(output))
+	}
 }
 
 func validResult(repo Repo, path string) FitnessResult {

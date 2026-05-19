@@ -46,7 +46,9 @@ func runMain(args []string, stdout io.Writer, stderr io.Writer) error {
 	switch subcommand {
 	case "validate":
 		return runValidate(subArgs, stdout)
-	case "init", "score", "generate", "progress", "accept", "cull":
+	case "init":
+		return runInit(subArgs, stdout)
+	case "score", "generate", "progress", "accept", "cull":
 		return notImplemented(subcommand)
 	case "help", "-h", "--help":
 		return writeText(stdout, usage)

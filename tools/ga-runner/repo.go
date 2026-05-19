@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 )
 
@@ -56,4 +57,17 @@ func (repo Repo) Rel(path string) string {
 		return filepath.ToSlash(filepath.Clean(path))
 	}
 	return filepath.ToSlash(rel)
+}
+
+func (repo Repo) Git(args ...string) ([]byte, error) {
+	// Intent: Query git's index for stable population membership so ordinary
+	// scans are not contaminated by untracked generated child sims. Source:
+	// DI-bagih
+	fullArgs := append([]string{"-C", repo.Root}, args...)
+	command := exec.Command("git", fullArgs...)
+	output, err := command.Output()
+	if err != nil {
+		return nil, fmt.Errorf("git %v: %w", args, err)
+	}
+	return output, nil
 }
