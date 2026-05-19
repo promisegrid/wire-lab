@@ -1,0 +1,160 @@
+package main
+
+import (
+	"encoding/json"
+	"fmt"
+	"os"
+	"path/filepath"
+	"regexp"
+)
+
+const stateSchemaV1 = "promisegrid.ga.state.v1"
+
+var safeStateIDPattern = regexp.MustCompile(`^[A-Za-z0-9][A-Za-z0-9._-]*$`)
+
+// GAState is the v1 checkpoint file that makes pending children auditable.
+//
+// Intent: Keep generated child sims outside the stable population until review
+// records an explicit acceptance event in the run state. Source: DI-podot
+type GAState struct {
+	Schema         string             `json:"schema"`
+	RunGroupID     string             `json:"run_group_id"`
+	CreatedAt      string             `json:"created_at,omitempty"`
+	UpdatedAt      string             `json:"updated_at,omitempty"`
+	RepoCommit     string             `json:"repo_commit,omitempty"`
+	ModelID        string             `json:"model_id,omitempty"`
+	Population     []GAStateSim       `json:"population,omitempty"`
+	ScenarioSample []GAStateScenario  `json:"scenario_sample,omitempty"`
+	Parents        []GAStateParent    `json:"parents,omitempty"`
+	Children       []GAChild          `json:"children,omitempty"`
+	Cells          []GACell           `json:"cells,omitempty"`
+	Acceptance     []AcceptanceRecord `json:"acceptance,omitempty"`
+	Culling        []CullingRecord    `json:"culling,omitempty"`
+}
+
+type GAStateSim struct {
+	SimID    string `json:"sim_id"`
+	Path     string `json:"path"`
+	TreeHash string `json:"tree_hash"`
+}
+
+type GAStateScenario struct {
+	ScenarioID string `json:"scenario_id"`
+	Path       string `json:"path"`
+	SHA256     string `json:"sha256,omitempty"`
+}
+
+type GAStateParent struct {
+	SimID     string `json:"sim_id"`
+	Rationale string `json:"rationale,omitempty"`
+}
+
+// GAChild describes a generated child simulation tree under simulations/SIM-*.
+//
+// Intent: Acceptance verifies the durable child tree instead of trusting a JSON
+// proposal object or the mere presence of a directory. Source: DI-podot
+type GAChild struct {
+	ChildID            string       `json:"child_id,omitempty"`
+	SimID              string       `json:"sim_id,omitempty"`
+	Path               string       `json:"path"`
+	ParentIDs          []string     `json:"parent_ids,omitempty"`
+	Operation          string       `json:"operation,omitempty"`
+	PromptHash         string       `json:"prompt_hash,omitempty"`
+	ResponseHash       string       `json:"response_hash,omitempty"`
+	Files              []SourceFile `json:"files,omitempty"`
+	TreeHash           string       `json:"tree_hash"`
+	Status             string       `json:"status"`
+	DesignDeltaSummary string       `json:"design_delta_summary,omitempty"`
+}
+
+type GACell struct {
+	CellID             string `json:"cell_id"`
+	SimID              string `json:"sim_id"`
+	ScenarioID         string `json:"scenario_id"`
+	ModelID            string `json:"model_id"`
+	ResultPath         string `json:"result_path,omitempty"`
+	ExpectedResultPath string `json:"expected_result_path,omitempty"`
+	Status             string `json:"status,omitempty"`
+	Attempts           int    `json:"attempts,omitempty"`
+	ValidationMessage  string `json:"validation_message,omitempty"`
+}
+
+type AcceptanceRecord struct {
+	AcceptedChildIDs []string `json:"accepted_child_ids"`
+	ResultPaths      []string `json:"result_paths"`
+	ReviewerNote     string   `json:"reviewer_note"`
+	AcceptedAt       string   `json:"accepted_at"`
+}
+
+type CullingRecord struct {
+	CulledChildIDs     []string `json:"culled_child_ids,omitempty"`
+	DeletedSimPaths    []string `json:"deleted_sim_paths,omitempty"`
+	DeletedResultPaths []string `json:"deleted_result_paths,omitempty"`
+	Reason             string   `json:"reason,omitempty"`
+	CulledAt           string   `json:"culled_at,omitempty"`
+}
+
+func statePath(repo Repo, runGroupID string) (string, error) {
+	// Intent: Treat run group IDs as filenames only, preventing a review command
+	// from resolving state outside results/state/. Source: DI-podot
+	if runGroupID == "" {
+		return "", fmt.Errorf("run-group-id is required")
+	}
+	if !safeStateIDPattern.MatchString(runGroupID) {
+		return "", fmt.Errorf("run-group-id must be a safe path segment")
+	}
+	return repo.Path("results", "state", runGroupID+".json"), nil
+}
+
+func readGAState(path string) (GAState, error) {
+	bytes, err := os.ReadFile(path)
+	if err != nil {
+		return GAState{}, err
+	}
+	var state GAState
+	if err := json.Unmarshal(bytes, &state); err != nil {
+		return GAState{}, err
+	}
+	if state.Schema != stateSchemaV1 {
+		return GAState{}, fmt.Errorf("state schema must be %s", stateSchemaV1)
+	}
+	return state, nil
+}
+
+// writeGAStateAtomic writes a v1 GA state update through a temp file in the same
+// directory so interrupted review checkpoints do not leave truncated JSON.
+//
+// Intent: Acceptance is a review checkpoint, so the state file must move from
+// old to new content atomically. Source: DI-podot
+func writeGAStateAtomic(path string, state GAState) error {
+	bytes, err := json.MarshalIndent(state, "", "  ")
+	if err != nil {
+		return err
+	}
+	if err := ensureParent(path); err != nil {
+		return err
+	}
+	tmp := path + ".tmp"
+	if err := os.WriteFile(tmp, append(bytes, '\n'), 0o644); err != nil {
+		return err
+	}
+	return os.Rename(tmp, path)
+}
+
+func (child GAChild) ID() string {
+	if child.ChildID != "" {
+		return child.ChildID
+	}
+	return child.SimID
+}
+
+func (cell GACell) SelectedResultPath() string {
+	if cell.ResultPath != "" {
+		return filepath.ToSlash(cell.ResultPath)
+	}
+	return filepath.ToSlash(cell.ExpectedResultPath)
+}
+
+func normalizeRelPath(path string) string {
+	return filepath.ToSlash(filepath.Clean(path))
+}

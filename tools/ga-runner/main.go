@@ -19,12 +19,12 @@ const usage = `Usage:
   ga-runner generate   Generate untracked child simulations. (not implemented yet)
   ga-runner validate   Validate JSON fitness result files.
   ga-runner progress   Show GA run progress. (not implemented yet)
-  ga-runner accept     Record accepted children and staging paths. (not implemented yet)
+  ga-runner accept     Record accepted children and staging paths.
   ga-runner cull       Delete rejected generated children and their results. (not implemented yet)
   ga-runner help       Print this message.
 
-All commands accept -repo-root when implemented. When omitted, ga-runner walks
-up from the current directory until it finds a .git directory.
+Implemented commands accept -repo-root. When omitted, ga-runner walks up from the
+current directory until it finds a .git directory.
 `
 
 func main() {
@@ -48,7 +48,11 @@ func runMain(args []string, stdout io.Writer, stderr io.Writer) error {
 		return runValidate(subArgs, stdout)
 	case "init":
 		return runInit(subArgs, stdout)
-	case "score", "generate", "progress", "accept", "cull":
+	case "accept":
+		// Intent: Route review/promotion through the acceptance checkpoint
+		// instead of the not-implemented stub. Source: DI-podot
+		return runAccept(subArgs, stdout)
+	case "score", "generate", "progress", "cull":
 		return notImplemented(subcommand)
 	case "help", "-h", "--help":
 		return writeText(stdout, usage)

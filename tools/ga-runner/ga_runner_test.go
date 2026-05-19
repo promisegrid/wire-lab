@@ -283,6 +283,155 @@ func TestRunInitDryRunPrintsGenerationPlan(t *testing.T) {
 	}
 }
 
+func TestRunAcceptRecordsAcceptanceAndPrintsStagePaths(t *testing.T) {
+	repo := newGitTestRepo(t)
+	resultPath := writeAcceptFixture(t, repo, "SIM-child", "ga-test")
+
+	var out strings.Builder
+	err := runMain([]string{
+		"ga-runner", "accept",
+		"-repo-root", repo.Root,
+		"-run-group-id", "ga-test",
+		"-child", "SIM-child",
+		"-result", repo.Rel(resultPath),
+		"-reviewer-note", "good enough to promote",
+	}, &out, &out)
+	if err != nil {
+		t.Fatalf("accept child: %v\n%s", err, out.String())
+	}
+
+	state, err := readGAState(repo.Path("results", "state", "ga-test.json"))
+	if err != nil {
+		t.Fatalf("read updated state: %v", err)
+	}
+	if len(state.Acceptance) != 1 {
+		t.Fatalf("expected one acceptance record, got %#v", state.Acceptance)
+	}
+	if state.Children[0].Status != "accepted" {
+		t.Fatalf("expected child status accepted, got %s", state.Children[0].Status)
+	}
+	text := out.String()
+	for _, want := range []string{
+		"accepted children=SIM-child",
+		"results/state/ga-test.json",
+		"simulations/SIM-child",
+		repo.Rel(resultPath),
+		"git add --",
+	} {
+		if !strings.Contains(text, want) {
+			t.Fatalf("expected %q in accept output:\n%s", want, text)
+		}
+	}
+	if cached := gitOutput(t, repo, "diff", "--cached", "--name-only"); strings.TrimSpace(cached) != "" {
+		t.Fatalf("accept must not stage changes; cached diff:\n%s", cached)
+	}
+}
+
+func TestRunAcceptRejectsMissingState(t *testing.T) {
+	repo := newTestRepo(t)
+	var out strings.Builder
+	err := runMain([]string{
+		"ga-runner", "accept",
+		"-repo-root", repo.Root,
+		"-run-group-id", "missing",
+		"-child", "SIM-child",
+		"-result", "results/SIM-child/scenario-one/model-a/20260519-101500.json",
+		"-reviewer-note", "note",
+	}, &out, &out)
+	if err == nil {
+		t.Fatalf("expected missing state error")
+	}
+}
+
+func TestRunAcceptRejectsUnknownChild(t *testing.T) {
+	repo := newTestRepo(t)
+	resultPath := writeAcceptFixture(t, repo, "SIM-child", "ga-test")
+	var out strings.Builder
+	err := runMain([]string{
+		"ga-runner", "accept",
+		"-repo-root", repo.Root,
+		"-run-group-id", "ga-test",
+		"-child", "SIM-missing",
+		"-result", repo.Rel(resultPath),
+		"-reviewer-note", "note",
+	}, &out, &out)
+	if err == nil || !strings.Contains(err.Error(), "is not present in GA state") {
+		t.Fatalf("expected unknown child error, got %v", err)
+	}
+}
+
+func TestRunAcceptRejectsInvalidResult(t *testing.T) {
+	repo := newTestRepo(t)
+	resultPath := writeAcceptFixture(t, repo, "SIM-child", "ga-test")
+	result := validResult(repo, resultPath)
+	result.Scores.PromiseGridAlignment = 9
+	if err := writeFitnessResultAtomic(resultPath, result); err != nil {
+		t.Fatalf("write invalid result: %v", err)
+	}
+
+	var out strings.Builder
+	err := runMain([]string{
+		"ga-runner", "accept",
+		"-repo-root", repo.Root,
+		"-run-group-id", "ga-test",
+		"-child", "SIM-child",
+		"-result", repo.Rel(resultPath),
+		"-reviewer-note", "note",
+	}, &out, &out)
+	if err == nil || !strings.Contains(err.Error(), "scores.promisegrid_alignment must be between 0 and 5") {
+		t.Fatalf("expected invalid result error, got %v", err)
+	}
+}
+
+func TestRunAcceptRejectsResultChildMismatch(t *testing.T) {
+	repo := newTestRepo(t)
+	writeAcceptFixture(t, repo, "SIM-child", "ga-test")
+	otherResultPath := repo.Path("results", "SIM-other", "scenario-one", "model-a", "20260519-101500.json")
+	otherResult := validResult(repo, otherResultPath)
+	if err := writeFitnessResultAtomic(otherResultPath, otherResult); err != nil {
+		t.Fatalf("write other result: %v", err)
+	}
+
+	var out strings.Builder
+	err := runMain([]string{
+		"ga-runner", "accept",
+		"-repo-root", repo.Root,
+		"-run-group-id", "ga-test",
+		"-child", "SIM-child",
+		"-result", repo.Rel(otherResultPath),
+		"-reviewer-note", "note",
+	}, &out, &out)
+	if err == nil || !strings.Contains(err.Error(), "is not a selected child") {
+		t.Fatalf("expected child mismatch error, got %v", err)
+	}
+}
+
+func TestRunAcceptRejectsChildHashDrift(t *testing.T) {
+	repo := newTestRepo(t)
+	resultPath := writeAcceptFixture(t, repo, "SIM-child", "ga-test")
+	state, err := readGAState(repo.Path("results", "state", "ga-test.json"))
+	if err != nil {
+		t.Fatalf("read state: %v", err)
+	}
+	state.Children[0].TreeHash = strings.Repeat("0", 64)
+	if err := writeGAStateAtomic(repo.Path("results", "state", "ga-test.json"), state); err != nil {
+		t.Fatalf("write drifted state: %v", err)
+	}
+
+	var out strings.Builder
+	err = runMain([]string{
+		"ga-runner", "accept",
+		"-repo-root", repo.Root,
+		"-run-group-id", "ga-test",
+		"-child", "SIM-child",
+		"-result", repo.Rel(resultPath),
+		"-reviewer-note", "note",
+	}, &out, &out)
+	if err == nil || !strings.Contains(err.Error(), "tree hash drift") {
+		t.Fatalf("expected tree hash drift error, got %v", err)
+	}
+}
+
 func newTestRepo(t *testing.T) Repo {
 	t.Helper()
 	root := t.TempDir()
@@ -322,6 +471,64 @@ func runGit(t *testing.T, root string, args ...string) {
 	if err != nil {
 		t.Fatalf("git %v failed: %v\n%s", args, err, string(output))
 	}
+}
+
+func gitOutput(t *testing.T, repo Repo, args ...string) string {
+	t.Helper()
+	command := exec.Command("git", append([]string{"-C", repo.Root}, args...)...)
+	output, err := command.CombinedOutput()
+	if err != nil {
+		t.Fatalf("git %v failed: %v\n%s", args, err, string(output))
+	}
+	return string(output)
+}
+
+func writeAcceptFixture(t *testing.T, repo Repo, childID string, runGroupID string) string {
+	t.Helper()
+	childPath := filepath.ToSlash(filepath.Join("simulations", childID))
+	writeTestFile(t, repo.Path(childPath, "README.md"), "# Child\n")
+	writeTestFile(t, repo.Path(childPath, "QUESTION.md"), "# Question\n")
+	treeHash, err := currentSimulationTreeHash(repo, childPath)
+	if err != nil {
+		t.Fatalf("hash child tree: %v", err)
+	}
+	resultPath := repo.Path("results", childID, "scenario-one", "model-a", "20260519-101500.json")
+	result := validResult(repo, resultPath)
+	result.Source.SimPath = childPath + "/"
+	result.Source.SimulationTreeHash = treeHash
+	if err := writeFitnessResultAtomic(resultPath, result); err != nil {
+		t.Fatalf("write result: %v", err)
+	}
+	state := GAState{
+		Schema:     stateSchemaV1,
+		RunGroupID: runGroupID,
+		CreatedAt:  "2026-05-19T10:43:01Z",
+		UpdatedAt:  "2026-05-19T10:43:01Z",
+		RepoCommit: "abc123",
+		ModelID:    "model-a",
+		Children: []GAChild{
+			{
+				ChildID:  childID,
+				Path:     childPath + "/",
+				TreeHash: treeHash,
+				Status:   "scored",
+			},
+		},
+		Cells: []GACell{
+			{
+				CellID:     "cell-1",
+				SimID:      childID,
+				ScenarioID: "scenario-one",
+				ModelID:    "model-a",
+				ResultPath: repo.Rel(resultPath),
+				Status:     "done",
+			},
+		},
+	}
+	if err := writeGAStateAtomic(repo.Path("results", "state", runGroupID+".json"), state); err != nil {
+		t.Fatalf("write state: %v", err)
+	}
+	return resultPath
 }
 
 func parentIDs(parents []PopulationSim) []string {

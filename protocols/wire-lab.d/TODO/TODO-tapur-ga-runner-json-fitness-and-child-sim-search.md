@@ -153,6 +153,31 @@ Affects: `tools/ga-runner/`;
 `protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`;
 future scenario-tag TODO work.
 
+ID: DI-podot
+Date: 2026-05-19 10:43:01
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Implement `tools/ga-runner accept` as the v1 review/promotion
+checkpoint: it reads `promisegrid.ga.state.v1`, verifies selected child sim
+paths and selected JSON result evidence, records acceptance in the state file,
+and prints exact repo-relative paths for the normal explicit `git add` and
+commit workflow without staging or committing on its own.
+Intent: Accepted children should be promoted from the same materialized
+`simulations/SIM-*` trees that were scored, with selected JSON fitness results
+as evidence. The tool should make the review boundary explicit and auditable
+without turning existence on disk into acceptance and without bypassing the
+repo's normal commit discipline.
+Constraints: Reject missing or non-v1 state files, old Markdown canary results,
+unknown children, culled children, child paths outside `simulations/SIM-*`,
+child tree-hash drift, invalid JSON result files, and result evidence that does
+not belong to a selected child. If the v1 state includes cells, selected result
+paths must be present in those cells. `accept` may update only the selected
+state file and must not create results, child sims, commits, or staged index
+entries.
+Affects: `tools/ga-runner/`; `results/state/<run-group-id>.json`;
+`simulations/SIM-*`; `results/<sim>/<scenario>/<model>/<timestamp>.json`;
+`protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`.
+
 ## Scope
 
 - Define and implement a new GA/search runner without changing
@@ -336,9 +361,10 @@ status in the GA state file.
   choose a small parent set, generate a small child batch, score each child
   against a uniform scenario sample, and promote at most a small number of
   children per generation. Source: `DI-ramar`; `DI-zusit`.
-- [ ] tapur.8 Implement review and promotion: accepted children are staged from
+- [x] tapur.8 Implement review and promotion: accepted children are staged from
   their existing `simulations/SIM-*` paths and committed with selected JSON
-  result evidence; rejected children remain uncommitted. Source: `DI-ramar`.
+  result evidence; rejected children remain uncommitted. Source: `DI-ramar`;
+  `DI-podot`.
 - [ ] tapur.9 Implement culling: rejected child sim trees and matching
   `results/<child-sim-id>/` trees are deleted only through an explicit cull
   command that records the action in the GA state file. Source: `DI-ramar`.
