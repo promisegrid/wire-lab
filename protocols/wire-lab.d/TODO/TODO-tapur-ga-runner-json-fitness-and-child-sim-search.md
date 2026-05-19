@@ -178,6 +178,29 @@ Affects: `tools/ga-runner/`; `results/state/<run-group-id>.json`;
 `simulations/SIM-*`; `results/<sim>/<scenario>/<model>/<timestamp>.json`;
 `protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`.
 
+ID: DI-kofil
+Date: 2026-05-19 10:52:50
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Implement `tools/ga-runner cull` as the explicit rejection cleanup
+checkpoint: it reads `promisegrid.ga.state.v1`, verifies selected generated
+children from the active state, optionally reports a dry-run plan, deletes only
+the selected child sim trees and matching result trees, and records the cull
+action in the state file.
+Intent: Rejected child sims should not linger as ambiguous untracked candidates
+or contaminate later GA work. Culling must still be explicit and state-bound, so
+the tool cannot delete arbitrary `simulations/` or `results/` content and cannot
+remove accepted children.
+Constraints: Reject missing or non-v1 state files, unknown children, accepted
+children, already-culled children, child paths outside exact
+`simulations/<SIM-id>/`, and unsafe result paths. `cull -dry-run` must validate
+and print the deletion plan without deleting files or writing state. Normal
+culling may delete only `simulations/<SIM-id>/` and `results/<SIM-id>/` for
+selected children, then append a culling record and set child status to `culled`.
+Affects: `tools/ga-runner/`; `results/state/<run-group-id>.json`;
+`simulations/SIM-*`; `results/SIM-*`;
+`protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`.
+
 ## Scope
 
 - Define and implement a new GA/search runner without changing
@@ -365,9 +388,10 @@ status in the GA state file.
   their existing `simulations/SIM-*` paths and committed with selected JSON
   result evidence; rejected children remain uncommitted. Source: `DI-ramar`;
   `DI-podot`.
-- [ ] tapur.9 Implement culling: rejected child sim trees and matching
+- [x] tapur.9 Implement culling: rejected child sim trees and matching
   `results/<child-sim-id>/` trees are deleted only through an explicit cull
-  command that records the action in the GA state file. Source: `DI-ramar`.
+  command that records the action in the GA state file. Source: `DI-ramar`;
+  `DI-kofil`.
 - [ ] tapur.10 Update `results/RUN-PROTOCOL.md`, `results/README.md`, and tool
   docs so GA-runner JSON results, Markdown canary-result exclusion, child-sim
   generation, review, promotion, and culling are documented from the same

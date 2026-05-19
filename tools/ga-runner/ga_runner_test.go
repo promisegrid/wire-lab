@@ -432,6 +432,151 @@ func TestRunAcceptRejectsChildHashDrift(t *testing.T) {
 	}
 }
 
+func TestRunCullDeletesRejectedChildAndRecordsState(t *testing.T) {
+	repo := newTestRepo(t)
+	resultPath := writeAcceptFixture(t, repo, "SIM-child", "ga-test")
+	unrelatedPath := repo.Path("results", "SIM-other", "scenario-one", "model-a", "20260519-101500.json")
+	writeTestFile(t, unrelatedPath, "{}\n")
+
+	var out strings.Builder
+	err := runMain([]string{
+		"ga-runner", "cull",
+		"-repo-root", repo.Root,
+		"-run-group-id", "ga-test",
+		"-child", "SIM-child",
+		"-reason", "not good enough",
+	}, &out, &out)
+	if err != nil {
+		t.Fatalf("cull child: %v\n%s", err, out.String())
+	}
+	assertMissing(t, repo.Path("simulations", "SIM-child"))
+	assertMissing(t, filepath.Dir(filepath.Dir(filepath.Dir(resultPath))))
+	assertExists(t, unrelatedPath)
+
+	state, err := readGAState(repo.Path("results", "state", "ga-test.json"))
+	if err != nil {
+		t.Fatalf("read updated state: %v", err)
+	}
+	if state.Children[0].Status != "culled" {
+		t.Fatalf("expected child status culled, got %s", state.Children[0].Status)
+	}
+	if len(state.Culling) != 1 || state.Culling[0].Reason != "not good enough" {
+		t.Fatalf("expected culling record, got %#v", state.Culling)
+	}
+	text := out.String()
+	for _, want := range []string{"cull children=SIM-child", "simulations/SIM-child", "results/SIM-child"} {
+		if !strings.Contains(text, want) {
+			t.Fatalf("expected %q in cull output:\n%s", want, text)
+		}
+	}
+}
+
+func TestRunCullDryRunDeletesNothingAndWritesNoState(t *testing.T) {
+	repo := newTestRepo(t)
+	resultPath := writeAcceptFixture(t, repo, "SIM-child", "ga-test")
+
+	var out strings.Builder
+	err := runMain([]string{
+		"ga-runner", "cull",
+		"-repo-root", repo.Root,
+		"-run-group-id", "ga-test",
+		"-child", "SIM-child",
+		"-reason", "not good enough",
+		"-dry-run",
+	}, &out, &out)
+	if err != nil {
+		t.Fatalf("dry-run cull child: %v\n%s", err, out.String())
+	}
+	assertExists(t, repo.Path("simulations", "SIM-child"))
+	assertExists(t, resultPath)
+	state, err := readGAState(repo.Path("results", "state", "ga-test.json"))
+	if err != nil {
+		t.Fatalf("read state: %v", err)
+	}
+	if state.Children[0].Status == "culled" || len(state.Culling) != 0 {
+		t.Fatalf("dry-run must not write culling state: %#v", state)
+	}
+	if !strings.Contains(out.String(), "dry-run children=SIM-child") {
+		t.Fatalf("expected dry-run output, got:\n%s", out.String())
+	}
+}
+
+func TestRunCullRejectsUnknownChild(t *testing.T) {
+	repo := newTestRepo(t)
+	writeAcceptFixture(t, repo, "SIM-child", "ga-test")
+	var out strings.Builder
+	err := runMain([]string{
+		"ga-runner", "cull",
+		"-repo-root", repo.Root,
+		"-run-group-id", "ga-test",
+		"-child", "SIM-missing",
+		"-reason", "reject",
+	}, &out, &out)
+	if err == nil || !strings.Contains(err.Error(), "is not present in GA state") {
+		t.Fatalf("expected unknown child error, got %v", err)
+	}
+}
+
+func TestRunCullRejectsAcceptedChild(t *testing.T) {
+	repo := newTestRepo(t)
+	writeAcceptFixture(t, repo, "SIM-child", "ga-test")
+	state := mustReadGAState(t, repo, "ga-test")
+	state.Children[0].Status = "accepted"
+	writeTestState(t, repo, "ga-test", state)
+
+	var out strings.Builder
+	err := runMain([]string{
+		"ga-runner", "cull",
+		"-repo-root", repo.Root,
+		"-run-group-id", "ga-test",
+		"-child", "SIM-child",
+		"-reason", "reject",
+	}, &out, &out)
+	if err == nil || !strings.Contains(err.Error(), "is accepted and cannot be culled") {
+		t.Fatalf("expected accepted child error, got %v", err)
+	}
+}
+
+func TestRunCullRejectsAlreadyCulledChild(t *testing.T) {
+	repo := newTestRepo(t)
+	writeAcceptFixture(t, repo, "SIM-child", "ga-test")
+	state := mustReadGAState(t, repo, "ga-test")
+	state.Children[0].Status = "culled"
+	writeTestState(t, repo, "ga-test", state)
+
+	var out strings.Builder
+	err := runMain([]string{
+		"ga-runner", "cull",
+		"-repo-root", repo.Root,
+		"-run-group-id", "ga-test",
+		"-child", "SIM-child",
+		"-reason", "reject",
+	}, &out, &out)
+	if err == nil || !strings.Contains(err.Error(), "is already culled") {
+		t.Fatalf("expected already culled error, got %v", err)
+	}
+}
+
+func TestRunCullRejectsUnsafeChildPath(t *testing.T) {
+	repo := newTestRepo(t)
+	writeAcceptFixture(t, repo, "SIM-child", "ga-test")
+	state := mustReadGAState(t, repo, "ga-test")
+	state.Children[0].Path = "results/SIM-child/"
+	writeTestState(t, repo, "ga-test", state)
+
+	var out strings.Builder
+	err := runMain([]string{
+		"ga-runner", "cull",
+		"-repo-root", repo.Root,
+		"-run-group-id", "ga-test",
+		"-child", "SIM-child",
+		"-reason", "reject",
+	}, &out, &out)
+	if err == nil || !strings.Contains(err.Error(), "path must be simulations/SIM-child/") {
+		t.Fatalf("expected unsafe child path error, got %v", err)
+	}
+}
+
 func newTestRepo(t *testing.T) Repo {
 	t.Helper()
 	root := t.TempDir()
@@ -529,6 +674,36 @@ func writeAcceptFixture(t *testing.T, repo Repo, childID string, runGroupID stri
 		t.Fatalf("write state: %v", err)
 	}
 	return resultPath
+}
+
+func mustReadGAState(t *testing.T, repo Repo, runGroupID string) GAState {
+	t.Helper()
+	state, err := readGAState(repo.Path("results", "state", runGroupID+".json"))
+	if err != nil {
+		t.Fatalf("read state: %v", err)
+	}
+	return state
+}
+
+func writeTestState(t *testing.T, repo Repo, runGroupID string, state GAState) {
+	t.Helper()
+	if err := writeGAStateAtomic(repo.Path("results", "state", runGroupID+".json"), state); err != nil {
+		t.Fatalf("write state: %v", err)
+	}
+}
+
+func assertMissing(t *testing.T, path string) {
+	t.Helper()
+	if _, err := os.Stat(path); !os.IsNotExist(err) {
+		t.Fatalf("expected %s to be missing, stat err=%v", path, err)
+	}
+}
+
+func assertExists(t *testing.T, path string) {
+	t.Helper()
+	if _, err := os.Stat(path); err != nil {
+		t.Fatalf("expected %s to exist: %v", path, err)
+	}
 }
 
 func parentIDs(parents []PopulationSim) []string {

@@ -20,7 +20,7 @@ const usage = `Usage:
   ga-runner validate   Validate JSON fitness result files.
   ga-runner progress   Show GA run progress. (not implemented yet)
   ga-runner accept     Record accepted children and staging paths.
-  ga-runner cull       Delete rejected generated children and their results. (not implemented yet)
+  ga-runner cull       Delete rejected generated children and their results.
   ga-runner help       Print this message.
 
 Implemented commands accept -repo-root. When omitted, ga-runner walks up from the
@@ -52,7 +52,11 @@ func runMain(args []string, stdout io.Writer, stderr io.Writer) error {
 		// Intent: Route review/promotion through the acceptance checkpoint
 		// instead of the not-implemented stub. Source: DI-podot
 		return runAccept(subArgs, stdout)
-	case "score", "generate", "progress", "cull":
+	case "cull":
+		// Intent: Route destructive rejection cleanup through the state-bound cull
+		// checkpoint instead of the not-implemented stub. Source: DI-kofil
+		return runCull(subArgs, stdout)
+	case "score", "generate", "progress":
 		return notImplemented(subcommand)
 	case "help", "-h", "--help":
 		return writeText(stdout, usage)
