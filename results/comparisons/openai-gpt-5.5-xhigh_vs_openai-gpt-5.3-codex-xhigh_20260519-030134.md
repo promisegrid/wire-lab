@@ -69,4 +69,5 @@
 ## Notes
 
 - This report compares verdict lines from result artifacts; it does not execute protocol harness code.
+- Scripted prototype plumbing outputs are excluded unless the comparison tool is run with `--include-prototype`.
 - Paths and line numbers for each verdict are in the source result files under `results/<sim>/<scenario>/<model>/<timestamp>.md`.

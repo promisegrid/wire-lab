@@ -88,5 +88,21 @@ Guide handoff.
 
 ## Current State
 
-No root result runs should be committed until at least one root scenario entry
-exists and a real run has been performed.
+Root result runs may be committed only when produced by an LLM or human reasoner
+following `results/RUN-PROTOCOL.md`. Scripted prototype files are retained only
+as plumbing-test artifacts and are excluded from evidence comparisons by default.
+Source: `DI-moduf`.
+
+## Run Preflight
+
+Before kicking off a large matrix run:
+
+1. Follow `results/RUN-PROTOCOL.md`.
+2. Generate a deterministic manifest with
+   `results/tools/generate_matrix_manifest.py`.
+3. Generate canary LLM jobs with `results/tools/generate_llm_jobs.py`.
+4. Run canary jobs through an LLM evaluator.
+5. Validate canary output with `results/tools/validate_results.py`.
+6. Run the full manifest only after canary validation passes.
+
+See `results/tools/README.md` for exact command examples.

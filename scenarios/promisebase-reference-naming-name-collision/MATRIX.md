@@ -8,3 +8,4 @@ Source: `DI-faros`; `DI-vabor`; `DI-dimas`; `DI-nanih`.
 | Simulation | Scenario | Latest result run | Status | Notes |
 |---|---|---|---|---|
 | `SIM-ligan-promisebase-reference-naming` | `promisebase-reference-naming-name-collision` |  | not-run | Source simulation for the mined row. |
+| `SIM-fonol-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-mandatory-opaque-bytes` | `promisebase-reference-naming-name-collision` | `results/SIM-fonol-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-mandatory-opaque-bytes/promisebase-reference-naming-name-collision/openai-gpt-5.3-codex-xhigh/20260519-031017.md` | prototype | Scripted prototype plumbing output; excluded from result evidence by `DI-moduf`. Original heuristic note: strong fit. |

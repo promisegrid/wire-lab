@@ -117,6 +117,31 @@ Affects: `protocols/wire-lab.d/TODO/TODO-dadub-root-scenario-skeleton-and-seed-c
 `scenarios/`; `scenarios/README.md`; `simulations/README.md`;
 `DEV-GUIDE-RESOURCES.md`.
 
+ID: DI-moduf
+Date: 2026-05-18 20:15:39
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Matrix cell result files must be produced by LLM or human reasoning,
+not by mechanical document parsing or keyword heuristics. Scripts may generate
+manifests, LLM prompts, queues, and validation/comparison reports; scripted
+prototype outputs are plumbing tests only and are excluded from result
+validation and comparison by default.
+Intent: Root results are supposed to preserve deeper reasoning about how a
+simulation behaves under a scenario's 100-year, sparse-knowledge,
+no-central-authority, auditability, and migration pressures. Mechanical parsing
+can verify shape and prepare work, but treating parser-generated prose as
+evidence would create fake confidence and undermine the apples-to-apples
+simulation matrix.
+Constraints: Preserve any already-written prototype files for audit history
+rather than deleting them. Mark prototype matrix rows explicitly. Keep
+`results/<sim-id>/<scenario-id>/<model-id>/<YYYYMMDD-HHMMSS>.md` as the run
+artifact path from `DI-miror`, but require real result-producing modes to be
+`codex-manual-blind` or `llm-doc-eval-blind` unless Steve explicitly opts into
+prototype handling for tooling tests.
+Affects: `protocols/wire-lab.d/TODO/TODO-dadub-root-scenario-skeleton-and-seed-catalog.md`;
+`results/RUN-PROTOCOL.md`; `results/README.md`; `results/tools/`;
+`results/comparisons/`; `scenarios/*/MATRIX.md`.
+
 ## Scope
 
 - Define the root scenario-entry contract implied by `DI-faros`: a root scenario

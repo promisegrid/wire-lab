@@ -2,6 +2,9 @@
 """
 Compare verdict drift between two result-model corpora.
 
+Intent: Model comparisons must summarize real LLM/human result evidence and
+exclude scripted prototype plumbing outputs by default. Source: DI-moduf
+
 Usage:
   python3 results/comparisons/compare_model_results.py \
     --old-model openai-gpt-5.5-xhigh \
@@ -80,6 +83,11 @@ def parse_args() -> argparse.Namespace:
         default="",
         help="Optional output markdown path. Default: results/comparisons/<old>_vs_<new>_<timestamp>.md",
     )
+    parser.add_argument(
+        "--include-prototype",
+        action="store_true",
+        help="Include scripted prototype plumbing outputs in the comparison.",
+    )
     return parser.parse_args()
 
 
@@ -109,7 +117,21 @@ def extract_verdict(path: Path) -> Tuple[str, int]:
     raise RuntimeError(f"Missing verdict line in {path}")
 
 
-def iter_model_files(model: str) -> Iterable[Path]:
+def is_prototype_result(path: Path) -> bool:
+    """Return true for known scripted plumbing-test artifacts.
+
+    Intent: Latest-result selection must not accidentally prefer a preserved
+    prototype file over an older real reasoning result. Source: DI-moduf
+    """
+    text = path.read_text()
+    prototype_markers = [
+        "Run mode: `scripted-doc-eval-blind`",
+        "Runner/interface: `results/tools/run_matrix_batch.py`",
+    ]
+    return any(marker in text for marker in prototype_markers)
+
+
+def iter_model_files(model: str, include_prototype: bool) -> Iterable[Path]:
     for path in RESULTS_ROOT.rglob("*.md"):
         if path == RESULTS_ROOT / "README.md":
             continue
@@ -118,12 +140,14 @@ def iter_model_files(model: str) -> Iterable[Path]:
             continue
         # results/<sim>/<scenario>/<model>/<timestamp>.md
         if parts[2] == model:
+            if is_prototype_result(path) and not include_prototype:
+                continue
             yield path
 
 
-def index_model_cells(model: str) -> Dict[CellKey, Dict[str, Path]]:
+def index_model_cells(model: str, include_prototype: bool) -> Dict[CellKey, Dict[str, Path]]:
     index: Dict[CellKey, Dict[str, Path]] = defaultdict(dict)
-    for path in iter_model_files(model):
+    for path in iter_model_files(model, include_prototype):
         rel = path.relative_to(RESULTS_ROOT).parts
         sim, scenario, model_slug, filename = rel
         if model_slug != model:
@@ -258,6 +282,9 @@ def render_report(
         "- This report compares verdict lines from result artifacts; it does not execute protocol harness code."
     )
     lines.append(
+        "- Scripted prototype plumbing outputs are excluded unless the comparison tool is run with `--include-prototype`."
+    )
+    lines.append(
         "- Paths and line numbers for each verdict are in the source result files under `results/<sim>/<scenario>/<model>/<timestamp>.md`."
     )
     return "\n".join(lines) + "\n"
@@ -265,8 +292,8 @@ def render_report(
 
 def main() -> int:
     args = parse_args()
-    old_index = index_model_cells(args.old_model)
-    new_index = index_model_cells(args.new_model)
+    old_index = index_model_cells(args.old_model, args.include_prototype)
+    new_index = index_model_cells(args.new_model, args.include_prototype)
     shared_keys = sorted(set(old_index.keys()) & set(new_index.keys()), key=lambda k: (k.sim, k.scenario))
     if not shared_keys:
         raise RuntimeError("No shared (sim, scenario) cells between the two models.")
@@ -290,4 +317,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-
