@@ -44,7 +44,7 @@ minted after that date carry only the proquint handle.
 | [TODO-nasat](./TODO-nasat-cross-repo-build-hazard-capture.md) | 2026-05-17 | Cross-repo build hazard capture | — |
 | [TODO-kugod](./TODO-kugod-te-40-apparatus-vs-specimen-completion.md) | 2026-05-07 | TE-40 apparatus-vs-specimen completion + TE-famar closure **(closed: post-Mupoz harness-spec, grid-envelope, and transport-spec residuals resolved by DI-mugar)** | `TODO-25` / `TODO-20260507-002306` |
 | [TODO-rusis](./TODO-rusis-simulation-split-and-specimen-relocation.md) | 2026-05-10 | Simulation split and specimen relocation **(open: dissolve `SIM-piloh` into independent lineage sims; retire active `ppx-dr`; preserve every existing artifact by move, archive, rooted retention, or supersession)** | — |
-| [TODO-dadub](./TODO-dadub-root-scenario-skeleton-and-seed-catalog.md) | 2026-05-18 | Root scenario skeleton and seed catalog | — |
+| [TODO-dadub](./TODO-dadub-root-scenario-skeleton-and-seed-catalog.md) | 2026-05-18 | Root scenario skeleton and seed catalog **(closed: root scenario/result skeleton, mined rows, and application seeds complete under DI-dimas / DI-nanih / DI-midif)** | — |
 | [TODO-turog](./TODO-turog-te-41-group-session-freeze-procedure.md) | 2026-05-07 | TE-41 group-session freeze procedure **(closed: active successor work closed by DI-rurab / DI-bomud)** | `TODO-26` / `TODO-20260507-002306` |
 | [TODO-duvuk](./TODO-duvuk-te-42-filename-cid-cascade-policy.md) | 2026-05-07 | TE-42 filename / CID-cascade policy **(closed: active successor work closed by DI-rurab / DI-bomud)** | `TODO-27` / `TODO-20260507-002306` |
 | [TODO-kituj](./TODO-kituj-te-43-promisebase-prior-art-adoption.md) | 2026-05-07 | TE-43 promisebase prior-art adoption | `TODO-28` / `TODO-20260507-002306` |

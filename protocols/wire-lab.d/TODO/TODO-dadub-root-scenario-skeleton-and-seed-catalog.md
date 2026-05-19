@@ -6,11 +6,11 @@ None. This TODO was minted after the proquint-handle migration.
 
 ## Status
 
-Open. Owns the first root `scenarios/` design/population pass and the first
-root `results/` documentation pass after TE-dojab locked the comparison
-apparatus shape. This TODO does not create root `scenarios/` or `results/`
-content by itself; it defines the work that the next implementation pass should
-execute. Source: `DI-faros`; `DI-miror`; `DI-vabor`.
+Closed. The first root `scenarios/` design/population pass and the first root
+`results/` documentation pass are complete: root templates exist, existing
+simulation-local scenario rows have been mined, and seed application entries
+have been created. Source: `DI-faros`; `DI-miror`; `DI-vabor`; `DI-dimas`;
+`DI-botup`; `DI-nanih`; `DI-midif`.
 
 ## Decision Intent Log
 
@@ -96,6 +96,27 @@ run files. Do not populate application seed entries in this pass.
 Affects: `protocols/wire-lab.d/TODO/TODO-dadub-root-scenario-skeleton-and-seed-catalog.md`;
 `scenarios/`.
 
+ID: DI-midif
+Date: 2026-05-18 19:22:41
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Execute the seed application pass by creating one root
+`scenarios/<entry-id>/` entry for every application listed in the seed
+application catalog, with README, MATRIX, and scenario markdown files for each
+entry.
+Intent: The root comparison apparatus needs application pressure, not just
+protocol-internal or simulation-local pressure. Lightweight application seeds
+let candidate simulations be compared against real-world domains early while
+keeping result evidence separate until actual model runs exist.
+Constraints: Preserve one directory per catalog entry. Keep entries lightweight
+but include application pressure, actors, expected PromiseGrid stress points,
+the `DI-botup` overarching goal checks, and the evidence-only authority
+boundary. Keep every matrix in `not-run` state until a real run exists. Do not
+create fake result run files.
+Affects: `protocols/wire-lab.d/TODO/TODO-dadub-root-scenario-skeleton-and-seed-catalog.md`;
+`scenarios/`; `scenarios/README.md`; `simulations/README.md`;
+`DEV-GUIDE-RESOURCES.md`.
+
 ## Scope
 
 - Define the root scenario-entry contract implied by `DI-faros`: a root scenario
@@ -119,9 +140,10 @@ Affects: `protocols/wire-lab.d/TODO/TODO-dadub-root-scenario-skeleton-and-seed-c
 - [x] dadub.2 Create `scenarios/README.md` explaining that root scenarios are
   shared comparison apparatus governed by `DI-faros`, not shared protocol
   components or PromiseGrid deployment layout. Done under `DI-dimas`.
-- [ ] dadub.3 Create one root scenario entry for every application listed in the
+- [x] dadub.3 Create one root scenario entry for every application listed in the
   seed application catalog below, using one `scenarios/<entry-id>/` directory per
-  application rather than broad application-family grouping.
+  application rather than broad application-family grouping. Done for 52
+  application entries under `DI-midif`.
 - [x] dadub.4 Mine every row from every existing simulation-local `SCENARIOS.md`
   source listed below and create one transformed root scenario entry per row.
   Done for 95 rows under `DI-nanih`.
@@ -141,9 +163,10 @@ Affects: `protocols/wire-lab.d/TODO/TODO-dadub-root-scenario-skeleton-and-seed-c
 - [x] dadub.9 Validate that every root scenario entry preserves provenance,
   avoids direct design authority claims, has a stable kebab-case entry ID, and
   addresses the overarching PromiseGrid goal checks from `DI-botup`. Done for
-  mined entries under `DI-nanih`.
+  mined entries under `DI-nanih` and application seed entries under `DI-midif`.
 - [x] dadub.10 Run stale-layout checks for old one-file-per-cell result paths and
-  run `git diff --check`. Done for the mined-entry pass under `DI-nanih`.
+  run `git diff --check`. Done for the scenario population passes under
+  `DI-nanih` and `DI-midif`.
 
 ## Candidate scenario entries
 
@@ -237,9 +260,9 @@ authority boundary.
 - BGP should appear twice in the broader scenario work: once as the existing
   `SIM-punaz-bgp-class-routing-app` source to mine, and once as a root
   `scenarios/bgp-routing/` application entry.
-- Application entries should be lightweight at first. The goal is to make the
-  pressure visible and comparable, not to fully model each industry in the first
-  pass.
+- Application entries are intentionally lightweight in the first pass. The goal
+  is to make the pressure visible and comparable, not to fully model each
+  industry before the first runs.
 - Mined sim-local rows should keep their original source path and row title so
   future agents can audit whether the transformation preserved intent.
 - Root result files should not be invented as examples. Until a real run occurs,

@@ -144,6 +144,8 @@ This matrix summarizes evidence. It does not declare a winning design by itself.
 
 ## Population Plan
 
-`TODO-dadub` owns the population plan. The first mining pass created one root
-entry per existing sim-local scenario row under `DI-nanih`. The remaining
-population work is to create one root entry per application seed.
+`TODO-dadub` owns the initial population plan. The first mining pass created
+one root entry per existing sim-local scenario row under `DI-nanih`, and the
+first application-seed pass created one root entry per seed application under
+`DI-midif`. Future entries should follow the same templates unless a later DI
+changes the root scenario contract.
