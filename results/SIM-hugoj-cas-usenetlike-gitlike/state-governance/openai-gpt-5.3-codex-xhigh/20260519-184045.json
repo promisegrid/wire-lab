@@ -1,0 +1,110 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-hugoj-cas-usenetlike-gitlike-state-governance-openai-gpt-5.3-codex-xhigh-20260519-184045",
+  "run_group_id": "ga-canary-20260519-184045",
+  "cell_id": "ga-canary-20260519-184045-000002-SIM-hugoj-cas-usenetlike-gitlike--state-governance--openai-gpt-5.3-codex-xhigh",
+  "sim_id": "SIM-hugoj-cas-usenetlike-gitlike",
+  "scenario_id": "state-governance",
+  "model_id": "openai-gpt-5.3-codex-xhigh",
+  "timestamp_utc": "20260519-184045",
+  "result_path": "results/SIM-hugoj-cas-usenetlike-gitlike/state-governance/openai-gpt-5.3-codex-xhigh/20260519-184045.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.3-codex",
+    "reasoning_effort": "xhigh",
+    "request_id": "req_07dfcaaf3964481bbe5279662f3eab48",
+    "response_id": "resp_03fdeb0405c8ad36006a0caeeed2048196a6d70e0db36ac8c3",
+    "input_tokens": 5532,
+    "output_tokens": 2564,
+    "cost_usd": 0.045577
+  },
+  "source": {
+    "repo_commit": "7bb49538eb21cbdb7b220a3f7bd9ef5130fd13c8",
+    "sim_path": "simulations/SIM-hugoj-cas-usenetlike-gitlike/",
+    "scenario_path": "scenarios/state-governance/state-governance.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "29b6c7f12fed7f0d7297c96102d3645cedca69109008bbed069c79b8fd6c493d"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-hugoj-cas-usenetlike-gitlike/README.md",
+        "sha256": "0506d32e30f1fe4903d1c0c1f2e6a7f25a3c3a438d6cfa0782d3e99c9448bdb8"
+      },
+      {
+        "path": "scenarios/state-governance/state-governance.md",
+        "sha256": "6cbfa949fc3eed42fd81bb6820d73ec96ac9c71669b3117d6e46673ddba38360"
+      }
+    ],
+    "simulation_tree_hash": "144951c8a39cbb610ac9d305fe823308c60e01e271c2f3b222a32276d4a196ef"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 4,
+    "auditability": 4,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 2,
+    "implementation_plausibility": 3,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 25,
+    "normalized_0_100": 62.5,
+    "confidence_0_1": 0.69
+  },
+  "assessment": {
+    "rationale": "The simulation is a credible PromiseGrid-aligned substrate exploration (CAS identity, hash chaining, transport separation, sparse replication) and is reasonably strong on durability/audit/evolution concerns, but it is not yet a strong direct fit for state-governance pressure because cross-agency authority semantics, contested-state adjudication, and domain-specific promise accounting are still under-specified.",
+    "strengths": [
+      "Content-addressed and hash-linked lineage supports long-lived, inspectable evidence trails.",
+      "Clear separation of protocol meaning from transport improves migration and long-horizon evolution safety.",
+      "Explicitly marks analogy limits (Usenet/git precedent vs. protocol identity), reducing overclaim risk."
+    ],
+    "weaknesses": [
+      "Limited direct modeling of state-governance workflows (benefits, licensing, legislative records, regional authority boundaries).",
+      "Identity, naming, delegation, and revocation mechanics for multi-agency authority are not concretely specified.",
+      "Disputed/stale/partitioned record handling is acknowledged but lacks explicit local decision procedures for Alice/Bob/Carol.",
+      "No concrete application-level promise-accounting examples for contested routine events in this domain."
+    ],
+    "risks": [
+      "Analogy lock-in may bias design toward message transport patterns while under-addressing statutory governance constraints.",
+      "Underspecified governance and moderation semantics can cause inconsistent inter-agency acceptance outcomes.",
+      "Adversaries can exploit stale or ambiguous evidence if local downgrade/escalation rules are not formalized."
+    ],
+    "open_questions": [
+      "How are agency and regional authority claims represented, delegated, and rotated over multi-decade key/org churn without central authority?",
+      "What peer-local acceptance/retry/downgrade/escalation policy should apply when required records are delayed or disputed?",
+      "How are corrections, supersession, and legally mandated amendments expressed over immutable CAS history while preserving auditability?",
+      "Which minimal promise-accounting records must each peer retain to justify decisions under sparse knowledge?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

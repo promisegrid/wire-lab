@@ -60,6 +60,12 @@ usage in queue state, prints actual accumulated cost, and can stop before a
 cell whose preflight estimate would exceed the configured budget. Source:
 `DI-nugiv`.
 
+GA/search provider calls must also send an explicit service tier. The default is
+Flex for lower-cost unattended work, `default` must be requested explicitly when
+standard processing is desired, and Priority is rejected. Flex `429` and timeout
+failures use bounded exponential backoff rather than silently falling back to a
+higher-cost tier. Source: `DI-mopob`.
+
 Allowed result-producing run modes:
 
 - `codex-manual-blind`
@@ -172,9 +178,9 @@ Use `tools/ga-runner` for JSON-fitness GA/search work. Implemented commands are:
 - Create state for one GA/search generation:
   `cd tools/ga-runner && go run . init -repo-root ../.. -model <model-id> -run-group-id <run-group-id>`
 - Score parent or child cells with provider-backed reasoning:
-  `cd tools/ga-runner && go run . score -repo-root ../.. -run-group-id <run-group-id> -target parents -api-model <provider-model> -reasoning-effort <effort> -max-run-cost-usd <budget>`
+  `cd tools/ga-runner && go run . score -repo-root ../.. -run-group-id <run-group-id> -target parents -api-model <provider-model> -reasoning-effort <effort> -service-tier flex -max-run-cost-usd <budget>`
 - Generate untracked child simulation trees from the active state:
-  `cd tools/ga-runner && go run . generate -repo-root ../.. -run-group-id <run-group-id> -api-model <provider-model> -reasoning-effort <effort> -max-run-cost-usd <budget>`
+  `cd tools/ga-runner && go run . generate -repo-root ../.. -run-group-id <run-group-id> -api-model <provider-model> -reasoning-effort <effort> -service-tier flex -max-run-cost-usd <budget>`
 - Record reviewed promotion candidates without staging or committing:
   `cd tools/ga-runner && go run . accept -repo-root ../.. -run-group-id <run-group-id> -child <SIM-id> -result <json-result-path> -reviewer-note '<note>'`
 - Cull rejected generated children and matching result trees through state:

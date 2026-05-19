@@ -21,18 +21,20 @@ go run . init -repo-root ../.. \
   -model openai-gpt-5.3-codex-xhigh \
   -run-group-id <run-group-id>
 
-go run . score -repo-root ../.. \
-  -run-group-id <run-group-id> \
-  -target parents \
-  -api-model gpt-5.3-codex \
-  -reasoning-effort xhigh \
-  -max-run-cost-usd <budget>
+  go run . score -repo-root ../.. \
+    -run-group-id <run-group-id> \
+    -target parents \
+    -api-model gpt-5.3-codex \
+    -reasoning-effort xhigh \
+    -service-tier flex \
+    -max-run-cost-usd <budget>
 
-go run . generate -repo-root ../.. \
-  -run-group-id <run-group-id> \
-  -api-model gpt-5.3-codex \
-  -reasoning-effort xhigh \
-  -max-run-cost-usd <budget>
+  go run . generate -repo-root ../.. \
+    -run-group-id <run-group-id> \
+    -api-model gpt-5.3-codex \
+    -reasoning-effort xhigh \
+    -service-tier flex \
+    -max-run-cost-usd <budget>
 
 go run . accept -repo-root ../.. \
   -run-group-id <run-group-id> \
@@ -60,6 +62,13 @@ state-selected generated child sim trees and matching result trees; use
 `-dry-run` to print the deletion plan without changing files. Source:
 `DI-pobus`; `DI-bagih`; `DI-zusit`; `DI-podot`; `DI-kofil`; `DI-ruzaj`;
 `DI-gijom`.
+
+Provider-backed `score` and `generate` always send an explicit service tier.
+The default is `-service-tier flex`; `-service-tier default` is available when
+standard processing is intentionally worth the cost, and `priority` is rejected.
+Flex `429` resource-unavailable responses and request timeouts retry with
+bounded exponential backoff before the cell is checkpointed as failed. Source:
+`DI-mopob`.
 
 ## Planned Commands
 

@@ -18,6 +18,7 @@ type scoreOptions struct {
 	ProviderName     string
 	APIModel         string
 	ReasoningEffort  string
+	ServiceTier      string
 	APIKeyEnv        string
 	OpenAIBaseURL    string
 	MaxOutputTokens  int
@@ -62,6 +63,9 @@ func parseScoreOptions(args []string) (scoreOptions, error) {
 	providerName := fs.String("provider", "openai", "provider name; v1 supports openai")
 	apiModel := fs.String("api-model", "", "provider API model name")
 	reasoningEffort := fs.String("reasoning-effort", "xhigh", "provider reasoning effort")
+	// Intent: Default scoring calls to Flex and reject Priority so unattended
+	// scoring cannot inherit expensive processing. Source: DI-mopob
+	serviceTier := fs.String("service-tier", defaultServiceTier, "provider service tier: flex or default; priority is rejected")
 	apiKeyEnv := fs.String("api-key-env", "OPENAI_API_KEY", "environment variable holding provider API key")
 	openAIBaseURL := fs.String("openai-base-url", "", "optional OpenAI Responses API URL override")
 	maxOutputTokens := fs.Int("max-output-tokens", 4000, "maximum provider output tokens")
@@ -86,6 +90,10 @@ func parseScoreOptions(args []string) (scoreOptions, error) {
 	if *target != "parents" && *target != "children" && *target != "all" {
 		return scoreOptions{}, errUsage("score: -target must be parents, children, or all")
 	}
+	normalizedServiceTier, err := normalizeServiceTier(*serviceTier)
+	if err != nil {
+		return scoreOptions{}, errUsage("score: " + err.Error())
+	}
 	return scoreOptions{
 		RepoRoot:         *repoRoot,
 		RunGroupID:       *runGroupID,
@@ -93,6 +101,7 @@ func parseScoreOptions(args []string) (scoreOptions, error) {
 		ProviderName:     *providerName,
 		APIModel:         *apiModel,
 		ReasoningEffort:  *reasoningEffort,
+		ServiceTier:      normalizedServiceTier,
 		APIKeyEnv:        *apiKeyEnv,
 		OpenAIBaseURL:    *openAIBaseURL,
 		MaxOutputTokens:  *maxOutputTokens,
@@ -109,6 +118,11 @@ func parseScoreOptions(args []string) (scoreOptions, error) {
 }
 
 func runScoreWithProvider(ctx context.Context, repo Repo, provider Provider, options scoreOptions, stdout io.Writer) error {
+	serviceTier, err := normalizeServiceTier(options.ServiceTier)
+	if err != nil {
+		return err
+	}
+	options.ServiceTier = serviceTier
 	stateFile, err := statePath(repo, options.RunGroupID)
 	if err != nil {
 		return err
@@ -254,6 +268,7 @@ func scoreOneCell(ctx context.Context, repo Repo, provider Provider, state *GASt
 	cell.Provider = options.ProviderName
 	cell.APIModel = options.APIModel
 	cell.ReasoningEffort = options.ReasoningEffort
+	cell.ServiceTier = options.ServiceTier
 	markGACell(cell, "running", "provider call started")
 	state.UpdatedAt = time.Now().UTC().Format(time.RFC3339)
 	if err := writeGAStateAtomic(stateFile, *state); err != nil {
@@ -264,6 +279,7 @@ func scoreOneCell(ctx context.Context, repo Repo, provider Provider, state *GASt
 		Provider:        options.ProviderName,
 		APIModel:        options.APIModel,
 		ReasoningEffort: options.ReasoningEffort,
+		ServiceTier:     options.ServiceTier,
 		MaxOutputTokens: options.MaxOutputTokens,
 		Instructions:    "Return only valid JSON for the requested GA score payload. Do not include code fences or commentary.",
 		Prompt:          prompt,
@@ -274,6 +290,7 @@ func scoreOneCell(ctx context.Context, repo Repo, provider Provider, state *GASt
 	}
 	cell.RequestID = response.RequestID
 	cell.ResponseID = response.ResponseID
+	cell.ServedServiceTier = response.ServiceTier
 	cell.UsageJSON = response.UsageJSON
 	// Intent: Record measured provider usage in the state and result so resumed
 	// runs and cost reviews use actual token counts when the provider returns
@@ -386,6 +403,8 @@ func buildFitnessResult(repo Repo, state GAState, cell GACell, scenario Scenario
 			Provider:          cell.Provider,
 			APIModel:          cell.APIModel,
 			ReasoningEffort:   cell.ReasoningEffort,
+			ServiceTier:       cell.ServiceTier,
+			ServedServiceTier: cell.ServedServiceTier,
 			RequestID:         cell.RequestID,
 			ResponseID:        cell.ResponseID,
 			InputTokens:       cell.InputTokens,

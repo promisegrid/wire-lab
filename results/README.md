@@ -113,6 +113,11 @@ state-bound, records accepted children without staging or committing them, and
 explicitly culls rejected children. Source: `DI-ramar`; `DI-zanon`;
 `DI-podot`; `DI-kofil`; `DI-ruzaj`; `DI-gijom`.
 
+GA/search provider calls default to explicit Flex processing with bounded
+retry/backoff for Flex `429` and timeout failures, and they reject Priority
+processing so unattended runs cannot inherit premium service-tier costs. Source:
+`DI-mopob`.
+
 `tools/matrix-runner` and the preserved Python scripts remain useful for legacy
 Markdown matrix canaries and historical comparisons. They are not the GA/search
 contract for JSON fitness evidence. Source: `DI-lulom`; `DI-ruzaj`.
@@ -143,8 +148,8 @@ Before a GA/search run:
 2. Use `tools/ga-runner init -dry-run` to preview the tracked population and
    conservative scenario/child plan.
 3. Use non-dry-run `tools/ga-runner init` to create the checkpoint state, then
-   run `tools/ga-runner score` and `tools/ga-runner generate` with explicit
-   provider model, reasoning effort, and cost-budget flags.
+    run `tools/ga-runner score` and `tools/ga-runner generate` with explicit
+    provider model, reasoning effort, service tier, and cost-budget flags.
 4. Keep generated child sims uncommitted until `tools/ga-runner accept` records
    reviewed promotion evidence.
 5. Use `tools/ga-runner cull` to delete rejected child sims and matching result

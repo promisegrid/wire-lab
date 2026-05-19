@@ -20,6 +20,7 @@ type generateOptions struct {
 	ProviderName     string
 	APIModel         string
 	ReasoningEffort  string
+	ServiceTier      string
 	APIKeyEnv        string
 	OpenAIBaseURL    string
 	MaxOutputTokens  int
@@ -67,6 +68,9 @@ func parseGenerateOptions(args []string) (generateOptions, error) {
 	providerName := fs.String("provider", "openai", "provider name; v1 supports openai")
 	apiModel := fs.String("api-model", "", "provider API model name")
 	reasoningEffort := fs.String("reasoning-effort", "xhigh", "provider reasoning effort")
+	// Intent: Default child generation to Flex and reject Priority so unattended
+	// generation cannot inherit expensive processing. Source: DI-mopob
+	serviceTier := fs.String("service-tier", defaultServiceTier, "provider service tier: flex or default; priority is rejected")
 	apiKeyEnv := fs.String("api-key-env", "OPENAI_API_KEY", "environment variable holding provider API key")
 	openAIBaseURL := fs.String("openai-base-url", "", "optional OpenAI Responses API URL override")
 	maxOutputTokens := fs.Int("max-output-tokens", 6000, "maximum provider output tokens")
@@ -89,6 +93,10 @@ func parseGenerateOptions(args []string) (generateOptions, error) {
 	if *apiModel == "" && !*dryRun {
 		return generateOptions{}, errUsage("generate: -api-model is required for non-dry runs")
 	}
+	normalizedServiceTier, err := normalizeServiceTier(*serviceTier)
+	if err != nil {
+		return generateOptions{}, errUsage("generate: " + err.Error())
+	}
 	return generateOptions{
 		RepoRoot:         *repoRoot,
 		RunGroupID:       *runGroupID,
@@ -96,6 +104,7 @@ func parseGenerateOptions(args []string) (generateOptions, error) {
 		ProviderName:     *providerName,
 		APIModel:         *apiModel,
 		ReasoningEffort:  *reasoningEffort,
+		ServiceTier:      normalizedServiceTier,
 		APIKeyEnv:        *apiKeyEnv,
 		OpenAIBaseURL:    *openAIBaseURL,
 		MaxOutputTokens:  *maxOutputTokens,
@@ -111,6 +120,11 @@ func parseGenerateOptions(args []string) (generateOptions, error) {
 }
 
 func runGenerateWithProvider(ctx context.Context, repo Repo, provider Provider, options generateOptions, stdout io.Writer) error {
+	serviceTier, err := normalizeServiceTier(options.ServiceTier)
+	if err != nil {
+		return err
+	}
+	options.ServiceTier = serviceTier
 	stateFile, err := statePath(repo, options.RunGroupID)
 	if err != nil {
 		return err
@@ -232,6 +246,7 @@ func generateOneChild(ctx context.Context, repo Repo, provider Provider, state *
 	child.Provider = options.ProviderName
 	child.APIModel = options.APIModel
 	child.ReasoningEffort = options.ReasoningEffort
+	child.ServiceTier = options.ServiceTier
 	markGAChild(child, "running", "provider call started")
 	state.UpdatedAt = time.Now().UTC().Format(time.RFC3339)
 	if err := writeGAStateAtomic(stateFile, *state); err != nil {
@@ -242,6 +257,7 @@ func generateOneChild(ctx context.Context, repo Repo, provider Provider, state *
 		Provider:        options.ProviderName,
 		APIModel:        options.APIModel,
 		ReasoningEffort: options.ReasoningEffort,
+		ServiceTier:     options.ServiceTier,
 		MaxOutputTokens: options.MaxOutputTokens,
 		Instructions:    "Return only valid JSON for the requested GA child file bundle. Do not include code fences or commentary.",
 		Prompt:          prompt,
@@ -252,6 +268,7 @@ func generateOneChild(ctx context.Context, repo Repo, provider Provider, state *
 	}
 	child.RequestID = response.RequestID
 	child.ResponseID = response.ResponseID
+	child.ServedServiceTier = response.ServiceTier
 	child.UsageJSON = response.UsageJSON
 	// Intent: Preserve actual usage from the generation provider so the state
 	// file remains the restart and cost-review checkpoint for the GA run.

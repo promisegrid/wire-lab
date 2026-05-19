@@ -264,6 +264,56 @@ generated untracked `simulations/SIM-*` child trees;
 `protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`;
 `results/RUN-PROTOCOL.md`; `tools/ga-runner/README.md`.
 
+ID: DI-simag
+Date: 2026-05-19 11:38:51
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Add a terminal wrapper script for the first GA canary shape. The
+wrapper runs state init, parent scoring, child generation, child scoring, and
+result validation with the locked 3-parent, 3-scenario, 2-child canary defaults,
+while streaming progress to stdout and teeing the full transcript to a
+pasteable `/tmp/wire-lab-ga-canary-*.log` file.
+Intent: The first provider-backed canary can take several minutes and may fail
+mid-run due to provider output limits or validation errors. A wrapper gives
+Steve a repeatable terminal command, visible progress from the checkpoint state,
+and a single `/tmp` log filename that can be pasted back for review.
+Constraints: Do not hide `ga-runner` failures; stop on the first failing phase
+and print the state summary plus log path. Default to `gpt-5.3-codex`,
+`xhigh`, run budget `$5.00`, cell estimate `$0.75`, child estimate `$1.00`,
+shuffle seed `20260519`, and uncommitted canary artifacts. The wrapper may warn
+about an already-dirty worktree but must not clean, stage, commit, accept, or
+cull artifacts.
+Affects: `tools/ga-runner/run-canary.sh`;
+`results/state/ga-canary-*.json`; `results/jobs/ga-canary-*/`;
+`results/<sim>/<scenario>/openai-gpt-5.3-codex-xhigh/<timestamp>.json`;
+generated untracked `simulations/SIM-*-ga-child-*`;
+`/tmp/wire-lab-ga-canary-*.log`;
+`protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`.
+
+ID: DI-mopob
+Date: 2026-05-19 20:34:30
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Add an explicit `service-tier` control to provider-backed GA runner
+commands and to the canary wrapper. `score` and `generate` default to
+`-service-tier flex`; `default` is allowed only when requested explicitly;
+`priority` and inherited `auto` behavior are rejected. Flex `429` and timeout
+failures retry with bounded exponential backoff for at most five attempts within
+a fifteen-minute retry window, with no automatic fallback to `default`.
+Intent: Unattended GA/canary runs are cost-sensitive background workloads. They
+must not accidentally inherit Priority or another expensive project/client
+default, and Flex capacity failures should be handled as retryable transient
+conditions rather than forcing Steve to babysit each cell.
+Constraints: V1 support remains OpenAI-compatible Responses API only. The public
+flag/env names are `-service-tier` and `GA_CANARY_SERVICE_TIER`. State/result
+metadata names are `service_tier` for the requested tier and
+`served_service_tier` for the provider-reported tier. Retry policy is bounded
+Flex-only retry; switching to standard processing requires an explicit
+operator-supplied `-service-tier default`.
+Affects: `tools/ga-runner/`; `tools/ga-runner/run-canary.sh`;
+`results/RUN-PROTOCOL.md`; `results/README.md`;
+`protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`.
+
 ## Scope
 
 - Define and implement a new GA/search runner without changing
@@ -294,7 +344,8 @@ Required top-level fields:
 - `cell_id`: state-file cell identifier for this sim/scenario/model/timestamp.
 - `sim_id`, `scenario_id`, `model_id`, `timestamp_utc`, and `result_path`.
 - `runner`: object containing `tool`, `provider`, `api_model`,
-  `reasoning_effort`, `request_id`, `response_id`, and token/cost fields when
+  `reasoning_effort`, requested `service_tier`, provider-reported
+  `served_service_tier`, `request_id`, `response_id`, and token/cost fields when
   available.
 - `source`: object containing repo commit, sim path, scenario path,
   root contract paths, per-file `sha256` entries, and a simulation tree hash.
@@ -328,9 +379,11 @@ Required top-level fields:
   source paths/hashes.
 - `parents`: selected parent sim IDs and selection rationale.
 - `children`: generated child sim IDs, paths under `simulations/SIM-*`, parent
-  IDs, generation prompt hash, design-delta summary, tree hash, and status.
+  IDs, generation prompt hash, design-delta summary, service-tier metadata, tree
+  hash, and status.
 - `cells`: scoring cells with cell ID, sim ID, scenario ID, expected JSON result
-  path, status, attempts, usage/cost fields, and validation message.
+  path, status, attempts, service-tier metadata, usage/cost fields, and
+  validation message.
 - `acceptance`: accepted child IDs, selected result paths, reviewer note, and
   acceptance timestamp.
 - `culling`: culled child IDs, deleted sim paths, deleted result paths, cull
@@ -349,10 +402,13 @@ The v1 CLI commands are:
   initialize parent-selection state.
 - `score`: evaluate manifest cells with one model, write JSON result files under
   `results/<sim>/<scenario>/<model>/<timestamp>.json`, validate each result, and
-  checkpoint state after every cell.
+  checkpoint state after every cell. Provider-backed scoring sends explicit
+  `-service-tier flex` by default; `default` requires explicit operator choice,
+  and `priority` is rejected.
 - `generate`: use selected parent sims and scenario pressure to write normal
   untracked child sim trees directly under `simulations/SIM-<handle>-<slug>/`,
-  then record their paths and tree hashes in state.
+  then record their paths and tree hashes in state. Provider-backed child
+  generation uses the same explicit service-tier policy as scoring.
 - `validate`: validate GA state, child sim tree shape, JSON result path shape,
   schema fields, source hashes, and score ranges; ignore all `results/**/*.md`
   files.
@@ -469,6 +525,12 @@ status in the GA state file.
 - [x] tapur.12 Implement stateful non-dry-run `init`, provider-backed `score`,
   and provider-backed `generate` for the GA/search loop. Source: `DI-ramar`;
   `DI-zanon`; `DI-zohal`; `DI-gijom`.
+- [x] tapur.13 Add a terminal canary wrapper that streams state progress to
+  stdout and writes a pasteable `/tmp` transcript for review. Source:
+  `DI-gijom`; `DI-simag`.
+- [x] tapur.14 Add explicit service-tier controls and bounded Flex retry handling
+  so GA/canary runs default to `flex`, reject `priority`, and never inherit an
+  expensive tier by accident. Source: `DI-mopob`.
 
 ## Predecessor context
 

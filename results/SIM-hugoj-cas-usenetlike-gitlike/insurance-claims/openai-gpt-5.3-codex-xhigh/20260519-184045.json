@@ -1,0 +1,112 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-hugoj-cas-usenetlike-gitlike-insurance-claims-openai-gpt-5.3-codex-xhigh-20260519-184045",
+  "run_group_id": "ga-canary-20260519-184045",
+  "cell_id": "ga-canary-20260519-184045-000001-SIM-hugoj-cas-usenetlike-gitlike--insurance-claims--openai-gpt-5.3-codex-xhigh",
+  "sim_id": "SIM-hugoj-cas-usenetlike-gitlike",
+  "scenario_id": "insurance-claims",
+  "model_id": "openai-gpt-5.3-codex-xhigh",
+  "timestamp_utc": "20260519-184045",
+  "result_path": "results/SIM-hugoj-cas-usenetlike-gitlike/insurance-claims/openai-gpt-5.3-codex-xhigh/20260519-184045.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.3-codex",
+    "reasoning_effort": "xhigh",
+    "request_id": "req_e776cbed8ae74fcc969c96d0eadfb1d6",
+    "response_id": "resp_09331e2cb30ea2df006a0caebdadc08192af71e2521bdc177c",
+    "input_tokens": 5526,
+    "output_tokens": 2770,
+    "cost_usd": 0.0484505
+  },
+  "source": {
+    "repo_commit": "7bb49538eb21cbdb7b220a3f7bd9ef5130fd13c8",
+    "sim_path": "simulations/SIM-hugoj-cas-usenetlike-gitlike/",
+    "scenario_path": "scenarios/insurance-claims/insurance-claims.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "29b6c7f12fed7f0d7297c96102d3645cedca69109008bbed069c79b8fd6c493d"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-hugoj-cas-usenetlike-gitlike/README.md",
+        "sha256": "0506d32e30f1fe4903d1c0c1f2e6a7f25a3c3a438d6cfa0782d3e99c9448bdb8"
+      },
+      {
+        "path": "scenarios/insurance-claims/insurance-claims.md",
+        "sha256": "2a9fe6a4c9a84a35f032d93ae9c36d2adec30a8175f821a34cf8592c73810ab1"
+      }
+    ],
+    "simulation_tree_hash": "144951c8a39cbb610ac9d305fe823308c60e01e271c2f3b222a32276d4a196ef"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 3,
+    "auditability": 4,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 2,
+    "implementation_plausibility": 3,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 23,
+    "normalized_0_100": 57.5,
+    "confidence_0_1": 0.71
+  },
+  "assessment": {
+    "rationale": "The simulation offers strong CAS/audit lineage and protocol/substrate separation that help with contested, delayed evidence under sparse knowledge, but it remains a generic exploratory messaging lineage without insurance-specific authority, fraud, payment, or appeal mechanics. Fit to insurance-claims pressure is therefore partial, with moderate delivery and governance risk.",
+    "strengths": [
+      "Content-addressed, hash-linked objects support tamper-evident claim evidence trails.",
+      "Store-and-forward replication across heterogeneous transports matches partition/staleness pressure.",
+      "Clear protocol-vs-transport boundary improves long-term migration and survivability.",
+      "README explicitly marks precedent as exploratory, reducing false equivalence with legacy systems."
+    ],
+    "weaknesses": [
+      "No explicit insurance-domain object schema for claims, policy coverage, payouts, or appeals.",
+      "Adjuster authority, delegation, and revocation semantics are not specified.",
+      "Fraud detection/escalation and dispute-resolution workflows are underspecified.",
+      "Peer-local promise accounting for accept/retry/downgrade/escalate decisions is not concretely modeled."
+    ],
+    "risks": [
+      "Hidden centralization may be reintroduced later to resolve authority disputes not handled in-model.",
+      "Disputed evidence could produce prolonged forks or inconsistent local decisions without explicit adjudication rules.",
+      "Payment and appeal finality may remain ambiguous, increasing legal/operational exposure."
+    ],
+    "open_questions": [
+      "What minimal CAS object set is required to represent claim intake, evidence, decision, payment, and appeal states?",
+      "How are adjuster identity claims, delegation chains, and revocations represented for offline/local verification?",
+      "Which local evidence thresholds distinguish routine delay from fraud pressure?",
+      "How should peers record and reconcile conflicting claim decisions without global authority?",
+      "What migration path preserves auditability across key rotation, org turnover, and protocol evolution over decades?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

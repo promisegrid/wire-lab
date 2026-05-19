@@ -4,11 +4,14 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
+	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 )
 
 func TestValidateResultFileAcceptsValidJSON(t *testing.T) {
@@ -321,11 +324,15 @@ func TestRunScoreWritesValidatedFitnessResult(t *testing.T) {
 	initGAStateForTest(t, repo, "ga-score")
 	provider := fakeGAProvider{
 		generate: func(ctx context.Context, request ProviderRequest) (ProviderResponse, error) {
+			if request.ServiceTier != defaultServiceTier {
+				t.Fatalf("score request service tier = %q, want %q", request.ServiceTier, defaultServiceTier)
+			}
 			return ProviderResponse{
-				Text:       validScorePayloadJSON(),
-				RequestID:  "req-score",
-				ResponseID: "resp-score",
-				UsageJSON:  `{"input_tokens":1000,"input_tokens_details":{"cached_tokens":100},"output_tokens":500}`,
+				Text:        validScorePayloadJSON(),
+				RequestID:   "req-score",
+				ResponseID:  "resp-score",
+				ServiceTier: defaultServiceTier,
+				UsageJSON:   `{"input_tokens":1000,"input_tokens_details":{"cached_tokens":100},"output_tokens":500}`,
 			}, nil
 		},
 	}
@@ -348,9 +355,16 @@ func TestRunScoreWritesValidatedFitnessResult(t *testing.T) {
 	if state.Cells[0].Status != "done" || state.Cells[0].RequestID != "req-score" || state.Cells[0].CostUSD <= 0 {
 		t.Fatalf("score state not updated: %#v", state.Cells[0])
 	}
+	if state.Cells[0].ServiceTier != defaultServiceTier || state.Cells[0].ServedServiceTier != defaultServiceTier {
+		t.Fatalf("score service tier not recorded: %#v", state.Cells[0])
+	}
 	resultPath := repo.Abs(state.Cells[0].ResultPath)
 	if issues := validateResultFile(repo, resultPath); len(issues) != 0 {
 		t.Fatalf("result did not validate: %v", issues)
+	}
+	result := mustReadFitnessResult(t, resultPath)
+	if result.Runner.ServiceTier != defaultServiceTier || result.Runner.ServedServiceTier != defaultServiceTier {
+		t.Fatalf("result service tier not recorded: %#v", result.Runner)
 	}
 }
 
@@ -361,11 +375,15 @@ func TestRunGenerateWritesChildTree(t *testing.T) {
 	childID := state.Children[0].ID()
 	provider := fakeGAProvider{
 		generate: func(ctx context.Context, request ProviderRequest) (ProviderResponse, error) {
+			if request.ServiceTier != defaultServiceTier {
+				t.Fatalf("generate request service tier = %q, want %q", request.ServiceTier, defaultServiceTier)
+			}
 			return ProviderResponse{
-				Text:       validChildBundleJSON(childID),
-				RequestID:  "req-generate",
-				ResponseID: "resp-generate",
-				UsageJSON:  `{"input_tokens":1200,"input_tokens_details":{"cached_tokens":200},"output_tokens":700}`,
+				Text:        validChildBundleJSON(childID),
+				RequestID:   "req-generate",
+				ResponseID:  "resp-generate",
+				ServiceTier: defaultServiceTier,
+				UsageJSON:   `{"input_tokens":1200,"input_tokens_details":{"cached_tokens":200},"output_tokens":700}`,
 			}, nil
 		},
 	}
@@ -387,8 +405,159 @@ func TestRunGenerateWritesChildTree(t *testing.T) {
 	if state.Children[0].Status != "generated" || state.Children[0].RequestID != "req-generate" || state.Children[0].TreeHash == "" {
 		t.Fatalf("generate state not updated: %#v", state.Children[0])
 	}
+	if state.Children[0].ServiceTier != defaultServiceTier || state.Children[0].ServedServiceTier != defaultServiceTier {
+		t.Fatalf("generate service tier not recorded: %#v", state.Children[0])
+	}
 	assertExists(t, repo.Path("simulations", childID, "README.md"))
 	assertExists(t, repo.Path("simulations", childID, "QUESTION.md"))
+}
+
+func TestServiceTierOptionsDefaultToFlexAndRejectPriority(t *testing.T) {
+	scoreDefaults, err := parseScoreOptions([]string{"-run-group-id", "ga-score", "-api-model", "model-a"})
+	if err != nil {
+		t.Fatalf("parse score defaults: %v", err)
+	}
+	if scoreDefaults.ServiceTier != serviceTierFlex {
+		t.Fatalf("score service tier = %q, want %q", scoreDefaults.ServiceTier, serviceTierFlex)
+	}
+	generateDefaults, err := parseGenerateOptions([]string{"-run-group-id", "ga-generate", "-api-model", "model-a"})
+	if err != nil {
+		t.Fatalf("parse generate defaults: %v", err)
+	}
+	if generateDefaults.ServiceTier != serviceTierFlex {
+		t.Fatalf("generate service tier = %q, want %q", generateDefaults.ServiceTier, serviceTierFlex)
+	}
+	scoreDefaultTier, err := parseScoreOptions([]string{"-run-group-id", "ga-score", "-api-model", "model-a", "-service-tier", "default"})
+	if err != nil {
+		t.Fatalf("parse explicit default tier: %v", err)
+	}
+	if scoreDefaultTier.ServiceTier != serviceTierDefault {
+		t.Fatalf("score explicit service tier = %q, want %q", scoreDefaultTier.ServiceTier, serviceTierDefault)
+	}
+	if _, err := parseGenerateOptions([]string{"-run-group-id", "ga-generate", "-api-model", "model-a", "-service-tier", "priority"}); err == nil {
+		t.Fatalf("expected priority service tier to be rejected")
+	}
+}
+
+func TestOpenAIProviderSendsExplicitServiceTier(t *testing.T) {
+	transport := roundTripFunc(func(request *http.Request) (*http.Response, error) {
+		var body openAIRequest
+		if err := json.NewDecoder(request.Body).Decode(&body); err != nil {
+			t.Fatalf("decode request body: %v", err)
+		}
+		if body.ServiceTier != serviceTierFlex {
+			t.Fatalf("request service tier = %q, want %q", body.ServiceTier, serviceTierFlex)
+		}
+		return openAITestHTTPResponse(request, http.StatusOK, "req-tier", openAITestSuccessBody(serviceTierFlex)), nil
+	})
+
+	provider := OpenAIProvider{
+		APIKey:  "test-key",
+		BaseURL: "https://example.test/responses",
+		Client:  &http.Client{Transport: transport},
+		RetryPolicy: ProviderRetryPolicy{
+			MaxAttempts: 1,
+		},
+	}
+	response, err := provider.Generate(context.Background(), ProviderRequest{
+		APIModel:    "model-a",
+		ServiceTier: serviceTierFlex,
+		Prompt:      "score this",
+	})
+	if err != nil {
+		t.Fatalf("generate: %v", err)
+	}
+	if response.ServiceTier != serviceTierFlex || response.RequestID != "req-tier" {
+		t.Fatalf("unexpected response metadata: %#v", response)
+	}
+}
+
+func TestOpenAIProviderRetriesFlex429WithoutChangingTier(t *testing.T) {
+	attempts := 0
+	var observedServiceTiers []string
+	transport := roundTripFunc(func(request *http.Request) (*http.Response, error) {
+		attempts++
+		var body openAIRequest
+		if err := json.NewDecoder(request.Body).Decode(&body); err != nil {
+			t.Fatalf("decode retry body: %v", err)
+		}
+		observedServiceTiers = append(observedServiceTiers, body.ServiceTier)
+		if attempts == 1 {
+			return openAITestHTTPResponse(request, http.StatusTooManyRequests, "", `{"error":{"message":"Resource Unavailable"}}`), nil
+		}
+		return openAITestHTTPResponse(request, http.StatusOK, "", openAITestSuccessBody(serviceTierFlex)), nil
+	})
+
+	provider := OpenAIProvider{
+		APIKey:  "test-key",
+		BaseURL: "https://example.test/responses",
+		Client:  &http.Client{Transport: transport},
+		RetryPolicy: ProviderRetryPolicy{
+			MaxAttempts:    2,
+			MaxElapsed:     time.Second,
+			InitialBackoff: time.Millisecond,
+			MaxBackoff:     time.Millisecond,
+		},
+	}
+	if _, err := provider.Generate(context.Background(), ProviderRequest{APIModel: "model-a", ServiceTier: serviceTierFlex, Prompt: "retry"}); err != nil {
+		t.Fatalf("generate after retry: %v", err)
+	}
+	if attempts != 2 {
+		t.Fatalf("attempts = %d, want 2", attempts)
+	}
+	for _, serviceTier := range observedServiceTiers {
+		if serviceTier != serviceTierFlex {
+			t.Fatalf("retry changed service tier: %v", observedServiceTiers)
+		}
+	}
+}
+
+func TestOpenAIProviderRetriesTimeout(t *testing.T) {
+	transport := &timeoutThenSuccessTransport{}
+	provider := OpenAIProvider{
+		APIKey: "test-key",
+		Client: &http.Client{Transport: transport},
+		RetryPolicy: ProviderRetryPolicy{
+			MaxAttempts:    2,
+			MaxElapsed:     time.Second,
+			InitialBackoff: time.Millisecond,
+			MaxBackoff:     time.Millisecond,
+		},
+	}
+	response, err := provider.Generate(context.Background(), ProviderRequest{APIModel: "model-a", ServiceTier: serviceTierFlex, Prompt: "retry timeout"})
+	if err != nil {
+		t.Fatalf("generate after timeout retry: %v", err)
+	}
+	if response.ServiceTier != serviceTierFlex || transport.Attempts != 2 {
+		t.Fatalf("unexpected timeout retry response=%#v attempts=%d", response, transport.Attempts)
+	}
+}
+
+func TestOpenAIProviderFailsAfterBoundedFlex429Retries(t *testing.T) {
+	attempts := 0
+	transport := roundTripFunc(func(request *http.Request) (*http.Response, error) {
+		attempts++
+		return openAITestHTTPResponse(request, http.StatusTooManyRequests, "", `{"error":{"message":"Resource Unavailable"}}`), nil
+	})
+
+	provider := OpenAIProvider{
+		APIKey:  "test-key",
+		BaseURL: "https://example.test/responses",
+		Client:  &http.Client{Transport: transport},
+		RetryPolicy: ProviderRetryPolicy{
+			MaxAttempts:    2,
+			MaxElapsed:     time.Second,
+			InitialBackoff: time.Millisecond,
+			MaxBackoff:     time.Millisecond,
+		},
+	}
+	_, err := provider.Generate(context.Background(), ProviderRequest{APIModel: "model-a", ServiceTier: serviceTierFlex, Prompt: "fail"})
+	if err == nil {
+		t.Fatalf("expected bounded retry failure")
+	}
+	if attempts != 2 || !strings.Contains(err.Error(), "after 2 attempts") {
+		t.Fatalf("unexpected retry failure attempts=%d err=%v", attempts, err)
+	}
 }
 
 func TestRunGenerateRejectsUnsafeBundlePath(t *testing.T) {
@@ -867,6 +1036,19 @@ func mustReadGAState(t *testing.T, repo Repo, runGroupID string) GAState {
 	return state
 }
 
+func mustReadFitnessResult(t *testing.T, path string) FitnessResult {
+	t.Helper()
+	bytes, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatalf("read result: %v", err)
+	}
+	var result FitnessResult
+	if err := json.Unmarshal(bytes, &result); err != nil {
+		t.Fatalf("parse result: %v", err)
+	}
+	return result
+}
+
 func writeTestState(t *testing.T, repo Repo, runGroupID string, state GAState) {
 	t.Helper()
 	if err := writeGAStateAtomic(repo.Path("results", "state", runGroupID+".json"), state); err != nil {
@@ -902,6 +1084,60 @@ func scenarioIDs(scenarios []Scenario) []string {
 		ids = append(ids, scenario.ScenarioID)
 	}
 	return ids
+}
+
+func openAITestSuccessBody(serviceTier string) string {
+	return fmt.Sprintf(`{"id":"resp-test","status":"completed","output_text":"{}","service_tier":%q,"usage":{"input_tokens":10,"input_tokens_details":{"cached_tokens":2},"output_tokens":3}}`, serviceTier)
+}
+
+func openAITestHTTPResponse(request *http.Request, statusCode int, requestID string, body string) *http.Response {
+	header := make(http.Header)
+	if requestID != "" {
+		header.Set("x-request-id", requestID)
+	}
+	return &http.Response{
+		StatusCode: statusCode,
+		Header:     header,
+		Body:       io.NopCloser(strings.NewReader(body)),
+		Request:    request,
+	}
+}
+
+type roundTripFunc func(request *http.Request) (*http.Response, error)
+
+func (roundTrip roundTripFunc) RoundTrip(request *http.Request) (*http.Response, error) {
+	return roundTrip(request)
+}
+
+type timeoutThenSuccessTransport struct {
+	Attempts int
+}
+
+func (transport *timeoutThenSuccessTransport) RoundTrip(request *http.Request) (*http.Response, error) {
+	transport.Attempts++
+	if transport.Attempts == 1 {
+		return nil, timeoutTestError{}
+	}
+	return &http.Response{
+		StatusCode: http.StatusOK,
+		Header:     make(http.Header),
+		Body:       io.NopCloser(strings.NewReader(openAITestSuccessBody(serviceTierFlex))),
+		Request:    request,
+	}, nil
+}
+
+type timeoutTestError struct{}
+
+func (timeoutTestError) Error() string {
+	return "test timeout"
+}
+
+func (timeoutTestError) Timeout() bool {
+	return true
+}
+
+func (timeoutTestError) Temporary() bool {
+	return true
 }
 
 func validResult(repo Repo, path string) FitnessResult {

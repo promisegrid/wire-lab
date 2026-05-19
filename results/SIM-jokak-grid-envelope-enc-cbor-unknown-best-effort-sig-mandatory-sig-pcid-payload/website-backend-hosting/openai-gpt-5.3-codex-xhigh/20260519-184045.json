@@ -1,0 +1,122 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-jokak-grid-envelope-enc-cbor-unknown-best-effort-sig-mandatory-sig-pcid-payload-website-backend-hosting-openai-gpt-5.3-codex-xhigh-20260519-184045",
+  "run_group_id": "ga-canary-20260519-184045",
+  "cell_id": "ga-canary-20260519-184045-000006-SIM-jokak-grid-envelope-enc-cbor-unknown-best-effort-sig-mandatory-sig-pcid-payload--website-backend-hosting--openai-gpt-5.3-codex-xhigh",
+  "sim_id": "SIM-jokak-grid-envelope-enc-cbor-unknown-best-effort-sig-mandatory-sig-pcid-payload",
+  "scenario_id": "website-backend-hosting",
+  "model_id": "openai-gpt-5.3-codex-xhigh",
+  "timestamp_utc": "20260519-184045",
+  "result_path": "results/SIM-jokak-grid-envelope-enc-cbor-unknown-best-effort-sig-mandatory-sig-pcid-payload/website-backend-hosting/openai-gpt-5.3-codex-xhigh/20260519-184045.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.3-codex",
+    "reasoning_effort": "xhigh",
+    "request_id": "req_547a487a326a997db2a6b724f78b1dff",
+    "response_id": "resp_0edfbf07c2398fa6006a0cafa8b9a481a09cd7be302624334d",
+    "input_tokens": 5946,
+    "output_tokens": 2184,
+    "cost_usd": 0.0409815
+  },
+  "source": {
+    "repo_commit": "7bb49538eb21cbdb7b220a3f7bd9ef5130fd13c8",
+    "sim_path": "simulations/SIM-jokak-grid-envelope-enc-cbor-unknown-best-effort-sig-mandatory-sig-pcid-payload/",
+    "scenario_path": "scenarios/website-backend-hosting/website-backend-hosting.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "29b6c7f12fed7f0d7297c96102d3645cedca69109008bbed069c79b8fd6c493d"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-jokak-grid-envelope-enc-cbor-unknown-best-effort-sig-mandatory-sig-pcid-payload/README.md",
+        "sha256": "85676851ce384edf8fc4546252b69b524b2c57bc5d7a72e603dba3e63c24c90c"
+      },
+      {
+        "path": "simulations/SIM-jokak-grid-envelope-enc-cbor-unknown-best-effort-sig-mandatory-sig-pcid-payload/QUESTION.md",
+        "sha256": "50fa82530ea929fde8df7856a9f2fa67758e32dfc2ff081c7f9a23d231395ace"
+      },
+      {
+        "path": "simulations/SIM-jokak-grid-envelope-enc-cbor-unknown-best-effort-sig-mandatory-sig-pcid-payload/protocols/grid-envelope.d/CHANGELOG.md",
+        "sha256": "aef2b7915320af9607f415cef649397530561e4f0f9372fda1bbf2691dd3f9b1"
+      },
+      {
+        "path": "simulations/SIM-jokak-grid-envelope-enc-cbor-unknown-best-effort-sig-mandatory-sig-pcid-payload/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "5a83134788f5fd6bebb92119be82086f34baa3756ec72971fc8da65456cce1b2"
+      },
+      {
+        "path": "scenarios/website-backend-hosting/website-backend-hosting.md",
+        "sha256": "410d1a5fce15529c59260d9a9b20479dcb0eacb406ab9c480d2a6279f73fe18f"
+      }
+    ],
+    "simulation_tree_hash": "70c6a17b236d0e9f1ba89621ed8e390e4169976db54f9ebcc2337ee9d9646834"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 3,
+    "auditability": 3,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 2,
+    "implementation_plausibility": 4,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 17,
+    "normalized_0_100": 49,
+    "confidence_0_1": 0.72
+  },
+  "assessment": {
+    "rationale": "This simulation is a credible wire-envelope specimen with clear slot/layer boundaries, deterministic CBOR canonicalization, and explicit unknown-pCID plus mandatory-signature behavior. It aligns moderately with PromiseGrid protocol goals, but it does not directly model website-backend-hosting promises (deployments, ownership, secret rotation, incident response, uptime), so end-to-end scenario fit is low.",
+    "strengths": [
+      "Deterministic CBOR positional encoding and canonical-bytes rules support reproducible hashing/signing and later audit.",
+      "Mandatory signature slots create a consistent authenticity hook at the envelope layer.",
+      "Unknown-pCID handling is explicit and requires unsupported/unverified marking rather than silent interpretation."
+    ],
+    "weaknesses": [
+      "No application-level payload contract for deployment, ownership, secret rotation, incident response, or uptime evidence.",
+      "Limited explicit peer-local promise-accounting records for Alice/Bob/Carol under contested operations.",
+      "Failure semantics for partitions/staleness are mostly delegated to payload/signature protocols, not fully specified here.",
+      "Draft specimen is unfrozen with no freeze-history entries, reducing governance maturity."
+    ],
+    "risks": [
+      "Operators may over-trust best-effort inspection of unknown pCID payloads during incidents.",
+      "Envelope-level correctness could mask missing operational controls required by the hosting scenario.",
+      "Interoperability risk remains if sig_pcid ecosystems diverge without strong migration guidance."
+    ],
+    "open_questions": [
+      "Which payload protocol should encode website-backend-hosting promises and incident artifacts on top of this envelope?",
+      "How should Carol persist long-horizon audit evidence for uptime and response commitments using only local state?",
+      "What are the required key-rotation and signer-revocation flows for sig_pcid protocols in this variant?",
+      "What conformance and adversarial tests must pass before freezing this draft?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}
