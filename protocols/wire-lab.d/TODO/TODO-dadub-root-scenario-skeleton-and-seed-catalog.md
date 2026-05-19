@@ -184,6 +184,28 @@ by the queue's normal retry path once reviewed.
 Affects: `results/tools/matrix_queue.py`;
 `protocols/wire-lab.d/TODO/TODO-dadub-root-scenario-skeleton-and-seed-catalog.md`.
 
+ID: DI-lulom
+Date: 2026-05-18 21:30:12
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Port the result matrix tooling into a standalone Go CLI at
+`tools/matrix-runner/`, keep the Python scripts as legacy/reference for now,
+and implement OpenAI API-backed unattended execution as the first real provider
+path.
+Intent: A durable full-matrix run needs one typed runner that owns manifests,
+prompt bundling, provider calls, checkpointing, validation, matrix updates, and
+comparison reports without shelling through a separate LLM command per cell.
+The API runner must bundle local source document contents because remote model
+APIs cannot read repository paths directly.
+Constraints: Preserve the existing result path shape and manifest CSV schema.
+Do not synthesize verdict prose mechanically; API output must provide the result
+body. Use raw Go HTTP for the OpenAI Responses API in this pass and leave
+Anthropic/Perplexity as future provider adapters. Do not delete the Python
+scripts until a later retirement decision.
+Affects: `tools/matrix-runner/`; `tools/README.md`; `results/tools/README.md`;
+`results/RUN-PROTOCOL.md`; `results/README.md`;
+`protocols/wire-lab.d/TODO/TODO-dadub-root-scenario-skeleton-and-seed-catalog.md`.
+
 ## Scope
 
 - Define the root scenario-entry contract implied by `DI-faros`: a root scenario
@@ -240,6 +262,9 @@ Affects: `results/tools/matrix_queue.py`;
 - [x] dadub.12 Persist `running` queue state before invoking the external LLM
   runner so interrupted unattended runs expose the in-flight cell. Done under
   `DI-bujiv`.
+- [x] dadub.13 Port matrix/result tooling into `tools/matrix-runner/`, including
+  manifest, jobs, run, progress, validate, update-matrix, compare, and OpenAI
+  API-backed prompt bundling. Done under `DI-lulom`.
 
 ## Candidate scenario entries
 

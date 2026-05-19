@@ -1,6 +1,34 @@
 # Results Tooling
 
-This directory contains matrix-run preflight and execution helpers.
+This directory contains legacy Python matrix-run preflight and execution
+helpers. The preferred implementation is now the Go CLI under
+`tools/matrix-runner/`; these scripts remain as reference and rollback tools
+until a later retirement decision. Source: `DI-lulom`.
+
+## Preferred Go Runner
+
+From `tools/matrix-runner/`:
+
+```bash
+go run . manifest -repo-root ../.. \
+  -models openai-gpt-5.3-codex-xhigh
+
+go run . run -repo-root ../.. \
+  -manifest ../../results/manifests/<manifest>.csv \
+  -provider openai \
+  -api-model <openai-api-model> \
+  -reasoning-effort xhigh
+
+go run . validate -repo-root ../.. \
+  -manifest ../../results/manifests/<manifest>.csv \
+  -strict-matrix
+```
+
+The Go runner bundles local source documents for API-backed runs, checkpoints
+under `results/state/`, and updates scenario matrices after validation. Source:
+`DI-lulom`.
+
+## Legacy Python Tools
 
 ## Generate Manifest
 

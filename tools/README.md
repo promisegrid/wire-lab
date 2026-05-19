@@ -10,6 +10,7 @@ exist for your benefit. Hazard notes are not optional.
 | dir | purpose | run frequency |
 | --- | --- | --- |
 | `build-index/` | rebuild `docs/thought-experiments/README.md` and per-protocol `TODO.md` index tables from `migrate-handles/mapping.tsv` + git log mint dates | after any TE or TODO add/rename |
+| `matrix-runner/` | generate, run, checkpoint, validate, update, and compare root scenario/simulation result matrices; preferred over legacy Python result tools | every matrix canary/full run |
 | `migrate-handles/` | one-shot TE-39 migration: rename legacy `(TE|TODO)-<timestamp>-<slug>.md` to proquint form and inject `## Prior aliases` sections | done; mapping.tsv is now read-only authority |
 | `mint-handle/` | allocate a new unique proquint handle for a new TE or TODO; collision-checks against the existing corpus | every new TE/TODO file |
 | `spec/` | freeze draft spec docs into content-addressed snapshots, audit manifest, list snapshots; backs the harness-spec workflow | when freezing a new spec pCID |
@@ -150,6 +151,29 @@ Regenerates `docs/thought-experiments/README.md` and the per-protocol
 git log first-commit dates. The README and `TODO.md` master indices
 are sweep-skipped (sweep-citations excludes them) precisely because
 this tool owns them.
+
+## matrix-runner runbook
+
+`matrix-runner` is the preferred root result-matrix runner. It replaces the
+legacy Python result scripts for normal operation but does not delete them.
+Source: `DI-lulom`.
+
+Before a full run:
+
+```
+cd tools/matrix-runner
+GOCACHE=/tmp/wire-lab-gocache go test ./...
+```
+
+Generate and run a canary first:
+
+```
+go run . manifest -repo-root ../.. -models openai-gpt-5.3-codex-xhigh -run-group-id canary-<ts> -timestamp <ts> -shuffle-seed 42 -limit-cells 3
+go run . run -repo-root ../.. -manifest ../../results/manifests/matrix-manifest-canary-<ts>.csv -provider openai -api-model <openai-api-model> -reasoning-effort xhigh
+go run . validate -repo-root ../.. -manifest ../../results/manifests/matrix-manifest-canary-<ts>.csv -strict-matrix
+```
+
+Only start the full manifest after canary validation passes.
 
 ## spec runbook
 

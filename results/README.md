@@ -98,11 +98,12 @@ Source: `DI-moduf`.
 Before kicking off a large matrix run:
 
 1. Follow `results/RUN-PROTOCOL.md`.
-2. Generate a deterministic manifest with
-   `results/tools/generate_matrix_manifest.py`.
-3. Generate canary LLM jobs with `results/tools/generate_llm_jobs.py`.
-4. Run canary jobs through an LLM evaluator.
-5. Validate canary output with `results/tools/validate_results.py`.
-6. Run the full manifest only after canary validation passes.
+2. Generate a deterministic manifest with `tools/matrix-runner`.
+3. Run a small API-backed canary with `tools/matrix-runner run`.
+4. Validate canary output with `tools/matrix-runner validate`.
+5. Run the full manifest only after canary validation passes.
 
-See `results/tools/README.md` for exact command examples.
+The old Python scripts under `results/tools/` remain legacy/reference tools;
+the Go runner is preferred for unattended API-backed runs because it bundles
+local source document contents, checkpoints state, validates results, and
+updates scenario matrices in one program. Source: `DI-lulom`.

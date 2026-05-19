@@ -33,6 +33,10 @@ validate the result file, and update the scenario matrix. The external runner
 must still produce the substantive result file; queue tooling only coordinates
 work and validation. Source: `DI-nuhon`.
 
+The preferred runner is now the Go `tools/matrix-runner` CLI. For API-backed
+runs it bundles local source document contents into the provider prompt, because
+remote APIs cannot read repo-local paths. Source: `DI-lulom`.
+
 Allowed result-producing run modes:
 
 - `codex-manual-blind`
@@ -96,6 +100,8 @@ Each result must include one line starting with `Evidence verdict:`.
 
 ## Tooling
 
+- Preferred Go runner:
+  `cd tools/matrix-runner && go run . <subcommand>`
 - Manifest generator:
   `python3 results/tools/generate_matrix_manifest.py --models <model-id>`
 - LLM job generator:
@@ -119,14 +125,14 @@ Each result must include one line starting with `Evidence verdict:`.
 ## Unattended Full-Run Shape
 
 1. Generate a manifest with a fixed model ID and concrete timestamp:
-   `python3 results/tools/generate_matrix_manifest.py --models <model-id>`.
-2. Start the queue with an explicit noninteractive runner command:
-   `python3 results/tools/matrix_queue.py run --manifest <manifest.csv> --runner-command '<runner> {prompt_path}'`.
+   `cd tools/matrix-runner && go run . manifest -repo-root ../.. -models <model-id>`.
+2. Start the queue with OpenAI API-backed execution:
+   `cd tools/matrix-runner && go run . run -repo-root ../.. -manifest <manifest.csv> -provider openai -api-model <api-model> -reasoning-effort xhigh`.
 3. Let the queue process one cell at a time. Each cell writes or refreshes its
    prompt under `results/jobs/<run-group-id>/`, invokes the runner command,
    validates `result_path`, updates the scenario `MATRIX.md`, and checkpoints
-   `results/state/<run-group-id>.json`. Source: `DI-nuhon`.
+   `results/state/<run-group-id>.json`. Source: `DI-nuhon`; `DI-lulom`.
 4. If the process is interrupted, rerun the same command with the same manifest
    and state path. Completed cells are skipped by default.
 5. When the queue completes, run strict validation over the manifest:
-   `python3 results/tools/validate_results.py --manifest <manifest.csv> --strict-matrix`.
+   `cd tools/matrix-runner && go run . validate -repo-root ../.. -manifest <manifest.csv> -strict-matrix`.
