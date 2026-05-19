@@ -65,6 +65,52 @@ Affects: `tools/ga-runner/`; `results/`; `results/state/`; `simulations/`;
 `protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`;
 future `results/RUN-PROTOCOL.md`; future `results/README.md`.
 
+ID: DI-zohal
+Date: 2026-05-19 10:11:37
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Lock the v1 child-generation contract for `tools/ga-runner`: generated
+children are materialized directly as normal untracked
+`simulations/SIM-<handle>-<slug>/` trees, the runner gives the model exact child
+IDs and paths before generation, each generated child has `README.md` and
+`QUESTION.md`, and the model may change only bounded design deltas derived from
+the selected parent sims and scenario pressure.
+Intent: Child proposals must be comparable to their parents as simulation
+specimens, not stored as JSON proposal objects. The runner still needs a
+machine-readable generation exchange so it can safely write files, hash them,
+record provenance, and cull rejected children, but the durable candidate is the
+materialized simulation tree.
+Constraints: Do not commit generated children until accepted. Do not feed old
+Markdown canary results into generation. Generation may use current GA state,
+selected parent sim trees, selected scenario files, and JSON fitness evidence
+from the active GA run. Generated children must include provenance back to
+parent sims, the run group, source result paths when used, design deltas, and an
+authority boundary. Child paths must be under `simulations/SIM-*`; generation
+must not write into parent sim trees.
+Affects: `tools/ga-runner/`; generated untracked `simulations/SIM-*` children;
+`results/state/<run-group-id>.json`;
+`protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`.
+
+ID: DI-pobus
+Date: 2026-05-19 10:18:12
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Implement the first `tools/ga-runner` scaffold as a standalone Go
+module with JSON-only fitness result validation, atomic JSON result-writing
+helpers for later scoring, `.md` result exclusion, and not-yet-implemented
+stubs for the remaining locked command surface.
+Intent: `tapur.5` should prove the JSON result contract in code before provider
+calls, child generation, population scanning, accept, or cull behavior are
+implemented. This keeps the first code pass small and prevents the old Markdown
+canary result contract from leaking into GA selection.
+Constraints: Do not modify `tools/matrix-runner`. Do not create real result
+files, state files, or child sims in this pass. `ga-runner validate` discovers
+only `results/<sim>/<scenario>/<model>/<timestamp>.json` files and ignores
+`results/**/*.md`. The helper that writes JSON results is available for later
+score work but is exercised only in tests during this pass.
+Affects: `tools/ga-runner/`;
+`protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`.
+
 ## Scope
 
 - Define and implement a new GA/search runner without changing
@@ -165,6 +211,60 @@ The v1 CLI commands are:
   and their matching `results/<child-sim-id>/` trees, then record the cull action
   in state.
 
+### Child-generation contract
+
+`tools/ga-runner generate` creates untracked child simulation trees directly
+under `simulations/`. The child tree, not a JSON proposal file, is the generated
+candidate.
+
+The runner must prepare each generation prompt with:
+
+- exact child sim ID and target path under `simulations/SIM-<handle>-<slug>/`;
+- selected parent sim IDs, parent paths, and parent tree hashes;
+- selected scenario sample and scenario pressure summaries;
+- relevant JSON fitness results from the active GA run when available;
+- required operation type: `mutation`, `crossover`, or `synthesis`;
+- a bounded design-delta budget of one to three substantive changes;
+- a requirement that the child remain a standalone simulation tree.
+
+The model's generation response may use a strict machine-readable file-bundle
+envelope so the runner can write files deterministically, but that envelope is
+only transport for generation. The durable child artifact is the materialized
+simulation directory.
+
+Each generated child must contain:
+
+- `README.md`, describing the candidate design, parentage, design deltas, and
+  authority boundary;
+- `QUESTION.md`, stating the decision question the child simulation tests;
+- optional `SCENARIOS.md`, only when the child adds simulation-local scenario
+  pressure not already represented by root `scenarios/`;
+- optional local protocol/spec directories when the design needs concrete local
+  specimen files;
+- provenance text naming parent sims, run group ID, generation model, source
+  scenario sample, source JSON fitness results when used, and generation time.
+
+Allowed generation operations:
+
+- `mutation`: alter one selected parent by changing one to three explicit design
+  choices while preserving the parent's problem frame.
+- `crossover`: combine compatible design choices from two or three parents while
+  preserving a coherent single decision question.
+- `synthesis`: create a child from parent fitness failures and scenario pressure
+  only when the state file records why mutation or crossover is insufficient.
+
+Forbidden generation operations:
+
+- rewriting a parent in place;
+- generating outside `simulations/SIM-*`;
+- creating a broad "best of everything" child with no bounded deltas;
+- importing old Markdown canary result prose as evidence;
+- treating generated children as accepted merely because they exist on disk.
+
+After writing a child tree, the runner records child ID, path, parent IDs,
+operation type, prompt hash, response hash, per-file hashes, tree hash, and
+status in the GA state file.
+
 ## Subtasks
 
 - [x] tapur.1 Define the canonical JSON fitness result schema, including source
@@ -178,13 +278,14 @@ The v1 CLI commands are:
 - [x] tapur.3 Specify `tools/ga-runner` commands for manifest generation, child
   generation, scoring, validation, progress/resume, accept, and cull. Source:
   `DI-ramar`; `DI-zanon`.
-- [ ] tapur.4 Define child-generation prompts that produce normal
+- [x] tapur.4 Define child-generation prompts that produce normal
   `simulations/SIM-<handle>-<slug>/` trees with `README.md`, `QUESTION.md` when
   needed, optional `SCENARIOS.md`, optional local protocol/spec dirs, provenance
-  back to parent sims, and bounded design deltas. Source: `DI-ramar`.
-- [ ] tapur.5 Implement JSON-only fitness result writing and validation for
+  back to parent sims, and bounded design deltas. Source: `DI-ramar`;
+  `DI-zohal`.
+- [x] tapur.5 Implement JSON-only fitness result writing and validation for
   `tools/ga-runner`, and make the runner ignore `results/**/*.md` canary files.
-  Source: `DI-ramar`.
+  Source: `DI-ramar`; `DI-pobus`.
 - [ ] tapur.6 Implement stable-population scanning so ordinary scans use
   committed/tracked `simulations/SIM-*` trees, while pending untracked children
   are included only through the active GA manifest. Source: `DI-ramar`.
