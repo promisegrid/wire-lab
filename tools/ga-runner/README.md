@@ -17,6 +17,23 @@ go run . init -repo-root ../.. -dry-run \
   -model openai-gpt-5.3-codex-xhigh \
   -run-group-id <run-group-id>
 
+go run . init -repo-root ../.. \
+  -model openai-gpt-5.3-codex-xhigh \
+  -run-group-id <run-group-id>
+
+go run . score -repo-root ../.. \
+  -run-group-id <run-group-id> \
+  -target parents \
+  -api-model gpt-5.3-codex \
+  -reasoning-effort xhigh \
+  -max-run-cost-usd <budget>
+
+go run . generate -repo-root ../.. \
+  -run-group-id <run-group-id> \
+  -api-model gpt-5.3-codex \
+  -reasoning-effort xhigh \
+  -max-run-cost-usd <budget>
+
 go run . accept -repo-root ../.. \
   -run-group-id <run-group-id> \
   -child <SIM-id> \
@@ -31,26 +48,30 @@ go run . cull -repo-root ../.. \
 
 `validate` reads only GA JSON fitness files and ignores old Markdown canary
 results. `init -dry-run` previews tracked population and conservative generation
-sizing without writing state. `accept` records reviewed promotion evidence and
-prints paths to stage, but it does not run `git add` or commit. `cull` deletes
-only state-selected generated child sim trees and matching result trees; use
+sizing without writing state. Non-dry-run `init` creates
+`promisegrid.ga.state.v1`. `score` builds source-complete prompts, calls the
+provider, writes validated JSON fitness results, and checkpoints usage/cost
+metadata after each cell. `generate` builds source-complete child prompts,
+materializes strict file-bundle responses as untracked `simulations/SIM-*`
+trees, and records prompt/response hashes, file hashes, tree hashes, and cost
+metadata in state. `accept` records reviewed promotion evidence and prints paths
+to stage, but it does not run `git add` or commit. `cull` deletes only
+state-selected generated child sim trees and matching result trees; use
 `-dry-run` to print the deletion plan without changing files. Source:
-`DI-pobus`; `DI-bagih`; `DI-zusit`; `DI-podot`; `DI-kofil`; `DI-ruzaj`.
+`DI-pobus`; `DI-bagih`; `DI-zusit`; `DI-podot`; `DI-kofil`; `DI-ruzaj`;
+`DI-gijom`.
 
 ## Planned Commands
 
 These command names are reserved by the v1 contract but are not fully
 implemented yet:
 
-- `init` without `-dry-run`: create `promisegrid.ga.state.v1`.
-- `score`: run one model over GA cells and write JSON fitness evidence.
-- `generate`: create untracked child simulation trees under `simulations/SIM-*`.
 - `progress`: summarize state counts, costs, child status, and culling status.
 
 Do not treat generated children as accepted merely because they exist on disk.
 Accepted children must pass through `accept`; rejected children should pass
 through `cull`. Source: `DI-ramar`; `DI-zanon`; `DI-zohal`; `DI-podot`;
-`DI-kofil`; `DI-ruzaj`.
+`DI-kofil`; `DI-ruzaj`; `DI-gijom`.
 
 ## Legacy Boundary
 

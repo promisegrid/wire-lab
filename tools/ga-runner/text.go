@@ -25,3 +25,10 @@ func writeFormat(writer io.Writer, format string, values ...any) error {
 func ensureParent(path string) error {
 	return os.MkdirAll(filepath.Dir(path), 0o755)
 }
+
+func writeFile(path string, text string) error {
+	if err := ensureParent(path); err != nil {
+		return err
+	}
+	return os.WriteFile(path, []byte(text), 0o644)
+}

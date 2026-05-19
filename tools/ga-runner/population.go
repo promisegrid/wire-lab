@@ -12,6 +12,7 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
+	"time"
 )
 
 // PopulationSim describes one committed/tracked simulation available to GA
@@ -33,6 +34,7 @@ func runInit(args []string, stdout io.Writer) error {
 	dryRun := fs.Bool("dry-run", false, "print tracked simulation population without writing GA state")
 	modelID := fs.String("model", "", "model ID for read-only generation planning")
 	runGroupID := fs.String("run-group-id", "", "run group ID for read-only generation planning")
+	timestamp := fs.String("timestamp", "", "UTC result timestamp in YYYYMMDD-HHMMSS; defaults to current UTC time for non-dry-run init")
 	shuffleSeed := fs.String("shuffle-seed", "", "deterministic shuffle seed for parent and scenario sampling")
 	parentCount := fs.Int("parent-count", defaultParentCount, "number of parent sims to select for planning")
 	scenarioCount := fs.Int("scenario-count", defaultScenarioCount, "number of root scenarios to sample uniformly")
@@ -40,9 +42,6 @@ func runInit(args []string, stdout io.Writer) error {
 	maxPromotions := fs.Int("max-promotions", defaultMaxPromotions, "maximum accepted children for this planned generation")
 	if err := fs.Parse(args); err != nil {
 		return err
-	}
-	if !*dryRun {
-		return notImplemented("init")
 	}
 	repo, err := openRepo(*repoRoot)
 	if err != nil {
@@ -61,6 +60,9 @@ func runInit(args []string, stdout io.Writer) error {
 		}
 	}
 	if *modelID == "" {
+		if !*dryRun {
+			return errUsage("init: -model is required")
+		}
 		return nil
 	}
 	scenarios, err := discoverScenarios(repo)
@@ -80,7 +82,168 @@ func runInit(args []string, stdout io.Writer) error {
 	if err != nil {
 		return err
 	}
+	if !*dryRun {
+		return writeInitialState(repo, stdout, plan, *timestamp)
+	}
 	return printGenerationPlan(stdout, plan)
+}
+
+func writeInitialState(repo Repo, stdout io.Writer, plan GenerationPlan, timestamp string) error {
+	if plan.RunGroupID == "" {
+		return errUsage("init: -run-group-id is required")
+	}
+	if timestamp == "" {
+		timestamp = time.Now().UTC().Format("20060102-150405")
+	}
+	stateFile, err := statePath(repo, plan.RunGroupID)
+	if err != nil {
+		return err
+	}
+	if _, err := os.Stat(stateFile); err == nil {
+		return fmt.Errorf("state file already exists: %s", repo.Rel(stateFile))
+	} else if !os.IsNotExist(err) {
+		return err
+	}
+	state, err := stateFromPlan(repo, plan, timestamp)
+	if err != nil {
+		return err
+	}
+	if err := writeGAStateAtomic(stateFile, state); err != nil {
+		return err
+	}
+	if err := writeFormat(stdout, "state=%s population=%d parents=%d scenarios=%d children=%d cells=%d\n",
+		repo.Rel(stateFile),
+		len(state.Population),
+		len(state.Parents),
+		len(state.ScenarioSample),
+		len(state.Children),
+		len(state.Cells)); err != nil {
+		return err
+	}
+	return printGenerationPlan(stdout, plan)
+}
+
+// stateFromPlan turns the conservative generation preview into the durable GA
+// state file that score/generate checkpoint after every expensive operation.
+//
+// Intent: Non-dry-run init is the boundary where a cheap plan becomes the
+// authoritative state for pending children and score cells. Source: DI-gijom
+func stateFromPlan(repo Repo, plan GenerationPlan, timestamp string) (GAState, error) {
+	now := time.Now().UTC().Format(time.RFC3339)
+	var population []GAStateSim
+	for _, sim := range plan.Population {
+		population = append(population, GAStateSim{
+			SimID:    sim.SimID,
+			Path:     sim.Path,
+			TreeHash: sim.TreeHash,
+		})
+	}
+	var scenarios []GAStateScenario
+	for _, scenario := range plan.Scenarios {
+		hash, err := sha256File(repo, scenario.Path)
+		if err != nil {
+			return GAState{}, err
+		}
+		scenarios = append(scenarios, GAStateScenario{
+			ScenarioID:   scenario.ScenarioID,
+			Path:         scenario.Path,
+			SamplePolicy: "uniform root scenario sample",
+			SHA256:       hash,
+		})
+	}
+	var parents []GAStateParent
+	for _, parent := range plan.Parents {
+		parents = append(parents, GAStateParent{
+			SimID:     parent.SimID,
+			Rationale: "uniform tracked-population sample",
+		})
+	}
+	children, err := plannedGAChildren(repo, plan)
+	if err != nil {
+		return GAState{}, err
+	}
+	cells := plannedGACells(plan.RunGroupID, plan.ModelID, timestamp, plan.Parents, children, plan.Scenarios)
+	return GAState{
+		Schema:         stateSchemaV1,
+		RunGroupID:     plan.RunGroupID,
+		CreatedAt:      now,
+		UpdatedAt:      now,
+		RepoCommit:     repo.GitCommit(),
+		ModelID:        plan.ModelID,
+		Population:     population,
+		ScenarioSample: scenarios,
+		Parents:        parents,
+		Children:       children,
+		Cells:          cells,
+	}, nil
+}
+
+func plannedGAChildren(repo Repo, plan GenerationPlan) ([]GAChild, error) {
+	var children []GAChild
+	used := map[string]bool{}
+	for index, child := range plan.Children {
+		childID, err := mintChildSimID(repo, plan.RunGroupID, index, used)
+		if err != nil {
+			return nil, err
+		}
+		used[childID] = true
+		children = append(children, GAChild{
+			ChildID:            childID,
+			Path:               filepath.ToSlash(filepath.Join("simulations", childID)) + "/",
+			ParentIDs:          child.ParentIDs,
+			Operation:          child.Operation,
+			Status:             "queued",
+			DesignDeltaSummary: "",
+		})
+	}
+	return children, nil
+}
+
+func plannedGACells(runGroupID string, modelID string, timestamp string, parents []PopulationSim, children []GAChild, scenarios []Scenario) []GACell {
+	var cells []GACell
+	ordinal := 1
+	for _, parent := range parents {
+		for _, scenario := range scenarios {
+			cells = append(cells, newGACell(runGroupID, ordinal, parent.SimID, scenario.ScenarioID, modelID, timestamp))
+			ordinal++
+		}
+	}
+	for _, child := range children {
+		for _, scenario := range scenarios {
+			cells = append(cells, newGACell(runGroupID, ordinal, child.ID(), scenario.ScenarioID, modelID, timestamp))
+			ordinal++
+		}
+	}
+	return cells
+}
+
+func newGACell(runGroupID string, ordinal int, simID string, scenarioID string, modelID string, timestamp string) GACell {
+	return GACell{
+		CellID:     fmt.Sprintf("%s-%06d-%s--%s--%s", runGroupID, ordinal, simID, scenarioID, modelID),
+		SimID:      simID,
+		ScenarioID: scenarioID,
+		ModelID:    modelID,
+		ResultPath: filepath.ToSlash(filepath.Join("results", simID, scenarioID, modelID, timestamp+".json")),
+		Status:     "queued",
+	}
+}
+
+func mintChildSimID(repo Repo, runGroupID string, index int, used map[string]bool) (string, error) {
+	for attempt := 0; attempt < 1000; attempt++ {
+		seed := fmt.Sprintf("%s-%d-%d-%d", runGroupID, index, attempt, time.Now().UnixNano())
+		sum := sha256.Sum256([]byte(seed))
+		handle := uint16ToProquint(uint16(sum[0])<<8 | uint16(sum[1]))
+		childID := fmt.Sprintf("SIM-%s-ga-child-%04d", handle, index+1)
+		if used[childID] {
+			continue
+		}
+		if _, err := os.Stat(repo.Path("simulations", childID)); os.IsNotExist(err) {
+			return childID, nil
+		} else if err != nil {
+			return "", err
+		}
+	}
+	return "", fmt.Errorf("could not mint unused child sim ID")
 }
 
 func printGenerationPlan(stdout io.Writer, plan GenerationPlan) error {

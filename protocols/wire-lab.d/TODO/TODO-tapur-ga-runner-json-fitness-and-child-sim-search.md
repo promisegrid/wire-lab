@@ -238,6 +238,32 @@ Affects:
 `protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`;
 future scenario metadata work.
 
+ID: DI-gijom
+Date: 2026-05-19 11:10:59
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Implement the stateful GA runner loop: non-dry-run `init` writes
+`promisegrid.ga.state.v1`, `score` evaluates state cells through one provider
+and writes `promisegrid.ga.result.v1` JSON fitness evidence, and `generate`
+creates untracked child simulation trees from provider-returned file bundles.
+Intent: The GA/search runner needs to produce the first real JSON-fitness
+evidence and generated child candidates without falling back to the legacy
+Markdown matrix contract. The runner should own prompt construction, provider
+calls, result validation, state checkpointing, usage/cost recording, and child
+tree materialization so a long run can resume safely.
+Constraints: V1 provider support is OpenAI-compatible Responses API only.
+`score` asks the model for a score payload and the runner fills authoritative
+identity/source/rubric fields. `generate` asks for a strict child file bundle and
+rejects unsafe paths, missing `README.md`, missing `QUESTION.md`, parent-tree
+writes, and malformed JSON. No scenario tags are added in this pass. Real API
+calls require explicit operator invocation after implementation; tests use fake
+providers only.
+Affects: `tools/ga-runner/`; `results/state/<run-group-id>.json`;
+`results/<sim>/<scenario>/<model>/<timestamp>.json`; `results/jobs/<run-group-id>/`;
+generated untracked `simulations/SIM-*` child trees;
+`protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`;
+`results/RUN-PROTOCOL.md`; `tools/ga-runner/README.md`.
+
 ## Scope
 
 - Define and implement a new GA/search runner without changing
@@ -440,6 +466,9 @@ status in the GA state file.
   naming, transport loss), `layer` (application, promise/accounting,
   group/session, CAS, envelope, transport), and `risk` (safety-critical,
   financial, governance, privacy, low-stakes). Source: `DI-zusit`; `DI-pibuh`.
+- [x] tapur.12 Implement stateful non-dry-run `init`, provider-backed `score`,
+  and provider-backed `generate` for the GA/search loop. Source: `DI-ramar`;
+  `DI-zanon`; `DI-zohal`; `DI-gijom`.
 
 ## Predecessor context
 

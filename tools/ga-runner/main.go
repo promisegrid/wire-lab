@@ -14,17 +14,17 @@ import (
 )
 
 const usage = `Usage:
-  ga-runner init       Create a GA run state file. (not implemented yet)
-  ga-runner score      Score GA cells and write JSON fitness results. (not implemented yet)
-  ga-runner generate   Generate untracked child simulations. (not implemented yet)
+  ga-runner init       Create or preview a GA run state file.
+  ga-runner score      Score GA cells and write JSON fitness results.
+  ga-runner generate   Generate untracked child simulations.
   ga-runner validate   Validate JSON fitness result files.
   ga-runner progress   Show GA run progress. (not implemented yet)
   ga-runner accept     Record accepted children and staging paths.
   ga-runner cull       Delete rejected generated children and their results.
   ga-runner help       Print this message.
 
-Implemented commands accept -repo-root. When omitted, ga-runner walks up from the
-current directory until it finds a .git directory.
+Commands accept -repo-root. When omitted, ga-runner walks up from the current
+directory until it finds a .git directory.
 `
 
 func main() {
@@ -56,7 +56,15 @@ func runMain(args []string, stdout io.Writer, stderr io.Writer) error {
 		// Intent: Route destructive rejection cleanup through the state-bound cull
 		// checkpoint instead of the not-implemented stub. Source: DI-kofil
 		return runCull(subArgs, stdout)
-	case "score", "generate", "progress":
+	case "score":
+		// Intent: Route JSON-fitness scoring through the stateful GA loop instead
+		// of the legacy Markdown matrix contract. Source: DI-gijom
+		return runScore(subArgs, stdout)
+	case "generate":
+		// Intent: Materialize child simulations only through state-bound GA
+		// generation so pending children remain auditable. Source: DI-gijom
+		return runGenerate(subArgs, stdout)
+	case "progress":
 		return notImplemented(subcommand)
 	case "help", "-h", "--help":
 		return writeText(stdout, usage)

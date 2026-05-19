@@ -23,6 +23,7 @@ const (
 type GenerationPlan struct {
 	RunGroupID       string
 	ModelID          string
+	Population       []PopulationSim
 	Parents          []PopulationSim
 	Scenarios        []Scenario
 	Children         []PlannedChild
@@ -118,6 +119,7 @@ func buildGenerationPlan(population []PopulationSim, scenarios []Scenario, optio
 	return GenerationPlan{
 		RunGroupID:       options.RunGroupID,
 		ModelID:          options.ModelID,
+		Population:       append([]PopulationSim(nil), population...),
 		Parents:          parents,
 		Scenarios:        sample,
 		Children:         children,

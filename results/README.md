@@ -107,10 +107,11 @@ evidence. Scenario-side summary files are not committed; generate inspection
 views with `tools/matrix-runner view` when needed. Source: `DI-zamin`.
 
 `tools/ga-runner` is the preferred runner for GA/search work. It validates JSON
-fitness results, ignores old Markdown canary files, keeps pending child sims
+fitness results, ignores old Markdown canary files, creates stateful generation
+runs, scores cells through provider-backed reasoning, keeps pending child sims
 state-bound, records accepted children without staging or committing them, and
 explicitly culls rejected children. Source: `DI-ramar`; `DI-zanon`;
-`DI-podot`; `DI-kofil`; `DI-ruzaj`.
+`DI-podot`; `DI-kofil`; `DI-ruzaj`; `DI-gijom`.
 
 `tools/matrix-runner` and the preserved Python scripts remain useful for legacy
 Markdown matrix canaries and historical comparisons. They are not the GA/search
@@ -141,8 +142,11 @@ Before a GA/search run:
 1. Follow the GA/search section in `results/RUN-PROTOCOL.md`.
 2. Use `tools/ga-runner init -dry-run` to preview the tracked population and
    conservative scenario/child plan.
-3. Keep generated child sims uncommitted until `tools/ga-runner accept` records
+3. Use non-dry-run `tools/ga-runner init` to create the checkpoint state, then
+   run `tools/ga-runner score` and `tools/ga-runner generate` with explicit
+   provider model, reasoning effort, and cost-budget flags.
+4. Keep generated child sims uncommitted until `tools/ga-runner accept` records
    reviewed promotion evidence.
-4. Use `tools/ga-runner cull` to delete rejected child sims and matching result
+5. Use `tools/ga-runner cull` to delete rejected child sims and matching result
    trees only through the state-bound cleanup path. Source: `DI-ramar`;
-   `DI-zusit`; `DI-podot`; `DI-kofil`; `DI-ruzaj`.
+   `DI-zusit`; `DI-podot`; `DI-kofil`; `DI-ruzaj`; `DI-gijom`.

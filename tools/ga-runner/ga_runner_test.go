@@ -1,7 +1,9 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
+	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -281,6 +283,138 @@ func TestRunInitDryRunPrintsGenerationPlan(t *testing.T) {
 	if strings.Contains(text, "SIM-child-untracked") {
 		t.Fatalf("untracked child should not appear in plan output:\n%s", text)
 	}
+}
+
+func TestRunInitWritesGAState(t *testing.T) {
+	repo := newGAFixtureRepo(t)
+
+	var out strings.Builder
+	err := runMain([]string{
+		"ga-runner", "init",
+		"-repo-root", repo.Root,
+		"-model", "model-a",
+		"-run-group-id", "ga-state",
+		"-timestamp", "20260519-111500",
+		"-parent-count", "1",
+		"-scenario-count", "1",
+		"-child-count", "1",
+		"-max-promotions", "1",
+	}, &out, &out)
+	if err != nil {
+		t.Fatalf("init state: %v\n%s", err, out.String())
+	}
+
+	state := mustReadGAState(t, repo, "ga-state")
+	if state.Schema != stateSchemaV1 || state.RunGroupID != "ga-state" {
+		t.Fatalf("unexpected state identity: %#v", state)
+	}
+	if len(state.Parents) != 1 || len(state.ScenarioSample) != 1 || len(state.Children) != 1 || len(state.Cells) != 2 {
+		t.Fatalf("unexpected state counts: parents=%d scenarios=%d children=%d cells=%d", len(state.Parents), len(state.ScenarioSample), len(state.Children), len(state.Cells))
+	}
+	if !strings.HasPrefix(state.Children[0].ID(), "SIM-") || state.Children[0].Status != "queued" {
+		t.Fatalf("unexpected planned child: %#v", state.Children[0])
+	}
+}
+
+func TestRunScoreWritesValidatedFitnessResult(t *testing.T) {
+	repo := newGAFixtureRepo(t)
+	initGAStateForTest(t, repo, "ga-score")
+	provider := fakeGAProvider{
+		generate: func(ctx context.Context, request ProviderRequest) (ProviderResponse, error) {
+			return ProviderResponse{
+				Text:       validScorePayloadJSON(),
+				RequestID:  "req-score",
+				ResponseID: "resp-score",
+				UsageJSON:  `{"input_tokens":1000,"input_tokens_details":{"cached_tokens":100},"output_tokens":500}`,
+			}, nil
+		},
+	}
+	var out strings.Builder
+	err := runScoreWithProvider(context.Background(), repo, provider, scoreOptions{
+		RunGroupID:       "ga-score",
+		Target:           "parents",
+		ProviderName:     "fake",
+		APIModel:         "model-a",
+		ReasoningEffort:  "xhigh",
+		MaxOutputTokens:  4000,
+		InputPrice:       defaultInputUSDPerMTok,
+		CachedInputPrice: defaultCachedInputUSDPerMTok,
+		OutputPrice:      defaultOutputUSDPerMTok,
+	}, &out)
+	if err != nil {
+		t.Fatalf("score: %v\n%s", err, out.String())
+	}
+	state := mustReadGAState(t, repo, "ga-score")
+	if state.Cells[0].Status != "done" || state.Cells[0].RequestID != "req-score" || state.Cells[0].CostUSD <= 0 {
+		t.Fatalf("score state not updated: %#v", state.Cells[0])
+	}
+	resultPath := repo.Abs(state.Cells[0].ResultPath)
+	if issues := validateResultFile(repo, resultPath); len(issues) != 0 {
+		t.Fatalf("result did not validate: %v", issues)
+	}
+}
+
+func TestRunGenerateWritesChildTree(t *testing.T) {
+	repo := newGAFixtureRepo(t)
+	initGAStateForTest(t, repo, "ga-generate")
+	state := mustReadGAState(t, repo, "ga-generate")
+	childID := state.Children[0].ID()
+	provider := fakeGAProvider{
+		generate: func(ctx context.Context, request ProviderRequest) (ProviderResponse, error) {
+			return ProviderResponse{
+				Text:       validChildBundleJSON(childID),
+				RequestID:  "req-generate",
+				ResponseID: "resp-generate",
+				UsageJSON:  `{"input_tokens":1200,"input_tokens_details":{"cached_tokens":200},"output_tokens":700}`,
+			}, nil
+		},
+	}
+	var out strings.Builder
+	err := runGenerateWithProvider(context.Background(), repo, provider, generateOptions{
+		RunGroupID:       "ga-generate",
+		ProviderName:     "fake",
+		APIModel:         "model-a",
+		ReasoningEffort:  "xhigh",
+		MaxOutputTokens:  6000,
+		InputPrice:       defaultInputUSDPerMTok,
+		CachedInputPrice: defaultCachedInputUSDPerMTok,
+		OutputPrice:      defaultOutputUSDPerMTok,
+	}, &out)
+	if err != nil {
+		t.Fatalf("generate: %v\n%s", err, out.String())
+	}
+	state = mustReadGAState(t, repo, "ga-generate")
+	if state.Children[0].Status != "generated" || state.Children[0].RequestID != "req-generate" || state.Children[0].TreeHash == "" {
+		t.Fatalf("generate state not updated: %#v", state.Children[0])
+	}
+	assertExists(t, repo.Path("simulations", childID, "README.md"))
+	assertExists(t, repo.Path("simulations", childID, "QUESTION.md"))
+}
+
+func TestRunGenerateRejectsUnsafeBundlePath(t *testing.T) {
+	repo := newGAFixtureRepo(t)
+	initGAStateForTest(t, repo, "ga-bad-generate")
+	state := mustReadGAState(t, repo, "ga-bad-generate")
+	childID := state.Children[0].ID()
+	provider := fakeGAProvider{
+		generate: func(ctx context.Context, request ProviderRequest) (ProviderResponse, error) {
+			return ProviderResponse{
+				Text: fmt.Sprintf(`{"child_id":%q,"design_delta_summary":"bad path","files":[{"path":"../README.md","content":"bad"},{"path":"QUESTION.md","content":"# Q"}]}`, childID),
+			}, nil
+		},
+	}
+	var out strings.Builder
+	err := runGenerateWithProvider(context.Background(), repo, provider, generateOptions{
+		RunGroupID:      "ga-bad-generate",
+		ProviderName:    "fake",
+		APIModel:        "model-a",
+		ReasoningEffort: "xhigh",
+		MaxOutputTokens: 6000,
+	}, &out)
+	if err == nil {
+		t.Fatalf("expected unsafe bundle path error")
+	}
+	assertMissing(t, repo.Path("simulations", childID))
 }
 
 func TestRunAcceptRecordsAcceptanceAndPrintsStagePaths(t *testing.T) {
@@ -593,6 +727,54 @@ func newGitTestRepo(t *testing.T) Repo {
 	return Repo{Root: root}
 }
 
+func newGAFixtureRepo(t *testing.T) Repo {
+	t.Helper()
+	repo := newGitTestRepo(t)
+	writeTestFile(t, repo.Path("results", "RUN-PROTOCOL.md"), "# Run Protocol\n\nScore cells as evidence.\n")
+	writeTestFile(t, repo.Path("scenarios", "README.md"), "# Scenarios\n\nUse 100-year PromiseGrid pressure.\n")
+	writeTestFile(t, repo.Path("scenarios", "scenario-one", "scenario-one.md"), "# Scenario One\n\nAlice asks Bob to ship labels with auditable promises.\n")
+	writeTestFile(t, repo.Path("simulations", "SIM-parent", "README.md"), "# Parent Sim\n\nA small parent simulation for GA tests.\n")
+	writeTestFile(t, repo.Path("simulations", "SIM-parent", "QUESTION.md"), "# Questions\n\nCan Alice and Bob audit the result?\n")
+	gitAdd(t, repo,
+		"results/RUN-PROTOCOL.md",
+		"scenarios/README.md",
+		"scenarios/scenario-one/scenario-one.md",
+		"simulations/SIM-parent/README.md",
+		"simulations/SIM-parent/QUESTION.md",
+	)
+	return repo
+}
+
+func initGAStateForTest(t *testing.T, repo Repo, runGroupID string) {
+	t.Helper()
+	var out strings.Builder
+	err := runMain([]string{
+		"ga-runner", "init",
+		"-repo-root", repo.Root,
+		"-model", "model-a",
+		"-run-group-id", runGroupID,
+		"-timestamp", "20260519-111500",
+		"-parent-count", "1",
+		"-scenario-count", "1",
+		"-child-count", "1",
+		"-max-promotions", "1",
+	}, &out, &out)
+	if err != nil {
+		t.Fatalf("init fixture state: %v\n%s", err, out.String())
+	}
+}
+
+type fakeGAProvider struct {
+	generate func(context.Context, ProviderRequest) (ProviderResponse, error)
+}
+
+func (provider fakeGAProvider) Generate(ctx context.Context, request ProviderRequest) (ProviderResponse, error) {
+	if provider.generate == nil {
+		return ProviderResponse{}, fmt.Errorf("fake provider has no generate function")
+	}
+	return provider.generate(ctx, request)
+}
+
 func writeTestFile(t *testing.T, path string, text string) {
 	t.Helper()
 	if err := ensureParent(path); err != nil {
@@ -794,6 +976,38 @@ func mustJSON(t *testing.T, result FitnessResult) []byte {
 
 func jsonMarshalIndent(result FitnessResult) ([]byte, error) {
 	return json.MarshalIndent(result, "", "  ")
+}
+
+func validScorePayloadJSON() string {
+	return `{
+  "scores": {
+    "scenario_fit": 4,
+    "promisegrid_alignment": 4,
+    "auditability": 4,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 3,
+    "implementation_plausibility": 4,
+    "risk_penalty": 1
+  },
+  "fitness": {
+    "raw": 25,
+    "normalized_0_100": 78,
+    "confidence_0_1": 0.72
+  },
+  "assessment": {
+    "rationale": "Strong enough for a provider-backed fixture.",
+    "strengths": ["clear audit path"],
+    "weaknesses": ["limited scenario depth"],
+    "risks": ["fixture-only evaluation"],
+    "open_questions": ["none for this test"],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}`
+}
+
+func validChildBundleJSON(childID string) string {
+	return fmt.Sprintf(`{"child_id":%q,"design_delta_summary":"Tighten audit language while keeping the fixture small.","files":[{"path":"README.md","content":"# Generated Child\n\nThis generated child keeps audit evidence local.\n"},{"path":"QUESTION.md","content":"# Questions\n\nDoes this child improve the audit path?\n"}]}`, childID)
 }
 
 func hasIssue(issues []string, want string) bool {

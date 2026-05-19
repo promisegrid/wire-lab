@@ -169,16 +169,21 @@ Use `tools/ga-runner` for JSON-fitness GA/search work. Implemented commands are:
   `cd tools/ga-runner && go run . validate -repo-root ../..`
 - Preview tracked population and conservative generation sizing:
   `cd tools/ga-runner && go run . init -repo-root ../.. -dry-run -model <model-id> -run-group-id <run-group-id>`
+- Create state for one GA/search generation:
+  `cd tools/ga-runner && go run . init -repo-root ../.. -model <model-id> -run-group-id <run-group-id>`
+- Score parent or child cells with provider-backed reasoning:
+  `cd tools/ga-runner && go run . score -repo-root ../.. -run-group-id <run-group-id> -target parents -api-model <provider-model> -reasoning-effort <effort> -max-run-cost-usd <budget>`
+- Generate untracked child simulation trees from the active state:
+  `cd tools/ga-runner && go run . generate -repo-root ../.. -run-group-id <run-group-id> -api-model <provider-model> -reasoning-effort <effort> -max-run-cost-usd <budget>`
 - Record reviewed promotion candidates without staging or committing:
   `cd tools/ga-runner && go run . accept -repo-root ../.. -run-group-id <run-group-id> -child <SIM-id> -result <json-result-path> -reviewer-note '<note>'`
 - Cull rejected generated children and matching result trees through state:
   `cd tools/ga-runner && go run . cull -repo-root ../.. -run-group-id <run-group-id> -child <SIM-id> -reason '<reason>'`
 
-`ga-runner score`, `generate`, `progress`, and non-dry-run `init` remain planned
-until their code paths are implemented. Generated children are normal
-`simulations/SIM-*` trees and are not accepted merely because they exist on
-disk. Source: `DI-ramar`; `DI-zanon`; `DI-zohal`; `DI-zusit`; `DI-podot`;
-`DI-kofil`; `DI-ruzaj`.
+`ga-runner progress` remains planned until its code path is implemented.
+Generated children are normal `simulations/SIM-*` trees and are not accepted
+merely because they exist on disk. Source: `DI-ramar`; `DI-zanon`; `DI-zohal`;
+`DI-zusit`; `DI-podot`; `DI-kofil`; `DI-ruzaj`; `DI-gijom`.
 
 ## Recommended Preflight
 

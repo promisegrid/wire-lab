@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 )
 
 // Repo keeps all path decisions rooted in one discovered wire-lab checkout.
@@ -70,4 +71,20 @@ func (repo Repo) Git(args ...string) ([]byte, error) {
 		return nil, fmt.Errorf("git %v: %w", args, err)
 	}
 	return output, nil
+}
+
+func (repo Repo) GitCommit() string {
+	output, err := repo.Git("rev-parse", "HEAD")
+	if err != nil {
+		return "unknown"
+	}
+	return strings.TrimSpace(string(output))
+}
+
+func (repo Repo) ReadRel(path string) (string, error) {
+	bytes, err := os.ReadFile(repo.Abs(path))
+	if err != nil {
+		return "", err
+	}
+	return string(bytes), nil
 }

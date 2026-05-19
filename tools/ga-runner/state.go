@@ -39,9 +39,11 @@ type GAStateSim struct {
 }
 
 type GAStateScenario struct {
-	ScenarioID string `json:"scenario_id"`
-	Path       string `json:"path"`
-	SHA256     string `json:"sha256,omitempty"`
+	ScenarioID   string `json:"scenario_id"`
+	Path         string `json:"path"`
+	SamplePolicy string `json:"sample_policy,omitempty"`
+	SHA256       string `json:"sha256,omitempty"`
+	TreeHash     string `json:"tree_hash,omitempty"`
 }
 
 type GAStateParent struct {
@@ -65,18 +67,41 @@ type GAChild struct {
 	TreeHash           string       `json:"tree_hash"`
 	Status             string       `json:"status"`
 	DesignDeltaSummary string       `json:"design_delta_summary,omitempty"`
+	ValidationMessage  string       `json:"validation_message,omitempty"`
+	UpdatedAt          string       `json:"updated_at,omitempty"`
+	Provider           string       `json:"provider,omitempty"`
+	APIModel           string       `json:"api_model,omitempty"`
+	ReasoningEffort    string       `json:"reasoning_effort,omitempty"`
+	RequestID          string       `json:"request_id,omitempty"`
+	ResponseID         string       `json:"response_id,omitempty"`
+	UsageJSON          string       `json:"usage_json,omitempty"`
+	InputTokens        int          `json:"input_tokens,omitempty"`
+	CachedTokens       int          `json:"cached_input_tokens,omitempty"`
+	OutputTokens       int          `json:"output_tokens,omitempty"`
+	CostUSD            float64      `json:"cost_usd,omitempty"`
 }
 
 type GACell struct {
-	CellID             string `json:"cell_id"`
-	SimID              string `json:"sim_id"`
-	ScenarioID         string `json:"scenario_id"`
-	ModelID            string `json:"model_id"`
-	ResultPath         string `json:"result_path,omitempty"`
-	ExpectedResultPath string `json:"expected_result_path,omitempty"`
-	Status             string `json:"status,omitempty"`
-	Attempts           int    `json:"attempts,omitempty"`
-	ValidationMessage  string `json:"validation_message,omitempty"`
+	CellID             string  `json:"cell_id"`
+	SimID              string  `json:"sim_id"`
+	ScenarioID         string  `json:"scenario_id"`
+	ModelID            string  `json:"model_id"`
+	ResultPath         string  `json:"result_path,omitempty"`
+	ExpectedResultPath string  `json:"expected_result_path,omitempty"`
+	Status             string  `json:"status,omitempty"`
+	Attempts           int     `json:"attempts,omitempty"`
+	ValidationMessage  string  `json:"validation_message,omitempty"`
+	UpdatedAt          string  `json:"updated_at,omitempty"`
+	Provider           string  `json:"provider,omitempty"`
+	APIModel           string  `json:"api_model,omitempty"`
+	ReasoningEffort    string  `json:"reasoning_effort,omitempty"`
+	RequestID          string  `json:"request_id,omitempty"`
+	ResponseID         string  `json:"response_id,omitempty"`
+	UsageJSON          string  `json:"usage_json,omitempty"`
+	InputTokens        int     `json:"input_tokens,omitempty"`
+	CachedTokens       int     `json:"cached_input_tokens,omitempty"`
+	OutputTokens       int     `json:"output_tokens,omitempty"`
+	CostUSD            float64 `json:"cost_usd,omitempty"`
 }
 
 type AcceptanceRecord struct {
