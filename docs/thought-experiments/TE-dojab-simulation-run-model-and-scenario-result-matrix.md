@@ -18,7 +18,8 @@ against shared scenarios?
 Steve's current lean is:
 
 - root-level `scenarios/`;
-- root-level `results/<sim-id>/<scenario-id>.md`;
+- root-level
+  `results/<sim-id>/<scenario-id>/<model-id>/<YYYYMMDD-HHMMSS>.md`;
 - Codex-only runs for now;
 - a 2D comparison matrix with scenarios on one axis and simulations on the
   other.
@@ -47,17 +48,20 @@ scenarios/
 
 results/
   <sim-id>/
-    <scenario-id>.md
+    <scenario-id>/
+      <model-id>/
+        <YYYYMMDD-HHMMSS>.md
 ```
 
 Start with Codex-only runs. Do not build a multi-provider runner yet. Instead,
-make each result file carry enough metadata that later OpenAI, Anthropic,
-Perplexity, scripted, or human runs can be added without changing the directory
-model.
+make each result path name the specific provider/model/reasoning configuration
+and UTC run timestamp, while each result file still carries enough metadata that
+later OpenAI, Anthropic, Perplexity, scripted, or human runs can be added without
+changing the directory model. Source: `DI-miror`.
 
 This keeps the first implementation small while preserving the important future
 option: multiple agents can run the same `(scenario, sim)` cell later and record
-separate run records or reviewer notes.
+separate model-specific run records or reviewer notes.
 
 ## Assumptions
 
@@ -75,13 +79,14 @@ separate run records or reviewer notes.
 
 ## Alternatives
 
-### Alt A - Codex-only, root scenarios, root cell results
+### Alt A - Codex-only, root scenarios, root per-run results
 
 Use Codex as the only runner for now. Put cross-sim scenario suites under root
 `scenarios/`. Put comparison results under root
-`results/<sim-id>/<scenario-id>.md`. Each result file names the scenario, sim,
-sim commit, runner, prompt or procedure, observations, verdict, and open
-questions.
+`results/<sim-id>/<scenario-id>/<model-id>/<YYYYMMDD-HHMMSS>.md`. Each result
+file names the scenario, sim, sim commit, runner/interface, specific model ID,
+UTC run timestamp, prompt or procedure, observations, verdict, and open
+questions. Source: `DI-miror`.
 
 **Easier:** Very small first step. The matrix is visible from root. Humans and
 agents can compare all sims without walking every sim tree. It matches Steve's
@@ -198,32 +203,32 @@ if cross-sim comparison is the main job.
 Carol suspects Codex is missing a failure mode. She wants Anthropic or another
 agent to run the same scenario/sim cell independently.
 
-- **Alt A:** Works if the result file has runner metadata and can later split
-  into multiple run sections or files. The first runner can be Codex without
-  baking Codex into the path.
+- **Alt A:** Works because multiple model-specific run files can coexist under
+  the same simulation/scenario path. The first runner can be Codex without
+  baking the generic `codex` interface name into the model path.
 - **Alt B:** Same, but evidence is scattered under sims.
 - **Alt C:** Best long-term, but too much up-front machinery.
 - **Alt D:** Does not answer LLM judgment disagreement.
 - **Alt E:** Too little room for disagreement evidence.
 
-S3 says Alt A is acceptable only if the result schema is runner-extensible from
-day one.
+S3 says Alt A is acceptable only if the result schema is runner- and
+model-extensible from day one.
 
 ### S4: Dave reruns an old cell after a sim changes
 
 Dave reruns scenario `S3` against `SIM-jurar` after the sim's CAS migration
 question changes.
 
-- **Alt A:** The simple one-file-per-cell path risks overwriting old evidence
-  unless the file has append-only run history or links to archived runs.
+- **Alt A:** A per-model, per-UTC-timestamp run file avoids overwriting old
+  evidence while keeping each run directly addressable.
 - **Alt B:** Same risk, but local to the sim.
 - **Alt C:** Runner identity makes the risk more obvious but not solved.
 - **Alt D:** Deterministic CI can keep many run artifacts cheaply later.
 - **Alt E:** The matrix cannot preserve rerun history well.
 
-S4 refines Alt A: the first implementation can use one file per cell, but the
-file must be append-only by run section, or it must link to `runs/<run-id>.md`
-when the history gets large.
+S4 refines Alt A: the first implementation should use one file per run, with the
+run identified by the specific model slug and UTC timestamp in the path. Source:
+`DI-miror`.
 
 ### S5: Ellen writes guide prose
 
@@ -287,12 +292,14 @@ scenarios/
     MATRIX.md
 ```
 
-Root result cells:
+Root result runs:
 
 ```text
 results/
   <sim-id>/
-    <scenario-id>.md
+    <scenario-id>/
+      <model-id>/
+        <YYYYMMDD-HHMMSS>.md
 ```
 
 Minimal scenario fields:
@@ -314,9 +321,9 @@ Minimal result fields:
 - `Scenario`
 - `Simulation`
 - `Simulation commit`
-- `Runner`
-- `Runner version/model`
-- `Run date`
+- `Runner/interface`
+- `Model ID`
+- `Run timestamp UTC`
 - `Prompt/procedure`
 - `Observed behavior`
 - `Verdict`
@@ -325,9 +332,12 @@ Minimal result fields:
 - `Handoff target`
 - `Authority boundary`
 
-For now, `Runner` should be `codex`. Later values can include `human`,
-`scripted`, `openai-agent`, `anthropic-agent`, `perplexity-agent`, or
-`multi-agent-panel` without changing the root layout.
+For now, `Runner/interface` should be `codex`. The path's `<model-id>` must name
+the specific provider/model/reasoning configuration, for example
+`openai-GPT-5.5-xhigh`; `codex` alone is not specific enough. Later runner
+values can include `human`, `scripted`, `openai-agent`, `anthropic-agent`,
+`perplexity-agent`, or `multi-agent-panel` without changing the root layout.
+Source: `DI-miror`.
 
 ## What this TE rejects for now
 
@@ -344,9 +354,9 @@ For now, `Runner` should be `codex`. Later values can include `human`,
   simulation-local `results/`. This is acceptable only if root `results/` is
   explicitly harness comparison apparatus, while sim-local results remain
   available for simulation-owned internal evidence if needed.
-- One file per cell may get too large after multiple reruns or multi-agent
-  comparisons. The escape hatch should be `results/<sim-id>/<scenario-id>/runs/`
-  if the append-only file becomes unwieldy.
+- One file per model/timestamp run may create many files after repeated reruns
+  or multi-agent comparisons. Suite matrices should summarize or point to the
+  relevant run files rather than duplicating their evidence.
 - Root `scenarios/` can become too generic. Each suite should declare which sims
   it applies to and why.
 
@@ -365,14 +375,17 @@ Surviving alternatives:
 - **1.C - Sim-local only.** Rejected for cross-sim comparison because it weakens
   apples-to-apples reuse.
 
-### DF-dojab.2 - Where do cross-sim result cells live?
+### DF-dojab.2 - Where do cross-sim result runs live?
 
-Recommended answer: root `results/<sim-id>/<scenario-id>.md`.
+Recommended answer: root
+`results/<sim-id>/<scenario-id>/<model-id>/<YYYYMMDD-HHMMSS>.md`, with UTC
+timestamps and provider-prefixed specific model IDs. Source: `DI-miror`.
 
 Surviving alternatives:
 
-- **2.A - Root `results/` (recommended).** Best for matrix comparison, with
-  clear authority-boundary language.
+- **2.A - Root per-run `results/` (recommended).** Best for matrix comparison,
+  rerun history, and model-specific evidence, with clear authority-boundary
+  language.
 - **2.B - Sim-local `simulations/<sim>/results/`.** Better locality, weaker
   comparison ergonomics.
 - **2.C - Matrix-only.** Rejected as too lossy.
@@ -391,13 +404,16 @@ Surviving alternatives:
 
 ### DF-dojab.4 - How should reruns and later multi-agent runs be represented?
 
-Recommended answer: one file per cell at first, append run sections; split into
-`runs/<run-id>.md` only when needed.
+Recommended answer: one file per specific model and UTC run timestamp from day
+one, at `results/<sim-id>/<scenario-id>/<model-id>/<YYYYMMDD-HHMMSS>.md`.
+Source: `DI-miror`.
 
 Surviving alternatives:
 
-- **4.A - Append-only cell file first (recommended).** Smallest useful shape.
-- **4.B - One run file per cell from day one.** More scalable but heavier.
+- **4.A - One run file per model/timestamp from day one (recommended).** More
+  scalable and preserves rerun evidence without append-section ambiguity.
+- **4.B - Append-only cell file first.** Smaller file count but makes reruns and
+  model comparisons harder to address directly.
 - **4.C - Overwrite latest result.** Rejected because it destroys evidence.
 
 ### DF-dojab.5 - What authority do results have?
@@ -428,6 +444,19 @@ Surviving alternatives:
 ## Decision status
 
 `needs DF`. This TE recommends root `scenarios/`, root
-`results/<sim-id>/<scenario-id>.md`, Codex-only first runs, append-only cell
-files, and evidence-only authority. None of those choices are locked until the
-DF questions above are answered and a DI records the result.
+`results/<sim-id>/<scenario-id>/<model-id>/<YYYYMMDD-HHMMSS>.md`, Codex-only
+first runs, per-run result files keyed by provider/model/reasoning slug and UTC
+timestamp, and evidence-only authority. The result-path refinement is recorded
+by `DI-miror`; the broader TE outcome still needs DF before it becomes a locked
+harness implementation decision.
+
+## Refinements
+
+### 2026-05-19 - Model-specific per-run result paths
+
+Steve refined the result-tree recommendation from one result file per
+simulation/scenario cell to one file per simulation, scenario, specific
+provider/model/reasoning slug, and UTC timestamp:
+`results/<sim-id>/<scenario-id>/<model-id>/<YYYYMMDD-HHMMSS>.md`. The generic
+runner/interface label such as `codex` remains result metadata and must not be
+used as the model ID. Source: `DI-miror`.

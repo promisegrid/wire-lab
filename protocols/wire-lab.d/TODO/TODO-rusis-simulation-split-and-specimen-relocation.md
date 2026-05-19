@@ -378,6 +378,28 @@ Affects: `protocols/wire-lab.d/TODO/TODO-rusis-simulation-split-and-specimen-rel
 `simulations/SIM-bohof-group-session-freeze-promise/`;
 `simulations/SIM-kuful-udp-feed-v0-conformance/`.
 
+ID: DI-miror
+Date: 2026-05-18 18:33:13
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Refine the TE-dojab simulation result-tree recommendation to use one
+run artifact per simulation, scenario, specific provider/model/reasoning slug,
+and UTC run timestamp at
+`results/<sim-id>/<scenario-id>/<model-id>/<YYYYMMDD-HHMMSS>.md`.
+Intent: Result evidence needs to compare both simulation behavior and
+model-specific judgment without overwriting reruns or hiding model drift behind
+generic runner labels. `codex` is the runner/interface, not the model identity;
+the path must name the specific model configuration, for example
+`openai-GPT-5.5-xhigh`.
+Constraints: Documentation-only refinement. Do not create root `scenarios/` or
+`results/` directories in this pass. Treat timestamps in result paths as UTC.
+Keep root `results/` as wire-lab harness comparison apparatus, not PromiseGrid
+world state or design authority.
+Affects: `protocols/wire-lab.d/TODO/TODO-rusis-simulation-split-and-specimen-relocation.md`;
+`docs/thought-experiments/TE-dojab-simulation-run-model-and-scenario-result-matrix.md`;
+`protocols/wire-lab.d/specs/harness-spec-draft.md`;
+`DEV-GUIDE-RESOURCES.md`.
+
 ## Context
 
 The current simulation layout still reflects the recovery process that

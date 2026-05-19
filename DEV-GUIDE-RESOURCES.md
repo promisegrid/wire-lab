@@ -51,10 +51,12 @@ PromiseGrid design choices are derived, tested, and recorded. Source:
   PromiseGrid layout commitments. Source: `DI-nunut`; `DI-fakin`.
 - `docs/thought-experiments/TE-dojab-simulation-run-model-and-scenario-result-matrix.md`
   is open design evidence about root `scenarios/`, root
-  `results/<sim-id>/<scenario-id>.md`, Codex-only first runs, and 2D
-  scenario-by-simulation comparison matrices. Until DF-dojab closes, treat those
-  paths as proposed wire-lab comparison apparatus, not PromiseGrid node layout or
-  final guide-facing API structure.
+  `results/<sim-id>/<scenario-id>/<model-id>/<YYYYMMDD-HHMMSS>.md`,
+  Codex-only first runs, and 2D scenario-by-simulation comparison matrices.
+  `model-id` is a specific provider/model/reasoning slug such as
+  `openai-GPT-5.5-xhigh`, and result-path timestamps are UTC per `DI-miror`.
+  Until DF-dojab closes, treat those paths as proposed wire-lab comparison
+  apparatus, not PromiseGrid node layout or final guide-facing API structure.
 - Active guide prose should use **promise accounting records** for peer-local
   relationship accounting. Alice, Bob, Carol, and other
   peers each keep their own records; wire-lab does not define a central or
