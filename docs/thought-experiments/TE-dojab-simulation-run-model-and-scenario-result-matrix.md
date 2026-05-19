@@ -6,7 +6,7 @@ TE-dojab
 
 ## Status
 
-needs DF
+decided, refined
 
 First drafted 2026-05-19.
 
@@ -364,7 +364,7 @@ Source: `DI-miror`.
 
 ### DF-dojab.1 - Where do shared scenario suites live?
 
-Recommended answer: root `scenarios/`.
+Locked answer: **1.A - Root `scenarios/`**. Source: `DI-faros`.
 
 Surviving alternatives:
 
@@ -377,9 +377,10 @@ Surviving alternatives:
 
 ### DF-dojab.2 - Where do cross-sim result runs live?
 
-Recommended answer: root
+Locked answer: **2.A - Root per-run `results/`**:
 `results/<sim-id>/<scenario-id>/<model-id>/<YYYYMMDD-HHMMSS>.md`, with UTC
-timestamps and provider-prefixed specific model IDs. Source: `DI-miror`.
+timestamps and provider-prefixed specific model IDs. Source: `DI-miror`;
+`DI-faros`.
 
 Surviving alternatives:
 
@@ -392,7 +393,7 @@ Surviving alternatives:
 
 ### DF-dojab.3 - What runner should be used first?
 
-Recommended answer: Codex-only manual runs.
+Locked answer: **3.A - Codex-only first**. Source: `DI-faros`.
 
 Surviving alternatives:
 
@@ -404,9 +405,10 @@ Surviving alternatives:
 
 ### DF-dojab.4 - How should reruns and later multi-agent runs be represented?
 
-Recommended answer: one file per specific model and UTC run timestamp from day
+Locked answer: **4.A - One run file per model/timestamp from day one**:
+one file per specific model and UTC run timestamp from day
 one, at `results/<sim-id>/<scenario-id>/<model-id>/<YYYYMMDD-HHMMSS>.md`.
-Source: `DI-miror`.
+Source: `DI-miror`; `DI-faros`.
 
 Surviving alternatives:
 
@@ -418,8 +420,8 @@ Surviving alternatives:
 
 ### DF-dojab.5 - What authority do results have?
 
-Recommended answer: evidence only; results graduate through DR/DI/spec/guide
-handoff.
+Locked answer: **5.A - Evidence only**; results graduate through DR/DI/spec/guide
+handoff. Source: `DI-faros`.
 
 Surviving alternatives:
 
@@ -433,9 +435,9 @@ Surviving alternatives:
 ## Implications for open TODOs, DRs, and DIs
 
 - A follow-on TODO should define the first `scenarios/` and `results/` skeleton
-  if Steve accepts DF-dojab.1 through DF-dojab.5.
+  now that `DF-dojab.1` through `DF-dojab.5` are locked by `DI-faros`.
 - `simulations/README.md` should later point readers to root scenario suites and
-  root result matrices once the DF is locked.
+  root result matrices after the root skeleton exists.
 - `DEV-GUIDE-RESOURCES.md` should treat result files as wire-lab evidence, not
   as final PromiseGrid guide prose.
 - Existing sim-local `SCENARIOS.md` files remain valid as local pressure tests;
@@ -443,12 +445,12 @@ Surviving alternatives:
 
 ## Decision status
 
-`needs DF`. This TE recommends root `scenarios/`, root
+`decided, refined`. `DF-dojab.1` through `DF-dojab.5` are locked by `DI-faros`:
+root `scenarios/`, root
 `results/<sim-id>/<scenario-id>/<model-id>/<YYYYMMDD-HHMMSS>.md`, Codex-only
-first runs, per-run result files keyed by provider/model/reasoning slug and UTC
-timestamp, and evidence-only authority. The result-path refinement is recorded
-by `DI-miror`; the broader TE outcome still needs DF before it becomes a locked
-harness implementation decision.
+first runs, one result file per provider/model/reasoning slug and UTC timestamp,
+and evidence-only authority. The result-path refinement remains recorded by
+`DI-miror`.
 
 ## Refinements
 
@@ -460,3 +462,11 @@ provider/model/reasoning slug, and UTC timestamp:
 `results/<sim-id>/<scenario-id>/<model-id>/<YYYYMMDD-HHMMSS>.md`. The generic
 runner/interface label such as `codex` remains result metadata and must not be
 used as the model ID. Source: `DI-miror`.
+
+### 2026-05-19 - DF-dojab closure
+
+Steve answered all five DF-dojab choices with the recommended alternatives:
+root `scenarios/`, root per-run `results/`, Codex-only first execution, one
+file per model/timestamp run from day one, and evidence-only result authority.
+Those choices are locked by `DI-faros`; `DI-miror` remains the source for the
+specific model-ID and UTC timestamp path refinement.

@@ -400,6 +400,33 @@ Affects: `protocols/wire-lab.d/TODO/TODO-rusis-simulation-split-and-specimen-rel
 `protocols/wire-lab.d/specs/harness-spec-draft.md`;
 `DEV-GUIDE-RESOURCES.md`.
 
+ID: DI-faros
+Date: 2026-05-18 18:44:33
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Lock `DF-dojab.1` through `DF-dojab.5` for the first
+simulation/scenario comparison apparatus: shared scenario suites live at root
+`scenarios/`; cross-simulation result runs live at root
+`results/<sim-id>/<scenario-id>/<model-id>/<YYYYMMDD-HHMMSS>.md`; the first
+runner/interface is Codex-only manual execution; reruns and later multi-agent
+runs use one result file per specific model and UTC timestamp from day one; and
+result files are evidence only, graduating into design authority only through
+DR, DI, frozen spec, or development-guide handoff.
+Intent: The simulation harness needs an apples-to-apples comparison surface now,
+but without turning result files into PromiseGrid node layout, simulation-local
+world state, or final design authority. Root scenarios and per-run root results
+make comparisons navigable while preserving independent simulation evolution
+and explicit decision provenance.
+Constraints: Do not create root `scenarios/` or `results/` directories as part
+of this DI-closing pass. Preserve `DI-miror` as the specific result-path
+refinement source. Keep generic runner/interface labels such as `codex` out of
+the `model-id` path segment; use provider/model/reasoning slugs such as
+`openai-GPT-5.5-xhigh`.
+Affects: `protocols/wire-lab.d/TODO/TODO-rusis-simulation-split-and-specimen-relocation.md`;
+`docs/thought-experiments/TE-dojab-simulation-run-model-and-scenario-result-matrix.md`;
+`protocols/wire-lab.d/specs/harness-spec-draft.md`;
+`DEV-GUIDE-RESOURCES.md`.
+
 ## Context
 
 The current simulation layout still reflects the recovery process that
