@@ -52,10 +52,13 @@ func (p OpenAIProvider) Generate(ctx context.Context, request ProviderRequest) (
 	if err != nil {
 		return ProviderResponse{}, err
 	}
-	defer httpResp.Body.Close()
 	responseBytes, err := io.ReadAll(httpResp.Body)
+	closeErr := httpResp.Body.Close()
 	if err != nil {
 		return ProviderResponse{}, err
+	}
+	if closeErr != nil {
+		return ProviderResponse{}, closeErr
 	}
 	if httpResp.StatusCode < 200 || httpResp.StatusCode >= 300 {
 		return ProviderResponse{}, fmt.Errorf("openai status %d: %s", httpResp.StatusCode, strings.TrimSpace(string(responseBytes)))

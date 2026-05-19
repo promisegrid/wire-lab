@@ -7,7 +7,6 @@ Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-nanih`.
 ## Scenario Files
 
 - [`transport-family-bakeoff-per-hop-authorization-failure.md`](transport-family-bakeoff-per-hop-authorization-failure.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 

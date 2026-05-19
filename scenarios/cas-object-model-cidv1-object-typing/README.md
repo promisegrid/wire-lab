@@ -7,7 +7,6 @@ Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-nanih`.
 ## Scenario Files
 
 - [`cas-object-model-cidv1-object-typing.md`](cas-object-model-cidv1-object-typing.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 

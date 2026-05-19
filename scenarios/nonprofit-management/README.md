@@ -7,7 +7,6 @@ authority. Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-midif`.
 ## Scenario Files
 
 - [`nonprofit-management.md`](nonprofit-management.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 

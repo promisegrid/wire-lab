@@ -7,7 +7,6 @@ Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-nanih`.
 ## Scenario Files
 
 - [`promise-accounting-records-cross-layer-decision.md`](promise-accounting-records-cross-layer-decision.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 

@@ -60,7 +60,8 @@ func runJobs(args []string, stdout io.Writer) error {
 	if err := writeFile(filepath.Join(outDir, "INDEX.md"), joinLines(indexLines)); err != nil {
 		return err
 	}
-	fmt.Fprintln(stdout, repo.Rel(outDir))
-	fmt.Fprintf(stdout, "jobs=%d\n", len(selected))
-	return nil
+	if err := writeLine(stdout, repo.Rel(outDir)); err != nil {
+		return err
+	}
+	return writeFormat(stdout, "jobs=%d\n", len(selected))
 }

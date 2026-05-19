@@ -7,7 +7,6 @@ Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-nanih`.
 ## Scenario Files
 
 - [`promise-economy-spectrum-permissioned-capability-token.md`](promise-economy-spectrum-permissioned-capability-token.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 

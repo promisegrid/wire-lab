@@ -7,7 +7,6 @@ Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-nanih`.
 ## Scenario Files
 
 - [`conditional-release-geofencing-opaque-lower-layer-carriage.md`](conditional-release-geofencing-opaque-lower-layer-carriage.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 

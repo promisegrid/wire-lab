@@ -7,7 +7,6 @@ Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-nanih`.
 ## Scenario Files
 
 - [`chunking-identity-bakeoff-same-bytes-different-chunkers.md`](chunking-identity-bakeoff-same-bytes-different-chunkers.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 

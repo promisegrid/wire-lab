@@ -7,7 +7,6 @@ Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-nanih`.
 ## Scenario Files
 
 - [`promise-economy-spectrum-peer-local-assessment-only.md`](promise-economy-spectrum-peer-local-assessment-only.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 

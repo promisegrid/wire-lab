@@ -7,7 +7,6 @@ Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-nanih`.
 ## Scenario Files
 
 - [`chunk-feed-replication-partial-merkle-fetch.md`](chunk-feed-replication-partial-merkle-fetch.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 

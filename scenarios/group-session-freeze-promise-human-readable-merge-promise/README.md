@@ -7,7 +7,6 @@ Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-nanih`.
 ## Scenario Files
 
 - [`group-session-freeze-promise-human-readable-merge-promise.md`](group-session-freeze-promise-human-readable-merge-promise.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 

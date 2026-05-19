@@ -7,7 +7,6 @@ Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-nanih`.
 ## Scenario Files
 
 - [`chunking-identity-bakeoff-profile-negotiation-mismatch.md`](chunking-identity-bakeoff-profile-negotiation-mismatch.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 

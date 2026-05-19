@@ -22,8 +22,7 @@ simulations can be evaluated against the same question rather than only inside
 
 - Primary source simulation: `SIM-punaz-bgp-class-routing-app/`
 - Other simulations that claim to address `bgp-class-routing-app` or the same PromiseGrid
-  pressure should be added to this entry's `MATRIX.md` before or during result
-  runs.
+  pressure should record result runs under `results/<sim-id>/<scenario-id>/<model-id>/<YYYYMMDD-HHMMSS>.md`; generated views can summarize completed runs when needed.
 
 ## Actors
 

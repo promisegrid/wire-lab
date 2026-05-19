@@ -7,7 +7,6 @@ Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-nanih`.
 ## Scenario Files
 
 - [`chunk-feed-replication-corrupt-chunk.md`](chunk-feed-replication-corrupt-chunk.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 

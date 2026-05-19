@@ -7,7 +7,6 @@ authority. Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-midif`.
 ## Scenario Files
 
 - [`tuition-attendance.md`](tuition-attendance.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 

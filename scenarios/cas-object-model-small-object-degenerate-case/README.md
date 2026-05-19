@@ -7,7 +7,6 @@ Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-nanih`.
 ## Scenario Files
 
 - [`cas-object-model-small-object-degenerate-case.md`](cas-object-model-small-object-degenerate-case.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 

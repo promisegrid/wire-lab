@@ -7,7 +7,6 @@ Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-nanih`.
 ## Scenario Files
 
 - [`spec-requirement-sections-minimal-binding-spec.md`](spec-requirement-sections-minimal-binding-spec.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 

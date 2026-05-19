@@ -7,7 +7,6 @@ authority. Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-midif`.
 ## Scenario Files
 
 - [`air-traffic-control.md`](air-traffic-control.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 

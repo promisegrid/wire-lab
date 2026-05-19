@@ -7,7 +7,6 @@ Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-nanih`.
 ## Scenario Files
 
 - [`cas-object-type-binding-bakeoff-application-object-family.md`](cas-object-type-binding-bakeoff-application-object-family.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 

@@ -26,8 +26,7 @@ func runQueue(ctx context.Context, args []string, stdout io.Writer) error {
 	limit := fs.Int("limit", -1, "maximum selected cells this invocation")
 	retryFailed := fs.Bool("retry-failed", false, "retry failed cells")
 	rerunDone := fs.Bool("rerun-done", false, "rerun done cells")
-	noMatrixUpdate := fs.Bool("no-matrix-update", false, "do not update scenario MATRIX.md")
-	dryRun := fs.Bool("dry-run", false, "show selected work without writing state/results/matrices")
+	dryRun := fs.Bool("dry-run", false, "show selected work without writing state/results")
 	if err := fs.Parse(args); err != nil {
 		return err
 	}
@@ -78,13 +77,14 @@ func runQueue(ctx context.Context, args []string, stdout io.Writer) error {
 		MaxOutputTokens: *maxOutputTokens,
 		RetryFailed:     *retryFailed,
 		RerunDone:       *rerunDone,
-		UpdateMatrix:    !*noMatrixUpdate,
 		DryRun:          *dryRun,
 	}
 	for _, cell := range cells {
 		record := state.Cells[cell.CellID]
 		if skip, reason := shouldSkip(record, options); skip {
-			fmt.Fprintf(stdout, "skip: %s: %s\n", cell.CellID, reason)
+			if err := writeFormat(stdout, "skip: %s: %s\n", cell.CellID, reason); err != nil {
+				return err
+			}
 			continue
 		}
 		status := runOneCell(ctx, repo, provider, state, statePath, jobDir, cell, record, options, stdout)
@@ -97,14 +97,18 @@ func runQueue(ctx context.Context, args []string, stdout io.Writer) error {
 				return err
 			}
 		}
-		fmt.Fprintln(stdout, formatCounts(state))
+		if err := writeLine(stdout, formatCounts(state)); err != nil {
+			return err
+		}
 	}
 	if !options.DryRun {
 		if err := saveState(statePath, state); err != nil {
 			return err
 		}
 	}
-	fmt.Fprintf(stdout, "processed=%d failed=%d state=%s\n", processed, failed, statePath)
+	if err := writeFormat(stdout, "processed=%d failed=%d state=%s\n", processed, failed, statePath); err != nil {
+		return err
+	}
 	if failed > 0 {
 		return fmt.Errorf("one or more cells failed")
 	}
@@ -118,7 +122,6 @@ type RunOptions struct {
 	MaxOutputTokens int
 	RetryFailed     bool
 	RerunDone       bool
-	UpdateMatrix    bool
 	DryRun          bool
 }
 
@@ -158,7 +161,10 @@ func shouldSkip(record *CellState, options RunOptions) (bool, string) {
 func runOneCell(ctx context.Context, repo Repo, provider Provider, state *QueueState, statePath string, jobDir string, cell MatrixCell, record *CellState, options RunOptions, stdout io.Writer) string {
 	resultPath := repo.Abs(cell.ResultPath)
 	if options.DryRun {
-		fmt.Fprintf(stdout, "dry-run: %s -> %s\n", cell.CellID, cell.ResultPath)
+		if err := writeFormat(stdout, "dry-run: %s -> %s\n", cell.CellID, cell.ResultPath); err != nil {
+			markCell(record, "failed", err.Error())
+			return "failed"
+		}
 		return record.Status
 	}
 	prompt, err := PromptBuilder{Repo: repo}.BuildAPIPrompt(cell)
@@ -170,13 +176,7 @@ func runOneCell(ctx context.Context, repo Repo, provider Provider, state *QueueS
 		markCell(record, "failed", err.Error())
 		return "failed"
 	}
-	if issues := validateResultFile(repo, resultPath, false, false); len(issues) == 0 {
-		if options.UpdateMatrix {
-			if _, _, _, err := updateMatrixForResult(repo, resultPath, false); err != nil {
-				markCell(record, "failed", err.Error())
-				return "failed"
-			}
-		}
+	if issues := validateResultFile(repo, resultPath, false); len(issues) == 0 {
 		markCell(record, "done", "existing valid result")
 		return "done"
 	}
@@ -210,15 +210,9 @@ func runOneCell(ctx context.Context, repo Repo, provider Provider, state *QueueS
 		markCell(record, "failed", err.Error())
 		return "failed"
 	}
-	if issues := validateResultFile(repo, resultPath, false, false); len(issues) > 0 {
+	if issues := validateResultFile(repo, resultPath, false); len(issues) > 0 {
 		markCell(record, "failed", strings.Join(issues, "; "))
 		return "failed"
-	}
-	if options.UpdateMatrix {
-		if _, _, _, err := updateMatrixForResult(repo, resultPath, false); err != nil {
-			markCell(record, "failed", err.Error())
-			return "failed"
-		}
 	}
 	markCell(record, "done", "validated result")
 	return "done"
@@ -253,7 +247,8 @@ func runProgress(args []string, stdout io.Writer) error {
 	if err != nil {
 		return err
 	}
-	fmt.Fprintln(stdout, formatCounts(state))
-	fmt.Fprintf(stdout, "state=%s\n", statePath)
-	return nil
+	if err := writeLine(stdout, formatCounts(state)); err != nil {
+		return err
+	}
+	return writeFormat(stdout, "state=%s\n", statePath)
 }

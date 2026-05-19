@@ -7,7 +7,6 @@ authority. Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-midif`.
 ## Scenario Files
 
 - [`agriculture-food-traceability.md`](agriculture-food-traceability.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 

@@ -7,7 +7,6 @@ Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-nanih`.
 ## Scenario Files
 
 - [`cas-object-model-dag-cbor-interop.md`](cas-object-model-dag-cbor-interop.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 

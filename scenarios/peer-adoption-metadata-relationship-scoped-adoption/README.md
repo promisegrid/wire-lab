@@ -7,7 +7,6 @@ Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-nanih`.
 ## Scenario Files
 
 - [`peer-adoption-metadata-relationship-scoped-adoption.md`](peer-adoption-metadata-relationship-scoped-adoption.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 

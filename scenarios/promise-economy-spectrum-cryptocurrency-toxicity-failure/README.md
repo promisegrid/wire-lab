@@ -7,7 +7,6 @@ Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-nanih`.
 ## Scenario Files
 
 - [`promise-economy-spectrum-cryptocurrency-toxicity-failure.md`](promise-economy-spectrum-cryptocurrency-toxicity-failure.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 

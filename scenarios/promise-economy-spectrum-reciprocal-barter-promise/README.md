@@ -7,7 +7,6 @@ Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-nanih`.
 ## Scenario Files
 
 - [`promise-economy-spectrum-reciprocal-barter-promise.md`](promise-economy-spectrum-reciprocal-barter-promise.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 

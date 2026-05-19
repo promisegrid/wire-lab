@@ -10,7 +10,7 @@ import (
 	"testing"
 )
 
-func TestManifestJobsUpdateAndValidate(t *testing.T) {
+func TestManifestJobsViewAndValidate(t *testing.T) {
 	repo := makeTestRepo(t)
 	var stdout bytes.Buffer
 	manifestPath := filepath.Join(repo.Root, "results", "manifests", "test.csv")
@@ -50,26 +50,22 @@ func TestManifestJobsUpdateAndValidate(t *testing.T) {
 	}
 	stdout.Reset()
 	err = runMain(context.Background(), []string{
-		"matrix-runner", "update-matrix",
+		"matrix-runner", "view",
 		"-repo-root", repo.Root,
-		"-result", resultPath,
+		"-scenario", "scenario-one",
 	}, &stdout, &stdout)
 	if err != nil {
-		t.Fatalf("update-matrix: %v\n%s", err, stdout.String())
+		t.Fatalf("view: %v\n%s", err, stdout.String())
 	}
-	matrixText, err := repo.ReadRel("scenarios/scenario-one/MATRIX.md")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if !strings.Contains(matrixText, repo.Rel(resultPath)) {
-		t.Fatalf("matrix missing result path:\n%s", matrixText)
+	viewText := stdout.String()
+	if !strings.Contains(viewText, repo.Rel(resultPath)) || !strings.Contains(viewText, "good partial fit") {
+		t.Fatalf("view missing result evidence:\n%s", viewText)
 	}
 	stdout.Reset()
 	err = runMain(context.Background(), []string{
 		"matrix-runner", "validate",
 		"-repo-root", repo.Root,
 		"-manifest", manifestPath,
-		"-strict-matrix",
 	}, &stdout, &stdout)
 	if err != nil {
 		t.Fatalf("validate: %v\n%s", err, stdout.String())
@@ -129,7 +125,6 @@ func TestRunCellPersistsRunningBeforeProviderCall(t *testing.T) {
 		APIModel:        "gpt-test",
 		ReasoningEffort: "xhigh",
 		MaxOutputTokens: 1000,
-		UpdateMatrix:    true,
 	}, &stdout)
 	if status != "done" {
 		t.Fatalf("status=%s state=%+v output=%s", status, state.Cells[cell.CellID], stdout.String())
@@ -157,16 +152,9 @@ func makeTestRepo(t *testing.T) Repo {
 	mustWrite(t, repo.Path("simulations", "SIM-alpha", "README.md"), "# SIM-alpha\n")
 	mustWrite(t, repo.Path("simulations", "SIM-alpha", "QUESTION.md"), "# Question\n")
 	mustWrite(t, repo.Path("simulations", "SIM-alpha", "protocols", "draft.md"), "# Draft\n")
+	mustWrite(t, repo.Path("scenarios", "README.md"), "# Scenarios\n")
 	mustWrite(t, repo.Path("scenarios", "scenario-one", "README.md"), "# Scenario One\n")
 	mustWrite(t, repo.Path("scenarios", "scenario-one", "scenario-one.md"), "# Scenario One Body\n")
-	mustWrite(t, repo.Path("scenarios", "scenario-one", "MATRIX.md"), strings.Join([]string{
-		"# Scenario One Matrix",
-		"",
-		"| Simulation | Scenario | Latest result run | Status | Notes |",
-		"|---|---|---|---|---|",
-		"| `<candidate-sim-id>` | `scenario-one` |  | not-run | Replace with a real simulation ID. |",
-		"",
-	}, "\n"))
 	return repo
 }
 

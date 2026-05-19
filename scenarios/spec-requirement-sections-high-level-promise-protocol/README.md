@@ -7,7 +7,6 @@ Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-nanih`.
 ## Scenario Files
 
 - [`spec-requirement-sections-high-level-promise-protocol.md`](spec-requirement-sections-high-level-promise-protocol.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 

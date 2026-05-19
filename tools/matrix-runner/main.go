@@ -3,8 +3,8 @@
 //
 // Intent: Replace the Python matrix orchestration scripts with one typed Go
 // program that can generate manifests, run unattended API-backed cells, resume
-// from checkpoints, validate result evidence, update scenario matrices, and
-// compare model corpora. Source: DI-lulom
+// from checkpoints, validate result evidence, generate read-only result views,
+// and compare model corpora. Source: DI-lulom; DI-zamin
 package main
 
 import (
@@ -23,7 +23,7 @@ const usage = `Usage:
   matrix-runner run            Run a manifest through an API provider with checkpoints.
   matrix-runner progress       Show queue checkpoint counts.
   matrix-runner validate       Validate result files or manifest rows.
-  matrix-runner update-matrix  Update scenario MATRIX.md rows from result files.
+  matrix-runner view           Generate a result view from canonical result files.
   matrix-runner compare        Compare verdict drift between two model corpora.
   matrix-runner help           Print this message.
 
@@ -40,7 +40,9 @@ func main() {
 
 func runMain(ctx context.Context, args []string, stdout io.Writer, stderr io.Writer) error {
 	if len(args) < 2 {
-		fmt.Fprint(stderr, usage)
+		if err := writeText(stderr, usage); err != nil {
+			return err
+		}
 		return exitCodeError{code: 2, message: "missing subcommand"}
 	}
 	subcommand := args[1]
@@ -56,15 +58,16 @@ func runMain(ctx context.Context, args []string, stdout io.Writer, stderr io.Wri
 		return runProgress(subArgs, stdout)
 	case "validate":
 		return runValidate(subArgs, stdout)
-	case "update-matrix":
-		return runUpdateMatrix(subArgs, stdout)
+	case "view":
+		return runView(subArgs, stdout)
 	case "compare":
 		return runCompare(subArgs, stdout)
 	case "help", "-h", "--help":
-		fmt.Fprint(stdout, usage)
-		return nil
+		return writeText(stdout, usage)
 	default:
-		fmt.Fprint(stderr, usage)
+		if err := writeText(stderr, usage); err != nil {
+			return err
+		}
 		return exitCodeError{code: 2, message: "unknown subcommand " + subcommand}
 	}
 }

@@ -7,7 +7,6 @@ Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-nanih`.
 ## Scenario Files
 
 - [`transport-family-bakeoff-cluster-boundary-crossing.md`](transport-family-bakeoff-cluster-boundary-crossing.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 

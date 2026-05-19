@@ -7,7 +7,6 @@ Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-nanih`.
 ## Scenario Files
 
 - [`conditional-release-geofencing-partial-compliance-evidence.md`](conditional-release-geofencing-partial-compliance-evidence.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 

@@ -7,7 +7,6 @@ Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-nanih`.
 ## Scenario Files
 
 - [`bgp-class-routing-app-route-hijack.md`](bgp-class-routing-app-route-hijack.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 

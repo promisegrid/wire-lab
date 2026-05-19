@@ -7,7 +7,6 @@ Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-nanih`.
 ## Scenario Files
 
 - [`peer-adoption-metadata-revocation-and-supersedence.md`](peer-adoption-metadata-revocation-and-supersedence.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 

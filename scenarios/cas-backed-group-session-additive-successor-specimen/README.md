@@ -7,7 +7,6 @@ Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-nanih`.
 ## Scenario Files
 
 - [`cas-backed-group-session-additive-successor-specimen.md`](cas-backed-group-session-additive-successor-specimen.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 

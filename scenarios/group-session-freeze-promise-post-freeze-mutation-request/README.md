@@ -7,7 +7,6 @@ Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-nanih`.
 ## Scenario Files
 
 - [`group-session-freeze-promise-post-freeze-mutation-request.md`](group-session-freeze-promise-post-freeze-mutation-request.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 

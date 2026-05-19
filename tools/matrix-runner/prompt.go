@@ -29,7 +29,9 @@ func pathOnlyPrompt(cell MatrixCell) string {
 	fmt.Fprintf(&out, "- `%sREADME.md`\n", cell.SimPath)
 	fmt.Fprintf(&out, "- `%sQUESTION.md` if present\n", cell.SimPath)
 	fmt.Fprintf(&out, "- local draft specs under `%s` if present\n", cell.SimPath)
+	fmt.Fprintln(&out, "- `scenarios/README.md`")
 	fmt.Fprintf(&out, "- `%s`\n", cell.ScenarioPath)
+	fmt.Fprintf(&out, "- local scenario docs under `scenarios/%s/` if present\n", cell.ScenarioID)
 	fmt.Fprintln(&out, "- `results/RUN-PROTOCOL.md`")
 	fmt.Fprintln(&out)
 	fmt.Fprintln(&out, "Do not read prior result files for this same sim/scenario cell before writing")
@@ -101,6 +103,7 @@ func (b PromptBuilder) BuildAPIPrompt(cell MatrixCell) (string, error) {
 func (b PromptBuilder) sourceDocuments(cell MatrixCell) ([]SourceDocument, error) {
 	required := []string{
 		"results/RUN-PROTOCOL.md",
+		"scenarios/README.md",
 		filepath.ToSlash(filepath.Join("scenarios", cell.ScenarioID, "README.md")),
 		cell.ScenarioPath,
 		filepath.ToSlash(filepath.Join("simulations", cell.SimID, "README.md")),
@@ -117,6 +120,11 @@ func (b PromptBuilder) sourceDocuments(cell MatrixCell) ([]SourceDocument, error
 	if text, err := b.Repo.ReadRel(questionPath); err == nil {
 		docs = append(docs, SourceDocument{Path: questionPath, Text: text})
 	}
+	scenarioDocs, err := b.localScenarioMarkdown(cell)
+	if err != nil {
+		return nil, err
+	}
+	docs = append(docs, scenarioDocs...)
 	localDocs, err := b.localSimulationMarkdown(cell)
 	if err != nil {
 		return nil, err
@@ -125,6 +133,39 @@ func (b PromptBuilder) sourceDocuments(cell MatrixCell) ([]SourceDocument, error
 	return docs, nil
 }
 
+// localScenarioMarkdown collects scenario-local markdown files that are not
+// already included as required sources. It explicitly ignores legacy MATRIX.md
+// names so stale generated or untracked summaries cannot leak into blind cell
+// prompts. Source: DI-zamin
+func (b PromptBuilder) localScenarioMarkdown(cell MatrixCell) ([]SourceDocument, error) {
+	root := b.Repo.Path("scenarios", cell.ScenarioID)
+	mainName := filepath.Base(cell.ScenarioPath)
+	var paths []string
+	err := filepath.WalkDir(root, func(path string, entry os.DirEntry, walkErr error) error {
+		if walkErr != nil {
+			return walkErr
+		}
+		if entry.IsDir() {
+			return nil
+		}
+		if filepath.Ext(path) != ".md" {
+			return nil
+		}
+		base := filepath.Base(path)
+		if base == "README.md" || base == mainName || base == "MATRIX.md" {
+			return nil
+		}
+		paths = append(paths, path)
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	return b.readSourceDocuments(paths)
+}
+
+// localSimulationMarkdown collects simulation-local design documents beyond the
+// required README and QUESTION files.
 func (b PromptBuilder) localSimulationMarkdown(cell MatrixCell) ([]SourceDocument, error) {
 	root := b.Repo.Path("simulations", cell.SimID)
 	var paths []string
@@ -151,6 +192,12 @@ func (b PromptBuilder) localSimulationMarkdown(cell MatrixCell) ([]SourceDocumen
 	if err != nil {
 		return nil, err
 	}
+	return b.readSourceDocuments(paths)
+}
+
+// readSourceDocuments reads source files in stable order so generated prompts
+// are deterministic across equivalent filesystem walks.
+func (b PromptBuilder) readSourceDocuments(paths []string) ([]SourceDocument, error) {
 	sort.Strings(paths)
 	var docs []SourceDocument
 	for _, path := range paths {

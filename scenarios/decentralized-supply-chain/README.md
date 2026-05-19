@@ -7,7 +7,6 @@ authority. Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-midif`.
 ## Scenario Files
 
 - [`decentralized-supply-chain.md`](decentralized-supply-chain.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 

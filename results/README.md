@@ -93,6 +93,10 @@ following `results/RUN-PROTOCOL.md`. Scripted prototype files are retained only
 as plumbing-test artifacts and are excluded from evidence comparisons by default.
 Source: `DI-moduf`.
 
+`results/` is the only canonical store for simulation/scenario/model run
+evidence. Scenario-side summary files are not committed; generate inspection
+views with `tools/matrix-runner view` when needed. Source: `DI-zamin`.
+
 ## Run Preflight
 
 Before kicking off a large matrix run:
@@ -106,4 +110,5 @@ Before kicking off a large matrix run:
 The old Python scripts under `results/tools/` remain legacy/reference tools;
 the Go runner is preferred for unattended API-backed runs because it bundles
 local source document contents, checkpoints state, validates results, and
-updates scenario matrices in one program. Source: `DI-lulom`.
+generates result views from the canonical result tree. Source: `DI-lulom`;
+`DI-zamin`.

@@ -228,6 +228,9 @@ Read only source/design inputs before producing the verdict:
 - `{cell.sim_path}README.md`
 - `{cell.sim_path}QUESTION.md` if present
 - local draft specs under `{cell.sim_path}` if present
+- `scenarios/README.md`
+- `scenarios/{cell.scenario_id}/README.md`
+- local scenario docs under `scenarios/{cell.scenario_id}/` if present
 - `{cell.scenario_path}`
 - `results/RUN-PROTOCOL.md`
 

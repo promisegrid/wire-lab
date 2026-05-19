@@ -7,7 +7,6 @@ authority. Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-midif`.
 ## Scenario Files
 
 - [`public-procurement.md`](public-procurement.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 

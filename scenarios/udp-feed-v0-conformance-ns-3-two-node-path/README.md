@@ -7,7 +7,6 @@ Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-nanih`.
 ## Scenario Files
 
 - [`udp-feed-v0-conformance-ns-3-two-node-path.md`](udp-feed-v0-conformance-ns-3-two-node-path.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 

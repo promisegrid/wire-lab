@@ -7,7 +7,6 @@ Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-nanih`.
 ## Scenario Files
 
 - [`bgp-class-routing-app-sparse-knowledge.md`](bgp-class-routing-app-sparse-knowledge.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 

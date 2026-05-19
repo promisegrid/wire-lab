@@ -7,7 +7,6 @@ Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-nanih`.
 ## Scenario Files
 
 - [`transport-family-bakeoff-large-n-receipts.md`](transport-family-bakeoff-large-n-receipts.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 

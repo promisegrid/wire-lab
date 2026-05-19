@@ -7,7 +7,6 @@ Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-nanih`.
 ## Scenario Files
 
 - [`transport-family-bakeoff-token-rotates-among-writers.md`](transport-family-bakeoff-token-rotates-among-writers.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 

@@ -30,7 +30,7 @@ func runValidate(args []string, stdout io.Writer) error {
 	manifest := fs.String("manifest", "", "optional manifest path")
 	model := fs.String("model", "", "optional model filter")
 	timestamp := fs.String("timestamp", "", "optional timestamp filter")
-	strictMatrix := fs.Bool("strict-matrix", false, "require each result path in scenario MATRIX.md")
+	strictMatrix := fs.Bool("strict-matrix", false, "deprecated no-op; result views are generated from results/")
 	allowPrototype := fs.Bool("allow-prototype", false, "allow scripted prototype results")
 	allowMissing := fs.Bool("allow-missing", false, "skip missing manifest result files")
 	maxErrors := fs.Int("max-errors", 50, "maximum printed errors")
@@ -40,6 +40,14 @@ func runValidate(args []string, stdout io.Writer) error {
 	repo, err := openRepo(*repoRoot)
 	if err != nil {
 		return err
+	}
+	if *strictMatrix {
+		// Intent: Keep old validation invocations from failing after committed
+		// scenario matrices were retired; canonical linkage now comes from the
+		// result path itself and generated views. Source: DI-zamin
+		if err := writeLine(stdout, "note: --strict-matrix is deprecated and ignored; results/ is canonical"); err != nil {
+			return err
+		}
 	}
 	var targets []string
 	var missing []string
@@ -73,20 +81,26 @@ func runValidate(args []string, stdout io.Writer) error {
 	printed := 0
 	for _, msg := range missing {
 		if printed < *maxErrors {
-			fmt.Fprintln(stdout, msg)
+			if err := writeLine(stdout, msg); err != nil {
+				return err
+			}
 			printed++
 		}
 	}
 	for _, path := range targets {
-		issues := validateResultFile(repo, path, *strictMatrix, *allowPrototype)
+		issues := validateResultFile(repo, path, *allowPrototype)
 		if len(issues) == 0 {
 			continue
 		}
 		bad++
 		if printed < *maxErrors {
-			fmt.Fprintf(stdout, "%s:\n", repo.Rel(path))
+			if err := writeFormat(stdout, "%s:\n", repo.Rel(path)); err != nil {
+				return err
+			}
 			for _, issue := range issues {
-				fmt.Fprintf(stdout, "  - %s\n", issue)
+				if err := writeFormat(stdout, "  - %s\n", issue); err != nil {
+					return err
+				}
 			}
 			printed++
 		}
@@ -94,7 +108,9 @@ func runValidate(args []string, stdout io.Writer) error {
 	if len(targets) == 0 && len(missing) == 0 && !(*manifest != "" && *allowMissing) {
 		return fmt.Errorf("no result files matched selection")
 	}
-	fmt.Fprintf(stdout, "validated=%d failed=%d\n", len(targets), bad)
+	if err := writeFormat(stdout, "validated=%d failed=%d\n", len(targets), bad); err != nil {
+		return err
+	}
 	if bad > 0 {
 		return fmt.Errorf("validation failed")
 	}
@@ -134,7 +150,7 @@ func findResultFiles(repo Repo, model string, timestamp string, allowPrototype b
 	return paths, err
 }
 
-func validateResultFile(repo Repo, path string, strictMatrix bool, allowPrototype bool) []string {
+func validateResultFile(repo Repo, path string, allowPrototype bool) []string {
 	var issues []string
 	textBytes, err := os.ReadFile(path)
 	if err != nil {
@@ -168,9 +184,6 @@ func validateResultFile(repo Repo, path string, strictMatrix bool, allowPrototyp
 	if !strings.Contains(modelLine, modelID) {
 		issues = append(issues, "Model ID line does not match path model")
 	}
-	if strictMatrix && !matrixContainsResult(repo, scenarioID, repo.Rel(path)) {
-		issues = append(issues, "scenario matrix does not reference this result path")
-	}
 	if simID == "" || scenarioID == "" {
 		issues = append(issues, "empty sim or scenario path component")
 	}
@@ -197,14 +210,6 @@ func isPrototypeResultPath(path string) bool {
 func isPrototypeText(text string) bool {
 	return strings.Contains(text, "Run mode: `scripted-doc-eval-blind`") ||
 		strings.Contains(text, "Runner/interface: `results/tools/run_matrix_batch.py`")
-}
-
-func matrixContainsResult(repo Repo, scenarioID string, relResult string) bool {
-	text, err := repo.ReadRel(filepath.ToSlash(filepath.Join("scenarios", scenarioID, "MATRIX.md")))
-	if err != nil {
-		return false
-	}
-	return strings.Contains(text, relResult)
 }
 
 func extractVerdict(path string) (string, error) {

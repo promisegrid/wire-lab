@@ -7,7 +7,6 @@ authority. Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-midif`.
 ## Scenario Files
 
 - [`federated-identity-credentials.md`](federated-identity-credentials.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 

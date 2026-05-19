@@ -7,7 +7,6 @@ Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-nanih`.
 ## Scenario Files
 
 - [`udp-feed-v0-conformance-boundary-size-payload.md`](udp-feed-v0-conformance-boundary-size-payload.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 

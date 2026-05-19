@@ -7,7 +7,6 @@ authority. Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-midif`.
 ## Scenario Files
 
 - [`energy-grid-coordination.md`](energy-grid-coordination.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 

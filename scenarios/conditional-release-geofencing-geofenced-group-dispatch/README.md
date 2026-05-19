@@ -7,7 +7,6 @@ Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-nanih`.
 ## Scenario Files
 
 - [`conditional-release-geofencing-geofenced-group-dispatch.md`](conditional-release-geofencing-geofenced-group-dispatch.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 

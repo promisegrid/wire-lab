@@ -29,9 +29,9 @@ mechanical parsing or keyword heuristics. Source: `DI-moduf`.
 
 Full-matrix execution may be unattended: the queue runner may invoke one
 external LLM command per manifest row, checkpoint state after every cell,
-validate the result file, and update the scenario matrix. The external runner
-must still produce the substantive result file; queue tooling only coordinates
-work and validation. Source: `DI-nuhon`.
+and validate the result file. The external runner must still produce the
+substantive result file; queue tooling only coordinates work and validation.
+Source: `DI-nuhon`; `DI-zamin`.
 
 The preferred runner is now the Go `tools/matrix-runner` CLI. For API-backed
 runs it bundles local source document contents into the provider prompt, because
@@ -87,7 +87,8 @@ Each result must include one line starting with `Evidence verdict:`.
   `cell_id` fields for unattended runs.
 - Use checkpoint state under `results/state/` for any long run that should
   resume without operator prompts.
-- Update scenario `MATRIX.md` rows when a result is written.
+- Treat `results/` as the only canonical result evidence. Generate result views
+  from `results/` instead of committing scenario-side summaries.
 - Keep old result files; never rewrite or delete prior runs.
 
 ## Failure and Retry Policy
@@ -108,10 +109,10 @@ Each result must include one line starting with `Evidence verdict:`.
   `python3 results/tools/generate_llm_jobs.py --manifest <manifest.csv>`
 - Unattended queue runner:
   `python3 results/tools/matrix_queue.py run --manifest <manifest.csv> --runner-command '<command with {prompt_path}>'`
-- Matrix row updater:
-  `python3 results/tools/update_matrix_rows.py --result <result.md>`
+- Generated result view:
+  `cd tools/matrix-runner && go run . view -repo-root ../.. -scenario <scenario-id>`
 - Result validator:
-  `python3 results/tools/validate_results.py --model <model-id> --timestamp <ts> --strict-matrix`
+  `python3 results/tools/validate_results.py --model <model-id> --timestamp <ts>`
 
 ## Recommended Preflight
 
@@ -130,9 +131,11 @@ Each result must include one line starting with `Evidence verdict:`.
    `cd tools/matrix-runner && go run . run -repo-root ../.. -manifest <manifest.csv> -provider openai -api-model <api-model> -reasoning-effort xhigh`.
 3. Let the queue process one cell at a time. Each cell writes or refreshes its
    prompt under `results/jobs/<run-group-id>/`, invokes the runner command,
-   validates `result_path`, updates the scenario `MATRIX.md`, and checkpoints
-   `results/state/<run-group-id>.json`. Source: `DI-nuhon`; `DI-lulom`.
+   validates `result_path`, and checkpoints `results/state/<run-group-id>.json`.
+   Source: `DI-nuhon`; `DI-lulom`; `DI-zamin`.
 4. If the process is interrupted, rerun the same command with the same manifest
    and state path. Completed cells are skipped by default.
-5. When the queue completes, run strict validation over the manifest:
-   `cd tools/matrix-runner && go run . validate -repo-root ../.. -manifest <manifest.csv> -strict-matrix`.
+5. When the queue completes, validate the manifest:
+   `cd tools/matrix-runner && go run . validate -repo-root ../.. -manifest <manifest.csv>`.
+6. Generate inspection views from the result tree as needed:
+   `cd tools/matrix-runner && go run . view -repo-root ../.. -model <model-id>`.

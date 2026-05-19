@@ -7,7 +7,6 @@ Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-nanih`.
 ## Scenario Files
 
 - [`promise-accounting-records-key-or-identity-rotation.md`](promise-accounting-records-key-or-identity-rotation.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 

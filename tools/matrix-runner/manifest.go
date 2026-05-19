@@ -81,7 +81,8 @@ func runManifest(args []string, stdout io.Writer) error {
 	if err := writeManifest(outPath, cells); err != nil {
 		return err
 	}
-	fmt.Fprintln(stdout, repo.Rel(outPath))
-	fmt.Fprintf(stdout, "rows=%d sims=%d scenarios=%d models=%d timestamp=%s\n", len(cells), len(simIDs), len(scenarioIDs), len(modelIDs), ts)
-	return nil
+	if err := writeLine(stdout, repo.Rel(outPath)); err != nil {
+		return err
+	}
+	return writeFormat(stdout, "rows=%d sims=%d scenarios=%d models=%d timestamp=%s\n", len(cells), len(simIDs), len(scenarioIDs), len(modelIDs), ts)
 }

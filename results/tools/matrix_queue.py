@@ -5,7 +5,8 @@ Run or inspect an unattended full-matrix queue.
 Intent: A large matrix run must be resumable and checkpointed cell-by-cell so
 Steve does not have to press keys through thousands of prompts, while each
 result file is still produced by an external LLM or human-authorized runner.
-Source: DI-nuhon
+Committed scenario matrices were retired; the queue validates result files and
+leaves result navigation to generated views. Source: DI-nuhon; DI-zamin
 """
 
 from __future__ import annotations
@@ -32,7 +33,6 @@ from matrix_common import (
     repo_relative_path,
     slug,
 )
-from update_matrix_rows import update_matrix_for_result
 from validate_results import validate_file
 
 
@@ -75,12 +75,12 @@ def parse_args() -> argparse.Namespace:
     run_parser.add_argument(
         "--no-matrix-update",
         action="store_true",
-        help="Do not update scenarios/<scenario-id>/MATRIX.md after validation.",
+        help="Deprecated no-op; scenario MATRIX.md files were retired.",
     )
     run_parser.add_argument(
         "--dry-run",
         action="store_true",
-        help="Show selected work without writing prompts, state, results, or matrices.",
+        help="Show selected work without writing prompts, state, or results.",
     )
 
     progress_parser = subparsers.add_parser("progress", help="Print queue status counts.")
@@ -279,7 +279,6 @@ def run_queue(args: argparse.Namespace) -> int:
             state_path,
             job_dir,
             args.runner_command,
-            update_matrix=not args.no_matrix_update,
             dry_run=args.dry_run,
         )
         processed += 1
@@ -302,7 +301,6 @@ def run_cell(
     state_path: Path,
     job_dir: Path,
     runner_command: str,
-    update_matrix: bool,
     dry_run: bool,
 ) -> str:
     """Run one cell and persist `running` before external LLM launch.
@@ -321,8 +319,6 @@ def run_cell(
     prompt_path = write_prompt(job_dir, cell)
     existing_issues = validate_result_path(result_path)
     if not existing_issues:
-        if update_matrix:
-            update_matrix_for_result(result_path)
         mark(record, "done", "existing valid result")
         return "done"
 
@@ -350,8 +346,6 @@ def run_cell(
         mark(record, "failed", "; ".join(issues))
         return "failed"
 
-    if update_matrix:
-        update_matrix_for_result(result_path)
     mark(record, "done", "validated result")
     return "done"
 

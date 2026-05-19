@@ -7,7 +7,6 @@ Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-nanih`.
 ## Scenario Files
 
 - [`chunking-identity-bakeoff-separate-chunking-descriptor.md`](chunking-identity-bakeoff-separate-chunking-descriptor.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 

@@ -7,7 +7,6 @@ Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-nanih`.
 ## Scenario Files
 
 - [`udp-feed-v0-conformance-loopback-round-trip.md`](udp-feed-v0-conformance-loopback-round-trip.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 

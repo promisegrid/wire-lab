@@ -96,8 +96,7 @@ func runCompare(args []string, stdout io.Writer) error {
 	if err := writeFile(outPath, report); err != nil {
 		return err
 	}
-	fmt.Fprintln(stdout, repo.Rel(outPath))
-	return nil
+	return writeLine(stdout, repo.Rel(outPath))
 }
 
 func scoreVerdict(verdict string) int {

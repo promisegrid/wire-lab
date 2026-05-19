@@ -7,7 +7,6 @@ authority. Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-midif`.
 ## Scenario Files
 
 - [`journalism-source-provenance.md`](journalism-source-provenance.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 

@@ -7,7 +7,6 @@ authority. Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-midif`.
 ## Scenario Files
 
 - [`national-governance.md`](national-governance.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 

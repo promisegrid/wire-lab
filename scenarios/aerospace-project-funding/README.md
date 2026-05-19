@@ -7,7 +7,6 @@ authority. Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-midif`.
 ## Scenario Files
 
 - [`aerospace-project-funding.md`](aerospace-project-funding.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 

@@ -7,7 +7,6 @@ authority. Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-midif`.
 ## Scenario Files
 
 - [`open-source-development.md`](open-source-development.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 

@@ -7,7 +7,6 @@ Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-nanih`.
 ## Scenario Files
 
 - [`group-session-freeze-promise-outer-feed-split.md`](group-session-freeze-promise-outer-feed-split.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 

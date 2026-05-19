@@ -7,7 +7,6 @@ Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-nanih`.
 ## Scenario Files
 
 - [`spec-requirement-sections-100-year-review.md`](spec-requirement-sections-100-year-review.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 

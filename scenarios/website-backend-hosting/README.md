@@ -7,7 +7,6 @@ authority. Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-midif`.
 ## Scenario Files
 
 - [`website-backend-hosting.md`](website-backend-hosting.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 

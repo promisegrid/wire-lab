@@ -7,7 +7,6 @@ Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-nanih`.
 ## Scenario Files
 
 - [`l6-cas-starting-profile-bakeoff-prior-art-substrate-reuse.md`](l6-cas-starting-profile-bakeoff-prior-art-substrate-reuse.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 

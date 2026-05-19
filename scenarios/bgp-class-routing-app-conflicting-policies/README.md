@@ -7,7 +7,6 @@ Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-nanih`.
 ## Scenario Files
 
 - [`bgp-class-routing-app-conflicting-policies.md`](bgp-class-routing-app-conflicting-policies.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 

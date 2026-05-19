@@ -7,7 +7,6 @@ Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-nanih`.
 ## Scenario Files
 
 - [`cas-object-type-binding-bakeoff-raw-chunk-versus-pointer-bytes.md`](cas-object-type-binding-bakeoff-raw-chunk-versus-pointer-bytes.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 

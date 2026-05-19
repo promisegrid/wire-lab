@@ -13,7 +13,6 @@ Each root scenario entry uses this shape:
 scenarios/
   <entry-id>/
     README.md
-    MATRIX.md
     <scenario-id>.md
 ```
 
@@ -23,8 +22,9 @@ scenarios/
 - Mined simulation rows use one root scenario entry per source row, transformed
   for cross-simulation comparison and linked back to the source
   `simulations/.../SCENARIOS.md` row.
-- `MATRIX.md` summarizes which simulations have been run against the entry and
-  links to result-run files under `results/`.
+- Result evidence lives only under
+  `results/<sim-id>/<scenario-id>/<model-id>/<YYYYMMDD-HHMMSS>.md`. Generate
+  scan tables from that result tree when needed. Source: `DI-zamin`.
 
 ## Scenario Entry Template
 
@@ -126,21 +126,20 @@ At minimum, each scenario should address:
 
 If a gate is not relevant, the scenario should say why instead of omitting it.
 
-## Matrix Template
+## Generated Result Views
 
-Each scenario entry's `MATRIX.md` should start with:
+Committed scenario entries are input context, not result summaries. Do not add a
+`MATRIX.md` file to a scenario directory. To inspect run evidence, generate a
+view from the canonical result tree:
 
-```markdown
-# <Scenario Entry> Matrix
-
-## Authority Boundary
-
-This matrix summarizes evidence. It does not declare a winning design by itself.
-
-| Simulation | Scenario | Latest result run | Status | Notes |
-|---|---|---|---|---|
-| `<sim-id>` | `<scenario-id>` | `results/<sim-id>/<scenario-id>/<model-id>/<YYYYMMDD-HHMMSS>.md` | not-run |  |
+```bash
+cd tools/matrix-runner
+go run . view -repo-root ../.. -scenario <scenario-id>
 ```
+
+The generated view is derived evidence navigation. It does not declare a winning
+design by itself, and it should not be committed as scenario source state.
+Source: `DI-zamin`.
 
 ## Population Plan
 

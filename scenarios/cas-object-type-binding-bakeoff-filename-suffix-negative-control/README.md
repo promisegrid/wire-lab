@@ -7,7 +7,6 @@ Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-nanih`.
 ## Scenario Files
 
 - [`cas-object-type-binding-bakeoff-filename-suffix-negative-control.md`](cas-object-type-binding-bakeoff-filename-suffix-negative-control.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 

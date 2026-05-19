@@ -7,7 +7,6 @@ Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-nanih`.
 ## Scenario Files
 
 - [`chunk-feed-replication-refusal-or-non-response.md`](chunk-feed-replication-refusal-or-non-response.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 

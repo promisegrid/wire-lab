@@ -7,7 +7,6 @@ Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-nanih`.
 ## Scenario Files
 
 - [`cas-object-model-chunker-parameter-mismatch.md`](cas-object-model-chunker-parameter-mismatch.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 

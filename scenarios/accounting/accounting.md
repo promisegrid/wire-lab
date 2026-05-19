@@ -20,8 +20,7 @@ trails, payment promises, reconciliations, corrections, and multi-party evidence
 
 - Any simulation that claims to support real application pressure rather than only
   protocol-internal mechanics.
-- Candidate simulations should be added to this entry's `MATRIX.md` before or
-  during result runs.
+- Result runs are recorded under `results/<sim-id>/<scenario-id>/<model-id>/<YYYYMMDD-HHMMSS>.md`; generated views can summarize completed runs when needed.
 
 ## Actors
 

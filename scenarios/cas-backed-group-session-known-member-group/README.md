@@ -7,7 +7,6 @@ Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-nanih`.
 ## Scenario Files
 
 - [`cas-backed-group-session-known-member-group.md`](cas-backed-group-session-known-member-group.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 

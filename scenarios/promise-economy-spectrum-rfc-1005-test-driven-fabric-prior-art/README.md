@@ -7,7 +7,6 @@ Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-nanih`.
 ## Scenario Files
 
 - [`promise-economy-spectrum-rfc-1005-test-driven-fabric-prior-art.md`](promise-economy-spectrum-rfc-1005-test-driven-fabric-prior-art.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 

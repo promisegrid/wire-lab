@@ -7,7 +7,6 @@ Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-nanih`.
 ## Scenario Files
 
 - [`promisebase-reference-naming-promisebase-custom-syntax-migration.md`](promisebase-reference-naming-promisebase-custom-syntax-migration.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 

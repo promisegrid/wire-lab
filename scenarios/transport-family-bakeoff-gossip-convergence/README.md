@@ -7,7 +7,6 @@ Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-nanih`.
 ## Scenario Files
 
 - [`transport-family-bakeoff-gossip-convergence.md`](transport-family-bakeoff-gossip-convergence.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 

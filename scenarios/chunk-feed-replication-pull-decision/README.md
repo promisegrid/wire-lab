@@ -7,7 +7,6 @@ Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-nanih`.
 ## Scenario Files
 
 - [`chunk-feed-replication-pull-decision.md`](chunk-feed-replication-pull-decision.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 

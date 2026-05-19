@@ -20,13 +20,15 @@ go run . run -repo-root ../.. \
   -reasoning-effort xhigh
 
 go run . validate -repo-root ../.. \
-  -manifest ../../results/manifests/<manifest>.csv \
-  -strict-matrix
+  -manifest ../../results/manifests/<manifest>.csv
+
+go run . view -repo-root ../.. \
+  -model openai-gpt-5.3-codex-xhigh
 ```
 
 The Go runner bundles local source documents for API-backed runs, checkpoints
-under `results/state/`, and updates scenario matrices after validation. Source:
-`DI-lulom`.
+under `results/state/`, validates result files, and generates read-only result
+views from `results/`. Source: `DI-lulom`; `DI-zamin`.
 
 ## Legacy Python Tools
 
@@ -84,10 +86,9 @@ python3 results/tools/matrix_queue.py run \
 ```
 
 The queue writes one prompt per cell, invokes the runner command, validates the
-result path, updates `scenarios/<scenario-id>/MATRIX.md`, and checkpoints
-`results/state/<run-group-id>.json` after each cell. The runner command must
-write the result file requested in the prompt; the queue does not generate
-verdict prose. Source: `DI-nuhon`.
+result path, and checkpoints `results/state/<run-group-id>.json` after each
+cell. The runner command must write the result file requested in the prompt; the
+queue does not generate verdict prose. Source: `DI-nuhon`; `DI-zamin`.
 
 Resume the same queue after interruption:
 
@@ -117,32 +118,32 @@ Runner-command placeholders:
 The command is split with `shlex`, not run through a shell. Put shell pipelines
 or complex orchestration behind a small wrapper script when needed.
 
-## Update Scenario Matrix Rows
+## Obsolete Scenario Matrix Updater
 
-Copy validated result evidence into the matching scenario matrix:
+`update_matrix_rows.py` is retained only as a compatibility tombstone. Committed
+scenario matrices were retired; use the Go runner's generated view instead.
+Source: `DI-zamin`.
 
 ```bash
-python3 results/tools/update_matrix_rows.py \
-  --result results/<sim-id>/<scenario-id>/<model-id>/<YYYYMMDD-HHMMSS>.md
+cd tools/matrix-runner
+go run . view -repo-root ../.. -scenario <scenario-id>
 ```
 
 ## Validate Batch
 
-Validate all results for a model/timestamp and enforce matrix links:
+Validate all results for a model/timestamp:
 
 ```bash
 python3 results/tools/validate_results.py \
   --model openai-gpt-5.3-codex-xhigh \
-  --timestamp <YYYYMMDD-HHMMSS> \
-  --strict-matrix
+  --timestamp <YYYYMMDD-HHMMSS>
 ```
 
 Validate every row in a concrete manifest:
 
 ```bash
 python3 results/tools/validate_results.py \
-  --manifest results/manifests/<manifest>.csv \
-  --strict-matrix
+  --manifest results/manifests/<manifest>.csv
 ```
 
 Prototype plumbing outputs are rejected by default. Use `--allow-prototype` only

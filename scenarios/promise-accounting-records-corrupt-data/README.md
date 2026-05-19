@@ -7,7 +7,6 @@ Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-nanih`.
 ## Scenario Files
 
 - [`promise-accounting-records-corrupt-data.md`](promise-accounting-records-corrupt-data.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 

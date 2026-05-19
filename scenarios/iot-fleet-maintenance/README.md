@@ -7,7 +7,6 @@ authority. Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-midif`.
 ## Scenario Files
 
 - [`iot-fleet-maintenance.md`](iot-fleet-maintenance.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 

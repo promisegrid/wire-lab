@@ -7,7 +7,6 @@ Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-nanih`.
 ## Scenario Files
 
 - [`peer-adoption-metadata-spec-answer-vocabulary-drift.md`](peer-adoption-metadata-spec-answer-vocabulary-drift.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 

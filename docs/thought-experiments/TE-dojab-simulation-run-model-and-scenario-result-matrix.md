@@ -445,12 +445,15 @@ Surviving alternatives:
 
 ## Decision status
 
-`decided, refined`. `DF-dojab.1` through `DF-dojab.5` are locked by `DI-faros`:
-root `scenarios/`, root
-`results/<sim-id>/<scenario-id>/<model-id>/<YYYYMMDD-HHMMSS>.md`, Codex-only
-first runs, one result file per provider/model/reasoning slug and UTC timestamp,
-and evidence-only authority. The result-path refinement remains recorded by
-`DI-miror`.
+`decided, refined; MATRIX.md clause superseded by TE-lizuh / DI-zamin`.
+`DF-dojab.1` through `DF-dojab.5` are locked by `DI-faros`: root `scenarios/`,
+root `results/<sim-id>/<scenario-id>/<model-id>/<YYYYMMDD-HHMMSS>.md`,
+Codex-only first runs, one result file per provider/model/reasoning slug and UTC
+timestamp, and evidence-only authority. The result-path refinement remains
+recorded by `DI-miror`. The scenario `MATRIX.md` layout detail in this TE's
+recommended first contract is historical only; current apparatus treats
+`results/` as canonical and derives matrix views from result files. Source:
+`DI-zamin`.
 
 ## Refinements
 
@@ -470,3 +473,10 @@ root `scenarios/`, root per-run `results/`, Codex-only first execution, one
 file per model/timestamp run from day one, and evidence-only result authority.
 Those choices are locked by `DI-faros`; `DI-miror` remains the source for the
 specific model-ID and UTC timestamp path refinement.
+
+### 2026-05-18 - Scenario MATRIX.md committed state removed
+
+TE-lizuh supersedes this TE's scenario `MATRIX.md` layout detail. Root
+`scenarios/` and root per-run `results/` remain active, but committed
+`scenarios/*/MATRIX.md` files are no longer source-of-truth artifacts. Matrix
+views are generated from `results/` when needed. Source: `DI-zamin`.

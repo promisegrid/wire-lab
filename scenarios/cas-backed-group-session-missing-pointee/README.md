@@ -7,7 +7,6 @@ Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-nanih`.
 ## Scenario Files
 
 - [`cas-backed-group-session-missing-pointee.md`](cas-backed-group-session-missing-pointee.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 

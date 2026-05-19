@@ -7,7 +7,6 @@ authority. Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-midif`.
 ## Scenario Files
 
 - [`shipping-label-printing.md`](shipping-label-printing.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 

@@ -7,7 +7,6 @@ Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-nanih`.
 ## Scenario Files
 
 - [`spec-requirement-sections-layperson-handoff.md`](spec-requirement-sections-layperson-handoff.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 

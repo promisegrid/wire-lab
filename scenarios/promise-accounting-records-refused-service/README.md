@@ -7,7 +7,6 @@ Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-nanih`.
 ## Scenario Files
 
 - [`promise-accounting-records-refused-service.md`](promise-accounting-records-refused-service.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 

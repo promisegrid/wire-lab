@@ -7,7 +7,6 @@ Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-nanih`.
 ## Scenario Files
 
 - [`promisebase-reference-naming-name-collision.md`](promisebase-reference-naming-name-collision.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 

@@ -7,7 +7,6 @@ authority. Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-midif`.
 ## Scenario Files
 
 - [`software-supply-chain-attestation.md`](software-supply-chain-attestation.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 

@@ -7,7 +7,6 @@ Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-nanih`.
 ## Scenario Files
 
 - [`cas-object-model-promisebase-adapter.md`](cas-object-model-promisebase-adapter.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 

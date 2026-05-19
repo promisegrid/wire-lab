@@ -7,7 +7,6 @@ Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-nanih`.
 ## Scenario Files
 
 - [`chunk-feed-replication-carrier-independence.md`](chunk-feed-replication-carrier-independence.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 

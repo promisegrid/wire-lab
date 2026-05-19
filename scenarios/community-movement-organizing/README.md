@@ -7,7 +7,6 @@ authority. Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-midif`.
 ## Scenario Files
 
 - [`community-movement-organizing.md`](community-movement-organizing.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 

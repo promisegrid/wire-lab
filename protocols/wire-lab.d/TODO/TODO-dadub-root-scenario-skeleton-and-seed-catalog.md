@@ -206,6 +206,29 @@ Affects: `tools/matrix-runner/`; `tools/README.md`; `results/tools/README.md`;
 `results/RUN-PROTOCOL.md`; `results/README.md`;
 `protocols/wire-lab.d/TODO/TODO-dadub-root-scenario-skeleton-and-seed-catalog.md`.
 
+ID: DI-zamin
+Date: 2026-05-18 22:18:33
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Delete committed `scenarios/*/MATRIX.md` files and make `results/`
+the canonical source of truth for completed scenario/simulation/model runs.
+Matrix-style summaries must be generated from `results/` on demand rather than
+maintained as committed scenario state.
+Intent: Scenario trees should be input context and result trees should be output
+evidence. Committed matrices duplicate result paths and verdict notes, create
+placeholder `not-run` churn, and risk being mistaken for prompt context.
+Generated views preserve scanability without creating a second source of truth.
+Constraints: Preserve root `scenarios/` and root per-run `results/` from
+TE-dojab. Do not delete result files. Do not feed generated result views or
+prior result summaries into blind run prompts. Keep legacy Python scripts as
+reference, but mark matrix-update and strict-matrix behavior obsolete.
+Affects: `docs/thought-experiments/TE-lizuh-results-canonical-no-scenario-matrix.md`;
+`docs/thought-experiments/TE-dojab-simulation-run-model-and-scenario-result-matrix.md`;
+`scenarios/`; `scenarios/README.md`; `results/README.md`;
+`results/RUN-PROTOCOL.md`; `results/tools/README.md`; `results/tools/`;
+`tools/matrix-runner/`; `tools/README.md`;
+`protocols/wire-lab.d/TODO/TODO-dadub-root-scenario-skeleton-and-seed-catalog.md`.
+
 ## Scope
 
 - Define the root scenario-entry contract implied by `DI-faros`: a root scenario
@@ -264,7 +287,11 @@ Affects: `tools/matrix-runner/`; `tools/README.md`; `results/tools/README.md`;
   `DI-bujiv`.
 - [x] dadub.13 Port matrix/result tooling into `tools/matrix-runner/`, including
   manifest, jobs, run, progress, validate, update-matrix, compare, and OpenAI
-  API-backed prompt bundling. Done under `DI-lulom`.
+  API-backed prompt bundling. Done under `DI-lulom`; the update-matrix clause
+  was superseded by dadub.14 / `DI-zamin`.
+- [x] dadub.14 Remove committed scenario `MATRIX.md` state, make `results/`
+  canonical for completed runs, and replace matrix updates with generated views.
+  Done under `DI-zamin`.
 
 ## Candidate scenario entries
 

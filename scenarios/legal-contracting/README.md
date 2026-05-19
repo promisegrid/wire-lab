@@ -7,7 +7,6 @@ authority. Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-midif`.
 ## Scenario Files
 
 - [`legal-contracting.md`](legal-contracting.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 

@@ -7,7 +7,6 @@ Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-nanih`.
 ## Scenario Files
 
 - [`conditional-release-geofencing-onward-restraint-chain.md`](conditional-release-geofencing-onward-restraint-chain.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 

@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """
-Validate result artifacts for required shape and matrix linkage.
+Validate result artifacts for required shape.
 
 Intent: Result validation must reject parser-generated prototype artifacts by
 default so scripted plumbing tests cannot masquerade as design evidence.
-Source: DI-moduf
+Committed scenario matrices were retired; the legacy --strict-matrix flag is a
+compatibility no-op. Source: DI-moduf; DI-zamin
 """
 
 from __future__ import annotations
@@ -45,7 +46,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--strict-matrix",
         action="store_true",
-        help="Require each result path to be referenced in its scenario MATRIX.md row.",
+        help="Deprecated no-op; result views are generated from results/.",
     )
     parser.add_argument(
         "--allow-prototype",
@@ -123,17 +124,6 @@ def iter_targets(model: str, timestamp: str) -> Iterable[Path]:
         yield path
 
 
-def matrix_contains_result(result_path: Path) -> bool:
-    rel = result_path.relative_to(REPO_ROOT)
-    parts = rel.parts
-    # results/<sim>/<scenario>/<model>/<ts>.md
-    scenario_id = parts[2]
-    matrix = REPO_ROOT / "scenarios" / scenario_id / "MATRIX.md"
-    if not matrix.exists():
-        return False
-    return str(rel) in matrix.read_text()
-
-
 def is_prototype_result(text: str) -> bool:
     """Return true for known scripted plumbing-test artifacts.
 
@@ -152,6 +142,12 @@ def validate_file(path: Path, strict_matrix: bool, allow_prototype: bool) -> Lis
     errors: List[str] = []
     text = path.read_text()
     lines = text.splitlines()
+
+    if strict_matrix:
+        # Intent: Preserve old validator command lines after MATRIX.md removal
+        # without reintroducing duplicate scenario-side result state.
+        # Source: DI-zamin
+        strict_matrix = False
 
     if is_prototype_result(text) and not allow_prototype:
         errors.append(
@@ -182,14 +178,13 @@ def validate_file(path: Path, strict_matrix: bool, allow_prototype: bool) -> Lis
     if model_id not in model_line:
         errors.append("Model ID line does not match path model")
 
-    if strict_matrix and not matrix_contains_result(path):
-        errors.append("scenario matrix does not reference this result path")
-
     return errors
 
 
 def main() -> int:
     args = parse_args()
+    if args.strict_matrix:
+        print("note: --strict-matrix is deprecated and ignored; results/ is canonical")
     missing: List[Tuple[str, str]] = []
     if args.manifest:
         manifest_targets = resolve_manifest_targets(

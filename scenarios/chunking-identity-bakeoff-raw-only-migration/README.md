@@ -7,7 +7,6 @@ Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-nanih`.
 ## Scenario Files
 
 - [`chunking-identity-bakeoff-raw-only-migration.md`](chunking-identity-bakeoff-raw-only-migration.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 

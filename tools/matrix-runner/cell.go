@@ -19,9 +19,9 @@ var slugPattern = regexp.MustCompile(`[^A-Za-z0-9_.-]+`)
 
 // MatrixCell is one concrete simulation/scenario/model work unit.
 //
-// Intent: Keep manifest, prompt, queue, validation, and matrix-update logic on
-// one normalized data shape so unattended runs cannot drift between inferred
-// result paths and committed result paths. Source: DI-lulom
+// Intent: Keep manifest, prompt, queue, validation, and generated result-view
+// logic on one normalized data shape so unattended runs cannot drift between
+// inferred result paths and committed result paths. Source: DI-lulom; DI-zamin
 type MatrixCell struct {
 	RunGroupID     string
 	Ordinal        int
@@ -147,12 +147,15 @@ func readManifest(repo Repo, path string) ([]MatrixCell, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer handle.Close()
 	reader := csv.NewReader(handle)
 	reader.FieldsPerRecord = -1
 	rows, err := reader.ReadAll()
+	closeErr := handle.Close()
 	if err != nil {
 		return nil, err
+	}
+	if closeErr != nil {
+		return nil, closeErr
 	}
 	if len(rows) == 0 {
 		return nil, fmt.Errorf("manifest has no header")
@@ -238,7 +241,6 @@ func writeManifest(path string, cells []MatrixCell) error {
 	if err != nil {
 		return err
 	}
-	defer handle.Close()
 	writer := csv.NewWriter(handle)
 	header := []string{
 		"run_group_id", "ordinal", "cell_id", "sim_id", "scenario_id", "model_id",
@@ -269,7 +271,11 @@ func writeManifest(path string, cells []MatrixCell) error {
 		}
 	}
 	writer.Flush()
-	return writer.Error()
+	if err := writer.Error(); err != nil {
+		closeErr := handle.Close()
+		return firstErr(err, closeErr)
+	}
+	return handle.Close()
 }
 
 func selectedCells(cells []MatrixCell, startIndex int, limit int) ([]MatrixCell, error) {

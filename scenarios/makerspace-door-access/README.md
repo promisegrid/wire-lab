@@ -7,7 +7,6 @@ authority. Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-midif`.
 ## Scenario Files
 
 - [`makerspace-door-access.md`](makerspace-door-access.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 

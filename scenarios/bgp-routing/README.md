@@ -7,7 +7,6 @@ authority. Source: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-midif`.
 ## Scenario Files
 
 - [`bgp-routing.md`](bgp-routing.md)
-- [`MATRIX.md`](MATRIX.md)
 
 ## Source
 
