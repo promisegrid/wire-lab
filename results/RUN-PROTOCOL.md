@@ -15,8 +15,8 @@ comparable across models and timestamps.
   - `simulations/<sim-id>/QUESTION.md` (if present)
   - simulation local spec docs (if present)
 - `scenario-id` and scenario docs:
+  - `scenarios/README.md` for the shared scenario contract
   - `scenarios/<scenario-id>/<scenario-id>.md`
-  - `scenarios/<scenario-id>/README.md`
 - `model-id` must be explicit and path-safe
   (for example `openai-gpt-5.3-codex-xhigh`).
 
@@ -36,6 +36,12 @@ Source: `DI-nuhon`; `DI-zamin`.
 The preferred runner is now the Go `tools/matrix-runner` CLI. For API-backed
 runs it bundles local source document contents into the provider prompt, because
 remote APIs cannot read repo-local paths. Source: `DI-lulom`.
+
+Root scenario prompts use `scenarios/README.md` for shared scenario contract
+context and `scenarios/<scenario-id>/<scenario-id>.md` for scenario-specific
+pressure. Per-scenario `README.md` files are intentionally absent so repeated
+boilerplate can be cached once rather than bundled with every scenario. Source:
+`DI-kizal`.
 
 API-backed runs must use explicit cost controls before any large batch. The
 runner defaults to concise result style and a lower output cap, records provider

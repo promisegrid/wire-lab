@@ -31,7 +31,6 @@ func pathOnlyPrompt(cell MatrixCell, resultStyle string) string {
 	fmt.Fprintf(&out, "- local draft specs under `%s` if present\n", cell.SimPath)
 	fmt.Fprintln(&out, "- `scenarios/README.md`")
 	fmt.Fprintf(&out, "- `%s`\n", cell.ScenarioPath)
-	fmt.Fprintf(&out, "- local scenario docs under `scenarios/%s/` if present\n", cell.ScenarioID)
 	fmt.Fprintln(&out, "- `results/RUN-PROTOCOL.md`")
 	fmt.Fprintln(&out)
 	fmt.Fprintln(&out, "Do not read prior result files for this same sim/scenario cell before writing")
@@ -88,6 +87,14 @@ func (b PromptBuilder) BuildAPIPrompt(cell MatrixCell) (string, error) {
 	fmt.Fprintf(&out, "The Markdown result must contain exactly the required sections from `results/RUN-PROTOCOL.md`, include `- Run mode: llm-doc-eval-blind`, include one line starting with `Evidence verdict:`, and include an explicit `Authority Boundary` section.\n\n")
 	fmt.Fprintf(&out, "## Evaluation Task\n\n")
 	fmt.Fprintf(&out, "Evaluate the simulation against the scenario. Explain what the simulation covers, what it pushes to another layer, how the scenario's 100-year durability, sparse knowledge, no central authority, auditability, and migration pressures expose weaknesses, and which open questions remain.\n\n")
+	// Intent: Place reusable source context before per-cell output coordinates so
+	// provider prompt caching can reuse the shared contract and simulation docs
+	// across many scenario cells. Source: DI-kizal
+	fmt.Fprintf(&out, "## Source Documents\n\n")
+	for _, doc := range docs {
+		fmt.Fprintf(&out, "### `%s`\n\n", doc.Path)
+		fmt.Fprintf(&out, "```markdown\n%s\n```\n\n", strings.TrimSpace(doc.Text))
+	}
 	fmt.Fprintf(&out, "## Required Output Coordinates\n\n")
 	fmt.Fprintf(&out, "- Result path: `%s`\n", cell.ResultPath)
 	fmt.Fprintf(&out, "- Header: `# Result: %s / %s / %s / %s`\n", cell.SimID, cell.ScenarioID, cell.ModelID, cell.Timestamp)
@@ -99,11 +106,6 @@ func (b PromptBuilder) BuildAPIPrompt(cell MatrixCell) (string, error) {
 	fmt.Fprintf(&out, "- Simulation commit: `%s`\n", b.Repo.GitCommit())
 	fmt.Fprintf(&out, "- Model ID: `%s`\n", cell.ModelID)
 	fmt.Fprintf(&out, "- Run timestamp UTC: `%s`\n\n", cell.Timestamp)
-	fmt.Fprintf(&out, "## Source Documents\n\n")
-	for _, doc := range docs {
-		fmt.Fprintf(&out, "### `%s`\n\n", doc.Path)
-		fmt.Fprintf(&out, "```markdown\n%s\n```\n\n", strings.TrimSpace(doc.Text))
-	}
 	return out.String(), nil
 }
 
@@ -125,8 +127,6 @@ func (b PromptBuilder) sourceDocuments(cell MatrixCell) ([]SourceDocument, error
 	required := []string{
 		"results/RUN-PROTOCOL.md",
 		"scenarios/README.md",
-		filepath.ToSlash(filepath.Join("scenarios", cell.ScenarioID, "README.md")),
-		cell.ScenarioPath,
 		filepath.ToSlash(filepath.Join("simulations", cell.SimID, "README.md")),
 	}
 	var docs []SourceDocument
@@ -141,23 +141,30 @@ func (b PromptBuilder) sourceDocuments(cell MatrixCell) ([]SourceDocument, error
 	if text, err := b.Repo.ReadRel(questionPath); err == nil {
 		docs = append(docs, SourceDocument{Path: questionPath, Text: text})
 	}
-	scenarioDocs, err := b.localScenarioMarkdown(cell)
-	if err != nil {
-		return nil, err
-	}
-	docs = append(docs, scenarioDocs...)
 	localDocs, err := b.localSimulationMarkdown(cell)
 	if err != nil {
 		return nil, err
 	}
 	docs = append(docs, localDocs...)
+	scenarioText, err := b.Repo.ReadRel(cell.ScenarioPath)
+	if err != nil {
+		return nil, fmt.Errorf("read required source %s: %w", cell.ScenarioPath, err)
+	}
+	docs = append(docs, SourceDocument{Path: cell.ScenarioPath, Text: scenarioText})
+	scenarioDocs, err := b.localScenarioMarkdown(cell)
+	if err != nil {
+		return nil, err
+	}
+	docs = append(docs, scenarioDocs...)
 	return docs, nil
 }
 
 // localScenarioMarkdown collects scenario-local markdown files that are not
-// already included as required sources. It explicitly ignores legacy MATRIX.md
-// names so stale generated or untracked summaries cannot leak into blind cell
-// prompts. Source: DI-zamin
+// already included as required sources. It explicitly ignores README.md because
+// per-scenario README files were removed in favor of the cacheable root scenario
+// contract, and it ignores legacy MATRIX.md names so stale generated or
+// untracked summaries cannot leak into blind cell prompts. Source: DI-zamin;
+// DI-kizal
 func (b PromptBuilder) localScenarioMarkdown(cell MatrixCell) ([]SourceDocument, error) {
 	root := b.Repo.Path("scenarios", cell.ScenarioID)
 	mainName := filepath.Base(cell.ScenarioPath)

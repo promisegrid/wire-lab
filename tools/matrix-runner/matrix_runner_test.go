@@ -179,6 +179,26 @@ func TestRunCellPersistsRunningBeforeProviderCall(t *testing.T) {
 	}
 }
 
+func TestAPIPromptUsesRootScenarioContract(t *testing.T) {
+	repo := makeTestRepo(t)
+	prompt, err := PromptBuilder{Repo: repo, ResultStyle: "concise"}.BuildAPIPrompt(testCell())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if strings.Contains(prompt, "scenarios/scenario-one/README.md") {
+		t.Fatalf("prompt should not require deleted per-scenario README:\\n%s", prompt)
+	}
+	rootIndex := strings.Index(prompt, "### `scenarios/README.md`")
+	simIndex := strings.Index(prompt, "### `simulations/SIM-alpha/README.md`")
+	scenarioIndex := strings.Index(prompt, "### `scenarios/scenario-one/scenario-one.md`")
+	if rootIndex < 0 || simIndex < 0 || scenarioIndex < 0 {
+		t.Fatalf("prompt missing expected source documents:\\n%s", prompt)
+	}
+	if !(rootIndex < simIndex && simIndex < scenarioIndex) {
+		t.Fatalf("prompt source order should keep cacheable common and sim docs before scenario docs:\\n%s", prompt)
+	}
+}
+
 type fakeProvider struct {
 	text  string
 	usage string
@@ -233,7 +253,6 @@ func makeTestRepo(t *testing.T) Repo {
 	mustWrite(t, repo.Path("simulations", "SIM-alpha", "QUESTION.md"), "# Question\n")
 	mustWrite(t, repo.Path("simulations", "SIM-alpha", "protocols", "draft.md"), "# Draft\n")
 	mustWrite(t, repo.Path("scenarios", "README.md"), "# Scenarios\n")
-	mustWrite(t, repo.Path("scenarios", "scenario-one", "README.md"), "# Scenario One\n")
 	mustWrite(t, repo.Path("scenarios", "scenario-one", "scenario-one.md"), "# Scenario One Body\n")
 	return repo
 }

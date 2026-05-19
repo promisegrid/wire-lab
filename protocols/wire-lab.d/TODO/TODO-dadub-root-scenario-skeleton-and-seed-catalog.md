@@ -6,11 +6,13 @@ None. This TODO was minted after the proquint-handle migration.
 
 ## Status
 
-Closed. The first root `scenarios/` design/population pass and the first root
-`results/` documentation pass are complete: root templates exist, existing
-simulation-local scenario rows have been mined, and seed application entries
-have been created. Source: `DI-faros`; `DI-miror`; `DI-vabor`; `DI-dimas`;
-`DI-botup`; `DI-nanih`; `DI-midif`.
+Closed. The root `scenarios/` design/population pass, root `results/`
+documentation pass, and scenario-cache cleanup pass are complete: root templates
+exist, existing simulation-local scenario rows have been mined, seed application
+entries have been created, per-scenario boilerplate has moved to
+`scenarios/README.md`, and result evidence lives under `results/`. Source:
+`DI-faros`; `DI-miror`; `DI-vabor`; `DI-dimas`; `DI-botup`; `DI-nanih`;
+`DI-midif`; `DI-zamin`; `DI-kizal`.
 
 ## Decision Intent Log
 
@@ -250,11 +252,34 @@ Affects: `tools/matrix-runner/`; `tools/README.md`; `results/RUN-PROTOCOL.md`;
 `results/README.md`;
 `protocols/wire-lab.d/TODO/TODO-dadub-root-scenario-skeleton-and-seed-catalog.md`.
 
+ID: DI-kizal
+Date: 2026-05-19 08:48:59
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Rewrite the root scenario corpus itself to be cache-friendly: move
+shared scenario boilerplate into `scenarios/README.md`, keep each primary
+`scenarios/<id>/<id>.md` file focused on unique scenario facts, delete
+per-scenario `README.md` navigation files, and stop matrix prompt tooling from
+requiring those per-scenario README files.
+Intent: The rejected `-source-detail compact|full` idea would have made Go code
+parse scenario markdown to decide what context to send. The better source of
+truth is a cleaner document corpus: common scenario rules should appear once at
+the root where provider prompt caching can reuse them, while individual scenario
+files should carry only the pressure that makes that scenario distinct.
+Constraints: Preserve every scenario's ID, provenance, source path, source row or
+catalog entry, purpose, setup, stimulus, expected pressure, and unique questions.
+Do not delete result evidence. Do not make mechanical scripts generate result
+verdict prose; this change only reduces input-context boilerplate.
+Affects: `scenarios/`; `scenarios/README.md`; `tools/matrix-runner/`;
+`results/RUN-PROTOCOL.md`; `results/tools/`; `tools/README.md`;
+`protocols/wire-lab.d/TODO/TODO-dadub-root-scenario-skeleton-and-seed-catalog.md`.
+
 ## Scope
 
 - Define the root scenario-entry contract implied by `DI-faros`: a root scenario
-  entry is a `scenarios/<entry-id>/` directory with a local `README.md`, local
-  `MATRIX.md`, and one or more scenario markdown files.
+  entry is a `scenarios/<entry-id>/` directory with one primary
+  `<entry-id>.md` scenario file. Earlier local `README.md` and `MATRIX.md`
+  assumptions were superseded by `DI-kizal` and `DI-zamin`.
 - Populate root scenario entries broadly in the next implementation pass: one
   entry per application and one entry per mined sim-local scenario row.
 - Transform existing sim-local `SCENARIOS.md` rows into root scenario entries
@@ -315,6 +340,9 @@ Affects: `tools/matrix-runner/`; `tools/README.md`; `results/RUN-PROTOCOL.md`;
   Done under `DI-zamin`.
 - [x] dadub.15 Add cost controls and concise API result mode before a full matrix
   run. Done under `DI-nugiv`.
+- [x] dadub.16 Rewrite root scenarios to remove repeated boilerplate from
+  per-scenario files and route the shared scenario contract through
+  `scenarios/README.md`. Done under `DI-kizal`.
 
 ## Candidate scenario entries
 

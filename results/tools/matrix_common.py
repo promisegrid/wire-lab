@@ -209,6 +209,9 @@ def prompt_filename(cell: MatrixCell) -> str:
 def prompt_for(cell: MatrixCell) -> str:
     """Build the blind LLM evaluation prompt for a concrete matrix cell."""
 
+    # Intent: Require the root scenario contract plus the primary scenario file,
+    # not deleted per-scenario README files, so legacy job prompts match the
+    # cache-friendly scenario corpus shape. Source: DI-kizal
     return f"""# LLM Matrix Cell Job
 
 ## Cell
@@ -229,8 +232,6 @@ Read only source/design inputs before producing the verdict:
 - `{cell.sim_path}QUESTION.md` if present
 - local draft specs under `{cell.sim_path}` if present
 - `scenarios/README.md`
-- `scenarios/{cell.scenario_id}/README.md`
-- local scenario docs under `scenarios/{cell.scenario_id}/` if present
 - `{cell.scenario_path}`
 - `results/RUN-PROTOCOL.md`
 
