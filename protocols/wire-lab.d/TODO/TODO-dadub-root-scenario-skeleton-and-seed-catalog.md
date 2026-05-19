@@ -142,6 +142,31 @@ Affects: `protocols/wire-lab.d/TODO/TODO-dadub-root-scenario-skeleton-and-seed-c
 `results/RUN-PROTOCOL.md`; `results/README.md`; `results/tools/`;
 `results/comparisons/`; `scenarios/*/MATRIX.md`.
 
+ID: DI-nuhon
+Date: 2026-05-18 20:57:50
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Full-matrix runs must be able to execute unattended through a
+checkpointed queue: each manifest row carries a concrete timestamp, result path,
+ordinal, and cell ID; a queue runner invokes an external LLM command once per
+cell; each cell is validated and then used to update the scenario matrix; queue
+state is persisted after every cell so a 7000-cell run can resume without
+interactive keypresses.
+Intent: The matrix is too large to drive manually prompt-by-prompt, but result
+files still need deeper LLM/human reasoning under `DI-moduf`. The correct split
+is for scripts to coordinate durable work units and validation while delegating
+the actual verdict prose to a real model runner.
+Constraints: Do not synthesize result verdict prose mechanically. Preserve
+`results/<sim-id>/<scenario-id>/<model-id>/<YYYYMMDD-HHMMSS>.md` as the result
+artifact path. Keep the runner command external and explicit so Codex, OpenAI
+API, Anthropic API, Perplexity, or another evaluator can be swapped without
+changing result semantics. State and prompts are operational artifacts under
+`results/state/` and `results/jobs/`; result files remain the evidence source.
+Affects: `results/tools/matrix_common.py`; `results/tools/generate_matrix_manifest.py`;
+`results/tools/generate_llm_jobs.py`; `results/tools/matrix_queue.py`;
+`results/tools/update_matrix_rows.py`; `results/tools/validate_results.py`;
+`results/tools/README.md`; `results/RUN-PROTOCOL.md`; `scenarios/*/MATRIX.md`.
+
 ## Scope
 
 - Define the root scenario-entry contract implied by `DI-faros`: a root scenario
@@ -192,6 +217,9 @@ Affects: `protocols/wire-lab.d/TODO/TODO-dadub-root-scenario-skeleton-and-seed-c
 - [x] dadub.10 Run stale-layout checks for old one-file-per-cell result paths and
   run `git diff --check`. Done for the scenario population passes under
   `DI-nanih` and `DI-midif`.
+- [x] dadub.11 Add unattended full-matrix run support with concrete manifest
+  paths, checkpointed queue state, per-cell LLM prompt generation, validation,
+  and scenario matrix row updates. Done under `DI-nuhon`.
 
 ## Candidate scenario entries
 

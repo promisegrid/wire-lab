@@ -11,6 +11,10 @@ python3 results/tools/generate_matrix_manifest.py \
   --models openai-gpt-5.3-codex-xhigh
 ```
 
+The manifest includes concrete `timestamp`, `result_path`, `ordinal`, and
+`cell_id` fields so a long run can checkpoint and resume one cell at a time.
+Source: `DI-nuhon`.
+
 Generate deterministic canary manifest (30 cells):
 
 ```bash
@@ -41,6 +45,59 @@ python3 results/tools/generate_llm_jobs.py \
   --start-index 500
 ```
 
+## Run Unattended Queue
+
+Run a manifest through an external noninteractive LLM command:
+
+```bash
+python3 results/tools/matrix_queue.py run \
+  --manifest results/manifests/<manifest>.csv \
+  --runner-command '<llm-runner> {prompt_path}'
+```
+
+The queue writes one prompt per cell, invokes the runner command, validates the
+result path, updates `scenarios/<scenario-id>/MATRIX.md`, and checkpoints
+`results/state/<run-group-id>.json` after each cell. The runner command must
+write the result file requested in the prompt; the queue does not generate
+verdict prose. Source: `DI-nuhon`.
+
+Resume the same queue after interruption:
+
+```bash
+python3 results/tools/matrix_queue.py run \
+  --manifest results/manifests/<manifest>.csv \
+  --runner-command '<llm-runner> {prompt_path}'
+```
+
+Inspect progress:
+
+```bash
+python3 results/tools/matrix_queue.py progress \
+  --manifest results/manifests/<manifest>.csv
+```
+
+Runner-command placeholders:
+
+- `{prompt_path}`
+- `{result_path}`
+- `{cell_id}`
+- `{sim_id}`
+- `{scenario_id}`
+- `{model_id}`
+- `{run_group_id}`
+
+The command is split with `shlex`, not run through a shell. Put shell pipelines
+or complex orchestration behind a small wrapper script when needed.
+
+## Update Scenario Matrix Rows
+
+Copy validated result evidence into the matching scenario matrix:
+
+```bash
+python3 results/tools/update_matrix_rows.py \
+  --result results/<sim-id>/<scenario-id>/<model-id>/<YYYYMMDD-HHMMSS>.md
+```
+
 ## Validate Batch
 
 Validate all results for a model/timestamp and enforce matrix links:
@@ -49,6 +106,14 @@ Validate all results for a model/timestamp and enforce matrix links:
 python3 results/tools/validate_results.py \
   --model openai-gpt-5.3-codex-xhigh \
   --timestamp <YYYYMMDD-HHMMSS> \
+  --strict-matrix
+```
+
+Validate every row in a concrete manifest:
+
+```bash
+python3 results/tools/validate_results.py \
+  --manifest results/manifests/<manifest>.csv \
   --strict-matrix
 ```
 

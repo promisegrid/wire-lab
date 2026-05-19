@@ -14,33 +14,17 @@ Source: DI-moduf
 from __future__ import annotations
 
 import argparse
-import csv
-import re
-from dataclasses import dataclass
 from pathlib import Path
-from typing import List
 
-
-REPO_ROOT = Path(__file__).resolve().parents[2]
-DEFAULT_JOB_ROOT = REPO_ROOT / "results" / "jobs"
-REQUIRED_FIELDS = {
-    "run_group_id",
-    "sim_id",
-    "scenario_id",
-    "model_id",
-    "sim_path",
-    "scenario_path",
-}
-
-
-@dataclass
-class JobCell:
-    run_group_id: str
-    sim_id: str
-    scenario_id: str
-    model_id: str
-    sim_path: str
-    scenario_path: str
+from matrix_common import (
+    DEFAULT_JOB_ROOT,
+    TIMESTAMP_PLACEHOLDER,
+    iter_selected,
+    prompt_filename,
+    prompt_for,
+    read_manifest,
+    with_timestamp,
+)
 
 
 def parse_args() -> argparse.Namespace:
@@ -53,8 +37,11 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--timestamp",
-        default="<YYYYMMDD-HHMMSS>",
-        help="Result timestamp placeholder or fixed timestamp for generated prompts.",
+        default=TIMESTAMP_PLACEHOLDER,
+        help=(
+            "Optional fixed timestamp override. Default: use concrete manifest "
+            "result_path/timestamp fields, or retain the placeholder for old manifests."
+        ),
     )
     parser.add_argument(
         "--max-cells",
@@ -71,91 +58,11 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def slug(value: str) -> str:
-    return re.sub(r"[^A-Za-z0-9_.-]+", "-", value).strip("-")
-
-
-def read_manifest(path: Path) -> List[JobCell]:
-    with path.open() as handle:
-        reader = csv.DictReader(handle)
-        if reader.fieldnames is None:
-            raise RuntimeError("Manifest has no header.")
-        missing = REQUIRED_FIELDS - set(reader.fieldnames)
-        if missing:
-            raise RuntimeError(f"Manifest missing required fields: {sorted(missing)}")
-        rows = [
-            JobCell(
-                run_group_id=row["run_group_id"],
-                sim_id=row["sim_id"],
-                scenario_id=row["scenario_id"],
-                model_id=row["model_id"],
-                sim_path=row["sim_path"],
-                scenario_path=row["scenario_path"],
-            )
-            for row in reader
-        ]
-    if not rows:
-        raise RuntimeError("Manifest contains no rows.")
-    return rows
-
-
-def prompt_for(cell: JobCell, timestamp: str) -> str:
-    result_path = f"results/{cell.sim_id}/{cell.scenario_id}/{cell.model_id}/{timestamp}.md"
-    return f"""# LLM Matrix Cell Job
-
-## Cell
-
-- Run group ID: `{cell.run_group_id}`
-- Simulation ID: `{cell.sim_id}`
-- Scenario ID: `{cell.scenario_id}`
-- Model ID: `{cell.model_id}`
-- Intended result path: `{result_path}`
-
-## Required Source Inputs
-
-Read only source/design inputs before producing the verdict:
-
-- `{cell.sim_path}README.md`
-- `{cell.sim_path}QUESTION.md` if present
-- local draft specs under `{cell.sim_path}` if present
-- `{cell.scenario_path}`
-- `results/RUN-PROTOCOL.md`
-
-Do not read prior result files for this same sim/scenario cell before writing
-the verdict. This job is blind with respect to prior results.
-
-## Task
-
-Evaluate the simulation against the scenario using deeper reasoning. Explain:
-
-- what the simulation can actually cover,
-- what obligations it pushes to another layer,
-- where the scenario's 100-year, sparse-knowledge, no-central-authority,
-  auditability, and migration pressures expose weaknesses,
-- which open questions remain.
-
-Write the result file at:
-
-`{result_path}`
-
-The result must follow the section contract in `results/RUN-PROTOCOL.md` and
-must include:
-
-- `- Run mode: llm-doc-eval-blind`
-- a line starting with `Evidence verdict:`
-- an explicit `Authority Boundary` section.
-"""
-
-
 def main() -> int:
     args = parse_args()
     cells = read_manifest(Path(args.manifest).resolve())
-    if args.start_index:
-        cells = cells[args.start_index :]
-    if args.max_cells is not None:
-        cells = cells[: args.max_cells]
-    if not cells:
-        raise RuntimeError("No cells selected after filters.")
+    cells = [with_timestamp(cell, args.timestamp) for cell in cells]
+    cells = iter_selected(cells, args.start_index, args.max_cells)
 
     run_group_id = cells[0].run_group_id
     output_dir = Path(args.output_dir).resolve() if args.output_dir else DEFAULT_JOB_ROOT / run_group_id
@@ -164,10 +71,10 @@ def main() -> int:
     index_path = output_dir / "INDEX.md"
     index_lines = [f"# LLM Jobs: {run_group_id}", ""]
 
-    for index, cell in enumerate(cells, 1):
-        filename = f"{index:05d}-{slug(cell.sim_id)}--{slug(cell.scenario_id)}--{slug(cell.model_id)}.md"
+    for cell in cells:
+        filename = prompt_filename(cell)
         path = output_dir / filename
-        path.write_text(prompt_for(cell, args.timestamp))
+        path.write_text(prompt_for(cell))
         index_lines.append(f"- [{filename}]({filename})")
 
     index_path.write_text("\n".join(index_lines) + "\n")

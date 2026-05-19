@@ -10,9 +10,16 @@ from __future__ import annotations
 import argparse
 import csv
 import random
-from datetime import datetime, timezone
 from pathlib import Path
 from typing import Iterable, List
+
+from matrix_common import (
+    default_cell_id,
+    default_result_dir,
+    default_result_path,
+    default_result_template,
+    utc_compact_timestamp,
+)
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -20,10 +27,6 @@ SIM_ROOT = REPO_ROOT / "simulations"
 SCENARIO_ROOT = REPO_ROOT / "scenarios"
 RESULTS_ROOT = REPO_ROOT / "results"
 DEFAULT_MANIFEST_DIR = RESULTS_ROOT / "manifests"
-
-
-def utc_compact_timestamp() -> str:
-    return datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
 
 
 def parse_args() -> argparse.Namespace:
@@ -37,6 +40,14 @@ def parse_args() -> argparse.Namespace:
         "--run-group-id",
         default="",
         help="Optional run group ID. Default: current UTC timestamp.",
+    )
+    parser.add_argument(
+        "--timestamp",
+        default="",
+        help=(
+            "Optional concrete result timestamp. Default: the generated run group "
+            "timestamp, or current UTC if --run-group-id is supplied."
+        ),
     )
     parser.add_argument(
         "--output",
@@ -82,7 +93,11 @@ def discover_scenario_ids() -> List[str]:
 
 
 def iter_rows(
-    run_group_id: str, sim_ids: Iterable[str], scenario_ids: Iterable[str], model_ids: Iterable[str]
+    run_group_id: str,
+    timestamp: str,
+    sim_ids: Iterable[str],
+    scenario_ids: Iterable[str],
+    model_ids: Iterable[str],
 ) -> List[dict]:
     rows: List[dict] = []
     for sim_id in sim_ids:
@@ -98,9 +113,13 @@ def iter_rows(
                         "model_id": model_id,
                         "sim_path": sim_path,
                         "scenario_path": scenario_path,
-                        "result_dir": f"results/{sim_id}/{scenario_id}/{model_id}/",
-                        "result_path_template": (
-                            f"results/{sim_id}/{scenario_id}/{model_id}/<YYYYMMDD-HHMMSS>.md"
+                        "result_dir": default_result_dir(sim_id, scenario_id, model_id),
+                        "result_path_template": default_result_template(
+                            sim_id, scenario_id, model_id
+                        ),
+                        "timestamp": timestamp,
+                        "result_path": default_result_path(
+                            sim_id, scenario_id, model_id, timestamp
                         ),
                         "status": "queued",
                     }
@@ -108,9 +127,30 @@ def iter_rows(
     return rows
 
 
+def assign_manifest_ordinals(run_group_id: str, rows: List[dict]) -> None:
+    """Assign queue order after deterministic shuffle/limit operations.
+
+    Intent: A full unattended run needs stable per-row IDs in the exact emitted
+    queue order, including canary manifests that are shuffled or truncated.
+    Source: DI-nuhon
+    """
+
+    for ordinal, row in enumerate(rows, 1):
+        row["ordinal"] = str(ordinal)
+        row["cell_id"] = default_cell_id(
+            run_group_id,
+            ordinal,
+            row["sim_id"],
+            row["scenario_id"],
+            row["model_id"],
+        )
+
+
 def main() -> int:
     args = parse_args()
-    run_group_id = args.run_group_id or utc_compact_timestamp()
+    generated_timestamp = utc_compact_timestamp()
+    run_group_id = args.run_group_id or generated_timestamp
+    timestamp = args.timestamp or (generated_timestamp if args.run_group_id else run_group_id)
     model_ids = [model.strip() for model in args.models.split(",") if model.strip()]
     if not model_ids:
         raise RuntimeError("At least one model ID is required.")
@@ -122,11 +162,12 @@ def main() -> int:
     if not scenario_ids:
         raise RuntimeError("No scenario entries found under scenarios/.")
 
-    rows = iter_rows(run_group_id, sim_ids, scenario_ids, model_ids)
+    rows = iter_rows(run_group_id, timestamp, sim_ids, scenario_ids, model_ids)
     if args.shuffle_seed is not None:
         random.Random(args.shuffle_seed).shuffle(rows)
     if args.limit_cells is not None:
         rows = rows[: args.limit_cells]
+    assign_manifest_ordinals(run_group_id, rows)
 
     if args.output:
         out_path = Path(args.output).resolve()
@@ -136,6 +177,8 @@ def main() -> int:
 
     fieldnames = [
         "run_group_id",
+        "ordinal",
+        "cell_id",
         "sim_id",
         "scenario_id",
         "model_id",
@@ -143,6 +186,8 @@ def main() -> int:
         "scenario_path",
         "result_dir",
         "result_path_template",
+        "timestamp",
+        "result_path",
         "status",
     ]
     with out_path.open("w", newline="") as handle:
@@ -151,10 +196,12 @@ def main() -> int:
         writer.writerows(rows)
 
     print(out_path)
-    print(f"rows={len(rows)} sims={len(sim_ids)} scenarios={len(scenario_ids)} models={len(model_ids)}")
+    print(
+        f"rows={len(rows)} sims={len(sim_ids)} scenarios={len(scenario_ids)} "
+        f"models={len(model_ids)} timestamp={timestamp}"
+    )
     return 0
 
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

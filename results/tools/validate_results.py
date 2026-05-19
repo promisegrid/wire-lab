@@ -11,12 +11,12 @@ from __future__ import annotations
 
 import argparse
 import csv
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable, List, Tuple
 
+from matrix_common import REPO_ROOT, RESULTS_ROOT, TIMESTAMP_PLACEHOLDER, row_result_path
 
-REPO_ROOT = Path(__file__).resolve().parents[2]
-RESULTS_ROOT = REPO_ROOT / "results"
 
 REQUIRED_HEADINGS = [
     "## Result ID",
@@ -52,19 +52,55 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Allow scripted prototype result files for plumbing checks.",
     )
+    parser.add_argument(
+        "--allow-missing",
+        action="store_true",
+        help="For manifest validation, skip missing result files instead of failing them.",
+    )
     parser.add_argument("--max-errors", type=int, default=50, help="Maximum printed errors.")
     return parser.parse_args()
 
 
-def iter_targets_from_manifest(manifest_path: Path) -> Iterable[Path]:
+@dataclass(frozen=True)
+class ManifestTargets:
+    """Resolved manifest result targets plus unresolved/missing rows."""
+
+    paths: List[Path]
+    missing: List[Tuple[str, str]]
+
+
+def resolve_manifest_targets(manifest_path: Path, allow_missing: bool) -> ManifestTargets:
+    """Resolve concrete manifest rows and report missing cells explicitly.
+
+    Intent: Full unattended validation must not claim success after silently
+    filtering out missing result files from a 7000-cell manifest.
+    Source: DI-nuhon
+    """
+
+    paths: List[Path] = []
+    missing: List[Tuple[str, str]] = []
     with manifest_path.open() as handle:
         reader = csv.DictReader(handle)
         for row in reader:
-            result_template = row.get("result_path_template", "")
-            if not result_template:
+            result_path = row_result_path(row)
+            cell_id = row.get("cell_id", "") or (
+                f"{row.get('run_group_id', '')}/"
+                f"{row.get('sim_id', '')}/"
+                f"{row.get('scenario_id', '')}/"
+                f"{row.get('model_id', '')}"
+            )
+            if not result_path or TIMESTAMP_PLACEHOLDER in result_path:
+                missing.append((cell_id, "manifest row has no concrete result_path/timestamp"))
                 continue
-            target = result_template.replace("<YYYYMMDD-HHMMSS>", row.get("timestamp", ""))
-            yield (REPO_ROOT / target).resolve()
+            target = Path(result_path)
+            if not target.is_absolute():
+                target = (REPO_ROOT / target).resolve()
+            if not target.exists():
+                if not allow_missing:
+                    missing.append((cell_id, f"missing result file: {target.relative_to(REPO_ROOT)}"))
+                continue
+            paths.append(target)
+    return ManifestTargets(paths=paths, missing=missing)
 
 
 def iter_targets(model: str, timestamp: str) -> Iterable[Path]:
@@ -154,16 +190,28 @@ def validate_file(path: Path, strict_matrix: bool, allow_prototype: bool) -> Lis
 
 def main() -> int:
     args = parse_args()
+    missing: List[Tuple[str, str]] = []
     if args.manifest:
-        targets = [path for path in iter_targets_from_manifest(Path(args.manifest).resolve()) if path.exists()]
+        manifest_targets = resolve_manifest_targets(
+            Path(args.manifest).resolve(),
+            allow_missing=args.allow_missing,
+        )
+        targets = manifest_targets.paths
+        missing = manifest_targets.missing
     else:
         targets = list(iter_targets(args.model, args.timestamp))
-    if not targets:
+    if not targets and not missing and not (args.manifest and args.allow_missing):
         raise RuntimeError("No result files matched selection.")
 
     total = 0
-    bad = 0
+    bad = len(missing)
     printed = 0
+    for cell_id, issue in missing:
+        if printed < args.max_errors:
+            print(f"{cell_id}:")
+            print(f"  - {issue}")
+            printed += 1
+
     for path in sorted(targets):
         total += 1
         issues = validate_file(

@@ -27,6 +27,12 @@ cell's source docs. A script may prepare manifests, prompts, queues, and
 validation reports, but a script must not generate final verdict prose by
 mechanical parsing or keyword heuristics. Source: `DI-moduf`.
 
+Full-matrix execution may be unattended: the queue runner may invoke one
+external LLM command per manifest row, checkpoint state after every cell,
+validate the result file, and update the scenario matrix. The external runner
+must still produce the substantive result file; queue tooling only coordinates
+work and validation. Source: `DI-nuhon`.
+
 Allowed result-producing run modes:
 
 - `codex-manual-blind`
@@ -73,6 +79,10 @@ Each result must include one line starting with `Evidence verdict:`.
 - Generate a deterministic manifest before running a batch.
 - Use one `run_group_id` for the manifest and one result timestamp for a
   single run invocation.
+- Use manifests with concrete `timestamp`, `result_path`, `ordinal`, and
+  `cell_id` fields for unattended runs.
+- Use checkpoint state under `results/state/` for any long run that should
+  resume without operator prompts.
 - Update scenario `MATRIX.md` rows when a result is written.
 - Keep old result files; never rewrite or delete prior runs.
 
@@ -80,7 +90,8 @@ Each result must include one line starting with `Evidence verdict:`.
 
 - A cell is `failed` if required input docs are missing or result validation
   fails.
-- Retries are explicit reruns with a new timestamp.
+- Retries are explicit reruns with a new timestamp unless the same queue is
+  intentionally resumed for a cell that never produced a valid result.
 - Do not overwrite result files from a previous attempt.
 
 ## Tooling
@@ -89,6 +100,10 @@ Each result must include one line starting with `Evidence verdict:`.
   `python3 results/tools/generate_matrix_manifest.py --models <model-id>`
 - LLM job generator:
   `python3 results/tools/generate_llm_jobs.py --manifest <manifest.csv>`
+- Unattended queue runner:
+  `python3 results/tools/matrix_queue.py run --manifest <manifest.csv> --runner-command '<command with {prompt_path}>'`
+- Matrix row updater:
+  `python3 results/tools/update_matrix_rows.py --result <result.md>`
 - Result validator:
   `python3 results/tools/validate_results.py --model <model-id> --timestamp <ts> --strict-matrix`
 
@@ -100,3 +115,18 @@ Each result must include one line starting with `Evidence verdict:`.
 4. Validate canary output.
 5. Review drift/comparison report.
 6. Run the full manifest.
+
+## Unattended Full-Run Shape
+
+1. Generate a manifest with a fixed model ID and concrete timestamp:
+   `python3 results/tools/generate_matrix_manifest.py --models <model-id>`.
+2. Start the queue with an explicit noninteractive runner command:
+   `python3 results/tools/matrix_queue.py run --manifest <manifest.csv> --runner-command '<runner> {prompt_path}'`.
+3. Let the queue process one cell at a time. Each cell writes or refreshes its
+   prompt under `results/jobs/<run-group-id>/`, invokes the runner command,
+   validates `result_path`, updates the scenario `MATRIX.md`, and checkpoints
+   `results/state/<run-group-id>.json`. Source: `DI-nuhon`.
+4. If the process is interrupted, rerun the same command with the same manifest
+   and state path. Completed cells are skipped by default.
+5. When the queue completes, run strict validation over the manifest:
+   `python3 results/tools/validate_results.py --manifest <manifest.csv> --strict-matrix`.
