@@ -8,4 +8,4 @@ Source: `DI-faros`; `DI-vabor`; `DI-dimas`; `DI-botup`; `DI-midif`.
 | Simulation | Scenario | Latest result run | Status | Notes |
 |---|---|---|---|---|
 | `<candidate-sim-id>` | `climate-coordination` |  | not-run | Replace with a real simulation ID when this application seed is run. |
-| `SIM-punaz-bgp-class-routing-app` | `climate-coordination` | `results/SIM-punaz-bgp-class-routing-app/climate-coordination/openai-gpt-5.3-codex-xhigh/20260519-031017.md` | prototype | Scripted prototype plumbing output; excluded from result evidence by `DI-moduf`. Original heuristic note: partial fit. |
+| `SIM-punaz-bgp-class-routing-app` | `climate-coordination` | `results/SIM-punaz-bgp-class-routing-app/climate-coordination/openai-gpt-5.3-codex-xhigh/20260519-032257.md` | run | partial fit: transferable trust-accounting pattern, but climate-domain semantics are mostly out of scope. |

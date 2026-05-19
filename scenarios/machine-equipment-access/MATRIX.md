@@ -8,4 +8,4 @@ Source: `DI-faros`; `DI-vabor`; `DI-dimas`; `DI-botup`; `DI-midif`.
 | Simulation | Scenario | Latest result run | Status | Notes |
 |---|---|---|---|---|
 | `<candidate-sim-id>` | `machine-equipment-access` |  | not-run | Replace with a real simulation ID when this application seed is run. |
-| `SIM-punaz-bgp-class-routing-app` | `machine-equipment-access` | `results/SIM-punaz-bgp-class-routing-app/machine-equipment-access/openai-gpt-5.3-codex-xhigh/20260519-031017.md` | prototype | Scripted prototype plumbing output; excluded from result evidence by `DI-moduf`. Original heuristic note: partial fit. |
+| `SIM-punaz-bgp-class-routing-app` | `machine-equipment-access` | `results/SIM-punaz-bgp-class-routing-app/machine-equipment-access/openai-gpt-5.3-codex-xhigh/20260519-032257.md` | run | weak-to-partial fit: transferable trust-accounting pattern, domain semantics largely missing. |
