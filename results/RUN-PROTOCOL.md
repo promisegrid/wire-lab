@@ -1,7 +1,12 @@
 # Results Run Protocol
 
-This document defines the operational contract for matrix runs under
-`results/<sim-id>/<scenario-id>/<model-id>/<YYYYMMDD-HHMMSS>.md`.
+This document defines operational contracts for result evidence under `results/`.
+Legacy matrix runs write Markdown files at
+`results/<sim-id>/<scenario-id>/<model-id>/<YYYYMMDD-HHMMSS>.md`. GA/search runs
+write JSON fitness files at
+`results/<sim-id>/<scenario-id>/<model-id>/<YYYYMMDD-HHMMSS>.json` and checkpoint
+state at `results/state/<run-group-id>.json`. Source: `DI-zamin`; `DI-ramar`;
+`DI-zanon`; `DI-ruzaj`.
 
 ## Purpose
 
@@ -33,9 +38,15 @@ and validate the result file. The external runner must still produce the
 substantive result file; queue tooling only coordinates work and validation.
 Source: `DI-nuhon`; `DI-zamin`.
 
-The preferred runner is now the Go `tools/matrix-runner` CLI. For API-backed
-runs it bundles local source document contents into the provider prompt, because
-remote APIs cannot read repo-local paths. Source: `DI-lulom`.
+The preferred runner for legacy Markdown matrix runs is the Go
+`tools/matrix-runner` CLI. For API-backed runs it bundles local source document
+contents into the provider prompt, because remote APIs cannot read repo-local
+paths. Source: `DI-lulom`; `DI-ruzaj`.
+
+The preferred runner for GA/search work is `tools/ga-runner`. It uses JSON
+fitness evidence, `promisegrid.ga.state.v1` state, generated child sims under
+`simulations/SIM-*`, explicit review via `accept`, and explicit cleanup via
+`cull`. Source: `DI-ramar`; `DI-zanon`; `DI-podot`; `DI-kofil`; `DI-ruzaj`.
 
 Root scenario prompts use `scenarios/README.md` for shared scenario contract
 context and `scenarios/<scenario-id>/<scenario-id>.md` for scenario-specific
@@ -77,6 +88,8 @@ Source: `DI-moduf`.
 
 ## Result File Contract
 
+### Legacy Markdown Matrix Results
+
 Each result must contain these sections:
 
 - `## Result ID`
@@ -92,6 +105,20 @@ Each result must contain these sections:
 - `## Authority Boundary`
 
 Each result must include one line starting with `Evidence verdict:`.
+
+### GA/Search JSON Fitness Results
+
+GA/search results use schema `promisegrid.ga.result.v1` and path
+`results/<sim-id>/<scenario-id>/<model-id>/<YYYYMMDD-HHMMSS>.json`. The JSON
+file is the fitness evidence; there is no separate `results/fitness/` tree.
+Required content includes source paths, source hashes, runner/model metadata,
+rubric axes, integer rubric scores, normalized fitness, rationale, risks, open
+questions, and authority boundary. Source: `DI-ramar`; `DI-zanon`; `DI-pobus`;
+`DI-ruzaj`.
+
+Old Markdown canary results remain historical evidence, but `tools/ga-runner`
+must ignore `results/**/*.md` when validating or selecting GA fitness evidence.
+Source: `DI-ramar`; `DI-pobus`; `DI-ruzaj`.
 
 ## Batch Rules
 
@@ -119,8 +146,10 @@ Each result must include one line starting with `Evidence verdict:`.
 
 ## Tooling
 
-- Preferred Go runner:
+- Preferred legacy Markdown matrix runner:
   `cd tools/matrix-runner && go run . <subcommand>`
+- Preferred GA/search runner:
+  `cd tools/ga-runner && go run . <subcommand>`
 - Manifest generator:
   `python3 results/tools/generate_matrix_manifest.py --models <model-id>`
 - LLM job generator:
@@ -131,6 +160,25 @@ Each result must include one line starting with `Evidence verdict:`.
   `cd tools/matrix-runner && go run . view -repo-root ../.. -scenario <scenario-id>`
 - Result validator:
   `python3 results/tools/validate_results.py --model <model-id> --timestamp <ts>`
+
+## GA/Search Runner Shape
+
+Use `tools/ga-runner` for JSON-fitness GA/search work. Implemented commands are:
+
+- Validate JSON fitness evidence:
+  `cd tools/ga-runner && go run . validate -repo-root ../..`
+- Preview tracked population and conservative generation sizing:
+  `cd tools/ga-runner && go run . init -repo-root ../.. -dry-run -model <model-id> -run-group-id <run-group-id>`
+- Record reviewed promotion candidates without staging or committing:
+  `cd tools/ga-runner && go run . accept -repo-root ../.. -run-group-id <run-group-id> -child <SIM-id> -result <json-result-path> -reviewer-note '<note>'`
+- Cull rejected generated children and matching result trees through state:
+  `cd tools/ga-runner && go run . cull -repo-root ../.. -run-group-id <run-group-id> -child <SIM-id> -reason '<reason>'`
+
+`ga-runner score`, `generate`, `progress`, and non-dry-run `init` remain planned
+until their code paths are implemented. Generated children are normal
+`simulations/SIM-*` trees and are not accepted merely because they exist on
+disk. Source: `DI-ramar`; `DI-zanon`; `DI-zohal`; `DI-zusit`; `DI-podot`;
+`DI-kofil`; `DI-ruzaj`.
 
 ## Recommended Preflight
 

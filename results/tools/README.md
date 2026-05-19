@@ -1,11 +1,12 @@
 # Results Tooling
 
 This directory contains legacy Python matrix-run preflight and execution
-helpers. The preferred implementation is now the Go CLI under
-`tools/matrix-runner/`; these scripts remain as reference and rollback tools
-until a later retirement decision. Source: `DI-lulom`.
+helpers. For legacy Markdown matrix runs, the preferred implementation is the Go
+CLI under `tools/matrix-runner/`; these scripts remain as reference and rollback
+tools until a later retirement decision. GA/search JSON fitness work uses
+`tools/ga-runner/` instead. Source: `DI-lulom`; `DI-ruzaj`.
 
-## Preferred Go Runner
+## Preferred Legacy Matrix Runner
 
 From `tools/matrix-runner/`:
 
@@ -35,6 +36,13 @@ under `results/state/`, validates result files, and generates read-only result
 views from `results/`. Cost-controlled runs also record token/cost metadata in
 state and stop before starting over-budget cells. Source: `DI-lulom`;
 `DI-zamin`; `DI-nugiv`.
+
+## GA/Search Runner
+
+GA/search work is intentionally separate from the Markdown matrix tooling. Use
+`tools/ga-runner/` for JSON fitness validation, tracked-population planning,
+state-bound acceptance, and state-bound culling. It ignores old Markdown canary
+results. Source: `DI-ramar`; `DI-zanon`; `DI-podot`; `DI-kofil`; `DI-ruzaj`.
 
 ## Legacy Python Tools
 

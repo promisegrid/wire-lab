@@ -201,6 +201,26 @@ Affects: `tools/ga-runner/`; `results/state/<run-group-id>.json`;
 `simulations/SIM-*`; `results/SIM-*`;
 `protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`.
 
+ID: DI-ruzaj
+Date: 2026-05-19 10:57:53
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Document the GA/search runner separately from legacy Markdown matrix
+tooling: `results/` keeps both historical Markdown evidence and new JSON
+fitness evidence, `tools/ga-runner` owns GA/search JSON result validation,
+state-bound review, and culling, and matrix-runner/Python tooling remains
+legacy/canary matrix-run support rather than the preferred GA/search path.
+Intent: Operators need one clear place to see which result shape and toolchain
+apply to GA/search without deleting historical canary evidence or misleading
+future runs into using the Markdown matrix contract for JSON fitness work.
+Constraints: Preserve old result files and legacy documentation context. Do not
+claim unimplemented `ga-runner` modes are operational. Cite the active GA runner
+DIs so the docs remain tied to the decision source for JSON fitness, state,
+acceptance, and culling.
+Affects: `results/README.md`; `results/RUN-PROTOCOL.md`;
+`results/tools/README.md`; `tools/ga-runner/README.md`;
+`protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`.
+
 ## Scope
 
 - Define and implement a new GA/search runner without changing
@@ -392,10 +412,10 @@ status in the GA state file.
   `results/<child-sim-id>/` trees are deleted only through an explicit cull
   command that records the action in the GA state file. Source: `DI-ramar`;
   `DI-kofil`.
-- [ ] tapur.10 Update `results/RUN-PROTOCOL.md`, `results/README.md`, and tool
+- [x] tapur.10 Update `results/RUN-PROTOCOL.md`, `results/README.md`, and tool
   docs so GA-runner JSON results, Markdown canary-result exclusion, child-sim
   generation, review, promotion, and culling are documented from the same
-  decision source. Source: `DI-ramar`.
+  decision source. Source: `DI-ramar`; `DI-ruzaj`.
 - [ ] tapur.11 Add explicit scenario tags before serious GA runs. Candidate tag
   families: `domain` (for example logistics, governance, aviation, CAS,
   group-session, promisebase), `pressure` (sparse knowledge, adversarial trust,

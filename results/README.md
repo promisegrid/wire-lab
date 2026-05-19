@@ -4,12 +4,18 @@ Root `results/` entries are wire-lab comparison evidence for root scenarios.
 They are not PromiseGrid node layout, production API, final design authority, or
 simulation-local world state. Source: `DI-faros`; `DI-miror`; `DI-dimas`.
 
-## Path Shape
+## Path Shapes
 
-Every real result run must use this path:
+Legacy Markdown matrix evidence uses this path:
 
 ```text
 results/<sim-id>/<scenario-id>/<model-id>/<YYYYMMDD-HHMMSS>.md
+```
+
+GA/search fitness evidence uses this path:
+
+```text
+results/<sim-id>/<scenario-id>/<model-id>/<YYYYMMDD-HHMMSS>.json
 ```
 
 - `<sim-id>` is the exact simulation directory name without a trailing slash.
@@ -18,6 +24,9 @@ results/<sim-id>/<scenario-id>/<model-id>/<YYYYMMDD-HHMMSS>.md
   `openai-GPT-5.5-xhigh`. A generic interface label such as `codex` is not a
   valid model ID.
 - `<YYYYMMDD-HHMMSS>` is the UTC run timestamp.
+
+GA/search run state lives at `results/state/<run-group-id>.json` with schema
+`promisegrid.ga.state.v1`. Source: `DI-zanon`; `DI-ruzaj`.
 
 Do not create placeholder run files. A result file exists only after a real
 human, Codex, scripted, or other model run has produced observations.
@@ -97,9 +106,19 @@ Source: `DI-moduf`.
 evidence. Scenario-side summary files are not committed; generate inspection
 views with `tools/matrix-runner view` when needed. Source: `DI-zamin`.
 
+`tools/ga-runner` is the preferred runner for GA/search work. It validates JSON
+fitness results, ignores old Markdown canary files, keeps pending child sims
+state-bound, records accepted children without staging or committing them, and
+explicitly culls rejected children. Source: `DI-ramar`; `DI-zanon`;
+`DI-podot`; `DI-kofil`; `DI-ruzaj`.
+
+`tools/matrix-runner` and the preserved Python scripts remain useful for legacy
+Markdown matrix canaries and historical comparisons. They are not the GA/search
+contract for JSON fitness evidence. Source: `DI-lulom`; `DI-ruzaj`.
+
 ## Run Preflight
 
-Before kicking off a large matrix run:
+Before kicking off a legacy Markdown matrix run:
 
 1. Follow `results/RUN-PROTOCOL.md`.
 2. Generate a deterministic manifest with `tools/matrix-runner`.
@@ -111,8 +130,19 @@ Before kicking off a large matrix run:
 6. Run the full manifest only after canary validation and cost review pass.
 Source: `DI-nugiv`.
 
-The old Python scripts under `results/tools/` remain legacy/reference tools;
-the Go runner is preferred for unattended API-backed runs because it bundles
-local source document contents, checkpoints state, validates results, and
-generates result views from the canonical result tree. Source: `DI-lulom`;
-`DI-zamin`.
+The old Python scripts under `results/tools/` remain legacy/reference tools.
+For legacy Markdown matrix runs, the Go matrix-runner is preferred because it
+bundles local source document contents, checkpoints state, validates results,
+and generates result views from the canonical result tree. Source: `DI-lulom`;
+`DI-zamin`; `DI-ruzaj`.
+
+Before a GA/search run:
+
+1. Follow the GA/search section in `results/RUN-PROTOCOL.md`.
+2. Use `tools/ga-runner init -dry-run` to preview the tracked population and
+   conservative scenario/child plan.
+3. Keep generated child sims uncommitted until `tools/ga-runner accept` records
+   reviewed promotion evidence.
+4. Use `tools/ga-runner cull` to delete rejected child sims and matching result
+   trees only through the state-bound cleanup path. Source: `DI-ramar`;
+   `DI-zusit`; `DI-podot`; `DI-kofil`; `DI-ruzaj`.
