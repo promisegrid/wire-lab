@@ -66,6 +66,13 @@ standard processing is desired, and Priority is rejected. Flex `429` and timeout
 failures use bounded exponential backoff rather than silently falling back to a
 higher-cost tier. Source: `DI-mopob`.
 
+Synchronous GA/search calls should be bounded before Batch mode is available:
+raw `tools/ga-runner score` and `generate` default to one worker, five-minute
+provider attempts, two attempts per cell or child, and a six-minute retry
+elapsed cap. Canary wrappers may raise scoring workers when cost reservations
+are active, but they must not dispatch concurrent cells past the configured run
+budget. Source: `DI-juzus`.
+
 Unattended canary-style GA runs may continue past unusable individual cells by
 using `score -skip-failed-cells` and `generate -skip-failed-children`. Skipped
 items keep their failure messages in state, do not create synthetic result JSON,

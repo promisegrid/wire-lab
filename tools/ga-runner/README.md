@@ -27,6 +27,10 @@ go run . validate -repo-root ../..
     -api-model gpt-5.4 \
     -reasoning-effort xhigh \
     -service-tier flex \
+    -workers 3 \
+    -request-timeout 5m \
+    -provider-max-attempts 2 \
+    -provider-max-elapsed 6m \
     -skip-failed-cells \
     -max-run-cost-usd <budget>
 
@@ -35,6 +39,10 @@ go run . validate -repo-root ../..
     -api-model gpt-5.4 \
     -reasoning-effort xhigh \
     -service-tier flex \
+    -workers 1 \
+    -request-timeout 5m \
+    -provider-max-attempts 2 \
+    -provider-max-elapsed 6m \
     -skip-failed-children \
     -max-run-cost-usd <budget>
 
@@ -71,6 +79,14 @@ standard processing is intentionally worth the cost, and `priority` is rejected.
 Flex `429` resource-unavailable responses and request timeouts retry with
 bounded exponential backoff before the cell is checkpointed as failed. Source:
 `DI-mopob`.
+
+Provider-backed `score` and `generate` are serial by default with `-workers 1`,
+but sync canaries may use bounded workers for higher throughput. Each provider
+attempt defaults to `-request-timeout 5m`; each cell/child retry window defaults
+to `-provider-max-attempts 2` and `-provider-max-elapsed 6m`. Concurrent scoring
+reserves estimated cell cost before dispatch, so `-max-run-cost-usd` remains a
+conservative launch budget rather than a best-effort warning. Source:
+`DI-juzus`.
 
 For unattended canary-style runs, `score -skip-failed-cells` and
 `generate -skip-failed-children` preserve per-cell or per-child failure messages

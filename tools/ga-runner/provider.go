@@ -4,12 +4,21 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"time"
 )
 
 const (
 	defaultServiceTier = "flex"
 	serviceTierFlex    = "flex"
 	serviceTierDefault = "default"
+)
+
+const (
+	defaultRequestTimeout      = 5 * time.Minute
+	defaultProviderMaxAttempts = 2
+	defaultProviderMaxElapsed  = 6 * time.Minute
+	defaultScoreWorkers        = 1
+	defaultGenerateWorkers     = 1
 )
 
 // ProviderRequest is the complete prompt envelope that a GA command sends to a
@@ -57,4 +66,22 @@ func normalizeServiceTier(serviceTier string) (string, error) {
 	default:
 		return "", fmt.Errorf("service-tier must be %q or %q; got %q", serviceTierFlex, serviceTierDefault, serviceTier)
 	}
+}
+
+func normalizeWorkers(workers int) (int, error) {
+	if workers < 1 {
+		return 0, fmt.Errorf("workers must be at least 1")
+	}
+	return workers, nil
+}
+
+func parsePositiveDurationFlag(name string, value string) (time.Duration, error) {
+	duration, err := time.ParseDuration(strings.TrimSpace(value))
+	if err != nil {
+		return 0, fmt.Errorf("%s must be a Go duration such as 5m: %w", name, err)
+	}
+	if duration <= 0 {
+		return 0, fmt.Errorf("%s must be greater than zero", name)
+	}
+	return duration, nil
 }

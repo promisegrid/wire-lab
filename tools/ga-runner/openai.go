@@ -21,10 +21,11 @@ type OpenAIProvider struct {
 }
 
 // ProviderRetryPolicy bounds provider retries for long-running unattended GA
-// runs. The zero value selects conservative Flex defaults.
+// runs. The zero value selects conservative sync canary defaults.
 //
-// Intent: Keep retry timing explicit, finite, and testable so Flex scarcity does
-// not require interactive babysitting. Source: DI-mopob
+// Intent: Keep retry timing explicit, finite, and testable so Flex scarcity and
+// slow provider calls do not require interactive babysitting. Source: DI-mopob;
+// DI-juzus
 type ProviderRetryPolicy struct {
 	MaxAttempts    int
 	MaxElapsed     time.Duration
@@ -87,7 +88,9 @@ func (provider OpenAIProvider) generateOnce(ctx context.Context, request Provide
 	}
 	client := provider.Client
 	if client == nil {
-		client = &http.Client{Timeout: 30 * time.Minute}
+		// Intent: Do not allow direct OpenAIProvider construction to fall back to
+		// the old 30-minute request wait. Source: DI-juzus
+		client = &http.Client{Timeout: defaultRequestTimeout}
 	}
 	body := openAIRequest{
 		Model:           request.APIModel,
@@ -166,10 +169,10 @@ func (provider OpenAIProvider) generateOnce(ctx context.Context, request Provide
 
 func (policy ProviderRetryPolicy) withDefaults() ProviderRetryPolicy {
 	if policy.MaxAttempts <= 0 {
-		policy.MaxAttempts = 5
+		policy.MaxAttempts = defaultProviderMaxAttempts
 	}
 	if policy.MaxElapsed <= 0 {
-		policy.MaxElapsed = 15 * time.Minute
+		policy.MaxElapsed = defaultProviderMaxElapsed
 	}
 	if policy.InitialBackoff <= 0 {
 		policy.InitialBackoff = 15 * time.Second

@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -23,6 +24,10 @@ type generateOptions struct {
 	ServiceTier        string
 	APIKeyEnv          string
 	OpenAIBaseURL      string
+	Workers            int
+	RequestTimeout     time.Duration
+	ProviderAttempts   int
+	ProviderElapsed    time.Duration
 	MaxOutputTokens    int
 	MaxRunCostUSD      float64
 	MaxChildCostUSD    float64
@@ -55,7 +60,15 @@ func runGenerate(args []string, stdout io.Writer) error {
 	if err != nil {
 		return err
 	}
-	provider, err := buildProvider(options.ProviderName, options.APIKeyEnv, options.OpenAIBaseURL, options.DryRun)
+	provider, err := buildProvider(providerBuildOptions{
+		ProviderName:        options.ProviderName,
+		APIKeyEnv:           options.APIKeyEnv,
+		OpenAIBaseURL:       options.OpenAIBaseURL,
+		DryRun:              options.DryRun,
+		RequestTimeout:      options.RequestTimeout,
+		ProviderMaxAttempts: options.ProviderAttempts,
+		ProviderMaxElapsed:  options.ProviderElapsed,
+	})
 	if err != nil {
 		return err
 	}
@@ -74,6 +87,12 @@ func parseGenerateOptions(args []string) (generateOptions, error) {
 	serviceTier := fs.String("service-tier", defaultServiceTier, "provider service tier: flex or default; priority is rejected")
 	apiKeyEnv := fs.String("api-key-env", "OPENAI_API_KEY", "environment variable holding provider API key")
 	openAIBaseURL := fs.String("openai-base-url", "", "optional OpenAI Responses API URL override")
+	// Intent: Keep raw generation serial by default while allowing bounded
+	// worker pools for deliberately larger sync runs. Source: DI-juzus
+	workers := fs.Int("workers", defaultGenerateWorkers, "number of concurrent provider child-generation workers")
+	requestTimeout := fs.String("request-timeout", defaultRequestTimeout.String(), "per-request provider timeout as a Go duration")
+	providerAttempts := fs.Int("provider-max-attempts", defaultProviderMaxAttempts, "maximum provider attempts per child")
+	providerElapsed := fs.String("provider-max-elapsed", defaultProviderMaxElapsed.String(), "maximum elapsed provider retry time per child")
 	maxOutputTokens := fs.Int("max-output-tokens", 6000, "maximum provider output tokens")
 	maxRunCost := fs.Float64("max-run-cost-usd", 0, "stop before starting a child that would exceed this run budget; 0 disables")
 	maxChildCost := fs.Float64("max-child-estimate-usd", 0, "skip children whose preflight worst-case cost estimate exceeds this amount; 0 disables")
@@ -102,6 +121,21 @@ func parseGenerateOptions(args []string) (generateOptions, error) {
 	if err != nil {
 		return generateOptions{}, errUsage("generate: " + err.Error())
 	}
+	normalizedWorkers, err := normalizeWorkers(*workers)
+	if err != nil {
+		return generateOptions{}, errUsage("generate: " + err.Error())
+	}
+	parsedRequestTimeout, err := parsePositiveDurationFlag("request-timeout", *requestTimeout)
+	if err != nil {
+		return generateOptions{}, errUsage("generate: " + err.Error())
+	}
+	if *providerAttempts < 1 {
+		return generateOptions{}, errUsage("generate: provider-max-attempts must be at least 1")
+	}
+	parsedProviderElapsed, err := parsePositiveDurationFlag("provider-max-elapsed", *providerElapsed)
+	if err != nil {
+		return generateOptions{}, errUsage("generate: " + err.Error())
+	}
 	return generateOptions{
 		RepoRoot:           *repoRoot,
 		RunGroupID:         *runGroupID,
@@ -112,6 +146,10 @@ func parseGenerateOptions(args []string) (generateOptions, error) {
 		ServiceTier:        normalizedServiceTier,
 		APIKeyEnv:          *apiKeyEnv,
 		OpenAIBaseURL:      *openAIBaseURL,
+		Workers:            normalizedWorkers,
+		RequestTimeout:     parsedRequestTimeout,
+		ProviderAttempts:   *providerAttempts,
+		ProviderElapsed:    parsedProviderElapsed,
 		MaxOutputTokens:    *maxOutputTokens,
 		MaxRunCostUSD:      *maxRunCost,
 		MaxChildCostUSD:    *maxChildCost,
@@ -168,15 +206,18 @@ func runGenerateWithProvider(ctx context.Context, repo Repo, provider Provider, 
 	processed := 0
 	failed := 0
 	skipped := 0
+	reservedCostUSD := 0.0
+	var jobs []generateJob
 	for _, index := range indexes {
-		if cost.MaxRunUSD > 0 && stateActualCostUSD(state) >= cost.MaxRunUSD {
-			if err := writeFormat(stdout, "budget-stop: actual_cost_usd=%.6f max_run_cost_usd=%.6f\n", stateActualCostUSD(state), cost.MaxRunUSD); err != nil {
-				return err
-			}
-			break
+		job, status, err := prepareGenerateJob(repo, &state, stateFile, jobDir, index, options, cost, &reservedCostUSD, stdout)
+		if err != nil {
+			return err
 		}
-		status := generateOneChild(ctx, repo, provider, &state, stateFile, jobDir, index, options, cost, stdout)
 		processed++
+		if job.Ready {
+			jobs = append(jobs, job)
+			continue
+		}
 		if status == "failed" {
 			// Intent: Preserve failed child-generation messages in state while
 			// letting generated siblings continue through the GA cycle.
@@ -199,6 +240,27 @@ func runGenerateWithProvider(ctx context.Context, repo Repo, provider Provider, 
 		}
 		if status == "budget-stop" {
 			break
+		}
+	}
+	for result := range runGenerateJobs(ctx, repo, provider, jobs, options, cost) {
+		status := result.Status
+		if status == "failed" {
+			if options.SkipFailedChildren {
+				skipGAChildAfterFailure(&result.Child)
+				status = "skipped"
+			} else {
+				failed++
+			}
+		}
+		if status == "skipped" {
+			skipped++
+		}
+		if !options.DryRun {
+			state.Children[result.Index] = result.Child
+			state.UpdatedAt = time.Now().UTC().Format(time.RFC3339)
+			if err := writeGAStateAtomic(stateFile, state); err != nil {
+				return err
+			}
 		}
 	}
 	if err := writeFormat(stdout, "processed=%d failed=%d skipped=%d state=%s\n", processed, failed, skipped, repo.Rel(stateFile)); err != nil {
@@ -232,39 +294,52 @@ func selectedGenerateChildIndexes(state GAState, options generateOptions) []int 
 	return indexes
 }
 
-func generateOneChild(ctx context.Context, repo Repo, provider Provider, state *GAState, stateFile string, jobDir string, index int, options generateOptions, cost CostConfig, stdout io.Writer) string {
+type generateJob struct {
+	Ready  bool
+	Index  int
+	Child  GAChild
+	Prompt string
+}
+
+type generateJobResult struct {
+	Index  int
+	Child  GAChild
+	Status string
+}
+
+func prepareGenerateJob(repo Repo, state *GAState, stateFile string, jobDir string, index int, options generateOptions, cost CostConfig, reservedCostUSD *float64, stdout io.Writer) (generateJob, string, error) {
 	child := &state.Children[index]
 	if options.DryRun {
 		if err := writeFormat(stdout, "dry-run generate: %s -> %s\n", child.ID(), child.Path); err != nil {
 			child.Status = "failed"
-			return "failed"
+			return generateJob{}, "failed", nil
 		}
-		return child.Status
+		return generateJob{}, child.Status, nil
 	}
 	prompt, err := buildGeneratePrompt(repo, *state, *child)
 	if err != nil {
 		markGAChild(child, "failed", err.Error())
-		return "failed"
+		return generateJob{}, "failed", nil
 	}
-	// Intent: Stop before spending provider tokens when a child generation
-	// prompt would exceed the configured per-child or whole-run budget.
-	// Source: DI-gijom
+	// Intent: Stop before dispatching concurrent provider workers when a child
+	// generation prompt would exceed per-child or reserved whole-run budget.
+	// Source: DI-gijom; DI-juzus
 	estimate := cost.EstimatePromptCost(prompt, options.MaxOutputTokens)
 	if cost.MaxCellEstimateUSD > 0 && estimate.CostUSD > cost.MaxCellEstimateUSD {
 		markGAChild(child, "failed", fmt.Sprintf("estimated child cost %.6f exceeds max %.6f", estimate.CostUSD, cost.MaxCellEstimateUSD))
-		return "failed"
+		return generateJob{}, "failed", nil
 	}
-	if cost.MaxRunUSD > 0 && stateActualCostUSD(*state)+estimate.CostUSD > cost.MaxRunUSD {
-		if err := writeFormat(stdout, "budget-stop: actual_cost_usd=%.6f estimated_next_child_usd=%.6f max_run_cost_usd=%.6f\n", stateActualCostUSD(*state), estimate.CostUSD, cost.MaxRunUSD); err != nil {
+	if cost.MaxRunUSD > 0 && stateActualCostUSD(*state)+*reservedCostUSD+estimate.CostUSD > cost.MaxRunUSD {
+		if err := writeFormat(stdout, "budget-stop: actual_cost_usd=%.6f reserved_estimate_usd=%.6f estimated_next_child_usd=%.6f max_run_cost_usd=%.6f\n", stateActualCostUSD(*state), *reservedCostUSD, estimate.CostUSD, cost.MaxRunUSD); err != nil {
 			markGAChild(child, "failed", err.Error())
-			return "failed"
+			return generateJob{}, "failed", nil
 		}
-		return "budget-stop"
+		return generateJob{}, "budget-stop", nil
 	}
 	promptPath := filepath.Join(jobDir, child.ID()+".generate.md")
 	if err := writeFile(promptPath, prompt); err != nil {
 		markGAChild(child, "failed", err.Error())
-		return "failed"
+		return generateJob{}, "failed", nil
 	}
 	child.PromptHash = hashText(prompt)
 	child.Provider = options.ProviderName
@@ -275,20 +350,75 @@ func generateOneChild(ctx context.Context, repo Repo, provider Provider, state *
 	state.UpdatedAt = time.Now().UTC().Format(time.RFC3339)
 	if err := writeGAStateAtomic(stateFile, *state); err != nil {
 		markGAChild(child, "failed", err.Error())
-		return "failed"
+		return generateJob{}, "failed", nil
 	}
-	response, err := provider.Generate(ctx, ProviderRequest{
+	*reservedCostUSD += estimate.CostUSD
+	return generateJob{
+		Ready:  true,
+		Index:  index,
+		Child:  *child,
+		Prompt: prompt,
+	}, "running", nil
+}
+
+func runGenerateJobs(ctx context.Context, repo Repo, provider Provider, jobs []generateJob, options generateOptions, cost CostConfig) <-chan generateJobResult {
+	results := make(chan generateJobResult)
+	if len(jobs) == 0 {
+		close(results)
+		return results
+	}
+	workers := options.Workers
+	if workers < 1 {
+		workers = defaultGenerateWorkers
+	}
+	if workers > len(jobs) {
+		workers = len(jobs)
+	}
+	jobCh := make(chan generateJob)
+	var waitGroup sync.WaitGroup
+	waitGroup.Add(workers)
+	for workerID := 0; workerID < workers; workerID++ {
+		go func() {
+			defer waitGroup.Done()
+			for job := range jobCh {
+				results <- executeGenerateJob(ctx, repo, provider, job, options, cost)
+			}
+		}()
+	}
+	go func() {
+		for _, job := range jobs {
+			jobCh <- job
+		}
+		close(jobCh)
+		waitGroup.Wait()
+		close(results)
+	}()
+	return results
+}
+
+func executeGenerateJob(ctx context.Context, repo Repo, provider Provider, job generateJob, options generateOptions, cost CostConfig) generateJobResult {
+	child := job.Child
+	callCtx := ctx
+	cancel := func() {}
+	if options.ProviderElapsed > 0 {
+		// Intent: Bound each child-generation retry window so one slow child
+		// cannot monopolize a worker for the old 30-minute timeout. Source:
+		// DI-juzus
+		callCtx, cancel = context.WithTimeout(ctx, options.ProviderElapsed)
+	}
+	defer cancel()
+	response, err := provider.Generate(callCtx, ProviderRequest{
 		Provider:        options.ProviderName,
 		APIModel:        options.APIModel,
 		ReasoningEffort: options.ReasoningEffort,
 		ServiceTier:     options.ServiceTier,
 		MaxOutputTokens: options.MaxOutputTokens,
 		Instructions:    "Return only valid JSON for the requested GA child file bundle. Do not include code fences or commentary.",
-		Prompt:          prompt,
+		Prompt:          job.Prompt,
 	})
 	if err != nil {
-		markGAChild(child, "failed", err.Error())
-		return "failed"
+		markGAChild(&child, "failed", err.Error())
+		return generateJobResult{Index: job.Index, Child: child, Status: "failed"}
 	}
 	child.RequestID = response.RequestID
 	child.ResponseID = response.ResponseID
@@ -300,42 +430,42 @@ func generateOneChild(ctx context.Context, repo Repo, provider Provider, state *
 	if response.UsageJSON != "" {
 		usageCost, err := cost.ParseUsage(response.UsageJSON)
 		if err != nil {
-			markGAChild(child, "failed", err.Error())
-			return "failed"
+			markGAChild(&child, "failed", err.Error())
+			return generateJobResult{Index: job.Index, Child: child, Status: "failed"}
 		}
 		child.InputTokens = usageCost.InputTokens
 		child.CachedTokens = usageCost.CachedInputTokens
 		child.OutputTokens = usageCost.OutputTokens
 		child.CostUSD = usageCost.CostUSD
 	} else if cost.BudgetEnabled() {
-		markGAChild(child, "failed", "missing provider usage metadata for cost-controlled run")
-		return "failed"
+		markGAChild(&child, "failed", "missing provider usage metadata for cost-controlled run")
+		return generateJobResult{Index: job.Index, Child: child, Status: "failed"}
 	}
 	child.ResponseHash = hashText(response.Text)
 	bundle, err := parseChildBundle(response.Text)
 	if err != nil {
-		markGAChild(child, "failed", err.Error())
-		return "failed"
+		markGAChild(&child, "failed", err.Error())
+		return generateJobResult{Index: job.Index, Child: child, Status: "failed"}
 	}
-	if err := writeChildBundle(repo, *child, bundle); err != nil {
-		markGAChild(child, "failed", err.Error())
-		return "failed"
+	if err := writeChildBundle(repo, child, bundle); err != nil {
+		markGAChild(&child, "failed", err.Error())
+		return generateJobResult{Index: job.Index, Child: child, Status: "failed"}
 	}
 	treeHash, err := currentSimulationTreeHash(repo, strings.TrimSuffix(normalizeRelPath(child.Path), "/"))
 	if err != nil {
-		markGAChild(child, "failed", err.Error())
-		return "failed"
+		markGAChild(&child, "failed", err.Error())
+		return generateJobResult{Index: job.Index, Child: child, Status: "failed"}
 	}
-	files, err := generatedChildFiles(repo, *child)
+	files, err := generatedChildFiles(repo, child)
 	if err != nil {
-		markGAChild(child, "failed", err.Error())
-		return "failed"
+		markGAChild(&child, "failed", err.Error())
+		return generateJobResult{Index: job.Index, Child: child, Status: "failed"}
 	}
 	child.DesignDeltaSummary = bundle.DesignDeltaSummary
 	child.TreeHash = treeHash
 	child.Files = files
-	markGAChild(child, "generated", "validated child tree")
-	return "generated"
+	markGAChild(&child, "generated", "validated child tree")
+	return generateJobResult{Index: job.Index, Child: child, Status: "generated"}
 }
 
 func parseChildBundle(text string) (childBundle, error) {

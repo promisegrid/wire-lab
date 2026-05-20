@@ -4,7 +4,9 @@ set -Eeuo pipefail
 # Intent: Provide a terminal-friendly canary wrapper that streams observable
 # progress to stdout while teeing the complete run transcript to a pasteable
 # /tmp log file. Service tier is passed explicitly so the wrapper cannot inherit
-# an expensive project/client default. Source: DI-simag; DI-mopob
+# an expensive project/client default. Worker and timeout knobs are also passed
+# explicitly so slow provider calls are bounded. Source: DI-simag; DI-mopob;
+# DI-juzus
 
 usage() {
 	cat <<'USAGE'
@@ -21,6 +23,11 @@ Environment overrides:
   GA_CANARY_MAX_RUN_COST_USD   default: 5.00
   GA_CANARY_MAX_CELL_USD       default: 0.75
   GA_CANARY_MAX_CHILD_USD      default: 1.00
+  GA_CANARY_SCORE_WORKERS      default: 3
+  GA_CANARY_GENERATE_WORKERS   default: 1
+  GA_CANARY_REQUEST_TIMEOUT    default: 5m
+  GA_CANARY_PROVIDER_ATTEMPTS  default: 2
+  GA_CANARY_PROVIDER_ELAPSED   default: 6m
   GA_CANARY_POLL_SECONDS       default: 30
   GA_CANARY_LOG_FILE           default: /tmp/wire-lab-ga-canary-<run-group>.log
 
@@ -55,6 +62,11 @@ service_tier="${GA_CANARY_SERVICE_TIER:-flex}"
 max_run_cost_usd="${GA_CANARY_MAX_RUN_COST_USD:-5.00}"
 max_cell_usd="${GA_CANARY_MAX_CELL_USD:-0.75}"
 max_child_usd="${GA_CANARY_MAX_CHILD_USD:-1.00}"
+score_workers="${GA_CANARY_SCORE_WORKERS:-3}"
+generate_workers="${GA_CANARY_GENERATE_WORKERS:-1}"
+request_timeout="${GA_CANARY_REQUEST_TIMEOUT:-5m}"
+provider_attempts="${GA_CANARY_PROVIDER_ATTEMPTS:-2}"
+provider_elapsed="${GA_CANARY_PROVIDER_ELAPSED:-6m}"
 poll_seconds="${GA_CANARY_POLL_SECONDS:-30}"
 log_file="${GA_CANARY_LOG_FILE:-/tmp/wire-lab-ga-canary-$run_group.log}"
 state_file="$repo_root/results/state/$run_group.json"
@@ -68,6 +80,18 @@ fi
 
 if ! [[ "$poll_seconds" =~ ^[0-9]+$ ]] || [ "$poll_seconds" -lt 1 ]; then
 	echo "GA_CANARY_POLL_SECONDS must be a positive integer." >&2
+	exit 2
+fi
+if ! [[ "$score_workers" =~ ^[0-9]+$ ]] || [ "$score_workers" -lt 1 ]; then
+	echo "GA_CANARY_SCORE_WORKERS must be a positive integer." >&2
+	exit 2
+fi
+if ! [[ "$generate_workers" =~ ^[0-9]+$ ]] || [ "$generate_workers" -lt 1 ]; then
+	echo "GA_CANARY_GENERATE_WORKERS must be a positive integer." >&2
+	exit 2
+fi
+if ! [[ "$provider_attempts" =~ ^[0-9]+$ ]] || [ "$provider_attempts" -lt 1 ]; then
+	echo "GA_CANARY_PROVIDER_ATTEMPTS must be a positive integer." >&2
 	exit 2
 fi
 
@@ -85,6 +109,7 @@ print_state_summary() {
 import json
 import sys
 from collections import Counter
+from datetime import datetime, timezone
 
 state_path = sys.argv[1]
 with open(state_path, encoding="utf-8") as state_file:
@@ -99,6 +124,33 @@ cost += sum(child.get("cost_usd", 0) or 0 for child in children)
 
 print(f"[progress] state={state_path}")
 print(f"[progress] cells={dict(sorted(cell_counts.items()))} children={dict(sorted(child_counts.items()))} cost_usd={cost:.6f}")
+
+def age_text(updated_at):
+    if not updated_at:
+        return "unknown"
+    try:
+        value = updated_at.replace("Z", "+00:00")
+        started = datetime.fromisoformat(value)
+    except ValueError:
+        return "unknown"
+    seconds = max(0, int((datetime.now(timezone.utc) - started).total_seconds()))
+    minutes, seconds = divmod(seconds, 60)
+    return f"{minutes}m{seconds:02d}s"
+
+running = [
+    ("cell", cell.get("cell_id", ""), cell.get("updated_at", ""), cell.get("validation_message", ""))
+    for cell in cells
+    if cell.get("status") == "running"
+]
+running += [
+    ("child", child.get("child_id") or child.get("sim_id", ""), child.get("updated_at", ""), child.get("validation_message", ""))
+    for child in children
+    if child.get("status") == "running"
+]
+if running:
+    print("[progress] running:")
+    for item_type, item_id, updated_at, message in running[:10]:
+        print(f"[progress] - {item_type} {item_id} age={age_text(updated_at)} message={message}")
 
 failures = [
     (cell.get("cell_id", ""), cell.get("validation_message", ""))
@@ -167,6 +219,11 @@ echo "Repo root: $repo_root"
 echo "Log file: $log_file"
 echo "GOCACHE: $GOCACHE"
 echo "Service tier: $service_tier"
+echo "Score workers: $score_workers"
+echo "Generate workers: $generate_workers"
+echo "Request timeout: $request_timeout"
+echo "Provider attempts: $provider_attempts"
+echo "Provider elapsed: $provider_elapsed"
 
 if git -C "$repo_root" status --short | grep -q .; then
 	echo "[warning] worktree has uncommitted or untracked files; continuing because canary outputs are expected to be uncommitted."
@@ -194,6 +251,10 @@ run_step_with_monitor "score parent cells" \
 		-api-model "$api_model" \
 		-reasoning-effort "$reasoning_effort" \
 		-service-tier "$service_tier" \
+		-workers "$score_workers" \
+		-request-timeout "$request_timeout" \
+		-provider-max-attempts "$provider_attempts" \
+		-provider-max-elapsed "$provider_elapsed" \
 		-skip-failed-cells \
 		-max-run-cost-usd "$max_run_cost_usd" \
 		-max-cell-estimate-usd "$max_cell_usd"
@@ -205,6 +266,10 @@ run_step_with_monitor "generate child simulations" \
 		-api-model "$api_model" \
 		-reasoning-effort "$reasoning_effort" \
 		-service-tier "$service_tier" \
+		-workers "$generate_workers" \
+		-request-timeout "$request_timeout" \
+		-provider-max-attempts "$provider_attempts" \
+		-provider-max-elapsed "$provider_elapsed" \
 		-skip-failed-children \
 		-max-run-cost-usd "$max_run_cost_usd" \
 		-max-child-estimate-usd "$max_child_usd"
@@ -217,6 +282,10 @@ run_step_with_monitor "score child cells" \
 		-api-model "$api_model" \
 		-reasoning-effort "$reasoning_effort" \
 		-service-tier "$service_tier" \
+		-workers "$score_workers" \
+		-request-timeout "$request_timeout" \
+		-provider-max-attempts "$provider_attempts" \
+		-provider-max-elapsed "$provider_elapsed" \
 		-skip-failed-cells \
 		-max-run-cost-usd "$max_run_cost_usd" \
 		-max-cell-estimate-usd "$max_cell_usd"

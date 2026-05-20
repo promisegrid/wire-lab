@@ -361,6 +361,28 @@ Affects: `tools/ga-runner/`; `tools/ga-runner/run-canary.sh`;
 `tools/ga-runner/README.md`; `results/RUN-PROTOCOL.md`;
 `protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`.
 
+ID: DI-juzus
+Date: 2026-05-19 22:59:20
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Add bounded synchronous throughput controls to `tools/ga-runner`:
+provider-backed `score` and `generate` get explicit worker counts, a five-minute
+request timeout, a default two-attempt retry budget, and a six-minute retry
+elapsed cap; the terminal canary opts into three scoring workers and one child
+generation worker while keeping raw commands serial by default.
+Intent: A 30-minute single synchronous provider wait makes the GA canary
+operationally unusable and hides stalls behind repeated status counts. The sync
+runner should provide fast bounded feedback now, while separate Batch-mode work
+owns large asynchronous runs.
+Constraints: Keep cost controls conservative under concurrency by reserving
+estimated cost before launching provider calls. Do not let concurrent workers
+write state unsafely. Preserve `-skip-failed-cells` and
+`-skip-failed-children` continuation behavior. Do not implement OpenAI Batch in
+this TODO pass.
+Affects: `tools/ga-runner/`; `tools/ga-runner/run-canary.sh`;
+`tools/ga-runner/README.md`; `results/RUN-PROTOCOL.md`;
+`protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`.
+
 ## Scope
 
 - Define and implement a new GA/search runner without changing
@@ -588,6 +610,10 @@ status in the GA state file.
   can finish parent scoring, child generation, child scoring, and validation even
   when individual cells or children are unusable after bounded retries. Source:
   `DI-zikag`.
+- [x] tapur.17 Add bounded timeout, retry-budget, worker-count, and progress
+  controls so sync GA canaries do not block for 30 minutes per provider call and
+  can score multiple cells concurrently before Batch mode exists. Source:
+  `DI-juzus`.
 
 ## Predecessor context
 

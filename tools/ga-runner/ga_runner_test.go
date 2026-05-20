@@ -10,6 +10,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 )
@@ -398,6 +399,122 @@ func TestRunScoreSkipsFailedCellWhenRequested(t *testing.T) {
 	}
 }
 
+func TestRunScoreUsesConfiguredWorkers(t *testing.T) {
+	repo := newGAFixtureRepo(t)
+	addFixtureScenarios(t, repo, "scenario-two", "scenario-three")
+	initGAStateForTestWithScenarioCount(t, repo, "ga-score-workers", 3)
+	var mu sync.Mutex
+	inFlight := 0
+	maxInFlight := 0
+	provider := fakeGAProvider{
+		generate: func(ctx context.Context, request ProviderRequest) (ProviderResponse, error) {
+			mu.Lock()
+			inFlight++
+			if inFlight > maxInFlight {
+				maxInFlight = inFlight
+			}
+			mu.Unlock()
+			time.Sleep(25 * time.Millisecond)
+			mu.Lock()
+			inFlight--
+			mu.Unlock()
+			return ProviderResponse{
+				Text:        validScorePayloadJSON(),
+				RequestID:   "req-score",
+				ResponseID:  "resp-score",
+				ServiceTier: defaultServiceTier,
+				UsageJSON:   `{"input_tokens":1000,"input_tokens_details":{"cached_tokens":100},"output_tokens":500}`,
+			}, nil
+		},
+	}
+	var out strings.Builder
+	err := runScoreWithProvider(context.Background(), repo, provider, scoreOptions{
+		RunGroupID:       "ga-score-workers",
+		Target:           "parents",
+		ProviderName:     "fake",
+		APIModel:         "model-a",
+		ReasoningEffort:  "xhigh",
+		Workers:          3,
+		MaxOutputTokens:  4000,
+		InputPrice:       defaultInputUSDPerMTok,
+		CachedInputPrice: defaultCachedInputUSDPerMTok,
+		OutputPrice:      defaultOutputUSDPerMTok,
+	}, &out)
+	if err != nil {
+		t.Fatalf("score with workers: %v\n%s", err, out.String())
+	}
+	if maxInFlight < 2 {
+		t.Fatalf("expected concurrent provider calls, max in flight was %d", maxInFlight)
+	}
+	state := mustReadGAState(t, repo, "ga-score-workers")
+	doneParents := 0
+	for _, cell := range state.Cells {
+		if cell.SimID == "SIM-parent" && cell.Status == "done" {
+			doneParents++
+		}
+	}
+	if doneParents != 3 {
+		t.Fatalf("expected 3 done parent cells, got %d", doneParents)
+	}
+}
+
+func TestRunScoreReservesBudgetBeforeConcurrentDispatch(t *testing.T) {
+	repo := newGAFixtureRepo(t)
+	addFixtureScenarios(t, repo, "scenario-two", "scenario-three")
+	initGAStateForTestWithScenarioCount(t, repo, "ga-score-budget", 3)
+	state := mustReadGAState(t, repo, "ga-score-budget")
+	scenario, err := scenarioFromState(state, state.Cells[0].ScenarioID)
+	if err != nil {
+		t.Fatalf("scenario from state: %v", err)
+	}
+	prompt, err := buildScorePrompt(repo, state, state.Cells[0], scenario)
+	if err != nil {
+		t.Fatalf("build prompt: %v", err)
+	}
+	cost := CostConfig{
+		InputUSDPerMTok:       defaultInputUSDPerMTok,
+		CachedInputUSDPerMTok: defaultCachedInputUSDPerMTok,
+		OutputUSDPerMTok:      defaultOutputUSDPerMTok,
+	}
+	estimate := cost.EstimatePromptCost(prompt, 4000)
+	calls := 0
+	provider := fakeGAProvider{
+		generate: func(ctx context.Context, request ProviderRequest) (ProviderResponse, error) {
+			calls++
+			return ProviderResponse{
+				Text:        validScorePayloadJSON(),
+				RequestID:   "req-score",
+				ResponseID:  "resp-score",
+				ServiceTier: defaultServiceTier,
+				UsageJSON:   `{"input_tokens":1000,"input_tokens_details":{"cached_tokens":100},"output_tokens":500}`,
+			}, nil
+		},
+	}
+	var out strings.Builder
+	err = runScoreWithProvider(context.Background(), repo, provider, scoreOptions{
+		RunGroupID:       "ga-score-budget",
+		Target:           "parents",
+		ProviderName:     "fake",
+		APIModel:         "model-a",
+		ReasoningEffort:  "xhigh",
+		Workers:          3,
+		MaxOutputTokens:  4000,
+		MaxRunCostUSD:    estimate.CostUSD * 1.5,
+		InputPrice:       defaultInputUSDPerMTok,
+		CachedInputPrice: defaultCachedInputUSDPerMTok,
+		OutputPrice:      defaultOutputUSDPerMTok,
+	}, &out)
+	if err != nil {
+		t.Fatalf("score with budget reservation: %v\n%s", err, out.String())
+	}
+	if calls != 1 {
+		t.Fatalf("expected budget reservation to dispatch 1 provider call, got %d", calls)
+	}
+	if !strings.Contains(out.String(), "budget-stop") {
+		t.Fatalf("expected budget-stop output, got %q", out.String())
+	}
+}
+
 func TestRunGenerateWritesChildTree(t *testing.T) {
 	repo := newGAFixtureRepo(t)
 	initGAStateForTest(t, repo, "ga-generate")
@@ -494,12 +611,18 @@ func TestServiceTierOptionsDefaultToFlexAndRejectPriority(t *testing.T) {
 	if scoreDefaults.ServiceTier != serviceTierFlex {
 		t.Fatalf("score service tier = %q, want %q", scoreDefaults.ServiceTier, serviceTierFlex)
 	}
+	if scoreDefaults.Workers != defaultScoreWorkers || scoreDefaults.RequestTimeout != defaultRequestTimeout || scoreDefaults.ProviderAttempts != defaultProviderMaxAttempts || scoreDefaults.ProviderElapsed != defaultProviderMaxElapsed {
+		t.Fatalf("score throughput defaults not applied: %#v", scoreDefaults)
+	}
 	generateDefaults, err := parseGenerateOptions([]string{"-run-group-id", "ga-generate", "-api-model", "model-a"})
 	if err != nil {
 		t.Fatalf("parse generate defaults: %v", err)
 	}
 	if generateDefaults.ServiceTier != serviceTierFlex {
 		t.Fatalf("generate service tier = %q, want %q", generateDefaults.ServiceTier, serviceTierFlex)
+	}
+	if generateDefaults.Workers != defaultGenerateWorkers || generateDefaults.RequestTimeout != defaultRequestTimeout || generateDefaults.ProviderAttempts != defaultProviderMaxAttempts || generateDefaults.ProviderElapsed != defaultProviderMaxElapsed {
+		t.Fatalf("generate throughput defaults not applied: %#v", generateDefaults)
 	}
 	scoreDefaultTier, err := parseScoreOptions([]string{"-run-group-id", "ga-score", "-api-model", "model-a", "-service-tier", "default"})
 	if err != nil {
@@ -508,8 +631,18 @@ func TestServiceTierOptionsDefaultToFlexAndRejectPriority(t *testing.T) {
 	if scoreDefaultTier.ServiceTier != serviceTierDefault {
 		t.Fatalf("score explicit service tier = %q, want %q", scoreDefaultTier.ServiceTier, serviceTierDefault)
 	}
+	scoreCustom, err := parseScoreOptions([]string{"-run-group-id", "ga-score", "-api-model", "model-a", "-workers", "3", "-request-timeout", "2m", "-provider-max-attempts", "4", "-provider-max-elapsed", "9m"})
+	if err != nil {
+		t.Fatalf("parse custom throughput knobs: %v", err)
+	}
+	if scoreCustom.Workers != 3 || scoreCustom.RequestTimeout != 2*time.Minute || scoreCustom.ProviderAttempts != 4 || scoreCustom.ProviderElapsed != 9*time.Minute {
+		t.Fatalf("custom throughput knobs not applied: %#v", scoreCustom)
+	}
 	if _, err := parseGenerateOptions([]string{"-run-group-id", "ga-generate", "-api-model", "model-a", "-service-tier", "priority"}); err == nil {
 		t.Fatalf("expected priority service tier to be rejected")
+	}
+	if _, err := parseScoreOptions([]string{"-run-group-id", "ga-score", "-api-model", "model-a", "-workers", "0"}); err == nil {
+		t.Fatalf("expected zero workers to be rejected")
 	}
 }
 
@@ -1018,6 +1151,11 @@ func newGAFixtureRepo(t *testing.T) Repo {
 
 func initGAStateForTest(t *testing.T, repo Repo, runGroupID string) {
 	t.Helper()
+	initGAStateForTestWithScenarioCount(t, repo, runGroupID, 1)
+}
+
+func initGAStateForTestWithScenarioCount(t *testing.T, repo Repo, runGroupID string, scenarioCount int) {
+	t.Helper()
 	var out strings.Builder
 	err := runMain([]string{
 		"ga-runner", "init",
@@ -1026,13 +1164,24 @@ func initGAStateForTest(t *testing.T, repo Repo, runGroupID string) {
 		"-run-group-id", runGroupID,
 		"-timestamp", "20260519-111500",
 		"-parent-count", "1",
-		"-scenario-count", "1",
+		"-scenario-count", fmt.Sprintf("%d", scenarioCount),
 		"-child-count", "1",
 		"-max-promotions", "1",
 	}, &out, &out)
 	if err != nil {
 		t.Fatalf("init fixture state: %v\n%s", err, out.String())
 	}
+}
+
+func addFixtureScenarios(t *testing.T, repo Repo, scenarioIDs ...string) {
+	t.Helper()
+	var paths []string
+	for _, scenarioID := range scenarioIDs {
+		rel := filepath.ToSlash(filepath.Join("scenarios", scenarioID, scenarioID+".md"))
+		writeTestFile(t, repo.Path(rel), "# "+scenarioID+"\n\nAlice and Bob exercise "+scenarioID+".\n")
+		paths = append(paths, rel)
+	}
+	gitAdd(t, repo, paths...)
 }
 
 type fakeGAProvider struct {

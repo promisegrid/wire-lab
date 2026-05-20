@@ -8,6 +8,7 @@ import (
 	"io"
 	"path/filepath"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -21,6 +22,10 @@ type scoreOptions struct {
 	ServiceTier      string
 	APIKeyEnv        string
 	OpenAIBaseURL    string
+	Workers          int
+	RequestTimeout   time.Duration
+	ProviderAttempts int
+	ProviderElapsed  time.Duration
 	MaxOutputTokens  int
 	MaxRunCostUSD    float64
 	MaxCellCostUSD   float64
@@ -49,7 +54,15 @@ func runScore(args []string, stdout io.Writer) error {
 	if err != nil {
 		return err
 	}
-	provider, err := buildProvider(options.ProviderName, options.APIKeyEnv, options.OpenAIBaseURL, options.DryRun)
+	provider, err := buildProvider(providerBuildOptions{
+		ProviderName:        options.ProviderName,
+		APIKeyEnv:           options.APIKeyEnv,
+		OpenAIBaseURL:       options.OpenAIBaseURL,
+		DryRun:              options.DryRun,
+		RequestTimeout:      options.RequestTimeout,
+		ProviderMaxAttempts: options.ProviderAttempts,
+		ProviderMaxElapsed:  options.ProviderElapsed,
+	})
 	if err != nil {
 		return err
 	}
@@ -69,6 +82,12 @@ func parseScoreOptions(args []string) (scoreOptions, error) {
 	serviceTier := fs.String("service-tier", defaultServiceTier, "provider service tier: flex or default; priority is rejected")
 	apiKeyEnv := fs.String("api-key-env", "OPENAI_API_KEY", "environment variable holding provider API key")
 	openAIBaseURL := fs.String("openai-base-url", "", "optional OpenAI Responses API URL override")
+	// Intent: Keep raw scoring serial by default while letting canaries opt into
+	// bounded concurrent provider calls. Source: DI-juzus
+	workers := fs.Int("workers", defaultScoreWorkers, "number of concurrent provider scoring workers")
+	requestTimeout := fs.String("request-timeout", defaultRequestTimeout.String(), "per-request provider timeout as a Go duration")
+	providerAttempts := fs.Int("provider-max-attempts", defaultProviderMaxAttempts, "maximum provider attempts per cell")
+	providerElapsed := fs.String("provider-max-elapsed", defaultProviderMaxElapsed.String(), "maximum elapsed provider retry time per cell")
 	maxOutputTokens := fs.Int("max-output-tokens", 4000, "maximum provider output tokens")
 	maxRunCost := fs.Float64("max-run-cost-usd", 0, "stop before starting a cell that would exceed this run budget; 0 disables")
 	maxCellCost := fs.Float64("max-cell-estimate-usd", 0, "skip cells whose preflight worst-case cost estimate exceeds this amount; 0 disables")
@@ -98,6 +117,21 @@ func parseScoreOptions(args []string) (scoreOptions, error) {
 	if err != nil {
 		return scoreOptions{}, errUsage("score: " + err.Error())
 	}
+	normalizedWorkers, err := normalizeWorkers(*workers)
+	if err != nil {
+		return scoreOptions{}, errUsage("score: " + err.Error())
+	}
+	parsedRequestTimeout, err := parsePositiveDurationFlag("request-timeout", *requestTimeout)
+	if err != nil {
+		return scoreOptions{}, errUsage("score: " + err.Error())
+	}
+	if *providerAttempts < 1 {
+		return scoreOptions{}, errUsage("score: provider-max-attempts must be at least 1")
+	}
+	parsedProviderElapsed, err := parsePositiveDurationFlag("provider-max-elapsed", *providerElapsed)
+	if err != nil {
+		return scoreOptions{}, errUsage("score: " + err.Error())
+	}
 	return scoreOptions{
 		RepoRoot:         *repoRoot,
 		RunGroupID:       *runGroupID,
@@ -108,6 +142,10 @@ func parseScoreOptions(args []string) (scoreOptions, error) {
 		ServiceTier:      normalizedServiceTier,
 		APIKeyEnv:        *apiKeyEnv,
 		OpenAIBaseURL:    *openAIBaseURL,
+		Workers:          normalizedWorkers,
+		RequestTimeout:   parsedRequestTimeout,
+		ProviderAttempts: *providerAttempts,
+		ProviderElapsed:  parsedProviderElapsed,
 		MaxOutputTokens:  *maxOutputTokens,
 		MaxRunCostUSD:    *maxRunCost,
 		MaxCellCostUSD:   *maxCellCost,
@@ -165,15 +203,18 @@ func runScoreWithProvider(ctx context.Context, repo Repo, provider Provider, opt
 	processed := 0
 	failed := 0
 	skipped := 0
+	reservedCostUSD := 0.0
+	var jobs []scoreJob
 	for _, index := range cells {
-		if cost.MaxRunUSD > 0 && stateActualCostUSD(state) >= cost.MaxRunUSD {
-			if err := writeFormat(stdout, "budget-stop: actual_cost_usd=%.6f max_run_cost_usd=%.6f\n", stateActualCostUSD(state), cost.MaxRunUSD); err != nil {
-				return err
-			}
-			break
+		job, status, err := prepareScoreJob(repo, &state, stateFile, jobDir, index, options, cost, &reservedCostUSD, stdout)
+		if err != nil {
+			return err
 		}
-		status := scoreOneCell(ctx, repo, provider, &state, stateFile, jobDir, index, options, cost, stdout)
 		processed++
+		if job.Ready {
+			jobs = append(jobs, job)
+			continue
+		}
 		if status == "failed" {
 			// Intent: Preserve the failure message in state while allowing the
 			// terminal canary to continue into child generation and child scoring.
@@ -196,6 +237,27 @@ func runScoreWithProvider(ctx context.Context, repo Repo, provider Provider, opt
 		}
 		if status == "budget-stop" {
 			break
+		}
+	}
+	for result := range runScoreJobs(ctx, repo, provider, jobs, state, options, cost) {
+		status := result.Status
+		if status == "failed" {
+			if options.SkipFailedCells {
+				skipGACellAfterFailure(&result.Cell)
+				status = "skipped"
+			} else {
+				failed++
+			}
+		}
+		if status == "skipped" {
+			skipped++
+		}
+		if !options.DryRun {
+			state.Cells[result.Index] = result.Cell
+			state.UpdatedAt = time.Now().UTC().Format(time.RFC3339)
+			if err := writeGAStateAtomic(stateFile, state); err != nil {
+				return err
+			}
 		}
 	}
 	if err := writeFormat(stdout, "processed=%d failed=%d skipped=%d state=%s\n", processed, failed, skipped, repo.Rel(stateFile)); err != nil {
@@ -237,6 +299,20 @@ func selectedScoreCellIndexes(state GAState, options scoreOptions) []int {
 	return indexes
 }
 
+type scoreJob struct {
+	Ready    bool
+	Index    int
+	Cell     GACell
+	Scenario Scenario
+	Prompt   string
+}
+
+type scoreJobResult struct {
+	Index  int
+	Cell   GACell
+	Status string
+}
+
 func skipCellStatus(cell GACell, retryFailed bool, rerunDone bool) bool {
 	switch cell.Status {
 	case "done":
@@ -250,47 +326,47 @@ func skipCellStatus(cell GACell, retryFailed bool, rerunDone bool) bool {
 	}
 }
 
-func scoreOneCell(ctx context.Context, repo Repo, provider Provider, state *GAState, stateFile string, jobDir string, index int, options scoreOptions, cost CostConfig, stdout io.Writer) string {
+func prepareScoreJob(repo Repo, state *GAState, stateFile string, jobDir string, index int, options scoreOptions, cost CostConfig, reservedCostUSD *float64, stdout io.Writer) (scoreJob, string, error) {
 	cell := &state.Cells[index]
 	scenario, err := scenarioFromState(*state, cell.ScenarioID)
 	if err != nil {
 		markGACell(cell, "failed", err.Error())
-		return "failed"
+		return scoreJob{}, "failed", nil
 	}
 	if options.DryRun {
 		if err := writeFormat(stdout, "dry-run score: %s -> %s\n", cell.CellID, cell.ResultPath); err != nil {
 			markGACell(cell, "failed", err.Error())
-			return "failed"
+			return scoreJob{}, "failed", nil
 		}
-		return cell.Status
+		return scoreJob{}, cell.Status, nil
 	}
 	prompt, err := buildScorePrompt(repo, *state, *cell, scenario)
 	if err != nil {
 		markGACell(cell, "failed", err.Error())
-		return "failed"
+		return scoreJob{}, "failed", nil
 	}
-	// Intent: Estimate worst-case token cost before each provider call so a
-	// long GA scoring run can stop before exceeding the user-approved budget.
-	// Source: DI-gijom
+	// Intent: Estimate and reserve worst-case token cost before dispatching
+	// concurrent provider calls, so worker pools cannot oversubscribe the
+	// user-approved run budget. Source: DI-gijom; DI-juzus
 	estimate := cost.EstimatePromptCost(prompt, options.MaxOutputTokens)
 	if cost.MaxCellEstimateUSD > 0 && estimate.CostUSD > cost.MaxCellEstimateUSD {
 		markGACell(cell, "skipped", fmt.Sprintf("estimated cell cost %.6f exceeds max %.6f", estimate.CostUSD, cost.MaxCellEstimateUSD))
-		return "skipped"
+		return scoreJob{}, "skipped", nil
 	}
-	if cost.MaxRunUSD > 0 && stateActualCostUSD(*state)+estimate.CostUSD > cost.MaxRunUSD {
-		if err := writeFormat(stdout, "budget-stop: actual_cost_usd=%.6f estimated_next_cell_usd=%.6f max_run_cost_usd=%.6f\n", stateActualCostUSD(*state), estimate.CostUSD, cost.MaxRunUSD); err != nil {
+	if cost.MaxRunUSD > 0 && stateActualCostUSD(*state)+*reservedCostUSD+estimate.CostUSD > cost.MaxRunUSD {
+		if err := writeFormat(stdout, "budget-stop: actual_cost_usd=%.6f reserved_estimate_usd=%.6f estimated_next_cell_usd=%.6f max_run_cost_usd=%.6f\n", stateActualCostUSD(*state), *reservedCostUSD, estimate.CostUSD, cost.MaxRunUSD); err != nil {
 			markGACell(cell, "failed", err.Error())
-			return "failed"
+			return scoreJob{}, "failed", nil
 		}
-		return "budget-stop"
+		return scoreJob{}, "budget-stop", nil
 	}
 	if err := writeFile(filepath.Join(jobDir, cell.CellID+".score.md"), prompt); err != nil {
 		markGACell(cell, "failed", err.Error())
-		return "failed"
+		return scoreJob{}, "failed", nil
 	}
 	if issues := validateResultFile(repo, repo.Abs(cell.ResultPath)); len(issues) == 0 {
 		markGACell(cell, "done", "existing valid result")
-		return "done"
+		return scoreJob{}, "done", nil
 	}
 	cell.Attempts++
 	cell.Provider = options.ProviderName
@@ -301,20 +377,76 @@ func scoreOneCell(ctx context.Context, repo Repo, provider Provider, state *GASt
 	state.UpdatedAt = time.Now().UTC().Format(time.RFC3339)
 	if err := writeGAStateAtomic(stateFile, *state); err != nil {
 		markGACell(cell, "failed", err.Error())
-		return "failed"
+		return scoreJob{}, "failed", nil
 	}
-	response, err := provider.Generate(ctx, ProviderRequest{
+	*reservedCostUSD += estimate.CostUSD
+	return scoreJob{
+		Ready:    true,
+		Index:    index,
+		Cell:     *cell,
+		Scenario: scenario,
+		Prompt:   prompt,
+	}, "running", nil
+}
+
+func runScoreJobs(ctx context.Context, repo Repo, provider Provider, jobs []scoreJob, state GAState, options scoreOptions, cost CostConfig) <-chan scoreJobResult {
+	results := make(chan scoreJobResult)
+	if len(jobs) == 0 {
+		close(results)
+		return results
+	}
+	workers := options.Workers
+	if workers < 1 {
+		workers = defaultScoreWorkers
+	}
+	if workers > len(jobs) {
+		workers = len(jobs)
+	}
+	jobCh := make(chan scoreJob)
+	var waitGroup sync.WaitGroup
+	waitGroup.Add(workers)
+	for workerID := 0; workerID < workers; workerID++ {
+		go func() {
+			defer waitGroup.Done()
+			for job := range jobCh {
+				results <- executeScoreJob(ctx, repo, provider, job, state, options, cost)
+			}
+		}()
+	}
+	go func() {
+		for _, job := range jobs {
+			jobCh <- job
+		}
+		close(jobCh)
+		waitGroup.Wait()
+		close(results)
+	}()
+	return results
+}
+
+func executeScoreJob(ctx context.Context, repo Repo, provider Provider, job scoreJob, state GAState, options scoreOptions, cost CostConfig) scoreJobResult {
+	cell := job.Cell
+	callCtx := ctx
+	cancel := func() {}
+	if options.ProviderElapsed > 0 {
+		// Intent: Bound the whole provider retry window per cell so a worker
+		// slot cannot sit indefinitely even if the provider ignores client-side
+		// request timeouts. Source: DI-juzus
+		callCtx, cancel = context.WithTimeout(ctx, options.ProviderElapsed)
+	}
+	defer cancel()
+	response, err := provider.Generate(callCtx, ProviderRequest{
 		Provider:        options.ProviderName,
 		APIModel:        options.APIModel,
 		ReasoningEffort: options.ReasoningEffort,
 		ServiceTier:     options.ServiceTier,
 		MaxOutputTokens: options.MaxOutputTokens,
 		Instructions:    "Return only valid JSON for the requested GA score payload. Do not include code fences or commentary.",
-		Prompt:          prompt,
+		Prompt:          job.Prompt,
 	})
 	if err != nil {
-		markGACell(cell, "failed", err.Error())
-		return "failed"
+		markGACell(&cell, "failed", err.Error())
+		return scoreJobResult{Index: job.Index, Cell: cell, Status: "failed"}
 	}
 	cell.RequestID = response.RequestID
 	cell.ResponseID = response.ResponseID
@@ -326,37 +458,37 @@ func scoreOneCell(ctx context.Context, repo Repo, provider Provider, state *GASt
 	if response.UsageJSON != "" {
 		usageCost, err := cost.ParseUsage(response.UsageJSON)
 		if err != nil {
-			markGACell(cell, "failed", err.Error())
-			return "failed"
+			markGACell(&cell, "failed", err.Error())
+			return scoreJobResult{Index: job.Index, Cell: cell, Status: "failed"}
 		}
 		cell.InputTokens = usageCost.InputTokens
 		cell.CachedTokens = usageCost.CachedInputTokens
 		cell.OutputTokens = usageCost.OutputTokens
 		cell.CostUSD = usageCost.CostUSD
 	} else if cost.BudgetEnabled() {
-		markGACell(cell, "failed", "missing provider usage metadata for cost-controlled run")
-		return "failed"
+		markGACell(&cell, "failed", "missing provider usage metadata for cost-controlled run")
+		return scoreJobResult{Index: job.Index, Cell: cell, Status: "failed"}
 	}
 	payload, err := parseScorePayload(response.Text)
 	if err != nil {
-		markGACell(cell, "failed", err.Error())
-		return "failed"
+		markGACell(&cell, "failed", err.Error())
+		return scoreJobResult{Index: job.Index, Cell: cell, Status: "failed"}
 	}
-	result, err := buildFitnessResult(repo, *state, *cell, scenario, payload)
+	result, err := buildFitnessResult(repo, state, cell, job.Scenario, payload)
 	if err != nil {
-		markGACell(cell, "failed", err.Error())
-		return "failed"
+		markGACell(&cell, "failed", err.Error())
+		return scoreJobResult{Index: job.Index, Cell: cell, Status: "failed"}
 	}
 	if err := writeFitnessResultAtomic(repo.Abs(cell.ResultPath), result); err != nil {
-		markGACell(cell, "failed", err.Error())
-		return "failed"
+		markGACell(&cell, "failed", err.Error())
+		return scoreJobResult{Index: job.Index, Cell: cell, Status: "failed"}
 	}
 	if issues := validateResultFile(repo, repo.Abs(cell.ResultPath)); len(issues) > 0 {
-		markGACell(cell, "failed", strings.Join(issues, "; "))
-		return "failed"
+		markGACell(&cell, "failed", strings.Join(issues, "; "))
+		return scoreJobResult{Index: job.Index, Cell: cell, Status: "failed"}
 	}
-	markGACell(cell, "done", "validated result")
-	return "done"
+	markGACell(&cell, "done", "validated result")
+	return scoreJobResult{Index: job.Index, Cell: cell, Status: "done"}
 }
 
 func parseScorePayload(text string) (scorePayload, error) {
