@@ -1,0 +1,123 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-fonig-grid-envelope-enc-cbor-unknown-best-effort-sig-unsigned-v0-l6-cas-starting-profile-bakeoff-bridge-first-exchange-openai-gpt-5.4-xhigh-20260520-213325",
+  "run_group_id": "ga-canary-20260520-213325",
+  "cell_id": "ga-canary-20260520-213325-000003-SIM-fonig-grid-envelope-enc-cbor-unknown-best-effort-sig-unsigned-v0--l6-cas-starting-profile-bakeoff-bridge-first-exchange--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-fonig-grid-envelope-enc-cbor-unknown-best-effort-sig-unsigned-v0",
+  "scenario_id": "l6-cas-starting-profile-bakeoff-bridge-first-exchange",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260520-213325",
+  "result_path": "results/SIM-fonig-grid-envelope-enc-cbor-unknown-best-effort-sig-unsigned-v0/l6-cas-starting-profile-bakeoff-bridge-first-exchange/openai-gpt-5.4-xhigh/20260520-213325.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_95576bdd965e442c95175404e02668ba",
+    "response_id": "resp_051c8cfbfef28f4d006a0e28a7352c819a842c699874bdd7ec",
+    "input_tokens": 6433,
+    "output_tokens": 12647,
+    "cost_usd": 0.18831575
+  },
+  "source": {
+    "repo_commit": "61993e3c90fc94a518fb9fd5992aa59cc95e5dc0",
+    "sim_path": "simulations/SIM-fonig-grid-envelope-enc-cbor-unknown-best-effort-sig-unsigned-v0/",
+    "scenario_path": "scenarios/l6-cas-starting-profile-bakeoff-bridge-first-exchange/l6-cas-starting-profile-bakeoff-bridge-first-exchange.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "4640f5a26bcce0799d472dede1a4bca777224bb08ce9d3e5ff3b992d06e73a06"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-fonig-grid-envelope-enc-cbor-unknown-best-effort-sig-unsigned-v0/README.md",
+        "sha256": "d6201b58eb40bf797b0a48ecf439a8b5aa04edaba21b1b3c8b370c400f1bf0e9"
+      },
+      {
+        "path": "simulations/SIM-fonig-grid-envelope-enc-cbor-unknown-best-effort-sig-unsigned-v0/QUESTION.md",
+        "sha256": "093486bf301e9181a059afbeb8254e78de0e87a14f1bcb490849bc9b80fad342"
+      },
+      {
+        "path": "simulations/SIM-fonig-grid-envelope-enc-cbor-unknown-best-effort-sig-unsigned-v0/protocols/grid-envelope.d/CHANGELOG.md",
+        "sha256": "aef2b7915320af9607f415cef649397530561e4f0f9372fda1bbf2691dd3f9b1"
+      },
+      {
+        "path": "simulations/SIM-fonig-grid-envelope-enc-cbor-unknown-best-effort-sig-unsigned-v0/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "05e47c85609f90ee64fbd0b2746e7c293a0a60e1c0cb0962cb587ee101873c40"
+      },
+      {
+        "path": "scenarios/l6-cas-starting-profile-bakeoff-bridge-first-exchange/l6-cas-starting-profile-bakeoff-bridge-first-exchange.md",
+        "sha256": "1073b8362c9d6ac5ead65e55b023b472c03f8cb24b15fdd03bd84c37fb89c9f6"
+      }
+    ],
+    "simulation_tree_hash": "23f5d289e0986e4bb57324238374ffc087026f54fdea244bcf080a22de738036"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 3,
+    "promisegrid_alignment": 3,
+    "auditability": 2,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 3,
+    "implementation_plausibility": 5,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 21,
+    "normalized_0_100": 60,
+    "confidence_0_1": 0.78
+  },
+  "assessment": {
+    "rationale": "Deterministic CBOR, CIDv1-based dispatch, and explicit unknown-pCID salvage give this variant some bridge value for first inspection with generic CBOR/IPLD-shaped tools. But it does not itself define a bridge-friendly pointer-object profile, and its unsigned positional wrapper leaves most semantics and trust to the payload protocol or transport.",
+    "strengths": [
+      "Deterministic CBOR makes the outer bytes easy for generic tooling to decode.",
+      "CIDv1 pCID gives an explicit dispatch handle without requiring a central registry.",
+      "Unknown-pCID best-effort salvage preserves limited inspection while clearly marking it unsupported/unverified."
+    ],
+    "weaknesses": [
+      "The envelope is a custom positional array rather than a named DAG-CBOR/IPLD pointer-object profile.",
+      "Without the pCID handler, Bob only gets opaque payload bytes plus an unsupported/unverified label.",
+      "Unsigned v0 leaves envelope-level authenticity and accountability outside the design."
+    ],
+    "risks": [
+      "Bob may over-trust salvaged bytes that the spec says are not verified interpretation.",
+      "First-exchange tampering or origin confusion is hard to detect without an authenticated outer layer.",
+      "Cheap bridgeability may depend on custom shims, weakening the scenario's interop goal."
+    ],
+    "open_questions": [
+      "Will common DAG-CBOR/IPLD tools and multicodec tables treat the CIDv1 byte-string pCID usefully, or is a custom adapter required?",
+      "Should bridge-oriented payloads use standard DAG-CBOR link conventions inside payload?",
+      "Is transport- or payload-level signing sufficient for first exchange, or should a successor envelope add minimal native authenticity?",
+      "Why does the draft mention sig_pcid/signature slots when the declared base shape is [pcid, payload]?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

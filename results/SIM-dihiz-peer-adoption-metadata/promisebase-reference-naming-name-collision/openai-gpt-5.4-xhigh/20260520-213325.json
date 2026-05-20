@@ -1,0 +1,118 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-dihiz-peer-adoption-metadata-promisebase-reference-naming-name-collision-openai-gpt-5.4-xhigh-20260520-213325",
+  "run_group_id": "ga-canary-20260520-213325",
+  "cell_id": "ga-canary-20260520-213325-000005-SIM-dihiz-peer-adoption-metadata--promisebase-reference-naming-name-collision--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-dihiz-peer-adoption-metadata",
+  "scenario_id": "promisebase-reference-naming-name-collision",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260520-213325",
+  "result_path": "results/SIM-dihiz-peer-adoption-metadata/promisebase-reference-naming-name-collision/openai-gpt-5.4-xhigh/20260520-213325.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_e9d6cd147fbe4521af94dcff4498a6ba",
+    "response_id": "resp_060f12ddcc240422006a0e296bbd34819ba2bf40fb1f820949",
+    "input_tokens": 6240,
+    "output_tokens": 8557,
+    "cost_usd": 0.130718
+  },
+  "source": {
+    "repo_commit": "61993e3c90fc94a518fb9fd5992aa59cc95e5dc0",
+    "sim_path": "simulations/SIM-dihiz-peer-adoption-metadata/",
+    "scenario_path": "scenarios/promisebase-reference-naming-name-collision/promisebase-reference-naming-name-collision.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "d922a1d4d3248281af5d547ae5cdc42bf1dbb5f1b7d6bea2adb95178a81621ee"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-dihiz-peer-adoption-metadata/README.md",
+        "sha256": "ee0cea388e1fb3f66b8ac84815cb61469f781b498f45f42b3c643ca33fd3d544"
+      },
+      {
+        "path": "simulations/SIM-dihiz-peer-adoption-metadata/QUESTION.md",
+        "sha256": "7440e3520f0a627c2da0ac71e10a151be9f0a69e9769cb4d2c4ab8c3d90788ee"
+      },
+      {
+        "path": "simulations/SIM-dihiz-peer-adoption-metadata/SCENARIOS.md",
+        "sha256": "f767ff14c3e656af3f296e6712020cd08d7368273742833b5bc2c163ad17c9f2"
+      },
+      {
+        "path": "scenarios/promisebase-reference-naming-name-collision/promisebase-reference-naming-name-collision.md",
+        "sha256": "cd7096ff8355d9d87dcd0e44374943c11cb9b4066aeab8e4556f7996e5c325e4"
+      }
+    ],
+    "simulation_tree_hash": "0ef52f12b43c93b29474d07d492db05c900b139eef70ae86b40afdadc6413501"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 4,
+    "auditability": 3,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 2,
+    "implementation_plausibility": 3,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 19,
+    "normalized_0_100": 54,
+    "confidence_0_1": 0.8
+  },
+  "assessment": {
+    "rationale": "Partial fit. SIM-dihiz can sidestep some collision pressure by binding adoption to exact spec pCIDs and by explicitly asking whether claims are peer-, relationship-, or group-scoped. But it does not define a namespace or collision rule for human-readable references like 'release', so the scenario's core naming problem remains mostly unresolved.",
+    "strengths": [
+      "Exact spec pCID binding offers a path to avoid global alias collisions.",
+      "Covers relationship scope, vocabulary drift, supersedence, and offline verification.",
+      "Signed, content-addressed claims support peer-local audit and durable evidence."
+    ],
+    "weaknesses": [
+      "No explicit scope rule for colliding human-readable names across peers, groups, or sites.",
+      "Scoping and wire-shape choices remain open rather than committed.",
+      "Does not define how Alice discovers or compares current claims when labels collide."
+    ],
+    "risks": [
+      "Adding friendly labels without strict scope rules would recreate a de facto naming registry.",
+      "Unresolved answer-key or profile naming could make old and new claims ambiguous across spec evolution.",
+      "Current-claim discovery may drift toward central indexes if peer-local lookup is not specified."
+    ],
+    "open_questions": [
+      "Should human-readable aliases be forbidden, or required to carry explicit peer/group/site scope?",
+      "Are answer keys spec-local, profile-local, or separately versioned names with migration records?",
+      "What peer-local evidence lets Alice find Bob's current adoption claim after supersedence or revocation?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

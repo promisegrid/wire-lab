@@ -19,6 +19,7 @@ type scoreOptions struct {
 	ProviderName             string
 	APIModel                 string
 	ReasoningEffort          string
+	ReasoningSummary         string
 	ServiceTier              string
 	APIKeyEnv                string
 	OpenAIBaseURL            string
@@ -28,6 +29,7 @@ type scoreOptions struct {
 	ProviderElapsed          time.Duration
 	Stream                   bool
 	StreamIdleTimeout        time.Duration
+	StreamContentStdout      bool
 	TextVerbosity            string
 	MaxOutputTokens          int
 	CostEstimateOutputTokens int
@@ -68,6 +70,7 @@ func runScore(args []string, stdout io.Writer) error {
 		ProviderMaxElapsed:  options.ProviderElapsed,
 		Stream:              options.Stream,
 		StreamIdleTimeout:   options.StreamIdleTimeout,
+		StreamContentStdout: options.StreamContentStdout,
 	})
 	if err != nil {
 		return err
@@ -83,6 +86,10 @@ func parseScoreOptions(args []string) (scoreOptions, error) {
 	providerName := fs.String("provider", "openai", "provider name; v1 supports openai")
 	apiModel := fs.String("api-model", "", "provider API model name")
 	reasoningEffort := fs.String("reasoning-effort", defaultScoreReasoningEffort, "provider reasoning effort")
+	// Intent: Raw score commands default to no reasoning summary, while the
+	// terminal canary opts in so stdout can show supported reasoning-summary
+	// stream content. Source: DI-vadub
+	reasoningSummary := fs.String("reasoning-summary", "", "provider reasoning summary mode such as auto; empty omits")
 	// Intent: Default scoring calls to Flex and reject Priority so unattended
 	// scoring cannot inherit expensive processing. Source: DI-mopob
 	serviceTier := fs.String("service-tier", defaultServiceTier, "provider service tier: flex or default; priority is rejected")
@@ -98,6 +105,7 @@ func parseScoreOptions(args []string) (scoreOptions, error) {
 	// evidence before a timeout or retry. Source: DI-tufud
 	stream := fs.Bool("stream", defaultProviderStream, "stream OpenAI Responses API events when supported")
 	streamIdleTimeout := fs.String("stream-idle-timeout", defaultStreamIdleTimeout.String(), "maximum silence between streaming events as a Go duration")
+	streamContentStdout := fs.Bool("stream-content-stdout", false, "print streamed reasoning-summary and output deltas to stdout")
 	// Intent: Default score requests away from hard output-token caps; budget
 	// estimates stay separate from provider request shape. Source: DI-pulap
 	textVerbosity := fs.String("text-verbosity", defaultTextVerbosity, "provider text verbosity: low, medium, or high")
@@ -167,6 +175,7 @@ func parseScoreOptions(args []string) (scoreOptions, error) {
 		ProviderName:             *providerName,
 		APIModel:                 *apiModel,
 		ReasoningEffort:          *reasoningEffort,
+		ReasoningSummary:         *reasoningSummary,
 		ServiceTier:              normalizedServiceTier,
 		APIKeyEnv:                *apiKeyEnv,
 		OpenAIBaseURL:            *openAIBaseURL,
@@ -176,6 +185,7 @@ func parseScoreOptions(args []string) (scoreOptions, error) {
 		ProviderElapsed:          parsedProviderElapsed,
 		Stream:                   *stream,
 		StreamIdleTimeout:        parsedStreamIdleTimeout,
+		StreamContentStdout:      *streamContentStdout,
 		TextVerbosity:            normalizedTextVerbosity,
 		MaxOutputTokens:          *maxOutputTokens,
 		CostEstimateOutputTokens: *costEstimateOutputTokens,
@@ -523,14 +533,15 @@ func executeScoreJob(ctx context.Context, repo Repo, provider Provider, job scor
 	}
 	defer cancel()
 	response, err := provider.Generate(callCtx, ProviderRequest{
-		Provider:        options.ProviderName,
-		APIModel:        options.APIModel,
-		ReasoningEffort: options.ReasoningEffort,
-		ServiceTier:     options.ServiceTier,
-		TextVerbosity:   options.TextVerbosity,
-		MaxOutputTokens: options.MaxOutputTokens,
-		Instructions:    "Return only valid JSON for the requested GA score payload. Do not include code fences or commentary.",
-		Prompt:          job.Prompt,
+		Provider:         options.ProviderName,
+		APIModel:         options.APIModel,
+		ReasoningEffort:  options.ReasoningEffort,
+		ReasoningSummary: options.ReasoningSummary,
+		ServiceTier:      options.ServiceTier,
+		TextVerbosity:    options.TextVerbosity,
+		MaxOutputTokens:  options.MaxOutputTokens,
+		Instructions:     "Return only valid JSON for the requested GA score payload. Do not include code fences or commentary.",
+		Prompt:           job.Prompt,
 	})
 	if err != nil {
 		markGACell(&cell, "failed", err.Error())

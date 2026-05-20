@@ -1,0 +1,119 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-dihiz-peer-adoption-metadata-l6-cas-starting-profile-bakeoff-bridge-first-exchange-openai-gpt-5.4-xhigh-20260520-213325",
+  "run_group_id": "ga-canary-20260520-213325",
+  "cell_id": "ga-canary-20260520-213325-000006-SIM-dihiz-peer-adoption-metadata--l6-cas-starting-profile-bakeoff-bridge-first-exchange--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-dihiz-peer-adoption-metadata",
+  "scenario_id": "l6-cas-starting-profile-bakeoff-bridge-first-exchange",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260520-213325",
+  "result_path": "results/SIM-dihiz-peer-adoption-metadata/l6-cas-starting-profile-bakeoff-bridge-first-exchange/openai-gpt-5.4-xhigh/20260520-213325.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_9a40a77ed5af470ab5a90bb036ac9679",
+    "response_id": "resp_0fd8078578a175eb006a0e2970a6008198bcccb88bfc031946",
+    "input_tokens": 6321,
+    "output_tokens": 12858,
+    "cost_usd": 0.19107375
+  },
+  "source": {
+    "repo_commit": "61993e3c90fc94a518fb9fd5992aa59cc95e5dc0",
+    "sim_path": "simulations/SIM-dihiz-peer-adoption-metadata/",
+    "scenario_path": "scenarios/l6-cas-starting-profile-bakeoff-bridge-first-exchange/l6-cas-starting-profile-bakeoff-bridge-first-exchange.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "d922a1d4d3248281af5d547ae5cdc42bf1dbb5f1b7d6bea2adb95178a81621ee"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-dihiz-peer-adoption-metadata/README.md",
+        "sha256": "ee0cea388e1fb3f66b8ac84815cb61469f781b498f45f42b3c643ca33fd3d544"
+      },
+      {
+        "path": "simulations/SIM-dihiz-peer-adoption-metadata/QUESTION.md",
+        "sha256": "7440e3520f0a627c2da0ac71e10a151be9f0a69e9769cb4d2c4ab8c3d90788ee"
+      },
+      {
+        "path": "simulations/SIM-dihiz-peer-adoption-metadata/SCENARIOS.md",
+        "sha256": "f767ff14c3e656af3f296e6712020cd08d7368273742833b5bc2c163ad17c9f2"
+      },
+      {
+        "path": "scenarios/l6-cas-starting-profile-bakeoff-bridge-first-exchange/l6-cas-starting-profile-bakeoff-bridge-first-exchange.md",
+        "sha256": "1073b8362c9d6ac5ead65e55b023b472c03f8cb24b15fdd03bd84c37fb89c9f6"
+      }
+    ],
+    "simulation_tree_hash": "0ef52f12b43c93b29474d07d492db05c900b139eef70ae86b40afdadc6413501"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 4,
+    "auditability": 3,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 3,
+    "implementation_plausibility": 2,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 19,
+    "normalized_0_100": 54,
+    "confidence_0_1": 0.8
+  },
+  "assessment": {
+    "rationale": "SIM-dihiz is useful adjacent evidence on what an adoption claim must bind and how it evolves, but it is weak direct evidence for this bridge-first exchange scenario. It does not choose a concrete wire/profile shape and does not address DAG-CBOR, CIDv1, multicodec, or IPFS/IPLD-shaped inspection, so CAS bridgeability remains largely untested.",
+    "strengths": [
+      "Explicit adoption-claim fields: peer, spec pCID, answer set, scope, freshness, signature, and supersedence.",
+      "Strong evolution pressure coverage through vocabulary drift, relationship scope, and revocation/supersedence.",
+      "Offline verification and third-party carriage support no-central-registry, peer-local reasoning."
+    ],
+    "weaknesses": [
+      "No concrete DAG-CBOR/CIDv1/multicodec or IPFS/IPLD interop story.",
+      "Wire shape is intentionally unresolved, so the scenario cannot be exercised concretely.",
+      "README keeps pCID-storage decisions out of scope, limiting relevance to this CAS profile bakeoff."
+    ],
+    "risks": [
+      "If the eventual wire shape skips common CAS conventions, offline and third-party inspection may fragment across toolchains.",
+      "Unsettled answer-key naming may make old claims ambiguous across superseding specs.",
+      "Weak freshness or current-pointer rules could let stale relayed claims be mistaken for current ones."
+    ],
+    "open_questions": [
+      "Should a structured adoption object itself use DAG-CBOR/CIDv1/multicodec conventions?",
+      "How are answer keys stabilized or mapped across superseding specs?",
+      "How does Alice discover Bob's current claim versus a superseded but still auditable record?",
+      "What scope must be signed: peer, device, relationship, group/session, or some mix?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

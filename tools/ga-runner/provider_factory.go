@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 	"time"
@@ -17,6 +18,7 @@ type providerBuildOptions struct {
 	ProviderMaxElapsed  time.Duration
 	Stream              bool
 	StreamIdleTimeout   time.Duration
+	StreamContentStdout bool
 }
 
 // buildProvider centralizes provider construction so score/generate share the
@@ -57,6 +59,12 @@ func buildProvider(options providerBuildOptions) (Provider, error) {
 			RequestTimeout:    requestTimeout,
 			Stream:            options.Stream,
 			StreamIdleTimeout: streamIdleTimeout,
+			StreamContentWriter: func() io.Writer {
+				if options.StreamContentStdout {
+					return os.Stdout
+				}
+				return nil
+			}(),
 			// Intent: Send raw provider request/response diagnostics to the
 			// canary transcript so hangs have evidence before timeout. Source:
 			// DI-tufud

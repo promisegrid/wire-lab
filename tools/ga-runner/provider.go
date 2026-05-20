@@ -46,14 +46,15 @@ const (
 // ProviderRequest is the complete prompt envelope that a GA command sends to a
 // model provider for one score cell or one child-generation step.
 type ProviderRequest struct {
-	Provider        string
-	APIModel        string
-	ReasoningEffort string
-	ServiceTier     string
-	TextVerbosity   string
-	MaxOutputTokens int
-	Instructions    string
-	Prompt          string
+	Provider         string
+	APIModel         string
+	ReasoningEffort  string
+	ReasoningSummary string
+	ServiceTier      string
+	TextVerbosity    string
+	MaxOutputTokens  int
+	Instructions     string
+	Prompt           string
 }
 
 // ProviderResponse is intentionally narrow: the runner consumes the model text

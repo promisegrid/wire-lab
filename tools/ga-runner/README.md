@@ -26,14 +26,16 @@ go run . validate -repo-root ../..
     -target parents \
     -api-model gpt-5.4 \
     -reasoning-effort xhigh \
+    -reasoning-summary auto \
     -text-verbosity low \
     -service-tier flex \
-    -workers 3 \
+    -workers 6 \
     -request-timeout 5m \
     -provider-max-attempts 2 \
     -provider-max-elapsed 12m \
     -stream=true \
     -stream-idle-timeout 2m \
+    -stream-content-stdout=true \
     -skip-failed-cells \
     -max-run-cost-usd <budget>
 
@@ -41,6 +43,7 @@ go run . validate -repo-root ../..
     -run-group-id <run-group-id> \
     -api-model gpt-5.4 \
     -reasoning-effort medium \
+    -reasoning-summary auto \
     -text-verbosity low \
     -service-tier flex \
     -workers 1 \
@@ -49,6 +52,7 @@ go run . validate -repo-root ../..
     -provider-max-elapsed 12m \
     -stream=true \
     -stream-idle-timeout 2m \
+    -stream-content-stdout=true \
     -skip-failed-children \
     -max-run-cost-usd <budget>
 
@@ -74,9 +78,8 @@ parent simulation tree once, scenario-specific pressure once, and summarized
 fitness evidence, then uses completed parent fitness results to rank the
 selected parent pool, applies deterministic highest-scoring-parent plus uniform
 random scored-parent selection, materializes strict file-bundle responses as
-untracked
-`simulations/SIM-*` trees, and records prompt/response hashes, file hashes, tree
-hashes, and cost metadata in state.
+untracked `simulations/SIM-*` trees, and records prompt/response hashes, file
+hashes, tree hashes, and cost metadata in state.
 `accept` records reviewed promotion evidence and prints paths to stage, but it
 does not run `git add` or commit. `cull` deletes only state-selected generated
 child sim trees and matching result trees; use `-dry-run` to print the deletion
@@ -93,14 +96,24 @@ backoff before the cell is checkpointed as failed. Source: `DI-mopob`;
 `DI-tufud`.
 
 Provider-backed `score` and `generate` are serial by default with `-workers 1`,
-but sync canaries may use bounded workers for higher throughput. Each provider
-attempt defaults to `-request-timeout 5m`; each cell/child retry window defaults
-to `-provider-max-attempts 2` and `-provider-max-elapsed 12m`. Streaming is on
-by default with `-stream=true` and `-stream-idle-timeout 2m`, so long Responses
-API calls log event progress and retry silent stalls. Concurrent scoring
-reserves estimated cell cost before dispatch, so `-max-run-cost-usd` remains a
-conservative launch budget rather than a best-effort warning. Source:
-`DI-juzus`; `DI-tufud`.
+but sync canaries use bounded workers for higher throughput. The terminal
+canary defaults to six scoring workers and one child-generation worker until a
+successful generation phase provides evidence for parallel child writes. Each
+provider attempt defaults to `-request-timeout 5m`; each cell/child retry window
+defaults to `-provider-max-attempts 2` and `-provider-max-elapsed 12m`.
+Streaming is on by default with `-stream=true` and `-stream-idle-timeout 2m`, so
+long Responses API calls log event progress and retry silent stalls. Concurrent
+scoring reserves estimated cell cost before dispatch, so `-max-run-cost-usd`
+remains a conservative launch budget rather than a best-effort warning. Source:
+`DI-juzus`; `DI-tufud`; `DI-pivuj`; `DI-suzor`.
+
+The terminal canary opts into `-reasoning-summary auto` and
+`-stream-content-stdout=true` so stdout/logs show supported
+`response.reasoning_summary_text.delta` content and visible
+`response.output_text.delta` content while cells are running. This is reasoning
+summary output, not hidden raw reasoning tokens, which the OpenAI Responses API
+does not expose. Raw `score` and `generate` commands leave stdout stream content
+off unless requested explicitly. Source: `DI-vadub`.
 
 Provider-backed `score` and `generate` omit `max_output_tokens` by default.
 `-max-output-tokens` remains an explicit emergency fuse, but normal cost control

@@ -6,8 +6,10 @@ set -Eeuo pipefail
 # /tmp log file. Service tier is passed explicitly so the wrapper cannot inherit
 # an expensive project/client default. Worker and timeout knobs are also passed
 # explicitly so slow provider calls are bounded, while concise output is guided
-# by text verbosity instead of hard output caps. Source: DI-simag; DI-mopob;
-# DI-juzus; DI-pulap; DI-tufud
+# by text verbosity instead of hard output caps. The canary also requests
+# reasoning summaries and mirrors streamed content to stdout/log for live
+# diagnosis. Source: DI-simag; DI-mopob; DI-juzus; DI-pulap; DI-tufud; DI-vadub;
+# DI-pivuj; DI-suzor
 
 usage() {
 	cat <<'USAGE'
@@ -22,18 +24,20 @@ Environment overrides:
   GA_CANARY_API_MODEL          default: gpt-5.4
   GA_CANARY_SCORE_REASONING_EFFORT     default: xhigh
   GA_CANARY_GENERATE_REASONING_EFFORT  default: medium
+  GA_CANARY_REASONING_SUMMARY  default: auto
   GA_CANARY_TEXT_VERBOSITY     default: low
   GA_CANARY_SERVICE_TIER       default: flex
   GA_CANARY_MAX_RUN_COST_USD   default: 5.00
   GA_CANARY_MAX_CELL_USD       default: 0.75
   GA_CANARY_MAX_CHILD_USD      default: 1.00
-  GA_CANARY_SCORE_WORKERS      default: 3
+  GA_CANARY_SCORE_WORKERS      default: 6
   GA_CANARY_GENERATE_WORKERS   default: 1
   GA_CANARY_REQUEST_TIMEOUT    default: 5m
   GA_CANARY_PROVIDER_ATTEMPTS  default: 2
   GA_CANARY_PROVIDER_ELAPSED   default: 12m
   GA_CANARY_STREAM             default: true
   GA_CANARY_STREAM_IDLE_TIMEOUT default: 2m
+  GA_CANARY_STREAM_CONTENT_STDOUT default: true
   GA_CANARY_POLL_SECONDS       default: 30
   GA_CANARY_LOG_FILE           default: /tmp/wire-lab-ga-canary-<run-group>.log
 
@@ -66,18 +70,20 @@ model_id="${GA_CANARY_MODEL_ID:-openai-gpt-5.4-xhigh}"
 api_model="${GA_CANARY_API_MODEL:-gpt-5.4}"
 score_reasoning_effort="${GA_CANARY_SCORE_REASONING_EFFORT:-xhigh}"
 generate_reasoning_effort="${GA_CANARY_GENERATE_REASONING_EFFORT:-medium}"
+reasoning_summary="${GA_CANARY_REASONING_SUMMARY:-auto}"
 text_verbosity="${GA_CANARY_TEXT_VERBOSITY:-low}"
 service_tier="${GA_CANARY_SERVICE_TIER:-flex}"
 max_run_cost_usd="${GA_CANARY_MAX_RUN_COST_USD:-5.00}"
 max_cell_usd="${GA_CANARY_MAX_CELL_USD:-0.75}"
 max_child_usd="${GA_CANARY_MAX_CHILD_USD:-1.00}"
-score_workers="${GA_CANARY_SCORE_WORKERS:-3}"
+score_workers="${GA_CANARY_SCORE_WORKERS:-6}"
 generate_workers="${GA_CANARY_GENERATE_WORKERS:-1}"
 request_timeout="${GA_CANARY_REQUEST_TIMEOUT:-5m}"
 provider_attempts="${GA_CANARY_PROVIDER_ATTEMPTS:-2}"
 provider_elapsed="${GA_CANARY_PROVIDER_ELAPSED:-12m}"
 stream="${GA_CANARY_STREAM:-true}"
 stream_idle_timeout="${GA_CANARY_STREAM_IDLE_TIMEOUT:-2m}"
+stream_content_stdout="${GA_CANARY_STREAM_CONTENT_STDOUT:-true}"
 poll_seconds="${GA_CANARY_POLL_SECONDS:-30}"
 log_file="${GA_CANARY_LOG_FILE:-/tmp/wire-lab-ga-canary-$run_group.log}"
 state_file="$repo_root/results/state/$run_group.json"
@@ -106,6 +112,14 @@ case "$stream" in
 		;;
 	*)
 		echo "GA_CANARY_STREAM must be true or false." >&2
+		exit 2
+		;;
+esac
+case "$stream_content_stdout" in
+	true|false)
+		;;
+	*)
+		echo "GA_CANARY_STREAM_CONTENT_STDOUT must be true or false." >&2
 		exit 2
 		;;
 esac
@@ -246,6 +260,7 @@ echo "GOCACHE: $GOCACHE"
 echo "Service tier: $service_tier"
 echo "Score reasoning effort: $score_reasoning_effort"
 echo "Generate reasoning effort: $generate_reasoning_effort"
+echo "Reasoning summary: $reasoning_summary"
 echo "Text verbosity: $text_verbosity"
 echo "Score workers: $score_workers"
 echo "Generate workers: $generate_workers"
@@ -254,6 +269,7 @@ echo "Provider attempts: $provider_attempts"
 echo "Provider elapsed: $provider_elapsed"
 echo "Provider streaming: $stream"
 echo "Stream idle timeout: $stream_idle_timeout"
+echo "Stream content stdout: $stream_content_stdout"
 
 if git -C "$repo_root" status --short | grep -q .; then
 	echo "[warning] worktree has uncommitted or untracked files; continuing because canary outputs are expected to be uncommitted."
@@ -280,6 +296,7 @@ run_step_with_monitor "score parent cells" \
 		-target parents \
 		-api-model "$api_model" \
 		-reasoning-effort "$score_reasoning_effort" \
+		-reasoning-summary "$reasoning_summary" \
 		-text-verbosity "$text_verbosity" \
 		-service-tier "$service_tier" \
 		-workers "$score_workers" \
@@ -288,6 +305,7 @@ run_step_with_monitor "score parent cells" \
 		-provider-max-elapsed "$provider_elapsed" \
 		-stream="$stream" \
 		-stream-idle-timeout "$stream_idle_timeout" \
+		-stream-content-stdout="$stream_content_stdout" \
 		-skip-failed-cells \
 		-max-run-cost-usd "$max_run_cost_usd" \
 		-max-cell-estimate-usd "$max_cell_usd"
@@ -298,6 +316,7 @@ run_step_with_monitor "generate child simulations" \
 		-run-group-id "$run_group" \
 		-api-model "$api_model" \
 		-reasoning-effort "$generate_reasoning_effort" \
+		-reasoning-summary "$reasoning_summary" \
 		-text-verbosity "$text_verbosity" \
 		-service-tier "$service_tier" \
 		-workers "$generate_workers" \
@@ -306,6 +325,7 @@ run_step_with_monitor "generate child simulations" \
 		-provider-max-elapsed "$provider_elapsed" \
 		-stream="$stream" \
 		-stream-idle-timeout "$stream_idle_timeout" \
+		-stream-content-stdout="$stream_content_stdout" \
 		-skip-failed-children \
 		-max-run-cost-usd "$max_run_cost_usd" \
 		-max-child-estimate-usd "$max_child_usd"
@@ -317,6 +337,7 @@ run_step_with_monitor "score child cells" \
 		-target children \
 		-api-model "$api_model" \
 		-reasoning-effort "$score_reasoning_effort" \
+		-reasoning-summary "$reasoning_summary" \
 		-text-verbosity "$text_verbosity" \
 		-service-tier "$service_tier" \
 		-workers "$score_workers" \
@@ -325,6 +346,7 @@ run_step_with_monitor "score child cells" \
 		-provider-max-elapsed "$provider_elapsed" \
 		-stream="$stream" \
 		-stream-idle-timeout "$stream_idle_timeout" \
+		-stream-content-stdout="$stream_content_stdout" \
 		-skip-failed-cells \
 		-max-run-cost-usd "$max_run_cost_usd" \
 		-max-cell-estimate-usd "$max_cell_usd"

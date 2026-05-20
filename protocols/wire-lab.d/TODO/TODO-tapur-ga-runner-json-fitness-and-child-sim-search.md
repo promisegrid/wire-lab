@@ -501,6 +501,66 @@ Supersedes: `DI-bukid` tournament-diversity selection only; `DI-juzus`
 six-minute elapsed retry default only; `DI-mopob` Flex-only transient retry
 status list only.
 
+ID: DI-vadub
+Date: 2026-05-20 14:35:53
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Make the terminal GA canary request OpenAI reasoning summaries and
+print streamed reasoning-summary and visible-output deltas to stdout/log when
+streaming is enabled.
+Intent: Steve wants to see live provider content instead of only event counters
+while canary cells run. OpenAI does not expose raw reasoning tokens, so the
+canary should request the supported `reasoning.summary` output and print those
+summary deltas, plus visible output deltas, as diagnostic stream content.
+Constraints: Do not claim or attempt to expose hidden raw reasoning tokens. Keep
+stdout content opt-in for raw `score` and `generate` commands so their normal
+status output stays readable; make the canary opt in by default. Preserve JSON
+result parsing and state checkpointing semantics.
+Affects: `tools/ga-runner/`; `tools/ga-runner/run-canary.sh`;
+`tools/ga-runner/README.md`; `results/RUN-PROTOCOL.md`;
+`protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`.
+
+ID: DI-pivuj
+Date: 2026-05-20 14:43:07
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Raise the terminal canary wrapper's default sync parallelism to six
+score workers and two child-generation workers while keeping raw `score` and
+`generate` command defaults serial.
+Intent: The 2026-05-20 canary log showed parent scoring progressing normally but
+too slowly: three score workers left parent cells queued while individual cells
+completed in roughly one-to-three minutes. The canary should use more of the
+available sync provider throughput before Batch mode exists, but raw commands
+should remain conservative unless the operator opts into concurrency.
+Constraints: Preserve the existing cost-reservation gate before concurrent
+provider dispatch; do not increase the default run budget; keep worker counts
+overridable by `GA_CANARY_SCORE_WORKERS` and `GA_CANARY_GENERATE_WORKERS`; keep
+generation parallelism modest because children write simulation trees.
+Affects: `tools/ga-runner/run-canary.sh`; `tools/ga-runner/README.md`;
+`results/RUN-PROTOCOL.md`;
+`protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`.
+
+ID: DI-suzor
+Date: 2026-05-20 14:47:50
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Keep the terminal canary's default child-generation worker count at
+one while raising only scoring parallelism to six workers.
+Intent: The 2026-05-20 canary evidence covered parent scoring only: parent cells
+completed cleanly, queued work remained, and no provider retries or timeouts
+occurred. The same run stopped before child generation because the wrapper
+referenced an unset `reasoning_summary` variable in that historical execution.
+Until a generation phase completes, raising generation parallelism would be an
+untested change in the phase that writes child simulation trees.
+Constraints: Keep `GA_CANARY_GENERATE_WORKERS` overridable for explicit tests;
+use `GA_CANARY_SCORE_WORKERS=6` for the next canary; consider
+`GA_CANARY_GENERATE_WORKERS=2` only after at least one successful generate phase
+shows generation is safe and slow enough to justify parallel writes.
+Affects: `tools/ga-runner/run-canary.sh`; `tools/ga-runner/README.md`;
+`results/RUN-PROTOCOL.md`;
+`protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`.
+Supersedes: `DI-pivuj` only for the default child-generation worker count.
+
 ## Scope
 
 - Define and implement a new GA/search runner without changing
@@ -752,6 +812,15 @@ status in the GA state file.
   transient-provider retries, a twelve-minute default retry elapsed budget, and
   top-plus-random scored parent selection for the next GA canary. Source:
   `DI-tufud`.
+- [x] tapur.23 Make the terminal canary request reasoning summaries and print
+  supported reasoning-summary and visible-output stream deltas to stdout/log
+  without claiming access to hidden raw reasoning tokens. Source: `DI-vadub`.
+- [x] tapur.24 Raise terminal canary default sync parallelism to six score
+  workers and two child-generation workers while preserving serial raw command
+  defaults and cost-reservation gates. Source: `DI-pivuj`.
+- [x] tapur.25 Narrow the terminal canary default child-generation worker count
+  back to one until a successful generation phase provides evidence for
+  parallel child writes. Source: `DI-suzor`.
 
 ## Predecessor context
 

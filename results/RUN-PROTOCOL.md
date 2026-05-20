@@ -77,8 +77,17 @@ raw `tools/ga-runner score` and `generate` default to one worker, five-minute
 provider attempts, two attempts per cell or child, and a twelve-minute retry
 elapsed cap. Streaming is enabled by default for provider liveness logging, with
 a two-minute idle timeout for silent stalls. Canary wrappers may raise scoring
-workers when cost reservations are active, but they must not dispatch concurrent
-cells past the configured run budget. Source: `DI-juzus`; `DI-tufud`.
+and generation workers when cost reservations are active; the terminal canary
+defaults to six scoring workers and one child-generation worker until a
+successful generation phase provides evidence for parallel child writes, and it
+must not dispatch concurrent cells or children past the configured run budget.
+Source: `DI-juzus`; `DI-tufud`; `DI-pivuj`; `DI-suzor`.
+
+Canary wrappers may request `reasoning.summary=auto` and mirror supported
+reasoning-summary and visible-output stream deltas to stdout/log. This is live
+diagnostic content for operator visibility; it is not raw hidden reasoning
+tokens, and raw commands should keep stdout stream content off unless explicitly
+requested. Source: `DI-vadub`.
 
 Unattended canary-style GA runs may continue past unusable individual cells by
 using `score -skip-failed-cells` and `generate -skip-failed-children`. Skipped

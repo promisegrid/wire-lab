@@ -25,7 +25,10 @@ type OpenAIProvider struct {
 	// Intent: Treat silent streaming gaps as retryable stalls while any SSE event
 	// proves the provider connection is still alive. Source: DI-tufud
 	StreamIdleTimeout time.Duration
-	RetryPolicy       ProviderRetryPolicy
+	// Intent: Mirror selected streaming content to stdout for canary diagnosis
+	// without changing the parsed provider response. Source: DI-vadub
+	StreamContentWriter io.Writer
+	RetryPolicy         ProviderRetryPolicy
 	// DebugWriter receives raw request and response diagnostics for provider
 	// calls. Authorization headers are intentionally excluded from these logs.
 	DebugWriter io.Writer
@@ -138,8 +141,8 @@ func (provider OpenAIProvider) generateOnce(ctx context.Context, request Provide
 		Stream:          provider.Stream,
 		Text:            &openAIText{Verbosity: textVerbosity},
 	}
-	if request.ReasoningEffort != "" {
-		body.Reasoning = &openAIReasoning{Effort: request.ReasoningEffort}
+	if request.ReasoningEffort != "" || request.ReasoningSummary != "" {
+		body.Reasoning = &openAIReasoning{Effort: request.ReasoningEffort, Summary: request.ReasoningSummary}
 	}
 	payload, err := json.Marshal(body)
 	if err != nil {
@@ -376,7 +379,30 @@ func (provider OpenAIProvider) dispatchOpenAIStreamEvent(attempt int, startedAt 
 			return ProviderResponse{}, true, fmt.Errorf("decode openai stream text delta: %w", err)
 		}
 		output.WriteString(payload.Delta)
+		provider.writeStreamContent(attempt, eventType, payload.Delta)
 		provider.debugf("attempt=%d event=stream_event elapsed=%s type=%q delta_chars=%d", attempt, time.Since(startedAt).Round(time.Millisecond), eventType, len(payload.Delta))
+		return ProviderResponse{}, false, nil
+	case "response.reasoning_summary_text.delta":
+		var payload struct {
+			Delta string `json:"delta"`
+		}
+		if err := json.Unmarshal([]byte(data), &payload); err != nil {
+			return ProviderResponse{}, true, fmt.Errorf("decode openai stream reasoning summary delta: %w", err)
+		}
+		provider.writeStreamContent(attempt, eventType, payload.Delta)
+		provider.debugf("attempt=%d event=stream_event elapsed=%s type=%q delta_chars=%d", attempt, time.Since(startedAt).Round(time.Millisecond), eventType, len(payload.Delta))
+		return ProviderResponse{}, false, nil
+	case "response.reasoning_summary_part.done":
+		var payload struct {
+			Part struct {
+				Text string `json:"text"`
+			} `json:"part"`
+		}
+		if err := json.Unmarshal([]byte(data), &payload); err != nil {
+			return ProviderResponse{}, true, fmt.Errorf("decode openai stream reasoning summary done: %w", err)
+		}
+		provider.writeStreamContent(attempt, eventType, payload.Part.Text)
+		provider.debugf("attempt=%d event=stream_event elapsed=%s type=%q text_chars=%d", attempt, time.Since(startedAt).Round(time.Millisecond), eventType, len(payload.Part.Text))
 		return ProviderResponse{}, false, nil
 	case "response.output_text.done":
 		var payload struct {
@@ -447,6 +473,18 @@ func resetTimer(timer *time.Timer, duration time.Duration) {
 		}
 	}
 	timer.Reset(duration)
+}
+
+func (provider OpenAIProvider) writeStreamContent(attempt int, eventType string, text string) {
+	if provider.StreamContentWriter == nil || text == "" {
+		return
+	}
+	// Intent: Write line-oriented stream content so the canary stdout/log shows
+	// live reasoning-summary and visible-output deltas without corrupting the
+	// provider response text used for JSON parsing. Source: DI-vadub
+	if _, err := fmt.Fprintf(provider.StreamContentWriter, "[openai-stream] attempt=%d type=%s delta=%q\n", attempt, eventType, text); err != nil {
+		provider.debugf("attempt=%d event=stream_content_write_error type=%q error=%q", attempt, eventType, err.Error())
+	}
 }
 
 func retryableOpenAIStatus(status string, reason string) bool {
@@ -595,7 +633,8 @@ type openAIText struct {
 }
 
 type openAIReasoning struct {
-	Effort string `json:"effort"`
+	Effort  string `json:"effort,omitempty"`
+	Summary string `json:"summary,omitempty"`
 }
 
 type openAIResponse struct {

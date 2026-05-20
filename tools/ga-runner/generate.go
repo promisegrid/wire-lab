@@ -23,6 +23,7 @@ type generateOptions struct {
 	ProviderName             string
 	APIModel                 string
 	ReasoningEffort          string
+	ReasoningSummary         string
 	ServiceTier              string
 	APIKeyEnv                string
 	OpenAIBaseURL            string
@@ -32,6 +33,7 @@ type generateOptions struct {
 	ProviderElapsed          time.Duration
 	Stream                   bool
 	StreamIdleTimeout        time.Duration
+	StreamContentStdout      bool
 	TextVerbosity            string
 	MaxOutputTokens          int
 	CostEstimateOutputTokens int
@@ -91,6 +93,7 @@ func runGenerate(args []string, stdout io.Writer) error {
 		ProviderMaxElapsed:  options.ProviderElapsed,
 		Stream:              options.Stream,
 		StreamIdleTimeout:   options.StreamIdleTimeout,
+		StreamContentStdout: options.StreamContentStdout,
 	})
 	if err != nil {
 		return err
@@ -108,6 +111,10 @@ func parseGenerateOptions(args []string) (generateOptions, error) {
 	// scoring, so default it to medium reasoning while preserving explicit
 	// operator override. Source: DI-pulap
 	reasoningEffort := fs.String("reasoning-effort", defaultGenerateReasoningEffort, "provider reasoning effort")
+	// Intent: Raw generate commands default to no reasoning summary, while the
+	// terminal canary opts in so stdout can show supported reasoning-summary
+	// stream content. Source: DI-vadub
+	reasoningSummary := fs.String("reasoning-summary", "", "provider reasoning summary mode such as auto; empty omits")
 	// Intent: Default child generation to Flex and reject Priority so unattended
 	// generation cannot inherit expensive processing. Source: DI-mopob
 	serviceTier := fs.String("service-tier", defaultServiceTier, "provider service tier: flex or default; priority is rejected")
@@ -123,6 +130,7 @@ func parseGenerateOptions(args []string) (generateOptions, error) {
 	// instead of sitting silently until an arbitrary timeout. Source: DI-tufud
 	stream := fs.Bool("stream", defaultProviderStream, "stream OpenAI Responses API events when supported")
 	streamIdleTimeout := fs.String("stream-idle-timeout", defaultStreamIdleTimeout.String(), "maximum silence between streaming events as a Go duration")
+	streamContentStdout := fs.Bool("stream-content-stdout", false, "print streamed reasoning-summary and output deltas to stdout")
 	// Intent: Default child-generation requests away from hard output-token caps;
 	// budget estimates remain preflight-only. Source: DI-pulap
 	textVerbosity := fs.String("text-verbosity", defaultTextVerbosity, "provider text verbosity: low, medium, or high")
@@ -191,6 +199,7 @@ func parseGenerateOptions(args []string) (generateOptions, error) {
 		ProviderName:             *providerName,
 		APIModel:                 *apiModel,
 		ReasoningEffort:          *reasoningEffort,
+		ReasoningSummary:         *reasoningSummary,
 		ServiceTier:              normalizedServiceTier,
 		APIKeyEnv:                *apiKeyEnv,
 		OpenAIBaseURL:            *openAIBaseURL,
@@ -200,6 +209,7 @@ func parseGenerateOptions(args []string) (generateOptions, error) {
 		ProviderElapsed:          parsedProviderElapsed,
 		Stream:                   *stream,
 		StreamIdleTimeout:        parsedStreamIdleTimeout,
+		StreamContentStdout:      *streamContentStdout,
 		TextVerbosity:            normalizedTextVerbosity,
 		MaxOutputTokens:          *maxOutputTokens,
 		CostEstimateOutputTokens: *costEstimateOutputTokens,
@@ -709,14 +719,15 @@ func executeGenerateJob(ctx context.Context, repo Repo, provider Provider, job g
 	}
 	defer cancel()
 	response, err := provider.Generate(callCtx, ProviderRequest{
-		Provider:        options.ProviderName,
-		APIModel:        options.APIModel,
-		ReasoningEffort: options.ReasoningEffort,
-		ServiceTier:     options.ServiceTier,
-		TextVerbosity:   options.TextVerbosity,
-		MaxOutputTokens: options.MaxOutputTokens,
-		Instructions:    "Return only valid JSON for the requested GA child file bundle. Do not include code fences or commentary.",
-		Prompt:          job.Prompt,
+		Provider:         options.ProviderName,
+		APIModel:         options.APIModel,
+		ReasoningEffort:  options.ReasoningEffort,
+		ReasoningSummary: options.ReasoningSummary,
+		ServiceTier:      options.ServiceTier,
+		TextVerbosity:    options.TextVerbosity,
+		MaxOutputTokens:  options.MaxOutputTokens,
+		Instructions:     "Return only valid JSON for the requested GA child file bundle. Do not include code fences or commentary.",
+		Prompt:           job.Prompt,
 	})
 	if err != nil {
 		markGAChild(&child, "failed", err.Error())
