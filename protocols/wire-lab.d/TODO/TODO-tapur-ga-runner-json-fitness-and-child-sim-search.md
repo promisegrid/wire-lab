@@ -471,6 +471,36 @@ Affects: `tools/ga-runner/`; `tools/ga-runner/README.md`;
 `results/RUN-PROTOCOL.md`;
 `protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`.
 
+ID: DI-tufud
+Date: 2026-05-20 14:20:19
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Strengthen synchronous GA provider reliability before the next
+canary: parent selection uses one highest-scoring parent plus one deterministic
+uniform random scored parent, OpenAI-compatible calls retry transient provider
+failures including `408`, `409`, `429`, `500`, `502`, `503`, `504`, network
+timeouts, and request timeouts, child/provider retry windows get enough elapsed
+budget for a real second attempt, and Responses API streaming is enabled by
+default with event-progress diagnostics and an idle timeout.
+Intent: The canary logs showed child generation hanging or timing out without
+useful liveness evidence, while parent selection still used tournament behavior
+after Steve asked for one fit parent plus one random parent. The runner should
+create visible progress, recover from ordinary transient provider failures, and
+apply simple deterministic selection pressure without overfitting the second
+parent choice.
+Constraints: Keep `service_tier` explicit and do not fallback to Priority.
+Preserve `max_output_tokens` as an opt-in emergency fuse only. Treat
+`max_output_tokens` exhaustion as deterministic non-retryable unless the
+operator changes the request shape. Keep the first parent sorted by completed
+fitness evidence; choose the second parent uniformly from other scored parents
+with a deterministic seed. Do not implement Batch in this change.
+Affects: `tools/ga-runner/`; `tools/ga-runner/run-canary.sh`;
+`tools/ga-runner/README.md`; `results/RUN-PROTOCOL.md`;
+`protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`.
+Supersedes: `DI-bukid` tournament-diversity selection only; `DI-juzus`
+six-minute elapsed retry default only; `DI-mopob` Flex-only transient retry
+status list only.
+
 ## Scope
 
 - Define and implement a new GA/search runner without changing
@@ -712,11 +742,16 @@ status in the GA state file.
   hidden reasoning-token consumption. Source: `DI-pulap`.
 - [x] tapur.20 Add fitness-ranked parent selection before child generation and
   strengthen child prompts so generated children are explicitly expected to
-  improve over parent scores while preserving tournament diversity. Source:
-  `DI-bukid`.
+  improve over parent scores while pairing the best scored parent with one
+  deterministic uniform random scored non-top parent. Source: `DI-bukid`;
+  `DI-tufud`.
 - [x] tapur.21 Compact child-generation prompts so breed calls include parent
   documents once, scenario pressure once, and summarized fitness evidence instead
   of repeated root boilerplate and full result JSON. Source: `DI-dilaf`.
+- [x] tapur.22 Add Responses API streaming liveness diagnostics, broader
+  transient-provider retries, a twelve-minute default retry elapsed budget, and
+  top-plus-random scored parent selection for the next GA canary. Source:
+  `DI-tufud`.
 
 ## Predecessor context
 

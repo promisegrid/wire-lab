@@ -1,0 +1,117 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-kuful-udp-feed-v0-conformance-bgp-class-routing-app-partition-and-stale-path-openai-gpt-5.4-xhigh-20260520-205857",
+  "run_group_id": "ga-canary-20260520-205857",
+  "cell_id": "ga-canary-20260520-205857-000007-SIM-kuful-udp-feed-v0-conformance--bgp-class-routing-app-partition-and-stale-path--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-kuful-udp-feed-v0-conformance",
+  "scenario_id": "bgp-class-routing-app-partition-and-stale-path",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260520-205857",
+  "result_path": "results/SIM-kuful-udp-feed-v0-conformance/bgp-class-routing-app-partition-and-stale-path/openai-gpt-5.4-xhigh/20260520-205857.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_077d4ec9e7e64baf8b7086751555a9d1",
+    "response_id": "resp_0a12166cd0f4d66c006a0e2193cf88819bb7e5d20a9dd75b82",
+    "input_tokens": 6207,
+    "output_tokens": 10074,
+    "cost_usd": 0.15189825
+  },
+  "source": {
+    "repo_commit": "39aac816b4af60ab2490c21c49fcc18fdbd68771",
+    "sim_path": "simulations/SIM-kuful-udp-feed-v0-conformance/",
+    "scenario_path": "scenarios/bgp-class-routing-app-partition-and-stale-path/bgp-class-routing-app-partition-and-stale-path.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "5603da290add5fe52b38a676ee282636da60770bd6d108b0c5926fbed31d00a6"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-kuful-udp-feed-v0-conformance/README.md",
+        "sha256": "e62c2e8b169f842e90f1ca08fd874618cc0ae520906054efa5e1ef92cd7ee29a"
+      },
+      {
+        "path": "simulations/SIM-kuful-udp-feed-v0-conformance/QUESTION.md",
+        "sha256": "2c899c2bbf88cd6f3d3f7e84d8d77bbb5fc2bac6351477bfd147410bd5765bc3"
+      },
+      {
+        "path": "simulations/SIM-kuful-udp-feed-v0-conformance/SCENARIOS.md",
+        "sha256": "0aa4dd75295e8b1230522841eec0c591588f26ae7391c61177bda3e85690ab1c"
+      },
+      {
+        "path": "scenarios/bgp-class-routing-app-partition-and-stale-path/bgp-class-routing-app-partition-and-stale-path.md",
+        "sha256": "a74852732579b0a6604406ce146f331eb290621cbbd838f26775826c87266ce8"
+      }
+    ],
+    "simulation_tree_hash": "8b600e965000d8b48f7f6a6f24015afafc6f507a49480afc1214915dd5143ae0"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 0,
+    "promisegrid_alignment": 2,
+    "auditability": 2,
+    "evolution_safety": 2,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 0,
+    "implementation_plausibility": 2,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 11,
+    "normalized_0_100": 31,
+    "confidence_0_1": 0.89
+  },
+  "assessment": {
+    "rationale": "This simulation is a clear, lower-layer UDP-feed conformance study, not a routing-path aging study. It has strong boundary discipline and plausible conformance evidence, but it does not directly model stale promises, withdrawals, timeouts, or local path repair under partition.",
+    "strengths": [
+      "Explicitly keeps UDP-feed below session and routing semantics, which prevents overclaiming.",
+      "Defines concrete conformance surfaces such as vectors, artifact output, ns-3 round trip, and composition probing.",
+      "Could serve as precursor evidence for a later routing-layer simulation."
+    ],
+    "weaknesses": [
+      "No routing table, advertisement, withdrawal, or best-path decision model.",
+      "No peer-local record of stale-path detection or repair during intermittent connectivity.",
+      "Covers PromiseGrid failure pressure only indirectly at the transport/specimen layer."
+    ],
+    "risks": [
+      "Network realism from ns-3 could be mistaken for evidence of stale-path handling.",
+      "A composition test could overstate routing readiness unless timer, withdrawal, and aging semantics are added."
+    ],
+    "open_questions": [
+      "Should a follow-on simulation layer route advertisement, withdrawal, and aging behavior over UDP-feed?",
+      "What local artifacts would prove stale-path repair without central convergence machinery?",
+      "Is partition fault injection better added here, or in a distinct routing-application simulation?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

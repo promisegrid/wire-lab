@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"bytes"
 	"context"
 	"encoding/json"
@@ -14,10 +15,17 @@ import (
 )
 
 type OpenAIProvider struct {
-	APIKey      string
-	BaseURL     string
-	Client      *http.Client
-	RetryPolicy ProviderRetryPolicy
+	APIKey  string
+	BaseURL string
+	Client  *http.Client
+	// Intent: Bound one provider attempt while preserving a larger total retry
+	// window for a useful second attempt. Source: DI-tufud
+	RequestTimeout time.Duration
+	Stream         bool
+	// Intent: Treat silent streaming gaps as retryable stalls while any SSE event
+	// proves the provider connection is still alive. Source: DI-tufud
+	StreamIdleTimeout time.Duration
+	RetryPolicy       ProviderRetryPolicy
 	// DebugWriter receives raw request and response diagnostics for provider
 	// calls. Authorization headers are intentionally excluded from these logs.
 	DebugWriter io.Writer
@@ -28,7 +36,7 @@ type OpenAIProvider struct {
 //
 // Intent: Keep retry timing explicit, finite, and testable so Flex scarcity and
 // slow provider calls do not require interactive babysitting. Source: DI-mopob;
-// DI-juzus
+// DI-tufud
 type ProviderRetryPolicy struct {
 	MaxAttempts    int
 	MaxElapsed     time.Duration
@@ -42,7 +50,8 @@ type ProviderRetryPolicy struct {
 // Intent: Keep the first provider-backed GA implementation concrete and
 // checkpointable without leaking OpenAI response details into score/generate
 // orchestration. The wrapper now applies bounded Flex retries before returning a
-// checkpointable provider error. Source: DI-gijom; DI-mopob
+// checkpointable provider error and streams liveness events when enabled.
+// Source: DI-gijom; DI-mopob; DI-tufud
 func (provider OpenAIProvider) Generate(ctx context.Context, request ProviderRequest) (ProviderResponse, error) {
 	policy := provider.RetryPolicy.withDefaults()
 	var lastErr error
@@ -50,7 +59,16 @@ func (provider OpenAIProvider) Generate(ctx context.Context, request ProviderReq
 	attempts := 0
 	for attempt := 1; attempt <= policy.MaxAttempts; attempt++ {
 		attempts = attempt
-		response, err := provider.generateOnce(ctx, request, attempt)
+		attemptCtx := ctx
+		cancelAttempt := func() {}
+		if timeout := provider.requestTimeout(); timeout > 0 {
+			// Intent: Scope the request timeout to this attempt, not to the whole
+			// retry window, so a timed-out first attempt still leaves the second
+			// attempt with its own full timeout budget. Source: DI-tufud
+			attemptCtx, cancelAttempt = context.WithTimeout(ctx, timeout)
+		}
+		response, err := provider.generateOnce(attemptCtx, request, attempt)
+		cancelAttempt()
 		if err == nil {
 			return response, nil
 		}
@@ -106,9 +124,10 @@ func (provider OpenAIProvider) generateOnce(ctx context.Context, request Provide
 	}
 	client := provider.Client
 	if client == nil {
-		// Intent: Do not allow direct OpenAIProvider construction to fall back to
-		// the old 30-minute request wait. Source: DI-juzus
-		client = &http.Client{Timeout: defaultRequestTimeout}
+		// Intent: Keep timeout ownership in the attempt context so streaming can
+		// use idle diagnostics without http.Client cutting off active SSE
+		// connections independently. Source: DI-tufud
+		client = &http.Client{}
 	}
 	body := openAIRequest{
 		Model:           request.APIModel,
@@ -116,6 +135,7 @@ func (provider OpenAIProvider) generateOnce(ctx context.Context, request Provide
 		Instructions:    request.Instructions,
 		ServiceTier:     serviceTier,
 		MaxOutputTokens: request.MaxOutputTokens,
+		Stream:          provider.Stream,
 		Text:            &openAIText{Verbosity: textVerbosity},
 	}
 	if request.ReasoningEffort != "" {
@@ -141,6 +161,12 @@ func (provider OpenAIProvider) generateOnce(ctx context.Context, request Provide
 		provider.debugf("attempt=%d event=http_error elapsed=%s error=%q", attempt, time.Since(startedAt).Round(time.Millisecond), err.Error())
 		return ProviderResponse{}, err
 	}
+	if provider.Stream {
+		// Intent: Use Responses API streaming events as liveness evidence while
+		// preserving the final JSON parsing contract for score and child bundle
+		// responses. Source: DI-tufud
+		return provider.readStreamingResponse(ctx, httpResp, attempt, startedAt)
+	}
 	responseBytes, err := io.ReadAll(httpResp.Body)
 	closeErr := httpResp.Body.Close()
 	if err != nil {
@@ -162,6 +188,10 @@ func (provider OpenAIProvider) generateOnce(ctx context.Context, request Provide
 	if err := json.Unmarshal(responseBytes, &parsed); err != nil {
 		return ProviderResponse{}, err
 	}
+	return normalizeOpenAIResponse(parsed, httpResp.Header.Get("x-request-id"), "")
+}
+
+func normalizeOpenAIResponse(parsed openAIResponse, requestID string, textOverride string) (ProviderResponse, error) {
 	usageJSON := ""
 	if len(parsed.Usage) > 0 {
 		usageBytes, err := json.Marshal(parsed.Usage)
@@ -171,8 +201,19 @@ func (provider OpenAIProvider) generateOnce(ctx context.Context, request Provide
 		usageJSON = string(usageBytes)
 	}
 	text := parsed.OutputText
-	if text == "" {
+	if textOverride != "" {
+		text = textOverride
+	} else if text == "" {
 		text = parsed.JoinOutputText()
+	}
+	if parsed.Error != nil {
+		// Intent: Preserve provider-side failed Response evidence while treating
+		// ordinary server-side failures as retryable provider anomalies.
+		// Source: DI-tufud
+		return ProviderResponse{}, openAIResponseError{
+			Message:   fmt.Sprintf("openai response error type %q code %q message %q usage %s", parsed.Error.Type, parsed.Error.Code, parsed.Error.Message, usageJSON),
+			Retryable: retryableOpenAIProviderError(parsed.Error.Type),
+		}
 	}
 	if parsed.Status != "" && parsed.Status != "completed" {
 		reason := parsed.IncompleteDetails.Reason
@@ -198,11 +239,214 @@ func (provider OpenAIProvider) generateOnce(ctx context.Context, request Provide
 	}
 	return ProviderResponse{
 		Text:        strings.TrimSpace(text) + "\n",
-		RequestID:   httpResp.Header.Get("x-request-id"),
+		RequestID:   requestID,
 		ResponseID:  parsed.ID,
 		ServiceTier: parsed.ServiceTier,
 		UsageJSON:   usageJSON,
 	}, nil
+}
+
+func (provider OpenAIProvider) readStreamingResponse(ctx context.Context, httpResp *http.Response, attempt int, startedAt time.Time) (ProviderResponse, error) {
+	defer func() {
+		if err := httpResp.Body.Close(); err != nil {
+			provider.debugf("attempt=%d event=response_close_error elapsed=%s status=%d request_id=%q error=%q", attempt, time.Since(startedAt).Round(time.Millisecond), httpResp.StatusCode, httpResp.Header.Get("x-request-id"), err.Error())
+		}
+	}()
+	if httpResp.StatusCode < 200 || httpResp.StatusCode >= 300 {
+		responseBytes, err := io.ReadAll(httpResp.Body)
+		if err != nil {
+			provider.debugf("attempt=%d event=response_read_error elapsed=%s status=%d request_id=%q error=%q", attempt, time.Since(startedAt).Round(time.Millisecond), httpResp.StatusCode, httpResp.Header.Get("x-request-id"), err.Error())
+			return ProviderResponse{}, err
+		}
+		// Intent: Preserve raw non-2xx provider response evidence for retry and
+		// postmortem analysis even when streaming was requested. Source:
+		// DI-tufud
+		provider.debugf("attempt=%d event=response elapsed=%s status=%d request_id=%q response_json=%s", attempt, time.Since(startedAt).Round(time.Millisecond), httpResp.StatusCode, httpResp.Header.Get("x-request-id"), strings.TrimSpace(string(responseBytes)))
+		return ProviderResponse{}, openAIHTTPError{StatusCode: httpResp.StatusCode, Body: strings.TrimSpace(string(responseBytes))}
+	}
+	idleTimeout := provider.streamIdleTimeout()
+	lines := scanOpenAIStreamLines(httpResp.Body)
+	timer := time.NewTimer(idleTimeout)
+	defer timer.Stop()
+	output := &strings.Builder{}
+	eventType := ""
+	var dataLines []string
+	for {
+		select {
+		case <-ctx.Done():
+			return ProviderResponse{}, ctx.Err()
+		case <-timer.C:
+			// Intent: Turn a silent streaming connection into retryable evidence
+			// instead of leaving the canary blocked with no observable progress.
+			// Source: DI-tufud
+			return ProviderResponse{}, openAIResponseError{
+				Message:   fmt.Sprintf("openai stream idle for %s after %s", idleTimeout, time.Since(startedAt).Round(time.Millisecond)),
+				Retryable: true,
+			}
+		case lineResult, ok := <-lines:
+			if !ok {
+				if len(dataLines) > 0 {
+					response, done, err := provider.dispatchOpenAIStreamEvent(attempt, startedAt, eventType, strings.Join(dataLines, "\n"), httpResp.Header.Get("x-request-id"), output)
+					if done || err != nil {
+						return response, err
+					}
+				}
+				return ProviderResponse{}, openAIResponseError{
+					Message:   fmt.Sprintf("openai stream ended before response.completed after %s", time.Since(startedAt).Round(time.Millisecond)),
+					Retryable: true,
+				}
+			}
+			resetTimer(timer, idleTimeout)
+			if lineResult.Err != nil {
+				return ProviderResponse{}, openAIResponseError{
+					Message:   fmt.Sprintf("openai stream read error after %s: %v", time.Since(startedAt).Round(time.Millisecond), lineResult.Err),
+					Retryable: true,
+				}
+			}
+			line := strings.TrimSuffix(lineResult.Line, "\r")
+			if line == "" {
+				if len(dataLines) == 0 {
+					eventType = ""
+					continue
+				}
+				response, done, err := provider.dispatchOpenAIStreamEvent(attempt, startedAt, eventType, strings.Join(dataLines, "\n"), httpResp.Header.Get("x-request-id"), output)
+				eventType = ""
+				dataLines = nil
+				if done || err != nil {
+					return response, err
+				}
+				continue
+			}
+			if strings.HasPrefix(line, ":") {
+				provider.debugf("attempt=%d event=stream_keepalive elapsed=%s bytes=%d", attempt, time.Since(startedAt).Round(time.Millisecond), len(line))
+				continue
+			}
+			if after, ok := strings.CutPrefix(line, "event:"); ok {
+				eventType = strings.TrimSpace(after)
+				continue
+			}
+			if after, ok := strings.CutPrefix(line, "data:"); ok {
+				dataLines = append(dataLines, strings.TrimSpace(after))
+			}
+		}
+	}
+}
+
+type streamLineResult struct {
+	Line string
+	Err  error
+}
+
+func scanOpenAIStreamLines(reader io.Reader) <-chan streamLineResult {
+	lines := make(chan streamLineResult, 64)
+	go func() {
+		defer close(lines)
+		scanner := bufio.NewScanner(reader)
+		scanner.Buffer(make([]byte, 0, 64*1024), 10*1024*1024)
+		for scanner.Scan() {
+			lines <- streamLineResult{Line: scanner.Text()}
+		}
+		if err := scanner.Err(); err != nil {
+			lines <- streamLineResult{Err: err}
+		}
+	}()
+	return lines
+}
+
+func (provider OpenAIProvider) dispatchOpenAIStreamEvent(attempt int, startedAt time.Time, eventType string, data string, requestID string, output *strings.Builder) (ProviderResponse, bool, error) {
+	if data == "[DONE]" {
+		provider.debugf("attempt=%d event=stream_done_marker elapsed=%s", attempt, time.Since(startedAt).Round(time.Millisecond))
+		return ProviderResponse{}, false, nil
+	}
+	var envelope struct {
+		Type string `json:"type"`
+	}
+	if err := json.Unmarshal([]byte(data), &envelope); err != nil {
+		return ProviderResponse{}, true, fmt.Errorf("decode openai stream event %q: %w", eventType, err)
+	}
+	if eventType == "" {
+		eventType = envelope.Type
+	}
+	switch eventType {
+	case "response.output_text.delta":
+		var payload struct {
+			Delta string `json:"delta"`
+		}
+		if err := json.Unmarshal([]byte(data), &payload); err != nil {
+			return ProviderResponse{}, true, fmt.Errorf("decode openai stream text delta: %w", err)
+		}
+		output.WriteString(payload.Delta)
+		provider.debugf("attempt=%d event=stream_event elapsed=%s type=%q delta_chars=%d", attempt, time.Since(startedAt).Round(time.Millisecond), eventType, len(payload.Delta))
+		return ProviderResponse{}, false, nil
+	case "response.output_text.done":
+		var payload struct {
+			Text string `json:"text"`
+		}
+		if err := json.Unmarshal([]byte(data), &payload); err != nil {
+			return ProviderResponse{}, true, fmt.Errorf("decode openai stream text done: %w", err)
+		}
+		if output.Len() == 0 && payload.Text != "" {
+			output.WriteString(payload.Text)
+		}
+		provider.debugf("attempt=%d event=stream_event elapsed=%s type=%q text_chars=%d", attempt, time.Since(startedAt).Round(time.Millisecond), eventType, len(payload.Text))
+		return ProviderResponse{}, false, nil
+	case "response.completed":
+		var payload struct {
+			Response openAIResponse `json:"response"`
+		}
+		if err := json.Unmarshal([]byte(data), &payload); err != nil {
+			return ProviderResponse{}, true, fmt.Errorf("decode openai stream completed response: %w", err)
+		}
+		provider.debugf("attempt=%d event=stream_event elapsed=%s type=%q response_id=%q", attempt, time.Since(startedAt).Round(time.Millisecond), eventType, payload.Response.ID)
+		response, err := normalizeOpenAIResponse(payload.Response, requestID, output.String())
+		return response, true, err
+	case "response.failed", "response.incomplete":
+		var payload struct {
+			Response openAIResponse `json:"response"`
+		}
+		if err := json.Unmarshal([]byte(data), &payload); err != nil {
+			return ProviderResponse{}, true, fmt.Errorf("decode openai stream failed response: %w", err)
+		}
+		provider.debugf("attempt=%d event=stream_event elapsed=%s type=%q response_id=%q", attempt, time.Since(startedAt).Round(time.Millisecond), eventType, payload.Response.ID)
+		response, err := normalizeOpenAIResponse(payload.Response, requestID, output.String())
+		return response, true, err
+	case "error":
+		var payload struct {
+			Error   *openAIError `json:"error"`
+			Message string       `json:"message"`
+			Type    string       `json:"type"`
+			Code    string       `json:"code"`
+		}
+		if err := json.Unmarshal([]byte(data), &payload); err != nil {
+			return ProviderResponse{}, true, fmt.Errorf("decode openai stream error: %w", err)
+		}
+		errorType := payload.Type
+		errorCode := payload.Code
+		message := payload.Message
+		if payload.Error != nil {
+			errorType = payload.Error.Type
+			errorCode = payload.Error.Code
+			message = payload.Error.Message
+		}
+		provider.debugf("attempt=%d event=stream_event elapsed=%s type=%q error_type=%q error_code=%q", attempt, time.Since(startedAt).Round(time.Millisecond), eventType, errorType, errorCode)
+		return ProviderResponse{}, true, openAIResponseError{
+			Message:   fmt.Sprintf("openai stream error type %q code %q message %q", errorType, errorCode, message),
+			Retryable: retryableOpenAIProviderError(errorType),
+		}
+	default:
+		provider.debugf("attempt=%d event=stream_event elapsed=%s type=%q data_bytes=%d", attempt, time.Since(startedAt).Round(time.Millisecond), eventType, len(data))
+		return ProviderResponse{}, false, nil
+	}
+}
+
+func resetTimer(timer *time.Timer, duration time.Duration) {
+	if !timer.Stop() {
+		select {
+		case <-timer.C:
+		default:
+		}
+	}
+	timer.Reset(duration)
 }
 
 func retryableOpenAIStatus(status string, reason string) bool {
@@ -214,6 +458,29 @@ func retryableOpenAIStatus(status string, reason string) bool {
 	default:
 		return false
 	}
+}
+
+func retryableOpenAIProviderError(errorType string) bool {
+	switch strings.ToLower(strings.TrimSpace(errorType)) {
+	case "invalid_request_error", "authentication_error", "permission_error", "insufficient_quota":
+		return false
+	default:
+		return true
+	}
+}
+
+func (provider OpenAIProvider) requestTimeout() time.Duration {
+	if provider.RequestTimeout <= 0 {
+		return defaultRequestTimeout
+	}
+	return provider.RequestTimeout
+}
+
+func (provider OpenAIProvider) streamIdleTimeout() time.Duration {
+	if provider.StreamIdleTimeout <= 0 {
+		return defaultStreamIdleTimeout
+	}
+	return provider.StreamIdleTimeout
 }
 
 func (policy ProviderRetryPolicy) withDefaults() ProviderRetryPolicy {
@@ -277,13 +544,28 @@ func shouldRetryOpenAIError(ctx context.Context, err error) bool {
 	}
 	var httpErr openAIHTTPError
 	if errors.As(err, &httpErr) {
-		return httpErr.StatusCode == http.StatusTooManyRequests || httpErr.StatusCode == http.StatusRequestTimeout
+		return retryableOpenAIHTTPStatus(httpErr.StatusCode)
 	}
 	var netErr net.Error
 	if errors.As(err, &netErr) && netErr.Timeout() {
 		return true
 	}
 	return errors.Is(err, context.DeadlineExceeded)
+}
+
+func retryableOpenAIHTTPStatus(statusCode int) bool {
+	switch statusCode {
+	case http.StatusRequestTimeout,
+		http.StatusConflict,
+		http.StatusTooManyRequests,
+		http.StatusInternalServerError,
+		http.StatusBadGateway,
+		http.StatusServiceUnavailable,
+		http.StatusGatewayTimeout:
+		return true
+	default:
+		return false
+	}
 }
 
 func sleepWithContext(ctx context.Context, duration time.Duration) error {
@@ -303,6 +585,7 @@ type openAIRequest struct {
 	Instructions    string           `json:"instructions,omitempty"`
 	ServiceTier     string           `json:"service_tier"`
 	MaxOutputTokens int              `json:"max_output_tokens,omitempty"`
+	Stream          bool             `json:"stream,omitempty"`
 	Text            *openAIText      `json:"text,omitempty"`
 	Reasoning       *openAIReasoning `json:"reasoning,omitempty"`
 }
@@ -320,9 +603,16 @@ type openAIResponse struct {
 	Status            string                  `json:"status"`
 	OutputText        string                  `json:"output_text"`
 	ServiceTier       string                  `json:"service_tier"`
+	Error             *openAIError            `json:"error"`
 	Output            []openAIOutputItem      `json:"output"`
 	Usage             map[string]interface{}  `json:"usage"`
 	IncompleteDetails openAIIncompleteDetails `json:"incomplete_details"`
+}
+
+type openAIError struct {
+	Message string `json:"message"`
+	Type    string `json:"type"`
+	Code    string `json:"code"`
 }
 
 type openAIIncompleteDetails struct {

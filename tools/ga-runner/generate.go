@@ -30,6 +30,8 @@ type generateOptions struct {
 	RequestTimeout           time.Duration
 	ProviderAttempts         int
 	ProviderElapsed          time.Duration
+	Stream                   bool
+	StreamIdleTimeout        time.Duration
 	TextVerbosity            string
 	MaxOutputTokens          int
 	CostEstimateOutputTokens int
@@ -87,6 +89,8 @@ func runGenerate(args []string, stdout io.Writer) error {
 		RequestTimeout:      options.RequestTimeout,
 		ProviderMaxAttempts: options.ProviderAttempts,
 		ProviderMaxElapsed:  options.ProviderElapsed,
+		Stream:              options.Stream,
+		StreamIdleTimeout:   options.StreamIdleTimeout,
 	})
 	if err != nil {
 		return err
@@ -115,6 +119,10 @@ func parseGenerateOptions(args []string) (generateOptions, error) {
 	requestTimeout := fs.String("request-timeout", defaultRequestTimeout.String(), "per-request provider timeout as a Go duration")
 	providerAttempts := fs.Int("provider-max-attempts", defaultProviderMaxAttempts, "maximum provider attempts per child")
 	providerElapsed := fs.String("provider-max-elapsed", defaultProviderMaxElapsed.String(), "maximum elapsed provider retry time per child")
+	// Intent: Stream by default so child generation exposes liveness events
+	// instead of sitting silently until an arbitrary timeout. Source: DI-tufud
+	stream := fs.Bool("stream", defaultProviderStream, "stream OpenAI Responses API events when supported")
+	streamIdleTimeout := fs.String("stream-idle-timeout", defaultStreamIdleTimeout.String(), "maximum silence between streaming events as a Go duration")
 	// Intent: Default child-generation requests away from hard output-token caps;
 	// budget estimates remain preflight-only. Source: DI-pulap
 	textVerbosity := fs.String("text-verbosity", defaultTextVerbosity, "provider text verbosity: low, medium, or high")
@@ -168,6 +176,10 @@ func parseGenerateOptions(args []string) (generateOptions, error) {
 	if err != nil {
 		return generateOptions{}, errUsage("generate: " + err.Error())
 	}
+	parsedStreamIdleTimeout, err := parsePositiveDurationFlag("stream-idle-timeout", *streamIdleTimeout)
+	if err != nil {
+		return generateOptions{}, errUsage("generate: " + err.Error())
+	}
 	normalizedTextVerbosity, err := normalizeTextVerbosity(*textVerbosity)
 	if err != nil {
 		return generateOptions{}, errUsage("generate: " + err.Error())
@@ -186,6 +198,8 @@ func parseGenerateOptions(args []string) (generateOptions, error) {
 		RequestTimeout:           parsedRequestTimeout,
 		ProviderAttempts:         *providerAttempts,
 		ProviderElapsed:          parsedProviderElapsed,
+		Stream:                   *stream,
+		StreamIdleTimeout:        parsedStreamIdleTimeout,
 		TextVerbosity:            normalizedTextVerbosity,
 		MaxOutputTokens:          *maxOutputTokens,
 		CostEstimateOutputTokens: *costEstimateOutputTokens,
@@ -360,10 +374,10 @@ func effectiveGenerateCostEstimateOutputTokens(options generateOptions) int {
 // to the current two-parent breed operator.
 //
 // Intent: Use the parent score evidence already produced by the canary to bias
-// children toward high-fitness parents while preserving deterministic tournament
-// diversity instead of blindly generating from the initial uniform sample. LLM
-// child generation uses a single two-parent breed operation, not one-parent
-// mutation or byte-level crossover. Source: DI-bukid; DI-sohus
+// children toward the highest-fitness parent while pairing it with one
+// deterministic uniform random scored parent. LLM child generation uses a
+// single two-parent breed operation, not one-parent mutation or byte-level
+// crossover. Source: DI-tufud; DI-sohus
 func applyFitnessParentSelection(repo Repo, state *GAState, indexes []int) (bool, error) {
 	ranked, ok, err := rankedParentsByFitness(repo, *state)
 	if err != nil {
@@ -373,17 +387,16 @@ func applyFitnessParentSelection(repo Repo, state *GAState, indexes []int) (bool
 	if ok {
 		changed = sortStateParentsByFitness(state, ranked)
 	}
-	breedRanks := breedParentRanks(*state, ranked)
 	for selectionIndex, childIndex := range indexes {
 		child := &state.Children[childIndex]
-		parentIDs, ok := parentSelectionForChild(*state, breedRanks, *child, selectionIndex)
+		parentIDs, ok := parentSelectionForChild(*state, ranked, *child, selectionIndex)
 		if !ok {
 			parentIDs = distinctStrings(child.ParentIDs)
 		}
 		if child.Operation != childOperationBreed || !sameStrings(parentIDs, child.ParentIDs) {
 			child.Operation = childOperationBreed
 			child.ParentIDs = parentIDs
-			child.ValidationMessage = fmt.Sprintf("breed parents selected by fitness-ranked tournament: %s", strings.Join(parentIDs, ","))
+			child.ValidationMessage = fmt.Sprintf("breed parents selected by fitness-top plus deterministic-random scored parent: %s", strings.Join(parentIDs, ","))
 			changed = true
 		}
 	}
@@ -465,30 +478,6 @@ func sortStateParentsByFitness(state *GAState, ranked []parentFitnessRank) bool 
 	return !sameStateParents(before, state.Parents)
 }
 
-func breedParentRanks(state GAState, ranked []parentFitnessRank) []parentFitnessRank {
-	scoreByID := map[string]parentFitnessRank{}
-	for _, rank := range ranked {
-		scoreByID[rank.SimID] = rank
-	}
-	var ranks []parentFitnessRank
-	for index, parent := range state.Parents {
-		if parent.SimID == "" {
-			continue
-		}
-		if rank, ok := scoreByID[parent.SimID]; ok {
-			ranks = append(ranks, rank)
-			continue
-		}
-		ranks = append(ranks, parentFitnessRank{
-			SimID:             parent.SimID,
-			AverageNormalized: -1,
-			Samples:           0,
-			OriginalIndex:     index,
-		})
-	}
-	return ranks
-}
-
 func parentSelectionForChild(state GAState, ranked []parentFitnessRank, child GAChild, selectionIndex int) ([]string, bool) {
 	if len(ranked) < 2 {
 		parentIDs := distinctStrings(child.ParentIDs)
@@ -496,14 +485,14 @@ func parentSelectionForChild(state GAState, ranked []parentFitnessRank, child GA
 	}
 	seed := state.RunGroupID + ":" + child.ID() + ":" + fmt.Sprintf("%d", selectionIndex)
 	first := ranked[0].SimID
-	parent, ok := tournamentParent(ranked, seed+":breed", map[string]bool{first: true})
+	parent, ok := uniformRandomParent(ranked, seed+":breed", map[string]bool{first: true})
 	if !ok {
 		return nil, false
 	}
 	return []string{first, parent.SimID}, true
 }
 
-func tournamentParent(ranked []parentFitnessRank, seed string, excluded map[string]bool) (parentFitnessRank, bool) {
+func uniformRandomParent(ranked []parentFitnessRank, seed string, excluded map[string]bool) (parentFitnessRank, bool) {
 	var candidates []parentFitnessRank
 	for _, parent := range ranked {
 		if excluded != nil && excluded[parent.SimID] {
@@ -514,18 +503,7 @@ func tournamentParent(ranked []parentFitnessRank, seed string, excluded map[stri
 	if len(candidates) == 0 {
 		return parentFitnessRank{}, false
 	}
-	best := candidates[deterministicIndex(seed+":0", len(candidates))]
-	rounds := 2
-	if len(candidates) < rounds {
-		rounds = len(candidates)
-	}
-	for round := 1; round < rounds; round++ {
-		candidate := candidates[deterministicIndex(fmt.Sprintf("%s:%d", seed, round), len(candidates))]
-		if betterParentFitness(candidate, best) {
-			best = candidate
-		}
-	}
-	return best, true
+	return candidates[deterministicIndex(seed, len(candidates))], true
 }
 
 func deterministicIndex(seed string, count int) int {
@@ -534,13 +512,6 @@ func deterministicIndex(seed string, count int) int {
 	}
 	sum := sha256.Sum256([]byte(seed))
 	return int(binary.BigEndian.Uint64(sum[:8]) % uint64(count))
-}
-
-func betterParentFitness(left parentFitnessRank, right parentFitnessRank) bool {
-	if left.AverageNormalized != right.AverageNormalized {
-		return left.AverageNormalized > right.AverageNormalized
-	}
-	return left.SimID < right.SimID
 }
 
 func sameStateParents(left []GAStateParent, right []GAStateParent) bool {

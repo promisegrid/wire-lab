@@ -26,6 +26,8 @@ type scoreOptions struct {
 	RequestTimeout           time.Duration
 	ProviderAttempts         int
 	ProviderElapsed          time.Duration
+	Stream                   bool
+	StreamIdleTimeout        time.Duration
 	TextVerbosity            string
 	MaxOutputTokens          int
 	CostEstimateOutputTokens int
@@ -64,6 +66,8 @@ func runScore(args []string, stdout io.Writer) error {
 		RequestTimeout:      options.RequestTimeout,
 		ProviderMaxAttempts: options.ProviderAttempts,
 		ProviderMaxElapsed:  options.ProviderElapsed,
+		Stream:              options.Stream,
+		StreamIdleTimeout:   options.StreamIdleTimeout,
 	})
 	if err != nil {
 		return err
@@ -90,6 +94,10 @@ func parseScoreOptions(args []string) (scoreOptions, error) {
 	requestTimeout := fs.String("request-timeout", defaultRequestTimeout.String(), "per-request provider timeout as a Go duration")
 	providerAttempts := fs.Int("provider-max-attempts", defaultProviderMaxAttempts, "maximum provider attempts per cell")
 	providerElapsed := fs.String("provider-max-elapsed", defaultProviderMaxElapsed.String(), "maximum elapsed provider retry time per cell")
+	// Intent: Stream by default so long score calls emit provider liveness
+	// evidence before a timeout or retry. Source: DI-tufud
+	stream := fs.Bool("stream", defaultProviderStream, "stream OpenAI Responses API events when supported")
+	streamIdleTimeout := fs.String("stream-idle-timeout", defaultStreamIdleTimeout.String(), "maximum silence between streaming events as a Go duration")
 	// Intent: Default score requests away from hard output-token caps; budget
 	// estimates stay separate from provider request shape. Source: DI-pulap
 	textVerbosity := fs.String("text-verbosity", defaultTextVerbosity, "provider text verbosity: low, medium, or high")
@@ -144,6 +152,10 @@ func parseScoreOptions(args []string) (scoreOptions, error) {
 	if err != nil {
 		return scoreOptions{}, errUsage("score: " + err.Error())
 	}
+	parsedStreamIdleTimeout, err := parsePositiveDurationFlag("stream-idle-timeout", *streamIdleTimeout)
+	if err != nil {
+		return scoreOptions{}, errUsage("score: " + err.Error())
+	}
 	normalizedTextVerbosity, err := normalizeTextVerbosity(*textVerbosity)
 	if err != nil {
 		return scoreOptions{}, errUsage("score: " + err.Error())
@@ -162,6 +174,8 @@ func parseScoreOptions(args []string) (scoreOptions, error) {
 		RequestTimeout:           parsedRequestTimeout,
 		ProviderAttempts:         *providerAttempts,
 		ProviderElapsed:          parsedProviderElapsed,
+		Stream:                   *stream,
+		StreamIdleTimeout:        parsedStreamIdleTimeout,
 		TextVerbosity:            normalizedTextVerbosity,
 		MaxOutputTokens:          *maxOutputTokens,
 		CostEstimateOutputTokens: *costEstimateOutputTokens,

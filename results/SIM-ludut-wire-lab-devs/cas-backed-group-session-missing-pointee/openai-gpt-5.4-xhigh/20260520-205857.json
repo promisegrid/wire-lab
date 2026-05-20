@@ -1,0 +1,120 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-ludut-wire-lab-devs-cas-backed-group-session-missing-pointee-openai-gpt-5.4-xhigh-20260520-205857",
+  "run_group_id": "ga-canary-20260520-205857",
+  "cell_id": "ga-canary-20260520-205857-000003-SIM-ludut-wire-lab-devs--cas-backed-group-session-missing-pointee--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-ludut-wire-lab-devs",
+  "scenario_id": "cas-backed-group-session-missing-pointee",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260520-205857",
+  "result_path": "results/SIM-ludut-wire-lab-devs/cas-backed-group-session-missing-pointee/openai-gpt-5.4-xhigh/20260520-205857.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_1e57b954da8d4a5ebb5206007f8db250",
+    "response_id": "resp_048e6d79da0667c9006a0e20932f088199a7e77afc5ccda70b",
+    "input_tokens": 5976,
+    "output_tokens": 7680,
+    "cost_usd": 0.117978
+  },
+  "source": {
+    "repo_commit": "39aac816b4af60ab2490c21c49fcc18fdbd68771",
+    "sim_path": "simulations/SIM-ludut-wire-lab-devs/",
+    "scenario_path": "scenarios/cas-backed-group-session-missing-pointee/cas-backed-group-session-missing-pointee.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "5603da290add5fe52b38a676ee282636da60770bd6d108b0c5926fbed31d00a6"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-ludut-wire-lab-devs/README.md",
+        "sha256": "6804b8d7438280d3828a82ff3f1530196099ec9b32cd7d779ab19df4c1679fba"
+      },
+      {
+        "path": "simulations/SIM-ludut-wire-lab-devs/QUESTION.md",
+        "sha256": "61c19ba5c45381b1215e6e8f47ac694c1178a208a23853aaabe577e86fe8d720"
+      },
+      {
+        "path": "simulations/SIM-ludut-wire-lab-devs/seed/wire-lab-devs-draft-migration.md",
+        "sha256": "46ae5923f54f74ee4b1ac69f44c71fd03cf3c72409e37998b8c12bd5e2791fe1"
+      },
+      {
+        "path": "scenarios/cas-backed-group-session-missing-pointee/cas-backed-group-session-missing-pointee.md",
+        "sha256": "08b0a34310bbae187319c57c05627d2acacceec0bb5740a6813f212363a909d9"
+      }
+    ],
+    "simulation_tree_hash": "0ea8781ea8d19089355073cde98e1e93ac60fbf3c7e2267a3dc85687acec43f1"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 3,
+    "auditability": 3,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 1,
+    "implementation_plausibility": 2,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 16,
+    "normalized_0_100": 46,
+    "confidence_0_1": 0.68
+  },
+  "assessment": {
+    "rationale": "This lineage is auditable, evolution-friendly transport evidence, but on the provided docs it is mostly orthogonal to the missing-pointee scenario: it preserves CID-named messages and migration history yet does not define a group view, pointer graph, or pending/unresolved treatment for absent CAS content.",
+    "strengths": [
+      "Concrete dogfood transport evidence is preserved as a separate simulation instead of hard-coding current repo layout as the final product shape.",
+      "The migration record is auditable through source path, source commit, CID parameters, and explicit post-move CID verification.",
+      "The docs clearly preserve room to evolve transport, CAS layout, and group protocol choices later."
+    ],
+    "weaknesses": [
+      "No explicit group-session object model, pointer/root/chunk structure, or group-view semantics are described.",
+      "The docs do not show how partially available CAS content stays visible as pending or unresolved rather than being treated as invalid.",
+      "Peer-local promise accounting and later audit records for Bob or Carol under missing-content conditions are not specified.",
+      "Failure and adversarial behavior for absent roots or child chunks is undocumented."
+    ],
+    "risks": [
+      "Readers may over-read preserved transport evidence as coverage of group-session semantics that are not actually specified.",
+      "A real implementation derived too directly from this lineage could drop or invalidate partially fetched messages instead of surfacing sparse-CAS state.",
+      "Near-term dogfood shortcuts could harden into de facto protocol expectations before missing-pointee behavior is designed."
+    ],
+    "open_questions": [
+      "What object or feed structure links the CID-named message files into a group session view?",
+      "How should Bob record and display pointer CID Y when root CID X or child chunks are missing?",
+      "What durable local evidence should Carol inspect to distinguish pending, permanently missing, and maliciously withheld content?",
+      "How would this lineage migrate to richer CAS-backed group/session objects without losing existing evidence?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

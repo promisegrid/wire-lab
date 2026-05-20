@@ -61,23 +61,24 @@ and compact score/rationale/risk/open-question summaries from completed parent
 fitness results. Source: `DI-dilaf`.
 
 API-backed runs must use explicit cost controls before any large batch. The
-runner defaults to concise result style and a lower output cap, records provider
-usage in queue state, prints actual accumulated cost, and can stop before a
-cell whose preflight estimate would exceed the configured budget. Source:
-`DI-nugiv`.
+runner defaults to concise result style, records provider usage in queue state,
+prints actual accumulated cost, and can stop before a cell whose preflight
+estimate would exceed the configured budget. Source: `DI-nugiv`; `DI-pulap`.
 
 GA/search provider calls must also send an explicit service tier. The default is
 Flex for lower-cost unattended work, `default` must be requested explicitly when
-standard processing is desired, and Priority is rejected. Flex `429` and timeout
-failures use bounded exponential backoff rather than silently falling back to a
-higher-cost tier. Source: `DI-mopob`.
+standard processing is desired, and Priority is rejected. OpenAI-compatible
+transient failures (`408`, `409`, `429`, `500`, `502`, `503`, `504`, network
+timeouts, and request timeouts) use bounded exponential backoff rather than
+silently falling back to a higher-cost tier. Source: `DI-mopob`; `DI-tufud`.
 
 Synchronous GA/search calls should be bounded before Batch mode is available:
 raw `tools/ga-runner score` and `generate` default to one worker, five-minute
-provider attempts, two attempts per cell or child, and a six-minute retry
-elapsed cap. Canary wrappers may raise scoring workers when cost reservations
-are active, but they must not dispatch concurrent cells past the configured run
-budget. Source: `DI-juzus`.
+provider attempts, two attempts per cell or child, and a twelve-minute retry
+elapsed cap. Streaming is enabled by default for provider liveness logging, with
+a two-minute idle timeout for silent stalls. Canary wrappers may raise scoring
+workers when cost reservations are active, but they must not dispatch concurrent
+cells past the configured run budget. Source: `DI-juzus`; `DI-tufud`.
 
 Unattended canary-style GA runs may continue past unusable individual cells by
 using `score -skip-failed-cells` and `generate -skip-failed-children`. Skipped
@@ -156,8 +157,8 @@ Source: `DI-ramar`; `DI-pobus`; `DI-ruzaj`.
   resume without operator prompts.
 - Score parent cells before child generation when using `tools/ga-runner`.
   `generate` uses completed parent fitness evidence to rank the selected parent
-  pool and apply deterministic top-parent plus tournament-diversity parent
-  selection. Source: `DI-bukid`.
+  pool and apply deterministic highest-scoring-parent plus uniform random scored
+  non-top parent selection. Source: `DI-tufud`.
 - Keep child-generation prompts compact: parent simulation documents once,
   scenario-specific pressure once, and compact fitness summaries instead of full
   parent result JSON. Source: `DI-dilaf`.

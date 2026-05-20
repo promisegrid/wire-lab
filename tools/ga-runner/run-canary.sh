@@ -7,7 +7,7 @@ set -Eeuo pipefail
 # an expensive project/client default. Worker and timeout knobs are also passed
 # explicitly so slow provider calls are bounded, while concise output is guided
 # by text verbosity instead of hard output caps. Source: DI-simag; DI-mopob;
-# DI-juzus; DI-pulap
+# DI-juzus; DI-pulap; DI-tufud
 
 usage() {
 	cat <<'USAGE'
@@ -31,7 +31,9 @@ Environment overrides:
   GA_CANARY_GENERATE_WORKERS   default: 1
   GA_CANARY_REQUEST_TIMEOUT    default: 5m
   GA_CANARY_PROVIDER_ATTEMPTS  default: 2
-  GA_CANARY_PROVIDER_ELAPSED   default: 6m
+  GA_CANARY_PROVIDER_ELAPSED   default: 12m
+  GA_CANARY_STREAM             default: true
+  GA_CANARY_STREAM_IDLE_TIMEOUT default: 2m
   GA_CANARY_POLL_SECONDS       default: 30
   GA_CANARY_LOG_FILE           default: /tmp/wire-lab-ga-canary-<run-group>.log
 
@@ -73,7 +75,9 @@ score_workers="${GA_CANARY_SCORE_WORKERS:-3}"
 generate_workers="${GA_CANARY_GENERATE_WORKERS:-1}"
 request_timeout="${GA_CANARY_REQUEST_TIMEOUT:-5m}"
 provider_attempts="${GA_CANARY_PROVIDER_ATTEMPTS:-2}"
-provider_elapsed="${GA_CANARY_PROVIDER_ELAPSED:-6m}"
+provider_elapsed="${GA_CANARY_PROVIDER_ELAPSED:-12m}"
+stream="${GA_CANARY_STREAM:-true}"
+stream_idle_timeout="${GA_CANARY_STREAM_IDLE_TIMEOUT:-2m}"
 poll_seconds="${GA_CANARY_POLL_SECONDS:-30}"
 log_file="${GA_CANARY_LOG_FILE:-/tmp/wire-lab-ga-canary-$run_group.log}"
 state_file="$repo_root/results/state/$run_group.json"
@@ -97,6 +101,14 @@ if ! [[ "$generate_workers" =~ ^[0-9]+$ ]] || [ "$generate_workers" -lt 1 ]; the
 	echo "GA_CANARY_GENERATE_WORKERS must be a positive integer." >&2
 	exit 2
 fi
+case "$stream" in
+	true|false)
+		;;
+	*)
+		echo "GA_CANARY_STREAM must be true or false." >&2
+		exit 2
+		;;
+esac
 if ! [[ "$shuffle_seed" =~ ^[0-9]+$ ]]; then
 	echo "GA_CANARY_SHUFFLE_SEED must be a decimal integer." >&2
 	exit 2
@@ -240,6 +252,8 @@ echo "Generate workers: $generate_workers"
 echo "Request timeout: $request_timeout"
 echo "Provider attempts: $provider_attempts"
 echo "Provider elapsed: $provider_elapsed"
+echo "Provider streaming: $stream"
+echo "Stream idle timeout: $stream_idle_timeout"
 
 if git -C "$repo_root" status --short | grep -q .; then
 	echo "[warning] worktree has uncommitted or untracked files; continuing because canary outputs are expected to be uncommitted."
@@ -272,6 +286,8 @@ run_step_with_monitor "score parent cells" \
 		-request-timeout "$request_timeout" \
 		-provider-max-attempts "$provider_attempts" \
 		-provider-max-elapsed "$provider_elapsed" \
+		-stream="$stream" \
+		-stream-idle-timeout "$stream_idle_timeout" \
 		-skip-failed-cells \
 		-max-run-cost-usd "$max_run_cost_usd" \
 		-max-cell-estimate-usd "$max_cell_usd"
@@ -288,6 +304,8 @@ run_step_with_monitor "generate child simulations" \
 		-request-timeout "$request_timeout" \
 		-provider-max-attempts "$provider_attempts" \
 		-provider-max-elapsed "$provider_elapsed" \
+		-stream="$stream" \
+		-stream-idle-timeout "$stream_idle_timeout" \
 		-skip-failed-children \
 		-max-run-cost-usd "$max_run_cost_usd" \
 		-max-child-estimate-usd "$max_child_usd"
@@ -305,6 +323,8 @@ run_step_with_monitor "score child cells" \
 		-request-timeout "$request_timeout" \
 		-provider-max-attempts "$provider_attempts" \
 		-provider-max-elapsed "$provider_elapsed" \
+		-stream="$stream" \
+		-stream-idle-timeout "$stream_idle_timeout" \
 		-skip-failed-cells \
 		-max-run-cost-usd "$max_run_cost_usd" \
 		-max-cell-estimate-usd "$max_cell_usd"

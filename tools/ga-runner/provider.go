@@ -16,9 +16,18 @@ const (
 const (
 	defaultRequestTimeout      = 5 * time.Minute
 	defaultProviderMaxAttempts = 2
-	defaultProviderMaxElapsed  = 6 * time.Minute
-	defaultScoreWorkers        = 1
-	defaultGenerateWorkers     = 1
+	// Intent: Leave enough elapsed retry budget for two full five-minute
+	// attempts plus backoff instead of timing out the second attempt early.
+	// Source: DI-tufud
+	defaultProviderMaxElapsed = 12 * time.Minute
+	// Intent: Prefer streaming liveness diagnostics for canary provider calls
+	// unless the operator explicitly disables streaming. Source: DI-tufud
+	defaultProviderStream = true
+	// Intent: Retry a silent streaming connection while allowing active SSE
+	// events to prove the provider request is still alive. Source: DI-tufud
+	defaultStreamIdleTimeout = 2 * time.Minute
+	defaultScoreWorkers      = 1
+	defaultGenerateWorkers   = 1
 )
 
 const (

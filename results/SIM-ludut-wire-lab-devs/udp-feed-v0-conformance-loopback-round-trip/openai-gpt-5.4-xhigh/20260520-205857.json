@@ -1,0 +1,117 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-ludut-wire-lab-devs-udp-feed-v0-conformance-loopback-round-trip-openai-gpt-5.4-xhigh-20260520-205857",
+  "run_group_id": "ga-canary-20260520-205857",
+  "cell_id": "ga-canary-20260520-205857-000002-SIM-ludut-wire-lab-devs--udp-feed-v0-conformance-loopback-round-trip--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-ludut-wire-lab-devs",
+  "scenario_id": "udp-feed-v0-conformance-loopback-round-trip",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260520-205857",
+  "result_path": "results/SIM-ludut-wire-lab-devs/udp-feed-v0-conformance-loopback-round-trip/openai-gpt-5.4-xhigh/20260520-205857.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_e8ebe16788f54f91923a09082cdae58d",
+    "response_id": "resp_00bfce961fb8cec6006a0e20932ed88199aa53c058b88f0f17",
+    "input_tokens": 5993,
+    "output_tokens": 8485,
+    "cost_usd": 0.12927775
+  },
+  "source": {
+    "repo_commit": "39aac816b4af60ab2490c21c49fcc18fdbd68771",
+    "sim_path": "simulations/SIM-ludut-wire-lab-devs/",
+    "scenario_path": "scenarios/udp-feed-v0-conformance-loopback-round-trip/udp-feed-v0-conformance-loopback-round-trip.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "5603da290add5fe52b38a676ee282636da60770bd6d108b0c5926fbed31d00a6"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-ludut-wire-lab-devs/README.md",
+        "sha256": "6804b8d7438280d3828a82ff3f1530196099ec9b32cd7d779ab19df4c1679fba"
+      },
+      {
+        "path": "simulations/SIM-ludut-wire-lab-devs/QUESTION.md",
+        "sha256": "61c19ba5c45381b1215e6e8f47ac694c1178a208a23853aaabe577e86fe8d720"
+      },
+      {
+        "path": "simulations/SIM-ludut-wire-lab-devs/seed/wire-lab-devs-draft-migration.md",
+        "sha256": "46ae5923f54f74ee4b1ac69f44c71fd03cf3c72409e37998b8c12bd5e2791fe1"
+      },
+      {
+        "path": "scenarios/udp-feed-v0-conformance-loopback-round-trip/udp-feed-v0-conformance-loopback-round-trip.md",
+        "sha256": "784c01cb7d33829c81164e50028c258227f71ca334c71a87e46c651bbdec4277"
+      }
+    ],
+    "simulation_tree_hash": "0ea8781ea8d19089355073cde98e1e93ac60fbf3c7e2267a3dc85687acec43f1"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 3,
+    "auditability": 3,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 1,
+    "implementation_plausibility": 2,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 15,
+    "normalized_0_100": 43,
+    "confidence_0_1": 0.79
+  },
+  "assessment": {
+    "rationale": "Good as migration and byte-stability evidence, weak as direct UDP loopback conformance evidence. The docs show preserved transport artifacts and CID-checked bytes, but not a UDP v0 reference implementation, the 612-byte loopback test, or an expected send/receive API.",
+    "strengths": [
+      "CID-checked migrated message files provide concrete byte-preservation evidence.",
+      "The simulation clearly separates lineage evidence from final PromiseGrid product or layout commitments.",
+      "Existing transport artifacts make near-term developer dogfooding more plausible than a purely hypothetical design."
+    ],
+    "weaknesses": [
+      "No explicit UDP loopback behavior or 612-byte round-trip proof is documented.",
+      "No send/receive API contract or conformance vector set is shown.",
+      "Failure, adversarial, and peer-local receipt accounting for network behavior are largely absent."
+    ],
+    "risks": [
+      "File-level byte preservation could be mistaken for UDP conformance if the boundary is not kept explicit.",
+      "Urgent dogfood pressure could freeze an accidental transport or interface boundary before it is fully specified."
+    ],
+    "open_questions": [
+      "Does the migrated transport include executable UDP send/receive code or only specimen files?",
+      "What exact API and fixed vectors define udp-feed-v0 conformance for replay across implementations?",
+      "How are timeout, truncation, bind failure, duplication, or reordering recorded as durable local evidence?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

@@ -31,7 +31,9 @@ go run . validate -repo-root ../..
     -workers 3 \
     -request-timeout 5m \
     -provider-max-attempts 2 \
-    -provider-max-elapsed 6m \
+    -provider-max-elapsed 12m \
+    -stream=true \
+    -stream-idle-timeout 2m \
     -skip-failed-cells \
     -max-run-cost-usd <budget>
 
@@ -44,7 +46,9 @@ go run . validate -repo-root ../..
     -workers 1 \
     -request-timeout 5m \
     -provider-max-attempts 2 \
-    -provider-max-elapsed 6m \
+    -provider-max-elapsed 12m \
+    -stream=true \
+    -stream-idle-timeout 2m \
     -skip-failed-children \
     -max-run-cost-usd <budget>
 
@@ -68,8 +72,9 @@ provider, writes validated JSON fitness results, and checkpoints usage/cost
 metadata after each cell. `generate` builds compact child prompts from each
 parent simulation tree once, scenario-specific pressure once, and summarized
 fitness evidence, then uses completed parent fitness results to rank the
-selected parent pool, applies deterministic top-parent plus tournament-diversity
-parent selection, materializes strict file-bundle responses as untracked
+selected parent pool, applies deterministic highest-scoring-parent plus uniform
+random scored-parent selection, materializes strict file-bundle responses as
+untracked
 `simulations/SIM-*` trees, and records prompt/response hashes, file hashes, tree
 hashes, and cost metadata in state.
 `accept` records reviewed promotion evidence and prints paths to stage, but it
@@ -77,22 +82,25 @@ does not run `git add` or commit. `cull` deletes only state-selected generated
 child sim trees and matching result trees; use `-dry-run` to print the deletion
 plan without changing files. Source:
 `DI-pobus`; `DI-bagih`; `DI-zusit`; `DI-podot`; `DI-kofil`; `DI-ruzaj`;
-`DI-gijom`; `DI-bukid`; `DI-dilaf`.
+`DI-gijom`; `DI-tufud`; `DI-dilaf`.
 
 Provider-backed `score` and `generate` always send an explicit service tier.
 The default is `-service-tier flex`; `-service-tier default` is available when
 standard processing is intentionally worth the cost, and `priority` is rejected.
-Flex `429` resource-unavailable responses and request timeouts retry with
-bounded exponential backoff before the cell is checkpointed as failed. Source:
-`DI-mopob`.
+OpenAI-compatible transient failures (`408`, `409`, `429`, `500`, `502`, `503`,
+`504`, network timeouts, and request timeouts) retry with bounded exponential
+backoff before the cell is checkpointed as failed. Source: `DI-mopob`;
+`DI-tufud`.
 
 Provider-backed `score` and `generate` are serial by default with `-workers 1`,
 but sync canaries may use bounded workers for higher throughput. Each provider
 attempt defaults to `-request-timeout 5m`; each cell/child retry window defaults
-to `-provider-max-attempts 2` and `-provider-max-elapsed 6m`. Concurrent scoring
+to `-provider-max-attempts 2` and `-provider-max-elapsed 12m`. Streaming is on
+by default with `-stream=true` and `-stream-idle-timeout 2m`, so long Responses
+API calls log event progress and retry silent stalls. Concurrent scoring
 reserves estimated cell cost before dispatch, so `-max-run-cost-usd` remains a
 conservative launch budget rather than a best-effort warning. Source:
-`DI-juzus`.
+`DI-juzus`; `DI-tufud`.
 
 Provider-backed `score` and `generate` omit `max_output_tokens` by default.
 `-max-output-tokens` remains an explicit emergency fuse, but normal cost control
@@ -111,15 +119,16 @@ tokens. Source: `DI-pulap`.
 Child generation uses parent score evidence in two ways. First, `generate`
 reranks the selected parent pool by average completed parent
 `fitness.normalized_0_100` and rewrites queued child parent IDs as exactly two
-distinct `breed` parents using top-parent plus deterministic tournament
-diversity. Second, the child prompt tells the model to preserve parent
-strengths, repair weaknesses, reduce risks, route open questions, and make
+distinct `breed` parents using the highest-scoring parent plus one deterministic
+uniform random scored non-top parent. Second, the child prompt tells the model
+to preserve parent strengths, repair weaknesses, reduce risks, route open
+questions, and make
 bounded design deltas expected to improve the same rubric score. If fewer than
 two viable parents exist, generation records a failed or skipped child instead
 of creating a one-parent child. Child-generation prompts do not embed complete
 parent result JSON; they include compact result-path, score, fitness, rationale,
 strength, weakness, risk, and open-question summaries to reduce timeout-prone
-prompt bulk while preserving the feedback signal. Source: `DI-bukid`;
+prompt bulk while preserving the feedback signal. Source: `DI-tufud`;
 `DI-sohus`; `DI-dilaf`.
 
 For unattended canary-style runs, `score -skip-failed-cells` and

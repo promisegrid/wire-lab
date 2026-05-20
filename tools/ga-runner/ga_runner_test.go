@@ -737,11 +737,41 @@ func TestRunGenerateSelectsParentsByFitnessEvidence(t *testing.T) {
 	}
 	for _, child := range state.Children {
 		if child.Operation != childOperationBreed || len(child.ParentIDs) != 2 || child.ParentIDs[0] != "SIM-high" {
-			t.Fatalf("child did not breed top parent with tournament diversity: %#v", child)
+			t.Fatalf("child did not breed top parent with random scored diversity: %#v", child)
 		}
 		if child.ParentIDs[1] == "SIM-high" {
 			t.Fatalf("breed reused top parent twice: %#v", child)
 		}
+		if child.ParentIDs[1] != "SIM-parent" && child.ParentIDs[1] != "SIM-low" {
+			t.Fatalf("second parent was not selected from scored non-top parents: %#v", child)
+		}
+	}
+}
+
+func TestParentSelectionUsesTopPlusUniformRandomScoredParent(t *testing.T) {
+	state := GAState{RunGroupID: "ga-select"}
+	ranked := []parentFitnessRank{
+		{SimID: "SIM-high", AverageNormalized: 95, Samples: 3},
+		{SimID: "SIM-mid", AverageNormalized: 60, Samples: 3},
+		{SimID: "SIM-low", AverageNormalized: 20, Samples: 3},
+	}
+	seenSecondParents := map[string]bool{}
+	for index := 0; index < 40; index++ {
+		child := GAChild{ChildID: fmt.Sprintf("SIM-child-%02d", index)}
+		parentIDs, ok := parentSelectionForChild(state, ranked, child, index)
+		if !ok {
+			t.Fatalf("expected parent selection for child %d", index)
+		}
+		if len(parentIDs) != 2 || parentIDs[0] != "SIM-high" {
+			t.Fatalf("top parent was not fixed first: %#v", parentIDs)
+		}
+		if parentIDs[1] == "SIM-high" {
+			t.Fatalf("random parent reused top parent: %#v", parentIDs)
+		}
+		seenSecondParents[parentIDs[1]] = true
+	}
+	if !seenSecondParents["SIM-mid"] || !seenSecondParents["SIM-low"] {
+		t.Fatalf("uniform random scored parent did not sample both non-top parents: %#v", seenSecondParents)
 	}
 }
 
@@ -887,7 +917,7 @@ func TestServiceTierOptionsDefaultToFlexAndRejectPriority(t *testing.T) {
 	if scoreDefaults.ReasoningEffort != defaultScoreReasoningEffort || scoreDefaults.TextVerbosity != defaultTextVerbosity || scoreDefaults.MaxOutputTokens != 0 || scoreDefaults.CostEstimateOutputTokens != defaultScoreCostEstimateOutputTokens {
 		t.Fatalf("score request-shaping defaults not applied: %#v", scoreDefaults)
 	}
-	if scoreDefaults.Workers != defaultScoreWorkers || scoreDefaults.RequestTimeout != defaultRequestTimeout || scoreDefaults.ProviderAttempts != defaultProviderMaxAttempts || scoreDefaults.ProviderElapsed != defaultProviderMaxElapsed {
+	if scoreDefaults.Workers != defaultScoreWorkers || scoreDefaults.RequestTimeout != defaultRequestTimeout || scoreDefaults.ProviderAttempts != defaultProviderMaxAttempts || scoreDefaults.ProviderElapsed != defaultProviderMaxElapsed || scoreDefaults.Stream != defaultProviderStream || scoreDefaults.StreamIdleTimeout != defaultStreamIdleTimeout {
 		t.Fatalf("score throughput defaults not applied: %#v", scoreDefaults)
 	}
 	generateDefaults, err := parseGenerateOptions([]string{"-run-group-id", "ga-generate", "-api-model", "model-a"})
@@ -900,7 +930,7 @@ func TestServiceTierOptionsDefaultToFlexAndRejectPriority(t *testing.T) {
 	if generateDefaults.ReasoningEffort != defaultGenerateReasoningEffort || generateDefaults.TextVerbosity != defaultTextVerbosity || generateDefaults.MaxOutputTokens != 0 || generateDefaults.CostEstimateOutputTokens != defaultGenerateCostEstimateOutputTokens {
 		t.Fatalf("generate request-shaping defaults not applied: %#v", generateDefaults)
 	}
-	if generateDefaults.Workers != defaultGenerateWorkers || generateDefaults.RequestTimeout != defaultRequestTimeout || generateDefaults.ProviderAttempts != defaultProviderMaxAttempts || generateDefaults.ProviderElapsed != defaultProviderMaxElapsed {
+	if generateDefaults.Workers != defaultGenerateWorkers || generateDefaults.RequestTimeout != defaultRequestTimeout || generateDefaults.ProviderAttempts != defaultProviderMaxAttempts || generateDefaults.ProviderElapsed != defaultProviderMaxElapsed || generateDefaults.Stream != defaultProviderStream || generateDefaults.StreamIdleTimeout != defaultStreamIdleTimeout {
 		t.Fatalf("generate throughput defaults not applied: %#v", generateDefaults)
 	}
 	scoreDefaultTier, err := parseScoreOptions([]string{"-run-group-id", "ga-score", "-api-model", "model-a", "-service-tier", "default"})
@@ -910,11 +940,11 @@ func TestServiceTierOptionsDefaultToFlexAndRejectPriority(t *testing.T) {
 	if scoreDefaultTier.ServiceTier != serviceTierDefault {
 		t.Fatalf("score explicit service tier = %q, want %q", scoreDefaultTier.ServiceTier, serviceTierDefault)
 	}
-	scoreCustom, err := parseScoreOptions([]string{"-run-group-id", "ga-score", "-api-model", "model-a", "-workers", "3", "-request-timeout", "2m", "-provider-max-attempts", "4", "-provider-max-elapsed", "9m", "-text-verbosity", "high", "-max-output-tokens", "123", "-cost-estimate-output-tokens", "456"})
+	scoreCustom, err := parseScoreOptions([]string{"-run-group-id", "ga-score", "-api-model", "model-a", "-workers", "3", "-request-timeout", "2m", "-provider-max-attempts", "4", "-provider-max-elapsed", "9m", "-stream=false", "-stream-idle-timeout", "11s", "-text-verbosity", "high", "-max-output-tokens", "123", "-cost-estimate-output-tokens", "456"})
 	if err != nil {
 		t.Fatalf("parse custom throughput knobs: %v", err)
 	}
-	if scoreCustom.Workers != 3 || scoreCustom.RequestTimeout != 2*time.Minute || scoreCustom.ProviderAttempts != 4 || scoreCustom.ProviderElapsed != 9*time.Minute {
+	if scoreCustom.Workers != 3 || scoreCustom.RequestTimeout != 2*time.Minute || scoreCustom.ProviderAttempts != 4 || scoreCustom.ProviderElapsed != 9*time.Minute || scoreCustom.Stream || scoreCustom.StreamIdleTimeout != 11*time.Second {
 		t.Fatalf("custom throughput knobs not applied: %#v", scoreCustom)
 	}
 	if scoreCustom.TextVerbosity != textVerbosityHigh || scoreCustom.MaxOutputTokens != 123 || scoreCustom.CostEstimateOutputTokens != 456 {
@@ -1030,6 +1060,64 @@ func TestOpenAIProviderLogsRequestAndResponseJSON(t *testing.T) {
 	}
 }
 
+func TestOpenAIProviderStreamsResponsesEvents(t *testing.T) {
+	transport := roundTripFunc(func(request *http.Request) (*http.Response, error) {
+		requestBytes, err := io.ReadAll(request.Body)
+		if err != nil {
+			t.Fatalf("read stream request body: %v", err)
+		}
+		var body openAIRequest
+		if err := json.Unmarshal(requestBytes, &body); err != nil {
+			t.Fatalf("decode stream request body: %v", err)
+		}
+		if !body.Stream {
+			t.Fatalf("stream request did not set stream=true: %s", string(requestBytes))
+		}
+		streamBody := strings.Join([]string{
+			`event: response.created`,
+			`data: {"type":"response.created","response":{"id":"resp-stream","status":"in_progress"}}`,
+			``,
+			`event: response.output_text.delta`,
+			`data: {"type":"response.output_text.delta","delta":"{\"scores\":{"}`,
+			``,
+			`event: response.output_text.delta`,
+			`data: {"type":"response.output_text.delta","delta":"}}"}`,
+			``,
+			`event: response.completed`,
+			`data: {"type":"response.completed","response":{"id":"resp-stream","status":"completed","service_tier":"default","usage":{"input_tokens":10,"input_tokens_details":{"cached_tokens":1},"output_tokens":2},"output":[]}}`,
+			``,
+		}, "\n")
+		return openAITestHTTPResponse(request, http.StatusOK, "req-stream", streamBody), nil
+	})
+	var debug strings.Builder
+	provider := OpenAIProvider{
+		APIKey:            "test-key",
+		BaseURL:           "https://example.test/responses",
+		Client:            &http.Client{Transport: transport},
+		RequestTimeout:    time.Second,
+		Stream:            true,
+		StreamIdleTimeout: time.Second,
+		DebugWriter:       &debug,
+		RetryPolicy: ProviderRetryPolicy{
+			MaxAttempts: 1,
+		},
+	}
+	response, err := provider.Generate(context.Background(), ProviderRequest{
+		APIModel:    "model-a",
+		ServiceTier: serviceTierDefault,
+		Prompt:      "stream this",
+	})
+	if err != nil {
+		t.Fatalf("stream generate: %v\n%s", err, debug.String())
+	}
+	if response.Text != `{"scores":{}}`+"\n" || response.RequestID != "req-stream" || response.ResponseID != "resp-stream" || response.ServiceTier != serviceTierDefault {
+		t.Fatalf("unexpected stream response: %#v", response)
+	}
+	if !strings.Contains(debug.String(), "event=stream_event") || !strings.Contains(debug.String(), `type="response.output_text.delta"`) || !strings.Contains(debug.String(), `type="response.completed"`) {
+		t.Fatalf("stream debug log missing liveness events:\n%s", debug.String())
+	}
+}
+
 func TestOpenAIProviderRetriesFlex429WithoutChangingTier(t *testing.T) {
 	attempts := 0
 	var observedServiceTiers []string
@@ -1067,6 +1155,46 @@ func TestOpenAIProviderRetriesFlex429WithoutChangingTier(t *testing.T) {
 		if serviceTier != serviceTierFlex {
 			t.Fatalf("retry changed service tier: %v", observedServiceTiers)
 		}
+	}
+}
+
+func TestOpenAIProviderRetriesTransientHTTPStatuses(t *testing.T) {
+	for _, statusCode := range []int{
+		http.StatusRequestTimeout,
+		http.StatusConflict,
+		http.StatusTooManyRequests,
+		http.StatusInternalServerError,
+		http.StatusBadGateway,
+		http.StatusServiceUnavailable,
+		http.StatusGatewayTimeout,
+	} {
+		t.Run(fmt.Sprintf("status_%d", statusCode), func(t *testing.T) {
+			attempts := 0
+			transport := roundTripFunc(func(request *http.Request) (*http.Response, error) {
+				attempts++
+				if attempts == 1 {
+					return openAITestHTTPResponse(request, statusCode, "", `{"error":{"message":"temporary provider failure"}}`), nil
+				}
+				return openAITestHTTPResponse(request, http.StatusOK, "", openAITestSuccessBody(serviceTierFlex)), nil
+			})
+			provider := OpenAIProvider{
+				APIKey:  "test-key",
+				BaseURL: "https://example.test/responses",
+				Client:  &http.Client{Transport: transport},
+				RetryPolicy: ProviderRetryPolicy{
+					MaxAttempts:    2,
+					MaxElapsed:     time.Second,
+					InitialBackoff: time.Millisecond,
+					MaxBackoff:     time.Millisecond,
+				},
+			}
+			if _, err := provider.Generate(context.Background(), ProviderRequest{APIModel: "model-a", ServiceTier: serviceTierFlex, Prompt: "retry transient"}); err != nil {
+				t.Fatalf("generate after transient retry: %v", err)
+			}
+			if attempts != 2 {
+				t.Fatalf("attempts = %d, want 2", attempts)
+			}
+		})
 	}
 }
 

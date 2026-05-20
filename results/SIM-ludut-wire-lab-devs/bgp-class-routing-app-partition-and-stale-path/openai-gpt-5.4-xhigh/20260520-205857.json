@@ -1,0 +1,117 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-ludut-wire-lab-devs-bgp-class-routing-app-partition-and-stale-path-openai-gpt-5.4-xhigh-20260520-205857",
+  "run_group_id": "ga-canary-20260520-205857",
+  "cell_id": "ga-canary-20260520-205857-000001-SIM-ludut-wire-lab-devs--bgp-class-routing-app-partition-and-stale-path--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-ludut-wire-lab-devs",
+  "scenario_id": "bgp-class-routing-app-partition-and-stale-path",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260520-205857",
+  "result_path": "results/SIM-ludut-wire-lab-devs/bgp-class-routing-app-partition-and-stale-path/openai-gpt-5.4-xhigh/20260520-205857.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_d6caa7a0fe8149e38a1accb06cdcca54",
+    "response_id": "resp_0e92afd9fbcc7443006a0e2093348881988eeb2288b00a84a2",
+    "input_tokens": 5982,
+    "output_tokens": 8087,
+    "cost_usd": 0.1236865
+  },
+  "source": {
+    "repo_commit": "39aac816b4af60ab2490c21c49fcc18fdbd68771",
+    "sim_path": "simulations/SIM-ludut-wire-lab-devs/",
+    "scenario_path": "scenarios/bgp-class-routing-app-partition-and-stale-path/bgp-class-routing-app-partition-and-stale-path.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "5603da290add5fe52b38a676ee282636da60770bd6d108b0c5926fbed31d00a6"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-ludut-wire-lab-devs/README.md",
+        "sha256": "6804b8d7438280d3828a82ff3f1530196099ec9b32cd7d779ab19df4c1679fba"
+      },
+      {
+        "path": "simulations/SIM-ludut-wire-lab-devs/QUESTION.md",
+        "sha256": "61c19ba5c45381b1215e6e8f47ac694c1178a208a23853aaabe577e86fe8d720"
+      },
+      {
+        "path": "simulations/SIM-ludut-wire-lab-devs/seed/wire-lab-devs-draft-migration.md",
+        "sha256": "46ae5923f54f74ee4b1ac69f44c71fd03cf3c72409e37998b8c12bd5e2791fe1"
+      },
+      {
+        "path": "scenarios/bgp-class-routing-app-partition-and-stale-path/bgp-class-routing-app-partition-and-stale-path.md",
+        "sha256": "a74852732579b0a6604406ce146f331eb290621cbbd838f26775826c87266ce8"
+      }
+    ],
+    "simulation_tree_hash": "0ea8781ea8d19089355073cde98e1e93ac60fbf3c7e2267a3dc85687acec43f1"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 2,
+    "auditability": 3,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 0,
+    "implementation_plausibility": 1,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 13,
+    "normalized_0_100": 37,
+    "confidence_0_1": 0.8
+  },
+  "assessment": {
+    "rationale": "The docs show strong evidence preservation, migration discipline, and explicit non-final boundaries, but they do not describe route aging, timeout or withdrawal handling, or peer-local repair under partition. Fit to this stale-path routing scenario is therefore weak and mostly indirect.",
+    "strengths": [
+      "CID-verified migration evidence makes the preserved transport artifacts traceable.",
+      "The simulation explicitly treats current layout and mechanics as non-final, which helps evolution safety.",
+      "Evidence and authority boundaries are clearly stated."
+    ],
+    "weaknesses": [
+      "No explicit route or path model is described.",
+      "No timeout, stale-promise aging, or withdrawal-notice behavior is specified.",
+      "The docs do not show what peers can record locally after a partition."
+    ],
+    "risks": [
+      "A reviewer could over-read developer dogfood transport evidence as proof of stale-path routing behavior.",
+      "Hidden manual coordination assumptions may exist because failure handling is not specified."
+    ],
+    "open_questions": [
+      "What local record marks a once-good path as stale or withdrawn?",
+      "How would peers age out bad path information without central convergence machinery?",
+      "Can the preserved transport lineage be extended into explicit partition-and-repair tests?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}
