@@ -96,6 +96,10 @@ func (provider OpenAIProvider) generateOnce(ctx context.Context, request Provide
 	if err != nil {
 		return ProviderResponse{}, err
 	}
+	textVerbosity, err := normalizeTextVerbosity(request.TextVerbosity)
+	if err != nil {
+		return ProviderResponse{}, err
+	}
 	baseURL := provider.BaseURL
 	if baseURL == "" {
 		baseURL = "https://api.openai.com/v1/responses"
@@ -112,6 +116,7 @@ func (provider OpenAIProvider) generateOnce(ctx context.Context, request Provide
 		Instructions:    request.Instructions,
 		ServiceTier:     serviceTier,
 		MaxOutputTokens: request.MaxOutputTokens,
+		Text:            &openAIText{Verbosity: textVerbosity},
 	}
 	if request.ReasoningEffort != "" {
 		body.Reasoning = &openAIReasoning{Effort: request.ReasoningEffort}
@@ -298,7 +303,12 @@ type openAIRequest struct {
 	Instructions    string           `json:"instructions,omitempty"`
 	ServiceTier     string           `json:"service_tier"`
 	MaxOutputTokens int              `json:"max_output_tokens,omitempty"`
+	Text            *openAIText      `json:"text,omitempty"`
 	Reasoning       *openAIReasoning `json:"reasoning,omitempty"`
+}
+
+type openAIText struct {
+	Verbosity string `json:"verbosity,omitempty"`
 }
 
 type openAIReasoning struct {

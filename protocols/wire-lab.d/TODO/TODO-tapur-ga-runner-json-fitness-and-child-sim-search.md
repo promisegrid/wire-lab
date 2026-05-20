@@ -383,6 +383,29 @@ Affects: `tools/ga-runner/`; `tools/ga-runner/run-canary.sh`;
 `tools/ga-runner/README.md`; `results/RUN-PROTOCOL.md`;
 `protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`.
 
+ID: DI-pulap
+Date: 2026-05-20 12:31:49
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Remove default provider hard output-token caps from `tools/ga-runner`
+and the terminal canary. Keep budget controls by using separate estimate-only
+output-token counts, send low text verbosity to the provider, and default child
+generation to medium reasoning while keeping scoring at xhigh reasoning.
+Intent: The canary showed child-generation calls consuming the entire output
+cap as hidden reasoning tokens, producing `max_output_tokens` failures after
+spending time and budget. The runner should guide concise JSON with soft output
+shaping and prompt constraints, while preserving conservative preflight budget
+estimates that do not alter provider behavior.
+Constraints: Do not remove the explicit `-max-output-tokens` emergency fuse for
+manual runs, but default it to omitted. Do not weaken `-max-run-cost-usd`,
+`-max-cell-estimate-usd`, or `-max-child-estimate-usd`. Keep result scoring model
+identity stable while recording generation reasoning effort in child state.
+Structured Outputs are a separate follow-up decision after canary throughput is
+healthy.
+Affects: `tools/ga-runner/`; `tools/ga-runner/run-canary.sh`;
+`tools/ga-runner/README.md`; `results/RUN-PROTOCOL.md`;
+`protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`.
+
 ## Scope
 
 - Define and implement a new GA/search runner without changing
@@ -614,6 +637,14 @@ status in the GA state file.
   controls so sync GA canaries do not block for 30 minutes per provider call and
   can score multiple cells concurrently before Batch mode exists. Source:
   `DI-juzus`.
+- [x] tapur.18 Remove default hard output caps from GA provider calls, add
+  estimate-only output-token budgeting, send low text verbosity, and split the
+  canary's score/generate reasoning defaults. Source: `DI-pulap`.
+- [ ] tapur.19 Evaluate OpenAI Structured Outputs for GA score and child-bundle
+  responses after the uncapped canary completes. Pros: schema-constrained JSON,
+  fewer parser retries, and shorter formatting prompts. Cons: OpenAI-specific
+  schema plumbing, stricter Markdown-in-JSON escaping, and no direct fix for
+  hidden reasoning-token consumption. Source: `DI-pulap`.
 
 ## Predecessor context
 

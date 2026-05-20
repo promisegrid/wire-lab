@@ -768,6 +768,9 @@ func TestServiceTierOptionsDefaultToFlexAndRejectPriority(t *testing.T) {
 	if scoreDefaults.ServiceTier != serviceTierFlex {
 		t.Fatalf("score service tier = %q, want %q", scoreDefaults.ServiceTier, serviceTierFlex)
 	}
+	if scoreDefaults.ReasoningEffort != defaultScoreReasoningEffort || scoreDefaults.TextVerbosity != defaultTextVerbosity || scoreDefaults.MaxOutputTokens != 0 || scoreDefaults.CostEstimateOutputTokens != defaultScoreCostEstimateOutputTokens {
+		t.Fatalf("score request-shaping defaults not applied: %#v", scoreDefaults)
+	}
 	if scoreDefaults.Workers != defaultScoreWorkers || scoreDefaults.RequestTimeout != defaultRequestTimeout || scoreDefaults.ProviderAttempts != defaultProviderMaxAttempts || scoreDefaults.ProviderElapsed != defaultProviderMaxElapsed {
 		t.Fatalf("score throughput defaults not applied: %#v", scoreDefaults)
 	}
@@ -777,6 +780,9 @@ func TestServiceTierOptionsDefaultToFlexAndRejectPriority(t *testing.T) {
 	}
 	if generateDefaults.ServiceTier != serviceTierFlex {
 		t.Fatalf("generate service tier = %q, want %q", generateDefaults.ServiceTier, serviceTierFlex)
+	}
+	if generateDefaults.ReasoningEffort != defaultGenerateReasoningEffort || generateDefaults.TextVerbosity != defaultTextVerbosity || generateDefaults.MaxOutputTokens != 0 || generateDefaults.CostEstimateOutputTokens != defaultGenerateCostEstimateOutputTokens {
+		t.Fatalf("generate request-shaping defaults not applied: %#v", generateDefaults)
 	}
 	if generateDefaults.Workers != defaultGenerateWorkers || generateDefaults.RequestTimeout != defaultRequestTimeout || generateDefaults.ProviderAttempts != defaultProviderMaxAttempts || generateDefaults.ProviderElapsed != defaultProviderMaxElapsed {
 		t.Fatalf("generate throughput defaults not applied: %#v", generateDefaults)
@@ -788,12 +794,15 @@ func TestServiceTierOptionsDefaultToFlexAndRejectPriority(t *testing.T) {
 	if scoreDefaultTier.ServiceTier != serviceTierDefault {
 		t.Fatalf("score explicit service tier = %q, want %q", scoreDefaultTier.ServiceTier, serviceTierDefault)
 	}
-	scoreCustom, err := parseScoreOptions([]string{"-run-group-id", "ga-score", "-api-model", "model-a", "-workers", "3", "-request-timeout", "2m", "-provider-max-attempts", "4", "-provider-max-elapsed", "9m"})
+	scoreCustom, err := parseScoreOptions([]string{"-run-group-id", "ga-score", "-api-model", "model-a", "-workers", "3", "-request-timeout", "2m", "-provider-max-attempts", "4", "-provider-max-elapsed", "9m", "-text-verbosity", "high", "-max-output-tokens", "123", "-cost-estimate-output-tokens", "456"})
 	if err != nil {
 		t.Fatalf("parse custom throughput knobs: %v", err)
 	}
 	if scoreCustom.Workers != 3 || scoreCustom.RequestTimeout != 2*time.Minute || scoreCustom.ProviderAttempts != 4 || scoreCustom.ProviderElapsed != 9*time.Minute {
 		t.Fatalf("custom throughput knobs not applied: %#v", scoreCustom)
+	}
+	if scoreCustom.TextVerbosity != textVerbosityHigh || scoreCustom.MaxOutputTokens != 123 || scoreCustom.CostEstimateOutputTokens != 456 {
+		t.Fatalf("custom request-shaping knobs not applied: %#v", scoreCustom)
 	}
 	if _, err := parseGenerateOptions([]string{"-run-group-id", "ga-generate", "-api-model", "model-a", "-service-tier", "priority"}); err == nil {
 		t.Fatalf("expected priority service tier to be rejected")
@@ -801,16 +810,32 @@ func TestServiceTierOptionsDefaultToFlexAndRejectPriority(t *testing.T) {
 	if _, err := parseScoreOptions([]string{"-run-group-id", "ga-score", "-api-model", "model-a", "-workers", "0"}); err == nil {
 		t.Fatalf("expected zero workers to be rejected")
 	}
+	if _, err := parseGenerateOptions([]string{"-run-group-id", "ga-generate", "-api-model", "model-a", "-text-verbosity", "verbose"}); err == nil {
+		t.Fatalf("expected invalid text verbosity to be rejected")
+	}
+	if _, err := parseScoreOptions([]string{"-run-group-id", "ga-score", "-api-model", "model-a", "-max-output-tokens", "-1"}); err == nil {
+		t.Fatalf("expected negative max output tokens to be rejected")
+	}
 }
 
 func TestOpenAIProviderSendsExplicitServiceTier(t *testing.T) {
 	transport := roundTripFunc(func(request *http.Request) (*http.Response, error) {
+		requestBytes, err := io.ReadAll(request.Body)
+		if err != nil {
+			t.Fatalf("read request body: %v", err)
+		}
 		var body openAIRequest
-		if err := json.NewDecoder(request.Body).Decode(&body); err != nil {
+		if err := json.Unmarshal(requestBytes, &body); err != nil {
 			t.Fatalf("decode request body: %v", err)
 		}
 		if body.ServiceTier != serviceTierFlex {
 			t.Fatalf("request service tier = %q, want %q", body.ServiceTier, serviceTierFlex)
+		}
+		if body.Text == nil || body.Text.Verbosity != defaultTextVerbosity {
+			t.Fatalf("request text verbosity = %#v, want %q", body.Text, defaultTextVerbosity)
+		}
+		if strings.Contains(string(requestBytes), "max_output_tokens") {
+			t.Fatalf("default request unexpectedly sent hard max_output_tokens: %s", string(requestBytes))
 		}
 		return openAITestHTTPResponse(request, http.StatusOK, "req-tier", openAITestSuccessBody(serviceTierFlex)), nil
 	})
@@ -871,7 +896,9 @@ func TestOpenAIProviderLogsRequestAndResponseJSON(t *testing.T) {
 		"query_json=",
 		`"model":"model-a"`,
 		`"service_tier":"default"`,
+		`"text":{"verbosity":"low"}`,
 		`"reasoning":{"effort":"xhigh"}`,
+		`"max_output_tokens":12`,
 		"event=response",
 		"status=200",
 		`request_id="req-debug"`,

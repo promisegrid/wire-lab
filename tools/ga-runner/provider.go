@@ -21,6 +21,19 @@ const (
 	defaultGenerateWorkers     = 1
 )
 
+const (
+	// Intent: Score operations keep the established high-reasoning comparison
+	// baseline, while child generation defaults lower because canary evidence
+	// showed xhigh child responses exhausting output caps on hidden reasoning.
+	// Source: DI-pulap
+	defaultScoreReasoningEffort    = "xhigh"
+	defaultGenerateReasoningEffort = "medium"
+	defaultTextVerbosity           = "low"
+	textVerbosityLow               = "low"
+	textVerbosityMedium            = "medium"
+	textVerbosityHigh              = "high"
+)
+
 // ProviderRequest is the complete prompt envelope that a GA command sends to a
 // model provider for one score cell or one child-generation step.
 type ProviderRequest struct {
@@ -28,6 +41,7 @@ type ProviderRequest struct {
 	APIModel        string
 	ReasoningEffort string
 	ServiceTier     string
+	TextVerbosity   string
 	MaxOutputTokens int
 	Instructions    string
 	Prompt          string
@@ -65,6 +79,25 @@ func normalizeServiceTier(serviceTier string) (string, error) {
 		return normalized, nil
 	default:
 		return "", fmt.Errorf("service-tier must be %q or %q; got %q", serviceTierFlex, serviceTierDefault, serviceTier)
+	}
+}
+
+// normalizeTextVerbosity keeps concise JSON shaping explicit while avoiding a
+// hard output-token cap that can exhaust on hidden reasoning tokens.
+//
+// Intent: Guide result size with the provider's soft text-verbosity control
+// instead of default `max_output_tokens` caps that made child generation fail
+// after spending reasoning tokens. Source: DI-pulap
+func normalizeTextVerbosity(textVerbosity string) (string, error) {
+	normalized := strings.ToLower(strings.TrimSpace(textVerbosity))
+	if normalized == "" {
+		return defaultTextVerbosity, nil
+	}
+	switch normalized {
+	case textVerbosityLow, textVerbosityMedium, textVerbosityHigh:
+		return normalized, nil
+	default:
+		return "", fmt.Errorf("text-verbosity must be %q, %q, or %q; got %q", textVerbosityLow, textVerbosityMedium, textVerbosityHigh, textVerbosity)
 	}
 }
 

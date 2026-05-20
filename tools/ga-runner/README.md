@@ -26,25 +26,25 @@ go run . validate -repo-root ../..
     -target parents \
     -api-model gpt-5.4 \
     -reasoning-effort xhigh \
+    -text-verbosity low \
     -service-tier flex \
     -workers 3 \
     -request-timeout 5m \
     -provider-max-attempts 2 \
     -provider-max-elapsed 6m \
-    -max-output-tokens 12000 \
     -skip-failed-cells \
     -max-run-cost-usd <budget>
 
   go run . generate -repo-root ../.. \
     -run-group-id <run-group-id> \
     -api-model gpt-5.4 \
-    -reasoning-effort xhigh \
+    -reasoning-effort medium \
+    -text-verbosity low \
     -service-tier flex \
     -workers 1 \
     -request-timeout 5m \
     -provider-max-attempts 2 \
     -provider-max-elapsed 6m \
-    -max-output-tokens 16000 \
     -skip-failed-children \
     -max-run-cost-usd <budget>
 
@@ -90,12 +90,19 @@ reserves estimated cell cost before dispatch, so `-max-run-cost-usd` remains a
 conservative launch budget rather than a best-effort warning. Source:
 `DI-juzus`.
 
-For xhigh canary runs, the wrapper passes explicit output caps with
-`GA_CANARY_SCORE_MAX_OUTPUT_TOKENS` defaulting to `12000` and
-`GA_CANARY_GENERATE_MAX_OUTPUT_TOKENS` defaulting to `16000`. A provider
-response with `status: incomplete` and `reason: max_output_tokens` is treated as
-a deterministic cap failure rather than retried with the same cap. Source:
-`DI-juzus`; `DI-zikag`.
+Provider-backed `score` and `generate` omit `max_output_tokens` by default.
+`-max-output-tokens` remains an explicit emergency fuse, but normal cost control
+uses `-cost-estimate-output-tokens` only for preflight budget estimates. The
+default provider text verbosity is `low`; the terminal canary scores with xhigh
+reasoning and generates children with medium reasoning. A provider response with
+`status: incomplete` and `reason: max_output_tokens` is still treated as a
+deterministic cap failure when an operator explicitly sets the cap. Source:
+`DI-juzus`; `DI-zikag`; `DI-pulap`.
+
+OpenAI Structured Outputs remain a follow-up after the uncapped canary succeeds.
+They may reduce JSON-shape retries and prompt boilerplate, but they add
+provider-specific schema plumbing and do not directly reduce hidden reasoning
+tokens. Source: `DI-pulap`.
 
 For unattended canary-style runs, `score -skip-failed-cells` and
 `generate -skip-failed-children` preserve per-cell or per-child failure messages

@@ -15,29 +15,31 @@ import (
 )
 
 type generateOptions struct {
-	RepoRoot           string
-	RunGroupID         string
-	ChildIDs           []string
-	ProviderName       string
-	APIModel           string
-	ReasoningEffort    string
-	ServiceTier        string
-	APIKeyEnv          string
-	OpenAIBaseURL      string
-	Workers            int
-	RequestTimeout     time.Duration
-	ProviderAttempts   int
-	ProviderElapsed    time.Duration
-	MaxOutputTokens    int
-	MaxRunCostUSD      float64
-	MaxChildCostUSD    float64
-	InputPrice         float64
-	CachedInputPrice   float64
-	OutputPrice        float64
-	RetryFailed        bool
-	SkipFailedChildren bool
-	DryRun             bool
-	JobDir             string
+	RepoRoot                 string
+	RunGroupID               string
+	ChildIDs                 []string
+	ProviderName             string
+	APIModel                 string
+	ReasoningEffort          string
+	ServiceTier              string
+	APIKeyEnv                string
+	OpenAIBaseURL            string
+	Workers                  int
+	RequestTimeout           time.Duration
+	ProviderAttempts         int
+	ProviderElapsed          time.Duration
+	TextVerbosity            string
+	MaxOutputTokens          int
+	CostEstimateOutputTokens int
+	MaxRunCostUSD            float64
+	MaxChildCostUSD          float64
+	InputPrice               float64
+	CachedInputPrice         float64
+	OutputPrice              float64
+	RetryFailed              bool
+	SkipFailedChildren       bool
+	DryRun                   bool
+	JobDir                   string
 }
 
 type childBundle struct {
@@ -81,7 +83,10 @@ func parseGenerateOptions(args []string) (generateOptions, error) {
 	runGroupID := fs.String("run-group-id", "", "GA run group whose state contains queued child plans")
 	providerName := fs.String("provider", "openai", "provider name; v1 supports openai")
 	apiModel := fs.String("api-model", "", "provider API model name")
-	reasoningEffort := fs.String("reasoning-effort", "xhigh", "provider reasoning effort")
+	// Intent: Child generation is more prone to reasoning-token exhaustion than
+	// scoring, so default it to medium reasoning while preserving explicit
+	// operator override. Source: DI-pulap
+	reasoningEffort := fs.String("reasoning-effort", defaultGenerateReasoningEffort, "provider reasoning effort")
 	// Intent: Default child generation to Flex and reject Priority so unattended
 	// generation cannot inherit expensive processing. Source: DI-mopob
 	serviceTier := fs.String("service-tier", defaultServiceTier, "provider service tier: flex or default; priority is rejected")
@@ -93,9 +98,13 @@ func parseGenerateOptions(args []string) (generateOptions, error) {
 	requestTimeout := fs.String("request-timeout", defaultRequestTimeout.String(), "per-request provider timeout as a Go duration")
 	providerAttempts := fs.Int("provider-max-attempts", defaultProviderMaxAttempts, "maximum provider attempts per child")
 	providerElapsed := fs.String("provider-max-elapsed", defaultProviderMaxElapsed.String(), "maximum elapsed provider retry time per child")
-	maxOutputTokens := fs.Int("max-output-tokens", 6000, "maximum provider output tokens")
+	// Intent: Default child-generation requests away from hard output-token caps;
+	// budget estimates remain preflight-only. Source: DI-pulap
+	textVerbosity := fs.String("text-verbosity", defaultTextVerbosity, "provider text verbosity: low, medium, or high")
+	maxOutputTokens := fs.Int("max-output-tokens", 0, "optional hard provider output-token cap; 0 omits")
+	costEstimateOutputTokens := fs.Int("cost-estimate-output-tokens", defaultGenerateCostEstimateOutputTokens, "output tokens used only for preflight cost estimates")
 	maxRunCost := fs.Float64("max-run-cost-usd", 0, "stop before starting a child that would exceed this run budget; 0 disables")
-	maxChildCost := fs.Float64("max-child-estimate-usd", 0, "skip children whose preflight worst-case cost estimate exceeds this amount; 0 disables")
+	maxChildCost := fs.Float64("max-child-estimate-usd", 0, "skip children whose preflight cost estimate exceeds this amount; 0 disables")
 	inputPrice := fs.Float64("cost-input-usd-per-mtok", defaultInputUSDPerMTok, "uncached input price in USD per million tokens")
 	cachedInputPrice := fs.Float64("cost-cached-input-usd-per-mtok", defaultCachedInputUSDPerMTok, "cached input price in USD per million tokens")
 	outputPrice := fs.Float64("cost-output-usd-per-mtok", defaultOutputUSDPerMTok, "output price in USD per million tokens")
@@ -132,34 +141,46 @@ func parseGenerateOptions(args []string) (generateOptions, error) {
 	if *providerAttempts < 1 {
 		return generateOptions{}, errUsage("generate: provider-max-attempts must be at least 1")
 	}
+	if *maxOutputTokens < 0 {
+		return generateOptions{}, errUsage("generate: max-output-tokens must be zero or greater")
+	}
+	if *costEstimateOutputTokens < 0 {
+		return generateOptions{}, errUsage("generate: cost-estimate-output-tokens must be zero or greater")
+	}
 	parsedProviderElapsed, err := parsePositiveDurationFlag("provider-max-elapsed", *providerElapsed)
 	if err != nil {
 		return generateOptions{}, errUsage("generate: " + err.Error())
 	}
+	normalizedTextVerbosity, err := normalizeTextVerbosity(*textVerbosity)
+	if err != nil {
+		return generateOptions{}, errUsage("generate: " + err.Error())
+	}
 	return generateOptions{
-		RepoRoot:           *repoRoot,
-		RunGroupID:         *runGroupID,
-		ChildIDs:           []string(childIDs),
-		ProviderName:       *providerName,
-		APIModel:           *apiModel,
-		ReasoningEffort:    *reasoningEffort,
-		ServiceTier:        normalizedServiceTier,
-		APIKeyEnv:          *apiKeyEnv,
-		OpenAIBaseURL:      *openAIBaseURL,
-		Workers:            normalizedWorkers,
-		RequestTimeout:     parsedRequestTimeout,
-		ProviderAttempts:   *providerAttempts,
-		ProviderElapsed:    parsedProviderElapsed,
-		MaxOutputTokens:    *maxOutputTokens,
-		MaxRunCostUSD:      *maxRunCost,
-		MaxChildCostUSD:    *maxChildCost,
-		InputPrice:         *inputPrice,
-		CachedInputPrice:   *cachedInputPrice,
-		OutputPrice:        *outputPrice,
-		RetryFailed:        *retryFailed,
-		SkipFailedChildren: *skipFailedChildren,
-		DryRun:             *dryRun,
-		JobDir:             *jobDir,
+		RepoRoot:                 *repoRoot,
+		RunGroupID:               *runGroupID,
+		ChildIDs:                 []string(childIDs),
+		ProviderName:             *providerName,
+		APIModel:                 *apiModel,
+		ReasoningEffort:          *reasoningEffort,
+		ServiceTier:              normalizedServiceTier,
+		APIKeyEnv:                *apiKeyEnv,
+		OpenAIBaseURL:            *openAIBaseURL,
+		Workers:                  normalizedWorkers,
+		RequestTimeout:           parsedRequestTimeout,
+		ProviderAttempts:         *providerAttempts,
+		ProviderElapsed:          parsedProviderElapsed,
+		TextVerbosity:            normalizedTextVerbosity,
+		MaxOutputTokens:          *maxOutputTokens,
+		CostEstimateOutputTokens: *costEstimateOutputTokens,
+		MaxRunCostUSD:            *maxRunCost,
+		MaxChildCostUSD:          *maxChildCost,
+		InputPrice:               *inputPrice,
+		CachedInputPrice:         *cachedInputPrice,
+		OutputPrice:              *outputPrice,
+		RetryFailed:              *retryFailed,
+		SkipFailedChildren:       *skipFailedChildren,
+		DryRun:                   *dryRun,
+		JobDir:                   *jobDir,
 	}, nil
 }
 
@@ -169,6 +190,11 @@ func runGenerateWithProvider(ctx context.Context, repo Repo, provider Provider, 
 		return err
 	}
 	options.ServiceTier = serviceTier
+	textVerbosity, err := normalizeTextVerbosity(options.TextVerbosity)
+	if err != nil {
+		return err
+	}
+	options.TextVerbosity = textVerbosity
 	stateFile, err := statePath(repo, options.RunGroupID)
 	if err != nil {
 		return err
@@ -290,6 +316,18 @@ func runGenerateWithProvider(ctx context.Context, repo Repo, provider Provider, 
 	return nil
 }
 
+// effectiveGenerateCostEstimateOutputTokens keeps budget estimates conservative
+// for tests and direct callers that bypass CLI parsing.
+//
+// Intent: Preserve preflight cost controls while omitting default provider hard
+// output caps that waste canary attempts. Source: DI-pulap
+func effectiveGenerateCostEstimateOutputTokens(options generateOptions) int {
+	if options.CostEstimateOutputTokens > 0 {
+		return options.CostEstimateOutputTokens
+	}
+	return defaultGenerateCostEstimateOutputTokens
+}
+
 func selectedGenerateChildIndexes(state GAState, options generateOptions) []int {
 	selected := map[string]bool{}
 	for _, childID := range options.ChildIDs {
@@ -357,9 +395,10 @@ func prepareGenerateJob(repo Repo, state *GAState, stateFile string, jobDir stri
 		return generateJob{}, "failed", nil
 	}
 	// Intent: Stop before dispatching concurrent provider workers when a child
-	// generation prompt would exceed per-child or reserved whole-run budget.
-	// Source: DI-gijom; DI-juzus
-	estimate := cost.EstimatePromptCost(prompt, options.MaxOutputTokens)
+	// generation prompt would exceed per-child or reserved whole-run budget,
+	// using estimate-only output tokens instead of a provider hard cap. Source:
+	// DI-gijom; DI-juzus; DI-pulap
+	estimate := cost.EstimatePromptCost(prompt, effectiveGenerateCostEstimateOutputTokens(options))
 	if cost.MaxCellEstimateUSD > 0 && estimate.CostUSD > cost.MaxCellEstimateUSD {
 		markGAChild(child, "failed", fmt.Sprintf("estimated child cost %.6f exceeds max %.6f", estimate.CostUSD, cost.MaxCellEstimateUSD))
 		return generateJob{}, "failed", nil
@@ -447,6 +486,7 @@ func executeGenerateJob(ctx context.Context, repo Repo, provider Provider, job g
 		APIModel:        options.APIModel,
 		ReasoningEffort: options.ReasoningEffort,
 		ServiceTier:     options.ServiceTier,
+		TextVerbosity:   options.TextVerbosity,
 		MaxOutputTokens: options.MaxOutputTokens,
 		Instructions:    "Return only valid JSON for the requested GA child file bundle. Do not include code fences or commentary.",
 		Prompt:          job.Prompt,

@@ -11,6 +11,14 @@ const (
 	defaultOutputUSDPerMTok      = 14.00
 )
 
+const (
+	// Intent: Keep preflight budget estimates conservative after removing
+	// provider hard output caps from default score/generate requests. Source:
+	// DI-pulap
+	defaultScoreCostEstimateOutputTokens    = 4000
+	defaultGenerateCostEstimateOutputTokens = 6000
+)
+
 // CostConfig keeps expensive GA runs bounded by explicit operator budgets.
 //
 // Intent: Provider-backed GA scoring and generation can become expensive, so

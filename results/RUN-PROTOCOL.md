@@ -149,8 +149,9 @@ Source: `DI-ramar`; `DI-pobus`; `DI-ruzaj`.
 - Use checkpoint state under `results/state/` for any long run that should
   resume without operator prompts.
 - Set an explicit `-max-run-cost-usd` for unattended API-backed batches, and use
-  `-max-cell-estimate-usd` plus `-max-output-tokens` to prevent accidentally
-  starting cells whose worst-case estimate is too high.
+  estimate-only output-token budgeting with per-cell/per-child estimate caps
+  where the runner supports it. Treat hard `-max-output-tokens` caps as an
+  explicit emergency fuse, not as the normal budget control. Source: `DI-pulap`.
 - Treat `results/` as the only canonical result evidence. Generate result views
   from `results/` instead of committing scenario-side summaries.
 - Keep old result files; never rewrite or delete prior runs.
@@ -210,8 +211,8 @@ merely because they exist on disk. Source: `DI-ramar`; `DI-zanon`; `DI-zohal`;
 2. Generate canary LLM job prompts or run the API queue with explicit budget
    flags.
 3. Validate canary output.
-4. Review token/cost fields in the state file and tune output caps or result
-   style.
+4. Review token/cost fields in the state file and tune text verbosity,
+   reasoning effort, or estimate-only output-token budgets.
 5. Review drift/comparison report.
 6. Run the full manifest only with an explicit budget. Source: `DI-nugiv`.
 

@@ -13,30 +13,32 @@ import (
 )
 
 type scoreOptions struct {
-	RepoRoot         string
-	RunGroupID       string
-	Target           string
-	ProviderName     string
-	APIModel         string
-	ReasoningEffort  string
-	ServiceTier      string
-	APIKeyEnv        string
-	OpenAIBaseURL    string
-	Workers          int
-	RequestTimeout   time.Duration
-	ProviderAttempts int
-	ProviderElapsed  time.Duration
-	MaxOutputTokens  int
-	MaxRunCostUSD    float64
-	MaxCellCostUSD   float64
-	InputPrice       float64
-	CachedInputPrice float64
-	OutputPrice      float64
-	RetryFailed      bool
-	RerunDone        bool
-	SkipFailedCells  bool
-	DryRun           bool
-	JobDir           string
+	RepoRoot                 string
+	RunGroupID               string
+	Target                   string
+	ProviderName             string
+	APIModel                 string
+	ReasoningEffort          string
+	ServiceTier              string
+	APIKeyEnv                string
+	OpenAIBaseURL            string
+	Workers                  int
+	RequestTimeout           time.Duration
+	ProviderAttempts         int
+	ProviderElapsed          time.Duration
+	TextVerbosity            string
+	MaxOutputTokens          int
+	CostEstimateOutputTokens int
+	MaxRunCostUSD            float64
+	MaxCellCostUSD           float64
+	InputPrice               float64
+	CachedInputPrice         float64
+	OutputPrice              float64
+	RetryFailed              bool
+	RerunDone                bool
+	SkipFailedCells          bool
+	DryRun                   bool
+	JobDir                   string
 }
 
 type scorePayload struct {
@@ -76,7 +78,7 @@ func parseScoreOptions(args []string) (scoreOptions, error) {
 	target := fs.String("target", "parents", "cells to score: parents, children, or all")
 	providerName := fs.String("provider", "openai", "provider name; v1 supports openai")
 	apiModel := fs.String("api-model", "", "provider API model name")
-	reasoningEffort := fs.String("reasoning-effort", "xhigh", "provider reasoning effort")
+	reasoningEffort := fs.String("reasoning-effort", defaultScoreReasoningEffort, "provider reasoning effort")
 	// Intent: Default scoring calls to Flex and reject Priority so unattended
 	// scoring cannot inherit expensive processing. Source: DI-mopob
 	serviceTier := fs.String("service-tier", defaultServiceTier, "provider service tier: flex or default; priority is rejected")
@@ -88,9 +90,13 @@ func parseScoreOptions(args []string) (scoreOptions, error) {
 	requestTimeout := fs.String("request-timeout", defaultRequestTimeout.String(), "per-request provider timeout as a Go duration")
 	providerAttempts := fs.Int("provider-max-attempts", defaultProviderMaxAttempts, "maximum provider attempts per cell")
 	providerElapsed := fs.String("provider-max-elapsed", defaultProviderMaxElapsed.String(), "maximum elapsed provider retry time per cell")
-	maxOutputTokens := fs.Int("max-output-tokens", 4000, "maximum provider output tokens")
+	// Intent: Default score requests away from hard output-token caps; budget
+	// estimates stay separate from provider request shape. Source: DI-pulap
+	textVerbosity := fs.String("text-verbosity", defaultTextVerbosity, "provider text verbosity: low, medium, or high")
+	maxOutputTokens := fs.Int("max-output-tokens", 0, "optional hard provider output-token cap; 0 omits")
+	costEstimateOutputTokens := fs.Int("cost-estimate-output-tokens", defaultScoreCostEstimateOutputTokens, "output tokens used only for preflight cost estimates")
 	maxRunCost := fs.Float64("max-run-cost-usd", 0, "stop before starting a cell that would exceed this run budget; 0 disables")
-	maxCellCost := fs.Float64("max-cell-estimate-usd", 0, "skip cells whose preflight worst-case cost estimate exceeds this amount; 0 disables")
+	maxCellCost := fs.Float64("max-cell-estimate-usd", 0, "skip cells whose preflight cost estimate exceeds this amount; 0 disables")
 	inputPrice := fs.Float64("cost-input-usd-per-mtok", defaultInputUSDPerMTok, "uncached input price in USD per million tokens")
 	cachedInputPrice := fs.Float64("cost-cached-input-usd-per-mtok", defaultCachedInputUSDPerMTok, "cached input price in USD per million tokens")
 	outputPrice := fs.Float64("cost-output-usd-per-mtok", defaultOutputUSDPerMTok, "output price in USD per million tokens")
@@ -128,35 +134,47 @@ func parseScoreOptions(args []string) (scoreOptions, error) {
 	if *providerAttempts < 1 {
 		return scoreOptions{}, errUsage("score: provider-max-attempts must be at least 1")
 	}
+	if *maxOutputTokens < 0 {
+		return scoreOptions{}, errUsage("score: max-output-tokens must be zero or greater")
+	}
+	if *costEstimateOutputTokens < 0 {
+		return scoreOptions{}, errUsage("score: cost-estimate-output-tokens must be zero or greater")
+	}
 	parsedProviderElapsed, err := parsePositiveDurationFlag("provider-max-elapsed", *providerElapsed)
 	if err != nil {
 		return scoreOptions{}, errUsage("score: " + err.Error())
 	}
+	normalizedTextVerbosity, err := normalizeTextVerbosity(*textVerbosity)
+	if err != nil {
+		return scoreOptions{}, errUsage("score: " + err.Error())
+	}
 	return scoreOptions{
-		RepoRoot:         *repoRoot,
-		RunGroupID:       *runGroupID,
-		Target:           *target,
-		ProviderName:     *providerName,
-		APIModel:         *apiModel,
-		ReasoningEffort:  *reasoningEffort,
-		ServiceTier:      normalizedServiceTier,
-		APIKeyEnv:        *apiKeyEnv,
-		OpenAIBaseURL:    *openAIBaseURL,
-		Workers:          normalizedWorkers,
-		RequestTimeout:   parsedRequestTimeout,
-		ProviderAttempts: *providerAttempts,
-		ProviderElapsed:  parsedProviderElapsed,
-		MaxOutputTokens:  *maxOutputTokens,
-		MaxRunCostUSD:    *maxRunCost,
-		MaxCellCostUSD:   *maxCellCost,
-		InputPrice:       *inputPrice,
-		CachedInputPrice: *cachedInputPrice,
-		OutputPrice:      *outputPrice,
-		RetryFailed:      *retryFailed,
-		RerunDone:        *rerunDone,
-		SkipFailedCells:  *skipFailedCells,
-		DryRun:           *dryRun,
-		JobDir:           *jobDir,
+		RepoRoot:                 *repoRoot,
+		RunGroupID:               *runGroupID,
+		Target:                   *target,
+		ProviderName:             *providerName,
+		APIModel:                 *apiModel,
+		ReasoningEffort:          *reasoningEffort,
+		ServiceTier:              normalizedServiceTier,
+		APIKeyEnv:                *apiKeyEnv,
+		OpenAIBaseURL:            *openAIBaseURL,
+		Workers:                  normalizedWorkers,
+		RequestTimeout:           parsedRequestTimeout,
+		ProviderAttempts:         *providerAttempts,
+		ProviderElapsed:          parsedProviderElapsed,
+		TextVerbosity:            normalizedTextVerbosity,
+		MaxOutputTokens:          *maxOutputTokens,
+		CostEstimateOutputTokens: *costEstimateOutputTokens,
+		MaxRunCostUSD:            *maxRunCost,
+		MaxCellCostUSD:           *maxCellCost,
+		InputPrice:               *inputPrice,
+		CachedInputPrice:         *cachedInputPrice,
+		OutputPrice:              *outputPrice,
+		RetryFailed:              *retryFailed,
+		RerunDone:                *rerunDone,
+		SkipFailedCells:          *skipFailedCells,
+		DryRun:                   *dryRun,
+		JobDir:                   *jobDir,
 	}, nil
 }
 
@@ -166,6 +184,11 @@ func runScoreWithProvider(ctx context.Context, repo Repo, provider Provider, opt
 		return err
 	}
 	options.ServiceTier = serviceTier
+	textVerbosity, err := normalizeTextVerbosity(options.TextVerbosity)
+	if err != nil {
+		return err
+	}
+	options.TextVerbosity = textVerbosity
 	stateFile, err := statePath(repo, options.RunGroupID)
 	if err != nil {
 		return err
@@ -287,6 +310,19 @@ func runScoreWithProvider(ctx context.Context, repo Repo, provider Provider, opt
 	return nil
 }
 
+// effectiveScoreCostEstimateOutputTokens keeps old direct-call tests and
+// hand-built options conservative even when only the CLI default path populated
+// the estimate-only field.
+//
+// Intent: Preserve budget reservation without sending a provider hard cap.
+// Source: DI-pulap
+func effectiveScoreCostEstimateOutputTokens(options scoreOptions) int {
+	if options.CostEstimateOutputTokens > 0 {
+		return options.CostEstimateOutputTokens
+	}
+	return defaultScoreCostEstimateOutputTokens
+}
+
 func selectedScoreCellIndexes(state GAState, options scoreOptions) []int {
 	parentIDs := map[string]bool{}
 	for _, parent := range state.Parents {
@@ -381,10 +417,11 @@ func prepareScoreJob(repo Repo, state *GAState, stateFile string, jobDir string,
 		markGACell(cell, "failed", err.Error())
 		return scoreJob{}, "failed", nil
 	}
-	// Intent: Estimate and reserve worst-case token cost before dispatching
-	// concurrent provider calls, so worker pools cannot oversubscribe the
-	// user-approved run budget. Source: DI-gijom; DI-juzus
-	estimate := cost.EstimatePromptCost(prompt, options.MaxOutputTokens)
+	// Intent: Estimate and reserve token cost before dispatching concurrent
+	// provider calls, so worker pools cannot oversubscribe the user-approved run
+	// budget without sending a hard provider cap. Source: DI-gijom; DI-juzus;
+	// DI-pulap
+	estimate := cost.EstimatePromptCost(prompt, effectiveScoreCostEstimateOutputTokens(options))
 	if cost.MaxCellEstimateUSD > 0 && estimate.CostUSD > cost.MaxCellEstimateUSD {
 		markGACell(cell, "skipped", fmt.Sprintf("estimated cell cost %.6f exceeds max %.6f", estimate.CostUSD, cost.MaxCellEstimateUSD))
 		return scoreJob{}, "skipped", nil
@@ -476,6 +513,7 @@ func executeScoreJob(ctx context.Context, repo Repo, provider Provider, job scor
 		APIModel:        options.APIModel,
 		ReasoningEffort: options.ReasoningEffort,
 		ServiceTier:     options.ServiceTier,
+		TextVerbosity:   options.TextVerbosity,
 		MaxOutputTokens: options.MaxOutputTokens,
 		Instructions:    "Return only valid JSON for the requested GA score payload. Do not include code fences or commentary.",
 		Prompt:          job.Prompt,
