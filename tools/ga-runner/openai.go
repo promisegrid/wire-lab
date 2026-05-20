@@ -389,17 +389,16 @@ func (provider OpenAIProvider) dispatchOpenAIStreamEvent(attempt int, startedAt 
 		if err := json.Unmarshal([]byte(data), &payload); err != nil {
 			return ProviderResponse{}, true, fmt.Errorf("decode openai stream reasoning summary delta: %w", err)
 		}
-		provider.writeStreamContent(attempt, eventType, payload.Delta)
-		provider.debugf("attempt=%d event=stream_event elapsed=%s type=%q delta_chars=%d", attempt, time.Since(startedAt).Round(time.Millisecond), eventType, len(payload.Delta))
+		provider.writeStreamProgressDot(attempt, eventType)
 		return ProviderResponse{}, false, nil
-	case "response.reasoning_summary_part.done":
+	case "response.reasoning_summary_part.added", "response.reasoning_summary_part.done":
 		var payload struct {
 			Part struct {
 				Text string `json:"text"`
 			} `json:"part"`
 		}
 		if err := json.Unmarshal([]byte(data), &payload); err != nil {
-			return ProviderResponse{}, true, fmt.Errorf("decode openai stream reasoning summary done: %w", err)
+			return ProviderResponse{}, true, fmt.Errorf("decode openai stream reasoning summary part: %w", err)
 		}
 		provider.writeStreamContent(attempt, eventType, payload.Part.Text)
 		provider.debugf("attempt=%d event=stream_event elapsed=%s type=%q text_chars=%d", attempt, time.Since(startedAt).Round(time.Millisecond), eventType, len(payload.Part.Text))
@@ -479,10 +478,23 @@ func (provider OpenAIProvider) writeStreamContent(attempt int, eventType string,
 	if provider.StreamContentWriter == nil || text == "" {
 		return
 	}
-	// Intent: Write line-oriented stream content so the canary stdout/log shows
-	// live reasoning-summary and visible-output deltas without corrupting the
-	// provider response text used for JSON parsing. Source: DI-vadub
+	// Intent: Write line-oriented visible-output stream content so canary
+	// stdout/logs show JSON-output progress and reasoning-summary part events
+	// without corrupting the provider response text used for JSON parsing. Source:
+	// DI-vadub; DI-babik; DI-vajut; DI-sakam
 	if _, err := fmt.Fprintf(provider.StreamContentWriter, "[openai-stream] attempt=%d type=%s delta=%q\n", attempt, eventType, text); err != nil {
+		provider.debugf("attempt=%d event=stream_content_write_error type=%q error=%q", attempt, eventType, err.Error())
+	}
+}
+
+func (provider OpenAIProvider) writeStreamProgressDot(attempt int, eventType string) {
+	if provider.StreamContentWriter == nil {
+		return
+	}
+	// Intent: Show that reasoning-summary streaming is alive without printing
+	// summary event names or summary text into the canary transcript. Source:
+	// DI-babik
+	if _, err := fmt.Fprint(provider.StreamContentWriter, "."); err != nil {
 		provider.debugf("attempt=%d event=stream_content_write_error type=%q error=%q", attempt, eventType, err.Error())
 	}
 }

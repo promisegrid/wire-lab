@@ -1,0 +1,560 @@
+{
+  "schema": "promisegrid.ga.state.v1",
+  "run_group_id": "ga-canary-20260520-215120",
+  "created_at": "2026-05-20T21:51:21Z",
+  "updated_at": "2026-05-20T22:07:13Z",
+  "repo_commit": "61993e3c90fc94a518fb9fd5992aa59cc95e5dc0",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "population": [
+    {
+      "sim_id": "SIM-bobud-l6-cas-starting-profile-bakeoff",
+      "path": "simulations/SIM-bobud-l6-cas-starting-profile-bakeoff/",
+      "tree_hash": "05b70394b6a32ed64dbb54186095554efeecac7583309b5802cbcd752645b6cc"
+    },
+    {
+      "sim_id": "SIM-bohof-group-session-freeze-promise",
+      "path": "simulations/SIM-bohof-group-session-freeze-promise/",
+      "tree_hash": "333676907f990d9bd1bb91cc9b0c0a4ecb629a615ebb1bec82f88f3c12db307a"
+    },
+    {
+      "sim_id": "SIM-dihiz-peer-adoption-metadata",
+      "path": "simulations/SIM-dihiz-peer-adoption-metadata/",
+      "tree_hash": "0ef52f12b43c93b29474d07d492db05c900b139eef70ae86b40afdadc6413501"
+    },
+    {
+      "sim_id": "SIM-dorut-grid-envelope-enc-cbor-unknown-hard-reject-sig-wrapper-pcid",
+      "path": "simulations/SIM-dorut-grid-envelope-enc-cbor-unknown-hard-reject-sig-wrapper-pcid/",
+      "tree_hash": "50242ebc807aae53051606d642abf07404c95576243dbe41336a113a8f6970bb"
+    },
+    {
+      "sim_id": "SIM-fonig-grid-envelope-enc-cbor-unknown-best-effort-sig-unsigned-v0",
+      "path": "simulations/SIM-fonig-grid-envelope-enc-cbor-unknown-best-effort-sig-unsigned-v0/",
+      "tree_hash": "23f5d289e0986e4bb57324238374ffc087026f54fdea244bcf080a22de738036"
+    },
+    {
+      "sim_id": "SIM-fonol-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-mandatory-opaque-bytes",
+      "path": "simulations/SIM-fonol-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-mandatory-opaque-bytes/",
+      "tree_hash": "44f3c24c3bba709fc9084c9b7b00d63db3f0a9184926cc751ab92633c53a6bae"
+    },
+    {
+      "sim_id": "SIM-gasus-grid-envelope-enc-cbor-unknown-opaque-sig-unsigned-v0",
+      "path": "simulations/SIM-gasus-grid-envelope-enc-cbor-unknown-opaque-sig-unsigned-v0/",
+      "tree_hash": "1a62ac77b896a9bb889f3312e61162d60d5e02c5fa1415afad123d5463a83ece"
+    },
+    {
+      "sim_id": "SIM-gazan-grid-envelope-enc-cbor-unknown-hard-reject-sig-unsigned-v0",
+      "path": "simulations/SIM-gazan-grid-envelope-enc-cbor-unknown-hard-reject-sig-unsigned-v0/",
+      "tree_hash": "988ac72d01c01d1a0ed98ef495d793957da140b4d288cb00aa0088c9cb9ca647"
+    },
+    {
+      "sim_id": "SIM-gobaz-chunking-identity-bakeoff",
+      "path": "simulations/SIM-gobaz-chunking-identity-bakeoff/",
+      "tree_hash": "80b24fcfe45fcf87e4142316d0ddc727894c0ddc0baf2795d4ec63555d4e6e20"
+    },
+    {
+      "sim_id": "SIM-gojot-grid-envelope-enc-dag-cbor-unknown-opaque-sig-wrapper-pcid",
+      "path": "simulations/SIM-gojot-grid-envelope-enc-dag-cbor-unknown-opaque-sig-wrapper-pcid/",
+      "tree_hash": "9e114c7aa2aa728b929b6162d361c7f7fbb6d464ac69d30f8b4f563b5354d8df"
+    },
+    {
+      "sim_id": "SIM-guhor-grid-envelope-enc-cbor-unknown-best-effort-sig-mandatory-opaque-bytes",
+      "path": "simulations/SIM-guhor-grid-envelope-enc-cbor-unknown-best-effort-sig-mandatory-opaque-bytes/",
+      "tree_hash": "d31569a6a684e574940f7156736bbf02b5789289cb2520469fd57807458c1a18"
+    },
+    {
+      "sim_id": "SIM-hagom-grid-envelope-enc-dag-cbor-unknown-opaque-sig-unsigned-v0",
+      "path": "simulations/SIM-hagom-grid-envelope-enc-dag-cbor-unknown-opaque-sig-unsigned-v0/",
+      "tree_hash": "228178578418dd49b30e5abae06099d74ee881b317085859e039cf08c8a0ebd6"
+    },
+    {
+      "sim_id": "SIM-haros-promise-economy-spectrum",
+      "path": "simulations/SIM-haros-promise-economy-spectrum/",
+      "tree_hash": "9bec8ccc55bf0facdc8b02ab1e4bef63f00c5365221db31af036b09b4ec1aaac"
+    },
+    {
+      "sim_id": "SIM-hiviv-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-unsigned-v0",
+      "path": "simulations/SIM-hiviv-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-unsigned-v0/",
+      "tree_hash": "d0c4f015c61aa7a511cf00b0bf45ce39d9ecc8a54b12363a6abd232a452342cf"
+    },
+    {
+      "sim_id": "SIM-hugoj-cas-usenetlike-gitlike",
+      "path": "simulations/SIM-hugoj-cas-usenetlike-gitlike/",
+      "tree_hash": "144951c8a39cbb610ac9d305fe823308c60e01e271c2f3b222a32276d4a196ef"
+    },
+    {
+      "sim_id": "SIM-hupir-grid-envelope-enc-cbor-unknown-hard-reject-sig-mandatory-opaque-bytes",
+      "path": "simulations/SIM-hupir-grid-envelope-enc-cbor-unknown-hard-reject-sig-mandatory-opaque-bytes/",
+      "tree_hash": "8cf2242305b6f3d92194a5e4881f8b3b8adf8a39e25bc1237713cc887e1ec805"
+    },
+    {
+      "sim_id": "SIM-johum-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-wrapper-pcid",
+      "path": "simulations/SIM-johum-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-wrapper-pcid/",
+      "tree_hash": "cfea4f21c240950e568c6e59cdc5e33ecb81989d8d42c9188a1b52c94462cd6c"
+    },
+    {
+      "sim_id": "SIM-jokak-grid-envelope-enc-cbor-unknown-best-effort-sig-mandatory-sig-pcid-payload",
+      "path": "simulations/SIM-jokak-grid-envelope-enc-cbor-unknown-best-effort-sig-mandatory-sig-pcid-payload/",
+      "tree_hash": "70c6a17b236d0e9f1ba89621ed8e390e4169976db54f9ebcc2337ee9d9646834"
+    },
+    {
+      "sim_id": "SIM-jomag-cas-object-model",
+      "path": "simulations/SIM-jomag-cas-object-model/",
+      "tree_hash": "db2c26d2e739adab24964d5eaedae274932fae7b8259e05761250abc421e0e23"
+    },
+    {
+      "sim_id": "SIM-jurar-cas-backed-group-session",
+      "path": "simulations/SIM-jurar-cas-backed-group-session/",
+      "tree_hash": "cfc13d1751e31648002a01d4444f33c759361450ba245d0441bce016fede46be"
+    },
+    {
+      "sim_id": "SIM-kohad-cas-object-type-binding-bakeoff",
+      "path": "simulations/SIM-kohad-cas-object-type-binding-bakeoff/",
+      "tree_hash": "74e9e595d3f4ba7176284cbe48983486dc9c06a9a2f4a2ec1d972edddb52a018"
+    },
+    {
+      "sim_id": "SIM-kovis-grid-envelope-enc-cbor-unknown-hard-reject-sig-mandatory-sig-pcid-payload",
+      "path": "simulations/SIM-kovis-grid-envelope-enc-cbor-unknown-hard-reject-sig-mandatory-sig-pcid-payload/",
+      "tree_hash": "eb72da938d67fc2ce8cce48ed81dd825940a7993a82a9dbc4bf42acd39a1dadc"
+    },
+    {
+      "sim_id": "SIM-kuful-udp-feed-v0-conformance",
+      "path": "simulations/SIM-kuful-udp-feed-v0-conformance/",
+      "tree_hash": "8b600e965000d8b48f7f6a6f24015afafc6f507a49480afc1214915dd5143ae0"
+    },
+    {
+      "sim_id": "SIM-kurim-grid-envelope",
+      "path": "simulations/SIM-kurim-grid-envelope/",
+      "tree_hash": "fa6038ce0391ca93197d19e4abf1961aa0ec1999946380f0b4eb8ce7d5012d39"
+    },
+    {
+      "sim_id": "SIM-labit-feed-outer",
+      "path": "simulations/SIM-labit-feed-outer/",
+      "tree_hash": "060eb3fe3a7c63ee4e88f66a0c9af758b9e7d2219b68b87c5b132ff2fb7c50ff"
+    },
+    {
+      "sim_id": "SIM-ligan-promisebase-reference-naming",
+      "path": "simulations/SIM-ligan-promisebase-reference-naming/",
+      "tree_hash": "e5bd7100c41c5eadf9e6dc4ddf7490d3c40ebecb498e9b79801fa466762d723f"
+    },
+    {
+      "sim_id": "SIM-ludaf-udp-feed",
+      "path": "simulations/SIM-ludaf-udp-feed/",
+      "tree_hash": "1f626da6f8c3305ac8a02bdbbbb9f66cdcfdba59ebd91dff2433acf4ec107c93"
+    },
+    {
+      "sim_id": "SIM-ludut-wire-lab-devs",
+      "path": "simulations/SIM-ludut-wire-lab-devs/",
+      "tree_hash": "0ea8781ea8d19089355073cde98e1e93ac60fbf3c7e2267a3dc85687acec43f1"
+    },
+    {
+      "sim_id": "SIM-mahih-grid-envelope-enc-cbor-unknown-opaque-sig-wrapper-pcid",
+      "path": "simulations/SIM-mahih-grid-envelope-enc-cbor-unknown-opaque-sig-wrapper-pcid/",
+      "tree_hash": "f4a70d5b05c7608d49fe60e0bfd51e87f1cf701aafad2970df62c7bcf9922a6d"
+    },
+    {
+      "sim_id": "SIM-narok-transport-family-bakeoff",
+      "path": "simulations/SIM-narok-transport-family-bakeoff/",
+      "tree_hash": "84e59195b3a55583b569459455ac9712e39a1ef1af9eda1473b948c1e74256fb"
+    },
+    {
+      "sim_id": "SIM-nipoh-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-wrapper-pcid",
+      "path": "simulations/SIM-nipoh-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-wrapper-pcid/",
+      "tree_hash": "90a6dd3091fcccc5e5fef0a39e859ae00100ea2a89b212ac10fc2fc2aca1d42e"
+    },
+    {
+      "sim_id": "SIM-punaz-bgp-class-routing-app",
+      "path": "simulations/SIM-punaz-bgp-class-routing-app/",
+      "tree_hash": "26522373a19fa0133724841a623a140f3d283f0339c77cbea330d3d0c0679526"
+    },
+    {
+      "sim_id": "SIM-rakir-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-mandatory-sig-pcid-payload",
+      "path": "simulations/SIM-rakir-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-mandatory-sig-pcid-payload/",
+      "tree_hash": "92c5d8e985a5266b1219c5985a1305bcf0ecba2bd5929def1374240a00e8a528"
+    },
+    {
+      "sim_id": "SIM-rakot-group-session",
+      "path": "simulations/SIM-rakot-group-session/",
+      "tree_hash": "1525fe7dd6097b1f62bfc62bfc8f9bdcd452f9e7cc0f5ead8af9278b753e2e16"
+    },
+    {
+      "sim_id": "SIM-ranib-spec-requirement-sections",
+      "path": "simulations/SIM-ranib-spec-requirement-sections/",
+      "tree_hash": "c7e6b37d3b7df0b56b76185ed425d704c1d4c51c137ea948a94a2e0879056a08"
+    },
+    {
+      "sim_id": "SIM-riliz-grid-envelope-enc-dag-cbor-unknown-opaque-sig-mandatory-sig-pcid-payload",
+      "path": "simulations/SIM-riliz-grid-envelope-enc-dag-cbor-unknown-opaque-sig-mandatory-sig-pcid-payload/",
+      "tree_hash": "d85aac8e8bda9ef21343c7364adf6fa3924c754abc3105e7384fda1d516fc3e7"
+    },
+    {
+      "sim_id": "SIM-rusap-promise-accounting-records",
+      "path": "simulations/SIM-rusap-promise-accounting-records/",
+      "tree_hash": "68329074b8fdfa8199d800aa9b183175c63a167ec55be34403848d91944509f8"
+    },
+    {
+      "sim_id": "SIM-ruzil-grid-envelope-enc-dag-cbor-unknown-opaque-sig-mandatory-opaque-bytes",
+      "path": "simulations/SIM-ruzil-grid-envelope-enc-dag-cbor-unknown-opaque-sig-mandatory-opaque-bytes/",
+      "tree_hash": "6f2afd5b2d31d78758925a1d4cc49a6ff4815410d9c349068bee0c088e5b43e1"
+    },
+    {
+      "sim_id": "SIM-sivus-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-mandatory-sig-pcid-payload",
+      "path": "simulations/SIM-sivus-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-mandatory-sig-pcid-payload/",
+      "tree_hash": "3ce175e89ae14c517939db9039e2af1f4ff2a4c2050a7556ac94d6435a2f0006"
+    },
+    {
+      "sim_id": "SIM-tohol-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-mandatory-opaque-bytes",
+      "path": "simulations/SIM-tohol-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-mandatory-opaque-bytes/",
+      "tree_hash": "86ce37ad43c89feda138427cb7edc9ad2cb1998b2b8412246fbc9ce1dc3d2490"
+    },
+    {
+      "sim_id": "SIM-vamaz-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-sig-pcid-payload",
+      "path": "simulations/SIM-vamaz-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-sig-pcid-payload/",
+      "tree_hash": "93c691c8787dbdc8be5fa107abae8706592ce57ce7b958a885d7cb1d577d0c1d"
+    },
+    {
+      "sim_id": "SIM-vivus-grid-envelope-enc-cbor-unknown-best-effort-sig-wrapper-pcid",
+      "path": "simulations/SIM-vivus-grid-envelope-enc-cbor-unknown-best-effort-sig-wrapper-pcid/",
+      "tree_hash": "58aac6347a21eca760edb90e4c33f9105046b86ff556ebea7d7e85182b7d0552"
+    },
+    {
+      "sim_id": "SIM-vutar-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-opaque-bytes",
+      "path": "simulations/SIM-vutar-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-opaque-bytes/",
+      "tree_hash": "ae895e6a4a91751df8c391916c0c07169b9eacd5bb19a9992dfe10475f0a7419"
+    },
+    {
+      "sim_id": "SIM-zarud-conditional-release-geofencing",
+      "path": "simulations/SIM-zarud-conditional-release-geofencing/",
+      "tree_hash": "533f88600b1231b2c1a16d7d0480a824ff426d41dfe52fefd83961cc9418175b"
+    },
+    {
+      "sim_id": "SIM-zazit-chunk-feed-replication",
+      "path": "simulations/SIM-zazit-chunk-feed-replication/",
+      "tree_hash": "94381ef3396f4ec015b5541f34f6cad3d2c0b91cb56ed045c718bef55345de2e"
+    },
+    {
+      "sim_id": "SIM-zifik-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-unsigned-v0",
+      "path": "simulations/SIM-zifik-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-unsigned-v0/",
+      "tree_hash": "588cdf7a9d0f14b9081b539d842ede027573f04c728321fa2ff7ea996f79a7da"
+    }
+  ],
+  "scenario_sample": [
+    {
+      "scenario_id": "conditional-release-geofencing-geofenced-group-dispatch",
+      "path": "scenarios/conditional-release-geofencing-geofenced-group-dispatch/conditional-release-geofencing-geofenced-group-dispatch.md",
+      "sample_policy": "uniform root scenario sample",
+      "sha256": "dfaec0e42e4cfba477dc36edf128f921a287397d594bbac280e43548c4aaff85"
+    },
+    {
+      "scenario_id": "insurance-claims",
+      "path": "scenarios/insurance-claims/insurance-claims.md",
+      "sample_policy": "uniform root scenario sample",
+      "sha256": "2a9fe6a4c9a84a35f032d93ae9c36d2adec30a8175f821a34cf8592c73810ab1"
+    },
+    {
+      "scenario_id": "bgp-class-routing-app-route-hijack",
+      "path": "scenarios/bgp-class-routing-app-route-hijack/bgp-class-routing-app-route-hijack.md",
+      "sample_policy": "uniform root scenario sample",
+      "sha256": "2b52846b0be0b637d2764ba26854441dd9e4fc8ce7323a5b74a740c0756cca61"
+    }
+  ],
+  "parents": [
+    {
+      "sim_id": "SIM-zazit-chunk-feed-replication",
+      "rationale": "fitness-ranked selected-parent pool avg_normalized_0_100=56.00 samples=3"
+    },
+    {
+      "sim_id": "SIM-johum-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-wrapper-pcid",
+      "rationale": "fitness-ranked selected-parent pool avg_normalized_0_100=53.00 samples=3"
+    },
+    {
+      "sim_id": "SIM-vutar-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-opaque-bytes",
+      "rationale": "fitness-ranked selected-parent pool avg_normalized_0_100=52.90 samples=3"
+    }
+  ],
+  "children": [
+    {
+      "child_id": "SIM-gakan-ga-child-0001",
+      "path": "simulations/SIM-gakan-ga-child-0001/",
+      "parent_ids": [
+        "SIM-zazit-chunk-feed-replication",
+        "SIM-johum-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-wrapper-pcid"
+      ],
+      "operation": "breed",
+      "prompt_hash": "328ed77a161ce4d541c6e370cfb0b53eb1337d7371e2e557af8cf031b0257577",
+      "tree_hash": "",
+      "status": "skipped",
+      "validation_message": "skipped after child generation failure: openai request failed after 2 attempts over 10m15s: context deadline exceeded",
+      "updated_at": "2026-05-20T22:07:13Z",
+      "provider": "openai",
+      "api_model": "gpt-5.4",
+      "reasoning_effort": "xhigh",
+      "service_tier": "default"
+    },
+    {
+      "child_id": "SIM-gifoh-ga-child-0002",
+      "path": "simulations/SIM-gifoh-ga-child-0002/",
+      "parent_ids": [
+        "SIM-zazit-chunk-feed-replication",
+        "SIM-johum-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-wrapper-pcid"
+      ],
+      "operation": "breed",
+      "prompt_hash": "5bc233fd18aaad5aa30e18f18cb90e0884bf07c67cae011ebd489ac4c129d4e3",
+      "tree_hash": "",
+      "status": "running",
+      "validation_message": "provider call started",
+      "updated_at": "2026-05-20T22:07:13Z",
+      "provider": "openai",
+      "api_model": "gpt-5.4",
+      "reasoning_effort": "xhigh",
+      "service_tier": "default"
+    }
+  ],
+  "cells": [
+    {
+      "cell_id": "ga-canary-20260520-215120-000001-SIM-johum-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-wrapper-pcid--conditional-release-geofencing-geofenced-group-dispatch--openai-gpt-5.4-xhigh",
+      "sim_id": "SIM-johum-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-wrapper-pcid",
+      "scenario_id": "conditional-release-geofencing-geofenced-group-dispatch",
+      "model_id": "openai-gpt-5.4-xhigh",
+      "result_path": "results/SIM-johum-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-wrapper-pcid/conditional-release-geofencing-geofenced-group-dispatch/openai-gpt-5.4-xhigh/20260520-215120.json",
+      "status": "done",
+      "attempts": 1,
+      "validation_message": "validated result",
+      "updated_at": "2026-05-20T21:53:50Z",
+      "provider": "openai",
+      "api_model": "gpt-5.4",
+      "reasoning_effort": "xhigh",
+      "service_tier": "default",
+      "served_service_tier": "default",
+      "request_id": "req_c473bfc1346f919bb3487188a7e1a278",
+      "response_id": "resp_0e99da1317f51ff1006a0e2cda9620819bbaf6eb881bd03d91",
+      "usage_json": "{\"input_tokens\":6541,\"input_tokens_details\":{\"cached_tokens\":0},\"output_tokens\":10442,\"output_tokens_details\":{\"reasoning_tokens\":10028},\"total_tokens\":16983}",
+      "input_tokens": 6541,
+      "output_tokens": 10442,
+      "cost_usd": 0.15763475
+    },
+    {
+      "cell_id": "ga-canary-20260520-215120-000002-SIM-johum-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-wrapper-pcid--insurance-claims--openai-gpt-5.4-xhigh",
+      "sim_id": "SIM-johum-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-wrapper-pcid",
+      "scenario_id": "insurance-claims",
+      "model_id": "openai-gpt-5.4-xhigh",
+      "result_path": "results/SIM-johum-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-wrapper-pcid/insurance-claims/openai-gpt-5.4-xhigh/20260520-215120.json",
+      "status": "done",
+      "attempts": 1,
+      "validation_message": "validated result",
+      "updated_at": "2026-05-20T21:54:04Z",
+      "provider": "openai",
+      "api_model": "gpt-5.4",
+      "reasoning_effort": "xhigh",
+      "service_tier": "default",
+      "served_service_tier": "default",
+      "request_id": "req_842c426fd5164bb4ad70be65796a3aae",
+      "response_id": "resp_0614398bc472f772006a0e2cda96d88199a5ab1324770945aa",
+      "usage_json": "{\"input_tokens\":6574,\"input_tokens_details\":{\"cached_tokens\":0},\"output_tokens\":10812,\"output_tokens_details\":{\"reasoning_tokens\":10352},\"total_tokens\":17386}",
+      "input_tokens": 6574,
+      "output_tokens": 10812,
+      "cost_usd": 0.1628725
+    },
+    {
+      "cell_id": "ga-canary-20260520-215120-000003-SIM-johum-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-wrapper-pcid--bgp-class-routing-app-route-hijack--openai-gpt-5.4-xhigh",
+      "sim_id": "SIM-johum-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-wrapper-pcid",
+      "scenario_id": "bgp-class-routing-app-route-hijack",
+      "model_id": "openai-gpt-5.4-xhigh",
+      "result_path": "results/SIM-johum-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-wrapper-pcid/bgp-class-routing-app-route-hijack/openai-gpt-5.4-xhigh/20260520-215120.json",
+      "status": "done",
+      "attempts": 1,
+      "validation_message": "validated result",
+      "updated_at": "2026-05-20T21:53:57Z",
+      "provider": "openai",
+      "api_model": "gpt-5.4",
+      "reasoning_effort": "xhigh",
+      "service_tier": "default",
+      "served_service_tier": "default",
+      "request_id": "req_4ace25dff05e4587991a2b0e335727fc",
+      "response_id": "resp_09a13055eb2dede8006a0e2cda8c68819b956bd4bab70f4210",
+      "usage_json": "{\"input_tokens\":6502,\"input_tokens_details\":{\"cached_tokens\":0},\"output_tokens\":10615,\"output_tokens_details\":{\"reasoning_tokens\":10197},\"total_tokens\":17117}",
+      "input_tokens": 6502,
+      "output_tokens": 10615,
+      "cost_usd": 0.1599885
+    },
+    {
+      "cell_id": "ga-canary-20260520-215120-000004-SIM-vutar-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-opaque-bytes--conditional-release-geofencing-geofenced-group-dispatch--openai-gpt-5.4-xhigh",
+      "sim_id": "SIM-vutar-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-opaque-bytes",
+      "scenario_id": "conditional-release-geofencing-geofenced-group-dispatch",
+      "model_id": "openai-gpt-5.4-xhigh",
+      "result_path": "results/SIM-vutar-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-opaque-bytes/conditional-release-geofencing-geofenced-group-dispatch/openai-gpt-5.4-xhigh/20260520-215120.json",
+      "status": "done",
+      "attempts": 1,
+      "validation_message": "validated result",
+      "updated_at": "2026-05-20T21:54:09Z",
+      "provider": "openai",
+      "api_model": "gpt-5.4",
+      "reasoning_effort": "xhigh",
+      "service_tier": "default",
+      "served_service_tier": "default",
+      "request_id": "req_96febcca0ee9486d8c88bd367f079705",
+      "response_id": "resp_0412f2199b20b386006a0e2cda943c819ab5ba009823a49b6c",
+      "usage_json": "{\"input_tokens\":6555,\"input_tokens_details\":{\"cached_tokens\":0},\"output_tokens\":10723,\"output_tokens_details\":{\"reasoning_tokens\":10292},\"total_tokens\":17278}",
+      "input_tokens": 6555,
+      "output_tokens": 10723,
+      "cost_usd": 0.16159325
+    },
+    {
+      "cell_id": "ga-canary-20260520-215120-000005-SIM-vutar-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-opaque-bytes--insurance-claims--openai-gpt-5.4-xhigh",
+      "sim_id": "SIM-vutar-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-opaque-bytes",
+      "scenario_id": "insurance-claims",
+      "model_id": "openai-gpt-5.4-xhigh",
+      "result_path": "results/SIM-vutar-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-opaque-bytes/insurance-claims/openai-gpt-5.4-xhigh/20260520-215120.json",
+      "status": "done",
+      "attempts": 1,
+      "validation_message": "validated result",
+      "updated_at": "2026-05-20T21:54:18Z",
+      "provider": "openai",
+      "api_model": "gpt-5.4",
+      "reasoning_effort": "xhigh",
+      "service_tier": "default",
+      "served_service_tier": "default",
+      "request_id": "req_a092d33f1f464b369e75dd49cc085be5",
+      "response_id": "resp_0b5215d8cb283d51006a0e2cda8de08198b7740815b8c63ce6",
+      "usage_json": "{\"input_tokens\":6588,\"input_tokens_details\":{\"cached_tokens\":0},\"output_tokens\":11955,\"output_tokens_details\":{\"reasoning_tokens\":11579},\"total_tokens\":18543}",
+      "input_tokens": 6588,
+      "output_tokens": 11955,
+      "cost_usd": 0.178899
+    },
+    {
+      "cell_id": "ga-canary-20260520-215120-000006-SIM-vutar-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-opaque-bytes--bgp-class-routing-app-route-hijack--openai-gpt-5.4-xhigh",
+      "sim_id": "SIM-vutar-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-opaque-bytes",
+      "scenario_id": "bgp-class-routing-app-route-hijack",
+      "model_id": "openai-gpt-5.4-xhigh",
+      "result_path": "results/SIM-vutar-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-opaque-bytes/bgp-class-routing-app-route-hijack/openai-gpt-5.4-xhigh/20260520-215120.json",
+      "status": "done",
+      "attempts": 1,
+      "validation_message": "validated result",
+      "updated_at": "2026-05-20T21:54:42Z",
+      "provider": "openai",
+      "api_model": "gpt-5.4",
+      "reasoning_effort": "xhigh",
+      "service_tier": "default",
+      "served_service_tier": "default",
+      "request_id": "req_673244852dfe42609df9ba6a4be1dd6f",
+      "response_id": "resp_0020a864de7ccd15006a0e2cda8db88199b1934f1bdc7a9ae1",
+      "usage_json": "{\"input_tokens\":6516,\"input_tokens_details\":{\"cached_tokens\":0},\"output_tokens\":11979,\"output_tokens_details\":{\"reasoning_tokens\":11612},\"total_tokens\":18495}",
+      "input_tokens": 6516,
+      "output_tokens": 11979,
+      "cost_usd": 0.179109
+    },
+    {
+      "cell_id": "ga-canary-20260520-215120-000007-SIM-zazit-chunk-feed-replication--conditional-release-geofencing-geofenced-group-dispatch--openai-gpt-5.4-xhigh",
+      "sim_id": "SIM-zazit-chunk-feed-replication",
+      "scenario_id": "conditional-release-geofencing-geofenced-group-dispatch",
+      "model_id": "openai-gpt-5.4-xhigh",
+      "result_path": "results/SIM-zazit-chunk-feed-replication/conditional-release-geofencing-geofenced-group-dispatch/openai-gpt-5.4-xhigh/20260520-215120.json",
+      "status": "done",
+      "attempts": 1,
+      "validation_message": "validated result",
+      "updated_at": "2026-05-20T21:56:55Z",
+      "provider": "openai",
+      "api_model": "gpt-5.4",
+      "reasoning_effort": "xhigh",
+      "service_tier": "default",
+      "served_service_tier": "default",
+      "request_id": "req_0bad6baac19f45b4800d9c29ca7fe0af",
+      "response_id": "resp_028a0ea86c052ed1006a0e2d6ec8ac819bac080a2cfd921bd5",
+      "usage_json": "{\"input_tokens\":6851,\"input_tokens_details\":{\"cached_tokens\":0},\"output_tokens\":11514,\"output_tokens_details\":{\"reasoning_tokens\":11076},\"total_tokens\":18365}",
+      "input_tokens": 6851,
+      "output_tokens": 11514,
+      "cost_usd": 0.17318525
+    },
+    {
+      "cell_id": "ga-canary-20260520-215120-000008-SIM-zazit-chunk-feed-replication--insurance-claims--openai-gpt-5.4-xhigh",
+      "sim_id": "SIM-zazit-chunk-feed-replication",
+      "scenario_id": "insurance-claims",
+      "model_id": "openai-gpt-5.4-xhigh",
+      "result_path": "results/SIM-zazit-chunk-feed-replication/insurance-claims/openai-gpt-5.4-xhigh/20260520-215120.json",
+      "status": "done",
+      "attempts": 1,
+      "validation_message": "validated result",
+      "updated_at": "2026-05-20T21:56:06Z",
+      "provider": "openai",
+      "api_model": "gpt-5.4",
+      "reasoning_effort": "xhigh",
+      "service_tier": "default",
+      "served_service_tier": "default",
+      "request_id": "req_9b78f268437e480a833ec04104dbba7a",
+      "response_id": "resp_08de81f8d5390432006a0e2d758218819bb18db8f39f2b8b01",
+      "usage_json": "{\"input_tokens\":6884,\"input_tokens_details\":{\"cached_tokens\":0},\"output_tokens\":8725,\"output_tokens_details\":{\"reasoning_tokens\":8324},\"total_tokens\":15609}",
+      "input_tokens": 6884,
+      "output_tokens": 8725,
+      "cost_usd": 0.134197
+    },
+    {
+      "cell_id": "ga-canary-20260520-215120-000009-SIM-zazit-chunk-feed-replication--bgp-class-routing-app-route-hijack--openai-gpt-5.4-xhigh",
+      "sim_id": "SIM-zazit-chunk-feed-replication",
+      "scenario_id": "bgp-class-routing-app-route-hijack",
+      "model_id": "openai-gpt-5.4-xhigh",
+      "result_path": "results/SIM-zazit-chunk-feed-replication/bgp-class-routing-app-route-hijack/openai-gpt-5.4-xhigh/20260520-215120.json",
+      "status": "done",
+      "attempts": 1,
+      "validation_message": "validated result",
+      "updated_at": "2026-05-20T21:55:28Z",
+      "provider": "openai",
+      "api_model": "gpt-5.4",
+      "reasoning_effort": "xhigh",
+      "service_tier": "default",
+      "served_service_tier": "default",
+      "request_id": "req_73cd1f69bd6647adbb06b3ed80085a47",
+      "response_id": "resp_001712c156580740006a0e2d7c25fc819ab80035d78261274f",
+      "usage_json": "{\"input_tokens\":6812,\"input_tokens_details\":{\"cached_tokens\":0},\"output_tokens\":6009,\"output_tokens_details\":{\"reasoning_tokens\":5696},\"total_tokens\":12821}",
+      "input_tokens": 6812,
+      "output_tokens": 6009,
+      "cost_usd": 0.096047
+    },
+    {
+      "cell_id": "ga-canary-20260520-215120-000010-SIM-gakan-ga-child-0001--conditional-release-geofencing-geofenced-group-dispatch--openai-gpt-5.4-xhigh",
+      "sim_id": "SIM-gakan-ga-child-0001",
+      "scenario_id": "conditional-release-geofencing-geofenced-group-dispatch",
+      "model_id": "openai-gpt-5.4-xhigh",
+      "result_path": "results/SIM-gakan-ga-child-0001/conditional-release-geofencing-geofenced-group-dispatch/openai-gpt-5.4-xhigh/20260520-215120.json",
+      "status": "queued"
+    },
+    {
+      "cell_id": "ga-canary-20260520-215120-000011-SIM-gakan-ga-child-0001--insurance-claims--openai-gpt-5.4-xhigh",
+      "sim_id": "SIM-gakan-ga-child-0001",
+      "scenario_id": "insurance-claims",
+      "model_id": "openai-gpt-5.4-xhigh",
+      "result_path": "results/SIM-gakan-ga-child-0001/insurance-claims/openai-gpt-5.4-xhigh/20260520-215120.json",
+      "status": "queued"
+    },
+    {
+      "cell_id": "ga-canary-20260520-215120-000012-SIM-gakan-ga-child-0001--bgp-class-routing-app-route-hijack--openai-gpt-5.4-xhigh",
+      "sim_id": "SIM-gakan-ga-child-0001",
+      "scenario_id": "bgp-class-routing-app-route-hijack",
+      "model_id": "openai-gpt-5.4-xhigh",
+      "result_path": "results/SIM-gakan-ga-child-0001/bgp-class-routing-app-route-hijack/openai-gpt-5.4-xhigh/20260520-215120.json",
+      "status": "queued"
+    },
+    {
+      "cell_id": "ga-canary-20260520-215120-000013-SIM-gifoh-ga-child-0002--conditional-release-geofencing-geofenced-group-dispatch--openai-gpt-5.4-xhigh",
+      "sim_id": "SIM-gifoh-ga-child-0002",
+      "scenario_id": "conditional-release-geofencing-geofenced-group-dispatch",
+      "model_id": "openai-gpt-5.4-xhigh",
+      "result_path": "results/SIM-gifoh-ga-child-0002/conditional-release-geofencing-geofenced-group-dispatch/openai-gpt-5.4-xhigh/20260520-215120.json",
+      "status": "queued"
+    },
+    {
+      "cell_id": "ga-canary-20260520-215120-000014-SIM-gifoh-ga-child-0002--insurance-claims--openai-gpt-5.4-xhigh",
+      "sim_id": "SIM-gifoh-ga-child-0002",
+      "scenario_id": "insurance-claims",
+      "model_id": "openai-gpt-5.4-xhigh",
+      "result_path": "results/SIM-gifoh-ga-child-0002/insurance-claims/openai-gpt-5.4-xhigh/20260520-215120.json",
+      "status": "queued"
+    },
+    {
+      "cell_id": "ga-canary-20260520-215120-000015-SIM-gifoh-ga-child-0002--bgp-class-routing-app-route-hijack--openai-gpt-5.4-xhigh",
+      "sim_id": "SIM-gifoh-ga-child-0002",
+      "scenario_id": "bgp-class-routing-app-route-hijack",
+      "model_id": "openai-gpt-5.4-xhigh",
+      "result_path": "results/SIM-gifoh-ga-child-0002/bgp-class-routing-app-route-hijack/openai-gpt-5.4-xhigh/20260520-215120.json",
+      "status": "queued"
+    }
+  ]
+}

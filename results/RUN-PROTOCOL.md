@@ -83,11 +83,13 @@ successful generation phase provides evidence for parallel child writes, and it
 must not dispatch concurrent cells or children past the configured run budget.
 Source: `DI-juzus`; `DI-tufud`; `DI-pivuj`; `DI-suzor`.
 
-Canary wrappers may request `reasoning.summary=auto` and mirror supported
-reasoning-summary and visible-output stream deltas to stdout/log. This is live
-diagnostic content for operator visibility; it is not raw hidden reasoning
-tokens, and raw commands should keep stdout stream content off unless explicitly
-requested. Source: `DI-vadub`.
+Canary wrappers may request `reasoning.summary=auto` and print one no-newline
+progress dot per supported reasoning-summary text-delta event while mirroring
+reasoning-summary part-added and part-done events plus visible-output stream
+deltas to stdout/log. The dot is a liveness diagnostic, not raw hidden reasoning
+or reasoning-summary delta content, and raw commands should keep stdout stream
+content off unless explicitly requested. Source: `DI-vadub`; `DI-babik`;
+`DI-vajut`; `DI-sakam`.
 
 Unattended canary-style GA runs may continue past unusable individual cells by
 using `score -skip-failed-cells` and `generate -skip-failed-children`. Skipped

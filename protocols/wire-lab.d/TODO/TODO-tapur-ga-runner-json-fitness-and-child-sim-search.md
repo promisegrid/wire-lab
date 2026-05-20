@@ -561,6 +561,71 @@ Affects: `tools/ga-runner/run-canary.sh`; `tools/ga-runner/README.md`;
 `protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`.
 Supersedes: `DI-pivuj` only for the default child-generation worker count.
 
+ID: DI-babik
+Date: 2026-05-20 14:55:52
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: For terminal canary stream-content output, do not print
+`response.reasoning_summary_text.delta` event names or reasoning-summary text;
+print one `.` with no newline for each reasoning-summary text delta event
+instead.
+Intent: Reasoning-summary text is useful for proving the provider is alive, but
+printing the event name and full summary content makes canary stdout/logs noisy
+and hard to scan. Progress dots preserve the liveness signal without exposing or
+interleaving summary content with JSON output diagnostics.
+Constraints: Keep visible `response.output_text.delta` mirroring available for
+JSON-output diagnosis. Do not alter the parsed provider response text used for
+result validation. Suppress reasoning-summary part text as well so no summary
+content reaches the canary content stream.
+Affects: `tools/ga-runner/openai.go`; `tools/ga-runner/ga_runner_test.go`;
+`tools/ga-runner/README.md`; `results/RUN-PROTOCOL.md`;
+`protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`.
+Supersedes: `DI-vadub` only for printing reasoning-summary event names and
+summary text to stdout/log.
+
+ID: DI-vajut
+Date: 2026-05-20 14:58:21
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Keep `response.reasoning_summary_text.delta` output as no-newline
+progress dots, but print `response.reasoning_summary_part.done` event names and
+content to the canary stream-content output.
+Intent: Delta events are too noisy when printed verbosely, but part-done events
+are coarse enough to be useful diagnostic summaries. The canary should show
+fine-grained liveness with dots while still preserving completed reasoning
+summary parts for operator review.
+Constraints: Do not print delta event names or delta content. Keep visible
+`response.output_text.delta` mirroring unchanged. Do not append
+reasoning-summary text to the parsed provider response used for result
+validation.
+Affects: `tools/ga-runner/openai.go`; `tools/ga-runner/ga_runner_test.go`;
+`tools/ga-runner/README.md`; `results/RUN-PROTOCOL.md`;
+`protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`.
+Supersedes: `DI-babik` only for suppressing
+`response.reasoning_summary_part.done` event names and content.
+
+ID: DI-sakam
+Date: 2026-05-20 15:01:24
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Print both `response.reasoning_summary_part.added` and
+`response.reasoning_summary_part.done` event names and content to canary
+stream-content output, while keeping `response.reasoning_summary_text.delta`
+events as no-newline progress dots only.
+Intent: Part-added and part-done events are useful coarse-grained summary
+markers, while text-delta events are too frequent and noisy. The canary should
+show progress for deltas without printing their event names or text, and should
+show summary-part boundaries and content when the provider emits them.
+Constraints: Do not print reasoning-summary text-delta event names or delta
+content. Keep visible `response.output_text.delta` mirroring unchanged. Do not
+append reasoning-summary text to the parsed provider response used for result
+validation.
+Affects: `tools/ga-runner/openai.go`; `tools/ga-runner/ga_runner_test.go`;
+`tools/ga-runner/README.md`; `results/RUN-PROTOCOL.md`;
+`protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`.
+Supersedes: `DI-vajut` only for omitting
+`response.reasoning_summary_part.added` event names and content.
+
 ## Scope
 
 - Define and implement a new GA/search runner without changing
@@ -821,6 +886,15 @@ status in the GA state file.
 - [x] tapur.25 Narrow the terminal canary default child-generation worker count
   back to one until a successful generation phase provides evidence for
   parallel child writes. Source: `DI-suzor`.
+- [x] tapur.26 Replace canary reasoning-summary stream-content text with one
+  no-newline progress dot per `response.reasoning_summary_text.delta` event.
+  Source: `DI-babik`.
+- [x] tapur.27 Restore canary `response.reasoning_summary_part.done` event names
+  and content while keeping text-delta events as no-newline progress dots.
+  Source: `DI-vajut`.
+- [x] tapur.28 Print canary `response.reasoning_summary_part.added` event names
+  and content as well, while keeping text-delta events as no-newline progress
+  dots. Source: `DI-sakam`.
 
 ## Predecessor context
 

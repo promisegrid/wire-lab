@@ -1,0 +1,119 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-zazit-chunk-feed-replication-conditional-release-geofencing-geofenced-group-dispatch-openai-gpt-5.4-xhigh-20260520-215120",
+  "run_group_id": "ga-canary-20260520-215120",
+  "cell_id": "ga-canary-20260520-215120-000007-SIM-zazit-chunk-feed-replication--conditional-release-geofencing-geofenced-group-dispatch--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-zazit-chunk-feed-replication",
+  "scenario_id": "conditional-release-geofencing-geofenced-group-dispatch",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260520-215120",
+  "result_path": "results/SIM-zazit-chunk-feed-replication/conditional-release-geofencing-geofenced-group-dispatch/openai-gpt-5.4-xhigh/20260520-215120.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_0bad6baac19f45b4800d9c29ca7fe0af",
+    "response_id": "resp_028a0ea86c052ed1006a0e2d6ec8ac819bac080a2cfd921bd5",
+    "input_tokens": 6851,
+    "output_tokens": 11514,
+    "cost_usd": 0.17318525
+  },
+  "source": {
+    "repo_commit": "61993e3c90fc94a518fb9fd5992aa59cc95e5dc0",
+    "sim_path": "simulations/SIM-zazit-chunk-feed-replication/",
+    "scenario_path": "scenarios/conditional-release-geofencing-geofenced-group-dispatch/conditional-release-geofencing-geofenced-group-dispatch.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "1c42f54c72b421470bcd50fafeab56322e0cb77b520d3e89c98f18b2cfbed82a"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-zazit-chunk-feed-replication/README.md",
+        "sha256": "cd88a0f7230f4184f9310a3813a09f27c83d6fe7ac85367abb6137815f104d4c"
+      },
+      {
+        "path": "simulations/SIM-zazit-chunk-feed-replication/QUESTION.md",
+        "sha256": "937bcf23041ee152f065192e9ad7943ca5e71e97df38c88afcddd4780f3bb563"
+      },
+      {
+        "path": "simulations/SIM-zazit-chunk-feed-replication/SCENARIOS.md",
+        "sha256": "0802fd455442a1a8a29a41e71ef80736c98239241d33ec79bd476202b0b2ebd6"
+      },
+      {
+        "path": "scenarios/conditional-release-geofencing-geofenced-group-dispatch/conditional-release-geofencing-geofenced-group-dispatch.md",
+        "sha256": "dfaec0e42e4cfba477dc36edf128f921a287397d594bbac280e43548c4aaff85"
+      }
+    ],
+    "simulation_tree_hash": "94381ef3396f4ec015b5541f34f6cad3d2c0b91cb56ed045c718bef55345de2e"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 4,
+    "auditability": 1,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 2,
+    "implementation_plausibility": 2,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 14,
+    "normalized_0_100": 40,
+    "confidence_0_1": 0.85
+  },
+  "assessment": {
+    "rationale": "SIM-zazit is useful mainly as a boundary-setting lower-layer study: it strongly suggests geofence policy should not live inside L5 chunk replication, and it gives local refusal/request/accounting hooks. But it does not model membership, location evidence, or owner-layer release and audit rules, so it only weakly covers geofenced group dispatch.",
+    "strengths": [
+      "Clearly keeps L5 feeds meaning-oblivious, reducing pressure to encode group or geofence semantics in chunk transport.",
+      "Fits PromiseGrid sparse-site and peer-local-accounting goals better than any central geofence oracle approach.",
+      "Treats refusal and non-response as normal observable outcomes that higher layers could record."
+    ],
+    "weaknesses": [
+      "No representation of group membership, regional claims, or geofence policy objects.",
+      "No owner-layer audit trail for why Carol was denied despite being a member.",
+      "Does not decide whether enforcement belongs at dispatch, fetch, storage, pointer-object, or key-release time."
+    ],
+    "risks": [
+      "If feed-level refusal is mistaken for complete enforcement, chunks may leak before policy is checked.",
+      "Without a non-central way to bind location evidence to release decisions, refusals remain hard to audit.",
+      "Previously replicated chunks create unresolved retention and eviction risk when a peer moves out of region."
+    ],
+    "open_questions": [
+      "What higher-layer artifact binds region policy to specific CAS roots, pointer objects, or keys?",
+      "What peer-local evidence can audit Alice's location-conditioned refusal without a central location oracle?",
+      "Should geofenced release be enforced by suppressing advertisements, refusing chunk transfer, withholding pointers, or withholding decryption keys?",
+      "If Carol already holds chunks from an earlier allowed state, what storage or retention promise applies after she leaves the region?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

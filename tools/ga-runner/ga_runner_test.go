@@ -1092,6 +1092,12 @@ func TestOpenAIProviderStreamsResponsesEvents(t *testing.T) {
 			`event: response.reasoning_summary_text.delta`,
 			`data: {"type":"response.reasoning_summary_text.delta","delta":"checking parent scores"}`,
 			``,
+			`event: response.reasoning_summary_part.added`,
+			`data: {"type":"response.reasoning_summary_part.added","part":{"text":"checking score evidence"}}`,
+			``,
+			`event: response.reasoning_summary_part.done`,
+			`data: {"type":"response.reasoning_summary_part.done","part":{"text":"checked parent scores"}}`,
+			``,
 			`event: response.output_text.delta`,
 			`data: {"type":"response.output_text.delta","delta":"{\"scores\":{"}`,
 			``,
@@ -1134,8 +1140,18 @@ func TestOpenAIProviderStreamsResponsesEvents(t *testing.T) {
 	if !strings.Contains(debug.String(), "event=stream_event") || !strings.Contains(debug.String(), `type="response.output_text.delta"`) || !strings.Contains(debug.String(), `type="response.completed"`) {
 		t.Fatalf("stream debug log missing liveness events:\n%s", debug.String())
 	}
+	for _, forbidden := range []string{
+		"checking parent scores",
+		"response.reasoning_summary_text.delta",
+	} {
+		if strings.Contains(streamContent.String(), forbidden) {
+			t.Fatalf("stream content leaked reasoning summary delta %q:\n%s", forbidden, streamContent.String())
+		}
+	}
 	for _, want := range []string{
-		`type=response.reasoning_summary_text.delta delta="checking parent scores"`,
+		`.`,
+		`type=response.reasoning_summary_part.added delta="checking score evidence"`,
+		`type=response.reasoning_summary_part.done delta="checked parent scores"`,
 		`type=response.output_text.delta delta="{\"scores\":{"`,
 	} {
 		if !strings.Contains(streamContent.String(), want) {

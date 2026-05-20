@@ -108,12 +108,15 @@ remains a conservative launch budget rather than a best-effort warning. Source:
 `DI-juzus`; `DI-tufud`; `DI-pivuj`; `DI-suzor`.
 
 The terminal canary opts into `-reasoning-summary auto` and
-`-stream-content-stdout=true` so stdout/logs show supported
-`response.reasoning_summary_text.delta` content and visible
-`response.output_text.delta` content while cells are running. This is reasoning
-summary output, not hidden raw reasoning tokens, which the OpenAI Responses API
-does not expose. Raw `score` and `generate` commands leave stdout stream content
-off unless requested explicitly. Source: `DI-vadub`.
+`-stream-content-stdout=true` so stdout/logs show one no-newline progress dot
+per `response.reasoning_summary_text.delta` event,
+`response.reasoning_summary_part.added` and
+`response.reasoning_summary_part.done` event names and content, and visible
+`response.output_text.delta` content while cells are running. Delta dots are
+only liveness signals; reasoning-summary delta text and delta event names are
+not mirrored to the canary content stream. Raw `score` and `generate` commands
+leave stdout stream content off unless requested explicitly. Source: `DI-vadub`;
+`DI-babik`; `DI-vajut`; `DI-sakam`.
 
 Provider-backed `score` and `generate` omit `max_output_tokens` by default.
 `-max-output-tokens` remains an explicit emergency fuse, but normal cost control

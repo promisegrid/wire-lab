@@ -1,0 +1,122 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-vutar-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-opaque-bytes-insurance-claims-openai-gpt-5.4-xhigh-20260520-215120",
+  "run_group_id": "ga-canary-20260520-215120",
+  "cell_id": "ga-canary-20260520-215120-000005-SIM-vutar-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-opaque-bytes--insurance-claims--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-vutar-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-opaque-bytes",
+  "scenario_id": "insurance-claims",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260520-215120",
+  "result_path": "results/SIM-vutar-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-opaque-bytes/insurance-claims/openai-gpt-5.4-xhigh/20260520-215120.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_a092d33f1f464b369e75dd49cc085be5",
+    "response_id": "resp_0b5215d8cb283d51006a0e2cda8de08198b7740815b8c63ce6",
+    "input_tokens": 6588,
+    "output_tokens": 11955,
+    "cost_usd": 0.178899
+  },
+  "source": {
+    "repo_commit": "61993e3c90fc94a518fb9fd5992aa59cc95e5dc0",
+    "sim_path": "simulations/SIM-vutar-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-opaque-bytes/",
+    "scenario_path": "scenarios/insurance-claims/insurance-claims.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "d54093b6bf7b04ae975a1705d3e2066b9c8f1043f837af8da30be30221317b3e"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-vutar-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-opaque-bytes/README.md",
+        "sha256": "57080488d4ef26a7b680490d0389601a0705fbf9048236a88640c26e976a0cac"
+      },
+      {
+        "path": "simulations/SIM-vutar-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-opaque-bytes/QUESTION.md",
+        "sha256": "9ca436255adddf6c479794df2cd1a372741a1f75367a0bb072eb197f819b9aa5"
+      },
+      {
+        "path": "simulations/SIM-vutar-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-opaque-bytes/protocols/grid-envelope.d/CHANGELOG.md",
+        "sha256": "aef2b7915320af9607f415cef649397530561e4f0f9372fda1bbf2691dd3f9b1"
+      },
+      {
+        "path": "simulations/SIM-vutar-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-opaque-bytes/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "2b217f86d383c3401e9de3ea3e4387ba2994486489bc53faaa21df925f7fe863"
+      },
+      {
+        "path": "scenarios/insurance-claims/insurance-claims.md",
+        "sha256": "2a9fe6a4c9a84a35f032d93ae9c36d2adec30a8175f821a34cf8592c73810ab1"
+      }
+    ],
+    "simulation_tree_hash": "ae895e6a4a91751df8c391916c0c07169b9eacd5bb19a9992dfe10475f0a7419"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 2,
+    "auditability": 2,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 2,
+    "implementation_plausibility": 4,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 22,
+    "normalized_0_100": 55,
+    "confidence_0_1": 0.78
+  },
+  "assessment": {
+    "rationale": "Good at preserving exact bytes and making unsupported interpretation explicit, but too thin on authority, fraud, payment, appeal, and audit semantics to carry insurance-claims workflows beyond transport.",
+    "strengths": [
+      "Deterministic CBOR and signing of [pcid,payload] preserve exact claim-artifact bytes.",
+      "Unknown-pCID handling allows opaque store/forward with explicit failure instead of speculative parsing.",
+      "Avoids a central pCID registry and keeps the envelope/payload boundary clear."
+    ],
+    "weaknesses": [
+      "No model for claim objects, authority, payments, appeals, or peer-local promise accounting.",
+      "Opaque signature bytes do not by themselves tell Carol who signed, with what policy, or whether verification succeeded.",
+      "No scenario-level rules for retry, downgrade, escrow, or escalation under stale or disputed evidence."
+    ],
+    "risks": [
+      "Presence-only signatures or opaque payloads can create false confidence when handlers or verification policy are missing.",
+      "Critical claim evidence may be preserved but operationally unusable if a pCID handler is unavailable.",
+      "Draft status leaves long-term archival and interoperability commitments unsettled."
+    ],
+    "open_questions": [
+      "How are claimant identity, adjuster authority, fraud findings, payment approvals, and appeal rights bound to payloads?",
+      "What local promise-accounting record should Alice or Carol keep for forwarded-but-uninterpretable envelopes?",
+      "How are old handlers/specs and verification rules preserved for 100-year claim audits?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}
