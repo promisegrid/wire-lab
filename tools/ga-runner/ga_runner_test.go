@@ -458,6 +458,109 @@ func TestRunScoreUsesConfiguredWorkers(t *testing.T) {
 	}
 }
 
+func TestRunScoreMarksOnlyWorkerOwnedCellsRunning(t *testing.T) {
+	repo := newGAFixtureRepo(t)
+	addFixtureScenarios(t, repo, "scenario-two", "scenario-three")
+	initGAStateForTestWithScenarioCount(t, repo, "ga-score-worker-owned-running", 3)
+	calls := 0
+	provider := fakeGAProvider{
+		generate: func(ctx context.Context, request ProviderRequest) (ProviderResponse, error) {
+			running, err := countRunningParentCells(repo, "ga-score-worker-owned-running")
+			if err != nil {
+				return ProviderResponse{}, err
+			}
+			// Intent: Catch the canary failure mode where all prepared jobs were
+			// pre-marked running even though only one serialized worker owned a
+			// provider call. Source: DI-juzus
+			if running != 1 {
+				return ProviderResponse{}, fmt.Errorf("expected exactly one running parent score cell, got %d", running)
+			}
+			calls++
+			return ProviderResponse{
+				Text:        validScorePayloadJSON(),
+				RequestID:   "req-score",
+				ResponseID:  "resp-score",
+				ServiceTier: defaultServiceTier,
+				UsageJSON:   `{"input_tokens":1000,"input_tokens_details":{"cached_tokens":100},"output_tokens":500}`,
+			}, nil
+		},
+	}
+	var out strings.Builder
+	err := runScoreWithProvider(context.Background(), repo, provider, scoreOptions{
+		RunGroupID:       "ga-score-worker-owned-running",
+		Target:           "parents",
+		ProviderName:     "fake",
+		APIModel:         "model-a",
+		ReasoningEffort:  "xhigh",
+		Workers:          1,
+		MaxOutputTokens:  4000,
+		InputPrice:       defaultInputUSDPerMTok,
+		CachedInputPrice: defaultCachedInputUSDPerMTok,
+		OutputPrice:      defaultOutputUSDPerMTok,
+	}, &out)
+	if err != nil {
+		t.Fatalf("score with worker-owned running state: %v\n%s", err, out.String())
+	}
+	if calls != 3 {
+		t.Fatalf("expected 3 serialized score calls, got %d", calls)
+	}
+}
+
+func TestRunScoreResetsStaleRunningCellsBeforeDispatch(t *testing.T) {
+	repo := newGAFixtureRepo(t)
+	addFixtureScenarios(t, repo, "scenario-two", "scenario-three")
+	initGAStateForTestWithScenarioCount(t, repo, "ga-score-stale-running", 3)
+	state := mustReadGAState(t, repo, "ga-score-stale-running")
+	for index := range state.Cells {
+		if state.Cells[index].SimID == "SIM-parent" {
+			markGACell(&state.Cells[index], "running", "stale interrupted score attempt")
+		}
+	}
+	writeTestState(t, repo, "ga-score-stale-running", state)
+	calls := 0
+	provider := fakeGAProvider{
+		generate: func(ctx context.Context, request ProviderRequest) (ProviderResponse, error) {
+			running, err := countRunningParentCells(repo, "ga-score-stale-running")
+			if err != nil {
+				return ProviderResponse{}, err
+			}
+			// Intent: A restarted score command must reclaim stale running cells
+			// before dispatch; otherwise the progress file keeps reporting dead
+			// workers from the interrupted process. Source: DI-juzus
+			if running != 1 {
+				return ProviderResponse{}, fmt.Errorf("expected one reclaimed running parent score cell, got %d", running)
+			}
+			calls++
+			return ProviderResponse{
+				Text:        validScorePayloadJSON(),
+				RequestID:   "req-score",
+				ResponseID:  "resp-score",
+				ServiceTier: defaultServiceTier,
+				UsageJSON:   `{"input_tokens":1000,"input_tokens_details":{"cached_tokens":100},"output_tokens":500}`,
+			}, nil
+		},
+	}
+	var out strings.Builder
+	err := runScoreWithProvider(context.Background(), repo, provider, scoreOptions{
+		RunGroupID:       "ga-score-stale-running",
+		Target:           "parents",
+		ProviderName:     "fake",
+		APIModel:         "model-a",
+		ReasoningEffort:  "xhigh",
+		Workers:          1,
+		MaxOutputTokens:  4000,
+		InputPrice:       defaultInputUSDPerMTok,
+		CachedInputPrice: defaultCachedInputUSDPerMTok,
+		OutputPrice:      defaultOutputUSDPerMTok,
+	}, &out)
+	if err != nil {
+		t.Fatalf("score after stale running reset: %v\n%s", err, out.String())
+	}
+	if calls != 3 {
+		t.Fatalf("expected 3 reclaimed score calls, got %d", calls)
+	}
+}
+
 func TestRunScoreReservesBudgetBeforeConcurrentDispatch(t *testing.T) {
 	repo := newGAFixtureRepo(t)
 	addFixtureScenarios(t, repo, "scenario-two", "scenario-three")
@@ -557,6 +660,60 @@ func TestRunGenerateWritesChildTree(t *testing.T) {
 	}
 	assertExists(t, repo.Path("simulations", childID, "README.md"))
 	assertExists(t, repo.Path("simulations", childID, "QUESTION.md"))
+}
+
+func TestRunGenerateResetsStaleRunningChildrenBeforeDispatch(t *testing.T) {
+	repo := newGAFixtureRepo(t)
+	initGAStateForTestWithCounts(t, repo, "ga-generate-stale-running", 1, 3)
+	state := mustReadGAState(t, repo, "ga-generate-stale-running")
+	childIDs := make([]string, 0, len(state.Children))
+	for index := range state.Children {
+		childIDs = append(childIDs, state.Children[index].ID())
+		markGAChild(&state.Children[index], "running", "stale interrupted child-generation attempt")
+	}
+	writeTestState(t, repo, "ga-generate-stale-running", state)
+	calls := 0
+	provider := fakeGAProvider{
+		generate: func(ctx context.Context, request ProviderRequest) (ProviderResponse, error) {
+			running, err := countRunningChildren(repo, "ga-generate-stale-running")
+			if err != nil {
+				return ProviderResponse{}, err
+			}
+			// Intent: A restarted generation command must not leave every child
+			// plan marked running before serialized workers actually own them.
+			// Source: DI-juzus
+			if running != 1 {
+				return ProviderResponse{}, fmt.Errorf("expected one reclaimed running child, got %d", running)
+			}
+			childID := childIDs[calls]
+			calls++
+			return ProviderResponse{
+				Text:        validChildBundleJSON(childID),
+				RequestID:   "req-generate",
+				ResponseID:  "resp-generate",
+				ServiceTier: defaultServiceTier,
+				UsageJSON:   `{"input_tokens":1200,"input_tokens_details":{"cached_tokens":200},"output_tokens":700}`,
+			}, nil
+		},
+	}
+	var out strings.Builder
+	err := runGenerateWithProvider(context.Background(), repo, provider, generateOptions{
+		RunGroupID:       "ga-generate-stale-running",
+		ProviderName:     "fake",
+		APIModel:         "model-a",
+		ReasoningEffort:  "xhigh",
+		Workers:          1,
+		MaxOutputTokens:  6000,
+		InputPrice:       defaultInputUSDPerMTok,
+		CachedInputPrice: defaultCachedInputUSDPerMTok,
+		OutputPrice:      defaultOutputUSDPerMTok,
+	}, &out)
+	if err != nil {
+		t.Fatalf("generate after stale running reset: %v\n%s", err, out.String())
+	}
+	if calls != 3 {
+		t.Fatalf("expected 3 reclaimed child-generation calls, got %d", calls)
+	}
 }
 
 func TestRunGenerateSkipsFailedChildAndChildScoreNoOps(t *testing.T) {
@@ -1156,6 +1313,11 @@ func initGAStateForTest(t *testing.T, repo Repo, runGroupID string) {
 
 func initGAStateForTestWithScenarioCount(t *testing.T, repo Repo, runGroupID string, scenarioCount int) {
 	t.Helper()
+	initGAStateForTestWithCounts(t, repo, runGroupID, scenarioCount, 1)
+}
+
+func initGAStateForTestWithCounts(t *testing.T, repo Repo, runGroupID string, scenarioCount int, childCount int) {
+	t.Helper()
 	var out strings.Builder
 	err := runMain([]string{
 		"ga-runner", "init",
@@ -1165,12 +1327,40 @@ func initGAStateForTestWithScenarioCount(t *testing.T, repo Repo, runGroupID str
 		"-timestamp", "20260519-111500",
 		"-parent-count", "1",
 		"-scenario-count", fmt.Sprintf("%d", scenarioCount),
-		"-child-count", "1",
+		"-child-count", fmt.Sprintf("%d", childCount),
 		"-max-promotions", "1",
 	}, &out, &out)
 	if err != nil {
 		t.Fatalf("init fixture state: %v\n%s", err, out.String())
 	}
+}
+
+func countRunningParentCells(repo Repo, runGroupID string) (int, error) {
+	state, err := readGAState(repo.Path("results", "state", runGroupID+".json"))
+	if err != nil {
+		return 0, err
+	}
+	running := 0
+	for _, cell := range state.Cells {
+		if cell.SimID == "SIM-parent" && cell.Status == "running" {
+			running++
+		}
+	}
+	return running, nil
+}
+
+func countRunningChildren(repo Repo, runGroupID string) (int, error) {
+	state, err := readGAState(repo.Path("results", "state", runGroupID+".json"))
+	if err != nil {
+		return 0, err
+	}
+	running := 0
+	for _, child := range state.Children {
+		if child.Status == "running" {
+			running++
+		}
+	}
+	return running, nil
 }
 
 func addFixtureScenarios(t *testing.T, repo Repo, scenarioIDs ...string) {

@@ -187,6 +187,12 @@ func runScoreWithProvider(ctx context.Context, repo Repo, provider Provider, opt
 		}
 		return fmt.Errorf("no score cells matched target %s", options.Target)
 	}
+	if !options.DryRun && resetRunningScoreCellsForRetry(&state, cells) {
+		state.UpdatedAt = time.Now().UTC().Format(time.RFC3339)
+		if err := writeGAStateAtomic(stateFile, state); err != nil {
+			return err
+		}
+	}
 	jobDir := options.JobDir
 	if jobDir == "" {
 		jobDir = repo.Path("results", "jobs", options.RunGroupID)
@@ -241,6 +247,18 @@ func runScoreWithProvider(ctx context.Context, repo Repo, provider Provider, opt
 	}
 	for result := range runScoreJobs(ctx, repo, provider, jobs, state, options, cost) {
 		status := result.Status
+		if !result.Final {
+			state.Cells[result.Index] = result.Cell
+			state.UpdatedAt = time.Now().UTC().Format(time.RFC3339)
+			err := writeGAStateAtomic(stateFile, state)
+			if result.Ack != nil {
+				result.Ack <- err
+			}
+			if err != nil {
+				return err
+			}
+			continue
+		}
 		if status == "failed" {
 			if options.SkipFailedCells {
 				skipGACellAfterFailure(&result.Cell)
@@ -311,6 +329,24 @@ type scoreJobResult struct {
 	Index  int
 	Cell   GACell
 	Status string
+	Final  bool
+	Ack    chan error
+}
+
+func resetRunningScoreCellsForRetry(state *GAState, indexes []int) bool {
+	changed := false
+	for _, index := range indexes {
+		if state.Cells[index].Status != "running" {
+			continue
+		}
+		// Intent: Treat stale `running` cells as interrupted prior work when a
+		// user explicitly reruns the score command for the same state. Fresh
+		// worker-owned `running` status is written only after a worker starts.
+		// Source: DI-juzus
+		markGACell(&state.Cells[index], "queued", "queued after incomplete prior score attempt")
+		changed = true
+	}
+	return changed
 }
 
 func skipCellStatus(cell GACell, retryFailed bool, rerunDone bool) bool {
@@ -373,12 +409,6 @@ func prepareScoreJob(repo Repo, state *GAState, stateFile string, jobDir string,
 	cell.APIModel = options.APIModel
 	cell.ReasoningEffort = options.ReasoningEffort
 	cell.ServiceTier = options.ServiceTier
-	markGACell(cell, "running", "provider call started")
-	state.UpdatedAt = time.Now().UTC().Format(time.RFC3339)
-	if err := writeGAStateAtomic(stateFile, *state); err != nil {
-		markGACell(cell, "failed", err.Error())
-		return scoreJob{}, "failed", nil
-	}
 	*reservedCostUSD += estimate.CostUSD
 	return scoreJob{
 		Ready:    true,
@@ -409,7 +439,7 @@ func runScoreJobs(ctx context.Context, repo Repo, provider Provider, jobs []scor
 		go func() {
 			defer waitGroup.Done()
 			for job := range jobCh {
-				results <- executeScoreJob(ctx, repo, provider, job, state, options, cost)
+				executeScoreJob(ctx, repo, provider, job, state, options, cost, results)
 			}
 		}()
 	}
@@ -424,8 +454,14 @@ func runScoreJobs(ctx context.Context, repo Repo, provider Provider, jobs []scor
 	return results
 }
 
-func executeScoreJob(ctx context.Context, repo Repo, provider Provider, job scoreJob, state GAState, options scoreOptions, cost CostConfig) scoreJobResult {
+func executeScoreJob(ctx context.Context, repo Repo, provider Provider, job scoreJob, state GAState, options scoreOptions, cost CostConfig, results chan<- scoreJobResult) {
 	cell := job.Cell
+	markGACell(&cell, "running", "provider call started")
+	ack := make(chan error)
+	results <- scoreJobResult{Index: job.Index, Cell: cell, Status: "running", Ack: ack}
+	if err := <-ack; err != nil {
+		return
+	}
 	callCtx := ctx
 	cancel := func() {}
 	if options.ProviderElapsed > 0 {
@@ -446,7 +482,8 @@ func executeScoreJob(ctx context.Context, repo Repo, provider Provider, job scor
 	})
 	if err != nil {
 		markGACell(&cell, "failed", err.Error())
-		return scoreJobResult{Index: job.Index, Cell: cell, Status: "failed"}
+		results <- scoreJobResult{Index: job.Index, Cell: cell, Status: "failed", Final: true}
+		return
 	}
 	cell.RequestID = response.RequestID
 	cell.ResponseID = response.ResponseID
@@ -459,7 +496,8 @@ func executeScoreJob(ctx context.Context, repo Repo, provider Provider, job scor
 		usageCost, err := cost.ParseUsage(response.UsageJSON)
 		if err != nil {
 			markGACell(&cell, "failed", err.Error())
-			return scoreJobResult{Index: job.Index, Cell: cell, Status: "failed"}
+			results <- scoreJobResult{Index: job.Index, Cell: cell, Status: "failed", Final: true}
+			return
 		}
 		cell.InputTokens = usageCost.InputTokens
 		cell.CachedTokens = usageCost.CachedInputTokens
@@ -467,28 +505,33 @@ func executeScoreJob(ctx context.Context, repo Repo, provider Provider, job scor
 		cell.CostUSD = usageCost.CostUSD
 	} else if cost.BudgetEnabled() {
 		markGACell(&cell, "failed", "missing provider usage metadata for cost-controlled run")
-		return scoreJobResult{Index: job.Index, Cell: cell, Status: "failed"}
+		results <- scoreJobResult{Index: job.Index, Cell: cell, Status: "failed", Final: true}
+		return
 	}
 	payload, err := parseScorePayload(response.Text)
 	if err != nil {
 		markGACell(&cell, "failed", err.Error())
-		return scoreJobResult{Index: job.Index, Cell: cell, Status: "failed"}
+		results <- scoreJobResult{Index: job.Index, Cell: cell, Status: "failed", Final: true}
+		return
 	}
 	result, err := buildFitnessResult(repo, state, cell, job.Scenario, payload)
 	if err != nil {
 		markGACell(&cell, "failed", err.Error())
-		return scoreJobResult{Index: job.Index, Cell: cell, Status: "failed"}
+		results <- scoreJobResult{Index: job.Index, Cell: cell, Status: "failed", Final: true}
+		return
 	}
 	if err := writeFitnessResultAtomic(repo.Abs(cell.ResultPath), result); err != nil {
 		markGACell(&cell, "failed", err.Error())
-		return scoreJobResult{Index: job.Index, Cell: cell, Status: "failed"}
+		results <- scoreJobResult{Index: job.Index, Cell: cell, Status: "failed", Final: true}
+		return
 	}
 	if issues := validateResultFile(repo, repo.Abs(cell.ResultPath)); len(issues) > 0 {
 		markGACell(&cell, "failed", strings.Join(issues, "; "))
-		return scoreJobResult{Index: job.Index, Cell: cell, Status: "failed"}
+		results <- scoreJobResult{Index: job.Index, Cell: cell, Status: "failed", Final: true}
+		return
 	}
 	markGACell(&cell, "done", "validated result")
-	return scoreJobResult{Index: job.Index, Cell: cell, Status: "done"}
+	results <- scoreJobResult{Index: job.Index, Cell: cell, Status: "done", Final: true}
 }
 
 func parseScorePayload(text string) (scorePayload, error) {

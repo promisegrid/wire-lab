@@ -190,6 +190,12 @@ func runGenerateWithProvider(ctx context.Context, repo Repo, provider Provider, 
 		}
 		return fmt.Errorf("no child plans matched generation selection")
 	}
+	if !options.DryRun && resetRunningGenerateChildrenForRetry(&state, indexes) {
+		state.UpdatedAt = time.Now().UTC().Format(time.RFC3339)
+		if err := writeGAStateAtomic(stateFile, state); err != nil {
+			return err
+		}
+	}
 	jobDir := options.JobDir
 	if jobDir == "" {
 		jobDir = repo.Path("results", "jobs", options.RunGroupID)
@@ -244,6 +250,18 @@ func runGenerateWithProvider(ctx context.Context, repo Repo, provider Provider, 
 	}
 	for result := range runGenerateJobs(ctx, repo, provider, jobs, options, cost) {
 		status := result.Status
+		if !result.Final {
+			state.Children[result.Index] = result.Child
+			state.UpdatedAt = time.Now().UTC().Format(time.RFC3339)
+			err := writeGAStateAtomic(stateFile, state)
+			if result.Ack != nil {
+				result.Ack <- err
+			}
+			if err != nil {
+				return err
+			}
+			continue
+		}
 		if status == "failed" {
 			if options.SkipFailedChildren {
 				skipGAChildAfterFailure(&result.Child)
@@ -305,6 +323,23 @@ type generateJobResult struct {
 	Index  int
 	Child  GAChild
 	Status string
+	Final  bool
+	Ack    chan error
+}
+
+func resetRunningGenerateChildrenForRetry(state *GAState, indexes []int) bool {
+	changed := false
+	for _, index := range indexes {
+		if state.Children[index].Status != "running" {
+			continue
+		}
+		// Intent: Treat stale `running` child-generation records as interrupted
+		// prior work when a user reruns generation. Fresh `running` status is
+		// written only after a worker owns the child. Source: DI-juzus
+		markGAChild(&state.Children[index], "queued", "queued after incomplete prior child-generation attempt")
+		changed = true
+	}
+	return changed
 }
 
 func prepareGenerateJob(repo Repo, state *GAState, stateFile string, jobDir string, index int, options generateOptions, cost CostConfig, reservedCostUSD *float64, stdout io.Writer) (generateJob, string, error) {
@@ -346,12 +381,6 @@ func prepareGenerateJob(repo Repo, state *GAState, stateFile string, jobDir stri
 	child.APIModel = options.APIModel
 	child.ReasoningEffort = options.ReasoningEffort
 	child.ServiceTier = options.ServiceTier
-	markGAChild(child, "running", "provider call started")
-	state.UpdatedAt = time.Now().UTC().Format(time.RFC3339)
-	if err := writeGAStateAtomic(stateFile, *state); err != nil {
-		markGAChild(child, "failed", err.Error())
-		return generateJob{}, "failed", nil
-	}
 	*reservedCostUSD += estimate.CostUSD
 	return generateJob{
 		Ready:  true,
@@ -381,7 +410,7 @@ func runGenerateJobs(ctx context.Context, repo Repo, provider Provider, jobs []g
 		go func() {
 			defer waitGroup.Done()
 			for job := range jobCh {
-				results <- executeGenerateJob(ctx, repo, provider, job, options, cost)
+				executeGenerateJob(ctx, repo, provider, job, options, cost, results)
 			}
 		}()
 	}
@@ -396,8 +425,14 @@ func runGenerateJobs(ctx context.Context, repo Repo, provider Provider, jobs []g
 	return results
 }
 
-func executeGenerateJob(ctx context.Context, repo Repo, provider Provider, job generateJob, options generateOptions, cost CostConfig) generateJobResult {
+func executeGenerateJob(ctx context.Context, repo Repo, provider Provider, job generateJob, options generateOptions, cost CostConfig, results chan<- generateJobResult) {
 	child := job.Child
+	markGAChild(&child, "running", "provider call started")
+	ack := make(chan error)
+	results <- generateJobResult{Index: job.Index, Child: child, Status: "running", Ack: ack}
+	if err := <-ack; err != nil {
+		return
+	}
 	callCtx := ctx
 	cancel := func() {}
 	if options.ProviderElapsed > 0 {
@@ -418,7 +453,8 @@ func executeGenerateJob(ctx context.Context, repo Repo, provider Provider, job g
 	})
 	if err != nil {
 		markGAChild(&child, "failed", err.Error())
-		return generateJobResult{Index: job.Index, Child: child, Status: "failed"}
+		results <- generateJobResult{Index: job.Index, Child: child, Status: "failed", Final: true}
+		return
 	}
 	child.RequestID = response.RequestID
 	child.ResponseID = response.ResponseID
@@ -431,7 +467,8 @@ func executeGenerateJob(ctx context.Context, repo Repo, provider Provider, job g
 		usageCost, err := cost.ParseUsage(response.UsageJSON)
 		if err != nil {
 			markGAChild(&child, "failed", err.Error())
-			return generateJobResult{Index: job.Index, Child: child, Status: "failed"}
+			results <- generateJobResult{Index: job.Index, Child: child, Status: "failed", Final: true}
+			return
 		}
 		child.InputTokens = usageCost.InputTokens
 		child.CachedTokens = usageCost.CachedInputTokens
@@ -439,33 +476,38 @@ func executeGenerateJob(ctx context.Context, repo Repo, provider Provider, job g
 		child.CostUSD = usageCost.CostUSD
 	} else if cost.BudgetEnabled() {
 		markGAChild(&child, "failed", "missing provider usage metadata for cost-controlled run")
-		return generateJobResult{Index: job.Index, Child: child, Status: "failed"}
+		results <- generateJobResult{Index: job.Index, Child: child, Status: "failed", Final: true}
+		return
 	}
 	child.ResponseHash = hashText(response.Text)
 	bundle, err := parseChildBundle(response.Text)
 	if err != nil {
 		markGAChild(&child, "failed", err.Error())
-		return generateJobResult{Index: job.Index, Child: child, Status: "failed"}
+		results <- generateJobResult{Index: job.Index, Child: child, Status: "failed", Final: true}
+		return
 	}
 	if err := writeChildBundle(repo, child, bundle); err != nil {
 		markGAChild(&child, "failed", err.Error())
-		return generateJobResult{Index: job.Index, Child: child, Status: "failed"}
+		results <- generateJobResult{Index: job.Index, Child: child, Status: "failed", Final: true}
+		return
 	}
 	treeHash, err := currentSimulationTreeHash(repo, strings.TrimSuffix(normalizeRelPath(child.Path), "/"))
 	if err != nil {
 		markGAChild(&child, "failed", err.Error())
-		return generateJobResult{Index: job.Index, Child: child, Status: "failed"}
+		results <- generateJobResult{Index: job.Index, Child: child, Status: "failed", Final: true}
+		return
 	}
 	files, err := generatedChildFiles(repo, child)
 	if err != nil {
 		markGAChild(&child, "failed", err.Error())
-		return generateJobResult{Index: job.Index, Child: child, Status: "failed"}
+		results <- generateJobResult{Index: job.Index, Child: child, Status: "failed", Final: true}
+		return
 	}
 	child.DesignDeltaSummary = bundle.DesignDeltaSummary
 	child.TreeHash = treeHash
 	child.Files = files
 	markGAChild(&child, "generated", "validated child tree")
-	return generateJobResult{Index: job.Index, Child: child, Status: "generated"}
+	results <- generateJobResult{Index: job.Index, Child: child, Status: "generated", Final: true}
 }
 
 func parseChildBundle(text string) (childBundle, error) {
