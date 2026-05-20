@@ -1,0 +1,135 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-ludaf-udp-feed-makerspace-door-access-openai-gpt-5.4-xhigh-20260520-194221",
+  "run_group_id": "ga-canary-20260520-194221",
+  "cell_id": "ga-canary-20260520-194221-000005-SIM-ludaf-udp-feed--makerspace-door-access--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-ludaf-udp-feed",
+  "scenario_id": "makerspace-door-access",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260520-194221",
+  "result_path": "results/SIM-ludaf-udp-feed/makerspace-door-access/openai-gpt-5.4-xhigh/20260520-194221.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_4d901411ad324bd686ec8fa0193535a2",
+    "response_id": "resp_0c92a08b55e469ba006a0e0f1196f4819b87542fba4b07d69c",
+    "input_tokens": 9656,
+    "output_tokens": 13534,
+    "cost_usd": 0.206374
+  },
+  "source": {
+    "repo_commit": "d79e4669c410f21c4c0abf616422de8e169da5c3",
+    "sim_path": "simulations/SIM-ludaf-udp-feed/",
+    "scenario_path": "scenarios/makerspace-door-access/makerspace-door-access.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "9bf7fd58adfffcb4aeebb87bca14576ac9016681ed3aac0750f2ddafb00792a6"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-ludaf-udp-feed/README.md",
+        "sha256": "6238e2781f9658feae574df275356e4e25a6d22eba5b8a2f12ae22b1561ef252"
+      },
+      {
+        "path": "simulations/SIM-ludaf-udp-feed/QUESTION.md",
+        "sha256": "9136722a6e7b982ace707418665d088de2e9f229e099ea4a646ad6c5196e5463"
+      },
+      {
+        "path": "simulations/SIM-ludaf-udp-feed/protocols/udp-feed.d/CHANGELOG.md",
+        "sha256": "59df64a3749a92b706582ebe7041e19ba6545cf4840eaf2715c9cedef55e07aa"
+      },
+      {
+        "path": "simulations/SIM-ludaf-udp-feed/protocols/udp-feed.d/TODO/TODO-jodon-udp-binding-v0-reference-implementation.md",
+        "sha256": "e63864119b92646905ff3519a4173074c3ce11256fc9d7ae3dcbbf99b7de7dd4"
+      },
+      {
+        "path": "simulations/SIM-ludaf-udp-feed/protocols/udp-feed.d/TODO/TODO.md",
+        "sha256": "cc9141e03e0e508984e6ce60108ce2e20d3fd440172275251303c3fd4a0445d1"
+      },
+      {
+        "path": "simulations/SIM-ludaf-udp-feed/protocols/udp-feed.d/specs/udp-binding-draft.md",
+        "sha256": "5305152a5372c37f26f81c77b0d02fb9b3e82dd431d452ad1f11bdd46c4f0c7d"
+      },
+      {
+        "path": "simulations/SIM-ludaf-udp-feed/seed/protocol-migration.md",
+        "sha256": "d835ef1b97297872e7ef2700464a9be5b68fdd31aca4b05483dbc11d98003669"
+      },
+      {
+        "path": "scenarios/makerspace-door-access/makerspace-door-access.md",
+        "sha256": "18baa89e4f187886d95c27d7a7bfe55db1277d9be7d9da2efa821587c69c994c"
+      }
+    ],
+    "simulation_tree_hash": "1f626da6f8c3305ac8a02bdbbbb9f66cdcfdba59ebd91dff2433acf4ec107c93"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 3,
+    "auditability": 2,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 1,
+    "implementation_plausibility": 2,
+    "risk_penalty": 4
+  },
+  "fitness": {
+    "raw": 18,
+    "normalized_0_100": 45,
+    "confidence_0_1": 0.88
+  },
+  "assessment": {
+    "rationale": "Useful as a clearly bounded transport substrate, but not as a makerspace door-access design. The simulation documents UDP carriage, local wire artifacts, and versioning/forking expectations, yet it leaves identity, authorization, revocation, emergency override, and accountable door decisions to higher layers.",
+    "strengths": [
+      "Excellent layer boundary clarity: udp-feed is transport-only and says so explicitly.",
+      "Registry-free, peer-local transport behavior and simulator artifact paths fit PromiseGrid basics.",
+      "Rename/fork/version notes provide a workable, if still draft, evolution story."
+    ],
+    "weaknesses": [
+      "No membership, guest, override, revocation, or door-policy objects are defined.",
+      "Raw UDP provides no authenticity, privacy, reliability, ordering, or replay protection.",
+      "Transport artifacts alone are not enough for Carol to audit a contested door decision.",
+      "The protocol is still draft with no freeze or conformance evidence."
+    ],
+    "risks": [
+      "If misapplied directly, spoofed, stale, or lost datagrams could cause unsafe unlock or deny outcomes.",
+      "Best-effort delivery can hide missed revocations or emergency updates during partitions.",
+      "Opaque byte logs may preserve wire evidence without preserving long-term human accountability."
+    ],
+    "open_questions": [
+      "Which signed membership, guest-access, and emergency-override objects sit above udp-feed?",
+      "How should a local door controller behave when authorization evidence is stale, missing, or disputed?",
+      "What durable audit bundle links a received datagram to a justified door decision decades later?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

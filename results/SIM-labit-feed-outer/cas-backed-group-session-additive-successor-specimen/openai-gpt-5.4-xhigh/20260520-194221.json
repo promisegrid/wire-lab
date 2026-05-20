@@ -1,0 +1,130 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-labit-feed-outer-cas-backed-group-session-additive-successor-specimen-openai-gpt-5.4-xhigh-20260520-194221",
+  "run_group_id": "ga-canary-20260520-194221",
+  "cell_id": "ga-canary-20260520-194221-000007-SIM-labit-feed-outer--cas-backed-group-session-additive-successor-specimen--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-labit-feed-outer",
+  "scenario_id": "cas-backed-group-session-additive-successor-specimen",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260520-194221",
+  "result_path": "results/SIM-labit-feed-outer/cas-backed-group-session-additive-successor-specimen/openai-gpt-5.4-xhigh/20260520-194221.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_94c8608b2e844a53ad508b42446ab6ad",
+    "response_id": "resp_02fffdd686613aa5006a0e0fabb43c8198b32aba59ae5f5675",
+    "input_tokens": 7882,
+    "output_tokens": 12907,
+    "cost_usd": 0.1944915
+  },
+  "source": {
+    "repo_commit": "d79e4669c410f21c4c0abf616422de8e169da5c3",
+    "sim_path": "simulations/SIM-labit-feed-outer/",
+    "scenario_path": "scenarios/cas-backed-group-session-additive-successor-specimen/cas-backed-group-session-additive-successor-specimen.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "9bf7fd58adfffcb4aeebb87bca14576ac9016681ed3aac0750f2ddafb00792a6"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-labit-feed-outer/README.md",
+        "sha256": "5df982634d6bf2c3911480fbf73f3ba7448222db5aad97081904fb76a991f959"
+      },
+      {
+        "path": "simulations/SIM-labit-feed-outer/QUESTION.md",
+        "sha256": "11331c6cd26618a9a2ebdecdacd90340da5ad45006d2d793c7754136df1afedc"
+      },
+      {
+        "path": "simulations/SIM-labit-feed-outer/TODO/TODO-kakaz-feed-outer-freeze-and-cid-cascade-follow-on.md",
+        "sha256": "f52dfefcc991894afe9491b049cd6fb4525df75399bd8512fd40cd6cfd028a6e"
+      },
+      {
+        "path": "simulations/SIM-labit-feed-outer/TODO/TODO.md",
+        "sha256": "3bb3f6416756d1d8ff9ba9805c4c1fb581086a207f8e9c9187b928b7621434cc"
+      },
+      {
+        "path": "simulations/SIM-labit-feed-outer/protocols/feed-outer.d/specs/feed-outer-draft.md",
+        "sha256": "c628890da6e3ee82585ea262452392cfe3d38ff6f9ca142275c3f00a850d6faa"
+      },
+      {
+        "path": "simulations/SIM-labit-feed-outer/seed/extraction-sources.md",
+        "sha256": "9a832d0836848fb42307935420bb940f6cccc3fb43e054873fbb115fa22290b3"
+      },
+      {
+        "path": "scenarios/cas-backed-group-session-additive-successor-specimen/cas-backed-group-session-additive-successor-specimen.md",
+        "sha256": "e1eaad54488dd151065a9023e1d348e7cd0cbc1c3475ffa5bc19fe0f5b1e1887"
+      }
+    ],
+    "simulation_tree_hash": "060eb3fe3a7c63ee4e88f66a0c9af758b9e7d2219b68b87c5b132ff2fb7c50ff"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 3,
+    "promisegrid_alignment": 4,
+    "auditability": 4,
+    "evolution_safety": 5,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 2,
+    "implementation_plausibility": 3,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 24,
+    "normalized_0_100": 73,
+    "confidence_0_1": 0.84
+  },
+  "assessment": {
+    "rationale": "The simulation is strong evidence that evolution can stay additive and preserve historical transport/feed evidence, but it only partially answers this scenario because the actual CAS-backed group-session overlap mechanics are outside this lineage's scope.",
+    "strengths": [
+      "The freeze boundary is explicitly additive: historical transport/feed specimens remain evidence and are not renamed, rehashed, or rewritten.",
+      "Any frozen successor or derived mirror must cite its source evidence, which helps migration auditability.",
+      "Layer boundaries are very clear: feed-outer owns transport naming and outer convention, not message-level CID, header, or body rules."
+    ],
+    "weaknesses": [
+      "It does not define how old text specimens and new CAS-backed specimens are linked or co-read inside a group-session.",
+      "Message-CID cascade, legacy compatibility, and reader-side migration policy are explicitly out of scope.",
+      "Failure, stale-reader, and adversarial-mirror handling are only lightly specified."
+    ],
+    "risks": [
+      "Teams may overread the outer-layer additive rule as a complete migration recipe when the message layer is still unresolved.",
+      "The spec is still draft, so the final frozen pCID and operational migration path are not yet locked.",
+      "Temporary reliance on a Steve-authored DI as the operative promise weakens decentralization until stronger promise tooling exists."
+    ],
+    "open_questions": [
+      "Which transport-protocol spec records the old .txt to new CAS linkage and local audit trail?",
+      "How should readers validate additive derived mirrors across draft and frozen phases?",
+      "What local evidence proves equivalence without relying on a central registry or a single trusted maintainer?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

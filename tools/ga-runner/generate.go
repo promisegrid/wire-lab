@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"crypto/sha256"
+	"encoding/binary"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -51,6 +53,13 @@ type childBundle struct {
 type childBundleFile struct {
 	Path    string `json:"path"`
 	Content string `json:"content"`
+}
+
+type parentFitnessRank struct {
+	SimID             string
+	AverageNormalized float64
+	Samples           int
+	OriginalIndex     int
 }
 
 func runGenerate(args []string, stdout io.Writer) error {
@@ -222,6 +231,16 @@ func runGenerateWithProvider(ctx context.Context, repo Repo, provider Provider, 
 			return err
 		}
 	}
+	parentSelectionChanged, err := applyFitnessParentSelection(repo, &state, indexes)
+	if err != nil {
+		return err
+	}
+	if !options.DryRun && parentSelectionChanged {
+		state.UpdatedAt = time.Now().UTC().Format(time.RFC3339)
+		if err := writeGAStateAtomic(stateFile, state); err != nil {
+			return err
+		}
+	}
 	jobDir := options.JobDir
 	if jobDir == "" {
 		jobDir = repo.Path("results", "jobs", options.RunGroupID)
@@ -326,6 +345,196 @@ func effectiveGenerateCostEstimateOutputTokens(options generateOptions) int {
 		return options.CostEstimateOutputTokens
 	}
 	return defaultGenerateCostEstimateOutputTokens
+}
+
+// applyFitnessParentSelection turns completed parent score cells into selection
+// pressure immediately before child generation.
+//
+// Intent: Use the parent score evidence already produced by the canary to bias
+// children toward high-fitness parents while preserving deterministic tournament
+// diversity instead of blindly generating from the initial uniform sample.
+// Source: DI-bukid
+func applyFitnessParentSelection(repo Repo, state *GAState, indexes []int) (bool, error) {
+	ranked, ok, err := rankedParentsByFitness(repo, *state)
+	if err != nil {
+		return false, err
+	}
+	if !ok {
+		return false, nil
+	}
+	changed := sortStateParentsByFitness(state, ranked)
+	for selectionIndex, childIndex := range indexes {
+		child := &state.Children[childIndex]
+		parentIDs, operation := parentSelectionForChild(*state, ranked, *child, selectionIndex)
+		if operation != child.Operation || !sameStrings(parentIDs, child.ParentIDs) {
+			child.Operation = operation
+			child.ParentIDs = parentIDs
+			child.ValidationMessage = fmt.Sprintf("parents selected by fitness-ranked tournament: %s", strings.Join(parentIDs, ","))
+			changed = true
+		}
+	}
+	return changed, nil
+}
+
+func rankedParentsByFitness(repo Repo, state GAState) ([]parentFitnessRank, bool, error) {
+	parentOriginalIndex := map[string]int{}
+	for index, parent := range state.Parents {
+		parentOriginalIndex[parent.SimID] = index
+	}
+	type aggregate struct {
+		total   float64
+		samples int
+	}
+	aggregates := map[string]aggregate{}
+	for _, cell := range state.Cells {
+		if _, ok := parentOriginalIndex[cell.SimID]; !ok || cell.Status != "done" || cell.ResultPath == "" {
+			continue
+		}
+		result, err := readFitnessResult(repo.Abs(cell.ResultPath))
+		if err != nil {
+			return nil, false, fmt.Errorf("read parent fitness %s: %w", cell.ResultPath, err)
+		}
+		item := aggregates[cell.SimID]
+		item.total += result.Fitness.Normalized0To100
+		item.samples++
+		aggregates[cell.SimID] = item
+	}
+	var ranked []parentFitnessRank
+	for simID, item := range aggregates {
+		if item.samples == 0 {
+			continue
+		}
+		ranked = append(ranked, parentFitnessRank{
+			SimID:             simID,
+			AverageNormalized: item.total / float64(item.samples),
+			Samples:           item.samples,
+			OriginalIndex:     parentOriginalIndex[simID],
+		})
+	}
+	if len(ranked) == 0 {
+		return nil, false, nil
+	}
+	sort.SliceStable(ranked, func(i, j int) bool {
+		if ranked[i].AverageNormalized != ranked[j].AverageNormalized {
+			return ranked[i].AverageNormalized > ranked[j].AverageNormalized
+		}
+		return ranked[i].SimID < ranked[j].SimID
+	})
+	return ranked, true, nil
+}
+
+func sortStateParentsByFitness(state *GAState, ranked []parentFitnessRank) bool {
+	scoreByID := map[string]parentFitnessRank{}
+	for _, rank := range ranked {
+		scoreByID[rank.SimID] = rank
+	}
+	before := append([]GAStateParent(nil), state.Parents...)
+	sort.SliceStable(state.Parents, func(i, j int) bool {
+		left, leftScored := scoreByID[state.Parents[i].SimID]
+		right, rightScored := scoreByID[state.Parents[j].SimID]
+		if leftScored && rightScored {
+			if left.AverageNormalized != right.AverageNormalized {
+				return left.AverageNormalized > right.AverageNormalized
+			}
+			return state.Parents[i].SimID < state.Parents[j].SimID
+		}
+		if leftScored != rightScored {
+			return leftScored
+		}
+		return false
+	})
+	for index := range state.Parents {
+		if score, ok := scoreByID[state.Parents[index].SimID]; ok {
+			state.Parents[index].Rationale = fmt.Sprintf("fitness-ranked selected-parent pool avg_normalized_0_100=%.2f samples=%d", score.AverageNormalized, score.Samples)
+		}
+	}
+	return !sameStateParents(before, state.Parents)
+}
+
+func parentSelectionForChild(state GAState, ranked []parentFitnessRank, child GAChild, selectionIndex int) ([]string, string) {
+	if len(ranked) == 0 {
+		return child.ParentIDs, child.Operation
+	}
+	seed := state.RunGroupID + ":" + child.ID() + ":" + fmt.Sprintf("%d", selectionIndex)
+	if child.Operation == "crossover" && len(ranked) >= 2 {
+		first := ranked[0].SimID
+		second, ok := tournamentParent(ranked, seed+":crossover", map[string]bool{first: true})
+		if ok {
+			return []string{first, second.SimID}, "crossover"
+		}
+	}
+	if selectionIndex < 2 && selectionIndex < len(ranked) {
+		return []string{ranked[selectionIndex].SimID}, "mutation"
+	}
+	parent, ok := tournamentParent(ranked, seed+":mutation", nil)
+	if !ok {
+		return []string{ranked[0].SimID}, "mutation"
+	}
+	return []string{parent.SimID}, "mutation"
+}
+
+func tournamentParent(ranked []parentFitnessRank, seed string, excluded map[string]bool) (parentFitnessRank, bool) {
+	var candidates []parentFitnessRank
+	for _, parent := range ranked {
+		if excluded != nil && excluded[parent.SimID] {
+			continue
+		}
+		candidates = append(candidates, parent)
+	}
+	if len(candidates) == 0 {
+		return parentFitnessRank{}, false
+	}
+	best := candidates[deterministicIndex(seed+":0", len(candidates))]
+	rounds := 2
+	if len(candidates) < rounds {
+		rounds = len(candidates)
+	}
+	for round := 1; round < rounds; round++ {
+		candidate := candidates[deterministicIndex(fmt.Sprintf("%s:%d", seed, round), len(candidates))]
+		if betterParentFitness(candidate, best) {
+			best = candidate
+		}
+	}
+	return best, true
+}
+
+func deterministicIndex(seed string, count int) int {
+	if count <= 0 {
+		return 0
+	}
+	sum := sha256.Sum256([]byte(seed))
+	return int(binary.BigEndian.Uint64(sum[:8]) % uint64(count))
+}
+
+func betterParentFitness(left parentFitnessRank, right parentFitnessRank) bool {
+	if left.AverageNormalized != right.AverageNormalized {
+		return left.AverageNormalized > right.AverageNormalized
+	}
+	return left.SimID < right.SimID
+}
+
+func sameStateParents(left []GAStateParent, right []GAStateParent) bool {
+	if len(left) != len(right) {
+		return false
+	}
+	for index := range left {
+		if left[index] != right[index] {
+			return false
+		}
+	}
+	return true
+}
+
+func sameStrings(left []string, right []string) bool {
+	if len(left) != len(right) {
+		return false
+	}
+	for index := range left {
+		if left[index] != right[index] {
+			return false
+		}
+	}
+	return true
 }
 
 func selectedGenerateChildIndexes(state GAState, options generateOptions) []int {
@@ -564,12 +773,15 @@ func parseChildBundle(text string) (childBundle, error) {
 
 func buildGeneratePrompt(repo Repo, state GAState, child GAChild) (string, error) {
 	// Intent: Generate children from complete local source bundles and in-run
-	// fitness evidence so proposed sims can stand alone after materialization.
-	// Source: DI-gijom
+	// fitness evidence so proposed sims can stand alone after materialization
+	// and make score-improving design moves. Source: DI-gijom; DI-bukid
 	var out strings.Builder
 	out.WriteString("# GA Child Generation\n\n")
 	out.WriteString("Return only JSON with keys `child_id`, `design_delta_summary`, and `files`.\n")
 	out.WriteString("Each file path must be relative to the child simulation root. Include `README.md` and `QUESTION.md`.\n\n")
+	out.WriteString("Optimization goal: generate a child simulation expected to score higher than its parent set on the same rubric and sampled scenarios.\n")
+	out.WriteString("Use the fitness evidence below as training feedback: preserve parent strengths, repair weaknesses, reduce risks, answer or route open questions, and keep changes to one to three bounded design deltas.\n")
+	out.WriteString("Do not merely summarize the parent. The child must make an explicit design move that should improve `fitness.normalized_0_100` while keeping the simulation standalone and auditable.\n\n")
 	fmt.Fprintf(&out, "- Run group ID: `%s`\n", state.RunGroupID)
 	fmt.Fprintf(&out, "- Child ID: `%s`\n", child.ID())
 	fmt.Fprintf(&out, "- Child path: `%s`\n", child.Path)

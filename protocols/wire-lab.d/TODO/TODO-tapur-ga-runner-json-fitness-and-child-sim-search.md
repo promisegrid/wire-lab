@@ -406,6 +406,27 @@ Affects: `tools/ga-runner/`; `tools/ga-runner/run-canary.sh`;
 `tools/ga-runner/README.md`; `results/RUN-PROTOCOL.md`;
 `protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`.
 
+ID: DI-bukid
+Date: 2026-05-20 12:56:40
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Before child generation, rank the selected parent pool by completed
+parent fitness results, update queued child parent IDs with deterministic
+top-parent plus tournament-diversity selection, and strengthen the child prompt
+so the model is explicitly optimizing for a higher rubric score.
+Intent: Passing parent score JSON into the prompt is useful but insufficient if
+the runner still generates from the original uniform parent assignment and the
+prompt does not tell the model to preserve strengths, repair weaknesses, reduce
+risks, and improve `fitness.normalized_0_100`. The GA loop needs real selection
+pressure while preserving diversity to avoid immediate convergence.
+Constraints: Do not require a separate pre-generation state file shape or a full
+population scoring pass in this change. If no completed parent score evidence is
+available, preserve the existing child plan. Keep parent selection deterministic
+from state/run inputs so interrupted runs can resume reproducibly.
+Affects: `tools/ga-runner/`; `tools/ga-runner/README.md`;
+`results/RUN-PROTOCOL.md`;
+`protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`.
+
 ## Scope
 
 - Define and implement a new GA/search runner without changing
@@ -645,6 +666,10 @@ status in the GA state file.
   fewer parser retries, and shorter formatting prompts. Cons: OpenAI-specific
   schema plumbing, stricter Markdown-in-JSON escaping, and no direct fix for
   hidden reasoning-token consumption. Source: `DI-pulap`.
+- [x] tapur.20 Add fitness-ranked parent selection before child generation and
+  strengthen child prompts so generated children are explicitly expected to
+  improve over parent scores while preserving tournament diversity. Source:
+  `DI-bukid`.
 
 ## Predecessor context
 

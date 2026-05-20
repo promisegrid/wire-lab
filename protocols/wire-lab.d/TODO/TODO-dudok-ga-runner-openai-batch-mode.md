@@ -47,6 +47,32 @@ replace the synchronous canary controls in `TODO-tapur`.
   `results/<sim-id>/<scenario-id>/<model-id>/<YYYYMMDD-HHMMSS>.json`, generated
   child simulation trees, and `results/state/<run-group-id>.json`.
 
+## DF/DI decisions needed before implementation
+
+- Command shape: decide whether Batch support is a `batch` subcommand group
+  such as `prepare`, `submit`, `poll`, `ingest`, and `cancel`, or separate
+  top-level commands. Source: `DI-nizam`.
+- State schema: decide whether Batch metadata extends
+  `promisegrid.ga.state.v1` or requires a new state schema version. Source:
+  `DI-nizam`.
+- Batch artifact paths: decide whether JSONL inputs, provider output files, and
+  ingest logs live under `results/jobs/<run-group-id>/batch/`,
+  `results/batches/<run-group-id>/`, or another bounded results path. Source:
+  `DI-nizam`.
+- Prompt/source strategy: decide whether v1 Batch requests bundle the same
+  source-complete prompts as sync scoring/generation, or whether a later
+  server-side file strategy is worth designing first. Source: `DI-nizam`.
+- Phase policy: decide how the runner records the dependency chain from parent
+  scoring to child generation to child scoring, and how it prevents child phases
+  from starting before prerequisite Batch outputs are ingested. Source:
+  `DI-nizam`.
+- Cost policy: decide how Batch pricing, estimates, usage metadata, and budget
+  stop conditions interact with the existing sync cost controls. Source:
+  `DI-nizam`.
+- Failure policy: decide how failed, expired, missing, cancelled, malformed, or
+  partially ingested Batch rows become retryable state without overwriting prior
+  valid results or accepted child sims. Source: `DI-nizam`.
+
 ## Subtasks
 
 - [ ] dudok.1 Run DF for Batch command shape, state schema extension, storage
@@ -70,3 +96,25 @@ replace the synchronous canary controls in `TODO-tapur`.
   Source: `DI-nizam`.
 - [ ] dudok.8 Document operator workflow, cost controls, large-run acceptance
   criteria, and how Batch differs from sync canary runs. Source: `DI-nizam`.
+
+## Validation and acceptance criteria
+
+- Batch preparation is deterministic for a fixed GA state and writes a JSONL
+  request set whose line identifiers map back to exactly one GA state cell or
+  child-generation plan. Source: `DI-nizam`.
+- Batch submit, poll, ingest, and cancel behavior is covered by tests using
+  fake provider responses; normal tests must not require network access. Source:
+  `DI-nizam`.
+- Ingest produces the same durable artifacts as sync mode: validated JSON
+  fitness result files, checkpointed GA state updates, generated child sim
+  trees, usage/cost metadata when available, and validation messages. Source:
+  `DI-nizam`.
+- Resume and retry never overwrite existing valid result files, accepted child
+  simulation trees, or prior Batch attempt evidence. Source: `DI-nizam`.
+- Batch-mode documentation explains the operator workflow, phase boundaries,
+  cost controls, retry/resume behavior, and the distinction from the current
+  synchronous canary path. Source: `DI-nizam`.
+- Implementation validation should include `go test ./...`, `go vet ./...`,
+  `errcheck ./...`, `bash -n tools/ga-runner/run-canary.sh`, and a dry-run or
+  fake-provider Batch cycle that exercises prepare through ingest. Source:
+  `DI-nizam`.

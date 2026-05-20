@@ -148,6 +148,10 @@ Source: `DI-ramar`; `DI-pobus`; `DI-ruzaj`.
   `cell_id` fields for unattended runs.
 - Use checkpoint state under `results/state/` for any long run that should
   resume without operator prompts.
+- Score parent cells before child generation when using `tools/ga-runner`.
+  `generate` uses completed parent fitness evidence to rank the selected parent
+  pool and apply deterministic top-parent plus tournament-diversity parent
+  selection. Source: `DI-bukid`.
 - Set an explicit `-max-run-cost-usd` for unattended API-backed batches, and use
   estimate-only output-token budgeting with per-cell/per-child estimate caps
   where the runner supports it. Treat hard `-max-output-tokens` caps as an

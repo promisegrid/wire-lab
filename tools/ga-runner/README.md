@@ -66,14 +66,16 @@ sizing without writing state. Non-dry-run `init` creates
 `promisegrid.ga.state.v1`. `score` builds source-complete prompts, calls the
 provider, writes validated JSON fitness results, and checkpoints usage/cost
 metadata after each cell. `generate` builds source-complete child prompts,
-materializes strict file-bundle responses as untracked `simulations/SIM-*`
-trees, and records prompt/response hashes, file hashes, tree hashes, and cost
-metadata in state. `accept` records reviewed promotion evidence and prints paths
-to stage, but it does not run `git add` or commit. `cull` deletes only
-state-selected generated child sim trees and matching result trees; use
-`-dry-run` to print the deletion plan without changing files. Source:
+uses completed parent fitness results to rank the selected parent pool, applies
+deterministic top-parent plus tournament-diversity parent selection, materializes
+strict file-bundle responses as untracked `simulations/SIM-*` trees, and records
+prompt/response hashes, file hashes, tree hashes, and cost metadata in state.
+`accept` records reviewed promotion evidence and prints paths to stage, but it
+does not run `git add` or commit. `cull` deletes only state-selected generated
+child sim trees and matching result trees; use `-dry-run` to print the deletion
+plan without changing files. Source:
 `DI-pobus`; `DI-bagih`; `DI-zusit`; `DI-podot`; `DI-kofil`; `DI-ruzaj`;
-`DI-gijom`.
+`DI-gijom`; `DI-bukid`.
 
 Provider-backed `score` and `generate` always send an explicit service tier.
 The default is `-service-tier flex`; `-service-tier default` is available when
@@ -103,6 +105,15 @@ OpenAI Structured Outputs remain a follow-up after the uncapped canary succeeds.
 They may reduce JSON-shape retries and prompt boilerplate, but they add
 provider-specific schema plumbing and do not directly reduce hidden reasoning
 tokens. Source: `DI-pulap`.
+
+Child generation uses parent score evidence in two ways. First, `generate`
+reranks the selected parent pool by average completed parent
+`fitness.normalized_0_100` and rewrites queued child parent IDs using top-parent
+plus deterministic tournament diversity. Second, the child prompt tells the
+model to preserve parent strengths, repair weaknesses, reduce risks, route open
+questions, and make bounded design deltas expected to improve the same rubric
+score. If no completed parent score evidence exists, the original child plan is
+preserved. Source: `DI-bukid`.
 
 For unattended canary-style runs, `score -skip-failed-cells` and
 `generate -skip-failed-children` preserve per-cell or per-child failure messages

@@ -662,6 +662,70 @@ func TestRunGenerateWritesChildTree(t *testing.T) {
 	assertExists(t, repo.Path("simulations", childID, "QUESTION.md"))
 }
 
+func TestRunGenerateSelectsParentsByFitnessEvidence(t *testing.T) {
+	repo := newGAFixtureRepo(t)
+	addTrackedFixtureSim(t, repo, "SIM-high")
+	addTrackedFixtureSim(t, repo, "SIM-low")
+	initGAStateForTestWithParentsAndChildren(t, repo, "ga-generate-ranked", 3, 2)
+	state := mustReadGAState(t, repo, "ga-generate-ranked")
+	writeParentFitnessResults(t, repo, "ga-generate-ranked", map[string]float64{
+		"SIM-high":   95,
+		"SIM-parent": 60,
+		"SIM-low":    20,
+	})
+	state = mustReadGAState(t, repo, "ga-generate-ranked")
+	calls := 0
+	provider := fakeGAProvider{
+		generate: func(ctx context.Context, request ProviderRequest) (ProviderResponse, error) {
+			if !strings.Contains(request.Prompt, "expected to score higher than its parent set") {
+				return ProviderResponse{}, fmt.Errorf("generate prompt does not state score-improvement goal")
+			}
+			if !strings.Contains(request.Prompt, `"normalized_0_100": 95`) {
+				return ProviderResponse{}, fmt.Errorf("generate prompt missing high parent fitness evidence")
+			}
+			childID := promptChildID(t, request.Prompt)
+			calls++
+			return ProviderResponse{
+				Text:        validChildBundleJSON(childID),
+				RequestID:   "req-ranked",
+				ResponseID:  "resp-ranked",
+				ServiceTier: defaultServiceTier,
+				UsageJSON:   `{"input_tokens":1200,"input_tokens_details":{"cached_tokens":200},"output_tokens":700}`,
+			}, nil
+		},
+	}
+	var out strings.Builder
+	err := runGenerateWithProvider(context.Background(), repo, provider, generateOptions{
+		RunGroupID:       "ga-generate-ranked",
+		ProviderName:     "fake",
+		APIModel:         "model-a",
+		ReasoningEffort:  "xhigh",
+		Workers:          1,
+		InputPrice:       defaultInputUSDPerMTok,
+		CachedInputPrice: defaultCachedInputUSDPerMTok,
+		OutputPrice:      defaultOutputUSDPerMTok,
+	}, &out)
+	if err != nil {
+		t.Fatalf("generate with ranked parents: %v\n%s", err, out.String())
+	}
+	if calls != 2 {
+		t.Fatalf("expected two child-generation calls, got %d", calls)
+	}
+	state = mustReadGAState(t, repo, "ga-generate-ranked")
+	if state.Parents[0].SimID != "SIM-high" || !strings.Contains(state.Parents[0].Rationale, "avg_normalized_0_100=95.00") {
+		t.Fatalf("parents were not fitness-ranked: %#v", state.Parents)
+	}
+	if !sameStrings(state.Children[0].ParentIDs, []string{"SIM-high"}) || state.Children[0].Operation != "mutation" {
+		t.Fatalf("first child did not mutate top parent: %#v", state.Children[0])
+	}
+	if state.Children[1].Operation != "crossover" || len(state.Children[1].ParentIDs) != 2 || state.Children[1].ParentIDs[0] != "SIM-high" {
+		t.Fatalf("second child did not use top parent plus tournament diversity: %#v", state.Children[1])
+	}
+	if state.Children[1].ParentIDs[1] == "SIM-high" {
+		t.Fatalf("crossover reused top parent twice: %#v", state.Children[1])
+	}
+}
+
 func TestRunGenerateResetsStaleRunningChildrenBeforeDispatch(t *testing.T) {
 	repo := newGAFixtureRepo(t)
 	initGAStateForTestWithCounts(t, repo, "ga-generate-stale-running", 1, 3)
@@ -1436,6 +1500,16 @@ func initGAStateForTestWithScenarioCount(t *testing.T, repo Repo, runGroupID str
 
 func initGAStateForTestWithCounts(t *testing.T, repo Repo, runGroupID string, scenarioCount int, childCount int) {
 	t.Helper()
+	initGAStateForTestWithParentsScenariosAndChildren(t, repo, runGroupID, 1, scenarioCount, childCount)
+}
+
+func initGAStateForTestWithParentsAndChildren(t *testing.T, repo Repo, runGroupID string, parentCount int, childCount int) {
+	t.Helper()
+	initGAStateForTestWithParentsScenariosAndChildren(t, repo, runGroupID, parentCount, 1, childCount)
+}
+
+func initGAStateForTestWithParentsScenariosAndChildren(t *testing.T, repo Repo, runGroupID string, parentCount int, scenarioCount int, childCount int) {
+	t.Helper()
 	var out strings.Builder
 	err := runMain([]string{
 		"ga-runner", "init",
@@ -1443,7 +1517,7 @@ func initGAStateForTestWithCounts(t *testing.T, repo Repo, runGroupID string, sc
 		"-model", "model-a",
 		"-run-group-id", runGroupID,
 		"-timestamp", "20260519-111500",
-		"-parent-count", "1",
+		"-parent-count", fmt.Sprintf("%d", parentCount),
 		"-scenario-count", fmt.Sprintf("%d", scenarioCount),
 		"-child-count", fmt.Sprintf("%d", childCount),
 		"-max-promotions", "1",
@@ -1451,6 +1525,60 @@ func initGAStateForTestWithCounts(t *testing.T, repo Repo, runGroupID string, sc
 	if err != nil {
 		t.Fatalf("init fixture state: %v\n%s", err, out.String())
 	}
+}
+
+func addTrackedFixtureSim(t *testing.T, repo Repo, simID string) {
+	t.Helper()
+	writeTestFile(t, repo.Path("simulations", simID, "README.md"), "# "+simID+"\n\nA fixture simulation for ranked parent selection.\n")
+	writeTestFile(t, repo.Path("simulations", simID, "QUESTION.md"), "# Questions\n\nCan Alice and Bob improve the score?\n")
+	gitAdd(t, repo,
+		filepath.ToSlash(filepath.Join("simulations", simID, "README.md")),
+		filepath.ToSlash(filepath.Join("simulations", simID, "QUESTION.md")),
+	)
+}
+
+func writeParentFitnessResults(t *testing.T, repo Repo, runGroupID string, normalizedBySimID map[string]float64) {
+	t.Helper()
+	state := mustReadGAState(t, repo, runGroupID)
+	parentIDs := map[string]bool{}
+	for _, parent := range state.Parents {
+		parentIDs[parent.SimID] = true
+	}
+	for index := range state.Cells {
+		cell := &state.Cells[index]
+		if !parentIDs[cell.SimID] {
+			continue
+		}
+		result := validResult(repo, repo.Abs(cell.ResultPath))
+		result.RunGroupID = state.RunGroupID
+		result.CellID = cell.CellID
+		result.SimID = cell.SimID
+		result.ScenarioID = cell.ScenarioID
+		result.ModelID = cell.ModelID
+		result.ResultPath = cell.ResultPath
+		result.Source.SimPath = filepath.ToSlash(filepath.Join("simulations", cell.SimID)) + "/"
+		result.Fitness.Normalized0To100 = normalizedBySimID[cell.SimID]
+		if err := writeFitnessResultAtomic(repo.Abs(cell.ResultPath), result); err != nil {
+			t.Fatalf("write parent result for %s: %v", cell.SimID, err)
+		}
+		cell.Status = "done"
+	}
+	writeTestState(t, repo, runGroupID, state)
+}
+
+func promptChildID(t *testing.T, prompt string) string {
+	t.Helper()
+	prefix := "- Child ID: `"
+	start := strings.Index(prompt, prefix)
+	if start < 0 {
+		t.Fatalf("prompt missing child ID: %s", prompt)
+	}
+	start += len(prefix)
+	end := strings.Index(prompt[start:], "`")
+	if end < 0 {
+		t.Fatalf("prompt has unterminated child ID: %s", prompt)
+	}
+	return prompt[start : start+end]
 }
 
 func countRunningParentCells(repo Repo, runGroupID string) (int, error) {
