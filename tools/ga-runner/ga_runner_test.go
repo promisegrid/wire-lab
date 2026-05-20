@@ -836,6 +836,57 @@ func TestOpenAIProviderSendsExplicitServiceTier(t *testing.T) {
 	}
 }
 
+func TestOpenAIProviderLogsRequestAndResponseJSON(t *testing.T) {
+	transport := roundTripFunc(func(request *http.Request) (*http.Response, error) {
+		return openAITestHTTPResponse(request, http.StatusOK, "req-debug", openAITestSuccessBody(serviceTierDefault)), nil
+	})
+
+	var debug strings.Builder
+	provider := OpenAIProvider{
+		APIKey:      "test-key",
+		BaseURL:     "https://example.test/responses",
+		Client:      &http.Client{Transport: transport},
+		DebugWriter: &debug,
+		RetryPolicy: ProviderRetryPolicy{
+			MaxAttempts: 1,
+		},
+	}
+	response, err := provider.Generate(context.Background(), ProviderRequest{
+		APIModel:        "model-a",
+		ServiceTier:     serviceTierDefault,
+		ReasoningEffort: "xhigh",
+		MaxOutputTokens: 12,
+		Instructions:    "reply in json",
+		Prompt:          "score this",
+	})
+	if err != nil {
+		t.Fatalf("generate with debug logging: %v", err)
+	}
+	if response.ServiceTier != serviceTierDefault || response.RequestID != "req-debug" {
+		t.Fatalf("unexpected response metadata: %#v", response)
+	}
+	logText := debug.String()
+	for _, want := range []string{
+		"event=request",
+		"query_json=",
+		`"model":"model-a"`,
+		`"service_tier":"default"`,
+		`"reasoning":{"effort":"xhigh"}`,
+		"event=response",
+		"status=200",
+		`request_id="req-debug"`,
+		"response_json=",
+		`"service_tier":"default"`,
+	} {
+		if !strings.Contains(logText, want) {
+			t.Fatalf("debug log missing %q:\n%s", want, logText)
+		}
+	}
+	if strings.Contains(logText, "test-key") {
+		t.Fatalf("debug log leaked API key:\n%s", logText)
+	}
+}
+
 func TestOpenAIProviderRetriesFlex429WithoutChangingTier(t *testing.T) {
 	attempts := 0
 	var observedServiceTiers []string

@@ -18,6 +18,9 @@ type OpenAIProvider struct {
 	BaseURL     string
 	Client      *http.Client
 	RetryPolicy ProviderRetryPolicy
+	// DebugWriter receives raw request and response diagnostics for provider
+	// calls. Authorization headers are intentionally excluded from these logs.
+	DebugWriter io.Writer
 }
 
 // ProviderRetryPolicy bounds provider retries for long-running unattended GA
@@ -47,11 +50,12 @@ func (provider OpenAIProvider) Generate(ctx context.Context, request ProviderReq
 	attempts := 0
 	for attempt := 1; attempt <= policy.MaxAttempts; attempt++ {
 		attempts = attempt
-		response, err := provider.generateOnce(ctx, request)
+		response, err := provider.generateOnce(ctx, request, attempt)
 		if err == nil {
 			return response, nil
 		}
 		lastErr = err
+		provider.debugf("attempt=%d event=error elapsed=%s error=%q", attempt, time.Since(startedAt).Round(time.Millisecond), err.Error())
 		if !shouldRetryOpenAIError(ctx, err) || attempt == policy.MaxAttempts {
 			break
 		}
@@ -59,6 +63,7 @@ func (provider OpenAIProvider) Generate(ctx context.Context, request ProviderReq
 		if policy.MaxElapsed > 0 && time.Since(startedAt)+backoff > policy.MaxElapsed {
 			break
 		}
+		provider.debugf("attempt=%d event=retry_sleep duration=%s", attempt, backoff)
 		if err := sleepWithContext(ctx, backoff); err != nil {
 			return ProviderResponse{}, err
 		}
@@ -69,12 +74,21 @@ func (provider OpenAIProvider) Generate(ctx context.Context, request ProviderReq
 	return ProviderResponse{}, fmt.Errorf("openai request failed after %d attempts over %s: %w", attempts, time.Since(startedAt).Round(time.Second), lastErr)
 }
 
+func (provider OpenAIProvider) debugf(format string, args ...interface{}) {
+	if provider.DebugWriter == nil {
+		return
+	}
+	if _, err := fmt.Fprintf(provider.DebugWriter, "[openai] "+format+"\n", args...); err != nil {
+		return
+	}
+}
+
 // generateOnce performs one Responses API attempt. Retry policy stays in
 // Generate so a single attempt has straightforward HTTP and JSON ownership.
 //
 // Intent: Keep Flex retry decisions explicit and bounded without mixing retry
 // state into response parsing. Source: DI-mopob
-func (provider OpenAIProvider) generateOnce(ctx context.Context, request ProviderRequest) (ProviderResponse, error) {
+func (provider OpenAIProvider) generateOnce(ctx context.Context, request ProviderRequest, attempt int) (ProviderResponse, error) {
 	if provider.APIKey == "" {
 		return ProviderResponse{}, fmt.Errorf("missing OpenAI API key")
 	}
@@ -106,24 +120,36 @@ func (provider OpenAIProvider) generateOnce(ctx context.Context, request Provide
 	if err != nil {
 		return ProviderResponse{}, err
 	}
+	// Intent: Make provider stalls diagnosable from the terminal canary log by
+	// emitting the exact Responses API JSON sent for each attempt, without
+	// logging authorization headers. Source: DI-juzus
+	provider.debugf("attempt=%d event=request method=%s url=%s query_json=%s", attempt, http.MethodPost, baseURL, string(payload))
 	httpReq, err := http.NewRequestWithContext(ctx, http.MethodPost, baseURL, bytes.NewReader(payload))
 	if err != nil {
 		return ProviderResponse{}, err
 	}
 	httpReq.Header.Set("Authorization", "Bearer "+provider.APIKey)
 	httpReq.Header.Set("Content-Type", "application/json")
+	startedAt := time.Now()
 	httpResp, err := client.Do(httpReq)
 	if err != nil {
+		provider.debugf("attempt=%d event=http_error elapsed=%s error=%q", attempt, time.Since(startedAt).Round(time.Millisecond), err.Error())
 		return ProviderResponse{}, err
 	}
 	responseBytes, err := io.ReadAll(httpResp.Body)
 	closeErr := httpResp.Body.Close()
 	if err != nil {
+		provider.debugf("attempt=%d event=response_read_error elapsed=%s status=%d request_id=%q error=%q", attempt, time.Since(startedAt).Round(time.Millisecond), httpResp.StatusCode, httpResp.Header.Get("x-request-id"), err.Error())
 		return ProviderResponse{}, err
 	}
 	if closeErr != nil {
+		provider.debugf("attempt=%d event=response_close_error elapsed=%s status=%d request_id=%q error=%q", attempt, time.Since(startedAt).Round(time.Millisecond), httpResp.StatusCode, httpResp.Header.Get("x-request-id"), closeErr.Error())
 		return ProviderResponse{}, closeErr
 	}
+	// Intent: Preserve raw provider response evidence in the canary transcript
+	// so empty-output, queued, incomplete, or tier-mismatch responses can be
+	// diagnosed after an unattended run. Source: DI-juzus
+	provider.debugf("attempt=%d event=response elapsed=%s status=%d request_id=%q response_json=%s", attempt, time.Since(startedAt).Round(time.Millisecond), httpResp.StatusCode, httpResp.Header.Get("x-request-id"), strings.TrimSpace(string(responseBytes)))
 	if httpResp.StatusCode < 200 || httpResp.StatusCode >= 300 {
 		return ProviderResponse{}, openAIHTTPError{StatusCode: httpResp.StatusCode, Body: strings.TrimSpace(string(responseBytes))}
 	}

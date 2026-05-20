@@ -47,6 +47,10 @@ func buildProvider(options providerBuildOptions) (Provider, error) {
 			APIKey:  os.Getenv(options.APIKeyEnv),
 			BaseURL: options.OpenAIBaseURL,
 			Client:  &http.Client{Timeout: requestTimeout},
+			// Intent: Send raw provider request/response diagnostics to the
+			// canary transcript so hangs have evidence before timeout. Source:
+			// DI-juzus
+			DebugWriter: os.Stderr,
 			RetryPolicy: ProviderRetryPolicy{
 				MaxAttempts: maxAttempts,
 				MaxElapsed:  maxElapsed,
