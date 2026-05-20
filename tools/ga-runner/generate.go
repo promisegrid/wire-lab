@@ -348,28 +348,34 @@ func effectiveGenerateCostEstimateOutputTokens(options generateOptions) int {
 }
 
 // applyFitnessParentSelection turns completed parent score cells into selection
-// pressure immediately before child generation.
+// pressure immediately before child generation and normalizes old operator names
+// to the current two-parent breed operator.
 //
 // Intent: Use the parent score evidence already produced by the canary to bias
 // children toward high-fitness parents while preserving deterministic tournament
-// diversity instead of blindly generating from the initial uniform sample.
-// Source: DI-bukid
+// diversity instead of blindly generating from the initial uniform sample. LLM
+// child generation uses a single two-parent breed operation, not one-parent
+// mutation or byte-level crossover. Source: DI-bukid; DI-sohus
 func applyFitnessParentSelection(repo Repo, state *GAState, indexes []int) (bool, error) {
 	ranked, ok, err := rankedParentsByFitness(repo, *state)
 	if err != nil {
 		return false, err
 	}
-	if !ok {
-		return false, nil
+	changed := false
+	if ok {
+		changed = sortStateParentsByFitness(state, ranked)
 	}
-	changed := sortStateParentsByFitness(state, ranked)
+	breedRanks := breedParentRanks(*state, ranked)
 	for selectionIndex, childIndex := range indexes {
 		child := &state.Children[childIndex]
-		parentIDs, operation := parentSelectionForChild(*state, ranked, *child, selectionIndex)
-		if operation != child.Operation || !sameStrings(parentIDs, child.ParentIDs) {
-			child.Operation = operation
+		parentIDs, ok := parentSelectionForChild(*state, breedRanks, *child, selectionIndex)
+		if !ok {
+			parentIDs = distinctStrings(child.ParentIDs)
+		}
+		if child.Operation != childOperationBreed || !sameStrings(parentIDs, child.ParentIDs) {
+			child.Operation = childOperationBreed
 			child.ParentIDs = parentIDs
-			child.ValidationMessage = fmt.Sprintf("parents selected by fitness-ranked tournament: %s", strings.Join(parentIDs, ","))
+			child.ValidationMessage = fmt.Sprintf("breed parents selected by fitness-ranked tournament: %s", strings.Join(parentIDs, ","))
 			changed = true
 		}
 	}
@@ -451,26 +457,42 @@ func sortStateParentsByFitness(state *GAState, ranked []parentFitnessRank) bool 
 	return !sameStateParents(before, state.Parents)
 }
 
-func parentSelectionForChild(state GAState, ranked []parentFitnessRank, child GAChild, selectionIndex int) ([]string, string) {
-	if len(ranked) == 0 {
-		return child.ParentIDs, child.Operation
+func breedParentRanks(state GAState, ranked []parentFitnessRank) []parentFitnessRank {
+	scoreByID := map[string]parentFitnessRank{}
+	for _, rank := range ranked {
+		scoreByID[rank.SimID] = rank
+	}
+	var ranks []parentFitnessRank
+	for index, parent := range state.Parents {
+		if parent.SimID == "" {
+			continue
+		}
+		if rank, ok := scoreByID[parent.SimID]; ok {
+			ranks = append(ranks, rank)
+			continue
+		}
+		ranks = append(ranks, parentFitnessRank{
+			SimID:             parent.SimID,
+			AverageNormalized: -1,
+			Samples:           0,
+			OriginalIndex:     index,
+		})
+	}
+	return ranks
+}
+
+func parentSelectionForChild(state GAState, ranked []parentFitnessRank, child GAChild, selectionIndex int) ([]string, bool) {
+	if len(ranked) < 2 {
+		parentIDs := distinctStrings(child.ParentIDs)
+		return parentIDs, len(parentIDs) == 2
 	}
 	seed := state.RunGroupID + ":" + child.ID() + ":" + fmt.Sprintf("%d", selectionIndex)
-	if child.Operation == "crossover" && len(ranked) >= 2 {
-		first := ranked[0].SimID
-		second, ok := tournamentParent(ranked, seed+":crossover", map[string]bool{first: true})
-		if ok {
-			return []string{first, second.SimID}, "crossover"
-		}
-	}
-	if selectionIndex < 2 && selectionIndex < len(ranked) {
-		return []string{ranked[selectionIndex].SimID}, "mutation"
-	}
-	parent, ok := tournamentParent(ranked, seed+":mutation", nil)
+	first := ranked[0].SimID
+	parent, ok := tournamentParent(ranked, seed+":breed", map[string]bool{first: true})
 	if !ok {
-		return []string{ranked[0].SimID}, "mutation"
+		return nil, false
 	}
-	return []string{parent.SimID}, "mutation"
+	return []string{first, parent.SimID}, true
 }
 
 func tournamentParent(ranked []parentFitnessRank, seed string, excluded map[string]bool) (parentFitnessRank, bool) {
@@ -537,6 +559,19 @@ func sameStrings(left []string, right []string) bool {
 	return true
 }
 
+func distinctStrings(values []string) []string {
+	var distinct []string
+	seen := map[string]bool{}
+	for _, value := range values {
+		if value == "" || seen[value] {
+			continue
+		}
+		seen[value] = true
+		distinct = append(distinct, value)
+	}
+	return distinct
+}
+
 func selectedGenerateChildIndexes(state GAState, options generateOptions) []int {
 	selected := map[string]bool{}
 	for _, childID := range options.ChildIDs {
@@ -591,6 +626,10 @@ func resetRunningGenerateChildrenForRetry(state *GAState, indexes []int) bool {
 
 func prepareGenerateJob(repo Repo, state *GAState, stateFile string, jobDir string, index int, options generateOptions, cost CostConfig, reservedCostUSD *float64, stdout io.Writer) (generateJob, string, error) {
 	child := &state.Children[index]
+	if err := validateBreedChild(*child); err != nil {
+		markGAChild(child, "failed", err.Error())
+		return generateJob{}, "failed", nil
+	}
 	if options.DryRun {
 		if err := writeFormat(stdout, "dry-run generate: %s -> %s\n", child.ID(), child.Path); err != nil {
 			child.Status = "failed"
@@ -774,12 +813,13 @@ func parseChildBundle(text string) (childBundle, error) {
 func buildGeneratePrompt(repo Repo, state GAState, child GAChild) (string, error) {
 	// Intent: Generate children from complete local source bundles and in-run
 	// fitness evidence so proposed sims can stand alone after materialization
-	// and make score-improving design moves. Source: DI-gijom; DI-bukid
+	// and make score-improving two-parent breed moves. Source: DI-gijom;
+	// DI-bukid; DI-sohus
 	var out strings.Builder
 	out.WriteString("# GA Child Generation\n\n")
 	out.WriteString("Return only JSON with keys `child_id`, `design_delta_summary`, and `files`.\n")
 	out.WriteString("Each file path must be relative to the child simulation root. Include `README.md` and `QUESTION.md`.\n\n")
-	out.WriteString("Optimization goal: generate a child simulation expected to score higher than its parent set on the same rubric and sampled scenarios.\n")
+	out.WriteString("Optimization goal: breed a child simulation from exactly two parent simulations, expected to score higher than its parent set on the same rubric and sampled scenarios.\n")
 	out.WriteString("Use the fitness evidence below as training feedback: preserve parent strengths, repair weaknesses, reduce risks, answer or route open questions, and keep changes to one to three bounded design deltas.\n")
 	out.WriteString("Do not merely summarize the parent. The child must make an explicit design move that should improve `fitness.normalized_0_100` while keeping the simulation standalone and auditable.\n\n")
 	fmt.Fprintf(&out, "- Run group ID: `%s`\n", state.RunGroupID)
@@ -823,6 +863,22 @@ func buildGeneratePrompt(repo Repo, state GAState, child GAChild) (string, error
 	fmt.Fprintf(&out, `{"child_id":%q,"design_delta_summary":"one to three bounded design deltas","files":[{"path":"README.md","content":"# ..."},{"path":"QUESTION.md","content":"# ..."}]}`, child.ID())
 	out.WriteString("\n")
 	return out.String(), nil
+}
+
+func validateBreedChild(child GAChild) error {
+	// Intent: Fail explicit state evidence rather than silently producing
+	// one-parent LLM children after the GA operator was narrowed to breed.
+	// Source: DI-sohus
+	if child.Operation != childOperationBreed {
+		return fmt.Errorf("child operation must be %q, got %q", childOperationBreed, child.Operation)
+	}
+	if len(child.ParentIDs) != 2 {
+		return fmt.Errorf("breed child requires exactly two parent IDs, got %d: %s", len(child.ParentIDs), strings.Join(child.ParentIDs, ","))
+	}
+	if len(distinctStrings(child.ParentIDs)) != 2 {
+		return fmt.Errorf("breed child requires two distinct parent IDs: %s", strings.Join(child.ParentIDs, ","))
+	}
+	return nil
 }
 
 func writeChildBundle(repo Repo, child GAChild, bundle childBundle) error {

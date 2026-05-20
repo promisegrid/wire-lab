@@ -209,6 +209,10 @@ Generated children are normal `simulations/SIM-*` trees and are not accepted
 merely because they exist on disk. Source: `DI-ramar`; `DI-zanon`; `DI-zohal`;
 `DI-zusit`; `DI-podot`; `DI-kofil`; `DI-ruzaj`; `DI-gijom`.
 
+LLM-generated children use one operation, `breed`, with exactly two distinct
+parent simulations. The runner must fail or skip generation rather than create a
+one-parent child. Source: `DI-sohus`.
+
 ## Recommended Preflight
 
 1. Generate a canary manifest (20-30 cells).

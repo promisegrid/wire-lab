@@ -14,6 +14,7 @@ const (
 	defaultScenarioCount = 5
 	defaultChildCount    = 4
 	defaultMaxPromotions = 2
+	childOperationBreed  = "breed"
 )
 
 // GenerationPlan is a read-only preview of a conservative GA generation.
@@ -109,6 +110,9 @@ func buildGenerationPlan(population []PopulationSim, scenarios []Scenario, optio
 	if err != nil {
 		return GenerationPlan{}, err
 	}
+	if len(parents) < 2 {
+		return GenerationPlan{}, fmt.Errorf("at least two parent sims are required for breed child planning")
+	}
 	sample, err := selectScenarios(scenarios, options.ScenarioCount, options.ShuffleSeed)
 	if err != nil {
 		return GenerationPlan{}, err
@@ -132,6 +136,9 @@ func buildGenerationPlan(population []PopulationSim, scenarios []Scenario, optio
 func validatePlanOptions(options PlanOptions) error {
 	if options.ParentCount <= 0 {
 		return fmt.Errorf("parent-count must be positive")
+	}
+	if options.ParentCount < 2 {
+		return fmt.Errorf("parent-count must be at least 2 for breed child planning")
 	}
 	if options.ScenarioCount <= 0 {
 		return fmt.Errorf("scenario-count must be positive")
@@ -187,25 +194,34 @@ func shuffleBySeed(seedText string, size int, swap func(i, j int)) error {
 }
 
 func planChildren(parents []PopulationSim, childCount int) []PlannedChild {
+	// Intent: LLM-based child generation uses one two-parent breed operator
+	// instead of pretending that prompt synthesis is byte-level mutation or
+	// crossover. Source: DI-sohus
 	var children []PlannedChild
 	for index := 0; index < childCount; index++ {
 		child := PlannedChild{
-			ChildID: fmt.Sprintf("planned-child-%04d", index+1),
+			ChildID:   fmt.Sprintf("planned-child-%04d", index+1),
+			Operation: childOperationBreed,
 		}
-		if index%2 == 1 && len(parents) >= 2 {
-			child.Operation = "crossover"
-			child.ParentIDs = []string{
-				parents[index%len(parents)].SimID,
-				parents[(index+1)%len(parents)].SimID,
-			}
-		} else {
-			child.Operation = "mutation"
-			child.ParentIDs = []string{parents[index%len(parents)].SimID}
-		}
+		child.ParentIDs = plannedBreedParentIDs(parents, index)
 		child.ResultPath = fmt.Sprintf("simulations/SIM-<handle>-%s/", child.ChildID)
 		children = append(children, child)
 	}
 	return children
+}
+
+func plannedBreedParentIDs(parents []PopulationSim, index int) []string {
+	if len(parents) < 2 {
+		return nil
+	}
+	first := parents[index%len(parents)].SimID
+	for offset := 1; offset < len(parents); offset++ {
+		second := parents[(index+offset)%len(parents)].SimID
+		if second != first {
+			return []string{first, second}
+		}
+	}
+	return nil
 }
 
 func planCellsFromParents(parents []PopulationSim, scenarios []Scenario, modelID string) []PlannedCell {

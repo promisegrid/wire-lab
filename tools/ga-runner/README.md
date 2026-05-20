@@ -108,12 +108,13 @@ tokens. Source: `DI-pulap`.
 
 Child generation uses parent score evidence in two ways. First, `generate`
 reranks the selected parent pool by average completed parent
-`fitness.normalized_0_100` and rewrites queued child parent IDs using top-parent
-plus deterministic tournament diversity. Second, the child prompt tells the
-model to preserve parent strengths, repair weaknesses, reduce risks, route open
-questions, and make bounded design deltas expected to improve the same rubric
-score. If no completed parent score evidence exists, the original child plan is
-preserved. Source: `DI-bukid`.
+`fitness.normalized_0_100` and rewrites queued child parent IDs as exactly two
+distinct `breed` parents using top-parent plus deterministic tournament
+diversity. Second, the child prompt tells the model to preserve parent
+strengths, repair weaknesses, reduce risks, route open questions, and make
+bounded design deltas expected to improve the same rubric score. If fewer than
+two viable parents exist, generation records a failed or skipped child instead
+of creating a one-parent child. Source: `DI-bukid`; `DI-sohus`.
 
 For unattended canary-style runs, `score -skip-failed-cells` and
 `generate -skip-failed-children` preserve per-cell or per-child failure messages

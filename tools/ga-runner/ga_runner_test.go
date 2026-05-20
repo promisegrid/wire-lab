@@ -227,8 +227,10 @@ func TestBuildGenerationPlanIsDeterministic(t *testing.T) {
 	if len(first.ParentScoreCells) != 4 || len(first.ChildScoreCells) != 6 {
 		t.Fatalf("unexpected cell counts: parent=%d child=%d", len(first.ParentScoreCells), len(first.ChildScoreCells))
 	}
-	if first.Children[0].Operation != "mutation" || first.Children[1].Operation != "crossover" {
-		t.Fatalf("unexpected child operations: %#v", first.Children)
+	for _, child := range first.Children {
+		if child.Operation != childOperationBreed || len(child.ParentIDs) != 2 || len(distinctStrings(child.ParentIDs)) != 2 {
+			t.Fatalf("unexpected breed child plan: %#v", child)
+		}
 	}
 }
 
@@ -237,7 +239,7 @@ func TestBuildGenerationPlanValidatesCounts(t *testing.T) {
 	scenarios := []Scenario{{ScenarioID: "scenario-a"}}
 	options := PlanOptions{
 		ModelID:       "model-a",
-		ParentCount:   1,
+		ParentCount:   2,
 		ScenarioCount: 1,
 		ChildCount:    1,
 		MaxPromotions: 2,
@@ -247,9 +249,9 @@ func TestBuildGenerationPlanValidatesCounts(t *testing.T) {
 		t.Fatalf("expected max-promotions validation error, got %v", err)
 	}
 	options.MaxPromotions = 0
-	options.ParentCount = 0
+	options.ParentCount = 1
 	_, err = buildGenerationPlan(population, scenarios, options)
-	if err == nil || !strings.Contains(err.Error(), "parent-count must be positive") {
+	if err == nil || !strings.Contains(err.Error(), "parent-count must be at least 2") {
 		t.Fatalf("expected parent-count validation error, got %v", err)
 	}
 }
@@ -257,10 +259,11 @@ func TestBuildGenerationPlanValidatesCounts(t *testing.T) {
 func TestRunInitDryRunPrintsGenerationPlan(t *testing.T) {
 	repo := newGitTestRepo(t)
 	writeTestFile(t, repo.Path("simulations", "SIM-parent", "README.md"), "# Parent\n")
+	writeTestFile(t, repo.Path("simulations", "SIM-second", "README.md"), "# Second\n")
 	writeTestFile(t, repo.Path("simulations", "SIM-child-untracked", "README.md"), "# Child\n")
 	writeTestFile(t, repo.Path("scenarios", "scenario-one", "scenario-one.md"), "# One\n")
 	writeTestFile(t, repo.Path("scenarios", "scenario-two", "scenario-two.md"), "# Two\n")
-	gitAdd(t, repo, "simulations/SIM-parent/README.md", "scenarios/scenario-one/scenario-one.md", "scenarios/scenario-two/scenario-two.md")
+	gitAdd(t, repo, "simulations/SIM-parent/README.md", "simulations/SIM-second/README.md", "scenarios/scenario-one/scenario-one.md", "scenarios/scenario-two/scenario-two.md")
 
 	var out strings.Builder
 	err := runMain([]string{
@@ -270,7 +273,7 @@ func TestRunInitDryRunPrintsGenerationPlan(t *testing.T) {
 		"-model", "model-a",
 		"-run-group-id", "ga-test",
 		"-shuffle-seed", "7",
-		"-parent-count", "1",
+		"-parent-count", "2",
 		"-scenario-count", "2",
 		"-child-count", "2",
 		"-max-promotions", "1",
@@ -279,7 +282,7 @@ func TestRunInitDryRunPrintsGenerationPlan(t *testing.T) {
 		t.Fatalf("init dry-run plan: %v", err)
 	}
 	text := out.String()
-	for _, want := range []string{"population=1", "plan run_group_id=ga-test model=model-a", "parent_score_cells=2", "child_score_cells=4", "planned-child-0001"} {
+	for _, want := range []string{"population=2", "plan run_group_id=ga-test model=model-a", "parent_score_cells=4", "child_score_cells=4", "planned-child-0001", "operation=breed"} {
 		if !strings.Contains(text, want) {
 			t.Fatalf("expected %q in output:\n%s", want, text)
 		}
@@ -299,7 +302,7 @@ func TestRunInitWritesGAState(t *testing.T) {
 		"-model", "model-a",
 		"-run-group-id", "ga-state",
 		"-timestamp", "20260519-111500",
-		"-parent-count", "1",
+		"-parent-count", "2",
 		"-scenario-count", "1",
 		"-child-count", "1",
 		"-max-promotions", "1",
@@ -312,10 +315,10 @@ func TestRunInitWritesGAState(t *testing.T) {
 	if state.Schema != stateSchemaV1 || state.RunGroupID != "ga-state" {
 		t.Fatalf("unexpected state identity: %#v", state)
 	}
-	if len(state.Parents) != 1 || len(state.ScenarioSample) != 1 || len(state.Children) != 1 || len(state.Cells) != 2 {
+	if len(state.Parents) != 2 || len(state.ScenarioSample) != 1 || len(state.Children) != 1 || len(state.Cells) != 3 {
 		t.Fatalf("unexpected state counts: parents=%d scenarios=%d children=%d cells=%d", len(state.Parents), len(state.ScenarioSample), len(state.Children), len(state.Cells))
 	}
-	if !strings.HasPrefix(state.Children[0].ID(), "SIM-") || state.Children[0].Status != "queued" {
+	if !strings.HasPrefix(state.Children[0].ID(), "SIM-") || state.Children[0].Status != "queued" || state.Children[0].Operation != childOperationBreed || len(state.Children[0].ParentIDs) != 2 {
 		t.Fatalf("unexpected planned child: %#v", state.Children[0])
 	}
 }
@@ -501,8 +504,8 @@ func TestRunScoreMarksOnlyWorkerOwnedCellsRunning(t *testing.T) {
 	if err != nil {
 		t.Fatalf("score with worker-owned running state: %v\n%s", err, out.String())
 	}
-	if calls != 3 {
-		t.Fatalf("expected 3 serialized score calls, got %d", calls)
+	if calls != 6 {
+		t.Fatalf("expected 6 serialized score calls, got %d", calls)
 	}
 }
 
@@ -556,8 +559,8 @@ func TestRunScoreResetsStaleRunningCellsBeforeDispatch(t *testing.T) {
 	if err != nil {
 		t.Fatalf("score after stale running reset: %v\n%s", err, out.String())
 	}
-	if calls != 3 {
-		t.Fatalf("expected 3 reclaimed score calls, got %d", calls)
+	if calls != 6 {
+		t.Fatalf("expected 6 reclaimed score calls, got %d", calls)
 	}
 }
 
@@ -680,6 +683,9 @@ func TestRunGenerateSelectsParentsByFitnessEvidence(t *testing.T) {
 			if !strings.Contains(request.Prompt, "expected to score higher than its parent set") {
 				return ProviderResponse{}, fmt.Errorf("generate prompt does not state score-improvement goal")
 			}
+			if !strings.Contains(request.Prompt, "breed a child simulation from exactly two parent simulations") || !strings.Contains(request.Prompt, "- Operation: `breed`") {
+				return ProviderResponse{}, fmt.Errorf("generate prompt missing breed operator language")
+			}
 			if !strings.Contains(request.Prompt, `"normalized_0_100": 95`) {
 				return ProviderResponse{}, fmt.Errorf("generate prompt missing high parent fitness evidence")
 			}
@@ -715,14 +721,46 @@ func TestRunGenerateSelectsParentsByFitnessEvidence(t *testing.T) {
 	if state.Parents[0].SimID != "SIM-high" || !strings.Contains(state.Parents[0].Rationale, "avg_normalized_0_100=95.00") {
 		t.Fatalf("parents were not fitness-ranked: %#v", state.Parents)
 	}
-	if !sameStrings(state.Children[0].ParentIDs, []string{"SIM-high"}) || state.Children[0].Operation != "mutation" {
-		t.Fatalf("first child did not mutate top parent: %#v", state.Children[0])
+	for _, child := range state.Children {
+		if child.Operation != childOperationBreed || len(child.ParentIDs) != 2 || child.ParentIDs[0] != "SIM-high" {
+			t.Fatalf("child did not breed top parent with tournament diversity: %#v", child)
+		}
+		if child.ParentIDs[1] == "SIM-high" {
+			t.Fatalf("breed reused top parent twice: %#v", child)
+		}
 	}
-	if state.Children[1].Operation != "crossover" || len(state.Children[1].ParentIDs) != 2 || state.Children[1].ParentIDs[0] != "SIM-high" {
-		t.Fatalf("second child did not use top parent plus tournament diversity: %#v", state.Children[1])
+}
+
+func TestRunGenerateSkipsBreedChildWithTooFewParents(t *testing.T) {
+	repo := newGAFixtureRepo(t)
+	initGAStateForTest(t, repo, "ga-generate-one-parent")
+	state := mustReadGAState(t, repo, "ga-generate-one-parent")
+	state.Parents = state.Parents[:1]
+	state.Children[0].Operation = "mutation"
+	state.Children[0].ParentIDs = []string{state.Parents[0].SimID}
+	writeTestState(t, repo, "ga-generate-one-parent", state)
+	provider := fakeGAProvider{
+		generate: func(ctx context.Context, request ProviderRequest) (ProviderResponse, error) {
+			return ProviderResponse{}, fmt.Errorf("provider should not be called for invalid breed parent count")
+		},
 	}
-	if state.Children[1].ParentIDs[1] == "SIM-high" {
-		t.Fatalf("crossover reused top parent twice: %#v", state.Children[1])
+	var out strings.Builder
+	err := runGenerateWithProvider(context.Background(), repo, provider, generateOptions{
+		RunGroupID:         "ga-generate-one-parent",
+		ProviderName:       "fake",
+		APIModel:           "model-a",
+		ReasoningEffort:    "xhigh",
+		SkipFailedChildren: true,
+		InputPrice:         defaultInputUSDPerMTok,
+		CachedInputPrice:   defaultCachedInputUSDPerMTok,
+		OutputPrice:        defaultOutputUSDPerMTok,
+	}, &out)
+	if err != nil {
+		t.Fatalf("generate should skip invalid breed child: %v\n%s", err, out.String())
+	}
+	state = mustReadGAState(t, repo, "ga-generate-one-parent")
+	if state.Children[0].Status != "skipped" || state.Children[0].Operation != childOperationBreed || !strings.Contains(state.Children[0].ValidationMessage, "exactly two parent IDs") {
+		t.Fatalf("invalid breed child was not skipped with clear evidence: %#v", state.Children[0])
 	}
 }
 
@@ -1478,12 +1516,16 @@ func newGAFixtureRepo(t *testing.T) Repo {
 	writeTestFile(t, repo.Path("scenarios", "scenario-one", "scenario-one.md"), "# Scenario One\n\nAlice asks Bob to ship labels with auditable promises.\n")
 	writeTestFile(t, repo.Path("simulations", "SIM-parent", "README.md"), "# Parent Sim\n\nA small parent simulation for GA tests.\n")
 	writeTestFile(t, repo.Path("simulations", "SIM-parent", "QUESTION.md"), "# Questions\n\nCan Alice and Bob audit the result?\n")
+	writeTestFile(t, repo.Path("simulations", "SIM-second", "README.md"), "# Second Parent Sim\n\nAnother small parent simulation for GA breed tests.\n")
+	writeTestFile(t, repo.Path("simulations", "SIM-second", "QUESTION.md"), "# Questions\n\nCan Carol compare the two parent designs?\n")
 	gitAdd(t, repo,
 		"results/RUN-PROTOCOL.md",
 		"scenarios/README.md",
 		"scenarios/scenario-one/scenario-one.md",
 		"simulations/SIM-parent/README.md",
 		"simulations/SIM-parent/QUESTION.md",
+		"simulations/SIM-second/README.md",
+		"simulations/SIM-second/QUESTION.md",
 	)
 	return repo
 }
@@ -1500,7 +1542,7 @@ func initGAStateForTestWithScenarioCount(t *testing.T, repo Repo, runGroupID str
 
 func initGAStateForTestWithCounts(t *testing.T, repo Repo, runGroupID string, scenarioCount int, childCount int) {
 	t.Helper()
-	initGAStateForTestWithParentsScenariosAndChildren(t, repo, runGroupID, 1, scenarioCount, childCount)
+	initGAStateForTestWithParentsScenariosAndChildren(t, repo, runGroupID, 2, scenarioCount, childCount)
 }
 
 func initGAStateForTestWithParentsAndChildren(t *testing.T, repo Repo, runGroupID string, parentCount int, childCount int) {
@@ -1586,9 +1628,13 @@ func countRunningParentCells(repo Repo, runGroupID string) (int, error) {
 	if err != nil {
 		return 0, err
 	}
+	parentIDs := map[string]bool{}
+	for _, parent := range state.Parents {
+		parentIDs[parent.SimID] = true
+	}
 	running := 0
 	for _, cell := range state.Cells {
-		if cell.SimID == "SIM-parent" && cell.Status == "running" {
+		if parentIDs[cell.SimID] && cell.Status == "running" {
 			running++
 		}
 	}

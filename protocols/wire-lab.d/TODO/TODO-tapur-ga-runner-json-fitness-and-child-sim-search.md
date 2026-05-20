@@ -427,6 +427,27 @@ Affects: `tools/ga-runner/`; `tools/ga-runner/README.md`;
 `results/RUN-PROTOCOL.md`;
 `protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`.
 
+ID: DI-sohus
+Date: 2026-05-20 13:22:28
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: For LLM-based GA child generation, replace separate `mutation` and
+`crossover` operation labels with a single `breed` operation using exactly two
+distinct parent simulation IDs.
+Intent: LLM generation does not perform byte-level genetic mutation or crossover.
+The useful operator is a two-parent design breeding prompt that asks the model to
+use both parent simulations and their score evidence to produce one improved,
+standalone child. One-parent children hide missing comparison pressure, while
+three-or-more-parent prompts inflate context and blur design provenance.
+Constraints: New child plans must use `breed` and two distinct parents. Existing
+queued or running `mutation`/`crossover` state may be normalized during
+generation; historical completed state and result evidence must not be rewritten.
+If fewer than two viable parents are available, generation must fail or skip with
+clear state evidence rather than silently creating a one-parent child.
+Affects: `tools/ga-runner/`; `tools/ga-runner/README.md`;
+`results/RUN-PROTOCOL.md`;
+`protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`.
+
 ## Scope
 
 - Define and implement a new GA/search runner without changing
@@ -548,7 +569,8 @@ The runner must prepare each generation prompt with:
 - selected parent sim IDs, parent paths, and parent tree hashes;
 - selected scenario sample and scenario pressure summaries;
 - relevant JSON fitness results from the active GA run when available;
-- required operation type: `mutation`, `crossover`, or `synthesis`;
+- required operation type: `breed`;
+- exactly two distinct parent simulation IDs;
 - a bounded design-delta budget of one to three substantive changes;
 - a requirement that the child remain a standalone simulation tree.
 
@@ -569,14 +591,11 @@ Each generated child must contain:
 - provenance text naming parent sims, run group ID, generation model, source
   scenario sample, source JSON fitness results when used, and generation time.
 
-Allowed generation operations:
+Allowed generation operation:
 
-- `mutation`: alter one selected parent by changing one to three explicit design
-  choices while preserving the parent's problem frame.
-- `crossover`: combine compatible design choices from two or three parents while
-  preserving a coherent single decision question.
-- `synthesis`: create a child from parent fitness failures and scenario pressure
-  only when the state file records why mutation or crossover is insufficient.
+- `breed`: combine two distinct parent simulations into one standalone child
+  with one to three explicit design deltas and preserved provenance for both
+  parents.
 
 Forbidden generation operations:
 
