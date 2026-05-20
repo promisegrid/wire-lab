@@ -1,0 +1,125 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-nipoh-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-wrapper-pcid-website-backend-hosting-openai-gpt-5.4-xhigh-20260520-184540",
+  "run_group_id": "ga-canary-20260520-184540",
+  "cell_id": "ga-canary-20260520-184540-000009-SIM-nipoh-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-wrapper-pcid--website-backend-hosting--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-nipoh-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-wrapper-pcid",
+  "scenario_id": "website-backend-hosting",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260520-184540",
+  "result_path": "results/SIM-nipoh-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-wrapper-pcid/website-backend-hosting/openai-gpt-5.4-xhigh/20260520-184540.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_47bd9cca2b5f4f27b885c1c173c6e25c",
+    "response_id": "resp_0882e56c8adcd440006a0e0289bef881999c5ff3406b6d2fb7",
+    "input_tokens": 6109,
+    "output_tokens": 10597,
+    "cost_usd": 0.15904875
+  },
+  "source": {
+    "repo_commit": "bf8f3ec6b37af889c7f7b101cdf6c7b6ee00edaa",
+    "sim_path": "simulations/SIM-nipoh-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-wrapper-pcid/",
+    "scenario_path": "scenarios/website-backend-hosting/website-backend-hosting.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "577f1f424926d38817eb0dbface9c3cc1a1d70378a07629c848eb0ecd8351bc6"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-nipoh-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-wrapper-pcid/README.md",
+        "sha256": "37ecc4b11d4fb7bdc0436801830411c65c739e69957ee1c0ac72fec86ec20d7b"
+      },
+      {
+        "path": "simulations/SIM-nipoh-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-wrapper-pcid/QUESTION.md",
+        "sha256": "ce6ab563ed7d413b3f2027ee8863184e9c0f28e59a1d2c074ab124a7f4310754"
+      },
+      {
+        "path": "simulations/SIM-nipoh-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-wrapper-pcid/protocols/grid-envelope.d/CHANGELOG.md",
+        "sha256": "aef2b7915320af9607f415cef649397530561e4f0f9372fda1bbf2691dd3f9b1"
+      },
+      {
+        "path": "simulations/SIM-nipoh-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-wrapper-pcid/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "65b435945ee4d952230dec56867d56bb533ec3e533452bcaa54861949a9b3ba8"
+      },
+      {
+        "path": "scenarios/website-backend-hosting/website-backend-hosting.md",
+        "sha256": "410d1a5fce15529c59260d9a9b20479dcb0eacb406ab9c480d2a6279f73fe18f"
+      }
+    ],
+    "simulation_tree_hash": "90a6dd3091fcccc5e5fef0a39e859ae00100ea2a89b212ac10fc2fc2aca1d42e"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 3,
+    "auditability": 2,
+    "evolution_safety": 1,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 2,
+    "implementation_plausibility": 4,
+    "risk_penalty": 4
+  },
+  "fitness": {
+    "raw": 14,
+    "normalized_0_100": 45,
+    "confidence_0_1": 0.77
+  },
+  "assessment": {
+    "rationale": "The specimen is strong as a minimal wire-layer envelope: [pcid, payload], canonical DAG-CBOR bytes, and wrapper-selected signature protocols make dispatch and hashing rules explicit. But for website-backend-hosting it only supplies a transport shell, not the deployment, ownership, secret-rotation, incident-response, or uptime records the scenario needs. Its unknown-pCID hard-reject rule gives visible failure, yet it is brittle for rolling upgrades, partial knowledge, and outage-time evidence preservation.",
+    "strengths": [
+      "Very clear separation between envelope dispatch and payload semantics.",
+      "Canonical DAG-CBOR bytes support reproducible hashing and signature verification.",
+      "Avoids assuming a central pCID registry and allows signatures or other evidence to live in wrapper protocols.",
+      "Incompatible interpretation fails at an explicit dispatch boundary instead of silently misparsing bytes."
+    ],
+    "weaknesses": [
+      "Does not define the application-level promises, feeds, or CAS objects needed for backend hosting operations.",
+      "Base envelope has no built-in authorship or relay-evidence slot, so auditors must interpret extra wrapper protocols.",
+      "Unknown pCID messages are hard rejected rather than gracefully downgraded, relayed, or preserved as valid envelope traffic.",
+      "The spec is still a draft specimen, so long-term interoperability and freeze discipline are unproven."
+    ],
+    "risks": [
+      "Rolling upgrades or key-rotation changes could surface as availability failures when some peers lack a new pCID handler.",
+      "Incident responders may lose useful in-band evidence if unknown envelopes cannot be carried forward as valid messages.",
+      "Mallory can exploit unknown-pCID rejection or wrapper inconsistency to trigger drops or dispute handling during contested events."
+    ],
+    "open_questions": [
+      "What payload protocols represent deployments, service ownership, secret rotation, incident response, and uptime promises?",
+      "Can peers preserve unknown envelopes as raw audit artifacts without undermining the hard-reject safety goal?",
+      "How are pCIDs discovered, cached, and migrated over long time horizons without a central registry?",
+      "What wrapper conventions provide consistent authorship, hop evidence, encryption, and key-rotation semantics across services?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

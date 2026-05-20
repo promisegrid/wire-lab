@@ -1,0 +1,111 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-hugoj-cas-usenetlike-gitlike-website-backend-hosting-openai-gpt-5.4-xhigh-20260520-184540",
+  "run_group_id": "ga-canary-20260520-184540",
+  "cell_id": "ga-canary-20260520-184540-000003-SIM-hugoj-cas-usenetlike-gitlike--website-backend-hosting--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-hugoj-cas-usenetlike-gitlike",
+  "scenario_id": "website-backend-hosting",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260520-184540",
+  "result_path": "results/SIM-hugoj-cas-usenetlike-gitlike/website-backend-hosting/openai-gpt-5.4-xhigh/20260520-184540.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_16172f68cc4649c7a3f5ae7644604627",
+    "response_id": "resp_026544e5df9d0eba006a0e01567c10819abe4f4d6563a1dcbe",
+    "input_tokens": 5797,
+    "output_tokens": 7225,
+    "cost_usd": 0.11129475
+  },
+  "source": {
+    "repo_commit": "bf8f3ec6b37af889c7f7b101cdf6c7b6ee00edaa",
+    "sim_path": "simulations/SIM-hugoj-cas-usenetlike-gitlike/",
+    "scenario_path": "scenarios/website-backend-hosting/website-backend-hosting.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "577f1f424926d38817eb0dbface9c3cc1a1d70378a07629c848eb0ecd8351bc6"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-hugoj-cas-usenetlike-gitlike/README.md",
+        "sha256": "0506d32e30f1fe4903d1c0c1f2e6a7f25a3c3a438d6cfa0782d3e99c9448bdb8"
+      },
+      {
+        "path": "scenarios/website-backend-hosting/website-backend-hosting.md",
+        "sha256": "410d1a5fce15529c59260d9a9b20479dcb0eacb406ab9c480d2a6279f73fe18f"
+      }
+    ],
+    "simulation_tree_hash": "144951c8a39cbb610ac9d305fe823308c60e01e271c2f3b222a32276d4a196ef"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 4,
+    "auditability": 4,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 2,
+    "implementation_plausibility": 2,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 19,
+    "normalized_0_100": 54,
+    "confidence_0_1": 0.79
+  },
+  "assessment": {
+    "rationale": "The simulation offers a strong PromiseGrid-aligned evidence substrate—content-addressed objects, append-only and hash-chained history, store-and-forward replication, and transport separation—but only an indirect fit for website backend hosting. It helps with durable, locally auditable records under sparse knowledge, yet it does not define the concrete operational promises and decision rules needed for deployments, service ownership, secret rotation, uptime, and incident response.",
+    "strengths": [
+      "Content-addressed and hash-chained records support durable audit trails for disputed deployment or incident evidence.",
+      "Store-and-forward replication across named peers or sites fits sparse, partial-knowledge conditions without assuming a central authority.",
+      "The simulation is explicit about precedent versus identity and protocol meaning versus transport, which improves migration and long-term evolution safety."
+    ],
+    "weaknesses": [
+      "The current specimen is message/feed oriented, not a website-backend hosting model with explicit deployment, ownership, uptime, or secret-rotation promises.",
+      "No concrete object, feed, or authorization shapes are given for service ownership changes, rollback, secret revocation, or incident escalation.",
+      "The README does not specify local decision rules for accepting, retrying, downgrading, or escalating when operational evidence is stale or conflicting."
+    ],
+    "risks": [
+      "The Usenet/git analogy could be overextended, treating replicated evidence as sufficient for live operational control.",
+      "Secret rotation and revocation require freshness and authorization semantics that are not present in the current simulation.",
+      "Delayed propagation may be acceptable for audit logs but insufficient for uptime and incident-response commitments."
+    ],
+    "open_questions": [
+      "What CAS objects and feeds would represent deployments, service owners, secret epochs, health observations, and incident decisions?",
+      "How are freshness, expiry, supersession, and revocation modeled without a central registry or hidden global state?",
+      "What locally observable threshold lets Alice or Carol accept, retry, downgrade, or escalate a contested backend action?",
+      "How are long-lived service names and backend identities bound across migrations, key changes, and organizational turnover?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

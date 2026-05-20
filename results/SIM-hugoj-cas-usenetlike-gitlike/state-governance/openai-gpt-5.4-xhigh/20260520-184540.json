@@ -1,0 +1,113 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-hugoj-cas-usenetlike-gitlike-state-governance-openai-gpt-5.4-xhigh-20260520-184540",
+  "run_group_id": "ga-canary-20260520-184540",
+  "cell_id": "ga-canary-20260520-184540-000002-SIM-hugoj-cas-usenetlike-gitlike--state-governance--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-hugoj-cas-usenetlike-gitlike",
+  "scenario_id": "state-governance",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260520-184540",
+  "result_path": "results/SIM-hugoj-cas-usenetlike-gitlike/state-governance/openai-gpt-5.4-xhigh/20260520-184540.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_33c5b8e9f00a405c9523b32fc56ac1d4",
+    "response_id": "resp_0bb65ede1f22b08e006a0e01569b248198a4acc5bcfe659526",
+    "input_tokens": 5782,
+    "output_tokens": 6276,
+    "cost_usd": 0.0979825
+  },
+  "source": {
+    "repo_commit": "bf8f3ec6b37af889c7f7b101cdf6c7b6ee00edaa",
+    "sim_path": "simulations/SIM-hugoj-cas-usenetlike-gitlike/",
+    "scenario_path": "scenarios/state-governance/state-governance.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "577f1f424926d38817eb0dbface9c3cc1a1d70378a07629c848eb0ecd8351bc6"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-hugoj-cas-usenetlike-gitlike/README.md",
+        "sha256": "0506d32e30f1fe4903d1c0c1f2e6a7f25a3c3a438d6cfa0782d3e99c9448bdb8"
+      },
+      {
+        "path": "scenarios/state-governance/state-governance.md",
+        "sha256": "6cbfa949fc3eed42fd81bb6820d73ec96ac9c71669b3117d6e46673ddba38360"
+      }
+    ],
+    "simulation_tree_hash": "144951c8a39cbb610ac9d305fe823308c60e01e271c2f3b222a32276d4a196ef"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 3,
+    "auditability": 3,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 2,
+    "implementation_plausibility": 3,
+    "risk_penalty": 4
+  },
+  "fitness": {
+    "raw": 17,
+    "normalized_0_100": 49,
+    "confidence_0_1": 0.77
+  },
+  "assessment": {
+    "rationale": "This simulation is a plausible lower-layer ingredient for the scenario because it emphasizes content-addressed, hash-chained, append-only messages, store-and-forward replication, sparse knowledge, and transport separation. Those traits help with durability, local evidence retention, and relay under partitions. But as scored against state-governance pressure, it remains far from sufficient: it does not yet specify the identity claims, naming, jurisdiction/regional-authority rules, promise-accounting records, or accept/retry/downgrade/escalate policies needed for contested government records. The README is notably strong at keeping substrate, specimen, and precedent boundaries explicit, which improves evolution safety and reduces analogy drift, but the actual governance layer is still missing.",
+    "strengths": [
+      "Stable content-addressed identities plus append-only/hash-chained history support later audit of disputed records.",
+      "Store-and-forward replication and transport separation fit sparse knowledge, partitioned operation, and long-lived evolution better than a centralized registry model.",
+      "The simulation explicitly distinguishes precedent from identity and substrate from governance, which gives it unusually clear layer boundaries.",
+      "Named peers or sites and per-instance exchange declarations could serve as a base for cross-agency evidence relay."
+    ],
+    "weaknesses": [
+      "It does not define regional authority, delegation, jurisdiction, or cross-agency conflict-resolution semantics.",
+      "The scenario's required identity claims, names, signatures, and peer-local promise-accounting records are not specified.",
+      "Failure handling is mostly substrate-level; there is no clear policy for when a peer should accept, retry, downgrade, or escalate contested state.",
+      "No domain model is provided for benefits, licensing, legislative records, or other state-governance artifacts."
+    ],
+    "risks": [
+      "A message-centric lineage could be mistaken for a governance model, hiding unresolved authority and policy semantics.",
+      "Without stronger naming, identity, and reconciliation rules, stale or ambiguous cross-agency records could be treated as trustworthy evidence.",
+      "Government-state use amplifies the harm of under-specified escalation and revocation behavior."
+    ],
+    "open_questions": [
+      "What authority, delegation, and revocation objects would sit above this CAS/message substrate for regional or agency governance?",
+      "How would peers represent jurisdictional boundaries and escalation paths without introducing a hidden central registry?",
+      "What local promise-accounting record would let Carol justify accepting or rejecting a contested application event?",
+      "How would schema evolution, moderation/freeze rules, and retention policy work for legislative or licensing records over decades?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

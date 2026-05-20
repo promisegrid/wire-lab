@@ -16,6 +16,7 @@ Usage:
 Environment overrides:
   GA_CANARY_RUN_GROUP          default: ga-canary-<UTC timestamp>
   GA_CANARY_TIMESTAMP          default: current UTC YYYYMMDD-HHMMSS
+  GA_CANARY_SHUFFLE_SEED       default: current UTC YYYYMMDDHHMMSS
   GA_CANARY_MODEL_ID           default: openai-gpt-5.4-xhigh
   GA_CANARY_API_MODEL          default: gpt-5.4
   GA_CANARY_REASONING_EFFORT   default: xhigh
@@ -56,6 +57,7 @@ repo_root="$(cd "$script_dir/../.." && pwd)"
 ga_dir="$repo_root/tools/ga-runner"
 
 timestamp="${GA_CANARY_TIMESTAMP:-$(date -u +%Y%m%d-%H%M%S)}"
+shuffle_seed="${GA_CANARY_SHUFFLE_SEED:-$(date -u +%Y%m%d%H%M%S)}"
 run_group="${GA_CANARY_RUN_GROUP:-ga-canary-$timestamp}"
 model_id="${GA_CANARY_MODEL_ID:-openai-gpt-5.4-xhigh}"
 api_model="${GA_CANARY_API_MODEL:-gpt-5.4}"
@@ -94,6 +96,10 @@ if ! [[ "$generate_workers" =~ ^[0-9]+$ ]] || [ "$generate_workers" -lt 1 ]; the
 	echo "GA_CANARY_GENERATE_WORKERS must be a positive integer." >&2
 	exit 2
 fi
+if ! [[ "$shuffle_seed" =~ ^[0-9]+$ ]]; then
+	echo "GA_CANARY_SHUFFLE_SEED must be a decimal integer." >&2
+	exit 2
+fi
 if ! [[ "$provider_attempts" =~ ^[0-9]+$ ]] || [ "$provider_attempts" -lt 1 ]; then
 	echo "GA_CANARY_PROVIDER_ATTEMPTS must be a positive integer." >&2
 	exit 2
@@ -113,6 +119,7 @@ mkdir -p "$log_dir"
 exec > >(tee -a "$log_file") 2>&1
 
 print_state_summary() {
+	echo "[progress] log=$log_file"
 	if [ ! -f "$state_file" ]; then
 		echo "[progress] state not created yet: $state_file"
 		return 0
@@ -227,6 +234,7 @@ trap 'on_error "$LINENO"' ERR
 
 echo "GA canary run group: $run_group"
 echo "Timestamp: $timestamp"
+echo "Shuffle seed: $shuffle_seed"
 echo "Repo root: $repo_root"
 echo "Log file: $log_file"
 echo "GOCACHE: $GOCACHE"
@@ -251,7 +259,7 @@ run_step "init state" \
 		-model "$model_id" \
 		-run-group-id "$run_group" \
 		-timestamp "$timestamp" \
-		-shuffle-seed 20260519 \
+		-shuffle-seed "$shuffle_seed" \
 		-parent-count 3 \
 		-scenario-count 3 \
 		-child-count 2 \

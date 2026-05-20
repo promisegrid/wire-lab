@@ -1,0 +1,126 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-jokak-grid-envelope-enc-cbor-unknown-best-effort-sig-mandatory-sig-pcid-payload-insurance-claims-openai-gpt-5.4-xhigh-20260520-184540",
+  "run_group_id": "ga-canary-20260520-184540",
+  "cell_id": "ga-canary-20260520-184540-000004-SIM-jokak-grid-envelope-enc-cbor-unknown-best-effort-sig-mandatory-sig-pcid-payload--insurance-claims--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-jokak-grid-envelope-enc-cbor-unknown-best-effort-sig-mandatory-sig-pcid-payload",
+  "scenario_id": "insurance-claims",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260520-184540",
+  "result_path": "results/SIM-jokak-grid-envelope-enc-cbor-unknown-best-effort-sig-mandatory-sig-pcid-payload/insurance-claims/openai-gpt-5.4-xhigh/20260520-184540.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_28b95ad70b1b4baab4f93d3b3b676c13",
+    "response_id": "resp_016df51201e5e546006a0e01b978448198b6246df9fac146db",
+    "input_tokens": 6175,
+    "output_tokens": 8389,
+    "cost_usd": 0.12825225
+  },
+  "source": {
+    "repo_commit": "bf8f3ec6b37af889c7f7b101cdf6c7b6ee00edaa",
+    "sim_path": "simulations/SIM-jokak-grid-envelope-enc-cbor-unknown-best-effort-sig-mandatory-sig-pcid-payload/",
+    "scenario_path": "scenarios/insurance-claims/insurance-claims.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "577f1f424926d38817eb0dbface9c3cc1a1d70378a07629c848eb0ecd8351bc6"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-jokak-grid-envelope-enc-cbor-unknown-best-effort-sig-mandatory-sig-pcid-payload/README.md",
+        "sha256": "85676851ce384edf8fc4546252b69b524b2c57bc5d7a72e603dba3e63c24c90c"
+      },
+      {
+        "path": "simulations/SIM-jokak-grid-envelope-enc-cbor-unknown-best-effort-sig-mandatory-sig-pcid-payload/QUESTION.md",
+        "sha256": "50fa82530ea929fde8df7856a9f2fa67758e32dfc2ff081c7f9a23d231395ace"
+      },
+      {
+        "path": "simulations/SIM-jokak-grid-envelope-enc-cbor-unknown-best-effort-sig-mandatory-sig-pcid-payload/protocols/grid-envelope.d/CHANGELOG.md",
+        "sha256": "aef2b7915320af9607f415cef649397530561e4f0f9372fda1bbf2691dd3f9b1"
+      },
+      {
+        "path": "simulations/SIM-jokak-grid-envelope-enc-cbor-unknown-best-effort-sig-mandatory-sig-pcid-payload/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "5a83134788f5fd6bebb92119be82086f34baa3756ec72971fc8da65456cce1b2"
+      },
+      {
+        "path": "scenarios/insurance-claims/insurance-claims.md",
+        "sha256": "2a9fe6a4c9a84a35f032d93ae9c36d2adec30a8175f821a34cf8592c73810ab1"
+      }
+    ],
+    "simulation_tree_hash": "70c6a17b236d0e9f1ba89621ed8e390e4169976db54f9ebcc2337ee9d9646834"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 3,
+    "auditability": 3,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 2,
+    "implementation_plausibility": 4,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 23,
+    "normalized_0_100": 57.5,
+    "confidence_0_1": 0.76
+  },
+  "assessment": {
+    "rationale": "This variant is a credible low-level carrier for contested claim records because it gives deterministic CBOR bytes, explicit pCID-based dispatch, and mandatory signature slots, but it does not itself model claim evidence types, adjuster delegation, payment or appeal promises, or peer-local promise accounting. Its best contribution to the insurance-claims scenario is visible failure at the interpretation boundary and long-term salvage of unknown payloads; its main gap is that the application semantics and authority chain still have to live elsewhere.",
+    "strengths": [
+      "Deterministic CBOR arrays provide stable canonical bytes for hashing and signing, which helps later audit and replay of claim artifacts.",
+      "Mandatory signature slots reduce the chance that important claim envelopes are treated as unsigned by default and make provenance expectations explicit.",
+      "pCID-based dispatch and the unknown-pCID rule keep unsupported interpretations visible instead of silently guessing semantics.",
+      "The spec is clear that ordering, forwarding, and external body references belong to payload protocols or wrapper envelopes, which helps preserve layer boundaries."
+    ],
+    "weaknesses": [
+      "The specimen does not define insurance-domain payloads for claim evidence, adjuster authority, fraud review, payment promises, or appeals.",
+      "Peer-local promise accounting, names, feeds, and identity/delegation chains are outside this layer, so the scenario's core decision logic remains underspecified.",
+      "Auditability is limited by positional, opaque byte slots; humans and future tools still need the referenced pCID handlers or salvage tooling.",
+      "The variant is still draft and unfrozen, with no minted stable spec pCID or freeze history."
+    ],
+    "risks": [
+      "Best-effort inspection of unknown payloads could be overtrusted in a disputed claim, even though the spec says such output must remain unsupported and unverified.",
+      "Signature presence is mandatory, but signature meaning and signer authority depend on external sig_pcid and identity protocols that may diverge or age poorly.",
+      "Because the specimen is not frozen, long-lived records using it may face interoperability or archival interpretation drift."
+    ],
+    "open_questions": [
+      "Which payload protocols would carry claim evidence bundles, adjuster delegation, payment commitments, and appeal records in a way peers can audit locally?",
+      "How are signer identity, delegation, revocation, and time-bounded adjuster authority represented without hidden central registries?",
+      "Should insurance-grade use forbid or further constrain best-effort salvage so unsupported payload views cannot be confused with admissible evidence?",
+      "Do contested-claims workflows need additional wrapper conventions for timestamps, receipts, countersignatures, or relay provenance beyond this base envelope?",
+      "How should peers retry, downgrade, or escalate when referenced CAS objects or signature handlers are missing for long periods?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

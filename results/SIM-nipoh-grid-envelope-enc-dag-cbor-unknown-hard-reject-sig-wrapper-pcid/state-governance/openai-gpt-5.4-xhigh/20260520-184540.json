@@ -1,0 +1,123 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-nipoh-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-wrapper-pcid-state-governance-openai-gpt-5.4-xhigh-20260520-184540",
+  "run_group_id": "ga-canary-20260520-184540",
+  "cell_id": "ga-canary-20260520-184540-000008-SIM-nipoh-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-wrapper-pcid--state-governance--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-nipoh-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-wrapper-pcid",
+  "scenario_id": "state-governance",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260520-184540",
+  "result_path": "results/SIM-nipoh-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-wrapper-pcid/state-governance/openai-gpt-5.4-xhigh/20260520-184540.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_ef969e05b9ac4fe4bae1734f956616b4",
+    "response_id": "resp_04ae555d3b2916f3006a0e0242bd50819bb3974ff3b1c98eea",
+    "input_tokens": 6094,
+    "output_tokens": 11085,
+    "cost_usd": 0.1658545
+  },
+  "source": {
+    "repo_commit": "bf8f3ec6b37af889c7f7b101cdf6c7b6ee00edaa",
+    "sim_path": "simulations/SIM-nipoh-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-wrapper-pcid/",
+    "scenario_path": "scenarios/state-governance/state-governance.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "577f1f424926d38817eb0dbface9c3cc1a1d70378a07629c848eb0ecd8351bc6"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-nipoh-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-wrapper-pcid/README.md",
+        "sha256": "37ecc4b11d4fb7bdc0436801830411c65c739e69957ee1c0ac72fec86ec20d7b"
+      },
+      {
+        "path": "simulations/SIM-nipoh-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-wrapper-pcid/QUESTION.md",
+        "sha256": "ce6ab563ed7d413b3f2027ee8863184e9c0f28e59a1d2c074ab124a7f4310754"
+      },
+      {
+        "path": "simulations/SIM-nipoh-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-wrapper-pcid/protocols/grid-envelope.d/CHANGELOG.md",
+        "sha256": "aef2b7915320af9607f415cef649397530561e4f0f9372fda1bbf2691dd3f9b1"
+      },
+      {
+        "path": "simulations/SIM-nipoh-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-wrapper-pcid/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "65b435945ee4d952230dec56867d56bb533ec3e533452bcaa54861949a9b3ba8"
+      },
+      {
+        "path": "scenarios/state-governance/state-governance.md",
+        "sha256": "6cbfa949fc3eed42fd81bb6820d73ec96ac9c71669b3117d6e46673ddba38360"
+      }
+    ],
+    "simulation_tree_hash": "90a6dd3091fcccc5e5fef0a39e859ae00100ea2a89b212ac10fc2fc2aca1d42e"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 3,
+    "auditability": 3,
+    "evolution_safety": 1,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 2,
+    "implementation_plausibility": 4,
+    "risk_penalty": 4
+  },
+  "fitness": {
+    "raw": 20,
+    "normalized_0_100": 50,
+    "confidence_0_1": 0.78
+  },
+  "assessment": {
+    "rationale": "Useful as a lower-layer specimen: the positional DAG-CBOR envelope gives clear canonical bytes and explicit dispatch, and wrapper-selected signature protocols keep layer boundaries clean. But it is only a wire-format slice of the state-governance problem, not a full account of disputed records, names, delegations, or promise accounting. The decisive drawback is the unknown-hard-reject rule, which makes cross-agency upgrades and multi-decade evolution brittle.",
+    "strengths": [
+      "Minimal [pcid, payload] structure is straightforward to implement and gives a stable byte sequence for hashing and signing.",
+      "Putting signatures and hop/authorship evidence in pCID-selected wrappers preserves a clean boundary between envelope transport and higher-layer evidence semantics.",
+      "Peers can make local accept/reject decisions from the explicit pCID boundary, and unsupported handlers fail visibly rather than being silently misinterpreted."
+    ],
+    "weaknesses": [
+      "The specimen does not define the application objects, names, identity claims, feeds, or promise-accounting records that the state-governance scenario needs.",
+      "Unknown-hard-reject prevents graceful archive, relay, or deferred interpretation when agencies upgrade at different times.",
+      "Audit and security depend on external wrapper conventions that are not specified here, especially for signer binding, delegation, and hop evidence."
+    ],
+    "risks": [
+      "Version skew across agencies can create hard interoperability failures as soon as a new wrapper or payload pCID appears.",
+      "Long-lived governance records may be dropped or stranded because older peers cannot treat unknown envelopes as valid messages for retention or forwarding.",
+      "Divergent signature-wrapper conventions could create authorship disputes, stripping/rewrapping ambiguity, or uneven verifier behavior."
+    ],
+    "open_questions": [
+      "Can a peer safely archive or relay an unknown envelope as opaque bytes without violating the hard-reject contract?",
+      "How are pCID definitions discovered, authenticated, cached, and migrated across agencies over decades without sliding into de facto central governance?",
+      "What exact wrapper rules prevent signature stripping or wrapper-order ambiguity in contested cases?",
+      "Where do agency names, regional authority claims, and delegation chains live so Carol can audit a disputed decision from local evidence alone?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

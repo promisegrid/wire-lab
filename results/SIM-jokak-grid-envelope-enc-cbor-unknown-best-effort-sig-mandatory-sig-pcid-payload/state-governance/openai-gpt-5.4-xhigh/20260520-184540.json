@@ -1,0 +1,125 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-jokak-grid-envelope-enc-cbor-unknown-best-effort-sig-mandatory-sig-pcid-payload-state-governance-openai-gpt-5.4-xhigh-20260520-184540",
+  "run_group_id": "ga-canary-20260520-184540",
+  "cell_id": "ga-canary-20260520-184540-000005-SIM-jokak-grid-envelope-enc-cbor-unknown-best-effort-sig-mandatory-sig-pcid-payload--state-governance--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-jokak-grid-envelope-enc-cbor-unknown-best-effort-sig-mandatory-sig-pcid-payload",
+  "scenario_id": "state-governance",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260520-184540",
+  "result_path": "results/SIM-jokak-grid-envelope-enc-cbor-unknown-best-effort-sig-mandatory-sig-pcid-payload/state-governance/openai-gpt-5.4-xhigh/20260520-184540.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_2e2f74642df249a5acdce2d9c4f1716a",
+    "response_id": "resp_09b0bfc3e995b041006a0e01c3bd488198bebfde7344d36486",
+    "input_tokens": 6181,
+    "output_tokens": 8794,
+    "cost_usd": 0.13393275
+  },
+  "source": {
+    "repo_commit": "bf8f3ec6b37af889c7f7b101cdf6c7b6ee00edaa",
+    "sim_path": "simulations/SIM-jokak-grid-envelope-enc-cbor-unknown-best-effort-sig-mandatory-sig-pcid-payload/",
+    "scenario_path": "scenarios/state-governance/state-governance.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "577f1f424926d38817eb0dbface9c3cc1a1d70378a07629c848eb0ecd8351bc6"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-jokak-grid-envelope-enc-cbor-unknown-best-effort-sig-mandatory-sig-pcid-payload/README.md",
+        "sha256": "85676851ce384edf8fc4546252b69b524b2c57bc5d7a72e603dba3e63c24c90c"
+      },
+      {
+        "path": "simulations/SIM-jokak-grid-envelope-enc-cbor-unknown-best-effort-sig-mandatory-sig-pcid-payload/QUESTION.md",
+        "sha256": "50fa82530ea929fde8df7856a9f2fa67758e32dfc2ff081c7f9a23d231395ace"
+      },
+      {
+        "path": "simulations/SIM-jokak-grid-envelope-enc-cbor-unknown-best-effort-sig-mandatory-sig-pcid-payload/protocols/grid-envelope.d/CHANGELOG.md",
+        "sha256": "aef2b7915320af9607f415cef649397530561e4f0f9372fda1bbf2691dd3f9b1"
+      },
+      {
+        "path": "simulations/SIM-jokak-grid-envelope-enc-cbor-unknown-best-effort-sig-mandatory-sig-pcid-payload/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "5a83134788f5fd6bebb92119be82086f34baa3756ec72971fc8da65456cce1b2"
+      },
+      {
+        "path": "scenarios/state-governance/state-governance.md",
+        "sha256": "6cbfa949fc3eed42fd81bb6820d73ec96ac9c71669b3117d6e46673ddba38360"
+      }
+    ],
+    "simulation_tree_hash": "70c6a17b236d0e9f1ba89621ed8e390e4169976db54f9ebcc2337ee9d9646834"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 3,
+    "auditability": 3,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 2,
+    "implementation_plausibility": 4,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 24,
+    "normalized_0_100": 60,
+    "confidence_0_1": 0.78
+  },
+  "assessment": {
+    "rationale": "This draft envelope is a credible wire-level substrate for state-governance evidence because it gives deterministic CBOR bytes, explicit payload and signature protocol dispatch, mandatory signature slots, and clear layer boundaries without assuming a central registry. Unknown-pCID best-effort salvage is useful for cross-agency partial interoperability, but the specimen stops at transport semantics: it does not define the identity, delegation, naming, feed, revocation, multi-authority, or local decision rules needed when records are delayed, stale, or disputed.",
+    "strengths": [
+      "Deterministic CBOR encoding and mandatory signature metadata support stable hashing, verification, and later audit of exactly what bytes were signed.",
+      "The spec is explicit about envelope vs payload vs signature responsibilities, which is strong for layer-boundary clarity under sparse knowledge.",
+      "Using pCID and sig_pCID avoids a required central registry and fits peer-local verification better than globally coordinated dispatch.",
+      "The four-slot positional structure is straightforward to implement and compare against sibling wire variants."
+    ],
+    "weaknesses": [
+      "The specimen is only an envelope draft; it does not define the state-governance payloads, authority records, feeds, or promise-accounting artifacts the scenario asks peers to reason about.",
+      "Single signature slots are not enough by themselves to express countersignatures, delegation chains, regional overrides, or revocation-heavy public-sector workflows.",
+      "Failure handling stops at visible unsupported or unverified status; it does not specify acceptance, retry, downgrade, escalation, or stale-evidence policy for contested cases.",
+      "The spec is still unfrozen and has no minted specimen pCID or freeze history, so long-term durability is not yet demonstrated."
+    ],
+    "risks": [
+      "Operators may over-trust best-effort inspection of unknown payloads even though the spec says such results are unsupported and unverified.",
+      "Cross-agency interoperability can fragment if different agencies mint incompatible payload or signature protocol identifiers without clear migration guidance.",
+      "Long-lived governance records need time, revocation, and authority-change semantics that are outside this envelope and could be handled inconsistently downstream."
+    ],
+    "open_questions": [
+      "What payload protocol carries agency identity, jurisdiction, delegation, and promise-accounting records for this scenario?",
+      "How are multiple signatures or chained attestations represented in practice: nested envelopes, a richer signature protocol, or payload-level structures?",
+      "What local policy tells Alice or Carol when unsupported best-effort inspection may inform triage but must never justify acceptance?",
+      "How would this variant handle decades-long migration of keys, pCIDs, and legal authority changes while preserving auditability?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}
