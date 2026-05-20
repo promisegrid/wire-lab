@@ -157,16 +157,6 @@ func (provider OpenAIProvider) generateOnce(ctx context.Context, request Provide
 	if err := json.Unmarshal(responseBytes, &parsed); err != nil {
 		return ProviderResponse{}, err
 	}
-	text := parsed.OutputText
-	if text == "" {
-		text = parsed.JoinOutputText()
-	}
-	if strings.TrimSpace(text) == "" {
-		// Intent: Empty successful Responses payloads are transient provider
-		// anomalies in canary evidence; retry before the caller skips the cell.
-		// Source: DI-zikag
-		return ProviderResponse{}, openAIResponseError{Message: "openai response contained no output text", Retryable: true}
-	}
 	usageJSON := ""
 	if len(parsed.Usage) > 0 {
 		usageBytes, err := json.Marshal(parsed.Usage)
@@ -175,13 +165,30 @@ func (provider OpenAIProvider) generateOnce(ctx context.Context, request Provide
 		}
 		usageJSON = string(usageBytes)
 	}
+	text := parsed.OutputText
+	if text == "" {
+		text = parsed.JoinOutputText()
+	}
 	if parsed.Status != "" && parsed.Status != "completed" {
-		// Intent: Incomplete Responses payloads may succeed on retry and should
-		// not abort an unattended GA cycle until bounded retries are exhausted.
+		reason := parsed.IncompleteDetails.Reason
+		// Intent: Retry transient incomplete Responses states, but do not retry
+		// deterministic max-output exhaustion. The canary log showed xhigh
+		// calls consuming the whole output cap as reasoning tokens; retrying the
+		// same cap only spends more budget and looks like a hang. Source:
+		// DI-juzus; DI-zikag
+		return ProviderResponse{}, openAIResponseError{
+			Message: fmt.Sprintf("openai response status %q reason %q with output text length %d usage %s",
+				parsed.Status, reason, len(text), usageJSON),
+			Retryable: retryableOpenAIStatus(parsed.Status, reason),
+		}
+	}
+	if strings.TrimSpace(text) == "" {
+		// Intent: Empty successful Responses payloads are transient provider
+		// anomalies in canary evidence; retry before the caller skips the cell.
 		// Source: DI-zikag
 		return ProviderResponse{}, openAIResponseError{
-			Message:   fmt.Sprintf("openai response status %q with output text length %d", parsed.Status, len(text)),
-			Retryable: parsed.Status == "incomplete",
+			Message:   fmt.Sprintf("openai response contained no output text usage %s", usageJSON),
+			Retryable: true,
 		}
 	}
 	return ProviderResponse{
@@ -191,6 +198,17 @@ func (provider OpenAIProvider) generateOnce(ctx context.Context, request Provide
 		ServiceTier: parsed.ServiceTier,
 		UsageJSON:   usageJSON,
 	}, nil
+}
+
+func retryableOpenAIStatus(status string, reason string) bool {
+	switch status {
+	case "queued", "in_progress":
+		return true
+	case "incomplete":
+		return reason != "max_output_tokens"
+	default:
+		return false
+	}
 }
 
 func (policy ProviderRetryPolicy) withDefaults() ProviderRetryPolicy {
@@ -288,12 +306,17 @@ type openAIReasoning struct {
 }
 
 type openAIResponse struct {
-	ID          string                 `json:"id"`
-	Status      string                 `json:"status"`
-	OutputText  string                 `json:"output_text"`
-	ServiceTier string                 `json:"service_tier"`
-	Output      []openAIOutputItem     `json:"output"`
-	Usage       map[string]interface{} `json:"usage"`
+	ID                string                  `json:"id"`
+	Status            string                  `json:"status"`
+	OutputText        string                  `json:"output_text"`
+	ServiceTier       string                  `json:"service_tier"`
+	Output            []openAIOutputItem      `json:"output"`
+	Usage             map[string]interface{}  `json:"usage"`
+	IncompleteDetails openAIIncompleteDetails `json:"incomplete_details"`
+}
+
+type openAIIncompleteDetails struct {
+	Reason string `json:"reason"`
 }
 
 type openAIOutputItem struct {

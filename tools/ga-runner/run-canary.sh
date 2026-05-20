@@ -28,6 +28,8 @@ Environment overrides:
   GA_CANARY_REQUEST_TIMEOUT    default: 5m
   GA_CANARY_PROVIDER_ATTEMPTS  default: 2
   GA_CANARY_PROVIDER_ELAPSED   default: 6m
+  GA_CANARY_SCORE_MAX_OUTPUT_TOKENS     default: 12000
+  GA_CANARY_GENERATE_MAX_OUTPUT_TOKENS  default: 16000
   GA_CANARY_POLL_SECONDS       default: 30
   GA_CANARY_LOG_FILE           default: /tmp/wire-lab-ga-canary-<run-group>.log
 
@@ -67,6 +69,8 @@ generate_workers="${GA_CANARY_GENERATE_WORKERS:-1}"
 request_timeout="${GA_CANARY_REQUEST_TIMEOUT:-5m}"
 provider_attempts="${GA_CANARY_PROVIDER_ATTEMPTS:-2}"
 provider_elapsed="${GA_CANARY_PROVIDER_ELAPSED:-6m}"
+score_max_output_tokens="${GA_CANARY_SCORE_MAX_OUTPUT_TOKENS:-12000}"
+generate_max_output_tokens="${GA_CANARY_GENERATE_MAX_OUTPUT_TOKENS:-16000}"
 poll_seconds="${GA_CANARY_POLL_SECONDS:-30}"
 log_file="${GA_CANARY_LOG_FILE:-/tmp/wire-lab-ga-canary-$run_group.log}"
 state_file="$repo_root/results/state/$run_group.json"
@@ -92,6 +96,14 @@ if ! [[ "$generate_workers" =~ ^[0-9]+$ ]] || [ "$generate_workers" -lt 1 ]; the
 fi
 if ! [[ "$provider_attempts" =~ ^[0-9]+$ ]] || [ "$provider_attempts" -lt 1 ]; then
 	echo "GA_CANARY_PROVIDER_ATTEMPTS must be a positive integer." >&2
+	exit 2
+fi
+if ! [[ "$score_max_output_tokens" =~ ^[0-9]+$ ]] || [ "$score_max_output_tokens" -lt 1 ]; then
+	echo "GA_CANARY_SCORE_MAX_OUTPUT_TOKENS must be a positive integer." >&2
+	exit 2
+fi
+if ! [[ "$generate_max_output_tokens" =~ ^[0-9]+$ ]] || [ "$generate_max_output_tokens" -lt 1 ]; then
+	echo "GA_CANARY_GENERATE_MAX_OUTPUT_TOKENS must be a positive integer." >&2
 	exit 2
 fi
 
@@ -224,6 +236,8 @@ echo "Generate workers: $generate_workers"
 echo "Request timeout: $request_timeout"
 echo "Provider attempts: $provider_attempts"
 echo "Provider elapsed: $provider_elapsed"
+echo "Score max output tokens: $score_max_output_tokens"
+echo "Generate max output tokens: $generate_max_output_tokens"
 
 if git -C "$repo_root" status --short | grep -q .; then
 	echo "[warning] worktree has uncommitted or untracked files; continuing because canary outputs are expected to be uncommitted."
@@ -255,6 +269,7 @@ run_step_with_monitor "score parent cells" \
 		-request-timeout "$request_timeout" \
 		-provider-max-attempts "$provider_attempts" \
 		-provider-max-elapsed "$provider_elapsed" \
+		-max-output-tokens "$score_max_output_tokens" \
 		-skip-failed-cells \
 		-max-run-cost-usd "$max_run_cost_usd" \
 		-max-cell-estimate-usd "$max_cell_usd"
@@ -270,6 +285,7 @@ run_step_with_monitor "generate child simulations" \
 		-request-timeout "$request_timeout" \
 		-provider-max-attempts "$provider_attempts" \
 		-provider-max-elapsed "$provider_elapsed" \
+		-max-output-tokens "$generate_max_output_tokens" \
 		-skip-failed-children \
 		-max-run-cost-usd "$max_run_cost_usd" \
 		-max-child-estimate-usd "$max_child_usd"
@@ -286,6 +302,7 @@ run_step_with_monitor "score child cells" \
 		-request-timeout "$request_timeout" \
 		-provider-max-attempts "$provider_attempts" \
 		-provider-max-elapsed "$provider_elapsed" \
+		-max-output-tokens "$score_max_output_tokens" \
 		-skip-failed-cells \
 		-max-run-cost-usd "$max_run_cost_usd" \
 		-max-cell-estimate-usd "$max_cell_usd"

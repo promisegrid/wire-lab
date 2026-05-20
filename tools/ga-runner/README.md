@@ -31,6 +31,7 @@ go run . validate -repo-root ../..
     -request-timeout 5m \
     -provider-max-attempts 2 \
     -provider-max-elapsed 6m \
+    -max-output-tokens 12000 \
     -skip-failed-cells \
     -max-run-cost-usd <budget>
 
@@ -43,6 +44,7 @@ go run . validate -repo-root ../..
     -request-timeout 5m \
     -provider-max-attempts 2 \
     -provider-max-elapsed 6m \
+    -max-output-tokens 16000 \
     -skip-failed-children \
     -max-run-cost-usd <budget>
 
@@ -87,6 +89,13 @@ to `-provider-max-attempts 2` and `-provider-max-elapsed 6m`. Concurrent scoring
 reserves estimated cell cost before dispatch, so `-max-run-cost-usd` remains a
 conservative launch budget rather than a best-effort warning. Source:
 `DI-juzus`.
+
+For xhigh canary runs, the wrapper passes explicit output caps with
+`GA_CANARY_SCORE_MAX_OUTPUT_TOKENS` defaulting to `12000` and
+`GA_CANARY_GENERATE_MAX_OUTPUT_TOKENS` defaulting to `16000`. A provider
+response with `status: incomplete` and `reason: max_output_tokens` is treated as
+a deterministic cap failure rather than retried with the same cap. Source:
+`DI-juzus`; `DI-zikag`.
 
 For unattended canary-style runs, `score -skip-failed-cells` and
 `generate -skip-failed-children` preserve per-cell or per-child failure messages

@@ -955,6 +955,46 @@ func TestOpenAIProviderRetriesEmptyOutput(t *testing.T) {
 	}
 }
 
+func TestOpenAIProviderDoesNotRetryMaxOutputIncomplete(t *testing.T) {
+	attempts := 0
+	transport := roundTripFunc(func(request *http.Request) (*http.Response, error) {
+		attempts++
+		body := `{"id":"resp-incomplete","status":"incomplete","incomplete_details":{"reason":"max_output_tokens"},"service_tier":"default","output":[{"type":"reasoning","summary":[]}],"usage":{"input_tokens":10,"input_tokens_details":{"cached_tokens":0},"output_tokens":4000,"output_tokens_details":{"reasoning_tokens":4000}}}`
+		return openAITestHTTPResponse(request, http.StatusOK, "req-incomplete", body), nil
+	})
+	var debug strings.Builder
+	provider := OpenAIProvider{
+		APIKey:      "test-key",
+		BaseURL:     "https://example.test/responses",
+		Client:      &http.Client{Transport: transport},
+		DebugWriter: &debug,
+		RetryPolicy: ProviderRetryPolicy{
+			MaxAttempts:    2,
+			MaxElapsed:     time.Second,
+			InitialBackoff: time.Millisecond,
+			MaxBackoff:     time.Millisecond,
+		},
+	}
+	_, err := provider.Generate(context.Background(), ProviderRequest{
+		APIModel:        "model-a",
+		ServiceTier:     serviceTierDefault,
+		ReasoningEffort: "xhigh",
+		Prompt:          "retry would waste budget",
+	})
+	if err == nil {
+		t.Fatalf("expected max-output incomplete response to fail")
+	}
+	if attempts != 1 {
+		t.Fatalf("max-output incomplete response retried %d attempts; want 1", attempts)
+	}
+	if !strings.Contains(err.Error(), `reason "max_output_tokens"`) || !strings.Contains(err.Error(), `"output_tokens":4000`) {
+		t.Fatalf("error did not preserve cap/usage evidence: %v", err)
+	}
+	if strings.Contains(debug.String(), "event=retry_sleep") {
+		t.Fatalf("max-output incomplete response should not retry:\n%s", debug.String())
+	}
+}
+
 func TestOpenAIProviderRetriesTimeout(t *testing.T) {
 	transport := &timeoutThenSuccessTransport{}
 	provider := OpenAIProvider{
