@@ -62,6 +62,14 @@ type parentFitnessRank struct {
 	OriginalIndex     int
 }
 
+const (
+	// Intent: Bound child-generation feedback text so one verbose result cannot
+	// dominate the prompt or trigger provider timeout behavior. Source: DI-dilaf
+	compactFitnessTextLimit = 700
+	compactFitnessItemLimit = 240
+	compactFitnessItemCount = 3
+)
+
 func runGenerate(args []string, stdout io.Writer) error {
 	options, err := parseGenerateOptions(args)
 	if err != nil {
@@ -814,7 +822,7 @@ func buildGeneratePrompt(repo Repo, state GAState, child GAChild) (string, error
 	// Intent: Generate children from complete local source bundles and in-run
 	// fitness evidence so proposed sims can stand alone after materialization
 	// and make score-improving two-parent breed moves. Source: DI-gijom;
-	// DI-bukid; DI-sohus
+	// DI-bukid; DI-sohus; DI-dilaf
 	var out strings.Builder
 	out.WriteString("# GA Child Generation\n\n")
 	out.WriteString("Return only JSON with keys `child_id`, `design_delta_summary`, and `files`.\n")
@@ -831,38 +839,151 @@ func buildGeneratePrompt(repo Repo, state GAState, child GAChild) (string, error
 	for _, scenario := range state.ScenarioSample {
 		fmt.Fprintf(&out, "- `%s` at `%s`\n", scenario.ScenarioID, scenario.Path)
 	}
-	out.WriteString("\n## Parent Source Documents\n\n")
-	seen := map[string]bool{}
-	for _, parentID := range child.ParentIDs {
-		for _, scenarioState := range state.ScenarioSample {
-			docs, err := sourceDocumentsForPrompt(repo, parentID, Scenario{ScenarioID: scenarioState.ScenarioID, Path: scenarioState.Path})
-			if err != nil {
-				return "", err
-			}
-			for _, doc := range docs {
-				if seen[doc.Path] {
-					continue
-				}
-				seen[doc.Path] = true
-				fmt.Fprintf(&out, "### `%s`\n\n```markdown\n%s\n```\n\n", doc.Path, strings.TrimSpace(doc.Text))
-			}
-		}
+	out.WriteString("\n## Scenario Pressure\n\n")
+	if err := writeScenarioPressureForGeneratePrompt(&out, repo, state.ScenarioSample); err != nil {
+		return "", err
 	}
-	out.WriteString("## Existing Fitness Evidence From This Run\n\n")
-	for _, cell := range state.Cells {
-		if !containsString(child.ParentIDs, cell.SimID) || cell.Status != "done" || cell.ResultPath == "" {
-			continue
-		}
-		text, err := repo.ReadRel(cell.ResultPath)
-		if err != nil {
-			continue
-		}
-		fmt.Fprintf(&out, "### `%s`\n\n```json\n%s\n```\n\n", cell.ResultPath, strings.TrimSpace(text))
+	out.WriteString("## Parent Simulation Documents\n\n")
+	if err := writeParentDocumentsForGeneratePrompt(&out, repo, child.ParentIDs); err != nil {
+		return "", err
+	}
+	out.WriteString("## Compact Fitness Evidence From This Run\n\n")
+	if err := writeCompactFitnessEvidenceForGeneratePrompt(&out, repo, state, child); err != nil {
+		return "", err
 	}
 	out.WriteString("## Required JSON Shape\n\n")
 	fmt.Fprintf(&out, `{"child_id":%q,"design_delta_summary":"one to three bounded design deltas","files":[{"path":"README.md","content":"# ..."},{"path":"QUESTION.md","content":"# ..."}]}`, child.ID())
 	out.WriteString("\n")
 	return out.String(), nil
+}
+
+func writeScenarioPressureForGeneratePrompt(out *strings.Builder, repo Repo, scenarios []GAStateScenario) error {
+	// Intent: Preserve the scenario-specific pressure that steers child design
+	// while leaving shared scenario boilerplate out of the child-generation
+	// prompt so repeated provider calls stay bounded. Source: DI-dilaf
+	seen := map[string]bool{}
+	for _, scenario := range scenarios {
+		docs, err := scenarioSourceDocumentsForGeneratePrompt(repo, scenario)
+		if err != nil {
+			return fmt.Errorf("read scenario pressure %s: %w", scenario.Path, err)
+		}
+		for _, doc := range docs {
+			if seen[doc.Path] {
+				continue
+			}
+			seen[doc.Path] = true
+			fmt.Fprintf(out, "### `%s`\n\n```markdown\n%s\n```\n\n", doc.Path, strings.TrimSpace(doc.Text))
+		}
+	}
+	return nil
+}
+
+func writeParentDocumentsForGeneratePrompt(out *strings.Builder, repo Repo, parentIDs []string) error {
+	// Intent: Bundle each parent simulation tree once so the model can produce a
+	// standalone child without multiplying parent documents by every sampled
+	// scenario. Source: DI-dilaf
+	seen := map[string]bool{}
+	for _, parentID := range parentIDs {
+		docs, err := parentSourceDocumentsForGeneratePrompt(repo, parentID)
+		if err != nil {
+			return err
+		}
+		for _, doc := range docs {
+			if seen[doc.Path] {
+				continue
+			}
+			seen[doc.Path] = true
+			fmt.Fprintf(out, "### `%s`\n\n```markdown\n%s\n```\n\n", doc.Path, strings.TrimSpace(doc.Text))
+		}
+	}
+	return nil
+}
+
+func writeCompactFitnessEvidenceForGeneratePrompt(out *strings.Builder, repo Repo, state GAState, child GAChild) error {
+	// Intent: Give the child generator actionable score feedback without
+	// embedding complete fitness-result JSON documents that caused header-timeout
+	// failures in the canary. Source: DI-dilaf
+	matched := 0
+	for _, cell := range state.Cells {
+		if !containsString(child.ParentIDs, cell.SimID) || cell.Status != "done" || cell.ResultPath == "" {
+			continue
+		}
+		result, err := readFitnessResult(repo.Abs(cell.ResultPath))
+		if err != nil {
+			return fmt.Errorf("read compact fitness evidence %s: %w", cell.ResultPath, err)
+		}
+		writeCompactFitnessResult(out, cell.ResultPath, result)
+		matched++
+	}
+	if matched == 0 {
+		out.WriteString("- No completed parent fitness evidence is available for these parents yet.\n\n")
+	}
+	return nil
+}
+
+func writeCompactFitnessResult(out *strings.Builder, resultPath string, result FitnessResult) {
+	// Intent: Preserve the score, rationale, risk, and open-question evidence
+	// that matters to breeding while omitting bulky source and runner metadata
+	// already checkpointed in the durable result file. Source: DI-dilaf
+	fmt.Fprintf(out, "### `%s` x `%s`\n\n", result.SimID, result.ScenarioID)
+	fmt.Fprintf(out, "- Result path: `%s`\n", resultPath)
+	fmt.Fprintf(out, "- Scores: scenario_fit=%d promisegrid_alignment=%d auditability=%d evolution_safety=%d layer_boundary_clarity=%d failure_handling=%d implementation_plausibility=%d risk_penalty=%d\n",
+		result.Scores.ScenarioFit,
+		result.Scores.PromiseGridAlignment,
+		result.Scores.Auditability,
+		result.Scores.EvolutionSafety,
+		result.Scores.LayerBoundaryClarity,
+		result.Scores.FailureHandling,
+		result.Scores.ImplementationPlausibility,
+		result.Scores.RiskPenalty,
+	)
+	fmt.Fprintf(out, "- Fitness: raw=%.2f normalized_0_100=%.2f confidence_0_1=%.2f\n", result.Fitness.Raw, result.Fitness.Normalized0To100, result.Fitness.Confidence0To1)
+	fmt.Fprintf(out, "- Rationale: %s\n", compactPromptText(result.Assessment.Rationale, compactFitnessTextLimit))
+	writeCompactAssessmentList(out, "Strengths", result.Assessment.Strengths)
+	writeCompactAssessmentList(out, "Weaknesses", result.Assessment.Weaknesses)
+	writeCompactAssessmentList(out, "Risks", result.Assessment.Risks)
+	writeCompactAssessmentList(out, "Open questions", result.Assessment.OpenQuestions)
+	if strings.TrimSpace(result.Assessment.AuthorityBoundary) != "" {
+		fmt.Fprintf(out, "- Authority boundary: %s\n", compactPromptText(result.Assessment.AuthorityBoundary, compactFitnessItemLimit))
+	}
+	out.WriteString("\n")
+}
+
+func writeCompactAssessmentList(out *strings.Builder, label string, items []string) {
+	// Intent: Keep each assessment category visible while preventing long lists
+	// from crowding out parent docs and scenario pressure. Source: DI-dilaf
+	if len(items) == 0 {
+		fmt.Fprintf(out, "- %s: none\n", label)
+		return
+	}
+	fmt.Fprintf(out, "- %s:\n", label)
+	limit := compactFitnessItemCount
+	if len(items) < limit {
+		limit = len(items)
+	}
+	for index := 0; index < limit; index++ {
+		fmt.Fprintf(out, "  - %s\n", compactPromptText(items[index], compactFitnessItemLimit))
+	}
+	if len(items) > limit {
+		fmt.Fprintf(out, "  - ... %d more\n", len(items)-limit)
+	}
+}
+
+func compactPromptText(text string, limit int) string {
+	// Intent: Normalize whitespace and apply a soft prompt-size guard to
+	// assessment prose without changing durable result files. Source: DI-dilaf
+	clean := strings.Join(strings.Fields(strings.TrimSpace(text)), " ")
+	if clean == "" {
+		return "none"
+	}
+	runes := []rune(clean)
+	if len(runes) <= limit {
+		return clean
+	}
+	if limit < 1 {
+		return ""
+	}
+	return string(runes[:limit]) + "..."
 }
 
 func validateBreedChild(child GAChild) error {

@@ -448,6 +448,29 @@ Affects: `tools/ga-runner/`; `tools/ga-runner/README.md`;
 `results/RUN-PROTOCOL.md`;
 `protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`.
 
+ID: DI-dilaf
+Date: 2026-05-20 13:51:45
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Compact GA child-generation prompts by bundling parent simulation
+documents once per parent, scenario pressure documents once per sampled
+scenario, and score evidence as compact fitness summaries instead of full JSON
+result files.
+Intent: Canary child generation timed out before response headers while sending
+large prompts that repeated root run/scenario boilerplate and embedded complete
+parent result JSON. Child generation needs enough context to breed an improved
+standalone sim, but it does not need full result source metadata, runner usage,
+rubric boilerplate, or repeated root contracts. Compact prompts should reduce
+latency and cost without weakening score evidence or parent design context.
+Constraints: Keep score prompts source-complete. Do not rewrite historical result
+files or current canary state. Keep parent sim docs complete for child
+generation; compact only repeated root boilerplate and result evidence. Preserve
+scenario-specific pressure, parent IDs, result paths, scores, fitness,
+rationale, strengths, weaknesses, risks, and open questions in prompt form.
+Affects: `tools/ga-runner/`; `tools/ga-runner/README.md`;
+`results/RUN-PROTOCOL.md`;
+`protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`.
+
 ## Scope
 
 - Define and implement a new GA/search runner without changing
@@ -569,6 +592,8 @@ The runner must prepare each generation prompt with:
 - selected parent sim IDs, parent paths, and parent tree hashes;
 - selected scenario sample and scenario pressure summaries;
 - relevant JSON fitness results from the active GA run when available;
+- compact result-path, score, fitness, rationale, strength, weakness, risk, and
+  open-question summaries instead of complete fitness-result JSON documents;
 - required operation type: `breed`;
 - exactly two distinct parent simulation IDs;
 - a bounded design-delta budget of one to three substantive changes;
@@ -689,6 +714,9 @@ status in the GA state file.
   strengthen child prompts so generated children are explicitly expected to
   improve over parent scores while preserving tournament diversity. Source:
   `DI-bukid`.
+- [x] tapur.21 Compact child-generation prompts so breed calls include parent
+  documents once, scenario pressure once, and summarized fitness evidence instead
+  of repeated root boilerplate and full result JSON. Source: `DI-dilaf`.
 
 ## Predecessor context
 
@@ -704,5 +732,6 @@ status in the GA state file.
   to committed matrix summaries.
 - `DI-nugiv` requires cost controls before large unattended API-backed runs.
 - `DI-kizal` keeps scenario files compact by centralizing shared scenario
-  boilerplate in `scenarios/README.md`, which should remain part of GA-runner
-  prompt bundling.
+  boilerplate in `scenarios/README.md`; score prompts keep using that root
+  contract, while child-generation prompts use scenario-specific pressure and
+  compact fitness evidence to avoid repeated boilerplate.

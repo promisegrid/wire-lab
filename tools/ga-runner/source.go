@@ -94,6 +94,13 @@ func sourceDocumentsForPrompt(repo Repo, simID string, scenario Scenario) ([]Sou
 	if err != nil {
 		return nil, err
 	}
+	return sourceDocumentsFromPaths(repo, paths)
+}
+
+func sourceDocumentsFromPaths(repo Repo, paths []string) ([]SourceDocument, error) {
+	// Intent: Keep path-selection policy separate from file loading so scoring
+	// and generation prompts can share safe repo-rooted reads. Source: DI-gijom;
+	// DI-dilaf
 	var docs []SourceDocument
 	for _, path := range paths {
 		text, err := repo.ReadRel(path)
@@ -103,6 +110,55 @@ func sourceDocumentsForPrompt(repo Repo, simID string, scenario Scenario) ([]Sou
 		docs = append(docs, SourceDocument{Path: path, Text: text})
 	}
 	return docs, nil
+}
+
+func parentSourceDocumentsForGeneratePrompt(repo Repo, simID string) ([]SourceDocument, error) {
+	// Intent: Keep child-generation prompts source-complete for each parent sim
+	// while avoiding repeated root contracts and scenario boilerplate that made
+	// provider calls time out before returning headers. Source: DI-dilaf
+	required := []string{
+		filepath.ToSlash(filepath.Join("simulations", simID, "README.md")),
+	}
+	var paths []string
+	for _, rel := range required {
+		if info, err := os.Stat(repo.Abs(rel)); err != nil || info.IsDir() {
+			if err != nil {
+				return nil, fmt.Errorf("read required source %s: %w", rel, err)
+			}
+			return nil, fmt.Errorf("required source %s is a directory", rel)
+		}
+		paths = append(paths, rel)
+	}
+	questionPath := filepath.ToSlash(filepath.Join("simulations", simID, "QUESTION.md"))
+	if info, err := os.Stat(repo.Abs(questionPath)); err == nil && !info.IsDir() {
+		paths = append(paths, questionPath)
+	}
+	localSim, err := localMarkdownFiles(repo, filepath.ToSlash(filepath.Join("simulations", simID)), map[string]bool{
+		"README.md":   true,
+		"QUESTION.md": true,
+	})
+	if err != nil {
+		return nil, err
+	}
+	paths = append(paths, localSim...)
+	return sourceDocumentsFromPaths(repo, uniqueStrings(paths))
+}
+
+func scenarioSourceDocumentsForGeneratePrompt(repo Repo, scenario GAStateScenario) ([]SourceDocument, error) {
+	// Intent: Keep scenario-specific pressure complete for child generation while
+	// excluding the shared root scenario contract that belongs in scoring prompts,
+	// not every breed prompt. Source: DI-dilaf
+	paths := []string{scenario.Path}
+	localScenario, err := localMarkdownFiles(repo, filepath.ToSlash(filepath.Join("scenarios", scenario.ScenarioID)), map[string]bool{
+		filepath.Base(scenario.Path): true,
+		"README.md":                  true,
+		"MATRIX.md":                  true,
+	})
+	if err != nil {
+		return nil, err
+	}
+	paths = append(paths, localScenario...)
+	return sourceDocumentsFromPaths(repo, uniqueStrings(paths))
 }
 
 func localMarkdownFiles(repo Repo, relRoot string, excludedBase map[string]bool) ([]string, error) {

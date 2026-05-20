@@ -65,17 +65,19 @@ results. `init -dry-run` previews tracked population and conservative generation
 sizing without writing state. Non-dry-run `init` creates
 `promisegrid.ga.state.v1`. `score` builds source-complete prompts, calls the
 provider, writes validated JSON fitness results, and checkpoints usage/cost
-metadata after each cell. `generate` builds source-complete child prompts,
-uses completed parent fitness results to rank the selected parent pool, applies
-deterministic top-parent plus tournament-diversity parent selection, materializes
-strict file-bundle responses as untracked `simulations/SIM-*` trees, and records
-prompt/response hashes, file hashes, tree hashes, and cost metadata in state.
+metadata after each cell. `generate` builds compact child prompts from each
+parent simulation tree once, scenario-specific pressure once, and summarized
+fitness evidence, then uses completed parent fitness results to rank the
+selected parent pool, applies deterministic top-parent plus tournament-diversity
+parent selection, materializes strict file-bundle responses as untracked
+`simulations/SIM-*` trees, and records prompt/response hashes, file hashes, tree
+hashes, and cost metadata in state.
 `accept` records reviewed promotion evidence and prints paths to stage, but it
 does not run `git add` or commit. `cull` deletes only state-selected generated
 child sim trees and matching result trees; use `-dry-run` to print the deletion
 plan without changing files. Source:
 `DI-pobus`; `DI-bagih`; `DI-zusit`; `DI-podot`; `DI-kofil`; `DI-ruzaj`;
-`DI-gijom`; `DI-bukid`.
+`DI-gijom`; `DI-bukid`; `DI-dilaf`.
 
 Provider-backed `score` and `generate` always send an explicit service tier.
 The default is `-service-tier flex`; `-service-tier default` is available when
@@ -114,7 +116,11 @@ diversity. Second, the child prompt tells the model to preserve parent
 strengths, repair weaknesses, reduce risks, route open questions, and make
 bounded design deltas expected to improve the same rubric score. If fewer than
 two viable parents exist, generation records a failed or skipped child instead
-of creating a one-parent child. Source: `DI-bukid`; `DI-sohus`.
+of creating a one-parent child. Child-generation prompts do not embed complete
+parent result JSON; they include compact result-path, score, fitness, rationale,
+strength, weakness, risk, and open-question summaries to reduce timeout-prone
+prompt bulk while preserving the feedback signal. Source: `DI-bukid`;
+`DI-sohus`; `DI-dilaf`.
 
 For unattended canary-style runs, `score -skip-failed-cells` and
 `generate -skip-failed-children` preserve per-cell or per-child failure messages

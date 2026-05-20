@@ -669,6 +669,8 @@ func TestRunGenerateSelectsParentsByFitnessEvidence(t *testing.T) {
 	repo := newGAFixtureRepo(t)
 	addTrackedFixtureSim(t, repo, "SIM-high")
 	addTrackedFixtureSim(t, repo, "SIM-low")
+	writeTestFile(t, repo.Path("scenarios", "scenario-one", "extra-pressure.md"), "# Extra Pressure\n\nCarol needs delayed shipment audits.\n")
+	gitAdd(t, repo, "scenarios/scenario-one/extra-pressure.md")
 	initGAStateForTestWithParentsAndChildren(t, repo, "ga-generate-ranked", 3, 2)
 	state := mustReadGAState(t, repo, "ga-generate-ranked")
 	writeParentFitnessResults(t, repo, "ga-generate-ranked", map[string]float64{
@@ -686,8 +688,20 @@ func TestRunGenerateSelectsParentsByFitnessEvidence(t *testing.T) {
 			if !strings.Contains(request.Prompt, "breed a child simulation from exactly two parent simulations") || !strings.Contains(request.Prompt, "- Operation: `breed`") {
 				return ProviderResponse{}, fmt.Errorf("generate prompt missing breed operator language")
 			}
-			if !strings.Contains(request.Prompt, `"normalized_0_100": 95`) {
+			if !strings.Contains(request.Prompt, "## Compact Fitness Evidence From This Run") || !strings.Contains(request.Prompt, "normalized_0_100=95.00") {
 				return ProviderResponse{}, fmt.Errorf("generate prompt missing high parent fitness evidence")
+			}
+			if strings.Contains(request.Prompt, "\"schema\":") || strings.Contains(request.Prompt, "\"runner\":") {
+				return ProviderResponse{}, fmt.Errorf("generate prompt should not embed complete fitness JSON")
+			}
+			if strings.Contains(request.Prompt, "# Run Protocol") || strings.Contains(request.Prompt, "# Scenarios") {
+				return ProviderResponse{}, fmt.Errorf("generate prompt should not repeat root boilerplate")
+			}
+			if !strings.Contains(request.Prompt, "## Scenario Pressure") || !strings.Contains(request.Prompt, "Alice asks Bob to ship labels") || !strings.Contains(request.Prompt, "Carol needs delayed shipment audits") {
+				return ProviderResponse{}, fmt.Errorf("generate prompt missing scenario pressure")
+			}
+			if !strings.Contains(request.Prompt, "## Parent Simulation Documents") || !strings.Contains(request.Prompt, "A fixture simulation for ranked parent selection") {
+				return ProviderResponse{}, fmt.Errorf("generate prompt missing parent simulation documents")
 			}
 			childID := promptChildID(t, request.Prompt)
 			calls++

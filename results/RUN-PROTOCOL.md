@@ -54,6 +54,12 @@ pressure. Per-scenario `README.md` files are intentionally absent so repeated
 boilerplate can be cached once rather than bundled with every scenario. Source:
 `DI-kizal`.
 
+GA child-generation prompts keep the parent simulation documents complete but do
+not rebundle the root run protocol, root scenario contract, or complete parent
+result JSON for every breed call. They include sampled scenario pressure once
+and compact score/rationale/risk/open-question summaries from completed parent
+fitness results. Source: `DI-dilaf`.
+
 API-backed runs must use explicit cost controls before any large batch. The
 runner defaults to concise result style and a lower output cap, records provider
 usage in queue state, prints actual accumulated cost, and can stop before a
@@ -152,6 +158,9 @@ Source: `DI-ramar`; `DI-pobus`; `DI-ruzaj`.
   `generate` uses completed parent fitness evidence to rank the selected parent
   pool and apply deterministic top-parent plus tournament-diversity parent
   selection. Source: `DI-bukid`.
+- Keep child-generation prompts compact: parent simulation documents once,
+  scenario-specific pressure once, and compact fitness summaries instead of full
+  parent result JSON. Source: `DI-dilaf`.
 - Set an explicit `-max-run-cost-usd` for unattended API-backed batches, and use
   estimate-only output-token budgeting with per-cell/per-child estimate caps
   where the runner supports it. Treat hard `-max-output-tokens` caps as an
@@ -212,6 +221,12 @@ merely because they exist on disk. Source: `DI-ramar`; `DI-zanon`; `DI-zohal`;
 LLM-generated children use one operation, `breed`, with exactly two distinct
 parent simulations. The runner must fail or skip generation rather than create a
 one-parent child. Source: `DI-sohus`.
+
+Child breed prompts use compact fitness summaries rather than full parent result
+JSON documents. The durable result files remain the source of truth in
+`results/`; the prompt carries only the score, rationale, strength, weakness,
+risk, and open-question evidence needed for the child to improve the rubric.
+Source: `DI-dilaf`.
 
 ## Recommended Preflight
 

@@ -1,0 +1,125 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-guhor-grid-envelope-enc-cbor-unknown-best-effort-sig-mandatory-opaque-bytes-open-source-development-openai-gpt-5.4-xhigh-20260520-203341",
+  "run_group_id": "ga-canary-20260520-203341",
+  "cell_id": "ga-canary-20260520-203341-000006-SIM-guhor-grid-envelope-enc-cbor-unknown-best-effort-sig-mandatory-opaque-bytes--open-source-development--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-guhor-grid-envelope-enc-cbor-unknown-best-effort-sig-mandatory-opaque-bytes",
+  "scenario_id": "open-source-development",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260520-203341",
+  "result_path": "results/SIM-guhor-grid-envelope-enc-cbor-unknown-best-effort-sig-mandatory-opaque-bytes/open-source-development/openai-gpt-5.4-xhigh/20260520-203341.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_a8f1513f1a234402b1fc62945db9f279",
+    "response_id": "resp_0eba01522760a9be006a0e1b37e758819ab43d754a742045a8",
+    "input_tokens": 6263,
+    "output_tokens": 17857,
+    "cost_usd": 0.26095825
+  },
+  "source": {
+    "repo_commit": "39aac816b4af60ab2490c21c49fcc18fdbd68771",
+    "sim_path": "simulations/SIM-guhor-grid-envelope-enc-cbor-unknown-best-effort-sig-mandatory-opaque-bytes/",
+    "scenario_path": "scenarios/open-source-development/open-source-development.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "c6e5388b5635afb39230dc34c5577b5bec8f0171d13868da2c660a615b58eb18"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-guhor-grid-envelope-enc-cbor-unknown-best-effort-sig-mandatory-opaque-bytes/README.md",
+        "sha256": "577753a742867694e2a8ee84c229e8264f04fa109942f444c3af2feda056a45c"
+      },
+      {
+        "path": "simulations/SIM-guhor-grid-envelope-enc-cbor-unknown-best-effort-sig-mandatory-opaque-bytes/QUESTION.md",
+        "sha256": "eaebc9d28329655b84215f609f1d60f7a6267bccf424f314a2be1aef0b1f764f"
+      },
+      {
+        "path": "simulations/SIM-guhor-grid-envelope-enc-cbor-unknown-best-effort-sig-mandatory-opaque-bytes/protocols/grid-envelope.d/CHANGELOG.md",
+        "sha256": "aef2b7915320af9607f415cef649397530561e4f0f9372fda1bbf2691dd3f9b1"
+      },
+      {
+        "path": "simulations/SIM-guhor-grid-envelope-enc-cbor-unknown-best-effort-sig-mandatory-opaque-bytes/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "30aadb2f95a3906e1c5c27acb96ea3687a88346a2d6e2d171db2d90c55bbe656"
+      },
+      {
+        "path": "scenarios/open-source-development/open-source-development.md",
+        "sha256": "0965a20ce8888de4b4b3f3ec8bc07d0efa493a54f319f792d59f244231000c7f"
+      }
+    ],
+    "simulation_tree_hash": "d31569a6a684e574940f7156736bbf02b5789289cb2520469fd57807458c1a18"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 3,
+    "auditability": 2,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 3,
+    "implementation_plausibility": 4,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 25,
+    "normalized_0_100": 62.5,
+    "confidence_0_1": 0.74
+  },
+  "assessment": {
+    "rationale": "Useful only as a lower-layer carrier for open-source artifacts with mandatory signature bytes: deterministic CBOR, explicit pcid dispatch, and unsupported/unverified downgrade behavior work under partial knowledge. It does not model maintainer authority, contributor reputation, promise accounting, freshness, or dispute semantics, so application fit remains limited.",
+    "strengths": [
+      "Deterministic CBOR plus a mandatory signature slot over a fixed prefix give stable canonical bytes with attached signature material for local storage, hashing, and archival.",
+      "Explicit pcid dispatch and the lack of a central registry fit sparse-knowledge and no-central-authority goals.",
+      "Unknown-pcid best-effort salvage lets older tools retain and inspect new artifacts while forcing unsupported/unverified labeling.",
+      "Envelope, payload, and signature responsibilities are separated clearly."
+    ],
+    "weaknesses": [
+      "It does not define issue, patch, review promise, release artifact, maintainer authority, or contributor reputation objects.",
+      "Mandatory signature bytes do not carry in-envelope signer identity, algorithm, or verification rules.",
+      "Opaque payloads and positional CBOR reduce generic human/LLM auditability without the referenced handler spec.",
+      "No peer-local promise-accounting, freshness, revocation, retry, or escalation rules are provided for contested development workflows."
+    ],
+    "risks": [
+      "Consumers may over-trust the mere presence of signature bytes when the relevant verification regime is missing or disputed.",
+      "Best-effort inspection of unknown payloads can produce misleading partial interpretations if tooling hides the unsupported/unverified state.",
+      "Long-term verification depends on preserving external handler and signature-verification specs, not just the envelope bytes."
+    ],
+    "open_questions": [
+      "What payload protocol encodes review state, maintainer authority, and contributor reputation for this application?",
+      "How are key rotation, revocation, and project-specific trust roots represented across decades?",
+      "The encoding text mentions sig_pcid and sig_payload when present; are extra signature conventions or wrappers intended beyond the three-slot envelope?",
+      "Are wrapper conventions needed for timestamps, countersignatures, relay evidence, or merge/release attestations?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

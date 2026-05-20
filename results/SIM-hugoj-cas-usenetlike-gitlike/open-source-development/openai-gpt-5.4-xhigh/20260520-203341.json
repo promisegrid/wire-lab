@@ -1,0 +1,111 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-hugoj-cas-usenetlike-gitlike-open-source-development-openai-gpt-5.4-xhigh-20260520-203341",
+  "run_group_id": "ga-canary-20260520-203341",
+  "cell_id": "ga-canary-20260520-203341-000003-SIM-hugoj-cas-usenetlike-gitlike--open-source-development--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-hugoj-cas-usenetlike-gitlike",
+  "scenario_id": "open-source-development",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260520-203341",
+  "result_path": "results/SIM-hugoj-cas-usenetlike-gitlike/open-source-development/openai-gpt-5.4-xhigh/20260520-203341.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_6e2f6269eba741eea9c3ad7ebad16c09",
+    "response_id": "resp_04e72d58fb1cfc6a006a0e1aa778dc819bad0a589a53ea93b6",
+    "input_tokens": 5910,
+    "output_tokens": 8979,
+    "cost_usd": 0.1360485
+  },
+  "source": {
+    "repo_commit": "39aac816b4af60ab2490c21c49fcc18fdbd68771",
+    "sim_path": "simulations/SIM-hugoj-cas-usenetlike-gitlike/",
+    "scenario_path": "scenarios/open-source-development/open-source-development.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "c6e5388b5635afb39230dc34c5577b5bec8f0171d13868da2c660a615b58eb18"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-hugoj-cas-usenetlike-gitlike/README.md",
+        "sha256": "0506d32e30f1fe4903d1c0c1f2e6a7f25a3c3a438d6cfa0782d3e99c9448bdb8"
+      },
+      {
+        "path": "scenarios/open-source-development/open-source-development.md",
+        "sha256": "0965a20ce8888de4b4b3f3ec8bc07d0efa493a54f319f792d59f244231000c7f"
+      }
+    ],
+    "simulation_tree_hash": "144951c8a39cbb610ac9d305fe823308c60e01e271c2f3b222a32276d4a196ef"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 3,
+    "promisegrid_alignment": 4,
+    "auditability": 4,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 3,
+    "implementation_plausibility": 4,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 24,
+    "normalized_0_100": 69,
+    "confidence_0_1": 0.74
+  },
+  "assessment": {
+    "rationale": "Strong substrate-level fit for decentralized open-source evidence flows: durable CAS identities, append-only DAG/thread history, store-and-forward replication, and transport separation match sparse, multi-site development well. The fit is only partial at the application layer because maintainer authority, contributor reputation, review commitments, and release trust are not yet modeled as explicit peer-local promises.",
+    "strengths": [
+      "Durable content-addressed and hash-linked history supports replayable audit trails across transport changes.",
+      "Store-and-forward replication and substrate independence fit partitioned, multi-site collaboration without requiring central hosting.",
+      "The simulation is clear about boundaries between historical precedent, current specimen, and any future PromiseGrid protocol, which helps evolution."
+    ],
+    "weaknesses": [
+      "Maintainer authority, contributor reputation, and review promises are not defined as first-class local records.",
+      "The current specimen is discussion-centric and does not spell out patch, merge, or release workflows.",
+      "Peer-local accept, retry, downgrade, and escalation rules for stale or disputed evidence are not explicit."
+    ],
+    "risks": [
+      "The Usenet/git analogy could under-specify governance, moderation, and release policy needed for real open-source projects.",
+      "Unresolved naming, feed, and sparse-CAS decisions could push deployments back toward central forges or registries.",
+      "If authority and reputation remain implicit, different peers may make incompatible trust decisions with weak interoperability."
+    ],
+    "open_questions": [
+      "How are issues, patches, reviews, and release artifacts represented as distinct CAS objects or feeds?",
+      "How does a peer record maintainer authority and contributor reputation locally without a central forge or registry?",
+      "What retry, downgrade, or escalation rules apply when signatures, reviews, or release evidence are delayed, stale, or disputed?",
+      "How do maintainer and release claims survive key, organization, or hosting changes over long time spans?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}
