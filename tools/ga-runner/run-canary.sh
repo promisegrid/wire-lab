@@ -26,7 +26,7 @@ Environment overrides:
   GA_CANARY_GENERATE_REASONING_EFFORT  default: medium
   GA_CANARY_REASONING_SUMMARY  default: auto
   GA_CANARY_TEXT_VERBOSITY     default: low
-  GA_CANARY_SERVICE_TIER       default: flex
+  GA_CANARY_SERVICE_TIER       default: default
   GA_CANARY_MAX_RUN_COST_USD   default: 5.00
 	  GA_CANARY_MAX_CELL_USD       default: 0.75
 	  GA_CANARY_MAX_CHILD_USD      default: 1.00

@@ -304,6 +304,25 @@ verifier obligations.
 |---|---|
 | `simulations/SIM-lotiv-grid-envelope-cryptid-multisig-signature-proofs/` | Tests whether a codec-agnostic Multisig object can represent grid-envelope signature/proof bytes while preserving unresolved PromiseGrid signature design choices. |
 
+## Development Guide Feedback Evidence Homes
+
+`DI-ragaz` routes the current open feedback in
+`/home/stevegt/lab/promisegrid-dev-guide/FEEDBACK.md` into provisional
+simulation homes and root scenarios. These artifacts are comparison inputs for
+wire-lab runs. They do not close the guide-blocking DRs, and guide writers should
+cite them as evidence pressure until a DR/DI/frozen-spec/guide handoff settles
+the prose.
+
+| Feedback | Simulation home | Root scenarios | Guide-writer status |
+|---|---|---|---|
+| `FB-vopik` | `simulations/SIM-mikas-minimal-blob-app-contract/` | `scenarios/minimal-immutable-blob-app/` | Provisional CAS-facing App Dev evidence; final answer still depends on `DR-tuhaz` and `DR-tumus`. |
+| `FB-dodos`, `FB-hisis`, `FB-kutub`, `FB-gomod`, `FB-tahof` | `simulations/SIM-robot-app-semantics-conformance/` | `scenarios/app-semantics-partial-conformance/` | Provisional app-semantics and conformance evidence; do not present as stable app SDK or message API. |
+| `FB-nojit`, `FB-tisuf`, `FB-tulit` | `simulations/SIM-zisan-device-bound-agent/` | `scenarios/device-bound-agent-physical-effect/` | Provisional device-bound-app evidence for sensors, actuators, owner/operator delegation, and host-driver conformance. |
+| `FB-hurit`, `FB-nilat` | `simulations/SIM-kugap-live-sync-audit-split/` | `scenarios/live-crdt-audit-publication/` | Provisional live-state versus durable-audit evidence; does not freeze a reliable low-latency binding. |
+| `FB-zazon`, `FB-robif` | `simulations/SIM-nijuz-multi-embodiment-identity/` | `scenarios/multi-embodiment-app-identity/`; `scenarios/portable-signing-key-identity/` | Provisional multi-host identity and conformance evidence; concrete signing-key recipe remains unsettled. |
+| `FB-vitih`, `FB-mulum`, `FB-potin` | `simulations/SIM-funas-kernel-porting-boundary/` | `scenarios/kernel-porting-boundary/` | Provisional kernel/runtime/dispatcher boundary evidence; settled porting target remains blocked by `DR-davod`. |
+| `FB-gigit` | Existing Laypeople readiness matrix and `DR-napum` | Existing 100-year and governance scenarios | No new sim required; this is a narrative-settlement question rather than a distinct run surface. |
+
 ## Audience Readiness Matrix
 
 This matrix answers the current guide-writer feedback items `FB-gigit`,

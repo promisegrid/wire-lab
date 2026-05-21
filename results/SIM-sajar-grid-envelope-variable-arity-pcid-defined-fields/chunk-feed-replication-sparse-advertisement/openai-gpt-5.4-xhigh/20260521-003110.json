@@ -1,0 +1,122 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields-chunk-feed-replication-sparse-advertisement-openai-gpt-5.4-xhigh-20260521-003110",
+  "run_group_id": "ga-canary-20260521-003110",
+  "cell_id": "ga-canary-20260521-003110-000001-SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields--chunk-feed-replication-sparse-advertisement--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields",
+  "scenario_id": "chunk-feed-replication-sparse-advertisement",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260521-003110",
+  "result_path": "results/SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields/chunk-feed-replication-sparse-advertisement/openai-gpt-5.4-xhigh/20260521-003110.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_1cd583d1ca5c4430839395fc0093e304",
+    "response_id": "resp_0c7dede377907458006a0e524ffc90819a983a51b91653501b",
+    "input_tokens": 6845,
+    "output_tokens": 10266,
+    "cost_usd": 0.15570275
+  },
+  "source": {
+    "repo_commit": "5f7d5def568fa8cac030d0911a723c4650dada91",
+    "sim_path": "simulations/SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields/",
+    "scenario_path": "scenarios/chunk-feed-replication-sparse-advertisement/chunk-feed-replication-sparse-advertisement.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "8a3cb036c4849e8e694c94f004100a68495ad1287ff01291711b43aa19ad270b"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields/README.md",
+        "sha256": "3ab052fe6b0a0513740136a232eeaf2f73e992923012280c92c2e159c8fb0a9c"
+      },
+      {
+        "path": "simulations/SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields/QUESTION.md",
+        "sha256": "707280a55807f9fce459bf58b891379e28a66c77fbedf1c263937113936a25d3"
+      },
+      {
+        "path": "simulations/SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields/protocols/grid-envelope.d/CHANGELOG.md",
+        "sha256": "3652c6b6111b64750a90c10edf0da60a2d88777a2c3313477f21490d61d97201"
+      },
+      {
+        "path": "simulations/SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "68d7443d65d236f5471fac7781b122413a1f5ba914587b2b3522c8b3677062d9"
+      },
+      {
+        "path": "scenarios/chunk-feed-replication-sparse-advertisement/chunk-feed-replication-sparse-advertisement.md",
+        "sha256": "c922519634c8a9de3dc7e3501a523d7dd816875178e22b60d4920750232a2b0b"
+      }
+    ],
+    "simulation_tree_hash": "cee27e908e02ebb98055f64a9a1750e4c150996dd05c4c53e16ec029927598f1"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 2,
+    "auditability": 1,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 3,
+    "implementation_plausibility": 4,
+    "risk_penalty": 4
+  },
+  "fitness": {
+    "raw": 19,
+    "normalized_0_100": 47.5,
+    "confidence_0_1": 0.84
+  },
+  "assessment": {
+    "rationale": "Indirect fit only: this specimen defines an envelope, not a sparse chunk-feed advertisement protocol. Its conservative unknown-pCID rule and clear generic/schema-local boundary help safety, but the same choice makes leaves, frontiers, and summaries opaque to generic peers and later auditors.",
+    "strengths": [
+      "Conservative unknown-pCID handling prevents false interpretation and permits opaque retention or forwarding.",
+      "The generic vs. pCID-specific responsibility split is explicit, which improves layer-boundary clarity.",
+      "New per-pCID schemas can be added without changing the outer envelope, and deterministic CBOR keeps implementation plausible."
+    ],
+    "weaknesses": [
+      "It does not define how sparse chunk-replication advertisements represent leaves, roots, pointer objects, frontiers, or compact summaries.",
+      "Generic tooling cannot tell which outer fields are payload, proof, or advertisement summary without the pCID handler.",
+      "There is no universal signature slot, machine-readable arity metadata, or stated field-count/size limit."
+    ],
+    "risks": [
+      "Sparse peers may fail to interoperate if advertisements depend on unavailable or mismatched pCID schemas.",
+      "If old pCID schemas or handlers are lost, long-term evidence becomes hard to audit beyond opaque byte preservation.",
+      "Schema-local typing and signature rules, plus unresolved size limits, raise substitution and denial-of-service risk."
+    ],
+    "open_questions": [
+      "Can a per-pCID sparse-advertisement schema expose roots, frontiers, or summaries with enough generic structure for routing and audit?",
+      "Should each pCID publish machine-readable arity, type, signature-coverage, and size-limit metadata?",
+      "What durable discovery path lets future peers recover the needed schema or handler for old envelopes?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

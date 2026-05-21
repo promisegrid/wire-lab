@@ -56,6 +56,43 @@ Intent: Prevent the TODO status from implying full closure when the file has bot
 Constraints: Keep `AGENTS.md` as the recurring instruction source for when `DEV-GUIDE-RESOURCES.md` must be updated. Keep `rozas.10` open as a future milestone rather than copying it into `AGENTS.md`. Do not edit `/home/stevegt/lab/promisegrid-dev-guide` under this status correction.
 Affects: `protocols/wire-lab.d/TODO/TODO-rozas-promisegrid-dev-guide-resources.md`; `AGENTS.md`; `DEV-GUIDE-RESOURCES.md`.
 
+### DI-ragaz
+
+ID: DI-ragaz
+Date: 2026-05-20 17:49:46
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Route the remaining open PromiseGrid Development Guide feedback items
+from `/home/stevegt/lab/promisegrid-dev-guide/FEEDBACK.md` into six
+wire-lab question-home simulations plus root scenarios that can be run against
+candidate designs.
+Intent: The guide feedback now asks concrete App Dev and Kernel Dev questions
+that should not live only in the external guide repo or in broad DR prose.
+Simulation homes keep each question cluster independently evolvable, while root
+scenarios make the pressure reusable across existing and future sims. The work
+does not edit the guide repo and does not settle the blocking DRs.
+Constraints: Keep the new sims as provisional question homes, not guide prose and
+not PromiseGrid API commitments. Use `TODO-rozas` as the owner and
+`DEV-GUIDE-RESOURCES.md` as the guide-writer map. `FB-gigit` remains covered by
+the existing layperson readiness matrix and `DR-napum`; no new sim is required
+for that narrative-status question. Do not mark `DR-tuhaz`, `DR-davod`,
+`DR-tumus`, `DR-gabif`, `DR-robon`, or `DR-napum` closed.
+Affects: `simulations/SIM-mikas-minimal-blob-app-contract/`;
+`simulations/SIM-robot-app-semantics-conformance/`;
+`simulations/SIM-zisan-device-bound-agent/`;
+`simulations/SIM-kugap-live-sync-audit-split/`;
+`simulations/SIM-nijuz-multi-embodiment-identity/`;
+`simulations/SIM-funas-kernel-porting-boundary/`;
+`scenarios/minimal-immutable-blob-app/`;
+`scenarios/app-semantics-partial-conformance/`;
+`scenarios/device-bound-agent-physical-effect/`;
+`scenarios/live-crdt-audit-publication/`;
+`scenarios/multi-embodiment-app-identity/`;
+`scenarios/portable-signing-key-identity/`;
+`scenarios/kernel-porting-boundary/`; `simulations/README.md`;
+`DEV-GUIDE-RESOURCES.md`;
+`protocols/wire-lab.d/TODO/TODO-rozas-promisegrid-dev-guide-resources.md`.
+
 ## Context
 
 The PromiseGrid Development Guide currently has three locked audiences:
@@ -78,6 +115,25 @@ guide's claims.
 - `FB-vitih` is answered at current wire-lab scope by the Kernel Devs row in `DEV-GUIDE-RESOURCES.md` and the 2026-05-08 `DR-davod` event.
 - `FB-mulaj` is answered by the new audience readiness matrix in `DEV-GUIDE-RESOURCES.md`.
 - `FB-rigod` is answered by the likely normative citation path in `DEV-GUIDE-RESOURCES.md`.
+- `FB-vopik` is routed to `SIM-mikas` and
+  `scenarios/minimal-immutable-blob-app/` for minimal CAS-facing app pressure.
+- `FB-dodos`, `FB-hisis`, `FB-kutub`, `FB-gomod`, and `FB-tahof` are routed to
+  `SIM-robot` and `scenarios/app-semantics-partial-conformance/` for
+  app-vocabulary, local/wire identity, partial-conformance, provisional-signing,
+  ingress, and policy/economy pressure.
+- `FB-nojit`, `FB-tisuf`, and `FB-tulit` are routed to `SIM-zisan` and
+  `scenarios/device-bound-agent-physical-effect/` for host-owned device agents,
+  physical effects, owner/operator authority, and driver-stack conformance.
+- `FB-hurit` and `FB-nilat` are routed to `SIM-kugap` and
+  `scenarios/live-crdt-audit-publication/` for live-state versus durable-audit
+  split pressure.
+- `FB-zazon` and `FB-robif` are routed to `SIM-nijuz`,
+  `scenarios/multi-embodiment-app-identity/`, and
+  `scenarios/portable-signing-key-identity/` for multi-host app identity,
+  per-component conformance claims, and portable signing-key recipes.
+- `FB-vitih`, `FB-mulum`, and `FB-potin` are routed to `SIM-funas` and
+  `scenarios/kernel-porting-boundary/` for kernel/runtime/dispatcher porting
+  boundary pressure.
 
 ## Subtasks
 
@@ -91,3 +147,6 @@ guide's claims.
 - [x] rozas.8 Add authority-transition notes explaining when stabilized guide prose supersedes exploratory wire-lab notes.
 - [x] rozas.9 Identify unresolved guide-writing gaps and file or link DRs for any question that blocks a settled guide claim.
 - [ ] rozas.10 After guide prose stabilizes, review `DEV-GUIDE-RESOURCES.md` and downgrade superseded wire-lab material to provenance pointers.
+- [x] rozas.11 Route current open guide-feedback questions into provisional
+  simulation homes and root scenarios so the guide can cite evidence pressure
+  without treating open DRs as settled. Source: `DI-ragaz`.

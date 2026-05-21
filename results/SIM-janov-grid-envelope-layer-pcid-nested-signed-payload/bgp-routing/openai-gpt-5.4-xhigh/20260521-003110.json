@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-janov-grid-envelope-layer-pcid-nested-signed-payload-bgp-routing-openai-gpt-5.4-xhigh-20260521-003110",
+  "run_group_id": "ga-canary-20260521-003110",
+  "cell_id": "ga-canary-20260521-003110-000006-SIM-janov-grid-envelope-layer-pcid-nested-signed-payload--bgp-routing--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-janov-grid-envelope-layer-pcid-nested-signed-payload",
+  "scenario_id": "bgp-routing",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260521-003110",
+  "result_path": "results/SIM-janov-grid-envelope-layer-pcid-nested-signed-payload/bgp-routing/openai-gpt-5.4-xhigh/20260521-003110.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_6d1e259ef0d24de7aeae83824ef1aa26",
+    "response_id": "resp_0c26aa7934374712006a0e5250038c819bac2e45c59052bcea",
+    "input_tokens": 7217,
+    "output_tokens": 8761,
+    "cost_usd": 0.13528375
+  },
+  "source": {
+    "repo_commit": "5f7d5def568fa8cac030d0911a723c4650dada91",
+    "sim_path": "simulations/SIM-janov-grid-envelope-layer-pcid-nested-signed-payload/",
+    "scenario_path": "scenarios/bgp-routing/bgp-routing.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "8a3cb036c4849e8e694c94f004100a68495ad1287ff01291711b43aa19ad270b"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-janov-grid-envelope-layer-pcid-nested-signed-payload/README.md",
+        "sha256": "f48ab3c3b1dd2fe4a36b96ea5f602e34cae7c1615e97990ee1c8791a4c3a047f"
+      },
+      {
+        "path": "simulations/SIM-janov-grid-envelope-layer-pcid-nested-signed-payload/QUESTION.md",
+        "sha256": "32ba4a616d9b335c481cbfcbd7b114100210fb742a82061a52557b050d0530a9"
+      },
+      {
+        "path": "simulations/SIM-janov-grid-envelope-layer-pcid-nested-signed-payload/protocols/grid-envelope.d/CHANGELOG.md",
+        "sha256": "3652c6b6111b64750a90c10edf0da60a2d88777a2c3313477f21490d61d97201"
+      },
+      {
+        "path": "simulations/SIM-janov-grid-envelope-layer-pcid-nested-signed-payload/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "d182c06be14aaa48aaf3546e2050b361e7f10e1020faf32a9be8750948f2571d"
+      },
+      {
+        "path": "scenarios/bgp-routing/bgp-routing.md",
+        "sha256": "90a37247bb6cc291809077f99ef95c4c74865a657b8e5c5c164cce6ef330b17f"
+      }
+    ],
+    "simulation_tree_hash": "bf0f4a64c42e752ebbf0764f95b9c41c7dc4374f56465564e4bd7e5a9d4c09c3"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 2,
+    "auditability": 2,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 2,
+    "implementation_plausibility": 4,
+    "risk_penalty": 4
+  },
+  "fitness": {
+    "raw": 20,
+    "normalized_0_100": 50,
+    "confidence_0_1": 0.81
+  },
+  "assessment": {
+    "rationale": "Relevant as a routing-envelope subtest because it cleanly separates outer layer and signed inner payload, but it does not model BGP route propagation or policy, and the unsigned outer conformance/relay promise is a serious weakness under hijack/leak pressure.",
+    "strengths": [
+      "Clear two-layer envelope with deterministic CBOR and an inner signature over [pcid_b, payload_b].",
+      "Unknown-pCID policy preserves opaque evidence and avoids false claims of understanding.",
+      "Nested pcid_b supports payload evolution without changing the universal outer shape."
+    ],
+    "weaknesses": [
+      "Does not model route propagation, policy, withdrawals, or leak/hijack-specific promise accounting.",
+      "Unsigned outer [pcid_a, payload_a] leaves relay and conformance authorship tied to transport context rather than durable cryptographic evidence.",
+      "Local accept/retry/downgrade logic for stale or disputed routing evidence is unspecified."
+    ],
+    "risks": [
+      "A valid signed inner payload can be replayed in a misleading outer context, obscuring who endorsed propagation.",
+      "Carol may lack durable evidence to distinguish origin, relay, and leak during partitions or stale-state disputes."
+    ],
+    "open_questions": [
+      "For routing, should outer propagation or endorsement be signed separately from the inner payload?",
+      "Can transport identity plus local peer-adoption records satisfy 100-year auditability for contested routing evidence?",
+      "Should routing-specific path or hop attestations live inside payload_b instead of relying on envelope context?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

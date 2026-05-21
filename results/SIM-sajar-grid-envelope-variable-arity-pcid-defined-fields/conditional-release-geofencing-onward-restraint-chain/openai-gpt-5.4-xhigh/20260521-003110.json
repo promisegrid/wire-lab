@@ -1,0 +1,124 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields-conditional-release-geofencing-onward-restraint-chain-openai-gpt-5.4-xhigh-20260521-003110",
+  "run_group_id": "ga-canary-20260521-003110",
+  "cell_id": "ga-canary-20260521-003110-000002-SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields--conditional-release-geofencing-onward-restraint-chain--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields",
+  "scenario_id": "conditional-release-geofencing-onward-restraint-chain",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260521-003110",
+  "result_path": "results/SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields/conditional-release-geofencing-onward-restraint-chain/openai-gpt-5.4-xhigh/20260521-003110.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_f6e8e13666d54742823ec1f88be9da04",
+    "response_id": "resp_062cf7e8d39fffb2006a0e525008608198a6a8722b82f1af8d",
+    "input_tokens": 6879,
+    "output_tokens": 9531,
+    "cost_usd": 0.14547225
+  },
+  "source": {
+    "repo_commit": "5f7d5def568fa8cac030d0911a723c4650dada91",
+    "sim_path": "simulations/SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields/",
+    "scenario_path": "scenarios/conditional-release-geofencing-onward-restraint-chain/conditional-release-geofencing-onward-restraint-chain.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "8a3cb036c4849e8e694c94f004100a68495ad1287ff01291711b43aa19ad270b"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields/README.md",
+        "sha256": "3ab052fe6b0a0513740136a232eeaf2f73e992923012280c92c2e159c8fb0a9c"
+      },
+      {
+        "path": "simulations/SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields/QUESTION.md",
+        "sha256": "707280a55807f9fce459bf58b891379e28a66c77fbedf1c263937113936a25d3"
+      },
+      {
+        "path": "simulations/SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields/protocols/grid-envelope.d/CHANGELOG.md",
+        "sha256": "3652c6b6111b64750a90c10edf0da60a2d88777a2c3313477f21490d61d97201"
+      },
+      {
+        "path": "simulations/SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "68d7443d65d236f5471fac7781b122413a1f5ba914587b2b3522c8b3677062d9"
+      },
+      {
+        "path": "scenarios/conditional-release-geofencing-onward-restraint-chain/conditional-release-geofencing-onward-restraint-chain.md",
+        "sha256": "3c84fc46e1b14de5e5c6e9b029fcb891bd655238b45e516b20eda97dabe8ff24"
+      }
+    ],
+    "simulation_tree_hash": "cee27e908e02ebb98055f64a9a1750e4c150996dd05c4c53e16ec029927598f1"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 2,
+    "auditability": 1,
+    "evolution_safety": 2,
+    "layer_boundary_clarity": 2,
+    "failure_handling": 3,
+    "implementation_plausibility": 4,
+    "risk_penalty": 4
+  },
+  "fitness": {
+    "raw": 11,
+    "normalized_0_100": 40,
+    "confidence_0_1": 0.86
+  },
+  "assessment": {
+    "rationale": "Low fit for this scenario. This specimen only defines a variable-arity outer envelope; it could carry a conditional-release schema, but it does not define where the onward-restraint graph lives or how peers generically verify and audit recursive promises. Its main positive is conservative unknown-pCID handling, but meaning, signature coverage, and audit all become schema-local.",
+    "strengths": [
+      "Unknown-pCID handling is explicit and conservative: peers may store or forward opaque bytes without claiming understanding.",
+      "The draft avoids a central pCID registry and does not assume global state, which helps sparse-knowledge and no-central-authority goals.",
+      "Deterministic CBOR plus first-slot pCID dispatch is technically implementable and extensible for future specialized schemas."
+    ],
+    "weaknesses": [
+      "The simulation does not specify the recursive promise graph or whether it belongs at session, conditional-release, feed, or CAS-object level.",
+      "Generic tooling cannot know which outer fields are payload, proof, or signature, which weakens cross-peer audit of onward restraints.",
+      "There is no universal signature slot or coverage rule, so proof of Bob's and Carol's promises is schema-specific.",
+      "Long-term understanding depends on retaining the relevant pCID spec and handler, weakening 100-year readability."
+    ],
+    "risks": [
+      "Schema-local signature coverage could omit or ambiguously bind the restraint condition, enabling substitution or downgrade attacks.",
+      "If handlers are lost or diverge, restraint-chain evidence degrades into opaque bytes that later auditors cannot meaningfully interpret.",
+      "Unspecified maximum field count and encoded-size limits create denial-of-service and interoperability risk."
+    ],
+    "open_questions": [
+      "Where should the recursive onward-restraint graph live in PromiseGrid: session state, conditional-release objects, feed entries, or separate CAS objects?",
+      "Should each pCID schema publish machine-readable arity, field-type, and signature-coverage metadata so generic tools can sanity-check envelopes?",
+      "What universal size and field-count limits are required for safe variable-arity envelopes?",
+      "How would Bob verify Carol's compatible onward-restraint promise when the evidence is opaque without the exact handler version?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

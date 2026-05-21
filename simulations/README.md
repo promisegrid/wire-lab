@@ -95,6 +95,22 @@ evidence is copied under root `results/`.
 | `SIM-jufag-grid-envelope-quarantine-sig-pcid-outcomes/` | DAG-CBOR | Quarantine store/forward with explicit accepted, quarantined, and rejected outcomes | Mandatory profiled opaque signature bytes with explicit `sig_pcid` dispatch |
 | `SIM-bimos-grid-envelope-quarantine-sig-pcid-audit-tuple/` | DAG-CBOR | Quarantine as local rejection plus exact-byte evidence relay | Mandatory `sig_pcid` plus `sig_payload`, with a local audit tuple |
 
+## Development-guide feedback simulations
+
+`DI-ragaz` creates provisional question-home simulations for open PromiseGrid
+Development Guide feedback clusters. These sims do not settle guide prose or
+close their blocking DRs; they make the pressure runnable against existing and
+future candidate designs.
+
+| Simulation | Feedback pressure |
+|---|---|
+| `SIM-mikas-minimal-blob-app-contract/` | Minimal immutable blob app assumptions: CAS write/read, replication, discovery, and hash-as-capability boundaries. |
+| `SIM-robot-app-semantics-conformance/` | App vocabulary, local-vs-wire identity, partial conformance, provisional signing, ingress, and policy/economy status. |
+| `SIM-zisan-device-bound-agent/` | Host-owned sensor/actuator agents, irreversible effects, owner/operator delegation, and driver-stack conformance. |
+| `SIM-kugap-live-sync-audit-split/` | Reliable low-latency live state versus durable group-session audit publication. |
+| `SIM-nijuz-multi-embodiment-identity/` | One logical app spanning browser/plugin embodiments, per-component conformance, and portable signing-key identity. |
+| `SIM-funas-kernel-porting-boundary/` | Kernel/runtime/dispatcher terminology, minimum porting target, runtime surface, and conformance boundary. |
+
 ## Grid-envelope arity and nested-signature probes
 
 `DI-joman` adds arity-focused probes outside the 24-row positional matrix.
