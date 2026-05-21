@@ -1,0 +1,128 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-virim-manifested-embodiment-savepoint-receipts-kernel-porting-boundary-openai-gpt-5.4-xhigh-20260521-210902",
+  "run_group_id": "ga-canary-20260521-210902",
+  "cell_id": "ga-canary-20260521-210902-000049-SIM-virim-child-manifested-embodiment-savepoint-receipts--kernel-porting-boundary--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-virim-manifested-embodiment-savepoint-receipts",
+  "scenario_id": "kernel-porting-boundary",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260521-210902",
+  "result_path": "results/SIM-virim-manifested-embodiment-savepoint-receipts/kernel-porting-boundary/openai-gpt-5.4-xhigh/20260521-210902.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_4e8c2f280cb64be9b58f8f69bba41912",
+    "response_id": "resp_00b120da3d2666d3006a0f78d91040819a86e15e0c398a11ec",
+    "input_tokens": 7501,
+    "output_tokens": 7163,
+    "cost_usd": 0.11340875
+  },
+  "source": {
+    "repo_commit": "8b52ecc2c4de95963e561758fff699b65e25fc2d",
+    "sim_path": "proposals/ga-canary-20260521-210902/simulations/SIM-virim-child-manifested-embodiment-savepoint-receipts/",
+    "scenario_path": "scenarios/kernel-porting-boundary/kernel-porting-boundary.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "30a7b1ad0052f1acedcd6dd6d6f27e550b3c4fa6f9926ad93676f18d2612b1c7"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "proposals/ga-canary-20260521-210902/simulations/SIM-virim-child-manifested-embodiment-savepoint-receipts/README.md",
+        "sha256": "55d674a5ad74c061a20535d9e51f7f997d2006437ee440066f00a2fd98299d3f"
+      },
+      {
+        "path": "proposals/ga-canary-20260521-210902/simulations/SIM-virim-child-manifested-embodiment-savepoint-receipts/QUESTION.md",
+        "sha256": "4740539ea8d202e12d7efa8631c0d35ceff889418fe8f524069bda09bc067945"
+      },
+      {
+        "path": "proposals/ga-canary-20260521-210902/simulations/SIM-virim-child-manifested-embodiment-savepoint-receipts/CLAIMS.md",
+        "sha256": "7499dc52cbf4e7e298cbb5f607b745f5872ea1945719ba57e51eb521f72a15e3"
+      },
+      {
+        "path": "scenarios/kernel-porting-boundary/kernel-porting-boundary.md",
+        "sha256": "d1646fa062e6c64f27cbbd25da0e96f6d484c60582677cdfc798d265a22d5096"
+      }
+    ],
+    "simulation_tree_hash": "dfcca9b4fa04cc0dc6a1acf6c2d605b3e8bce6c3de1de769bd59dea03c8e207d"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 4,
+    "auditability": 5,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 3,
+    "implementation_plausibility": 3,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 24,
+    "normalized_0_100": 69,
+    "confidence_0_1": 0.79
+  },
+  "assessment": {
+    "rationale": "Strong as a guide-safe evidence/profile layer, weak as a direct answer to the first-port kernel boundary. It helps Alice write honest provisional claims and cleanly separates live behavior from durable PromiseGrid claims, but it does not define the minimum kernel/runtime/CAS/session porting target or the provisional K1-K5 boundary.",
+    "strengths": [
+      "Clear AM/EC/ICR/SAE artifact set makes claims and audits easy to inspect.",
+      "Excellent layer separation: live transport is explicitly outside the durable conformance claim.",
+      "Successor manifests, key-continuity receipts, and break-witnesses support migration and key rotation.",
+      "Local promise accounting aligns well with sparse-knowledge and later audit needs."
+    ],
+    "weaknesses": [
+      "Does not say what the minimum viable kernel/runtime/dispatcher/library port actually is.",
+      "Leaves ingress, feed, CAS, session, and message obligations mostly unscoped for first-port guidance.",
+      "Does not show how draft evidence becomes frozen-spec conformance after DR-davod closes."
+    ],
+    "risks": [
+      "Porters may treat AM/EC/ICR/SAE as core porting obligations instead of an app-profile overlay.",
+      "Early savepoint-envelope and receipt shapes could ossify before lower-layer boundaries are frozen."
+    ],
+    "open_questions": [
+      "What is the smallest host/runtime surface that can honestly claim a first PromiseGrid port?",
+      "How should provisional conformance claims cite draft references now and frozen pCIDs later?",
+      "Which parts of this profile belong above the kernel/runtime boundary versus inside it?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  },
+  "promotion": {
+    "promotion_di": "DI-lanuz",
+    "run_group_id": "ga-canary-20260521-210902",
+    "original_child_sim_id": "SIM-virim-child-manifested-embodiment-savepoint-receipts",
+    "final_sim_id": "SIM-virim-manifested-embodiment-savepoint-receipts",
+    "original_proposal_sim_path": "proposals/ga-canary-20260521-210902/simulations/SIM-virim-child-manifested-embodiment-savepoint-receipts/",
+    "original_proposal_result_path": "proposals/ga-canary-20260521-210902/results/SIM-virim-child-manifested-embodiment-savepoint-receipts/kernel-porting-boundary/openai-gpt-5.4-xhigh/20260521-210902.json",
+    "canonical_result_path": "results/SIM-virim-manifested-embodiment-savepoint-receipts/kernel-porting-boundary/openai-gpt-5.4-xhigh/20260521-210902.json",
+    "source_provenance_policy": "Canonical storage identity fields were updated for discoverability; source.* fields intentionally preserve the exact proposal tree and file hashes scored by the LLM before promotion."
+  }
+}

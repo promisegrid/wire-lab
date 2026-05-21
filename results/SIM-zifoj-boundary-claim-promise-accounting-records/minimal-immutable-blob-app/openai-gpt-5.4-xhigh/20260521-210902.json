@@ -1,0 +1,132 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-zifoj-boundary-claim-promise-accounting-records-minimal-immutable-blob-app-openai-gpt-5.4-xhigh-20260521-210902",
+  "run_group_id": "ga-canary-20260521-210902",
+  "cell_id": "ga-canary-20260521-210902-000050-SIM-zifoj-child-boundary-claim-ledger--minimal-immutable-blob-app--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-zifoj-boundary-claim-promise-accounting-records",
+  "scenario_id": "minimal-immutable-blob-app",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260521-210902",
+  "result_path": "results/SIM-zifoj-boundary-claim-promise-accounting-records/minimal-immutable-blob-app/openai-gpt-5.4-xhigh/20260521-210902.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_6f3987272ddb45dcbcb2ca79da2b80a1",
+    "response_id": "resp_0f81d1e7ad5143db006a0f78de3560819a8a3afaa165c5711a",
+    "input_tokens": 7701,
+    "output_tokens": 6216,
+    "cost_usd": 0.10050075
+  },
+  "source": {
+    "repo_commit": "8b52ecc2c4de95963e561758fff699b65e25fc2d",
+    "sim_path": "proposals/ga-canary-20260521-210902/simulations/SIM-zifoj-child-boundary-claim-ledger/",
+    "scenario_path": "scenarios/minimal-immutable-blob-app/minimal-immutable-blob-app.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "30a7b1ad0052f1acedcd6dd6d6f27e550b3c4fa6f9926ad93676f18d2612b1c7"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "proposals/ga-canary-20260521-210902/simulations/SIM-zifoj-child-boundary-claim-ledger/README.md",
+        "sha256": "a5f74a5df805651342bfbed7e920d52658069d5337a28cdd244c641452113feb"
+      },
+      {
+        "path": "proposals/ga-canary-20260521-210902/simulations/SIM-zifoj-child-boundary-claim-ledger/QUESTION.md",
+        "sha256": "f7be184e858cd53036c4e80c33de9bd0e15f4be1ad46cd296749def4aa3faeaf"
+      },
+      {
+        "path": "proposals/ga-canary-20260521-210902/simulations/SIM-zifoj-child-boundary-claim-ledger/CLAIM-CARDS.md",
+        "sha256": "6f17cec105c1c58144fb9c2aafd4a53d5f30645afb874115d0605d4d044d30ce"
+      },
+      {
+        "path": "proposals/ga-canary-20260521-210902/simulations/SIM-zifoj-child-boundary-claim-ledger/LEDGER.md",
+        "sha256": "a796c294637234d15d20e2120a934bbe4f3fcadf524ce8b5fd4708126d0907fb"
+      },
+      {
+        "path": "scenarios/minimal-immutable-blob-app/minimal-immutable-blob-app.md",
+        "sha256": "187e449b0498cddda2a2b28192f6aa29e824dae72e60ff47c35d34df35115a73"
+      }
+    ],
+    "simulation_tree_hash": "f99564ca60997e6bd9e949b0bee9309a39f15535420d0258da57e65e641acd9b"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 5,
+    "promisegrid_alignment": 4,
+    "auditability": 5,
+    "evolution_safety": 5,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 5,
+    "implementation_plausibility": 4,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 31,
+    "normalized_0_100": 88.6,
+    "confidence_0_1": 0.87
+  },
+  "assessment": {
+    "rationale": "Excellent fit for the blob-app scenario: it explicitly says a returned hash proves byte identity only unless separate availability, retention, discovery, or authorization promises are named, and it gives local ledger rows for publish/retrieve and failure audit. The main gap is that long-term publication and discovery of claim cards and evidence refs are still underspecified.",
+    "strengths": [
+      "Directly answers the core scenario pressure by separating content identity from availability, authorization, retention, and discovery promises.",
+      "Adds concrete peer-local promise accounting for Bob's returned hash claim and Carol's failed retrieval evidence.",
+      "Uses status tags and migration notes to support honest partial conformance without overclaiming frozen semantics."
+    ],
+    "weaknesses": [
+      "Does not yet define a concrete durable packaging or discovery path for claim cards and evidence when Carol has only a hash years later.",
+      "Some mandatory fields and terms remain open, so cross-implementation consistency is not fully settled.",
+      "Authorization and capability semantics remain mostly provisional or local-only rather than frozen."
+    ],
+    "risks": [
+      "Claim cards could be read as stronger conformance claims than intended if implementations are sloppy about status tags.",
+      "Evidence refs may decay or become undiscoverable without a clearer long-term publication strategy.",
+      "Different implementations may diverge on role terms and field discipline before the open decisions are closed."
+    ],
+    "open_questions": [
+      "What minimum response bundle besides the hash should Bob return for durable later audit: claim card ref, availability claim ref, auth hint, or none?",
+      "How should claim cards and evidence refs be published and discovered over decades without introducing a central registry?",
+      "Which blob publish/retrieve ledger rows must be mandatory for Alice as well as Bob and Carol?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  },
+  "promotion": {
+    "promotion_di": "DI-lanuz",
+    "run_group_id": "ga-canary-20260521-210902",
+    "original_child_sim_id": "SIM-zifoj-child-boundary-claim-ledger",
+    "final_sim_id": "SIM-zifoj-boundary-claim-promise-accounting-records",
+    "original_proposal_sim_path": "proposals/ga-canary-20260521-210902/simulations/SIM-zifoj-child-boundary-claim-ledger/",
+    "original_proposal_result_path": "proposals/ga-canary-20260521-210902/results/SIM-zifoj-child-boundary-claim-ledger/minimal-immutable-blob-app/openai-gpt-5.4-xhigh/20260521-210902.json",
+    "canonical_result_path": "results/SIM-zifoj-boundary-claim-promise-accounting-records/minimal-immutable-blob-app/openai-gpt-5.4-xhigh/20260521-210902.json",
+    "source_provenance_policy": "Canonical storage identity fields were updated for discoverability; source.* fields intentionally preserve the exact proposal tree and file hashes scored by the LLM before promotion."
+  }
+}

@@ -1,0 +1,114 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-funas-kernel-porting-boundary-live-crdt-audit-publication-openai-gpt-5.4-xhigh-20260521-210902",
+  "run_group_id": "ga-canary-20260521-210902",
+  "cell_id": "ga-canary-20260521-210902-000039-SIM-funas-kernel-porting-boundary--live-crdt-audit-publication--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-funas-kernel-porting-boundary",
+  "scenario_id": "live-crdt-audit-publication",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260521-210902",
+  "result_path": "results/SIM-funas-kernel-porting-boundary/live-crdt-audit-publication/openai-gpt-5.4-xhigh/20260521-210902.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_5eeabfdb475442f8ae25abe8baa01dfa",
+    "response_id": "resp_0dc041b009a0e7dc006a0f773e9b4c819bb221102f87fa6510",
+    "input_tokens": 6295,
+    "output_tokens": 8629,
+    "cost_usd": 0.13182225
+  },
+  "source": {
+    "repo_commit": "8b52ecc2c4de95963e561758fff699b65e25fc2d",
+    "sim_path": "simulations/SIM-funas-kernel-porting-boundary/",
+    "scenario_path": "scenarios/live-crdt-audit-publication/live-crdt-audit-publication.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "30a7b1ad0052f1acedcd6dd6d6f27e550b3c4fa6f9926ad93676f18d2612b1c7"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-funas-kernel-porting-boundary/README.md",
+        "sha256": "7610bd7589d30cbc7054afd5ec64be256ec3048adc6135cf2a85c48fa94c2363"
+      },
+      {
+        "path": "simulations/SIM-funas-kernel-porting-boundary/QUESTION.md",
+        "sha256": "c9b86b2a64e4a8ed5cebea5048ad7908752f168d36d68e9ff0c00d2542187486"
+      },
+      {
+        "path": "scenarios/live-crdt-audit-publication/live-crdt-audit-publication.md",
+        "sha256": "870887bbd5848db45bc4406e5369b492a516c2bd997de9226d24825214c49d94"
+      }
+    ],
+    "simulation_tree_hash": "3036063b40b8f7f00637b0135a1962f32775f8d0abb3406a49cb169d7048cfe6"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 4,
+    "promisegrid_alignment": 4,
+    "auditability": 3,
+    "evolution_safety": 5,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 3,
+    "implementation_plausibility": 3,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 25,
+    "normalized_0_100": 71,
+    "confidence_0_1": 0.8
+  },
+  "assessment": {
+    "rationale": "Strong as a boundary-setting simulation for this scenario: it can clearly separate sub-second live CRDT transport from durable audit publication and keep unsettled live/runtime details out of the current core port target, but it does not yet specify the live binding, exact cited audit object, or detailed reconnect behavior.",
+    "strengths": [
+      "Directly addresses the scenario's main pressure to keep live transport claims separate from durable audit-layer claims.",
+      "Very strong on provisional-versus-stable guidance, which supports 100-year evolution without freezing the wrong porting API.",
+      "Supports durable, content-addressed audit publication without assuming central authority or globally complete state."
+    ],
+    "weaknesses": [
+      "Does not define the reliable ordered live channel needed for the CRDT session itself.",
+      "Leaves the exact snapshot or envelope cited by the save-time audit message underspecified.",
+      "Provides only limited actor-local failure and recovery detail for partition, reorder, and delayed publication."
+    ],
+    "risks": [
+      "Porters may mistake provisional boundary guidance for a settled kernel or runtime API.",
+      "Documentation could still blur optional live-channel behavior with core audit-layer conformance.",
+      "Developers may overfit to harness-era drafts instead of a minimal frozen-spec port target."
+    ],
+    "open_questions": [
+      "Should live CRDT sync stay explicitly off-grid until a reliable binding is frozen?",
+      "What exact CAS object or snapshot manifest should the durable audit message cite?",
+      "How should live-channel conformance claims be versioned and reported separately from audit-layer claims?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

@@ -1,0 +1,113 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-mikas-minimal-blob-app-contract-kernel-porting-boundary-openai-gpt-5.4-xhigh-20260521-210902",
+  "run_group_id": "ga-canary-20260521-210902",
+  "cell_id": "ga-canary-20260521-210902-000007-SIM-mikas-minimal-blob-app-contract--kernel-porting-boundary--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-mikas-minimal-blob-app-contract",
+  "scenario_id": "kernel-porting-boundary",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260521-210902",
+  "result_path": "results/SIM-mikas-minimal-blob-app-contract/kernel-porting-boundary/openai-gpt-5.4-xhigh/20260521-210902.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_e34fc03c4e9b408bb9c0c9b8cacb8828",
+    "response_id": "resp_033993009461bc02006a0f74d07178819890d3a5f1a433da57",
+    "input_tokens": 6313,
+    "output_tokens": 8114,
+    "cost_usd": 0.12464375
+  },
+  "source": {
+    "repo_commit": "8b52ecc2c4de95963e561758fff699b65e25fc2d",
+    "sim_path": "simulations/SIM-mikas-minimal-blob-app-contract/",
+    "scenario_path": "scenarios/kernel-porting-boundary/kernel-porting-boundary.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "30a7b1ad0052f1acedcd6dd6d6f27e550b3c4fa6f9926ad93676f18d2612b1c7"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-mikas-minimal-blob-app-contract/README.md",
+        "sha256": "0c4755add75a4aed9913cbcf3271eb4faf20db662cb7993921d8c4b684c1bf60"
+      },
+      {
+        "path": "simulations/SIM-mikas-minimal-blob-app-contract/QUESTION.md",
+        "sha256": "546fe58b588d2a8057994b8d12f0e770b389a3591d401d76d61ab6f4d407bd03"
+      },
+      {
+        "path": "scenarios/kernel-porting-boundary/kernel-porting-boundary.md",
+        "sha256": "d1646fa062e6c64f27cbbd25da0e96f6d484c60582677cdfc798d265a22d5096"
+      }
+    ],
+    "simulation_tree_hash": "97358511b9d6fdb6a02c37fd0722f03dafb09104268a3c034a920d71dd711c93"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 4,
+    "auditability": 3,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 2,
+    "failure_handling": 2,
+    "implementation_plausibility": 2,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 16,
+    "normalized_0_100": 46,
+    "confidence_0_1": 0.84
+  },
+  "assessment": {
+    "rationale": "Strong on PromiseGrid-safe app/CAS scoping, weak on the actual porting-boundary question. It helps identify which CAS behaviors should remain provisional or host-defined, but it does not define the kernel/runtime/dispatcher target, separate harness from real port obligations, or support a meaningful port conformance claim.",
+    "strengths": [
+      "Explicitly avoids overpromising availability, replication, discovery, and hash-as-capability semantics.",
+      "Keeps draft status, open DRs, and 100-year survival concerns visible.",
+      "Clearly marks several behaviors as host-defined rather than base semantics."
+    ],
+    "weaknesses": [
+      "It is app-contract guidance, not a kernel/runtime/library porting guide.",
+      "It does not separate wire-lab harness apparatus from the actual port target.",
+      "It leaves session, message, feed, and broader conformance obligations unaddressed."
+    ],
+    "risks": [
+      "Porters could mistake minimal blob guidance for sufficient infrastructure conformance scope.",
+      "CAS-only focus may delay necessary runtime/session boundary decisions."
+    ],
+    "open_questions": [
+      "How should this app-level CAS draft connect to kernel/runtime/dispatcher terminology?",
+      "Which CAS duties are part of a minimum viable port versus app-layer convention only?",
+      "What provisional evidence should a porter cite before DR-davod and frozen pCIDs close the boundary?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

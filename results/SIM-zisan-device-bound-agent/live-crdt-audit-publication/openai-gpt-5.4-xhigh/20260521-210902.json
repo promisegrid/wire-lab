@@ -1,0 +1,115 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-zisan-device-bound-agent-live-crdt-audit-publication-openai-gpt-5.4-xhigh-20260521-210902",
+  "run_group_id": "ga-canary-20260521-210902",
+  "cell_id": "ga-canary-20260521-210902-000018-SIM-zisan-device-bound-agent--live-crdt-audit-publication--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-zisan-device-bound-agent",
+  "scenario_id": "live-crdt-audit-publication",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260521-210902",
+  "result_path": "results/SIM-zisan-device-bound-agent/live-crdt-audit-publication/openai-gpt-5.4-xhigh/20260521-210902.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_23d5d16e151c40958b68d33a9a821e8f",
+    "response_id": "resp_09ddf851aff9068f006a0f75aaa7bc819b9581faa7941fe0fc",
+    "input_tokens": 6297,
+    "output_tokens": 11627,
+    "cost_usd": 0.17379775
+  },
+  "source": {
+    "repo_commit": "8b52ecc2c4de95963e561758fff699b65e25fc2d",
+    "sim_path": "simulations/SIM-zisan-device-bound-agent/",
+    "scenario_path": "scenarios/live-crdt-audit-publication/live-crdt-audit-publication.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "30a7b1ad0052f1acedcd6dd6d6f27e550b3c4fa6f9926ad93676f18d2612b1c7"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-zisan-device-bound-agent/README.md",
+        "sha256": "0d4ffd8bc616cb590c55290d4b7082f1949b0cae6381f48d2776386b459733e9"
+      },
+      {
+        "path": "simulations/SIM-zisan-device-bound-agent/QUESTION.md",
+        "sha256": "d4301120704c334bf147b96d6bef7bf625ea1962cf2974d1a2a778ef2c471e34"
+      },
+      {
+        "path": "scenarios/live-crdt-audit-publication/live-crdt-audit-publication.md",
+        "sha256": "870887bbd5848db45bc4406e5369b492a516c2bd997de9226d24825214c49d94"
+      }
+    ],
+    "simulation_tree_hash": "4e24774dcf443da1a667e63bf1c84ecc23953d7a3ea2c7fb1d76baf96313d935"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 3,
+    "auditability": 2,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 1,
+    "implementation_plausibility": 2,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 15,
+    "normalized_0_100": 43,
+    "confidence_0_1": 0.8
+  },
+  "assessment": {
+    "rationale": "Useful mainly as a boundary-discipline analogy: it clearly separates PromiseGrid claims from host-side dependencies and supports durable receipt-style evidence, but it is not a real model of live CRDT transport, reconnect semantics, or save-time snapshot publication.",
+    "strengths": [
+      "Excellent separation between grid-facing claims and host-specific dependency claims.",
+      "Receipts, deduplication, and break-witness ideas transfer to durable audit evidence.",
+      "Explicitly provisional boundaries are relatively safe for future evolution."
+    ],
+    "weaknesses": [
+      "Poor direct fit for sub-second ordered live CRDT sync.",
+      "Does not address dropped or reordered live frames, partition recovery, or reconnect behavior.",
+      "Does not define the exact content-addressed snapshot or audit object Carol should review.",
+      "Device custody and actuator concerns are mostly orthogonal to collaborative editing."
+    ],
+    "risks": [
+      "Could be over-read as support for live PromiseGrid transport when it really only suggests boundary discipline.",
+      "May blur device-agent conformance claims with app-level live collaboration claims.",
+      "Could distract from the need for a distinct reliable live binding or explicit off-grid posture."
+    ],
+    "open_questions": [
+      "Should live CRDT traffic remain explicitly off-grid until a reliable PromiseGrid binding exists?",
+      "What exact CAS snapshot or transcript should the save-time audit message cite?",
+      "What conformance wording cleanly separates live-sync behavior from durable audit publication?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

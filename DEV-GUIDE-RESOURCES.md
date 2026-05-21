@@ -326,8 +326,9 @@ the prose.
 | `FB-vitih`, `FB-mulum`, `FB-potin` | `simulations/SIM-funas-kernel-porting-boundary/` | `scenarios/kernel-porting-boundary/` | Provisional kernel/runtime/dispatcher boundary evidence; settled porting target remains blocked by `DR-davod`. |
 | `FB-gigit` | Existing Laypeople readiness matrix and `DR-napum` | Existing 100-year and governance scenarios | No new sim required; this is a narrative-settlement question rather than a distinct run surface. |
 
-`DI-fihub` also promotes two GA-derived guide-feedback specimens from
-`ga-canary-20260521-011601`. They are provisional evidence homes for stronger
+`DI-fihub` promotes two GA-derived guide-feedback specimens from
+`ga-canary-20260521-011601`, and `DI-lanuz` promotes two more from
+`ga-canary-20260521-210902`. They are provisional evidence homes for stronger
 claim/conformance shapes bred from the guide-feedback sims above, not settled
 guide prose and not a final app SDK.
 
@@ -335,6 +336,8 @@ guide prose and not a final app SDK.
 |---|---|---|
 | `simulations/SIM-savak-scoped-claim-card-audit-ledger/` | Tests scoped claim cards, exact audit-anchor citations, and peer-local promise-accounting records across app, live/audit, blob, device, embodiment, signing-key, and kernel-porting pressures. | Provisional child-derived guide-feedback evidence. |
 | `simulations/SIM-tizad-scoped-conformance-citation-ledger/` | Tests scoped conformance manifests, durable citation records, and guide-safe partial-conformance claims across the same guide-feedback pressure set. | Provisional child-derived guide-feedback evidence. |
+| `simulations/SIM-virim-manifested-embodiment-savepoint-receipts/` | Tests a concrete App Manifest, Embodiment Claim, Identity Continuity Receipt, and Savepoint Audit Envelope profile for multi-embodiment apps and durable live-state audit. | Provisional child-derived guide-feedback evidence. |
+| `simulations/SIM-zifoj-boundary-claim-promise-accounting-records/` | Tests boundary claim cards, per-field status tags, and peer-local promise-accounting records for porting, app semantics, host dependencies, physical effects, blobs, live audit, and key continuity. | Provisional child-derived guide-feedback evidence. |
 
 ## Audience Readiness Matrix
 

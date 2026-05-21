@@ -888,6 +888,40 @@ Affects: `tools/ga-runner/generate.go`; `tools/ga-runner/ga_runner_test.go`;
 `protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`.
 Supersedes: `DI-tufud` highest-scoring first-parent selection only.
 
+ID: DI-lanuz
+Date: 2026-05-21 16:07:41
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Promote the Virim and Zifoj GA child proposals as canonical non-child
+guide-feedback simulation specimens with copied canonical JSON score evidence
+and preserved proposal-source provenance.
+Intent: Steve selected `virim` and `zifoj` after the
+`ga-canary-20260521-210902` run. Virim explores a concrete App Manifest,
+Embodiment Claim, Identity Continuity Receipt, and Savepoint Audit Envelope
+profile. Zifoj scored highest in the run and explores a general boundary claim
+package with scoped claim cards, field status tags, and peer-local
+promise-accounting records. Promotion should make both specimens discoverable
+without claiming that the LLM scored the cleaned canonical trees instead of the
+ignored proposal trees.
+Constraints: Promote `SIM-virim-child-manifested-embodiment-savepoint-receipts`
+from `ga-canary-20260521-210902` as
+`SIM-virim-manifested-embodiment-savepoint-receipts`; promote
+`SIM-zifoj-child-boundary-claim-ledger` from `ga-canary-20260521-210902` as
+`SIM-zifoj-boundary-claim-promise-accounting-records`. Copy proposal trees and
+result JSONs rather than moving or culling ignored proposal artifacts. Update
+canonical result storage identity fields while preserving `source.*` fields
+that point at the exact proposal tree scored by the LLM, and add explicit
+promotion metadata with this DI. Normalize canonical Zifoj prose away from the
+ambiguous `ledger` term and toward peer-local promise-accounting records.
+Affects: `proposals/ga-canary-20260521-210902/`;
+`results/state/ga-canary-20260521-210902.json`;
+`simulations/SIM-virim-manifested-embodiment-savepoint-receipts/`;
+`simulations/SIM-zifoj-boundary-claim-promise-accounting-records/`;
+`results/SIM-virim-manifested-embodiment-savepoint-receipts/`;
+`results/SIM-zifoj-boundary-claim-promise-accounting-records/`;
+`simulations/README.md`; `DEV-GUIDE-RESOURCES.md`;
+`protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`.
+
 ## Scope
 
 - Define and implement a new GA/search runner without changing

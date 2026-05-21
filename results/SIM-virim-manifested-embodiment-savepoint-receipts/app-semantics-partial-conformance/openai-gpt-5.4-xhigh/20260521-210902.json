@@ -1,0 +1,130 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-virim-manifested-embodiment-savepoint-receipts-app-semantics-partial-conformance-openai-gpt-5.4-xhigh-20260521-210902",
+  "run_group_id": "ga-canary-20260521-210902",
+  "cell_id": "ga-canary-20260521-210902-000044-SIM-virim-child-manifested-embodiment-savepoint-receipts--app-semantics-partial-conformance--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-virim-manifested-embodiment-savepoint-receipts",
+  "scenario_id": "app-semantics-partial-conformance",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260521-210902",
+  "result_path": "results/SIM-virim-manifested-embodiment-savepoint-receipts/app-semantics-partial-conformance/openai-gpt-5.4-xhigh/20260521-210902.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_e275790951c145ec8036e4821badb480",
+    "response_id": "resp_04de62925280d7d2006a0f787d5b0081989a561bb9e04390c5",
+    "input_tokens": 7505,
+    "output_tokens": 7553,
+    "cost_usd": 0.11887575
+  },
+  "source": {
+    "repo_commit": "8b52ecc2c4de95963e561758fff699b65e25fc2d",
+    "sim_path": "proposals/ga-canary-20260521-210902/simulations/SIM-virim-child-manifested-embodiment-savepoint-receipts/",
+    "scenario_path": "scenarios/app-semantics-partial-conformance/app-semantics-partial-conformance.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "30a7b1ad0052f1acedcd6dd6d6f27e550b3c4fa6f9926ad93676f18d2612b1c7"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "proposals/ga-canary-20260521-210902/simulations/SIM-virim-child-manifested-embodiment-savepoint-receipts/README.md",
+        "sha256": "55d674a5ad74c061a20535d9e51f7f997d2006437ee440066f00a2fd98299d3f"
+      },
+      {
+        "path": "proposals/ga-canary-20260521-210902/simulations/SIM-virim-child-manifested-embodiment-savepoint-receipts/QUESTION.md",
+        "sha256": "4740539ea8d202e12d7efa8631c0d35ceff889418fe8f524069bda09bc067945"
+      },
+      {
+        "path": "proposals/ga-canary-20260521-210902/simulations/SIM-virim-child-manifested-embodiment-savepoint-receipts/CLAIMS.md",
+        "sha256": "7499dc52cbf4e7e298cbb5f607b745f5872ea1945719ba57e51eb521f72a15e3"
+      },
+      {
+        "path": "scenarios/app-semantics-partial-conformance/app-semantics-partial-conformance.md",
+        "sha256": "e84a88096e8ecaca83f7a04d8958d6f7e5712e53bf180d14674e32fab69399ef"
+      }
+    ],
+    "simulation_tree_hash": "dfcca9b4fa04cc0dc6a1acf6c2d605b3e8bce6c3de1de769bd59dea03c8e207d"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 5,
+    "promisegrid_alignment": 5,
+    "auditability": 5,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 4,
+    "implementation_plausibility": 4,
+    "risk_penalty": 1
+  },
+  "fitness": {
+    "raw": 31,
+    "normalized_0_100": 89,
+    "confidence_0_1": 0.89
+  },
+  "assessment": {
+    "rationale": "Very strong fit for honest partial conformance: it gives explicit claim wording, names the authoritative boundary identity through continuity receipts, and makes durable audit publication concrete without pretending live sync is already PromiseGrid-conformant. Remaining gaps are mostly witness and normalization details.",
+    "strengths": [
+      "Embodiment Claims explicitly state implemented subset, excluded guarantees, and the boundary of the conformance claim.",
+      "Identity Continuity Receipts make the current signing key, not UI labels or local IDs, the authoritative protocol-boundary identity.",
+      "App Manifest CID plus successor chain makes multi-embodiment app identity auditable across browser and helper forms.",
+      "Savepoint Audit Envelopes and local promise ledgers give Bob and Carol concrete peer-local audit evidence."
+    ],
+    "weaknesses": [
+      "The interoperable semantic subset still depends on external contract-family drafts rather than a tightly normalized subset here.",
+      "One-sided continuity, later witnesses, and break-witness sufficiency are left open.",
+      "Supporting several cited-object variants in one audit envelope may complicate simple tooling and review."
+    ],
+    "risks": [
+      "Implementers may still overread the profile as fuller conformance unless the exclusions stay prominent.",
+      "Schema flexibility could fragment early implementations before a narrower profile stabilizes.",
+      "If referenced objects are unavailable, the audit story remains honest but may still be hard to verify."
+    ],
+    "open_questions": [
+      "What minimum App Manifest and Embodiment Claim fields are mandatory for third-party interop review?",
+      "What witness or break-witness is sufficient when browser and helper cannot co-sign an Identity Continuity Receipt?",
+      "Should the Savepoint Audit Envelope normalize one cited-object shape or allow multiple variants long term?",
+      "What exact guide-safe wording best states that a content hash is not a retention, availability, or authorization promise?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  },
+  "promotion": {
+    "promotion_di": "DI-lanuz",
+    "run_group_id": "ga-canary-20260521-210902",
+    "original_child_sim_id": "SIM-virim-child-manifested-embodiment-savepoint-receipts",
+    "final_sim_id": "SIM-virim-manifested-embodiment-savepoint-receipts",
+    "original_proposal_sim_path": "proposals/ga-canary-20260521-210902/simulations/SIM-virim-child-manifested-embodiment-savepoint-receipts/",
+    "original_proposal_result_path": "proposals/ga-canary-20260521-210902/results/SIM-virim-child-manifested-embodiment-savepoint-receipts/app-semantics-partial-conformance/openai-gpt-5.4-xhigh/20260521-210902.json",
+    "canonical_result_path": "results/SIM-virim-manifested-embodiment-savepoint-receipts/app-semantics-partial-conformance/openai-gpt-5.4-xhigh/20260521-210902.json",
+    "source_provenance_policy": "Canonical storage identity fields were updated for discoverability; source.* fields intentionally preserve the exact proposal tree and file hashes scored by the LLM before promotion."
+  }
+}

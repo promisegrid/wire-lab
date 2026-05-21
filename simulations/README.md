@@ -115,6 +115,8 @@ future candidate designs.
 | `SIM-funas-kernel-porting-boundary/` | Kernel/runtime/dispatcher terminology, minimum porting target, runtime surface, and conformance boundary. |
 | `SIM-savak-scoped-claim-card-audit-ledger/` | Promoted GA probe for scoped claim cards, exact audit-anchor citations, and peer-local promise-accounting records. Source: `DI-fihub`. |
 | `SIM-tizad-scoped-conformance-citation-ledger/` | Promoted GA probe for scoped conformance manifests, durable citation records, and guide-safe partial-conformance claims. Source: `DI-fihub`. |
+| `SIM-virim-manifested-embodiment-savepoint-receipts/` | Promoted GA probe for App Manifest, Embodiment Claim, Identity Continuity Receipt, and Savepoint Audit Envelope profiles. Source: `DI-lanuz`. |
+| `SIM-zifoj-boundary-claim-promise-accounting-records/` | Promoted GA probe for boundary claim cards, field status tags, and peer-local promise-accounting records. Source: `DI-lanuz`. |
 
 ## Grid-envelope arity and nested-signature probes
 

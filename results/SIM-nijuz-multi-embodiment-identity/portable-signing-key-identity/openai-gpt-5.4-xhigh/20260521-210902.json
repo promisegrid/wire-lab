@@ -1,0 +1,115 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-nijuz-multi-embodiment-identity-portable-signing-key-identity-openai-gpt-5.4-xhigh-20260521-210902",
+  "run_group_id": "ga-canary-20260521-210902",
+  "cell_id": "ga-canary-20260521-210902-000034-SIM-nijuz-multi-embodiment-identity--portable-signing-key-identity--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-nijuz-multi-embodiment-identity",
+  "scenario_id": "portable-signing-key-identity",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260521-210902",
+  "result_path": "results/SIM-nijuz-multi-embodiment-identity/portable-signing-key-identity/openai-gpt-5.4-xhigh/20260521-210902.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_7d63bee67bbd4c838a053c21c35cf068",
+    "response_id": "resp_010d3f23cf191068006a0f76cf7d188199ba5d842f137c2fbe",
+    "input_tokens": 6299,
+    "output_tokens": 4575,
+    "cost_usd": 0.07507325
+  },
+  "source": {
+    "repo_commit": "8b52ecc2c4de95963e561758fff699b65e25fc2d",
+    "sim_path": "simulations/SIM-nijuz-multi-embodiment-identity/",
+    "scenario_path": "scenarios/portable-signing-key-identity/portable-signing-key-identity.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "30a7b1ad0052f1acedcd6dd6d6f27e550b3c4fa6f9926ad93676f18d2612b1c7"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-nijuz-multi-embodiment-identity/README.md",
+        "sha256": "e965c63e7f5c8c0f37014f713aa9ab13dfd63d09f227c1cb684a9208b4d65ecc"
+      },
+      {
+        "path": "simulations/SIM-nijuz-multi-embodiment-identity/QUESTION.md",
+        "sha256": "45eb7527cbfd32de80eb829e8452bb29864569bd5d2f2db04210f826fdcbc29b"
+      },
+      {
+        "path": "scenarios/portable-signing-key-identity/portable-signing-key-identity.md",
+        "sha256": "4deaafd0d50191f352fe959dbd93ce9ea916706abc6e23a05274e32bfb92625f"
+      }
+    ],
+    "simulation_tree_hash": "f4f9f7df1f6fb39e72cdd5f6e792f278a36d400239ad6372909005125a92dab4"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 5,
+    "promisegrid_alignment": 4,
+    "auditability": 4,
+    "evolution_safety": 5,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 3,
+    "implementation_plausibility": 4,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 32,
+    "normalized_0_100": 80,
+    "confidence_0_1": 0.82
+  },
+  "assessment": {
+    "rationale": "Direct fit to the scenario: the simulation is explicitly about one logical app spanning browser and helper/plugin embodiments while preserving durable signing-key identity, honest per-embodiment claims, auditability, and a pivotable v0 key recipe. The score is capped by intentionally unresolved details around cross-host binding, concrete rotation evidence, and browser-storage/XSS guidance.",
+    "strengths": [
+      "Targets the exact browser-plus-helper identity continuity problem.",
+      "Makes embodiment boundaries explicit by limiting each component to honest partial conformance claims.",
+      "Strong evolution posture: key algorithm, rotation, handshake, and storage guidance are explicitly provisional and pivotable.",
+      "Auditability is a first-class concern, including later understanding of which component signed which claim under which protocol version."
+    ],
+    "weaknesses": [
+      "Does not yet specify the concrete evidence chain linking old and new signing keys.",
+      "Cross-embodiment binding remains underspecified beyond the high-level identity story.",
+      "Failure handling for XSS, stolen browser state, and confusing local usernames is acknowledged more than fully designed."
+    ],
+    "risks": [
+      "A provisional recipe could be misread as a permanent identity standard before DR-tuhaz closes.",
+      "Browser key storage guidance could overstate security if XSS and host-compromise limits are not stated sharply.",
+      "Users or implementers may still conflate display names or local handles with durable signing identity without stricter guide language."
+    ],
+    "open_questions": [
+      "What exact signed artifacts prove rotation continuity from old key to new key for later auditors?",
+      "How should the guide describe browser-side key storage and XSS risk without implying stronger guarantees than exist?",
+      "What handshake or attestation shape best links browser and helper embodiments as one logical app without relying on central authority?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

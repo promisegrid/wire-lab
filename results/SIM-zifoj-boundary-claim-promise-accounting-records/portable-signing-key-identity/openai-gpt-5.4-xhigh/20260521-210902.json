@@ -1,0 +1,133 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-zifoj-boundary-claim-promise-accounting-records-portable-signing-key-identity-openai-gpt-5.4-xhigh-20260521-210902",
+  "run_group_id": "ga-canary-20260521-210902",
+  "cell_id": "ga-canary-20260521-210902-000055-SIM-zifoj-child-boundary-claim-ledger--portable-signing-key-identity--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-zifoj-boundary-claim-promise-accounting-records",
+  "scenario_id": "portable-signing-key-identity",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260521-210902",
+  "result_path": "results/SIM-zifoj-boundary-claim-promise-accounting-records/portable-signing-key-identity/openai-gpt-5.4-xhigh/20260521-210902.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_5d82c13f942048dabbd5eac016b28ff2",
+    "response_id": "resp_086491af2a8d9062006a0f794084648199b826c58938557819",
+    "input_tokens": 7671,
+    "output_tokens": 5209,
+    "cost_usd": 0.08635025
+  },
+  "source": {
+    "repo_commit": "8b52ecc2c4de95963e561758fff699b65e25fc2d",
+    "sim_path": "proposals/ga-canary-20260521-210902/simulations/SIM-zifoj-child-boundary-claim-ledger/",
+    "scenario_path": "scenarios/portable-signing-key-identity/portable-signing-key-identity.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "30a7b1ad0052f1acedcd6dd6d6f27e550b3c4fa6f9926ad93676f18d2612b1c7"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "proposals/ga-canary-20260521-210902/simulations/SIM-zifoj-child-boundary-claim-ledger/README.md",
+        "sha256": "a5f74a5df805651342bfbed7e920d52658069d5337a28cdd244c641452113feb"
+      },
+      {
+        "path": "proposals/ga-canary-20260521-210902/simulations/SIM-zifoj-child-boundary-claim-ledger/QUESTION.md",
+        "sha256": "f7be184e858cd53036c4e80c33de9bd0e15f4be1ad46cd296749def4aa3faeaf"
+      },
+      {
+        "path": "proposals/ga-canary-20260521-210902/simulations/SIM-zifoj-child-boundary-claim-ledger/CLAIM-CARDS.md",
+        "sha256": "6f17cec105c1c58144fb9c2aafd4a53d5f30645afb874115d0605d4d044d30ce"
+      },
+      {
+        "path": "proposals/ga-canary-20260521-210902/simulations/SIM-zifoj-child-boundary-claim-ledger/LEDGER.md",
+        "sha256": "a796c294637234d15d20e2120a934bbe4f3fcadf524ce8b5fd4708126d0907fb"
+      },
+      {
+        "path": "scenarios/portable-signing-key-identity/portable-signing-key-identity.md",
+        "sha256": "4deaafd0d50191f352fe959dbd93ce9ea916706abc6e23a05274e32bfb92625f"
+      }
+    ],
+    "simulation_tree_hash": "f99564ca60997e6bd9e949b0bee9309a39f15535420d0258da57e65e641acd9b"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 4,
+    "promisegrid_alignment": 5,
+    "auditability": 5,
+    "evolution_safety": 5,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 4,
+    "implementation_plausibility": 4,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 30,
+    "normalized_0_100": 88,
+    "confidence_0_1": 0.84
+  },
+  "assessment": {
+    "rationale": "Strong fit: the child adds embodiment-specific claim cards, signed continuity language, storage caveats, and key-rotation ledger rows that let Bob and Carol audit cross-host identity continuity without confusing display names or host-local state for durable identity. Main gap: it packages honest claims and evidence, but does not yet define the concrete portable v0 identity object, handshake, or minimum rotation-proof set.",
+    "strengths": [
+      "Explicitly separates app identity, host embodiment facts, and runtime boundaries.",
+      "Key-rotation ledger rows plus evidence refs support later audit of old->new key continuity.",
+      "Status tags and migration notes make provisional crypto and storage claims evolvable.",
+      "Rejects display name, local username, and host storage location as durable identity anchors."
+    ],
+    "weaknesses": [
+      "No concrete portable v0 identity object or handshake is specified.",
+      "Minimum mandatory evidence linking old and new keys is still underspecified.",
+      "Browser storage and XSS posture are noted, not turned into a settled security recipe."
+    ],
+    "risks": [
+      "Readers may overinterpret the claim package as full interoperability or security proof before the underlying identity recipe is frozen.",
+      "Implementations could emit non-comparable continuity evidence unless required fields are tightened."
+    ],
+    "open_questions": [
+      "Which claim-card fields must be mandatory for cross-embodiment identity continuity?",
+      "What exact signed evidence set must link old_key_id to new_key_id?",
+      "Which algorithm and handshake details should be provisional versus local-only?",
+      "How should browser key storage and XSS caveats be stated without overstating protection?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  },
+  "promotion": {
+    "promotion_di": "DI-lanuz",
+    "run_group_id": "ga-canary-20260521-210902",
+    "original_child_sim_id": "SIM-zifoj-child-boundary-claim-ledger",
+    "final_sim_id": "SIM-zifoj-boundary-claim-promise-accounting-records",
+    "original_proposal_sim_path": "proposals/ga-canary-20260521-210902/simulations/SIM-zifoj-child-boundary-claim-ledger/",
+    "original_proposal_result_path": "proposals/ga-canary-20260521-210902/results/SIM-zifoj-child-boundary-claim-ledger/portable-signing-key-identity/openai-gpt-5.4-xhigh/20260521-210902.json",
+    "canonical_result_path": "results/SIM-zifoj-boundary-claim-promise-accounting-records/portable-signing-key-identity/openai-gpt-5.4-xhigh/20260521-210902.json",
+    "source_provenance_policy": "Canonical storage identity fields were updated for discoverability; source.* fields intentionally preserve the exact proposal tree and file hashes scored by the LLM before promotion."
+  }
+}

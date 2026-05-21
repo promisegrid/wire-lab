@@ -1,0 +1,131 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-zifoj-boundary-claim-promise-accounting-records-multi-embodiment-app-identity-openai-gpt-5.4-xhigh-20260521-210902",
+  "run_group_id": "ga-canary-20260521-210902",
+  "cell_id": "ga-canary-20260521-210902-000054-SIM-zifoj-child-boundary-claim-ledger--multi-embodiment-app-identity--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-zifoj-boundary-claim-promise-accounting-records",
+  "scenario_id": "multi-embodiment-app-identity",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260521-210902",
+  "result_path": "results/SIM-zifoj-boundary-claim-promise-accounting-records/multi-embodiment-app-identity/openai-gpt-5.4-xhigh/20260521-210902.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_501c6f154c724766a4cd2b4d6898971e",
+    "response_id": "resp_0d7809c904d9c39a006a0f792c28808199a5f9dbbd79541192",
+    "input_tokens": 7691,
+    "output_tokens": 8110,
+    "cost_usd": 0.12699925
+  },
+  "source": {
+    "repo_commit": "8b52ecc2c4de95963e561758fff699b65e25fc2d",
+    "sim_path": "proposals/ga-canary-20260521-210902/simulations/SIM-zifoj-child-boundary-claim-ledger/",
+    "scenario_path": "scenarios/multi-embodiment-app-identity/multi-embodiment-app-identity.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "30a7b1ad0052f1acedcd6dd6d6f27e550b3c4fa6f9926ad93676f18d2612b1c7"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "proposals/ga-canary-20260521-210902/simulations/SIM-zifoj-child-boundary-claim-ledger/README.md",
+        "sha256": "a5f74a5df805651342bfbed7e920d52658069d5337a28cdd244c641452113feb"
+      },
+      {
+        "path": "proposals/ga-canary-20260521-210902/simulations/SIM-zifoj-child-boundary-claim-ledger/QUESTION.md",
+        "sha256": "f7be184e858cd53036c4e80c33de9bd0e15f4be1ad46cd296749def4aa3faeaf"
+      },
+      {
+        "path": "proposals/ga-canary-20260521-210902/simulations/SIM-zifoj-child-boundary-claim-ledger/CLAIM-CARDS.md",
+        "sha256": "6f17cec105c1c58144fb9c2aafd4a53d5f30645afb874115d0605d4d044d30ce"
+      },
+      {
+        "path": "proposals/ga-canary-20260521-210902/simulations/SIM-zifoj-child-boundary-claim-ledger/LEDGER.md",
+        "sha256": "a796c294637234d15d20e2120a934bbe4f3fcadf524ce8b5fd4708126d0907fb"
+      },
+      {
+        "path": "scenarios/multi-embodiment-app-identity/multi-embodiment-app-identity.md",
+        "sha256": "e05f78b9d46c47acecbf430a12fda015268e17d60fbea9e0609fa11e604e52cc"
+      }
+    ],
+    "simulation_tree_hash": "f99564ca60997e6bd9e949b0bee9309a39f15535420d0258da57e65e641acd9b"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 5,
+    "promisegrid_alignment": 5,
+    "auditability": 5,
+    "evolution_safety": 5,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 4,
+    "implementation_plausibility": 4,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 36,
+    "normalized_0_100": 90,
+    "confidence_0_1": 0.88
+  },
+  "assessment": {
+    "rationale": "Direct hit on the scenario: it defines how heterogeneous embodiments stay one app through protocol-boundary identity plus contract reference and continuity evidence, while separate cards and a local ledger keep host-specific limits and long-term audit explicit.",
+    "strengths": [
+      "App Semantics and Host cards cleanly separate shared app identity from embodiment-specific scope, dependencies, and local-only behavior.",
+      "The browser/plugin case is addressed directly: shared identity comes from contract reference and signed continuity records, not branding or host storage location.",
+      "Ledger rows, status tags, and migration notes give Carol and future porters durable evidence for snapshots, key rotation, failures, and partial conformance."
+    ],
+    "weaknesses": [
+      "The exact proof format behind shared_app_identity_ref or same_app_basis is still underspecified.",
+      "Storage loss, host replacement, and helper upgrades are recorded well, but the recovery procedure is not fully defined end to end.",
+      "Mandatory field norms and evidence formats remain open, which may limit interop between independent implementations."
+    ],
+    "risks": [
+      "If continuity evidence is weak, Mallory can still blur 'same UX app' and 'same protocol app' claims.",
+      "The claim-card package could harden into premature pseudo-spec before open DRs and frozen contracts settle."
+    ],
+    "open_questions": [
+      "What minimum signed continuity artifact is required to prove two embodiments are the same app across host replacement?",
+      "Which claim-card fields must be mandatory for multi-embodiment conformance claims?",
+      "How should contract or family references stay resolvable for long-term audit without central services?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  },
+  "promotion": {
+    "promotion_di": "DI-lanuz",
+    "run_group_id": "ga-canary-20260521-210902",
+    "original_child_sim_id": "SIM-zifoj-child-boundary-claim-ledger",
+    "final_sim_id": "SIM-zifoj-boundary-claim-promise-accounting-records",
+    "original_proposal_sim_path": "proposals/ga-canary-20260521-210902/simulations/SIM-zifoj-child-boundary-claim-ledger/",
+    "original_proposal_result_path": "proposals/ga-canary-20260521-210902/results/SIM-zifoj-child-boundary-claim-ledger/multi-embodiment-app-identity/openai-gpt-5.4-xhigh/20260521-210902.json",
+    "canonical_result_path": "results/SIM-zifoj-boundary-claim-promise-accounting-records/multi-embodiment-app-identity/openai-gpt-5.4-xhigh/20260521-210902.json",
+    "source_provenance_policy": "Canonical storage identity fields were updated for discoverability; source.* fields intentionally preserve the exact proposal tree and file hashes scored by the LLM before promotion."
+  }
+}

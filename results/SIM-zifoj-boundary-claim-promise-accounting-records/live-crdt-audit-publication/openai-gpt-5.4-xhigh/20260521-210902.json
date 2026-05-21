@@ -1,0 +1,132 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-zifoj-boundary-claim-promise-accounting-records-live-crdt-audit-publication-openai-gpt-5.4-xhigh-20260521-210902",
+  "run_group_id": "ga-canary-20260521-210902",
+  "cell_id": "ga-canary-20260521-210902-000053-SIM-zifoj-child-boundary-claim-ledger--live-crdt-audit-publication--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-zifoj-boundary-claim-promise-accounting-records",
+  "scenario_id": "live-crdt-audit-publication",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260521-210902",
+  "result_path": "results/SIM-zifoj-boundary-claim-promise-accounting-records/live-crdt-audit-publication/openai-gpt-5.4-xhigh/20260521-210902.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_08828b8639554ffca915a112fd1b1dca",
+    "response_id": "resp_0e785903a0321e41006a0f7921be74819bb363fc56b36e6ae2",
+    "input_tokens": 7712,
+    "output_tokens": 9753,
+    "cost_usd": 0.150038
+  },
+  "source": {
+    "repo_commit": "8b52ecc2c4de95963e561758fff699b65e25fc2d",
+    "sim_path": "proposals/ga-canary-20260521-210902/simulations/SIM-zifoj-child-boundary-claim-ledger/",
+    "scenario_path": "scenarios/live-crdt-audit-publication/live-crdt-audit-publication.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "30a7b1ad0052f1acedcd6dd6d6f27e550b3c4fa6f9926ad93676f18d2612b1c7"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "proposals/ga-canary-20260521-210902/simulations/SIM-zifoj-child-boundary-claim-ledger/README.md",
+        "sha256": "a5f74a5df805651342bfbed7e920d52658069d5337a28cdd244c641452113feb"
+      },
+      {
+        "path": "proposals/ga-canary-20260521-210902/simulations/SIM-zifoj-child-boundary-claim-ledger/QUESTION.md",
+        "sha256": "f7be184e858cd53036c4e80c33de9bd0e15f4be1ad46cd296749def4aa3faeaf"
+      },
+      {
+        "path": "proposals/ga-canary-20260521-210902/simulations/SIM-zifoj-child-boundary-claim-ledger/CLAIM-CARDS.md",
+        "sha256": "6f17cec105c1c58144fb9c2aafd4a53d5f30645afb874115d0605d4d044d30ce"
+      },
+      {
+        "path": "proposals/ga-canary-20260521-210902/simulations/SIM-zifoj-child-boundary-claim-ledger/LEDGER.md",
+        "sha256": "a796c294637234d15d20e2120a934bbe4f3fcadf524ce8b5fd4708126d0907fb"
+      },
+      {
+        "path": "scenarios/live-crdt-audit-publication/live-crdt-audit-publication.md",
+        "sha256": "870887bbd5848db45bc4406e5369b492a516c2bd997de9226d24825214c49d94"
+      }
+    ],
+    "simulation_tree_hash": "f99564ca60997e6bd9e949b0bee9309a39f15535420d0258da57e65e641acd9b"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 5,
+    "promisegrid_alignment": 5,
+    "auditability": 5,
+    "evolution_safety": 5,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 4,
+    "implementation_plausibility": 4,
+    "risk_penalty": 1
+  },
+  "fitness": {
+    "raw": 32,
+    "normalized_0_100": 91,
+    "confidence_0_1": 0.89
+  },
+  "assessment": {
+    "rationale": "Excellent fit for this scenario: it explicitly separates host-specific live CRDT transport from durable PromiseGrid audit publication, and the claim-card plus local-ledger package gives later auditors concrete evidence without overstating conformance. The main gap is that reconnect behavior, exact audit-object conventions, and any future live binding remain open.",
+    "strengths": [
+      "Directly answers the scenario's key boundary problem by separating live-channel claims from audit-layer claims.",
+      "Minimal local promise-accounting rows give Alice, Bob, and Carol durable evidence for snapshots, failures, break-witnesses, and dependency caveats.",
+      "Per-field frozen/provisional/blocked/local-only tags make partial conformance honest and migration-safe."
+    ],
+    "weaknesses": [
+      "Does not define live transport, ordering, or CRDT reconnection semantics beyond honest scoping.",
+      "The exact durable object cited by the audit message is narrowed but not frozen into one interoperable shape.",
+      "Cross-implementation consistency still depends on future standardization of mandatory card and ledger fields."
+    ],
+    "risks": [
+      "Provisional claim-card practice could harden into de facto standards before witness and object formats are frozen.",
+      "The host-local live-channel carve-out could become a long-term escape hatch instead of a bridge to a future live binding."
+    ],
+    "open_questions": [
+      "Should live state remain explicitly off-grid until a reliable binding exists, or should a future live pCID shape be sketched now?",
+      "What exact stable object should the audit message cite: snapshot object, manifest, or another wrapper?",
+      "Which claim-card and ledger fields must be mandatory to keep audits comparable across implementations?",
+      "Which signature-carriage and host-dependency statements are safe as provisional versus only local-only?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  },
+  "promotion": {
+    "promotion_di": "DI-lanuz",
+    "run_group_id": "ga-canary-20260521-210902",
+    "original_child_sim_id": "SIM-zifoj-child-boundary-claim-ledger",
+    "final_sim_id": "SIM-zifoj-boundary-claim-promise-accounting-records",
+    "original_proposal_sim_path": "proposals/ga-canary-20260521-210902/simulations/SIM-zifoj-child-boundary-claim-ledger/",
+    "original_proposal_result_path": "proposals/ga-canary-20260521-210902/results/SIM-zifoj-child-boundary-claim-ledger/live-crdt-audit-publication/openai-gpt-5.4-xhigh/20260521-210902.json",
+    "canonical_result_path": "results/SIM-zifoj-boundary-claim-promise-accounting-records/live-crdt-audit-publication/openai-gpt-5.4-xhigh/20260521-210902.json",
+    "source_provenance_policy": "Canonical storage identity fields were updated for discoverability; source.* fields intentionally preserve the exact proposal tree and file hashes scored by the LLM before promotion."
+  }
+}

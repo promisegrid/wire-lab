@@ -1,0 +1,114 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-kugap-live-sync-audit-split-multi-embodiment-app-identity-openai-gpt-5.4-xhigh-20260521-210902",
+  "run_group_id": "ga-canary-20260521-210902",
+  "cell_id": "ga-canary-20260521-210902-000026-SIM-kugap-live-sync-audit-split--multi-embodiment-app-identity--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-kugap-live-sync-audit-split",
+  "scenario_id": "multi-embodiment-app-identity",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260521-210902",
+  "result_path": "results/SIM-kugap-live-sync-audit-split/multi-embodiment-app-identity/openai-gpt-5.4-xhigh/20260521-210902.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_60ef9243f9674deba4b555b0deac9eb1",
+    "response_id": "resp_06eab787218dfb8f006a0f763be14481988c87c086e02008b7",
+    "input_tokens": 6288,
+    "output_tokens": 8695,
+    "cost_usd": 0.132734
+  },
+  "source": {
+    "repo_commit": "8b52ecc2c4de95963e561758fff699b65e25fc2d",
+    "sim_path": "simulations/SIM-kugap-live-sync-audit-split/",
+    "scenario_path": "scenarios/multi-embodiment-app-identity/multi-embodiment-app-identity.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "30a7b1ad0052f1acedcd6dd6d6f27e550b3c4fa6f9926ad93676f18d2612b1c7"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-kugap-live-sync-audit-split/README.md",
+        "sha256": "067533d02de3dfa7d0fdad5339c027137464078466e580e0eb015c2882ade0a5"
+      },
+      {
+        "path": "simulations/SIM-kugap-live-sync-audit-split/QUESTION.md",
+        "sha256": "bb5c1895580c64161ecca3a936f980625ac543355d79d94f1bc7e971dfb0d935"
+      },
+      {
+        "path": "scenarios/multi-embodiment-app-identity/multi-embodiment-app-identity.md",
+        "sha256": "e05f78b9d46c47acecbf430a12fda015268e17d60fbea9e0609fa11e604e52cc"
+      }
+    ],
+    "simulation_tree_hash": "f88642638aa759074214d592d8be3398201cc6d7d3680894098cbc1df811030c"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 4,
+    "promisegrid_alignment": 4,
+    "auditability": 4,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 3,
+    "implementation_plausibility": 3,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 24,
+    "normalized_0_100": 69,
+    "confidence_0_1": 0.8
+  },
+  "assessment": {
+    "rationale": "Strong partial fit: the simulation cleanly separates embodiment-specific live transport from durable audit publication and supports honest per-component conformance claims, but it leaves the app-level contract family and recovery linkage underdefined, so 'one app' identity remains somewhat ambiguous.",
+    "strengths": [
+      "Separates live-channel claims from durable audit claims, reducing false full-stack conformance.",
+      "Supports scoped per-embodiment claims for browser, plugin, and helper components with different runtime limits.",
+      "Provides a durable audit path that can outlast embodiment churn and support long-term review."
+    ],
+    "weaknesses": [
+      "Does not yet define the contract family or manifest that binds heterogeneous embodiments into one app.",
+      "Peer-local accounting and compatibility rules across the custom live channel remain thin.",
+      "Minimum conformance-claim contents for each embodiment are not yet concrete."
+    ],
+    "risks": [
+      "Mallory can exploit loose 'same app' labeling if cross-embodiment linkage is not explicit.",
+      "Carol may mistake audit publication for proof of live transport guarantees such as ordering or reliability.",
+      "Upgrades or host replacement could create silent drift between embodiments without durable compatibility evidence."
+    ],
+    "open_questions": [
+      "What app-level contract or descriptor links browser, plugin, and helper as one logical app?",
+      "What exact fields must each embodiment claim: runtime limits, supported subprotocols, durability scope, and excluded guarantees?",
+      "Which durable objects should be cited for recovery and long-term verification after storage loss or helper replacement?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}
