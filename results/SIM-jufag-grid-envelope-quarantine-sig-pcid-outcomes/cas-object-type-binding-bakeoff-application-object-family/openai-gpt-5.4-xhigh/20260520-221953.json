@@ -1,0 +1,131 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-jufag-grid-envelope-quarantine-sig-pcid-outcomes-cas-object-type-binding-bakeoff-application-object-family-openai-gpt-5.4-xhigh-20260520-221953",
+  "run_group_id": "ga-canary-20260520-221953",
+  "cell_id": "ga-canary-20260520-221953-000015-SIM-jufag-child-grid-envelope-quarantine-sig-pcid-outcomes--cas-object-type-binding-bakeoff-application-object-family--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-jufag-grid-envelope-quarantine-sig-pcid-outcomes",
+  "scenario_id": "cas-object-type-binding-bakeoff-application-object-family",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260520-221953",
+  "result_path": "results/SIM-jufag-grid-envelope-quarantine-sig-pcid-outcomes/cas-object-type-binding-bakeoff-application-object-family/openai-gpt-5.4-xhigh/20260520-221953.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_187e565205784dd7b721caea51bae57f",
+    "response_id": "resp_008f29f15e1622de006a0e359144ec819aab91c59dba35b298",
+    "input_tokens": 7510,
+    "output_tokens": 9232,
+    "cost_usd": 0.1423905
+  },
+  "source": {
+    "repo_commit": "d1453a8dcfdb44912db1073de8223f0d16de4b53",
+    "sim_path": "proposals/ga-canary-20260520-221953/simulations/SIM-jufag-child-grid-envelope-quarantine-sig-pcid-outcomes/",
+    "scenario_path": "scenarios/cas-object-type-binding-bakeoff-application-object-family/cas-object-type-binding-bakeoff-application-object-family.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "8fec2bd45b32afc24aafb1bac22cb63b4026cc408dfad1fd65a1d85845ee46ea"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "proposals/ga-canary-20260520-221953/simulations/SIM-jufag-child-grid-envelope-quarantine-sig-pcid-outcomes/README.md",
+        "sha256": "c16214c44dcfa4559d7d4e291034551dd58181877480087b31d8454eb5223514"
+      },
+      {
+        "path": "proposals/ga-canary-20260520-221953/simulations/SIM-jufag-child-grid-envelope-quarantine-sig-pcid-outcomes/QUESTION.md",
+        "sha256": "0ab7c3003c64825cf986ab7212823d21cbd91988b39e5021eb079b5cd3cec225"
+      },
+      {
+        "path": "proposals/ga-canary-20260520-221953/simulations/SIM-jufag-child-grid-envelope-quarantine-sig-pcid-outcomes/protocols/grid-envelope.d/CHANGELOG.md",
+        "sha256": "9294a78ed5fde40b1b2fb16445767c04d07edefd6679701cb17e321c2850992a"
+      },
+      {
+        "path": "proposals/ga-canary-20260520-221953/simulations/SIM-jufag-child-grid-envelope-quarantine-sig-pcid-outcomes/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "568e2767f197b8996841a1a64f3adc703c34e1ce0d5a0cef6357569eca95e252"
+      },
+      {
+        "path": "scenarios/cas-object-type-binding-bakeoff-application-object-family/cas-object-type-binding-bakeoff-application-object-family.md",
+        "sha256": "592147772a181786e73bbaac4b8e98d419f0ae832b3aaa933010b94bed97712f"
+      }
+    ],
+    "simulation_tree_hash": "980b81247956b90e86bd5d271179c95644a8e037ed774ca5a7df3e0dd8fad126"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 5,
+    "promisegrid_alignment": 4,
+    "auditability": 4,
+    "evolution_safety": 5,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 5,
+    "implementation_plausibility": 4,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 30,
+    "normalized_0_100": 85.7,
+    "confidence_0_1": 0.84
+  },
+  "assessment": {
+    "rationale": "Strong fit for the application-object-family pressure: new families can use new pcid values without reinterpreting old envelope bytes, while older peers retain exact bytes as quarantined evidence instead of silently trusting or destroying them. Explicit sig_pcid and accepted/quarantined/rejected outcomes materially improve migration safety and auditability, but durable pcid/profile discovery and inner payload-family binding remain outside this draft.",
+    "strengths": [
+      "New object families can be introduced by minting new pcid values without changing the meaning of old envelope bytes.",
+      "Unknown-quarantine preserves exact bytes for later audit or replay while fail-closing semantic acceptance on unknown payload or signature semantics.",
+      "Explicit sig_pcid plus tri-state receiver outcomes make verification rules and local evidence records clearer than either parent extreme."
+    ],
+    "weaknesses": [
+      "The extensibility story is strongest at the envelope boundary; bare or inner application objects still need their own durable type/version binding rules.",
+      "Long-term discovery and archival of pcid and sig_pcid specifications are assumed rather than specified.",
+      "Mandatory signatures may be an awkward fit for some future application families that want unsigned or differently authenticated objects."
+    ],
+    "risks": [
+      "Quarantine-and-relay can create opaque backlog or spam pressure unless local storage and forwarding policy is defined.",
+      "If pcid or signature-profile recovery fails over time, preserved bytes may remain permanently uninterpretable."
+    ],
+    "open_questions": [
+      "How are pcid and sig_pcid artifacts discovered and preserved for 100-year recovery without a central registry?",
+      "What relay and retention limits should apply to quarantined unknown families?",
+      "Does the envelope need a standard unsigned or multi-signature profile path for some application families?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  },
+  "promotion": {
+    "promotion_di": "DI-dipid",
+    "run_group_id": "ga-canary-20260520-221953",
+    "original_child_sim_id": "SIM-jufag-child-grid-envelope-quarantine-sig-pcid-outcomes",
+    "final_sim_id": "SIM-jufag-grid-envelope-quarantine-sig-pcid-outcomes",
+    "original_proposal_sim_path": "proposals/ga-canary-20260520-221953/simulations/SIM-jufag-child-grid-envelope-quarantine-sig-pcid-outcomes/",
+    "original_proposal_result_path": "proposals/ga-canary-20260520-221953/results/SIM-jufag-child-grid-envelope-quarantine-sig-pcid-outcomes/cas-object-type-binding-bakeoff-application-object-family/openai-gpt-5.4-xhigh/20260520-221953.json",
+    "canonical_result_path": "results/SIM-jufag-grid-envelope-quarantine-sig-pcid-outcomes/cas-object-type-binding-bakeoff-application-object-family/openai-gpt-5.4-xhigh/20260520-221953.json",
+    "source_provenance_policy": "Canonical storage identity fields were updated for discoverability; source.* fields intentionally preserve the exact proposal tree and file hashes scored by the LLM before promotion."
+  }
+}

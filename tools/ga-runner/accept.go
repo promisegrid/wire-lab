@@ -157,7 +157,7 @@ func selectedChildren(repo Repo, state GAState, childIDs []string) (map[string]G
 		if !ok {
 			return nil, fmt.Errorf("child %s is not present in GA state", childID)
 		}
-		if err := validateChildForAcceptance(repo, childID, child); err != nil {
+		if err := validateChildForAcceptance(repo, state, childID, child); err != nil {
 			return nil, err
 		}
 		selected[childID] = child
@@ -165,7 +165,7 @@ func selectedChildren(repo Repo, state GAState, childIDs []string) (map[string]G
 	return selected, nil
 }
 
-func validateChildForAcceptance(repo Repo, childID string, child GAChild) error {
+func validateChildForAcceptance(repo Repo, state GAState, childID string, child GAChild) error {
 	if !strings.HasPrefix(childID, "SIM-") {
 		return fmt.Errorf("child %s must start with SIM-", childID)
 	}
@@ -173,7 +173,7 @@ func validateChildForAcceptance(repo Repo, childID string, child GAChild) error 
 		return fmt.Errorf("child %s is already culled", childID)
 	}
 	childPath := strings.TrimSuffix(normalizeRelPath(child.Path), "/")
-	expectedPath := "simulations/" + childID
+	expectedPath := strings.TrimSuffix(proposalChildSimulationPath(state.RunGroupID, childID), "/")
 	if childPath != expectedPath {
 		return fmt.Errorf("child %s path must be %s", childID, expectedPath+"/")
 	}
@@ -259,10 +259,12 @@ func stateCellResultPaths(state GAState) map[string]bool {
 
 func currentSimulationTreeHash(repo Repo, relDir string) (string, error) {
 	// Intent: Re-hash the current materialized child tree before acceptance so
-	// reviewers do not promote a tree that drifted after scoring. Source: DI-podot
+	// reviewers do not promote a tree that drifted after scoring; proposal-stage
+	// child paths are valid until promotion moves winners to canonical
+	// `simulations/`. Source: DI-podot; DI-lirat
 	cleanDir := strings.TrimSuffix(normalizeRelPath(relDir), "/")
-	if !strings.HasPrefix(cleanDir, "simulations/SIM-") {
-		return "", fmt.Errorf("simulation tree must be under simulations/SIM-*")
+	if !isCanonicalSimulationTreePath(cleanDir) && !isProposalSimulationTreePath(cleanDir) {
+		return "", fmt.Errorf("simulation tree must be under simulations/SIM-* or proposals/<run-group>/simulations/SIM-*")
 	}
 	var files []string
 	err := filepath.WalkDir(repo.Abs(cleanDir), func(path string, entry os.DirEntry, walkErr error) error {
@@ -285,6 +287,20 @@ func currentSimulationTreeHash(repo Repo, relDir string) (string, error) {
 	return trackedTreeHash(repo, files)
 }
 
+func isCanonicalSimulationTreePath(relPath string) bool {
+	parts := strings.Split(strings.TrimSuffix(normalizeRelPath(relPath), "/"), "/")
+	return len(parts) == 2 && parts[0] == "simulations" && safeSimIDPattern.MatchString(parts[1])
+}
+
+func isProposalSimulationTreePath(relPath string) bool {
+	parts := strings.Split(strings.TrimSuffix(normalizeRelPath(relPath), "/"), "/")
+	return len(parts) == 4 &&
+		parts[0] == "proposals" &&
+		safeStateIDPattern.MatchString(parts[1]) &&
+		parts[2] == "simulations" &&
+		safeSimIDPattern.MatchString(parts[3])
+}
+
 func readFitnessResult(path string) (FitnessResult, error) {
 	bytes, err := os.ReadFile(path)
 	if err != nil {
@@ -303,7 +319,7 @@ func printAcceptance(stdout io.Writer, plan acceptancePlan) error {
 	if err := writeFormat(stdout, "accepted children=%s results=%d state=%s\n", strings.Join(sortedKeys(plan.Children), ","), len(plan.ResultPaths), plan.StatePath); err != nil {
 		return err
 	}
-	if err := writeLine(stdout, "stage paths:"); err != nil {
+	if err := writeLine(stdout, "review paths:"); err != nil {
 		return err
 	}
 	for _, path := range plan.StagePaths {
@@ -311,11 +327,11 @@ func printAcceptance(stdout io.Writer, plan acceptancePlan) error {
 			return err
 		}
 	}
-	var quoted []string
-	for _, path := range plan.StagePaths {
-		quoted = append(quoted, shellQuote(path))
-	}
-	return writeFormat(stdout, "git add -- %s\n", strings.Join(quoted, " "))
+	// Intent: Proposal paths are ignored staging artifacts; acceptance records
+	// reviewer intent, while a later promotion step must move selected artifacts
+	// into canonical `simulations/` and `results/` paths before git staging.
+	// Source: DI-lirat
+	return writeLine(stdout, "promotion required before git add: move selected proposal artifacts into canonical simulations/ and results/ paths")
 }
 
 func sortedKeys(values map[string]GAChild) []string {
@@ -338,16 +354,4 @@ func uniqueStrings(values []string) []string {
 		unique = append(unique, value)
 	}
 	return unique
-}
-
-func shellQuote(value string) string {
-	if value == "" {
-		return "''"
-	}
-	if strings.IndexFunc(value, func(r rune) bool {
-		return !(r == '/' || r == '.' || r == '_' || r == '-' || r == '+' || r == ':' || r >= '0' && r <= '9' || r >= 'A' && r <= 'Z' || r >= 'a' && r <= 'z')
-	}) == -1 {
-		return value
-	}
-	return "'" + strings.ReplaceAll(value, "'", "'\"'\"'") + "'"
 }

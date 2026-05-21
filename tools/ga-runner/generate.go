@@ -351,6 +351,11 @@ func runGenerateWithProvider(ctx context.Context, repo Repo, provider Provider, 
 			skipped++
 		}
 		if !options.DryRun {
+			oldChildID := state.Children[result.Index].ID()
+			newChildID := result.Child.ID()
+			if err := repointChildScoreCells(&state, state.RunGroupID, oldChildID, newChildID); err != nil {
+				return err
+			}
 			state.Children[result.Index] = result.Child
 			state.UpdatedAt = time.Now().UTC().Format(time.RFC3339)
 			if err := writeGAStateAtomic(stateFile, state); err != nil {
@@ -764,7 +769,7 @@ func executeGenerateJob(ctx context.Context, repo Repo, provider Provider, job g
 		results <- generateJobResult{Index: job.Index, Child: child, Status: "failed", Final: true}
 		return
 	}
-	if err := writeChildBundle(repo, child, bundle); err != nil {
+	if err := writeChildBundle(repo, options.RunGroupID, &child, bundle); err != nil {
 		markGAChild(&child, "failed", err.Error())
 		results <- generateJobResult{Index: job.Index, Child: child, Status: "failed", Final: true}
 		return
@@ -806,15 +811,21 @@ func buildGeneratePrompt(repo Repo, state GAState, child GAChild) (string, error
 	// and make score-improving two-parent breed moves. Source: DI-gijom;
 	// DI-bukid; DI-sohus; DI-dilaf
 	var out strings.Builder
+	childPrefix, err := generatedChildIDPrefix(child.ID())
+	if err != nil {
+		return "", err
+	}
 	out.WriteString("# GA Child Generation\n\n")
 	out.WriteString("Return only JSON with keys `child_id`, `design_delta_summary`, and `files`.\n")
+	fmt.Fprintf(&out, "Choose a descriptive `child_id` that starts with `%s` and ends with a kebab-case design slug. Do not use generic `ga-child`, `pending`, or ordinal-only names.\n", childPrefix)
 	out.WriteString("Each file path must be relative to the child simulation root. Include `README.md` and `QUESTION.md`.\n\n")
 	out.WriteString("Optimization goal: breed a child simulation from exactly two parent simulations, expected to score higher than its parent set on the same rubric and sampled scenarios.\n")
 	out.WriteString("Use the fitness evidence below as training feedback: preserve parent strengths, repair weaknesses, reduce risks, answer or route open questions, and keep changes to one to three bounded design deltas.\n")
 	out.WriteString("Do not merely summarize the parent. The child must make an explicit design move that should improve `fitness.normalized_0_100` while keeping the simulation standalone and auditable.\n\n")
 	fmt.Fprintf(&out, "- Run group ID: `%s`\n", state.RunGroupID)
-	fmt.Fprintf(&out, "- Child ID: `%s`\n", child.ID())
-	fmt.Fprintf(&out, "- Child path: `%s`\n", child.Path)
+	fmt.Fprintf(&out, "- Planned child ID prefix: `%s`\n", childPrefix)
+	fmt.Fprintf(&out, "- Temporary child ID: `%s`\n", child.ID())
+	fmt.Fprintf(&out, "- Temporary child path: `%s`\n", child.Path)
 	fmt.Fprintf(&out, "- Operation: `%s`\n", child.Operation)
 	fmt.Fprintf(&out, "- Parent IDs: `%s`\n\n", strings.Join(child.ParentIDs, ", "))
 	out.WriteString("## Scenario Sample\n\n")
@@ -834,7 +845,7 @@ func buildGeneratePrompt(repo Repo, state GAState, child GAChild) (string, error
 		return "", err
 	}
 	out.WriteString("## Required JSON Shape\n\n")
-	fmt.Fprintf(&out, `{"child_id":%q,"design_delta_summary":"one to three bounded design deltas","files":[{"path":"README.md","content":"# ..."},{"path":"QUESTION.md","content":"# ..."}]}`, child.ID())
+	fmt.Fprintf(&out, `{"child_id":%q,"design_delta_summary":"one to three bounded design deltas","files":[{"path":"README.md","content":"# ..."},{"path":"QUESTION.md","content":"# ..."}]}`, childPrefix+"descriptive-design-slug")
 	out.WriteString("\n")
 	return out.String(), nil
 }
@@ -984,16 +995,22 @@ func validateBreedChild(child GAChild) error {
 	return nil
 }
 
-func writeChildBundle(repo Repo, child GAChild, bundle childBundle) error {
+func writeChildBundle(repo Repo, runGroupID string, child *GAChild, bundle childBundle) error {
 	// Intent: Treat the model response as a bounded transport envelope only; the
-	// durable artifact is the materialized simulation tree under simulations/.
-	// Source: DI-gijom
-	if bundle.ChildID != child.ID() {
-		return fmt.Errorf("bundle child_id %q does not match expected %q", bundle.ChildID, child.ID())
+	// durable artifact is the materialized review-stage simulation tree under an
+	// ignored run-scoped `proposals/` path. Source: DI-gijom; DI-fihof; DI-lirat
+	if !safeStateIDPattern.MatchString(runGroupID) {
+		return fmt.Errorf("run-group-id must be a safe path segment")
 	}
+	generatedID, err := validateGeneratedChildID(child.ID(), bundle.ChildID)
+	if err != nil {
+		return err
+	}
+	child.ChildID = generatedID
+	child.Path = proposalChildSimulationPath(runGroupID, generatedID)
 	relChildPath := strings.TrimSuffix(normalizeRelPath(child.Path), "/")
-	if relChildPath != filepath.ToSlash(filepath.Join("simulations", child.ID())) {
-		return fmt.Errorf("child path must be simulations/%s/", child.ID())
+	if !isRunScopedProposalSimulationPath(runGroupID, generatedID, relChildPath) {
+		return fmt.Errorf("child path must be %s", proposalChildSimulationPath(runGroupID, generatedID))
 	}
 	if _, err := os.Stat(repo.Abs(relChildPath)); err == nil {
 		return fmt.Errorf("child path already exists: %s", relChildPath)
@@ -1003,7 +1020,7 @@ func writeChildBundle(repo Repo, child GAChild, bundle childBundle) error {
 	if err := validateChildBundle(bundle); err != nil {
 		return err
 	}
-	tmpPath := repo.Path("simulations", "."+child.ID()+".tmp-"+fmt.Sprintf("%d", time.Now().UnixNano()))
+	tmpPath := repo.Path("proposals", runGroupID, "simulations", "."+generatedID+".tmp-"+fmt.Sprintf("%d", time.Now().UnixNano()))
 	if err := os.MkdirAll(tmpPath, 0o755); err != nil {
 		return err
 	}
@@ -1017,6 +1034,90 @@ func writeChildBundle(repo Repo, child GAChild, bundle childBundle) error {
 		}
 	}
 	return os.Rename(tmpPath, repo.Abs(relChildPath))
+}
+
+func generatedChildIDPrefix(plannedID string) (string, error) {
+	clean := strings.TrimSpace(plannedID)
+	marker := "-child-"
+	index := strings.Index(clean, marker)
+	if !strings.HasPrefix(clean, "SIM-") || index < 0 {
+		return "", fmt.Errorf("planned child ID %q must start with SIM- and contain -child-", plannedID)
+	}
+	return clean[:index+len(marker)], nil
+}
+
+func validateGeneratedChildID(plannedID string, proposedID string) (string, error) {
+	prefix, err := generatedChildIDPrefix(plannedID)
+	if err != nil {
+		return "", err
+	}
+	clean := strings.TrimSpace(proposedID)
+	if !safeSimIDPattern.MatchString(clean) {
+		return "", fmt.Errorf("generated child_id %q must be a safe SIM-* path segment", proposedID)
+	}
+	if !strings.HasPrefix(clean, prefix) {
+		return "", fmt.Errorf("generated child_id %q must start with planned prefix %q", clean, prefix)
+	}
+	slug := strings.TrimPrefix(clean, prefix)
+	if !isDescriptiveChildSlug(slug) {
+		return "", fmt.Errorf("generated child_id %q needs a descriptive slug after %q", clean, prefix)
+	}
+	return clean, nil
+}
+
+func isDescriptiveChildSlug(slug string) bool {
+	trimmed := strings.Trim(slug, "-_.")
+	if len(trimmed) < 8 {
+		return false
+	}
+	lower := strings.ToLower(trimmed)
+	if strings.HasPrefix(lower, "pending") || strings.HasPrefix(lower, "ga-child") || strings.HasPrefix(lower, "child") {
+		return false
+	}
+	hasLetter := false
+	hasSeparator := false
+	for _, char := range lower {
+		if char >= 'a' && char <= 'z' {
+			hasLetter = true
+		}
+		if char == '-' {
+			hasSeparator = true
+		}
+	}
+	return hasLetter && hasSeparator
+}
+
+func repointChildScoreCells(state *GAState, runGroupID string, oldChildID string, newChildID string) error {
+	if oldChildID == "" || newChildID == "" || oldChildID == newChildID {
+		return nil
+	}
+	// Intent: Child generation gets the final descriptive proposal name from the
+	// model after init, so all queued child score cells must move together before
+	// scoring writes ignored run-scoped proposal evidence. Source: DI-fihof;
+	// DI-lirat
+	for index := range state.Cells {
+		cell := &state.Cells[index]
+		if cell.SimID != oldChildID {
+			continue
+		}
+		cell.SimID = newChildID
+		cell.CellID = strings.Replace(cell.CellID, oldChildID, newChildID, 1)
+		if cell.ResultPath != "" {
+			cell.ResultPath = replaceChildResultPath(runGroupID, cell.ResultPath, newChildID, cell.ScenarioID, cell.ModelID)
+		}
+		if cell.ExpectedResultPath != "" {
+			cell.ExpectedResultPath = replaceChildResultPath(runGroupID, cell.ExpectedResultPath, newChildID, cell.ScenarioID, cell.ModelID)
+		}
+	}
+	return nil
+}
+
+func replaceChildResultPath(runGroupID string, path string, newChildID string, scenarioID string, modelID string) string {
+	timestamp := strings.TrimSuffix(filepath.Base(path), ".json")
+	if timestamp == "" || timestamp == "." {
+		return path
+	}
+	return proposalChildResultPath(runGroupID, newChildID, scenarioID, modelID, timestamp)
 }
 
 func validateChildBundle(bundle childBundle) error {
@@ -1042,7 +1143,7 @@ func validateChildBundle(bundle childBundle) error {
 
 func childBundleRelPath(path string) (string, error) {
 	clean := normalizeRelPath(path)
-	if filepath.IsAbs(path) || strings.HasPrefix(clean, "..") || strings.HasPrefix(clean, "simulations/") || clean == "." {
+	if filepath.IsAbs(path) || strings.HasPrefix(clean, "..") || strings.HasPrefix(clean, "simulations/") || strings.HasPrefix(clean, "proposals/") || clean == "." {
 		return "", fmt.Errorf("unsafe child bundle path %s", path)
 	}
 	return clean, nil

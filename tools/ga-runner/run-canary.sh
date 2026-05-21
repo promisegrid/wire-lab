@@ -9,7 +9,7 @@ set -Eeuo pipefail
 # by text verbosity instead of hard output caps. The canary also requests
 # reasoning summaries and mirrors streamed content to stdout/log for live
 # diagnosis. Source: DI-simag; DI-mopob; DI-juzus; DI-pulap; DI-tufud; DI-vadub;
-# DI-pivuj; DI-suzor
+# DI-pivuj; DI-suzor; DI-guvif
 
 usage() {
 	cat <<'USAGE'
@@ -28,11 +28,15 @@ Environment overrides:
   GA_CANARY_TEXT_VERBOSITY     default: low
   GA_CANARY_SERVICE_TIER       default: flex
   GA_CANARY_MAX_RUN_COST_USD   default: 5.00
-  GA_CANARY_MAX_CELL_USD       default: 0.75
-  GA_CANARY_MAX_CHILD_USD      default: 1.00
-  GA_CANARY_SCORE_WORKERS      default: 6
+	  GA_CANARY_MAX_CELL_USD       default: 0.75
+	  GA_CANARY_MAX_CHILD_USD      default: 1.00
+	  GA_CANARY_INCLUDE_SIMS       optional comma/space list of SIM IDs to include
+	  GA_CANARY_INCLUDE_SCENARIOS  optional comma/space list of scenario IDs to include
+	  GA_CANARY_SCORE_WORKERS      default: 6
   GA_CANARY_GENERATE_WORKERS   default: 1
-  GA_CANARY_REQUEST_TIMEOUT    default: 5m
+  GA_CANARY_SCORE_REQUEST_TIMEOUT default: GA_CANARY_REQUEST_TIMEOUT or 5m
+  GA_CANARY_GENERATE_REQUEST_TIMEOUT default: 15m
+  GA_CANARY_REQUEST_TIMEOUT    legacy score timeout fallback
   GA_CANARY_PROVIDER_ATTEMPTS  default: 2
   GA_CANARY_PROVIDER_ELAPSED   default: 12m
   GA_CANARY_STREAM             default: true
@@ -76,9 +80,12 @@ service_tier="${GA_CANARY_SERVICE_TIER:-flex}"
 max_run_cost_usd="${GA_CANARY_MAX_RUN_COST_USD:-5.00}"
 max_cell_usd="${GA_CANARY_MAX_CELL_USD:-0.75}"
 max_child_usd="${GA_CANARY_MAX_CHILD_USD:-1.00}"
+include_sims="${GA_CANARY_INCLUDE_SIMS:-}"
+include_scenarios="${GA_CANARY_INCLUDE_SCENARIOS:-}"
 score_workers="${GA_CANARY_SCORE_WORKERS:-6}"
 generate_workers="${GA_CANARY_GENERATE_WORKERS:-1}"
-request_timeout="${GA_CANARY_REQUEST_TIMEOUT:-5m}"
+score_request_timeout="${GA_CANARY_SCORE_REQUEST_TIMEOUT:-${GA_CANARY_REQUEST_TIMEOUT:-5m}}"
+generate_request_timeout="${GA_CANARY_GENERATE_REQUEST_TIMEOUT:-15m}"
 provider_attempts="${GA_CANARY_PROVIDER_ATTEMPTS:-2}"
 provider_elapsed="${GA_CANARY_PROVIDER_ELAPSED:-12m}"
 stream="${GA_CANARY_STREAM:-true}"
@@ -131,6 +138,20 @@ if ! [[ "$provider_attempts" =~ ^[0-9]+$ ]] || [ "$provider_attempts" -lt 1 ]; t
 	echo "GA_CANARY_PROVIDER_ATTEMPTS must be a positive integer." >&2
 	exit 2
 fi
+
+append_repeat_flags() {
+	local flag_name="$1"
+	local raw_values="$2"
+	local -n output_args="$3"
+	local normalized="${raw_values//,/ }"
+	for value in $normalized; do
+		output_args+=("$flag_name" "$value")
+	done
+}
+
+init_include_args=()
+append_repeat_flags "-include-sim" "$include_sims" init_include_args
+append_repeat_flags "-include-scenario" "$include_scenarios" init_include_args
 
 log_dir="$(dirname "$log_file")"
 mkdir -p "$log_dir"
@@ -264,12 +285,19 @@ echo "Reasoning summary: $reasoning_summary"
 echo "Text verbosity: $text_verbosity"
 echo "Score workers: $score_workers"
 echo "Generate workers: $generate_workers"
-echo "Request timeout: $request_timeout"
+echo "Score request timeout: $score_request_timeout"
+echo "Generate request timeout: $generate_request_timeout"
 echo "Provider attempts: $provider_attempts"
 echo "Provider elapsed: $provider_elapsed"
 echo "Provider streaming: $stream"
 echo "Stream idle timeout: $stream_idle_timeout"
 echo "Stream content stdout: $stream_content_stdout"
+if [ -n "$include_sims" ]; then
+	echo "Included sims: $include_sims"
+fi
+if [ -n "$include_scenarios" ]; then
+	echo "Included scenarios: $include_scenarios"
+fi
 
 if git -C "$repo_root" status --short | grep -q .; then
 	echo "[warning] worktree has uncommitted or untracked files; continuing because canary outputs are expected to be uncommitted."
@@ -283,11 +311,12 @@ run_step "init state" \
 		-model "$model_id" \
 		-run-group-id "$run_group" \
 		-timestamp "$timestamp" \
-		-shuffle-seed "$shuffle_seed" \
-		-parent-count 3 \
-		-scenario-count 3 \
-		-child-count 2 \
-		-max-promotions 1
+			-shuffle-seed "$shuffle_seed" \
+			-parent-count 3 \
+			-scenario-count 3 \
+			-child-count 2 \
+			-max-promotions 1 \
+			"${init_include_args[@]}"
 
 run_step_with_monitor "score parent cells" \
 	go run . score \
@@ -300,7 +329,7 @@ run_step_with_monitor "score parent cells" \
 		-text-verbosity "$text_verbosity" \
 		-service-tier "$service_tier" \
 		-workers "$score_workers" \
-		-request-timeout "$request_timeout" \
+		-request-timeout "$score_request_timeout" \
 		-provider-max-attempts "$provider_attempts" \
 		-provider-max-elapsed "$provider_elapsed" \
 		-stream="$stream" \
@@ -320,7 +349,7 @@ run_step_with_monitor "generate child simulations" \
 		-text-verbosity "$text_verbosity" \
 		-service-tier "$service_tier" \
 		-workers "$generate_workers" \
-		-request-timeout "$request_timeout" \
+		-request-timeout "$generate_request_timeout" \
 		-provider-max-attempts "$provider_attempts" \
 		-provider-max-elapsed "$provider_elapsed" \
 		-stream="$stream" \
@@ -341,7 +370,7 @@ run_step_with_monitor "score child cells" \
 		-text-verbosity "$text_verbosity" \
 		-service-tier "$service_tier" \
 		-workers "$score_workers" \
-		-request-timeout "$request_timeout" \
+		-request-timeout "$score_request_timeout" \
 		-provider-max-attempts "$provider_attempts" \
 		-provider-max-elapsed "$provider_elapsed" \
 		-stream="$stream" \

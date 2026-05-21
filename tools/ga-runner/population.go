@@ -40,6 +40,10 @@ func runInit(args []string, stdout io.Writer) error {
 	scenarioCount := fs.Int("scenario-count", defaultScenarioCount, "number of root scenarios to sample uniformly")
 	childCount := fs.Int("child-count", defaultChildCount, "number of planned child sims")
 	maxPromotions := fs.Int("max-promotions", defaultMaxPromotions, "maximum accepted children for this planned generation")
+	var includeSims stringListFlag
+	var includeScenarios stringListFlag
+	fs.Var(&includeSims, "include-sim", "simulation ID that must be included in selected parents; repeatable")
+	fs.Var(&includeScenarios, "include-scenario", "scenario ID that must be included in the sampled scenarios; repeatable")
 	if err := fs.Parse(args); err != nil {
 		return err
 	}
@@ -70,13 +74,15 @@ func runInit(args []string, stdout io.Writer) error {
 		return err
 	}
 	options := PlanOptions{
-		RunGroupID:    *runGroupID,
-		ModelID:       *modelID,
-		ShuffleSeed:   *shuffleSeed,
-		ParentCount:   *parentCount,
-		ScenarioCount: *scenarioCount,
-		ChildCount:    *childCount,
-		MaxPromotions: *maxPromotions,
+		RunGroupID:         *runGroupID,
+		ModelID:            *modelID,
+		ShuffleSeed:        *shuffleSeed,
+		ParentCount:        *parentCount,
+		ScenarioCount:      *scenarioCount,
+		ChildCount:         *childCount,
+		MaxPromotions:      *maxPromotions,
+		IncludeSimIDs:      []string(includeSims),
+		IncludeScenarioIDs: []string(includeScenarios),
 	}
 	plan, err := buildGenerationPlan(population, scenarios, options)
 	if err != nil {
@@ -189,7 +195,7 @@ func plannedGAChildren(repo Repo, plan GenerationPlan) ([]GAChild, error) {
 		used[childID] = true
 		children = append(children, GAChild{
 			ChildID:            childID,
-			Path:               filepath.ToSlash(filepath.Join("simulations", childID)) + "/",
+			Path:               proposalChildSimulationPath(plan.RunGroupID, childID),
 			ParentIDs:          child.ParentIDs,
 			Operation:          child.Operation,
 			Status:             "queued",
@@ -204,26 +210,26 @@ func plannedGACells(runGroupID string, modelID string, timestamp string, parents
 	ordinal := 1
 	for _, parent := range parents {
 		for _, scenario := range scenarios {
-			cells = append(cells, newGACell(runGroupID, ordinal, parent.SimID, scenario.ScenarioID, modelID, timestamp))
+			cells = append(cells, newGACell(runGroupID, ordinal, parent.SimID, scenario.ScenarioID, modelID, filepath.ToSlash(filepath.Join("results", parent.SimID, scenario.ScenarioID, modelID, timestamp+".json"))))
 			ordinal++
 		}
 	}
 	for _, child := range children {
 		for _, scenario := range scenarios {
-			cells = append(cells, newGACell(runGroupID, ordinal, child.ID(), scenario.ScenarioID, modelID, timestamp))
+			cells = append(cells, newGACell(runGroupID, ordinal, child.ID(), scenario.ScenarioID, modelID, proposalChildResultPath(runGroupID, child.ID(), scenario.ScenarioID, modelID, timestamp)))
 			ordinal++
 		}
 	}
 	return cells
 }
 
-func newGACell(runGroupID string, ordinal int, simID string, scenarioID string, modelID string, timestamp string) GACell {
+func newGACell(runGroupID string, ordinal int, simID string, scenarioID string, modelID string, resultPath string) GACell {
 	return GACell{
 		CellID:     fmt.Sprintf("%s-%06d-%s--%s--%s", runGroupID, ordinal, simID, scenarioID, modelID),
 		SimID:      simID,
 		ScenarioID: scenarioID,
 		ModelID:    modelID,
-		ResultPath: filepath.ToSlash(filepath.Join("results", simID, scenarioID, modelID, timestamp+".json")),
+		ResultPath: resultPath,
 		Status:     "queued",
 	}
 }
@@ -233,11 +239,17 @@ func mintChildSimID(repo Repo, runGroupID string, index int, used map[string]boo
 		seed := fmt.Sprintf("%s-%d-%d-%d", runGroupID, index, attempt, time.Now().UnixNano())
 		sum := sha256.Sum256([]byte(seed))
 		handle := uint16ToProquint(uint16(sum[0])<<8 | uint16(sum[1]))
-		childID := fmt.Sprintf("SIM-%s-ga-child-%04d", handle, index+1)
+		childID := fmt.Sprintf("SIM-%s-child-pending-%04d", handle, index+1)
 		if used[childID] {
 			continue
 		}
-		if _, err := os.Stat(repo.Path("simulations", childID)); os.IsNotExist(err) {
+		proposalPath := strings.TrimSuffix(proposalChildSimulationPath(runGroupID, childID), "/")
+		if _, err := os.Stat(repo.Path("simulations", childID)); err == nil {
+			continue
+		} else if err != nil && !os.IsNotExist(err) {
+			return "", err
+		}
+		if _, err := os.Stat(repo.Abs(proposalPath)); os.IsNotExist(err) {
 			return childID, nil
 		} else if err != nil {
 			return "", err

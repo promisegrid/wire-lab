@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"sort"
 	"strconv"
+	"strings"
 )
 
 const (
@@ -53,13 +54,15 @@ type PlannedCell struct {
 }
 
 type PlanOptions struct {
-	RunGroupID    string
-	ModelID       string
-	ShuffleSeed   string
-	ParentCount   int
-	ScenarioCount int
-	ChildCount    int
-	MaxPromotions int
+	RunGroupID         string
+	ModelID            string
+	ShuffleSeed        string
+	ParentCount        int
+	ScenarioCount      int
+	ChildCount         int
+	MaxPromotions      int
+	IncludeSimIDs      []string
+	IncludeScenarioIDs []string
 }
 
 func defaultPlanOptions() PlanOptions {
@@ -106,20 +109,20 @@ func buildGenerationPlan(population []PopulationSim, scenarios []Scenario, optio
 	if len(scenarios) == 0 {
 		return GenerationPlan{}, fmt.Errorf("no scenarios available")
 	}
-	parents, err := selectParents(population, options.ParentCount, options.ShuffleSeed)
+	parents, err := selectParents(population, options.ParentCount, options.ShuffleSeed, options.IncludeSimIDs)
 	if err != nil {
 		return GenerationPlan{}, err
 	}
 	if len(parents) < 2 {
 		return GenerationPlan{}, fmt.Errorf("at least two parent sims are required for breed child planning")
 	}
-	sample, err := selectScenarios(scenarios, options.ScenarioCount, options.ShuffleSeed)
+	sample, err := selectScenarios(scenarios, options.ScenarioCount, options.ShuffleSeed, options.IncludeScenarioIDs)
 	if err != nil {
 		return GenerationPlan{}, err
 	}
 	children := planChildren(parents, options.ChildCount)
 	parentCells := planCellsFromParents(parents, sample, options.ModelID)
-	childCells := planCellsFromChildren(children, sample, options.ModelID)
+	childCells := planCellsFromChildren(options.RunGroupID, children, sample, options.ModelID)
 	return GenerationPlan{
 		RunGroupID:       options.RunGroupID,
 		ModelID:          options.ModelID,
@@ -155,30 +158,64 @@ func validatePlanOptions(options PlanOptions) error {
 	return nil
 }
 
-func selectParents(population []PopulationSim, count int, seedText string) ([]PopulationSim, error) {
-	shuffled := append([]PopulationSim(nil), population...)
-	if err := shuffleBySeed(seedText, len(shuffled), func(i, j int) {
-		shuffled[i], shuffled[j] = shuffled[j], shuffled[i]
-	}); err != nil {
-		return nil, err
-	}
-	if count > len(shuffled) {
-		count = len(shuffled)
-	}
-	return shuffled[:count], nil
+func selectParents(population []PopulationSim, count int, seedText string, includeIDs []string) ([]PopulationSim, error) {
+	// Intent: Focused canaries must include explicitly named new or suspect sims,
+	// while still filling remaining slots through deterministic shuffle coverage.
+	// Source: DI-duzur
+	return selectByID(population, count, seedText, includeIDs, func(sim PopulationSim) string {
+		return sim.SimID
+	}, "simulation")
 }
 
-func selectScenarios(scenarios []Scenario, count int, seedText string) ([]Scenario, error) {
-	shuffled := append([]Scenario(nil), scenarios...)
+func selectScenarios(scenarios []Scenario, count int, seedText string, includeIDs []string) ([]Scenario, error) {
+	// Intent: Focused canaries must include explicitly named scenarios while
+	// keeping random scenario pressure for apples-to-apples breadth. Source:
+	// DI-duzur
+	return selectByID(scenarios, count, seedText, includeIDs, func(scenario Scenario) string {
+		return scenario.ScenarioID
+	}, "scenario")
+}
+
+func selectByID[T any](items []T, count int, seedText string, includeIDs []string, itemID func(T) string, label string) ([]T, error) {
+	byID := map[string]T{}
+	for _, item := range items {
+		byID[itemID(item)] = item
+	}
+	var selected []T
+	selectedIDs := map[string]bool{}
+	for _, id := range uniqueNonEmptyStrings(includeIDs) {
+		item, ok := byID[id]
+		if !ok {
+			return nil, fmt.Errorf("included %s %q was not discovered", label, id)
+		}
+		selected = append(selected, item)
+		selectedIDs[id] = true
+	}
+	shuffled := append([]T(nil), items...)
 	if err := shuffleBySeed(seedText, len(shuffled), func(i, j int) {
 		shuffled[i], shuffled[j] = shuffled[j], shuffled[i]
 	}); err != nil {
 		return nil, err
 	}
-	if count > len(shuffled) {
-		count = len(shuffled)
+	target := count
+	if len(selected) > target {
+		target = len(selected)
 	}
-	return shuffled[:count], nil
+	if target > len(items) {
+		target = len(items)
+	}
+	for _, item := range shuffled {
+		if len(selected) >= target {
+			break
+		}
+		id := itemID(item)
+		if selectedIDs[id] {
+			continue
+		}
+		selected = append(selected, item)
+		selectedIDs[id] = true
+	}
+	return selected, nil
 }
 
 func shuffleBySeed(seedText string, size int, swap func(i, j int)) error {
@@ -193,6 +230,20 @@ func shuffleBySeed(seedText string, size int, swap func(i, j int)) error {
 	return nil
 }
 
+func uniqueNonEmptyStrings(values []string) []string {
+	seen := map[string]bool{}
+	var unique []string
+	for _, value := range values {
+		clean := strings.TrimSpace(value)
+		if clean == "" || seen[clean] {
+			continue
+		}
+		seen[clean] = true
+		unique = append(unique, clean)
+	}
+	return unique
+}
+
 func planChildren(parents []PopulationSim, childCount int) []PlannedChild {
 	// Intent: LLM-based child generation uses one two-parent breed operator
 	// instead of pretending that prompt synthesis is byte-level mutation or
@@ -204,7 +255,7 @@ func planChildren(parents []PopulationSim, childCount int) []PlannedChild {
 			Operation: childOperationBreed,
 		}
 		child.ParentIDs = plannedBreedParentIDs(parents, index)
-		child.ResultPath = fmt.Sprintf("simulations/SIM-<handle>-%s/", child.ChildID)
+		child.ResultPath = "proposals/<run-group-id>/simulations/SIM-<handle>-child-<descriptive-slug>/"
 		children = append(children, child)
 	}
 	return children
@@ -239,7 +290,7 @@ func planCellsFromParents(parents []PopulationSim, scenarios []Scenario, modelID
 	return cells
 }
 
-func planCellsFromChildren(children []PlannedChild, scenarios []Scenario, modelID string) []PlannedCell {
+func planCellsFromChildren(runGroupID string, children []PlannedChild, scenarios []Scenario, modelID string) []PlannedCell {
 	var cells []PlannedCell
 	for _, child := range children {
 		for _, scenario := range scenarios {
@@ -247,7 +298,7 @@ func planCellsFromChildren(children []PlannedChild, scenarios []Scenario, modelI
 				SimID:      child.ChildID,
 				ScenarioID: scenario.ScenarioID,
 				ModelID:    modelID,
-				ResultPath: plannedResultPath(child.ChildID, scenario.ScenarioID, modelID),
+				ResultPath: plannedChildResultPath(runGroupID, child.ChildID, scenario.ScenarioID, modelID),
 			})
 		}
 	}
@@ -256,4 +307,11 @@ func planCellsFromChildren(children []PlannedChild, scenarios []Scenario, modelI
 
 func plannedResultPath(simID string, scenarioID string, modelID string) string {
 	return fmt.Sprintf("results/%s/%s/%s/<YYYYMMDD-HHMMSS>.json", simID, scenarioID, modelID)
+}
+
+func plannedChildResultPath(runGroupID string, simID string, scenarioID string, modelID string) string {
+	if runGroupID == "" {
+		runGroupID = "<run-group-id>"
+	}
+	return fmt.Sprintf("proposals/%s/results/%s/%s/%s/<YYYYMMDD-HHMMSS>.json", runGroupID, simID, scenarioID, modelID)
 }

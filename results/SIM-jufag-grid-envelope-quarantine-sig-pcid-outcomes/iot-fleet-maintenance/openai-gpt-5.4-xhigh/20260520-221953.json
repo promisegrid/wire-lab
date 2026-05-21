@@ -1,0 +1,132 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-jufag-grid-envelope-quarantine-sig-pcid-outcomes-iot-fleet-maintenance-openai-gpt-5.4-xhigh-20260520-221953",
+  "run_group_id": "ga-canary-20260520-221953",
+  "cell_id": "ga-canary-20260520-221953-000013-SIM-jufag-child-grid-envelope-quarantine-sig-pcid-outcomes--iot-fleet-maintenance--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-jufag-grid-envelope-quarantine-sig-pcid-outcomes",
+  "scenario_id": "iot-fleet-maintenance",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260520-221953",
+  "result_path": "results/SIM-jufag-grid-envelope-quarantine-sig-pcid-outcomes/iot-fleet-maintenance/openai-gpt-5.4-xhigh/20260520-221953.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_7dd33f5b579d40e1b0419cb1ff42e69c",
+    "response_id": "resp_04d11b982447f383006a0e359144cc819991c1841ad639dc3b",
+    "input_tokens": 7568,
+    "output_tokens": 16598,
+    "cost_usd": 0.245616
+  },
+  "source": {
+    "repo_commit": "d1453a8dcfdb44912db1073de8223f0d16de4b53",
+    "sim_path": "proposals/ga-canary-20260520-221953/simulations/SIM-jufag-child-grid-envelope-quarantine-sig-pcid-outcomes/",
+    "scenario_path": "scenarios/iot-fleet-maintenance/iot-fleet-maintenance.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "8fec2bd45b32afc24aafb1bac22cb63b4026cc408dfad1fd65a1d85845ee46ea"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "proposals/ga-canary-20260520-221953/simulations/SIM-jufag-child-grid-envelope-quarantine-sig-pcid-outcomes/README.md",
+        "sha256": "c16214c44dcfa4559d7d4e291034551dd58181877480087b31d8454eb5223514"
+      },
+      {
+        "path": "proposals/ga-canary-20260520-221953/simulations/SIM-jufag-child-grid-envelope-quarantine-sig-pcid-outcomes/QUESTION.md",
+        "sha256": "0ab7c3003c64825cf986ab7212823d21cbd91988b39e5021eb079b5cd3cec225"
+      },
+      {
+        "path": "proposals/ga-canary-20260520-221953/simulations/SIM-jufag-child-grid-envelope-quarantine-sig-pcid-outcomes/protocols/grid-envelope.d/CHANGELOG.md",
+        "sha256": "9294a78ed5fde40b1b2fb16445767c04d07edefd6679701cb17e321c2850992a"
+      },
+      {
+        "path": "proposals/ga-canary-20260520-221953/simulations/SIM-jufag-child-grid-envelope-quarantine-sig-pcid-outcomes/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "568e2767f197b8996841a1a64f3adc703c34e1ce0d5a0cef6357569eca95e252"
+      },
+      {
+        "path": "scenarios/iot-fleet-maintenance/iot-fleet-maintenance.md",
+        "sha256": "84a6be3a0556877f9043c0bf7fdb6bdb73986955d58261ebd5b9ec4d53a89b68"
+      }
+    ],
+    "simulation_tree_hash": "980b81247956b90e86bd5d271179c95644a8e037ed774ca5a7df3e0dd8fad126"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 3,
+    "promisegrid_alignment": 4,
+    "auditability": 5,
+    "evolution_safety": 5,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 4,
+    "implementation_plausibility": 4,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 33,
+    "normalized_0_100": 82.5,
+    "confidence_0_1": 0.82
+  },
+  "assessment": {
+    "rationale": "Strong as an IoT fleet envelope substrate rather than a full application design: it preserves unknown future firmware or telemetry artifacts as quarantined exact-byte evidence, names signature verification semantics explicitly, and gives local peers auditable accept/quarantine/reject outcomes without central state. The score is capped because device identity, freshness, authorization, maintenance history, and richer promise accounting are left to payload and signature profiles.",
+    "strengths": [
+      "Unknown pcid or sig_pcid is fail-closed but preserved as exact canonical bytes, helping mixed-version fleets carry forward disputed or delayed evidence without blind trust or destructive drop.",
+      "The signature covers [pcid, payload, sig_pcid], so relays cannot silently swap verification semantics.",
+      "Accepted, quarantined, and rejected outcomes plus explicit non-goals give strong auditability and crisp layer boundaries."
+    ],
+    "weaknesses": [
+      "The envelope does not define device identity, firmware authorization, maintenance history, freshness, telemetry meaning, or access-control policy.",
+      "Fleet-local promise accounting beyond the three receiver outcomes is unspecified.",
+      "Operational usefulness depends on durable access to pcid and sig_pcid specs and handlers."
+    ],
+    "risks": [
+      "Quarantine without quotas, TTLs, or relay limits can become a storage or bandwidth abuse surface on constrained gateways.",
+      "Operators may over-trust well-formed quarantined messages unless tooling makes quarantined status visibly non-authoritative.",
+      "Divergent signature profiles could fragment interoperability or complicate long-term recovery."
+    ],
+    "open_questions": [
+      "Which payload and signature profiles carry device identity, firmware authorization, revocation, and maintenance-history semantics for this scenario?",
+      "What local policies govern retry, downgrade, relay, expiration, and escalation for quarantined envelopes during partitions?",
+      "How are pcid and sig_pcid specs mirrored and validated over decades without drifting into a de facto central registry?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  },
+  "promotion": {
+    "promotion_di": "DI-dipid",
+    "run_group_id": "ga-canary-20260520-221953",
+    "original_child_sim_id": "SIM-jufag-child-grid-envelope-quarantine-sig-pcid-outcomes",
+    "final_sim_id": "SIM-jufag-grid-envelope-quarantine-sig-pcid-outcomes",
+    "original_proposal_sim_path": "proposals/ga-canary-20260520-221953/simulations/SIM-jufag-child-grid-envelope-quarantine-sig-pcid-outcomes/",
+    "original_proposal_result_path": "proposals/ga-canary-20260520-221953/results/SIM-jufag-child-grid-envelope-quarantine-sig-pcid-outcomes/iot-fleet-maintenance/openai-gpt-5.4-xhigh/20260520-221953.json",
+    "canonical_result_path": "results/SIM-jufag-grid-envelope-quarantine-sig-pcid-outcomes/iot-fleet-maintenance/openai-gpt-5.4-xhigh/20260520-221953.json",
+    "source_provenance_policy": "Canonical storage identity fields were updated for discoverability; source.* fields intentionally preserve the exact proposal tree and file hashes scored by the LLM before promotion."
+  }
+}

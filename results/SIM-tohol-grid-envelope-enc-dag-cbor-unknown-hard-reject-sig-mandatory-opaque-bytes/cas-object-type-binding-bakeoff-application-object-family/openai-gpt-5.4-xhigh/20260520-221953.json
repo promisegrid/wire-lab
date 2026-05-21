@@ -1,0 +1,122 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-tohol-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-mandatory-opaque-bytes-cas-object-type-binding-bakeoff-application-object-family-openai-gpt-5.4-xhigh-20260520-221953",
+  "run_group_id": "ga-canary-20260520-221953",
+  "cell_id": "ga-canary-20260520-221953-000003-SIM-tohol-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-mandatory-opaque-bytes--cas-object-type-binding-bakeoff-application-object-family--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-tohol-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-mandatory-opaque-bytes",
+  "scenario_id": "cas-object-type-binding-bakeoff-application-object-family",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260520-221953",
+  "result_path": "results/SIM-tohol-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-mandatory-opaque-bytes/cas-object-type-binding-bakeoff-application-object-family/openai-gpt-5.4-xhigh/20260520-221953.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_68c52e39cb194261a0b1cef6da843a61",
+    "response_id": "resp_0079bcb0f67860db006a0e338ba33881999804f95ae70f3457",
+    "input_tokens": 6662,
+    "output_tokens": 12311,
+    "cost_usd": 0.1840125
+  },
+  "source": {
+    "repo_commit": "d1453a8dcfdb44912db1073de8223f0d16de4b53",
+    "sim_path": "simulations/SIM-tohol-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-mandatory-opaque-bytes/",
+    "scenario_path": "scenarios/cas-object-type-binding-bakeoff-application-object-family/cas-object-type-binding-bakeoff-application-object-family.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "a188539d4d20314a96f16541c14d6279f296f47d7abc18ea9cd0a57e95d8e818"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-tohol-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-mandatory-opaque-bytes/README.md",
+        "sha256": "23b1dd2e36bd262c8e84a31505c84d8f81404272de09806770224576d7ace328"
+      },
+      {
+        "path": "simulations/SIM-tohol-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-mandatory-opaque-bytes/QUESTION.md",
+        "sha256": "86c7a812939c054b8cf7a1aebd1bbb93e98b802026fffb7082a4e5c33d44d975"
+      },
+      {
+        "path": "simulations/SIM-tohol-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-mandatory-opaque-bytes/protocols/grid-envelope.d/CHANGELOG.md",
+        "sha256": "aef2b7915320af9607f415cef649397530561e4f0f9372fda1bbf2691dd3f9b1"
+      },
+      {
+        "path": "simulations/SIM-tohol-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-mandatory-opaque-bytes/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "3cacbc62822afbb0b37cfcae1edb3d896292053e876b68b78cf384aa603f61c4"
+      },
+      {
+        "path": "scenarios/cas-object-type-binding-bakeoff-application-object-family/cas-object-type-binding-bakeoff-application-object-family.md",
+        "sha256": "592147772a181786e73bbaac4b8e98d419f0ae832b3aaa933010b94bed97712f"
+      }
+    ],
+    "simulation_tree_hash": "86ce37ad43c89feda138427cb7edc9ad2cb1998b2b8412246fbc9ce1dc3d2490"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 3,
+    "auditability": 3,
+    "evolution_safety": 1,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 3,
+    "implementation_plausibility": 4,
+    "risk_penalty": 4
+  },
+  "fitness": {
+    "raw": 22,
+    "normalized_0_100": 55,
+    "confidence_0_1": 0.74
+  },
+  "assessment": {
+    "rationale": "This variant partially fits the scenario: pCID-bound opaque payloads give a plausible way to add new application families without reinterpreting old envelope bytes, and canonical DAG-CBOR bytes keep old envelope hashes stable. But it is only an envelope specimen, not a full CAS family-binding model, and its unknown-pCID hard-reject rule makes future-family rollout brittle for older peers.",
+    "strengths": [
+      "pCID-based dispatch and opaque payload bytes avoid implicit reinterpretation of existing envelope bytes.",
+      "Canonical DAG-CBOR bytes give stable hashing and signing boundaries.",
+      "Envelope and payload responsibilities are sharply separated without assuming a central registry."
+    ],
+    "weaknesses": [
+      "The draft defines envelope dispatch, not an explicit CAS family taxonomy or binding rule.",
+      "Unknown pCIDs are hard-rejected instead of being carried as opaque future objects.",
+      "Signature verification, signer identity, and long-term pCID migration are deferred to other layers."
+    ],
+    "risks": [
+      "New application families may require coordinated handler rollout before peers can treat them as valid envelopes.",
+      "Loss of pCID-to-handler knowledge over time can make durable bytes uninterpretable.",
+      "Hard rejection may discourage storing or relaying unfamiliar future objects, weakening migration paths."
+    ],
+    "open_questions": [
+      "Should future application object families mint new pCIDs or live under payload-level family tags?",
+      "Can unknown-pCID envelopes be retained or forwarded as opaque CAS artifacts without being accepted as valid envelopes?",
+      "How is 100-year handler discovery and versioning expected to work without drifting into de facto central registries?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

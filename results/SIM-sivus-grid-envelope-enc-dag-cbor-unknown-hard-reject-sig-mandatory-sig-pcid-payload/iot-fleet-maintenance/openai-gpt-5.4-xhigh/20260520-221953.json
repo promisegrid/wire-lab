@@ -1,0 +1,122 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-sivus-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-mandatory-sig-pcid-payload-iot-fleet-maintenance-openai-gpt-5.4-xhigh-20260520-221953",
+  "run_group_id": "ga-canary-20260520-221953",
+  "cell_id": "ga-canary-20260520-221953-000004-SIM-sivus-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-mandatory-sig-pcid-payload--iot-fleet-maintenance--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-sivus-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-mandatory-sig-pcid-payload",
+  "scenario_id": "iot-fleet-maintenance",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260520-221953",
+  "result_path": "results/SIM-sivus-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-mandatory-sig-pcid-payload/iot-fleet-maintenance/openai-gpt-5.4-xhigh/20260520-221953.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_1e118e8776fe490590ab43863e983250",
+    "response_id": "resp_01bd7a38a3a308d1006a0e338bbe948198be0ff1417ec985f3",
+    "input_tokens": 6775,
+    "output_tokens": 9684,
+    "cost_usd": 0.14743225
+  },
+  "source": {
+    "repo_commit": "d1453a8dcfdb44912db1073de8223f0d16de4b53",
+    "sim_path": "simulations/SIM-sivus-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-mandatory-sig-pcid-payload/",
+    "scenario_path": "scenarios/iot-fleet-maintenance/iot-fleet-maintenance.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "a188539d4d20314a96f16541c14d6279f296f47d7abc18ea9cd0a57e95d8e818"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-sivus-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-mandatory-sig-pcid-payload/README.md",
+        "sha256": "714239e56e726ec071f124ce1a93ae61c779a22025b5356cc6a6f54cb1a4383f"
+      },
+      {
+        "path": "simulations/SIM-sivus-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-mandatory-sig-pcid-payload/QUESTION.md",
+        "sha256": "33d8758a7420936904092f5515e5f3665b59c55c9e042ed7a164c2477b2fc517"
+      },
+      {
+        "path": "simulations/SIM-sivus-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-mandatory-sig-pcid-payload/protocols/grid-envelope.d/CHANGELOG.md",
+        "sha256": "aef2b7915320af9607f415cef649397530561e4f0f9372fda1bbf2691dd3f9b1"
+      },
+      {
+        "path": "simulations/SIM-sivus-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-mandatory-sig-pcid-payload/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "544ccb091e53070f47e4d23497d68d37f1d4cdaf122f2e557d4ffacc9442b7c4"
+      },
+      {
+        "path": "scenarios/iot-fleet-maintenance/iot-fleet-maintenance.md",
+        "sha256": "84a6be3a0556877f9043c0bf7fdb6bdb73986955d58261ebd5b9ec4d53a89b68"
+      }
+    ],
+    "simulation_tree_hash": "3ce175e89ae14c517939db9039e2af1f4ff2a4c2050a7556ac94d6435a2f0006"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 3,
+    "auditability": 3,
+    "evolution_safety": 2,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 2,
+    "implementation_plausibility": 4,
+    "risk_penalty": 4
+  },
+  "fitness": {
+    "raw": 22,
+    "normalized_0_100": 55,
+    "confidence_0_1": 0.75
+  },
+  "assessment": {
+    "rationale": "Strong as a strict signed wire envelope with clear dispatch boundaries, but only a partial fit for IoT fleet maintenance because device identity, maintenance history, freshness, and access-control logic live above the envelope. The main downside is upgrade brittleness from unknown pCID hard reject in long-lived mixed fleets.",
+    "strengths": [
+      "Clear separation of envelope dispatch, payload semantics, and signature semantics.",
+      "Mandatory signatures over canonical DAG-CBOR bytes improve integrity checks and later audit.",
+      "Does not require a central registry; peers can decide from local handler availability."
+    ],
+    "weaknesses": [
+      "Does not itself define the application objects, feeds, and promise accounting the scenario needs.",
+      "Unknown pCID hard reject reduces graceful interoperability across mixed protocol versions.",
+      "No built-in semantics for stale, delayed, disputed, or partially available maintenance evidence."
+    ],
+    "risks": [
+      "Older gateways or devices may drop future update or telemetry envelopes instead of safely relaying them.",
+      "Useful maintenance evidence may be lost or sidelined when receivers cannot interpret a new pCID.",
+      "Mandatory signature slots without a defined rotation and revocation story can create fleet lockout pressure."
+    ],
+    "open_questions": [
+      "Which payload protocols and feeds carry device identity, maintenance history, firmware approval, telemetry, and access control?",
+      "Can unknown envelopes be archived as opaque evidence while keeping the hard-reject safety goal?",
+      "How are pCID and signature-protocol migrations handled across decades of intermittent, mixed-version fleets?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

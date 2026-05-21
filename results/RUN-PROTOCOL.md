@@ -44,9 +44,10 @@ contents into the provider prompt, because remote APIs cannot read repo-local
 paths. Source: `DI-lulom`; `DI-ruzaj`.
 
 The preferred runner for GA/search work is `tools/ga-runner`. It uses JSON
-fitness evidence, `promisegrid.ga.state.v1` state, generated child sims under
-`simulations/SIM-*`, explicit review via `accept`, and explicit cleanup via
-`cull`. Source: `DI-ramar`; `DI-zanon`; `DI-podot`; `DI-kofil`; `DI-ruzaj`.
+fitness evidence, `promisegrid.ga.state.v1` state, generated child sims and
+child score evidence under ignored `proposals/<run-group-id>/` trees, explicit
+review/promotion, and explicit cleanup via `cull`. Source: `DI-ramar`;
+`DI-zanon`; `DI-podot`; `DI-kofil`; `DI-ruzaj`; `DI-fihof`; `DI-lirat`.
 
 Root scenario prompts use `scenarios/README.md` for shared scenario contract
 context and `scenarios/<scenario-id>/<scenario-id>.md` for scenario-specific
@@ -59,6 +60,12 @@ not rebundle the root run protocol, root scenario contract, or complete parent
 result JSON for every breed call. They include sampled scenario pressure once
 and compact score/rationale/risk/open-question summaries from completed parent
 fitness results. Source: `DI-dilaf`.
+
+Focused GA canaries may require specific parent simulations or scenarios in the
+sample before the remaining slots are filled by deterministic shuffle. Use
+`-include-sim` / `-include-scenario` on `tools/ga-runner init`, or
+`GA_CANARY_INCLUDE_SIMS` / `GA_CANARY_INCLUDE_SCENARIOS` with the canary wrapper,
+when a newly-added sim or scenario must be exercised. Source: `DI-duzur`.
 
 API-backed runs must use explicit cost controls before any large batch. The
 runner defaults to concise result style, records provider usage in queue state,
@@ -78,18 +85,20 @@ provider attempts, two attempts per cell or child, and a twelve-minute retry
 elapsed cap. Streaming is enabled by default for provider liveness logging, with
 a two-minute idle timeout for silent stalls. Canary wrappers may raise scoring
 and generation workers when cost reservations are active; the terminal canary
-defaults to six scoring workers and one child-generation worker until a
-successful generation phase provides evidence for parallel child writes, and it
-must not dispatch concurrent cells or children past the configured run budget.
-Source: `DI-juzus`; `DI-tufud`; `DI-pivuj`; `DI-suzor`.
+defaults to six scoring workers, one child-generation worker, five-minute score
+attempts, and fifteen-minute child-generation attempts until a successful
+generation phase provides evidence for tighter bounds. It must not dispatch
+concurrent cells or children past the configured run budget. Source:
+`DI-juzus`; `DI-tufud`; `DI-pivuj`; `DI-suzor`; `DI-guvif`.
 
 Canary wrappers may request `reasoning.summary=auto` and print one no-newline
 progress dot per supported reasoning-summary text-delta event while mirroring
-reasoning-summary part-added and part-done events plus visible-output stream
-deltas to stdout/log. The dot is a liveness diagnostic, not raw hidden reasoning
-or reasoning-summary delta content, and raw commands should keep stdout stream
-content off unless explicitly requested. Source: `DI-vadub`; `DI-babik`;
-`DI-vajut`; `DI-sakam`.
+reasoning-summary part-done events to stdout/log. The dot is a liveness
+diagnostic, not raw hidden reasoning or reasoning-summary delta content;
+part-added events and visible-output deltas are intentionally quiet, and raw
+commands should keep stdout stream content off unless explicitly requested.
+Source: `DI-vadub`; `DI-babik`; `DI-vajut`; `DI-sakam`; `DI-fupob`;
+`DI-ramun`.
 
 Unattended canary-style GA runs may continue past unusable individual cells by
 using `score -skip-failed-cells` and `generate -skip-failed-children`. Skipped
@@ -226,9 +235,15 @@ Use `tools/ga-runner` for JSON-fitness GA/search work. Implemented commands are:
   `cd tools/ga-runner && go run . cull -repo-root ../.. -run-group-id <run-group-id> -child <SIM-id> -reason '<reason>'`
 
 `ga-runner progress` remains planned until its code path is implemented.
-Generated children are normal `simulations/SIM-*` trees and are not accepted
-merely because they exist on disk. Source: `DI-ramar`; `DI-zanon`; `DI-zohal`;
-`DI-zusit`; `DI-podot`; `DI-kofil`; `DI-ruzaj`; `DI-gijom`.
+Generated children are ignored review-stage
+`proposals/<run-group-id>/simulations/<SIM-id>/` trees with matching ignored
+`proposals/<run-group-id>/results/<SIM-id>/` score evidence. They are not
+accepted merely because they exist on disk. A review/promotion pass should
+rename selected children to final descriptive non-child `SIM-*` names, fill any
+missing standing simulation files, and move selected score evidence into
+canonical `results/` before commit. Source: `DI-ramar`; `DI-zanon`; `DI-zohal`;
+`DI-zusit`; `DI-podot`; `DI-kofil`; `DI-ruzaj`; `DI-gijom`; `DI-fihof`;
+`DI-lirat`.
 
 LLM-generated children use one operation, `breed`, with exactly two distinct
 parent simulations. The runner must fail or skip generation rather than create a

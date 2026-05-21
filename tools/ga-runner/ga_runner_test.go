@@ -234,6 +234,52 @@ func TestBuildGenerationPlanIsDeterministic(t *testing.T) {
 	}
 }
 
+func TestBuildGenerationPlanIncludesRequestedSimsAndScenarios(t *testing.T) {
+	population := []PopulationSim{
+		{SimID: "SIM-a", Path: "simulations/SIM-a/", TreeHash: "a"},
+		{SimID: "SIM-b", Path: "simulations/SIM-b/", TreeHash: "b"},
+		{SimID: "SIM-c", Path: "simulations/SIM-c/", TreeHash: "c"},
+	}
+	scenarios := []Scenario{
+		{ScenarioID: "scenario-a", Path: "scenarios/scenario-a/scenario-a.md"},
+		{ScenarioID: "scenario-b", Path: "scenarios/scenario-b/scenario-b.md"},
+		{ScenarioID: "scenario-c", Path: "scenarios/scenario-c/scenario-c.md"},
+	}
+	plan, err := buildGenerationPlan(population, scenarios, PlanOptions{
+		RunGroupID:         "ga-include",
+		ModelID:            "model-a",
+		ShuffleSeed:        "5",
+		ParentCount:        2,
+		ScenarioCount:      1,
+		ChildCount:         1,
+		MaxPromotions:      1,
+		IncludeSimIDs:      []string{"SIM-c", "SIM-c"},
+		IncludeScenarioIDs: []string{"scenario-c", "scenario-b"},
+	})
+	if err != nil {
+		t.Fatalf("build include plan: %v", err)
+	}
+	if !stringSliceContains(parentIDs(plan.Parents), "SIM-c") {
+		t.Fatalf("included sim was not selected: %#v", plan.Parents)
+	}
+	if got := strings.Join(scenarioIDs(plan.Scenarios), ","); got != "scenario-c,scenario-b" {
+		t.Fatalf("included scenarios should be preserved and expand sample when needed, got %s", got)
+	}
+
+	_, err = buildGenerationPlan(population, scenarios, PlanOptions{
+		RunGroupID:    "ga-include-missing",
+		ModelID:       "model-a",
+		ParentCount:   2,
+		ScenarioCount: 1,
+		ChildCount:    1,
+		MaxPromotions: 1,
+		IncludeSimIDs: []string{"SIM-missing"},
+	})
+	if err == nil || !strings.Contains(err.Error(), `included simulation "SIM-missing" was not discovered`) {
+		t.Fatalf("expected missing included sim error, got %v", err)
+	}
+}
+
 func TestBuildGenerationPlanValidatesCounts(t *testing.T) {
 	population := []PopulationSim{{SimID: "SIM-a", TreeHash: "a"}}
 	scenarios := []Scenario{{ScenarioID: "scenario-a"}}
@@ -658,11 +704,28 @@ func TestRunGenerateWritesChildTree(t *testing.T) {
 	if state.Children[0].Status != "generated" || state.Children[0].RequestID != "req-generate" || state.Children[0].TreeHash == "" {
 		t.Fatalf("generate state not updated: %#v", state.Children[0])
 	}
+	generatedChildID := state.Children[0].ID()
+	if generatedChildID == childID || !strings.Contains(generatedChildID, "-child-audit-path") {
+		t.Fatalf("generate did not adopt descriptive child ID: planned=%s generated=%s", childID, generatedChildID)
+	}
 	if state.Children[0].ServiceTier != defaultServiceTier || state.Children[0].ServedServiceTier != defaultServiceTier {
 		t.Fatalf("generate service tier not recorded: %#v", state.Children[0])
 	}
-	assertExists(t, repo.Path("simulations", childID, "README.md"))
-	assertExists(t, repo.Path("simulations", childID, "QUESTION.md"))
+	assertExists(t, repo.Abs(filepath.Join("proposals", "ga-generate", "simulations", generatedChildID, "README.md")))
+	assertExists(t, repo.Abs(filepath.Join("proposals", "ga-generate", "simulations", generatedChildID, "QUESTION.md")))
+	foundChildScoreCell := false
+	for _, cell := range state.Cells {
+		if cell.SimID != generatedChildID {
+			continue
+		}
+		foundChildScoreCell = true
+		if !strings.Contains(cell.ResultPath, "proposals/ga-generate/results/"+generatedChildID+"/") {
+			t.Fatalf("child score cell was not repointed to descriptive result path: %#v", cell)
+		}
+	}
+	if !foundChildScoreCell {
+		t.Fatalf("no child score cell was repointed to %s", generatedChildID)
+	}
 }
 
 func TestRunGenerateSelectsParentsByFitnessEvidence(t *testing.T) {
@@ -1137,22 +1200,24 @@ func TestOpenAIProviderStreamsResponsesEvents(t *testing.T) {
 	if response.Text != `{"scores":{}}`+"\n" || response.RequestID != "req-stream" || response.ResponseID != "resp-stream" || response.ServiceTier != serviceTierDefault {
 		t.Fatalf("unexpected stream response: %#v", response)
 	}
-	if !strings.Contains(debug.String(), "event=stream_event") || !strings.Contains(debug.String(), `type="response.output_text.delta"`) || !strings.Contains(debug.String(), `type="response.completed"`) {
+	if !strings.Contains(debug.String(), "event=stream_event") || !strings.Contains(debug.String(), `type="response.completed"`) {
 		t.Fatalf("stream debug log missing liveness events:\n%s", debug.String())
 	}
 	for _, forbidden := range []string{
+		`{"scores":{`,
 		"checking parent scores",
+		"checking score evidence",
+		"response.output_text.delta",
 		"response.reasoning_summary_text.delta",
+		"response.reasoning_summary_part.added",
 	} {
 		if strings.Contains(streamContent.String(), forbidden) {
-			t.Fatalf("stream content leaked reasoning summary delta %q:\n%s", forbidden, streamContent.String())
+			t.Fatalf("stream content leaked suppressed stream event %q:\n%s", forbidden, streamContent.String())
 		}
 	}
 	for _, want := range []string{
 		`.`,
-		`type=response.reasoning_summary_part.added delta="checking score evidence"`,
 		`type=response.reasoning_summary_part.done delta="checked parent scores"`,
-		`type=response.output_text.delta delta="{\"scores\":{"`,
 	} {
 		if !strings.Contains(streamContent.String(), want) {
 			t.Fatalf("stream content missing %q:\n%s", want, streamContent.String())
@@ -1379,7 +1444,7 @@ func TestRunGenerateRejectsUnsafeBundlePath(t *testing.T) {
 	if err == nil {
 		t.Fatalf("expected unsafe bundle path error")
 	}
-	assertMissing(t, repo.Path("simulations", childID))
+	assertMissing(t, repo.Abs(strings.TrimSuffix(proposalChildSimulationPath("ga-bad-generate", childID), "/")))
 }
 
 func TestRunAcceptRecordsAcceptanceAndPrintsStagePaths(t *testing.T) {
@@ -1413,9 +1478,9 @@ func TestRunAcceptRecordsAcceptanceAndPrintsStagePaths(t *testing.T) {
 	for _, want := range []string{
 		"accepted children=SIM-child",
 		"results/state/ga-test.json",
-		"simulations/SIM-child",
+		"proposals/ga-test/simulations/SIM-child",
 		repo.Rel(resultPath),
-		"git add --",
+		"promotion required before git add",
 	} {
 		if !strings.Contains(text, want) {
 			t.Fatalf("expected %q in accept output:\n%s", want, text)
@@ -1548,7 +1613,7 @@ func TestRunCullDeletesRejectedChildAndRecordsState(t *testing.T) {
 	if err != nil {
 		t.Fatalf("cull child: %v\n%s", err, out.String())
 	}
-	assertMissing(t, repo.Path("simulations", "SIM-child"))
+	assertMissing(t, repo.Abs(strings.TrimSuffix(proposalChildSimulationPath("ga-test", "SIM-child"), "/")))
 	assertMissing(t, filepath.Dir(filepath.Dir(filepath.Dir(resultPath))))
 	assertExists(t, unrelatedPath)
 
@@ -1563,7 +1628,7 @@ func TestRunCullDeletesRejectedChildAndRecordsState(t *testing.T) {
 		t.Fatalf("expected culling record, got %#v", state.Culling)
 	}
 	text := out.String()
-	for _, want := range []string{"cull children=SIM-child", "simulations/SIM-child", "results/SIM-child"} {
+	for _, want := range []string{"cull children=SIM-child", "proposals/ga-test/simulations/SIM-child", "proposals/ga-test/results/SIM-child"} {
 		if !strings.Contains(text, want) {
 			t.Fatalf("expected %q in cull output:\n%s", want, text)
 		}
@@ -1586,7 +1651,7 @@ func TestRunCullDryRunDeletesNothingAndWritesNoState(t *testing.T) {
 	if err != nil {
 		t.Fatalf("dry-run cull child: %v\n%s", err, out.String())
 	}
-	assertExists(t, repo.Path("simulations", "SIM-child"))
+	assertExists(t, repo.Abs(strings.TrimSuffix(proposalChildSimulationPath("ga-test", "SIM-child"), "/")))
 	assertExists(t, resultPath)
 	state, err := readGAState(repo.Path("results", "state", "ga-test.json"))
 	if err != nil {
@@ -1671,7 +1736,7 @@ func TestRunCullRejectsUnsafeChildPath(t *testing.T) {
 		"-child", "SIM-child",
 		"-reason", "reject",
 	}, &out, &out)
-	if err == nil || !strings.Contains(err.Error(), "path must be simulations/SIM-child/") {
+	if err == nil || !strings.Contains(err.Error(), "path must be proposals/ga-test/simulations/SIM-child/") {
 		t.Fatalf("expected unsafe child path error, got %v", err)
 	}
 }
@@ -1794,10 +1859,10 @@ func writeParentFitnessResults(t *testing.T, repo Repo, runGroupID string, norma
 
 func promptChildID(t *testing.T, prompt string) string {
 	t.Helper()
-	prefix := "- Child ID: `"
+	prefix := "- Temporary child ID: `"
 	start := strings.Index(prompt, prefix)
 	if start < 0 {
-		t.Fatalf("prompt missing child ID: %s", prompt)
+		t.Fatalf("prompt missing temporary child ID: %s", prompt)
 	}
 	start += len(prefix)
 	end := strings.Index(prompt[start:], "`")
@@ -1898,14 +1963,14 @@ func gitOutput(t *testing.T, repo Repo, args ...string) string {
 
 func writeAcceptFixture(t *testing.T, repo Repo, childID string, runGroupID string) string {
 	t.Helper()
-	childPath := filepath.ToSlash(filepath.Join("simulations", childID))
+	childPath := strings.TrimSuffix(proposalChildSimulationPath(runGroupID, childID), "/")
 	writeTestFile(t, repo.Path(childPath, "README.md"), "# Child\n")
 	writeTestFile(t, repo.Path(childPath, "QUESTION.md"), "# Question\n")
 	treeHash, err := currentSimulationTreeHash(repo, childPath)
 	if err != nil {
 		t.Fatalf("hash child tree: %v", err)
 	}
-	resultPath := repo.Path("results", childID, "scenario-one", "model-a", "20260519-101500.json")
+	resultPath := repo.Abs(proposalChildResultPath(runGroupID, childID, "scenario-one", "model-a", "20260519-101500"))
 	result := validResult(repo, resultPath)
 	result.Source.SimPath = childPath + "/"
 	result.Source.SimulationTreeHash = treeHash
@@ -2001,6 +2066,15 @@ func scenarioIDs(scenarios []Scenario) []string {
 		ids = append(ids, scenario.ScenarioID)
 	}
 	return ids
+}
+
+func stringSliceContains(values []string, target string) bool {
+	for _, value := range values {
+		if value == target {
+			return true
+		}
+	}
+	return false
 }
 
 func openAITestSuccessBody(serviceTier string) string {
@@ -2160,7 +2234,16 @@ func validScorePayloadJSON() string {
 }
 
 func validChildBundleJSON(childID string) string {
-	return fmt.Sprintf(`{"child_id":%q,"design_delta_summary":"Tighten audit language while keeping the fixture small.","files":[{"path":"README.md","content":"# Generated Child\n\nThis generated child keeps audit evidence local.\n"},{"path":"QUESTION.md","content":"# Questions\n\nDoes this child improve the audit path?\n"}]}`, childID)
+	generatedID := generatedChildIDForTest(childID)
+	return fmt.Sprintf(`{"child_id":%q,"design_delta_summary":"Tighten audit language while keeping the fixture small.","files":[{"path":"README.md","content":"# %s\n\nThis generated child keeps audit evidence local.\n"},{"path":"QUESTION.md","content":"# Questions\n\nDoes this child improve the audit path?\n"}]}`, generatedID, generatedID)
+}
+
+func generatedChildIDForTest(plannedID string) string {
+	prefix, err := generatedChildIDPrefix(plannedID)
+	if err != nil {
+		return plannedID
+	}
+	return prefix + "audit-path"
 }
 
 func hasIssue(issues []string, want string) bool {

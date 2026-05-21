@@ -1,0 +1,122 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-guhor-grid-envelope-enc-cbor-unknown-best-effort-sig-mandatory-opaque-bytes-promise-accounting-records-corrupt-data-openai-gpt-5.4-xhigh-20260520-221405",
+  "run_group_id": "ga-canary-20260520-221405",
+  "cell_id": "ga-canary-20260520-221405-000001-SIM-guhor-grid-envelope-enc-cbor-unknown-best-effort-sig-mandatory-opaque-bytes--promise-accounting-records-corrupt-data--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-guhor-grid-envelope-enc-cbor-unknown-best-effort-sig-mandatory-opaque-bytes",
+  "scenario_id": "promise-accounting-records-corrupt-data",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260520-221405",
+  "result_path": "results/SIM-guhor-grid-envelope-enc-cbor-unknown-best-effort-sig-mandatory-opaque-bytes/promise-accounting-records-corrupt-data/openai-gpt-5.4-xhigh/20260520-221405.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_64a6d8de443146128183a6783f598fc7",
+    "response_id": "resp_0da6177cc8de454f006a0e322f8f4481999190655a77c6b360",
+    "input_tokens": 6563,
+    "output_tokens": 6105,
+    "cost_usd": 0.09695525
+  },
+  "source": {
+    "repo_commit": "d1453a8dcfdb44912db1073de8223f0d16de4b53",
+    "sim_path": "simulations/SIM-guhor-grid-envelope-enc-cbor-unknown-best-effort-sig-mandatory-opaque-bytes/",
+    "scenario_path": "scenarios/promise-accounting-records-corrupt-data/promise-accounting-records-corrupt-data.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "be3e107ca142d89744e9434dcbb5668221ad0b475e6a7068ed3bcad5a839c24e"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-guhor-grid-envelope-enc-cbor-unknown-best-effort-sig-mandatory-opaque-bytes/README.md",
+        "sha256": "577753a742867694e2a8ee84c229e8264f04fa109942f444c3af2feda056a45c"
+      },
+      {
+        "path": "simulations/SIM-guhor-grid-envelope-enc-cbor-unknown-best-effort-sig-mandatory-opaque-bytes/QUESTION.md",
+        "sha256": "eaebc9d28329655b84215f609f1d60f7a6267bccf424f314a2be1aef0b1f764f"
+      },
+      {
+        "path": "simulations/SIM-guhor-grid-envelope-enc-cbor-unknown-best-effort-sig-mandatory-opaque-bytes/protocols/grid-envelope.d/CHANGELOG.md",
+        "sha256": "aef2b7915320af9607f415cef649397530561e4f0f9372fda1bbf2691dd3f9b1"
+      },
+      {
+        "path": "simulations/SIM-guhor-grid-envelope-enc-cbor-unknown-best-effort-sig-mandatory-opaque-bytes/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "30aadb2f95a3906e1c5c27acb96ea3687a88346a2d6e2d171db2d90c55bbe656"
+      },
+      {
+        "path": "scenarios/promise-accounting-records-corrupt-data/promise-accounting-records-corrupt-data.md",
+        "sha256": "c5da5aa71f13e1011ddf79d7ad3f0ff34af8bf92d0aab8746a29d1f0826fb2ed"
+      }
+    ],
+    "simulation_tree_hash": "d31569a6a684e574940f7156736bbf02b5789289cb2520469fd57807458c1a18"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 3,
+    "auditability": 2,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 2,
+    "implementation_plausibility": 4,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 17,
+    "normalized_0_100": 49,
+    "confidence_0_1": 0.79
+  },
+  "assessment": {
+    "rationale": "This specimen is mainly a byte-preserving envelope, not a promise-accounting design. It can carry and deterministically sign the exact corrupt payload bytes and it keeps the envelope/payload boundary explicit, but CID verification outcomes, peer-local accounting records, and future decision policy are delegated to higher-layer protocols. That makes it only a partial answer to the corrupt-data scenario.",
+    "strengths": [
+      "Deterministic CBOR plus signing over [pcid, payload] supports reproducible evidence about exactly which bytes were received.",
+      "The envelope cleanly separates transport from payload interpretation, which fits sparse knowledge and no-central-authority goals.",
+      "Unknown-pCID handling requires unsupported/unverified marking instead of pretending successful interpretation."
+    ],
+    "weaknesses": [
+      "No peer-local promise-accounting record format is defined for a CID verification failure.",
+      "CAS/body-reference verification is outside the envelope, so the core scenario is unresolved at this layer.",
+      "Signature bytes are mandatory but signer identity, algorithm, and verification semantics remain external."
+    ],
+    "risks": [
+      "Best-effort salvage on unknown payloads could lead to inconsistent local judgments if operators overread unverified data.",
+      "Different payload protocols may react differently to the same corrupt bytes, weakening comparable future decisions.",
+      "100-year auditability depends on preserving external payload and signature semantics, not just the envelope bytes."
+    ],
+    "open_questions": [
+      "What exact local record should a peer write when payload-contained CID verification fails?",
+      "After corrupt-data evidence, should a peer quarantine, retry, warn, or downgrade trust in the sender?",
+      "How are signature verification semantics and identity claims made durable across protocol evolution?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

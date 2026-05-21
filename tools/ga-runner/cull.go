@@ -118,7 +118,7 @@ func validateCulling(repo Repo, stateFile string, state GAState, options cullOpt
 	var missingResultPaths []string
 	for _, childID := range sortedKeys(children) {
 		childPath := strings.TrimSuffix(normalizeRelPath(children[childID].Path), "/")
-		resultPath := "results/" + childID
+		resultPath := proposalChildResultRoot(state.RunGroupID, childID)
 		simPaths = append(simPaths, childPath)
 		if info, err := os.Stat(repo.Abs(resultPath)); err == nil && info.IsDir() {
 			resultPaths = append(resultPaths, resultPath)
@@ -159,7 +159,7 @@ func selectedChildrenForCulling(repo Repo, state GAState, childIDs []string) (ma
 		if !ok {
 			return nil, fmt.Errorf("child %s is not present in GA state", childID)
 		}
-		if err := validateChildForCulling(repo, childID, child); err != nil {
+		if err := validateChildForCulling(repo, state, childID, child); err != nil {
 			return nil, err
 		}
 		selected[childID] = child
@@ -167,7 +167,7 @@ func selectedChildrenForCulling(repo Repo, state GAState, childIDs []string) (ma
 	return selected, nil
 }
 
-func validateChildForCulling(repo Repo, childID string, child GAChild) error {
+func validateChildForCulling(repo Repo, state GAState, childID string, child GAChild) error {
 	if !safeSimIDPattern.MatchString(childID) {
 		return fmt.Errorf("child %s must be a safe SIM-* path segment", childID)
 	}
@@ -178,7 +178,7 @@ func validateChildForCulling(repo Repo, childID string, child GAChild) error {
 		return fmt.Errorf("child %s is already culled", childID)
 	}
 	childPath := strings.TrimSuffix(normalizeRelPath(child.Path), "/")
-	expectedPath := "simulations/" + childID
+	expectedPath := strings.TrimSuffix(proposalChildSimulationPath(state.RunGroupID, childID), "/")
 	if childPath != expectedPath {
 		return fmt.Errorf("child %s path must be %s", childID, expectedPath+"/")
 	}
@@ -216,13 +216,18 @@ func validateDeletionTarget(relPath string) error {
 	if filepath.IsAbs(relPath) || strings.HasPrefix(clean, "..") {
 		return fmt.Errorf("refusing unsafe deletion target %s", relPath)
 	}
-	if strings.HasPrefix(clean, "simulations/SIM-") || strings.HasPrefix(clean, "results/SIM-") {
-		parts := strings.Split(clean, "/")
-		if len(parts) == 2 && safeSimIDPattern.MatchString(parts[1]) {
-			return nil
-		}
+	if isCanonicalSimulationTreePath(clean) {
+		return nil
 	}
-	return fmt.Errorf("refusing deletion target outside child sim/result roots: %s", relPath)
+	parts := strings.Split(clean, "/")
+	if len(parts) == 4 &&
+		parts[0] == "proposals" &&
+		safeStateIDPattern.MatchString(parts[1]) &&
+		(parts[2] == "simulations" || parts[2] == "results") &&
+		safeSimIDPattern.MatchString(parts[3]) {
+		return nil
+	}
+	return fmt.Errorf("refusing deletion target outside proposal child sim/result roots: %s", relPath)
 }
 
 func printCullingPlan(stdout io.Writer, plan cullingPlan) error {

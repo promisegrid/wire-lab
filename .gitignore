@@ -1,0 +1,3 @@
+# GA-runner generated child proposals are review staging artifacts. Accepted
+# designs are promoted out of this ignored tree before commit.
+proposals/

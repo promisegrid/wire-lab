@@ -1,0 +1,133 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-bimos-grid-envelope-quarantine-sig-pcid-audit-tuple-bgp-routing-openai-gpt-5.4-xhigh-20260520-221953",
+  "run_group_id": "ga-canary-20260520-221953",
+  "cell_id": "ga-canary-20260520-221953-000011-SIM-bimos-child-grid-envelope-quarantine-sig-pcid-audit-tuple--bgp-routing--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-bimos-grid-envelope-quarantine-sig-pcid-audit-tuple",
+  "scenario_id": "bgp-routing",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260520-221953",
+  "result_path": "results/SIM-bimos-grid-envelope-quarantine-sig-pcid-audit-tuple/bgp-routing/openai-gpt-5.4-xhigh/20260520-221953.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_b1809705de774d38aaceaa5c8712ea26",
+    "response_id": "resp_0ed719ed9793090b006a0e359153508199b87e1f9abc248ea4",
+    "input_tokens": 7405,
+    "output_tokens": 13034,
+    "cost_usd": 0.19543475
+  },
+  "source": {
+    "repo_commit": "d1453a8dcfdb44912db1073de8223f0d16de4b53",
+    "sim_path": "proposals/ga-canary-20260520-221953/simulations/SIM-bimos-child-grid-envelope-quarantine-sig-pcid-audit-tuple/",
+    "scenario_path": "scenarios/bgp-routing/bgp-routing.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "8fec2bd45b32afc24aafb1bac22cb63b4026cc408dfad1fd65a1d85845ee46ea"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "proposals/ga-canary-20260520-221953/simulations/SIM-bimos-child-grid-envelope-quarantine-sig-pcid-audit-tuple/README.md",
+        "sha256": "b6157b5fad95bcb1f0a6f4c760c6e145e20a6501c35dcacedeba593016eed7eb"
+      },
+      {
+        "path": "proposals/ga-canary-20260520-221953/simulations/SIM-bimos-child-grid-envelope-quarantine-sig-pcid-audit-tuple/QUESTION.md",
+        "sha256": "682a08b2aa5bc6c23966a338b1d28a753b6cc053272463ae13694c64a8e5f376"
+      },
+      {
+        "path": "proposals/ga-canary-20260520-221953/simulations/SIM-bimos-child-grid-envelope-quarantine-sig-pcid-audit-tuple/protocols/grid-envelope.d/CHANGELOG.md",
+        "sha256": "29ae7dea7980bf1903febf343736d227fa48622e27a855567105f2225998bdd6"
+      },
+      {
+        "path": "proposals/ga-canary-20260520-221953/simulations/SIM-bimos-child-grid-envelope-quarantine-sig-pcid-audit-tuple/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "b70de02052f9512343ad84b974398a8e07081faa6a306678af035a4f276a6c3a"
+      },
+      {
+        "path": "scenarios/bgp-routing/bgp-routing.md",
+        "sha256": "90a37247bb6cc291809077f99ef95c4c74865a657b8e5c5c164cce6ef330b17f"
+      }
+    ],
+    "simulation_tree_hash": "dbcd23f1e5c2b3881b204a26d7488f44fae9f5afbca6935792c856c49fdbd72f"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 3,
+    "promisegrid_alignment": 4,
+    "auditability": 5,
+    "evolution_safety": 5,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 4,
+    "implementation_plausibility": 4,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 28,
+    "normalized_0_100": 80,
+    "confidence_0_1": 0.82
+  },
+  "assessment": {
+    "rationale": "This is a strong envelope-layer substrate for BGP-like evidence exchange: it preserves unknown route artifacts as exact quarantined bytes and keeps acceptance boundaries explicit, but it does not itself define the routing semantics or policy checks needed to resolve hijacks, leaks, or stale paths.",
+    "strengths": [
+      "Quarantine preserves exact bytes of unknown route evidence without accepting it, improving mixed-version and partitioned routing audits.",
+      "Explicit payload/signature protocol dispatch and no-speculative-parse rules reduce type confusion and keep layer boundaries clear.",
+      "The local audit tuple records receive context, interpretation result, and verifier version for later peer-local review."
+    ],
+    "weaknesses": [
+      "The variant does not define route semantics, withdrawals, freshness, leak policy, or hijack detection.",
+      "Quarantine relay preserves evidence, but interoperable rules for carrying rejection and provenance metadata are still underspecified.",
+      "Identity, authority, revocation, and trust policy are delegated to external protocols, so end-to-end routing safety is incomplete here."
+    ],
+    "risks": [
+      "Opaque quarantine relay can be abused for storage or bandwidth flooding.",
+      "Downstream peers may receive raw bytes without trustworthy context showing where and why interpretation failed.",
+      "Signed but stale or policy-violating route objects can still circulate unless payload-layer freshness and policy checks exist."
+    ],
+    "open_questions": [
+      "How should quarantine status and relay provenance be encoded so later peers can audit forwarding versus acceptance?",
+      "What limits govern archival, relay, and garbage collection of quarantined envelopes in large routing deployments?",
+      "Which payload-layer objects and promise-accounting records represent route announcements, withdrawals, freshness, and leak evidence?",
+      "How do peers retain or recover the specs and handlers referenced by old pcid and sig_pcid values over long time horizons?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  },
+  "promotion": {
+    "promotion_di": "DI-dipid",
+    "run_group_id": "ga-canary-20260520-221953",
+    "original_child_sim_id": "SIM-bimos-child-grid-envelope-quarantine-sig-pcid-audit-tuple",
+    "final_sim_id": "SIM-bimos-grid-envelope-quarantine-sig-pcid-audit-tuple",
+    "original_proposal_sim_path": "proposals/ga-canary-20260520-221953/simulations/SIM-bimos-child-grid-envelope-quarantine-sig-pcid-audit-tuple/",
+    "original_proposal_result_path": "proposals/ga-canary-20260520-221953/results/SIM-bimos-child-grid-envelope-quarantine-sig-pcid-audit-tuple/bgp-routing/openai-gpt-5.4-xhigh/20260520-221953.json",
+    "canonical_result_path": "results/SIM-bimos-grid-envelope-quarantine-sig-pcid-audit-tuple/bgp-routing/openai-gpt-5.4-xhigh/20260520-221953.json",
+    "source_provenance_policy": "Canonical storage identity fields were updated for discoverability; source.* fields intentionally preserve the exact proposal tree and file hashes scored by the LLM before promotion."
+  }
+}

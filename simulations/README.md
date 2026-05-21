@@ -81,3 +81,40 @@ placement; none is preferred by the harness or by this index.
 | `SIM-zifik-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-unsigned-v0/` | DAG-CBOR | Best-effort inspection | Unsigned v0 |
 | `SIM-fonol-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-mandatory-opaque-bytes/` | DAG-CBOR | Best-effort inspection | Mandatory opaque bytes |
 | `SIM-rakir-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-mandatory-sig-pcid-payload/` | DAG-CBOR | Best-effort inspection | Mandatory signature pCID + payload |
+
+## Promoted GA grid-envelope variants
+
+`DI-dipid` promoted two review-stage children from
+`ga-canary-20260520-221953` into canonical non-child simulation specimens. These
+variants remain candidate specimens, not preferred envelope families. Their raw
+proposal artifacts remain under ignored `proposals/`, and their accepted score
+evidence is copied under root `results/`.
+
+| Simulation | Encoding | Unknown-pCID policy | Signature policy |
+|---|---|---|---|
+| `SIM-jufag-grid-envelope-quarantine-sig-pcid-outcomes/` | DAG-CBOR | Quarantine store/forward with explicit accepted, quarantined, and rejected outcomes | Mandatory profiled opaque signature bytes with explicit `sig_pcid` dispatch |
+| `SIM-bimos-grid-envelope-quarantine-sig-pcid-audit-tuple/` | DAG-CBOR | Quarantine as local rejection plus exact-byte evidence relay | Mandatory `sig_pcid` plus `sig_payload`, with a local audit tuple |
+
+## Grid-envelope arity and nested-signature probes
+
+`DI-joman` adds arity-focused probes outside the 24-row positional matrix.
+These simulations test whether variable arity belongs in the outer envelope or
+inside a pCID-defined payload layer. They are candidate specimens, not
+preferred envelope families.
+
+| Simulation | Probe |
+|---|---|
+| `SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields/` | First `pcid` defines how many outer fields follow and what each field means. |
+| `SIM-janov-grid-envelope-layer-pcid-nested-signed-payload/` | Outer `[pcid_a, payload_a]`; `pcid_a` defines nested `[pcid_b, payload_b, signature_b]`. |
+
+## Grid-envelope signature/proof object probes
+
+`DI-sahiv` adds a standalone non-child probe for using Cryptid's Multisig object
+model as the envelope signature/proof payload representation. This simulation
+keeps detached versus combined signatures, outer versus nested placement,
+variable arity, pCID binding, unknown-codec handling, threshold shares, and
+verifier obligations open for comparison.
+
+| Simulation | Probe |
+|---|---|
+| `SIM-lotiv-grid-envelope-cryptid-multisig-signature-proofs/` | Cryptid Multisig object model as grid-envelope signature/proof payload bytes. |

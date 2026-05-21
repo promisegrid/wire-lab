@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strings"
 )
 
 const stateSchemaV1 = "promisegrid.ga.state.v1"
@@ -51,7 +52,7 @@ type GAStateParent struct {
 	Rationale string `json:"rationale,omitempty"`
 }
 
-// GAChild describes a generated child simulation tree under simulations/SIM-*.
+// GAChild describes a generated child simulation proposal under proposals/.
 //
 // Intent: Acceptance verifies the durable child tree instead of trusting a JSON
 // proposal object or the mere presence of a directory. Source: DI-podot
@@ -186,4 +187,42 @@ func (cell GACell) SelectedResultPath() string {
 
 func normalizeRelPath(path string) string {
 	return filepath.ToSlash(filepath.Clean(path))
+}
+
+func proposalRunRoot(runGroupID string) string {
+	return filepath.ToSlash(filepath.Join("proposals", runGroupID))
+}
+
+func proposalChildSimulationPath(runGroupID string, childID string) string {
+	// Intent: Keep generated child simulation trees out of canonical
+	// `simulations/` until human review promotes them. Source: DI-lirat
+	return filepath.ToSlash(filepath.Join(proposalRunRoot(runGroupID), "simulations", childID)) + "/"
+}
+
+func proposalChildResultRoot(runGroupID string, childID string) string {
+	return filepath.ToSlash(filepath.Join(proposalRunRoot(runGroupID), "results", childID))
+}
+
+func proposalChildResultPath(runGroupID string, childID string, scenarioID string, modelID string, timestamp string) string {
+	// Intent: Keep generated child score evidence with the ignored child proposal
+	// it evaluates, rather than mixing it into canonical `results/`. Source:
+	// DI-lirat
+	return filepath.ToSlash(filepath.Join(proposalChildResultRoot(runGroupID, childID), scenarioID, modelID, timestamp+".json"))
+}
+
+func isRunScopedProposalSimulationPath(runGroupID string, childID string, relPath string) bool {
+	expected := strings.TrimSuffix(normalizeRelPath(proposalChildSimulationPath(runGroupID, childID)), "/")
+	return strings.TrimSuffix(normalizeRelPath(relPath), "/") == expected
+}
+
+func simulationPathForState(state GAState, simID string) string {
+	for _, child := range state.Children {
+		if child.ID() == simID && child.Path != "" {
+			// Intent: Child score cells must read the ignored proposal tree recorded
+			// in GA state, not an accidental canonical tree with the same ID.
+			// Source: DI-lirat
+			return strings.TrimSuffix(normalizeRelPath(child.Path), "/")
+		}
+	}
+	return filepath.ToSlash(filepath.Join("simulations", simID))
 }

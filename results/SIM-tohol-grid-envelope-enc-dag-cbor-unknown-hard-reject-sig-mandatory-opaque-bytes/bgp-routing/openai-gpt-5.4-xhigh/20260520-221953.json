@@ -1,0 +1,123 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-tohol-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-mandatory-opaque-bytes-bgp-routing-openai-gpt-5.4-xhigh-20260520-221953",
+  "run_group_id": "ga-canary-20260520-221953",
+  "cell_id": "ga-canary-20260520-221953-000002-SIM-tohol-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-mandatory-opaque-bytes--bgp-routing--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-tohol-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-mandatory-opaque-bytes",
+  "scenario_id": "bgp-routing",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260520-221953",
+  "result_path": "results/SIM-tohol-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-mandatory-opaque-bytes/bgp-routing/openai-gpt-5.4-xhigh/20260520-221953.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_2c50f357d8d540609458d3f9428731e4",
+    "response_id": "resp_05eb396fe8d9c84d006a0e338bb52c819a858b9b91184077ab",
+    "input_tokens": 6704,
+    "output_tokens": 10850,
+    "cost_usd": 0.163632
+  },
+  "source": {
+    "repo_commit": "d1453a8dcfdb44912db1073de8223f0d16de4b53",
+    "sim_path": "simulations/SIM-tohol-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-mandatory-opaque-bytes/",
+    "scenario_path": "scenarios/bgp-routing/bgp-routing.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "a188539d4d20314a96f16541c14d6279f296f47d7abc18ea9cd0a57e95d8e818"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-tohol-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-mandatory-opaque-bytes/README.md",
+        "sha256": "23b1dd2e36bd262c8e84a31505c84d8f81404272de09806770224576d7ace328"
+      },
+      {
+        "path": "simulations/SIM-tohol-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-mandatory-opaque-bytes/QUESTION.md",
+        "sha256": "86c7a812939c054b8cf7a1aebd1bbb93e98b802026fffb7082a4e5c33d44d975"
+      },
+      {
+        "path": "simulations/SIM-tohol-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-mandatory-opaque-bytes/protocols/grid-envelope.d/CHANGELOG.md",
+        "sha256": "aef2b7915320af9607f415cef649397530561e4f0f9372fda1bbf2691dd3f9b1"
+      },
+      {
+        "path": "simulations/SIM-tohol-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-mandatory-opaque-bytes/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "3cacbc62822afbb0b37cfcae1edb3d896292053e876b68b78cf384aa603f61c4"
+      },
+      {
+        "path": "scenarios/bgp-routing/bgp-routing.md",
+        "sha256": "90a37247bb6cc291809077f99ef95c4c74865a657b8e5c5c164cce6ef330b17f"
+      }
+    ],
+    "simulation_tree_hash": "86ce37ad43c89feda138427cb7edc9ad2cb1998b2b8412246fbc9ce1dc3d2490"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 3,
+    "auditability": 2,
+    "evolution_safety": 1,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 2,
+    "implementation_plausibility": 4,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 21,
+    "normalized_0_100": 52.5,
+    "confidence_0_1": 0.72
+  },
+  "assessment": {
+    "rationale": "The envelope helps peers capture exact local route evidence without a central registry, but it does not itself model route provenance, freshness, policy, or sparse-topology reasoning; those remain external. Unknown-hard-reject makes mixed-version routing brittle.",
+    "strengths": [
+      "Explicit pCID dispatch gives a crisp boundary between envelope transport and routing semantics.",
+      "Canonical DAG-CBOR bytes make local evidence reproducible for later verification.",
+      "Mandatory signature slot ensures every accepted envelope includes an authenticity field.",
+      "The specimen does not require a central pCID registry or global state."
+    ],
+    "weaknesses": [
+      "Route origin, path, freshness, leak/hijack semantics, and withdrawals are outside the envelope.",
+      "Signature bytes are opaque; verification rules, signer identity, and trust policy are external.",
+      "Unknown pCID hard rejection blocks graceful forward-compatibility and diagnostic forwarding."
+    ],
+    "risks": [
+      "Mixed-version deployments can drop otherwise useful route updates when new pCIDs appear.",
+      "Signature presence can be mistaken for real security if the routing profile does not tightly define verification.",
+      "Rejected unknown envelopes may reduce incident forensics and recovery options."
+    ],
+    "open_questions": [
+      "What routing payload/profile carries origin, path, freshness, withdrawal, and leak evidence?",
+      "How are signer identity, delegation, revocation, and policy trust represented without central authority?",
+      "Can unknown envelopes be quarantined or translated without violating the hard-reject rule?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

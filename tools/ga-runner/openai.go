@@ -379,8 +379,6 @@ func (provider OpenAIProvider) dispatchOpenAIStreamEvent(attempt int, startedAt 
 			return ProviderResponse{}, true, fmt.Errorf("decode openai stream text delta: %w", err)
 		}
 		output.WriteString(payload.Delta)
-		provider.writeStreamContent(attempt, eventType, payload.Delta)
-		provider.debugf("attempt=%d event=stream_event elapsed=%s type=%q delta_chars=%d", attempt, time.Since(startedAt).Round(time.Millisecond), eventType, len(payload.Delta))
 		return ProviderResponse{}, false, nil
 	case "response.reasoning_summary_text.delta":
 		var payload struct {
@@ -391,7 +389,7 @@ func (provider OpenAIProvider) dispatchOpenAIStreamEvent(attempt int, startedAt 
 		}
 		provider.writeStreamProgressDot(attempt, eventType)
 		return ProviderResponse{}, false, nil
-	case "response.reasoning_summary_part.added", "response.reasoning_summary_part.done":
+	case "response.reasoning_summary_part.done":
 		var payload struct {
 			Part struct {
 				Text string `json:"text"`
@@ -478,10 +476,10 @@ func (provider OpenAIProvider) writeStreamContent(attempt int, eventType string,
 	if provider.StreamContentWriter == nil || text == "" {
 		return
 	}
-	// Intent: Write line-oriented visible-output stream content so canary
-	// stdout/logs show JSON-output progress and reasoning-summary part events
-	// without corrupting the provider response text used for JSON parsing. Source:
-	// DI-vadub; DI-babik; DI-vajut; DI-sakam
+	// Intent: Write line-oriented completed reasoning-summary part events so
+	// canary stdout/logs show useful summary checkpoints without corrupting the
+	// provider response text used for JSON parsing. Source: DI-vadub; DI-babik;
+	// DI-vajut; DI-sakam; DI-fupob; DI-ramun
 	if _, err := fmt.Fprintf(provider.StreamContentWriter, "[openai-stream] attempt=%d type=%s delta=%q\n", attempt, eventType, text); err != nil {
 		provider.debugf("attempt=%d event=stream_content_write_error type=%q error=%q", attempt, eventType, err.Error())
 	}

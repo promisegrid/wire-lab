@@ -26,8 +26,8 @@ func sha256File(repo Repo, relPath string) (string, error) {
 	return hex.EncodeToString(sum[:]), nil
 }
 
-func sourceFilesForResult(repo Repo, simID string, scenario Scenario) ([]SourceFile, error) {
-	paths, err := sourcePathsForPrompt(repo, simID, scenario)
+func sourceFilesForResult(repo Repo, state GAState, simID string, scenario Scenario) ([]SourceFile, error) {
+	paths, err := sourcePathsForPrompt(repo, simulationPathForState(state, simID), scenario)
 	if err != nil {
 		return nil, err
 	}
@@ -47,12 +47,14 @@ func sourceFilesForResult(repo Repo, simID string, scenario Scenario) ([]SourceF
 //
 // Intent: Keep each GA cell source-complete without restoring cross-sim shared
 // source-of-truth files or relying on provider-side filesystem discovery.
-// Source: DI-gijom
-func sourcePathsForPrompt(repo Repo, simID string, scenario Scenario) ([]string, error) {
+// Proposal child cells use the state-recorded proposal path instead of canonical
+// `simulations/`. Source: DI-gijom; DI-lirat
+func sourcePathsForPrompt(repo Repo, simPath string, scenario Scenario) ([]string, error) {
+	cleanSimPath := strings.TrimSuffix(normalizeRelPath(simPath), "/")
 	required := []string{
 		"results/RUN-PROTOCOL.md",
 		"scenarios/README.md",
-		filepath.ToSlash(filepath.Join("simulations", simID, "README.md")),
+		filepath.ToSlash(filepath.Join(cleanSimPath, "README.md")),
 	}
 	var paths []string
 	for _, rel := range required {
@@ -64,11 +66,11 @@ func sourcePathsForPrompt(repo Repo, simID string, scenario Scenario) ([]string,
 		}
 		paths = append(paths, rel)
 	}
-	questionPath := filepath.ToSlash(filepath.Join("simulations", simID, "QUESTION.md"))
+	questionPath := filepath.ToSlash(filepath.Join(cleanSimPath, "QUESTION.md"))
 	if info, err := os.Stat(repo.Abs(questionPath)); err == nil && !info.IsDir() {
 		paths = append(paths, questionPath)
 	}
-	localSim, err := localMarkdownFiles(repo, filepath.ToSlash(filepath.Join("simulations", simID)), map[string]bool{
+	localSim, err := localMarkdownFiles(repo, cleanSimPath, map[string]bool{
 		"README.md":   true,
 		"QUESTION.md": true,
 	})
@@ -89,8 +91,8 @@ func sourcePathsForPrompt(repo Repo, simID string, scenario Scenario) ([]string,
 	return uniqueStrings(paths), nil
 }
 
-func sourceDocumentsForPrompt(repo Repo, simID string, scenario Scenario) ([]SourceDocument, error) {
-	paths, err := sourcePathsForPrompt(repo, simID, scenario)
+func sourceDocumentsForPrompt(repo Repo, state GAState, simID string, scenario Scenario) ([]SourceDocument, error) {
+	paths, err := sourcePathsForPrompt(repo, simulationPathForState(state, simID), scenario)
 	if err != nil {
 		return nil, err
 	}

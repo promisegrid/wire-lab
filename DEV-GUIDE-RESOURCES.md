@@ -267,6 +267,43 @@ actual independently evolvable specimens. Source: `DI-fanah`;
 | `simulations/SIM-fonol-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-mandatory-opaque-bytes/` | Tests a positional DAG-CBOR envelope that attempts best-effort inspection of unknown protocol payloads and requires opaque signature bytes. | DAG-CBOR | Best-effort inspection | Mandatory opaque bytes |
 | `simulations/SIM-rakir-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-mandatory-sig-pcid-payload/` | Tests a positional DAG-CBOR envelope that attempts best-effort inspection of unknown protocol payloads and requires a signature pCID plus signature payload. | DAG-CBOR | Best-effort inspection | Mandatory signature pCID + payload |
 
+### Promoted GA Grid-Envelope Variants
+
+`DI-dipid` promotes two reviewed `ga-canary-20260520-221953` children into
+canonical non-child simulations. Guide writers may treat them as provisional
+evidence about whether `unknown-quarantine` beats both opaque store/forward and
+hard reject in mixed-version deployments; neither is a settled guide rule.
+
+| Simulation | What it is for | Encoding | Unknown-pCID policy | Signature policy |
+|---|---|---|---|---|
+| `simulations/SIM-jufag-grid-envelope-quarantine-sig-pcid-outcomes/` | Tests quarantine store/forward with explicit accepted, quarantined, and rejected receiver outcomes. | DAG-CBOR | Quarantine store/forward | Mandatory profiled opaque signature bytes with explicit `sig_pcid` dispatch |
+| `simulations/SIM-bimos-grid-envelope-quarantine-sig-pcid-audit-tuple/` | Tests quarantine as local rejection plus exact-byte evidence relay and a retained local audit tuple. | DAG-CBOR | Quarantine with local rejection/evidence relay | Mandatory `sig_pcid` plus `sig_payload` |
+
+### Grid-Envelope Arity and Nested-Signature Probes
+
+`DI-joman` adds two non-positional-matrix probes for guide writers to treat as
+provisional evidence about arity placement. They do not update the `DI-fanah`
+count of 24 positional variants and do not imply a preferred envelope family.
+
+| Simulation | What it is for |
+|---|---|
+| `simulations/SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields/` | Tests whether the first `pcid` can safely define the number, order, and type of all outer fields that follow it. |
+| `simulations/SIM-janov-grid-envelope-layer-pcid-nested-signed-payload/` | Tests whether outer `[pcid_a, payload_a]` can carry a `pcid_a`-defined nested signed payload `[pcid_b, payload_b, signature_b]` while relying on transport/context for the unsigned outer conformance promise. |
+
+### Grid-Envelope Signature/Proof Object Probe
+
+`DI-sahiv` adds a standalone non-child probe for guide writers to treat as
+provisional evidence about using Cryptid's Multisig object model as the bytes
+carried by a grid-envelope signature/proof slot or nested payload proof. The
+probe does not require Cryptid Multisig as a PromiseGrid dependency and does not
+settle detached versus combined signatures, outer versus nested placement,
+variable arity, pCID binding, unknown-codec handling, threshold shares, or final
+verifier obligations.
+
+| Simulation | What it is for |
+|---|---|
+| `simulations/SIM-lotiv-grid-envelope-cryptid-multisig-signature-proofs/` | Tests whether a codec-agnostic Multisig object can represent grid-envelope signature/proof bytes while preserving unresolved PromiseGrid signature design choices. |
+
 ## Audience Readiness Matrix
 
 This matrix answers the current guide-writer feedback items `FB-gigit`,

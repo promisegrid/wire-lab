@@ -1,0 +1,122 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-guhor-grid-envelope-enc-cbor-unknown-best-effort-sig-mandatory-opaque-bytes-cas-backed-group-session-group-visible-identity-openai-gpt-5.4-xhigh-20260520-221405",
+  "run_group_id": "ga-canary-20260520-221405",
+  "cell_id": "ga-canary-20260520-221405-000003-SIM-guhor-grid-envelope-enc-cbor-unknown-best-effort-sig-mandatory-opaque-bytes--cas-backed-group-session-group-visible-identity--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-guhor-grid-envelope-enc-cbor-unknown-best-effort-sig-mandatory-opaque-bytes",
+  "scenario_id": "cas-backed-group-session-group-visible-identity",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260520-221405",
+  "result_path": "results/SIM-guhor-grid-envelope-enc-cbor-unknown-best-effort-sig-mandatory-opaque-bytes/cas-backed-group-session-group-visible-identity/openai-gpt-5.4-xhigh/20260520-221405.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_59b94742f6464fceb4b1ead68ad7e091",
+    "response_id": "resp_017b8e92cdbce241006a0e322fb040819b92ba91d3a7d9d5ca",
+    "input_tokens": 6578,
+    "output_tokens": 9236,
+    "cost_usd": 0.1408155
+  },
+  "source": {
+    "repo_commit": "d1453a8dcfdb44912db1073de8223f0d16de4b53",
+    "sim_path": "simulations/SIM-guhor-grid-envelope-enc-cbor-unknown-best-effort-sig-mandatory-opaque-bytes/",
+    "scenario_path": "scenarios/cas-backed-group-session-group-visible-identity/cas-backed-group-session-group-visible-identity.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "be3e107ca142d89744e9434dcbb5668221ad0b475e6a7068ed3bcad5a839c24e"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-guhor-grid-envelope-enc-cbor-unknown-best-effort-sig-mandatory-opaque-bytes/README.md",
+        "sha256": "577753a742867694e2a8ee84c229e8264f04fa109942f444c3af2feda056a45c"
+      },
+      {
+        "path": "simulations/SIM-guhor-grid-envelope-enc-cbor-unknown-best-effort-sig-mandatory-opaque-bytes/QUESTION.md",
+        "sha256": "eaebc9d28329655b84215f609f1d60f7a6267bccf424f314a2be1aef0b1f764f"
+      },
+      {
+        "path": "simulations/SIM-guhor-grid-envelope-enc-cbor-unknown-best-effort-sig-mandatory-opaque-bytes/protocols/grid-envelope.d/CHANGELOG.md",
+        "sha256": "aef2b7915320af9607f415cef649397530561e4f0f9372fda1bbf2691dd3f9b1"
+      },
+      {
+        "path": "simulations/SIM-guhor-grid-envelope-enc-cbor-unknown-best-effort-sig-mandatory-opaque-bytes/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "30aadb2f95a3906e1c5c27acb96ea3687a88346a2d6e2d171db2d90c55bbe656"
+      },
+      {
+        "path": "scenarios/cas-backed-group-session-group-visible-identity/cas-backed-group-session-group-visible-identity.md",
+        "sha256": "c942ac821a362530eef1afdbf2a4e358efe2085e52e6312aed245567f206a580"
+      }
+    ],
+    "simulation_tree_hash": "d31569a6a684e574940f7156736bbf02b5789289cb2520469fd57807458c1a18"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 3,
+    "auditability": 3,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 3,
+    "implementation_plausibility": 5,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 21,
+    "normalized_0_100": 60,
+    "confidence_0_1": 0.74
+  },
+  "assessment": {
+    "rationale": "Deterministic CBOR gives a clear, locally hashable envelope and strong layer boundaries, but the spec never says whether the envelope CID or a payload-level CID is the durable group-visible identity. That leaves the scenario's main requirement—one non-competing reference for humans, tools, parent links, and acknowledgements—mostly unresolved.",
+    "strengths": [
+      "Deterministic CBOR array encoding makes the envelope bytes and any derived envelope CID stable and locally observable.",
+      "The spec is explicit that payload meaning, nested references, and ordering live behind the pCID dispatch boundary.",
+      "Unknown-pCID handling is visible and bounded: best-effort inspection is allowed but must remain unsupported and unverified."
+    ],
+    "weaknesses": [
+      "The spec does not distinguish a durable logical-message identifier from a transport-wrapper identifier.",
+      "Signature bytes are mandatory but opaque, and signer identity plus verification semantics are pushed outside the envelope.",
+      "The specimen is still a draft with no frozen pCID, so long-term citation semantics are not yet durable."
+    ],
+    "risks": [
+      "Different peers or tools may cite different CIDs for the same logical message, fragmenting acknowledgements and parent links.",
+      "Re-signing or re-wrapping can change the envelope CID even when the intended message content is the same.",
+      "Best-effort salvage of unknown payloads may encourage informal interpretation without verified semantics."
+    ],
+    "open_questions": [
+      "Should group-visible references target the envelope CID, a payload/message-root CID, or both with explicit role labels?",
+      "If the payload stays the same but signature or wrapper changes, is that the same message or a new artifact?",
+      "Where should signer identity and verification policy live so message identity remains auditable across migrations?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

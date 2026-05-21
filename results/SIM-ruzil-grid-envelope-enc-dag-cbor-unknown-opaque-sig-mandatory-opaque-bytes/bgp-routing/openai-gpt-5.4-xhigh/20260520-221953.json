@@ -1,0 +1,123 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-ruzil-grid-envelope-enc-dag-cbor-unknown-opaque-sig-mandatory-opaque-bytes-bgp-routing-openai-gpt-5.4-xhigh-20260520-221953",
+  "run_group_id": "ga-canary-20260520-221953",
+  "cell_id": "ga-canary-20260520-221953-000008-SIM-ruzil-grid-envelope-enc-dag-cbor-unknown-opaque-sig-mandatory-opaque-bytes--bgp-routing--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-ruzil-grid-envelope-enc-dag-cbor-unknown-opaque-sig-mandatory-opaque-bytes",
+  "scenario_id": "bgp-routing",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260520-221953",
+  "result_path": "results/SIM-ruzil-grid-envelope-enc-dag-cbor-unknown-opaque-sig-mandatory-opaque-bytes/bgp-routing/openai-gpt-5.4-xhigh/20260520-221953.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_020f5749c7214272b9108b689b633032",
+    "response_id": "resp_008348e019b721a7006a0e342c4de8819985c6058c818537b1",
+    "input_tokens": 6707,
+    "output_tokens": 11482,
+    "cost_usd": 0.17248525
+  },
+  "source": {
+    "repo_commit": "d1453a8dcfdb44912db1073de8223f0d16de4b53",
+    "sim_path": "simulations/SIM-ruzil-grid-envelope-enc-dag-cbor-unknown-opaque-sig-mandatory-opaque-bytes/",
+    "scenario_path": "scenarios/bgp-routing/bgp-routing.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "a188539d4d20314a96f16541c14d6279f296f47d7abc18ea9cd0a57e95d8e818"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-ruzil-grid-envelope-enc-dag-cbor-unknown-opaque-sig-mandatory-opaque-bytes/README.md",
+        "sha256": "02fe8223eede4ee9691f4253519224ad1c54d41e6dec6715793d64083b84ed3a"
+      },
+      {
+        "path": "simulations/SIM-ruzil-grid-envelope-enc-dag-cbor-unknown-opaque-sig-mandatory-opaque-bytes/QUESTION.md",
+        "sha256": "21332910793921442d64503daa42a144944f3ab9f583b0f9eae16cb3e23a1d73"
+      },
+      {
+        "path": "simulations/SIM-ruzil-grid-envelope-enc-dag-cbor-unknown-opaque-sig-mandatory-opaque-bytes/protocols/grid-envelope.d/CHANGELOG.md",
+        "sha256": "aef2b7915320af9607f415cef649397530561e4f0f9372fda1bbf2691dd3f9b1"
+      },
+      {
+        "path": "simulations/SIM-ruzil-grid-envelope-enc-dag-cbor-unknown-opaque-sig-mandatory-opaque-bytes/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "a45cf04447c65033193fd07f94fd18cc6fc7470ff259a166dc6fa856629e19b0"
+      },
+      {
+        "path": "scenarios/bgp-routing/bgp-routing.md",
+        "sha256": "90a37247bb6cc291809077f99ef95c4c74865a657b8e5c5c164cce6ef330b17f"
+      }
+    ],
+    "simulation_tree_hash": "6f2afd5b2d31d78758925a1d4cc49a6ff4815410d9c349068bee0c088e5b43e1"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 3,
+    "auditability": 2,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 2,
+    "implementation_plausibility": 4,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 24,
+    "normalized_0_100": 60,
+    "confidence_0_1": 0.75
+  },
+  "assessment": {
+    "rationale": "Strong as an envelope substrate, limited as a direct bgp-routing answer: it preserves signature-bearing opaque route objects across sparse peers and makes interpretation boundaries explicit, but routing trust, freshness, and leak/hijack semantics sit above the envelope.",
+    "strengths": [
+      "Clear pCID dispatch boundary and explicit ban on speculative parsing preserve layer separation.",
+      "Canonical DAG-CBOR bytes plus a mandatory signature slot give stable byte-level evidence.",
+      "Unknown-pCID store/forward supports sparse peers and future protocol variants without a central registry."
+    ],
+    "weaknesses": [
+      "It does not define route announcements, withdrawals, freshness, identity claims, or promise-accounting records for bgp-routing.",
+      "Signer identity and verification rules are outside the envelope, so Carol cannot rely on envelope data alone.",
+      "The draft mentions sig_pcid/sig_payload despite a 3-slot envelope, leaving signature-layer details unsettled."
+    ],
+    "risks": [
+      "Hijack or leak evidence can stay ambiguous unless the payload protocol carries explicit path and policy attestations.",
+      "Stale or replayed route objects may circulate because freshness and expiry are not envelope-level concepts here.",
+      "Long-term audit depends on durable access to the pCID-linked handler/spec; otherwise payload and signature remain opaque."
+    ],
+    "open_questions": [
+      "How does a verifier learn the signature algorithm and signer/key binding when signature is only opaque bytes?",
+      "How are route freshness, withdrawals, and replay protection represented for BGP-like payloads?",
+      "Are nested wrapper envelopes enough for multi-hop AS-path evidence, or is native multi-signature support needed?",
+      "What durable mechanism lets a 100-year auditor resolve pCID to a usable spec without hidden central services?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

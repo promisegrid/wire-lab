@@ -79,35 +79,47 @@ func validateTargets(repo Repo, explicitResult string, model string, timestamp s
 	return findResultFiles(repo, model, timestamp)
 }
 
-// findResultFiles discovers only GA JSON result artifacts. Markdown canary files
-// are intentionally invisible to GA-runner validation and future scoring logic.
+// findResultFiles discovers only GA JSON result artifacts, including ignored
+// proposal-stage child score evidence. Markdown canary files are intentionally
+// invisible to GA-runner validation and future scoring logic.
 //
 // Intent: Keep old matrix-runner canaries as historical evidence without letting
-// them contaminate GA fitness selection. Source: DI-ramar; DI-pobus
+// them contaminate GA fitness selection. Source: DI-ramar; DI-pobus; DI-lirat
 func findResultFiles(repo Repo, model string, timestamp string) ([]string, error) {
 	var paths []string
-	root := repo.Path("results")
-	err := filepath.WalkDir(root, func(path string, entry os.DirEntry, walkErr error) error {
-		if walkErr != nil {
-			return walkErr
+	for _, rootName := range []string{"results", "proposals"} {
+		root := repo.Path(rootName)
+		if info, err := os.Stat(root); err != nil || !info.IsDir() {
+			if err != nil && !os.IsNotExist(err) {
+				return nil, err
+			}
+			continue
 		}
-		if entry.IsDir() || filepath.Ext(path) != ".json" {
+		err := filepath.WalkDir(root, func(path string, entry os.DirEntry, walkErr error) error {
+			if walkErr != nil {
+				return walkErr
+			}
+			if entry.IsDir() || filepath.Ext(path) != ".json" {
+				return nil
+			}
+			parts, issues := parseResultPath(repo, path)
+			if len(issues) > 0 {
+				return nil
+			}
+			if model != "" && parts.ModelID != model {
+				return nil
+			}
+			if timestamp != "" && parts.Timestamp != timestamp {
+				return nil
+			}
+			paths = append(paths, path)
 			return nil
+		})
+		if err != nil {
+			return nil, err
 		}
-		parts, issues := parseResultPath(repo, path)
-		if len(issues) > 0 {
-			return nil
-		}
-		if model != "" && parts.ModelID != model {
-			return nil
-		}
-		if timestamp != "" && parts.Timestamp != timestamp {
-			return nil
-		}
-		paths = append(paths, path)
-		return nil
-	})
-	return paths, err
+	}
+	return paths, nil
 }
 
 func validateResultFile(repo Repo, path string) []string {
@@ -136,23 +148,31 @@ func parseResultPath(repo Repo, path string) (resultPathParts, []string) {
 	rel := repo.Rel(path)
 	relParts := strings.Split(rel, "/")
 	var issues []string
-	if len(relParts) != 5 || relParts[0] != "results" {
-		return resultPathParts{}, []string{"path shape must be results/<sim>/<scenario>/<model>/<timestamp>.json"}
+	switch {
+	case len(relParts) == 5 && relParts[0] == "results":
+		return parseResultPathParts(relParts[1], relParts[2], relParts[3], relParts[4], issues)
+	case len(relParts) == 7 && relParts[0] == "proposals" && relParts[2] == "results":
+		return parseResultPathParts(relParts[3], relParts[4], relParts[5], relParts[6], issues)
+	default:
+		return resultPathParts{}, []string{"path shape must be results/<sim>/<scenario>/<model>/<timestamp>.json or proposals/<run-group>/results/<sim>/<scenario>/<model>/<timestamp>.json"}
 	}
-	if filepath.Ext(relParts[4]) != ".json" {
+}
+
+func parseResultPathParts(simID string, scenarioID string, modelID string, timestampFile string, issues []string) (resultPathParts, []string) {
+	if filepath.Ext(timestampFile) != ".json" {
 		issues = append(issues, "path extension must be .json")
 	}
-	if !strings.HasPrefix(relParts[1], "SIM-") {
+	if !strings.HasPrefix(simID, "SIM-") {
 		issues = append(issues, "sim path component must start with SIM-")
 	}
-	timestamp := strings.TrimSuffix(relParts[4], ".json")
+	timestamp := strings.TrimSuffix(timestampFile, ".json")
 	if !resultTimestampPattern.MatchString(timestamp) {
 		issues = append(issues, "timestamp must match YYYYMMDD-HHMMSS")
 	}
 	return resultPathParts{
-		SimID:      relParts[1],
-		ScenarioID: relParts[2],
-		ModelID:    relParts[3],
+		SimID:      simID,
+		ScenarioID: scenarioID,
+		ModelID:    modelID,
 		Timestamp:  timestamp,
 	}, issues
 }

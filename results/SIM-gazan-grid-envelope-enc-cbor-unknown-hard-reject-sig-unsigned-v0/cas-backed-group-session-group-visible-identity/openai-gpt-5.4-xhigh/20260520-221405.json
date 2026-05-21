@@ -1,0 +1,122 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-gazan-grid-envelope-enc-cbor-unknown-hard-reject-sig-unsigned-v0-cas-backed-group-session-group-visible-identity-openai-gpt-5.4-xhigh-20260520-221405",
+  "run_group_id": "ga-canary-20260520-221405",
+  "cell_id": "ga-canary-20260520-221405-000009-SIM-gazan-grid-envelope-enc-cbor-unknown-hard-reject-sig-unsigned-v0--cas-backed-group-session-group-visible-identity--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-gazan-grid-envelope-enc-cbor-unknown-hard-reject-sig-unsigned-v0",
+  "scenario_id": "cas-backed-group-session-group-visible-identity",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260520-221405",
+  "result_path": "results/SIM-gazan-grid-envelope-enc-cbor-unknown-hard-reject-sig-unsigned-v0/cas-backed-group-session-group-visible-identity/openai-gpt-5.4-xhigh/20260520-221405.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_eea7d045d37c4a458f2db3438b475b4d",
+    "response_id": "resp_0d73cb8a0c747b1c006a0e32c36b6c819aaa6c91034ab7a3e6",
+    "input_tokens": 6496,
+    "output_tokens": 10960,
+    "cost_usd": 0.164808
+  },
+  "source": {
+    "repo_commit": "d1453a8dcfdb44912db1073de8223f0d16de4b53",
+    "sim_path": "simulations/SIM-gazan-grid-envelope-enc-cbor-unknown-hard-reject-sig-unsigned-v0/",
+    "scenario_path": "scenarios/cas-backed-group-session-group-visible-identity/cas-backed-group-session-group-visible-identity.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "a188539d4d20314a96f16541c14d6279f296f47d7abc18ea9cd0a57e95d8e818"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-gazan-grid-envelope-enc-cbor-unknown-hard-reject-sig-unsigned-v0/README.md",
+        "sha256": "7703457eaf956a6670549c24748b8c4ba8a85abe1562aff374aa453081d5e7e3"
+      },
+      {
+        "path": "simulations/SIM-gazan-grid-envelope-enc-cbor-unknown-hard-reject-sig-unsigned-v0/QUESTION.md",
+        "sha256": "7febcf225475203d65dfee915b8c42db430aa6c7fea8b921c5e8f76c5ec566c0"
+      },
+      {
+        "path": "simulations/SIM-gazan-grid-envelope-enc-cbor-unknown-hard-reject-sig-unsigned-v0/protocols/grid-envelope.d/CHANGELOG.md",
+        "sha256": "aef2b7915320af9607f415cef649397530561e4f0f9372fda1bbf2691dd3f9b1"
+      },
+      {
+        "path": "simulations/SIM-gazan-grid-envelope-enc-cbor-unknown-hard-reject-sig-unsigned-v0/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "4823ad8219ff9b87e0eabbaa8f1087539d392bb5c4be0d719b56aa79ba200c01"
+      },
+      {
+        "path": "scenarios/cas-backed-group-session-group-visible-identity/cas-backed-group-session-group-visible-identity.md",
+        "sha256": "c942ac821a362530eef1afdbf2a4e358efe2085e52e6312aed245567f206a580"
+      }
+    ],
+    "simulation_tree_hash": "988ac72d01c01d1a0ed98ef495d793957da140b4d288cb00aa0088c9cb9ca647"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 2,
+    "auditability": 2,
+    "evolution_safety": 1,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 2,
+    "implementation_plausibility": 5,
+    "risk_penalty": 4
+  },
+  "fitness": {
+    "raw": 14,
+    "normalized_0_100": 40,
+    "confidence_0_1": 0.82
+  },
+  "assessment": {
+    "rationale": "This variant is a clear minimal dispatch envelope, not a full answer to group-visible identity. Deterministic CBOR makes a stable envelope identity possible, but the spec never chooses between envelope, pointer, or payload-root CIDs for citations, parent links, and acknowledgements. Unsigned v0 and unknown-hard-reject further weaken accountability and migration safety.",
+    "strengths": [
+      "Deterministic CBOR makes a stable envelope identity possible if callers choose to cite the envelope.",
+      "The envelope/payload boundary is explicit at the pCID dispatch layer.",
+      "Unknown pCID handling fails visibly instead of silently reinterpreting data."
+    ],
+    "weaknesses": [
+      "It does not choose whether humans, tools, parent links, and acknowledgements should cite the envelope CID, a payload-root CID, or a pointer-object CID.",
+      "Unsigned v0 gives no envelope-level authorship or integrity proof for the cited object.",
+      "Unknown-hard-reject offers little migration support when visible identity rules or pCIDs change."
+    ],
+    "risks": [
+      "Different implementations may cite different CIDs for the same logical message.",
+      "Format migration can split conversations and acknowledgements across old and new identifiers.",
+      "Long-term audit trails may depend on transport-local evidence instead of one durable cited object."
+    ],
+    "open_questions": [
+      "Should PromiseGrid define one canonical cited CID per logical message, and at which layer?",
+      "How should aliasing or supersession be recorded when visible identity changes across wrappers or migrations?",
+      "If the envelope stays unsigned, which object carries the durable authorship commitment for parent links and acknowledgements?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

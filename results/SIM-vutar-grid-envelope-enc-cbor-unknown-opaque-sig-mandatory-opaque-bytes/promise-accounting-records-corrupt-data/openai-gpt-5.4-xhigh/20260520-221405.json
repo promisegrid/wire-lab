@@ -1,0 +1,123 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-vutar-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-opaque-bytes-promise-accounting-records-corrupt-data-openai-gpt-5.4-xhigh-20260520-221405",
+  "run_group_id": "ga-canary-20260520-221405",
+  "cell_id": "ga-canary-20260520-221405-000004-SIM-vutar-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-opaque-bytes--promise-accounting-records-corrupt-data--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-vutar-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-opaque-bytes",
+  "scenario_id": "promise-accounting-records-corrupt-data",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260520-221405",
+  "result_path": "results/SIM-vutar-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-opaque-bytes/promise-accounting-records-corrupt-data/openai-gpt-5.4-xhigh/20260520-221405.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_a1e79c80546849909d73dbbc43ed0b43",
+    "response_id": "resp_058641a96fe498e5006a0e322f97c0819a8c4bbe720a3cf217",
+    "input_tokens": 6542,
+    "output_tokens": 14351,
+    "cost_usd": 0.2123625
+  },
+  "source": {
+    "repo_commit": "d1453a8dcfdb44912db1073de8223f0d16de4b53",
+    "sim_path": "simulations/SIM-vutar-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-opaque-bytes/",
+    "scenario_path": "scenarios/promise-accounting-records-corrupt-data/promise-accounting-records-corrupt-data.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "be3e107ca142d89744e9434dcbb5668221ad0b475e6a7068ed3bcad5a839c24e"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-vutar-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-opaque-bytes/README.md",
+        "sha256": "57080488d4ef26a7b680490d0389601a0705fbf9048236a88640c26e976a0cac"
+      },
+      {
+        "path": "simulations/SIM-vutar-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-opaque-bytes/QUESTION.md",
+        "sha256": "9ca436255adddf6c479794df2cd1a372741a1f75367a0bb072eb197f819b9aa5"
+      },
+      {
+        "path": "simulations/SIM-vutar-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-opaque-bytes/protocols/grid-envelope.d/CHANGELOG.md",
+        "sha256": "aef2b7915320af9607f415cef649397530561e4f0f9372fda1bbf2691dd3f9b1"
+      },
+      {
+        "path": "simulations/SIM-vutar-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-opaque-bytes/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "2b217f86d383c3401e9de3ea3e4387ba2994486489bc53faaa21df925f7fe863"
+      },
+      {
+        "path": "scenarios/promise-accounting-records-corrupt-data/promise-accounting-records-corrupt-data.md",
+        "sha256": "c5da5aa71f13e1011ddf79d7ad3f0ff34af8bf92d0aab8746a29d1f0826fb2ed"
+      }
+    ],
+    "simulation_tree_hash": "ae895e6a4a91751df8c391916c0c07169b9eacd5bb19a9992dfe10475f0a7419"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 3,
+    "auditability": 3,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 3,
+    "implementation_plausibility": 4,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 21,
+    "normalized_0_100": 60,
+    "confidence_0_1": 0.76
+  },
+  "assessment": {
+    "rationale": "The variant localizes corrupt-data failures cleanly at byte/CAS/payload boundaries and avoids central enforcement, but it only partially answers the scenario because the peer-local record, sender attribution, and later policy changes after a CID failure are left outside the envelope spec.",
+    "strengths": [
+      "Deterministic CBOR canonical bytes make CID-failure evidence reproducible.",
+      "No speculative parsing and opaque payload handling preserve exact failure evidence at clear layer boundaries.",
+      "Content-addressed body verification can remain peer-local without a central registry or authority."
+    ],
+    "weaknesses": [
+      "The spec does not define the promise-accounting record written after CID verification fails.",
+      "It does not say how failed bytes are attributed to Mallory versus a relay or storage fault.",
+      "Signature presence is mandatory, but signature meaning and verification live outside the envelope."
+    ],
+    "risks": [
+      "Peers may react inconsistently to the same corrupt bytes because post-failure policy is external.",
+      "Long-term auditability depends on external payload and signature specs remaining recoverable.",
+      "Draft text ambiguity around signature-related fields could cause interop drift."
+    ],
+    "open_questions": [
+      "What exact local record is written when Mallory supplies bytes that fail CID verification?",
+      "How does that record drive later accept, quarantine, retry, or distrust decisions without central enforcement?",
+      "Where are signature verification and sender-attribution rules frozen for 100-year review?",
+      "Is the encoding section's mention of sig_pcid/sig_payload intentional for this 3-slot variant?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

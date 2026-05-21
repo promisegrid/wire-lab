@@ -610,7 +610,7 @@ func parseScorePayload(text string) (scorePayload, error) {
 }
 
 func buildScorePrompt(repo Repo, state GAState, cell GACell, scenario Scenario) (string, error) {
-	docs, err := sourceDocumentsForPrompt(repo, cell.SimID, scenario)
+	docs, err := sourceDocumentsForPrompt(repo, state, cell.SimID, scenario)
 	if err != nil {
 		return "", err
 	}
@@ -646,11 +646,12 @@ func buildFitnessResult(repo Repo, state GAState, cell GACell, scenario Scenario
 	if len(issues) > 0 {
 		return FitnessResult{}, fmt.Errorf("%s", strings.Join(issues, "; "))
 	}
-	files, err := sourceFilesForResult(repo, cell.SimID, scenario)
+	files, err := sourceFilesForResult(repo, state, cell.SimID, scenario)
 	if err != nil {
 		return FitnessResult{}, err
 	}
-	simHash, err := currentSimulationTreeHash(repo, filepath.ToSlash(filepath.Join("simulations", cell.SimID)))
+	simPath := simulationPathForState(state, cell.SimID)
+	simHash, err := currentSimulationTreeHash(repo, simPath)
 	if err != nil {
 		return FitnessResult{}, err
 	}
@@ -680,7 +681,7 @@ func buildFitnessResult(repo Repo, state GAState, cell GACell, scenario Scenario
 		},
 		Source: SourceInfo{
 			RepoCommit:         state.RepoCommit,
-			SimPath:            filepath.ToSlash(filepath.Join("simulations", cell.SimID)) + "/",
+			SimPath:            strings.TrimSuffix(normalizeRelPath(simPath), "/") + "/",
 			ScenarioPath:       scenario.Path,
 			RootContractPaths:  []string{"results/RUN-PROTOCOL.md", "scenarios/README.md"},
 			Files:              files,

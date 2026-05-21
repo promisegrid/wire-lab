@@ -7,10 +7,10 @@ None. This TODO was minted after the proquint-handle migration.
 ## Status
 
 Open. This TODO owns the fresh `tools/ga-runner` path for JSON fitness results,
-direct child-sim generation under `simulations/`, GA/search orchestration,
-review, promotion, and culling. It uses `TODO-dadub` as predecessor context for
-root scenarios and result evidence, but does not reopen `TODO-dadub`. Source:
-`DI-ramar`.
+proposal-stage child-sim generation under ignored `proposals/`, GA/search
+orchestration, review, promotion, and culling. It uses `TODO-dadub` as
+predecessor context for root scenarios and result evidence, but does not reopen
+`TODO-dadub`. Source: `DI-ramar`; `DI-lirat`.
 
 ## Decision Intent Log
 
@@ -626,14 +626,182 @@ Affects: `tools/ga-runner/openai.go`; `tools/ga-runner/ga_runner_test.go`;
 Supersedes: `DI-vajut` only for omitting
 `response.reasoning_summary_part.added` event names and content.
 
+ID: DI-guvif
+Date: 2026-05-20 15:13:57
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Split terminal canary request-timeout defaults by phase: scoring uses
+`GA_CANARY_SCORE_REQUEST_TIMEOUT` with a five-minute default, child generation
+uses `GA_CANARY_GENERATE_REQUEST_TIMEOUT` with a fifteen-minute default, and
+child generation keeps `GA_CANARY_GENERATE_REASONING_EFFORT=medium` by default
+while scoring remains `xhigh`.
+Intent: The 2026-05-20 canary evidence showed parent scoring finishing cleanly
+under six `xhigh` workers and five-minute request attempts, while child
+generation with an explicit `xhigh` override spent the whole timeout budget in
+reasoning-summary events without emitting child-bundle output. Generation needs
+a longer per-attempt window and a lower default reasoning effort without
+weakening the scoring phase.
+Constraints: Preserve legacy `GA_CANARY_REQUEST_TIMEOUT` as the score timeout
+fallback for existing operator habits, but do not let it silently shorten the
+new generation timeout unless `GA_CANARY_GENERATE_REQUEST_TIMEOUT` is set.
+Leave provider elapsed and attempt count unchanged for now.
+Affects: `tools/ga-runner/run-canary.sh`; `tools/ga-runner/README.md`;
+`results/RUN-PROTOCOL.md`;
+`protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`.
+
+ID: DI-fupob
+Date: 2026-05-20 15:17:11
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Print `response.reasoning_summary_part.done` event names and content
+to canary stream-content output, but do not print
+`response.reasoning_summary_part.added` event names or content.
+Intent: Part-added events are repetitive structural markers and do not carry the
+completed summary content Steve wants to inspect. Printing only part-done keeps
+the useful coarse summary while reducing stdout/log noise during long child
+generation calls.
+Constraints: Keep `response.reasoning_summary_text.delta` as no-newline dots
+only. Keep visible `response.output_text.delta` mirroring unchanged. Do not
+append reasoning-summary text to the parsed provider response used for result
+validation.
+Affects: `tools/ga-runner/openai.go`; `tools/ga-runner/ga_runner_test.go`;
+`tools/ga-runner/README.md`; `results/RUN-PROTOCOL.md`;
+`protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`.
+Supersedes: `DI-sakam` only for printing
+`response.reasoning_summary_part.added` event names and content.
+
+ID: DI-ramun
+Date: 2026-05-20 15:18:25
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Do not print `response.output_text.delta` event names or content to
+canary stdout/log; keep those deltas only inside the internal response buffer
+used for JSON parsing.
+Intent: Visible-output deltas are high-volume and can interleave with progress
+dots and monitor lines, making the canary transcript hard to scan. The canary
+still needs output-text deltas for assembling the provider response, but the
+operator-facing transcript should show only liveness dots and completed
+reasoning-summary parts.
+Constraints: Preserve response assembly and final JSON parsing. Keep
+`response.reasoning_summary_text.delta` as no-newline dots only, keep
+`response.reasoning_summary_part.done` event names and content, and keep
+`response.reasoning_summary_part.added` quiet.
+Affects: `tools/ga-runner/openai.go`; `tools/ga-runner/ga_runner_test.go`;
+`tools/ga-runner/README.md`; `results/RUN-PROTOCOL.md`;
+`protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`.
+
+ID: DI-fihof
+Date: 2026-05-20 16:16:53
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Treat generated GA children as ignored review-stage proposals named
+`SIM-<handle>-child-<descriptive-slug>` with matching ignored child result
+trees, rather than as commit-ready `SIM-<handle>-ga-child-<ordinal>` simulation
+names.
+Intent: The first canary-generated children demonstrated useful design moves,
+but generic `ga-child` names and visible untracked result trees made review
+state look like canonical simulation state. Generated children should be easy
+to inspect and score, but should not be accidentally committed before a human
+review/codex promotion pass gives them final simulation names and any missing
+standing files.
+Constraints: Keep unreviewed child proposals under `simulations/` so scoring
+can reuse existing simulation source loading, but ignore `SIM-*-child-*` trees
+and matching `results/SIM-*-child-*` evidence. The generator must propose a
+descriptive child ID under the planned handle prefix. Existing generated
+children from `ga-canary-20260520-221953` are renamed in-place as review-stage
+children; their proposal result metadata may be rewritten because the proposal
+artifacts remain uncommitted review staging evidence.
+Affects: `.gitignore`; `tools/ga-runner/population.go`;
+`tools/ga-runner/generate.go`; `tools/ga-runner/ga_runner_test.go`;
+`tools/ga-runner/README.md`; `results/RUN-PROTOCOL.md`;
+`simulations/SIM-bimos-child-grid-envelope-quarantine-sig-pcid-audit-tuple/`;
+`simulations/SIM-jufag-child-grid-envelope-quarantine-sig-pcid-outcomes/`;
+`results/SIM-bimos-child-grid-envelope-quarantine-sig-pcid-audit-tuple/`;
+`results/SIM-jufag-child-grid-envelope-quarantine-sig-pcid-outcomes/`;
+`results/state/ga-canary-20260520-221953.json`.
+
+ID: DI-lirat
+Date: 2026-05-20 16:28:30
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Stage generated GA child simulation trees and their child score
+evidence under root `proposals/<run-group-id>/`, and ignore the entire root
+`proposals/` tree until a human review/promotion pass moves selected artifacts
+into canonical `simulations/` and `results/` homes.
+Intent: Generated children are not canonical simulation specimens and generated
+child score files are not canonical result evidence until reviewed. Keeping both
+under one ignored run-scoped proposal tree prevents accidental commits, keeps
+each child run reviewable as a unit, and avoids hiding accidental child writes
+under canonical `simulations/` or `results/` paths.
+Constraints: Parent score results remain under canonical `results/`; child
+simulation proposals use
+`proposals/<run-group-id>/simulations/<child-sim-id>/`; child score evidence uses
+`proposals/<run-group-id>/results/<child-sim-id>/<scenario>/<model>/<timestamp>.json`.
+Promotion remains a separate review step that creates final non-child `SIM-*`
+names and canonical result paths as needed.
+Affects: `.gitignore`; `tools/ga-runner/`; `tools/ga-runner/README.md`;
+`results/RUN-PROTOCOL.md`; generated `proposals/<run-group-id>/`;
+`results/state/<run-group-id>.json`.
+Supersedes: DI-fihof; DI-podot
+
+ID: DI-duzur
+Date: 2026-05-20 16:47:07
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Let GA canary planning require specific parent simulations and
+scenarios through explicit include lists, while filling the rest of the parent
+and scenario sample by the existing deterministic shuffle.
+Intent: Canary runs often need to exercise a newly-added simulation or a
+specific scenario without abandoning small randomized coverage. Required
+inclusions make focused canaries reproducible and prevent a new design point
+from being missed by the uniform sample.
+Constraints: Includes must validate against discovered tracked simulations and
+root scenarios; duplicate includes are ignored; include counts may consume or
+expand the effective sample size rather than silently dropping requested items.
+The canary wrapper exposes comma/space-separated environment variables and the
+`init` command exposes repeatable flags.
+Affects: `tools/ga-runner/planning.go`; `tools/ga-runner/population.go`;
+`tools/ga-runner/run-canary.sh`; `tools/ga-runner/README.md`;
+`tools/ga-runner/ga_runner_test.go`; `results/RUN-PROTOCOL.md`.
+
+ID: DI-dipid
+Date: 2026-05-20 17:21:31
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Promote both `ga-canary-20260520-221953` Jufag and Bimos proposal
+children as canonical non-child simulation specimens, with copied canonical JSON
+score evidence and preserved proposal-source provenance.
+Intent: Steve chose to promote both reviewed children rather than only the
+higher-scoring Jufag variant, so the quarantine/profiled-signature-outcomes and
+quarantine/audit-tuple variants can continue competing as independent simulation
+specimens. Canonical result files should be discoverable under root `results/`,
+but must not falsely claim that the LLM evaluated the post-promotion tree; the
+scored proposal path remains the source evidence.
+Constraints: Final simulation IDs drop only the `child` marker:
+`SIM-jufag-grid-envelope-quarantine-sig-pcid-outcomes` and
+`SIM-bimos-grid-envelope-quarantine-sig-pcid-audit-tuple`. Copy proposal trees and
+result JSONs rather than moving or culling ignored proposal artifacts. Update
+canonical result storage identity fields while preserving `source.*` fields that
+point at the original proposal tree, and add explicit promotion metadata.
+Affects: `proposals/ga-canary-20260520-221953/`;
+`results/state/ga-canary-20260520-221953.json`;
+`simulations/SIM-jufag-grid-envelope-quarantine-sig-pcid-outcomes/`;
+`simulations/SIM-bimos-grid-envelope-quarantine-sig-pcid-audit-tuple/`;
+`results/SIM-jufag-grid-envelope-quarantine-sig-pcid-outcomes/`;
+`results/SIM-bimos-grid-envelope-quarantine-sig-pcid-audit-tuple/`;
+`simulations/README.md`; `DEV-GUIDE-RESOURCES.md`;
+`protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`.
+
 ## Scope
 
 - Define and implement a new GA/search runner without changing
   `tools/matrix-runner` as part of this TODO.
 - Treat root scenarios and committed sims as the stable evaluation surface from
-  `TODO-dadub`, while letting GA runs create untracked child sims as temporary
-  candidates.
-- Make JSON fitness result files the canonical output for GA runs.
+  `TODO-dadub`, while letting GA runs create ignored proposal-stage child sims as
+  temporary candidates.
+- Make JSON fitness result files the canonical output for reviewed GA evidence,
+  with child score evidence staged under ignored `proposals/<run-group-id>/`
+  until promotion.
 - Keep old Markdown result files as historical canary evidence, outside the
   GA-runner input set.
 - Plan child generation, scoring, review, promotion, and culling in one owner so
@@ -643,9 +811,11 @@ Supersedes: `DI-vajut` only for omitting
 
 ### JSON fitness result schema
 
-GA-runner fitness results are JSON files at
-`results/<sim-id>/<scenario-id>/<model-id>/<YYYYMMDD-HHMMSS>.json`. The
-required schema ID is `promisegrid.ga.result.v1`.
+GA-runner parent fitness results are JSON files at
+`results/<sim-id>/<scenario-id>/<model-id>/<YYYYMMDD-HHMMSS>.json`. Child score
+evidence is the same JSON schema staged at
+`proposals/<run-group-id>/results/<sim-id>/<scenario-id>/<model-id>/<YYYYMMDD-HHMMSS>.json`
+until review/promotion. The required schema ID is `promisegrid.ga.result.v1`.
 
 Required top-level fields:
 
@@ -679,7 +849,7 @@ that requires a new schema version.
 
 Each GA run has one state file at `results/state/<run-group-id>.json` using
 schema `promisegrid.ga.state.v1`. This file is the authority for pending
-untracked children and for safe culling.
+proposal children and for safe culling.
 
 Required top-level fields:
 
@@ -690,9 +860,10 @@ Required top-level fields:
 - `scenario_sample`: scenario IDs chosen for this generation, sample policy, and
   source paths/hashes.
 - `parents`: selected parent sim IDs and selection rationale.
-- `children`: generated child sim IDs, paths under `simulations/SIM-*`, parent
-  IDs, generation prompt hash, design-delta summary, service-tier metadata, tree
-  hash, and status.
+- `children`: generated child sim IDs, paths under
+  `proposals/<run-group-id>/simulations/<child-sim-id>/`, parent IDs, generation
+  prompt hash, design-delta summary, service-tier metadata, tree hash, and
+  status.
 - `cells`: scoring cells with cell ID, sim ID, scenario ID, expected JSON result
   path, status, attempts, service-tier metadata, usage/cost fields, and
   validation message.
@@ -711,39 +882,45 @@ The v1 CLI commands are:
 
 - `init`: create `results/state/<run-group-id>.json`, discover the stable
   committed/tracked sim population, choose or record a scenario sample, and
-  initialize parent-selection state.
-- `score`: evaluate manifest cells with one model, write JSON result files under
-  `results/<sim>/<scenario>/<model>/<timestamp>.json`, validate each result, and
-  checkpoint state after every cell. Provider-backed scoring sends explicit
-  `-service-tier flex` by default; `default` requires explicit operator choice,
-  and `priority` is rejected. `-skip-failed-cells` marks unusable cells as
-  `skipped` after retries so later GA phases can continue.
+  initialize parent-selection state. Optional `-include-sim` and
+  `-include-scenario` flags guarantee focused coverage before deterministic
+  shuffle fills the remaining sample slots. Source: `DI-duzur`.
+- `score`: evaluate manifest cells with one model, write parent JSON result files
+  under `results/<sim>/<scenario>/<model>/<timestamp>.json`, write child score
+  evidence under `proposals/<run-group-id>/results/<sim>/<scenario>/<model>/<timestamp>.json`,
+  validate each result, and checkpoint state after every cell. Provider-backed
+  scoring sends explicit `-service-tier flex` by default; `default` requires
+  explicit operator choice, and `priority` is rejected. `-skip-failed-cells`
+  marks unusable cells as `skipped` after retries so later GA phases can
+  continue.
 - `generate`: use selected parent sims and scenario pressure to write normal
-  untracked child sim trees directly under `simulations/SIM-<handle>-<slug>/`,
-  then record their paths and tree hashes in state. Provider-backed child
-  generation uses the same explicit service-tier policy as scoring.
-  `-skip-failed-children` marks unusable child plans as `skipped` after retries
-  so child scoring can proceed for generated children.
+  proposal-stage child sim trees under
+  `proposals/<run-group-id>/simulations/<SIM-id>/`, then record their paths and
+  tree hashes in state. Provider-backed child generation uses the same explicit
+  service-tier policy as scoring. `-skip-failed-children` marks unusable child
+  plans as `skipped` after retries so child scoring can proceed for generated
+  children.
 - `validate`: validate GA state, child sim tree shape, JSON result path shape,
   schema fields, source hashes, and score ranges; ignore all `results/**/*.md`
   files.
 - `progress`: print state counts, cost totals, generated children, scored cells,
   accepted children, and culled children.
-- `accept`: verify selected child and result hashes, record acceptance in state,
-  and print exact paths to stage for the normal repo commit workflow.
+- `accept`: verify selected proposal child and proposal result hashes, record
+  acceptance in state, and print exact paths for the later promotion workflow.
 - `cull`: delete only generated child sim trees named in the active state file
-  and their matching `results/<child-sim-id>/` trees, then record the cull action
-  in state.
+  and their matching `proposals/<run-group-id>/results/<child-sim-id>/` trees,
+  then record the cull action in state.
 
 ### Child-generation contract
 
-`tools/ga-runner generate` creates untracked child simulation trees directly
-under `simulations/`. The child tree, not a JSON proposal file, is the generated
-candidate.
+`tools/ga-runner generate` creates child simulation trees under ignored
+`proposals/<run-group-id>/simulations/`. The child tree, not a JSON proposal
+file, is the generated candidate.
 
 The runner must prepare each generation prompt with:
 
-- exact child sim ID and target path under `simulations/SIM-<handle>-<slug>/`;
+- exact child sim ID and target path under
+  `proposals/<run-group-id>/simulations/SIM-<handle>-child-<slug>/`;
 - selected parent sim IDs, parent paths, and parent tree hashes;
 - selected scenario sample and scenario pressure summaries;
 - relevant JSON fitness results from the active GA run when available;
@@ -780,7 +957,7 @@ Allowed generation operation:
 Forbidden generation operations:
 
 - rewriting a parent in place;
-- generating outside `simulations/SIM-*`;
+- generating outside `proposals/<run-group-id>/simulations/SIM-*`;
 - creating a broad "best of everything" child with no bounded deltas;
 - importing old Markdown canary result prose as evidence;
 - treating generated children as accepted merely because they exist on disk.
@@ -802,11 +979,11 @@ status in the GA state file.
 - [x] tapur.3 Specify `tools/ga-runner` commands for manifest generation, child
   generation, scoring, validation, progress/resume, accept, and cull. Source:
   `DI-ramar`; `DI-zanon`.
-- [x] tapur.4 Define child-generation prompts that produce normal
-  `simulations/SIM-<handle>-<slug>/` trees with `README.md`, `QUESTION.md` when
-  needed, optional `SCENARIOS.md`, optional local protocol/spec dirs, provenance
-  back to parent sims, and bounded design deltas. Source: `DI-ramar`;
-  `DI-zohal`.
+- [x] tapur.4 Define child-generation prompts that produce normal simulation
+  shaped trees under `proposals/<run-group-id>/simulations/SIM-<handle>-child-<slug>/`
+  with `README.md`, `QUESTION.md` when needed, optional `SCENARIOS.md`, optional
+  local protocol/spec dirs, provenance back to parent sims, and bounded design
+  deltas. Source: `DI-ramar`; `DI-zohal`; `DI-lirat`.
 - [x] tapur.5 Implement JSON-only fitness result writing and validation for
   `tools/ga-runner`, and make the runner ignore `results/**/*.md` canary files.
   Source: `DI-ramar`; `DI-pobus`.
@@ -818,14 +995,15 @@ status in the GA state file.
   choose a small parent set, generate a small child batch, score each child
   against a uniform scenario sample, and promote at most a small number of
   children per generation. Source: `DI-ramar`; `DI-zusit`.
-- [x] tapur.8 Implement review and promotion: accepted children are staged from
-  their existing `simulations/SIM-*` paths and committed with selected JSON
-  result evidence; rejected children remain uncommitted. Source: `DI-ramar`;
-  `DI-podot`.
+- [x] tapur.8 Implement review and promotion: accepted children are reviewed from
+  ignored `proposals/<run-group-id>/` paths before selected designs are promoted
+  into canonical non-child `simulations/SIM-*` paths with selected JSON result
+  evidence; rejected children remain uncommitted. Source: `DI-ramar`; `DI-podot`;
+  `DI-lirat`; `DI-dipid`.
 - [x] tapur.9 Implement culling: rejected child sim trees and matching
-  `results/<child-sim-id>/` trees are deleted only through an explicit cull
-  command that records the action in the GA state file. Source: `DI-ramar`;
-  `DI-kofil`.
+  `proposals/<run-group-id>/results/<child-sim-id>/` trees are deleted only
+  through an explicit cull command that records the action in the GA state file.
+  Source: `DI-ramar`; `DI-kofil`; `DI-lirat`.
 - [x] tapur.10 Update `results/RUN-PROTOCOL.md`, `results/README.md`, and tool
   docs so GA-runner JSON results, Markdown canary-result exclusion, child-sim
   generation, review, promotion, and culling are documented from the same
@@ -895,6 +1073,15 @@ status in the GA state file.
 - [x] tapur.28 Print canary `response.reasoning_summary_part.added` event names
   and content as well, while keeping text-delta events as no-newline progress
   dots. Source: `DI-sakam`.
+- [x] tapur.29 Split canary score and child-generation request timeout defaults
+  so scoring remains `xhigh` / `5m` and child generation defaults to `medium` /
+  `15m`. Source: `DI-guvif`.
+- [x] tapur.30 Stop printing canary `response.reasoning_summary_part.added`
+  event names and content; keep `response.reasoning_summary_part.done` output.
+  Source: `DI-fupob`.
+- [x] tapur.31 Stop printing canary `response.output_text.delta` event names and
+  content while keeping output deltas for internal JSON response assembly.
+  Source: `DI-ramun`.
 
 ## Predecessor context
 

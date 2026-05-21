@@ -62,6 +62,59 @@ Affects: `simulations/README.md`;
 `protocols/wire-lab.d/TODO/TODO-juhub-turns-149-208-chronological-rewalk.md`;
 `simulations/SIM-*-grid-envelope-enc-<cbor|dag-cbor>-unknown-<opaque|hard-reject|best-effort>-sig-<wrapper-pcid|unsigned-v0|mandatory-opaque-bytes|mandatory-sig-pcid-payload>/`.
 
+ID: DI-joman
+Date: 2026-05-20 16:02:50
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Add two standalone grid-envelope arity probes alongside the 24
+positional variants: one where the first `pcid` defines the outer field count
+and field types, and one where the outer layer stays `[pcid_a, payload_a]` but
+`pcid_a` defines a nested signed payload structure inside `payload_a`.
+Intent: The current grid-envelope matrix does not directly test whether
+variable arity belongs in the outer envelope or inside the pCID-defined payload
+layer. These probes preserve both hypotheses as independently runnable
+specimens without changing the existing positional matrix or declaring a
+canonical PromiseGrid envelope.
+Constraints: Do not mark either probe as preferred. Keep them standalone under
+`simulations/`. Keep the existing 24 positional variants intact. The
+layer-pCID nested-signed-payload probe must explicitly preserve the concern
+that an unsigned outer envelope relies on transport or local context to
+identify the agent promising `payload_a` conforms to `pcid_a`.
+Affects: `simulations/SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields/`;
+`simulations/SIM-janov-grid-envelope-layer-pcid-nested-signed-payload/`;
+`simulations/README.md`;
+`DEV-GUIDE-RESOURCES.md`;
+`simulations/SIM-kurim-grid-envelope/TODO/TODO-tujad-grid-envelope-successor-owner.md`.
+
+ID: DI-sahiv
+Date: 2026-05-20 16:25:11
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Add a standalone non-child grid-envelope simulation named
+`SIM-lotiv-grid-envelope-cryptid-multisig-signature-proofs` to test whether
+Cryptid's Multisig object model can serve as the envelope signature/proof
+payload model without prematurely choosing detached versus combined signatures,
+outer versus nested signature placement, fixed versus variable arity, pCID
+binding, unknown-codec handling, threshold-share aggregation, or verifier
+obligations.
+Intent: The existing positional, arity, and nested-signature grid-envelope
+specimens test where signature bytes may live, but they do not directly pressure
+a codec-agnostic signature object that can carry detached or combined payloads,
+skippable unknown signing codecs, and threshold-share attributes. A dedicated
+Cryptid Multisig specimen preserves that design space as runnable evidence while
+keeping the unresolved PromiseGrid envelope questions explicit.
+Constraints: Keep the simulation standalone under `simulations/`, not generated,
+not a child/proposal sim, and not canonical PromiseGrid wire format. Include
+normal local simulation files and a simulation-local `protocols/grid-envelope.d/`
+draft. Treat the upstream Multisig source as pre-draft prior art, not as a
+normative PromiseGrid dependency. Do not delete or overwrite sibling simulations
+or unrelated uncommitted edits.
+Affects:
+`simulations/SIM-lotiv-grid-envelope-cryptid-multisig-signature-proofs/`;
+`simulations/README.md`;
+`DEV-GUIDE-RESOURCES.md`;
+`simulations/SIM-kurim-grid-envelope/TODO/TODO-tujad-grid-envelope-successor-owner.md`.
+
 ## Scope
 
 This TODO owns grid-envelope follow-on that was previously parked under
@@ -146,6 +199,30 @@ without relying on this parent lineage as a shared protocol bundle.
 | `../SIM-zifik-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-unsigned-v0/` | DAG-CBOR | Best-effort inspection | Unsigned v0 |
 | `../SIM-fonol-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-mandatory-opaque-bytes/` | DAG-CBOR | Best-effort inspection | Mandatory opaque bytes |
 | `../SIM-rakir-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-mandatory-sig-pcid-payload/` | DAG-CBOR | Best-effort inspection | Mandatory signature pCID + payload |
+
+## Arity and Nested-Signature Probe Simulations
+
+`DI-joman` adds two arity-focused probes that are intentionally outside the
+24-row positional matrix. They test whether arity should be a property of the
+outer envelope or of a pCID-defined nested payload layer.
+
+| Simulation | Probe question |
+|---|---|
+| `../SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields/` | Can the first `pcid` safely define how many outer fields follow it and what each field means? |
+| `../SIM-janov-grid-envelope-layer-pcid-nested-signed-payload/` | Can a shared layer/network pCID define a parseable signed nested payload while leaving the outer envelope unsigned? |
+
+## Signature/Proof Object Probe Simulations
+
+`DI-sahiv` adds a standalone non-child probe for using Cryptid's Multisig object
+model as the bytes carried by a grid-envelope signature/proof slot or by a
+payload protocol's nested proof. The probe keeps detached versus combined
+signatures, outer versus nested placement, variable arity, pCID binding,
+unknown-codec handling, threshold shares, and verifier obligations open for
+comparison.
+
+| Simulation | Probe question |
+|---|---|
+| `../SIM-lotiv-grid-envelope-cryptid-multisig-signature-proofs/` | Can Cryptid Multisig carry grid-envelope signature/proof bytes without prematurely settling PromiseGrid signature design choices? |
 
 ## Subtasks
 
