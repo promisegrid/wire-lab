@@ -2,7 +2,7 @@
   "schema": "promisegrid.ga.state.v1",
   "run_group_id": "ga-canary-20260521-011601",
   "created_at": "2026-05-21T01:16:01Z",
-  "updated_at": "2026-05-21T17:59:02Z",
+  "updated_at": "2026-05-21T20:46:46Z",
   "repo_commit": "dd50f76bf5d5eeffc699bc0e5b542c86b7c3e196",
   "model_id": "openai-gpt-5.4-xhigh",
   "population": [
@@ -388,7 +388,7 @@
         }
       ],
       "tree_hash": "9e1c852421e68eb7c7926e4724cd14149b126d94d7141809624328e36114b7cb",
-      "status": "generated",
+      "status": "accepted",
       "design_delta_summary": "1) Add per-plane scoped conformance claim cards with an authoritative boundary identity and explicit implemented/provisional/blocked/local-only fields; 2) require each durable publication to cite exactly one audit-anchor CAS object plus a human-readable promise body; 3) require a minimal peer-local promise ledger with stable operation/effect keys and break-witness-on-ambiguous-restart for non-idempotent actions.",
       "validation_message": "validated child tree",
       "updated_at": "2026-05-21T01:30:55Z",
@@ -429,7 +429,7 @@
         }
       ],
       "tree_hash": "ca8d661700a714c6da553c10d52cc0dc4de9d4d54ff9d89e3777044e8cba78c4",
-      "status": "generated",
+      "status": "accepted",
       "design_delta_summary": "1) Add a layer-scoped conformance manifest that separates local implementation, live transport, audit publication, and device-effect claims while naming one authoritative protocol-boundary contract or contract-family identity. 2) Require every durable publication to cite a concrete CAS milestone object instead of a live channel or vague app state. 3) Add a minimal peer-local promise ledger that records who promised identity, availability, authorization, or physical effect, plus receipt and break-witness outcomes.",
       "validation_message": "validated child tree",
       "updated_at": "2026-05-21T17:52:22Z",
@@ -1678,6 +1678,32 @@
       "input_tokens": 7307,
       "output_tokens": 7153,
       "cost_usd": 0.11292925
+    }
+  ],
+  "acceptance": [
+    {
+      "accepted_child_ids": [
+        "SIM-savak-child-scoped-claim-card-audit-ledger",
+        "SIM-tizad-child-scoped-conformance-citation-ledger"
+      ],
+      "result_paths": [
+        "proposals/ga-canary-20260521-011601/results/SIM-savak-child-scoped-claim-card-audit-ledger/app-semantics-partial-conformance/openai-gpt-5.4-xhigh/20260521-011601.json",
+        "proposals/ga-canary-20260521-011601/results/SIM-savak-child-scoped-claim-card-audit-ledger/device-bound-agent-physical-effect/openai-gpt-5.4-xhigh/20260521-011601.json",
+        "proposals/ga-canary-20260521-011601/results/SIM-savak-child-scoped-claim-card-audit-ledger/kernel-porting-boundary/openai-gpt-5.4-xhigh/20260521-011601.json",
+        "proposals/ga-canary-20260521-011601/results/SIM-savak-child-scoped-claim-card-audit-ledger/live-crdt-audit-publication/openai-gpt-5.4-xhigh/20260521-011601.json",
+        "proposals/ga-canary-20260521-011601/results/SIM-savak-child-scoped-claim-card-audit-ledger/minimal-immutable-blob-app/openai-gpt-5.4-xhigh/20260521-011601.json",
+        "proposals/ga-canary-20260521-011601/results/SIM-savak-child-scoped-claim-card-audit-ledger/multi-embodiment-app-identity/openai-gpt-5.4-xhigh/20260521-011601.json",
+        "proposals/ga-canary-20260521-011601/results/SIM-savak-child-scoped-claim-card-audit-ledger/portable-signing-key-identity/openai-gpt-5.4-xhigh/20260521-011601.json",
+        "proposals/ga-canary-20260521-011601/results/SIM-tizad-child-scoped-conformance-citation-ledger/app-semantics-partial-conformance/openai-gpt-5.4-xhigh/20260521-011601.json",
+        "proposals/ga-canary-20260521-011601/results/SIM-tizad-child-scoped-conformance-citation-ledger/device-bound-agent-physical-effect/openai-gpt-5.4-xhigh/20260521-011601.json",
+        "proposals/ga-canary-20260521-011601/results/SIM-tizad-child-scoped-conformance-citation-ledger/kernel-porting-boundary/openai-gpt-5.4-xhigh/20260521-011601.json",
+        "proposals/ga-canary-20260521-011601/results/SIM-tizad-child-scoped-conformance-citation-ledger/live-crdt-audit-publication/openai-gpt-5.4-xhigh/20260521-011601.json",
+        "proposals/ga-canary-20260521-011601/results/SIM-tizad-child-scoped-conformance-citation-ledger/minimal-immutable-blob-app/openai-gpt-5.4-xhigh/20260521-011601.json",
+        "proposals/ga-canary-20260521-011601/results/SIM-tizad-child-scoped-conformance-citation-ledger/multi-embodiment-app-identity/openai-gpt-5.4-xhigh/20260521-011601.json",
+        "proposals/ga-canary-20260521-011601/results/SIM-tizad-child-scoped-conformance-citation-ledger/portable-signing-key-identity/openai-gpt-5.4-xhigh/20260521-011601.json"
+      ],
+      "reviewer_note": "Promote Savak and Tizad as canonical guide-feedback child-derived specimens under DI-fihub; proposal source remains the scored evidence.",
+      "accepted_at": "2026-05-21T20:46:46Z"
     }
   ]
 }

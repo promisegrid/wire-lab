@@ -389,10 +389,10 @@ func effectiveGenerateCostEstimateOutputTokens(options generateOptions) int {
 // to the current two-parent breed operator.
 //
 // Intent: Use the parent score evidence already produced by the canary to bias
-// children toward the highest-fitness parent while pairing it with one
+// children toward higher-fitness parents while pairing that high parent with one
 // deterministic uniform random scored parent. LLM child generation uses a
 // single two-parent breed operation, not one-parent mutation or byte-level
-// crossover. Source: DI-tufud; DI-sohus
+// crossover. Source: DI-puhog; DI-sohus
 func applyFitnessParentSelection(repo Repo, state *GAState, indexes []int) (bool, error) {
 	ranked, ok, err := rankedParentsByFitness(repo, *state)
 	if err != nil {
@@ -411,7 +411,7 @@ func applyFitnessParentSelection(repo Repo, state *GAState, indexes []int) (bool
 		if child.Operation != childOperationBreed || !sameStrings(parentIDs, child.ParentIDs) {
 			child.Operation = childOperationBreed
 			child.ParentIDs = parentIDs
-			child.ValidationMessage = fmt.Sprintf("breed parents selected by fitness-top plus deterministic-random scored parent: %s", strings.Join(parentIDs, ","))
+			child.ValidationMessage = fmt.Sprintf("breed parents selected by weighted fitness-high plus deterministic-random scored parent: %s", strings.Join(parentIDs, ","))
 			changed = true
 		}
 	}
@@ -499,12 +499,44 @@ func parentSelectionForChild(state GAState, ranked []parentFitnessRank, child GA
 		return parentIDs, len(parentIDs) == 2
 	}
 	seed := state.RunGroupID + ":" + child.ID() + ":" + fmt.Sprintf("%d", selectionIndex)
-	first := ranked[0].SimID
-	parent, ok := uniformRandomParent(ranked, seed+":breed", map[string]bool{first: true})
+	first, ok := weightedHighParent(ranked, seed+":high", nil)
 	if !ok {
 		return nil, false
 	}
-	return []string{first, parent.SimID}, true
+	parent, ok := uniformRandomParent(ranked, seed+":breed", map[string]bool{first.SimID: true})
+	if !ok {
+		return nil, false
+	}
+	return []string{first.SimID, parent.SimID}, true
+}
+
+func weightedHighParent(ranked []parentFitnessRank, seed string, excluded map[string]bool) (parentFitnessRank, bool) {
+	// Intent: Replace a fixed top-parent choice with bounded rank pressure so
+	// higher-ranked parents are more likely while every scored parent remains
+	// reachable across deterministic child-selection seeds. Source: DI-puhog
+	var candidates []parentFitnessRank
+	for _, parent := range ranked {
+		if excluded != nil && excluded[parent.SimID] {
+			continue
+		}
+		candidates = append(candidates, parent)
+	}
+	if len(candidates) == 0 {
+		return parentFitnessRank{}, false
+	}
+	var totalWeight uint64
+	for index := range candidates {
+		totalWeight += uint64(len(candidates) - index)
+	}
+	target := deterministicUint64(seed) % totalWeight
+	var cumulative uint64
+	for index, parent := range candidates {
+		cumulative += uint64(len(candidates) - index)
+		if target < cumulative {
+			return parent, true
+		}
+	}
+	return candidates[len(candidates)-1], true
 }
 
 func uniformRandomParent(ranked []parentFitnessRank, seed string, excluded map[string]bool) (parentFitnessRank, bool) {
@@ -525,8 +557,12 @@ func deterministicIndex(seed string, count int) int {
 	if count <= 0 {
 		return 0
 	}
+	return int(deterministicUint64(seed) % uint64(count))
+}
+
+func deterministicUint64(seed string) uint64 {
 	sum := sha256.Sum256([]byte(seed))
-	return int(binary.BigEndian.Uint64(sum[:8]) % uint64(count))
+	return binary.BigEndian.Uint64(sum[:8])
 }
 
 func sameStateParents(left []GAStateParent, right []GAStateParent) bool {

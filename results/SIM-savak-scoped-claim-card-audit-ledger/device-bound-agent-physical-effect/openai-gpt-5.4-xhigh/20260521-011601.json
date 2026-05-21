@@ -1,0 +1,129 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-savak-scoped-claim-card-audit-ledger-device-bound-agent-physical-effect-openai-gpt-5.4-xhigh-20260521-011601",
+  "run_group_id": "ga-canary-20260521-011601",
+  "cell_id": "ga-canary-20260521-011601-000045-SIM-savak-child-scoped-claim-card-audit-ledger--device-bound-agent-physical-effect--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-savak-scoped-claim-card-audit-ledger",
+  "scenario_id": "device-bound-agent-physical-effect",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260521-011601",
+  "result_path": "results/SIM-savak-scoped-claim-card-audit-ledger/device-bound-agent-physical-effect/openai-gpt-5.4-xhigh/20260521-011601.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_c87afb22b1364d4eb0eb9ea8fd0ae294",
+    "response_id": "resp_0754e616c0659c14006a0f4657531c819bbd63b512a91f0b80",
+    "input_tokens": 7259,
+    "output_tokens": 9822,
+    "cost_usd": 0.15021125
+  },
+  "source": {
+    "repo_commit": "dd50f76bf5d5eeffc699bc0e5b542c86b7c3e196",
+    "sim_path": "proposals/ga-canary-20260521-011601/simulations/SIM-savak-child-scoped-claim-card-audit-ledger/",
+    "scenario_path": "scenarios/device-bound-agent-physical-effect/device-bound-agent-physical-effect.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "8a3cb036c4849e8e694c94f004100a68495ad1287ff01291711b43aa19ad270b"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "proposals/ga-canary-20260521-011601/simulations/SIM-savak-child-scoped-claim-card-audit-ledger/README.md",
+        "sha256": "0c6ed790ff370508bd5e7ff13973d855a04000a5d54238d689ff2662b6e3d990"
+      },
+      {
+        "path": "proposals/ga-canary-20260521-011601/simulations/SIM-savak-child-scoped-claim-card-audit-ledger/QUESTION.md",
+        "sha256": "c8f5d53a6f3fee1377023495ec4567391399a910425bc48ad3506f4fba5f4d6c"
+      },
+      {
+        "path": "proposals/ga-canary-20260521-011601/simulations/SIM-savak-child-scoped-claim-card-audit-ledger/PATTERNS.md",
+        "sha256": "397ec0af03cfc69ee3cf3f60036b2378f191acdf7a79ea6bd5c09c5664b56f54"
+      },
+      {
+        "path": "scenarios/device-bound-agent-physical-effect/device-bound-agent-physical-effect.md",
+        "sha256": "ffd2cee6094031ae77651ba8da6c3c76b54d200845f65f0e93d07c8e96aaeb2a"
+      }
+    ],
+    "simulation_tree_hash": "9e1c852421e68eb7c7926e4724cd14149b126d94d7141809624328e36114b7cb"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 5,
+    "promisegrid_alignment": 5,
+    "auditability": 4,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 5,
+    "implementation_plausibility": 4,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 35,
+    "normalized_0_100": 88,
+    "confidence_0_1": 0.85
+  },
+  "assessment": {
+    "rationale": "Strong direct fit: device-plane claim cards disclose dependencies and authority notes, exact effect-receipt or break-witness anchors give Carol a precise audit target, and the break-witness-on-ambiguous-restart rule gives a clear at-most-once posture. The main gap is that delegation proof and receipt schema remain proposed shapes rather than a frozen cross-implementation artifact contract.",
+    "strengths": [
+      "Explicit device/live/audit/storage scoping sharply separates conformance claims and avoids conflating receipt, effect completion, and durable publication.",
+      "Claim cards provide a concrete place to disclose CUPS, libusb, IIO, IPP, or vendor SDK dependencies and provisional status.",
+      "Exact audit anchors plus a local append-only promise ledger give Carol a replayable trail for receipts, failures, and break-witnesses.",
+      "The default rule to emit a break-witness instead of re-executing an ambiguous non-idempotent effect is a strong answer to restart and replay pressure."
+    ],
+    "weaknesses": [
+      "Owner delegation is only referenced as a capability or authorization note, not a standardized proof object.",
+      "Effect receipt and break-witness contents are not yet frozen, which limits cross-implementation audit precision.",
+      "Transport, capability format, and witness envelope remain open, so some operational semantics stay implementation-specific."
+    ],
+    "risks": [
+      "Different apps may invent incompatible claim-card, receipt, or break-witness schemas before a frozen contract exists.",
+      "A weak delegation note could let operators overstate what a device-bound agent was actually authorized to do.",
+      "If local ledgers are not retained durably, long-term forensic value drops even when immutable anchors exist."
+    ],
+    "open_questions": [
+      "What exact artifact must a device-plane claim card cite to prove Bob delegated the printer or sensor to the daemon?",
+      "What minimum fields must an effect receipt or break-witness carry to remain interpretable after device drivers and SDKs are gone?",
+      "Must ambiguous post-restart state always emit a break-witness for non-idempotent effects, or are there narrowly safe exceptions?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  },
+  "promotion": {
+    "promotion_di": "DI-fihub",
+    "run_group_id": "ga-canary-20260521-011601",
+    "original_child_sim_id": "SIM-savak-child-scoped-claim-card-audit-ledger",
+    "final_sim_id": "SIM-savak-scoped-claim-card-audit-ledger",
+    "original_proposal_sim_path": "proposals/ga-canary-20260521-011601/simulations/SIM-savak-child-scoped-claim-card-audit-ledger/",
+    "original_proposal_result_path": "proposals/ga-canary-20260521-011601/results/SIM-savak-child-scoped-claim-card-audit-ledger/device-bound-agent-physical-effect/openai-gpt-5.4-xhigh/20260521-011601.json",
+    "canonical_result_path": "results/SIM-savak-scoped-claim-card-audit-ledger/device-bound-agent-physical-effect/openai-gpt-5.4-xhigh/20260521-011601.json",
+    "source_provenance_policy": "Canonical storage identity fields were updated for discoverability; source.* fields intentionally preserve the exact proposal tree and file hashes scored by the LLM before promotion."
+  }
+}

@@ -1,0 +1,125 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-tizad-scoped-conformance-citation-ledger-app-semantics-partial-conformance-openai-gpt-5.4-xhigh-20260521-011601",
+  "run_group_id": "ga-canary-20260521-011601",
+  "cell_id": "ga-canary-20260521-011601-000051-SIM-tizad-child-scoped-conformance-citation-ledger--app-semantics-partial-conformance--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-tizad-scoped-conformance-citation-ledger",
+  "scenario_id": "app-semantics-partial-conformance",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260521-011601",
+  "result_path": "results/SIM-tizad-scoped-conformance-citation-ledger/app-semantics-partial-conformance/openai-gpt-5.4-xhigh/20260521-011601.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_4e18baeccda24ae194525421354e79cf",
+    "response_id": "resp_0f0151aace564890006a0f46f49f208198be696958b1ba6a96",
+    "input_tokens": 7311,
+    "output_tokens": 7774,
+    "cost_usd": 0.12163025
+  },
+  "source": {
+    "repo_commit": "dd50f76bf5d5eeffc699bc0e5b542c86b7c3e196",
+    "sim_path": "proposals/ga-canary-20260521-011601/simulations/SIM-tizad-child-scoped-conformance-citation-ledger/",
+    "scenario_path": "scenarios/app-semantics-partial-conformance/app-semantics-partial-conformance.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "8a3cb036c4849e8e694c94f004100a68495ad1287ff01291711b43aa19ad270b"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "proposals/ga-canary-20260521-011601/simulations/SIM-tizad-child-scoped-conformance-citation-ledger/README.md",
+        "sha256": "3d4e71c96e15add3d4351ec01e2bd298063ceb24c96a4068379dc17c6aaba6df"
+      },
+      {
+        "path": "proposals/ga-canary-20260521-011601/simulations/SIM-tizad-child-scoped-conformance-citation-ledger/QUESTION.md",
+        "sha256": "08338599122100576e57398b6ce24fb78acfbc677c88888caa01bb6793ea678d"
+      },
+      {
+        "path": "proposals/ga-canary-20260521-011601/simulations/SIM-tizad-child-scoped-conformance-citation-ledger/CLAIM-BUNDLE.md",
+        "sha256": "3a1fc1b9776dce965bd12464b8673dfa6b11e5c0c110443ffb467d90189e4ec5"
+      },
+      {
+        "path": "scenarios/app-semantics-partial-conformance/app-semantics-partial-conformance.md",
+        "sha256": "e84a88096e8ecaca83f7a04d8958d6f7e5712e53bf180d14674e32fab69399ef"
+      }
+    ],
+    "simulation_tree_hash": "ca8d661700a714c6da553c10d52cc0dc4de9d4d54ff9d89e3777044e8cba78c4"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 5,
+    "promisegrid_alignment": 5,
+    "auditability": 5,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 4,
+    "implementation_plausibility": 4,
+    "risk_penalty": 1
+  },
+  "fitness": {
+    "raw": 36,
+    "normalized_0_100": 90,
+    "confidence_0_1": 0.89
+  },
+  "assessment": {
+    "rationale": "Excellent match for the scenario. The design gives Alice a concrete honest partial-conformance claim shape, anchors protocol identity in an app-contract reference instead of local embodiment labels, separates local/live/audit/effect scopes, and requires durable cited objects plus peer-local records so Bob and Carol can verify what is and is not promised.",
+    "strengths": [
+      "Claim scope plus implemented/provisional/blocked status directly supports honest partial-conformance wording.",
+      "Protocol-boundary identity is separated from embodiment labels, branding, and local implementation shortcuts.",
+      "Durable citation and peer-local ledger rules materially improve later audit, replay review, and failure interpretation."
+    ],
+    "weaknesses": [
+      "It is still a guide pattern, not a frozen verification standard or final app contract.",
+      "Signature carriage, capability-token language, and some witness details remain intentionally unresolved."
+    ],
+    "risks": [
+      "A weak implementation could still market a scoped manifest as broader interoperability proof than the unfinished contract justifies."
+    ],
+    "open_questions": [
+      "What minimum validation rules must Bob apply to reject underspecified manifests?",
+      "How should contract-family references express compatibility and supersession across evolving embodiments?",
+      "Which durable audit object should be mandatory for each app class when live behavior later needs durable evidence?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  },
+  "promotion": {
+    "promotion_di": "DI-fihub",
+    "run_group_id": "ga-canary-20260521-011601",
+    "original_child_sim_id": "SIM-tizad-child-scoped-conformance-citation-ledger",
+    "final_sim_id": "SIM-tizad-scoped-conformance-citation-ledger",
+    "original_proposal_sim_path": "proposals/ga-canary-20260521-011601/simulations/SIM-tizad-child-scoped-conformance-citation-ledger/",
+    "original_proposal_result_path": "proposals/ga-canary-20260521-011601/results/SIM-tizad-child-scoped-conformance-citation-ledger/app-semantics-partial-conformance/openai-gpt-5.4-xhigh/20260521-011601.json",
+    "canonical_result_path": "results/SIM-tizad-scoped-conformance-citation-ledger/app-semantics-partial-conformance/openai-gpt-5.4-xhigh/20260521-011601.json",
+    "source_provenance_policy": "Canonical storage identity fields were updated for discoverability; source.* fields intentionally preserve the exact proposal tree and file hashes scored by the LLM before promotion."
+  }
+}

@@ -82,11 +82,12 @@ the provider, writes validated JSON fitness results, and checkpoints usage/cost
 metadata after each cell. `generate` builds compact child prompts from each
 parent simulation tree once, scenario-specific pressure once, and summarized
 fitness evidence, then uses completed parent fitness results to rank the
-selected parent pool, applies deterministic highest-scoring-parent plus uniform
-random scored-parent selection, materializes strict file-bundle responses under
-ignored review-stage `proposals/<run-group-id>/simulations/<SIM-id>/` trees, and
-records prompt/response hashes, file hashes, tree hashes, and cost metadata in
-state. Matching child score evidence is written under
+selected parent pool, applies deterministic linear-rank weighted high-parent
+plus uniform random scored-parent selection, materializes strict file-bundle
+responses under ignored review-stage
+`proposals/<run-group-id>/simulations/<SIM-id>/` trees, and records
+prompt/response hashes, file hashes, tree hashes, and cost metadata in state.
+Matching child score evidence is written under
 `proposals/<run-group-id>/results/<SIM-id>/` until a review/promotion pass gives
 the child a final non-child simulation name and canonical result home.
 `accept` records reviewed promotion evidence and prints proposal paths for the
@@ -97,7 +98,7 @@ trees, canonical result paths, and `source.*` evidence. `cull` deletes only
 state-selected generated child sim trees and matching result trees; use
 `-dry-run` to print the deletion plan without changing files. Source:
 `DI-pobus`; `DI-bagih`; `DI-zusit`; `DI-podot`; `DI-kofil`; `DI-ruzaj`;
-`DI-gijom`; `DI-tufud`; `DI-dilaf`; `DI-fihof`; `DI-lirat`; `DI-dikoh`.
+`DI-gijom`; `DI-puhog`; `DI-dilaf`; `DI-fihof`; `DI-lirat`; `DI-dikoh`.
 
 Provider-backed `score` and `generate` always send an explicit service tier.
 The default is `-service-tier flex`; `-service-tier default` is available when
@@ -153,17 +154,18 @@ tokens. Source: `DI-pulap`.
 Child generation uses parent score evidence in two ways. First, `generate`
 reranks the selected parent pool by average completed parent
 `fitness.normalized_0_100` and rewrites queued child parent IDs as exactly two
-distinct `breed` parents using the highest-scoring parent plus one deterministic
-uniform random scored non-top parent. Second, the child prompt tells the model
-to preserve parent strengths, repair weaknesses, reduce risks, route open
-questions, and make
-bounded design deltas expected to improve the same rubric score. If fewer than
-two viable parents exist, generation records a failed or skipped child instead
-of creating a one-parent child. Child-generation prompts do not embed complete
-parent result JSON; they include compact result-path, score, fitness, rationale,
-strength, weakness, risk, and open-question summaries to reduce timeout-prone
-prompt bulk while preserving the feedback signal. Source: `DI-tufud`;
-`DI-sohus`; `DI-dilaf`.
+distinct `breed` parents using a deterministic linear-rank weighted high parent
+plus one deterministic uniform random scored non-high parent. The high-parent
+weights are bounded as `n, n-1, ..., 1` over the ranked scored pool, so better
+parents are favored without making the top parent mandatory. Second, the child
+prompt tells the model to preserve parent strengths, repair weaknesses, reduce
+risks, route open questions, and make bounded design deltas expected to improve
+the same rubric score. If fewer than two viable parents exist, generation
+records a failed or skipped child instead of creating a one-parent child.
+Child-generation prompts do not embed complete parent result JSON; they include
+compact result-path, score, fitness, rationale, strength, weakness, risk, and
+open-question summaries to reduce timeout-prone prompt bulk while preserving the
+feedback signal. Source: `DI-puhog`; `DI-sohus`; `DI-dilaf`.
 
 For unattended canary-style runs, `score -skip-failed-cells` and
 `generate -skip-failed-children` preserve per-cell or per-child failure messages

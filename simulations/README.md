@@ -85,15 +85,18 @@ placement; none is preferred by the harness or by this index.
 ## Promoted GA grid-envelope variants
 
 `DI-dipid` promoted two review-stage children from
-`ga-canary-20260520-221953` into canonical non-child simulation specimens. These
-variants remain candidate specimens, not preferred envelope families. Their raw
-proposal artifacts remain under ignored `proposals/`, and their accepted score
-evidence is copied under root `results/`.
+`ga-canary-20260520-221953`, and `DI-fihub` promoted two review-stage children
+from `ga-canary-20260521-003110`, into canonical non-child simulation
+specimens. These variants remain candidate specimens, not preferred envelope
+families. Their raw proposal artifacts remain under ignored `proposals/`, and
+their accepted score evidence is copied under root `results/`.
 
 | Simulation | Encoding | Unknown-pCID policy | Signature policy |
 |---|---|---|---|
 | `SIM-jufag-grid-envelope-quarantine-sig-pcid-outcomes/` | DAG-CBOR | Quarantine store/forward with explicit accepted, quarantined, and rejected outcomes | Mandatory profiled opaque signature bytes with explicit `sig_pcid` dispatch |
 | `SIM-bimos-grid-envelope-quarantine-sig-pcid-audit-tuple/` | DAG-CBOR | Quarantine as local rejection plus exact-byte evidence relay | Mandatory `sig_pcid` plus `sig_payload`, with a local audit tuple |
+| `SIM-maraz-grid-envelope-signed-summary-header-nested-schema/` | CBOR | Unknown inner schema can keep signed summary-header audit fields while retaining opaque nested payload bytes | Outer signed summary header plus nested payload signature |
+| `SIM-natim-grid-envelope-nested-payload-outer-attestation-multisig/` | CBOR | Unsupported pCIDs/codecs retain exact bytes with explicit unsupported/quarantine outcomes | Mandatory outer Cryptid-style Multisig attestation plus nested payload proof |
 
 ## Development-guide feedback simulations
 
@@ -110,6 +113,8 @@ future candidate designs.
 | `SIM-kugap-live-sync-audit-split/` | Reliable low-latency live state versus durable group-session audit publication. |
 | `SIM-nijuz-multi-embodiment-identity/` | One logical app spanning browser/plugin embodiments, per-component conformance, and portable signing-key identity. |
 | `SIM-funas-kernel-porting-boundary/` | Kernel/runtime/dispatcher terminology, minimum porting target, runtime surface, and conformance boundary. |
+| `SIM-savak-scoped-claim-card-audit-ledger/` | Promoted GA probe for scoped claim cards, exact audit-anchor citations, and peer-local promise-accounting records. Source: `DI-fihub`. |
+| `SIM-tizad-scoped-conformance-citation-ledger/` | Promoted GA probe for scoped conformance manifests, durable citation records, and guide-safe partial-conformance claims. Source: `DI-fihub`. |
 
 ## Grid-envelope arity and nested-signature probes
 

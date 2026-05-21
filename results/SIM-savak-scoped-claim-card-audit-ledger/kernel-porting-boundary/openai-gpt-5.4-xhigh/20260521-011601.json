@@ -1,0 +1,130 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-savak-scoped-claim-card-audit-ledger-kernel-porting-boundary-openai-gpt-5.4-xhigh-20260521-011601",
+  "run_group_id": "ga-canary-20260521-011601",
+  "cell_id": "ga-canary-20260521-011601-000049-SIM-savak-child-scoped-claim-card-audit-ledger--kernel-porting-boundary--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-savak-scoped-claim-card-audit-ledger",
+  "scenario_id": "kernel-porting-boundary",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260521-011601",
+  "result_path": "results/SIM-savak-scoped-claim-card-audit-ledger/kernel-porting-boundary/openai-gpt-5.4-xhigh/20260521-011601.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_5e35ee574c6f4ca89f97afec3e409dc9",
+    "response_id": "resp_06b360e667def24f006a0f46ce392881989a2187a7f8b0db41",
+    "input_tokens": 7233,
+    "output_tokens": 5664,
+    "cost_usd": 0.09195375
+  },
+  "source": {
+    "repo_commit": "dd50f76bf5d5eeffc699bc0e5b542c86b7c3e196",
+    "sim_path": "proposals/ga-canary-20260521-011601/simulations/SIM-savak-child-scoped-claim-card-audit-ledger/",
+    "scenario_path": "scenarios/kernel-porting-boundary/kernel-porting-boundary.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "8a3cb036c4849e8e694c94f004100a68495ad1287ff01291711b43aa19ad270b"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "proposals/ga-canary-20260521-011601/simulations/SIM-savak-child-scoped-claim-card-audit-ledger/README.md",
+        "sha256": "0c6ed790ff370508bd5e7ff13973d855a04000a5d54238d689ff2662b6e3d990"
+      },
+      {
+        "path": "proposals/ga-canary-20260521-011601/simulations/SIM-savak-child-scoped-claim-card-audit-ledger/QUESTION.md",
+        "sha256": "c8f5d53a6f3fee1377023495ec4567391399a910425bc48ad3506f4fba5f4d6c"
+      },
+      {
+        "path": "proposals/ga-canary-20260521-011601/simulations/SIM-savak-child-scoped-claim-card-audit-ledger/PATTERNS.md",
+        "sha256": "397ec0af03cfc69ee3cf3f60036b2378f191acdf7a79ea6bd5c09c5664b56f54"
+      },
+      {
+        "path": "scenarios/kernel-porting-boundary/kernel-porting-boundary.md",
+        "sha256": "d1646fa062e6c64f27cbbd25da0e96f6d484c60582677cdfc798d265a22d5096"
+      }
+    ],
+    "simulation_tree_hash": "9e1c852421e68eb7c7926e4724cd14149b126d94d7141809624328e36114b7cb"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 4,
+    "auditability": 5,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 3,
+    "failure_handling": 4,
+    "implementation_plausibility": 3,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 22,
+    "normalized_0_100": 63,
+    "confidence_0_1": 0.79
+  },
+  "assessment": {
+    "rationale": "Strong on honest provisional conformance evidence and audit trails, but only partially fits this scenario because it does not define the kernel/runtime porting boundary, minimum viable port target, or harness-vs-target split the scenario asks for.",
+    "strengths": [
+      "Provides a concrete way to mark implemented, provisional, blocked, and local-only claims, which helps Alice write an honest early conformance statement.",
+      "Uses exact audit-anchor citations and local append-only promise ledgers, giving strong human/LLM auditability.",
+      "Separates local IDs from boundary identity, live from audit, hash/address from authorization, and receipt from physical-effect completion.",
+      "Keeps a path to future frozen-spec conformance via draft-path plus revision hash, supersession, and rotation references."
+    ],
+    "weaknesses": [
+      "Does not directly answer whether the guide should say kernel, runtime, dispatcher, handler host, or library.",
+      "Does not define the minimum viable porting target or map obligations across ingress, feed, CAS, session, and app layers.",
+      "Its scope planes are oriented toward app/service/device evidence, not the specific harness-versus-port boundary in this scenario."
+    ],
+    "risks": [
+      "Porters may mistake claim-card paperwork for resolving the actual runtime boundary and conformance surface.",
+      "Early mandatory card or ledger fields could freeze the wrong abstraction before DR-davod settles terminology and obligations.",
+      "Without an explicit harness exclusion rule, Mallory can still argue that copying the wire-lab harness counts as the port target."
+    ],
+    "open_questions": [
+      "How should claim-card scope map onto kernel/runtime/dispatcher/library terminology for a first port?",
+      "Which pre-freeze obligations should be claimable now for ingress, feed, CAS, and session, and which must remain blocked?",
+      "How should a port explicitly distinguish harness apparatus from the real implementation target in its claim card?",
+      "Is draft-path plus revision hash sufficient for pre-freeze runtime claims, or does the porting boundary need a stricter temporary identifier?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  },
+  "promotion": {
+    "promotion_di": "DI-fihub",
+    "run_group_id": "ga-canary-20260521-011601",
+    "original_child_sim_id": "SIM-savak-child-scoped-claim-card-audit-ledger",
+    "final_sim_id": "SIM-savak-scoped-claim-card-audit-ledger",
+    "original_proposal_sim_path": "proposals/ga-canary-20260521-011601/simulations/SIM-savak-child-scoped-claim-card-audit-ledger/",
+    "original_proposal_result_path": "proposals/ga-canary-20260521-011601/results/SIM-savak-child-scoped-claim-card-audit-ledger/kernel-porting-boundary/openai-gpt-5.4-xhigh/20260521-011601.json",
+    "canonical_result_path": "results/SIM-savak-scoped-claim-card-audit-ledger/kernel-porting-boundary/openai-gpt-5.4-xhigh/20260521-011601.json",
+    "source_provenance_policy": "Canonical storage identity fields were updated for discoverability; source.* fields intentionally preserve the exact proposal tree and file hashes scored by the LLM before promotion."
+  }
+}

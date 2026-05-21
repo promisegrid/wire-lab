@@ -2,7 +2,7 @@
   "schema": "promisegrid.ga.state.v1",
   "run_group_id": "ga-canary-20260521-003110",
   "created_at": "2026-05-21T00:31:11Z",
-  "updated_at": "2026-05-21T00:43:34Z",
+  "updated_at": "2026-05-21T20:46:36Z",
   "repo_commit": "5f7d5def568fa8cac030d0911a723c4650dada91",
   "model_id": "openai-gpt-5.4-xhigh",
   "population": [
@@ -326,7 +326,7 @@
         }
       ],
       "tree_hash": "fae57d72207b5be2bbae8161e5ecbbe6252b8995c24eab55588d16b4285e9e9f",
-      "status": "generated",
+      "status": "accepted",
       "design_delta_summary": "1) Keep the nested signed payload pattern, but make outer-layer authorship explicit with a mandatory Cryptid-style Multisig attestation slot. 2) Bind that outer attestation to a small role-scoped transcript including role, constraints reference, and freshness reference so origin/holder/relay/forwarder promises are distinguishable. 3) Add explicit dual-proof verification and audit outcomes so unsupported, stale, or partially understood evidence is retained without overclaiming validity.",
       "validation_message": "validated child tree",
       "updated_at": "2026-05-21T00:37:41Z",
@@ -371,7 +371,7 @@
         }
       ],
       "tree_hash": "6065aa187f3360dca3b6e6e8ee7efc3064139acaa2c957aef8efda928bb1da62",
-      "status": "generated",
+      "status": "accepted",
       "design_delta_summary": "Adds a fixed signed outer audit header, keeps a Janov-style nested signed payload whose inner schema can still be Sajar-style variable-arity, and adds universal limits plus schema-discovery references so sparse peers can route and audit unknown payloads without pretending to fully parse them.",
       "validation_message": "validated child tree",
       "updated_at": "2026-05-21T00:40:58Z",
@@ -718,6 +718,24 @@
       "input_tokens": 8133,
       "output_tokens": 5893,
       "cost_usd": 0.09673475
+    }
+  ],
+  "acceptance": [
+    {
+      "accepted_child_ids": [
+        "SIM-maraz-child-signed-summary-header-nested-schema",
+        "SIM-natim-child-nested-payload-outer-attestation-multisig"
+      ],
+      "result_paths": [
+        "proposals/ga-canary-20260521-003110/results/SIM-maraz-child-signed-summary-header-nested-schema/bgp-routing/openai-gpt-5.4-xhigh/20260521-003110.json",
+        "proposals/ga-canary-20260521-003110/results/SIM-maraz-child-signed-summary-header-nested-schema/chunk-feed-replication-sparse-advertisement/openai-gpt-5.4-xhigh/20260521-003110.json",
+        "proposals/ga-canary-20260521-003110/results/SIM-maraz-child-signed-summary-header-nested-schema/conditional-release-geofencing-onward-restraint-chain/openai-gpt-5.4-xhigh/20260521-003110.json",
+        "proposals/ga-canary-20260521-003110/results/SIM-natim-child-nested-payload-outer-attestation-multisig/bgp-routing/openai-gpt-5.4-xhigh/20260521-003110.json",
+        "proposals/ga-canary-20260521-003110/results/SIM-natim-child-nested-payload-outer-attestation-multisig/chunk-feed-replication-sparse-advertisement/openai-gpt-5.4-xhigh/20260521-003110.json",
+        "proposals/ga-canary-20260521-003110/results/SIM-natim-child-nested-payload-outer-attestation-multisig/conditional-release-geofencing-onward-restraint-chain/openai-gpt-5.4-xhigh/20260521-003110.json"
+      ],
+      "reviewer_note": "Promote Maraz and Natim as canonical grid-envelope child-derived specimens under DI-fihub; proposal source remains the scored evidence.",
+      "accepted_at": "2026-05-21T20:46:36Z"
     }
   ]
 }

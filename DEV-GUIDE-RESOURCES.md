@@ -269,15 +269,18 @@ actual independently evolvable specimens. Source: `DI-fanah`;
 
 ### Promoted GA Grid-Envelope Variants
 
-`DI-dipid` promotes two reviewed `ga-canary-20260520-221953` children into
+`DI-dipid` promotes two reviewed `ga-canary-20260520-221953` children, and
+`DI-fihub` promotes two reviewed `ga-canary-20260521-003110` children, into
 canonical non-child simulations. Guide writers may treat them as provisional
-evidence about whether `unknown-quarantine` beats both opaque store/forward and
-hard reject in mixed-version deployments; neither is a settled guide rule.
+evidence about mixed-version quarantine, nested signatures, outer attestations,
+and generic audit visibility; none is a settled guide rule.
 
 | Simulation | What it is for | Encoding | Unknown-pCID policy | Signature policy |
 |---|---|---|---|---|
 | `simulations/SIM-jufag-grid-envelope-quarantine-sig-pcid-outcomes/` | Tests quarantine store/forward with explicit accepted, quarantined, and rejected receiver outcomes. | DAG-CBOR | Quarantine store/forward | Mandatory profiled opaque signature bytes with explicit `sig_pcid` dispatch |
 | `simulations/SIM-bimos-grid-envelope-quarantine-sig-pcid-audit-tuple/` | Tests quarantine as local rejection plus exact-byte evidence relay and a retained local audit tuple. | DAG-CBOR | Quarantine with local rejection/evidence relay | Mandatory `sig_pcid` plus `sig_payload` |
+| `simulations/SIM-maraz-grid-envelope-signed-summary-header-nested-schema/` | Tests a signed universal summary header around a nested pCID-defined signed payload so generic peers can audit sparse evidence without fully understanding the inner schema. | CBOR | Unknown inner schemas retain bounded audit-visible header fields plus opaque nested payload bytes | Outer signed summary header plus nested payload signature |
+| `simulations/SIM-natim-grid-envelope-nested-payload-outer-attestation-multisig/` | Tests a mandatory outer Cryptid-style Multisig attestation over exact nested payload bytes plus role, constraints, and freshness context. | CBOR | Unsupported pCIDs/codecs retain exact bytes with unsupported/quarantine outcomes | Mandatory outer Multisig attestation plus nested payload proof |
 
 ### Grid-Envelope Arity and Nested-Signature Probes
 
@@ -322,6 +325,16 @@ the prose.
 | `FB-zazon`, `FB-robif` | `simulations/SIM-nijuz-multi-embodiment-identity/` | `scenarios/multi-embodiment-app-identity/`; `scenarios/portable-signing-key-identity/` | Provisional multi-host identity and conformance evidence; concrete signing-key recipe remains unsettled. |
 | `FB-vitih`, `FB-mulum`, `FB-potin` | `simulations/SIM-funas-kernel-porting-boundary/` | `scenarios/kernel-porting-boundary/` | Provisional kernel/runtime/dispatcher boundary evidence; settled porting target remains blocked by `DR-davod`. |
 | `FB-gigit` | Existing Laypeople readiness matrix and `DR-napum` | Existing 100-year and governance scenarios | No new sim required; this is a narrative-settlement question rather than a distinct run surface. |
+
+`DI-fihub` also promotes two GA-derived guide-feedback specimens from
+`ga-canary-20260521-011601`. They are provisional evidence homes for stronger
+claim/conformance shapes bred from the guide-feedback sims above, not settled
+guide prose and not a final app SDK.
+
+| Promoted simulation | What it is for | Guide-writer status |
+|---|---|---|
+| `simulations/SIM-savak-scoped-claim-card-audit-ledger/` | Tests scoped claim cards, exact audit-anchor citations, and peer-local promise-accounting records across app, live/audit, blob, device, embodiment, signing-key, and kernel-porting pressures. | Provisional child-derived guide-feedback evidence. |
+| `simulations/SIM-tizad-scoped-conformance-citation-ledger/` | Tests scoped conformance manifests, durable citation records, and guide-safe partial-conformance claims across the same guide-feedback pressure set. | Provisional child-derived guide-feedback evidence. |
 
 ## Audience Readiness Matrix
 

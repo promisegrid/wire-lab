@@ -751,8 +751,8 @@ func TestRunGenerateSelectsParentsByFitnessEvidence(t *testing.T) {
 			if !strings.Contains(request.Prompt, "breed a child simulation from exactly two parent simulations") || !strings.Contains(request.Prompt, "- Operation: `breed`") {
 				return ProviderResponse{}, fmt.Errorf("generate prompt missing breed operator language")
 			}
-			if !strings.Contains(request.Prompt, "## Compact Fitness Evidence From This Run") || !strings.Contains(request.Prompt, "normalized_0_100=95.00") {
-				return ProviderResponse{}, fmt.Errorf("generate prompt missing high parent fitness evidence")
+			if !strings.Contains(request.Prompt, "## Compact Fitness Evidence From This Run") || !strings.Contains(request.Prompt, "normalized_0_100=") {
+				return ProviderResponse{}, fmt.Errorf("generate prompt missing selected parent fitness evidence")
 			}
 			if strings.Contains(request.Prompt, "\"schema\":") || strings.Contains(request.Prompt, "\"runner\":") {
 				return ProviderResponse{}, fmt.Errorf("generate prompt should not embed complete fitness JSON")
@@ -799,42 +799,49 @@ func TestRunGenerateSelectsParentsByFitnessEvidence(t *testing.T) {
 		t.Fatalf("parents were not fitness-ranked: %#v", state.Parents)
 	}
 	for _, child := range state.Children {
-		if child.Operation != childOperationBreed || len(child.ParentIDs) != 2 || child.ParentIDs[0] != "SIM-high" {
-			t.Fatalf("child did not breed top parent with random scored diversity: %#v", child)
+		if child.Operation != childOperationBreed || len(child.ParentIDs) != 2 {
+			t.Fatalf("child did not breed two scored parents: %#v", child)
 		}
-		if child.ParentIDs[1] == "SIM-high" {
-			t.Fatalf("breed reused top parent twice: %#v", child)
+		if child.ParentIDs[0] == child.ParentIDs[1] {
+			t.Fatalf("breed reused the same parent twice: %#v", child)
 		}
-		if child.ParentIDs[1] != "SIM-parent" && child.ParentIDs[1] != "SIM-low" {
-			t.Fatalf("second parent was not selected from scored non-top parents: %#v", child)
+		for _, parentID := range child.ParentIDs {
+			if parentID != "SIM-high" && parentID != "SIM-parent" && parentID != "SIM-low" {
+				t.Fatalf("parent was not selected from scored parents: %#v", child)
+			}
 		}
 	}
 }
 
-func TestParentSelectionUsesTopPlusUniformRandomScoredParent(t *testing.T) {
+func TestParentSelectionUsesWeightedHighPlusUniformRandomScoredParent(t *testing.T) {
 	state := GAState{RunGroupID: "ga-select"}
 	ranked := []parentFitnessRank{
 		{SimID: "SIM-high", AverageNormalized: 95, Samples: 3},
 		{SimID: "SIM-mid", AverageNormalized: 60, Samples: 3},
 		{SimID: "SIM-low", AverageNormalized: 20, Samples: 3},
 	}
+	seenFirstParents := map[string]int{}
 	seenSecondParents := map[string]bool{}
-	for index := 0; index < 40; index++ {
+	for index := 0; index < 600; index++ {
 		child := GAChild{ChildID: fmt.Sprintf("SIM-child-%02d", index)}
 		parentIDs, ok := parentSelectionForChild(state, ranked, child, index)
 		if !ok {
 			t.Fatalf("expected parent selection for child %d", index)
 		}
-		if len(parentIDs) != 2 || parentIDs[0] != "SIM-high" {
-			t.Fatalf("top parent was not fixed first: %#v", parentIDs)
+		if len(parentIDs) != 2 {
+			t.Fatalf("expected two parents: %#v", parentIDs)
 		}
-		if parentIDs[1] == "SIM-high" {
-			t.Fatalf("random parent reused top parent: %#v", parentIDs)
+		if parentIDs[0] == parentIDs[1] {
+			t.Fatalf("random parent reused high parent: %#v", parentIDs)
 		}
+		seenFirstParents[parentIDs[0]]++
 		seenSecondParents[parentIDs[1]] = true
 	}
-	if !seenSecondParents["SIM-mid"] || !seenSecondParents["SIM-low"] {
-		t.Fatalf("uniform random scored parent did not sample both non-top parents: %#v", seenSecondParents)
+	if seenFirstParents["SIM-high"] <= seenFirstParents["SIM-mid"] || seenFirstParents["SIM-mid"] <= seenFirstParents["SIM-low"] {
+		t.Fatalf("weighted high parent did not favor higher ranks: %#v", seenFirstParents)
+	}
+	if !seenSecondParents["SIM-high"] || !seenSecondParents["SIM-mid"] || !seenSecondParents["SIM-low"] {
+		t.Fatalf("uniform random scored parent did not preserve full diversity after exclusion: %#v", seenSecondParents)
 	}
 }
 

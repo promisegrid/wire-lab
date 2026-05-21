@@ -814,6 +814,80 @@ Affects: `tools/ga-runner/PROMOTION.md`; `tools/ga-runner/README.md`;
 `results/RUN-PROTOCOL.md`;
 `protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`.
 
+ID: DI-fihub
+Date: 2026-05-21 13:45:38
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Promote the Maraz, Natim, Savak, and Tizad GA child proposals as
+canonical non-child simulation specimens with copied canonical JSON score
+evidence and preserved proposal-source provenance.
+Intent: Steve selected `maraz`, `natim`, `savak`, and `tizad` after the
+proposal review/evaluation pass. Maraz and Natim extend the grid-envelope
+arity/signature/proof exploration, while Savak and Tizad extend the guide-facing
+claim/conformance evidence family. Promotion should make those specimens
+discoverable and runnable without pretending the LLM scored the cleaned
+canonical trees rather than the ignored proposal trees.
+Constraints: Promote `SIM-maraz-child-signed-summary-header-nested-schema` from
+`ga-canary-20260521-003110` as
+`SIM-maraz-grid-envelope-signed-summary-header-nested-schema`; promote
+`SIM-natim-child-nested-payload-outer-attestation-multisig` from
+`ga-canary-20260521-003110` as
+`SIM-natim-grid-envelope-nested-payload-outer-attestation-multisig`; promote
+`SIM-savak-child-scoped-claim-card-audit-ledger` from
+`ga-canary-20260521-011601` as
+`SIM-savak-scoped-claim-card-audit-ledger`; promote
+`SIM-tizad-child-scoped-conformance-citation-ledger` from
+`ga-canary-20260521-011601` as
+`SIM-tizad-scoped-conformance-citation-ledger`. Copy proposal trees and result
+JSONs rather than moving or culling ignored proposal artifacts. Update canonical
+result storage identity fields while preserving `source.*` fields that point at
+the exact proposal tree scored by the LLM, and add explicit promotion metadata
+with this DI. Add missing grid-envelope manifests to the promoted Maraz and
+Natim canonical trees so they match comparable promoted grid-envelope specimens.
+Affects: `proposals/ga-canary-20260521-003110/`;
+`proposals/ga-canary-20260521-011601/`;
+`results/state/ga-canary-20260521-003110.json`;
+`results/state/ga-canary-20260521-011601.json`;
+`simulations/SIM-maraz-grid-envelope-signed-summary-header-nested-schema/`;
+`simulations/SIM-natim-grid-envelope-nested-payload-outer-attestation-multisig/`;
+`simulations/SIM-savak-scoped-claim-card-audit-ledger/`;
+`simulations/SIM-tizad-scoped-conformance-citation-ledger/`;
+`results/SIM-maraz-grid-envelope-signed-summary-header-nested-schema/`;
+`results/SIM-natim-grid-envelope-nested-payload-outer-attestation-multisig/`;
+`results/SIM-savak-scoped-claim-card-audit-ledger/`;
+`results/SIM-tizad-scoped-conformance-citation-ledger/`;
+`simulations/README.md`; `DEV-GUIDE-RESOURCES.md`;
+`protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`.
+
+ID: DI-puhog
+Date: 2026-05-21 13:54:46
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Replace GA child-generation parent selection from deterministic
+top-parent plus uniform random scored parent to deterministic weighted-high plus
+uniform random scored parent. The high parent uses linear rank weights over the
+fitness-ranked scored parent pool, with weights `n, n-1, ..., 1` from best rank
+to worst rank; the second parent remains uniformly selected from the other
+scored parents using the existing deterministic seed inputs.
+Intent: Steve asked for `high + random` instead of `top + random`: the first
+parent should still be biased toward better completed parent fitness evidence,
+but it should not always be the single highest-scoring parent. Linear rank
+weighting is bounded, keeps every scored parent reachable, preserves
+deterministic resumability from run/child/selection inputs, and avoids adding
+public flags before canary evidence proves a need for tuning knobs.
+Constraints: Preserve the existing parent ranking criterion: average completed
+parent `fitness.normalized_0_100`, descending, with `SimID` as the tie-breaker.
+Keep exactly two distinct `breed` parents. Preserve the second parent's uniform
+random diversity over scored non-high parents. Use private helper names for the
+implementation (`weightedHighParent` and `deterministicUint64`) and avoid new
+public flags or state schema fields. Do not touch in-progress promotion
+artifacts outside the GA-runner implementation, directly related tests/docs,
+and this append-only DI.
+Affects: `tools/ga-runner/generate.go`; `tools/ga-runner/ga_runner_test.go`;
+`tools/ga-runner/README.md`;
+`protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`.
+Supersedes: `DI-tufud` highest-scoring first-parent selection only.
+
 ## Scope
 
 - Define and implement a new GA/search runner without changing

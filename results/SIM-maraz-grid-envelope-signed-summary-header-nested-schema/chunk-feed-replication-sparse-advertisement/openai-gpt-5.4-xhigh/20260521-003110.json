@@ -1,0 +1,133 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-maraz-grid-envelope-signed-summary-header-nested-schema-chunk-feed-replication-sparse-advertisement-openai-gpt-5.4-xhigh-20260521-003110",
+  "run_group_id": "ga-canary-20260521-003110",
+  "cell_id": "ga-canary-20260521-003110-000013-SIM-maraz-child-signed-summary-header-nested-schema--chunk-feed-replication-sparse-advertisement--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-maraz-grid-envelope-signed-summary-header-nested-schema",
+  "scenario_id": "chunk-feed-replication-sparse-advertisement",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260521-003110",
+  "result_path": "results/SIM-maraz-grid-envelope-signed-summary-header-nested-schema/chunk-feed-replication-sparse-advertisement/openai-gpt-5.4-xhigh/20260521-003110.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_d25dccfc68fe429c8d9205e05fc66112",
+    "response_id": "resp_01dacaf28bc325a2006a0e54afc2fc819aa3931d57a5565364",
+    "input_tokens": 8072,
+    "output_tokens": 6556,
+    "cost_usd": 0.10591
+  },
+  "source": {
+    "repo_commit": "5f7d5def568fa8cac030d0911a723c4650dada91",
+    "sim_path": "proposals/ga-canary-20260521-003110/simulations/SIM-maraz-child-signed-summary-header-nested-schema/",
+    "scenario_path": "scenarios/chunk-feed-replication-sparse-advertisement/chunk-feed-replication-sparse-advertisement.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "8a3cb036c4849e8e694c94f004100a68495ad1287ff01291711b43aa19ad270b"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "proposals/ga-canary-20260521-003110/simulations/SIM-maraz-child-signed-summary-header-nested-schema/README.md",
+        "sha256": "c124825641868e4371ea280928198ad1937e19030214f8f801c997c6eb3f9eb3"
+      },
+      {
+        "path": "proposals/ga-canary-20260521-003110/simulations/SIM-maraz-child-signed-summary-header-nested-schema/QUESTION.md",
+        "sha256": "f758bb360f4928cc7484991fd910edfefbd45232c81b7615ad019694b3eace78"
+      },
+      {
+        "path": "proposals/ga-canary-20260521-003110/simulations/SIM-maraz-child-signed-summary-header-nested-schema/protocols/grid-envelope.d/CHANGELOG.md",
+        "sha256": "a9a8e8552df14c3ec7e9d7d116b970cce67e67c4084ef3c6c7e172e8f65dc16d"
+      },
+      {
+        "path": "proposals/ga-canary-20260521-003110/simulations/SIM-maraz-child-signed-summary-header-nested-schema/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "a4bef02f232a36b9b4886a684b9e5d121ec67e0cfbfb1f9bfc54f8a6c77f63b6"
+      },
+      {
+        "path": "scenarios/chunk-feed-replication-sparse-advertisement/chunk-feed-replication-sparse-advertisement.md",
+        "sha256": "c922519634c8a9de3dc7e3501a523d7dd816875178e22b60d4920750232a2b0b"
+      }
+    ],
+    "simulation_tree_hash": "6065aa187f3360dca3b6e6e8ee7efc3064139acaa2c957aef8efda928bb1da62"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 4,
+    "promisegrid_alignment": 4,
+    "auditability": 5,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 4,
+    "implementation_plausibility": 4,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 33,
+    "normalized_0_100": 83,
+    "confidence_0_1": 0.82
+  },
+  "assessment": {
+    "rationale": "Strong envelope-level answer to sparse advertisement: a signed outer header exposes summary refs, class, signer, and freshness to peers that lack the inner schema, while nested signed payloads preserve evolvable content semantics. It stops short of a full chunk-feed replication design and still carries risk from lossy header projection, fixed class vocabulary, and optional schema recovery.",
+    "strengths": [
+      "Signed outer header makes advertised roots/frontiers/pointer summaries visible under sparse knowledge.",
+      "Separate outer and inner signatures clarify carriage endorsement versus payload authorship.",
+      "Unknown-pCID rules, canonical encoding, and size limits improve generic audit and bounded handling.",
+      "schema_ref and content_pcid preserve an evolution path for later schema recovery."
+    ],
+    "weaknesses": [
+      "It is not itself a chunk-feed replication protocol and leaves feed-specific advertisement semantics unspecified.",
+      "summary_refs are only a compact projection, so important replication meaning can remain opaque.",
+      "schema_ref is optional, weakening very long-term audit for old unknown payload schemas."
+    ],
+    "risks": [
+      "Generic peers may overtrust header summaries they cannot fully cross-check against inner semantics.",
+      "The fixed msg_class set may ossify or be overloaded as workloads evolve.",
+      "Dual-signature verification and signer_ref resolution add interoperability complexity."
+    ],
+    "open_questions": [
+      "Should schema_ref be mandatory for durable audit of unknown content_pcid values?",
+      "Are summary_refs enough for frontier/leaf/pointer advertisement, or is another universal field needed?",
+      "How should peers treat later-discovered divergence between header projection and inner payload meaning?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  },
+  "promotion": {
+    "promotion_di": "DI-fihub",
+    "run_group_id": "ga-canary-20260521-003110",
+    "original_child_sim_id": "SIM-maraz-child-signed-summary-header-nested-schema",
+    "final_sim_id": "SIM-maraz-grid-envelope-signed-summary-header-nested-schema",
+    "original_proposal_sim_path": "proposals/ga-canary-20260521-003110/simulations/SIM-maraz-child-signed-summary-header-nested-schema/",
+    "original_proposal_result_path": "proposals/ga-canary-20260521-003110/results/SIM-maraz-child-signed-summary-header-nested-schema/chunk-feed-replication-sparse-advertisement/openai-gpt-5.4-xhigh/20260521-003110.json",
+    "canonical_result_path": "results/SIM-maraz-grid-envelope-signed-summary-header-nested-schema/chunk-feed-replication-sparse-advertisement/openai-gpt-5.4-xhigh/20260521-003110.json",
+    "source_provenance_policy": "Canonical storage identity fields were updated for discoverability; source.* fields intentionally preserve the exact proposal tree and file hashes scored by the LLM before promotion."
+  }
+}

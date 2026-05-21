@@ -1,0 +1,131 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-maraz-grid-envelope-signed-summary-header-nested-schema-bgp-routing-openai-gpt-5.4-xhigh-20260521-003110",
+  "run_group_id": "ga-canary-20260521-003110",
+  "cell_id": "ga-canary-20260521-003110-000015-SIM-maraz-child-signed-summary-header-nested-schema--bgp-routing--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-maraz-grid-envelope-signed-summary-header-nested-schema",
+  "scenario_id": "bgp-routing",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260521-003110",
+  "result_path": "results/SIM-maraz-grid-envelope-signed-summary-header-nested-schema/bgp-routing/openai-gpt-5.4-xhigh/20260521-003110.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_bf4de6561fae483596836b699e88305b",
+    "response_id": "resp_02beacd78b57d66c006a0e54afc3e8819ab89bc1940153021d",
+    "input_tokens": 8133,
+    "output_tokens": 5893,
+    "cost_usd": 0.09673475
+  },
+  "source": {
+    "repo_commit": "5f7d5def568fa8cac030d0911a723c4650dada91",
+    "sim_path": "proposals/ga-canary-20260521-003110/simulations/SIM-maraz-child-signed-summary-header-nested-schema/",
+    "scenario_path": "scenarios/bgp-routing/bgp-routing.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "8a3cb036c4849e8e694c94f004100a68495ad1287ff01291711b43aa19ad270b"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "proposals/ga-canary-20260521-003110/simulations/SIM-maraz-child-signed-summary-header-nested-schema/README.md",
+        "sha256": "c124825641868e4371ea280928198ad1937e19030214f8f801c997c6eb3f9eb3"
+      },
+      {
+        "path": "proposals/ga-canary-20260521-003110/simulations/SIM-maraz-child-signed-summary-header-nested-schema/QUESTION.md",
+        "sha256": "f758bb360f4928cc7484991fd910edfefbd45232c81b7615ad019694b3eace78"
+      },
+      {
+        "path": "proposals/ga-canary-20260521-003110/simulations/SIM-maraz-child-signed-summary-header-nested-schema/protocols/grid-envelope.d/CHANGELOG.md",
+        "sha256": "a9a8e8552df14c3ec7e9d7d116b970cce67e67c4084ef3c6c7e172e8f65dc16d"
+      },
+      {
+        "path": "proposals/ga-canary-20260521-003110/simulations/SIM-maraz-child-signed-summary-header-nested-schema/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "a4bef02f232a36b9b4886a684b9e5d121ec67e0cfbfb1f9bfc54f8a6c77f63b6"
+      },
+      {
+        "path": "scenarios/bgp-routing/bgp-routing.md",
+        "sha256": "90a37247bb6cc291809077f99ef95c4c74865a657b8e5c5c164cce6ef330b17f"
+      }
+    ],
+    "simulation_tree_hash": "6065aa187f3360dca3b6e6e8ee7efc3064139acaa2c957aef8efda928bb1da62"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 4,
+    "promisegrid_alignment": 4,
+    "auditability": 4,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 4,
+    "implementation_plausibility": 4,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 27,
+    "normalized_0_100": 77,
+    "confidence_0_1": 0.82
+  },
+  "assessment": {
+    "rationale": "Strong envelope-level support for contested BGP-style evidence: generic peers can verify relay endorsement, index route claims and withdrawals, follow related evidence, and apply freshness without full inner-schema knowledge. The main limitation is that routing policy, path semantics, naming, and accept/downgrade logic still live outside the universal header.",
+    "strengths": [
+      "Distinct outer and inner signatures separate propagation endorsement from route-origin claim.",
+      "summary_refs, related_ref, and freshness support sparse local audit of claims, withdrawals, supersession, and disputes.",
+      "Fixed outer bounds with pCID-bound inner schemas improve generic handling while preserving evolution room."
+    ],
+    "weaknesses": [
+      "It does not define routing policy, path validation, or peer decision rules for hijacks and leaks.",
+      "Fixed msg_class and compact header projection may be too coarse for some routing disputes.",
+      "Optional schema_ref leaves long-term recovery of unknown inner route schemas brittle."
+    ],
+    "risks": [
+      "Senders can under-project or strategically choose summary_refs, biasing generic audit.",
+      "signer_ref trust and relay-versus-origin role conventions remain underspecified."
+    ],
+    "open_questions": [
+      "Should schema_ref be mandatory for route evidence intended for long-term audit?",
+      "Do BGP-like cases need universal path-lineage or policy-scope fields beyond msg_class and summary_refs?",
+      "How should peers treat envelopes with valid outer endorsement but unverifiable or unknown inner claims?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  },
+  "promotion": {
+    "promotion_di": "DI-fihub",
+    "run_group_id": "ga-canary-20260521-003110",
+    "original_child_sim_id": "SIM-maraz-child-signed-summary-header-nested-schema",
+    "final_sim_id": "SIM-maraz-grid-envelope-signed-summary-header-nested-schema",
+    "original_proposal_sim_path": "proposals/ga-canary-20260521-003110/simulations/SIM-maraz-child-signed-summary-header-nested-schema/",
+    "original_proposal_result_path": "proposals/ga-canary-20260521-003110/results/SIM-maraz-child-signed-summary-header-nested-schema/bgp-routing/openai-gpt-5.4-xhigh/20260521-003110.json",
+    "canonical_result_path": "results/SIM-maraz-grid-envelope-signed-summary-header-nested-schema/bgp-routing/openai-gpt-5.4-xhigh/20260521-003110.json",
+    "source_provenance_policy": "Canonical storage identity fields were updated for discoverability; source.* fields intentionally preserve the exact proposal tree and file hashes scored by the LLM before promotion."
+  }
+}

@@ -1,0 +1,3 @@
+# Question
+
+Can a grid envelope improve auditability and scenario fit by combining a nested signed payload with a mandatory outer Cryptid-style Multisig attestation that signs the exact nested payload bytes plus a small role/constraints/freshness transcript, so receivers can distinguish payload authorship from current-origin, holder, relay, or forwarder promises without hidden transport identity assumptions?
