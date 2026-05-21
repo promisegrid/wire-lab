@@ -1,0 +1,115 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-nijuz-multi-embodiment-identity-multi-embodiment-app-identity-openai-gpt-5.4-xhigh-20260521-011601",
+  "run_group_id": "ga-canary-20260521-011601",
+  "cell_id": "ga-canary-20260521-011601-000033-SIM-nijuz-multi-embodiment-identity--multi-embodiment-app-identity--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-nijuz-multi-embodiment-identity",
+  "scenario_id": "multi-embodiment-app-identity",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260521-011601",
+  "result_path": "results/SIM-nijuz-multi-embodiment-identity/multi-embodiment-app-identity/openai-gpt-5.4-xhigh/20260521-011601.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_0328937cc5194a4ebba722014beeacde",
+    "response_id": "resp_03579f7485eeed2f006a0e5eecea6c81988713de56cbe08f6f",
+    "input_tokens": 6280,
+    "output_tokens": 9486,
+    "cost_usd": 0.143794
+  },
+  "source": {
+    "repo_commit": "dd50f76bf5d5eeffc699bc0e5b542c86b7c3e196",
+    "sim_path": "simulations/SIM-nijuz-multi-embodiment-identity/",
+    "scenario_path": "scenarios/multi-embodiment-app-identity/multi-embodiment-app-identity.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "8a3cb036c4849e8e694c94f004100a68495ad1287ff01291711b43aa19ad270b"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-nijuz-multi-embodiment-identity/README.md",
+        "sha256": "e965c63e7f5c8c0f37014f713aa9ab13dfd63d09f227c1cb684a9208b4d65ecc"
+      },
+      {
+        "path": "simulations/SIM-nijuz-multi-embodiment-identity/QUESTION.md",
+        "sha256": "45eb7527cbfd32de80eb829e8452bb29864569bd5d2f2db04210f826fdcbc29b"
+      },
+      {
+        "path": "scenarios/multi-embodiment-app-identity/multi-embodiment-app-identity.md",
+        "sha256": "e05f78b9d46c47acecbf430a12fda015268e17d60fbea9e0609fa11e604e52cc"
+      }
+    ],
+    "simulation_tree_hash": "f4f9f7df1f6fb39e72cdd5f6e792f278a36d400239ad6372909005125a92dab4"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 5,
+    "promisegrid_alignment": 3,
+    "auditability": 4,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 2,
+    "implementation_plausibility": 3,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 29,
+    "normalized_0_100": 73,
+    "confidence_0_1": 0.73
+  },
+  "assessment": {
+    "rationale": "Very strong scenario match with especially clear one-app versus per-embodiment contract boundaries, but it remains a provisional framing exercise rather than a fully specified identity, recovery, and audit pattern.",
+    "strengths": [
+      "Nearly exact fit to the browser-plus-helper/plugin multi-embodiment identity pressure.",
+      "Clear boundary that each embodiment claims only the contract parts it actually implements.",
+      "Strong audit/evolution instinct: durable signing identity is separated from UI names, and key/storage guidance is kept provisional."
+    ],
+    "weaknesses": [
+      "Mostly frames the problem; it does not yet define a concrete claim schema, handshake, or durable audit record.",
+      "Sparse-knowledge, peer-local accounting, and no-central-authority mechanics are not made explicit.",
+      "Browser storage loss, helper upgrades, version skew, and embodiment replacement are not operationalized."
+    ],
+    "risks": [
+      "Provisional signing-key guidance could harden too early before binding and rotation decisions are settled.",
+      "Mallory can exploit ambiguity between 'same UX app' and 'same protocol contract' if conformance claims stay under-specified.",
+      "Identity continuity may fail on host replacement or storage loss without a durable local evidence story."
+    ],
+    "open_questions": [
+      "What exact fields must a per-embodiment conformance claim publish?",
+      "Is the right shape one shared contract with partial claims or a small family of related contracts?",
+      "How are signing keys generated, rotated, and rebound across browser-only and helper-backed hosts?",
+      "What locally observable records let Carol audit continuity after storage loss, upgrade, or embodiment replacement?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

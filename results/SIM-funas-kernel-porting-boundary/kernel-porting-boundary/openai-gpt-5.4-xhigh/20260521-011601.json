@@ -1,0 +1,115 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-funas-kernel-porting-boundary-kernel-porting-boundary-openai-gpt-5.4-xhigh-20260521-011601",
+  "run_group_id": "ga-canary-20260521-011601",
+  "cell_id": "ga-canary-20260521-011601-000042-SIM-funas-kernel-porting-boundary--kernel-porting-boundary--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-funas-kernel-porting-boundary",
+  "scenario_id": "kernel-porting-boundary",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260521-011601",
+  "result_path": "results/SIM-funas-kernel-porting-boundary/kernel-porting-boundary/openai-gpt-5.4-xhigh/20260521-011601.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_917c06ff412040c5aa96baa50517de4e",
+    "response_id": "resp_0ac7e238eb04212b006a0e5fa780d8819aa0eaa864c67983cf",
+    "input_tokens": 6231,
+    "output_tokens": 6475,
+    "cost_usd": 0.10155425
+  },
+  "source": {
+    "repo_commit": "dd50f76bf5d5eeffc699bc0e5b542c86b7c3e196",
+    "sim_path": "simulations/SIM-funas-kernel-porting-boundary/",
+    "scenario_path": "scenarios/kernel-porting-boundary/kernel-porting-boundary.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "8a3cb036c4849e8e694c94f004100a68495ad1287ff01291711b43aa19ad270b"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-funas-kernel-porting-boundary/README.md",
+        "sha256": "7610bd7589d30cbc7054afd5ec64be256ec3048adc6135cf2a85c48fa94c2363"
+      },
+      {
+        "path": "simulations/SIM-funas-kernel-porting-boundary/QUESTION.md",
+        "sha256": "c9b86b2a64e4a8ed5cebea5048ad7908752f168d36d68e9ff0c00d2542187486"
+      },
+      {
+        "path": "scenarios/kernel-porting-boundary/kernel-porting-boundary.md",
+        "sha256": "d1646fa062e6c64f27cbbd25da0e96f6d484c60582677cdfc798d265a22d5096"
+      }
+    ],
+    "simulation_tree_hash": "3036063b40b8f7f00637b0135a1962f32775f8d0abb3406a49cb169d7048cfe6"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 5,
+    "promisegrid_alignment": 3,
+    "auditability": 4,
+    "evolution_safety": 5,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 3,
+    "implementation_plausibility": 3,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 25,
+    "normalized_0_100": 71.4,
+    "confidence_0_1": 0.82
+  },
+  "assessment": {
+    "rationale": "Direct hit on the scenario: it frames the unsettled kernel/runtime porting boundary, rejects treating the wire-lab harness as the porting target, and preserves future frozen-spec evolution, but it is still a provisional framing aid more than a concrete first-port contract.",
+    "strengths": [
+      "Targets the exact developer-facing porting-boundary question.",
+      "Explicitly separates provisional guidance from blocked final obligations.",
+      "Protects future frozen-spec conformance by avoiding a false harness target."
+    ],
+    "weaknesses": [
+      "Does not yet define a concrete minimum viable port checklist.",
+      "Layer assignments are identified as decision axes more than settled rules.",
+      "PromiseGrid-wide goals like sparse knowledge and peer-local accounting are only implicit."
+    ],
+    "risks": [
+      "Provisional kernel terminology could ossify into a misleading implementation target.",
+      "Draft runtime or harness details may leak into claimed conformance too early.",
+      "Different porters could make incompatible first-port claims before DR-davod closes."
+    ],
+    "open_questions": [
+      "Should the guide say kernel, runtime, dispatcher, handler host, or library?",
+      "Which frozen binding/session/message/CAS specs define the first real port?",
+      "How should a conformance claim mark draft-followed behavior versus deferred obligations?",
+      "Which K1-K5, feed, CAS, session, and app-layer details stay orientation-only for now?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

@@ -1,0 +1,114 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-mikas-minimal-blob-app-contract-kernel-porting-boundary-openai-gpt-5.4-xhigh-20260521-011601",
+  "run_group_id": "ga-canary-20260521-011601",
+  "cell_id": "ga-canary-20260521-011601-000007-SIM-mikas-minimal-blob-app-contract--kernel-porting-boundary--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-mikas-minimal-blob-app-contract",
+  "scenario_id": "kernel-porting-boundary",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260521-011601",
+  "result_path": "results/SIM-mikas-minimal-blob-app-contract/kernel-porting-boundary/openai-gpt-5.4-xhigh/20260521-011601.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_49ad60e5ddc94141805c1699fc9d238e",
+    "response_id": "resp_05a53bb1701dc96f006a0e5d1f5dd881988ca00b0f9ccaf507",
+    "input_tokens": 6274,
+    "output_tokens": 7401,
+    "cost_usd": 0.1145935
+  },
+  "source": {
+    "repo_commit": "dd50f76bf5d5eeffc699bc0e5b542c86b7c3e196",
+    "sim_path": "simulations/SIM-mikas-minimal-blob-app-contract/",
+    "scenario_path": "scenarios/kernel-porting-boundary/kernel-porting-boundary.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "8a3cb036c4849e8e694c94f004100a68495ad1287ff01291711b43aa19ad270b"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-mikas-minimal-blob-app-contract/README.md",
+        "sha256": "0c4755add75a4aed9913cbcf3271eb4faf20db662cb7993921d8c4b684c1bf60"
+      },
+      {
+        "path": "simulations/SIM-mikas-minimal-blob-app-contract/QUESTION.md",
+        "sha256": "546fe58b588d2a8057994b8d12f0e770b389a3591d401d76d61ab6f4d407bd03"
+      },
+      {
+        "path": "scenarios/kernel-porting-boundary/kernel-porting-boundary.md",
+        "sha256": "d1646fa062e6c64f27cbbd25da0e96f6d484c60582677cdfc798d265a22d5096"
+      }
+    ],
+    "simulation_tree_hash": "97358511b9d6fdb6a02c37fd0722f03dafb09104268a3c034a920d71dd711c93"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 3,
+    "auditability": 3,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 2,
+    "failure_handling": 2,
+    "implementation_plausibility": 2,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 14,
+    "normalized_0_100": 40,
+    "confidence_0_1": 0.85
+  },
+  "assessment": {
+    "rationale": "Partial fit only on the scenario's CAS/app-layer blocked-vs-provisional question. The simulation is strong at limiting what a blob app may assume and at marking replication, discovery, retention, and hash semantics as host- or spec-defined. It is weak for the core kernel-porting task because it does not define a minimum port target, separate harness from target, or stage binding/session/message/runtime conformance pending DR-davod.",
+    "strengths": [
+      "Clear provisional CAS/app contract with explicit host-defined retention, replication, and discovery boundaries.",
+      "Good evolution posture: draft-only framing, open-DR awareness, and 100-year survival emphasis.",
+      "Avoids overpromising universal availability or hash-as-capability semantics."
+    ],
+    "weaknesses": [
+      "Not centered on porting a PromiseGrid kernel/runtime/library stack.",
+      "Does not directly separate wire-lab harness apparatus from real porting obligations.",
+      "Provides little guidance on provisional binding, session, message, and runtime conformance."
+    ],
+    "risks": [
+      "Porters could misread app-layer CAS guidance as the minimum platform contract.",
+      "Mallory-style confusion between harness behavior and true port target remains unresolved.",
+      "A conformance claim built on this alone could omit non-CAS obligations while sounding complete."
+    ],
+    "open_questions": [
+      "Which blob/CAS assumptions belong only in app docs versus the porting guide?",
+      "What provisional CAS obligations, if any, should a first port claim before DR-davod closes?",
+      "How should future frozen specs separate port-target duties from host policy and app conventions?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

@@ -1,3 +1,27 @@
+# GA Score Cell
+
+Return only JSON with keys `scores`, `fitness`, and `assessment`.
+Do not include result identity, source metadata, code fences, or commentary.
+
+## Cell
+
+- Run group ID: `ga-canary-20260521-011601`
+- Cell ID: `ga-canary-20260521-011601-000024-SIM-kugap-live-sync-audit-split--device-bound-agent-physical-effect--openai-gpt-5.4-xhigh`
+- Simulation ID: `SIM-kugap-live-sync-audit-split`
+- Scenario ID: `device-bound-agent-physical-effect`
+- Model ID: `openai-gpt-5.4-xhigh`
+- Result path: `results/SIM-kugap-live-sync-audit-split/device-bound-agent-physical-effect/openai-gpt-5.4-xhigh/20260521-011601.json`
+
+## Rubric
+
+Score each axis from 0 to 5. Higher is better except `risk_penalty`, where 0 is low risk and 5 is severe risk.
+Axes: scenario_fit, promisegrid_alignment, auditability, evolution_safety, layer_boundary_clarity, failure_handling, implementation_plausibility, risk_penalty.
+
+## Source Documents
+
+### `results/RUN-PROTOCOL.md`
+
+```markdown
 # Results Run Protocol
 
 This document defines operational contracts for result evidence under `results/`.
@@ -240,12 +264,10 @@ Generated children are ignored review-stage
 `proposals/<run-group-id>/results/<SIM-id>/` score evidence. They are not
 accepted merely because they exist on disk. A review/promotion pass should
 rename selected children to final descriptive non-child `SIM-*` names, fill any
-missing standing simulation files, and copy selected score evidence into
-canonical `results/` before commit. The detailed operator procedure is
-`tools/ga-runner/PROMOTION.md`, used when Steve says
-`promote <child-proquint> ...`. Source: `DI-ramar`; `DI-zanon`; `DI-zohal`;
+missing standing simulation files, and move selected score evidence into
+canonical `results/` before commit. Source: `DI-ramar`; `DI-zanon`; `DI-zohal`;
 `DI-zusit`; `DI-podot`; `DI-kofil`; `DI-ruzaj`; `DI-gijom`; `DI-fihof`;
-`DI-lirat`; `DI-dikoh`.
+`DI-lirat`.
 
 LLM-generated children use one operation, `breed`, with exactly two distinct
 parent simulations. The runner must fail or skip generation rather than create a
@@ -285,3 +307,287 @@ Source: `DI-dilaf`.
    `cd tools/matrix-runner && go run . validate -repo-root ../.. -manifest <manifest.csv>`.
 6. Generate inspection views from the result tree as needed:
    `cd tools/matrix-runner && go run . view -repo-root ../.. -model <model-id>`.
+```
+
+### `scenarios/README.md`
+
+```markdown
+# Root Scenarios
+
+Root `scenarios/` entries are wire-lab comparison apparatus. They describe
+pressure that multiple simulations can be run against; they are not PromiseGrid
+node layout, production API, shared protocol components, or simulation-local
+world state. Source: `DI-faros`; `DI-vabor`; `DI-dimas`; `DI-kizal`.
+
+## Directory Shape
+
+Each root scenario entry uses this shape:
+
+```text
+scenarios/
+  <scenario-id>/
+    <scenario-id>.md
+```
+
+- `<scenario-id>` is stable kebab-case.
+- Application entries use one `scenarios/<application-id>/` directory per
+  application, such as `scenarios/bgp-routing/`.
+- Mined simulation rows use one root scenario entry per source row, transformed
+  for cross-simulation comparison and linked back to the source
+  `simulations/.../SCENARIOS.md` row.
+- Per-scenario `README.md` files are intentionally absent. Shared scenario
+  contract prose lives here so API prompts can reuse the same cacheable context,
+  while `scenarios/<scenario-id>/<scenario-id>.md` files carry only
+  scenario-specific pressure. Source: `DI-kizal`.
+- Result evidence lives only under
+  `results/<sim-id>/<scenario-id>/<model-id>/<YYYYMMDD-HHMMSS>.md`. Generate
+  scan tables from that result tree when needed. Source: `DI-zamin`.
+
+## Scenario Entry Template
+
+Use this template for each scenario markdown file:
+
+```markdown
+# <Scenario Title>
+
+## Scenario ID
+
+<stable-kebab-case-id>
+
+## Source / Provenance
+
+- Source type: application seed | mined simulation row | new harness scenario
+- Source path:
+- Source row/title:
+- Source DI / TODO / TE:
+
+## Purpose
+
+<What design pressure this scenario applies.>
+
+## Setup
+
+<Initial state, promises, artifacts, sites, policies, and sparse knowledge.>
+
+## Stimulus
+
+<The event or request that exercises the scenario.>
+
+## Expected Pressure
+
+<What the scenario should force a candidate design to explain.>
+
+## Scenario-Specific Evaluation Questions
+
+- <Only questions unique to this scenario, if any.>
+```
+
+Do not duplicate the common actors, applicability, goal checks, result-path
+shape, or authority boundary in each scenario file. Those shared rules are part
+of this root scenario contract. Source: `DI-kizal`.
+
+## Shared Applicability
+
+Every scenario can be applied to any simulation that claims to address its
+application domain, source-row pressure, or underlying PromiseGrid design
+question. A result may conclude that the simulation intentionally does not cover
+the scenario, but the run should still make the boundary explicit. Source:
+`DI-kizal`.
+
+## Actor Convention
+
+Use Alice, Bob, Carol, Dave, Ellen, Frank, and Mallory where named actors help
+make promises, failures, sparse knowledge, or adversarial pressure concrete.
+Alice normally depends on the outcome, Bob makes or relays promises, Carol
+audits or relies on evidence, and Mallory represents adversarial, captured,
+stale, or misleading evidence when that pressure is relevant. Source:
+`DI-034-20260508-060134`; `DI-kizal`.
+
+## Scenario Quality Gates
+
+Every root scenario run must explicitly test the 100-year PromiseGrid goal and
+other overarching PromiseGrid goals. A scenario may be small, but it must not be
+narrow in a way that accidentally assumes away the conditions PromiseGrid is
+meant to survive. Source: `DI-botup`; `DI-kizal`.
+
+At minimum, each run should address:
+
+- **100-year durability:** Does the scenario still make sense after tools,
+  organizations, keys, people, and infrastructure have changed?
+- **Sparse, partial knowledge:** Does it avoid assuming any peer has the whole
+  graph, all CAS objects, or globally complete state?
+- **No central authority or registry:** Does it avoid relying on a central pCID,
+  identity, trust, naming, routing, currency, or governance authority unless the
+  point of the scenario is to test that failure mode?
+- **Peer-local promise accounting:** Does it show what Alice, Bob, Carol, or
+  another peer can observe and record locally?
+- **Adversarial or failure pressure:** Does it include Mallory, corruption,
+  refusal, stale data, partition, capture, default, or another failure mode when
+  relevant?
+- **Human and LLM auditability:** Can a later person or model understand what
+  was promised, what happened, and why the result matters?
+- **Migration / evolution path:** Does it expose what happens when protocols,
+  keys, names, object shapes, policies, or organizations evolve?
+
+If a gate is not relevant, the result should say why instead of omitting it.
+
+## Common Evaluation Questions
+
+Every scenario run should answer these common questions unless a
+scenario-specific question narrows them:
+
+- Which promises, CAS objects, feeds, identity claims, names, promise accounting
+  records, or protocol claims does the candidate simulation need?
+- What can Alice, Bob, Carol, Mallory, or another peer observe and record locally
+  after the stimulus?
+- Does the candidate design preserve the expected pressure without appealing to
+  hidden global state or central authority?
+- Which assumptions would make the run fail the 100-year, sparse-knowledge, or
+  no-central-authority goals?
+- What DR, DI, frozen spec, TODO, TE, or guide handoff would the evidence inform?
+
+## Result Runs
+
+Result runs live under:
+
+`results/<sim-id>/<scenario-id>/<model-id>/<YYYYMMDD-HHMMSS>.md`
+
+Committed scenario entries are input context, not result summaries. Do not add a
+`MATRIX.md` file to a scenario directory. To inspect run evidence, generate a
+view from the canonical result tree:
+
+```bash
+cd tools/matrix-runner
+go run . view -repo-root ../.. -scenario <scenario-id>
+```
+
+The generated view is derived evidence navigation. It does not declare a winning
+design by itself, and it should not be committed as scenario source state.
+Source: `DI-zamin`.
+
+## Authority Boundary
+
+Scenarios and result runs are evidence only. Design authority still graduates
+through DR, DI, frozen spec, or PromiseGrid Development Guide handoff. Source:
+`DI-faros`; `DI-kizal`.
+
+## Population Plan
+
+`TODO-dadub` owns the initial population plan. The first mining pass created one
+root entry per existing sim-local scenario row under `DI-nanih`, the first
+application-seed pass created one root entry per seed application under
+`DI-midif`, and the cache cleanup pass removed per-scenario boilerplate under
+`DI-kizal`. Future entries should follow this shared-contract shape unless a
+later DI changes the root scenario contract.
+```
+
+### `simulations/SIM-kugap-live-sync-audit-split/README.md`
+
+```markdown
+# SIM-kugap: Live sync and audit split
+
+This simulation is a provisional question home for `FB-hurit` and `FB-nilat`:
+apps that need low-latency reliable live state but still want durable
+PromiseGrid audit publication. Source: `DI-ragaz`.
+
+## Question
+
+Should the guide describe a future reliable live-state protocol shape, an
+off-grid live channel plus PromiseGrid audit publication pattern, or both as
+explicitly provisional? Source: `DI-ragaz`.
+
+## Decision Axes
+
+- **Live transport needs:** reliable, in-order, frame-preserving delivery with
+  sub-second latency for CRDT sync or presence.
+- **Audit protocol needs:** durable, replayable publication of snapshots,
+  milestones, receipts, or break-witnesses.
+- **Layer separation:** live state and durable audit may use different pCIDs,
+  timings, durability promises, and conformance claims.
+- **Group-session role:** group-session may be an audit layer without being the
+  live transport.
+- **Failure behavior:** dropped live frames, stale audit snapshots, and partition
+  recovery must be explicit.
+
+## Related Root Scenario
+
+- `scenarios/live-crdt-audit-publication/live-crdt-audit-publication.md`
+
+## Boundaries
+
+This simulation does not define a reliable low-latency binding. It tests whether
+the guide can name the split honestly without implying that `udp-feed` or
+`group-session` already solves live CRDT transport. Source: `DI-ragaz`.
+```
+
+### `simulations/SIM-kugap-live-sync-audit-split/QUESTION.md`
+
+```markdown
+# Question
+
+How should PromiseGrid distinguish live-state protocol claims from durable audit
+publication claims for real-time apps such as collaborative editors, presence,
+multiplayer state, and telemetry? Source: `DI-ragaz`.
+
+Open decision points:
+
+- Is the guide-safe posture "live state stays off-grid for now, audit publishes
+  to group-session" or a provisional future live protocol sketch?
+- What does an audit message cite: snapshot CID, CRDT save blob, operation log,
+  milestone receipt, or another object?
+- How should conformance claims avoid conflating live channel behavior with
+  group-session audit behavior?
+```
+
+### `scenarios/device-bound-agent-physical-effect/device-bound-agent-physical-effect.md`
+
+```markdown
+# Device-Bound Agent Physical Effect
+
+## Scenario ID
+
+device-bound-agent-physical-effect
+
+## Source / Provenance
+
+- Source type: new harness scenario
+- Source path: `/home/stevegt/lab/promisegrid-dev-guide/FEEDBACK.md`
+- Source row/title: `FB-nojit`, `FB-tisuf`, and `FB-tulit`
+- Source DI / TODO / TE: `DI-ragaz`; `TODO-rozas`; `DR-tuhaz`; `DR-davod`
+
+## Purpose
+
+Exercise apps where Bob's local daemon controls a host-owned physical device and
+Alice asks it to perform or report something through a grid protocol.
+
+## Setup
+
+Bob owns a label printer and a temperature sensor. He delegates the front-desk
+machine to print shipping labels and the rack sensor to report readings. Alice
+sends a print request. Carol audits the receipt. Mallory replays the request
+after the label has already been printed.
+
+## Stimulus
+
+The daemon restarts after receiving the request but before all receipts propagate.
+It must decide whether replay should print another label, report an already-done
+effect, or emit a break-witness.
+
+## Expected Pressure
+
+The candidate design must handle owner/operator identity, host-driver
+dependencies, non-idempotent physical effects, at-most-once posture, receipts,
+break-witnesses, and 100-year interpretation of evidence after the device and
+driver stack are gone.
+
+## Scenario-Specific Evaluation Questions
+
+- What evidence proves the owner delegated the device-bound agent?
+- How is a physical effect deduplicated across replay and restart?
+- What should a conformance claim say about CUPS, libusb, IIO, i2c, IPP, or
+  vendor SDK dependencies?
+```
+
+## Required JSON Shape
+
+{"scores":{"scenario_fit":0,"promisegrid_alignment":0,"auditability":0,"evolution_safety":0,"layer_boundary_clarity":0,"failure_handling":0,"implementation_plausibility":0,"risk_penalty":0},"fitness":{"raw":0,"normalized_0_100":0,"confidence_0_1":0.0},"assessment":{"rationale":"","strengths":[],"weaknesses":[],"risks":[],"open_questions":[],"authority_boundary":"Evidence only; does not settle PromiseGrid design."}}

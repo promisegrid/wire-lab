@@ -1,0 +1,114 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-zisan-device-bound-agent-multi-embodiment-app-identity-openai-gpt-5.4-xhigh-20260521-011601",
+  "run_group_id": "ga-canary-20260521-011601",
+  "cell_id": "ga-canary-20260521-011601-000019-SIM-zisan-device-bound-agent--multi-embodiment-app-identity--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-zisan-device-bound-agent",
+  "scenario_id": "multi-embodiment-app-identity",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260521-011601",
+  "result_path": "results/SIM-zisan-device-bound-agent/multi-embodiment-app-identity/openai-gpt-5.4-xhigh/20260521-011601.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_7dc29a3a5f8449e0b0583eb72c25f9a3",
+    "response_id": "resp_0ffce94af94d6400006a0e5df8c338819aa5345e68c021c755",
+    "input_tokens": 6237,
+    "output_tokens": 6326,
+    "cost_usd": 0.09947875
+  },
+  "source": {
+    "repo_commit": "dd50f76bf5d5eeffc699bc0e5b542c86b7c3e196",
+    "sim_path": "simulations/SIM-zisan-device-bound-agent/",
+    "scenario_path": "scenarios/multi-embodiment-app-identity/multi-embodiment-app-identity.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "8a3cb036c4849e8e694c94f004100a68495ad1287ff01291711b43aa19ad270b"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-zisan-device-bound-agent/README.md",
+        "sha256": "0d4ffd8bc616cb590c55290d4b7082f1949b0cae6381f48d2776386b459733e9"
+      },
+      {
+        "path": "simulations/SIM-zisan-device-bound-agent/QUESTION.md",
+        "sha256": "d4301120704c334bf147b96d6bef7bf625ea1962cf2974d1a2a778ef2c471e34"
+      },
+      {
+        "path": "scenarios/multi-embodiment-app-identity/multi-embodiment-app-identity.md",
+        "sha256": "e05f78b9d46c47acecbf430a12fda015268e17d60fbea9e0609fa11e604e52cc"
+      }
+    ],
+    "simulation_tree_hash": "4e24774dcf443da1a667e63bf1c84ecc23953d7a3ea2c7fb1d76baf96313d935"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 3,
+    "promisegrid_alignment": 3,
+    "auditability": 4,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 3,
+    "implementation_plausibility": 3,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 21,
+    "normalized_0_100": 60,
+    "confidence_0_1": 0.79
+  },
+  "assessment": {
+    "rationale": "Best overlap is the simulation's insistence on honest partial conformance claims and explicit host/runtime boundaries. That helps with per-embodiment scope, but it does not itself define the durable shared app identity this scenario asks for.",
+    "strengths": [
+      "Strong emphasis on honest partial conformance and host-dependency disclosure.",
+      "Good evidence posture around authority, receipts, and break-witnesses.",
+      "Clear boundaries between protocol-facing agent behavior and host-specific implementation layers."
+    ],
+    "weaknesses": [
+      "Does not directly model browser and plugin embodiments sharing one app identity.",
+      "No explicit pCID or contract-family mechanism for linking multiple embodiments.",
+      "Failure analysis is centered on physical effects, not browser storage loss or helper upgrades."
+    ],
+    "risks": [
+      "Mallory can exploit ambiguity between same UX, same device context, and same protocol contract.",
+      "Open key/device binding questions can blur long-term embodiment identity.",
+      "Provisional boundaries may be overread as settled app-identity guidance."
+    ],
+    "open_questions": [
+      "What durable claim makes heterogeneous embodiments 'one app' in PromiseGrid terms?",
+      "Should shared app identity be one contract or a family of linked contracts?",
+      "What audit record survives host replacement, browser storage loss, and helper upgrades?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

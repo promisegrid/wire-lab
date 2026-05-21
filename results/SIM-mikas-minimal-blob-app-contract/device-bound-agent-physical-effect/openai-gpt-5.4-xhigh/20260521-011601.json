@@ -1,0 +1,115 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-mikas-minimal-blob-app-contract-device-bound-agent-physical-effect-openai-gpt-5.4-xhigh-20260521-011601",
+  "run_group_id": "ga-canary-20260521-011601",
+  "cell_id": "ga-canary-20260521-011601-000003-SIM-mikas-minimal-blob-app-contract--device-bound-agent-physical-effect--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-mikas-minimal-blob-app-contract",
+  "scenario_id": "device-bound-agent-physical-effect",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260521-011601",
+  "result_path": "results/SIM-mikas-minimal-blob-app-contract/device-bound-agent-physical-effect/openai-gpt-5.4-xhigh/20260521-011601.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_1421881931ba48289bdeae79305c28f9",
+    "response_id": "resp_0ff52297138a76a4006a0e5cd2c74c819a8fe169e26f3f8492",
+    "input_tokens": 7078,
+    "output_tokens": 6558,
+    "cost_usd": 0.1041985
+  },
+  "source": {
+    "repo_commit": "dd50f76bf5d5eeffc699bc0e5b542c86b7c3e196",
+    "sim_path": "simulations/SIM-mikas-minimal-blob-app-contract/",
+    "scenario_path": "scenarios/device-bound-agent-physical-effect/device-bound-agent-physical-effect.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "8a3cb036c4849e8e694c94f004100a68495ad1287ff01291711b43aa19ad270b"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-mikas-minimal-blob-app-contract/README.md",
+        "sha256": "0c4755add75a4aed9913cbcf3271eb4faf20db662cb7993921d8c4b684c1bf60"
+      },
+      {
+        "path": "simulations/SIM-mikas-minimal-blob-app-contract/QUESTION.md",
+        "sha256": "546fe58b588d2a8057994b8d12f0e770b389a3591d401d76d61ab6f4d407bd03"
+      },
+      {
+        "path": "scenarios/device-bound-agent-physical-effect/device-bound-agent-physical-effect.md",
+        "sha256": "ffd2cee6094031ae77651ba8da6c3c76b54d200845f65f0e93d07c8e96aaeb2a"
+      }
+    ],
+    "simulation_tree_hash": "97358511b9d6fdb6a02c37fd0722f03dafb09104268a3c034a920d71dd711c93"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 3,
+    "auditability": 1,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 0,
+    "implementation_plausibility": 1,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 10,
+    "normalized_0_100": 29,
+    "confidence_0_1": 0.92
+  },
+  "assessment": {
+    "rationale": "Strong on scoping a minimal immutable CAS layer and on not overpromising availability, discovery, or authorization semantics, but it does not address the scenario's core pressures: delegated device control, non-idempotent physical effects, replay after restart, receipts, or break-witnesses. It is useful mainly as a lower-layer evidence substrate, not as a direct fit for this scenario.",
+    "strengths": [
+      "Clearly limits the base contract to blob write/read behavior and avoids hidden guarantees.",
+      "Explicitly keeps retention, replication, discovery, and authorization in host/app policy space.",
+      "Foregrounds 100-year survival and could anchor durable receipt blobs if another layer defines their meaning."
+    ],
+    "weaknesses": [
+      "No owner-delegation or operator-identity model for a device-bound agent.",
+      "No at-most-once, deduplication, or replay-handling semantics for physical actions.",
+      "No receipt or break-witness structure for Carol to audit after restart.",
+      "No conformance boundary for device, driver, or host-stack dependencies."
+    ],
+    "risks": [
+      "If misapplied to actuation, replay after restart could duplicate a physical effect such as printing a label.",
+      "Implementers may wrongly treat possession of a hash as authority to trigger or read device actions.",
+      "Durable blobs alone may preserve bytes without proving what physical effect actually occurred."
+    ],
+    "open_questions": [
+      "Should physical-effect apps use this only as a receipt-storage layer while a separate protocol handles delegation and idempotence?",
+      "What durable receipt or break-witness schema would remain interpretable after device and driver stacks disappear?",
+      "How should conformance claims separate PromiseGrid semantics from CUPS, libusb, IIO, i2c, IPP, or vendor SDK dependencies?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

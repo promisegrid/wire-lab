@@ -1,0 +1,248 @@
+# GA Child Promotion Procedure
+
+This procedure is the operator contract for promoting generated GA child
+simulations into canonical simulation and result homes. Use it when Steve says:
+
+```text
+promote <child-proquint> [<child-proquint> ...]
+```
+
+For example, `promote natim maraz` means "find the generated child simulations
+whose IDs start with `SIM-natim-child-` and `SIM-maraz-child-`, review their
+evidence, and promote the selected designs using this procedure." Source:
+`DI-dikoh`.
+
+## Authority Boundary
+
+Promotion is a review decision. A generated child is not canonical merely because
+it exists under `proposals/<run-group-id>/`. `tools/ga-runner accept` records the
+reviewed proposal evidence in GA state, but it does not by itself create final
+canonical simulation/result artifacts or stage files for commit. Source:
+`DI-lirat`; `DI-dikoh`.
+
+The Jufag/Bimos promotion from `ga-canary-20260520-221953` is the precedent:
+proposal sim trees and proposal result JSON files were copied into canonical
+homes, final IDs dropped the `child` marker, canonical result identity fields
+were rewritten for discoverability, and `source.*` continued to point at the
+exact proposal tree scored by the LLM. Source: `DI-dipid`; `DI-dikoh`.
+
+## 1. Resolve Requested Children
+
+For each requested proquint:
+
+1. Search `results/state/ga-canary-*.json` for child IDs matching
+   `SIM-<proquint>-child-*`.
+2. Require exactly one usable match unless Steve explicitly resolves the
+   ambiguity.
+3. The child status must normally be `generated`. `accepted` is allowed only when
+   resuming an interrupted promotion that already passed the accept step.
+4. Record the run group, child ID, proposal sim path, parent IDs, tree hash, and
+   child result paths.
+5. Ignore old queued, skipped, failed, or stale `running` children unless Steve
+   explicitly asks to recover that run first.
+
+If there are multiple matches for a proquint, stop before editing and report the
+candidate run groups and child IDs.
+
+## 2. Validate Candidate Evidence
+
+Before canonical edits, verify each selected child:
+
+1. The proposal sim path from GA state exists under
+   `proposals/<run-group-id>/simulations/<child-id>/`.
+2. The current proposal tree hash matches the state `tree_hash`.
+3. Every selected child result JSON path exists under
+   `proposals/<run-group-id>/results/<child-id>/<scenario>/<model>/<timestamp>.json`.
+4. `tools/ga-runner validate` accepts the selected result JSON files.
+5. Each result JSON's `source.sim_path` points at the proposal sim path and
+   `source.simulation_tree_hash` matches the proposal tree.
+6. The child has enough standing simulation material for a canonical sim. At
+   minimum this normally means `README.md` and `QUESTION.md`; if comparable sims
+   in the same family carry local protocol files such as
+   `protocols/<slug>.d/CHANGELOG.md`, `manifest.json`, or draft specs, fill those
+   before final handoff.
+
+Do not repair the proposal tree in place after scoring unless Steve explicitly
+chooses that path. Promotion should preserve proposal evidence as the scored raw
+artifact and make any canonical cleanup in the copied final sim.
+
+## 3. Choose Final Names
+
+Default final simulation ID:
+
+```text
+SIM-<same-proquint>-<child-slug-with-child-removed>
+```
+
+Examples:
+
+- `SIM-natim-child-nested-payload-outer-attestation-multisig` becomes
+  `SIM-natim-nested-payload-outer-attestation-multisig`, unless a clearer
+  domain-qualified final name is needed.
+- If adding a family prefix improves index consistency, use the smallest clear
+  final name, such as
+  `SIM-natim-grid-envelope-nested-payload-outer-attestation-multisig`.
+
+Stop and ask Steve before editing when:
+
+- the final name would collide with an existing `simulations/SIM-*` or
+  `results/SIM-*` path;
+- the generated slug is generic, misleading, or still contains `ga-child`,
+  `pending`, or another process artifact;
+- two promoted children should be merged instead of kept as separate competing
+  sims.
+
+## 4. Record the Promotion DI
+
+Before canonical promotion edits, append a new DI to
+`protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`.
+The DI must name:
+
+- selected run group and child IDs;
+- final canonical simulation IDs;
+- whether each child is promoted, deferred, or rejected;
+- the copy-not-move policy for proposal artifacts;
+- the canonical result rewrite policy;
+- the provenance rule that `source.*` remains the exact proposal evidence scored
+  by the LLM;
+- all expected canonical sim, result, state, and index paths.
+
+Use that DI ID in promoted sim docs, result `promotion` metadata, and final
+handoff evidence.
+
+## 5. Record Acceptance in GA State
+
+Run `accept` before copying canonical artifacts:
+
+```bash
+cd tools/ga-runner
+go run . accept \
+  -repo-root ../.. \
+  -run-group-id <run-group-id> \
+  -child <child-id> \
+  -result proposals/<run-group-id>/results/<child-id>/<scenario-1>/<model>/<timestamp>.json \
+  -result proposals/<run-group-id>/results/<child-id>/<scenario-2>/<model>/<timestamp>.json \
+  -reviewer-note '<why this child is accepted; cite DI-<handle>>'
+```
+
+Repeat `-child` and `-result` as needed when promoting multiple children from the
+same run. If children come from different run groups, run one `accept` command
+per run group. The command should print review paths and remind the operator
+that promotion is still required before `git add`.
+
+## 6. Copy Proposal Sim Trees to Canonical Homes
+
+For each accepted child:
+
+1. Copy the proposal sim tree to `simulations/<final-sim-id>/`.
+2. Do not move, delete, or cull the proposal tree during promotion.
+3. Replace proposal IDs and titles with the final simulation ID.
+4. Remove `child` wording where it implies the canonical sim is still a generated
+   proposal.
+5. Keep useful provenance language: parent IDs, run group, original child ID, and
+   promotion DI.
+6. Fill or repair standing sim files so the promoted sim is self-contained and
+   indexable.
+
+The canonical sim may be cleaner than the proposal tree, but it must not claim
+that the LLM scored the cleaned tree. The result provenance remains tied to the
+proposal source.
+
+## 7. Copy Result Evidence to Canonical Results
+
+For each selected proposal result JSON:
+
+1. Copy it to:
+
+   ```text
+   results/<final-sim-id>/<scenario-id>/<model-id>/<timestamp>.json
+   ```
+
+2. Rewrite canonical storage identity fields for discoverability:
+
+   - `result_id`
+   - `sim_id`
+   - `result_path`
+
+3. Preserve the original `run_group_id`, `scenario_id`, model fields, scores,
+   fitness, assessment, usage, cost, and `source.*` fields.
+4. Add or update a `promotion` object:
+
+   ```json
+   {
+     "promotion_di": "DI-<handle>",
+     "run_group_id": "<run-group-id>",
+     "original_child_sim_id": "<child-id>",
+     "final_sim_id": "<final-sim-id>",
+     "original_proposal_sim_path": "proposals/<run-group-id>/simulations/<child-id>/",
+     "original_proposal_result_path": "proposals/<run-group-id>/results/<child-id>/<scenario>/<model>/<timestamp>.json",
+     "canonical_result_path": "results/<final-sim-id>/<scenario>/<model>/<timestamp>.json",
+     "source_provenance_policy": "Canonical storage identity fields were updated for discoverability; source.* fields intentionally preserve the exact proposal tree and file hashes scored by the LLM before promotion."
+   }
+   ```
+
+Do not rewrite `source.sim_path`, `source.files`, or
+`source.simulation_tree_hash` to the final canonical sim tree.
+
+## 8. Update Indexes and Cross-References
+
+Update the public navigation surfaces that make the new canonical sim
+discoverable:
+
+- `simulations/README.md`;
+- `DEV-GUIDE-RESOURCES.md` when the sim is relevant to the developer guide or an
+  existing resource table;
+- the relevant TODO/DR/DI text when the promotion closes or routes open work.
+
+For family-specific sims, preserve local family grouping. For example,
+grid-envelope promotions belong with the grid-envelope table, while guide-level
+claim/conformance promotions should be indexed as their own simulation family
+instead of being forced into grid-envelope language.
+
+## 9. Validate Before Handoff
+
+Run targeted validation on every copied canonical JSON file:
+
+```bash
+cd tools/ga-runner
+go run . validate -repo-root ../.. -result ../../results/<final-sim-id>/<scenario-id>/<model-id>/<timestamp>.json
+```
+
+For larger batches, also validate the shared timestamp/model after the explicit
+file checks:
+
+```bash
+cd tools/ga-runner
+go run . validate -repo-root ../.. -model <model-id> -timestamp <timestamp>
+```
+
+Then run repository-level documentation checks that are cheap and relevant:
+
+```bash
+git diff --check
+```
+
+If code changed, also run the code-specific checks required by `AGENTS.md`,
+including comment-delta audit and `errcheck ./...` for Go changes. A normal
+promotion should not require Go code changes.
+
+## 10. Handoff
+
+The final response must include:
+
+- promoted final sim IDs;
+- accepted run group(s) and original child IDs;
+- canonical result root(s);
+- validation commands run;
+- explicit statement that proposal artifacts were preserved;
+- Decision Compliance, Decision Matrix, Inline diff annotations, Runtime Path
+  Touch Matrix, Comment audit, Intent provenance audit, and Exceptions.
+
+Do not commit unless Steve says `commit`.
+
+## 11. Cull Separately
+
+Promotion does not cull rejected or unpromoted children. If Steve later says to
+cull proposals, use `tools/ga-runner cull` with explicit child IDs and reasons so
+the destructive cleanup is state-bound and auditable. Source: `DI-kofil`;
+`DI-dikoh`.

@@ -792,6 +792,28 @@ Affects: `proposals/ga-canary-20260520-221953/`;
 `simulations/README.md`; `DEV-GUIDE-RESOURCES.md`;
 `protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`.
 
+ID: DI-dikoh
+Date: 2026-05-21 13:33:26
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Store the repeatable GA child-promotion operator procedure in
+`tools/ga-runner/PROMOTION.md` and use it when Steve says
+`promote <child-proquint> [<child-proquint> ...]`.
+Intent: Jufag and Bimos proved the promotion pattern, but the working procedure
+was spread across state records, TODO provenance, canonical result metadata, and
+operator memory. A dedicated procedure lets future promotions preserve the same
+review, final naming, canonical result, and proposal-source provenance discipline
+without re-deriving the steps each time.
+Constraints: Promotion remains a review step, not automatic acceptance from disk.
+The agent must resolve proquints through GA state, record a promotion DI before
+canonical edits, copy proposal artifacts instead of moving or deleting them,
+preserve `source.*` as the exact scored proposal evidence, add `promotion`
+metadata to copied result JSON, update public indexes, and leave culling to an
+explicit later command.
+Affects: `tools/ga-runner/PROMOTION.md`; `tools/ga-runner/README.md`;
+`results/RUN-PROTOCOL.md`;
+`protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`.
+
 ## Scope
 
 - Define and implement a new GA/search runner without changing

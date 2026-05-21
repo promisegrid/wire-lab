@@ -1,3 +1,27 @@
+# GA Score Cell
+
+Return only JSON with keys `scores`, `fitness`, and `assessment`.
+Do not include result identity, source metadata, code fences, or commentary.
+
+## Cell
+
+- Run group ID: `ga-canary-20260521-011601`
+- Cell ID: `ga-canary-20260521-011601-000021-SIM-zisan-device-bound-agent--kernel-porting-boundary--openai-gpt-5.4-xhigh`
+- Simulation ID: `SIM-zisan-device-bound-agent`
+- Scenario ID: `kernel-porting-boundary`
+- Model ID: `openai-gpt-5.4-xhigh`
+- Result path: `results/SIM-zisan-device-bound-agent/kernel-porting-boundary/openai-gpt-5.4-xhigh/20260521-011601.json`
+
+## Rubric
+
+Score each axis from 0 to 5. Higher is better except `risk_penalty`, where 0 is low risk and 5 is severe risk.
+Axes: scenario_fit, promisegrid_alignment, auditability, evolution_safety, layer_boundary_clarity, failure_handling, implementation_plausibility, risk_penalty.
+
+## Source Documents
+
+### `results/RUN-PROTOCOL.md`
+
+```markdown
 # Results Run Protocol
 
 This document defines operational contracts for result evidence under `results/`.
@@ -240,12 +264,10 @@ Generated children are ignored review-stage
 `proposals/<run-group-id>/results/<SIM-id>/` score evidence. They are not
 accepted merely because they exist on disk. A review/promotion pass should
 rename selected children to final descriptive non-child `SIM-*` names, fill any
-missing standing simulation files, and copy selected score evidence into
-canonical `results/` before commit. The detailed operator procedure is
-`tools/ga-runner/PROMOTION.md`, used when Steve says
-`promote <child-proquint> ...`. Source: `DI-ramar`; `DI-zanon`; `DI-zohal`;
+missing standing simulation files, and move selected score evidence into
+canonical `results/` before commit. Source: `DI-ramar`; `DI-zanon`; `DI-zohal`;
 `DI-zusit`; `DI-podot`; `DI-kofil`; `DI-ruzaj`; `DI-gijom`; `DI-fihof`;
-`DI-lirat`; `DI-dikoh`.
+`DI-lirat`.
 
 LLM-generated children use one operation, `breed`, with exactly two distinct
 parent simulations. The runner must fail or skip generation rather than create a
@@ -285,3 +307,285 @@ Source: `DI-dilaf`.
    `cd tools/matrix-runner && go run . validate -repo-root ../.. -manifest <manifest.csv>`.
 6. Generate inspection views from the result tree as needed:
    `cd tools/matrix-runner && go run . view -repo-root ../.. -model <model-id>`.
+```
+
+### `scenarios/README.md`
+
+```markdown
+# Root Scenarios
+
+Root `scenarios/` entries are wire-lab comparison apparatus. They describe
+pressure that multiple simulations can be run against; they are not PromiseGrid
+node layout, production API, shared protocol components, or simulation-local
+world state. Source: `DI-faros`; `DI-vabor`; `DI-dimas`; `DI-kizal`.
+
+## Directory Shape
+
+Each root scenario entry uses this shape:
+
+```text
+scenarios/
+  <scenario-id>/
+    <scenario-id>.md
+```
+
+- `<scenario-id>` is stable kebab-case.
+- Application entries use one `scenarios/<application-id>/` directory per
+  application, such as `scenarios/bgp-routing/`.
+- Mined simulation rows use one root scenario entry per source row, transformed
+  for cross-simulation comparison and linked back to the source
+  `simulations/.../SCENARIOS.md` row.
+- Per-scenario `README.md` files are intentionally absent. Shared scenario
+  contract prose lives here so API prompts can reuse the same cacheable context,
+  while `scenarios/<scenario-id>/<scenario-id>.md` files carry only
+  scenario-specific pressure. Source: `DI-kizal`.
+- Result evidence lives only under
+  `results/<sim-id>/<scenario-id>/<model-id>/<YYYYMMDD-HHMMSS>.md`. Generate
+  scan tables from that result tree when needed. Source: `DI-zamin`.
+
+## Scenario Entry Template
+
+Use this template for each scenario markdown file:
+
+```markdown
+# <Scenario Title>
+
+## Scenario ID
+
+<stable-kebab-case-id>
+
+## Source / Provenance
+
+- Source type: application seed | mined simulation row | new harness scenario
+- Source path:
+- Source row/title:
+- Source DI / TODO / TE:
+
+## Purpose
+
+<What design pressure this scenario applies.>
+
+## Setup
+
+<Initial state, promises, artifacts, sites, policies, and sparse knowledge.>
+
+## Stimulus
+
+<The event or request that exercises the scenario.>
+
+## Expected Pressure
+
+<What the scenario should force a candidate design to explain.>
+
+## Scenario-Specific Evaluation Questions
+
+- <Only questions unique to this scenario, if any.>
+```
+
+Do not duplicate the common actors, applicability, goal checks, result-path
+shape, or authority boundary in each scenario file. Those shared rules are part
+of this root scenario contract. Source: `DI-kizal`.
+
+## Shared Applicability
+
+Every scenario can be applied to any simulation that claims to address its
+application domain, source-row pressure, or underlying PromiseGrid design
+question. A result may conclude that the simulation intentionally does not cover
+the scenario, but the run should still make the boundary explicit. Source:
+`DI-kizal`.
+
+## Actor Convention
+
+Use Alice, Bob, Carol, Dave, Ellen, Frank, and Mallory where named actors help
+make promises, failures, sparse knowledge, or adversarial pressure concrete.
+Alice normally depends on the outcome, Bob makes or relays promises, Carol
+audits or relies on evidence, and Mallory represents adversarial, captured,
+stale, or misleading evidence when that pressure is relevant. Source:
+`DI-034-20260508-060134`; `DI-kizal`.
+
+## Scenario Quality Gates
+
+Every root scenario run must explicitly test the 100-year PromiseGrid goal and
+other overarching PromiseGrid goals. A scenario may be small, but it must not be
+narrow in a way that accidentally assumes away the conditions PromiseGrid is
+meant to survive. Source: `DI-botup`; `DI-kizal`.
+
+At minimum, each run should address:
+
+- **100-year durability:** Does the scenario still make sense after tools,
+  organizations, keys, people, and infrastructure have changed?
+- **Sparse, partial knowledge:** Does it avoid assuming any peer has the whole
+  graph, all CAS objects, or globally complete state?
+- **No central authority or registry:** Does it avoid relying on a central pCID,
+  identity, trust, naming, routing, currency, or governance authority unless the
+  point of the scenario is to test that failure mode?
+- **Peer-local promise accounting:** Does it show what Alice, Bob, Carol, or
+  another peer can observe and record locally?
+- **Adversarial or failure pressure:** Does it include Mallory, corruption,
+  refusal, stale data, partition, capture, default, or another failure mode when
+  relevant?
+- **Human and LLM auditability:** Can a later person or model understand what
+  was promised, what happened, and why the result matters?
+- **Migration / evolution path:** Does it expose what happens when protocols,
+  keys, names, object shapes, policies, or organizations evolve?
+
+If a gate is not relevant, the result should say why instead of omitting it.
+
+## Common Evaluation Questions
+
+Every scenario run should answer these common questions unless a
+scenario-specific question narrows them:
+
+- Which promises, CAS objects, feeds, identity claims, names, promise accounting
+  records, or protocol claims does the candidate simulation need?
+- What can Alice, Bob, Carol, Mallory, or another peer observe and record locally
+  after the stimulus?
+- Does the candidate design preserve the expected pressure without appealing to
+  hidden global state or central authority?
+- Which assumptions would make the run fail the 100-year, sparse-knowledge, or
+  no-central-authority goals?
+- What DR, DI, frozen spec, TODO, TE, or guide handoff would the evidence inform?
+
+## Result Runs
+
+Result runs live under:
+
+`results/<sim-id>/<scenario-id>/<model-id>/<YYYYMMDD-HHMMSS>.md`
+
+Committed scenario entries are input context, not result summaries. Do not add a
+`MATRIX.md` file to a scenario directory. To inspect run evidence, generate a
+view from the canonical result tree:
+
+```bash
+cd tools/matrix-runner
+go run . view -repo-root ../.. -scenario <scenario-id>
+```
+
+The generated view is derived evidence navigation. It does not declare a winning
+design by itself, and it should not be committed as scenario source state.
+Source: `DI-zamin`.
+
+## Authority Boundary
+
+Scenarios and result runs are evidence only. Design authority still graduates
+through DR, DI, frozen spec, or PromiseGrid Development Guide handoff. Source:
+`DI-faros`; `DI-kizal`.
+
+## Population Plan
+
+`TODO-dadub` owns the initial population plan. The first mining pass created one
+root entry per existing sim-local scenario row under `DI-nanih`, the first
+application-seed pass created one root entry per seed application under
+`DI-midif`, and the cache cleanup pass removed per-scenario boilerplate under
+`DI-kizal`. Future entries should follow this shared-contract shape unless a
+later DI changes the root scenario contract.
+```
+
+### `simulations/SIM-zisan-device-bound-agent/README.md`
+
+```markdown
+# SIM-zisan: Device-bound agent
+
+This simulation is a provisional question home for `FB-nojit`, `FB-tisuf`, and
+`FB-tulit`: apps that expose a host-owned physical device, sensor, actuator, or
+driver stack to grid peers. Source: `DI-ragaz`.
+
+## Question
+
+What can the guide safely teach about a device-bound PromiseGrid app before the
+final app and kernel boundaries settle? Source: `DI-ragaz`.
+
+## Decision Axes
+
+- **Agent role:** a long-running userspace daemon acts as the protocol-facing
+  voice of a host-owned device.
+- **Owner and operator authority:** owner keys, delegated operator keys, and
+  physical custody need explicit evidence.
+- **Irreversible effects:** actuator requests need at-most-once posture,
+  deduplication, receipts, and break-witnesses for non-idempotent outcomes.
+- **Sensor versus actuator:** sensors and actuators share device-bound identity
+  and driver-stack concerns; actuators add irreversible-effect pressure.
+- **B-side conformance:** code may claim a grid protocol while honestly naming
+  host dependencies such as CUPS, libusb, Linux IIO, i2c, IPP, or vendor SDKs.
+
+## Related Root Scenario
+
+- `scenarios/device-bound-agent-physical-effect/device-bound-agent-physical-effect.md`
+
+## Boundaries
+
+This simulation does not freeze a device-agent protocol or driver API. It tests
+guide-safe patterns for provisional tutorials and conformance claims. Source:
+`DI-ragaz`.
+```
+
+### `simulations/SIM-zisan-device-bound-agent/QUESTION.md`
+
+```markdown
+# Question
+
+Can PromiseGrid guide prose describe device-bound agents, owner/operator
+delegation, irreversible physical effects, and host-driver conformance as
+provisional App Dev patterns while `DR-tuhaz` and `DR-davod` remain open? Source:
+`DI-ragaz`.
+
+Open decision points:
+
+- What request, receipt, deduplication, and break-witness shape is needed for
+  non-idempotent physical actions?
+- How does an owner bind a signing key to a device and delegate operation?
+- What should a conformance claim say when the implementation depends on a
+  host-specific driver stack?
+```
+
+### `scenarios/kernel-porting-boundary/kernel-porting-boundary.md`
+
+```markdown
+# Kernel Porting Boundary
+
+## Scenario ID
+
+kernel-porting-boundary
+
+## Source / Provenance
+
+- Source type: new harness scenario
+- Source path: `/home/stevegt/lab/promisegrid-dev-guide/FEEDBACK.md`
+- Source row/title: `FB-vitih`, `FB-mulum`, and `FB-potin`
+- Source DI / TODO / TE: `DI-ragaz`; `TODO-rozas`; `DR-davod`
+
+## Purpose
+
+Exercise the developer-facing boundary for a first real PromiseGrid port while
+the kernel/runtime terminology remains unsettled.
+
+## Setup
+
+Alice wants to port PromiseGrid infrastructure to a new host environment. Bob
+offers a library, Carol offers a dispatcher/runtime, and Mallory claims that
+copying the wire-lab harness is the porting target. The available specs are
+drafts, and only some future frozen pCIDs will become obligations.
+
+## Stimulus
+
+Alice writes a first porting plan and a conformance claim. The plan must say what
+it implements now, what draft evidence it follows, and what it defers until
+`DR-davod` closes.
+
+## Expected Pressure
+
+The candidate design must separate harness apparatus from porting target,
+identify which binding/session/message/CAS/runtime obligations are provisional,
+and preserve a clear path to future frozen-spec conformance.
+
+## Scenario-Specific Evaluation Questions
+
+- Should the guide say kernel, runtime, dispatcher, handler host, or library?
+- What is the minimum viable porting target before final freeze?
+- Which K1-K5 ingress, feed, CAS, session, and app-layer details should remain
+  blocked versus provisional orientation?
+```
+
+## Required JSON Shape
+
+{"scores":{"scenario_fit":0,"promisegrid_alignment":0,"auditability":0,"evolution_safety":0,"layer_boundary_clarity":0,"failure_handling":0,"implementation_plausibility":0,"risk_penalty":0},"fitness":{"raw":0,"normalized_0_100":0,"confidence_0_1":0.0},"assessment":{"rationale":"","strengths":[],"weaknesses":[],"risks":[],"open_questions":[],"authority_boundary":"Evidence only; does not settle PromiseGrid design."}}

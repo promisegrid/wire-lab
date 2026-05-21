@@ -1,0 +1,115 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-nijuz-multi-embodiment-identity-device-bound-agent-physical-effect-openai-gpt-5.4-xhigh-20260521-011601",
+  "run_group_id": "ga-canary-20260521-011601",
+  "cell_id": "ga-canary-20260521-011601-000031-SIM-nijuz-multi-embodiment-identity--device-bound-agent-physical-effect--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-nijuz-multi-embodiment-identity",
+  "scenario_id": "device-bound-agent-physical-effect",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260521-011601",
+  "result_path": "results/SIM-nijuz-multi-embodiment-identity/device-bound-agent-physical-effect/openai-gpt-5.4-xhigh/20260521-011601.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_712d6459d31b473a95f62ecdf400b3ab",
+    "response_id": "resp_0bbd175048b7f22c006a0e5ecc8f58819a8dfb2ae62888adfc",
+    "input_tokens": 6302,
+    "output_tokens": 8850,
+    "cost_usd": 0.1349285
+  },
+  "source": {
+    "repo_commit": "dd50f76bf5d5eeffc699bc0e5b542c86b7c3e196",
+    "sim_path": "simulations/SIM-nijuz-multi-embodiment-identity/",
+    "scenario_path": "scenarios/device-bound-agent-physical-effect/device-bound-agent-physical-effect.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "8a3cb036c4849e8e694c94f004100a68495ad1287ff01291711b43aa19ad270b"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-nijuz-multi-embodiment-identity/README.md",
+        "sha256": "e965c63e7f5c8c0f37014f713aa9ab13dfd63d09f227c1cb684a9208b4d65ecc"
+      },
+      {
+        "path": "simulations/SIM-nijuz-multi-embodiment-identity/QUESTION.md",
+        "sha256": "45eb7527cbfd32de80eb829e8452bb29864569bd5d2f2db04210f826fdcbc29b"
+      },
+      {
+        "path": "scenarios/device-bound-agent-physical-effect/device-bound-agent-physical-effect.md",
+        "sha256": "ffd2cee6094031ae77651ba8da6c3c76b54d200845f65f0e93d07c8e96aaeb2a"
+      }
+    ],
+    "simulation_tree_hash": "f4f9f7df1f6fb39e72cdd5f6e792f278a36d400239ad6372909005125a92dab4"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 3,
+    "auditability": 3,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 1,
+    "implementation_plausibility": 3,
+    "risk_penalty": 4
+  },
+  "fitness": {
+    "raw": 17,
+    "normalized_0_100": 49,
+    "confidence_0_1": 0.75
+  },
+  "assessment": {
+    "rationale": "Strong on honest browser/helper identity and per-embodiment claim boundaries, but it does not yet solve the scenario's core physical-effect problems: delegated device authority, replay-safe at-most-once execution, receipts, and break-witnesses after restart.",
+    "strengths": [
+      "Clear per-embodiment conformance claims fit browser/helper splits well.",
+      "The docs emphasize later auditability of which component made which claim under which key and protocol version.",
+      "Portable signing-key identity plus provisional key/storage guidance leaves room for migration."
+    ],
+    "weaknesses": [
+      "No explicit evidence model for Bob delegating printer or sensor control.",
+      "No at-most-once, receipt, deduplication, or break-witness semantics for non-idempotent physical effects.",
+      "No concrete story for surfacing device and driver dependencies in conformance claims."
+    ],
+    "risks": [
+      "Replay after daemon restart could duplicate a physical effect.",
+      "Shared logical-app identity could blur owner, operator, and embodiment responsibility.",
+      "Unresolved host-key binding could make device authority transfer unsafe or ambiguous."
+    ],
+    "open_questions": [
+      "How does Bob delegate and revoke device authority to a specific helper embodiment?",
+      "What durable local record lets the daemon distinguish an already-done effect from a replay after restart?",
+      "Which embodiment signs the physical-effect receipt, and what evidence remains interpretable after the device and driver stack are gone?",
+      "How should CUPS, libusb, IIO, i2c, IPP, or vendor SDK dependencies appear in conformance claims?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}
