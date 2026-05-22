@@ -814,6 +814,107 @@ Affects: `tools/ga-runner/PROMOTION.md`; `tools/ga-runner/README.md`;
 `results/RUN-PROTOCOL.md`;
 `protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`.
 
+ID: DI-lunuv
+Date: 2026-05-22 00:10:12
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Promote `SIM-nonol-child-unknown-quarantine-blind-carry` from
+`ga-canary-20260522-012332` as canonical
+`SIM-nonol-unknown-quarantine-blind-carry`, and reject
+`SIM-dubil-child-dag-cbor-opaque-wrapper-semantic-receipts` from the same run.
+The `nonol` promotion keeps the proposal artifacts as scored provenance, copies
+the proposal simulation tree into `simulations/`, copies all selected `nonol`
+JSON fitness results into canonical `results/`, rewrites only canonical storage
+identity fields plus promotion metadata, and preserves `source.*` fields as the
+exact proposal tree scored by the LLM. The `dubil` rejection is recorded through
+state-bound culling because its `semantic_id` mutation is unnecessary beside the
+canonical `[pcid, payload]` envelope CID and adds avoidable protocol machinery.
+Intent: Keep the promoted grid-envelope line aligned with pCID determinism,
+Burgess Promise Theory simplicity, small-device constraints, and 100-year
+durability. `nonol` preserves the useful middle path between opaque acceptance
+and hard rejection: unknown pCIDs may be quarantined or blind-carried as exact
+bytes without being treated as semantically accepted. `dubil` scored higher, but
+its extra `semantic_id` layer is not accepted as current design consensus.
+Constraints: Final canonical simulation ID is
+`SIM-nonol-unknown-quarantine-blind-carry`. Do not move or rewrite scored
+`nonol` proposal artifacts during promotion. Cull only the rejected `dubil`
+proposal sim/result roots named by `results/state/ga-canary-20260522-012332.json`.
+Update `results/state/ga-canary-20260522-012332.json`,
+`simulations/README.md`, and `DEV-GUIDE-RESOURCES.md`; add canonical result
+evidence under
+`results/SIM-nonol-unknown-quarantine-blind-carry/<scenario>/openai-gpt-5.4-xhigh/20260522-012332.json`.
+Affects: `results/state/ga-canary-20260522-012332.json`;
+`proposals/ga-canary-20260522-012332/simulations/SIM-dubil-child-dag-cbor-opaque-wrapper-semantic-receipts/`;
+`proposals/ga-canary-20260522-012332/results/SIM-dubil-child-dag-cbor-opaque-wrapper-semantic-receipts/`;
+`proposals/ga-canary-20260522-012332/simulations/SIM-nonol-child-unknown-quarantine-blind-carry/`;
+`proposals/ga-canary-20260522-012332/results/SIM-nonol-child-unknown-quarantine-blind-carry/`;
+`simulations/SIM-nonol-unknown-quarantine-blind-carry/`;
+`results/SIM-nonol-unknown-quarantine-blind-carry/`;
+`simulations/README.md`; `DEV-GUIDE-RESOURCES.md`;
+`protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`.
+
+ID: DI-zadik
+Date: 2026-05-22 00:15:37
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Change GA child promotion from copy-preserve to move-cleanup. Future
+promotions move accepted proposal simulation trees and selected proposal result
+trees from `proposals/<run-group-id>/` into canonical `simulations/` and
+`results/` homes, then apply canonical cleanup in place. Existing promoted
+children whose canonical simulations/results already exist should have their
+accepted proposal simulation/result roots removed so `proposals/` contains only
+unreviewed or still-reviewable proposals.
+Intent: `proposals/` is ignored staging, not an archive. Keeping promoted child
+trees in both proposal and canonical homes creates clutter and duplicate sources
+of truth. The durable evidence after promotion is the canonical simulation tree,
+canonical JSON result evidence, the result `source.*` hashes and historical
+scored-source paths, the run state acceptance/culling records, and any job
+prompts retained under `results/jobs/`.
+Constraints: Do not remove unpromoted proposal children. Before cleaning an
+accepted proposal root, verify the corresponding canonical simulation and
+canonical result root exist. Existing canonical result `source.*` fields may
+continue to name the historical proposal path and scored file hashes; those
+fields are provenance metadata, not a promise that the ignored proposal path
+still exists after cleanup. Promotion metadata must say whether artifacts were
+moved or cleaned after earlier copy-style promotion.
+Affects: `tools/ga-runner/PROMOTION.md`; `tools/ga-runner/README.md`;
+`results/RUN-PROTOCOL.md`; `simulations/README.md`;
+`protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`;
+promoted accepted proposal roots under `proposals/ga-canary-*`.
+Supersedes: DI-dikoh; DI-lunuv
+
+ID: DI-higot
+Date: 2026-05-22 10:57:43
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Treat scored artifact bytes as append-only. After a simulation README,
+simulation-local specimen file, or result JSON has been scored or promoted as
+scored evidence, do not rewrite that artifact in place to add cleanup metadata,
+canonical-home notes, or other post-score edits. If promotion or cleanup needs
+documentation, record it in TODOs, procedures, indexes, and surrounding docs
+instead. Revert the current uncommitted scored-artifact edits, including the
+uncommitted `SIM-nonol-unknown-quarantine-blind-carry` sim/result trees and the
+post-score edits to already-scored promoted sim/result artifacts.
+Intent: Preserve scored evidence as exact historical bytes. Post-score edits to
+the artifact itself blur the distinction between what the LLM actually scored
+and what later operators wanted the canonical tree to say about that score.
+This repo can still evolve promotion procedure and provenance policy, but those
+changes belong in surrounding apparatus docs rather than inside the scored
+artifact bytes.
+Constraints: Do not rewrite already-scored result JSONs or already-scored
+simulation specimen/readme files to add provenance notes. If a promoted result
+or specimen needs a stable home, move or copy the artifact bytes unchanged, or
+leave them under `proposals/` until a non-mutating promotion path is agreed.
+When reverting uncommitted scored-artifact changes, also fix any surrounding doc
+references that would otherwise point at reverted uncommitted artifact paths.
+Affects: `protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`;
+`results/RUN-PROTOCOL.md`; `tools/ga-runner/PROMOTION.md`;
+`tools/ga-runner/README.md`; `simulations/README.md`;
+`DEV-GUIDE-RESOURCES.md`; currently modified `results/SIM-*/`;
+currently modified `simulations/SIM-*/`; uncommitted
+`results/SIM-nonol-unknown-quarantine-blind-carry/`; uncommitted
+`simulations/SIM-nonol-unknown-quarantine-blind-carry/`.
+
 ID: DI-fihub
 Date: 2026-05-21 13:45:38
 Status: active

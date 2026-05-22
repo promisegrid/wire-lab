@@ -92,13 +92,18 @@ Matching child score evidence is written under
 the child a final non-child simulation name and canonical result home.
 `accept` records reviewed promotion evidence and prints proposal paths for the
 later promotion workflow, but it does not run `git add` or commit. Follow
-`PROMOTION.md` when Steve says `promote <child-proquint> ...`; that procedure
-preserves the Jufag/Bimos provenance pattern for final names, copied proposal
-trees, canonical result paths, and `source.*` evidence. `cull` deletes only
+`PROMOTION.md` when Steve says `promote <child-proquint> ...`; under
+`DI-higot`, scored child/result artifacts are append-only, so promotion must
+not rewrite scored simulation files or scored JSON result bytes in place. A
+future promotion may move or copy scored bytes unchanged into canonical homes,
+but until that byte-identical path is locked accepted children may remain under
+`proposals/` with review state and surrounding index/TODO provenance. `cull`
+deletes only
 state-selected generated child sim trees and matching result trees; use
 `-dry-run` to print the deletion plan without changing files. Source:
 `DI-pobus`; `DI-bagih`; `DI-zusit`; `DI-podot`; `DI-kofil`; `DI-ruzaj`;
-`DI-gijom`; `DI-puhog`; `DI-dilaf`; `DI-fihof`; `DI-lirat`; `DI-dikoh`.
+`DI-gijom`; `DI-puhog`; `DI-dilaf`; `DI-fihof`; `DI-lirat`; `DI-dikoh`;
+`DI-zadik`; `DI-higot`.
 
 Provider-backed `score` and `generate` always send an explicit service tier.
 The default is `-service-tier flex`; `-service-tier default` is available when
@@ -183,13 +188,14 @@ implemented yet:
 
 Do not treat generated children as accepted merely because they exist on disk.
 Unreviewed children and their child score evidence live under ignored
-`proposals/<run-group-id>/`. A promotion pass should rename selected children to
-final descriptive non-child `SIM-*` names, fill any missing standing simulation
-files, and copy any selected score evidence into canonical `results/` before
-commit; rejected children should pass through `cull`. The detailed operator
-procedure is `PROMOTION.md`. Source: `DI-ramar`;
-`DI-zanon`; `DI-zohal`; `DI-podot`; `DI-kofil`; `DI-ruzaj`; `DI-gijom`;
-`DI-fihof`; `DI-lirat`; `DI-dikoh`.
+`proposals/<run-group-id>/`. A promotion pass must first record acceptance and
+promotion intent without rewriting scored artifact bytes. If a canonical
+simulation/result home is needed, use only a byte-identical move/copy path or
+leave the scored artifacts under `proposals/` until that path is locked.
+Rejected children should pass through `cull`. The detailed operator procedure
+is `PROMOTION.md`. Source: `DI-ramar`; `DI-zanon`; `DI-zohal`; `DI-podot`;
+`DI-kofil`; `DI-ruzaj`; `DI-gijom`; `DI-fihof`; `DI-lirat`; `DI-dikoh`;
+`DI-zadik`; `DI-higot`.
 
 ## Legacy Boundary
 

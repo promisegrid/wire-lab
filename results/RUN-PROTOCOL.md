@@ -47,7 +47,8 @@ The preferred runner for GA/search work is `tools/ga-runner`. It uses JSON
 fitness evidence, `promisegrid.ga.state.v1` state, generated child sims and
 child score evidence under ignored `proposals/<run-group-id>/` trees, explicit
 review/promotion, and explicit cleanup via `cull`. Source: `DI-ramar`;
-`DI-zanon`; `DI-podot`; `DI-kofil`; `DI-ruzaj`; `DI-fihof`; `DI-lirat`.
+`DI-zanon`; `DI-podot`; `DI-kofil`; `DI-ruzaj`; `DI-fihof`; `DI-lirat`;
+`DI-higot`.
 
 Root scenario prompts use `scenarios/README.md` for shared scenario contract
 context and `scenarios/<scenario-id>/<scenario-id>.md` for scenario-specific
@@ -238,14 +239,14 @@ Use `tools/ga-runner` for JSON-fitness GA/search work. Implemented commands are:
 Generated children are ignored review-stage
 `proposals/<run-group-id>/simulations/<SIM-id>/` trees with matching ignored
 `proposals/<run-group-id>/results/<SIM-id>/` score evidence. They are not
-accepted merely because they exist on disk. A review/promotion pass should
-rename selected children to final descriptive non-child `SIM-*` names, fill any
-missing standing simulation files, and copy selected score evidence into
-canonical `results/` before commit. The detailed operator procedure is
-`tools/ga-runner/PROMOTION.md`, used when Steve says
+accepted merely because they exist on disk. A review/promotion pass must not
+rewrite scored result JSONs or scored simulation files in place. If canonical
+homes are needed, use a byte-identical move/copy path or leave the scored
+artifacts under `proposals/` until that path is locked. The detailed operator
+procedure is `tools/ga-runner/PROMOTION.md`, used when Steve says
 `promote <child-proquint> ...`. Source: `DI-ramar`; `DI-zanon`; `DI-zohal`;
 `DI-zusit`; `DI-podot`; `DI-kofil`; `DI-ruzaj`; `DI-gijom`; `DI-fihof`;
-`DI-lirat`; `DI-dikoh`.
+`DI-lirat`; `DI-dikoh`; `DI-zadik`; `DI-higot`.
 
 LLM-generated children use one operation, `breed`, with exactly two distinct
 parent simulations. The runner must fail or skip generation rather than create a

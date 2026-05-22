@@ -10,21 +10,25 @@ promote <child-proquint> [<child-proquint> ...]
 For example, `promote natim maraz` means "find the generated child simulations
 whose IDs start with `SIM-natim-child-` and `SIM-maraz-child-`, review their
 evidence, and promote the selected designs using this procedure." Source:
-`DI-dikoh`.
+`DI-dikoh`; `DI-zadik`; `DI-higot`.
 
 ## Authority Boundary
 
 Promotion is a review decision. A generated child is not canonical merely because
 it exists under `proposals/<run-group-id>/`. `tools/ga-runner accept` records the
 reviewed proposal evidence in GA state, but it does not by itself create final
-canonical simulation/result artifacts or stage files for commit. Source:
-`DI-lirat`; `DI-dikoh`.
+canonical simulation/result artifacts or stage files for commit. Under
+`DI-higot`, scored simulation files and scored result JSON bytes are
+append-only. A promotion procedure may not rewrite them in place to add cleanup
+metadata, canonical IDs, or canonical-home notes. Source: `DI-lirat`;
+`DI-dikoh`; `DI-zadik`; `DI-higot`.
 
-The Jufag/Bimos promotion from `ga-canary-20260520-221953` is the precedent:
-proposal sim trees and proposal result JSON files were copied into canonical
-homes, final IDs dropped the `child` marker, canonical result identity fields
-were rewritten for discoverability, and `source.*` continued to point at the
-exact proposal tree scored by the LLM. Source: `DI-dipid`; `DI-dikoh`.
+The Jufag/Bimos promotion from `ga-canary-20260520-221953` is the historical
+copy-style precedent. `DI-zadik` superseded that operational style with
+move-cleanup intent, but `DI-higot` adds a harder constraint: scored artifact
+bytes are append-only. A future promotion may move or copy accepted scored
+artifacts unchanged into canonical homes, but this procedure must not instruct
+post-score rewrites of those artifact bytes.
 
 ## 1. Resolve Requested Children
 
@@ -56,15 +60,18 @@ Before canonical edits, verify each selected child:
 4. `tools/ga-runner validate` accepts the selected result JSON files.
 5. Each result JSON's `source.sim_path` points at the proposal sim path and
    `source.simulation_tree_hash` matches the proposal tree.
-6. The child has enough standing simulation material for a canonical sim. At
-   minimum this normally means `README.md` and `QUESTION.md`; if comparable sims
-   in the same family carry local protocol files such as
-   `protocols/<slug>.d/CHANGELOG.md`, `manifest.json`, or draft specs, fill those
-   before final handoff.
+6. The child has enough standing simulation material to be reviewable as scored
+   evidence. At minimum this normally means `README.md` and `QUESTION.md`; if
+   comparable sims in the same family carry local protocol files such as
+   `protocols/<slug>.d/CHANGELOG.md`, `manifest.json`, or draft specs, record
+   any missing canonicalization work as follow-up rather than editing the scored
+   child in place.
 
-Do not repair the proposal tree in place after scoring unless Steve explicitly
-chooses that path. Promotion should preserve proposal evidence as the scored raw
-artifact and make any canonical cleanup in the copied final sim.
+Do not repair the proposal tree in place before `accept`; `accept` verifies the
+raw scored child. After `accept`, do not repair the scored child in place
+either. If canonicalization is required, route it through surrounding docs or a
+future byte-identical move/copy path. The original proposal path in `source.*`
+remains historical scored-source metadata.
 
 ## 3. Choose Final Names
 
@@ -101,10 +108,10 @@ The DI must name:
 - selected run group and child IDs;
 - final canonical simulation IDs;
 - whether each child is promoted, deferred, or rejected;
-- the copy-not-move policy for proposal artifacts;
-- the canonical result rewrite policy;
-- the provenance rule that `source.*` remains the exact proposal evidence scored
-  by the LLM;
+- the move-cleanup policy for proposal artifacts;
+- the scored-artifact handling policy;
+- the provenance rule that `source.*` remains the historical scored-source path
+  and hashes even after the proposal root is moved away;
 - all expected canonical sim, result, state, and index paths.
 
 Use that DI ID in promoted sim docs, result `promotion` metadata, and final
@@ -112,7 +119,7 @@ handoff evidence.
 
 ## 5. Record Acceptance in GA State
 
-Run `accept` before copying canonical artifacts:
+Run `accept` before moving canonical artifacts:
 
 ```bash
 cd tools/ga-runner
@@ -130,86 +137,54 @@ same run. If children come from different run groups, run one `accept` command
 per run group. The command should print review paths and remind the operator
 that promotion is still required before `git add`.
 
-## 6. Copy Proposal Sim Trees to Canonical Homes
+## 6. Record Canonical Intent Without Rewriting Scored Bytes
 
 For each accepted child:
 
-1. Copy the proposal sim tree to `simulations/<final-sim-id>/`.
-2. Do not move, delete, or cull the proposal tree during promotion.
-3. Replace proposal IDs and titles with the final simulation ID.
-4. Remove `child` wording where it implies the canonical sim is still a generated
-   proposal.
-5. Keep useful provenance language: parent IDs, run group, original child ID, and
-   promotion DI.
-6. Fill or repair standing sim files so the promoted sim is self-contained and
-   indexable.
+1. Record the intended final canonical simulation ID in the promotion DI and
+   reviewer note.
+2. Keep useful provenance language in surrounding docs: parent IDs, run group,
+   original child ID, and promotion DI.
+3. Do not rewrite scored simulation files or scored result JSONs to replace
+   child IDs, add cleanup notes, or add canonical result metadata.
+4. If Steve explicitly wants canonical homes before a later byte-identical path
+   is locked, stop and resolve whether to move or copy the scored bytes
+   unchanged.
 
-The canonical sim may be cleaner than the proposal tree, but it must not claim
-that the LLM scored the cleaned tree. The result provenance remains tied to the
-proposal source.
+This keeps the scored artifact bytes historical while still letting TODOs,
+indexes, and review notes say which child was accepted and what canonical name
+is intended.
 
-## 7. Copy Result Evidence to Canonical Results
-
-For each selected proposal result JSON:
-
-1. Copy it to:
-
-   ```text
-   results/<final-sim-id>/<scenario-id>/<model-id>/<timestamp>.json
-   ```
-
-2. Rewrite canonical storage identity fields for discoverability:
-
-   - `result_id`
-   - `sim_id`
-   - `result_path`
-
-3. Preserve the original `run_group_id`, `scenario_id`, model fields, scores,
-   fitness, assessment, usage, cost, and `source.*` fields.
-4. Add or update a `promotion` object:
-
-   ```json
-   {
-     "promotion_di": "DI-<handle>",
-     "run_group_id": "<run-group-id>",
-     "original_child_sim_id": "<child-id>",
-     "final_sim_id": "<final-sim-id>",
-     "original_proposal_sim_path": "proposals/<run-group-id>/simulations/<child-id>/",
-     "original_proposal_result_path": "proposals/<run-group-id>/results/<child-id>/<scenario>/<model>/<timestamp>.json",
-     "canonical_result_path": "results/<final-sim-id>/<scenario>/<model>/<timestamp>.json",
-     "source_provenance_policy": "Canonical storage identity fields were updated for discoverability; source.* fields intentionally preserve the exact proposal tree and file hashes scored by the LLM before promotion."
-   }
-   ```
-
-Do not rewrite `source.sim_path`, `source.files`, or
-`source.simulation_tree_hash` to the final canonical sim tree.
-
-## 8. Update Indexes and Cross-References
+## 7. Update Indexes and Cross-References
 
 Update the public navigation surfaces that make the new canonical sim
 discoverable:
 
-- `simulations/README.md`;
-- `DEV-GUIDE-RESOURCES.md` when the sim is relevant to the developer guide or an
-  existing resource table;
-- the relevant TODO/DR/DI text when the promotion closes or routes open work.
+- the relevant TODO/DR/DI text when the promotion closes or routes open work;
+- `simulations/README.md` only if it can point at scored evidence without
+  pretending a rewritten canonical sim tree exists;
+- `DEV-GUIDE-RESOURCES.md` when the accepted child materially changes the guide
+  evidence picture and the reference can be made without claiming a rewritten
+  canonical artifact already exists.
 
 For family-specific sims, preserve local family grouping. For example,
 grid-envelope promotions belong with the grid-envelope table, while guide-level
 claim/conformance promotions should be indexed as their own simulation family
 instead of being forced into grid-envelope language.
 
-## 9. Validate Before Handoff
+## 8. Validate Before Handoff
 
-Run targeted validation on every copied canonical JSON file:
+Run targeted validation on every scored JSON file whose surrounding docs or
+state you touched:
 
 ```bash
 cd tools/ga-runner
-go run . validate -repo-root ../.. -result ../../results/<final-sim-id>/<scenario-id>/<model-id>/<timestamp>.json
+go run . validate -repo-root ../.. -result ../../proposals/<run-group-id>/results/<child-id>/<scenario-id>/<model-id>/<timestamp>.json
 ```
 
-For larger batches, also validate the shared timestamp/model after the explicit
-file checks:
+If a future byte-identical promotion path creates canonical result files, also
+validate those copied/moved files explicitly. For larger batches, validate the
+shared timestamp/model after the explicit file checks:
 
 ```bash
 cd tools/ga-runner
@@ -226,23 +201,25 @@ If code changed, also run the code-specific checks required by `AGENTS.md`,
 including comment-delta audit and `errcheck ./...` for Go changes. A normal
 promotion should not require Go code changes.
 
-## 10. Handoff
+## 9. Handoff
 
 The final response must include:
 
-- promoted final sim IDs;
+- accepted child IDs and intended final sim IDs;
 - accepted run group(s) and original child IDs;
-- canonical result root(s);
+- where the scored evidence currently lives;
 - validation commands run;
-- explicit statement that proposal artifacts were preserved;
+- explicit statement that scored artifact bytes were left unchanged, or that any
+  move/copy was byte-identical;
 - Decision Compliance, Decision Matrix, Inline diff annotations, Runtime Path
   Touch Matrix, Comment audit, Intent provenance audit, and Exceptions.
 
 Do not commit unless Steve says `commit`.
 
-## 11. Cull Separately
+## 10. Cull Rejected Children Separately
 
-Promotion does not cull rejected or unpromoted children. If Steve later says to
-cull proposals, use `tools/ga-runner cull` with explicit child IDs and reasons so
-the destructive cleanup is state-bound and auditable. Source: `DI-kofil`;
-`DI-dikoh`.
+Promotion moves accepted children and therefore does not use `cull` for those
+children. Rejected or unpromoted children remain under `proposals/` until Steve
+chooses to cull them. For rejected children, use `tools/ga-runner cull` with
+explicit child IDs and reasons so destructive cleanup is state-bound and
+auditable. Source: `DI-kofil`; `DI-dikoh`; `DI-zadik`; `DI-higot`.

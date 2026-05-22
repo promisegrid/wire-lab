@@ -147,6 +147,70 @@ Affects: `DEV-GUIDE-RESOURCES.md`; `AGENTS.md`;
 future `DEV-GUIDE-RESOURCES.md` maintenance.
 Supersedes: DI-lukib
 
+### DI-baral
+
+ID: DI-baral
+Date: 2026-05-21 19:11:43
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Supersede the overly broad claim-card interpretation of
+`DI-volos`. The `DEV-GUIDE-RESOURCES.md` `## Current Design State` section
+must derive guide-facing protocol examples from consensus across near-contender
+simulations, not from the single top score. It must prefer small positional
+pCID-selected wire shapes, deterministic pCID-defined payload contracts, and
+Burgess Promise Theory vocabulary: autonomous promisers, promisees, promise
+bodies, kept/broken observations, and peer-local promise accounting records.
+Capability tokens, when discussed, are promises made by a promiser rather than
+global permissions or app-selected capability maps.
+Intent: Keep the PromiseGrid guide snapshot simple enough for small devices and
+durable enough for a 100-year design horizon. A pCID should identify the exact
+payload contract and handler semantics so applications do not shop through
+large capability or claim maps at runtime. Complex claim-card-like fixtures may
+remain simulation evidence, but the guide snapshot must not present them as the
+current consensus protocol shape unless several near contenders independently
+support that complexity.
+Constraints: Keep the top section technical but compact. Show candidate CDDL-like
+or CBOR-like forms only when they are pCID-determined and explicitly marked
+candidate, not frozen. Treat proof/signature placement as a profile decision
+unless the near-contender evidence converges on an outer proof field. Call out
+capability-token-as-promise coverage separately if it is only historical,
+adjacent, or insufficiently covered by current promoted simulations. Avoid
+central authority, central trust ledgers, global permission registries,
+capability-shopping maps, and large general-purpose claim-card maps in the
+guide-facing consensus summary.
+Affects: `DEV-GUIDE-RESOURCES.md`; `AGENTS.md`;
+`protocols/wire-lab.d/TODO/TODO-rozas-promisegrid-dev-guide-resources.md`;
+future `DEV-GUIDE-RESOURCES.md` maintenance.
+Supersedes: DI-volos
+
+### DI-pagin
+
+ID: DI-pagin
+Date: 2026-05-22 10:36:55
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Tighten `DEV-GUIDE-RESOURCES.md` to use Promise-Theory-first,
+promise-first guide wording. The guide-facing base sentence is: "I, Alice,
+promise that this payload meets the protocol specification referred to by this
+pCID." Treat "conformance" only as a predicate or shorthand for that promise,
+not as the name of a separate universal artifact. Avoid guide-facing terms such
+as "claim card", "conformance bundle", "port claim", and "profile support
+claim" unless they are required by a specific pCID spec or are preserved only
+as historical simulation/file names.
+Intent: Remove the remaining standards/compliance vocabulary drift from the
+guide resource map so current guidance stays simple, pCID-centered, and aligned
+with Burgess Promise Theory. Guide writers should see payload promises,
+implementation promises, and peer-local promise accounting rather than generic
+claim-card or bundle abstractions.
+Constraints: Do not rename historical simulation IDs, TE titles, DR titles, or
+file paths that already contain older terms. Keep `DEV-GUIDE-RESOURCES.md`
+technical and compact. Preserve the existing consensus toward small positional
+`[pcid, payload]` shapes, pCID-owned payload semantics, and peer-local promise
+accounting. Do not introduce a new universal outer promise wrapper merely to
+replace the old vocabulary.
+Affects: `DEV-GUIDE-RESOURCES.md`;
+`protocols/wire-lab.d/TODO/TODO-rozas-promisegrid-dev-guide-resources.md`.
+
 ## Context
 
 The PromiseGrid Development Guide currently has three locked audiences:
@@ -204,3 +268,6 @@ guide's claims.
 - [x] rozas.11 Route current open guide-feedback questions into provisional
   simulation homes and root scenarios so the guide can cite evidence pressure
   without treating open DRs as settled. Source: `DI-ragaz`.
+- [ ] rozas.12 Add or route a dedicated capability-token-as-promise simulation
+  before guide prose treats capability tokens as settled current-simulation
+  consensus. Source: `DI-baral`.
