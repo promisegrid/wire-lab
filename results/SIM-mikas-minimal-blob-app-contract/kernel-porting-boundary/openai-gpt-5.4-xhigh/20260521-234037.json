@@ -1,0 +1,114 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-mikas-minimal-blob-app-contract-kernel-porting-boundary-openai-gpt-5.4-xhigh-20260521-234037",
+  "run_group_id": "ga-canary-20260521-234037",
+  "cell_id": "ga-canary-20260521-234037-000007-SIM-mikas-minimal-blob-app-contract--kernel-porting-boundary--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-mikas-minimal-blob-app-contract",
+  "scenario_id": "kernel-porting-boundary",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260521-234037",
+  "result_path": "results/SIM-mikas-minimal-blob-app-contract/kernel-porting-boundary/openai-gpt-5.4-xhigh/20260521-234037.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_d1aa3cc849aa4b88928e68956aea0d1f",
+    "response_id": "resp_04061e9e3db67905006a0f984a59ec819baa4450a27dc6f20b",
+    "input_tokens": 6321,
+    "output_tokens": 5950,
+    "cost_usd": 0.09436175
+  },
+  "source": {
+    "repo_commit": "f098e31d950a71f6844c4015150af0c90523ca4f",
+    "sim_path": "simulations/SIM-mikas-minimal-blob-app-contract/",
+    "scenario_path": "scenarios/kernel-porting-boundary/kernel-porting-boundary.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "28a7d5ae02517cd2fc22e1fb03c497d40d982d374a5876f401cfc8d8ac68b9a7"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-mikas-minimal-blob-app-contract/README.md",
+        "sha256": "0c4755add75a4aed9913cbcf3271eb4faf20db662cb7993921d8c4b684c1bf60"
+      },
+      {
+        "path": "simulations/SIM-mikas-minimal-blob-app-contract/QUESTION.md",
+        "sha256": "546fe58b588d2a8057994b8d12f0e770b389a3591d401d76d61ab6f4d407bd03"
+      },
+      {
+        "path": "scenarios/kernel-porting-boundary/kernel-porting-boundary.md",
+        "sha256": "d1646fa062e6c64f27cbbd25da0e96f6d484c60582677cdfc798d265a22d5096"
+      }
+    ],
+    "simulation_tree_hash": "97358511b9d6fdb6a02c37fd0722f03dafb09104268a3c034a920d71dd711c93"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 4,
+    "auditability": 3,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 2,
+    "failure_handling": 1,
+    "implementation_plausibility": 2,
+    "risk_penalty": 4
+  },
+  "fitness": {
+    "raw": 18,
+    "normalized_0_100": 45,
+    "confidence_0_1": 0.87
+  },
+  "assessment": {
+    "rationale": "Useful as a narrow CAS/app-boundary input, but mostly off-target for this porting scenario: it clarifies provisional blob-contract limits yet does not define the porting surface, terminology, harness separation, or first-port conformance claim.",
+    "strengths": [
+      "Explicitly keeps replication, retention, discovery, ingress, and hash-as-capability outside any overclaimed base CAS guarantee.",
+      "Strong draft-vs-frozen-spec caution and explicit acknowledgement of open DRs.",
+      "Frames 100-year survival and non-canonical implementation choice as design constraints."
+    ],
+    "weaknesses": [
+      "Does not say what the minimum viable porting target is before freeze.",
+      "Does not separate wire-lab harness apparatus from real host-port obligations.",
+      "Does not cover runtime/kernel/dispatcher/library terminology or binding/session/message/feed conformance scope."
+    ],
+    "risks": [
+      "Readers could misread app-level blob guidance as kernel or runtime porting guidance.",
+      "A provisional CAS profile could be treated as a premature conformance obligation.",
+      "Missing non-CAS layer boundaries may create a false sense that a first port is more specified than it is."
+    ],
+    "open_questions": [
+      "What terminology should the guide standardize on for the porting target before DR-davod closes?",
+      "Which K1-K5 ingress, feed, session, message, and app-layer details are blocked versus provisionally portable?",
+      "Can any CAS-facing draft profile be part of a first-port claim, or should it stay app-orientation only until freeze?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

@@ -1,0 +1,122 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-kovis-grid-envelope-enc-cbor-unknown-hard-reject-sig-mandatory-sig-pcid-payload-cas-object-type-binding-bakeoff-raw-chunk-versus-pointer-bytes-openai-gpt-5.4-xhigh-20260522-012332",
+  "run_group_id": "ga-canary-20260522-012332",
+  "cell_id": "ga-canary-20260522-012332-000112-SIM-kovis-grid-envelope-enc-cbor-unknown-hard-reject-sig-mandatory-sig-pcid-payload--cas-object-type-binding-bakeoff-raw-chunk-versus-pointer-bytes--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-kovis-grid-envelope-enc-cbor-unknown-hard-reject-sig-mandatory-sig-pcid-payload",
+  "scenario_id": "cas-object-type-binding-bakeoff-raw-chunk-versus-pointer-bytes",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260522-012332",
+  "result_path": "results/SIM-kovis-grid-envelope-enc-cbor-unknown-hard-reject-sig-mandatory-sig-pcid-payload/cas-object-type-binding-bakeoff-raw-chunk-versus-pointer-bytes/openai-gpt-5.4-xhigh/20260522-012332.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_33f5682c17b045e5973bfb5eee5a2b6f",
+    "response_id": "resp_0b4005b00b4a6d45006a0fbbb9550481999358acfa33a4155f",
+    "input_tokens": 6951,
+    "output_tokens": 6597,
+    "cost_usd": 0.10452225
+  },
+  "source": {
+    "repo_commit": "f098e31d950a71f6844c4015150af0c90523ca4f",
+    "sim_path": "simulations/SIM-kovis-grid-envelope-enc-cbor-unknown-hard-reject-sig-mandatory-sig-pcid-payload/",
+    "scenario_path": "scenarios/cas-object-type-binding-bakeoff-raw-chunk-versus-pointer-bytes/cas-object-type-binding-bakeoff-raw-chunk-versus-pointer-bytes.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "28a7d5ae02517cd2fc22e1fb03c497d40d982d374a5876f401cfc8d8ac68b9a7"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-kovis-grid-envelope-enc-cbor-unknown-hard-reject-sig-mandatory-sig-pcid-payload/README.md",
+        "sha256": "88cd13e9f51f6742986035a0a1deee85830e1fcaa8b9e8df049e53dcef62ed77"
+      },
+      {
+        "path": "simulations/SIM-kovis-grid-envelope-enc-cbor-unknown-hard-reject-sig-mandatory-sig-pcid-payload/QUESTION.md",
+        "sha256": "f08b4b45a3ec3bf3a66b5d90b67f67f026496e27e4d552a89002a69e0fe088f6"
+      },
+      {
+        "path": "simulations/SIM-kovis-grid-envelope-enc-cbor-unknown-hard-reject-sig-mandatory-sig-pcid-payload/protocols/grid-envelope.d/CHANGELOG.md",
+        "sha256": "aef2b7915320af9607f415cef649397530561e4f0f9372fda1bbf2691dd3f9b1"
+      },
+      {
+        "path": "simulations/SIM-kovis-grid-envelope-enc-cbor-unknown-hard-reject-sig-mandatory-sig-pcid-payload/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "4967b3c784d924af3f97950f8fd731572e2f32e61b550acbdb35e95de6ec4c62"
+      },
+      {
+        "path": "scenarios/cas-object-type-binding-bakeoff-raw-chunk-versus-pointer-bytes/cas-object-type-binding-bakeoff-raw-chunk-versus-pointer-bytes.md",
+        "sha256": "64da602a38c041eeed6075a84c4c46c3d4448cbf21381eb803382aae0aec4018"
+      }
+    ],
+    "simulation_tree_hash": "eb72da938d67fc2ce8cce48ed81dd825940a7993a82a9dbc4bf42acd39a1dadc"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 3,
+    "auditability": 4,
+    "evolution_safety": 2,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 3,
+    "implementation_plausibility": 4,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 20,
+    "normalized_0_100": 57,
+    "confidence_0_1": 0.81
+  },
+  "assessment": {
+    "rationale": "The variant gives wrapped bytes an in-band payload type via pCID and makes failures explicit, but it does not make CID codec identity alone distinguish raw chunks from pointer objects; that question is deferred to the envelope context or the payload protocol.",
+    "strengths": [
+      "Payload interpretation is bound in-band by pCID rather than local filenames or paths.",
+      "Deterministic CBOR plus mandatory signatures support reproducible auditing.",
+      "Envelope, payload, and signature responsibilities are separated clearly."
+    ],
+    "weaknesses": [
+      "CID codec identity alone still does not tell Bob whether bytes are a pointer object or raw payload.",
+      "Type binding for separately addressed body bytes is pushed into the payload protocol, not solved at the envelope layer.",
+      "Unknown-hard-reject makes the design brittle across future protocol additions."
+    ],
+    "risks": [
+      "Older peers may drop or refuse future pCIDs instead of preserving evidence for later handling.",
+      "If the envelope is stripped or only payload bytes are shared by hash, the type signal can disappear.",
+      "The draft is unfrozen and the spec pCID is not yet minted, so long-term interoperability remains uncertain."
+    ],
+    "open_questions": [
+      "What outer codec or object convention tells Bob that arbitrary bytes should be parsed as this grid envelope at all?",
+      "How are raw-chunk versus pointer-object distinctions carried when only a referenced CAS blob survives, not the whole envelope?",
+      "Can unknown-hard-reject coexist with archival or relay behavior needed for long-lived mixed-version networks?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

@@ -1,0 +1,122 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-mahih-grid-envelope-enc-cbor-unknown-opaque-sig-wrapper-pcid-chunk-feed-replication-carrier-independence-openai-gpt-5.4-xhigh-20260522-012332",
+  "run_group_id": "ga-canary-20260522-012332",
+  "cell_id": "ga-canary-20260522-012332-000143-SIM-mahih-grid-envelope-enc-cbor-unknown-opaque-sig-wrapper-pcid--chunk-feed-replication-carrier-independence--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-mahih-grid-envelope-enc-cbor-unknown-opaque-sig-wrapper-pcid",
+  "scenario_id": "chunk-feed-replication-carrier-independence",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260522-012332",
+  "result_path": "results/SIM-mahih-grid-envelope-enc-cbor-unknown-opaque-sig-wrapper-pcid/chunk-feed-replication-carrier-independence/openai-gpt-5.4-xhigh/20260522-012332.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_59dcde60fe624a47a585e452629782c9",
+    "response_id": "resp_082cd6a878b1cfc2006a0fbeff1088819baf29bf79ea81210e",
+    "input_tokens": 6801,
+    "output_tokens": 11248,
+    "cost_usd": 0.16937375
+  },
+  "source": {
+    "repo_commit": "f098e31d950a71f6844c4015150af0c90523ca4f",
+    "sim_path": "simulations/SIM-mahih-grid-envelope-enc-cbor-unknown-opaque-sig-wrapper-pcid/",
+    "scenario_path": "scenarios/chunk-feed-replication-carrier-independence/chunk-feed-replication-carrier-independence.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "28a7d5ae02517cd2fc22e1fb03c497d40d982d374a5876f401cfc8d8ac68b9a7"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-mahih-grid-envelope-enc-cbor-unknown-opaque-sig-wrapper-pcid/README.md",
+        "sha256": "9b3812b34ce54f670f2557b1186b0f1372205dd26df88105f37d74c257adba2b"
+      },
+      {
+        "path": "simulations/SIM-mahih-grid-envelope-enc-cbor-unknown-opaque-sig-wrapper-pcid/QUESTION.md",
+        "sha256": "d9adefd3bde20b8b93489dae32c873a6e21009855c1f007aa166ac1cd1faf641"
+      },
+      {
+        "path": "simulations/SIM-mahih-grid-envelope-enc-cbor-unknown-opaque-sig-wrapper-pcid/protocols/grid-envelope.d/CHANGELOG.md",
+        "sha256": "aef2b7915320af9607f415cef649397530561e4f0f9372fda1bbf2691dd3f9b1"
+      },
+      {
+        "path": "simulations/SIM-mahih-grid-envelope-enc-cbor-unknown-opaque-sig-wrapper-pcid/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "c98e7f4891f72f87d438ccb85b720fa3f7d52043b03038d711e32f91780112e8"
+      },
+      {
+        "path": "scenarios/chunk-feed-replication-carrier-independence/chunk-feed-replication-carrier-independence.md",
+        "sha256": "5386ebc3943d885551ac45b3b4fb1616d67d742407906c347b7d1d388f31c346"
+      }
+    ],
+    "simulation_tree_hash": "f4a70d5b05c7608d49fe60e0bfd51e87f1cf701aafad2970df62c7bcf9922a6d"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 3,
+    "auditability": 3,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 3,
+    "implementation_plausibility": 4,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 21,
+    "normalized_0_100": 60,
+    "confidence_0_1": 0.78
+  },
+  "assessment": {
+    "rationale": "The variant gives a clean carrier-neutral envelope boundary: deterministic CBOR bytes can move over different carriers, unknown pCIDs can still be relayed opaquely, and interpretation, ordering, and authorship are pushed into pCID-selected payload or wrapper protocols. That is a useful partial answer to carrier independence, but it does not itself define feed semantics, chunk replication rules, or local audit/accounting, so the scenario is only partially covered.",
+    "strengths": [
+      "Same canonical envelope bytes can ride multiple carriers without changing the envelope contract.",
+      "Unknown-pCID store-and-forward with explicit unsupported results fits sparse knowledge and avoids speculative parsing.",
+      "The spec makes the layer boundary explicit: ordering, relay evidence, signatures, and body references belong to payload or wrapper protocols, not the carrier."
+    ],
+    "weaknesses": [
+      "It does not define feed-role semantics, chunk ordering/completeness rules, or replication invariants across carriers.",
+      "Peer-local promise accounting and cross-carrier audit records are not specified.",
+      "Wrapper-selected signatures add indirection that can make audits and interoperability harder."
+    ],
+    "risks": [
+      "Different implementations may choose incompatible wrapper and signature conventions and lose cross-carrier interoperability.",
+      "Long-term interpretation depends on preserving access to the pCID-identified specs or handlers, not just the envelope bytes.",
+      "Because the specimen is still a draft, compatibility assumptions may change before freeze."
+    ],
+    "open_questions": [
+      "What pCID-defined feed protocol carries chunk replication semantics independently of carrier choice?",
+      "How are the pCID-identified specs or handlers discovered and preserved over long time spans without hidden central authority?",
+      "What local records should Alice, Bob, and Carol keep to audit replication success after carrier changes?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

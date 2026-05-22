@@ -1,0 +1,122 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-gojot-grid-envelope-enc-dag-cbor-unknown-opaque-sig-wrapper-pcid-udp-feed-v0-conformance-session-layer-composition-openai-gpt-5.4-xhigh-20260522-012332",
+  "run_group_id": "ga-canary-20260522-012332",
+  "cell_id": "ga-canary-20260522-012332-000060-SIM-gojot-grid-envelope-enc-dag-cbor-unknown-opaque-sig-wrapper-pcid--udp-feed-v0-conformance-session-layer-composition--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-gojot-grid-envelope-enc-dag-cbor-unknown-opaque-sig-wrapper-pcid",
+  "scenario_id": "udp-feed-v0-conformance-session-layer-composition",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260522-012332",
+  "result_path": "results/SIM-gojot-grid-envelope-enc-dag-cbor-unknown-opaque-sig-wrapper-pcid/udp-feed-v0-conformance-session-layer-composition/openai-gpt-5.4-xhigh/20260522-012332.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_441cbf6540f34ecc9217f1784f142c09",
+    "response_id": "resp_07dc073219bdcbd5006a0fb6553828819a8d22fae2c3e9742d",
+    "input_tokens": 6828,
+    "output_tokens": 8386,
+    "cost_usd": 0.129353
+  },
+  "source": {
+    "repo_commit": "f098e31d950a71f6844c4015150af0c90523ca4f",
+    "sim_path": "simulations/SIM-gojot-grid-envelope-enc-dag-cbor-unknown-opaque-sig-wrapper-pcid/",
+    "scenario_path": "scenarios/udp-feed-v0-conformance-session-layer-composition/udp-feed-v0-conformance-session-layer-composition.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "28a7d5ae02517cd2fc22e1fb03c497d40d982d374a5876f401cfc8d8ac68b9a7"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-gojot-grid-envelope-enc-dag-cbor-unknown-opaque-sig-wrapper-pcid/README.md",
+        "sha256": "b24a3975b733c2401f9ea6d4016f8423e7fd7b03313bcfcba78608e5ccdb3808"
+      },
+      {
+        "path": "simulations/SIM-gojot-grid-envelope-enc-dag-cbor-unknown-opaque-sig-wrapper-pcid/QUESTION.md",
+        "sha256": "622a65ebda9ebdb7eed3613c31de38962af4942dac2493ac8d885692a0c897a8"
+      },
+      {
+        "path": "simulations/SIM-gojot-grid-envelope-enc-dag-cbor-unknown-opaque-sig-wrapper-pcid/protocols/grid-envelope.d/CHANGELOG.md",
+        "sha256": "aef2b7915320af9607f415cef649397530561e4f0f9372fda1bbf2691dd3f9b1"
+      },
+      {
+        "path": "simulations/SIM-gojot-grid-envelope-enc-dag-cbor-unknown-opaque-sig-wrapper-pcid/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "14ea55b94631c1438682e6795ae44965b926e6349e9411c1641af86d4059beed"
+      },
+      {
+        "path": "scenarios/udp-feed-v0-conformance-session-layer-composition/udp-feed-v0-conformance-session-layer-composition.md",
+        "sha256": "69da5db705a56cd7067a653928ff8b2dc9301ef6ebfc712bd81038a65c9d352c"
+      }
+    ],
+    "simulation_tree_hash": "9e114c7aa2aa728b929b6162d361c7f7fbb6d464ac69d30f8b4f563b5354d8df"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 3,
+    "promisegrid_alignment": 4,
+    "auditability": 3,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 3,
+    "implementation_plausibility": 4,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 24,
+    "normalized_0_100": 69,
+    "confidence_0_1": 0.67
+  },
+  "assessment": {
+    "rationale": "This specimen is a reasonable composition substrate because UDP-feed can carry the canonical envelope bytes without learning payload meaning, and pCID dispatch keeps layer boundaries explicit. It only partially satisfies the scenario, though, because proving next-layer sufficiency still needs wrapper/payload rules for session identity, sequencing, replay, fragmentation, and other checks beyond a UDP round trip.",
+    "strengths": [
+      "Clear transport/envelope/payload separation via positional [pcid, payload] and no speculative parsing.",
+      "Unknown-pCID store/forward behavior supports sparse knowledge, later audit, and long-term retention of exact bytes.",
+      "Wrapper-based signatures/evidence allow evolution without changing the base envelope shape."
+    ],
+    "weaknesses": [
+      "No explicit UDP-feed v0 API contract or worked session-layer composition example.",
+      "Session concerns such as sequencing, replay, multiplexing, and fragmentation are deferred to other protocols.",
+      "Opaque payloads and wrapper-only evidence reduce immediate human/LLM interpretability without extra handler specs."
+    ],
+    "risks": [
+      "Implementers may create incompatible signature or session wrappers around the same base envelope.",
+      "Transport concerns like MTU, ordering, or deduplication may leak upward because this specimen leaves them unspecified.",
+      "Store-and-forward of unknown envelopes preserves bytes but can delay detection of misbound or malicious content."
+    ],
+    "open_questions": [
+      "What must TODO-jodon's done criteria include beyond a successful UDP round trip to prove real next-layer composition?",
+      "Which pCIDs carry session identity, sequencing, replay protection, and hop evidence?",
+      "How are fragmentation and reassembly handled over UDP-feed v0 while preserving canonical bytes?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

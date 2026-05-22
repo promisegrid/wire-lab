@@ -1,0 +1,124 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-vivus-grid-envelope-enc-cbor-unknown-best-effort-sig-wrapper-pcid-chunk-feed-replication-carrier-independence-openai-gpt-5.4-xhigh-20260522-012332",
+  "run_group_id": "ga-canary-20260522-012332",
+  "cell_id": "ga-canary-20260522-012332-000203-SIM-vivus-grid-envelope-enc-cbor-unknown-best-effort-sig-wrapper-pcid--chunk-feed-replication-carrier-independence--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-vivus-grid-envelope-enc-cbor-unknown-best-effort-sig-wrapper-pcid",
+  "scenario_id": "chunk-feed-replication-carrier-independence",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260522-012332",
+  "result_path": "results/SIM-vivus-grid-envelope-enc-cbor-unknown-best-effort-sig-wrapper-pcid/chunk-feed-replication-carrier-independence/openai-gpt-5.4-xhigh/20260522-012332.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_9bd0403c048947039eb4a63d77409dec",
+    "response_id": "resp_0ca16d9aefd1064d006a0fccee2248819b86ac026d6ee106ba",
+    "input_tokens": 6813,
+    "output_tokens": 14409,
+    "cost_usd": 0.21364875
+  },
+  "source": {
+    "repo_commit": "f098e31d950a71f6844c4015150af0c90523ca4f",
+    "sim_path": "simulations/SIM-vivus-grid-envelope-enc-cbor-unknown-best-effort-sig-wrapper-pcid/",
+    "scenario_path": "scenarios/chunk-feed-replication-carrier-independence/chunk-feed-replication-carrier-independence.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "28a7d5ae02517cd2fc22e1fb03c497d40d982d374a5876f401cfc8d8ac68b9a7"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-vivus-grid-envelope-enc-cbor-unknown-best-effort-sig-wrapper-pcid/README.md",
+        "sha256": "2021f0124eb525c7a4603cacb2594e2b4f23ded46503995e7434fb548829dea3"
+      },
+      {
+        "path": "simulations/SIM-vivus-grid-envelope-enc-cbor-unknown-best-effort-sig-wrapper-pcid/QUESTION.md",
+        "sha256": "2db906c0951fd55e7f4e0ad6772e0de93be4e6ed614da4d1371df96505f32fa7"
+      },
+      {
+        "path": "simulations/SIM-vivus-grid-envelope-enc-cbor-unknown-best-effort-sig-wrapper-pcid/protocols/grid-envelope.d/CHANGELOG.md",
+        "sha256": "aef2b7915320af9607f415cef649397530561e4f0f9372fda1bbf2691dd3f9b1"
+      },
+      {
+        "path": "simulations/SIM-vivus-grid-envelope-enc-cbor-unknown-best-effort-sig-wrapper-pcid/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "fbf65d9dc63bda02cfb23129cf0d4860449a168349cb580e0a9c52479deb1dcb"
+      },
+      {
+        "path": "scenarios/chunk-feed-replication-carrier-independence/chunk-feed-replication-carrier-independence.md",
+        "sha256": "5386ebc3943d885551ac45b3b4fb1616d67d742407906c347b7d1d388f31c346"
+      }
+    ],
+    "simulation_tree_hash": "58aac6347a21eca760edb90e4c33f9105046b86ff556ebea7d7e85182b7d0552"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 4,
+    "auditability": 2,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 2,
+    "implementation_plausibility": 4,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 21,
+    "normalized_0_100": 60,
+    "confidence_0_1": 0.72
+  },
+  "assessment": {
+    "rationale": "Strong at the wire-layer boundary: the deterministic CBOR [pcid,payload] envelope is carrier-agnostic, sparse-knowledge friendly, and keeps substrate mechanics out of the base shape, with visible unknown-pCID failure. But it only partially fits this chunk-feed scenario because feed semantics, replication evidence, and authorship are deferred to payload or wrapper protocols rather than defined here.",
+    "strengths": [
+      "The two-slot envelope is simple and transport-neutral, supporting the same bytes over different carriers.",
+      "Deterministic CBOR bytes and explicit unsupported/unverified unknown-pCID handling make dispatch failures visible.",
+      "The specimen avoids assuming a central pCID registry, aligning with non-central PromiseGrid goals.",
+      "Wrapper-based signatures let authorship and integrity schemes evolve without changing the base envelope."
+    ],
+    "weaknesses": [
+      "No chunk-feed protocol, cursor, or chunk-ordering semantics are specified.",
+      "Carrier and replication failure behavior is mostly delegated to payload or wrapper protocols.",
+      "Base-envelope auditability is limited because signatures and hop evidence are externalized.",
+      "The specimen is still draft-only and the spec pCID is not yet minted or frozen."
+    ],
+    "risks": [
+      "Best-effort salvage of unknown pCIDs could be mistaken for verified interpretation.",
+      "Different wrapper signature or evidence conventions could fragment cross-carrier interoperability.",
+      "Carrier independence remains only partial until a concrete feed protocol is defined on top of the envelope."
+    ],
+    "open_questions": [
+      "What payload protocol supplies carrier-independent chunk-feed semantics on top of this envelope?",
+      "How should peers record local replication and audit evidence when authorship lives in wrappers?",
+      "How is long-term pCID-to-spec resolution kept understandable without a central registry?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

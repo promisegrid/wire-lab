@@ -1,0 +1,116 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-zisan-device-bound-agent-app-semantics-partial-conformance-openai-gpt-5.4-xhigh-20260521-234037",
+  "run_group_id": "ga-canary-20260521-234037",
+  "cell_id": "ga-canary-20260521-234037-000016-SIM-zisan-device-bound-agent--app-semantics-partial-conformance--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-zisan-device-bound-agent",
+  "scenario_id": "app-semantics-partial-conformance",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260521-234037",
+  "result_path": "results/SIM-zisan-device-bound-agent/app-semantics-partial-conformance/openai-gpt-5.4-xhigh/20260521-234037.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_68f9173b80f54df89faec6970a1bdeca",
+    "response_id": "resp_068de713a7510e6e006a0f98d01e2c819a9f3e5d918269f0bd",
+    "input_tokens": 6284,
+    "output_tokens": 6421,
+    "cost_usd": 0.100891
+  },
+  "source": {
+    "repo_commit": "f098e31d950a71f6844c4015150af0c90523ca4f",
+    "sim_path": "simulations/SIM-zisan-device-bound-agent/",
+    "scenario_path": "scenarios/app-semantics-partial-conformance/app-semantics-partial-conformance.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "28a7d5ae02517cd2fc22e1fb03c497d40d982d374a5876f401cfc8d8ac68b9a7"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-zisan-device-bound-agent/README.md",
+        "sha256": "0d4ffd8bc616cb590c55290d4b7082f1949b0cae6381f48d2776386b459733e9"
+      },
+      {
+        "path": "simulations/SIM-zisan-device-bound-agent/QUESTION.md",
+        "sha256": "d4301120704c334bf147b96d6bef7bf625ea1962cf2974d1a2a778ef2c471e34"
+      },
+      {
+        "path": "scenarios/app-semantics-partial-conformance/app-semantics-partial-conformance.md",
+        "sha256": "e84a88096e8ecaca83f7a04d8958d6f7e5712e53bf180d14674e32fab69399ef"
+      }
+    ],
+    "simulation_tree_hash": "4e24774dcf443da1a667e63bf1c84ecc23953d7a3ea2c7fb1d76baf96313d935"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 5,
+    "promisegrid_alignment": 4,
+    "auditability": 4,
+    "evolution_safety": 5,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 4,
+    "implementation_plausibility": 4,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 28,
+    "normalized_0_100": 80,
+    "confidence_0_1": 0.83
+  },
+  "assessment": {
+    "rationale": "Strong fit: SIM-zisan explicitly targets provisional app-dev guidance, honest B-side conformance, and protocol-versus-host boundary clarity for device-bound agents. It is less complete on generic app-semantic claim wording and still leaves key authority, signature-carriage, and witness details open.",
+    "strengths": [
+      "Explicitly addresses honest partial-conformance claims without pretending final app or kernel boundaries are settled.",
+      "Clearly separates protocol-facing agent identity from host-specific driver-stack dependencies.",
+      "Emphasizes auditable delegation and irreversible-effect handling through explicit evidence, receipts, deduplication, and break-witness concepts.",
+      "Keeps protocol and driver API details provisional, which supports later evolution."
+    ],
+    "weaknesses": [
+      "Does not yet give a concrete template for the published partial-conformance claim.",
+      "Leaves authoritative boundary identity and signature-carriage wording unresolved.",
+      "Covers device-bound concerns more strongly than generic append/read/merge app semantics."
+    ],
+    "risks": [
+      "Bob could be misled if adapter-local shortcuts are presented as stable interoperable semantics.",
+      "Ambiguity between device, owner, operator, and agent authority could blur who is making the protocol promise.",
+      "Host-specific dependencies and actuator side effects raise safety risk when conformance language is underspecified."
+    ],
+    "open_questions": [
+      "What minimum fields and caveats must an honest partial-conformance claim include?",
+      "Which identity should be authoritative at the protocol boundary: device, owner, operator, or agent?",
+      "How should provisional signature carriage and capability or break-witness language be described without freezing them?",
+      "What minimum receipt and deduplication shape is required before non-idempotent actuator claims are safe?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

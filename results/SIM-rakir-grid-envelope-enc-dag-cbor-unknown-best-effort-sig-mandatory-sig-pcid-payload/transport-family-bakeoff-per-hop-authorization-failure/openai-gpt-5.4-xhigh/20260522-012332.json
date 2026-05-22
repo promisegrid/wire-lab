@@ -1,0 +1,123 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-rakir-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-mandatory-sig-pcid-payload-transport-family-bakeoff-per-hop-authorization-failure-openai-gpt-5.4-xhigh-20260522-012332",
+  "run_group_id": "ga-canary-20260522-012332",
+  "cell_id": "ga-canary-20260522-012332-000163-SIM-rakir-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-mandatory-sig-pcid-payload--transport-family-bakeoff-per-hop-authorization-failure--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-rakir-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-mandatory-sig-pcid-payload",
+  "scenario_id": "transport-family-bakeoff-per-hop-authorization-failure",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260522-012332",
+  "result_path": "results/SIM-rakir-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-mandatory-sig-pcid-payload/transport-family-bakeoff-per-hop-authorization-failure/openai-gpt-5.4-xhigh/20260522-012332.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_5d67212aba504d76a315d0663a18ec50",
+    "response_id": "resp_06e31a2a2c7d36b4006a0fc8dbb150819b90b4edf5d9175014",
+    "input_tokens": 6949,
+    "output_tokens": 10328,
+    "cost_usd": 0.15675275
+  },
+  "source": {
+    "repo_commit": "f098e31d950a71f6844c4015150af0c90523ca4f",
+    "sim_path": "simulations/SIM-rakir-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-mandatory-sig-pcid-payload/",
+    "scenario_path": "scenarios/transport-family-bakeoff-per-hop-authorization-failure/transport-family-bakeoff-per-hop-authorization-failure.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "28a7d5ae02517cd2fc22e1fb03c497d40d982d374a5876f401cfc8d8ac68b9a7"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-rakir-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-mandatory-sig-pcid-payload/README.md",
+        "sha256": "75921c77944a6d425f9a68fa8ab98e86f4db3e298b8d2c9748b45dc0f555076c"
+      },
+      {
+        "path": "simulations/SIM-rakir-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-mandatory-sig-pcid-payload/QUESTION.md",
+        "sha256": "bd6df2762928dcd70fa3eb114b62dced885e399ebb26bd34080dce6dd8276b53"
+      },
+      {
+        "path": "simulations/SIM-rakir-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-mandatory-sig-pcid-payload/protocols/grid-envelope.d/CHANGELOG.md",
+        "sha256": "aef2b7915320af9607f415cef649397530561e4f0f9372fda1bbf2691dd3f9b1"
+      },
+      {
+        "path": "simulations/SIM-rakir-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-mandatory-sig-pcid-payload/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "538501739ea9fea2614c27eb07065bfcd0d3429f4583f3e837971c2889bed432"
+      },
+      {
+        "path": "scenarios/transport-family-bakeoff-per-hop-authorization-failure/transport-family-bakeoff-per-hop-authorization-failure.md",
+        "sha256": "f938e10ab88db666d3097a2f97c1667bbbc6e8e071681134049068982cc39cf2"
+      }
+    ],
+    "simulation_tree_hash": "92c5d8e985a5266b1219c5985a1305bcf0ecba2bd5929def1374240a00e8a528"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 3,
+    "auditability": 3,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 1,
+    "implementation_plausibility": 4,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 19,
+    "normalized_0_100": 54,
+    "confidence_0_1": 0.82
+  },
+  "assessment": {
+    "rationale": "Useful as a carrier for signed hop-local evidence, weak as a direct answer to the transport scenario: the variant cleanly separates envelope, payload, and signature layers, but it leaves per-hop authorization, refusal recording, and ring reconfiguration semantics outside the specimen.",
+    "strengths": [
+      "Explicit layer boundary: forwarding or hop-local evidence can live in wrapper envelopes or payload protocols instead of being hidden in the base envelope.",
+      "Mandatory signature slots and canonical DAG-CBOR bytes make the received message auditable.",
+      "pCID-based dispatch and explicit unknown-pCID behavior support sparse knowledge and avoid central-registry dependence."
+    ],
+    "weaknesses": [
+      "The specimen does not define the actual per-hop authorization decision model for ring forwarding.",
+      "It does not specify whether authorization failure breaks the ring, skips a hop, records refusal, or triggers membership reconfiguration.",
+      "No standardized signed refusal or membership-update object is defined; the default signature only covers the base message."
+    ],
+    "risks": [
+      "Different payload or wrapper conventions could make authorization-failure evidence non-interoperable across hops.",
+      "Best-effort handling of unsupported payloads could be misapplied where policy should block action rather than inspect bytes.",
+      "Draft, unfrozen status and the unminted spec pCID reduce long-term stability."
+    ],
+    "open_questions": [
+      "What pCID and payload shape should Bob use for a signed refusal-to-forward record?",
+      "How do Alice and Carol distinguish authorized refusal from outage or malicious suppression?",
+      "How are ring membership changes represented and authenticated without introducing central authority?",
+      "Should hop-local authorization evidence be carried in a nested wrapper envelope signed by the refusing hop?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

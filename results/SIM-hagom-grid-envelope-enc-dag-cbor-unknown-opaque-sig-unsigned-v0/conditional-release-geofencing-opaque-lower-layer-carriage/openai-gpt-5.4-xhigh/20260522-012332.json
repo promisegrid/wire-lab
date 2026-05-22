@@ -1,0 +1,122 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-hagom-grid-envelope-enc-dag-cbor-unknown-opaque-sig-unsigned-v0-conditional-release-geofencing-opaque-lower-layer-carriage-openai-gpt-5.4-xhigh-20260522-012332",
+  "run_group_id": "ga-canary-20260522-012332",
+  "cell_id": "ga-canary-20260522-012332-000071-SIM-hagom-grid-envelope-enc-dag-cbor-unknown-opaque-sig-unsigned-v0--conditional-release-geofencing-opaque-lower-layer-carriage--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-hagom-grid-envelope-enc-dag-cbor-unknown-opaque-sig-unsigned-v0",
+  "scenario_id": "conditional-release-geofencing-opaque-lower-layer-carriage",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260522-012332",
+  "result_path": "results/SIM-hagom-grid-envelope-enc-dag-cbor-unknown-opaque-sig-unsigned-v0/conditional-release-geofencing-opaque-lower-layer-carriage/openai-gpt-5.4-xhigh/20260522-012332.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_388e92ed8bd84eb38eec9f29db4896a6",
+    "response_id": "resp_0852538c3d5a5dca006a0fb74df500819a933f4aa36ab8ee31",
+    "input_tokens": 6840,
+    "output_tokens": 10222,
+    "cost_usd": 0.155078
+  },
+  "source": {
+    "repo_commit": "f098e31d950a71f6844c4015150af0c90523ca4f",
+    "sim_path": "simulations/SIM-hagom-grid-envelope-enc-dag-cbor-unknown-opaque-sig-unsigned-v0/",
+    "scenario_path": "scenarios/conditional-release-geofencing-opaque-lower-layer-carriage/conditional-release-geofencing-opaque-lower-layer-carriage.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "28a7d5ae02517cd2fc22e1fb03c497d40d982d374a5876f401cfc8d8ac68b9a7"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-hagom-grid-envelope-enc-dag-cbor-unknown-opaque-sig-unsigned-v0/README.md",
+        "sha256": "aabd3b2ce056784bb4ce0c1bf2d4a8b873ec0c57ca71b523844b899aee4ac9ac"
+      },
+      {
+        "path": "simulations/SIM-hagom-grid-envelope-enc-dag-cbor-unknown-opaque-sig-unsigned-v0/QUESTION.md",
+        "sha256": "854d88c3858b2d9813231632226a1bc7786fc23fbee154a0863656e4d593c179"
+      },
+      {
+        "path": "simulations/SIM-hagom-grid-envelope-enc-dag-cbor-unknown-opaque-sig-unsigned-v0/protocols/grid-envelope.d/CHANGELOG.md",
+        "sha256": "aef2b7915320af9607f415cef649397530561e4f0f9372fda1bbf2691dd3f9b1"
+      },
+      {
+        "path": "simulations/SIM-hagom-grid-envelope-enc-dag-cbor-unknown-opaque-sig-unsigned-v0/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "29527a223343bdf35f6613985226e116c5c2de9a101e9b561468b48d82e42569"
+      },
+      {
+        "path": "scenarios/conditional-release-geofencing-opaque-lower-layer-carriage/conditional-release-geofencing-opaque-lower-layer-carriage.md",
+        "sha256": "e0af12980a8e0beec8a12683a7352f864cd5c2fcfcaa17cc457db28bea9cb525"
+      }
+    ],
+    "simulation_tree_hash": "228178578418dd49b30e5abae06099d74ee881b317085859e039cf08c8a0ebd6"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 4,
+    "promisegrid_alignment": 3,
+    "auditability": 2,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 3,
+    "implementation_plausibility": 4,
+    "risk_penalty": 4
+  },
+  "fitness": {
+    "raw": 26,
+    "normalized_0_100": 65,
+    "confidence_0_1": 0.83
+  },
+  "assessment": {
+    "rationale": "This variant matches the scenario well at the carriage boundary: lower layers can keep condition-bearing bytes opaque, preserve exact bytes, and fail explicitly on unknown pCIDs. It is only a partial end-to-end answer, though, because unsigned v0 does not itself make the condition object authentic, current, or auditable enough to avoid accidental promise violations.",
+    "strengths": [
+      "Unknown-pCID handling explicitly permits exact store-and-forward of opaque bytes without speculative parsing.",
+      "The [pcid, payload] boundary is very clear about what lower layers may carry versus what higher layers must interpret.",
+      "Canonical DAG-CBOR bytes and payload-level external/content-addressed references give higher layers a plausible place to attach verifiable condition material."
+    ],
+    "weaknesses": [
+      "The base envelope has no required signature or integrity protection.",
+      "The spec does not define how an opaque condition object becomes verifiable to carriers or later auditors.",
+      "Conditional-release semantics and peer-local promise accounting are left outside the envelope."
+    ],
+    "risks": [
+      "Opaque condition references can be replayed, swapped, or stale unless higher layers bind them cryptographically to the promised release conditions.",
+      "A node may be able to prove it carried bytes, but not that any release decision was actually authorized.",
+      "Long-term verification depends on preserving pCID interpretation material and whatever external authentication layer is used."
+    ],
+    "open_questions": [
+      "What exact mechanism makes a geofencing condition reference verifiable when intermediary layers do not understand its semantics?",
+      "What local record should Bob keep to show he only stored or forwarded opaque material rather than authorizing release?",
+      "How are pCID handlers, spec snapshots, and authentication evidence preserved across long-term protocol evolution?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

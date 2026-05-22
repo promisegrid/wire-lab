@@ -1,0 +1,123 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-vamaz-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-sig-pcid-payload-cas-object-type-binding-bakeoff-unknown-typed-object-openai-gpt-5.4-xhigh-20260522-012332",
+  "run_group_id": "ga-canary-20260522-012332",
+  "cell_id": "ga-canary-20260522-012332-000186-SIM-vamaz-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-sig-pcid-payload--cas-object-type-binding-bakeoff-unknown-typed-object--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-vamaz-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-sig-pcid-payload",
+  "scenario_id": "cas-object-type-binding-bakeoff-unknown-typed-object",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260522-012332",
+  "result_path": "results/SIM-vamaz-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-sig-pcid-payload/cas-object-type-binding-bakeoff-unknown-typed-object/openai-gpt-5.4-xhigh/20260522-012332.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_ee5d5b7cd41c440196688a8928b8eb33",
+    "response_id": "resp_05ddec476613bb3d006a0fcb3e6e04819ab29f67a1a650fb34",
+    "input_tokens": 6913,
+    "output_tokens": 9249,
+    "cost_usd": 0.14158375
+  },
+  "source": {
+    "repo_commit": "f098e31d950a71f6844c4015150af0c90523ca4f",
+    "sim_path": "simulations/SIM-vamaz-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-sig-pcid-payload/",
+    "scenario_path": "scenarios/cas-object-type-binding-bakeoff-unknown-typed-object/cas-object-type-binding-bakeoff-unknown-typed-object.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "28a7d5ae02517cd2fc22e1fb03c497d40d982d374a5876f401cfc8d8ac68b9a7"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-vamaz-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-sig-pcid-payload/README.md",
+        "sha256": "9ee5d1dd4dd7cd177f3cbaad482ce0dc3f10be734d7b5da9e4ebda8610d0f0d9"
+      },
+      {
+        "path": "simulations/SIM-vamaz-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-sig-pcid-payload/QUESTION.md",
+        "sha256": "37345350a0759eec3e552c6c0c86961bb3a4d8d26acaa5cbc429574ff6010629"
+      },
+      {
+        "path": "simulations/SIM-vamaz-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-sig-pcid-payload/protocols/grid-envelope.d/CHANGELOG.md",
+        "sha256": "aef2b7915320af9607f415cef649397530561e4f0f9372fda1bbf2691dd3f9b1"
+      },
+      {
+        "path": "simulations/SIM-vamaz-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-sig-pcid-payload/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "0b4c6dfef01543d947c35d86f5e5549596e9fac8791a70028f012b30b582d2b8"
+      },
+      {
+        "path": "scenarios/cas-object-type-binding-bakeoff-unknown-typed-object/cas-object-type-binding-bakeoff-unknown-typed-object.md",
+        "sha256": "76f0a7016fa2bad5e53903682706bca4eeb4aa2d099311a4ea52b7280748cf90"
+      }
+    ],
+    "simulation_tree_hash": "93c691c8787dbdc8be5fa107abae8706592ce57ce7b958a885d7cb1d577d0c1d"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 4,
+    "promisegrid_alignment": 4,
+    "auditability": 3,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 4,
+    "implementation_plausibility": 5,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 32,
+    "normalized_0_100": 80,
+    "confidence_0_1": 0.82
+  },
+  "assessment": {
+    "rationale": "Strong on the core unknown-type pressure at the envelope layer: a peer can keep exact bytes, forward opaquely, and return an explicit unsupported-pCID result without speculative parsing. The fit is not perfect because the scenario names an unknown CID codec, while this specimen more directly defines unknown payload/protocol handling inside a known CBOR envelope and leaves unknown signature-protocol behavior less explicit.",
+    "strengths": [
+      "Explicit unknown-pCID policy allows opaque store-and-forward while forbidding unsafe payload parsing.",
+      "Signature coverage of [pcid, payload] binds type identifier to payload bytes.",
+      "Layer boundaries are clear: envelope dispatch, payload interpretation, and signature interpretation are separated.",
+      "Does not require a central pCID registry."
+    ],
+    "weaknesses": [
+      "Addresses unknown inner pCID more clearly than the literal case of a CID whose outer codec is unknown.",
+      "Unknown sig_pCID handling is not spelled out as clearly as unknown payload pCID handling.",
+      "Advertisement behavior is implied by opaque forwarding, not explicitly specified."
+    ],
+    "risks": [
+      "Peers may accumulate opaque envelopes they can relay but cannot verify when the signature protocol is also unknown.",
+      "Opaque forwarding can propagate harmful or policy-violating content unless local relay/storage policy adds gates.",
+      "Draft status means interop details may still shift."
+    ],
+    "open_questions": [
+      "Should unknown sig_pCID follow the same explicit store-forward and no-speculative-parse rule as unknown pCID?",
+      "How should peers advertise unsupported objects without implying semantic understanding?",
+      "How should this envelope map to the scenario's bare unknown-CID-codec case?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

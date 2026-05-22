@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-rakir-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-mandatory-sig-pcid-payload-cas-object-type-binding-bakeoff-unknown-typed-object-openai-gpt-5.4-xhigh-20260522-012332",
+  "run_group_id": "ga-canary-20260522-012332",
+  "cell_id": "ga-canary-20260522-012332-000156-SIM-rakir-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-mandatory-sig-pcid-payload--cas-object-type-binding-bakeoff-unknown-typed-object--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-rakir-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-mandatory-sig-pcid-payload",
+  "scenario_id": "cas-object-type-binding-bakeoff-unknown-typed-object",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260522-012332",
+  "result_path": "results/SIM-rakir-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-mandatory-sig-pcid-payload/cas-object-type-binding-bakeoff-unknown-typed-object/openai-gpt-5.4-xhigh/20260522-012332.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_9ac8e56fd2ff48a5bc135e5817a63f3b",
+    "response_id": "resp_024e9f23f202c5ee006a0fc80ab068819ba1c91a4b70e3670b",
+    "input_tokens": 6955,
+    "output_tokens": 9397,
+    "cost_usd": 0.14372925
+  },
+  "source": {
+    "repo_commit": "f098e31d950a71f6844c4015150af0c90523ca4f",
+    "sim_path": "simulations/SIM-rakir-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-mandatory-sig-pcid-payload/",
+    "scenario_path": "scenarios/cas-object-type-binding-bakeoff-unknown-typed-object/cas-object-type-binding-bakeoff-unknown-typed-object.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "28a7d5ae02517cd2fc22e1fb03c497d40d982d374a5876f401cfc8d8ac68b9a7"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-rakir-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-mandatory-sig-pcid-payload/README.md",
+        "sha256": "75921c77944a6d425f9a68fa8ab98e86f4db3e298b8d2c9748b45dc0f555076c"
+      },
+      {
+        "path": "simulations/SIM-rakir-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-mandatory-sig-pcid-payload/QUESTION.md",
+        "sha256": "bd6df2762928dcd70fa3eb114b62dced885e399ebb26bd34080dce6dd8276b53"
+      },
+      {
+        "path": "simulations/SIM-rakir-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-mandatory-sig-pcid-payload/protocols/grid-envelope.d/CHANGELOG.md",
+        "sha256": "aef2b7915320af9607f415cef649397530561e4f0f9372fda1bbf2691dd3f9b1"
+      },
+      {
+        "path": "simulations/SIM-rakir-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-mandatory-sig-pcid-payload/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "538501739ea9fea2614c27eb07065bfcd0d3429f4583f3e837971c2889bed432"
+      },
+      {
+        "path": "scenarios/cas-object-type-binding-bakeoff-unknown-typed-object/cas-object-type-binding-bakeoff-unknown-typed-object.md",
+        "sha256": "76f0a7016fa2bad5e53903682706bca4eeb4aa2d099311a4ea52b7280748cf90"
+      }
+    ],
+    "simulation_tree_hash": "92c5d8e985a5266b1219c5985a1305bcf0ecba2bd5929def1374240a00e8a528"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 3,
+    "auditability": 3,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 3,
+    "implementation_plausibility": 4,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 22,
+    "normalized_0_100": 63,
+    "confidence_0_1": 0.74
+  },
+  "assessment": {
+    "rationale": "The variant handles unknown payload protocols by keeping payload bytes opaque and forcing unsupported/unverified labeling, which partially matches the unknown-object pressure. But it is mainly an envelope-dispatch design, not a full CAS object type-binding policy, so the scenario's required store/advertise/forward behavior for unknown CID codecs remains underspecified.",
+    "strengths": [
+      "Payload stays opaque until a known handler is selected, reducing forced parsing of unknown content.",
+      "Unknown-type best-effort output must be marked unsupported and unverified rather than treated as successful interpretation.",
+      "Canonical DAG-CBOR bytes and mandatory signature slots improve byte-level auditability."
+    ],
+    "weaknesses": [
+      "The spec speaks more directly to unknown pcid dispatch than to unknown CID codec behavior in CAS objects.",
+      "It does not define concrete storage, advertisement, or forwarding rules for unknown typed objects.",
+      "Best-effort salvage is allowed but not tightly profiled, so peer behavior may diverge."
+    ],
+    "risks": [
+      "Generic salvage tooling could slip into unsafe or misleading partial parsing.",
+      "A valid signature can authenticate bytes even when the object's semantics remain unknown, which may be overread by operators."
+    ],
+    "open_questions": [
+      "What exact operations are guaranteed when the envelope is understood but the embedded object's CID codec is unknown?",
+      "Should forwarding or advertising unknown typed objects be mandatory, optional, or policy-gated?",
+      "How should peers record opaque storage or relay so later auditors can distinguish preservation from interpretation?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

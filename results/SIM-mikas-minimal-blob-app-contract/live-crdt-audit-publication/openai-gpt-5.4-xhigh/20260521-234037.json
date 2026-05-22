@@ -1,0 +1,113 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-mikas-minimal-blob-app-contract-live-crdt-audit-publication-openai-gpt-5.4-xhigh-20260521-234037",
+  "run_group_id": "ga-canary-20260521-234037",
+  "cell_id": "ga-canary-20260521-234037-000004-SIM-mikas-minimal-blob-app-contract--live-crdt-audit-publication--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-mikas-minimal-blob-app-contract",
+  "scenario_id": "live-crdt-audit-publication",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260521-234037",
+  "result_path": "results/SIM-mikas-minimal-blob-app-contract/live-crdt-audit-publication/openai-gpt-5.4-xhigh/20260521-234037.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_0de35f5b29e84baf8ac7f85230b31149",
+    "response_id": "resp_037784151e9e2d51006a0f97f7258c819b9e20facef5aa362f",
+    "input_tokens": 6346,
+    "output_tokens": 6679,
+    "cost_usd": 0.1046115
+  },
+  "source": {
+    "repo_commit": "f098e31d950a71f6844c4015150af0c90523ca4f",
+    "sim_path": "simulations/SIM-mikas-minimal-blob-app-contract/",
+    "scenario_path": "scenarios/live-crdt-audit-publication/live-crdt-audit-publication.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "28a7d5ae02517cd2fc22e1fb03c497d40d982d374a5876f401cfc8d8ac68b9a7"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-mikas-minimal-blob-app-contract/README.md",
+        "sha256": "0c4755add75a4aed9913cbcf3271eb4faf20db662cb7993921d8c4b684c1bf60"
+      },
+      {
+        "path": "simulations/SIM-mikas-minimal-blob-app-contract/QUESTION.md",
+        "sha256": "546fe58b588d2a8057994b8d12f0e770b389a3591d401d76d61ab6f4d407bd03"
+      },
+      {
+        "path": "scenarios/live-crdt-audit-publication/live-crdt-audit-publication.md",
+        "sha256": "870887bbd5848db45bc4406e5369b492a516c2bd997de9226d24825214c49d94"
+      }
+    ],
+    "simulation_tree_hash": "97358511b9d6fdb6a02c37fd0722f03dafb09104268a3c034a920d71dd711c93"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 4,
+    "auditability": 3,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 2,
+    "implementation_plausibility": 2,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 20,
+    "normalized_0_100": 57,
+    "confidence_0_1": 0.82
+  },
+  "assessment": {
+    "rationale": "Useful mainly as a boundary-setting partial answer: it supports citing an immutable content-addressed snapshot for later audit, but it does not cover the reliable ordered live transport and CRDT behavior at the center of this scenario.",
+    "strengths": [
+      "Very clear separation between base CAS semantics and host/app policy for retention, replication, discovery, ingress, and authorization.",
+      "Provides a plausible durable object for Carol to audit later: an immutable hash-addressed snapshot blob.",
+      "Strong 100-year and draft-profile framing improves migration and evolution safety."
+    ],
+    "weaknesses": [
+      "Does not specify sub-second in-order live sync, reconnect behavior, or CRDT merge/session semantics.",
+      "Does not define the audit publication envelope that binds the human-readable promise body to the cited snapshot.",
+      "Failure handling for partition, reordering, and delayed publication is largely outside scope."
+    ],
+    "risks": [
+      "Teams may incorrectly treat a minimal blob contract as if it were enough for live collaboration transport.",
+      "Open hash-as-capability and authorization questions can make read/audit expectations unsafe."
+    ],
+    "open_questions": [
+      "Should live CRDT state stay explicitly off-grid until a reliable binding exists?",
+      "Should the audit message cite a raw snapshot blob hash or a richer content-addressed audit object?",
+      "How should live-channel conformance claims be kept separate from audit-layer claims in app guidance?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

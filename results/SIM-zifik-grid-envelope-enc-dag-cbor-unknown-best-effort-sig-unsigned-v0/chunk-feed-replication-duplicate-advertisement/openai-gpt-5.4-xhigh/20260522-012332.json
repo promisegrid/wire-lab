@@ -1,0 +1,122 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-zifik-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-unsigned-v0-chunk-feed-replication-duplicate-advertisement-openai-gpt-5.4-xhigh-20260522-012332",
+  "run_group_id": "ga-canary-20260522-012332",
+  "cell_id": "ga-canary-20260522-012332-000220-SIM-zifik-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-unsigned-v0--chunk-feed-replication-duplicate-advertisement--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-zifik-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-unsigned-v0",
+  "scenario_id": "chunk-feed-replication-duplicate-advertisement",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260522-012332",
+  "result_path": "results/SIM-zifik-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-unsigned-v0/chunk-feed-replication-duplicate-advertisement/openai-gpt-5.4-xhigh/20260522-012332.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_f1e7bb80368247e7b1c813d287f54efd",
+    "response_id": "resp_06cafdcc6853efef006a0fceadafa8819b80c05472739999dd",
+    "input_tokens": 6809,
+    "output_tokens": 14316,
+    "cost_usd": 0.21233975
+  },
+  "source": {
+    "repo_commit": "f098e31d950a71f6844c4015150af0c90523ca4f",
+    "sim_path": "simulations/SIM-zifik-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-unsigned-v0/",
+    "scenario_path": "scenarios/chunk-feed-replication-duplicate-advertisement/chunk-feed-replication-duplicate-advertisement.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "28a7d5ae02517cd2fc22e1fb03c497d40d982d374a5876f401cfc8d8ac68b9a7"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-zifik-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-unsigned-v0/README.md",
+        "sha256": "715a5e5683bdbe00ad96b5a849ab35a9676a07e8c3b378c907e8573cc2c4525c"
+      },
+      {
+        "path": "simulations/SIM-zifik-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-unsigned-v0/QUESTION.md",
+        "sha256": "f7c9cddff4ffb49e35c187e91f26be77fda064b9d9b55f68a30dc85f41ad23df"
+      },
+      {
+        "path": "simulations/SIM-zifik-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-unsigned-v0/protocols/grid-envelope.d/CHANGELOG.md",
+        "sha256": "aef2b7915320af9607f415cef649397530561e4f0f9372fda1bbf2691dd3f9b1"
+      },
+      {
+        "path": "simulations/SIM-zifik-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-unsigned-v0/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "a234b12b171c31e01d2878134ba4541b68b43e997cd7ec1aba875407cc1ffeb0"
+      },
+      {
+        "path": "scenarios/chunk-feed-replication-duplicate-advertisement/chunk-feed-replication-duplicate-advertisement.md",
+        "sha256": "5bb68a07363f7a70d839611178b098fbb7d15bcb880a86dde08d2a70b7130372"
+      }
+    ],
+    "simulation_tree_hash": "588cdf7a9d0f14b9081b539d842ede027573f04c728321fa2ff7ea996f79a7da"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 2,
+    "auditability": 2,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 2,
+    "implementation_plausibility": 4,
+    "risk_penalty": 4
+  },
+  "fitness": {
+    "raw": 15,
+    "normalized_0_100": 50,
+    "confidence_0_1": 0.76
+  },
+  "assessment": {
+    "rationale": "It can carry duplicate chunk advertisements without centralizing peer reputation, but as an unsigned thin envelope it leaves sender attribution and promise-accounting evidence outside the artifact. Boundary clarity and pCID-based evolution are decent; durable, auditable peer choice is not.",
+    "strengths": [
+      "Clear [pcid, payload] boundary keeps chunk advertisement semantics and peer selection out of a central feed layer.",
+      "Canonical DAG-CBOR bytes make duplicate offers easy to compare byte-for-byte.",
+      "Unknown-pCID salvage is explicitly marked unsupported and unverified."
+    ],
+    "weaknesses": [
+      "Unsigned envelopes do not durably bind an advertisement to Alice or Carol.",
+      "Bob's peer choice and promise accounting are delegated to transport or payload layers not specified here.",
+      "Stored or forwarded advertisements lose provenance unless extra wrappers or logs are added."
+    ],
+    "risks": [
+      "Spoofed or replayed offers can distort local peer choice.",
+      "Later auditors may not be able to reconstruct why Bob preferred one peer.",
+      "Best-effort inspection of unknown payloads may be over-trusted by tooling."
+    ],
+    "open_questions": [
+      "Must the chunk advertisement payload carry its own signatures or peer identity claims?",
+      "Should relays wrap unsigned envelopes with hop-local provenance?",
+      "What local record format preserves peer-choice evidence across protocol evolution?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

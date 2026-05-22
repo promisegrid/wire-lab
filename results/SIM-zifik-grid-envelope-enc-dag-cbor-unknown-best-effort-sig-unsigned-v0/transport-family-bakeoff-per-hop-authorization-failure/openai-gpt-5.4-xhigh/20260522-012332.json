@@ -1,0 +1,122 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-zifik-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-unsigned-v0-transport-family-bakeoff-per-hop-authorization-failure-openai-gpt-5.4-xhigh-20260522-012332",
+  "run_group_id": "ga-canary-20260522-012332",
+  "cell_id": "ga-canary-20260522-012332-000223-SIM-zifik-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-unsigned-v0--transport-family-bakeoff-per-hop-authorization-failure--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-zifik-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-unsigned-v0",
+  "scenario_id": "transport-family-bakeoff-per-hop-authorization-failure",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260522-012332",
+  "result_path": "results/SIM-zifik-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-unsigned-v0/transport-family-bakeoff-per-hop-authorization-failure/openai-gpt-5.4-xhigh/20260522-012332.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_c0309865057e44b2b8724a85a72e63c4",
+    "response_id": "resp_0839cbad56ca6025006a0fced78d488199bcbb24c810a7a438",
+    "input_tokens": 6836,
+    "output_tokens": 7067,
+    "cost_usd": 0.110901
+  },
+  "source": {
+    "repo_commit": "f098e31d950a71f6844c4015150af0c90523ca4f",
+    "sim_path": "simulations/SIM-zifik-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-unsigned-v0/",
+    "scenario_path": "scenarios/transport-family-bakeoff-per-hop-authorization-failure/transport-family-bakeoff-per-hop-authorization-failure.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "28a7d5ae02517cd2fc22e1fb03c497d40d982d374a5876f401cfc8d8ac68b9a7"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-zifik-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-unsigned-v0/README.md",
+        "sha256": "715a5e5683bdbe00ad96b5a849ab35a9676a07e8c3b378c907e8573cc2c4525c"
+      },
+      {
+        "path": "simulations/SIM-zifik-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-unsigned-v0/QUESTION.md",
+        "sha256": "f7c9cddff4ffb49e35c187e91f26be77fda064b9d9b55f68a30dc85f41ad23df"
+      },
+      {
+        "path": "simulations/SIM-zifik-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-unsigned-v0/protocols/grid-envelope.d/CHANGELOG.md",
+        "sha256": "aef2b7915320af9607f415cef649397530561e4f0f9372fda1bbf2691dd3f9b1"
+      },
+      {
+        "path": "simulations/SIM-zifik-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-unsigned-v0/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "a234b12b171c31e01d2878134ba4541b68b43e997cd7ec1aba875407cc1ffeb0"
+      },
+      {
+        "path": "scenarios/transport-family-bakeoff-per-hop-authorization-failure/transport-family-bakeoff-per-hop-authorization-failure.md",
+        "sha256": "f938e10ab88db666d3097a2f97c1667bbbc6e8e071681134049068982cc39cf2"
+      }
+    ],
+    "simulation_tree_hash": "588cdf7a9d0f14b9081b539d842ede027573f04c728321fa2ff7ea996f79a7da"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 2,
+    "auditability": 1,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 1,
+    "implementation_plausibility": 4,
+    "risk_penalty": 4
+  },
+  "fitness": {
+    "raw": 12,
+    "normalized_0_100": 43,
+    "confidence_0_1": 0.82
+  },
+  "assessment": {
+    "rationale": "Useful as a minimal wire-envelope specimen, but not a strong standalone answer to per-hop authorization failure. The spec explicitly pushes authorship, integrity, forwarding, and hop-local evidence into transport or payload layers, so ring break/skip/refusal/reconfiguration behavior remains mostly unspecified here.",
+    "strengths": [
+      "Clear dispatch and layer boundary.",
+      "Simple DAG-CBOR positional form is plausible to implement.",
+      "Unknown-pCID best-effort output is explicitly marked unsupported and unverified."
+    ],
+    "weaknesses": [
+      "No native signature, sender proof, or hop-refusal record.",
+      "Does not define what Bob should do when he cannot forward to Carol.",
+      "Scenario coverage depends on unspecified wrapper or payload protocols."
+    ],
+    "risks": [
+      "Per-hop authorization failures may be unauditable if this envelope is used without stronger surrounding protocols.",
+      "Best-effort salvage could encourage over-trust in unverified payload bytes.",
+      "Draft, unfrozen status increases evolution and interoperability risk."
+    ],
+    "open_questions": [
+      "What exact wrapper or payload record proves Bob refused or was unauthorized to forward?",
+      "How would the ring skip a hop or reconfigure membership without hidden global state?",
+      "What durable evidence of authorization failure survives long-term key and protocol evolution?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

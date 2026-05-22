@@ -1,0 +1,122 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-vamaz-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-sig-pcid-payload-transport-family-bakeoff-per-hop-authorization-failure-openai-gpt-5.4-xhigh-20260522-012332",
+  "run_group_id": "ga-canary-20260522-012332",
+  "cell_id": "ga-canary-20260522-012332-000193-SIM-vamaz-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-sig-pcid-payload--transport-family-bakeoff-per-hop-authorization-failure--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-vamaz-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-sig-pcid-payload",
+  "scenario_id": "transport-family-bakeoff-per-hop-authorization-failure",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260522-012332",
+  "result_path": "results/SIM-vamaz-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-sig-pcid-payload/transport-family-bakeoff-per-hop-authorization-failure/openai-gpt-5.4-xhigh/20260522-012332.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_789f0274819c4fa59200b3feabdd3ec1",
+    "response_id": "resp_06f18dcef9f330c4006a0fcbcfdc04819a9b84dc4bcc2abe37",
+    "input_tokens": 6907,
+    "output_tokens": 7100,
+    "cost_usd": 0.11148725
+  },
+  "source": {
+    "repo_commit": "f098e31d950a71f6844c4015150af0c90523ca4f",
+    "sim_path": "simulations/SIM-vamaz-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-sig-pcid-payload/",
+    "scenario_path": "scenarios/transport-family-bakeoff-per-hop-authorization-failure/transport-family-bakeoff-per-hop-authorization-failure.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "28a7d5ae02517cd2fc22e1fb03c497d40d982d374a5876f401cfc8d8ac68b9a7"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-vamaz-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-sig-pcid-payload/README.md",
+        "sha256": "9ee5d1dd4dd7cd177f3cbaad482ce0dc3f10be734d7b5da9e4ebda8610d0f0d9"
+      },
+      {
+        "path": "simulations/SIM-vamaz-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-sig-pcid-payload/QUESTION.md",
+        "sha256": "37345350a0759eec3e552c6c0c86961bb3a4d8d26acaa5cbc429574ff6010629"
+      },
+      {
+        "path": "simulations/SIM-vamaz-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-sig-pcid-payload/protocols/grid-envelope.d/CHANGELOG.md",
+        "sha256": "aef2b7915320af9607f415cef649397530561e4f0f9372fda1bbf2691dd3f9b1"
+      },
+      {
+        "path": "simulations/SIM-vamaz-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-sig-pcid-payload/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "0b4c6dfef01543d947c35d86f5e5549596e9fac8791a70028f012b30b582d2b8"
+      },
+      {
+        "path": "scenarios/transport-family-bakeoff-per-hop-authorization-failure/transport-family-bakeoff-per-hop-authorization-failure.md",
+        "sha256": "f938e10ab88db666d3097a2f97c1667bbbc6e8e071681134049068982cc39cf2"
+      }
+    ],
+    "simulation_tree_hash": "93c691c8787dbdc8be5fa107abae8706592ce57ce7b958a885d7cb1d577d0c1d"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 3,
+    "auditability": 3,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 1,
+    "implementation_plausibility": 4,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 19,
+    "normalized_0_100": 54,
+    "confidence_0_1": 0.8
+  },
+  "assessment": {
+    "rationale": "Good as a clear, evolvable envelope substrate, but weak on this scenario because the actual per-hop authorization failure model is delegated to wrapper or payload protocols instead of being specified here.",
+    "strengths": [
+      "Very clear envelope-vs-payload boundary, including explicit handling of unknown pCIDs.",
+      "Deterministic CBOR bytes and mandatory signature slots support later byte-level audit and authenticated hop-local evidence.",
+      "No central registry is assumed; opaque store-and-forward behavior helps long-term evolution."
+    ],
+    "weaknesses": [
+      "The specimen does not define ring semantics or what Bob must do when forwarding to Carol is unauthorized.",
+      "It does not choose among break-the-ring, skip-the-hop, signed refusal, or membership reconfiguration behavior.",
+      "Opaque payload and signature payload formats reduce direct human/LLM comparability across transports."
+    ],
+    "risks": [
+      "Different payload protocols could encode authorization failure differently, making bakeoff results non-comparable.",
+      "Later auditors may preserve the bytes but still lack understandable refusal semantics if they do not have the payload or signature handlers.",
+      "Draft status leaves room for variant drift before any refusal pattern is frozen."
+    ],
+    "open_questions": [
+      "Which payload or wrapper pCID is supposed to carry Bob's signed refusal or non-forward record?",
+      "What peer-local accounting record distinguishes an explicit authorization refusal from a silent drop?",
+      "Should unauthorized forwarding trigger ring breakage, skipped delivery, or a signed membership-change message in this family?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

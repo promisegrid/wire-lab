@@ -1,0 +1,123 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-vamaz-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-sig-pcid-payload-chunk-feed-replication-corrupt-chunk-openai-gpt-5.4-xhigh-20260522-012332",
+  "run_group_id": "ga-canary-20260522-012332",
+  "cell_id": "ga-canary-20260522-012332-000189-SIM-vamaz-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-sig-pcid-payload--chunk-feed-replication-corrupt-chunk--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-vamaz-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-sig-pcid-payload",
+  "scenario_id": "chunk-feed-replication-corrupt-chunk",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260522-012332",
+  "result_path": "results/SIM-vamaz-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-sig-pcid-payload/chunk-feed-replication-corrupt-chunk/openai-gpt-5.4-xhigh/20260522-012332.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_1a8405438ae9430aa787ef2251277b25",
+    "response_id": "resp_02ddbea0842ef1ee006a0fcb9021c0819a932b49ef13145a69",
+    "input_tokens": 6886,
+    "output_tokens": 17616,
+    "cost_usd": 0.2586745
+  },
+  "source": {
+    "repo_commit": "f098e31d950a71f6844c4015150af0c90523ca4f",
+    "sim_path": "simulations/SIM-vamaz-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-sig-pcid-payload/",
+    "scenario_path": "scenarios/chunk-feed-replication-corrupt-chunk/chunk-feed-replication-corrupt-chunk.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "28a7d5ae02517cd2fc22e1fb03c497d40d982d374a5876f401cfc8d8ac68b9a7"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-vamaz-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-sig-pcid-payload/README.md",
+        "sha256": "9ee5d1dd4dd7cd177f3cbaad482ce0dc3f10be734d7b5da9e4ebda8610d0f0d9"
+      },
+      {
+        "path": "simulations/SIM-vamaz-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-sig-pcid-payload/QUESTION.md",
+        "sha256": "37345350a0759eec3e552c6c0c86961bb3a4d8d26acaa5cbc429574ff6010629"
+      },
+      {
+        "path": "simulations/SIM-vamaz-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-sig-pcid-payload/protocols/grid-envelope.d/CHANGELOG.md",
+        "sha256": "aef2b7915320af9607f415cef649397530561e4f0f9372fda1bbf2691dd3f9b1"
+      },
+      {
+        "path": "simulations/SIM-vamaz-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-sig-pcid-payload/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "0b4c6dfef01543d947c35d86f5e5549596e9fac8791a70028f012b30b582d2b8"
+      },
+      {
+        "path": "scenarios/chunk-feed-replication-corrupt-chunk/chunk-feed-replication-corrupt-chunk.md",
+        "sha256": "57eb49a6a8304b475add47f66f2f2e7d84c7ec0ecbcee2d862951d88c19f2a00"
+      }
+    ],
+    "simulation_tree_hash": "93c691c8787dbdc8be5fa107abae8706592ce57ce7b958a885d7cb1d577d0c1d"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 3,
+    "auditability": 3,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 2,
+    "implementation_plausibility": 4,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 24,
+    "normalized_0_100": 60,
+    "confidence_0_1": 0.77
+  },
+  "assessment": {
+    "rationale": "The variant cleanly carries signed opaque feed bytes and defers CAS interpretation to the payload pCID, which is good layering, but it does not standardize the corrupt-chunk rejection, local accounting, or retry behavior that this scenario needs.",
+    "strengths": [
+      "Makes CAS/body-reference interpretation a payload concern with an explicit pCID dispatch boundary.",
+      "Deterministic CBOR plus mandatory signature slots preserve stable bytes for local verification and later review.",
+      "Unknown-pCID store-and-forward supports sparse knowledge and avoids central registry dependence."
+    ],
+    "weaknesses": [
+      "Does not itself define CID-mismatch rejection flow, retry policy, or peer-local accounting records.",
+      "Audit of a corrupt chunk still depends on the payload handler; the envelope alone cannot explain the mismatch.",
+      "The spec leaves hop-local evidence placement flexible across payloads, wrappers, and signature conventions.",
+      "The specimen is still a draft and not frozen."
+    ],
+    "risks": [
+      "Implementers may over-read a valid envelope signature as proof that referenced chunk bytes are also valid.",
+      "If chunk bytes travel out of band, the default signature coverage may not directly bind the bad bytes to the signed evidence.",
+      "Local corruption evidence may fragment across different payload or wrapper conventions, weakening interoperability."
+    ],
+    "open_questions": [
+      "Where should peers record CID mismatch and retry decisions so evidence stays local but interoperable?",
+      "Should signed payloads bind advertised chunk references or actual chunk bytes strongly enough to prove Mallory sent bad data?",
+      "How should unknown sig_pCID cases be retained or forwarded without losing corrupt-chunk evidence?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

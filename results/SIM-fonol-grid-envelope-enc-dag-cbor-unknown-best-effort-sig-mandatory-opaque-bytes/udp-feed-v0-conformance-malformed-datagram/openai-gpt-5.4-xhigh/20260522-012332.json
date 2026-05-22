@@ -1,0 +1,123 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-fonol-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-mandatory-opaque-bytes-udp-feed-v0-conformance-malformed-datagram-openai-gpt-5.4-xhigh-20260522-012332",
+  "run_group_id": "ga-canary-20260522-012332",
+  "cell_id": "ga-canary-20260522-012332-000029-SIM-fonol-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-mandatory-opaque-bytes--udp-feed-v0-conformance-malformed-datagram--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-fonol-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-mandatory-opaque-bytes",
+  "scenario_id": "udp-feed-v0-conformance-malformed-datagram",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260522-012332",
+  "result_path": "results/SIM-fonol-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-mandatory-opaque-bytes/udp-feed-v0-conformance-malformed-datagram/openai-gpt-5.4-xhigh/20260522-012332.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_8de53be8bd15467cba900208e401a3e3",
+    "response_id": "resp_004529f5515788a1006a0fb2d27cd48198a8ec6e7f7ec092fc",
+    "input_tokens": 6901,
+    "output_tokens": 10047,
+    "cost_usd": 0.15273475
+  },
+  "source": {
+    "repo_commit": "f098e31d950a71f6844c4015150af0c90523ca4f",
+    "sim_path": "simulations/SIM-fonol-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-mandatory-opaque-bytes/",
+    "scenario_path": "scenarios/udp-feed-v0-conformance-malformed-datagram/udp-feed-v0-conformance-malformed-datagram.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "28a7d5ae02517cd2fc22e1fb03c497d40d982d374a5876f401cfc8d8ac68b9a7"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-fonol-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-mandatory-opaque-bytes/README.md",
+        "sha256": "7180bae471f5dc14a7b28ad7e438ae382933cbb03370a758517cb4c2af3a392c"
+      },
+      {
+        "path": "simulations/SIM-fonol-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-mandatory-opaque-bytes/QUESTION.md",
+        "sha256": "d1e68d688bcf1aeeda502a03f9951d38e91b2806aa681f790fba198d6e41fd05"
+      },
+      {
+        "path": "simulations/SIM-fonol-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-mandatory-opaque-bytes/protocols/grid-envelope.d/CHANGELOG.md",
+        "sha256": "aef2b7915320af9607f415cef649397530561e4f0f9372fda1bbf2691dd3f9b1"
+      },
+      {
+        "path": "simulations/SIM-fonol-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-mandatory-opaque-bytes/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "63ca5ed3dd48d1d53c9d7254cd9f6c9b2f1fc6d0f153f331cc1348f71af69f37"
+      },
+      {
+        "path": "scenarios/udp-feed-v0-conformance-malformed-datagram/udp-feed-v0-conformance-malformed-datagram.md",
+        "sha256": "1d9346150fa86d237c26fbca078b661e469a1d68323b60ec00a13b45b5d79efb"
+      }
+    ],
+    "simulation_tree_hash": "44f3c24c3bba709fc9084c9b7b00d63db3f0a9184926cc751ab92633c53a6bae"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 3,
+    "auditability": 2,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 2,
+    "implementation_plausibility": 3,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 23,
+    "normalized_0_100": 57.5,
+    "confidence_0_1": 0.72
+  },
+  "assessment": {
+    "rationale": "Strong on not inventing payload semantics: the envelope keeps `payload` opaque and makes unknown-`pcid` salvage explicitly unsupported and unverified. But this is not itself a UDP-feed binding, and the draft does not specify how completely malformed non-DAG-CBOR datagrams are preserved, surfaced, and audited.",
+    "strengths": [
+      "Clear layer boundary: interpretation is pushed to the `pcid` handler and the envelope mainly preserves bytes plus dispatch identity.",
+      "Unknown-`pcid` best-effort output is explicitly marked unsupported and unverified rather than treated as real interpretation.",
+      "DAG-CBOR canonical bytes and the absence of a central `pcid` registry fit sparse-knowledge and no-central-authority goals reasonably well."
+    ],
+    "weaknesses": [
+      "The specimen is not a UDP-feed conformance spec, so raw datagram pass-through behavior is inferred rather than stated.",
+      "The core scenario case—bytes that do not parse as the outer envelope at all—has no explicit local recording or audit rule.",
+      "Signature/authorship semantics are delegated to external ecosystems, and the draft text references `sig_pcid`/`sig_payload` fields that are not in the declared envelope shape."
+    ],
+    "risks": [
+      "Implementations may drop or normalize malformed datagrams instead of surfacing raw bytes upward unchanged.",
+      "Generic salvage tooling for unknown `pcid` payloads could drift into invented message semantics if unsupported/unverified markings are ignored.",
+      "A mandatory opaque signature slot can create false assurance when verification and signer-identity rules are not frozen."
+    ],
+    "open_questions": [
+      "When outer DAG-CBOR parsing fails, what exact bytes and failure record must Bob keep locally?",
+      "Should a UDP binding always pass raw datagram bytes upward even when no valid grid envelope exists?",
+      "Are `sig_pcid` and `sig_payload` accidental leftovers or intended future extension points?",
+      "Which signer-identity and verification rules are required for interoperable conformance?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

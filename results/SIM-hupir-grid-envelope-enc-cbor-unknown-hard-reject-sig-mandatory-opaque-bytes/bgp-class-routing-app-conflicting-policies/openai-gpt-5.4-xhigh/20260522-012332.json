@@ -1,0 +1,122 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-hupir-grid-envelope-enc-cbor-unknown-hard-reject-sig-mandatory-opaque-bytes-bgp-class-routing-app-conflicting-policies-openai-gpt-5.4-xhigh-20260522-012332",
+  "run_group_id": "ga-canary-20260522-012332",
+  "cell_id": "ga-canary-20260522-012332-000091-SIM-hupir-grid-envelope-enc-cbor-unknown-hard-reject-sig-mandatory-opaque-bytes--bgp-class-routing-app-conflicting-policies--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-hupir-grid-envelope-enc-cbor-unknown-hard-reject-sig-mandatory-opaque-bytes",
+  "scenario_id": "bgp-class-routing-app-conflicting-policies",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260522-012332",
+  "result_path": "results/SIM-hupir-grid-envelope-enc-cbor-unknown-hard-reject-sig-mandatory-opaque-bytes/bgp-class-routing-app-conflicting-policies/openai-gpt-5.4-xhigh/20260522-012332.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_46fd6bb8d51f4fd3991fb47728e512b5",
+    "response_id": "resp_06ab840f68202d77006a0fb98d06948199ac23e3b1075a9867",
+    "input_tokens": 6851,
+    "output_tokens": 8170,
+    "cost_usd": 0.12636925
+  },
+  "source": {
+    "repo_commit": "f098e31d950a71f6844c4015150af0c90523ca4f",
+    "sim_path": "simulations/SIM-hupir-grid-envelope-enc-cbor-unknown-hard-reject-sig-mandatory-opaque-bytes/",
+    "scenario_path": "scenarios/bgp-class-routing-app-conflicting-policies/bgp-class-routing-app-conflicting-policies.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "28a7d5ae02517cd2fc22e1fb03c497d40d982d374a5876f401cfc8d8ac68b9a7"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-hupir-grid-envelope-enc-cbor-unknown-hard-reject-sig-mandatory-opaque-bytes/README.md",
+        "sha256": "13d04ba02f1ff218b1b89f98e147c3f1e245d12c5ccc07634dd014fa98ccfa8c"
+      },
+      {
+        "path": "simulations/SIM-hupir-grid-envelope-enc-cbor-unknown-hard-reject-sig-mandatory-opaque-bytes/QUESTION.md",
+        "sha256": "44d68ab2785e516a852b159c428e893d50c1687b90018c2f1d3a80d84dbe1b14"
+      },
+      {
+        "path": "simulations/SIM-hupir-grid-envelope-enc-cbor-unknown-hard-reject-sig-mandatory-opaque-bytes/protocols/grid-envelope.d/CHANGELOG.md",
+        "sha256": "aef2b7915320af9607f415cef649397530561e4f0f9372fda1bbf2691dd3f9b1"
+      },
+      {
+        "path": "simulations/SIM-hupir-grid-envelope-enc-cbor-unknown-hard-reject-sig-mandatory-opaque-bytes/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "6e4d5ffb0f6986b179ce31eca4714de7255ae6b9afef531d8e0102745280daf7"
+      },
+      {
+        "path": "scenarios/bgp-class-routing-app-conflicting-policies/bgp-class-routing-app-conflicting-policies.md",
+        "sha256": "e0a0e2e8b317ce945417fdc2990afc86627a56f6e38518464ce66c6fa1e27a12"
+      }
+    ],
+    "simulation_tree_hash": "8cf2242305b6f3d92194a5e4881f8b3b8adf8a39e25bc1237713cc887e1ec805"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 3,
+    "auditability": 2,
+    "evolution_safety": 1,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 2,
+    "implementation_plausibility": 4,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 15,
+    "normalized_0_100": 43,
+    "confidence_0_1": 0.85
+  },
+  "assessment": {
+    "rationale": "Strong as lower-layer boundary evidence but weak as a direct routing answer. The specimen can carry signed opaque routing payloads and clearly delegates route-selection semantics to the protocol named by pcid, so it does not force a single global-best model. But it does not define Bob's competing route offers, Alice/Carol-specific preference and refusal logic, or auditable peer-local records explaining a route choice. The unknown-hard-reject rule also makes mixed-version routing-policy evolution brittle.",
+    "strengths": [
+      "Explicit pcid dispatch keeps policy-relative route choice in the routing payload rather than conflating it with the envelope.",
+      "Deterministic CBOR and a mandatory signed prefix provide stable byte-level evidence and straightforward implementation shape.",
+      "The specimen does not require a central registry or global routing authority at the envelope layer."
+    ],
+    "weaknesses": [
+      "It has no native representation for route advertisements, jurisdiction tags, costs, or peer-specific policy evaluation.",
+      "Auditability of why Alice or Carol chose or refused a path is entirely outside this simulation.",
+      "Unknown-hard-reject prevents valid-envelope storage or forwarding when a peer lacks the relevant pcid."
+    ],
+    "risks": [
+      "Forward compatibility is weak: new routing-policy payload types can partition heterogeneous peers.",
+      "Signature bytes are mandatory, but signer identity and verification semantics are unspecified and may diverge across deployments.",
+      "The specimen is still draft and unfrozen, so long-term wire commitments are not yet stable."
+    ],
+    "open_questions": [
+      "What payload protocol records Bob's competing offers plus Alice- and Carol-local policy evaluation?",
+      "How are peer-local route-choice records linked so a later auditor can see why a non-global-best path was chosen?",
+      "Should unknown pcids be retainable or relayable as opaque evidence to support 100-year migration?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

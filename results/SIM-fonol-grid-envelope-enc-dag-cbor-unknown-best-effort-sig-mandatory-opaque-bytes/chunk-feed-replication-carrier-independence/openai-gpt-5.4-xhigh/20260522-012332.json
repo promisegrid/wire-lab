@@ -1,0 +1,123 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-fonol-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-mandatory-opaque-bytes-chunk-feed-replication-carrier-independence-openai-gpt-5.4-xhigh-20260522-012332",
+  "run_group_id": "ga-canary-20260522-012332",
+  "cell_id": "ga-canary-20260522-012332-000023-SIM-fonol-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-mandatory-opaque-bytes--chunk-feed-replication-carrier-independence--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-fonol-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-mandatory-opaque-bytes",
+  "scenario_id": "chunk-feed-replication-carrier-independence",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260522-012332",
+  "result_path": "results/SIM-fonol-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-mandatory-opaque-bytes/chunk-feed-replication-carrier-independence/openai-gpt-5.4-xhigh/20260522-012332.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_036c7f9582054163b3a46fda5b9c37b8",
+    "response_id": "resp_0dc0a4420337bd24006a0fb21e2600819abb0ee427a12f7f98",
+    "input_tokens": 6908,
+    "output_tokens": 10788,
+    "cost_usd": 0.163121
+  },
+  "source": {
+    "repo_commit": "f098e31d950a71f6844c4015150af0c90523ca4f",
+    "sim_path": "simulations/SIM-fonol-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-mandatory-opaque-bytes/",
+    "scenario_path": "scenarios/chunk-feed-replication-carrier-independence/chunk-feed-replication-carrier-independence.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "28a7d5ae02517cd2fc22e1fb03c497d40d982d374a5876f401cfc8d8ac68b9a7"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-fonol-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-mandatory-opaque-bytes/README.md",
+        "sha256": "7180bae471f5dc14a7b28ad7e438ae382933cbb03370a758517cb4c2af3a392c"
+      },
+      {
+        "path": "simulations/SIM-fonol-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-mandatory-opaque-bytes/QUESTION.md",
+        "sha256": "d1e68d688bcf1aeeda502a03f9951d38e91b2806aa681f790fba198d6e41fd05"
+      },
+      {
+        "path": "simulations/SIM-fonol-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-mandatory-opaque-bytes/protocols/grid-envelope.d/CHANGELOG.md",
+        "sha256": "aef2b7915320af9607f415cef649397530561e4f0f9372fda1bbf2691dd3f9b1"
+      },
+      {
+        "path": "simulations/SIM-fonol-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-mandatory-opaque-bytes/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "63ca5ed3dd48d1d53c9d7254cd9f6c9b2f1fc6d0f153f331cc1348f71af69f37"
+      },
+      {
+        "path": "scenarios/chunk-feed-replication-carrier-independence/chunk-feed-replication-carrier-independence.md",
+        "sha256": "5386ebc3943d885551ac45b3b4fb1616d67d742407906c347b7d1d388f31c346"
+      }
+    ],
+    "simulation_tree_hash": "44f3c24c3bba709fc9084c9b7b00d63db3f0a9184926cc751ab92633c53a6bae"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 3,
+    "promisegrid_alignment": 3,
+    "auditability": 3,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 3,
+    "implementation_plausibility": 4,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 28,
+    "normalized_0_100": 70,
+    "confidence_0_1": 0.78
+  },
+  "assessment": {
+    "rationale": "This variant is a good carrier-neutral wrapper with canonical signed bytes and a very clear pCID/payload boundary, so it helps separate feed semantics from substrate mechanics; however, it only partially addresses the scenario because chunk-feed replication behavior remains outside the envelope specimen.",
+    "strengths": [
+      "Canonical DAG-CBOR bytes plus a mandatory signature slot make the same envelope portable across different carriers.",
+      "The spec clearly assigns interpretation to the pCID-selected payload protocol rather than to the transport.",
+      "It explicitly avoids requiring a central pCID registry.",
+      "Unknown-pCID handling preserves salvage while marking results unsupported and unverified."
+    ],
+    "weaknesses": [
+      "The specimen does not define chunk-feed roles, chunk identity, or replication completeness.",
+      "Signature algorithm, signer identity, and verification semantics are outside the envelope.",
+      "Carrier-specific replay, ordering, and retry behavior is delegated out of scope."
+    ],
+    "risks": [
+      "Best-effort tooling could over-trust unknown payload inspection.",
+      "Different ecosystems could attach incompatible signature profiles to the same envelope shape.",
+      "Long-term usefulness depends on durable preservation of pCID-linked handler specs."
+    ],
+    "open_questions": [
+      "What concrete chunk-feed payload profile rides inside this envelope unchanged across UDP, git, libp2p, IPFS, and ATPROTO-like carriers?",
+      "How do peers locally audit chunk completeness, replay, and ordering when carriers differ?",
+      "What minimum signature/profile commitments are needed for 100-year cross-carrier verification?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

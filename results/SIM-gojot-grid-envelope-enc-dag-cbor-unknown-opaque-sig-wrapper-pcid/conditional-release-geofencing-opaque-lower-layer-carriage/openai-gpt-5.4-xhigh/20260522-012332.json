@@ -1,0 +1,123 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-gojot-grid-envelope-enc-dag-cbor-unknown-opaque-sig-wrapper-pcid-conditional-release-geofencing-opaque-lower-layer-carriage-openai-gpt-5.4-xhigh-20260522-012332",
+  "run_group_id": "ga-canary-20260522-012332",
+  "cell_id": "ga-canary-20260522-012332-000056-SIM-gojot-grid-envelope-enc-dag-cbor-unknown-opaque-sig-wrapper-pcid--conditional-release-geofencing-opaque-lower-layer-carriage--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-gojot-grid-envelope-enc-dag-cbor-unknown-opaque-sig-wrapper-pcid",
+  "scenario_id": "conditional-release-geofencing-opaque-lower-layer-carriage",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260522-012332",
+  "result_path": "results/SIM-gojot-grid-envelope-enc-dag-cbor-unknown-opaque-sig-wrapper-pcid/conditional-release-geofencing-opaque-lower-layer-carriage/openai-gpt-5.4-xhigh/20260522-012332.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_88db2903ecdf4da4adfc1b75e7933897",
+    "response_id": "resp_08b4f3ac8e670cc6006a0fb5dd7ab8819a9e5375ca658967da",
+    "input_tokens": 6842,
+    "output_tokens": 7158,
+    "cost_usd": 0.1121855
+  },
+  "source": {
+    "repo_commit": "f098e31d950a71f6844c4015150af0c90523ca4f",
+    "sim_path": "simulations/SIM-gojot-grid-envelope-enc-dag-cbor-unknown-opaque-sig-wrapper-pcid/",
+    "scenario_path": "scenarios/conditional-release-geofencing-opaque-lower-layer-carriage/conditional-release-geofencing-opaque-lower-layer-carriage.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "28a7d5ae02517cd2fc22e1fb03c497d40d982d374a5876f401cfc8d8ac68b9a7"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-gojot-grid-envelope-enc-dag-cbor-unknown-opaque-sig-wrapper-pcid/README.md",
+        "sha256": "b24a3975b733c2401f9ea6d4016f8423e7fd7b03313bcfcba78608e5ccdb3808"
+      },
+      {
+        "path": "simulations/SIM-gojot-grid-envelope-enc-dag-cbor-unknown-opaque-sig-wrapper-pcid/QUESTION.md",
+        "sha256": "622a65ebda9ebdb7eed3613c31de38962af4942dac2493ac8d885692a0c897a8"
+      },
+      {
+        "path": "simulations/SIM-gojot-grid-envelope-enc-dag-cbor-unknown-opaque-sig-wrapper-pcid/protocols/grid-envelope.d/CHANGELOG.md",
+        "sha256": "aef2b7915320af9607f415cef649397530561e4f0f9372fda1bbf2691dd3f9b1"
+      },
+      {
+        "path": "simulations/SIM-gojot-grid-envelope-enc-dag-cbor-unknown-opaque-sig-wrapper-pcid/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "14ea55b94631c1438682e6795ae44965b926e6349e9411c1641af86d4059beed"
+      },
+      {
+        "path": "scenarios/conditional-release-geofencing-opaque-lower-layer-carriage/conditional-release-geofencing-opaque-lower-layer-carriage.md",
+        "sha256": "e0af12980a8e0beec8a12683a7352f864cd5c2fcfcaa17cc457db28bea9cb525"
+      }
+    ],
+    "simulation_tree_hash": "9e114c7aa2aa728b929b6162d361c7f7fbb6d464ac69d30f8b4f563b5354d8df"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 4,
+    "promisegrid_alignment": 4,
+    "auditability": 3,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 4,
+    "implementation_plausibility": 4,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 30,
+    "normalized_0_100": 75,
+    "confidence_0_1": 0.76
+  },
+  "assessment": {
+    "rationale": "For this lower-layer geofencing case, the variant is a good envelope-level fit: Bob can retain and forward encrypted condition-bearing payloads opaquely, with explicit unsupported-pCID failure and no speculative parsing. That reduces accidental semantic overreach, but the specimen leaves condition-proof format and promise-accounting semantics to higher-layer pCID-defined protocols.",
+    "strengths": [
+      "Explicit unknown-pCID policy allows safe store-and-forward of opaque payloads without speculative parsing.",
+      "The positional [pcid,payload] envelope gives a very clear layer boundary and preserves exact bytes for later audit.",
+      "Wrapper-based signatures/evidence can add integrity or authorship without forcing every lower layer to understand condition semantics.",
+      "The specimen does not require a central registry to make opaque carriage work."
+    ],
+    "weaknesses": [
+      "The specimen does not define the condition object or proof model needed to verify conditional-release or geofencing semantics.",
+      "Auditability depends on external pCID handlers and wrapper protocols once payload semantics matter.",
+      "It does not spell out the promise/accounting rule that separates safe opaque carriage from authorized release behavior."
+    ],
+    "risks": [
+      "A node could mistakenly treat successful opaque carriage as authorization to release or satisfy a condition.",
+      "Long-term preservation may keep bytes intact while losing the handler knowledge needed to interpret the condition reference.",
+      "Wrapper-only signing can make provenance discovery less uniform across implementations."
+    ],
+    "open_questions": [
+      "What condition-reference format lets higher layers verify the condition object while lower layers remain opaque carriers?",
+      "What local promise-accounting record distinguishes storage/relay of opaque envelopes from acceptance of the embedded release condition?",
+      "How is durable pCID-to-spec resolution preserved for 100-year audits if handlers and organizations change?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

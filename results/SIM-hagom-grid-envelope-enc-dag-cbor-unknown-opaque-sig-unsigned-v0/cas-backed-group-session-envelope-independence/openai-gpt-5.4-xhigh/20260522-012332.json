@@ -1,0 +1,122 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-hagom-grid-envelope-enc-dag-cbor-unknown-opaque-sig-unsigned-v0-cas-backed-group-session-envelope-independence-openai-gpt-5.4-xhigh-20260522-012332",
+  "run_group_id": "ga-canary-20260522-012332",
+  "cell_id": "ga-canary-20260522-012332-000065-SIM-hagom-grid-envelope-enc-dag-cbor-unknown-opaque-sig-unsigned-v0--cas-backed-group-session-envelope-independence--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-hagom-grid-envelope-enc-dag-cbor-unknown-opaque-sig-unsigned-v0",
+  "scenario_id": "cas-backed-group-session-envelope-independence",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260522-012332",
+  "result_path": "results/SIM-hagom-grid-envelope-enc-dag-cbor-unknown-opaque-sig-unsigned-v0/cas-backed-group-session-envelope-independence/openai-gpt-5.4-xhigh/20260522-012332.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_74e929b008a9482e89e8ec2d60feed29",
+    "response_id": "resp_0cc6914d1befd209006a0fb6b69ec88198a5ead78552799bdb",
+    "input_tokens": 6807,
+    "output_tokens": 10138,
+    "cost_usd": 0.15384425
+  },
+  "source": {
+    "repo_commit": "f098e31d950a71f6844c4015150af0c90523ca4f",
+    "sim_path": "simulations/SIM-hagom-grid-envelope-enc-dag-cbor-unknown-opaque-sig-unsigned-v0/",
+    "scenario_path": "scenarios/cas-backed-group-session-envelope-independence/cas-backed-group-session-envelope-independence.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "28a7d5ae02517cd2fc22e1fb03c497d40d982d374a5876f401cfc8d8ac68b9a7"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-hagom-grid-envelope-enc-dag-cbor-unknown-opaque-sig-unsigned-v0/README.md",
+        "sha256": "aabd3b2ce056784bb4ce0c1bf2d4a8b873ec0c57ca71b523844b899aee4ac9ac"
+      },
+      {
+        "path": "simulations/SIM-hagom-grid-envelope-enc-dag-cbor-unknown-opaque-sig-unsigned-v0/QUESTION.md",
+        "sha256": "854d88c3858b2d9813231632226a1bc7786fc23fbee154a0863656e4d593c179"
+      },
+      {
+        "path": "simulations/SIM-hagom-grid-envelope-enc-dag-cbor-unknown-opaque-sig-unsigned-v0/protocols/grid-envelope.d/CHANGELOG.md",
+        "sha256": "aef2b7915320af9607f415cef649397530561e4f0f9372fda1bbf2691dd3f9b1"
+      },
+      {
+        "path": "simulations/SIM-hagom-grid-envelope-enc-dag-cbor-unknown-opaque-sig-unsigned-v0/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "29527a223343bdf35f6613985226e116c5c2de9a101e9b561468b48d82e42569"
+      },
+      {
+        "path": "scenarios/cas-backed-group-session-envelope-independence/cas-backed-group-session-envelope-independence.md",
+        "sha256": "7f4409bc81e7ad284aca085e99865ff0c8b01f7ce5c8c39054845ad65d1ff464"
+      }
+    ],
+    "simulation_tree_hash": "228178578418dd49b30e5abae06099d74ee881b317085859e039cf08c8a0ebd6"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 4,
+    "promisegrid_alignment": 4,
+    "auditability": 3,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 4,
+    "implementation_plausibility": 5,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 26,
+    "normalized_0_100": 74,
+    "confidence_0_1": 0.78
+  },
+  "assessment": {
+    "rationale": "Strong envelope/payload separation makes this a good fit for envelope-independence pressure: meaning lives under the pcid-selected payload handler, unknown envelopes stay opaque, and the spec explicitly avoids declaring a canonical winner. It is not a full pass because it does not define how a CAS-backed group session proves semantic equivalence across different outer-envelope bytes, and unsigned v0 pushes integrity and accountability into other layers.",
+    "strengths": [
+      "Meaning is explicitly owned by the pcid-selected payload protocol rather than the outer envelope.",
+      "Unknown-pCID handling preserves exact bytes and fails explicitly without speculative parsing.",
+      "The spec explicitly rejects a central registry and avoids treating this variant as the winner."
+    ],
+    "weaknesses": [
+      "No explicit rule shows how the same group-session message stays identical across different envelope variants.",
+      "Unsigned v0 weakens provenance and peer-local accountability at the envelope layer.",
+      "Canonical hashing of exact envelope bytes can still couple identifiers to the chosen wrapper."
+    ],
+    "risks": [
+      "Upper layers may accidentally content-address the outer DAG-CBOR envelope, reintroducing envelope dependence.",
+      "Transport-supplied authorship could become a de facto authority or vary between deployments.",
+      "Peers may be able to store and forward opaque bytes yet still lack enough evidence to audit payload meaning."
+    ],
+    "open_questions": [
+      "What should a CAS-backed session bind to when two envelope variants carry the same resolved payload?",
+      "How should peers compare or deduplicate semantically equivalent cross-variant messages using only local evidence?",
+      "Is the layering note about signature slots meant to rely on wrappers or successor variants despite the base [pcid, payload] shape?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

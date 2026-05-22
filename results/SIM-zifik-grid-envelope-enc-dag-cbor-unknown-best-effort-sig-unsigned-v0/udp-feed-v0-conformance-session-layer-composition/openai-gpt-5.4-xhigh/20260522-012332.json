@@ -1,0 +1,122 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-zifik-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-unsigned-v0-udp-feed-v0-conformance-session-layer-composition-openai-gpt-5.4-xhigh-20260522-012332",
+  "run_group_id": "ga-canary-20260522-012332",
+  "cell_id": "ga-canary-20260522-012332-000225-SIM-zifik-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-unsigned-v0--udp-feed-v0-conformance-session-layer-composition--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-zifik-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-unsigned-v0",
+  "scenario_id": "udp-feed-v0-conformance-session-layer-composition",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260522-012332",
+  "result_path": "results/SIM-zifik-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-unsigned-v0/udp-feed-v0-conformance-session-layer-composition/openai-gpt-5.4-xhigh/20260522-012332.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_d9215c2978fd4bac8d01deef9f856531",
+    "response_id": "resp_016e5ec264d9f848006a0fcf5d1ccc819a9fd2ac4efeb03518",
+    "input_tokens": 6829,
+    "output_tokens": 11745,
+    "cost_usd": 0.17638075
+  },
+  "source": {
+    "repo_commit": "f098e31d950a71f6844c4015150af0c90523ca4f",
+    "sim_path": "simulations/SIM-zifik-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-unsigned-v0/",
+    "scenario_path": "scenarios/udp-feed-v0-conformance-session-layer-composition/udp-feed-v0-conformance-session-layer-composition.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "28a7d5ae02517cd2fc22e1fb03c497d40d982d374a5876f401cfc8d8ac68b9a7"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-zifik-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-unsigned-v0/README.md",
+        "sha256": "715a5e5683bdbe00ad96b5a849ab35a9676a07e8c3b378c907e8573cc2c4525c"
+      },
+      {
+        "path": "simulations/SIM-zifik-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-unsigned-v0/QUESTION.md",
+        "sha256": "f7c9cddff4ffb49e35c187e91f26be77fda064b9d9b55f68a30dc85f41ad23df"
+      },
+      {
+        "path": "simulations/SIM-zifik-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-unsigned-v0/protocols/grid-envelope.d/CHANGELOG.md",
+        "sha256": "aef2b7915320af9607f415cef649397530561e4f0f9372fda1bbf2691dd3f9b1"
+      },
+      {
+        "path": "simulations/SIM-zifik-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-unsigned-v0/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "a234b12b171c31e01d2878134ba4541b68b43e997cd7ec1aba875407cc1ffeb0"
+      },
+      {
+        "path": "scenarios/udp-feed-v0-conformance-session-layer-composition/udp-feed-v0-conformance-session-layer-composition.md",
+        "sha256": "69da5db705a56cd7067a653928ff8b2dc9301ef6ebfc712bd81038a65c9d352c"
+      }
+    ],
+    "simulation_tree_hash": "588cdf7a9d0f14b9081b539d842ede027573f04c728321fa2ff7ea996f79a7da"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 3,
+    "promisegrid_alignment": 3,
+    "auditability": 2,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 3,
+    "implementation_plausibility": 5,
+    "risk_penalty": 4
+  },
+  "fitness": {
+    "raw": 20,
+    "normalized_0_100": 57.1,
+    "confidence_0_1": 0.77
+  },
+  "assessment": {
+    "rationale": "The variant is a strong layering specimen: [pcid,payload] lets a session message ride above UDP-feed without transport semantics leaking upward. But because v0 is unsigned and delegates integrity and authorship elsewhere, it only partially meets PromiseGrid composition pressure under audit, adversarial, and long-lived evidence needs.",
+    "strengths": [
+      "Two-slot positional envelope keeps transport and next-layer semantics separated.",
+      "pCID dispatch, opaque payload, and recursive wrapping support modular composition.",
+      "Unknown-pCID handling makes unsupported cases explicit instead of pretending to parse."
+    ],
+    "weaknesses": [
+      "No built-in integrity or authorship; higher layers must supply their own accountability.",
+      "The spec does not say what concrete UDP-feed metadata, if any, the session layer still needs.",
+      "Best-effort salvage can tempt heuristic parsing of unknown payloads."
+    ],
+    "risks": [
+      "Transport-specific trust or identity may leak back into the session boundary.",
+      "Unsigned envelopes are exposed to spoofing, tampering, and replay with weak peer-local evidence.",
+      "Long-term pCID/handler discovery remains underspecified."
+    ],
+    "open_questions": [
+      "What exact UDP-feed API surface is assumed beyond byte delivery?",
+      "How should wrapper or payload signatures be encoded without breaking the two-slot boundary?",
+      "How are replay, ordering, and session-membership proofs recorded peer-locally across transports?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

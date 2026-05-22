@@ -1,0 +1,122 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-dorut-grid-envelope-enc-cbor-unknown-hard-reject-sig-wrapper-pcid-conditional-release-geofencing-opaque-lower-layer-carriage-openai-gpt-5.4-xhigh-20260522-012332",
+  "run_group_id": "ga-canary-20260522-012332",
+  "cell_id": "ga-canary-20260522-012332-000011-SIM-dorut-grid-envelope-enc-cbor-unknown-hard-reject-sig-wrapper-pcid--conditional-release-geofencing-opaque-lower-layer-carriage--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-dorut-grid-envelope-enc-cbor-unknown-hard-reject-sig-wrapper-pcid",
+  "scenario_id": "conditional-release-geofencing-opaque-lower-layer-carriage",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260522-012332",
+  "result_path": "results/SIM-dorut-grid-envelope-enc-cbor-unknown-hard-reject-sig-wrapper-pcid/conditional-release-geofencing-opaque-lower-layer-carriage/openai-gpt-5.4-xhigh/20260522-012332.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_8b7dd75769e145b68e71b8bc63968c18",
+    "response_id": "resp_0c4f652738d27aa0006a0fb0abbcbc8199b8357865391095c8",
+    "input_tokens": 6818,
+    "output_tokens": 11286,
+    "cost_usd": 0.1699355
+  },
+  "source": {
+    "repo_commit": "f098e31d950a71f6844c4015150af0c90523ca4f",
+    "sim_path": "simulations/SIM-dorut-grid-envelope-enc-cbor-unknown-hard-reject-sig-wrapper-pcid/",
+    "scenario_path": "scenarios/conditional-release-geofencing-opaque-lower-layer-carriage/conditional-release-geofencing-opaque-lower-layer-carriage.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "28a7d5ae02517cd2fc22e1fb03c497d40d982d374a5876f401cfc8d8ac68b9a7"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-dorut-grid-envelope-enc-cbor-unknown-hard-reject-sig-wrapper-pcid/README.md",
+        "sha256": "b39ff286314958a31708394b61daf8d59480be8ca892f39c2d3e7b4bd8842eaf"
+      },
+      {
+        "path": "simulations/SIM-dorut-grid-envelope-enc-cbor-unknown-hard-reject-sig-wrapper-pcid/QUESTION.md",
+        "sha256": "89b5bc5445c004f352bd9268c99d80bd97db881eaec5705ffd32d27b6d1dd6ac"
+      },
+      {
+        "path": "simulations/SIM-dorut-grid-envelope-enc-cbor-unknown-hard-reject-sig-wrapper-pcid/protocols/grid-envelope.d/CHANGELOG.md",
+        "sha256": "aef2b7915320af9607f415cef649397530561e4f0f9372fda1bbf2691dd3f9b1"
+      },
+      {
+        "path": "simulations/SIM-dorut-grid-envelope-enc-cbor-unknown-hard-reject-sig-wrapper-pcid/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "674972e36abe7a1ad042b0af6a1a6cdf3a9ead7d89c89a3615ce7ba004e90fb1"
+      },
+      {
+        "path": "scenarios/conditional-release-geofencing-opaque-lower-layer-carriage/conditional-release-geofencing-opaque-lower-layer-carriage.md",
+        "sha256": "e0af12980a8e0beec8a12683a7352f864cd5c2fcfcaa17cc457db28bea9cb525"
+      }
+    ],
+    "simulation_tree_hash": "50242ebc807aae53051606d642abf07404c95576243dbe41336a113a8f6970bb"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 3,
+    "promisegrid_alignment": 3,
+    "auditability": 2,
+    "evolution_safety": 2,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 4,
+    "implementation_plausibility": 4,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 25,
+    "normalized_0_100": 63,
+    "confidence_0_1": 0.75
+  },
+  "assessment": {
+    "rationale": "Strong on layer separation: the [pcid,payload] CBOR envelope preserves opaque bytes and pushes signatures/evidence into wrapper protocols, so lower layers need not parse condition semantics. Unknown-pCID hard reject also reduces accidental misinterpretation. But the key conditional-release proof and promise-accounting rules are mostly deferred to higher-layer protocols, and hard reject limits generic carriage when the outer pCID is unknown.",
+    "strengths": [
+      "Clear opaque boundary between envelope dispatch and payload semantics.",
+      "Deterministic CBOR plus wrapper-based signature/evidence protocols support stable layered verification.",
+      "Unknown-pCID hard reject makes unsupported cases fail visibly instead of being accepted ambiguously."
+    ],
+    "weaknesses": [
+      "Condition-object verification and promise-accounting rules are not defined in this specimen.",
+      "A node that lacks the outer pCID cannot store or forward the message as a valid envelope, limiting generic opaque carriage.",
+      "The base envelope has no mandatory signature, hop-evidence, or audit fields, and the spec is still draft."
+    ],
+    "risks": [
+      "Wrapper or payload protocol churn can strand older carriers because unknown top-level pCIDs are hard rejected.",
+      "Implementations may disagree on when opaque stored content is safe relative to local promises.",
+      "Audit trails may be uneven if nested signature conventions differ across payload protocols."
+    ],
+    "open_questions": [
+      "What concrete wrapper binds encrypted content, condition reference, and releaser identity for this scenario?",
+      "Can relays or archive nodes retain unknown-top-level envelopes as uninterpreted bytes without counting them as accepted messages?",
+      "How does long-term pCID migration work without weakening the hard-reject safety boundary?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-gasus-grid-envelope-enc-cbor-unknown-opaque-sig-unsigned-v0-chunk-feed-replication-duplicate-advertisement-openai-gpt-5.4-xhigh-20260522-012332",
+  "run_group_id": "ga-canary-20260522-012332",
+  "cell_id": "ga-canary-20260522-012332-000040-SIM-gasus-grid-envelope-enc-cbor-unknown-opaque-sig-unsigned-v0--chunk-feed-replication-duplicate-advertisement--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-gasus-grid-envelope-enc-cbor-unknown-opaque-sig-unsigned-v0",
+  "scenario_id": "chunk-feed-replication-duplicate-advertisement",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260522-012332",
+  "result_path": "results/SIM-gasus-grid-envelope-enc-cbor-unknown-opaque-sig-unsigned-v0/chunk-feed-replication-duplicate-advertisement/openai-gpt-5.4-xhigh/20260522-012332.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_b647c71548fb456cabad57fa997a5346",
+    "response_id": "resp_0d89187bebd20e8d006a0fb42280d88198bcd8236305cec25e",
+    "input_tokens": 6767,
+    "output_tokens": 10852,
+    "cost_usd": 0.16377025
+  },
+  "source": {
+    "repo_commit": "f098e31d950a71f6844c4015150af0c90523ca4f",
+    "sim_path": "simulations/SIM-gasus-grid-envelope-enc-cbor-unknown-opaque-sig-unsigned-v0/",
+    "scenario_path": "scenarios/chunk-feed-replication-duplicate-advertisement/chunk-feed-replication-duplicate-advertisement.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "28a7d5ae02517cd2fc22e1fb03c497d40d982d374a5876f401cfc8d8ac68b9a7"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-gasus-grid-envelope-enc-cbor-unknown-opaque-sig-unsigned-v0/README.md",
+        "sha256": "9d4da5369b36920ebd5913ad06969e21562df7dfbd1ec1e7235b87bab514f515"
+      },
+      {
+        "path": "simulations/SIM-gasus-grid-envelope-enc-cbor-unknown-opaque-sig-unsigned-v0/QUESTION.md",
+        "sha256": "83fda750443b41fc2ca1c52a4830c551b85fab67de847715ff7c88de400c4b96"
+      },
+      {
+        "path": "simulations/SIM-gasus-grid-envelope-enc-cbor-unknown-opaque-sig-unsigned-v0/protocols/grid-envelope.d/CHANGELOG.md",
+        "sha256": "aef2b7915320af9607f415cef649397530561e4f0f9372fda1bbf2691dd3f9b1"
+      },
+      {
+        "path": "simulations/SIM-gasus-grid-envelope-enc-cbor-unknown-opaque-sig-unsigned-v0/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "2837bcf7efd97c9d23091aee5fd19e7f4b56180d918db23ac3ab18ea715ded47"
+      },
+      {
+        "path": "scenarios/chunk-feed-replication-duplicate-advertisement/chunk-feed-replication-duplicate-advertisement.md",
+        "sha256": "5bb68a07363f7a70d839611178b098fbb7d15bcb880a86dde08d2a70b7130372"
+      }
+    ],
+    "simulation_tree_hash": "1a62ac77b896a9bb889f3312e61162d60d5e02c5fa1415afad123d5463a83ece"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 3,
+    "auditability": 2,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 2,
+    "implementation_plausibility": 4,
+    "risk_penalty": 4
+  },
+  "fitness": {
+    "raw": 22,
+    "normalized_0_100": 55,
+    "confidence_0_1": 0.82
+  },
+  "assessment": {
+    "rationale": "This specimen helps mainly as a neutral carrier: deterministic CBOR, explicit pCID dispatch, and unknown-opaque forwarding fit sparse-knowledge and evolution goals. But duplicate-advertisement handling, peer choice, and promise accounting all sit above the envelope, and unsigned v0 leaves Bob's Alice-vs-Carol evidence outside the base format.",
+    "strengths": [
+      "Clear [pcid, payload] boundary keeps feed semantics out of the envelope.",
+      "Unknown-pCID store-and-forward behavior supports sparse knowledge and forward compatibility.",
+      "Deterministic CBOR bytes are simple to implement, hash, and compare."
+    ],
+    "weaknesses": [
+      "No native way to express advertiser identity, duplicate-offer meaning, or Bob's selection rationale.",
+      "Unsigned v0 leaves integrity and authorship to payload or transport.",
+      "Auditors need extra protocol context to interpret opaque payloads and relay evidence."
+    ],
+    "risks": [
+      "Without signed higher-layer evidence, duplicate advertisements can be hard to attribute or challenge locally.",
+      "Peer choice could drift into implicit transport trust or centralized reputation if promise accounting is not defined above the envelope."
+    ],
+    "open_questions": [
+      "What payload or wrapper records Alice and Carol's identities and Bob's peer-choice evidence using only local observations?",
+      "Are duplicate advertisements meant to be deduplicated, ranked, or treated as corroboration by the chunk-feed protocol?",
+      "What exact wrapper or signature path is intended for relay and authorship evidence as this variant evolves beyond unsigned v0?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

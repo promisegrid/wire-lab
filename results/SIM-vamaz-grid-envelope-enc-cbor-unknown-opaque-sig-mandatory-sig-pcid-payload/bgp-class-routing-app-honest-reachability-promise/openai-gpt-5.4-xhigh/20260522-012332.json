@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-vamaz-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-sig-pcid-payload-bgp-class-routing-app-honest-reachability-promise-openai-gpt-5.4-xhigh-20260522-012332",
+  "run_group_id": "ga-canary-20260522-012332",
+  "cell_id": "ga-canary-20260522-012332-000182-SIM-vamaz-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-sig-pcid-payload--bgp-class-routing-app-honest-reachability-promise--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-vamaz-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-sig-pcid-payload",
+  "scenario_id": "bgp-class-routing-app-honest-reachability-promise",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260522-012332",
+  "result_path": "results/SIM-vamaz-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-sig-pcid-payload/bgp-class-routing-app-honest-reachability-promise/openai-gpt-5.4-xhigh/20260522-012332.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_b430138897f643faa05b3d5b786a21ed",
+    "response_id": "resp_02b2787dc54045cc006a0fcab198f0819a81056c512aae6c99",
+    "input_tokens": 6911,
+    "output_tokens": 11985,
+    "cost_usd": 0.17988425
+  },
+  "source": {
+    "repo_commit": "f098e31d950a71f6844c4015150af0c90523ca4f",
+    "sim_path": "simulations/SIM-vamaz-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-sig-pcid-payload/",
+    "scenario_path": "scenarios/bgp-class-routing-app-honest-reachability-promise/bgp-class-routing-app-honest-reachability-promise.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "28a7d5ae02517cd2fc22e1fb03c497d40d982d374a5876f401cfc8d8ac68b9a7"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-vamaz-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-sig-pcid-payload/README.md",
+        "sha256": "9ee5d1dd4dd7cd177f3cbaad482ce0dc3f10be734d7b5da9e4ebda8610d0f0d9"
+      },
+      {
+        "path": "simulations/SIM-vamaz-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-sig-pcid-payload/QUESTION.md",
+        "sha256": "37345350a0759eec3e552c6c0c86961bb3a4d8d26acaa5cbc429574ff6010629"
+      },
+      {
+        "path": "simulations/SIM-vamaz-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-sig-pcid-payload/protocols/grid-envelope.d/CHANGELOG.md",
+        "sha256": "aef2b7915320af9607f415cef649397530561e4f0f9372fda1bbf2691dd3f9b1"
+      },
+      {
+        "path": "simulations/SIM-vamaz-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-sig-pcid-payload/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "0b4c6dfef01543d947c35d86f5e5549596e9fac8791a70028f012b30b582d2b8"
+      },
+      {
+        "path": "scenarios/bgp-class-routing-app-honest-reachability-promise/bgp-class-routing-app-honest-reachability-promise.md",
+        "sha256": "f85a898a4cb0ac219d2dcee050117d73efebefe9e0d4b62f48113106e83bcaca"
+      }
+    ],
+    "simulation_tree_hash": "93c691c8787dbdc8be5fa107abae8706592ce57ce7b958a885d7cb1d577d0c1d"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 3,
+    "auditability": 2,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 2,
+    "implementation_plausibility": 4,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 21,
+    "normalized_0_100": 53,
+    "confidence_0_1": 0.82
+  },
+  "assessment": {
+    "rationale": "Strong as a signed opaque wire envelope, but weak direct fit for honest reachability because route promises, path success, and peer-local kept-promise records are left to higher-layer payload protocols.",
+    "strengths": [
+      "Deterministic CBOR and mandatory signature slots provide stable locally storable evidence bytes.",
+      "Unknown-pCID opaque store/forward behavior fits sparse knowledge and avoids requiring a central protocol authority.",
+      "The spec makes the envelope-vs-payload boundary explicit, so routing semantics are not hidden in framing."
+    ],
+    "weaknesses": [
+      "The simulation does not define route advertisements, forwarding confirmations, or Alice/Bob/Carol local accounting records.",
+      "Auditing a reachability promise depends on external payload and signature protocol specs, not this envelope alone.",
+      "The specimen is still draft and unfrozen, which weakens long-horizon interpretability."
+    ],
+    "risks": [
+      "A signed envelope could be mistaken for proof of honest reachability even when the payload semantics are insufficient.",
+      "If payload or signature handlers are unavailable later, the bytes survive but the routing claim becomes semantically opaque."
+    ],
+    "open_questions": [
+      "Which payload protocol would encode reachability advertisements, withdrawals, and kept/broken outcomes?",
+      "What exact local records should Alice, Bob, and Carol retain after a successful forwarded path?",
+      "How are pCID and signature-protocol specs kept retrievable for 100-year audits?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

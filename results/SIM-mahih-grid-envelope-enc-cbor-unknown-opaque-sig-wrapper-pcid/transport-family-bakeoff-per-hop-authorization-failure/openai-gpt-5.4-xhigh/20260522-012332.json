@@ -1,0 +1,122 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-mahih-grid-envelope-enc-cbor-unknown-opaque-sig-wrapper-pcid-transport-family-bakeoff-per-hop-authorization-failure-openai-gpt-5.4-xhigh-20260522-012332",
+  "run_group_id": "ga-canary-20260522-012332",
+  "cell_id": "ga-canary-20260522-012332-000148-SIM-mahih-grid-envelope-enc-cbor-unknown-opaque-sig-wrapper-pcid--transport-family-bakeoff-per-hop-authorization-failure--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-mahih-grid-envelope-enc-cbor-unknown-opaque-sig-wrapper-pcid",
+  "scenario_id": "transport-family-bakeoff-per-hop-authorization-failure",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260522-012332",
+  "result_path": "results/SIM-mahih-grid-envelope-enc-cbor-unknown-opaque-sig-wrapper-pcid/transport-family-bakeoff-per-hop-authorization-failure/openai-gpt-5.4-xhigh/20260522-012332.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_346e11e486b64ee0a17863cb20ac943f",
+    "response_id": "resp_0ffa0fca82f8057d006a0fc75d028c8199b7070428707c23f6",
+    "input_tokens": 6805,
+    "output_tokens": 10710,
+    "cost_usd": 0.16184875
+  },
+  "source": {
+    "repo_commit": "f098e31d950a71f6844c4015150af0c90523ca4f",
+    "sim_path": "simulations/SIM-mahih-grid-envelope-enc-cbor-unknown-opaque-sig-wrapper-pcid/",
+    "scenario_path": "scenarios/transport-family-bakeoff-per-hop-authorization-failure/transport-family-bakeoff-per-hop-authorization-failure.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "28a7d5ae02517cd2fc22e1fb03c497d40d982d374a5876f401cfc8d8ac68b9a7"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-mahih-grid-envelope-enc-cbor-unknown-opaque-sig-wrapper-pcid/README.md",
+        "sha256": "9b3812b34ce54f670f2557b1186b0f1372205dd26df88105f37d74c257adba2b"
+      },
+      {
+        "path": "simulations/SIM-mahih-grid-envelope-enc-cbor-unknown-opaque-sig-wrapper-pcid/QUESTION.md",
+        "sha256": "d9adefd3bde20b8b93489dae32c873a6e21009855c1f007aa166ac1cd1faf641"
+      },
+      {
+        "path": "simulations/SIM-mahih-grid-envelope-enc-cbor-unknown-opaque-sig-wrapper-pcid/protocols/grid-envelope.d/CHANGELOG.md",
+        "sha256": "aef2b7915320af9607f415cef649397530561e4f0f9372fda1bbf2691dd3f9b1"
+      },
+      {
+        "path": "simulations/SIM-mahih-grid-envelope-enc-cbor-unknown-opaque-sig-wrapper-pcid/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "c98e7f4891f72f87d438ccb85b720fa3f7d52043b03038d711e32f91780112e8"
+      },
+      {
+        "path": "scenarios/transport-family-bakeoff-per-hop-authorization-failure/transport-family-bakeoff-per-hop-authorization-failure.md",
+        "sha256": "f938e10ab88db666d3097a2f97c1667bbbc6e8e071681134049068982cc39cf2"
+      }
+    ],
+    "simulation_tree_hash": "f4a70d5b05c7608d49fe60e0bfd51e87f1cf701aafad2970df62c7bcf9922a6d"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 3,
+    "auditability": 2,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 1,
+    "implementation_plausibility": 4,
+    "risk_penalty": 4
+  },
+  "fitness": {
+    "raw": 19,
+    "normalized_0_100": 48,
+    "confidence_0_1": 0.69
+  },
+  "assessment": {
+    "rationale": "This specimen is a clear, minimal carrier layer with explicit dispatch boundaries, but for this scenario it mostly defers per-hop authorization failure semantics to unspecified wrapper or payload protocols, and its opaque-forwarding rule can permit relay without understanding authorization state.",
+    "strengths": [
+      "Explicit [pcid, payload] structure and no speculative parsing keep layer boundaries clear.",
+      "Deterministic CBOR gives stable canonical bytes for hashing or signature wrappers.",
+      "Unknown-pCID handling and wrapper-based extensibility support migration without a central registry."
+    ],
+    "weaknesses": [
+      "It does not define ring behavior for authorization failure: break, skip, refusal record, or membership reconfiguration.",
+      "Per-hop authorization evidence has no mandatory slot or standard refusal artifact in the base envelope.",
+      "Long-term audit depends on preserving external wrapper specs and handlers for this still-draft specimen."
+    ],
+    "risks": [
+      "A node may store-and-forward opaque envelopes without understanding whether forwarding is authorized for the next hop.",
+      "Different wrapper conventions can represent refusal or hop authorization incompatibly across implementations.",
+      "Authorization failures may collapse into silent drops instead of durable peer-local evidence."
+    ],
+    "open_questions": [
+      "What concrete wrapper or payload protocol records Bob's refusal to forward to Carol?",
+      "Must a node understand the authorization wrapper before opaque store-and-forward is allowed?",
+      "How would ring reconfiguration after an authorization failure be encoded and audited over time?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

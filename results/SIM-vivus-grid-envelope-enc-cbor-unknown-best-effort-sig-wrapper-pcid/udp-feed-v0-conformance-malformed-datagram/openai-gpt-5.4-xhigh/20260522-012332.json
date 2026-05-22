@@ -1,0 +1,122 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-vivus-grid-envelope-enc-cbor-unknown-best-effort-sig-wrapper-pcid-udp-feed-v0-conformance-malformed-datagram-openai-gpt-5.4-xhigh-20260522-012332",
+  "run_group_id": "ga-canary-20260522-012332",
+  "cell_id": "ga-canary-20260522-012332-000209-SIM-vivus-grid-envelope-enc-cbor-unknown-best-effort-sig-wrapper-pcid--udp-feed-v0-conformance-malformed-datagram--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-vivus-grid-envelope-enc-cbor-unknown-best-effort-sig-wrapper-pcid",
+  "scenario_id": "udp-feed-v0-conformance-malformed-datagram",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260522-012332",
+  "result_path": "results/SIM-vivus-grid-envelope-enc-cbor-unknown-best-effort-sig-wrapper-pcid/udp-feed-v0-conformance-malformed-datagram/openai-gpt-5.4-xhigh/20260522-012332.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_5f3d4f0679944492be3ce0dd1ad9c5b5",
+    "response_id": "resp_025914d65b0dc51c006a0fcd912b9c8199bd477cbd10a0b80e",
+    "input_tokens": 6806,
+    "output_tokens": 8246,
+    "cost_usd": 0.1273545
+  },
+  "source": {
+    "repo_commit": "f098e31d950a71f6844c4015150af0c90523ca4f",
+    "sim_path": "simulations/SIM-vivus-grid-envelope-enc-cbor-unknown-best-effort-sig-wrapper-pcid/",
+    "scenario_path": "scenarios/udp-feed-v0-conformance-malformed-datagram/udp-feed-v0-conformance-malformed-datagram.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "28a7d5ae02517cd2fc22e1fb03c497d40d982d374a5876f401cfc8d8ac68b9a7"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-vivus-grid-envelope-enc-cbor-unknown-best-effort-sig-wrapper-pcid/README.md",
+        "sha256": "2021f0124eb525c7a4603cacb2594e2b4f23ded46503995e7434fb548829dea3"
+      },
+      {
+        "path": "simulations/SIM-vivus-grid-envelope-enc-cbor-unknown-best-effort-sig-wrapper-pcid/QUESTION.md",
+        "sha256": "2db906c0951fd55e7f4e0ad6772e0de93be4e6ed614da4d1371df96505f32fa7"
+      },
+      {
+        "path": "simulations/SIM-vivus-grid-envelope-enc-cbor-unknown-best-effort-sig-wrapper-pcid/protocols/grid-envelope.d/CHANGELOG.md",
+        "sha256": "aef2b7915320af9607f415cef649397530561e4f0f9372fda1bbf2691dd3f9b1"
+      },
+      {
+        "path": "simulations/SIM-vivus-grid-envelope-enc-cbor-unknown-best-effort-sig-wrapper-pcid/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "fbf65d9dc63bda02cfb23129cf0d4860449a168349cb580e0a9c52479deb1dcb"
+      },
+      {
+        "path": "scenarios/udp-feed-v0-conformance-malformed-datagram/udp-feed-v0-conformance-malformed-datagram.md",
+        "sha256": "1d9346150fa86d237c26fbca078b661e469a1d68323b60ec00a13b45b5d79efb"
+      }
+    ],
+    "simulation_tree_hash": "58aac6347a21eca760edb90e4c33f9105046b86ff556ebea7d7e85182b7d0552"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 3,
+    "promisegrid_alignment": 4,
+    "auditability": 4,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 3,
+    "implementation_plausibility": 4,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 24,
+    "normalized_0_100": 69,
+    "confidence_0_1": 0.74
+  },
+  "assessment": {
+    "rationale": "Moderate-to-strong fit on the core layering question: this variant keeps byte transport separate from protocol interpretation, but it is not itself a UDP-feed binding and it leaves totally malformed non-CBOR datagram handling under-specified.",
+    "strengths": [
+      "Opaque payload plus pCID dispatch keeps message semantics above the byte boundary.",
+      "Unknown-pCID best-effort salvage is explicitly marked unsupported and unverified, limiting accidental semantic invention.",
+      "Deterministic CBOR canonical bytes and wrapper-based evidence make the envelope relatively auditable and implementable."
+    ],
+    "weaknesses": [
+      "The scenario targets UDP-feed conformance, but this specimen is a higher-layer envelope rather than a UDP binding.",
+      "The draft does not explicitly define how to retain or surface raw datagrams that fail envelope parsing entirely.",
+      "Wrapper-only signature/authorship handling may create uneven failure surfaces across implementations."
+    ],
+    "risks": [
+      "Peers may diverge on malformed-byte handling before pCID dispatch, reducing conformance.",
+      "Best-effort tooling could still drift into misleading salvage if unsupported/unverified labeling is not enforced.",
+      "Draft status leaves long-term interoperability details unsettled."
+    ],
+    "open_questions": [
+      "What exact local audit record should Bob keep when bytes are not valid envelope CBOR at all?",
+      "Should transport bindings be required to pass raw datagram bytes upward unchanged alongside parse-failure metadata?",
+      "How should future peers recover pCID handler meaning over long horizons without central registry assumptions?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

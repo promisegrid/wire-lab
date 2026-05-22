@@ -1,0 +1,123 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-vamaz-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-sig-pcid-payload-cas-backed-group-session-envelope-independence-openai-gpt-5.4-xhigh-20260522-012332",
+  "run_group_id": "ga-canary-20260522-012332",
+  "cell_id": "ga-canary-20260522-012332-000185-SIM-vamaz-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-sig-pcid-payload--cas-backed-group-session-envelope-independence--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-vamaz-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-sig-pcid-payload",
+  "scenario_id": "cas-backed-group-session-envelope-independence",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260522-012332",
+  "result_path": "results/SIM-vamaz-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-sig-pcid-payload/cas-backed-group-session-envelope-independence/openai-gpt-5.4-xhigh/20260522-012332.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_cda425d5eec54c5c81df3e4ecab0ebe5",
+    "response_id": "resp_094a0b9d92667253006a0fcb252ac4819aaebb5185ca709df1",
+    "input_tokens": 6881,
+    "output_tokens": 8218,
+    "cost_usd": 0.12709375
+  },
+  "source": {
+    "repo_commit": "f098e31d950a71f6844c4015150af0c90523ca4f",
+    "sim_path": "simulations/SIM-vamaz-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-sig-pcid-payload/",
+    "scenario_path": "scenarios/cas-backed-group-session-envelope-independence/cas-backed-group-session-envelope-independence.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "28a7d5ae02517cd2fc22e1fb03c497d40d982d374a5876f401cfc8d8ac68b9a7"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-vamaz-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-sig-pcid-payload/README.md",
+        "sha256": "9ee5d1dd4dd7cd177f3cbaad482ce0dc3f10be734d7b5da9e4ebda8610d0f0d9"
+      },
+      {
+        "path": "simulations/SIM-vamaz-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-sig-pcid-payload/QUESTION.md",
+        "sha256": "37345350a0759eec3e552c6c0c86961bb3a4d8d26acaa5cbc429574ff6010629"
+      },
+      {
+        "path": "simulations/SIM-vamaz-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-sig-pcid-payload/protocols/grid-envelope.d/CHANGELOG.md",
+        "sha256": "aef2b7915320af9607f415cef649397530561e4f0f9372fda1bbf2691dd3f9b1"
+      },
+      {
+        "path": "simulations/SIM-vamaz-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-sig-pcid-payload/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "0b4c6dfef01543d947c35d86f5e5549596e9fac8791a70028f012b30b582d2b8"
+      },
+      {
+        "path": "scenarios/cas-backed-group-session-envelope-independence/cas-backed-group-session-envelope-independence.md",
+        "sha256": "7f4409bc81e7ad284aca085e99865ff0c8b01f7ce5c8c39054845ad65d1ff464"
+      }
+    ],
+    "simulation_tree_hash": "93c691c8787dbdc8be5fa107abae8706592ce57ce7b958a885d7cb1d577d0c1d"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 4,
+    "promisegrid_alignment": 4,
+    "auditability": 3,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 4,
+    "implementation_plausibility": 4,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 25,
+    "normalized_0_100": 71,
+    "confidence_0_1": 0.74
+  },
+  "assessment": {
+    "rationale": "This variant fits the envelope-independence scenario reasonably well because it keeps payload semantics behind the payload pCID, treats unknown payloads as opaque, and explicitly refuses to claim a canonical envelope winner. The main limitation is that it does not demonstrate a group-session payload surviving unchanged across sibling envelopes, and its signing/hash canonicalization is still variant-specific.",
+    "strengths": [
+      "Payload meaning is delegated to the handler named by `pcid`, not inferred from envelope structure.",
+      "Unknown `pcid` handling preserves exact bytes for store-and-forward and fails explicitly without speculative parsing.",
+      "The draft explicitly says it is not the canonical PromiseGrid envelope and does not obsolete sibling variants.",
+      "Deterministic CBOR arrays and separate `sig_pcid`/`sig_payload` slots are straightforward to implement."
+    ],
+    "weaknesses": [
+      "No concrete group-session example proves that the same session semantics survive across different envelope variants.",
+      "Canonical signing and hashing over this variant's exact array bytes can make message identity depend on the chosen envelope.",
+      "Positional opaque encoding is less self-describing for later human or LLM audit than a richer labeled form.",
+      "The specimen is still a draft with no freeze, minted spec pCID, or migration walkthrough."
+    ],
+    "risks": [
+      "Implementers may accidentally bind transcript semantics or CAS references to whole-envelope bytes, reintroducing envelope dependence.",
+      "Mandatory signature slots could become a de facto coupling point if sibling variants express proofs differently."
+    ],
+    "open_questions": [
+      "Should group-session references and transcript hashes bind payload bytes, payload CAS objects, or full envelope bytes?",
+      "Can the same signature/proof protocol be reused across sibling envelope variants without changing semantic meaning?",
+      "How should bad signatures, malformed CBOR, or unsupported `sig_pcid` results be recorded for peer-local audit?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

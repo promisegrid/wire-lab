@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-mahih-grid-envelope-enc-cbor-unknown-opaque-sig-wrapper-pcid-cas-object-type-binding-bakeoff-raw-chunk-versus-pointer-bytes-openai-gpt-5.4-xhigh-20260522-012332",
+  "run_group_id": "ga-canary-20260522-012332",
+  "cell_id": "ga-canary-20260522-012332-000142-SIM-mahih-grid-envelope-enc-cbor-unknown-opaque-sig-wrapper-pcid--cas-object-type-binding-bakeoff-raw-chunk-versus-pointer-bytes--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-mahih-grid-envelope-enc-cbor-unknown-opaque-sig-wrapper-pcid",
+  "scenario_id": "cas-object-type-binding-bakeoff-raw-chunk-versus-pointer-bytes",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260522-012332",
+  "result_path": "results/SIM-mahih-grid-envelope-enc-cbor-unknown-opaque-sig-wrapper-pcid/cas-object-type-binding-bakeoff-raw-chunk-versus-pointer-bytes/openai-gpt-5.4-xhigh/20260522-012332.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_45d9133d61494757bd484799413d16d4",
+    "response_id": "resp_0d02046333fa9320006a0fbe8bcc7c8198815aca158cf07dc4",
+    "input_tokens": 6843,
+    "output_tokens": 7538,
+    "cost_usd": 0.11750725
+  },
+  "source": {
+    "repo_commit": "f098e31d950a71f6844c4015150af0c90523ca4f",
+    "sim_path": "simulations/SIM-mahih-grid-envelope-enc-cbor-unknown-opaque-sig-wrapper-pcid/",
+    "scenario_path": "scenarios/cas-object-type-binding-bakeoff-raw-chunk-versus-pointer-bytes/cas-object-type-binding-bakeoff-raw-chunk-versus-pointer-bytes.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "28a7d5ae02517cd2fc22e1fb03c497d40d982d374a5876f401cfc8d8ac68b9a7"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-mahih-grid-envelope-enc-cbor-unknown-opaque-sig-wrapper-pcid/README.md",
+        "sha256": "9b3812b34ce54f670f2557b1186b0f1372205dd26df88105f37d74c257adba2b"
+      },
+      {
+        "path": "simulations/SIM-mahih-grid-envelope-enc-cbor-unknown-opaque-sig-wrapper-pcid/QUESTION.md",
+        "sha256": "d9adefd3bde20b8b93489dae32c873a6e21009855c1f007aa166ac1cd1faf641"
+      },
+      {
+        "path": "simulations/SIM-mahih-grid-envelope-enc-cbor-unknown-opaque-sig-wrapper-pcid/protocols/grid-envelope.d/CHANGELOG.md",
+        "sha256": "aef2b7915320af9607f415cef649397530561e4f0f9372fda1bbf2691dd3f9b1"
+      },
+      {
+        "path": "simulations/SIM-mahih-grid-envelope-enc-cbor-unknown-opaque-sig-wrapper-pcid/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "c98e7f4891f72f87d438ccb85b720fa3f7d52043b03038d711e32f91780112e8"
+      },
+      {
+        "path": "scenarios/cas-object-type-binding-bakeoff-raw-chunk-versus-pointer-bytes/cas-object-type-binding-bakeoff-raw-chunk-versus-pointer-bytes.md",
+        "sha256": "64da602a38c041eeed6075a84c4c46c3d4448cbf21381eb803382aae0aec4018"
+      }
+    ],
+    "simulation_tree_hash": "f4a70d5b05c7608d49fe60e0bfd51e87f1cf701aafad2970df62c7bcf9922a6d"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 3,
+    "promisegrid_alignment": 4,
+    "auditability": 3,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 4,
+    "implementation_plausibility": 4,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 25,
+    "normalized_0_100": 71,
+    "confidence_0_1": 0.74
+  },
+  "assessment": {
+    "rationale": "This variant partly addresses the bakeoff by carrying a protocol/type selector inside the hashed envelope bytes via pCID, so Bob need not rely on filenames and unknown types fail explicitly. It is weaker because the draft does not define the concrete raw-versus-pointer payload conventions or explain how CID codec alone tells Bob that the outer bytes are a grid envelope.",
+    "strengths": [
+      "Type/handler binding travels with the bytes via pCID instead of local path metadata.",
+      "Unknown pCID handling preserves exact bytes and returns an explicit unsupported result rather than speculative parsing.",
+      "Deterministic CBOR gives stable bytes for hashing, signing, and later audit."
+    ],
+    "weaknesses": [
+      "The specimen does not define actual raw-chunk and pointer-object payload schemas.",
+      "It does not specify how the outer object is content-addressed so a receiver knows to decode it as a grid envelope first.",
+      "Human interpretation still depends on durable access to the pCID-selected spec/handler."
+    ],
+    "risks": [
+      "If the outer envelope form is not recognizable, Bob can still be stuck between treating bytes as raw payload or as structured content.",
+      "Long-term interoperability may fragment if multiple pCIDs encode similar pointer/raw semantics without a durable discovery story."
+    ],
+    "open_questions": [
+      "Are all CAS objects in this design required to be wrapped as grid envelopes, or can naked raw chunks still circulate?",
+      "What CID codec or outer convention identifies these deterministic CBOR envelope bytes before reading pCID?",
+      "Which concrete pCIDs would represent raw payload versus pointer-bearing payloads in this bakeoff?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

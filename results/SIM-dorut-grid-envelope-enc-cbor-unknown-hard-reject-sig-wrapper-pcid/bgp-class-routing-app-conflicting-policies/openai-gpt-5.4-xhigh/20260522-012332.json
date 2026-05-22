@@ -1,0 +1,122 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-dorut-grid-envelope-enc-cbor-unknown-hard-reject-sig-wrapper-pcid-bgp-class-routing-app-conflicting-policies-openai-gpt-5.4-xhigh-20260522-012332",
+  "run_group_id": "ga-canary-20260522-012332",
+  "cell_id": "ga-canary-20260522-012332-000001-SIM-dorut-grid-envelope-enc-cbor-unknown-hard-reject-sig-wrapper-pcid--bgp-class-routing-app-conflicting-policies--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-dorut-grid-envelope-enc-cbor-unknown-hard-reject-sig-wrapper-pcid",
+  "scenario_id": "bgp-class-routing-app-conflicting-policies",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260522-012332",
+  "result_path": "results/SIM-dorut-grid-envelope-enc-cbor-unknown-hard-reject-sig-wrapper-pcid/bgp-class-routing-app-conflicting-policies/openai-gpt-5.4-xhigh/20260522-012332.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_f8cfe890c2c846ec88bf84cf38adbeab",
+    "response_id": "resp_02b55f336d2ef864006a0fb01664708198b22b18964658ca28",
+    "input_tokens": 6786,
+    "output_tokens": 9171,
+    "cost_usd": 0.1402695
+  },
+  "source": {
+    "repo_commit": "f098e31d950a71f6844c4015150af0c90523ca4f",
+    "sim_path": "simulations/SIM-dorut-grid-envelope-enc-cbor-unknown-hard-reject-sig-wrapper-pcid/",
+    "scenario_path": "scenarios/bgp-class-routing-app-conflicting-policies/bgp-class-routing-app-conflicting-policies.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "28a7d5ae02517cd2fc22e1fb03c497d40d982d374a5876f401cfc8d8ac68b9a7"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-dorut-grid-envelope-enc-cbor-unknown-hard-reject-sig-wrapper-pcid/README.md",
+        "sha256": "b39ff286314958a31708394b61daf8d59480be8ca892f39c2d3e7b4bd8842eaf"
+      },
+      {
+        "path": "simulations/SIM-dorut-grid-envelope-enc-cbor-unknown-hard-reject-sig-wrapper-pcid/QUESTION.md",
+        "sha256": "89b5bc5445c004f352bd9268c99d80bd97db881eaec5705ffd32d27b6d1dd6ac"
+      },
+      {
+        "path": "simulations/SIM-dorut-grid-envelope-enc-cbor-unknown-hard-reject-sig-wrapper-pcid/protocols/grid-envelope.d/CHANGELOG.md",
+        "sha256": "aef2b7915320af9607f415cef649397530561e4f0f9372fda1bbf2691dd3f9b1"
+      },
+      {
+        "path": "simulations/SIM-dorut-grid-envelope-enc-cbor-unknown-hard-reject-sig-wrapper-pcid/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "674972e36abe7a1ad042b0af6a1a6cdf3a9ead7d89c89a3615ce7ba004e90fb1"
+      },
+      {
+        "path": "scenarios/bgp-class-routing-app-conflicting-policies/bgp-class-routing-app-conflicting-policies.md",
+        "sha256": "e0a0e2e8b317ce945417fdc2990afc86627a56f6e38518464ce66c6fa1e27a12"
+      }
+    ],
+    "simulation_tree_hash": "50242ebc807aae53051606d642abf07404c95576243dbe41336a113a8f6970bb"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 2,
+    "auditability": 2,
+    "evolution_safety": 1,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 3,
+    "implementation_plausibility": 4,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 15,
+    "normalized_0_100": 43,
+    "confidence_0_1": 0.88
+  },
+  "assessment": {
+    "rationale": "Useful mainly as a carrier-layer boundary test, not as a direct answer to conflicting-policy routing. It keeps route policy out of the envelope and makes unknown-protocol failure visible, but it does not define the offers, local preference logic, or audit records this scenario needs. unknown-hard-reject plus wrapper-selected signatures also weakens migration safety.",
+    "strengths": [
+      "Clear separation between envelope dispatch and higher-layer routing policy.",
+      "Deterministic CBOR positional bytes support reproducible parse/sign/hash behavior.",
+      "Spec avoids a central pCID registry and makes unknown-pCID failure explicit."
+    ],
+    "weaknesses": [
+      "No model for Bob's competing offers or Alice/Carol policy-relative selection and refusal.",
+      "No peer-local accounting records for explaining route decisions to later auditors.",
+      "unknown-hard-reject is brittle for long-lived protocol and policy evolution."
+    ],
+    "risks": [
+      "New policy or signature wrapper pCIDs could split interoperability during migration.",
+      "Hard rejection may discard route evidence that a translator or auditor could still use.",
+      "The minimal envelope may be mistaken for an application-routing solution when it is only a carrier."
+    ],
+    "open_questions": [
+      "What payload protocol carries route offers, refusals, and per-peer policy evidence?",
+      "How do older peers coexist with new wrapper pCIDs under unknown-hard-reject?",
+      "What local records should Alice, Bob, and Carol retain to audit divergent route choices over time?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

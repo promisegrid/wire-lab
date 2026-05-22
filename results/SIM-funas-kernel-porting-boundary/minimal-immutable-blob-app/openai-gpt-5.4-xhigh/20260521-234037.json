@@ -1,0 +1,113 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-funas-kernel-porting-boundary-minimal-immutable-blob-app-openai-gpt-5.4-xhigh-20260521-234037",
+  "run_group_id": "ga-canary-20260521-234037",
+  "cell_id": "ga-canary-20260521-234037-000036-SIM-funas-kernel-porting-boundary--minimal-immutable-blob-app--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-funas-kernel-porting-boundary",
+  "scenario_id": "minimal-immutable-blob-app",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260521-234037",
+  "result_path": "results/SIM-funas-kernel-porting-boundary/minimal-immutable-blob-app/openai-gpt-5.4-xhigh/20260521-234037.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_750f2eccfa324f26aabad5246cd09013",
+    "response_id": "resp_07b524c0dd472da4006a0f9a3b902c8199b6daca73d6ac1903",
+    "input_tokens": 6292,
+    "output_tokens": 5533,
+    "cost_usd": 0.088473
+  },
+  "source": {
+    "repo_commit": "f098e31d950a71f6844c4015150af0c90523ca4f",
+    "sim_path": "simulations/SIM-funas-kernel-porting-boundary/",
+    "scenario_path": "scenarios/minimal-immutable-blob-app/minimal-immutable-blob-app.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "28a7d5ae02517cd2fc22e1fb03c497d40d982d374a5876f401cfc8d8ac68b9a7"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-funas-kernel-porting-boundary/README.md",
+        "sha256": "7610bd7589d30cbc7054afd5ec64be256ec3048adc6135cf2a85c48fa94c2363"
+      },
+      {
+        "path": "simulations/SIM-funas-kernel-porting-boundary/QUESTION.md",
+        "sha256": "c9b86b2a64e4a8ed5cebea5048ad7908752f168d36d68e9ff0c00d2542187486"
+      },
+      {
+        "path": "scenarios/minimal-immutable-blob-app/minimal-immutable-blob-app.md",
+        "sha256": "187e449b0498cddda2a2b28192f6aa29e824dae72e60ff47c35d34df35115a73"
+      }
+    ],
+    "simulation_tree_hash": "3036063b40b8f7f00637b0135a1962f32775f8d0abb3406a49cb169d7048cfe6"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 3,
+    "auditability": 3,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 1,
+    "implementation_plausibility": 2,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 17,
+    "normalized_0_100": 49,
+    "confidence_0_1": 0.8
+  },
+  "assessment": {
+    "rationale": "This simulation is useful mainly as a boundary-checking lens, not as a direct answer to the minimal immutable blob app. It helps separate CAS/app/runtime obligations and avoids teaching an unstable harness clone as the port target, but it does not specify the actual hash-to-blob promise, long-term availability behavior, or local failure accounting the scenario asks for.",
+    "strengths": [
+      "Explicitly distinguishes provisional guidance from blocked settled instructions.",
+      "Directly foregrounds CAS/app/runtime layer boundaries, which is central to this scenario.",
+      "Calls for frozen specs, conformance claims, and implementation changelog evidence."
+    ],
+    "weaknesses": [
+      "Does not define who promises `hash in -\u003e blob out` or what that promise includes.",
+      "Does not explain discovery, retention, replication, or cross-site retrieval years later.",
+      "Provides little peer-local promise accounting for Alice, Bob, and Carol when retrieval fails."
+    ],
+    "risks": [
+      "Temporary porting guidance could ossify into an incorrect blob-contract expectation.",
+      "Implementers may conflate content identity with storage availability or read authorization."
+    ],
+    "open_questions": [
+      "What minimum frozen spec set is enough for a first real immutable-blob app port?",
+      "Is possession of a hash only an address, or ever a capability/app convention?",
+      "What durable local records should survive incomplete-cache or stale-availability failures years later?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

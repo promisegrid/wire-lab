@@ -1,0 +1,113 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-nijuz-multi-embodiment-identity-minimal-immutable-blob-app-openai-gpt-5.4-xhigh-20260521-234037",
+  "run_group_id": "ga-canary-20260521-234037",
+  "cell_id": "ga-canary-20260521-234037-000029-SIM-nijuz-multi-embodiment-identity--minimal-immutable-blob-app--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-nijuz-multi-embodiment-identity",
+  "scenario_id": "minimal-immutable-blob-app",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260521-234037",
+  "result_path": "results/SIM-nijuz-multi-embodiment-identity/minimal-immutable-blob-app/openai-gpt-5.4-xhigh/20260521-234037.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_01608a0b93fd4d20baa1a3476c9fe6e6",
+    "response_id": "resp_0c6d0d6d0028b88e006a0f99883154819b80b03ea5cb011712",
+    "input_tokens": 6337,
+    "output_tokens": 6373,
+    "cost_usd": 0.10031175
+  },
+  "source": {
+    "repo_commit": "f098e31d950a71f6844c4015150af0c90523ca4f",
+    "sim_path": "simulations/SIM-nijuz-multi-embodiment-identity/",
+    "scenario_path": "scenarios/minimal-immutable-blob-app/minimal-immutable-blob-app.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "28a7d5ae02517cd2fc22e1fb03c497d40d982d374a5876f401cfc8d8ac68b9a7"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-nijuz-multi-embodiment-identity/README.md",
+        "sha256": "e965c63e7f5c8c0f37014f713aa9ab13dfd63d09f227c1cb684a9208b4d65ecc"
+      },
+      {
+        "path": "simulations/SIM-nijuz-multi-embodiment-identity/QUESTION.md",
+        "sha256": "45eb7527cbfd32de80eb829e8452bb29864569bd5d2f2db04210f826fdcbc29b"
+      },
+      {
+        "path": "scenarios/minimal-immutable-blob-app/minimal-immutable-blob-app.md",
+        "sha256": "187e449b0498cddda2a2b28192f6aa29e824dae72e60ff47c35d34df35115a73"
+      }
+    ],
+    "simulation_tree_hash": "f4f9f7df1f6fb39e72cdd5f6e792f278a36d400239ad6372909005125a92dab4"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 3,
+    "auditability": 4,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 1,
+    "implementation_plausibility": 3,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 18,
+    "normalized_0_100": 51,
+    "confidence_0_1": 0.77
+  },
+  "assessment": {
+    "rationale": "Strong on per-embodiment identity, claim provenance, and versioned auditability, but only an indirect fit for a minimal immutable blob app. It helps clarify who spoke under which key, not the blob-specific promises around availability, authorization, retention, and hash semantics.",
+    "strengths": [
+      "Explicitly requires honest per-component conformance claims across browser and helper embodiments.",
+      "Emphasizes later auditability of which key and protocol version made each claim.",
+      "Keeps key, storage, and binding recipes provisional, which is safer for long-term evolution."
+    ],
+    "weaknesses": [
+      "Does not define the core CAS promise behind 'hash in -\u003e blob out'.",
+      "Does not separate address, read capability, availability, replication, and retention in blob-specific terms.",
+      "Provides little explicit local promise-accounting guidance for failed retrieval years later."
+    ],
+    "risks": [
+      "The 'one logical app' framing could still blur which embodiment actually promised durability or service.",
+      "Portable identity could be misread as settling authorization or hash-possession semantics when it does not."
+    ],
+    "open_questions": [
+      "Which embodiment signs and records any retention or read-service promise for a blob?",
+      "How should key rotation be linked to old blob-service claims so Carol can audit them years later?",
+      "What minimal local records should Alice, Bob, and Carol keep when storage or retrieval fails?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

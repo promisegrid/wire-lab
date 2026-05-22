@@ -1,0 +1,122 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-fonol-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-mandatory-opaque-bytes-transport-family-bakeoff-per-hop-authorization-failure-openai-gpt-5.4-xhigh-20260522-012332",
+  "run_group_id": "ga-canary-20260522-012332",
+  "cell_id": "ga-canary-20260522-012332-000028-SIM-fonol-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-mandatory-opaque-bytes--transport-family-bakeoff-per-hop-authorization-failure--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-fonol-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-mandatory-opaque-bytes",
+  "scenario_id": "transport-family-bakeoff-per-hop-authorization-failure",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260522-012332",
+  "result_path": "results/SIM-fonol-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-mandatory-opaque-bytes/transport-family-bakeoff-per-hop-authorization-failure/openai-gpt-5.4-xhigh/20260522-012332.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_8e05006c324c420f8fe7713510e28eeb",
+    "response_id": "resp_02b4c1c41b1f8b81006a0fb29d6218819abb52bd89e8f164f7",
+    "input_tokens": 6912,
+    "output_tokens": 12554,
+    "cost_usd": 0.187852
+  },
+  "source": {
+    "repo_commit": "f098e31d950a71f6844c4015150af0c90523ca4f",
+    "sim_path": "simulations/SIM-fonol-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-mandatory-opaque-bytes/",
+    "scenario_path": "scenarios/transport-family-bakeoff-per-hop-authorization-failure/transport-family-bakeoff-per-hop-authorization-failure.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "28a7d5ae02517cd2fc22e1fb03c497d40d982d374a5876f401cfc8d8ac68b9a7"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-fonol-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-mandatory-opaque-bytes/README.md",
+        "sha256": "7180bae471f5dc14a7b28ad7e438ae382933cbb03370a758517cb4c2af3a392c"
+      },
+      {
+        "path": "simulations/SIM-fonol-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-mandatory-opaque-bytes/QUESTION.md",
+        "sha256": "d1e68d688bcf1aeeda502a03f9951d38e91b2806aa681f790fba198d6e41fd05"
+      },
+      {
+        "path": "simulations/SIM-fonol-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-mandatory-opaque-bytes/protocols/grid-envelope.d/CHANGELOG.md",
+        "sha256": "aef2b7915320af9607f415cef649397530561e4f0f9372fda1bbf2691dd3f9b1"
+      },
+      {
+        "path": "simulations/SIM-fonol-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-mandatory-opaque-bytes/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "63ca5ed3dd48d1d53c9d7254cd9f6c9b2f1fc6d0f153f331cc1348f71af69f37"
+      },
+      {
+        "path": "scenarios/transport-family-bakeoff-per-hop-authorization-failure/transport-family-bakeoff-per-hop-authorization-failure.md",
+        "sha256": "f938e10ab88db666d3097a2f97c1667bbbc6e8e071681134049068982cc39cf2"
+      }
+    ],
+    "simulation_tree_hash": "44f3c24c3bba709fc9084c9b7b00d63db3f0a9184926cc751ab92633c53a6bae"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 3,
+    "auditability": 2,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 2,
+    "implementation_plausibility": 4,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 18,
+    "normalized_0_100": 51,
+    "confidence_0_1": 0.82
+  },
+  "assessment": {
+    "rationale": "As a wire-envelope specimen, this variant helps only indirectly on per-hop authorization failure. Its canonical DAG-CBOR bytes, explicit protocol dispatch, and mandatory signature slot can carry signed wrapper or refusal evidence, but the actual authorization rule, refusal semantics, and ring break/skip/reconfigure behavior all live outside the envelope.",
+    "strengths": [
+      "Explicit protocol dispatch makes unsupported versus interpreted state visible.",
+      "Canonical bytes plus a mandatory signature slot can preserve tamper-evident hop-local evidence.",
+      "Unknown-best-effort handling gives some graceful behavior under sparse knowledge and protocol evolution."
+    ],
+    "weaknesses": [
+      "No native model for forwarding authorization, refusal reasons, or ring membership changes.",
+      "The envelope does not choose whether failure breaks the ring, skips a hop, records refusal, or reconfigures membership.",
+      "Opaque signature bytes do not by themselves identify the authorizer or verification rules."
+    ],
+    "risks": [
+      "Generic tooling may over-read unsupported or unverified best-effort output as meaningful authorization evidence.",
+      "Different payload ecosystems may encode refusal differently, reducing interoperability and comparison value."
+    ],
+    "open_questions": [
+      "Where should Bob's refusal be recorded: wrapper envelope, payload object, or separate feed?",
+      "How are forwarding rights and ring membership bound to signer identity across long-lived key and protocol migrations?",
+      "Should unknown-pCID best-effort inspection be allowed when forwarding policy is restrictive?",
+      "Is the draft's reference to sig_pcid and sig_payload intentional or leftover text?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-rakir-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-mandatory-sig-pcid-payload-bgp-class-routing-app-conflicting-policies-openai-gpt-5.4-xhigh-20260522-012332",
+  "run_group_id": "ga-canary-20260522-012332",
+  "cell_id": "ga-canary-20260522-012332-000151-SIM-rakir-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-mandatory-sig-pcid-payload--bgp-class-routing-app-conflicting-policies--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-rakir-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-mandatory-sig-pcid-payload",
+  "scenario_id": "bgp-class-routing-app-conflicting-policies",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260522-012332",
+  "result_path": "results/SIM-rakir-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-mandatory-sig-pcid-payload/bgp-class-routing-app-conflicting-policies/openai-gpt-5.4-xhigh/20260522-012332.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_972f5dcf6b944e2985e33a8219dc6031",
+    "response_id": "resp_043639a846981551006a0fc7d194c4819ab8a6bfa201a867e9",
+    "input_tokens": 6924,
+    "output_tokens": 8668,
+    "cost_usd": 0.133469
+  },
+  "source": {
+    "repo_commit": "f098e31d950a71f6844c4015150af0c90523ca4f",
+    "sim_path": "simulations/SIM-rakir-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-mandatory-sig-pcid-payload/",
+    "scenario_path": "scenarios/bgp-class-routing-app-conflicting-policies/bgp-class-routing-app-conflicting-policies.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "28a7d5ae02517cd2fc22e1fb03c497d40d982d374a5876f401cfc8d8ac68b9a7"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-rakir-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-mandatory-sig-pcid-payload/README.md",
+        "sha256": "75921c77944a6d425f9a68fa8ab98e86f4db3e298b8d2c9748b45dc0f555076c"
+      },
+      {
+        "path": "simulations/SIM-rakir-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-mandatory-sig-pcid-payload/QUESTION.md",
+        "sha256": "bd6df2762928dcd70fa3eb114b62dced885e399ebb26bd34080dce6dd8276b53"
+      },
+      {
+        "path": "simulations/SIM-rakir-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-mandatory-sig-pcid-payload/protocols/grid-envelope.d/CHANGELOG.md",
+        "sha256": "aef2b7915320af9607f415cef649397530561e4f0f9372fda1bbf2691dd3f9b1"
+      },
+      {
+        "path": "simulations/SIM-rakir-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-mandatory-sig-pcid-payload/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "538501739ea9fea2614c27eb07065bfcd0d3429f4583f3e837971c2889bed432"
+      },
+      {
+        "path": "scenarios/bgp-class-routing-app-conflicting-policies/bgp-class-routing-app-conflicting-policies.md",
+        "sha256": "e0a0e2e8b317ce945417fdc2990afc86627a56f6e38518464ce66c6fa1e27a12"
+      }
+    ],
+    "simulation_tree_hash": "92c5d8e985a5266b1219c5985a1305bcf0ecba2bd5929def1374240a00e8a528"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 3,
+    "auditability": 3,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 2,
+    "implementation_plausibility": 3,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 19,
+    "normalized_0_100": 54,
+    "confidence_0_1": 0.82
+  },
+  "assessment": {
+    "rationale": "This envelope variant is a plausible signed carrier for routing-policy payloads and keeps route-choice semantics out of the wire wrapper, but it does not itself define peer-specific preference, refusal, or local accounting behavior needed for the conflicting-policies routing scenario.",
+    "strengths": [
+      "Clear layer boundary: route-ordering and policy semantics are delegated to the payload protocol rather than hidden in the envelope.",
+      "Mandatory signature slots over canonical DAG-CBOR bytes support provenance and later audit of carried route offers or policy objects.",
+      "pCID-based dispatch and no central registry fit sparse-knowledge, evolvable PromiseGrid assumptions."
+    ],
+    "weaknesses": [
+      "No payload-level schema for path attributes, peer-specific preferences, refusals, or policy-relative route selection.",
+      "Does not show what Alice, Bob, or Carol can record locally to explain why different peers chose different routes.",
+      "Best-effort handling of unknown pCIDs helps inspection but does not provide interoperable routing semantics."
+    ],
+    "risks": [
+      "Unsupported or unverified best-effort inspection could be mistaken for valid routing evidence.",
+      "Using a wire-envelope specimen as proof of routing-policy behavior can create false confidence about application-layer coverage."
+    ],
+    "open_questions": [
+      "Which payload protocol would encode route offers, local preference rules, and refusal semantics?",
+      "How would peer-local promise accounting capture Bob's multiple offers and Alice and Carol's different choices?",
+      "Do nested envelopes or extra attestations need to carry relay or jurisdiction evidence for policy decisions?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

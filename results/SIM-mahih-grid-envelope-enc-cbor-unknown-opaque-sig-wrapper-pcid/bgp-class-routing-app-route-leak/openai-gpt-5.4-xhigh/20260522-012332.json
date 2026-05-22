@@ -1,0 +1,122 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-mahih-grid-envelope-enc-cbor-unknown-opaque-sig-wrapper-pcid-bgp-class-routing-app-route-leak-openai-gpt-5.4-xhigh-20260522-012332",
+  "run_group_id": "ga-canary-20260522-012332",
+  "cell_id": "ga-canary-20260522-012332-000138-SIM-mahih-grid-envelope-enc-cbor-unknown-opaque-sig-wrapper-pcid--bgp-class-routing-app-route-leak--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-mahih-grid-envelope-enc-cbor-unknown-opaque-sig-wrapper-pcid",
+  "scenario_id": "bgp-class-routing-app-route-leak",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260522-012332",
+  "result_path": "results/SIM-mahih-grid-envelope-enc-cbor-unknown-opaque-sig-wrapper-pcid/bgp-class-routing-app-route-leak/openai-gpt-5.4-xhigh/20260522-012332.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_d90b949539f74850af0b081abc1f819b",
+    "response_id": "resp_0a31f19c2d3b976b006a0fbe67aeb0819a92b5539ba558367e",
+    "input_tokens": 6771,
+    "output_tokens": 9450,
+    "cost_usd": 0.14414925
+  },
+  "source": {
+    "repo_commit": "f098e31d950a71f6844c4015150af0c90523ca4f",
+    "sim_path": "simulations/SIM-mahih-grid-envelope-enc-cbor-unknown-opaque-sig-wrapper-pcid/",
+    "scenario_path": "scenarios/bgp-class-routing-app-route-leak/bgp-class-routing-app-route-leak.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "28a7d5ae02517cd2fc22e1fb03c497d40d982d374a5876f401cfc8d8ac68b9a7"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-mahih-grid-envelope-enc-cbor-unknown-opaque-sig-wrapper-pcid/README.md",
+        "sha256": "9b3812b34ce54f670f2557b1186b0f1372205dd26df88105f37d74c257adba2b"
+      },
+      {
+        "path": "simulations/SIM-mahih-grid-envelope-enc-cbor-unknown-opaque-sig-wrapper-pcid/QUESTION.md",
+        "sha256": "d9adefd3bde20b8b93489dae32c873a6e21009855c1f007aa166ac1cd1faf641"
+      },
+      {
+        "path": "simulations/SIM-mahih-grid-envelope-enc-cbor-unknown-opaque-sig-wrapper-pcid/protocols/grid-envelope.d/CHANGELOG.md",
+        "sha256": "aef2b7915320af9607f415cef649397530561e4f0f9372fda1bbf2691dd3f9b1"
+      },
+      {
+        "path": "simulations/SIM-mahih-grid-envelope-enc-cbor-unknown-opaque-sig-wrapper-pcid/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "c98e7f4891f72f87d438ccb85b720fa3f7d52043b03038d711e32f91780112e8"
+      },
+      {
+        "path": "scenarios/bgp-class-routing-app-route-leak/bgp-class-routing-app-route-leak.md",
+        "sha256": "e0e702af25ccf4c9d8219d2f5b892c0eed6c07ff3bc75eb387cda0c955cff1d7"
+      }
+    ],
+    "simulation_tree_hash": "f4a70d5b05c7608d49fe60e0bfd51e87f1cf701aafad2970df62c7bcf9922a6d"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 3,
+    "auditability": 2,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 2,
+    "implementation_plausibility": 4,
+    "risk_penalty": 4
+  },
+  "fitness": {
+    "raw": 18,
+    "normalized_0_100": 51,
+    "confidence_0_1": 0.75
+  },
+  "assessment": {
+    "rationale": "Well-specified as a minimal transport envelope, with strong dispatch and evolution behavior. But route leaks are about durable, peer-local policy scope and onward-restraint semantics, and those are deferred to higher-layer pCID-specific payload or wrapper protocols. This variant can carry a solution, but does not itself provide much of one.",
+    "strengths": [
+      "Explicit [pcid,payload] dispatch keeps layer responsibility clear.",
+      "Deterministic CBOR bytes and no speculative parsing support stable signing and visible protocol mismatch.",
+      "Unknown-pCID store/forward and wrapper-based evidence support sparse knowledge and protocol evolution without a central registry."
+    ],
+    "weaknesses": [
+      "No native representation of route-policy scope, onward-restraint promises, or leak-violation evidence.",
+      "Opaque payloads and pCID-specific handlers limit generic human/LLM auditability.",
+      "No fixed signature or hop-evidence slot makes generic cross-protocol auditing harder."
+    ],
+    "risks": [
+      "A peer may forward bytes it cannot semantically police, which is risky for policy-scoped routing.",
+      "Policy promises may be buried in custom payload formats, weakening interoperable leak detection.",
+      "Long-term audit depends on durable recovery of pCID meanings and wrapper semantics."
+    ],
+    "open_questions": [
+      "Which payload or wrapper protocol would standardize route-scope and onward-restraint evidence?",
+      "What peer-local records would prove that Bob leaked Alice's restricted transit offer?",
+      "Should unknown-pCID store/forward be limited when policy enforcement depends on semantic understanding?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

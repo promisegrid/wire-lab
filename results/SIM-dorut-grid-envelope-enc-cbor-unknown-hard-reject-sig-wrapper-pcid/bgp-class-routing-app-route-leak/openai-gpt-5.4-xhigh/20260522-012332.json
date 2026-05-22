@@ -1,0 +1,122 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-dorut-grid-envelope-enc-cbor-unknown-hard-reject-sig-wrapper-pcid-bgp-class-routing-app-route-leak-openai-gpt-5.4-xhigh-20260522-012332",
+  "run_group_id": "ga-canary-20260522-012332",
+  "cell_id": "ga-canary-20260522-012332-000003-SIM-dorut-grid-envelope-enc-cbor-unknown-hard-reject-sig-wrapper-pcid--bgp-class-routing-app-route-leak--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-dorut-grid-envelope-enc-cbor-unknown-hard-reject-sig-wrapper-pcid",
+  "scenario_id": "bgp-class-routing-app-route-leak",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260522-012332",
+  "result_path": "results/SIM-dorut-grid-envelope-enc-cbor-unknown-hard-reject-sig-wrapper-pcid/bgp-class-routing-app-route-leak/openai-gpt-5.4-xhigh/20260522-012332.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_3cf1593bb7784cfa942276740c7dab81",
+    "response_id": "resp_0bffe46bf03ca72f006a0fb01671c88199bfde1a8f4b101612",
+    "input_tokens": 6777,
+    "output_tokens": 9297,
+    "cost_usd": 0.14201775
+  },
+  "source": {
+    "repo_commit": "f098e31d950a71f6844c4015150af0c90523ca4f",
+    "sim_path": "simulations/SIM-dorut-grid-envelope-enc-cbor-unknown-hard-reject-sig-wrapper-pcid/",
+    "scenario_path": "scenarios/bgp-class-routing-app-route-leak/bgp-class-routing-app-route-leak.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "28a7d5ae02517cd2fc22e1fb03c497d40d982d374a5876f401cfc8d8ac68b9a7"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-dorut-grid-envelope-enc-cbor-unknown-hard-reject-sig-wrapper-pcid/README.md",
+        "sha256": "b39ff286314958a31708394b61daf8d59480be8ca892f39c2d3e7b4bd8842eaf"
+      },
+      {
+        "path": "simulations/SIM-dorut-grid-envelope-enc-cbor-unknown-hard-reject-sig-wrapper-pcid/QUESTION.md",
+        "sha256": "89b5bc5445c004f352bd9268c99d80bd97db881eaec5705ffd32d27b6d1dd6ac"
+      },
+      {
+        "path": "simulations/SIM-dorut-grid-envelope-enc-cbor-unknown-hard-reject-sig-wrapper-pcid/protocols/grid-envelope.d/CHANGELOG.md",
+        "sha256": "aef2b7915320af9607f415cef649397530561e4f0f9372fda1bbf2691dd3f9b1"
+      },
+      {
+        "path": "simulations/SIM-dorut-grid-envelope-enc-cbor-unknown-hard-reject-sig-wrapper-pcid/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "674972e36abe7a1ad042b0af6a1a6cdf3a9ead7d89c89a3615ce7ba004e90fb1"
+      },
+      {
+        "path": "scenarios/bgp-class-routing-app-route-leak/bgp-class-routing-app-route-leak.md",
+        "sha256": "e0e702af25ccf4c9d8219d2f5b892c0eed6c07ff3bc75eb387cda0c955cff1d7"
+      }
+    ],
+    "simulation_tree_hash": "50242ebc807aae53051606d642abf07404c95576243dbe41336a113a8f6970bb"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 2,
+    "auditability": 2,
+    "evolution_safety": 1,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 3,
+    "implementation_plausibility": 4,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 20,
+    "normalized_0_100": 50,
+    "confidence_0_1": 0.76
+  },
+  "assessment": {
+    "rationale": "Partial fit. This variant can carry signed routing-policy objects via payload and wrapper pCIDs, but it does not itself define policy scope, onward-restraint promises, or leak-proof evidence. Deterministic CBOR and clear dispatch boundaries help, while unknown-hard-reject is brittle for mixed-version routing and long-term evolution.",
+    "strengths": [
+      "Deterministic CBOR provides stable bytes for hashing and signatures.",
+      "Envelope dispatch is cleanly separated from routing-policy semantics.",
+      "Unknown pCID hard-reject makes unsupported policy/evidence formats fail visibly."
+    ],
+    "weaknesses": [
+      "The base envelope has no native structure for policy scope or route-leak evidence.",
+      "Auditability depends on extra wrapper and payload protocols, not the envelope alone.",
+      "Hard-reject on unknown pCIDs makes gradual rollout and future compatibility weak."
+    ],
+    "risks": [
+      "Peers may drop useful route-policy evidence when any required wrapper pCID is unknown.",
+      "Different signature-wrapper conventions could fragment interoperability.",
+      "Diagnostic retention for rejected envelopes may vary across implementations."
+    ],
+    "open_questions": [
+      "Which payload and wrapper pCIDs would encode restricted transit offers and onward-restraint promises?",
+      "Can rejected unknown-pCID envelopes be preserved in a standard audit form without being treated as valid traffic?",
+      "How would this variant migrate safely as policy and signature wrappers change over decades?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

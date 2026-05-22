@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-gojot-grid-envelope-enc-dag-cbor-unknown-opaque-sig-wrapper-pcid-cas-object-type-binding-bakeoff-unknown-typed-object-openai-gpt-5.4-xhigh-20260522-012332",
+  "run_group_id": "ga-canary-20260522-012332",
+  "cell_id": "ga-canary-20260522-012332-000051-SIM-gojot-grid-envelope-enc-dag-cbor-unknown-opaque-sig-wrapper-pcid--cas-object-type-binding-bakeoff-unknown-typed-object--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-gojot-grid-envelope-enc-dag-cbor-unknown-opaque-sig-wrapper-pcid",
+  "scenario_id": "cas-object-type-binding-bakeoff-unknown-typed-object",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260522-012332",
+  "result_path": "results/SIM-gojot-grid-envelope-enc-dag-cbor-unknown-opaque-sig-wrapper-pcid/cas-object-type-binding-bakeoff-unknown-typed-object/openai-gpt-5.4-xhigh/20260522-012332.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_1c8bb98bed404e49aaa9180f645f6786",
+    "response_id": "resp_0f28f09720cfddbe006a0fb556abe8819995c9c1021afb9037",
+    "input_tokens": 6841,
+    "output_tokens": 9002,
+    "cost_usd": 0.13799975
+  },
+  "source": {
+    "repo_commit": "f098e31d950a71f6844c4015150af0c90523ca4f",
+    "sim_path": "simulations/SIM-gojot-grid-envelope-enc-dag-cbor-unknown-opaque-sig-wrapper-pcid/",
+    "scenario_path": "scenarios/cas-object-type-binding-bakeoff-unknown-typed-object/cas-object-type-binding-bakeoff-unknown-typed-object.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "28a7d5ae02517cd2fc22e1fb03c497d40d982d374a5876f401cfc8d8ac68b9a7"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-gojot-grid-envelope-enc-dag-cbor-unknown-opaque-sig-wrapper-pcid/README.md",
+        "sha256": "b24a3975b733c2401f9ea6d4016f8423e7fd7b03313bcfcba78608e5ccdb3808"
+      },
+      {
+        "path": "simulations/SIM-gojot-grid-envelope-enc-dag-cbor-unknown-opaque-sig-wrapper-pcid/QUESTION.md",
+        "sha256": "622a65ebda9ebdb7eed3613c31de38962af4942dac2493ac8d885692a0c897a8"
+      },
+      {
+        "path": "simulations/SIM-gojot-grid-envelope-enc-dag-cbor-unknown-opaque-sig-wrapper-pcid/protocols/grid-envelope.d/CHANGELOG.md",
+        "sha256": "aef2b7915320af9607f415cef649397530561e4f0f9372fda1bbf2691dd3f9b1"
+      },
+      {
+        "path": "simulations/SIM-gojot-grid-envelope-enc-dag-cbor-unknown-opaque-sig-wrapper-pcid/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "14ea55b94631c1438682e6795ae44965b926e6349e9411c1641af86d4059beed"
+      },
+      {
+        "path": "scenarios/cas-object-type-binding-bakeoff-unknown-typed-object/cas-object-type-binding-bakeoff-unknown-typed-object.md",
+        "sha256": "76f0a7016fa2bad5e53903682706bca4eeb4aa2d099311a4ea52b7280748cf90"
+      }
+    ],
+    "simulation_tree_hash": "9e114c7aa2aa728b929b6162d361c7f7fbb6d464ac69d30f8b4f563b5354d8df"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 4,
+    "promisegrid_alignment": 4,
+    "auditability": 3,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 4,
+    "implementation_plausibility": 4,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 26,
+    "normalized_0_100": 74,
+    "confidence_0_1": 0.78
+  },
+  "assessment": {
+    "rationale": "Strong envelope-level match: unknown pCID handling explicitly permits byte-exact opaque store/forward and forbids speculative parsing. The fit is limited because the scenario is about unknown CID/object codecs, and those inner type-binding rules are mostly delegated to payload protocols rather than fully defined here.",
+    "strengths": [
+      "Explicit unknown-pCID policy allows exact-byte store/forward with a visible unsupported result.",
+      "Clear dispatch boundary keeps payload opaque until the named handler is available.",
+      "Canonical DAG-CBOR bytes support durable relaying and later byte-level audit."
+    ],
+    "weaknesses": [
+      "The draft defines unknown behavior at the envelope pCID boundary, not a full policy for unknown inner CID/object codecs.",
+      "Advertise/discovery behavior for unknown objects is not specified in detail.",
+      "Uniform authorship and audit evidence depends on wrapper protocols, not the base envelope."
+    ],
+    "risks": [
+      "Implementers may overgeneralize envelope-level opacity to inner CAS object types that still need their own safety rules.",
+      "Opaque forwarding without explicit local policy limits can create storage or abuse pressure."
+    ],
+    "open_questions": [
+      "How should a peer advertise or index unknown referenced objects whose inner codec is unsupported?",
+      "What local evidence proves byte-exact preservation across relays for unknown objects?",
+      "What resource or policy limits apply to forwarding opaque unknown content?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

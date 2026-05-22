@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-gojot-grid-envelope-enc-dag-cbor-unknown-opaque-sig-wrapper-pcid-udp-feed-v0-conformance-malformed-datagram-openai-gpt-5.4-xhigh-20260522-012332",
+  "run_group_id": "ga-canary-20260522-012332",
+  "cell_id": "ga-canary-20260522-012332-000059-SIM-gojot-grid-envelope-enc-dag-cbor-unknown-opaque-sig-wrapper-pcid--udp-feed-v0-conformance-malformed-datagram--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-gojot-grid-envelope-enc-dag-cbor-unknown-opaque-sig-wrapper-pcid",
+  "scenario_id": "udp-feed-v0-conformance-malformed-datagram",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260522-012332",
+  "result_path": "results/SIM-gojot-grid-envelope-enc-dag-cbor-unknown-opaque-sig-wrapper-pcid/udp-feed-v0-conformance-malformed-datagram/openai-gpt-5.4-xhigh/20260522-012332.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_8f76d5de20084aafaae6505f56249c75",
+    "response_id": "resp_0ba8dd55e5eecf9e006a0fb64cd1ec8198bf6e5ec6e2d0cb3a",
+    "input_tokens": 6824,
+    "output_tokens": 7175,
+    "cost_usd": 0.112392
+  },
+  "source": {
+    "repo_commit": "f098e31d950a71f6844c4015150af0c90523ca4f",
+    "sim_path": "simulations/SIM-gojot-grid-envelope-enc-dag-cbor-unknown-opaque-sig-wrapper-pcid/",
+    "scenario_path": "scenarios/udp-feed-v0-conformance-malformed-datagram/udp-feed-v0-conformance-malformed-datagram.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "28a7d5ae02517cd2fc22e1fb03c497d40d982d374a5876f401cfc8d8ac68b9a7"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-gojot-grid-envelope-enc-dag-cbor-unknown-opaque-sig-wrapper-pcid/README.md",
+        "sha256": "b24a3975b733c2401f9ea6d4016f8423e7fd7b03313bcfcba78608e5ccdb3808"
+      },
+      {
+        "path": "simulations/SIM-gojot-grid-envelope-enc-dag-cbor-unknown-opaque-sig-wrapper-pcid/QUESTION.md",
+        "sha256": "622a65ebda9ebdb7eed3613c31de38962af4942dac2493ac8d885692a0c897a8"
+      },
+      {
+        "path": "simulations/SIM-gojot-grid-envelope-enc-dag-cbor-unknown-opaque-sig-wrapper-pcid/protocols/grid-envelope.d/CHANGELOG.md",
+        "sha256": "aef2b7915320af9607f415cef649397530561e4f0f9372fda1bbf2691dd3f9b1"
+      },
+      {
+        "path": "simulations/SIM-gojot-grid-envelope-enc-dag-cbor-unknown-opaque-sig-wrapper-pcid/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "14ea55b94631c1438682e6795ae44965b926e6349e9411c1641af86d4059beed"
+      },
+      {
+        "path": "scenarios/udp-feed-v0-conformance-malformed-datagram/udp-feed-v0-conformance-malformed-datagram.md",
+        "sha256": "1d9346150fa86d237c26fbca078b661e469a1d68323b60ec00a13b45b5d79efb"
+      }
+    ],
+    "simulation_tree_hash": "9e114c7aa2aa728b929b6162d361c7f7fbb6d464ac69d30f8b4f563b5354d8df"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 4,
+    "auditability": 3,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 3,
+    "implementation_plausibility": 4,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 23,
+    "normalized_0_100": 66,
+    "confidence_0_1": 0.75
+  },
+  "assessment": {
+    "rationale": "Partial fit: this specimen is not a UDP-feed binding, but it mirrors the scenario's core pressure by treating payload as opaque bytes until the pCID-selected handler and by forbidding speculative parsing. Coverage is incomplete because the draft does not say how completely malformed outer datagrams are surfaced or recorded locally.",
+    "strengths": [
+      "Receivers must not parse payload speculatively without the pCID handler.",
+      "Unknown-pCID handling permits exact-byte store/forward with explicit unsupported-pCID failure.",
+      "The design avoids central registry assumptions and works under sparse knowledge."
+    ],
+    "weaknesses": [
+      "No UDP-feed or transport-binding behavior is defined, so direct datagram-conformance evidence is limited.",
+      "Completely malformed outer bytes or wrong outer array shape are not explicitly handled.",
+      "Local audit/accounting artifacts for malformed input are not specified."
+    ],
+    "risks": [
+      "Implementations may diverge on drop/log/store behavior for undecodable outer datagrams.",
+      "Opaque forwarding can retain junk or adversarial bytes without clear relay limits."
+    ],
+    "open_questions": [
+      "Should Bob retain exact raw UDP bytes when outer DAG-CBOR decoding fails?",
+      "What local record proves the binding passed bytes upward unchanged?",
+      "How should signature-wrapper protocols report failure when the outer envelope itself is malformed?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

@@ -1,0 +1,114 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-zisan-device-bound-agent-kernel-porting-boundary-openai-gpt-5.4-xhigh-20260521-234037",
+  "run_group_id": "ga-canary-20260521-234037",
+  "cell_id": "ga-canary-20260521-234037-000021-SIM-zisan-device-bound-agent--kernel-porting-boundary--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-zisan-device-bound-agent",
+  "scenario_id": "kernel-porting-boundary",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260521-234037",
+  "result_path": "results/SIM-zisan-device-bound-agent/kernel-porting-boundary/openai-gpt-5.4-xhigh/20260521-234037.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_dcaf25543af94228bcc67a632f772f3c",
+    "response_id": "resp_04453fc980542412006a0f99263650819b8d533ad85a924c53",
+    "input_tokens": 6280,
+    "output_tokens": 7198,
+    "cost_usd": 0.111762
+  },
+  "source": {
+    "repo_commit": "f098e31d950a71f6844c4015150af0c90523ca4f",
+    "sim_path": "simulations/SIM-zisan-device-bound-agent/",
+    "scenario_path": "scenarios/kernel-porting-boundary/kernel-porting-boundary.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "28a7d5ae02517cd2fc22e1fb03c497d40d982d374a5876f401cfc8d8ac68b9a7"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-zisan-device-bound-agent/README.md",
+        "sha256": "0d4ffd8bc616cb590c55290d4b7082f1949b0cae6381f48d2776386b459733e9"
+      },
+      {
+        "path": "simulations/SIM-zisan-device-bound-agent/QUESTION.md",
+        "sha256": "d4301120704c334bf147b96d6bef7bf625ea1962cf2974d1a2a778ef2c471e34"
+      },
+      {
+        "path": "scenarios/kernel-porting-boundary/kernel-porting-boundary.md",
+        "sha256": "d1646fa062e6c64f27cbbd25da0e96f6d484c60582677cdfc798d265a22d5096"
+      }
+    ],
+    "simulation_tree_hash": "4e24774dcf443da1a667e63bf1c84ecc23953d7a3ea2c7fb1d76baf96313d935"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 3,
+    "auditability": 3,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 3,
+    "failure_handling": 2,
+    "implementation_plausibility": 3,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 22,
+    "normalized_0_100": 55,
+    "confidence_0_1": 0.73
+  },
+  "assessment": {
+    "rationale": "Moderate indirect fit. SIM-zisan is mainly about device-bound app agents, not the core PromiseGrid port, but it does help on provisional conformance, honest host-dependency claims, and the userspace-agent versus driver-stack boundary while kernel edges remain unsettled. It is weak on the scenario's core asks around minimum port target, runtime terminology, and K1-K5/CAS/session scope.",
+    "strengths": [
+      "Explicit provisional-conformance posture preserves room for later frozen specs.",
+      "Clear userspace-agent versus host-driver-stack boundary.",
+      "Realistic handling of host-specific dependencies in conformance claims."
+    ],
+    "weaknesses": [
+      "Primary focus is app/device integration, not kernel/runtime porting.",
+      "Does not clearly separate wire-lab harness apparatus from the true port target.",
+      "Little guidance on K1-K5 ingress, feed, CAS, and session obligations."
+    ],
+    "risks": [
+      "Alice could mistake a device-bound app integration for the core PromiseGrid port.",
+      "Mallory's claim that the harness is the port target is only weakly rebutted here.",
+      "Premature conformance language could harden before DR-davod settles boundaries."
+    ],
+    "open_questions": [
+      "What is the minimum viable pre-freeze porting target below the device-bound agent layer?",
+      "Which obligations remain blocked versus provisional across ingress, feed, CAS, and session layers?",
+      "Which guide term should anchor this boundary: runtime, dispatcher, library, or kernel?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

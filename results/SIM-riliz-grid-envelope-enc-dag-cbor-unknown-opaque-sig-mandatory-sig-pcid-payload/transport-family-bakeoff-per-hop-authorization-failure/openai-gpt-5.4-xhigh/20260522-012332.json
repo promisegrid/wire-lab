@@ -1,0 +1,122 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-riliz-grid-envelope-enc-dag-cbor-unknown-opaque-sig-mandatory-sig-pcid-payload-transport-family-bakeoff-per-hop-authorization-failure-openai-gpt-5.4-xhigh-20260522-012332",
+  "run_group_id": "ga-canary-20260522-012332",
+  "cell_id": "ga-canary-20260522-012332-000178-SIM-riliz-grid-envelope-enc-dag-cbor-unknown-opaque-sig-mandatory-sig-pcid-payload--transport-family-bakeoff-per-hop-authorization-failure--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-riliz-grid-envelope-enc-dag-cbor-unknown-opaque-sig-mandatory-sig-pcid-payload",
+  "scenario_id": "transport-family-bakeoff-per-hop-authorization-failure",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260522-012332",
+  "result_path": "results/SIM-riliz-grid-envelope-enc-dag-cbor-unknown-opaque-sig-mandatory-sig-pcid-payload/transport-family-bakeoff-per-hop-authorization-failure/openai-gpt-5.4-xhigh/20260522-012332.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_605171c5d8ee4596aaf06b5f5e57a6a3",
+    "response_id": "resp_0abdb8edbddf554e006a0fca7da938819aa67e0fcef880c64d",
+    "input_tokens": 6937,
+    "output_tokens": 12652,
+    "cost_usd": 0.18926775
+  },
+  "source": {
+    "repo_commit": "f098e31d950a71f6844c4015150af0c90523ca4f",
+    "sim_path": "simulations/SIM-riliz-grid-envelope-enc-dag-cbor-unknown-opaque-sig-mandatory-sig-pcid-payload/",
+    "scenario_path": "scenarios/transport-family-bakeoff-per-hop-authorization-failure/transport-family-bakeoff-per-hop-authorization-failure.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "28a7d5ae02517cd2fc22e1fb03c497d40d982d374a5876f401cfc8d8ac68b9a7"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-riliz-grid-envelope-enc-dag-cbor-unknown-opaque-sig-mandatory-sig-pcid-payload/README.md",
+        "sha256": "895462b3a614fbf279571db85936675c52353daec48aa97c322bc9c0f8dd85e3"
+      },
+      {
+        "path": "simulations/SIM-riliz-grid-envelope-enc-dag-cbor-unknown-opaque-sig-mandatory-sig-pcid-payload/QUESTION.md",
+        "sha256": "8565bafc2a227089abd84bf969d4fa3b1ec87560561274db7f4747e1f990d7f9"
+      },
+      {
+        "path": "simulations/SIM-riliz-grid-envelope-enc-dag-cbor-unknown-opaque-sig-mandatory-sig-pcid-payload/protocols/grid-envelope.d/CHANGELOG.md",
+        "sha256": "aef2b7915320af9607f415cef649397530561e4f0f9372fda1bbf2691dd3f9b1"
+      },
+      {
+        "path": "simulations/SIM-riliz-grid-envelope-enc-dag-cbor-unknown-opaque-sig-mandatory-sig-pcid-payload/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "c88d11d428b1ef88a6d4b3724ab5264072e7242339074a85d6b35399db67ce85"
+      },
+      {
+        "path": "scenarios/transport-family-bakeoff-per-hop-authorization-failure/transport-family-bakeoff-per-hop-authorization-failure.md",
+        "sha256": "f938e10ab88db666d3097a2f97c1667bbbc6e8e071681134049068982cc39cf2"
+      }
+    ],
+    "simulation_tree_hash": "d85aac8e8bda9ef21343c7364adf6fa3924c754abc3105e7384fda1d516fc3e7"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 4,
+    "auditability": 3,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 2,
+    "implementation_plausibility": 4,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 21,
+    "normalized_0_100": 60,
+    "confidence_0_1": 0.84
+  },
+  "assessment": {
+    "rationale": "Useful as a carrier but not as the failure model itself: the envelope preserves exact bytes, dispatch IDs, and mandatory signatures, so Bob can keep verifiable local evidence and higher layers can wrap or log a refusal. But it does not define ring membership, next-hop authorization, refusal records, or reconfiguration behavior, so the core bakeoff question is mostly deferred to payload or wrapper protocols.",
+    "strengths": [
+      "Clear dispatch boundary: unknown payloads stay opaque and speculative parsing is forbidden.",
+      "Canonical DAG-CBOR bytes plus mandatory signature slots support durable local evidence.",
+      "pCID-based layering supports sparse knowledge and avoids a central registry."
+    ],
+    "weaknesses": [
+      "No native notion of ring membership or authorized next hop.",
+      "Does not standardize whether authorization failure breaks the ring, skips a hop, records refusal, or reconfigures membership.",
+      "Multi-hop authorization evidence likely needs wrappers or payload-specific chaining beyond the base envelope."
+    ],
+    "risks": [
+      "Opaque forwarding of unknown payloads can conflict with per-hop authorization unless policy forbids relay without handler-level checks.",
+      "Different payload protocols may encode refusal or reconfiguration differently, hurting cross-simulation comparability and audit.",
+      "The specimen is still draft and unfrozen, so long-term wire semantics are not yet settled."
+    ],
+    "open_questions": [
+      "Which payload or wrapper protocol defines Bob's authorization check and signed refusal record?",
+      "What policy prevents opaque relay when Bob cannot evaluate per-hop authorization for an unknown pCID?",
+      "How are skip-hop or ring-reconfiguration decisions represented and audited without a central authority?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

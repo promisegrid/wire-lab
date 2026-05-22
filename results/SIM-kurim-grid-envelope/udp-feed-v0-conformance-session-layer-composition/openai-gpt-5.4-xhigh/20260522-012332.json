@@ -1,0 +1,126 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-kurim-grid-envelope-udp-feed-v0-conformance-session-layer-composition-openai-gpt-5.4-xhigh-20260522-012332",
+  "run_group_id": "ga-canary-20260522-012332",
+  "cell_id": "ga-canary-20260522-012332-000135-SIM-kurim-grid-envelope--udp-feed-v0-conformance-session-layer-composition--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-kurim-grid-envelope",
+  "scenario_id": "udp-feed-v0-conformance-session-layer-composition",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260522-012332",
+  "result_path": "results/SIM-kurim-grid-envelope/udp-feed-v0-conformance-session-layer-composition/openai-gpt-5.4-xhigh/20260522-012332.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_f28dbc02192e49a9841c941dd608f850",
+    "response_id": "resp_08ac005309ef4034006a0fbdf07bbc819baab52410046fd9b4",
+    "input_tokens": 10358,
+    "output_tokens": 9786,
+    "cost_usd": 0.1551305
+  },
+  "source": {
+    "repo_commit": "f098e31d950a71f6844c4015150af0c90523ca4f",
+    "sim_path": "simulations/SIM-kurim-grid-envelope/",
+    "scenario_path": "scenarios/udp-feed-v0-conformance-session-layer-composition/udp-feed-v0-conformance-session-layer-composition.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "28a7d5ae02517cd2fc22e1fb03c497d40d982d374a5876f401cfc8d8ac68b9a7"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-kurim-grid-envelope/README.md",
+        "sha256": "ecf4614b85b76dbd404c91a600561e3bfad4212ad853447fa0a56734c9630ef6"
+      },
+      {
+        "path": "simulations/SIM-kurim-grid-envelope/QUESTION.md",
+        "sha256": "dc716719f8bf916d1cda5da020ea0ce6cfd3ef5221e85a9b41dd81537664c7a4"
+      },
+      {
+        "path": "simulations/SIM-kurim-grid-envelope/TODO/TODO-tujad-grid-envelope-successor-owner.md",
+        "sha256": "e246e1fa25fbe51f550922af92665ad8bff25022fdcb3643e118285eca6d40bc"
+      },
+      {
+        "path": "simulations/SIM-kurim-grid-envelope/TODO/TODO.md",
+        "sha256": "68d0fff548e0489d1114c0c490788bf9d8d7be9fd769296e73749b0fbf610840"
+      },
+      {
+        "path": "simulations/SIM-kurim-grid-envelope/seed/extraction-sources.md",
+        "sha256": "444042ace58bed35b22df66c65e76a195418e76ec50dab3b25afee077ddfb08d"
+      },
+      {
+        "path": "scenarios/udp-feed-v0-conformance-session-layer-composition/udp-feed-v0-conformance-session-layer-composition.md",
+        "sha256": "69da5db705a56cd7067a653928ff8b2dc9301ef6ebfc712bd81038a65c9d352c"
+      }
+    ],
+    "simulation_tree_hash": "f644f1f7130016bc26b62e903e784a948f962727c347009162f6b29dcc18e6e2"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 3,
+    "promisegrid_alignment": 4,
+    "auditability": 4,
+    "evolution_safety": 5,
+    "layer_boundary_clarity": 3,
+    "failure_handling": 3,
+    "implementation_plausibility": 2,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 21,
+    "normalized_0_100": 60,
+    "confidence_0_1": 0.79
+  },
+  "assessment": {
+    "rationale": "Relevant because the lineage was extracted from group-session carrier/message-envelope work and preserves a transport-agnostic `grid([pcid, payload])` layering hypothesis. But this parent sim is mostly inventory and successor-owner evidence, not a concrete UDP-feed v0/session composition specimen, so it does not prove that the lower API is sufficient or that binding details stay hidden.",
+    "strengths": [
+      "Transport-agnostic envelope framing is relevant to upper-layer composition.",
+      "Provenance back to group-session carrier work and TE sources is explicit.",
+      "Unknown-pCID and signature-placement pressures are surfaced early.",
+      "Evolution is handled cautiously through 24 variants and later probes instead of premature lock-in."
+    ],
+    "weaknesses": [
+      "No explicit UDP-feed v0 API contract or worked session-layer composition example.",
+      "The parent simulation is not a settled protocol; serialization and signature canon remain open.",
+      "Peer-local observability and accounting details are underspecified."
+    ],
+    "risks": [
+      "pCID or routing/version semantics could blur the transport/session boundary and leak binding assumptions.",
+      "Unsettled signature and canonicalization choices could cause cross-layer interoperability drift."
+    ],
+    "open_questions": [
+      "Which child grid-envelope variant, if any, composes cleanly with UDP-feed v0 without exposing transport details?",
+      "Should the upper layer see only opaque envelope bytes, or some parsed pCID/signature metadata?",
+      "What recursion limit and canonical serialization are required before session-layer composition is safely auditable?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

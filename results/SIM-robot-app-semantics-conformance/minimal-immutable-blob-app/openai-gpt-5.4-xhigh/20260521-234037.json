@@ -1,0 +1,114 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-robot-app-semantics-conformance-minimal-immutable-blob-app-openai-gpt-5.4-xhigh-20260521-234037",
+  "run_group_id": "ga-canary-20260521-234037",
+  "cell_id": "ga-canary-20260521-234037-000008-SIM-robot-app-semantics-conformance--minimal-immutable-blob-app--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-robot-app-semantics-conformance",
+  "scenario_id": "minimal-immutable-blob-app",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260521-234037",
+  "result_path": "results/SIM-robot-app-semantics-conformance/minimal-immutable-blob-app/openai-gpt-5.4-xhigh/20260521-234037.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_6dfc1aad7d424f658033696fe3cd050e",
+    "response_id": "resp_01f91ef8a74b28f1006a0f984c8cc4819b9a864f1097c69a64",
+    "input_tokens": 6306,
+    "output_tokens": 7967,
+    "cost_usd": 0.1225735
+  },
+  "source": {
+    "repo_commit": "f098e31d950a71f6844c4015150af0c90523ca4f",
+    "sim_path": "simulations/SIM-robot-app-semantics-conformance/",
+    "scenario_path": "scenarios/minimal-immutable-blob-app/minimal-immutable-blob-app.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "28a7d5ae02517cd2fc22e1fb03c497d40d982d374a5876f401cfc8d8ac68b9a7"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-robot-app-semantics-conformance/README.md",
+        "sha256": "b1bd9731ee228d45f4efde278611f0d5f99bdfff4976d37f6e011f828c2dc1b4"
+      },
+      {
+        "path": "simulations/SIM-robot-app-semantics-conformance/QUESTION.md",
+        "sha256": "32857bd8e974c4f0326ed382a3ffae0e91d65404934f614ab3b7b1becfe0ea2f"
+      },
+      {
+        "path": "scenarios/minimal-immutable-blob-app/minimal-immutable-blob-app.md",
+        "sha256": "187e449b0498cddda2a2b28192f6aa29e824dae72e60ff47c35d34df35115a73"
+      }
+    ],
+    "simulation_tree_hash": "e57bc7679fd213e955302abe66d10f62f5e3f6e719093146f00c240f25158767"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 3,
+    "promisegrid_alignment": 4,
+    "auditability": 3,
+    "evolution_safety": 5,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 2,
+    "implementation_plausibility": 4,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 24,
+    "normalized_0_100": 69,
+    "confidence_0_1": 0.79
+  },
+  "assessment": {
+    "rationale": "Strong as a provisional semantics frame for a minimal blob app, especially on honest partial-conformance and local-vs-wire boundaries, but it does not yet answer the scenario's harder operational questions about long-term availability, replication, authorization, and failure records.",
+    "strengths": [
+      "Explicitly distinguishes local IDs/storage handles from protocol-boundary identity.",
+      "Encourages honest partial-conformance claims instead of overclaiming a stable app contract.",
+      "Keeps unstable surfaces like capability semantics and signature carriage clearly provisional."
+    ],
+    "weaknesses": [
+      "Does not specify who promises durable 'hash in -\u003e blob out' retrieval across sites and time.",
+      "Provides little concrete guidance on retention changes, incomplete caches, or stale availability claims.",
+      "Does not define the local promise-accounting records Alice, Bob, and Carol should keep on failure."
+    ],
+    "risks": [
+      "Guide prose could be mistaken for a de facto stable CAS app contract before upstream DRs close.",
+      "Developers may overread a returned hash as an authorization token or availability guarantee.",
+      "Adapter-local signing or witness practices may not migrate cleanly to a later frozen wire contract."
+    ],
+    "open_questions": [
+      "What is the smallest honest conformance claim for a blob app that returns a hash?",
+      "Is possession of the hash merely an address, an app convention, or ever a read capability?",
+      "What durable local evidence should peers retain when a blob becomes unavailable or policy-denied years later?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

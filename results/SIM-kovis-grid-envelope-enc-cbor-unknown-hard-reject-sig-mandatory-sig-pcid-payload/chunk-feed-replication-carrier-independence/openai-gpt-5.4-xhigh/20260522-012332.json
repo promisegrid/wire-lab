@@ -1,0 +1,122 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-kovis-grid-envelope-enc-cbor-unknown-hard-reject-sig-mandatory-sig-pcid-payload-chunk-feed-replication-carrier-independence-openai-gpt-5.4-xhigh-20260522-012332",
+  "run_group_id": "ga-canary-20260522-012332",
+  "cell_id": "ga-canary-20260522-012332-000113-SIM-kovis-grid-envelope-enc-cbor-unknown-hard-reject-sig-mandatory-sig-pcid-payload--chunk-feed-replication-carrier-independence--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-kovis-grid-envelope-enc-cbor-unknown-hard-reject-sig-mandatory-sig-pcid-payload",
+  "scenario_id": "chunk-feed-replication-carrier-independence",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260522-012332",
+  "result_path": "results/SIM-kovis-grid-envelope-enc-cbor-unknown-hard-reject-sig-mandatory-sig-pcid-payload/chunk-feed-replication-carrier-independence/openai-gpt-5.4-xhigh/20260522-012332.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_131bd8e6694547309769f71d0662eccf",
+    "response_id": "resp_08ebf69bec648035006a0fbbbcc45c819bbffa5999a9e68e94",
+    "input_tokens": 6909,
+    "output_tokens": 9530,
+    "cost_usd": 0.14551075
+  },
+  "source": {
+    "repo_commit": "f098e31d950a71f6844c4015150af0c90523ca4f",
+    "sim_path": "simulations/SIM-kovis-grid-envelope-enc-cbor-unknown-hard-reject-sig-mandatory-sig-pcid-payload/",
+    "scenario_path": "scenarios/chunk-feed-replication-carrier-independence/chunk-feed-replication-carrier-independence.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "28a7d5ae02517cd2fc22e1fb03c497d40d982d374a5876f401cfc8d8ac68b9a7"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-kovis-grid-envelope-enc-cbor-unknown-hard-reject-sig-mandatory-sig-pcid-payload/README.md",
+        "sha256": "88cd13e9f51f6742986035a0a1deee85830e1fcaa8b9e8df049e53dcef62ed77"
+      },
+      {
+        "path": "simulations/SIM-kovis-grid-envelope-enc-cbor-unknown-hard-reject-sig-mandatory-sig-pcid-payload/QUESTION.md",
+        "sha256": "f08b4b45a3ec3bf3a66b5d90b67f67f026496e27e4d552a89002a69e0fe088f6"
+      },
+      {
+        "path": "simulations/SIM-kovis-grid-envelope-enc-cbor-unknown-hard-reject-sig-mandatory-sig-pcid-payload/protocols/grid-envelope.d/CHANGELOG.md",
+        "sha256": "aef2b7915320af9607f415cef649397530561e4f0f9372fda1bbf2691dd3f9b1"
+      },
+      {
+        "path": "simulations/SIM-kovis-grid-envelope-enc-cbor-unknown-hard-reject-sig-mandatory-sig-pcid-payload/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "4967b3c784d924af3f97950f8fd731572e2f32e61b550acbdb35e95de6ec4c62"
+      },
+      {
+        "path": "scenarios/chunk-feed-replication-carrier-independence/chunk-feed-replication-carrier-independence.md",
+        "sha256": "5386ebc3943d885551ac45b3b4fb1616d67d742407906c347b7d1d388f31c346"
+      }
+    ],
+    "simulation_tree_hash": "eb72da938d67fc2ce8cce48ed81dd825940a7993a82a9dbc4bf42acd39a1dadc"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 3,
+    "promisegrid_alignment": 3,
+    "auditability": 4,
+    "evolution_safety": 2,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 2,
+    "implementation_plausibility": 4,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 24,
+    "normalized_0_100": 60,
+    "confidence_0_1": 0.78
+  },
+  "assessment": {
+    "rationale": "This variant cleanly separates carrier-neutral envelope bytes from payload interpretation, so it partially supports the scenario's feed-vs-carrier boundary. But it is only a wire-envelope specimen, not a chunk-feed replication design, and its unknown-pCID hard reject makes mixed-version forwarding and long-term carrier independence brittle.",
+    "strengths": [
+      "Deterministic CBOR bytes and envelope-level signatures can travel unchanged over many substrates.",
+      "The positional split between pcid, payload, sig_pcid, and sig_payload makes layer responsibilities explicit.",
+      "The draft avoids a central pCID registry and supports peer-local verification."
+    ],
+    "weaknesses": [
+      "It does not define feed, chunk, replication, or deduplication semantics for the scenario itself.",
+      "Receivers without a payload handler must reject and not forward/store the envelope as valid, limiting generic relay behavior.",
+      "Carrier-specific recovery concerns such as fragmentation, retry, and partial replication are left out of scope."
+    ],
+    "risks": [
+      "Hard reject on unknown pCID may undermine 100-year mixed-version interoperability and substrate independence.",
+      "Mandatory envelope signatures may add overhead or duplicate integrity already supplied at feed or content-address layers.",
+      "The specimen is still a draft with no freeze evidence, so migration details remain unsettled."
+    ],
+    "open_questions": [
+      "Can relays or archives preserve unknown envelopes as opaque chunks without violating the design intent?",
+      "Which chunk-feed semantics are expected in the payload protocol versus wrappers or carrier mechanics?",
+      "How should new payload or signature pCIDs be introduced without breaking older replicators?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

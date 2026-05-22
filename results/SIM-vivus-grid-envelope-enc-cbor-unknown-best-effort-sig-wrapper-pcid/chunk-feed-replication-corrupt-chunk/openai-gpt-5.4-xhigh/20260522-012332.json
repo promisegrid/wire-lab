@@ -1,0 +1,122 @@
+{
+  "schema": "promisegrid.ga.result.v1",
+  "result_id": "SIM-vivus-grid-envelope-enc-cbor-unknown-best-effort-sig-wrapper-pcid-chunk-feed-replication-corrupt-chunk-openai-gpt-5.4-xhigh-20260522-012332",
+  "run_group_id": "ga-canary-20260522-012332",
+  "cell_id": "ga-canary-20260522-012332-000204-SIM-vivus-grid-envelope-enc-cbor-unknown-best-effort-sig-wrapper-pcid--chunk-feed-replication-corrupt-chunk--openai-gpt-5.4-xhigh",
+  "sim_id": "SIM-vivus-grid-envelope-enc-cbor-unknown-best-effort-sig-wrapper-pcid",
+  "scenario_id": "chunk-feed-replication-corrupt-chunk",
+  "model_id": "openai-gpt-5.4-xhigh",
+  "timestamp_utc": "20260522-012332",
+  "result_path": "results/SIM-vivus-grid-envelope-enc-cbor-unknown-best-effort-sig-wrapper-pcid/chunk-feed-replication-corrupt-chunk/openai-gpt-5.4-xhigh/20260522-012332.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "xhigh",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_04453a14683b43f19d1d6f1498dec730",
+    "response_id": "resp_0d1b02701e8b6649006a0fccef2f94819bb73e71cbb36aa50a",
+    "input_tokens": 6796,
+    "output_tokens": 8794,
+    "cost_usd": 0.135009
+  },
+  "source": {
+    "repo_commit": "f098e31d950a71f6844c4015150af0c90523ca4f",
+    "sim_path": "simulations/SIM-vivus-grid-envelope-enc-cbor-unknown-best-effort-sig-wrapper-pcid/",
+    "scenario_path": "scenarios/chunk-feed-replication-corrupt-chunk/chunk-feed-replication-corrupt-chunk.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "28a7d5ae02517cd2fc22e1fb03c497d40d982d374a5876f401cfc8d8ac68b9a7"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-vivus-grid-envelope-enc-cbor-unknown-best-effort-sig-wrapper-pcid/README.md",
+        "sha256": "2021f0124eb525c7a4603cacb2594e2b4f23ded46503995e7434fb548829dea3"
+      },
+      {
+        "path": "simulations/SIM-vivus-grid-envelope-enc-cbor-unknown-best-effort-sig-wrapper-pcid/QUESTION.md",
+        "sha256": "2db906c0951fd55e7f4e0ad6772e0de93be4e6ed614da4d1371df96505f32fa7"
+      },
+      {
+        "path": "simulations/SIM-vivus-grid-envelope-enc-cbor-unknown-best-effort-sig-wrapper-pcid/protocols/grid-envelope.d/CHANGELOG.md",
+        "sha256": "aef2b7915320af9607f415cef649397530561e4f0f9372fda1bbf2691dd3f9b1"
+      },
+      {
+        "path": "simulations/SIM-vivus-grid-envelope-enc-cbor-unknown-best-effort-sig-wrapper-pcid/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "fbf65d9dc63bda02cfb23129cf0d4860449a168349cb580e0a9c52479deb1dcb"
+      },
+      {
+        "path": "scenarios/chunk-feed-replication-corrupt-chunk/chunk-feed-replication-corrupt-chunk.md",
+        "sha256": "57eb49a6a8304b475add47f66f2f2e7d84c7ec0ecbcee2d862951d88c19f2a00"
+      }
+    ],
+    "simulation_tree_hash": "58aac6347a21eca760edb90e4c33f9105046b86ff556ebea7d7e85182b7d0552"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260519-v1",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "risk_penalty": "0 low risk, 5 severe risk"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 3,
+    "auditability": 3,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 2,
+    "implementation_plausibility": 4,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 25,
+    "normalized_0_100": 62.5,
+    "confidence_0_1": 0.84
+  },
+  "assessment": {
+    "rationale": "Good as a wire-layer boundary specimen, weak as a full corrupt-chunk replication answer. Deterministic CBOR, pCID dispatch, and explicit unsupported/unverified handling fit local and no-central-authority goals, but chunk hash rejection, retry, and peer-local accounting are delegated to payload or wrapper protocols rather than specified here.",
+    "strengths": [
+      "Deterministic CBOR and exact-byte canonicalization support reproducible audit of what was sent.",
+      "The minimal [pcid, payload] envelope keeps layer boundaries explicit and composes cleanly with external CAS or feed protocols.",
+      "Unknown pCIDs are handled locally and must be marked unsupported/unverified, avoiding silent trust and central registry assumptions."
+    ],
+    "weaknesses": [
+      "The specimen does not define chunk-feed replication semantics, CID mismatch handling, retry policy, or peer-local accounting records.",
+      "The base envelope has no built-in signature or authorship field, so integrity and blame evidence depend on extra wrapper protocols.",
+      "The spec is still a draft with no freeze or minted spec pCID, so long-term interoperability is not yet demonstrated."
+    ],
+    "risks": [
+      "Different implementations may expose unknown-pCID payload bytes differently, creating operator confusion around corrupt or unauthenticated content.",
+      "If wrapper signatures or CAS checks are omitted, Mallory's bad bytes may travel farther before rejection.",
+      "Clean wire-layer separation could be overrated here while replication and accounting rules remain underspecified."
+    ],
+    "open_questions": [
+      "Which payload or wrapper protocol binds a feed entry to CID C and records local rejection when bytes do not match?",
+      "How are retry/backoff and peer-local reputation or accounting represented without central enforcement?",
+      "Should best-effort salvage from unknown pCIDs be further constrained when content is corrupt or unsigned?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}
