@@ -16,6 +16,15 @@
 ## DEV-GUIDE-RESOURCES.md
 
 - Update DEV-GUIDE-RESOURCES.md file when a cited or relevant DR, DI, TE, or TODO is updated, when a cited draft spec freezes, or when the PromiseGrid Development Guide (https://github.com/ciwg/promisegrid-dev-guide) settles prose that supersedes a wire-lab note. Source: `DI-nunut`.
+- Whenever `DEV-GUIDE-RESOURCES.md` is updated, also regenerate its top
+  `## Current Design State` section by Codex LLM analysis of the current
+  simulations and root `results/` evidence. The section must read like a
+  concise protocol design document for PromiseGrid kernel and app-guide
+  developers, not a wall of prose. It must include example envelope and payload
+  formats derived from current simulation / GA evidence, describe dominant and
+  alternative designs with strengths and weaknesses, call out weak or missing
+  coverage, and must not present simulations, proposal children, or score
+  results as final PromiseGrid APIs. Source: `DI-volos`.
 
 ## Decision-First Specification and Compliance Protocol (Required)
 - Decision-first means decisions must be locked before coding; it does not forbid pre-decision analysis such as required thought experiments.
