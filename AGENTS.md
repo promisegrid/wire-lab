@@ -20,11 +20,14 @@
   `## Current Design State` section by Codex LLM analysis of the current
   simulations and root `results/` evidence. The section must read like a
   concise protocol design document for PromiseGrid kernel and app-guide
-  developers, not a wall of prose. It must include example envelope and payload
-  formats derived from current simulation / GA evidence, describe dominant and
-  alternative designs with strengths and weaknesses, call out weak or missing
-  coverage, and must not present simulations, proposal children, or score
-  results as final PromiseGrid APIs. Source: `DI-volos`.
+  developers, not a wall of prose. It must derive examples from consensus
+  across near-contender simulations rather than from only the top score, prefer
+  simple positional pCID-selected wire shapes and deterministic pCID-defined
+  payload contracts, use Burgess Promise Theory vocabulary, preserve
+  small-device and 100-year durability constraints, avoid capability-shopping
+  maps or large general-purpose claim-card maps as the apparent consensus, call
+  out weak or missing coverage, and must not present simulations, proposal
+  children, or score results as final PromiseGrid APIs. Source: `DI-baral`.
 
 ## Decision-First Specification and Compliance Protocol (Required)
 - Decision-first means decisions must be locked before coding; it does not forbid pre-decision analysis such as required thought experiments.
