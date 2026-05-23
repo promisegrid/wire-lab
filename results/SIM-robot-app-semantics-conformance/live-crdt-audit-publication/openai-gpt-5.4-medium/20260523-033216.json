@@ -1,0 +1,120 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-robot-app-semantics-conformance-live-crdt-audit-publication-openai-gpt-5.4-medium-20260523-033216",
+  "run_group_id": "ga-calib-20260523-033216-medium",
+  "cell_id": "ga-calib-20260523-033216-medium-000004-SIM-robot-app-semantics-conformance--live-crdt-audit-publication--openai-gpt-5.4-medium",
+  "sim_id": "SIM-robot-app-semantics-conformance",
+  "scenario_id": "live-crdt-audit-publication",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-033216",
+  "result_path": "results/SIM-robot-app-semantics-conformance/live-crdt-audit-publication/openai-gpt-5.4-medium/20260523-033216.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_4f1378f3d7af4bc8a05010bc9ff6825e",
+    "response_id": "resp_0a8adcffe82f1e64006a112049abf48199a6430af26ab5654d",
+    "input_tokens": 7092,
+    "output_tokens": 1277,
+    "cost_usd": 0.030289
+  },
+  "source": {
+    "repo_commit": "28327f4e9d3e58354a4a0c615f02caaec502c740",
+    "sim_path": "simulations/SIM-robot-app-semantics-conformance/",
+    "scenario_path": "scenarios/live-crdt-audit-publication/live-crdt-audit-publication.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "775c8bb9048b1c22867f2e37dc77014382d1b04e0f147ea49d282a53163465e4"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-robot-app-semantics-conformance/README.md",
+        "sha256": "b1bd9731ee228d45f4efde278611f0d5f99bdfff4976d37f6e011f828c2dc1b4"
+      },
+      {
+        "path": "simulations/SIM-robot-app-semantics-conformance/QUESTION.md",
+        "sha256": "32857bd8e974c4f0326ed382a3ffae0e91d65404934f614ab3b7b1becfe0ea2f"
+      },
+      {
+        "path": "scenarios/live-crdt-audit-publication/live-crdt-audit-publication.md",
+        "sha256": "870887bbd5848db45bc4406e5369b492a516c2bd997de9226d24825214c49d94"
+      }
+    ],
+    "simulation_tree_hash": "e57bc7679fd213e955302abe66d10f62f5e3f6e719093146f00c240f25158767"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 4,
+    "promisegrid_alignment": 4,
+    "auditability": 4,
+    "evolution_safety": 5,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 3,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 3,
+    "simplicity_durability": 4,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 39,
+    "normalized_0_100": 78,
+    "confidence_0_1": 0.74
+  },
+  "assessment": {
+    "rationale": "This simulation is a strong semantic-fit for the scenario because it is explicitly about honest app-facing conformance language, partial conformance boundaries, and keeping provisional app behavior separate from frozen wire contracts. It is especially good on evolution safety and layer separation: live CRDT transport should not be misrepresented as durable PromiseGrid publication, while milestone audit publication can cite content-addressed snapshot state. The main limitation is that the simulation is still question-oriented rather than a concrete transport/audit design, so failure handling and exact promise wording remain somewhat underspecified.",
+    "strengths": [
+      "Explicitly warns against claiming a stable app API before upstream decisions land",
+      "Strong local-vs-wire and provisional-vs-frozen boundary discipline",
+      "Supports honest partial-conformance framing for live-vs-audit split",
+      "Fits durable milestone publication better than pretending the live channel is on-grid"
+    ],
+    "weaknesses": [
+      "Does not fully specify partition/reorder recovery behavior for the live channel",
+      "Promise-first payload wording is not yet fully sharpened",
+      "Leaves the exact cited audit object and signature carriage contract somewhat open"
+    ],
+    "risks": [
+      "Guide prose could still drift into overclaiming live-channel conformance",
+      "Provisional signing language may be misread as a stable cross-app contract"
+    ],
+    "open_questions": [
+      "Should the guide recommend live CRDT sync stay explicitly off-grid until a reliable binding exists?",
+      "Should the audit message cite a saved snapshot object, a CRDT state digest, or a session-specific publication envelope?",
+      "What exact partial-conformance sentence cleanly separates live transport claims from audit-layer claims?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

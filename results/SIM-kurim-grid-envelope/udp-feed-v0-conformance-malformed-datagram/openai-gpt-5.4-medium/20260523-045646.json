@@ -1,0 +1,131 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-kurim-grid-envelope-udp-feed-v0-conformance-malformed-datagram-openai-gpt-5.4-medium-20260523-045646",
+  "run_group_id": "ga-backfill-20260522-215638-medium",
+  "cell_id": "ga-backfill-20260522-215638-medium-000014-SIM-kurim-grid-envelope--udp-feed-v0-conformance-malformed-datagram--openai-gpt-5.4-medium",
+  "sim_id": "SIM-kurim-grid-envelope",
+  "scenario_id": "udp-feed-v0-conformance-malformed-datagram",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-045646",
+  "result_path": "results/SIM-kurim-grid-envelope/udp-feed-v0-conformance-malformed-datagram/openai-gpt-5.4-medium/20260523-045646.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_b04ac81263694fc1abbb0adaffcd8275",
+    "response_id": "resp_0ef0e6904320f3f8006a1134ea0fd4819a9a245a61e89fe941",
+    "input_tokens": 11178,
+    "output_tokens": 1298,
+    "cost_usd": 0.0377335
+  },
+  "source": {
+    "repo_commit": "a45211091e3039cfe3801d0b54f83cf5c530847e",
+    "sim_path": "simulations/SIM-kurim-grid-envelope/",
+    "scenario_path": "scenarios/udp-feed-v0-conformance-malformed-datagram/udp-feed-v0-conformance-malformed-datagram.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "c2e3d08afc5d6a4bfcd002888ecd18e348728e843cd8180635313d486f07e023"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-kurim-grid-envelope/README.md",
+        "sha256": "ecf4614b85b76dbd404c91a600561e3bfad4212ad853447fa0a56734c9630ef6"
+      },
+      {
+        "path": "simulations/SIM-kurim-grid-envelope/QUESTION.md",
+        "sha256": "dc716719f8bf916d1cda5da020ea0ce6cfd3ef5221e85a9b41dd81537664c7a4"
+      },
+      {
+        "path": "simulations/SIM-kurim-grid-envelope/TODO/TODO-tujad-grid-envelope-successor-owner.md",
+        "sha256": "e246e1fa25fbe51f550922af92665ad8bff25022fdcb3643e118285eca6d40bc"
+      },
+      {
+        "path": "simulations/SIM-kurim-grid-envelope/TODO/TODO.md",
+        "sha256": "68d0fff548e0489d1114c0c490788bf9d8d7be9fd769296e73749b0fbf610840"
+      },
+      {
+        "path": "simulations/SIM-kurim-grid-envelope/seed/extraction-sources.md",
+        "sha256": "444042ace58bed35b22df66c65e76a195418e76ec50dab3b25afee077ddfb08d"
+      },
+      {
+        "path": "scenarios/udp-feed-v0-conformance-malformed-datagram/udp-feed-v0-conformance-malformed-datagram.md",
+        "sha256": "1d9346150fa86d237c26fbca078b661e469a1d68323b60ec00a13b45b5d79efb"
+      }
+    ],
+    "simulation_tree_hash": "f644f1f7130016bc26b62e903e784a948f962727c347009162f6b29dcc18e6e2"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 4,
+    "auditability": 4,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 2,
+    "implementation_plausibility": 2,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 4,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 30,
+    "normalized_0_100": 60,
+    "confidence_0_1": 0.82
+  },
+  "assessment": {
+    "rationale": "This parent grid-envelope simulation is well aligned with PromiseGrid’s specimen-first, transport-agnostic design work, but it is a weak direct fit for a UDP malformed-datagram conformance test. It documents envelope candidates and boundary questions rather than a concrete UDP binding that can show bytes being passed upward unchanged.",
+    "strengths": [
+      "Clear apparatus-vs-specimen and non-canonical framing.",
+      "Strong layer discussion around envelope vs payload and unknown-pCID handling.",
+      "Good audit trail through DIs, TODO ownership, and explicit successor variants."
+    ],
+    "weaknesses": [
+      "Not a UDP-feed simulation and does not define datagram handling behavior directly.",
+      "Parent lineage inventory is less testable than a concrete successor variant.",
+      "Failure behavior for malformed bytes is only implicit via successor-policy axes, not specified here."
+    ],
+    "risks": [
+      "Reviewers may over-credit this parent inventory as if it were a concrete wire-conformance design.",
+      "A scorer could infer session semantics or rejection behavior that the parent docs intentionally leave open."
+    ],
+    "open_questions": [
+      "Which successor grid-envelope variant best preserves the 'pass bytes upward unchanged' pressure for UDP-feed?",
+      "At what exact layer should malformed datagram rejection occur versus opaque forwarding?",
+      "Should malformed outer-envelope bytes be treated differently from unknown but well-formed pCID payloads?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

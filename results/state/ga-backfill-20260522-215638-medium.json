@@ -1,0 +1,1263 @@
+{
+  "schema": "promisegrid.ga.state.v1",
+  "run_group_id": "ga-backfill-20260522-215638-medium",
+  "created_at": "2026-05-23T04:56:46Z",
+  "updated_at": "2026-05-23T05:11:41Z",
+  "repo_commit": "a45211091e3039cfe3801d0b54f83cf5c530847e",
+  "model_id": "openai-gpt-5.4-medium",
+  "population": [
+    {
+      "sim_id": "SIM-bimos-grid-envelope-quarantine-sig-pcid-audit-tuple",
+      "path": "simulations/SIM-bimos-grid-envelope-quarantine-sig-pcid-audit-tuple/",
+      "tree_hash": "b70c5ff51037ca47511e214bc341f6e029019d175de158273070542a462b6992"
+    },
+    {
+      "sim_id": "SIM-bobud-l6-cas-starting-profile-bakeoff",
+      "path": "simulations/SIM-bobud-l6-cas-starting-profile-bakeoff/",
+      "tree_hash": "05b70394b6a32ed64dbb54186095554efeecac7583309b5802cbcd752645b6cc"
+    },
+    {
+      "sim_id": "SIM-bohof-group-session-freeze-promise",
+      "path": "simulations/SIM-bohof-group-session-freeze-promise/",
+      "tree_hash": "333676907f990d9bd1bb91cc9b0c0a4ecb629a615ebb1bec82f88f3c12db307a"
+    },
+    {
+      "sim_id": "SIM-dihiz-peer-adoption-metadata",
+      "path": "simulations/SIM-dihiz-peer-adoption-metadata/",
+      "tree_hash": "0ef52f12b43c93b29474d07d492db05c900b139eef70ae86b40afdadc6413501"
+    },
+    {
+      "sim_id": "SIM-dorut-grid-envelope-enc-cbor-unknown-hard-reject-sig-wrapper-pcid",
+      "path": "simulations/SIM-dorut-grid-envelope-enc-cbor-unknown-hard-reject-sig-wrapper-pcid/",
+      "tree_hash": "50242ebc807aae53051606d642abf07404c95576243dbe41336a113a8f6970bb"
+    },
+    {
+      "sim_id": "SIM-fonig-grid-envelope-enc-cbor-unknown-best-effort-sig-unsigned-v0",
+      "path": "simulations/SIM-fonig-grid-envelope-enc-cbor-unknown-best-effort-sig-unsigned-v0/",
+      "tree_hash": "23f5d289e0986e4bb57324238374ffc087026f54fdea244bcf080a22de738036"
+    },
+    {
+      "sim_id": "SIM-fonol-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-mandatory-opaque-bytes",
+      "path": "simulations/SIM-fonol-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-mandatory-opaque-bytes/",
+      "tree_hash": "44f3c24c3bba709fc9084c9b7b00d63db3f0a9184926cc751ab92633c53a6bae"
+    },
+    {
+      "sim_id": "SIM-funas-kernel-porting-boundary",
+      "path": "simulations/SIM-funas-kernel-porting-boundary/",
+      "tree_hash": "3036063b40b8f7f00637b0135a1962f32775f8d0abb3406a49cb169d7048cfe6"
+    },
+    {
+      "sim_id": "SIM-gasus-grid-envelope-enc-cbor-unknown-opaque-sig-unsigned-v0",
+      "path": "simulations/SIM-gasus-grid-envelope-enc-cbor-unknown-opaque-sig-unsigned-v0/",
+      "tree_hash": "1a62ac77b896a9bb889f3312e61162d60d5e02c5fa1415afad123d5463a83ece"
+    },
+    {
+      "sim_id": "SIM-gazan-grid-envelope-enc-cbor-unknown-hard-reject-sig-unsigned-v0",
+      "path": "simulations/SIM-gazan-grid-envelope-enc-cbor-unknown-hard-reject-sig-unsigned-v0/",
+      "tree_hash": "988ac72d01c01d1a0ed98ef495d793957da140b4d288cb00aa0088c9cb9ca647"
+    },
+    {
+      "sim_id": "SIM-gobaz-chunking-identity-bakeoff",
+      "path": "simulations/SIM-gobaz-chunking-identity-bakeoff/",
+      "tree_hash": "80b24fcfe45fcf87e4142316d0ddc727894c0ddc0baf2795d4ec63555d4e6e20"
+    },
+    {
+      "sim_id": "SIM-gojot-grid-envelope-enc-dag-cbor-unknown-opaque-sig-wrapper-pcid",
+      "path": "simulations/SIM-gojot-grid-envelope-enc-dag-cbor-unknown-opaque-sig-wrapper-pcid/",
+      "tree_hash": "9e114c7aa2aa728b929b6162d361c7f7fbb6d464ac69d30f8b4f563b5354d8df"
+    },
+    {
+      "sim_id": "SIM-guhor-grid-envelope-enc-cbor-unknown-best-effort-sig-mandatory-opaque-bytes",
+      "path": "simulations/SIM-guhor-grid-envelope-enc-cbor-unknown-best-effort-sig-mandatory-opaque-bytes/",
+      "tree_hash": "d31569a6a684e574940f7156736bbf02b5789289cb2520469fd57807458c1a18"
+    },
+    {
+      "sim_id": "SIM-hagom-grid-envelope-enc-dag-cbor-unknown-opaque-sig-unsigned-v0",
+      "path": "simulations/SIM-hagom-grid-envelope-enc-dag-cbor-unknown-opaque-sig-unsigned-v0/",
+      "tree_hash": "228178578418dd49b30e5abae06099d74ee881b317085859e039cf08c8a0ebd6"
+    },
+    {
+      "sim_id": "SIM-haros-promise-economy-spectrum",
+      "path": "simulations/SIM-haros-promise-economy-spectrum/",
+      "tree_hash": "9bec8ccc55bf0facdc8b02ab1e4bef63f00c5365221db31af036b09b4ec1aaac"
+    },
+    {
+      "sim_id": "SIM-hiviv-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-unsigned-v0",
+      "path": "simulations/SIM-hiviv-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-unsigned-v0/",
+      "tree_hash": "d0c4f015c61aa7a511cf00b0bf45ce39d9ecc8a54b12363a6abd232a452342cf"
+    },
+    {
+      "sim_id": "SIM-hugoj-cas-usenetlike-gitlike",
+      "path": "simulations/SIM-hugoj-cas-usenetlike-gitlike/",
+      "tree_hash": "144951c8a39cbb610ac9d305fe823308c60e01e271c2f3b222a32276d4a196ef"
+    },
+    {
+      "sim_id": "SIM-hupir-grid-envelope-enc-cbor-unknown-hard-reject-sig-mandatory-opaque-bytes",
+      "path": "simulations/SIM-hupir-grid-envelope-enc-cbor-unknown-hard-reject-sig-mandatory-opaque-bytes/",
+      "tree_hash": "8cf2242305b6f3d92194a5e4881f8b3b8adf8a39e25bc1237713cc887e1ec805"
+    },
+    {
+      "sim_id": "SIM-janov-grid-envelope-layer-pcid-nested-signed-payload",
+      "path": "simulations/SIM-janov-grid-envelope-layer-pcid-nested-signed-payload/",
+      "tree_hash": "bf0f4a64c42e752ebbf0764f95b9c41c7dc4374f56465564e4bd7e5a9d4c09c3"
+    },
+    {
+      "sim_id": "SIM-johum-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-wrapper-pcid",
+      "path": "simulations/SIM-johum-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-wrapper-pcid/",
+      "tree_hash": "cfea4f21c240950e568c6e59cdc5e33ecb81989d8d42c9188a1b52c94462cd6c"
+    },
+    {
+      "sim_id": "SIM-jokak-grid-envelope-enc-cbor-unknown-best-effort-sig-mandatory-sig-pcid-payload",
+      "path": "simulations/SIM-jokak-grid-envelope-enc-cbor-unknown-best-effort-sig-mandatory-sig-pcid-payload/",
+      "tree_hash": "70c6a17b236d0e9f1ba89621ed8e390e4169976db54f9ebcc2337ee9d9646834"
+    },
+    {
+      "sim_id": "SIM-jomag-cas-object-model",
+      "path": "simulations/SIM-jomag-cas-object-model/",
+      "tree_hash": "db2c26d2e739adab24964d5eaedae274932fae7b8259e05761250abc421e0e23"
+    },
+    {
+      "sim_id": "SIM-jufag-grid-envelope-quarantine-sig-pcid-outcomes",
+      "path": "simulations/SIM-jufag-grid-envelope-quarantine-sig-pcid-outcomes/",
+      "tree_hash": "930b03d7306ea38f2f33749445213062788da08b6b8b211a2b5a66c09f723348"
+    },
+    {
+      "sim_id": "SIM-jurar-cas-backed-group-session",
+      "path": "simulations/SIM-jurar-cas-backed-group-session/",
+      "tree_hash": "cfc13d1751e31648002a01d4444f33c759361450ba245d0441bce016fede46be"
+    },
+    {
+      "sim_id": "SIM-kohad-cas-object-type-binding-bakeoff",
+      "path": "simulations/SIM-kohad-cas-object-type-binding-bakeoff/",
+      "tree_hash": "74e9e595d3f4ba7176284cbe48983486dc9c06a9a2f4a2ec1d972edddb52a018"
+    },
+    {
+      "sim_id": "SIM-kovis-grid-envelope-enc-cbor-unknown-hard-reject-sig-mandatory-sig-pcid-payload",
+      "path": "simulations/SIM-kovis-grid-envelope-enc-cbor-unknown-hard-reject-sig-mandatory-sig-pcid-payload/",
+      "tree_hash": "eb72da938d67fc2ce8cce48ed81dd825940a7993a82a9dbc4bf42acd39a1dadc"
+    },
+    {
+      "sim_id": "SIM-kuful-udp-feed-v0-conformance",
+      "path": "simulations/SIM-kuful-udp-feed-v0-conformance/",
+      "tree_hash": "8b600e965000d8b48f7f6a6f24015afafc6f507a49480afc1214915dd5143ae0"
+    },
+    {
+      "sim_id": "SIM-kugap-live-sync-audit-split",
+      "path": "simulations/SIM-kugap-live-sync-audit-split/",
+      "tree_hash": "f88642638aa759074214d592d8be3398201cc6d7d3680894098cbc1df811030c"
+    },
+    {
+      "sim_id": "SIM-kurim-grid-envelope",
+      "path": "simulations/SIM-kurim-grid-envelope/",
+      "tree_hash": "f644f1f7130016bc26b62e903e784a948f962727c347009162f6b29dcc18e6e2"
+    },
+    {
+      "sim_id": "SIM-labit-feed-outer",
+      "path": "simulations/SIM-labit-feed-outer/",
+      "tree_hash": "060eb3fe3a7c63ee4e88f66a0c9af758b9e7d2219b68b87c5b132ff2fb7c50ff"
+    },
+    {
+      "sim_id": "SIM-ligan-promisebase-reference-naming",
+      "path": "simulations/SIM-ligan-promisebase-reference-naming/",
+      "tree_hash": "e5bd7100c41c5eadf9e6dc4ddf7490d3c40ebecb498e9b79801fa466762d723f"
+    },
+    {
+      "sim_id": "SIM-lotiv-grid-envelope-cryptid-multisig-signature-proofs",
+      "path": "simulations/SIM-lotiv-grid-envelope-cryptid-multisig-signature-proofs/",
+      "tree_hash": "83f96165cff32abe7490c2176ed2265a57ad81868f6f614b069f209ffd8615bc"
+    },
+    {
+      "sim_id": "SIM-ludaf-udp-feed",
+      "path": "simulations/SIM-ludaf-udp-feed/",
+      "tree_hash": "1f626da6f8c3305ac8a02bdbbbb9f66cdcfdba59ebd91dff2433acf4ec107c93"
+    },
+    {
+      "sim_id": "SIM-ludut-wire-lab-devs",
+      "path": "simulations/SIM-ludut-wire-lab-devs/",
+      "tree_hash": "0ea8781ea8d19089355073cde98e1e93ac60fbf3c7e2267a3dc85687acec43f1"
+    },
+    {
+      "sim_id": "SIM-mahih-grid-envelope-enc-cbor-unknown-opaque-sig-wrapper-pcid",
+      "path": "simulations/SIM-mahih-grid-envelope-enc-cbor-unknown-opaque-sig-wrapper-pcid/",
+      "tree_hash": "f4a70d5b05c7608d49fe60e0bfd51e87f1cf701aafad2970df62c7bcf9922a6d"
+    },
+    {
+      "sim_id": "SIM-maraz-grid-envelope-signed-summary-header-nested-schema",
+      "path": "simulations/SIM-maraz-grid-envelope-signed-summary-header-nested-schema/",
+      "tree_hash": "f19399cdfa3cc931cc48b8aacaf97a7afe1479d867d15d364706bc1a4d147c9f"
+    },
+    {
+      "sim_id": "SIM-mikas-minimal-blob-app-contract",
+      "path": "simulations/SIM-mikas-minimal-blob-app-contract/",
+      "tree_hash": "97358511b9d6fdb6a02c37fd0722f03dafb09104268a3c034a920d71dd711c93"
+    },
+    {
+      "sim_id": "SIM-narok-transport-family-bakeoff",
+      "path": "simulations/SIM-narok-transport-family-bakeoff/",
+      "tree_hash": "84e59195b3a55583b569459455ac9712e39a1ef1af9eda1473b948c1e74256fb"
+    },
+    {
+      "sim_id": "SIM-natim-grid-envelope-nested-payload-outer-attestation-multisig",
+      "path": "simulations/SIM-natim-grid-envelope-nested-payload-outer-attestation-multisig/",
+      "tree_hash": "668854aaae32a3dc6bf13e5909bad575b36357d7af8d362f2ebc79ab053078ea"
+    },
+    {
+      "sim_id": "SIM-nijuz-multi-embodiment-identity",
+      "path": "simulations/SIM-nijuz-multi-embodiment-identity/",
+      "tree_hash": "f4f9f7df1f6fb39e72cdd5f6e792f278a36d400239ad6372909005125a92dab4"
+    },
+    {
+      "sim_id": "SIM-nipoh-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-wrapper-pcid",
+      "path": "simulations/SIM-nipoh-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-wrapper-pcid/",
+      "tree_hash": "90a6dd3091fcccc5e5fef0a39e859ae00100ea2a89b212ac10fc2fc2aca1d42e"
+    },
+    {
+      "sim_id": "SIM-punaz-bgp-class-routing-app",
+      "path": "simulations/SIM-punaz-bgp-class-routing-app/",
+      "tree_hash": "26522373a19fa0133724841a623a140f3d283f0339c77cbea330d3d0c0679526"
+    },
+    {
+      "sim_id": "SIM-rakir-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-mandatory-sig-pcid-payload",
+      "path": "simulations/SIM-rakir-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-mandatory-sig-pcid-payload/",
+      "tree_hash": "92c5d8e985a5266b1219c5985a1305bcf0ecba2bd5929def1374240a00e8a528"
+    },
+    {
+      "sim_id": "SIM-rakot-group-session",
+      "path": "simulations/SIM-rakot-group-session/",
+      "tree_hash": "1525fe7dd6097b1f62bfc62bfc8f9bdcd452f9e7cc0f5ead8af9278b753e2e16"
+    },
+    {
+      "sim_id": "SIM-ranib-spec-requirement-sections",
+      "path": "simulations/SIM-ranib-spec-requirement-sections/",
+      "tree_hash": "c7e6b37d3b7df0b56b76185ed425d704c1d4c51c137ea948a94a2e0879056a08"
+    },
+    {
+      "sim_id": "SIM-riliz-grid-envelope-enc-dag-cbor-unknown-opaque-sig-mandatory-sig-pcid-payload",
+      "path": "simulations/SIM-riliz-grid-envelope-enc-dag-cbor-unknown-opaque-sig-mandatory-sig-pcid-payload/",
+      "tree_hash": "d85aac8e8bda9ef21343c7364adf6fa3924c754abc3105e7384fda1d516fc3e7"
+    },
+    {
+      "sim_id": "SIM-robot-app-semantics-conformance",
+      "path": "simulations/SIM-robot-app-semantics-conformance/",
+      "tree_hash": "e57bc7679fd213e955302abe66d10f62f5e3f6e719093146f00c240f25158767"
+    },
+    {
+      "sim_id": "SIM-rusap-promise-accounting-records",
+      "path": "simulations/SIM-rusap-promise-accounting-records/",
+      "tree_hash": "68329074b8fdfa8199d800aa9b183175c63a167ec55be34403848d91944509f8"
+    },
+    {
+      "sim_id": "SIM-ruzil-grid-envelope-enc-dag-cbor-unknown-opaque-sig-mandatory-opaque-bytes",
+      "path": "simulations/SIM-ruzil-grid-envelope-enc-dag-cbor-unknown-opaque-sig-mandatory-opaque-bytes/",
+      "tree_hash": "6f2afd5b2d31d78758925a1d4cc49a6ff4815410d9c349068bee0c088e5b43e1"
+    },
+    {
+      "sim_id": "SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields",
+      "path": "simulations/SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields/",
+      "tree_hash": "cee27e908e02ebb98055f64a9a1750e4c150996dd05c4c53e16ec029927598f1"
+    },
+    {
+      "sim_id": "SIM-savak-scoped-claim-card-audit-ledger",
+      "path": "simulations/SIM-savak-scoped-claim-card-audit-ledger/",
+      "tree_hash": "a3d2108c4a27128a7d42e5b0ac1541ad1774df2898f96e97eed1043e7e428d87"
+    },
+    {
+      "sim_id": "SIM-sivus-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-mandatory-sig-pcid-payload",
+      "path": "simulations/SIM-sivus-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-mandatory-sig-pcid-payload/",
+      "tree_hash": "3ce175e89ae14c517939db9039e2af1f4ff2a4c2050a7556ac94d6435a2f0006"
+    },
+    {
+      "sim_id": "SIM-tizad-scoped-conformance-citation-ledger",
+      "path": "simulations/SIM-tizad-scoped-conformance-citation-ledger/",
+      "tree_hash": "f45aa7d6c917a553cd0b9e4ed9de53aec6bfa37cb67f1af4bd8ecb516146c77d"
+    },
+    {
+      "sim_id": "SIM-tohol-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-mandatory-opaque-bytes",
+      "path": "simulations/SIM-tohol-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-mandatory-opaque-bytes/",
+      "tree_hash": "86ce37ad43c89feda138427cb7edc9ad2cb1998b2b8412246fbc9ce1dc3d2490"
+    },
+    {
+      "sim_id": "SIM-vamaz-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-sig-pcid-payload",
+      "path": "simulations/SIM-vamaz-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-sig-pcid-payload/",
+      "tree_hash": "93c691c8787dbdc8be5fa107abae8706592ce57ce7b958a885d7cb1d577d0c1d"
+    },
+    {
+      "sim_id": "SIM-virim-manifested-embodiment-savepoint-receipts",
+      "path": "simulations/SIM-virim-manifested-embodiment-savepoint-receipts/",
+      "tree_hash": "7df2279006ed03cd2070bdecdef763477839a3e7b0229d048f53f21ed1d82849"
+    },
+    {
+      "sim_id": "SIM-vivus-grid-envelope-enc-cbor-unknown-best-effort-sig-wrapper-pcid",
+      "path": "simulations/SIM-vivus-grid-envelope-enc-cbor-unknown-best-effort-sig-wrapper-pcid/",
+      "tree_hash": "58aac6347a21eca760edb90e4c33f9105046b86ff556ebea7d7e85182b7d0552"
+    },
+    {
+      "sim_id": "SIM-vutar-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-opaque-bytes",
+      "path": "simulations/SIM-vutar-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-opaque-bytes/",
+      "tree_hash": "ae895e6a4a91751df8c391916c0c07169b9eacd5bb19a9992dfe10475f0a7419"
+    },
+    {
+      "sim_id": "SIM-zarud-conditional-release-geofencing",
+      "path": "simulations/SIM-zarud-conditional-release-geofencing/",
+      "tree_hash": "533f88600b1231b2c1a16d7d0480a824ff426d41dfe52fefd83961cc9418175b"
+    },
+    {
+      "sim_id": "SIM-zazit-chunk-feed-replication",
+      "path": "simulations/SIM-zazit-chunk-feed-replication/",
+      "tree_hash": "94381ef3396f4ec015b5541f34f6cad3d2c0b91cb56ed045c718bef55345de2e"
+    },
+    {
+      "sim_id": "SIM-zifik-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-unsigned-v0",
+      "path": "simulations/SIM-zifik-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-unsigned-v0/",
+      "tree_hash": "588cdf7a9d0f14b9081b539d842ede027573f04c728321fa2ff7ea996f79a7da"
+    },
+    {
+      "sim_id": "SIM-zifoj-boundary-claim-promise-accounting-records",
+      "path": "simulations/SIM-zifoj-boundary-claim-promise-accounting-records/",
+      "tree_hash": "714bd034f0bcbacbafbf1e9db6f2d7cbc405a872b5390233f7c8390d511a3068"
+    },
+    {
+      "sim_id": "SIM-zisan-device-bound-agent",
+      "path": "simulations/SIM-zisan-device-bound-agent/",
+      "tree_hash": "4e24774dcf443da1a667e63bf1c84ecc23953d7a3ea2c7fb1d76baf96313d935"
+    }
+  ],
+  "scenario_sample": [
+    {
+      "scenario_id": "app-semantics-partial-conformance",
+      "path": "scenarios/app-semantics-partial-conformance/app-semantics-partial-conformance.md",
+      "sample_policy": "audit-first targeted rubric-v2 backfill from historical v1 results",
+      "sha256": "e84a88096e8ecaca83f7a04d8958d6f7e5712e53bf180d14674e32fab69399ef"
+    },
+    {
+      "scenario_id": "bgp-class-routing-app-conflicting-policies",
+      "path": "scenarios/bgp-class-routing-app-conflicting-policies/bgp-class-routing-app-conflicting-policies.md",
+      "sample_policy": "audit-first targeted rubric-v2 backfill from historical v1 results",
+      "sha256": "e0a0e2e8b317ce945417fdc2990afc86627a56f6e38518464ce66c6fa1e27a12"
+    },
+    {
+      "scenario_id": "bgp-class-routing-app-honest-reachability-promise",
+      "path": "scenarios/bgp-class-routing-app-honest-reachability-promise/bgp-class-routing-app-honest-reachability-promise.md",
+      "sample_policy": "audit-first targeted rubric-v2 backfill from historical v1 results",
+      "sha256": "f85a898a4cb0ac219d2dcee050117d73efebefe9e0d4b62f48113106e83bcaca"
+    },
+    {
+      "scenario_id": "bgp-class-routing-app-route-leak",
+      "path": "scenarios/bgp-class-routing-app-route-leak/bgp-class-routing-app-route-leak.md",
+      "sample_policy": "audit-first targeted rubric-v2 backfill from historical v1 results",
+      "sha256": "e0e702af25ccf4c9d8219d2f5b892c0eed6c07ff3bc75eb387cda0c955cff1d7"
+    },
+    {
+      "scenario_id": "bgp-class-routing-app-sparse-knowledge",
+      "path": "scenarios/bgp-class-routing-app-sparse-knowledge/bgp-class-routing-app-sparse-knowledge.md",
+      "sample_policy": "audit-first targeted rubric-v2 backfill from historical v1 results",
+      "sha256": "e713afeb55d75c92c764c5be159f4c745c9533f5fe082387973a9accde1e016a"
+    },
+    {
+      "scenario_id": "cas-backed-group-session-envelope-independence",
+      "path": "scenarios/cas-backed-group-session-envelope-independence/cas-backed-group-session-envelope-independence.md",
+      "sample_policy": "audit-first targeted rubric-v2 backfill from historical v1 results",
+      "sha256": "7f4409bc81e7ad284aca085e99865ff0c8b01f7ce5c8c39054845ad65d1ff464"
+    },
+    {
+      "scenario_id": "cas-object-type-binding-bakeoff-raw-chunk-versus-pointer-bytes",
+      "path": "scenarios/cas-object-type-binding-bakeoff-raw-chunk-versus-pointer-bytes/cas-object-type-binding-bakeoff-raw-chunk-versus-pointer-bytes.md",
+      "sample_policy": "audit-first targeted rubric-v2 backfill from historical v1 results",
+      "sha256": "64da602a38c041eeed6075a84c4c46c3d4448cbf21381eb803382aae0aec4018"
+    },
+    {
+      "scenario_id": "cas-object-type-binding-bakeoff-unknown-typed-object",
+      "path": "scenarios/cas-object-type-binding-bakeoff-unknown-typed-object/cas-object-type-binding-bakeoff-unknown-typed-object.md",
+      "sample_policy": "audit-first targeted rubric-v2 backfill from historical v1 results",
+      "sha256": "76f0a7016fa2bad5e53903682706bca4eeb4aa2d099311a4ea52b7280748cf90"
+    },
+    {
+      "scenario_id": "chunk-feed-replication-carrier-independence",
+      "path": "scenarios/chunk-feed-replication-carrier-independence/chunk-feed-replication-carrier-independence.md",
+      "sample_policy": "audit-first targeted rubric-v2 backfill from historical v1 results",
+      "sha256": "5386ebc3943d885551ac45b3b4fb1616d67d742407906c347b7d1d388f31c346"
+    },
+    {
+      "scenario_id": "chunk-feed-replication-corrupt-chunk",
+      "path": "scenarios/chunk-feed-replication-corrupt-chunk/chunk-feed-replication-corrupt-chunk.md",
+      "sample_policy": "audit-first targeted rubric-v2 backfill from historical v1 results",
+      "sha256": "57eb49a6a8304b475add47f66f2f2e7d84c7ec0ecbcee2d862951d88c19f2a00"
+    },
+    {
+      "scenario_id": "chunk-feed-replication-duplicate-advertisement",
+      "path": "scenarios/chunk-feed-replication-duplicate-advertisement/chunk-feed-replication-duplicate-advertisement.md",
+      "sample_policy": "audit-first targeted rubric-v2 backfill from historical v1 results",
+      "sha256": "5bb68a07363f7a70d839611178b098fbb7d15bcb880a86dde08d2a70b7130372"
+    },
+    {
+      "scenario_id": "conditional-release-geofencing-opaque-lower-layer-carriage",
+      "path": "scenarios/conditional-release-geofencing-opaque-lower-layer-carriage/conditional-release-geofencing-opaque-lower-layer-carriage.md",
+      "sample_policy": "audit-first targeted rubric-v2 backfill from historical v1 results",
+      "sha256": "e0af12980a8e0beec8a12683a7352f864cd5c2fcfcaa17cc457db28bea9cb525"
+    },
+    {
+      "scenario_id": "conditional-release-geofencing-replay-outside-conditions",
+      "path": "scenarios/conditional-release-geofencing-replay-outside-conditions/conditional-release-geofencing-replay-outside-conditions.md",
+      "sample_policy": "audit-first targeted rubric-v2 backfill from historical v1 results",
+      "sha256": "f1480d60e85afb41b0fe5e49fdc70801e029734edbe32c3068434be7f4cb1c6e"
+    },
+    {
+      "scenario_id": "device-bound-agent-physical-effect",
+      "path": "scenarios/device-bound-agent-physical-effect/device-bound-agent-physical-effect.md",
+      "sample_policy": "audit-first targeted rubric-v2 backfill from historical v1 results",
+      "sha256": "ffd2cee6094031ae77651ba8da6c3c76b54d200845f65f0e93d07c8e96aaeb2a"
+    },
+    {
+      "scenario_id": "kernel-porting-boundary",
+      "path": "scenarios/kernel-porting-boundary/kernel-porting-boundary.md",
+      "sample_policy": "audit-first targeted rubric-v2 backfill from historical v1 results",
+      "sha256": "d1646fa062e6c64f27cbbd25da0e96f6d484c60582677cdfc798d265a22d5096"
+    },
+    {
+      "scenario_id": "live-crdt-audit-publication",
+      "path": "scenarios/live-crdt-audit-publication/live-crdt-audit-publication.md",
+      "sample_policy": "audit-first targeted rubric-v2 backfill from historical v1 results",
+      "sha256": "870887bbd5848db45bc4406e5369b492a516c2bd997de9226d24825214c49d94"
+    },
+    {
+      "scenario_id": "minimal-immutable-blob-app",
+      "path": "scenarios/minimal-immutable-blob-app/minimal-immutable-blob-app.md",
+      "sample_policy": "audit-first targeted rubric-v2 backfill from historical v1 results",
+      "sha256": "187e449b0498cddda2a2b28192f6aa29e824dae72e60ff47c35d34df35115a73"
+    },
+    {
+      "scenario_id": "multi-embodiment-app-identity",
+      "path": "scenarios/multi-embodiment-app-identity/multi-embodiment-app-identity.md",
+      "sample_policy": "audit-first targeted rubric-v2 backfill from historical v1 results",
+      "sha256": "e05f78b9d46c47acecbf430a12fda015268e17d60fbea9e0609fa11e604e52cc"
+    },
+    {
+      "scenario_id": "portable-signing-key-identity",
+      "path": "scenarios/portable-signing-key-identity/portable-signing-key-identity.md",
+      "sample_policy": "audit-first targeted rubric-v2 backfill from historical v1 results",
+      "sha256": "4deaafd0d50191f352fe959dbd93ce9ea916706abc6e23a05274e32bfb92625f"
+    },
+    {
+      "scenario_id": "transport-family-bakeoff-per-hop-authorization-failure",
+      "path": "scenarios/transport-family-bakeoff-per-hop-authorization-failure/transport-family-bakeoff-per-hop-authorization-failure.md",
+      "sample_policy": "audit-first targeted rubric-v2 backfill from historical v1 results",
+      "sha256": "f938e10ab88db666d3097a2f97c1667bbbc6e8e071681134049068982cc39cf2"
+    },
+    {
+      "scenario_id": "udp-feed-v0-conformance-malformed-datagram",
+      "path": "scenarios/udp-feed-v0-conformance-malformed-datagram/udp-feed-v0-conformance-malformed-datagram.md",
+      "sample_policy": "audit-first targeted rubric-v2 backfill from historical v1 results",
+      "sha256": "1d9346150fa86d237c26fbca078b661e469a1d68323b60ec00a13b45b5d79efb"
+    },
+    {
+      "scenario_id": "udp-feed-v0-conformance-session-layer-composition",
+      "path": "scenarios/udp-feed-v0-conformance-session-layer-composition/udp-feed-v0-conformance-session-layer-composition.md",
+      "sample_policy": "audit-first targeted rubric-v2 backfill from historical v1 results",
+      "sha256": "69da5db705a56cd7067a653928ff8b2dc9301ef6ebfc712bd81038a65c9d352c"
+    }
+  ],
+  "parents": [
+    {
+      "sim_id": "SIM-kurim-grid-envelope",
+      "rationale": "audit-first rubric-v2 backfill clean grid-envelope calibration results=15"
+    },
+    {
+      "sim_id": "SIM-robot-app-semantics-conformance",
+      "rationale": "audit-first rubric-v2 backfill hard_hit exact-match results=21"
+    }
+  ],
+  "cells": [
+    {
+      "cell_id": "ga-backfill-20260522-215638-medium-000001-SIM-kurim-grid-envelope--bgp-class-routing-app-conflicting-policies--openai-gpt-5.4-medium",
+      "sim_id": "SIM-kurim-grid-envelope",
+      "scenario_id": "bgp-class-routing-app-conflicting-policies",
+      "model_id": "openai-gpt-5.4-medium",
+      "result_path": "results/SIM-kurim-grid-envelope/bgp-class-routing-app-conflicting-policies/openai-gpt-5.4-medium/20260523-045646.json",
+      "status": "done",
+      "attempts": 2,
+      "validation_message": "validated result",
+      "updated_at": "2026-05-23T04:58:01Z",
+      "provider": "openai",
+      "api_model": "gpt-5.4",
+      "reasoning_effort": "medium",
+      "service_tier": "default",
+      "served_service_tier": "default",
+      "request_id": "req_2feb6f39f38a44e295470eccd3b88ffd",
+      "response_id": "resp_0d7119b880405fe9006a1133b1c930819b8a12eafa7e0b0075",
+      "usage_json": "{\"input_tokens\":11164,\"input_tokens_details\":{\"cached_tokens\":0},\"output_tokens\":2287,\"output_tokens_details\":{\"reasoning_tokens\":1923},\"total_tokens\":13451}",
+      "input_tokens": 11164,
+      "output_tokens": 2287,
+      "cost_usd": 0.051555
+    },
+    {
+      "cell_id": "ga-backfill-20260522-215638-medium-000002-SIM-kurim-grid-envelope--bgp-class-routing-app-honest-reachability-promise--openai-gpt-5.4-medium",
+      "sim_id": "SIM-kurim-grid-envelope",
+      "scenario_id": "bgp-class-routing-app-honest-reachability-promise",
+      "model_id": "openai-gpt-5.4-medium",
+      "result_path": "results/SIM-kurim-grid-envelope/bgp-class-routing-app-honest-reachability-promise/openai-gpt-5.4-medium/20260523-045646.json",
+      "status": "done",
+      "attempts": 2,
+      "validation_message": "validated result",
+      "updated_at": "2026-05-23T04:58:25Z",
+      "provider": "openai",
+      "api_model": "gpt-5.4",
+      "reasoning_effort": "medium",
+      "service_tier": "default",
+      "served_service_tier": "default",
+      "request_id": "req_e27fa66c8ebb489b8cc602c901c6bdf5",
+      "response_id": "resp_0a0864555a594e54006a1133d9ac20819983c060f60797213c",
+      "usage_json": "{\"input_tokens\":11193,\"input_tokens_details\":{\"cached_tokens\":0},\"output_tokens\":1429,\"output_tokens_details\":{\"reasoning_tokens\":1069},\"total_tokens\":12622}",
+      "input_tokens": 11193,
+      "output_tokens": 1429,
+      "cost_usd": 0.03959375
+    },
+    {
+      "cell_id": "ga-backfill-20260522-215638-medium-000003-SIM-kurim-grid-envelope--bgp-class-routing-app-route-leak--openai-gpt-5.4-medium",
+      "sim_id": "SIM-kurim-grid-envelope",
+      "scenario_id": "bgp-class-routing-app-route-leak",
+      "model_id": "openai-gpt-5.4-medium",
+      "result_path": "results/SIM-kurim-grid-envelope/bgp-class-routing-app-route-leak/openai-gpt-5.4-medium/20260523-045646.json",
+      "status": "done",
+      "attempts": 2,
+      "validation_message": "validated result",
+      "updated_at": "2026-05-23T04:58:48Z",
+      "provider": "openai",
+      "api_model": "gpt-5.4",
+      "reasoning_effort": "medium",
+      "service_tier": "default",
+      "served_service_tier": "default",
+      "request_id": "req_1dc3d5870a7f466a987e86bb1d2aa4b1",
+      "response_id": "resp_0b1d1315d067ddff006a1133f15364819aa523681897048a59",
+      "usage_json": "{\"input_tokens\":11155,\"input_tokens_details\":{\"cached_tokens\":0},\"output_tokens\":1481,\"output_tokens_details\":{\"reasoning_tokens\":1080},\"total_tokens\":12636}",
+      "input_tokens": 11155,
+      "output_tokens": 1481,
+      "cost_usd": 0.04025525
+    },
+    {
+      "cell_id": "ga-backfill-20260522-215638-medium-000004-SIM-kurim-grid-envelope--bgp-class-routing-app-sparse-knowledge--openai-gpt-5.4-medium",
+      "sim_id": "SIM-kurim-grid-envelope",
+      "scenario_id": "bgp-class-routing-app-sparse-knowledge",
+      "model_id": "openai-gpt-5.4-medium",
+      "result_path": "results/SIM-kurim-grid-envelope/bgp-class-routing-app-sparse-knowledge/openai-gpt-5.4-medium/20260523-045646.json",
+      "status": "done",
+      "attempts": 2,
+      "validation_message": "validated result",
+      "updated_at": "2026-05-23T04:59:12Z",
+      "provider": "openai",
+      "api_model": "gpt-5.4",
+      "reasoning_effort": "medium",
+      "service_tier": "default",
+      "served_service_tier": "default",
+      "request_id": "req_c04272d7f55943acafe2bbd5b0dac3d0",
+      "response_id": "resp_07d460c3f0f85597006a1134089b388198b81579d45a9e3820",
+      "usage_json": "{\"input_tokens\":11167,\"input_tokens_details\":{\"cached_tokens\":0},\"output_tokens\":1448,\"output_tokens_details\":{\"reasoning_tokens\":1034},\"total_tokens\":12615}",
+      "input_tokens": 11167,
+      "output_tokens": 1448,
+      "cost_usd": 0.03981425
+    },
+    {
+      "cell_id": "ga-backfill-20260522-215638-medium-000005-SIM-kurim-grid-envelope--cas-backed-group-session-envelope-independence--openai-gpt-5.4-medium",
+      "sim_id": "SIM-kurim-grid-envelope",
+      "scenario_id": "cas-backed-group-session-envelope-independence",
+      "model_id": "openai-gpt-5.4-medium",
+      "result_path": "results/SIM-kurim-grid-envelope/cas-backed-group-session-envelope-independence/openai-gpt-5.4-medium/20260523-045646.json",
+      "status": "done",
+      "attempts": 2,
+      "validation_message": "validated result",
+      "updated_at": "2026-05-23T04:59:35Z",
+      "provider": "openai",
+      "api_model": "gpt-5.4",
+      "reasoning_effort": "medium",
+      "service_tier": "default",
+      "served_service_tier": "default",
+      "request_id": "req_b8946a7c3b6f4348bfa0de5bd0e4403d",
+      "response_id": "resp_091f6579580b20dd006a1134201a34819888852b0bb70fa962",
+      "usage_json": "{\"input_tokens\":11163,\"input_tokens_details\":{\"cached_tokens\":0},\"output_tokens\":1655,\"output_tokens_details\":{\"reasoning_tokens\":1324},\"total_tokens\":12818}",
+      "input_tokens": 11163,
+      "output_tokens": 1655,
+      "cost_usd": 0.04270525
+    },
+    {
+      "cell_id": "ga-backfill-20260522-215638-medium-000006-SIM-kurim-grid-envelope--cas-object-type-binding-bakeoff-raw-chunk-versus-pointer-bytes--openai-gpt-5.4-medium",
+      "sim_id": "SIM-kurim-grid-envelope",
+      "scenario_id": "cas-object-type-binding-bakeoff-raw-chunk-versus-pointer-bytes",
+      "model_id": "openai-gpt-5.4-medium",
+      "result_path": "results/SIM-kurim-grid-envelope/cas-object-type-binding-bakeoff-raw-chunk-versus-pointer-bytes/openai-gpt-5.4-medium/20260523-045646.json",
+      "status": "done",
+      "attempts": 2,
+      "validation_message": "validated result",
+      "updated_at": "2026-05-23T04:59:55Z",
+      "provider": "openai",
+      "api_model": "gpt-5.4",
+      "reasoning_effort": "medium",
+      "service_tier": "default",
+      "served_service_tier": "default",
+      "request_id": "req_31915599841f4d83a0d66b48d6aa86ee",
+      "response_id": "resp_010f8a517a7a41cb006a113437694c819ba0cc85f9630355e5",
+      "usage_json": "{\"input_tokens\":11227,\"input_tokens_details\":{\"cached_tokens\":0},\"output_tokens\":1283,\"output_tokens_details\":{\"reasoning_tokens\":865},\"total_tokens\":12510}",
+      "input_tokens": 11227,
+      "output_tokens": 1283,
+      "cost_usd": 0.03760925
+    },
+    {
+      "cell_id": "ga-backfill-20260522-215638-medium-000007-SIM-kurim-grid-envelope--cas-object-type-binding-bakeoff-unknown-typed-object--openai-gpt-5.4-medium",
+      "sim_id": "SIM-kurim-grid-envelope",
+      "scenario_id": "cas-object-type-binding-bakeoff-unknown-typed-object",
+      "model_id": "openai-gpt-5.4-medium",
+      "result_path": "results/SIM-kurim-grid-envelope/cas-object-type-binding-bakeoff-unknown-typed-object/openai-gpt-5.4-medium/20260523-045646.json",
+      "status": "done",
+      "attempts": 2,
+      "validation_message": "validated result",
+      "updated_at": "2026-05-23T05:00:27Z",
+      "provider": "openai",
+      "api_model": "gpt-5.4",
+      "reasoning_effort": "medium",
+      "service_tier": "default",
+      "served_service_tier": "default",
+      "request_id": "req_e769f2a412fc42e2af18933445f314f2",
+      "response_id": "resp_0a4bfe087a5243da006a11344c10f08199bf99437dceafe92c",
+      "usage_json": "{\"input_tokens\":11195,\"input_tokens_details\":{\"cached_tokens\":0},\"output_tokens\":2032,\"output_tokens_details\":{\"reasoning_tokens\":1645},\"total_tokens\":13227}",
+      "input_tokens": 11195,
+      "output_tokens": 2032,
+      "cost_usd": 0.04803925
+    },
+    {
+      "cell_id": "ga-backfill-20260522-215638-medium-000008-SIM-kurim-grid-envelope--chunk-feed-replication-carrier-independence--openai-gpt-5.4-medium",
+      "sim_id": "SIM-kurim-grid-envelope",
+      "scenario_id": "chunk-feed-replication-carrier-independence",
+      "model_id": "openai-gpt-5.4-medium",
+      "result_path": "results/SIM-kurim-grid-envelope/chunk-feed-replication-carrier-independence/openai-gpt-5.4-medium/20260523-045646.json",
+      "status": "done",
+      "attempts": 2,
+      "validation_message": "validated result",
+      "updated_at": "2026-05-23T05:00:43Z",
+      "provider": "openai",
+      "api_model": "gpt-5.4",
+      "reasoning_effort": "medium",
+      "service_tier": "default",
+      "served_service_tier": "default",
+      "request_id": "req_78104c2fef15424a833f641ce4a7f5e1",
+      "response_id": "resp_02f991cf402bccbd006a11346b7c50819a81b3667edfae600b",
+      "usage_json": "{\"input_tokens\":11185,\"input_tokens_details\":{\"cached_tokens\":0},\"output_tokens\":985,\"output_tokens_details\":{\"reasoning_tokens\":646},\"total_tokens\":12170}",
+      "input_tokens": 11185,
+      "output_tokens": 985,
+      "cost_usd": 0.03336375
+    },
+    {
+      "cell_id": "ga-backfill-20260522-215638-medium-000009-SIM-kurim-grid-envelope--chunk-feed-replication-corrupt-chunk--openai-gpt-5.4-medium",
+      "sim_id": "SIM-kurim-grid-envelope",
+      "scenario_id": "chunk-feed-replication-corrupt-chunk",
+      "model_id": "openai-gpt-5.4-medium",
+      "result_path": "results/SIM-kurim-grid-envelope/chunk-feed-replication-corrupt-chunk/openai-gpt-5.4-medium/20260523-045646.json",
+      "status": "done",
+      "attempts": 2,
+      "validation_message": "validated result",
+      "updated_at": "2026-05-23T05:01:04Z",
+      "provider": "openai",
+      "api_model": "gpt-5.4",
+      "reasoning_effort": "medium",
+      "service_tier": "default",
+      "served_service_tier": "default",
+      "request_id": "req_2ba4218ba0f040619872becff8700a3c",
+      "response_id": "resp_0004b4f3a3e5b26f006a11347b7de8819bb2919d4a837e4be3",
+      "usage_json": "{\"input_tokens\":11168,\"input_tokens_details\":{\"cached_tokens\":0},\"output_tokens\":1326,\"output_tokens_details\":{\"reasoning_tokens\":929},\"total_tokens\":12494}",
+      "input_tokens": 11168,
+      "output_tokens": 1326,
+      "cost_usd": 0.038108
+    },
+    {
+      "cell_id": "ga-backfill-20260522-215638-medium-000010-SIM-kurim-grid-envelope--chunk-feed-replication-duplicate-advertisement--openai-gpt-5.4-medium",
+      "sim_id": "SIM-kurim-grid-envelope",
+      "scenario_id": "chunk-feed-replication-duplicate-advertisement",
+      "model_id": "openai-gpt-5.4-medium",
+      "result_path": "results/SIM-kurim-grid-envelope/chunk-feed-replication-duplicate-advertisement/openai-gpt-5.4-medium/20260523-045646.json",
+      "status": "done",
+      "attempts": 2,
+      "validation_message": "validated result",
+      "updated_at": "2026-05-23T05:01:21Z",
+      "provider": "openai",
+      "api_model": "gpt-5.4",
+      "reasoning_effort": "medium",
+      "service_tier": "default",
+      "served_service_tier": "default",
+      "request_id": "req_d4f7a3363b204520b9bff520a61e115b",
+      "response_id": "resp_000930f965b6856b006a1134910cbc819ab7a557fe006fcbfd",
+      "usage_json": "{\"input_tokens\":11162,\"input_tokens_details\":{\"cached_tokens\":0},\"output_tokens\":1047,\"output_tokens_details\":{\"reasoning_tokens\":709},\"total_tokens\":12209}",
+      "input_tokens": 11162,
+      "output_tokens": 1047,
+      "cost_usd": 0.0341915
+    },
+    {
+      "cell_id": "ga-backfill-20260522-215638-medium-000011-SIM-kurim-grid-envelope--conditional-release-geofencing-opaque-lower-layer-carriage--openai-gpt-5.4-medium",
+      "sim_id": "SIM-kurim-grid-envelope",
+      "scenario_id": "conditional-release-geofencing-opaque-lower-layer-carriage",
+      "model_id": "openai-gpt-5.4-medium",
+      "result_path": "results/SIM-kurim-grid-envelope/conditional-release-geofencing-opaque-lower-layer-carriage/openai-gpt-5.4-medium/20260523-045646.json",
+      "status": "done",
+      "attempts": 2,
+      "validation_message": "validated result",
+      "updated_at": "2026-05-23T05:01:48Z",
+      "provider": "openai",
+      "api_model": "gpt-5.4",
+      "reasoning_effort": "medium",
+      "service_tier": "default",
+      "served_service_tier": "default",
+      "request_id": "req_419d8c818f1148e98cbcf7439909cc39",
+      "response_id": "resp_0bc6372863673d5e006a1134a1e7688199a6b501b85410c874",
+      "usage_json": "{\"input_tokens\":11196,\"input_tokens_details\":{\"cached_tokens\":0},\"output_tokens\":1499,\"output_tokens_details\":{\"reasoning_tokens\":1064},\"total_tokens\":12695}",
+      "input_tokens": 11196,
+      "output_tokens": 1499,
+      "cost_usd": 0.040579
+    },
+    {
+      "cell_id": "ga-backfill-20260522-215638-medium-000012-SIM-kurim-grid-envelope--conditional-release-geofencing-replay-outside-conditions--openai-gpt-5.4-medium",
+      "sim_id": "SIM-kurim-grid-envelope",
+      "scenario_id": "conditional-release-geofencing-replay-outside-conditions",
+      "model_id": "openai-gpt-5.4-medium",
+      "result_path": "results/SIM-kurim-grid-envelope/conditional-release-geofencing-replay-outside-conditions/openai-gpt-5.4-medium/20260523-045646.json",
+      "status": "done",
+      "attempts": 2,
+      "validation_message": "validated result",
+      "updated_at": "2026-05-23T05:02:10Z",
+      "provider": "openai",
+      "api_model": "gpt-5.4",
+      "reasoning_effort": "medium",
+      "service_tier": "default",
+      "served_service_tier": "default",
+      "request_id": "req_8c1a55023f3c4628b030528891fa46f0",
+      "response_id": "resp_0902fd265f8f3f29006a1134bc82788199b656ae921d4d16b9",
+      "usage_json": "{\"input_tokens\":11189,\"input_tokens_details\":{\"cached_tokens\":0},\"output_tokens\":1398,\"output_tokens_details\":{\"reasoning_tokens\":938},\"total_tokens\":12587}",
+      "input_tokens": 11189,
+      "output_tokens": 1398,
+      "cost_usd": 0.03915275
+    },
+    {
+      "cell_id": "ga-backfill-20260522-215638-medium-000013-SIM-kurim-grid-envelope--transport-family-bakeoff-per-hop-authorization-failure--openai-gpt-5.4-medium",
+      "sim_id": "SIM-kurim-grid-envelope",
+      "scenario_id": "transport-family-bakeoff-per-hop-authorization-failure",
+      "model_id": "openai-gpt-5.4-medium",
+      "result_path": "results/SIM-kurim-grid-envelope/transport-family-bakeoff-per-hop-authorization-failure/openai-gpt-5.4-medium/20260523-045646.json",
+      "status": "done",
+      "attempts": 2,
+      "validation_message": "validated result",
+      "updated_at": "2026-05-23T05:02:33Z",
+      "provider": "openai",
+      "api_model": "gpt-5.4",
+      "reasoning_effort": "medium",
+      "service_tier": "default",
+      "served_service_tier": "default",
+      "request_id": "req_6b9aaf16c9c44dff90736b75a9a6e681",
+      "response_id": "resp_05d3e91424b5eccf006a1134d2fdec819b9db23a4b4cf676a6",
+      "usage_json": "{\"input_tokens\":11189,\"input_tokens_details\":{\"cached_tokens\":0},\"output_tokens\":1404,\"output_tokens_details\":{\"reasoning_tokens\":1013},\"total_tokens\":12593}",
+      "input_tokens": 11189,
+      "output_tokens": 1404,
+      "cost_usd": 0.03923675
+    },
+    {
+      "cell_id": "ga-backfill-20260522-215638-medium-000014-SIM-kurim-grid-envelope--udp-feed-v0-conformance-malformed-datagram--openai-gpt-5.4-medium",
+      "sim_id": "SIM-kurim-grid-envelope",
+      "scenario_id": "udp-feed-v0-conformance-malformed-datagram",
+      "model_id": "openai-gpt-5.4-medium",
+      "result_path": "results/SIM-kurim-grid-envelope/udp-feed-v0-conformance-malformed-datagram/openai-gpt-5.4-medium/20260523-045646.json",
+      "status": "done",
+      "attempts": 2,
+      "validation_message": "validated result",
+      "updated_at": "2026-05-23T05:02:53Z",
+      "provider": "openai",
+      "api_model": "gpt-5.4",
+      "reasoning_effort": "medium",
+      "service_tier": "default",
+      "served_service_tier": "default",
+      "request_id": "req_b04ac81263694fc1abbb0adaffcd8275",
+      "response_id": "resp_0ef0e6904320f3f8006a1134ea0fd4819a9a245a61e89fe941",
+      "usage_json": "{\"input_tokens\":11178,\"input_tokens_details\":{\"cached_tokens\":0},\"output_tokens\":1298,\"output_tokens_details\":{\"reasoning_tokens\":929},\"total_tokens\":12476}",
+      "input_tokens": 11178,
+      "output_tokens": 1298,
+      "cost_usd": 0.0377335
+    },
+    {
+      "cell_id": "ga-backfill-20260522-215638-medium-000015-SIM-kurim-grid-envelope--udp-feed-v0-conformance-session-layer-composition--openai-gpt-5.4-medium",
+      "sim_id": "SIM-kurim-grid-envelope",
+      "scenario_id": "udp-feed-v0-conformance-session-layer-composition",
+      "model_id": "openai-gpt-5.4-medium",
+      "result_path": "results/SIM-kurim-grid-envelope/udp-feed-v0-conformance-session-layer-composition/openai-gpt-5.4-medium/20260523-045646.json",
+      "status": "done",
+      "attempts": 2,
+      "validation_message": "validated result",
+      "updated_at": "2026-05-23T05:03:15Z",
+      "provider": "openai",
+      "api_model": "gpt-5.4",
+      "reasoning_effort": "medium",
+      "service_tier": "default",
+      "served_service_tier": "default",
+      "request_id": "req_b0c0832681cc4606bc4de47a7468bdb1",
+      "response_id": "resp_0d7f72a68f46cefa006a1134fd9cc4819aa277eb24988f01d4",
+      "usage_json": "{\"input_tokens\":11182,\"input_tokens_details\":{\"cached_tokens\":0},\"output_tokens\":1423,\"output_tokens_details\":{\"reasoning_tokens\":1034},\"total_tokens\":12605}",
+      "input_tokens": 11182,
+      "output_tokens": 1423,
+      "cost_usd": 0.0394905
+    },
+    {
+      "cell_id": "ga-backfill-20260522-215638-medium-000016-SIM-robot-app-semantics-conformance--app-semantics-partial-conformance--openai-gpt-5.4-medium",
+      "sim_id": "SIM-robot-app-semantics-conformance",
+      "scenario_id": "app-semantics-partial-conformance",
+      "model_id": "openai-gpt-5.4-medium",
+      "result_path": "results/SIM-robot-app-semantics-conformance/app-semantics-partial-conformance/openai-gpt-5.4-medium/20260523-045646.json",
+      "status": "done",
+      "attempts": 2,
+      "validation_message": "validated result",
+      "updated_at": "2026-05-23T05:03:33Z",
+      "provider": "openai",
+      "api_model": "gpt-5.4",
+      "reasoning_effort": "medium",
+      "service_tier": "default",
+      "served_service_tier": "default",
+      "request_id": "req_f3da2e858a744474be81b234d3d5c4c0",
+      "response_id": "resp_0166899df8ceffea006a113513b178819a98293c4e4f54a94d",
+      "usage_json": "{\"input_tokens\":7120,\"input_tokens_details\":{\"cached_tokens\":0},\"output_tokens\":1252,\"output_tokens_details\":{\"reasoning_tokens\":854},\"total_tokens\":8372}",
+      "input_tokens": 7120,
+      "output_tokens": 1252,
+      "cost_usd": 0.029988
+    },
+    {
+      "cell_id": "ga-backfill-20260522-215638-medium-000017-SIM-robot-app-semantics-conformance--app-semantics-partial-conformance--openai-gpt-5.4-medium",
+      "sim_id": "SIM-robot-app-semantics-conformance",
+      "scenario_id": "app-semantics-partial-conformance",
+      "model_id": "openai-gpt-5.4-medium",
+      "result_path": "results/SIM-robot-app-semantics-conformance/app-semantics-partial-conformance/openai-gpt-5.4-medium/20260523-045646.json",
+      "status": "done",
+      "attempts": 2,
+      "validation_message": "validated result",
+      "updated_at": "2026-05-23T05:03:50Z",
+      "provider": "openai",
+      "api_model": "gpt-5.4",
+      "reasoning_effort": "medium",
+      "service_tier": "default",
+      "served_service_tier": "default",
+      "request_id": "req_117c5880527d4faea36242a21696e63b",
+      "response_id": "resp_00a3621583cfc6c2006a113525d2d4819ab6f897d26ade901c",
+      "usage_json": "{\"input_tokens\":7120,\"input_tokens_details\":{\"cached_tokens\":0},\"output_tokens\":1068,\"output_tokens_details\":{\"reasoning_tokens\":683},\"total_tokens\":8188}",
+      "input_tokens": 7120,
+      "output_tokens": 1068,
+      "cost_usd": 0.027412
+    },
+    {
+      "cell_id": "ga-backfill-20260522-215638-medium-000018-SIM-robot-app-semantics-conformance--app-semantics-partial-conformance--openai-gpt-5.4-medium",
+      "sim_id": "SIM-robot-app-semantics-conformance",
+      "scenario_id": "app-semantics-partial-conformance",
+      "model_id": "openai-gpt-5.4-medium",
+      "result_path": "results/SIM-robot-app-semantics-conformance/app-semantics-partial-conformance/openai-gpt-5.4-medium/20260523-045646.json",
+      "status": "done",
+      "attempts": 2,
+      "validation_message": "validated result",
+      "updated_at": "2026-05-23T05:04:14Z",
+      "provider": "openai",
+      "api_model": "gpt-5.4",
+      "reasoning_effort": "medium",
+      "service_tier": "default",
+      "served_service_tier": "default",
+      "request_id": "req_49914f4160814283996bf467c8ce89d6",
+      "response_id": "resp_0d32a31b6dfad1bd006a11353635708198911c19ba93901b44",
+      "usage_json": "{\"input_tokens\":7120,\"input_tokens_details\":{\"cached_tokens\":0},\"output_tokens\":1273,\"output_tokens_details\":{\"reasoning_tokens\":900},\"total_tokens\":8393}",
+      "input_tokens": 7120,
+      "output_tokens": 1273,
+      "cost_usd": 0.030282
+    },
+    {
+      "cell_id": "ga-backfill-20260522-215638-medium-000019-SIM-robot-app-semantics-conformance--device-bound-agent-physical-effect--openai-gpt-5.4-medium",
+      "sim_id": "SIM-robot-app-semantics-conformance",
+      "scenario_id": "device-bound-agent-physical-effect",
+      "model_id": "openai-gpt-5.4-medium",
+      "result_path": "results/SIM-robot-app-semantics-conformance/device-bound-agent-physical-effect/openai-gpt-5.4-medium/20260523-045646.json",
+      "status": "done",
+      "attempts": 2,
+      "validation_message": "validated result",
+      "updated_at": "2026-05-23T05:04:42Z",
+      "provider": "openai",
+      "api_model": "gpt-5.4",
+      "reasoning_effort": "medium",
+      "service_tier": "default",
+      "served_service_tier": "default",
+      "request_id": "req_28594dac09cc4380b3b30384908cdf14",
+      "response_id": "resp_018fd9059588f737006a11354ee9b8819a9a3826fcbfd907c3",
+      "usage_json": "{\"input_tokens\":7142,\"input_tokens_details\":{\"cached_tokens\":0},\"output_tokens\":1517,\"output_tokens_details\":{\"reasoning_tokens\":1099},\"total_tokens\":8659}",
+      "input_tokens": 7142,
+      "output_tokens": 1517,
+      "cost_usd": 0.0337365
+    },
+    {
+      "cell_id": "ga-backfill-20260522-215638-medium-000020-SIM-robot-app-semantics-conformance--device-bound-agent-physical-effect--openai-gpt-5.4-medium",
+      "sim_id": "SIM-robot-app-semantics-conformance",
+      "scenario_id": "device-bound-agent-physical-effect",
+      "model_id": "openai-gpt-5.4-medium",
+      "result_path": "results/SIM-robot-app-semantics-conformance/device-bound-agent-physical-effect/openai-gpt-5.4-medium/20260523-045646.json",
+      "status": "done",
+      "attempts": 2,
+      "validation_message": "validated result",
+      "updated_at": "2026-05-23T05:05:06Z",
+      "provider": "openai",
+      "api_model": "gpt-5.4",
+      "reasoning_effort": "medium",
+      "service_tier": "default",
+      "served_service_tier": "default",
+      "request_id": "req_4f19d16f6db24e779a7149e0c8c8e94c",
+      "response_id": "resp_0950eacc2435f7fe006a11356aa62c8198befe4d36f6b6b191",
+      "usage_json": "{\"input_tokens\":7142,\"input_tokens_details\":{\"cached_tokens\":0},\"output_tokens\":1379,\"output_tokens_details\":{\"reasoning_tokens\":997},\"total_tokens\":8521}",
+      "input_tokens": 7142,
+      "output_tokens": 1379,
+      "cost_usd": 0.0318045
+    },
+    {
+      "cell_id": "ga-backfill-20260522-215638-medium-000021-SIM-robot-app-semantics-conformance--device-bound-agent-physical-effect--openai-gpt-5.4-medium",
+      "sim_id": "SIM-robot-app-semantics-conformance",
+      "scenario_id": "device-bound-agent-physical-effect",
+      "model_id": "openai-gpt-5.4-medium",
+      "result_path": "results/SIM-robot-app-semantics-conformance/device-bound-agent-physical-effect/openai-gpt-5.4-medium/20260523-045646.json",
+      "status": "done",
+      "attempts": 2,
+      "validation_message": "validated result",
+      "updated_at": "2026-05-23T05:05:38Z",
+      "provider": "openai",
+      "api_model": "gpt-5.4",
+      "reasoning_effort": "medium",
+      "service_tier": "default",
+      "served_service_tier": "default",
+      "request_id": "req_8164e49e3c4b42b19527c210aff6b88a",
+      "response_id": "resp_0171c681a0c0cf8e006a1135823400819a849c6348c4b3d270",
+      "usage_json": "{\"input_tokens\":7142,\"input_tokens_details\":{\"cached_tokens\":0},\"output_tokens\":2215,\"output_tokens_details\":{\"reasoning_tokens\":1814},\"total_tokens\":9357}",
+      "input_tokens": 7142,
+      "output_tokens": 2215,
+      "cost_usd": 0.0435085
+    },
+    {
+      "cell_id": "ga-backfill-20260522-215638-medium-000022-SIM-robot-app-semantics-conformance--kernel-porting-boundary--openai-gpt-5.4-medium",
+      "sim_id": "SIM-robot-app-semantics-conformance",
+      "scenario_id": "kernel-porting-boundary",
+      "model_id": "openai-gpt-5.4-medium",
+      "result_path": "results/SIM-robot-app-semantics-conformance/kernel-porting-boundary/openai-gpt-5.4-medium/20260523-045646.json",
+      "status": "done",
+      "attempts": 2,
+      "validation_message": "validated result",
+      "updated_at": "2026-05-23T05:05:59Z",
+      "provider": "openai",
+      "api_model": "gpt-5.4",
+      "reasoning_effort": "medium",
+      "service_tier": "default",
+      "served_service_tier": "default",
+      "request_id": "req_9a49aab63a404b3b9b60a8ee58c2cba0",
+      "response_id": "resp_09ad6a6115e18f3f006a1135a2552c819ab016f167e9fae8a3",
+      "usage_json": "{\"input_tokens\":7116,\"input_tokens_details\":{\"cached_tokens\":0},\"output_tokens\":1434,\"output_tokens_details\":{\"reasoning_tokens\":1026},\"total_tokens\":8550}",
+      "input_tokens": 7116,
+      "output_tokens": 1434,
+      "cost_usd": 0.032529
+    },
+    {
+      "cell_id": "ga-backfill-20260522-215638-medium-000023-SIM-robot-app-semantics-conformance--kernel-porting-boundary--openai-gpt-5.4-medium",
+      "sim_id": "SIM-robot-app-semantics-conformance",
+      "scenario_id": "kernel-porting-boundary",
+      "model_id": "openai-gpt-5.4-medium",
+      "result_path": "results/SIM-robot-app-semantics-conformance/kernel-porting-boundary/openai-gpt-5.4-medium/20260523-045646.json",
+      "status": "done",
+      "attempts": 2,
+      "validation_message": "validated result",
+      "updated_at": "2026-05-23T05:06:18Z",
+      "provider": "openai",
+      "api_model": "gpt-5.4",
+      "reasoning_effort": "medium",
+      "service_tier": "default",
+      "served_service_tier": "default",
+      "request_id": "req_e4cf55c5fd9545eb8d1bd8255724b4c4",
+      "response_id": "resp_0234895d4effc81b006a1135b74c40819bb8532ee48496962c",
+      "usage_json": "{\"input_tokens\":7116,\"input_tokens_details\":{\"cached_tokens\":0},\"output_tokens\":1360,\"output_tokens_details\":{\"reasoning_tokens\":917},\"total_tokens\":8476}",
+      "input_tokens": 7116,
+      "output_tokens": 1360,
+      "cost_usd": 0.031493
+    },
+    {
+      "cell_id": "ga-backfill-20260522-215638-medium-000024-SIM-robot-app-semantics-conformance--kernel-porting-boundary--openai-gpt-5.4-medium",
+      "sim_id": "SIM-robot-app-semantics-conformance",
+      "scenario_id": "kernel-porting-boundary",
+      "model_id": "openai-gpt-5.4-medium",
+      "result_path": "results/SIM-robot-app-semantics-conformance/kernel-porting-boundary/openai-gpt-5.4-medium/20260523-045646.json",
+      "status": "done",
+      "attempts": 2,
+      "validation_message": "validated result",
+      "updated_at": "2026-05-23T05:06:41Z",
+      "provider": "openai",
+      "api_model": "gpt-5.4",
+      "reasoning_effort": "medium",
+      "service_tier": "default",
+      "served_service_tier": "default",
+      "request_id": "req_c732704f07e548dc929246ee86e8631a",
+      "response_id": "resp_002f8370e27e2206006a1135cac7288198a282d3503f2b6d3a",
+      "usage_json": "{\"input_tokens\":7116,\"input_tokens_details\":{\"cached_tokens\":0},\"output_tokens\":1421,\"output_tokens_details\":{\"reasoning_tokens\":1019},\"total_tokens\":8537}",
+      "input_tokens": 7116,
+      "output_tokens": 1421,
+      "cost_usd": 0.032347
+    },
+    {
+      "cell_id": "ga-backfill-20260522-215638-medium-000025-SIM-robot-app-semantics-conformance--live-crdt-audit-publication--openai-gpt-5.4-medium",
+      "sim_id": "SIM-robot-app-semantics-conformance",
+      "scenario_id": "live-crdt-audit-publication",
+      "model_id": "openai-gpt-5.4-medium",
+      "result_path": "results/SIM-robot-app-semantics-conformance/live-crdt-audit-publication/openai-gpt-5.4-medium/20260523-045646.json",
+      "status": "done",
+      "attempts": 2,
+      "validation_message": "validated result",
+      "updated_at": "2026-05-23T05:06:59Z",
+      "provider": "openai",
+      "api_model": "gpt-5.4",
+      "reasoning_effort": "medium",
+      "service_tier": "default",
+      "served_service_tier": "default",
+      "request_id": "req_14a54cdb937c4851a76bd9d11bbcc512",
+      "response_id": "resp_06389fb64b57d801006a1135e1bcb4819ba64c4b405a24554e",
+      "usage_json": "{\"input_tokens\":7141,\"input_tokens_details\":{\"cached_tokens\":0},\"output_tokens\":1158,\"output_tokens_details\":{\"reasoning_tokens\":751},\"total_tokens\":8299}",
+      "input_tokens": 7141,
+      "output_tokens": 1158,
+      "cost_usd": 0.02870875
+    },
+    {
+      "cell_id": "ga-backfill-20260522-215638-medium-000026-SIM-robot-app-semantics-conformance--live-crdt-audit-publication--openai-gpt-5.4-medium",
+      "sim_id": "SIM-robot-app-semantics-conformance",
+      "scenario_id": "live-crdt-audit-publication",
+      "model_id": "openai-gpt-5.4-medium",
+      "result_path": "results/SIM-robot-app-semantics-conformance/live-crdt-audit-publication/openai-gpt-5.4-medium/20260523-045646.json",
+      "status": "done",
+      "attempts": 2,
+      "validation_message": "validated result",
+      "updated_at": "2026-05-23T05:07:25Z",
+      "provider": "openai",
+      "api_model": "gpt-5.4",
+      "reasoning_effort": "medium",
+      "service_tier": "default",
+      "served_service_tier": "default",
+      "request_id": "req_5be271ae4800413586741df7d6da0d77",
+      "response_id": "resp_0c91382e3f17010b006a1135f55290819a9c506102454e40db",
+      "usage_json": "{\"input_tokens\":7141,\"input_tokens_details\":{\"cached_tokens\":0},\"output_tokens\":1422,\"output_tokens_details\":{\"reasoning_tokens\":1034},\"total_tokens\":8563}",
+      "input_tokens": 7141,
+      "output_tokens": 1422,
+      "cost_usd": 0.03240475
+    },
+    {
+      "cell_id": "ga-backfill-20260522-215638-medium-000027-SIM-robot-app-semantics-conformance--live-crdt-audit-publication--openai-gpt-5.4-medium",
+      "sim_id": "SIM-robot-app-semantics-conformance",
+      "scenario_id": "live-crdt-audit-publication",
+      "model_id": "openai-gpt-5.4-medium",
+      "result_path": "results/SIM-robot-app-semantics-conformance/live-crdt-audit-publication/openai-gpt-5.4-medium/20260523-045646.json",
+      "status": "done",
+      "attempts": 2,
+      "validation_message": "validated result",
+      "updated_at": "2026-05-23T05:07:42Z",
+      "provider": "openai",
+      "api_model": "gpt-5.4",
+      "reasoning_effort": "medium",
+      "service_tier": "default",
+      "served_service_tier": "default",
+      "request_id": "req_dabcd56dd77243f686a56b3137b6fce8",
+      "response_id": "resp_0f7ef6e9467d7565006a11360d9e3c8198bf0854855c64d29d",
+      "usage_json": "{\"input_tokens\":7141,\"input_tokens_details\":{\"cached_tokens\":0},\"output_tokens\":1186,\"output_tokens_details\":{\"reasoning_tokens\":847},\"total_tokens\":8327}",
+      "input_tokens": 7141,
+      "output_tokens": 1186,
+      "cost_usd": 0.02910075
+    },
+    {
+      "cell_id": "ga-backfill-20260522-215638-medium-000028-SIM-robot-app-semantics-conformance--minimal-immutable-blob-app--openai-gpt-5.4-medium",
+      "sim_id": "SIM-robot-app-semantics-conformance",
+      "scenario_id": "minimal-immutable-blob-app",
+      "model_id": "openai-gpt-5.4-medium",
+      "result_path": "results/SIM-robot-app-semantics-conformance/minimal-immutable-blob-app/openai-gpt-5.4-medium/20260523-045646.json",
+      "status": "done",
+      "attempts": 2,
+      "validation_message": "validated result",
+      "updated_at": "2026-05-23T05:08:05Z",
+      "provider": "openai",
+      "api_model": "gpt-5.4",
+      "reasoning_effort": "medium",
+      "service_tier": "default",
+      "served_service_tier": "default",
+      "request_id": "req_600989b023434e20882fca57f0f5859c",
+      "response_id": "resp_0fb06cb531078b29006a11361f0ac0819b93a725e58219b51e",
+      "usage_json": "{\"input_tokens\":7130,\"input_tokens_details\":{\"cached_tokens\":0},\"output_tokens\":1431,\"output_tokens_details\":{\"reasoning_tokens\":1034},\"total_tokens\":8561}",
+      "input_tokens": 7130,
+      "output_tokens": 1431,
+      "cost_usd": 0.0325115
+    },
+    {
+      "cell_id": "ga-backfill-20260522-215638-medium-000029-SIM-robot-app-semantics-conformance--minimal-immutable-blob-app--openai-gpt-5.4-medium",
+      "sim_id": "SIM-robot-app-semantics-conformance",
+      "scenario_id": "minimal-immutable-blob-app",
+      "model_id": "openai-gpt-5.4-medium",
+      "result_path": "results/SIM-robot-app-semantics-conformance/minimal-immutable-blob-app/openai-gpt-5.4-medium/20260523-045646.json",
+      "status": "done",
+      "attempts": 2,
+      "validation_message": "validated result",
+      "updated_at": "2026-05-23T05:08:26Z",
+      "provider": "openai",
+      "api_model": "gpt-5.4",
+      "reasoning_effort": "medium",
+      "service_tier": "default",
+      "served_service_tier": "default",
+      "request_id": "req_52774930a2b14440b0580bead9e7e61c",
+      "response_id": "resp_0ae9fc245d3162e0006a113635afc4819a958dce714ed718a4",
+      "usage_json": "{\"input_tokens\":7130,\"input_tokens_details\":{\"cached_tokens\":0},\"output_tokens\":1463,\"output_tokens_details\":{\"reasoning_tokens\":1017},\"total_tokens\":8593}",
+      "input_tokens": 7130,
+      "output_tokens": 1463,
+      "cost_usd": 0.0329595
+    },
+    {
+      "cell_id": "ga-backfill-20260522-215638-medium-000030-SIM-robot-app-semantics-conformance--minimal-immutable-blob-app--openai-gpt-5.4-medium",
+      "sim_id": "SIM-robot-app-semantics-conformance",
+      "scenario_id": "minimal-immutable-blob-app",
+      "model_id": "openai-gpt-5.4-medium",
+      "result_path": "results/SIM-robot-app-semantics-conformance/minimal-immutable-blob-app/openai-gpt-5.4-medium/20260523-045646.json",
+      "status": "done",
+      "attempts": 2,
+      "validation_message": "validated result",
+      "updated_at": "2026-05-23T05:09:02Z",
+      "provider": "openai",
+      "api_model": "gpt-5.4",
+      "reasoning_effort": "medium",
+      "service_tier": "default",
+      "served_service_tier": "default",
+      "request_id": "req_1aa7ce5b7c74468abb43c7090cef1c58",
+      "response_id": "resp_01ab88772427001a006a11364a2b208199904fae9f55f25819",
+      "usage_json": "{\"input_tokens\":7130,\"input_tokens_details\":{\"cached_tokens\":0},\"output_tokens\":2319,\"output_tokens_details\":{\"reasoning_tokens\":1948},\"total_tokens\":9449}",
+      "input_tokens": 7130,
+      "output_tokens": 2319,
+      "cost_usd": 0.0449435
+    },
+    {
+      "cell_id": "ga-backfill-20260522-215638-medium-000031-SIM-robot-app-semantics-conformance--multi-embodiment-app-identity--openai-gpt-5.4-medium",
+      "sim_id": "SIM-robot-app-semantics-conformance",
+      "scenario_id": "multi-embodiment-app-identity",
+      "model_id": "openai-gpt-5.4-medium",
+      "result_path": "results/SIM-robot-app-semantics-conformance/multi-embodiment-app-identity/openai-gpt-5.4-medium/20260523-045646.json",
+      "status": "done",
+      "attempts": 2,
+      "validation_message": "validated result",
+      "updated_at": "2026-05-23T05:09:32Z",
+      "provider": "openai",
+      "api_model": "gpt-5.4",
+      "reasoning_effort": "medium",
+      "service_tier": "default",
+      "served_service_tier": "default",
+      "request_id": "req_8c0662459f984061bb45936cf9040601",
+      "response_id": "resp_0befe3c484fc7064006a11366ecea88198a45dc50c2afd8d4e",
+      "usage_json": "{\"input_tokens\":7120,\"input_tokens_details\":{\"cached_tokens\":0},\"output_tokens\":1989,\"output_tokens_details\":{\"reasoning_tokens\":1620},\"total_tokens\":9109}",
+      "input_tokens": 7120,
+      "output_tokens": 1989,
+      "cost_usd": 0.040306
+    },
+    {
+      "cell_id": "ga-backfill-20260522-215638-medium-000032-SIM-robot-app-semantics-conformance--multi-embodiment-app-identity--openai-gpt-5.4-medium",
+      "sim_id": "SIM-robot-app-semantics-conformance",
+      "scenario_id": "multi-embodiment-app-identity",
+      "model_id": "openai-gpt-5.4-medium",
+      "result_path": "results/SIM-robot-app-semantics-conformance/multi-embodiment-app-identity/openai-gpt-5.4-medium/20260523-045646.json",
+      "status": "done",
+      "attempts": 2,
+      "validation_message": "validated result",
+      "updated_at": "2026-05-23T05:09:52Z",
+      "provider": "openai",
+      "api_model": "gpt-5.4",
+      "reasoning_effort": "medium",
+      "service_tier": "default",
+      "served_service_tier": "default",
+      "request_id": "req_a80cc47e4b8f4e7f8247b79f90620cdb",
+      "response_id": "resp_0e74af5c748761d7006a11368c2a208198b4fdaa19e951b846",
+      "usage_json": "{\"input_tokens\":7120,\"input_tokens_details\":{\"cached_tokens\":0},\"output_tokens\":1451,\"output_tokens_details\":{\"reasoning_tokens\":1015},\"total_tokens\":8571}",
+      "input_tokens": 7120,
+      "output_tokens": 1451,
+      "cost_usd": 0.032774
+    },
+    {
+      "cell_id": "ga-backfill-20260522-215638-medium-000033-SIM-robot-app-semantics-conformance--multi-embodiment-app-identity--openai-gpt-5.4-medium",
+      "sim_id": "SIM-robot-app-semantics-conformance",
+      "scenario_id": "multi-embodiment-app-identity",
+      "model_id": "openai-gpt-5.4-medium",
+      "result_path": "results/SIM-robot-app-semantics-conformance/multi-embodiment-app-identity/openai-gpt-5.4-medium/20260523-045646.json",
+      "status": "done",
+      "attempts": 2,
+      "validation_message": "validated result",
+      "updated_at": "2026-05-23T05:10:12Z",
+      "provider": "openai",
+      "api_model": "gpt-5.4",
+      "reasoning_effort": "medium",
+      "service_tier": "default",
+      "served_service_tier": "default",
+      "request_id": "req_6a5caa2713d746d69f97b5f6204c1697",
+      "response_id": "resp_076d3d4e632c7368006a1136a0b380819bb8a332ec0d7c8491",
+      "usage_json": "{\"input_tokens\":7120,\"input_tokens_details\":{\"cached_tokens\":0},\"output_tokens\":1389,\"output_tokens_details\":{\"reasoning_tokens\":989},\"total_tokens\":8509}",
+      "input_tokens": 7120,
+      "output_tokens": 1389,
+      "cost_usd": 0.031906
+    },
+    {
+      "cell_id": "ga-backfill-20260522-215638-medium-000034-SIM-robot-app-semantics-conformance--portable-signing-key-identity--openai-gpt-5.4-medium",
+      "sim_id": "SIM-robot-app-semantics-conformance",
+      "scenario_id": "portable-signing-key-identity",
+      "model_id": "openai-gpt-5.4-medium",
+      "result_path": "results/SIM-robot-app-semantics-conformance/portable-signing-key-identity/openai-gpt-5.4-medium/20260523-045646.json",
+      "status": "done",
+      "attempts": 2,
+      "validation_message": "validated result",
+      "updated_at": "2026-05-23T05:10:30Z",
+      "provider": "openai",
+      "api_model": "gpt-5.4",
+      "reasoning_effort": "medium",
+      "service_tier": "default",
+      "served_service_tier": "default",
+      "request_id": "req_f4eccb88a6ce47f7aa3edb6183b07ad4",
+      "response_id": "resp_0899d3e788049dba006a1136b4a450819882a31e3e8595f83d",
+      "usage_json": "{\"input_tokens\":7100,\"input_tokens_details\":{\"cached_tokens\":0},\"output_tokens\":1173,\"output_tokens_details\":{\"reasoning_tokens\":800},\"total_tokens\":8273}",
+      "input_tokens": 7100,
+      "output_tokens": 1173,
+      "cost_usd": 0.028847
+    },
+    {
+      "cell_id": "ga-backfill-20260522-215638-medium-000035-SIM-robot-app-semantics-conformance--portable-signing-key-identity--openai-gpt-5.4-medium",
+      "sim_id": "SIM-robot-app-semantics-conformance",
+      "scenario_id": "portable-signing-key-identity",
+      "model_id": "openai-gpt-5.4-medium",
+      "result_path": "results/SIM-robot-app-semantics-conformance/portable-signing-key-identity/openai-gpt-5.4-medium/20260523-045646.json",
+      "status": "done",
+      "attempts": 2,
+      "validation_message": "validated result",
+      "updated_at": "2026-05-23T05:11:19Z",
+      "provider": "openai",
+      "api_model": "gpt-5.4",
+      "reasoning_effort": "medium",
+      "service_tier": "default",
+      "served_service_tier": "default",
+      "request_id": "req_93ee14fd0f204888bf7714f3ba3d80bf",
+      "response_id": "resp_0175dac9f0621990006a1136c6223c819bbd19ada1c7d57d97",
+      "usage_json": "{\"input_tokens\":7100,\"input_tokens_details\":{\"cached_tokens\":0},\"output_tokens\":3128,\"output_tokens_details\":{\"reasoning_tokens\":2746},\"total_tokens\":10228}",
+      "input_tokens": 7100,
+      "output_tokens": 3128,
+      "cost_usd": 0.056217
+    },
+    {
+      "cell_id": "ga-backfill-20260522-215638-medium-000036-SIM-robot-app-semantics-conformance--portable-signing-key-identity--openai-gpt-5.4-medium",
+      "sim_id": "SIM-robot-app-semantics-conformance",
+      "scenario_id": "portable-signing-key-identity",
+      "model_id": "openai-gpt-5.4-medium",
+      "result_path": "results/SIM-robot-app-semantics-conformance/portable-signing-key-identity/openai-gpt-5.4-medium/20260523-045646.json",
+      "status": "done",
+      "attempts": 2,
+      "validation_message": "validated result",
+      "updated_at": "2026-05-23T05:11:41Z",
+      "provider": "openai",
+      "api_model": "gpt-5.4",
+      "reasoning_effort": "medium",
+      "service_tier": "default",
+      "served_service_tier": "default",
+      "request_id": "req_977fcd96d45d4df29046ffc264cbb6e2",
+      "response_id": "resp_016c7c281ca8a632006a1136f80d44819ab1373465773e1988",
+      "usage_json": "{\"input_tokens\":7100,\"input_tokens_details\":{\"cached_tokens\":0},\"output_tokens\":1478,\"output_tokens_details\":{\"reasoning_tokens\":1034},\"total_tokens\":8578}",
+      "input_tokens": 7100,
+      "output_tokens": 1478,
+      "cost_usd": 0.033117
+    }
+  ]
+}

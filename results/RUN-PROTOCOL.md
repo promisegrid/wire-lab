@@ -240,6 +240,8 @@ Use `tools/ga-runner` for JSON-fitness GA/search work. Implemented commands are:
   `cd tools/ga-runner && go run . audit -repo-root ../..`
 - Create a targeted rubric-v2 backfill state from canonical v1 evidence:
   `cd tools/ga-runner && go run . backfill-init -repo-root ../.. -run-group-id <run-group-id>`
+  Optional staged override for honest multi-stage rescoring:
+  `cd tools/ga-runner && go run . backfill-init -repo-root ../.. -run-group-id <run-group-id> -staged-model-id openai-gpt-5.4-high -staged-reasoning-effort high`
 - Preview tracked population and conservative generation sizing:
   `cd tools/ga-runner && go run . init -repo-root ../.. -dry-run -model <model-id> -run-group-id <run-group-id>`
 - Create state for one GA/search generation:
@@ -264,7 +266,18 @@ artifacts under `proposals/` until that path is locked. The detailed operator
 procedure is `tools/ga-runner/PROMOTION.md`, used when Steve says
 `promote <child-proquint> ...`. Source: `DI-ramar`; `DI-zanon`; `DI-zohal`;
 `DI-zusit`; `DI-podot`; `DI-kofil`; `DI-ruzaj`; `DI-gijom`; `DI-fihof`;
-`DI-lirat`; `DI-dikoh`; `DI-zadik`; `DI-higot`; `DI-roruj`.
+`DI-lirat`; `DI-dikoh`; `DI-zadik`; `DI-higot`; `DI-roruj`; `DI-hijub`.
+
+`backfill-init` preserves historical source model lineage by default. When a
+targeted rerun must score under a new model ID or reasoning default, pass
+`-staged-model-id` and optionally `-staged-reasoning-effort`. The emitted
+state, planned cell `model_id`, result directories, and derived provider
+`api_model` then match the new stage instead of reusing historical lineage from
+the source evidence. Source: `DI-hijub`.
+
+Broad GA parent scoring now defaults to `medium` reasoning effort. Use `xhigh`
+explicitly for tie-breaks, promotion candidates, and design-state-sensitive
+comparisons where the extra cost is justified. Source: `DI-nanor`.
 
 Audit-first rubric-v2 backfill should compare historical source hashes against
 current sim/scenario bytes while reporting root-contract drift separately. This
@@ -293,6 +306,13 @@ Source: `DI-dilaf`.
    reasoning effort, or estimate-only output-token budgets.
 5. Review drift/comparison report.
 6. Run the full manifest only with an explicit budget. Source: `DI-nugiv`.
+
+For audit-first rubric-v2 rescoring, the comparison report is a derived Markdown
+artifact under `results/reports/<run-group-id>-comparison.md`. It compares each
+completed v2 backfill cell against the latest exact-match canonical
+`promisegrid.ga.result.v1` record for the same `sim_id` + `scenario_id`,
+preferring the same `runner.api_model` when available, and summarizes sim-rank
+drift plus large per-cell deltas before any broader rerun. Source: `DI-zuzup`.
 
 ## Unattended Full-Run Shape
 

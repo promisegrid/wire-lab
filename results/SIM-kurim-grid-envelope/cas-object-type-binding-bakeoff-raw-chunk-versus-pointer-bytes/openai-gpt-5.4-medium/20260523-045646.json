@@ -1,0 +1,134 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-kurim-grid-envelope-cas-object-type-binding-bakeoff-raw-chunk-versus-pointer-bytes-openai-gpt-5.4-medium-20260523-045646",
+  "run_group_id": "ga-backfill-20260522-215638-medium",
+  "cell_id": "ga-backfill-20260522-215638-medium-000006-SIM-kurim-grid-envelope--cas-object-type-binding-bakeoff-raw-chunk-versus-pointer-bytes--openai-gpt-5.4-medium",
+  "sim_id": "SIM-kurim-grid-envelope",
+  "scenario_id": "cas-object-type-binding-bakeoff-raw-chunk-versus-pointer-bytes",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-045646",
+  "result_path": "results/SIM-kurim-grid-envelope/cas-object-type-binding-bakeoff-raw-chunk-versus-pointer-bytes/openai-gpt-5.4-medium/20260523-045646.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_31915599841f4d83a0d66b48d6aa86ee",
+    "response_id": "resp_010f8a517a7a41cb006a113437694c819ba0cc85f9630355e5",
+    "input_tokens": 11227,
+    "output_tokens": 1283,
+    "cost_usd": 0.03760925
+  },
+  "source": {
+    "repo_commit": "a45211091e3039cfe3801d0b54f83cf5c530847e",
+    "sim_path": "simulations/SIM-kurim-grid-envelope/",
+    "scenario_path": "scenarios/cas-object-type-binding-bakeoff-raw-chunk-versus-pointer-bytes/cas-object-type-binding-bakeoff-raw-chunk-versus-pointer-bytes.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "c2e3d08afc5d6a4bfcd002888ecd18e348728e843cd8180635313d486f07e023"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-kurim-grid-envelope/README.md",
+        "sha256": "ecf4614b85b76dbd404c91a600561e3bfad4212ad853447fa0a56734c9630ef6"
+      },
+      {
+        "path": "simulations/SIM-kurim-grid-envelope/QUESTION.md",
+        "sha256": "dc716719f8bf916d1cda5da020ea0ce6cfd3ef5221e85a9b41dd81537664c7a4"
+      },
+      {
+        "path": "simulations/SIM-kurim-grid-envelope/TODO/TODO-tujad-grid-envelope-successor-owner.md",
+        "sha256": "e246e1fa25fbe51f550922af92665ad8bff25022fdcb3643e118285eca6d40bc"
+      },
+      {
+        "path": "simulations/SIM-kurim-grid-envelope/TODO/TODO.md",
+        "sha256": "68d0fff548e0489d1114c0c490788bf9d8d7be9fd769296e73749b0fbf610840"
+      },
+      {
+        "path": "simulations/SIM-kurim-grid-envelope/seed/extraction-sources.md",
+        "sha256": "444042ace58bed35b22df66c65e76a195418e76ec50dab3b25afee077ddfb08d"
+      },
+      {
+        "path": "scenarios/cas-object-type-binding-bakeoff-raw-chunk-versus-pointer-bytes/cas-object-type-binding-bakeoff-raw-chunk-versus-pointer-bytes.md",
+        "sha256": "64da602a38c041eeed6075a84c4c46c3d4448cbf21381eb803382aae0aec4018"
+      }
+    ],
+    "simulation_tree_hash": "f644f1f7130016bc26b62e903e784a948f962727c347009162f6b29dcc18e6e2"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 4,
+    "auditability": 4,
+    "evolution_safety": 5,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 2,
+    "implementation_plausibility": 3,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 4,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 32,
+    "normalized_0_100": 64,
+    "confidence_0_1": 0.79
+  },
+  "assessment": {
+    "rationale": "The simulation is a clear, audit-friendly parent inventory for grid-envelope candidates, and its `grid([pcid,payload])` hypothesis gives an explicit type-binding layer that helps avoid filename-dependent interpretation. But this cell is not a direct CAS object-type-binding design: it does not squarely answer whether CID codec identity alone distinguishes raw bytes from pointer objects, and many decisive behaviors are intentionally deferred to child variants.",
+    "strengths": [
+      "Explicit envelope/type-binding hypothesis instead of local-path reliance",
+      "Strong documentation of scope, lineage, and unresolved questions",
+      "Good separation between outer envelope and pCID-defined payload semantics",
+      "Evolution-friendly because alternatives remain runnable rather than prematurely frozen"
+    ],
+    "weaknesses": [
+      "Only indirectly addresses the raw-chunk-versus-pointer-bytes scenario",
+      "Parent seed is not a concrete protocol specimen with settled behavior",
+      "Unknown-pCID and signature handling are deferred rather than specified here",
+      "Promise wording is not strongly promise-first or payload-promise oriented"
+    ],
+    "risks": [
+      "Envelope-level typing may be mistaken for solving CAS object typing when the scenario asks about object bytes themselves",
+      "Unsettled serialization, signing, and recursion rules could undermine durable interoperability",
+      "Variant proliferation without a chosen specimen can delay operational clarity"
+    ],
+    "open_questions": [
+      "Should object type be conveyed by CID codec, by outer pCID, or by a nested payload contract?",
+      "If bytes arrive without filename or context, what exact local evidence lets Bob distinguish raw payload from pointer object?",
+      "Which child variant, if any, preserves opaque transport while remaining auditable and durable?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

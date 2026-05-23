@@ -393,6 +393,8 @@ func runBackfillInit(args []string, stdout io.Writer) error {
 	runGroupID := fs.String("run-group-id", "", "run group ID for the targeted v2 backfill state")
 	timestamp := fs.String("timestamp", "", "UTC result timestamp in YYYYMMDD-HHMMSS; defaults to current UTC time")
 	model := fs.String("model", "", "optional canonical source result model filter")
+	stagedModelID := fs.String("staged-model-id", "", "optional model ID override for the new v2 backfill state, for example openai-gpt-5.4-high")
+	stagedReasoningEffort := fs.String("staged-reasoning-effort", "", "optional reasoning effort override for the new v2 backfill state, for example high")
 	cleanEnvelopeCount := fs.Int("clean-envelope-count", defaultBackfillCleanEnvelopeCount, "number of clean grid-envelope sims to keep as calibration targets")
 	if err := fs.Parse(args); err != nil {
 		return err
@@ -428,7 +430,10 @@ func runBackfillInit(args []string, stdout io.Writer) error {
 	if err != nil {
 		return err
 	}
-	state, err := stateFromBackfillSelection(repo, *runGroupID, *timestamp, population, selection)
+	state, err := stateFromBackfillSelection(repo, *runGroupID, *timestamp, population, selection, backfillStateOverrides{
+		StagedModelID:         strings.TrimSpace(*stagedModelID),
+		StagedReasoningEffort: strings.TrimSpace(*stagedReasoningEffort),
+	})
 	if err != nil {
 		return err
 	}
@@ -449,10 +454,19 @@ func runBackfillInit(args []string, stdout io.Writer) error {
 	return nil
 }
 
+type backfillStateOverrides struct {
+	StagedModelID         string
+	StagedReasoningEffort string
+}
+
 // Intent: Materialize a fresh GA state from audited historical results without
 // mutating any v1 scored artifact, so targeted rubric-v2 rescoring starts from
-// additive evidence only. Source: DI-roruj
-func stateFromBackfillSelection(repo Repo, runGroupID string, timestamp string, population []PopulationSim, selection backfillSelection) (GAState, error) {
+// additive evidence only. When Steve wants a truthful staged rerun such as
+// `high` first and `xhigh` second, the override path must mint fresh model IDs,
+// result homes, and default reasoning effort in the new state instead of
+// reusing historical lineage strings from the source evidence. Source: DI-roruj;
+// DI-hijub
+func stateFromBackfillSelection(repo Repo, runGroupID string, timestamp string, population []PopulationSim, selection backfillSelection, overrides backfillStateOverrides) (GAState, error) {
 	now := time.Now().UTC().Format(time.RFC3339)
 	var statePopulation []GAStateSim
 	for _, sim := range population {
@@ -476,7 +490,11 @@ func stateFromBackfillSelection(repo Repo, runGroupID string, timestamp string, 
 	modelIDs := map[string]bool{}
 	for index, record := range selection.Records {
 		parentCounts[record.Result.SimID]++
-		modelIDs[record.Result.ModelID] = true
+		stagedModelID := record.Result.ModelID
+		if overrides.StagedModelID != "" {
+			stagedModelID = overrides.StagedModelID
+		}
+		modelIDs[stagedModelID] = true
 		if _, ok := scenarioByID[record.Result.ScenarioID]; !ok {
 			hash, err := sha256File(repo, record.Result.Source.ScenarioPath)
 			if err != nil {
@@ -489,17 +507,31 @@ func stateFromBackfillSelection(repo Repo, runGroupID string, timestamp string, 
 				SHA256:       hash,
 			}
 		}
-		resultPath := filepath.ToSlash(filepath.Join("results", record.Result.SimID, record.Result.ScenarioID, record.Result.ModelID, timestamp+".json"))
-		cell := newGACell(runGroupID, index+1, record.Result.SimID, record.Result.ScenarioID, record.Result.ModelID, resultPath)
+		resultPath := filepath.ToSlash(filepath.Join("results", record.Result.SimID, record.Result.ScenarioID, stagedModelID, timestamp+".json"))
+		cell := newGACell(runGroupID, index+1, record.Result.SimID, record.Result.ScenarioID, stagedModelID, resultPath)
 		cell.Provider = record.Result.Runner.Provider
 		if cell.Provider == "" {
 			cell.Provider = "openai"
 		}
+		// Intent: A staged backfill run needs an API model that matches the new
+		// model ID in the emitted result path, otherwise a `high` or `xhigh`
+		// rerun would write truthful JSON metadata into a misleading historical
+		// directory. Source: DI-hijub
 		cell.APIModel = record.Result.Runner.APIModel
-		if cell.APIModel == "" {
-			cell.APIModel = deriveAPIModelFromModelID(record.Result.ModelID)
+		if overrides.StagedModelID != "" {
+			cell.APIModel = deriveAPIModelFromModelID(stagedModelID)
 		}
+		if cell.APIModel == "" {
+			cell.APIModel = deriveAPIModelFromModelID(stagedModelID)
+		}
+		// Intent: Preserve historical effort by default, but let staged reruns
+		// declare a new default effort in the generated state so the operator can
+		// switch from, for example, `high` triage to `xhigh` tie-breaks without
+		// falsifying the planned cells. Source: DI-hijub
 		cell.ReasoningEffort = record.Result.Runner.ReasoningEffort
+		if overrides.StagedReasoningEffort != "" {
+			cell.ReasoningEffort = overrides.StagedReasoningEffort
+		}
 		if cell.ReasoningEffort == "" {
 			cell.ReasoningEffort = defaultScoreReasoningEffort
 		}

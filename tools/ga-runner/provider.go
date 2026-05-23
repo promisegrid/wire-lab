@@ -31,11 +31,12 @@ const (
 )
 
 const (
-	// Intent: Score operations keep the established high-reasoning comparison
-	// baseline, while child generation defaults lower because canary evidence
-	// showed xhigh child responses exhausting output caps on hidden reasoning.
-	// Source: DI-pulap
-	defaultScoreReasoningEffort    = "xhigh"
+	// Intent: Broad GA parent scoring now defaults to medium reasoning because
+	// the calibration slice matched xhigh ranking better than low or high while
+	// costing far less than xhigh. Child generation still defaults lower because
+	// earlier canary evidence showed xhigh child responses exhausting output caps
+	// on hidden reasoning. Source: DI-pulap; DI-nanor
+	defaultScoreReasoningEffort    = "medium"
 	defaultGenerateReasoningEffort = "medium"
 	defaultTextVerbosity           = "low"
 	textVerbosityLow               = "low"

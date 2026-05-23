@@ -1277,6 +1277,96 @@ Affects: `tools/ga-runner/result.go`; `tools/ga-runner/validate.go`;
 `results/RUN-PROTOCOL.md`;
 `protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`.
 
+ID: DI-hijub
+Date: 2026-05-22 20:23:22
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Let `backfill-init` optionally override the staged rescoring
+`model_id` and default `reasoning_effort` for the generated v2 state while
+preserving historical model lineage by default when no override is provided.
+This is the path for honest multi-stage rescoring such as a `high` first pass
+followed by an `xhigh` pass with distinct result paths and state files.
+Intent: Two-stage rescoring is useful, but the generated state/result paths must
+not keep historical `openai-gpt-5.4-xhigh` model IDs when a staged pass is
+actually being scored at `high` or another effort. Stage overrides need to be
+explicit, additive, and auditable.
+Constraints: Default behavior stays unchanged: preserve original model IDs and
+derived API models when no stage override is provided. Do not rewrite existing
+state or result files. Result paths, `cell.model_id`, and `state.model_id` must
+match the staged override when one is provided. `cell.api_model` should derive
+from the staged `model_id` unless explicitly overridden later by the scoring
+command.
+Affects: `tools/ga-runner/population.go`; `tools/ga-runner/ga_runner_test.go`;
+`tools/ga-runner/README.md`; `results/RUN-PROTOCOL.md`;
+`protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`.
+
+ID: DI-sirih
+Date: 2026-05-22 21:53:06
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Treat the 5-cell `gpt-5.4` reasoning-effort calibration as evidence
+that broad GA parent scoring should prefer `medium` by default, with `xhigh`
+reserved for tie-breaks, promotion candidates, and design-state-sensitive
+comparisons, but do not change runner defaults until that default-change choice
+is explicitly implemented.
+Intent: The calibration slice showed `medium` matching `xhigh` much better than
+`low` or `high` while costing far less than `xhigh`. Record the evidence now so
+the repo has a durable recommendation, without silently changing live runner
+behavior in the same step.
+Constraints: Calibration evidence is the 5-cell run-group family
+`ga-calib-20260523-033216-{low,medium,high,xhigh}` under `results/state/` and
+their matching result trees. Do not change `tools/ga-runner` defaults under this
+DI alone. A later explicit implementation step may update defaults or canary
+wrapper policy after review.
+Affects: `protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`;
+`results/state/ga-calib-20260523-033216-low.json`;
+`results/state/ga-calib-20260523-033216-medium.json`;
+`results/state/ga-calib-20260523-033216-high.json`;
+`results/state/ga-calib-20260523-033216-xhigh.json`.
+
+ID: DI-nanor
+Date: 2026-05-22 21:54:04
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Change the default GA parent scoring effort from `xhigh` to `medium`
+in `tools/ga-runner`, and change the canary wrapper's default scoring `model_id`
+to `openai-gpt-5.4-medium` so the emitted state/result lineage matches the new
+default. Keep `xhigh` as an explicit escalation path for tie-breaks, promotion
+candidates, and design-state-sensitive comparisons.
+Intent: The 5-cell calibration run showed `medium` matching the `xhigh` ranking
+materially better than `low` or `high` while costing far less than `xhigh`.
+Make the cheaper default real in runner behavior and keep the higher-effort path
+explicit rather than implicit.
+Constraints: Do not change child generation defaults. Do not remove `xhigh`
+support. Update code comments, docs, and default-expectation tests together so
+the new default is explicit and auditable.
+Affects: `tools/ga-runner/provider.go`; `tools/ga-runner/run-canary.sh`;
+`tools/ga-runner/README.md`; `tools/ga-runner/ga_runner_test.go`;
+`protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`.
+
+ID: DI-zuzup
+Date: 2026-05-22 22:18:11
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Add `ga-runner compare-backfill` to generate targeted rubric-v2
+v1-vs-v2 comparison reports. The command writes a derived Markdown report under
+`results/reports/<run-group-id>-comparison.md` by default and compares each
+completed v2 backfill cell against the latest exact-match canonical
+`promisegrid.ga.result.v1` result for the same `sim_id` + `scenario_id`,
+preferring the same `runner.api_model` when available.
+Intent: `tapur.36` needs a durable, reviewable artifact that shows whether the
+vocabulary-aware rubric actually changes rankings before broader rescoring is
+authorized.
+Constraints: Do not rewrite any scored artifact bytes. Treat the report as
+derived evidence only. Include sim-rank drift, family highlights for
+grid-envelope and conformance-family sims when present, and the largest
+per-cell score deltas. Report unmatched and ambiguous historical pairings
+instead of hiding them.
+Affects: `tools/ga-runner/main.go`; `tools/ga-runner/compare.go`;
+`tools/ga-runner/ga_runner_test.go`; `tools/ga-runner/README.md`;
+`results/RUN-PROTOCOL.md`;
+`protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`.
+
 ## Subtasks
 
 - [x] tapur.1 Define the canonical JSON fitness result schema, including source
@@ -1407,9 +1497,12 @@ Affects: `tools/ga-runner/result.go`; `tools/ga-runner/validate.go`;
 - [x] tapur.35 Add targeted backfill state initialization that writes a fresh
   `results/state/<run-group-id>.json` with queued v2 result paths and preserves
   original model IDs by default. Source: `DI-roruj`.
-- [ ] tapur.36 Add a v1-vs-v2 comparison report once targeted rubric-v2 results
+- [x] tapur.36 Add a v1-vs-v2 comparison report once targeted rubric-v2 results
   exist, with explicit rank-delta reporting for envelope contenders and the
-  claim/conformance family. Source: `DI-roruj`.
+  claim/conformance family. Implemented as `ga-runner compare-backfill` under
+  `DI-zuzup`; the first report is
+  `results/reports/ga-backfill-20260522-215638-medium-comparison.md`. Source:
+  `DI-roruj`; `DI-zuzup`.
 - [x] tapur.37 Update surrounding GA-runner docs so operators can see the v1/v2
   coexistence contract, the new `audit` / `backfill-init` commands, and the
   targeted-backfill-first policy. Source: `DI-roruj`.
@@ -1422,6 +1515,14 @@ Affects: `tools/ga-runner/result.go`; `tools/ga-runner/validate.go`;
   promoted results can use byte-identical canonical sim trees as audit fallback
   when historical proposal roots are gone, while unresolved sources stay
   non-exact instead of aborting the run. Source: `DI-zobur`.
+- [x] tapur.40 Add staged backfill model/effort overrides so multi-stage rescoring
+  can emit truthful state/result-path model IDs instead of reusing the
+  historical model lineage strings when a new stage intentionally changes
+  effort. Source: `DI-hijub`.
+- [x] tapur.41 Change the default GA parent scoring effort from `xhigh` to
+  `medium`, using calibration evidence from
+  `ga-calib-20260523-033216-{low,medium,high,xhigh}` and keeping `xhigh` as the
+  explicit escalation path for tie-breaks and promotions. Source: `DI-nanor`.
 
 ## Predecessor context
 

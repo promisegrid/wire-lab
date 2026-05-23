@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -698,6 +699,146 @@ func TestRunBackfillInitWritesTargetedState(t *testing.T) {
 	}
 	if !strings.HasSuffix(state.Cells[0].ResultPath, "20260522-130000.json") {
 		t.Fatalf("backfill result path = %q, want new timestamp", state.Cells[0].ResultPath)
+	}
+}
+
+func TestRunBackfillInitAppliesStagedModelAndEffortOverrides(t *testing.T) {
+	repo := newGAFixtureRepo(t)
+	writeTestFile(t, repo.Path("simulations", "SIM-claim-card-target", "README.md"), "# Claim Card\n\nThis sim still talks about a claim card artifact.\n")
+	writeTestFile(t, repo.Path("simulations", "SIM-claim-card-target", "QUESTION.md"), "# Questions\n\nCan Alice and Bob simplify this?\n")
+	gitAdd(t, repo,
+		"simulations/SIM-claim-card-target/README.md",
+		"simulations/SIM-claim-card-target/QUESTION.md",
+	)
+	writeExactMatchV1Result(t, repo, "SIM-claim-card-target", "scenario-one", "openai-gpt-5.4-xhigh", "20260519-101500", 82)
+	var out strings.Builder
+	err := runMain([]string{
+		"ga-runner", "backfill-init",
+		"-repo-root", repo.Root,
+		"-run-group-id", "ga-backfill-high",
+		"-timestamp", "20260522-131000",
+		"-staged-model-id", "openai-gpt-5.4-high",
+		"-staged-reasoning-effort", "high",
+	}, &out, &out)
+	if err != nil {
+		t.Fatalf("backfill-init staged override: %v\n%s", err, out.String())
+	}
+	state := mustReadGAState(t, repo, "ga-backfill-high")
+	if state.ModelID != "openai-gpt-5.4-high" {
+		t.Fatalf("backfill state model_id = %q, want %q", state.ModelID, "openai-gpt-5.4-high")
+	}
+	if len(state.Cells) != 1 {
+		t.Fatalf("unexpected staged backfill cell count: %d", len(state.Cells))
+	}
+	cell := state.Cells[0]
+	if cell.ModelID != "openai-gpt-5.4-high" {
+		t.Fatalf("backfill cell model_id = %q, want %q", cell.ModelID, "openai-gpt-5.4-high")
+	}
+	if cell.APIModel != "gpt-5.4" {
+		t.Fatalf("backfill cell api_model = %q, want %q", cell.APIModel, "gpt-5.4")
+	}
+	if cell.ReasoningEffort != "high" {
+		t.Fatalf("backfill cell reasoning_effort = %q, want %q", cell.ReasoningEffort, "high")
+	}
+	if !strings.HasSuffix(cell.ResultPath, "/openai-gpt-5.4-high/20260522-131000.json") {
+		t.Fatalf("backfill result path = %q, want staged model/timestamp suffix", cell.ResultPath)
+	}
+}
+
+func TestCompareBackfillWritesReport(t *testing.T) {
+	repo := newGitTestRepo(t)
+	writeTestFile(t, repo.Path("results", "RUN-PROTOCOL.md"), "# Run Protocol\n\nScore cells as evidence.\n")
+	writeTestFile(t, repo.Path("scenarios", "README.md"), "# Scenarios\n\nUse 100-year PromiseGrid pressure.\n")
+	writeTestFile(t, repo.Path("scenarios", "scenario-one", "scenario-one.md"), "# Scenario One\n\nAlice asks Bob to ship labels with auditable promises.\n")
+	writeTestFile(t, repo.Path("simulations", "SIM-grid-envelope-clean", "README.md"), "# Grid Envelope\n\nAlice promises this payload meets the protocol specification referred to by this pCID.\n")
+	writeTestFile(t, repo.Path("simulations", "SIM-grid-envelope-clean", "QUESTION.md"), "# Questions\n\nCan Bob audit the payload promise?\n")
+	writeTestFile(t, repo.Path("simulations", "SIM-robot-app-semantics-conformance", "README.md"), "# App Semantics\n\nAlice promises this payload meets the protocol specification referred to by this pCID.\n")
+	writeTestFile(t, repo.Path("simulations", "SIM-robot-app-semantics-conformance", "QUESTION.md"), "# Questions\n\nCan Carol audit partial implementation promises?\n")
+	gitAdd(t, repo,
+		"results/RUN-PROTOCOL.md",
+		"scenarios/README.md",
+		"scenarios/scenario-one/scenario-one.md",
+		"simulations/SIM-grid-envelope-clean/README.md",
+		"simulations/SIM-grid-envelope-clean/QUESTION.md",
+		"simulations/SIM-robot-app-semantics-conformance/README.md",
+		"simulations/SIM-robot-app-semantics-conformance/QUESTION.md",
+	)
+	writeExactMatchV1Result(t, repo, "SIM-grid-envelope-clean", "scenario-one", "openai-gpt-5.4-xhigh", "20260519-101500", 91)
+	writeExactMatchV1Result(t, repo, "SIM-robot-app-semantics-conformance", "scenario-one", "openai-gpt-5.4-xhigh", "20260519-101501", 62)
+
+	v2APath := repo.Path("results", "SIM-grid-envelope-clean", "scenario-one", "openai-gpt-5.4-medium", "20260523-220000.json")
+	v2A := validResult(repo, v2APath)
+	v2A.Schema = resultSchemaV2
+	v2A.RunGroupID = "ga-backfill-medium"
+	v2A.CellID = "ga-backfill-medium-000001"
+	v2A.SimID = "SIM-grid-envelope-clean"
+	v2A.ScenarioID = "scenario-one"
+	v2A.ModelID = "openai-gpt-5.4-medium"
+	v2A.TimestampUTC = "20260523-220000"
+	v2A.ResultPath = repo.Rel(v2APath)
+	v2A.Runner.APIModel = "gpt-5.4"
+	v2A.Runner.ReasoningEffort = "medium"
+	v2A.Source.RepoCommit = repo.GitCommit()
+	v2A.Source.SimPath = "simulations/SIM-grid-envelope-clean/"
+	v2A.Source.ScenarioPath = "scenarios/scenario-one/scenario-one.md"
+	v2A.Source.RootContractPaths = []string{"results/RUN-PROTOCOL.md", "scenarios/README.md"}
+	v2A.Source.Files = buildExactMatchSourceFiles(t, repo, "SIM-grid-envelope-clean", "scenario-one")
+	v2A.Source.SimulationTreeHash = mustSimulationTreeHash(t, repo, "SIM-grid-envelope-clean")
+	v2A.Rubric.RubricVersion = rubricVersionV2
+	v2A.Rubric.Axes = rubricAxesV2
+	v2A.Scores.PromiseVocabulary = 5
+	v2A.Scores.SimplicityDurability = 4
+	v2A.Fitness.Normalized0To100 = 88
+	if err := writeFitnessResultAtomic(v2APath, v2A); err != nil {
+		t.Fatalf("write v2 result A: %v", err)
+	}
+
+	v2BPath := repo.Path("results", "SIM-robot-app-semantics-conformance", "scenario-one", "openai-gpt-5.4-medium", "20260523-220000.json")
+	v2B := v2A
+	v2B.ResultID = "SIM-robot-app-semantics-conformance-scenario-one-openai-gpt-5.4-medium-20260523-220000"
+	v2B.CellID = "ga-backfill-medium-000002"
+	v2B.SimID = "SIM-robot-app-semantics-conformance"
+	v2B.ResultPath = repo.Rel(v2BPath)
+	v2B.Source.SimPath = "simulations/SIM-robot-app-semantics-conformance/"
+	v2B.Source.Files = buildExactMatchSourceFiles(t, repo, "SIM-robot-app-semantics-conformance", "scenario-one")
+	v2B.Source.SimulationTreeHash = mustSimulationTreeHash(t, repo, "SIM-robot-app-semantics-conformance")
+	v2B.Fitness.Normalized0To100 = 70
+	if err := writeFitnessResultAtomic(v2BPath, v2B); err != nil {
+		t.Fatalf("write v2 result B: %v", err)
+	}
+
+	state := GAState{
+		Schema:     stateSchemaV1,
+		RunGroupID: "ga-backfill-medium",
+		Cells: []GACell{
+			{CellID: "ga-backfill-medium-000001", SimID: "SIM-grid-envelope-clean", ScenarioID: "scenario-one", ModelID: "openai-gpt-5.4-medium", ResultPath: repo.Rel(v2APath), Status: "done"},
+			{CellID: "ga-backfill-medium-000002", SimID: "SIM-robot-app-semantics-conformance", ScenarioID: "scenario-one", ModelID: "openai-gpt-5.4-medium", ResultPath: repo.Rel(v2BPath), Status: "done"},
+		},
+	}
+	writeTestState(t, repo, "ga-backfill-medium", state)
+
+	var out bytes.Buffer
+	err := runMain([]string{"ga-runner", "compare-backfill", "-repo-root", repo.Root, "-run-group-id", "ga-backfill-medium"}, &out, io.Discard)
+	if err != nil {
+		t.Fatalf("compare-backfill: %v\n%s", err, out.String())
+	}
+	if !strings.Contains(out.String(), "report=results/reports/ga-backfill-medium-comparison.md") {
+		t.Fatalf("compare output missing report path:\n%s", out.String())
+	}
+	reportPath := repo.Path("results", "reports", "ga-backfill-medium-comparison.md")
+	reportBytes, err := os.ReadFile(reportPath)
+	if err != nil {
+		t.Fatalf("read report: %v", err)
+	}
+	report := string(reportBytes)
+	if !strings.Contains(report, "# GA Backfill Comparison Report") {
+		t.Fatalf("missing report title:\n%s", report)
+	}
+	if !strings.Contains(report, "`SIM-grid-envelope-clean`") || !strings.Contains(report, "`SIM-robot-app-semantics-conformance`") {
+		t.Fatalf("missing sim detail in report:\n%s", report)
+	}
+	if !strings.Contains(report, "## Family Highlights") || !strings.Contains(report, "grid-envelope") || !strings.Contains(report, "conformance-family") {
+		t.Fatalf("missing family highlights:\n%s", report)
 	}
 }
 
@@ -2594,6 +2735,38 @@ func writePromotedCanonicalV1Result(t *testing.T, repo Repo, finalSimID string, 
 		t.Fatalf("write promoted canonical result: %v", err)
 	}
 	return path
+}
+
+func buildExactMatchSourceFiles(t *testing.T, repo Repo, simID string, scenarioID string) []SourceFile {
+	t.Helper()
+	sourcePaths := []string{
+		"results/RUN-PROTOCOL.md",
+		"scenarios/README.md",
+		filepath.ToSlash(filepath.Join("scenarios", scenarioID, scenarioID+".md")),
+		filepath.ToSlash(filepath.Join("simulations", simID, "README.md")),
+	}
+	questionPath := filepath.ToSlash(filepath.Join("simulations", simID, "QUESTION.md"))
+	if _, err := os.Stat(repo.Abs(questionPath)); err == nil {
+		sourcePaths = append(sourcePaths, questionPath)
+	}
+	var files []SourceFile
+	for _, sourcePath := range sourcePaths {
+		hash, err := sha256File(repo, sourcePath)
+		if err != nil {
+			t.Fatalf("hash source %s: %v", sourcePath, err)
+		}
+		files = append(files, SourceFile{Path: sourcePath, SHA256: hash})
+	}
+	return files
+}
+
+func mustSimulationTreeHash(t *testing.T, repo Repo, simID string) string {
+	t.Helper()
+	treeHash, err := currentSimulationTreeHash(repo, filepath.ToSlash(filepath.Join("simulations", simID)))
+	if err != nil {
+		t.Fatalf("sim tree hash: %v", err)
+	}
+	return treeHash
 }
 
 func mustJSON(t *testing.T, result FitnessResult) []byte {

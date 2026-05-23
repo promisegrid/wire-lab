@@ -1,0 +1,131 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-kurim-grid-envelope-bgp-class-routing-app-honest-reachability-promise-openai-gpt-5.4-medium-20260523-045646",
+  "run_group_id": "ga-backfill-20260522-215638-medium",
+  "cell_id": "ga-backfill-20260522-215638-medium-000002-SIM-kurim-grid-envelope--bgp-class-routing-app-honest-reachability-promise--openai-gpt-5.4-medium",
+  "sim_id": "SIM-kurim-grid-envelope",
+  "scenario_id": "bgp-class-routing-app-honest-reachability-promise",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-045646",
+  "result_path": "results/SIM-kurim-grid-envelope/bgp-class-routing-app-honest-reachability-promise/openai-gpt-5.4-medium/20260523-045646.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_e27fa66c8ebb489b8cc602c901c6bdf5",
+    "response_id": "resp_0a0864555a594e54006a1133d9ac20819983c060f60797213c",
+    "input_tokens": 11193,
+    "output_tokens": 1429,
+    "cost_usd": 0.03959375
+  },
+  "source": {
+    "repo_commit": "a45211091e3039cfe3801d0b54f83cf5c530847e",
+    "sim_path": "simulations/SIM-kurim-grid-envelope/",
+    "scenario_path": "scenarios/bgp-class-routing-app-honest-reachability-promise/bgp-class-routing-app-honest-reachability-promise.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "c2e3d08afc5d6a4bfcd002888ecd18e348728e843cd8180635313d486f07e023"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-kurim-grid-envelope/README.md",
+        "sha256": "ecf4614b85b76dbd404c91a600561e3bfad4212ad853447fa0a56734c9630ef6"
+      },
+      {
+        "path": "simulations/SIM-kurim-grid-envelope/QUESTION.md",
+        "sha256": "dc716719f8bf916d1cda5da020ea0ce6cfd3ef5221e85a9b41dd81537664c7a4"
+      },
+      {
+        "path": "simulations/SIM-kurim-grid-envelope/TODO/TODO-tujad-grid-envelope-successor-owner.md",
+        "sha256": "e246e1fa25fbe51f550922af92665ad8bff25022fdcb3643e118285eca6d40bc"
+      },
+      {
+        "path": "simulations/SIM-kurim-grid-envelope/TODO/TODO.md",
+        "sha256": "68d0fff548e0489d1114c0c490788bf9d8d7be9fd769296e73749b0fbf610840"
+      },
+      {
+        "path": "simulations/SIM-kurim-grid-envelope/seed/extraction-sources.md",
+        "sha256": "444042ace58bed35b22df66c65e76a195418e76ec50dab3b25afee077ddfb08d"
+      },
+      {
+        "path": "scenarios/bgp-class-routing-app-honest-reachability-promise/bgp-class-routing-app-honest-reachability-promise.md",
+        "sha256": "f85a898a4cb0ac219d2dcee050117d73efebefe9e0d4b62f48113106e83bcaca"
+      }
+    ],
+    "simulation_tree_hash": "f644f1f7130016bc26b62e903e784a948f962727c347009162f6b29dcc18e6e2"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 3,
+    "auditability": 4,
+    "evolution_safety": 5,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 2,
+    "implementation_plausibility": 3,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 3,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 29,
+    "normalized_0_100": 57.99999999999999,
+    "confidence_0_1": 0.78
+  },
+  "assessment": {
+    "rationale": "The simulation is a well-documented grid-envelope parent lineage with strong provenance and evolution discipline, but it is not a routing or reachability specimen. It only weakly addresses the scenario's need for observable local records of honest path promises between Alice, Bob, and Carol.",
+    "strengths": [
+      "Clear provenance, variant inventory, and audit trail.",
+      "Strong evolution posture: keeps alternatives open and avoids premature canonization.",
+      "Good envelope/payload boundary discussion with explicit open design questions."
+    ],
+    "weaknesses": [
+      "Poor direct fit to honest reachability or route-like promise accounting.",
+      "Little concrete handling of what each actor records locally after successful forwarding.",
+      "Promise vocabulary is only partial; it does not center payload promises in the preferred Promise-Theory form."
+    ],
+    "risks": [
+      "Unsettled envelope, signature, and unknown-pCID behavior could mislead downstream routing-app evaluation.",
+      "Parent-lineage inventory may look more mature than it is if treated as application-ready."
+    ],
+    "open_questions": [
+      "How would Alice, Bob, and Carol record kept reachability promises using this envelope alone?",
+      "Which child variant, if any, gives auditable success/failure evidence for forwarding claims?",
+      "What signed payload form would bind a reachability promise to a promiser without central authority?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

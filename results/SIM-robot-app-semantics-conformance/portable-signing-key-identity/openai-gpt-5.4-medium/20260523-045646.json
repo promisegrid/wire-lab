@@ -1,0 +1,120 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-robot-app-semantics-conformance-portable-signing-key-identity-openai-gpt-5.4-medium-20260523-045646",
+  "run_group_id": "ga-backfill-20260522-215638-medium",
+  "cell_id": "ga-backfill-20260522-215638-medium-000036-SIM-robot-app-semantics-conformance--portable-signing-key-identity--openai-gpt-5.4-medium",
+  "sim_id": "SIM-robot-app-semantics-conformance",
+  "scenario_id": "portable-signing-key-identity",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-045646",
+  "result_path": "results/SIM-robot-app-semantics-conformance/portable-signing-key-identity/openai-gpt-5.4-medium/20260523-045646.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_977fcd96d45d4df29046ffc264cbb6e2",
+    "response_id": "resp_016c7c281ca8a632006a1136f80d44819ab1373465773e1988",
+    "input_tokens": 7100,
+    "output_tokens": 1478,
+    "cost_usd": 0.033117
+  },
+  "source": {
+    "repo_commit": "a45211091e3039cfe3801d0b54f83cf5c530847e",
+    "sim_path": "simulations/SIM-robot-app-semantics-conformance/",
+    "scenario_path": "scenarios/portable-signing-key-identity/portable-signing-key-identity.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "c2e3d08afc5d6a4bfcd002888ecd18e348728e843cd8180635313d486f07e023"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-robot-app-semantics-conformance/README.md",
+        "sha256": "b1bd9731ee228d45f4efde278611f0d5f99bdfff4976d37f6e011f828c2dc1b4"
+      },
+      {
+        "path": "simulations/SIM-robot-app-semantics-conformance/QUESTION.md",
+        "sha256": "32857bd8e974c4f0326ed382a3ffae0e91d65404934f614ab3b7b1becfe0ea2f"
+      },
+      {
+        "path": "scenarios/portable-signing-key-identity/portable-signing-key-identity.md",
+        "sha256": "4deaafd0d50191f352fe959dbd93ce9ea916706abc6e23a05274e32bfb92625f"
+      }
+    ],
+    "simulation_tree_hash": "e57bc7679fd213e955302abe66d10f62f5e3f6e719093146f00c240f25158767"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 4,
+    "promisegrid_alignment": 4,
+    "auditability": 3,
+    "evolution_safety": 5,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 3,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 4,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 36,
+    "normalized_0_100": 72,
+    "confidence_0_1": 0.8
+  },
+  "assessment": {
+    "rationale": "The simulation fits this scenario well because it explicitly targets provisional app semantics, local-versus-wire identity, partial conformance honesty, and provisional signing before the final app contract is frozen. It is especially strong on evolution safety and boundary clarity, but it remains somewhat abstract on exact audit artifacts, failure behavior, and promise-first wording for portable key continuity and rotation evidence.",
+    "strengths": [
+      "Directly addresses local-versus-wire identity and provisional signing, which are central to portable browser/helper key identity.",
+      "Strong evolution posture: it explicitly avoids hardcoding final cryptography or claiming a settled app API before DR-tuhaz closes.",
+      "Clear boundary discipline: local storage handles may exist, but protocol-boundary identity must be spec-defined."
+    ],
+    "weaknesses": [
+      "Does not yet specify the concrete evidence object that links old and new signing keys across rotation.",
+      "Audit trail and witness details remain provisional, limiting later independent verification clarity.",
+      "Vocabulary is not strongly promise-first; it still leans on conformance and identity framing more than payload-promise wording."
+    ],
+    "risks": [
+      "Guide prose could overclaim stable identity semantics or security properties before signature carriage and app contracts are frozen.",
+      "Browser storage guidance may be misunderstood as stronger security than warranted under XSS or host compromise.",
+      "Portable identity could drift toward username/display-name confusion if continuity evidence is not made explicit."
+    ],
+    "open_questions": [
+      "What exact payload or claim should bind old and new keys during rotation in a v0 recipe?",
+      "Which parts of signature carriage are adapter-local evidence versus protocol commitments at the wire boundary?",
+      "How should the guide describe browser key storage and XSS exposure without collapsing into either false assurance or unusable pessimism?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

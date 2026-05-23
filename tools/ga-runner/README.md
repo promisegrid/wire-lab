@@ -16,11 +16,11 @@ Run commands from this directory and pass `-repo-root ../..` when needed:
 go run . validate -repo-root ../..
 
   go run . init -repo-root ../.. -dry-run \
-    -model openai-gpt-5.4-xhigh \
+    -model openai-gpt-5.4-medium \
     -run-group-id <run-group-id>
 
 	  go run . init -repo-root ../.. \
-	    -model openai-gpt-5.4-xhigh \
+	    -model openai-gpt-5.4-medium \
 	    -run-group-id <run-group-id> \
 	    -include-sim <SIM-id> \
 	    -include-scenario <scenario-id>
@@ -30,12 +30,17 @@ go run . validate -repo-root ../..
 
   go run . backfill-init -repo-root ../.. \
     -run-group-id <run-group-id> \
+    -staged-model-id openai-gpt-5.4-high \
+    -staged-reasoning-effort high \
     -clean-envelope-count 6
+
+  go run . compare-backfill -repo-root ../.. \
+    -run-group-id <run-group-id>
 
   go run . score -repo-root ../.. \
     -run-group-id <run-group-id> \
     -target parents \
-    -reasoning-effort xhigh \
+    -reasoning-effort medium \
     -reasoning-summary auto \
     -text-verbosity low \
     -service-tier flex \
@@ -90,6 +95,18 @@ historical `source.*` proposal paths; when those proposal trees are gone,
 source root exists, the record stays non-exact and is excluded from targeted
 backfill instead of aborting the run. `backfill-init` turns that audit into a
 targeted `promisegrid.ga.state.v1` state file for additive rubric-v2 rescoring.
+`compare-backfill` turns a completed targeted v2 state into a reviewable
+Markdown report under `results/reports/<run-group-id>-comparison.md`, comparing
+each v2 cell against the latest exact-match canonical v1 result for the same
+`sim_id` + `scenario_id`, preferring the same `runner.api_model` when
+available. The report summarizes sim rank drift, family highlights, and the
+largest per-cell score deltas before any broader rerun. Source: `DI-zuzup`.
+By default it preserves the historical source model lineage. When a new stage
+should score under a different model ID or default effort, use
+`-staged-model-id` and optionally `-staged-reasoning-effort` so the generated
+state, cell `model_id`, result paths, derived `api_model`, and default
+reasoning effort all match the new stage. That is the honest path for
+multi-stage rescoring such as `high` triage followed by `xhigh` tie-breaks.
 `init -dry-run` previews tracked
 population and conservative generation sizing without writing state. Non-dry-run
 `init` creates `promisegrid.ga.state.v1`. `init` can repeat `-include-sim` and
@@ -120,7 +137,7 @@ state-selected generated child sim trees and matching result trees; use
 `-dry-run` to print the deletion plan without changing files. Source:
 `DI-pobus`; `DI-bagih`; `DI-zusit`; `DI-podot`; `DI-kofil`; `DI-ruzaj`;
 `DI-gijom`; `DI-puhog`; `DI-dilaf`; `DI-fihof`; `DI-lirat`; `DI-dikoh`;
-`DI-zadik`; `DI-higot`; `DI-roruj`; `DI-zobur`.
+`DI-zadik`; `DI-higot`; `DI-roruj`; `DI-zobur`; `DI-hijub`; `DI-zuzup`.
 
 Provider-backed `score` and `generate` always send an explicit service tier.
 The default is `-service-tier flex`; `-service-tier default` is available when
@@ -169,11 +186,13 @@ off unless requested explicitly. Source: `DI-vadub`; `DI-babik`; `DI-vajut`;
 Provider-backed `score` and `generate` omit `max_output_tokens` by default.
 `-max-output-tokens` remains an explicit emergency fuse, but normal cost control
 uses `-cost-estimate-output-tokens` only for preflight budget estimates. The
-default provider text verbosity is `low`; the terminal canary scores with xhigh
-reasoning and generates children with medium reasoning. A provider response with
+default provider text verbosity is `low`; the terminal canary scores with
+medium reasoning by default and generates children with medium reasoning.
+Escalate scoring to `xhigh` explicitly for tie-breaks and promotion-sensitive
+comparisons. A provider response with
 `status: incomplete` and `reason: max_output_tokens` is still treated as a
 deterministic cap failure when an operator explicitly sets the cap. Source:
-`DI-juzus`; `DI-zikag`; `DI-pulap`.
+`DI-juzus`; `DI-zikag`; `DI-pulap`; `DI-nanor`.
 
 OpenAI Structured Outputs remain a follow-up after the uncapped canary succeeds.
 They may reduce JSON-shape retries and prompt boilerplate, but they add

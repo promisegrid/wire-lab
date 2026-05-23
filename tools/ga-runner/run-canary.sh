@@ -23,9 +23,9 @@ Environment overrides:
   GA_CANARY_RUN_GROUP          default: ga-canary-<UTC timestamp>
   GA_CANARY_TIMESTAMP          default: current UTC YYYYMMDD-HHMMSS
   GA_CANARY_SHUFFLE_SEED       default: current UTC YYYYMMDDHHMMSS
-  GA_CANARY_MODEL_ID           default: openai-gpt-5.4-xhigh
+  GA_CANARY_MODEL_ID           default: openai-gpt-5.4-medium
   GA_CANARY_API_MODEL          default: gpt-5.4
-  GA_CANARY_SCORE_REASONING_EFFORT     default: xhigh
+  GA_CANARY_SCORE_REASONING_EFFORT     default: medium
   GA_CANARY_GENERATE_REASONING_EFFORT  default: medium
   GA_CANARY_REASONING_SUMMARY  default: auto
   GA_CANARY_TEXT_VERBOSITY     default: low
@@ -76,9 +76,13 @@ ga_dir="$repo_root/tools/ga-runner"
 timestamp="${GA_CANARY_TIMESTAMP:-$(date -u +%Y%m%d-%H%M%S)}"
 shuffle_seed="${GA_CANARY_SHUFFLE_SEED:-$(date -u +%Y%m%d%H%M%S)}"
 run_group="${GA_CANARY_RUN_GROUP:-ga-canary-$timestamp}"
-model_id="${GA_CANARY_MODEL_ID:-openai-gpt-5.4-xhigh}"
+# Intent: Keep the canary's default state/result lineage aligned with the
+# scoring default. The calibration run showed medium scoring is the best
+# broad-coverage default, while xhigh should be an explicit escalation path.
+# Source: DI-nanor
+model_id="${GA_CANARY_MODEL_ID:-openai-gpt-5.4-medium}"
 api_model="${GA_CANARY_API_MODEL:-gpt-5.4}"
-score_reasoning_effort="${GA_CANARY_SCORE_REASONING_EFFORT:-xhigh}"
+score_reasoning_effort="${GA_CANARY_SCORE_REASONING_EFFORT:-medium}"
 generate_reasoning_effort="${GA_CANARY_GENERATE_REASONING_EFFORT:-medium}"
 reasoning_summary="${GA_CANARY_REASONING_SUMMARY:-auto}"
 text_verbosity="${GA_CANARY_TEXT_VERBOSITY:-low}"

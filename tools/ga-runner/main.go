@@ -16,6 +16,7 @@ import (
 const usage = `Usage:
   ga-runner init       Create or preview a GA run state file.
   ga-runner backfill-init  Create a targeted rubric-v2 backfill state file.
+  ga-runner compare-backfill  Compare targeted rubric-v2 backfill results against canonical v1 evidence.
   ga-runner score      Score GA cells and write JSON fitness results.
   ga-runner generate   Generate untracked child simulations.
   ga-runner validate   Validate JSON fitness result files.
@@ -54,6 +55,11 @@ func runMain(args []string, stdout io.Writer, stderr io.Writer) error {
 		// Intent: Build an audit-first rescore state file from historical v1
 		// evidence without rewriting any scored artifact bytes. Source: DI-roruj
 		return runBackfillInit(subArgs, stdout)
+	case "compare-backfill":
+		// Intent: Materialize a durable drift report from targeted rubric-v2
+		// backfill evidence before operators broaden rescoring scope. Source:
+		// DI-zuzup
+		return runCompareBackfill(subArgs, stdout)
 	case "accept":
 		// Intent: Route review/promotion through the acceptance checkpoint
 		// instead of the not-implemented stub. Source: DI-podot

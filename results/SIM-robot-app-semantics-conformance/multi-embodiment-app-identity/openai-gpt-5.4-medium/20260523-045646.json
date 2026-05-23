@@ -1,0 +1,119 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-robot-app-semantics-conformance-multi-embodiment-app-identity-openai-gpt-5.4-medium-20260523-045646",
+  "run_group_id": "ga-backfill-20260522-215638-medium",
+  "cell_id": "ga-backfill-20260522-215638-medium-000033-SIM-robot-app-semantics-conformance--multi-embodiment-app-identity--openai-gpt-5.4-medium",
+  "sim_id": "SIM-robot-app-semantics-conformance",
+  "scenario_id": "multi-embodiment-app-identity",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-045646",
+  "result_path": "results/SIM-robot-app-semantics-conformance/multi-embodiment-app-identity/openai-gpt-5.4-medium/20260523-045646.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_6a5caa2713d746d69f97b5f6204c1697",
+    "response_id": "resp_076d3d4e632c7368006a1136a0b380819bb8a332ec0d7c8491",
+    "input_tokens": 7120,
+    "output_tokens": 1389,
+    "cost_usd": 0.031906
+  },
+  "source": {
+    "repo_commit": "a45211091e3039cfe3801d0b54f83cf5c530847e",
+    "sim_path": "simulations/SIM-robot-app-semantics-conformance/",
+    "scenario_path": "scenarios/multi-embodiment-app-identity/multi-embodiment-app-identity.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "c2e3d08afc5d6a4bfcd002888ecd18e348728e843cd8180635313d486f07e023"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-robot-app-semantics-conformance/README.md",
+        "sha256": "b1bd9731ee228d45f4efde278611f0d5f99bdfff4976d37f6e011f828c2dc1b4"
+      },
+      {
+        "path": "simulations/SIM-robot-app-semantics-conformance/QUESTION.md",
+        "sha256": "32857bd8e974c4f0326ed382a3ffae0e91d65404934f614ab3b7b1becfe0ea2f"
+      },
+      {
+        "path": "scenarios/multi-embodiment-app-identity/multi-embodiment-app-identity.md",
+        "sha256": "e05f78b9d46c47acecbf430a12fda015268e17d60fbea9e0609fa11e604e52cc"
+      }
+    ],
+    "simulation_tree_hash": "e57bc7679fd213e955302abe66d10f62f5e3f6e719093146f00c240f25158767"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 5,
+    "promisegrid_alignment": 5,
+    "auditability": 4,
+    "evolution_safety": 5,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 3,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 4,
+    "simplicity_durability": 3,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 41,
+    "normalized_0_100": 82,
+    "confidence_0_1": 0.84
+  },
+  "assessment": {
+    "rationale": "Strong fit: the simulation directly targets honest app semantics, partial conformance, and local-versus-wire identity, which matches the pressure of one logical app spanning browser and plugin embodiments. It is weaker on concrete long-lived claim artifacts and explicit failure-path detail.",
+    "strengths": [
+      "Directly addresses heterogeneous embodiments sharing one app identity without overclaiming full implementation parity.",
+      "Emphasizes explicit protocol contracts, partial conformance honesty, and spec-defined wire identity boundaries.",
+      "Keeps evolution pressure in scope by treating app-facing semantics as provisional until upstream decisions freeze."
+    ],
+    "weaknesses": [
+      "Does not yet pin down a minimal durable claim format Carol can audit over long time horizons.",
+      "Failure handling is present as pressure but not deeply specified for storage loss, channel breakage, or stale helper state.",
+      "Vocabulary is careful but still centered on conformance claims more than payload-level promise wording."
+    ],
+    "risks": [
+      "Guide prose could still let Mallory blur shared UX identity with actual protocol-boundary identity.",
+      "Provisional signing and unfinished witness/signature carriage decisions may create audit drift across embodiments."
+    ],
+    "open_questions": [
+      "What exact payload promise should each embodiment publish to bind itself to the shared contract pCID and its subset of implemented parts?",
+      "Should one app identity be a family of contracts, a shared contract plus embodiment-specific promises, or another composition pattern?",
+      "What local records must survive browser reset, host replacement, and helper upgrades for 100-year auditability?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

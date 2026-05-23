@@ -1,0 +1,135 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-kurim-grid-envelope-transport-family-bakeoff-per-hop-authorization-failure-openai-gpt-5.4-medium-20260523-045646",
+  "run_group_id": "ga-backfill-20260522-215638-medium",
+  "cell_id": "ga-backfill-20260522-215638-medium-000013-SIM-kurim-grid-envelope--transport-family-bakeoff-per-hop-authorization-failure--openai-gpt-5.4-medium",
+  "sim_id": "SIM-kurim-grid-envelope",
+  "scenario_id": "transport-family-bakeoff-per-hop-authorization-failure",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-045646",
+  "result_path": "results/SIM-kurim-grid-envelope/transport-family-bakeoff-per-hop-authorization-failure/openai-gpt-5.4-medium/20260523-045646.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_6b9aaf16c9c44dff90736b75a9a6e681",
+    "response_id": "resp_05d3e91424b5eccf006a1134d2fdec819b9db23a4b4cf676a6",
+    "input_tokens": 11189,
+    "output_tokens": 1404,
+    "cost_usd": 0.03923675
+  },
+  "source": {
+    "repo_commit": "a45211091e3039cfe3801d0b54f83cf5c530847e",
+    "sim_path": "simulations/SIM-kurim-grid-envelope/",
+    "scenario_path": "scenarios/transport-family-bakeoff-per-hop-authorization-failure/transport-family-bakeoff-per-hop-authorization-failure.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "c2e3d08afc5d6a4bfcd002888ecd18e348728e843cd8180635313d486f07e023"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-kurim-grid-envelope/README.md",
+        "sha256": "ecf4614b85b76dbd404c91a600561e3bfad4212ad853447fa0a56734c9630ef6"
+      },
+      {
+        "path": "simulations/SIM-kurim-grid-envelope/QUESTION.md",
+        "sha256": "dc716719f8bf916d1cda5da020ea0ce6cfd3ef5221e85a9b41dd81537664c7a4"
+      },
+      {
+        "path": "simulations/SIM-kurim-grid-envelope/TODO/TODO-tujad-grid-envelope-successor-owner.md",
+        "sha256": "e246e1fa25fbe51f550922af92665ad8bff25022fdcb3643e118285eca6d40bc"
+      },
+      {
+        "path": "simulations/SIM-kurim-grid-envelope/TODO/TODO.md",
+        "sha256": "68d0fff548e0489d1114c0c490788bf9d8d7be9fd769296e73749b0fbf610840"
+      },
+      {
+        "path": "simulations/SIM-kurim-grid-envelope/seed/extraction-sources.md",
+        "sha256": "444042ace58bed35b22df66c65e76a195418e76ec50dab3b25afee077ddfb08d"
+      },
+      {
+        "path": "scenarios/transport-family-bakeoff-per-hop-authorization-failure/transport-family-bakeoff-per-hop-authorization-failure.md",
+        "sha256": "f938e10ab88db666d3097a2f97c1667bbbc6e8e071681134049068982cc39cf2"
+      }
+    ],
+    "simulation_tree_hash": "f644f1f7130016bc26b62e903e784a948f962727c347009162f6b29dcc18e6e2"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 3,
+    "auditability": 4,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 1,
+    "implementation_plausibility": 2,
+    "promise_vocabulary": 1,
+    "simplicity_durability": 4,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 27,
+    "normalized_0_100": 54,
+    "confidence_0_1": 0.84
+  },
+  "assessment": {
+    "rationale": "The parent grid-envelope simulation is a clear, durable envelope-specimen inventory, but it does not model ring forwarding, per-hop authorization, refusal recording, or membership reconfiguration. It helps separate message-layer concerns from transport behavior, yet it is only a weak direct fit for this scenario.",
+    "strengths": [
+      "Explicitly keeps envelope design as specimen evidence rather than canonical protocol",
+      "Strong provenance and variant lineage make the design auditable",
+      "Small positional envelope hypothesis is simple and durable",
+      "Clear layer separation reduces accidental transport-layer overclaiming"
+    ],
+    "weaknesses": [
+      "Does not define ring semantics or per-hop authorization behavior",
+      "No concrete refusal, skip-hop, or reconfiguration model for authorization failure",
+      "Parent seed is less testable than the concrete child variants for failure behavior",
+      "Uses limited promise-first vocabulary"
+    ],
+    "risks": [
+      "Could be misread as evidence about transport authorization when it only addresses envelope structure",
+      "Scoring the parent lineage may hide meaningful differences among child envelope variants",
+      "Unsigned or weakly bound envelope interpretations could leave refusal/forwarding accountability ambiguous"
+    ],
+    "open_questions": [
+      "Which child variant, if any, can carry signed per-hop refusal evidence cleanly?",
+      "Should hop authorization promises live in the transport payload, the envelope, or both?",
+      "What local audit record should Bob retain when he is unauthorized to forward?",
+      "How would Carol distinguish ring breakage from explicit refusal without shared global state?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

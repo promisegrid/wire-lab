@@ -1,0 +1,120 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-robot-app-semantics-conformance-kernel-porting-boundary-openai-gpt-5.4-medium-20260523-045646",
+  "run_group_id": "ga-backfill-20260522-215638-medium",
+  "cell_id": "ga-backfill-20260522-215638-medium-000024-SIM-robot-app-semantics-conformance--kernel-porting-boundary--openai-gpt-5.4-medium",
+  "sim_id": "SIM-robot-app-semantics-conformance",
+  "scenario_id": "kernel-porting-boundary",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-045646",
+  "result_path": "results/SIM-robot-app-semantics-conformance/kernel-porting-boundary/openai-gpt-5.4-medium/20260523-045646.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_c732704f07e548dc929246ee86e8631a",
+    "response_id": "resp_002f8370e27e2206006a1135cac7288198a282d3503f2b6d3a",
+    "input_tokens": 7116,
+    "output_tokens": 1421,
+    "cost_usd": 0.032347
+  },
+  "source": {
+    "repo_commit": "a45211091e3039cfe3801d0b54f83cf5c530847e",
+    "sim_path": "simulations/SIM-robot-app-semantics-conformance/",
+    "scenario_path": "scenarios/kernel-porting-boundary/kernel-porting-boundary.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "c2e3d08afc5d6a4bfcd002888ecd18e348728e843cd8180635313d486f07e023"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-robot-app-semantics-conformance/README.md",
+        "sha256": "b1bd9731ee228d45f4efde278611f0d5f99bdfff4976d37f6e011f828c2dc1b4"
+      },
+      {
+        "path": "simulations/SIM-robot-app-semantics-conformance/QUESTION.md",
+        "sha256": "32857bd8e974c4f0326ed382a3ffae0e91d65404934f614ab3b7b1becfe0ea2f"
+      },
+      {
+        "path": "scenarios/kernel-porting-boundary/kernel-porting-boundary.md",
+        "sha256": "d1646fa062e6c64f27cbbd25da0e96f6d484c60582677cdfc798d265a22d5096"
+      }
+    ],
+    "simulation_tree_hash": "e57bc7679fd213e955302abe66d10f62f5e3f6e719093146f00c240f25158767"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 3,
+    "auditability": 4,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 2,
+    "failure_handling": 2,
+    "implementation_plausibility": 2,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 4,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 26,
+    "normalized_0_100": 52,
+    "confidence_0_1": 0.79
+  },
+  "assessment": {
+    "rationale": "The simulation is mainly about app-facing semantics and honest partial conformance, so it only partially helps with a kernel-porting-boundary scenario. Its strongest value here is disciplined provisional wording and explicit deferral to future frozen obligations, but it does not directly define the kernel/runtime/dispatcher boundary or the minimum viable porting target.",
+    "strengths": [
+      "Explicitly marks claims as provisional and bounded by future DR/spec closure.",
+      "Clear about local-versus-wire identity and honest partial conformance claims.",
+      "Small, explicit question home with durable boundaries rather than a large wrapper artifact."
+    ],
+    "weaknesses": [
+      "Focuses on app semantics, not first-port kernel/runtime obligations.",
+      "Does not clearly separate harness apparatus from actual porting target.",
+      "Provides little concrete failure-path handling for stale drafts, misleading claims, or partial implementation gaps in a port."
+    ],
+    "risks": [
+      "Guide readers may incorrectly transfer app-layer conformance language onto kernel/runtime port claims.",
+      "Unsettled terminology could blur library, dispatcher, runtime, and handler-host boundaries.",
+      "A premature conformance claim could overstate draft-spec support before DR-davod freezes obligations."
+    ],
+    "open_questions": [
+      "What is the minimum viable porting target before final freeze: runtime, dispatcher, session/CAS subset, or something narrower?",
+      "Which ingress/feed/CAS/session details are safe as provisional orientation versus blocked pending DR-davod?",
+      "What promise-first wording should a port make now without implying full frozen-spec conformance?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}
