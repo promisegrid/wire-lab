@@ -189,6 +189,23 @@ func normalizeRelPath(path string) string {
 	return filepath.ToSlash(filepath.Clean(path))
 }
 
+// deriveAPIModelFromModelID peels provider and reasoning suffix decorations off
+// the durable result-path model ID so mixed historical backfill runs can reuse
+// the provider model each cell originally came from. Source: DI-roruj
+func deriveAPIModelFromModelID(modelID string) string {
+	clean := strings.TrimSpace(strings.ToLower(modelID))
+	if clean == "" {
+		return ""
+	}
+	clean = strings.TrimPrefix(clean, "openai-")
+	for _, suffix := range []string{"-xhigh", "-high", "-medium", "-low"} {
+		if strings.HasSuffix(clean, suffix) {
+			return strings.TrimSuffix(clean, suffix)
+		}
+	}
+	return clean
+}
+
 func proposalRunRoot(runGroupID string) string {
 	return filepath.ToSlash(filepath.Join("proposals", runGroupID))
 }

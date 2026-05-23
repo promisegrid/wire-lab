@@ -129,9 +129,6 @@ func parseScoreOptions(args []string) (scoreOptions, error) {
 	if *runGroupID == "" {
 		return scoreOptions{}, errUsage("score: -run-group-id is required")
 	}
-	if *apiModel == "" && !*dryRun {
-		return scoreOptions{}, errUsage("score: -api-model is required for non-dry runs")
-	}
 	if *target != "parents" && *target != "children" && *target != "all" {
 		return scoreOptions{}, errUsage("score: -target must be parents, children, or all")
 	}
@@ -347,6 +344,23 @@ func effectiveScoreCostEstimateOutputTokens(options scoreOptions) int {
 	return defaultScoreCostEstimateOutputTokens
 }
 
+// Intent: Let audit-first rubric-v2 rescoring reuse each cell's original API
+// model when the operator omits `-api-model`, so rubric changes stay isolated
+// from model drift by default. Source: DI-roruj
+func effectiveScoreAPIModel(options scoreOptions, cell GACell) (string, error) {
+	if strings.TrimSpace(options.APIModel) != "" {
+		return strings.TrimSpace(options.APIModel), nil
+	}
+	if strings.TrimSpace(cell.APIModel) != "" {
+		return strings.TrimSpace(cell.APIModel), nil
+	}
+	derived := deriveAPIModelFromModelID(cell.ModelID)
+	if derived != "" {
+		return derived, nil
+	}
+	return "", fmt.Errorf("score: -api-model is required when selected cells do not already carry api_model")
+}
+
 func selectedScoreCellIndexes(state GAState, options scoreOptions) []int {
 	parentIDs := map[string]bool{}
 	for _, parent := range state.Parents {
@@ -465,9 +479,14 @@ func prepareScoreJob(repo Repo, state *GAState, stateFile string, jobDir string,
 		markGACell(cell, "done", "existing valid result")
 		return scoreJob{}, "done", nil
 	}
+	apiModel, err := effectiveScoreAPIModel(options, *cell)
+	if err != nil {
+		markGACell(cell, "failed", err.Error())
+		return scoreJob{}, "failed", nil
+	}
 	cell.Attempts++
 	cell.Provider = options.ProviderName
-	cell.APIModel = options.APIModel
+	cell.APIModel = apiModel
 	cell.ReasoningEffort = options.ReasoningEffort
 	cell.ServiceTier = options.ServiceTier
 	*reservedCostUSD += estimate.CostUSD
@@ -534,10 +553,10 @@ func executeScoreJob(ctx context.Context, repo Repo, provider Provider, job scor
 	defer cancel()
 	response, err := provider.Generate(callCtx, ProviderRequest{
 		Provider:         options.ProviderName,
-		APIModel:         options.APIModel,
-		ReasoningEffort:  options.ReasoningEffort,
+		APIModel:         cell.APIModel,
+		ReasoningEffort:  cell.ReasoningEffort,
 		ReasoningSummary: options.ReasoningSummary,
-		ServiceTier:      options.ServiceTier,
+		ServiceTier:      cell.ServiceTier,
 		TextVerbosity:    options.TextVerbosity,
 		MaxOutputTokens:  options.MaxOutputTokens,
 		Instructions:     "Return only valid JSON for the requested GA score payload. Do not include code fences or commentary.",
@@ -617,6 +636,10 @@ func buildScorePrompt(repo Repo, state GAState, cell GACell, scenario Scenario) 
 	// Intent: Bundle the exact local sim/scenario source documents into each
 	// score prompt so a provider-backed cell has enough context without parsing
 	// cross-file links itself. Source: DI-gijom
+	//
+	// Intent: Ask the scorer for the rubric-v2 promise-first axes directly in the
+	// prompt so new evidence penalizes claim-card drift and rewards small,
+	// durable pCID-specific promises. Source: DI-roruj
 	var out strings.Builder
 	out.WriteString("# GA Score Cell\n\n")
 	out.WriteString("Return only JSON with keys `scores`, `fitness`, and `assessment`.\n")
@@ -630,17 +653,23 @@ func buildScorePrompt(repo Repo, state GAState, cell GACell, scenario Scenario) 
 	fmt.Fprintf(&out, "- Result path: `%s`\n\n", cell.ResultPath)
 	out.WriteString("## Rubric\n\n")
 	out.WriteString("Score each axis from 0 to 5. Higher is better except `risk_penalty`, where 0 is low risk and 5 is severe risk.\n")
-	out.WriteString("Axes: scenario_fit, promisegrid_alignment, auditability, evolution_safety, layer_boundary_clarity, failure_handling, implementation_plausibility, risk_penalty.\n\n")
+	out.WriteString("Axes: scenario_fit, promisegrid_alignment, auditability, evolution_safety, layer_boundary_clarity, failure_handling, implementation_plausibility, promise_vocabulary, simplicity_durability, risk_penalty.\n")
+	out.WriteString("- `promise_vocabulary`: reward Promise-Theory-correct, promise-first wording. Prefer payload promises such as \"Alice promises this payload meets the protocol specification referred to by this pCID.\" Penalize normative claim cards, conformance bundles, generic profile support claims, port claims, and central trust-ledger framing.\n")
+	out.WriteString("- `simplicity_durability`: reward small, explicit, deterministic, 100-year durable artifacts that fit small devices. Penalize generic maps, cards, ledgers, bundles, and feature-shopping wrappers.\n")
+	out.WriteString("- The runner recomputes `fitness.raw` and `fitness.normalized_0_100` from your axis scores with normal weighting. Use `fitness.confidence_0_1` for your confidence.\n\n")
 	out.WriteString("## Source Documents\n\n")
 	for _, doc := range docs {
 		fmt.Fprintf(&out, "### `%s`\n\n```markdown\n%s\n```\n\n", doc.Path, strings.TrimSpace(doc.Text))
 	}
 	out.WriteString("## Required JSON Shape\n\n")
-	out.WriteString(`{"scores":{"scenario_fit":0,"promisegrid_alignment":0,"auditability":0,"evolution_safety":0,"layer_boundary_clarity":0,"failure_handling":0,"implementation_plausibility":0,"risk_penalty":0},"fitness":{"raw":0,"normalized_0_100":0,"confidence_0_1":0.0},"assessment":{"rationale":"","strengths":[],"weaknesses":[],"risks":[],"open_questions":[],"authority_boundary":"Evidence only; does not settle PromiseGrid design."}}`)
+	out.WriteString(`{"scores":{"scenario_fit":0,"promisegrid_alignment":0,"auditability":0,"evolution_safety":0,"layer_boundary_clarity":0,"failure_handling":0,"implementation_plausibility":0,"promise_vocabulary":0,"simplicity_durability":0,"risk_penalty":0},"fitness":{"raw":0,"normalized_0_100":0,"confidence_0_1":0.0},"assessment":{"rationale":"","strengths":[],"weaknesses":[],"risks":[],"open_questions":[],"authority_boundary":"Evidence only; does not settle PromiseGrid design."}}`)
 	out.WriteString("\n")
 	return out.String(), nil
 }
 
+// Intent: Persist only rubric-v2 result envelopes for new score runs while the
+// runner, not the provider, recomputes deterministic fitness from the returned
+// axis scores. Source: DI-roruj
 func buildFitnessResult(repo Repo, state GAState, cell GACell, scenario Scenario, payload scorePayload) (FitnessResult, error) {
 	parts, issues := parseResultPath(repo, repo.Abs(cell.ResultPath))
 	if len(issues) > 0 {
@@ -656,7 +685,7 @@ func buildFitnessResult(repo Repo, state GAState, cell GACell, scenario Scenario
 		return FitnessResult{}, err
 	}
 	return FitnessResult{
-		Schema:       resultSchemaV1,
+		Schema:       resultSchemaV2,
 		ResultID:     strings.Join([]string{parts.SimID, parts.ScenarioID, parts.ModelID, parts.Timestamp}, "-"),
 		RunGroupID:   state.RunGroupID,
 		CellID:       cell.CellID,
@@ -688,13 +717,13 @@ func buildFitnessResult(repo Repo, state GAState, cell GACell, scenario Scenario
 			SimulationTreeHash: simHash,
 		},
 		Rubric: RubricInfo{
-			RubricVersion: "ga-rubric-20260519-v1",
+			RubricVersion: rubricVersionForSchema(resultSchemaV2),
 			ScoreScale:    "0..5",
-			ScoreMeanings: map[string]string{"0": "no fit or absent", "5": "strong fit", "risk_penalty": "0 low risk, 5 severe risk"},
-			Axes:          []string{"scenario_fit", "promisegrid_alignment", "auditability", "evolution_safety", "layer_boundary_clarity", "failure_handling", "implementation_plausibility", "risk_penalty"},
+			ScoreMeanings: rubricScoreMeaningsForSchema(resultSchemaV2),
+			Axes:          rubricAxesForSchema(resultSchemaV2),
 		},
 		Scores:     payload.Scores,
-		Fitness:    payload.Fitness,
+		Fitness:    deterministicFitnessSummary(resultSchemaV2, payload.Scores, payload.Fitness.Confidence0To1),
 		Assessment: payload.Assessment,
 	}, nil
 }

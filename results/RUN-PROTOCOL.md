@@ -3,10 +3,11 @@
 This document defines operational contracts for result evidence under `results/`.
 Legacy matrix runs write Markdown files at
 `results/<sim-id>/<scenario-id>/<model-id>/<YYYYMMDD-HHMMSS>.md`. GA/search runs
-write JSON fitness files at
-`results/<sim-id>/<scenario-id>/<model-id>/<YYYYMMDD-HHMMSS>.json` and checkpoint
-state at `results/state/<run-group-id>.json`. Source: `DI-zamin`; `DI-ramar`;
-`DI-zanon`; `DI-ruzaj`.
+keep historical `promisegrid.ga.result.v1` JSON fitness files, write new
+`promisegrid.ga.result.v2` JSON fitness files at
+`results/<sim-id>/<scenario-id>/<model-id>/<YYYYMMDD-HHMMSS>.json`, and
+checkpoint state at `results/state/<run-group-id>.json`. Source: `DI-zamin`;
+`DI-ramar`; `DI-zanon`; `DI-ruzaj`; `DI-roruj`.
 
 ## Purpose
 
@@ -46,9 +47,10 @@ paths. Source: `DI-lulom`; `DI-ruzaj`.
 The preferred runner for GA/search work is `tools/ga-runner`. It uses JSON
 fitness evidence, `promisegrid.ga.state.v1` state, generated child sims and
 child score evidence under ignored `proposals/<run-group-id>/` trees, explicit
-review/promotion, and explicit cleanup via `cull`. Source: `DI-ramar`;
+review/promotion, explicit cleanup via `cull`, and audit-first rubric-v2
+backfill planning via `audit` / `backfill-init`. Source: `DI-ramar`;
 `DI-zanon`; `DI-podot`; `DI-kofil`; `DI-ruzaj`; `DI-fihof`; `DI-lirat`;
-`DI-higot`.
+`DI-higot`; `DI-roruj`.
 
 Root scenario prompts use `scenarios/README.md` for shared scenario contract
 context and `scenarios/<scenario-id>/<scenario-id>.md` for scenario-specific
@@ -155,13 +157,15 @@ Each result must include one line starting with `Evidence verdict:`.
 
 ### GA/Search JSON Fitness Results
 
-GA/search results use schema `promisegrid.ga.result.v1` and path
+GA/search results use schema `promisegrid.ga.result.v1` or
+`promisegrid.ga.result.v2` and path
 `results/<sim-id>/<scenario-id>/<model-id>/<YYYYMMDD-HHMMSS>.json`. The JSON
 file is the fitness evidence; there is no separate `results/fitness/` tree.
 Required content includes source paths, source hashes, runner/model metadata,
 rubric axes, integer rubric scores, normalized fitness, rationale, risks, open
-questions, and authority boundary. Source: `DI-ramar`; `DI-zanon`; `DI-pobus`;
-`DI-ruzaj`.
+questions, and authority boundary. Historical v1 evidence remains append-only;
+new promise-first vocabulary scoring writes v2. Source: `DI-ramar`; `DI-zanon`;
+`DI-pobus`; `DI-ruzaj`; `DI-roruj`.
 
 Old Markdown canary results remain historical evidence, but `tools/ga-runner`
 must ignore `results/**/*.md` when validating or selecting GA fitness evidence.
@@ -222,6 +226,10 @@ Use `tools/ga-runner` for JSON-fitness GA/search work. Implemented commands are:
 
 - Validate JSON fitness evidence:
   `cd tools/ga-runner && go run . validate -repo-root ../..`
+- Audit canonical v1 evidence before targeted vocabulary-aware backfill:
+  `cd tools/ga-runner && go run . audit -repo-root ../..`
+- Create a targeted rubric-v2 backfill state from canonical v1 evidence:
+  `cd tools/ga-runner && go run . backfill-init -repo-root ../.. -run-group-id <run-group-id>`
 - Preview tracked population and conservative generation sizing:
   `cd tools/ga-runner && go run . init -repo-root ../.. -dry-run -model <model-id> -run-group-id <run-group-id>`
 - Create state for one GA/search generation:
@@ -246,7 +254,14 @@ artifacts under `proposals/` until that path is locked. The detailed operator
 procedure is `tools/ga-runner/PROMOTION.md`, used when Steve says
 `promote <child-proquint> ...`. Source: `DI-ramar`; `DI-zanon`; `DI-zohal`;
 `DI-zusit`; `DI-podot`; `DI-kofil`; `DI-ruzaj`; `DI-gijom`; `DI-fihof`;
-`DI-lirat`; `DI-dikoh`; `DI-zadik`; `DI-higot`.
+`DI-lirat`; `DI-dikoh`; `DI-zadik`; `DI-higot`; `DI-roruj`.
+
+Audit-first rubric-v2 backfill should compare historical source hashes against
+current sim/scenario bytes while reporting root-contract drift separately. This
+lets v2 reruns focus on stable sim/scenario evidence even when the root scoring
+contract docs themselves have evolved. Targeted backfill includes exact-match
+hard-hit vocabulary families plus a clean grid-envelope calibration slice before
+any wider rerun is attempted. Source: `DI-roruj`.
 
 LLM-generated children use one operation, `breed`, with exactly two distinct
 parent simulations. The runner must fail or skip generation rather than create a

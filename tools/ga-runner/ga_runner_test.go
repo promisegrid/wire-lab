@@ -95,8 +95,64 @@ func TestValidateResultFileRejectsSchemaMismatch(t *testing.T) {
 		t.Fatalf("write bad schema result: %v", err)
 	}
 	issues := validateResultFile(repo, path)
-	if !hasIssue(issues, "schema must be "+resultSchemaV1) {
+	if !hasIssue(issues, expectedResultSchemaMessage()) {
 		t.Fatalf("expected schema issue, got %v", issues)
+	}
+}
+
+func TestValidateResultFileRequiresV2Fields(t *testing.T) {
+	repo := newTestRepo(t)
+	path := repo.Path("results", "SIM-alpha", "scenario-one", "model-a", "20260519-101500.json")
+	raw := `{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-alpha-scenario-one-model-a-20260519-101500",
+  "run_group_id": "ga-test",
+  "cell_id": "ga-test-000001",
+  "sim_id": "SIM-alpha",
+  "scenario_id": "scenario-one",
+  "model_id": "model-a",
+  "timestamp_utc": "20260519-101500",
+  "result_path": "results/SIM-alpha/scenario-one/model-a/20260519-101500.json",
+  "runner": {"tool": "ga-runner"},
+  "source": {
+    "repo_commit": "abc123",
+    "sim_path": "simulations/SIM-alpha/",
+    "scenario_path": "scenarios/scenario-one/scenario-one.md",
+    "root_contract_paths": ["results/RUN-PROTOCOL.md", "scenarios/README.md"],
+    "files": [{"path": "simulations/SIM-alpha/README.md", "sha256": "` + strings.Repeat("a", 64) + `"}],
+    "simulation_tree_hash": "` + strings.Repeat("b", 64) + `"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {"0": "no fit", "5": "strong fit"},
+    "axes": ["scenario_fit", "promisegrid_alignment", "auditability", "evolution_safety", "layer_boundary_clarity", "failure_handling", "implementation_plausibility", "promise_vocabulary", "simplicity_durability", "risk_penalty"]
+  },
+  "scores": {
+    "scenario_fit": 4,
+    "promisegrid_alignment": 4,
+    "auditability": 4,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 3,
+    "implementation_plausibility": 4,
+    "risk_penalty": 1
+  },
+  "fitness": {"raw": 0, "normalized_0_100": 0, "confidence_0_1": 0.7},
+  "assessment": {"rationale": "fixture", "strengths": [], "weaknesses": [], "risks": [], "open_questions": [], "authority_boundary": "Evidence only; does not settle PromiseGrid design."}
+}`
+	if err := ensureParent(path); err != nil {
+		t.Fatalf("make parent: %v", err)
+	}
+	if err := os.WriteFile(path, []byte(raw), 0o644); err != nil {
+		t.Fatalf("write result: %v", err)
+	}
+	issues := validateResultFile(repo, path)
+	if !hasIssue(issues, "scores.promise_vocabulary is required for "+resultSchemaV2) {
+		t.Fatalf("expected promise_vocabulary issue, got %v", issues)
+	}
+	if !hasIssue(issues, "scores.simplicity_durability is required for "+resultSchemaV2) {
+		t.Fatalf("expected simplicity_durability issue, got %v", issues)
 	}
 }
 
@@ -415,6 +471,123 @@ func TestRunScoreWritesValidatedFitnessResult(t *testing.T) {
 	result := mustReadFitnessResult(t, resultPath)
 	if result.Runner.ServiceTier != defaultServiceTier || result.Runner.ServedServiceTier != defaultServiceTier {
 		t.Fatalf("result service tier not recorded: %#v", result.Runner)
+	}
+	if result.Schema != resultSchemaV2 {
+		t.Fatalf("score wrote schema %q, want %q", result.Schema, resultSchemaV2)
+	}
+	if result.Rubric.RubricVersion != rubricVersionV2 {
+		t.Fatalf("score wrote rubric version %q, want %q", result.Rubric.RubricVersion, rubricVersionV2)
+	}
+	if result.Scores.PromiseVocabulary != 4 || result.Scores.SimplicityDurability != 4 {
+		t.Fatalf("score did not capture new v2 axes: %#v", result.Scores)
+	}
+	if result.Fitness.Raw != 38 || result.Fitness.Normalized0To100 != 76 {
+		t.Fatalf("score did not recompute deterministic fitness: %#v", result.Fitness)
+	}
+}
+
+func TestRunScoreUsesPerCellAPIModelWhenOptionIsEmpty(t *testing.T) {
+	repo := newGAFixtureRepo(t)
+	initGAStateForTest(t, repo, "ga-score-state-api-model")
+	state := mustReadGAState(t, repo, "ga-score-state-api-model")
+	parentIDs := map[string]bool{}
+	for _, parent := range state.Parents {
+		parentIDs[parent.SimID] = true
+	}
+	for index := range state.Cells {
+		if parentIDs[state.Cells[index].SimID] {
+			state.Cells[index].APIModel = "gpt-5.3-codex"
+		}
+	}
+	writeTestState(t, repo, "ga-score-state-api-model", state)
+	provider := fakeGAProvider{
+		generate: func(ctx context.Context, request ProviderRequest) (ProviderResponse, error) {
+			if request.APIModel != "gpt-5.3-codex" {
+				t.Fatalf("score request api model = %q, want %q", request.APIModel, "gpt-5.3-codex")
+			}
+			return ProviderResponse{
+				Text:        validScorePayloadJSON(),
+				RequestID:   "req-score",
+				ResponseID:  "resp-score",
+				ServiceTier: defaultServiceTier,
+				UsageJSON:   `{"input_tokens":1000,"input_tokens_details":{"cached_tokens":100},"output_tokens":500}`,
+			}, nil
+		},
+	}
+	var out strings.Builder
+	err := runScoreWithProvider(context.Background(), repo, provider, scoreOptions{
+		RunGroupID:       "ga-score-state-api-model",
+		Target:           "parents",
+		ProviderName:     "fake",
+		ReasoningEffort:  "xhigh",
+		MaxOutputTokens:  4000,
+		InputPrice:       defaultInputUSDPerMTok,
+		CachedInputPrice: defaultCachedInputUSDPerMTok,
+		OutputPrice:      defaultOutputUSDPerMTok,
+	}, &out)
+	if err != nil {
+		t.Fatalf("score: %v\n%s", err, out.String())
+	}
+}
+
+func TestAuditSimulationVocabularyClassifiesAllowedAndHardHitSims(t *testing.T) {
+	repo := newGAFixtureRepo(t)
+	writeTestFile(t, repo.Path("simulations", "SIM-hard-hit", "README.md"), "# Hard Hit\n\nThis sim uses a claim card artifact.\n")
+	writeTestFile(t, repo.Path("simulations", "SIM-udp-feed-v0-conformance", "README.md"), "# UDP Fixture\n\nA UDP-feed v0 conformance fixture.\n")
+	gitAdd(t, repo,
+		"simulations/SIM-hard-hit/README.md",
+		"simulations/SIM-udp-feed-v0-conformance/README.md",
+	)
+	status, _, err := auditSimulationVocabulary(repo, "simulations/SIM-hard-hit/", "SIM-hard-hit")
+	if err != nil {
+		t.Fatalf("audit hard-hit sim: %v", err)
+	}
+	if status != "hard_hit" {
+		t.Fatalf("hard-hit sim status = %q, want %q", status, "hard_hit")
+	}
+	status, _, err = auditSimulationVocabulary(repo, "simulations/SIM-udp-feed-v0-conformance/", "SIM-udp-feed-v0-conformance")
+	if err != nil {
+		t.Fatalf("audit udp sim: %v", err)
+	}
+	if status != "clean" {
+		t.Fatalf("udp fixture status = %q, want %q", status, "clean")
+	}
+}
+
+func TestRunBackfillInitWritesTargetedState(t *testing.T) {
+	repo := newGAFixtureRepo(t)
+	writeTestFile(t, repo.Path("simulations", "SIM-claim-card-target", "README.md"), "# Claim Card\n\nThis sim still talks about a claim card artifact.\n")
+	writeTestFile(t, repo.Path("simulations", "SIM-claim-card-target", "QUESTION.md"), "# Questions\n\nCan Alice and Bob simplify this?\n")
+	writeTestFile(t, repo.Path("simulations", "SIM-grid-envelope-clean", "README.md"), "# Grid Envelope Clean\n\nAlice promises this payload meets the protocol specification referred to by this pCID.\n")
+	writeTestFile(t, repo.Path("simulations", "SIM-grid-envelope-clean", "QUESTION.md"), "# Questions\n\nCan Bob keep this envelope minimal and durable?\n")
+	gitAdd(t, repo,
+		"simulations/SIM-claim-card-target/README.md",
+		"simulations/SIM-claim-card-target/QUESTION.md",
+		"simulations/SIM-grid-envelope-clean/README.md",
+		"simulations/SIM-grid-envelope-clean/QUESTION.md",
+	)
+	writeExactMatchV1Result(t, repo, "SIM-claim-card-target", "scenario-one", "openai-gpt-5.4-xhigh", "20260519-101500", 82)
+	writeExactMatchV1Result(t, repo, "SIM-grid-envelope-clean", "scenario-one", "openai-gpt-5.4-xhigh", "20260519-101501", 91)
+	var out strings.Builder
+	err := runMain([]string{
+		"ga-runner", "backfill-init",
+		"-repo-root", repo.Root,
+		"-run-group-id", "ga-backfill",
+		"-timestamp", "20260522-130000",
+		"-clean-envelope-count", "1",
+	}, &out, &out)
+	if err != nil {
+		t.Fatalf("backfill-init: %v\n%s", err, out.String())
+	}
+	state := mustReadGAState(t, repo, "ga-backfill")
+	if len(state.Parents) != 2 || len(state.Cells) != 2 || len(state.Children) != 0 {
+		t.Fatalf("unexpected backfill state counts: parents=%d cells=%d children=%d", len(state.Parents), len(state.Cells), len(state.Children))
+	}
+	if state.Cells[0].APIModel != "gpt-5.4" {
+		t.Fatalf("backfill cell api_model = %q, want %q", state.Cells[0].APIModel, "gpt-5.4")
+	}
+	if !strings.HasSuffix(state.Cells[0].ResultPath, "20260522-130000.json") {
+		t.Fatalf("backfill result path = %q, want new timestamp", state.Cells[0].ResultPath)
 	}
 }
 
@@ -2199,6 +2372,50 @@ func validResult(repo Repo, path string) FitnessResult {
 	}
 }
 
+func writeExactMatchV1Result(t *testing.T, repo Repo, simID string, scenarioID string, modelID string, timestamp string, normalized float64) string {
+	t.Helper()
+	path := repo.Path("results", simID, scenarioID, modelID, timestamp+".json")
+	result := validResult(repo, path)
+	result.Schema = resultSchemaV1
+	result.RunGroupID = "ga-v1"
+	result.CellID = "ga-v1-000001"
+	result.ModelID = modelID
+	result.ResultPath = repo.Rel(path)
+	result.Runner.APIModel = ""
+	result.Source.RepoCommit = repo.GitCommit()
+	result.Source.SimPath = filepath.ToSlash(filepath.Join("simulations", simID)) + "/"
+	result.Source.ScenarioPath = filepath.ToSlash(filepath.Join("scenarios", scenarioID, scenarioID+".md"))
+	sourcePaths := []string{
+		"results/RUN-PROTOCOL.md",
+		"scenarios/README.md",
+		filepath.ToSlash(filepath.Join("scenarios", scenarioID, scenarioID+".md")),
+		filepath.ToSlash(filepath.Join("simulations", simID, "README.md")),
+	}
+	questionPath := filepath.ToSlash(filepath.Join("simulations", simID, "QUESTION.md"))
+	if _, err := os.Stat(repo.Abs(questionPath)); err == nil {
+		sourcePaths = append(sourcePaths, questionPath)
+	}
+	result.Source.Files = nil
+	for _, sourcePath := range sourcePaths {
+		hash, err := sha256File(repo, sourcePath)
+		if err != nil {
+			t.Fatalf("hash source %s: %v", sourcePath, err)
+		}
+		result.Source.Files = append(result.Source.Files, SourceFile{Path: sourcePath, SHA256: hash})
+	}
+	treeHash, err := currentSimulationTreeHash(repo, filepath.ToSlash(filepath.Join("simulations", simID)))
+	if err != nil {
+		t.Fatalf("sim tree hash: %v", err)
+	}
+	result.Source.SimulationTreeHash = treeHash
+	result.Fitness.Raw = normalized
+	result.Fitness.Normalized0To100 = normalized
+	if err := writeFitnessResultAtomic(path, result); err != nil {
+		t.Fatalf("write exact-match result: %v", err)
+	}
+	return path
+}
+
 func mustJSON(t *testing.T, result FitnessResult) []byte {
 	t.Helper()
 	bytes, err := jsonMarshalIndent(result)
@@ -2222,11 +2439,13 @@ func validScorePayloadJSON() string {
     "layer_boundary_clarity": 4,
     "failure_handling": 3,
     "implementation_plausibility": 4,
+    "promise_vocabulary": 4,
+    "simplicity_durability": 4,
     "risk_penalty": 1
   },
   "fitness": {
-    "raw": 25,
-    "normalized_0_100": 78,
+    "raw": 0,
+    "normalized_0_100": 0,
     "confidence_0_1": 0.72
   },
   "assessment": {

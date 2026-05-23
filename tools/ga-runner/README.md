@@ -1,12 +1,12 @@
 # GA Runner
 
 `tools/ga-runner` is the PromiseGrid Wire Lab runner for GA/search work. It is
-separate from the legacy Markdown matrix-runner path. Parent fitness evidence is
-JSON at `results/<sim-id>/<scenario-id>/<model-id>/<YYYYMMDD-HHMMSS>.json`,
-child proposals and child score evidence stage under
-`proposals/<run-group-id>/`, and run state is JSON at
+separate from the legacy Markdown matrix-runner path. Historical GA evidence
+remains append-only `promisegrid.ga.result.v1`, new scoring writes
+`promisegrid.ga.result.v2`, child proposals and child score evidence stage
+under `proposals/<run-group-id>/`, and run state remains JSON at
 `results/state/<run-group-id>.json`. Source: `DI-ramar`; `DI-zanon`;
-`DI-ruzaj`; `DI-lirat`.
+`DI-ruzaj`; `DI-lirat`; `DI-roruj`.
 
 ## Current Commands
 
@@ -25,10 +25,16 @@ go run . validate -repo-root ../..
 	    -include-sim <SIM-id> \
 	    -include-scenario <scenario-id>
 
+  go run . audit -repo-root ../.. \
+    -clean-envelope-count 6
+
+  go run . backfill-init -repo-root ../.. \
+    -run-group-id <run-group-id> \
+    -clean-envelope-count 6
+
   go run . score -repo-root ../.. \
     -run-group-id <run-group-id> \
     -target parents \
-    -api-model gpt-5.4 \
     -reasoning-effort xhigh \
     -reasoning-summary auto \
     -text-verbosity low \
@@ -73,9 +79,13 @@ go run . cull -repo-root ../.. \
 ```
 
 `validate` reads only GA JSON fitness files and ignores old Markdown canary
-results. `init -dry-run` previews tracked population and conservative generation
-sizing without writing state. Non-dry-run `init` creates
-`promisegrid.ga.state.v1`. `init` can repeat `-include-sim` and
+results. `audit` inspects canonical historical `promisegrid.ga.result.v1`
+results, reports exact-match vs root-contract drift, and identifies hard-hit
+vocabulary families plus clean grid-envelope calibration contenders.
+`backfill-init` turns that audit into a targeted `promisegrid.ga.state.v1`
+state file for additive rubric-v2 rescoring. `init -dry-run` previews tracked
+population and conservative generation sizing without writing state. Non-dry-run
+`init` creates `promisegrid.ga.state.v1`. `init` can repeat `-include-sim` and
 `-include-scenario` to guarantee focused coverage while filling remaining sample
 slots by deterministic shuffle. `score` builds source-complete prompts, calls
 the provider, writes validated JSON fitness results, and checkpoints usage/cost
@@ -103,7 +113,7 @@ state-selected generated child sim trees and matching result trees; use
 `-dry-run` to print the deletion plan without changing files. Source:
 `DI-pobus`; `DI-bagih`; `DI-zusit`; `DI-podot`; `DI-kofil`; `DI-ruzaj`;
 `DI-gijom`; `DI-puhog`; `DI-dilaf`; `DI-fihof`; `DI-lirat`; `DI-dikoh`;
-`DI-zadik`; `DI-higot`.
+`DI-zadik`; `DI-higot`; `DI-roruj`.
 
 Provider-backed `score` and `generate` always send an explicit service tier.
 The default is `-service-tier flex`; `-service-tier default` is available when
@@ -155,6 +165,18 @@ OpenAI Structured Outputs remain a follow-up after the uncapped canary succeeds.
 They may reduce JSON-shape retries and prompt boilerplate, but they add
 provider-specific schema plumbing and do not directly reduce hidden reasoning
 tokens. Source: `DI-pulap`.
+
+Rubric-v2 scoring adds `promise_vocabulary` and `simplicity_durability` to the
+historical axis set and recomputes `fitness.raw` / `fitness.normalized_0_100`
+inside the runner with normal weighting so v2 comparisons do not depend on
+provider-specific math. Historical v1 results remain valid evidence and are not
+rewritten. Source: `DI-roruj`.
+
+If `score` is run without `-api-model`, each selected cell uses the `api_model`
+already stored in the state file, falling back to a provider-model derivation
+from the durable `<model-id>` path when needed. This allows mixed-model
+audit-first backfill states to preserve historical model lineage without
+rewriting v1 evidence. Source: `DI-roruj`.
 
 Child generation uses parent score evidence in two ways. First, `generate`
 reranks the selected parent pool by average completed parent

@@ -21,6 +21,11 @@ type resultPathParts struct {
 	Timestamp  string
 }
 
+type rawResultPresence struct {
+	Schema string                     `json:"schema"`
+	Scores map[string]json.RawMessage `json:"scores"`
+}
+
 func runValidate(args []string, stdout io.Writer) error {
 	fs := flag.NewFlagSet("validate", flag.ContinueOnError)
 	repoRoot := commonRepoFlag(fs)
@@ -79,6 +84,10 @@ func validateTargets(repo Repo, explicitResult string, model string, timestamp s
 	return findResultFiles(repo, model, timestamp)
 }
 
+func findCanonicalResultFiles(repo Repo, model string, timestamp string) ([]string, error) {
+	return findResultFilesUnderRoots(repo, []string{"results"}, model, timestamp)
+}
+
 // findResultFiles discovers only GA JSON result artifacts, including ignored
 // proposal-stage child score evidence. Markdown canary files are intentionally
 // invisible to GA-runner validation and future scoring logic.
@@ -86,8 +95,12 @@ func validateTargets(repo Repo, explicitResult string, model string, timestamp s
 // Intent: Keep old matrix-runner canaries as historical evidence without letting
 // them contaminate GA fitness selection. Source: DI-ramar; DI-pobus; DI-lirat
 func findResultFiles(repo Repo, model string, timestamp string) ([]string, error) {
+	return findResultFilesUnderRoots(repo, []string{"results", "proposals"}, model, timestamp)
+}
+
+func findResultFilesUnderRoots(repo Repo, rootNames []string, model string, timestamp string) ([]string, error) {
 	var paths []string
-	for _, rootName := range []string{"results", "proposals"} {
+	for _, rootName := range rootNames {
 		root := repo.Path(rootName)
 		if info, err := os.Stat(root); err != nil || !info.IsDir() {
 			if err != nil && !os.IsNotExist(err) {
@@ -134,11 +147,15 @@ func validateResultFile(repo Repo, path string) []string {
 	if err := json.Unmarshal(bytes, &result); err != nil {
 		return append(issues, "invalid JSON: "+err.Error())
 	}
+	var presence rawResultPresence
+	if err := json.Unmarshal(bytes, &presence); err != nil {
+		return append(issues, "invalid JSON presence scan: "+err.Error())
+	}
 	issues = append(issues, validateResultIdentity(repo, path, parts, result)...)
 	issues = append(issues, validateRunner(result.Runner)...)
 	issues = append(issues, validateSource(result.Source)...)
-	issues = append(issues, validateRubric(result.Rubric)...)
-	issues = append(issues, validateScores(result.Scores)...)
+	issues = append(issues, validateRubric(result.Schema, result.Rubric)...)
+	issues = append(issues, validateScores(result.Schema, presence.Scores, result.Scores)...)
 	issues = append(issues, validateFitness(result.Fitness)...)
 	issues = append(issues, validateAssessment(result.Assessment)...)
 	return issues
@@ -179,8 +196,8 @@ func parseResultPathParts(simID string, scenarioID string, modelID string, times
 
 func validateResultIdentity(repo Repo, path string, parts resultPathParts, result FitnessResult) []string {
 	var issues []string
-	if result.Schema != resultSchemaV1 {
-		issues = append(issues, "schema must be "+resultSchemaV1)
+	if !isKnownResultSchema(result.Schema) {
+		issues = append(issues, expectedResultSchemaMessage())
 	}
 	expectedID := strings.Join([]string{parts.SimID, parts.ScenarioID, parts.ModelID, parts.Timestamp}, "-")
 	if result.ResultID != expectedID {
@@ -248,7 +265,7 @@ func validateSource(source SourceInfo) []string {
 	return issues
 }
 
-func validateRubric(rubric RubricInfo) []string {
+func validateRubric(schema string, rubric RubricInfo) []string {
 	var issues []string
 	if rubric.RubricVersion == "" {
 		issues = append(issues, "rubric.rubric_version is required")
@@ -262,10 +279,19 @@ func validateRubric(rubric RubricInfo) []string {
 	if len(rubric.Axes) == 0 {
 		issues = append(issues, "rubric.axes must not be empty")
 	}
+	if schema == resultSchemaV2 {
+		if rubric.RubricVersion != rubricVersionV2 {
+			issues = append(issues, "rubric.rubric_version must be "+rubricVersionV2+" for "+resultSchemaV2)
+		}
+		expectedAxes := rubricAxesForSchema(schema)
+		if strings.Join(rubric.Axes, ",") != strings.Join(expectedAxes, ",") {
+			issues = append(issues, "rubric.axes must match "+strings.Join(expectedAxes, ",")+" for "+resultSchemaV2)
+		}
+	}
 	return issues
 }
 
-func validateScores(scores FitnessScores) []string {
+func validateScores(schema string, rawScores map[string]json.RawMessage, scores FitnessScores) []string {
 	scoreMap := map[string]int{
 		"scenario_fit":                scores.ScenarioFit,
 		"promisegrid_alignment":       scores.PromiseGridAlignment,
@@ -274,12 +300,21 @@ func validateScores(scores FitnessScores) []string {
 		"layer_boundary_clarity":      scores.LayerBoundaryClarity,
 		"failure_handling":            scores.FailureHandling,
 		"implementation_plausibility": scores.ImplementationPlausibility,
+		"promise_vocabulary":          scores.PromiseVocabulary,
+		"simplicity_durability":       scores.SimplicityDurability,
 		"risk_penalty":                scores.RiskPenalty,
 	}
 	var issues []string
 	for name, value := range scoreMap {
 		if value < 0 || value > 5 {
 			issues = append(issues, fmt.Sprintf("scores.%s must be between 0 and 5", name))
+		}
+	}
+	if schema == resultSchemaV2 {
+		for _, field := range []string{"promise_vocabulary", "simplicity_durability"} {
+			if _, ok := rawScores[field]; !ok {
+				issues = append(issues, "scores."+field+" is required for "+resultSchemaV2)
+			}
 		}
 	}
 	sort.Strings(issues)
@@ -306,4 +341,390 @@ func validateAssessment(assessment Assessment) []string {
 		issues = append(issues, "assessment.authority_boundary is required")
 	}
 	return issues
+}
+
+const defaultBackfillCleanEnvelopeCount = 6
+
+type auditRecord struct {
+	Path              string
+	Result            FitnessResult
+	ExactMatch        bool
+	RootContractDrift bool
+	VocabularyStatus  string
+	VocabularyReasons []string
+}
+
+type auditSummary struct {
+	SimID             string
+	ResultCount       int
+	ExactMatchCount   int
+	AverageNormalized float64
+	VocabularyStatus  string
+	RootContractDrift bool
+	Models            []string
+}
+
+type backfillSelection struct {
+	Records             []auditRecord
+	HardHitSimIDs       []string
+	CleanEnvelopeSimIDs []string
+}
+
+func runAudit(args []string, stdout io.Writer) error {
+	// Intent: Make rubric-v2 backfill selection cheap and reviewable before any
+	// new provider calls spend money on a broad rescore. Source: DI-roruj
+	fs := flag.NewFlagSet("audit", flag.ContinueOnError)
+	repoRoot := commonRepoFlag(fs)
+	model := fs.String("model", "", "optional canonical result model filter")
+	timestamp := fs.String("timestamp", "", "optional canonical result timestamp filter")
+	cleanEnvelopeCount := fs.Int("clean-envelope-count", defaultBackfillCleanEnvelopeCount, "number of clean grid-envelope sims to surface as calibration targets")
+	if err := fs.Parse(args); err != nil {
+		return err
+	}
+	repo, err := openRepo(*repoRoot)
+	if err != nil {
+		return err
+	}
+	records, err := auditCanonicalV1Results(repo, *model, *timestamp)
+	if err != nil {
+		return err
+	}
+	selection := selectTargetedBackfill(records, *cleanEnvelopeCount)
+	summaries := summarizeAuditRecords(records)
+	exactMatches := 0
+	rootDrift := 0
+	for _, record := range records {
+		if record.ExactMatch {
+			exactMatches++
+		}
+		if record.RootContractDrift {
+			rootDrift++
+		}
+	}
+	if err := writeFormat(stdout, "audited=%d exact_match=%d mismatch=%d root_contract_drift=%d hard_hit_sims=%d clean_envelope_candidates=%d\n",
+		len(records),
+		exactMatches,
+		len(records)-exactMatches,
+		rootDrift,
+		len(selection.HardHitSimIDs),
+		len(selection.CleanEnvelopeSimIDs)); err != nil {
+		return err
+	}
+	if len(selection.HardHitSimIDs) > 0 {
+		if err := writeLine(stdout, "hard_hit sims:"); err != nil {
+			return err
+		}
+		for _, simID := range selection.HardHitSimIDs {
+			summary := summaries[simID]
+			if err := writeAuditSummaryLine(stdout, summary); err != nil {
+				return err
+			}
+		}
+	}
+	if len(selection.CleanEnvelopeSimIDs) > 0 {
+		if err := writeLine(stdout, "clean envelope calibration sims:"); err != nil {
+			return err
+		}
+		for _, simID := range selection.CleanEnvelopeSimIDs {
+			summary := summaries[simID]
+			if err := writeAuditSummaryLine(stdout, summary); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+func writeAuditSummaryLine(stdout io.Writer, summary auditSummary) error {
+	return writeFormat(stdout,
+		"  %s results=%d exact_match=%d avg_normalized_0_100=%.2f vocab=%s root_contract_drift=%t models=%s\n",
+		summary.SimID,
+		summary.ResultCount,
+		summary.ExactMatchCount,
+		summary.AverageNormalized,
+		summary.VocabularyStatus,
+		summary.RootContractDrift,
+		strings.Join(summary.Models, ","),
+	)
+}
+
+func auditCanonicalV1Results(repo Repo, model string, timestamp string) ([]auditRecord, error) {
+	paths, err := findCanonicalResultFiles(repo, model, timestamp)
+	if err != nil {
+		return nil, err
+	}
+	var records []auditRecord
+	for _, path := range paths {
+		result, err := readFitnessResult(path)
+		if err != nil {
+			return nil, err
+		}
+		if result.Schema != resultSchemaV1 {
+			continue
+		}
+		exactMatch, rootContractDrift := auditResultSourceMatch(repo, result)
+		vocabularyStatus, vocabularyReasons, err := auditSimulationVocabulary(repo, result.Source.SimPath, result.SimID)
+		if err != nil {
+			return nil, err
+		}
+		records = append(records, auditRecord{
+			Path:              repo.Rel(path),
+			Result:            result,
+			ExactMatch:        exactMatch,
+			RootContractDrift: rootContractDrift,
+			VocabularyStatus:  vocabularyStatus,
+			VocabularyReasons: vocabularyReasons,
+		})
+	}
+	if len(records) == 0 {
+		return nil, fmt.Errorf("no canonical %s results matched selection", resultSchemaV1)
+	}
+	sort.Slice(records, func(i, j int) bool {
+		return records[i].Path < records[j].Path
+	})
+	return records, nil
+}
+
+func auditResultSourceMatch(repo Repo, result FitnessResult) (bool, bool) {
+	// Intent: Gate targeted backfill on current sim/scenario bytes while
+	// reporting root-contract drift separately, because rubric-v2 updates will
+	// naturally change shared scoring docs without changing the candidate sim
+	// itself. Source: DI-roruj
+	rootContracts := map[string]bool{}
+	for _, path := range result.Source.RootContractPaths {
+		rootContracts[normalizeRelPath(path)] = true
+	}
+	exactMatch := true
+	rootContractDrift := false
+	for _, file := range result.Source.Files {
+		path := normalizeRelPath(file.Path)
+		hash, err := sha256File(repo, path)
+		if err != nil {
+			if rootContracts[path] {
+				rootContractDrift = true
+				continue
+			}
+			exactMatch = false
+			continue
+		}
+		if hash == file.SHA256 {
+			continue
+		}
+		if rootContracts[path] {
+			rootContractDrift = true
+			continue
+		}
+		exactMatch = false
+	}
+	currentTreeHash, err := currentSimulationTreeHash(repo, strings.TrimSuffix(normalizeRelPath(result.Source.SimPath), "/"))
+	if err != nil || currentTreeHash != result.Source.SimulationTreeHash {
+		exactMatch = false
+	}
+	return exactMatch, rootContractDrift
+}
+
+func auditSimulationVocabulary(repo Repo, simPath string, simID string) (string, []string, error) {
+	// Intent: Classify only the current sim's own vocabulary drift so the audit
+	// can target clearly affected families first and leave broader clean sims for
+	// calibration sampling. Source: DI-roruj
+	paths, err := simulationAuditPaths(repo, simPath)
+	if err != nil {
+		return "", nil, err
+	}
+	docs, err := sourceDocumentsFromPaths(repo, paths)
+	if err != nil {
+		return "", nil, err
+	}
+	var body strings.Builder
+	for _, doc := range docs {
+		body.WriteString("\n")
+		body.WriteString(strings.ToLower(doc.Text))
+	}
+	text := body.String()
+	simIDLower := strings.ToLower(simID)
+	isUDPConformanceFixture := strings.Contains(simIDLower, "udp-feed-v0-conformance")
+	var hardReasons []string
+	if strings.Contains(simIDLower, "claim-card") {
+		hardReasons = append(hardReasons, "sim-id uses claim-card artifact vocabulary")
+	}
+	if strings.Contains(simIDLower, "boundary-claim") {
+		hardReasons = append(hardReasons, "sim-id uses boundary-claim artifact vocabulary")
+	}
+	if strings.Contains(simIDLower, "conformance-citation") {
+		hardReasons = append(hardReasons, "sim-id uses conformance-citation artifact vocabulary")
+	}
+	if strings.Contains(simIDLower, "conformance") && !isUDPConformanceFixture {
+		hardReasons = append(hardReasons, "sim-id uses conformance-family naming outside the allowed UDP fixture")
+	}
+	for phrase, reason := range map[string]string{
+		"claim card":            "docs use claim-card artifact vocabulary",
+		"conformance bundle":    "docs use conformance-bundle artifact vocabulary",
+		"profile support claim": "docs use profile-support-claim vocabulary",
+		"port claim":            "docs use port-claim vocabulary",
+		"trust ledger":          "docs use trust-ledger vocabulary",
+		"boundary claim":        "docs use boundary-claim artifact vocabulary",
+		"conformance citation":  "docs use conformance-citation artifact vocabulary",
+	} {
+		if strings.Contains(text, phrase) {
+			hardReasons = append(hardReasons, reason)
+		}
+	}
+	if len(hardReasons) > 0 {
+		return "hard_hit", uniqueStrings(hardReasons), nil
+	}
+	cleaned := text
+	for _, allowed := range []string{
+		"payload conforms to the protocol specification referred to by this pcid",
+		"payload conforms to pcid",
+		"alice promises this payload meets the protocol specification referred to by this pcid",
+		"udp-feed v0 conformance",
+	} {
+		cleaned = strings.ReplaceAll(cleaned, allowed, " ")
+	}
+	var softReasons []string
+	for _, pattern := range []struct {
+		substring string
+		reason    string
+	}{
+		{substring: "claim", reason: "docs still use claim vocabulary"},
+		{substring: "conformance", reason: "docs still use conformance vocabulary"},
+		{substring: "profile", reason: "docs still use profile vocabulary"},
+		{substring: "trust ledger", reason: "docs still use trust-ledger vocabulary"},
+	} {
+		if strings.Contains(cleaned, pattern.substring) {
+			softReasons = append(softReasons, pattern.reason)
+		}
+	}
+	if len(softReasons) > 0 {
+		return "soft_hit", uniqueStrings(softReasons), nil
+	}
+	return "clean", nil, nil
+}
+
+func simulationAuditPaths(repo Repo, simPath string) ([]string, error) {
+	cleanSimPath := strings.TrimSuffix(normalizeRelPath(simPath), "/")
+	paths := []string{filepath.ToSlash(filepath.Join(cleanSimPath, "README.md"))}
+	questionPath := filepath.ToSlash(filepath.Join(cleanSimPath, "QUESTION.md"))
+	if info, err := os.Stat(repo.Abs(questionPath)); err == nil && !info.IsDir() {
+		paths = append(paths, questionPath)
+	}
+	localSim, err := localMarkdownFiles(repo, cleanSimPath, map[string]bool{
+		"README.md":   true,
+		"QUESTION.md": true,
+	})
+	if err != nil {
+		return nil, err
+	}
+	paths = append(paths, localSim...)
+	return uniqueStrings(paths), nil
+}
+
+func summarizeAuditRecords(records []auditRecord) map[string]auditSummary {
+	type aggregate struct {
+		summary   auditSummary
+		sum       float64
+		modelSeen map[string]bool
+	}
+	aggregates := map[string]*aggregate{}
+	for _, record := range records {
+		item, ok := aggregates[record.Result.SimID]
+		if !ok {
+			item = &aggregate{
+				summary: auditSummary{
+					SimID:            record.Result.SimID,
+					VocabularyStatus: record.VocabularyStatus,
+				},
+				modelSeen: map[string]bool{},
+			}
+			aggregates[record.Result.SimID] = item
+		}
+		item.summary.ResultCount++
+		if record.ExactMatch {
+			item.summary.ExactMatchCount++
+			item.sum += record.Result.Fitness.Normalized0To100
+		}
+		if vocabularySeverity(record.VocabularyStatus) > vocabularySeverity(item.summary.VocabularyStatus) {
+			item.summary.VocabularyStatus = record.VocabularyStatus
+		}
+		if record.RootContractDrift {
+			item.summary.RootContractDrift = true
+		}
+		if !item.modelSeen[record.Result.ModelID] {
+			item.modelSeen[record.Result.ModelID] = true
+			item.summary.Models = append(item.summary.Models, record.Result.ModelID)
+		}
+	}
+	summaries := map[string]auditSummary{}
+	for simID, item := range aggregates {
+		sort.Strings(item.summary.Models)
+		if item.summary.ExactMatchCount > 0 {
+			item.summary.AverageNormalized = item.sum / float64(item.summary.ExactMatchCount)
+		}
+		summaries[simID] = item.summary
+	}
+	return summaries
+}
+
+func selectTargetedBackfill(records []auditRecord, cleanEnvelopeCount int) backfillSelection {
+	// Intent: Spend the first v2 rescoring budget on the sims most likely to move
+	// under the new vocabulary rules, then add a small clean envelope slice so
+	// the rerun still shows whether the top wire-format contenders stay stable.
+	// Source: DI-roruj
+	summaries := summarizeAuditRecords(records)
+	var hardHit []auditSummary
+	var cleanEnvelope []auditSummary
+	for _, summary := range summaries {
+		if summary.ExactMatchCount == 0 {
+			continue
+		}
+		if summary.VocabularyStatus == "hard_hit" {
+			hardHit = append(hardHit, summary)
+			continue
+		}
+		if summary.VocabularyStatus == "clean" && strings.Contains(strings.ToLower(summary.SimID), "grid-envelope") {
+			cleanEnvelope = append(cleanEnvelope, summary)
+		}
+	}
+	sort.Slice(hardHit, func(i, j int) bool {
+		return hardHit[i].SimID < hardHit[j].SimID
+	})
+	sort.Slice(cleanEnvelope, func(i, j int) bool {
+		if cleanEnvelope[i].AverageNormalized != cleanEnvelope[j].AverageNormalized {
+			return cleanEnvelope[i].AverageNormalized > cleanEnvelope[j].AverageNormalized
+		}
+		return cleanEnvelope[i].SimID < cleanEnvelope[j].SimID
+	})
+	if cleanEnvelopeCount > 0 && len(cleanEnvelope) > cleanEnvelopeCount {
+		cleanEnvelope = cleanEnvelope[:cleanEnvelopeCount]
+	}
+	selectedSimIDs := map[string]bool{}
+	selection := backfillSelection{}
+	for _, summary := range hardHit {
+		selectedSimIDs[summary.SimID] = true
+		selection.HardHitSimIDs = append(selection.HardHitSimIDs, summary.SimID)
+	}
+	for _, summary := range cleanEnvelope {
+		selectedSimIDs[summary.SimID] = true
+		selection.CleanEnvelopeSimIDs = append(selection.CleanEnvelopeSimIDs, summary.SimID)
+	}
+	for _, record := range records {
+		if record.ExactMatch && selectedSimIDs[record.Result.SimID] {
+			selection.Records = append(selection.Records, record)
+		}
+	}
+	sort.Slice(selection.Records, func(i, j int) bool {
+		return selection.Records[i].Path < selection.Records[j].Path
+	})
+	return selection
+}
+
+func vocabularySeverity(status string) int {
+	switch status {
+	case "hard_hit":
+		return 2
+	case "soft_hit":
+		return 1
+	default:
+		return 0
+	}
 }

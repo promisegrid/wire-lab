@@ -15,9 +15,11 @@ import (
 
 const usage = `Usage:
   ga-runner init       Create or preview a GA run state file.
+  ga-runner backfill-init  Create a targeted rubric-v2 backfill state file.
   ga-runner score      Score GA cells and write JSON fitness results.
   ga-runner generate   Generate untracked child simulations.
   ga-runner validate   Validate JSON fitness result files.
+  ga-runner audit      Audit canonical scored results for rubric-v2 backfill.
   ga-runner progress   Show GA run progress. (not implemented yet)
   ga-runner accept     Record accepted children and staging paths.
   ga-runner cull       Delete rejected generated children and their results.
@@ -48,6 +50,10 @@ func runMain(args []string, stdout io.Writer, stderr io.Writer) error {
 		return runValidate(subArgs, stdout)
 	case "init":
 		return runInit(subArgs, stdout)
+	case "backfill-init":
+		// Intent: Build an audit-first rescore state file from historical v1
+		// evidence without rewriting any scored artifact bytes. Source: DI-roruj
+		return runBackfillInit(subArgs, stdout)
 	case "accept":
 		// Intent: Route review/promotion through the acceptance checkpoint
 		// instead of the not-implemented stub. Source: DI-podot
@@ -64,6 +70,11 @@ func runMain(args []string, stdout io.Writer, stderr io.Writer) error {
 		// Intent: Materialize child simulations only through state-bound GA
 		// generation so pending children remain auditable. Source: DI-gijom
 		return runGenerate(subArgs, stdout)
+	case "audit":
+		// Intent: Audit canonical GA evidence before a targeted vocabulary-aware
+		// backfill so rescoring focuses on the sims most likely to move. Source:
+		// DI-roruj
+		return runAudit(subArgs, stdout)
 	case "progress":
 		return notImplemented(subcommand)
 	case "help", "-h", "--help":

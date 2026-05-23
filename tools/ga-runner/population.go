@@ -383,3 +383,174 @@ func hashWrite(writer hash.Hash, data []byte) error {
 	}
 	return nil
 }
+
+// Intent: Turn the cheap vocabulary/source audit into a runnable targeted
+// rubric-v2 state so operators can re-score the most affected sims before
+// paying for any broader corpus backfill. Source: DI-roruj
+func runBackfillInit(args []string, stdout io.Writer) error {
+	fs := flag.NewFlagSet("backfill-init", flag.ContinueOnError)
+	repoRoot := commonRepoFlag(fs)
+	runGroupID := fs.String("run-group-id", "", "run group ID for the targeted v2 backfill state")
+	timestamp := fs.String("timestamp", "", "UTC result timestamp in YYYYMMDD-HHMMSS; defaults to current UTC time")
+	model := fs.String("model", "", "optional canonical source result model filter")
+	cleanEnvelopeCount := fs.Int("clean-envelope-count", defaultBackfillCleanEnvelopeCount, "number of clean grid-envelope sims to keep as calibration targets")
+	if err := fs.Parse(args); err != nil {
+		return err
+	}
+	if *runGroupID == "" {
+		return errUsage("backfill-init: -run-group-id is required")
+	}
+	repo, err := openRepo(*repoRoot)
+	if err != nil {
+		return err
+	}
+	if *timestamp == "" {
+		*timestamp = time.Now().UTC().Format("20060102-150405")
+	}
+	stateFile, err := statePath(repo, *runGroupID)
+	if err != nil {
+		return err
+	}
+	if _, err := os.Stat(stateFile); err == nil {
+		return fmt.Errorf("state file already exists: %s", repo.Rel(stateFile))
+	} else if err != nil && !os.IsNotExist(err) {
+		return err
+	}
+	records, err := auditCanonicalV1Results(repo, *model, "")
+	if err != nil {
+		return err
+	}
+	selection := selectTargetedBackfill(records, *cleanEnvelopeCount)
+	if len(selection.Records) == 0 {
+		return fmt.Errorf("backfill-init: no exact-match hard-hit or clean-envelope calibration results were selected")
+	}
+	population, err := discoverTrackedPopulation(repo)
+	if err != nil {
+		return err
+	}
+	state, err := stateFromBackfillSelection(repo, *runGroupID, *timestamp, population, selection)
+	if err != nil {
+		return err
+	}
+	if err := writeGAStateAtomic(stateFile, state); err != nil {
+		return err
+	}
+	if err := writeFormat(stdout,
+		"state=%s parents=%d scenarios=%d cells=%d hard_hit_sims=%d clean_envelope_sims=%d\n",
+		repo.Rel(stateFile),
+		len(state.Parents),
+		len(state.ScenarioSample),
+		len(state.Cells),
+		len(selection.HardHitSimIDs),
+		len(selection.CleanEnvelopeSimIDs),
+	); err != nil {
+		return err
+	}
+	return nil
+}
+
+// Intent: Materialize a fresh GA state from audited historical results without
+// mutating any v1 scored artifact, so targeted rubric-v2 rescoring starts from
+// additive evidence only. Source: DI-roruj
+func stateFromBackfillSelection(repo Repo, runGroupID string, timestamp string, population []PopulationSim, selection backfillSelection) (GAState, error) {
+	now := time.Now().UTC().Format(time.RFC3339)
+	var statePopulation []GAStateSim
+	for _, sim := range population {
+		statePopulation = append(statePopulation, GAStateSim{
+			SimID:    sim.SimID,
+			Path:     sim.Path,
+			TreeHash: sim.TreeHash,
+		})
+	}
+	hardHit := map[string]bool{}
+	for _, simID := range selection.HardHitSimIDs {
+		hardHit[simID] = true
+	}
+	cleanEnvelope := map[string]bool{}
+	for _, simID := range selection.CleanEnvelopeSimIDs {
+		cleanEnvelope[simID] = true
+	}
+	parentCounts := map[string]int{}
+	scenarioByID := map[string]GAStateScenario{}
+	var cells []GACell
+	modelIDs := map[string]bool{}
+	for index, record := range selection.Records {
+		parentCounts[record.Result.SimID]++
+		modelIDs[record.Result.ModelID] = true
+		if _, ok := scenarioByID[record.Result.ScenarioID]; !ok {
+			hash, err := sha256File(repo, record.Result.Source.ScenarioPath)
+			if err != nil {
+				return GAState{}, err
+			}
+			scenarioByID[record.Result.ScenarioID] = GAStateScenario{
+				ScenarioID:   record.Result.ScenarioID,
+				Path:         record.Result.Source.ScenarioPath,
+				SamplePolicy: "audit-first targeted rubric-v2 backfill from historical v1 results",
+				SHA256:       hash,
+			}
+		}
+		resultPath := filepath.ToSlash(filepath.Join("results", record.Result.SimID, record.Result.ScenarioID, record.Result.ModelID, timestamp+".json"))
+		cell := newGACell(runGroupID, index+1, record.Result.SimID, record.Result.ScenarioID, record.Result.ModelID, resultPath)
+		cell.Provider = record.Result.Runner.Provider
+		if cell.Provider == "" {
+			cell.Provider = "openai"
+		}
+		cell.APIModel = record.Result.Runner.APIModel
+		if cell.APIModel == "" {
+			cell.APIModel = deriveAPIModelFromModelID(record.Result.ModelID)
+		}
+		cell.ReasoningEffort = record.Result.Runner.ReasoningEffort
+		if cell.ReasoningEffort == "" {
+			cell.ReasoningEffort = defaultScoreReasoningEffort
+		}
+		cell.ValidationMessage = "queued from audit-first rubric-v2 backfill selection"
+		cells = append(cells, cell)
+	}
+	var scenarioIDs []string
+	for scenarioID := range scenarioByID {
+		scenarioIDs = append(scenarioIDs, scenarioID)
+	}
+	sort.Strings(scenarioIDs)
+	var scenarios []GAStateScenario
+	for _, scenarioID := range scenarioIDs {
+		scenarios = append(scenarios, scenarioByID[scenarioID])
+	}
+	var parentIDs []string
+	for simID := range parentCounts {
+		parentIDs = append(parentIDs, simID)
+	}
+	sort.Strings(parentIDs)
+	var parents []GAStateParent
+	for _, simID := range parentIDs {
+		reason := "audit-first rubric-v2 backfill exact-match result set"
+		switch {
+		case hardHit[simID]:
+			reason = fmt.Sprintf("audit-first rubric-v2 backfill hard_hit exact-match results=%d", parentCounts[simID])
+		case cleanEnvelope[simID]:
+			reason = fmt.Sprintf("audit-first rubric-v2 backfill clean grid-envelope calibration results=%d", parentCounts[simID])
+		}
+		parents = append(parents, GAStateParent{
+			SimID:     simID,
+			Rationale: reason,
+		})
+	}
+	modelID := "mixed"
+	if len(modelIDs) == 1 {
+		for only := range modelIDs {
+			modelID = only
+		}
+	}
+	return GAState{
+		Schema:         stateSchemaV1,
+		RunGroupID:     runGroupID,
+		CreatedAt:      now,
+		UpdatedAt:      now,
+		RepoCommit:     repo.GitCommit(),
+		ModelID:        modelID,
+		Population:     statePopulation,
+		ScenarioSample: scenarios,
+		Parents:        parents,
+		Children:       nil,
+		Cells:          cells,
+	}, nil
+}

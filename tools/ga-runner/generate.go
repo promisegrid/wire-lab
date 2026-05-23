@@ -956,16 +956,7 @@ func writeCompactFitnessResult(out *strings.Builder, resultPath string, result F
 	// already checkpointed in the durable result file. Source: DI-dilaf
 	fmt.Fprintf(out, "### `%s` x `%s`\n\n", result.SimID, result.ScenarioID)
 	fmt.Fprintf(out, "- Result path: `%s`\n", resultPath)
-	fmt.Fprintf(out, "- Scores: scenario_fit=%d promisegrid_alignment=%d auditability=%d evolution_safety=%d layer_boundary_clarity=%d failure_handling=%d implementation_plausibility=%d risk_penalty=%d\n",
-		result.Scores.ScenarioFit,
-		result.Scores.PromiseGridAlignment,
-		result.Scores.Auditability,
-		result.Scores.EvolutionSafety,
-		result.Scores.LayerBoundaryClarity,
-		result.Scores.FailureHandling,
-		result.Scores.ImplementationPlausibility,
-		result.Scores.RiskPenalty,
-	)
+	fmt.Fprintf(out, "- Scores: %s\n", formatCompactScoreSummary(result))
 	fmt.Fprintf(out, "- Fitness: raw=%.2f normalized_0_100=%.2f confidence_0_1=%.2f\n", result.Fitness.Raw, result.Fitness.Normalized0To100, result.Fitness.Confidence0To1)
 	fmt.Fprintf(out, "- Rationale: %s\n", compactPromptText(result.Assessment.Rationale, compactFitnessTextLimit))
 	writeCompactAssessmentList(out, "Strengths", result.Assessment.Strengths)
@@ -976,6 +967,17 @@ func writeCompactFitnessResult(out *strings.Builder, resultPath string, result F
 		fmt.Fprintf(out, "- Authority boundary: %s\n", compactPromptText(result.Assessment.AuthorityBoundary, compactFitnessItemLimit))
 	}
 	out.WriteString("\n")
+}
+
+// Intent: Render compact parent score evidence from either schema generation,
+// so breed prompts can consume mixed historical v1 plus new rubric-v2 results
+// without silently dropping the added axes. Source: DI-roruj
+func formatCompactScoreSummary(result FitnessResult) string {
+	var parts []string
+	for _, axis := range scoreAxesForResult(result) {
+		parts = append(parts, fmt.Sprintf("%s=%d", axis, result.Scores.axisValue(axis)))
+	}
+	return strings.Join(parts, " ")
 }
 
 func writeCompactAssessmentList(out *strings.Builder, label string, items []string) {

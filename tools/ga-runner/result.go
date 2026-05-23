@@ -5,7 +5,36 @@ import (
 	"os"
 )
 
-const resultSchemaV1 = "promisegrid.ga.result.v1"
+const (
+	resultSchemaV1  = "promisegrid.ga.result.v1"
+	resultSchemaV2  = "promisegrid.ga.result.v2"
+	rubricVersionV1 = "ga-rubric-20260519-v1"
+	rubricVersionV2 = "ga-rubric-20260522-v2"
+)
+
+var rubricAxesV1 = []string{
+	"scenario_fit",
+	"promisegrid_alignment",
+	"auditability",
+	"evolution_safety",
+	"layer_boundary_clarity",
+	"failure_handling",
+	"implementation_plausibility",
+	"risk_penalty",
+}
+
+var rubricAxesV2 = []string{
+	"scenario_fit",
+	"promisegrid_alignment",
+	"auditability",
+	"evolution_safety",
+	"layer_boundary_clarity",
+	"failure_handling",
+	"implementation_plausibility",
+	"promise_vocabulary",
+	"simplicity_durability",
+	"risk_penalty",
+}
 
 // FitnessResult is the machine-readable evidence shape for one GA runner cell.
 //
@@ -73,6 +102,8 @@ type FitnessScores struct {
 	LayerBoundaryClarity       int `json:"layer_boundary_clarity"`
 	FailureHandling            int `json:"failure_handling"`
 	ImplementationPlausibility int `json:"implementation_plausibility"`
+	PromiseVocabulary          int `json:"promise_vocabulary,omitempty"`
+	SimplicityDurability       int `json:"simplicity_durability,omitempty"`
 	RiskPenalty                int `json:"risk_penalty"`
 }
 
@@ -89,6 +120,116 @@ type Assessment struct {
 	Risks             []string `json:"risks"`
 	OpenQuestions     []string `json:"open_questions"`
 	AuthorityBoundary string   `json:"authority_boundary"`
+}
+
+func knownResultSchemas() []string {
+	return []string{resultSchemaV1, resultSchemaV2}
+}
+
+func isKnownResultSchema(schema string) bool {
+	for _, candidate := range knownResultSchemas() {
+		if schema == candidate {
+			return true
+		}
+	}
+	return false
+}
+
+func expectedResultSchemaMessage() string {
+	return "schema must be " + resultSchemaV1 + " or " + resultSchemaV2
+}
+
+func rubricVersionForSchema(schema string) string {
+	if schema == resultSchemaV2 {
+		return rubricVersionV2
+	}
+	return rubricVersionV1
+}
+
+func rubricAxesForSchema(schema string) []string {
+	if schema == resultSchemaV2 {
+		return append([]string(nil), rubricAxesV2...)
+	}
+	return append([]string(nil), rubricAxesV1...)
+}
+
+func rubricScoreMeaningsForSchema(schema string) map[string]string {
+	meanings := map[string]string{
+		"0":            "no fit or absent",
+		"5":            "strong fit",
+		"risk_penalty": "0 low risk, 5 severe risk",
+	}
+	if schema == resultSchemaV2 {
+		meanings["promise_vocabulary"] = "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific"
+		meanings["simplicity_durability"] = "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+	}
+	return meanings
+}
+
+func scoreAxesForResult(result FitnessResult) []string {
+	if result.Schema != "" {
+		return rubricAxesForSchema(result.Schema)
+	}
+	if len(result.Rubric.Axes) > 0 {
+		return append([]string(nil), result.Rubric.Axes...)
+	}
+	return rubricAxesForSchema(resultSchemaV1)
+}
+
+func (scores FitnessScores) axisValue(name string) int {
+	switch name {
+	case "scenario_fit":
+		return scores.ScenarioFit
+	case "promisegrid_alignment":
+		return scores.PromiseGridAlignment
+	case "auditability":
+		return scores.Auditability
+	case "evolution_safety":
+		return scores.EvolutionSafety
+	case "layer_boundary_clarity":
+		return scores.LayerBoundaryClarity
+	case "failure_handling":
+		return scores.FailureHandling
+	case "implementation_plausibility":
+		return scores.ImplementationPlausibility
+	case "promise_vocabulary":
+		return scores.PromiseVocabulary
+	case "simplicity_durability":
+		return scores.SimplicityDurability
+	case "risk_penalty":
+		return scores.RiskPenalty
+	default:
+		return 0
+	}
+}
+
+// deterministicFitnessSummary keeps v2 fitness normalization in the runner so
+// rubric expansion changes comparison math exactly once in audited code instead
+// of depending on provider-specific prose interpretation. Source: DI-roruj
+func deterministicFitnessSummary(schema string, scores FitnessScores, confidence float64) FitnessSummary {
+	axes := rubricAxesForSchema(schema)
+	if len(axes) == 0 {
+		return FitnessSummary{Confidence0To1: confidence}
+	}
+	raw := 0.0
+	for _, axis := range axes {
+		value := scores.axisValue(axis)
+		if axis == "risk_penalty" {
+			raw += float64(5 - value)
+			continue
+		}
+		raw += float64(value)
+	}
+	maxRaw := float64(len(axes) * 5)
+	normalized := 0.0
+	if maxRaw > 0 {
+		normalized = raw / maxRaw * 100
+	}
+	return FitnessSummary{
+		Raw:              raw,
+		Normalized0To100: normalized,
+		Confidence0To1:   confidence,
+	}
 }
 
 // writeFitnessResultAtomic writes a JSON result through a same-directory temp

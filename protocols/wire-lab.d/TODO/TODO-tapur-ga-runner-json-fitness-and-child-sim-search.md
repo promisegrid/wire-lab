@@ -1197,6 +1197,36 @@ After writing a child tree, the runner records child ID, path, parent IDs,
 operation type, prompt hash, response hash, per-file hashes, tree hash, and
 status in the GA state file.
 
+ID: DI-roruj
+Date: 2026-05-22 12:15:37
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Add GA rubric/result v2 for promise-first vocabulary scoring, keep
+historical v1 scored artifacts append-only, and use an audit-first targeted
+backfill instead of an immediate full-corpus rescore. The new result schema is
+`promisegrid.ga.result.v2`, the new rubric version is
+`ga-rubric-20260522-v2`, the two new axes are `promise_vocabulary` and
+`simplicity_durability`, and v2 scoring uses normal weighting across all axes.
+The first targeted backfill audits canonical v1 results, treats sim/scenario
+source-byte matches as the exact-match gate while allowing root-contract drift
+to be reported separately, includes all exact-match hard-hit sims, adds a clean
+grid-envelope calibration slice, preserves original model IDs by default, and
+writes only new timestamped v2 result files.
+Intent: Full-corpus rescoring is expensive, and the new vocabulary rules are
+meant to change scoring going forward without falsifying historical evidence.
+The runner therefore needs a distinct v2 scoring contract, a cheap audit to
+find the sims most likely to move, and a targeted backfill path that can be
+reviewed before any broader rerun is justified.
+Constraints: Do not rewrite or delete any scored v1 sim/result bytes. Keep
+`promisegrid.ga.state.v1` as the current run-state schema. Preserve v1
+validation for historical evidence. Audit current sim/scenario bytes, not the
+mutated v2 root-contract docs, when deciding whether a historical result is an
+exact-match backfill candidate. Keep comparison/reporting follow-on work open
+until targeted v2 evidence exists.
+Affects: `tools/ga-runner/`; `results/RUN-PROTOCOL.md`;
+`tools/ga-runner/README.md`;
+`protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`.
+
 ## Subtasks
 
 - [x] tapur.1 Define the canonical JSON fitness result schema, including source
@@ -1313,6 +1343,26 @@ status in the GA state file.
 - [x] tapur.31 Stop printing canary `response.output_text.delta` event names and
   content while keeping output deltas for internal JSON response assembly.
   Source: `DI-ramun`.
+- [x] tapur.32 Define the rubric/result v2 contract: `promisegrid.ga.result.v2`,
+  `ga-rubric-20260522-v2`, and the new `promise_vocabulary` +
+  `simplicity_durability` axes while keeping historical v1 evidence valid and
+  append-only. Source: `DI-roruj`.
+- [x] tapur.33 Add a deterministic GA audit mode that classifies canonical v1
+  results by sim/scenario exact-match status, root-contract drift, and
+  vocabulary hard-hit / soft-hit / clean status before any targeted backfill.
+  Source: `DI-roruj`.
+- [x] tapur.34 Add the audit-first targeted backfill selection policy: include
+  exact-match hard-hit sims first, then add a clean grid-envelope calibration
+  slice instead of paying for a full-corpus rerun up front. Source: `DI-roruj`.
+- [x] tapur.35 Add targeted backfill state initialization that writes a fresh
+  `results/state/<run-group-id>.json` with queued v2 result paths and preserves
+  original model IDs by default. Source: `DI-roruj`.
+- [ ] tapur.36 Add a v1-vs-v2 comparison report once targeted rubric-v2 results
+  exist, with explicit rank-delta reporting for envelope contenders and the
+  claim/conformance family. Source: `DI-roruj`.
+- [x] tapur.37 Update surrounding GA-runner docs so operators can see the v1/v2
+  coexistence contract, the new `audit` / `backfill-init` commands, and the
+  targeted-backfill-first policy. Source: `DI-roruj`.
 
 ## Predecessor context
 
