@@ -17,7 +17,7 @@ set -Eeuo pipefail
 usage() {
 	cat <<'USAGE'
 Usage:
-  ./run-canary.sh
+  ./run-canary.sh [all|init|score-parents|breed|score-children|help]
 
 Environment overrides:
   GA_CANARY_RUN_GROUP          default: ga-canary-<UTC timestamp>
@@ -31,14 +31,14 @@ Environment overrides:
   GA_CANARY_TEXT_VERBOSITY     default: low
   GA_CANARY_SERVICE_TIER       default: flex
   GA_CANARY_MAX_RUN_COST_USD   default: 10.00
-	  GA_CANARY_MAX_CELL_USD       default: 0.75
-	  GA_CANARY_MAX_CHILD_USD      default: 1.00
-	  GA_CANARY_INCLUDE_SIMS       optional comma/space list of SIM IDs to include
-	  GA_CANARY_INCLUDE_SCENARIOS  optional comma/space list of scenario IDs to include
-	  /tmp/canary-cells            optional focus file with `sims:` / `scenarios:`
-	                               sections; entries resolve by unique prefix and
-	                               merge with GA_CANARY_INCLUDE_* values
-	  GA_CANARY_SCORE_WORKERS      default: 6
+  GA_CANARY_MAX_CELL_USD       default: 0.75
+  GA_CANARY_MAX_CHILD_USD      default: 1.00
+  GA_CANARY_INCLUDE_SIMS       optional comma/space list of SIM IDs to include
+  GA_CANARY_INCLUDE_SCENARIOS  optional comma/space list of scenario IDs to include
+  /tmp/canary-cells            optional focus file with `sims:` / `scenarios:`
+                               sections; entries resolve by unique prefix and
+                               merge with GA_CANARY_INCLUDE_* values
+  GA_CANARY_SCORE_WORKERS      default: 6
   GA_CANARY_GENERATE_WORKERS   default: 1
   GA_CANARY_SCORE_REQUEST_TIMEOUT default: GA_CANARY_REQUEST_TIMEOUT or 5m
   GA_CANARY_GENERATE_REQUEST_TIMEOUT default: 15m
@@ -53,13 +53,25 @@ Environment overrides:
 
 The script prints progress to stdout and writes the same transcript to the log.
 It stops on the first ga-runner failure and prints the log filename.
+
+Subcommands:
+  all             default; run init, score-parents, breed, score-children, validate
+  init            create the state file and planned cells
+  score-parents   score only parent cells in an existing run-group
+  breed           generate child simulations in an existing run-group
+  score-children  score only child cells in an existing run-group
+  help            show this usage text
+
+For subcommands after init, set GA_CANARY_RUN_GROUP explicitly so the wrapper
+reuses an existing state file instead of silently creating a fresh run-group.
 USAGE
 }
 
-case "${1:-}" in
-	"")
+subcommand="${1:-all}"
+case "$subcommand" in
+	""|all|init|score-parents|breed|score-children)
 		;;
-	-h|--help)
+	help|-h|--help)
 		usage
 		exit 0
 		;;
@@ -106,9 +118,14 @@ poll_seconds="${GA_CANARY_POLL_SECONDS:-30}"
 log_file="${GA_CANARY_LOG_FILE:-/tmp/wire-lab-ga-canary-$run_group.log}"
 state_file="$repo_root/results/state/$run_group.json"
 
+if [ "$subcommand" != "all" ] && [ "$subcommand" != "init" ] && [ -z "${GA_CANARY_RUN_GROUP:-}" ]; then
+	echo "GA_CANARY_RUN_GROUP is required for subcommand '$subcommand'." >&2
+	exit 2
+fi
+
 export GOCACHE="${GOCACHE:-/tmp/wire-lab-gocache}"
 
-if [ -z "${OPENAI_API_KEY:-}" ]; then
+if [ "$subcommand" != "init" ] && [ -z "${OPENAI_API_KEY:-}" ]; then
 	echo "OPENAI_API_KEY is required for provider-backed canary runs." >&2
 	exit 2
 fi
@@ -340,7 +357,11 @@ append_flag_args_from_array "-include-scenario" init_include_scenarios init_incl
 
 log_dir="$(dirname "$log_file")"
 mkdir -p "$log_dir"
-: > "$log_file"
+if [ "$subcommand" = "all" ] || [ "$subcommand" = "init" ]; then
+	: > "$log_file"
+else
+	touch "$log_file"
+fi
 exec > >(tee -a "$log_file") 2>&1
 
 print_state_summary() {
@@ -445,6 +466,97 @@ run_step_with_monitor() {
 	return "$status"
 }
 
+run_init_stage() {
+	run_step "init state" \
+		go run . init \
+			-repo-root "$repo_root" \
+			-model "$model_id" \
+			-run-group-id "$run_group" \
+			-timestamp "$timestamp" \
+			-shuffle-seed "$shuffle_seed" \
+			-parent-count 3 \
+			-scenario-count 3 \
+			-child-count 2 \
+			-max-promotions 1 \
+			"${init_include_args[@]}"
+}
+
+run_score_parents_stage() {
+	run_step_with_monitor "score parent cells" \
+		go run . score \
+			-repo-root "$repo_root" \
+			-run-group-id "$run_group" \
+			-target parents \
+			-api-model "$api_model" \
+			-reasoning-effort "$score_reasoning_effort" \
+			-reasoning-summary "$reasoning_summary" \
+			-text-verbosity "$text_verbosity" \
+			-service-tier "$service_tier" \
+			-workers "$score_workers" \
+			-request-timeout "$score_request_timeout" \
+			-provider-max-attempts "$provider_attempts" \
+			-provider-max-elapsed "$provider_elapsed" \
+			-stream="$stream" \
+			-stream-idle-timeout "$stream_idle_timeout" \
+			-stream-content-stdout="$stream_content_stdout" \
+			-skip-failed-cells \
+			-max-run-cost-usd "$max_run_cost_usd" \
+			-max-cell-estimate-usd "$max_cell_usd"
+}
+
+run_breed_stage() {
+	run_step_with_monitor "generate child simulations" \
+		go run . generate \
+			-repo-root "$repo_root" \
+			-run-group-id "$run_group" \
+			-api-model "$api_model" \
+			-reasoning-effort "$generate_reasoning_effort" \
+			-reasoning-summary "$reasoning_summary" \
+			-text-verbosity "$text_verbosity" \
+			-service-tier "$service_tier" \
+			-workers "$generate_workers" \
+			-request-timeout "$generate_request_timeout" \
+			-provider-max-attempts "$provider_attempts" \
+			-provider-max-elapsed "$provider_elapsed" \
+			-stream="$stream" \
+			-stream-idle-timeout "$stream_idle_timeout" \
+			-stream-content-stdout="$stream_content_stdout" \
+			-skip-failed-children \
+			-max-run-cost-usd "$max_run_cost_usd" \
+			-max-child-estimate-usd "$max_child_usd"
+}
+
+run_score_children_stage() {
+	run_step_with_monitor "score child cells" \
+		go run . score \
+			-repo-root "$repo_root" \
+			-run-group-id "$run_group" \
+			-target children \
+			-api-model "$api_model" \
+			-reasoning-effort "$score_reasoning_effort" \
+			-reasoning-summary "$reasoning_summary" \
+			-text-verbosity "$text_verbosity" \
+			-service-tier "$service_tier" \
+			-workers "$score_workers" \
+			-request-timeout "$score_request_timeout" \
+			-provider-max-attempts "$provider_attempts" \
+			-provider-max-elapsed "$provider_elapsed" \
+			-stream="$stream" \
+			-stream-idle-timeout "$stream_idle_timeout" \
+			-stream-content-stdout="$stream_content_stdout" \
+			-skip-failed-cells \
+			-max-run-cost-usd "$max_run_cost_usd" \
+			-max-cell-estimate-usd "$max_cell_usd"
+}
+
+run_validate_stage() {
+	run_step "validate timestamp results" \
+		go run . validate \
+			-repo-root "$repo_root" \
+			-model "$model_id" \
+			-timestamp "$timestamp"
+}
+
 on_error() {
 	local status=$?
 	local line="$1"
@@ -458,6 +570,7 @@ on_error() {
 trap 'on_error "$LINENO"' ERR
 
 echo "GA canary run group: $run_group"
+echo "Subcommand: $subcommand"
 echo "Timestamp: $timestamp"
 echo "Shuffle seed: $shuffle_seed"
 echo "Repo root: $repo_root"
@@ -499,88 +612,33 @@ fi
 
 cd "$ga_dir"
 
-run_step "init state" \
-	go run . init \
-		-repo-root "$repo_root" \
-		-model "$model_id" \
-		-run-group-id "$run_group" \
-		-timestamp "$timestamp" \
-			-shuffle-seed "$shuffle_seed" \
-			-parent-count 3 \
-			-scenario-count 3 \
-			-child-count 2 \
-			-max-promotions 1 \
-			"${init_include_args[@]}"
-
-run_step_with_monitor "score parent cells" \
-	go run . score \
-		-repo-root "$repo_root" \
-		-run-group-id "$run_group" \
-		-target parents \
-		-api-model "$api_model" \
-		-reasoning-effort "$score_reasoning_effort" \
-		-reasoning-summary "$reasoning_summary" \
-		-text-verbosity "$text_verbosity" \
-		-service-tier "$service_tier" \
-		-workers "$score_workers" \
-		-request-timeout "$score_request_timeout" \
-		-provider-max-attempts "$provider_attempts" \
-		-provider-max-elapsed "$provider_elapsed" \
-		-stream="$stream" \
-		-stream-idle-timeout "$stream_idle_timeout" \
-		-stream-content-stdout="$stream_content_stdout" \
-		-skip-failed-cells \
-		-max-run-cost-usd "$max_run_cost_usd" \
-		-max-cell-estimate-usd "$max_cell_usd"
-
-run_step_with_monitor "generate child simulations" \
-	go run . generate \
-		-repo-root "$repo_root" \
-		-run-group-id "$run_group" \
-		-api-model "$api_model" \
-		-reasoning-effort "$generate_reasoning_effort" \
-		-reasoning-summary "$reasoning_summary" \
-		-text-verbosity "$text_verbosity" \
-		-service-tier "$service_tier" \
-		-workers "$generate_workers" \
-		-request-timeout "$generate_request_timeout" \
-		-provider-max-attempts "$provider_attempts" \
-		-provider-max-elapsed "$provider_elapsed" \
-		-stream="$stream" \
-		-stream-idle-timeout "$stream_idle_timeout" \
-		-stream-content-stdout="$stream_content_stdout" \
-		-skip-failed-children \
-		-max-run-cost-usd "$max_run_cost_usd" \
-		-max-child-estimate-usd "$max_child_usd"
-
-run_step_with_monitor "score child cells" \
-	go run . score \
-		-repo-root "$repo_root" \
-		-run-group-id "$run_group" \
-		-target children \
-		-api-model "$api_model" \
-		-reasoning-effort "$score_reasoning_effort" \
-		-reasoning-summary "$reasoning_summary" \
-		-text-verbosity "$text_verbosity" \
-		-service-tier "$service_tier" \
-		-workers "$score_workers" \
-		-request-timeout "$score_request_timeout" \
-		-provider-max-attempts "$provider_attempts" \
-		-provider-max-elapsed "$provider_elapsed" \
-		-stream="$stream" \
-		-stream-idle-timeout "$stream_idle_timeout" \
-		-stream-content-stdout="$stream_content_stdout" \
-		-skip-failed-cells \
-		-max-run-cost-usd "$max_run_cost_usd" \
-		-max-cell-estimate-usd "$max_cell_usd"
-
-run_step "validate timestamp results" \
-	go run . validate \
-		-repo-root "$repo_root" \
-		-model "$model_id" \
-		-timestamp "$timestamp"
+case "$subcommand" in
+	all)
+		run_init_stage
+		run_score_parents_stage
+		run_breed_stage
+		run_score_children_stage
+		run_validate_stage
+		;;
+	init)
+		run_init_stage
+		;;
+	score-parents)
+		run_score_parents_stage
+		;;
+	breed)
+		run_breed_stage
+		;;
+	score-children)
+		run_score_children_stage
+		;;
+	*)
+		echo "unknown subcommand: $subcommand" >&2
+		exit 2
+		;;
+esac
 
 echo
-echo "Canary completed successfully."
+echo "Canary command completed successfully."
 echo "State file: $state_file"
 echo "Log file: $log_file"

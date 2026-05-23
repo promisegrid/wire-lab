@@ -177,6 +177,12 @@ ignores blank lines and `#` comments, resolves selectors by unique prefix
 against current sim/scenario IDs, and merges the resolved IDs with any
 `GA_CANARY_INCLUDE_*` values before the `init` step. The wrapper fails fast on
 malformed, missing, or ambiguous focus-file selectors before any provider call.
+`run-canary.sh` now accepts stage subcommands: `all` (default full flow),
+`init`, `score-parents`, `breed`, and `score-children`. Use one explicit
+`GA_CANARY_RUN_GROUP` across those stage calls when resuming or splitting the
+flow; only `all` and `init` may mint a fresh default run-group. Stage
+subcommands append to the same log file for that run-group instead of truncating
+prior stage output. Source: `DI-bataj`; `DI-bizab`.
 Tracked simulations may also carry optional root metadata at
 `simulations/SIM-*/SIM-META.json` with schema `promisegrid.sim.meta.v1`. The
 currently locked non-breeding roles are `negative-control`, `bakeoff`, and

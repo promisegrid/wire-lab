@@ -1764,6 +1764,29 @@ Affects: `simulations/SIM-lozuk-l6-cas-ipfs-ipld-starting-profile/`;
   without relaxing strict validation or auto-filling missing scores. Source:
   `DI-kibuf`.
 
+ID: DI-bizab
+Date: 2026-05-23 22:50:14
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Keep `tools/ga-runner/run-canary.sh` as the single terminal canary
+wrapper, but add explicit stage subcommands instead of creating multiple new
+wrapper scripts. Support `all` (current full flow), `init`, `score-parents`,
+`breed`, and `score-children`. Keep `validate` inside the default `all` flow
+for now rather than making it a standalone stage command. For stage subcommands
+after `init`, require an explicit `GA_CANARY_RUN_GROUP` so the operator cannot
+accidentally create a fresh run-group by omission.
+Intent: The operator wants to run canary stages independently while preserving
+one source of truth for `/tmp/canary-cells`, logging, service tier, worker
+defaults, timeout defaults, and state-file reporting. Subcommands keep that
+surface coherent and avoid wrapper drift.
+Constraints: Do not fork the wrapper into multiple scripts. Preserve the current
+`all` behavior as the default when no subcommand is given. Keep `/tmp/canary-cells`
+resolution in one place. Preserve append-only GA state and proposal/result
+artifacts. Make stage invocations append to an existing log instead of silently
+truncating prior stage output for the same run-group.
+Affects: `tools/ga-runner/run-canary.sh`; `tools/ga-runner/README.md`;
+`protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`.
+
 ## Predecessor context
 
 - `TODO-dadub` owns the completed root scenario/result skeleton, scenario corpus,
