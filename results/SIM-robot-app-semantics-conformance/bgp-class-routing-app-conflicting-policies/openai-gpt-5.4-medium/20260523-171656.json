@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-robot-app-semantics-conformance-bgp-class-routing-app-conflicting-policies-openai-gpt-5.4-medium-20260523-171656",
+  "run_group_id": "ga-calib-20260523-structured-prompt",
+  "cell_id": "ga-calib-20260523-structured-prompt-000007-SIM-robot-app-semantics-conformance--bgp-class-routing-app-conflicting-policies--openai-gpt-5.4-medium",
+  "sim_id": "SIM-robot-app-semantics-conformance",
+  "scenario_id": "bgp-class-routing-app-conflicting-policies",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-171656",
+  "result_path": "results/SIM-robot-app-semantics-conformance/bgp-class-routing-app-conflicting-policies/openai-gpt-5.4-medium/20260523-171656.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "prompt_json",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_0300280bf07b4b35a7a38170428fc362",
+    "response_id": "resp_0a867526063c3e19006a11e14aa3188199b1e58fa26e99b2da",
+    "input_tokens": 7489,
+    "output_tokens": 1762,
+    "cost_usd": 0.03777375
+  },
+  "source": {
+    "repo_commit": "b35bf8ed25ef35d583168ba24fa464c3882aa819",
+    "sim_path": "simulations/SIM-robot-app-semantics-conformance/",
+    "scenario_path": "scenarios/bgp-class-routing-app-conflicting-policies/bgp-class-routing-app-conflicting-policies.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-robot-app-semantics-conformance/README.md",
+        "sha256": "b1bd9731ee228d45f4efde278611f0d5f99bdfff4976d37f6e011f828c2dc1b4"
+      },
+      {
+        "path": "simulations/SIM-robot-app-semantics-conformance/QUESTION.md",
+        "sha256": "32857bd8e974c4f0326ed382a3ffae0e91d65404934f614ab3b7b1becfe0ea2f"
+      },
+      {
+        "path": "scenarios/bgp-class-routing-app-conflicting-policies/bgp-class-routing-app-conflicting-policies.md",
+        "sha256": "e0a0e2e8b317ce945417fdc2990afc86627a56f6e38518464ce66c6fa1e27a12"
+      }
+    ],
+    "simulation_tree_hash": "e57bc7679fd213e955302abe66d10f62f5e3f6e719093146f00c240f25158767"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 3,
+    "auditability": 3,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 2,
+    "implementation_plausibility": 3,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 3,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 28,
+    "normalized_0_100": 56.00000000000001,
+    "confidence_0_1": 0.87
+  },
+  "assessment": {
+    "rationale": "The simulation is mostly a careful provisional app-semantics and conformance vocabulary exercise, not a routing-policy design, so it fits the conflicting-policy BGP-class scenario poorly. Its main value here is boundary discipline: it clearly separates local versus wire identity, avoids premature stable API claims, and is cautious about partial conformance and policy-surface claims.",
+    "strengths": [
+      "Clear boundary between provisional app guidance and frozen protocol semantics.",
+      "Strong evolution safety through explicit blocking of unsettled areas.",
+      "Good auditability of what is and is not being claimed."
+    ],
+    "weaknesses": [
+      "Does not really model route choice, peer-relative policy, or conflicting routing preferences.",
+      "Uses meta-conformance vocabulary more than promise-first payload wording.",
+      "Provides little concrete failure behavior for refusal, stale offers, or policy conflict resolution."
+    ],
+    "risks": [
+      "Could be over-read as support for routing-policy semantics that the simulation does not actually specify.",
+      "App-level conformance language may drift into normative claim-card framing if not tightened.",
+      "Scenario mismatch may hide unresolved questions about peer-local route selection evidence."
+    ],
+    "open_questions": [
+      "What would an honest promise-first payload look like for peer-specific route preference and refusal?",
+      "How would Alice, Bob, and Carol each record local evidence for conflicting routing policies without global best-path authority?",
+      "Which parts of routing-policy semantics belong in app guidance versus frozen wire protocol?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

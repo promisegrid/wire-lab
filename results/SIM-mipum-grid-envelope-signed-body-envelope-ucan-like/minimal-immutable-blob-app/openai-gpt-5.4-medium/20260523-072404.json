@@ -1,0 +1,126 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-mipum-grid-envelope-signed-body-envelope-ucan-like-minimal-immutable-blob-app-openai-gpt-5.4-medium-20260523-072404",
+  "run_group_id": "ga-tugoz-20260523-072345",
+  "cell_id": "ga-tugoz-20260523-072345-000018-SIM-mipum-grid-envelope-signed-body-envelope-ucan-like--minimal-immutable-blob-app--openai-gpt-5.4-medium",
+  "sim_id": "SIM-mipum-grid-envelope-signed-body-envelope-ucan-like",
+  "scenario_id": "minimal-immutable-blob-app",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-072404",
+  "result_path": "results/SIM-mipum-grid-envelope-signed-body-envelope-ucan-like/minimal-immutable-blob-app/openai-gpt-5.4-medium/20260523-072404.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_cffcb4004ba1494fa16372c0ddaf652e",
+    "response_id": "resp_059743ce7a2ab9fd006a1156a2d354819aa931c846ae64b0e5",
+    "input_tokens": 7772,
+    "output_tokens": 1273,
+    "cost_usd": 0.031423
+  },
+  "source": {
+    "repo_commit": "b35bf8ed25ef35d583168ba24fa464c3882aa819",
+    "sim_path": "simulations/SIM-mipum-grid-envelope-signed-body-envelope-ucan-like/",
+    "scenario_path": "scenarios/minimal-immutable-blob-app/minimal-immutable-blob-app.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "1c8b795ba3b07f6ae9d95037854ffebe792eb88bcdf9545409aeecf068956f9d"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-mipum-grid-envelope-signed-body-envelope-ucan-like/README.md",
+        "sha256": "29d854652c10275e30003a63f67c3176a2e8b9a1fe4b669877e8c1f65c62a39d"
+      },
+      {
+        "path": "simulations/SIM-mipum-grid-envelope-signed-body-envelope-ucan-like/QUESTION.md",
+        "sha256": "5eaac8f1673cfebb11c2f25aa30f9593f3c3a30756fae9fe7827b636840979a8"
+      },
+      {
+        "path": "simulations/SIM-mipum-grid-envelope-signed-body-envelope-ucan-like/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "89aeebe42adff993d6ff1e28af71b440a281800289f4fc9f6100923834600c18"
+      },
+      {
+        "path": "scenarios/minimal-immutable-blob-app/minimal-immutable-blob-app.md",
+        "sha256": "187e449b0498cddda2a2b28192f6aa29e824dae72e60ff47c35d34df35115a73"
+      }
+    ],
+    "simulation_tree_hash": "73977fda1730d6b06516e18e89c1cca807e7a11b09a68bf4442a1c4673e71dfc"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 4,
+    "auditability": 4,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 2,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 3,
+    "simplicity_durability": 4,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 33,
+    "normalized_0_100": 66,
+    "confidence_0_1": 0.77
+  },
+  "assessment": {
+    "rationale": "Strong envelope-local specimen with clear body/proof separation and durable minimal encoding, but only indirect fit for a minimal immutable blob app because it does not define the app-level promises around content availability, retention, discovery, or hash-based access.",
+    "strengths": [
+      "Minimal deterministic outer shape fits small-device and long-term durability goals.",
+      "Explicit sibling body/proof split is easy to inspect and audit locally.",
+      "Unknown-pCID handling is explicit and avoids false claims of understanding.",
+      "Keeps proof semantics payload-local without requiring universal outer proof slots."
+    ],
+    "weaknesses": [
+      "Does not answer who promises 'hash in -\u003e blob out' in the blob app scenario.",
+      "Does not separate content identity from availability, replication, retention, or authorization promises at the application layer.",
+      "Promise vocabulary is mixed; the draft is mostly spec/normative wording rather than peer-local promise statements.",
+      "Failure handling covers parse/validation support gaps more than storage/retrieval failure accounting."
+    ],
+    "risks": [
+      "Readers may over-interpret possession of a signed envelope or hash as a read capability or availability guarantee.",
+      "Proof currently binds [body_pcid, body_payload] but may leave outer-envelope semantics under-bound.",
+      "Envelope focus could distract from the core blob-app requirement to keep storage and retrieval promises explicitly separate."
+    ],
+    "open_questions": [
+      "Should proof also bind the outer pcid as associated data?",
+      "For a minimal blob app, what peer-local record shows the difference between content identity and any retrieval promise?",
+      "Is this envelope shape adding useful value for immutable blob retrieval, or only for signed metadata layers above it?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

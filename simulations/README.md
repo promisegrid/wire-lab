@@ -130,6 +130,24 @@ preferred envelope families.
 | `SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields/` | First `pcid` defines how many outer fields follow and what each field means. |
 | `SIM-janov-grid-envelope-layer-pcid-nested-signed-payload/` | Outer `[pcid_a, payload_a]`; `pcid_a` defines nested `[pcid_b, payload_b, signature_b]`. |
 
+## Grid-envelope signature-structure and Gordian comparison probes
+
+`DI-nohir` adds a six-sim comparison batch under `TODO-tugoz`. Three sims model
+signature placement and signable-byte rules after adjacent prior-art families
+(atproto-like, Ceramic-like, UCAN-like). Three more sims test Gordian-style
+subject/assertion/proof structure as payload-family evidence, universal-envelope
+negative control, and selective-disclosure pressure. These are candidate
+specimens, not preferred envelope families.
+
+| Simulation | Probe |
+|---|---|
+| `SIM-pamap-grid-envelope-signable-view-atproto-like/` | Proof carried in a reserved payload slot with an explicit named signable projection over `grid([pcid, payload_without_sig])`. |
+| `SIM-jumav-grid-envelope-wrapper-proof-ceramic-like/` | Payload becomes a wrapper proof over linked content rather than an inside-payload proof slot. |
+| `SIM-mipum-grid-envelope-signed-body-envelope-ucan-like/` | Payload explicitly separates signed body bytes from sibling proof bytes in one payload envelope. |
+| `SIM-fitin-gordian-payload-wrapper/` | Gordian-style subject/assertion/proof structure confined to a pCID-owned payload/wrapper family. |
+| `SIM-suzuf-gordian-universal-envelope-negative-control/` | Negative control that moves Gordian-style structure into the universal outer envelope. |
+| `SIM-vizan-gordian-selective-disclosure/` | Gordian-style payload family with explicit claim/disclosure roots and selective-disclosure pressure. |
+
 ## Grid-envelope signature/proof object probes
 
 `DI-sahiv` adds a standalone non-child probe for using Cryptid's Multisig object

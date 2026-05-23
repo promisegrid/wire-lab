@@ -1,0 +1,126 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-fitin-gordian-payload-wrapper-minimal-immutable-blob-app-openai-gpt-5.4-medium-20260523-073120",
+  "run_group_id": "ga-tugoz-20260523-073108-suzuf",
+  "cell_id": "ga-tugoz-20260523-073108-suzuf-000012-SIM-fitin-gordian-payload-wrapper--minimal-immutable-blob-app--openai-gpt-5.4-medium",
+  "sim_id": "SIM-fitin-gordian-payload-wrapper",
+  "scenario_id": "minimal-immutable-blob-app",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-073120",
+  "result_path": "results/SIM-fitin-gordian-payload-wrapper/minimal-immutable-blob-app/openai-gpt-5.4-medium/20260523-073120.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_9dbd1d081c94411c871c13be0c74dafc",
+    "response_id": "resp_081b3a2a2ec03046006a1157fdad88819b8914459ac5b5d53c",
+    "input_tokens": 7558,
+    "output_tokens": 1450,
+    "cost_usd": 0.0335265
+  },
+  "source": {
+    "repo_commit": "b35bf8ed25ef35d583168ba24fa464c3882aa819",
+    "sim_path": "simulations/SIM-fitin-gordian-payload-wrapper/",
+    "scenario_path": "scenarios/minimal-immutable-blob-app/minimal-immutable-blob-app.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "1c8b795ba3b07f6ae9d95037854ffebe792eb88bcdf9545409aeecf068956f9d"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-fitin-gordian-payload-wrapper/README.md",
+        "sha256": "279c7872010838e6e1a717d1d09d5d1f3ba4dc7f65bd2478f9480a25a58ad90f"
+      },
+      {
+        "path": "simulations/SIM-fitin-gordian-payload-wrapper/QUESTION.md",
+        "sha256": "b19f7ea6f944b6e01a27599024b8b542e1c70e1d632dd102cd665c7e8c8f7625"
+      },
+      {
+        "path": "simulations/SIM-fitin-gordian-payload-wrapper/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "757f81e773faa42f28f9def305c409dd66e586af89d1e29654f1b760e914dad6"
+      },
+      {
+        "path": "scenarios/minimal-immutable-blob-app/minimal-immutable-blob-app.md",
+        "sha256": "187e449b0498cddda2a2b28192f6aa29e824dae72e60ff47c35d34df35115a73"
+      }
+    ],
+    "simulation_tree_hash": "89e59244cc796db7feb98172fe4717350d151e0833647afb0891ec143141b835"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 4,
+    "auditability": 4,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 2,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 3,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 32,
+    "normalized_0_100": 64,
+    "confidence_0_1": 0.76
+  },
+  "assessment": {
+    "rationale": "Strong boundary discipline and good audit-oriented extensibility, but this specimen is not well tuned to the minimal immutable blob app: it adds Gordian wrapper structure without directly specifying the key CAS-facing promises around retrieval, availability, authorization, and retention.",
+    "strengths": [
+      "Keeps the universal envelope minimal as [pcid, payload].",
+      "Confines richer subject/assertion/proof structure to a payload-family pCID instead of universal doctrine.",
+      "Provides deterministic encoding and explicit unknown-pCID handling.",
+      "Offers better audit structure than a bare blob payload when specialized peers need attribution or proof context."
+    ],
+    "weaknesses": [
+      "Does not directly answer what promise 'hash in -\u003e blob out' means for this app.",
+      "Leaves availability, retention, discovery, and authorization promises underspecified.",
+      "Uses Gordian subject/assertion/proof vocabulary more than promise-first payload promises.",
+      "Adds wrapper complexity that is likely unnecessary for the smallest CAS app."
+    ],
+    "risks": [
+      "Peers may overinterpret possession of a hash or wrapper as stronger retrieval guarantees than are actually promised.",
+      "Audit-oriented wrapper structure may bloat a design that should stay extremely small and durable.",
+      "The payload family could be mistaken for a recommended universal pattern despite the draft's non-canonical intent."
+    ],
+    "open_questions": [
+      "What exact payload promise should represent immutable blob publication and later retrieval?",
+      "What local promise-accounting records should Alice, Bob, and Carol keep when a blob is unavailable years later?",
+      "Is the Gordian wrapper materially better than a simpler payload for this minimal app, or just extra structure?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

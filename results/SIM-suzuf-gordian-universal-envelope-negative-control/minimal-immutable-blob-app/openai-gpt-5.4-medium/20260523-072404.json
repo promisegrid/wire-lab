@@ -1,0 +1,125 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-suzuf-gordian-universal-envelope-negative-control-minimal-immutable-blob-app-openai-gpt-5.4-medium-20260523-072404",
+  "run_group_id": "ga-tugoz-20260523-072345",
+  "cell_id": "ga-tugoz-20260523-072345-000030-SIM-suzuf-gordian-universal-envelope-negative-control--minimal-immutable-blob-app--openai-gpt-5.4-medium",
+  "sim_id": "SIM-suzuf-gordian-universal-envelope-negative-control",
+  "scenario_id": "minimal-immutable-blob-app",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-072404",
+  "result_path": "results/SIM-suzuf-gordian-universal-envelope-negative-control/minimal-immutable-blob-app/openai-gpt-5.4-medium/20260523-072404.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_2becde31ae564ccfa15710a480465dd3",
+    "response_id": "resp_0e2d1b8088fe98f0006a11e0b315a0819a986ba3a65669b0ff",
+    "input_tokens": 8125,
+    "output_tokens": 1188,
+    "cost_usd": 0.03085075
+  },
+  "source": {
+    "repo_commit": "b35bf8ed25ef35d583168ba24fa464c3882aa819",
+    "sim_path": "simulations/SIM-suzuf-gordian-universal-envelope-negative-control/",
+    "scenario_path": "scenarios/minimal-immutable-blob-app/minimal-immutable-blob-app.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-suzuf-gordian-universal-envelope-negative-control/README.md",
+        "sha256": "306c10193c93691950caa3378d8bd523752933ddda3ed51b175e29e011befdcc"
+      },
+      {
+        "path": "simulations/SIM-suzuf-gordian-universal-envelope-negative-control/QUESTION.md",
+        "sha256": "d94a994881167dabb66ff4fc1c0af520c7d511165e337076890b0f3bc2ccd781"
+      },
+      {
+        "path": "simulations/SIM-suzuf-gordian-universal-envelope-negative-control/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "da841566faa56f37ede19f3a5f72e5f0e6b5565e5c87094d257071577780c320"
+      },
+      {
+        "path": "scenarios/minimal-immutable-blob-app/minimal-immutable-blob-app.md",
+        "sha256": "187e449b0498cddda2a2b28192f6aa29e824dae72e60ff47c35d34df35115a73"
+      }
+    ],
+    "simulation_tree_hash": "593c725ca5728740f1a521fcac5ecdf4d282e7f7f3ebf45ad3ab6a67962beeb2"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 1,
+    "auditability": 2,
+    "evolution_safety": 1,
+    "layer_boundary_clarity": 1,
+    "failure_handling": 1,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 1,
+    "risk_penalty": 4
+  },
+  "fitness": {
+    "raw": 13,
+    "normalized_0_100": 26,
+    "confidence_0_1": 0.9
+  },
+  "assessment": {
+    "rationale": "For a minimal immutable blob app, this negative-control design is intentionally overbuilt. It offers some audit-friendly explicit structure and is technically implementable, but it weakens PromiseGrid fit by making proof-bearing semantics universal, removing the tiny dispatch surface, and increasing parser burden for the simplest CAS use case. It does not cleanly preserve the scenario's needed separation between content identity and separate promises about availability, authorization, retention, and retrieval.",
+    "strengths": [
+      "Deterministic CBOR positional encoding is concrete and implementable.",
+      "Subject/assertion/proof structure can help some audit narratives.",
+      "The spec explicitly acknowledges its own negative-control status and comparison pressure."
+    ],
+    "weaknesses": [
+      "Poor fit for the smallest useful blob app; the universal envelope adds semantics the scenario does not need.",
+      "No minimal universal dispatch slot; unknown-protocol behavior is worse than in minimal-grid designs.",
+      "Pushes proof/authorship concerns into the global outer layer instead of keeping them payload-local.",
+      "Does not directly specify local promise-accounting records for storage, retention, discovery, or retrieval failure."
+    ],
+    "risks": [
+      "Universal envelope complexity raises long-term parser and migration burden for small devices and durable archives.",
+      "Unknown assertion/proof pCID handling becomes a global interoperability risk rather than a payload-local one.",
+      "Readers may incorrectly treat proof-bearing outer structure as evidence of storage or read entitlement, blurring core scenario boundaries."
+    ],
+    "open_questions": [
+      "Can a minimal immutable blob app gain any real audit value from universal subject/assertion/proof structure, or is it pure overhead?",
+      "How would Carol record local evidence of retrieval failure years later without introducing app-specific availability claims into the universal envelope?",
+      "Does removing a universal [pcid,payload] dispatch slot make mixed-version blob retrieval materially worse for long-term interoperability?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

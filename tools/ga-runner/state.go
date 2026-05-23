@@ -98,6 +98,7 @@ type GACell struct {
 	Provider           string  `json:"provider,omitempty"`
 	APIModel           string  `json:"api_model,omitempty"`
 	ReasoningEffort    string  `json:"reasoning_effort,omitempty"`
+	OutputContract     string  `json:"output_contract,omitempty"`
 	ServiceTier        string  `json:"service_tier,omitempty"`
 	ServedServiceTier  string  `json:"served_service_tier,omitempty"`
 	RequestID          string  `json:"request_id,omitempty"`

@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"path/filepath"
+	"sort"
 	"strings"
 	"sync"
 	"time"
@@ -19,6 +20,7 @@ type scoreOptions struct {
 	ProviderName             string
 	APIModel                 string
 	ReasoningEffort          string
+	OutputContract           string
 	ReasoningSummary         string
 	ServiceTier              string
 	APIKeyEnv                string
@@ -49,6 +51,22 @@ type scorePayload struct {
 	Scores     FitnessScores  `json:"scores"`
 	Fitness    FitnessSummary `json:"fitness"`
 	Assessment Assessment     `json:"assessment"`
+}
+
+type scorePayloadEnvelope struct {
+	Scores map[string]json.RawMessage `json:"scores"`
+}
+
+type scorePayloadParse struct {
+	Payload scorePayload
+	Raw     scorePayloadEnvelope
+}
+
+type scoreResponseAttempt struct {
+	Response ProviderResponse
+	Payload  scorePayload
+	Raw      scorePayloadEnvelope
+	Usage    UsageCost
 }
 
 func runScore(args []string, stdout io.Writer) error {
@@ -86,6 +104,7 @@ func parseScoreOptions(args []string) (scoreOptions, error) {
 	providerName := fs.String("provider", "openai", "provider name; v1 supports openai")
 	apiModel := fs.String("api-model", "", "provider API model name")
 	reasoningEffort := fs.String("reasoning-effort", defaultScoreReasoningEffort, "provider reasoning effort")
+	outputContract := fs.String("output-contract", outputContractJSONSchemaStrict, "score output contract: prompt_json or json_schema_strict")
 	// Intent: Raw score commands default to no reasoning summary, while the
 	// terminal canary opts in so stdout can show supported reasoning-summary
 	// stream content. Source: DI-vadub
@@ -136,6 +155,10 @@ func parseScoreOptions(args []string) (scoreOptions, error) {
 	if err != nil {
 		return scoreOptions{}, errUsage("score: " + err.Error())
 	}
+	normalizedOutputContract, err := normalizeOutputContract(*outputContract)
+	if err != nil {
+		return scoreOptions{}, errUsage("score: " + err.Error())
+	}
 	normalizedWorkers, err := normalizeWorkers(*workers)
 	if err != nil {
 		return scoreOptions{}, errUsage("score: " + err.Error())
@@ -172,6 +195,7 @@ func parseScoreOptions(args []string) (scoreOptions, error) {
 		ProviderName:             *providerName,
 		APIModel:                 *apiModel,
 		ReasoningEffort:          *reasoningEffort,
+		OutputContract:           normalizedOutputContract,
 		ReasoningSummary:         *reasoningSummary,
 		ServiceTier:              normalizedServiceTier,
 		APIKeyEnv:                *apiKeyEnv,
@@ -210,6 +234,11 @@ func runScoreWithProvider(ctx context.Context, repo Repo, provider Provider, opt
 		return err
 	}
 	options.TextVerbosity = textVerbosity
+	outputContract, err := normalizeOutputContract(options.OutputContract)
+	if err != nil {
+		return err
+	}
+	options.OutputContract = outputContract
 	stateFile, err := statePath(repo, options.RunGroupID)
 	if err != nil {
 		return err
@@ -488,6 +517,7 @@ func prepareScoreJob(repo Repo, state *GAState, stateFile string, jobDir string,
 	cell.Provider = options.ProviderName
 	cell.APIModel = apiModel
 	cell.ReasoningEffort = options.ReasoningEffort
+	cell.OutputContract = options.OutputContract
 	cell.ServiceTier = options.ServiceTier
 	*reservedCostUSD += estimate.CostUSD
 	return scoreJob{
@@ -551,52 +581,35 @@ func executeScoreJob(ctx context.Context, repo Repo, provider Provider, job scor
 		callCtx, cancel = context.WithTimeout(ctx, options.ProviderElapsed)
 	}
 	defer cancel()
-	response, err := provider.Generate(callCtx, ProviderRequest{
-		Provider:         options.ProviderName,
-		APIModel:         cell.APIModel,
-		ReasoningEffort:  cell.ReasoningEffort,
-		ReasoningSummary: options.ReasoningSummary,
-		ServiceTier:      cell.ServiceTier,
-		TextVerbosity:    options.TextVerbosity,
-		MaxOutputTokens:  options.MaxOutputTokens,
-		Instructions:     "Return only valid JSON for the requested GA score payload. Do not include code fences or commentary.",
-		Prompt:           job.Prompt,
-	})
+	// Intent: Keep rubric-v2 validation strict, but spend one narrow follow-up
+	// provider call when a JSON-shaped score response omits required axes such as
+	// `promise_vocabulary` or `simplicity_durability`. This prevents repeated
+	// paid failures like the `SIM-suzuf` focused-slice regression without
+	// inventing missing scores locally. Source: DI-kibuf
+	attempt, err := executeScoreAttempt(callCtx, provider, options, cell, job.Prompt, cost)
 	if err != nil {
 		markGACell(&cell, "failed", err.Error())
 		results <- scoreJobResult{Index: job.Index, Cell: cell, Status: "failed", Final: true}
 		return
 	}
-	cell.RequestID = response.RequestID
-	cell.ResponseID = response.ResponseID
-	cell.ServedServiceTier = response.ServiceTier
-	cell.UsageJSON = response.UsageJSON
-	// Intent: Record measured provider usage in the state and result so resumed
-	// runs and cost reviews use actual token counts when the provider returns
-	// them. Source: DI-gijom
-	if response.UsageJSON != "" {
-		usageCost, err := cost.ParseUsage(response.UsageJSON)
-		if err != nil {
-			markGACell(&cell, "failed", err.Error())
+	if missingAxes := missingRequiredScoreAxes(resultSchemaV2, attempt.Raw); len(missingAxes) > 0 && effectiveScoreOutputContract(options, cell) == outputContractPromptJSON {
+		cell.Attempts++
+		retryPrompt := buildScoreSchemaCorrectionPrompt(job.Prompt, missingAxes)
+		retryAttempt, retryErr := executeScoreAttempt(callCtx, provider, options, cell, retryPrompt, cost)
+		if retryErr != nil {
+			markGACell(&cell, "failed", retryErr.Error())
 			results <- scoreJobResult{Index: job.Index, Cell: cell, Status: "failed", Final: true}
 			return
 		}
-		cell.InputTokens = usageCost.InputTokens
-		cell.CachedTokens = usageCost.CachedInputTokens
-		cell.OutputTokens = usageCost.OutputTokens
-		cell.CostUSD = usageCost.CostUSD
-	} else if cost.BudgetEnabled() {
-		markGACell(&cell, "failed", "missing provider usage metadata for cost-controlled run")
-		results <- scoreJobResult{Index: job.Index, Cell: cell, Status: "failed", Final: true}
-		return
+		attempt = mergeScoreAttempts(attempt, retryAttempt)
+		if missingAxes = missingRequiredScoreAxes(resultSchemaV2, attempt.Raw); len(missingAxes) > 0 {
+			markGACell(&cell, "failed", fmt.Sprintf("schema-correction retry still missing required score axes: %s", strings.Join(missingAxes, ", ")))
+			results <- scoreJobResult{Index: job.Index, Cell: cell, Status: "failed", Final: true}
+			return
+		}
 	}
-	payload, err := parseScorePayload(response.Text)
-	if err != nil {
-		markGACell(&cell, "failed", err.Error())
-		results <- scoreJobResult{Index: job.Index, Cell: cell, Status: "failed", Final: true}
-		return
-	}
-	result, err := buildFitnessResult(repo, state, cell, job.Scenario, payload)
+	applyScoreAttemptToCell(&cell, attempt)
+	result, err := buildFitnessResult(repo, state, cell, job.Scenario, attempt.Payload)
 	if err != nil {
 		markGACell(&cell, "failed", err.Error())
 		results <- scoreJobResult{Index: job.Index, Cell: cell, Status: "failed", Final: true}
@@ -616,16 +629,202 @@ func executeScoreJob(ctx context.Context, repo Repo, provider Provider, job scor
 	results <- scoreJobResult{Index: job.Index, Cell: cell, Status: "done", Final: true}
 }
 
-func parseScorePayload(text string) (scorePayload, error) {
+func executeScoreAttempt(ctx context.Context, provider Provider, options scoreOptions, cell GACell, prompt string, cost CostConfig) (scoreResponseAttempt, error) {
+	response, err := provider.Generate(ctx, ProviderRequest{
+		Provider:         options.ProviderName,
+		APIModel:         cell.APIModel,
+		ReasoningEffort:  cell.ReasoningEffort,
+		ReasoningSummary: options.ReasoningSummary,
+		ServiceTier:      cell.ServiceTier,
+		TextVerbosity:    options.TextVerbosity,
+		MaxOutputTokens:  options.MaxOutputTokens,
+		OutputContract:   effectiveScoreOutputContract(options, cell),
+		OutputSchemaName: "ga_score_payload_v2",
+		OutputSchema:     scorePayloadJSONSchema(),
+		Instructions:     "Return only valid JSON for the requested GA score payload. Do not include code fences or commentary.",
+		Prompt:           prompt,
+	})
+	if err != nil {
+		return scoreResponseAttempt{}, err
+	}
+	usageCost, err := parseScoreUsageCost(cost, response.UsageJSON)
+	if err != nil {
+		return scoreResponseAttempt{}, err
+	}
+	parsed, err := parseScorePayload(response.Text)
+	if err != nil {
+		return scoreResponseAttempt{}, err
+	}
+	return scoreResponseAttempt{
+		Response: response,
+		Payload:  parsed.Payload,
+		Raw:      parsed.Raw,
+		Usage:    usageCost,
+	}, nil
+}
+
+func parseScoreUsageCost(cost CostConfig, usageJSON string) (UsageCost, error) {
+	// Intent: Record measured provider usage for every score attempt so
+	// schema-correction retries count toward state cost instead of vanishing from
+	// the run ledger. Source: DI-kibuf
+	if usageJSON == "" {
+		if cost.BudgetEnabled() {
+			return UsageCost{}, fmt.Errorf("missing provider usage metadata for cost-controlled run")
+		}
+		return UsageCost{}, nil
+	}
+	return cost.ParseUsage(usageJSON)
+}
+
+func applyScoreAttemptToCell(cell *GACell, attempt scoreResponseAttempt) {
+	cell.RequestID = attempt.Response.RequestID
+	cell.ResponseID = attempt.Response.ResponseID
+	cell.ServedServiceTier = attempt.Response.ServiceTier
+	cell.UsageJSON = attempt.Response.UsageJSON
+	cell.InputTokens = attempt.Usage.InputTokens
+	cell.CachedTokens = attempt.Usage.CachedInputTokens
+	cell.OutputTokens = attempt.Usage.OutputTokens
+	cell.CostUSD = attempt.Usage.CostUSD
+}
+
+func effectiveScoreOutputContract(options scoreOptions, cell GACell) string {
+	if normalized, err := normalizeOutputContract(options.OutputContract); err == nil && normalized != "" {
+		return normalized
+	}
+	if normalized, err := normalizeOutputContract(cell.OutputContract); err == nil && normalized != "" {
+		return normalized
+	}
+	return outputContractJSONSchemaStrict
+}
+
+func mergeScoreAttempts(first scoreResponseAttempt, second scoreResponseAttempt) scoreResponseAttempt {
+	second.Usage.InputTokens += first.Usage.InputTokens
+	second.Usage.CachedInputTokens += first.Usage.CachedInputTokens
+	second.Usage.OutputTokens += first.Usage.OutputTokens
+	second.Usage.CostUSD += first.Usage.CostUSD
+	return second
+}
+
+func parseScorePayload(text string) (scorePayloadParse, error) {
 	clean := strings.TrimSpace(text)
 	clean = strings.TrimPrefix(clean, "```json")
 	clean = strings.TrimPrefix(clean, "```")
 	clean = strings.TrimSuffix(clean, "```")
+	clean = strings.TrimSpace(clean)
 	var payload scorePayload
-	if err := json.Unmarshal([]byte(strings.TrimSpace(clean)), &payload); err != nil {
-		return scorePayload{}, err
+	if err := json.Unmarshal([]byte(clean), &payload); err != nil {
+		return scorePayloadParse{}, err
 	}
-	return payload, nil
+	var raw scorePayloadEnvelope
+	if err := json.Unmarshal([]byte(clean), &raw); err != nil {
+		return scorePayloadParse{}, err
+	}
+	return scorePayloadParse{Payload: payload, Raw: raw}, nil
+}
+
+func missingRequiredScoreAxes(schema string, raw scorePayloadEnvelope) []string {
+	if schema != resultSchemaV2 {
+		return nil
+	}
+	var missing []string
+	for _, field := range []string{"promise_vocabulary", "simplicity_durability"} {
+		if _, ok := raw.Scores[field]; !ok {
+			missing = append(missing, field)
+		}
+	}
+	sort.Strings(missing)
+	return missing
+}
+
+func buildScoreSchemaCorrectionPrompt(prompt string, missingAxes []string) string {
+	var out strings.Builder
+	out.WriteString(prompt)
+	out.WriteString("\n## Schema Correction\n\n")
+	out.WriteString("Your previous JSON response was invalid because it omitted required `scores` fields for the rubric-v2 contract.\n")
+	fmt.Fprintf(&out, "Missing score axes: `%s`.\n", strings.Join(missingAxes, "`, `"))
+	out.WriteString("Return the full JSON object again, with all 10 `scores` axes present exactly once.\n")
+	out.WriteString("A response missing any required `scores` axis is invalid.\n")
+	return out.String()
+}
+
+func scorePayloadJSONSchema() map[string]interface{} {
+	stringArraySchema := map[string]interface{}{
+		"type":  "array",
+		"items": map[string]interface{}{"type": "string"},
+	}
+	return map[string]interface{}{
+		"type":                 "object",
+		"additionalProperties": false,
+		"required":             []string{"scores", "fitness", "assessment"},
+		"properties": map[string]interface{}{
+			"scores": map[string]interface{}{
+				"type":                 "object",
+				"additionalProperties": false,
+				"required": []string{
+					"scenario_fit",
+					"promisegrid_alignment",
+					"auditability",
+					"evolution_safety",
+					"layer_boundary_clarity",
+					"failure_handling",
+					"implementation_plausibility",
+					"promise_vocabulary",
+					"simplicity_durability",
+					"risk_penalty",
+				},
+				"properties": map[string]interface{}{
+					"scenario_fit":                boundedIntegerSchema(),
+					"promisegrid_alignment":       boundedIntegerSchema(),
+					"auditability":                boundedIntegerSchema(),
+					"evolution_safety":            boundedIntegerSchema(),
+					"layer_boundary_clarity":      boundedIntegerSchema(),
+					"failure_handling":            boundedIntegerSchema(),
+					"implementation_plausibility": boundedIntegerSchema(),
+					"promise_vocabulary":          boundedIntegerSchema(),
+					"simplicity_durability":       boundedIntegerSchema(),
+					"risk_penalty":                boundedIntegerSchema(),
+				},
+			},
+			"fitness": map[string]interface{}{
+				"type":                 "object",
+				"additionalProperties": false,
+				"required":             []string{"raw", "normalized_0_100", "confidence_0_1"},
+				"properties": map[string]interface{}{
+					"raw":              map[string]interface{}{"type": "number"},
+					"normalized_0_100": map[string]interface{}{"type": "number"},
+					"confidence_0_1":   map[string]interface{}{"type": "number", "minimum": 0, "maximum": 1},
+				},
+			},
+			"assessment": map[string]interface{}{
+				"type":                 "object",
+				"additionalProperties": false,
+				"required": []string{
+					"rationale",
+					"strengths",
+					"weaknesses",
+					"risks",
+					"open_questions",
+					"authority_boundary",
+				},
+				"properties": map[string]interface{}{
+					"rationale":          map[string]interface{}{"type": "string"},
+					"strengths":          stringArraySchema,
+					"weaknesses":         stringArraySchema,
+					"risks":              stringArraySchema,
+					"open_questions":     stringArraySchema,
+					"authority_boundary": map[string]interface{}{"type": "string"},
+				},
+			},
+		},
+	}
+}
+
+func boundedIntegerSchema() map[string]interface{} {
+	return map[string]interface{}{
+		"type":    "integer",
+		"minimum": 0,
+		"maximum": 5,
+	}
 }
 
 func buildScorePrompt(repo Repo, state GAState, cell GACell, scenario Scenario) (string, error) {
@@ -657,6 +856,8 @@ func buildScorePrompt(repo Repo, state GAState, cell GACell, scenario Scenario) 
 	out.WriteString("- `promise_vocabulary`: reward Promise-Theory-correct, promise-first wording. Prefer payload promises such as \"Alice promises this payload meets the protocol specification referred to by this pCID.\" Penalize normative claim cards, conformance bundles, generic profile support claims, port claims, and central trust-ledger framing.\n")
 	out.WriteString("- `simplicity_durability`: reward small, explicit, deterministic, 100-year durable artifacts that fit small devices. Penalize generic maps, cards, ledgers, bundles, and feature-shopping wrappers.\n")
 	out.WriteString("- The runner recomputes `fitness.raw` and `fitness.normalized_0_100` from your axis scores with normal weighting. Use `fitness.confidence_0_1` for your confidence.\n\n")
+	out.WriteString("Required score-axis checklist: `scenario_fit`, `promisegrid_alignment`, `auditability`, `evolution_safety`, `layer_boundary_clarity`, `failure_handling`, `implementation_plausibility`, `promise_vocabulary`, `simplicity_durability`, `risk_penalty`.\n")
+	out.WriteString("A response missing any required `scores` axis is invalid.\n\n")
 	out.WriteString("## Source Documents\n\n")
 	for _, doc := range docs {
 		fmt.Fprintf(&out, "### `%s`\n\n```markdown\n%s\n```\n\n", doc.Path, strings.TrimSpace(doc.Text))
@@ -699,6 +900,7 @@ func buildFitnessResult(repo Repo, state GAState, cell GACell, scenario Scenario
 			Provider:          cell.Provider,
 			APIModel:          cell.APIModel,
 			ReasoningEffort:   cell.ReasoningEffort,
+			OutputContract:    cell.OutputContract,
 			ServiceTier:       cell.ServiceTier,
 			ServedServiceTier: cell.ServedServiceTier,
 			RequestID:         cell.RequestID,

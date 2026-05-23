@@ -1,0 +1,135 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-kurim-grid-envelope-app-semantics-partial-conformance-openai-gpt-5.4-medium-20260523-171912",
+  "run_group_id": "ga-calib-20260523-structured-strict2",
+  "cell_id": "ga-calib-20260523-structured-strict2-000001-SIM-kurim-grid-envelope--app-semantics-partial-conformance--openai-gpt-5.4-medium",
+  "sim_id": "SIM-kurim-grid-envelope",
+  "scenario_id": "app-semantics-partial-conformance",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-171912",
+  "result_path": "results/SIM-kurim-grid-envelope/app-semantics-partial-conformance/openai-gpt-5.4-medium/20260523-171912.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_ceba96f03783412a9480674a28c5243c",
+    "response_id": "resp_09591a9b65964315006a11e1a2d4e8819bb35f6ee3b6d152ec",
+    "input_tokens": 12006,
+    "output_tokens": 1234,
+    "cost_usd": 0.0382865
+  },
+  "source": {
+    "repo_commit": "b35bf8ed25ef35d583168ba24fa464c3882aa819",
+    "sim_path": "simulations/SIM-kurim-grid-envelope/",
+    "scenario_path": "scenarios/app-semantics-partial-conformance/app-semantics-partial-conformance.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-kurim-grid-envelope/README.md",
+        "sha256": "ecf4614b85b76dbd404c91a600561e3bfad4212ad853447fa0a56734c9630ef6"
+      },
+      {
+        "path": "simulations/SIM-kurim-grid-envelope/QUESTION.md",
+        "sha256": "dc716719f8bf916d1cda5da020ea0ce6cfd3ef5221e85a9b41dd81537664c7a4"
+      },
+      {
+        "path": "simulations/SIM-kurim-grid-envelope/TODO/TODO-tujad-grid-envelope-successor-owner.md",
+        "sha256": "e246e1fa25fbe51f550922af92665ad8bff25022fdcb3643e118285eca6d40bc"
+      },
+      {
+        "path": "simulations/SIM-kurim-grid-envelope/TODO/TODO.md",
+        "sha256": "68d0fff548e0489d1114c0c490788bf9d8d7be9fd769296e73749b0fbf610840"
+      },
+      {
+        "path": "simulations/SIM-kurim-grid-envelope/seed/extraction-sources.md",
+        "sha256": "444042ace58bed35b22df66c65e76a195418e76ec50dab3b25afee077ddfb08d"
+      },
+      {
+        "path": "scenarios/app-semantics-partial-conformance/app-semantics-partial-conformance.md",
+        "sha256": "e84a88096e8ecaca83f7a04d8958d6f7e5712e53bf180d14674e32fab69399ef"
+      }
+    ],
+    "simulation_tree_hash": "f644f1f7130016bc26b62e903e784a948f962727c347009162f6b29dcc18e6e2"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 3,
+    "auditability": 4,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 2,
+    "implementation_plausibility": 3,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 3,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 30,
+    "normalized_0_100": 60,
+    "confidence_0_1": 0.78
+  },
+  "assessment": {
+    "rationale": "This simulation is a useful restraint against overclaim because it treats grid envelopes as candidate specimens, keeps the wire format unsettled, and records explicit owner/history evidence. That helps with honest partial-conformance posture. But it is not an app-semantics design, does not directly define conformance claim wording, and uses limited promise-first language.",
+    "strengths": [
+      "Explicitly marks the envelope as a working hypothesis rather than a final contract.",
+      "Strong audit trail through TODO ownership, DI links, and variant inventory.",
+      "Supports evolution by preserving multiple specimens instead of freezing one premature answer.",
+      "Maintains good boundary between candidate artifacts and canonical design authority."
+    ],
+    "weaknesses": [
+      "Weak direct coverage of app-level semantics and interoperability claims.",
+      "Limited Promise-Theory-native wording for conformance statements.",
+      "Failure behavior is mostly deferred to successor variants rather than settled here.",
+      "Does not clearly specify authoritative protocol-boundary identity for partial-conformance claims."
+    ],
+    "risks": [
+      "Readers may mistake the parent lineage inventory for a protocol endorsement or conformance surface.",
+      "Protocol-boundary identity and signature authority remain unresolved for provisional app claims.",
+      "App-level semantic claims could be underspecified if envelope experimentation is presented without explicit promise wording."
+    ],
+    "open_questions": [
+      "What exact promise-first wording should an app use to claim provisional conformance without implying a settled app contract?",
+      "Which identity or signature context is authoritative at the protocol boundary when the outer envelope or carriage remains provisional?",
+      "How should partial app semantics be bound to pCID-defined payload behavior versus adapter-local wire choices?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

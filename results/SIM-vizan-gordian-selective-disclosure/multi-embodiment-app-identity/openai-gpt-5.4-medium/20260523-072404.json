@@ -1,0 +1,124 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-vizan-gordian-selective-disclosure-multi-embodiment-app-identity-openai-gpt-5.4-medium-20260523-072404",
+  "run_group_id": "ga-tugoz-20260523-072345",
+  "cell_id": "ga-tugoz-20260523-072345-000033-SIM-vizan-gordian-selective-disclosure--multi-embodiment-app-identity--openai-gpt-5.4-medium",
+  "sim_id": "SIM-vizan-gordian-selective-disclosure",
+  "scenario_id": "multi-embodiment-app-identity",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-072404",
+  "result_path": "results/SIM-vizan-gordian-selective-disclosure/multi-embodiment-app-identity/openai-gpt-5.4-medium/20260523-072404.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_76bdc2735299454c84336df5302b8676",
+    "response_id": "resp_0d80c6cbf3838033006a1156dd044c819b8e9218d23dbb1a15",
+    "input_tokens": 7575,
+    "output_tokens": 1474,
+    "cost_usd": 0.03389225
+  },
+  "source": {
+    "repo_commit": "b35bf8ed25ef35d583168ba24fa464c3882aa819",
+    "sim_path": "simulations/SIM-vizan-gordian-selective-disclosure/",
+    "scenario_path": "scenarios/multi-embodiment-app-identity/multi-embodiment-app-identity.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "1c8b795ba3b07f6ae9d95037854ffebe792eb88bcdf9545409aeecf068956f9d"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-vizan-gordian-selective-disclosure/README.md",
+        "sha256": "0a990715360259e3723e8b663d1ec9d433c71bcd1da9e8cf9df3854ba3ab97f1"
+      },
+      {
+        "path": "simulations/SIM-vizan-gordian-selective-disclosure/QUESTION.md",
+        "sha256": "8446f97cab455f39f6f9baf8bbbde66dbac9f09ee3cc03f239d02472afdd7d98"
+      },
+      {
+        "path": "simulations/SIM-vizan-gordian-selective-disclosure/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "5e3e4c2d0878dfcaa5a5372e38b778c8a53912fc91c0ff1b86ec1b33bfcae8d8"
+      },
+      {
+        "path": "scenarios/multi-embodiment-app-identity/multi-embodiment-app-identity.md",
+        "sha256": "e05f78b9d46c47acecbf430a12fda015268e17d60fbea9e0609fa11e604e52cc"
+      }
+    ],
+    "simulation_tree_hash": "a0344f847a20f696402be4bb81705f998fb9a0f2c69b89a81e5bf75a0ddc305a"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 4,
+    "auditability": 3,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 3,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 2,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 30,
+    "normalized_0_100": 60,
+    "confidence_0_1": 0.78
+  },
+  "assessment": {
+    "rationale": "Good envelope-layer discipline and evolution handling, but the specimen is aimed at selective disclosure rather than multi-embodiment app identity. It helps with shared wire-contract identity via pCID-selected payloads, yet it does not define embodiment-scoped conformance claims, runtime constraints, or a clear way to say which component implements which subset.",
+    "strengths": [
+      "Keeps a minimal universal outer envelope while isolating specialized disclosure logic in the payload family.",
+      "Uses explicit pCID and proof_pCID slots, which helps heterogeneous embodiments share a wire contract without forcing universal parser knowledge.",
+      "Has clear unknown-pCID and unknown-proof handling, supporting partial understanding and future evolution."
+    ],
+    "weaknesses": [
+      "Does not directly specify how browser and plugin publish separate implementation-scope claims while still being one app.",
+      "Promise vocabulary is mostly spec/structure oriented rather than explicit peer-local promise wording.",
+      "Selective-disclosure structure adds audit and implementation complexity for a scenario that is mainly about app identity and embodiment boundaries."
+    ],
+    "risks": [
+      "Mallory can exploit ambiguity between shared UX identity and actual protocol-contract coverage because the specimen lacks a conformance-claim shape.",
+      "Specialized disclosure wrappers may overfit privacy pressure and distract from durable, minimal app-identity evidence.",
+      "Long-term audits may struggle to compare embodiments if implementation-scope artifacts are left out of the design."
+    ],
+    "open_questions": [
+      "What artifact would let each embodiment promise exactly which parts of the shared contract it implements?",
+      "Is shared payload-family pCID enough to establish one app identity, or is an additional app-family contract needed?",
+      "How would audits survive browser storage loss and helper replacement without a durable embodiment-claim record?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

@@ -1,0 +1,126 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-jumav-grid-envelope-wrapper-proof-ceramic-like-device-bound-agent-physical-effect-openai-gpt-5.4-medium-20260523-072404",
+  "run_group_id": "ga-tugoz-20260523-072345",
+  "cell_id": "ga-tugoz-20260523-072345-000011-SIM-jumav-grid-envelope-wrapper-proof-ceramic-like--device-bound-agent-physical-effect--openai-gpt-5.4-medium",
+  "sim_id": "SIM-jumav-grid-envelope-wrapper-proof-ceramic-like",
+  "scenario_id": "device-bound-agent-physical-effect",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-072404",
+  "result_path": "results/SIM-jumav-grid-envelope-wrapper-proof-ceramic-like/device-bound-agent-physical-effect/openai-gpt-5.4-medium/20260523-072404.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_6d4a7852f6a347b69b86df382c5f103a",
+    "response_id": "resp_0c2a31d32d6a3482006a115686ea748199b6e0bb7af7f592b5",
+    "input_tokens": 7780,
+    "output_tokens": 1085,
+    "cost_usd": 0.028805
+  },
+  "source": {
+    "repo_commit": "b35bf8ed25ef35d583168ba24fa464c3882aa819",
+    "sim_path": "simulations/SIM-jumav-grid-envelope-wrapper-proof-ceramic-like/",
+    "scenario_path": "scenarios/device-bound-agent-physical-effect/device-bound-agent-physical-effect.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "1c8b795ba3b07f6ae9d95037854ffebe792eb88bcdf9545409aeecf068956f9d"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-jumav-grid-envelope-wrapper-proof-ceramic-like/README.md",
+        "sha256": "e68c0c9c3b6a4c40272863e43fa75e04a2b585732f125a9af75ff9bea497c359"
+      },
+      {
+        "path": "simulations/SIM-jumav-grid-envelope-wrapper-proof-ceramic-like/QUESTION.md",
+        "sha256": "072544a1b733436e564d7ac6fd105347e08188fff1fd5fbe5912d9b9bc16265d"
+      },
+      {
+        "path": "simulations/SIM-jumav-grid-envelope-wrapper-proof-ceramic-like/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "ad73678c9870d79cd65313088b6978d2c986e9aeb9cb85382c1a2af03b00f067"
+      },
+      {
+        "path": "scenarios/device-bound-agent-physical-effect/device-bound-agent-physical-effect.md",
+        "sha256": "ffd2cee6094031ae77651ba8da6c3c76b54d200845f65f0e93d07c8e96aaeb2a"
+      }
+    ],
+    "simulation_tree_hash": "3bafd6207899415f0dd2bac6a206354f0d9a1273593e0af477084bfc5ebc3db2"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 3,
+    "auditability": 3,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 1,
+    "implementation_plausibility": 3,
+    "promise_vocabulary": 1,
+    "simplicity_durability": 3,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 24,
+    "normalized_0_100": 48,
+    "confidence_0_1": 0.82
+  },
+  "assessment": {
+    "rationale": "The specimen is a plausible small envelope variant with clear wrapper/content separation, but it barely addresses the scenario's core pressures: delegated device control, non-idempotent physical effects, replay after restart, receipts, and break-witness behavior. It helps with durable attestation framing more than with device-bound effect control.",
+    "strengths": [
+      "Tiny outer envelope fits small-device and durability goals.",
+      "Clear boundary between outer envelope, linked content, and proof wrapper.",
+      "Unknown-pCID handling preserves evidence without over-claiming verification.",
+      "Linked-content proof structure can support later audit if referenced content survives."
+    ],
+    "weaknesses": [
+      "No explicit model for owner delegation to a device-bound agent.",
+      "No mechanism for deduplicating non-idempotent physical effects across replay/restart.",
+      "No receipt or break-witness semantics for already-done effects.",
+      "Vocabulary is proof/profile-centric rather than promise-first."
+    ],
+    "risks": [
+      "Replay could trigger duplicate physical actions unless another layer supplies effect IDs and local accounting.",
+      "Audit may fail if linked content is unavailable or device/driver context is not captured.",
+      "Wrapper indirection may encourage generic conformance framing instead of explicit payload promises."
+    ],
+    "open_questions": [
+      "What payload promise would bind the device owner, delegated agent, requested effect, and effect identifier?",
+      "Where would at-most-once evidence and break-witness records live: content object, wrapper payload, or a separate receipt object?",
+      "How would Carol audit a completed print after the device, driver stack, and proof profile tooling are gone?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

@@ -1,0 +1,124 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-pamap-grid-envelope-signable-view-atproto-like-live-crdt-audit-publication-openai-gpt-5.4-medium-20260523-072404",
+  "run_group_id": "ga-tugoz-20260523-072345",
+  "cell_id": "ga-tugoz-20260523-072345-000002-SIM-pamap-grid-envelope-signable-view-atproto-like--live-crdt-audit-publication--openai-gpt-5.4-medium",
+  "sim_id": "SIM-pamap-grid-envelope-signable-view-atproto-like",
+  "scenario_id": "live-crdt-audit-publication",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-072404",
+  "result_path": "results/SIM-pamap-grid-envelope-signable-view-atproto-like/live-crdt-audit-publication/openai-gpt-5.4-medium/20260523-072404.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_32db7f5be476493db2b5cb2c430316c2",
+    "response_id": "resp_016fa9f9771222c3006a115671c53c8198ac3ef0c1d29005d2",
+    "input_tokens": 7892,
+    "output_tokens": 1343,
+    "cost_usd": 0.032613
+  },
+  "source": {
+    "repo_commit": "b35bf8ed25ef35d583168ba24fa464c3882aa819",
+    "sim_path": "simulations/SIM-pamap-grid-envelope-signable-view-atproto-like/",
+    "scenario_path": "scenarios/live-crdt-audit-publication/live-crdt-audit-publication.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "1c8b795ba3b07f6ae9d95037854ffebe792eb88bcdf9545409aeecf068956f9d"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-pamap-grid-envelope-signable-view-atproto-like/README.md",
+        "sha256": "2281f7b166be066043b71addddf160de7252f67e3877f5e205fae363b849da64"
+      },
+      {
+        "path": "simulations/SIM-pamap-grid-envelope-signable-view-atproto-like/QUESTION.md",
+        "sha256": "03b6ad09a2cf073dfec603863709a15da24b3380563e7aaf9a35b4f0b035724e"
+      },
+      {
+        "path": "simulations/SIM-pamap-grid-envelope-signable-view-atproto-like/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "1d9ec592ecb1fa5e1fb6157b86f24d5a94b7fabee115709b9b949c9a80da6616"
+      },
+      {
+        "path": "scenarios/live-crdt-audit-publication/live-crdt-audit-publication.md",
+        "sha256": "870887bbd5848db45bc4406e5369b492a516c2bd997de9226d24825214c49d94"
+      }
+    ],
+    "simulation_tree_hash": "4807df0f3808e27bf7226487a8b2c06486c183f3911960da1e360f3a902ae736"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 3,
+    "promisegrid_alignment": 4,
+    "auditability": 4,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 3,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 3,
+    "simplicity_durability": 4,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 35,
+    "normalized_0_100": 70,
+    "confidence_0_1": 0.82
+  },
+  "assessment": {
+    "rationale": "Good fit for the durable audit-publication half of the scenario, but not for live CRDT transport itself. The specimen gives a small deterministic object shape, explicit signed bytes, and clear unknown-handler behavior, which helps later audit. It does not solve sub-second ordered live delivery, so the strongest reading is: keep live sync off-grid or separate, and publish milestone audit artifacts on-grid.",
+    "strengths": [
+      "Small durable envelope with explicit signable view.",
+      "Audit can cite a concrete content-addressed outer object while verification rules stay deterministic.",
+      "Clear separation between unknown payload parsing and proof-verification support."
+    ],
+    "weaknesses": [
+      "Does not model reliable low-latency live CRDT transport or partition recovery.",
+      "Generic tooling may miss audit meaning unless it knows the payload contract's reserved proof slot and projection rule.",
+      "Spec wording is more signature/authentication-centric than promise-first."
+    ],
+    "risks": [
+      "Implementers may blur live-channel claims with audit-layer claims because both sit near the payload contract.",
+      "Signing sig_pcid inside the signable view may make proof-profile migration awkward.",
+      "Sparse peers may preserve bytes but lack enough contract knowledge to audit proofs consistently."
+    ],
+    "open_questions": [
+      "Should the save-time audit message cite the full outer grid object, the CRDT snapshot object it contains, or both?",
+      "Should live sync remain explicitly off-grid until a reliable binding exists?",
+      "Is the named payload_without_sig projection simple enough for long-term generic audit tooling?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

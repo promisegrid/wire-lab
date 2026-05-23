@@ -1,0 +1,126 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-pamap-grid-envelope-signable-view-atproto-like-portable-signing-key-identity-openai-gpt-5.4-medium-20260523-072404",
+  "run_group_id": "ga-tugoz-20260523-072345",
+  "cell_id": "ga-tugoz-20260523-072345-000001-SIM-pamap-grid-envelope-signable-view-atproto-like--portable-signing-key-identity--openai-gpt-5.4-medium",
+  "sim_id": "SIM-pamap-grid-envelope-signable-view-atproto-like",
+  "scenario_id": "portable-signing-key-identity",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-072404",
+  "result_path": "results/SIM-pamap-grid-envelope-signable-view-atproto-like/portable-signing-key-identity/openai-gpt-5.4-medium/20260523-072404.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_383a7b3a83a24bc2993388cdef7fec90",
+    "response_id": "resp_01cac782628a1e79006a115671a8788199a8236ebc261d4497",
+    "input_tokens": 7851,
+    "output_tokens": 1115,
+    "cost_usd": 0.02934925
+  },
+  "source": {
+    "repo_commit": "b35bf8ed25ef35d583168ba24fa464c3882aa819",
+    "sim_path": "simulations/SIM-pamap-grid-envelope-signable-view-atproto-like/",
+    "scenario_path": "scenarios/portable-signing-key-identity/portable-signing-key-identity.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "1c8b795ba3b07f6ae9d95037854ffebe792eb88bcdf9545409aeecf068956f9d"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-pamap-grid-envelope-signable-view-atproto-like/README.md",
+        "sha256": "2281f7b166be066043b71addddf160de7252f67e3877f5e205fae363b849da64"
+      },
+      {
+        "path": "simulations/SIM-pamap-grid-envelope-signable-view-atproto-like/QUESTION.md",
+        "sha256": "03b6ad09a2cf073dfec603863709a15da24b3380563e7aaf9a35b4f0b035724e"
+      },
+      {
+        "path": "simulations/SIM-pamap-grid-envelope-signable-view-atproto-like/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "1d9ec592ecb1fa5e1fb6157b86f24d5a94b7fabee115709b9b949c9a80da6616"
+      },
+      {
+        "path": "scenarios/portable-signing-key-identity/portable-signing-key-identity.md",
+        "sha256": "4deaafd0d50191f352fe959dbd93ce9ea916706abc6e23a05274e32bfb92625f"
+      }
+    ],
+    "simulation_tree_hash": "4807df0f3808e27bf7226487a8b2c06486c183f3911960da1e360f3a902ae736"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 4,
+    "auditability": 3,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 3,
+    "failure_handling": 3,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 1,
+    "simplicity_durability": 4,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 28,
+    "normalized_0_100": 56.00000000000001,
+    "confidence_0_1": 0.79
+  },
+  "assessment": {
+    "rationale": "Strong minimal envelope specimen with explicit signable bytes and decent sparse-peer behavior, but it does not really solve the scenario's portable identity, key continuity, rotation evidence, or browser/plugin storage guidance questions.",
+    "strengths": [
+      "Small deterministic artifact shape.",
+      "Explicit signable view binds pcid and proof-profile choice.",
+      "Unknown-pCID and unsupported-proof handling are stated.",
+      "Avoids central registry assumptions."
+    ],
+    "weaknesses": [
+      "Little direct support for durable identity distinct from signing keys.",
+      "No concrete old-key to new-key linkage recipe.",
+      "Does not address browser vs helper storage constraints or XSS-qualified guidance.",
+      "Uses spec/conformance wording more than promise-first payload promises."
+    ],
+    "risks": [
+      "Could be overread as an identity solution when it is mainly a signing-envelope variant.",
+      "Embedding proof semantics inside payload contracts may reduce generic audit clarity.",
+      "Signing sig_pcid helps binding but may complicate migration across proof profiles."
+    ],
+    "open_questions": [
+      "What payload-level artifact would carry key-rotation continuity evidence?",
+      "How should portable identity claims be expressed independently of display names and local usernames?",
+      "What v0 guidance should distinguish browser-keystore practicality from stronger host-backed storage?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

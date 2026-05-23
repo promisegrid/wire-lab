@@ -14,6 +14,11 @@ const (
 )
 
 const (
+	outputContractPromptJSON       = "prompt_json"
+	outputContractJSONSchemaStrict = "json_schema_strict"
+)
+
+const (
 	defaultRequestTimeout      = 5 * time.Minute
 	defaultProviderMaxAttempts = 2
 	// Intent: Leave enough elapsed retry budget for two full five-minute
@@ -54,6 +59,9 @@ type ProviderRequest struct {
 	ServiceTier      string
 	TextVerbosity    string
 	MaxOutputTokens  int
+	OutputContract   string
+	OutputSchemaName string
+	OutputSchema     map[string]interface{}
 	Instructions     string
 	Prompt           string
 }
@@ -67,6 +75,19 @@ type ProviderResponse struct {
 	ResponseID  string
 	ServiceTier string
 	UsageJSON   string
+}
+
+func normalizeOutputContract(outputContract string) (string, error) {
+	normalized := strings.ToLower(strings.TrimSpace(outputContract))
+	if normalized == "" {
+		return outputContractJSONSchemaStrict, nil
+	}
+	switch normalized {
+	case outputContractPromptJSON, outputContractJSONSchemaStrict:
+		return normalized, nil
+	default:
+		return "", fmt.Errorf("output-contract must be %q or %q; got %q", outputContractPromptJSON, outputContractJSONSchemaStrict, outputContract)
+	}
 }
 
 // Provider hides provider-specific APIs behind the single GA operation needed

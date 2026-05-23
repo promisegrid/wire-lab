@@ -1,0 +1,125 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-fitin-gordian-payload-wrapper-live-crdt-audit-publication-openai-gpt-5.4-medium-20260523-073120",
+  "run_group_id": "ga-tugoz-20260523-073108-suzuf",
+  "cell_id": "ga-tugoz-20260523-073108-suzuf-000008-SIM-fitin-gordian-payload-wrapper--live-crdt-audit-publication--openai-gpt-5.4-medium",
+  "sim_id": "SIM-fitin-gordian-payload-wrapper",
+  "scenario_id": "live-crdt-audit-publication",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-073120",
+  "result_path": "results/SIM-fitin-gordian-payload-wrapper/live-crdt-audit-publication/openai-gpt-5.4-medium/20260523-073120.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_9eda52c2ad084972b0af1aa93e1158e9",
+    "response_id": "resp_046dffb335329dfb006a1157f38ea0819aac0e98e5f7758aa3",
+    "input_tokens": 7569,
+    "output_tokens": 1507,
+    "cost_usd": 0.03434375
+  },
+  "source": {
+    "repo_commit": "b35bf8ed25ef35d583168ba24fa464c3882aa819",
+    "sim_path": "simulations/SIM-fitin-gordian-payload-wrapper/",
+    "scenario_path": "scenarios/live-crdt-audit-publication/live-crdt-audit-publication.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "1c8b795ba3b07f6ae9d95037854ffebe792eb88bcdf9545409aeecf068956f9d"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-fitin-gordian-payload-wrapper/README.md",
+        "sha256": "279c7872010838e6e1a717d1d09d5d1f3ba4dc7f65bd2478f9480a25a58ad90f"
+      },
+      {
+        "path": "simulations/SIM-fitin-gordian-payload-wrapper/QUESTION.md",
+        "sha256": "b19f7ea6f944b6e01a27599024b8b542e1c70e1d632dd102cd665c7e8c8f7625"
+      },
+      {
+        "path": "simulations/SIM-fitin-gordian-payload-wrapper/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "757f81e773faa42f28f9def305c409dd66e586af89d1e29654f1b760e914dad6"
+      },
+      {
+        "path": "scenarios/live-crdt-audit-publication/live-crdt-audit-publication.md",
+        "sha256": "870887bbd5848db45bc4406e5369b492a516c2bd997de9226d24825214c49d94"
+      }
+    ],
+    "simulation_tree_hash": "89e59244cc796db7feb98172fe4717350d151e0833647afb0891ec143141b835"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 3,
+    "promisegrid_alignment": 4,
+    "auditability": 4,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 3,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 3,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 35,
+    "normalized_0_100": 70,
+    "confidence_0_1": 0.79
+  },
+  "assessment": {
+    "rationale": "Strong on durable audit publication structure and boundary discipline, but only partial for the live-CRDT side because it does not supply a reliable live binding or a concrete off-grid/live-on-grid transition design.",
+    "strengths": [
+      "Keeps the universal envelope minimal while allowing richer audit structure in a payload family.",
+      "Subject/assertion/proof wrapper can make milestone audit publications easier for Carol to inspect later.",
+      "Unknown-pCID policy and payload-local semantics support evolution without forcing universal Gordian doctrine.",
+      "Clear separation between generic grid parsing and higher-level audit interpretation helps keep live-layer and audit-layer claims distinct."
+    ],
+    "weaknesses": [
+      "Does not define the live reliable ordered transport needed for sub-second CRDT sync.",
+      "Promise wording is mostly structural/spec-centric rather than explicit promise-first payload claims.",
+      "Adds wrapper complexity that may be hard to justify for small-device durable artifacts.",
+      "Partition, reordering, and delayed publication handling are not worked through for this scenario."
+    ],
+    "risks": [
+      "Teams may overuse the Gordian wrapper for cases where a smaller payload promise would suffice.",
+      "Audit structure could be mistaken for live-channel conformance evidence without an explicit binding spec."
+    ],
+    "open_questions": [
+      "Should live CRDT traffic stay off-grid entirely until a reliable live binding exists?",
+      "Is subject_ref the durable snapshot object Carol audits, or is another cited CAS object needed?",
+      "What minimal promise-first assertion vocabulary would this payload family use at save-time publication?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

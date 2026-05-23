@@ -1409,6 +1409,60 @@ Affects: `tools/ga-runner/compare.go`; `tools/ga-runner/ga_runner_test.go`;
 `tools/ga-runner/README.md`; `results/RUN-PROTOCOL.md`;
 `protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`.
 
+ID: DI-kibuf
+Date: 2026-05-23 00:38:11
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Harden GA score output handling for rubric-v2 schema compliance
+without relaxing result validation. Tighten the base score prompt with an
+explicit required-axis checklist and invalid-response warning, and add one
+targeted corrective provider retry when a scored response parses as JSON but
+omits required v2 axes such as `promise_vocabulary` or
+`simplicity_durability`.
+Intent: The focused `tugoz` run showed a repeated failure mode where the model
+returned an older 8-axis score object for `promisegrid.ga.result.v2`. That
+wastes paid scoring cells and leaves partial focused slices. The runner should
+push back once with a short schema-correction retry while keeping validation
+strict and refusing to invent missing scores locally.
+Constraints: Do not auto-fill or locally repair missing axes. Keep
+`validateResultFile` strict and authoritative. Limit the schema-correction path
+to one extra provider call per cell and only when the response is JSON-shaped
+but missing required rubric-v2 score keys. Accumulate both provider-call costs
+into state when the corrective retry happens. Keep normal provider transport
+retry behavior unchanged.
+Affects: `tools/ga-runner/score.go`; `tools/ga-runner/ga_runner_test.go`;
+`tools/ga-runner/README.md`; `results/RUN-PROTOCOL.md`;
+`protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`.
+
+ID: DI-fogop
+Date: 2026-05-23 10:07:42
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Switch `ga-runner score` to provider-enforced structured outputs by
+default for score cells, while keeping `prompt_json` as an explicit fallback
+output contract. Record the score output-contract mode in state/result lineage,
+do not change the rubric-v2 schema or fitness math, and do not trigger a
+full-corpus rescore automatically. The required follow-on evidence is: rerun the
+failed `SIM-suzuf` score cells under the stricter contract and run a small
+prompt-json versus structured-output calibration slice before any broader rerun
+decision.
+Intent: The `SIM-suzuf` failures showed that prompt-enforced JSON plus one
+schema-correction retry still allows old 8-axis score shapes to leak through.
+Provider-enforced schema adherence should harden the score transport without
+falsifying historical evidence or treating transport hardening as a new rubric.
+Constraints: Keep historical `promisegrid.ga.result.v1` and existing
+`promisegrid.ga.result.v2` artifacts append-only. Score-path only; child
+generation remains on the prompt-driven JSON path for now. Additive lineage must
+distinguish `prompt_json` from `json_schema_strict`. If strict schema mode is
+explicitly requested, unsupported providers/models must fail clearly rather than
+silently degrading unless a later DI adds automatic fallback.
+Affects: `tools/ga-runner/provider.go`; `tools/ga-runner/openai.go`;
+`tools/ga-runner/score.go`; `tools/ga-runner/result.go`;
+`tools/ga-runner/state.go`; `tools/ga-runner/validate.go`;
+`tools/ga-runner/ga_runner_test.go`; `tools/ga-runner/README.md`;
+`results/RUN-PROTOCOL.md`;
+`protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`.
+
 ## Subtasks
 
 - [x] tapur.1 Define the canonical JSON fitness result schema, including source
@@ -1481,11 +1535,11 @@ Affects: `tools/ga-runner/compare.go`; `tools/ga-runner/ga_runner_test.go`;
 - [x] tapur.18 Remove default hard output caps from GA provider calls, add
   estimate-only output-token budgeting, send low text verbosity, and split the
   canary's score/generate reasoning defaults. Source: `DI-pulap`.
-- [ ] tapur.19 Evaluate OpenAI Structured Outputs for GA score and child-bundle
-  responses after the uncapped canary completes. Pros: schema-constrained JSON,
-  fewer parser retries, and shorter formatting prompts. Cons: OpenAI-specific
-  schema plumbing, stricter Markdown-in-JSON escaping, and no direct fix for
-  hidden reasoning-token consumption. Source: `DI-pulap`.
+- [x] tapur.19 Evaluate and adopt OpenAI Structured Outputs for GA score
+  responses without forcing an automatic corpus-wide rescore. Implemented by
+  `DI-fogop` as score-only `json_schema_strict` output-contract support with
+  additive lineage, explicit `prompt_json` fallback, `SIM-suzuf` rerun, and a
+  small prompt-json versus structured-output calibration slice.
 - [x] tapur.20 Add fitness-ranked parent selection before child generation and
   strengthen child prompts so generated children are explicitly expected to
   improve over parent scores while pairing the best scored parent with one
@@ -1568,6 +1622,10 @@ Affects: `tools/ga-runner/compare.go`; `tools/ga-runner/ga_runner_test.go`;
 - [x] tapur.42 Refine `compare-backfill` ambiguity accounting so same-model
   historical reruns collapse to one deterministic winner and are reported
   separately from true ambiguous historical pairings. Source: `DI-sirir`.
+- [x] tapur.43 Harden GA rubric-v2 scorer prompts and add one targeted
+  schema-correction retry for JSON responses that omit required v2 score axes,
+  without relaxing strict validation or auto-filling missing scores. Source:
+  `DI-kibuf`.
 
 ## Predecessor context
 

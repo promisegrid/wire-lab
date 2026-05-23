@@ -1,0 +1,124 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-suzuf-gordian-universal-envelope-negative-control-multi-embodiment-app-identity-openai-gpt-5.4-medium-20260523-072404",
+  "run_group_id": "ga-tugoz-20260523-072345",
+  "cell_id": "ga-tugoz-20260523-072345-000027-SIM-suzuf-gordian-universal-envelope-negative-control--multi-embodiment-app-identity--openai-gpt-5.4-medium",
+  "sim_id": "SIM-suzuf-gordian-universal-envelope-negative-control",
+  "scenario_id": "multi-embodiment-app-identity",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-072404",
+  "result_path": "results/SIM-suzuf-gordian-universal-envelope-negative-control/multi-embodiment-app-identity/openai-gpt-5.4-medium/20260523-072404.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_f911a9535c484e1e84410a24d2ef15cc",
+    "response_id": "resp_051e9ad87b0e1f09006a11e0b316608199afed64bfdd85dd43",
+    "input_tokens": 8115,
+    "output_tokens": 1297,
+    "cost_usd": 0.03235925
+  },
+  "source": {
+    "repo_commit": "b35bf8ed25ef35d583168ba24fa464c3882aa819",
+    "sim_path": "simulations/SIM-suzuf-gordian-universal-envelope-negative-control/",
+    "scenario_path": "scenarios/multi-embodiment-app-identity/multi-embodiment-app-identity.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-suzuf-gordian-universal-envelope-negative-control/README.md",
+        "sha256": "306c10193c93691950caa3378d8bd523752933ddda3ed51b175e29e011befdcc"
+      },
+      {
+        "path": "simulations/SIM-suzuf-gordian-universal-envelope-negative-control/QUESTION.md",
+        "sha256": "d94a994881167dabb66ff4fc1c0af520c7d511165e337076890b0f3bc2ccd781"
+      },
+      {
+        "path": "simulations/SIM-suzuf-gordian-universal-envelope-negative-control/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "da841566faa56f37ede19f3a5f72e5f0e6b5565e5c87094d257071577780c320"
+      },
+      {
+        "path": "scenarios/multi-embodiment-app-identity/multi-embodiment-app-identity.md",
+        "sha256": "e05f78b9d46c47acecbf430a12fda015268e17d60fbea9e0609fa11e604e52cc"
+      }
+    ],
+    "simulation_tree_hash": "593c725ca5728740f1a521fcac5ecdf4d282e7f7f3ebf45ad3ab6a67962beeb2"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 1,
+    "auditability": 3,
+    "evolution_safety": 1,
+    "layer_boundary_clarity": 1,
+    "failure_handling": 1,
+    "implementation_plausibility": 3,
+    "risk_penalty": 4
+  },
+  "fitness": {
+    "raw": 12,
+    "normalized_0_100": 24,
+    "confidence_0_1": 0.88
+  },
+  "assessment": {
+    "rationale": "This negative-control envelope is mostly orthogonal to the scenario. It may improve uniform parsing of assertions and proofs, but it does not supply a clear app-identity or embodiment-scope mechanism. By making subject/assertion/proof universal, it also weakens PromiseGrid's preferred minimal outer dispatch layer, increases parser burden, and makes unknown-protocol evolution harder. That leaves it poorly matched to a scenario about one app with heterogeneous embodiments making precise local promises.",
+    "strengths": [
+      "Deterministic positional CBOR envelope is implementable and auditable at the byte level.",
+      "Universal subject/assertion/proof structure could make some evidence chains easier to inspect consistently."
+    ],
+    "weaknesses": [
+      "No explicit mechanism for saying what makes the browser tab and plugin one app.",
+      "No clear embodiment-local conformance claim shape stating partial implementation scope and runtime constraints.",
+      "Universalizes Gordian semantics across all traffic, blurring payload-family boundaries.",
+      "Not promise-first in vocabulary or structure.",
+      "Poor fit for 100-year minimal durable envelope goals."
+    ],
+    "risks": [
+      "Mallory can exploit ambiguity between shared UX identity and actual protocol-contract scope because the design does not clearly bind embodiment-specific promises to one app identity.",
+      "Universal proof-bearing structure increases global parser and policy burden on all peers, including small or long-lived implementations.",
+      "Mixed-version and unknown-pCID handling become more fragile because there is no tiny universal dispatch slot."
+    ],
+    "open_questions": [
+      "What artifact, if any, would let browser and plugin prove they are embodiments of one app contract rather than merely using the same outer envelope?",
+      "Can embodiment-specific implementation-scope promises be expressed without making subject/assertion/proof universal?",
+      "Would any audit gain from universal proof structure survive mixed-version peers and long-term unknown-pCID evolution?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

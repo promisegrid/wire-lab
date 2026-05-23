@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-robot-app-semantics-conformance-cas-backed-group-session-envelope-independence-openai-gpt-5.4-medium-20260523-171912",
+  "run_group_id": "ga-calib-20260523-structured-strict2",
+  "cell_id": "ga-calib-20260523-structured-strict2-000008-SIM-robot-app-semantics-conformance--cas-backed-group-session-envelope-independence--openai-gpt-5.4-medium",
+  "sim_id": "SIM-robot-app-semantics-conformance",
+  "scenario_id": "cas-backed-group-session-envelope-independence",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-171912",
+  "result_path": "results/SIM-robot-app-semantics-conformance/cas-backed-group-session-envelope-independence/openai-gpt-5.4-medium/20260523-171912.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_29acf8b9c5b14a67ae8b8b83a37e4d24",
+    "response_id": "resp_01da624d99930302006a11e1b5cccc819b8ddb8e310c247d79",
+    "input_tokens": 7741,
+    "output_tokens": 920,
+    "cost_usd": 0.02642675
+  },
+  "source": {
+    "repo_commit": "b35bf8ed25ef35d583168ba24fa464c3882aa819",
+    "sim_path": "simulations/SIM-robot-app-semantics-conformance/",
+    "scenario_path": "scenarios/cas-backed-group-session-envelope-independence/cas-backed-group-session-envelope-independence.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-robot-app-semantics-conformance/README.md",
+        "sha256": "b1bd9731ee228d45f4efde278611f0d5f99bdfff4976d37f6e011f828c2dc1b4"
+      },
+      {
+        "path": "simulations/SIM-robot-app-semantics-conformance/QUESTION.md",
+        "sha256": "32857bd8e974c4f0326ed382a3ffae0e91d65404934f614ab3b7b1becfe0ea2f"
+      },
+      {
+        "path": "scenarios/cas-backed-group-session-envelope-independence/cas-backed-group-session-envelope-independence.md",
+        "sha256": "7f4409bc81e7ad284aca085e99865ff0c8b01f7ce5c8c39054845ad65d1ff464"
+      }
+    ],
+    "simulation_tree_hash": "e57bc7679fd213e955302abe66d10f62f5e3f6e719093146f00c240f25158767"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 2,
+    "auditability": 3,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 3,
+    "failure_handling": 1,
+    "implementation_plausibility": 3,
+    "promise_vocabulary": 3,
+    "simplicity_durability": 3,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 25,
+    "normalized_0_100": 50,
+    "confidence_0_1": 0.87
+  },
+  "assessment": {
+    "rationale": "This simulation is mainly about honest app-facing semantics, partial conformance, and local-versus-wire identity. Those themes help with layer discipline and evolution, but it does not directly model CAS-backed group-session behavior or test envelope independence. Fit to this scenario is therefore weak, with some limited value from its caution about not claiming unstable protocol contracts as if they were settled.",
+    "strengths": [
+      "Emphasizes honest partial-conformance claims instead of overclaiming full protocol support.",
+      "Maintains useful boundary awareness between local and wire semantics.",
+      "Provisional, non-final framing is relatively evolution-safe."
+    ],
+    "weaknesses": [
+      "Does not directly address group-session semantics.",
+      "Does not specify how payload meaning is preserved across competing envelope variants.",
+      "Little explicit failure or adversarial treatment for envelope-coupling hazards."
+    ],
+    "risks": [
+      "A reader could overextend app-semantics guidance into envelope-selection territory without explicit safeguards.",
+      "Because group-session and CAS mechanics are out of scope here, the design could accidentally hide dependence on a preferred envelope variant.",
+      "Provisional signing language may blur payload semantics versus wrapper semantics if reused carelessly."
+    ],
+    "open_questions": [
+      "Can app-level semantic claims be stated so resolved payload meaning stays independent of any grid-envelope winner?",
+      "What minimal payload-bound promise vocabulary would let auditors check conformance without coupling to envelope format?",
+      "If signature carriage remains provisional, how would a peer distinguish payload semantics from envelope-specific transport evidence?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

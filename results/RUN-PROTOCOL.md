@@ -86,6 +86,16 @@ transient failures (`408`, `409`, `429`, `500`, `502`, `503`, `504`, network
 timeouts, and request timeouts) use bounded exponential backoff rather than
 silently falling back to a higher-cost tier. Source: `DI-mopob`; `DI-tufud`.
 
+GA rubric-v2 score calls now default to provider-enforced structured outputs via
+an explicit score output contract, `json_schema_strict`. This is transport
+hardening, not a rubric change: new score results should record
+`runner.output_contract` so `prompt_json` and provider-enforced schema runs can
+coexist in the corpus without rewriting history. The explicit fallback path is
+`score -output-contract prompt_json`. Adopting structured outputs does not by
+itself authorize a full-corpus rescore; first rerun any affected failed cells
+and use a small calibration slice to check for material rank drift. Source:
+`DI-fogop`.
+
 Synchronous GA/search calls should be bounded before Batch mode is available:
 raw `tools/ga-runner score` and `generate` default to one worker, five-minute
 provider attempts, two attempts per cell or child, and a twelve-minute retry
@@ -278,6 +288,16 @@ the source evidence. Source: `DI-hijub`.
 Broad GA parent scoring now defaults to `medium` reasoning effort. Use `xhigh`
 explicitly for tie-breaks, promotion candidates, and design-state-sensitive
 comparisons where the extra cost is justified. Source: `DI-nanor`.
+
+GA scorer prompts must enumerate the full rubric-v2 axis list and treat any
+missing required score axis as an invalid response. Under
+`-output-contract json_schema_strict`, schema adherence is delegated to the
+provider and missing-axis responses should surface as provider or validation
+failures rather than a local schema-correction loop. Under the explicit
+fallback `-output-contract prompt_json`, `score` may send one targeted
+schema-correction retry, accumulate both call costs in state, and still reject
+the cell if the retry remains incomplete. It must not auto-fill missing scores
+locally. Source: `DI-kibuf`; `DI-fogop`.
 
 Audit-first rubric-v2 backfill should compare historical source hashes against
 current sim/scenario bytes while reporting root-contract drift separately. This

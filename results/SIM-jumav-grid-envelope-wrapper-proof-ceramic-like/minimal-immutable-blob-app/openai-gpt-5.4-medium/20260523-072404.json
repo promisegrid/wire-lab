@@ -1,0 +1,123 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-jumav-grid-envelope-wrapper-proof-ceramic-like-minimal-immutable-blob-app-openai-gpt-5.4-medium-20260523-072404",
+  "run_group_id": "ga-tugoz-20260523-072345",
+  "cell_id": "ga-tugoz-20260523-072345-000012-SIM-jumav-grid-envelope-wrapper-proof-ceramic-like--minimal-immutable-blob-app--openai-gpt-5.4-medium",
+  "sim_id": "SIM-jumav-grid-envelope-wrapper-proof-ceramic-like",
+  "scenario_id": "minimal-immutable-blob-app",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-072404",
+  "result_path": "results/SIM-jumav-grid-envelope-wrapper-proof-ceramic-like/minimal-immutable-blob-app/openai-gpt-5.4-medium/20260523-072404.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_7000a7447012476c80ab865ee594683e",
+    "response_id": "resp_0296b93296dfa162006a11568e2644819abb9157dc657e3cc4",
+    "input_tokens": 7768,
+    "output_tokens": 1327,
+    "cost_usd": 0.032172
+  },
+  "source": {
+    "repo_commit": "b35bf8ed25ef35d583168ba24fa464c3882aa819",
+    "sim_path": "simulations/SIM-jumav-grid-envelope-wrapper-proof-ceramic-like/",
+    "scenario_path": "scenarios/minimal-immutable-blob-app/minimal-immutable-blob-app.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "1c8b795ba3b07f6ae9d95037854ffebe792eb88bcdf9545409aeecf068956f9d"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-jumav-grid-envelope-wrapper-proof-ceramic-like/README.md",
+        "sha256": "e68c0c9c3b6a4c40272863e43fa75e04a2b585732f125a9af75ff9bea497c359"
+      },
+      {
+        "path": "simulations/SIM-jumav-grid-envelope-wrapper-proof-ceramic-like/QUESTION.md",
+        "sha256": "072544a1b733436e564d7ac6fd105347e08188fff1fd5fbe5912d9b9bc16265d"
+      },
+      {
+        "path": "simulations/SIM-jumav-grid-envelope-wrapper-proof-ceramic-like/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "ad73678c9870d79cd65313088b6978d2c986e9aeb9cb85382c1a2af03b00f067"
+      },
+      {
+        "path": "scenarios/minimal-immutable-blob-app/minimal-immutable-blob-app.md",
+        "sha256": "187e449b0498cddda2a2b28192f6aa29e824dae72e60ff47c35d34df35115a73"
+      }
+    ],
+    "simulation_tree_hash": "3bafd6207899415f0dd2bac6a206354f0d9a1273593e0af477084bfc5ebc3db2"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 3,
+    "promisegrid_alignment": 4,
+    "auditability": 4,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 2,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 3,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 33,
+    "normalized_0_100": 66,
+    "confidence_0_1": 0.76
+  },
+  "assessment": {
+    "rationale": "Strong on separating content identity from proof and on preserving a tiny outer envelope, but only partially addresses the scenario's core app promises around storage, retrieval, retention, authorization, and local failure accounting. The wrapper-proof indirection helps auditability and evolution, yet adds complexity for a minimal immutable blob app and is described mostly in spec/conformance language rather than promise-first terms.",
+    "strengths": [
+      "Clear separation between content reference and proof material.",
+      "Explicit unknown-pCID handling supports long-term blind carry and partial understanding.",
+      "Minimal outer envelope avoids baking heavy proof rules into the universal wrapper."
+    ],
+    "weaknesses": [
+      "Does not say who promises blob availability, retention, replication, or retrieval.",
+      "Leaves hash/cid meaning closer to address/evidence than to an explicit app promise.",
+      "Extra wrapper indirection is heavier than needed for the smallest CAS-facing app."
+    ],
+    "risks": [
+      "Readers may overread possession of the hash or content_ref as sufficient access or availability.",
+      "Detached proof-over-link can complicate small-device implementations and sparse-peer recovery."
+    ],
+    "open_questions": [
+      "For this minimal app, what exact promise should Bob make when returning the hash?",
+      "What local records should Alice, Bob, and Carol keep when the blob is unavailable years later?",
+      "Is the wrapper-proof layer worth its cost when no stronger authorship or policy evidence is needed?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

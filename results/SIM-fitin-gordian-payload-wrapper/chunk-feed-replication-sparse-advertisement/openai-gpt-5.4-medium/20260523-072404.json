@@ -1,0 +1,123 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-fitin-gordian-payload-wrapper-chunk-feed-replication-sparse-advertisement-openai-gpt-5.4-medium-20260523-072404",
+  "run_group_id": "ga-tugoz-20260523-072345",
+  "cell_id": "ga-tugoz-20260523-072345-000022-SIM-fitin-gordian-payload-wrapper--chunk-feed-replication-sparse-advertisement--openai-gpt-5.4-medium",
+  "sim_id": "SIM-fitin-gordian-payload-wrapper",
+  "scenario_id": "chunk-feed-replication-sparse-advertisement",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-072404",
+  "result_path": "results/SIM-fitin-gordian-payload-wrapper/chunk-feed-replication-sparse-advertisement/openai-gpt-5.4-medium/20260523-072404.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_f22716d595e84fb2918a22a220fcdc40",
+    "response_id": "resp_01f36a9088e57784006a1156b0d3dc819ba46be4faf94cae0e",
+    "input_tokens": 7448,
+    "output_tokens": 1092,
+    "cost_usd": 0.028322
+  },
+  "source": {
+    "repo_commit": "b35bf8ed25ef35d583168ba24fa464c3882aa819",
+    "sim_path": "simulations/SIM-fitin-gordian-payload-wrapper/",
+    "scenario_path": "scenarios/chunk-feed-replication-sparse-advertisement/chunk-feed-replication-sparse-advertisement.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "1c8b795ba3b07f6ae9d95037854ffebe792eb88bcdf9545409aeecf068956f9d"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-fitin-gordian-payload-wrapper/README.md",
+        "sha256": "279c7872010838e6e1a717d1d09d5d1f3ba4dc7f65bd2478f9480a25a58ad90f"
+      },
+      {
+        "path": "simulations/SIM-fitin-gordian-payload-wrapper/QUESTION.md",
+        "sha256": "b19f7ea6f944b6e01a27599024b8b542e1c70e1d632dd102cd665c7e8c8f7625"
+      },
+      {
+        "path": "simulations/SIM-fitin-gordian-payload-wrapper/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "757f81e773faa42f28f9def305c409dd66e586af89d1e29654f1b760e914dad6"
+      },
+      {
+        "path": "scenarios/chunk-feed-replication-sparse-advertisement/chunk-feed-replication-sparse-advertisement.md",
+        "sha256": "c922519634c8a9de3dc7e3501a523d7dd816875178e22b60d4920750232a2b0b"
+      }
+    ],
+    "simulation_tree_hash": "89e59244cc796db7feb98172fe4717350d151e0833647afb0891ec143141b835"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 4,
+    "auditability": 4,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 2,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 3,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 33,
+    "normalized_0_100": 66,
+    "confidence_0_1": 0.78
+  },
+  "assessment": {
+    "rationale": "Strong outer/payload boundary and good audit-oriented structure, but this specimen is not really a chunk-feed replication design. It can carry sparse-advertisement claims, yet it does not specify leaves, roots, frontiers, or partial-replication behavior directly.",
+    "strengths": [
+      "Tiny universal outer envelope with clear payload-family scoping.",
+      "Gordian-style subject/assertion/proof wrapper improves audit traceability.",
+      "Unknown-pCID handling is explicit and supports evolution."
+    ],
+    "weaknesses": [
+      "Weak direct fit to chunk-feed sparse advertisement pressure.",
+      "Little scenario-specific failure behavior for partial chunk knowledge.",
+      "Vocabulary is more assertion/proof-oriented than promise-first."
+    ],
+    "risks": [
+      "Wrapper complexity may exceed what small replication peers need.",
+      "Audit structure could tempt generic claim cards instead of narrow payload promises."
+    ],
+    "open_questions": [
+      "What exact payload promise would advertise partial chunk possession or frontier knowledge?",
+      "Does the wrapper stay compact enough for small devices in high-volume replication feeds?",
+      "Can peers compare conflicting sparse advertisements without a heavier trust framework?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

@@ -39,6 +39,57 @@ signable-view and Gordian batch; future `simulations/README.md`; future
 `DEV-GUIDE-RESOURCES.md`; future prior-art notes under `docs/` or
 `docs/research/`.
 
+ID: DI-kafot
+Date: 2026-05-22 23:33:34
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Capture `tugoz.1` and `tugoz.2` as two non-normative notes under
+`docs/research/`: one gap note comparing the nearest existing envelope sims,
+and one prior-art note covering Ceramic, atproto, and UCAN. Do not treat either
+note as a TE, frozen spec, or current consensus statement.
+Intent: The next useful step is to make the unresolved signable-view and
+Gordian comparison work citeable from repo-owned artifacts before creating new
+sims. `docs/research/` is the right home for these notes because they are
+reference material for future simulations, not decisions by themselves.
+Constraints: Do not lock the winning signable-view rule or Gordian batch shape
+in these notes. Keep the current outer-envelope question open. The notes may
+recommend what to test next, but the actual sim-creation choice stays with the
+later tugoz subtasks.
+Affects: `protocols/wire-lab.d/TODO/TODO-tugoz-grid-envelope-signable-view-and-gordian-comparison-sims.md`;
+`docs/research/grid-envelope-signable-view-gap-20260522.md`;
+`docs/research/grid-envelope-signature-prior-art-20260522.md`.
+
+ID: DI-nohir
+Date: 2026-05-23 00:15:13
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Implement the next `tugoz` batch as six standalone simulations:
+three signature-structure probes modeled after atproto, Ceramic, and UCAN, plus
+three Gordian comparison sims (payload/wrapper, universal-envelope negative
+control, and selective disclosure). Use the first scored slice
+`portable-signing-key-identity`, `live-crdt-audit-publication`,
+`multi-embodiment-app-identity`, `chunk-feed-replication-sparse-advertisement`,
+`device-bound-agent-physical-effect`, and `minimal-immutable-blob-app`.
+Intent: The user expanded the earlier single signable-view idea into a direct
+prior-art comparison batch and chose the broader 6-scenario first score slice.
+That makes the implementation target a concrete six-sim family rather than one
+specimen plus deferred comparisons.
+Constraints: Keep the universal outer-envelope question open. Do not rewrite
+scored sim trees. Keep these sims out of the current-consensus section of
+`DEV-GUIDE-RESOURCES.md` until scored evidence exists. The atproto-like sim is
+the only one in this batch that directly tests "proof carried in a reserved
+payload slot while signing a named signable projection". Use medium scoring for
+the first focused slice.
+Affects: `protocols/wire-lab.d/TODO/TODO-tugoz-grid-envelope-signable-view-and-gordian-comparison-sims.md`;
+`simulations/SIM-pamap-grid-envelope-signable-view-atproto-like/`;
+`simulations/SIM-jumav-grid-envelope-wrapper-proof-ceramic-like/`;
+`simulations/SIM-mipum-grid-envelope-signed-body-envelope-ucan-like/`;
+`simulations/SIM-fitin-gordian-payload-wrapper/`;
+`simulations/SIM-suzuf-gordian-universal-envelope-negative-control/`;
+`simulations/SIM-vizan-gordian-selective-disclosure/`;
+`simulations/README.md`; `DEV-GUIDE-RESOURCES.md`; focused `results/` and
+`results/jobs/` artifacts for the first score slice.
+
 ## Scope
 
 This TODO covers the next standalone simulation batch for the grid-envelope
@@ -84,24 +135,35 @@ consensus wording in `DEV-GUIDE-RESOURCES.md` by itself.
 
 ## Subtasks
 
-- [ ] tugoz.1 Write a concise gap note comparing `SIM-janov`, `SIM-maraz`,
+- [x] tugoz.1 Write a concise gap note comparing `SIM-janov`, `SIM-maraz`,
   `SIM-natim`, `SIM-riliz`, and `SIM-sajar`, and pin down exactly what the new
-  explicit signable-view sim must add. Source: `DI-dunat`.
-- [ ] tugoz.2 Capture the external prior-art note for Ceramic, atproto, UCAN,
+  explicit signable-view sim must add. Implemented in
+  `docs/research/grid-envelope-signable-view-gap-20260522.md`. Source:
+  `DI-dunat`; `DI-kafot`.
+- [x] tugoz.2 Capture the external prior-art note for Ceramic, atproto, UCAN,
   and adjacent signed-envelope systems in a repo file that future sims can cite.
-  Source: `DI-dunat`.
-- [ ] tugoz.3 Create the standalone explicit signable-view simulation under
-  `simulations/`, with `README.md`, `QUESTION.md`, and local protocol/spec files
-  as needed. Source: `DI-dunat`.
-- [ ] tugoz.4 Create the Gordian comparison sims under `simulations/`, keeping
-  at least one payload/wrapper-focused specimen and one negative-control
-  universal-envelope specimen. Source: `DI-dunat`.
-- [ ] tugoz.5 Register the new sims in `simulations/README.md` and list them as
+  Implemented in `docs/research/grid-envelope-signature-prior-art-20260522.md`.
+  Source: `DI-dunat`; `DI-kafot`.
+- [x] tugoz.3 Create the signature-structure comparison sims under
+  `simulations/`: atproto-like explicit signable view, Ceramic-like wrapper
+  proof, and UCAN-like signed-body envelope. Source: `DI-dunat`; `DI-nohir`.
+- [x] tugoz.4 Create the Gordian comparison sims under `simulations/`: a
+  payload/wrapper specimen, a universal-envelope negative control, and a
+  selective-disclosure specimen. Source: `DI-dunat`; `DI-nohir`.
+- [x] tugoz.5 Register the new sims in `simulations/README.md` and list them as
   active alternatives, not consensus, in `DEV-GUIDE-RESOURCES.md` once they
-  exist. Source: `DI-dunat`.
-- [ ] tugoz.6 Run a focused scored slice for the new sims against the chosen
-  existing scenarios after the audit/backfill path is unblocked. Source:
-  `DI-dunat`.
+  exist. Source: `DI-dunat`; `DI-nohir`.
+- [ ] tugoz.6 Run a focused scored slice for the six new sims against
+  `portable-signing-key-identity`, `live-crdt-audit-publication`,
+  `multi-embodiment-app-identity`, `chunk-feed-replication-sparse-advertisement`,
+  `device-bound-agent-physical-effect`, and `minimal-immutable-blob-app`.
+  Attempted via `ga-tugoz-20260523-072345`, which produced 30 valid parent
+  results and 6 failed `SIM-suzuf-gordian-universal-envelope-negative-control`
+  cells because the provider emitted an 8-axis score object that omitted
+  `promise_vocabulary` and `simplicity_durability`. Narrow retry
+  `ga-tugoz-20260523-073108-suzuf` reproduced the same `SIM-suzuf`
+  provider-output failure. Leave this item open until those cells are recovered
+  or a scoring-policy exception is approved. Source: `DI-dunat`; `DI-nohir`.
 
 ## Validation and acceptance criteria
 

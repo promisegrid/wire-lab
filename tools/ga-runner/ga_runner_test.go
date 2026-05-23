@@ -1131,6 +1131,206 @@ func TestRunScoreReservesBudgetBeforeConcurrentDispatch(t *testing.T) {
 	}
 }
 
+func TestBuildScorePromptIncludesRequiredAxisChecklist(t *testing.T) {
+	repo := newGAFixtureRepo(t)
+	initGAStateForTest(t, repo, "ga-score-prompt-checklist")
+	state := mustReadGAState(t, repo, "ga-score-prompt-checklist")
+	scenario, err := scenarioFromState(state, state.Cells[0].ScenarioID)
+	if err != nil {
+		t.Fatalf("scenario from state: %v", err)
+	}
+	prompt, err := buildScorePrompt(repo, state, state.Cells[0], scenario)
+	if err != nil {
+		t.Fatalf("build prompt: %v", err)
+	}
+	for _, want := range []string{
+		"Required score-axis checklist:",
+		"`promise_vocabulary`",
+		"`simplicity_durability`",
+		"A response missing any required `scores` axis is invalid.",
+	} {
+		if !strings.Contains(prompt, want) {
+			t.Fatalf("prompt missing %q:\n%s", want, prompt)
+		}
+	}
+}
+
+func TestRunScoreRetriesMissingV2Axes(t *testing.T) {
+	repo := newGAFixtureRepo(t)
+	initGAStateForTest(t, repo, "ga-score-schema-retry")
+	calls := 0
+	provider := fakeGAProvider{
+		generate: func(ctx context.Context, request ProviderRequest) (ProviderResponse, error) {
+			calls++
+			switch calls {
+			case 1:
+				return ProviderResponse{
+					Text:        invalidScorePayloadMissingV2AxesJSON(),
+					RequestID:   "req-score-1",
+					ResponseID:  "resp-score-1",
+					ServiceTier: defaultServiceTier,
+					UsageJSON:   `{"input_tokens":1000,"input_tokens_details":{"cached_tokens":100},"output_tokens":500}`,
+				}, nil
+			case 2:
+				if !strings.Contains(request.Prompt, "## Schema Correction") || !strings.Contains(request.Prompt, "`promise_vocabulary`") || !strings.Contains(request.Prompt, "`simplicity_durability`") {
+					return ProviderResponse{}, fmt.Errorf("schema correction prompt missing missing-axis guidance")
+				}
+				return ProviderResponse{
+					Text:        validScorePayloadJSON(),
+					RequestID:   "req-score-2",
+					ResponseID:  "resp-score-2",
+					ServiceTier: defaultServiceTier,
+					UsageJSON:   `{"input_tokens":1200,"input_tokens_details":{"cached_tokens":200},"output_tokens":700}`,
+				}, nil
+			case 3:
+				return ProviderResponse{
+					Text:        validScorePayloadJSON(),
+					RequestID:   "req-score-3",
+					ResponseID:  "resp-score-3",
+					ServiceTier: defaultServiceTier,
+					UsageJSON:   `{"input_tokens":900,"input_tokens_details":{"cached_tokens":90},"output_tokens":450}`,
+				}, nil
+			default:
+				return ProviderResponse{}, fmt.Errorf("unexpected extra score call %d", calls)
+			}
+		},
+	}
+	var out strings.Builder
+	err := runScoreWithProvider(context.Background(), repo, provider, scoreOptions{
+		RunGroupID:       "ga-score-schema-retry",
+		Target:           "parents",
+		ProviderName:     "fake",
+		APIModel:         "model-a",
+		ReasoningEffort:  "medium",
+		OutputContract:   outputContractPromptJSON,
+		Workers:          1,
+		InputPrice:       defaultInputUSDPerMTok,
+		CachedInputPrice: defaultCachedInputUSDPerMTok,
+		OutputPrice:      defaultOutputUSDPerMTok,
+	}, &out)
+	if err != nil {
+		t.Fatalf("score with schema retry: %v\n%s", err, out.String())
+	}
+	if calls != 3 {
+		t.Fatalf("expected one schema-correction retry across two parent cells, got %d calls", calls)
+	}
+	state := mustReadGAState(t, repo, "ga-score-schema-retry")
+	cell := state.Cells[0]
+	if cell.Status != "done" || cell.Attempts != 2 {
+		t.Fatalf("score state did not record retry success: %#v", cell)
+	}
+	if cell.InputTokens != 2200 || cell.CachedTokens != 300 || cell.OutputTokens != 1200 {
+		t.Fatalf("score state did not accumulate retry usage: %#v", cell)
+	}
+	if cell.CostUSD <= 0 {
+		t.Fatalf("score state missing accumulated retry cost: %#v", cell)
+	}
+	if cell.RequestID != "req-score-2" || cell.ResponseID != "resp-score-2" {
+		t.Fatalf("score state did not keep latest provider ids: %#v", cell)
+	}
+	if state.Cells[1].Status != "done" || state.Cells[1].Attempts != 1 {
+		t.Fatalf("second parent cell should succeed without retry: %#v", state.Cells[1])
+	}
+}
+
+func TestRunScoreFailsAfterSchemaRetryStillMissingAxes(t *testing.T) {
+	repo := newGAFixtureRepo(t)
+	initGAStateForTest(t, repo, "ga-score-schema-retry-fail")
+	calls := 0
+	provider := fakeGAProvider{
+		generate: func(ctx context.Context, request ProviderRequest) (ProviderResponse, error) {
+			calls++
+			return ProviderResponse{
+				Text:        invalidScorePayloadMissingV2AxesJSON(),
+				RequestID:   fmt.Sprintf("req-score-%d", calls),
+				ResponseID:  fmt.Sprintf("resp-score-%d", calls),
+				ServiceTier: defaultServiceTier,
+				UsageJSON:   `{"input_tokens":1000,"input_tokens_details":{"cached_tokens":100},"output_tokens":500}`,
+			}, nil
+		},
+	}
+	var out strings.Builder
+	err := runScoreWithProvider(context.Background(), repo, provider, scoreOptions{
+		RunGroupID:       "ga-score-schema-retry-fail",
+		Target:           "parents",
+		ProviderName:     "fake",
+		APIModel:         "model-a",
+		ReasoningEffort:  "medium",
+		OutputContract:   outputContractPromptJSON,
+		Workers:          1,
+		InputPrice:       defaultInputUSDPerMTok,
+		CachedInputPrice: defaultCachedInputUSDPerMTok,
+		OutputPrice:      defaultOutputUSDPerMTok,
+	}, &out)
+	if err == nil {
+		t.Fatalf("expected schema retry failure")
+	}
+	if calls != 4 {
+		t.Fatalf("expected both parent cells to retry before failure, got %d calls", calls)
+	}
+	state := mustReadGAState(t, repo, "ga-score-schema-retry-fail")
+	for _, cell := range state.Cells {
+		if strings.HasPrefix(cell.ResultPath, "proposals/") {
+			continue
+		}
+		if cell.Status != "failed" || !strings.Contains(cell.ValidationMessage, "schema-correction retry still missing required score axes") {
+			t.Fatalf("score state did not preserve schema retry failure: %#v", cell)
+		}
+	}
+}
+
+func TestRunScoreStrictStructuredOutputDoesNotSchemaRetry(t *testing.T) {
+	repo := newGAFixtureRepo(t)
+	initGAStateForTest(t, repo, "ga-score-structured-no-retry")
+	calls := 0
+	provider := fakeGAProvider{
+		generate: func(ctx context.Context, request ProviderRequest) (ProviderResponse, error) {
+			calls++
+			if request.OutputContract != outputContractJSONSchemaStrict {
+				return ProviderResponse{}, fmt.Errorf("output contract = %q, want %q", request.OutputContract, outputContractJSONSchemaStrict)
+			}
+			if request.OutputSchemaName != "ga_score_payload_v2" || len(request.OutputSchema) == 0 {
+				return ProviderResponse{}, fmt.Errorf("structured output schema missing from request")
+			}
+			return ProviderResponse{
+				Text:        invalidScorePayloadMissingV2AxesJSON(),
+				RequestID:   fmt.Sprintf("req-score-%d", calls),
+				ResponseID:  fmt.Sprintf("resp-score-%d", calls),
+				ServiceTier: defaultServiceTier,
+				UsageJSON:   `{"input_tokens":1000,"input_tokens_details":{"cached_tokens":100},"output_tokens":500}`,
+			}, nil
+		},
+	}
+	var out strings.Builder
+	err := runScoreWithProvider(context.Background(), repo, provider, scoreOptions{
+		RunGroupID:       "ga-score-structured-no-retry",
+		Target:           "parents",
+		ProviderName:     "fake",
+		APIModel:         "model-a",
+		ReasoningEffort:  "medium",
+		OutputContract:   outputContractJSONSchemaStrict,
+		Workers:          1,
+		InputPrice:       defaultInputUSDPerMTok,
+		CachedInputPrice: defaultCachedInputUSDPerMTok,
+		OutputPrice:      defaultOutputUSDPerMTok,
+	}, &out)
+	if err == nil {
+		t.Fatalf("expected strict structured-output failure")
+	}
+	if calls != 2 {
+		t.Fatalf("expected two total calls for two parent cells without schema retry, got %d", calls)
+	}
+	state := mustReadGAState(t, repo, "ga-score-structured-no-retry")
+	for _, cell := range state.Cells {
+		if strings.HasPrefix(cell.ResultPath, "proposals/") {
+			continue
+		}
+		if cell.Attempts != 1 {
+			t.Fatalf("strict structured-output cell should not schema-retry: %#v", cell)
+		}
+	}
+}
+
 func TestRunGenerateWritesChildTree(t *testing.T) {
 	repo := newGAFixtureRepo(t)
 	initGAStateForTest(t, repo, "ga-generate")
@@ -1448,6 +1648,9 @@ func TestServiceTierOptionsDefaultToFlexAndRejectPriority(t *testing.T) {
 	if scoreDefaults.ServiceTier != serviceTierFlex {
 		t.Fatalf("score service tier = %q, want %q", scoreDefaults.ServiceTier, serviceTierFlex)
 	}
+	if scoreDefaults.OutputContract != outputContractJSONSchemaStrict {
+		t.Fatalf("score output contract = %q, want %q", scoreDefaults.OutputContract, outputContractJSONSchemaStrict)
+	}
 	if scoreDefaults.ReasoningEffort != defaultScoreReasoningEffort || scoreDefaults.TextVerbosity != defaultTextVerbosity || scoreDefaults.MaxOutputTokens != 0 || scoreDefaults.CostEstimateOutputTokens != defaultScoreCostEstimateOutputTokens {
 		t.Fatalf("score request-shaping defaults not applied: %#v", scoreDefaults)
 	}
@@ -1495,6 +1698,9 @@ func TestServiceTierOptionsDefaultToFlexAndRejectPriority(t *testing.T) {
 	}
 	if _, err := parseGenerateOptions([]string{"-run-group-id", "ga-generate", "-api-model", "model-a", "-service-tier", "priority"}); err == nil {
 		t.Fatalf("expected priority service tier to be rejected")
+	}
+	if _, err := parseScoreOptions([]string{"-run-group-id", "ga-score", "-api-model", "model-a", "-output-contract", "yaml"}); err == nil {
+		t.Fatalf("expected invalid output contract to be rejected")
 	}
 	if _, err := parseScoreOptions([]string{"-run-group-id", "ga-score", "-api-model", "model-a", "-workers", "0"}); err == nil {
 		t.Fatalf("expected zero workers to be rejected")
@@ -1547,6 +1753,52 @@ func TestOpenAIProviderSendsExplicitServiceTier(t *testing.T) {
 	}
 	if response.ServiceTier != serviceTierFlex || response.RequestID != "req-tier" {
 		t.Fatalf("unexpected response metadata: %#v", response)
+	}
+}
+
+func TestOpenAIProviderSendsStructuredOutputFormat(t *testing.T) {
+	transport := roundTripFunc(func(request *http.Request) (*http.Response, error) {
+		requestBytes, err := io.ReadAll(request.Body)
+		if err != nil {
+			t.Fatalf("read request body: %v", err)
+		}
+		var body openAIRequest
+		if err := json.Unmarshal(requestBytes, &body); err != nil {
+			t.Fatalf("decode request body: %v", err)
+		}
+		if body.Text == nil || body.Text.Format == nil {
+			t.Fatalf("structured output request missing text.format: %s", string(requestBytes))
+		}
+		if body.Text.Format.Type != "json_schema" || !body.Text.Format.Strict {
+			t.Fatalf("unexpected text.format: %#v", body.Text.Format)
+		}
+		if body.Text.Format.Name != "ga_score_payload_v2" {
+			t.Fatalf("structured output schema name = %q, want ga_score_payload_v2", body.Text.Format.Name)
+		}
+		if _, ok := body.Text.Format.Schema["properties"]; !ok {
+			t.Fatalf("structured output schema missing properties: %#v", body.Text.Format.Schema)
+		}
+		return openAITestHTTPResponse(request, http.StatusOK, "req-schema", openAITestSuccessBody(serviceTierFlex)), nil
+	})
+
+	provider := OpenAIProvider{
+		APIKey:  "test-key",
+		BaseURL: "https://example.test/responses",
+		Client:  &http.Client{Transport: transport},
+		RetryPolicy: ProviderRetryPolicy{
+			MaxAttempts: 1,
+		},
+	}
+	_, err := provider.Generate(context.Background(), ProviderRequest{
+		APIModel:         "model-a",
+		ServiceTier:      serviceTierFlex,
+		Prompt:           "score this",
+		OutputContract:   outputContractJSONSchemaStrict,
+		OutputSchemaName: "ga_score_payload_v2",
+		OutputSchema:     scorePayloadJSONSchema(),
+	})
+	if err != nil {
+		t.Fatalf("generate: %v", err)
 	}
 }
 
@@ -2846,6 +3098,34 @@ func validScorePayloadJSON() string {
     "strengths": ["clear audit path"],
     "weaknesses": ["limited scenario depth"],
     "risks": ["fixture-only evaluation"],
+    "open_questions": ["none for this test"],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}`
+}
+
+func invalidScorePayloadMissingV2AxesJSON() string {
+	return `{
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 1,
+    "auditability": 3,
+    "evolution_safety": 1,
+    "layer_boundary_clarity": 1,
+    "failure_handling": 1,
+    "implementation_plausibility": 3,
+    "risk_penalty": 4
+  },
+  "fitness": {
+    "raw": 0,
+    "normalized_0_100": 0,
+    "confidence_0_1": 0.44
+  },
+  "assessment": {
+    "rationale": "Old 8-axis fixture output.",
+    "strengths": ["small fixture"],
+    "weaknesses": ["missing rubric-v2 axes"],
+    "risks": ["schema drift"],
     "open_questions": ["none for this test"],
     "authority_boundary": "Evidence only; does not settle PromiseGrid design."
   }

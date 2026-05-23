@@ -1,0 +1,124 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-suzuf-gordian-universal-envelope-negative-control-chunk-feed-replication-sparse-advertisement-openai-gpt-5.4-medium-20260523-073120",
+  "run_group_id": "ga-tugoz-20260523-073108-suzuf",
+  "cell_id": "ga-tugoz-20260523-073108-suzuf-000004-SIM-suzuf-gordian-universal-envelope-negative-control--chunk-feed-replication-sparse-advertisement--openai-gpt-5.4-medium",
+  "sim_id": "SIM-suzuf-gordian-universal-envelope-negative-control",
+  "scenario_id": "chunk-feed-replication-sparse-advertisement",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-073120",
+  "result_path": "results/SIM-suzuf-gordian-universal-envelope-negative-control/chunk-feed-replication-sparse-advertisement/openai-gpt-5.4-medium/20260523-073120.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_0a549a1fa4dc483ab4e0bc8dd9c1088a",
+    "response_id": "resp_0d509420ae7ee77a006a1157db79a88199ac6b7bc86d4039f4",
+    "input_tokens": 7436,
+    "output_tokens": 1680,
+    "cost_usd": 0.036533
+  },
+  "source": {
+    "repo_commit": "b35bf8ed25ef35d583168ba24fa464c3882aa819",
+    "sim_path": "simulations/SIM-suzuf-gordian-universal-envelope-negative-control/",
+    "scenario_path": "scenarios/chunk-feed-replication-sparse-advertisement/chunk-feed-replication-sparse-advertisement.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "1c8b795ba3b07f6ae9d95037854ffebe792eb88bcdf9545409aeecf068956f9d"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-suzuf-gordian-universal-envelope-negative-control/README.md",
+        "sha256": "306c10193c93691950caa3378d8bd523752933ddda3ed51b175e29e011befdcc"
+      },
+      {
+        "path": "simulations/SIM-suzuf-gordian-universal-envelope-negative-control/QUESTION.md",
+        "sha256": "d94a994881167dabb66ff4fc1c0af520c7d511165e337076890b0f3bc2ccd781"
+      },
+      {
+        "path": "simulations/SIM-suzuf-gordian-universal-envelope-negative-control/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "da841566faa56f37ede19f3a5f72e5f0e6b5565e5c87094d257071577780c320"
+      },
+      {
+        "path": "scenarios/chunk-feed-replication-sparse-advertisement/chunk-feed-replication-sparse-advertisement.md",
+        "sha256": "c922519634c8a9de3dc7e3501a523d7dd816875178e22b60d4920750232a2b0b"
+      }
+    ],
+    "simulation_tree_hash": "593c725ca5728740f1a521fcac5ecdf4d282e7f7f3ebf45ad3ab6a67962beeb2"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 1,
+    "auditability": 2,
+    "evolution_safety": 1,
+    "layer_boundary_clarity": 1,
+    "failure_handling": 1,
+    "implementation_plausibility": 2,
+    "risk_penalty": 4
+  },
+  "fitness": {
+    "raw": 10,
+    "normalized_0_100": 20,
+    "confidence_0_1": 0.85
+  },
+  "assessment": {
+    "rationale": "As a negative control, this specimen usefully exposes the cost of making subject/assertion/proof universal, but it fits the sparse-advertisement chunk-feed scenario poorly. It does not define feed-specific promises for advertising leaves, roots, frontiers, or pointer summaries under partial replication, and its missing minimal dispatch slot makes unknown-protocol and mixed-version behavior worse under sparse knowledge.",
+    "strengths": [
+      "Deterministic universal envelope gives a uniform parse shape once the global contract is known.",
+      "Built-in assertion/proof structure may help local audit readability in some cases.",
+      "The draft is explicit that it is a negative control and names the tradeoff being tested."
+    ],
+    "weaknesses": [
+      "Weak scenario fit: no concrete chunk-feed advertisement mechanism is defined.",
+      "Universal Gordian structure blurs layers by making proof semantics everyone's outer-envelope concern.",
+      "No minimal universal pCID dispatch slot, so unknown assertion/proof types are more invasive.",
+      "Promise vocabulary is not promise-first and does not center payload promises between peers.",
+      "Poor simplicity and 100-year durability profile for small devices and long-lived evolution."
+    ],
+    "risks": [
+      "Mixed-version and unknown-protocol interoperability failures under sparse replication.",
+      "Global parser burden and migration complexity becoming mandatory for all payload families.",
+      "Richer universal envelope encouraging central or normative conformance thinking instead of local payload promises."
+    ],
+    "open_questions": [
+      "Can sparse chunk advertisement be expressed cleanly without turning subject/assertion/proof into a universal outer layer?",
+      "Do the audit gains survive adversarial, partial-replication, unknown-pCID conditions?",
+      "Is there any domain benefit here large enough to justify the long-term device and evolution cost?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

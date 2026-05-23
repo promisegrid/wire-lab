@@ -1,0 +1,126 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-fitin-gordian-payload-wrapper-portable-signing-key-identity-openai-gpt-5.4-medium-20260523-072404",
+  "run_group_id": "ga-tugoz-20260523-072345",
+  "cell_id": "ga-tugoz-20260523-072345-000019-SIM-fitin-gordian-payload-wrapper--portable-signing-key-identity--openai-gpt-5.4-medium",
+  "sim_id": "SIM-fitin-gordian-payload-wrapper",
+  "scenario_id": "portable-signing-key-identity",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-072404",
+  "result_path": "results/SIM-fitin-gordian-payload-wrapper/portable-signing-key-identity/openai-gpt-5.4-medium/20260523-072404.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_01bd17d4a0a04da1b1852a290cbcc6fa",
+    "response_id": "resp_0d155af866663900006a1156abcb74819889325f93141380c0",
+    "input_tokens": 7522,
+    "output_tokens": 1336,
+    "cost_usd": 0.0318675
+  },
+  "source": {
+    "repo_commit": "b35bf8ed25ef35d583168ba24fa464c3882aa819",
+    "sim_path": "simulations/SIM-fitin-gordian-payload-wrapper/",
+    "scenario_path": "scenarios/portable-signing-key-identity/portable-signing-key-identity.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "1c8b795ba3b07f6ae9d95037854ffebe792eb88bcdf9545409aeecf068956f9d"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-fitin-gordian-payload-wrapper/README.md",
+        "sha256": "279c7872010838e6e1a717d1d09d5d1f3ba4dc7f65bd2478f9480a25a58ad90f"
+      },
+      {
+        "path": "simulations/SIM-fitin-gordian-payload-wrapper/QUESTION.md",
+        "sha256": "b19f7ea6f944b6e01a27599024b8b542e1c70e1d632dd102cd665c7e8c8f7625"
+      },
+      {
+        "path": "simulations/SIM-fitin-gordian-payload-wrapper/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "757f81e773faa42f28f9def305c409dd66e586af89d1e29654f1b760e914dad6"
+      },
+      {
+        "path": "scenarios/portable-signing-key-identity/portable-signing-key-identity.md",
+        "sha256": "4deaafd0d50191f352fe959dbd93ce9ea916706abc6e23a05274e32bfb92625f"
+      }
+    ],
+    "simulation_tree_hash": "89e59244cc796db7feb98172fe4717350d151e0833647afb0891ec143141b835"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 4,
+    "auditability": 4,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 3,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 3,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 34,
+    "normalized_0_100": 68,
+    "confidence_0_1": 0.76
+  },
+  "assessment": {
+    "rationale": "Good envelope/payload layering and strong audit-oriented structure, but it is only an enabling wrapper pattern, not a complete portable signing-key identity recipe. It can carry key-rotation and host-specific evidence cleanly, yet it does not by itself define continuity semantics, provisional algorithm policy, or browser/plugin storage guidance.",
+    "strengths": [
+      "Keeps the universal envelope minimal while isolating richer identity evidence in a payload family.",
+      "Subject/assertion/proof structure can represent old-key to new-key linkage for later audit.",
+      "Unknown-pCID policy supports partial understanding without false interpretation.",
+      "Deterministic CBOR arrays are plausible for small devices and durable parsing."
+    ],
+    "weaknesses": [
+      "Does not itself specify portable identity semantics across browser and helper embodiments.",
+      "Does not define how old and new signing keys are bound, witnessed, or challenged.",
+      "Uses little explicit promise-first vocabulary.",
+      "Adds wrapper complexity relative to simpler payload forms."
+    ],
+    "risks": [
+      "Implementers may mistake the wrapper shape for a full identity protocol.",
+      "Audit structure may invite overengineering before continuity and storage claims are nailed down.",
+      "Browser storage and XSS threat guidance remain outside the specimen, leaving security expectations underspecified."
+    ],
+    "open_questions": [
+      "What exact assertion/proof payloads would express key rotation and cross-host continuity?",
+      "How should provisional algorithm choices and future pivots be encoded without freezing cryptography too early?",
+      "What minimal host-storage claim should distinguish browser-held versus helper-held keys and associated XSS exposure?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

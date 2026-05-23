@@ -1,0 +1,124 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-vizan-gordian-selective-disclosure-chunk-feed-replication-sparse-advertisement-openai-gpt-5.4-medium-20260523-072404",
+  "run_group_id": "ga-tugoz-20260523-072345",
+  "cell_id": "ga-tugoz-20260523-072345-000034-SIM-vizan-gordian-selective-disclosure--chunk-feed-replication-sparse-advertisement--openai-gpt-5.4-medium",
+  "sim_id": "SIM-vizan-gordian-selective-disclosure",
+  "scenario_id": "chunk-feed-replication-sparse-advertisement",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-072404",
+  "result_path": "results/SIM-vizan-gordian-selective-disclosure/chunk-feed-replication-sparse-advertisement/openai-gpt-5.4-medium/20260523-072404.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_847467a036fc42b0a4069d29af424399",
+    "response_id": "resp_09aa67a213c1078f006a1156df0090819bbf5c5ee86f2cd8f8",
+    "input_tokens": 7481,
+    "output_tokens": 1318,
+    "cost_usd": 0.03154375
+  },
+  "source": {
+    "repo_commit": "b35bf8ed25ef35d583168ba24fa464c3882aa819",
+    "sim_path": "simulations/SIM-vizan-gordian-selective-disclosure/",
+    "scenario_path": "scenarios/chunk-feed-replication-sparse-advertisement/chunk-feed-replication-sparse-advertisement.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "1c8b795ba3b07f6ae9d95037854ffebe792eb88bcdf9545409aeecf068956f9d"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-vizan-gordian-selective-disclosure/README.md",
+        "sha256": "0a990715360259e3723e8b663d1ec9d433c71bcd1da9e8cf9df3854ba3ab97f1"
+      },
+      {
+        "path": "simulations/SIM-vizan-gordian-selective-disclosure/QUESTION.md",
+        "sha256": "8446f97cab455f39f6f9baf8bbbde66dbac9f09ee3cc03f239d02472afdd7d98"
+      },
+      {
+        "path": "simulations/SIM-vizan-gordian-selective-disclosure/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "5e3e4c2d0878dfcaa5a5372e38b778c8a53912fc91c0ff1b86ec1b33bfcae8d8"
+      },
+      {
+        "path": "scenarios/chunk-feed-replication-sparse-advertisement/chunk-feed-replication-sparse-advertisement.md",
+        "sha256": "c922519634c8a9de3dc7e3501a523d7dd816875178e22b60d4920750232a2b0b"
+      }
+    ],
+    "simulation_tree_hash": "a0344f847a20f696402be4bb81705f998fb9a0f2c69b89a81e5bf75a0ddc305a"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 3,
+    "auditability": 3,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 3,
+    "implementation_plausibility": 3,
+    "promise_vocabulary": 1,
+    "simplicity_durability": 2,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 25,
+    "normalized_0_100": 50,
+    "confidence_0_1": 0.83
+  },
+  "assessment": {
+    "rationale": "This specimen is only a weak fit for sparse chunk-feed advertisement. It helps with partial knowledge by carrying claim and disclosure roots and by preserving unknown payloads, but it does not define feed advertisement, frontier summaries, or replication behavior. Its main value here is boundary discipline: selective-disclosure complexity stays inside the payload family rather than expanding the universal envelope.",
+    "strengths": [
+      "Keeps the universal outer envelope minimal while isolating specialized disclosure structure in the payload family.",
+      "Explicit claim_root and disclosure_root give sparse peers stable references they can preserve and relay without full understanding.",
+      "Unknown pCID and unknown proof_pCID policies support blind carry and partial audit under evolution."
+    ],
+    "weaknesses": [
+      "Does not directly address chunk-feed advertisement primitives such as leaves, pointer objects, frontiers, or compact replication summaries.",
+      "Selective-disclosure structure adds audit and implementation complexity that is not clearly needed for this scenario.",
+      "Wording is mostly spec-normative rather than promise-first Promise Theory vocabulary."
+    ],
+    "risks": [
+      "Extra wrapper structure may overfit privacy/reveal use cases and distract from simpler replication artifacts.",
+      "Peers may preserve roots without enough semantics to compare partial chunk sets or decide what to request next.",
+      "Audit surface grows because claim graph, disclosure package, and proof profile can drift independently."
+    ],
+    "open_questions": [
+      "Can claim_root or disclosure_root be repurposed as compact sparse-advertisement handles, or is a separate feed-summary object required?",
+      "How would Alice and Bob negotiate missing chunks from different partial sets using only this envelope family?",
+      "Is the selective-disclosure benefit large enough to justify the added long-term complexity for non-privacy scenarios?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

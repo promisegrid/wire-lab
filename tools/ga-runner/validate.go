@@ -228,10 +228,16 @@ func validateResultIdentity(repo Repo, path string, parts resultPathParts, resul
 }
 
 func validateRunner(runner RunnerInfo) []string {
+	var issues []string
 	if runner.Tool == "" {
-		return []string{"runner.tool is required"}
+		issues = append(issues, "runner.tool is required")
 	}
-	return nil
+	if runner.OutputContract != "" {
+		if _, err := normalizeOutputContract(runner.OutputContract); err != nil {
+			issues = append(issues, "runner."+err.Error())
+		}
+	}
+	return issues
 }
 
 func validateSource(source SourceInfo) []string {

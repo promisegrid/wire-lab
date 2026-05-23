@@ -1,0 +1,125 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-suzuf-gordian-universal-envelope-negative-control-device-bound-agent-physical-effect-openai-gpt-5.4-medium-20260523-072404",
+  "run_group_id": "ga-tugoz-20260523-072345",
+  "cell_id": "ga-tugoz-20260523-072345-000029-SIM-suzuf-gordian-universal-envelope-negative-control--device-bound-agent-physical-effect--openai-gpt-5.4-medium",
+  "sim_id": "SIM-suzuf-gordian-universal-envelope-negative-control",
+  "scenario_id": "device-bound-agent-physical-effect",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-072404",
+  "result_path": "results/SIM-suzuf-gordian-universal-envelope-negative-control/device-bound-agent-physical-effect/openai-gpt-5.4-medium/20260523-072404.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_e5b8249b90ab4e7395bc99404ed8f7d7",
+    "response_id": "resp_048ddeff3b7675d4006a11e0b3010881999d748f85161f5774",
+    "input_tokens": 8137,
+    "output_tokens": 1318,
+    "cost_usd": 0.03269175
+  },
+  "source": {
+    "repo_commit": "b35bf8ed25ef35d583168ba24fa464c3882aa819",
+    "sim_path": "simulations/SIM-suzuf-gordian-universal-envelope-negative-control/",
+    "scenario_path": "scenarios/device-bound-agent-physical-effect/device-bound-agent-physical-effect.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-suzuf-gordian-universal-envelope-negative-control/README.md",
+        "sha256": "306c10193c93691950caa3378d8bd523752933ddda3ed51b175e29e011befdcc"
+      },
+      {
+        "path": "simulations/SIM-suzuf-gordian-universal-envelope-negative-control/QUESTION.md",
+        "sha256": "d94a994881167dabb66ff4fc1c0af520c7d511165e337076890b0f3bc2ccd781"
+      },
+      {
+        "path": "simulations/SIM-suzuf-gordian-universal-envelope-negative-control/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "da841566faa56f37ede19f3a5f72e5f0e6b5565e5c87094d257071577780c320"
+      },
+      {
+        "path": "scenarios/device-bound-agent-physical-effect/device-bound-agent-physical-effect.md",
+        "sha256": "ffd2cee6094031ae77651ba8da6c3c76b54d200845f65f0e93d07c8e96aaeb2a"
+      }
+    ],
+    "simulation_tree_hash": "593c725ca5728740f1a521fcac5ecdf4d282e7f7f3ebf45ad3ab6a67962beeb2"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 1,
+    "auditability": 2,
+    "evolution_safety": 1,
+    "layer_boundary_clarity": 1,
+    "failure_handling": 0,
+    "implementation_plausibility": 2,
+    "risk_penalty": 4
+  },
+  "fitness": {
+    "raw": 9,
+    "normalized_0_100": 18,
+    "confidence_0_1": 0.92
+  },
+  "assessment": {
+    "rationale": "This negative-control envelope is implementable and may improve structured audit traces, but it fits the device-bound physical-effect scenario poorly because it specifies only a heavier universal envelope, not delegation, dedupe keys, at-most-once receipts, or break-witness behavior. It is also intentionally misaligned with PromiseGrid's minimal universal envelope direction, increases mixed-version and unknown-protocol burden, and uses non-promise-first vocabulary.",
+    "strengths": [
+      "Deterministic CBOR positional encoding is straightforward to implement.",
+      "Built-in subject/assertion/proof fields could help later auditors interpret some evidence structures.",
+      "The spec explicitly surfaces its own tradeoff as a negative control, which is useful comparison evidence."
+    ],
+    "weaknesses": [
+      "No concrete mechanism for owner delegation evidence for a device-bound agent.",
+      "No defined deduplication, at-most-once, receipt, or break-witness model for physical effects after restart or replay.",
+      "Uses Gordian subject/assertion/proof framing instead of explicit promise-first payload claims.",
+      "Intentionally abandons the minimal universal [pcid, payload] dispatch surface, hurting simplicity and durability."
+    ],
+    "risks": [
+      "Replay or restart handling for non-idempotent device actions is left unspecified, so duplicate physical effects remain a major risk.",
+      "Universal subject/assertion/proof structure raises parser and policy burden for all peers, including small devices that do not need it.",
+      "Lack of a minimal dispatch slot makes unknown-protocol and evolution behavior worse, especially across long-lived deployments.",
+      "Globalizing proof structure blurs layer boundaries between transport envelope and application-specific effect semantics."
+    ],
+    "open_questions": [
+      "Could a universal proof-bearing envelope ever encode durable break-witness and receipt patterns for non-idempotent physical effects without imposing global parser burden?",
+      "What migration story would let mixed-version peers handle replay, restart, and unknown assertion/proof pCIDs safely in device-agent deployments?",
+      "Can Gordian-style subject/assertion/proof vocabulary be recast into explicit promise payloads without losing any claimed audit benefit?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

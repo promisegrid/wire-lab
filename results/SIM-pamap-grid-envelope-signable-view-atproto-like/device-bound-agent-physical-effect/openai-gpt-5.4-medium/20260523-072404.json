@@ -1,0 +1,124 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-pamap-grid-envelope-signable-view-atproto-like-device-bound-agent-physical-effect-openai-gpt-5.4-medium-20260523-072404",
+  "run_group_id": "ga-tugoz-20260523-072345",
+  "cell_id": "ga-tugoz-20260523-072345-000005-SIM-pamap-grid-envelope-signable-view-atproto-like--device-bound-agent-physical-effect--openai-gpt-5.4-medium",
+  "sim_id": "SIM-pamap-grid-envelope-signable-view-atproto-like",
+  "scenario_id": "device-bound-agent-physical-effect",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-072404",
+  "result_path": "results/SIM-pamap-grid-envelope-signable-view-atproto-like/device-bound-agent-physical-effect/openai-gpt-5.4-medium/20260523-072404.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_9770757d085f4be39fcc86594b97e1ed",
+    "response_id": "resp_032d381d4e017a1b006a115671c7408198a9c0acfd67493389",
+    "input_tokens": 7893,
+    "output_tokens": 1287,
+    "cost_usd": 0.03183075
+  },
+  "source": {
+    "repo_commit": "b35bf8ed25ef35d583168ba24fa464c3882aa819",
+    "sim_path": "simulations/SIM-pamap-grid-envelope-signable-view-atproto-like/",
+    "scenario_path": "scenarios/device-bound-agent-physical-effect/device-bound-agent-physical-effect.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "1c8b795ba3b07f6ae9d95037854ffebe792eb88bcdf9545409aeecf068956f9d"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-pamap-grid-envelope-signable-view-atproto-like/README.md",
+        "sha256": "2281f7b166be066043b71addddf160de7252f67e3877f5e205fae363b849da64"
+      },
+      {
+        "path": "simulations/SIM-pamap-grid-envelope-signable-view-atproto-like/QUESTION.md",
+        "sha256": "03b6ad09a2cf073dfec603863709a15da24b3380563e7aaf9a35b4f0b035724e"
+      },
+      {
+        "path": "simulations/SIM-pamap-grid-envelope-signable-view-atproto-like/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "1d9ec592ecb1fa5e1fb6157b86f24d5a94b7fabee115709b9b949c9a80da6616"
+      },
+      {
+        "path": "scenarios/device-bound-agent-physical-effect/device-bound-agent-physical-effect.md",
+        "sha256": "ffd2cee6094031ae77651ba8da6c3c76b54d200845f65f0e93d07c8e96aaeb2a"
+      }
+    ],
+    "simulation_tree_hash": "4807df0f3808e27bf7226487a8b2c06486c183f3911960da1e360f3a902ae736"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 4,
+    "auditability": 3,
+    "evolution_safety": 2,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 1,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 4,
+    "risk_penalty": 4
+  },
+  "fitness": {
+    "raw": 26,
+    "normalized_0_100": 52,
+    "confidence_0_1": 0.79
+  },
+  "assessment": {
+    "rationale": "A compact, PromiseGrid-friendly envelope specimen with clear payload/outer binding, but it mostly tests signature placement rather than the scenario's core device-agent problems: delegation, replay-safe physical effects, restart recovery, receipts, and break-witness behavior.",
+    "strengths": [
+      "Very small deterministic artifact shape suited to durable storage and constrained devices.",
+      "Clear boundary between universal outer envelope and payload-defined proof semantics.",
+      "Explicit unknown-pCID and unknown-signature-profile behavior supports sparse-peer handling."
+    ],
+    "weaknesses": [
+      "Does not model owner delegation to a device-bound agent or host/driver dependency evidence.",
+      "Does not define effect deduplication, at-most-once posture, replay handling, or break-witness emission after restart.",
+      "Proof is embedded in the payload contract, which reduces generic audit visibility for physical-effect receipts."
+    ],
+    "risks": [
+      "Replay of a previously valid print request could remain semantically valid at the envelope layer and cause duplicate physical effects.",
+      "Signing sig_pcid inside the signable view may make long-term proof-profile migration awkward.",
+      "Auditors may have durable bytes but insufficient semantics to decide whether a physical action already happened."
+    ],
+    "open_questions": [
+      "What payload-level promise and receipt structure would represent delegated authority for a specific device and host agent?",
+      "How would this specimen carry a stable effect identifier so restart and replay can resolve to already-done, duplicate, or break-witness outcomes?",
+      "Should physical-effect receipts be a separate durable payload type rather than inferred from the signed request form?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

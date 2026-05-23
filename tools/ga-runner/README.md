@@ -40,6 +40,7 @@ go run . validate -repo-root ../..
   go run . score -repo-root ../.. \
     -run-group-id <run-group-id> \
     -target parents \
+    -output-contract json_schema_strict \
     -reasoning-effort medium \
     -reasoning-summary auto \
     -text-verbosity low \
@@ -115,7 +116,16 @@ population and conservative generation sizing without writing state. Non-dry-run
 `-include-scenario` to guarantee focused coverage while filling remaining sample
 slots by deterministic shuffle. `score` builds source-complete prompts, calls
 the provider, writes validated JSON fitness results, and checkpoints usage/cost
-metadata after each cell. `generate` builds compact child prompts from each
+metadata after each cell. Score runs now default to
+`-output-contract json_schema_strict`, which asks the provider to enforce the
+rubric-v2 JSON Schema instead of relying only on prompt wording. New score
+results record `runner.output_contract` so later reviews can distinguish
+prompt-enforced JSON from provider-enforced schema adherence. When
+`-output-contract prompt_json` is used, `score` may still send one short
+schema-correction retry if a valid JSON response omits required rubric-v2 score
+axes such as `promise_vocabulary` or `simplicity_durability`, and it still
+refuses to auto-fill missing scores locally. `generate` builds compact
+child prompts from each
 parent simulation tree once, scenario-specific pressure once, and summarized
 fitness evidence, then uses completed parent fitness results to rank the
 selected parent pool, applies deterministic linear-rank weighted high-parent
@@ -172,7 +182,7 @@ long Responses API calls log event progress and retry silent stalls. Concurrent
 scoring reserves estimated cell cost before dispatch, so `-max-run-cost-usd`
 remains a conservative launch budget rather than a best-effort warning. Source:
 `DI-juzus`; `DI-tufud`; `DI-pivuj`; `DI-suzor`; `DI-guvif`; `DI-duzur`;
-`DI-bataj`.
+`DI-bataj`; `DI-fogop`.
 
 The terminal canary opts into `-reasoning-summary auto` and
 `-stream-content-stdout=true` so stdout/logs show one no-newline progress dot
@@ -196,10 +206,11 @@ comparisons. A provider response with
 deterministic cap failure when an operator explicitly sets the cap. Source:
 `DI-juzus`; `DI-zikag`; `DI-pulap`; `DI-nanor`.
 
-OpenAI Structured Outputs remain a follow-up after the uncapped canary succeeds.
-They may reduce JSON-shape retries and prompt boilerplate, but they add
+OpenAI Structured Outputs are now the default score output contract. They reduce
+JSON-shape retries and prompt boilerplate for score cells, but they add
 provider-specific schema plumbing and do not directly reduce hidden reasoning
-tokens. Source: `DI-pulap`.
+tokens. Use `-output-contract prompt_json` only when a score run must stay on
+the older prompt-enforced JSON path. Source: `DI-pulap`; `DI-fogop`.
 
 Rubric-v2 scoring adds `promise_vocabulary` and `simplicity_durability` to the
 historical axis set and recomputes `fitness.raw` / `fitness.normalized_0_100`

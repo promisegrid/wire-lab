@@ -155,6 +155,23 @@ Design rule:
 | Hard reject unknowns | `SIM-gazan`, `SIM-dorut`, `SIM-nipoh`, `SIM-tohol` | Simple semantic safety. | Weak 100-year migration and mixed-version evidence retention. |
 | Opaque store-forward | `SIM-gasus`, `SIM-hagom`, `SIM-ruzil` | Preserves future evidence. | Must be labeled as carriage only, not semantic acceptance. |
 
+#### Active Unscored Alternatives
+
+The following new `TODO-tugoz` specimens are active alternatives, not current
+consensus. They exist so future scored evidence can compare three
+signature-structure families (atproto-like, Ceramic-like, UCAN-like) and three
+Gordian-oriented families without silently dragging current guide prose toward a
+winner before results exist. Source: `DI-nohir`.
+
+| Simulation | Why it exists |
+|---|---|
+| `SIM-pamap-grid-envelope-signable-view-atproto-like` | Direct test of proof in a reserved payload slot with a named signable projection. |
+| `SIM-jumav-grid-envelope-wrapper-proof-ceramic-like` | Direct test of wrapper-proof-over-link structure. |
+| `SIM-mipum-grid-envelope-signed-body-envelope-ucan-like` | Direct test of explicit signed-body plus sibling proof shape. |
+| `SIM-fitin-gordian-payload-wrapper` | Tests whether Gordian structure belongs in a payload/wrapper family rather than the universal grid. |
+| `SIM-suzuf-gordian-universal-envelope-negative-control` | Tests the cost of making Gordian structure universal. |
+| `SIM-vizan-gordian-selective-disclosure` | Tests whether selective-disclosure pressure justifies richer Gordian-style payload structure. |
+
 ### Open Protocol Decisions
 
 | Decision | Why it matters |

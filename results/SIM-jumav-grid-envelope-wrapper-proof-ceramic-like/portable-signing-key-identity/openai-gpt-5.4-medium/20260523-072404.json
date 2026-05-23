@@ -1,0 +1,125 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-jumav-grid-envelope-wrapper-proof-ceramic-like-portable-signing-key-identity-openai-gpt-5.4-medium-20260523-072404",
+  "run_group_id": "ga-tugoz-20260523-072345",
+  "cell_id": "ga-tugoz-20260523-072345-000007-SIM-jumav-grid-envelope-wrapper-proof-ceramic-like--portable-signing-key-identity--openai-gpt-5.4-medium",
+  "sim_id": "SIM-jumav-grid-envelope-wrapper-proof-ceramic-like",
+  "scenario_id": "portable-signing-key-identity",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-072404",
+  "result_path": "results/SIM-jumav-grid-envelope-wrapper-proof-ceramic-like/portable-signing-key-identity/openai-gpt-5.4-medium/20260523-072404.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_ef15dfb78db24ac0b1277abed641d7e7",
+    "response_id": "resp_0588d1df4adce1a2006a1156840e0c8198a818996fb1459b0a",
+    "input_tokens": 7738,
+    "output_tokens": 1850,
+    "cost_usd": 0.0394415
+  },
+  "source": {
+    "repo_commit": "b35bf8ed25ef35d583168ba24fa464c3882aa819",
+    "sim_path": "simulations/SIM-jumav-grid-envelope-wrapper-proof-ceramic-like/",
+    "scenario_path": "scenarios/portable-signing-key-identity/portable-signing-key-identity.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "1c8b795ba3b07f6ae9d95037854ffebe792eb88bcdf9545409aeecf068956f9d"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-jumav-grid-envelope-wrapper-proof-ceramic-like/README.md",
+        "sha256": "e68c0c9c3b6a4c40272863e43fa75e04a2b585732f125a9af75ff9bea497c359"
+      },
+      {
+        "path": "simulations/SIM-jumav-grid-envelope-wrapper-proof-ceramic-like/QUESTION.md",
+        "sha256": "072544a1b733436e564d7ac6fd105347e08188fff1fd5fbe5912d9b9bc16265d"
+      },
+      {
+        "path": "simulations/SIM-jumav-grid-envelope-wrapper-proof-ceramic-like/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "ad73678c9870d79cd65313088b6978d2c986e9aeb9cb85382c1a2af03b00f067"
+      },
+      {
+        "path": "scenarios/portable-signing-key-identity/portable-signing-key-identity.md",
+        "sha256": "4deaafd0d50191f352fe959dbd93ce9ea916706abc6e23a05274e32bfb92625f"
+      }
+    ],
+    "simulation_tree_hash": "3bafd6207899415f0dd2bac6a206354f0d9a1273593e0af477084bfc5ebc3db2"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 3,
+    "auditability": 3,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 2,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 1,
+    "simplicity_durability": 3,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 26,
+    "normalized_0_100": 52,
+    "confidence_0_1": 0.83
+  },
+  "assessment": {
+    "rationale": "Strong as a small envelope specimen with explicit content/proof separation, but weak as a direct portable signing-key identity recipe. It can carry rotation artifacts, yet the simulation does not itself define payload promises for old-to-new key linkage, presentation-hint separation, or browser/plugin storage boundaries.",
+    "strengths": [
+      "Tiny deterministic outer envelope fits PromiseGrid minimality.",
+      "Detached proof wrapper gives clear content-versus-proof layering.",
+      "Unknown-pCID handling preserves evidence without overstating verification."
+    ],
+    "weaknesses": [
+      "No explicit identity or key-rotation payload model.",
+      "Does not distinguish durable identity claims from display names or local usernames.",
+      "No concrete browser versus helper storage/security guidance.",
+      "Promise vocabulary is mostly proof/spec language rather than promise-first payload wording."
+    ],
+    "risks": [
+      "Implementers may mistake wrapper proof validity for durable identity continuity.",
+      "Linked-content indirection can fail later audits if referenced objects are missing.",
+      "Portable-host security claims could be overstated because XSS and local key-storage limits are out of scope here."
+    ],
+    "open_questions": [
+      "What exact payload promise links old and new signing keys for Carol's later audit?",
+      "How should browser-held versus helper-held key material be described without false security guarantees?",
+      "Should identity continuity live in a separate signed claim object rather than in wrapper semantics?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

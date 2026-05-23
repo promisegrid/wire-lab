@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-suzuf-gordian-universal-envelope-negative-control-live-crdt-audit-publication-openai-gpt-5.4-medium-20260523-073120",
+  "run_group_id": "ga-tugoz-20260523-073108-suzuf",
+  "cell_id": "ga-tugoz-20260523-073108-suzuf-000002-SIM-suzuf-gordian-universal-envelope-negative-control--live-crdt-audit-publication--openai-gpt-5.4-medium",
+  "sim_id": "SIM-suzuf-gordian-universal-envelope-negative-control",
+  "scenario_id": "live-crdt-audit-publication",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-073120",
+  "result_path": "results/SIM-suzuf-gordian-universal-envelope-negative-control/live-crdt-audit-publication/openai-gpt-5.4-medium/20260523-073120.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_5895165613c8469195d148a115b66dd3",
+    "response_id": "resp_0dc7070b2f37f8b8006a1157d9d00c819ab4a2ca3574ac5913",
+    "input_tokens": 7551,
+    "output_tokens": 2149,
+    "cost_usd": 0.04330025
+  },
+  "source": {
+    "repo_commit": "b35bf8ed25ef35d583168ba24fa464c3882aa819",
+    "sim_path": "simulations/SIM-suzuf-gordian-universal-envelope-negative-control/",
+    "scenario_path": "scenarios/live-crdt-audit-publication/live-crdt-audit-publication.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "1c8b795ba3b07f6ae9d95037854ffebe792eb88bcdf9545409aeecf068956f9d"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-suzuf-gordian-universal-envelope-negative-control/README.md",
+        "sha256": "306c10193c93691950caa3378d8bd523752933ddda3ed51b175e29e011befdcc"
+      },
+      {
+        "path": "simulations/SIM-suzuf-gordian-universal-envelope-negative-control/QUESTION.md",
+        "sha256": "d94a994881167dabb66ff4fc1c0af520c7d511165e337076890b0f3bc2ccd781"
+      },
+      {
+        "path": "simulations/SIM-suzuf-gordian-universal-envelope-negative-control/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "da841566faa56f37ede19f3a5f72e5f0e6b5565e5c87094d257071577780c320"
+      },
+      {
+        "path": "scenarios/live-crdt-audit-publication/live-crdt-audit-publication.md",
+        "sha256": "870887bbd5848db45bc4406e5369b492a516c2bd997de9226d24825214c49d94"
+      }
+    ],
+    "simulation_tree_hash": "593c725ca5728740f1a521fcac5ecdf4d282e7f7f3ebf45ad3ab6a67962beeb2"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 0,
+    "auditability": 2,
+    "evolution_safety": 1,
+    "layer_boundary_clarity": 1,
+    "failure_handling": 1,
+    "implementation_plausibility": 2,
+    "risk_penalty": 4
+  },
+  "fitness": {
+    "raw": 9,
+    "normalized_0_100": 18,
+    "confidence_0_1": 0.87
+  },
+  "assessment": {
+    "rationale": "Poor fit for live CRDT pressure. It can carry durable audit publications, but making subject/assertion/proof universal adds global parser burden, weakens unknown-pCID and mixed-version behavior, and does not supply a credible reliable live binding. As a negative control it is useful mainly for showing why richer audit structure should stay payload-local, not universal.",
+    "strengths": [
+      "Deterministic CBOR array is straightforward to parse and implement.",
+      "Built-in assertion/proof slots can help later human or LLM audit of published snapshots."
+    ],
+    "weaknesses": [
+      "Universal outer-envelope structure is a bad match for sub-second live CRDT transport pressure.",
+      "Removing a minimal universal [pcid,payload] dispatch slot hurts evolution and unknown-protocol handling.",
+      "Subject/assertion/proof framing is not promise-first vocabulary and pushes Gordian semantics onto every payload."
+    ],
+    "risks": [
+      "Higher small-device and 100-year parser burden across all traffic.",
+      "Audit-layer structure may leak into live-channel design and blur layer claims.",
+      "Partitions, reordering, and delayed publication are not handled beyond generic envelope shape."
+    ],
+    "open_questions": [
+      "Should live state stay off-grid until a reliable ordered binding exists?",
+      "What exact content-addressed snapshot object would the audit publication cite?",
+      "Can the audit/proof structure be kept inside a payload family instead of the universal envelope?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

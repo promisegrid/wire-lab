@@ -144,6 +144,18 @@ func (provider OpenAIProvider) generateOnce(ctx context.Context, request Provide
 	if request.ReasoningEffort != "" || request.ReasoningSummary != "" {
 		body.Reasoning = &openAIReasoning{Effort: request.ReasoningEffort, Summary: request.ReasoningSummary}
 	}
+	if request.OutputContract == outputContractJSONSchemaStrict {
+		if len(request.OutputSchema) == 0 {
+			return ProviderResponse{}, fmt.Errorf("structured output contract requires output schema")
+		}
+		body.Text.Format = &openAITextFormat{
+			Type:        "json_schema",
+			Name:        request.OutputSchemaName,
+			Description: "PromiseGrid GA score payload",
+			Schema:      request.OutputSchema,
+			Strict:      true,
+		}
+	}
 	payload, err := json.Marshal(body)
 	if err != nil {
 		return ProviderResponse{}, err
@@ -209,6 +221,7 @@ func normalizeOpenAIResponse(parsed openAIResponse, requestID string, textOverri
 	} else if text == "" {
 		text = parsed.JoinOutputText()
 	}
+	refusal := parsed.JoinRefusalText()
 	if parsed.Error != nil {
 		// Intent: Preserve provider-side failed Response evidence while treating
 		// ordinary server-side failures as retryable provider anomalies.
@@ -216,6 +229,12 @@ func normalizeOpenAIResponse(parsed openAIResponse, requestID string, textOverri
 		return ProviderResponse{}, openAIResponseError{
 			Message:   fmt.Sprintf("openai response error type %q code %q message %q usage %s", parsed.Error.Type, parsed.Error.Code, parsed.Error.Message, usageJSON),
 			Retryable: retryableOpenAIProviderError(parsed.Error.Type),
+		}
+	}
+	if strings.TrimSpace(refusal) != "" {
+		return ProviderResponse{}, openAIResponseError{
+			Message:   fmt.Sprintf("openai refusal: %s", strings.TrimSpace(refusal)),
+			Retryable: false,
 		}
 	}
 	if parsed.Status != "" && parsed.Status != "completed" {
@@ -639,12 +658,21 @@ type openAIRequest struct {
 }
 
 type openAIText struct {
-	Verbosity string `json:"verbosity,omitempty"`
+	Verbosity string            `json:"verbosity,omitempty"`
+	Format    *openAITextFormat `json:"format,omitempty"`
 }
 
 type openAIReasoning struct {
 	Effort  string `json:"effort,omitempty"`
 	Summary string `json:"summary,omitempty"`
+}
+
+type openAITextFormat struct {
+	Type        string                 `json:"type"`
+	Name        string                 `json:"name,omitempty"`
+	Description string                 `json:"description,omitempty"`
+	Schema      map[string]interface{} `json:"schema,omitempty"`
+	Strict      bool                   `json:"strict,omitempty"`
 }
 
 type openAIResponse struct {
@@ -674,8 +702,9 @@ type openAIOutputItem struct {
 }
 
 type openAIContentPart struct {
-	Type string `json:"type"`
-	Text string `json:"text"`
+	Type    string `json:"type"`
+	Text    string `json:"text"`
+	Refusal string `json:"refusal"`
 }
 
 func (response openAIResponse) JoinOutputText() string {
@@ -687,6 +716,21 @@ func (response openAIResponse) JoinOutputText() string {
 		for _, content := range item.Content {
 			if content.Type == "output_text" && content.Text != "" {
 				parts = append(parts, content.Text)
+			}
+		}
+	}
+	return strings.Join(parts, "\n")
+}
+
+func (response openAIResponse) JoinRefusalText() string {
+	var parts []string
+	for _, item := range response.Output {
+		if item.Type != "message" {
+			continue
+		}
+		for _, content := range item.Content {
+			if content.Type == "refusal" && content.Refusal != "" {
+				parts = append(parts, content.Refusal)
 			}
 		}
 	}

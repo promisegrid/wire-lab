@@ -1,0 +1,126 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-fitin-gordian-payload-wrapper-multi-embodiment-app-identity-openai-gpt-5.4-medium-20260523-072404",
+  "run_group_id": "ga-tugoz-20260523-072345",
+  "cell_id": "ga-tugoz-20260523-072345-000021-SIM-fitin-gordian-payload-wrapper--multi-embodiment-app-identity--openai-gpt-5.4-medium",
+  "sim_id": "SIM-fitin-gordian-payload-wrapper",
+  "scenario_id": "multi-embodiment-app-identity",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-072404",
+  "result_path": "results/SIM-fitin-gordian-payload-wrapper/multi-embodiment-app-identity/openai-gpt-5.4-medium/20260523-072404.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_ca735804daea4cf398d0a2138f11fb08",
+    "response_id": "resp_0189db47dbf8c543006a1156ad136881988c17221594932a7c",
+    "input_tokens": 7542,
+    "output_tokens": 1279,
+    "cost_usd": 0.0311045
+  },
+  "source": {
+    "repo_commit": "b35bf8ed25ef35d583168ba24fa464c3882aa819",
+    "sim_path": "simulations/SIM-fitin-gordian-payload-wrapper/",
+    "scenario_path": "scenarios/multi-embodiment-app-identity/multi-embodiment-app-identity.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "1c8b795ba3b07f6ae9d95037854ffebe792eb88bcdf9545409aeecf068956f9d"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-fitin-gordian-payload-wrapper/README.md",
+        "sha256": "279c7872010838e6e1a717d1d09d5d1f3ba4dc7f65bd2478f9480a25a58ad90f"
+      },
+      {
+        "path": "simulations/SIM-fitin-gordian-payload-wrapper/QUESTION.md",
+        "sha256": "b19f7ea6f944b6e01a27599024b8b542e1c70e1d632dd102cd665c7e8c8f7625"
+      },
+      {
+        "path": "simulations/SIM-fitin-gordian-payload-wrapper/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "757f81e773faa42f28f9def305c409dd66e586af89d1e29654f1b760e914dad6"
+      },
+      {
+        "path": "scenarios/multi-embodiment-app-identity/multi-embodiment-app-identity.md",
+        "sha256": "e05f78b9d46c47acecbf430a12fda015268e17d60fbea9e0609fa11e604e52cc"
+      }
+    ],
+    "simulation_tree_hash": "89e59244cc796db7feb98172fe4717350d151e0833647afb0891ec143141b835"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 4,
+    "auditability": 4,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 3,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 3,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 34,
+    "normalized_0_100": 68,
+    "confidence_0_1": 0.82
+  },
+  "assessment": {
+    "rationale": "Strong on minimal outer-envelope boundaries and payload-family audit structure, but only partial fit for multi-embodiment app identity because it does not define how heterogeneous embodiments make scoped, durable promises about which parts of a shared app contract they implement.",
+    "strengths": [
+      "Keeps the universal envelope minimal while isolating richer structure in a pCID-owned payload family.",
+      "Improves auditability with explicit subject/assertion/proof slots.",
+      "Has clear unknown-pCID behavior and preserves blind-carry boundaries.",
+      "Supports evolution by letting richer semantics vary by payload family rather than universal envelope doctrine."
+    ],
+    "weaknesses": [
+      "Does not specify embodiment-scoped app-identity promises for browser vs plugin/helper roles.",
+      "Does not say what each component must publish for long-term audit of partial implementation scope.",
+      "Uses little explicit promise-first wording; reads more like format/spec structure than peer promises.",
+      "Does not directly address host replacement, browser storage loss, or helper upgrade continuity."
+    ],
+    "risks": [
+      "Mallory can exploit ambiguity between shared UX identity and actual protocol obligations if no separate scoped payload promises are defined.",
+      "The Gordian wrapper may add complexity without fully solving embodiment-conformance evidence.",
+      "Different peers may preserve wrapper bytes but disagree on assertion/proof meaning when sub-pCIDs are unsupported."
+    ],
+    "open_questions": [
+      "What payload promise should bind multiple embodiments to one app identity without claiming identical capabilities?",
+      "How should a browser tab and helper-backed plugin each declare implemented contract subsets and runtime limits?",
+      "What durable local records let Carol audit the same app identity across storage loss, upgrades, and host replacement?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

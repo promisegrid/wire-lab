@@ -1,0 +1,124 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-jumav-grid-envelope-wrapper-proof-ceramic-like-multi-embodiment-app-identity-openai-gpt-5.4-medium-20260523-072404",
+  "run_group_id": "ga-tugoz-20260523-072345",
+  "cell_id": "ga-tugoz-20260523-072345-000009-SIM-jumav-grid-envelope-wrapper-proof-ceramic-like--multi-embodiment-app-identity--openai-gpt-5.4-medium",
+  "sim_id": "SIM-jumav-grid-envelope-wrapper-proof-ceramic-like",
+  "scenario_id": "multi-embodiment-app-identity",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-072404",
+  "result_path": "results/SIM-jumav-grid-envelope-wrapper-proof-ceramic-like/multi-embodiment-app-identity/openai-gpt-5.4-medium/20260523-072404.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_97b63dcbf16b41ab83828f7616b92ca2",
+    "response_id": "resp_020139cf04537b90006a1156845c98819ab82371f3d097b861",
+    "input_tokens": 7758,
+    "output_tokens": 1108,
+    "cost_usd": 0.0290885
+  },
+  "source": {
+    "repo_commit": "b35bf8ed25ef35d583168ba24fa464c3882aa819",
+    "sim_path": "simulations/SIM-jumav-grid-envelope-wrapper-proof-ceramic-like/",
+    "scenario_path": "scenarios/multi-embodiment-app-identity/multi-embodiment-app-identity.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "1c8b795ba3b07f6ae9d95037854ffebe792eb88bcdf9545409aeecf068956f9d"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-jumav-grid-envelope-wrapper-proof-ceramic-like/README.md",
+        "sha256": "e68c0c9c3b6a4c40272863e43fa75e04a2b585732f125a9af75ff9bea497c359"
+      },
+      {
+        "path": "simulations/SIM-jumav-grid-envelope-wrapper-proof-ceramic-like/QUESTION.md",
+        "sha256": "072544a1b733436e564d7ac6fd105347e08188fff1fd5fbe5912d9b9bc16265d"
+      },
+      {
+        "path": "simulations/SIM-jumav-grid-envelope-wrapper-proof-ceramic-like/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "ad73678c9870d79cd65313088b6978d2c986e9aeb9cb85382c1a2af03b00f067"
+      },
+      {
+        "path": "scenarios/multi-embodiment-app-identity/multi-embodiment-app-identity.md",
+        "sha256": "e05f78b9d46c47acecbf430a12fda015268e17d60fbea9e0609fa11e604e52cc"
+      }
+    ],
+    "simulation_tree_hash": "3bafd6207899415f0dd2bac6a206354f0d9a1273593e0af477084bfc5ebc3db2"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 3,
+    "auditability": 3,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 3,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 3,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 30,
+    "normalized_0_100": 60,
+    "confidence_0_1": 0.74
+  },
+  "assessment": {
+    "rationale": "Good envelope-layer specimen with clear proof/content separation and some audit/evolution support, but it only weakly addresses the scenario's core need: durable, explicit multi-embodiment app identity and scoped conformance claims per embodiment.",
+    "strengths": [
+      "Tiny deterministic outer envelope with explicit wrapper semantics.",
+      "Clear boundary between envelope, linked content, and proof profile.",
+      "Unknown-pCID policy supports partial understanding and evidence preservation."
+    ],
+    "weaknesses": [
+      "Does not define what makes browser and plugin one app beyond sharing envelope/proof conventions.",
+      "No explicit per-embodiment promise or conformance-claim shape.",
+      "Vocabulary is mostly normative spec language rather than promise-first claims."
+    ],
+    "risks": [
+      "Mallory can exploit ambiguity between shared payload/profile use and shared app identity.",
+      "Detached wrapper indirection may be overread as application-level conformance evidence.",
+      "Extra reference layer may hurt small-device simplicity if widely required."
+    ],
+    "open_questions": [
+      "What artifact would let each embodiment promise only its implemented contract slice?",
+      "How are host replacement, storage loss, and helper upgrades tied to one durable app identity?",
+      "Should app identity live above the envelope as explicit promise objects rather than proof wrappers?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

@@ -1,0 +1,125 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-mipum-grid-envelope-signed-body-envelope-ucan-like-multi-embodiment-app-identity-openai-gpt-5.4-medium-20260523-072404",
+  "run_group_id": "ga-tugoz-20260523-072345",
+  "cell_id": "ga-tugoz-20260523-072345-000015-SIM-mipum-grid-envelope-signed-body-envelope-ucan-like--multi-embodiment-app-identity--openai-gpt-5.4-medium",
+  "sim_id": "SIM-mipum-grid-envelope-signed-body-envelope-ucan-like",
+  "scenario_id": "multi-embodiment-app-identity",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-072404",
+  "result_path": "results/SIM-mipum-grid-envelope-signed-body-envelope-ucan-like/multi-embodiment-app-identity/openai-gpt-5.4-medium/20260523-072404.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_f18f1b9516134a0ea9cc1e86a27d1f1e",
+    "response_id": "resp_07c0d5e78aea83c7006a11569aa6748198b4404613004d6430",
+    "input_tokens": 7762,
+    "output_tokens": 1131,
+    "cost_usd": 0.0294175
+  },
+  "source": {
+    "repo_commit": "b35bf8ed25ef35d583168ba24fa464c3882aa819",
+    "sim_path": "simulations/SIM-mipum-grid-envelope-signed-body-envelope-ucan-like/",
+    "scenario_path": "scenarios/multi-embodiment-app-identity/multi-embodiment-app-identity.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "1c8b795ba3b07f6ae9d95037854ffebe792eb88bcdf9545409aeecf068956f9d"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-mipum-grid-envelope-signed-body-envelope-ucan-like/README.md",
+        "sha256": "29d854652c10275e30003a63f67c3176a2e8b9a1fe4b669877e8c1f65c62a39d"
+      },
+      {
+        "path": "simulations/SIM-mipum-grid-envelope-signed-body-envelope-ucan-like/QUESTION.md",
+        "sha256": "5eaac8f1673cfebb11c2f25aa30f9593f3c3a30756fae9fe7827b636840979a8"
+      },
+      {
+        "path": "simulations/SIM-mipum-grid-envelope-signed-body-envelope-ucan-like/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "89aeebe42adff993d6ff1e28af71b440a281800289f4fc9f6100923834600c18"
+      },
+      {
+        "path": "scenarios/multi-embodiment-app-identity/multi-embodiment-app-identity.md",
+        "sha256": "e05f78b9d46c47acecbf430a12fda015268e17d60fbea9e0609fa11e604e52cc"
+      }
+    ],
+    "simulation_tree_hash": "73977fda1730d6b06516e18e89c1cca807e7a11b09a68bf4442a1c4673e71dfc"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 4,
+    "auditability": 4,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 4,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 3,
+    "simplicity_durability": 4,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 34,
+    "normalized_0_100": 68,
+    "confidence_0_1": 0.74
+  },
+  "assessment": {
+    "rationale": "Strong small-envelope specimen with clear body/proof separation and explicit unknown-pCID behavior, but it addresses wire-shape more than the scenario's core need: durable, auditable per-embodiment app-identity and scoped conformance promises.",
+    "strengths": [
+      "Small deterministic array artifacts fit PromiseGrid durability goals.",
+      "Clear layer split between outer envelope, signed body contract, and proof contract.",
+      "Unknown-pCID handling improves local auditability and failure reporting.",
+      "Implementation looks plausible on constrained and heterogeneous runtimes."
+    ],
+    "weaknesses": [
+      "Does not directly define how browser and plugin make scoped conformance promises while remaining one app.",
+      "Uses mostly spec/normative language rather than explicit promise-first wording.",
+      "Open binding question around whether proof should bind the outer pCID leaves evolution ambiguity."
+    ],
+    "risks": [
+      "Embodiments may overclaim 'same app' from shared envelope support without explicit partial-scope promises.",
+      "If only [body_pcid, body_payload] is signed, outer-contract substitution or confusion risk may remain.",
+      "Scenario pressure around host replacement, storage loss, and long-term conformance audit is under-specified."
+    ],
+    "open_questions": [
+      "What artifact names the shared app contract versus each embodiment's narrower implementation promises?",
+      "Should proof bind the outer pCID as associated data?",
+      "How are durable conformance claims recorded so Carol can audit partial support across embodiments over time?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

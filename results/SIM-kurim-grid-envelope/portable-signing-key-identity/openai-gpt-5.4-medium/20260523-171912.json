@@ -1,0 +1,134 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-kurim-grid-envelope-portable-signing-key-identity-openai-gpt-5.4-medium-20260523-171912",
+  "run_group_id": "ga-calib-20260523-structured-strict2",
+  "cell_id": "ga-calib-20260523-structured-strict2-000005-SIM-kurim-grid-envelope--portable-signing-key-identity--openai-gpt-5.4-medium",
+  "sim_id": "SIM-kurim-grid-envelope",
+  "scenario_id": "portable-signing-key-identity",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-171912",
+  "result_path": "results/SIM-kurim-grid-envelope/portable-signing-key-identity/openai-gpt-5.4-medium/20260523-171912.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_f925fb3000914d0093522fa3ccba5ff1",
+    "response_id": "resp_0f523e60f2442acd006a11e1a2d94c819aa672a620fcc0cf1c",
+    "input_tokens": 11986,
+    "output_tokens": 1046,
+    "cost_usd": 0.0356195
+  },
+  "source": {
+    "repo_commit": "b35bf8ed25ef35d583168ba24fa464c3882aa819",
+    "sim_path": "simulations/SIM-kurim-grid-envelope/",
+    "scenario_path": "scenarios/portable-signing-key-identity/portable-signing-key-identity.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-kurim-grid-envelope/README.md",
+        "sha256": "ecf4614b85b76dbd404c91a600561e3bfad4212ad853447fa0a56734c9630ef6"
+      },
+      {
+        "path": "simulations/SIM-kurim-grid-envelope/QUESTION.md",
+        "sha256": "dc716719f8bf916d1cda5da020ea0ce6cfd3ef5221e85a9b41dd81537664c7a4"
+      },
+      {
+        "path": "simulations/SIM-kurim-grid-envelope/TODO/TODO-tujad-grid-envelope-successor-owner.md",
+        "sha256": "e246e1fa25fbe51f550922af92665ad8bff25022fdcb3643e118285eca6d40bc"
+      },
+      {
+        "path": "simulations/SIM-kurim-grid-envelope/TODO/TODO.md",
+        "sha256": "68d0fff548e0489d1114c0c490788bf9d8d7be9fd769296e73749b0fbf610840"
+      },
+      {
+        "path": "simulations/SIM-kurim-grid-envelope/seed/extraction-sources.md",
+        "sha256": "444042ace58bed35b22df66c65e76a195418e76ec50dab3b25afee077ddfb08d"
+      },
+      {
+        "path": "scenarios/portable-signing-key-identity/portable-signing-key-identity.md",
+        "sha256": "4deaafd0d50191f352fe959dbd93ce9ea916706abc6e23a05274e32bfb92625f"
+      }
+    ],
+    "simulation_tree_hash": "f644f1f7130016bc26b62e903e784a948f962727c347009162f6b29dcc18e6e2"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 3,
+    "auditability": 3,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 3,
+    "failure_handling": 1,
+    "implementation_plausibility": 2,
+    "promise_vocabulary": 1,
+    "simplicity_durability": 4,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 24,
+    "normalized_0_100": 48,
+    "confidence_0_1": 0.82
+  },
+  "assessment": {
+    "rationale": "This parent simulation is mainly an envelope-lineage inventory, not a portable signing-key identity recipe. It helps with small durable message framing and keeps signature-placement questions visible, but it does not specify key continuity, rotation evidence, host-specific storage claims, or presentation-hint separation needed by the scenario.",
+    "strengths": [
+      "Small positional grid-envelope hypothesis is simple and durable.",
+      "Explicitly preserves evolution space instead of hardcoding one cryptographic shape forever.",
+      "Keeps layer and pCID/payload questions visible for later audit."
+    ],
+    "weaknesses": [
+      "Does not define a browser/plugin portable identity recipe.",
+      "Does not specify evidence linking old and new signing keys.",
+      "Does not address browser storage limits, XSS risk wording, or cross-host handshake behavior.",
+      "Promise vocabulary is limited; wording is envelope-first more than promise-first."
+    ],
+    "risks": [
+      "Readers may over-apply envelope work to identity continuity without an explicit rotation protocol.",
+      "Unsettled signature placement can leave agent identity binding ambiguous across hosts.",
+      "Local names or display hints could be mistaken for durable identity because the sim does not define the distinction."
+    ],
+    "open_questions": [
+      "What signed payload links old and new signing keys across browser and helper embodiments?",
+      "What canonical serialization is used for signing rotation and continuity statements?",
+      "Is signer identity bound in the outer envelope or only inside a pCID-defined payload?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}
