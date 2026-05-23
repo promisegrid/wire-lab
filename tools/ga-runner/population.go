@@ -32,8 +32,10 @@ type PopulationSim struct {
 }
 
 const (
-	simMetaSchemaV1    = "promisegrid.sim.meta.v1"
-	simRoleNegativeCtl = "negative-control"
+	simMetaSchemaV1     = "promisegrid.sim.meta.v1"
+	simRoleNegativeCtl  = "negative-control"
+	simRoleBakeoff      = "bakeoff"
+	simRoleQuestionHome = "question-home"
 )
 
 type SimulationMeta struct {
@@ -177,8 +179,8 @@ func stateFromPlan(repo Repo, plan GenerationPlan, timestamp string) (GAState, e
 	var parents []GAStateParent
 	for _, parent := range plan.Parents {
 		rationale := "uniform tracked-population sample"
-		if parent.ExplicitInclude && parent.Role == simRoleNegativeCtl {
-			rationale = "explicit include override for negative-control parent"
+		if parent.ExplicitInclude && simRoleExcludedFromBreeding(parent.Role) {
+			rationale = fmt.Sprintf("explicit include override for non-breeding parent role=%s", parent.Role)
 		} else if parent.ExplicitInclude {
 			rationale = "explicit include override"
 		}
@@ -376,10 +378,19 @@ func readTrackedSimulationMeta(repo Repo, simID string, files []string) (Simulat
 		return SimulationMeta{}, fmt.Errorf("%s schema must be %s", metaPath, simMetaSchemaV1)
 	}
 	switch meta.Role {
-	case "", simRoleNegativeCtl:
+	case "", simRoleNegativeCtl, simRoleBakeoff, simRoleQuestionHome:
 		return meta, nil
 	default:
 		return SimulationMeta{}, fmt.Errorf("%s role %q is unsupported", metaPath, meta.Role)
+	}
+}
+
+func simRoleExcludedFromBreeding(role string) bool {
+	switch role {
+	case simRoleNegativeCtl, simRoleBakeoff, simRoleQuestionHome:
+		return true
+	default:
+		return false
 	}
 }
 

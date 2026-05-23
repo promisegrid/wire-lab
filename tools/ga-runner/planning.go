@@ -160,8 +160,9 @@ func validatePlanOptions(options PlanOptions) error {
 
 func selectParents(population []PopulationSim, count int, seedText string, includeIDs []string) ([]PopulationSim, error) {
 	// Intent: Focused canaries must include explicitly named new or suspect sims,
-	// while keeping machine-tagged negative controls out of the default GA parent
-	// pool unless the operator names them explicitly. Source: DI-duzur; DI-kuzag
+	// while keeping machine-tagged non-breeding sims out of the default GA parent
+	// pool unless the operator names them explicitly. Source: DI-duzur; DI-kuzag;
+	// DI-mivuz
 	byID := map[string]PopulationSim{}
 	for _, sim := range population {
 		byID[sim.SimID] = sim
@@ -182,7 +183,7 @@ func selectParents(population []PopulationSim, count int, seedText string, inclu
 		if selectedIDs[sim.SimID] {
 			continue
 		}
-		if sim.Role == simRoleNegativeCtl {
+		if simRoleExcludedFromBreeding(sim.Role) {
 			continue
 		}
 		eligible = append(eligible, sim)

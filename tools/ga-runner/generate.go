@@ -433,9 +433,10 @@ func applyFitnessParentSelection(repo Repo, state *GAState, indexes []int) (bool
 }
 
 func eligibleRankedParents(repo Repo, state GAState, ranked []parentFitnessRank) ([]parentFitnessRank, error) {
-	// Intent: Keep negative-control specimens available for scoring pressure
-	// without letting them silently re-enter breed-parent selection unless the
-	// current state records an explicit include override. Source: DI-kuzag
+	// Intent: Keep machine-tagged non-breeding specimens available for scoring
+	// pressure without letting them silently re-enter breed-parent selection
+	// unless the current state records an explicit include override. Source:
+	// DI-kuzag; DI-mivuz
 	roleByID := map[string]string{}
 	population, err := discoverTrackedPopulation(repo)
 	if err != nil {
@@ -455,7 +456,7 @@ func eligibleRankedParents(repo Repo, state GAState, ranked []parentFitnessRank)
 		if role == "" {
 			role = roleByID[rank.SimID]
 		}
-		if role == simRoleNegativeCtl && !parent.ExplicitInclude {
+		if simRoleExcludedFromBreeding(role) && !parent.ExplicitInclude {
 			continue
 		}
 		eligible = append(eligible, rank)

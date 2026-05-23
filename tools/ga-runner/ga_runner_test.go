@@ -219,15 +219,15 @@ func TestDiscoverTrackedPopulationExcludesUntrackedChildren(t *testing.T) {
 func TestDiscoverTrackedPopulationReadsSimulationMetadata(t *testing.T) {
 	repo := newGitTestRepo(t)
 	writeTestFile(t, repo.Path("simulations", "SIM-parent", "README.md"), "# Parent\n")
-	writeTestFile(t, repo.Path("simulations", "SIM-parent", "SIM-META.json"), "{\n  \"schema\": \"promisegrid.sim.meta.v1\",\n  \"role\": \"negative-control\"\n}\n")
+	writeTestFile(t, repo.Path("simulations", "SIM-parent", "SIM-META.json"), "{\n  \"schema\": \"promisegrid.sim.meta.v1\",\n  \"role\": \"question-home\"\n}\n")
 	gitAdd(t, repo, "simulations/SIM-parent/README.md", "simulations/SIM-parent/SIM-META.json")
 
 	population, err := discoverTrackedPopulation(repo)
 	if err != nil {
 		t.Fatalf("discover tracked population with metadata: %v", err)
 	}
-	if len(population) != 1 || population[0].Role != simRoleNegativeCtl {
-		t.Fatalf("expected negative-control role in tracked population, got %#v", population)
+	if len(population) != 1 || population[0].Role != simRoleQuestionHome {
+		t.Fatalf("expected question-home role in tracked population, got %#v", population)
 	}
 }
 
@@ -352,10 +352,10 @@ func TestBuildGenerationPlanIncludesRequestedSimsAndScenarios(t *testing.T) {
 	}
 }
 
-func TestBuildGenerationPlanExcludesNegativeControlParentsUnlessIncluded(t *testing.T) {
+func TestBuildGenerationPlanExcludesNonBreedingParentsUnlessIncluded(t *testing.T) {
 	population := []PopulationSim{
 		{SimID: "SIM-a", Path: "simulations/SIM-a/", TreeHash: "a"},
-		{SimID: "SIM-b", Path: "simulations/SIM-b/", TreeHash: "b", Role: simRoleNegativeCtl},
+		{SimID: "SIM-b", Path: "simulations/SIM-b/", TreeHash: "b", Role: simRoleBakeoff},
 		{SimID: "SIM-c", Path: "simulations/SIM-c/", TreeHash: "c"},
 	}
 	scenarios := []Scenario{
@@ -373,10 +373,10 @@ func TestBuildGenerationPlanExcludesNegativeControlParentsUnlessIncluded(t *test
 		MaxPromotions: 1,
 	})
 	if err != nil {
-		t.Fatalf("build default plan with negative control: %v", err)
+		t.Fatalf("build default plan with non-breeding role: %v", err)
 	}
 	if stringSliceContains(parentIDs(plan.Parents), "SIM-b") {
-		t.Fatalf("negative-control sim should be excluded by default: %#v", plan.Parents)
+		t.Fatalf("non-breeding sim should be excluded by default: %#v", plan.Parents)
 	}
 
 	plan, err = buildGenerationPlan(population, scenarios, PlanOptions{
@@ -390,10 +390,10 @@ func TestBuildGenerationPlanExcludesNegativeControlParentsUnlessIncluded(t *test
 		IncludeSimIDs: []string{"SIM-b"},
 	})
 	if err != nil {
-		t.Fatalf("build include plan with negative control: %v", err)
+		t.Fatalf("build include plan with non-breeding role: %v", err)
 	}
 	if !stringSliceContains(parentIDs(plan.Parents), "SIM-b") || !plan.Parents[0].ExplicitInclude {
-		t.Fatalf("explicit include should preserve negative-control parent: %#v", plan.Parents)
+		t.Fatalf("explicit include should preserve non-breeding parent: %#v", plan.Parents)
 	}
 }
 
@@ -1582,12 +1582,12 @@ func TestRunGenerateSelectsParentsByFitnessEvidence(t *testing.T) {
 	}
 }
 
-func TestRunGenerateExcludesNegativeControlParentsFromFitnessSelection(t *testing.T) {
+func TestRunGenerateExcludesNonBreedingParentsFromFitnessSelection(t *testing.T) {
 	repo := newGAFixtureRepo(t)
 	addTrackedFixtureSim(t, repo, "SIM-high")
 	addTrackedFixtureSim(t, repo, "SIM-low")
 	initGAStateForTestWithParentsAndChildren(t, repo, "ga-generate-negative-control", 3, 2)
-	writeTestFile(t, repo.Path("simulations", "SIM-high", "SIM-META.json"), "{\n  \"schema\": \"promisegrid.sim.meta.v1\",\n  \"role\": \"negative-control\"\n}\n")
+	writeTestFile(t, repo.Path("simulations", "SIM-high", "SIM-META.json"), "{\n  \"schema\": \"promisegrid.sim.meta.v1\",\n  \"role\": \"bakeoff\"\n}\n")
 	gitAdd(t, repo, "simulations/SIM-high/SIM-META.json")
 	writeParentFitnessResults(t, repo, "ga-generate-negative-control", map[string]float64{
 		"SIM-high":   95,
@@ -1624,16 +1624,16 @@ func TestRunGenerateExcludesNegativeControlParentsFromFitnessSelection(t *testin
 
 	state := mustReadGAState(t, repo, "ga-generate-negative-control")
 	if state.Parents[0].SimID == "SIM-high" {
-		t.Fatalf("negative-control parent should not lead the ranked parent pool: %#v", state.Parents)
+		t.Fatalf("non-breeding parent should not lead the ranked parent pool: %#v", state.Parents)
 	}
 	for _, child := range state.Children {
 		if stringSliceContains(child.ParentIDs, "SIM-high") {
-			t.Fatalf("negative-control parent should not be selected for breed: %#v", child)
+			t.Fatalf("non-breeding parent should not be selected for breed: %#v", child)
 		}
 	}
 }
 
-func TestEligibleRankedParentsAllowsExplicitNegativeControlOverride(t *testing.T) {
+func TestEligibleRankedParentsAllowsExplicitNonBreedingOverride(t *testing.T) {
 	repo := newGAFixtureRepo(t)
 	addTrackedFixtureSim(t, repo, "SIM-high")
 	addTrackedFixtureSim(t, repo, "SIM-low")
@@ -1644,7 +1644,7 @@ func TestEligibleRankedParentsAllowsExplicitNegativeControlOverride(t *testing.T
 	}
 	state := GAState{
 		Parents: []GAStateParent{
-			{SimID: "SIM-high", Role: simRoleNegativeCtl, ExplicitInclude: true},
+			{SimID: "SIM-high", Role: simRoleQuestionHome, ExplicitInclude: true},
 			{SimID: "SIM-parent"},
 			{SimID: "SIM-low"},
 		},
@@ -1654,7 +1654,7 @@ func TestEligibleRankedParentsAllowsExplicitNegativeControlOverride(t *testing.T
 		t.Fatalf("eligible ranked parents: %v", err)
 	}
 	if len(eligible) != 3 || eligible[0].SimID != "SIM-high" {
-		t.Fatalf("explicit include should preserve negative-control parent eligibility: %#v", eligible)
+		t.Fatalf("explicit include should preserve non-breeding parent eligibility: %#v", eligible)
 	}
 }
 

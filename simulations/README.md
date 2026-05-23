@@ -48,6 +48,50 @@ evidence only. Source: `DI-faros`; `DI-miror`; `DI-vabor`; `DI-dimas`;
 | `SIM-bohof-group-session-freeze-promise/` | Question home for group-session freeze evidence and `merge-group-transport-spec` promise shape from TODO-bisur. Source: `DI-pukap`. | Active design-point exploration |
 | `SIM-kuful-udp-feed-v0-conformance/` | Question home for UDP-feed v0 reference implementation, test-vector, artifact-writer, and ns-3 conformance evidence from TODO-jodon. Source: `DI-pukap`. | Active design-point exploration |
 
+## Extracted protocol-design candidate simulations
+
+`DI-fibuv` splits alternatives that were previously held inside non-breeding
+overview sims into ordinary GA-testable candidate specimens. The overview sims
+remain question homes; these rows are the concrete protocol alternatives that
+can be scored, compared, bred, promoted, or rejected by simulation evidence.
+
+| Source overview | Candidate simulation | Alternative under test |
+|---|---|---|
+| `SIM-bobud-l6-cas-starting-profile-bakeoff/` | `SIM-lozuk-l6-cas-ipfs-ipld-starting-profile/` | IPFS / IPLD-aligned L6 CAS starting profile |
+| `SIM-bobud-l6-cas-starting-profile-bakeoff/` | `SIM-tudar-l6-cas-promisebase-adapter-profile/` | Promisebase-adapter L6 CAS starting profile |
+| `SIM-bobud-l6-cas-starting-profile-bakeoff/` | `SIM-vagak-l6-cas-minimal-pointer-raw-profile/` | Minimal pointer/raw L6 CAS starting profile |
+| `SIM-kohad-cas-object-type-binding-bakeoff/` | `SIM-zubuf-cas-type-cid-codec-only/` | CAS object type carried only by CID codec / multicodec |
+| `SIM-kohad-cas-object-type-binding-bakeoff/` | `SIM-bihim-cas-type-codec-plus-internal-kind/` | CAS object type carried by codec plus internal kind field |
+| `SIM-kohad-cas-object-type-binding-bakeoff/` | `SIM-lilok-cas-type-path-suffix-negative-control/` | Path-suffix object typing as an intentionally weak comparison point |
+| `SIM-gobaz-chunking-identity-bakeoff/` | `SIM-kabiv-chunking-pcid-driven-identity/` | Chunking identity derived from the pCID-defined protocol |
+| `SIM-gobaz-chunking-identity-bakeoff/` | `SIM-gujav-chunking-descriptor-cid-identity/` | Chunking identity carried by a chunking descriptor CID |
+| `SIM-gobaz-chunking-identity-bakeoff/` | `SIM-rokub-chunking-negotiated-profile-identity/` | Chunking identity negotiated as an implementation profile |
+| `SIM-gobaz-chunking-identity-bakeoff/` | `SIM-nalug-chunking-raw-only-first-profile/` | Raw-object-only first profile that defers chunking standardization |
+| `SIM-zarud-conditional-release-geofencing/` | `SIM-gibut-conditional-release-group-session-local/` | Conditional release enforced as group-session-local policy |
+| `SIM-zarud-conditional-release-geofencing/` | `SIM-falun-conditional-release-separate-protocol-family/` | Conditional release expressed as a separate protocol family |
+| `SIM-zarud-conditional-release-geofencing/` | `SIM-dujoh-conditional-release-transport-visible-constraint/` | Conditional release exposed as transport-visible routing constraint |
+| `SIM-zarud-conditional-release-geofencing/` | `SIM-gujiv-conditional-release-hybrid-reference-graph/` | Conditional release as a hybrid reference-graph pattern |
+| `SIM-narok-transport-family-bakeoff/` | `SIM-jomaj-transport-token-ring/` | Token-ring transport family |
+| `SIM-narok-transport-family-bakeoff/` | `SIM-guhum-transport-cluster-of-clusters/` | Cluster-of-clusters transport family |
+| `SIM-narok-transport-family-bakeoff/` | `SIM-numop-transport-gossip/` | Gossip transport family |
+| `SIM-narok-transport-family-bakeoff/` | `SIM-vopit-transport-receipts-at-scale/` | Receipt-heavy transport family at scale |
+| `SIM-dihiz-peer-adoption-metadata/` | `SIM-votoj-peer-adoption-structured-object/` | Peer adoption metadata as a structured object |
+| `SIM-dihiz-peer-adoption-metadata/` | `SIM-gadol-peer-adoption-promise-message/` | Peer adoption metadata as a promise message |
+| `SIM-dihiz-peer-adoption-metadata/` | `SIM-hopiv-peer-adoption-spec-side-answer-vocabulary/` | Peer adoption metadata as spec-side answer vocabulary |
+| `SIM-dihiz-peer-adoption-metadata/` | `SIM-lofij-peer-adoption-hybrid-pointer/` | Peer adoption metadata as a hybrid pointer pattern |
+| `SIM-ranib-spec-requirement-sections/` | `SIM-gozin-spec-sections-required/` | Promise vocabulary, 100-year, and layperson sections always required |
+| `SIM-ranib-spec-requirement-sections/` | `SIM-togit-spec-sections-required-when-applicable/` | Those spec sections required only when applicable |
+| `SIM-ranib-spec-requirement-sections/` | `SIM-zakil-spec-sections-guide-only/` | Those sections handled by guide prose rather than protocol specs |
+| `SIM-ranib-spec-requirement-sections/` | `SIM-sutap-spec-sections-split-template/` | Those sections split between mandatory and optional template blocks |
+| `SIM-bohof-group-session-freeze-promise/` | `SIM-padin-group-session-freeze-evidence/` | Freeze promise backed by a freeze-evidence object |
+| `SIM-bohof-group-session-freeze-promise/` | `SIM-tuhas-group-session-two-surface-freeze-gate/` | Freeze promise split into authoring and publication surfaces |
+| `SIM-bohof-group-session-freeze-promise/` | `SIM-bahod-group-session-human-merge-promise/` | Freeze promise as a human merge promise |
+| `SIM-bohof-group-session-freeze-promise/` | `SIM-fiboh-group-session-deferred-freeze/` | Deferred freeze promise with post-merge evidence |
+| `SIM-kuful-udp-feed-v0-conformance/` | `SIM-jaboj-udp-feed-reference-first-conformance/` | Reference implementation before tests |
+| `SIM-kuful-udp-feed-v0-conformance/` | `SIM-ruhog-udp-feed-vector-first-conformance/` | Test vectors before implementation |
+| `SIM-kuful-udp-feed-v0-conformance/` | `SIM-nonib-udp-feed-harness-first-conformance/` | Harness-first conformance before reference implementation |
+| `SIM-kuful-udp-feed-v0-conformance/` | `SIM-bilam-udp-feed-layer-composition-conformance/` | Layer-composition conformance across UDP feed and adjacent layers |
+
 ## Grid-envelope positional variant matrix
 
 `DI-fanah` split the pending grid-envelope successor work from

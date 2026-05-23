@@ -1513,6 +1513,93 @@ Affects: `tools/ga-runner/planning.go`; `tools/ga-runner/population.go`;
 `simulations/SIM-suzuf-gordian-universal-envelope-negative-control/SIM-META.json`;
 `protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`.
 
+ID: DI-mivuz
+Date: 2026-05-23 15:12:33
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Extend `promisegrid.sim.meta.v1` to support additional non-breeding
+simulation roles `bakeoff` and `question-home` alongside `negative-control`.
+Default GA parent sampling and generate-time parent reselection must exclude all
+three roles unless the operator explicitly names a sim with `-include-sim`.
+Intent: The first sweep showed that `SIM-suzuf` is the only explicit standalone
+negative control, but the current simulation index also contains obvious
+non-breeding families recorded as bakeoffs and question homes. Those should not
+breed by default, but they should remain tracked, scoreable, and manually
+includable for focused canaries.
+Constraints: Keep `SIM-META.json` optional and additive. Preserve `DI-kuzag`:
+explicit include remains authoritative and older GA states may fall back to
+tracked repo metadata when state-local role fields are absent. Do not infer new
+roles from free-form README text at runtime; use only explicit metadata.
+Affects: `tools/ga-runner/population.go`; `tools/ga-runner/planning.go`;
+`tools/ga-runner/generate.go`; `tools/ga-runner/README.md`;
+`tools/ga-runner/ga_runner_test.go`;
+`simulations/SIM-bobud-l6-cas-starting-profile-bakeoff/SIM-META.json`;
+`simulations/SIM-kohad-cas-object-type-binding-bakeoff/SIM-META.json`;
+`simulations/SIM-gobaz-chunking-identity-bakeoff/SIM-META.json`;
+`simulations/SIM-zarud-conditional-release-geofencing/SIM-META.json`;
+`simulations/SIM-narok-transport-family-bakeoff/SIM-META.json`;
+`simulations/SIM-dihiz-peer-adoption-metadata/SIM-META.json`;
+`simulations/SIM-ranib-spec-requirement-sections/SIM-META.json`;
+`simulations/SIM-bohof-group-session-freeze-promise/SIM-META.json`;
+`simulations/SIM-kuful-udp-feed-v0-conformance/SIM-META.json`;
+`protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`.
+
+ID: DI-fibuv
+Date: 2026-05-23 15:29:40
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Split each protocol design alternative listed in the non-breeding
+overview sims `SIM-bobud`, `SIM-kohad`, `SIM-gobaz`, `SIM-zarud`, `SIM-narok`,
+`SIM-dihiz`, `SIM-ranib`, `SIM-bohof`, and `SIM-kuful` into a concrete
+breedable simulation directory with `README.md` and `QUESTION.md`. Keep the
+overview sims as non-breeding coordination containers, but make their listed
+alternatives individually scoreable by GA/search.
+Intent: The overview sims were intended to make the alternatives testable and
+let answers emerge from simulation results. Treating the overview sims
+themselves as non-breeding is useful only if each listed candidate becomes its
+own normal simulation specimen.
+Constraints: Do not remove or rewrite the overview sims. Do not tag the derived
+candidate sims as non-breeding. Keep each derived sim small, standalone, and
+focused on one alternative or question shape. Use the existing root
+`scenarios/` and GA result machinery; do not create local scenario or result
+trees in this pass.
+Affects: `simulations/SIM-lozuk-l6-cas-ipfs-ipld-starting-profile/`;
+`simulations/SIM-tudar-l6-cas-promisebase-adapter-profile/`;
+`simulations/SIM-vagak-l6-cas-minimal-pointer-raw-profile/`;
+`simulations/SIM-zubuf-cas-type-cid-codec-only/`;
+`simulations/SIM-bihim-cas-type-codec-plus-internal-kind/`;
+`simulations/SIM-lilok-cas-type-path-suffix-negative-control/`;
+`simulations/SIM-kabiv-chunking-pcid-driven-identity/`;
+`simulations/SIM-gujav-chunking-descriptor-cid-identity/`;
+`simulations/SIM-rokub-chunking-negotiated-profile-identity/`;
+`simulations/SIM-nalug-chunking-raw-only-first-profile/`;
+`simulations/SIM-gibut-conditional-release-group-session-local/`;
+`simulations/SIM-falun-conditional-release-separate-protocol-family/`;
+`simulations/SIM-dujoh-conditional-release-transport-visible-constraint/`;
+`simulations/SIM-gujiv-conditional-release-hybrid-reference-graph/`;
+`simulations/SIM-jomaj-transport-token-ring/`;
+`simulations/SIM-guhum-transport-cluster-of-clusters/`;
+`simulations/SIM-numop-transport-gossip/`;
+`simulations/SIM-vopit-transport-receipts-at-scale/`;
+`simulations/SIM-votoj-peer-adoption-structured-object/`;
+`simulations/SIM-gadol-peer-adoption-promise-message/`;
+`simulations/SIM-hopiv-peer-adoption-spec-side-answer-vocabulary/`;
+`simulations/SIM-lofij-peer-adoption-hybrid-pointer/`;
+`simulations/SIM-gozin-spec-sections-required/`;
+`simulations/SIM-togit-spec-sections-required-when-applicable/`;
+`simulations/SIM-zakil-spec-sections-guide-only/`;
+`simulations/SIM-sutap-spec-sections-split-template/`;
+`simulations/SIM-padin-group-session-freeze-evidence/`;
+`simulations/SIM-tuhas-group-session-two-surface-freeze-gate/`;
+`simulations/SIM-bahod-group-session-human-merge-promise/`;
+`simulations/SIM-fiboh-group-session-deferred-freeze/`;
+`simulations/SIM-jaboj-udp-feed-reference-first-conformance/`;
+`simulations/SIM-ruhog-udp-feed-vector-first-conformance/`;
+`simulations/SIM-nonib-udp-feed-harness-first-conformance/`;
+`simulations/SIM-bilam-udp-feed-layer-composition-conformance/`;
+`simulations/README.md`;
+`protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`.
+
 ## Subtasks
 
 - [x] tapur.1 Define the canonical JSON fitness result schema, including source

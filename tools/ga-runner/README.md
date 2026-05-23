@@ -179,10 +179,11 @@ against current sim/scenario IDs, and merges the resolved IDs with any
 malformed, missing, or ambiguous focus-file selectors before any provider call.
 Tracked simulations may also carry optional root metadata at
 `simulations/SIM-*/SIM-META.json` with schema `promisegrid.sim.meta.v1`. The
-first locked role is `negative-control`: these sims remain discoverable and
-scoreable, but `init` excludes them from default parent sampling and `generate`
-excludes them from fitness parent reselection unless the operator explicitly
-names them with `-include-sim`. Source: `DI-kuzag`.
+currently locked non-breeding roles are `negative-control`, `bakeoff`, and
+`question-home`: these sims remain discoverable and scoreable, but `init`
+excludes them from default parent sampling and `generate` excludes them from
+fitness parent reselection unless the operator explicitly names them with
+`-include-sim`. Source: `DI-kuzag`; `DI-mivuz`.
 Streaming is on by default with `-stream=true` and `-stream-idle-timeout 2m`, so
 long Responses API calls log event progress and retry silent stalls. Concurrent
 scoring reserves estimated cell cost before dispatch, so `-max-run-cost-usd`
