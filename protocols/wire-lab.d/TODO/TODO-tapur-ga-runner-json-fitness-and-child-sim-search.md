@@ -1227,6 +1227,30 @@ Affects: `tools/ga-runner/`; `results/RUN-PROTOCOL.md`;
 `tools/ga-runner/README.md`;
 `protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`.
 
+ID: DI-bataj
+Date: 2026-05-22 19:35:22
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Add `/tmp/canary-cells` as an optional plain-text focus file for
+`tools/ga-runner/run-canary.sh`. The file contains `sims:` and/or
+`scenarios:` sections, one selector per line, ignores blank lines and `#`
+comments, resolves selectors by unique prefix expansion against current
+`simulations/SIM-*` and root scenario IDs, merges the resolved IDs with any
+`GA_CANARY_INCLUDE_*` values, and fails fast on malformed, missing, or
+ambiguous selectors before any provider calls. Do not add a live scoring queue
+or change the canary budget model.
+Intent: Targeted canary slices should be easy to edit without mutating
+`/tmp/canary.env`, but unattended spending must remain attached to explicit
+canary invocations rather than an always-on queue.
+Constraints: Implement this in `tools/ga-runner/run-canary.sh` only. Keep
+existing budget, service-tier, worker, and timeout controls unchanged. Use the
+fixed focus-file path `/tmp/canary-cells`. Merge resolved file entries with the
+existing `GA_CANARY_INCLUDE_SIMS` / `GA_CANARY_INCLUDE_SCENARIOS` values rather
+than replacing them.
+Affects: `tools/ga-runner/run-canary.sh`; `tools/ga-runner/README.md`;
+`results/RUN-PROTOCOL.md`;
+`protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`.
+
 ## Subtasks
 
 - [x] tapur.1 Define the canonical JSON fitness result schema, including source
@@ -1363,6 +1387,11 @@ Affects: `tools/ga-runner/`; `results/RUN-PROTOCOL.md`;
 - [x] tapur.37 Update surrounding GA-runner docs so operators can see the v1/v2
   coexistence contract, the new `audit` / `backfill-init` commands, and the
   targeted-backfill-first policy. Source: `DI-roruj`.
+- [x] tapur.38 Add `/tmp/canary-cells` focus-file parsing to
+  `tools/ga-runner/run-canary.sh`, merging resolved sim/scenario prefixes with
+  `GA_CANARY_INCLUDE_*` so focused canaries no longer require editing
+  `/tmp/canary.env` and no live scoring queue is introduced. Source:
+  `DI-bataj`.
 
 ## Predecessor context
 

@@ -8,8 +8,11 @@ set -Eeuo pipefail
 # explicitly so slow provider calls are bounded, while concise output is guided
 # by text verbosity instead of hard output caps. The canary also requests
 # reasoning summaries and mirrors streamed content to stdout/log for live
-# diagnosis. Source: DI-simag; DI-mopob; DI-juzus; DI-pulap; DI-tufud; DI-vadub;
-# DI-pivuj; DI-suzor; DI-guvif
+# diagnosis. `/tmp/canary-cells` can inject focused sim/scenario selections
+# without editing `/tmp/canary.env`, but the run remains an explicit
+# budget-governed canary invocation rather than a live queue. Source: DI-simag;
+# DI-mopob; DI-juzus; DI-pulap; DI-tufud; DI-vadub; DI-pivuj; DI-suzor;
+# DI-guvif; DI-bataj
 
 usage() {
 	cat <<'USAGE'
@@ -32,6 +35,9 @@ Environment overrides:
 	  GA_CANARY_MAX_CHILD_USD      default: 1.00
 	  GA_CANARY_INCLUDE_SIMS       optional comma/space list of SIM IDs to include
 	  GA_CANARY_INCLUDE_SCENARIOS  optional comma/space list of scenario IDs to include
+	  /tmp/canary-cells            optional focus file with `sims:` / `scenarios:`
+	                               sections; entries resolve by unique prefix and
+	                               merge with GA_CANARY_INCLUDE_* values
 	  GA_CANARY_SCORE_WORKERS      default: 6
   GA_CANARY_GENERATE_WORKERS   default: 1
   GA_CANARY_SCORE_REQUEST_TIMEOUT default: GA_CANARY_REQUEST_TIMEOUT or 5m
@@ -82,6 +88,7 @@ max_cell_usd="${GA_CANARY_MAX_CELL_USD:-0.75}"
 max_child_usd="${GA_CANARY_MAX_CHILD_USD:-1.00}"
 include_sims="${GA_CANARY_INCLUDE_SIMS:-}"
 include_scenarios="${GA_CANARY_INCLUDE_SCENARIOS:-}"
+focus_file="/tmp/canary-cells"
 score_workers="${GA_CANARY_SCORE_WORKERS:-6}"
 generate_workers="${GA_CANARY_GENERATE_WORKERS:-1}"
 score_request_timeout="${GA_CANARY_SCORE_REQUEST_TIMEOUT:-${GA_CANARY_REQUEST_TIMEOUT:-5m}}"
@@ -149,9 +156,183 @@ append_repeat_flags() {
 	done
 }
 
+append_unique_value() {
+	local value="$1"
+	local -n values_ref="$2"
+	local existing
+	for existing in "${values_ref[@]}"; do
+		if [ "$existing" = "$value" ]; then
+			return 0
+		fi
+	done
+	values_ref+=("$value")
+}
+
+append_split_unique_values() {
+	local raw_values="$1"
+	local target_name="$2"
+	local -n values_ref="$target_name"
+	local normalized="${raw_values//,/ }"
+	local value
+	for value in $normalized; do
+		if [ -n "$value" ]; then
+			append_unique_value "$value" "$target_name"
+		fi
+	done
+}
+
+append_flag_args_from_array() {
+	local flag_name="$1"
+	local -n values_ref="$2"
+	local -n output_args="$3"
+	local value
+	for value in "${values_ref[@]}"; do
+		output_args+=("$flag_name" "$value")
+	done
+}
+
+trim_line() {
+	local text="$1"
+	text="${text#"${text%%[![:space:]]*}"}"
+	text="${text%"${text##*[![:space:]]}"}"
+	printf '%s\n' "$text"
+}
+
+list_available_sims() {
+	local path
+	for path in "$repo_root"/simulations/SIM-*; do
+		if [ -d "$path" ]; then
+			basename "$path"
+		fi
+	done
+}
+
+list_available_scenarios() {
+	local path scenario_id
+	for path in "$repo_root"/scenarios/*; do
+		if [ ! -d "$path" ]; then
+			continue
+		fi
+		scenario_id="$(basename "$path")"
+		if [ -f "$path/$scenario_id.md" ]; then
+			printf '%s\n' "$scenario_id"
+		fi
+	done
+}
+
+resolve_unique_prefix() {
+	local kind="$1"
+	local selector="$2"
+	shift 2
+	local candidates=("$@")
+	local candidate normalized exact_matches=() prefix_matches=()
+	for candidate in "${candidates[@]}"; do
+		normalized="$candidate"
+		if [ "$kind" = "sim" ]; then
+			normalized="${candidate#SIM-}"
+		fi
+		if [ "$candidate" = "$selector" ] || [ "$normalized" = "$selector" ]; then
+			exact_matches+=("$candidate")
+		fi
+	done
+	if [ "${#exact_matches[@]}" -eq 1 ]; then
+		printf '%s\n' "${exact_matches[0]}"
+		return 0
+	fi
+	for candidate in "${candidates[@]}"; do
+		normalized="$candidate"
+		if [ "$kind" = "sim" ]; then
+			normalized="${candidate#SIM-}"
+		fi
+		if [[ "$candidate" == "$selector"* || "$normalized" == "$selector"* ]]; then
+			prefix_matches+=("$candidate")
+		fi
+	done
+	if [ "${#prefix_matches[@]}" -eq 1 ]; then
+		printf '%s\n' "${prefix_matches[0]}"
+		return 0
+	fi
+	if [ "${#prefix_matches[@]}" -eq 0 ]; then
+		echo "Focus file selector '$selector' matched no $kind IDs." >&2
+		return 1
+	fi
+	echo "Focus file selector '$selector' is ambiguous for $kind IDs: ${prefix_matches[*]}" >&2
+	return 1
+}
+
+parse_focus_file() {
+	local path="$1"
+	if [ ! -f "$path" ]; then
+		return 0
+	fi
+	# Intent: Resolve `/tmp/canary-cells` against the current repo before any
+	# provider work starts so focused canaries fail fast on malformed or
+	# ambiguous selectors. Source: DI-bataj
+	local sims_name="$2"
+	local scenarios_name="$3"
+	local -n sims_ref="$sims_name"
+	local -n scenarios_ref="$scenarios_name"
+	local line raw section=""
+	local resolved
+	local available_sims=()
+	local available_scenarios=()
+	mapfile -t available_sims < <(list_available_sims)
+	mapfile -t available_scenarios < <(list_available_scenarios)
+	while IFS= read -r raw || [ -n "$raw" ]; do
+		line="$(trim_line "$raw")"
+		if [ -z "$line" ] || [[ "$line" == \#* ]]; then
+			continue
+		fi
+		case "$line" in
+			sims:|simulations:)
+				section="sims"
+				continue
+				;;
+			scenarios:)
+				section="scenarios"
+				continue
+				;;
+		esac
+		if [[ "$line" == -* ]]; then
+			line="$(trim_line "${line#-}")"
+		fi
+		if [ -z "$section" ]; then
+			echo "Focus file $path is malformed: entry '$line' must appear under a sims: or scenarios: section." >&2
+			return 1
+		fi
+		case "$section" in
+			sims)
+				resolved="$(resolve_unique_prefix sim "$line" "${available_sims[@]}")" || return 1
+				append_unique_value "$resolved" "$sims_name"
+				;;
+			scenarios)
+				resolved="$(resolve_unique_prefix scenario "$line" "${available_scenarios[@]}")" || return 1
+				append_unique_value "$resolved" "$scenarios_name"
+				;;
+			*)
+				echo "Focus file $path is malformed: unknown section '$section'." >&2
+				return 1
+				;;
+		esac
+	done < "$path"
+}
+
+init_include_sims=()
+init_include_scenarios=()
+focus_file_sims=()
+focus_file_scenarios=()
+append_split_unique_values "$include_sims" init_include_sims
+append_split_unique_values "$include_scenarios" init_include_scenarios
+parse_focus_file "$focus_file" focus_file_sims focus_file_scenarios
+for value in "${focus_file_sims[@]}"; do
+	append_unique_value "$value" init_include_sims
+done
+for value in "${focus_file_scenarios[@]}"; do
+	append_unique_value "$value" init_include_scenarios
+done
 init_include_args=()
-append_repeat_flags "-include-sim" "$include_sims" init_include_args
-append_repeat_flags "-include-scenario" "$include_scenarios" init_include_args
+append_flag_args_from_array "-include-sim" init_include_sims init_include_args
+append_flag_args_from_array "-include-scenario" init_include_scenarios init_include_args
 
 log_dir="$(dirname "$log_file")"
 mkdir -p "$log_dir"
@@ -292,11 +473,20 @@ echo "Provider elapsed: $provider_elapsed"
 echo "Provider streaming: $stream"
 echo "Stream idle timeout: $stream_idle_timeout"
 echo "Stream content stdout: $stream_content_stdout"
-if [ -n "$include_sims" ]; then
-	echo "Included sims: $include_sims"
+if [ -f "$focus_file" ]; then
+	echo "Focus file: $focus_file"
 fi
-if [ -n "$include_scenarios" ]; then
-	echo "Included scenarios: $include_scenarios"
+if [ "${#focus_file_sims[@]}" -gt 0 ]; then
+	echo "Focus-file sims: ${focus_file_sims[*]}"
+fi
+if [ "${#focus_file_scenarios[@]}" -gt 0 ]; then
+	echo "Focus-file scenarios: ${focus_file_scenarios[*]}"
+fi
+if [ "${#init_include_sims[@]}" -gt 0 ]; then
+	echo "Included sims: ${init_include_sims[*]}"
+fi
+if [ "${#init_include_scenarios[@]}" -gt 0 ]; then
+	echo "Included scenarios: ${init_include_scenarios[*]}"
 fi
 
 if git -C "$repo_root" status --short | grep -q .; then

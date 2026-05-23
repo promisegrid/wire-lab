@@ -68,7 +68,11 @@ Focused GA canaries may require specific parent simulations or scenarios in the
 sample before the remaining slots are filled by deterministic shuffle. Use
 `-include-sim` / `-include-scenario` on `tools/ga-runner init`, or
 `GA_CANARY_INCLUDE_SIMS` / `GA_CANARY_INCLUDE_SCENARIOS` with the canary wrapper,
-when a newly-added sim or scenario must be exercised. Source: `DI-duzur`.
+when a newly-added sim or scenario must be exercised. The canary wrapper also
+accepts `/tmp/canary-cells` as a plain-text focus file with `sims:` and
+`scenarios:` sections; selectors resolve by unique prefix against current
+sim/scenario IDs, merge with any `GA_CANARY_INCLUDE_*` values, and must be
+valid before any provider-backed work begins. Source: `DI-duzur`; `DI-bataj`.
 
 API-backed runs must use explicit cost controls before any large batch. The
 runner defaults to concise result style, records provider usage in queue state,

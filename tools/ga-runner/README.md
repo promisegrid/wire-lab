@@ -135,11 +135,18 @@ cell/child retry window defaults to `-provider-max-attempts 2` and
 Set `GA_CANARY_INCLUDE_SIMS` and `GA_CANARY_INCLUDE_SCENARIOS` to comma- or
 space-separated IDs when a canary must include a newly-added sim or a particular
 scenario; the wrapper passes those through as repeatable `init` include flags.
+`tools/ga-runner/run-canary.sh` also reads an optional `/tmp/canary-cells`
+focus file with `sims:` / `scenarios:` sections, one selector per line,
+ignores blank lines and `#` comments, resolves selectors by unique prefix
+against current sim/scenario IDs, and merges the resolved IDs with any
+`GA_CANARY_INCLUDE_*` values before the `init` step. The wrapper fails fast on
+malformed, missing, or ambiguous focus-file selectors before any provider call.
 Streaming is on by default with `-stream=true` and `-stream-idle-timeout 2m`, so
 long Responses API calls log event progress and retry silent stalls. Concurrent
 scoring reserves estimated cell cost before dispatch, so `-max-run-cost-usd`
 remains a conservative launch budget rather than a best-effort warning. Source:
-`DI-juzus`; `DI-tufud`; `DI-pivuj`; `DI-suzor`; `DI-guvif`; `DI-duzur`.
+`DI-juzus`; `DI-tufud`; `DI-pivuj`; `DI-suzor`; `DI-guvif`; `DI-duzur`;
+`DI-bataj`.
 
 The terminal canary opts into `-reasoning-summary auto` and
 `-stream-content-stdout=true` so stdout/logs show one no-newline progress dot
