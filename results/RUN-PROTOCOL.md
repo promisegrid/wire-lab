@@ -171,6 +171,12 @@ questions, and authority boundary. Historical v1 evidence remains append-only;
 new promise-first vocabulary scoring writes v2. Source: `DI-ramar`; `DI-zanon`;
 `DI-pobus`; `DI-ruzaj`; `DI-roruj`.
 
+Promoted canonical results may preserve historical `source.*` proposal paths
+even after the proposal tree is deleted. Audit/backfill code may compare those
+historical source hashes against a byte-identical canonical `simulations/<sim-id>/`
+tree as a current exact-match fallback, but the stored JSON evidence is not
+rewritten. Source: `DI-zobur`.
+
 Old Markdown canary results remain historical evidence, but `tools/ga-runner`
 must ignore `results/**/*.md` when validating or selecting GA fitness evidence.
 Source: `DI-ramar`; `DI-pobus`; `DI-ruzaj`.

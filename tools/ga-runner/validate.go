@@ -350,6 +350,7 @@ type auditRecord struct {
 	Result            FitnessResult
 	ExactMatch        bool
 	RootContractDrift bool
+	SourceResolution  string
 	VocabularyStatus  string
 	VocabularyReasons []string
 }
@@ -359,6 +360,7 @@ type auditSummary struct {
 	ResultCount       int
 	ExactMatchCount   int
 	AverageNormalized float64
+	SourceResolution  string
 	VocabularyStatus  string
 	RootContractDrift bool
 	Models            []string
@@ -393,6 +395,9 @@ func runAudit(args []string, stdout io.Writer) error {
 	summaries := summarizeAuditRecords(records)
 	exactMatches := 0
 	rootDrift := 0
+	historicalSources := 0
+	canonicalFallbackSources := 0
+	missingSources := 0
 	for _, record := range records {
 		if record.ExactMatch {
 			exactMatches++
@@ -400,12 +405,23 @@ func runAudit(args []string, stdout io.Writer) error {
 		if record.RootContractDrift {
 			rootDrift++
 		}
+		switch record.SourceResolution {
+		case auditSourceResolutionHistorical:
+			historicalSources++
+		case auditSourceResolutionCanonicalFallback:
+			canonicalFallbackSources++
+		default:
+			missingSources++
+		}
 	}
-	if err := writeFormat(stdout, "audited=%d exact_match=%d mismatch=%d root_contract_drift=%d hard_hit_sims=%d clean_envelope_candidates=%d\n",
+	if err := writeFormat(stdout, "audited=%d exact_match=%d mismatch=%d root_contract_drift=%d source_historical=%d source_canonical_fallback=%d source_missing=%d hard_hit_sims=%d clean_envelope_candidates=%d\n",
 		len(records),
 		exactMatches,
 		len(records)-exactMatches,
 		rootDrift,
+		historicalSources,
+		canonicalFallbackSources,
+		missingSources,
 		len(selection.HardHitSimIDs),
 		len(selection.CleanEnvelopeSimIDs)); err != nil {
 		return err
@@ -437,11 +453,12 @@ func runAudit(args []string, stdout io.Writer) error {
 
 func writeAuditSummaryLine(stdout io.Writer, summary auditSummary) error {
 	return writeFormat(stdout,
-		"  %s results=%d exact_match=%d avg_normalized_0_100=%.2f vocab=%s root_contract_drift=%t models=%s\n",
+		"  %s results=%d exact_match=%d avg_normalized_0_100=%.2f source_resolution=%s vocab=%s root_contract_drift=%t models=%s\n",
 		summary.SimID,
 		summary.ResultCount,
 		summary.ExactMatchCount,
 		summary.AverageNormalized,
+		summary.SourceResolution,
 		summary.VocabularyStatus,
 		summary.RootContractDrift,
 		strings.Join(summary.Models, ","),
@@ -462,8 +479,9 @@ func auditCanonicalV1Results(repo Repo, model string, timestamp string) ([]audit
 		if result.Schema != resultSchemaV1 {
 			continue
 		}
-		exactMatch, rootContractDrift := auditResultSourceMatch(repo, result)
-		vocabularyStatus, vocabularyReasons, err := auditSimulationVocabulary(repo, result.Source.SimPath, result.SimID)
+		sourceResolution := resolveAuditSimulationSource(repo, repo.Rel(path), result)
+		exactMatch, rootContractDrift := auditResultSourceMatch(repo, result, sourceResolution)
+		vocabularyStatus, vocabularyReasons, err := auditSimulationVocabulary(repo, sourceResolution, result.SimID)
 		if err != nil {
 			return nil, err
 		}
@@ -472,6 +490,7 @@ func auditCanonicalV1Results(repo Repo, model string, timestamp string) ([]audit
 			Result:            result,
 			ExactMatch:        exactMatch,
 			RootContractDrift: rootContractDrift,
+			SourceResolution:  sourceResolution.Mode,
 			VocabularyStatus:  vocabularyStatus,
 			VocabularyReasons: vocabularyReasons,
 		})
@@ -485,11 +504,108 @@ func auditCanonicalV1Results(repo Repo, model string, timestamp string) ([]audit
 	return records, nil
 }
 
-func auditResultSourceMatch(repo Repo, result FitnessResult) (bool, bool) {
+const (
+	auditSourceResolutionHistorical        = "historical"
+	auditSourceResolutionCanonicalFallback = "canonical_fallback"
+	auditSourceResolutionMissing           = "missing"
+	auditSourceResolutionMixed             = "mixed"
+)
+
+type auditSourceState struct {
+	Mode              string
+	HistoricalSimPath string
+	ActiveSimPath     string
+	CanonicalSimPath  string
+}
+
+// resolveAuditSimulationSource keeps historical source provenance intact while
+// letting audit/backfill compare promoted canonical results against the current
+// canonical sim tree when the original proposal tree has been deleted.
+//
+// Intent: Preserve append-only historical `source.*` fields while unblocking
+// audit/backfill on promoted canonical results that intentionally still point at
+// deleted proposal paths. Source: DI-zobur
+func resolveAuditSimulationSource(repo Repo, auditedResultPath string, result FitnessResult) auditSourceState {
+	historicalSimPath := strings.TrimSuffix(normalizeRelPath(result.Source.SimPath), "/")
+	if info, err := os.Stat(repo.Abs(historicalSimPath)); err == nil && info.IsDir() {
+		return auditSourceState{
+			Mode:              auditSourceResolutionHistorical,
+			HistoricalSimPath: historicalSimPath,
+			ActiveSimPath:     historicalSimPath,
+		}
+	}
+	if result.Promotion == nil {
+		return auditSourceState{
+			Mode:              auditSourceResolutionMissing,
+			HistoricalSimPath: historicalSimPath,
+		}
+	}
+	if normalizeRelPath(result.Promotion.CanonicalResultPath) != normalizeRelPath(auditedResultPath) {
+		return auditSourceState{
+			Mode:              auditSourceResolutionMissing,
+			HistoricalSimPath: historicalSimPath,
+		}
+	}
+	if !strings.HasPrefix(historicalSimPath, "proposals/") {
+		return auditSourceState{
+			Mode:              auditSourceResolutionMissing,
+			HistoricalSimPath: historicalSimPath,
+		}
+	}
+	finalSimID := strings.TrimSpace(result.Promotion.FinalSimID)
+	if finalSimID == "" {
+		finalSimID = result.SimID
+	}
+	canonicalSimPath := filepath.ToSlash(filepath.Join("simulations", finalSimID))
+	if info, err := os.Stat(repo.Abs(canonicalSimPath)); err == nil && info.IsDir() {
+		return auditSourceState{
+			Mode:              auditSourceResolutionCanonicalFallback,
+			HistoricalSimPath: historicalSimPath,
+			ActiveSimPath:     canonicalSimPath,
+			CanonicalSimPath:  canonicalSimPath,
+		}
+	}
+	return auditSourceState{
+		Mode:              auditSourceResolutionMissing,
+		HistoricalSimPath: historicalSimPath,
+	}
+}
+
+// auditPathRelativeToRoot preserves the relative suffix of a historical
+// sim-root file so canonical fallback can compare the same logical file under a
+// different root.
+func auditPathRelativeToRoot(path string, root string) (string, bool) {
+	cleanPath := normalizeRelPath(path)
+	cleanRoot := strings.TrimSuffix(normalizeRelPath(root), "/")
+	prefix := cleanRoot + "/"
+	if !strings.HasPrefix(cleanPath, prefix) {
+		return "", false
+	}
+	return strings.TrimPrefix(cleanPath, prefix), true
+}
+
+// remapAuditSourcePath rewrites only sim-root source paths during canonical
+// fallback. Root contracts and scenario files keep their historical stored
+// paths.
+func remapAuditSourcePath(path string, source auditSourceState) string {
+	cleanPath := normalizeRelPath(path)
+	if source.Mode != auditSourceResolutionCanonicalFallback {
+		return cleanPath
+	}
+	relativePath, ok := auditPathRelativeToRoot(cleanPath, source.HistoricalSimPath)
+	if !ok {
+		return cleanPath
+	}
+	return filepath.ToSlash(filepath.Join(source.CanonicalSimPath, relativePath))
+}
+
+func auditResultSourceMatch(repo Repo, result FitnessResult, source auditSourceState) (bool, bool) {
 	// Intent: Gate targeted backfill on current sim/scenario bytes while
 	// reporting root-contract drift separately, because rubric-v2 updates will
 	// naturally change shared scoring docs without changing the candidate sim
-	// itself. Source: DI-roruj
+	// itself. Promoted canonical results may compare against the current canonical
+	// sim tree when historical proposal paths are gone, but only as an exact-byte
+	// fallback. Source: DI-roruj; DI-zobur
 	rootContracts := map[string]bool{}
 	for _, path := range result.Source.RootContractPaths {
 		rootContracts[normalizeRelPath(path)] = true
@@ -497,10 +613,11 @@ func auditResultSourceMatch(repo Repo, result FitnessResult) (bool, bool) {
 	exactMatch := true
 	rootContractDrift := false
 	for _, file := range result.Source.Files {
-		path := normalizeRelPath(file.Path)
-		hash, err := sha256File(repo, path)
+		storedPath := normalizeRelPath(file.Path)
+		currentPath := remapAuditSourcePath(storedPath, source)
+		hash, err := sha256File(repo, currentPath)
 		if err != nil {
-			if rootContracts[path] {
+			if rootContracts[storedPath] {
 				rootContractDrift = true
 				continue
 			}
@@ -510,24 +627,32 @@ func auditResultSourceMatch(repo Repo, result FitnessResult) (bool, bool) {
 		if hash == file.SHA256 {
 			continue
 		}
-		if rootContracts[path] {
+		if rootContracts[storedPath] {
 			rootContractDrift = true
 			continue
 		}
 		exactMatch = false
 	}
-	currentTreeHash, err := currentSimulationTreeHash(repo, strings.TrimSuffix(normalizeRelPath(result.Source.SimPath), "/"))
+	if source.Mode == auditSourceResolutionMissing {
+		return false, rootContractDrift
+	}
+	currentTreeHash, err := currentSimulationTreeHash(repo, source.ActiveSimPath)
 	if err != nil || currentTreeHash != result.Source.SimulationTreeHash {
 		exactMatch = false
 	}
 	return exactMatch, rootContractDrift
 }
 
-func auditSimulationVocabulary(repo Repo, simPath string, simID string) (string, []string, error) {
+func auditSimulationVocabulary(repo Repo, source auditSourceState, simID string) (string, []string, error) {
 	// Intent: Classify only the current sim's own vocabulary drift so the audit
 	// can target clearly affected families first and leave broader clean sims for
-	// calibration sampling. Source: DI-roruj
-	paths, err := simulationAuditPaths(repo, simPath)
+	// calibration sampling. Promoted canonical results audit the current canonical
+	// sim docs when the original proposal tree no longer exists. Source: DI-roruj;
+	// DI-zobur
+	if source.Mode == auditSourceResolutionMissing {
+		return "soft_hit", []string{"simulation source unresolved for current audit"}, nil
+	}
+	paths, err := simulationAuditPaths(repo, source.ActiveSimPath)
 	if err != nil {
 		return "", nil, err
 	}
@@ -632,6 +757,7 @@ func summarizeAuditRecords(records []auditRecord) map[string]auditSummary {
 			item = &aggregate{
 				summary: auditSummary{
 					SimID:            record.Result.SimID,
+					SourceResolution: record.SourceResolution,
 					VocabularyStatus: record.VocabularyStatus,
 				},
 				modelSeen: map[string]bool{},
@@ -646,6 +772,7 @@ func summarizeAuditRecords(records []auditRecord) map[string]auditSummary {
 		if vocabularySeverity(record.VocabularyStatus) > vocabularySeverity(item.summary.VocabularyStatus) {
 			item.summary.VocabularyStatus = record.VocabularyStatus
 		}
+		item.summary.SourceResolution = mergeAuditSourceResolution(item.summary.SourceResolution, record.SourceResolution)
 		if record.RootContractDrift {
 			item.summary.RootContractDrift = true
 		}
@@ -663,6 +790,19 @@ func summarizeAuditRecords(records []auditRecord) map[string]auditSummary {
 		summaries[simID] = item.summary
 	}
 	return summaries
+}
+
+// mergeAuditSourceResolution keeps grouped per-sim audit summaries readable if
+// the corpus ever contains mixed historical and canonical-fallback records for
+// the same canonical sim ID.
+func mergeAuditSourceResolution(current string, next string) string {
+	if current == "" {
+		return next
+	}
+	if current == next {
+		return current
+	}
+	return auditSourceResolutionMixed
 }
 
 func selectTargetedBackfill(records []auditRecord, cleanEnvelopeCount int) backfillSelection {

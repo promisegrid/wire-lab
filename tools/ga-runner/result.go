@@ -52,6 +52,7 @@ type FitnessResult struct {
 	ResultPath   string         `json:"result_path"`
 	Runner       RunnerInfo     `json:"runner"`
 	Source       SourceInfo     `json:"source"`
+	Promotion    *PromotionInfo `json:"promotion,omitempty"`
 	Rubric       RubricInfo     `json:"rubric"`
 	Scores       FitnessScores  `json:"scores"`
 	Fitness      FitnessSummary `json:"fitness"`
@@ -85,6 +86,20 @@ type SourceInfo struct {
 type SourceFile struct {
 	Path   string `json:"path"`
 	SHA256 string `json:"sha256"`
+}
+
+// PromotionInfo records how a scored proposal result was later promoted into a
+// canonical `results/` home without claiming that the historical `source.*`
+// proposal provenance changed.
+type PromotionInfo struct {
+	PromotionDI                string `json:"promotion_di,omitempty"`
+	RunGroupID                 string `json:"run_group_id,omitempty"`
+	OriginalChildSimID         string `json:"original_child_sim_id,omitempty"`
+	FinalSimID                 string `json:"final_sim_id,omitempty"`
+	OriginalProposalSimPath    string `json:"original_proposal_sim_path,omitempty"`
+	OriginalProposalResultPath string `json:"original_proposal_result_path,omitempty"`
+	CanonicalResultPath        string `json:"canonical_result_path,omitempty"`
+	SourceProvenancePolicy     string `json:"source_provenance_policy,omitempty"`
 }
 
 type RubricInfo struct {

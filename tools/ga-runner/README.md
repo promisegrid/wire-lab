@@ -80,10 +80,17 @@ go run . cull -repo-root ../.. \
 
 `validate` reads only GA JSON fitness files and ignores old Markdown canary
 results. `audit` inspects canonical historical `promisegrid.ga.result.v1`
-results, reports exact-match vs root-contract drift, and identifies hard-hit
-vocabulary families plus clean grid-envelope calibration contenders.
-`backfill-init` turns that audit into a targeted `promisegrid.ga.state.v1`
-state file for additive rubric-v2 rescoring. `init -dry-run` previews tracked
+results, reports exact-match vs root-contract drift, reports whether each sim
+was audited from a live historical source, a canonical fallback, or an
+unresolved source, and identifies hard-hit vocabulary families plus clean
+grid-envelope calibration contenders. Promoted canonical results may keep their
+historical `source.*` proposal paths; when those proposal trees are gone,
+`audit` and `backfill-init` may compare against the current canonical
+`simulations/<sim-id>/` tree, but only as an exact-byte fallback. If neither
+source root exists, the record stays non-exact and is excluded from targeted
+backfill instead of aborting the run. `backfill-init` turns that audit into a
+targeted `promisegrid.ga.state.v1` state file for additive rubric-v2 rescoring.
+`init -dry-run` previews tracked
 population and conservative generation sizing without writing state. Non-dry-run
 `init` creates `promisegrid.ga.state.v1`. `init` can repeat `-include-sim` and
 `-include-scenario` to guarantee focused coverage while filling remaining sample
@@ -113,7 +120,7 @@ state-selected generated child sim trees and matching result trees; use
 `-dry-run` to print the deletion plan without changing files. Source:
 `DI-pobus`; `DI-bagih`; `DI-zusit`; `DI-podot`; `DI-kofil`; `DI-ruzaj`;
 `DI-gijom`; `DI-puhog`; `DI-dilaf`; `DI-fihof`; `DI-lirat`; `DI-dikoh`;
-`DI-zadik`; `DI-higot`; `DI-roruj`.
+`DI-zadik`; `DI-higot`; `DI-roruj`; `DI-zobur`.
 
 Provider-backed `score` and `generate` always send an explicit service tier.
 The default is `-service-tier flex`; `-service-tier default` is available when

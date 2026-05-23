@@ -46,6 +46,7 @@ minted after that date carry only the proquint handle.
 | [TODO-rusis](./TODO-rusis-simulation-split-and-specimen-relocation.md) | 2026-05-10 | Simulation split and specimen relocation **(open: dissolve `SIM-piloh` into independent lineage sims; retire active `ppx-dr`; preserve every existing artifact by move, archive, rooted retention, or supersession)** | — |
 | [TODO-dadub](./TODO-dadub-root-scenario-skeleton-and-seed-catalog.md) | 2026-05-18 | Root scenario skeleton and seed catalog **(closed: root scenario/result skeleton, mined rows, and application seeds complete under DI-dimas / DI-nanih / DI-midif)** | — |
 | [TODO-tapur](./TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md) | 2026-05-19 | GA runner JSON fitness and child sim search | — |
+| [TODO-tugoz](./TODO-tugoz-grid-envelope-signable-view-and-gordian-comparison-sims.md) | 2026-05-22 | Grid-envelope signable-view and Gordian comparison sims | — |
 | [TODO-dudok](./TODO-dudok-ga-runner-openai-batch-mode.md) | 2026-05-19 | GA runner OpenAI Batch mode and large-run orchestration | — |
 | [TODO-turog](./TODO-turog-te-41-group-session-freeze-procedure.md) | 2026-05-07 | TE-41 group-session freeze procedure **(closed: active successor work closed by DI-rurab / DI-bomud)** | `TODO-26` / `TODO-20260507-002306` |
 | [TODO-duvuk](./TODO-duvuk-te-42-filename-cid-cascade-policy.md) | 2026-05-07 | TE-42 filename / CID-cascade policy **(closed: active successor work closed by DI-rurab / DI-bomud)** | `TODO-27` / `TODO-20260507-002306` |

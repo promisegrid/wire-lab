@@ -538,19 +538,129 @@ func TestAuditSimulationVocabularyClassifiesAllowedAndHardHitSims(t *testing.T) 
 		"simulations/SIM-hard-hit/README.md",
 		"simulations/SIM-udp-feed-v0-conformance/README.md",
 	)
-	status, _, err := auditSimulationVocabulary(repo, "simulations/SIM-hard-hit/", "SIM-hard-hit")
+	status, _, err := auditSimulationVocabulary(repo, auditSourceState{
+		Mode:          auditSourceResolutionHistorical,
+		ActiveSimPath: "simulations/SIM-hard-hit",
+	}, "SIM-hard-hit")
 	if err != nil {
 		t.Fatalf("audit hard-hit sim: %v", err)
 	}
 	if status != "hard_hit" {
 		t.Fatalf("hard-hit sim status = %q, want %q", status, "hard_hit")
 	}
-	status, _, err = auditSimulationVocabulary(repo, "simulations/SIM-udp-feed-v0-conformance/", "SIM-udp-feed-v0-conformance")
+	status, _, err = auditSimulationVocabulary(repo, auditSourceState{
+		Mode:          auditSourceResolutionHistorical,
+		ActiveSimPath: "simulations/SIM-udp-feed-v0-conformance",
+	}, "SIM-udp-feed-v0-conformance")
 	if err != nil {
 		t.Fatalf("audit udp sim: %v", err)
 	}
 	if status != "clean" {
 		t.Fatalf("udp fixture status = %q, want %q", status, "clean")
+	}
+}
+
+func TestAuditCanonicalV1ResultsUsesCanonicalFallbackForPromotedResults(t *testing.T) {
+	repo := newGAFixtureRepo(t)
+	writeTestFile(t, repo.Path("simulations", "SIM-promoted-clean", "README.md"), "# Promoted Clean\n\nAlice promises this payload meets the protocol specification referred to by this pCID.\n")
+	writeTestFile(t, repo.Path("simulations", "SIM-promoted-clean", "QUESTION.md"), "# Questions\n\nCan Bob keep the outer grid minimal?\n")
+	gitAdd(t, repo,
+		"simulations/SIM-promoted-clean/README.md",
+		"simulations/SIM-promoted-clean/QUESTION.md",
+	)
+	writePromotedCanonicalV1Result(t, repo, "SIM-promoted-clean", "SIM-promoted-child", "scenario-one", "openai-gpt-5.4-xhigh", "20260519-101520", 88)
+	records, err := auditCanonicalV1Results(repo, "", "")
+	if err != nil {
+		t.Fatalf("audit canonical promoted result: %v", err)
+	}
+	if len(records) != 1 {
+		t.Fatalf("record count = %d, want 1", len(records))
+	}
+	record := records[0]
+	if record.SourceResolution != auditSourceResolutionCanonicalFallback {
+		t.Fatalf("source resolution = %q, want %q", record.SourceResolution, auditSourceResolutionCanonicalFallback)
+	}
+	if !record.ExactMatch {
+		t.Fatalf("expected promoted canonical fallback to remain exact-match")
+	}
+	if record.VocabularyStatus != "clean" {
+		t.Fatalf("vocabulary status = %q, want clean", record.VocabularyStatus)
+	}
+}
+
+func TestAuditCanonicalV1ResultsDetectsCanonicalFallbackDrift(t *testing.T) {
+	repo := newGAFixtureRepo(t)
+	writeTestFile(t, repo.Path("simulations", "SIM-promoted-drift", "README.md"), "# Promoted Drift\n\nAlice promises this payload meets the protocol specification referred to by this pCID.\n")
+	writeTestFile(t, repo.Path("simulations", "SIM-promoted-drift", "QUESTION.md"), "# Questions\n\nCan Bob detect drift?\n")
+	gitAdd(t, repo,
+		"simulations/SIM-promoted-drift/README.md",
+		"simulations/SIM-promoted-drift/QUESTION.md",
+	)
+	writePromotedCanonicalV1Result(t, repo, "SIM-promoted-drift", "SIM-promoted-drift-child", "scenario-one", "openai-gpt-5.4-xhigh", "20260519-101521", 84)
+	writeTestFile(t, repo.Path("simulations", "SIM-promoted-drift", "README.md"), "# Promoted Drift\n\nThis drift changes the canonical bytes after scoring.\n")
+	records, err := auditCanonicalV1Results(repo, "", "")
+	if err != nil {
+		t.Fatalf("audit drifted promoted result: %v", err)
+	}
+	if len(records) != 1 {
+		t.Fatalf("record count = %d, want 1", len(records))
+	}
+	record := records[0]
+	if record.SourceResolution != auditSourceResolutionCanonicalFallback {
+		t.Fatalf("source resolution = %q, want %q", record.SourceResolution, auditSourceResolutionCanonicalFallback)
+	}
+	if record.ExactMatch {
+		t.Fatalf("drifted canonical fallback remained exact-match")
+	}
+}
+
+func TestRunAuditReportsSourceResolutionCounts(t *testing.T) {
+	repo := newGAFixtureRepo(t)
+	writeTestFile(t, repo.Path("simulations", "SIM-promoted-audit-grid-envelope", "README.md"), "# Promoted Audit\n\nAlice promises this payload meets the protocol specification referred to by this pCID.\n")
+	gitAdd(t, repo, "simulations/SIM-promoted-audit-grid-envelope/README.md")
+	writePromotedCanonicalV1Result(t, repo, "SIM-promoted-audit-grid-envelope", "SIM-promoted-audit-child", "scenario-one", "openai-gpt-5.4-xhigh", "20260519-101522", 87)
+	var out strings.Builder
+	err := runMain([]string{
+		"ga-runner", "audit",
+		"-repo-root", repo.Root,
+	}, &out, &out)
+	if err != nil {
+		t.Fatalf("audit command: %v\n%s", err, out.String())
+	}
+	text := out.String()
+	if !strings.Contains(text, "source_canonical_fallback=1") {
+		t.Fatalf("audit output missing canonical fallback count:\n%s", text)
+	}
+	if !strings.Contains(text, "source_resolution=canonical_fallback") {
+		t.Fatalf("audit output missing source resolution summary:\n%s", text)
+	}
+}
+
+func TestRunBackfillInitUsesPromotedCanonicalFallbackResults(t *testing.T) {
+	repo := newGAFixtureRepo(t)
+	writeTestFile(t, repo.Path("simulations", "SIM-promoted-hard-hit", "README.md"), "# Promoted Hard Hit\n\nThis sim still uses a claim card artifact.\n")
+	writeTestFile(t, repo.Path("simulations", "SIM-promoted-hard-hit", "QUESTION.md"), "# Questions\n\nCan Alice simplify this later?\n")
+	gitAdd(t, repo,
+		"simulations/SIM-promoted-hard-hit/README.md",
+		"simulations/SIM-promoted-hard-hit/QUESTION.md",
+	)
+	writePromotedCanonicalV1Result(t, repo, "SIM-promoted-hard-hit", "SIM-promoted-hard-hit-child", "scenario-one", "openai-gpt-5.4-xhigh", "20260519-101523", 83)
+	var out strings.Builder
+	err := runMain([]string{
+		"ga-runner", "backfill-init",
+		"-repo-root", repo.Root,
+		"-run-group-id", "ga-backfill-promoted",
+		"-timestamp", "20260522-130500",
+	}, &out, &out)
+	if err != nil {
+		t.Fatalf("backfill-init promoted result: %v\n%s", err, out.String())
+	}
+	state := mustReadGAState(t, repo, "ga-backfill-promoted")
+	if len(state.Parents) != 1 || len(state.Cells) != 1 {
+		t.Fatalf("unexpected promoted backfill state counts: parents=%d cells=%d", len(state.Parents), len(state.Cells))
+	}
+	if state.Parents[0].SimID != "SIM-promoted-hard-hit" {
+		t.Fatalf("backfill parent sim = %q, want %q", state.Parents[0].SimID, "SIM-promoted-hard-hit")
 	}
 }
 
@@ -2412,6 +2522,76 @@ func writeExactMatchV1Result(t *testing.T, repo Repo, simID string, scenarioID s
 	result.Fitness.Normalized0To100 = normalized
 	if err := writeFitnessResultAtomic(path, result); err != nil {
 		t.Fatalf("write exact-match result: %v", err)
+	}
+	return path
+}
+
+func writePromotedCanonicalV1Result(t *testing.T, repo Repo, finalSimID string, originalChildSimID string, scenarioID string, modelID string, timestamp string, normalized float64) string {
+	t.Helper()
+	path := repo.Path("results", finalSimID, scenarioID, modelID, timestamp+".json")
+	result := validResult(repo, path)
+	result.Schema = resultSchemaV1
+	result.RunGroupID = "ga-v1-promoted"
+	result.CellID = "ga-v1-promoted-000001"
+	result.SimID = finalSimID
+	result.ModelID = modelID
+	result.ResultPath = repo.Rel(path)
+	result.Runner.APIModel = ""
+	result.Source.RepoCommit = repo.GitCommit()
+	proposalRunGroupID := "ga-promoted-fixture"
+	proposalSimPath := filepath.ToSlash(filepath.Join("proposals", proposalRunGroupID, "simulations", originalChildSimID))
+	canonicalSimPath := filepath.ToSlash(filepath.Join("simulations", finalSimID))
+	result.Source.SimPath = proposalSimPath + "/"
+	result.Source.ScenarioPath = filepath.ToSlash(filepath.Join("scenarios", scenarioID, scenarioID+".md"))
+	sourcePaths := []string{
+		"results/RUN-PROTOCOL.md",
+		"scenarios/README.md",
+		filepath.ToSlash(filepath.Join("scenarios", scenarioID, scenarioID+".md")),
+		filepath.ToSlash(filepath.Join(canonicalSimPath, "README.md")),
+	}
+	questionPath := filepath.ToSlash(filepath.Join(canonicalSimPath, "QUESTION.md"))
+	if _, err := os.Stat(repo.Abs(questionPath)); err == nil {
+		sourcePaths = append(sourcePaths, questionPath)
+	}
+	localSim, err := localMarkdownFiles(repo, canonicalSimPath, map[string]bool{
+		"README.md":   true,
+		"QUESTION.md": true,
+	})
+	if err != nil {
+		t.Fatalf("local markdown files for promoted result: %v", err)
+	}
+	sourcePaths = append(sourcePaths, localSim...)
+	result.Source.Files = nil
+	for _, sourcePath := range uniqueStrings(sourcePaths) {
+		hash, err := sha256File(repo, sourcePath)
+		if err != nil {
+			t.Fatalf("hash promoted source %s: %v", sourcePath, err)
+		}
+		storedPath := sourcePath
+		if relativePath, ok := auditPathRelativeToRoot(sourcePath, canonicalSimPath); ok {
+			storedPath = filepath.ToSlash(filepath.Join(proposalSimPath, relativePath))
+		}
+		result.Source.Files = append(result.Source.Files, SourceFile{Path: storedPath, SHA256: hash})
+	}
+	treeHash, err := currentSimulationTreeHash(repo, canonicalSimPath)
+	if err != nil {
+		t.Fatalf("canonical sim tree hash: %v", err)
+	}
+	result.Source.SimulationTreeHash = treeHash
+	result.Promotion = &PromotionInfo{
+		PromotionDI:                "DI-test-promotion",
+		RunGroupID:                 proposalRunGroupID,
+		OriginalChildSimID:         originalChildSimID,
+		FinalSimID:                 finalSimID,
+		OriginalProposalSimPath:    proposalSimPath + "/",
+		OriginalProposalResultPath: filepath.ToSlash(filepath.Join("proposals", proposalRunGroupID, "results", originalChildSimID, scenarioID, modelID, timestamp+".json")),
+		CanonicalResultPath:        repo.Rel(path),
+		SourceProvenancePolicy:     "Test fixture: canonical storage identity differs from preserved historical source.* proposal paths.",
+	}
+	result.Fitness.Raw = normalized
+	result.Fitness.Normalized0To100 = normalized
+	if err := writeFitnessResultAtomic(path, result); err != nil {
+		t.Fatalf("write promoted canonical result: %v", err)
 	}
 	return path
 }

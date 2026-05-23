@@ -1251,6 +1251,32 @@ Affects: `tools/ga-runner/run-canary.sh`; `tools/ga-runner/README.md`;
 `results/RUN-PROTOCOL.md`;
 `protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`.
 
+ID: DI-zobur
+Date: 2026-05-22 20:07:19
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Make `tools/ga-runner audit` and `backfill-init` promotion-aware
+without rewriting historical scored artifacts. When a canonical promoted result
+still preserves historical `source.sim_path` and sim-root source-file paths
+under a deleted `proposals/...` tree, audit may fall back to the current
+canonical `simulations/<sim-id>/` tree, but it counts as `exact_match` only if
+the canonical sim files and tree hash still match the historical scored bytes
+exactly. Missing historical proposal roots must not abort audit; unresolved
+sources become non-exact and are excluded from targeted backfill.
+Intent: Historical `source.*` provenance must stay append-only, but targeted
+rubric-v2 rescoring is blocked unless the runner can compare promoted canonical
+results against the byte-identical canonical sim trees that replaced deleted
+proposal trees.
+Constraints: Do not rewrite any scored result JSON or simulation bytes. Keep
+`source.*` proposal provenance authoritative. Use canonical fallback only for
+current audit/backfill comparison. Report source resolution in `audit` output.
+Keep `tapur.36` as a later comparison-report step after actual v2 results
+exist.
+Affects: `tools/ga-runner/result.go`; `tools/ga-runner/validate.go`;
+`tools/ga-runner/ga_runner_test.go`; `tools/ga-runner/README.md`;
+`results/RUN-PROTOCOL.md`;
+`protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`.
+
 ## Subtasks
 
 - [x] tapur.1 Define the canonical JSON fitness result schema, including source
@@ -1392,6 +1418,10 @@ Affects: `tools/ga-runner/run-canary.sh`; `tools/ga-runner/README.md`;
   `GA_CANARY_INCLUDE_*` so focused canaries no longer require editing
   `/tmp/canary.env` and no live scoring queue is introduced. Source:
   `DI-bataj`.
+- [x] tapur.39 Make `audit` and `backfill-init` promotion-aware so canonical
+  promoted results can use byte-identical canonical sim trees as audit fallback
+  when historical proposal roots are gone, while unresolved sources stay
+  non-exact instead of aborting the run. Source: `DI-zobur`.
 
 ## Predecessor context
 
