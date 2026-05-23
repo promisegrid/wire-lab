@@ -1463,6 +1463,29 @@ Affects: `tools/ga-runner/provider.go`; `tools/ga-runner/openai.go`;
 `results/RUN-PROTOCOL.md`;
 `protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`.
 
+ID: DI-vonot
+Date: 2026-05-23 10:31:53
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Treat zero-valued rubric-v2 score axes as present scores when writing
+GA result JSON. Remove `omitempty` from the `promise_vocabulary` and
+`simplicity_durability` score fields so a valid score of `0` is serialized
+instead of being dropped and later misreported as a missing field.
+Intent: The `SIM-suzuf` strict-schema rerun showed five apparent missing-axis
+failures after provider-enforced output was enabled. Inspection of the written
+result JSON showed the failures were local serialization defects: the model had
+scored those axes as zero, but the runner omitted the fields because only the two
+new rubric-v2 fields had `omitempty` tags. Required score presence must be
+independent of score value.
+Constraints: Do not relax result validation. Do not auto-fill missing provider
+scores. Preserve historical artifacts append-only; only future writes and
+explicit reruns should produce corrected JSON. Keep v1 result validation
+compatible with historical files that do not include rubric-v2 fields.
+Affects: `tools/ga-runner/result.go`; `tools/ga-runner/ga_runner_test.go`;
+`protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`;
+`results/state/ga-tugoz-20260523-072345.json`;
+`results/SIM-suzuf-gordian-universal-envelope-negative-control/...`.
+
 ## Subtasks
 
 - [x] tapur.1 Define the canonical JSON fitness result schema, including source

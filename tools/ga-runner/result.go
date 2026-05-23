@@ -110,6 +110,11 @@ type RubricInfo struct {
 	Axes          []string          `json:"axes"`
 }
 
+// FitnessScores is serialized as the durable score evidence. Required axes must
+// be emitted even when the score is zero, because zero is a valid judgment while
+// an absent JSON field is a schema defect. Intent: preserve rubric-v2 score
+// presence after the SIM-suzuf rerun exposed zero-valued fields being omitted by
+// JSON tags. Source: DI-vonot
 type FitnessScores struct {
 	ScenarioFit                int `json:"scenario_fit"`
 	PromiseGridAlignment       int `json:"promisegrid_alignment"`
@@ -118,8 +123,8 @@ type FitnessScores struct {
 	LayerBoundaryClarity       int `json:"layer_boundary_clarity"`
 	FailureHandling            int `json:"failure_handling"`
 	ImplementationPlausibility int `json:"implementation_plausibility"`
-	PromiseVocabulary          int `json:"promise_vocabulary,omitempty"`
-	SimplicityDurability       int `json:"simplicity_durability,omitempty"`
+	PromiseVocabulary          int `json:"promise_vocabulary"`
+	SimplicityDurability       int `json:"simplicity_durability"`
 	RiskPenalty                int `json:"risk_penalty"`
 }
 

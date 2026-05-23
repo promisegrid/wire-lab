@@ -13,13 +13,14 @@
     "provider": "openai",
     "api_model": "gpt-5.4",
     "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
     "service_tier": "default",
     "served_service_tier": "default",
-    "request_id": "req_0a549a1fa4dc483ab4e0bc8dd9c1088a",
-    "response_id": "resp_0d509420ae7ee77a006a1157db79a88199ac6b7bc86d4039f4",
-    "input_tokens": 7436,
-    "output_tokens": 1680,
-    "cost_usd": 0.036533
+    "request_id": "req_466cb871ed79412abc4b5ea94a81b81f",
+    "response_id": "resp_0a8d19434cd18a84006a11ea338620819ab0a4d7e47374badd",
+    "input_tokens": 8027,
+    "output_tokens": 1160,
+    "cost_usd": 0.03028725
   },
   "source": {
     "repo_commit": "b35bf8ed25ef35d583168ba24fa464c3882aa819",
@@ -32,7 +33,7 @@
     "files": [
       {
         "path": "results/RUN-PROTOCOL.md",
-        "sha256": "1c8b795ba3b07f6ae9d95037854ffebe792eb88bcdf9545409aeecf068956f9d"
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
       },
       {
         "path": "scenarios/README.md",
@@ -81,43 +82,42 @@
     ]
   },
   "scores": {
-    "scenario_fit": 1,
+    "scenario_fit": 0,
     "promisegrid_alignment": 1,
     "auditability": 2,
     "evolution_safety": 1,
     "layer_boundary_clarity": 1,
     "failure_handling": 1,
     "implementation_plausibility": 2,
-    "risk_penalty": 4
+    "promise_vocabulary": 0,
+    "simplicity_durability": 0,
+    "risk_penalty": 5
   },
   "fitness": {
-    "raw": 10,
-    "normalized_0_100": 20,
-    "confidence_0_1": 0.85
+    "raw": 8,
+    "normalized_0_100": 16,
+    "confidence_0_1": 0.86
   },
   "assessment": {
-    "rationale": "As a negative control, this specimen usefully exposes the cost of making subject/assertion/proof universal, but it fits the sparse-advertisement chunk-feed scenario poorly. It does not define feed-specific promises for advertising leaves, roots, frontiers, or pointer summaries under partial replication, and its missing minimal dispatch slot makes unknown-protocol and mixed-version behavior worse under sparse knowledge.",
+    "rationale": "This negative-control envelope is largely orthogonal to the sparse chunk-advertisement problem. It offers some explicit structure that may aid auditing, but it does not specify how peers advertise partial chunk possession, roots, frontiers, or compact summaries under sparse knowledge. As a universal outer envelope, it also weakens PromiseGrid goals around minimal global parsing, small-device durability, and clean protocol evolution.",
     "strengths": [
-      "Deterministic universal envelope gives a uniform parse shape once the global contract is known.",
-      "Built-in assertion/proof structure may help local audit readability in some cases.",
-      "The draft is explicit that it is a negative control and names the tradeoff being tested."
+      "Deterministic CBOR positional encoding is implementable.",
+      "Built-in proof-bearing structure may improve some audit readability."
     ],
     "weaknesses": [
-      "Weak scenario fit: no concrete chunk-feed advertisement mechanism is defined.",
-      "Universal Gordian structure blurs layers by making proof semantics everyone's outer-envelope concern.",
-      "No minimal universal pCID dispatch slot, so unknown assertion/proof types are more invasive.",
-      "Promise vocabulary is not promise-first and does not center payload promises between peers.",
-      "Poor simplicity and 100-year durability profile for small devices and long-lived evolution."
+      "Does not directly address feed advertisement of partial chunk sets.",
+      "Pushes application-specific semantics into the universal envelope.",
+      "Not promise-first in vocabulary or payload framing.",
+      "Poor fit for small-device, long-horizon simplicity and durability."
     ],
     "risks": [
-      "Mixed-version and unknown-protocol interoperability failures under sparse replication.",
-      "Global parser burden and migration complexity becoming mandatory for all payload families.",
-      "Richer universal envelope encouraging central or normative conformance thinking instead of local payload promises."
+      "Universal subject/assertion/proof structure adds parser and policy burden to all peers, including simple replication participants.",
+      "Lack of a minimal dispatch slot makes unknown-protocol and mixed-version behavior more invasive.",
+      "The design does not show a peer-local, sparse-knowledge mechanism for advertising partial chunk availability."
     ],
     "open_questions": [
-      "Can sparse chunk advertisement be expressed cleanly without turning subject/assertion/proof into a universal outer layer?",
-      "Do the audit gains survive adversarial, partial-replication, unknown-pCID conditions?",
-      "Is there any domain benefit here large enough to justify the long-term device and evolution cost?"
+      "Could a sparse chunk-advertisement feed be layered cleanly on this envelope without making every peer parse Gordian subject/assertion/proof structure?",
+      "Would any audit benefit from universal proof-bearing structure materially help partial-replication feeds, or would it mostly add overhead?"
     ],
     "authority_boundary": "Evidence only; does not settle PromiseGrid design."
   }

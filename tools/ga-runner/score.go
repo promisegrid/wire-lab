@@ -592,7 +592,15 @@ func executeScoreJob(ctx context.Context, repo Repo, provider Provider, job scor
 		results <- scoreJobResult{Index: job.Index, Cell: cell, Status: "failed", Final: true}
 		return
 	}
-	if missingAxes := missingRequiredScoreAxes(resultSchemaV2, attempt.Raw); len(missingAxes) > 0 && effectiveScoreOutputContract(options, cell) == outputContractPromptJSON {
+	if missingAxes := missingRequiredScoreAxes(resultSchemaV2, attempt.Raw); len(missingAxes) > 0 {
+		// Intent: Fail strict structured-output responses that omit required axes
+		// instead of converting absent provider scores into local zero values.
+		// Source: DI-vonot
+		if effectiveScoreOutputContract(options, cell) != outputContractPromptJSON {
+			markGACell(&cell, "failed", fmt.Sprintf("structured output response missing required score axes: %s", strings.Join(missingAxes, ", ")))
+			results <- scoreJobResult{Index: job.Index, Cell: cell, Status: "failed", Final: true}
+			return
+		}
 		cell.Attempts++
 		retryPrompt := buildScoreSchemaCorrectionPrompt(job.Prompt, missingAxes)
 		retryAttempt, retryErr := executeScoreAttempt(callCtx, provider, options, cell, retryPrompt, cost)

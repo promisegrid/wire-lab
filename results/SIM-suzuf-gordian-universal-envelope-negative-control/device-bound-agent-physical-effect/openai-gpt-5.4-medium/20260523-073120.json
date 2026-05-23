@@ -13,13 +13,14 @@
     "provider": "openai",
     "api_model": "gpt-5.4",
     "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
     "service_tier": "default",
     "served_service_tier": "default",
-    "request_id": "req_c17149a4a00c48ce90920a0b63e1b411",
-    "response_id": "resp_0f80890833576c4c006a1157d9d240819986723e41348a7eff",
-    "input_tokens": 7552,
-    "output_tokens": 1830,
-    "cost_usd": 0.038836
+    "request_id": "req_c9e9455e80da44198828aee719360a12",
+    "response_id": "resp_008e972aa82069bb006a11ea337f28819bbb007dc557ad8dce",
+    "input_tokens": 8143,
+    "output_tokens": 1202,
+    "cost_usd": 0.03107825
   },
   "source": {
     "repo_commit": "b35bf8ed25ef35d583168ba24fa464c3882aa819",
@@ -32,7 +33,7 @@
     "files": [
       {
         "path": "results/RUN-PROTOCOL.md",
-        "sha256": "1c8b795ba3b07f6ae9d95037854ffebe792eb88bcdf9545409aeecf068956f9d"
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
       },
       {
         "path": "scenarios/README.md",
@@ -87,36 +88,37 @@
     "evolution_safety": 1,
     "layer_boundary_clarity": 1,
     "failure_handling": 1,
-    "implementation_plausibility": 2,
+    "implementation_plausibility": 3,
+    "promise_vocabulary": 1,
+    "simplicity_durability": 0,
     "risk_penalty": 4
   },
   "fitness": {
-    "raw": 11,
-    "normalized_0_100": 22,
-    "confidence_0_1": 0.85
+    "raw": 13,
+    "normalized_0_100": 26,
+    "confidence_0_1": 0.86
   },
   "assessment": {
-    "rationale": "As a negative control, this design is intentionally misaligned with the minimal PromiseGrid envelope. The universal subject/assertion/proof outer structure may help audit trails, but it adds global parser burden, weakens mixed-version behavior, and does not by itself solve device-bound delegation, replay deduplication, or break-witness handling for non-idempotent physical effects.",
+    "rationale": "This negative-control envelope is implementable and may improve local audit readability by making subject/assertion/proof structure explicit, but it fits the device-bound physical-effect scenario poorly. The scenario needs crisp promises about delegation, non-idempotent effects, replay handling, receipts, and break-witnesses across restart. The draft supplies only a heavier universal envelope, not the needed effect semantics, and it pushes Gordian-style parsing burden onto all peers. That hurts PromiseGrid alignment, small-device durability, boundary clarity, and evolution safety.",
     "strengths": [
-      "Deterministic CBOR positional envelope is implementable.",
-      "Universal proof-bearing slots could make receipts and later audit artifacts easier to locate.",
-      "Subject references could help point at delegated devices or agents."
+      "Deterministic CBOR positional encoding is straightforward to implement.",
+      "Built-in subject/assertion/proof slots can help human and LLM audit of archived receipts.",
+      "The specimen makes its tradeoff explicit as a negative control rather than hiding the added burden."
     ],
     "weaknesses": [
-      "No minimal universal pCID dispatch slot; unknown assertion/proof handling becomes globally invasive.",
-      "Uses Gordian-style assertion/proof framing instead of promise-first payload wording.",
-      "Does not specify at-most-once replay handling, receipt keys, or break-witness behavior for physical effects.",
-      "Adds complexity and small-device burden that conflicts with 100-year durability goals."
+      "Does not specify device delegation, receipt, deduplication, or break-witness semantics needed by the scenario.",
+      "Uses Gordian-style subject/assertion/proof framing instead of promise-first payload vocabulary.",
+      "Universalizes rich outer-envelope structure, weakening simplicity, layer separation, and 100-year durability for small devices."
     ],
     "risks": [
-      "Restart-plus-replay may cause duplicate physical actions without a defined deduplication receipt model.",
-      "Universal envelope semantics can lock device daemons into heavier parsing and migration obligations.",
-      "Driver and host-stack dependencies risk being blurred into global envelope expectations rather than local payload promises."
+      "Universal proof-bearing structure increases parser and policy burden on small device agents and long-lived auditors.",
+      "No minimal outer dispatch slot makes unknown-protocol and mixed-version handling more fragile during migration.",
+      "Replay/restart handling for non-idempotent physical effects is underspecified, risking duplicate action or ambiguous evidence."
     ],
     "open_questions": [
-      "How would a printer daemon persist and replay-check an at-most-once receipt across restart?",
-      "What durable promise artifact proves the owner delegated the device-bound agent?",
-      "Can unknown assertion/proof pCIDs fail safely without breaking generic peers decades later?"
+      "Can a universal subject/assertion/proof envelope carry durable device-delegation and break-witness receipts without forcing every peer to understand device-domain structure?",
+      "How would replay-deduplication and at-most-once physical-effect evidence be expressed when the draft defines only envelope shape, not effect/receipt semantics?",
+      "Does removing a minimal universal dispatch slot make mixed-version device agents and long-lived archived receipts materially harder to interpret?"
     ],
     "authority_boundary": "Evidence only; does not settle PromiseGrid design."
   }

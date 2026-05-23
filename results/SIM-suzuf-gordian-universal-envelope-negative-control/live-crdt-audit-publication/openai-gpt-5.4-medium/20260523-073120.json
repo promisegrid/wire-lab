@@ -13,13 +13,14 @@
     "provider": "openai",
     "api_model": "gpt-5.4",
     "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
     "service_tier": "default",
     "served_service_tier": "default",
-    "request_id": "req_5895165613c8469195d148a115b66dd3",
-    "response_id": "resp_0dc7070b2f37f8b8006a1157d9d00c819ab4a2ca3574ac5913",
-    "input_tokens": 7551,
-    "output_tokens": 2149,
-    "cost_usd": 0.04330025
+    "request_id": "req_b2549c3bb0a2495294f2b7a744bf5be2",
+    "response_id": "resp_0d82df65a5de8eea006a11ea338058819b8d4d83d96d727c90",
+    "input_tokens": 8142,
+    "output_tokens": 1262,
+    "cost_usd": 0.0319165
   },
   "source": {
     "repo_commit": "b35bf8ed25ef35d583168ba24fa464c3882aa819",
@@ -32,7 +33,7 @@
     "files": [
       {
         "path": "results/RUN-PROTOCOL.md",
-        "sha256": "1c8b795ba3b07f6ae9d95037854ffebe792eb88bcdf9545409aeecf068956f9d"
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
       },
       {
         "path": "scenarios/README.md",
@@ -82,39 +83,43 @@
   },
   "scores": {
     "scenario_fit": 1,
-    "promisegrid_alignment": 0,
-    "auditability": 2,
+    "promisegrid_alignment": 1,
+    "auditability": 3,
     "evolution_safety": 1,
     "layer_boundary_clarity": 1,
     "failure_handling": 1,
-    "implementation_plausibility": 2,
+    "implementation_plausibility": 3,
+    "promise_vocabulary": 1,
+    "simplicity_durability": 0,
     "risk_penalty": 4
   },
   "fitness": {
-    "raw": 9,
-    "normalized_0_100": 18,
-    "confidence_0_1": 0.87
+    "raw": 13,
+    "normalized_0_100": 26,
+    "confidence_0_1": 0.84
   },
   "assessment": {
-    "rationale": "Poor fit for live CRDT pressure. It can carry durable audit publications, but making subject/assertion/proof universal adds global parser burden, weakens unknown-pCID and mixed-version behavior, and does not supply a credible reliable live binding. As a negative control it is useful mainly for showing why richer audit structure should stay payload-local, not universal.",
+    "rationale": "This negative-control envelope helps audit narration by making subject/assertion/proof explicit, but it is a poor fit for a scenario that needs live low-latency CRDT transport separated from durable milestone publication. Making proof-bearing structure universal pushes extra parser and policy burden toward the live path, weakens the minimal dispatch story, and increases mixed-version and unknown-protocol friction. It can still carry durable audit messages, but it does so with worse simplicity, durability, and layer separation than a minimal envelope plus audit-specific payload family.",
     "strengths": [
-      "Deterministic CBOR array is straightforward to parse and implement.",
-      "Built-in assertion/proof slots can help later human or LLM audit of published snapshots."
+      "Explicit subject/assertion/proof fields can aid later human or LLM audit of published snapshots.",
+      "Deterministic positional CBOR is implementable.",
+      "Can encode a save-time audit message that cites a content-addressed object."
     ],
     "weaknesses": [
-      "Universal outer-envelope structure is a bad match for sub-second live CRDT transport pressure.",
-      "Removing a minimal universal [pcid,payload] dispatch slot hurts evolution and unknown-protocol handling.",
-      "Subject/assertion/proof framing is not promise-first vocabulary and pushes Gordian semantics onto every payload."
+      "Bad scenario fit for sub-second live CRDT traffic because the universal envelope is heavier than needed.",
+      "Poor layer boundary clarity between live-channel behavior and durable audit publication.",
+      "Weak PromiseGrid alignment versus the preferred tiny universal dispatch surface.",
+      "Low simplicity and 100-year durability due to global parser burden and richer universal semantics."
     ],
     "risks": [
-      "Higher small-device and 100-year parser burden across all traffic.",
-      "Audit-layer structure may leak into live-channel design and blur layer claims.",
-      "Partitions, reordering, and delayed publication are not handled beyond generic envelope shape."
+      "Universal proof structure may leak audit-layer complexity into live transport decisions.",
+      "No minimal outer dispatch slot makes unknown-protocol and evolution handling more invasive.",
+      "Small-device and long-term parser burden are high for a design used on every envelope."
     ],
     "open_questions": [
-      "Should live state stay off-grid until a reliable ordered binding exists?",
-      "What exact content-addressed snapshot object would the audit publication cite?",
-      "Can the audit/proof structure be kept inside a payload family instead of the universal envelope?"
+      "Can this envelope be restricted to durable audit publications while keeping live CRDT frames off-grid, or does its universal framing inherently blur that boundary?",
+      "What exact snapshot object would Carol audit: a CRDT state CID, an operation batch CID, or a higher-level save event object?",
+      "How would mixed-version peers handle unknown assertion/proof pCIDs during reconnect and backlog replay without harming live behavior?"
     ],
     "authority_boundary": "Evidence only; does not settle PromiseGrid design."
   }

@@ -16,11 +16,11 @@
     "output_contract": "json_schema_strict",
     "service_tier": "default",
     "served_service_tier": "default",
-    "request_id": "req_2becde31ae564ccfa15710a480465dd3",
-    "response_id": "resp_0e2d1b8088fe98f0006a11e0b315a0819a986ba3a65669b0ff",
+    "request_id": "req_ab1826fe07604ed09d0919668634516e",
+    "response_id": "resp_0e0f2e9462d6fe94006a11e9ee24088198bccc443d4b0c8c89",
     "input_tokens": 8125,
-    "output_tokens": 1188,
-    "cost_usd": 0.03085075
+    "output_tokens": 1024,
+    "cost_usd": 0.02855475
   },
   "source": {
     "repo_commit": "b35bf8ed25ef35d583168ba24fa464c3882aa819",
@@ -84,41 +84,43 @@
   "scores": {
     "scenario_fit": 1,
     "promisegrid_alignment": 1,
-    "auditability": 2,
+    "auditability": 3,
     "evolution_safety": 1,
     "layer_boundary_clarity": 1,
-    "failure_handling": 1,
+    "failure_handling": 2,
     "implementation_plausibility": 4,
     "promise_vocabulary": 1,
+    "simplicity_durability": 0,
     "risk_penalty": 4
   },
   "fitness": {
-    "raw": 13,
-    "normalized_0_100": 26,
+    "raw": 15,
+    "normalized_0_100": 30,
     "confidence_0_1": 0.9
   },
   "assessment": {
-    "rationale": "For a minimal immutable blob app, this negative-control design is intentionally overbuilt. It offers some audit-friendly explicit structure and is technically implementable, but it weakens PromiseGrid fit by making proof-bearing semantics universal, removing the tiny dispatch surface, and increasing parser burden for the simplest CAS use case. It does not cleanly preserve the scenario's needed separation between content identity and separate promises about availability, authorization, retention, and retrieval.",
+    "rationale": "This negative-control design is intentionally a poor fit for the minimal immutable blob app. It imposes universal subject/assertion/proof structure where the scenario wants a tiny durable artifact that cleanly separates content identity from availability and authorization promises. The draft is still implementable and somewhat auditable, but it weakens PromiseGrid alignment, evolution safety, and small-device durability.",
     "strengths": [
-      "Deterministic CBOR positional encoding is concrete and implementable.",
-      "Subject/assertion/proof structure can help some audit narratives.",
-      "The spec explicitly acknowledges its own negative-control status and comparison pressure."
+      "Deterministic CBOR positional encoding is implementable.",
+      "Explicit assertion/proof slots can help later audit in some domains.",
+      "The draft clearly states its own negative-control purpose and tradeoff pressure."
     ],
     "weaknesses": [
-      "Poor fit for the smallest useful blob app; the universal envelope adds semantics the scenario does not need.",
-      "No minimal universal dispatch slot; unknown-protocol behavior is worse than in minimal-grid designs.",
-      "Pushes proof/authorship concerns into the global outer layer instead of keeping them payload-local.",
-      "Does not directly specify local promise-accounting records for storage, retention, discovery, or retrieval failure."
+      "Overbuilt for a minimal immutable blob app.",
+      "No minimal universal [pcid,payload] prefix for simple dispatch.",
+      "Not promise-first vocabulary; framed around Gordian subject/assertion/proof structure.",
+      "Poor fit for small devices and long-term minimal durability."
     ],
     "risks": [
-      "Universal envelope complexity raises long-term parser and migration burden for small devices and durable archives.",
-      "Unknown assertion/proof pCID handling becomes a global interoperability risk rather than a payload-local one.",
-      "Readers may incorrectly treat proof-bearing outer structure as evidence of storage or read entitlement, blurring core scenario boundaries."
+      "Global parser burden for the simplest blob use case.",
+      "Mixed-version and unknown-protocol handling becomes more brittle without a minimal dispatch slot.",
+      "Universal proof structure may blur layer boundaries between blob identity, transport, authorization, and audit claims.",
+      "100-year durability is harmed by making richer outer semantics mandatory everywhere."
     ],
     "open_questions": [
-      "Can a minimal immutable blob app gain any real audit value from universal subject/assertion/proof structure, or is it pure overhead?",
-      "How would Carol record local evidence of retrieval failure years later without introducing app-specific availability claims into the universal envelope?",
-      "Does removing a universal [pcid,payload] dispatch slot make mixed-version blob retrieval materially worse for long-term interoperability?"
+      "Can a universal proof-bearing envelope ever justify its global parse burden for tiny CAS apps?",
+      "How would mixed-version peers safely handle unknown assertion or proof pCIDs without a minimal outer dispatch slot?",
+      "What promise-accounting record would clearly separate blob identity from storage, replication, and read authorization in this envelope?"
     ],
     "authority_boundary": "Evidence only; does not settle PromiseGrid design."
   }

@@ -16,11 +16,11 @@
     "output_contract": "json_schema_strict",
     "service_tier": "default",
     "served_service_tier": "default",
-    "request_id": "req_a7a3b2313e77415ea555c0dab6ee2a6f",
-    "response_id": "resp_05e3d4bd9b54f74e006a11e0b30d088198a086c0322a41530c",
+    "request_id": "req_e505881e9570427e95fc56378cdc6127",
+    "response_id": "resp_0fa34fd34c189c85006a11e9ee28fc8199a493a235104689a1",
     "input_tokens": 8021,
-    "output_tokens": 1523,
-    "cost_usd": 0.03535875
+    "output_tokens": 1165,
+    "cost_usd": 0.03034675
   },
   "source": {
     "repo_commit": "b35bf8ed25ef35d583168ba24fa464c3882aa819",
@@ -89,36 +89,38 @@
     "layer_boundary_clarity": 1,
     "failure_handling": 1,
     "implementation_plausibility": 3,
+    "promise_vocabulary": 1,
+    "simplicity_durability": 0,
     "risk_penalty": 4
   },
   "fitness": {
-    "raw": 13,
-    "normalized_0_100": 26,
+    "raw": 14,
+    "normalized_0_100": 28.000000000000004,
     "confidence_0_1": 0.84
   },
   "assessment": {
-    "rationale": "This negative-control envelope can carry sparse-advertisement claims, but it does not directly solve chunk-feed replication and makes every peer pay a global parse and policy cost. The richer universal structure helps audit readability somewhat, yet it weakens minimal-dispatch evolution, blurs layer boundaries, and is notably misaligned with PromiseGrid's small durable outer-envelope preference.",
+    "rationale": "This negative-control envelope can carry sparse-advertisement claims, but it is not shaped for them. Universal subject/assertion/proof structure slightly helps audit narration, yet it weakens PromiseGrid fit for sparse partial-replication because all peers must parse richer global structure and unknown protocol handling becomes more invasive. The design is plausible as CBOR, but it is not promise-first, not minimal, and not durable in the small explicit 100-year sense favored by the rubric.",
     "strengths": [
-      "Deterministic CBOR positional array is implementable.",
-      "Built-in subject/assertion/proof slots can make some advertisements easier to inspect and explain.",
-      "Can represent partial-state assertions without assuming full replication."
+      "Deterministic CBOR positional encoding is implementable.",
+      "Universal assertion/proof fields can make some audit traces more explicit.",
+      "Can express claims about roots, leaves, frontiers, or pointer objects without requiring full replication."
     ],
     "weaknesses": [
-      "Not feed-specific; sparse advertisement semantics remain underdefined.",
-      "No minimal universal dispatch slot, so mixed-version evolution is worse.",
-      "Universalizes payload-policy structure that should stay local.",
-      "Uses Gordian framing instead of promise-first payload vocabulary.",
-      "Too heavy for 100-year small-device durability goals."
+      "Scenario focus is feed advertisement under sparse replication, but the design mostly changes the universal envelope rather than the replication method.",
+      "Not promise-first vocabulary; it centers Gordian subject/assertion/proof structure rather than payload promises.",
+      "Poor minimality and durability for small devices because every payload inherits richer outer structure.",
+      "Weak evolution behavior because unknown assertion/proof pCIDs are more invasive without a tiny dispatch prefix.",
+      "Blurs layer boundaries by making one semantic pattern everybody's outer-envelope concern."
     ],
     "risks": [
-      "Global parser burden for all peers even when they only need a small feed advertisement payload.",
-      "Unknown assertion/proof pCIDs become more disruptive in sparse partial-replication settings.",
-      "Universal proof-bearing envelope increases long-term migration and small-device cost."
+      "Global outer-envelope complexity raises parser burden for all chunk-feed participants, including small devices.",
+      "Lack of a minimal universal dispatch slot makes unknown-protocol and mixed-version behavior worse under sparse knowledge.",
+      "Universal proof-bearing structure may overfit audit style while harming long-term simplicity and migration."
     ],
     "open_questions": [
-      "Does universal subject/assertion/proof structure materially improve audit of sparse chunk advertisements versus a feed-local payload promise?",
-      "How badly do unknown assertion/proof pCIDs hurt mixed-version chunk-feed replication when peers only have partial CAS state?",
-      "Can the same sparse-advertisement evidence be expressed more durably with a minimal outer dispatch plus payload-local proof structure?"
+      "Can sparse chunk-advertisement payloads remain efficient when every message pays the universal subject/assertion/proof envelope cost?",
+      "How do mixed-version peers handle unknown assertion_pcid or proof_pcid during partial replication without a minimal dispatch slot?",
+      "Does the built-in proof structure materially help chunk-feed audit trails enough to justify worse small-device and long-term evolution costs?"
     ],
     "authority_boundary": "Evidence only; does not settle PromiseGrid design."
   }

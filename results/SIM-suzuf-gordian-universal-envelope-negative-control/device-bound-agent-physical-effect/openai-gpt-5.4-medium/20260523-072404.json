@@ -16,11 +16,11 @@
     "output_contract": "json_schema_strict",
     "service_tier": "default",
     "served_service_tier": "default",
-    "request_id": "req_e5b8249b90ab4e7395bc99404ed8f7d7",
-    "response_id": "resp_048ddeff3b7675d4006a11e0b3010881999d748f85161f5774",
+    "request_id": "req_fb8943622a7646bfa0d7bdd6bf7e67a3",
+    "response_id": "resp_0c3c83f78511884a006a11e9ee4ac48199ac3b6bd8985ca4b1",
     "input_tokens": 8137,
-    "output_tokens": 1318,
-    "cost_usd": 0.03269175
+    "output_tokens": 1995,
+    "cost_usd": 0.04216975
   },
   "source": {
     "repo_commit": "b35bf8ed25ef35d583168ba24fa464c3882aa819",
@@ -82,43 +82,43 @@
     ]
   },
   "scores": {
-    "scenario_fit": 1,
+    "scenario_fit": 2,
     "promisegrid_alignment": 1,
-    "auditability": 2,
+    "auditability": 3,
     "evolution_safety": 1,
     "layer_boundary_clarity": 1,
-    "failure_handling": 0,
+    "failure_handling": 1,
     "implementation_plausibility": 2,
+    "promise_vocabulary": 1,
+    "simplicity_durability": 1,
     "risk_penalty": 4
   },
   "fitness": {
-    "raw": 9,
-    "normalized_0_100": 18,
-    "confidence_0_1": 0.92
+    "raw": 14,
+    "normalized_0_100": 28.000000000000004,
+    "confidence_0_1": 0.85
   },
   "assessment": {
-    "rationale": "This negative-control envelope is implementable and may improve structured audit traces, but it fits the device-bound physical-effect scenario poorly because it specifies only a heavier universal envelope, not delegation, dedupe keys, at-most-once receipts, or break-witness behavior. It is also intentionally misaligned with PromiseGrid's minimal universal envelope direction, increases mixed-version and unknown-protocol burden, and uses non-promise-first vocabulary.",
+    "rationale": "As a negative control, this design helps audit structure by making subject/assertion/proof explicit, but it fits the scenario poorly because the scenario needs payload-local promises for delegation, at-most-once physical effects, receipts, and break-witnesses. The universal envelope increases parser burden, weakens minimal dispatch and evolution behavior, and is not promise-first vocabulary.",
     "strengths": [
-      "Deterministic CBOR positional encoding is straightforward to implement.",
-      "Built-in subject/assertion/proof fields could help later auditors interpret some evidence structures.",
-      "The spec explicitly surfaces its own tradeoff as a negative control, which is useful comparison evidence."
+      "Deterministic CBOR positional encoding is implementable and auditable.",
+      "Universal subject/assertion/proof slots can help Carol inspect delegation and receipt evidence structure."
     ],
     "weaknesses": [
-      "No concrete mechanism for owner delegation evidence for a device-bound agent.",
-      "No defined deduplication, at-most-once, receipt, or break-witness model for physical effects after restart or replay.",
-      "Uses Gordian subject/assertion/proof framing instead of explicit promise-first payload claims.",
-      "Intentionally abandons the minimal universal [pcid, payload] dispatch surface, hurting simplicity and durability."
+      "Not promise-first vocabulary; it centers Gordian subject/assertion/proof rather than explicit peer promises.",
+      "Removes the minimal universal dispatch slot, harming mixed-version and unknown-protocol handling.",
+      "Pushes proof semantics into the universal envelope instead of keeping scenario-specific device/effect logic payload-local.",
+      "Does not by itself specify effect identity, replay deduplication, receipts, or break-witness behavior needed for non-idempotent physical actions."
     ],
     "risks": [
-      "Replay or restart handling for non-idempotent device actions is left unspecified, so duplicate physical effects remain a major risk.",
-      "Universal subject/assertion/proof structure raises parser and policy burden for all peers, including small devices that do not need it.",
-      "Lack of a minimal dispatch slot makes unknown-protocol and evolution behavior worse, especially across long-lived deployments.",
-      "Globalizing proof structure blurs layer boundaries between transport envelope and application-specific effect semantics."
+      "Replay after daemon restart could still cause duplicate physical effects because the envelope does not define deduplication or at-most-once semantics.",
+      "Unknown or evolved assertion/proof pCIDs are more disruptive because generic peers must understand the richer universal outer contract.",
+      "Global proof-bearing structure raises long-term small-device and 100-year maintenance burden."
     ],
     "open_questions": [
-      "Could a universal proof-bearing envelope ever encode durable break-witness and receipt patterns for non-idempotent physical effects without imposing global parser burden?",
-      "What migration story would let mixed-version peers handle replay, restart, and unknown assertion/proof pCIDs safely in device-agent deployments?",
-      "Can Gordian-style subject/assertion/proof vocabulary be recast into explicit promise payloads without losing any claimed audit benefit?"
+      "What payload-level promise shape would identify a non-idempotent physical effect across restart and replay?",
+      "Can delegation, receipt, and break-witness semantics stay payload-local if the outer envelope is universally subject/assertion/proof?",
+      "How would unknown assertion/proof pCIDs degrade device-side behavior during mixed-version upgrades?"
     ],
     "authority_boundary": "Evidence only; does not settle PromiseGrid design."
   }

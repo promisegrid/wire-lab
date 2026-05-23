@@ -16,11 +16,11 @@
     "output_contract": "json_schema_strict",
     "service_tier": "default",
     "served_service_tier": "default",
-    "request_id": "req_7b82b6a311c24c2596c54498a9112c73",
-    "response_id": "resp_0d5edb0979d86010006a11e0b28f3c819a971e9596b9268c61",
+    "request_id": "req_139d651f5a2c4e8dbbbbaa3bf37e5b83",
+    "response_id": "resp_074af40d8c2be697006a11e9ee31cc8199a697241c0c034237",
     "input_tokens": 8095,
-    "output_tokens": 1545,
-    "cost_usd": 0.03579625
+    "output_tokens": 1432,
+    "cost_usd": 0.03421425
   },
   "source": {
     "repo_commit": "b35bf8ed25ef35d583168ba24fa464c3882aa819",
@@ -83,43 +83,43 @@
   },
   "scores": {
     "scenario_fit": 2,
-    "promisegrid_alignment": 0,
+    "promisegrid_alignment": 1,
     "auditability": 3,
     "evolution_safety": 1,
-    "layer_boundary_clarity": 0,
-    "failure_handling": 1,
+    "layer_boundary_clarity": 1,
+    "failure_handling": 2,
     "implementation_plausibility": 3,
-    "risk_penalty": 5
+    "promise_vocabulary": 0,
+    "simplicity_durability": 1,
+    "risk_penalty": 4
   },
   "fitness": {
-    "raw": 10,
-    "normalized_0_100": 20,
-    "confidence_0_1": 0.9
+    "raw": 15,
+    "normalized_0_100": 30,
+    "confidence_0_1": 0.87
   },
   "assessment": {
-    "rationale": "This negative-control envelope can represent identity and key-rotation evidence as subject/assertion/proof artifacts, so it has some audit relevance to the scenario. But it does not provide a portable signing-key identity recipe, does not isolate provisional algorithm and storage guidance, and pushes identity-flavored structure into the universal outer layer. That clashes with PromiseGrid's minimal dispatch preference, weakens evolution safety, and adds durable parser burden for small or mixed-version peers.",
+    "rationale": "This negative-control design can represent signing-key rotation and subject-linked proofs explicitly, which helps audit trails for portable identity. But it fits the scenario poorly as a PromiseGrid candidate because it makes Gordian subject/assertion/proof structure universal, lacks a tiny dispatch-first outer layer, uses weak promise-first vocabulary, and adds long-term parser and migration burden for all artifacts rather than just identity-specific payloads.",
     "strengths": [
-      "Built-in proof-bearing structure can help Carol audit old-to-new key linkage.",
-      "Deterministic CBOR positional encoding is technically implementable across browser and helper environments.",
-      "The specimen makes the auditability-versus-global-burden tradeoff explicit."
+      "Deterministic CBOR positional encoding is implementable.",
+      "Built-in subject/assertion/proof fields can make old-to-new key linkage explicit for auditors.",
+      "The specimen directly exposes tradeoffs around portable identity and key rotation evidence."
     ],
     "weaknesses": [
-      "No concrete v0 portable identity recipe for browser plus plugin host.",
-      "No clear promise-first wording for signing-key continuity, rotation, or host-specific storage claims.",
-      "Poor layer boundary: identity-proof structure becomes everybody's outer-envelope concern.",
-      "Mixed-version and unknown-protocol behavior is explicitly worse than minimal-grid alternatives.",
-      "Adds complexity where the scenario mainly needs a durable payload-level claim and rotation trail."
+      "Not promise-first; it centers subject/assertion/proof rather than explicit payload promises.",
+      "Poor layer boundary: identity-proof structure is forced into the universal envelope.",
+      "Weak 100-year durability posture because every peer inherits extra global parse assumptions.",
+      "Scenario details about browser key storage, XSS caveats, and provisional host-specific recipes are underspecified."
     ],
     "risks": [
-      "Universal subject/assertion/proof structure hardcodes more semantics into the outer envelope than the scenario needs.",
-      "Unknown assertion/proof pCIDs create worse interoperability and failure behavior during migration or partial deployment.",
-      "The richer universal wrapper increases long-term complexity and small-device burden for a problem that should likely stay payload-local.",
-      "Identity claims may be framed as normative assertions rather than explicit peer promises."
+      "Universal proof-bearing structure increases parser and policy burden on constrained hosts such as browsers and small devices.",
+      "No minimal outer dispatch slot makes unknown-protocol and mixed-version handling worse during long-lived identity evolution.",
+      "Identity continuity may get overframed as a universal assertion/proof problem instead of a payload-local promise problem."
     ],
     "open_questions": [
-      "Can key-rotation link evidence be expressed cleanly without making subject/assertion/proof universal outer-envelope obligations?",
-      "How would browser-host storage and XSS caveats be represented without turning host-specific policy into global envelope structure?",
-      "Does the audit gain for portable signing-key continuity outweigh the mixed-version and unknown-protocol costs here?"
+      "Can key-rotation evidence be expressed as a payload-local promise family instead of a universal subject/assertion/proof envelope?",
+      "How would browser storage, XSS exposure, and cross-host key portability be modeled without overclaiming security?",
+      "Does removing the minimal universal dispatch slot make mixed-version identity artifacts too fragile over long time horizons?"
     ],
     "authority_boundary": "Evidence only; does not settle PromiseGrid design."
   }

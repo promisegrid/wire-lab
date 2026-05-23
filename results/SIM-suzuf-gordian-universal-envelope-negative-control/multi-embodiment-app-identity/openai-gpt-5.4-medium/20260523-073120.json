@@ -13,13 +13,14 @@
     "provider": "openai",
     "api_model": "gpt-5.4",
     "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
     "service_tier": "default",
     "served_service_tier": "default",
-    "request_id": "req_b426dd24f2e248f2b63c28c08b2f27ad",
-    "response_id": "resp_0be3779e150b79a3006a1157d9d404819ba0e47496b814c88f",
-    "input_tokens": 7530,
-    "output_tokens": 1706,
-    "cost_usd": 0.0370615
+    "request_id": "req_002046d987ec4f03935ea0c56a307cfa",
+    "response_id": "resp_0a60a4dc1326e3f7006a11ea33886c819aba03955ff0d6f3df",
+    "input_tokens": 8121,
+    "output_tokens": 1432,
+    "cost_usd": 0.03425975
   },
   "source": {
     "repo_commit": "b35bf8ed25ef35d583168ba24fa464c3882aa819",
@@ -32,7 +33,7 @@
     "files": [
       {
         "path": "results/RUN-PROTOCOL.md",
-        "sha256": "1c8b795ba3b07f6ae9d95037854ffebe792eb88bcdf9545409aeecf068956f9d"
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
       },
       {
         "path": "scenarios/README.md",
@@ -81,43 +82,44 @@
     ]
   },
   "scores": {
-    "scenario_fit": 2,
+    "scenario_fit": 1,
     "promisegrid_alignment": 1,
-    "auditability": 4,
+    "auditability": 2,
     "evolution_safety": 1,
     "layer_boundary_clarity": 1,
     "failure_handling": 1,
     "implementation_plausibility": 2,
-    "promise_vocabulary": 1,
+    "promise_vocabulary": 0,
+    "simplicity_durability": 0,
     "risk_penalty": 4
   },
   "fitness": {
-    "raw": 14,
-    "normalized_0_100": 28.000000000000004,
-    "confidence_0_1": 0.84
+    "raw": 10,
+    "normalized_0_100": 20,
+    "confidence_0_1": 0.87
   },
   "assessment": {
-    "rationale": "The negative-control envelope can make embodiment claims more uniformly inspectable, but it fits this scenario poorly because it globalizes subject/assertion/proof structure instead of cleanly expressing app-level identity plus embodiment-local promises. It weakens minimal dispatch, mixed-version behavior, and small-device durability exactly where heterogeneous embodiments need narrow, durable contracts.",
+    "rationale": "This negative control offers some audit structure because subject/assertion/proof fields are always present, but it fits the scenario poorly: the docs do not define how heterogeneous embodiments remain one app through explicit contract promises while separately declaring partial implementation scope. Making Gordian structure universal weakens PromiseGrid alignment, blurs payload-vs-envelope boundaries, and creates worse mixed-version behavior exactly where the scenario needs durable, embodiment-specific claims.",
     "strengths": [
-      "Universal subject/assertion/proof slots could help Carol compare browser and plugin claim shapes.",
-      "Deterministic CBOR positional encoding is mechanically plausible.",
-      "The spec explicitly surfaces unknown-protocol and migration pressure instead of hiding it."
+      "Deterministic positional CBOR envelope is implementable and mechanically parseable.",
+      "Universal subject/assertion/proof slots could carry auditable embodiment claims if a stronger payload family were added."
     ],
     "weaknesses": [
-      "It does not clearly show what makes the browser tab and plugin one app beyond sharing the same heavy outer envelope.",
-      "Universal proof-bearing structure blurs outer-envelope concerns with app-specific conformance semantics.",
-      "No minimal universal pCID dispatch slot makes mixed embodiments and unknown payload evolution harder.",
-      "The wording is not promise-first; it centers assertions/proofs rather than explicit peer promises about payloads."
+      "No explicit model for one app identity spanning heterogeneous embodiments with different capability subsets.",
+      "Universal proof-bearing envelope pushes a heavy global parser contract onto all peers.",
+      "Removes minimal outer dispatch, hurting mixed-version and unknown-protocol handling.",
+      "Uses Gordian/conformance-style framing rather than promise-first payload wording.",
+      "Poor fit for small-device and 100-year durability goals."
     ],
     "risks": [
-      "Mallory can exploit ambiguity between shared UX identity and shared protocol obligation because embodiment-local scope is not first-class.",
-      "Global parser burden increases failure risk for constrained embodiments such as browser tabs.",
-      "100-year durability is weakened by richer mandatory outer semantics and harder migration across versions."
+      "Mallory can exploit ambiguity between shared app identity and per-embodiment conformance because the specimen does not define a clear promise-first claim model for partial implementations.",
+      "Global knowledge of the richer outer envelope increases lock-in and migration risk when protocols or embodiments evolve.",
+      "Unknown assertion or proof pCIDs are more invasive than minimal dispatch designs, raising failure risk for sparse or long-lived peers."
     ],
     "open_questions": [
-      "How would each embodiment publish a small, explicit promise about which contract subset it implements without relying on generic conformance claims?",
-      "Can one logical app identity be represented without making every peer understand universal subject/assertion/proof structure?",
-      "What mixed-version behavior should Alice and Carol expect when one embodiment loses storage or upgrades its helper while the other does not?"
+      "Can assertion payload families cleanly express embodiment-scoped app-identity promises without turning the universal envelope into a conformance framework?",
+      "How do unknown assertion/proof pCIDs degrade in mixed-version multi-embodiment deployments over long periods?",
+      "Are the audit gains from universal proof-bearing structure enough to offset the added parser burden on small and long-lived peers?"
     ],
     "authority_boundary": "Evidence only; does not settle PromiseGrid design."
   }

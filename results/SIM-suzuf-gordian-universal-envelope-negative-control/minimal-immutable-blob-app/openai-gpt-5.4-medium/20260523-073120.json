@@ -13,13 +13,14 @@
     "provider": "openai",
     "api_model": "gpt-5.4",
     "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
     "service_tier": "default",
     "served_service_tier": "default",
-    "request_id": "req_fbde17ae78ae43a7a507f0459a14faaf",
-    "response_id": "resp_09162a11a77608c0006a1157d9d29c819ab700927948fc972b",
-    "input_tokens": 7540,
-    "output_tokens": 1897,
-    "cost_usd": 0.039753
+    "request_id": "req_da921eab646d4f90b3db600231594bb8",
+    "response_id": "resp_0bd8c7ee45b19b1c006a11ea33874881988985de74df779378",
+    "input_tokens": 8131,
+    "output_tokens": 1240,
+    "cost_usd": 0.03158925
   },
   "source": {
     "repo_commit": "b35bf8ed25ef35d583168ba24fa464c3882aa819",
@@ -32,7 +33,7 @@
     "files": [
       {
         "path": "results/RUN-PROTOCOL.md",
-        "sha256": "1c8b795ba3b07f6ae9d95037854ffebe792eb88bcdf9545409aeecf068956f9d"
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
       },
       {
         "path": "scenarios/README.md",
@@ -82,40 +83,43 @@
   },
   "scores": {
     "scenario_fit": 1,
-    "promisegrid_alignment": 0,
+    "promisegrid_alignment": 1,
     "auditability": 2,
     "evolution_safety": 1,
     "layer_boundary_clarity": 1,
     "failure_handling": 1,
-    "implementation_plausibility": 3,
-    "risk_penalty": 4
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 0,
+    "simplicity_durability": 0,
+    "risk_penalty": 5
   },
   "fitness": {
-    "raw": 10,
-    "normalized_0_100": 20,
-    "confidence_0_1": 0.86
+    "raw": 11,
+    "normalized_0_100": 22,
+    "confidence_0_1": 0.88
   },
   "assessment": {
-    "rationale": "This negative-control envelope is technically parseable, but it is a poor fit for a minimal immutable blob app. Making subject/assertion/proof universal adds global parser burden and weakens the clean minimal dispatch needed for long-lived hash-\u003eblob use, while not clearly improving separation of content identity from availability, authorization, retention, and replication promises.",
+    "rationale": "This negative-control envelope is implementable and somewhat inspectable, but it is a poor fit for the minimal immutable blob scenario. The scenario wants a tiny, durable separation between content identity and other promises such as storage, discovery, authorization, and retention. This design makes subject/assertion/proof structure universal, removes the minimal [pcid,payload] dispatch slot, and explicitly increases global parser burden and mixed-version risk. That hurts PromiseGrid alignment, simplicity, boundary clarity, and 100-year durability for the smallest CAS-facing app.",
     "strengths": [
-      "Deterministic CBOR positional encoding is implementable.",
-      "Uniform assertion/proof slots may help some audit reads once the envelope is known.",
-      "The specimen makes its tradeoff explicit as a negative control."
+      "Deterministic CBOR positional encoding is plausible to implement.",
+      "Built-in structure may slightly help human or tool inspection when assertion/proof semantics are actually needed."
     ],
     "weaknesses": [
-      "Overbuilt for the smallest useful CAS app.",
-      "No minimal universal pCID dispatch slot, so unknown-protocol and mixed-version handling get worse.",
-      "Universal proof-bearing structure blurs envelope and payload-family boundaries.",
-      "Wording is not promise-first and does not clearly state who promises hash-\u003eblob, retention, or availability behavior."
+      "Overfits a minimal blob app with universal subject/assertion/proof fields.",
+      "Not promise-first in vocabulary or decomposition of app-level promises.",
+      "Blurs layer boundaries by making proof semantics part of every outer envelope.",
+      "Weak evolution story for unknown pCIDs and mixed-version readers.",
+      "Poor simplicity and long-term durability for the smallest useful CAS artifact."
     ],
     "risks": [
-      "Small devices inherit permanent parse and policy burden for features the blob app does not need.",
-      "Future migration becomes brittle because Gordian semantics are baked into the universal outer shape.",
-      "Peers may conflate content identity with proof or access semantics instead of keeping those as separate promises."
+      "Universal proof-bearing structure may cause readers to over-assume that a hash implies proof, authority, or availability.",
+      "Lack of a minimal universal dispatch slot makes unknown-protocol and migration behavior worse for long-lived blob retrieval.",
+      "Extra universal envelope complexity raises small-device and archival-reader burden for a use case that mainly needs stable content identity."
     ],
     "open_questions": [
-      "Could the same audit benefit be achieved by keeping proof structure inside specific payload families instead of the universal envelope?",
-      "What exact local promise-accounting records would Alice, Bob, and Carol keep when retention or remote retrieval fails under this design?"
+      "Can this envelope express minimal blob retrieval promises without implying proof or authorization semantics that the app does not need?",
+      "How would Alice, Bob, and Carol record local promise-accounting evidence for missing bytes, stale availability claims, or retention-policy changes under this universal structure?",
+      "Does any audit gain from universal subject/assertion/proof structure justify the extra parse burden for tiny long-lived blob readers?"
     ],
     "authority_boundary": "Evidence only; does not settle PromiseGrid design."
   }

@@ -16,11 +16,11 @@
     "output_contract": "json_schema_strict",
     "service_tier": "default",
     "served_service_tier": "default",
-    "request_id": "req_f911a9535c484e1e84410a24d2ef15cc",
-    "response_id": "resp_051e9ad87b0e1f09006a11e0b316608199afed64bfdd85dd43",
+    "request_id": "req_3d825eb61d254d7ebda7936d29c3da69",
+    "response_id": "resp_0f4fd3a716ab51f2006a11e9ee4af8819ab82e4c6a2a207af7",
     "input_tokens": 8115,
-    "output_tokens": 1297,
-    "cost_usd": 0.03235925
+    "output_tokens": 1226,
+    "cost_usd": 0.03136525
   },
   "source": {
     "repo_commit": "b35bf8ed25ef35d583168ba24fa464c3882aa819",
@@ -89,35 +89,37 @@
     "layer_boundary_clarity": 1,
     "failure_handling": 1,
     "implementation_plausibility": 3,
+    "promise_vocabulary": 0,
+    "simplicity_durability": 1,
     "risk_penalty": 4
   },
   "fitness": {
-    "raw": 12,
-    "normalized_0_100": 24,
-    "confidence_0_1": 0.88
+    "raw": 13,
+    "normalized_0_100": 26,
+    "confidence_0_1": 0.85
   },
   "assessment": {
-    "rationale": "This negative-control envelope is mostly orthogonal to the scenario. It may improve uniform parsing of assertions and proofs, but it does not supply a clear app-identity or embodiment-scope mechanism. By making subject/assertion/proof universal, it also weakens PromiseGrid's preferred minimal outer dispatch layer, increases parser burden, and makes unknown-protocol evolution harder. That leaves it poorly matched to a scenario about one app with heterogeneous embodiments making precise local promises.",
+    "rationale": "This negative-control envelope is only weakly fit for the scenario. It offers deterministic structure and potentially clearer audit artifacts, but it pushes Gordian-style subject/assertion/proof semantics into the universal outer layer, which works against the scenario's need for small, explicit, embodiment-scoped contract claims. The docs do not show a clean promise-first way for browser and plugin embodiments to share one app identity while separately declaring scope and constraints. The simulation itself is explicitly a negative control and highlights parser burden, mixed-version pain, and durability costs.",
     "strengths": [
-      "Deterministic positional CBOR envelope is implementable and auditable at the byte level.",
-      "Universal subject/assertion/proof structure could make some evidence chains easier to inspect consistently."
+      "Deterministic CBOR positional envelope is implementable.",
+      "Built-in subject/assertion/proof fields may help some audit flows.",
+      "The spec explicitly surfaces its own tradeoffs and failure pressure."
     ],
     "weaknesses": [
-      "No explicit mechanism for saying what makes the browser tab and plugin one app.",
-      "No clear embodiment-local conformance claim shape stating partial implementation scope and runtime constraints.",
-      "Universalizes Gordian semantics across all traffic, blurring payload-family boundaries.",
-      "Not promise-first in vocabulary or structure.",
-      "Poor fit for 100-year minimal durable envelope goals."
+      "Does not directly model multi-embodiment app identity or embodiment-scoped conformance claims.",
+      "Uses Gordian-style assertion/proof vocabulary rather than promise-first payload promises.",
+      "Weak layer boundaries: universal envelope absorbs semantics that should stay in payload families.",
+      "Poor fit for minimal durable artifacts and unknown-pCID evolution."
     ],
     "risks": [
-      "Mallory can exploit ambiguity between shared UX identity and actual protocol-contract scope because the design does not clearly bind embodiment-specific promises to one app identity.",
-      "Universal proof-bearing structure increases global parser and policy burden on all peers, including small or long-lived implementations.",
-      "Mixed-version and unknown-pCID handling become more fragile because there is no tiny universal dispatch slot."
+      "Universal proof-bearing outer structure can blur app-contract claims with transport/envelope concerns.",
+      "Unknown-protocol and mixed-version behavior is riskier because there is no minimal universal pCID dispatch slot.",
+      "Small-device and long-term durability costs are increased by global parser burden."
     ],
     "open_questions": [
-      "What artifact, if any, would let browser and plugin prove they are embodiments of one app contract rather than merely using the same outer envelope?",
-      "Can embodiment-specific implementation-scope promises be expressed without making subject/assertion/proof universal?",
-      "Would any audit gain from universal proof structure survive mixed-version peers and long-term unknown-pCID evolution?"
+      "Can multi-embodiment app identity be expressed cleanly without turning embodiment-specific conformance into universal subject/assertion/proof machinery?",
+      "How would long-term audit distinguish one shared app contract from two loosely related embodiments under this envelope?",
+      "Does the missing minimal universal dispatch slot make mixed-version browser/plugin evolution materially worse?"
     ],
     "authority_boundary": "Evidence only; does not settle PromiseGrid design."
   }

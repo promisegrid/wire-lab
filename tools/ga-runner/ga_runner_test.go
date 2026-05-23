@@ -487,6 +487,51 @@ func TestRunScoreWritesValidatedFitnessResult(t *testing.T) {
 	}
 }
 
+func TestRunScoreWritesZeroValuedV2Axes(t *testing.T) {
+	repo := newGAFixtureRepo(t)
+	initGAStateForTest(t, repo, "ga-score-zero-v2-axes")
+	provider := fakeGAProvider{
+		generate: func(ctx context.Context, request ProviderRequest) (ProviderResponse, error) {
+			return ProviderResponse{
+				Text:        scorePayloadWithZeroV2AxesJSON(),
+				RequestID:   "req-score-zero",
+				ResponseID:  "resp-score-zero",
+				ServiceTier: defaultServiceTier,
+				UsageJSON:   `{"input_tokens":1000,"input_tokens_details":{"cached_tokens":100},"output_tokens":500}`,
+			}, nil
+		},
+	}
+	var out strings.Builder
+	err := runScoreWithProvider(context.Background(), repo, provider, scoreOptions{
+		RunGroupID:       "ga-score-zero-v2-axes",
+		Target:           "parents",
+		ProviderName:     "fake",
+		APIModel:         "model-a",
+		ReasoningEffort:  "medium",
+		OutputContract:   outputContractJSONSchemaStrict,
+		InputPrice:       defaultInputUSDPerMTok,
+		CachedInputPrice: defaultCachedInputUSDPerMTok,
+		OutputPrice:      defaultOutputUSDPerMTok,
+	}, &out)
+	if err != nil {
+		t.Fatalf("score with zero-valued v2 axes: %v\n%s", err, out.String())
+	}
+	state := mustReadGAState(t, repo, "ga-score-zero-v2-axes")
+	resultPath := repo.Abs(state.Cells[0].ResultPath)
+	bytes, err := os.ReadFile(resultPath)
+	if err != nil {
+		t.Fatalf("read result: %v", err)
+	}
+	for _, want := range []string{`"promise_vocabulary": 0`, `"simplicity_durability": 0`} {
+		if !strings.Contains(string(bytes), want) {
+			t.Fatalf("result omitted required zero-valued v2 axis %s:\n%s", want, string(bytes))
+		}
+	}
+	if issues := validateResultFile(repo, resultPath); len(issues) != 0 {
+		t.Fatalf("zero-valued v2 axes should validate as present scores, got %v", issues)
+	}
+}
+
 func TestRunScoreUsesPerCellAPIModelWhenOptionIsEmpty(t *testing.T) {
 	repo := newGAFixtureRepo(t)
 	initGAStateForTest(t, repo, "ga-score-state-api-model")
@@ -3126,6 +3171,36 @@ func invalidScorePayloadMissingV2AxesJSON() string {
     "strengths": ["small fixture"],
     "weaknesses": ["missing rubric-v2 axes"],
     "risks": ["schema drift"],
+    "open_questions": ["none for this test"],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}`
+}
+
+func scorePayloadWithZeroV2AxesJSON() string {
+	return `{
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 0,
+    "auditability": 3,
+    "evolution_safety": 1,
+    "layer_boundary_clarity": 0,
+    "failure_handling": 1,
+    "implementation_plausibility": 3,
+    "promise_vocabulary": 0,
+    "simplicity_durability": 0,
+    "risk_penalty": 5
+  },
+  "fitness": {
+    "raw": 0,
+    "normalized_0_100": 0,
+    "confidence_0_1": 0.9
+  },
+  "assessment": {
+    "rationale": "Zero-valued rubric-v2 axes are valid low scores, not absent fields.",
+    "strengths": ["explicit low-score fixture"],
+    "weaknesses": ["fixture-only evaluation"],
+    "risks": ["serialization regression"],
     "open_questions": ["none for this test"],
     "authority_boundary": "Evidence only; does not settle PromiseGrid design."
   }
