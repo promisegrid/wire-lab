@@ -38,7 +38,7 @@ type backfillComparisonSimSummary struct {
 // Intent: Turn targeted rubric-v2 backfill evidence into a durable review
 // document so operators can inspect rank drift before expanding rescoring scope.
 // The report is additive derived evidence under results/reports/ and does not
-// rewrite any scored artifact bytes. Source: DI-zuzup
+// rewrite any scored artifact bytes. Source: DI-zuzup; DI-sirir
 func runCompareBackfill(args []string, stdout io.Writer) error {
 	fs := flag.NewFlagSet("compare-backfill", flag.ContinueOnError)
 	repoRoot := commonRepoFlag(fs)
@@ -75,7 +75,7 @@ func runCompareBackfill(args []string, stdout io.Writer) error {
 		return err
 	}
 	index := indexAuditRecordsByPair(records)
-	report, comparisons, simSummaries, unmatched, ambiguous, err := buildBackfillComparisonReport(repo, state, index)
+	report, comparisons, simSummaries, unmatched, ambiguous, rerunGroups, err := buildBackfillComparisonReport(repo, state, index)
 	if err != nil {
 		return err
 	}
@@ -86,11 +86,12 @@ func runCompareBackfill(args []string, stdout io.Writer) error {
 	if err := writeFile(repo.Abs(target), report); err != nil {
 		return err
 	}
-	return writeFormat(stdout, "report=%s cells=%d sims=%d unmatched=%d ambiguous=%d\n",
+	return writeFormat(stdout, "report=%s cells=%d sims=%d unmatched=%d rerun_groups=%d ambiguous=%d\n",
 		repo.Rel(repo.Abs(target)),
 		len(comparisons),
 		len(simSummaries),
 		unmatched,
+		rerunGroups,
 		ambiguous,
 	)
 }
@@ -154,11 +155,12 @@ func preferComparisonAuditRecord(left auditRecord, right auditRecord) bool {
 //
 // Intent: Make the operator's first drift review deterministic and auditable,
 // even when multiple historical v1 records exist for one sim/scenario pair.
-// Source: DI-zuzup
-func buildBackfillComparisonReport(repo Repo, state GAState, index auditRecordIndex) (string, []backfillComparisonRecord, []backfillComparisonSimSummary, int, int, error) {
+// Source: DI-zuzup; DI-sirir
+func buildBackfillComparisonReport(repo Repo, state GAState, index auditRecordIndex) (string, []backfillComparisonRecord, []backfillComparisonSimSummary, int, int, int, error) {
 	var comparisons []backfillComparisonRecord
 	unmatched := 0
 	ambiguous := 0
+	rerunGroups := 0
 	seenResultPaths := map[string]bool{}
 	for _, cell := range state.Cells {
 		v2Path := repo.Abs(cell.SelectedResultPath())
@@ -169,7 +171,7 @@ func buildBackfillComparisonReport(repo Repo, state GAState, index auditRecordIn
 		seenResultPaths[v2RelPath] = true
 		v2, err := readFitnessResult(v2Path)
 		if err != nil {
-			return "", nil, nil, 0, 0, err
+			return "", nil, nil, 0, 0, 0, err
 		}
 		key := backfillPairKey(cell.SimID, cell.ScenarioID)
 		candidates := append([]auditRecord(nil), index[key]...)
@@ -178,6 +180,8 @@ func buildBackfillComparisonReport(repo Repo, state GAState, index auditRecordIn
 			continue
 		}
 		candidates = narrowAuditCandidatesByAPIModel(candidates, v2.Runner.APIModel)
+		candidates, collapsedGroups := collapseHistoricalRerunGroups(candidates)
+		rerunGroups += collapsedGroups
 		if len(candidates) > 1 {
 			ambiguous++
 		}
@@ -201,8 +205,8 @@ func buildBackfillComparisonReport(repo Repo, state GAState, index auditRecordIn
 		return comparisons[i].ScenarioID < comparisons[j].ScenarioID
 	})
 	simSummaries := summarizeBackfillComparison(comparisons)
-	report := renderBackfillComparisonMarkdown(state, comparisons, simSummaries, unmatched, ambiguous)
-	return report, comparisons, simSummaries, unmatched, ambiguous, nil
+	report := renderBackfillComparisonMarkdown(state, comparisons, simSummaries, unmatched, ambiguous, rerunGroups)
+	return report, comparisons, simSummaries, unmatched, ambiguous, rerunGroups, nil
 }
 
 // narrowAuditCandidatesByAPIModel keeps same-provider-model comparisons
@@ -225,6 +229,47 @@ func narrowAuditCandidatesByAPIModel(candidates []auditRecord, apiModel string) 
 		return filtered
 	}
 	return candidates
+}
+
+func historicalRerunKey(record auditRecord) string {
+	return strings.TrimSpace(record.Result.ModelID) + "\x00" + strings.TrimSpace(record.Result.Runner.APIModel)
+}
+
+// collapseHistoricalRerunGroups removes repeated same-lineage historical reruns
+// from a narrowed comparison candidate pool.
+//
+// Intent: `compare-backfill` should keep the latest exact-match record for a
+// lineage without counting repeated same-model reruns as true ambiguity.
+// Source: DI-sirir
+func collapseHistoricalRerunGroups(candidates []auditRecord) ([]auditRecord, int) {
+	if len(candidates) <= 1 {
+		return candidates, 0
+	}
+	byLineage := map[string][]auditRecord{}
+	for _, candidate := range candidates {
+		key := historicalRerunKey(candidate)
+		byLineage[key] = append(byLineage[key], candidate)
+	}
+	var collapsed []auditRecord
+	rerunGroups := 0
+	for _, group := range byLineage {
+		collapsed = append(collapsed, group[0])
+		if len(group) > 1 {
+			rerunGroups++
+		}
+	}
+	sort.Slice(collapsed, func(i, j int) bool {
+		left := collapsed[i]
+		right := collapsed[j]
+		if preferComparisonAuditRecord(left, right) {
+			return true
+		}
+		if preferComparisonAuditRecord(right, left) {
+			return false
+		}
+		return left.Path < right.Path
+	})
+	return collapsed, rerunGroups
 }
 
 // summarizeBackfillComparison collapses cell-level v1/v2 evidence into sim-level
@@ -349,14 +394,15 @@ func strongerSourceResolution(current string, next string) string {
 //
 // Intent: Keep the comparison artifact readable as protocol evidence rather than
 // as an ephemeral CLI-only summary. Source: DI-zuzup
-func renderBackfillComparisonMarkdown(state GAState, comparisons []backfillComparisonRecord, simSummaries []backfillComparisonSimSummary, unmatched int, ambiguous int) string {
+func renderBackfillComparisonMarkdown(state GAState, comparisons []backfillComparisonRecord, simSummaries []backfillComparisonSimSummary, unmatched int, ambiguous int, rerunGroups int) string {
 	var out strings.Builder
 	out.WriteString("# GA Backfill Comparison Report\n\n")
 	out.WriteString(fmt.Sprintf("- Run group: `%s`\n", state.RunGroupID))
 	out.WriteString(fmt.Sprintf("- State: `results/state/%s.json`\n", state.RunGroupID))
-	out.WriteString("- Comparison basis: latest exact-match canonical `promisegrid.ga.result.v1` record for the same `sim_id` + `scenario_id`, preferring the same `runner.api_model` when available.\n")
+	out.WriteString("- Comparison basis: latest exact-match canonical `promisegrid.ga.result.v1` record for the same `sim_id` + `scenario_id`, preferring the same `runner.api_model` when available and collapsing same-lineage historical reruns to the latest record.\n")
 	out.WriteString(fmt.Sprintf("- Compared cells: `%d`\n", len(comparisons)))
 	out.WriteString(fmt.Sprintf("- Unmatched v2 cells: `%d`\n", unmatched))
+	out.WriteString(fmt.Sprintf("- Historical rerun groups collapsed: `%d`\n", rerunGroups))
 	out.WriteString(fmt.Sprintf("- Ambiguous matched pairs: `%d`\n\n", ambiguous))
 
 	out.WriteString("## Sim Rank Drift\n\n")

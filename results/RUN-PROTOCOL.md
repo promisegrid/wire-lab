@@ -311,8 +311,10 @@ For audit-first rubric-v2 rescoring, the comparison report is a derived Markdown
 artifact under `results/reports/<run-group-id>-comparison.md`. It compares each
 completed v2 backfill cell against the latest exact-match canonical
 `promisegrid.ga.result.v1` record for the same `sim_id` + `scenario_id`,
-preferring the same `runner.api_model` when available, and summarizes sim-rank
-drift plus large per-cell deltas before any broader rerun. Source: `DI-zuzup`.
+preferring the same `runner.api_model` when available. Same-model historical
+reruns collapse to the latest record and are reported separately from true
+ambiguous historical pairings. The report summarizes sim-rank drift plus large
+per-cell deltas before any broader rerun. Source: `DI-zuzup`; `DI-sirir`.
 
 ## Unattended Full-Run Shape
 

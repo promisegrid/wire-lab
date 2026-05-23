@@ -2,10 +2,11 @@
 
 - Run group: `ga-backfill-20260523-060223-dedupe`
 - State: `results/state/ga-backfill-20260523-060223-dedupe.json`
-- Comparison basis: latest exact-match canonical `promisegrid.ga.result.v1` record for the same `sim_id` + `scenario_id`, preferring the same `runner.api_model` when available.
+- Comparison basis: latest exact-match canonical `promisegrid.ga.result.v1` record for the same `sim_id` + `scenario_id`, preferring the same `runner.api_model` when available and collapsing same-lineage historical reruns to the latest record.
 - Compared cells: `22`
 - Unmatched v2 cells: `0`
-- Ambiguous matched pairs: `7`
+- Historical rerun groups collapsed: `7`
+- Ambiguous matched pairs: `0`
 
 ## Sim Rank Drift
 

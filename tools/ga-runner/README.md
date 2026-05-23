@@ -99,8 +99,10 @@ targeted `promisegrid.ga.state.v1` state file for additive rubric-v2 rescoring.
 Markdown report under `results/reports/<run-group-id>-comparison.md`, comparing
 each v2 cell against the latest exact-match canonical v1 result for the same
 `sim_id` + `scenario_id`, preferring the same `runner.api_model` when
-available. The report summarizes sim rank drift, family highlights, and the
-largest per-cell score deltas before any broader rerun. Source: `DI-zuzup`.
+available. Same-model historical reruns collapse to the latest record and are
+reported separately from true ambiguous historical pairings. The report
+summarizes sim rank drift, family highlights, and the largest per-cell score
+deltas before any broader rerun. Source: `DI-zuzup`; `DI-sirir`.
 By default it preserves the historical source model lineage. When a new stage
 should score under a different model ID or default effort, use
 `-staged-model-id` and optionally `-staged-reasoning-effort` so the generated

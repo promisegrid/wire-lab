@@ -1388,6 +1388,27 @@ backfill selection/state materialization.
 Affects: `tools/ga-runner/validate.go`; `tools/ga-runner/ga_runner_test.go`;
 `protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`.
 
+ID: DI-sirir
+Date: 2026-05-22 23:33:34
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: `compare-backfill` should collapse same-model historical reruns after
+`runner.api_model` narrowing, keep the latest rerun deterministically, and
+report the collapsed rerun groups separately from true ambiguous historical
+pairings. A historical rerun group is a set of exact-match canonical
+`promisegrid.ga.result.v1` records for one `sim_id` + `scenario_id` that share
+the same `model_id` and `runner.api_model`.
+Intent: The remaining `7` "ambiguous" pairings in the first deduped backfill
+comparison are repeated same-model xhigh historical reruns for the
+`SIM-robot-app-semantics-conformance` slice, not true mixed-lineage ambiguity.
+The report should keep real ambiguity visible without overstating rerun noise.
+Constraints: Do not rewrite or delete any historical result artifacts. Preserve
+deterministic latest-rerun selection. Keep true ambiguity visible when more than
+one narrowed lineage remains after rerun collapse.
+Affects: `tools/ga-runner/compare.go`; `tools/ga-runner/ga_runner_test.go`;
+`tools/ga-runner/README.md`; `results/RUN-PROTOCOL.md`;
+`protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`.
+
 ## Subtasks
 
 - [x] tapur.1 Define the canonical JSON fitness result schema, including source
@@ -1544,6 +1565,9 @@ Affects: `tools/ga-runner/validate.go`; `tools/ga-runner/ga_runner_test.go`;
   `medium`, using calibration evidence from
   `ga-calib-20260523-033216-{low,medium,high,xhigh}` and keeping `xhigh` as the
   explicit escalation path for tie-breaks and promotions. Source: `DI-nanor`.
+- [x] tapur.42 Refine `compare-backfill` ambiguity accounting so same-model
+  historical reruns collapse to one deterministic winner and are reported
+  separately from true ambiguous historical pairings. Source: `DI-sirir`.
 
 ## Predecessor context
 

@@ -798,6 +798,7 @@ func TestCompareBackfillWritesReport(t *testing.T) {
 	)
 	writeExactMatchV1Result(t, repo, "SIM-grid-envelope-clean", "scenario-one", "openai-gpt-5.4-xhigh", "20260519-101500", 91)
 	writeExactMatchV1Result(t, repo, "SIM-robot-app-semantics-conformance", "scenario-one", "openai-gpt-5.4-xhigh", "20260519-101501", 62)
+	writeExactMatchV1Result(t, repo, "SIM-robot-app-semantics-conformance", "scenario-one", "openai-gpt-5.4-xhigh", "20260519-101502", 63)
 
 	v2APath := repo.Path("results", "SIM-grid-envelope-clean", "scenario-one", "openai-gpt-5.4-medium", "20260523-220000.json")
 	v2A := validResult(repo, v2APath)
@@ -858,6 +859,9 @@ func TestCompareBackfillWritesReport(t *testing.T) {
 	if !strings.Contains(out.String(), "report=results/reports/ga-backfill-medium-comparison.md") {
 		t.Fatalf("compare output missing report path:\n%s", out.String())
 	}
+	if !strings.Contains(out.String(), "rerun_groups=1") || !strings.Contains(out.String(), "ambiguous=0") {
+		t.Fatalf("compare output missing rerun/ambiguity counts:\n%s", out.String())
+	}
 	reportPath := repo.Path("results", "reports", "ga-backfill-medium-comparison.md")
 	reportBytes, err := os.ReadFile(reportPath)
 	if err != nil {
@@ -872,6 +876,9 @@ func TestCompareBackfillWritesReport(t *testing.T) {
 	}
 	if !strings.Contains(report, "## Family Highlights") || !strings.Contains(report, "grid-envelope") || !strings.Contains(report, "conformance-family") {
 		t.Fatalf("missing family highlights:\n%s", report)
+	}
+	if !strings.Contains(report, "- Historical rerun groups collapsed: `1`") || !strings.Contains(report, "- Ambiguous matched pairs: `0`") {
+		t.Fatalf("missing rerun/ambiguity summary:\n%s", report)
 	}
 }
 
