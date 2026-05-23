@@ -809,7 +809,10 @@ func selectTargetedBackfill(records []auditRecord, cleanEnvelopeCount int) backf
 	// Intent: Spend the first v2 rescoring budget on the sims most likely to move
 	// under the new vocabulary rules, then add a small clean envelope slice so
 	// the rerun still shows whether the top wire-format contenders stay stable.
-	// Source: DI-roruj
+	// When the historical corpus has repeated exact-match v1 rows for the same
+	// sim/scenario pair, future targeted backfill states should queue one
+	// deterministic winner rather than emit repeated v2 cells that all point at
+	// the same result path. Source: DI-roruj; DI-guhar
 	summaries := summarizeAuditRecords(records)
 	var hardHit []auditSummary
 	var cleanEnvelope []auditSummary
@@ -852,10 +855,34 @@ func selectTargetedBackfill(records []auditRecord, cleanEnvelopeCount int) backf
 			selection.Records = append(selection.Records, record)
 		}
 	}
+	selection.Records = dedupeBackfillRecordsByPair(selection.Records)
 	sort.Slice(selection.Records, func(i, j int) bool {
 		return selection.Records[i].Path < selection.Records[j].Path
 	})
 	return selection
+}
+
+// dedupeBackfillRecordsByPair keeps one deterministic historical v1 candidate
+// for each targeted sim/scenario pair before `backfill-init` materializes new
+// v2 cells.
+//
+// Intent: Future backfill states should not queue duplicate work for the same
+// v2 result home just because the historical corpus kept multiple exact-match
+// v1 rows for that pair. Source: DI-guhar
+func dedupeBackfillRecordsByPair(records []auditRecord) []auditRecord {
+	byPair := map[string]auditRecord{}
+	for _, record := range records {
+		key := backfillPairKey(record.Result.SimID, record.Result.ScenarioID)
+		current, ok := byPair[key]
+		if !ok || preferComparisonAuditRecord(record, current) {
+			byPair[key] = record
+		}
+	}
+	var deduped []auditRecord
+	for _, record := range byPair {
+		deduped = append(deduped, record)
+	}
+	return deduped
 }
 
 func vocabularySeverity(status string) int {

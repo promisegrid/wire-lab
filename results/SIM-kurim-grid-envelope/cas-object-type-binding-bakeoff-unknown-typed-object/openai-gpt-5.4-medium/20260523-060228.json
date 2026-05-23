@@ -1,0 +1,135 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-kurim-grid-envelope-cas-object-type-binding-bakeoff-unknown-typed-object-openai-gpt-5.4-medium-20260523-060228",
+  "run_group_id": "ga-backfill-20260523-060223-dedupe",
+  "cell_id": "ga-backfill-20260523-060223-dedupe-000007-SIM-kurim-grid-envelope--cas-object-type-binding-bakeoff-unknown-typed-object--openai-gpt-5.4-medium",
+  "sim_id": "SIM-kurim-grid-envelope",
+  "scenario_id": "cas-object-type-binding-bakeoff-unknown-typed-object",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-060228",
+  "result_path": "results/SIM-kurim-grid-envelope/cas-object-type-binding-bakeoff-unknown-typed-object/openai-gpt-5.4-medium/20260523-060228.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_6799e36eb05349279ab74ebad08ff8d9",
+    "response_id": "resp_01447e854b184e05006a1143f5e300819b99d730147b06e3ab",
+    "input_tokens": 11308,
+    "output_tokens": 1073,
+    "cost_usd": 0.034811
+  },
+  "source": {
+    "repo_commit": "f0088fcdc2f90a46d307ffedc45afc6259c286d4",
+    "sim_path": "simulations/SIM-kurim-grid-envelope/",
+    "scenario_path": "scenarios/cas-object-type-binding-bakeoff-unknown-typed-object/cas-object-type-binding-bakeoff-unknown-typed-object.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "bd21da74761c8cc683e46f54dd6ff5bfffc59cd5d8be6f3bae205cd45e41acd8"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-kurim-grid-envelope/README.md",
+        "sha256": "ecf4614b85b76dbd404c91a600561e3bfad4212ad853447fa0a56734c9630ef6"
+      },
+      {
+        "path": "simulations/SIM-kurim-grid-envelope/QUESTION.md",
+        "sha256": "dc716719f8bf916d1cda5da020ea0ce6cfd3ef5221e85a9b41dd81537664c7a4"
+      },
+      {
+        "path": "simulations/SIM-kurim-grid-envelope/TODO/TODO-tujad-grid-envelope-successor-owner.md",
+        "sha256": "e246e1fa25fbe51f550922af92665ad8bff25022fdcb3643e118285eca6d40bc"
+      },
+      {
+        "path": "simulations/SIM-kurim-grid-envelope/TODO/TODO.md",
+        "sha256": "68d0fff548e0489d1114c0c490788bf9d8d7be9fd769296e73749b0fbf610840"
+      },
+      {
+        "path": "simulations/SIM-kurim-grid-envelope/seed/extraction-sources.md",
+        "sha256": "444042ace58bed35b22df66c65e76a195418e76ec50dab3b25afee077ddfb08d"
+      },
+      {
+        "path": "scenarios/cas-object-type-binding-bakeoff-unknown-typed-object/cas-object-type-binding-bakeoff-unknown-typed-object.md",
+        "sha256": "76f0a7016fa2bad5e53903682706bca4eeb4aa2d099311a4ea52b7280748cf90"
+      }
+    ],
+    "simulation_tree_hash": "f644f1f7130016bc26b62e903e784a948f962727c347009162f6b29dcc18e6e2"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 3,
+    "auditability": 4,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 3,
+    "failure_handling": 2,
+    "implementation_plausibility": 3,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 4,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 30,
+    "normalized_0_100": 60,
+    "confidence_0_1": 0.74
+  },
+  "assessment": {
+    "rationale": "This parent grid-envelope simulation squarely exposes unknown-pCID handling as an open comparison axis, so it is relevant to the scenario, but it does not itself define a concrete rule for storing, advertising, or safely forwarding an unknown typed object. It is more a specimen owner and variant inventory than a settled design answer.",
+    "strengths": [
+      "Explicitly identifies unknown-pCID behavior as a first-class bakeoff axis.",
+      "Keeps the envelope small and durable with a positional pcid-plus-payload hypothesis.",
+      "Documents lineage and open questions clearly enough for later audit and comparison.",
+      "Preserves evolution space instead of prematurely freezing one unknown-type policy."
+    ],
+    "weaknesses": [
+      "The parent simulation does not choose opaque-forward, hard-reject, or best-effort behavior.",
+      "No concrete peer-local procedure is given for safe handling of an unknown typed object.",
+      "Promise-first wording is weak; framing is mostly protocol/envelope oriented rather than explicit payload promises.",
+      "Signature, binding, and parser boundary details remain unresolved."
+    ],
+    "risks": [
+      "Implementers could infer incompatible unknown-object behavior from the parent inventory alone.",
+      "Best-effort or nested parsing paths could drift into unsafe inspection without stricter rules.",
+      "Type binding may stay ambiguous between outer envelope semantics and pCID-defined payload semantics."
+    ],
+    "open_questions": [
+      "Should the parent lineage prefer opaque store/advertise/forward as the safe default for unknown typed objects?",
+      "What exact local promise should a sender make about a payload when the receiver lacks the referenced codec?",
+      "Which layer is allowed to inspect unknown typed payload bytes, if any?",
+      "How should signatures bind pcid and payload so unknown objects remain safely forwardable without unsafe parsing?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

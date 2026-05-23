@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-robot-app-semantics-conformance-app-semantics-partial-conformance-openai-gpt-5.4-medium-20260523-060228",
+  "run_group_id": "ga-backfill-20260523-060223-dedupe",
+  "cell_id": "ga-backfill-20260523-060223-dedupe-000016-SIM-robot-app-semantics-conformance--app-semantics-partial-conformance--openai-gpt-5.4-medium",
+  "sim_id": "SIM-robot-app-semantics-conformance",
+  "scenario_id": "app-semantics-partial-conformance",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-060228",
+  "result_path": "results/SIM-robot-app-semantics-conformance/app-semantics-partial-conformance/openai-gpt-5.4-medium/20260523-060228.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_1b6bb8c49a2e41d6baa12579bdd32d40",
+    "response_id": "resp_05908a757d6688c8006a1144bd16f0819bbffa3a2220b45e32",
+    "input_tokens": 7233,
+    "output_tokens": 1083,
+    "cost_usd": 0.02781975
+  },
+  "source": {
+    "repo_commit": "f0088fcdc2f90a46d307ffedc45afc6259c286d4",
+    "sim_path": "simulations/SIM-robot-app-semantics-conformance/",
+    "scenario_path": "scenarios/app-semantics-partial-conformance/app-semantics-partial-conformance.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "bd21da74761c8cc683e46f54dd6ff5bfffc59cd5d8be6f3bae205cd45e41acd8"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-robot-app-semantics-conformance/README.md",
+        "sha256": "b1bd9731ee228d45f4efde278611f0d5f99bdfff4976d37f6e011f828c2dc1b4"
+      },
+      {
+        "path": "simulations/SIM-robot-app-semantics-conformance/QUESTION.md",
+        "sha256": "32857bd8e974c4f0326ed382a3ffae0e91d65404934f614ab3b7b1becfe0ea2f"
+      },
+      {
+        "path": "scenarios/app-semantics-partial-conformance/app-semantics-partial-conformance.md",
+        "sha256": "e84a88096e8ecaca83f7a04d8958d6f7e5712e53bf180d14674e32fab69399ef"
+      }
+    ],
+    "simulation_tree_hash": "e57bc7679fd213e955302abe66d10f62f5e3f6e719093146f00c240f25158767"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 5,
+    "promisegrid_alignment": 4,
+    "auditability": 4,
+    "evolution_safety": 5,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 3,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 3,
+    "simplicity_durability": 4,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 40,
+    "normalized_0_100": 80,
+    "confidence_0_1": 0.79
+  },
+  "assessment": {
+    "rationale": "The simulation is tightly matched to the scenario and is notably careful about partial conformance, provisional semantics, and local-versus-wire boundaries. Its main weakness is that it still speaks more in conformance/app-semantics vocabulary than strict promise-first payload promises, and it does not yet ground failure handling or audit artifacts in very concrete durable evidence shapes.",
+    "strengths": [
+      "Direct fit for honest partial-conformance pressure.",
+      "Explicit separation of local IDs from protocol-boundary identity.",
+      "Strong provisional/evolution-aware stance before upstream decisions freeze.",
+      "Blocks overclaiming and avoids pretending a final app contract exists."
+    ],
+    "weaknesses": [
+      "Promise vocabulary is only partial; wording remains conformance-centric.",
+      "Audit artifacts and observer-local evidence are not fully concretized.",
+      "Failure and adversarial handling are present more as caution than worked procedure."
+    ],
+    "risks": [
+      "Guide prose could still harden into de facto API claims if readers ignore the provisional boundary.",
+      "Adapter-local signature carriage may be mistaken for a stable wire contract.",
+      "Partial-conformance claims may drift into generic profile/support claims without stricter wording examples."
+    ],
+    "open_questions": [
+      "What exact wording should a payload-level partial-conformance promise use?",
+      "Which protocol-boundary identifiers are authoritative before DR-tuhaz closes?",
+      "How should provisional signature carriage be documented so later migration is auditable?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

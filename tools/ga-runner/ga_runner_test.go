@@ -745,6 +745,39 @@ func TestRunBackfillInitAppliesStagedModelAndEffortOverrides(t *testing.T) {
 	}
 }
 
+func TestRunBackfillInitDedupesRepeatedHistoricalPairs(t *testing.T) {
+	repo := newGAFixtureRepo(t)
+	writeTestFile(t, repo.Path("simulations", "SIM-claim-card-target", "README.md"), "# Claim Card\n\nThis sim still talks about a claim card artifact.\n")
+	writeTestFile(t, repo.Path("simulations", "SIM-claim-card-target", "QUESTION.md"), "# Questions\n\nCan Alice and Bob simplify this?\n")
+	gitAdd(t, repo,
+		"simulations/SIM-claim-card-target/README.md",
+		"simulations/SIM-claim-card-target/QUESTION.md",
+	)
+	writeExactMatchV1Result(t, repo, "SIM-claim-card-target", "scenario-one", "openai-gpt-5.4-xhigh", "20260519-101500", 82)
+	writeExactMatchV1Result(t, repo, "SIM-claim-card-target", "scenario-one", "openai-gpt-5.4-low", "20260519-101700", 80)
+	var out strings.Builder
+	err := runMain([]string{
+		"ga-runner", "backfill-init",
+		"-repo-root", repo.Root,
+		"-run-group-id", "ga-backfill-dedupe",
+		"-timestamp", "20260522-132000",
+	}, &out, &out)
+	if err != nil {
+		t.Fatalf("backfill-init dedupe: %v\n%s", err, out.String())
+	}
+	state := mustReadGAState(t, repo, "ga-backfill-dedupe")
+	if len(state.Parents) != 1 || len(state.Cells) != 1 {
+		t.Fatalf("unexpected deduped backfill counts: parents=%d cells=%d", len(state.Parents), len(state.Cells))
+	}
+	cell := state.Cells[0]
+	if cell.SimID != "SIM-claim-card-target" || cell.ScenarioID != "scenario-one" {
+		t.Fatalf("unexpected deduped cell identity: %+v", cell)
+	}
+	if cell.APIModel != "gpt-5.4" {
+		t.Fatalf("deduped backfill chose api_model %q, want %q", cell.APIModel, "gpt-5.4")
+	}
+}
+
 func TestCompareBackfillWritesReport(t *testing.T) {
 	repo := newGitTestRepo(t)
 	writeTestFile(t, repo.Path("results", "RUN-PROTOCOL.md"), "# Run Protocol\n\nScore cells as evidence.\n")

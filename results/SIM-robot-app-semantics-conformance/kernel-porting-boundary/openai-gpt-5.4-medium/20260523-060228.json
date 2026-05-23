@@ -1,0 +1,120 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-robot-app-semantics-conformance-kernel-porting-boundary-openai-gpt-5.4-medium-20260523-060228",
+  "run_group_id": "ga-backfill-20260523-060223-dedupe",
+  "cell_id": "ga-backfill-20260523-060223-dedupe-000018-SIM-robot-app-semantics-conformance--kernel-porting-boundary--openai-gpt-5.4-medium",
+  "sim_id": "SIM-robot-app-semantics-conformance",
+  "scenario_id": "kernel-porting-boundary",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-060228",
+  "result_path": "results/SIM-robot-app-semantics-conformance/kernel-porting-boundary/openai-gpt-5.4-medium/20260523-060228.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_5ec7ebe5a7534d999fec1d07d70ba534",
+    "response_id": "resp_0aae5a9512d8a71e006a1144f0cf00819b950220661666d6ab",
+    "input_tokens": 7229,
+    "output_tokens": 1638,
+    "cost_usd": 0.03558275
+  },
+  "source": {
+    "repo_commit": "f0088fcdc2f90a46d307ffedc45afc6259c286d4",
+    "sim_path": "simulations/SIM-robot-app-semantics-conformance/",
+    "scenario_path": "scenarios/kernel-porting-boundary/kernel-porting-boundary.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "bd21da74761c8cc683e46f54dd6ff5bfffc59cd5d8be6f3bae205cd45e41acd8"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-robot-app-semantics-conformance/README.md",
+        "sha256": "b1bd9731ee228d45f4efde278611f0d5f99bdfff4976d37f6e011f828c2dc1b4"
+      },
+      {
+        "path": "simulations/SIM-robot-app-semantics-conformance/QUESTION.md",
+        "sha256": "32857bd8e974c4f0326ed382a3ffae0e91d65404934f614ab3b7b1becfe0ea2f"
+      },
+      {
+        "path": "scenarios/kernel-porting-boundary/kernel-porting-boundary.md",
+        "sha256": "d1646fa062e6c64f27cbbd25da0e96f6d484c60582677cdfc798d265a22d5096"
+      }
+    ],
+    "simulation_tree_hash": "e57bc7679fd213e955302abe66d10f62f5e3f6e719093146f00c240f25158767"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 3,
+    "auditability": 3,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 2,
+    "failure_handling": 1,
+    "implementation_plausibility": 2,
+    "promise_vocabulary": 3,
+    "simplicity_durability": 3,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 24,
+    "normalized_0_100": 48,
+    "confidence_0_1": 0.76
+  },
+  "assessment": {
+    "rationale": "This simulation is mainly about honest app-facing semantics and partial conformance, so it only partially fits a kernel-porting-boundary scenario. Its strongest contribution is caution about provisional claims before freeze; its weakest point is that it does not directly define the porting target or cleanly resolve kernel/runtime/dispatcher/library boundaries.",
+    "strengths": [
+      "Explicitly treats conformance language as provisional and bounded until upstream decisions close.",
+      "Keeps local-versus-wire identity and signed-artifact claims cautious, which helps avoid overclaiming during first-port planning.",
+      "States clear non-goals and preserves an evolution path toward later frozen obligations."
+    ],
+    "weaknesses": [
+      "Not centered on kernel, runtime, dispatcher, or library terminology for a first real port.",
+      "Does not spell out the minimum viable porting target across ingress, session, message, CAS, and runtime obligations.",
+      "Provides little explicit failure-mode analysis for mistaken harness-as-target claims or other adversarial porting confusion."
+    ],
+    "risks": [
+      "Guide authors could wrongly reuse app-semantics conformance language as if it settled kernel-port boundaries.",
+      "Layer confusion between wire-lab harness behavior and actual porting obligations remains insufficiently resolved.",
+      "Partial-conformance wording may still be read too broadly without a sharper frozen-spec boundary."
+    ],
+    "open_questions": [
+      "What exact artifact should count as the first honest porting target before DR-davod closes?",
+      "Which obligations are safe to name now as provisional orientation versus blocked pending freeze?",
+      "Should the guide standardize on kernel, runtime, dispatcher, handler host, or library for this boundary?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

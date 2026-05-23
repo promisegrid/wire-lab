@@ -1367,6 +1367,27 @@ Affects: `tools/ga-runner/main.go`; `tools/ga-runner/compare.go`;
 `results/RUN-PROTOCOL.md`;
 `protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`.
 
+ID: DI-guhar
+Date: 2026-05-22 22:41:54
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Deduplicate targeted backfill selection by `sim_id` +
+`scenario_id` before writing the v2 state. When multiple exact-match canonical
+v1 candidates survive for the same pair, keep one deterministic winner using
+the same ordering preference as `compare-backfill`: prefer a record with
+`runner.api_model`, then newer `timestamp_utc`, then lexical `model_id`, then
+path. Future `backfill-init` states should not emit repeated v2 cells that
+write the same result path.
+Intent: The first live comparison report surfaced repeated state rows for the
+same sim/scenario pair, which inflated ambiguity and made the targeted backfill
+state noisier than the actual result corpus.
+Constraints: Do not rewrite historical v1 or completed v2 result bytes. Keep
+the ambiguity visible in `compare-backfill` when the historical corpus still
+contains multiple exact-match v1 candidates; this DI only deduplicates future
+backfill selection/state materialization.
+Affects: `tools/ga-runner/validate.go`; `tools/ga-runner/ga_runner_test.go`;
+`protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`.
+
 ## Subtasks
 
 - [x] tapur.1 Define the canonical JSON fitness result schema, including source

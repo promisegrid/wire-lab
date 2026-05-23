@@ -1,0 +1,135 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-kurim-grid-envelope-conditional-release-geofencing-opaque-lower-layer-carriage-openai-gpt-5.4-medium-20260523-060228",
+  "run_group_id": "ga-backfill-20260523-060223-dedupe",
+  "cell_id": "ga-backfill-20260523-060223-dedupe-000011-SIM-kurim-grid-envelope--conditional-release-geofencing-opaque-lower-layer-carriage--openai-gpt-5.4-medium",
+  "sim_id": "SIM-kurim-grid-envelope",
+  "scenario_id": "conditional-release-geofencing-opaque-lower-layer-carriage",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-060228",
+  "result_path": "results/SIM-kurim-grid-envelope/conditional-release-geofencing-opaque-lower-layer-carriage/openai-gpt-5.4-medium/20260523-060228.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_0ff8f628b70e4601916ee2f0615b29fd",
+    "response_id": "resp_0ca7bddf6aa90dc0006a1144575530819ba28bfcfa5cf5c455",
+    "input_tokens": 11309,
+    "output_tokens": 1125,
+    "cost_usd": 0.03554075
+  },
+  "source": {
+    "repo_commit": "f0088fcdc2f90a46d307ffedc45afc6259c286d4",
+    "sim_path": "simulations/SIM-kurim-grid-envelope/",
+    "scenario_path": "scenarios/conditional-release-geofencing-opaque-lower-layer-carriage/conditional-release-geofencing-opaque-lower-layer-carriage.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "bd21da74761c8cc683e46f54dd6ff5bfffc59cd5d8be6f3bae205cd45e41acd8"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-kurim-grid-envelope/README.md",
+        "sha256": "ecf4614b85b76dbd404c91a600561e3bfad4212ad853447fa0a56734c9630ef6"
+      },
+      {
+        "path": "simulations/SIM-kurim-grid-envelope/QUESTION.md",
+        "sha256": "dc716719f8bf916d1cda5da020ea0ce6cfd3ef5221e85a9b41dd81537664c7a4"
+      },
+      {
+        "path": "simulations/SIM-kurim-grid-envelope/TODO/TODO-tujad-grid-envelope-successor-owner.md",
+        "sha256": "e246e1fa25fbe51f550922af92665ad8bff25022fdcb3643e118285eca6d40bc"
+      },
+      {
+        "path": "simulations/SIM-kurim-grid-envelope/TODO/TODO.md",
+        "sha256": "68d0fff548e0489d1114c0c490788bf9d8d7be9fd769296e73749b0fbf610840"
+      },
+      {
+        "path": "simulations/SIM-kurim-grid-envelope/seed/extraction-sources.md",
+        "sha256": "444042ace58bed35b22df66c65e76a195418e76ec50dab3b25afee077ddfb08d"
+      },
+      {
+        "path": "scenarios/conditional-release-geofencing-opaque-lower-layer-carriage/conditional-release-geofencing-opaque-lower-layer-carriage.md",
+        "sha256": "e0af12980a8e0beec8a12683a7352f864cd5c2fcfcaa17cc457db28bea9cb525"
+      }
+    ],
+    "simulation_tree_hash": "f644f1f7130016bc26b62e903e784a948f962727c347009162f6b29dcc18e6e2"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 3,
+    "promisegrid_alignment": 4,
+    "auditability": 4,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 2,
+    "implementation_plausibility": 3,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 4,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 32,
+    "normalized_0_100": 64,
+    "confidence_0_1": 0.79
+  },
+  "assessment": {
+    "rationale": "The simulation is relevant because it explicitly keeps opaque unknown-pCID carriage in the grid-envelope design space, which maps to lower layers carrying condition references they cannot parse. But this parent lineage is mostly an inventory and successor owner record, not a concrete opaque-carriage protocol for conditional release, so it only partially answers verification, promise-boundary, and failure questions.",
+    "strengths": [
+      "Directly exposes opaque carriage as a first-class design axis.",
+      "Keeps envelope small and durable with a simple positional pCID-plus-payload hypothesis.",
+      "Preserves evolution space instead of prematurely fixing a canonical wire format.",
+      "Documents open questions about recursion, signing, and outer-layer disclosure."
+    ],
+    "weaknesses": [
+      "The parent sim is not the concrete opaque variant; details are deferred to child simulations.",
+      "Does not specify how a lower layer verifies that an opaque condition object is safe to carry.",
+      "Promise wording is mostly protocol/spec vocabulary rather than explicit promise statements.",
+      "Failure behavior for accidental promise violation is only lightly developed at this level."
+    ],
+    "risks": [
+      "Opaque carriage may let intermediaries relay condition objects they cannot safely interpret.",
+      "Unsettled signature placement and signer binding could make responsibility for condition assertions ambiguous.",
+      "If verification depends on hidden global context, the design would fail sparse-knowledge goals."
+    ],
+    "open_questions": [
+      "Which descendant opaque variant, if any, shows safe conditional-release handling without semantic understanding at every layer?",
+      "What exact payload promise should bind the condition object to the pCID and signer?",
+      "What local evidence can Bob and Carol record when Bob carries but cannot parse the condition vocabulary?",
+      "How should unknown condition pCIDs interact with reject, store-forward, or best-effort behaviors?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

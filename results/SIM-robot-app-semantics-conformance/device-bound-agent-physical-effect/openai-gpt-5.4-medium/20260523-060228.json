@@ -1,0 +1,120 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-robot-app-semantics-conformance-device-bound-agent-physical-effect-openai-gpt-5.4-medium-20260523-060228",
+  "run_group_id": "ga-backfill-20260523-060223-dedupe",
+  "cell_id": "ga-backfill-20260523-060223-dedupe-000017-SIM-robot-app-semantics-conformance--device-bound-agent-physical-effect--openai-gpt-5.4-medium",
+  "sim_id": "SIM-robot-app-semantics-conformance",
+  "scenario_id": "device-bound-agent-physical-effect",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-060228",
+  "result_path": "results/SIM-robot-app-semantics-conformance/device-bound-agent-physical-effect/openai-gpt-5.4-medium/20260523-060228.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_c5a8fea7835548cebd758fe63f3d0f12",
+    "response_id": "resp_03e1ad0323b49d8d006a1144cf1f4c8199b6e0ed2d5a9cfd78",
+    "input_tokens": 7255,
+    "output_tokens": 2072,
+    "cost_usd": 0.04170425
+  },
+  "source": {
+    "repo_commit": "f0088fcdc2f90a46d307ffedc45afc6259c286d4",
+    "sim_path": "simulations/SIM-robot-app-semantics-conformance/",
+    "scenario_path": "scenarios/device-bound-agent-physical-effect/device-bound-agent-physical-effect.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "bd21da74761c8cc683e46f54dd6ff5bfffc59cd5d8be6f3bae205cd45e41acd8"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-robot-app-semantics-conformance/README.md",
+        "sha256": "b1bd9731ee228d45f4efde278611f0d5f99bdfff4976d37f6e011f828c2dc1b4"
+      },
+      {
+        "path": "simulations/SIM-robot-app-semantics-conformance/QUESTION.md",
+        "sha256": "32857bd8e974c4f0326ed382a3ffae0e91d65404934f614ab3b7b1becfe0ea2f"
+      },
+      {
+        "path": "scenarios/device-bound-agent-physical-effect/device-bound-agent-physical-effect.md",
+        "sha256": "ffd2cee6094031ae77651ba8da6c3c76b54d200845f65f0e93d07c8e96aaeb2a"
+      }
+    ],
+    "simulation_tree_hash": "e57bc7679fd213e955302abe66d10f62f5e3f6e719093146f00c240f25158767"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 3,
+    "promisegrid_alignment": 4,
+    "auditability": 3,
+    "evolution_safety": 5,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 2,
+    "implementation_plausibility": 3,
+    "promise_vocabulary": 3,
+    "simplicity_durability": 3,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 32,
+    "normalized_0_100": 64,
+    "confidence_0_1": 0.74
+  },
+  "assessment": {
+    "rationale": "Good fit on honest app-semantics boundaries, partial conformance language, and local-vs-wire separation for device-bound agents, but weak on concrete replay, dedupe, receipt, and break-witness behavior for non-idempotent physical effects.",
+    "strengths": [
+      "Explicitly targets honest provisional app semantics and partial conformance claims.",
+      "Strong on boundary clarity between local adapter behavior and protocol-bound claims.",
+      "Evolution-safe posture: avoids freezing app APIs, witness formats, or signature carriage too early."
+    ],
+    "weaknesses": [
+      "Does not specify how restart/replay avoids duplicate physical effects.",
+      "Audit evidence for delegation, receipts, and break-witnesses is not concretely defined.",
+      "Promise vocabulary is discussed, but not yet expressed as clear payload-level promises."
+    ],
+    "risks": [
+      "Guide prose could be read as stronger device or driver conformance than intended.",
+      "Adapter-local signing or identity language may leak into wire-level claims.",
+      "Physical-effect scenarios may be under-specified until upstream DRs settle witness and app contracts."
+    ],
+    "open_questions": [
+      "What durable evidence proves Bob delegated the printer or sensor agent?",
+      "How should an app claim at-most-once or already-done outcomes after daemon restart?",
+      "What exactly may a conformance claim say about CUPS, libusb, IIO, i2c, IPP, or vendor SDK dependencies?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}
