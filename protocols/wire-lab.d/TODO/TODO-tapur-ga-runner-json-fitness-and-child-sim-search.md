@@ -1486,6 +1486,33 @@ Affects: `tools/ga-runner/result.go`; `tools/ga-runner/ga_runner_test.go`;
 `results/state/ga-tugoz-20260523-072345.json`;
 `results/SIM-suzuf-gordian-universal-envelope-negative-control/...`.
 
+ID: DI-kuzag
+Date: 2026-05-23 13:40:12
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Add optional simulation-root `SIM-META.json` files under
+`simulations/SIM-*/` with schema `promisegrid.sim.meta.v1` and a `role` field.
+The first locked role is `negative-control`. GA parent sampling must exclude
+negative-control sims by default while keeping them scoreable and population-
+discoverable, and explicit `-include-sim` selection must remain authoritative.
+Generate-time fitness parent reselection must also refuse negative-control
+parents unless the active GA state records that they were explicitly included.
+Intent: Negative-control specimens such as `SIM-suzuf` are useful comparison
+pressure, but they should not silently contaminate breed-parent selection or
+child generation. The runner needs a small durable metadata convention so the
+guard is machine-readable instead of inferred from README prose.
+Constraints: Keep simulation metadata optional and additive. Do not remove
+negative controls from tracked population discovery, score cells, or validation.
+Do not weaken explicit operator overrides via `-include-sim`. Preserve existing
+state/result paths and GA command surface. Use current repo metadata as a safety
+fallback for older states that do not yet record the parent role explicitly.
+Affects: `tools/ga-runner/planning.go`; `tools/ga-runner/population.go`;
+`tools/ga-runner/generate.go`; `tools/ga-runner/source.go`;
+`tools/ga-runner/state.go`; `tools/ga-runner/README.md`;
+`tools/ga-runner/ga_runner_test.go`;
+`simulations/SIM-suzuf-gordian-universal-envelope-negative-control/SIM-META.json`;
+`protocols/wire-lab.d/TODO/TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md`.
+
 ## Subtasks
 
 - [x] tapur.1 Define the canonical JSON fitness result schema, including source

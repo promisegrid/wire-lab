@@ -70,6 +70,12 @@ func sourcePathsForPrompt(repo Repo, simPath string, scenario Scenario) ([]strin
 	if info, err := os.Stat(repo.Abs(questionPath)); err == nil && !info.IsDir() {
 		paths = append(paths, questionPath)
 	}
+	metaPath := filepath.ToSlash(filepath.Join(cleanSimPath, "SIM-META.json"))
+	if info, err := os.Stat(repo.Abs(metaPath)); err == nil && !info.IsDir() {
+		paths = append(paths, metaPath)
+	} else if err != nil && !os.IsNotExist(err) {
+		return nil, err
+	}
 	localSim, err := localMarkdownFiles(repo, cleanSimPath, map[string]bool{
 		"README.md":   true,
 		"QUESTION.md": true,
@@ -134,6 +140,12 @@ func parentSourceDocumentsForGeneratePrompt(repo Repo, simID string) ([]SourceDo
 	questionPath := filepath.ToSlash(filepath.Join("simulations", simID, "QUESTION.md"))
 	if info, err := os.Stat(repo.Abs(questionPath)); err == nil && !info.IsDir() {
 		paths = append(paths, questionPath)
+	}
+	metaPath := filepath.ToSlash(filepath.Join("simulations", simID, "SIM-META.json"))
+	if info, err := os.Stat(repo.Abs(metaPath)); err == nil && !info.IsDir() {
+		paths = append(paths, metaPath)
+	} else if err != nil && !os.IsNotExist(err) {
+		return nil, err
 	}
 	localSim, err := localMarkdownFiles(repo, filepath.ToSlash(filepath.Join("simulations", simID)), map[string]bool{
 		"README.md":   true,

@@ -398,24 +398,77 @@ func applyFitnessParentSelection(repo Repo, state *GAState, indexes []int) (bool
 	if err != nil {
 		return false, err
 	}
+	eligible := ranked
+	if ok {
+		eligible, err = eligibleRankedParents(repo, *state, ranked)
+		if err != nil {
+			return false, err
+		}
+	}
 	changed := false
 	if ok {
-		changed = sortStateParentsByFitness(state, ranked)
+		changed = sortStateParentsByFitness(state, eligible)
 	}
 	for selectionIndex, childIndex := range indexes {
 		child := &state.Children[childIndex]
-		parentIDs, ok := parentSelectionForChild(*state, ranked, *child, selectionIndex)
-		if !ok {
+		parentIDs, ok := parentSelectionForChild(*state, eligible, *child, selectionIndex)
+		if !ok && len(ranked) >= 2 {
+			parentIDs = rankedParentIDs(eligible)
+		}
+		if !ok && len(ranked) < 2 {
 			parentIDs = distinctStrings(child.ParentIDs)
 		}
 		if child.Operation != childOperationBreed || !sameStrings(parentIDs, child.ParentIDs) {
 			child.Operation = childOperationBreed
 			child.ParentIDs = parentIDs
-			child.ValidationMessage = fmt.Sprintf("breed parents selected by weighted fitness-high plus deterministic-random scored parent: %s", strings.Join(parentIDs, ","))
+			if len(parentIDs) < 2 && len(ranked) >= 2 {
+				child.ValidationMessage = "negative-control parent guard left fewer than two breed-eligible scored parents"
+			} else {
+				child.ValidationMessage = fmt.Sprintf("breed parents selected by weighted fitness-high plus deterministic-random scored parent: %s", strings.Join(parentIDs, ","))
+			}
 			changed = true
 		}
 	}
 	return changed, nil
+}
+
+func eligibleRankedParents(repo Repo, state GAState, ranked []parentFitnessRank) ([]parentFitnessRank, error) {
+	// Intent: Keep negative-control specimens available for scoring pressure
+	// without letting them silently re-enter breed-parent selection unless the
+	// current state records an explicit include override. Source: DI-kuzag
+	roleByID := map[string]string{}
+	population, err := discoverTrackedPopulation(repo)
+	if err != nil {
+		return nil, err
+	}
+	for _, sim := range population {
+		roleByID[sim.SimID] = sim.Role
+	}
+	parentByID := map[string]GAStateParent{}
+	for _, parent := range state.Parents {
+		parentByID[parent.SimID] = parent
+	}
+	var eligible []parentFitnessRank
+	for _, rank := range ranked {
+		parent := parentByID[rank.SimID]
+		role := parent.Role
+		if role == "" {
+			role = roleByID[rank.SimID]
+		}
+		if role == simRoleNegativeCtl && !parent.ExplicitInclude {
+			continue
+		}
+		eligible = append(eligible, rank)
+	}
+	return eligible, nil
+}
+
+func rankedParentIDs(ranked []parentFitnessRank) []string {
+	var ids []string
+	for _, rank := range ranked {
+		ids = append(ids, rank.SimID)
+	}
+	return distinctStrings(ids)
 }
 
 func rankedParentsByFitness(repo Repo, state GAState) ([]parentFitnessRank, bool, error) {

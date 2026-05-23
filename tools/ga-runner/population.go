@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"crypto/sha256"
 	"encoding/hex"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"hash"
@@ -22,10 +23,22 @@ import (
 // specimens, while generated untracked children stay pending until accepted.
 // Source: DI-bagih
 type PopulationSim struct {
-	SimID    string
-	Path     string
-	Files    []string
-	TreeHash string
+	SimID           string
+	Path            string
+	Files           []string
+	TreeHash        string
+	Role            string
+	ExplicitInclude bool
+}
+
+const (
+	simMetaSchemaV1    = "promisegrid.sim.meta.v1"
+	simRoleNegativeCtl = "negative-control"
+)
+
+type SimulationMeta struct {
+	Schema string `json:"schema"`
+	Role   string `json:"role,omitempty"`
 }
 
 func runInit(args []string, stdout io.Writer) error {
@@ -59,7 +72,11 @@ func runInit(args []string, stdout io.Writer) error {
 		return err
 	}
 	for _, sim := range population {
-		if err := writeFormat(stdout, "%s files=%d tree_hash=%s path=%s\n", sim.SimID, len(sim.Files), sim.TreeHash, sim.Path); err != nil {
+		extra := ""
+		if sim.Role != "" {
+			extra = fmt.Sprintf(" role=%s", sim.Role)
+		}
+		if err := writeFormat(stdout, "%s files=%d tree_hash=%s path=%s%s\n", sim.SimID, len(sim.Files), sim.TreeHash, sim.Path, extra); err != nil {
 			return err
 		}
 	}
@@ -159,9 +176,17 @@ func stateFromPlan(repo Repo, plan GenerationPlan, timestamp string) (GAState, e
 	}
 	var parents []GAStateParent
 	for _, parent := range plan.Parents {
+		rationale := "uniform tracked-population sample"
+		if parent.ExplicitInclude && parent.Role == simRoleNegativeCtl {
+			rationale = "explicit include override for negative-control parent"
+		} else if parent.ExplicitInclude {
+			rationale = "explicit include override"
+		}
 		parents = append(parents, GAStateParent{
-			SimID:     parent.SimID,
-			Rationale: "uniform tracked-population sample",
+			SimID:           parent.SimID,
+			Role:            parent.Role,
+			ExplicitInclude: parent.ExplicitInclude,
+			Rationale:       rationale,
 		})
 	}
 	children, err := plannedGAChildren(repo, plan)
@@ -319,14 +344,43 @@ func discoverTrackedPopulation(repo Repo) ([]PopulationSim, error) {
 		if err != nil {
 			return nil, err
 		}
+		meta, err := readTrackedSimulationMeta(repo, simID, files)
+		if err != nil {
+			return nil, err
+		}
 		population = append(population, PopulationSim{
 			SimID:    simID,
 			Path:     filepath.ToSlash(filepath.Join("simulations", simID)) + "/",
 			Files:    files,
 			TreeHash: treeHash,
+			Role:     meta.Role,
 		})
 	}
 	return population, nil
+}
+
+func readTrackedSimulationMeta(repo Repo, simID string, files []string) (SimulationMeta, error) {
+	metaPath := filepath.ToSlash(filepath.Join("simulations", simID, "SIM-META.json"))
+	if !containsString(files, metaPath) {
+		return SimulationMeta{}, nil
+	}
+	bytes, err := os.ReadFile(repo.Abs(metaPath))
+	if err != nil {
+		return SimulationMeta{}, err
+	}
+	var meta SimulationMeta
+	if err := json.Unmarshal(bytes, &meta); err != nil {
+		return SimulationMeta{}, fmt.Errorf("parse %s: %w", metaPath, err)
+	}
+	if meta.Schema != simMetaSchemaV1 {
+		return SimulationMeta{}, fmt.Errorf("%s schema must be %s", metaPath, simMetaSchemaV1)
+	}
+	switch meta.Role {
+	case "", simRoleNegativeCtl:
+		return meta, nil
+	default:
+		return SimulationMeta{}, fmt.Errorf("%s role %q is unsupported", metaPath, meta.Role)
+	}
 }
 
 func splitNUL(output []byte) []string {

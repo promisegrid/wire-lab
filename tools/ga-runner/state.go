@@ -48,8 +48,10 @@ type GAStateScenario struct {
 }
 
 type GAStateParent struct {
-	SimID     string `json:"sim_id"`
-	Rationale string `json:"rationale,omitempty"`
+	SimID           string `json:"sim_id"`
+	Role            string `json:"role,omitempty"`
+	ExplicitInclude bool   `json:"explicit_include,omitempty"`
+	Rationale       string `json:"rationale,omitempty"`
 }
 
 // GAChild describes a generated child simulation proposal under proposals/.

@@ -160,11 +160,53 @@ func validatePlanOptions(options PlanOptions) error {
 
 func selectParents(population []PopulationSim, count int, seedText string, includeIDs []string) ([]PopulationSim, error) {
 	// Intent: Focused canaries must include explicitly named new or suspect sims,
-	// while still filling remaining slots through deterministic shuffle coverage.
-	// Source: DI-duzur
-	return selectByID(population, count, seedText, includeIDs, func(sim PopulationSim) string {
-		return sim.SimID
-	}, "simulation")
+	// while keeping machine-tagged negative controls out of the default GA parent
+	// pool unless the operator names them explicitly. Source: DI-duzur; DI-kuzag
+	byID := map[string]PopulationSim{}
+	for _, sim := range population {
+		byID[sim.SimID] = sim
+	}
+	var selected []PopulationSim
+	selectedIDs := map[string]bool{}
+	for _, id := range uniqueNonEmptyStrings(includeIDs) {
+		item, ok := byID[id]
+		if !ok {
+			return nil, fmt.Errorf("included simulation %q was not discovered", id)
+		}
+		item.ExplicitInclude = true
+		selected = append(selected, item)
+		selectedIDs[id] = true
+	}
+	var eligible []PopulationSim
+	for _, sim := range population {
+		if selectedIDs[sim.SimID] {
+			continue
+		}
+		if sim.Role == simRoleNegativeCtl {
+			continue
+		}
+		eligible = append(eligible, sim)
+	}
+	shuffled := append([]PopulationSim(nil), eligible...)
+	if err := shuffleBySeed(seedText, len(shuffled), func(i, j int) {
+		shuffled[i], shuffled[j] = shuffled[j], shuffled[i]
+	}); err != nil {
+		return nil, err
+	}
+	target := count
+	if len(selected) > target {
+		target = len(selected)
+	}
+	if maxSelectable := len(selected) + len(shuffled); target > maxSelectable {
+		target = maxSelectable
+	}
+	for _, sim := range shuffled {
+		if len(selected) >= target {
+			break
+		}
+		selected = append(selected, sim)
+	}
+	return selected, nil
 }
 
 func selectScenarios(scenarios []Scenario, count int, seedText string, includeIDs []string) ([]Scenario, error) {

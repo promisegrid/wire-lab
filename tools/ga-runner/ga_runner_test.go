@@ -216,6 +216,21 @@ func TestDiscoverTrackedPopulationExcludesUntrackedChildren(t *testing.T) {
 	}
 }
 
+func TestDiscoverTrackedPopulationReadsSimulationMetadata(t *testing.T) {
+	repo := newGitTestRepo(t)
+	writeTestFile(t, repo.Path("simulations", "SIM-parent", "README.md"), "# Parent\n")
+	writeTestFile(t, repo.Path("simulations", "SIM-parent", "SIM-META.json"), "{\n  \"schema\": \"promisegrid.sim.meta.v1\",\n  \"role\": \"negative-control\"\n}\n")
+	gitAdd(t, repo, "simulations/SIM-parent/README.md", "simulations/SIM-parent/SIM-META.json")
+
+	population, err := discoverTrackedPopulation(repo)
+	if err != nil {
+		t.Fatalf("discover tracked population with metadata: %v", err)
+	}
+	if len(population) != 1 || population[0].Role != simRoleNegativeCtl {
+		t.Fatalf("expected negative-control role in tracked population, got %#v", population)
+	}
+}
+
 func TestRunInitDryRunPrintsTrackedPopulation(t *testing.T) {
 	repo := newGitTestRepo(t)
 	writeTestFile(t, repo.Path("simulations", "SIM-parent", "README.md"), "# Parent\n")
@@ -334,6 +349,51 @@ func TestBuildGenerationPlanIncludesRequestedSimsAndScenarios(t *testing.T) {
 	})
 	if err == nil || !strings.Contains(err.Error(), `included simulation "SIM-missing" was not discovered`) {
 		t.Fatalf("expected missing included sim error, got %v", err)
+	}
+}
+
+func TestBuildGenerationPlanExcludesNegativeControlParentsUnlessIncluded(t *testing.T) {
+	population := []PopulationSim{
+		{SimID: "SIM-a", Path: "simulations/SIM-a/", TreeHash: "a"},
+		{SimID: "SIM-b", Path: "simulations/SIM-b/", TreeHash: "b", Role: simRoleNegativeCtl},
+		{SimID: "SIM-c", Path: "simulations/SIM-c/", TreeHash: "c"},
+	}
+	scenarios := []Scenario{
+		{ScenarioID: "scenario-a", Path: "scenarios/scenario-a/scenario-a.md"},
+		{ScenarioID: "scenario-b", Path: "scenarios/scenario-b/scenario-b.md"},
+	}
+
+	plan, err := buildGenerationPlan(population, scenarios, PlanOptions{
+		RunGroupID:    "ga-negative-default",
+		ModelID:       "model-a",
+		ShuffleSeed:   "7",
+		ParentCount:   2,
+		ScenarioCount: 1,
+		ChildCount:    1,
+		MaxPromotions: 1,
+	})
+	if err != nil {
+		t.Fatalf("build default plan with negative control: %v", err)
+	}
+	if stringSliceContains(parentIDs(plan.Parents), "SIM-b") {
+		t.Fatalf("negative-control sim should be excluded by default: %#v", plan.Parents)
+	}
+
+	plan, err = buildGenerationPlan(population, scenarios, PlanOptions{
+		RunGroupID:    "ga-negative-include",
+		ModelID:       "model-a",
+		ShuffleSeed:   "7",
+		ParentCount:   2,
+		ScenarioCount: 1,
+		ChildCount:    1,
+		MaxPromotions: 1,
+		IncludeSimIDs: []string{"SIM-b"},
+	})
+	if err != nil {
+		t.Fatalf("build include plan with negative control: %v", err)
+	}
+	if !stringSliceContains(parentIDs(plan.Parents), "SIM-b") || !plan.Parents[0].ExplicitInclude {
+		t.Fatalf("explicit include should preserve negative-control parent: %#v", plan.Parents)
 	}
 }
 
@@ -1519,6 +1579,82 @@ func TestRunGenerateSelectsParentsByFitnessEvidence(t *testing.T) {
 				t.Fatalf("parent was not selected from scored parents: %#v", child)
 			}
 		}
+	}
+}
+
+func TestRunGenerateExcludesNegativeControlParentsFromFitnessSelection(t *testing.T) {
+	repo := newGAFixtureRepo(t)
+	addTrackedFixtureSim(t, repo, "SIM-high")
+	addTrackedFixtureSim(t, repo, "SIM-low")
+	initGAStateForTestWithParentsAndChildren(t, repo, "ga-generate-negative-control", 3, 2)
+	writeTestFile(t, repo.Path("simulations", "SIM-high", "SIM-META.json"), "{\n  \"schema\": \"promisegrid.sim.meta.v1\",\n  \"role\": \"negative-control\"\n}\n")
+	gitAdd(t, repo, "simulations/SIM-high/SIM-META.json")
+	writeParentFitnessResults(t, repo, "ga-generate-negative-control", map[string]float64{
+		"SIM-high":   95,
+		"SIM-parent": 60,
+		"SIM-low":    20,
+	})
+
+	provider := fakeGAProvider{
+		generate: func(ctx context.Context, request ProviderRequest) (ProviderResponse, error) {
+			childID := promptChildID(t, request.Prompt)
+			return ProviderResponse{
+				Text:        validChildBundleJSON(childID),
+				RequestID:   "req-negative-control",
+				ResponseID:  "resp-negative-control",
+				ServiceTier: defaultServiceTier,
+				UsageJSON:   `{"input_tokens":1200,"input_tokens_details":{"cached_tokens":200},"output_tokens":700}`,
+			}, nil
+		},
+	}
+	var out strings.Builder
+	err := runGenerateWithProvider(context.Background(), repo, provider, generateOptions{
+		RunGroupID:       "ga-generate-negative-control",
+		ProviderName:     "fake",
+		APIModel:         "model-a",
+		ReasoningEffort:  "medium",
+		Workers:          1,
+		InputPrice:       defaultInputUSDPerMTok,
+		CachedInputPrice: defaultCachedInputUSDPerMTok,
+		OutputPrice:      defaultOutputUSDPerMTok,
+	}, &out)
+	if err != nil {
+		t.Fatalf("generate with negative-control fallback guard: %v\n%s", err, out.String())
+	}
+
+	state := mustReadGAState(t, repo, "ga-generate-negative-control")
+	if state.Parents[0].SimID == "SIM-high" {
+		t.Fatalf("negative-control parent should not lead the ranked parent pool: %#v", state.Parents)
+	}
+	for _, child := range state.Children {
+		if stringSliceContains(child.ParentIDs, "SIM-high") {
+			t.Fatalf("negative-control parent should not be selected for breed: %#v", child)
+		}
+	}
+}
+
+func TestEligibleRankedParentsAllowsExplicitNegativeControlOverride(t *testing.T) {
+	repo := newGAFixtureRepo(t)
+	addTrackedFixtureSim(t, repo, "SIM-high")
+	addTrackedFixtureSim(t, repo, "SIM-low")
+	ranked := []parentFitnessRank{
+		{SimID: "SIM-high", AverageNormalized: 95, Samples: 3},
+		{SimID: "SIM-parent", AverageNormalized: 60, Samples: 3},
+		{SimID: "SIM-low", AverageNormalized: 20, Samples: 3},
+	}
+	state := GAState{
+		Parents: []GAStateParent{
+			{SimID: "SIM-high", Role: simRoleNegativeCtl, ExplicitInclude: true},
+			{SimID: "SIM-parent"},
+			{SimID: "SIM-low"},
+		},
+	}
+	eligible, err := eligibleRankedParents(repo, state, ranked)
+	if err != nil {
+		t.Fatalf("eligible ranked parents: %v", err)
+	}
+	if len(eligible) != 3 || eligible[0].SimID != "SIM-high" {
+		t.Fatalf("explicit include should preserve negative-control parent eligibility: %#v", eligible)
 	}
 }
 
