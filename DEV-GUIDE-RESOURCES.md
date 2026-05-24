@@ -86,7 +86,8 @@ guide should prefer unless future simulations justify more. Source: `DI-pagin`;
 Candidate payload for a pCID that means "capability token as promise":
 
 ```cddl
-; Candidate payload only. Field meaning and arity are fixed by this payload pCID.
+; Candidate payload only. Field meaning and arity are fixed by the protocol
+; named by this pCID.
 capability-token-promise = [
   promiser: agent-ref,          ; Alice promises behavior
   promisee: agent-ref / nil,    ; Bob, or nil for a bearer-style promise
@@ -141,7 +142,7 @@ Design rule:
 - Variable arity belongs to a pCID-defined payload shape, not to the universal
   grid envelope.
 - Generic peers parse only the outer `[pcid, payload]` envelope unless they
-  support the payload pCID.
+  support the protocol named by that pCID.
 
 ### Alternative Envelope Designs
 

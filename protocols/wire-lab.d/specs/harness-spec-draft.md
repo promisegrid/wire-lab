@@ -430,6 +430,8 @@ Each TE is a falsifiable experiment whose outcome teaches us something about the
 
 - **[TE-nahir: Grid-envelope protocol-owned signature slot](docs/thought-experiments/TE-nahir-grid-envelope-protocol-owned-signature-slot.md)** — Compares narrow and broad follow-on comparison packets for the three-slot outer envelope `[pcid, payload, signature]` where `pcid` owns proof semantics. Recommends adding one new standalone sim and comparing it against existing minimal, explicit-`sig_pcid`, payload-owned-proof, and wrapper-proof families.
 
+- **[TE-pokul: CBOR array extensibility, pCID-owned proof, and likely grid-envelope landing shape](docs/thought-experiments/TE-pokul-cbor-array-extensibility-pcid-owned-proof-and-grid-envelope-landing-shape.md)** — Tests whether CBOR-array extensibility and `pCID`-named proof semantics remove visible outer future-proofing as a design requirement, leaving the likely landing zone as a choice between minimal `[pCID, payload]` and `[pCID, payload, proof]` where the protocol named by `pCID` defines proof encoding and current-sender proof semantics. Decision status is `needs DF`. Source: `DI-vatav`.
+
 ---
 
 ## 9. Realism Suggestions

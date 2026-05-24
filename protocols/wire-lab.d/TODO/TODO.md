@@ -49,6 +49,7 @@ minted after that date carry only the proquint handle.
 | [TODO-lugag](./TODO-lugag-promise-theory-ga-prompt-scenario-and-rescore-correction.md) | 2026-05-23 | Promise Theory GA prompt, scenario, and rescore correction | — |
 | [TODO-tugoz](./TODO-tugoz-grid-envelope-signable-view-and-gordian-comparison-sims.md) | 2026-05-22 | Grid-envelope signable-view and Gordian comparison sims | — |
 | [TODO-mujad](./TODO-mujad-grid-envelope-protocol-owned-signature-slot.md) | 2026-05-23 | Grid-envelope protocol-owned signature slot | — |
+| [TODO-mopob](./TODO-mopob-pcid-protocol-cid-corpus-correction-and-envelope-successors.md) | 2026-05-24 | pCID Protocol-CID corpus correction and envelope successors | — |
 | [TODO-dudok](./TODO-dudok-ga-runner-openai-batch-mode.md) | 2026-05-19 | GA runner OpenAI Batch mode and large-run orchestration | — |
 | [TODO-turog](./TODO-turog-te-41-group-session-freeze-procedure.md) | 2026-05-07 | TE-41 group-session freeze procedure **(closed: active successor work closed by DI-rurab / DI-bomud)** | `TODO-26` / `TODO-20260507-002306` |
 | [TODO-duvuk](./TODO-duvuk-te-42-filename-cid-cascade-policy.md) | 2026-05-07 | TE-42 filename / CID-cascade policy **(closed: active successor work closed by DI-rurab / DI-bomud)** | `TODO-27` / `TODO-20260507-002306` |
