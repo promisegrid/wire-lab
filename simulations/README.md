@@ -48,6 +48,21 @@ evidence only. Source: `DI-faros`; `DI-miror`; `DI-vabor`; `DI-dimas`;
 | `SIM-bohof-group-session-freeze-promise/` | Question home for group-session freeze evidence and `merge-group-transport-spec` promise shape from TODO-bisur. Source: `DI-pukap`. | Active design-point exploration |
 | `SIM-kuful-udp-feed-v0-conformance/` | Question home for UDP-feed v0 reference implementation, test-vector, artifact-writer, and ns-3 conformance evidence from TODO-jodon. Source: `DI-pukap`. | Active design-point exploration |
 
+## PT-clean successor simulations
+
+`DI-tavaz` keeps several scored PT-drifting sims as historical evidence and
+adds successor sims instead of rewriting the scored directories in place. These
+successors are the preferred evolution path when later PT-gated scoring or
+breeding needs a cleaner specimen to compare against the older design.
+
+| Predecessor | Successor simulation | PT-clean rewrite focus |
+|---|---|---|
+| `SIM-gibut-conditional-release-group-session-local/` | `SIM-fonom-conditional-release-selective-send-onward-promises/` | Replace session-local policy framing with selective sending plus onward-handling promises |
+| `SIM-savak-scoped-claim-card-audit-ledger/` | `SIM-vuliv-scoped-promise-evidence-records/` | Replace claim-card authority framing with scoped promise/evidence records |
+| `SIM-tizad-scoped-conformance-citation-ledger/` | `SIM-konit-pcid-promise-evidence-index/` | Replace conformance-ledger framing with pCID-scoped promise/evidence indexing |
+| `SIM-janov-grid-envelope-layer-pcid-nested-signed-payload/` | `SIM-pobod-grid-envelope-outer-promise-nested-signed-payload/` | Make the outer-layer promise explicit in the nested signed-payload envelope |
+| `SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields/` | `SIM-dutam-grid-envelope-fixed-header-variable-body/` | Replace fully variable outer arity with a fixed header plus variable body |
+
 ## Extracted protocol-design candidate simulations
 
 `DI-fibuv` splits alternatives that were previously held inside non-breeding

@@ -110,6 +110,33 @@ Affects: `protocols/wire-lab.d/TODO/TODO-lugag-promise-theory-ga-prompt-scenario
 `tools/ga-runner/validate.go`; `tools/ga-runner/ga_runner_test.go`
 Supersedes: DI-lumit
 
+ID: DI-tavaz
+Date: 2026-05-23 19:18:00
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Rework PT-drifting scored sims by creating successor simulations
+instead of rewriting the scored simulation directories in place. The immediate
+successors are a selective-send/onward-promise rewrite for `gibut`, a
+promise-evidence-record rewrite for `savak`, a pCID promise-evidence-index
+rewrite for `tizad`, an outer-promise nested-signed-payload rewrite for
+`janov`, and a fixed-header variable-body rewrite for `sajar`.
+Intent: Historical scores must remain evidence about the exact bytes that were
+scored. In-place rewrites would mix old scores with new semantics under one
+`sim_id` and would undermine later audit, comparison, and GA parent-selection
+honesty. Successor sims let wire-lab compare the old PT-drifting design against
+the PT-clean rewrite directly.
+Constraints: Do not rewrite the scored predecessor sim trees in place. New
+successor sims should explicitly name the predecessor they replace and should
+restate the design in Promise-Theory-first vocabulary. Promotion, breeding, and
+later rescoring should prefer the successor lineage once evidence exists.
+Affects: `protocols/wire-lab.d/TODO/TODO-lugag-promise-theory-ga-prompt-scenario-and-rescore-correction.md`;
+`simulations/README.md`; new `simulations/SIM-fonom-conditional-release-selective-send-onward-promises/`;
+new `simulations/SIM-vuliv-scoped-promise-evidence-records/`;
+new `simulations/SIM-konit-pcid-promise-evidence-index/`;
+new `simulations/SIM-pobod-grid-envelope-outer-promise-nested-signed-payload/`;
+new `simulations/SIM-dutam-grid-envelope-fixed-header-variable-body/`
+Supersedes: DI-movur
+
 ## Scope
 
 This TODO covers:
