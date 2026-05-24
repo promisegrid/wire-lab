@@ -47,6 +47,9 @@ evidence only. Source: `DI-faros`; `DI-miror`; `DI-vabor`; `DI-dimas`;
 | `SIM-ranib-spec-requirement-sections/` | Question home for protocol spec promise-vocabulary, 100-year, and layperson/easy-implementation section requirements from TODO-kulih / DR-robon. Source: `DI-pukap`. | Active design-point exploration |
 | `SIM-bohof-group-session-freeze-promise/` | Question home for group-session freeze evidence and `merge-group-transport-spec` promise shape from TODO-bisur. Source: `DI-pukap`. | Active design-point exploration |
 | `SIM-kuful-udp-feed-v0-conformance/` | Question home for UDP-feed v0 reference implementation, test-vector, artifact-writer, and ns-3 conformance evidence from TODO-jodon. Source: `DI-pukap`. | Active design-point exploration |
+| `SIM-tupog-promise-accounting-observation-refusal-evidence/` | Higher-layer payload specimen for signed refusal versus silence/timeout, exact-byte local observations, and peer-local trust updates. Source: `DI-kafiz`. | Active higher-layer PT specimen |
+| `SIM-ravad-freeze-successor-records/` | Higher-layer payload specimen for freeze and successor records as each agent's own promise over exact bytes. Source: `DI-kafiz`. | Active higher-layer PT specimen |
+| `SIM-lurip-capability-promise-token-payload/` | Higher-layer payload specimen for capability-like behavior as signed promise-token payloads rather than global permission. Source: `DI-kafiz`. | Active higher-layer PT specimen |
 
 ## PT-clean successor simulations
 
@@ -66,6 +69,20 @@ evidence without silently re-entering default GA parent selection.
 | `SIM-tizad-scoped-conformance-citation-ledger/` | `SIM-konit-pcid-promise-evidence-index/` | Replace conformance-ledger framing with pCID-scoped promise/evidence indexing |
 | `SIM-janov-grid-envelope-layer-pcid-nested-signed-payload/` | `SIM-pobod-grid-envelope-outer-promise-nested-signed-payload/` | Make the outer-layer promise explicit in the nested signed-payload envelope |
 | `SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields/` | `SIM-dutam-grid-envelope-fixed-header-variable-body/` | Replace fully variable outer arity with a fixed header plus variable body |
+
+## Higher-layer Promise Theory payload simulations
+
+`DI-kafiz` keeps the useful pressure from rejected `hadit`/`jogoh` GA children
+without promoting their envelope-layer selector stacks. These sims are
+higher-layer payload specimens: a pCID-named protocol may define each record
+shape, but the base envelope does not gain generic claim headers, claim cards,
+or universal statement capsules.
+
+| Simulation | Higher-layer pressure |
+|---|---|
+| `SIM-tupog-promise-accounting-observation-refusal-evidence/` | Promise-accounting observation/refusal records, exact observed bytes, signed refusal, silence/timeout, and local trust updates. |
+| `SIM-ravad-freeze-successor-records/` | Freeze and successor records as autonomous agents' own promises over exact bytes and lineage references. |
+| `SIM-lurip-capability-promise-token-payload/` | Capability tokens as pCID-owned promise-token payloads with transfer/freeze semantics as local-trust evidence. |
 
 ## Extracted protocol-design candidate simulations
 
@@ -214,8 +231,8 @@ specimens, not preferred envelope families.
 ## Grid-envelope protocol-owned outer signature-slot probe
 
 `DI-kukuk` adds a standalone follow-on probe for the cleaner three-slot outer
-shape `[pcid, payload, signature]` where the payload `pcid` owns the proof
-family and the signed bytes are canonical `[pcid, payload]`. This is a
+shape `[pcid, payload, signature]` where the protocol named by `pcid` owns the
+proof family and the signed bytes are canonical `[pcid, payload]`. This is a
 candidate specimen, not current consensus.
 
 | Simulation | Probe |

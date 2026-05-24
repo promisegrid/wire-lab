@@ -224,8 +224,13 @@ func rubricScoreMeaningsForSchema(schema string) map[string]string {
 		// layer-local Promise Theory interpretation, so envelope-layer promises
 		// are not mislabeled as weak merely because higher-layer accounting lives
 		// inside the payload protocol. Source: DI-pozom
-		meanings["promise_vocabulary"] = "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first, layer-local, and pCID-specific"
-		meanings["simplicity_durability"] = "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+		//
+		// Intent: Keep stored rubric meanings aligned with the hadit/jogoh review:
+		// generic claim/statement wrappers and selector-shopping stacks are weak
+		// base-envelope evidence, while pCID-owned higher-layer records remain
+		// valid design space. Source: DI-kafiz
+		meanings["promise_vocabulary"] = "0 drifts into claims/profiles/generic statement capsules/central trust-ledger framing, 5 stays promise-first, layer-local, and pCID-specific"
+		meanings["simplicity_durability"] = "0 overbuilt, selector-shopping, or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
 	}
 	return meanings
 }

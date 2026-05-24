@@ -903,6 +903,11 @@ func buildScorePrompt(repo Repo, state GAState, cell GACell, scenario Scenario) 
 	// the protocol payload. A signed envelope can itself be a scoped promise that
 	// the payload is shaped according to the protocol specification named by the
 	// pCID. Source: DI-pozom
+	//
+	// Intent: Penalize rejected hadit/jogoh-style base-envelope selector stacks
+	// without forbidding pCID-selected higher-layer payload protocols from owning
+	// their own evidence, freeze, transfer, or capability-token records. Source:
+	// DI-kafiz
 	var out strings.Builder
 	out.WriteString("# GA Score Cell\n\n")
 	out.WriteString("Return only JSON with keys `scores`, `fitness`, and `assessment`.\n")
@@ -918,8 +923,9 @@ func buildScorePrompt(repo Repo, state GAState, cell GACell, scenario Scenario) 
 	out.WriteString("Score each axis from 0 to 5. Higher is better except `risk_penalty`, where 0 is low risk and 5 is severe risk.\n")
 	out.WriteString("Axes: scenario_fit, promisegrid_alignment, auditability, evolution_safety, layer_boundary_clarity, failure_handling, implementation_plausibility, promise_vocabulary, simplicity_durability, risk_penalty.\n")
 	out.WriteString("- Score the candidate at its claimed layer. Do not penalize an envelope-layer design for leaving promise accounting, storage semantics, computation semantics, or application-specific trust updates to the payload protocol when the layer boundary is explicit.\n")
-	out.WriteString("- `promise_vocabulary`: reward Promise-Theory-correct, promise-first wording at the candidate's layer. For envelope sims, reward signed pCID-specific promises such as \"Alice promises these payload bytes are shaped according to the protocol specification named by this pCID.\" Penalize normative claim cards, conformance bundles, generic profile support claims, port claims, and central trust-ledger framing.\n")
-	out.WriteString("- `simplicity_durability`: reward small, explicit, deterministic, 100-year durable artifacts that fit small devices. Penalize generic maps, cards, ledgers, bundles, and feature-shopping wrappers.\n")
+	out.WriteString("- `promise_vocabulary`: reward Promise-Theory-correct, promise-first wording at the candidate's layer. For envelope sims, reward signed pCID-specific promises such as \"Alice promises these payload bytes are shaped according to the protocol specification named by this pCID.\" Penalize normative claim cards, generic claim headers/cards, conformance bundles, generic profile support claims, port claims, universal statement capsules, and central trust-ledger framing.\n")
+	out.WriteString("- `simplicity_durability`: reward small, explicit, deterministic, 100-year durable artifacts that fit small devices. Penalize generic maps, cards, ledgers, bundles, feature-shopping wrappers, and base-envelope selector-shopping stacks such as `env_pCID`/`sig_pCID`/`payload_pCID`.\n")
+	out.WriteString("- Do not treat higher-layer pCID-owned payload protocols as selector shopping merely because they define their own signed refusal records, exact-byte observation evidence, freeze successor records, transfer semantics, or capability-as-promise-token payload behavior.\n")
 	out.WriteString("- `scenario_fit` may be lower when a scenario asks for higher-layer behavior the candidate intentionally delegates to the payload protocol, but that delegation is not by itself a PT-gate violation when the layer boundary and local trust boundary are clear.\n")
 	out.WriteString("- The runner recomputes `fitness.raw` and `fitness.normalized_0_100` from your axis scores with normal weighting. Use `fitness.confidence_0_1` for your confidence.\n\n")
 	out.WriteString("## Promise Theory Fundamentals\n\n")

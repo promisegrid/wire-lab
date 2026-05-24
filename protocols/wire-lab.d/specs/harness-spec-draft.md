@@ -431,6 +431,7 @@ Each TE is a falsifiable experiment whose outcome teaches us something about the
 - **[TE-nahir: Grid-envelope protocol-owned signature slot](docs/thought-experiments/TE-nahir-grid-envelope-protocol-owned-signature-slot.md)** — Compares narrow and broad follow-on comparison packets for the three-slot outer envelope `[pcid, payload, signature]` where `pcid` owns proof semantics. Recommends adding one new standalone sim and comparing it against existing minimal, explicit-`sig_pcid`, payload-owned-proof, and wrapper-proof families.
 
 - **[TE-pokul: CBOR array extensibility, pCID-owned proof, and likely grid-envelope landing shape](docs/thought-experiments/TE-pokul-cbor-array-extensibility-pcid-owned-proof-and-grid-envelope-landing-shape.md)** — Tests whether CBOR-array extensibility and `pCID`-named proof semantics remove visible outer future-proofing as a design requirement, leaving the likely landing zone as a choice between minimal `[pCID, payload]` and `[pCID, payload, proof]` where the protocol named by `pCID` defines proof encoding and current-sender proof semantics. Decision status is `needs DF`. Source: `DI-vatav`.
+- **[TE-vujaj: Grid-envelope DAG-CBOR link wording](docs/thought-experiments/TE-vujaj-grid-envelope-dag-cbor-link-wording.md)** — Tests whether repo prose should describe the conceptual envelope candidate as `grid([pCID, payload, sig])` and reserve `42(pCID)` for DAG-CBOR profile examples, or whether DAG-CBOR Link notation should become part of the canonical phrase. Decision status is `needs DF`. Source: `DI-falap`.
 
 ---
 

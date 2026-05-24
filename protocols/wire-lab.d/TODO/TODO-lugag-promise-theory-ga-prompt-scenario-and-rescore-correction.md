@@ -163,6 +163,41 @@ new `simulations/SIM-janov-grid-envelope-layer-pcid-nested-signed-payload/SIM-ME
 new `simulations/SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields/SIM-META.json`
 Supersedes: DI-tavaz
 
+ID: DI-kafiz
+Date: 2026-05-24 14:04:28
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Treat `SIM-hadit-child-explicit-proof-scoped-claim-header` and
+`SIM-jogoh-child-dual-witness-nested-statement-vocabulary` as rejected GA
+pressure, not promotable specimens. Harden GA generation, scoring, and audit
+guidance against base-envelope selector stacks such as
+`env_pCID`/`sig_pCID`/`payload_pCID`, generic claim headers, generic claim
+cards, and universal statement capsules. Preserve the useful pressure by adding
+standalone higher-layer simulations for promise-accounting
+observation/refusal evidence, freeze successor records, and
+capability-as-promise-token payload behavior.
+Intent: The culled children found real pressure but placed it at the wrong
+layer. A pCID is a Protocol CID: the pCID-named spec may define payload shape,
+signature encoding, refusal evidence, freeze-successor records, or capability
+promise-token records. The base envelope should not grow selector-shopping
+fields or generic statement wrappers just because higher-layer promise
+accounting needs exact-byte evidence.
+Constraints: Do not promote or recreate `hadit` or `jogoh`. Do not ban
+higher-layer payload protocols from defining their own promise-accounting
+records. Keep outer signatures scoped to the current sender's own promise, and
+keep signed refusal, silence/timeout distinction, exact-byte local evidence,
+freeze, transfer, and capability semantics as higher-layer payload/specimen
+pressure unless a future DI settles otherwise.
+Affects: `protocols/wire-lab.d/TODO/TODO-lugag-promise-theory-ga-prompt-scenario-and-rescore-correction.md`;
+`tools/ga-runner/generate.go`; `tools/ga-runner/score.go`;
+`tools/ga-runner/result.go`; `tools/ga-runner/validate.go`;
+`tools/ga-runner/ga_runner_test.go`; `simulations/README.md`;
+`DEV-GUIDE-RESOURCES.md`;
+`simulations/SIM-tupog-promise-accounting-observation-refusal-evidence/`;
+`simulations/SIM-ravad-freeze-successor-records/`;
+`simulations/SIM-lurip-capability-promise-token-payload/`
+Supersedes: DI-gobul for the narrower hadit/jogoh follow-up only.
+
 ## Scope
 
 This TODO covers:
@@ -216,6 +251,10 @@ thinking.
   say clearly enough that impositions, conformance claims, and other
   non-voluntary cooperation patterns should score poorly unless decomposed into
   autonomous promises and local assessments.
+- The culled `hadit` and `jogoh` children preserved useful signed-refusal,
+  exact-byte evidence, freeze, transfer, and capability pressure, but encoded
+  that pressure as base-envelope selector stacks, generic claim headers/cards,
+  or universal statement capsules. Source: `DI-kafiz`.
 - Many scenarios still read as boilerplate rather than thought experiments:
   they under-use Alice/Bob/Carol/Mallory roles, have weak setup/stimulus/trust
   history, and often drift into non-PT vocabulary such as `authority`,
@@ -339,6 +378,13 @@ thinking.
   evidence exists. Future `tools/ga-runner/README.md`, promotion procedure, and
   `DEV-GUIDE-RESOURCES.md` updates must describe PT-first generation and scoring
   rules and must not summarize non-PT-clean results as consensus.
+- [x] lugag.18 Harden GA generator/scorer guidance and source-vocabulary audit
+  so future children avoid or score poorly for base-envelope selector stacks,
+  generic claim headers/cards, and universal statement capsules while preserving
+  higher-layer pCID-owned payload protocols. Source: `DI-kafiz`.
+- [x] lugag.19 Add standalone higher-layer simulations for promise-accounting
+  observation/refusal evidence, freeze successor records, and
+  capability-as-promise-token payload behavior. Source: `DI-kafiz`.
 
 ## Validation and acceptance criteria
 
@@ -357,3 +403,5 @@ thinking.
   complete.
 - Rescoring must preserve historical scored artifacts and append new PT-clean
   evidence instead of mutating old bytes in place.
+- Future GA children must not recreate `hadit`/`jogoh` envelope-layer selector
+  stacks; they may reuse only the higher-layer pressure captured by `DI-kafiz`.

@@ -20,6 +20,34 @@ evidence. Source: `DI-muniz`; `DI-pozom`.
 
 ## Decision Intent Log
 
+ID: DI-falap
+Date: 2026-05-24 14:09:36
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Add a standalone TE, `TE-vujaj`, under `TODO-mopob` to test the
+wording boundary between conceptual PromiseGrid envelope shape and
+DAG-CBOR-specific link encoding. The TE will ask whether PromiseGrid should say
+the envelope shape is `grid([42(pCID), payload, sig])`, or instead say the
+conceptual shape is `grid([pCID, payload, sig])` and reserve `42(pCID)` for
+DAG-CBOR encoding examples and profile-specific specimens.
+Intent: The current corpus has already locked that `pCID` means Protocol CID and
+that `42(...)` is a DAG-CBOR link representation, but it has not yet written a
+repo-owned TE focused on whether using `42(pCID)` in the canonical envelope
+phrase would collapse encoding-level detail into the semantic shape. A separate
+TE is safer than rewriting `TE-pokul` because `TE-pokul` already owns the
+two-slot-versus-three-slot envelope-family question.
+Constraints: Keep `pCID` as Protocol CID throughout. Do not pre-lock the TE's
+conclusion in the DI: deciding whether the preferred phrase is
+`grid([pCID, payload, sig])`, `grid([42(pCID), payload, sig])`, or a stricter
+conceptual-versus-wire distinction is the purpose of `TE-vujaj`. Do not update
+`DEV-GUIDE-RESOURCES.md` or active simulation lineages in this task. Keep the TE
+status at `needs DF` unless the TE itself truly closes the question under
+existing evidence.
+Affects: `protocols/wire-lab.d/TODO/TODO-mopob-pcid-protocol-cid-corpus-correction-and-envelope-successors.md`;
+`docs/thought-experiments/TE-vujaj-grid-envelope-dag-cbor-link-wording.md`;
+`docs/thought-experiments/README.md`;
+`protocols/wire-lab.d/specs/harness-spec-draft.md`.
+
 ID: DI-muniz
 Date: 2026-05-24 23:59:00
 Status: active
@@ -210,6 +238,11 @@ supersession:
 - [ ] mopob.13 After successor creation, rerun the source grep and eradicate or
   supersede every remaining active source-side mention of the error. Leave only
   historical evidence that is intentionally frozen. Source: `DI-muniz`.
+- [x] mopob.14 Add `TE-vujaj` as a standalone thought experiment for the wording
+  boundary between conceptual envelope shape and DAG-CBOR link encoding. The TE
+  belongs under `TODO-mopob` because it clarifies how Protocol-CID semantics
+  should be described without silently recasting `42(...)` as the semantic
+  envelope shape. Source: `DI-falap`.
 
 ## Validation and acceptance criteria
 

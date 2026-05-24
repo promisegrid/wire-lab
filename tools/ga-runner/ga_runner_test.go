@@ -666,9 +666,13 @@ func TestRunScoreUsesPerCellAPIModelWhenOptionIsEmpty(t *testing.T) {
 func TestAuditSimulationVocabularyClassifiesAllowedAndHardHitSims(t *testing.T) {
 	repo := newGAFixtureRepo(t)
 	writeTestFile(t, repo.Path("simulations", "SIM-hard-hit", "README.md"), "# Hard Hit\n\nThis sim uses a claim card artifact.\n")
+	writeTestFile(t, repo.Path("simulations", "SIM-stack-hit", "README.md"), "# Stack Hit\n\nThis sim uses env_pCID, sig_pCID, payload_pCID, and a statement_capsule at the envelope layer.\n")
+	writeTestFile(t, repo.Path("simulations", "SIM-sig-pcid-allowed", "README.md"), "# Sig Allowed\n\nThis sim uses a small outer tuple with sig_pcid and sig_payload but keeps the envelope otherwise minimal and avoids the rejected selector-stack and generic assertion-wrapper patterns.\n")
 	writeTestFile(t, repo.Path("simulations", "SIM-udp-feed-v0-conformance", "README.md"), "# UDP Fixture\n\nA UDP-feed v0 conformance fixture.\n")
 	gitAdd(t, repo,
 		"simulations/SIM-hard-hit/README.md",
+		"simulations/SIM-stack-hit/README.md",
+		"simulations/SIM-sig-pcid-allowed/README.md",
 		"simulations/SIM-udp-feed-v0-conformance/README.md",
 	)
 	status, _, err := auditSimulationVocabulary(repo, auditSourceState{
@@ -680,6 +684,26 @@ func TestAuditSimulationVocabularyClassifiesAllowedAndHardHitSims(t *testing.T) 
 	}
 	if status != "hard_hit" {
 		t.Fatalf("hard-hit sim status = %q, want %q", status, "hard_hit")
+	}
+	status, reasons, err := auditSimulationVocabulary(repo, auditSourceState{
+		Mode:          auditSourceResolutionHistorical,
+		ActiveSimPath: "simulations/SIM-stack-hit",
+	}, "SIM-stack-hit")
+	if err != nil {
+		t.Fatalf("audit selector-stack sim: %v", err)
+	}
+	if status != "hard_hit" || !containsString(reasons, "docs use universal statement-capsule vocabulary") {
+		t.Fatalf("selector-stack sim status=%q reasons=%v, want statement-capsule hard_hit", status, reasons)
+	}
+	status, reasons, err = auditSimulationVocabulary(repo, auditSourceState{
+		Mode:          auditSourceResolutionHistorical,
+		ActiveSimPath: "simulations/SIM-sig-pcid-allowed",
+	}, "SIM-sig-pcid-allowed")
+	if err != nil {
+		t.Fatalf("audit allowed sig_pcid sim: %v", err)
+	}
+	if status != "clean" {
+		t.Fatalf("allowed sig_pcid sim status=%q reasons=%v, want clean", status, reasons)
 	}
 	status, _, err = auditSimulationVocabulary(repo, auditSourceState{
 		Mode:          auditSourceResolutionHistorical,
@@ -1283,6 +1307,9 @@ func TestBuildScorePromptIncludesRequiredAxisChecklist(t *testing.T) {
 		"Mark Burgess",
 		"`pt_clean`, `pt_reframe_needed`, or `pt_invalid`",
 		"A response missing any required `scores` axis or `assessment.pt_gate` is invalid.",
+		"selector-shopping stacks",
+		"universal statement capsules",
+		"higher-layer pCID-owned payload protocols",
 	} {
 		if !strings.Contains(prompt, want) {
 			t.Fatalf("prompt missing %q:\n%s", want, prompt)
@@ -1552,6 +1579,9 @@ func TestRunGenerateSelectsParentsByFitnessEvidence(t *testing.T) {
 			}
 			if !strings.Contains(request.Prompt, "## Compact Fitness Evidence From This Run") || !strings.Contains(request.Prompt, "normalized_0_100=") {
 				return ProviderResponse{}, fmt.Errorf("generate prompt missing selected parent fitness evidence")
+			}
+			if !strings.Contains(request.Prompt, "## Design Guardrails") || !strings.Contains(request.Prompt, "env_pCID") || !strings.Contains(request.Prompt, "higher-layer payload protocols") {
+				return ProviderResponse{}, fmt.Errorf("generate prompt missing selector-stack design guardrails")
 			}
 			if strings.Contains(request.Prompt, "\"schema\":") || strings.Contains(request.Prompt, "\"runner\":") {
 				return ProviderResponse{}, fmt.Errorf("generate prompt should not embed complete fitness JSON")

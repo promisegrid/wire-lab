@@ -211,6 +211,32 @@ replace the old vocabulary.
 Affects: `DEV-GUIDE-RESOURCES.md`;
 `protocols/wire-lab.d/TODO/TODO-rozas-promisegrid-dev-guide-resources.md`.
 
+### DI-rusup
+
+ID: DI-rusup
+Date: 2026-05-24 14:03:42
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Add `TE-jimar` as the current thought experiment for the PromiseGrid
+kernel/runtime portability boundary and update guide-resource references
+without closing `DR-davod`.
+Intent: Kernel-developer guide prose needs a portable boundary that fits daemon,
+microkernel, WASM/browser host, MCU/header-only, split-object, and future
+runtime shapes. The current narrowed answer should treat "kernel" as a local
+infrastructure role/profile around pCID-selected messages, exact bytes, local
+promises, peer-local trust assessment, and evidence records, while keeping the
+final porting boundary in DF.
+Constraints: Do not edit `/home/stevegt/lab/promisegrid-dev-guide`. Keep
+`DR-davod` open. Treat IPLD/CAR/selectors as optional L6/CAS tooling unless a
+specific frozen pCID requires them. Treat Gordian-style structures as
+pCID-owned payload/wrapper families unless future evidence broadens them. Do
+not present daemon, microkernel, host-runtime, or header/library-only shapes as
+the universal PromiseGrid kernel.
+Affects: `docs/thought-experiments/TE-jimar-kernel-runtime-portability-boundary.md`;
+`docs/thought-experiments/README.md`; `DEV-GUIDE-RESOURCES.md`;
+`DR/DR-davod-promisegrid-kernel-dev-porting-boundary.md`;
+`protocols/wire-lab.d/TODO/TODO-rozas-promisegrid-dev-guide-resources.md`.
+
 ## Context
 
 The PromiseGrid Development Guide currently has three locked audiences:
@@ -271,3 +297,6 @@ guide's claims.
 - [ ] rozas.12 Add or route a dedicated capability-token-as-promise simulation
   before guide prose treats capability tokens as settled current-simulation
   consensus. Source: `DI-baral`.
+- [x] rozas.13 Draft `TE-jimar` and route its provisional kernel/runtime
+  portability findings into `DEV-GUIDE-RESOURCES.md` without closing
+  `DR-davod`. Source: `DI-rusup`.

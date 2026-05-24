@@ -900,6 +900,11 @@ func buildGeneratePrompt(repo Repo, state GAState, child GAChild) (string, error
 	// fitness evidence so proposed sims can stand alone after materialization
 	// and make score-improving two-parent breed moves. Source: DI-gijom;
 	// DI-bukid; DI-sohus; DI-dilaf
+	//
+	// Intent: Keep future children from recreating rejected hadit/jogoh
+	// envelope-layer selector stacks while still letting higher-layer payload
+	// protocols model refusal evidence, freeze records, and capability promises.
+	// Source: DI-kafiz
 	var out strings.Builder
 	childPrefix, err := generatedChildIDPrefix(child.ID())
 	if err != nil {
@@ -912,6 +917,11 @@ func buildGeneratePrompt(repo Repo, state GAState, child GAChild) (string, error
 	out.WriteString("Optimization goal: breed a child simulation from exactly two parent simulations, expected to score higher than its parent set on the same rubric and sampled scenarios.\n")
 	out.WriteString("Use the fitness evidence below as training feedback: preserve parent strengths, repair weaknesses, reduce risks, answer or route open questions, and keep changes to one to three bounded design deltas.\n")
 	out.WriteString("Do not merely summarize the parent. The child must make an explicit design move that should improve `fitness.normalized_0_100` while keeping the simulation standalone and auditable.\n\n")
+	out.WriteString("## Design Guardrails\n\n")
+	out.WriteString("- Treat `pCID` as Protocol CID: the pCID-named protocol spec may define payload shape, signature/proof encoding, refusal evidence, freeze-successor records, or capability promise-token records.\n")
+	out.WriteString("- For base-envelope children, avoid selector-shopping stacks such as `env_pCID`/`sig_pCID`/`payload_pCID`, generic `claim_header` or claim-card layers, generic claim cards, and universal `statement_capsule` wrappers.\n")
+	out.WriteString("- Do not ban higher-layer payload protocols from defining their own promise-accounting records. Put signed refusal versus silence/timeout, exact-byte local evidence, freeze successor records, transfer semantics, and capability-as-promise-token behavior inside the pCID-selected payload/specimen layer unless the scenario explicitly asks to test an envelope negative control.\n")
+	out.WriteString("- Keep outer signatures scoped to the current sender's own promise; no agent promises for another agent, and every receiver keeps local trust assessments.\n\n")
 	fmt.Fprintf(&out, "- Run group ID: `%s`\n", state.RunGroupID)
 	fmt.Fprintf(&out, "- Planned child ID prefix: `%s`\n", childPrefix)
 	fmt.Fprintf(&out, "- Temporary child ID: `%s`\n", child.ID())

@@ -755,6 +755,11 @@ func auditSimulationVocabulary(repo Repo, source auditSourceState, simID string)
 	}
 	for phrase, reason := range map[string]string{
 		"claim card":            "docs use claim-card artifact vocabulary",
+		"claim cards":           "docs use claim-card artifact vocabulary",
+		"claim_header":          "docs use generic claim-header vocabulary",
+		"claim header":          "docs use generic claim-header vocabulary",
+		"statement_capsule":     "docs use universal statement-capsule vocabulary",
+		"statement capsule":     "docs use universal statement-capsule vocabulary",
 		"conformance bundle":    "docs use conformance-bundle artifact vocabulary",
 		"profile support claim": "docs use profile-support-claim vocabulary",
 		"port claim":            "docs use port-claim vocabulary",
@@ -765,6 +770,15 @@ func auditSimulationVocabulary(repo Repo, source auditSourceState, simID string)
 		if strings.Contains(text, phrase) {
 			hardReasons = append(hardReasons, reason)
 		}
+	}
+	hasEnvSelector := strings.Contains(text, "env_pcid")
+	hasSigSelector := strings.Contains(text, "sig_pcid")
+	hasPayloadSelector := strings.Contains(text, "payload_pcid")
+	if hasEnvSelector && (hasSigSelector || hasPayloadSelector) {
+		hardReasons = append(hardReasons, "docs use envelope selector-stack vocabulary")
+	}
+	if hasSigSelector && hasPayloadSelector && (strings.Contains(text, "claim_header") || strings.Contains(text, "claim header") || strings.Contains(text, "statement_capsule") || strings.Contains(text, "statement capsule")) {
+		hardReasons = append(hardReasons, "docs use nested selector-stack vocabulary")
 	}
 	if len(hardReasons) > 0 {
 		return "hard_hit", uniqueStrings(hardReasons), nil
