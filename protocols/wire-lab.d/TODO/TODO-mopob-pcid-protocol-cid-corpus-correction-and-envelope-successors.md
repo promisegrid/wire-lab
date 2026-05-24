@@ -13,7 +13,10 @@ and proof/signature encoding. The whole message is encoded as CBOR, so arity is
 carried by the CBOR array header ahead of the `[pCID, ...]` array contents.
 This TODO plans direct source fixes where safe, successor sims where scored
 artifacts must remain immutable, and a source-side eradication pass for the
-wrong “payload pCID” framing. Source: `DI-muniz`.
+wrong “payload pCID” framing. `SIM-dalor` has one explicit exception because
+its score evidence was produced from the bad pCID wording plus a bad layer-local
+rubric; the stale run is removed and replaced rather than preserved as current
+evidence. Source: `DI-muniz`; `DI-pozom`.
 
 ## Decision Intent Log
 
@@ -48,6 +51,44 @@ the corrected envelope lineages; future `simulations/README.md`; future
 `DEV-GUIDE-RESOURCES.md`; related source docs that still say or imply “payload
 pCID”.
 
+ID: DI-pozom
+Date: 2026-05-24 11:54:14
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Apply a one-time `SIM-dalor` exception to the usual scored-artifact
+immutability rule. Edit `SIM-dalor-grid-envelope-protocol-owned-signature-slot`
+in place so `pCID` is consistently Protocol CID, the envelope-level signed
+promise is explicit, and promise-accounting remains a higher-layer payload
+concern. Remove the stale `20260524-070634` canary run evidence and the
+uncommitted `20260524-174215` dalor-breed evidence, then replace them with a
+fresh forced dalor-breed run under the corrected source and rubric.
+Intent: The low dalor scores were not reliable design evidence. They were
+created from two coupled mistakes: source text that said “payload pCID” and a
+scorer rubric that let higher-layer promise-accounting scenarios penalize an
+envelope-layer design for correctly leaving accounting semantics to the payload
+protocol. A dalor envelope is itself a signed promise that the payload bytes are
+shaped according to the protocol specification named by the `pCID`; peers still
+make local trust judgments from that evidence. Replacing this narrow run keeps
+future GA breeding from suppressing a valid envelope candidate because of known
+bad inputs.
+Constraints: This exception applies only to `SIM-dalor` and the named stale
+runs. It does not authorize broad in-place rewrites of other scored sims or
+historical evidence. The scorer must evaluate candidates at their claimed
+layer: envelope sims may score highly for PT cleanliness when they express the
+envelope-level signed promise, even if higher-layer promise accounting belongs
+inside the payload protocol. Scenario fit may still be lower when a scenario
+asks for higher-layer semantics the envelope intentionally does not provide.
+Affects: `protocols/wire-lab.d/TODO/TODO-mopob-pcid-protocol-cid-corpus-correction-and-envelope-successors.md`;
+`simulations/SIM-dalor-grid-envelope-protocol-owned-signature-slot/`;
+`tools/ga-runner/score.go`; `tools/ga-runner/result.go`;
+`tools/ga-runner/run-canary.sh`; stale `results/**/*20260524-070634.json`;
+stale `results/jobs/ga-canary-20260524-pt-gate-v3-successors-plus-dalor/`;
+stale `results/state/ga-canary-20260524-pt-gate-v3-successors-plus-dalor.json`;
+uncommitted `results/**/*20260524-174215.json`;
+uncommitted `results/jobs/ga-canary-20260524-dalor-breed/`;
+uncommitted `results/state/ga-canary-20260524-dalor-breed.json`.
+Supersedes: DI-muniz for this narrow `SIM-dalor` stale-run replacement only.
+
 ## Scope
 
 This TODO covers:
@@ -56,15 +97,17 @@ This TODO covers:
   “payload pCID” framing;
 - fixing safe non-evidence docs in place;
 - superseding scored or otherwise lineaged sim docs with corrected successor
-  sims;
+  sims, except for the explicit `SIM-dalor` stale-run replacement authorized by
+  `DI-pozom`;
 - updating sim-index and guide prose to route readers to the corrected
   successor lineages;
 - keeping committed results immutable while documenting how to interpret older
   wording safely.
 
-This TODO does not rewrite committed `results/` artifacts, does not mutate
-already-scored canonical sims in place, and does not by itself lock the final
-winning envelope shape.
+This TODO does not normally rewrite committed `results/` artifacts, does not
+normally mutate already-scored canonical sims in place, and does not by itself
+lock the final winning envelope shape. The only current exception is the
+`SIM-dalor` stale-run replacement authorized by `DI-pozom`.
 
 ## Predecessor context
 
@@ -130,10 +173,12 @@ supersession:
 - [ ] mopob.2 Record a short repo-owned clarification note, if needed, stating
   how to read older scored artifacts that still use the wrong shorthand without
   treating them as current terminology. Source: `DI-muniz`.
-- [ ] mopob.3 Create a corrected successor for `SIM-dalor` that keeps the
-  three-slot probe but states explicitly that the outer `pCID` names the
-  protocol spec, that the protocol may define proof encoding, and that CBOR
-  already carries arity. Source: `DI-muniz`.
+- [x] mopob.3 Correct `SIM-dalor` in place under the one-time stale-run
+  exception. Keep the three-slot probe but state explicitly that the outer
+  `pCID` names the protocol spec, that the protocol may define proof encoding,
+  that CBOR already carries arity, and that the envelope-level signature is
+  evidence of the sender's promise that the payload is shaped according to the
+  protocol named by the `pCID`. Source: `DI-muniz`; `DI-pozom`.
 - [ ] mopob.4 Create a corrected successor for `SIM-pamap` that states the
   signable-view/proof-slot rule as part of the protocol named by the `pCID`,
   not as something owned by a “payload pCID”. Source: `DI-muniz`.

@@ -35,6 +35,10 @@ Environment overrides:
   GA_CANARY_MAX_CHILD_USD      default: 1.00
   GA_CANARY_INCLUDE_SIMS       optional comma/space list of SIM IDs to include
   GA_CANARY_INCLUDE_SCENARIOS  optional comma/space list of scenario IDs to include
+  GA_CANARY_PARENT_COUNT       default: 3
+  GA_CANARY_SCENARIO_COUNT     default: 3
+  GA_CANARY_CHILD_COUNT        default: 2
+  GA_CANARY_MAX_PROMOTIONS     default: 1
   /tmp/canary-cells            optional focus file with `sims:` / `scenarios:`
                                sections; entries resolve by unique prefix and
                                merge with GA_CANARY_INCLUDE_* values
@@ -105,6 +109,13 @@ max_child_usd="${GA_CANARY_MAX_CHILD_USD:-1.00}"
 include_sims="${GA_CANARY_INCLUDE_SIMS:-}"
 include_scenarios="${GA_CANARY_INCLUDE_SCENARIOS:-}"
 focus_file="/tmp/canary-cells"
+# Intent: Let focused canaries shrink the parent pool so a known-underweighted
+# candidate such as dalor can be forced to breed after a rubric/source repair.
+# Source: DI-pozom
+parent_count="${GA_CANARY_PARENT_COUNT:-3}"
+scenario_count="${GA_CANARY_SCENARIO_COUNT:-3}"
+child_count="${GA_CANARY_CHILD_COUNT:-2}"
+max_promotions="${GA_CANARY_MAX_PROMOTIONS:-1}"
 score_workers="${GA_CANARY_SCORE_WORKERS:-6}"
 generate_workers="${GA_CANARY_GENERATE_WORKERS:-1}"
 score_request_timeout="${GA_CANARY_SCORE_REQUEST_TIMEOUT:-${GA_CANARY_REQUEST_TIMEOUT:-5m}}"
@@ -136,6 +147,22 @@ if ! [[ "$poll_seconds" =~ ^[0-9]+$ ]] || [ "$poll_seconds" -lt 1 ]; then
 fi
 if ! [[ "$score_workers" =~ ^[0-9]+$ ]] || [ "$score_workers" -lt 1 ]; then
 	echo "GA_CANARY_SCORE_WORKERS must be a positive integer." >&2
+	exit 2
+fi
+if ! [[ "$parent_count" =~ ^[0-9]+$ ]] || [ "$parent_count" -lt 1 ]; then
+	echo "GA_CANARY_PARENT_COUNT must be a positive integer." >&2
+	exit 2
+fi
+if ! [[ "$scenario_count" =~ ^[0-9]+$ ]] || [ "$scenario_count" -lt 1 ]; then
+	echo "GA_CANARY_SCENARIO_COUNT must be a positive integer." >&2
+	exit 2
+fi
+if ! [[ "$child_count" =~ ^[0-9]+$ ]] || [ "$child_count" -lt 0 ]; then
+	echo "GA_CANARY_CHILD_COUNT must be a non-negative integer." >&2
+	exit 2
+fi
+if ! [[ "$max_promotions" =~ ^[0-9]+$ ]] || [ "$max_promotions" -lt 0 ]; then
+	echo "GA_CANARY_MAX_PROMOTIONS must be a non-negative integer." >&2
 	exit 2
 fi
 if ! [[ "$generate_workers" =~ ^[0-9]+$ ]] || [ "$generate_workers" -lt 1 ]; then
@@ -474,10 +501,10 @@ run_init_stage() {
 			-run-group-id "$run_group" \
 			-timestamp "$timestamp" \
 			-shuffle-seed "$shuffle_seed" \
-			-parent-count 3 \
-			-scenario-count 3 \
-			-child-count 2 \
-			-max-promotions 1 \
+			-parent-count "$parent_count" \
+			-scenario-count "$scenario_count" \
+			-child-count "$child_count" \
+			-max-promotions "$max_promotions" \
 			"${init_include_args[@]}"
 }
 
@@ -583,6 +610,10 @@ echo "Reasoning summary: $reasoning_summary"
 echo "Text verbosity: $text_verbosity"
 echo "Score workers: $score_workers"
 echo "Generate workers: $generate_workers"
+echo "Parent count: $parent_count"
+echo "Scenario count: $scenario_count"
+echo "Child count: $child_count"
+echo "Max promotions: $max_promotions"
 echo "Score request timeout: $score_request_timeout"
 echo "Generate request timeout: $generate_request_timeout"
 echo "Provider attempts: $provider_attempts"

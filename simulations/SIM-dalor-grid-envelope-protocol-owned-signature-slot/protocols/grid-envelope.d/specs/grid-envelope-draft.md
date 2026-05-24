@@ -7,76 +7,89 @@
 
 This spec defines one grid-envelope candidate for wire-lab comparison. It is a
 specimen inside `SIM-dalor-grid-envelope-protocol-owned-signature-slot`, not a
-harness rule and not the canonical PromiseGrid envelope. Source: `DI-kukuk`.
+harness rule and not the canonical PromiseGrid envelope. It uses `pCID` only as
+Protocol CID: the content identifier of the protocol specification document, not
+the content identifier of the payload bytes. Source: `DI-kukuk`; `DI-pozom`.
 
 ## Envelope Shape
 
 The outer envelope shape is:
 
 ```text
-[pcid, payload, signature]
+[pCID, payload, signature]
 ```
 
 Slots are interpreted positionally:
 
-- `pcid` identifies the payload protocol and the proof rules for the third slot.
-- `payload` is opaque bytes until interpreted by the handler named by `pcid`.
+- `pCID` identifies the protocol specification and the proof rules for the third
+  slot.
+- `payload` is opaque bytes until interpreted by the handler for the protocol
+  named by `pCID`.
 - `signature` is mandatory proof bytes over the canonical unsigned prefix.
 
 This is the key design move under test: the proof remains a sibling outer slot,
 but there is no separate outer proof-profile selector. If a protocol wants a
 varsig, multisig, or other proof family, that choice is part of the protocol
-named by `pcid`.
+named by `pCID`.
+
+In Promise Theory terms, the signature is not a command, permission, global
+trust score, or promise made on behalf of anyone else. It is current-sender
+evidence for the sender's own scoped promise: "I promise that these payload
+bytes are shaped according to the protocol specification named by this `pCID`."
+Each receiver still decides locally whether it trusts the sender, recognizes the
+protocol, verifies the proof family, stores the bytes, relays the bytes, or uses
+the payload.
 
 ## Signable Bytes
 
 The signed bytes are the canonical bytes of:
 
 ```text
-[pcid, payload]
+[pCID, payload]
 ```
 
-This binds both the payload bytes and the payload protocol name without adding a
-second protocol selector to the outer envelope.
+This binds both the payload bytes and the protocol name without adding a second
+protocol selector to the outer envelope.
 
 ## Encoding
 
-The outer envelope is a deterministic CBOR positional array. `pcid` is a CIDv1
+The outer envelope is a deterministic CBOR positional array. `pCID` is a CIDv1
 byte string or link as defined by the carrier profile. `payload` and
-`signature` are byte strings at the carrier layer.
+`signature` are byte strings at the carrier layer. The CBOR array header already
+records arity, so this specimen does not add an outer arity field.
 
 ## Unknown pCID Policy
 
-If a receiver lacks a handler for `pcid`, it may preserve or blind-carry the
+If a receiver lacks a handler for `pCID`, it may preserve or blind-carry the
 exact outer bytes as uninterpreted evidence, but it MUST NOT claim to parse the
 payload shape or verify the signature.
 
 This specimen intentionally stays close to the current simple-envelope direction:
-unsupported `pcid` means “bytes may survive, meaning does not.”
+unsupported `pCID` means “bytes may survive, meaning does not.”
 
 ## Signature and Authorship Policy
 
 This specimen has no universal outer `sig_pcid` slot. Instead, the protocol
-named by `pcid` defines:
+named by `pCID` defines:
 
 - whether the third slot is interpreted as varsig, multisig, or another proof
   family;
 - signer binding and signer identity rules;
 - delegation, freshness, revocation, and threshold semantics, if any;
-- whether extra associated data beyond canonical `[pcid, payload]` bytes is
+- whether extra associated data beyond canonical `[pCID, payload]` bytes is
   required.
 
 The outer envelope itself enforces only three things:
 
 - there is a third proof slot;
-- the signable baseline is canonical `[pcid, payload]`;
-- proof semantics are owned by the protocol named by `pcid`.
+- the signable baseline is canonical `[pCID, payload]`;
+- proof semantics are owned by the protocol named by `pCID`.
 
 ## Comparison Pressure
 
 Compared with `SIM-jufag`, this specimen removes the separate outer proof
-selector and asks whether one payload pCID is enough to own both payload and
-proof semantics.
+selector and asks whether one protocol `pCID` is enough to name both payload
+shape and proof semantics.
 
 Compared with `SIM-pamap`, this specimen keeps the proof as an outer sibling
 slot rather than moving it into the payload contract.
@@ -89,12 +102,12 @@ while still trying to keep the outer surface small.
 
 ## Open Questions
 
-- Is one payload pCID enough to keep proof-family evolution legible, or does a
+- Is one protocol `pCID` enough to keep proof-family evolution legible, or does a
   separate outer proof selector age better?
-- Does this design force too many proof-profile changes to mint new payload
-  pCIDs?
+- Does this design force too many proof-profile changes to mint new protocol
+  `pCID`s?
 - Do generic peers lose too much audit clarity when the outer slot is explicit
-  but its proof family is hidden behind `pcid`?
+  but its proof family is defined by the protocol named by `pCID`?
 
 ## Non-Canonical Status
 

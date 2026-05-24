@@ -220,7 +220,11 @@ func rubricScoreMeaningsForSchema(schema string) map[string]string {
 		"risk_penalty": "0 low risk, 5 severe risk",
 	}
 	if schema == resultSchemaV2 || schema == resultSchemaV3 {
-		meanings["promise_vocabulary"] = "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific"
+		// Intent: Keep stored rubric descriptions aligned with the scorer's
+		// layer-local Promise Theory interpretation, so envelope-layer promises
+		// are not mislabeled as weak merely because higher-layer accounting lives
+		// inside the payload protocol. Source: DI-pozom
+		meanings["promise_vocabulary"] = "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first, layer-local, and pCID-specific"
 		meanings["simplicity_durability"] = "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
 	}
 	return meanings
