@@ -1,0 +1,173 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields-group-session-freeze-promise-post-freeze-mutation-request-openai-gpt-5.4-medium-20260524-024852",
+  "run_group_id": "ga-canary-20260523-pt-gate-v3",
+  "cell_id": "ga-canary-20260523-pt-gate-v3-000014-SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields--group-session-freeze-promise-post-freeze-mutation-request--openai-gpt-5.4-medium",
+  "sim_id": "SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields",
+  "scenario_id": "group-session-freeze-promise-post-freeze-mutation-request",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260524-024852",
+  "result_path": "results/SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields/group-session-freeze-promise-post-freeze-mutation-request/openai-gpt-5.4-medium/20260524-024852.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_8e1eaa270abe424894f0fae7b80d295b",
+    "response_id": "resp_0929f463e050b0ee006a12676b66dc8198900d7c8c32bc60cb",
+    "input_tokens": 9059,
+    "output_tokens": 1527,
+    "cost_usd": 0.03723125
+  },
+  "source": {
+    "repo_commit": "ec652bd3ecaaf2f904e62cff00e113a88c7e3efd",
+    "sim_path": "simulations/SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields/",
+    "scenario_path": "scenarios/group-session-freeze-promise-post-freeze-mutation-request/group-session-freeze-promise-post-freeze-mutation-request.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields/README.md",
+        "sha256": "3ab052fe6b0a0513740136a232eeaf2f73e992923012280c92c2e159c8fb0a9c"
+      },
+      {
+        "path": "simulations/SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields/QUESTION.md",
+        "sha256": "707280a55807f9fce459bf58b891379e28a66c77fbedf1c263937113936a25d3"
+      },
+      {
+        "path": "simulations/SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields/protocols/grid-envelope.d/CHANGELOG.md",
+        "sha256": "3652c6b6111b64750a90c10edf0da60a2d88777a2c3313477f21490d61d97201"
+      },
+      {
+        "path": "simulations/SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "68d7443d65d236f5471fac7781b122413a1f5ba914587b2b3522c8b3677062d9"
+      },
+      {
+        "path": "scenarios/group-session-freeze-promise-post-freeze-mutation-request/group-session-freeze-promise-post-freeze-mutation-request.md",
+        "sha256": "9083e149d879dcf5890bbcc3d3bb2fcf87b4490ba1878e59a73402bd5312ee52"
+      }
+    ],
+    "simulation_tree_hash": "cee27e908e02ebb98055f64a9a1750e4c150996dd05c4c53e16ec029927598f1"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 2,
+    "auditability": 2,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 2,
+    "failure_handling": 3,
+    "implementation_plausibility": 3,
+    "promise_vocabulary": 1,
+    "simplicity_durability": 2,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 22,
+    "normalized_0_100": 44,
+    "confidence_0_1": 0.77
+  },
+  "assessment": {
+    "rationale": "Technically interesting envelope variant with conservative unknown-pCID behavior and some evolution affordances, but it is a weak fit for the freeze-mutation scenario because freeze lineage semantics are largely absent. The design also drifts from Promise Theory vocabulary into protocol-centric framing.",
+    "strengths": [
+      "Explicitly avoids central registry claims and keeps unknown-pCID handling conservative.",
+      "Deterministic CBOR array gives stable bytes for storage and later evidence review.",
+      "Per-pCID evolution path can add new schemas without rewriting the outer draft."
+    ],
+    "weaknesses": [
+      "No explicit frozen-spec or superseding-pCID rule for post-freeze breaking changes.",
+      "Generic tooling cannot reliably inspect payload/proof boundaries.",
+      "Promise-first wording is largely absent."
+    ],
+    "risks": [
+      "Post-freeze breaking changes could be ambiguously handled because the specimen lacks explicit freeze/supersession rules.",
+      "Generic audit and routing are weakened because later fields are opaque without the pCID handler.",
+      "Schema-local signature rules raise substitution and long-term verification risks."
+    ],
+    "open_questions": [
+      "If freeze evidence exists for a pCID-defined envelope shape, is any breaking outer-field change required to mint a new pCID rather than amend prior lineage?",
+      "What freeze/change-log artifact lets peers locally distinguish supersession from illicit post-freeze mutation?",
+      "Can variable-arity schemas publish enough durable metadata for later audit without requiring original handler code?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design.",
+    "pt_gate": {
+      "status": "pt_reframe_needed",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "Nothing here overrides agent autonomy, though the design is framed as protocol behavior rather than agent promises."
+      },
+      "scoped_intent": {
+        "status": "warning",
+        "note": "The simulation is not promise-first; it specifies envelope mechanics, not scoped declarations of intent by named agents."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "The specimen does not make one agent promise on behalf of another."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "The draft is cautious about unknown pCIDs and does not guarantee interpretation or verification outcomes."
+      },
+      "local_trust_assessment": {
+        "status": "warning",
+        "note": "Trust is mostly implicit in possession of a handler/spec, not clearly framed as peer-local assessment of promises kept."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "The draft does not equate receipt or use with obligation; unknown pCID handling is conservative."
+      },
+      "violations": [
+        "Framed as protocol/spec mechanics instead of explicit agent promises.",
+        "Freeze and mutation handling are not expressed as locally assessable promises about immutable lineage or supersession."
+      ]
+    }
+  }
+}

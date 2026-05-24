@@ -1,0 +1,162 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-padin-group-session-freeze-evidence-promise-accounting-records-kept-storage-promise-openai-gpt-5.4-medium-20260524-032521",
+  "run_group_id": "ga-canary-20260523-pt-gate-v3-successors",
+  "cell_id": "ga-canary-20260523-pt-gate-v3-successors-000034-SIM-padin-group-session-freeze-evidence--promise-accounting-records-kept-storage-promise--openai-gpt-5.4-medium",
+  "sim_id": "SIM-padin-group-session-freeze-evidence",
+  "scenario_id": "promise-accounting-records-kept-storage-promise",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260524-032521",
+  "result_path": "results/SIM-padin-group-session-freeze-evidence/promise-accounting-records-kept-storage-promise/openai-gpt-5.4-medium/20260524-032521.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_e2883ab542cd4b8e99ea22b9618bd874",
+    "response_id": "resp_0bf0d8251f297162006a127059dca08198a011dbddcf3cf004",
+    "input_tokens": 8104,
+    "output_tokens": 1436,
+    "cost_usd": 0.034286
+  },
+  "source": {
+    "repo_commit": "925c7f5c1c7ce7d5b0caf6a924d40d3f9b7d0483",
+    "sim_path": "simulations/SIM-padin-group-session-freeze-evidence/",
+    "scenario_path": "scenarios/promise-accounting-records-kept-storage-promise/promise-accounting-records-kept-storage-promise.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-padin-group-session-freeze-evidence/README.md",
+        "sha256": "43f96cd79379eeb2ae36319c1fd26144cc0a95a86f0c3fc2f9f48bf9024a11d5"
+      },
+      {
+        "path": "simulations/SIM-padin-group-session-freeze-evidence/QUESTION.md",
+        "sha256": "6bdde351a8bd4a900a82304f488913fc2ae0224396de55473b61698525bc1d04"
+      },
+      {
+        "path": "scenarios/promise-accounting-records-kept-storage-promise/promise-accounting-records-kept-storage-promise.md",
+        "sha256": "9972dff7f20d9b4f3231c07a8eb332d2e75b43e84cf0d34af29c1d3ea9c1ad74"
+      }
+    ],
+    "simulation_tree_hash": "8fbe9da939de6ecdba9776b2cc20f5cb8b910b7381d306b38a6017026c170175"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 4,
+    "auditability": 5,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 2,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 3,
+    "simplicity_durability": 4,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 34,
+    "normalized_0_100": 68,
+    "confidence_0_1": 0.71
+  },
+  "assessment": {
+    "rationale": "Strong on exact artifacts, local verification, and auditability, but only indirectly addresses the storage-promise scenario. It helps Bob keep evidence about what was served and verified, yet it does not fully model a kept storage promise or later pull/keep/advertise decisions.",
+    "strengths": [
+      "Exact CIDs and reproducible checks create strong local audit evidence.",
+      "Independent peer reproduction fits sparse knowledge and no-central-authority goals.",
+      "Boundaries are explicit: evidence for a freeze decision, not the whole protocol."
+    ],
+    "weaknesses": [
+      "Does not directly specify Alice promising to retain and later serve chunk C.",
+      "Promise-accounting outcomes for kept versus broken storage promises are not explicit.",
+      "Limited detail on adversarial or long-delay retrieval failure cases."
+    ],
+    "risks": [
+      "Scenario mismatch: freeze-evidence artifacts are not the same as a direct storage-service promise.",
+      "Failure behavior for missing, stale, or refused future retrieval is under-specified.",
+      "Exact-artifact freezing may become brittle if parser or checker evolution is not itself well-versioned."
+    ],
+    "open_questions": [
+      "What concrete promise-accounting record would Bob keep after Alice serves or fails to serve a referenced artifact later?",
+      "How does the specimen describe stale, missing, or replaced storage outcomes over time?",
+      "What exact promise wording binds artifact retention versus only reproducible validation of a frozen slice?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design.",
+    "pt_gate": {
+      "status": "pt_clean",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "Independent peers reproduce the DAG and validation outcomes for themselves; judgment stays with each agent."
+      },
+      "scoped_intent": {
+        "status": "pass",
+        "note": "Intent is scoped to freezing evidence for a specific group-session v0 specimen slice and exact artifacts."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "The simulation does not assign promises on behalf of other agents."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "Reproducible checks support confidence but do not guarantee future storage or universal acceptance."
+      },
+      "local_trust_assessment": {
+        "status": "pass",
+        "note": "The core claim is locally checkable evidence, which fits trust as a peer-local assessment."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "Peers may treat the specimen as evidence locally; the design does not require others to accept it as an obligation."
+      },
+      "violations": []
+    }
+  }
+}

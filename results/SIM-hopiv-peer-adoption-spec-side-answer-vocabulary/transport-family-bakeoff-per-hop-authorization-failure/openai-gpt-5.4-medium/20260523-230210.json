@@ -1,0 +1,122 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-hopiv-peer-adoption-spec-side-answer-vocabulary-transport-family-bakeoff-per-hop-authorization-failure-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000143-SIM-hopiv-peer-adoption-spec-side-answer-vocabulary--transport-family-bakeoff-per-hop-authorization-failure--openai-gpt-5.4-medium",
+  "sim_id": "SIM-hopiv-peer-adoption-spec-side-answer-vocabulary",
+  "scenario_id": "transport-family-bakeoff-per-hop-authorization-failure",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-hopiv-peer-adoption-spec-side-answer-vocabulary/transport-family-bakeoff-per-hop-authorization-failure/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_5f9ee109d93d4bc4a22286064fea2f09",
+    "response_id": "resp_0511fa8ed8a44fdd006a1233a35eec81999d6229dbe941dbd6",
+    "input_tokens": 7523,
+    "output_tokens": 952,
+    "cost_usd": 0.02649325
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-hopiv-peer-adoption-spec-side-answer-vocabulary/",
+    "scenario_path": "scenarios/transport-family-bakeoff-per-hop-authorization-failure/transport-family-bakeoff-per-hop-authorization-failure.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-hopiv-peer-adoption-spec-side-answer-vocabulary/README.md",
+        "sha256": "2c328c9dc0a642ca6a4ccad23fd9aae7080ff731c2701732147083d5604a9581"
+      },
+      {
+        "path": "simulations/SIM-hopiv-peer-adoption-spec-side-answer-vocabulary/QUESTION.md",
+        "sha256": "70f695bd831a9511d34c521fb9637256cc37c923ffabaabb364dfa05b1f9a16e"
+      },
+      {
+        "path": "scenarios/transport-family-bakeoff-per-hop-authorization-failure/transport-family-bakeoff-per-hop-authorization-failure.md",
+        "sha256": "f938e10ab88db666d3097a2f97c1667bbbc6e8e071681134049068982cc39cf2"
+      }
+    ],
+    "simulation_tree_hash": "977f0ee4e8210e2d3d83b8418e464c1ee43f865ad6b15dd7167b05d43b90e374"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 0,
+    "promisegrid_alignment": 2,
+    "auditability": 2,
+    "evolution_safety": 1,
+    "layer_boundary_clarity": 2,
+    "failure_handling": 0,
+    "implementation_plausibility": 3,
+    "promise_vocabulary": 3,
+    "simplicity_durability": 3,
+    "risk_penalty": 4
+  },
+  "fitness": {
+    "raw": 17,
+    "normalized_0_100": 34,
+    "confidence_0_1": 0.9
+  },
+  "assessment": {
+    "rationale": "This simulation is mainly about compact peer-adoption metadata, not transport behavior. It has some PromiseGrid-friendly traits: explicit spec reference, compact peer-local bindings, and a relatively small artifact shape. But it does not model ring forwarding, per-hop authorization, refusal recording, skip-hop behavior, or membership reconfiguration, so it cannot answer the scenario's core pressure. Its main internal weakness is evolution fragility: meaning lives in the spec-side vocabulary, so old bindings may become ambiguous across revisions unless successor rules are very strict and durable.",
+    "strengths": [
+      "Compact peer-published bindings fit small-device and durable-artifact goals better than large metadata bundles.",
+      "The design has a reasonably clear split between spec-defined meaning and peer-selected values.",
+      "Implementation appears plausible for adoption metadata publication."
+    ],
+    "weaknesses": [
+      "Does not address the scenario's per-hop authorization failure at all.",
+      "No explicit failure model for refusal, skip-hop, breakage, or ring reconfiguration.",
+      "Evolution safety is weak because answer meaning depends on spec-side vocabulary continuity.",
+      "Audit trail for transport decisions is absent."
+    ],
+    "risks": [
+      "Severe scenario mismatch could create misleading comparison results in a transport bakeoff.",
+      "Spec-defined vocabularies may break long-term interpretability of historic peer answers across revisions.",
+      "Authorization failure semantics may be pushed into unstated surrounding systems, weakening auditability and layer boundaries."
+    ],
+    "open_questions": [
+      "Can a spec-side answer vocabulary preserve meaning for old bindings after spec successor pCIDs?",
+      "If a peer refuses to relay or authorize a hop, what local promise/accounting artifact records that refusal?",
+      "Does this metadata design need transport- or authorization-failure fields to be usable in transport-family comparisons?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

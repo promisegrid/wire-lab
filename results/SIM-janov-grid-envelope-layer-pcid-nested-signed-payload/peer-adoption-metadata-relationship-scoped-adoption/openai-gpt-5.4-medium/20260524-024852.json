@@ -1,0 +1,174 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-janov-grid-envelope-layer-pcid-nested-signed-payload-peer-adoption-metadata-relationship-scoped-adoption-openai-gpt-5.4-medium-20260524-024852",
+  "run_group_id": "ga-canary-20260523-pt-gate-v3",
+  "cell_id": "ga-canary-20260523-pt-gate-v3-000005-SIM-janov-grid-envelope-layer-pcid-nested-signed-payload--peer-adoption-metadata-relationship-scoped-adoption--openai-gpt-5.4-medium",
+  "sim_id": "SIM-janov-grid-envelope-layer-pcid-nested-signed-payload",
+  "scenario_id": "peer-adoption-metadata-relationship-scoped-adoption",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260524-024852",
+  "result_path": "results/SIM-janov-grid-envelope-layer-pcid-nested-signed-payload/peer-adoption-metadata-relationship-scoped-adoption/openai-gpt-5.4-medium/20260524-024852.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_b57d7de4639043338f4b01faf55048a7",
+    "response_id": "resp_02c262fac3a692de006a12673ba154819a90881035ce84907d",
+    "input_tokens": 9367,
+    "output_tokens": 1743,
+    "cost_usd": 0.04079425
+  },
+  "source": {
+    "repo_commit": "ec652bd3ecaaf2f904e62cff00e113a88c7e3efd",
+    "sim_path": "simulations/SIM-janov-grid-envelope-layer-pcid-nested-signed-payload/",
+    "scenario_path": "scenarios/peer-adoption-metadata-relationship-scoped-adoption/peer-adoption-metadata-relationship-scoped-adoption.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-janov-grid-envelope-layer-pcid-nested-signed-payload/README.md",
+        "sha256": "f48ab3c3b1dd2fe4a36b96ea5f602e34cae7c1615e97990ee1c8791a4c3a047f"
+      },
+      {
+        "path": "simulations/SIM-janov-grid-envelope-layer-pcid-nested-signed-payload/QUESTION.md",
+        "sha256": "32ba4a616d9b335c481cbfcbd7b114100210fb742a82061a52557b050d0530a9"
+      },
+      {
+        "path": "simulations/SIM-janov-grid-envelope-layer-pcid-nested-signed-payload/protocols/grid-envelope.d/CHANGELOG.md",
+        "sha256": "3652c6b6111b64750a90c10edf0da60a2d88777a2c3313477f21490d61d97201"
+      },
+      {
+        "path": "simulations/SIM-janov-grid-envelope-layer-pcid-nested-signed-payload/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "d182c06be14aaa48aaf3546e2050b361e7f10e1020faf32a9be8750948f2571d"
+      },
+      {
+        "path": "scenarios/peer-adoption-metadata-relationship-scoped-adoption/peer-adoption-metadata-relationship-scoped-adoption.md",
+        "sha256": "b2a2b0fb4dfcd76dfd88a39d4bb4f4d8a85fafb0b052621a36de8692d19fe3d7"
+      }
+    ],
+    "simulation_tree_hash": "bf0f4a64c42e752ebbf0764f95b9c41c7dc4374f56465564e4bd7e5a9d4c09c3"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 2,
+    "auditability": 3,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 3,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 4,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 30,
+    "normalized_0_100": 60,
+    "confidence_0_1": 0.78
+  },
+  "assessment": {
+    "rationale": "Strong layer separation and deterministic encoding make the specimen auditable and implementable, but it is a poor direct fit for relationship-scoped adoption because adoption is not carried as an explicit promise artifact. The unsigned outer layer makes authorship of the conformance promise depend on transport identity or local context, so PT framing needs rework.",
+    "strengths": [
+      "Very clear outer vs nested layer boundary.",
+      "Deterministic CBOR and nested signature support later audit.",
+      "Unknown-pCID policy avoids overclaiming interpretation.",
+      "Compact artifact shape is durable and plausible for small devices."
+    ],
+    "weaknesses": [
+      "Does not natively model Bob adopting one profile with Alice and another with Carol.",
+      "Promise wording is secondary to conformance/authorship framing.",
+      "Outer envelope lacks explicit signer-binding for the layer promise."
+    ],
+    "risks": [
+      "Alice and Carol may infer different meanings from the same outer envelope without explicit relationship-scoped adoption evidence.",
+      "Unsigned outer conformance can let Mallory relay or relabel payload_a in ways that preserve inner signature evidence but muddy layer-level accountability.",
+      "Auditors can verify inner payload integrity while still lacking durable evidence of who promised Layer-A conformance."
+    ],
+    "open_questions": [
+      "Should relationship-scoped adoption be made explicit in the signed payload or adjacent metadata rather than inferred from transport context?",
+      "Does the outer envelope need its own signer-binding field to avoid confusing payload authorship with layer-conformance authorship?",
+      "Can Alice and Carol locally record different Bob-\u003epeer adoption of pcid_a without introducing a global profile claim?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design.",
+    "pt_gate": {
+      "status": "pt_reframe_needed",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "Peers independently decide whether to parse, verify, preserve, or trust the envelope based on their own handlers and local context."
+      },
+      "scoped_intent": {
+        "status": "warning",
+        "note": "Intent is partly scoped by pcid_a and pcid_b, but the outer conformance promise lacks a first-class signed promiser and relationship scope is not explicit."
+      },
+      "no_promises_for_others": {
+        "status": "warning",
+        "note": "The draft does not let one agent promise on behalf of another, though transport identity can blur who made the outer conformance promise."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "Signatures and pCIDs provide evidence, not guaranteed acceptance or delivery."
+      },
+      "local_trust_assessment": {
+        "status": "warning",
+        "note": "The draft explicitly relies on local peer-adoption records and surrounding context, which is PT-compatible, but trust in outer conformance is under-specified."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "The design does not turn receipt or parsing into an obligation; receivers may preserve bytes opaquely or decline interpretation."
+      },
+      "violations": [
+        "Outer layer conformance/authorship is ambiguous and depends on transport or surrounding context rather than an explicit scoped promise.",
+        "Relationship-scoped adoption is not represented as a first-class promise artifact; it is only indirectly supportable through local peer records."
+      ]
+    }
+  }
+}

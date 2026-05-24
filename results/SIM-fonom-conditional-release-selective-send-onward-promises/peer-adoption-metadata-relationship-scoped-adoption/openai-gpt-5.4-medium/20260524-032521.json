@@ -1,0 +1,160 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-fonom-conditional-release-selective-send-onward-promises-peer-adoption-metadata-relationship-scoped-adoption-openai-gpt-5.4-medium-20260524-032521",
+  "run_group_id": "ga-canary-20260523-pt-gate-v3-successors",
+  "cell_id": "ga-canary-20260523-pt-gate-v3-successors-000029-SIM-fonom-conditional-release-selective-send-onward-promises--peer-adoption-metadata-relationship-scoped-adoption--openai-gpt-5.4-medium",
+  "sim_id": "SIM-fonom-conditional-release-selective-send-onward-promises",
+  "scenario_id": "peer-adoption-metadata-relationship-scoped-adoption",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260524-032521",
+  "result_path": "results/SIM-fonom-conditional-release-selective-send-onward-promises/peer-adoption-metadata-relationship-scoped-adoption/openai-gpt-5.4-medium/20260524-032521.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_cbf56c9562424c1cbf2494e2291ac935",
+    "response_id": "resp_047ad979b409c03a006a12703df1b0819a8a615217f9a7c4c1",
+    "input_tokens": 8329,
+    "output_tokens": 1067,
+    "cost_usd": 0.02951375
+  },
+  "source": {
+    "repo_commit": "925c7f5c1c7ce7d5b0caf6a924d40d3f9b7d0483",
+    "sim_path": "simulations/SIM-fonom-conditional-release-selective-send-onward-promises/",
+    "scenario_path": "scenarios/peer-adoption-metadata-relationship-scoped-adoption/peer-adoption-metadata-relationship-scoped-adoption.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-fonom-conditional-release-selective-send-onward-promises/README.md",
+        "sha256": "0a837d8cec99e559952fc357e9ec480391374a623737d353f792068716a43404"
+      },
+      {
+        "path": "simulations/SIM-fonom-conditional-release-selective-send-onward-promises/QUESTION.md",
+        "sha256": "0203a7fa0bd33e83e523bfd362166c129dc90b8cdb2427fa6a71c96cbf641bce"
+      },
+      {
+        "path": "scenarios/peer-adoption-metadata-relationship-scoped-adoption/peer-adoption-metadata-relationship-scoped-adoption.md",
+        "sha256": "b2a2b0fb4dfcd76dfd88a39d4bb4f4d8a85fafb0b052621a36de8692d19fe3d7"
+      }
+    ],
+    "simulation_tree_hash": "cd3e88d89860fc3ab87f7d04a08a8cd16d6d8239eaba87b821f4fd07b65537d0"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 5,
+    "promisegrid_alignment": 5,
+    "auditability": 4,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 4,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 5,
+    "simplicity_durability": 4,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 43,
+    "normalized_0_100": 86,
+    "confidence_0_1": 0.9
+  },
+  "assessment": {
+    "rationale": "Strong fit. The simulation directly models relationship-scoped behavior as local selective sending plus peer-specific handling promises, which matches the scenario's need for Bob to present different adoption/handling profiles to Alice and Carol without collapsing them into identity-global claims. It stays close to Promise Theory by keeping trust local, intent scoped, and outcomes non-guaranteed.",
+    "strengths": [
+      "Directly supports different promises in different peer relationships.",
+      "Clear Promise-Theory framing: autonomy, local trust, scoped intent.",
+      "Avoids central registry, global trust ledger, and session-command semantics."
+    ],
+    "weaknesses": [
+      "Audit evidence for promise keeping is not fully specified.",
+      "Geofencing/deletion language can still drift toward implied enforcement if not carefully worded."
+    ],
+    "risks": [
+      "Onward-handling promises remain hard to verify if audit evidence is sparse or delayed.",
+      "Users may still misread relationship-scoped promises as enforceable policy rather than observed intent."
+    ],
+    "open_questions": [
+      "What durable local evidence best records whether Bob kept a relationship-scoped onward-handling promise?",
+      "How should Alice describe geofencing or deletion intent without implying enforceable control over Bob or Carol?",
+      "When Bob uses different handling profiles with Alice and Carol, what evidence distinguishes legitimate relationship scoping from misleading double-signaling?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design.",
+    "pt_gate": {
+      "status": "pt_clean",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "Alice, Bob, and Carol act as autonomous peers; no session artifact commands behavior."
+      },
+      "scoped_intent": {
+        "status": "pass",
+        "note": "Promises are explicitly relationship-scoped, matching the scenario's adoption pressure."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "Each peer makes only its own relationship-specific handling promises."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "The design frames onward restraint as Bob's promise, not an assured outcome."
+      },
+      "local_trust_assessment": {
+        "status": "pass",
+        "note": "Alice decides whether to send based on Bob's prior promise history and her local trust update."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "Selective send and later receipt are voluntary choices, not obligation semantics."
+      },
+      "violations": []
+    }
+  }
+}

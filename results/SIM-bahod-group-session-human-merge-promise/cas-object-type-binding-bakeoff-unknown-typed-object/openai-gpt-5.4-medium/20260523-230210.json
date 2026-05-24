@@ -1,0 +1,122 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-bahod-group-session-human-merge-promise-cas-object-type-binding-bakeoff-unknown-typed-object-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000197-SIM-bahod-group-session-human-merge-promise--cas-object-type-binding-bakeoff-unknown-typed-object--openai-gpt-5.4-medium",
+  "sim_id": "SIM-bahod-group-session-human-merge-promise",
+  "scenario_id": "cas-object-type-binding-bakeoff-unknown-typed-object",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-bahod-group-session-human-merge-promise/cas-object-type-binding-bakeoff-unknown-typed-object/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_7373245c13f84f4cbc2ab7871b66bd11",
+    "response_id": "resp_05181e4b63c91537006a123443c7e4819986a0f2a7450c856c",
+    "input_tokens": 7541,
+    "output_tokens": 964,
+    "cost_usd": 0.02669275
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-bahod-group-session-human-merge-promise/",
+    "scenario_path": "scenarios/cas-object-type-binding-bakeoff-unknown-typed-object/cas-object-type-binding-bakeoff-unknown-typed-object.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-bahod-group-session-human-merge-promise/README.md",
+        "sha256": "4964fb355ec738dc3dbac8490e4014efb1064ee16447f9a90bd86f824e3c456d"
+      },
+      {
+        "path": "simulations/SIM-bahod-group-session-human-merge-promise/QUESTION.md",
+        "sha256": "4e94bfbd2c9ebc7df8ee6f74a6e3cf53d56d35ca413a94d40195630069c1a3d7"
+      },
+      {
+        "path": "scenarios/cas-object-type-binding-bakeoff-unknown-typed-object/cas-object-type-binding-bakeoff-unknown-typed-object.md",
+        "sha256": "76f0a7016fa2bad5e53903682706bca4eeb4aa2d099311a4ea52b7280748cf90"
+      }
+    ],
+    "simulation_tree_hash": "bfbeb2ea13f8e4903a0479f07dabee6590d4b6b828775195f8b4861589eb5f91"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 3,
+    "auditability": 3,
+    "evolution_safety": 1,
+    "layer_boundary_clarity": 3,
+    "failure_handling": 0,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 3,
+    "simplicity_durability": 4,
+    "risk_penalty": 4
+  },
+  "fitness": {
+    "raw": 23,
+    "normalized_0_100": 46,
+    "confidence_0_1": 0.92
+  },
+  "assessment": {
+    "rationale": "This simulation is mainly about whether a human-authored merge promise can freeze a specimen by naming exact artifacts, paths, scope, and open questions. That gives some PromiseGrid-relevant evidence about promise wording and auditability, but it does not substantially address the scenario's required behavior for unknown typed CAS objects: opaque store/advertise/forward semantics and explicit avoidance of unsafe parsing. As a result, it aligns better with governance/evidence pressure than with the object-type-binding bakeoff itself.",
+    "strengths": [
+      "Uses explicit promise framing rather than a generic capability card.",
+      "Names exact artifacts and scope, which helps human auditability.",
+      "Small, simple evidence artifact is plausible for early-stage freeze governance."
+    ],
+    "weaknesses": [
+      "Does not define unknown-codec object handling semantics.",
+      "Does not show Dave can store, advertise, and forward opaquely.",
+      "Provides little failure-handling guidance for unsafe parsing avoidance or mixed-version behavior.",
+      "Focuses on merge/freeze governance rather than the scenario's wire-behavior pressure."
+    ],
+    "risks": [
+      "Unknown-type behavior is unspecified, so peers may parse unsafely, reject objects, or fail to forward them consistently.",
+      "Plain-English freeze promises can leave mixed-version interoperability rules too ambiguous for long-lived networks.",
+      "Lack of cryptographic promise tooling weakens durable verification of what exact handling was promised."
+    ],
+    "open_questions": [
+      "Could the human-authored merge promise explicitly promise opaque storage/forwarding behavior for unknown-codec CAS objects?",
+      "How would later tooling bind exact unknown-type handling semantics to the referenced artifacts without scope ambiguity?",
+      "What local audit record would show Dave avoided unsafe parsing rather than merely lacking support?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

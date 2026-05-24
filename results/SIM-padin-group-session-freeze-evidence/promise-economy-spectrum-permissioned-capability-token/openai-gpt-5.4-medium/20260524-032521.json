@@ -1,0 +1,162 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-padin-group-session-freeze-evidence-promise-economy-spectrum-permissioned-capability-token-openai-gpt-5.4-medium-20260524-032521",
+  "run_group_id": "ga-canary-20260523-pt-gate-v3-successors",
+  "cell_id": "ga-canary-20260523-pt-gate-v3-successors-000040-SIM-padin-group-session-freeze-evidence--promise-economy-spectrum-permissioned-capability-token--openai-gpt-5.4-medium",
+  "sim_id": "SIM-padin-group-session-freeze-evidence",
+  "scenario_id": "promise-economy-spectrum-permissioned-capability-token",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260524-032521",
+  "result_path": "results/SIM-padin-group-session-freeze-evidence/promise-economy-spectrum-permissioned-capability-token/openai-gpt-5.4-medium/20260524-032521.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_bd9fcdfe935a4ed6a281e32c47b15ec6",
+    "response_id": "resp_09d27025e2deba86006a12707621ec8199bd5e39dfda932c1f",
+    "input_tokens": 8100,
+    "output_tokens": 1171,
+    "cost_usd": 0.030569
+  },
+  "source": {
+    "repo_commit": "925c7f5c1c7ce7d5b0caf6a924d40d3f9b7d0483",
+    "sim_path": "simulations/SIM-padin-group-session-freeze-evidence/",
+    "scenario_path": "scenarios/promise-economy-spectrum-permissioned-capability-token/promise-economy-spectrum-permissioned-capability-token.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-padin-group-session-freeze-evidence/README.md",
+        "sha256": "43f96cd79379eeb2ae36319c1fd26144cc0a95a86f0c3fc2f9f48bf9024a11d5"
+      },
+      {
+        "path": "simulations/SIM-padin-group-session-freeze-evidence/QUESTION.md",
+        "sha256": "6bdde351a8bd4a900a82304f488913fc2ae0224396de55473b61698525bc1d04"
+      },
+      {
+        "path": "scenarios/promise-economy-spectrum-permissioned-capability-token/promise-economy-spectrum-permissioned-capability-token.md",
+        "sha256": "ac5ba8f29fb13e1d693bdbfb0a5cc1c516750bf4f3a142b8dee90128d13ce2e2"
+      }
+    ],
+    "simulation_tree_hash": "8fbe9da939de6ecdba9776b2cc20f5cb8b910b7381d306b38a6017026c170175"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 4,
+    "auditability": 5,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 2,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 3,
+    "simplicity_durability": 4,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 33,
+    "normalized_0_100": 66,
+    "confidence_0_1": 0.87
+  },
+  "assessment": {
+    "rationale": "Strong Promise-Theory and audit posture, but weak fit for the permissioned capability-token scenario. The candidate explains how exact artifacts can support local verification of a frozen specimen, yet it does not model capability issuance, non-transferability, redemption, or permission scoping without exchange semantics.",
+    "strengths": [
+      "Exact CIDs, verified DAGs, and reproducible checks are highly auditable.",
+      "Clear evidence boundary: artifacts support local peer judgment without central registry.",
+      "Small, explicit specimen framing is relatively durable and implementation-plausible."
+    ],
+    "weaknesses": [
+      "Does not directly represent a permissioned capability token.",
+      "No clear account of redemption, denial, revocation, or scope enforcement.",
+      "Limited failure analysis for adversarial or stale capability evidence."
+    ],
+    "risks": [
+      "Scenario mismatch may overstate usefulness for capability-token design questions.",
+      "Exact frozen evidence may not capture lifecycle events like revocation or expiry.",
+      "Capability semantics could be smuggled in later through out-of-band authority not described here."
+    ],
+    "open_questions": [
+      "Can the same exact-artifact evidence pattern represent issuance, non-transferability, and redemption checks for a capability without adding exchange semantics?",
+      "What locally auditable artifact would show Bob's right to fetch a chunk family and its scope limits?",
+      "How would refusal, expiry, revocation, or stale evidence be represented without central authority?"
+    ],
+    "authority_boundary": "Evidence only; this judges fit to the scenario, not canonical PromiseGrid design.",
+    "pt_gate": {
+      "status": "pt_clean",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "Alice, Bob, and Carol independently assess artifacts and checker results."
+      },
+      "scoped_intent": {
+        "status": "pass",
+        "note": "Intent is narrowly scoped to freezing a specimen slice via exact evidence."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "The simulation does not make one agent promise on behalf of another."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "The freeze promise offers evidence sufficiency, not guaranteed redemption or universal acceptance."
+      },
+      "local_trust_assessment": {
+        "status": "pass",
+        "note": "Trust is based on each peer reproducing DAG and validation outcomes from named artifacts."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "The design centers on reproducible evidence and peer verification, not obligations imposed on receivers."
+      },
+      "violations": []
+    }
+  }
+}

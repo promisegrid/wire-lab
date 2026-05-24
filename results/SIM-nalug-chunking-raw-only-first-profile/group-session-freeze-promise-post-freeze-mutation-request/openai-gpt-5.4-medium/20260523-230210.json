@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-nalug-chunking-raw-only-first-profile-group-session-freeze-promise-post-freeze-mutation-request-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000069-SIM-nalug-chunking-raw-only-first-profile--group-session-freeze-promise-post-freeze-mutation-request--openai-gpt-5.4-medium",
+  "sim_id": "SIM-nalug-chunking-raw-only-first-profile",
+  "scenario_id": "group-session-freeze-promise-post-freeze-mutation-request",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-nalug-chunking-raw-only-first-profile/group-session-freeze-promise-post-freeze-mutation-request/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_ad4b15a1e19143a0b6d3a55e50bdb7c9",
+    "response_id": "resp_0c4834268bf29b4e006a1232bdfe0c8199b6a332a8c97a3a67",
+    "input_tokens": 7536,
+    "output_tokens": 1415,
+    "cost_usd": 0.032998
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-nalug-chunking-raw-only-first-profile/",
+    "scenario_path": "scenarios/group-session-freeze-promise-post-freeze-mutation-request/group-session-freeze-promise-post-freeze-mutation-request.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-nalug-chunking-raw-only-first-profile/README.md",
+        "sha256": "d06e84e3a1b1bddc6ee085761d4cc17706f142ea1bbb990808bdd194f762462a"
+      },
+      {
+        "path": "simulations/SIM-nalug-chunking-raw-only-first-profile/QUESTION.md",
+        "sha256": "36ac5aa1f84e520d63a05b6a46cf0047bbf79b6d7e1c4d6797a61904688f5f63"
+      },
+      {
+        "path": "scenarios/group-session-freeze-promise-post-freeze-mutation-request/group-session-freeze-promise-post-freeze-mutation-request.md",
+        "sha256": "9083e149d879dcf5890bbcc3d3bb2fcf87b4490ba1878e59a73402bd5312ee52"
+      }
+    ],
+    "simulation_tree_hash": "8196e3e0b535f402a9f37e9151e3857701f1c260b2db59f24f35f2bb6c077e74"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 2,
+    "auditability": 4,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 1,
+    "implementation_plausibility": 5,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 5,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 29,
+    "normalized_0_100": 57.99999999999999,
+    "confidence_0_1": 0.84
+  },
+  "assessment": {
+    "rationale": "This simulation is largely orthogonal to the group-session freeze mutation scenario. Its core idea—raw-byte identity only, with chunking deferred—does reinforce immutability and suggests that post-freeze mutation should produce a new artifact or later profile rather than rewrite history. But it does not define freeze semantics, amendment lineage, group-session records, or local peer accounting for a post-freeze change request.",
+    "strengths": [
+      "Very clear first-profile boundary: raw-byte identity only.",
+      "Simple and durable artifact model is easy to audit.",
+      "Immutable content identity pushes against history mutation."
+    ],
+    "weaknesses": [
+      "Does not directly model group-session freeze behavior.",
+      "No explicit supersession or amendment mechanism for post-freeze changes.",
+      "Promise vocabulary is profile-centric rather than concrete agent/payload promises."
+    ],
+    "risks": [
+      "Scenario mismatch may over-credit simple immutability while missing the actual freeze-lineage pressure.",
+      "Deferring chunked identity may complicate later migration from frozen raw-only specimens to richer replication forms.",
+      "Lack of explicit promise/accounting artifacts leaves room for ambiguous amendment handling after freeze."
+    ],
+    "open_questions": [
+      "If freeze evidence exists for a raw-only artifact, does any later structural change require a new specimen, a new profile, or a superseding lineage record?",
+      "How would peers audit post-freeze amendments when the simulation defines content identity but not group-session freeze records or amendment promises?",
+      "Can raw-only identity support sparse large-object replication well enough before a later chunking profile arrives?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

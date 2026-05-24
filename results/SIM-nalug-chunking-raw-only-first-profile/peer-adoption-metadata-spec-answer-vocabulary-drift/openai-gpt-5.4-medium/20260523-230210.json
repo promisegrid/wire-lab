@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-nalug-chunking-raw-only-first-profile-peer-adoption-metadata-spec-answer-vocabulary-drift-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000067-SIM-nalug-chunking-raw-only-first-profile--peer-adoption-metadata-spec-answer-vocabulary-drift--openai-gpt-5.4-medium",
+  "sim_id": "SIM-nalug-chunking-raw-only-first-profile",
+  "scenario_id": "peer-adoption-metadata-spec-answer-vocabulary-drift",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-nalug-chunking-raw-only-first-profile/peer-adoption-metadata-spec-answer-vocabulary-drift/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_2874b74d1628491ba4c2a2ed3adf3d76",
+    "response_id": "resp_02cf929ce15f8623006a1232b5cc2c819a90ed174c6eb0fc77",
+    "input_tokens": 7535,
+    "output_tokens": 942,
+    "cost_usd": 0.02637425
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-nalug-chunking-raw-only-first-profile/",
+    "scenario_path": "scenarios/peer-adoption-metadata-spec-answer-vocabulary-drift/peer-adoption-metadata-spec-answer-vocabulary-drift.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-nalug-chunking-raw-only-first-profile/README.md",
+        "sha256": "d06e84e3a1b1bddc6ee085761d4cc17706f142ea1bbb990808bdd194f762462a"
+      },
+      {
+        "path": "simulations/SIM-nalug-chunking-raw-only-first-profile/QUESTION.md",
+        "sha256": "36ac5aa1f84e520d63a05b6a46cf0047bbf79b6d7e1c4d6797a61904688f5f63"
+      },
+      {
+        "path": "scenarios/peer-adoption-metadata-spec-answer-vocabulary-drift/peer-adoption-metadata-spec-answer-vocabulary-drift.md",
+        "sha256": "a9e8ba84995e69fcad36f2554442cc62c5e1128ea0818197cb7ebf66e843ff53"
+      }
+    ],
+    "simulation_tree_hash": "8196e3e0b535f402a9f37e9151e3857701f1c260b2db59f24f35f2bb6c077e74"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 3,
+    "auditability": 3,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 1,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 5,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 28,
+    "normalized_0_100": 56.00000000000001,
+    "confidence_0_1": 0.88
+  },
+  "assessment": {
+    "rationale": "This specimen is only a partial fit for the scenario. It is clear and plausibly useful as a first-profile CAS simplification, but the scenario asks how adoption metadata answers survive frozen-spec vocabulary drift. The simulation does not define answer-key naming, migration records, or spec/profile-local metadata conventions, so it cannot directly resolve the ambiguity pressure. It scores better on simplicity, boundary clarity, and evolvability-by-deferral than on scenario coverage.",
+    "strengths": [
+      "Very simple, durable first-profile idea centered on raw-byte identity.",
+      "Clear boundary between current raw identity promises and later chunking/profile work.",
+      "Deferral reduces early protocol debt and may ease future evolution."
+    ],
+    "weaknesses": [
+      "Does not directly model adoption metadata, answer keys, or spec-local vocabulary.",
+      "Provides little failure-handling or migration behavior for renamed/removed questions.",
+      "Promise wording is limited and not strongly expressed as payload-level promises."
+    ],
+    "risks": [
+      "Old adoption claims may become ambiguous if later specs rename or remove fields without an explicit migration artifact.",
+      "Deferring chunked identity may also defer the metadata structure needed to audit cross-version claims.",
+      "Peers may infer generic profile support claims instead of narrow payload-specific promises if vocabulary is not pinned."
+    ],
+    "open_questions": [
+      "Can a raw-only first profile carry spec-local answer-key bindings without introducing a separate metadata migration layer?",
+      "What durable migration record would map old profile/spec question names to new ones under sparse peer knowledge?",
+      "Does deferring chunked identity also defer too much evidence for large-object replication and profile adoption claims?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

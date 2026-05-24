@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-gadol-peer-adoption-promise-message-transport-family-bakeoff-per-hop-authorization-failure-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000136-SIM-gadol-peer-adoption-promise-message--transport-family-bakeoff-per-hop-authorization-failure--openai-gpt-5.4-medium",
+  "sim_id": "SIM-gadol-peer-adoption-promise-message",
+  "scenario_id": "transport-family-bakeoff-per-hop-authorization-failure",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-gadol-peer-adoption-promise-message/transport-family-bakeoff-per-hop-authorization-failure/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_a01065d74484472e955c08b7f68a5583",
+    "response_id": "resp_0f866858c58bdf46006a1233870de0819bbe8e6159df3cade1",
+    "input_tokens": 7524,
+    "output_tokens": 947,
+    "cost_usd": 0.026425
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-gadol-peer-adoption-promise-message/",
+    "scenario_path": "scenarios/transport-family-bakeoff-per-hop-authorization-failure/transport-family-bakeoff-per-hop-authorization-failure.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-gadol-peer-adoption-promise-message/README.md",
+        "sha256": "b7767c1a9279ef3c1a9bcc08a1d96a87259fe4e5090fa06ad2811a397fef49d3"
+      },
+      {
+        "path": "simulations/SIM-gadol-peer-adoption-promise-message/QUESTION.md",
+        "sha256": "3096ee94cbc1ba2247fc46b908d4e215cbe96af054b7943f6b6d567185b6df3b"
+      },
+      {
+        "path": "scenarios/transport-family-bakeoff-per-hop-authorization-failure/transport-family-bakeoff-per-hop-authorization-failure.md",
+        "sha256": "f938e10ab88db666d3097a2f97c1667bbbc6e8e071681134049068982cc39cf2"
+      }
+    ],
+    "simulation_tree_hash": "cc25bca5323b36b38c3d31b1314bf64a50e08e8631c97040b6e872ad0548e43a"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 4,
+    "auditability": 3,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 3,
+    "failure_handling": 1,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 5,
+    "simplicity_durability": 5,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 32,
+    "normalized_0_100": 64,
+    "confidence_0_1": 0.9
+  },
+  "assessment": {
+    "rationale": "The simulation is strongly promise-first and durable as an adoption artifact, but it does not really model transport-family ring behavior or per-hop authorization failure. It helps with peer-local adoption evidence, not with deciding whether a ring breaks, skips a hop, records refusal, or reconfigures membership when forwarding is denied.",
+    "strengths": [
+      "Uses an ordinary promise message rather than a special metadata object, which fits PromiseGrid's promise-first direction.",
+      "Adoption claims are small, explicit, and likely durable enough for long-term storage and relay.",
+      "Supersession under normal promise-accounting rules supports evolution without a central registry."
+    ],
+    "weaknesses": [
+      "Does not define ring or per-hop transport semantics.",
+      "Does not explain what Bob records when he is unauthorized to forward to Carol.",
+      "Does not resolve whether the ring breaks, skips a hop, records refusal, or reconfigures membership under authorization failure."
+    ],
+    "risks": [
+      "Category error: scoring an adoption-message design against a transport-hop failure scenario may over-credit unrelated strengths.",
+      "Missing failure semantics could hide how authorization denial is observed and recorded by downstream peers.",
+      "If adoption promises are mistaken for transport authorization promises, layer boundaries may blur."
+    ],
+    "open_questions": [
+      "Can the ordinary promise-message adoption artifact be extended with explicit refusal or non-forwarding evidence without collapsing transport and adoption layers?",
+      "If a peer is unauthorized to relay, what peer-local record should later auditors use to distinguish refusal, policy denial, and broken transport?",
+      "Would a separate transport-level promise be required before this adoption-message approach can speak to per-hop authorization failures?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

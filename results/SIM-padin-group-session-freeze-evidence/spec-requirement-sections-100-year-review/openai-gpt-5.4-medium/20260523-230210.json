@@ -1,0 +1,123 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-padin-group-session-freeze-evidence-spec-requirement-sections-100-year-review-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000187-SIM-padin-group-session-freeze-evidence--spec-requirement-sections-100-year-review--openai-gpt-5.4-medium",
+  "sim_id": "SIM-padin-group-session-freeze-evidence",
+  "scenario_id": "spec-requirement-sections-100-year-review",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-padin-group-session-freeze-evidence/spec-requirement-sections-100-year-review/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_1f459ea7d52f4dab85749eb9d194008f",
+    "response_id": "resp_08aed83e5e5298c7006a123424c354819bb27b830d380f7b34",
+    "input_tokens": 7500,
+    "output_tokens": 1354,
+    "cost_usd": 0.032081
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-padin-group-session-freeze-evidence/",
+    "scenario_path": "scenarios/spec-requirement-sections-100-year-review/spec-requirement-sections-100-year-review.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-padin-group-session-freeze-evidence/README.md",
+        "sha256": "43f96cd79379eeb2ae36319c1fd26144cc0a95a86f0c3fc2f9f48bf9024a11d5"
+      },
+      {
+        "path": "simulations/SIM-padin-group-session-freeze-evidence/QUESTION.md",
+        "sha256": "6bdde351a8bd4a900a82304f488913fc2ae0224396de55473b61698525bc1d04"
+      },
+      {
+        "path": "scenarios/spec-requirement-sections-100-year-review/spec-requirement-sections-100-year-review.md",
+        "sha256": "b2e71192b720372495986fad6387d0bfd5222ce78a7cfd9da03940d1a1062cd7"
+      }
+    ],
+    "simulation_tree_hash": "8fbe9da939de6ecdba9776b2cc20f5cb8b910b7381d306b38a6017026c170175"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 4,
+    "auditability": 5,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 2,
+    "implementation_plausibility": 5,
+    "promise_vocabulary": 4,
+    "simplicity_durability": 4,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 36,
+    "normalized_0_100": 72,
+    "confidence_0_1": 0.82
+  },
+  "assessment": {
+    "rationale": "Exact CIDs, a verified message DAG, and reproducible checker outcomes make this simulation strong on auditability and concrete evidence preservation. That helps long-horizon review, but the candidate is not primarily a spec-section design and does not explicitly define the assumption-preserving sections, migration notes, or future-reader guidance this scenario is asking for.",
+    "strengths": [
+      "Uses exact artifacts and reproducible checks that support later audit.",
+      "Boundary is clear: evidence for freezing, not the whole protocol freeze.",
+      "Concrete message-DAG evidence fits sparse, peer-local verification better than central registries.",
+      "Implementation approach is straightforward and testable."
+    ],
+    "weaknesses": [
+      "Does not directly define required long-horizon spec sections.",
+      "Assumption preservation for future readers is mostly implicit.",
+      "Evolution and migration behavior are under-specified.",
+      "Failure and disagreement handling are not a central part of the design."
+    ],
+    "risks": [
+      "Future readers may have the artifacts but still lack the narrative assumptions needed to interpret them correctly.",
+      "Durability may depend too much on reproducing current parser/checker behavior rather than a small timeless textual contract.",
+      "A freeze-evidence specimen could be treated as sufficient documentation even when requirement-section gaps remain."
+    ],
+    "open_questions": [
+      "What exact spec section would preserve the frozen specimen's assumptions for a reader 100 years later?",
+      "How are parser/checker behaviors specified so future reimplementations do not depend on today's tooling stack?",
+      "What failure evidence should be preserved when reproduced validation disagrees across implementations?"
+    ],
+    "authority_boundary": "Evidence only; supports judging whether specimen evidence is sufficient to justify a freeze decision, but does not settle PromiseGrid design or the required long-horizon spec-section structure."
+  }
+}

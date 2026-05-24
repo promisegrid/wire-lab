@@ -1,0 +1,177 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields-promise-economy-spectrum-transferable-promise-token-openai-gpt-5.4-medium-20260524-024852",
+  "run_group_id": "ga-canary-20260523-pt-gate-v3",
+  "cell_id": "ga-canary-20260523-pt-gate-v3-000015-SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields--promise-economy-spectrum-transferable-promise-token--openai-gpt-5.4-medium",
+  "sim_id": "SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields",
+  "scenario_id": "promise-economy-spectrum-transferable-promise-token",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260524-024852",
+  "result_path": "results/SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields/promise-economy-spectrum-transferable-promise-token/openai-gpt-5.4-medium/20260524-024852.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_4a736279358648ffb9157f3f6ba5cfc2",
+    "response_id": "resp_0c5f479b2b22d1c7006a1267756ff8819bbfc85be57b0470ac",
+    "input_tokens": 9045,
+    "output_tokens": 2745,
+    "cost_usd": 0.05425875
+  },
+  "source": {
+    "repo_commit": "ec652bd3ecaaf2f904e62cff00e113a88c7e3efd",
+    "sim_path": "simulations/SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields/",
+    "scenario_path": "scenarios/promise-economy-spectrum-transferable-promise-token/promise-economy-spectrum-transferable-promise-token.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields/README.md",
+        "sha256": "3ab052fe6b0a0513740136a232eeaf2f73e992923012280c92c2e159c8fb0a9c"
+      },
+      {
+        "path": "simulations/SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields/QUESTION.md",
+        "sha256": "707280a55807f9fce459bf58b891379e28a66c77fbedf1c263937113936a25d3"
+      },
+      {
+        "path": "simulations/SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields/protocols/grid-envelope.d/CHANGELOG.md",
+        "sha256": "3652c6b6111b64750a90c10edf0da60a2d88777a2c3313477f21490d61d97201"
+      },
+      {
+        "path": "simulations/SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "68d7443d65d236f5471fac7781b122413a1f5ba914587b2b3522c8b3677062d9"
+      },
+      {
+        "path": "scenarios/promise-economy-spectrum-transferable-promise-token/promise-economy-spectrum-transferable-promise-token.md",
+        "sha256": "abaf39f500a3cf675bc528e6367b46bd6ded03011700c415d728dbe7cb8b0019"
+      }
+    ],
+    "simulation_tree_hash": "cee27e908e02ebb98055f64a9a1750e4c150996dd05c4c53e16ec029927598f1"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 2,
+    "auditability": 2,
+    "evolution_safety": 2,
+    "layer_boundary_clarity": 2,
+    "failure_handling": 2,
+    "implementation_plausibility": 3,
+    "promise_vocabulary": 0,
+    "simplicity_durability": 1,
+    "risk_penalty": 4
+  },
+  "fitness": {
+    "raw": 16,
+    "normalized_0_100": 32,
+    "confidence_0_1": 0.83
+  },
+  "assessment": {
+    "rationale": "Useful as a conservative wire-envelope experiment, but weak for this scenario because it does not model transferable promise-token semantics. It can carry opaque evidence, yet provenance, permission, double-spend prevention, refusal, and signer meaning are all pushed into per-pCID schemas, which reduces generic auditability and century-scale recoverability.",
+    "strengths": [
+      "Deterministic CBOR bytes give a stable local evidence artifact.",
+      "Unknown-pCID handling is conservative and avoids false interpretation.",
+      "The specimen does not rely on a central registry or global trust ledger."
+    ],
+    "weaknesses": [
+      "The design is an envelope only, not a transferable promise-token protocol.",
+      "No universal payload or signature fields means generic provenance audit is weak.",
+      "Permission, double-spend, and refusal semantics are entirely external to the envelope.",
+      "100-year interoperability depends heavily on preserving per-pCID specs and handlers."
+    ],
+    "risks": [
+      "Per-pCID token schemas can make signature-coverage or type-substitution mistakes that generic tooling cannot detect.",
+      "Opaque later fields make independent provenance audit and indexing difficult when handlers are missing.",
+      "Variable arity plus unresolved size limits increases denial-of-service and archival ambiguity risk.",
+      "A token schema layered on this envelope could accidentally drift into obligation-style transfer semantics."
+    ],
+    "open_questions": [
+      "Can a per-pCID token schema make provenance and refusal locally auditable without any universal outer payload/proof fields?",
+      "How would double-spend prevention remain peer-local and durable without introducing a central authority?",
+      "What machine-readable metadata must survive with a pCID so a future auditor can recover field meaning after tool loss?",
+      "What field-count or size limits are needed to prevent adversarial variable-arity envelopes from becoming a DoS vector?"
+    ],
+    "authority_boundary": "Evidence only; this envelope specimen does not settle PromiseGrid design or promise-token semantics.",
+    "pt_gate": {
+      "status": "pt_reframe_needed",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "The envelope format does not command agent behavior; interpretation remains local to handlers and peers."
+      },
+      "scoped_intent": {
+        "status": "warning",
+        "note": "This is a protocol-envelope draft, not a promise-first scoped declaration of agent intent."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "The specimen does not claim one agent can promise acceptance or performance on behalf of another."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "The draft does not guarantee redemption, transfer success, or other outcomes."
+      },
+      "local_trust_assessment": {
+        "status": "warning",
+        "note": "Verification is delegated to schema-local handlers, but trust is not explicitly framed as a local assessment of promises."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "The draft allows local store/forward/use choices and does not equate receipt with obligation."
+      },
+      "violations": [
+        "Protocol-centric rather than promise-first framing.",
+        "Trust and verification are expressed as handler/schema mechanics instead of explicit local trust assessments.",
+        "Transferable-token promise semantics are delegated outside the specimen, leaving promise/refusal meaning underspecified."
+      ]
+    }
+  }
+}

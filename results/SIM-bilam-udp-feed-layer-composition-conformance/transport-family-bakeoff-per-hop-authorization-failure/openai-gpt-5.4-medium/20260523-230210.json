@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-bilam-udp-feed-layer-composition-conformance-transport-family-bakeoff-per-hop-authorization-failure-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000234-SIM-bilam-udp-feed-layer-composition-conformance--transport-family-bakeoff-per-hop-authorization-failure--openai-gpt-5.4-medium",
+  "sim_id": "SIM-bilam-udp-feed-layer-composition-conformance",
+  "scenario_id": "transport-family-bakeoff-per-hop-authorization-failure",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-bilam-udp-feed-layer-composition-conformance/transport-family-bakeoff-per-hop-authorization-failure/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_1233671cce6b48ea87ddd3d3bc8612d3",
+    "response_id": "resp_09bfd3d7fc8a5972006a1234aa7390819b83adf04d63d92952",
+    "input_tokens": 7531,
+    "output_tokens": 1143,
+    "cost_usd": 0.02918125
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-bilam-udp-feed-layer-composition-conformance/",
+    "scenario_path": "scenarios/transport-family-bakeoff-per-hop-authorization-failure/transport-family-bakeoff-per-hop-authorization-failure.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-bilam-udp-feed-layer-composition-conformance/README.md",
+        "sha256": "679fb3e0e7ef397eab2c4e9bbd702a0917bcec69a8093b18a8080eb984b93bc8"
+      },
+      {
+        "path": "simulations/SIM-bilam-udp-feed-layer-composition-conformance/QUESTION.md",
+        "sha256": "c771644ce2de0dc1fc356c7cdb8f6e2f471a406c71e1a427a2db0077f31855ce"
+      },
+      {
+        "path": "scenarios/transport-family-bakeoff-per-hop-authorization-failure/transport-family-bakeoff-per-hop-authorization-failure.md",
+        "sha256": "f938e10ab88db666d3097a2f97c1667bbbc6e8e071681134049068982cc39cf2"
+      }
+    ],
+    "simulation_tree_hash": "fc9f51cd962d3438f6bb96a1c7baa9fa2be765dca50bb60b16dde4a672aede9f"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 3,
+    "auditability": 3,
+    "evolution_safety": 2,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 1,
+    "implementation_plausibility": 3,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 3,
+    "risk_penalty": 4
+  },
+  "fitness": {
+    "raw": 23,
+    "normalized_0_100": 46,
+    "confidence_0_1": 0.78
+  },
+  "assessment": {
+    "rationale": "This simulation is mainly a transport-to-session composition test, not a concrete ring or forwarding-authorization design. It aligns with PromiseGrid by insisting higher layers preserve their own promises and by keeping transport and session concerns separate, but it does not specify the per-hop authorization behavior the scenario asks to compare.",
+    "strengths": [
+      "Clear boundary between UDP-feed transport and higher-layer session semantics.",
+      "Explicit requirement for auditable composition evidence.",
+      "Plausible minimal candidate for testing whether transport alone is insufficient."
+    ],
+    "weaknesses": [
+      "Poor direct fit to ring-style per-hop authorization failure.",
+      "No concrete higher-layer protocol or authorization promise vocabulary.",
+      "Failure handling for unauthorized forwarding is unspecified."
+    ],
+    "risks": [
+      "Transport conformance could be overrated without a concrete higher-layer authorization protocol.",
+      "The scenario may be only weakly covered, producing ambiguous comparison evidence.",
+      "Missing refusal and membership-reconfiguration semantics make failure behavior hard to audit."
+    ],
+    "open_questions": [
+      "What higher-layer protocol riding over UDP-feed would define and record per-hop authorization promises?",
+      "Can composition evidence show a local refusal record when an intermediate peer is not authorized to forward?",
+      "Should UDP-feed v0 be judged inapplicable to ring-style authorization scenarios until a concrete session layer exists?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

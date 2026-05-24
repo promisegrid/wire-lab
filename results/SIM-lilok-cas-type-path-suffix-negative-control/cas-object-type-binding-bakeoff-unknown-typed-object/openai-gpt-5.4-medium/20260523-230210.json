@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-lilok-cas-type-path-suffix-negative-control-cas-object-type-binding-bakeoff-unknown-typed-object-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000036-SIM-lilok-cas-type-path-suffix-negative-control--cas-object-type-binding-bakeoff-unknown-typed-object--openai-gpt-5.4-medium",
+  "sim_id": "SIM-lilok-cas-type-path-suffix-negative-control",
+  "scenario_id": "cas-object-type-binding-bakeoff-unknown-typed-object",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-lilok-cas-type-path-suffix-negative-control/cas-object-type-binding-bakeoff-unknown-typed-object/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_3caa7a9c487642bc977035c9be7a0fc4",
+    "response_id": "resp_0392cd735d50c91e006a1232573f5c8198bda87e32494b6bc1",
+    "input_tokens": 7552,
+    "output_tokens": 1231,
+    "cost_usd": 0.03045
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-lilok-cas-type-path-suffix-negative-control/",
+    "scenario_path": "scenarios/cas-object-type-binding-bakeoff-unknown-typed-object/cas-object-type-binding-bakeoff-unknown-typed-object.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-lilok-cas-type-path-suffix-negative-control/README.md",
+        "sha256": "01679bfb564db2b4f8adfc4535d1a02413330fa05cea0bc288f12d5ab519c086"
+      },
+      {
+        "path": "simulations/SIM-lilok-cas-type-path-suffix-negative-control/QUESTION.md",
+        "sha256": "b1845d40f8012e290f866398d59d22236cd65c974e210c8040a4f1ed2dc86297"
+      },
+      {
+        "path": "scenarios/cas-object-type-binding-bakeoff-unknown-typed-object/cas-object-type-binding-bakeoff-unknown-typed-object.md",
+        "sha256": "76f0a7016fa2bad5e53903682706bca4eeb4aa2d099311a4ea52b7280748cf90"
+      }
+    ],
+    "simulation_tree_hash": "0fe117659bfa499dd1f42891807e2ccdb2da83ab00099599578ffabf5fa458d6"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 0,
+    "auditability": 3,
+    "evolution_safety": 0,
+    "layer_boundary_clarity": 1,
+    "failure_handling": 0,
+    "implementation_plausibility": 3,
+    "promise_vocabulary": 0,
+    "simplicity_durability": 1,
+    "risk_penalty": 5
+  },
+  "fitness": {
+    "raw": 9,
+    "normalized_0_100": 18,
+    "confidence_0_1": 0.95
+  },
+  "assessment": {
+    "rationale": "This specimen is a useful negative control because it makes the failure mode explicit: path-local suffixes do not travel with CID bytes reliably, so they cannot serve as primary object-type binding in a mixed-version CAS network. Under the scenario, an unknown-codec peer needs a safe opaque rule; suffix binding instead depends on local naming context and invites divergent interpretation after rename, export, or relay.",
+    "strengths": [
+      "Very clear negative-control specimen for demonstrating why path-local naming is insufficient.",
+      "Easy to audit because the failure mode is concrete and inspectable.",
+      "Locally simple to implement as a storage convention."
+    ],
+    "weaknesses": [
+      "Fails the scenario's opaque store-and-forward pressure for unknown codecs.",
+      "Confuses storage path naming with durable CAS object semantics.",
+      "Same CID can acquire different meanings across peers or over time.",
+      "Uses non-promise-first vocabulary and weak PromiseGrid framing."
+    ],
+    "risks": [
+      "Different peers may assign different types to the same CID based on local filenames or archive paths.",
+      "Unknown-type objects may be parsed unsafely or mishandled because type inference is decoupled from the bytes.",
+      "Long-term archives, mirrors, and content moves can silently strip or rewrite the only type signal."
+    ],
+    "open_questions": [
+      "Can path suffixes be retained only as optional local hints while primary type binding stays in the content-addressed bytes or referenced protocol spec?",
+      "What minimal artifact lets an unknown-codec peer store and forward the object opaquely without inferring type from local filenames?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

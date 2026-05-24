@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-lozuk-l6-cas-ipfs-ipld-starting-profile-spec-requirement-sections-100-year-review-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000005-SIM-lozuk-l6-cas-ipfs-ipld-starting-profile--spec-requirement-sections-100-year-review--openai-gpt-5.4-medium",
+  "sim_id": "SIM-lozuk-l6-cas-ipfs-ipld-starting-profile",
+  "scenario_id": "spec-requirement-sections-100-year-review",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-lozuk-l6-cas-ipfs-ipld-starting-profile/spec-requirement-sections-100-year-review/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_b89002e7e9e44b738962e677aaf513db",
+    "response_id": "resp_040044d2ac0a9f4b006a1231f665e0819aa54751092481ca76",
+    "input_tokens": 7600,
+    "output_tokens": 957,
+    "cost_usd": 0.026698
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-lozuk-l6-cas-ipfs-ipld-starting-profile/",
+    "scenario_path": "scenarios/spec-requirement-sections-100-year-review/spec-requirement-sections-100-year-review.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-lozuk-l6-cas-ipfs-ipld-starting-profile/README.md",
+        "sha256": "60dfa034360800265f33acf508dcf428a2b8c0d404509cb9d0dfcb92a656aac2"
+      },
+      {
+        "path": "simulations/SIM-lozuk-l6-cas-ipfs-ipld-starting-profile/QUESTION.md",
+        "sha256": "799541890c2ad70dc9b76c1e1da3c3b90bb980b08d4754adc26d4612add52bf6"
+      },
+      {
+        "path": "scenarios/spec-requirement-sections-100-year-review/spec-requirement-sections-100-year-review.md",
+        "sha256": "b2e71192b720372495986fad6387d0bfd5222ce78a7cfd9da03940d1a1062cd7"
+      }
+    ],
+    "simulation_tree_hash": "60a5f82d2ae49fd25d4909ed71a2c0c8c577758a9fe863f70e5205958bc1d99c"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 3,
+    "auditability": 2,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 1,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 3,
+    "simplicity_durability": 3,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 27,
+    "normalized_0_100": 54,
+    "confidence_0_1": 0.75
+  },
+  "assessment": {
+    "rationale": "The simulation is a plausible, fairly clear CAS-profile candidate, with explicit separation between CAS object identity and pCID-owned payload semantics. That helps PromiseGrid alignment and implementation plausibility. But this scenario asks for long-horizon spec-section intelligibility, and the simulation does not yet show a concrete required-section home, review procedure, or future-reader audit path. Its IPLD/IPFS alignment improves bridgeability while also importing external vocabulary and registry-drift risk that weakens 100-year durability fit.",
+    "strengths": [
+      "Explicit CAS-layer vs payload-semantics boundary.",
+      "Deterministic structured-object direction via DAG-CBOR.",
+      "High implementation plausibility because it reuses known content-addressed conventions."
+    ],
+    "weaknesses": [
+      "Weak direct fit to a scenario about required long-horizon spec sections.",
+      "Limited promise-first wording; much of the text is profile/spec framing rather than concrete peer promises.",
+      "Little explicit failure-handling or future-audit procedure."
+    ],
+    "risks": [
+      "Long-horizon understanding may depend on external IPLD/CID/multicodec context rather than a self-contained PromiseGrid section set.",
+      "Bridgeability choices may pull in complexity or registry assumptions that age poorly.",
+      "Failure and stale-tooling behavior are not specified for future audits."
+    ],
+    "open_questions": [
+      "Does the profile define any durable required spec-section structure for future readers, or only object-format choices?",
+      "Can CIDv1/multicodec dependencies be frozen or profiled tightly enough for 100-year intelligibility without external registry dependence?",
+      "What local audit record would Carol keep to verify payload semantics when tooling and host assumptions have changed?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

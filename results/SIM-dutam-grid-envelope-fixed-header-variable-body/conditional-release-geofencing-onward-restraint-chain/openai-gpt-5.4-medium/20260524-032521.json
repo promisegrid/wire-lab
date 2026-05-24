@@ -1,0 +1,162 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-dutam-grid-envelope-fixed-header-variable-body-conditional-release-geofencing-onward-restraint-chain-openai-gpt-5.4-medium-20260524-032521",
+  "run_group_id": "ga-canary-20260523-pt-gate-v3-successors",
+  "cell_id": "ga-canary-20260523-pt-gate-v3-successors-000012-SIM-dutam-grid-envelope-fixed-header-variable-body--conditional-release-geofencing-onward-restraint-chain--openai-gpt-5.4-medium",
+  "sim_id": "SIM-dutam-grid-envelope-fixed-header-variable-body",
+  "scenario_id": "conditional-release-geofencing-onward-restraint-chain",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260524-032521",
+  "result_path": "results/SIM-dutam-grid-envelope-fixed-header-variable-body/conditional-release-geofencing-onward-restraint-chain/openai-gpt-5.4-medium/20260524-032521.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_e73a07d4ca61449ca28996d9a51af258",
+    "response_id": "resp_04c2bbcb006a63e3006a126fd1882081998055282400b6b11c",
+    "input_tokens": 8272,
+    "output_tokens": 1423,
+    "cost_usd": 0.034398
+  },
+  "source": {
+    "repo_commit": "925c7f5c1c7ce7d5b0caf6a924d40d3f9b7d0483",
+    "sim_path": "simulations/SIM-dutam-grid-envelope-fixed-header-variable-body/",
+    "scenario_path": "scenarios/conditional-release-geofencing-onward-restraint-chain/conditional-release-geofencing-onward-restraint-chain.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-dutam-grid-envelope-fixed-header-variable-body/README.md",
+        "sha256": "36e655e9147306232cd1d4d874dbc7792e6eab7cc359251aee487b33d4b7c7b9"
+      },
+      {
+        "path": "simulations/SIM-dutam-grid-envelope-fixed-header-variable-body/QUESTION.md",
+        "sha256": "3790d466579bdf56d98055c4a630d802ca0d3ec042c01606860ff83f073621b0"
+      },
+      {
+        "path": "scenarios/conditional-release-geofencing-onward-restraint-chain/conditional-release-geofencing-onward-restraint-chain.md",
+        "sha256": "3c84fc46e1b14de5e5c6e9b029fcb891bd655238b45e516b20eda97dabe8ff24"
+      }
+    ],
+    "simulation_tree_hash": "41922bc0db1ac263325ae5ab91a03e187f0e61c5985a29f4f566745634f65fdb"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 4,
+    "auditability": 4,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 2,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 3,
+    "simplicity_durability": 5,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 35,
+    "normalized_0_100": 70,
+    "confidence_0_1": 0.76
+  },
+  "assessment": {
+    "rationale": "Strong PromiseGrid fit as a durable, auditable carrier pattern, but only partial fit for this scenario because it does not itself decide where the recursive onward-restraint chain semantics live.",
+    "strengths": [
+      "Small fixed header improves generic later audit across evolving body formats.",
+      "Clear separation between stable outer contract and variable body supports evolution.",
+      "Can carry body bytes or references, which suits sparse-knowledge and CAS-oriented designs."
+    ],
+    "weaknesses": [
+      "Does not specify the onward-restraint graph model required by the scenario.",
+      "Failure handling for broken or missing downstream promises is not defined.",
+      "Promise wording is implicit in the simulation and not expressed as explicit payload promises."
+    ],
+    "risks": [
+      "Scenario semantics may be deferred into body protocols with inconsistent representations across pCIDs.",
+      "Optional proof slot may be too vague for interoperable audit of multi-hop restraint chains.",
+      "A generic envelope could hide important policy distinctions unless body protocols are tightly documented."
+    ],
+    "open_questions": [
+      "Should onward-restraint promises live in the variable body as a reusable payload protocol, or at a higher session/feed layer?",
+      "What minimal proof/evidence shape is needed in the optional header slot to audit chained conditional-release promises across hops?",
+      "How should later peers distinguish a body that states Bob's own forwarding intent from one merely relaying Alice's conditions?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design.",
+    "pt_gate": {
+      "status": "pt_clean",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "The design preserves autonomous peers; it defines a carrier shape, not a commanding authority."
+      },
+      "scoped_intent": {
+        "status": "pass",
+        "note": "A fixed header plus pCID-defined body cleanly scopes what is stable versus protocol-specific intent."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "It can represent Bob's own promise without implying Alice can promise on Carol's behalf."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "The envelope can carry conditional-release evidence, but it does not guarantee downstream compliance."
+      },
+      "local_trust_assessment": {
+        "status": "pass",
+        "note": "Stable header fields and optional proof support local inspection, while trust in onward-restraint promises remains peer-local."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "Receiving or parsing the envelope does not itself impose acceptance or forwarding obligations."
+      },
+      "violations": []
+    }
+  }
+}

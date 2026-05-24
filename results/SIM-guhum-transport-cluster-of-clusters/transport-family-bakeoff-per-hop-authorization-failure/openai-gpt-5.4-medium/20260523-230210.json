@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-guhum-transport-cluster-of-clusters-transport-family-bakeoff-per-hop-authorization-failure-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000108-SIM-guhum-transport-cluster-of-clusters--transport-family-bakeoff-per-hop-authorization-failure--openai-gpt-5.4-medium",
+  "sim_id": "SIM-guhum-transport-cluster-of-clusters",
+  "scenario_id": "transport-family-bakeoff-per-hop-authorization-failure",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-guhum-transport-cluster-of-clusters/transport-family-bakeoff-per-hop-authorization-failure/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_4000028706174f9da1bcf5c1b04d29a9",
+    "response_id": "resp_08df6995acd4ae78006a123337d1a8819890f61229a04d89e9",
+    "input_tokens": 7518,
+    "output_tokens": 1078,
+    "cost_usd": 0.0282485
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-guhum-transport-cluster-of-clusters/",
+    "scenario_path": "scenarios/transport-family-bakeoff-per-hop-authorization-failure/transport-family-bakeoff-per-hop-authorization-failure.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-guhum-transport-cluster-of-clusters/README.md",
+        "sha256": "9faf90179b085adf41d297b03e68fcea05f1036b00e1b289da4be5f7765e7350"
+      },
+      {
+        "path": "simulations/SIM-guhum-transport-cluster-of-clusters/QUESTION.md",
+        "sha256": "9c28415f96b79e449c81152d12b31194c886b19e458c9865af66f5e07c381955"
+      },
+      {
+        "path": "scenarios/transport-family-bakeoff-per-hop-authorization-failure/transport-family-bakeoff-per-hop-authorization-failure.md",
+        "sha256": "f938e10ab88db666d3097a2f97c1667bbbc6e8e071681134049068982cc39cf2"
+      }
+    ],
+    "simulation_tree_hash": "0c3d3b4f767b25b25cd7017af80c516d7440b523c53d81768d763ddb4e97dfe2"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 3,
+    "auditability": 3,
+    "evolution_safety": 2,
+    "layer_boundary_clarity": 3,
+    "failure_handling": 1,
+    "implementation_plausibility": 3,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 2,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 23,
+    "normalized_0_100": 46,
+    "confidence_0_1": 0.78
+  },
+  "assessment": {
+    "rationale": "The simulation is relevant because it is a transport candidate centered on peer-local cluster promises and explicit concern about avoiding central routing authority. But this scenario asks for a concrete per-hop authorization failure model, and the specimen does not define how an unauthorized forward is refused, recorded, or recovered from. Its hierarchy may help localize policy, yet summary promises between clusters risk obscuring the exact failed hop and introducing hidden authority at cluster boundaries.",
+    "strengths": [
+      "Explicitly frames transport in promise terms at cluster scope.",
+      "Targets scaling without a central routing authority.",
+      "Provides a plausible place for local authorization policy at each cluster relay."
+    ],
+    "weaknesses": [
+      "Scenario is ring/per-hop specific while the simulation does not define ring failure semantics.",
+      "No explicit refusal record, retry, reroute, or membership-reconfiguration behavior.",
+      "Addressing and governance are unresolved, weakening long-term evolution and audit clarity."
+    ],
+    "risks": [
+      "Cluster boundaries may become de facto routing or policy authorities.",
+      "Inter-cluster summary promises may hide the specific refusal evidence needed for audit.",
+      "Undefined failure semantics could cause inconsistent stop/skip/reroute behavior across clusters."
+    ],
+    "open_questions": [
+      "Can a cluster relay refusal be recorded and propagated without hidden global state?",
+      "When an inter-cluster hop is unauthorized, does the design reroute, stop, or reconfigure membership?",
+      "Do cluster summary promises preserve enough detail for later human/LLM audit of per-hop authorization failures?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

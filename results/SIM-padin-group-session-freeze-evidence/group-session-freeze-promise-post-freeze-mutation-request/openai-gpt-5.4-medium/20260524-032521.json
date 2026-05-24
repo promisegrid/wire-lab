@@ -1,0 +1,162 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-padin-group-session-freeze-evidence-group-session-freeze-promise-post-freeze-mutation-request-openai-gpt-5.4-medium-20260524-032521",
+  "run_group_id": "ga-canary-20260523-pt-gate-v3-successors",
+  "cell_id": "ga-canary-20260523-pt-gate-v3-successors-000038-SIM-padin-group-session-freeze-evidence--group-session-freeze-promise-post-freeze-mutation-request--openai-gpt-5.4-medium",
+  "sim_id": "SIM-padin-group-session-freeze-evidence",
+  "scenario_id": "group-session-freeze-promise-post-freeze-mutation-request",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260524-032521",
+  "result_path": "results/SIM-padin-group-session-freeze-evidence/group-session-freeze-promise-post-freeze-mutation-request/openai-gpt-5.4-medium/20260524-032521.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_0a09634f840f4f29af732b79611495c7",
+    "response_id": "resp_0691433b37fce444006a12706e11508199af18716334419ec5",
+    "input_tokens": 8113,
+    "output_tokens": 1526,
+    "cost_usd": 0.03556175
+  },
+  "source": {
+    "repo_commit": "925c7f5c1c7ce7d5b0caf6a924d40d3f9b7d0483",
+    "sim_path": "simulations/SIM-padin-group-session-freeze-evidence/",
+    "scenario_path": "scenarios/group-session-freeze-promise-post-freeze-mutation-request/group-session-freeze-promise-post-freeze-mutation-request.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-padin-group-session-freeze-evidence/README.md",
+        "sha256": "43f96cd79379eeb2ae36319c1fd26144cc0a95a86f0c3fc2f9f48bf9024a11d5"
+      },
+      {
+        "path": "simulations/SIM-padin-group-session-freeze-evidence/QUESTION.md",
+        "sha256": "6bdde351a8bd4a900a82304f488913fc2ae0224396de55473b61698525bc1d04"
+      },
+      {
+        "path": "scenarios/group-session-freeze-promise-post-freeze-mutation-request/group-session-freeze-promise-post-freeze-mutation-request.md",
+        "sha256": "9083e149d879dcf5890bbcc3d3bb2fcf87b4490ba1878e59a73402bd5312ee52"
+      }
+    ],
+    "simulation_tree_hash": "8fbe9da939de6ecdba9776b2cc20f5cb8b910b7381d306b38a6017026c170175"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 3,
+    "promisegrid_alignment": 4,
+    "auditability": 5,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 2,
+    "implementation_plausibility": 5,
+    "promise_vocabulary": 4,
+    "simplicity_durability": 5,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 39,
+    "normalized_0_100": 78,
+    "confidence_0_1": 0.78
+  },
+  "assessment": {
+    "rationale": "Strong fit for immutable evidence and local auditability: exact CIDs, verified DAGs, and reproducible checks support freeze evidence without central authority. It handles the scenario's anti-mutation pressure indirectly by favoring new named artifacts over rewriting history, but the post-freeze successor lineage rules are not fully explicit.",
+    "strengths": [
+      "Exact artifacts and reproducible validation make auditing strong.",
+      "Clear evidence/design boundary: the simulation tests whether evidence can justify freeze treatment, not centralized freeze authority.",
+      "CID-addressed specimen evidence is durable, small-scope, and compatible with independent evolution."
+    ],
+    "weaknesses": [
+      "The scenario's core choice among new specimen, superseding pCID, or amendment lineage is not fully specified.",
+      "Failure handling for mismatched validators or incomplete artifact sets is thin in the provided docs.",
+      "Some wording still centers a 'freeze decision' more than explicit peer-local promises of use and assessment."
+    ],
+    "risks": [
+      "Post-freeze mutation semantics may remain ambiguous if supersession vs amendment is not explicitly defined.",
+      "Checker or parser drift could weaken long-term reproducibility unless execution details are fully pinned.",
+      "A reader might overinterpret 'freeze evidence' as a global decision rather than peer-local acceptance."
+    ],
+    "open_questions": [
+      "How is a breaking post-freeze change named and linked: new specimen, superseding pCID, or amendment lineage?",
+      "What exact checker/parser versions must be pinned so later peers can reproduce the same validation outcome?",
+      "What local evidence distinguishes immutable frozen history from later interpretive updates?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design.",
+    "pt_gate": {
+      "status": "pt_clean",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "Alice, Bob, and Carol independently reproduce the DAG and validation results from named artifacts."
+      },
+      "scoped_intent": {
+        "status": "pass",
+        "note": "The promise is narrowly scoped to exact artifacts and reproducible validation outcomes for a group-session v0 slice."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "The design does not make one peer promise acceptance or behavior on behalf of another."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "The freeze promise offers reproducible evidence, not guaranteed universal acceptance or immutable social consensus."
+      },
+      "local_trust_assessment": {
+        "status": "pass",
+        "note": "Trust is based on each peer's local reproduction of exact artifacts and checks, not on a global authority."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "Peers can independently treat the specimen as frozen based on local evidence; the design does not require mandatory acceptance."
+      },
+      "violations": []
+    }
+  }
+}

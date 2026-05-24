@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-lilok-cas-type-path-suffix-negative-control-group-session-freeze-promise-post-freeze-mutation-request-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000041-SIM-lilok-cas-type-path-suffix-negative-control--group-session-freeze-promise-post-freeze-mutation-request--openai-gpt-5.4-medium",
+  "sim_id": "SIM-lilok-cas-type-path-suffix-negative-control",
+  "scenario_id": "group-session-freeze-promise-post-freeze-mutation-request",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-lilok-cas-type-path-suffix-negative-control/group-session-freeze-promise-post-freeze-mutation-request/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_8cfd23aad0dd4e91b0ad5c7db151699e",
+    "response_id": "resp_09920c785e6c101b006a1232693b088198a5b66508e65485b8",
+    "input_tokens": 7544,
+    "output_tokens": 1307,
+    "cost_usd": 0.0315
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-lilok-cas-type-path-suffix-negative-control/",
+    "scenario_path": "scenarios/group-session-freeze-promise-post-freeze-mutation-request/group-session-freeze-promise-post-freeze-mutation-request.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-lilok-cas-type-path-suffix-negative-control/README.md",
+        "sha256": "01679bfb564db2b4f8adfc4535d1a02413330fa05cea0bc288f12d5ab519c086"
+      },
+      {
+        "path": "simulations/SIM-lilok-cas-type-path-suffix-negative-control/QUESTION.md",
+        "sha256": "b1845d40f8012e290f866398d59d22236cd65c974e210c8040a4f1ed2dc86297"
+      },
+      {
+        "path": "scenarios/group-session-freeze-promise-post-freeze-mutation-request/group-session-freeze-promise-post-freeze-mutation-request.md",
+        "sha256": "9083e149d879dcf5890bbcc3d3bb2fcf87b4490ba1878e59a73402bd5312ee52"
+      }
+    ],
+    "simulation_tree_hash": "0fe117659bfa499dd1f42891807e2ccdb2da83ab00099599578ffabf5fa458d6"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 0,
+    "auditability": 2,
+    "evolution_safety": 0,
+    "layer_boundary_clarity": 1,
+    "failure_handling": 1,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 0,
+    "simplicity_durability": 1,
+    "risk_penalty": 5
+  },
+  "fitness": {
+    "raw": 10,
+    "normalized_0_100": 20,
+    "confidence_0_1": 0.94
+  },
+  "assessment": {
+    "rationale": "This negative-control specimen is only indirectly fit for the freeze scenario, but it exposes an important failure: if object type meaning rides on local path suffixes, a frozen specimen can appear to change semantics after freeze without byte changes, or different peers can assign different meanings to the same CID. That breaks clear lineage, supersession, and amendment handling. The design is easy to implement locally, but it is poorly aligned with PromiseGrid because meaning is not carried by durable, portable, content-addressed artifacts or explicit payload promises.",
+    "strengths": [
+      "Very easy to implement and test as a negative control.",
+      "Failure mode is auditable because the dependency on local filenames is explicit.",
+      "Applies useful pressure against hidden path-local semantics in CAS designs."
+    ],
+    "weaknesses": [
+      "Poor direct fit to group-session freeze semantics compared with a lineage-aware specimen design.",
+      "Type meaning is not durable under transfer, archival, or renaming.",
+      "Not promise-first: semantics depend on ambient storage convention rather than explicit payload-level promises.",
+      "Offers no robust mechanism for superseding or amending frozen history."
+    ],
+    "risks": [
+      "Same CID can be reinterpreted across peers by filename or suffix changes alone.",
+      "Freeze lineage becomes ambiguous because post-freeze 'mutation' may be only a rename, or a hidden semantic rewrite, with no byte-level evidence.",
+      "Archives, migrations, and transports that drop or rewrite filenames lose type meaning."
+    ],
+    "open_questions": [
+      "Can path suffixes be kept only as local presentation hints while immutable typed meaning lives in the payload bytes or referenced protocol?",
+      "How would a peer distinguish harmless local renaming from a semantic post-freeze mutation request when the CID bytes stay the same?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-padin-group-session-freeze-evidence-udp-feed-v0-conformance-session-layer-composition-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000189-SIM-padin-group-session-freeze-evidence--udp-feed-v0-conformance-session-layer-composition--openai-gpt-5.4-medium",
+  "sim_id": "SIM-padin-group-session-freeze-evidence",
+  "scenario_id": "udp-feed-v0-conformance-session-layer-composition",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-padin-group-session-freeze-evidence/udp-feed-v0-conformance-session-layer-composition/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_4d8a136ce9be45f2b30224b4a5cf7d3a",
+    "response_id": "resp_0ab041d98e824151006a12342cf9c4819ba74c5f4a893faa31",
+    "input_tokens": 7502,
+    "output_tokens": 1284,
+    "cost_usd": 0.0311045
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-padin-group-session-freeze-evidence/",
+    "scenario_path": "scenarios/udp-feed-v0-conformance-session-layer-composition/udp-feed-v0-conformance-session-layer-composition.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-padin-group-session-freeze-evidence/README.md",
+        "sha256": "43f96cd79379eeb2ae36319c1fd26144cc0a95a86f0c3fc2f9f48bf9024a11d5"
+      },
+      {
+        "path": "simulations/SIM-padin-group-session-freeze-evidence/QUESTION.md",
+        "sha256": "6bdde351a8bd4a900a82304f488913fc2ae0224396de55473b61698525bc1d04"
+      },
+      {
+        "path": "scenarios/udp-feed-v0-conformance-session-layer-composition/udp-feed-v0-conformance-session-layer-composition.md",
+        "sha256": "69da5db705a56cd7067a653928ff8b2dc9301ef6ebfc712bd81038a65c9d352c"
+      }
+    ],
+    "simulation_tree_hash": "8fbe9da939de6ecdba9776b2cc20f5cb8b910b7381d306b38a6017026c170175"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 3,
+    "auditability": 5,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 2,
+    "failure_handling": 2,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 3,
+    "simplicity_durability": 4,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 29,
+    "normalized_0_100": 57.99999999999999,
+    "confidence_0_1": 0.76
+  },
+  "assessment": {
+    "rationale": "The simulation is strong as freeze evidence: exact CIDs, a verified message DAG, and reproducible checking give Alice, Bob, and Carol auditable local evidence. But it is only a partial fit for this scenario because the scenario asks whether UDP-feed v0 cleanly supports the next session layer without leaking binding details, and this specimen-focused design does not clearly define or test that interface boundary.",
+    "strengths": [
+      "High auditability from exact artifacts and reproducible validation.",
+      "Uses peer-reproducible local evidence rather than central authority.",
+      "Small, concrete evidence shape is relatively durable and implementable."
+    ],
+    "weaknesses": [
+      "Weak direct coverage of UDP-feed API sufficiency for the next layer.",
+      "Session-layer versus transport-layer boundary is not made explicit.",
+      "Limited failure-mode treatment for missing, stale, or divergent checker results."
+    ],
+    "risks": [
+      "Peers may treat specimen reproducibility as proof of clean layer composition when transport-binding assumptions were never isolated.",
+      "Exact checker behavior can become a hidden compatibility anchor if long-term evolution of the lower-layer API is not specified.",
+      "Freezing evidence around one slice may underspecify refusal, malformed input, and transport-variation failure cases."
+    ],
+    "open_questions": [
+      "Do the frozen artifacts specify a session-layer contract that remains valid if the UDP-feed binding changes?",
+      "Can independent peers detect when parser/checker reproduction agrees on specimen validity but still leaks transport-specific assumptions upward?",
+      "What failure record is kept when artifacts are missing, stale, or reproduced differently across implementations?"
+    ],
+    "authority_boundary": "Evidence only; this scoring does not authorize freezing group-session or settling UDP-feed/session-layer design."
+  }
+}

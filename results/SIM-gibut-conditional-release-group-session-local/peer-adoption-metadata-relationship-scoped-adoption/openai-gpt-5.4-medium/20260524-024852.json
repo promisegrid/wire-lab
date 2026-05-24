@@ -1,0 +1,166 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-gibut-conditional-release-group-session-local-peer-adoption-metadata-relationship-scoped-adoption-openai-gpt-5.4-medium-20260524-024852",
+  "run_group_id": "ga-canary-20260523-pt-gate-v3",
+  "cell_id": "ga-canary-20260523-pt-gate-v3-000029-SIM-gibut-conditional-release-group-session-local--peer-adoption-metadata-relationship-scoped-adoption--openai-gpt-5.4-medium",
+  "sim_id": "SIM-gibut-conditional-release-group-session-local",
+  "scenario_id": "peer-adoption-metadata-relationship-scoped-adoption",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260524-024852",
+  "result_path": "results/SIM-gibut-conditional-release-group-session-local/peer-adoption-metadata-relationship-scoped-adoption/openai-gpt-5.4-medium/20260524-024852.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_5c74070aeecb48b78934d12e558b010d",
+    "response_id": "resp_0e1f89cf2715ffae006a1267c6b454819891d432f6d8ecb166",
+    "input_tokens": 8118,
+    "output_tokens": 1717,
+    "cost_usd": 0.0382445
+  },
+  "source": {
+    "repo_commit": "ec652bd3ecaaf2f904e62cff00e113a88c7e3efd",
+    "sim_path": "simulations/SIM-gibut-conditional-release-group-session-local/",
+    "scenario_path": "scenarios/peer-adoption-metadata-relationship-scoped-adoption/peer-adoption-metadata-relationship-scoped-adoption.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-gibut-conditional-release-group-session-local/README.md",
+        "sha256": "c0e15735585e1296ae39d522ffa8cbe097d7a9cb66ff7d479b75f62b335a901c"
+      },
+      {
+        "path": "simulations/SIM-gibut-conditional-release-group-session-local/QUESTION.md",
+        "sha256": "7cb4d75a2a69df7f86b185094a9bf106bc89bf26e018d70a272c6ba43e1ba288"
+      },
+      {
+        "path": "scenarios/peer-adoption-metadata-relationship-scoped-adoption/peer-adoption-metadata-relationship-scoped-adoption.md",
+        "sha256": "b2a2b0fb4dfcd76dfd88a39d4bb4f4d8a85fafb0b052621a36de8692d19fe3d7"
+      }
+    ],
+    "simulation_tree_hash": "f552334ad886c1cf76d05a0fe07428ebf0166d4c006b5e8ade3e35abc82280f3"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 3,
+    "promisegrid_alignment": 2,
+    "auditability": 3,
+    "evolution_safety": 2,
+    "layer_boundary_clarity": 1,
+    "failure_handling": 1,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 2,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 22,
+    "normalized_0_100": 44,
+    "confidence_0_1": 0.77
+  },
+  "assessment": {
+    "rationale": "The design partially fits relationship-scoped adoption because session-local conditions can vary by conversational context, but it targets conditional release more than adoption metadata. Its promise framing is mixed: participants promise their own forwarding behavior, yet the session layer also carries policy-like conditions that can look normative and blur layer boundaries.",
+    "strengths": [
+      "Supports context-local variation rather than forcing one peer-wide rule.",
+      "Implementation is plausible with message-carried or referenced conditions.",
+      "Keeps some agency at the participant level for onward dispatch decisions."
+    ],
+    "weaknesses": [
+      "Not directly about adoption metadata, so scenario fit is only moderate.",
+      "Layer boundary between session transport and policy/promise semantics is unclear.",
+      "Failure and violation handling are underspecified.",
+      "Promise vocabulary is weaker than a payload-first explicit promise card or assertion."
+    ],
+    "risks": [
+      "Relationship-specific behavior may be encoded indirectly through session policy instead of explicit peer-local adoption promises.",
+      "Auditors may not be able to distinguish a kept promise from merely propagated condition text.",
+      "Bundling release policy into session semantics may make long-term evolution and interop brittle."
+    ],
+    "open_questions": [
+      "Can session-local release conditions cleanly express Bob using one relationship profile with Alice and another with Carol without looking like peer-wide inconsistency?",
+      "What local audit artifact shows that a participant accepted a conditional-release promise versus merely received content with attached policy text?",
+      "How are refusal, stripping, or reinterpretation of release conditions by later recipients represented without implying guaranteed enforcement?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design.",
+    "pt_gate": {
+      "status": "pt_reframe_needed",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "Participants are described as making their own onward-restraint promises; no central actor is required."
+      },
+      "scoped_intent": {
+        "status": "pass",
+        "note": "Intent is scoped to a group/session and later dispatch actions, which is narrower than peer-global identity claims."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "The design mostly keeps promises attached to each participant's own dispatch behavior."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "warning",
+        "note": "Participants can promise their own forwarding behavior, but the design does not guarantee downstream compliance."
+      },
+      "local_trust_assessment": {
+        "status": "warning",
+        "note": "Trust can remain peer-local, but session-embedded policy may encourage a shared/global reading of compliance."
+      },
+      "accept_use_not_obligation": {
+        "status": "warning",
+        "note": "Carrying release conditions inside session semantics risks treating receipt or forwarding as an obligation rather than a voluntary promise."
+      },
+      "violations": [
+        "Session-carried release conditions can be read as imposed obligations on recipients rather than explicit voluntary promises.",
+        "Embedding onward-restraint in group/session semantics blurs local trust assessment and weakens clear promise-layer boundaries."
+      ]
+    }
+  }
+}

@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-bihim-cas-type-codec-plus-internal-kind-spec-requirement-sections-100-year-review-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000033-SIM-bihim-cas-type-codec-plus-internal-kind--spec-requirement-sections-100-year-review--openai-gpt-5.4-medium",
+  "sim_id": "SIM-bihim-cas-type-codec-plus-internal-kind",
+  "scenario_id": "spec-requirement-sections-100-year-review",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-bihim-cas-type-codec-plus-internal-kind/spec-requirement-sections-100-year-review/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_794c687d706b4ad3b8cd96f0a4c84a45",
+    "response_id": "resp_00bee96ef01a423f006a12324c5014819a96c19a1bf562fb0f",
+    "input_tokens": 7527,
+    "output_tokens": 1387,
+    "cost_usd": 0.03259025
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-bihim-cas-type-codec-plus-internal-kind/",
+    "scenario_path": "scenarios/spec-requirement-sections-100-year-review/spec-requirement-sections-100-year-review.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-bihim-cas-type-codec-plus-internal-kind/README.md",
+        "sha256": "cf17971491ff515870ce86a883b5d97ee691a029cddb96211e80700ce11be16d"
+      },
+      {
+        "path": "simulations/SIM-bihim-cas-type-codec-plus-internal-kind/QUESTION.md",
+        "sha256": "da3251d1bd0bba3e15cad022e5f58793e2d087d9a10c8f4bd25a88241e29ad07"
+      },
+      {
+        "path": "scenarios/spec-requirement-sections-100-year-review/spec-requirement-sections-100-year-review.md",
+        "sha256": "b2e71192b720372495986fad6387d0bfd5222ce78a7cfd9da03940d1a1062cd7"
+      }
+    ],
+    "simulation_tree_hash": "415f66cfc07267d51ba343b130cfa4da0b6625c18c05fefee3dc38b71f2d11b0"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 3,
+    "auditability": 2,
+    "evolution_safety": 2,
+    "layer_boundary_clarity": 2,
+    "failure_handling": 1,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 3,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 23,
+    "normalized_0_100": 46,
+    "confidence_0_1": 0.78
+  },
+  "assessment": {
+    "rationale": "The specimen helps long-horizon review by putting finer dispatch cues inside the object bytes, which future readers can still inspect locally. But it is only an indirect fit for a spec-section review scenario, and it leaves the most important century-scale assumptions unresolved: kind naming, registry mechanics, conflict handling, and the explanatory section that would make the split authority intelligible later.",
+    "strengths": [
+      "Small deterministic in-object kind can aid later local inspection of bytes.",
+      "Broad codec plus finer internal distinction is implementable on constrained systems.",
+      "Keeps content identity verification local to Alice/Bob/Carol rather than requiring a central service."
+    ],
+    "weaknesses": [
+      "Does not itself define the required long-horizon spec section or review checklist.",
+      "Creates potential dual type authorities between CID codec and internal kind.",
+      "Failure handling and evolution rules for unknown, conflicting, or deprecated kinds are not specified."
+    ],
+    "risks": [
+      "Future implementations may depend on an unavailable external kind registry or social convention.",
+      "Codec-versus-kind ambiguity can create divergent decoding and audit results.",
+      "Unspecified unknown-kind behavior weakens durability under protocol evolution."
+    ],
+    "open_questions": [
+      "What spec section defines precedence if CID codec and internal kind disagree?",
+      "How should a 100-year-later reader handle unknown or deprecated kinds without a live registry?",
+      "Can the kind namespace evolve without creating a central authority dependency?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

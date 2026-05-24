@@ -1,0 +1,122 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-gujiv-conditional-release-hybrid-reference-graph-group-session-freeze-promise-post-freeze-mutation-request-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000097-SIM-gujiv-conditional-release-hybrid-reference-graph--group-session-freeze-promise-post-freeze-mutation-request--openai-gpt-5.4-medium",
+  "sim_id": "SIM-gujiv-conditional-release-hybrid-reference-graph",
+  "scenario_id": "group-session-freeze-promise-post-freeze-mutation-request",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-gujiv-conditional-release-hybrid-reference-graph/group-session-freeze-promise-post-freeze-mutation-request/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_ec89923d0e57468e94f59b33e008b4e4",
+    "response_id": "resp_0727e47854e54711006a123310905c8198969e2ec89c9a7492",
+    "input_tokens": 7539,
+    "output_tokens": 1481,
+    "cost_usd": 0.03392725
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-gujiv-conditional-release-hybrid-reference-graph/",
+    "scenario_path": "scenarios/group-session-freeze-promise-post-freeze-mutation-request/group-session-freeze-promise-post-freeze-mutation-request.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-gujiv-conditional-release-hybrid-reference-graph/README.md",
+        "sha256": "03247c8a2a06b2a8c3928b5e3ebf5e8ec82d683558f04b551ba936c880caf1f9"
+      },
+      {
+        "path": "simulations/SIM-gujiv-conditional-release-hybrid-reference-graph/QUESTION.md",
+        "sha256": "c9ffd03808d1cbc2c8ecd1ea86828b900e9543798f69d99e2d0327c9d7e695c5"
+      },
+      {
+        "path": "scenarios/group-session-freeze-promise-post-freeze-mutation-request/group-session-freeze-promise-post-freeze-mutation-request.md",
+        "sha256": "9083e149d879dcf5890bbcc3d3bb2fcf87b4490ba1878e59a73402bd5312ee52"
+      }
+    ],
+    "simulation_tree_hash": "bfaaa00c0154723abdec6de204c1fc67d79012cf94e8e62b83667423be99cb22"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 3,
+    "promisegrid_alignment": 4,
+    "auditability": 4,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 3,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 4,
+    "simplicity_durability": 3,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 37,
+    "normalized_0_100": 74,
+    "confidence_0_1": 0.78
+  },
+  "assessment": {
+    "rationale": "The hybrid reference-graph design fits the scenario moderately well because it strongly favors immutable references, local evidence, and clear layer boundaries, all of which help avoid mutating frozen history. Its best match is in representing superseding or refused changes as new graph references rather than edits in place. However, the simulation does not yet spell out freeze lineage semantics, amendment rules, or the exact post-freeze mutation outcome, so scenario coverage is incomplete.",
+    "strengths": [
+      "Keeps human promise meaning at the group/session layer while lower layers carry stable references.",
+      "Supports local audit through stable condition CIDs and evidence hooks rather than central authority.",
+      "Naturally favors append-only evolution by adding references or refusals instead of mutating prior artifacts.",
+      "Layer-boundary goal is explicit and well aligned with PromiseGrid pressure."
+    ],
+    "weaknesses": [
+      "Does not explicitly define freeze semantics or post-freeze lineage transitions.",
+      "Does not settle whether a breaking change becomes a new specimen, superseding node, or amendment form.",
+      "Failure handling is only partial; refusal is mentioned, but conflict and concurrent mutation behavior are underspecified."
+    ],
+    "risks": [
+      "Unsettled graph object model may leave freeze and supersession semantics ambiguous across implementations.",
+      "Reference-graph complexity could blur simple long-term audit trails if lineage rules are not explicit.",
+      "Peers may interpret post-freeze mutation requests differently without a canonical local refusal/supersession pattern."
+    ],
+    "open_questions": [
+      "What exact frozen artifact anchors a post-freeze release node: session payload CID, release graph node CID, or both?",
+      "When Carol proposes a breaking change after freeze, is the required outcome a new specimen, a superseding reference, or an explicit refusal plus fresh lineage?",
+      "How are competing post-freeze amendments represented so peers can audit divergence without hidden global state?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

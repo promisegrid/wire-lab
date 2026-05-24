@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-dujoh-conditional-release-transport-visible-constraint-group-session-freeze-promise-post-freeze-mutation-request-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000090-SIM-dujoh-conditional-release-transport-visible-constraint--group-session-freeze-promise-post-freeze-mutation-request--openai-gpt-5.4-medium",
+  "sim_id": "SIM-dujoh-conditional-release-transport-visible-constraint",
+  "scenario_id": "group-session-freeze-promise-post-freeze-mutation-request",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-dujoh-conditional-release-transport-visible-constraint/group-session-freeze-promise-post-freeze-mutation-request/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_f151c0394e594ea1b521b9ac796f7fca",
+    "response_id": "resp_0ceb2e96da2a4f23006a1232fd840c8199b9b227256224860d",
+    "input_tokens": 7535,
+    "output_tokens": 1083,
+    "cost_usd": 0.02834825
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-dujoh-conditional-release-transport-visible-constraint/",
+    "scenario_path": "scenarios/group-session-freeze-promise-post-freeze-mutation-request/group-session-freeze-promise-post-freeze-mutation-request.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-dujoh-conditional-release-transport-visible-constraint/README.md",
+        "sha256": "c049f3a0bf15b40506257afc5d06ccb8cc7fa27e301f3aebc7ea4bab129542a5"
+      },
+      {
+        "path": "simulations/SIM-dujoh-conditional-release-transport-visible-constraint/QUESTION.md",
+        "sha256": "598dbb05c0bd9223d0235ead35ac79872e30b1836844b254d73fdc3db1fb63a9"
+      },
+      {
+        "path": "scenarios/group-session-freeze-promise-post-freeze-mutation-request/group-session-freeze-promise-post-freeze-mutation-request.md",
+        "sha256": "9083e149d879dcf5890bbcc3d3bb2fcf87b4490ba1878e59a73402bd5312ee52"
+      }
+    ],
+    "simulation_tree_hash": "993c6c480b07328fd67b857ec4258cd9b4ca2aaf4252e5490f9e7a6322e481cf"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 3,
+    "auditability": 3,
+    "evolution_safety": 1,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 3,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 4,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 27,
+    "normalized_0_100": 54,
+    "confidence_0_1": 0.85
+  },
+  "assessment": {
+    "rationale": "The design is coherent for conditional-release enforcement at transport/feed boundaries, but it does not directly answer the scenario's core pressure about frozen lineage, superseding pCIDs, or post-freeze mutation handling. Its main value here is boundary discipline: lower layers get only small refusal hints, while richer semantics stay above transport.",
+    "strengths": [
+      "Clear lower-layer versus payload boundary.",
+      "Small machine-checkable hints are plausible and durable artifacts.",
+      "Supports peer-local refusal to store or forward when local promises would be violated."
+    ],
+    "weaknesses": [
+      "Does not specify freeze semantics or immutable lineage handling.",
+      "Does not explain whether a post-freeze change becomes a new specimen, superseding pCID, or amendment.",
+      "Uses limited promise-first vocabulary compared with explicit payload promises."
+    ],
+    "risks": [
+      "Transport-visible condition hints may leak policy or relationship metadata.",
+      "Peers may over-trust lower-layer hints even though freeze/version semantics remain unresolved above transport.",
+      "Scenario mismatch could hide lineage-mutation risks by focusing on forwarding/storage refusal instead of immutable evolution."
+    ],
+    "open_questions": [
+      "Can freeze lineage and post-freeze amendment semantics be expressed as payload-level promises while still giving transport enough refusal hints?",
+      "What minimal visible hint set distinguishes a new frozen specimen from a mutation request against an old lineage?",
+      "How much policy leakage does transport-visible conditional metadata create over long-lived deployments?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

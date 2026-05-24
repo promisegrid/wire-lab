@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-tuhas-group-session-two-surface-freeze-gate-transport-family-bakeoff-per-hop-authorization-failure-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000192-SIM-tuhas-group-session-two-surface-freeze-gate--transport-family-bakeoff-per-hop-authorization-failure--openai-gpt-5.4-medium",
+  "sim_id": "SIM-tuhas-group-session-two-surface-freeze-gate",
+  "scenario_id": "transport-family-bakeoff-per-hop-authorization-failure",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-tuhas-group-session-two-surface-freeze-gate/transport-family-bakeoff-per-hop-authorization-failure/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_e827c95cff1d47558d901c5628d1cc9d",
+    "response_id": "resp_0e05d31edd0bc843006a12343636e08199bfeb99d229d4fbae",
+    "input_tokens": 7534,
+    "output_tokens": 1020,
+    "cost_usd": 0.0274645
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-tuhas-group-session-two-surface-freeze-gate/",
+    "scenario_path": "scenarios/transport-family-bakeoff-per-hop-authorization-failure/transport-family-bakeoff-per-hop-authorization-failure.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-tuhas-group-session-two-surface-freeze-gate/README.md",
+        "sha256": "e43f0b558a84df77949d02ecc1b3935ed88b960c004389aa25dbd5bbcf210d9d"
+      },
+      {
+        "path": "simulations/SIM-tuhas-group-session-two-surface-freeze-gate/QUESTION.md",
+        "sha256": "941b2f5c4cddf2e0e09049946ae9eea7a18729897d9f17752f75227383d77764"
+      },
+      {
+        "path": "scenarios/transport-family-bakeoff-per-hop-authorization-failure/transport-family-bakeoff-per-hop-authorization-failure.md",
+        "sha256": "f938e10ab88db666d3097a2f97c1667bbbc6e8e071681134049068982cc39cf2"
+      }
+    ],
+    "simulation_tree_hash": "922fe155f0556c2815948fc7c7d60c4110e7e227d2cb2af2ab330e76d35c3f57"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 2,
+    "auditability": 3,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 1,
+    "implementation_plausibility": 3,
+    "promise_vocabulary": 3,
+    "simplicity_durability": 4,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 27,
+    "normalized_0_100": 54,
+    "confidence_0_1": 0.88
+  },
+  "assessment": {
+    "rationale": "This simulation is mostly a poor fit for the per-hop authorization-failure scenario. Its main contribution is clearer separation between transport/feed and group-session semantic freeze surfaces, which helps audit and evolution, but it does not actually specify ring forwarding, refusal handling, skip-hop behavior, or membership reconfiguration under authorization failure.",
+    "strengths": [
+      "Explicit split between outer/feed and session-semantic freeze surfaces.",
+      "Good boundary clarity for future evolution and audit.",
+      "Small, explicit freeze-gate concept is relatively durable."
+    ],
+    "weaknesses": [
+      "Does not directly model transport-family ring forwarding behavior.",
+      "No concrete failure-handling rule for unauthorized per-hop forwarding.",
+      "Promise wording is better than generic claims but not strongly payload-promise-centered."
+    ],
+    "risks": [
+      "Surface separation may hide rather than resolve where authorization failure semantics belong.",
+      "A reviewer could over-credit boundary clarity as if it solved transport failure handling.",
+      "Ring semantics remain underspecified, so different implementations could diverge on refusal behavior."
+    ],
+    "open_questions": [
+      "Can the outer/feed surface explicitly carry per-hop authorization promises and refusal records?",
+      "Which surface defines ring continuation after a hop refuses forward: transport/feed or group-session semantics?",
+      "How would membership reconfiguration be recorded when authorization fails at one hop?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

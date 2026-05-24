@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-lozuk-l6-cas-ipfs-ipld-starting-profile-peer-adoption-metadata-spec-answer-vocabulary-drift-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000004-SIM-lozuk-l6-cas-ipfs-ipld-starting-profile--peer-adoption-metadata-spec-answer-vocabulary-drift--openai-gpt-5.4-medium",
+  "sim_id": "SIM-lozuk-l6-cas-ipfs-ipld-starting-profile",
+  "scenario_id": "peer-adoption-metadata-spec-answer-vocabulary-drift",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-lozuk-l6-cas-ipfs-ipld-starting-profile/peer-adoption-metadata-spec-answer-vocabulary-drift/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_5fab2721ac604e728fd305b992211bdb",
+    "response_id": "resp_0dc49c7dd48b1cfa006a1231f671008199b52c928e8cebbe96",
+    "input_tokens": 7606,
+    "output_tokens": 1154,
+    "cost_usd": 0.0294665
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-lozuk-l6-cas-ipfs-ipld-starting-profile/",
+    "scenario_path": "scenarios/peer-adoption-metadata-spec-answer-vocabulary-drift/peer-adoption-metadata-spec-answer-vocabulary-drift.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-lozuk-l6-cas-ipfs-ipld-starting-profile/README.md",
+        "sha256": "60dfa034360800265f33acf508dcf428a2b8c0d404509cb9d0dfcb92a656aac2"
+      },
+      {
+        "path": "simulations/SIM-lozuk-l6-cas-ipfs-ipld-starting-profile/QUESTION.md",
+        "sha256": "799541890c2ad70dc9b76c1e1da3c3b90bb980b08d4754adc26d4612add52bf6"
+      },
+      {
+        "path": "scenarios/peer-adoption-metadata-spec-answer-vocabulary-drift/peer-adoption-metadata-spec-answer-vocabulary-drift.md",
+        "sha256": "a9e8ba84995e69fcad36f2554442cc62c5e1128ea0818197cb7ebf66e843ff53"
+      }
+    ],
+    "simulation_tree_hash": "60a5f82d2ae49fd25d4909ed71a2c0c8c577758a9fe863f70e5205958bc1d99c"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 3,
+    "auditability": 3,
+    "evolution_safety": 2,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 1,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 3,
+    "simplicity_durability": 2,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 25,
+    "normalized_0_100": 50,
+    "confidence_0_1": 0.79
+  },
+  "assessment": {
+    "rationale": "The simulation helps only indirectly. Its strongest relevance is the explicit split between CID-addressed object storage and pCID-owned payload semantics, which gives a place to anchor spec-local meaning. But it does not directly define adoption-metadata answer keys, migration records, or vocabulary-drift handling, so the scenario pressure is mostly unmet.",
+    "strengths": [
+      "Explicit pCID-owned payload semantics preserve PromiseGrid's local authority model better than pure generic CAS claims.",
+      "Deterministic DAG-CBOR and CIDv1-compatible identities support auditable, reproducible artifacts.",
+      "The design states a clear boundary between CAS object identity and higher-layer payload meaning."
+    ],
+    "weaknesses": [
+      "No direct mechanism for renamed or removed answer keys across spec revisions.",
+      "No explicit migration, alias, or supersession record format for old versus new vocabulary.",
+      "The simulation is focused on CAS profile choice, not peer-adoption metadata semantics."
+    ],
+    "risks": [
+      "Vocabulary drift may leave old adoption claims ambiguous because the simulation does not specify spec-local answer-key binding or migration semantics.",
+      "IPFS/IPLD-aligned conventions may pull in evolving codec or tooling expectations that weaken long-horizon stability if not tightly profiled.",
+      "Peers may infer global or ecosystem-standard meanings from reused IPLD/IPFS terminology instead of explicit pCID-scoped promises."
+    ],
+    "open_questions": [
+      "Can pCID-owned payload semantics cleanly bind adoption-metadata answer keys to a specific frozen spec revision?",
+      "How would old and new answer vocabularies be related without a global registry when Q9 is renamed or removed?",
+      "Are migration records or alias objects needed above the CAS layer to keep historic claims unambiguous?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

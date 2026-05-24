@@ -1,0 +1,122 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-bilam-udp-feed-layer-composition-conformance-spec-requirement-sections-100-year-review-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000236-SIM-bilam-udp-feed-layer-composition-conformance--spec-requirement-sections-100-year-review--openai-gpt-5.4-medium",
+  "sim_id": "SIM-bilam-udp-feed-layer-composition-conformance",
+  "scenario_id": "spec-requirement-sections-100-year-review",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-bilam-udp-feed-layer-composition-conformance/spec-requirement-sections-100-year-review/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_a041d3f23e5c495fa51be9f8721e020d",
+    "response_id": "resp_0f2e8cbfb549fd1c006a1234ac4eac819a933e7408e80ca420",
+    "input_tokens": 7522,
+    "output_tokens": 1131,
+    "cost_usd": 0.0289975
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-bilam-udp-feed-layer-composition-conformance/",
+    "scenario_path": "scenarios/spec-requirement-sections-100-year-review/spec-requirement-sections-100-year-review.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-bilam-udp-feed-layer-composition-conformance/README.md",
+        "sha256": "679fb3e0e7ef397eab2c4e9bbd702a0917bcec69a8093b18a8080eb984b93bc8"
+      },
+      {
+        "path": "simulations/SIM-bilam-udp-feed-layer-composition-conformance/QUESTION.md",
+        "sha256": "c771644ce2de0dc1fc356c7cdb8f6e2f471a406c71e1a427a2db0077f31855ce"
+      },
+      {
+        "path": "scenarios/spec-requirement-sections-100-year-review/spec-requirement-sections-100-year-review.md",
+        "sha256": "b2e71192b720372495986fad6387d0bfd5222ce78a7cfd9da03940d1a1062cd7"
+      }
+    ],
+    "simulation_tree_hash": "fc9f51cd962d3438f6bb96a1c7baa9fa2be765dca50bb60b16dde4a672aede9f"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 3,
+    "auditability": 3,
+    "evolution_safety": 2,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 1,
+    "implementation_plausibility": 3,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 2,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 23,
+    "normalized_0_100": 46,
+    "confidence_0_1": 0.84
+  },
+  "assessment": {
+    "rationale": "The simulation is relevant to PromiseGrid because it insists transport success is insufficient without higher-layer promise preservation and auditable composition. But this scenario asks for a long-horizon spec-section review, and the candidate does not provide a concrete spec-section home, durable section structure, or explicit future-reader assumptions. It is therefore only a partial fit.",
+    "strengths": [
+      "Clear separation between UDP-feed transport and higher-layer session/feed responsibilities.",
+      "Explicit emphasis on auditable composition evidence.",
+      "Small, concrete question about whether transport-only success is misleading."
+    ],
+    "weaknesses": [
+      "Poor direct fit for a scenario about preserved spec requirement sections.",
+      "Uses conformance/usability language more than promise-first payload wording.",
+      "Does not spell out failure modes, adversarial pressure, or sparse-knowledge audit records.",
+      "No concrete long-lived artifact or section template for future readers."
+    ],
+    "risks": [
+      "Conformance-oriented framing may encourage normative bundles instead of small payload promises.",
+      "Leaving the higher layer unspecified weakens 100-year auditability and migration evidence.",
+      "The design could set a high bar without defining the durable artifact future reviewers must inspect."
+    ],
+    "open_questions": [
+      "What concrete higher-layer promise artifact would be durable and intelligible enough for a 100-year reviewer?",
+      "Should UDP-feed v0 require a frozen composition-spec section, rather than only a successful higher-layer specimen?",
+      "How would future auditors verify composition evidence if the chosen higher-layer protocol or hosting assumptions disappear?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

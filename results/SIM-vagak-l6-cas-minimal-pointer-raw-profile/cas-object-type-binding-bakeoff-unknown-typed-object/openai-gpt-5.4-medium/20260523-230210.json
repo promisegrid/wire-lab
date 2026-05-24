@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-vagak-l6-cas-minimal-pointer-raw-profile-cas-object-type-binding-bakeoff-unknown-typed-object-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000015-SIM-vagak-l6-cas-minimal-pointer-raw-profile--cas-object-type-binding-bakeoff-unknown-typed-object--openai-gpt-5.4-medium",
+  "sim_id": "SIM-vagak-l6-cas-minimal-pointer-raw-profile",
+  "scenario_id": "cas-object-type-binding-bakeoff-unknown-typed-object",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-vagak-l6-cas-minimal-pointer-raw-profile/cas-object-type-binding-bakeoff-unknown-typed-object/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_4f31b48263294bd087461de64753e25d",
+    "response_id": "resp_0ab53d2583536261006a12321857608199b7a5664aeb3a3250",
+    "input_tokens": 7588,
+    "output_tokens": 1224,
+    "cost_usd": 0.030415
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-vagak-l6-cas-minimal-pointer-raw-profile/",
+    "scenario_path": "scenarios/cas-object-type-binding-bakeoff-unknown-typed-object/cas-object-type-binding-bakeoff-unknown-typed-object.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-vagak-l6-cas-minimal-pointer-raw-profile/README.md",
+        "sha256": "f7ad9b33539e14933ad1c903cd38b19235c78e3a1001ea534f726d0e7b664d53"
+      },
+      {
+        "path": "simulations/SIM-vagak-l6-cas-minimal-pointer-raw-profile/QUESTION.md",
+        "sha256": "124f7bc6031956ec43f1bdf89bc1cc04f4f5823ae421ef898a0c0d2e449b203f"
+      },
+      {
+        "path": "scenarios/cas-object-type-binding-bakeoff-unknown-typed-object/cas-object-type-binding-bakeoff-unknown-typed-object.md",
+        "sha256": "76f0a7016fa2bad5e53903682706bca4eeb4aa2d099311a4ea52b7280748cf90"
+      }
+    ],
+    "simulation_tree_hash": "93ed6b00afc3d94381a3e4a416c793e7b201ed1f670dc0af547f8466c19fee07"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 3,
+    "promisegrid_alignment": 4,
+    "auditability": 3,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 2,
+    "implementation_plausibility": 5,
+    "promise_vocabulary": 1,
+    "simplicity_durability": 5,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 33,
+    "normalized_0_100": 66,
+    "confidence_0_1": 0.74
+  },
+  "assessment": {
+    "rationale": "The minimal raw-plus-pointer profile fits the scenario partly well because it favors opaque storage and forwarding with a small durable artifact surface. It also helps separate CAS retention from higher-level object interpretation. But the provided simulation text does not explicitly define unknown-type behavior, safe parsing boundaries, or failure signaling for peers that do not implement a codec, so key scenario pressure remains underspecified.",
+    "strengths": [
+      "Small deterministic artifact shape supports durable opaque handling.",
+      "Defers richer object-family commitments, which helps mixed-version evolution.",
+      "Clearer separation between byte retention/reference and higher-level graph semantics than heavier typed bundles."
+    ],
+    "weaknesses": [
+      "Unknown typed object behavior is not spelled out directly.",
+      "Failure and refusal semantics for unsupported codecs are weakly specified.",
+      "Promise-theory vocabulary is minimal rather than promise-first."
+    ],
+    "risks": [
+      "Peers may infer semantic support from successful storage/advertisement of unknown objects.",
+      "Without explicit unknown-type rules, implementations may drift into unsafe parse attempts or inconsistent rejection behavior.",
+      "Future typed object families may need compatibility rules that this minimal profile has deferred rather than settled."
+    ],
+    "open_questions": [
+      "What exact promise or rule tells Dave when to store and forward an unknown-codec object opaquely versus reject it?",
+      "How is the minimal pointer object's own type binding specified so mixed-version peers avoid unsafe parsing?",
+      "What local audit record shows that an object was handled opaquely without implying semantic understanding?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

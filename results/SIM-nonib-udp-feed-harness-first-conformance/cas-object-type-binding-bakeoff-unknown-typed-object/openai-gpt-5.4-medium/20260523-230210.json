@@ -1,0 +1,119 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-nonib-udp-feed-harness-first-conformance-cas-object-type-binding-bakeoff-unknown-typed-object-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000225-SIM-nonib-udp-feed-harness-first-conformance--cas-object-type-binding-bakeoff-unknown-typed-object--openai-gpt-5.4-medium",
+  "sim_id": "SIM-nonib-udp-feed-harness-first-conformance",
+  "scenario_id": "cas-object-type-binding-bakeoff-unknown-typed-object",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-nonib-udp-feed-harness-first-conformance/cas-object-type-binding-bakeoff-unknown-typed-object/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_8a163c6069734213a37b5b25664040ba",
+    "response_id": "resp_0a718c5e24a4ba04006a12349520808198a5e0c9d83d6c2403",
+    "input_tokens": 7545,
+    "output_tokens": 1201,
+    "cost_usd": 0.03001775
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-nonib-udp-feed-harness-first-conformance/",
+    "scenario_path": "scenarios/cas-object-type-binding-bakeoff-unknown-typed-object/cas-object-type-binding-bakeoff-unknown-typed-object.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-nonib-udp-feed-harness-first-conformance/README.md",
+        "sha256": "d2745a347b4e1106f615279c5cdb47ec7f164a09da4e95e705d911ee1eaa4784"
+      },
+      {
+        "path": "simulations/SIM-nonib-udp-feed-harness-first-conformance/QUESTION.md",
+        "sha256": "c7ff0d94855382a5f0e62c9d2818e74561fa830fdf82296586df93bdd24d9270"
+      },
+      {
+        "path": "scenarios/cas-object-type-binding-bakeoff-unknown-typed-object/cas-object-type-binding-bakeoff-unknown-typed-object.md",
+        "sha256": "76f0a7016fa2bad5e53903682706bca4eeb4aa2d099311a4ea52b7280748cf90"
+      }
+    ],
+    "simulation_tree_hash": "8994291972228d954b465cbf4735badeca0703bcb0e41dffd53a54494c86bf99"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 0,
+    "promisegrid_alignment": 2,
+    "auditability": 2,
+    "evolution_safety": 1,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 2,
+    "implementation_plausibility": 3,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 1,
+    "risk_penalty": 4
+  },
+  "fitness": {
+    "raw": 18,
+    "normalized_0_100": 36,
+    "confidence_0_1": 0.9
+  },
+  "assessment": {
+    "rationale": "This simulation is mainly about harness-first UDP transport conformance under loss and timing pressure, not CAS object type binding. It has some PromiseGrid-adjacent strengths in explicit evidence and boundary definition, but it does not meaningfully answer the scenario's core question about safe opaque handling of unknown typed CAS objects.",
+    "strengths": [
+      "Clear design boundary: transport binding usefulness should be evidenced before API polish.",
+      "Good audit intent for its own domain via packet-level conformance evidence."
+    ],
+    "weaknesses": [
+      "Almost no direct scenario fit for unknown typed CAS object handling.",
+      "No explicit promise about storing, advertising, or forwarding unknown codecs opaquely.",
+      "No safe-parsing rule or mixed-version evolution behavior is defined.",
+      "Harness artifacts are heavier and less durable than a small explicit binding rule."
+    ],
+    "risks": [
+      "A transport-focused conformance story could be mistaken for coverage of object-type compatibility when no such rule is specified.",
+      "Harness-first emphasis may delay or obscure the simpler durable artifact needed for unknown-type behavior at the CAS/binding layer."
+    ],
+    "open_questions": [
+      "Should UDP-feed bindings carry an explicit rule for unknown CAS codecs: store/forward opaquely and forbid parsing?",
+      "If harness-first evidence is kept, what artifact proves mixed-version unknown-type behavior rather than only packet loss behavior?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

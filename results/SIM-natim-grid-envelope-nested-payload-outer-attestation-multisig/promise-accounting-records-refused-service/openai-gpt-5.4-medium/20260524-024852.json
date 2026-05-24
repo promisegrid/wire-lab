@@ -1,0 +1,170 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-natim-grid-envelope-nested-payload-outer-attestation-multisig-promise-accounting-records-refused-service-openai-gpt-5.4-medium-20260524-024852",
+  "run_group_id": "ga-canary-20260523-pt-gate-v3",
+  "cell_id": "ga-canary-20260523-pt-gate-v3-000043-SIM-natim-grid-envelope-nested-payload-outer-attestation-multisig--promise-accounting-records-refused-service--openai-gpt-5.4-medium",
+  "sim_id": "SIM-natim-grid-envelope-nested-payload-outer-attestation-multisig",
+  "scenario_id": "promise-accounting-records-refused-service",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260524-024852",
+  "result_path": "results/SIM-natim-grid-envelope-nested-payload-outer-attestation-multisig/promise-accounting-records-refused-service/openai-gpt-5.4-medium/20260524-024852.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_fdedcddb68e14c1aa2c943a89225d510",
+    "response_id": "resp_0a4f7d397f099c37006a126820ca40819b90202e6a4ec89a2b",
+    "input_tokens": 10715,
+    "output_tokens": 1672,
+    "cost_usd": 0.04215925
+  },
+  "source": {
+    "repo_commit": "ec652bd3ecaaf2f904e62cff00e113a88c7e3efd",
+    "sim_path": "simulations/SIM-natim-grid-envelope-nested-payload-outer-attestation-multisig/",
+    "scenario_path": "scenarios/promise-accounting-records-refused-service/promise-accounting-records-refused-service.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-natim-grid-envelope-nested-payload-outer-attestation-multisig/README.md",
+        "sha256": "66d0d285a83e308582cae373211ad2a7452768eabd5e3a5c78ce68ac7dffb623"
+      },
+      {
+        "path": "simulations/SIM-natim-grid-envelope-nested-payload-outer-attestation-multisig/QUESTION.md",
+        "sha256": "1e6d7d459400f07f95ebc98b40b482465702ee815ca120074c72ae4ec4c3f250"
+      },
+      {
+        "path": "simulations/SIM-natim-grid-envelope-nested-payload-outer-attestation-multisig/protocols/grid-envelope.d/CHANGELOG.md",
+        "sha256": "42d47d8aa770957218217786ba9ba436e8c1c28496f149f3ed7dd9995de44ba0"
+      },
+      {
+        "path": "simulations/SIM-natim-grid-envelope-nested-payload-outer-attestation-multisig/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "f6f4eccac6ff705b6b2145058dadab72d8ebf8365370faf7bf2bbd5d18bb5c47"
+      },
+      {
+        "path": "scenarios/promise-accounting-records-refused-service/promise-accounting-records-refused-service.md",
+        "sha256": "9a7d47455793988cfb9b0fb045b29086ed13ee22cd0db080584e259c0aa69313"
+      }
+    ],
+    "simulation_tree_hash": "668854aaae32a3dc6bf13e5909bad575b36357d7af8d362f2ebc79ab053078ea"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 4,
+    "auditability": 5,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 3,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 4,
+    "simplicity_durability": 3,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 37,
+    "normalized_0_100": 74,
+    "confidence_0_1": 0.77
+  },
+  "assessment": {
+    "rationale": "Strong PromiseGrid-style envelope specimen with excellent local auditability, exact-byte retention, and clear separation between payload authorship and current actor intent. For this scenario, though, it only partially fits: it can help record evidence around a refusal, but it does not itself define explicit honest-refusal semantics distinct from timeout, reject, or unsupported outcomes.",
+    "strengths": [
+      "Excellent exact-byte audit retention for both payload and outer actor attestation.",
+      "Clear layer boundary between content authorship and current relay/holder/forwarder promise.",
+      "Conservative unknown-codec and unknown-pCID handling supports sparse knowledge and long-term evolution."
+    ],
+    "weaknesses": [
+      "No explicit refusal record shape or refusal decision class for this scenario.",
+      "Service refusal can be confused with absence, policy reject, or unsupported handling unless extra profile work is added.",
+      "Nested payload plus mandatory multisig is less simple and durable than a smaller envelope."
+    ],
+    "risks": [
+      "Honest refusal may be recorded inconsistently across peers because the decision classes do not include a first-class refusal outcome.",
+      "Mandatory outer attestation adds complexity and may increase unsupported/quarantine results in mixed deployments.",
+      "Generic constraints_ref can leave refusal reasons too opaque for durable audit unless later profiles standardize them."
+    ],
+    "open_questions": [
+      "Should this specimen define an explicit refusal payload or decision class so honest service refusal is not collapsed into unsupported, quarantine, reject, or silence?",
+      "How should a peer locally distinguish no response from a signed refusal when the envelope itself is only a carrier?",
+      "Can constraints_ref or a small standard refusal object make policy/cost/authorization refusals durable and auditable without adding much complexity?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design.",
+    "pt_gate": {
+      "status": "pt_clean",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "Actors attest only to their own current role and local policy still decides acceptance."
+      },
+      "scoped_intent": {
+        "status": "pass",
+        "note": "Outer attestation is a scoped declaration about carrying or forwarding exact payload bytes under referenced constraints/freshness."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "A key strength is separating payload authorship from the current actor's relay/holder/forwarder promise."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "The specimen records attestations and verification outcomes, not guaranteed delivery or service."
+      },
+      "local_trust_assessment": {
+        "status": "pass",
+        "note": "Verification outcomes and policy acceptance are explicitly local, with no global trust oracle."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "The design authenticates payloads and outer attestations without treating receipt or use as obligation."
+      },
+      "violations": []
+    }
+  }
+}

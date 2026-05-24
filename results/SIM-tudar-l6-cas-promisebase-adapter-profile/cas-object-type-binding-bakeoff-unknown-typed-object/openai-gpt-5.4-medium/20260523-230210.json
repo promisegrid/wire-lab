@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-tudar-l6-cas-promisebase-adapter-profile-cas-object-type-binding-bakeoff-unknown-typed-object-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000008-SIM-tudar-l6-cas-promisebase-adapter-profile--cas-object-type-binding-bakeoff-unknown-typed-object--openai-gpt-5.4-medium",
+  "sim_id": "SIM-tudar-l6-cas-promisebase-adapter-profile",
+  "scenario_id": "cas-object-type-binding-bakeoff-unknown-typed-object",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-tudar-l6-cas-promisebase-adapter-profile/cas-object-type-binding-bakeoff-unknown-typed-object/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_30139cecf93b4b3bbe089cd436aa75cb",
+    "response_id": "resp_0496ca8b3deb1583006a1232067460819986886c0b4ec49015",
+    "input_tokens": 7589,
+    "output_tokens": 1150,
+    "cost_usd": 0.02938075
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-tudar-l6-cas-promisebase-adapter-profile/",
+    "scenario_path": "scenarios/cas-object-type-binding-bakeoff-unknown-typed-object/cas-object-type-binding-bakeoff-unknown-typed-object.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-tudar-l6-cas-promisebase-adapter-profile/README.md",
+        "sha256": "8045140e0a499bf871f1834cc4b3e4d57d1ae25f7a28022c4e533ee510d1f836"
+      },
+      {
+        "path": "simulations/SIM-tudar-l6-cas-promisebase-adapter-profile/QUESTION.md",
+        "sha256": "5fa3894dd300e1cc66718738501116149682d9c6b6751b497abc7ced4b0799ca"
+      },
+      {
+        "path": "scenarios/cas-object-type-binding-bakeoff-unknown-typed-object/cas-object-type-binding-bakeoff-unknown-typed-object.md",
+        "sha256": "76f0a7016fa2bad5e53903682706bca4eeb4aa2d099311a4ea52b7280748cf90"
+      }
+    ],
+    "simulation_tree_hash": "6c2abb880ff69e2a4b5e9895f65ee92dde3468ae93c11a0f546feff3eb8d0eee"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 3,
+    "promisegrid_alignment": 3,
+    "auditability": 3,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 3,
+    "failure_handling": 2,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 2,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 28,
+    "normalized_0_100": 56.00000000000001,
+    "confidence_0_1": 0.74
+  },
+  "assessment": {
+    "rationale": "Relevant but underspecified. The simulation is about a promisebase-to-PromiseGrid adapter with explicit translation rules, which helps mixed-version evolution, but the provided docs do not clearly state unknown-type opaque handling or anti-unsafe-parsing behavior.",
+    "strengths": [
+      "Directly concerns CAS object identity, pointer shape, and stream evolution.",
+      "Explicit translation rules improve implementability and cross-version continuity.",
+      "Boundary says promisebase is not canonical, which limits lock-in."
+    ],
+    "weaknesses": [
+      "No explicit promise for unknown-type store/advertise/forward behavior.",
+      "Promise-first vocabulary is weak; framing centers on compatibility profile and prior art.",
+      "Adapter layer adds complexity and may blur type-binding boundaries."
+    ],
+    "risks": [
+      "Adapter-first design may import prior-art assumptions that blur PromiseGrid-native type binding rules.",
+      "Unknown codec behavior may remain implicit, leading to unsafe parsing or inconsistent relay behavior across implementations.",
+      "Profile/mapping framing may age less cleanly than a smaller native payload-promise artifact."
+    ],
+    "open_questions": [
+      "Does the adapter explicitly promise that unknown-codec objects may be stored and forwarded opaquely without parsing?",
+      "How are type/codec bindings represented so mixed-version peers can distinguish safe opaque relay from required local understanding?",
+      "What peer-local audit record shows which translation rule or profile version was applied to an unknown object?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

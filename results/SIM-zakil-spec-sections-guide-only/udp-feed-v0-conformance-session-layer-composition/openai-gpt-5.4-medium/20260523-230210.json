@@ -1,0 +1,122 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-zakil-spec-sections-guide-only-udp-feed-v0-conformance-session-layer-composition-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000175-SIM-zakil-spec-sections-guide-only--udp-feed-v0-conformance-session-layer-composition--openai-gpt-5.4-medium",
+  "sim_id": "SIM-zakil-spec-sections-guide-only",
+  "scenario_id": "udp-feed-v0-conformance-session-layer-composition",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-zakil-spec-sections-guide-only/udp-feed-v0-conformance-session-layer-composition/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_d7417a0a2a0b4d8282903e288bad85e2",
+    "response_id": "resp_064f46dc7524d14c006a123403a1d88198a885e7776b1bd1b2",
+    "input_tokens": 7512,
+    "output_tokens": 890,
+    "cost_usd": 0.025606
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-zakil-spec-sections-guide-only/",
+    "scenario_path": "scenarios/udp-feed-v0-conformance-session-layer-composition/udp-feed-v0-conformance-session-layer-composition.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-zakil-spec-sections-guide-only/README.md",
+        "sha256": "84b2fe46bfd2dce8cfa0713c417fd90426238202ec0ad84a4eb05fcddee877de"
+      },
+      {
+        "path": "simulations/SIM-zakil-spec-sections-guide-only/QUESTION.md",
+        "sha256": "9f59b502ea22367343e71e14e36ebb833466c0cdd9f323fdfcca6179c7643c72"
+      },
+      {
+        "path": "scenarios/udp-feed-v0-conformance-session-layer-composition/udp-feed-v0-conformance-session-layer-composition.md",
+        "sha256": "69da5db705a56cd7067a653928ff8b2dc9301ef6ebfc712bd81038a65c9d352c"
+      }
+    ],
+    "simulation_tree_hash": "6a5c66d0ad4c70a583988375452abf7033e0bd0dfd2d62779b137b51635eff6c"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 2,
+    "auditability": 2,
+    "evolution_safety": 2,
+    "layer_boundary_clarity": 1,
+    "failure_handling": 1,
+    "implementation_plausibility": 3,
+    "promise_vocabulary": 1,
+    "simplicity_durability": 2,
+    "risk_penalty": 4
+  },
+  "fitness": {
+    "raw": 16,
+    "normalized_0_100": 32,
+    "confidence_0_1": 0.84
+  },
+  "assessment": {
+    "rationale": "This simulation is weak for the session-layer composition scenario because the pressure is about whether the transport-facing spec itself exposes a clean, sufficient boundary for the next layer. Moving explanatory promise meaning into a guide makes composition less self-contained and risks hiding binding details or conformance expectations outside the normative artifact.",
+    "strengths": [
+      "Keeps protocol specs small and easier to implement mechanically.",
+      "May reduce clutter in the core normative document.",
+      "Plain-language guide prose could help onboarding when kept aligned."
+    ],
+    "weaknesses": [
+      "Poor direct fit to a session-layer composition test.",
+      "Promise wording is displaced from the artifact that implementers must compose against.",
+      "Boundary clarity between transport spec and higher-layer expectations is weakened.",
+      "Failure modes from missing, stale, or divergent guide prose are not resolved."
+    ],
+    "risks": [
+      "Normative meaning may drift between spec and guide.",
+      "Implementers may compose against underspecified session-layer expectations.",
+      "Long-term auditability suffers if guide prose changes or disappears."
+    ],
+    "open_questions": [
+      "Can a minimal UDP-feed spec still state the exact payload promises needed by a session layer without relying on guide prose?",
+      "How are guide citations frozen or versioned so later auditors know which explanatory text shaped conformance?",
+      "What happens when implementers compose layers using only the normative spec and never read the guide?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

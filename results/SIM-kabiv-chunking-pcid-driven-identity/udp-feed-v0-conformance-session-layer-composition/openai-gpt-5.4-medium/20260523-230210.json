@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-kabiv-chunking-pcid-driven-identity-udp-feed-v0-conformance-session-layer-composition-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000049-SIM-kabiv-chunking-pcid-driven-identity--udp-feed-v0-conformance-session-layer-composition--openai-gpt-5.4-medium",
+  "sim_id": "SIM-kabiv-chunking-pcid-driven-identity",
+  "scenario_id": "udp-feed-v0-conformance-session-layer-composition",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-kabiv-chunking-pcid-driven-identity/udp-feed-v0-conformance-session-layer-composition/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_05359cb3cbdd4f8d81347c1a07fc9909",
+    "response_id": "resp_0f3cc194cdcf1c80006a12327db344819bb56d20d9a8599e45",
+    "input_tokens": 7544,
+    "output_tokens": 1382,
+    "cost_usd": 0.03255
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-kabiv-chunking-pcid-driven-identity/",
+    "scenario_path": "scenarios/udp-feed-v0-conformance-session-layer-composition/udp-feed-v0-conformance-session-layer-composition.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-kabiv-chunking-pcid-driven-identity/README.md",
+        "sha256": "f2fd1cfe737e467037ae5298888ddeff9d1042625d9ec2bfabb15830d5d38953"
+      },
+      {
+        "path": "simulations/SIM-kabiv-chunking-pcid-driven-identity/QUESTION.md",
+        "sha256": "ed85c69097a9fa5aac0ca6f33b6749a795c916e00aa52ac17bb8cac4c48512e2"
+      },
+      {
+        "path": "scenarios/udp-feed-v0-conformance-session-layer-composition/udp-feed-v0-conformance-session-layer-composition.md",
+        "sha256": "69da5db705a56cd7067a653928ff8b2dc9301ef6ebfc712bd81038a65c9d352c"
+      }
+    ],
+    "simulation_tree_hash": "05b7a54cb26daa2675abb925708f149eaf46f08dd93700190a804876c953a3e9"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 3,
+    "auditability": 4,
+    "evolution_safety": 2,
+    "layer_boundary_clarity": 3,
+    "failure_handling": 2,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 3,
+    "simplicity_durability": 4,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 28,
+    "normalized_0_100": 56.00000000000001,
+    "confidence_0_1": 0.84
+  },
+  "assessment": {
+    "rationale": "This simulation is only a weak direct fit for UDP-feed session-layer composition because it does not model UDP-feed APIs or session messages. Its main relevance is indirect: it tests whether protocol identity leaks low-level chunking policy across layer boundaries, which is a composition concern. The design is crisp and auditable, but it risks coupling protocol semantics to storage/chunking choices in ways that may hinder clean next-layer composition and evolution.",
+    "strengths": [
+      "Deterministic identity rule is explicit: receivers reconstruct chunk boundaries from the pCID and reject mismatched roots.",
+      "The design squarely examines a real layer-boundary question: protocol meaning versus chunking policy.",
+      "Implementation appears plausible on small peers with local verification."
+    ],
+    "weaknesses": [
+      "It does not directly demonstrate whether UDP-feed v0 is sufficient for a session layer without leaking binding details.",
+      "Failure handling is narrow and mostly limited to root mismatch rejection.",
+      "Evolution story is weak because protocol specs may become responsible for low-level chunking choices."
+    ],
+    "risks": [
+      "Binding chunking policy to pCID may leak storage-format details into interfaces that should stay session- or payload-level.",
+      "Changing chunking parameters may require protocol identity churn even when higher-layer semantics stay the same.",
+      "The simulation leaves transport/session failure behavior largely unspecified."
+    ],
+    "open_questions": [
+      "Would a session-layer spec above UDP-feed need to inherit the pCID-defined chunking contract, or can it remain opaque to it?",
+      "How would chunking-spec upgrades avoid forcing unnecessary protocol-version churn at higher layers?",
+      "Can Alice and Carol audit conformance locally when different peers advertise the same payload protocol but different chunking recipes?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

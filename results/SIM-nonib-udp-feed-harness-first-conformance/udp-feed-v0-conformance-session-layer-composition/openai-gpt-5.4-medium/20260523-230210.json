@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-nonib-udp-feed-harness-first-conformance-udp-feed-v0-conformance-session-layer-composition-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000231-SIM-nonib-udp-feed-harness-first-conformance--udp-feed-v0-conformance-session-layer-composition--openai-gpt-5.4-medium",
+  "sim_id": "SIM-nonib-udp-feed-harness-first-conformance",
+  "scenario_id": "udp-feed-v0-conformance-session-layer-composition",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-nonib-udp-feed-harness-first-conformance/udp-feed-v0-conformance-session-layer-composition/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_f7e4d122edd240698c987d7fb89b5397",
+    "response_id": "resp_069430a213d0a29d006a1234a4f1d4819b8c0b697569d90eba",
+    "input_tokens": 7532,
+    "output_tokens": 1278,
+    "cost_usd": 0.031073
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-nonib-udp-feed-harness-first-conformance/",
+    "scenario_path": "scenarios/udp-feed-v0-conformance-session-layer-composition/udp-feed-v0-conformance-session-layer-composition.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-nonib-udp-feed-harness-first-conformance/README.md",
+        "sha256": "d2745a347b4e1106f615279c5cdb47ec7f164a09da4e95e705d911ee1eaa4784"
+      },
+      {
+        "path": "simulations/SIM-nonib-udp-feed-harness-first-conformance/QUESTION.md",
+        "sha256": "c7ff0d94855382a5f0e62c9d2818e74561fa830fdf82296586df93bdd24d9270"
+      },
+      {
+        "path": "scenarios/udp-feed-v0-conformance-session-layer-composition/udp-feed-v0-conformance-session-layer-composition.md",
+        "sha256": "69da5db705a56cd7067a653928ff8b2dc9301ef6ebfc712bd81038a65c9d352c"
+      }
+    ],
+    "simulation_tree_hash": "8994291972228d954b465cbf4735badeca0703bcb0e41dffd53a54494c86bf99"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 3,
+    "auditability": 4,
+    "evolution_safety": 2,
+    "layer_boundary_clarity": 2,
+    "failure_handling": 4,
+    "implementation_plausibility": 3,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 1,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 25,
+    "normalized_0_100": 50,
+    "confidence_0_1": 0.79
+  },
+  "assessment": {
+    "rationale": "This simulation is relevant because it pressures UDP-feed under loss, timing, and topology change, but it mainly evaluates transport-binding evidence rather than whether a clean session-layer composition contract exists. It scores well on packet-level auditability and failure pressure, but weakly on next-layer boundary clarity, promise-first vocabulary, and small durable artifact shape.",
+    "strengths": [
+      "Strong audit orientation through recorded packet-level evidence.",
+      "Directly exercises loss, timing, and topology failure pressure.",
+      "Clear bounded purpose: test whether harness-first evidence is needed before stronger usefulness claims."
+    ],
+    "weaknesses": [
+      "Does not clearly specify the session-layer promise surface above UDP-feed v0.",
+      "Focuses on harness evidence more than layer-composition semantics.",
+      "Artifact shape is relatively heavy and not very 100-year small-device durable."
+    ],
+    "risks": [
+      "Conformance may become simulator-centric and still leave the session-layer contract undefined.",
+      "Packet-level evidence can overfit transport behavior while missing binding-detail leakage into higher layers.",
+      "Harness cost may delay or crowd out a simpler explicit composition artifact for v0."
+    ],
+    "open_questions": [
+      "What exact session-layer artifact or promise would sit above UDP-feed v0 without exposing binding internals?",
+      "Can harness-first packet evidence be reduced to a small durable conformance artifact that later implementations can audit without ns-3?",
+      "Which composition failures matter most: ordering, retransmission visibility, peer churn, or identity/session binding drift?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

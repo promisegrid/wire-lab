@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-zakil-spec-sections-guide-only-peer-adoption-metadata-spec-answer-vocabulary-drift-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000172-SIM-zakil-spec-sections-guide-only--peer-adoption-metadata-spec-answer-vocabulary-drift--openai-gpt-5.4-medium",
+  "sim_id": "SIM-zakil-spec-sections-guide-only",
+  "scenario_id": "peer-adoption-metadata-spec-answer-vocabulary-drift",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-zakil-spec-sections-guide-only/peer-adoption-metadata-spec-answer-vocabulary-drift/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_977f07f81a2a4fbdb22d83bdf05835f1",
+    "response_id": "resp_08f3652150f4d42c006a1233fafee481988eceddb1f465f690",
+    "input_tokens": 7516,
+    "output_tokens": 1607,
+    "cost_usd": 0.035651
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-zakil-spec-sections-guide-only/",
+    "scenario_path": "scenarios/peer-adoption-metadata-spec-answer-vocabulary-drift/peer-adoption-metadata-spec-answer-vocabulary-drift.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-zakil-spec-sections-guide-only/README.md",
+        "sha256": "84b2fe46bfd2dce8cfa0713c417fd90426238202ec0ad84a4eb05fcddee877de"
+      },
+      {
+        "path": "simulations/SIM-zakil-spec-sections-guide-only/QUESTION.md",
+        "sha256": "9f59b502ea22367343e71e14e36ebb833466c0cdd9f323fdfcca6179c7643c72"
+      },
+      {
+        "path": "scenarios/peer-adoption-metadata-spec-answer-vocabulary-drift/peer-adoption-metadata-spec-answer-vocabulary-drift.md",
+        "sha256": "a9e8ba84995e69fcad36f2554442cc62c5e1128ea0818197cb7ebf66e843ff53"
+      }
+    ],
+    "simulation_tree_hash": "6a5c66d0ad4c70a583988375452abf7033e0bd0dfd2d62779b137b51635eff6c"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 2,
+    "auditability": 2,
+    "evolution_safety": 1,
+    "layer_boundary_clarity": 3,
+    "failure_handling": 1,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 1,
+    "simplicity_durability": 2,
+    "risk_penalty": 4
+  },
+  "fitness": {
+    "raw": 19,
+    "normalized_0_100": 38,
+    "confidence_0_1": 0.83
+  },
+  "assessment": {
+    "rationale": "The simulation is relevant because the scenario is about metadata meaning across spec evolution, and this design deliberately moves explanatory meaning out of the spec. Its main benefit is a clean small-spec/guide split that is easy to publish and implement. Its main failure is that renamed or removed answer vocabulary can become dependent on external guide prose rather than on durable spec-local promises or explicit migration records, which weakens long-term auditability and evolution safety.",
+    "strengths": [
+      "Clear documentation layer split.",
+      "Small normative specs are easy to implement and maintain.",
+      "Avoids bloated wrapper specs."
+    ],
+    "weaknesses": [
+      "Weak answer-key migration story in this scenario.",
+      "Promise meaning is too dependent on external prose.",
+      "Old claims become harder to audit after spec renames or removals.",
+      "Failure behavior under vocabulary drift is not explicit."
+    ],
+    "risks": [
+      "Guide revisions can change how later readers interpret old metadata claims.",
+      "Different peers may rely on different cached guide versions, producing vocabulary drift.",
+      "Minimal specs may omit the exact promise wording needed to keep superseded answer keys unambiguous."
+    ],
+    "open_questions": [
+      "Can a minimal spec still freeze per-pCID answer-key semantics or migration pointers without pulling full guide prose back into the spec?",
+      "How would a peer audit an old Q9-era claim if guide prose has since been revised or reorganized?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

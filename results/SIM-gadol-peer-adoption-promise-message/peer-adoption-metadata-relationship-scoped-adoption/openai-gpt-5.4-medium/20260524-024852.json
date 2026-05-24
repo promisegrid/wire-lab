@@ -1,0 +1,163 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-gadol-peer-adoption-promise-message-peer-adoption-metadata-relationship-scoped-adoption-openai-gpt-5.4-medium-20260524-024852",
+  "run_group_id": "ga-canary-20260523-pt-gate-v3",
+  "cell_id": "ga-canary-20260523-pt-gate-v3-000021-SIM-gadol-peer-adoption-promise-message--peer-adoption-metadata-relationship-scoped-adoption--openai-gpt-5.4-medium",
+  "sim_id": "SIM-gadol-peer-adoption-promise-message",
+  "scenario_id": "peer-adoption-metadata-relationship-scoped-adoption",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260524-024852",
+  "result_path": "results/SIM-gadol-peer-adoption-promise-message/peer-adoption-metadata-relationship-scoped-adoption/openai-gpt-5.4-medium/20260524-024852.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_e6331aba74704cdc92f33c744bc8693b",
+    "response_id": "resp_09383b77cce36ca0006a1267994020819a8e54634545c82526",
+    "input_tokens": 8121,
+    "output_tokens": 1673,
+    "cost_usd": 0.03763375
+  },
+  "source": {
+    "repo_commit": "ec652bd3ecaaf2f904e62cff00e113a88c7e3efd",
+    "sim_path": "simulations/SIM-gadol-peer-adoption-promise-message/",
+    "scenario_path": "scenarios/peer-adoption-metadata-relationship-scoped-adoption/peer-adoption-metadata-relationship-scoped-adoption.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-gadol-peer-adoption-promise-message/README.md",
+        "sha256": "b7767c1a9279ef3c1a9bcc08a1d96a87259fe4e5090fa06ad2811a397fef49d3"
+      },
+      {
+        "path": "simulations/SIM-gadol-peer-adoption-promise-message/QUESTION.md",
+        "sha256": "3096ee94cbc1ba2247fc46b908d4e215cbe96af054b7943f6b6d567185b6df3b"
+      },
+      {
+        "path": "scenarios/peer-adoption-metadata-relationship-scoped-adoption/peer-adoption-metadata-relationship-scoped-adoption.md",
+        "sha256": "b2a2b0fb4dfcd76dfd88a39d4bb4f4d8a85fafb0b052621a36de8692d19fe3d7"
+      }
+    ],
+    "simulation_tree_hash": "cc25bca5323b36b38c3d31b1314bf64a50e08e8631c97040b6e872ad0548e43a"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 4,
+    "promisegrid_alignment": 5,
+    "auditability": 4,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 3,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 5,
+    "simplicity_durability": 5,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 41,
+    "normalized_0_100": 82,
+    "confidence_0_1": 0.83
+  },
+  "assessment": {
+    "rationale": "Strong Promise-Theory fit: adoption is reframed as an ordinary peer promise, which is durable, auditable, and avoids special authority-heavy metadata. It handles the scenario reasonably well because relationship-scoped adoption can be expressed as separate promises, but the specimen does not yet make relationship scope and supersession mechanics explicit enough to remove ambiguity.",
+    "strengths": [
+      "Promise-first wording centered on a peer's own declared behavior.",
+      "Reuses ordinary promise-message path instead of special adoption metadata.",
+      "Supports storage, relay, and supersession under normal promise accounting.",
+      "Small durable artifact likely to fit long-lived and low-resource environments."
+    ],
+    "weaknesses": [
+      "Relationship-scoped adoption is not explicitly modeled in the current specimen.",
+      "Final envelope is intentionally undecided, leaving audit details open.",
+      "Failure handling for conflicting or stale adoption promises is only partial."
+    ],
+    "risks": [
+      "If relationship scope is implicit or underspecified, peers may misread legitimate per-peer variation as contradiction.",
+      "Superseding messages may create stale or conflicting interpretations without a clear local selection rule.",
+      "Answer-binding resolution may drift across implementations if canonical form is not fixed."
+    ],
+    "open_questions": [
+      "How is relationship scope encoded so Bob can promise one profile to Alice and another to Carol without ambiguity?",
+      "What locally-auditable supersession rule decides which promise message is active per counterparty and time?",
+      "How are answer bindings canonicalized so independent peers resolve the same pCID plus binding set durably?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design.",
+    "pt_gate": {
+      "status": "pt_clean",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "Each peer publishes its own promise message and remains autonomous."
+      },
+      "scoped_intent": {
+        "status": "pass",
+        "note": "Using an ordinary promise message fits scoped declarations of intent, and relationship-specific scope appears representable though not yet fully specified."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "The simulation has Alice promise her own behavior only."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "The message declares intended behavior under a profile; it does not guarantee outcomes."
+      },
+      "local_trust_assessment": {
+        "status": "pass",
+        "note": "Stored and relayed promise messages support peer-local trust assessment rather than a global authority."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "The design speaks in terms of a peer promising its own behavior, not obligating others to accept or comply."
+      },
+      "violations": []
+    }
+  }
+}

@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-guhum-transport-cluster-of-clusters-udp-feed-v0-conformance-session-layer-composition-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000112-SIM-guhum-transport-cluster-of-clusters--udp-feed-v0-conformance-session-layer-composition--openai-gpt-5.4-medium",
+  "sim_id": "SIM-guhum-transport-cluster-of-clusters",
+  "scenario_id": "udp-feed-v0-conformance-session-layer-composition",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-guhum-transport-cluster-of-clusters/udp-feed-v0-conformance-session-layer-composition/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_3ddcdeaa9d06444496712ecdeacf9d38",
+    "response_id": "resp_0d7e6954c4c3825c006a1233421830819980b54a35ed315bcf",
+    "input_tokens": 7511,
+    "output_tokens": 970,
+    "cost_usd": 0.02672425
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-guhum-transport-cluster-of-clusters/",
+    "scenario_path": "scenarios/udp-feed-v0-conformance-session-layer-composition/udp-feed-v0-conformance-session-layer-composition.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-guhum-transport-cluster-of-clusters/README.md",
+        "sha256": "9faf90179b085adf41d297b03e68fcea05f1036b00e1b289da4be5f7765e7350"
+      },
+      {
+        "path": "simulations/SIM-guhum-transport-cluster-of-clusters/QUESTION.md",
+        "sha256": "9c28415f96b79e449c81152d12b31194c886b19e458c9865af66f5e07c381955"
+      },
+      {
+        "path": "scenarios/udp-feed-v0-conformance-session-layer-composition/udp-feed-v0-conformance-session-layer-composition.md",
+        "sha256": "69da5db705a56cd7067a653928ff8b2dc9301ef6ebfc712bd81038a65c9d352c"
+      }
+    ],
+    "simulation_tree_hash": "0c3d3b4f767b25b25cd7017af80c516d7440b523c53d81768d763ddb4e97dfe2"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 3,
+    "auditability": 2,
+    "evolution_safety": 2,
+    "layer_boundary_clarity": 2,
+    "failure_handling": 1,
+    "implementation_plausibility": 3,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 2,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 21,
+    "normalized_0_100": 42,
+    "confidence_0_1": 0.74
+  },
+  "assessment": {
+    "rationale": "The simulation is relevant at a transport/layering level, but it does not directly specify UDP-feed v0 or a clean session-layer composition contract. It helps probe whether clustered transport can hide lower-layer complexity, yet the current specimen stays abstract on next-layer API shape, audit artifacts, and failure behavior. Alignment with PromiseGrid goals is partial because it emphasizes peer-local cluster promises and avoidance of central routing authority, but the hierarchy risks hidden control points and boundary leakage.",
+    "strengths": [
+      "Explicitly targets scale without central global transport state.",
+      "Uses promise-oriented framing for cluster membership, routing, and relay behavior.",
+      "Naturally raises boundary questions between local transport behavior and wider composition."
+    ],
+    "weaknesses": [
+      "No direct UDP-feed v0 conformance surface is defined.",
+      "Session-layer API sufficiency is not specified or testable from the current docs.",
+      "Failure handling, adversarial pressure, and audit records are largely absent."
+    ],
+    "risks": [
+      "Cluster summaries may become de facto control or trust choke points.",
+      "Session semantics may leak transport binding details if cluster relay behavior is underspecified.",
+      "Hierarchy may complicate long-term migration and cross-version interoperability."
+    ],
+    "open_questions": [
+      "Can a cluster expose a session-safe transport API without leaking cluster membership or routing internals upward?",
+      "What peer-local evidence would show session-layer conformance across cluster boundaries?",
+      "How are versioning and migration handled when session expectations change but cluster transport summaries remain coarse?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-jaboj-udp-feed-reference-first-conformance-peer-adoption-metadata-spec-answer-vocabulary-drift-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000214-SIM-jaboj-udp-feed-reference-first-conformance--peer-adoption-metadata-spec-answer-vocabulary-drift--openai-gpt-5.4-medium",
+  "sim_id": "SIM-jaboj-udp-feed-reference-first-conformance",
+  "scenario_id": "peer-adoption-metadata-spec-answer-vocabulary-drift",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-jaboj-udp-feed-reference-first-conformance/peer-adoption-metadata-spec-answer-vocabulary-drift/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_faa3e5e19a6a4f91a611e0371f91b089",
+    "response_id": "resp_0eccd9c37e7c9d24006a12347536088199a20472fe3823ba2a",
+    "input_tokens": 7521,
+    "output_tokens": 1205,
+    "cost_usd": 0.03003175
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-jaboj-udp-feed-reference-first-conformance/",
+    "scenario_path": "scenarios/peer-adoption-metadata-spec-answer-vocabulary-drift/peer-adoption-metadata-spec-answer-vocabulary-drift.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-jaboj-udp-feed-reference-first-conformance/README.md",
+        "sha256": "7a366479b944562eb3ad213d94428192af23f1d79149ffb11e33896c593ef129"
+      },
+      {
+        "path": "simulations/SIM-jaboj-udp-feed-reference-first-conformance/QUESTION.md",
+        "sha256": "de16e9046e2265bd63480386d3f90b49b31f72bd680d4d0a6c46ffff010c66fc"
+      },
+      {
+        "path": "scenarios/peer-adoption-metadata-spec-answer-vocabulary-drift/peer-adoption-metadata-spec-answer-vocabulary-drift.md",
+        "sha256": "a9e8ba84995e69fcad36f2554442cc62c5e1128ea0818197cb7ebf66e843ff53"
+      }
+    ],
+    "simulation_tree_hash": "f289c5266e54709caa056201b96564ab65f920220f6cd9dd50db946813c2b7d1"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 0,
+    "promisegrid_alignment": 1,
+    "auditability": 3,
+    "evolution_safety": 1,
+    "layer_boundary_clarity": 2,
+    "failure_handling": 1,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 0,
+    "simplicity_durability": 2,
+    "risk_penalty": 4
+  },
+  "fitness": {
+    "raw": 15,
+    "normalized_0_100": 30,
+    "confidence_0_1": 0.87
+  },
+  "assessment": {
+    "rationale": "This simulation is a weak fit for the scenario. It focuses on code-first UDP-feed conformance, while the scenario asks how adoption-metadata answer keys survive frozen-spec evolution and vocabulary drift. The design does help audit observable behavior and is plausible to build, but it does not directly model spec-local vs global answer naming, migration records, or promise-first metadata claims. Its own stated risk—accidental implementation behavior becoming normative—maps to poor evolution safety under vocabulary drift.",
+    "strengths": [
+      "Small concrete artifact with observable behavior.",
+      "Explicitly acknowledges boundary between reference code and later validation artifacts.",
+      "High implementation plausibility for early convergence testing."
+    ],
+    "weaknesses": [
+      "Does not directly address adoption metadata or answer-key naming scope.",
+      "Uses conformance/reference-implementation framing rather than promise-first payload promises.",
+      "Weak migration/evolution story for renamed or removed fields.",
+      "No explicit failure-handling plan for stale or superseded vocabulary."
+    ],
+    "risks": [
+      "Reference-first behavior may ossify accidental names or semantics before a durable spec-local migration story exists.",
+      "Peers may treat implementation output as the authoritative vocabulary, increasing drift and ambiguity after later spec changes.",
+      "Scenario pressure may be falsely 'passed' by executable behavior without answering how old claims remain interpretable over long time spans."
+    ],
+    "open_questions": [
+      "Could the reference implementation expose spec-local identifiers or migration records without turning implementation details into the normative vocabulary?",
+      "If later vectors/specs supersede the first implementation, what artifact becomes the durable authority for renamed or removed fields?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

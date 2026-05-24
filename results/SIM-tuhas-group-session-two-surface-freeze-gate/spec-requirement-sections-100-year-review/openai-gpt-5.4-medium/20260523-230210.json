@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-tuhas-group-session-two-surface-freeze-gate-spec-requirement-sections-100-year-review-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000194-SIM-tuhas-group-session-two-surface-freeze-gate--spec-requirement-sections-100-year-review--openai-gpt-5.4-medium",
+  "sim_id": "SIM-tuhas-group-session-two-surface-freeze-gate",
+  "scenario_id": "spec-requirement-sections-100-year-review",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-tuhas-group-session-two-surface-freeze-gate/spec-requirement-sections-100-year-review/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_463fcd14f1e1460ca1bb02c2fcd35cfb",
+    "response_id": "resp_0e11ccd5607d03fe006a123437ea348199a3018b096029410f",
+    "input_tokens": 7525,
+    "output_tokens": 1354,
+    "cost_usd": 0.03212475
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-tuhas-group-session-two-surface-freeze-gate/",
+    "scenario_path": "scenarios/spec-requirement-sections-100-year-review/spec-requirement-sections-100-year-review.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-tuhas-group-session-two-surface-freeze-gate/README.md",
+        "sha256": "e43f0b558a84df77949d02ecc1b3935ed88b960c004389aa25dbd5bbcf210d9d"
+      },
+      {
+        "path": "simulations/SIM-tuhas-group-session-two-surface-freeze-gate/QUESTION.md",
+        "sha256": "941b2f5c4cddf2e0e09049946ae9eea7a18729897d9f17752f75227383d77764"
+      },
+      {
+        "path": "scenarios/spec-requirement-sections-100-year-review/spec-requirement-sections-100-year-review.md",
+        "sha256": "b2e71192b720372495986fad6387d0bfd5222ce78a7cfd9da03940d1a1062cd7"
+      }
+    ],
+    "simulation_tree_hash": "922fe155f0556c2815948fc7c7d60c4110e7e227d2cb2af2ab330e76d35c3f57"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 3,
+    "promisegrid_alignment": 3,
+    "auditability": 4,
+    "evolution_safety": 5,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 2,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 4,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 35,
+    "normalized_0_100": 70,
+    "confidence_0_1": 0.78
+  },
+  "assessment": {
+    "rationale": "Moderate fit. The simulation directly targets long-horizon assumption preservation by separating outer/feed freeze scope from group-session semantic freeze scope, which helps future readers see what was actually frozen. It scores best on boundary clarity and evolution safety. It is weaker for this scenario because it does not yet define a concrete required spec-section home, durable review format, or strong failure-mode/audit procedure for century-scale readers.",
+    "strengths": [
+      "Clear separation of outer/feed versus session-semantic surfaces improves 100-year interpretability.",
+      "Strong evolution-safety story: later changes are less likely to rewrite the wrong promise scope.",
+      "Small and plausible mechanism compared with larger bundles or registry-heavy designs."
+    ],
+    "weaknesses": [
+      "No concrete TE-dajot-style section home or frozen artifact structure is specified.",
+      "Limited treatment of adversarial, stale, or refusal cases for long-horizon audit.",
+      "Uses promise-adjacent wording, but not strongly payload-promise-first vocabulary."
+    ],
+    "risks": [
+      "Two freeze surfaces may introduce coordination overhead and reader confusion if the durable spec text is not extremely explicit.",
+      "A merge promise that spans both surfaces could become the new ambiguity point unless its evidence shape is tightly constrained.",
+      "Without a concrete archival section layout, the design may improve intent but still fail future intelligibility."
+    ],
+    "open_questions": [
+      "What concrete long-horizon spec section or artifact would carry the two-surface freeze assumptions for future readers?",
+      "How does a peer record and audit a partial freeze locally when one surface changes and the other does not?",
+      "What are the exact refusal and merge semantics when the two surfaces disagree across eras or implementations?"
+    ],
+    "authority_boundary": "Evidence only; suggests separate freeze surfaces may help 100-year review, but final authority belongs in DR/DI/frozen spec."
+  }
+}

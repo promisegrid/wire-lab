@@ -1,0 +1,122 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-jaboj-udp-feed-reference-first-conformance-spec-requirement-sections-100-year-review-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000215-SIM-jaboj-udp-feed-reference-first-conformance--spec-requirement-sections-100-year-review--openai-gpt-5.4-medium",
+  "sim_id": "SIM-jaboj-udp-feed-reference-first-conformance",
+  "scenario_id": "spec-requirement-sections-100-year-review",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-jaboj-udp-feed-reference-first-conformance/spec-requirement-sections-100-year-review/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_912497dfff9545048586d062f544626c",
+    "response_id": "resp_00442d9379a9adbf006a123477784c8198b1b91a5d2006bf34",
+    "input_tokens": 7515,
+    "output_tokens": 925,
+    "cost_usd": 0.02610125
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-jaboj-udp-feed-reference-first-conformance/",
+    "scenario_path": "scenarios/spec-requirement-sections-100-year-review/spec-requirement-sections-100-year-review.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-jaboj-udp-feed-reference-first-conformance/README.md",
+        "sha256": "7a366479b944562eb3ad213d94428192af23f1d79149ffb11e33896c593ef129"
+      },
+      {
+        "path": "simulations/SIM-jaboj-udp-feed-reference-first-conformance/QUESTION.md",
+        "sha256": "de16e9046e2265bd63480386d3f90b49b31f72bd680d4d0a6c46ffff010c66fc"
+      },
+      {
+        "path": "scenarios/spec-requirement-sections-100-year-review/spec-requirement-sections-100-year-review.md",
+        "sha256": "b2e71192b720372495986fad6387d0bfd5222ce78a7cfd9da03940d1a1062cd7"
+      }
+    ],
+    "simulation_tree_hash": "f289c5266e54709caa056201b96564ab65f920220f6cd9dd50db946813c2b7d1"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 1,
+    "auditability": 2,
+    "evolution_safety": 1,
+    "layer_boundary_clarity": 2,
+    "failure_handling": 1,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 0,
+    "simplicity_durability": 2,
+    "risk_penalty": 4
+  },
+  "fitness": {
+    "raw": 15,
+    "normalized_0_100": 30,
+    "confidence_0_1": 0.84
+  },
+  "assessment": {
+    "rationale": "This candidate is a plausible short-term engineering path for UDP-feed v0, but it fits the 100-year review scenario weakly because the design centers reference code rather than an explicit durable requirement section. The docs themselves acknowledge the main hazard: later vectors and simulations may inherit accidental implementation behavior as norm. That weakens long-horizon intelligibility, promise-first framing, and evolution safety.",
+    "strengths": [
+      "Small concrete artifact is implementation-plausible.",
+      "The simulation explicitly names the risk of accidental behavior becoming normative.",
+      "Boundaries are at least partially stated."
+    ],
+    "weaknesses": [
+      "Poor fit for a scenario asking whether required long-horizon sections preserve assumptions for future readers.",
+      "Not expressed in promise-first vocabulary.",
+      "Weak 100-year durability compared with explicit frozen requirement text.",
+      "Limited failure-handling or migration story if implementation and later vectors diverge."
+    ],
+    "risks": [
+      "Reference implementation behavior may become de facto normative without a stable human-readable requirement section.",
+      "Future auditors may need obsolete Go/tooling context to understand what was promised.",
+      "Code-first conformance can blur the boundary between transport behavior, test oracle, and specification authority."
+    ],
+    "open_questions": [
+      "Would a frozen spec section accompany the reference implementation so future readers are not forced to infer requirements from Go behavior?",
+      "How would Carol audit conformance 100 years later if the toolchain, runtime, and hosting assumptions are gone?",
+      "What prevents accidental implementation quirks from becoming normative v0 behavior?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

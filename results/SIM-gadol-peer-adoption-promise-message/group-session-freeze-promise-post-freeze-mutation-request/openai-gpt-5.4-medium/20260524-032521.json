@@ -1,0 +1,163 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-gadol-peer-adoption-promise-message-group-session-freeze-promise-post-freeze-mutation-request-openai-gpt-5.4-medium-20260524-032521",
+  "run_group_id": "ga-canary-20260523-pt-gate-v3-successors",
+  "cell_id": "ga-canary-20260523-pt-gate-v3-successors-000022-SIM-gadol-peer-adoption-promise-message--group-session-freeze-promise-post-freeze-mutation-request--openai-gpt-5.4-medium",
+  "sim_id": "SIM-gadol-peer-adoption-promise-message",
+  "scenario_id": "group-session-freeze-promise-post-freeze-mutation-request",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260524-032521",
+  "result_path": "results/SIM-gadol-peer-adoption-promise-message/group-session-freeze-promise-post-freeze-mutation-request/openai-gpt-5.4-medium/20260524-032521.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_40ad31e0b75241258e78b98c459bb17e",
+    "response_id": "resp_0891350c6a671bf4006a127016e414819b92c25c3555ffbe10",
+    "input_tokens": 8128,
+    "output_tokens": 1141,
+    "cost_usd": 0.030198
+  },
+  "source": {
+    "repo_commit": "925c7f5c1c7ce7d5b0caf6a924d40d3f9b7d0483",
+    "sim_path": "simulations/SIM-gadol-peer-adoption-promise-message/",
+    "scenario_path": "scenarios/group-session-freeze-promise-post-freeze-mutation-request/group-session-freeze-promise-post-freeze-mutation-request.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-gadol-peer-adoption-promise-message/README.md",
+        "sha256": "b7767c1a9279ef3c1a9bcc08a1d96a87259fe4e5090fa06ad2811a397fef49d3"
+      },
+      {
+        "path": "simulations/SIM-gadol-peer-adoption-promise-message/QUESTION.md",
+        "sha256": "3096ee94cbc1ba2247fc46b908d4e215cbe96af054b7943f6b6d567185b6df3b"
+      },
+      {
+        "path": "scenarios/group-session-freeze-promise-post-freeze-mutation-request/group-session-freeze-promise-post-freeze-mutation-request.md",
+        "sha256": "9083e149d879dcf5890bbcc3d3bb2fcf87b4490ba1878e59a73402bd5312ee52"
+      }
+    ],
+    "simulation_tree_hash": "cc25bca5323b36b38c3d31b1314bf64a50e08e8631c97040b6e872ad0548e43a"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 3,
+    "promisegrid_alignment": 4,
+    "auditability": 3,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 2,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 5,
+    "simplicity_durability": 4,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 36,
+    "normalized_0_100": 72,
+    "confidence_0_1": 0.82
+  },
+  "assessment": {
+    "rationale": "This is a strong Promise-Theory-shaped design because adoption is expressed as an ordinary agent promise that can be stored and superseded. For the freeze mutation scenario, it helps by favoring new later promises over in-place mutation, but it does not yet specify enough lineage and freeze semantics to cleanly distinguish amendment versus new specimen versus superseding pCID in all cases.",
+    "strengths": [
+      "Promise-first wording with explicit autonomous agent intent.",
+      "Reuses ordinary promise messages instead of introducing special adoption metadata.",
+      "Supports evolution through superseding messages rather than mutating prior records.",
+      "Likely durable and implementable on small devices because the artifact can remain a compact message."
+    ],
+    "weaknesses": [
+      "Freeze semantics are not first-class in the simulation.",
+      "Does not define how to audit old frozen history against later breaking changes.",
+      "Conflict handling for stale, concurrent, or adversarial superseding messages is thin."
+    ],
+    "risks": [
+      "Post-freeze change classification may remain ambiguous without explicit lineage fields or freeze references.",
+      "Independent peers may reach different conclusions when superseding messages conflict or arrive out of order.",
+      "Ordinary promise-message reuse could blur adoption evidence and protocol-version evidence if the envelope stays underspecified."
+    ],
+    "open_questions": [
+      "How does freeze evidence bind a later superseding adoption message to a new specimen or lineage without mutating old history?",
+      "What exact locally-auditable fields let independent peers distinguish amendment, supersession, and incompatible replacement after freeze?",
+      "How are stale or conflicting post-freeze adoption promises compared when peers lack full history?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design.",
+    "pt_gate": {
+      "status": "pt_clean",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "The design centers on Alice publishing her own promise message, preserving agent autonomy."
+      },
+      "scoped_intent": {
+        "status": "pass",
+        "note": "The promise is scoped to Alice's stated behavior under a referenced pCID and answer bindings."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "The simulation does not have one agent promise adoption on behalf of other peers."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "The design states intent to behave according to pCID X, not guaranteed network-wide convergence or acceptance."
+      },
+      "local_trust_assessment": {
+        "status": "pass",
+        "note": "Peers can assess Alice's promise locally from stored messages, though trust evidence and conflict resolution remain under-specified."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "A promise to adopt or behave according to a pCID does not impose obligation on other peers to accept or use it."
+      },
+      "violations": []
+    }
+  }
+}

@@ -1,0 +1,163 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-konit-pcid-promise-evidence-index-peer-adoption-metadata-relationship-scoped-adoption-openai-gpt-5.4-medium-20260524-032521",
+  "run_group_id": "ga-canary-20260523-pt-gate-v3-successors",
+  "cell_id": "ga-canary-20260523-pt-gate-v3-successors-000061-SIM-konit-pcid-promise-evidence-index--peer-adoption-metadata-relationship-scoped-adoption--openai-gpt-5.4-medium",
+  "sim_id": "SIM-konit-pcid-promise-evidence-index",
+  "scenario_id": "peer-adoption-metadata-relationship-scoped-adoption",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260524-032521",
+  "result_path": "results/SIM-konit-pcid-promise-evidence-index/peer-adoption-metadata-relationship-scoped-adoption/openai-gpt-5.4-medium/20260524-032521.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_b9e544e0bdb44409942a322aac7dd47a",
+    "response_id": "resp_072fd202ff5aa417006a1270ef9664819bade30639fc207902",
+    "input_tokens": 8265,
+    "output_tokens": 1305,
+    "cost_usd": 0.03273375
+  },
+  "source": {
+    "repo_commit": "925c7f5c1c7ce7d5b0caf6a924d40d3f9b7d0483",
+    "sim_path": "simulations/SIM-konit-pcid-promise-evidence-index/",
+    "scenario_path": "scenarios/peer-adoption-metadata-relationship-scoped-adoption/peer-adoption-metadata-relationship-scoped-adoption.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-konit-pcid-promise-evidence-index/README.md",
+        "sha256": "9ebee1bbac1dafa81dd66c456d35cc98c1bcc2152ac436c41ce31d1fb5d2a6ef"
+      },
+      {
+        "path": "simulations/SIM-konit-pcid-promise-evidence-index/QUESTION.md",
+        "sha256": "03e6029e9943fdd935fc8c629d871c771710a27f4ccbdf5b3db727be79814960"
+      },
+      {
+        "path": "scenarios/peer-adoption-metadata-relationship-scoped-adoption/peer-adoption-metadata-relationship-scoped-adoption.md",
+        "sha256": "b2a2b0fb4dfcd76dfd88a39d4bb4f4d8a85fafb0b052621a36de8692d19fe3d7"
+      }
+    ],
+    "simulation_tree_hash": "227c9a080416752ab4c2fd51ae77ac84fad407f5deaf7843de114272995e423a"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 4,
+    "promisegrid_alignment": 5,
+    "auditability": 5,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 4,
+    "implementation_plausibility": 5,
+    "promise_vocabulary": 5,
+    "simplicity_durability": 4,
+    "risk_penalty": 1
+  },
+  "fitness": {
+    "raw": 44,
+    "normalized_0_100": 88,
+    "confidence_0_1": 0.82
+  },
+  "assessment": {
+    "rationale": "Strong Promise-Theory fit: the design is descriptive evidence about who promised what under a pCID and what was later observed. That maps well to relationship-scoped adoption because Bob can make different promises to Alice and Carol without a global adoption claim, but the simulation should state audience/relationship scope more explicitly to score perfectly on this scenario.",
+    "strengths": [
+      "Promise-first wording with explicit promiser, evidence, and later observation.",
+      "Clear local-trust boundary; no central authority or certification semantics.",
+      "Good auditability for peer-specific adoption claims when entries are scoped precisely.",
+      "Durable pCID-linked evidence can survive protocol evolution better than generic adoption metadata."
+    ],
+    "weaknesses": [
+      "Relationship-scoped adoption is supported implicitly more than explicitly.",
+      "Failure-handling mechanics for conflicting peer-specific claims are not fully specified.",
+      "Boundary against broader metadata-wrapper growth may need firmer minimal-shape constraints."
+    ],
+    "risks": [
+      "If implementations omit relationship/audience scope, different peer-specific adoption promises could be misread as inconsistency.",
+      "A richer evidence index could drift back toward profile-card or ledger framing if kept too generic.",
+      "Cross-peer comparisons may tempt users to infer global conformance from local evidence records."
+    ],
+    "open_questions": [
+      "Does each index entry explicitly bind the promise to a named relationship or audience such as Bob-\u003eAlice versus Bob-\u003eCarol, rather than only to Bob's peer identity?",
+      "How are later observations of keep, break, or ambiguity recorded when Bob makes different adoption promises to different peers at the same time?",
+      "What minimal artifact shape preserves relationship scope durably without turning the index into a larger profile metadata wrapper?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design.",
+    "pt_gate": {
+      "status": "pt_clean",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "Agents make and assess promises locally; the index does not remove autonomy."
+      },
+      "scoped_intent": {
+        "status": "pass",
+        "note": "pCID-scoped promise evidence fits Promise Theory well, though relationship scope should be explicit for this scenario."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "The design asks who promised what and keeps that attribution explicit."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "Entries describe promised intent and later observations, not guaranteed success."
+      },
+      "local_trust_assessment": {
+        "status": "pass",
+        "note": "Trust remains a local judgment by Alice, Bob, or Carol based on cited evidence."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "The design records evidence about promises and observations; it does not treat peer adoption or use as an obligation."
+      },
+      "violations": []
+    }
+  }
+}

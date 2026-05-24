@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-fiboh-group-session-deferred-freeze-group-session-freeze-promise-post-freeze-mutation-request-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000209-SIM-fiboh-group-session-deferred-freeze--group-session-freeze-promise-post-freeze-mutation-request--openai-gpt-5.4-medium",
+  "sim_id": "SIM-fiboh-group-session-deferred-freeze",
+  "scenario_id": "group-session-freeze-promise-post-freeze-mutation-request",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-fiboh-group-session-deferred-freeze/group-session-freeze-promise-post-freeze-mutation-request/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_d27ebb75c01c408baa6db59f2e475782",
+    "response_id": "resp_0f9f07fc19977e9d006a123465ffe48198961118adc6ffa16b",
+    "input_tokens": 7499,
+    "output_tokens": 1158,
+    "cost_usd": 0.02933525
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-fiboh-group-session-deferred-freeze/",
+    "scenario_path": "scenarios/group-session-freeze-promise-post-freeze-mutation-request/group-session-freeze-promise-post-freeze-mutation-request.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-fiboh-group-session-deferred-freeze/README.md",
+        "sha256": "5ef83b5e7ef5f2f1dcbbee4d4ca46b8593bcb621402a846c322fad5755171ec4"
+      },
+      {
+        "path": "simulations/SIM-fiboh-group-session-deferred-freeze/QUESTION.md",
+        "sha256": "63305f0ebe3e9872f700b432a543d21b4fcfa92cc97b15d868bbb1dbc683799a"
+      },
+      {
+        "path": "scenarios/group-session-freeze-promise-post-freeze-mutation-request/group-session-freeze-promise-post-freeze-mutation-request.md",
+        "sha256": "9083e149d879dcf5890bbcc3d3bb2fcf87b4490ba1878e59a73402bd5312ee52"
+      }
+    ],
+    "simulation_tree_hash": "82f864d7ecf63092f2a95e63c7b0d422873220146ce76ca85070bce48efc86d8"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 3,
+    "promisegrid_alignment": 4,
+    "auditability": 4,
+    "evolution_safety": 5,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 2,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 4,
+    "simplicity_durability": 4,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 37,
+    "normalized_0_100": 74,
+    "confidence_0_1": 0.78
+  },
+  "assessment": {
+    "rationale": "The simulation is a strong guard against false freeze certainty: it refuses freeze promises until exact artifacts are frozen by pCID and verifiable tooling exists. That aligns well with immutable lineage and makes post-freeze mutation harder to smuggle in as history rewrite. But the specimen is thin on the concrete handling path after a valid freeze already exists, so it only partially answers whether Carol's request becomes a new specimen, superseding pCID, or other lineage step.",
+    "strengths": [
+      "Strong anti-history-mutation stance via frozen pCID-bound artifact sets.",
+      "Clear prerequisite boundary between provisional work and accepted freeze promise.",
+      "Good 100-year durability posture if frozen references and verification tooling exist."
+    ],
+    "weaknesses": [
+      "Scenario response is indirect because the design mainly defers freeze rather than specifying the mutation workflow after freeze.",
+      "Failure/refusal handling for Carol's request is underspecified.",
+      "Sparse Promise-Theory payload wording and limited local-accounting detail."
+    ],
+    "risks": [
+      "Deferral can postpone decision-making long enough to stall useful coordination.",
+      "The docs do not fully specify the operational path for a post-freeze mutation request after freeze is eventually valid.",
+      "Missing explicit peer-local audit records could leave disagreement about when freeze conditions were actually met."
+    ],
+    "open_questions": [
+      "Once freeze is finally accepted, does any breaking change always require a new specimen/pCID lineage rather than amendment?",
+      "What peer-local records show that freeze was deferred, by whom, and under which missing-tooling conditions?",
+      "How is useful convergence evidence preserved without letting deferral become indefinite?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

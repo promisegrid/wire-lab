@@ -1,0 +1,122 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-gibut-conditional-release-group-session-local-spec-requirement-sections-100-year-review-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000075-SIM-gibut-conditional-release-group-session-local--spec-requirement-sections-100-year-review--openai-gpt-5.4-medium",
+  "sim_id": "SIM-gibut-conditional-release-group-session-local",
+  "scenario_id": "spec-requirement-sections-100-year-review",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-gibut-conditional-release-group-session-local/spec-requirement-sections-100-year-review/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_8c5eefa3303d4a288599eebbdde5d70a",
+    "response_id": "resp_0053ef693cb15843006a1232d0c240819bbd3f15a63a4a07d7",
+    "input_tokens": 7512,
+    "output_tokens": 971,
+    "cost_usd": 0.02674
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-gibut-conditional-release-group-session-local/",
+    "scenario_path": "scenarios/spec-requirement-sections-100-year-review/spec-requirement-sections-100-year-review.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-gibut-conditional-release-group-session-local/README.md",
+        "sha256": "c0e15735585e1296ae39d522ffa8cbe097d7a9cb66ff7d479b75f62b335a901c"
+      },
+      {
+        "path": "simulations/SIM-gibut-conditional-release-group-session-local/QUESTION.md",
+        "sha256": "7cb4d75a2a69df7f86b185094a9bf106bc89bf26e018d70a272c6ba43e1ba288"
+      },
+      {
+        "path": "scenarios/spec-requirement-sections-100-year-review/spec-requirement-sections-100-year-review.md",
+        "sha256": "b2e71192b720372495986fad6387d0bfd5222ce78a7cfd9da03940d1a1062cd7"
+      }
+    ],
+    "simulation_tree_hash": "f552334ad886c1cf76d05a0fe07428ebf0166d4c006b5e8ade3e35abc82280f3"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 2,
+    "auditability": 1,
+    "evolution_safety": 1,
+    "layer_boundary_clarity": 1,
+    "failure_handling": 1,
+    "implementation_plausibility": 3,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 1,
+    "risk_penalty": 4
+  },
+  "fitness": {
+    "raw": 14,
+    "normalized_0_100": 28.000000000000004,
+    "confidence_0_1": 0.83
+  },
+  "assessment": {
+    "rationale": "The simulation names a relevant design question, but it is a weak fit for a 100-year spec-review scenario because it does not provide a concrete durable spec-section shape, artifact set, or future-reader-oriented explanation. Its main value here is exposing that embedding conditional release into group-session semantics risks long-term layer confusion and weak auditability.",
+    "strengths": [
+      "Explicitly tests whether conditional release belongs in session semantics.",
+      "Uses promise language at a high level by making participants responsible for preserving conditions.",
+      "Surfaces boundary tension between session meaning and lower-layer behavior."
+    ],
+    "weaknesses": [
+      "No concrete 100-year spec section or review-oriented structure is provided.",
+      "Audit trail, local records, and observable artifacts are underspecified.",
+      "Failure, adversarial pressure, and evolution mechanics are mostly absent.",
+      "Layer boundaries are explicitly in question, which hurts long-term clarity."
+    ],
+    "risks": [
+      "Session semantics may absorb policy that should live in a separate layer, making future interpretation brittle.",
+      "Participants are asked to preserve conditions, but the simulation does not define durable local evidence for whether they did so.",
+      "Geofencing and onward-restraint assumptions may age poorly as networks, organizations, and enforcement models change."
+    ],
+    "open_questions": [
+      "What exact long-horizon spec section would preserve the assumptions of session-local conditional release for future readers?",
+      "What durable local audit artifacts would show which release conditions were promised and later propagated?",
+      "Can onward-restraint and geofencing be specified without making storage, routing, and replay semantics layer-ambiguous over long time horizons?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-bihim-cas-type-codec-plus-internal-kind-udp-feed-v0-conformance-session-layer-composition-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000035-SIM-bihim-cas-type-codec-plus-internal-kind--udp-feed-v0-conformance-session-layer-composition--openai-gpt-5.4-medium",
+  "sim_id": "SIM-bihim-cas-type-codec-plus-internal-kind",
+  "scenario_id": "udp-feed-v0-conformance-session-layer-composition",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-bihim-cas-type-codec-plus-internal-kind/udp-feed-v0-conformance-session-layer-composition/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_0391685578104767b1f57ed91bbe8401",
+    "response_id": "resp_08ee2ea79863f662006a123256ad20819a80f034c9009626a6",
+    "input_tokens": 7529,
+    "output_tokens": 1166,
+    "cost_usd": 0.02949975
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-bihim-cas-type-codec-plus-internal-kind/",
+    "scenario_path": "scenarios/udp-feed-v0-conformance-session-layer-composition/udp-feed-v0-conformance-session-layer-composition.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-bihim-cas-type-codec-plus-internal-kind/README.md",
+        "sha256": "cf17971491ff515870ce86a883b5d97ee691a029cddb96211e80700ce11be16d"
+      },
+      {
+        "path": "simulations/SIM-bihim-cas-type-codec-plus-internal-kind/QUESTION.md",
+        "sha256": "da3251d1bd0bba3e15cad022e5f58793e2d087d9a10c8f4bd25a88241e29ad07"
+      },
+      {
+        "path": "scenarios/udp-feed-v0-conformance-session-layer-composition/udp-feed-v0-conformance-session-layer-composition.md",
+        "sha256": "69da5db705a56cd7067a653928ff8b2dc9301ef6ebfc712bd81038a65c9d352c"
+      }
+    ],
+    "simulation_tree_hash": "415f66cfc07267d51ba343b130cfa4da0b6625c18c05fefee3dc38b71f2d11b0"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 3,
+    "auditability": 3,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 2,
+    "failure_handling": 1,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 3,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 24,
+    "normalized_0_100": 48,
+    "confidence_0_1": 0.79
+  },
+  "assessment": {
+    "rationale": "This specimen is only weakly matched to the UDP-feed session-layer composition scenario. Its main relevance is indirect: it explores whether broad outer-family typing plus a deterministic inner kind helps higher layers compose cleanly. That gives some value on boundary clarity and evolution, but it does not directly answer whether the UDP-feed API is sufficient for the next layer without leaking transport or binding details. The design is implementable and relatively small, yet it risks creating two type authorities and does not say much about failure handling, peer-local records, or session-layer behavior.",
+    "strengths": [
+      "Small, deterministic dispatch idea that is easy to implement.",
+      "Internal kind can improve fine-grained auditing and forward evolution within a broad family.",
+      "The simulation explicitly recognizes the risk of competing type authorities."
+    ],
+    "weaknesses": [
+      "Does not directly address UDP-feed v0 API sufficiency for session-layer composition.",
+      "Promise vocabulary is design-centric rather than explicit payload promises between peers.",
+      "Failure modes, adversarial behavior, and peer-local accounting are mostly unaddressed."
+    ],
+    "risks": [
+      "Broad codec plus internal kind can split authority between envelope and payload typing.",
+      "Unknown or conflicting kind handling is unspecified and may fracture interoperability.",
+      "Scenario mismatch may hide whether the next layer can compose over UDP-feed without leakage."
+    ],
+    "open_questions": [
+      "Can the internal kind be kept strictly payload-local without becoming a second type registry?",
+      "Does session-layer composition over UDP-feed need type promises at all, or is this simulation largely orthogonal?",
+      "How would peers audit kind evolution and downgrade/unknown-kind behavior across long-lived deployments?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

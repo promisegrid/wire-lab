@@ -1,0 +1,162 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-gadol-peer-adoption-promise-message-conditional-release-geofencing-onward-restraint-chain-openai-gpt-5.4-medium-20260524-024852",
+  "run_group_id": "ga-canary-20260523-pt-gate-v3",
+  "cell_id": "ga-canary-20260523-pt-gate-v3-000020-SIM-gadol-peer-adoption-promise-message--conditional-release-geofencing-onward-restraint-chain--openai-gpt-5.4-medium",
+  "sim_id": "SIM-gadol-peer-adoption-promise-message",
+  "scenario_id": "conditional-release-geofencing-onward-restraint-chain",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260524-024852",
+  "result_path": "results/SIM-gadol-peer-adoption-promise-message/conditional-release-geofencing-onward-restraint-chain/openai-gpt-5.4-medium/20260524-024852.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_03d4c1edfd1f43cc9a22b5616202dcef",
+    "response_id": "resp_03ea3add374e6a19006a12679721b08198ae6d8859d9e1d39c",
+    "input_tokens": 8151,
+    "output_tokens": 1443,
+    "cost_usd": 0.03446625
+  },
+  "source": {
+    "repo_commit": "ec652bd3ecaaf2f904e62cff00e113a88c7e3efd",
+    "sim_path": "simulations/SIM-gadol-peer-adoption-promise-message/",
+    "scenario_path": "scenarios/conditional-release-geofencing-onward-restraint-chain/conditional-release-geofencing-onward-restraint-chain.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-gadol-peer-adoption-promise-message/README.md",
+        "sha256": "b7767c1a9279ef3c1a9bcc08a1d96a87259fe4e5090fa06ad2811a397fef49d3"
+      },
+      {
+        "path": "simulations/SIM-gadol-peer-adoption-promise-message/QUESTION.md",
+        "sha256": "3096ee94cbc1ba2247fc46b908d4e215cbe96af054b7943f6b6d567185b6df3b"
+      },
+      {
+        "path": "scenarios/conditional-release-geofencing-onward-restraint-chain/conditional-release-geofencing-onward-restraint-chain.md",
+        "sha256": "3c84fc46e1b14de5e5c6e9b029fcb891bd655238b45e516b20eda97dabe8ff24"
+      }
+    ],
+    "simulation_tree_hash": "cc25bca5323b36b38c3d31b1314bf64a50e08e8631c97040b6e872ad0548e43a"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 4,
+    "auditability": 4,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 3,
+    "failure_handling": 2,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 5,
+    "simplicity_durability": 4,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 35,
+    "normalized_0_100": 70,
+    "confidence_0_1": 0.83
+  },
+  "assessment": {
+    "rationale": "Strong Promise-Theory framing: adoption is modeled as an ordinary peer promise message with local evidence and supersession. But this scenario pressures conditional onward release, and the specimen does not yet show how the recursive restraint chain is attached to specific content or forwarding acts, so fit is partial rather than strong.",
+    "strengths": [
+      "Promise-first wording centered on peer-declared intent.",
+      "Uses ordinary durable messages that can be stored, relayed, and superseded.",
+      "Good local audit trail potential without central authority."
+    ],
+    "weaknesses": [
+      "Does not directly model the Bob-to-Carol conditional forwarding step.",
+      "Leaves unclear whether restraint lives at session, transport, or CAS-object level.",
+      "Limited treatment of refusal, stale evidence, and adversarial relay cases."
+    ],
+    "risks": [
+      "Adoption promises may be mistaken for proof that a specific release chain was honored.",
+      "Without content-level linkage, onward-restraint evidence can become ambiguous across sessions or transports.",
+      "Superseding adoption messages could create stale or conflicting interpretations of earlier forwarding conditions."
+    ],
+    "open_questions": [
+      "Can the same ordinary promise-message form bind a specific content release and its onward-restraint condition, or is a separate artifact needed?",
+      "How do Bob and Carol record local evidence that a forwarding step preserved the same restraint without assuming a global graph?",
+      "What supersession or revocation rules apply when adoption promises change after content has already been forwarded?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design.",
+    "pt_gate": {
+      "status": "pt_clean",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "Alice, Bob, and Carol can each issue their own messages; the design does not remove peer autonomy."
+      },
+      "scoped_intent": {
+        "status": "pass",
+        "note": "Promise scope is explicit around a referenced pCID and answer bindings, though content-specific release scope is not yet fully modeled."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "The specimen has each peer speak only for itself; Bob would still need Bob's own promise before forwarding."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "A published promise message is evidence of intent, not a guarantee that onward restraint will be honored."
+      },
+      "local_trust_assessment": {
+        "status": "pass",
+        "note": "Peers can store and assess each promise message locally as evidence of claimed intent."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "The design expresses adoption as a peer's own promise message, not as an obligation imposed on recipients."
+      },
+      "violations": []
+    }
+  }
+}

@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-votoj-peer-adoption-structured-object-cas-object-type-binding-bakeoff-unknown-typed-object-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000127-SIM-votoj-peer-adoption-structured-object--cas-object-type-binding-bakeoff-unknown-typed-object--openai-gpt-5.4-medium",
+  "sim_id": "SIM-votoj-peer-adoption-structured-object",
+  "scenario_id": "cas-object-type-binding-bakeoff-unknown-typed-object",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-votoj-peer-adoption-structured-object/cas-object-type-binding-bakeoff-unknown-typed-object/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_672e3ece36324c2ebcfe284df805b96c",
+    "response_id": "resp_01280f0031fbbd91006a1233700e40819a81c59d7159560147",
+    "input_tokens": 7539,
+    "output_tokens": 1074,
+    "cost_usd": 0.02822925
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-votoj-peer-adoption-structured-object/",
+    "scenario_path": "scenarios/cas-object-type-binding-bakeoff-unknown-typed-object/cas-object-type-binding-bakeoff-unknown-typed-object.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-votoj-peer-adoption-structured-object/README.md",
+        "sha256": "06f14d972a3ec8332d7baff995dd35169c670f09022747c884261b2191e8850c"
+      },
+      {
+        "path": "simulations/SIM-votoj-peer-adoption-structured-object/QUESTION.md",
+        "sha256": "a7cc3078a66e739a146030782a1b6f269647565f29e74289b17418cb28d7b01d"
+      },
+      {
+        "path": "scenarios/cas-object-type-binding-bakeoff-unknown-typed-object/cas-object-type-binding-bakeoff-unknown-typed-object.md",
+        "sha256": "76f0a7016fa2bad5e53903682706bca4eeb4aa2d099311a4ea52b7280748cf90"
+      }
+    ],
+    "simulation_tree_hash": "adb3592995211962b89e86ffc4b78d8012af31efec475fd0649ce63a78a74238"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 3,
+    "auditability": 4,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 3,
+    "failure_handling": 1,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 3,
+    "simplicity_durability": 2,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 27,
+    "normalized_0_100": 54,
+    "confidence_0_1": 0.76
+  },
+  "assessment": {
+    "rationale": "The simulation is relevant because it makes protocol adoption a content-addressed typed object, but it does not directly specify unknown-type handling. Its main value here is auditability: a signed object with spec pCID and answers can be fetched and checked later. Its main gap is scenario pressure: Dave receiving an unsupported codec needs explicit store/advertise/forward-opaque rules and parse-safety boundaries, which the simulation leaves unspecified.",
+    "strengths": [
+      "Uses CAS objects and explicit spec-pCID binding.",
+      "Provides good local audit evidence via identity, answers, scope/time, and signatures.",
+      "Implementation is plausible with ordinary fetch-and-verify behavior."
+    ],
+    "weaknesses": [
+      "Does not directly define unknown-codec storage, relay, or opaque forwarding behavior.",
+      "Failure handling for unsupported typed objects is largely absent.",
+      "The object-centered approach risks extra wrapper complexity around simple adoption promises."
+    ],
+    "risks": [
+      "Peers may assume they must parse the adoption object to act on it, creating unsafe or brittle unknown-codec behavior.",
+      "The structured adoption object can grow into a heavy metadata wrapper rather than a minimal durable promise artifact.",
+      "Undefined schema and handling rules may fragment interoperability across mixed-version networks."
+    ],
+    "open_questions": [
+      "Can an unknown-codec adoption object be safely relayed and cached without any schema-specific parsing?",
+      "What minimal envelope, if any, is required so mixed-version peers can recognize handling rules for opaque adoption objects?",
+      "Does the adoption object stay small enough for routine peer declarations over long-lived protocol evolution?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

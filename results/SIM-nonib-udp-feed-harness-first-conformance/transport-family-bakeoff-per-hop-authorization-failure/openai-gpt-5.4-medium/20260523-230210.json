@@ -1,0 +1,123 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-nonib-udp-feed-harness-first-conformance-transport-family-bakeoff-per-hop-authorization-failure-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000227-SIM-nonib-udp-feed-harness-first-conformance--transport-family-bakeoff-per-hop-authorization-failure--openai-gpt-5.4-medium",
+  "sim_id": "SIM-nonib-udp-feed-harness-first-conformance",
+  "scenario_id": "transport-family-bakeoff-per-hop-authorization-failure",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-nonib-udp-feed-harness-first-conformance/transport-family-bakeoff-per-hop-authorization-failure/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_d0a8be61d054422e9d5e49eab25f4a19",
+    "response_id": "resp_023301a13ab0b9a6006a1234981d74819b8d68d2bef6e451c7",
+    "input_tokens": 7539,
+    "output_tokens": 978,
+    "cost_usd": 0.02688525
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-nonib-udp-feed-harness-first-conformance/",
+    "scenario_path": "scenarios/transport-family-bakeoff-per-hop-authorization-failure/transport-family-bakeoff-per-hop-authorization-failure.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-nonib-udp-feed-harness-first-conformance/README.md",
+        "sha256": "d2745a347b4e1106f615279c5cdb47ec7f164a09da4e95e705d911ee1eaa4784"
+      },
+      {
+        "path": "simulations/SIM-nonib-udp-feed-harness-first-conformance/QUESTION.md",
+        "sha256": "c7ff0d94855382a5f0e62c9d2818e74561fa830fdf82296586df93bdd24d9270"
+      },
+      {
+        "path": "scenarios/transport-family-bakeoff-per-hop-authorization-failure/transport-family-bakeoff-per-hop-authorization-failure.md",
+        "sha256": "f938e10ab88db666d3097a2f97c1667bbbc6e8e071681134049068982cc39cf2"
+      }
+    ],
+    "simulation_tree_hash": "8994291972228d954b465cbf4735badeca0703bcb0e41dffd53a54494c86bf99"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 2,
+    "auditability": 4,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 2,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 1,
+    "simplicity_durability": 3,
+    "risk_penalty": 4
+  },
+  "fitness": {
+    "raw": 25,
+    "normalized_0_100": 50,
+    "confidence_0_1": 0.84
+  },
+  "assessment": {
+    "rationale": "This specimen is strong on harness-first transport evidence, packet-level auditability, and boundary clarity, but it is a poor direct fit for a per-hop authorization failure scenario. The scenario asks for refusal, skip-hop, or membership-reconfiguration behavior in ring semantics; the simulation mainly asks whether UDP-feed claims should wait for ns-3-style loss/timing/topology evidence. It can expose forwarding failure symptoms, but not the authorization semantics themselves.",
+    "strengths": [
+      "Clear focus on binding-layer evidence under loss, timing, and topology pressure.",
+      "Strong auditability via packet-level delivery/loss/recovery records.",
+      "Good layer separation: transport behavior is tested before polishing API shape.",
+      "Implementation path is plausible for a network harness specimen."
+    ],
+    "weaknesses": [
+      "Does not define per-hop authorization promises or refusal records.",
+      "Does not model ring semantics, hop skipping, or membership reconfiguration directly.",
+      "Uses weak Promise-Theory vocabulary; centers conformance/usefulness rather than explicit payload promises.",
+      "Harness-first artifacts are heavier and less durable than minimal explicit long-lived evidence objects."
+    ],
+    "risks": [
+      "A score above minimal scenario fit could over-credit a transport harness for solving authorization-policy behavior it does not define.",
+      "Harness-first conformance language may encourage generic conformance claims instead of peer-local promise/refusal records.",
+      "Simulator-heavy evidence may be less durable than small explicit artifacts if treated as the primary long-term proof object."
+    ],
+    "open_questions": [
+      "Can the harness represent per-hop authorization refusal as an observable transport-layer event without smuggling in application policy?",
+      "What peer-local artifact would record Bob's refusal to forward to Carol?",
+      "Does UDP-feed even model ring membership and reconfiguration, or is this scenario out of scope for the specimen?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

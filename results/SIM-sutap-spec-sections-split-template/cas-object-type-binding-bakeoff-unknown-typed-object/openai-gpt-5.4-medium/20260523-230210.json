@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-sutap-spec-sections-split-template-cas-object-type-binding-bakeoff-unknown-typed-object-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000176-SIM-sutap-spec-sections-split-template--cas-object-type-binding-bakeoff-unknown-typed-object--openai-gpt-5.4-medium",
+  "sim_id": "SIM-sutap-spec-sections-split-template",
+  "scenario_id": "cas-object-type-binding-bakeoff-unknown-typed-object",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-sutap-spec-sections-split-template/cas-object-type-binding-bakeoff-unknown-typed-object/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_606351c95143470c9517a67b4f9734ea",
+    "response_id": "resp_0870034ced010664006a123404b92081999e993ee97a51a000",
+    "input_tokens": 7517,
+    "output_tokens": 1228,
+    "cost_usd": 0.03034675
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-sutap-spec-sections-split-template/",
+    "scenario_path": "scenarios/cas-object-type-binding-bakeoff-unknown-typed-object/cas-object-type-binding-bakeoff-unknown-typed-object.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-sutap-spec-sections-split-template/README.md",
+        "sha256": "6ea42ce84be4770e4e100e0fcf9ca2d6cef76bfdcf7558040f33907b22c367b7"
+      },
+      {
+        "path": "simulations/SIM-sutap-spec-sections-split-template/QUESTION.md",
+        "sha256": "224cb421f142b72082ecfcaa79627a831538b92231e06f885d13b688673fc85a"
+      },
+      {
+        "path": "scenarios/cas-object-type-binding-bakeoff-unknown-typed-object/cas-object-type-binding-bakeoff-unknown-typed-object.md",
+        "sha256": "76f0a7016fa2bad5e53903682706bca4eeb4aa2d099311a4ea52b7280748cf90"
+      }
+    ],
+    "simulation_tree_hash": "7d2ed975444e7dd1a0a27e8dd1d6f4055a8b84e22175a957a8c981fb1f413dc8"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 3,
+    "auditability": 4,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 1,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 4,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 29,
+    "normalized_0_100": 57.99999999999999,
+    "confidence_0_1": 0.79
+  },
+  "assessment": {
+    "rationale": "This simulation is mainly about spec structure, not CAS type-binding behavior. It helps by separating stable normative hooks from evolving explanation, which is useful for long-lived unknown-type handling, but it does not itself specify the required opaque-forwarding and no-unsafe-parse behavior.",
+    "strengths": [
+      "Strong separation between normative protocol surface and explanatory material.",
+      "Good fit for long-term evolution and small durable spec artifacts.",
+      "Improves auditability of what the pCID actually owns."
+    ],
+    "weaknesses": [
+      "Does not directly solve the unknown typed object behavior in the scenario.",
+      "Failure handling for unsupported codecs is not concretely specified.",
+      "Promise-first payload wording is only partial, not fully explicit."
+    ],
+    "risks": [
+      "Normative hooks may be too thin to fully pin down unknown-type safety behavior.",
+      "Companion-doc evolution could reintroduce interpretation drift across implementations.",
+      "Readers may mistake explanatory guidance for the real protocol promise boundary."
+    ],
+    "open_questions": [
+      "Can the compact normative hook explicitly require opaque store/advertise/forward behavior for unknown codecs without relying on companion prose?",
+      "How does the split template prevent drift between pCID-owned normative text and evolving explanatory docs for mixed-version peers?",
+      "What minimal normative language defines unsafe parsing avoidance and observable peer-local outcomes?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

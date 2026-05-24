@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-nonib-udp-feed-harness-first-conformance-spec-requirement-sections-100-year-review-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000229-SIM-nonib-udp-feed-harness-first-conformance--spec-requirement-sections-100-year-review--openai-gpt-5.4-medium",
+  "sim_id": "SIM-nonib-udp-feed-harness-first-conformance",
+  "scenario_id": "spec-requirement-sections-100-year-review",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-nonib-udp-feed-harness-first-conformance/spec-requirement-sections-100-year-review/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_eb6a7ee44ac14b69a339bbb812d7f4ea",
+    "response_id": "resp_0b61f8d15622628f006a12349a91c8819ba3a9f6e9799e1a27",
+    "input_tokens": 7530,
+    "output_tokens": 1031,
+    "cost_usd": 0.0276115
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-nonib-udp-feed-harness-first-conformance/",
+    "scenario_path": "scenarios/spec-requirement-sections-100-year-review/spec-requirement-sections-100-year-review.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-nonib-udp-feed-harness-first-conformance/README.md",
+        "sha256": "d2745a347b4e1106f615279c5cdb47ec7f164a09da4e95e705d911ee1eaa4784"
+      },
+      {
+        "path": "simulations/SIM-nonib-udp-feed-harness-first-conformance/QUESTION.md",
+        "sha256": "c7ff0d94855382a5f0e62c9d2818e74561fa830fdf82296586df93bdd24d9270"
+      },
+      {
+        "path": "scenarios/spec-requirement-sections-100-year-review/spec-requirement-sections-100-year-review.md",
+        "sha256": "b2e71192b720372495986fad6387d0bfd5222ce78a7cfd9da03940d1a1062cd7"
+      }
+    ],
+    "simulation_tree_hash": "8994291972228d954b465cbf4735badeca0703bcb0e41dffd53a54494c86bf99"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 2,
+    "auditability": 3,
+    "evolution_safety": 1,
+    "layer_boundary_clarity": 3,
+    "failure_handling": 3,
+    "implementation_plausibility": 3,
+    "promise_vocabulary": 1,
+    "simplicity_durability": 1,
+    "risk_penalty": 4
+  },
+  "fitness": {
+    "raw": 19,
+    "normalized_0_100": 38,
+    "confidence_0_1": 0.82
+  },
+  "assessment": {
+    "rationale": "The simulation is relevant to long-horizon review because it insists on explicit transport-behavior evidence under loss and topology change, but it does not actually define durable required spec sections for future readers. Its strengths are audit-minded packet-level evidence and clear binding-layer focus; its weaknesses are simulator/tool dependence, weak promise-first vocabulary, and limited 100-year readability without a concrete frozen spec-section home.",
+    "strengths": [
+      "Explicit packet-level evidence improves auditability.",
+      "Clear focus on binding-layer behavior before API polish.",
+      "Exercises loss, timing, and topology failure pressure directly."
+    ],
+    "weaknesses": [
+      "Poor direct fit to a scenario about required long-horizon spec sections.",
+      "Vocabulary is conformance/harness-first rather than promise-first.",
+      "Durability is weakened by dependence on simulator-era tooling and social context."
+    ],
+    "risks": [
+      "Future readers may need obsolete simulator assumptions to interpret the evidence.",
+      "Harness-first conformance could harden into a costly gate before durable minimal artifacts are defined.",
+      "The design may preserve transport-test rigor while still failing the scenario's requirement for intelligible long-horizon specification sections."
+    ],
+    "open_questions": [
+      "Would the harness evidence be captured in a stable, human-readable spec section rather than depending on ns-3-era tooling?",
+      "What minimal long-horizon artifact would future readers need to understand the claimed transport promises without rerunning the simulator?",
+      "Can the conformance surface be rewritten as explicit peer-local payload promises instead of generic conformance claims?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

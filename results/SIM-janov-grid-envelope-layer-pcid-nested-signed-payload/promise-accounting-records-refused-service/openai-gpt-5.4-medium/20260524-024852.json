@@ -1,0 +1,173 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-janov-grid-envelope-layer-pcid-nested-signed-payload-promise-accounting-records-refused-service-openai-gpt-5.4-medium-20260524-024852",
+  "run_group_id": "ga-canary-20260523-pt-gate-v3",
+  "cell_id": "ga-canary-20260523-pt-gate-v3-000003-SIM-janov-grid-envelope-layer-pcid-nested-signed-payload--promise-accounting-records-refused-service--openai-gpt-5.4-medium",
+  "sim_id": "SIM-janov-grid-envelope-layer-pcid-nested-signed-payload",
+  "scenario_id": "promise-accounting-records-refused-service",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260524-024852",
+  "result_path": "results/SIM-janov-grid-envelope-layer-pcid-nested-signed-payload/promise-accounting-records-refused-service/openai-gpt-5.4-medium/20260524-024852.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_1978490100f24bd18dc7c8cc5e1978df",
+    "response_id": "resp_0e7cd5b187da9d12006a126723dbec819b924a4051a2a416b7",
+    "input_tokens": 9346,
+    "output_tokens": 1678,
+    "cost_usd": 0.0398475
+  },
+  "source": {
+    "repo_commit": "ec652bd3ecaaf2f904e62cff00e113a88c7e3efd",
+    "sim_path": "simulations/SIM-janov-grid-envelope-layer-pcid-nested-signed-payload/",
+    "scenario_path": "scenarios/promise-accounting-records-refused-service/promise-accounting-records-refused-service.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-janov-grid-envelope-layer-pcid-nested-signed-payload/README.md",
+        "sha256": "f48ab3c3b1dd2fe4a36b96ea5f602e34cae7c1615e97990ee1c8791a4c3a047f"
+      },
+      {
+        "path": "simulations/SIM-janov-grid-envelope-layer-pcid-nested-signed-payload/QUESTION.md",
+        "sha256": "32ba4a616d9b335c481cbfcbd7b114100210fb742a82061a52557b050d0530a9"
+      },
+      {
+        "path": "simulations/SIM-janov-grid-envelope-layer-pcid-nested-signed-payload/protocols/grid-envelope.d/CHANGELOG.md",
+        "sha256": "3652c6b6111b64750a90c10edf0da60a2d88777a2c3313477f21490d61d97201"
+      },
+      {
+        "path": "simulations/SIM-janov-grid-envelope-layer-pcid-nested-signed-payload/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "d182c06be14aaa48aaf3546e2050b361e7f10e1020faf32a9be8750948f2571d"
+      },
+      {
+        "path": "scenarios/promise-accounting-records-refused-service/promise-accounting-records-refused-service.md",
+        "sha256": "9a7d47455793988cfb9b0fb045b29086ed13ee22cd0db080584e259c0aa69313"
+      }
+    ],
+    "simulation_tree_hash": "bf0f4a64c42e752ebbf0764f95b9c41c7dc4374f56465564e4bd7e5a9d4c09c3"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 2,
+    "auditability": 3,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 2,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 1,
+    "simplicity_durability": 3,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 25,
+    "normalized_0_100": 50,
+    "confidence_0_1": 0.84
+  },
+  "assessment": {
+    "rationale": "Clear and plausible envelope layering specimen, but weak fit for refused-service promise accounting. It can carry a refusal record only if payload_b defines one; the simulation itself does not show how refusal is recorded differently from failure, corruption, or timeout. PT framing also drifts because outer conformance is described as if the pCID promises it, while the actual promising agent is ambiguous.",
+    "strengths": [
+      "Deterministic small envelope shape with explicit nested signature coverage over [pcid_b, payload_b].",
+      "Good layer separation and explicit unknown-pCID handling.",
+      "Can preserve opaque bytes as evidence when parsing support is absent."
+    ],
+    "weaknesses": [
+      "Does not natively model promise-accounting records or refusal semantics.",
+      "Cannot by itself distinguish honest refusal from timeout or failure.",
+      "Promise vocabulary is not fully agent-centered."
+    ],
+    "risks": [
+      "Unsigned outer layer can create authorship ambiguity for the conformance claim.",
+      "Scenario pressure may be hidden inside payload_b, leaving refusal semantics non-interoperable across peers.",
+      "Transport-identity dependence weakens long-term auditability and cross-context reuse."
+    ],
+    "open_questions": [
+      "How would a refusal be encoded so peers can distinguish policy refusal from timeout, corruption, or unsupported payload?",
+      "Who is the explicit agent promising outer-envelope conformance to pcid_a when the outer layer is unsigned?",
+      "Should refusal/accounting records live in payload_b, or does the envelope need an explicit outcome/status discriminator?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design.",
+    "pt_gate": {
+      "status": "pt_reframe_needed",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "Peers remain autonomous and may reject unknown pcids or unsupported payloads locally."
+      },
+      "scoped_intent": {
+        "status": "warning",
+        "note": "The specimen describes protocol structure well, but the outer promise is not cleanly scoped to a named promising agent."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "It does not directly assign promises to other agents, but outer conformance authorship is underspecified."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "The draft does not guarantee delivery or interpretation; it explicitly allows unsupported and opaque handling."
+      },
+      "local_trust_assessment": {
+        "status": "warning",
+        "note": "Trust is mostly local, but the outer conformance claim depends on transport identity and surrounding context rather than explicit in-band authorship."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "The design does not equate receipt or use with obligation."
+      },
+      "violations": [
+        "Uses artifact-centric wording like 'pcid_a promises' instead of agent-scoped promises.",
+        "Outer conformance/authorship is not explicitly carried in-band and is partly delegated to transport identity/context."
+      ]
+    }
+  }
+}

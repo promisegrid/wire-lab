@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-jomaj-transport-token-ring-spec-requirement-sections-100-year-review-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000103-SIM-jomaj-transport-token-ring--spec-requirement-sections-100-year-review--openai-gpt-5.4-medium",
+  "sim_id": "SIM-jomaj-transport-token-ring",
+  "scenario_id": "spec-requirement-sections-100-year-review",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-jomaj-transport-token-ring/spec-requirement-sections-100-year-review/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_4bbf425a0ae8416c8be616b0cb97aac2",
+    "response_id": "resp_0816e7fa37e28b6d006a123328358c819899fe4b0cf2e50a67",
+    "input_tokens": 7498,
+    "output_tokens": 966,
+    "cost_usd": 0.0266455
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-jomaj-transport-token-ring/",
+    "scenario_path": "scenarios/spec-requirement-sections-100-year-review/spec-requirement-sections-100-year-review.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-jomaj-transport-token-ring/README.md",
+        "sha256": "da5a8b07baa9f0969362a89aa8bb0d3c5d367bb2fe6783621ed461bac7c9851e"
+      },
+      {
+        "path": "simulations/SIM-jomaj-transport-token-ring/QUESTION.md",
+        "sha256": "f1cc68278f35c5f9d14f7bc4ed97b3c4249e9933fbff955219beb1e83d635b6e"
+      },
+      {
+        "path": "scenarios/spec-requirement-sections-100-year-review/spec-requirement-sections-100-year-review.md",
+        "sha256": "b2e71192b720372495986fad6387d0bfd5222ce78a7cfd9da03940d1a1062cd7"
+      }
+    ],
+    "simulation_tree_hash": "1e99d614e1d78c2d36ea51a210ff9e5480e57752534b2cee956563c7c8d5f95f"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 3,
+    "auditability": 2,
+    "evolution_safety": 1,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 2,
+    "implementation_plausibility": 3,
+    "promise_vocabulary": 3,
+    "simplicity_durability": 2,
+    "risk_penalty": 4
+  },
+  "fitness": {
+    "raw": 22,
+    "normalized_0_100": 44,
+    "confidence_0_1": 0.82
+  },
+  "assessment": {
+    "rationale": "The simulation states a clear transport question and boundary, but it is a sparse design sketch rather than a 100-year spec artifact. It helps by naming per-hop promises, ordering, refusal, and partition/offline fragility, yet it does not define durable required sections, concrete payload promises, or future-reader audit material. For this scenario, it is relevant but under-specified.",
+    "strengths": [
+      "Clear transport-layer scope; explicitly does not replace other layers.",
+      "Names per-hop forwarding, waiting, and refusal as observable promise points.",
+      "Surfaces mixed-version, offline-peer, and partition-recovery pressure directly."
+    ],
+    "weaknesses": [
+      "Very weak fit to a spec-section review scenario because no actual long-horizon section structure is provided.",
+      "Insufficient detail for future readers to reconstruct protocol obligations, artifacts, or local evidence.",
+      "Durability is undermined by ring-membership and liveness fragility."
+    ],
+    "risks": [
+      "Token-ring membership and liveness assumptions may age poorly across mixed versions and long offline periods.",
+      "Ordering benefits may depend on brittle ring continuity that future operators cannot easily recover or audit.",
+      "Current wording centers transport behavior more than durable promise-first specification text."
+    ],
+    "open_questions": [
+      "Would a durable spec need an explicit long-horizon transport section covering ring membership churn, partitions, and mixed-version recovery?",
+      "What minimal on-wire promises and local audit records would let a future reader reconstruct token custody and refusal semantics?",
+      "Can the transport remain understandable and operable without any stable coordinator or full ring knowledge after major ecosystem change?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-togit-spec-sections-required-when-applicable-transport-family-bakeoff-per-hop-authorization-failure-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000164-SIM-togit-spec-sections-required-when-applicable--transport-family-bakeoff-per-hop-authorization-failure--openai-gpt-5.4-medium",
+  "sim_id": "SIM-togit-spec-sections-required-when-applicable",
+  "scenario_id": "transport-family-bakeoff-per-hop-authorization-failure",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-togit-spec-sections-required-when-applicable/transport-family-bakeoff-per-hop-authorization-failure/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_73d91fd76c6c4b3d83678189de932090",
+    "response_id": "resp_01fcb4250f391d1f006a1233e047a08198957d4f7e09d872d3",
+    "input_tokens": 7523,
+    "output_tokens": 1306,
+    "cost_usd": 0.03144925
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-togit-spec-sections-required-when-applicable/",
+    "scenario_path": "scenarios/transport-family-bakeoff-per-hop-authorization-failure/transport-family-bakeoff-per-hop-authorization-failure.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-togit-spec-sections-required-when-applicable/README.md",
+        "sha256": "66263302e91fd60b3428ecacb3c0c25121e97dd52cebf444bad1a0315daa6515"
+      },
+      {
+        "path": "simulations/SIM-togit-spec-sections-required-when-applicable/QUESTION.md",
+        "sha256": "08f3b0838c8a6fb4ab9136cb743e5ea73d754d5a4a3ffc06a01521bcf228f037"
+      },
+      {
+        "path": "scenarios/transport-family-bakeoff-per-hop-authorization-failure/transport-family-bakeoff-per-hop-authorization-failure.md",
+        "sha256": "f938e10ab88db666d3097a2f97c1667bbbc6e8e071681134049068982cc39cf2"
+      }
+    ],
+    "simulation_tree_hash": "6a9e1226fa8914d1fd9767d6eedff77757e47a0a2b96f98d674a150770f0e20c"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 2,
+    "auditability": 2,
+    "evolution_safety": 2,
+    "layer_boundary_clarity": 3,
+    "failure_handling": 1,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 4,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 23,
+    "normalized_0_100": 46,
+    "confidence_0_1": 0.83
+  },
+  "assessment": {
+    "rationale": "This simulation is mainly a spec-structure policy, not a transport design, so it only partially addresses the scenario. It helps by demanding explicit applicability statements and keeping specs concise, but it does not itself define ring failure behavior, authorization promises, or concrete local evidence for refusal. The main value here is as a meta-spec discipline that could force those sections to appear when truly load-bearing; the main weakness is that the applicability test is still underspecified.",
+    "strengths": [
+      "Keeps artifacts small and durable by avoiding unconditional boilerplate.",
+      "Requires specs to say whether key explanatory sections are applicable instead of silently omitting them.",
+      "Improves layer-focused writing by tying explanatory sections to load-bearing ambiguity."
+    ],
+    "weaknesses": [
+      "Does not provide a concrete transport-family authorization-failure model.",
+      "Does not define what Bob records locally when he refuses to forward to Carol.",
+      "Leaves applicability criteria unresolved, which weakens failure handling and auditability."
+    ],
+    "risks": [
+      "Critical failure-model sections may be omitted under an overly narrow reading of 'not applicable'.",
+      "Different authors may make inconsistent applicability judgments, hurting cross-spec comparability.",
+      "Audit trails may stay too thin to explain per-hop authorization refusal under sparse knowledge."
+    ],
+    "open_questions": [
+      "Which section set becomes mandatory when per-hop authorization semantics are load-bearing in a transport spec?",
+      "How is 'applicable' decided and audited so authors cannot omit refusal, skip-hop, or reconfiguration semantics?",
+      "What concrete promise-first wording would this specimen require for authorization failure evidence and local records?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

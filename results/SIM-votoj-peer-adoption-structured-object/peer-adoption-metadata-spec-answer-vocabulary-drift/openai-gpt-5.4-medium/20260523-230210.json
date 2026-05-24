@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-votoj-peer-adoption-structured-object-peer-adoption-metadata-spec-answer-vocabulary-drift-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000130-SIM-votoj-peer-adoption-structured-object--peer-adoption-metadata-spec-answer-vocabulary-drift--openai-gpt-5.4-medium",
+  "sim_id": "SIM-votoj-peer-adoption-structured-object",
+  "scenario_id": "peer-adoption-metadata-spec-answer-vocabulary-drift",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-votoj-peer-adoption-structured-object/peer-adoption-metadata-spec-answer-vocabulary-drift/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_2a0a95311982486e8d4783e2c3534630",
+    "response_id": "resp_06412b9e969ad554006a123376af8c819ab05db1612275ade0",
+    "input_tokens": 7530,
+    "output_tokens": 1143,
+    "cost_usd": 0.0291795
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-votoj-peer-adoption-structured-object/",
+    "scenario_path": "scenarios/peer-adoption-metadata-spec-answer-vocabulary-drift/peer-adoption-metadata-spec-answer-vocabulary-drift.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-votoj-peer-adoption-structured-object/README.md",
+        "sha256": "06f14d972a3ec8332d7baff995dd35169c670f09022747c884261b2191e8850c"
+      },
+      {
+        "path": "simulations/SIM-votoj-peer-adoption-structured-object/QUESTION.md",
+        "sha256": "a7cc3078a66e739a146030782a1b6f269647565f29e74289b17418cb28d7b01d"
+      },
+      {
+        "path": "scenarios/peer-adoption-metadata-spec-answer-vocabulary-drift/peer-adoption-metadata-spec-answer-vocabulary-drift.md",
+        "sha256": "a9e8ba84995e69fcad36f2554442cc62c5e1128ea0818197cb7ebf66e843ff53"
+      }
+    ],
+    "simulation_tree_hash": "adb3592995211962b89e86ffc4b78d8012af31efec475fd0649ce63a78a74238"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 4,
+    "promisegrid_alignment": 3,
+    "auditability": 4,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 3,
+    "failure_handling": 2,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 2,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 29,
+    "normalized_0_100": 57.99999999999999,
+    "confidence_0_1": 0.79
+  },
+  "assessment": {
+    "rationale": "The simulation is directly about a content-addressed adoption object carrying a peer's spec reference and answers, so it fits the vocabulary-drift scenario well. Its strongest value is auditability: Carol can fetch, hash, and verify a concrete object tied to a spec pCID. But the design stays object-centric and does not define a final schema, so evolution rules for renamed or removed questions remain underspecified. That leaves moderate ambiguity and wrapper risk under long-term spec drift.",
+    "strengths": [
+      "Direct match to the scenario's need to bind answers to a specific spec reference.",
+      "Content-addressed signed object improves later audit and replay of what Bob claimed.",
+      "Implementation is plausible with straightforward object storage and verification."
+    ],
+    "weaknesses": [
+      "No final schema is defined, so the exact anti-drift mechanism is missing.",
+      "Promise wording is weaker than a small explicit payload promise and leans object/metadata centric.",
+      "Failure handling for stale mappings, removed questions, and contested migrations is thin."
+    ],
+    "risks": [
+      "Question identifiers may drift unless the schema makes them spec-local and immutable.",
+      "A signed structured adoption object can become a durable but heavy metadata wrapper around ordinary protocol use.",
+      "If migration is handled by external mapping records, peers may reintroduce dependence on extra coordination or stale translation data."
+    ],
+    "open_questions": [
+      "Should answer keys be explicitly namespaced by spec pCID so Q9 in pCID X cannot be confused with a renamed question in a later spec?",
+      "Does the object need an explicit migration field or separate migration records for superseded specs?",
+      "How should peers verify old signed adoption objects when identities, key material, or profile conventions evolve?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

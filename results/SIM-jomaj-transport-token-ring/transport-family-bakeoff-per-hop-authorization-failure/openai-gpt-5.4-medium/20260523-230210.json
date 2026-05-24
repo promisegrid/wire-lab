@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-jomaj-transport-token-ring-transport-family-bakeoff-per-hop-authorization-failure-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000101-SIM-jomaj-transport-token-ring--transport-family-bakeoff-per-hop-authorization-failure--openai-gpt-5.4-medium",
+  "sim_id": "SIM-jomaj-transport-token-ring",
+  "scenario_id": "transport-family-bakeoff-per-hop-authorization-failure",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-jomaj-transport-token-ring/transport-family-bakeoff-per-hop-authorization-failure/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_f97d61f613cb46eba8d73626c120cc6e",
+    "response_id": "resp_07308194b204f1a6006a12332203d0819894c80d00dc76c26f",
+    "input_tokens": 7507,
+    "output_tokens": 936,
+    "cost_usd": 0.02624125
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-jomaj-transport-token-ring/",
+    "scenario_path": "scenarios/transport-family-bakeoff-per-hop-authorization-failure/transport-family-bakeoff-per-hop-authorization-failure.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-jomaj-transport-token-ring/README.md",
+        "sha256": "da5a8b07baa9f0969362a89aa8bb0d3c5d367bb2fe6783621ed461bac7c9851e"
+      },
+      {
+        "path": "simulations/SIM-jomaj-transport-token-ring/QUESTION.md",
+        "sha256": "f1cc68278f35c5f9d14f7bc4ed97b3c4249e9933fbff955219beb1e83d635b6e"
+      },
+      {
+        "path": "scenarios/transport-family-bakeoff-per-hop-authorization-failure/transport-family-bakeoff-per-hop-authorization-failure.md",
+        "sha256": "f938e10ab88db666d3097a2f97c1667bbbc6e8e071681134049068982cc39cf2"
+      }
+    ],
+    "simulation_tree_hash": "1e99d614e1d78c2d36ea51a210ff9e5480e57752534b2cee956563c7c8d5f95f"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 5,
+    "promisegrid_alignment": 3,
+    "auditability": 4,
+    "evolution_safety": 2,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 2,
+    "implementation_plausibility": 3,
+    "promise_vocabulary": 3,
+    "simplicity_durability": 2,
+    "risk_penalty": 4
+  },
+  "fitness": {
+    "raw": 29,
+    "normalized_0_100": 57.99999999999999,
+    "confidence_0_1": 0.82
+  },
+  "assessment": {
+    "rationale": "The simulation fits the scenario directly because it explicitly explores token-ring transport with per-hop authorization and recorded forwarding/refusal promises. It has decent auditability and transport-layer focus, but the docs leave the failure model unresolved and openly question fragility around mixed-version peers, offline peers, and partition recovery. That makes PromiseGrid fit only moderate and durability/evolution weaker than simpler transport families.",
+    "strengths": [
+      "Scenario is an exact match for the design's stated per-hop authorization concern.",
+      "Per-hop forwarding/wait/refuse promises support local accountability and later audit.",
+      "The simulation keeps a relatively clear transport-layer boundary instead of claiming to replace all transport families."
+    ],
+    "weaknesses": [
+      "The docs do not specify a concrete authorization-failure recovery path.",
+      "Token-ring membership and liveness appear fragile under offline peers and partitions.",
+      "Promise wording is present but not strongly payload-promise-first."
+    ],
+    "risks": [
+      "Authorization failure may stall the ring and turn one peer's refusal into a liveness failure for unrelated traffic.",
+      "Membership reconfiguration after refusal may add brittle coordination assumptions that conflict with sparse-knowledge and long-term durability goals.",
+      "Strong ordering via token ownership may create recovery and upgrade hazards under partition or version skew."
+    ],
+    "open_questions": [
+      "Does an authorization refusal halt the ring, trigger deterministic membership reconfiguration, or allow a safe bypass?",
+      "How are offline or mixed-version peers prevented from deadlocking token ownership after a refusal?",
+      "What exact local artifact records the refused forward promise so later auditors can reconstruct the failure?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

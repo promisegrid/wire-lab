@@ -1,0 +1,163 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-dutam-grid-envelope-fixed-header-variable-body-promise-accounting-records-kept-storage-promise-openai-gpt-5.4-medium-20260524-032521",
+  "run_group_id": "ga-canary-20260523-pt-gate-v3-successors",
+  "cell_id": "ga-canary-20260523-pt-gate-v3-successors-000010-SIM-dutam-grid-envelope-fixed-header-variable-body--promise-accounting-records-kept-storage-promise--openai-gpt-5.4-medium",
+  "sim_id": "SIM-dutam-grid-envelope-fixed-header-variable-body",
+  "scenario_id": "promise-accounting-records-kept-storage-promise",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260524-032521",
+  "result_path": "results/SIM-dutam-grid-envelope-fixed-header-variable-body/promise-accounting-records-kept-storage-promise/openai-gpt-5.4-medium/20260524-032521.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_9c4664621be64e7a901ae5254ca73e3e",
+    "response_id": "resp_059ec94f530010d4006a126fcba8e48199a576c8042a55da90",
+    "input_tokens": 8236,
+    "output_tokens": 1389,
+    "cost_usd": 0.033859
+  },
+  "source": {
+    "repo_commit": "925c7f5c1c7ce7d5b0caf6a924d40d3f9b7d0483",
+    "sim_path": "simulations/SIM-dutam-grid-envelope-fixed-header-variable-body/",
+    "scenario_path": "scenarios/promise-accounting-records-kept-storage-promise/promise-accounting-records-kept-storage-promise.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-dutam-grid-envelope-fixed-header-variable-body/README.md",
+        "sha256": "36e655e9147306232cd1d4d874dbc7792e6eab7cc359251aee487b33d4b7c7b9"
+      },
+      {
+        "path": "simulations/SIM-dutam-grid-envelope-fixed-header-variable-body/QUESTION.md",
+        "sha256": "3790d466579bdf56d98055c4a630d802ca0d3ec042c01606860ff83f073621b0"
+      },
+      {
+        "path": "scenarios/promise-accounting-records-kept-storage-promise/promise-accounting-records-kept-storage-promise.md",
+        "sha256": "9972dff7f20d9b4f3231c07a8eb332d2e75b43e84cf0d34af29c1d3ea9c1ad74"
+      }
+    ],
+    "simulation_tree_hash": "41922bc0db1ac263325ae5ab91a03e187f0e61c5985a29f4f566745634f65fdb"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 4,
+    "auditability": 4,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 1,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 5,
+    "risk_penalty": 1
+  },
+  "fitness": {
+    "raw": 35,
+    "normalized_0_100": 70,
+    "confidence_0_1": 0.81
+  },
+  "assessment": {
+    "rationale": "A fixed-header, variable-body envelope is a strong PromiseGrid substrate for later local audit and evolution, but this scenario specifically tests kept storage-promise accounting. Dutam helps by making the storage claim's protocol and evidence more generically inspectable, yet it does not itself define the storage-promise outcome vocabulary Bob needs. So it fits as an enabling transport/accounting envelope rather than a complete scenario answer.",
+    "strengths": [
+      "Small fixed header preserves generic cross-peer auditability.",
+      "pCID-defined body supports protocol evolution without freezing every payload shape.",
+      "Clear outer/inner boundary helps later peers understand what they are looking at even after software changes.",
+      "Durable, compact envelope shape fits the 100-year small-device goal better than fully variable outer arity."
+    ],
+    "weaknesses": [
+      "Does not directly specify kept-storage promise records or outcome fields.",
+      "Promise vocabulary in the docs is limited; most wording is envelope/protocol-centric rather than explicit promise-accounting language.",
+      "Failure, dispute, and stale-evidence handling are not developed for this scenario."
+    ],
+    "risks": [
+      "Scenario-specific promise accounting may remain too implicit if kept-storage outcomes live only in body-specific conventions.",
+      "Different body protocols could fragment how peers record kept-promise evidence.",
+      "Weak failure semantics in the simulation leave stale, partial, or disputed storage evidence underexplained."
+    ],
+    "open_questions": [
+      "What minimal body schema lets Bob record that Alice kept a storage promise without needing simulation-specific hidden context?",
+      "Should the fixed header reserve a standard evidence slot for served-chunk proof in kept-promise cases?",
+      "How should later peers distinguish 'Alice served C once' from a broader ongoing keep/advertise promise when only local records survive?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design.",
+    "pt_gate": {
+      "status": "pt_clean",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "Nothing in the design removes agent autonomy; peers choose what to promise, send, store, or trust."
+      },
+      "scoped_intent": {
+        "status": "pass",
+        "note": "Intent is scoped by the fixed envelope plus the pCID-defined body protocol."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "The simulation does not authorize one agent to promise storage behavior on behalf of another."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "The design improves auditable claims and records but does not imply guaranteed storage outcomes."
+      },
+      "local_trust_assessment": {
+        "status": "pass",
+        "note": "The small fixed header supports peer-local audit of what was claimed and which body protocol applies, though storage trust still depends on the body protocol and local evidence."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "The envelope carries declarations and evidence; it does not turn receipt or use into obligation semantics."
+      },
+      "violations": []
+    }
+  }
+}

@@ -1,0 +1,171 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-savak-scoped-claim-card-audit-ledger-promise-economy-spectrum-permissioned-capability-token-openai-gpt-5.4-medium-20260524-024852",
+  "run_group_id": "ga-canary-20260523-pt-gate-v3",
+  "cell_id": "ga-canary-20260523-pt-gate-v3-000056-SIM-savak-scoped-claim-card-audit-ledger--promise-economy-spectrum-permissioned-capability-token--openai-gpt-5.4-medium",
+  "sim_id": "SIM-savak-scoped-claim-card-audit-ledger",
+  "scenario_id": "promise-economy-spectrum-permissioned-capability-token",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260524-024852",
+  "result_path": "results/SIM-savak-scoped-claim-card-audit-ledger/promise-economy-spectrum-permissioned-capability-token/openai-gpt-5.4-medium/20260524-024852.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_5fb13cf2bbca48ba87e25a9b63d5c2f8",
+    "response_id": "resp_08572ff9f90c8620006a12687f8eac81999d58e44940ff201c",
+    "input_tokens": 9367,
+    "output_tokens": 1625,
+    "cost_usd": 0.03914225
+  },
+  "source": {
+    "repo_commit": "ec652bd3ecaaf2f904e62cff00e113a88c7e3efd",
+    "sim_path": "simulations/SIM-savak-scoped-claim-card-audit-ledger/",
+    "scenario_path": "scenarios/promise-economy-spectrum-permissioned-capability-token/promise-economy-spectrum-permissioned-capability-token.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-savak-scoped-claim-card-audit-ledger/README.md",
+        "sha256": "f9fde554d9d081495a2192d16f7121ea95535f414c6866c5ecf15ed43d3a5282"
+      },
+      {
+        "path": "simulations/SIM-savak-scoped-claim-card-audit-ledger/QUESTION.md",
+        "sha256": "b0889652ec3fbac187f07360da3818107a1a9868c3442c5fad520189d9257773"
+      },
+      {
+        "path": "simulations/SIM-savak-scoped-claim-card-audit-ledger/PATTERNS.md",
+        "sha256": "0d2da32f9958b9146ed43581612296ff249b1218c918baf8de0e60743e63eaf9"
+      },
+      {
+        "path": "scenarios/promise-economy-spectrum-permissioned-capability-token/promise-economy-spectrum-permissioned-capability-token.md",
+        "sha256": "ac5ba8f29fb13e1d693bdbfb0a5cc1c516750bf4f3a142b8dee90128d13ce2e2"
+      }
+    ],
+    "simulation_tree_hash": "a3d2108c4a27128a7d42e5b0ac1541ad1774df2898f96e97eed1043e7e428d87"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 4,
+    "promisegrid_alignment": 2,
+    "auditability": 5,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 4,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 3,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 35,
+    "normalized_0_100": 70,
+    "confidence_0_1": 0.83
+  },
+  "assessment": {
+    "rationale": "Strong fit for permissioned capability pressure because it explicitly separates authorization from content hash and from availability promises, and provides auditable local evidence for scoped permission claims. It is weaker on the scenario's actual capability-token mechanics: issuance, non-transferability, redemption, expiry, and revocation remain underspecified. Audit and layer separation are excellent, but the vocabulary still leans toward claim cards and authoritative IDs rather than clean promise-first wording.",
+    "strengths": [
+      "Clear separation of hash/address from authorization and from retention or availability promises.",
+      "Exact audit-anchor citation improves later verification of permission-related claims.",
+      "Local append-only promise-accounting records support durable peer-local evidence.",
+      "Strong plane separation helps avoid implying that storage, live transport, and audit publication are the same promise."
+    ],
+    "weaknesses": [
+      "Does not define the capability token artifact itself or its redemption semantics.",
+      "Non-transferability, expiry, revocation, and delegation rules are not concretely specified.",
+      "Promise vocabulary is diluted by claim-card and authoritative-identity framing.",
+      "Artifact surface may become heavier than necessary for small long-lived implementations."
+    ],
+    "risks": [
+      "Capability semantics may collapse into an external auth service if the capability artifact remains only a note field.",
+      "'Authoritative boundary identity' can drift toward authority-heavy interpretation if not kept purely descriptive.",
+      "Claim-card and audit-ledger packaging may grow into generic wrappers instead of small durable promise artifacts."
+    ],
+    "open_questions": [
+      "What minimum fields must a separate capability artifact carry to make the claim card's capability_auth_note auditable and non-transferable?",
+      "How should expiry, revocation, and redemption failure be recorded locally without introducing a central permission registry?",
+      "Is draft-path plus revision hash sufficient boundary identity when capability semantics matter across embodiments?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design.",
+    "pt_gate": {
+      "status": "pt_reframe_needed",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "Peers publish their own scoped cards and keep local append-only records; no commanding agent is assumed."
+      },
+      "scoped_intent": {
+        "status": "warning",
+        "note": "Per-plane scoped cards are close to scoped promises, but the design is still framed as claim cards and audit records more than explicit promise payloads."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "The simulation mostly reports publisher scope and dependencies rather than making guarantees on behalf of other agents."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "The design separates hash/address, authorization, availability, and retention, so permission does not guarantee retrieval outcome."
+      },
+      "local_trust_assessment": {
+        "status": "pass",
+        "note": "Audit anchors and local promise-accounting records support peer-local trust decisions."
+      },
+      "accept_use_not_obligation": {
+        "status": "warning",
+        "note": "Capability framing can permit Bob to fetch without implying obligation to redeem or unconditional obligation to serve, though this should be stated more explicitly."
+      },
+      "violations": [
+        "Uses claim-card framing instead of consistently expressing agent-scoped promises.",
+        "Leaves receive/use-vs-obligation semantics for capability redemption implicit rather than explicit."
+      ]
+    }
+  }
+}

@@ -1,0 +1,123 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-gozin-spec-sections-required-spec-requirement-sections-100-year-review-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000159-SIM-gozin-spec-sections-required--spec-requirement-sections-100-year-review--openai-gpt-5.4-medium",
+  "sim_id": "SIM-gozin-spec-sections-required",
+  "scenario_id": "spec-requirement-sections-100-year-review",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-gozin-spec-sections-required/spec-requirement-sections-100-year-review/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_6a5197b919da4de18f1c0dabf72ef14f",
+    "response_id": "resp_0a132a09cf7f4a73006a1233d661e0819a8a20979b922e9156",
+    "input_tokens": 7491,
+    "output_tokens": 1242,
+    "cost_usd": 0.03049725
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-gozin-spec-sections-required/",
+    "scenario_path": "scenarios/spec-requirement-sections-100-year-review/spec-requirement-sections-100-year-review.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-gozin-spec-sections-required/README.md",
+        "sha256": "ee33ac614913056db1824486380c1d6197ffe98aeefdb6b009925bcb22ca500a"
+      },
+      {
+        "path": "simulations/SIM-gozin-spec-sections-required/QUESTION.md",
+        "sha256": "2ab8c8a586d91ec7e46e58ebff30d17ffa801ba418be4c087fbc79eb0e1f5471"
+      },
+      {
+        "path": "scenarios/spec-requirement-sections-100-year-review/spec-requirement-sections-100-year-review.md",
+        "sha256": "b2e71192b720372495986fad6387d0bfd5222ce78a7cfd9da03940d1a1062cd7"
+      }
+    ],
+    "simulation_tree_hash": "53bf3a7312230b2885693633632d800de388ba1cdf2b0646723f005d7b31a192"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 5,
+    "promisegrid_alignment": 4,
+    "auditability": 5,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 3,
+    "failure_handling": 2,
+    "implementation_plausibility": 5,
+    "promise_vocabulary": 4,
+    "simplicity_durability": 3,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 38,
+    "normalized_0_100": 76,
+    "confidence_0_1": 0.8
+  },
+  "assessment": {
+    "rationale": "This simulation fits the scenario well because it directly proposes mandatory spec sections for promise vocabulary and 100-year review, which helps future readers locate long-horizon assumptions. It is plausible and auditable as a documentation rule, but the universal requirement risks boilerplate, especially for small or low-level protocols, and it does not by itself guarantee strong failure analysis or fully promise-first wording.",
+    "strengths": [
+      "Directly targets the scenario's 100-year intelligibility pressure.",
+      "Improves auditability by making key explanatory material easy to find in every spec.",
+      "Easy to implement as a consistent spec-template requirement.",
+      "Supports evolution review by preserving assumptions and mental-model guidance for later readers."
+    ],
+    "weaknesses": [
+      "Applies the same section set regardless of layer or complexity.",
+      "Documentation structure alone does not ensure good failure handling content.",
+      "The proposal is about required sections, not itself a strongly promise-first artifact.",
+      "Boilerplate risk weakens simplicity for very small protocols."
+    ],
+    "risks": [
+      "Uniform mandatory sections may create checkbox prose instead of durable evidence.",
+      "Small protocols may become bloated by template requirements that add little layer-specific value.",
+      "A generic 'promise vocabulary' section could drift into normative summaries rather than concrete payload promises."
+    ],
+    "open_questions": [
+      "Should all required sections apply uniformly to every layer, or should some be conditional by protocol size and role?",
+      "How can the required sections avoid empty boilerplate and preserve real 100-year review value?",
+      "Should the promise-vocabulary section require concrete payload promises rather than generic explanatory prose?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

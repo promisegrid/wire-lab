@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-zubuf-cas-type-cid-codec-only-conditional-release-geofencing-replay-outside-conditions-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000023-SIM-zubuf-cas-type-cid-codec-only--conditional-release-geofencing-replay-outside-conditions--openai-gpt-5.4-medium",
+  "sim_id": "SIM-zubuf-cas-type-cid-codec-only",
+  "scenario_id": "conditional-release-geofencing-replay-outside-conditions",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-zubuf-cas-type-cid-codec-only/conditional-release-geofencing-replay-outside-conditions/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_4424aa55e4124741be158a241c6c1daf",
+    "response_id": "resp_0909f3b38fd62c4c006a12322f3450819b95a345ee4186f931",
+    "input_tokens": 7549,
+    "output_tokens": 1769,
+    "cost_usd": 0.03797675
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-zubuf-cas-type-cid-codec-only/",
+    "scenario_path": "scenarios/conditional-release-geofencing-replay-outside-conditions/conditional-release-geofencing-replay-outside-conditions.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-zubuf-cas-type-cid-codec-only/README.md",
+        "sha256": "f8b576e7f1fd2f44298bb944891aada2d51cc4b84c7f7d1edaf3f0c9cf263887"
+      },
+      {
+        "path": "simulations/SIM-zubuf-cas-type-cid-codec-only/QUESTION.md",
+        "sha256": "3a42af71a5ab26ea6a32d4789f1036c37e4381a434ca2448e0489a26b17ca1f4"
+      },
+      {
+        "path": "scenarios/conditional-release-geofencing-replay-outside-conditions/conditional-release-geofencing-replay-outside-conditions.md",
+        "sha256": "f1480d60e85afb41b0fe5e49fdc70801e029734edbe32c3068434be7f4cb1c6e"
+      }
+    ],
+    "simulation_tree_hash": "8ed0fd394a31271380de3ed1e49a2700f22a654280e93e4c7bbb4d65bf0d89b5"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 0,
+    "promisegrid_alignment": 2,
+    "auditability": 1,
+    "evolution_safety": 1,
+    "layer_boundary_clarity": 3,
+    "failure_handling": 0,
+    "implementation_plausibility": 3,
+    "promise_vocabulary": 1,
+    "simplicity_durability": 4,
+    "risk_penalty": 4
+  },
+  "fitness": {
+    "raw": 16,
+    "normalized_0_100": 32,
+    "confidence_0_1": 0.91
+  },
+  "assessment": {
+    "rationale": "This simulation is mostly orthogonal to the scenario. CID-codec-only typing may be a clean CAS-layer choice, but it does not specify how conditional release binds to recipient, geography, epoch, or session context, nor how Dave detects stale or unauthorized replay. The only strong fit is a clear lower-layer boundary: codec choice can stay separate from policy, but that also means the scenario's core pressure is unanswered here.",
+    "strengths": [
+      "Small, explicit, deterministic CAS-layer rule.",
+      "Clear separation between object typing and higher-layer access policy.",
+      "Plausible to implement on constrained devices and durable over time."
+    ],
+    "weaknesses": [
+      "No promise mechanism for audience, geography, epoch, or session binding.",
+      "No replay-detection or stale-use handling for receivers or feeds.",
+      "Provides little scenario-specific audit evidence beyond object type interpretation."
+    ],
+    "risks": [
+      "Unauthorized replay remains undetectable if higher-layer condition-binding artifacts are absent or underspecified.",
+      "Codec-only type binding may be too coarse once policy-bearing or condition-bearing object families evolve.",
+      "Auditors may be unable to tell whether a valid old CID was valid for this receiver and context."
+    ],
+    "open_questions": [
+      "What payload promise binds a CID to audience, location, time, or session constraints?",
+      "Which peer-local artifacts would record release authorization and replay invalidation?",
+      "Should conditional-release state live in separate policy objects, feeds, or capability tokens rather than in codec choice?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

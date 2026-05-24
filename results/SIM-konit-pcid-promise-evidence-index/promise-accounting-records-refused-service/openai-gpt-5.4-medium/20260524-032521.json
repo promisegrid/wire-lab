@@ -1,0 +1,163 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-konit-pcid-promise-evidence-index-promise-accounting-records-refused-service-openai-gpt-5.4-medium-20260524-032521",
+  "run_group_id": "ga-canary-20260523-pt-gate-v3-successors",
+  "cell_id": "ga-canary-20260523-pt-gate-v3-successors-000059-SIM-konit-pcid-promise-evidence-index--promise-accounting-records-refused-service--openai-gpt-5.4-medium",
+  "sim_id": "SIM-konit-pcid-promise-evidence-index",
+  "scenario_id": "promise-accounting-records-refused-service",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260524-032521",
+  "result_path": "results/SIM-konit-pcid-promise-evidence-index/promise-accounting-records-refused-service/openai-gpt-5.4-medium/20260524-032521.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_ab808d8959944d928fc7751e01f80149",
+    "response_id": "resp_0e4f50fae72c981a006a1270e9dcec8199b47aacd1b0d8361b",
+    "input_tokens": 8244,
+    "output_tokens": 1107,
+    "cost_usd": 0.029925
+  },
+  "source": {
+    "repo_commit": "925c7f5c1c7ce7d5b0caf6a924d40d3f9b7d0483",
+    "sim_path": "simulations/SIM-konit-pcid-promise-evidence-index/",
+    "scenario_path": "scenarios/promise-accounting-records-refused-service/promise-accounting-records-refused-service.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-konit-pcid-promise-evidence-index/README.md",
+        "sha256": "9ebee1bbac1dafa81dd66c456d35cc98c1bcc2152ac436c41ce31d1fb5d2a6ef"
+      },
+      {
+        "path": "simulations/SIM-konit-pcid-promise-evidence-index/QUESTION.md",
+        "sha256": "03e6029e9943fdd935fc8c629d871c771710a27f4ccbdf5b3db727be79814960"
+      },
+      {
+        "path": "scenarios/promise-accounting-records-refused-service/promise-accounting-records-refused-service.md",
+        "sha256": "9a7d47455793988cfb9b0fb045b29086ed13ee22cd0db080584e259c0aa69313"
+      }
+    ],
+    "simulation_tree_hash": "227c9a080416752ab4c2fd51ae77ac84fad407f5deaf7843de114272995e423a"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 5,
+    "promisegrid_alignment": 5,
+    "auditability": 5,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 5,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 5,
+    "simplicity_durability": 4,
+    "risk_penalty": 1
+  },
+  "fitness": {
+    "raw": 46,
+    "normalized_0_100": 92,
+    "confidence_0_1": 0.9
+  },
+  "assessment": {
+    "rationale": "Strong match. The simulation explicitly centers pCID-scoped promise evidence and later observations including refusal, which directly answers the scenario pressure to distinguish honest refusal from failure or corruption. It stays Promise-Theory-first by treating the index as descriptive local evidence rather than certification or authority.",
+    "strengths": [
+      "Explicitly includes later observations of refusal, break, keep, or ambiguity.",
+      "Clear evidence-only framing avoids conformance-ledger and authority drift.",
+      "High auditability from exact evidence-object citation and who-promised-what indexing.",
+      "Strong layer clarity between promise evidence and local trust judgment."
+    ],
+    "weaknesses": [
+      "The docs do not yet define a concrete refusal record format or minimal fields.",
+      "Implementation details for privacy-preserving refusal evidence are unspecified.",
+      "Conflict handling across multiple observers is left open."
+    ],
+    "risks": [
+      "An index can drift toward quasi-ledger interpretation if operators treat citations as centralized truth.",
+      "Refusal records may expose sensitive policy or authorization details unless carefully minimized.",
+      "Cross-peer aggregation could blur local observations into implied global adjudication."
+    ],
+    "open_questions": [
+      "What exact durable record shape distinguishes refusal from timeout, corruption, and silent absence?",
+      "How should policy-, cost-, and authorization-based refusals be cited without leaking unnecessary sensitive context?",
+      "How are conflicting later observations from different peers indexed without implying global settlement?"
+    ],
+    "authority_boundary": "Evidence-only indexing pattern; does not certify conformance, authorize service, or settle disputes. Design authority remains with later DR/DI/spec decisions.",
+    "pt_gate": {
+      "status": "pt_clean",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "Agents make and assess promises locally, and refusal is treated as an honest autonomous outcome."
+      },
+      "scoped_intent": {
+        "status": "pass",
+        "note": "Promises are scoped to pCID-referenced payloads or services and to cited evidence objects."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "The design asks who promised what and cites evidence, rather than letting one agent promise on behalf of another."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "Promises are linked to later observations such as keep, break, refusal, or ambiguity rather than guaranteed success."
+      },
+      "local_trust_assessment": {
+        "status": "pass",
+        "note": "The index is descriptive evidence only and leaves trust judgment to Alice, Bob, or Carol locally."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "The design records evidence about promises and observations; it does not recast receipt or use as an obligation to serve."
+      },
+      "violations": []
+    }
+  }
+}

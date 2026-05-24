@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-tudar-l6-cas-promisebase-adapter-profile-transport-family-bakeoff-per-hop-authorization-failure-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000010-SIM-tudar-l6-cas-promisebase-adapter-profile--transport-family-bakeoff-per-hop-authorization-failure--openai-gpt-5.4-medium",
+  "sim_id": "SIM-tudar-l6-cas-promisebase-adapter-profile",
+  "scenario_id": "transport-family-bakeoff-per-hop-authorization-failure",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-tudar-l6-cas-promisebase-adapter-profile/transport-family-bakeoff-per-hop-authorization-failure/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_00427c2cebee4acab777062652f11f59",
+    "response_id": "resp_0d8e1520e7f8cec8006a12320b227c819b83b0543eec9ebde5",
+    "input_tokens": 7583,
+    "output_tokens": 950,
+    "cost_usd": 0.02657025
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-tudar-l6-cas-promisebase-adapter-profile/",
+    "scenario_path": "scenarios/transport-family-bakeoff-per-hop-authorization-failure/transport-family-bakeoff-per-hop-authorization-failure.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-tudar-l6-cas-promisebase-adapter-profile/README.md",
+        "sha256": "8045140e0a499bf871f1834cc4b3e4d57d1ae25f7a28022c4e533ee510d1f836"
+      },
+      {
+        "path": "simulations/SIM-tudar-l6-cas-promisebase-adapter-profile/QUESTION.md",
+        "sha256": "5fa3894dd300e1cc66718738501116149682d9c6b6751b497abc7ced4b0799ca"
+      },
+      {
+        "path": "scenarios/transport-family-bakeoff-per-hop-authorization-failure/transport-family-bakeoff-per-hop-authorization-failure.md",
+        "sha256": "f938e10ab88db666d3097a2f97c1667bbbc6e8e071681134049068982cc39cf2"
+      }
+    ],
+    "simulation_tree_hash": "6c2abb880ff69e2a4b5e9895f65ee92dde3468ae93c11a0f546feff3eb8d0eee"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 3,
+    "auditability": 3,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 0,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 2,
+    "risk_penalty": 4
+  },
+  "fitness": {
+    "raw": 23,
+    "normalized_0_100": 46,
+    "confidence_0_1": 0.86
+  },
+  "assessment": {
+    "rationale": "This simulation is a CAS-profile adapter specimen, not a transport or ring-membership design, so it fits the scenario poorly. It does show useful PromiseGrid-oriented structure through explicit translation rules, pCIDs, pointers, and stream evolution, which helps boundary clarity and implementation plausibility. But it does not explain per-hop authorization failure behavior, refusal recording, hop skipping, or membership reconfiguration, so the scenario pressure is largely unmet.",
+    "strengths": [
+      "Clear L6 CAS scope and non-goal boundary.",
+      "Explicit translation-rule intent supports auditability and independent implementation.",
+      "Stream evolution and prior-art reuse improve plausibility and some evolution safety."
+    ],
+    "weaknesses": [
+      "Does not address ring semantics or per-hop authorization behavior.",
+      "No explicit refusal, skip-hop, or reconfiguration failure model.",
+      "Promise vocabulary is present only indirectly; wording remains profile/adapter-centric rather than payload-promise-first."
+    ],
+    "risks": [
+      "Strong scenario mismatch could hide transport failure semantics behind an out-of-scope CAS layer.",
+      "Adapter-first framing may encourage generic compatibility claims instead of explicit payload promises.",
+      "If transport authorization evidence is not modeled separately, audits may not be able to distinguish storage integrity from forwarding refusal."
+    ],
+    "open_questions": [
+      "Can the CAS profile expose any payload-level promise that a transport layer could use to record per-hop refusal or authorization state without smearing layers?",
+      "If a stream or pointer chain depends on authorized relays, how would the adapter profile preserve auditable refusal evidence across implementations?",
+      "Is there a clean boundary where transport-family authorization failure is explicitly out of scope rather than silently unsupported?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

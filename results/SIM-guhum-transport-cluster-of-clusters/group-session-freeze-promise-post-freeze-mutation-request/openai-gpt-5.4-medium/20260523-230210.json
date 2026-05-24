@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-guhum-transport-cluster-of-clusters-group-session-freeze-promise-post-freeze-mutation-request-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000111-SIM-guhum-transport-cluster-of-clusters--group-session-freeze-promise-post-freeze-mutation-request--openai-gpt-5.4-medium",
+  "sim_id": "SIM-guhum-transport-cluster-of-clusters",
+  "scenario_id": "group-session-freeze-promise-post-freeze-mutation-request",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-guhum-transport-cluster-of-clusters/group-session-freeze-promise-post-freeze-mutation-request/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_87d7c25682ac48f2a3a427c5d4c6571c",
+    "response_id": "resp_0cb7121abf22d3f6006a12333f486481989f1176db1d042acc",
+    "input_tokens": 7516,
+    "output_tokens": 1213,
+    "cost_usd": 0.030135
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-guhum-transport-cluster-of-clusters/",
+    "scenario_path": "scenarios/group-session-freeze-promise-post-freeze-mutation-request/group-session-freeze-promise-post-freeze-mutation-request.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-guhum-transport-cluster-of-clusters/README.md",
+        "sha256": "9faf90179b085adf41d297b03e68fcea05f1036b00e1b289da4be5f7765e7350"
+      },
+      {
+        "path": "simulations/SIM-guhum-transport-cluster-of-clusters/QUESTION.md",
+        "sha256": "9c28415f96b79e449c81152d12b31194c886b19e458c9865af66f5e07c381955"
+      },
+      {
+        "path": "scenarios/group-session-freeze-promise-post-freeze-mutation-request/group-session-freeze-promise-post-freeze-mutation-request.md",
+        "sha256": "9083e149d879dcf5890bbcc3d3bb2fcf87b4490ba1878e59a73402bd5312ee52"
+      }
+    ],
+    "simulation_tree_hash": "0c3d3b4f767b25b25cd7017af80c516d7440b523c53d81768d763ddb4e97dfe2"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 3,
+    "auditability": 2,
+    "evolution_safety": 2,
+    "layer_boundary_clarity": 3,
+    "failure_handling": 1,
+    "implementation_plausibility": 3,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 2,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 21,
+    "normalized_0_100": 42,
+    "confidence_0_1": 0.83
+  },
+  "assessment": {
+    "rationale": "The simulation is a transport-scaling candidate, not a group-session freeze design. It aligns partly with PromiseGrid goals by emphasizing peer-local cluster promises and avoiding a central routing authority, but it does not specify freeze semantics, lineage handling, or mutation-after-freeze behavior. For this scenario, the main value is boundary clarity: the design appears intentionally below the session/specimen layer, so it cannot adequately answer the core pressure without additional artifacts above transport.",
+    "strengths": [
+      "Clear transport-layer scope and stated concern about avoiding central routing authority.",
+      "Uses explicit promise framing around local membership, routing, relay, and inter-cluster summaries.",
+      "Acknowledges migration and hidden-authority risks directly."
+    ],
+    "weaknesses": [
+      "Does not define freeze, specimen, pCID, or amendment/supersession semantics.",
+      "Provides little scenario-specific failure handling for stale, conflicting, or adversarial post-freeze mutation requests.",
+      "Audit trail for end-to-end session history is underspecified once information is compressed into cluster summaries."
+    ],
+    "risks": [
+      "Cluster summaries could hide lineage details needed to audit whether frozen history was mutated or superseded.",
+      "Clusters may become de facto authority points for routing or policy, undermining peer-local interpretation of freeze evidence.",
+      "Evolution across cluster boundaries may introduce inconsistent handling of post-freeze updates."
+    ],
+    "open_questions": [
+      "How would freeze evidence and post-freeze lineage be represented across cluster boundaries without hidden global coordination?",
+      "Would a post-freeze mutation become a new specimen, a superseding pCID, or some transport-level amendment signal in this design?",
+      "Can cluster summary promises preserve enough history for later human/LLM audit of freeze semantics?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

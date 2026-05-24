@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-kabiv-chunking-pcid-driven-identity-transport-family-bakeoff-per-hop-authorization-failure-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000045-SIM-kabiv-chunking-pcid-driven-identity--transport-family-bakeoff-per-hop-authorization-failure--openai-gpt-5.4-medium",
+  "sim_id": "SIM-kabiv-chunking-pcid-driven-identity",
+  "scenario_id": "transport-family-bakeoff-per-hop-authorization-failure",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-kabiv-chunking-pcid-driven-identity/transport-family-bakeoff-per-hop-authorization-failure/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_0f9f22fead2e44d6a8094a05e1ab688a",
+    "response_id": "resp_0b78421b85ac82c1006a12327358008198ad133c8f1c9b1ef3",
+    "input_tokens": 7551,
+    "output_tokens": 999,
+    "cost_usd": 0.02720025
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-kabiv-chunking-pcid-driven-identity/",
+    "scenario_path": "scenarios/transport-family-bakeoff-per-hop-authorization-failure/transport-family-bakeoff-per-hop-authorization-failure.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-kabiv-chunking-pcid-driven-identity/README.md",
+        "sha256": "f2fd1cfe737e467037ae5298888ddeff9d1042625d9ec2bfabb15830d5d38953"
+      },
+      {
+        "path": "simulations/SIM-kabiv-chunking-pcid-driven-identity/QUESTION.md",
+        "sha256": "ed85c69097a9fa5aac0ca6f33b6749a795c916e00aa52ac17bb8cac4c48512e2"
+      },
+      {
+        "path": "scenarios/transport-family-bakeoff-per-hop-authorization-failure/transport-family-bakeoff-per-hop-authorization-failure.md",
+        "sha256": "f938e10ab88db666d3097a2f97c1667bbbc6e8e071681134049068982cc39cf2"
+      }
+    ],
+    "simulation_tree_hash": "05b7a54cb26daa2675abb925708f149eaf46f08dd93700190a804876c953a3e9"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 0,
+    "promisegrid_alignment": 3,
+    "auditability": 3,
+    "evolution_safety": 2,
+    "layer_boundary_clarity": 2,
+    "failure_handling": 0,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 3,
+    "simplicity_durability": 4,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 23,
+    "normalized_0_100": 46,
+    "confidence_0_1": 0.9
+  },
+  "assessment": {
+    "rationale": "This simulation is largely out of scope for the scenario. It explores pCID-defined chunking and deterministic object identity, not ring forwarding or per-hop authorization failure. It does align with PromiseGrid goals around deterministic, peer-local verification and no central registry, but it provides little direct evidence about whether a blocked hop breaks, skips, records refusal, or reconfigures membership.",
+    "strengths": [
+      "Deterministic, peer-local reconstruction of chunk boundaries supports auditability.",
+      "pCID-centered verification avoids central trust-ledger dependence.",
+      "Artifact shape is relatively small and durable compared with richer conformance bundles."
+    ],
+    "weaknesses": [
+      "Does not model ring membership, forwarding, or per-hop authorization.",
+      "No explicit refusal, fallback, or recovery behavior for authorization failure.",
+      "Chunking policy is pulled into protocol identity, weakening layer separation."
+    ],
+    "risks": [
+      "Scenario mismatch may hide transport-layer failure requirements behind an identity-layer design.",
+      "Binding chunking policy to protocol pCID may make protocol evolution harder and blur semantic vs storage boundaries.",
+      "Absent an explicit authorization-failure model, implementers may assume hidden transport behavior."
+    ],
+    "open_questions": [
+      "Should per-hop authorization be expressed as a separate transport-layer promise family, independent of pCID-defined chunking?",
+      "If a protocol spec owns chunking, how are chunking-spec upgrades handled without breaking long-lived object identity?",
+      "What local refusal/audit artifact would a transport hop emit when authorization fails?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

@@ -1,0 +1,119 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-lilok-cas-type-path-suffix-negative-control-conditional-release-geofencing-replay-outside-conditions-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000037-SIM-lilok-cas-type-path-suffix-negative-control--conditional-release-geofencing-replay-outside-conditions--openai-gpt-5.4-medium",
+  "sim_id": "SIM-lilok-cas-type-path-suffix-negative-control",
+  "scenario_id": "conditional-release-geofencing-replay-outside-conditions",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-lilok-cas-type-path-suffix-negative-control/conditional-release-geofencing-replay-outside-conditions/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_77a49e6a4fd443df9186b3bab7cbd6d4",
+    "response_id": "resp_0f70b25550f9bde0006a12325760c8819b864dbfd40f842245",
+    "input_tokens": 7546,
+    "output_tokens": 1155,
+    "cost_usd": 0.0293755
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-lilok-cas-type-path-suffix-negative-control/",
+    "scenario_path": "scenarios/conditional-release-geofencing-replay-outside-conditions/conditional-release-geofencing-replay-outside-conditions.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-lilok-cas-type-path-suffix-negative-control/README.md",
+        "sha256": "01679bfb564db2b4f8adfc4535d1a02413330fa05cea0bc288f12d5ab519c086"
+      },
+      {
+        "path": "simulations/SIM-lilok-cas-type-path-suffix-negative-control/QUESTION.md",
+        "sha256": "b1845d40f8012e290f866398d59d22236cd65c974e210c8040a4f1ed2dc86297"
+      },
+      {
+        "path": "scenarios/conditional-release-geofencing-replay-outside-conditions/conditional-release-geofencing-replay-outside-conditions.md",
+        "sha256": "f1480d60e85afb41b0fe5e49fdc70801e029734edbe32c3068434be7f4cb1c6e"
+      }
+    ],
+    "simulation_tree_hash": "0fe117659bfa499dd1f42891807e2ccdb2da83ab00099599578ffabf5fa458d6"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 0,
+    "promisegrid_alignment": 0,
+    "auditability": 1,
+    "evolution_safety": 0,
+    "layer_boundary_clarity": 0,
+    "failure_handling": 0,
+    "implementation_plausibility": 2,
+    "promise_vocabulary": 0,
+    "simplicity_durability": 1,
+    "risk_penalty": 5
+  },
+  "fitness": {
+    "raw": 4,
+    "normalized_0_100": 8,
+    "confidence_0_1": 0.94
+  },
+  "assessment": {
+    "rationale": "This specimen is a deliberate negative control for CAS type binding by filename/path suffix. It does not meaningfully address conditional release, recipient/geography binding, epoch binding, or replay detection. In this scenario, replay outside conditions succeeds or becomes ambiguous because path-local naming carries no durable, transferable authorization semantics.",
+    "strengths": [
+      "Very small and explicit negative-control specimen.",
+      "Easy to implement and easy to falsify under cross-peer transfer pressure."
+    ],
+    "weaknesses": [
+      "Does not bind conditions to payload bytes, recipient, location, or session context.",
+      "Path-local suffix semantics are not durable across transfer, archive, or rename.",
+      "Uses weak promise vocabulary and lacks promise-first payload claims."
+    ],
+    "risks": [
+      "Renaming or rehosting the same CID under a different suffix can change apparent type without changing bytes.",
+      "Receivers cannot audit geofence, audience, or freshness conditions from path names alone.",
+      "The design conflates local storage conventions with cross-peer content meaning, creating severe replay and misclassification risk."
+    ],
+    "open_questions": [
+      "Could path suffixes be retained only as local convenience while all replay/geofence conditions are bound in signed payload bytes instead?",
+      "Is any cross-peer evidence defined here that would let Dave distinguish valid reuse from stale or unauthorized replay?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

@@ -1,0 +1,122 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-tudar-l6-cas-promisebase-adapter-profile-udp-feed-v0-conformance-session-layer-composition-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000014-SIM-tudar-l6-cas-promisebase-adapter-profile--udp-feed-v0-conformance-session-layer-composition--openai-gpt-5.4-medium",
+  "sim_id": "SIM-tudar-l6-cas-promisebase-adapter-profile",
+  "scenario_id": "udp-feed-v0-conformance-session-layer-composition",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-tudar-l6-cas-promisebase-adapter-profile/udp-feed-v0-conformance-session-layer-composition/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_6605543113c64ac0ad11e76e1b03b214",
+    "response_id": "resp_0bbc38e1e9046531006a1232169db8819bb61b7ecbba3f22dd",
+    "input_tokens": 7576,
+    "output_tokens": 1051,
+    "cost_usd": 0.027972
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-tudar-l6-cas-promisebase-adapter-profile/",
+    "scenario_path": "scenarios/udp-feed-v0-conformance-session-layer-composition/udp-feed-v0-conformance-session-layer-composition.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-tudar-l6-cas-promisebase-adapter-profile/README.md",
+        "sha256": "8045140e0a499bf871f1834cc4b3e4d57d1ae25f7a28022c4e533ee510d1f836"
+      },
+      {
+        "path": "simulations/SIM-tudar-l6-cas-promisebase-adapter-profile/QUESTION.md",
+        "sha256": "5fa3894dd300e1cc66718738501116149682d9c6b6751b497abc7ced4b0799ca"
+      },
+      {
+        "path": "scenarios/udp-feed-v0-conformance-session-layer-composition/udp-feed-v0-conformance-session-layer-composition.md",
+        "sha256": "69da5db705a56cd7067a653928ff8b2dc9301ef6ebfc712bd81038a65c9d352c"
+      }
+    ],
+    "simulation_tree_hash": "6c2abb880ff69e2a4b5e9895f65ee92dde3468ae93c11a0f546feff3eb8d0eee"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 3,
+    "auditability": 2,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 2,
+    "failure_handling": 1,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 3,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 23,
+    "normalized_0_100": 46,
+    "confidence_0_1": 0.7
+  },
+  "assessment": {
+    "rationale": "The simulation is a CAS-profile adapter focused on translating promisebase object and stream ideas into PromiseGrid terms. That gives some layer-translation value, but it is only an indirect fit for a UDP-feed session-layer composition scenario. The docs suggest explicit translation and evolution rules, which helps plausibility, but they do not show session-facing boundaries, failure behavior, or concrete promise-first conformance artifacts.",
+    "strengths": [
+      "Explicitly targets translation rules for identity, pointers, and stream evolution.",
+      "Reuses prior art, which improves implementation plausibility.",
+      "Keeps promisebase non-canonical, preserving some architectural boundary."
+    ],
+    "weaknesses": [
+      "Weak direct fit to a UDP-feed next-layer composition scenario.",
+      "Does not define session-layer observable artifacts or conformance evidence.",
+      "Uses profile/adapter framing more than concrete promise payload wording.",
+      "Failure handling and adversarial behavior are largely unspecified."
+    ],
+    "risks": [
+      "Adapter semantics may leak lower-layer promisebase details into higher-layer session composition.",
+      "Conformance may depend on profile-level interpretation rather than small payload promises.",
+      "Sparse failure and audit evidence make independent verification weak."
+    ],
+    "open_questions": [
+      "Can the adapter expose a session-safe API without leaking promisebase stream or pointer details upward?",
+      "What peer-local evidence would prove conformance of translated objects and streams across independent implementations?",
+      "How are version negotiation and mixed-profile evolution handled when the next layer depends on stable CAS semantics?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

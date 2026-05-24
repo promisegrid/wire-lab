@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-lilok-cas-type-path-suffix-negative-control-spec-requirement-sections-100-year-review-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000040-SIM-lilok-cas-type-path-suffix-negative-control--spec-requirement-sections-100-year-review--openai-gpt-5.4-medium",
+  "sim_id": "SIM-lilok-cas-type-path-suffix-negative-control",
+  "scenario_id": "spec-requirement-sections-100-year-review",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-lilok-cas-type-path-suffix-negative-control/spec-requirement-sections-100-year-review/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_aed3ae3c0b744a75b6b3c6d67fa19c1b",
+    "response_id": "resp_076b6c7385f8609e006a1232623420819bbf2efe08e76cd3cb",
+    "input_tokens": 7537,
+    "output_tokens": 1240,
+    "cost_usd": 0.03054975
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-lilok-cas-type-path-suffix-negative-control/",
+    "scenario_path": "scenarios/spec-requirement-sections-100-year-review/spec-requirement-sections-100-year-review.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-lilok-cas-type-path-suffix-negative-control/README.md",
+        "sha256": "01679bfb564db2b4f8adfc4535d1a02413330fa05cea0bc288f12d5ab519c086"
+      },
+      {
+        "path": "simulations/SIM-lilok-cas-type-path-suffix-negative-control/QUESTION.md",
+        "sha256": "b1845d40f8012e290f866398d59d22236cd65c974e210c8040a4f1ed2dc86297"
+      },
+      {
+        "path": "scenarios/spec-requirement-sections-100-year-review/spec-requirement-sections-100-year-review.md",
+        "sha256": "b2e71192b720372495986fad6387d0bfd5222ce78a7cfd9da03940d1a1062cd7"
+      }
+    ],
+    "simulation_tree_hash": "0fe117659bfa499dd1f42891807e2ccdb2da83ab00099599578ffabf5fa458d6"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 0,
+    "auditability": 3,
+    "evolution_safety": 0,
+    "layer_boundary_clarity": 1,
+    "failure_handling": 1,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 1,
+    "simplicity_durability": 1,
+    "risk_penalty": 5
+  },
+  "fitness": {
+    "raw": 12,
+    "normalized_0_100": 24,
+    "confidence_0_1": 0.9
+  },
+  "assessment": {
+    "rationale": "This specimen is a clear negative control for why path suffixes should not carry primary CAS object type meaning. That makes it relevant to 100-year review pressure in a cautionary way, but it is a weak fit for a scenario about durable required spec sections because it provides no section structure or long-horizon documentation pattern of its own.",
+    "strengths": [
+      "Very concrete and easy to audit as a failure specimen.",
+      "Strongly exposes a non-durable assumption that a 100-year review should reject.",
+      "Implementation is plausible enough to be a realistic negative control."
+    ],
+    "weaknesses": [
+      "Poor direct fit to a scenario about required spec sections and future-reader intelligibility.",
+      "Confuses local storage naming with content-level meaning.",
+      "Offers little evolution safety once files move between peers or archives.",
+      "Uses only limited promise-first payload vocabulary."
+    ],
+    "risks": [
+      "Primary type meaning tied to local filenames will drift across tools, archives, transports, and eras.",
+      "Peers can interpret identical CID bytes differently based on local path context, breaking auditability and interoperability.",
+      "Storage-layer naming semantics can be mistaken for durable protocol semantics."
+    ],
+    "open_questions": [
+      "Should this negative-control sim include an explicit long-horizon spec section so the scenario can test documentation durability directly?",
+      "Can filename or suffix cues be constrained to non-authoritative local UI hints without leaking into protocol meaning?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

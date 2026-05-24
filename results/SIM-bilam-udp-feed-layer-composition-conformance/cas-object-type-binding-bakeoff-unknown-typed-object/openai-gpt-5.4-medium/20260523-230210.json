@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-bilam-udp-feed-layer-composition-conformance-cas-object-type-binding-bakeoff-unknown-typed-object-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000232-SIM-bilam-udp-feed-layer-composition-conformance--cas-object-type-binding-bakeoff-unknown-typed-object--openai-gpt-5.4-medium",
+  "sim_id": "SIM-bilam-udp-feed-layer-composition-conformance",
+  "scenario_id": "cas-object-type-binding-bakeoff-unknown-typed-object",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-bilam-udp-feed-layer-composition-conformance/cas-object-type-binding-bakeoff-unknown-typed-object/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_edd3e83f57274c56805a3da6f7dbfb39",
+    "response_id": "resp_002afc71acc52723006a1234a5c134819b8a94bdeae3077178",
+    "input_tokens": 7537,
+    "output_tokens": 1134,
+    "cost_usd": 0.02906575
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-bilam-udp-feed-layer-composition-conformance/",
+    "scenario_path": "scenarios/cas-object-type-binding-bakeoff-unknown-typed-object/cas-object-type-binding-bakeoff-unknown-typed-object.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-bilam-udp-feed-layer-composition-conformance/README.md",
+        "sha256": "679fb3e0e7ef397eab2c4e9bbd702a0917bcec69a8093b18a8080eb984b93bc8"
+      },
+      {
+        "path": "simulations/SIM-bilam-udp-feed-layer-composition-conformance/QUESTION.md",
+        "sha256": "c771644ce2de0dc1fc356c7cdb8f6e2f471a406c71e1a427a2db0077f31855ce"
+      },
+      {
+        "path": "scenarios/cas-object-type-binding-bakeoff-unknown-typed-object/cas-object-type-binding-bakeoff-unknown-typed-object.md",
+        "sha256": "76f0a7016fa2bad5e53903682706bca4eeb4aa2d099311a4ea52b7280748cf90"
+      }
+    ],
+    "simulation_tree_hash": "fc9f51cd962d3438f6bb96a1c7baa9fa2be765dca50bb60b16dde4a672aede9f"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 3,
+    "auditability": 3,
+    "evolution_safety": 2,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 1,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 3,
+    "simplicity_durability": 3,
+    "risk_penalty": 4
+  },
+  "fitness": {
+    "raw": 25,
+    "normalized_0_100": 50,
+    "confidence_0_1": 0.72
+  },
+  "assessment": {
+    "rationale": "This simulation is strongly about layer composition and preserving higher-layer promises over UDP-feed, but it does not specify CAS object type-binding behavior. It therefore helps on boundary clarity and audit framing, yet fits this unknown-typed-object bakeoff only weakly because the needed opaque unknown-codec behavior is left to an unspecified upper layer.",
+    "strengths": [
+      "Clear transport-to-session layer boundary.",
+      "Explicit concern for preserving higher-layer promises through binding.",
+      "Audit-oriented composition evidence is part of the design intent."
+    ],
+    "weaknesses": [
+      "Does not directly define behavior for unknown CAS object codecs.",
+      "Leaves the decisive object-handling semantics to an unspecified higher layer.",
+      "Provides little concrete failure behavior for store/advertise/forward under unknown type pressure."
+    ],
+    "risks": [
+      "An unspecified upper layer may hide unsafe parsing assumptions instead of proving opaque handling.",
+      "Transport-layer success could be mistaken for object-type conformance without explicit unknown-type promises.",
+      "Mixed-version durability is underdefined because unknown codec behavior is not bound in the specimen itself."
+    ],
+    "open_questions": [
+      "What higher-layer protocol riding over UDP-feed would explicitly promise opaque handling for unknown CAS object codecs?",
+      "Can the composition proof show that a relay stores and forwards a CID without attempting unsafe parse or semantic validation?",
+      "What local audit record would distinguish opaque forwarding success from refusal or drop when the object type is unknown?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

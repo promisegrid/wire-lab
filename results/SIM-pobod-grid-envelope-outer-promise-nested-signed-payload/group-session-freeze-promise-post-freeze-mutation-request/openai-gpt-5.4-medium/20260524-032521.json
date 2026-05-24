@@ -1,0 +1,162 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-pobod-grid-envelope-outer-promise-nested-signed-payload-group-session-freeze-promise-post-freeze-mutation-request-openai-gpt-5.4-medium-20260524-032521",
+  "run_group_id": "ga-canary-20260523-pt-gate-v3-successors",
+  "cell_id": "ga-canary-20260523-pt-gate-v3-successors-000006-SIM-pobod-grid-envelope-outer-promise-nested-signed-payload--group-session-freeze-promise-post-freeze-mutation-request--openai-gpt-5.4-medium",
+  "sim_id": "SIM-pobod-grid-envelope-outer-promise-nested-signed-payload",
+  "scenario_id": "group-session-freeze-promise-post-freeze-mutation-request",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260524-032521",
+  "result_path": "results/SIM-pobod-grid-envelope-outer-promise-nested-signed-payload/group-session-freeze-promise-post-freeze-mutation-request/openai-gpt-5.4-medium/20260524-032521.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_b3637991781643c3bc32f823992007da",
+    "response_id": "resp_0b9136dbcfeb9f7a006a126fb52e2c8199b9272dcf4157a569",
+    "input_tokens": 8312,
+    "output_tokens": 1564,
+    "cost_usd": 0.036442
+  },
+  "source": {
+    "repo_commit": "925c7f5c1c7ce7d5b0caf6a924d40d3f9b7d0483",
+    "sim_path": "simulations/SIM-pobod-grid-envelope-outer-promise-nested-signed-payload/",
+    "scenario_path": "scenarios/group-session-freeze-promise-post-freeze-mutation-request/group-session-freeze-promise-post-freeze-mutation-request.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-pobod-grid-envelope-outer-promise-nested-signed-payload/README.md",
+        "sha256": "eb57e248895158aa53182aa525888b693905ec27813ce1618dc6de1ff50998b9"
+      },
+      {
+        "path": "simulations/SIM-pobod-grid-envelope-outer-promise-nested-signed-payload/QUESTION.md",
+        "sha256": "99fce8d0035d8056937da17da995ccb1b152837053e2621909883a6cf3afbb8d"
+      },
+      {
+        "path": "scenarios/group-session-freeze-promise-post-freeze-mutation-request/group-session-freeze-promise-post-freeze-mutation-request.md",
+        "sha256": "9083e149d879dcf5890bbcc3d3bb2fcf87b4490ba1878e59a73402bd5312ee52"
+      }
+    ],
+    "simulation_tree_hash": "941614f1c8ec15ab226d7b287e27dfd6e06074c920a61c1a5460d449f282d27b"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 4,
+    "auditability": 4,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 2,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 5,
+    "simplicity_durability": 4,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 36,
+    "normalized_0_100": 72,
+    "confidence_0_1": 0.79
+  },
+  "assessment": {
+    "rationale": "Strong PT-clean restatement of nested signed payloads with explicit outer promise and local trust. It is less strong for this freeze/mutation scenario because it does not itself define lineage, freeze evidence, or supersession rules, so it only partially explains how post-freeze changes avoid mutating history.",
+    "strengths": [
+      "Explicit outer promise improves PT correctness over implicit transport authority.",
+      "Clear outer/inner boundary helps audit what is being promised versus what is merely carried as evidence.",
+      "Small envelope plus pCID-typed nested payload supports durable, inspectable artifacts."
+    ],
+    "weaknesses": [
+      "No explicit model for freeze evidence, supersession, or amendment lineage.",
+      "Scenario fit is partial because post-freeze mutation handling lives outside the envelope semantics.",
+      "Failure handling is mostly trust rejection, not explicit history-preserving mutation resolution."
+    ],
+    "risks": [
+      "A receiver could misread a new signed payload as authority to mutate prior frozen state unless lineage rules are defined elsewhere.",
+      "Freeze and supersession semantics may leak into ad hoc application conventions instead of durable envelope-level evidence.",
+      "The nested signature may be over-trusted as global authority rather than one local input to trust assessment."
+    ],
+    "open_questions": [
+      "How would freeze evidence be carried or referenced so a post-freeze mutation request is clearly evaluated as a new specimen or superseding pCID rather than a rewrite of history?",
+      "What local evidence distinguishes an allowed amendment from an invalid mutation against a frozen lineage?",
+      "Should the outer promise explicitly include lineage or supersession pointers for frozen artifacts?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design.",
+    "pt_gate": {
+      "status": "pt_clean",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "The design keeps sender and receiver autonomy explicit."
+      },
+      "scoped_intent": {
+        "status": "pass",
+        "note": "The outer-layer promise is narrowly scoped to parsing and interpretation of nested bytes."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "The sender promises only about the carried structure and evidence object, not on behalf of other agents."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "The envelope offers evidence and intent, not guaranteed interpretation or acceptance."
+      },
+      "local_trust_assessment": {
+        "status": "pass",
+        "note": "Trust is explicitly receiver-local and based on sender promise plus nested signature evidence."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "Receivers decide locally whether to trust and use the envelope; acceptance is not framed as obligation."
+      },
+      "violations": []
+    }
+  }
+}

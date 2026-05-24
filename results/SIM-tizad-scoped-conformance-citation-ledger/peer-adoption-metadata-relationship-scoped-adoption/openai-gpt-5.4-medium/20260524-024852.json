@@ -1,0 +1,170 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-tizad-scoped-conformance-citation-ledger-peer-adoption-metadata-relationship-scoped-adoption-openai-gpt-5.4-medium-20260524-024852",
+  "run_group_id": "ga-canary-20260523-pt-gate-v3",
+  "cell_id": "ga-canary-20260523-pt-gate-v3-000061-SIM-tizad-scoped-conformance-citation-ledger--peer-adoption-metadata-relationship-scoped-adoption--openai-gpt-5.4-medium",
+  "sim_id": "SIM-tizad-scoped-conformance-citation-ledger",
+  "scenario_id": "peer-adoption-metadata-relationship-scoped-adoption",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260524-024852",
+  "result_path": "results/SIM-tizad-scoped-conformance-citation-ledger/peer-adoption-metadata-relationship-scoped-adoption/openai-gpt-5.4-medium/20260524-024852.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_103f9b346e614bcdbd282e3c99973cd5",
+    "response_id": "resp_0eddb475e7ecfc06006a1268a68970819a86c3f97236db65ab",
+    "input_tokens": 9450,
+    "output_tokens": 2157,
+    "cost_usd": 0.0467355
+  },
+  "source": {
+    "repo_commit": "ec652bd3ecaaf2f904e62cff00e113a88c7e3efd",
+    "sim_path": "simulations/SIM-tizad-scoped-conformance-citation-ledger/",
+    "scenario_path": "scenarios/peer-adoption-metadata-relationship-scoped-adoption/peer-adoption-metadata-relationship-scoped-adoption.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-tizad-scoped-conformance-citation-ledger/README.md",
+        "sha256": "9668854c94fcb6a8331a98003184968f3e5369102dbe9000783a5f9b867e79ef"
+      },
+      {
+        "path": "simulations/SIM-tizad-scoped-conformance-citation-ledger/QUESTION.md",
+        "sha256": "05f7a658c8c67f64e164153a02dd9fed0df2af9f4f09a02118eaaa06273fb43c"
+      },
+      {
+        "path": "simulations/SIM-tizad-scoped-conformance-citation-ledger/CLAIM-BUNDLE.md",
+        "sha256": "29b03975828b554b774e2cb385cc4a85f80653fa8841494227a837efc95ba45c"
+      },
+      {
+        "path": "scenarios/peer-adoption-metadata-relationship-scoped-adoption/peer-adoption-metadata-relationship-scoped-adoption.md",
+        "sha256": "b2a2b0fb4dfcd76dfd88a39d4bb4f4d8a85fafb0b052621a36de8692d19fe3d7"
+      }
+    ],
+    "simulation_tree_hash": "f45aa7d6c917a553cd0b9e4ed9de53aec6bfa37cb67f1af4bd8ecb516146c77d"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 3,
+    "promisegrid_alignment": 2,
+    "auditability": 5,
+    "evolution_safety": 5,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 4,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 4,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 36,
+    "normalized_0_100": 72,
+    "confidence_0_1": 0.84
+  },
+  "assessment": {
+    "rationale": "Strong on scoped boundaries, durable audit citation, and peer-local evidence. It can support relationship-scoped adoption indirectly because peers can keep different local records per relationship, but it does not model that scenario explicitly and its vocabulary leans toward conformance claims rather than promise-first declarations.",
+    "strengths": [
+      "Clear separation of local, live, audit, and effect scopes.",
+      "Durable citation rule improves long-term auditability.",
+      "Peer-local promise-accounting records fit sparse knowledge and local trust.",
+      "Explicit failure evidence for replay, refusal, and ambiguous effects improves resilience."
+    ],
+    "weaknesses": [
+      "Does not explicitly encode relationship-scoped adoption metadata.",
+      "Promise vocabulary is mixed with conformance/claim terminology.",
+      "Authoritative contract reference may blur identifier role with authority role for some readers."
+    ],
+    "risks": [
+      "Readers may treat a publishable conformance manifest as globally authoritative rather than as one peer's scoped statement.",
+      "Relationship-specific adoption can remain implicit, causing ambiguity when Bob presents different profiles to Alice and Carol.",
+      "'Claim bundle' framing may drift toward compliance card semantics instead of direct promises and local trust assessment."
+    ],
+    "open_questions": [
+      "How should relationship-specific adoption metadata be represented explicitly rather than inferred from local records?",
+      "Should a conformance manifest include an optional peer/relationship scope so Bob can honestly publish different adoption states for Alice and Carol?",
+      "What minimal durable artifact best records per-relationship adoption changes without turning into a global registry?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design.",
+    "pt_gate": {
+      "status": "pt_reframe_needed",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "Peers publish their own manifests and keep their own local promise-accounting records; no central actor controls adoption."
+      },
+      "scoped_intent": {
+        "status": "pass",
+        "note": "Layer-scoped claims are explicit and well bounded across local, live, audit, and device-effect layers."
+      },
+      "no_promises_for_others": {
+        "status": "warning",
+        "note": "Mostly preserved, but 'conformance manifest' and 'authoritative contract' wording can be misread as speaking for a whole app family rather than a specific promisor and embodiment."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "The design distinguishes durable claims from live behavior and records failures, so claims do not guarantee successful outcomes."
+      },
+      "local_trust_assessment": {
+        "status": "warning",
+        "note": "Peer-local accounting supports local trust decisions, though publishable conformance manifests could still be overread as globally authoritative evidence."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "The design separates observable artifacts and local records from any obligation that another peer must adopt or reciprocate."
+      },
+      "violations": [
+        "Uses claim/conformance vocabulary more than explicit promisor-scoped promise wording.",
+        "Publishable manifests plus 'authoritative' framing may be misread as app-wide or global statements rather than strictly local declarations of intent and evidence."
+      ]
+    }
+  }
+}

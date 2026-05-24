@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-bahod-group-session-human-merge-promise-transport-family-bakeoff-per-hop-authorization-failure-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000199-SIM-bahod-group-session-human-merge-promise--transport-family-bakeoff-per-hop-authorization-failure--openai-gpt-5.4-medium",
+  "sim_id": "SIM-bahod-group-session-human-merge-promise",
+  "scenario_id": "transport-family-bakeoff-per-hop-authorization-failure",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-bahod-group-session-human-merge-promise/transport-family-bakeoff-per-hop-authorization-failure/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_59f4c060a5924984b6ff33e371f58416",
+    "response_id": "resp_07ffdf9a384d54ef006a123447062c819a8e21aa052aa13617",
+    "input_tokens": 7535,
+    "output_tokens": 1190,
+    "cost_usd": 0.02984625
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-bahod-group-session-human-merge-promise/",
+    "scenario_path": "scenarios/transport-family-bakeoff-per-hop-authorization-failure/transport-family-bakeoff-per-hop-authorization-failure.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-bahod-group-session-human-merge-promise/README.md",
+        "sha256": "4964fb355ec738dc3dbac8490e4014efb1064ee16447f9a90bd86f824e3c456d"
+      },
+      {
+        "path": "simulations/SIM-bahod-group-session-human-merge-promise/QUESTION.md",
+        "sha256": "4e94bfbd2c9ebc7df8ee6f74a6e3cf53d56d35ca413a94d40195630069c1a3d7"
+      },
+      {
+        "path": "scenarios/transport-family-bakeoff-per-hop-authorization-failure/transport-family-bakeoff-per-hop-authorization-failure.md",
+        "sha256": "f938e10ab88db666d3097a2f97c1667bbbc6e8e071681134049068982cc39cf2"
+      }
+    ],
+    "simulation_tree_hash": "bfbeb2ea13f8e4903a0479f07dabee6590d4b6b828775195f8b4861589eb5f91"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 0,
+    "promisegrid_alignment": 3,
+    "auditability": 4,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 0,
+    "implementation_plausibility": 5,
+    "promise_vocabulary": 4,
+    "simplicity_durability": 5,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 31,
+    "normalized_0_100": 62,
+    "confidence_0_1": 0.92
+  },
+  "assessment": {
+    "rationale": "Strong as a small, auditable, promise-first governance artifact with explicit boundaries, but it does not model ring forwarding, per-hop authorization, refusal recording, or reconfiguration. It therefore fits the scenario poorly despite good PromiseGrid-style evidence hygiene.",
+    "strengths": [
+      "Explicit promise framing around exact artifacts, paths, CIDs, scope, and unresolved questions.",
+      "Very clear boundary between evidence/freeze intent and actual merge execution.",
+      "Small, durable, human-auditable artifact likely easy to implement immediately."
+    ],
+    "weaknesses": [
+      "Does not describe transport behavior, ring semantics, or hop-by-hop authorization.",
+      "No concrete failure-handling model for refusal, skip, break, or membership reconfiguration.",
+      "Lacks peer-local post-failure records for Bob, Carol, or auditors in this scenario."
+    ],
+    "risks": [
+      "Scenario mismatch could hide missing transport failure semantics behind a governance artifact.",
+      "Human-authored plain-English scope may remain ambiguous under disputes or later policy evolution.",
+      "Unsigned evidence may be too weak for contested authorization failures."
+    ],
+    "open_questions": [
+      "Can the merge promise name any per-hop authorization/refusal semantics explicitly enough to support later transport comparison?",
+      "Would unsigned plain-English freeze text be trusted when authorization policy or membership changes over time?",
+      "What local evidence would Bob or Carol retain after an authorization refusal under this governance-only artifact?"
+    ],
+    "authority_boundary": "Evidence only; evaluates whether a human-authored merge promise is a useful governance artifact, not whether it solves transport authorization semantics."
+  }
+}

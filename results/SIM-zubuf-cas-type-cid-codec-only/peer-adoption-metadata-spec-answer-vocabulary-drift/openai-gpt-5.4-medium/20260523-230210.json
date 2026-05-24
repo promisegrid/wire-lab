@@ -1,0 +1,120 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-zubuf-cas-type-cid-codec-only-peer-adoption-metadata-spec-answer-vocabulary-drift-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000025-SIM-zubuf-cas-type-cid-codec-only--peer-adoption-metadata-spec-answer-vocabulary-drift--openai-gpt-5.4-medium",
+  "sim_id": "SIM-zubuf-cas-type-cid-codec-only",
+  "scenario_id": "peer-adoption-metadata-spec-answer-vocabulary-drift",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-zubuf-cas-type-cid-codec-only/peer-adoption-metadata-spec-answer-vocabulary-drift/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_a88e6e1d781d493fb448588deea6099e",
+    "response_id": "resp_0a820e47f4198f63006a123233d340819aa63733a912efbe78",
+    "input_tokens": 7546,
+    "output_tokens": 1207,
+    "cost_usd": 0.0301035
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-zubuf-cas-type-cid-codec-only/",
+    "scenario_path": "scenarios/peer-adoption-metadata-spec-answer-vocabulary-drift/peer-adoption-metadata-spec-answer-vocabulary-drift.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-zubuf-cas-type-cid-codec-only/README.md",
+        "sha256": "f8b576e7f1fd2f44298bb944891aada2d51cc4b84c7f7d1edaf3f0c9cf263887"
+      },
+      {
+        "path": "simulations/SIM-zubuf-cas-type-cid-codec-only/QUESTION.md",
+        "sha256": "3a42af71a5ab26ea6a32d4789f1036c37e4381a434ca2448e0489a26b17ca1f4"
+      },
+      {
+        "path": "scenarios/peer-adoption-metadata-spec-answer-vocabulary-drift/peer-adoption-metadata-spec-answer-vocabulary-drift.md",
+        "sha256": "a9e8ba84995e69fcad36f2554442cc62c5e1128ea0818197cb7ebf66e843ff53"
+      }
+    ],
+    "simulation_tree_hash": "8ed0fd394a31271380de3ed1e49a2700f22a654280e93e4c7bbb4d65bf0d89b5"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 2,
+    "auditability": 3,
+    "evolution_safety": 1,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 1,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 4,
+    "risk_penalty": 4
+  },
+  "fitness": {
+    "raw": 23,
+    "normalized_0_100": 46,
+    "confidence_0_1": 0.87
+  },
+  "assessment": {
+    "rationale": "This simulation is a poor direct fit for adoption-metadata vocabulary drift. It cleanly tests a narrow CAS-layer idea—binding object family to CID codec only—but does not specify how spec-local answers, renamed keys, or migration records are carried and audited across frozen-spec changes. Its main value here is boundary clarity: it avoids mixing metadata semantics into object bytes. But that same narrowness leaves the scenario's evolution pressure largely unanswered.",
+    "strengths": [
+      "Very clear CAS-layer discriminator with one source of truth for broad object interpretation.",
+      "Small, deterministic, implementation-plausible artifact shape that suits durable storage and small devices.",
+      "Good layer separation signal: object typing is kept distinct from higher-level metadata semantics."
+    ],
+    "weaknesses": [
+      "Does not directly model adoption metadata, answer keys, pCID supersession, or migration records.",
+      "Provides little help for renamed or removed questionnaire fields such as Q9.",
+      "No explicit failure or recovery story for mixed-era peers interpreting old versus new spec answers."
+    ],
+    "risks": [
+      "Peers may overload codec choice with higher-level semantic meaning that should live in spec-local metadata, making later vocabulary migration ambiguous.",
+      "A codec-only type scheme may force unnecessary codec proliferation or ad hoc out-of-band interpretation when metadata schemas evolve.",
+      "Old claims may remain machine-readable at the byte/type layer while becoming semantically unclear at the adoption-metadata layer."
+    ],
+    "open_questions": [
+      "Should spec-version or pCID references live in payloads separate from CID codec so old adoption claims remain unambiguous after renames?",
+      "If metadata answer vocabularies evolve, what migration artifact translates old answer keys without allocating new codecs for each semantic revision?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

@@ -1,0 +1,120 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-lofij-peer-adoption-hybrid-pointer-cas-object-type-binding-bakeoff-unknown-typed-object-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000148-SIM-lofij-peer-adoption-hybrid-pointer--cas-object-type-binding-bakeoff-unknown-typed-object--openai-gpt-5.4-medium",
+  "sim_id": "SIM-lofij-peer-adoption-hybrid-pointer",
+  "scenario_id": "cas-object-type-binding-bakeoff-unknown-typed-object",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-lofij-peer-adoption-hybrid-pointer/cas-object-type-binding-bakeoff-unknown-typed-object/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_667dea92b5c44987be1c024ee2588b1f",
+    "response_id": "resp_0fd0ba9209efb2eb006a1233b19bb48198a6a5f2a0c2a99a9b",
+    "input_tokens": 7528,
+    "output_tokens": 1770,
+    "cost_usd": 0.037954
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-lofij-peer-adoption-hybrid-pointer/",
+    "scenario_path": "scenarios/cas-object-type-binding-bakeoff-unknown-typed-object/cas-object-type-binding-bakeoff-unknown-typed-object.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-lofij-peer-adoption-hybrid-pointer/README.md",
+        "sha256": "577bbdf30e1ac5eb5d84c8b7c202449b8f5a04da94f7f44b8f062116ebb9ae79"
+      },
+      {
+        "path": "simulations/SIM-lofij-peer-adoption-hybrid-pointer/QUESTION.md",
+        "sha256": "03c6ced9337309eae8fd87691ea8a6de917340b9a341040344ca4e98cde075e8"
+      },
+      {
+        "path": "scenarios/cas-object-type-binding-bakeoff-unknown-typed-object/cas-object-type-binding-bakeoff-unknown-typed-object.md",
+        "sha256": "76f0a7016fa2bad5e53903682706bca4eeb4aa2d099311a4ea52b7280748cf90"
+      }
+    ],
+    "simulation_tree_hash": "412e7ab674cb54201689072610a695ea0e8772f4e95597d7f7bc312af9c30d1d"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 4,
+    "auditability": 2,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 1,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 4,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 28,
+    "normalized_0_100": 56.00000000000001,
+    "confidence_0_1": 0.68
+  },
+  "assessment": {
+    "rationale": "The hybrid pointer design is structurally PromiseGrid-friendly: a small adoption promise can stay durable while richer evidence sits behind a CID. That helps mixed-version evolution and may permit opaque storage and forwarding. But this cell's scenario is specifically about unknown typed CAS objects, and the simulation does not explicitly define unknown-codec behavior, safe parsing limits, or fallback/refusal promises. So it is a plausible indirect fit, not a strong direct answer.",
+    "strengths": [
+      "Compact envelope plus optional richer object matches small durable artifact goals.",
+      "Clear separation between minimal adoption signal and heavier evidence object.",
+      "Reasonably plausible evolution path for mixed-version peers."
+    ],
+    "weaknesses": [
+      "Unknown-type handling is not specified directly.",
+      "Failure behavior for unreadable pointed objects is unclear.",
+      "Vocabulary is promise-adjacent but not strongly payload-promise-first."
+    ],
+    "risks": [
+      "Implementers may treat the richer pointed object as semantically required and attempt unsafe parsing when its codec is unknown.",
+      "Different peers may disagree on what must be inline versus behind the pointer, reducing interoperable opaque forwarding."
+    ],
+    "open_questions": [
+      "Must the compact adoption promise alone carry enough semantics for safe opaque relay when the richer object type is unknown?",
+      "What explicit promise should cover store/advertise/forward behavior for a pointed object whose codec Dave does not implement?",
+      "Which fields, if any, must remain in a known minimal envelope so mixed-version peers avoid unsafe parsing?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

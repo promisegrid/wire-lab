@@ -1,0 +1,163 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-gadol-peer-adoption-promise-message-promise-accounting-records-refused-service-openai-gpt-5.4-medium-20260524-032521",
+  "run_group_id": "ga-canary-20260523-pt-gate-v3-successors",
+  "cell_id": "ga-canary-20260523-pt-gate-v3-successors-000019-SIM-gadol-peer-adoption-promise-message--promise-accounting-records-refused-service--openai-gpt-5.4-medium",
+  "sim_id": "SIM-gadol-peer-adoption-promise-message",
+  "scenario_id": "promise-accounting-records-refused-service",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260524-032521",
+  "result_path": "results/SIM-gadol-peer-adoption-promise-message/promise-accounting-records-refused-service/openai-gpt-5.4-medium/20260524-032521.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_172652abf964458e90c46a205323b22e",
+    "response_id": "resp_0e6779b46a91d4be006a126ffef3dc81999dd8c96c0fa6c194",
+    "input_tokens": 8104,
+    "output_tokens": 1364,
+    "cost_usd": 0.033278
+  },
+  "source": {
+    "repo_commit": "925c7f5c1c7ce7d5b0caf6a924d40d3f9b7d0483",
+    "sim_path": "simulations/SIM-gadol-peer-adoption-promise-message/",
+    "scenario_path": "scenarios/promise-accounting-records-refused-service/promise-accounting-records-refused-service.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-gadol-peer-adoption-promise-message/README.md",
+        "sha256": "b7767c1a9279ef3c1a9bcc08a1d96a87259fe4e5090fa06ad2811a397fef49d3"
+      },
+      {
+        "path": "simulations/SIM-gadol-peer-adoption-promise-message/QUESTION.md",
+        "sha256": "3096ee94cbc1ba2247fc46b908d4e215cbe96af054b7943f6b6d567185b6df3b"
+      },
+      {
+        "path": "scenarios/promise-accounting-records-refused-service/promise-accounting-records-refused-service.md",
+        "sha256": "9a7d47455793988cfb9b0fb045b29086ed13ee22cd0db080584e259c0aa69313"
+      }
+    ],
+    "simulation_tree_hash": "cc25bca5323b36b38c3d31b1314bf64a50e08e8631c97040b6e872ad0548e43a"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 4,
+    "auditability": 3,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 2,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 5,
+    "simplicity_durability": 4,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 35,
+    "normalized_0_100": 70,
+    "confidence_0_1": 0.79
+  },
+  "assessment": {
+    "rationale": "Strong Promise-Theory framing: adoption is expressed as an ordinary promise message that peers can store, relay, supersede, and assess locally. That fits PromiseGrid well and keeps the artifact simple and durable. However, this scenario specifically pressures promise-accounting around honest refusal of service, and the simulation does not explicitly define how refusal is distinguished from failure, corruption, or timeout in accounting records. So alignment is good, but scenario coverage is partial.",
+    "strengths": [
+      "Promise-first wording with clear agent-local intent.",
+      "Reuses the ordinary promise path instead of inventing special metadata.",
+      "Supersedable messages support evolution and durable historical evidence.",
+      "Small explicit artifacts are plausible to store and relay on modest devices."
+    ],
+    "weaknesses": [
+      "Does not directly specify refusal-record handling.",
+      "Does not show how accounting distinguishes honest refusal from timeout or corruption.",
+      "Scenario evidence depends on unstated promise-accounting conventions outside this sim."
+    ],
+    "risks": [
+      "Refusal semantics may remain ambiguous if the design only states adoption and not explicit refusal/accounting vocabulary.",
+      "Independent peers may record non-delivery inconsistently without a clear refusal record shape.",
+      "Answer-binding and spec-resolution ambiguity could complicate later audit of why service was refused."
+    ],
+    "open_questions": [
+      "How would a peer using this adoption-message pattern encode and account for an explicit refusal to provide C versus timeout, corruption, or simple nonresponse?",
+      "What minimum promise-accounting record shape is needed so independent peers can later audit refusal semantics from stored promise messages alone?",
+      "Can superseding adoption messages cleanly preserve historical evidence about earlier refusal-related policy bindings?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design.",
+    "pt_gate": {
+      "status": "pt_clean",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "Alice declares her own intended behavior via a promise message; peer autonomy is preserved."
+      },
+      "scoped_intent": {
+        "status": "pass",
+        "note": "The promise is scoped to Alice behaving according to a referenced pCID with answer bindings."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "The simulation has Alice promise her own behavior, not someone else's."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "The design expresses intended behavior, not guaranteed service outcomes."
+      },
+      "local_trust_assessment": {
+        "status": "pass",
+        "note": "Peers can store and assess Alice's promise message locally rather than relying on a central authority."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "An adoption promise message can be received or ignored by other peers; it does not by itself impose use or obedience."
+      },
+      "violations": []
+    }
+  }
+}

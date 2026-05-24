@@ -1,0 +1,122 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-jomaj-transport-token-ring-udp-feed-v0-conformance-session-layer-composition-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000105-SIM-jomaj-transport-token-ring--udp-feed-v0-conformance-session-layer-composition--openai-gpt-5.4-medium",
+  "sim_id": "SIM-jomaj-transport-token-ring",
+  "scenario_id": "udp-feed-v0-conformance-session-layer-composition",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-jomaj-transport-token-ring/udp-feed-v0-conformance-session-layer-composition/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_2cf3796d547444679096006e0aed78c7",
+    "response_id": "resp_011191c9d923a746006a123329bdc08198b64086dee0e0d8b8",
+    "input_tokens": 7500,
+    "output_tokens": 1359,
+    "cost_usd": 0.032151
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-jomaj-transport-token-ring/",
+    "scenario_path": "scenarios/udp-feed-v0-conformance-session-layer-composition/udp-feed-v0-conformance-session-layer-composition.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-jomaj-transport-token-ring/README.md",
+        "sha256": "da5a8b07baa9f0969362a89aa8bb0d3c5d367bb2fe6783621ed461bac7c9851e"
+      },
+      {
+        "path": "simulations/SIM-jomaj-transport-token-ring/QUESTION.md",
+        "sha256": "f1cc68278f35c5f9d14f7bc4ed97b3c4249e9933fbff955219beb1e83d635b6e"
+      },
+      {
+        "path": "scenarios/udp-feed-v0-conformance-session-layer-composition/udp-feed-v0-conformance-session-layer-composition.md",
+        "sha256": "69da5db705a56cd7067a653928ff8b2dc9301ef6ebfc712bd81038a65c9d352c"
+      }
+    ],
+    "simulation_tree_hash": "1e99d614e1d78c2d36ea51a210ff9e5480e57752534b2cee956563c7c8d5f95f"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 3,
+    "auditability": 4,
+    "evolution_safety": 1,
+    "layer_boundary_clarity": 3,
+    "failure_handling": 2,
+    "implementation_plausibility": 3,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 1,
+    "risk_penalty": 4
+  },
+  "fitness": {
+    "raw": 21,
+    "normalized_0_100": 42,
+    "confidence_0_1": 0.82
+  },
+  "assessment": {
+    "rationale": "Weak fit for this scenario. The simulation is a transport-family specimen, not a UDP-feed v0 composition design, so it does not directly show that a minimal session layer can compose above UDP-feed without leaking transport-binding details. It does contribute some PromiseGrid-friendly traits through explicit per-hop promises and local forwarding records, but its own stated risks center on membership and liveness fragility, which hurts evolution safety and durability.",
+    "strengths": [
+      "Explicit per-hop forward/wait/refuse promises aid local accountability.",
+      "Boundaries are stated: it does not claim to replace UDP-feed or group-session.",
+      "Ordered transport behavior is implementable enough to evaluate concretely."
+    ],
+    "weaknesses": [
+      "Does not directly answer whether UDP-feed v0's API is sufficient for session-layer composition.",
+      "Focuses on transport turn-taking rather than session-layer artifact boundaries.",
+      "Promise wording is transport/mechanism-centric rather than payload-promise-first.",
+      "Membership and liveness fragility are acknowledged but not resolved."
+    ],
+    "risks": [
+      "Token ownership and ring membership can leak transport mechanics upward into session behavior.",
+      "Offline peers, partitions, or mixed versions may stall progress or complicate recovery.",
+      "Stronger ordering may trade away sparse-knowledge resilience and long-term simplicity."
+    ],
+    "open_questions": [
+      "Can the ring transport expose a transport-agnostic API that a session layer can use without learning token or membership details?",
+      "How do mixed-version, offline, or partitioned peers rejoin without breaking ordered session semantics?",
+      "What session-layer promises would sit above per-hop forward/wait/refuse promises?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

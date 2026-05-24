@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-jaboj-udp-feed-reference-first-conformance-group-session-freeze-promise-post-freeze-mutation-request-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000216-SIM-jaboj-udp-feed-reference-first-conformance--group-session-freeze-promise-post-freeze-mutation-request--openai-gpt-5.4-medium",
+  "sim_id": "SIM-jaboj-udp-feed-reference-first-conformance",
+  "scenario_id": "group-session-freeze-promise-post-freeze-mutation-request",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-jaboj-udp-feed-reference-first-conformance/group-session-freeze-promise-post-freeze-mutation-request/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_a9697cfa46c04305a6317b93332981e0",
+    "response_id": "resp_03bc1a8cf6786638006a12347bf6cc8199810dcf6eaff31440",
+    "input_tokens": 7522,
+    "output_tokens": 1937,
+    "cost_usd": 0.0402815
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-jaboj-udp-feed-reference-first-conformance/",
+    "scenario_path": "scenarios/group-session-freeze-promise-post-freeze-mutation-request/group-session-freeze-promise-post-freeze-mutation-request.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-jaboj-udp-feed-reference-first-conformance/README.md",
+        "sha256": "7a366479b944562eb3ad213d94428192af23f1d79149ffb11e33896c593ef129"
+      },
+      {
+        "path": "simulations/SIM-jaboj-udp-feed-reference-first-conformance/QUESTION.md",
+        "sha256": "de16e9046e2265bd63480386d3f90b49b31f72bd680d4d0a6c46ffff010c66fc"
+      },
+      {
+        "path": "scenarios/group-session-freeze-promise-post-freeze-mutation-request/group-session-freeze-promise-post-freeze-mutation-request.md",
+        "sha256": "9083e149d879dcf5890bbcc3d3bb2fcf87b4490ba1878e59a73402bd5312ee52"
+      }
+    ],
+    "simulation_tree_hash": "f289c5266e54709caa056201b96564ab65f920220f6cd9dd50db946813c2b7d1"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 0,
+    "promisegrid_alignment": 1,
+    "auditability": 2,
+    "evolution_safety": 1,
+    "layer_boundary_clarity": 3,
+    "failure_handling": 0,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 0,
+    "simplicity_durability": 3,
+    "risk_penalty": 4
+  },
+  "fitness": {
+    "raw": 15,
+    "normalized_0_100": 30,
+    "confidence_0_1": 0.89
+  },
+  "assessment": {
+    "rationale": "Very weak fit for the scenario. The simulation is about UDP-feed reference-first conformance, while the scenario asks for freeze semantics and post-freeze mutation lineage. Its main value here is that a small reference implementation can be auditable and plausible, but it does not supply promise-first frozen artifacts, lineage rules, or mutation handling.",
+    "strengths": [
+      "Small concrete specimen idea is relatively easy to inspect.",
+      "Scope and boundaries are stated clearly.",
+      "A minimal Go implementation is plausible to build and compare against later tests."
+    ],
+    "weaknesses": [
+      "Does not directly address group-session freeze semantics or post-freeze mutation handling.",
+      "Uses conformance/reference-implementation framing rather than promise-first payload promises.",
+      "Provides no clear peer-local accounting or durable lineage artifact for independent evolution."
+    ],
+    "risks": [
+      "Accidental reference-implementation behavior could become normative and hard to evolve safely.",
+      "Post-freeze breaking changes have no clear supersession or amendment mechanism.",
+      "Trust may collapse onto one implementation rather than durable peer-local promise evidence."
+    ],
+    "open_questions": [
+      "How would a breaking post-freeze change be represented: new specimen, superseding pCID, or explicit amendment lineage?",
+      "What durable frozen artifact would peers audit in 100 years besides a Go reference implementation?",
+      "How can peers verify behavior locally without treating the reference implementation as a de facto central authority?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

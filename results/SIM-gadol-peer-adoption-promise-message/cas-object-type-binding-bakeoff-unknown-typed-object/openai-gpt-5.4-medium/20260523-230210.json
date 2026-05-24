@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-gadol-peer-adoption-promise-message-cas-object-type-binding-bakeoff-unknown-typed-object-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000134-SIM-gadol-peer-adoption-promise-message--cas-object-type-binding-bakeoff-unknown-typed-object--openai-gpt-5.4-medium",
+  "sim_id": "SIM-gadol-peer-adoption-promise-message",
+  "scenario_id": "cas-object-type-binding-bakeoff-unknown-typed-object",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-gadol-peer-adoption-promise-message/cas-object-type-binding-bakeoff-unknown-typed-object/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_f7ccef8511d541669c9c7d54f8f334e1",
+    "response_id": "resp_000b133636add1d4006a1233836458819b8c43b2f09d56f84e",
+    "input_tokens": 7530,
+    "output_tokens": 924,
+    "cost_usd": 0.0261135
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-gadol-peer-adoption-promise-message/",
+    "scenario_path": "scenarios/cas-object-type-binding-bakeoff-unknown-typed-object/cas-object-type-binding-bakeoff-unknown-typed-object.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-gadol-peer-adoption-promise-message/README.md",
+        "sha256": "b7767c1a9279ef3c1a9bcc08a1d96a87259fe4e5090fa06ad2811a397fef49d3"
+      },
+      {
+        "path": "simulations/SIM-gadol-peer-adoption-promise-message/QUESTION.md",
+        "sha256": "3096ee94cbc1ba2247fc46b908d4e215cbe96af054b7943f6b6d567185b6df3b"
+      },
+      {
+        "path": "scenarios/cas-object-type-binding-bakeoff-unknown-typed-object/cas-object-type-binding-bakeoff-unknown-typed-object.md",
+        "sha256": "76f0a7016fa2bad5e53903682706bca4eeb4aa2d099311a4ea52b7280748cf90"
+      }
+    ],
+    "simulation_tree_hash": "cc25bca5323b36b38c3d31b1314bf64a50e08e8631c97040b6e872ad0548e43a"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 4,
+    "auditability": 2,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 3,
+    "failure_handling": 1,
+    "implementation_plausibility": 3,
+    "promise_vocabulary": 4,
+    "simplicity_durability": 3,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 26,
+    "normalized_0_100": 52,
+    "confidence_0_1": 0.84
+  },
+  "assessment": {
+    "rationale": "Strong promise-first framing, but this simulation is about peer adoption messaging rather than unknown-type CAS object handling. It helps with durable declaration and audit of protocol/spec intent, yet it does not directly specify opaque storage, advertisement, forwarding, or safe refusal behavior for an unimplemented codec.",
+    "strengths": [
+      "Uses ordinary promise messages rather than special metadata, which fits PromiseGrid's local promise accounting model.",
+      "Promise/supersession framing is reasonably durable and evolution-friendly.",
+      "pCID-and-answer-binding language is closer to payload promises than generic profile claims."
+    ],
+    "weaknesses": [
+      "Does not directly answer the scenario's core requirement for opaque handling of unknown typed objects.",
+      "Provides little concrete failure-handling guidance for unsafe parsing avoidance.",
+      "Boundary between adoption evidence and CAS type-binding behavior is incomplete for this bakeoff pressure."
+    ],
+    "risks": [
+      "Peers may overread adoption messages as proving safe handling of object types they do not implement.",
+      "Unknown-type behavior remains underspecified, inviting inconsistent relay or parsing decisions across mixed-version peers.",
+      "The unspecified final promise-message envelope leaves interoperability details open."
+    ],
+    "open_questions": [
+      "Can an adoption promise message carry enough explicit type-handling promises for unknown-codec CAS objects, or is a separate binding artifact still needed?",
+      "What exactly may Dave safely advertise or relay when he cannot parse the object but can verify only CID-level integrity?",
+      "How are unsafe parsing refusals and opaque-forwarding promises recorded in a durable, peer-local way?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

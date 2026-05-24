@@ -1,0 +1,162 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-padin-group-session-freeze-evidence-peer-adoption-metadata-relationship-scoped-adoption-openai-gpt-5.4-medium-20260524-032521",
+  "run_group_id": "ga-canary-20260523-pt-gate-v3-successors",
+  "cell_id": "ga-canary-20260523-pt-gate-v3-successors-000037-SIM-padin-group-session-freeze-evidence--peer-adoption-metadata-relationship-scoped-adoption--openai-gpt-5.4-medium",
+  "sim_id": "SIM-padin-group-session-freeze-evidence",
+  "scenario_id": "peer-adoption-metadata-relationship-scoped-adoption",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260524-032521",
+  "result_path": "results/SIM-padin-group-session-freeze-evidence/peer-adoption-metadata-relationship-scoped-adoption/openai-gpt-5.4-medium/20260524-032521.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_4718c14fda4041cc8d8e23265e83f272",
+    "response_id": "resp_0fb281836ede61f3006a127064b250819a9ba85ee955a8bce5",
+    "input_tokens": 8110,
+    "output_tokens": 1592,
+    "cost_usd": 0.0364805
+  },
+  "source": {
+    "repo_commit": "925c7f5c1c7ce7d5b0caf6a924d40d3f9b7d0483",
+    "sim_path": "simulations/SIM-padin-group-session-freeze-evidence/",
+    "scenario_path": "scenarios/peer-adoption-metadata-relationship-scoped-adoption/peer-adoption-metadata-relationship-scoped-adoption.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-padin-group-session-freeze-evidence/README.md",
+        "sha256": "43f96cd79379eeb2ae36319c1fd26144cc0a95a86f0c3fc2f9f48bf9024a11d5"
+      },
+      {
+        "path": "simulations/SIM-padin-group-session-freeze-evidence/QUESTION.md",
+        "sha256": "6bdde351a8bd4a900a82304f488913fc2ae0224396de55473b61698525bc1d04"
+      },
+      {
+        "path": "scenarios/peer-adoption-metadata-relationship-scoped-adoption/peer-adoption-metadata-relationship-scoped-adoption.md",
+        "sha256": "b2a2b0fb4dfcd76dfd88a39d4bb4f4d8a85fafb0b052621a36de8692d19fe3d7"
+      }
+    ],
+    "simulation_tree_hash": "8fbe9da939de6ecdba9776b2cc20f5cb8b910b7381d306b38a6017026c170175"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 4,
+    "auditability": 5,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 2,
+    "implementation_plausibility": 5,
+    "promise_vocabulary": 4,
+    "simplicity_durability": 4,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 35,
+    "normalized_0_100": 70,
+    "confidence_0_1": 0.84
+  },
+  "assessment": {
+    "rationale": "Strong promise-first evidence design for auditable specimen freezing, but it barely addresses the scenario's core question about relationship-scoped adoption metadata. Good local evidence and boundary clarity; weak scenario coverage and limited handling of per-relationship variation.",
+    "strengths": [
+      "Exact artifacts and reproducible checks make auditing strong.",
+      "Boundary is clear: evidence for a freeze decision, not the whole protocol.",
+      "Implementation appears straightforward with message DAG plus exact CIDs."
+    ],
+    "weaknesses": [
+      "Little to no explicit support for relationship-scoped adoption promises.",
+      "Scenario pressure about Bob behaving differently toward Alice and Carol is mostly uncovered.",
+      "Failure and adversarial handling are only lightly developed."
+    ],
+    "risks": [
+      "Operators may overread freeze evidence as solving adoption semantics it does not model.",
+      "Exact-parser reproducibility may depend on toolchain preservation more than the simulation states.",
+      "Freezing a v0 specimen can preserve accidental quirks if review discipline is weak."
+    ],
+    "open_questions": [
+      "How would Bob express adoption promises that differ for Alice versus Carol using this evidence shape?",
+      "What peer-local records would show relationship-scoped adoption rather than a peer-global freeze claim?",
+      "How are stale or conflicting specimen-evidence freezes detected and compared over time?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design.",
+    "pt_gate": {
+      "status": "pt_clean",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "Alice, Bob, and Carol remain independent evaluators of the frozen specimen evidence."
+      },
+      "scoped_intent": {
+        "status": "pass",
+        "note": "The design makes a narrow promise about freezing a specific group-session v0 specimen from exact artifacts."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "The simulation describes evidence and promises about artifacts, not promises made on behalf of other peers."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "Reproducible evidence supports a freeze decision but does not guarantee universal agreement or future behavior."
+      },
+      "local_trust_assessment": {
+        "status": "pass",
+        "note": "Trust is left to each peer's local judgment about the artifacts and reproducible checks."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "Peers may use the specimen evidence to inform local acceptance, but the design does not impose acceptance as an obligation."
+      },
+      "violations": []
+    }
+  }
+}

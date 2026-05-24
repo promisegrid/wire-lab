@@ -1,0 +1,163 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-pobod-grid-envelope-outer-promise-nested-signed-payload-peer-adoption-metadata-relationship-scoped-adoption-openai-gpt-5.4-medium-20260524-032521",
+  "run_group_id": "ga-canary-20260523-pt-gate-v3-successors",
+  "cell_id": "ga-canary-20260523-pt-gate-v3-successors-000005-SIM-pobod-grid-envelope-outer-promise-nested-signed-payload--peer-adoption-metadata-relationship-scoped-adoption--openai-gpt-5.4-medium",
+  "sim_id": "SIM-pobod-grid-envelope-outer-promise-nested-signed-payload",
+  "scenario_id": "peer-adoption-metadata-relationship-scoped-adoption",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260524-032521",
+  "result_path": "results/SIM-pobod-grid-envelope-outer-promise-nested-signed-payload/peer-adoption-metadata-relationship-scoped-adoption/openai-gpt-5.4-medium/20260524-032521.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_7ae216df7b55497eafa43ea7134440f7",
+    "response_id": "resp_081d0817bd3936c6006a126fb40090819aaa6d6d98b10c81ef",
+    "input_tokens": 8309,
+    "output_tokens": 1290,
+    "cost_usd": 0.03260075
+  },
+  "source": {
+    "repo_commit": "925c7f5c1c7ce7d5b0caf6a924d40d3f9b7d0483",
+    "sim_path": "simulations/SIM-pobod-grid-envelope-outer-promise-nested-signed-payload/",
+    "scenario_path": "scenarios/peer-adoption-metadata-relationship-scoped-adoption/peer-adoption-metadata-relationship-scoped-adoption.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-pobod-grid-envelope-outer-promise-nested-signed-payload/README.md",
+        "sha256": "eb57e248895158aa53182aa525888b693905ec27813ce1618dc6de1ff50998b9"
+      },
+      {
+        "path": "simulations/SIM-pobod-grid-envelope-outer-promise-nested-signed-payload/QUESTION.md",
+        "sha256": "99fce8d0035d8056937da17da995ccb1b152837053e2621909883a6cf3afbb8d"
+      },
+      {
+        "path": "scenarios/peer-adoption-metadata-relationship-scoped-adoption/peer-adoption-metadata-relationship-scoped-adoption.md",
+        "sha256": "b2a2b0fb4dfcd76dfd88a39d4bb4f4d8a85fafb0b052621a36de8692d19fe3d7"
+      }
+    ],
+    "simulation_tree_hash": "941614f1c8ec15ab226d7b287e27dfd6e06074c920a61c1a5460d449f282d27b"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 5,
+    "auditability": 4,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 3,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 5,
+    "simplicity_durability": 4,
+    "risk_penalty": 1
+  },
+  "fitness": {
+    "raw": 40,
+    "normalized_0_100": 80,
+    "confidence_0_1": 0.84
+  },
+  "assessment": {
+    "rationale": "Strong PT-first cleanup of the nested signed-payload envelope. It is especially good on explicit promise boundaries, local trust, and auditability. But this scenario asks about relationship-scoped adoption, and the simulation does not directly model per-peer adoption metadata; it only provides a cleaner carrier that could hold such claims.",
+    "strengths": [
+      "Explicit outer-layer promise aligns well with Promise Theory.",
+      "Small deterministic envelope supports durable auditing.",
+      "Clear separation between unsigned transport context and signed evidence object.",
+      "Nested payload structure can carry relationship-specific claims without changing the outer frame."
+    ],
+    "weaknesses": [
+      "No direct mechanism for relationship-scoped adoption semantics.",
+      "Scenario fit is limited because adoption metadata is not the main subject of the simulation.",
+      "Failure handling for stale, replayed, or conflicting peer-specific claims is under-specified."
+    ],
+    "risks": [
+      "Relationship-specific adoption may be inferred from payload content without a standard, auditable way to express audience scope.",
+      "Different peer-specific payloads could look like equivocation unless local records capture the intended relationship context.",
+      "Replay or stale signed payloads could misrepresent current adoption state if freshness rules are left outside the envelope."
+    ],
+    "open_questions": [
+      "How would Bob express different adoption promises to Alice and Carol without introducing identity-global profile claims?",
+      "Does the envelope need an explicit relationship or audience scope field, or should that remain entirely inside the signed payload semantics?",
+      "How are stale or replayed relationship-scoped adoption claims detected and audited locally over time?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design.",
+    "pt_gate": {
+      "status": "pt_clean",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "Sender and receiver remain autonomous; the design centers on what each agent promises or assesses locally."
+      },
+      "scoped_intent": {
+        "status": "pass",
+        "note": "The outer envelope is framed as a scoped sender promise about parsing and meaning of the nested signed payload."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "The sender promises only about the carried bytes and claimed structure, not on behalf of other agents."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "The outer promise describes intended structure and evidence, not guaranteed acceptance or truth."
+      },
+      "local_trust_assessment": {
+        "status": "pass",
+        "note": "The simulation explicitly says receivers decide locally whether to trust the sender and nested signature evidence."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "Receivers decide locally whether to trust and use the payload; receipt is not framed as obligation."
+      },
+      "violations": []
+    }
+  }
+}

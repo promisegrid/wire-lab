@@ -1,0 +1,122 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-padin-group-session-freeze-evidence-transport-family-bakeoff-per-hop-authorization-failure-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000185-SIM-padin-group-session-freeze-evidence--transport-family-bakeoff-per-hop-authorization-failure--openai-gpt-5.4-medium",
+  "sim_id": "SIM-padin-group-session-freeze-evidence",
+  "scenario_id": "transport-family-bakeoff-per-hop-authorization-failure",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-padin-group-session-freeze-evidence/transport-family-bakeoff-per-hop-authorization-failure/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_e26ee8b2aa2f4fc299814c38262ec658",
+    "response_id": "resp_06a4668658097873006a12341fdf688199a4e7d0a36d7e25e8",
+    "input_tokens": 7509,
+    "output_tokens": 1582,
+    "cost_usd": 0.03528875
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-padin-group-session-freeze-evidence/",
+    "scenario_path": "scenarios/transport-family-bakeoff-per-hop-authorization-failure/transport-family-bakeoff-per-hop-authorization-failure.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-padin-group-session-freeze-evidence/README.md",
+        "sha256": "43f96cd79379eeb2ae36319c1fd26144cc0a95a86f0c3fc2f9f48bf9024a11d5"
+      },
+      {
+        "path": "simulations/SIM-padin-group-session-freeze-evidence/QUESTION.md",
+        "sha256": "6bdde351a8bd4a900a82304f488913fc2ae0224396de55473b61698525bc1d04"
+      },
+      {
+        "path": "scenarios/transport-family-bakeoff-per-hop-authorization-failure/transport-family-bakeoff-per-hop-authorization-failure.md",
+        "sha256": "f938e10ab88db666d3097a2f97c1667bbbc6e8e071681134049068982cc39cf2"
+      }
+    ],
+    "simulation_tree_hash": "8fbe9da939de6ecdba9776b2cc20f5cb8b910b7381d306b38a6017026c170175"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 3,
+    "auditability": 5,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 1,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 3,
+    "simplicity_durability": 4,
+    "risk_penalty": 4
+  },
+  "fitness": {
+    "raw": 30,
+    "normalized_0_100": 60,
+    "confidence_0_1": 0.9
+  },
+  "assessment": {
+    "rationale": "Strong on durable, reproducible evidence for a frozen specimen, but weak for this scenario because it does not define how per-hop authorization failure affects forwarding, refusal recording, hop skipping, or membership reconfiguration. The design is PromiseGrid-friendly as evidence infrastructure, not as a transport failure model.",
+    "strengths": [
+      "Exact CIDs, verified message DAGs, and reproducible checks are highly auditable.",
+      "The simulation has a clear boundary: evidence for freezing a specimen, not full protocol closure.",
+      "Small explicit artifacts are durable and suitable for later independent re-checking."
+    ],
+    "weaknesses": [
+      "It is not a transport-family design, so scenario fit is poor.",
+      "Per-hop authorization failure handling is largely unspecified.",
+      "It does not say whether the ring breaks, skips a hop, records refusal, or reconfigures membership.",
+      "Promise wording is present but not strongly payload-promise-centric."
+    ],
+    "risks": [
+      "Freezing specimen evidence without explicit authorization-failure semantics could create false confidence that ring behavior is specified when it is not.",
+      "A message DAG can show what happened after the fact, but may not explain what should happen on unauthorized forwarding attempts.",
+      "Scenario mismatch may hide missing transport-layer promises behind strong audit artifacts."
+    ],
+    "open_questions": [
+      "Can the frozen specimen include explicit per-hop authorization promises and refusal records, or is that outside this simulation's scope?",
+      "If a forward is unauthorized, what exact local artifact would Alice, Bob, and Carol retain to distinguish refusal from omission?",
+      "Does group-session v0 define membership reconfiguration semantics, or would this scenario require a separate transport/failure design?"
+    ],
+    "authority_boundary": "Evidence only; this specimen-freeze candidate does not settle transport authorization semantics or ring failure behavior."
+  }
+}

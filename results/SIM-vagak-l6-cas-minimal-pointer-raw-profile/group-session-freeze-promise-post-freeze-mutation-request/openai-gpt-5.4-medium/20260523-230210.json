@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-vagak-l6-cas-minimal-pointer-raw-profile-group-session-freeze-promise-post-freeze-mutation-request-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000020-SIM-vagak-l6-cas-minimal-pointer-raw-profile--group-session-freeze-promise-post-freeze-mutation-request--openai-gpt-5.4-medium",
+  "sim_id": "SIM-vagak-l6-cas-minimal-pointer-raw-profile",
+  "scenario_id": "group-session-freeze-promise-post-freeze-mutation-request",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-vagak-l6-cas-minimal-pointer-raw-profile/group-session-freeze-promise-post-freeze-mutation-request/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_e6a7686cbc2b4c7f8b1ce20861a7995d",
+    "response_id": "resp_0436ae3e0d51f868006a12322638c08199bba4f5c61f9d98a9",
+    "input_tokens": 7580,
+    "output_tokens": 1121,
+    "cost_usd": 0.028959
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-vagak-l6-cas-minimal-pointer-raw-profile/",
+    "scenario_path": "scenarios/group-session-freeze-promise-post-freeze-mutation-request/group-session-freeze-promise-post-freeze-mutation-request.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-vagak-l6-cas-minimal-pointer-raw-profile/README.md",
+        "sha256": "f7ad9b33539e14933ad1c903cd38b19235c78e3a1001ea534f726d0e7b664d53"
+      },
+      {
+        "path": "simulations/SIM-vagak-l6-cas-minimal-pointer-raw-profile/QUESTION.md",
+        "sha256": "124f7bc6031956ec43f1bdf89bc1cc04f4f5823ae421ef898a0c0d2e449b203f"
+      },
+      {
+        "path": "scenarios/group-session-freeze-promise-post-freeze-mutation-request/group-session-freeze-promise-post-freeze-mutation-request.md",
+        "sha256": "9083e149d879dcf5890bbcc3d3bb2fcf87b4490ba1878e59a73402bd5312ee52"
+      }
+    ],
+    "simulation_tree_hash": "93ed6b00afc3d94381a3e4a416c793e7b201ed1f670dc0af547f8466c19fee07"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 4,
+    "auditability": 3,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 1,
+    "implementation_plausibility": 5,
+    "promise_vocabulary": 3,
+    "simplicity_durability": 5,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 34,
+    "normalized_0_100": 68,
+    "confidence_0_1": 0.77
+  },
+  "assessment": {
+    "rationale": "The minimal raw-chunk plus deterministic-pointer CAS profile supports immutable artifacts and easy creation of new objects instead of mutating old ones, which helps with post-freeze change pressure. But the simulation is a CAS substrate profile, not a group-session freeze design, so it only partially answers how a breaking post-freeze request becomes a new specimen, superseding pCID, or amendment record.",
+    "strengths": [
+      "Strong immutability story: raw chunks and deterministic pointer objects naturally resist history mutation.",
+      "Very small, explicit artifact shape fits durable, auditable, small-device goals.",
+      "Boundaries are clear: the sim explicitly tests an early CAS profile without claiming to solve all future object families."
+    ],
+    "weaknesses": [
+      "Not directly designed for group-session freeze governance or lineage decisions.",
+      "Little explicit failure-handling for conflicting post-freeze mutation requests.",
+      "Promise wording is profile-centric rather than payload-promise-centric."
+    ],
+    "risks": [
+      "Teams may over-read CAS immutability as complete freeze semantics and leave lineage/replacement rules underspecified.",
+      "Without explicit supersession or amendment vocabulary, different peers may model post-freeze changes inconsistently.",
+      "Minimal pointer scope may be too thin to carry durable evolution metadata needed by higher layers."
+    ],
+    "open_questions": [
+      "What exact object or promise shape marks a frozen lineage versus a superseding specimen?",
+      "How would peers record and audit post-freeze amendment requests without adding mutable history semantics to CAS?",
+      "Does the minimal pointer need explicit lineage or replacement fields to support freeze-era evolution safely?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

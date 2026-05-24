@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-lilok-cas-type-path-suffix-negative-control-peer-adoption-metadata-spec-answer-vocabulary-drift-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000039-SIM-lilok-cas-type-path-suffix-negative-control--peer-adoption-metadata-spec-answer-vocabulary-drift--openai-gpt-5.4-medium",
+  "sim_id": "SIM-lilok-cas-type-path-suffix-negative-control",
+  "scenario_id": "peer-adoption-metadata-spec-answer-vocabulary-drift",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-lilok-cas-type-path-suffix-negative-control/peer-adoption-metadata-spec-answer-vocabulary-drift/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_8febf4d88884454bb0c18972638917c9",
+    "response_id": "resp_04a40802a32033ab006a12326048708198aa88a7b3a64efb1c",
+    "input_tokens": 7543,
+    "output_tokens": 984,
+    "cost_usd": 0.02697625
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-lilok-cas-type-path-suffix-negative-control/",
+    "scenario_path": "scenarios/peer-adoption-metadata-spec-answer-vocabulary-drift/peer-adoption-metadata-spec-answer-vocabulary-drift.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-lilok-cas-type-path-suffix-negative-control/README.md",
+        "sha256": "01679bfb564db2b4f8adfc4535d1a02413330fa05cea0bc288f12d5ab519c086"
+      },
+      {
+        "path": "simulations/SIM-lilok-cas-type-path-suffix-negative-control/QUESTION.md",
+        "sha256": "b1845d40f8012e290f866398d59d22236cd65c974e210c8040a4f1ed2dc86297"
+      },
+      {
+        "path": "scenarios/peer-adoption-metadata-spec-answer-vocabulary-drift/peer-adoption-metadata-spec-answer-vocabulary-drift.md",
+        "sha256": "a9e8ba84995e69fcad36f2554442cc62c5e1128ea0818197cb7ebf66e843ff53"
+      }
+    ],
+    "simulation_tree_hash": "0fe117659bfa499dd1f42891807e2ccdb2da83ab00099599578ffabf5fa458d6"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 0,
+    "promisegrid_alignment": 1,
+    "auditability": 2,
+    "evolution_safety": 0,
+    "layer_boundary_clarity": 1,
+    "failure_handling": 0,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 0,
+    "simplicity_durability": 1,
+    "risk_penalty": 5
+  },
+  "fitness": {
+    "raw": 9,
+    "normalized_0_100": 18,
+    "confidence_0_1": 0.94
+  },
+  "assessment": {
+    "rationale": "This negative-control specimen is largely orthogonal to the scenario. The scenario asks how adoption metadata and answer keys survive spec vocabulary drift; this design instead puts primary meaning in local path suffixes. That makes it a useful anti-example for evolution pressure, but not a credible answer to spec-local answer naming or migration.",
+    "strengths": [
+      "Failure mode is easy to understand and audit.",
+      "Implementation is straightforward as a negative control.",
+      "It usefully demonstrates why local naming should not carry protocol-critical meaning."
+    ],
+    "weaknesses": [
+      "Does not really address the scenario's adoption-metadata question.",
+      "Poor evolution safety under renamed or superseded specs.",
+      "Breaks layer boundaries by treating local path names as primary semantic binding.",
+      "Not expressed in promise-first vocabulary."
+    ],
+    "risks": [
+      "Primary type meaning in filenames/path suffixes becomes ambiguous when bytes move across peers, archives, or renamed paths.",
+      "Spec evolution or vocabulary drift cannot be audited from content alone if meaning depends on local storage names.",
+      "Peers may believe the same CID has different semantic type depending on local filename conventions."
+    ],
+    "open_questions": [
+      "Could this specimen contribute only as a contrast case inside a broader metadata-spec migration design?",
+      "Is there any bounded local-only use of path suffix typing that avoids being treated as protocol meaning across peers?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

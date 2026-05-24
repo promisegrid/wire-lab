@@ -1,0 +1,168 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-gibut-conditional-release-group-session-local-conditional-release-geofencing-onward-restraint-chain-openai-gpt-5.4-medium-20260524-024852",
+  "run_group_id": "ga-canary-20260523-pt-gate-v3",
+  "cell_id": "ga-canary-20260523-pt-gate-v3-000028-SIM-gibut-conditional-release-group-session-local--conditional-release-geofencing-onward-restraint-chain--openai-gpt-5.4-medium",
+  "sim_id": "SIM-gibut-conditional-release-group-session-local",
+  "scenario_id": "conditional-release-geofencing-onward-restraint-chain",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260524-024852",
+  "result_path": "results/SIM-gibut-conditional-release-group-session-local/conditional-release-geofencing-onward-restraint-chain/openai-gpt-5.4-medium/20260524-024852.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_6293decf88d94eddb6a3950c86bc39f1",
+    "response_id": "resp_0f6c0f00325b976c006a1267c68f6c8199ad11a81e1662378d",
+    "input_tokens": 8148,
+    "output_tokens": 1932,
+    "cost_usd": 0.041307
+  },
+  "source": {
+    "repo_commit": "ec652bd3ecaaf2f904e62cff00e113a88c7e3efd",
+    "sim_path": "simulations/SIM-gibut-conditional-release-group-session-local/",
+    "scenario_path": "scenarios/conditional-release-geofencing-onward-restraint-chain/conditional-release-geofencing-onward-restraint-chain.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-gibut-conditional-release-group-session-local/README.md",
+        "sha256": "c0e15735585e1296ae39d522ffa8cbe097d7a9cb66ff7d479b75f62b335a901c"
+      },
+      {
+        "path": "simulations/SIM-gibut-conditional-release-group-session-local/QUESTION.md",
+        "sha256": "7cb4d75a2a69df7f86b185094a9bf106bc89bf26e018d70a272c6ba43e1ba288"
+      },
+      {
+        "path": "scenarios/conditional-release-geofencing-onward-restraint-chain/conditional-release-geofencing-onward-restraint-chain.md",
+        "sha256": "3c84fc46e1b14de5e5c6e9b029fcb891bd655238b45e516b20eda97dabe8ff24"
+      }
+    ],
+    "simulation_tree_hash": "f552334ad886c1cf76d05a0fe07428ebf0166d4c006b5e8ade3e35abc82280f3"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 4,
+    "promisegrid_alignment": 2,
+    "auditability": 3,
+    "evolution_safety": 2,
+    "layer_boundary_clarity": 2,
+    "failure_handling": 2,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 2,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 25,
+    "normalized_0_100": 50,
+    "confidence_0_1": 0.8
+  },
+  "assessment": {
+    "rationale": "Directly addresses the scenario by placing the onward-restraint chain in group-session semantics, but that choice weakens layer clarity and risks sliding from local promises into implied session-enforced policy. Technically plausible, yet it needs reframing around separable peer-local promise evidence to be strongly PromiseGrid-aligned.",
+    "strengths": [
+      "Very strong fit to the exact scenario pressure about where the recursive promise graph lives.",
+      "Uses participant promises rather than pure authority commands.",
+      "Attaching conditions to messages or references is implementation-feasible and locally inspectable."
+    ],
+    "weaknesses": [
+      "Overloads the session layer with policy semantics.",
+      "Weak peer-local trust/accounting story for downstream promises and changing geofence facts.",
+      "Durability suffers because session-shaped policy may not compose well across future transports, stores, or audit tools."
+    ],
+    "risks": [
+      "False assurance that session semantics can enforce downstream restraint across later hops.",
+      "Audit ambiguity when different peers see different versions of release conditions or geofence state.",
+      "Harder evolution if policy semantics are baked into group/session behavior rather than composed as separate artifacts.",
+      "Potential centralization drift if implementations add shared policy or trust registries to make the chain workable."
+    ],
+    "open_questions": [
+      "Should onward-restraint live as a separate promise/evidence family that composes across sessions rather than inside session semantics?",
+      "What local artifact lets Bob assess that Carol made the needed promise without implying global enforcement?",
+      "How are stale or changing geofencing conditions audited over long-lived content chains?",
+      "What happens when content leaves the original group/session boundary but the restraint promise is still relevant?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design.",
+    "pt_gate": {
+      "status": "pt_reframe_needed",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "Participants are framed as making their own promises about forwarding behavior, which respects agent autonomy."
+      },
+      "scoped_intent": {
+        "status": "pass",
+        "note": "The intent is scoped to session participants and onward forwarding decisions."
+      },
+      "no_promises_for_others": {
+        "status": "warning",
+        "note": "Better than authority-led policy, but 'same promise' wording needs care so Bob is not treated as carrying Alice's promise onto Carol's behalf instead of Carol promising independently to Bob."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "warning",
+        "note": "Preserving conditions on dispatch is an intent, not an outcome guarantee, but the recursive restraint chain could be misread as stronger enforcement than PT allows."
+      },
+      "local_trust_assessment": {
+        "status": "warning",
+        "note": "The design does not yet show a clear peer-local evidence model for deciding whether downstream parties made and kept the relevant promises."
+      },
+      "accept_use_not_obligation": {
+        "status": "warning",
+        "note": "Conditional release inside session semantics can drift into obligation framing if membership is treated as mandatory compliance rather than voluntary acceptance plus local promises."
+      },
+      "violations": [
+        "Session-local ownership blurs session transport semantics with separate restraint/policy semantics.",
+        "Recursive 'same promise' framing is underspecified for peer-local trust and may drift toward global policy truth.",
+        "The design risks implying enforceable downstream compliance rather than autonomous local promises."
+      ]
+    }
+  }
+}

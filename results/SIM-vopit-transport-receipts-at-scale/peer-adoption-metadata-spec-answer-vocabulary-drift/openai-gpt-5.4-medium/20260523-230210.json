@@ -1,0 +1,120 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-vopit-transport-receipts-at-scale-peer-adoption-metadata-spec-answer-vocabulary-drift-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000123-SIM-vopit-transport-receipts-at-scale--peer-adoption-metadata-spec-answer-vocabulary-drift--openai-gpt-5.4-medium",
+  "sim_id": "SIM-vopit-transport-receipts-at-scale",
+  "scenario_id": "peer-adoption-metadata-spec-answer-vocabulary-drift",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-vopit-transport-receipts-at-scale/peer-adoption-metadata-spec-answer-vocabulary-drift/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_ae8432503a514371a8bc6b192497818d",
+    "response_id": "resp_013a192edc735e12006a1233627200819985783ee12464cb5a",
+    "input_tokens": 7510,
+    "output_tokens": 889,
+    "cost_usd": 0.0255885
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-vopit-transport-receipts-at-scale/",
+    "scenario_path": "scenarios/peer-adoption-metadata-spec-answer-vocabulary-drift/peer-adoption-metadata-spec-answer-vocabulary-drift.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-vopit-transport-receipts-at-scale/README.md",
+        "sha256": "0fbf01f60630a4d77a90b1eb757baaf22db54718e543726edd6f902784c0e973"
+      },
+      {
+        "path": "simulations/SIM-vopit-transport-receipts-at-scale/QUESTION.md",
+        "sha256": "f2d5400dddd9f92139fcbf4c1ca1daf8a9228dd7057e4e5eab115211a7873848"
+      },
+      {
+        "path": "scenarios/peer-adoption-metadata-spec-answer-vocabulary-drift/peer-adoption-metadata-spec-answer-vocabulary-drift.md",
+        "sha256": "a9e8ba84995e69fcad36f2554442cc62c5e1128ea0818197cb7ebf66e843ff53"
+      }
+    ],
+    "simulation_tree_hash": "0296d101bcc1d66b152b10009c3fd7e912eb0da942916f52f9bda4cf0d3c7c47"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 3,
+    "auditability": 3,
+    "evolution_safety": 2,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 2,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 4,
+    "simplicity_durability": 3,
+    "risk_penalty": 4
+  },
+  "fitness": {
+    "raw": 27,
+    "normalized_0_100": 54,
+    "confidence_0_1": 0.86
+  },
+  "assessment": {
+    "rationale": "The simulation is mainly about transport receipt aggregation, not peer-adoption metadata or spec-answer key drift. It aligns reasonably well with PromiseGrid on peer-local receipt promises and audit concerns, but it does not directly address whether answers are spec-local, profile-local, globally named, or migration-mapped.",
+    "strengths": [
+      "Clear transport-layer focus and explicit boundary that the format is not yet settled.",
+      "Uses promise-first framing around local receipt promises and auditability.",
+      "Recognizes the core risk of unverifiable summary claims at scale."
+    ],
+    "weaknesses": [
+      "Does not directly model adoption metadata, Q-key naming, or migration records.",
+      "Weak direct fit to the scenario's spec-answer vocabulary drift pressure.",
+      "Provides little concrete evolution mechanism for preserving meaning across renamed/removed fields."
+    ],
+    "risks": [
+      "Category mismatch: transport receipt evidence may not answer adoption-metadata vocabulary drift at all.",
+      "Aggregated summaries could become ambiguous across format/spec revisions if not bound to explicit spec references.",
+      "Unsettled receipt-vector format leaves migration and long-term interpretation underdefined."
+    ],
+    "open_questions": [
+      "Can receipt payloads bind explicitly to frozen protocol/spec identifiers so later vocabulary drift does not reinterpret old evidence?",
+      "If receipt aggregation formats evolve, what migration record lets old summaries remain locally auditable without global naming?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

@@ -1,0 +1,174 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-janov-grid-envelope-layer-pcid-nested-signed-payload-promise-economy-spectrum-peer-local-assessment-only-openai-gpt-5.4-medium-20260524-024852",
+  "run_group_id": "ga-canary-20260523-pt-gate-v3",
+  "cell_id": "ga-canary-20260523-pt-gate-v3-000001-SIM-janov-grid-envelope-layer-pcid-nested-signed-payload--promise-economy-spectrum-peer-local-assessment-only--openai-gpt-5.4-medium",
+  "sim_id": "SIM-janov-grid-envelope-layer-pcid-nested-signed-payload",
+  "scenario_id": "promise-economy-spectrum-peer-local-assessment-only",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260524-024852",
+  "result_path": "results/SIM-janov-grid-envelope-layer-pcid-nested-signed-payload/promise-economy-spectrum-peer-local-assessment-only/openai-gpt-5.4-medium/20260524-024852.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_38349fd2dc474b2d8da0c9ccde860e8f",
+    "response_id": "resp_0c3691dc7298dd95006a126723dc8c819aa1bf36952959f703",
+    "input_tokens": 9363,
+    "output_tokens": 1567,
+    "cost_usd": 0.03832325
+  },
+  "source": {
+    "repo_commit": "ec652bd3ecaaf2f904e62cff00e113a88c7e3efd",
+    "sim_path": "simulations/SIM-janov-grid-envelope-layer-pcid-nested-signed-payload/",
+    "scenario_path": "scenarios/promise-economy-spectrum-peer-local-assessment-only/promise-economy-spectrum-peer-local-assessment-only.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-janov-grid-envelope-layer-pcid-nested-signed-payload/README.md",
+        "sha256": "f48ab3c3b1dd2fe4a36b96ea5f602e34cae7c1615e97990ee1c8791a4c3a047f"
+      },
+      {
+        "path": "simulations/SIM-janov-grid-envelope-layer-pcid-nested-signed-payload/QUESTION.md",
+        "sha256": "32ba4a616d9b335c481cbfcbd7b114100210fb742a82061a52557b050d0530a9"
+      },
+      {
+        "path": "simulations/SIM-janov-grid-envelope-layer-pcid-nested-signed-payload/protocols/grid-envelope.d/CHANGELOG.md",
+        "sha256": "3652c6b6111b64750a90c10edf0da60a2d88777a2c3313477f21490d61d97201"
+      },
+      {
+        "path": "simulations/SIM-janov-grid-envelope-layer-pcid-nested-signed-payload/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "d182c06be14aaa48aaf3546e2050b361e7f10e1020faf32a9be8750948f2571d"
+      },
+      {
+        "path": "scenarios/promise-economy-spectrum-peer-local-assessment-only/promise-economy-spectrum-peer-local-assessment-only.md",
+        "sha256": "447986251c900f650f4b14b03e1660192d3e24b69dc82f9fbd1b61390866a5e6"
+      }
+    ],
+    "simulation_tree_hash": "bf0f4a64c42e752ebbf0764f95b9c41c7dc4374f56465564e4bd7e5a9d4c09c3"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 2,
+    "auditability": 4,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 3,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 1,
+    "simplicity_durability": 2,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 26,
+    "normalized_0_100": 52,
+    "confidence_0_1": 0.82
+  },
+  "assessment": {
+    "rationale": "Strong layer experiment with clear nested structure, deterministic encoding, and decent auditability, but it is poorly matched to the peer-local assessment-only scenario and drifts away from promise-first wording. Its key weakness is the unsigned outer conformance claim, which leaves local trust dependent on transport context rather than a durable explicit promise artifact.",
+    "strengths": [
+      "Very clear outer/nested layer boundary.",
+      "Deterministic CBOR and explicit unknown-pCID behavior support auditability.",
+      "Nested signature over [pcid_b, payload_b] gives stronger binding for the inner payload claim."
+    ],
+    "weaknesses": [
+      "Weak fit to the scenario: it does not directly explain peer-local pull/keep/advertise decisions without tokens.",
+      "Promise-first vocabulary is minimal; the artifact is framed as conformance/spec behavior.",
+      "Outer envelope lacks durable authorship evidence for the Layer-A promise.",
+      "Nested structure adds complexity without clear payoff for this scenario."
+    ],
+    "risks": [
+      "Unsigned outer layer creates ambiguity about who is promising Layer-A conformance.",
+      "Transport-identity dependence is brittle across relays, archives, migrations, and long-lived evidence use.",
+      "Scenario mismatch risks overvaluing wire-shape neatness while not answering the local-assessment-without-token pressure."
+    ],
+    "open_questions": [
+      "Can the outer conformance claim be made as an explicit agent-scoped promise instead of being inferred from transport context?",
+      "Is this envelope useful for peer-local trust accounting, or is it mainly a wire-shape experiment with weak direct support for the scenario?",
+      "Should the outer layer gain its own signed authorship evidence to reduce ambiguity around who promised Layer-A conformance?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design.",
+    "pt_gate": {
+      "status": "pt_reframe_needed",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "Peers remain free to parse, preserve, reject, or mark content unsupported based on local capability."
+      },
+      "scoped_intent": {
+        "status": "warning",
+        "note": "The design is mostly framed as protocol conformance and parser behavior rather than explicit agent-scoped promises."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "The draft does not assign one agent authority to promise on behalf of another, but authorship of the outer conformance claim is underspecified."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "The draft distinguishes verification ability from successful interpretation and does not promise guaranteed delivery or correctness outcomes."
+      },
+      "local_trust_assessment": {
+        "status": "pass",
+        "note": "It explicitly relies on local peer-adoption records and surrounding context, which fits local trust assessment, though transport identity dependence is fragile."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "The design does not turn receipt or parsing into obligation semantics."
+      },
+      "violations": [
+        "Promise vocabulary is weak: the draft centers protocol conformance rather than explicit agent-scoped promises.",
+        "The outer conformance promise is implicit and partly delegated to transport identity/context instead of a clear authored promise artifact."
+      ]
+    }
+  }
+}

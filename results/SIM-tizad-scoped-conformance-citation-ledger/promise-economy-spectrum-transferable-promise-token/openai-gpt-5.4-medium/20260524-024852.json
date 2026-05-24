@@ -1,0 +1,173 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-tizad-scoped-conformance-citation-ledger-promise-economy-spectrum-transferable-promise-token-openai-gpt-5.4-medium-20260524-024852",
+  "run_group_id": "ga-canary-20260523-pt-gate-v3",
+  "cell_id": "ga-canary-20260523-pt-gate-v3-000063-SIM-tizad-scoped-conformance-citation-ledger--promise-economy-spectrum-transferable-promise-token--openai-gpt-5.4-medium",
+  "sim_id": "SIM-tizad-scoped-conformance-citation-ledger",
+  "scenario_id": "promise-economy-spectrum-transferable-promise-token",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260524-024852",
+  "result_path": "results/SIM-tizad-scoped-conformance-citation-ledger/promise-economy-spectrum-transferable-promise-token/openai-gpt-5.4-medium/20260524-024852.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_a17009de43954b578fbb8abd7d705a7b",
+    "response_id": "resp_0979977da6869997006a1268b69e40819890d79de0713597d3",
+    "input_tokens": 9439,
+    "output_tokens": 1656,
+    "cost_usd": 0.03970225
+  },
+  "source": {
+    "repo_commit": "ec652bd3ecaaf2f904e62cff00e113a88c7e3efd",
+    "sim_path": "simulations/SIM-tizad-scoped-conformance-citation-ledger/",
+    "scenario_path": "scenarios/promise-economy-spectrum-transferable-promise-token/promise-economy-spectrum-transferable-promise-token.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-tizad-scoped-conformance-citation-ledger/README.md",
+        "sha256": "9668854c94fcb6a8331a98003184968f3e5369102dbe9000783a5f9b867e79ef"
+      },
+      {
+        "path": "simulations/SIM-tizad-scoped-conformance-citation-ledger/QUESTION.md",
+        "sha256": "05f7a658c8c67f64e164153a02dd9fed0df2af9f4f09a02118eaaa06273fb43c"
+      },
+      {
+        "path": "simulations/SIM-tizad-scoped-conformance-citation-ledger/CLAIM-BUNDLE.md",
+        "sha256": "29b03975828b554b774e2cb385cc4a85f80653fa8841494227a837efc95ba45c"
+      },
+      {
+        "path": "scenarios/promise-economy-spectrum-transferable-promise-token/promise-economy-spectrum-transferable-promise-token.md",
+        "sha256": "abaf39f500a3cf675bc528e6367b46bd6ded03011700c415d728dbe7cb8b0019"
+      }
+    ],
+    "simulation_tree_hash": "f45aa7d6c917a553cd0b9e4ed9de53aec6bfa37cb67f1af4bd8ecb516146c77d"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 2,
+    "auditability": 4,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 4,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 4,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 33,
+    "normalized_0_100": 66,
+    "confidence_0_1": 0.84
+  },
+  "assessment": {
+    "rationale": "Good fit for auditability, scope separation, and durable local evidence, but only partial fit for transferable promise tokens. It helps provenance and refusal auditing, yet does not define transferable authorization or double-spend handling. Promise-Theory alignment is decent at the boundary level, but the wording leans on conformance claims more than explicit promises.",
+    "strengths": [
+      "Clear separation of local, live, audit, and effect layers.",
+      "Durable citation rule improves later provenance and refusal auditing.",
+      "Peer-local promise-accounting records match sparse-knowledge and no-central-authority goals.",
+      "Good failure evidence pattern using receipts and break-witnesses."
+    ],
+    "weaknesses": [
+      "Does not directly solve transferable token semantics.",
+      "No explicit local pattern for double-spend prevention beyond generic evidence capture.",
+      "Promise vocabulary is diluted by conformance-manifest and status language.",
+      "Authorization transfer and acceptance/refusal semantics remain underspecified."
+    ],
+    "risks": [
+      "A reader may mistake a conformance manifest for a global trust or certification artifact.",
+      "Transferability pressure may be under-addressed, especially around replay and double-spend semantics.",
+      "Status-based claim language could smuggle normative expectations into what should remain local trust judgments."
+    ],
+    "open_questions": [
+      "What durable artifact would represent transfer or refusal of a promise token without implying central authority?",
+      "How would double-spend or replay be handled locally when the object is intended to be transferable?",
+      "Who exactly promises what when Carol receives Bob's transferred token: provenance only, authorization, availability, or effect?",
+      "Can the conformance manifest be reframed as explicit agent-scoped promises instead of status claims?"
+    ],
+    "authority_boundary": "Evidence only; useful for audit-layer scoping, not a settled design for transferable promise tokens.",
+    "pt_gate": {
+      "status": "pt_reframe_needed",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "Peers keep local records and make local assessments; no central obligating authority is required."
+      },
+      "scoped_intent": {
+        "status": "warning",
+        "note": "Strong scope separation is present, but the primary framing is conformance/claim/status language rather than explicit promiser-scoped declarations of intent."
+      },
+      "no_promises_for_others": {
+        "status": "warning",
+        "note": "It does not explicitly let one agent promise on behalf of another, but transfer-token semantics are underspecified and could invite that confusion if extended carelessly."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "The design records evidence, receipts, and break-witnesses rather than guaranteeing effects or interoperability outcomes."
+      },
+      "local_trust_assessment": {
+        "status": "warning",
+        "note": "Trust is mostly local via peer-held evidence, though publishable conformance manifests can drift toward externally interpreted trust labels."
+      },
+      "accept_use_not_obligation": {
+        "status": "warning",
+        "note": "The design separates authorization and availability from mere possession, but it does not fully model token acceptance/refusal semantics as local promises to use or decline."
+      },
+      "violations": [
+        "Conformance-manifest and claim-bundle framing is not consistently promise-first.",
+        "Transferable token semantics are not directly modeled as explicit local promises between autonomous agents.",
+        "Status-style claims risk being read as normative conformance cards rather than agent-scoped intent plus local trust assessment."
+      ]
+    }
+  }
+}

@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-lofij-peer-adoption-hybrid-pointer-spec-requirement-sections-100-year-review-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000152-SIM-lofij-peer-adoption-hybrid-pointer--spec-requirement-sections-100-year-review--openai-gpt-5.4-medium",
+  "sim_id": "SIM-lofij-peer-adoption-hybrid-pointer",
+  "scenario_id": "spec-requirement-sections-100-year-review",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-lofij-peer-adoption-hybrid-pointer/spec-requirement-sections-100-year-review/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_e748de6dbec540f4ae08619d857592d5",
+    "response_id": "resp_058ee0867e0b771d006a1233c327d4819bb03a19b4430f3991",
+    "input_tokens": 7513,
+    "output_tokens": 964,
+    "cost_usd": 0.02664375
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-lofij-peer-adoption-hybrid-pointer/",
+    "scenario_path": "scenarios/spec-requirement-sections-100-year-review/spec-requirement-sections-100-year-review.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-lofij-peer-adoption-hybrid-pointer/README.md",
+        "sha256": "577bbdf30e1ac5eb5d84c8b7c202449b8f5a04da94f7f44b8f062116ebb9ae79"
+      },
+      {
+        "path": "simulations/SIM-lofij-peer-adoption-hybrid-pointer/QUESTION.md",
+        "sha256": "03c6ced9337309eae8fd87691ea8a6de917340b9a341040344ca4e98cde075e8"
+      },
+      {
+        "path": "scenarios/spec-requirement-sections-100-year-review/spec-requirement-sections-100-year-review.md",
+        "sha256": "b2e71192b720372495986fad6387d0bfd5222ce78a7cfd9da03940d1a1062cd7"
+      }
+    ],
+    "simulation_tree_hash": "412e7ab674cb54201689072610a695ea0e8772f4e95597d7f7bc312af9c30d1d"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 4,
+    "auditability": 3,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 1,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 4,
+    "simplicity_durability": 3,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 29,
+    "normalized_0_100": 57.99999999999999,
+    "confidence_0_1": 0.81
+  },
+  "assessment": {
+    "rationale": "The hybrid pointer design is broadly PromiseGrid-shaped: small promise-first records, optional richer evidence, and clear separation between compact adoption and extended metadata. But this scenario is specifically about whether a long-horizon required spec section preserves assumptions for future readers, and the simulation does not define that spec-section home or a durable review procedure. It helps with compactness and evolvability more than with the scenario's direct 100-year review pressure.",
+    "strengths": [
+      "Compact promise plus optional richer object fits sparse peers and small-device durability goals better than always-inline bundles.",
+      "Promise-first structure is closer to PromiseGrid than generic conformance cards or central registry claims.",
+      "Separation between compact adoption claim and richer answer bindings is implementation-plausible and evolution-friendly."
+    ],
+    "weaknesses": [
+      "Weak direct fit to the scenario's demand for a concrete long-horizon spec-section home.",
+      "Failure handling for missing, stale, or unverifiable pointer targets is not specified.",
+      "Auditability depends on external retrieval and interpretation of the pointed object."
+    ],
+    "risks": [
+      "Pointer indirection may weaken long-horizon intelligibility if the richer object is unavailable or no longer interpretable.",
+      "Optional off-card evidence can create uneven audit outcomes across peers with partial retrieval.",
+      "The simulation leaves mandatory-field boundaries undecided, which limits durable review guidance."
+    ],
+    "open_questions": [
+      "Should a 100-year-readable spec require a stable home for the richer pointed object, not just the compact adoption promise?",
+      "How should future readers audit adoption when the pointer target is missing, stale, or uses obsolete signature formats?",
+      "Which adoption fields must remain inline versus optional behind the pointer for long-horizon review?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

@@ -1,0 +1,171 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-tizad-scoped-conformance-citation-ledger-conditional-release-geofencing-onward-restraint-chain-openai-gpt-5.4-medium-20260524-024852",
+  "run_group_id": "ga-canary-20260523-pt-gate-v3",
+  "cell_id": "ga-canary-20260523-pt-gate-v3-000060-SIM-tizad-scoped-conformance-citation-ledger--conditional-release-geofencing-onward-restraint-chain--openai-gpt-5.4-medium",
+  "sim_id": "SIM-tizad-scoped-conformance-citation-ledger",
+  "scenario_id": "conditional-release-geofencing-onward-restraint-chain",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260524-024852",
+  "result_path": "results/SIM-tizad-scoped-conformance-citation-ledger/conditional-release-geofencing-onward-restraint-chain/openai-gpt-5.4-medium/20260524-024852.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_68fd19b2dc454849bd99cd97c4431873",
+    "response_id": "resp_028c490595b5da35006a1268a5570c8198bcfda770ba6dc0af",
+    "input_tokens": 9480,
+    "output_tokens": 1894,
+    "cost_usd": 0.043106
+  },
+  "source": {
+    "repo_commit": "ec652bd3ecaaf2f904e62cff00e113a88c7e3efd",
+    "sim_path": "simulations/SIM-tizad-scoped-conformance-citation-ledger/",
+    "scenario_path": "scenarios/conditional-release-geofencing-onward-restraint-chain/conditional-release-geofencing-onward-restraint-chain.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-tizad-scoped-conformance-citation-ledger/README.md",
+        "sha256": "9668854c94fcb6a8331a98003184968f3e5369102dbe9000783a5f9b867e79ef"
+      },
+      {
+        "path": "simulations/SIM-tizad-scoped-conformance-citation-ledger/QUESTION.md",
+        "sha256": "05f7a658c8c67f64e164153a02dd9fed0df2af9f4f09a02118eaaa06273fb43c"
+      },
+      {
+        "path": "simulations/SIM-tizad-scoped-conformance-citation-ledger/CLAIM-BUNDLE.md",
+        "sha256": "29b03975828b554b774e2cb385cc4a85f80653fa8841494227a837efc95ba45c"
+      },
+      {
+        "path": "scenarios/conditional-release-geofencing-onward-restraint-chain/conditional-release-geofencing-onward-restraint-chain.md",
+        "sha256": "3c84fc46e1b14de5e5c6e9b029fcb891bd655238b45e516b20eda97dabe8ff24"
+      }
+    ],
+    "simulation_tree_hash": "f45aa7d6c917a553cd0b9e4ed9de53aec6bfa37cb67f1af4bd8ecb516146c77d"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 2,
+    "auditability": 5,
+    "evolution_safety": 5,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 4,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 4,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 35,
+    "normalized_0_100": 70,
+    "confidence_0_1": 0.82
+  },
+  "assessment": {
+    "rationale": "Strong on layer separation, durable citation, and local audit records, so it can document conditional-release evidence honestly. But this scenario is about recursive onward-restraint semantics, and the simulation does not yet define a first-class promise/object shape for the restraint chain itself. It helps audit the chain more than represent or enforce it.",
+    "strengths": [
+      "Clear separation between local implementation, live transport, audit publication, and device effect claims.",
+      "Durable citation rule fits the scenario's need for auditable per-hop evidence.",
+      "Peer-local promise-accounting records help preserve refusal, replay, and failure evidence over time.",
+      "Good 100-year and sparse-knowledge posture: small artifacts, local records, no required central registry."
+    ],
+    "weaknesses": [
+      "Does not define the recursive onward-restraint graph as a native promise family.",
+      "Scenario fit is partial: it explains where evidence would live, not the full forwarding condition semantics.",
+      "Vocabulary is only partly Promise-Theory-native because it centers conformance/status claims rather than promises."
+    ],
+    "risks": [
+      "Teams may overread a conformance manifest as proof that onward-restraint semantics are covered when only adjacent-layer evidence is covered.",
+      "Authoritative-contract wording may drift toward central or normative interpretation.",
+      "Without an explicit per-hop restraint artifact, downstream propagation can remain ambiguous across sessions or transports."
+    ],
+    "open_questions": [
+      "What exact promise-shaped artifact would Bob cite to show Carol accepted the same onward-restraint condition before forwarding?",
+      "Is onward-restraint represented per CAS object, per release receipt, or as a separate policy family linked from the cited object?",
+      "How should Alice or Carol record a partial chain where one hop is live-only and another hop is durably auditable?",
+      "What break-witness or failure record proves Bob refused to forward when downstream restraint evidence was missing?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design or final onward-restraint semantics.",
+    "pt_gate": {
+      "status": "pt_reframe_needed",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "Peers keep local records and make scoped claims about their own artifacts and behavior."
+      },
+      "scoped_intent": {
+        "status": "warning",
+        "note": "Layer-scoped claims are explicit and bounded, but they are framed as conformance/status manifests more than direct promises."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "It does not let Bob promise Carol's behavior; each hop would need its own claim/evidence."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "The design emphasizes audit evidence and failure records rather than guaranteed delivery or effect."
+      },
+      "local_trust_assessment": {
+        "status": "warning",
+        "note": "Trust remains largely peer-local, but 'authoritative contract reference' language could be misread as stronger global authority than PT prefers."
+      },
+      "accept_use_not_obligation": {
+        "status": "warning",
+        "note": "The design mostly distinguishes observable artifacts and local records from obligations, though conformance/status wording can still invite normative reading."
+      },
+      "violations": [
+        "Uses conformance-manifest and implementation-status vocabulary instead of consistently promisor-scoped promise statements.",
+        "Leans on authoritative contract-reference framing that needs reframing as a cited boundary artifact plus local trust assessment."
+      ]
+    }
+  }
+}

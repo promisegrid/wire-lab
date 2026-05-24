@@ -1,0 +1,174 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields-promise-accounting-records-kept-storage-promise-openai-gpt-5.4-medium-20260524-024852",
+  "run_group_id": "ga-canary-20260523-pt-gate-v3",
+  "cell_id": "ga-canary-20260523-pt-gate-v3-000010-SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields--promise-accounting-records-kept-storage-promise--openai-gpt-5.4-medium",
+  "sim_id": "SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields",
+  "scenario_id": "promise-accounting-records-kept-storage-promise",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260524-024852",
+  "result_path": "results/SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields/promise-accounting-records-kept-storage-promise/openai-gpt-5.4-medium/20260524-024852.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_021c12e0432a483c948def9c99723d80",
+    "response_id": "resp_0ba7aa23965d1822006a126753752081988dcf1c36b6e0ea76",
+    "input_tokens": 9050,
+    "output_tokens": 1685,
+    "cost_usd": 0.0394275
+  },
+  "source": {
+    "repo_commit": "ec652bd3ecaaf2f904e62cff00e113a88c7e3efd",
+    "sim_path": "simulations/SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields/",
+    "scenario_path": "scenarios/promise-accounting-records-kept-storage-promise/promise-accounting-records-kept-storage-promise.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields/README.md",
+        "sha256": "3ab052fe6b0a0513740136a232eeaf2f73e992923012280c92c2e159c8fb0a9c"
+      },
+      {
+        "path": "simulations/SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields/QUESTION.md",
+        "sha256": "707280a55807f9fce459bf58b891379e28a66c77fbedf1c263937113936a25d3"
+      },
+      {
+        "path": "simulations/SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields/protocols/grid-envelope.d/CHANGELOG.md",
+        "sha256": "3652c6b6111b64750a90c10edf0da60a2d88777a2c3313477f21490d61d97201"
+      },
+      {
+        "path": "simulations/SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "68d7443d65d236f5471fac7781b122413a1f5ba914587b2b3522c8b3677062d9"
+      },
+      {
+        "path": "scenarios/promise-accounting-records-kept-storage-promise/promise-accounting-records-kept-storage-promise.md",
+        "sha256": "9972dff7f20d9b4f3231c07a8eb332d2e75b43e84cf0d34af29c1d3ea9c1ad74"
+      }
+    ],
+    "simulation_tree_hash": "cee27e908e02ebb98055f64a9a1750e4c150996dd05c4c53e16ec029927598f1"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 2,
+    "auditability": 2,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 2,
+    "failure_handling": 3,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 1,
+    "simplicity_durability": 2,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 22,
+    "normalized_0_100": 44,
+    "confidence_0_1": 0.83
+  },
+  "assessment": {
+    "rationale": "Technically plausible as a wire-envelope experiment, but weak for this scenario. It can carry opaque evidence and handles unknown pCIDs conservatively, yet it does not define storage-promise semantics, observable kept-promise records, or generic audit fields Bob could use for future trust decisions.",
+    "strengths": [
+      "Deterministic CBOR array gives stable bytes for storage and hashing.",
+      "Unknown-pCID policy is conservative: store/forward opaque bytes without overclaiming understanding.",
+      "No central registry or mandatory global authority is assumed."
+    ],
+    "weaknesses": [
+      "Does not model the kept storage promise itself or Bob's local accounting record.",
+      "Generic envelope layer cannot identify payload, proof, or outcome fields.",
+      "Promise vocabulary is sparse and mostly replaced by protocol/handler language."
+    ],
+    "risks": [
+      "Loss of pCID handler/spec can leave long-lived records opaque and hard to audit.",
+      "Schema-local signature coverage increases substitution and misinterpretation risk across envelopes.",
+      "Generic tooling cannot reliably index or compare kept-storage outcomes across schemas."
+    ],
+    "open_questions": [
+      "Can a pCID-specific schema define a durable, locally auditable 'Alice stored chunk C and later served it' record without generic envelope help?",
+      "How would Bob compare kept-storage evidence across different pCID schemas if generic tooling cannot identify payload, proof, or promise-outcome fields?",
+      "What machine-readable arity/type metadata and size limits are needed so archived envelopes remain interpretable and safe decades later?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design.",
+    "pt_gate": {
+      "status": "pt_reframe_needed",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "The design does not require a central authority or command semantics between agents."
+      },
+      "scoped_intent": {
+        "status": "warning",
+        "note": "The artifact is mostly an envelope/parsing draft, not an explicit promise-first declaration of agent intent for storage behavior."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "It does not let one agent promise storage or service on behalf of another."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "The draft does not guarantee payload meaning, signature validity, or successful handling, especially for unknown pCIDs."
+      },
+      "local_trust_assessment": {
+        "status": "warning",
+        "note": "Trust remains local in principle, but the draft does not define the peer-local promise-accounting observations Bob needs for this scenario."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "The draft allows receivers to store or forward opaque bytes and does not equate receipt with obligation."
+      },
+      "violations": [
+        "Design is envelope-centric rather than promise-first.",
+        "It does not specify Alice/Bob peer-local promise-accounting records for a kept storage promise.",
+        "Scenario-relevant trust evidence is delegated to unspecified per-pCID schemas."
+      ]
+    }
+  }
+}

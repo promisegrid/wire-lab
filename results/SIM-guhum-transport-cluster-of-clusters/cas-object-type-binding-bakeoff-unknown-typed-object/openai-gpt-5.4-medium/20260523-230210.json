@@ -1,0 +1,122 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-guhum-transport-cluster-of-clusters-cas-object-type-binding-bakeoff-unknown-typed-object-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000106-SIM-guhum-transport-cluster-of-clusters--cas-object-type-binding-bakeoff-unknown-typed-object--openai-gpt-5.4-medium",
+  "sim_id": "SIM-guhum-transport-cluster-of-clusters",
+  "scenario_id": "cas-object-type-binding-bakeoff-unknown-typed-object",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-guhum-transport-cluster-of-clusters/cas-object-type-binding-bakeoff-unknown-typed-object/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_454bcca0fb444951a2dbc82d249bccf6",
+    "response_id": "resp_02667ca4cc70192a006a123330c7488198964a930148698a88",
+    "input_tokens": 7524,
+    "output_tokens": 919,
+    "cost_usd": 0.026033
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-guhum-transport-cluster-of-clusters/",
+    "scenario_path": "scenarios/cas-object-type-binding-bakeoff-unknown-typed-object/cas-object-type-binding-bakeoff-unknown-typed-object.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-guhum-transport-cluster-of-clusters/README.md",
+        "sha256": "9faf90179b085adf41d297b03e68fcea05f1036b00e1b289da4be5f7765e7350"
+      },
+      {
+        "path": "simulations/SIM-guhum-transport-cluster-of-clusters/QUESTION.md",
+        "sha256": "9c28415f96b79e449c81152d12b31194c886b19e458c9865af66f5e07c381955"
+      },
+      {
+        "path": "scenarios/cas-object-type-binding-bakeoff-unknown-typed-object/cas-object-type-binding-bakeoff-unknown-typed-object.md",
+        "sha256": "76f0a7016fa2bad5e53903682706bca4eeb4aa2d099311a4ea52b7280748cf90"
+      }
+    ],
+    "simulation_tree_hash": "0c3d3b4f767b25b25cd7017af80c516d7440b523c53d81768d763ddb4e97dfe2"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 2,
+    "auditability": 2,
+    "evolution_safety": 2,
+    "layer_boundary_clarity": 3,
+    "failure_handling": 1,
+    "implementation_plausibility": 3,
+    "promise_vocabulary": 1,
+    "simplicity_durability": 2,
+    "risk_penalty": 4
+  },
+  "fitness": {
+    "raw": 18,
+    "normalized_0_100": 36,
+    "confidence_0_1": 0.81
+  },
+  "assessment": {
+    "rationale": "This transport-focused simulation only partially addresses the unknown-typed-object pressure. Its transport layering suggests opaque forwarding is possible, but it does not specify CAS type-binding behavior, unknown-codec safety rules, or audit evidence for mixed-version handling. Cluster summaries may help scale routing, yet they also risk hiding object-handling assumptions behind cluster-level policy.",
+    "strengths": [
+      "Transport framing naturally supports treating unknown objects as opaque payloads.",
+      "The design explicitly aims to avoid central routing authority.",
+      "Cluster boundaries provide a plausible place to separate routing from object semantics."
+    ],
+    "weaknesses": [
+      "The simulation is not about CAS object type binding, so scenario coverage is weak.",
+      "No explicit promise defines safe handling for unknown codecs.",
+      "No clear local audit record is described for store/advertise/forward outcomes.",
+      "Cluster summary behavior may blur peer-local accountability."
+    ],
+    "risks": [
+      "Unknown-type behavior is unspecified, so implementations may parse or reject objects inconsistently.",
+      "Cluster-level routing or policy summaries could become hidden authority over object propagation.",
+      "Audit trails may be too coarse if forwarding decisions are made at cluster boundaries rather than peer-locally."
+    ],
+    "open_questions": [
+      "Can clusters advertise and relay unknown-codec CIDs strictly opaquely, without any cluster-level parsing or validation requirement?",
+      "What local evidence can Dave and Carol keep when a cluster forwards an unknown typed object?",
+      "Do cluster summary promises preserve end-to-end object handling semantics across mixed-version peers?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

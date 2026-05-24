@@ -1,0 +1,122 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-tudar-l6-cas-promisebase-adapter-profile-conditional-release-geofencing-replay-outside-conditions-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000009-SIM-tudar-l6-cas-promisebase-adapter-profile--conditional-release-geofencing-replay-outside-conditions--openai-gpt-5.4-medium",
+  "sim_id": "SIM-tudar-l6-cas-promisebase-adapter-profile",
+  "scenario_id": "conditional-release-geofencing-replay-outside-conditions",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-tudar-l6-cas-promisebase-adapter-profile/conditional-release-geofencing-replay-outside-conditions/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_75c453b38f9a4873879bccab057cf716",
+    "response_id": "resp_0f4f3b5de4f32ab3006a1232072fc4819bad5c72a44c713aa6",
+    "input_tokens": 7583,
+    "output_tokens": 1077,
+    "cost_usd": 0.02834825
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-tudar-l6-cas-promisebase-adapter-profile/",
+    "scenario_path": "scenarios/conditional-release-geofencing-replay-outside-conditions/conditional-release-geofencing-replay-outside-conditions.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-tudar-l6-cas-promisebase-adapter-profile/README.md",
+        "sha256": "8045140e0a499bf871f1834cc4b3e4d57d1ae25f7a28022c4e533ee510d1f836"
+      },
+      {
+        "path": "simulations/SIM-tudar-l6-cas-promisebase-adapter-profile/QUESTION.md",
+        "sha256": "5fa3894dd300e1cc66718738501116149682d9c6b6751b497abc7ced4b0799ca"
+      },
+      {
+        "path": "scenarios/conditional-release-geofencing-replay-outside-conditions/conditional-release-geofencing-replay-outside-conditions.md",
+        "sha256": "f1480d60e85afb41b0fe5e49fdc70801e029734edbe32c3068434be7f4cb1c6e"
+      }
+    ],
+    "simulation_tree_hash": "6c2abb880ff69e2a4b5e9895f65ee92dde3468ae93c11a0f546feff3eb8d0eee"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 3,
+    "auditability": 3,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 1,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 2,
+    "risk_penalty": 4
+  },
+  "fitness": {
+    "raw": 24,
+    "normalized_0_100": 48,
+    "confidence_0_1": 0.76
+  },
+  "assessment": {
+    "rationale": "This simulation is mainly an L6 CAS adapter/profile exercise, not a conditional-release design. It helps with object identity, pointer translation, and some audit trail concerns, but it does not clearly define promises that bind content release to geography, audience, epoch, or session context. That leaves replay-outside-conditions pressure mostly unanswered.",
+    "strengths": [
+      "Explicit translation rules for object identity and pointer shape can aid local inspection and cross-implementation auditing.",
+      "Stream evolution focus gives some path for versioning or supersession over time.",
+      "Layer boundary is relatively clear: this is a CAS profile/adapter, not a full policy system."
+    ],
+    "weaknesses": [
+      "Poor fit for the scenario's core need to detect unauthorized or stale reuse outside allowed conditions.",
+      "Failure handling for replay, stale conditions, and unauthorized audience/geography is not specified.",
+      "Promise vocabulary stays profile/adapter-centric rather than payload-promise-centric.",
+      "Adapter-first design adds wrapper complexity without showing durable minimal artifacts for conditional release."
+    ],
+    "risks": [
+      "Old valid references may remain reusable outside intended audience or geography because conditions are not clearly bound into the promised payload semantics.",
+      "An adapter/profile framing may import prior-art assumptions that weaken explicit peer-local promise accounting for conditional release.",
+      "Receivers may need hidden policy or external state to decide replay validity, which conflicts with sparse-knowledge and no-central-authority goals."
+    ],
+    "open_questions": [
+      "Can the adapter profile bind a pCID or pointer to recipient, epoch, geography, or session context without adding external authority?",
+      "What peer-local evidence would Dave record to distinguish valid reuse from replay outside allowed conditions?",
+      "Does stream evolution in the adapter give a durable way to revoke or supersede old release conditions?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

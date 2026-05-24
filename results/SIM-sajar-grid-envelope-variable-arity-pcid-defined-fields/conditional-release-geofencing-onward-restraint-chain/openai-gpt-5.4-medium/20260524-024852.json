@@ -1,0 +1,178 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields-conditional-release-geofencing-onward-restraint-chain-openai-gpt-5.4-medium-20260524-024852",
+  "run_group_id": "ga-canary-20260523-pt-gate-v3",
+  "cell_id": "ga-canary-20260523-pt-gate-v3-000012-SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields--conditional-release-geofencing-onward-restraint-chain--openai-gpt-5.4-medium",
+  "sim_id": "SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields",
+  "scenario_id": "conditional-release-geofencing-onward-restraint-chain",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260524-024852",
+  "result_path": "results/SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields/conditional-release-geofencing-onward-restraint-chain/openai-gpt-5.4-medium/20260524-024852.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_57b2aa4f7084499fbce0a3219df3abd8",
+    "response_id": "resp_0fac5d665bb6aac9006a1267578e60819a802e97c68ac1e286",
+    "input_tokens": 9086,
+    "output_tokens": 1926,
+    "cost_usd": 0.0428645
+  },
+  "source": {
+    "repo_commit": "ec652bd3ecaaf2f904e62cff00e113a88c7e3efd",
+    "sim_path": "simulations/SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields/",
+    "scenario_path": "scenarios/conditional-release-geofencing-onward-restraint-chain/conditional-release-geofencing-onward-restraint-chain.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields/README.md",
+        "sha256": "3ab052fe6b0a0513740136a232eeaf2f73e992923012280c92c2e159c8fb0a9c"
+      },
+      {
+        "path": "simulations/SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields/QUESTION.md",
+        "sha256": "707280a55807f9fce459bf58b891379e28a66c77fbedf1c263937113936a25d3"
+      },
+      {
+        "path": "simulations/SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields/protocols/grid-envelope.d/CHANGELOG.md",
+        "sha256": "3652c6b6111b64750a90c10edf0da60a2d88777a2c3313477f21490d61d97201"
+      },
+      {
+        "path": "simulations/SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "68d7443d65d236f5471fac7781b122413a1f5ba914587b2b3522c8b3677062d9"
+      },
+      {
+        "path": "scenarios/conditional-release-geofencing-onward-restraint-chain/conditional-release-geofencing-onward-restraint-chain.md",
+        "sha256": "3c84fc46e1b14de5e5c6e9b029fcb891bd655238b45e516b20eda97dabe8ff24"
+      }
+    ],
+    "simulation_tree_hash": "cee27e908e02ebb98055f64a9a1750e4c150996dd05c4c53e16ec029927598f1"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 1,
+    "auditability": 1,
+    "evolution_safety": 2,
+    "layer_boundary_clarity": 2,
+    "failure_handling": 2,
+    "implementation_plausibility": 3,
+    "promise_vocabulary": 0,
+    "simplicity_durability": 2,
+    "risk_penalty": 4
+  },
+  "fitness": {
+    "raw": 15,
+    "normalized_0_100": 30,
+    "confidence_0_1": 0.86
+  },
+  "assessment": {
+    "rationale": "Low scenario fit. This simulation is an envelope-format probe, not a conditional-release design. Its main strengths are deterministic encoding and conservative unknown-pCID handling, but for this scenario it cannot generically express or audit Alice's onward-restraint condition, Bob's forwarding promise, or Carol's inherited promise without deferring everything to a handler-specific schema. That weakens cross-peer audit, long-term interpretability, and Promise-Theory clarity.",
+    "strengths": [
+      "Deterministic CBOR array is compact and implementable.",
+      "Unknown-pCID policy is conservative and avoids false interpretation.",
+      "Can preserve opaque bytes for later audit or replay when the handler is unavailable.",
+      "Supports schema evolution without changing the outer envelope each time."
+    ],
+    "weaknesses": [
+      "Does not itself model conditional release or recursive onward-restraint promises.",
+      "Generic tooling cannot identify payload, proof, or policy fields without the pCID handler.",
+      "No universal signature slot weakens envelope-level auditability.",
+      "Not written in promise-first vocabulary and does not expose local trust accounting clearly."
+    ],
+    "risks": [
+      "Handler-specific field meaning makes later audit of restraint terms fragile.",
+      "No universal payload/proof slots increases substitution and misinterpretation risk across schemas.",
+      "Variable arity plus schema-local limits creates denial-of-service and parser-complexity risk.",
+      "Scenario-critical semantics may become invisible to generic relays and auditors, undermining local evidence of onward restraint."
+    ],
+    "open_questions": [
+      "Can any pCID-local schema encode recursive onward-restraint promises without losing generic auditability at the envelope layer?",
+      "Is machine-readable per-pCID field metadata required so later auditors can distinguish payload, proof, and restraint terms after tools change?",
+      "What size and field-count limits are needed so adversarial variable-arity envelopes cannot degrade relay or audit nodes?",
+      "Would a fixed minimal outer structure for payload plus proof make conditional-release chains more durable than fully pCID-defined outer arity?"
+    ],
+    "authority_boundary": "Evidence only; this envelope specimen does not define conditional-release policy, onward-restraint semantics, or canonical PromiseGrid design.",
+    "pt_gate": {
+      "status": "pt_reframe_needed",
+      "autonomous_agents": {
+        "status": "warning",
+        "note": "The design can be used by autonomous agents, but the draft is written as protocol imperatives rather than agent-scoped promises."
+      },
+      "scoped_intent": {
+        "status": "warning",
+        "note": "Intent is only indirectly expressed through schema-defined fields; the design is not promise-first and does not declare explicit scoped promises among participants."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "The specimen does not directly let one agent promise on behalf of another, though it also does not represent the Alice/Bob/Carol onward-promise chain needed by the scenario."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "The draft does not promise delivery or successful onward restraint; it mainly defines parsing and interpretation limits."
+      },
+      "local_trust_assessment": {
+        "status": "warning",
+        "note": "Unknown-pCID handling is locally conservative, which fits local trust assessment, but trust vocabulary and evidence boundaries are left implicit in handler-specific schemas."
+      },
+      "accept_use_not_obligation": {
+        "status": "warning",
+        "note": "The specimen does not explicitly collapse acceptance into obligation, but it also does not model receipt/use promises in Promise-Theory terms."
+      },
+      "violations": [
+        "Uses normative protocol/spec language instead of explicit promise-first agent declarations.",
+        "Does not represent the onward-restraint promise chain required by the scenario; any such meaning is deferred to opaque pCID-local schemas.",
+        "Generic trust and audit vocabulary is too weak because payload/proof meaning disappears without the pCID handler."
+      ]
+    }
+  }
+}

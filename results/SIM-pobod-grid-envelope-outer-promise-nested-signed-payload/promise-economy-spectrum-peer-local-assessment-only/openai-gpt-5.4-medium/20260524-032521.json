@@ -1,0 +1,163 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-pobod-grid-envelope-outer-promise-nested-signed-payload-promise-economy-spectrum-peer-local-assessment-only-openai-gpt-5.4-medium-20260524-032521",
+  "run_group_id": "ga-canary-20260523-pt-gate-v3-successors",
+  "cell_id": "ga-canary-20260523-pt-gate-v3-successors-000001-SIM-pobod-grid-envelope-outer-promise-nested-signed-payload--promise-economy-spectrum-peer-local-assessment-only--openai-gpt-5.4-medium",
+  "sim_id": "SIM-pobod-grid-envelope-outer-promise-nested-signed-payload",
+  "scenario_id": "promise-economy-spectrum-peer-local-assessment-only",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260524-032521",
+  "result_path": "results/SIM-pobod-grid-envelope-outer-promise-nested-signed-payload/promise-economy-spectrum-peer-local-assessment-only/openai-gpt-5.4-medium/20260524-032521.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_61a60314b17f404b9ba5bc445ff91ba2",
+    "response_id": "resp_0a714f3fe9623336006a126fa3c9dc819ab0df0a24399cf012",
+    "input_tokens": 8305,
+    "output_tokens": 1200,
+    "cost_usd": 0.03133375
+  },
+  "source": {
+    "repo_commit": "925c7f5c1c7ce7d5b0caf6a924d40d3f9b7d0483",
+    "sim_path": "simulations/SIM-pobod-grid-envelope-outer-promise-nested-signed-payload/",
+    "scenario_path": "scenarios/promise-economy-spectrum-peer-local-assessment-only/promise-economy-spectrum-peer-local-assessment-only.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-pobod-grid-envelope-outer-promise-nested-signed-payload/README.md",
+        "sha256": "eb57e248895158aa53182aa525888b693905ec27813ce1618dc6de1ff50998b9"
+      },
+      {
+        "path": "simulations/SIM-pobod-grid-envelope-outer-promise-nested-signed-payload/QUESTION.md",
+        "sha256": "99fce8d0035d8056937da17da995ccb1b152837053e2621909883a6cf3afbb8d"
+      },
+      {
+        "path": "scenarios/promise-economy-spectrum-peer-local-assessment-only/promise-economy-spectrum-peer-local-assessment-only.md",
+        "sha256": "447986251c900f650f4b14b03e1660192d3e24b69dc82f9fbd1b61390866a5e6"
+      }
+    ],
+    "simulation_tree_hash": "941614f1c8ec15ab226d7b287e27dfd6e06074c920a61c1a5460d449f282d27b"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 5,
+    "auditability": 4,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 3,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 5,
+    "simplicity_durability": 4,
+    "risk_penalty": 1
+  },
+  "fitness": {
+    "raw": 40,
+    "normalized_0_100": 80,
+    "confidence_0_1": 0.82
+  },
+  "assessment": {
+    "rationale": "Strong PT-clean envelope reframing: small explicit outer promise, nested signed payload, and receiver-local trust assessment. It aligns well with PromiseGrid fundamentals and avoids central authority framing. However, this scenario is about peer-local economic assessment without tokens, and the design is only an envelope primitive, so scenario coverage is partial rather than complete.",
+    "strengths": [
+      "Explicit outer-layer promise fixes the implicit transport-authority weakness of the predecessor.",
+      "Clear separation between outer parsing promise and inner signed payload evidence improves auditability.",
+      "Small deterministic envelope with pCID-based structure is durable and implementation-friendly.",
+      "Trust remains explicitly local rather than centralized or globally adjudicated."
+    ],
+    "weaknesses": [
+      "Does not directly model pull/keep/advertise decisions or storage-history observations in this scenario.",
+      "Failure handling is implicit; corruption, stale evidence, and disagreement flows are not fully specified.",
+      "Local assessment is supported as a framing principle, but peer-local accounting artifacts are underspecified."
+    ],
+    "risks": [
+      "May be over-applied as a solution to local reputation/accounting despite only defining message/evidence packaging.",
+      "If implementations start treating outer fields as authoritative metadata, PT cleanliness degrades.",
+      "Long-term usability depends on durable handling of signature evolution and stale evidence interpretation."
+    ],
+    "open_questions": [
+      "Can this envelope express peer-local keep/advertise history without adding a token or ledger layer?",
+      "What local records should Alice or Carol retain when outer and inner claims disagree or become stale?",
+      "Does the small outer promise stay sufficient across transport changes and long-term key rotation?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design.",
+    "pt_gate": {
+      "status": "pt_clean",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "Sender and receiver remain autonomous; the design describes promises and local trust decisions rather than commands."
+      },
+      "scoped_intent": {
+        "status": "pass",
+        "note": "The outer promise is narrowly scoped to parsing, payload structure, and interpretation of nested signature evidence."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "The sender promises only about the carried bytes and evidence object, not on behalf of other agents."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "The outer promise asserts intended structure/evidence, not guaranteed truth or delivery outcome."
+      },
+      "local_trust_assessment": {
+        "status": "pass",
+        "note": "The README explicitly says receivers decide locally whether they trust the sender and the nested signature evidence."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "Receivers decide locally whether to accept or use the payload; nothing here turns receipt into obligation."
+      },
+      "violations": []
+    }
+  }
+}

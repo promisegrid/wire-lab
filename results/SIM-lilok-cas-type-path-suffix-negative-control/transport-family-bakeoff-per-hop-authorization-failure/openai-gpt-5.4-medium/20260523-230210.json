@@ -1,0 +1,120 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-lilok-cas-type-path-suffix-negative-control-transport-family-bakeoff-per-hop-authorization-failure-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000038-SIM-lilok-cas-type-path-suffix-negative-control--transport-family-bakeoff-per-hop-authorization-failure--openai-gpt-5.4-medium",
+  "sim_id": "SIM-lilok-cas-type-path-suffix-negative-control",
+  "scenario_id": "transport-family-bakeoff-per-hop-authorization-failure",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-lilok-cas-type-path-suffix-negative-control/transport-family-bakeoff-per-hop-authorization-failure/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_e1b0e54253304e4c8684d766bcb3c9f7",
+    "response_id": "resp_0bd7e1d11a6e400d006a12325aed188199968553bb21e1ba05",
+    "input_tokens": 7546,
+    "output_tokens": 1743,
+    "cost_usd": 0.0376075
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-lilok-cas-type-path-suffix-negative-control/",
+    "scenario_path": "scenarios/transport-family-bakeoff-per-hop-authorization-failure/transport-family-bakeoff-per-hop-authorization-failure.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-lilok-cas-type-path-suffix-negative-control/README.md",
+        "sha256": "01679bfb564db2b4f8adfc4535d1a02413330fa05cea0bc288f12d5ab519c086"
+      },
+      {
+        "path": "simulations/SIM-lilok-cas-type-path-suffix-negative-control/QUESTION.md",
+        "sha256": "b1845d40f8012e290f866398d59d22236cd65c974e210c8040a4f1ed2dc86297"
+      },
+      {
+        "path": "scenarios/transport-family-bakeoff-per-hop-authorization-failure/transport-family-bakeoff-per-hop-authorization-failure.md",
+        "sha256": "f938e10ab88db666d3097a2f97c1667bbbc6e8e071681134049068982cc39cf2"
+      }
+    ],
+    "simulation_tree_hash": "0fe117659bfa499dd1f42891807e2ccdb2da83ab00099599578ffabf5fa458d6"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 1,
+    "auditability": 5,
+    "evolution_safety": 0,
+    "layer_boundary_clarity": 1,
+    "failure_handling": 0,
+    "implementation_plausibility": 2,
+    "promise_vocabulary": 0,
+    "simplicity_durability": 1,
+    "risk_penalty": 5
+  },
+  "fitness": {
+    "raw": 11,
+    "normalized_0_100": 22,
+    "confidence_0_1": 0.94
+  },
+  "assessment": {
+    "rationale": "This is a poor direct fit for the scenario: the simulation tests filename/path-suffix type binding in CAS, not ring forwarding or per-hop authorization behavior. It is still useful negative evidence because any hop that authorizes based on path-local suffixes can make inconsistent decisions about the same CID bytes after rename, relay, or archival movement.",
+    "strengths": [
+      "Negative-control purpose is explicit and easy to audit.",
+      "Failure is concrete: identical CID bytes can be reinterpreted under different suffixes.",
+      "Small specimen clearly exposes why local path names are not portable protocol evidence."
+    ],
+    "weaknesses": [
+      "Does not model ring breakage, hop skipping, refusal recording, or membership reconfiguration.",
+      "Conflates local storage naming with portable CAS object semantics.",
+      "Provides no promise-first authorization or refusal artifact vocabulary."
+    ],
+    "risks": [
+      "Per-hop authorization may vary by filename instead of content, causing inconsistent forward/refuse outcomes across peers.",
+      "Renames, gateways, or archive layout changes can silently alter apparent type semantics.",
+      "Audit trails become non-durable because path-local labels are not stable cross-peer evidence."
+    ],
+    "open_questions": [
+      "Could suffixes be kept only as local hints while authorization binds strictly to bytes plus explicit protocol identifiers?",
+      "What portable refusal record would a real transport design need so per-hop authorization failure stays auditable across peers?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

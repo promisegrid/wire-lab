@@ -1,0 +1,122 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-rokub-chunking-negotiated-profile-identity-spec-requirement-sections-100-year-review-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000061-SIM-rokub-chunking-negotiated-profile-identity--spec-requirement-sections-100-year-review--openai-gpt-5.4-medium",
+  "sim_id": "SIM-rokub-chunking-negotiated-profile-identity",
+  "scenario_id": "spec-requirement-sections-100-year-review",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-rokub-chunking-negotiated-profile-identity/spec-requirement-sections-100-year-review/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_a8c6841c1c9642d68a1a6cc45792c159",
+    "response_id": "resp_02265a82f70daaae006a1232a2e6548198a8237e02221b2670",
+    "input_tokens": 7516,
+    "output_tokens": 1130,
+    "cost_usd": 0.028973
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-rokub-chunking-negotiated-profile-identity/",
+    "scenario_path": "scenarios/spec-requirement-sections-100-year-review/spec-requirement-sections-100-year-review.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-rokub-chunking-negotiated-profile-identity/README.md",
+        "sha256": "cfeb2c64b5061e938cba35c3266e87af87df0679f6eaf43a97769756658b2b8c"
+      },
+      {
+        "path": "simulations/SIM-rokub-chunking-negotiated-profile-identity/QUESTION.md",
+        "sha256": "ce3d48efe724a47ca3de014bdfee99e9409e6001348dae2b89b36e82b867643a"
+      },
+      {
+        "path": "scenarios/spec-requirement-sections-100-year-review/spec-requirement-sections-100-year-review.md",
+        "sha256": "b2e71192b720372495986fad6387d0bfd5222ce78a7cfd9da03940d1a1062cd7"
+      }
+    ],
+    "simulation_tree_hash": "c3ce26f7460e9b0bbcc1d7d3e8b77abb0d296a9b5e17831ccad58324e43be3f0"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 2,
+    "auditability": 3,
+    "evolution_safety": 2,
+    "layer_boundary_clarity": 3,
+    "failure_handling": 2,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 1,
+    "risk_penalty": 4
+  },
+  "fitness": {
+    "raw": 21,
+    "normalized_0_100": 42,
+    "confidence_0_1": 0.83
+  },
+  "assessment": {
+    "rationale": "The simulation has some 100-year-review relevance because it tries to leave object-local evidence Carol can audit later, but it is not primarily a spec-section design and does not supply the concrete long-horizon requirement section the scenario pressures for. Negotiated profiles improve mixed-implementation flexibility yet introduce durable ambiguity, documentation burden, and future-reader risk unless profile identity, semantics, and failure behavior are frozen very explicitly.",
+    "strengths": [
+      "Uses peer-local promises rather than a central registry.",
+      "Object-root profile identity gives Carol some local audit evidence.",
+      "The README and question openly frame the ambiguity risk being tested."
+    ],
+    "weaknesses": [
+      "Poor direct fit to a scenario asking for required spec sections and future-reader intelligibility.",
+      "No concrete frozen spec-section structure for assumptions, migration rules, or archival interpretation.",
+      "Promise wording is partial; much of the design is still described as negotiation/features rather than explicit payload promises.",
+      "Failure behavior for unknown, stale, or conflicting profiles is under-specified."
+    ],
+    "risks": [
+      "Negotiated profiles may make identical bytes yield different roots across peer choices, undermining long-horizon intelligibility.",
+      "Future readers may see profile identifiers without enough durable semantics to reconstruct meaning after tooling and organizations change.",
+      "The simulation explicitly leaves negotiation protocol undefined, which weakens 100-year spec reviewability."
+    ],
+    "open_questions": [
+      "Would the design require a frozen long-horizon spec section that defines profile identity and mismatch handling independent of current negotiation tooling?",
+      "Can unknown or extinct chunking profiles still be interpreted safely 100 years later from object-local evidence alone?",
+      "Is negotiation necessary, or would fixed payload-level chunking promises produce more durable reviewable specs?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

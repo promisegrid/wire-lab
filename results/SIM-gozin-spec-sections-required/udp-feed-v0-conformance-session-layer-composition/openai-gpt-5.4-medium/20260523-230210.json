@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-gozin-spec-sections-required-udp-feed-v0-conformance-session-layer-composition-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000161-SIM-gozin-spec-sections-required--udp-feed-v0-conformance-session-layer-composition--openai-gpt-5.4-medium",
+  "sim_id": "SIM-gozin-spec-sections-required",
+  "scenario_id": "udp-feed-v0-conformance-session-layer-composition",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-gozin-spec-sections-required/udp-feed-v0-conformance-session-layer-composition/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_b3e3f224061a4150b00fde1b4cce8dfe",
+    "response_id": "resp_05ae592227c80374006a1233d96f548198a028e1b56e101768",
+    "input_tokens": 7493,
+    "output_tokens": 929,
+    "cost_usd": 0.02611875
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-gozin-spec-sections-required/",
+    "scenario_path": "scenarios/udp-feed-v0-conformance-session-layer-composition/udp-feed-v0-conformance-session-layer-composition.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-gozin-spec-sections-required/README.md",
+        "sha256": "ee33ac614913056db1824486380c1d6197ffe98aeefdb6b009925bcb22ca500a"
+      },
+      {
+        "path": "simulations/SIM-gozin-spec-sections-required/QUESTION.md",
+        "sha256": "2ab8c8a586d91ec7e46e58ebff30d17ffa801ba418be4c087fbc79eb0e1f5471"
+      },
+      {
+        "path": "scenarios/udp-feed-v0-conformance-session-layer-composition/udp-feed-v0-conformance-session-layer-composition.md",
+        "sha256": "69da5db705a56cd7067a653928ff8b2dc9301ef6ebfc712bd81038a65c9d352c"
+      }
+    ],
+    "simulation_tree_hash": "53bf3a7312230b2885693633632d800de388ba1cdf2b0646723f005d7b31a192"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 3,
+    "auditability": 4,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 2,
+    "failure_handling": 1,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 4,
+    "simplicity_durability": 3,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 29,
+    "normalized_0_100": 57.99999999999999,
+    "confidence_0_1": 0.8
+  },
+  "assessment": {
+    "rationale": "This simulation is a meta-spec requirement, not a concrete UDP-feed/session-layer composition design. It helps auditability by requiring consistent sections for promise wording, durability pressure, and implementation guidance, but it only indirectly addresses whether UDP-feed exposes a clean session-layer boundary. The fit is therefore partial: useful as review scaffolding, weak as direct evidence of composition sufficiency.",
+    "strengths": [
+      "Improves cross-spec auditability and reviewer consistency.",
+      "Encourages explicit promise vocabulary and 100-year pressure discussion.",
+      "Easy to implement as a spec-policy requirement."
+    ],
+    "weaknesses": [
+      "Does not directly specify the UDP-feed API or session-layer boundary.",
+      "Provides little concrete failure-handling guidance for composition leaks or binding errors.",
+      "Uniform required sections may be too generic to prove scenario-specific conformance."
+    ],
+    "risks": [
+      "Mandatory sections may become checklist boilerplate that appears to solve composition questions without adding concrete boundary promises.",
+      "A uniform requirement across all layers may overfit small protocols and obscure the minimal transport/session contract.",
+      "Reviewers may confuse template completeness with actual conformance evidence for next-layer composition."
+    ],
+    "open_questions": [
+      "Should required spec sections explicitly include layer-composition and abstraction-boundary checks, not just promise vocabulary and durability guidance?",
+      "Can a very small UDP-feed v0 spec stay compact if these sections are mandatory, or does this create boilerplate that hides the real session-layer contract?",
+      "What concrete conformance artifact would show that the next layer can compose without transport-binding leakage?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

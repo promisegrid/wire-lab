@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-votoj-peer-adoption-structured-object-transport-family-bakeoff-per-hop-authorization-failure-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000129-SIM-votoj-peer-adoption-structured-object--transport-family-bakeoff-per-hop-authorization-failure--openai-gpt-5.4-medium",
+  "sim_id": "SIM-votoj-peer-adoption-structured-object",
+  "scenario_id": "transport-family-bakeoff-per-hop-authorization-failure",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-votoj-peer-adoption-structured-object/transport-family-bakeoff-per-hop-authorization-failure/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_4337615c6cbf4ea1a337cc96064c11af",
+    "response_id": "resp_09932aef78c3b023006a1233745e68819a8ccbbfa65a6668b5",
+    "input_tokens": 7533,
+    "output_tokens": 1005,
+    "cost_usd": 0.02725275
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-votoj-peer-adoption-structured-object/",
+    "scenario_path": "scenarios/transport-family-bakeoff-per-hop-authorization-failure/transport-family-bakeoff-per-hop-authorization-failure.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-votoj-peer-adoption-structured-object/README.md",
+        "sha256": "06f14d972a3ec8332d7baff995dd35169c670f09022747c884261b2191e8850c"
+      },
+      {
+        "path": "simulations/SIM-votoj-peer-adoption-structured-object/QUESTION.md",
+        "sha256": "a7cc3078a66e739a146030782a1b6f269647565f29e74289b17418cb28d7b01d"
+      },
+      {
+        "path": "scenarios/transport-family-bakeoff-per-hop-authorization-failure/transport-family-bakeoff-per-hop-authorization-failure.md",
+        "sha256": "f938e10ab88db666d3097a2f97c1667bbbc6e8e071681134049068982cc39cf2"
+      }
+    ],
+    "simulation_tree_hash": "adb3592995211962b89e86ffc4b78d8012af31efec475fd0649ce63a78a74238"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 3,
+    "auditability": 4,
+    "evolution_safety": 2,
+    "layer_boundary_clarity": 2,
+    "failure_handling": 1,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 3,
+    "simplicity_durability": 2,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 24,
+    "normalized_0_100": 48,
+    "confidence_0_1": 0.87
+  },
+  "assessment": {
+    "rationale": "The simulation gives a structured, content-addressed record of a peer's claimed spec adoption, which helps audit who promised what. But the scenario asks about per-hop authorization failure in ring transport behavior, and this simulation does not define forwarding, refusal, skip-hop, membership reconfiguration, or ring failure semantics. It is therefore only weakly applicable as indirect governance/audit support rather than a direct scenario answer.",
+    "strengths": [
+      "Clearer audit trail for claimed spec pCID and open-question answers.",
+      "Content-addressed object supports later verification by other peers.",
+      "Implementation concept is plausible and concrete enough to test."
+    ],
+    "weaknesses": [
+      "Does not model per-hop authorization decisions or refusals.",
+      "Does not explain whether the ring breaks, skips a hop, or reconfigures membership.",
+      "Object-centric framing is heavier and less direct than a small payload promise."
+    ],
+    "risks": [
+      "A structured adoption object can grow into a heavy metadata wrapper detached from actual transport behavior.",
+      "Peers may mistake proof of adoption intent for proof of per-hop authorization or runtime compliance.",
+      "Schema and signature details could add migration burden without resolving ring failure semantics."
+    ],
+    "open_questions": [
+      "Can the adoption object express per-hop forwarding authorization or refusal without becoming a transport-layer wrapper?",
+      "What local evidence would Bob and Carol retain when Bob is unauthorized to forward but still adopts the transport spec?",
+      "Can schema evolution preserve durable verification of old adoption objects across long-lived transport families?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

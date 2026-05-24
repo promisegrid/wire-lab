@@ -1,0 +1,159 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-vuliv-scoped-promise-evidence-records-promise-accounting-records-refused-service-openai-gpt-5.4-medium-20260524-032521",
+  "run_group_id": "ga-canary-20260523-pt-gate-v3-successors",
+  "cell_id": "ga-canary-20260523-pt-gate-v3-successors-000051-SIM-vuliv-scoped-promise-evidence-records--promise-accounting-records-refused-service--openai-gpt-5.4-medium",
+  "sim_id": "SIM-vuliv-scoped-promise-evidence-records",
+  "scenario_id": "promise-accounting-records-refused-service",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260524-032521",
+  "result_path": "results/SIM-vuliv-scoped-promise-evidence-records/promise-accounting-records-refused-service/openai-gpt-5.4-medium/20260524-032521.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_4cde9cc31b5645ccb8461df60b28b2f9",
+    "response_id": "resp_06a3c8ab15388d93006a1270b604d0819ba8023450cc726dea",
+    "input_tokens": 8273,
+    "output_tokens": 1218,
+    "cost_usd": 0.03152975
+  },
+  "source": {
+    "repo_commit": "925c7f5c1c7ce7d5b0caf6a924d40d3f9b7d0483",
+    "sim_path": "simulations/SIM-vuliv-scoped-promise-evidence-records/",
+    "scenario_path": "scenarios/promise-accounting-records-refused-service/promise-accounting-records-refused-service.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-vuliv-scoped-promise-evidence-records/README.md",
+        "sha256": "e9becc2e87d9697aa51f2af9687c8e2ce176d637e96cce30813935941147ed96"
+      },
+      {
+        "path": "simulations/SIM-vuliv-scoped-promise-evidence-records/QUESTION.md",
+        "sha256": "e4f7afe8b326a37726f537ef37479983fcc898321c922ee2a9a9b28cdecd0a35"
+      },
+      {
+        "path": "scenarios/promise-accounting-records-refused-service/promise-accounting-records-refused-service.md",
+        "sha256": "9a7d47455793988cfb9b0fb045b29086ed13ee22cd0db080584e259c0aa69313"
+      }
+    ],
+    "simulation_tree_hash": "dad6e690288069f76dfec0e42facc6bd24c63b8ffe555e70b2edbc05959b1c35"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 5,
+    "promisegrid_alignment": 5,
+    "auditability": 5,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 5,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 5,
+    "simplicity_durability": 4,
+    "risk_penalty": 1
+  },
+  "fitness": {
+    "raw": 46,
+    "normalized_0_100": 92,
+    "confidence_0_1": 0.9
+  },
+  "assessment": {
+    "rationale": "Strong fit. The simulation directly models refusal as a first-class observed outcome alongside keep, break, retry, and timeout, which matches the scenario pressure and stays promise-first. It also cleanly separates durable evidence from authority artifacts, improving auditability and local trust assessment. Main limits are underspecified refusal encoding and the lack of a settled minimal envelope.",
+    "strengths": [
+      "Directly includes refusal as a distinct observed record type rather than misbehavior by default.",
+      "Uses promise, reference, and observed-outcome artifacts instead of claim-card or authority framing.",
+      "Supports durable later audit of local trust decisions with small scoped evidence."
+    ],
+    "weaknesses": [
+      "Does not yet define the minimal interoperable record shape for refusal evidence.",
+      "Policy, cost, and authorization reasons for refusal may be recorded unevenly across implementations."
+    ],
+    "risks": [
+      "If refusal categories are left too loose, different apps may collapse honest refusal back into generic failure.",
+      "Without a compact common linking pattern, cross-peer audit trails may become inconsistent."
+    ],
+    "open_questions": [
+      "What minimal durable schema is needed to distinguish refusal, timeout, policy denial, and corruption without reintroducing heavyweight envelopes?",
+      "How should observers link a refusal record to the original scoped promise and relevant policy context while keeping artifacts small and durable?"
+    ],
+    "authority_boundary": "Evidence only; informs local trust and audit decisions, not global authority or final PromiseGrid design.",
+    "pt_gate": {
+      "status": "pt_clean",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "Promisers publish their own scoped promises, and peers independently record observations such as refusal or timeout."
+      },
+      "scoped_intent": {
+        "status": "pass",
+        "note": "The simulation centers small scoped promise records naming boundary and intended behavior."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "Observers record what they saw rather than making promises on behalf of another agent."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "Observed keep, break, refusal, retry, and timeout are recorded as outcomes distinct from the original promise."
+      },
+      "local_trust_assessment": {
+        "status": "pass",
+        "note": "The design explicitly treats later trust as a peer-local judgment based on published evidence objects."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "Promise references and evidence records support local interpretation; they do not impose obligations or convert receipt/use into commanded behavior."
+      },
+      "violations": []
+    }
+  }
+}

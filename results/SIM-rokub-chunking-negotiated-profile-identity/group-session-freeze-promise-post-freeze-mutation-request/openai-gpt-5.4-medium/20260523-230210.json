@@ -1,0 +1,122 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-rokub-chunking-negotiated-profile-identity-group-session-freeze-promise-post-freeze-mutation-request-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000062-SIM-rokub-chunking-negotiated-profile-identity--group-session-freeze-promise-post-freeze-mutation-request--openai-gpt-5.4-medium",
+  "sim_id": "SIM-rokub-chunking-negotiated-profile-identity",
+  "scenario_id": "group-session-freeze-promise-post-freeze-mutation-request",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-rokub-chunking-negotiated-profile-identity/group-session-freeze-promise-post-freeze-mutation-request/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_f33d04a8c9374f86b616e4341ba8bf49",
+    "response_id": "resp_046c77496f9ecbbf006a1232a912f48198b8d6120f5d7f01c8",
+    "input_tokens": 7523,
+    "output_tokens": 1334,
+    "cost_usd": 0.03184125
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-rokub-chunking-negotiated-profile-identity/",
+    "scenario_path": "scenarios/group-session-freeze-promise-post-freeze-mutation-request/group-session-freeze-promise-post-freeze-mutation-request.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-rokub-chunking-negotiated-profile-identity/README.md",
+        "sha256": "cfeb2c64b5061e938cba35c3266e87af87df0679f6eaf43a97769756658b2b8c"
+      },
+      {
+        "path": "simulations/SIM-rokub-chunking-negotiated-profile-identity/QUESTION.md",
+        "sha256": "ce3d48efe724a47ca3de014bdfee99e9409e6001348dae2b89b36e82b867643a"
+      },
+      {
+        "path": "scenarios/group-session-freeze-promise-post-freeze-mutation-request/group-session-freeze-promise-post-freeze-mutation-request.md",
+        "sha256": "9083e149d879dcf5890bbcc3d3bb2fcf87b4490ba1878e59a73402bd5312ee52"
+      }
+    ],
+    "simulation_tree_hash": "c3ce26f7460e9b0bbcc1d7d3e8b77abb0d296a9b5e17831ccad58324e43be3f0"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 2,
+    "auditability": 4,
+    "evolution_safety": 2,
+    "layer_boundary_clarity": 3,
+    "failure_handling": 2,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 1,
+    "simplicity_durability": 2,
+    "risk_penalty": 4
+  },
+  "fitness": {
+    "raw": 23,
+    "normalized_0_100": 46,
+    "confidence_0_1": 0.79
+  },
+  "assessment": {
+    "rationale": "This simulation is only a partial fit for the post-freeze mutation scenario. It usefully shows that chunking-profile choices affect object identity and that profile identity should be recorded so Carol can audit mismatches locally. That supports a likely conclusion that post-freeze profile changes must create new lineage rather than mutate frozen history. But the simulation does not define freeze semantics, supersession rules, amendment rules, or a durable negotiation protocol, so it cannot fully answer the scenario on its own.",
+    "strengths": [
+      "Explicitly records profile identity in the object root, improving later auditability.",
+      "Makes profile mismatch observable to peers without requiring global state.",
+      "Implementation concept is concrete enough to test mixed-implementation behavior."
+    ],
+    "weaknesses": [
+      "Does not model group-session freeze, amendment, or superseding lineage directly.",
+      "Leaves the negotiation protocol undefined, which weakens evolution safety.",
+      "Uses profile negotiation/support language more than promise-first payload promises.",
+      "Adds flexibility and metadata complexity that may reduce long-term simplicity and durability."
+    ],
+    "risks": [
+      "Negotiated profiles can let the same bytes produce incompatible roots under different peer choices.",
+      "Profile negotiation without a frozen durable naming scheme may age poorly over long horizons.",
+      "Peers may detect mismatches but still lack a clear recovery or supersession path after freeze."
+    ],
+    "open_questions": [
+      "If a chunking-profile change is requested after freeze, must the design always mint a new specimen/root lineage rather than amend prior frozen identity?",
+      "What durable artifact names the negotiated profile so later auditors can still interpret it after implementations and organizations change?",
+      "Can negotiation be constrained enough that the same bytes do not acquire avoidably divergent identities across peers?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

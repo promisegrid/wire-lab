@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-gujiv-conditional-release-hybrid-reference-graph-peer-adoption-metadata-spec-answer-vocabulary-drift-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000095-SIM-gujiv-conditional-release-hybrid-reference-graph--peer-adoption-metadata-spec-answer-vocabulary-drift--openai-gpt-5.4-medium",
+  "sim_id": "SIM-gujiv-conditional-release-hybrid-reference-graph",
+  "scenario_id": "peer-adoption-metadata-spec-answer-vocabulary-drift",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-gujiv-conditional-release-hybrid-reference-graph/peer-adoption-metadata-spec-answer-vocabulary-drift/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_3c07218ec1a544a399ab32ea202f620c",
+    "response_id": "resp_0544a6ea0a608689006a12330ece5c81998b854f51a2465989",
+    "input_tokens": 7538,
+    "output_tokens": 1280,
+    "cost_usd": 0.0311115
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-gujiv-conditional-release-hybrid-reference-graph/",
+    "scenario_path": "scenarios/peer-adoption-metadata-spec-answer-vocabulary-drift/peer-adoption-metadata-spec-answer-vocabulary-drift.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-gujiv-conditional-release-hybrid-reference-graph/README.md",
+        "sha256": "03247c8a2a06b2a8c3928b5e3ebf5e8ec82d683558f04b551ba936c880caf1f9"
+      },
+      {
+        "path": "simulations/SIM-gujiv-conditional-release-hybrid-reference-graph/QUESTION.md",
+        "sha256": "c9ffd03808d1cbc2c8ecd1ea86828b900e9543798f69d99e2d0327c9d7e695c5"
+      },
+      {
+        "path": "scenarios/peer-adoption-metadata-spec-answer-vocabulary-drift/peer-adoption-metadata-spec-answer-vocabulary-drift.md",
+        "sha256": "a9e8ba84995e69fcad36f2554442cc62c5e1128ea0818197cb7ebf66e843ff53"
+      }
+    ],
+    "simulation_tree_hash": "bfaaa00c0154723abdec6de204c1fc67d79012cf94e8e62b83667423be99cb22"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 4,
+    "auditability": 3,
+    "evolution_safety": 2,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 3,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 4,
+    "simplicity_durability": 2,
+    "risk_penalty": 4
+  },
+  "fitness": {
+    "raw": 29,
+    "normalized_0_100": 57.99999999999999,
+    "confidence_0_1": 0.75
+  },
+  "assessment": {
+    "rationale": "The simulation is strong on layer separation and promise-first release semantics, but it is a weak direct fit for a scenario about adoption-metadata answer-key drift under frozen spec evolution. Stable lower-layer references and local evidence help somewhat with evolution and audit, yet the design does not explain how spec-local answers, renamed keys, or migration mappings stay unambiguous over time.",
+    "strengths": [
+      "Clear group-layer vs lower-layer boundary is the core design intent.",
+      "Uses promise-first language around release promises and local evidence.",
+      "Stable references and refusal/preservation hooks support peer-local audit."
+    ],
+    "weaknesses": [
+      "Does not directly model adoption metadata or answer-key naming strategy.",
+      "Provides no explicit migration mechanism for renamed or removed spec questions.",
+      "Reference-graph complexity is less durable than a small explicit spec-local payload artifact."
+    ],
+    "risks": [
+      "Referenced conditions may remain syntactically stable while their human meaning drifts across spec revisions.",
+      "Unsettled graph object modeling increases ambiguity for long-term audit and migration.",
+      "Peers may need extra out-of-band mapping logic to interpret old answer vocabularies after spec supersession."
+    ],
+    "open_questions": [
+      "Can condition CIDs or graph references be bound to spec-versioned answer vocabularies without central naming?",
+      "What migration record shape would preserve meaning when a referenced question is renamed or removed?",
+      "Does the unresolved graph object model permit durable peer-local interpretation across frozen spec revisions?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

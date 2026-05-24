@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-tuhas-group-session-two-surface-freeze-gate-cas-object-type-binding-bakeoff-unknown-typed-object-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000190-SIM-tuhas-group-session-two-surface-freeze-gate--cas-object-type-binding-bakeoff-unknown-typed-object--openai-gpt-5.4-medium",
+  "sim_id": "SIM-tuhas-group-session-two-surface-freeze-gate",
+  "scenario_id": "cas-object-type-binding-bakeoff-unknown-typed-object",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-tuhas-group-session-two-surface-freeze-gate/cas-object-type-binding-bakeoff-unknown-typed-object/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_3ab82a89cc21416c94091aa47dfe12e1",
+    "response_id": "resp_02c86e1e47be93d0006a12342fe93c8198a720077d19f473e1",
+    "input_tokens": 7540,
+    "output_tokens": 891,
+    "cost_usd": 0.025669
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-tuhas-group-session-two-surface-freeze-gate/",
+    "scenario_path": "scenarios/cas-object-type-binding-bakeoff-unknown-typed-object/cas-object-type-binding-bakeoff-unknown-typed-object.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-tuhas-group-session-two-surface-freeze-gate/README.md",
+        "sha256": "e43f0b558a84df77949d02ecc1b3935ed88b960c004389aa25dbd5bbcf210d9d"
+      },
+      {
+        "path": "simulations/SIM-tuhas-group-session-two-surface-freeze-gate/QUESTION.md",
+        "sha256": "941b2f5c4cddf2e0e09049946ae9eea7a18729897d9f17752f75227383d77764"
+      },
+      {
+        "path": "scenarios/cas-object-type-binding-bakeoff-unknown-typed-object/cas-object-type-binding-bakeoff-unknown-typed-object.md",
+        "sha256": "76f0a7016fa2bad5e53903682706bca4eeb4aa2d099311a4ea52b7280748cf90"
+      }
+    ],
+    "simulation_tree_hash": "922fe155f0556c2815948fc7c7d60c4110e7e227d2cb2af2ab330e76d35c3f57"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 4,
+    "auditability": 3,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 2,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 4,
+    "simplicity_durability": 3,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 34,
+    "normalized_0_100": 68,
+    "confidence_0_1": 0.82
+  },
+  "assessment": {
+    "rationale": "This simulation is only an indirect fit for unknown typed objects. Its main contribution is clearer separation between transport/feed handling and group-session semantics, which helps a peer treat an unknown object opaquely without accidentally claiming semantic understanding. That separation is useful for mixed-version durability and layer discipline, but the simulation does not directly specify unknown-codec storage, forwarding, or safe rejection behavior.",
+    "strengths": [
+      "Strong layer separation between outer/feed and session semantics.",
+      "Good evolution story for mixed-version networks when semantics change independently.",
+      "Promise-oriented framing around separate freeze and merge promises."
+    ],
+    "weaknesses": [
+      "Does not directly define type-binding rules for unknown codecs.",
+      "Failure handling for unsupported object types is underspecified.",
+      "Scenario coverage depends on inferred layering benefits rather than explicit artifact behavior."
+    ],
+    "risks": [
+      "Unknown-type behavior may remain implicit, leading peers to parse or reject inconsistently.",
+      "Two freeze surfaces can add coordination overhead and ambiguous merge states.",
+      "A design may appear layer-clean while still lacking concrete opaque-forwarding promises."
+    ],
+    "open_questions": [
+      "Does the outer/feed surface explicitly promise opaque store/advertise/forward behavior for unknown codecs?",
+      "What local evidence records show Dave refused parsing while still preserving the CID safely?",
+      "How are merge promises validated when one surface understands a type and another does not?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

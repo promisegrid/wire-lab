@@ -1,0 +1,122 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-numop-transport-gossip-spec-requirement-sections-100-year-review-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000117-SIM-numop-transport-gossip--spec-requirement-sections-100-year-review--openai-gpt-5.4-medium",
+  "sim_id": "SIM-numop-transport-gossip",
+  "scenario_id": "spec-requirement-sections-100-year-review",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-numop-transport-gossip/spec-requirement-sections-100-year-review/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_2c4a2135aef54effad02f2991e736edf",
+    "response_id": "resp_064fd636e6f921eb006a123351a320819bad8896234ad35f58",
+    "input_tokens": 7484,
+    "output_tokens": 1079,
+    "cost_usd": 0.028203
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-numop-transport-gossip/",
+    "scenario_path": "scenarios/spec-requirement-sections-100-year-review/spec-requirement-sections-100-year-review.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-numop-transport-gossip/README.md",
+        "sha256": "d212deb1b4924acea94877b821f5fbdb8947dce1e5ddcb352df77c1e98737cdf"
+      },
+      {
+        "path": "simulations/SIM-numop-transport-gossip/QUESTION.md",
+        "sha256": "d266b46d0dde882de3bd7df76ee20e8021d3c44d9f427fbcafff09dd3b16365b"
+      },
+      {
+        "path": "scenarios/spec-requirement-sections-100-year-review/spec-requirement-sections-100-year-review.md",
+        "sha256": "b2e71192b720372495986fad6387d0bfd5222ce78a7cfd9da03940d1a1062cd7"
+      }
+    ],
+    "simulation_tree_hash": "b127e7ce2ae9b23ee24e459fdce3fd3aaae78323fad68ffb2ec6b2f5bcef155c"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 4,
+    "auditability": 2,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 3,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 3,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 28,
+    "normalized_0_100": 56.00000000000001,
+    "confidence_0_1": 0.72
+  },
+  "assessment": {
+    "rationale": "This simulation is a weak direct fit for a spec-section review scenario because it proposes a transport family rather than a concrete required long-horizon specification section. It does, however, align with PromiseGrid goals around sparse knowledge, decentralization, and offline tolerance. Its main weakness under this scenario is auditability over very long time horizons: gossip convergence and duplicate suppression are operationally plausible, but the preserved evidence future readers would need is not yet made explicit.",
+    "strengths": [
+      "Good alignment with sparse-knowledge and no-central-authority goals.",
+      "Clear transport-family boundary: it tests gossip as a candidate without claiming full protocol finality.",
+      "Implementation direction is plausible for offline tolerance and eventual convergence."
+    ],
+    "weaknesses": [
+      "Poor direct fit to a scenario asking whether a required long-horizon spec section preserves assumptions for future readers.",
+      "Audit trail for advertised, requested, relayed, and suppressed messages is only partially defined.",
+      "Promise wording is present but not yet strongly payload-first or spec-anchor-first.",
+      "Long-term durable artifact shape is not specified."
+    ],
+    "risks": [
+      "Future readers may not be able to distinguish promised relay behavior from probabilistic eventual convergence claims.",
+      "A gossip design can hide failure and non-delivery behind incomplete local views unless evidence records are specified precisely.",
+      "Because the simulation does not define the final protocol or spec-section home, long-horizon intelligibility may remain underspecified."
+    ],
+    "open_questions": [
+      "Should a 100-year-required spec section explicitly define what gossip peers can locally prove versus only probabilistically infer?",
+      "What durable artifact shape would let future readers understand advertisement, request, relay, and suppression promises without relying on current tooling or protocol folklore?",
+      "Does this transport family need a frozen long-horizon vocabulary for convergence evidence and failure records?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

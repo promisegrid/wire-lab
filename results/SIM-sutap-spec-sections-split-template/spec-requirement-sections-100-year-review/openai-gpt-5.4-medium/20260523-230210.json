@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-sutap-spec-sections-split-template-spec-requirement-sections-100-year-review-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000180-SIM-sutap-spec-sections-split-template--spec-requirement-sections-100-year-review--openai-gpt-5.4-medium",
+  "sim_id": "SIM-sutap-spec-sections-split-template",
+  "scenario_id": "spec-requirement-sections-100-year-review",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-sutap-spec-sections-split-template/spec-requirement-sections-100-year-review/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_ec25a33992a24922a6aaf9f5efe86afe",
+    "response_id": "resp_0f8165553a8d31d2006a123412cd80819bb93e32ec4fb5aa31",
+    "input_tokens": 7502,
+    "output_tokens": 941,
+    "cost_usd": 0.0263025
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-sutap-spec-sections-split-template/",
+    "scenario_path": "scenarios/spec-requirement-sections-100-year-review/spec-requirement-sections-100-year-review.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-sutap-spec-sections-split-template/README.md",
+        "sha256": "6ea42ce84be4770e4e100e0fcf9ca2d6cef76bfdcf7558040f33907b22c367b7"
+      },
+      {
+        "path": "simulations/SIM-sutap-spec-sections-split-template/QUESTION.md",
+        "sha256": "224cb421f142b72082ecfcaa79627a831538b92231e06f885d13b688673fc85a"
+      },
+      {
+        "path": "scenarios/spec-requirement-sections-100-year-review/spec-requirement-sections-100-year-review.md",
+        "sha256": "b2e71192b720372495986fad6387d0bfd5222ce78a7cfd9da03940d1a1062cd7"
+      }
+    ],
+    "simulation_tree_hash": "7d2ed975444e7dd1a0a27e8dd1d6f4055a8b84e22175a957a8c981fb1f413dc8"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 4,
+    "promisegrid_alignment": 4,
+    "auditability": 4,
+    "evolution_safety": 5,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 2,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 3,
+    "simplicity_durability": 4,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 38,
+    "normalized_0_100": 76,
+    "confidence_0_1": 0.84
+  },
+  "assessment": {
+    "rationale": "The split-template design fits the scenario well because it explicitly separates compact pCID-owned normative hooks from longer explanatory prose, which improves boundary clarity and evolution safety. It supports long-horizon review by keeping the required protocol surface small and stable while allowing mental-model documents to evolve. The main weakness is that the scenario specifically pressures preservation of future-reader assumptions, and this simulation does not yet define a concrete durable home or audit rule for those assumptions when companion prose changes or disappears.",
+    "strengths": [
+      "Clear normative vs companion-doc boundary.",
+      "Strong evolution story: explanatory prose can change without changing the protocol promise.",
+      "Compact required hooks support durable, auditable long-term review artifacts."
+    ],
+    "weaknesses": [
+      "No explicit failure-mode treatment for stale or absent companion docs.",
+      "Promise-first wording is present but still secondary to spec-template framing.",
+      "The required 100-year review content is not yet pinned to a concrete mandatory section shape."
+    ],
+    "risks": [
+      "Future readers may lose critical assumptions if they live mainly in non-normative companion documents.",
+      "Normative and explanatory documents may drift, reducing long-term auditability.",
+      "The design does not yet show explicit handling for missing, stale, or contradictory companion prose."
+    ],
+    "open_questions": [
+      "Should the 100-year assumptions section be normative inside the pCID-owned spec or only referenced from companion prose?",
+      "How is drift between compact normative hooks and evolving explanatory companions detected and audited over time?",
+      "What minimum long-horizon review checklist must remain in the normative surface to survive host, tooling, and social change?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

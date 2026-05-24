@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-sutap-spec-sections-split-template-transport-family-bakeoff-per-hop-authorization-failure-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000178-SIM-sutap-spec-sections-split-template--transport-family-bakeoff-per-hop-authorization-failure--openai-gpt-5.4-medium",
+  "sim_id": "SIM-sutap-spec-sections-split-template",
+  "scenario_id": "transport-family-bakeoff-per-hop-authorization-failure",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-sutap-spec-sections-split-template/transport-family-bakeoff-per-hop-authorization-failure/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_0383ff14042f46679855ea8466fce7f9",
+    "response_id": "resp_005eae1f289d613a006a12340b361c819b8bda5a0d0a880771",
+    "input_tokens": 7511,
+    "output_tokens": 1111,
+    "cost_usd": 0.02869825
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-sutap-spec-sections-split-template/",
+    "scenario_path": "scenarios/transport-family-bakeoff-per-hop-authorization-failure/transport-family-bakeoff-per-hop-authorization-failure.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-sutap-spec-sections-split-template/README.md",
+        "sha256": "6ea42ce84be4770e4e100e0fcf9ca2d6cef76bfdcf7558040f33907b22c367b7"
+      },
+      {
+        "path": "simulations/SIM-sutap-spec-sections-split-template/QUESTION.md",
+        "sha256": "224cb421f142b72082ecfcaa79627a831538b92231e06f885d13b688673fc85a"
+      },
+      {
+        "path": "scenarios/transport-family-bakeoff-per-hop-authorization-failure/transport-family-bakeoff-per-hop-authorization-failure.md",
+        "sha256": "f938e10ab88db666d3097a2f97c1667bbbc6e8e071681134049068982cc39cf2"
+      }
+    ],
+    "simulation_tree_hash": "7d2ed975444e7dd1a0a27e8dd1d6f4055a8b84e22175a957a8c981fb1f413dc8"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 3,
+    "auditability": 4,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 1,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 4,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 29,
+    "normalized_0_100": 57.99999999999999,
+    "confidence_0_1": 0.85
+  },
+  "assessment": {
+    "rationale": "This simulation is mainly about spec-document structure, not transport behavior, so it fits the scenario weakly. Its main value here is that a compact normative surface plus separate explanatory prose could improve auditability and evolution safety if failure semantics are explicitly required. But the candidate does not itself define per-hop authorization handling, so it leaves the scenario's core pressure unresolved.",
+    "strengths": [
+      "Clear separation between normative protocol hooks and evolving explanatory prose.",
+      "Good durability/evolution story for long-lived specs.",
+      "Compact artifacts are plausible and auditable if the required hooks are explicit."
+    ],
+    "weaknesses": [
+      "Does not directly model ring forwarding or per-hop authorization failure outcomes.",
+      "Promise-first wording is only partial and remains template-level rather than actor/payload-level.",
+      "Failure handling for the scenario is mostly deferred to whatever future transport spec uses the template."
+    ],
+    "risks": [
+      "A split template may omit or under-specify critical authorization-failure behavior in the normative section.",
+      "Companion prose could drift from the pCID-owned hooks and confuse implementers about actual failure obligations.",
+      "Transport comparisons become hard if different specs use the template but encode failure semantics with inconsistent precision."
+    ],
+    "open_questions": [
+      "Can the split template require an explicit failure-semantics section for per-hop authorization cases without bloating the pCID-owned surface?",
+      "How would Alice or Carol audit Bob's refusal locally if the normative hooks stay very compact?",
+      "Does the template force transport specs to distinguish break-ring, skip-hop, refusal-record, and membership-reconfiguration outcomes?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

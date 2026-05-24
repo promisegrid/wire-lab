@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-gujav-chunking-descriptor-cid-identity-group-session-freeze-promise-post-freeze-mutation-request-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000055-SIM-gujav-chunking-descriptor-cid-identity--group-session-freeze-promise-post-freeze-mutation-request--openai-gpt-5.4-medium",
+  "sim_id": "SIM-gujav-chunking-descriptor-cid-identity",
+  "scenario_id": "group-session-freeze-promise-post-freeze-mutation-request",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-gujav-chunking-descriptor-cid-identity/group-session-freeze-promise-post-freeze-mutation-request/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_2a43bfefec7545f58ff2ef2aa89f1384",
+    "response_id": "resp_02a19f48e770a376006a12329322a08199afc1309380bf25b7",
+    "input_tokens": 7534,
+    "output_tokens": 942,
+    "cost_usd": 0.0263725
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-gujav-chunking-descriptor-cid-identity/",
+    "scenario_path": "scenarios/group-session-freeze-promise-post-freeze-mutation-request/group-session-freeze-promise-post-freeze-mutation-request.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-gujav-chunking-descriptor-cid-identity/README.md",
+        "sha256": "e305f4539f80b3ebf13efdf3ac7e5546a24bfb4f3f2b933ba5314ee8da45d04b"
+      },
+      {
+        "path": "simulations/SIM-gujav-chunking-descriptor-cid-identity/QUESTION.md",
+        "sha256": "4ce300a0089546c059324a77048602a2a11d6ee7da9726dd6f626491d2e9022b"
+      },
+      {
+        "path": "scenarios/group-session-freeze-promise-post-freeze-mutation-request/group-session-freeze-promise-post-freeze-mutation-request.md",
+        "sha256": "9083e149d879dcf5890bbcc3d3bb2fcf87b4490ba1878e59a73402bd5312ee52"
+      }
+    ],
+    "simulation_tree_hash": "15d243cabdef61ba22264cb689324663680bcab3609423fe91b7c7667b8025f2"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 3,
+    "auditability": 4,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 1,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 3,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 29,
+    "normalized_0_100": 57.99999999999999,
+    "confidence_0_1": 0.82
+  },
+  "assessment": {
+    "rationale": "The simulation is only an indirect fit for a group-session freeze scenario, but it does offer a clear way to express post-freeze chunking changes as new immutable artifacts rather than mutation of history. Its main value here is migration/evolution safety through explicit chunking descriptors. Its weakness is that it does not define freeze lineage, amendment rules, or post-freeze failure behavior directly.",
+    "strengths": [
+      "Explicit descriptor objects make chunking changes auditable instead of implicit.",
+      "Supports evolution by letting new chunking rules appear as new immutable descriptors.",
+      "Keeps chunking concerns somewhat separated from higher-level payload identity."
+    ],
+    "weaknesses": [
+      "Does not directly model group-session freeze semantics or lineage decisions.",
+      "Failure handling for disputed or missing post-freeze descriptor references is unspecified.",
+      "Wording is not strongly promise-first and leaves promise boundaries implicit."
+    ],
+    "risks": [
+      "A separate descriptor CID may weaken object identity clarity if readers cannot tell whether descriptor changes require a new specimen or only a new reference.",
+      "Extra indirection may create durable audit gaps when descriptor objects are unavailable or interpreted differently later.",
+      "The design may invite layer confusion between payload identity, protocol promises, and chunking mechanics."
+    ],
+    "open_questions": [
+      "If chunking parameters change after freeze, does the old object stay authoritative while a new specimen or superseding pCID carries the new descriptor?",
+      "Should the descriptor CID be part of the frozen identity envelope or only referenced as supporting evidence?",
+      "How do peers audit post-freeze mutation requests when descriptor references are missing, stale, or disputed?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

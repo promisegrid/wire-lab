@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-lofij-peer-adoption-hybrid-pointer-peer-adoption-metadata-spec-answer-vocabulary-drift-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000151-SIM-lofij-peer-adoption-hybrid-pointer--peer-adoption-metadata-spec-answer-vocabulary-drift--openai-gpt-5.4-medium",
+  "sim_id": "SIM-lofij-peer-adoption-hybrid-pointer",
+  "scenario_id": "peer-adoption-metadata-spec-answer-vocabulary-drift",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-lofij-peer-adoption-hybrid-pointer/peer-adoption-metadata-spec-answer-vocabulary-drift/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_47489e07fc28444cacaf51d4ddacce3a",
+    "response_id": "resp_0db227239d413f1f006a1233bb0e0c819bb38a108a70952add",
+    "input_tokens": 7519,
+    "output_tokens": 1197,
+    "cost_usd": 0.02991625
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-lofij-peer-adoption-hybrid-pointer/",
+    "scenario_path": "scenarios/peer-adoption-metadata-spec-answer-vocabulary-drift/peer-adoption-metadata-spec-answer-vocabulary-drift.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-lofij-peer-adoption-hybrid-pointer/README.md",
+        "sha256": "577bbdf30e1ac5eb5d84c8b7c202449b8f5a04da94f7f44b8f062116ebb9ae79"
+      },
+      {
+        "path": "simulations/SIM-lofij-peer-adoption-hybrid-pointer/QUESTION.md",
+        "sha256": "03c6ced9337309eae8fd87691ea8a6de917340b9a341040344ca4e98cde075e8"
+      },
+      {
+        "path": "scenarios/peer-adoption-metadata-spec-answer-vocabulary-drift/peer-adoption-metadata-spec-answer-vocabulary-drift.md",
+        "sha256": "a9e8ba84995e69fcad36f2554442cc62c5e1128ea0818197cb7ebf66e843ff53"
+      }
+    ],
+    "simulation_tree_hash": "412e7ab674cb54201689072610a695ea0e8772f4e95597d7f7bc312af9c30d1d"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 4,
+    "promisegrid_alignment": 4,
+    "auditability": 3,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 2,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 3,
+    "simplicity_durability": 4,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 34,
+    "normalized_0_100": 68,
+    "confidence_0_1": 0.77
+  },
+  "assessment": {
+    "rationale": "The hybrid pointer fits the scenario because it separates a compact adoption promise from richer answer metadata, letting old claims stay pinned to a specific spec pCID while optional detail evolves. That helps durability and small-device use. But the simulation does not define how answer vocabulary is scoped or migrated across spec revisions, so renamed or removed fields like Q9 can still become ambiguous unless the richer object carries explicit spec-local bindings or migration mappings.",
+    "strengths": [
+      "Compact promise explicitly names the spec pCID.",
+      "Optional richer object gives a place for answer bindings, scope, freshness, and signatures.",
+      "Clear small-core plus extensible-detail structure is durable and implementation-friendly."
+    ],
+    "weaknesses": [
+      "No explicit migration scheme for renamed or removed answer keys.",
+      "Mandatory versus optional fields are intentionally undecided.",
+      "Failure behavior for missing or stale pointer targets is underspecified."
+    ],
+    "risks": [
+      "Vocabulary drift may move ambiguity into the optional richer object instead of resolving it.",
+      "Audit and verification can fail if the pointer target is unavailable or no longer preserved.",
+      "Different peers may encode answer bindings differently unless the richer object shape is tightly specified."
+    ],
+    "open_questions": [
+      "Are answer keys explicitly spec-local and pinned by the referenced spec pCID, or can the richer object introduce profile-local names?",
+      "What migration record or alias mechanism preserves meaning when Q9 is renamed or removed in a later spec?",
+      "What should Alice conclude if the richer pointer is missing, stale, or unreachable?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

@@ -1,0 +1,123 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-vopit-transport-receipts-at-scale-conditional-release-geofencing-replay-outside-conditions-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000121-SIM-vopit-transport-receipts-at-scale--conditional-release-geofencing-replay-outside-conditions--openai-gpt-5.4-medium",
+  "sim_id": "SIM-vopit-transport-receipts-at-scale",
+  "scenario_id": "conditional-release-geofencing-replay-outside-conditions",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-vopit-transport-receipts-at-scale/conditional-release-geofencing-replay-outside-conditions/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_bf2572d9e9c549be867f8b17db369b33",
+    "response_id": "resp_0dc4ff9340158873006a12335a6b0c819b933634eca53dad73",
+    "input_tokens": 7513,
+    "output_tokens": 1682,
+    "cost_usd": 0.03669575
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-vopit-transport-receipts-at-scale/",
+    "scenario_path": "scenarios/conditional-release-geofencing-replay-outside-conditions/conditional-release-geofencing-replay-outside-conditions.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-vopit-transport-receipts-at-scale/README.md",
+        "sha256": "0fbf01f60630a4d77a90b1eb757baaf22db54718e543726edd6f902784c0e973"
+      },
+      {
+        "path": "simulations/SIM-vopit-transport-receipts-at-scale/QUESTION.md",
+        "sha256": "f2d5400dddd9f92139fcbf4c1ca1daf8a9228dd7057e4e5eab115211a7873848"
+      },
+      {
+        "path": "scenarios/conditional-release-geofencing-replay-outside-conditions/conditional-release-geofencing-replay-outside-conditions.md",
+        "sha256": "f1480d60e85afb41b0fe5e49fdc70801e029734edbe32c3068434be7f4cb1c6e"
+      }
+    ],
+    "simulation_tree_hash": "0296d101bcc1d66b152b10009c3fd7e912eb0da942916f52f9bda4cf0d3c7c47"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 3,
+    "auditability": 2,
+    "evolution_safety": 2,
+    "layer_boundary_clarity": 3,
+    "failure_handling": 1,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 3,
+    "risk_penalty": 4
+  },
+  "fitness": {
+    "raw": 22,
+    "normalized_0_100": 44,
+    "confidence_0_1": 0.82
+  },
+  "assessment": {
+    "rationale": "This simulation is mainly about scalable transport receipt aggregation, not conditional-release enforcement. It aligns somewhat with PromiseGrid by emphasizing peer-local receipt promises and auditability at scale, but the provided design docs do not show how receipts or summaries bind to recipient, geography, epoch, or session context. That leaves the replay-outside-conditions pressure largely unanswered.",
+    "strengths": [
+      "Peer-local receipt evidence fits PromiseGrid audit goals better than global delivery state.",
+      "Compact acknowledgement structures are plausible for large-N transport and constrained devices.",
+      "The simulation explicitly recognizes the risk that summaries can become unverifiable claims."
+    ],
+    "weaknesses": [
+      "No explicit mechanism binds content release to geography, audience, epoch, or session.",
+      "No clear stale-reference or replay-detection path is described for receivers or feeds.",
+      "The main design question is orthogonal to conditional-release authorization pressure.",
+      "Auditability of aggregated receipts in a replay dispute remains underspecified."
+    ],
+    "risks": [
+      "Aggregated receipt summaries may be misread as authorization evidence even when they only show transport acknowledgement.",
+      "Replay defense may implicitly depend on central policy, geofence, or revocation services not described here.",
+      "Summary structures could hide which recipient or condition actually applied, weakening dispute resolution."
+    ],
+    "open_questions": [
+      "Can each receipt promise bind recipient or audience scope plus epoch or session context?",
+      "What durable local artifact lets Dave reject a replayed old content reference outside allowed geography or audience?",
+      "How would expired conditions be represented without a central revocation or policy authority?",
+      "Can aggregated receipt proofs stay individually auditable for Carol when replay disputes occur?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

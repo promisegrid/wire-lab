@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-guhum-transport-cluster-of-clusters-conditional-release-geofencing-replay-outside-conditions-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000107-SIM-guhum-transport-cluster-of-clusters--conditional-release-geofencing-replay-outside-conditions--openai-gpt-5.4-medium",
+  "sim_id": "SIM-guhum-transport-cluster-of-clusters",
+  "scenario_id": "conditional-release-geofencing-replay-outside-conditions",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-guhum-transport-cluster-of-clusters/conditional-release-geofencing-replay-outside-conditions/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_8e72b1ddd4bf46059bd36cf234b0bcff",
+    "response_id": "resp_07fe5e3467b3cb28006a1233327cc4819990c34cdd0fb42a5b",
+    "input_tokens": 7518,
+    "output_tokens": 1139,
+    "cost_usd": 0.0291025
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-guhum-transport-cluster-of-clusters/",
+    "scenario_path": "scenarios/conditional-release-geofencing-replay-outside-conditions/conditional-release-geofencing-replay-outside-conditions.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-guhum-transport-cluster-of-clusters/README.md",
+        "sha256": "9faf90179b085adf41d297b03e68fcea05f1036b00e1b289da4be5f7765e7350"
+      },
+      {
+        "path": "simulations/SIM-guhum-transport-cluster-of-clusters/QUESTION.md",
+        "sha256": "9c28415f96b79e449c81152d12b31194c886b19e458c9865af66f5e07c381955"
+      },
+      {
+        "path": "scenarios/conditional-release-geofencing-replay-outside-conditions/conditional-release-geofencing-replay-outside-conditions.md",
+        "sha256": "f1480d60e85afb41b0fe5e49fdc70801e029734edbe32c3068434be7f4cb1c6e"
+      }
+    ],
+    "simulation_tree_hash": "0c3d3b4f767b25b25cd7017af80c516d7440b523c53d81768d763ddb4e97dfe2"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 2,
+    "auditability": 1,
+    "evolution_safety": 2,
+    "layer_boundary_clarity": 3,
+    "failure_handling": 1,
+    "implementation_plausibility": 3,
+    "promise_vocabulary": 3,
+    "simplicity_durability": 2,
+    "risk_penalty": 4
+  },
+  "fitness": {
+    "raw": 19,
+    "normalized_0_100": 38,
+    "confidence_0_1": 0.81
+  },
+  "assessment": {
+    "rationale": "This transport design is only a partial fit for the scenario. Cluster-local and inter-cluster boundaries could help scope routing and policy domains, but the specimen does not define conditional-release artifacts, audience/geography binding, or replay-specific checks. Its promise-first language is stronger than average, yet summary exchange between clusters risks hiding the concrete peer-local evidence Dave would need to reject an old but once-valid reference replayed outside conditions.",
+    "strengths": [
+      "Explicit promise-oriented framing: clusters promise membership, routing, and relay behavior.",
+      "Clear local-vs-inter-cluster boundary candidate for scaling transport state.",
+      "Plausible implementation direction for reducing global routing exposure."
+    ],
+    "weaknesses": [
+      "Scenario mismatch: transport hierarchy is not a direct conditional-release or geofencing design.",
+      "No explicit mechanism for binding content references to audience, epoch, session, or geography.",
+      "Weak peer-local audit trail for a receiver deciding whether a replay is stale or unauthorized."
+    ],
+    "risks": [
+      "Inter-cluster summary promises may conceal the exact condition checks needed for replay rejection.",
+      "Cluster hierarchy can drift toward hidden authority for policy, routing, or location interpretation.",
+      "Stale summaries or cached references could permit unauthorized reuse after conditions change."
+    ],
+    "open_questions": [
+      "Can a cluster promise carry recipient-, epoch-, or geography-binding evidence without reintroducing central policy state?",
+      "What local record lets Dave distinguish a valid old content reference from an out-of-conditions replay across clusters?",
+      "How are stale inter-cluster summaries expired or challenged under partition and migration?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

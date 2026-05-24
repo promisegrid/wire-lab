@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-lofij-peer-adoption-hybrid-pointer-transport-family-bakeoff-per-hop-authorization-failure-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000150-SIM-lofij-peer-adoption-hybrid-pointer--transport-family-bakeoff-per-hop-authorization-failure--openai-gpt-5.4-medium",
+  "sim_id": "SIM-lofij-peer-adoption-hybrid-pointer",
+  "scenario_id": "transport-family-bakeoff-per-hop-authorization-failure",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-lofij-peer-adoption-hybrid-pointer/transport-family-bakeoff-per-hop-authorization-failure/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_567c0b6d6a9d4e10842721e46fdd1b8f",
+    "response_id": "resp_0d1da28d19e637ef006a1233b44b54819aad8fb84d886f9832",
+    "input_tokens": 7522,
+    "output_tokens": 1171,
+    "cost_usd": 0.0295575
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-lofij-peer-adoption-hybrid-pointer/",
+    "scenario_path": "scenarios/transport-family-bakeoff-per-hop-authorization-failure/transport-family-bakeoff-per-hop-authorization-failure.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-lofij-peer-adoption-hybrid-pointer/README.md",
+        "sha256": "577bbdf30e1ac5eb5d84c8b7c202449b8f5a04da94f7f44b8f062116ebb9ae79"
+      },
+      {
+        "path": "simulations/SIM-lofij-peer-adoption-hybrid-pointer/QUESTION.md",
+        "sha256": "03c6ced9337309eae8fd87691ea8a6de917340b9a341040344ca4e98cde075e8"
+      },
+      {
+        "path": "scenarios/transport-family-bakeoff-per-hop-authorization-failure/transport-family-bakeoff-per-hop-authorization-failure.md",
+        "sha256": "f938e10ab88db666d3097a2f97c1667bbbc6e8e071681134049068982cc39cf2"
+      }
+    ],
+    "simulation_tree_hash": "412e7ab674cb54201689072610a695ea0e8772f4e95597d7f7bc312af9c30d1d"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 0,
+    "promisegrid_alignment": 3,
+    "auditability": 2,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 3,
+    "failure_handling": 0,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 3,
+    "simplicity_durability": 3,
+    "risk_penalty": 4
+  },
+  "fitness": {
+    "raw": 23,
+    "normalized_0_100": 46,
+    "confidence_0_1": 0.9
+  },
+  "assessment": {
+    "rationale": "Strong as a compact promise-plus-pointer pattern for adoption evidence, but it does not meaningfully answer the transport-family question about per-hop authorization failure in a ring. The design helps evolution and keeps the core artifact small, yet leaves refusal, skip-hop, break-ring, and reconfiguration behavior unspecified.",
+    "strengths": [
+      "Compact core promise with optional richer evidence fits sparse peers better than always-inline metadata.",
+      "Pointer indirection gives an evolution path for richer adoption details.",
+      "Implementation looks straightforward and plausibly deployable."
+    ],
+    "weaknesses": [
+      "Does not define ring transport behavior under per-hop authorization failure.",
+      "No explicit local promise-accounting record for refusal, skip, or membership reconfiguration.",
+      "Uses richer adoption/answer-profile objects that can drift away from strict payload-promise wording."
+    ],
+    "risks": [
+      "Scenario mismatch could mask the need for explicit transport failure semantics.",
+      "Authorization evidence may be pushed into optional side objects that some peers cannot fetch or preserve.",
+      "Pointer-centric designs can accumulate metadata sprawl and weaken durable local audit trails."
+    ],
+    "open_questions": [
+      "Can the richer pointed object carry explicit per-hop forward-authorization and refusal records without turning into a generic conformance bundle?",
+      "Should transport-hop authorization be a separate promise artifact from peer adoption evidence?",
+      "How would a missing or stale pointer object affect local audit of forwarding refusal over long-lived deployments?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

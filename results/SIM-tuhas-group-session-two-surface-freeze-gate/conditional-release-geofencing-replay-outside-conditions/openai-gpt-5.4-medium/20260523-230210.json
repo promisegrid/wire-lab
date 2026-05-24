@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-tuhas-group-session-two-surface-freeze-gate-conditional-release-geofencing-replay-outside-conditions-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000191-SIM-tuhas-group-session-two-surface-freeze-gate--conditional-release-geofencing-replay-outside-conditions--openai-gpt-5.4-medium",
+  "sim_id": "SIM-tuhas-group-session-two-surface-freeze-gate",
+  "scenario_id": "conditional-release-geofencing-replay-outside-conditions",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-tuhas-group-session-two-surface-freeze-gate/conditional-release-geofencing-replay-outside-conditions/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_e5c3174dd0024423bcc804dfee1307b6",
+    "response_id": "resp_0ec62ed8c1e0ab9d006a1234353d4081988d35c95ee31fa617",
+    "input_tokens": 7534,
+    "output_tokens": 984,
+    "cost_usd": 0.0269605
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-tuhas-group-session-two-surface-freeze-gate/",
+    "scenario_path": "scenarios/conditional-release-geofencing-replay-outside-conditions/conditional-release-geofencing-replay-outside-conditions.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-tuhas-group-session-two-surface-freeze-gate/README.md",
+        "sha256": "e43f0b558a84df77949d02ecc1b3935ed88b960c004389aa25dbd5bbcf210d9d"
+      },
+      {
+        "path": "simulations/SIM-tuhas-group-session-two-surface-freeze-gate/QUESTION.md",
+        "sha256": "941b2f5c4cddf2e0e09049946ae9eea7a18729897d9f17752f75227383d77764"
+      },
+      {
+        "path": "scenarios/conditional-release-geofencing-replay-outside-conditions/conditional-release-geofencing-replay-outside-conditions.md",
+        "sha256": "f1480d60e85afb41b0fe5e49fdc70801e029734edbe32c3068434be7f4cb1c6e"
+      }
+    ],
+    "simulation_tree_hash": "922fe155f0556c2815948fc7c7d60c4110e7e227d2cb2af2ab330e76d35c3f57"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 4,
+    "auditability": 4,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 2,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 4,
+    "simplicity_durability": 4,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 35,
+    "normalized_0_100": 70,
+    "confidence_0_1": 0.81
+  },
+  "assessment": {
+    "rationale": "The two-surface freeze gate helps by making outer/feed conditions and group-session semantics explicit and separately auditable, which can reduce ambiguity about where anti-replay conditions belong. But this simulation does not itself define recipient/geography/epoch binding, replay detection, or receiver-side rejection logic, so it only partially addresses the scenario.",
+    "strengths": [
+      "Very strong boundary clarity between outer/feed rules and session semantics.",
+      "Explicit freeze and merge promises improve later audit and evolution safety.",
+      "Small, plausible mechanism that avoids rewriting the wrong promise surface during spec change."
+    ],
+    "weaknesses": [
+      "No explicit geofencing, audience-binding, or epoch-binding mechanism.",
+      "Replay handling is indirect rather than a first-class promise in the design.",
+      "Failure behavior for stale or unauthorized reuse is not specified in receiver-local terms."
+    ],
+    "risks": [
+      "Operators may mistake surface separation for a complete replay defense when authorization bindings are still underspecified.",
+      "Conditional-release checks may fragment across surfaces and create inconsistent enforcement between feed and session consumers.",
+      "If merge promises are accepted without precise condition binding, stale references may be replayed outside intended audience or geography."
+    ],
+    "open_questions": [
+      "Can the frozen outer/feed surface carry recipient, geography, and epoch bindings strongly enough for replay rejection without central state?",
+      "Which peer records the evidence that a replay was outside allowed conditions, and how is that audited later under sparse knowledge?",
+      "How are location or audience conditions evolved without invalidating older group-session semantic freezes?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

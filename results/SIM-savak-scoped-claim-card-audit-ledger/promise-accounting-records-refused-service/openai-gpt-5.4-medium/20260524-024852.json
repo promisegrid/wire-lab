@@ -1,0 +1,170 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-savak-scoped-claim-card-audit-ledger-promise-accounting-records-refused-service-openai-gpt-5.4-medium-20260524-024852",
+  "run_group_id": "ga-canary-20260523-pt-gate-v3",
+  "cell_id": "ga-canary-20260523-pt-gate-v3-000051-SIM-savak-scoped-claim-card-audit-ledger--promise-accounting-records-refused-service--openai-gpt-5.4-medium",
+  "sim_id": "SIM-savak-scoped-claim-card-audit-ledger",
+  "scenario_id": "promise-accounting-records-refused-service",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260524-024852",
+  "result_path": "results/SIM-savak-scoped-claim-card-audit-ledger/promise-accounting-records-refused-service/openai-gpt-5.4-medium/20260524-024852.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_0cd74a8375c24599994fb530e2550246",
+    "response_id": "resp_068e539f461b3ecc006a12685af6308198957cfa919d8aab35",
+    "input_tokens": 9356,
+    "output_tokens": 2533,
+    "cost_usd": 0.051835
+  },
+  "source": {
+    "repo_commit": "ec652bd3ecaaf2f904e62cff00e113a88c7e3efd",
+    "sim_path": "simulations/SIM-savak-scoped-claim-card-audit-ledger/",
+    "scenario_path": "scenarios/promise-accounting-records-refused-service/promise-accounting-records-refused-service.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-savak-scoped-claim-card-audit-ledger/README.md",
+        "sha256": "f9fde554d9d081495a2192d16f7121ea95535f414c6866c5ecf15ed43d3a5282"
+      },
+      {
+        "path": "simulations/SIM-savak-scoped-claim-card-audit-ledger/QUESTION.md",
+        "sha256": "b0889652ec3fbac187f07360da3818107a1a9868c3442c5fad520189d9257773"
+      },
+      {
+        "path": "simulations/SIM-savak-scoped-claim-card-audit-ledger/PATTERNS.md",
+        "sha256": "0d2da32f9958b9146ed43581612296ff249b1218c918baf8de0e60743e63eaf9"
+      },
+      {
+        "path": "scenarios/promise-accounting-records-refused-service/promise-accounting-records-refused-service.md",
+        "sha256": "9a7d47455793988cfb9b0fb045b29086ed13ee22cd0db080584e259c0aa69313"
+      }
+    ],
+    "simulation_tree_hash": "a3d2108c4a27128a7d42e5b0ac1541ad1774df2898f96e97eed1043e7e428d87"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 3,
+    "promisegrid_alignment": 2,
+    "auditability": 5,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 4,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 3,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 34,
+    "normalized_0_100": 68,
+    "confidence_0_1": 0.82
+  },
+  "assessment": {
+    "rationale": "Strong fit on auditability and boundary clarity: the simulation gives small local records, exact immutable anchors, and careful separation of live, audit, storage, and device planes. For refused service, it can record an attempted interaction plus observed result and authorization context, so honest refusal is possible without calling it corruption or timeout. But the scenario wants that distinction to be explicit, and this design does not define refusal as a dedicated record shape. It is also somewhat claim-card/ledger centric rather than fully promise-first in vocabulary.",
+    "strengths": [
+      "Excellent live/audit/storage/device boundary separation.",
+      "Exact immutable audit-anchor citation improves later replay and audit.",
+      "Local append-only promise-accounting records fit sparse-knowledge operation.",
+      "Break-witness rule handles ambiguous non-idempotent effects honestly."
+    ],
+    "weaknesses": [
+      "No explicit refusal or denial record type for this scenario.",
+      "Promise vocabulary is diluted by claim-card and ledger framing.",
+      "Artifact set is somewhat wrapper-heavy compared with a smaller direct promise payload approach."
+    ],
+    "risks": [
+      "Implementers may encode refusal inconsistently inside generic attempt results, collapsing policy denial into ordinary failure.",
+      "Claim-card framing could drift into badge/conformance thinking instead of scoped declarations of intent.",
+      "Audit-ledger language may invite over-centralized trust interpretations despite the local-record intent."
+    ],
+    "open_questions": [
+      "Should refused service be a first-class promise-accounting record type rather than an observed_result value on a generic attempt record?",
+      "What immutable audit anchor should cite an intentional refusal when no positive publication occurs?",
+      "How should policy/cost/auth refusal reasons be exposed without turning local policy into a centralized obligation schema?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design.",
+    "pt_gate": {
+      "status": "pt_reframe_needed",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "Peers publish their own scoped cards and keep local append-only records without requiring a central coordinator."
+      },
+      "scoped_intent": {
+        "status": "warning",
+        "note": "Scope is clear by plane and embodiment, but the design is framed as claim cards and audit artifacts more than direct promise payloads."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "The design mostly keeps each embodiment or service speaking only for its own boundary."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "It explicitly avoids treating hashes as retention promises or receipts as guaranteed physical completion."
+      },
+      "local_trust_assessment": {
+        "status": "pass",
+        "note": "Trust is grounded in peer-local records plus cited immutable anchors rather than global state."
+      },
+      "accept_use_not_obligation": {
+        "status": "warning",
+        "note": "The design separates capability/authorization from object possession and allows refusal, but refusal is not yet first-class in the record taxonomy."
+      },
+      "violations": [
+        "Non-promise-first framing: claim-card and audit-ledger language dominates over explicit scoped promise payloads.",
+        "Refused service is not modeled as an explicit first-class promise-accounting outcome distinct from generic failure records."
+      ]
+    }
+  }
+}

@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-padin-group-session-freeze-evidence-cas-object-type-binding-bakeoff-unknown-typed-object-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000183-SIM-padin-group-session-freeze-evidence--cas-object-type-binding-bakeoff-unknown-typed-object--openai-gpt-5.4-medium",
+  "sim_id": "SIM-padin-group-session-freeze-evidence",
+  "scenario_id": "cas-object-type-binding-bakeoff-unknown-typed-object",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-padin-group-session-freeze-evidence/cas-object-type-binding-bakeoff-unknown-typed-object/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_18a62d37de0b457bb1227265be647136",
+    "response_id": "resp_0e9951f15eb24d3b006a12341bc51c8199b58b44f8856adfeb",
+    "input_tokens": 7515,
+    "output_tokens": 1698,
+    "cost_usd": 0.03692325
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-padin-group-session-freeze-evidence/",
+    "scenario_path": "scenarios/cas-object-type-binding-bakeoff-unknown-typed-object/cas-object-type-binding-bakeoff-unknown-typed-object.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-padin-group-session-freeze-evidence/README.md",
+        "sha256": "43f96cd79379eeb2ae36319c1fd26144cc0a95a86f0c3fc2f9f48bf9024a11d5"
+      },
+      {
+        "path": "simulations/SIM-padin-group-session-freeze-evidence/QUESTION.md",
+        "sha256": "6bdde351a8bd4a900a82304f488913fc2ae0224396de55473b61698525bc1d04"
+      },
+      {
+        "path": "scenarios/cas-object-type-binding-bakeoff-unknown-typed-object/cas-object-type-binding-bakeoff-unknown-typed-object.md",
+        "sha256": "76f0a7016fa2bad5e53903682706bca4eeb4aa2d099311a4ea52b7280748cf90"
+      }
+    ],
+    "simulation_tree_hash": "8fbe9da939de6ecdba9776b2cc20f5cb8b910b7381d306b38a6017026c170175"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 3,
+    "auditability": 4,
+    "evolution_safety": 2,
+    "layer_boundary_clarity": 2,
+    "failure_handling": 1,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 4,
+    "risk_penalty": 4
+  },
+  "fitness": {
+    "raw": 24,
+    "normalized_0_100": 48,
+    "confidence_0_1": 0.86
+  },
+  "assessment": {
+    "rationale": "The simulation is strong on frozen evidence, exact artifacts, and reproducible audit, but it does not directly specify unknown-type CAS object handling. It therefore only weakly fits the scenario pressure about opaque storage/advertise/forward behavior for unimplemented codecs.",
+    "strengths": [
+      "Exact CIDs, verified DAGs, and reproducible checks give strong audit evidence.",
+      "Independent peers can re-run validation from named artifacts without central authority dependence.",
+      "The artifact set is relatively small and durable."
+    ],
+    "weaknesses": [
+      "No explicit rule for unknown codec objects received by a peer that cannot decode them.",
+      "Does not clearly define store, advertise, or forward semantics for opaque objects.",
+      "Focuses on freeze evidence for a specimen rather than long-lived mixed-version type binding behavior."
+    ],
+    "risks": [
+      "Readers may over-credit specimen-freeze evidence as if it solved unknown-type network interoperability.",
+      "Absent explicit opaque-handling rules, implementations could still parse unsafely or drop unknown objects inconsistently.",
+      "Freeze-oriented checker behavior may couple validity to known parsers rather than durable type-binding rules."
+    ],
+    "open_questions": [
+      "Does the specimen/checker model explicitly permit unknown-codec objects to be stored and forwarded opaquely?",
+      "What promise or rule prevents a peer from attempting unsafe parsing when only a CID and unknown codec are available?",
+      "Are advertise/relay behaviors defined separately from validation so mixed-version peers can interoperate?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

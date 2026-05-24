@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-numop-transport-gossip-udp-feed-v0-conformance-session-layer-composition-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000119-SIM-numop-transport-gossip--udp-feed-v0-conformance-session-layer-composition--openai-gpt-5.4-medium",
+  "sim_id": "SIM-numop-transport-gossip",
+  "scenario_id": "udp-feed-v0-conformance-session-layer-composition",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-numop-transport-gossip/udp-feed-v0-conformance-session-layer-composition/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_2ab70e1a138b42818daa811e2240d3e3",
+    "response_id": "resp_0834e041798167e2006a1233568ccc8198a38d6937bc62cb05",
+    "input_tokens": 7486,
+    "output_tokens": 1037,
+    "cost_usd": 0.0276185
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-numop-transport-gossip/",
+    "scenario_path": "scenarios/udp-feed-v0-conformance-session-layer-composition/udp-feed-v0-conformance-session-layer-composition.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-numop-transport-gossip/README.md",
+        "sha256": "d212deb1b4924acea94877b821f5fbdb8947dce1e5ddcb352df77c1e98737cdf"
+      },
+      {
+        "path": "simulations/SIM-numop-transport-gossip/QUESTION.md",
+        "sha256": "d266b46d0dde882de3bd7df76ee20e8021d3c44d9f427fbcafff09dd3b16365b"
+      },
+      {
+        "path": "scenarios/udp-feed-v0-conformance-session-layer-composition/udp-feed-v0-conformance-session-layer-composition.md",
+        "sha256": "69da5db705a56cd7067a653928ff8b2dc9301ef6ebfc712bd81038a65c9d352c"
+      }
+    ],
+    "simulation_tree_hash": "b127e7ce2ae9b23ee24e459fdce3fd3aaae78323fad68ffb2ec6b2f5bcef155c"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 4,
+    "auditability": 2,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 2,
+    "failure_handling": 3,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 3,
+    "simplicity_durability": 3,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 28,
+    "normalized_0_100": 56.00000000000001,
+    "confidence_0_1": 0.73
+  },
+  "assessment": {
+    "rationale": "The simulation is relevant because it is a transport-family candidate and directly tests sparse-knowledge propagation above unreliable links, but it is not specifically a UDP-feed v0 composition design. It aligns with PromiseGrid goals around decentralization and partial knowledge, yet its eventual/probabilistic behavior weakens session-layer auditability and makes boundary cleanliness less clear.",
+    "strengths": [
+      "Strong fit to sparse-knowledge and no-central-ordering goals.",
+      "Plausible small-peer transport technique with offline tolerance.",
+      "Promise-oriented wording is present at the peer-behavior level."
+    ],
+    "weaknesses": [
+      "Not targeted to UDP-feed v0 API sufficiency.",
+      "Audit trail for higher-layer conformance is underspecified.",
+      "Layer boundary between transport gossip and session semantics is unclear."
+    ],
+    "risks": [
+      "Session-layer requirements may leak transport-specific gossip mechanics.",
+      "Probabilistic convergence may be too weak for conformance-style evidence.",
+      "Duplicate suppression and partial knowledge can make post-hoc auditing ambiguous."
+    ],
+    "open_questions": [
+      "Can a gossip transport present a clean session API without exposing IHave/IWant or peer-summary mechanics upward?",
+      "What locally auditable evidence would Alice or Carol retain for advertised, requested, and relayed messages after loss or partition?",
+      "Does session composition require stronger delivery/conformance promises than eventual convergence can provide?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

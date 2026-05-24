@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-kabiv-chunking-pcid-driven-identity-group-session-freeze-promise-post-freeze-mutation-request-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000048-SIM-kabiv-chunking-pcid-driven-identity--group-session-freeze-promise-post-freeze-mutation-request--openai-gpt-5.4-medium",
+  "sim_id": "SIM-kabiv-chunking-pcid-driven-identity",
+  "scenario_id": "group-session-freeze-promise-post-freeze-mutation-request",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-kabiv-chunking-pcid-driven-identity/group-session-freeze-promise-post-freeze-mutation-request/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_7bcd25f1f7c84718b7e650d01a6cb0f9",
+    "response_id": "resp_07b859b8ccc86db8006a12327c8a1c8199adff8c2694c84482",
+    "input_tokens": 7549,
+    "output_tokens": 1160,
+    "cost_usd": 0.02945075
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-kabiv-chunking-pcid-driven-identity/",
+    "scenario_path": "scenarios/group-session-freeze-promise-post-freeze-mutation-request/group-session-freeze-promise-post-freeze-mutation-request.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-kabiv-chunking-pcid-driven-identity/README.md",
+        "sha256": "f2fd1cfe737e467037ae5298888ddeff9d1042625d9ec2bfabb15830d5d38953"
+      },
+      {
+        "path": "simulations/SIM-kabiv-chunking-pcid-driven-identity/QUESTION.md",
+        "sha256": "ed85c69097a9fa5aac0ca6f33b6749a795c916e00aa52ac17bb8cac4c48512e2"
+      },
+      {
+        "path": "scenarios/group-session-freeze-promise-post-freeze-mutation-request/group-session-freeze-promise-post-freeze-mutation-request.md",
+        "sha256": "9083e149d879dcf5890bbcc3d3bb2fcf87b4490ba1878e59a73402bd5312ee52"
+      }
+    ],
+    "simulation_tree_hash": "05b7a54cb26daa2675abb925708f149eaf46f08dd93700190a804876c953a3e9"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 3,
+    "auditability": 4,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 2,
+    "failure_handling": 2,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 3,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 27,
+    "normalized_0_100": 54,
+    "confidence_0_1": 0.77
+  },
+  "assessment": {
+    "rationale": "The simulation gives a partial answer to post-freeze mutation pressure: if pCID fixes interpretation and chunking, a breaking post-freeze change naturally tends toward a new specimen or new pCID rather than mutation of frozen history. That supports immutable identity and local verification, but the sim does not directly define group-session freeze semantics, amendment rules, or lineage handling. Its main weakness is coupling low-level chunking policy to protocol identity, which blurs layers and may make evolution heavier than needed.",
+    "strengths": [
+      "Deterministic identity and root verification are locally auditable.",
+      "A post-freeze breaking mutation is pushed toward new identity instead of silent history rewrite.",
+      "No central registry is required for receivers to reject mismatched content."
+    ],
+    "weaknesses": [
+      "Does not directly model group-session freeze promises or amendment workflows.",
+      "Couples protocol semantics to chunking policy, weakening layer boundaries.",
+      "Promise-first actor wording is limited; the sim is mostly mechanism-first rather than explicit peer promises."
+    ],
+    "risks": [
+      "Chunking-policy changes may force protocol-identity changes even when session semantics are stable.",
+      "The design may overfit object identity while under-specifying freeze, supersession, and amendment behavior at the session layer.",
+      "Different operators may infer different lineage rules because the simulation does not explicitly define post-freeze governance artifacts."
+    ],
+    "open_questions": [
+      "Should a post-freeze breaking change always require a new pCID, or can lineage metadata safely relate old and new specimens without mutating frozen history?",
+      "How would this design represent freeze evidence and supersession for group-session artifacts, not just chunked object identity?",
+      "Does putting chunking rules under the pCID create unnecessary protocol churn when storage policy evolves?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

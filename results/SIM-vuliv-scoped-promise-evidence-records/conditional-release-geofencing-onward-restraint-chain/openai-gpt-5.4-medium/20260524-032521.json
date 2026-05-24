@@ -1,0 +1,163 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-vuliv-scoped-promise-evidence-records-conditional-release-geofencing-onward-restraint-chain-openai-gpt-5.4-medium-20260524-032521",
+  "run_group_id": "ga-canary-20260523-pt-gate-v3-successors",
+  "cell_id": "ga-canary-20260523-pt-gate-v3-successors-000052-SIM-vuliv-scoped-promise-evidence-records--conditional-release-geofencing-onward-restraint-chain--openai-gpt-5.4-medium",
+  "sim_id": "SIM-vuliv-scoped-promise-evidence-records",
+  "scenario_id": "conditional-release-geofencing-onward-restraint-chain",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260524-032521",
+  "result_path": "results/SIM-vuliv-scoped-promise-evidence-records/conditional-release-geofencing-onward-restraint-chain/openai-gpt-5.4-medium/20260524-032521.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_a2c69cea3a5642b0b427051e19dea475",
+    "response_id": "resp_0e62f682c9cd41a7006a1270bedfd08198b42aa070ff4c73e5",
+    "input_tokens": 8324,
+    "output_tokens": 1619,
+    "cost_usd": 0.037233
+  },
+  "source": {
+    "repo_commit": "925c7f5c1c7ce7d5b0caf6a924d40d3f9b7d0483",
+    "sim_path": "simulations/SIM-vuliv-scoped-promise-evidence-records/",
+    "scenario_path": "scenarios/conditional-release-geofencing-onward-restraint-chain/conditional-release-geofencing-onward-restraint-chain.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-vuliv-scoped-promise-evidence-records/README.md",
+        "sha256": "e9becc2e87d9697aa51f2af9687c8e2ce176d637e96cce30813935941147ed96"
+      },
+      {
+        "path": "simulations/SIM-vuliv-scoped-promise-evidence-records/QUESTION.md",
+        "sha256": "e4f7afe8b326a37726f537ef37479983fcc898321c922ee2a9a9b28cdecd0a35"
+      },
+      {
+        "path": "scenarios/conditional-release-geofencing-onward-restraint-chain/conditional-release-geofencing-onward-restraint-chain.md",
+        "sha256": "3c84fc46e1b14de5e5c6e9b029fcb891bd655238b45e516b20eda97dabe8ff24"
+      }
+    ],
+    "simulation_tree_hash": "dad6e690288069f76dfec0e42facc6bd24c63b8ffe555e70b2edbc05959b1c35"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 4,
+    "promisegrid_alignment": 5,
+    "auditability": 5,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 4,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 5,
+    "simplicity_durability": 4,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 42,
+    "normalized_0_100": 84,
+    "confidence_0_1": 0.84
+  },
+  "assessment": {
+    "rationale": "A strong Promise-Theory fit. The simulation cleanly reframes conditional release as a chain of scoped promises plus later keep/break evidence, which is better than claim-card or authority-object approaches for this scenario. Its main limitation is not vocabulary or auditability but under-specification: it does not yet pin down the exact representation of the recursive onward-restraint graph across sessions, transports, or CAS objects.",
+    "strengths": [
+      "Promise-first artifacts map directly onto Alice's conditional release and Bob/Carol onward promises.",
+      "Observed keep/break/refusal/timeout records give strong local auditability for later trust decisions.",
+      "Small durable evidence objects fit sparse knowledge and long-horizon replay better than central ledgers or claim cards.",
+      "The design explicitly avoids treating evidence artifacts as rights-granting authority objects."
+    ],
+    "weaknesses": [
+      "The simulation does not fully specify where the recursive promise graph should live for this scenario.",
+      "It supports audit after forwarding decisions better than preventive control before release.",
+      "No final universal envelope is defined, which leaves interoperability details open."
+    ],
+    "risks": [
+      "Evidence records may be mistaken for enforcement or authority if implementations drift toward capability-like interpretation.",
+      "Recursive onward-restraint chains can become operationally complex and expensive to audit if references sprawl.",
+      "The design documents violations well but may leave real-time prevention of unauthorized forwarding to app-local policy."
+    ],
+    "open_questions": [
+      "How should Bob reference Carol's onward-restraint promise before forwarding without implying a central authority or global graph?",
+      "Should recursive onward-restraint links live in promise records, promise references, or separate observed keep/break records for best durability?",
+      "What minimal local evidence is enough for Alice or Carol to audit a broken onward-restraint chain after partial replication or partition?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design.",
+    "pt_gate": {
+      "status": "pt_clean",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "Alice, Bob, and Carol each make or assess their own promises; the artifact does not remove autonomy."
+      },
+      "scoped_intent": {
+        "status": "pass",
+        "note": "Promises are explicitly scoped by boundary and behavior, which fits the onward-restraint chain well."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "The sim centers promiser-issued records and third-party observations, not promises made on behalf of another agent."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "Observed records document outcomes after the fact; they do not guarantee onward restraint will be kept."
+      },
+      "local_trust_assessment": {
+        "status": "pass",
+        "note": "Observed keep/break/refusal records support peer-local trust assessment instead of global trust assignment."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "The design treats promise records and observations as evidence for local decisions, not as obligations imposed on recipients."
+      },
+      "violations": []
+    }
+  }
+}

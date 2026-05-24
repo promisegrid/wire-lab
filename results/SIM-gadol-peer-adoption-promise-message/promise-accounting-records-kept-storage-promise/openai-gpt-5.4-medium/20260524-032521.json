@@ -1,0 +1,164 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-gadol-peer-adoption-promise-message-promise-accounting-records-kept-storage-promise-openai-gpt-5.4-medium-20260524-032521",
+  "run_group_id": "ga-canary-20260523-pt-gate-v3-successors",
+  "cell_id": "ga-canary-20260523-pt-gate-v3-successors-000018-SIM-gadol-peer-adoption-promise-message--promise-accounting-records-kept-storage-promise--openai-gpt-5.4-medium",
+  "sim_id": "SIM-gadol-peer-adoption-promise-message",
+  "scenario_id": "promise-accounting-records-kept-storage-promise",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260524-032521",
+  "result_path": "results/SIM-gadol-peer-adoption-promise-message/promise-accounting-records-kept-storage-promise/openai-gpt-5.4-medium/20260524-032521.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_b8545b4e8427456a943dabb5c2a0fc8f",
+    "response_id": "resp_041c7036f009f03f006a126ffceb68819a986d92e872f7d5b8",
+    "input_tokens": 8119,
+    "output_tokens": 1383,
+    "cost_usd": 0.03357025
+  },
+  "source": {
+    "repo_commit": "925c7f5c1c7ce7d5b0caf6a924d40d3f9b7d0483",
+    "sim_path": "simulations/SIM-gadol-peer-adoption-promise-message/",
+    "scenario_path": "scenarios/promise-accounting-records-kept-storage-promise/promise-accounting-records-kept-storage-promise.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-gadol-peer-adoption-promise-message/README.md",
+        "sha256": "b7767c1a9279ef3c1a9bcc08a1d96a87259fe4e5090fa06ad2811a397fef49d3"
+      },
+      {
+        "path": "simulations/SIM-gadol-peer-adoption-promise-message/QUESTION.md",
+        "sha256": "3096ee94cbc1ba2247fc46b908d4e215cbe96af054b7943f6b6d567185b6df3b"
+      },
+      {
+        "path": "scenarios/promise-accounting-records-kept-storage-promise/promise-accounting-records-kept-storage-promise.md",
+        "sha256": "9972dff7f20d9b4f3231c07a8eb332d2e75b43e84cf0d34af29c1d3ea9c1ad74"
+      }
+    ],
+    "simulation_tree_hash": "cc25bca5323b36b38c3d31b1314bf64a50e08e8631c97040b6e872ad0548e43a"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 4,
+    "auditability": 4,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 2,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 5,
+    "simplicity_durability": 5,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 37,
+    "normalized_0_100": 74,
+    "confidence_0_1": 0.82
+  },
+  "assessment": {
+    "rationale": "Strong Promise-Theory fit: adoption is expressed as an ordinary promise message that peers can store, relay, and account for locally. That helps auditability, evolution, and durable small-artifact design. But this scenario is about recording a kept storage promise after service, and the simulation does not yet define outcome vocabulary or local accounting records for kept-versus-broken storage behavior, so scenario fit is only partial.",
+    "strengths": [
+      "Promise-first wording with autonomous-agent semantics.",
+      "Ordinary promise messages are easy to store, relay, supersede, and audit locally.",
+      "Reusing the normal promise path is simple and likely durable across protocol evolution.",
+      "Avoids central registry or authority framing."
+    ],
+    "weaknesses": [
+      "Weak direct fit to a kept-storage-promise scenario.",
+      "Does not specify Bob's local record when Alice actually serves chunk C.",
+      "Failure and supersession handling for observed outcomes is underspecified.",
+      "Envelope and evidence-linking details are intentionally left open."
+    ],
+    "risks": [
+      "Peers may record declaration-of-intent well but still lack a standard way to record observed fulfillment of a storage promise.",
+      "Ambiguity around pCID resolution and answer bindings could weaken long-term interoperability.",
+      "Using the same generic promise path for adoption and later outcome evidence may blur layers unless kept-outcome records are specified separately."
+    ],
+    "open_questions": [
+      "How would Bob record a kept-versus-broken outcome using this adoption-message pattern rather than just the original declared intent?",
+      "What durable local evidence links a later successful serve of chunk C back to the earlier promise message and any superseding message?",
+      "Can pCID and answer-binding ambiguity be resolved locally without introducing quasi-central resolution habits?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design.",
+    "pt_gate": {
+      "status": "pt_clean",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "Alice publishes her own promise message and later peers assess it locally."
+      },
+      "scoped_intent": {
+        "status": "pass",
+        "note": "The message is a scoped declaration of intent tied to a specific pCID and answer bindings."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "The simulation has Alice promising her own behavior according to pCID X; it does not promise on behalf of others."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "The design presents adoption as a promise message that can be kept or superseded, not as a guaranteed result."
+      },
+      "local_trust_assessment": {
+        "status": "pass",
+        "note": "Stored and relayed promise messages support peer-local trust assessment rather than global trust."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "The design centers on Alice's declared intent and local accounting, not obligations imposed on Bob or others."
+      },
+      "violations": []
+    }
+  }
+}

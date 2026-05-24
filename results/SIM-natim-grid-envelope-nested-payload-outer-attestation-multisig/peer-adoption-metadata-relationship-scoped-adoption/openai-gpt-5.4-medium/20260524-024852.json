@@ -1,0 +1,171 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-natim-grid-envelope-nested-payload-outer-attestation-multisig-peer-adoption-metadata-relationship-scoped-adoption-openai-gpt-5.4-medium-20260524-024852",
+  "run_group_id": "ga-canary-20260523-pt-gate-v3",
+  "cell_id": "ga-canary-20260523-pt-gate-v3-000045-SIM-natim-grid-envelope-nested-payload-outer-attestation-multisig--peer-adoption-metadata-relationship-scoped-adoption--openai-gpt-5.4-medium",
+  "sim_id": "SIM-natim-grid-envelope-nested-payload-outer-attestation-multisig",
+  "scenario_id": "peer-adoption-metadata-relationship-scoped-adoption",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260524-024852",
+  "result_path": "results/SIM-natim-grid-envelope-nested-payload-outer-attestation-multisig/peer-adoption-metadata-relationship-scoped-adoption/openai-gpt-5.4-medium/20260524-024852.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_fad28e684fc84fb989d05e060951530a",
+    "response_id": "resp_0d53d42d76f881bb006a1268354e3c819a987d91457cae20b5",
+    "input_tokens": 10736,
+    "output_tokens": 1786,
+    "cost_usd": 0.043792
+  },
+  "source": {
+    "repo_commit": "ec652bd3ecaaf2f904e62cff00e113a88c7e3efd",
+    "sim_path": "simulations/SIM-natim-grid-envelope-nested-payload-outer-attestation-multisig/",
+    "scenario_path": "scenarios/peer-adoption-metadata-relationship-scoped-adoption/peer-adoption-metadata-relationship-scoped-adoption.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-natim-grid-envelope-nested-payload-outer-attestation-multisig/README.md",
+        "sha256": "66d0d285a83e308582cae373211ad2a7452768eabd5e3a5c78ce68ac7dffb623"
+      },
+      {
+        "path": "simulations/SIM-natim-grid-envelope-nested-payload-outer-attestation-multisig/QUESTION.md",
+        "sha256": "1e6d7d459400f07f95ebc98b40b482465702ee815ca120074c72ae4ec4c3f250"
+      },
+      {
+        "path": "simulations/SIM-natim-grid-envelope-nested-payload-outer-attestation-multisig/protocols/grid-envelope.d/CHANGELOG.md",
+        "sha256": "42d47d8aa770957218217786ba9ba436e8c1c28496f149f3ed7dd9995de44ba0"
+      },
+      {
+        "path": "simulations/SIM-natim-grid-envelope-nested-payload-outer-attestation-multisig/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "f6f4eccac6ff705b6b2145058dadab72d8ebf8365370faf7bf2bbd5d18bb5c47"
+      },
+      {
+        "path": "scenarios/peer-adoption-metadata-relationship-scoped-adoption/peer-adoption-metadata-relationship-scoped-adoption.md",
+        "sha256": "b2a2b0fb4dfcd76dfd88a39d4bb4f4d8a85fafb0b052621a36de8692d19fe3d7"
+      }
+    ],
+    "simulation_tree_hash": "668854aaae32a3dc6bf13e5909bad575b36357d7af8d362f2ebc79ab053078ea"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 3,
+    "promisegrid_alignment": 4,
+    "auditability": 5,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 5,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 4,
+    "simplicity_durability": 3,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 39,
+    "normalized_0_100": 78,
+    "confidence_0_1": 0.8
+  },
+  "assessment": {
+    "rationale": "Strong fit for locally auditable, relationship-sensitive evidence because the outer attestation can bind Bob's current role and relationship-specific constraint references to exact payload bytes without requiring global identity-wide adoption state. Scenario fit is not higher because the specimen is an envelope and attestation design, not a dedicated adoption-metadata protocol, so relationship-scoped adoption semantics must be supplied by the carried payload or referenced constraint objects.",
+    "strengths": [
+      "Separates payload authorship from current actor role, which helps Bob present different relationship-scoped metadata to Alice and Carol without hidden transport assumptions.",
+      "Excellent audit retention and explicit decision classes support later human or LLM review under sparse knowledge.",
+      "Conservative unsupported/quarantine behavior reduces false confidence when codecs, pCIDs, or attributes are unknown.",
+      "Extensible pCID-bound nested payload keeps relationship-specific adoption semantics evolvable without changing the outer envelope."
+    ],
+    "weaknesses": [
+      "The simulation does not directly define adoption promises or relationship-scoped metadata semantics; it only provides a carrier and attestation pattern.",
+      "`role_code`, `constraints_ref`, and `freshness_ref` may be too generic to make relationship-scoped adoption immediately interoperable.",
+      "The mandatory outer attestation and nested proof structure are less simple and durable than a smaller single-layer artifact."
+    ],
+    "risks": [
+      "Relationship scope may remain too implicit if `constraints_ref` is overloaded instead of using a clearer relationship-scoped adoption object.",
+      "Mandatory dual-layer proofs increase wire and implementation complexity for small peers.",
+      "Different per-peer adoption metadata could still be misread as contradiction if freshness and relationship context are underspecified."
+    ],
+    "open_questions": [
+      "How should relationship context be named or referenced so Bob can legitimately present different adoption profiles to Alice and Carol without implying a global peer-wide promise?",
+      "Should relationship-scoped adoption live in payload_b, constraints_ref, or a dedicated profile so auditors can distinguish peer identity from per-relationship intent more directly?",
+      "What local audit record best shows that differing Alice-facing and Carol-facing metadata is expected variation rather than stale or conflicting evidence?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design.",
+    "pt_gate": {
+      "status": "pt_clean",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "Actors attest only to their own current role and carried payload bytes; no central controller is assumed."
+      },
+      "scoped_intent": {
+        "status": "pass",
+        "note": "Intent is well scoped to exact bytes plus role/constraints/freshness transcript, though relationship-scoped adoption semantics are only indirect in this specimen."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "The outer attestor signs its own role/context over an exact nested payload, while payload authorship remains separately authenticated."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "Freshness and constraints are evidence inputs, not guarantees of delivery, validity, or future behavior."
+      },
+      "local_trust_assessment": {
+        "status": "pass",
+        "note": "Verification outcomes and policy decisions are explicitly local (`accepted-dual-bound`, `quarantine`, `unsupported`, etc.)."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "The design authenticates payloads and relay/forwarder attestations but does not treat receipt or use as an obligation."
+      },
+      "violations": []
+    }
+  }
+}

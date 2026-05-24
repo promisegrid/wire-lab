@@ -1,0 +1,119 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-gozin-spec-sections-required-transport-family-bakeoff-per-hop-authorization-failure-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000157-SIM-gozin-spec-sections-required--transport-family-bakeoff-per-hop-authorization-failure--openai-gpt-5.4-medium",
+  "sim_id": "SIM-gozin-spec-sections-required",
+  "scenario_id": "transport-family-bakeoff-per-hop-authorization-failure",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-gozin-spec-sections-required/transport-family-bakeoff-per-hop-authorization-failure/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_d7686f970e9d4f728c7cb6ebd80f9ed0",
+    "response_id": "resp_035bd693259282ae006a1233cca270819997093ca97633b06c",
+    "input_tokens": 7500,
+    "output_tokens": 1291,
+    "cost_usd": 0.031199
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-gozin-spec-sections-required/",
+    "scenario_path": "scenarios/transport-family-bakeoff-per-hop-authorization-failure/transport-family-bakeoff-per-hop-authorization-failure.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-gozin-spec-sections-required/README.md",
+        "sha256": "ee33ac614913056db1824486380c1d6197ffe98aeefdb6b009925bcb22ca500a"
+      },
+      {
+        "path": "simulations/SIM-gozin-spec-sections-required/QUESTION.md",
+        "sha256": "2ab8c8a586d91ec7e46e58ebff30d17ffa801ba418be4c087fbc79eb0e1f5471"
+      },
+      {
+        "path": "scenarios/transport-family-bakeoff-per-hop-authorization-failure/transport-family-bakeoff-per-hop-authorization-failure.md",
+        "sha256": "f938e10ab88db666d3097a2f97c1667bbbc6e8e071681134049068982cc39cf2"
+      }
+    ],
+    "simulation_tree_hash": "53bf3a7312230b2885693633632d800de388ba1cdf2b0646723f005d7b31a192"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 2,
+    "auditability": 3,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 2,
+    "failure_handling": 1,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 4,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 25,
+    "normalized_0_100": 50,
+    "confidence_0_1": 0.9
+  },
+  "assessment": {
+    "rationale": "This candidate is mostly orthogonal to the scenario. Requiring spec sections for promise vocabulary, 100-year pressure, and easy implementation could make a transport spec explain per-hop authorization refusal more clearly, but the simulation does not itself define ring behavior, local evidence, skip-hop rules, or membership reconfiguration. It improves documentation discipline more than transport-family failure semantics.",
+    "strengths": [
+      "Pushes specs to expose durability and explanatory material explicitly.",
+      "Likely improves reviewability and consistency across protocol documents.",
+      "Small procedural change is easy to adopt."
+    ],
+    "weaknesses": [
+      "Does not directly answer what Bob does when unauthorized to forward to Carol.",
+      "Provides little peer-local failure accounting beyond documentation expectations.",
+      "Uses meta-spec policy rather than concrete promise payloads or transport promises."
+    ],
+    "risks": [
+      "Required sections may devolve into boilerplate and hide the absence of a real failure model.",
+      "A universal spec-section rule may blur layer-specific needs and overconstrain very small protocols."
+    ],
+    "open_questions": [
+      "Should failure-model sections be mandatory only for protocols with hop-by-hop forwarding semantics rather than every spec?",
+      "What minimum local refusal/audit record should a transport spec define for per-hop authorization failure?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

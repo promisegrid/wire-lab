@@ -1,0 +1,122 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-gadol-peer-adoption-promise-message-spec-requirement-sections-100-year-review-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000138-SIM-gadol-peer-adoption-promise-message--spec-requirement-sections-100-year-review--openai-gpt-5.4-medium",
+  "sim_id": "SIM-gadol-peer-adoption-promise-message",
+  "scenario_id": "spec-requirement-sections-100-year-review",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-gadol-peer-adoption-promise-message/spec-requirement-sections-100-year-review/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_9308251abfe54ccd8eb2564fba6261b6",
+    "response_id": "resp_091e45ca22f46579006a123392be5c819bbdc4bc518b84fd9d",
+    "input_tokens": 7515,
+    "output_tokens": 1012,
+    "cost_usd": 0.02731925
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-gadol-peer-adoption-promise-message/",
+    "scenario_path": "scenarios/spec-requirement-sections-100-year-review/spec-requirement-sections-100-year-review.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-gadol-peer-adoption-promise-message/README.md",
+        "sha256": "b7767c1a9279ef3c1a9bcc08a1d96a87259fe4e5090fa06ad2811a397fef49d3"
+      },
+      {
+        "path": "simulations/SIM-gadol-peer-adoption-promise-message/QUESTION.md",
+        "sha256": "3096ee94cbc1ba2247fc46b908d4e215cbe96af054b7943f6b6d567185b6df3b"
+      },
+      {
+        "path": "scenarios/spec-requirement-sections-100-year-review/spec-requirement-sections-100-year-review.md",
+        "sha256": "b2e71192b720372495986fad6387d0bfd5222ce78a7cfd9da03940d1a1062cd7"
+      }
+    ],
+    "simulation_tree_hash": "cc25bca5323b36b38c3d31b1314bf64a50e08e8631c97040b6e872ad0548e43a"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 5,
+    "auditability": 4,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 2,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 5,
+    "simplicity_durability": 4,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 37,
+    "normalized_0_100": 74,
+    "confidence_0_1": 0.84
+  },
+  "assessment": {
+    "rationale": "This simulation fits the scenario only indirectly: it improves long-horizon review by making adoption an ordinary promise message with explicit pCID and bindings, but it does not itself define the required durable spec-section guidance the scenario asks for. It is strongly PromiseGrid-aligned, small, and implementation-plausible, yet still leaves ambiguity-resolution and future-reader interpretation under-specified.",
+    "strengths": [
+      "Uses ordinary promise messages instead of a special metadata layer.",
+      "Promise-first wording matches PromiseGrid well.",
+      "Supports supersession through normal promise-accounting rules.",
+      "Small, explicit artifact shape is relatively durable and plausible."
+    ],
+    "weaknesses": [
+      "Does not directly provide the concrete long-horizon spec-section home the scenario pressures.",
+      "Independent-peer resolution of spec and answer-set ambiguity remains open.",
+      "Failure and stale-evidence handling are only lightly specified."
+    ],
+    "risks": [
+      "Future readers may still lack enough context to interpret old pCID references or answer bindings.",
+      "Ordinary-message reuse could hide long-horizon documentation requirements that deserve an explicit spec section.",
+      "Supersession chains may be hard to reconstruct auditably over very long time spans without stronger conventions."
+    ],
+    "open_questions": [
+      "Does the adoption message itself carry enough frozen context for a future reader to resolve pCID and answer-binding meaning after surrounding tooling and registries disappear?",
+      "Should long-horizon interpretability requirements live in a dedicated spec section rather than be inferred from ordinary promise-message practice?",
+      "How should independent peers detect and explain supersession or conflicting adoption messages decades later?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

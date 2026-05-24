@@ -1,0 +1,123 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-nalug-chunking-raw-only-first-profile-transport-family-bakeoff-per-hop-authorization-failure-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000066-SIM-nalug-chunking-raw-only-first-profile--transport-family-bakeoff-per-hop-authorization-failure--openai-gpt-5.4-medium",
+  "sim_id": "SIM-nalug-chunking-raw-only-first-profile",
+  "scenario_id": "transport-family-bakeoff-per-hop-authorization-failure",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-nalug-chunking-raw-only-first-profile/transport-family-bakeoff-per-hop-authorization-failure/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_928b9cca6fe944f0aa5e7fc3967880d5",
+    "response_id": "resp_0a42021ef2d6c38f006a1232b3e290819aa1ad67192c32bd46",
+    "input_tokens": 7538,
+    "output_tokens": 1114,
+    "cost_usd": 0.0287875
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-nalug-chunking-raw-only-first-profile/",
+    "scenario_path": "scenarios/transport-family-bakeoff-per-hop-authorization-failure/transport-family-bakeoff-per-hop-authorization-failure.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-nalug-chunking-raw-only-first-profile/README.md",
+        "sha256": "d06e84e3a1b1bddc6ee085761d4cc17706f142ea1bbb990808bdd194f762462a"
+      },
+      {
+        "path": "simulations/SIM-nalug-chunking-raw-only-first-profile/QUESTION.md",
+        "sha256": "36ac5aa1f84e520d63a05b6a46cf0047bbf79b6d7e1c4d6797a61904688f5f63"
+      },
+      {
+        "path": "scenarios/transport-family-bakeoff-per-hop-authorization-failure/transport-family-bakeoff-per-hop-authorization-failure.md",
+        "sha256": "f938e10ab88db666d3097a2f97c1667bbbc6e8e071681134049068982cc39cf2"
+      }
+    ],
+    "simulation_tree_hash": "8196e3e0b535f402a9f37e9151e3857701f1c260b2db59f24f35f2bb6c077e74"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 0,
+    "promisegrid_alignment": 2,
+    "auditability": 3,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 0,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 4,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 25,
+    "normalized_0_100": 50,
+    "confidence_0_1": 0.91
+  },
+  "assessment": {
+    "rationale": "The simulation is a poor direct fit for a transport per-hop authorization failure scenario. It is about L6 CAS identity scope, not ring forwarding, membership, or authorization refusal behavior. Its main value here is negative evidence: the boundary is clear enough to show that raw-only content identity does not by itself answer transport failure semantics. The design is simple and evolution-friendly, but it leaves the scenario's key questions unresolved.",
+    "strengths": [
+      "Clear scope: raw-byte content identity only.",
+      "Strong simplicity and small-artifact bias.",
+      "Explicit deferral of chunking rules improves evolution flexibility.",
+      "Boundary between CAS identity and higher-layer transport behavior is relatively clear."
+    ],
+    "weaknesses": [
+      "Does not model per-hop authorization, refusal, hop skipping, or membership reconfiguration.",
+      "Provides no ring-versus-gossip failure semantics.",
+      "No explicit local promise/accounting artifact for authorization failure.",
+      "Scenario pressure is mostly unmet because the design lives at a different layer."
+    ],
+    "risks": [
+      "Layer mismatch could be mistaken for scenario success when the transport failure model is actually absent.",
+      "Deferring chunked identity may postpone evidence needed for larger-object transport behavior under failure.",
+      "Authorization refusal records may be underspecified if transport semantics are expected to ride on this profile alone."
+    ],
+    "open_questions": [
+      "Can a raw-only CAS profile cleanly support later transport-level refusal artifacts without changing content identity rules?",
+      "What minimal local record would Bob need to emit so Alice or Carol can audit a per-hop authorization refusal?",
+      "Does deferring chunked identity also defer too much evidence for large-object transport failure handling?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

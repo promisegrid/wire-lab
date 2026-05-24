@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-gujiv-conditional-release-hybrid-reference-graph-cas-object-type-binding-bakeoff-unknown-typed-object-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000092-SIM-gujiv-conditional-release-hybrid-reference-graph--cas-object-type-binding-bakeoff-unknown-typed-object--openai-gpt-5.4-medium",
+  "sim_id": "SIM-gujiv-conditional-release-hybrid-reference-graph",
+  "scenario_id": "cas-object-type-binding-bakeoff-unknown-typed-object",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-gujiv-conditional-release-hybrid-reference-graph/cas-object-type-binding-bakeoff-unknown-typed-object/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_d84081221c544520a5933e2caaaaaa9c",
+    "response_id": "resp_0f4f137a543a10c8006a123306dcb881999bc0668941ab7abb",
+    "input_tokens": 7547,
+    "output_tokens": 992,
+    "cost_usd": 0.02709525
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-gujiv-conditional-release-hybrid-reference-graph/",
+    "scenario_path": "scenarios/cas-object-type-binding-bakeoff-unknown-typed-object/cas-object-type-binding-bakeoff-unknown-typed-object.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-gujiv-conditional-release-hybrid-reference-graph/README.md",
+        "sha256": "03247c8a2a06b2a8c3928b5e3ebf5e8ec82d683558f04b551ba936c880caf1f9"
+      },
+      {
+        "path": "simulations/SIM-gujiv-conditional-release-hybrid-reference-graph/QUESTION.md",
+        "sha256": "c9ffd03808d1cbc2c8ecd1ea86828b900e9543798f69d99e2d0327c9d7e695c5"
+      },
+      {
+        "path": "scenarios/cas-object-type-binding-bakeoff-unknown-typed-object/cas-object-type-binding-bakeoff-unknown-typed-object.md",
+        "sha256": "76f0a7016fa2bad5e53903682706bca4eeb4aa2d099311a4ea52b7280748cf90"
+      }
+    ],
+    "simulation_tree_hash": "bfaaa00c0154723abdec6de204c1fc67d79012cf94e8e62b83667423be99cb22"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 3,
+    "promisegrid_alignment": 4,
+    "auditability": 3,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 2,
+    "implementation_plausibility": 3,
+    "promise_vocabulary": 3,
+    "simplicity_durability": 3,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 31,
+    "normalized_0_100": 62,
+    "confidence_0_1": 0.69
+  },
+  "assessment": {
+    "rationale": "The simulation is relevant because it centers opaque lower-layer references, stable condition CIDs, and local evidence, which helps with mixed-version handling of unknown typed objects. It also has strong layer-boundary intent. But the scenario asks for explicit unknown-type store/advertise/forward behavior and unsafe-parsing avoidance, and this specimen does not define that concretely; its object model is explicitly unsettled.",
+    "strengths": [
+      "Explicit emphasis on opaque lower-layer references fits unknown-type survival pressure.",
+      "Stable condition CIDs and local evidence support evolution and peer-local audit.",
+      "Clear focus on keeping human release meaning at the group layer while lower layers stay generic."
+    ],
+    "weaknesses": [
+      "No explicit rule for unknown-codec store/advertise/forward behavior.",
+      "Failure handling for unrecognized object types is underspecified.",
+      "Reference-graph/object-model details are left open, limiting auditability and implementation confidence."
+    ],
+    "risks": [
+      "Peers may still need type-specific logic at the wrong layer because unknown-type behavior is not specified.",
+      "An unsettled graph object model can undermine long-term interoperability and audit consistency.",
+      "Opaque references alone may not guarantee safe forwarding semantics for unknown codecs."
+    ],
+    "open_questions": [
+      "Does the design explicitly require unknown-codec objects to be stored and forwarded opaquely without parsing?",
+      "What concrete refusal or downgrade behavior applies when a peer cannot interpret a referenced object type?",
+      "How are advertisement and audit records encoded if the graph object model remains unsettled?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

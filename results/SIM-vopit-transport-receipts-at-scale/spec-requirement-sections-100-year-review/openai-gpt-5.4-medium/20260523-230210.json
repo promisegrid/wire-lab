@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-vopit-transport-receipts-at-scale-spec-requirement-sections-100-year-review-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000124-SIM-vopit-transport-receipts-at-scale--spec-requirement-sections-100-year-review--openai-gpt-5.4-medium",
+  "sim_id": "SIM-vopit-transport-receipts-at-scale",
+  "scenario_id": "spec-requirement-sections-100-year-review",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-vopit-transport-receipts-at-scale/spec-requirement-sections-100-year-review/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_ad183f9477fc407a89ddd7b7d7b70f6d",
+    "response_id": "resp_094ddb3ae5303a0f006a123363e3c48198904503a58f1f6655",
+    "input_tokens": 7504,
+    "output_tokens": 1071,
+    "cost_usd": 0.028126
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-vopit-transport-receipts-at-scale/",
+    "scenario_path": "scenarios/spec-requirement-sections-100-year-review/spec-requirement-sections-100-year-review.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-vopit-transport-receipts-at-scale/README.md",
+        "sha256": "0fbf01f60630a4d77a90b1eb757baaf22db54718e543726edd6f902784c0e973"
+      },
+      {
+        "path": "simulations/SIM-vopit-transport-receipts-at-scale/QUESTION.md",
+        "sha256": "f2d5400dddd9f92139fcbf4c1ca1daf8a9228dd7057e4e5eab115211a7873848"
+      },
+      {
+        "path": "scenarios/spec-requirement-sections-100-year-review/spec-requirement-sections-100-year-review.md",
+        "sha256": "b2e71192b720372495986fad6387d0bfd5222ce78a7cfd9da03940d1a1062cd7"
+      }
+    ],
+    "simulation_tree_hash": "0296d101bcc1d66b152b10009c3fd7e912eb0da942916f52f9bda4cf0d3c7c47"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 3,
+    "auditability": 3,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 2,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 3,
+    "simplicity_durability": 2,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 28,
+    "normalized_0_100": 56.00000000000001,
+    "confidence_0_1": 0.79
+  },
+  "assessment": {
+    "rationale": "The simulation partially fits the 100-year review pressure because it explicitly asks how receipt evidence can stay auditable at scale and warns against unverifiable summaries. But it is not primarily a spec-section or long-horizon documentation design, so it only indirectly answers whether future readers preserve the needed assumptions. Its strongest fit is peer-local receipt evidence and bounded retention; its weakest fit is lack of a concrete durable section shape, evolution story, and explicit long-horizon failure analysis.",
+    "strengths": [
+      "Centers local receipt promises rather than a central ledger.",
+      "Directly addresses bounded evidence retention at scale.",
+      "Makes auditability a first-class question and names the risk of unverifiable summaries."
+    ],
+    "weaknesses": [
+      "Does not define a concrete 100-year durable spec section or review procedure.",
+      "Failure modes for stale tooling, changed cryptography, and social context are underdeveloped.",
+      "Vocabulary is only partly promise-first and still framed in generic transport/acknowledgement terms."
+    ],
+    "risks": [
+      "Compact receipt summaries or proofs may become opaque artifacts that future readers cannot validate.",
+      "Aggregation may hide message-level loss or ambiguity behind summary claims.",
+      "The design could drift toward specialized formats whose verification assumptions are not preserved in durable text."
+    ],
+    "open_questions": [
+      "Would any aggregated receipt format remain intelligible and independently checkable after major tool and cryptographic turnover?",
+      "What minimum long-horizon spec section is needed so future readers can distinguish auditable receipt evidence from unverifiable summary claims?",
+      "Can small devices verify the proposed summaries or proofs without retaining large historical state?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

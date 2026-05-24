@@ -1,0 +1,122 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-gujav-chunking-descriptor-cid-identity-cas-object-type-binding-bakeoff-unknown-typed-object-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000050-SIM-gujav-chunking-descriptor-cid-identity--cas-object-type-binding-bakeoff-unknown-typed-object--openai-gpt-5.4-medium",
+  "sim_id": "SIM-gujav-chunking-descriptor-cid-identity",
+  "scenario_id": "cas-object-type-binding-bakeoff-unknown-typed-object",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-gujav-chunking-descriptor-cid-identity/cas-object-type-binding-bakeoff-unknown-typed-object/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_0ef10fc658fe439b8708a3cdf9b7bd0a",
+    "response_id": "resp_0ae2a5359c2839b4006a12328293008198ba357328111a60d3",
+    "input_tokens": 7542,
+    "output_tokens": 1097,
+    "cost_usd": 0.0285565
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-gujav-chunking-descriptor-cid-identity/",
+    "scenario_path": "scenarios/cas-object-type-binding-bakeoff-unknown-typed-object/cas-object-type-binding-bakeoff-unknown-typed-object.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-gujav-chunking-descriptor-cid-identity/README.md",
+        "sha256": "e305f4539f80b3ebf13efdf3ac7e5546a24bfb4f3f2b933ba5314ee8da45d04b"
+      },
+      {
+        "path": "simulations/SIM-gujav-chunking-descriptor-cid-identity/QUESTION.md",
+        "sha256": "4ce300a0089546c059324a77048602a2a11d6ee7da9726dd6f626491d2e9022b"
+      },
+      {
+        "path": "scenarios/cas-object-type-binding-bakeoff-unknown-typed-object/cas-object-type-binding-bakeoff-unknown-typed-object.md",
+        "sha256": "76f0a7016fa2bad5e53903682706bca4eeb4aa2d099311a4ea52b7280748cf90"
+      }
+    ],
+    "simulation_tree_hash": "15d243cabdef61ba22264cb689324663680bcab3609423fe91b7c7667b8025f2"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 3,
+    "auditability": 3,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 3,
+    "failure_handling": 1,
+    "implementation_plausibility": 3,
+    "promise_vocabulary": 3,
+    "simplicity_durability": 2,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 25,
+    "normalized_0_100": 50,
+    "confidence_0_1": 0.8
+  },
+  "assessment": {
+    "rationale": "The design is mostly orthogonal to this scenario. A separate chunking descriptor may help migration and reuse, but the provided simulation does not define unknown-type behavior, opaque forwarding rules, or safe failure handling when a peer lacks the object's codec. It offers some boundary clarity around chunking, yet it does not directly answer the scenario's type-binding pressure.",
+    "strengths": [
+      "Explicitly separates chunking description from object payload identity.",
+      "Strong migration/reuse intent is stated.",
+      "The descriptor artifact could be audited as a stable referenced object."
+    ],
+    "weaknesses": [
+      "Does not directly specify behavior for unknown codecs or types.",
+      "Does not show how Dave can store, advertise, and forward opaquely without parsing.",
+      "Promise wording is not actor-local and remains design-level rather than concrete peer promises.",
+      "Adds a durable artifact/indirection that may hurt simplicity."
+    ],
+    "risks": [
+      "Extra indirection can weaken obvious long-lived object identity.",
+      "Peers may incorrectly treat chunking-descriptor knowledge as sufficient to interpret unknown object types.",
+      "Descriptor lookup or absence could create ambiguous handling paths in mixed-version networks."
+    ],
+    "open_questions": [
+      "Does Dave need to fetch or understand the chunking descriptor before he can safely store and forward an unknown-typed object?",
+      "How does a separate chunking descriptor interact with object codec/type binding when the codec is unknown?",
+      "What local promise record shows that opaque forwarding occurred without unsafe parsing?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

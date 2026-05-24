@@ -1,0 +1,174 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields-peer-adoption-metadata-relationship-scoped-adoption-openai-gpt-5.4-medium-20260524-024852",
+  "run_group_id": "ga-canary-20260523-pt-gate-v3",
+  "cell_id": "ga-canary-20260523-pt-gate-v3-000013-SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields--peer-adoption-metadata-relationship-scoped-adoption--openai-gpt-5.4-medium",
+  "sim_id": "SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields",
+  "scenario_id": "peer-adoption-metadata-relationship-scoped-adoption",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260524-024852",
+  "result_path": "results/SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields/peer-adoption-metadata-relationship-scoped-adoption/openai-gpt-5.4-medium/20260524-024852.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_076ae604e710479097cf5f9a07c903e7",
+    "response_id": "resp_0ba8dd8e0be2eaa3006a12676b65f08199bc4d1a04551b74a1",
+    "input_tokens": 9056,
+    "output_tokens": 1601,
+    "cost_usd": 0.038262
+  },
+  "source": {
+    "repo_commit": "ec652bd3ecaaf2f904e62cff00e113a88c7e3efd",
+    "sim_path": "simulations/SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields/",
+    "scenario_path": "scenarios/peer-adoption-metadata-relationship-scoped-adoption/peer-adoption-metadata-relationship-scoped-adoption.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields/README.md",
+        "sha256": "3ab052fe6b0a0513740136a232eeaf2f73e992923012280c92c2e159c8fb0a9c"
+      },
+      {
+        "path": "simulations/SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields/QUESTION.md",
+        "sha256": "707280a55807f9fce459bf58b891379e28a66c77fbedf1c263937113936a25d3"
+      },
+      {
+        "path": "simulations/SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields/protocols/grid-envelope.d/CHANGELOG.md",
+        "sha256": "3652c6b6111b64750a90c10edf0da60a2d88777a2c3313477f21490d61d97201"
+      },
+      {
+        "path": "simulations/SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "68d7443d65d236f5471fac7781b122413a1f5ba914587b2b3522c8b3677062d9"
+      },
+      {
+        "path": "scenarios/peer-adoption-metadata-relationship-scoped-adoption/peer-adoption-metadata-relationship-scoped-adoption.md",
+        "sha256": "b2a2b0fb4dfcd76dfd88a39d4bb4f4d8a85fafb0b052621a36de8692d19fe3d7"
+      }
+    ],
+    "simulation_tree_hash": "cee27e908e02ebb98055f64a9a1750e4c150996dd05c4c53e16ec029927598f1"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 2,
+    "auditability": 2,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 2,
+    "failure_handling": 3,
+    "implementation_plausibility": 3,
+    "promise_vocabulary": 1,
+    "simplicity_durability": 2,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 21,
+    "normalized_0_100": 42,
+    "confidence_0_1": 0.82
+  },
+  "assessment": {
+    "rationale": "Technically interesting envelope specimen with conservative unknown-pCID behavior and decent extensibility, but it is a weak fit for relationship-scoped adoption. The design says little about peer-local adoption metadata and pushes most meaning into schema-specific handlers, which harms generic auditability and drifts away from promise-first framing.",
+    "strengths": [
+      "Explicit unknown-pCID policy preserves opaque evidence without overclaiming interpretation.",
+      "Deterministic CBOR array gives a compact durable wire artifact.",
+      "No central registry or global trust authority is required by the draft."
+    ],
+    "weaknesses": [
+      "Scenario mismatch: the specimen is about envelope parsing, not adoption promises between peers.",
+      "Generic tooling cannot tell which field carries payload, proof, or relationship metadata.",
+      "Promise vocabulary is weak; behavior is expressed as normative spec rules rather than promises."
+    ],
+    "risks": [
+      "Different relationship-specific schemas may be possible but not legible to generic peers or auditors.",
+      "Schema-local signatures and field meanings make cross-relationship comparison fragile.",
+      "Variable outer arity increases ambiguity and attack surface for malformed or misleading envelopes."
+    ],
+    "open_questions": [
+      "Can relationship-scoped adoption be expressed explicitly outside the pCID handler so Alice and Carol can audit Bob's different choices locally?",
+      "Would machine-readable per-pCID field metadata be enough to recover auditability for peer-local adoption evidence?",
+      "How would a peer record a promise such as 'Bob promises to use schema X with Alice but schema Y with Carol' without a generic relationship-scoped metadata layer?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design.",
+    "pt_gate": {
+      "status": "pt_reframe_needed",
+      "autonomous_agents": {
+        "status": "warning",
+        "note": "It does not impose central authority, but it is written as protocol rules rather than autonomous agent promises."
+      },
+      "scoped_intent": {
+        "status": "warning",
+        "note": "The design lacks scoped promise statements and does not model relationship-scoped adoption intent directly."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "It does not explicitly let one agent promise on behalf of another."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "The design does not promise outcomes; unknown schemas remain opaque evidence."
+      },
+      "local_trust_assessment": {
+        "status": "warning",
+        "note": "Unknown-pCID handling is conservative and local, but trust is implicit in handler availability rather than explicit local promise assessment."
+      },
+      "accept_use_not_obligation": {
+        "status": "warning",
+        "note": "The draft describes receiver behavior normatively rather than as voluntary promises to accept or use."
+      },
+      "violations": [
+        "Uses global protocol MUST/MUST NOT framing instead of explicit agent-scoped promises.",
+        "Does not represent relationship-scoped adoption as local promise accounting between peers.",
+        "Trust and interpretation depend on pCID-specific handlers rather than explicit local trust statements."
+      ]
+    }
+  }
+}

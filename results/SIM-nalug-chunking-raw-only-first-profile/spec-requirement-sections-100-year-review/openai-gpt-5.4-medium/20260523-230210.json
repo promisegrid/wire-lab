@@ -1,0 +1,122 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-nalug-chunking-raw-only-first-profile-spec-requirement-sections-100-year-review-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000068-SIM-nalug-chunking-raw-only-first-profile--spec-requirement-sections-100-year-review--openai-gpt-5.4-medium",
+  "sim_id": "SIM-nalug-chunking-raw-only-first-profile",
+  "scenario_id": "spec-requirement-sections-100-year-review",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-nalug-chunking-raw-only-first-profile/spec-requirement-sections-100-year-review/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_7b93a94ffdc64979b88d8f843d636e60",
+    "response_id": "resp_05f3e0115d4d33b9006a1232bdcebc819aac58955d2fb05dac",
+    "input_tokens": 7529,
+    "output_tokens": 1153,
+    "cost_usd": 0.02931775
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-nalug-chunking-raw-only-first-profile/",
+    "scenario_path": "scenarios/spec-requirement-sections-100-year-review/spec-requirement-sections-100-year-review.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-nalug-chunking-raw-only-first-profile/README.md",
+        "sha256": "d06e84e3a1b1bddc6ee085761d4cc17706f142ea1bbb990808bdd194f762462a"
+      },
+      {
+        "path": "simulations/SIM-nalug-chunking-raw-only-first-profile/QUESTION.md",
+        "sha256": "36ac5aa1f84e520d63a05b6a46cf0047bbf79b6d7e1c4d6797a61904688f5f63"
+      },
+      {
+        "path": "scenarios/spec-requirement-sections-100-year-review/spec-requirement-sections-100-year-review.md",
+        "sha256": "b2e71192b720372495986fad6387d0bfd5222ce78a7cfd9da03940d1a1062cd7"
+      }
+    ],
+    "simulation_tree_hash": "8196e3e0b535f402a9f37e9151e3857701f1c260b2db59f24f35f2bb6c077e74"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 3,
+    "auditability": 3,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 1,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 4,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 29,
+    "normalized_0_100": 57.99999999999999,
+    "confidence_0_1": 0.77
+  },
+  "assessment": {
+    "rationale": "The simulation is relevant to 100-year review because it explicitly narrows the first profile and states what is deferred, which helps future intelligibility. But it is only an indirect fit for a scenario about required long-horizon spec sections: it does not itself define a durable review section, audit record shape, or future-reader guidance. Its strongest qualities are simple scope, clear layer boundary between raw-byte identity and later chunking promises, and plausible incremental evolution. Its main gaps are weak failure handling, limited explicit Promise-Theory payload wording, and insufficient long-horizon review structure for large-object and sparse-replication concerns.",
+    "strengths": [
+      "Very simple first-profile scope supports durable reading and small-device implementation.",
+      "Clear separation between raw-byte content identity and later chunking algorithm promises.",
+      "Explicit boundary statement acknowledges that raw-only is a staged choice, not a forever claim."
+    ],
+    "weaknesses": [
+      "Does not provide a concrete required spec-section home for 100-year review pressure.",
+      "Little explicit treatment of adversarial, refusal, stale-data, or audit-failure cases.",
+      "Promise vocabulary is only partial and not strongly actor-local or payload-first.",
+      "Sparse replication and large-object evidence remain intentionally underdeveloped."
+    ],
+    "risks": [
+      "Future readers may understand the deferral decision but still lack enough evidence to judge large-object replication and sparse knowledge behavior.",
+      "A raw-only first profile could lock in underspecified migration expectations if the later chunking profile boundary is not documented more concretely.",
+      "Without an explicit required spec section, the rationale for deferring chunking may decay into tribal knowledge."
+    ],
+    "open_questions": [
+      "Should the spec require an explicit long-horizon section explaining why raw-only identity was chosen and what later chunking profiles must preserve?",
+      "How would future readers audit large-object replication or sparse-partial knowledge behavior if chunked identity is deferred?",
+      "What failure evidence should a raw-only first profile require so later profile migration remains intelligible after major tooling and organizational change?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

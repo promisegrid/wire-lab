@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-falun-conditional-release-separate-protocol-family-udp-feed-v0-conformance-session-layer-composition-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000084-SIM-falun-conditional-release-separate-protocol-family--udp-feed-v0-conformance-session-layer-composition--openai-gpt-5.4-medium",
+  "sim_id": "SIM-falun-conditional-release-separate-protocol-family",
+  "scenario_id": "udp-feed-v0-conformance-session-layer-composition",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-falun-conditional-release-separate-protocol-family/udp-feed-v0-conformance-session-layer-composition/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_0262eda028bf4cb8ab6b138e6b2d63f3",
+    "response_id": "resp_05caad3b6e68be0e006a1232ea31a4819aa796873accec9268",
+    "input_tokens": 7530,
+    "output_tokens": 1223,
+    "cost_usd": 0.0302995
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-falun-conditional-release-separate-protocol-family/",
+    "scenario_path": "scenarios/udp-feed-v0-conformance-session-layer-composition/udp-feed-v0-conformance-session-layer-composition.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-falun-conditional-release-separate-protocol-family/README.md",
+        "sha256": "221ec83723d44d8a44ef0a98e812228a4c5e913ca2f852803278c7f5483525a8"
+      },
+      {
+        "path": "simulations/SIM-falun-conditional-release-separate-protocol-family/QUESTION.md",
+        "sha256": "68958d90c7adb920e96089b88c3daa22e152f7fe6b21d2892c2421091049330c"
+      },
+      {
+        "path": "scenarios/udp-feed-v0-conformance-session-layer-composition/udp-feed-v0-conformance-session-layer-composition.md",
+        "sha256": "69da5db705a56cd7067a653928ff8b2dc9301ef6ebfc712bd81038a65c9d352c"
+      }
+    ],
+    "simulation_tree_hash": "9c6f5be6a30bb69caa3c1aff7b2b2992ad54cf3f9fb9529db69c6329b941e751"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 4,
+    "auditability": 4,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 1,
+    "implementation_plausibility": 3,
+    "promise_vocabulary": 4,
+    "simplicity_durability": 3,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 32,
+    "normalized_0_100": 64,
+    "confidence_0_1": 0.72
+  },
+  "assessment": {
+    "rationale": "The design matches the composition pressure by separating release conditions into a referenced protocol artifact rather than embedding them in each higher-layer format, which helps layer boundaries and protocol evolution. But the scenario is specifically about whether UDP-feed v0 is sufficient for session-layer composition, and this simulation does not specify the feed/session binding, API surface, or failure behavior in enough detail to prove that fit.",
+    "strengths": [
+      "Clear separation between conditional-release semantics and feed/session/application protocols.",
+      "Uses a dedicated promise object under its own pCID, supporting reuse and later audit.",
+      "Improves evolution safety by letting multiple protocol layers cite the same release artifact."
+    ],
+    "weaknesses": [
+      "Weak direct coverage of the UDP-feed v0 session-composition question.",
+      "No concrete failure-handling or stale-reference behavior is described.",
+      "Adds protocol-family indirection that may hurt simplicity on small devices."
+    ],
+    "risks": [
+      "Extra indirection may make ordinary content transfer harder to implement and debug.",
+      "A separate protocol family could drift into generic policy machinery rather than small payload promises.",
+      "Missing failure semantics for unavailable, expired, or disputed release objects could weaken auditability in practice."
+    ],
+    "open_questions": [
+      "How would the conditional-release object be bound to a UDP-feed/session message without leaking transport-specific details?",
+      "What local evidence records show refusal, expiry, or stale release-policy references across layers?",
+      "Does the extra reference hop remain small and durable enough for constrained devices and long-lived archives?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

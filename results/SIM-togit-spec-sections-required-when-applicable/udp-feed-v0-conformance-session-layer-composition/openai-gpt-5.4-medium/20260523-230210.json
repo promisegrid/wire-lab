@@ -1,0 +1,119 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-togit-spec-sections-required-when-applicable-udp-feed-v0-conformance-session-layer-composition-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000168-SIM-togit-spec-sections-required-when-applicable--udp-feed-v0-conformance-session-layer-composition--openai-gpt-5.4-medium",
+  "sim_id": "SIM-togit-spec-sections-required-when-applicable",
+  "scenario_id": "udp-feed-v0-conformance-session-layer-composition",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-togit-spec-sections-required-when-applicable/udp-feed-v0-conformance-session-layer-composition/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_52855060f7144b8192426b0521f2c962",
+    "response_id": "resp_0f50706a9ecb3492006a1233eccd64819aa87afea34018e5fc",
+    "input_tokens": 7516,
+    "output_tokens": 839,
+    "cost_usd": 0.024899
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-togit-spec-sections-required-when-applicable/",
+    "scenario_path": "scenarios/udp-feed-v0-conformance-session-layer-composition/udp-feed-v0-conformance-session-layer-composition.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-togit-spec-sections-required-when-applicable/README.md",
+        "sha256": "66263302e91fd60b3428ecacb3c0c25121e97dd52cebf444bad1a0315daa6515"
+      },
+      {
+        "path": "simulations/SIM-togit-spec-sections-required-when-applicable/QUESTION.md",
+        "sha256": "08f3b0838c8a6fb4ab9136cb743e5ea73d754d5a4a3ffc06a01521bcf228f037"
+      },
+      {
+        "path": "scenarios/udp-feed-v0-conformance-session-layer-composition/udp-feed-v0-conformance-session-layer-composition.md",
+        "sha256": "69da5db705a56cd7067a653928ff8b2dc9301ef6ebfc712bd81038a65c9d352c"
+      }
+    ],
+    "simulation_tree_hash": "6a9e1226fa8914d1fd9767d6eedff77757e47a0a2b96f98d674a150770f0e20c"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 3,
+    "auditability": 3,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 1,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 3,
+    "simplicity_durability": 4,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 30,
+    "normalized_0_100": 60,
+    "confidence_0_1": 0.72
+  },
+  "assessment": {
+    "rationale": "This simulation is a meta-spec-format candidate, not a UDP-feed/session protocol design, so it only partially fits the scenario. Its main value here is that it explicitly tries to require explanatory sections when layer composition is load-bearing, which helps boundary clarity and keeps specs small. But it does not define the applicability criteria, composition evidence, or failure cases needed to show that a UDP-feed API is sufficient for an upper session layer without leakage.",
+    "strengths": [
+      "Targets layer-dependent explanatory sections instead of unconditional boilerplate.",
+      "Small and durable spec shape; easy to implement in constrained environments.",
+      "Improves chances that composition concerns are documented when truly load-bearing."
+    ],
+    "weaknesses": [
+      "Does not directly specify UDP-feed v0 or session-layer composition behavior.",
+      "Applicability criteria are intentionally unresolved, weakening audit consistency.",
+      "Little explicit treatment of failure handling, adversarial pressure, or sparse-knowledge effects in this scenario."
+    ],
+    "risks": [
+      "Authors may wrongly mark composition-related sections as not applicable and hide real cross-layer coupling.",
+      "Lack of explicit applicability criteria can reduce comparability across specs and audits."
+    ],
+    "open_questions": [
+      "What concrete applicability test would force session-layer composition sections when UDP-feed binding details leak upward?",
+      "Can conditional sections be audited consistently across authors without a stricter checklist?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

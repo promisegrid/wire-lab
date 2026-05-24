@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-jomaj-transport-token-ring-cas-object-type-binding-bakeoff-unknown-typed-object-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000099-SIM-jomaj-transport-token-ring--cas-object-type-binding-bakeoff-unknown-typed-object--openai-gpt-5.4-medium",
+  "sim_id": "SIM-jomaj-transport-token-ring",
+  "scenario_id": "cas-object-type-binding-bakeoff-unknown-typed-object",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-jomaj-transport-token-ring/cas-object-type-binding-bakeoff-unknown-typed-object/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_eba89f4a7baf484f8cc328f1a708eee5",
+    "response_id": "resp_0add8762c0ece2f7006a12331a20b4819bb8dcb21253cd0628",
+    "input_tokens": 7513,
+    "output_tokens": 919,
+    "cost_usd": 0.02601375
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-jomaj-transport-token-ring/",
+    "scenario_path": "scenarios/cas-object-type-binding-bakeoff-unknown-typed-object/cas-object-type-binding-bakeoff-unknown-typed-object.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-jomaj-transport-token-ring/README.md",
+        "sha256": "da5a8b07baa9f0969362a89aa8bb0d3c5d367bb2fe6783621ed461bac7c9851e"
+      },
+      {
+        "path": "simulations/SIM-jomaj-transport-token-ring/QUESTION.md",
+        "sha256": "f1cc68278f35c5f9d14f7bc4ed97b3c4249e9933fbff955219beb1e83d635b6e"
+      },
+      {
+        "path": "scenarios/cas-object-type-binding-bakeoff-unknown-typed-object/cas-object-type-binding-bakeoff-unknown-typed-object.md",
+        "sha256": "76f0a7016fa2bad5e53903682706bca4eeb4aa2d099311a4ea52b7280748cf90"
+      }
+    ],
+    "simulation_tree_hash": "1e99d614e1d78c2d36ea51a210ff9e5480e57752534b2cee956563c7c8d5f95f"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 2,
+    "auditability": 2,
+    "evolution_safety": 1,
+    "layer_boundary_clarity": 2,
+    "failure_handling": 1,
+    "implementation_plausibility": 3,
+    "promise_vocabulary": 1,
+    "simplicity_durability": 2,
+    "risk_penalty": 4
+  },
+  "fitness": {
+    "raw": 16,
+    "normalized_0_100": 32,
+    "confidence_0_1": 0.81
+  },
+  "assessment": {
+    "rationale": "This simulation is mainly a transport experiment, not a CAS object type-binding design. It does support opaque forwarding in principle because it focuses on ordered message passing and per-hop forwarding promises, but the documents do not define unknown-codec object handling, safe non-parsing behavior, or type-binding evolution rules. So it is only a weak indirect fit to the scenario.",
+    "strengths": [
+      "Clear transport boundary: it does not claim to replace other layers.",
+      "Per-hop forward/wait/refuse promises give some local accountability.",
+      "Opaque forwarding is at least conceptually compatible with transport-level relay."
+    ],
+    "weaknesses": [
+      "Scenario fit is weak because the sim does not define CAS type-binding behavior.",
+      "No explicit promise vocabulary about payload conformance or unknown-type handling.",
+      "Mixed-version and partition recovery are already identified as fragility concerns, which hurts this scenario."
+    ],
+    "risks": [
+      "Layer mismatch: transport ordering may distract from the actual type-binding problem.",
+      "Ring liveness and membership fragility could block durable forwarding of opaque objects.",
+      "Unknown-type safety is not specified, so peers may still make unsafe assumptions above the transport layer."
+    ],
+    "open_questions": [
+      "Can the transport carry a CID and related claims without any peer needing to parse the unknown object type?",
+      "What exact promise is made when a peer forwards an opaque object it cannot validate semantically?",
+      "How does the ring behave when an unknown typed object reaches mixed-version or offline peers during recovery?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

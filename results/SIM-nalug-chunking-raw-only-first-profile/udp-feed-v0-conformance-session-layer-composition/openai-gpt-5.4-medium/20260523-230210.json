@@ -1,0 +1,122 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-nalug-chunking-raw-only-first-profile-udp-feed-v0-conformance-session-layer-composition-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000070-SIM-nalug-chunking-raw-only-first-profile--udp-feed-v0-conformance-session-layer-composition--openai-gpt-5.4-medium",
+  "sim_id": "SIM-nalug-chunking-raw-only-first-profile",
+  "scenario_id": "udp-feed-v0-conformance-session-layer-composition",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-nalug-chunking-raw-only-first-profile/udp-feed-v0-conformance-session-layer-composition/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_365c45616fb041e4b70a54fdf28c9bb9",
+    "response_id": "resp_08907bc3dbb279d0006a1232bef9e4819b83eb92215fd09828",
+    "input_tokens": 7531,
+    "output_tokens": 1162,
+    "cost_usd": 0.02944725
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-nalug-chunking-raw-only-first-profile/",
+    "scenario_path": "scenarios/udp-feed-v0-conformance-session-layer-composition/udp-feed-v0-conformance-session-layer-composition.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-nalug-chunking-raw-only-first-profile/README.md",
+        "sha256": "d06e84e3a1b1bddc6ee085761d4cc17706f142ea1bbb990808bdd194f762462a"
+      },
+      {
+        "path": "simulations/SIM-nalug-chunking-raw-only-first-profile/QUESTION.md",
+        "sha256": "36ac5aa1f84e520d63a05b6a46cf0047bbf79b6d7e1c4d6797a61904688f5f63"
+      },
+      {
+        "path": "scenarios/udp-feed-v0-conformance-session-layer-composition/udp-feed-v0-conformance-session-layer-composition.md",
+        "sha256": "69da5db705a56cd7067a653928ff8b2dc9301ef6ebfc712bd81038a65c9d352c"
+      }
+    ],
+    "simulation_tree_hash": "8196e3e0b535f402a9f37e9151e3857701f1c260b2db59f24f35f2bb6c077e74"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 3,
+    "auditability": 3,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 3,
+    "failure_handling": 1,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 4,
+    "simplicity_durability": 5,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 30,
+    "normalized_0_100": 60,
+    "confidence_0_1": 0.84
+  },
+  "assessment": {
+    "rationale": "The simulation is clear and promise-oriented, but it targets CAS identity deferral rather than UDP-feed session-layer composition. It scores well on simplicity, implementability, and evolutionary caution, yet offers little direct evidence that a next layer can compose over UDP-feed v0 without binding leakage.",
+    "strengths": [
+      "Very simple first-profile artifact with durable raw-byte identity semantics.",
+      "Explicit deferral of chunking rules reduces premature lock-in.",
+      "Clear simulation boundary and motivating question make the design easy to audit."
+    ],
+    "weaknesses": [
+      "Weak direct fit to the UDP-feed v0 session-layer composition scenario.",
+      "Does not specify how next-layer APIs avoid leaking lower-layer binding details.",
+      "Little failure-mode or adversarial handling evidence.",
+      "Promise wording is decent but not strongly payload-promise/card-level specific."
+    ],
+    "risks": [
+      "Raw-only identity may leave higher layers without enough evidence for large-object handling or sparse replication.",
+      "The design may postpone necessary composition constraints until too late, creating later profile debt.",
+      "Because the scenario is transport/session focused, applying this sim here risks over-crediting a design that does not answer the actual composition question."
+    ],
+    "open_questions": [
+      "Can a raw-only CAS profile provide enough evidence for higher-layer session composition without later leaking chunking or transport details?",
+      "What peer-local audit artifacts would show large-object replication and reassembly behavior before chunked identity is introduced?",
+      "Does deferring chunked identity help evolution more than it harms early interoperability for session-layer consumers?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

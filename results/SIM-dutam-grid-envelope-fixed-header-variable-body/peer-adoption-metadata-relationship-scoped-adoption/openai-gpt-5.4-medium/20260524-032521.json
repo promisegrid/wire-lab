@@ -1,0 +1,163 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-dutam-grid-envelope-fixed-header-variable-body-peer-adoption-metadata-relationship-scoped-adoption-openai-gpt-5.4-medium-20260524-032521",
+  "run_group_id": "ga-canary-20260523-pt-gate-v3-successors",
+  "cell_id": "ga-canary-20260523-pt-gate-v3-successors-000013-SIM-dutam-grid-envelope-fixed-header-variable-body--peer-adoption-metadata-relationship-scoped-adoption--openai-gpt-5.4-medium",
+  "sim_id": "SIM-dutam-grid-envelope-fixed-header-variable-body",
+  "scenario_id": "peer-adoption-metadata-relationship-scoped-adoption",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260524-032521",
+  "result_path": "results/SIM-dutam-grid-envelope-fixed-header-variable-body/peer-adoption-metadata-relationship-scoped-adoption/openai-gpt-5.4-medium/20260524-032521.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_8ffe9f7416164e22adde33cbd6e0f51f",
+    "response_id": "resp_0e6e0f56d8ca2ee2006a126fdde100819abcf66556faf9090e",
+    "input_tokens": 8242,
+    "output_tokens": 2076,
+    "cost_usd": 0.0434875
+  },
+  "source": {
+    "repo_commit": "925c7f5c1c7ce7d5b0caf6a924d40d3f9b7d0483",
+    "sim_path": "simulations/SIM-dutam-grid-envelope-fixed-header-variable-body/",
+    "scenario_path": "scenarios/peer-adoption-metadata-relationship-scoped-adoption/peer-adoption-metadata-relationship-scoped-adoption.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-dutam-grid-envelope-fixed-header-variable-body/README.md",
+        "sha256": "36e655e9147306232cd1d4d874dbc7792e6eab7cc359251aee487b33d4b7c7b9"
+      },
+      {
+        "path": "simulations/SIM-dutam-grid-envelope-fixed-header-variable-body/QUESTION.md",
+        "sha256": "3790d466579bdf56d98055c4a630d802ca0d3ec042c01606860ff83f073621b0"
+      },
+      {
+        "path": "scenarios/peer-adoption-metadata-relationship-scoped-adoption/peer-adoption-metadata-relationship-scoped-adoption.md",
+        "sha256": "b2a2b0fb4dfcd76dfd88a39d4bb4f4d8a85fafb0b052621a36de8692d19fe3d7"
+      }
+    ],
+    "simulation_tree_hash": "41922bc0db1ac263325ae5ab91a03e187f0e61c5985a29f4f566745634f65fdb"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 3,
+    "promisegrid_alignment": 5,
+    "auditability": 4,
+    "evolution_safety": 5,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 2,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 3,
+    "simplicity_durability": 5,
+    "risk_penalty": 1
+  },
+  "fitness": {
+    "raw": 40,
+    "normalized_0_100": 80,
+    "confidence_0_1": 0.82
+  },
+  "assessment": {
+    "rationale": "Strong PromiseGrid envelope design: a small fixed header preserves generic audit and evolution while leaving relationship-specific adoption details to body protocols. For this scenario it is only a partial fit, because it enables relationship-scoped adoption metadata but does not itself define the semantics, evidence, or conflict handling for that metadata.",
+    "strengths": [
+      "Small fixed header improves later audit across evolving body formats.",
+      "Variable body under pCID gives room for relationship-scoped adoption semantics without freezing one global schema.",
+      "Clear outer/inner boundary supports long-lived protocol evolution and small-device durability.",
+      "No central registry or authority is required for peers to make local adoption claims."
+    ],
+    "weaknesses": [
+      "The simulation does not define a concrete relationship-scoped adoption body.",
+      "Failure handling for stale, conflicting, or adversarial adoption metadata is largely out of scope.",
+      "Promise wording is more envelope/protocol oriented than explicit payload-level promise statements."
+    ],
+    "risks": [
+      "Implementers may hide too much meaning in body-specific payloads, weakening cross-peer audit despite the stable header.",
+      "Relationship scope could remain underspecified and drift back into peer-identity-wide interpretation.",
+      "Conflicting or stale relationship-specific adoption metadata is not handled by the simulation itself."
+    ],
+    "open_questions": [
+      "What body-level fields would make Bob's relationship-scoped adoption promise explicit and locally auditable?",
+      "How should a peer name or bind relationship context without collapsing back to a global identity/profile claim?",
+      "What local evidence should Alice or Carol retain when Bob changes the adopted body pCID for one relationship but not another?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design.",
+    "pt_gate": {
+      "status": "pt_clean",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "Peers remain free to choose different body protocols in different relationships; no central authority or mandatory global profile is implied."
+      },
+      "scoped_intent": {
+        "status": "pass",
+        "note": "Relationship-scoped intent is compatible with the design because scope can live in the body protocol, though this simulation does not define that body explicitly."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "The design does not ask one agent to promise another agent's behavior; Bob can only declare his own intended protocol use."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "The envelope can carry claims and evidence, but it does not guarantee that another peer will accept, understand, or follow a body protocol."
+      },
+      "local_trust_assessment": {
+        "status": "pass",
+        "note": "The fixed header improves peer-local inspection of what protocol/body is being offered without requiring global trust infrastructure."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "The design can carry adoption or use intent as peer-local metadata rather than turning receipt or use into an obligation."
+      },
+      "violations": []
+    }
+  }
+}

@@ -1,0 +1,122 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-lilok-cas-type-path-suffix-negative-control-udp-feed-v0-conformance-session-layer-composition-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000042-SIM-lilok-cas-type-path-suffix-negative-control--udp-feed-v0-conformance-session-layer-composition--openai-gpt-5.4-medium",
+  "sim_id": "SIM-lilok-cas-type-path-suffix-negative-control",
+  "scenario_id": "udp-feed-v0-conformance-session-layer-composition",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-lilok-cas-type-path-suffix-negative-control/udp-feed-v0-conformance-session-layer-composition/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_2ada8ee0911c499abd6cf8138851b230",
+    "response_id": "resp_0bd6ee77d1a087c2006a123269cf148199b4a3c0894777246c",
+    "input_tokens": 7539,
+    "output_tokens": 1005,
+    "cost_usd": 0.02726325
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-lilok-cas-type-path-suffix-negative-control/",
+    "scenario_path": "scenarios/udp-feed-v0-conformance-session-layer-composition/udp-feed-v0-conformance-session-layer-composition.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-lilok-cas-type-path-suffix-negative-control/README.md",
+        "sha256": "01679bfb564db2b4f8adfc4535d1a02413330fa05cea0bc288f12d5ab519c086"
+      },
+      {
+        "path": "simulations/SIM-lilok-cas-type-path-suffix-negative-control/QUESTION.md",
+        "sha256": "b1845d40f8012e290f866398d59d22236cd65c974e210c8040a4f1ed2dc86297"
+      },
+      {
+        "path": "scenarios/udp-feed-v0-conformance-session-layer-composition/udp-feed-v0-conformance-session-layer-composition.md",
+        "sha256": "69da5db705a56cd7067a653928ff8b2dc9301ef6ebfc712bd81038a65c9d352c"
+      }
+    ],
+    "simulation_tree_hash": "0fe117659bfa499dd1f42891807e2ccdb2da83ab00099599578ffabf5fa458d6"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 1,
+    "auditability": 3,
+    "evolution_safety": 1,
+    "layer_boundary_clarity": 1,
+    "failure_handling": 1,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 1,
+    "simplicity_durability": 1,
+    "risk_penalty": 5
+  },
+  "fitness": {
+    "raw": 15,
+    "normalized_0_100": 30,
+    "confidence_0_1": 0.84
+  },
+  "assessment": {
+    "rationale": "This negative control is only indirectly relevant to UDP-feed session-layer composition, but it does illuminate the exact kind of layer leak the scenario pressures: object meaning escapes the payload and depends on storage-local naming. That makes cross-peer composition, archival replay, and future evolution brittle. The specimen is easy to implement and easy to audit as a bad idea, but it aligns poorly with PromiseGrid goals and provides weak failure containment.",
+    "strengths": [
+      "Clear negative-control specimen for testing boundary leakage.",
+      "Simple to implement on small systems.",
+      "Failure mode is easy for auditors to explain."
+    ],
+    "weaknesses": [
+      "Poor fit to the scenario's UDP-feed API question except as a boundary anti-pattern.",
+      "Primary type meaning is not in content-addressed bytes or explicit payload promises.",
+      "Weak evolution safety across renames, transports, archives, and peer-local conventions.",
+      "Composition leaks storage-binding details into higher layers."
+    ],
+    "risks": [
+      "Session-layer consumers may misinterpret identical bytes differently based on local filenames.",
+      "Cross-peer transfer and archival restore can silently lose or alter authoritative type meaning.",
+      "The design encourages hidden ambient state outside the durable payload promise boundary."
+    ],
+    "open_questions": [
+      "Can any session-layer composition remain safe if type meaning is carried only by local path suffix after content transfer?",
+      "Would adding an explicit payload type promise eliminate the suffix scheme rather than salvage it?",
+      "Is there any bounded local-only use where suffix hints are harmless because they are never treated as authoritative?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

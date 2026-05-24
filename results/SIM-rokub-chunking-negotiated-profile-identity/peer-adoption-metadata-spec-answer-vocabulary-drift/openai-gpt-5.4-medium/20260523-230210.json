@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-rokub-chunking-negotiated-profile-identity-peer-adoption-metadata-spec-answer-vocabulary-drift-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000060-SIM-rokub-chunking-negotiated-profile-identity--peer-adoption-metadata-spec-answer-vocabulary-drift--openai-gpt-5.4-medium",
+  "sim_id": "SIM-rokub-chunking-negotiated-profile-identity",
+  "scenario_id": "peer-adoption-metadata-spec-answer-vocabulary-drift",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-rokub-chunking-negotiated-profile-identity/peer-adoption-metadata-spec-answer-vocabulary-drift/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_e78fe85124744768a8a98ae1837e20ac",
+    "response_id": "resp_04f8d96552fa0f64006a1232a2415081999a51c5c2ec40e554",
+    "input_tokens": 7522,
+    "output_tokens": 900,
+    "cost_usd": 0.0257635
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-rokub-chunking-negotiated-profile-identity/",
+    "scenario_path": "scenarios/peer-adoption-metadata-spec-answer-vocabulary-drift/peer-adoption-metadata-spec-answer-vocabulary-drift.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-rokub-chunking-negotiated-profile-identity/README.md",
+        "sha256": "cfeb2c64b5061e938cba35c3266e87af87df0679f6eaf43a97769756658b2b8c"
+      },
+      {
+        "path": "simulations/SIM-rokub-chunking-negotiated-profile-identity/QUESTION.md",
+        "sha256": "ce3d48efe724a47ca3de014bdfee99e9409e6001348dae2b89b36e82b867643a"
+      },
+      {
+        "path": "scenarios/peer-adoption-metadata-spec-answer-vocabulary-drift/peer-adoption-metadata-spec-answer-vocabulary-drift.md",
+        "sha256": "a9e8ba84995e69fcad36f2554442cc62c5e1128ea0818197cb7ebf66e843ff53"
+      }
+    ],
+    "simulation_tree_hash": "c3ce26f7460e9b0bbcc1d7d3e8b77abb0d296a9b5e17831ccad58324e43be3f0"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 2,
+    "auditability": 3,
+    "evolution_safety": 2,
+    "layer_boundary_clarity": 3,
+    "failure_handling": 1,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 3,
+    "risk_penalty": 4
+  },
+  "fitness": {
+    "raw": 22,
+    "normalized_0_100": 44,
+    "confidence_0_1": 0.84
+  },
+  "assessment": {
+    "rationale": "The simulation is adjacent to the scenario because it focuses on negotiated profiles and durable profile identity, which touches spec evolution and vocabulary drift. But it does not actually model adoption metadata, answer keys, or migration records for superseded specs, so it only partially addresses the scenario pressure.",
+    "strengths": [
+      "Explicitly records profile identity with received objects for later verification.",
+      "Makes mismatch detection between promised and used chunking rules auditable.",
+      "Keeps a relatively small and concrete artifact surface."
+    ],
+    "weaknesses": [
+      "Does not define adoption-metadata handling for renamed or removed spec questions.",
+      "No clear answer on whether answer keys are spec-local, profile-local, globally named, or migrated.",
+      "Failure handling for vocabulary drift is mostly implicit rather than specified."
+    ],
+    "risks": [
+      "Negotiated profile names may drift from frozen spec meaning and make old evidence ambiguous.",
+      "Recording profile identity in object roots may still be insufficient if question/answer vocabulary changes are not explicitly migrated.",
+      "Peers may conflate chunking-profile negotiation with higher-layer metadata semantics."
+    ],
+    "open_questions": [
+      "Is profile identity bound to a frozen spec identifier strongly enough to survive renamed or removed answer keys?",
+      "Would migration records be spec-local, profile-local, or external to the chunking negotiation layer?",
+      "Can old object roots remain unambiguous when later specs supersede the negotiated profile vocabulary?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

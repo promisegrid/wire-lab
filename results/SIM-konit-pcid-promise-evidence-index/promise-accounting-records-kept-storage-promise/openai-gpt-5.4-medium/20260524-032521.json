@@ -1,0 +1,160 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-konit-pcid-promise-evidence-index-promise-accounting-records-kept-storage-promise-openai-gpt-5.4-medium-20260524-032521",
+  "run_group_id": "ga-canary-20260523-pt-gate-v3-successors",
+  "cell_id": "ga-canary-20260523-pt-gate-v3-successors-000058-SIM-konit-pcid-promise-evidence-index--promise-accounting-records-kept-storage-promise--openai-gpt-5.4-medium",
+  "sim_id": "SIM-konit-pcid-promise-evidence-index",
+  "scenario_id": "promise-accounting-records-kept-storage-promise",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260524-032521",
+  "result_path": "results/SIM-konit-pcid-promise-evidence-index/promise-accounting-records-kept-storage-promise/openai-gpt-5.4-medium/20260524-032521.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_6a01f6ce0b4b4a4ab4805d87753d981a",
+    "response_id": "resp_02b1e679d9d27769006a1270d8423c819b8c04048a579e8034",
+    "input_tokens": 8259,
+    "output_tokens": 1447,
+    "cost_usd": 0.03471125
+  },
+  "source": {
+    "repo_commit": "925c7f5c1c7ce7d5b0caf6a924d40d3f9b7d0483",
+    "sim_path": "simulations/SIM-konit-pcid-promise-evidence-index/",
+    "scenario_path": "scenarios/promise-accounting-records-kept-storage-promise/promise-accounting-records-kept-storage-promise.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-konit-pcid-promise-evidence-index/README.md",
+        "sha256": "9ebee1bbac1dafa81dd66c456d35cc98c1bcc2152ac436c41ce31d1fb5d2a6ef"
+      },
+      {
+        "path": "simulations/SIM-konit-pcid-promise-evidence-index/QUESTION.md",
+        "sha256": "03e6029e9943fdd935fc8c629d871c771710a27f4ccbdf5b3db727be79814960"
+      },
+      {
+        "path": "scenarios/promise-accounting-records-kept-storage-promise/promise-accounting-records-kept-storage-promise.md",
+        "sha256": "9972dff7f20d9b4f3231c07a8eb332d2e75b43e84cf0d34af29c1d3ea9c1ad74"
+      }
+    ],
+    "simulation_tree_hash": "227c9a080416752ab4c2fd51ae77ac84fad407f5deaf7843de114272995e423a"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 4,
+    "promisegrid_alignment": 5,
+    "auditability": 5,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 4,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 5,
+    "simplicity_durability": 4,
+    "risk_penalty": 1
+  },
+  "fitness": {
+    "raw": 43,
+    "normalized_0_100": 86,
+    "confidence_0_1": 0.87
+  },
+  "assessment": {
+    "rationale": "Strong fit. The simulation directly supports Bob keeping a local record that Alice promised storage for chunk C and later kept that promise by serving it. It is especially strong on promise-first wording, evidence citation, and local trust accounting. It is somewhat incomplete on concrete record shape and failure/update mechanics for this exact storage scenario.",
+    "strengths": [
+      "Directly models who promised what, supporting evidence, and later observed keep/break outcomes.",
+      "Explicitly descriptive rather than certifying, which preserves Promise Theory boundaries.",
+      "Well suited to Bob's local promise-accounting record after a successful storage retrieval."
+    ],
+    "weaknesses": [
+      "More of an evidence pattern than a full end-to-end storage interaction design.",
+      "Failure-handling details for stale evidence, missing chunks, or conflicting observations are not fully specified."
+    ],
+    "risks": [
+      "Index vocabulary could drift back toward ledger or conformance framing if later expanded carelessly.",
+      "Operational details for retention, freshness, and compact record encoding are still under-specified."
+    ],
+    "open_questions": [
+      "What is the smallest durable index record Bob needs to keep locally after Alice serves chunk C?",
+      "How are freshness, retention period, and later rechecks represented without turning the index into a global ledger?",
+      "What evidence object shape best captures a kept storage observation on small devices?"
+    ],
+    "authority_boundary": "Evidence only; descriptive pCID-scoped promise-evidence indexing informs local trust and audit, not certification, authorization, or dispute settlement.",
+    "pt_gate": {
+      "status": "pt_clean",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "Promises and later observations are attached to named agents and remain locally assessed."
+      },
+      "scoped_intent": {
+        "status": "pass",
+        "note": "Promises are scoped to pCID-referenced payloads or services and exact evidence objects."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "The index asks which agent promised what and does not let one agent promise on behalf of another."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "The index records keep, break, refusal, or ambiguity as evidence; it does not guarantee service outcomes."
+      },
+      "local_trust_assessment": {
+        "status": "pass",
+        "note": "The simulation explicitly says trust remains a local judgment for Alice, Bob, or Carol."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "The design supports local recording and trust updates without reframing Bob's use or receipt as an obligation on other agents."
+      },
+      "violations": []
+    }
+  }
+}

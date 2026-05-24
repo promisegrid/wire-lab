@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-vagak-l6-cas-minimal-pointer-raw-profile-spec-requirement-sections-100-year-review-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000019-SIM-vagak-l6-cas-minimal-pointer-raw-profile--spec-requirement-sections-100-year-review--openai-gpt-5.4-medium",
+  "sim_id": "SIM-vagak-l6-cas-minimal-pointer-raw-profile",
+  "scenario_id": "spec-requirement-sections-100-year-review",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-vagak-l6-cas-minimal-pointer-raw-profile/spec-requirement-sections-100-year-review/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_b3fb3f409b144235b8b4a16b33a707a1",
+    "response_id": "resp_0da2753d322e8830006a1232253e308198accc6041a090adea",
+    "input_tokens": 7573,
+    "output_tokens": 975,
+    "cost_usd": 0.02690275
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-vagak-l6-cas-minimal-pointer-raw-profile/",
+    "scenario_path": "scenarios/spec-requirement-sections-100-year-review/spec-requirement-sections-100-year-review.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-vagak-l6-cas-minimal-pointer-raw-profile/README.md",
+        "sha256": "f7ad9b33539e14933ad1c903cd38b19235c78e3a1001ea534f726d0e7b664d53"
+      },
+      {
+        "path": "simulations/SIM-vagak-l6-cas-minimal-pointer-raw-profile/QUESTION.md",
+        "sha256": "124f7bc6031956ec43f1bdf89bc1cc04f4f5823ae421ef898a0c0d2e449b203f"
+      },
+      {
+        "path": "scenarios/spec-requirement-sections-100-year-review/spec-requirement-sections-100-year-review.md",
+        "sha256": "b2e71192b720372495986fad6387d0bfd5222ce78a7cfd9da03940d1a1062cd7"
+      }
+    ],
+    "simulation_tree_hash": "93ed6b00afc3d94381a3e4a416c793e7b201ed1f670dc0af547f8466c19fee07"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 3,
+    "auditability": 3,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 1,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 5,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 31,
+    "normalized_0_100": 62,
+    "confidence_0_1": 0.77
+  },
+  "assessment": {
+    "rationale": "The simulation fits the scenario indirectly: its tiny deterministic raw-plus-pointer profile is durable and reviewable, but the supplied design text does not itself show a strong required-spec-section strategy for 100-year intelligibility. It is promising as a small long-lived artifact, yet weak on explicit failure, audit, and future-reader guidance.",
+    "strengths": [
+      "Very small deterministic artifact shape supports long-term durability and small-device use.",
+      "Clear boundary that richer DAG/graph profiles can come later improves staged evolution.",
+      "Raw bytes plus minimal pointer are plausible to implement and audit."
+    ],
+    "weaknesses": [
+      "No explicit required-spec-section home for future-reader assumptions is shown.",
+      "Failure modes, stale interpretation, and adversarial review pressure are mostly unaddressed.",
+      "Promise vocabulary is limited; the design is framed more as a profile choice than as explicit peer promises."
+    ],
+    "risks": [
+      "Under-specification could leave future readers unsure which assumptions are normative versus provisional.",
+      "Deferring chunking/object semantics may shift ambiguity into later profiles without a clear long-horizon migration section.",
+      "Profile-centric wording is less promise-first than the rubric prefers."
+    ],
+    "open_questions": [
+      "Does the profile define enough self-describing spec text for a reader a century later to interpret pointer fields without external tooling culture?",
+      "Where should long-horizon required sections live so this minimal profile stays intelligible as richer CAS profiles arrive?",
+      "How are evolution and migration rules recorded when chunking and graph semantics are added later?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

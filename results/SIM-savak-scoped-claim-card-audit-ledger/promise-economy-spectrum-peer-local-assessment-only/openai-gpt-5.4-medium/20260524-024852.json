@@ -1,0 +1,170 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-savak-scoped-claim-card-audit-ledger-promise-economy-spectrum-peer-local-assessment-only-openai-gpt-5.4-medium-20260524-024852",
+  "run_group_id": "ga-canary-20260523-pt-gate-v3",
+  "cell_id": "ga-canary-20260523-pt-gate-v3-000049-SIM-savak-scoped-claim-card-audit-ledger--promise-economy-spectrum-peer-local-assessment-only--openai-gpt-5.4-medium",
+  "sim_id": "SIM-savak-scoped-claim-card-audit-ledger",
+  "scenario_id": "promise-economy-spectrum-peer-local-assessment-only",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260524-024852",
+  "result_path": "results/SIM-savak-scoped-claim-card-audit-ledger/promise-economy-spectrum-peer-local-assessment-only/openai-gpt-5.4-medium/20260524-024852.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_316eda774cd5469fb7835944fb69e1d4",
+    "response_id": "resp_0f0248b310b469ec006a1268524990819baba46477a773461f",
+    "input_tokens": 9373,
+    "output_tokens": 2002,
+    "cost_usd": 0.04443075
+  },
+  "source": {
+    "repo_commit": "ec652bd3ecaaf2f904e62cff00e113a88c7e3efd",
+    "sim_path": "simulations/SIM-savak-scoped-claim-card-audit-ledger/",
+    "scenario_path": "scenarios/promise-economy-spectrum-peer-local-assessment-only/promise-economy-spectrum-peer-local-assessment-only.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-savak-scoped-claim-card-audit-ledger/README.md",
+        "sha256": "f9fde554d9d081495a2192d16f7121ea95535f414c6866c5ecf15ed43d3a5282"
+      },
+      {
+        "path": "simulations/SIM-savak-scoped-claim-card-audit-ledger/QUESTION.md",
+        "sha256": "b0889652ec3fbac187f07360da3818107a1a9868c3442c5fad520189d9257773"
+      },
+      {
+        "path": "simulations/SIM-savak-scoped-claim-card-audit-ledger/PATTERNS.md",
+        "sha256": "0d2da32f9958b9146ed43581612296ff249b1218c918baf8de0e60743e63eaf9"
+      },
+      {
+        "path": "scenarios/promise-economy-spectrum-peer-local-assessment-only/promise-economy-spectrum-peer-local-assessment-only.md",
+        "sha256": "447986251c900f650f4b14b03e1660192d3e24b69dc82f9fbd1b61390866a5e6"
+      }
+    ],
+    "simulation_tree_hash": "a3d2108c4a27128a7d42e5b0ac1541ad1774df2898f96e97eed1043e7e428d87"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 4,
+    "promisegrid_alignment": 2,
+    "auditability": 5,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 4,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 3,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 35,
+    "normalized_0_100": 70,
+    "confidence_0_1": 0.84
+  },
+  "assessment": {
+    "rationale": "Strong local audit evidence and boundary separation make this a good fit for peer-local assessment, but the design still speaks in claim-card/conformance terms more than Promise-Theory-native promises.",
+    "strengths": [
+      "Direct support for peer-local observations via local promise-accounting records.",
+      "Clear separation between live, audit, storage, and device planes.",
+      "Exact immutable audit anchors improve later human and LLM auditability.",
+      "Good failure posture for ambiguous non-idempotent effects through break-witnesses."
+    ],
+    "weaknesses": [
+      "Promise vocabulary is weaker than the underlying PT behavior.",
+      "The artifact set is slightly heavier than the scenario needs for simple local pull/keep/advertise decisions.",
+      "Shared app identity and authoritative-boundary fields may invite over-global interpretation."
+    ],
+    "risks": [
+      "Claim-card framing may drift toward normative conformance bundles instead of small explicit promises.",
+      "Authoritative-boundary identity language could be read as stronger or more centralized than local trust warrants.",
+      "Local append-only audit records can grow into ledger-heavy wrappers if not kept minimal."
+    ],
+    "open_questions": [
+      "Can the scoped claim card be rewritten as explicit first-person agent promises rather than a conformance-style artifact?",
+      "For peer-local pull/keep/advertise decisions, which claim-card fields are actually necessary beyond local observations and cited audit anchors?",
+      "When no frozen pCID exists, does draft-path plus revision-hash introduce too much authority framing for a supposedly local-trust design?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design.",
+    "pt_gate": {
+      "status": "pt_reframe_needed",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "Peers publish their own scoped artifacts and keep local append-only records; break-witness handling preserves autonomous refusal under uncertainty."
+      },
+      "scoped_intent": {
+        "status": "warning",
+        "note": "Scope by plane is strong, but the core artifact is a claim card rather than explicit promise-first declarations of intent."
+      },
+      "no_promises_for_others": {
+        "status": "warning",
+        "note": "Mostly respected, but shared app-family and claim-card framing can blur who is actually promising what unless each embodiment states its own first-person intent."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "The design explicitly distinguishes hash/address, request receipt, retention, and physical-effect completion, avoiding guaranteed-outcome language."
+      },
+      "local_trust_assessment": {
+        "status": "pass",
+        "note": "Strong fit here: Alice can rely on local observations, audit anchors, and promise-accounting records without any token-transfer requirement."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "The design separates possession, retrieval, retention, and authorization; using or requesting data is not treated as an obligation on others."
+      },
+      "violations": [
+        "Uses claim/conformance-style vocabulary instead of consistently first-person promise wording.",
+        "Multi-embodiment/shared-family framing risks reading as umbrella claims unless each agent publishes its own scoped promise."
+      ]
+    }
+  }
+}

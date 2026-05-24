@@ -1,0 +1,164 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-dutam-grid-envelope-fixed-header-variable-body-group-session-freeze-promise-post-freeze-mutation-request-openai-gpt-5.4-medium-20260524-032521",
+  "run_group_id": "ga-canary-20260523-pt-gate-v3-successors",
+  "cell_id": "ga-canary-20260523-pt-gate-v3-successors-000014-SIM-dutam-grid-envelope-fixed-header-variable-body--group-session-freeze-promise-post-freeze-mutation-request--openai-gpt-5.4-medium",
+  "sim_id": "SIM-dutam-grid-envelope-fixed-header-variable-body",
+  "scenario_id": "group-session-freeze-promise-post-freeze-mutation-request",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260524-032521",
+  "result_path": "results/SIM-dutam-grid-envelope-fixed-header-variable-body/group-session-freeze-promise-post-freeze-mutation-request/openai-gpt-5.4-medium/20260524-032521.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_861646b5330241048c3982366e08a21c",
+    "response_id": "resp_03e31afad080656d006a126fe309788198a6238fa433da1438",
+    "input_tokens": 8245,
+    "output_tokens": 1567,
+    "cost_usd": 0.03636675
+  },
+  "source": {
+    "repo_commit": "925c7f5c1c7ce7d5b0caf6a924d40d3f9b7d0483",
+    "sim_path": "simulations/SIM-dutam-grid-envelope-fixed-header-variable-body/",
+    "scenario_path": "scenarios/group-session-freeze-promise-post-freeze-mutation-request/group-session-freeze-promise-post-freeze-mutation-request.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-dutam-grid-envelope-fixed-header-variable-body/README.md",
+        "sha256": "36e655e9147306232cd1d4d874dbc7792e6eab7cc359251aee487b33d4b7c7b9"
+      },
+      {
+        "path": "simulations/SIM-dutam-grid-envelope-fixed-header-variable-body/QUESTION.md",
+        "sha256": "3790d466579bdf56d98055c4a630d802ca0d3ec042c01606860ff83f073621b0"
+      },
+      {
+        "path": "scenarios/group-session-freeze-promise-post-freeze-mutation-request/group-session-freeze-promise-post-freeze-mutation-request.md",
+        "sha256": "9083e149d879dcf5890bbcc3d3bb2fcf87b4490ba1878e59a73402bd5312ee52"
+      }
+    ],
+    "simulation_tree_hash": "41922bc0db1ac263325ae5ab91a03e187f0e61c5985a29f4f566745634f65fdb"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 2,
+    "auditability": 4,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 2,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 4,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 30,
+    "normalized_0_100": 60,
+    "confidence_0_1": 0.72
+  },
+  "assessment": {
+    "rationale": "A fixed header plus pCID-defined body is a strong PromiseGrid envelope pattern for later audit and evolution, and it naturally supports representing a frozen lineage plus newer specimens. But this simulation does not itself define freeze semantics, amendment rules, or the local evidence peers would use to decide whether Carol's post-freeze change is a new specimen, superseding pCID, or amendment. Good substrate, weak direct scenario coverage.",
+    "strengths": [
+      "Small stable header improves generic auditability across evolving body schemas.",
+      "pCID-defined body supports protocol evolution without changing the outer envelope.",
+      "Clear header/body split keeps layer boundaries relatively legible and durable."
+    ],
+    "weaknesses": [
+      "Does not directly specify group-session freeze semantics.",
+      "Failure and conflict handling for post-freeze mutation requests are not described.",
+      "Promise-first vocabulary is present only indirectly, not as explicit payload promises."
+    ],
+    "risks": [
+      "Scenario pressure may be answered only by body-specific conventions, leaving cross-peer freeze interpretation inconsistent.",
+      "Without explicit lineage evidence in a stable place, later auditors may need protocol-specific handlers to reconstruct mutation history."
+    ],
+    "open_questions": [
+      "How would freeze evidence be encoded so later peers can distinguish immutable history from a superseding specimen or amendment?",
+      "Does the fixed header need an explicit lineage or mutation-intent slot, or should that stay entirely inside the pCID-defined body?",
+      "What local evidence lets Carol and later auditors assess trust in a post-freeze mutation claim without shared global state?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design.",
+    "pt_gate": {
+      "status": "pt_reframe_needed",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "Nothing here removes agent autonomy; peers can choose whether to emit, accept, or interpret envelopes."
+      },
+      "scoped_intent": {
+        "status": "warning",
+        "note": "The framing is mostly protocol-structure-centric rather than explicit agent-scoped promises about frozen lineage and mutation handling."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "The docs do not assign promises on behalf of other agents."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "The design improves auditability but does not claim guaranteed mutation outcomes."
+      },
+      "local_trust_assessment": {
+        "status": "warning",
+        "note": "Local audit is a stated goal, but the scenario-specific trust basis for freeze and mutation evidence is not yet explicit."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "The design does not equate parsing or using an envelope with obligation."
+      },
+      "violations": [
+        "PT framing is implicit: the design mainly specifies envelope structure instead of explicit agent-scoped promises.",
+        "Post-freeze mutation handling and local trust evidence are underspecified for this scenario."
+      ]
+    }
+  }
+}

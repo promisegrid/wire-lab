@@ -1,0 +1,122 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-rokub-chunking-negotiated-profile-identity-udp-feed-v0-conformance-session-layer-composition-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000063-SIM-rokub-chunking-negotiated-profile-identity--udp-feed-v0-conformance-session-layer-composition--openai-gpt-5.4-medium",
+  "sim_id": "SIM-rokub-chunking-negotiated-profile-identity",
+  "scenario_id": "udp-feed-v0-conformance-session-layer-composition",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-rokub-chunking-negotiated-profile-identity/udp-feed-v0-conformance-session-layer-composition/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_e6c606be72ed4e7583c0fafd5c49dfce",
+    "response_id": "resp_076b5ed0007253e6006a1232ab41808198bbd492a2be9a0985",
+    "input_tokens": 7518,
+    "output_tokens": 1084,
+    "cost_usd": 0.0283325
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-rokub-chunking-negotiated-profile-identity/",
+    "scenario_path": "scenarios/udp-feed-v0-conformance-session-layer-composition/udp-feed-v0-conformance-session-layer-composition.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-rokub-chunking-negotiated-profile-identity/README.md",
+        "sha256": "cfeb2c64b5061e938cba35c3266e87af87df0679f6eaf43a97769756658b2b8c"
+      },
+      {
+        "path": "simulations/SIM-rokub-chunking-negotiated-profile-identity/QUESTION.md",
+        "sha256": "ce3d48efe724a47ca3de014bdfee99e9409e6001348dae2b89b36e82b867643a"
+      },
+      {
+        "path": "scenarios/udp-feed-v0-conformance-session-layer-composition/udp-feed-v0-conformance-session-layer-composition.md",
+        "sha256": "69da5db705a56cd7067a653928ff8b2dc9301ef6ebfc712bd81038a65c9d352c"
+      }
+    ],
+    "simulation_tree_hash": "c3ce26f7460e9b0bbcc1d7d3e8b77abb0d296a9b5e17831ccad58324e43be3f0"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 2,
+    "auditability": 3,
+    "evolution_safety": 2,
+    "layer_boundary_clarity": 1,
+    "failure_handling": 1,
+    "implementation_plausibility": 3,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 2,
+    "risk_penalty": 4
+  },
+  "fitness": {
+    "raw": 18,
+    "normalized_0_100": 36,
+    "confidence_0_1": 0.84
+  },
+  "assessment": {
+    "rationale": "This simulation is only weakly fit for the UDP-feed session-layer composition scenario. It does examine boundary-sensitive interoperability and local verification, but its subject is negotiated chunking-profile identity, not whether a UDP-feed v0 API composes cleanly into the next session layer. It offers some PromiseGrid-friendly local evidence via profile identity recorded at object roots, yet leaves negotiation protocol shape, session composition, and failure behavior underdefined.",
+    "strengths": [
+      "Uses peer-local promises rather than a central registry.",
+      "Includes auditable evidence: object roots record profile identity for later verification.",
+      "Targets mixed-implementation interoperability explicitly."
+    ],
+    "weaknesses": [
+      "Does not actually specify UDP-feed v0 or session-layer composition behavior.",
+      "Boundary between content/chunking identity and transport/session concerns is unclear.",
+      "Negotiation protocol is intentionally incomplete, limiting audit of composition and evolution behavior.",
+      "Failure handling beyond detecting mismatches is thin."
+    ],
+    "risks": [
+      "Negotiated profiles may let identical bytes yield different roots across peer choices, undermining durable composition.",
+      "The design may leak lower-layer negotiation details upward because no clean session-layer contract is defined.",
+      "Mismatch detection is described more clearly than recovery, refusal, or downgrade behavior."
+    ],
+    "open_questions": [
+      "Can negotiated chunking-profile identity be expressed as a session-layer promise without leaking transport or binding details?",
+      "What local evidence would prove profile mismatch handling across mixed implementations over a minimal UDP-fed session?",
+      "How would profile evolution avoid long-term ambiguity when peers negotiate different chunking choices for the same bytes?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

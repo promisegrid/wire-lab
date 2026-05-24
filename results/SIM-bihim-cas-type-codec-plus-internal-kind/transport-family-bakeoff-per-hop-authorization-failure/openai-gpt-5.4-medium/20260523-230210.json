@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-bihim-cas-type-codec-plus-internal-kind-transport-family-bakeoff-per-hop-authorization-failure-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000031-SIM-bihim-cas-type-codec-plus-internal-kind--transport-family-bakeoff-per-hop-authorization-failure--openai-gpt-5.4-medium",
+  "sim_id": "SIM-bihim-cas-type-codec-plus-internal-kind",
+  "scenario_id": "transport-family-bakeoff-per-hop-authorization-failure",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-bihim-cas-type-codec-plus-internal-kind/transport-family-bakeoff-per-hop-authorization-failure/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_0f27d3e60a5041169a12e8853f4eb553",
+    "response_id": "resp_079905ff576ccd5c006a123248936c819abfdc84243aafa91a",
+    "input_tokens": 7536,
+    "output_tokens": 913,
+    "cost_usd": 0.02597
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-bihim-cas-type-codec-plus-internal-kind/",
+    "scenario_path": "scenarios/transport-family-bakeoff-per-hop-authorization-failure/transport-family-bakeoff-per-hop-authorization-failure.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-bihim-cas-type-codec-plus-internal-kind/README.md",
+        "sha256": "cf17971491ff515870ce86a883b5d97ee691a029cddb96211e80700ce11be16d"
+      },
+      {
+        "path": "simulations/SIM-bihim-cas-type-codec-plus-internal-kind/QUESTION.md",
+        "sha256": "da3251d1bd0bba3e15cad022e5f58793e2d087d9a10c8f4bd25a88241e29ad07"
+      },
+      {
+        "path": "scenarios/transport-family-bakeoff-per-hop-authorization-failure/transport-family-bakeoff-per-hop-authorization-failure.md",
+        "sha256": "f938e10ab88db666d3097a2f97c1667bbbc6e8e071681134049068982cc39cf2"
+      }
+    ],
+    "simulation_tree_hash": "415f66cfc07267d51ba343b130cfa4da0b6625c18c05fefee3dc38b71f2d11b0"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 0,
+    "promisegrid_alignment": 2,
+    "auditability": 3,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 2,
+    "failure_handling": 0,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 1,
+    "simplicity_durability": 3,
+    "risk_penalty": 4
+  },
+  "fitness": {
+    "raw": 19,
+    "normalized_0_100": 38,
+    "confidence_0_1": 0.96
+  },
+  "assessment": {
+    "rationale": "This simulation is largely orthogonal to the scenario. It proposes a CAS object typing pattern (broad codec plus deterministic internal kind), which may help payload auditability and evolution, but it does not model ring forwarding, per-hop authorization, refusal recording, hop skipping, or membership reconfiguration. As a PromiseGrid component idea it is plausible and fairly durable, but as evidence for this transport authorization-failure bakeoff it is a weak fit.",
+    "strengths": [
+      "Small deterministic payload-level mechanism.",
+      "Internal kind can improve fine-grained local dispatch and auditability.",
+      "Plausible evolution path within a broad object family."
+    ],
+    "weaknesses": [
+      "Does not address per-hop authorization failure behavior.",
+      "No ring, gossip, relay, or membership semantics are specified.",
+      "Promise vocabulary is not actor/payload-promise-first and remains design-level."
+    ],
+    "risks": [
+      "The design provides no explicit failure semantics for unauthorized forwarding, so scenario pressure is unanswered.",
+      "Using both codec and internal kind risks creating two competing type authorities.",
+      "Transport designers may overgeneralize payload typing benefits into transport-layer suitability without evidence."
+    ],
+    "open_questions": [
+      "Can this typing scheme express transport-hop authorization refusals at all, or is it entirely orthogonal to the scenario?",
+      "If both codec and internal kind influence dispatch, which one is authoritative when they conflict?",
+      "Would a transport protocol need separate refusal-record objects beyond this CAS typing mechanism?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

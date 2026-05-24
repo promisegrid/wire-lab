@@ -1,0 +1,123 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-bahod-group-session-human-merge-promise-spec-requirement-sections-100-year-review-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000201-SIM-bahod-group-session-human-merge-promise--spec-requirement-sections-100-year-review--openai-gpt-5.4-medium",
+  "sim_id": "SIM-bahod-group-session-human-merge-promise",
+  "scenario_id": "spec-requirement-sections-100-year-review",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-bahod-group-session-human-merge-promise/spec-requirement-sections-100-year-review/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_233ddd4b4d21433ab7740cb6324a89e1",
+    "response_id": "resp_059828bb28fd84ea006a12344f8590819aaf59b8e5079b4b8e",
+    "input_tokens": 7526,
+    "output_tokens": 1040,
+    "cost_usd": 0.0277305
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-bahod-group-session-human-merge-promise/",
+    "scenario_path": "scenarios/spec-requirement-sections-100-year-review/spec-requirement-sections-100-year-review.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-bahod-group-session-human-merge-promise/README.md",
+        "sha256": "4964fb355ec738dc3dbac8490e4014efb1064ee16447f9a90bd86f824e3c456d"
+      },
+      {
+        "path": "simulations/SIM-bahod-group-session-human-merge-promise/QUESTION.md",
+        "sha256": "4e94bfbd2c9ebc7df8ee6f74a6e3cf53d56d35ca413a94d40195630069c1a3d7"
+      },
+      {
+        "path": "scenarios/spec-requirement-sections-100-year-review/spec-requirement-sections-100-year-review.md",
+        "sha256": "b2e71192b720372495986fad6387d0bfd5222ce78a7cfd9da03940d1a1062cd7"
+      }
+    ],
+    "simulation_tree_hash": "bfbeb2ea13f8e4903a0479f07dabee6590d4b6b828775195f8b4861589eb5f91"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 3,
+    "promisegrid_alignment": 4,
+    "auditability": 4,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 2,
+    "implementation_plausibility": 5,
+    "promise_vocabulary": 4,
+    "simplicity_durability": 4,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 35,
+    "normalized_0_100": 70,
+    "confidence_0_1": 0.78
+  },
+  "assessment": {
+    "rationale": "The simulation is a reasonably strong fit because it directly tests whether a human-authored promise with exact artifact references can stay intelligible and govern freeze intent over time. It aligns with PromiseGrid better than generic conformance language because the design under test is explicitly a promise artifact, with explicit scope and unresolved questions. Auditability and implementation plausibility are good, but the unsigned plain-English form leaves ambiguity, weak failure handling, and some long-horizon drift risk.",
+    "strengths": [
+      "Promise-first design centered on a concrete human-authored merge promise.",
+      "Exact paths, CIDs, scope, and unresolved questions improve later auditability.",
+      "Small, explicit artifact is plausible to produce and preserve early in the process.",
+      "Boundaries are clearly stated: evidence for freeze work, not merge execution."
+    ],
+    "weaknesses": [
+      "Not specifically shaped as a required spec section for 100-year review pressure.",
+      "Failure handling is thin when promises conflict, go stale, or are partially understood.",
+      "Unsigned human text leaves authority and authenticity weaker than durable signed promises.",
+      "Scope ambiguity remains the core unresolved issue named by the simulation itself."
+    ],
+    "risks": [
+      "Plain-English promise wording may age poorly and admit multiple later interpretations.",
+      "Without cryptographic signing or stronger promise tooling, provenance and supersession may be hard to audit after organizational change.",
+      "Unresolved questions may remain attached as informal notes rather than durable protocol-scoped obligations."
+    ],
+    "open_questions": [
+      "What exact long-horizon section or frozen spec home should preserve the merge-promise assumptions for future readers?",
+      "How would a later auditor distinguish an authoritative human promise from stale or superseded plain-English text?",
+      "What minimum wording template would reliably bound scope ambiguity without signed promise tooling?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

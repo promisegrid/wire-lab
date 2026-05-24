@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-sutap-spec-sections-split-template-group-session-freeze-promise-post-freeze-mutation-request-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000181-SIM-sutap-spec-sections-split-template--group-session-freeze-promise-post-freeze-mutation-request--openai-gpt-5.4-medium",
+  "sim_id": "SIM-sutap-spec-sections-split-template",
+  "scenario_id": "group-session-freeze-promise-post-freeze-mutation-request",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-sutap-spec-sections-split-template/group-session-freeze-promise-post-freeze-mutation-request/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_627c8348ee7e454d87402b347caf14f9",
+    "response_id": "resp_08240c3728ba0da9006a1234140bb081998b2dfd5f3e18f8be",
+    "input_tokens": 7509,
+    "output_tokens": 1109,
+    "cost_usd": 0.02866675
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-sutap-spec-sections-split-template/",
+    "scenario_path": "scenarios/group-session-freeze-promise-post-freeze-mutation-request/group-session-freeze-promise-post-freeze-mutation-request.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-sutap-spec-sections-split-template/README.md",
+        "sha256": "6ea42ce84be4770e4e100e0fcf9ca2d6cef76bfdcf7558040f33907b22c367b7"
+      },
+      {
+        "path": "simulations/SIM-sutap-spec-sections-split-template/QUESTION.md",
+        "sha256": "224cb421f142b72082ecfcaa79627a831538b92231e06f885d13b688673fc85a"
+      },
+      {
+        "path": "scenarios/group-session-freeze-promise-post-freeze-mutation-request/group-session-freeze-promise-post-freeze-mutation-request.md",
+        "sha256": "9083e149d879dcf5890bbcc3d3bb2fcf87b4490ba1878e59a73402bd5312ee52"
+      }
+    ],
+    "simulation_tree_hash": "7d2ed975444e7dd1a0a27e8dd1d6f4055a8b84e22175a957a8c981fb1f413dc8"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 3,
+    "promisegrid_alignment": 4,
+    "auditability": 4,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 2,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 3,
+    "simplicity_durability": 4,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 36,
+    "normalized_0_100": 72,
+    "confidence_0_1": 0.79
+  },
+  "assessment": {
+    "rationale": "The split-template candidate fits this scenario indirectly: it strongly separates frozen pCID-owned normative hooks from mutable explanatory prose, which helps preserve history after freeze. That gives good evolution safety and boundary clarity for post-freeze requests. But the specimen does not explicitly define the decision rule for a breaking mutation request (new specimen, superseding pCID, or amendment lineage), so scenario coverage is only partial.",
+    "strengths": [
+      "Clear normative versus explanatory boundary.",
+      "Compact frozen surface supports durable audit after long time horizons.",
+      "Explicit goal of allowing explanatory evolution without mutating the protocol promise."
+    ],
+    "weaknesses": [
+      "Does not directly answer the scenario's new-specimen versus superseding-pCID versus amendment choice.",
+      "Failure/refusal and adversarial handling are not specified.",
+      "Uses some PromiseGrid language, but not strongly payload-promise phrasing."
+    ],
+    "risks": [
+      "Companion documents could be mistaken for normative updates after freeze.",
+      "Operators may blur frozen protocol promises and evolving mental-model prose.",
+      "Without explicit lineage rules, different peers may classify the same breaking change differently."
+    ],
+    "open_questions": [
+      "Does any post-freeze normative hook change always require a new pCID, or can lineage amendments exist without history mutation?",
+      "How are readers prevented from treating evolved companion prose as retroactive protocol change?",
+      "What minimal audit record links frozen normative sections to later explanatory updates?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

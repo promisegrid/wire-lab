@@ -1,0 +1,163 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-konit-pcid-promise-evidence-index-promise-economy-spectrum-permissioned-capability-token-openai-gpt-5.4-medium-20260524-032521",
+  "run_group_id": "ga-canary-20260523-pt-gate-v3-successors",
+  "cell_id": "ga-canary-20260523-pt-gate-v3-successors-000064-SIM-konit-pcid-promise-evidence-index--promise-economy-spectrum-permissioned-capability-token--openai-gpt-5.4-medium",
+  "sim_id": "SIM-konit-pcid-promise-evidence-index",
+  "scenario_id": "promise-economy-spectrum-permissioned-capability-token",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260524-032521",
+  "result_path": "results/SIM-konit-pcid-promise-evidence-index/promise-economy-spectrum-permissioned-capability-token/openai-gpt-5.4-medium/20260524-032521.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_9ce6343cfda94f4597dfef2761e1224f",
+    "response_id": "resp_0af79a0d7994166a006a1271073fa081999a4eac4c5cbead8b",
+    "input_tokens": 8255,
+    "output_tokens": 1276,
+    "cost_usd": 0.03231025
+  },
+  "source": {
+    "repo_commit": "925c7f5c1c7ce7d5b0caf6a924d40d3f9b7d0483",
+    "sim_path": "simulations/SIM-konit-pcid-promise-evidence-index/",
+    "scenario_path": "scenarios/promise-economy-spectrum-permissioned-capability-token/promise-economy-spectrum-permissioned-capability-token.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-konit-pcid-promise-evidence-index/README.md",
+        "sha256": "9ebee1bbac1dafa81dd66c456d35cc98c1bcc2152ac436c41ce31d1fb5d2a6ef"
+      },
+      {
+        "path": "simulations/SIM-konit-pcid-promise-evidence-index/QUESTION.md",
+        "sha256": "03e6029e9943fdd935fc8c629d871c771710a27f4ccbdf5b3db727be79814960"
+      },
+      {
+        "path": "scenarios/promise-economy-spectrum-permissioned-capability-token/promise-economy-spectrum-permissioned-capability-token.md",
+        "sha256": "ac5ba8f29fb13e1d693bdbfb0a5cc1c516750bf4f3a142b8dee90128d13ce2e2"
+      }
+    ],
+    "simulation_tree_hash": "227c9a080416752ab4c2fd51ae77ac84fad407f5deaf7843de114272995e423a"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 3,
+    "promisegrid_alignment": 5,
+    "auditability": 5,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 3,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 5,
+    "simplicity_durability": 4,
+    "risk_penalty": 1
+  },
+  "fitness": {
+    "raw": 41,
+    "normalized_0_100": 82,
+    "confidence_0_1": 0.83
+  },
+  "assessment": {
+    "rationale": "Strong Promise-Theory reframing of an evidence index: it stays descriptive, cites who promised what, and preserves local trust judgment. For this capability-token scenario it is useful mainly as audit/evidence scaffolding around issuance and redemption, not as the capability mechanism itself, so scenario fit is only moderate.",
+    "strengths": [
+      "Explicit promise-first wording and local trust framing.",
+      "Clear boundary that the artifact is descriptive evidence only, not certification or authorization.",
+      "Good audit trail structure for later observations such as keep, break, refusal, or ambiguity.",
+      "pCID-scoped references support durable evolution of protocol claims and evidence objects."
+    ],
+    "weaknesses": [
+      "Does not by itself define how capability issuance or redemption works.",
+      "Scenario pressure around permission scope is only indirectly addressed through evidence recording.",
+      "'Index' remains somewhat heavier and more wrapper-like than the smallest possible durable artifact."
+    ],
+    "risks": [
+      "The term 'index' can still drift toward ledger-like or quasi-authoritative interpretation if operators treat entries as permission grants.",
+      "Capability-token scenarios need explicit handling of replay, expiry, and non-transferability; the current simulation only implies those via later observations.",
+      "If pCID references become overloaded as authorization handles rather than evidence anchors, layer boundaries could blur."
+    ],
+    "open_questions": [
+      "Can non-transferable capability semantics be represented cleanly as promise evidence without the index drifting into an authorization ledger?",
+      "What minimal evidence objects would let Alice and Bob record redemption, refusal, expiry, or replay attempts locally?",
+      "How should peers describe capability scope and revocation under a pCID without implying exchange-rate or marketplace semantics?"
+    ],
+    "authority_boundary": "Evidence only; the index can cite promises and observations about capability issuance or redemption, but it does not itself grant permission, certify conformance, or settle authorization disputes.",
+    "pt_gate": {
+      "status": "pt_clean",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "Agents make and assess promises locally; the index is descriptive evidence about their behavior."
+      },
+      "scoped_intent": {
+        "status": "pass",
+        "note": "Promises are scoped to pCID-referenced payloads or services and associated evidence objects."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "Entries ask which agent promised what, avoiding proxy promises on behalf of others."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "The design records keep, break, refusal, or ambiguity and does not guarantee redemption outcomes."
+      },
+      "local_trust_assessment": {
+        "status": "pass",
+        "note": "The README explicitly says trust remains a local judgment for Alice, Bob, or Carol."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "The design records promises and observations; receiving or using a capability is not reframed as an obligation."
+      },
+      "violations": []
+    }
+  }
+}

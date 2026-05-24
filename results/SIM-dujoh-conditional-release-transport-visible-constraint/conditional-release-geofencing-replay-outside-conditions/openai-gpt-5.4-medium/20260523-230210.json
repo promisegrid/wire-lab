@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-dujoh-conditional-release-transport-visible-constraint-conditional-release-geofencing-replay-outside-conditions-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000086-SIM-dujoh-conditional-release-transport-visible-constraint--conditional-release-geofencing-replay-outside-conditions--openai-gpt-5.4-medium",
+  "sim_id": "SIM-dujoh-conditional-release-transport-visible-constraint",
+  "scenario_id": "conditional-release-geofencing-replay-outside-conditions",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-dujoh-conditional-release-transport-visible-constraint/conditional-release-geofencing-replay-outside-conditions/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_77c9cfbab9844d709df608ecdf711ea2",
+    "response_id": "resp_04c04f5716fe6eb9006a1232f2babc819990236c2527003f08",
+    "input_tokens": 7537,
+    "output_tokens": 1507,
+    "cost_usd": 0.03428775
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-dujoh-conditional-release-transport-visible-constraint/",
+    "scenario_path": "scenarios/conditional-release-geofencing-replay-outside-conditions/conditional-release-geofencing-replay-outside-conditions.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-dujoh-conditional-release-transport-visible-constraint/README.md",
+        "sha256": "c049f3a0bf15b40506257afc5d06ccb8cc7fa27e301f3aebc7ea4bab129542a5"
+      },
+      {
+        "path": "simulations/SIM-dujoh-conditional-release-transport-visible-constraint/QUESTION.md",
+        "sha256": "598dbb05c0bd9223d0235ead35ac79872e30b1836844b254d73fdc3db1fb63a9"
+      },
+      {
+        "path": "scenarios/conditional-release-geofencing-replay-outside-conditions/conditional-release-geofencing-replay-outside-conditions.md",
+        "sha256": "f1480d60e85afb41b0fe5e49fdc70801e029734edbe32c3068434be7f4cb1c6e"
+      }
+    ],
+    "simulation_tree_hash": "993c6c480b07328fd67b857ec4258cd9b4ca2aaf4252e5490f9e7a6322e481cf"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 4,
+    "promisegrid_alignment": 3,
+    "auditability": 3,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 2,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 4,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 31,
+    "normalized_0_100": 62,
+    "confidence_0_1": 0.78
+  },
+  "assessment": {
+    "rationale": "This design is a relevant but incomplete fit. Making condition references and small machine-checkable hints visible at transport/feed layers directly addresses the scenario's need for local refusal of obviously forbidden forwarding or storage outside allowed conditions. It also states a clear boundary: transport need not interpret full human policy text. However, the scenario specifically pressures replay detection for old references outside allowed audience/geography, and the simulation does not yet say how hints bind to freshness, recipient, location proof, or session state. The result is a plausible minimal mechanism for constraint visibility, but not yet a strong replay-specific answer.",
+    "strengths": [
+      "Directly targets the question of how much condition metadata must be visible for honest local forwarding/storage promises.",
+      "Keeps lower-layer surface intentionally small and machine-checkable.",
+      "Maintains a relatively clear boundary between transport checks and higher-layer human policy semantics."
+    ],
+    "weaknesses": [
+      "No explicit mechanism for replay freshness, nonce/epoch binding, or session-context validation.",
+      "Does not explain how unauthorized audience or geography is verified locally under sparse knowledge.",
+      "Uses transport/feed-centric wording more than explicit promise-first payload promises."
+    ],
+    "risks": [
+      "Visible condition hints may leak policy or geofencing metadata to intermediaries.",
+      "Minimal hints may be too weak or ambiguous for consistent replay rejection across implementations.",
+      "Peers may over-trust transport-visible constraints even when stale references or off-path copies bypass the intended checks."
+    ],
+    "open_questions": [
+      "What minimal visible hint set is enough to bind a condition to recipient, epoch, geography, or session context so replay can be rejected locally?",
+      "How can Dave or Carol audit whether an old content reference was still valid at replay time when condition references are opaque?",
+      "Does refusing storage or forwarding at transport/feed layer help enough if content was already cached or copied elsewhere?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

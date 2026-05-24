@@ -1,0 +1,173 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields-promise-accounting-records-refused-service-openai-gpt-5.4-medium-20260524-024852",
+  "run_group_id": "ga-canary-20260523-pt-gate-v3",
+  "cell_id": "ga-canary-20260523-pt-gate-v3-000011-SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields--promise-accounting-records-refused-service--openai-gpt-5.4-medium",
+  "sim_id": "SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields",
+  "scenario_id": "promise-accounting-records-refused-service",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260524-024852",
+  "result_path": "results/SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields/promise-accounting-records-refused-service/openai-gpt-5.4-medium/20260524-024852.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_4b135d4e02a24a47909e99f61e60b577",
+    "response_id": "resp_0b0403fb86bc99e0006a1267542b68819ba0bdebc0d553d609",
+    "input_tokens": 9035,
+    "output_tokens": 2140,
+    "cost_usd": 0.04577125
+  },
+  "source": {
+    "repo_commit": "ec652bd3ecaaf2f904e62cff00e113a88c7e3efd",
+    "sim_path": "simulations/SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields/",
+    "scenario_path": "scenarios/promise-accounting-records-refused-service/promise-accounting-records-refused-service.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields/README.md",
+        "sha256": "3ab052fe6b0a0513740136a232eeaf2f73e992923012280c92c2e159c8fb0a9c"
+      },
+      {
+        "path": "simulations/SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields/QUESTION.md",
+        "sha256": "707280a55807f9fce459bf58b891379e28a66c77fbedf1c263937113936a25d3"
+      },
+      {
+        "path": "simulations/SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields/protocols/grid-envelope.d/CHANGELOG.md",
+        "sha256": "3652c6b6111b64750a90c10edf0da60a2d88777a2c3313477f21490d61d97201"
+      },
+      {
+        "path": "simulations/SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "68d7443d65d236f5471fac7781b122413a1f5ba914587b2b3522c8b3677062d9"
+      },
+      {
+        "path": "scenarios/promise-accounting-records-refused-service/promise-accounting-records-refused-service.md",
+        "sha256": "9a7d47455793988cfb9b0fb045b29086ed13ee22cd0db080584e259c0aa69313"
+      }
+    ],
+    "simulation_tree_hash": "cee27e908e02ebb98055f64a9a1750e4c150996dd05c4c53e16ec029927598f1"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 2,
+    "auditability": 2,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 3,
+    "failure_handling": 2,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 1,
+    "simplicity_durability": 2,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 22,
+    "normalized_0_100": 44,
+    "confidence_0_1": 0.84
+  },
+  "assessment": {
+    "rationale": "Useful as a wire-format probe, but weak for this scenario. It can carry a refused-service record only if some separate pCID schema defines one, and generic tooling cannot distinguish refusal from other outcomes. Conservative unknown-pCID behavior helps local evidence retention, yet audit meaning and authorship are too schema-dependent for strong promise-accounting support.",
+    "strengths": [
+      "Deterministic CBOR array gives stable bytes for storage and later re-audit.",
+      "Unknown-pCID policy is conservative and avoids false interpretation.",
+      "No central registry or global trust authority is required by the specimen."
+    ],
+    "weaknesses": [
+      "The simulation does not define promise-accounting semantics for honest refusal.",
+      "Generic parsers cannot identify payload, proof, or refusal meaning without the pCID handler.",
+      "Promise vocabulary is minimal; the design is not expressed as agent promises."
+    ],
+    "risks": [
+      "A refused-service event may be stored as opaque bytes with no durable generic interpretation.",
+      "Per-pCID schema variation can make refusal/failure distinctions inconsistent across records.",
+      "No universal signature slot increases risk of weak or uneven authorship evidence."
+    ],
+    "open_questions": [
+      "What per-pCID schema would let Alice record an explicit refused-service outcome that later auditors can distinguish from timeout, corruption, or generic failure?",
+      "Can a peer without the pCID handler still retain enough locally meaningful evidence to audit a refusal decades later?",
+      "What signature and identity conventions are needed so a refusal record has durable authorship without a universal signature slot?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design.",
+    "pt_gate": {
+      "status": "pt_reframe_needed",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "Nothing in the envelope requires centralized command or removes peer autonomy."
+      },
+      "scoped_intent": {
+        "status": "warning",
+        "note": "The design is mostly transport/schema-centric and does not express scoped agent intent or refusal promises directly."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "The envelope format itself does not let one agent promise on behalf of another."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "The draft does not guarantee delivery, interpretation, or successful verification."
+      },
+      "local_trust_assessment": {
+        "status": "warning",
+        "note": "Unknown-pCID handling is locally conservative, but trust is framed as handler availability and verification mechanics rather than explicit local trust in promises."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "The specimen does not impose obligation semantics; receive/use behavior is left to local peers and schema handlers."
+      },
+      "violations": [
+        "Refusal semantics are not modeled as explicit agent promises or promise-accounting records; they are only possible if a later pCID schema adds them.",
+        "The framing is protocol/mechanics-first rather than promise-first, so scenario meaning depends on external schema interpretation."
+      ]
+    }
+  }
+}

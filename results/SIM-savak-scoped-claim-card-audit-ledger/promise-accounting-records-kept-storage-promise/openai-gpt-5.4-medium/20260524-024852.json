@@ -1,0 +1,170 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-savak-scoped-claim-card-audit-ledger-promise-accounting-records-kept-storage-promise-openai-gpt-5.4-medium-20260524-024852",
+  "run_group_id": "ga-canary-20260523-pt-gate-v3",
+  "cell_id": "ga-canary-20260523-pt-gate-v3-000050-SIM-savak-scoped-claim-card-audit-ledger--promise-accounting-records-kept-storage-promise--openai-gpt-5.4-medium",
+  "sim_id": "SIM-savak-scoped-claim-card-audit-ledger",
+  "scenario_id": "promise-accounting-records-kept-storage-promise",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260524-024852",
+  "result_path": "results/SIM-savak-scoped-claim-card-audit-ledger/promise-accounting-records-kept-storage-promise/openai-gpt-5.4-medium/20260524-024852.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_d782214698aa4d7882bb17f22edafab4",
+    "response_id": "resp_09e1b72db55fe247006a126853e710819a8823498493dd2dc4",
+    "input_tokens": 9371,
+    "output_tokens": 2651,
+    "cost_usd": 0.05351325
+  },
+  "source": {
+    "repo_commit": "ec652bd3ecaaf2f904e62cff00e113a88c7e3efd",
+    "sim_path": "simulations/SIM-savak-scoped-claim-card-audit-ledger/",
+    "scenario_path": "scenarios/promise-accounting-records-kept-storage-promise/promise-accounting-records-kept-storage-promise.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-savak-scoped-claim-card-audit-ledger/README.md",
+        "sha256": "f9fde554d9d081495a2192d16f7121ea95535f414c6866c5ecf15ed43d3a5282"
+      },
+      {
+        "path": "simulations/SIM-savak-scoped-claim-card-audit-ledger/QUESTION.md",
+        "sha256": "b0889652ec3fbac187f07360da3818107a1a9868c3442c5fad520189d9257773"
+      },
+      {
+        "path": "simulations/SIM-savak-scoped-claim-card-audit-ledger/PATTERNS.md",
+        "sha256": "0d2da32f9958b9146ed43581612296ff249b1218c918baf8de0e60743e63eaf9"
+      },
+      {
+        "path": "scenarios/promise-accounting-records-kept-storage-promise/promise-accounting-records-kept-storage-promise.md",
+        "sha256": "9972dff7f20d9b4f3231c07a8eb332d2e75b43e84cf0d34af29c1d3ea9c1ad74"
+      }
+    ],
+    "simulation_tree_hash": "a3d2108c4a27128a7d42e5b0ac1541ad1774df2898f96e97eed1043e7e428d87"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 4,
+    "promisegrid_alignment": 2,
+    "auditability": 5,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 4,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 3,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 35,
+    "normalized_0_100": 70,
+    "confidence_0_1": 0.86
+  },
+  "assessment": {
+    "rationale": "Strong fit for a kept-storage-promise scenario because it gives Bob and Alice concrete local record types for store, retrieve, retention-change, and observed availability, and it cleanly says a hash return is not itself a retention promise. The main weakness is vocabulary: the design centers scoped claim cards rather than direct scoped promises, so the observable 'kept promise' remains somewhat indirect.",
+    "strengths": [
+      "Directly supports local evidence for store and retrieve outcomes.",
+      "Separates storage retention promises from content addressing and authorization.",
+      "Exact audit-anchor citation improves later replay and audit.",
+      "Local append-only promise-accounting records fit sparse-knowledge operation."
+    ],
+    "weaknesses": [
+      "Not fully promise-first in wording.",
+      "Observable storage promises are embedded in note fields rather than a crisp payload promise form.",
+      "Adds card/message/record wrapper complexity compared with a smaller explicit promise artifact."
+    ],
+    "risks": [
+      "Claim-card framing may let implementers publish vague status artifacts instead of concrete retention promises.",
+      "The term 'audit ledger' could be misread as a global trust ledger even though the text describes local records.",
+      "Availability_retention_note may remain too underspecified across implementations to support durable comparison."
+    ],
+    "open_questions": [
+      "Should the storage-plane card require an explicit agent-scoped retention/retrieval promise form rather than only an availability_retention_note?",
+      "What minimum local record set is sufficient for Bob to distinguish one kept storage promise from a transient successful fetch?",
+      "How should future pull/keep/advertise choices be encoded so peers can act on local observations without implying global reputation?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design.",
+    "pt_gate": {
+      "status": "pt_reframe_needed",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "Peers publish their own scoped cards and keep their own local append-only records; no central actor decides trust."
+      },
+      "scoped_intent": {
+        "status": "warning",
+        "note": "Scope planes are clear, but the primary artifact is still a claim card rather than a direct agent-scoped promise payload."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "The design mostly keeps claims scoped to the publishing embodiment or service, though shared app-family framing should not be read as one agent promising for another."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "The simulation explicitly separates hash/address, authorization, retention, and successful later retrieval; audit records show observations, not guaranteed outcomes."
+      },
+      "local_trust_assessment": {
+        "status": "pass",
+        "note": "Bob can rely on local retrieve_attempt and availability/retention observations when deciding future choices."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "The design distinguishes retrieval attempts, capability notes, and observed outcomes from any obligation to serve."
+      },
+      "violations": [
+        "Primary framing uses claim cards and audit messages instead of explicit promise-first payloads such as 'Alice promises to retain and serve chunk C under stated conditions until T'.",
+        "The storage promise is captured indirectly in note fields, which weakens Promise-Theory clarity for this scenario."
+      ]
+    }
+  }
+}

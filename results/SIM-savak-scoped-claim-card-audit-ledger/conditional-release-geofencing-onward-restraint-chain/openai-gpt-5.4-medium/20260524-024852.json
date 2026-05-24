@@ -1,0 +1,168 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-savak-scoped-claim-card-audit-ledger-conditional-release-geofencing-onward-restraint-chain-openai-gpt-5.4-medium-20260524-024852",
+  "run_group_id": "ga-canary-20260523-pt-gate-v3",
+  "cell_id": "ga-canary-20260523-pt-gate-v3-000052-SIM-savak-scoped-claim-card-audit-ledger--conditional-release-geofencing-onward-restraint-chain--openai-gpt-5.4-medium",
+  "sim_id": "SIM-savak-scoped-claim-card-audit-ledger",
+  "scenario_id": "conditional-release-geofencing-onward-restraint-chain",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260524-024852",
+  "result_path": "results/SIM-savak-scoped-claim-card-audit-ledger/conditional-release-geofencing-onward-restraint-chain/openai-gpt-5.4-medium/20260524-024852.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_9dd1fa2209d445cea1bd1d989e210652",
+    "response_id": "resp_02a08caf5ced43c2006a12686a893c81999b85de6cfe35fc99",
+    "input_tokens": 9407,
+    "output_tokens": 1421,
+    "cost_usd": 0.03635625
+  },
+  "source": {
+    "repo_commit": "ec652bd3ecaaf2f904e62cff00e113a88c7e3efd",
+    "sim_path": "simulations/SIM-savak-scoped-claim-card-audit-ledger/",
+    "scenario_path": "scenarios/conditional-release-geofencing-onward-restraint-chain/conditional-release-geofencing-onward-restraint-chain.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-savak-scoped-claim-card-audit-ledger/README.md",
+        "sha256": "f9fde554d9d081495a2192d16f7121ea95535f414c6866c5ecf15ed43d3a5282"
+      },
+      {
+        "path": "simulations/SIM-savak-scoped-claim-card-audit-ledger/QUESTION.md",
+        "sha256": "b0889652ec3fbac187f07360da3818107a1a9868c3442c5fad520189d9257773"
+      },
+      {
+        "path": "simulations/SIM-savak-scoped-claim-card-audit-ledger/PATTERNS.md",
+        "sha256": "0d2da32f9958b9146ed43581612296ff249b1218c918baf8de0e60743e63eaf9"
+      },
+      {
+        "path": "scenarios/conditional-release-geofencing-onward-restraint-chain/conditional-release-geofencing-onward-restraint-chain.md",
+        "sha256": "3c84fc46e1b14de5e5c6e9b029fcb891bd655238b45e516b20eda97dabe8ff24"
+      }
+    ],
+    "simulation_tree_hash": "a3d2108c4a27128a7d42e5b0ac1541ad1774df2898f96e97eed1043e7e428d87"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 4,
+    "auditability": 5,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 4,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 4,
+    "simplicity_durability": 3,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 38,
+    "normalized_0_100": 76,
+    "confidence_0_1": 0.78
+  },
+  "assessment": {
+    "rationale": "Strong PromiseGrid fit on local evidence, scope separation, and auditable failure records. For this onward-restraint-chain scenario, it can document conditional-release claims and downstream evidence, but it does not define the recursive forwarding semantics or where that restraint graph lives, so scenario fit is only partial.",
+    "strengths": [
+      "Exact audit-anchor citation is highly auditable across long time horizons.",
+      "Clear live/audit/storage/device plane separation reduces semantic conflation.",
+      "Local append-only promise-accounting and break-witness rules handle ambiguity honestly.",
+      "Good Promise-Theory framing around scoped intent and local trust."
+    ],
+    "weaknesses": [
+      "Does not specify how recursive onward-restraint promises are represented across multiple recipients.",
+      "No concrete group-session or transport/feed semantics for conditional release propagation.",
+      "Claim-card framing still risks drifting toward conformance-card vocabulary.",
+      "Adds artifact types that may be heavier than necessary for simple small-device cases."
+    ],
+    "risks": [
+      "Claim cards may be mistaken for normative conformance or authorization bundles rather than scoped promises.",
+      "The onward-restraint chain could collapse into hidden app/session policy if the recursive condition is not made explicit per hop.",
+      "Audit evidence may record breaches after the fact without giving a clear interoperable representation of conditional forwardability at dispatch time."
+    ],
+    "open_questions": [
+      "How would a claim card encode Bob's onward-restraint promise so Carol's matching promise is locally checkable without a central policy graph?",
+      "Is the recursive release condition carried per CAS object, per feed/session, or only as audit-side prose?",
+      "What minimal audit-anchor and promise-accounting records are sufficient to show refusal, breach, or missing onward promises across hops?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design.",
+    "pt_gate": {
+      "status": "pt_clean",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "Peers publish scoped claims and keep local promise-accounting records; no agent is modeled as non-autonomous."
+      },
+      "scoped_intent": {
+        "status": "pass",
+        "note": "Scoped claim cards are explicit scoped declarations of intent by plane and embodiment."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "The design focuses on each peer's own published claims and observations, not promises made on behalf of downstream peers."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "Audit anchors and claim cards document intent and evidence, not guaranteed forwarding or retention outcomes."
+      },
+      "local_trust_assessment": {
+        "status": "pass",
+        "note": "Trust remains peer-local through cited anchors and local append-only observations rather than a global trust registry."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "The design distinguishes capability/auth notes and local records from obligations; it does not equate receipt or possession with compelled action."
+      },
+      "violations": []
+    }
+  }
+}

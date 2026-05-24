@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-zubuf-cas-type-cid-codec-only-udp-feed-v0-conformance-session-layer-composition-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000028-SIM-zubuf-cas-type-cid-codec-only--udp-feed-v0-conformance-session-layer-composition--openai-gpt-5.4-medium",
+  "sim_id": "SIM-zubuf-cas-type-cid-codec-only",
+  "scenario_id": "udp-feed-v0-conformance-session-layer-composition",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-zubuf-cas-type-cid-codec-only/udp-feed-v0-conformance-session-layer-composition/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_401e943ff34d48a999728d621793f19e",
+    "response_id": "resp_06b55148fc61a718006a12323b497081988579492bea3e174c",
+    "input_tokens": 7542,
+    "output_tokens": 1145,
+    "cost_usd": 0.0292285
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-zubuf-cas-type-cid-codec-only/",
+    "scenario_path": "scenarios/udp-feed-v0-conformance-session-layer-composition/udp-feed-v0-conformance-session-layer-composition.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-zubuf-cas-type-cid-codec-only/README.md",
+        "sha256": "f8b576e7f1fd2f44298bb944891aada2d51cc4b84c7f7d1edaf3f0c9cf263887"
+      },
+      {
+        "path": "simulations/SIM-zubuf-cas-type-cid-codec-only/QUESTION.md",
+        "sha256": "3a42af71a5ab26ea6a32d4789f1036c37e4381a434ca2448e0489a26b17ca1f4"
+      },
+      {
+        "path": "scenarios/udp-feed-v0-conformance-session-layer-composition/udp-feed-v0-conformance-session-layer-composition.md",
+        "sha256": "69da5db705a56cd7067a653928ff8b2dc9301ef6ebfc712bd81038a65c9d352c"
+      }
+    ],
+    "simulation_tree_hash": "8ed0fd394a31271380de3ed1e49a2700f22a654280e93e4c7bbb4d65bf0d89b5"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 2,
+    "auditability": 4,
+    "evolution_safety": 2,
+    "layer_boundary_clarity": 3,
+    "failure_handling": 0,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 5,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 25,
+    "normalized_0_100": 50,
+    "confidence_0_1": 0.8
+  },
+  "assessment": {
+    "rationale": "This candidate is mostly orthogonal to the scenario. It cleanly tests CAS object-family discrimination by CID codec alone, which helps layer separation at the object boundary, but it does not specify UDP-feed v0 API behavior, session-layer composition, or conformance evidence. Its main value here is showing a small, explicit discriminator with good auditability and implementation plausibility; its main gap is that it does not answer whether the next layer can compose above UDP-feed without leaking lower-layer binding details.",
+    "strengths": [
+      "Very small and explicit design surface.",
+      "Single discriminator avoids duplicate type fields and competing sources of truth.",
+      "Easy to audit and implement on constrained devices."
+    ],
+    "weaknesses": [
+      "Weak fit to a UDP-feed session-layer composition scenario.",
+      "No concrete promises or artifacts for session behavior, conformance, or transport/API sufficiency.",
+      "Limited treatment of failure modes, migration, and adversarial pressure."
+    ],
+    "risks": [
+      "Future evolution may overload codec allocation as the only type/version escape hatch.",
+      "Session-layer requirements may force extra out-of-band conventions, weakening the claimed single-source type binding.",
+      "Because failure and adversarial behavior are not modeled, composition risks could stay hidden until later integration."
+    ],
+    "open_questions": [
+      "Can codec-only typing compose cleanly with a session-layer payload contract without forcing transport-specific interpretation rules?",
+      "When application-shaped CAS objects evolve, is allocating new codecs enough, or does that create brittle proliferation?",
+      "What local evidence would show UDP-feed v0 is sufficient for session composition if object typing is carried only by CID codec?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

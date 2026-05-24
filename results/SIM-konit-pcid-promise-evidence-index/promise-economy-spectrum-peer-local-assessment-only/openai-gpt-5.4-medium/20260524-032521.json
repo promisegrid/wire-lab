@@ -1,0 +1,163 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-konit-pcid-promise-evidence-index-promise-economy-spectrum-peer-local-assessment-only-openai-gpt-5.4-medium-20260524-032521",
+  "run_group_id": "ga-canary-20260523-pt-gate-v3-successors",
+  "cell_id": "ga-canary-20260523-pt-gate-v3-successors-000057-SIM-konit-pcid-promise-evidence-index--promise-economy-spectrum-peer-local-assessment-only--openai-gpt-5.4-medium",
+  "sim_id": "SIM-konit-pcid-promise-evidence-index",
+  "scenario_id": "promise-economy-spectrum-peer-local-assessment-only",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260524-032521",
+  "result_path": "results/SIM-konit-pcid-promise-evidence-index/promise-economy-spectrum-peer-local-assessment-only/openai-gpt-5.4-medium/20260524-032521.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_c97375434ff341a485cc3e6a237706e4",
+    "response_id": "resp_0830f6311b059e9f006a1270d6ef9c8199a9dc0d6fccef738a",
+    "input_tokens": 8261,
+    "output_tokens": 1108,
+    "cost_usd": 0.02996875
+  },
+  "source": {
+    "repo_commit": "925c7f5c1c7ce7d5b0caf6a924d40d3f9b7d0483",
+    "sim_path": "simulations/SIM-konit-pcid-promise-evidence-index/",
+    "scenario_path": "scenarios/promise-economy-spectrum-peer-local-assessment-only/promise-economy-spectrum-peer-local-assessment-only.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-konit-pcid-promise-evidence-index/README.md",
+        "sha256": "9ebee1bbac1dafa81dd66c456d35cc98c1bcc2152ac436c41ce31d1fb5d2a6ef"
+      },
+      {
+        "path": "simulations/SIM-konit-pcid-promise-evidence-index/QUESTION.md",
+        "sha256": "03e6029e9943fdd935fc8c629d871c771710a27f4ccbdf5b3db727be79814960"
+      },
+      {
+        "path": "scenarios/promise-economy-spectrum-peer-local-assessment-only/promise-economy-spectrum-peer-local-assessment-only.md",
+        "sha256": "447986251c900f650f4b14b03e1660192d3e24b69dc82f9fbd1b61390866a5e6"
+      }
+    ],
+    "simulation_tree_hash": "227c9a080416752ab4c2fd51ae77ac84fad407f5deaf7843de114272995e423a"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 4,
+    "promisegrid_alignment": 5,
+    "auditability": 5,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 4,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 5,
+    "simplicity_durability": 4,
+    "risk_penalty": 1
+  },
+  "fitness": {
+    "raw": 44,
+    "normalized_0_100": 88,
+    "confidence_0_1": 0.87
+  },
+  "assessment": {
+    "rationale": "Strong fit. The simulation reframes the artifact as descriptive evidence about who promised what under a pCID and what peers later observed, which matches the scenario's peer-local assessment pressure without requiring token transfer or central settlement. Its main limitation is that it is an evidence index, not a full local decision protocol.",
+    "strengths": [
+      "Explicitly centers promise evidence rather than conformance or compliance claims.",
+      "Preserves local trust assessment and avoids central authority.",
+      "Supports auditability with exact evidence-object citations and later keep/break/refusal observations.",
+      "Clear boundary that the index is descriptive evidence only."
+    ],
+    "weaknesses": [
+      "Does not by itself specify how peers compute pull/keep/advertise decisions from the evidence.",
+      "An index can still become heavier than necessary for very small deployments.",
+      "Scenario fit is indirect because the design supports local assessment rather than defining the whole assessment workflow."
+    ],
+    "risks": [
+      "Could drift back into ledger or certification framing if implementations over-interpret the index.",
+      "May accumulate too much structure unless the entry format stays minimal and deterministic.",
+      "Local evidence sharing patterns could be mistaken for a global reputation mechanism."
+    ],
+    "open_questions": [
+      "What is the minimum durable entry shape needed for small-device, 100-year use?",
+      "How should peers cite negative observations like corrupt chunks or refusal without turning the index into a global reputation system?",
+      "What local decision rules connect indexed promise evidence to pull/keep/advertise behavior?"
+    ],
+    "authority_boundary": "Evidence only; supports local peer judgment but does not settle PromiseGrid design.",
+    "pt_gate": {
+      "status": "pt_clean",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "Agents make and assess promises locally; the index does not override peer autonomy."
+      },
+      "scoped_intent": {
+        "status": "pass",
+        "note": "Promises are scoped to pCID-referenced payloads or services with cited evidence."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "The index asks which agent promised what and avoids making promises on behalf of other agents."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "Entries describe supporting evidence and later observations, not guaranteed success."
+      },
+      "local_trust_assessment": {
+        "status": "pass",
+        "note": "Trust is explicitly left to Alice, Bob, or Carol as a local judgment."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "The design records evidence about promises and observations; it does not treat receipt or use as an imposed obligation."
+      },
+      "violations": []
+    }
+  }
+}

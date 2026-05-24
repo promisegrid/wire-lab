@@ -1,0 +1,163 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-konit-pcid-promise-evidence-index-conditional-release-geofencing-onward-restraint-chain-openai-gpt-5.4-medium-20260524-032521",
+  "run_group_id": "ga-canary-20260523-pt-gate-v3-successors",
+  "cell_id": "ga-canary-20260523-pt-gate-v3-successors-000060-SIM-konit-pcid-promise-evidence-index--conditional-release-geofencing-onward-restraint-chain--openai-gpt-5.4-medium",
+  "sim_id": "SIM-konit-pcid-promise-evidence-index",
+  "scenario_id": "conditional-release-geofencing-onward-restraint-chain",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260524-032521",
+  "result_path": "results/SIM-konit-pcid-promise-evidence-index/conditional-release-geofencing-onward-restraint-chain/openai-gpt-5.4-medium/20260524-032521.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_64c6be5ff2914555a584df8c616952df",
+    "response_id": "resp_0daab1ded9dceb64006a1270ef05808198be4d30bfe393e317",
+    "input_tokens": 8295,
+    "output_tokens": 1643,
+    "cost_usd": 0.03751825
+  },
+  "source": {
+    "repo_commit": "925c7f5c1c7ce7d5b0caf6a924d40d3f9b7d0483",
+    "sim_path": "simulations/SIM-konit-pcid-promise-evidence-index/",
+    "scenario_path": "scenarios/conditional-release-geofencing-onward-restraint-chain/conditional-release-geofencing-onward-restraint-chain.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-konit-pcid-promise-evidence-index/README.md",
+        "sha256": "9ebee1bbac1dafa81dd66c456d35cc98c1bcc2152ac436c41ce31d1fb5d2a6ef"
+      },
+      {
+        "path": "simulations/SIM-konit-pcid-promise-evidence-index/QUESTION.md",
+        "sha256": "03e6029e9943fdd935fc8c629d871c771710a27f4ccbdf5b3db727be79814960"
+      },
+      {
+        "path": "scenarios/conditional-release-geofencing-onward-restraint-chain/conditional-release-geofencing-onward-restraint-chain.md",
+        "sha256": "3c84fc46e1b14de5e5c6e9b029fcb891bd655238b45e516b20eda97dabe8ff24"
+      }
+    ],
+    "simulation_tree_hash": "227c9a080416752ab4c2fd51ae77ac84fad407f5deaf7843de114272995e423a"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 5,
+    "auditability": 5,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 4,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 5,
+    "simplicity_durability": 4,
+    "risk_penalty": 1
+  },
+  "fitness": {
+    "raw": 42,
+    "normalized_0_100": 84,
+    "confidence_0_1": 0.83
+  },
+  "assessment": {
+    "rationale": "This is a strong Promise-Theory reframing of evidence indexing: promise-first, descriptive, locally auditable, and explicit about not certifying outcomes. For this scenario it helps document an onward-restraint chain and later observations, but it is not itself the release-control or recursive dispatch mechanism, so scenario fit is only moderate.",
+    "strengths": [
+      "Very strong promise-first vocabulary tied to named agents, pCIDs, evidence, and later observations.",
+      "Clear authority boundary: evidence only, no certification, authorization, or dispute settlement.",
+      "High auditability from exact citations and durable evidence references.",
+      "Supports recording refusal, break, or ambiguity, which matches PT realism."
+    ],
+    "weaknesses": [
+      "Does not by itself specify how Bob decides whether Carol made the required downstream promise before forwarding.",
+      "Recursive promise-graph representation for onward-restraint chains is not yet explicit.",
+      "Operational behavior under stale, missing, or conflicting downstream evidence is underspecified."
+    ],
+    "risks": [
+      "Could be over-read as sufficient control for conditional release when it is only evidence.",
+      "May need extra structure to represent multi-hop onward-restraint chains cleanly across sessions or transports.",
+      "If entry shapes grow too generic, it could drift back toward ledger-style packaging."
+    ],
+    "open_questions": [
+      "How should the index encode recursive onward-restraint chains without implying central enforcement?",
+      "What is the smallest durable evidence shape for linking Alice-\u003eBob and Bob-\u003eCarol conditional promises across separate sessions or transports?",
+      "How should peers record ambiguous or missing downstream promises when release decisions must remain local?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design.",
+    "pt_gate": {
+      "status": "pt_clean",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "Promises are attached to specific agents and later observations, preserving agent autonomy."
+      },
+      "scoped_intent": {
+        "status": "pass",
+        "note": "Entries are pCID-scoped declarations and evidence references, which fits scoped intent."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "The design asks who promised what and does not let one agent promise on behalf of another."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "It records keep, break, refusal, or ambiguity rather than guaranteeing compliant forwarding."
+      },
+      "local_trust_assessment": {
+        "status": "pass",
+        "note": "The index is descriptive evidence only and leaves trust judgments to Alice, Bob, or Carol locally."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "The design records promises and observations without recasting receipt or use as obligation."
+      },
+      "violations": []
+    }
+  }
+}

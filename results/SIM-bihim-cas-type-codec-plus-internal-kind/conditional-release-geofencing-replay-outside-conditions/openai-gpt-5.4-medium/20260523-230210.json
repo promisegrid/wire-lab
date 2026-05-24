@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-bihim-cas-type-codec-plus-internal-kind-conditional-release-geofencing-replay-outside-conditions-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000030-SIM-bihim-cas-type-codec-plus-internal-kind--conditional-release-geofencing-replay-outside-conditions--openai-gpt-5.4-medium",
+  "sim_id": "SIM-bihim-cas-type-codec-plus-internal-kind",
+  "scenario_id": "conditional-release-geofencing-replay-outside-conditions",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-bihim-cas-type-codec-plus-internal-kind/conditional-release-geofencing-replay-outside-conditions/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_987f10db261f4e528b032c45d464ba17",
+    "response_id": "resp_0287b212ace08391006a12324779b48198b836b600205f8152",
+    "input_tokens": 7536,
+    "output_tokens": 1002,
+    "cost_usd": 0.027216
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-bihim-cas-type-codec-plus-internal-kind/",
+    "scenario_path": "scenarios/conditional-release-geofencing-replay-outside-conditions/conditional-release-geofencing-replay-outside-conditions.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-bihim-cas-type-codec-plus-internal-kind/README.md",
+        "sha256": "cf17971491ff515870ce86a883b5d97ee691a029cddb96211e80700ce11be16d"
+      },
+      {
+        "path": "simulations/SIM-bihim-cas-type-codec-plus-internal-kind/QUESTION.md",
+        "sha256": "da3251d1bd0bba3e15cad022e5f58793e2d087d9a10c8f4bd25a88241e29ad07"
+      },
+      {
+        "path": "scenarios/conditional-release-geofencing-replay-outside-conditions/conditional-release-geofencing-replay-outside-conditions.md",
+        "sha256": "f1480d60e85afb41b0fe5e49fdc70801e029734edbe32c3068434be7f4cb1c6e"
+      }
+    ],
+    "simulation_tree_hash": "415f66cfc07267d51ba343b130cfa4da0b6625c18c05fefee3dc38b71f2d11b0"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 3,
+    "auditability": 3,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 3,
+    "failure_handling": 0,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 4,
+    "simplicity_durability": 4,
+    "risk_penalty": 4
+  },
+  "fitness": {
+    "raw": 26,
+    "normalized_0_100": 52,
+    "confidence_0_1": 0.86
+  },
+  "assessment": {
+    "rationale": "This design mainly improves CAS payload dispatch by combining a broad codec with a deterministic internal kind. That helps object interpretation and some auditability, but it does not by itself address geofenced conditional release, stale reuse, recipient binding, or replay detection. It is a plausible low-level typing mechanism, yet the scenario needs higher-layer condition binding and local replay evidence that the simulation does not specify.",
+    "strengths": [
+      "Small deterministic payload marker is easy to implement and durable.",
+      "Internal kind can improve Carol's local interpretation and audit of CAS bytes.",
+      "The docs explicitly acknowledge forward-compatibility goals and dual-authority risk."
+    ],
+    "weaknesses": [
+      "Scenario mismatch: no explicit mechanism for geofence, audience, epoch, or session binding.",
+      "No stated replay detection, stale-object handling, or unauthorized reuse checks.",
+      "Layer split between codec and kind is clearer for typing than for authorization semantics."
+    ],
+    "risks": [
+      "Receivers may accept correctly typed objects that are replayed outside authorized geography or audience because typing is not authorization.",
+      "A broad codec plus internal kind can create two competing type authorities if evolution rules are not frozen tightly.",
+      "Security-sensitive implementations may overread the kind field as a trust signal rather than just a dispatch hint."
+    ],
+    "open_questions": [
+      "Can conditional-release predicates be bound canonically to recipient, geography, and epoch inside the payload kind without creating a second trust authority beside the codec?",
+      "What local evidence would Dave need to detect replayed but still well-typed objects outside allowed conditions?",
+      "Should replay resistance live in object typing at all, or in separate session/feed/accounting artifacts?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

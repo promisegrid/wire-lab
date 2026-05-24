@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-bilam-udp-feed-layer-composition-conformance-udp-feed-v0-conformance-session-layer-composition-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000238-SIM-bilam-udp-feed-layer-composition-conformance--udp-feed-v0-conformance-session-layer-composition--openai-gpt-5.4-medium",
+  "sim_id": "SIM-bilam-udp-feed-layer-composition-conformance",
+  "scenario_id": "udp-feed-v0-conformance-session-layer-composition",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-bilam-udp-feed-layer-composition-conformance/udp-feed-v0-conformance-session-layer-composition/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_473575747a564cc2ad9ef5dca3a7ff8b",
+    "response_id": "resp_03418aa50d6f7cc7006a1234b70e248198a837defcc0ba2c6f",
+    "input_tokens": 7524,
+    "output_tokens": 1141,
+    "cost_usd": 0.029141
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-bilam-udp-feed-layer-composition-conformance/",
+    "scenario_path": "scenarios/udp-feed-v0-conformance-session-layer-composition/udp-feed-v0-conformance-session-layer-composition.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-bilam-udp-feed-layer-composition-conformance/README.md",
+        "sha256": "679fb3e0e7ef397eab2c4e9bbd702a0917bcec69a8093b18a8080eb984b93bc8"
+      },
+      {
+        "path": "simulations/SIM-bilam-udp-feed-layer-composition-conformance/QUESTION.md",
+        "sha256": "c771644ce2de0dc1fc356c7cdb8f6e2f471a406c71e1a427a2db0077f31855ce"
+      },
+      {
+        "path": "scenarios/udp-feed-v0-conformance-session-layer-composition/udp-feed-v0-conformance-session-layer-composition.md",
+        "sha256": "69da5db705a56cd7067a653928ff8b2dc9301ef6ebfc712bd81038a65c9d352c"
+      }
+    ],
+    "simulation_tree_hash": "fc9f51cd962d3438f6bb96a1c7baa9fa2be765dca50bb60b16dde4a672aede9f"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 5,
+    "promisegrid_alignment": 4,
+    "auditability": 4,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 2,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 3,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 35,
+    "normalized_0_100": 70,
+    "confidence_0_1": 0.84
+  },
+  "assessment": {
+    "rationale": "This simulation fits the scenario well because it directly tests whether UDP-feed v0 is only meaningful when a higher-layer session can ride above it without exposing binding details. It is strong on layer-boundary clarity and reasonably aligned with PromiseGrid's sparse, local-evidence goals, but it stays mostly in conformance language rather than explicit promise-first payload language and says little about failure modes.",
+    "strengths": [
+      "Direct match to the session-layer composition scenario.",
+      "Clear focus on preserving higher-layer promises through the UDP-feed binding.",
+      "Explicitly seeks auditable composition evidence rather than mere UDP round-trip success."
+    ],
+    "weaknesses": [
+      "Does not specify a concrete higher-layer protocol or proof artifact.",
+      "Uses conformance-oriented wording more than Promise-Theory promise vocabulary.",
+      "Failure handling, adversarial pressure, and migration details are underdeveloped."
+    ],
+    "risks": [
+      "May overvalue a composition gate without defining the minimal auditable artifact needed to prove it.",
+      "Could block useful transport progress if the higher-layer requirement is set too rigidly or too early.",
+      "Lack of explicit failure/adversary treatment may hide session-binding leakage or downgrade risks."
+    ],
+    "open_questions": [
+      "What concrete higher-layer session artifact would count as sufficient composition evidence?",
+      "How should composition be audited when UDP-feed bindings evolve or multiple session protocols exist?",
+      "What failure cases must the session layer survive without leaking transport-binding details?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

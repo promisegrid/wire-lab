@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-kabiv-chunking-pcid-driven-identity-peer-adoption-metadata-spec-answer-vocabulary-drift-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000046-SIM-kabiv-chunking-pcid-driven-identity--peer-adoption-metadata-spec-answer-vocabulary-drift--openai-gpt-5.4-medium",
+  "sim_id": "SIM-kabiv-chunking-pcid-driven-identity",
+  "scenario_id": "peer-adoption-metadata-spec-answer-vocabulary-drift",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-kabiv-chunking-pcid-driven-identity/peer-adoption-metadata-spec-answer-vocabulary-drift/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_effdb1392d884d239b3994547431dd37",
+    "response_id": "resp_0fbd1565fb80d498006a123274a358819a885eea6429e6ffde",
+    "input_tokens": 7548,
+    "output_tokens": 1435,
+    "cost_usd": 0.033299
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-kabiv-chunking-pcid-driven-identity/",
+    "scenario_path": "scenarios/peer-adoption-metadata-spec-answer-vocabulary-drift/peer-adoption-metadata-spec-answer-vocabulary-drift.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-kabiv-chunking-pcid-driven-identity/README.md",
+        "sha256": "f2fd1cfe737e467037ae5298888ddeff9d1042625d9ec2bfabb15830d5d38953"
+      },
+      {
+        "path": "simulations/SIM-kabiv-chunking-pcid-driven-identity/QUESTION.md",
+        "sha256": "ed85c69097a9fa5aac0ca6f33b6749a795c916e00aa52ac17bb8cac4c48512e2"
+      },
+      {
+        "path": "scenarios/peer-adoption-metadata-spec-answer-vocabulary-drift/peer-adoption-metadata-spec-answer-vocabulary-drift.md",
+        "sha256": "a9e8ba84995e69fcad36f2554442cc62c5e1128ea0818197cb7ebf66e843ff53"
+      }
+    ],
+    "simulation_tree_hash": "05b7a54cb26daa2675abb925708f149eaf46f08dd93700190a804876c953a3e9"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 3,
+    "auditability": 3,
+    "evolution_safety": 1,
+    "layer_boundary_clarity": 2,
+    "failure_handling": 1,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 1,
+    "simplicity_durability": 3,
+    "risk_penalty": 4
+  },
+  "fitness": {
+    "raw": 20,
+    "normalized_0_100": 40,
+    "confidence_0_1": 0.85
+  },
+  "assessment": {
+    "rationale": "This simulation is only a weak fit for the scenario. It gives a clear, local, deterministic rule for deriving chunk identity from a pCID, which helps auditability and avoids central authority. But the scenario is about adoption metadata surviving spec-answer vocabulary drift, and this design does not model answer keys, claim vocabularies, or migration semantics. Because the pCID owns chunking semantics, spec evolution risks changing object identity and blurring the boundary between protocol meaning and storage policy.",
+    "strengths": [
+      "Deterministic pCID-scoped chunking is locally verifiable by any peer.",
+      "Audit trail is simple: recompute chunking from the referenced pCID and compare roots.",
+      "Avoids central registries or hidden global state for chunk interpretation."
+    ],
+    "weaknesses": [
+      "Does not directly address adoption metadata, answer keys, or profile/spec migration records.",
+      "Pushes low-level chunking policy into the protocol-spec layer, weakening boundary clarity.",
+      "Provides rejection on mismatch, but little failure-handling for mixed-version or renamed-vocabulary evolution."
+    ],
+    "risks": [
+      "Superseded specs can strand old objects and claims without a clear migration path.",
+      "Spec-local chunking policy may cause interoperability splits across peer adoption waves.",
+      "Vocabulary or field renames in later specs can make historical metadata ambiguous if tied too tightly to pCID-scoped semantics."
+    ],
+    "open_questions": [
+      "How are old and new pCIDs linked for audit when the chunking recipe changes?",
+      "Can historical claims stay unambiguous without a migration record between superseded specs?",
+      "Should chunking policy live in a subordinate recipe object instead of the protocol pCID?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

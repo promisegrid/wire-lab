@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-gujav-chunking-descriptor-cid-identity-transport-family-bakeoff-per-hop-authorization-failure-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000052-SIM-gujav-chunking-descriptor-cid-identity--transport-family-bakeoff-per-hop-authorization-failure--openai-gpt-5.4-medium",
+  "sim_id": "SIM-gujav-chunking-descriptor-cid-identity",
+  "scenario_id": "transport-family-bakeoff-per-hop-authorization-failure",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-gujav-chunking-descriptor-cid-identity/transport-family-bakeoff-per-hop-authorization-failure/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_c711282c318545758123487106671d96",
+    "response_id": "resp_0f1e4a99bef67987006a12328ce7b8819a805f4c1c1fcd6eac",
+    "input_tokens": 7536,
+    "output_tokens": 1061,
+    "cost_usd": 0.028042
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-gujav-chunking-descriptor-cid-identity/",
+    "scenario_path": "scenarios/transport-family-bakeoff-per-hop-authorization-failure/transport-family-bakeoff-per-hop-authorization-failure.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-gujav-chunking-descriptor-cid-identity/README.md",
+        "sha256": "e305f4539f80b3ebf13efdf3ac7e5546a24bfb4f3f2b933ba5314ee8da45d04b"
+      },
+      {
+        "path": "simulations/SIM-gujav-chunking-descriptor-cid-identity/QUESTION.md",
+        "sha256": "4ce300a0089546c059324a77048602a2a11d6ee7da9726dd6f626491d2e9022b"
+      },
+      {
+        "path": "scenarios/transport-family-bakeoff-per-hop-authorization-failure/transport-family-bakeoff-per-hop-authorization-failure.md",
+        "sha256": "f938e10ab88db666d3097a2f97c1667bbbc6e8e071681134049068982cc39cf2"
+      }
+    ],
+    "simulation_tree_hash": "15d243cabdef61ba22264cb689324663680bcab3609423fe91b7c7667b8025f2"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 0,
+    "promisegrid_alignment": 2,
+    "auditability": 3,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 0,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 3,
+    "simplicity_durability": 2,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 24,
+    "normalized_0_100": 48,
+    "confidence_0_1": 0.91
+  },
+  "assessment": {
+    "rationale": "The simulation is mostly orthogonal to the scenario. It offers a concrete, somewhat promise-oriented way to identify chunking rules and helps migration and reuse, but it does not model ring forwarding, per-hop authorization, refusal recording, skip behavior, or membership reconfiguration. As a result it scores well on local design clarity and evolution, but poorly on scenario fit and failure handling.",
+    "strengths": [
+      "Explicit descriptor artifact improves auditability of chunking choices.",
+      "Good separation of chunking parameters from payload/object evolution concerns.",
+      "Plausible implementation as a small deterministic referenced object."
+    ],
+    "weaknesses": [
+      "Does not answer the scenario's core per-hop authorization failure question.",
+      "No refusal, recovery, ring-break, skip-hop, or reconfiguration model.",
+      "Promise vocabulary is present but not fully expressed as peer-local payload promises."
+    ],
+    "risks": [
+      "Extra descriptor indirection can blur object identity and complicate small-device implementations.",
+      "Using this specimen for transport authorization comparison risks accidental layer conflation.",
+      "If descriptor references become a dependency for interpretation, long-term simplicity may degrade."
+    ],
+    "open_questions": [
+      "How would a transport using this chunking-descriptor scheme represent per-hop authorization promises and refusals?",
+      "Does the extra descriptor indirection help or hinder auditability when transport membership or forwarding policy changes?",
+      "Can chunking descriptors remain strictly payload-level so transport failure semantics stay in a separate layer?"
+    ],
+    "authority_boundary": "Evidence only; this simulation addresses chunking-descriptor identity, not transport-hop authorization semantics."
+  }
+}

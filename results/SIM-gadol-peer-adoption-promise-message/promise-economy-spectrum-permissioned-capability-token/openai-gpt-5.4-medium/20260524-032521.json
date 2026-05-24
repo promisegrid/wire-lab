@@ -1,0 +1,162 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-gadol-peer-adoption-promise-message-promise-economy-spectrum-permissioned-capability-token-openai-gpt-5.4-medium-20260524-032521",
+  "run_group_id": "ga-canary-20260523-pt-gate-v3-successors",
+  "cell_id": "ga-canary-20260523-pt-gate-v3-successors-000024-SIM-gadol-peer-adoption-promise-message--promise-economy-spectrum-permissioned-capability-token--openai-gpt-5.4-medium",
+  "sim_id": "SIM-gadol-peer-adoption-promise-message",
+  "scenario_id": "promise-economy-spectrum-permissioned-capability-token",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260524-032521",
+  "result_path": "results/SIM-gadol-peer-adoption-promise-message/promise-economy-spectrum-permissioned-capability-token/openai-gpt-5.4-medium/20260524-032521.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_600a3919deb147608b9b1dd6fb9ab43a",
+    "response_id": "resp_0a1155b2f95de956006a1270263b548198954fcb465879244d",
+    "input_tokens": 8115,
+    "output_tokens": 1103,
+    "cost_usd": 0.02964325
+  },
+  "source": {
+    "repo_commit": "925c7f5c1c7ce7d5b0caf6a924d40d3f9b7d0483",
+    "sim_path": "simulations/SIM-gadol-peer-adoption-promise-message/",
+    "scenario_path": "scenarios/promise-economy-spectrum-permissioned-capability-token/promise-economy-spectrum-permissioned-capability-token.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-gadol-peer-adoption-promise-message/README.md",
+        "sha256": "b7767c1a9279ef3c1a9bcc08a1d96a87259fe4e5090fa06ad2811a397fef49d3"
+      },
+      {
+        "path": "simulations/SIM-gadol-peer-adoption-promise-message/QUESTION.md",
+        "sha256": "3096ee94cbc1ba2247fc46b908d4e215cbe96af054b7943f6b6d567185b6df3b"
+      },
+      {
+        "path": "scenarios/promise-economy-spectrum-permissioned-capability-token/promise-economy-spectrum-permissioned-capability-token.md",
+        "sha256": "ac5ba8f29fb13e1d693bdbfb0a5cc1c516750bf4f3a142b8dee90128d13ce2e2"
+      }
+    ],
+    "simulation_tree_hash": "cc25bca5323b36b38c3d31b1314bf64a50e08e8631c97040b6e872ad0548e43a"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 4,
+    "auditability": 4,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 3,
+    "failure_handling": 2,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 5,
+    "simplicity_durability": 4,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 34,
+    "normalized_0_100": 68,
+    "confidence_0_1": 0.84
+  },
+  "assessment": {
+    "rationale": "Strong Promise-Theory fit: adoption is framed as an ordinary peer promise message with local storage, relay, and supersession. That is compact, auditable, and durable. But this cell's scenario is about permissioned capability tokens and scoped redemption without exchange-rate semantics; the simulation only partially helps because it covers adoption evidence, not capability issuance, redemption, revocation, or non-transferability.",
+    "strengths": [
+      "Promise-first wording centered on an autonomous agent declaring its own intent.",
+      "Ordinary promise messages are small, relayable, and fit long-term local accounting.",
+      "Supersession path gives a plausible evolution mechanism without special metadata objects."
+    ],
+    "weaknesses": [
+      "Does not directly model a permissioned capability or redemption flow.",
+      "Failure handling for stale, conflicting, or revoked permissions is underspecified.",
+      "Boundary between protocol adoption and service authorization remains blurry."
+    ],
+    "risks": [
+      "Scenario mismatch may overstate usefulness for capability-token pressure.",
+      "Spec pCID and answer-binding ambiguity may leave permission scope underdefined.",
+      "No concrete handling for expiry, revocation, or redemption failure in a capability setting."
+    ],
+    "open_questions": [
+      "Can the same promise-message pattern express a non-transferable fetch capability without drifting into token or market framing?",
+      "How would Bob and Carol locally distinguish adoption promises from redeemable service permissions?",
+      "What concrete promise-accounting records show redemption, refusal, expiry, or revocation for a scoped capability?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design.",
+    "pt_gate": {
+      "status": "pt_clean",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "Alice publishes her own promise message and later peers assess it locally."
+      },
+      "scoped_intent": {
+        "status": "pass",
+        "note": "The promise is scoped to behavior according to a referenced pCID with explicit answer bindings."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "The design has Alice promise her own behavior, not Bob's or a registry's."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "The message expresses intended behavior and supersession, not guaranteed redemption outcomes."
+      },
+      "local_trust_assessment": {
+        "status": "pass",
+        "note": "Independent peers can store, relay, and assess promise evidence without a global authority."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "A peer's receipt or use of a promise message does not imply obligation; the design stays declarative."
+      },
+      "violations": []
+    }
+  }
+}

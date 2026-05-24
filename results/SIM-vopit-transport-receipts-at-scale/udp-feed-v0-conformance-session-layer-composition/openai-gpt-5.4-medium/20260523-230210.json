@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-vopit-transport-receipts-at-scale-udp-feed-v0-conformance-session-layer-composition-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000126-SIM-vopit-transport-receipts-at-scale--udp-feed-v0-conformance-session-layer-composition--openai-gpt-5.4-medium",
+  "sim_id": "SIM-vopit-transport-receipts-at-scale",
+  "scenario_id": "udp-feed-v0-conformance-session-layer-composition",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-vopit-transport-receipts-at-scale/udp-feed-v0-conformance-session-layer-composition/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_5c5d400c138b4e689627faa90ecaa73d",
+    "response_id": "resp_00547ddf99bf690b006a12336e0b54819897d833294022f452",
+    "input_tokens": 7506,
+    "output_tokens": 865,
+    "cost_usd": 0.0252455
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-vopit-transport-receipts-at-scale/",
+    "scenario_path": "scenarios/udp-feed-v0-conformance-session-layer-composition/udp-feed-v0-conformance-session-layer-composition.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-vopit-transport-receipts-at-scale/README.md",
+        "sha256": "0fbf01f60630a4d77a90b1eb757baaf22db54718e543726edd6f902784c0e973"
+      },
+      {
+        "path": "simulations/SIM-vopit-transport-receipts-at-scale/QUESTION.md",
+        "sha256": "f2d5400dddd9f92139fcbf4c1ca1daf8a9228dd7057e4e5eab115211a7873848"
+      },
+      {
+        "path": "scenarios/udp-feed-v0-conformance-session-layer-composition/udp-feed-v0-conformance-session-layer-composition.md",
+        "sha256": "69da5db705a56cd7067a653928ff8b2dc9301ef6ebfc712bd81038a65c9d352c"
+      }
+    ],
+    "simulation_tree_hash": "0296d101bcc1d66b152b10009c3fd7e912eb0da942916f52f9bda4cf0d3c7c47"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 3,
+    "auditability": 3,
+    "evolution_safety": 2,
+    "layer_boundary_clarity": 1,
+    "failure_handling": 2,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 3,
+    "simplicity_durability": 2,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 23,
+    "normalized_0_100": 46,
+    "confidence_0_1": 0.83
+  },
+  "assessment": {
+    "rationale": "The simulation is relevant to transport-layer evidence and local receipt promises, but it does not directly specify a session-layer composition boundary for a minimal group/session protocol over UDP-feed v0. Its strongest fit is auditability pressure at scale; its weakest fit is the scenario's specific question about whether the lower-layer API is sufficient without leaking binding details upward.",
+    "strengths": [
+      "Centers peer-local receipt evidence rather than central authority.",
+      "Explicitly asks whether aggregation preserves auditability at scale.",
+      "Implementation direction is plausible for constrained devices compared with retaining all acknowledgements forever."
+    ],
+    "weaknesses": [
+      "Does not directly define session-layer composition promises.",
+      "Does not explain whether UDP-feed details leak into the next layer.",
+      "Failure semantics for unverifiable or partial summaries are underspecified."
+    ],
+    "risks": [
+      "Aggregated receipts may collapse into opaque summary claims that a session layer cannot independently audit.",
+      "A scale-focused receipt design may accidentally couple session semantics to transport acknowledgement mechanics.",
+      "If the format remains unsettled, composition behavior may drift across implementations."
+    ],
+    "open_questions": [
+      "Can receipt summaries be composed cleanly with a session layer without exposing UDP-feed-specific binding details?",
+      "What exact payload promise lets a later auditor verify aggregated receipt evidence across protocol evolution?",
+      "When summaries disagree with per-peer local logs, what local evidence is authoritative?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

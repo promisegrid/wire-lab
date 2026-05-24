@@ -1,0 +1,170 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-tizad-scoped-conformance-citation-ledger-group-session-freeze-promise-post-freeze-mutation-request-openai-gpt-5.4-medium-20260524-024852",
+  "run_group_id": "ga-canary-20260523-pt-gate-v3",
+  "cell_id": "ga-canary-20260523-pt-gate-v3-000062-SIM-tizad-scoped-conformance-citation-ledger--group-session-freeze-promise-post-freeze-mutation-request--openai-gpt-5.4-medium",
+  "sim_id": "SIM-tizad-scoped-conformance-citation-ledger",
+  "scenario_id": "group-session-freeze-promise-post-freeze-mutation-request",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260524-024852",
+  "result_path": "results/SIM-tizad-scoped-conformance-citation-ledger/group-session-freeze-promise-post-freeze-mutation-request/openai-gpt-5.4-medium/20260524-024852.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_a80462b633264f46b086c4785408391c",
+    "response_id": "resp_0c73e03bcc127ea1006a1268b21238819a9d992f3ef6646c53",
+    "input_tokens": 9453,
+    "output_tokens": 1902,
+    "cost_usd": 0.04317075
+  },
+  "source": {
+    "repo_commit": "ec652bd3ecaaf2f904e62cff00e113a88c7e3efd",
+    "sim_path": "simulations/SIM-tizad-scoped-conformance-citation-ledger/",
+    "scenario_path": "scenarios/group-session-freeze-promise-post-freeze-mutation-request/group-session-freeze-promise-post-freeze-mutation-request.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-tizad-scoped-conformance-citation-ledger/README.md",
+        "sha256": "9668854c94fcb6a8331a98003184968f3e5369102dbe9000783a5f9b867e79ef"
+      },
+      {
+        "path": "simulations/SIM-tizad-scoped-conformance-citation-ledger/QUESTION.md",
+        "sha256": "05f7a658c8c67f64e164153a02dd9fed0df2af9f4f09a02118eaaa06273fb43c"
+      },
+      {
+        "path": "simulations/SIM-tizad-scoped-conformance-citation-ledger/CLAIM-BUNDLE.md",
+        "sha256": "29b03975828b554b774e2cb385cc4a85f80653fa8841494227a837efc95ba45c"
+      },
+      {
+        "path": "scenarios/group-session-freeze-promise-post-freeze-mutation-request/group-session-freeze-promise-post-freeze-mutation-request.md",
+        "sha256": "9083e149d879dcf5890bbcc3d3bb2fcf87b4490ba1878e59a73402bd5312ee52"
+      }
+    ],
+    "simulation_tree_hash": "f45aa7d6c917a553cd0b9e4ed9de53aec6bfa37cb67f1af4bd8ecb516146c77d"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 3,
+    "promisegrid_alignment": 2,
+    "auditability": 5,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 4,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 3,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 34,
+    "normalized_0_100": 68,
+    "confidence_0_1": 0.84
+  },
+  "assessment": {
+    "rationale": "Good match on immutable audit evidence and safe evolution after freeze: concrete CAS citations and peer-local records help prevent silent history mutation. But the simulation does not fully specify freeze lineage semantics for whether a breaking post-freeze change becomes a new specimen, a superseding identifier, or an amendment, and its language leans more toward conformance claims than explicit agent promises.",
+    "strengths": [
+      "Strong durable citation discipline for frozen evidence.",
+      "Clear separation of local, live, audit, and effect layers.",
+      "Peer-local records improve long-term auditability and dispute handling.",
+      "Supports evolution without mutating prior cited objects."
+    ],
+    "weaknesses": [
+      "Does not define a concrete supersession/amendment mechanism for frozen group-session artifacts.",
+      "Promise vocabulary is weaker than ideal PT wording.",
+      "Manifest/bundle framing adds wrapper complexity."
+    ],
+    "risks": [
+      "Post-freeze lineage may remain ambiguous across embodiments.",
+      "Conformance-manifest framing may invite overclaiming beyond what one agent actually promises.",
+      "The bundle/manifest pattern is somewhat heavier than minimal durable artifacts."
+    ],
+    "open_questions": [
+      "How should a post-freeze breaking change be represented explicitly: new specimen, superseding contract-family reference, or amendment object?",
+      "What durable lineage object links old frozen audit evidence to the new mutation request without implying history rewrite?",
+      "How should per-agent manifests state supersession so Carol can distinguish coexistence from replacement?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design.",
+    "pt_gate": {
+      "status": "pt_reframe_needed",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "Each peer publishes its own scoped manifest and keeps its own promise-accounting records."
+      },
+      "scoped_intent": {
+        "status": "pass",
+        "note": "Claim scopes are explicit (`local-implementation`, `live-transport`, `audit-publication`, `device-effect`)."
+      },
+      "no_promises_for_others": {
+        "status": "warning",
+        "note": "Mostly local, but app-level conformance manifest language can be read as speaking for a broader app or embodiment set unless explicitly recast as per-agent promises."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "The design distinguishes identity, availability, authorization, and effect, and records failed or unknown outcomes."
+      },
+      "local_trust_assessment": {
+        "status": "pass",
+        "note": "Trust is grounded in peer-local records and cited CAS artifacts rather than a global registry."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "Peers can inspect cited artifacts locally; publication does not by itself impose acceptance or use."
+      },
+      "violations": [
+        "Uses conformance-manifest/claim framing instead of consistently promise-first wording.",
+        "'Authoritative' app-level contract references risk sounding global unless kept strictly as a cited boundary object for local promises."
+      ]
+    }
+  }
+}

@@ -1,0 +1,170 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-tizad-scoped-conformance-citation-ledger-promise-accounting-records-refused-service-openai-gpt-5.4-medium-20260524-024852",
+  "run_group_id": "ga-canary-20260523-pt-gate-v3",
+  "cell_id": "ga-canary-20260523-pt-gate-v3-000059-SIM-tizad-scoped-conformance-citation-ledger--promise-accounting-records-refused-service--openai-gpt-5.4-medium",
+  "sim_id": "SIM-tizad-scoped-conformance-citation-ledger",
+  "scenario_id": "promise-accounting-records-refused-service",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260524-024852",
+  "result_path": "results/SIM-tizad-scoped-conformance-citation-ledger/promise-accounting-records-refused-service/openai-gpt-5.4-medium/20260524-024852.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_c2c39b0c8b994cbb8d43cc840a5f119f",
+    "response_id": "resp_067af712d3cf7e63006a12689b8da08198aa61cab989afe54c",
+    "input_tokens": 9429,
+    "output_tokens": 1984,
+    "cost_usd": 0.04427675
+  },
+  "source": {
+    "repo_commit": "ec652bd3ecaaf2f904e62cff00e113a88c7e3efd",
+    "sim_path": "simulations/SIM-tizad-scoped-conformance-citation-ledger/",
+    "scenario_path": "scenarios/promise-accounting-records-refused-service/promise-accounting-records-refused-service.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-tizad-scoped-conformance-citation-ledger/README.md",
+        "sha256": "9668854c94fcb6a8331a98003184968f3e5369102dbe9000783a5f9b867e79ef"
+      },
+      {
+        "path": "simulations/SIM-tizad-scoped-conformance-citation-ledger/QUESTION.md",
+        "sha256": "05f7a658c8c67f64e164153a02dd9fed0df2af9f4f09a02118eaaa06273fb43c"
+      },
+      {
+        "path": "simulations/SIM-tizad-scoped-conformance-citation-ledger/CLAIM-BUNDLE.md",
+        "sha256": "29b03975828b554b774e2cb385cc4a85f80653fa8841494227a837efc95ba45c"
+      },
+      {
+        "path": "scenarios/promise-accounting-records-refused-service/promise-accounting-records-refused-service.md",
+        "sha256": "9a7d47455793988cfb9b0fb045b29086ed13ee22cd0db080584e259c0aa69313"
+      }
+    ],
+    "simulation_tree_hash": "f45aa7d6c917a553cd0b9e4ed9de53aec6bfa37cb67f1af4bd8ecb516146c77d"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 3,
+    "promisegrid_alignment": 2,
+    "auditability": 4,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 3,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 3,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 32,
+    "normalized_0_100": 64,
+    "confidence_0_1": 0.84
+  },
+  "assessment": {
+    "rationale": "Strong boundary discipline, durable citation, and peer-local records make this design audit-friendly and largely PromiseGrid-shaped. For this scenario, however, the record schema does not clearly encode honest refusal as distinct from generic failure, so it only partially satisfies the refused-service pressure. It is technically promising but needs PT-first wording and a refusal-specific outcome shape.",
+    "strengths": [
+      "Explicit layer boundaries reduce overclaiming across local, live, audit, and effect scopes.",
+      "Durable citation rules improve long-term auditability and evidence replay.",
+      "Peer-local promise-accounting records fit sparse knowledge and decentralized observation.",
+      "Separation of identity, availability, authorization, and effect promises helps classify service outcomes."
+    ],
+    "weaknesses": [
+      "Result values omit an explicit refusal or policy-denied state for this scenario.",
+      "Promise vocabulary is mixed with conformance, claim, and status language rather than consistently promise-first wording.",
+      "The 'authoritative' contract reference may invite central or normative interpretations if not carefully scoped."
+    ],
+    "risks": [
+      "Auditors may misread the publishable conformance manifest as a global trust or certification object.",
+      "Refused service may be logged as generic failure, losing the scenario's key distinction between refusal and malfunction.",
+      "The combination of manifest, claim bundle, and accounting rows adds some wrapper complexity compared with smaller promise payload artifacts."
+    ],
+    "open_questions": [
+      "Should promise-accounting rows add an explicit refusal or policy-denied result instead of collapsing refusal into failed or authorization-related outcomes?",
+      "What durable artifact should a peer cite for an honest refusal: local log entry only, signed refusal receipt, or a scenario-specific object?",
+      "How should the manifest wording be reframed from conformance/status claims into explicit promisor-scoped promises without losing audit utility?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design.",
+    "pt_gate": {
+      "status": "pt_reframe_needed",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "Peers keep their own local records and publish their own scoped statements, which respects agent autonomy."
+      },
+      "scoped_intent": {
+        "status": "pass",
+        "note": "Scope separation is a core strength: local implementation, live transport, audit publication, and device effect are separated clearly."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "The pattern is centered on peer-local records and scoped published claims rather than one agent promising on behalf of another."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "The design explicitly records failed, unknown, replayed, and superseded outcomes, so promises are not treated as guarantees."
+      },
+      "local_trust_assessment": {
+        "status": "warning",
+        "note": "Local evidence and peer-local accounting support local trust assessment, but 'authoritative' conformance framing can invite an overly global reading."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "The design mostly records what peers may observe and retain; it does not impose obligation semantics on acceptance or use."
+      },
+      "violations": [
+        "The primary artifact is framed as a conformance manifest with status claims rather than explicit promisor-scoped promises.",
+        "Use of an 'authoritative protocol-boundary contract' can be read as normative authority unless carefully limited to a cited boundary artifact for local assessment."
+      ]
+    }
+  }
+}

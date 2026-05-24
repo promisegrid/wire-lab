@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-gujiv-conditional-release-hybrid-reference-graph-udp-feed-v0-conformance-session-layer-composition-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000098-SIM-gujiv-conditional-release-hybrid-reference-graph--udp-feed-v0-conformance-session-layer-composition--openai-gpt-5.4-medium",
+  "sim_id": "SIM-gujiv-conditional-release-hybrid-reference-graph",
+  "scenario_id": "udp-feed-v0-conformance-session-layer-composition",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-gujiv-conditional-release-hybrid-reference-graph/udp-feed-v0-conformance-session-layer-composition/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_7670a875d988464293ecbc49af3674f1",
+    "response_id": "resp_0ee24ba9811ac559006a1233158db0819b9f86602b8dcec38f",
+    "input_tokens": 7534,
+    "output_tokens": 1335,
+    "cost_usd": 0.0318745
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-gujiv-conditional-release-hybrid-reference-graph/",
+    "scenario_path": "scenarios/udp-feed-v0-conformance-session-layer-composition/udp-feed-v0-conformance-session-layer-composition.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-gujiv-conditional-release-hybrid-reference-graph/README.md",
+        "sha256": "03247c8a2a06b2a8c3928b5e3ebf5e8ec82d683558f04b551ba936c880caf1f9"
+      },
+      {
+        "path": "simulations/SIM-gujiv-conditional-release-hybrid-reference-graph/QUESTION.md",
+        "sha256": "c9ffd03808d1cbc2c8ecd1ea86828b900e9543798f69d99e2d0327c9d7e695c5"
+      },
+      {
+        "path": "scenarios/udp-feed-v0-conformance-session-layer-composition/udp-feed-v0-conformance-session-layer-composition.md",
+        "sha256": "69da5db705a56cd7067a653928ff8b2dc9301ef6ebfc712bd81038a65c9d352c"
+      }
+    ],
+    "simulation_tree_hash": "bfaaa00c0154723abdec6de204c1fc67d79012cf94e8e62b83667423be99cb22"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 4,
+    "promisegrid_alignment": 4,
+    "auditability": 4,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 3,
+    "implementation_plausibility": 3,
+    "promise_vocabulary": 3,
+    "simplicity_durability": 2,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 35,
+    "normalized_0_100": 70,
+    "confidence_0_1": 0.79
+  },
+  "assessment": {
+    "rationale": "The simulation is a strong conceptual match for session-layer composition because it explicitly tries to keep human release meaning at the group/session layer while pushing stable opaque references and proof hooks downward. That directly addresses boundary leakage pressure, but the fit is incomplete because the design is not specific to UDP-feed v0 and leaves the graph object model unsettled. Audit and evolution properties look promising via stable condition CIDs and local evidence, while simplicity, failure detail, and implementation concreteness remain weaker.",
+    "strengths": [
+      "Explicit focus on preserving layer boundaries.",
+      "Stable condition references support local audit and later evolution.",
+      "Keeps human-facing release semantics at the higher layer instead of burying them in transport metadata."
+    ],
+    "weaknesses": [
+      "Not concretely tied to UDP-feed v0 API shape.",
+      "Failure/refusal handling is only lightly specified.",
+      "Hybrid reference graph is less simple and durable than a smaller explicit artifact set."
+    ],
+    "risks": [
+      "Hybrid graph plus proof-hook machinery may become too complex for small durable deployments.",
+      "Unsettled graph object modeling could leak semantics across layers during real composition work.",
+      "If lower-layer references are not tightly scoped, implementations may reintroduce transport-coupled conformance claims."
+    ],
+    "open_questions": [
+      "Can the lower-layer opaque references compose cleanly with a concrete UDP-feed v0 API without exposing transport binding details?",
+      "What exact graph object model and refusal/audit records are required for interoperable session-layer composition?",
+      "How small and durable can the reference/evidence artifacts be on constrained devices?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

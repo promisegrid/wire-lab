@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-dujoh-conditional-release-transport-visible-constraint-peer-adoption-metadata-spec-answer-vocabulary-drift-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000088-SIM-dujoh-conditional-release-transport-visible-constraint--peer-adoption-metadata-spec-answer-vocabulary-drift--openai-gpt-5.4-medium",
+  "sim_id": "SIM-dujoh-conditional-release-transport-visible-constraint",
+  "scenario_id": "peer-adoption-metadata-spec-answer-vocabulary-drift",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-dujoh-conditional-release-transport-visible-constraint/peer-adoption-metadata-spec-answer-vocabulary-drift/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_91bcf216af854f54b5c45092c6451f2d",
+    "response_id": "resp_03ba746858bedc3f006a1232fb60508198ac411ade308aeb8f",
+    "input_tokens": 7534,
+    "output_tokens": 1224,
+    "cost_usd": 0.0303205
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-dujoh-conditional-release-transport-visible-constraint/",
+    "scenario_path": "scenarios/peer-adoption-metadata-spec-answer-vocabulary-drift/peer-adoption-metadata-spec-answer-vocabulary-drift.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-dujoh-conditional-release-transport-visible-constraint/README.md",
+        "sha256": "c049f3a0bf15b40506257afc5d06ccb8cc7fa27e301f3aebc7ea4bab129542a5"
+      },
+      {
+        "path": "simulations/SIM-dujoh-conditional-release-transport-visible-constraint/QUESTION.md",
+        "sha256": "598dbb05c0bd9223d0235ead35ac79872e30b1836844b254d73fdc3db1fb63a9"
+      },
+      {
+        "path": "scenarios/peer-adoption-metadata-spec-answer-vocabulary-drift/peer-adoption-metadata-spec-answer-vocabulary-drift.md",
+        "sha256": "a9e8ba84995e69fcad36f2554442cc62c5e1128ea0818197cb7ebf66e843ff53"
+      }
+    ],
+    "simulation_tree_hash": "993c6c480b07328fd67b857ec4258cd9b4ca2aaf4252e5490f9e7a6322e481cf"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 2,
+    "auditability": 3,
+    "evolution_safety": 1,
+    "layer_boundary_clarity": 2,
+    "failure_handling": 3,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 3,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 23,
+    "normalized_0_100": 46,
+    "confidence_0_1": 0.84
+  },
+  "assessment": {
+    "rationale": "This simulation is only a weak fit for the scenario. It addresses visible conditional-release metadata at transport/feed layers, which is adjacent to metadata evolution, but it does not directly model adoption-answer keys, spec-local question IDs, or migration records for vocabulary drift. It does offer small auditable artifacts and plausible refusal behavior, yet the scenario's core pressure—surviving renamed or removed spec answers without ambiguity—is largely unanswered.",
+    "strengths": [
+      "Keeps the visible surface intentionally small rather than pushing full policy text into transport.",
+      "Supports peer-local refusal to store or forward when local promises would be violated.",
+      "Uses concrete machine-checkable artifacts that are more auditable than hidden enforcement."
+    ],
+    "weaknesses": [
+      "Does not directly represent adoption metadata answer keys such as Q9 or their spec-local naming.",
+      "Provides little evidence for how old and new vocabularies are mapped across spec evolution.",
+      "Only partially resolves layer boundaries because transport must see some condition metadata."
+    ],
+    "risks": [
+      "Transport-visible hints may ossify a vocabulary that later frozen specs rename or retire.",
+      "Lower-layer exposure of condition metadata can blur payload/transport boundaries and create long-term coupling.",
+      "Opaque references without explicit migration semantics can leave later auditors unable to interpret old claims."
+    ],
+    "open_questions": [
+      "Can the visible constraint hints be versioned or scoped to a frozen spec so renamed or removed answer keys do not create ambiguity?",
+      "Are migration records between old and new condition vocabularies explicit payload artifacts or implicit transport behavior?",
+      "How does a peer audit whether an opaque condition reference still means the same thing after spec supersession?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

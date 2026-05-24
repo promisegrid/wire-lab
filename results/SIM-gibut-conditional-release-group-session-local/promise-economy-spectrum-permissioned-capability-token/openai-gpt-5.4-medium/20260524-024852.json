@@ -1,0 +1,168 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-gibut-conditional-release-group-session-local-promise-economy-spectrum-permissioned-capability-token-openai-gpt-5.4-medium-20260524-024852",
+  "run_group_id": "ga-canary-20260523-pt-gate-v3",
+  "cell_id": "ga-canary-20260523-pt-gate-v3-000032-SIM-gibut-conditional-release-group-session-local--promise-economy-spectrum-permissioned-capability-token--openai-gpt-5.4-medium",
+  "sim_id": "SIM-gibut-conditional-release-group-session-local",
+  "scenario_id": "promise-economy-spectrum-permissioned-capability-token",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260524-024852",
+  "result_path": "results/SIM-gibut-conditional-release-group-session-local/promise-economy-spectrum-permissioned-capability-token/openai-gpt-5.4-medium/20260524-024852.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_df1cc1da1f284e9086adf0fa59cce593",
+    "response_id": "resp_0508ba23dab577c9006a1267e409bc819bb5b9286d8eac9746",
+    "input_tokens": 8108,
+    "output_tokens": 2554,
+    "cost_usd": 0.049945
+  },
+  "source": {
+    "repo_commit": "ec652bd3ecaaf2f904e62cff00e113a88c7e3efd",
+    "sim_path": "simulations/SIM-gibut-conditional-release-group-session-local/",
+    "scenario_path": "scenarios/promise-economy-spectrum-permissioned-capability-token/promise-economy-spectrum-permissioned-capability-token.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-gibut-conditional-release-group-session-local/README.md",
+        "sha256": "c0e15735585e1296ae39d522ffa8cbe097d7a9cb66ff7d479b75f62b335a901c"
+      },
+      {
+        "path": "simulations/SIM-gibut-conditional-release-group-session-local/QUESTION.md",
+        "sha256": "7cb4d75a2a69df7f86b185094a9bf106bc89bf26e018d70a272c6ba43e1ba288"
+      },
+      {
+        "path": "scenarios/promise-economy-spectrum-permissioned-capability-token/promise-economy-spectrum-permissioned-capability-token.md",
+        "sha256": "ac5ba8f29fb13e1d693bdbfb0a5cc1c516750bf4f3a142b8dee90128d13ce2e2"
+      }
+    ],
+    "simulation_tree_hash": "f552334ad886c1cf76d05a0fe07428ebf0166d4c006b5e8ade3e35abc82280f3"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 2,
+    "auditability": 2,
+    "evolution_safety": 2,
+    "layer_boundary_clarity": 1,
+    "failure_handling": 1,
+    "implementation_plausibility": 3,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 2,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 18,
+    "normalized_0_100": 36,
+    "confidence_0_1": 0.82
+  },
+  "assessment": {
+    "rationale": "The design can approximate permission scoping by attaching release conditions to session content, but it is a weak fit for a non-transferable capability token to fetch a chunk family. It blurs policy and session layers, leaves redemption/audit semantics unclear, and uses promise language that can slide into normative onward-restraint.",
+    "strengths": [
+      "Uses explicit promise framing rather than pure command semantics.",
+      "Keeps conditional-release intent close to the content exchange context.",
+      "Implementation is plausible for small-group forwarding workflows."
+    ],
+    "weaknesses": [
+      "Does not cleanly model a redeemable capability token for fetch.",
+      "Overloads the session layer with policy semantics.",
+      "Non-transferability is social/session-scoped rather than artifact-scoped.",
+      "Audit and failure evidence are underspecified."
+    ],
+    "risks": [
+      "Session membership may become an implicit authority boundary for capability redemption.",
+      "Onward-restraint may be unenforceable yet still presented as if recipients are bound.",
+      "Local peers may be unable to distinguish kept promises from silent out-of-band leakage.",
+      "Layering policy into session semantics could hinder evolution or reuse across transports."
+    ],
+    "open_questions": [
+      "Can a session-carried release condition be turned into a discrete Bob-redeemable fetch capability without making session membership the real authority?",
+      "What local artifact lets Carol audit whether Bob preserved a release condition after redispatch?",
+      "How would revocation, expiry, and stale membership be handled without central session authority?",
+      "Should onward-restraint stay outside the session layer to keep capability semantics clearer and more durable?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design.",
+    "pt_gate": {
+      "status": "pt_reframe_needed",
+      "autonomous_agents": {
+        "status": "warning",
+        "note": "Agents remain autonomous in principle, but session semantics may be read as mandatory behavior for members."
+      },
+      "scoped_intent": {
+        "status": "pass",
+        "note": "The intent is scoped to redispatch behavior around a session and its content."
+      },
+      "no_promises_for_others": {
+        "status": "warning",
+        "note": "Conditions attached for later recipients risk sounding like one agent sets another agent's behavior."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "It speaks in promises rather than guaranteed enforcement outcomes."
+      },
+      "local_trust_assessment": {
+        "status": "warning",
+        "note": "The design does not specify strong peer-local evidence for trusting that conditions were preserved."
+      },
+      "accept_use_not_obligation": {
+        "status": "warning",
+        "note": "Release conditions can drift into recipient obligations instead of voluntary promises about use or forwarding."
+      },
+      "violations": [
+        "Session-local release conditions risk being interpreted as obligations imposed on recipients rather than each agent's own scoped promises.",
+        "Trust and audit for condition preservation are underspecified and may drift toward session-wide or authority-like semantics."
+      ]
+    }
+  }
+}

@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-kabiv-chunking-pcid-driven-identity-spec-requirement-sections-100-year-review-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000047-SIM-kabiv-chunking-pcid-driven-identity--spec-requirement-sections-100-year-review--openai-gpt-5.4-medium",
+  "sim_id": "SIM-kabiv-chunking-pcid-driven-identity",
+  "scenario_id": "spec-requirement-sections-100-year-review",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-kabiv-chunking-pcid-driven-identity/spec-requirement-sections-100-year-review/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_c5d67b874f6246da9b9dc8221d8ff14f",
+    "response_id": "resp_071024b83de88ac1006a12327a5a18819b9cf7e0fe80a3734a",
+    "input_tokens": 7542,
+    "output_tokens": 1174,
+    "cost_usd": 0.0296345
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-kabiv-chunking-pcid-driven-identity/",
+    "scenario_path": "scenarios/spec-requirement-sections-100-year-review/spec-requirement-sections-100-year-review.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-kabiv-chunking-pcid-driven-identity/README.md",
+        "sha256": "f2fd1cfe737e467037ae5298888ddeff9d1042625d9ec2bfabb15830d5d38953"
+      },
+      {
+        "path": "simulations/SIM-kabiv-chunking-pcid-driven-identity/QUESTION.md",
+        "sha256": "ed85c69097a9fa5aac0ca6f33b6749a795c916e00aa52ac17bb8cac4c48512e2"
+      },
+      {
+        "path": "scenarios/spec-requirement-sections-100-year-review/spec-requirement-sections-100-year-review.md",
+        "sha256": "b2e71192b720372495986fad6387d0bfd5222ce78a7cfd9da03940d1a1062cd7"
+      }
+    ],
+    "simulation_tree_hash": "05b7a54cb26daa2675abb925708f149eaf46f08dd93700190a804876c953a3e9"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 3,
+    "auditability": 3,
+    "evolution_safety": 1,
+    "layer_boundary_clarity": 1,
+    "failure_handling": 2,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 3,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 23,
+    "normalized_0_100": 46,
+    "confidence_0_1": 0.82
+  },
+  "assessment": {
+    "rationale": "The simulation is relevant because it makes protocol specification content carry chunking rules, so 100-year intelligibility of the spec matters directly. But it is only a partial fit for this scenario: it poses the question and boundary clearly without providing a concrete long-horizon section structure, archival contract, or review-oriented requirement text. It improves deterministic identity plausibly, but at the cost of coupling protocol semantics to low-level chunking policy, which weakens evolution safety and layer clarity.",
+    "strengths": [
+      "Clear deterministic-identity goal tied to a spec-addressed pCID.",
+      "Small and auditable core idea: same pCID implies same chunk boundaries and root checks.",
+      "No central registry is required; peers can verify locally from the referenced spec and bytes."
+    ],
+    "weaknesses": [
+      "Does not define the concrete required spec sections needed for 100-year review.",
+      "Blurs protocol-semantics and chunking-layer boundaries.",
+      "Failure and migration behavior are only lightly sketched beyond rejecting mismatched roots."
+    ],
+    "risks": [
+      "Protocol specs may become overloaded with storage-policy detail that future readers and implementers must preserve indefinitely.",
+      "Changing chunking policy may require new pCIDs and fragment long-lived interoperability or object identity continuity.",
+      "Durability depends on the referenced spec remaining understandable and available, not just on the pCID token existing."
+    ],
+    "open_questions": [
+      "What exact long-horizon spec sections must a pCID-defined chunking spec carry so Carol can still interpret it after major tooling and organizational drift?",
+      "How does a protocol evolve chunking parameters without breaking durable object identity or forcing every protocol revision into a storage-policy fork?",
+      "What archival assumptions are required to keep the pCID-to-spec reference intelligible and fetchable after decades?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

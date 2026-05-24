@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-nonib-udp-feed-harness-first-conformance-conditional-release-geofencing-replay-outside-conditions-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000226-SIM-nonib-udp-feed-harness-first-conformance--conditional-release-geofencing-replay-outside-conditions--openai-gpt-5.4-medium",
+  "sim_id": "SIM-nonib-udp-feed-harness-first-conformance",
+  "scenario_id": "conditional-release-geofencing-replay-outside-conditions",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-nonib-udp-feed-harness-first-conformance/conditional-release-geofencing-replay-outside-conditions/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_083ffe3a179d418a914d7b804a9f8337",
+    "response_id": "resp_037bb1b3da6cd577006a123495dd88819a915a18fe84522c74",
+    "input_tokens": 7539,
+    "output_tokens": 1037,
+    "cost_usd": 0.02771125
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-nonib-udp-feed-harness-first-conformance/",
+    "scenario_path": "scenarios/conditional-release-geofencing-replay-outside-conditions/conditional-release-geofencing-replay-outside-conditions.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-nonib-udp-feed-harness-first-conformance/README.md",
+        "sha256": "d2745a347b4e1106f615279c5cdb47ec7f164a09da4e95e705d911ee1eaa4784"
+      },
+      {
+        "path": "simulations/SIM-nonib-udp-feed-harness-first-conformance/QUESTION.md",
+        "sha256": "c7ff0d94855382a5f0e62c9d2818e74561fa830fdf82296586df93bdd24d9270"
+      },
+      {
+        "path": "scenarios/conditional-release-geofencing-replay-outside-conditions/conditional-release-geofencing-replay-outside-conditions.md",
+        "sha256": "f1480d60e85afb41b0fe5e49fdc70801e029734edbe32c3068434be7f4cb1c6e"
+      }
+    ],
+    "simulation_tree_hash": "8994291972228d954b465cbf4735badeca0703bcb0e41dffd53a54494c86bf99"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 2,
+    "auditability": 4,
+    "evolution_safety": 2,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 2,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 1,
+    "simplicity_durability": 3,
+    "risk_penalty": 4
+  },
+  "fitness": {
+    "raw": 24,
+    "normalized_0_100": 48,
+    "confidence_0_1": 0.89
+  },
+  "assessment": {
+    "rationale": "This simulation is mainly about harness-first UDP transport conformance under loss, timing, and topology pressure. That gives strong packet-level auditability and clear binding-layer focus, but it does not directly model conditional release, geofencing, audience restrictions, or replay outside authorized conditions. It therefore offers only weak indirect coverage of the scenario.",
+    "strengths": [
+      "Strong emphasis on observable packet-level evidence.",
+      "Clear transport/binding-layer scope.",
+      "Plausible conformance approach for loss and recovery behavior."
+    ],
+    "weaknesses": [
+      "Poor direct fit to conditional-release geofencing replay pressure.",
+      "Little explicit promise-theory or payload-promise vocabulary.",
+      "Does not show how receivers detect unauthorized reuse by audience, geography, epoch, or session context."
+    ],
+    "risks": [
+      "Using transport-conformance evidence as security-condition evidence could overclaim coverage.",
+      "Replay, recipient binding, and geographic authorization may be left unspecified at the application/policy layer.",
+      "A harness that records packets well can still miss stale-but-valid content reuse failures."
+    ],
+    "open_questions": [
+      "Could the harness be extended with recipient/epoch/session-binding artifacts to test replay rejection explicitly?",
+      "What local evidence would prove unauthorized geographic or audience reuse without central location authority?",
+      "How would UDP-feed v0 bind stale content references to release conditions in a durable, promise-first way?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

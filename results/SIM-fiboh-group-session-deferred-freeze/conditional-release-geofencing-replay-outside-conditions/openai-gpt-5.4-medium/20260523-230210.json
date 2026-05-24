@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-fiboh-group-session-deferred-freeze-conditional-release-geofencing-replay-outside-conditions-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000205-SIM-fiboh-group-session-deferred-freeze--conditional-release-geofencing-replay-outside-conditions--openai-gpt-5.4-medium",
+  "sim_id": "SIM-fiboh-group-session-deferred-freeze",
+  "scenario_id": "conditional-release-geofencing-replay-outside-conditions",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-fiboh-group-session-deferred-freeze/conditional-release-geofencing-replay-outside-conditions/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_2985b133f42847d5bdc9e9e02a3dab0f",
+    "response_id": "resp_0d8224338bcffd66006a12345c0b788198b03e333ead80d0e3",
+    "input_tokens": 7501,
+    "output_tokens": 1198,
+    "cost_usd": 0.02989875
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-fiboh-group-session-deferred-freeze/",
+    "scenario_path": "scenarios/conditional-release-geofencing-replay-outside-conditions/conditional-release-geofencing-replay-outside-conditions.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-fiboh-group-session-deferred-freeze/README.md",
+        "sha256": "5ef83b5e7ef5f2f1dcbbee4d4ca46b8593bcb621402a846c322fad5755171ec4"
+      },
+      {
+        "path": "simulations/SIM-fiboh-group-session-deferred-freeze/QUESTION.md",
+        "sha256": "63305f0ebe3e9872f700b432a543d21b4fcfa92cc97b15d868bbb1dbc683799a"
+      },
+      {
+        "path": "scenarios/conditional-release-geofencing-replay-outside-conditions/conditional-release-geofencing-replay-outside-conditions.md",
+        "sha256": "f1480d60e85afb41b0fe5e49fdc70801e029734edbe32c3068434be7f4cb1c6e"
+      }
+    ],
+    "simulation_tree_hash": "82f864d7ecf63092f2a95e63c7b0d422873220146ce76ca85070bce48efc86d8"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 2,
+    "auditability": 3,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 3,
+    "failure_handling": 1,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 4,
+    "risk_penalty": 4
+  },
+  "fitness": {
+    "raw": 25,
+    "normalized_0_100": 50,
+    "confidence_0_1": 0.82
+  },
+  "assessment": {
+    "rationale": "The simulation is mainly a governance/timing rule: do not accept a freeze promise until exact artifacts are named by frozen pCID references and verifiable promise tooling exists. That is aligned with audit-first PromiseGrid instincts and helps avoid freezing an underspecified mechanism, but it does not itself explain how conditional-release geofencing or replay rejection works. For this scenario, it is mostly a prudent deferral boundary rather than a direct replay-handling design.",
+    "strengths": [
+      "Refuses premature certainty without frozen pCID-addressed artifacts.",
+      "Improves future auditability by insisting on exact verifiable specimen evidence.",
+      "Keeps evolution options open until cryptographic promise tooling is ready."
+    ],
+    "weaknesses": [
+      "Does not specify recipient, geography, epoch, or session-context binding.",
+      "Provides no concrete stale-reference or unauthorized-reuse detection path.",
+      "Scenario coverage is indirect and mostly out of scope for operational replay defense."
+    ],
+    "risks": [
+      "Replay outside conditions remains unresolved while freeze is deferred.",
+      "Teams may mistake deferral of freeze for mitigation of recipient/geography/epoch replay risk.",
+      "If useful interim group-session behavior ships before the stronger tooling exists, the unfreezed gap may carry ambiguous security semantics."
+    ],
+    "open_questions": [
+      "Would deferred freeze block any release until recipient/geography/epoch conditions can be bound in frozen pCID-addressed artifacts?",
+      "What local evidence would Dave check to reject a replayed old reference outside the allowed audience or geography?",
+      "Does the eventual cryptographic promise tooling model bind conditions to session context strongly enough to prevent valid-old-reference reuse?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

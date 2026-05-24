@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-togit-spec-sections-required-when-applicable-peer-adoption-metadata-spec-answer-vocabulary-drift-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000165-SIM-togit-spec-sections-required-when-applicable--peer-adoption-metadata-spec-answer-vocabulary-drift--openai-gpt-5.4-medium",
+  "sim_id": "SIM-togit-spec-sections-required-when-applicable",
+  "scenario_id": "peer-adoption-metadata-spec-answer-vocabulary-drift",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-togit-spec-sections-required-when-applicable/peer-adoption-metadata-spec-answer-vocabulary-drift/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_91813cb939cd48e28668567189b64a0d",
+    "response_id": "resp_021021988e90a74a006a1233e5618c819a99d41b458311a98b",
+    "input_tokens": 7520,
+    "output_tokens": 862,
+    "cost_usd": 0.025228
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-togit-spec-sections-required-when-applicable/",
+    "scenario_path": "scenarios/peer-adoption-metadata-spec-answer-vocabulary-drift/peer-adoption-metadata-spec-answer-vocabulary-drift.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-togit-spec-sections-required-when-applicable/README.md",
+        "sha256": "66263302e91fd60b3428ecacb3c0c25121e97dd52cebf444bad1a0315daa6515"
+      },
+      {
+        "path": "simulations/SIM-togit-spec-sections-required-when-applicable/QUESTION.md",
+        "sha256": "08f3b0838c8a6fb4ab9136cb743e5ea73d754d5a4a3ffc06a01521bcf228f037"
+      },
+      {
+        "path": "scenarios/peer-adoption-metadata-spec-answer-vocabulary-drift/peer-adoption-metadata-spec-answer-vocabulary-drift.md",
+        "sha256": "a9e8ba84995e69fcad36f2554442cc62c5e1128ea0818197cb7ebf66e843ff53"
+      }
+    ],
+    "simulation_tree_hash": "6a9e1226fa8914d1fd9767d6eedff77757e47a0a2b96f98d674a150770f0e20c"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 3,
+    "auditability": 3,
+    "evolution_safety": 2,
+    "layer_boundary_clarity": 3,
+    "failure_handling": 1,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 4,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 26,
+    "normalized_0_100": 52,
+    "confidence_0_1": 0.77
+  },
+  "assessment": {
+    "rationale": "This simulation helps only indirectly. A required-when-applicable section policy could force authors to explain vocabulary and evolution pressure when those issues are load-bearing, which is relevant to answer-key drift. But the simulation does not define migration semantics, answer-key scope, or hard applicability criteria, so it does not by itself resolve ambiguity when a later spec supersedes pCID X and renames Q9.",
+    "strengths": [
+      "Keeps specs concise while still allowing required explanatory sections when load-bearing.",
+      "Improves reviewability compared with always-implicit treatment of vocabulary and durability concerns.",
+      "Plausible to implement as a documentation/spec discipline without heavy machinery."
+    ],
+    "weaknesses": [
+      "Does not specify whether answer keys are spec-local, profile-local, global, or migration-mapped.",
+      "Applicability criteria are explicitly left undefined.",
+      "Offers little concrete failure handling when required sections are omitted or misclassified."
+    ],
+    "risks": [
+      "Authors may declare the evolution or promise-vocabulary sections 'not applicable' and leave drift unresolved.",
+      "Conditional sections can hide cross-version metadata rules unless applicability criteria are explicit and auditable.",
+      "Reviewers may get concise specs that still omit the exact mapping needed to interpret old answers."
+    ],
+    "open_questions": [
+      "What concrete applicability test forces an evolution/migration section when answer vocabulary can drift?",
+      "Can the spec template require payload-level promise wording instead of a generic 'promise vocabulary' note?",
+      "How would old Q9-style answers be mapped or audited after a frozen spec renames or removes keys?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

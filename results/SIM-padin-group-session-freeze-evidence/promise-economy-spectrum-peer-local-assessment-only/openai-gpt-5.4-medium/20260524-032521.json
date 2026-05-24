@@ -1,0 +1,163 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-padin-group-session-freeze-evidence-promise-economy-spectrum-peer-local-assessment-only-openai-gpt-5.4-medium-20260524-032521",
+  "run_group_id": "ga-canary-20260523-pt-gate-v3-successors",
+  "cell_id": "ga-canary-20260523-pt-gate-v3-successors-000033-SIM-padin-group-session-freeze-evidence--promise-economy-spectrum-peer-local-assessment-only--openai-gpt-5.4-medium",
+  "sim_id": "SIM-padin-group-session-freeze-evidence",
+  "scenario_id": "promise-economy-spectrum-peer-local-assessment-only",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260524-032521",
+  "result_path": "results/SIM-padin-group-session-freeze-evidence/promise-economy-spectrum-peer-local-assessment-only/openai-gpt-5.4-medium/20260524-032521.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_b2a48aea238740aa8445276a1c9a8f33",
+    "response_id": "resp_05a0a251f07c9c23006a12704d158c81988a38ab5d314e1c88",
+    "input_tokens": 8106,
+    "output_tokens": 1517,
+    "cost_usd": 0.0354235
+  },
+  "source": {
+    "repo_commit": "925c7f5c1c7ce7d5b0caf6a924d40d3f9b7d0483",
+    "sim_path": "simulations/SIM-padin-group-session-freeze-evidence/",
+    "scenario_path": "scenarios/promise-economy-spectrum-peer-local-assessment-only/promise-economy-spectrum-peer-local-assessment-only.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-padin-group-session-freeze-evidence/README.md",
+        "sha256": "43f96cd79379eeb2ae36319c1fd26144cc0a95a86f0c3fc2f9f48bf9024a11d5"
+      },
+      {
+        "path": "simulations/SIM-padin-group-session-freeze-evidence/QUESTION.md",
+        "sha256": "6bdde351a8bd4a900a82304f488913fc2ae0224396de55473b61698525bc1d04"
+      },
+      {
+        "path": "scenarios/promise-economy-spectrum-peer-local-assessment-only/promise-economy-spectrum-peer-local-assessment-only.md",
+        "sha256": "447986251c900f650f4b14b03e1660192d3e24b69dc82f9fbd1b61390866a5e6"
+      }
+    ],
+    "simulation_tree_hash": "8fbe9da939de6ecdba9776b2cc20f5cb8b910b7381d306b38a6017026c170175"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 3,
+    "promisegrid_alignment": 4,
+    "auditability": 5,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 3,
+    "implementation_plausibility": 5,
+    "promise_vocabulary": 4,
+    "simplicity_durability": 5,
+    "risk_penalty": 1
+  },
+  "fitness": {
+    "raw": 42,
+    "normalized_0_100": 84,
+    "confidence_0_1": 0.82
+  },
+  "assessment": {
+    "rationale": "Strong PromiseGrid fit as an evidence-first, peer-local design: exact artifacts, CIDs, and reproducible checks give durable audit trails without token transfer or central trust. The main limitation is scenario coverage: it supports local assessment well, but only indirectly addresses the broader pull/keep/advertise economy pressure.",
+    "strengths": [
+      "Excellent local auditability from exact artifacts and reproducible validation.",
+      "Clear evidence/authority boundary: the simulation tests whether evidence can justify a freeze judgment, not protocol governance.",
+      "No token or central registry dependency for the assessed behavior.",
+      "Small, explicit artifact set is durable and implementation-friendly."
+    ],
+    "weaknesses": [
+      "Only partial fit to the promise-economy scenario because it is about freeze evidence, not ongoing storage or advertisement decisions.",
+      "Failure handling is mostly about validation success/failure, with less detail on disagreement recovery or stale tooling.",
+      "Promise wording is good but still somewhat evidence-centric rather than consistently payload-promise-centric."
+    ],
+    "risks": [
+      "Reproducibility may drift if parser/checker behavior is not itself frozen tightly enough.",
+      "Exact-artifact validation can prove a narrow specimen while leaving broader operational behavior underspecified.",
+      "Peers may overread a successful check as global consensus rather than local evidence."
+    ],
+    "open_questions": [
+      "How are checker and parser identities pinned so later peers can reproduce validation without reintroducing hidden authority?",
+      "What local records should Alice, Bob, and Carol keep when reproduced validation disagrees across implementations?",
+      "How does this evidence pattern connect to pull/keep/advertise decisions outside the narrow freeze-specimen slice?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design.",
+    "pt_gate": {
+      "status": "pt_clean",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "Alice, Bob, and Carol assess artifacts independently from local evidence."
+      },
+      "scoped_intent": {
+        "status": "pass",
+        "note": "The promise is narrowly scoped to freezing evidence for a group-session v0 specimen slice, not the whole protocol."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "The design supports each peer deciding for itself whether to treat the slice as frozen."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "The simulation offers reproducible evidence for local judgment, not guaranteed acceptance or success."
+      },
+      "local_trust_assessment": {
+        "status": "pass",
+        "note": "Trust is grounded in each peer's own reproduction of the DAG and checks, not a global authority."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "Peers may use reproduced evidence to inform local freeze judgment; the design does not impose obligation semantics."
+      },
+      "violations": []
+    }
+  }
+}

@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-votoj-peer-adoption-structured-object-spec-requirement-sections-100-year-review-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000131-SIM-votoj-peer-adoption-structured-object--spec-requirement-sections-100-year-review--openai-gpt-5.4-medium",
+  "sim_id": "SIM-votoj-peer-adoption-structured-object",
+  "scenario_id": "spec-requirement-sections-100-year-review",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-votoj-peer-adoption-structured-object/spec-requirement-sections-100-year-review/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_1c76b7e187ed44a39b716e95656d0e3f",
+    "response_id": "resp_06d4a1fc6f46ad7b006a12337b95f48198be57d5b1969b8a25",
+    "input_tokens": 7524,
+    "output_tokens": 992,
+    "cost_usd": 0.027055
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-votoj-peer-adoption-structured-object/",
+    "scenario_path": "scenarios/spec-requirement-sections-100-year-review/spec-requirement-sections-100-year-review.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-votoj-peer-adoption-structured-object/README.md",
+        "sha256": "06f14d972a3ec8332d7baff995dd35169c670f09022747c884261b2191e8850c"
+      },
+      {
+        "path": "simulations/SIM-votoj-peer-adoption-structured-object/QUESTION.md",
+        "sha256": "a7cc3078a66e739a146030782a1b6f269647565f29e74289b17418cb28d7b01d"
+      },
+      {
+        "path": "scenarios/spec-requirement-sections-100-year-review/spec-requirement-sections-100-year-review.md",
+        "sha256": "b2e71192b720372495986fad6387d0bfd5222ce78a7cfd9da03940d1a1062cd7"
+      }
+    ],
+    "simulation_tree_hash": "adb3592995211962b89e86ffc4b78d8012af31efec475fd0649ce63a78a74238"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 2,
+    "auditability": 4,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 3,
+    "failure_handling": 1,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 1,
+    "simplicity_durability": 2,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 24,
+    "normalized_0_100": 48,
+    "confidence_0_1": 0.79
+  },
+  "assessment": {
+    "rationale": "The structured adoption object helps future auditors by pinning a spec pCID, explicit answers, and signature evidence, but it only indirectly addresses the scenario's need for durable required review sections in the spec itself. It improves auditability more than long-horizon simplicity. The design also leans on identity/signature metadata and object schema stability, which adds durability risk over a smaller promise-first payload.",
+    "strengths": [
+      "Explicit answer set and spec reference improve later audit.",
+      "Content-addressed object is plausible to store and verify.",
+      "Separates adoption evidence from observed protocol behavior."
+    ],
+    "weaknesses": [
+      "Weak fit to a scenario about required long-horizon spec sections.",
+      "Uses adoption-object framing more than promise-first payload wording.",
+      "Little stated failure handling for stale, missing, or unverifiable evidence."
+    ],
+    "risks": [
+      "Metadata wrapper growth could make common peer declarations too heavy for durable small-device use.",
+      "Identity and signature fields may age poorly across long time horizons.",
+      "Future readers may still need missing spec-section context that the adoption object does not supply."
+    ],
+    "open_questions": [
+      "Can a small, frozen adoption object schema stay intelligible for 100-year readers without becoming a bulky wrapper?",
+      "Should long-horizon assumptions live in the spec itself rather than in per-peer adoption objects?",
+      "How are stale keys, obsolete identity formats, or unverifiable signatures handled after major ecosystem change?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

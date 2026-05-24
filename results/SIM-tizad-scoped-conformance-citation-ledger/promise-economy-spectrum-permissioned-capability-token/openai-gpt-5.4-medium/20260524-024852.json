@@ -1,0 +1,171 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-tizad-scoped-conformance-citation-ledger-promise-economy-spectrum-permissioned-capability-token-openai-gpt-5.4-medium-20260524-024852",
+  "run_group_id": "ga-canary-20260523-pt-gate-v3",
+  "cell_id": "ga-canary-20260523-pt-gate-v3-000064-SIM-tizad-scoped-conformance-citation-ledger--promise-economy-spectrum-permissioned-capability-token--openai-gpt-5.4-medium",
+  "sim_id": "SIM-tizad-scoped-conformance-citation-ledger",
+  "scenario_id": "promise-economy-spectrum-permissioned-capability-token",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260524-024852",
+  "result_path": "results/SIM-tizad-scoped-conformance-citation-ledger/promise-economy-spectrum-permissioned-capability-token/openai-gpt-5.4-medium/20260524-024852.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_442439379da849d7a87f8cfd4feda83f",
+    "response_id": "resp_00ebf8c54134503c006a1268bf83d4819a821a0b9d34e8d839",
+    "input_tokens": 9440,
+    "output_tokens": 2154,
+    "cost_usd": 0.046676
+  },
+  "source": {
+    "repo_commit": "ec652bd3ecaaf2f904e62cff00e113a88c7e3efd",
+    "sim_path": "simulations/SIM-tizad-scoped-conformance-citation-ledger/",
+    "scenario_path": "scenarios/promise-economy-spectrum-permissioned-capability-token/promise-economy-spectrum-permissioned-capability-token.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-tizad-scoped-conformance-citation-ledger/README.md",
+        "sha256": "9668854c94fcb6a8331a98003184968f3e5369102dbe9000783a5f9b867e79ef"
+      },
+      {
+        "path": "simulations/SIM-tizad-scoped-conformance-citation-ledger/QUESTION.md",
+        "sha256": "05f7a658c8c67f64e164153a02dd9fed0df2af9f4f09a02118eaaa06273fb43c"
+      },
+      {
+        "path": "simulations/SIM-tizad-scoped-conformance-citation-ledger/CLAIM-BUNDLE.md",
+        "sha256": "29b03975828b554b774e2cb385cc4a85f80653fa8841494227a837efc95ba45c"
+      },
+      {
+        "path": "scenarios/promise-economy-spectrum-permissioned-capability-token/promise-economy-spectrum-permissioned-capability-token.md",
+        "sha256": "ac5ba8f29fb13e1d693bdbfb0a5cc1c516750bf4f3a142b8dee90128d13ce2e2"
+      }
+    ],
+    "simulation_tree_hash": "f45aa7d6c917a553cd0b9e4ed9de53aec6bfa37cb67f1af4bd8ecb516146c77d"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 3,
+    "promisegrid_alignment": 2,
+    "auditability": 5,
+    "evolution_safety": 5,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 5,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 3,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 36,
+    "normalized_0_100": 72,
+    "confidence_0_1": 0.84
+  },
+  "assessment": {
+    "rationale": "This simulation helps the scenario by cleanly separating authorization from content identity and by insisting on durable, locally auditable evidence for what was claimed and what failed. That supports scoped permission/redemption without implying exchange rates. However, it is not a direct capability-token design, and its conformance-manifest language still drifts away from promise-first wording.",
+    "strengths": [
+      "Strong separation of content identity, availability, authorization, and effect promises.",
+      "Excellent durable audit discipline via concrete cited CAS milestones.",
+      "Clear layer boundaries for local, live, audit, and device-effect claims.",
+      "Good local failure evidence model for later audits and disputes."
+    ],
+    "weaknesses": [
+      "Does not define the capability artifact or redemption protocol directly.",
+      "Promise vocabulary is diluted by manifest/conformance/bundle terminology.",
+      "Could be over-read as a ledger/certification pattern instead of local promise accounting."
+    ],
+    "risks": [
+      "Conformance/status framing could be mistaken for certification rather than a named agent's promise.",
+      "The scenario's non-transferable capability semantics remain underspecified.",
+      "'Authoritative contract' language may attract central-trust interpretations if not carefully bounded."
+    ],
+    "open_questions": [
+      "What exact durable artifact represents a non-transferable capability without turning it into a generic bearer token?",
+      "How should revocation, expiry, or one-time redemption be cited durably in the local promise-accounting records?",
+      "What observed wire artifact lets Bob verify authorization scope for a chunk family without implying availability or price?",
+      "How should delegated redemption failures be recorded when transport succeeds but authorization is denied or stale?"
+    ],
+    "authority_boundary": "Evidence only; useful for scoped authorization and audit evidence, but it does not settle a final PromiseGrid capability-token design or exchange semantics.",
+    "pt_gate": {
+      "status": "pt_reframe_needed",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "Peers keep local promise-accounting records and assess evidence locally rather than relying on commanded behavior."
+      },
+      "scoped_intent": {
+        "status": "pass",
+        "note": "Claim scopes are explicit and bounded by layer, which matches scoped declarations of intent."
+      },
+      "no_promises_for_others": {
+        "status": "warning",
+        "note": "Mostly respected, but publishable conformance manifests can read like app-level claims unless rewritten as promises by a named promisor."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "The design explicitly separates identity, availability, authorization, and effect claims and records failed/unknown outcomes."
+      },
+      "local_trust_assessment": {
+        "status": "pass",
+        "note": "Bob and Carol are expected to inspect observable artifacts and local records, which fits local trust assessment."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "The design separates authorization from content identity and does not equate possession or use with obligation."
+      },
+      "violations": [
+        "Uses conformance-manifest and status vocabulary instead of explicit promisor-scoped promise statements.",
+        "'Authoritative' contract-reference framing may be misread as global certification rather than locally assessed trust in a promisor's claim."
+      ]
+    }
+  }
+}

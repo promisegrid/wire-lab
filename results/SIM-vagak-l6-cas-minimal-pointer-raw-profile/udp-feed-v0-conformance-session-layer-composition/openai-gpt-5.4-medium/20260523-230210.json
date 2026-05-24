@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-vagak-l6-cas-minimal-pointer-raw-profile-udp-feed-v0-conformance-session-layer-composition-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000021-SIM-vagak-l6-cas-minimal-pointer-raw-profile--udp-feed-v0-conformance-session-layer-composition--openai-gpt-5.4-medium",
+  "sim_id": "SIM-vagak-l6-cas-minimal-pointer-raw-profile",
+  "scenario_id": "udp-feed-v0-conformance-session-layer-composition",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-vagak-l6-cas-minimal-pointer-raw-profile/udp-feed-v0-conformance-session-layer-composition/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_3161560e81d54941bb9960ee5452757e",
+    "response_id": "resp_07a4dca41ae5cbbf006a123228c6c4819bb203c2e10ed077ed",
+    "input_tokens": 7575,
+    "output_tokens": 1106,
+    "cost_usd": 0.02874025
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-vagak-l6-cas-minimal-pointer-raw-profile/",
+    "scenario_path": "scenarios/udp-feed-v0-conformance-session-layer-composition/udp-feed-v0-conformance-session-layer-composition.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-vagak-l6-cas-minimal-pointer-raw-profile/README.md",
+        "sha256": "f7ad9b33539e14933ad1c903cd38b19235c78e3a1001ea534f726d0e7b664d53"
+      },
+      {
+        "path": "simulations/SIM-vagak-l6-cas-minimal-pointer-raw-profile/QUESTION.md",
+        "sha256": "124f7bc6031956ec43f1bdf89bc1cc04f4f5823ae421ef898a0c0d2e449b203f"
+      },
+      {
+        "path": "scenarios/udp-feed-v0-conformance-session-layer-composition/udp-feed-v0-conformance-session-layer-composition.md",
+        "sha256": "69da5db705a56cd7067a653928ff8b2dc9301ef6ebfc712bd81038a65c9d352c"
+      }
+    ],
+    "simulation_tree_hash": "93ed6b00afc3d94381a3e4a416c793e7b201ed1f670dc0af547f8466c19fee07"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 0,
+    "promisegrid_alignment": 3,
+    "auditability": 3,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 3,
+    "failure_handling": 1,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 1,
+    "simplicity_durability": 5,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 26,
+    "normalized_0_100": 52,
+    "confidence_0_1": 0.9
+  },
+  "assessment": {
+    "rationale": "The design is a small, explicit, durable CAS-profile candidate, but this scenario asks about session-layer composition above UDP-feed v0. The provided evidence mostly addresses storage/object-shape minimalism, not whether a next layer can compose cleanly over UDP-feed without leaking binding details. So the specimen is philosophically aligned with PromiseGrid minimality, yet weakly evidenced for this scenario.",
+    "strengths": [
+      "Very small deterministic artifact family.",
+      "Clear intent to defer premature substrate commitments.",
+      "Good 100-year durability posture through simple raw bytes plus pointer object."
+    ],
+    "weaknesses": [
+      "Does not directly specify UDP-feed or session-layer API composition.",
+      "Little explicit promise-first wording for payload or conformance claims.",
+      "Failure behavior for loss, retry, and partial knowledge is largely absent."
+    ],
+    "risks": [
+      "Layer mismatch may hide real session-composition requirements until later redesign.",
+      "Minimal raw-plus-pointer artifacts may be too underspecified for interoperable next-layer composition evidence.",
+      "Lack of explicit failure and conformance promises could force ad hoc transport-specific behavior."
+    ],
+    "open_questions": [
+      "Can the minimal pointer object be carried or referenced across a UDP-feed session boundary without adding transport-coupled fields?",
+      "What promise-level conformance statement would let a next-layer session message rely on this CAS profile?",
+      "How are retries, loss, and partial delivery represented when session-layer composition depends on fetching raw chunks or pointer objects?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

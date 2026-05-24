@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-falun-conditional-release-separate-protocol-family-group-session-freeze-promise-post-freeze-mutation-request-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000083-SIM-falun-conditional-release-separate-protocol-family--group-session-freeze-promise-post-freeze-mutation-request--openai-gpt-5.4-medium",
+  "sim_id": "SIM-falun-conditional-release-separate-protocol-family",
+  "scenario_id": "group-session-freeze-promise-post-freeze-mutation-request",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-falun-conditional-release-separate-protocol-family/group-session-freeze-promise-post-freeze-mutation-request/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_655fa209ec2b4befbd4dd5a56399a3a3",
+    "response_id": "resp_072c317a18363d6a006a1232e921c881989110d539a1ac42a9",
+    "input_tokens": 7535,
+    "output_tokens": 1186,
+    "cost_usd": 0.02979025
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-falun-conditional-release-separate-protocol-family/",
+    "scenario_path": "scenarios/group-session-freeze-promise-post-freeze-mutation-request/group-session-freeze-promise-post-freeze-mutation-request.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-falun-conditional-release-separate-protocol-family/README.md",
+        "sha256": "221ec83723d44d8a44ef0a98e812228a4c5e913ca2f852803278c7f5483525a8"
+      },
+      {
+        "path": "simulations/SIM-falun-conditional-release-separate-protocol-family/QUESTION.md",
+        "sha256": "68958d90c7adb920e96089b88c3daa22e152f7fe6b21d2892c2421091049330c"
+      },
+      {
+        "path": "scenarios/group-session-freeze-promise-post-freeze-mutation-request/group-session-freeze-promise-post-freeze-mutation-request.md",
+        "sha256": "9083e149d879dcf5890bbcc3d3bb2fcf87b4490ba1878e59a73402bd5312ee52"
+      }
+    ],
+    "simulation_tree_hash": "9c6f5be6a30bb69caa3c1aff7b2b2992ad54cf3f9fb9529db69c6329b941e751"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 3,
+    "promisegrid_alignment": 4,
+    "auditability": 4,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 2,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 4,
+    "simplicity_durability": 4,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 37,
+    "normalized_0_100": 74,
+    "confidence_0_1": 0.81
+  },
+  "assessment": {
+    "rationale": "This design is not a direct group-session freeze protocol, but it gives a plausible way to keep post-freeze policy changes out of the frozen session artifact by moving release conditions into separately addressed promise objects. That separation helps auditability and independent evolution, but the simulation does not specify freeze lineage, amendment semantics, or rejection handling in enough detail to fully answer the scenario.",
+    "strengths": [
+      "Strong layer separation: release conditions live in their own protocol family and are referenced by pCID.",
+      "Good audit posture: frozen artifacts can point to exact conditional-release objects rather than embedding mutable policy text.",
+      "Supports independent evolution by issuing new condition objects instead of editing old payloads."
+    ],
+    "weaknesses": [
+      "Does not define freeze-specific semantics for post-freeze mutation requests.",
+      "Failure handling is underspecified for disputes, stale references, or mixed peer adoption.",
+      "Lineage between original and superseding condition objects is not concretely modeled."
+    ],
+    "risks": [
+      "Extra indirection may blur which frozen artifact governs release at a given time unless references are explicit and immutable.",
+      "Without a defined supersession rule, operators may accidentally treat a new conditional-release object as mutating old history.",
+      "Cross-protocol reference handling could become inconsistent across implementations."
+    ],
+    "open_questions": [
+      "When a cited conditional-release object changes after freeze, must the group/session issue a new specimen or can it add a superseding reference without rewriting history?",
+      "How are supersession and lineage between old and new conditional-release pCIDs recorded for later audit?",
+      "What local failure evidence should peers retain when a post-freeze mutation request is rejected or only partially adopted?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

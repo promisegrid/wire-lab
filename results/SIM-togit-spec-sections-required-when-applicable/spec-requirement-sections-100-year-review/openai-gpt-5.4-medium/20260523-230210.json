@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-togit-spec-sections-required-when-applicable-spec-requirement-sections-100-year-review-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000166-SIM-togit-spec-sections-required-when-applicable--spec-requirement-sections-100-year-review--openai-gpt-5.4-medium",
+  "sim_id": "SIM-togit-spec-sections-required-when-applicable",
+  "scenario_id": "spec-requirement-sections-100-year-review",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-togit-spec-sections-required-when-applicable/spec-requirement-sections-100-year-review/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_edb91c21efb04cb895fc9b17cfcf7a3c",
+    "response_id": "resp_0950aa590ab6709c006a1233eb51ec819b9da5b69ec0c49db8",
+    "input_tokens": 7514,
+    "output_tokens": 1068,
+    "cost_usd": 0.0281015
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-togit-spec-sections-required-when-applicable/",
+    "scenario_path": "scenarios/spec-requirement-sections-100-year-review/spec-requirement-sections-100-year-review.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-togit-spec-sections-required-when-applicable/README.md",
+        "sha256": "66263302e91fd60b3428ecacb3c0c25121e97dd52cebf444bad1a0315daa6515"
+      },
+      {
+        "path": "simulations/SIM-togit-spec-sections-required-when-applicable/QUESTION.md",
+        "sha256": "08f3b0838c8a6fb4ab9136cb743e5ea73d754d5a4a3ffc06a01521bcf228f037"
+      },
+      {
+        "path": "scenarios/spec-requirement-sections-100-year-review/spec-requirement-sections-100-year-review.md",
+        "sha256": "b2e71192b720372495986fad6387d0bfd5222ce78a7cfd9da03940d1a1062cd7"
+      }
+    ],
+    "simulation_tree_hash": "6a9e1226fa8914d1fd9767d6eedff77757e47a0a2b96f98d674a150770f0e20c"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 4,
+    "promisegrid_alignment": 4,
+    "auditability": 3,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 2,
+    "implementation_plausibility": 5,
+    "promise_vocabulary": 3,
+    "simplicity_durability": 4,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 34,
+    "normalized_0_100": 68,
+    "confidence_0_1": 0.82
+  },
+  "assessment": {
+    "rationale": "This candidate fits the scenario reasonably well because it explicitly treats 100-year pressure as a spec section that must be present when load-bearing, which directly addresses future review intelligibility. Its main weakness is that applicability criteria are intentionally left undefined, so a long-horizon assumption could disappear behind a disputed 'not applicable' judgment. The design is simple and plausible to implement, but its audit and failure properties depend heavily on disciplined review rather than a hard always-present section.",
+    "strengths": [
+      "Directly targets section bloat while preserving a place for 100-year reasoning when load-bearing.",
+      "Requires an explicit applicability decision instead of silent omission.",
+      "Small, durable document rule that is easy to adopt in specs."
+    ],
+    "weaknesses": [
+      "Does not define robust applicability criteria.",
+      "Weak protection against mistaken or self-serving omission of long-horizon assumptions.",
+      "Relies on reviewer judgment more than deterministic artifact shape."
+    ],
+    "risks": [
+      "Authors may omit durability guidance in cases where future reviewers would actually need it.",
+      "Different teams may apply 'when applicable' inconsistently across layers or eras.",
+      "Reviewers may lack enough local evidence to challenge a missing section decades later."
+    ],
+    "open_questions": [
+      "What concrete test decides when a 100-year section is applicable versus mandatory?",
+      "How should reviewers detect harmful omission when an author marks a section not applicable?",
+      "Should some minimal durability note always be present even when the full section is omitted?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

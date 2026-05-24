@@ -1,0 +1,163 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-dutam-grid-envelope-fixed-header-variable-body-promise-economy-spectrum-permissioned-capability-token-openai-gpt-5.4-medium-20260524-032521",
+  "run_group_id": "ga-canary-20260523-pt-gate-v3-successors",
+  "cell_id": "ga-canary-20260523-pt-gate-v3-successors-000016-SIM-dutam-grid-envelope-fixed-header-variable-body--promise-economy-spectrum-permissioned-capability-token--openai-gpt-5.4-medium",
+  "sim_id": "SIM-dutam-grid-envelope-fixed-header-variable-body",
+  "scenario_id": "promise-economy-spectrum-permissioned-capability-token",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260524-032521",
+  "result_path": "results/SIM-dutam-grid-envelope-fixed-header-variable-body/promise-economy-spectrum-permissioned-capability-token/openai-gpt-5.4-medium/20260524-032521.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_7d1423db0c5b4f4da6d881d04897a6b2",
+    "response_id": "resp_07973324bf00cc75006a126ffc9cd88198b4b2b73b007036d7",
+    "input_tokens": 8232,
+    "output_tokens": 1693,
+    "cost_usd": 0.038108
+  },
+  "source": {
+    "repo_commit": "925c7f5c1c7ce7d5b0caf6a924d40d3f9b7d0483",
+    "sim_path": "simulations/SIM-dutam-grid-envelope-fixed-header-variable-body/",
+    "scenario_path": "scenarios/promise-economy-spectrum-permissioned-capability-token/promise-economy-spectrum-permissioned-capability-token.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-dutam-grid-envelope-fixed-header-variable-body/README.md",
+        "sha256": "36e655e9147306232cd1d4d874dbc7792e6eab7cc359251aee487b33d4b7c7b9"
+      },
+      {
+        "path": "simulations/SIM-dutam-grid-envelope-fixed-header-variable-body/QUESTION.md",
+        "sha256": "3790d466579bdf56d98055c4a630d802ca0d3ec042c01606860ff83f073621b0"
+      },
+      {
+        "path": "scenarios/promise-economy-spectrum-permissioned-capability-token/promise-economy-spectrum-permissioned-capability-token.md",
+        "sha256": "ac5ba8f29fb13e1d693bdbfb0a5cc1c516750bf4f3a142b8dee90128d13ce2e2"
+      }
+    ],
+    "simulation_tree_hash": "41922bc0db1ac263325ae5ab91a03e187f0e61c5985a29f4f566745634f65fdb"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 3,
+    "promisegrid_alignment": 4,
+    "auditability": 4,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 2,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 3,
+    "simplicity_durability": 4,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 36,
+    "normalized_0_100": 72,
+    "confidence_0_1": 0.78
+  },
+  "assessment": {
+    "rationale": "Good structural fit for permissioned capability payloads: the fixed header preserves durable generic audit while the pCID-defined body can express scoped fetch capability terms without hardwiring marketplace semantics. Main weakness is that the simulation stops at envelope shape, so non-transferability, redemption failure, revocation, and promise-first capability wording are not specified.",
+    "strengths": [
+      "Small stable outer contract improves later audit across changing body families.",
+      "Clear layer split: generic envelope outside, capability semantics inside body protocol.",
+      "Flexible enough to carry capability-style payloads without freezing one token schema.",
+      "Durable, device-friendly shape aligns with 100-year and sparse-knowledge goals better than fully opaque outer arity."
+    ],
+    "weaknesses": [
+      "Scenario fit is partial because the simulation does not define capability semantics itself.",
+      "Failure handling for expiry, refusal, revocation, and replay is underspecified.",
+      "Promise vocabulary is structural rather than fully explicit at the scenario payload level."
+    ],
+    "risks": [
+      "Capability bodies may drift into authority-style 'permission' language instead of explicit promiser-scoped intent.",
+      "Variable bodies can hide critical redemption or revocation semantics from shallow generic tooling.",
+      "Without a standard local evidence pattern, stale or replayed capability artifacts may be hard to assess later."
+    ],
+    "open_questions": [
+      "How should a non-transferable capability be expressed in the body as a scoped promise rather than an authorization command?",
+      "What local evidence should peers retain for revocation, expiry, and failed redemption without introducing central authority?",
+      "How much fixed-header evidence is needed so later auditors can distinguish capability use from exchange-like transfer semantics?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design.",
+    "pt_gate": {
+      "status": "pt_clean",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "The design is message/envelope-oriented and does not require one agent to control another agent's behavior."
+      },
+      "scoped_intent": {
+        "status": "pass",
+        "note": "The small fixed header plus pCID-defined body supports narrowly scoped intent statements in durable payloads."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "A sender can package its own claims while the fixed header does not imply speaking for other agents."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "The envelope can record scoped intent and evidence, not guaranteed redemption outcomes."
+      },
+      "local_trust_assessment": {
+        "status": "pass",
+        "note": "Peers can assess trust from locally held envelope and body evidence rather than a mandated global ledger."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "The envelope can carry offers, acceptance, or use claims without collapsing them into obligations; those semantics remain explicit in the body."
+      },
+      "violations": []
+    }
+  }
+}

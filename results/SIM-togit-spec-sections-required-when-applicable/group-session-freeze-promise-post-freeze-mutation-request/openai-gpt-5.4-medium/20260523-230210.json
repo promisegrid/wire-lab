@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-togit-spec-sections-required-when-applicable-group-session-freeze-promise-post-freeze-mutation-request-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000167-SIM-togit-spec-sections-required-when-applicable--group-session-freeze-promise-post-freeze-mutation-request--openai-gpt-5.4-medium",
+  "sim_id": "SIM-togit-spec-sections-required-when-applicable",
+  "scenario_id": "group-session-freeze-promise-post-freeze-mutation-request",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-togit-spec-sections-required-when-applicable/group-session-freeze-promise-post-freeze-mutation-request/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_3dd63ca291424084a46cc3ec517d19f4",
+    "response_id": "resp_0cbe09d771300b60006a1233ebda9481999746ce9322235ef4",
+    "input_tokens": 7521,
+    "output_tokens": 930,
+    "cost_usd": 0.02618175
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-togit-spec-sections-required-when-applicable/",
+    "scenario_path": "scenarios/group-session-freeze-promise-post-freeze-mutation-request/group-session-freeze-promise-post-freeze-mutation-request.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-togit-spec-sections-required-when-applicable/README.md",
+        "sha256": "66263302e91fd60b3428ecacb3c0c25121e97dd52cebf444bad1a0315daa6515"
+      },
+      {
+        "path": "simulations/SIM-togit-spec-sections-required-when-applicable/QUESTION.md",
+        "sha256": "08f3b0838c8a6fb4ab9136cb743e5ea73d754d5a4a3ffc06a01521bcf228f037"
+      },
+      {
+        "path": "scenarios/group-session-freeze-promise-post-freeze-mutation-request/group-session-freeze-promise-post-freeze-mutation-request.md",
+        "sha256": "9083e149d879dcf5890bbcc3d3bb2fcf87b4490ba1878e59a73402bd5312ee52"
+      }
+    ],
+    "simulation_tree_hash": "6a9e1226fa8914d1fd9767d6eedff77757e47a0a2b96f98d674a150770f0e20c"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 2,
+    "auditability": 2,
+    "evolution_safety": 2,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 1,
+    "implementation_plausibility": 5,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 4,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 25,
+    "normalized_0_100": 50,
+    "confidence_0_1": 0.82
+  },
+  "assessment": {
+    "rationale": "The simulation is a documentation-structure candidate, not a freeze-semantics design. It helps only indirectly by requiring load-bearing sections when applicable, which could improve explanation of post-freeze mutation handling, but it does not itself specify how frozen lineage, amendments, or superseding specimens work.",
+    "strengths": [
+      "Directly targets spec concision without forcing boilerplate everywhere.",
+      "Explicitly frames applicability around implementation/review ambiguity, which supports audit-minded writing.",
+      "Strong layer-boundary instinct: only require sections when they are load-bearing for that layer."
+    ],
+    "weaknesses": [
+      "Does not define post-freeze mutation behavior, lineage rules, or immutable-history handling.",
+      "Provides no concrete failure-handling path when a breaking change arrives after freeze evidence exists.",
+      "Promise-first vocabulary is only mentioned as a section category, not expressed as payload promises."
+    ],
+    "risks": [
+      "Authors may judge freeze/evolution sections 'not applicable' and omit exactly the lineage rules this scenario needs.",
+      "Conditional section presence can reduce cross-spec audit consistency for auditors comparing freeze behavior.",
+      "A concise template may look complete while leaving mutation-after-freeze semantics underspecified."
+    ],
+    "open_questions": [
+      "What concrete applicability test would force a freeze-semantics section for specs that can create immutable post-freeze lineage?",
+      "How would reviewers detect a mistaken omission of an evolution/freeze section before ambiguous implementations ship?",
+      "Should mutation-after-freeze scenarios mandate explicit new-specimen vs superseding-pCID handling instead of leaving that to conditional prose?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

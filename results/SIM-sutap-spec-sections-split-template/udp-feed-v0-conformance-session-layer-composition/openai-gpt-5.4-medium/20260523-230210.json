@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-sutap-spec-sections-split-template-udp-feed-v0-conformance-session-layer-composition-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000182-SIM-sutap-spec-sections-split-template--udp-feed-v0-conformance-session-layer-composition--openai-gpt-5.4-medium",
+  "sim_id": "SIM-sutap-spec-sections-split-template",
+  "scenario_id": "udp-feed-v0-conformance-session-layer-composition",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-sutap-spec-sections-split-template/udp-feed-v0-conformance-session-layer-composition/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_536eff681c1844cfb1ba109458d4b031",
+    "response_id": "resp_0e084b098fa27b55006a12341797288199b7195d1a873ae464",
+    "input_tokens": 7504,
+    "output_tokens": 974,
+    "cost_usd": 0.026768
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-sutap-spec-sections-split-template/",
+    "scenario_path": "scenarios/udp-feed-v0-conformance-session-layer-composition/udp-feed-v0-conformance-session-layer-composition.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-sutap-spec-sections-split-template/README.md",
+        "sha256": "6ea42ce84be4770e4e100e0fcf9ca2d6cef76bfdcf7558040f33907b22c367b7"
+      },
+      {
+        "path": "simulations/SIM-sutap-spec-sections-split-template/QUESTION.md",
+        "sha256": "224cb421f142b72082ecfcaa79627a831538b92231e06f885d13b688673fc85a"
+      },
+      {
+        "path": "scenarios/udp-feed-v0-conformance-session-layer-composition/udp-feed-v0-conformance-session-layer-composition.md",
+        "sha256": "69da5db705a56cd7067a653928ff8b2dc9301ef6ebfc712bd81038a65c9d352c"
+      }
+    ],
+    "simulation_tree_hash": "7d2ed975444e7dd1a0a27e8dd1d6f4055a8b84e22175a957a8c981fb1f413dc8"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 4,
+    "auditability": 4,
+    "evolution_safety": 5,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 1,
+    "implementation_plausibility": 3,
+    "promise_vocabulary": 3,
+    "simplicity_durability": 4,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 33,
+    "normalized_0_100": 66,
+    "confidence_0_1": 0.8
+  },
+  "assessment": {
+    "rationale": "Strong as a spec-structure candidate for compact, evolvable, auditable protocol requirements, but only weakly fitted to this scenario because it does not directly specify UDP-feed/session-layer composition behavior.",
+    "strengths": [
+      "Keeps normative surface compact and pCID-scoped.",
+      "Supports long-term evolution of explanatory material without changing the core promise.",
+      "Improves audit focus by separating required hooks from mental-model prose."
+    ],
+    "weaknesses": [
+      "Does not directly define session-layer composition behavior for UDP-feed v0.",
+      "Provides little explicit failure-handling guidance.",
+      "Promise wording is somewhat promise-aware but not strongly payload-promise-first."
+    ],
+    "risks": [
+      "Companion prose could carry important composition guidance that is not normatively anchored.",
+      "A split template may appear to solve layering while leaving binding-detail leakage underspecified.",
+      "Scenario-specific conformance could be unverifiable if the compact hooks are too abstract."
+    ],
+    "open_questions": [
+      "Should the compact normative section explicitly state transport/session-layer non-leakage requirements?",
+      "What minimal conformance hooks would let a later session layer prove composition without relying on companion prose?",
+      "How are failure and boundary cases recorded when companion docs evolve faster than the pCID-owned normative text?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

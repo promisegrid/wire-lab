@@ -1,0 +1,122 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-tudar-l6-cas-promisebase-adapter-profile-group-session-freeze-promise-post-freeze-mutation-request-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000013-SIM-tudar-l6-cas-promisebase-adapter-profile--group-session-freeze-promise-post-freeze-mutation-request--openai-gpt-5.4-medium",
+  "sim_id": "SIM-tudar-l6-cas-promisebase-adapter-profile",
+  "scenario_id": "group-session-freeze-promise-post-freeze-mutation-request",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-tudar-l6-cas-promisebase-adapter-profile/group-session-freeze-promise-post-freeze-mutation-request/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_c30ad0ade678466cb432a48d55f546a8",
+    "response_id": "resp_0361df4ba350187b006a123215c6288199bf81725af4fc715d",
+    "input_tokens": 7581,
+    "output_tokens": 999,
+    "cost_usd": 0.02725275
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-tudar-l6-cas-promisebase-adapter-profile/",
+    "scenario_path": "scenarios/group-session-freeze-promise-post-freeze-mutation-request/group-session-freeze-promise-post-freeze-mutation-request.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-tudar-l6-cas-promisebase-adapter-profile/README.md",
+        "sha256": "8045140e0a499bf871f1834cc4b3e4d57d1ae25f7a28022c4e533ee510d1f836"
+      },
+      {
+        "path": "simulations/SIM-tudar-l6-cas-promisebase-adapter-profile/QUESTION.md",
+        "sha256": "5fa3894dd300e1cc66718738501116149682d9c6b6751b497abc7ced4b0799ca"
+      },
+      {
+        "path": "scenarios/group-session-freeze-promise-post-freeze-mutation-request/group-session-freeze-promise-post-freeze-mutation-request.md",
+        "sha256": "9083e149d879dcf5890bbcc3d3bb2fcf87b4490ba1878e59a73402bd5312ee52"
+      }
+    ],
+    "simulation_tree_hash": "6c2abb880ff69e2a4b5e9895f65ee92dde3468ae93c11a0f546feff3eb8d0eee"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 3,
+    "auditability": 3,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 3,
+    "failure_handling": 1,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 2,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 26,
+    "normalized_0_100": 52,
+    "confidence_0_1": 0.72
+  },
+  "assessment": {
+    "rationale": "The adapter-profile simulation is relevant because immutable CAS identity and stream evolution are core to handling post-freeze change requests, but it addresses the scenario only indirectly. It appears capable of modeling new specimens or superseding pCIDs better than in-place mutation, which helps evolution safety, yet the provided docs do not spell out freeze semantics, amendment handling, or failure behavior for a group-session workflow.",
+    "strengths": [
+      "CAS identity and stream-evolution focus aligns with immutable-history pressure.",
+      "Explicit translation rules suggest auditable mapping between prior-art objects and PromiseGrid objects.",
+      "Adapter-first reuse is implementation-plausible because it builds on existing concepts rather than inventing an entirely new storage model."
+    ],
+    "weaknesses": [
+      "Scenario fit is limited because the sim is about CAS profile design, not group-session freeze semantics specifically.",
+      "Failure handling is underspecified; no clear behavior for rejected or ambiguous post-freeze mutation requests.",
+      "Promise vocabulary is mixed: the docs still speak in profile/compatibility terms more than explicit payload promises.",
+      "Adapter complexity hurts simplicity and long-term durability versus a smaller PromiseGrid-native artifact."
+    ],
+    "risks": [
+      "Promisebase prior-art semantics may leak into PromiseGrid in ways that blur PromiseGrid-native freeze and supersession meaning.",
+      "A profile/adapter framing may encourage generic compatibility claims instead of explicit per-payload promises.",
+      "Without explicit mutation-after-freeze rules, different implementations could diverge on whether a change is a new specimen, a superseding lineage step, or an amendment record."
+    ],
+    "open_questions": [
+      "Does freeze map directly to immutable pCID issuance in this adapter, or would extra lineage metadata be needed above the CAS layer?",
+      "How are post-freeze stream or object amendments represented without implying in-place mutation of prior frozen content?",
+      "Can independent implementations derive the same supersession semantics from the promised translation rules alone?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-bahod-group-session-human-merge-promise-peer-adoption-metadata-spec-answer-vocabulary-drift-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000200-SIM-bahod-group-session-human-merge-promise--peer-adoption-metadata-spec-answer-vocabulary-drift--openai-gpt-5.4-medium",
+  "sim_id": "SIM-bahod-group-session-human-merge-promise",
+  "scenario_id": "peer-adoption-metadata-spec-answer-vocabulary-drift",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-bahod-group-session-human-merge-promise/peer-adoption-metadata-spec-answer-vocabulary-drift/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_95fe780f415547408978d8892a7ebfb8",
+    "response_id": "resp_0c38b21404553fa2006a12344ddefc819abb193057698bd0da",
+    "input_tokens": 7532,
+    "output_tokens": 1037,
+    "cost_usd": 0.027699
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-bahod-group-session-human-merge-promise/",
+    "scenario_path": "scenarios/peer-adoption-metadata-spec-answer-vocabulary-drift/peer-adoption-metadata-spec-answer-vocabulary-drift.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-bahod-group-session-human-merge-promise/README.md",
+        "sha256": "4964fb355ec738dc3dbac8490e4014efb1064ee16447f9a90bd86f824e3c456d"
+      },
+      {
+        "path": "simulations/SIM-bahod-group-session-human-merge-promise/QUESTION.md",
+        "sha256": "4e94bfbd2c9ebc7df8ee6f74a6e3cf53d56d35ca413a94d40195630069c1a3d7"
+      },
+      {
+        "path": "scenarios/peer-adoption-metadata-spec-answer-vocabulary-drift/peer-adoption-metadata-spec-answer-vocabulary-drift.md",
+        "sha256": "a9e8ba84995e69fcad36f2554442cc62c5e1128ea0818197cb7ebf66e843ff53"
+      }
+    ],
+    "simulation_tree_hash": "bfbeb2ea13f8e4903a0479f07dabee6590d4b6b828775195f8b4861589eb5f91"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 3,
+    "auditability": 4,
+    "evolution_safety": 1,
+    "layer_boundary_clarity": 3,
+    "failure_handling": 1,
+    "implementation_plausibility": 5,
+    "promise_vocabulary": 4,
+    "simplicity_durability": 4,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 28,
+    "normalized_0_100": 56.00000000000001,
+    "confidence_0_1": 0.86
+  },
+  "assessment": {
+    "rationale": "The simulation is strong on explicit human promise wording, exact artifact references, and auditability, but it is a weak fit for this scenario because it does not model adoption metadata, answer-key naming, or migration across spec vocabulary drift. It helps only indirectly by showing that a promise can point at exact paths and CIDs.",
+    "strengths": [
+      "Promise-first framing is explicit and avoids generic profile or ledger claims.",
+      "Names exact artifacts, paths, CIDs, scope, and unresolved questions for later audit.",
+      "Small human-authored artifact is plausible and durable as evidence."
+    ],
+    "weaknesses": [
+      "Does not directly address whether answer keys are spec-local, profile-local, global, or migration-mapped.",
+      "Provides little failure handling for superseded specs or removed vocabulary.",
+      "Evolution safety is weak because interpretation depends on plain-English wording rather than explicit migration structure."
+    ],
+    "risks": [
+      "Plain-English scope language may become ambiguous when later specs rename or remove fields.",
+      "Without explicit migration semantics, old promises may remain auditable yet still fail interoperable interpretation.",
+      "Early freeze governance may overstate durability if vocabulary binding is not machine-checkable."
+    ],
+    "open_questions": [
+      "Can a human-authored merge promise carry stable spec-local identifiers for renamed or removed answer keys such as Q9?",
+      "What migration record or supersession mechanism would let later peers interpret old promises after spec replacement?",
+      "How would auditors distinguish exact artifact reference from ambiguous vocabulary when the frozen spec evolves?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-fiboh-group-session-deferred-freeze-transport-family-bakeoff-per-hop-authorization-failure-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000206-SIM-fiboh-group-session-deferred-freeze--transport-family-bakeoff-per-hop-authorization-failure--openai-gpt-5.4-medium",
+  "sim_id": "SIM-fiboh-group-session-deferred-freeze",
+  "scenario_id": "transport-family-bakeoff-per-hop-authorization-failure",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-fiboh-group-session-deferred-freeze/transport-family-bakeoff-per-hop-authorization-failure/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_f5d58582479a47f6b3213ee0e36e2dab",
+    "response_id": "resp_0fd530f7fe916524006a12345d067c819989f97c2ee9423db2",
+    "input_tokens": 7501,
+    "output_tokens": 1071,
+    "cost_usd": 0.02812075
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-fiboh-group-session-deferred-freeze/",
+    "scenario_path": "scenarios/transport-family-bakeoff-per-hop-authorization-failure/transport-family-bakeoff-per-hop-authorization-failure.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-fiboh-group-session-deferred-freeze/README.md",
+        "sha256": "5ef83b5e7ef5f2f1dcbbee4d4ca46b8593bcb621402a846c322fad5755171ec4"
+      },
+      {
+        "path": "simulations/SIM-fiboh-group-session-deferred-freeze/QUESTION.md",
+        "sha256": "63305f0ebe3e9872f700b432a543d21b4fcfa92cc97b15d868bbb1dbc683799a"
+      },
+      {
+        "path": "scenarios/transport-family-bakeoff-per-hop-authorization-failure/transport-family-bakeoff-per-hop-authorization-failure.md",
+        "sha256": "f938e10ab88db666d3097a2f97c1667bbbc6e8e071681134049068982cc39cf2"
+      }
+    ],
+    "simulation_tree_hash": "82f864d7ecf63092f2a95e63c7b0d422873220146ce76ca85070bce48efc86d8"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 3,
+    "auditability": 3,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 2,
+    "failure_handling": 1,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 4,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 26,
+    "normalized_0_100": 52,
+    "confidence_0_1": 0.85
+  },
+  "assessment": {
+    "rationale": "This simulation is only a weak fit for the scenario. It is mainly about delaying group-session freeze until frozen pCID references and promise-verification tooling exist, not about how a ring handles per-hop authorization refusal. Its main value here is caution: it avoids freezing unclear semantics before auditable artifacts exist. But it does not itself explain whether the ring breaks, skips a hop, records refusal, or reconfigures membership.",
+    "strengths": [
+      "Clear conservative rule: do not freeze without exact frozen artifacts and verification tooling.",
+      "Good evolution posture because it avoids premature certainty.",
+      "Small and durable decision rule rather than a large governance bundle."
+    ],
+    "weaknesses": [
+      "Does not directly model per-hop authorization failure behavior.",
+      "Weak layer match to transport-family bakeoff pressure.",
+      "Promise-first vocabulary is limited and not expressed as concrete payload promises."
+    ],
+    "risks": [
+      "Freeze deferral can postpone convergence on concrete transport failure semantics.",
+      "The design may be over-credited for safety while leaving hop-level authorization behavior unspecified.",
+      "Scenario pressure could be displaced into tooling readiness instead of resolved in protocol behavior."
+    ],
+    "open_questions": [
+      "Can deferred freeze still require an explicit per-hop authorization failure record before any group-session transport is frozen?",
+      "Would stronger pCID and cryptographic promise tooling materially improve diagnosis of hop-level authorization refusal, or is this mainly a transport-semantics gap?",
+      "Should transport-family failure behavior be specified separately from freeze timing so the scenario can be evaluated directly?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

@@ -1,0 +1,121 @@
+{
+  "schema": "promisegrid.ga.result.v2",
+  "result_id": "SIM-vopit-transport-receipts-at-scale-transport-family-bakeoff-per-hop-authorization-failure-openai-gpt-5.4-medium-20260523-230210",
+  "run_group_id": "ga-canary-20260523-extracted-34x7",
+  "cell_id": "ga-canary-20260523-extracted-34x7-000122-SIM-vopit-transport-receipts-at-scale--transport-family-bakeoff-per-hop-authorization-failure--openai-gpt-5.4-medium",
+  "sim_id": "SIM-vopit-transport-receipts-at-scale",
+  "scenario_id": "transport-family-bakeoff-per-hop-authorization-failure",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260523-230210",
+  "result_path": "results/SIM-vopit-transport-receipts-at-scale/transport-family-bakeoff-per-hop-authorization-failure/openai-gpt-5.4-medium/20260523-230210.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_1a8b02ed77e4438ca926a831287ac145",
+    "response_id": "resp_00d813c000224b73006a1233601d00819a87ac098f3a3caf29",
+    "input_tokens": 7513,
+    "output_tokens": 1154,
+    "cost_usd": 0.02930375
+  },
+  "source": {
+    "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
+    "sim_path": "simulations/SIM-vopit-transport-receipts-at-scale/",
+    "scenario_path": "scenarios/transport-family-bakeoff-per-hop-authorization-failure/transport-family-bakeoff-per-hop-authorization-failure.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-vopit-transport-receipts-at-scale/README.md",
+        "sha256": "0fbf01f60630a4d77a90b1eb757baaf22db54718e543726edd6f902784c0e973"
+      },
+      {
+        "path": "simulations/SIM-vopit-transport-receipts-at-scale/QUESTION.md",
+        "sha256": "f2d5400dddd9f92139fcbf4c1ca1daf8a9228dd7057e4e5eab115211a7873848"
+      },
+      {
+        "path": "scenarios/transport-family-bakeoff-per-hop-authorization-failure/transport-family-bakeoff-per-hop-authorization-failure.md",
+        "sha256": "f938e10ab88db666d3097a2f97c1667bbbc6e8e071681134049068982cc39cf2"
+      }
+    ],
+    "simulation_tree_hash": "0296d101bcc1d66b152b10009c3fd7e912eb0da942916f52f9bda4cf0d3c7c47"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260522-v2",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 3,
+    "auditability": 3,
+    "evolution_safety": 2,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 1,
+    "implementation_plausibility": 3,
+    "promise_vocabulary": 3,
+    "simplicity_durability": 3,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 25,
+    "normalized_0_100": 50,
+    "confidence_0_1": 0.87
+  },
+  "assessment": {
+    "rationale": "The simulation is relevant to transport evidence and peer-local receipt accounting, but it does not directly specify per-hop authorization behavior or ring failure semantics. Its strongest fit is audit-oriented receipt aggregation at scale; its weakest fit is explaining what happens when an unauthorized hop must refuse forwarding.",
+    "strengths": [
+      "Centers peer-local receipt promises and transport auditability.",
+      "Explicitly targets scalable evidence without unbounded acknowledgement retention.",
+      "States boundaries clearly: aggregation is in scope, final receipt-vector format is not."
+    ],
+    "weaknesses": [
+      "Does not define behavior for per-hop authorization refusal.",
+      "Does not explain ring break, hop skip, or membership reconfiguration under failure.",
+      "Leaves verification details of summaries/proofs unresolved."
+    ],
+    "risks": [
+      "Aggregated receipt summaries may hide which hop refused authorization.",
+      "The design may optimize scalable acknowledgement evidence while leaving authorization failure semantics underspecified.",
+      "Compact proofs could become unverifiable summary claims if not tied to explicit local promises."
+    ],
+    "open_questions": [
+      "Can receipt aggregation encode a durable refusal receipt when Bob is unauthorized to forward to Carol?",
+      "If a hop refuses, does the transport preserve ring semantics, skip the hop, or force membership reconfiguration?",
+      "How can Carol or an auditor verify aggregated receipts without trusting opaque summary claims?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+  }
+}

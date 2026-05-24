@@ -1,0 +1,169 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-tizad-scoped-conformance-citation-ledger-promise-economy-spectrum-peer-local-assessment-only-openai-gpt-5.4-medium-20260524-024852",
+  "run_group_id": "ga-canary-20260523-pt-gate-v3",
+  "cell_id": "ga-canary-20260523-pt-gate-v3-000057-SIM-tizad-scoped-conformance-citation-ledger--promise-economy-spectrum-peer-local-assessment-only--openai-gpt-5.4-medium",
+  "sim_id": "SIM-tizad-scoped-conformance-citation-ledger",
+  "scenario_id": "promise-economy-spectrum-peer-local-assessment-only",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260524-024852",
+  "result_path": "results/SIM-tizad-scoped-conformance-citation-ledger/promise-economy-spectrum-peer-local-assessment-only/openai-gpt-5.4-medium/20260524-024852.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_bbcd3688b3ef48e3a191f50311d5d0f9",
+    "response_id": "resp_0d0cac0972760925006a1268861f88819abc1d1236ab5e234e",
+    "input_tokens": 9446,
+    "output_tokens": 2330,
+    "cost_usd": 0.0491505
+  },
+  "source": {
+    "repo_commit": "ec652bd3ecaaf2f904e62cff00e113a88c7e3efd",
+    "sim_path": "simulations/SIM-tizad-scoped-conformance-citation-ledger/",
+    "scenario_path": "scenarios/promise-economy-spectrum-peer-local-assessment-only/promise-economy-spectrum-peer-local-assessment-only.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-tizad-scoped-conformance-citation-ledger/README.md",
+        "sha256": "9668854c94fcb6a8331a98003184968f3e5369102dbe9000783a5f9b867e79ef"
+      },
+      {
+        "path": "simulations/SIM-tizad-scoped-conformance-citation-ledger/QUESTION.md",
+        "sha256": "05f7a658c8c67f64e164153a02dd9fed0df2af9f4f09a02118eaaa06273fb43c"
+      },
+      {
+        "path": "simulations/SIM-tizad-scoped-conformance-citation-ledger/CLAIM-BUNDLE.md",
+        "sha256": "29b03975828b554b774e2cb385cc4a85f80653fa8841494227a837efc95ba45c"
+      },
+      {
+        "path": "scenarios/promise-economy-spectrum-peer-local-assessment-only/promise-economy-spectrum-peer-local-assessment-only.md",
+        "sha256": "447986251c900f650f4b14b03e1660192d3e24b69dc82f9fbd1b61390866a5e6"
+      }
+    ],
+    "simulation_tree_hash": "f45aa7d6c917a553cd0b9e4ed9de53aec6bfa37cb67f1af4bd8ecb516146c77d"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 3,
+    "promisegrid_alignment": 2,
+    "auditability": 5,
+    "evolution_safety": 5,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 5,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 3,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 36,
+    "normalized_0_100": 72,
+    "confidence_0_1": 0.82
+  },
+  "assessment": {
+    "rationale": "Strong match on peer-local assessment, audit evidence, and non-central trust: Alice can record Bob's kept storage behavior and Mallory's corrupt chunks without any required token field. The design is especially good at separating content, availability, authorization, and effect evidence. It scores lower on PT purity because it centers conformance manifests and claim bundles rather than explicit promises.",
+    "strengths": [
+      "Explicit peer-local promise-accounting records fit the scenario's local assessment pressure well.",
+      "Durable citation of concrete CAS objects gives strong later auditability.",
+      "Clear separation of local, live, audit, and effect scopes reduces overclaiming.",
+      "Failure states and break-witness handling improve adversarial and replay analysis."
+    ],
+    "weaknesses": [
+      "Promise vocabulary is weak relative to the rubric's promise-first preference.",
+      "Conformance-manifest framing risks drifting toward normative profile claims.",
+      "Not specifically optimized for the promise-economy question of token-free keep/advertise decisions."
+    ],
+    "risks": [
+      "Conformance/status vocabulary may invite compliance-style reading instead of promise-first local intent.",
+      "The added manifest plus accounting records may grow into a quasi-ledger pattern if implementations centralize them.",
+      "Scenario fit is indirect: it supports local assessment well, but does not directly specify pull/keep/advertise policy mechanics."
+    ],
+    "open_questions": [
+      "Can the local promise-accounting rows directly drive pull/keep/advertise decisions without introducing a token or reputation field?",
+      "Should the publishable manifest be reframed as explicit agent promises to improve PT correctness without losing audit value?",
+      "What minimum local evidence is enough for peers to assess corruption and reliability without drifting toward a shared trust ledger?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design.",
+    "pt_gate": {
+      "status": "pt_reframe_needed",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "Peers publish their own scoped manifests and keep their own local accounting records; no central agent controls behavior."
+      },
+      "scoped_intent": {
+        "status": "warning",
+        "note": "Scope separation is strong, but the main artifact is framed as conformance claims/statuses rather than explicit promisor-scoped promises."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "The design records what each peer observed and claims locally rather than letting one peer guarantee another's behavior."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "The record model includes failed, unknown, replayed, and superseded outcomes rather than guaranteed success."
+      },
+      "local_trust_assessment": {
+        "status": "pass",
+        "note": "Trust is explicitly grounded in local observations and retained local evidence."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "The design supports peer-local assessment and does not require token transfer or obligation semantics for use decisions."
+      },
+      "violations": [
+        "Primary framing uses conformance-manifest and claim-bundle language instead of clear promise-first statements by named agents."
+      ]
+    }
+  }
+}
