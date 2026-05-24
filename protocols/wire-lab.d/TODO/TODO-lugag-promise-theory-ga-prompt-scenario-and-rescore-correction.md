@@ -12,7 +12,7 @@ disposition, and broad rescoring of previously scored cells. It coordinates with
 `TODO-tapur`, `TODO-dadub`, `TODO-ralud`, and `TODO-rozas`, but remains a
 separate harness TODO because the problem is not only a runner bug. It is a
 cross-artifact correction to the way wire-lab models multi-agent behavior.
-Source: `DI-safij`.
+Source: `DI-lumit`.
 
 `SIM-mipag-child-split-release-capsule-template` and
 `SIM-dafod-child-dual-surface-contract-witness-ledger` are explicitly deferred.
@@ -48,6 +48,38 @@ Affects: `protocols/wire-lab.d/TODO/TODO-lugag-promise-theory-ga-prompt-scenario
 `scenarios/`; future `simulations/`; future result comparison and rescore
 artifacts.
 
+ID: DI-lumit
+Date: 2026-05-23 18:09:50
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Ground `TODO-lugag` explicitly in Mark Burgess's basic Promise Theory
+rules and plan to carry those rules into GA scoring rubrics, GA child-generation
+prompts, and future GA-runner code. Treat non-voluntary cooperation,
+imposition-heavy framing, conformance-first language, and external-authority
+reasoning as highly suspect in generation and scoring unless they are explicitly
+decomposed into autonomous promises, accept/use promises, impositions, and local
+assessments.
+Intent: `TODO-lugag` should not merely push the repo toward a promise-first
+style; it should align with Burgess's basic PT mechanics. The core rules include
+autonomous agents, scoped declarations of intent, no promises on behalf of
+other agents, no guarantee of outcome, and trust as a local assessment of
+whether a promise will be kept. These are fundamental enough to function like
+base laws for PromiseGrid design evaluation. The scorer and generator should be
+made aware of those rules directly by including short references to Burgess's
+work in prompts and rubric text.
+Constraints: Keep `DI-safij`'s local-trust and reciprocal-promise direction.
+Do not turn Burgess compatibility into a simplistic banned-word policy:
+`contract`, `authority`, `authorization`, `permission`, and `conformance` may
+still appear when analyzed or decomposed in PT terms, but score and generation
+logic should be highly suspicious of designs that treat them as primitive
+external force or global authority. Future prompts should cite Burgess's
+foundational PT writings concisely enough to guide the model without bloating
+prompt size.
+Affects: `protocols/wire-lab.d/TODO/TODO-lugag-promise-theory-ga-prompt-scenario-and-rescore-correction.md`;
+future `tools/ga-runner/score.go`; future `tools/ga-runner/generate.go`;
+future `scenarios/README.md`; future GA tests and comparison reports.
+Supersedes: DI-safij
+
 ## Scope
 
 This TODO covers:
@@ -75,6 +107,16 @@ owner that drives those later decisions to DI before implementation.
 - `TODO-rozas` consumes mature evidence for dev-guide writer resources; it
   should not summarize non-PT-clean design drift as if it were consensus.
 
+## Burgess grounding
+
+The later implementation and review work under this TODO should stay grounded in
+Mark Burgess's Promise Theory writings, especially the basic-rule statements in
+`In Search of Certainty`, `Promise Theory: Principles and Applications`, `A
+Treatise on Systems, Volume 2`, and the FAQ/trust notes. This grounding matters
+because `lugag` is trying to correct not only vocabulary drift but also a
+deeper conceptual drift back toward RPC, policy-enforcement, and command-style
+thinking.
+
 ## Current problems
 
 - GA child-generation prompts do not require the model to identify promising
@@ -85,6 +127,12 @@ owner that drives those later decisions to DI before implementation.
   contract, or policy-enforcement framing as if those were external authority.
 - PT principles are not being applied uniformly to send, receive, relay,
   storage, computation, result return, refusal, and trust updates.
+- The TODO does not yet explicitly elevate Burgess's basic PT rules into a
+  canonical checklist for GA prompts, rubrics, and later code.
+- The current plan is suspicious of authority-style language, but does not yet
+  say clearly enough that impositions, conformance claims, and other
+  non-voluntary cooperation patterns should score poorly unless decomposed into
+  autonomous promises and local assessments.
 - Many scenarios still read as boilerplate rather than thought experiments:
   they under-use Alice/Bob/Carol/Mallory roles, have weak setup/stimulus/trust
   history, and often drift into non-PT vocabulary such as `authority`,
@@ -94,95 +142,117 @@ owner that drives those later decisions to DI before implementation.
 
 ## Subtasks
 
-- [ ] lugag.1 Lock the Promise Theory vocabulary and anti-vocabulary used by GA
-  prompts, scoring, scenario docs, and promotion review. Define preferred terms
-  such as promise, promiser, promisee, reciprocal promise, local trust, trust
-  history, kept promise, broken promise, and pCID-referenced promise; define
-  suspect terms such as permission, who may, authorization, conformance,
-  contract, policy enforcement, compliance, access control, and authority that
-  require explicit PT reframing before they are allowed.
+- [ ] lugag.1 Lock a canonical set of Burgess-grounded Promise Theory rules for
+  PromiseGrid evaluation and generation. At minimum include: agents are
+  autonomous; a promise is a scoped declaration of intent; no agent can make a
+  promise on behalf of another; promises do not guarantee outcomes; trust is a
+  local assessment of whether a promise will be kept; and promises to
+  receive/use are not equivalent to impositions, obligations, or promises to
+  give. Plan to make this rule set a first-class checklist in the scorer rubric,
+  generation prompts, and future GA-runner code paths.
 - [ ] lugag.2 Write a compact PT interaction checklist that applies the same
   discipline to send, receive, relay, store, retrieve, compute, return-result,
   forward, refuse, ignore, delay, supersede, and revoke behaviors. For each
   interaction class, require explicit answers to: which agent promises what,
   what evidence of keeping/breaking looks like, how local trust is updated, and
-  what no artifact can decide on the agent's behalf.
-- [ ] lugag.3 Harden GA child-generation prompts so every generated design must
+  what no artifact can decide on the agent's behalf. Explicitly distinguish
+  promises, accept/use promises, impositions, and assessments so the scorer does
+  not collapse them into one another.
+- [ ] lugag.3 Lock the Promise Theory vocabulary and anti-vocabulary used by GA
+  prompts, scoring, scenario docs, and promotion review. Define preferred terms
+  such as promise, promiser, promisee, reciprocal promise, local trust, trust
+  history, kept promise, broken promise, accept/use promise, assessment, and
+  pCID-referenced promise; define suspect terms such as permission, who may,
+  authorization, conformance, contract, policy enforcement, compliance, access
+  control, and authority that require explicit PT reframing before they are
+  allowed. Be highly suspicious of non-voluntary cooperation, imposition-heavy
+  framing, and conformance-first reasoning in both scoring and generation.
+- [ ] lugag.4 Harden GA child-generation prompts so every generated design must
   identify the promising agents, what each agent voluntarily promises, which
   promises are reciprocal, what make/break evidence records matter, and what
   remains local trust judgment. Require explicit treatment of send, receive,
   storage, and computation when relevant, and require the child to explain how
   Alice decides whether to trust Bob enough to send data and whether to trust
-  computation results Bob returns.
-- [ ] lugag.4 Add an explicit Promise Theory gate before weighted scoring. The
+  computation results Bob returns. Add concise references to Burgess's PT work
+  in the prompt so the generation model sees the basic autonomy/voluntary
+  cooperation rules while it reasons.
+- [ ] lugag.5 Add an explicit Promise Theory gate before weighted scoring. The
   gate must classify designs as PT-clean, PT-reframe-needed, or PT-invalid.
   PT-invalid designs cannot be promotable regardless of technical neatness.
   PT-reframe-needed designs may survive only as question homes or rework
   candidates. PT-clean status is required for any design that can influence
   promotion, consensus, or guide-level summary.
-- [ ] lugag.5 Harden the scorer rubric and penalties. Make
+- [ ] lugag.6 Harden the scorer rubric and penalties. Make
   `promise_vocabulary` close to a correctness axis rather than a soft style
   preference; make high `promisegrid_alignment` impossible unless the PT gate is
   clean; severely penalize external-authority language unless the scorer
   explains the local-promise interpretation; and penalize designs that treat
   storage or computation as neutral service calls rather than promises between
-  agents with local trust consequences.
-- [ ] lugag.6 Decide the PT-gate result shape and scoring-report contract. Lock
+  agents with local trust consequences. Add concise references to Burgess's PT
+  writings in the rubric so the scoring model is reminded of the governing
+  principles rather than relying on ambient intuition.
+- [ ] lugag.7 Decide the PT-gate result shape and scoring-report contract. Lock
   whether the PT gate becomes an explicit structured field in score results, a
   required assessment subsection, or both. Ensure the promotion and compare
   tooling can key off the PT gate deterministically rather than inferring it
   from prose alone.
-- [ ] lugag.7 Audit `scenarios/README.md` and strengthen the shared root
+- [ ] lugag.8 Audit `scenarios/README.md` and strengthen the shared root
   scenario contract so every scenario inherits explicit PT requirements for
   reciprocal promises, local trust, send/receive/storage/computation discipline,
   observable make/break history, and trust updates. Tighten the actor guidance
   so Alice, Bob, Carol, Dave, Ellen, Frank, and Mallory are used as concrete
-  cooperating or adversarial agents rather than as decorative placeholders.
-- [ ] lugag.8 Audit the full root scenario corpus and classify each scenario as
+  cooperating or adversarial agents rather than as decorative placeholders. Add
+  the Burgess-grounded PT rule set to the scenario contract so later scenario
+  rewrites use the same fundamentals as the GA rubric and prompts.
+- [ ] lugag.9 Audit the full root scenario corpus and classify each scenario as
   PT-clean, boilerplate-but-salvageable, or materially misframed. Record which
   scenarios misuse actors, omit trust-building, omit reciprocal promises, rely
   on hidden authority, misuse non-PT vocabulary, or lack concrete thought
-  experiment framing.
-- [ ] lugag.9 Define a stronger root scenario template for future rewrites.
+  experiment framing. Include a realism pass: find where scenarios use actors as
+  generic placeholders instead of as agents with actual relationships, history,
+  and reasons to trust or distrust one another.
+- [ ] lugag.10 Define a stronger root scenario template for future rewrites.
   Require each scenario to include a realistic setup, prior relationship/trust
   history, explicit promises already in force, a concrete stimulus, at least one
   break/refusal/failure path, locally observable evidence, trust-update
   consequences, and scenario-specific open questions. Require the scenario to
   identify whether the interaction is about sending, receiving, storage,
-  computation, or some combination.
-- [ ] lugag.10 Add new PT-focused scenarios that specifically exercise
+  computation, or some combination. Require enough thought-experiment framing
+  that a scorer can tell why Alice would trust Bob, distrust Bob, or demand
+  reciprocal promises from Carol.
+- [ ] lugag.11 Add new PT-focused scenarios that specifically exercise
   cross-legal-entity trust, selective sending, remote storage promises, remote
   computation promises, trust in returned results, reciprocal data exchange,
   promise-as-capability-token behavior, trust decay and repair, and multi-hop
   local trust without central authority.
-- [ ] lugag.11 Rework or add sims so the scenario matrix has PT-clean candidate
+- [ ] lugag.12 Rework or add sims so the scenario matrix has PT-clean candidate
   designs for selective sending, onward-restraint, storage promises,
   computation-result promises, reciprocal value exchange, and
   promise-as-capability-token framing. Treat capability tokens as promise
   evidence or promise references, never as bearer authority or imposed
   permission.
-- [ ] lugag.12 Rework deferred child proposals `mipag` and `dafod`. Preserve
+- [ ] lugag.13 Rework deferred child proposals `mipag` and `dafod`. Preserve
   only the parts that survive PT correction, such as explicit local evidence,
   durable pCID-referenced promise language, narrow layer boundaries, and
   long-horizon auditability. Remove or replace any framing that makes capsules,
   contracts, conformance, witness ledgers, or similar artifacts sound like
   authority-bearing mechanisms.
-- [ ] lugag.13 Define review and promotion policy under the PT gate. A child or
+- [ ] lugag.14 Define review and promotion policy under the PT gate. A child or
   sim with PT-invalid framing must not be promotable. PT-reframe-needed artifacts
   may be kept only as question homes, anti-pattern specimens, or inputs for
   rework. PT-clean status becomes a hard prerequisite for any artifact that
   influences current design-state summaries.
-- [ ] lugag.14 Plan the rescoring campaign. Freeze the corrected PT gate,
+- [ ] lugag.15 Plan the rescoring campaign. Freeze the corrected PT gate,
   generator contract, and scorer contract before spending on rescoring. Start
   with a small calibration sample, then re-score promoted or near-promoted sims,
   then hard-hit vocabulary families, then the broader corpus. Preserve
   historical scored JSON bytes and record new PT-corrected evidence as new
   result files rather than rewriting old artifacts.
-- [ ] lugag.15 Define the rescore comparison outputs. Produce reports that show
+- [ ] lugag.16 Define the rescore comparison outputs. Produce reports that show
   rank drift, formerly high scorers rejected by PT rules, newly strong PT-clean
   contenders, and scenario-driven shifts caused by more realistic trust and
   reciprocity framing.
-- [ ] lugag.16 Update operator and guide-facing docs only after PT-corrected
+- [ ] lugag.17 Update operator and guide-facing docs only after PT-corrected
   evidence exists. Future `tools/ga-runner/README.md`, promotion procedure, and
   `DEV-GUIDE-RESOURCES.md` updates must describe PT-first generation and scoring
   rules and must not summarize non-PT-clean results as consensus.
@@ -190,12 +260,13 @@ owner that drives those later decisions to DI before implementation.
 ## Validation and acceptance criteria
 
 - A later implementation pass must prove generator prompts require named agents,
-  voluntary promises, reciprocal promises where relevant, evidence records, and
-  local trust judgment.
+  voluntary promises, reciprocal promises where relevant, evidence records,
+  local trust judgment, and the Burgess-grounded PT rule set.
 - A later implementation pass must prove the scorer rejects conventional
   access-control or contract-authority designs even when they are otherwise
-  neat, and that it penalizes storage/computation designs that presume service
-  trust by default.
+  neat, that it is highly suspicious of non-voluntary cooperation and
+  imposition-heavy framing, and that it penalizes storage/computation designs
+  that presume service trust by default.
 - A later scenario rewrite pass must leave the root scenario corpus materially
   less boilerplate, more realistic, and more explicit about trust-building,
   reciprocal promises, evidence, and thought-experiment framing.
@@ -203,4 +274,3 @@ owner that drives those later decisions to DI before implementation.
   complete.
 - Rescoring must preserve historical scored artifacts and append new PT-clean
   evidence instead of mutating old bytes in place.
-
