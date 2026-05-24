@@ -101,11 +101,11 @@ func TestValidateResultFileRejectsSchemaMismatch(t *testing.T) {
 	}
 }
 
-func TestValidateResultFileRequiresV2Fields(t *testing.T) {
+func TestValidateResultFileRequiresV3Fields(t *testing.T) {
 	repo := newTestRepo(t)
 	path := repo.Path("results", "SIM-alpha", "scenario-one", "model-a", "20260519-101500.json")
 	raw := `{
-  "schema": "promisegrid.ga.result.v2",
+  "schema": "promisegrid.ga.result.v3",
   "result_id": "SIM-alpha-scenario-one-model-a-20260519-101500",
   "run_group_id": "ga-test",
   "cell_id": "ga-test-000001",
@@ -124,10 +124,12 @@ func TestValidateResultFileRequiresV2Fields(t *testing.T) {
     "simulation_tree_hash": "` + strings.Repeat("b", 64) + `"
   },
   "rubric": {
-    "rubric_version": "ga-rubric-20260522-v2",
+    "rubric_version": "ga-rubric-20260523-v3",
     "score_scale": "0..5",
     "score_meanings": {"0": "no fit", "5": "strong fit"},
-    "axes": ["scenario_fit", "promisegrid_alignment", "auditability", "evolution_safety", "layer_boundary_clarity", "failure_handling", "implementation_plausibility", "promise_vocabulary", "simplicity_durability", "risk_penalty"]
+    "axes": ["scenario_fit", "promisegrid_alignment", "auditability", "evolution_safety", "layer_boundary_clarity", "failure_handling", "implementation_plausibility", "promise_vocabulary", "simplicity_durability", "risk_penalty"],
+    "promise_theory_rules": ["Agents are autonomous.", "A promise is a scoped declaration of intent.", "No agent can make a promise on behalf of another agent.", "Promises do not guarantee outcomes.", "Trust is a local assessment of whether a promise will be kept.", "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."],
+    "promise_theory_references": ["Mark Burgess, In Search of Certainty", "Mark Burgess, Promise Theory: Principles and Applications", "Mark Burgess, Thinking in Promises"]
   },
   "scores": {
     "scenario_fit": 4,
@@ -149,11 +151,14 @@ func TestValidateResultFileRequiresV2Fields(t *testing.T) {
 		t.Fatalf("write result: %v", err)
 	}
 	issues := validateResultFile(repo, path)
-	if !hasIssue(issues, "scores.promise_vocabulary is required for "+resultSchemaV2) {
+	if !hasIssue(issues, "scores.promise_vocabulary is required for "+resultSchemaV3) {
 		t.Fatalf("expected promise_vocabulary issue, got %v", issues)
 	}
-	if !hasIssue(issues, "scores.simplicity_durability is required for "+resultSchemaV2) {
+	if !hasIssue(issues, "scores.simplicity_durability is required for "+resultSchemaV3) {
 		t.Fatalf("expected simplicity_durability issue, got %v", issues)
+	}
+	if !hasIssue(issues, "assessment.pt_gate is required for "+resultSchemaV3) {
+		t.Fatalf("expected pt_gate issue, got %v", issues)
 	}
 }
 
@@ -533,14 +538,20 @@ func TestRunScoreWritesValidatedFitnessResult(t *testing.T) {
 	if result.Runner.ServiceTier != defaultServiceTier || result.Runner.ServedServiceTier != defaultServiceTier {
 		t.Fatalf("result service tier not recorded: %#v", result.Runner)
 	}
-	if result.Schema != resultSchemaV2 {
-		t.Fatalf("score wrote schema %q, want %q", result.Schema, resultSchemaV2)
+	if result.Schema != resultSchemaV3 {
+		t.Fatalf("score wrote schema %q, want %q", result.Schema, resultSchemaV3)
 	}
-	if result.Rubric.RubricVersion != rubricVersionV2 {
-		t.Fatalf("score wrote rubric version %q, want %q", result.Rubric.RubricVersion, rubricVersionV2)
+	if result.Rubric.RubricVersion != rubricVersionV3 {
+		t.Fatalf("score wrote rubric version %q, want %q", result.Rubric.RubricVersion, rubricVersionV3)
+	}
+	if len(result.Rubric.PromiseTheoryRules) == 0 {
+		t.Fatalf("score wrote empty PT rule list")
 	}
 	if result.Scores.PromiseVocabulary != 4 || result.Scores.SimplicityDurability != 4 {
-		t.Fatalf("score did not capture new v2 axes: %#v", result.Scores)
+		t.Fatalf("score did not capture PT-scored axes: %#v", result.Scores)
+	}
+	if result.Assessment.PTGate.Status != ptGateStatusClean {
+		t.Fatalf("score wrote pt gate status %q, want %q", result.Assessment.PTGate.Status, ptGateStatusClean)
 	}
 	if result.Fitness.Raw != 38 || result.Fitness.Normalized0To100 != 76 {
 		t.Fatalf("score did not recompute deterministic fitness: %#v", result.Fitness)
@@ -589,6 +600,22 @@ func TestRunScoreWritesZeroValuedV2Axes(t *testing.T) {
 	}
 	if issues := validateResultFile(repo, resultPath); len(issues) != 0 {
 		t.Fatalf("zero-valued v2 axes should validate as present scores, got %v", issues)
+	}
+}
+
+func TestApplyPTGateScorePolicy(t *testing.T) {
+	base := FitnessScores{
+		PromiseGridAlignment: 5,
+		PromiseVocabulary:    5,
+		RiskPenalty:          1,
+	}
+	reframe := applyPTGateScorePolicy(base, PTGate{Status: ptGateStatusReframeNeeded})
+	if reframe.PromiseGridAlignment != 2 || reframe.PromiseVocabulary != 2 || reframe.RiskPenalty != 3 {
+		t.Fatalf("reframe gate policy mismatch: %#v", reframe)
+	}
+	invalid := applyPTGateScorePolicy(base, PTGate{Status: ptGateStatusInvalid})
+	if invalid.PromiseGridAlignment != 0 || invalid.PromiseVocabulary != 0 || invalid.RiskPenalty != 5 {
+		t.Fatalf("invalid gate policy mismatch: %#v", invalid)
 	}
 }
 
@@ -1252,7 +1279,10 @@ func TestBuildScorePromptIncludesRequiredAxisChecklist(t *testing.T) {
 		"Required score-axis checklist:",
 		"`promise_vocabulary`",
 		"`simplicity_durability`",
-		"A response missing any required `scores` axis is invalid.",
+		"Promise Theory Fundamentals",
+		"Mark Burgess",
+		"`pt_clean`, `pt_reframe_needed`, or `pt_invalid`",
+		"A response missing any required `scores` axis or `assessment.pt_gate` is invalid.",
 	} {
 		if !strings.Contains(prompt, want) {
 			t.Fatalf("prompt missing %q:\n%s", want, prompt)
@@ -1277,7 +1307,7 @@ func TestRunScoreRetriesMissingV2Axes(t *testing.T) {
 					UsageJSON:   `{"input_tokens":1000,"input_tokens_details":{"cached_tokens":100},"output_tokens":500}`,
 				}, nil
 			case 2:
-				if !strings.Contains(request.Prompt, "## Schema Correction") || !strings.Contains(request.Prompt, "`promise_vocabulary`") || !strings.Contains(request.Prompt, "`simplicity_durability`") {
+				if !strings.Contains(request.Prompt, "## Schema Correction") || !strings.Contains(request.Prompt, "`scores.promise_vocabulary`") || !strings.Contains(request.Prompt, "`scores.simplicity_durability`") || !strings.Contains(request.Prompt, "`assessment.pt_gate`") {
 					return ProviderResponse{}, fmt.Errorf("schema correction prompt missing missing-axis guidance")
 				}
 				return ProviderResponse{
@@ -1378,7 +1408,7 @@ func TestRunScoreFailsAfterSchemaRetryStillMissingAxes(t *testing.T) {
 		if strings.HasPrefix(cell.ResultPath, "proposals/") {
 			continue
 		}
-		if cell.Status != "failed" || !strings.Contains(cell.ValidationMessage, "schema-correction retry still missing required score axes") {
+		if cell.Status != "failed" || !strings.Contains(cell.ValidationMessage, "schema-correction retry still missing required score fields") {
 			t.Fatalf("score state did not preserve schema retry failure: %#v", cell)
 		}
 	}
@@ -1394,7 +1424,7 @@ func TestRunScoreStrictStructuredOutputDoesNotSchemaRetry(t *testing.T) {
 			if request.OutputContract != outputContractJSONSchemaStrict {
 				return ProviderResponse{}, fmt.Errorf("output contract = %q, want %q", request.OutputContract, outputContractJSONSchemaStrict)
 			}
-			if request.OutputSchemaName != "ga_score_payload_v2" || len(request.OutputSchema) == 0 {
+			if request.OutputSchemaName != "ga_score_payload_v3" || len(request.OutputSchema) == 0 {
 				return ProviderResponse{}, fmt.Errorf("structured output schema missing from request")
 			}
 			return ProviderResponse{
@@ -1953,8 +1983,8 @@ func TestOpenAIProviderSendsStructuredOutputFormat(t *testing.T) {
 		if body.Text.Format.Type != "json_schema" || !body.Text.Format.Strict {
 			t.Fatalf("unexpected text.format: %#v", body.Text.Format)
 		}
-		if body.Text.Format.Name != "ga_score_payload_v2" {
-			t.Fatalf("structured output schema name = %q, want ga_score_payload_v2", body.Text.Format.Name)
+		if body.Text.Format.Name != "ga_score_payload_v3" {
+			t.Fatalf("structured output schema name = %q, want ga_score_payload_v3", body.Text.Format.Name)
 		}
 		if _, ok := body.Text.Format.Schema["properties"]; !ok {
 			t.Fatalf("structured output schema missing properties: %#v", body.Text.Format.Schema)
@@ -1975,7 +2005,7 @@ func TestOpenAIProviderSendsStructuredOutputFormat(t *testing.T) {
 		ServiceTier:      serviceTierFlex,
 		Prompt:           "score this",
 		OutputContract:   outputContractJSONSchemaStrict,
-		OutputSchemaName: "ga_score_payload_v2",
+		OutputSchemaName: "ga_score_payload_v3",
 		OutputSchema:     scorePayloadJSONSchema(),
 	})
 	if err != nil {
@@ -3280,7 +3310,17 @@ func validScorePayloadJSON() string {
     "weaknesses": ["limited scenario depth"],
     "risks": ["fixture-only evaluation"],
     "open_questions": ["none for this test"],
-    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design.",
+    "pt_gate": {
+      "status": "pt_clean",
+      "autonomous_agents": {"status": "pass", "note": "named agents remain autonomous"},
+      "scoped_intent": {"status": "pass", "note": "promises stay scoped to payload behavior"},
+      "no_promises_for_others": {"status": "pass", "note": "no proxy promise authority"},
+      "no_guaranteed_outcomes": {"status": "pass", "note": "result does not claim certainty"},
+      "local_trust_assessment": {"status": "pass", "note": "trust remains local to the peer"},
+      "accept_use_not_obligation": {"status": "pass", "note": "receive/use is not framed as obligation"},
+      "violations": []
+    }
   }
 }`
 }
@@ -3338,7 +3378,17 @@ func scorePayloadWithZeroV2AxesJSON() string {
     "weaknesses": ["fixture-only evaluation"],
     "risks": ["serialization regression"],
     "open_questions": ["none for this test"],
-    "authority_boundary": "Evidence only; does not settle PromiseGrid design."
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design.",
+    "pt_gate": {
+      "status": "pt_reframe_needed",
+      "autonomous_agents": {"status": "warning", "note": "fixture keeps agent story thin"},
+      "scoped_intent": {"status": "pass", "note": "scoped enough for zero-score fixture"},
+      "no_promises_for_others": {"status": "pass", "note": "no delegated authority"},
+      "no_guaranteed_outcomes": {"status": "pass", "note": "does not imply certainty"},
+      "local_trust_assessment": {"status": "warning", "note": "trust evidence remains shallow"},
+      "accept_use_not_obligation": {"status": "pass", "note": "no receive obligation implied"},
+      "violations": ["thin PT evidence for fixture"]
+    }
   }
 }`
 }

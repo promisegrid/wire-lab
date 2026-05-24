@@ -8,8 +8,10 @@ import (
 const (
 	resultSchemaV1  = "promisegrid.ga.result.v1"
 	resultSchemaV2  = "promisegrid.ga.result.v2"
+	resultSchemaV3  = "promisegrid.ga.result.v3"
 	rubricVersionV1 = "ga-rubric-20260519-v1"
 	rubricVersionV2 = "ga-rubric-20260522-v2"
+	rubricVersionV3 = "ga-rubric-20260523-v3"
 )
 
 var rubricAxesV1 = []string{
@@ -34,6 +36,17 @@ var rubricAxesV2 = []string{
 	"promise_vocabulary",
 	"simplicity_durability",
 	"risk_penalty",
+}
+
+var rubricAxesV3 = append([]string(nil), rubricAxesV2...)
+
+var promiseTheoryRulesV1 = []string{
+	"Agents are autonomous.",
+	"A promise is a scoped declaration of intent.",
+	"No agent can make a promise on behalf of another agent.",
+	"Promises do not guarantee outcomes.",
+	"Trust is a local assessment of whether a promise will be kept.",
+	"Promises to receive or use are not equivalent to obligations, impositions, or promises to give.",
 }
 
 // FitnessResult is the machine-readable evidence shape for one GA runner cell.
@@ -104,17 +117,20 @@ type PromotionInfo struct {
 }
 
 type RubricInfo struct {
-	RubricVersion string            `json:"rubric_version"`
-	ScoreScale    string            `json:"score_scale"`
-	ScoreMeanings map[string]string `json:"score_meanings"`
-	Axes          []string          `json:"axes"`
+	RubricVersion      string            `json:"rubric_version"`
+	ScoreScale         string            `json:"score_scale"`
+	ScoreMeanings      map[string]string `json:"score_meanings"`
+	Axes               []string          `json:"axes"`
+	PromiseTheoryRules []string          `json:"promise_theory_rules,omitempty"`
+	PromiseTheoryRefs  []string          `json:"promise_theory_references,omitempty"`
 }
 
 // FitnessScores is serialized as the durable score evidence. Required axes must
-// be emitted even when the score is zero, because zero is a valid judgment while
-// an absent JSON field is a schema defect. Intent: preserve rubric-v2 score
-// presence after the SIM-suzuf rerun exposed zero-valued fields being omitted by
-// JSON tags. Source: DI-vonot
+// be emitted even when the score is zero, because zero is a valid judgment
+// while an absent JSON field is a schema defect.
+//
+// Intent: Preserve score-field presence after the SIM-suzuf rerun exposed
+// zero-valued fields being omitted by JSON tags. Source: DI-vonot; DI-movur
 type FitnessScores struct {
 	ScenarioFit                int `json:"scenario_fit"`
 	PromiseGridAlignment       int `json:"promisegrid_alignment"`
@@ -134,6 +150,22 @@ type FitnessSummary struct {
 	Confidence0To1   float64 `json:"confidence_0_1"`
 }
 
+type PTGateRuleAssessment struct {
+	Status string `json:"status"`
+	Note   string `json:"note"`
+}
+
+type PTGate struct {
+	Status                 string               `json:"status"`
+	AutonomousAgents       PTGateRuleAssessment `json:"autonomous_agents"`
+	ScopedIntent           PTGateRuleAssessment `json:"scoped_intent"`
+	NoPromisesForOthers    PTGateRuleAssessment `json:"no_promises_for_others"`
+	NoGuaranteedOutcomes   PTGateRuleAssessment `json:"no_guaranteed_outcomes"`
+	LocalTrustAssessment   PTGateRuleAssessment `json:"local_trust_assessment"`
+	AcceptUseNotObligation PTGateRuleAssessment `json:"accept_use_not_obligation"`
+	Violations             []string             `json:"violations"`
+}
+
 type Assessment struct {
 	Rationale         string   `json:"rationale"`
 	Strengths         []string `json:"strengths"`
@@ -141,10 +173,11 @@ type Assessment struct {
 	Risks             []string `json:"risks"`
 	OpenQuestions     []string `json:"open_questions"`
 	AuthorityBoundary string   `json:"authority_boundary"`
+	PTGate            PTGate   `json:"pt_gate,omitempty"`
 }
 
 func knownResultSchemas() []string {
-	return []string{resultSchemaV1, resultSchemaV2}
+	return []string{resultSchemaV1, resultSchemaV2, resultSchemaV3}
 }
 
 func isKnownResultSchema(schema string) bool {
@@ -157,10 +190,13 @@ func isKnownResultSchema(schema string) bool {
 }
 
 func expectedResultSchemaMessage() string {
-	return "schema must be " + resultSchemaV1 + " or " + resultSchemaV2
+	return "schema must be " + resultSchemaV1 + ", " + resultSchemaV2 + ", or " + resultSchemaV3
 }
 
 func rubricVersionForSchema(schema string) string {
+	if schema == resultSchemaV3 {
+		return rubricVersionV3
+	}
 	if schema == resultSchemaV2 {
 		return rubricVersionV2
 	}
@@ -168,6 +204,9 @@ func rubricVersionForSchema(schema string) string {
 }
 
 func rubricAxesForSchema(schema string) []string {
+	if schema == resultSchemaV3 {
+		return append([]string(nil), rubricAxesV3...)
+	}
 	if schema == resultSchemaV2 {
 		return append([]string(nil), rubricAxesV2...)
 	}
@@ -180,11 +219,29 @@ func rubricScoreMeaningsForSchema(schema string) map[string]string {
 		"5":            "strong fit",
 		"risk_penalty": "0 low risk, 5 severe risk",
 	}
-	if schema == resultSchemaV2 {
+	if schema == resultSchemaV2 || schema == resultSchemaV3 {
 		meanings["promise_vocabulary"] = "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific"
 		meanings["simplicity_durability"] = "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
 	}
 	return meanings
+}
+
+func rubricPromiseTheoryRulesForSchema(schema string) []string {
+	if schema != resultSchemaV3 {
+		return nil
+	}
+	return append([]string(nil), promiseTheoryRulesV1...)
+}
+
+func rubricPromiseTheoryReferencesForSchema(schema string) []string {
+	if schema != resultSchemaV3 {
+		return nil
+	}
+	return []string{
+		"Mark Burgess, In Search of Certainty",
+		"Mark Burgess, Promise Theory: Principles and Applications",
+		"Mark Burgess, Thinking in Promises",
+	}
 }
 
 func scoreAxesForResult(result FitnessResult) []string {
@@ -222,6 +279,43 @@ func (scores FitnessScores) axisValue(name string) int {
 	default:
 		return 0
 	}
+}
+
+const (
+	ptGateStatusClean         = "pt_clean"
+	ptGateStatusReframeNeeded = "pt_reframe_needed"
+	ptGateStatusInvalid       = "pt_invalid"
+	ptRuleStatusPass          = "pass"
+	ptRuleStatusWarning       = "warning"
+	ptRuleStatusFail          = "fail"
+)
+
+// applyPTGateScorePolicy enforces the PT gate before deterministic weighted
+// fitness is computed so non-PT designs cannot float to the top on technical
+// neatness alone.
+//
+// Intent: Make the lugag PT correction operational in score ranking instead of
+// leaving it as prose-only reviewer guidance. Source: DI-movur
+func applyPTGateScorePolicy(scores FitnessScores, gate PTGate) FitnessScores {
+	switch gate.Status {
+	case ptGateStatusInvalid:
+		scores.PromiseGridAlignment = 0
+		scores.PromiseVocabulary = 0
+		if scores.RiskPenalty < 5 {
+			scores.RiskPenalty = 5
+		}
+	case ptGateStatusReframeNeeded:
+		if scores.PromiseGridAlignment > 2 {
+			scores.PromiseGridAlignment = 2
+		}
+		if scores.PromiseVocabulary > 2 {
+			scores.PromiseVocabulary = 2
+		}
+		if scores.RiskPenalty < 3 {
+			scores.RiskPenalty = 3
+		}
+	}
+	return scores
 }
 
 // deterministicFitnessSummary keeps v2 fitness normalization in the runner so

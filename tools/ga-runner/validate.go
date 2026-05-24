@@ -22,8 +22,9 @@ type resultPathParts struct {
 }
 
 type rawResultPresence struct {
-	Schema string                     `json:"schema"`
-	Scores map[string]json.RawMessage `json:"scores"`
+	Schema     string                     `json:"schema"`
+	Scores     map[string]json.RawMessage `json:"scores"`
+	Assessment map[string]json.RawMessage `json:"assessment"`
 }
 
 func runValidate(args []string, stdout io.Writer) error {
@@ -157,6 +158,7 @@ func validateResultFile(repo Repo, path string) []string {
 	issues = append(issues, validateRubric(result.Schema, result.Rubric)...)
 	issues = append(issues, validateScores(result.Schema, presence.Scores, result.Scores)...)
 	issues = append(issues, validateFitness(result.Fitness)...)
+	issues = append(issues, validateAssessmentPresence(result.Schema, presence.Assessment)...)
 	issues = append(issues, validateAssessment(result.Assessment)...)
 	return issues
 }
@@ -294,6 +296,21 @@ func validateRubric(schema string, rubric RubricInfo) []string {
 			issues = append(issues, "rubric.axes must match "+strings.Join(expectedAxes, ",")+" for "+resultSchemaV2)
 		}
 	}
+	if schema == resultSchemaV3 {
+		if rubric.RubricVersion != rubricVersionV3 {
+			issues = append(issues, "rubric.rubric_version must be "+rubricVersionV3+" for "+resultSchemaV3)
+		}
+		expectedAxes := rubricAxesForSchema(schema)
+		if strings.Join(rubric.Axes, ",") != strings.Join(expectedAxes, ",") {
+			issues = append(issues, "rubric.axes must match "+strings.Join(expectedAxes, ",")+" for "+resultSchemaV3)
+		}
+		if strings.Join(rubric.PromiseTheoryRules, "\n") != strings.Join(rubricPromiseTheoryRulesForSchema(schema), "\n") {
+			issues = append(issues, "rubric.promise_theory_rules must match the canonical PT rule list for "+resultSchemaV3)
+		}
+		if len(rubric.PromiseTheoryRefs) == 0 {
+			issues = append(issues, "rubric.promise_theory_references must not be empty for "+resultSchemaV3)
+		}
+	}
 	return issues
 }
 
@@ -323,6 +340,13 @@ func validateScores(schema string, rawScores map[string]json.RawMessage, scores 
 			}
 		}
 	}
+	if schema == resultSchemaV3 {
+		for _, field := range []string{"promise_vocabulary", "simplicity_durability"} {
+			if _, ok := rawScores[field]; !ok {
+				issues = append(issues, "scores."+field+" is required for "+resultSchemaV3)
+			}
+		}
+	}
 	sort.Strings(issues)
 	return issues
 }
@@ -338,6 +362,16 @@ func validateFitness(fitness FitnessSummary) []string {
 	return issues
 }
 
+func validateAssessmentPresence(schema string, rawAssessment map[string]json.RawMessage) []string {
+	var issues []string
+	if schema == resultSchemaV3 {
+		if _, ok := rawAssessment["pt_gate"]; !ok {
+			issues = append(issues, "assessment.pt_gate is required for "+resultSchemaV3)
+		}
+	}
+	return issues
+}
+
 func validateAssessment(assessment Assessment) []string {
 	var issues []string
 	if assessment.Rationale == "" {
@@ -346,6 +380,38 @@ func validateAssessment(assessment Assessment) []string {
 	if assessment.AuthorityBoundary == "" {
 		issues = append(issues, "assessment.authority_boundary is required")
 	}
+	if assessment.PTGate.Status != "" {
+		issues = append(issues, validatePTGate(assessment.PTGate)...)
+	}
+	return issues
+}
+
+func validatePTGate(gate PTGate) []string {
+	var issues []string
+	switch gate.Status {
+	case ptGateStatusClean, ptGateStatusReframeNeeded, ptGateStatusInvalid:
+	default:
+		issues = append(issues, "assessment.pt_gate.status must be pt_clean, pt_reframe_needed, or pt_invalid")
+	}
+	rules := map[string]PTGateRuleAssessment{
+		"autonomous_agents":         gate.AutonomousAgents,
+		"scoped_intent":             gate.ScopedIntent,
+		"no_promises_for_others":    gate.NoPromisesForOthers,
+		"no_guaranteed_outcomes":    gate.NoGuaranteedOutcomes,
+		"local_trust_assessment":    gate.LocalTrustAssessment,
+		"accept_use_not_obligation": gate.AcceptUseNotObligation,
+	}
+	for name, rule := range rules {
+		switch rule.Status {
+		case ptRuleStatusPass, ptRuleStatusWarning, ptRuleStatusFail:
+		default:
+			issues = append(issues, "assessment.pt_gate."+name+".status must be pass, warning, or fail")
+		}
+		if rule.Note == "" {
+			issues = append(issues, "assessment.pt_gate."+name+".note is required")
+		}
+	}
+	sort.Strings(issues)
 	return issues
 }
 

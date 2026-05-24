@@ -80,6 +80,36 @@ future `tools/ga-runner/score.go`; future `tools/ga-runner/generate.go`;
 future `scenarios/README.md`; future GA tests and comparison reports.
 Supersedes: DI-safij
 
+ID: DI-movur
+Date: 2026-05-23 18:16:08
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Implement `lugag.1`, `lugag.5`, and `lugag.7` in the scorer as a new
+v3 score/result contract that keeps historical v1/v2 artifacts valid while
+making Promise Theory fundamentals and the PT gate explicit. New scorer results
+must carry the canonical Burgess-grounded PT rule set in the stored rubric and
+must carry a structured `assessment.pt_gate` object with deterministic
+statuses. The runner must apply the PT gate before computing weighted fitness,
+so PT-invalid designs cannot score as promotable and PT-reframe-needed designs
+are capped below PT-clean contenders.
+Intent: `lugag` needs a first-class, machine-readable PT checklist and gate,
+not only prose. Putting the rule set in the stored rubric makes later review
+and rescoring auditable. Using a v3 result contract avoids retroactively
+invalidating historical v2 score artifacts. Applying the gate before weighted
+fitness makes the PT correction operational instead of advisory.
+Constraints: Keep v1/v2 result validation intact. New score runs emit
+`promisegrid.ga.result.v3`, `ga-rubric-20260523-v3`, and
+`ga_score_payload_v3`. The PT gate must classify designs as `pt_clean`,
+`pt_reframe_needed`, or `pt_invalid`. The canonical rule checklist must cover
+autonomous agents, scoped intent, no promises on behalf of others, no
+guaranteed outcomes, trust as local assessment, and the non-equivalence of
+accept/use promises with obligations or impositions. The scorer prompt must
+include concise Burgess reference notes without bloating the prompt.
+Affects: `protocols/wire-lab.d/TODO/TODO-lugag-promise-theory-ga-prompt-scenario-and-rescore-correction.md`;
+`tools/ga-runner/result.go`; `tools/ga-runner/score.go`;
+`tools/ga-runner/validate.go`; `tools/ga-runner/ga_runner_test.go`
+Supersedes: DI-lumit
+
 ## Scope
 
 This TODO covers:
@@ -142,7 +172,7 @@ thinking.
 
 ## Subtasks
 
-- [ ] lugag.1 Lock a canonical set of Burgess-grounded Promise Theory rules for
+- [x] lugag.1 Lock a canonical set of Burgess-grounded Promise Theory rules for
   PromiseGrid evaluation and generation. At minimum include: agents are
   autonomous; a promise is a scoped declaration of intent; no agent can make a
   promise on behalf of another; promises do not guarantee outcomes; trust is a
@@ -176,7 +206,7 @@ thinking.
   computation results Bob returns. Add concise references to Burgess's PT work
   in the prompt so the generation model sees the basic autonomy/voluntary
   cooperation rules while it reasons.
-- [ ] lugag.5 Add an explicit Promise Theory gate before weighted scoring. The
+- [x] lugag.5 Add an explicit Promise Theory gate before weighted scoring. The
   gate must classify designs as PT-clean, PT-reframe-needed, or PT-invalid.
   PT-invalid designs cannot be promotable regardless of technical neatness.
   PT-reframe-needed designs may survive only as question homes or rework
@@ -191,7 +221,7 @@ thinking.
   agents with local trust consequences. Add concise references to Burgess's PT
   writings in the rubric so the scoring model is reminded of the governing
   principles rather than relying on ambient intuition.
-- [ ] lugag.7 Decide the PT-gate result shape and scoring-report contract. Lock
+- [x] lugag.7 Decide the PT-gate result shape and scoring-report contract. Lock
   whether the PT gate becomes an explicit structured field in score results, a
   required assessment subsection, or both. Ensure the promotion and compare
   tooling can key off the PT gate deterministically rather than inferring it
