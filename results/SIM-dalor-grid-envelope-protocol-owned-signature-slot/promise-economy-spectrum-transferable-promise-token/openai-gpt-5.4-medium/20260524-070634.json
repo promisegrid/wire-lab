@@ -1,0 +1,171 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-dalor-grid-envelope-protocol-owned-signature-slot-promise-economy-spectrum-transferable-promise-token-openai-gpt-5.4-medium-20260524-070634",
+  "run_group_id": "ga-canary-20260524-pt-gate-v3-successors-plus-dalor",
+  "cell_id": "ga-canary-20260524-pt-gate-v3-successors-plus-dalor-000023-SIM-dalor-grid-envelope-protocol-owned-signature-slot--promise-economy-spectrum-transferable-promise-token--openai-gpt-5.4-medium",
+  "sim_id": "SIM-dalor-grid-envelope-protocol-owned-signature-slot",
+  "scenario_id": "promise-economy-spectrum-transferable-promise-token",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260524-070634",
+  "result_path": "results/SIM-dalor-grid-envelope-protocol-owned-signature-slot/promise-economy-spectrum-transferable-promise-token/openai-gpt-5.4-medium/20260524-070634.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_cf5676ed8e644a89bf827155b429a8ee",
+    "response_id": "resp_0b753805f1fef548006a12a409bfbc819bbaf3703836ee63c3",
+    "input_tokens": 9032,
+    "output_tokens": 1988,
+    "cost_usd": 0.043638
+  },
+  "source": {
+    "repo_commit": "71dae2ade16dd0c061a3c37a39979203d716f804",
+    "sim_path": "simulations/SIM-dalor-grid-envelope-protocol-owned-signature-slot/",
+    "scenario_path": "scenarios/promise-economy-spectrum-transferable-promise-token/promise-economy-spectrum-transferable-promise-token.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-dalor-grid-envelope-protocol-owned-signature-slot/README.md",
+        "sha256": "b219f5069f4e3c7fe3b236de99d374a27fc5f2cf49228a3a64552e86a60a627d"
+      },
+      {
+        "path": "simulations/SIM-dalor-grid-envelope-protocol-owned-signature-slot/QUESTION.md",
+        "sha256": "baf36ee6659fb84fe2172404b741501de2ef752992cc9106907cf5138e147f0b"
+      },
+      {
+        "path": "simulations/SIM-dalor-grid-envelope-protocol-owned-signature-slot/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "f704629434cecc9ad8fecdb62666a28fde1e9afe4b90408ab9bfb29320dd05bf"
+      },
+      {
+        "path": "scenarios/promise-economy-spectrum-transferable-promise-token/promise-economy-spectrum-transferable-promise-token.md",
+        "sha256": "abaf39f500a3cf675bc528e6367b46bd6ded03011700c415d728dbe7cb8b0019"
+      }
+    ],
+    "simulation_tree_hash": "a49ebd30bfaf4e4ae29341dbeaa1b6e5da836fca5629f3f55c11abd5d992cc6c"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 2,
+    "auditability": 3,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 2,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 1,
+    "simplicity_durability": 4,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 26,
+    "normalized_0_100": 52,
+    "confidence_0_1": 0.85
+  },
+  "assessment": {
+    "rationale": "A small deterministic envelope with locally verifiable bytes is a plausible substrate for PromiseGrid, but this specimen mainly solves carriage and proof-slot structure. The scenario asks for provenance, permission, double-spend prevention, and refusal semantics for a transferable promise token; those semantics are almost entirely outside this design. As a result it aligns moderately as infrastructure, but fits the scenario poorly and needs promise-first reframing.",
+    "strengths": [
+      "Very small explicit envelope: deterministic CBOR [pcid,payload,signature].",
+      "Binds protocol identifier and payload bytes together for local audit.",
+      "Unknown-pcid policy preserves bytes without falsely claiming interpretation.",
+      "Clear boundary between outer transport artifact and payload-defined semantics."
+    ],
+    "weaknesses": [
+      "Does not model issuance, transfer, redemption, refusal, or revocation promises.",
+      "Provides no direct mechanism for local provenance chains or rival-transfer handling.",
+      "Promise vocabulary is weak; the spec is protocol-centric rather than promise-first.",
+      "Generic auditors may struggle because proof semantics are hidden behind payload pcid."
+    ],
+    "risks": [
+      "Transferable-token semantics may be smuggled into opaque pcid-specific rules, weakening generic auditability.",
+      "Nothing here addresses rival transfers or local double-spend detection beyond signed-byte integrity.",
+      "Proof-family evolution coupled to payload pcid may force needless protocol churn for token designs."
+    ],
+    "open_questions": [
+      "How would a transferable-token payload express Alice's actual promise, Carol's refusal rights, and Bob's transfer claim without slipping into obligation language?",
+      "What local evidence prevents or limits double-spend when the envelope only authenticates bytes and the token scenario needs rival-transfer handling?",
+      "Does hiding proof-family semantics behind payload pcid make third-party audit too opaque for long-lived transferable instruments?"
+    ],
+    "authority_boundary": "Evidence only; evaluates an envelope specimen against token-transfer pressure, not a canonical PromiseGrid currency design.",
+    "pt_gate": {
+      "status": "pt_reframe_needed",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "Peers remain autonomous: they may reject unknown pcids and no central verifier is required by the envelope."
+      },
+      "scoped_intent": {
+        "status": "warning",
+        "note": "The design is framed as protocol mechanics and signature verification, not as scoped agent promises for issuance, transfer, acceptance, and refusal."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "The envelope itself does not let one agent promise on behalf of another."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "A signature slot can authenticate bytes, not guarantee redemption, transfer success, or future behavior."
+      },
+      "local_trust_assessment": {
+        "status": "warning",
+        "note": "Verification is locally performable, but trust criteria for transferable redemption and provenance are deferred behind pcid-specific rules instead of being made explicit."
+      },
+      "accept_use_not_obligation": {
+        "status": "warning",
+        "note": "The envelope does not impose acceptance, but receive/use/refusal semantics are not stated and would need explicit promise-level framing in the payload protocol."
+      },
+      "violations": [
+        "Not expressed in promise-first terms; issuer/holder/redeemer intents are implicit rather than explicit promises.",
+        "Local trust and refusal semantics needed by transferable promise tokens are deferred to payload-specific rules, so PT framing is incomplete at the scenario level."
+      ]
+    }
+  }
+}

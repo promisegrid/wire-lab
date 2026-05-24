@@ -1,0 +1,163 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-fonom-conditional-release-selective-send-onward-promises-promise-economy-spectrum-permissioned-capability-token-openai-gpt-5.4-medium-20260524-070634",
+  "run_group_id": "ga-canary-20260524-pt-gate-v3-successors-plus-dalor",
+  "cell_id": "ga-canary-20260524-pt-gate-v3-successors-plus-dalor-000040-SIM-fonom-conditional-release-selective-send-onward-promises--promise-economy-spectrum-permissioned-capability-token--openai-gpt-5.4-medium",
+  "sim_id": "SIM-fonom-conditional-release-selective-send-onward-promises",
+  "scenario_id": "promise-economy-spectrum-permissioned-capability-token",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260524-070634",
+  "result_path": "results/SIM-fonom-conditional-release-selective-send-onward-promises/promise-economy-spectrum-permissioned-capability-token/openai-gpt-5.4-medium/20260524-070634.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_9fc96309786c4212bc4297fda621044a",
+    "response_id": "resp_035f02fc0d2aacea006a12a47d87cc819aa62395bc72893403",
+    "input_tokens": 8327,
+    "output_tokens": 1157,
+    "cost_usd": 0.03077025
+  },
+  "source": {
+    "repo_commit": "71dae2ade16dd0c061a3c37a39979203d716f804",
+    "sim_path": "simulations/SIM-fonom-conditional-release-selective-send-onward-promises/",
+    "scenario_path": "scenarios/promise-economy-spectrum-permissioned-capability-token/promise-economy-spectrum-permissioned-capability-token.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-fonom-conditional-release-selective-send-onward-promises/README.md",
+        "sha256": "0a837d8cec99e559952fc357e9ec480391374a623737d353f792068716a43404"
+      },
+      {
+        "path": "simulations/SIM-fonom-conditional-release-selective-send-onward-promises/QUESTION.md",
+        "sha256": "0203a7fa0bd33e83e523bfd362166c129dc90b8cdb2427fa6a71c96cbf641bce"
+      },
+      {
+        "path": "scenarios/promise-economy-spectrum-permissioned-capability-token/promise-economy-spectrum-permissioned-capability-token.md",
+        "sha256": "ac5ba8f29fb13e1d693bdbfb0a5cc1c516750bf4f3a142b8dee90128d13ce2e2"
+      }
+    ],
+    "simulation_tree_hash": "cd3e88d89860fc3ab87f7d04a08a8cd16d6d8239eaba87b821f4fd07b65537d0"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 3,
+    "promisegrid_alignment": 5,
+    "auditability": 4,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 3,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 5,
+    "simplicity_durability": 4,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 40,
+    "normalized_0_100": 80,
+    "confidence_0_1": 0.84
+  },
+  "assessment": {
+    "rationale": "Strong Promise-Theory fit: the design models permissioned access as Alice's selective sending plus Bob's explicit handling promises and local trust updates. It fits the scenario only partially because the source pressure asks for capability-token-style permission and redemption semantics, while this simulation intentionally avoids centering a transferable or registry-backed token artifact.",
+    "strengths": [
+      "Very clear agent-layer boundary: permission is a send decision, not a command.",
+      "Excellent Promise-Theory vocabulary and autonomy handling.",
+      "Good local audit story through observed promise-keeping and trust updates.",
+      "Avoids exchange-rate and marketplace framing cleanly."
+    ],
+    "weaknesses": [
+      "Does not directly specify a durable capability-token artifact or redemption protocol.",
+      "Failure and misuse handling are mostly trust-update based rather than enforcement-rich.",
+      "Scenario mapping to chunk-family fetch rights is implicit rather than explicit."
+    ],
+    "risks": [
+      "Capability redemption semantics may stay underspecified compared with the scenario's token-oriented pressure.",
+      "Reliance on local trust and post-hoc evidence means misuse after redemption is detectable at best, not preventable.",
+      "Non-transferability may be social or cryptographic only if separately specified; the core sim does not fully define that boundary."
+    ],
+    "open_questions": [
+      "How should a non-transferable fetch capability be represented so Bob can redeem it without turning the design into an authority-led token registry?",
+      "What local evidence can Alice and Carol retain when Bob later forwards redeemed data despite prior onward-restraint promises?",
+      "Can chunk-family fetch rights be scoped and evolved over long time horizons without hidden central naming or revocation dependencies?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design.",
+    "pt_gate": {
+      "status": "pt_clean",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "The design keeps Alice, Bob, and later peers autonomous; Bob may promise handling behavior but is not mechanically commanded by the artifact."
+      },
+      "scoped_intent": {
+        "status": "pass",
+        "note": "Promises are relationship-scoped and concern specific handling behavior such as onward restraint, storage discipline, and deletion."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "Each onward transfer requires a new relationship-specific promise rather than one agent speaking for another."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "The simulation explicitly avoids claiming that sessions, transport, or storage can guarantee Bob's compliance."
+      },
+      "local_trust_assessment": {
+        "status": "pass",
+        "note": "Alice decides whether to send based on Bob's prior promise history and updates trust from local observations."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "Receiving or redeeming a capability can be framed as Bob's voluntary use of what Alice selectively sends, not as an imposed obligation."
+      },
+      "violations": []
+    }
+  }
+}

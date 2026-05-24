@@ -1,0 +1,162 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-fonom-conditional-release-selective-send-onward-promises-promise-economy-spectrum-transferable-promise-token-openai-gpt-5.4-medium-20260524-070634",
+  "run_group_id": "ga-canary-20260524-pt-gate-v3-successors-plus-dalor",
+  "cell_id": "ga-canary-20260524-pt-gate-v3-successors-plus-dalor-000039-SIM-fonom-conditional-release-selective-send-onward-promises--promise-economy-spectrum-transferable-promise-token--openai-gpt-5.4-medium",
+  "sim_id": "SIM-fonom-conditional-release-selective-send-onward-promises",
+  "scenario_id": "promise-economy-spectrum-transferable-promise-token",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260524-070634",
+  "result_path": "results/SIM-fonom-conditional-release-selective-send-onward-promises/promise-economy-spectrum-transferable-promise-token/openai-gpt-5.4-medium/20260524-070634.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_c0506fd0cdcd421480550406b31575a4",
+    "response_id": "resp_07c3467c2d35d9c3006a12a479c048819b8f38ec5cf0382845",
+    "input_tokens": 8326,
+    "output_tokens": 1554,
+    "cost_usd": 0.0363265
+  },
+  "source": {
+    "repo_commit": "71dae2ade16dd0c061a3c37a39979203d716f804",
+    "sim_path": "simulations/SIM-fonom-conditional-release-selective-send-onward-promises/",
+    "scenario_path": "scenarios/promise-economy-spectrum-transferable-promise-token/promise-economy-spectrum-transferable-promise-token.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-fonom-conditional-release-selective-send-onward-promises/README.md",
+        "sha256": "0a837d8cec99e559952fc357e9ec480391374a623737d353f792068716a43404"
+      },
+      {
+        "path": "simulations/SIM-fonom-conditional-release-selective-send-onward-promises/QUESTION.md",
+        "sha256": "0203a7fa0bd33e83e523bfd362166c129dc90b8cdb2427fa6a71c96cbf641bce"
+      },
+      {
+        "path": "scenarios/promise-economy-spectrum-transferable-promise-token/promise-economy-spectrum-transferable-promise-token.md",
+        "sha256": "abaf39f500a3cf675bc528e6367b46bd6ded03011700c415d728dbe7cb8b0019"
+      }
+    ],
+    "simulation_tree_hash": "cd3e88d89860fc3ab87f7d04a08a8cd16d6d8239eaba87b821f4fd07b65537d0"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 4,
+    "auditability": 3,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 3,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 5,
+    "simplicity_durability": 4,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 36,
+    "normalized_0_100": 72,
+    "confidence_0_1": 0.79
+  },
+  "assessment": {
+    "rationale": "Strong Promise-Theory framing: selective send, local trust, and per-hop onward promises fit the scenario's refusal-locality pressure. But the scenario centers transferable-token provenance and double-spend concerns, which this simulation only addresses indirectly through re-promising, so scenario coverage is partial rather than complete.",
+    "strengths": [
+      "Very strong promise-first vocabulary and autonomous-agent framing.",
+      "Clear agent/layer boundary: no session artifact or transport enforcement is pretending to command behavior.",
+      "Local refusal and trust-update semantics map well to onward-transfer decisions."
+    ],
+    "weaknesses": [
+      "Does not natively model a transferable token artifact.",
+      "Double-spend prevention is under-specified under sparse knowledge.",
+      "Audit trail for provenance across repeated transfers is only partially explained."
+    ],
+    "risks": [
+      "Transferable-token language may tempt reintroduction of bearer-right or obligation semantics outside PT.",
+      "The simulation lacks a clear local mechanism for replay or double-send detection across multiple onward transfers.",
+      "Provenance may become ambiguous if many peers re-express promises without a compact durable artifact chain."
+    ],
+    "open_questions": [
+      "Should a transferable promise token be reframed as hop-by-hop re-promising rather than a bearer-like artifact?",
+      "What local evidence would let Carol distinguish legitimate onward transfer from replay or double-spend without a central ledger?",
+      "Can provenance and refusal semantics remain small and durable if transfers span many autonomous peers?"
+    ],
+    "authority_boundary": "Evidence only; evaluates local promise semantics under token-transfer pressure without settling protocol authority or global trust.",
+    "pt_gate": {
+      "status": "pt_clean",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "Alice, Bob, and Carol remain autonomous; Bob can promise handling but is not commanded by the mechanism."
+      },
+      "scoped_intent": {
+        "status": "pass",
+        "note": "Promises are relationship-specific handling and sending intents, not universal policy assertions."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "Each onward relationship requires a new peer's own promise; no agent speaks on behalf of another."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "The design explicitly avoids claiming that promises or lower layers guarantee Bob's behavior."
+      },
+      "local_trust_assessment": {
+        "status": "pass",
+        "note": "Alice updates trust from Bob's observed promise-keeping locally rather than relying on global settlement."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "The design treats receipt and onward sending as voluntary acts, not obligations imposed by a token."
+      },
+      "violations": []
+    }
+  }
+}

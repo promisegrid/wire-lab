@@ -1,0 +1,162 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-pobod-grid-envelope-outer-promise-nested-signed-payload-peer-adoption-metadata-relationship-scoped-adoption-openai-gpt-5.4-medium-20260524-070634",
+  "run_group_id": "ga-canary-20260524-pt-gate-v3-successors-plus-dalor",
+  "cell_id": "ga-canary-20260524-pt-gate-v3-successors-plus-dalor-000005-SIM-pobod-grid-envelope-outer-promise-nested-signed-payload--peer-adoption-metadata-relationship-scoped-adoption--openai-gpt-5.4-medium",
+  "sim_id": "SIM-pobod-grid-envelope-outer-promise-nested-signed-payload",
+  "scenario_id": "peer-adoption-metadata-relationship-scoped-adoption",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260524-070634",
+  "result_path": "results/SIM-pobod-grid-envelope-outer-promise-nested-signed-payload/peer-adoption-metadata-relationship-scoped-adoption/openai-gpt-5.4-medium/20260524-070634.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_2268a7ac8fdc458ba4413f0e768f5bee",
+    "response_id": "resp_0abbea7579ac23aa006a12a392062c81989453f48641adfcfa",
+    "input_tokens": 8317,
+    "output_tokens": 1372,
+    "cost_usd": 0.03376275
+  },
+  "source": {
+    "repo_commit": "71dae2ade16dd0c061a3c37a39979203d716f804",
+    "sim_path": "simulations/SIM-pobod-grid-envelope-outer-promise-nested-signed-payload/",
+    "scenario_path": "scenarios/peer-adoption-metadata-relationship-scoped-adoption/peer-adoption-metadata-relationship-scoped-adoption.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-pobod-grid-envelope-outer-promise-nested-signed-payload/README.md",
+        "sha256": "eb57e248895158aa53182aa525888b693905ec27813ce1618dc6de1ff50998b9"
+      },
+      {
+        "path": "simulations/SIM-pobod-grid-envelope-outer-promise-nested-signed-payload/QUESTION.md",
+        "sha256": "99fce8d0035d8056937da17da995ccb1b152837053e2621909883a6cf3afbb8d"
+      },
+      {
+        "path": "scenarios/peer-adoption-metadata-relationship-scoped-adoption/peer-adoption-metadata-relationship-scoped-adoption.md",
+        "sha256": "b2a2b0fb4dfcd76dfd88a39d4bb4f4d8a85fafb0b052621a36de8692d19fe3d7"
+      }
+    ],
+    "simulation_tree_hash": "941614f1c8ec15ab226d7b287e27dfd6e06074c920a61c1a5460d449f282d27b"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 3,
+    "promisegrid_alignment": 5,
+    "auditability": 4,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 3,
+    "implementation_plausibility": 5,
+    "promise_vocabulary": 5,
+    "simplicity_durability": 4,
+    "risk_penalty": 1
+  },
+  "fitness": {
+    "raw": 42,
+    "normalized_0_100": 84,
+    "confidence_0_1": 0.88
+  },
+  "assessment": {
+    "rationale": "Strong PT-clean successor. The explicit outer promise, local trust framing, and clear inner/outer evidence boundary align well with Promise Theory and PromiseGrid goals. For this scenario, the design can carry relationship-scoped adoption statements as signed payloads that Bob presents differently to Alice and Carol, so peer-local variation need not look like equivocation. However, relationship scoping is not first-class in the envelope itself, so scenario fit depends on higher-layer payload conventions for recipient/context binding and replay resistance.",
+    "strengths": [
+      "Excellent promise-first wording with explicit sender promise at the outer layer.",
+      "Very clear separation between parsing promise, signed evidence object, and receiver-local trust decision.",
+      "Small envelope plus pCID-typed nested payload supports durable audit and evolution."
+    ],
+    "weaknesses": [
+      "Scenario support is indirect rather than native; relationship-scoped adoption semantics live above the envelope.",
+      "Failure-handling for replay, stale context, and revocation is not specified here.",
+      "May still rely on payload-schema discipline to avoid ambiguous cross-relationship interpretation."
+    ],
+    "risks": [
+      "Relationship-scoped adoption may be underspecified if the nested payload lacks explicit recipient or context binding.",
+      "A valid signed payload could be replayed into another relationship unless higher-layer schemas constrain scope.",
+      "Outer-envelope clarity does not by itself solve revocation or stale-adoption interpretation across changing relationships."
+    ],
+    "open_questions": [
+      "How is relationship scope named or bound inside the nested signed payload so Bob's promise to Alice is distinguishable from Bob's promise to Carol?",
+      "What prevents replay of a relationship-scoped adoption payload into a different peer context where the bytes still parse correctly?",
+      "Does the design need an explicit convention for recipient/context binding, or is that intentionally left to higher-layer payload schemas?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design.",
+    "pt_gate": {
+      "status": "pt_clean",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "Sender and receiver remain autonomous; the envelope expresses sender intent and receiver-local trust decisions."
+      },
+      "scoped_intent": {
+        "status": "pass",
+        "note": "The outer envelope is framed as a scoped declaration of intent about nested structure and evidence meaning."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "The sender promises only about the carried bytes and claimed structure, not on behalf of other agents."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "The design offers evidence and claims, not guaranteed adoption outcomes."
+      },
+      "local_trust_assessment": {
+        "status": "pass",
+        "note": "Trust is explicitly local: receivers decide whether to believe the outer promise and inner signature evidence."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "Receivers decide locally whether to accept or rely on the payload; the design does not impose obligation semantics."
+      },
+      "violations": []
+    }
+  }
+}

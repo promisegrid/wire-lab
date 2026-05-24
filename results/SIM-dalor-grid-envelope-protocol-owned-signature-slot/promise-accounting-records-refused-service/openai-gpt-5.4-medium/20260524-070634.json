@@ -1,0 +1,171 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-dalor-grid-envelope-protocol-owned-signature-slot-promise-accounting-records-refused-service-openai-gpt-5.4-medium-20260524-070634",
+  "run_group_id": "ga-canary-20260524-pt-gate-v3-successors-plus-dalor",
+  "cell_id": "ga-canary-20260524-pt-gate-v3-successors-plus-dalor-000019-SIM-dalor-grid-envelope-protocol-owned-signature-slot--promise-accounting-records-refused-service--openai-gpt-5.4-medium",
+  "sim_id": "SIM-dalor-grid-envelope-protocol-owned-signature-slot",
+  "scenario_id": "promise-accounting-records-refused-service",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260524-070634",
+  "result_path": "results/SIM-dalor-grid-envelope-protocol-owned-signature-slot/promise-accounting-records-refused-service/openai-gpt-5.4-medium/20260524-070634.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_707ab12e14b140bd9b4c924bbfcc2005",
+    "response_id": "resp_074f4dedec953293006a12a3eb22608199858f1f48f34a2689",
+    "input_tokens": 9022,
+    "output_tokens": 1953,
+    "cost_usd": 0.0431305
+  },
+  "source": {
+    "repo_commit": "71dae2ade16dd0c061a3c37a39979203d716f804",
+    "sim_path": "simulations/SIM-dalor-grid-envelope-protocol-owned-signature-slot/",
+    "scenario_path": "scenarios/promise-accounting-records-refused-service/promise-accounting-records-refused-service.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-dalor-grid-envelope-protocol-owned-signature-slot/README.md",
+        "sha256": "b219f5069f4e3c7fe3b236de99d374a27fc5f2cf49228a3a64552e86a60a627d"
+      },
+      {
+        "path": "simulations/SIM-dalor-grid-envelope-protocol-owned-signature-slot/QUESTION.md",
+        "sha256": "baf36ee6659fb84fe2172404b741501de2ef752992cc9106907cf5138e147f0b"
+      },
+      {
+        "path": "simulations/SIM-dalor-grid-envelope-protocol-owned-signature-slot/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "f704629434cecc9ad8fecdb62666a28fde1e9afe4b90408ab9bfb29320dd05bf"
+      },
+      {
+        "path": "scenarios/promise-accounting-records-refused-service/promise-accounting-records-refused-service.md",
+        "sha256": "9a7d47455793988cfb9b0fb045b29086ed13ee22cd0db080584e259c0aa69313"
+      }
+    ],
+    "simulation_tree_hash": "a49ebd30bfaf4e4ae29341dbeaa1b6e5da836fca5629f3f55c11abd5d992cc6c"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 2,
+    "auditability": 3,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 2,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 1,
+    "simplicity_durability": 4,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 26,
+    "normalized_0_100": 52,
+    "confidence_0_1": 0.84
+  },
+  "assessment": {
+    "rationale": "A compact three-slot envelope is plausible and durable as wire format evidence, but this simulation mainly tests proof-slot ownership, not promise-accounting semantics. It can carry a refusal record if some payload protocol defines one, yet it does not itself explain how honest refusal is recorded distinctly from failure, corruption, or timeout. Promise-Theory fit is partial because the artifact is protocol-centric rather than promise-first.",
+    "strengths": [
+      "Very small deterministic artifact: [pcid,payload,signature].",
+      "Clear unknown-pCID behavior preserves uninterpreted evidence without false verification claims.",
+      "No central registry or authority is required to carry or store the envelope.",
+      "Implementation is straightforward on small devices."
+    ],
+    "weaknesses": [
+      "Does not natively model promise-accounting records or refusal categories.",
+      "Scenario fit is weak because refusal-vs-failure distinction lives outside the envelope.",
+      "Promise vocabulary is minimal; the draft speaks in protocol/spec terms rather than agent promises.",
+      "Outer audit clarity is reduced because proof-family semantics are hidden behind the payload pCID."
+    ],
+    "risks": [
+      "Honest refusal may be underspecified and collapse into generic signed failure unless payload protocols add explicit refusal semantics.",
+      "Generic auditors may struggle because proof meaning is hidden behind the payload pCID rather than a separately declared outer proof profile.",
+      "Proof-family evolution may force new payload pCIDs, complicating long-term refusal-record comparability."
+    ],
+    "open_questions": [
+      "How would a signed refusal be represented so peers can distinguish honest refusal from timeout or corruption without extra out-of-band rules?",
+      "Does tying proof-family semantics to the payload pCID make long-term audit of refusal records too opaque for generic peers?",
+      "Would refusal/accounting protocols need frequent new pCIDs when signer or delegation rules evolve?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design.",
+    "pt_gate": {
+      "status": "pt_reframe_needed",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "Peers remain free to verify, preserve, ignore, or reject envelopes locally."
+      },
+      "scoped_intent": {
+        "status": "warning",
+        "note": "The design is protocol/spec-first, not an explicit scoped declaration of agent promises."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "It does not explicitly let one agent promise on behalf of another, though signer semantics are deferred to protocol rules."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "The draft defines evidence shape and verification boundaries, not guaranteed service outcomes."
+      },
+      "local_trust_assessment": {
+        "status": "warning",
+        "note": "Verification is still local, but trust is framed mostly as protocol-owned verification rules rather than explicit peer-local trust assessment."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "The draft does not equate receipt or use with obligation."
+      },
+      "violations": [
+        "Protocol-owned rule framing dominates over promise-first agent declarations.",
+        "Local trust is implicit in verification behavior rather than stated as explicit peer-local promise assessment."
+      ]
+    }
+  }
+}

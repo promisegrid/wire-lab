@@ -1,0 +1,162 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-dutam-grid-envelope-fixed-header-variable-body-conditional-release-geofencing-onward-restraint-chain-openai-gpt-5.4-medium-20260524-070634",
+  "run_group_id": "ga-canary-20260524-pt-gate-v3-successors-plus-dalor",
+  "cell_id": "ga-canary-20260524-pt-gate-v3-successors-plus-dalor-000012-SIM-dutam-grid-envelope-fixed-header-variable-body--conditional-release-geofencing-onward-restraint-chain--openai-gpt-5.4-medium",
+  "sim_id": "SIM-dutam-grid-envelope-fixed-header-variable-body",
+  "scenario_id": "conditional-release-geofencing-onward-restraint-chain",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260524-070634",
+  "result_path": "results/SIM-dutam-grid-envelope-fixed-header-variable-body/conditional-release-geofencing-onward-restraint-chain/openai-gpt-5.4-medium/20260524-070634.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_a71a309fe27b43328ef4988405530bcb",
+    "response_id": "resp_0bf8085d486a926a006a12a3bef6f48199b0e03003b5402b12",
+    "input_tokens": 8280,
+    "output_tokens": 1690,
+    "cost_usd": 0.03815
+  },
+  "source": {
+    "repo_commit": "71dae2ade16dd0c061a3c37a39979203d716f804",
+    "sim_path": "simulations/SIM-dutam-grid-envelope-fixed-header-variable-body/",
+    "scenario_path": "scenarios/conditional-release-geofencing-onward-restraint-chain/conditional-release-geofencing-onward-restraint-chain.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-dutam-grid-envelope-fixed-header-variable-body/README.md",
+        "sha256": "36e655e9147306232cd1d4d874dbc7792e6eab7cc359251aee487b33d4b7c7b9"
+      },
+      {
+        "path": "simulations/SIM-dutam-grid-envelope-fixed-header-variable-body/QUESTION.md",
+        "sha256": "3790d466579bdf56d98055c4a630d802ca0d3ec042c01606860ff83f073621b0"
+      },
+      {
+        "path": "scenarios/conditional-release-geofencing-onward-restraint-chain/conditional-release-geofencing-onward-restraint-chain.md",
+        "sha256": "3c84fc46e1b14de5e5c6e9b029fcb891bd655238b45e516b20eda97dabe8ff24"
+      }
+    ],
+    "simulation_tree_hash": "41922bc0db1ac263325ae5ab91a03e187f0e61c5985a29f4f566745634f65fdb"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 3,
+    "promisegrid_alignment": 4,
+    "auditability": 4,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 2,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 4,
+    "simplicity_durability": 4,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 36,
+    "normalized_0_100": 72,
+    "confidence_0_1": 0.79
+  },
+  "assessment": {
+    "rationale": "This design fits the scenario moderately well because the variable body can encode recursive onward-restraint promises while the fixed header preserves cross-peer auditability. Its main gap is that it does not itself decide where the restraint chain lives or how failures and successor promises are represented, so scenario coverage depends on the body family chosen.",
+    "strengths": [
+      "Small fixed header improves later audit compared with fully variable outer arity.",
+      "Clear separation between durable envelope contract and evolving body protocol supports migration.",
+      "Compatible with promise-first modeling because recursive release conditions can be expressed as payload-level promises between autonomous agents."
+    ],
+    "weaknesses": [
+      "Does not specify the canonical representation level for the onward-restraint chain.",
+      "Failure handling for broken or unverifiable successor promises is underspecified.",
+      "Promise wording is stronger than many protocol-first designs but still mostly structural rather than explicit payload promise text."
+    ],
+    "risks": [
+      "Conditional-release semantics may become fragmented across body families, weakening cross-protocol comparability.",
+      "Generic peers may see only that a special body exists, not whether the onward-restraint chain is complete or trustworthy.",
+      "Missing explicit failure semantics for refusal, partial forwarding, or stale successor promises could create ambiguous local evidence."
+    ],
+    "open_questions": [
+      "Which pCID-defined body family should carry onward-restraint chains so different peers can compare and audit them locally?",
+      "How are refusal, revocation, stale promises, and missing successor promises represented when Bob forwards to Carol?",
+      "Can a generic auditor tell enough from the fixed header to distinguish conditional-release payloads from ordinary transport without parsing every body family?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design.",
+    "pt_gate": {
+      "status": "pt_clean",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "The envelope format does not remove peer autonomy; Alice, Bob, and Carol can each make or refuse their own release promises."
+      },
+      "scoped_intent": {
+        "status": "pass",
+        "note": "The design states a limited intent: preserve a small stable outer contract while leaving specific conditional-release semantics to the body protocol."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "The format can carry Bob's own forwarding conditions, but it does not inherently let Bob promise Carol's behavior on Carol's behalf."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "The design improves representation and auditability but does not claim that onward restraint will be guaranteed in practice."
+      },
+      "local_trust_assessment": {
+        "status": "pass",
+        "note": "A stable header plus pCID-defined body supports local inspection and trust assessment without requiring a central registry."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "The design does not equate receipt or use of an envelope with an obligation; conditional acceptance can remain a separate body-level promise."
+      },
+      "violations": []
+    }
+  }
+}

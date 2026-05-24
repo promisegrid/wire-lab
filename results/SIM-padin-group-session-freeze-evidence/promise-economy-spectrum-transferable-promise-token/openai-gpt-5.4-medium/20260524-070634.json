@@ -1,0 +1,164 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-padin-group-session-freeze-evidence-promise-economy-spectrum-transferable-promise-token-openai-gpt-5.4-medium-20260524-070634",
+  "run_group_id": "ga-canary-20260524-pt-gate-v3-successors-plus-dalor",
+  "cell_id": "ga-canary-20260524-pt-gate-v3-successors-plus-dalor-000047-SIM-padin-group-session-freeze-evidence--promise-economy-spectrum-transferable-promise-token--openai-gpt-5.4-medium",
+  "sim_id": "SIM-padin-group-session-freeze-evidence",
+  "scenario_id": "promise-economy-spectrum-transferable-promise-token",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260524-070634",
+  "result_path": "results/SIM-padin-group-session-freeze-evidence/promise-economy-spectrum-transferable-promise-token/openai-gpt-5.4-medium/20260524-070634.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_f2b70f24430047558f4a04d0c9fb7721",
+    "response_id": "resp_0e4f3b0b525fdc55006a12a4af21b08198b77a509581d7fd5f",
+    "input_tokens": 8107,
+    "output_tokens": 1400,
+    "cost_usd": 0.03378725
+  },
+  "source": {
+    "repo_commit": "71dae2ade16dd0c061a3c37a39979203d716f804",
+    "sim_path": "simulations/SIM-padin-group-session-freeze-evidence/",
+    "scenario_path": "scenarios/promise-economy-spectrum-transferable-promise-token/promise-economy-spectrum-transferable-promise-token.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-padin-group-session-freeze-evidence/README.md",
+        "sha256": "43f96cd79379eeb2ae36319c1fd26144cc0a95a86f0c3fc2f9f48bf9024a11d5"
+      },
+      {
+        "path": "simulations/SIM-padin-group-session-freeze-evidence/QUESTION.md",
+        "sha256": "6bdde351a8bd4a900a82304f488913fc2ae0224396de55473b61698525bc1d04"
+      },
+      {
+        "path": "scenarios/promise-economy-spectrum-transferable-promise-token/promise-economy-spectrum-transferable-promise-token.md",
+        "sha256": "abaf39f500a3cf675bc528e6367b46bd6ded03011700c415d728dbe7cb8b0019"
+      }
+    ],
+    "simulation_tree_hash": "8fbe9da939de6ecdba9776b2cc20f5cb8b910b7381d306b38a6017026c170175"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 4,
+    "auditability": 5,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 2,
+    "implementation_plausibility": 5,
+    "promise_vocabulary": 4,
+    "simplicity_durability": 5,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 37,
+    "normalized_0_100": 74,
+    "confidence_0_1": 0.88
+  },
+  "assessment": {
+    "rationale": "Strong PromiseGrid-style evidence design for exact, locally auditable specimen freezing, but weak fit for transferable promise-token pressure. It helps with provenance and audit trails, yet does not address transfer permissions, double-spend prevention, or refusal semantics as first-class behavior.",
+    "strengths": [
+      "Exact CIDs and message-DAG evidence are highly auditable.",
+      "Independent checker reproduction fits local trust assessment.",
+      "Clear boundary between evidence artifact and design authority.",
+      "Small explicit artifacts are durable and implementation-plausible."
+    ],
+    "weaknesses": [
+      "Does not model a transferable token or transfer protocol.",
+      "No clear handling of permission, acceptance, or refusal semantics for transfer.",
+      "No mechanism for preventing double spend or replay across peers.",
+      "Scenario pressure about local economic transfer is mostly out of scope."
+    ],
+    "risks": [
+      "Exact frozen evidence could be misapplied as if it solved token transfer semantics when it only supports auditability.",
+      "Lack of explicit anti-replay or exclusivity mechanisms leaves double-spend-style concerns unanswered.",
+      "Scenario mismatch may overstate the design's applicability to promise-economy exchange."
+    ],
+    "open_questions": [
+      "Can the exact-artifact evidence pattern be extended to transfer provenance chains without introducing a central registry?",
+      "How would refusal semantics be recorded locally if a recipient declines to accept or honor a transferred token-like claim?",
+      "What local mechanism, if any, would prevent replay or double-spend across peers using only specimen evidence?"
+    ],
+    "authority_boundary": "Evidence only; useful for specimen-freeze evidence, not a transferable token or promise-economy settlement design.",
+    "pt_gate": {
+      "status": "pt_clean",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "Alice, Bob, and Carol independently reproduce and assess evidence; no agent is modeled as centrally controlled."
+      },
+      "scoped_intent": {
+        "status": "pass",
+        "note": "The simulation makes a narrow, explicit claim about specimen-freeze evidence for a group-session v0 slice."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "The freeze promise names artifacts and intended evidence scope rather than promising performance on behalf of other agents."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "Reproducible checks provide evidence, not guaranteed acceptance or universal freeze outcomes."
+      },
+      "local_trust_assessment": {
+        "status": "pass",
+        "note": "Trust is grounded in each peer's local reproduction of the DAG and checker results."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "The design centers on evidence that peers may inspect and use locally; it does not equate receipt or use with obligation."
+      },
+      "violations": []
+    }
+  }
+}

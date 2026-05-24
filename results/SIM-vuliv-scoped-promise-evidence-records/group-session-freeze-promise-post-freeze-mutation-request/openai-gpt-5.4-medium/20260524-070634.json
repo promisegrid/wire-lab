@@ -1,0 +1,163 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-vuliv-scoped-promise-evidence-records-group-session-freeze-promise-post-freeze-mutation-request-openai-gpt-5.4-medium-20260524-070634",
+  "run_group_id": "ga-canary-20260524-pt-gate-v3-successors-plus-dalor",
+  "cell_id": "ga-canary-20260524-pt-gate-v3-successors-plus-dalor-000062-SIM-vuliv-scoped-promise-evidence-records--group-session-freeze-promise-post-freeze-mutation-request--openai-gpt-5.4-medium",
+  "sim_id": "SIM-vuliv-scoped-promise-evidence-records",
+  "scenario_id": "group-session-freeze-promise-post-freeze-mutation-request",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260524-070634",
+  "result_path": "results/SIM-vuliv-scoped-promise-evidence-records/group-session-freeze-promise-post-freeze-mutation-request/openai-gpt-5.4-medium/20260524-070634.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_39140afccd6542de8e56bbce8895b5f8",
+    "response_id": "resp_05621e6b8ce0ba95006a12a516fb1c819b88d0a43b9b522a75",
+    "input_tokens": 8305,
+    "output_tokens": 1487,
+    "cost_usd": 0.03535175
+  },
+  "source": {
+    "repo_commit": "71dae2ade16dd0c061a3c37a39979203d716f804",
+    "sim_path": "simulations/SIM-vuliv-scoped-promise-evidence-records/",
+    "scenario_path": "scenarios/group-session-freeze-promise-post-freeze-mutation-request/group-session-freeze-promise-post-freeze-mutation-request.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-vuliv-scoped-promise-evidence-records/README.md",
+        "sha256": "e9becc2e87d9697aa51f2af9687c8e2ce176d637e96cce30813935941147ed96"
+      },
+      {
+        "path": "simulations/SIM-vuliv-scoped-promise-evidence-records/QUESTION.md",
+        "sha256": "e4f7afe8b326a37726f537ef37479983fcc898321c922ee2a9a9b28cdecd0a35"
+      },
+      {
+        "path": "scenarios/group-session-freeze-promise-post-freeze-mutation-request/group-session-freeze-promise-post-freeze-mutation-request.md",
+        "sha256": "9083e149d879dcf5890bbcc3d3bb2fcf87b4490ba1878e59a73402bd5312ee52"
+      }
+    ],
+    "simulation_tree_hash": "dad6e690288069f76dfec0e42facc6bd24c63b8ffe555e70b2edbc05959b1c35"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 4,
+    "promisegrid_alignment": 5,
+    "auditability": 5,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 4,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 5,
+    "simplicity_durability": 4,
+    "risk_penalty": 1
+  },
+  "fitness": {
+    "raw": 44,
+    "normalized_0_100": 88,
+    "confidence_0_1": 0.82
+  },
+  "assessment": {
+    "rationale": "Strong Promise-Theory fit. For a post-freeze mutation request, the sim gives a clean way to preserve old freeze evidence, record later refusal or break, and publish a new scoped promise if evolution is needed. Its main gap is that it does not fully specify the exact lineage/supersession mechanics for freeze transitions.",
+    "strengths": [
+      "Promise-first vocabulary with explicit promiser, scope, and observed keep/break outcomes.",
+      "High auditability from small durable evidence objects that cite exact records.",
+      "Good fit for preserving frozen history while allowing later independent evolution through new records instead of mutation.",
+      "Clear rejection of authority-card framing and bearer-right semantics."
+    ],
+    "weaknesses": [
+      "Does not explicitly decide when a post-freeze change becomes a new specimen versus a superseding lineage record.",
+      "Freeze semantics are supported indirectly through evidence patterns rather than a concrete freeze protocol.",
+      "Inter-app comparison may be uneven until a minimal common record/reference shape stabilizes."
+    ],
+    "risks": [
+      "Different apps may invent incompatible supersession patterns for post-freeze changes.",
+      "Without a minimal shared reference pattern, auditors may struggle to distinguish legitimate successor promises from ambiguous amendments.",
+      "Because the sim intentionally avoids a final universal envelope, interoperability could lag in early deployments."
+    ],
+    "open_questions": [
+      "Should a post-freeze breaking change be represented as a new promise record plus references to prior freeze evidence, or as a standardized supersession record?",
+      "What minimal durable linkage is needed so later peers can distinguish amendment notes from history-rewriting attempts?",
+      "How should apps encode freeze-scope boundaries so observers can tell whether a later mutation request is out of scope, refused, or a declared break?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design.",
+    "pt_gate": {
+      "status": "pt_clean",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "Promises and observations are made by specific peers; no central actor controls outcomes."
+      },
+      "scoped_intent": {
+        "status": "pass",
+        "note": "The core artifact is a scoped promise record naming boundary and promised behavior."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "The sim centers promisers and observers making their own records, not proxy promises on behalf of others."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "Observed keep/break/refusal records explicitly separate promises from guaranteed results."
+      },
+      "local_trust_assessment": {
+        "status": "pass",
+        "note": "Later peers audit promise and keep/break evidence locally rather than relying on global authority."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "The design treats evidence artifacts as publishable records for local use, not as obligations imposed on peers."
+      },
+      "violations": []
+    }
+  }
+}

@@ -1,0 +1,163 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-pobod-grid-envelope-outer-promise-nested-signed-payload-promise-economy-spectrum-permissioned-capability-token-openai-gpt-5.4-medium-20260524-070634",
+  "run_group_id": "ga-canary-20260524-pt-gate-v3-successors-plus-dalor",
+  "cell_id": "ga-canary-20260524-pt-gate-v3-successors-plus-dalor-000008-SIM-pobod-grid-envelope-outer-promise-nested-signed-payload--promise-economy-spectrum-permissioned-capability-token--openai-gpt-5.4-medium",
+  "sim_id": "SIM-pobod-grid-envelope-outer-promise-nested-signed-payload",
+  "scenario_id": "promise-economy-spectrum-permissioned-capability-token",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260524-070634",
+  "result_path": "results/SIM-pobod-grid-envelope-outer-promise-nested-signed-payload/promise-economy-spectrum-permissioned-capability-token/openai-gpt-5.4-medium/20260524-070634.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_e98dd54237934bafaa0b21f8dde04cf0",
+    "response_id": "resp_04cbc8a844153c85006a12a3a620bc81999d395ba45ebddb9c",
+    "input_tokens": 8307,
+    "output_tokens": 1474,
+    "cost_usd": 0.03517325
+  },
+  "source": {
+    "repo_commit": "71dae2ade16dd0c061a3c37a39979203d716f804",
+    "sim_path": "simulations/SIM-pobod-grid-envelope-outer-promise-nested-signed-payload/",
+    "scenario_path": "scenarios/promise-economy-spectrum-permissioned-capability-token/promise-economy-spectrum-permissioned-capability-token.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-pobod-grid-envelope-outer-promise-nested-signed-payload/README.md",
+        "sha256": "eb57e248895158aa53182aa525888b693905ec27813ce1618dc6de1ff50998b9"
+      },
+      {
+        "path": "simulations/SIM-pobod-grid-envelope-outer-promise-nested-signed-payload/QUESTION.md",
+        "sha256": "99fce8d0035d8056937da17da995ccb1b152837053e2621909883a6cf3afbb8d"
+      },
+      {
+        "path": "scenarios/promise-economy-spectrum-permissioned-capability-token/promise-economy-spectrum-permissioned-capability-token.md",
+        "sha256": "ac5ba8f29fb13e1d693bdbfb0a5cc1c516750bf4f3a142b8dee90128d13ce2e2"
+      }
+    ],
+    "simulation_tree_hash": "941614f1c8ec15ab226d7b287e27dfd6e06074c920a61c1a5460d449f282d27b"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 5,
+    "auditability": 4,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 3,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 5,
+    "simplicity_durability": 5,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 40,
+    "normalized_0_100": 80,
+    "confidence_0_1": 0.82
+  },
+  "assessment": {
+    "rationale": "Strong Promise-Theory framing: the sender explicitly promises the outer structure and the nested signature serves as evidence for the inner claim, while trust stays local. This makes the design a clean carrier for permissioned capability artifacts. But the scenario asks whether capability permission and redemption can be scoped without drifting into token-market semantics, and this simulation does not define capability-specific semantics such as non-transferability, redemption scope, revocation, or anti-exchange framing. So it is PT-clean and structurally strong, but only a partial fit to this scenario.",
+    "strengths": [
+      "Explicit outer promise improves authorship and trust boundaries.",
+      "Nested signed payload gives good local audit evidence.",
+      "Small envelope and pCID-based parsing support durable evolution.",
+      "Avoids treating unsigned outer fields as self-authenticating authority."
+    ],
+    "weaknesses": [
+      "Does not itself model capability scope or redemption behavior.",
+      "Non-transferability is not represented at the simulation level.",
+      "Little scenario-specific treatment of revocation, replay, or expiry."
+    ],
+    "risks": [
+      "Capability-token semantics may be underspecified, leading implementers to reintroduce authority-heavy or market-like interpretations above the envelope.",
+      "Without explicit non-transferability and redemption rules, the same envelope could carry tradable token designs that miss the scenario's intent.",
+      "Failure modes around stale, replayed, or revoked capabilities are not resolved by the envelope alone."
+    ],
+    "open_questions": [
+      "How is non-transferability expressed and audited in the nested payload rather than inferred from transport or issuer authority?",
+      "What local evidence lets Bob or Carol distinguish scoped redemption permission from a tradable token or exchangeable asset?",
+      "How are expiry, revocation, and stale capability redemption handled without central registry assumptions?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design.",
+    "pt_gate": {
+      "status": "pt_clean",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "Sender and receiver remain autonomous; the envelope carries promises and evidence rather than commands."
+      },
+      "scoped_intent": {
+        "status": "pass",
+        "note": "The outer-layer promise is narrowly scoped to parsing and interpretation of the nested signed payload."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "The sender promises only about the carried structure and evidence object, not on behalf of other agents."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "The envelope offers signed evidence and parse promises, not guaranteed redemption outcomes."
+      },
+      "local_trust_assessment": {
+        "status": "pass",
+        "note": "The README explicitly says receivers decide locally whether to trust the sender and nested signature evidence."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "The design frames receivers as deciding locally whether to trust and use the payload; acceptance is not modeled as obligation."
+      },
+      "violations": []
+    }
+  }
+}

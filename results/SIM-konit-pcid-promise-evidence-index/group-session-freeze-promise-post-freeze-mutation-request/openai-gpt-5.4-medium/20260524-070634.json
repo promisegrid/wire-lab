@@ -1,0 +1,162 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-konit-pcid-promise-evidence-index-group-session-freeze-promise-post-freeze-mutation-request-openai-gpt-5.4-medium-20260524-070634",
+  "run_group_id": "ga-canary-20260524-pt-gate-v3-successors-plus-dalor",
+  "cell_id": "ga-canary-20260524-pt-gate-v3-successors-plus-dalor-000070-SIM-konit-pcid-promise-evidence-index--group-session-freeze-promise-post-freeze-mutation-request--openai-gpt-5.4-medium",
+  "sim_id": "SIM-konit-pcid-promise-evidence-index",
+  "scenario_id": "group-session-freeze-promise-post-freeze-mutation-request",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260524-070634",
+  "result_path": "results/SIM-konit-pcid-promise-evidence-index/group-session-freeze-promise-post-freeze-mutation-request/openai-gpt-5.4-medium/20260524-070634.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_df622cb6528a4e21838cb22175f05b1c",
+    "response_id": "resp_05e29f85fbf08f88006a12a5461f688199abe580dee2e56978",
+    "input_tokens": 8276,
+    "output_tokens": 1704,
+    "cost_usd": 0.038339
+  },
+  "source": {
+    "repo_commit": "71dae2ade16dd0c061a3c37a39979203d716f804",
+    "sim_path": "simulations/SIM-konit-pcid-promise-evidence-index/",
+    "scenario_path": "scenarios/group-session-freeze-promise-post-freeze-mutation-request/group-session-freeze-promise-post-freeze-mutation-request.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-konit-pcid-promise-evidence-index/README.md",
+        "sha256": "9ebee1bbac1dafa81dd66c456d35cc98c1bcc2152ac436c41ce31d1fb5d2a6ef"
+      },
+      {
+        "path": "simulations/SIM-konit-pcid-promise-evidence-index/QUESTION.md",
+        "sha256": "03e6029e9943fdd935fc8c629d871c771710a27f4ccbdf5b3db727be79814960"
+      },
+      {
+        "path": "scenarios/group-session-freeze-promise-post-freeze-mutation-request/group-session-freeze-promise-post-freeze-mutation-request.md",
+        "sha256": "9083e149d879dcf5890bbcc3d3bb2fcf87b4490ba1878e59a73402bd5312ee52"
+      }
+    ],
+    "simulation_tree_hash": "227c9a080416752ab4c2fd51ae77ac84fad407f5deaf7843de114272995e423a"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 3,
+    "promisegrid_alignment": 4,
+    "auditability": 5,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 4,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 5,
+    "simplicity_durability": 4,
+    "risk_penalty": 1
+  },
+  "fitness": {
+    "raw": 42,
+    "normalized_0_100": 84,
+    "confidence_0_1": 0.88
+  },
+  "assessment": {
+    "rationale": "Strong Promise-Theory fit: a descriptive evidence index can cleanly record freeze-era promises, later mutation requests, and observed keep/break outcomes without mutating history or invoking central authority. Its main limitation in this scenario is that it audits lineage decisions better than it defines them, so it helps explain a post-freeze mutation request but does not fully specify whether the result is a new specimen, superseding pCID, or amendment.",
+    "strengths": [
+      "Promise-first wording with explicit agent, pCID, evidence, and later observation structure.",
+      "Clear evidence-only boundary avoids conformance-ledger or central-certifier framing.",
+      "Good audit trail for post-freeze mutation requests, refusals, breaks, and ambiguities."
+    ],
+    "weaknesses": [
+      "Does not itself decide whether a breaking post-freeze change becomes a new specimen, superseding pCID, or amendment.",
+      "Needs a more explicit lineage model to make freeze evolution decisions comparable across peers.",
+      "Scenario fit is stronger for auditability than for operational freeze semantics."
+    ],
+    "risks": [
+      "Users may overread the index as an authoritative freeze arbiter instead of evidence for local judgment.",
+      "Without explicit supersession/lineage conventions, different peers may encode post-freeze mutations inconsistently.",
+      "Scenario coverage depends on a separate freeze-lineage rule set; this sim alone may leave edge cases unresolved."
+    ],
+    "open_questions": [
+      "How should the index represent whether a post-freeze breaking change is a new specimen, a superseding pCID, or a rejected amendment?",
+      "How are conflicting peer observations about freeze status or mutation legitimacy indexed without implying consensus?",
+      "Should freeze-state promises themselves be first-class pCID-scoped entries?"
+    ],
+    "authority_boundary": "Evidence only; records promise and observation history without deciding freeze lineage or design authority.",
+    "pt_gate": {
+      "status": "pt_clean",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "Entries describe what specific agents promised or observed; no agent is treated as controllable by another."
+      },
+      "scoped_intent": {
+        "status": "pass",
+        "note": "Promises are explicitly scoped to pCID-referenced payloads or services and to later observations about them."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "The simulation asks who promised what and avoids making promises on behalf of other agents."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "Promises are evidenced and later observed; the index does not claim that promises guarantee conformance or success."
+      },
+      "local_trust_assessment": {
+        "status": "pass",
+        "note": "The index supplies evidence, but Alice, Bob, and Carol still make local trust judgments about keep, break, refusal, or ambiguity."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "The design records promises, evidence, and later use/observation without reframing receipt or use as obligation."
+      },
+      "violations": []
+    }
+  }
+}

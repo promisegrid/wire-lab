@@ -1,0 +1,171 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-natim-grid-envelope-nested-payload-outer-attestation-multisig-promise-economy-spectrum-permissioned-capability-token-openai-gpt-5.4-medium-20260524-070634",
+  "run_group_id": "ga-canary-20260524-pt-gate-v3-successors-plus-dalor",
+  "cell_id": "ga-canary-20260524-pt-gate-v3-successors-plus-dalor-000056-SIM-natim-grid-envelope-nested-payload-outer-attestation-multisig--promise-economy-spectrum-permissioned-capability-token--openai-gpt-5.4-medium",
+  "sim_id": "SIM-natim-grid-envelope-nested-payload-outer-attestation-multisig",
+  "scenario_id": "promise-economy-spectrum-permissioned-capability-token",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260524-070634",
+  "result_path": "results/SIM-natim-grid-envelope-nested-payload-outer-attestation-multisig/promise-economy-spectrum-permissioned-capability-token/openai-gpt-5.4-medium/20260524-070634.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_406f1f9600274782bde58c440e25fbf6",
+    "response_id": "resp_04488b03a9f58bfa006a12a4e80df8819aada1209dc6c4b442",
+    "input_tokens": 10738,
+    "output_tokens": 1641,
+    "cost_usd": 0.0417655
+  },
+  "source": {
+    "repo_commit": "71dae2ade16dd0c061a3c37a39979203d716f804",
+    "sim_path": "simulations/SIM-natim-grid-envelope-nested-payload-outer-attestation-multisig/",
+    "scenario_path": "scenarios/promise-economy-spectrum-permissioned-capability-token/promise-economy-spectrum-permissioned-capability-token.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-natim-grid-envelope-nested-payload-outer-attestation-multisig/README.md",
+        "sha256": "66d0d285a83e308582cae373211ad2a7452768eabd5e3a5c78ce68ac7dffb623"
+      },
+      {
+        "path": "simulations/SIM-natim-grid-envelope-nested-payload-outer-attestation-multisig/QUESTION.md",
+        "sha256": "1e6d7d459400f07f95ebc98b40b482465702ee815ca120074c72ae4ec4c3f250"
+      },
+      {
+        "path": "simulations/SIM-natim-grid-envelope-nested-payload-outer-attestation-multisig/protocols/grid-envelope.d/CHANGELOG.md",
+        "sha256": "42d47d8aa770957218217786ba9ba436e8c1c28496f149f3ed7dd9995de44ba0"
+      },
+      {
+        "path": "simulations/SIM-natim-grid-envelope-nested-payload-outer-attestation-multisig/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "f6f4eccac6ff705b6b2145058dadab72d8ebf8365370faf7bf2bbd5d18bb5c47"
+      },
+      {
+        "path": "scenarios/promise-economy-spectrum-permissioned-capability-token/promise-economy-spectrum-permissioned-capability-token.md",
+        "sha256": "ac5ba8f29fb13e1d693bdbfb0a5cc1c516750bf4f3a142b8dee90128d13ce2e2"
+      }
+    ],
+    "simulation_tree_hash": "668854aaae32a3dc6bf13e5909bad575b36357d7af8d362f2ebc79ab053078ea"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 4,
+    "auditability": 5,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 5,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 4,
+    "simplicity_durability": 3,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 39,
+    "normalized_0_100": 78,
+    "confidence_0_1": 0.84
+  },
+  "assessment": {
+    "rationale": "Strong PromiseGrid envelope specimen with excellent local audit separation between payload authorship and current-actor forwarding/holding claims. It helps capability-token scenarios by binding scoped permission context, but it does not itself define non-transferable capability issuance, redemption, or anti-exchange semantics, so scenario fit is only moderate.",
+    "strengths": [
+      "Explicit separation of payload-authorship proof from current-actor attestation.",
+      "Deterministic exact-byte audit retention with conservative unsupported/quarantine behavior.",
+      "Good sparse-knowledge and no-central-authority posture.",
+      "Role and constraint hooks can scope permission context without assuming exchange rates."
+    ],
+    "weaknesses": [
+      "Does not define the capability token object, issuer/redeemer binding, or redemption flow.",
+      "Non-transferability is not enforced by the envelope alone.",
+      "Nested dual-proof structure is more complex than minimal durable artifacts."
+    ],
+    "risks": [
+      "Capability-token semantics may be pushed into unspecified payload schemas, leaving non-transferability and redemption underdefined.",
+      "Generic outer references could become profile-specific complexity or ambiguity across domains.",
+      "Mandatory dual-proof handling increases implementation and interoperability burden on small devices."
+    ],
+    "open_questions": [
+      "How would a capability payload bind Alice as issuer and Bob as intended redeemer without making the capability transferable or market-like?",
+      "Are generic constraints_ref and freshness_ref sufficient for redemption, expiry, and revocation evidence in a permissioned capability flow?",
+      "What local policy rules distinguish a redeemable capability promise from a tradable token representation in this envelope?"
+    ],
+    "authority_boundary": "Evidence only; simulation-local draft envelope for comparison, not a settled PromiseGrid token or governance design.",
+    "pt_gate": {
+      "status": "pt_clean",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "Roles such as origin, holder, relay, and forwarder are expressed as each actor's own attestation."
+      },
+      "scoped_intent": {
+        "status": "pass",
+        "note": "Promises are narrowly scoped to exact payload bytes plus role, constraints, and freshness context."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "The outer attestation records the current actor's role promise rather than speaking for other agents."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "Attestations authenticate claims and context but do not guarantee fetch success or policy acceptance."
+      },
+      "local_trust_assessment": {
+        "status": "pass",
+        "note": "Verification and acceptance are explicitly local, with unsupported/quarantine outcomes preserved."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "The design supports locally assessed use/redemption and does not equate receipt with obligation."
+      },
+      "violations": []
+    }
+  }
+}

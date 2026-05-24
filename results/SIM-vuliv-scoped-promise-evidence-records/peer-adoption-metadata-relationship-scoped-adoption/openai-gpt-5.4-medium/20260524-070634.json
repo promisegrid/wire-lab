@@ -1,0 +1,163 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-vuliv-scoped-promise-evidence-records-peer-adoption-metadata-relationship-scoped-adoption-openai-gpt-5.4-medium-20260524-070634",
+  "run_group_id": "ga-canary-20260524-pt-gate-v3-successors-plus-dalor",
+  "cell_id": "ga-canary-20260524-pt-gate-v3-successors-plus-dalor-000061-SIM-vuliv-scoped-promise-evidence-records--peer-adoption-metadata-relationship-scoped-adoption--openai-gpt-5.4-medium",
+  "sim_id": "SIM-vuliv-scoped-promise-evidence-records",
+  "scenario_id": "peer-adoption-metadata-relationship-scoped-adoption",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260524-070634",
+  "result_path": "results/SIM-vuliv-scoped-promise-evidence-records/peer-adoption-metadata-relationship-scoped-adoption/openai-gpt-5.4-medium/20260524-070634.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_3b93614496764187942b6e7cfd42b7b9",
+    "response_id": "resp_0d57308b15aea401006a12a51051008199a4020a84afc1f42c",
+    "input_tokens": 8302,
+    "output_tokens": 1159,
+    "cost_usd": 0.0307545
+  },
+  "source": {
+    "repo_commit": "71dae2ade16dd0c061a3c37a39979203d716f804",
+    "sim_path": "simulations/SIM-vuliv-scoped-promise-evidence-records/",
+    "scenario_path": "scenarios/peer-adoption-metadata-relationship-scoped-adoption/peer-adoption-metadata-relationship-scoped-adoption.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-vuliv-scoped-promise-evidence-records/README.md",
+        "sha256": "e9becc2e87d9697aa51f2af9687c8e2ce176d637e96cce30813935941147ed96"
+      },
+      {
+        "path": "simulations/SIM-vuliv-scoped-promise-evidence-records/QUESTION.md",
+        "sha256": "e4f7afe8b326a37726f537ef37479983fcc898321c922ee2a9a9b28cdecd0a35"
+      },
+      {
+        "path": "scenarios/peer-adoption-metadata-relationship-scoped-adoption/peer-adoption-metadata-relationship-scoped-adoption.md",
+        "sha256": "b2a2b0fb4dfcd76dfd88a39d4bb4f4d8a85fafb0b052621a36de8692d19fe3d7"
+      }
+    ],
+    "simulation_tree_hash": "dad6e690288069f76dfec0e42facc6bd24c63b8ffe555e70b2edbc05959b1c35"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 4,
+    "promisegrid_alignment": 5,
+    "auditability": 5,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 4,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 5,
+    "simplicity_durability": 4,
+    "risk_penalty": 1
+  },
+  "fitness": {
+    "raw": 43,
+    "normalized_0_100": 86,
+    "confidence_0_1": 0.87
+  },
+  "assessment": {
+    "rationale": "Strong fit. The simulation's core move from claim cards to scoped promise, reference, and observation records maps well to Bob presenting different relationship-scoped behavior toward Alice and Carol without turning variation into equivocation. It remains promise-first, locally auditable, and durable, though the scenario's specific adoption-metadata mechanics are only indirectly specified.",
+    "strengths": [
+      "Promise-first artifact model matches Promise Theory fundamentals closely.",
+      "Relationship-specific scope can represent different Bob-\u003eAlice and Bob-\u003eCarol promises cleanly.",
+      "Explicit keep/break/refusal/timeout evidence gives strong audit trails for later local trust decisions.",
+      "Small durable evidence objects suit long-lived, decentralized audit use."
+    ],
+    "weaknesses": [
+      "Not specifically designed around adoption-metadata negotiation, so some scenario mechanics remain implicit.",
+      "No final universal record envelope yet, which leaves interoperability details unresolved.",
+      "Boundary between private relationship context and publishable audit evidence needs more explicit treatment."
+    ],
+    "risks": [
+      "Relationship-scoped records may still leak sensitive social or protocol metadata if published too broadly.",
+      "Without a crisp envelope for scope expression, different implementations could drift and make cross-peer audit harder.",
+      "Observers may over-interpret evidence records as portable authority rather than local trust input."
+    ],
+    "open_questions": [
+      "How are relationship scopes named so Alice-local and Carol-local interpretations remain durable without implying a global profile registry?",
+      "What minimal promise-reference shape is sufficient to distinguish per-peer adoption promises from broader peer identity claims?",
+      "How are privacy leaks limited when relationship-scoped evidence records are later audited by third parties?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design.",
+    "pt_gate": {
+      "status": "pt_clean",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "The design centers promisers and observers as separate autonomous agents publishing their own records."
+      },
+      "scoped_intent": {
+        "status": "pass",
+        "note": "The simulation explicitly emphasizes scoped promises and scoped evidence, which fits relationship-specific adoption context well."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "Peers publish their own promises and their own observations; the artifact does not inherently let one agent promise on behalf of another."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "Observed outcome records acknowledge promises may be kept, broken, refused, retried, or time out; no guarantee is implied."
+      },
+      "local_trust_assessment": {
+        "status": "pass",
+        "note": "Observed keep/break/refusal records support peer-local trust decisions rather than global trust assignment."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "Relationship-scoped use or adoption can be framed as a peer's local choice to accept or rely on Bob's promise, not as an imposed obligation."
+      },
+      "violations": []
+    }
+  }
+}

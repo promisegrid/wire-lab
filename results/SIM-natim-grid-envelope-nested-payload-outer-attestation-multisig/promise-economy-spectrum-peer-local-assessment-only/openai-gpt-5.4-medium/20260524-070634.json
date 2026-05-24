@@ -1,0 +1,171 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-natim-grid-envelope-nested-payload-outer-attestation-multisig-promise-economy-spectrum-peer-local-assessment-only-openai-gpt-5.4-medium-20260524-070634",
+  "run_group_id": "ga-canary-20260524-pt-gate-v3-successors-plus-dalor",
+  "cell_id": "ga-canary-20260524-pt-gate-v3-successors-plus-dalor-000049-SIM-natim-grid-envelope-nested-payload-outer-attestation-multisig--promise-economy-spectrum-peer-local-assessment-only--openai-gpt-5.4-medium",
+  "sim_id": "SIM-natim-grid-envelope-nested-payload-outer-attestation-multisig",
+  "scenario_id": "promise-economy-spectrum-peer-local-assessment-only",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260524-070634",
+  "result_path": "results/SIM-natim-grid-envelope-nested-payload-outer-attestation-multisig/promise-economy-spectrum-peer-local-assessment-only/openai-gpt-5.4-medium/20260524-070634.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_1afa824dd25f4e83b2edc918ceed345e",
+    "response_id": "resp_0487008442769b47006a12a4bafc2c81989337e654853f16e9",
+    "input_tokens": 10744,
+    "output_tokens": 1604,
+    "cost_usd": 0.041258
+  },
+  "source": {
+    "repo_commit": "71dae2ade16dd0c061a3c37a39979203d716f804",
+    "sim_path": "simulations/SIM-natim-grid-envelope-nested-payload-outer-attestation-multisig/",
+    "scenario_path": "scenarios/promise-economy-spectrum-peer-local-assessment-only/promise-economy-spectrum-peer-local-assessment-only.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-natim-grid-envelope-nested-payload-outer-attestation-multisig/README.md",
+        "sha256": "66d0d285a83e308582cae373211ad2a7452768eabd5e3a5c78ce68ac7dffb623"
+      },
+      {
+        "path": "simulations/SIM-natim-grid-envelope-nested-payload-outer-attestation-multisig/QUESTION.md",
+        "sha256": "1e6d7d459400f07f95ebc98b40b482465702ee815ca120074c72ae4ec4c3f250"
+      },
+      {
+        "path": "simulations/SIM-natim-grid-envelope-nested-payload-outer-attestation-multisig/protocols/grid-envelope.d/CHANGELOG.md",
+        "sha256": "42d47d8aa770957218217786ba9ba436e8c1c28496f149f3ed7dd9995de44ba0"
+      },
+      {
+        "path": "simulations/SIM-natim-grid-envelope-nested-payload-outer-attestation-multisig/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "f6f4eccac6ff705b6b2145058dadab72d8ebf8365370faf7bf2bbd5d18bb5c47"
+      },
+      {
+        "path": "scenarios/promise-economy-spectrum-peer-local-assessment-only/promise-economy-spectrum-peer-local-assessment-only.md",
+        "sha256": "447986251c900f650f4b14b03e1660192d3e24b69dc82f9fbd1b61390866a5e6"
+      }
+    ],
+    "simulation_tree_hash": "668854aaae32a3dc6bf13e5909bad575b36357d7af8d362f2ebc79ab053078ea"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 4,
+    "promisegrid_alignment": 5,
+    "auditability": 5,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 5,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 4,
+    "simplicity_durability": 3,
+    "risk_penalty": 1
+  },
+  "fitness": {
+    "raw": 43,
+    "normalized_0_100": 86,
+    "confidence_0_1": 0.84
+  },
+  "assessment": {
+    "rationale": "Strong PT-compatible envelope specimen for peer-local assessment: it avoids token dependence, makes current actor claims auditable, and keeps trust decisions local. It is not a full promise-economy design, so scenario fit is good but not complete.",
+    "strengths": [
+      "Excellent local auditability with exact-byte retention and separate payload-versus-relay verification.",
+      "Clear layer boundaries between payload authorship and current actor role promise.",
+      "Conservative unsupported/quarantine behavior fits sparse knowledge and long-term evolution.",
+      "No token field or central registry is required for peers to make local pull/keep/advertise judgments."
+    ],
+    "weaknesses": [
+      "Does not itself define the storage or advertisement payload semantics needed for the full peer-local promise-economy scenario.",
+      "Promise vocabulary is mixed with attestation/proof framing rather than consistently using explicit promise statements.",
+      "Nested payload plus outer multisig reduces simplicity and may be heavy for very small implementations."
+    ],
+    "risks": [
+      "Dual-proof nesting and mandatory outer multisig add complexity versus simpler durable envelopes.",
+      "Role attestations may still be read as authority-like endorsements if future profiles drift away from promise-first wording.",
+      "Generic constraints_ref and freshness_ref hooks need careful profile discipline to avoid ambiguous local interpretation."
+    ],
+    "open_questions": [
+      "Does the outer holder/relay attestation meaningfully improve peer-local keep/advertise decisions in practice, or is it still too indirect without a storage-specific payload profile?",
+      "Should a future profile add a more explicit promise-form transcript so role attestations read less like generic conformance evidence and more like scoped intent?",
+      "How should stale or conflicting freshness references be compared across peers with only partial local knowledge?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design.",
+    "pt_gate": {
+      "status": "pt_clean",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "Actors make their own signed role attestations, and receivers make local accept/quarantine/reject decisions."
+      },
+      "scoped_intent": {
+        "status": "pass",
+        "note": "The outer transcript binds exact payload bytes to a specific role plus constraints and freshness references, which is a scoped declaration of intent."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "Payload authorship and current relay/holder/forwarder claims are separated, avoiding one agent promising on behalf of another."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "The specimen authenticates claims and context but does not guarantee storage, delivery, or future behavior."
+      },
+      "local_trust_assessment": {
+        "status": "pass",
+        "note": "Trust is explicitly local: peers retain exact bytes, evaluate proofs locally, and apply local policy to role, constraints, and freshness."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "The design supports local verification and policy decisions without turning receipt or use into an obligation."
+      },
+      "violations": []
+    }
+  }
+}

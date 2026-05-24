@@ -1,0 +1,164 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-vuliv-scoped-promise-evidence-records-conditional-release-geofencing-onward-restraint-chain-openai-gpt-5.4-medium-20260524-070634",
+  "run_group_id": "ga-canary-20260524-pt-gate-v3-successors-plus-dalor",
+  "cell_id": "ga-canary-20260524-pt-gate-v3-successors-plus-dalor-000060-SIM-vuliv-scoped-promise-evidence-records--conditional-release-geofencing-onward-restraint-chain--openai-gpt-5.4-medium",
+  "sim_id": "SIM-vuliv-scoped-promise-evidence-records",
+  "scenario_id": "conditional-release-geofencing-onward-restraint-chain",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260524-070634",
+  "result_path": "results/SIM-vuliv-scoped-promise-evidence-records/conditional-release-geofencing-onward-restraint-chain/openai-gpt-5.4-medium/20260524-070634.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_9306584475074526885656dd33d3c60b",
+    "response_id": "resp_0a04900dfe42c9b2006a12a50933bc8198b22fd14c470cea49",
+    "input_tokens": 8332,
+    "output_tokens": 1218,
+    "cost_usd": 0.031633
+  },
+  "source": {
+    "repo_commit": "71dae2ade16dd0c061a3c37a39979203d716f804",
+    "sim_path": "simulations/SIM-vuliv-scoped-promise-evidence-records/",
+    "scenario_path": "scenarios/conditional-release-geofencing-onward-restraint-chain/conditional-release-geofencing-onward-restraint-chain.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-vuliv-scoped-promise-evidence-records/README.md",
+        "sha256": "e9becc2e87d9697aa51f2af9687c8e2ce176d637e96cce30813935941147ed96"
+      },
+      {
+        "path": "simulations/SIM-vuliv-scoped-promise-evidence-records/QUESTION.md",
+        "sha256": "e4f7afe8b326a37726f537ef37479983fcc898321c922ee2a9a9b28cdecd0a35"
+      },
+      {
+        "path": "scenarios/conditional-release-geofencing-onward-restraint-chain/conditional-release-geofencing-onward-restraint-chain.md",
+        "sha256": "3c84fc46e1b14de5e5c6e9b029fcb891bd655238b45e516b20eda97dabe8ff24"
+      }
+    ],
+    "simulation_tree_hash": "dad6e690288069f76dfec0e42facc6bd24c63b8ffe555e70b2edbc05959b1c35"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 4,
+    "promisegrid_alignment": 5,
+    "auditability": 5,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 3,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 5,
+    "simplicity_durability": 4,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 41,
+    "normalized_0_100": 82,
+    "confidence_0_1": 0.84
+  },
+  "assessment": {
+    "rationale": "Strong Promise-Theory fit. The simulation can represent Alice's conditional release promise, Bob's onward-restraint promise, Carol's matching promise, and later keep/break evidence with durable local records. It is especially strong for auditability and local trust. Main limitation: it records the restraint chain more cleanly than it defines the operational composition semantics of that chain, so scenario fit is good rather than complete.",
+    "strengths": [
+      "Promise-first vocabulary with promiser, scope, and observed keep/break evidence.",
+      "High auditability for later review of who promised what and what was observed.",
+      "Supports sparse local knowledge without requiring central registry or trust authority.",
+      "Small durable artifacts fit long-term evidence retention better than claim-card bundles."
+    ],
+    "weaknesses": [
+      "Does not by itself choose the best layer for representing the recursive restraint graph.",
+      "Failure handling is evidentiary rather than preventive; it cannot stop onward misuse.",
+      "Cross-hop composition rules may vary between apps unless a narrower envelope emerges."
+    ],
+    "risks": [
+      "Implementers may accidentally treat cited promise-evidence records as authorization artifacts instead of evidence.",
+      "Recursive onward-restraint chains can become ambiguous if record granularity is not fixed.",
+      "Leakage or off-protocol forwarding remains detectable only after partial observation, not preventable by the evidence model itself."
+    ],
+    "open_questions": [
+      "What is the durable unit for the onward-restraint chain: per object, per feed/transport, or per session?",
+      "How should Bob cite Carol's matching promise without implying Bob can promise on Carol's behalf?",
+      "How are refusal, timeout, and suspected onward leak recorded across hops without central state?",
+      "How should updates or expiry of forwarding conditions be represented for long-lived artifacts?"
+    ],
+    "authority_boundary": "Evidence records inform local trust and audit of onward-restraint promises; they do not compel forwarding behavior, guarantee restraint, or settle final PromiseGrid protocol design.",
+    "pt_gate": {
+      "status": "pt_clean",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "Alice, Bob, and Carol each make their own scoped promises and observations; the design does not collapse them into a central controller."
+      },
+      "scoped_intent": {
+        "status": "pass",
+        "note": "Promises are explicitly scoped to behavior, protocol boundary, and evidence object, which fits the onward-restraint case well."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "The design centers promiser-authored promises and peer-authored observations, avoiding Bob promising Carol's behavior."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "Observed keep/break/refusal/timeout records support assessment after the fact and do not claim guaranteed restraint."
+      },
+      "local_trust_assessment": {
+        "status": "pass",
+        "note": "The core value is local audit evidence for later trust decisions rather than a global trust ledger."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "Peers may publish, receive, and assess promise-evidence records locally; use of a record is not framed as an obligation to comply."
+      },
+      "violations": []
+    }
+  }
+}

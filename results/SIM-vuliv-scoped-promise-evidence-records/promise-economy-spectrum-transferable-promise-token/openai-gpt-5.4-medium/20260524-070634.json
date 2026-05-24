@@ -1,0 +1,162 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-vuliv-scoped-promise-evidence-records-promise-economy-spectrum-transferable-promise-token-openai-gpt-5.4-medium-20260524-070634",
+  "run_group_id": "ga-canary-20260524-pt-gate-v3-successors-plus-dalor",
+  "cell_id": "ga-canary-20260524-pt-gate-v3-successors-plus-dalor-000063-SIM-vuliv-scoped-promise-evidence-records--promise-economy-spectrum-transferable-promise-token--openai-gpt-5.4-medium",
+  "sim_id": "SIM-vuliv-scoped-promise-evidence-records",
+  "scenario_id": "promise-economy-spectrum-transferable-promise-token",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260524-070634",
+  "result_path": "results/SIM-vuliv-scoped-promise-evidence-records/promise-economy-spectrum-transferable-promise-token/openai-gpt-5.4-medium/20260524-070634.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_cd0b19791c4c49798fe05e17089aa156",
+    "response_id": "resp_09a943f825549272006a12a51b965c81998e5a20a8e285f84d",
+    "input_tokens": 8291,
+    "output_tokens": 1688,
+    "cost_usd": 0.03814125
+  },
+  "source": {
+    "repo_commit": "71dae2ade16dd0c061a3c37a39979203d716f804",
+    "sim_path": "simulations/SIM-vuliv-scoped-promise-evidence-records/",
+    "scenario_path": "scenarios/promise-economy-spectrum-transferable-promise-token/promise-economy-spectrum-transferable-promise-token.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-vuliv-scoped-promise-evidence-records/README.md",
+        "sha256": "e9becc2e87d9697aa51f2af9687c8e2ce176d637e96cce30813935941147ed96"
+      },
+      {
+        "path": "simulations/SIM-vuliv-scoped-promise-evidence-records/QUESTION.md",
+        "sha256": "e4f7afe8b326a37726f537ef37479983fcc898321c922ee2a9a9b28cdecd0a35"
+      },
+      {
+        "path": "scenarios/promise-economy-spectrum-transferable-promise-token/promise-economy-spectrum-transferable-promise-token.md",
+        "sha256": "abaf39f500a3cf675bc528e6367b46bd6ded03011700c415d728dbe7cb8b0019"
+      }
+    ],
+    "simulation_tree_hash": "dad6e690288069f76dfec0e42facc6bd24c63b8ffe555e70b2edbc05959b1c35"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 5,
+    "auditability": 5,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 3,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 5,
+    "simplicity_durability": 5,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 41,
+    "normalized_0_100": 82,
+    "confidence_0_1": 0.84
+  },
+  "assessment": {
+    "rationale": "Strong Promise-Theory fit: the simulation cleanly reframes transferable-token pressure into scoped promises plus local evidence. It is highly auditable and durable, but only partially fits this scenario because transferable permission and double-spend prevention are mostly deferred rather than solved.",
+    "strengths": [
+      "Excellent promise-first vocabulary and PT boundary discipline.",
+      "Small durable artifacts support later human or LLM audit.",
+      "Clear handling of refusal, timeout, keep, and break as evidence rather than authority."
+    ],
+    "weaknesses": [
+      "Weak direct support for transferable token semantics.",
+      "No clear local mechanism for double-spend prevention beyond later conflicting evidence.",
+      "Permission on transfer is ambiguous unless Alice pre-scopes promises for successor recipients."
+    ],
+    "risks": [
+      "Readers may still smuggle bearer-token expectations back into promise references.",
+      "Without an explicit anti-conflict pattern, multiple transfers of the same referenced promise may be hard to assess locally.",
+      "Scenario pressure may demand recipient-facing redemption semantics that this simulation intentionally leaves out."
+    ],
+    "open_questions": [
+      "Can a promise-evidence record express explicitly transferable scope without implying Alice promises to unknown successors?",
+      "What local pattern, if any, would let Carol detect conflicting transfers or double-spend attempts without a central ledger?",
+      "Should transferable redemption be modeled as a fresh promise by each recipient-facing redeemer rather than as a moved token?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design.",
+    "pt_gate": {
+      "status": "pt_clean",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "Agents remain autonomous; Bob's transfer of evidence does not compel Alice or Carol."
+      },
+      "scoped_intent": {
+        "status": "pass",
+        "note": "Promises are explicitly scoped to promiser, boundary, and behavior."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "The design avoids letting Bob create or extend Alice's promise merely by transferring an artifact."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "Observed keep/break/refusal records acknowledge uncertainty and non-guaranteed outcomes."
+      },
+      "local_trust_assessment": {
+        "status": "pass",
+        "note": "Trust is based on locally held promise, reference, and keep/break evidence."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "The design treats possession or reference as evidence for local assessment, not as an obligation on Alice or Carol."
+      },
+      "violations": []
+    }
+  }
+}
