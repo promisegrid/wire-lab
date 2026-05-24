@@ -55,6 +55,10 @@ adds successor sims instead of rewriting the scored directories in place. These
 successors are the preferred evolution path when later PT-gated scoring or
 breeding needs a cleaner specimen to compare against the older design.
 
+`DI-gobul` also marks the predecessor sims below as `question-home`
+non-breeding specimens via `SIM-META.json`, so they remain scoreable historical
+evidence without silently re-entering default GA parent selection.
+
 | Predecessor | Successor simulation | PT-clean rewrite focus |
 |---|---|---|
 | `SIM-gibut-conditional-release-group-session-local/` | `SIM-fonom-conditional-release-selective-send-onward-promises/` | Replace session-local policy framing with selective sending plus onward-handling promises |

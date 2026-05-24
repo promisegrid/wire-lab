@@ -137,6 +137,32 @@ new `simulations/SIM-pobod-grid-envelope-outer-promise-nested-signed-payload/`;
 new `simulations/SIM-dutam-grid-envelope-fixed-header-variable-body/`
 Supersedes: DI-movur
 
+ID: DI-gobul
+Date: 2026-05-23 23:25:00
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Mark the five PT-drifting predecessor sims as non-breeding
+`question-home` specimens by adding `SIM-META.json` files to their simulation
+roots. The affected predecessors are `SIM-gibut-conditional-release-group-session-local`,
+`SIM-savak-scoped-claim-card-audit-ledger`,
+`SIM-tizad-scoped-conformance-citation-ledger`,
+`SIM-janov-grid-envelope-layer-pcid-nested-signed-payload`, and
+`SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields`.
+Intent: Once PT-clean successor sims exist, the predecessor specimens should
+remain available as scored historical evidence and question homes, but they
+should stop silently re-entering default GA parent selection.
+Constraints: Do not rewrite the predecessor design docs. Preserve their scored
+history and keep them scoreable. Exclude them from default breeding through
+standard `SIM-META.json` role handling rather than special-case runner code.
+Affects: `protocols/wire-lab.d/TODO/TODO-lugag-promise-theory-ga-prompt-scenario-and-rescore-correction.md`;
+`simulations/README.md`;
+new `simulations/SIM-gibut-conditional-release-group-session-local/SIM-META.json`;
+new `simulations/SIM-savak-scoped-claim-card-audit-ledger/SIM-META.json`;
+new `simulations/SIM-tizad-scoped-conformance-citation-ledger/SIM-META.json`;
+new `simulations/SIM-janov-grid-envelope-layer-pcid-nested-signed-payload/SIM-META.json`;
+new `simulations/SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields/SIM-META.json`
+Supersedes: DI-tavaz
+
 ## Scope
 
 This TODO covers:
