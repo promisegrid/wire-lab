@@ -161,13 +161,16 @@ The following new `TODO-tugoz` specimens are active alternatives, not current
 consensus. They exist so future scored evidence can compare three
 signature-structure families (atproto-like, Ceramic-like, UCAN-like) and three
 Gordian-oriented families without silently dragging current guide prose toward a
-winner before results exist. Source: `DI-nohir`.
+winner before results exist. `SIM-dalor` extends this alternatives bucket with a
+three-slot protocol-owned signature-slot probe. Source: `DI-nohir`;
+`DI-kukuk`.
 
 | Simulation | Why it exists |
 |---|---|
 | `SIM-pamap-grid-envelope-signable-view-atproto-like` | Direct test of proof in a reserved payload slot with a named signable projection. |
 | `SIM-jumav-grid-envelope-wrapper-proof-ceramic-like` | Direct test of wrapper-proof-over-link structure. |
 | `SIM-mipum-grid-envelope-signed-body-envelope-ucan-like` | Direct test of explicit signed-body plus sibling proof shape. |
+| `SIM-dalor-grid-envelope-protocol-owned-signature-slot` | Direct test of a three-slot outer envelope where the proof stays in the outer sibling slot but the payload `pcid` defines varsig/multisig-style proof rules. |
 | `SIM-fitin-gordian-payload-wrapper` | Tests whether Gordian structure belongs in a payload/wrapper family rather than the universal grid. |
 | `SIM-suzuf-gordian-universal-envelope-negative-control` | Tests the cost of making Gordian structure universal. |
 | `SIM-vizan-gordian-selective-disclosure` | Tests whether selective-disclosure pressure justifies richer Gordian-style payload structure. |

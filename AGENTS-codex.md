@@ -48,16 +48,16 @@ Do not skip these. Subsequent instructions assume you have read them.
 
 - Steve  : stevegt@t7a.org (Steve Traugott)
 - Bot    : stevegt+ppx@t7a.org (stevegt-via-perplexity)
-- You    : you act AS Steve. You are Steve's local agent. Commits you
-           make on Steve's behalf use Steve's identity. Never use the
-           bot's identity.
+- You    : you are the local Codex agent. Use the actual local git author
+           identity configured in this clone; do not impersonate Steve by
+           default, and never use the bot's identity for ordinary local work.
 
-Confirm Steve's local git identity is set correctly:
+Confirm the local git identity is set to the real local operator:
 
-  git config user.name   # should be "Steve Traugott" (or similar)
-  git config user.email  # should be "stevegt@t7a.org"
+  git config user.name   # should be the local human operator's real name
+  git config user.email  # should be the local human operator's real email
 
-If not, stop and tell Steve.
+If not, stop and ask the user to set a real local identity before committing.
 
 # Branch model (locked decisions; do not relitigate)
 
@@ -78,9 +78,9 @@ DROPPED the GitHub "Require a pull request before merging" rule
 (see DI-001-20260428-195701). Do not open GitHub pull requests. Merge
 by direct push to main.
 
-# What you do for Steve
+# What you do for the local operator
 
-Steve will give you tasks of three kinds. Handle each as follows.
+The local operator will give you tasks of three kinds. Handle each as follows.
 
 ## Kind 1: review-and-converge an inbound ppx/{twig} branch
 
@@ -162,10 +162,10 @@ Steps:
      the bot's branch yourself — comments come back as chat or as
      additional commits the bot will pull.
 
-## Kind 2: Steve-authored work on stevegt/{twig}
+## Kind 2: local-author work in this clone
 
-Trigger: Steve says something like "I want to add X" or "let's draft
-a TE for Y" without referencing a bot branch.
+Trigger: the local operator says something like "I want to add X" or "let's
+draft a TE for Y" without referencing a bot branch.
 
 Steps:
   a. Determine if this is trivial or non-trivial.
@@ -179,14 +179,15 @@ Steps:
      - Identify the decision being made.
      - Run a TE if multiple plausible designs remain. Write the TE
        doc under docs/thought-experiments/ with the right filename.
-     - Ask Steve multiple-choice DF questions for the surviving
+     - Ask the local operator multiple-choice DF questions for the surviving
        alternatives.
-     - When Steve answers, write the DI into the relevant
+     - When the local operator answers, write the DI into the relevant
        protocols/<slug>.d/TODO/TODO-<handle>-<slug>.md (harness-level
        TODOs live under protocols/wire-lab.d/TODO/). If no TODO file
        fits, propose creating a new one (and update
        protocols/wire-lab.d/TODO/TODO.md).
-     - Write a DR with State: decided (since Steve decided in chat),
+     - Write a DR with State: decided (since the local operator decided in
+       chat),
        Linked DI, all required fields.
 
   c. Make the actual changes (code, spec, docs).
@@ -203,9 +204,9 @@ Steps:
   g. Push to stevegt/{twig} (or directly to main, if Steve prefers
      and the change is trivial).
 
-  h. If pushed to stevegt/{twig}, ask Steve whether to merge to main
-     now or hold for further work. Steve is the only one allowed to
-     push main.
+  h. If pushed to `stevegt/{twig}`, ask Steve whether to merge to main
+     now or hold for further work. Steve is still the only one allowed to
+     push main under the current branch-protection rules.
 
 ## Kind 3: open questions / DRs that don't yet exist
 
@@ -244,8 +245,9 @@ untouched, and cites the relevant DR/DI provenance.
 
 In addition to AGENTS.md's repo-wide prohibitions:
 
-- Do not use the bot's git identity. You act as Steve; commits you make
-  on Steve's behalf use Steve's identity. (DI-001-20260428-195700)
+- Do not use the bot's git identity for ordinary local Codex work. Use the
+  actual configured local human identity in this clone, and do not impersonate
+  Steve by default. (DI-nufit)
 - Do not push to `main` without Steve's explicit approval for that
   action. When identity matters at the wire level, Steve must be the
   logged-in actor. (DI-001-20260428-195701)
@@ -293,7 +295,7 @@ prefers an extra round of clarification over a wrong commit.
 # First action
 
 After you finish reading the orientation files at the top of this
-prompt, post a short message to Steve confirming:
+prompt, post a short message to the local operator confirming:
 
   - which AGENTS.md sections you've internalized,
   - the current branch,
@@ -301,4 +303,4 @@ prompt, post a short message to Steve confirming:
   - the most recent ppx/{twig} branch on origin (if any) that is
     ahead of main and is therefore awaiting review.
 
-Then wait for Steve's first task.
+Then wait for the local operator's first task.

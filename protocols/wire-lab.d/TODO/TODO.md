@@ -48,6 +48,7 @@ minted after that date carry only the proquint handle.
 | [TODO-tapur](./TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md) | 2026-05-19 | GA runner JSON fitness and child sim search | — |
 | [TODO-lugag](./TODO-lugag-promise-theory-ga-prompt-scenario-and-rescore-correction.md) | 2026-05-23 | Promise Theory GA prompt, scenario, and rescore correction | — |
 | [TODO-tugoz](./TODO-tugoz-grid-envelope-signable-view-and-gordian-comparison-sims.md) | 2026-05-22 | Grid-envelope signable-view and Gordian comparison sims | — |
+| [TODO-mujad](./TODO-mujad-grid-envelope-protocol-owned-signature-slot.md) | 2026-05-23 | Grid-envelope protocol-owned signature slot | — |
 | [TODO-dudok](./TODO-dudok-ga-runner-openai-batch-mode.md) | 2026-05-19 | GA runner OpenAI Batch mode and large-run orchestration | — |
 | [TODO-turog](./TODO-turog-te-41-group-session-freeze-procedure.md) | 2026-05-07 | TE-41 group-session freeze procedure **(closed: active successor work closed by DI-rurab / DI-bomud)** | `TODO-26` / `TODO-20260507-002306` |
 | [TODO-duvuk](./TODO-duvuk-te-42-filename-cid-cascade-policy.md) | 2026-05-07 | TE-42 filename / CID-cascade policy **(closed: active successor work closed by DI-rurab / DI-bomud)** | `TODO-27` / `TODO-20260507-002306` |
@@ -61,6 +62,7 @@ minted after that date carry only the proquint handle.
 | [TODO-fonuz](./TODO-fonuz-proquint-id-upgrade.md) | 2026-05-07 | Proquint IDs for new coordination artifacts | — |
 | [TODO-zofan](./TODO-zofan-di-record-files.md) | 2026-05-10 | Move DI records to first-class files **(deferred: resume after replay cleanup)** | — |
 | [TODO-milum](./TODO-milum-agent-instruction-consolidation.md) | 2026-05-08 | Agent instruction consolidation | `TODO-34` |
+| [TODO-tapaf](./TODO-tapaf-codex-local-author-identity.md) | 2026-05-23 | Codex local author identity | — |
 | [TODO-rozas](./TODO-rozas-promisegrid-dev-guide-resources.md) | 2026-05-08 | PromiseGrid dev-guide writer resources **(running: periodic `DEV-GUIDE-RESOURCES.md` maintenance; rozas.10 open)** | — |
 
 ## group-session
