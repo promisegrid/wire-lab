@@ -192,6 +192,17 @@ specimens, not preferred envelope families.
 | `SIM-suzuf-gordian-universal-envelope-negative-control/` | Negative control that moves Gordian-style structure into the universal outer envelope. |
 | `SIM-vizan-gordian-selective-disclosure/` | Gordian-style payload family with explicit claim/disclosure roots and selective-disclosure pressure. |
 
+## Grid-envelope protocol-owned outer signature-slot probe
+
+`DI-kukuk` adds a standalone follow-on probe for the cleaner three-slot outer
+shape `[pcid, payload, signature]` where the payload `pcid` owns the proof
+family and the signed bytes are canonical `[pcid, payload]`. This is a
+candidate specimen, not current consensus.
+
+| Simulation | Probe |
+|---|---|
+| `SIM-dalor-grid-envelope-protocol-owned-signature-slot/` | Mandatory three-slot outer envelope where `pcid` owns varsig/multisig-style proof rules without a separate outer `sig_pcid`. |
+
 ## Grid-envelope signature/proof object probes
 
 `DI-sahiv` adds a standalone non-child probe for using Cryptid's Multisig object

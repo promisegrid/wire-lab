@@ -66,6 +66,8 @@ The proquint handle replaces both the integer alias (TE-1, TE-2, ...) and the ti
 | [TE-david](TE-david-promisegrid-dev-guide-resources.md) | 2026-05-08 | PromiseGrid dev-guide resources from wire-lab evidence |  |
 | [TE-dojab](TE-dojab-simulation-run-model-and-scenario-result-matrix.md) | 2026-05-19 | Simulation run model and scenario/result matrix |  |
 | [TE-lizuh](TE-lizuh-results-canonical-no-scenario-matrix.md) | 2026-05-18 | Results canonical, no committed scenario matrix |  |
+| [TE-puzud](TE-puzud-codex-local-author-identity.md) | 2026-05-23 | Codex local author identity |  |
+| [TE-nahir](TE-nahir-grid-envelope-protocol-owned-signature-slot.md) | 2026-05-23 | Grid-envelope protocol-owned signature slot |  |
 
 The proquint handle is **both** the stable identifier and the display nickname. It is collision-free at mint time, fork-stable across branches (each fork mints its own handles; collisions at merge time are handled by re-minting), and short enough to use directly in prose ("per TE-titur S5"). DF / DI / DR descendant numbering still uses the handle root: DF-titur.1, DI-titur-..., DR-009 (DR has its own numbering scheme). Backward citations to integer aliases (e.g., "per TE-25 S5") remain valid; readers may consult the cited file's `## Prior aliases` section or the `Prior alias` column above to recover the integer.
 
