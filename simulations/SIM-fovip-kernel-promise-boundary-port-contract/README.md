@@ -8,15 +8,15 @@ close the kernel-developer porting boundary, and now incorporates the follow-on
 
 ## Question
 
-What minimum PromiseGrid port promise record can be claimed across rich native
-nodes, browser/WASM hosts, mobile sandboxes, MCU/header-only ports, and split
-local service graphs without pretending that one process shape, namespace,
-API, or prior-art pattern is universal?
+What minimum PromiseGrid kernel implementation promises can be claimed across
+rich native nodes, browser/WASM hosts, mobile sandboxes, MCU/header-only ports,
+and split local service graphs without pretending that one process shape,
+namespace, API, or prior-art pattern is universal?
 
 ## Candidate specimen
 
-The specimen under test is a port promise record. A port promises its own
-behavior by publishing:
+The specimen under test is a kernel implementation promise record: a local
+implementation promises its own behavior by publishing:
 
 - profile name and runtime class;
 - supported pCIDs and unsupported-pCID behavior;
@@ -47,14 +47,16 @@ behavior by publishing:
 
 - Kernel is a role/profile set, not a ruler.
 - Everything useful is a promise: app/kernel operations, resources, namespaces,
-  references, and port records all help agents make or evaluate promises.
+  references, and kernel implementation promise records all help agents make or
+  evaluate promises.
 - The app/kernel boundary is a promise boundary; exposed operations are
   pCID-selected `grid([42(pCID), payload, ...])` messages, even when local APIs
   provide ergonomic adapters.
-- A port promise record is not a global certificate. Alice, Bob, Carol, and later
-  agents evaluate the record and make/break history locally.
-- Host assumptions are not port promises unless the host is also an explicit
-  promiser.
+- A kernel implementation promise record is not a global certificate. Alice,
+  Bob, Carol, and later agents evaluate the record and make/break history
+  locally.
+- Host assumptions are not implementation promises unless the host is also an
+  explicit promiser.
 - Voluntary group namespaces may exist inside trust relationships, but imposed
   universal namespaces are rejected.
 - File-like resources are promise-log projections or checkpoints, not evidence
@@ -84,10 +86,10 @@ The simulation should let reviewers ask whether the candidate:
 ## Boundaries
 
 This simulation does not close `DR-davod` and does not define a final
-PromiseGrid kernel API. It tests whether a port promise record gives guide
-writers enough evidence to discuss kernel developers without promising a daemon,
-microkernel, browser host, mobile runtime, MCU library, namespace protocol, or
-SDK as the single correct implementation shape.
+PromiseGrid kernel API. It tests whether kernel implementation promises give
+guide writers enough evidence to discuss kernel developers without promising a
+daemon, microkernel, browser host, mobile runtime, MCU library, namespace
+protocol, or SDK as the single correct implementation shape.
 
 The current envelope shape `grid([42(pCID), payload, ...])` is input evidence,
 not a reopened decision.

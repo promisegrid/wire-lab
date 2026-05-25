@@ -80,7 +80,7 @@ kernel TEs under `docs/thought-experiments/`; `protocols/wire-lab.d/TODO/TODO.md
 - `docs/thought-experiments/TE-jimar-kernel-runtime-portability-boundary.md`
   narrows "kernel" toward role/profile definition.
 - `docs/thought-experiments/TE-mazop-kernel-promise-boundary-and-minimum-port-contract.md`
-  narrows the minimum credible port promise record.
+  narrows the minimum credible kernel implementation promises.
 - `docs/thought-experiments/TE-pudiv-app-kernel-grid-message-boundary.md`
   narrows app/kernel operations toward pCID-selected grid-message semantics.
 - `docs/thought-experiments/TE-dunas-prior-art-influence-on-promisegrid-kernel.md`
@@ -100,12 +100,12 @@ kernel TEs under `docs/thought-experiments/`; `protocols/wire-lab.d/TODO/TODO.md
   design-document and evidence-surface changes made under this packet.
 - [x] binag.3 Expand `SIM-fovip` so it becomes the active evidence home for all
   open kernel questions: kernel as role/profile set, app/kernel pCID grid
-  messages, port promise records, operation coverage, separated host/runtime
-  assumptions, unsupported-pCID behavior, voluntary namespaces,
+  messages, kernel implementation promise records, operation coverage, separated
+  host/runtime assumptions, unsupported-pCID behavior, voluntary namespaces,
   CID-rooted references, and file/resource checkpoints over promise logs.
 - [x] binag.4 Update the `SIM-fovip` simulation-local kernel-port draft to prefer
-  "port promise record" in prose while preserving the historical filename and
-  making clear the record is not a global certificate.
+  "kernel implementation promises" in prose while preserving the historical
+  filename and making clear the record is not a global certificate.
 - [x] binag.5 Expand `scenarios/kernel-porting-boundary/` with Alice/Bob/Carol
   pressure for native, browser/WASM, mobile, MCU/header-only, split-service,
   broken-promise, voluntary-namespace, CID-rooted-reference, and checkpoint/log

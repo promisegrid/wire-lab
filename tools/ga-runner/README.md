@@ -2,8 +2,8 @@
 
 `tools/ga-runner` is the PromiseGrid Wire Lab runner for GA/search work. It is
 separate from the legacy Markdown matrix-runner path. Historical GA evidence
-remains append-only `promisegrid.ga.result.v1`, new scoring writes
-`promisegrid.ga.result.v2`, child proposals and child score evidence stage
+remains append-only `promisegrid.ga.result.v1`, current scoring writes
+`promisegrid.ga.result.v4`, child proposals and child score evidence stage
 under `proposals/<run-group-id>/`, and run state remains JSON at
 `results/state/<run-group-id>.json`. Source: `DI-ramar`; `DI-zanon`;
 `DI-ruzaj`; `DI-lirat`; `DI-roruj`.
@@ -95,10 +95,10 @@ historical `source.*` proposal paths; when those proposal trees are gone,
 `simulations/<sim-id>/` tree, but only as an exact-byte fallback. If neither
 source root exists, the record stays non-exact and is excluded from targeted
 backfill instead of aborting the run. `backfill-init` turns that audit into a
-targeted `promisegrid.ga.state.v1` state file for additive rubric-v2 rescoring.
-`compare-backfill` turns a completed targeted v2 state into a reviewable
+targeted `promisegrid.ga.state.v1` state file for additive rescoring.
+`compare-backfill` turns a completed targeted state into a reviewable
 Markdown report under `results/reports/<run-group-id>-comparison.md`, comparing
-each v2 cell against the latest exact-match canonical v1 result for the same
+each newer cell against the latest exact-match canonical v1 result for the same
 `sim_id` + `scenario_id`, preferring the same `runner.api_model` when
 available. Same-model historical reruns collapse to the latest record and are
 reported separately from true ambiguous historical pairings. The report
@@ -116,14 +116,18 @@ population and conservative generation sizing without writing state. Non-dry-run
 `-include-scenario` to guarantee focused coverage while filling remaining sample
 slots by deterministic shuffle. `score` builds source-complete prompts, calls
 the provider, writes validated JSON fitness results, and checkpoints usage/cost
-metadata after each cell. Score runs now default to
+metadata after each cell. New score runs write
+`promisegrid.ga.result.v4` / `ga-rubric-20260525-v4`, which keeps the v3 PT gate
+and adds `envelope_discipline`, `kernel_implementation_promises`, and
+`app_protocol_promise_semantics` for layer-aware scoring. Source: `DI-ripuz`.
+Score runs now default to
 `-output-contract json_schema_strict`, which asks the provider to enforce the
-rubric-v2 JSON Schema instead of relying only on prompt wording. New score
+rubric-v4 JSON Schema instead of relying only on prompt wording. New score
 results record `runner.output_contract` so later reviews can distinguish
 prompt-enforced JSON from provider-enforced schema adherence. When
 `-output-contract prompt_json` is used, `score` may still send one short
-schema-correction retry if a valid JSON response omits required rubric-v2 score
-axes such as `promise_vocabulary` or `simplicity_durability`, and it still
+schema-correction retry if a valid JSON response omits required rubric-v4 score
+axes such as `envelope_discipline` or `kernel_implementation_promises`, and it still
 refuses to auto-fill missing scores locally. `generate` builds compact
 child prompts from each
 parent simulation tree once, scenario-specific pressure once, and summarized
@@ -225,11 +229,12 @@ provider-specific schema plumbing and do not directly reduce hidden reasoning
 tokens. Use `-output-contract prompt_json` only when a score run must stay on
 the older prompt-enforced JSON path. Source: `DI-pulap`; `DI-fogop`.
 
-Rubric-v2 scoring adds `promise_vocabulary` and `simplicity_durability` to the
-historical axis set and recomputes `fitness.raw` / `fitness.normalized_0_100`
-inside the runner with normal weighting so v2 comparisons do not depend on
-provider-specific math. Historical v1 results remain valid evidence and are not
-rewritten. Source: `DI-roruj`.
+Rubric-v4 scoring keeps `promise_vocabulary` and `simplicity_durability`, adds
+the layer-specific envelope/kernel/app axes, and recomputes `fitness.raw` /
+`fitness.normalized_0_100` inside the runner with normal weighting so
+comparisons do not depend on provider-specific math. Historical v1/v2/v3
+results remain valid evidence and are not rewritten. Source: `DI-roruj`;
+`DI-ripuz`.
 
 If `score` is run without `-api-model`, each selected cell uses the `api_model`
 already stored in the state file, falling back to a provider-model derivation

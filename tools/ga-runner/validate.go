@@ -311,21 +311,42 @@ func validateRubric(schema string, rubric RubricInfo) []string {
 			issues = append(issues, "rubric.promise_theory_references must not be empty for "+resultSchemaV3)
 		}
 	}
+	// Intent: Keep V4 validation append-only and explicit so new layer-aware
+	// results cannot masquerade as V3 or omit the envelope/kernel/app axes that
+	// make the rubric expansion meaningful. Source: DI-ripuz
+	if schema == resultSchemaV4 {
+		if rubric.RubricVersion != rubricVersionV4 {
+			issues = append(issues, "rubric.rubric_version must be "+rubricVersionV4+" for "+resultSchemaV4)
+		}
+		expectedAxes := rubricAxesForSchema(schema)
+		if strings.Join(rubric.Axes, ",") != strings.Join(expectedAxes, ",") {
+			issues = append(issues, "rubric.axes must match "+strings.Join(expectedAxes, ",")+" for "+resultSchemaV4)
+		}
+		if strings.Join(rubric.PromiseTheoryRules, "\n") != strings.Join(rubricPromiseTheoryRulesForSchema(schema), "\n") {
+			issues = append(issues, "rubric.promise_theory_rules must match the canonical PT rule list for "+resultSchemaV4)
+		}
+		if len(rubric.PromiseTheoryRefs) == 0 {
+			issues = append(issues, "rubric.promise_theory_references must not be empty for "+resultSchemaV4)
+		}
+	}
 	return issues
 }
 
 func validateScores(schema string, rawScores map[string]json.RawMessage, scores FitnessScores) []string {
 	scoreMap := map[string]int{
-		"scenario_fit":                scores.ScenarioFit,
-		"promisegrid_alignment":       scores.PromiseGridAlignment,
-		"auditability":                scores.Auditability,
-		"evolution_safety":            scores.EvolutionSafety,
-		"layer_boundary_clarity":      scores.LayerBoundaryClarity,
-		"failure_handling":            scores.FailureHandling,
-		"implementation_plausibility": scores.ImplementationPlausibility,
-		"promise_vocabulary":          scores.PromiseVocabulary,
-		"simplicity_durability":       scores.SimplicityDurability,
-		"risk_penalty":                scores.RiskPenalty,
+		"scenario_fit":                   scores.ScenarioFit,
+		"promisegrid_alignment":          scores.PromiseGridAlignment,
+		"auditability":                   scores.Auditability,
+		"evolution_safety":               scores.EvolutionSafety,
+		"layer_boundary_clarity":         scores.LayerBoundaryClarity,
+		"failure_handling":               scores.FailureHandling,
+		"implementation_plausibility":    scores.ImplementationPlausibility,
+		"promise_vocabulary":             scores.PromiseVocabulary,
+		"simplicity_durability":          scores.SimplicityDurability,
+		"envelope_discipline":            scores.EnvelopeDiscipline,
+		"kernel_implementation_promises": scores.KernelImplementationPromises,
+		"app_protocol_promise_semantics": scores.AppProtocolPromiseSemantics,
+		"risk_penalty":                   scores.RiskPenalty,
 	}
 	var issues []string
 	for name, value := range scoreMap {
@@ -347,6 +368,22 @@ func validateScores(schema string, rawScores map[string]json.RawMessage, scores 
 			}
 		}
 	}
+	// Intent: Require every V4 axis to be present even when a score is zero, so
+	// additive rescoring distinguishes absent provider output from an explicit
+	// low judgment for a layer-specific axis. Source: DI-ripuz
+	if schema == resultSchemaV4 {
+		for _, field := range []string{
+			"promise_vocabulary",
+			"simplicity_durability",
+			"envelope_discipline",
+			"kernel_implementation_promises",
+			"app_protocol_promise_semantics",
+		} {
+			if _, ok := rawScores[field]; !ok {
+				issues = append(issues, "scores."+field+" is required for "+resultSchemaV4)
+			}
+		}
+	}
 	sort.Strings(issues)
 	return issues
 }
@@ -364,9 +401,9 @@ func validateFitness(fitness FitnessSummary) []string {
 
 func validateAssessmentPresence(schema string, rawAssessment map[string]json.RawMessage) []string {
 	var issues []string
-	if schema == resultSchemaV3 {
+	if schema == resultSchemaV3 || schema == resultSchemaV4 {
 		if _, ok := rawAssessment["pt_gate"]; !ok {
-			issues = append(issues, "assessment.pt_gate is required for "+resultSchemaV3)
+			issues = append(issues, "assessment.pt_gate is required for "+schema)
 		}
 	}
 	return issues

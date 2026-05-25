@@ -9,9 +9,11 @@ const (
 	resultSchemaV1  = "promisegrid.ga.result.v1"
 	resultSchemaV2  = "promisegrid.ga.result.v2"
 	resultSchemaV3  = "promisegrid.ga.result.v3"
+	resultSchemaV4  = "promisegrid.ga.result.v4"
 	rubricVersionV1 = "ga-rubric-20260519-v1"
 	rubricVersionV2 = "ga-rubric-20260522-v2"
 	rubricVersionV3 = "ga-rubric-20260523-v3"
+	rubricVersionV4 = "ga-rubric-20260525-v4"
 )
 
 var rubricAxesV1 = []string{
@@ -39,6 +41,22 @@ var rubricAxesV2 = []string{
 }
 
 var rubricAxesV3 = append([]string(nil), rubricAxesV2...)
+
+var rubricAxesV4 = []string{
+	"scenario_fit",
+	"promisegrid_alignment",
+	"auditability",
+	"evolution_safety",
+	"layer_boundary_clarity",
+	"failure_handling",
+	"implementation_plausibility",
+	"promise_vocabulary",
+	"simplicity_durability",
+	"envelope_discipline",
+	"kernel_implementation_promises",
+	"app_protocol_promise_semantics",
+	"risk_penalty",
+}
 
 var promiseTheoryRulesV1 = []string{
 	"Agents are autonomous.",
@@ -132,16 +150,19 @@ type RubricInfo struct {
 // Intent: Preserve score-field presence after the SIM-suzuf rerun exposed
 // zero-valued fields being omitted by JSON tags. Source: DI-vonot; DI-movur
 type FitnessScores struct {
-	ScenarioFit                int `json:"scenario_fit"`
-	PromiseGridAlignment       int `json:"promisegrid_alignment"`
-	Auditability               int `json:"auditability"`
-	EvolutionSafety            int `json:"evolution_safety"`
-	LayerBoundaryClarity       int `json:"layer_boundary_clarity"`
-	FailureHandling            int `json:"failure_handling"`
-	ImplementationPlausibility int `json:"implementation_plausibility"`
-	PromiseVocabulary          int `json:"promise_vocabulary"`
-	SimplicityDurability       int `json:"simplicity_durability"`
-	RiskPenalty                int `json:"risk_penalty"`
+	ScenarioFit                  int `json:"scenario_fit"`
+	PromiseGridAlignment         int `json:"promisegrid_alignment"`
+	Auditability                 int `json:"auditability"`
+	EvolutionSafety              int `json:"evolution_safety"`
+	LayerBoundaryClarity         int `json:"layer_boundary_clarity"`
+	FailureHandling              int `json:"failure_handling"`
+	ImplementationPlausibility   int `json:"implementation_plausibility"`
+	PromiseVocabulary            int `json:"promise_vocabulary"`
+	SimplicityDurability         int `json:"simplicity_durability"`
+	EnvelopeDiscipline           int `json:"envelope_discipline"`
+	KernelImplementationPromises int `json:"kernel_implementation_promises"`
+	AppProtocolPromiseSemantics  int `json:"app_protocol_promise_semantics"`
+	RiskPenalty                  int `json:"risk_penalty"`
 }
 
 type FitnessSummary struct {
@@ -177,7 +198,7 @@ type Assessment struct {
 }
 
 func knownResultSchemas() []string {
-	return []string{resultSchemaV1, resultSchemaV2, resultSchemaV3}
+	return []string{resultSchemaV1, resultSchemaV2, resultSchemaV3, resultSchemaV4}
 }
 
 func isKnownResultSchema(schema string) bool {
@@ -190,10 +211,13 @@ func isKnownResultSchema(schema string) bool {
 }
 
 func expectedResultSchemaMessage() string {
-	return "schema must be " + resultSchemaV1 + ", " + resultSchemaV2 + ", or " + resultSchemaV3
+	return "schema must be " + resultSchemaV1 + ", " + resultSchemaV2 + ", " + resultSchemaV3 + ", or " + resultSchemaV4
 }
 
 func rubricVersionForSchema(schema string) string {
+	if schema == resultSchemaV4 {
+		return rubricVersionV4
+	}
 	if schema == resultSchemaV3 {
 		return rubricVersionV3
 	}
@@ -204,6 +228,9 @@ func rubricVersionForSchema(schema string) string {
 }
 
 func rubricAxesForSchema(schema string) []string {
+	if schema == resultSchemaV4 {
+		return append([]string(nil), rubricAxesV4...)
+	}
 	if schema == resultSchemaV3 {
 		return append([]string(nil), rubricAxesV3...)
 	}
@@ -219,7 +246,7 @@ func rubricScoreMeaningsForSchema(schema string) map[string]string {
 		"5":            "strong fit",
 		"risk_penalty": "0 low risk, 5 severe risk",
 	}
-	if schema == resultSchemaV2 || schema == resultSchemaV3 {
+	if schema == resultSchemaV2 || schema == resultSchemaV3 || schema == resultSchemaV4 {
 		// Intent: Keep stored rubric descriptions aligned with the scorer's
 		// layer-local Promise Theory interpretation, so envelope-layer promises
 		// are not mislabeled as weak merely because higher-layer accounting lives
@@ -232,18 +259,27 @@ func rubricScoreMeaningsForSchema(schema string) map[string]string {
 		meanings["promise_vocabulary"] = "0 drifts into claims/profiles/generic statement capsules/central trust-ledger framing, 5 stays promise-first, layer-local, and pCID-specific"
 		meanings["simplicity_durability"] = "0 overbuilt, selector-shopping, or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
 	}
+	if schema == resultSchemaV4 {
+		// Intent: Persist the layer-specific V4 axis meanings with every result
+		// so additive rescoring can distinguish wire-envelope, kernel, and
+		// higher-layer protocol/app fitness without rereading prompt history.
+		// Source: DI-ripuz
+		meanings["envelope_discipline"] = "0 ignores the settled envelope direction or confuses pCID, 5 aligns with grid([42(pCID), payload, ...]), Protocol-CID semantics, and protocol-owned later slots"
+		meanings["kernel_implementation_promises"] = "0 treats the kernel as authority or generic port conformance, 5 names local kernel implementation promises, assumptions, unsupported behavior, and evidence"
+		meanings["app_protocol_promise_semantics"] = "0 uses command/permission framing, 5 models storage, computation, send/receive, reciprocal promises, local trust, and make/break evidence"
+	}
 	return meanings
 }
 
 func rubricPromiseTheoryRulesForSchema(schema string) []string {
-	if schema != resultSchemaV3 {
+	if schema != resultSchemaV3 && schema != resultSchemaV4 {
 		return nil
 	}
 	return append([]string(nil), promiseTheoryRulesV1...)
 }
 
 func rubricPromiseTheoryReferencesForSchema(schema string) []string {
-	if schema != resultSchemaV3 {
+	if schema != resultSchemaV3 && schema != resultSchemaV4 {
 		return nil
 	}
 	return []string{
@@ -283,6 +319,12 @@ func (scores FitnessScores) axisValue(name string) int {
 		return scores.PromiseVocabulary
 	case "simplicity_durability":
 		return scores.SimplicityDurability
+	case "envelope_discipline":
+		return scores.EnvelopeDiscipline
+	case "kernel_implementation_promises":
+		return scores.KernelImplementationPromises
+	case "app_protocol_promise_semantics":
+		return scores.AppProtocolPromiseSemantics
 	case "risk_penalty":
 		return scores.RiskPenalty
 	default:
@@ -304,12 +346,13 @@ const (
 // neatness alone.
 //
 // Intent: Make the lugag PT correction operational in score ranking instead of
-// leaving it as prose-only reviewer guidance. Source: DI-movur
+// leaving it as prose-only reviewer guidance. Source: DI-movur; DI-ripuz
 func applyPTGateScorePolicy(scores FitnessScores, gate PTGate) FitnessScores {
 	switch gate.Status {
 	case ptGateStatusInvalid:
 		scores.PromiseGridAlignment = 0
 		scores.PromiseVocabulary = 0
+		scores.AppProtocolPromiseSemantics = 0
 		if scores.RiskPenalty < 5 {
 			scores.RiskPenalty = 5
 		}
@@ -319,6 +362,9 @@ func applyPTGateScorePolicy(scores FitnessScores, gate PTGate) FitnessScores {
 		}
 		if scores.PromiseVocabulary > 2 {
 			scores.PromiseVocabulary = 2
+		}
+		if scores.AppProtocolPromiseSemantics > 2 {
+			scores.AppProtocolPromiseSemantics = 2
 		}
 		if scores.RiskPenalty < 3 {
 			scores.RiskPenalty = 3

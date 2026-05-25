@@ -1,16 +1,16 @@
-# Kernel port promise record draft
+# Kernel implementation promise record draft
 
 This draft is a simulation-local specimen for `SIM-fovip`. It is not a frozen
 PromiseGrid protocol spec. Its purpose is to make the `DR-davod` question
 testable by forcing a port to publish the promises, assumptions, unsupported
-features, and evidence records that make a first port credible. Source:
+features, and evidence records that make a first implementation credible. Source:
 `DI-funaf`; `DI-fidot`.
 
 ## Role
 
-A kernel port promise record is a local implementation promise record. It says
-what a PromiseGrid port promises to local apps and operators, what it depends on
-from the host runtime, and what it explicitly does not promise.
+A kernel implementation promise record says what a PromiseGrid implementation
+promises to local apps and operators, what it depends on from the host runtime,
+and what it explicitly does not promise.
 
 The record is not a global certificate, permission, or authority. Each receiving
 agent still assesses the record and the port's make/break history locally.
@@ -18,7 +18,7 @@ agent still assesses the record and the port's make/break history locally.
 ## Record shape
 
 ```text
-kernel_port_promise_record = [
+kernel_implementation_promise_record = [
   record_pcid,
   port_identity,
   profile,
@@ -39,16 +39,16 @@ kernel_port_promise_record = [
 - `port_identity` names the local implementation or agent making the promises.
 - `profile` names the runtime class: native node, browser/WASM, mobile sandbox,
   MCU/header-only, split local services, or another pCID-defined profile.
-- `supported_pcids` lists the pCID-selected protocols the port promises to
+- `supported_pcids` lists the pCID-selected protocols the implementation promises to
   parse, dispatch, validate, or preserve.
-- `app_facing_promises` states what the port promises for storage, compute,
-  network send/receive, key use, device access, lifecycle, pCID dispatch,
-  refusal, receipt, evidence recording, namespace projection, reference
-  resolution, and resource checkpoint behavior.
+- `app_facing_promises` states what the implementation promises for storage,
+  compute, network send/receive, key use, device access, lifecycle, pCID
+  dispatch, refusal, receipt, evidence recording, namespace projection,
+  reference resolution, and resource checkpoint behavior.
 - `host_assumptions` states what the port depends on from a browser, OS, mobile
   sandbox, language runtime, hardware platform, or local service graph.
 - `unsupported_features` states what the port refuses or cannot perform.
-- `evidence_policy` states what exact bytes and local records the port promises
+- `evidence_policy` states what exact bytes and local records the implementation promises
   to keep for kept, refused, unavailable, and broken promises.
 - `adapter_promises` states which local APIs wrap which pCID-selected messages
   and what evidence the adapter records.
@@ -59,9 +59,9 @@ kernel_port_promise_record = [
 
 ## Promise rules
 
-- A port promises only its own behavior.
-- A port may cite host/runtime assumptions, but it does not promise that the
-  host will keep them unless the host is also an explicit promiser.
+- An implementation promises only its own behavior.
+- An implementation may cite host/runtime assumptions, but it does not promise
+  that the host will keep them unless the host is also an explicit promiser.
 - Unsupported features must be named directly. They must not be hidden behind a
   generic "partial implementation" label.
 - Evidence records are local. They help Alice, Bob, Carol, and future agents

@@ -28,11 +28,11 @@ become obligations.
 
 ## Stimulus
 
-Alice writes a first porting plan and a port promise record. The plan must say
-what it implements now, which pCID-selected messages it exposes, what draft
-evidence it follows, what it refuses or cannot promise, what host assumptions it
-depends on, what evidence it records, and what it defers until `DR-davod`
-decides the guide-facing boundary.
+Alice writes a first porting plan and a kernel implementation promise record.
+The plan must say what it implements now, which pCID-selected messages it
+exposes, what draft evidence it follows, what it refuses or cannot promise, what
+host assumptions it depends on, what evidence it records, and what it defers
+until `DR-davod` decides the guide-facing boundary. Source: `DI-ripuz`.
 
 ## Expected Pressure
 

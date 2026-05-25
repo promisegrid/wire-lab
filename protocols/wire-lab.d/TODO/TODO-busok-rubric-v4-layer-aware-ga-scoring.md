@@ -7,10 +7,10 @@ No integer or timestamp alias exists.
 
 ## Status
 
-Planned. Rubric V4 will expand GA scoring so envelope, kernel, and higher-layer
-protocol/app candidates are evaluated on the PromiseGrid layer they actually
-claim to occupy. The first calibration target is an additive rescore of
-`ga-canary-20260525-kernel-resolution`.
+Implemented pending commit and Steve-run rescore. Rubric V4 expands GA scoring
+so envelope, kernel, and higher-layer protocol/app candidates are evaluated on
+the PromiseGrid layer they actually claim to occupy. The first calibration
+target is an additive rescore of `ga-canary-20260525-kernel-resolution`.
 
 ## Decision Intent Log
 
@@ -70,23 +70,22 @@ Keep existing v3 axes and add:
 - [x] busok.1 Add this TODO and cross-list it in
   `protocols/wire-lab.d/TODO/TODO.md`.
 - [x] busok.2 Add the DI above.
-- [ ] busok.3 Cite `DI-ripuz` from all non-trivial v4 scoring code/doc changes.
-- [ ] busok.4 Update active terminology from `port promise record` to
+- [x] busok.3 Cite `DI-ripuz` from all non-trivial v4 scoring code/doc changes.
+- [x] busok.4 Update active terminology from `port promise record` to
   `kernel implementation promises`.
-- [ ] busok.5 Implement `promisegrid.ga.result.v4` /
+- [x] busok.5 Implement `promisegrid.ga.result.v4` /
   `ga-rubric-20260525-v4` in `tools/ga-runner`.
-- [ ] busok.6 Add `DN-jotob` envelope guidance to the scoring prompt.
-- [ ] busok.7 Add kernel implementation promise guidance to the scoring prompt.
-- [ ] busok.8 Add higher-layer/app Promise Theory guidance to the scoring
+- [x] busok.6 Add `DN-jotob` envelope guidance to the scoring prompt.
+- [x] busok.7 Add kernel implementation promise guidance to the scoring prompt.
+- [x] busok.8 Add higher-layer/app Promise Theory guidance to the scoring
   prompt.
-- [ ] busok.9 Update tests so v4 requires the three new axes while v1/v2/v3
+- [x] busok.9 Update tests so v4 requires the three new axes while v1/v2/v3
   remain historically valid.
 - [ ] busok.10 Commit v4 source/doc changes before any v4 scoring run.
-- [ ] busok.11 Configure the additive v4 kernel rescore using the same parent
+- [x] busok.11 Configure the additive v4 kernel rescore using the same parent
   slice as `ga-canary-20260525-kernel-resolution`.
-- [ ] busok.12 Ask Steve to run:
-  `GA_CANARY_RUN_GROUP=ga-canary-20260525-kernel-resolution-rubric-v4
-  ./run-canary.sh init` and then `score-parents`.
+- [x] busok.12 Ask Steve to run `/tmp/run-busok-v4-kernel-rescore.sh` after
+  committing this source/doc change set.
 - [ ] busok.13 Compare v3 vs v4 drift: rank order, PT gate status, `SIM-fovip`
   stability, `SIM-funas` downgrade stability, and new-axis scores.
 - [ ] busok.14 Decide whether v4 is safe for broader GA runs, needs prompt

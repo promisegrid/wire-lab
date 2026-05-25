@@ -7,10 +7,11 @@ No integer or timestamp alias exists.
 
 ## Status
 
-Planned. Configure a deliberate GA breeding slice that uses
-`SIM-dalor-grid-envelope-protocol-owned-signature-slot` as the anchor parent and
-tests it against both `SIM-zukis-grid-envelope-tag42-protocol-owned-slot2-varsig`
-and `SIM-fovip-kernel-promise-boundary-port-contract`.
+Configured pending commit and Steve-run execution. The configured GA breeding
+slice uses `SIM-dalor-grid-envelope-protocol-owned-signature-slot` as the anchor
+parent and tests it against both
+`SIM-zukis-grid-envelope-tag42-protocol-owned-slot2-varsig` and
+`SIM-fovip-kernel-promise-boundary-port-contract`.
 
 ## Decision Intent Log
 
@@ -133,18 +134,18 @@ Reject or rework generated children that:
 - [x] goban.1 Add this TODO and cross-list it in
   `protocols/wire-lab.d/TODO/TODO.md`.
 - [x] goban.2 Record `DI-kipoz` for the dalor-anchored breeding intent.
-- [ ] goban.3 Confirm whether Rubric V4 from `TODO-busok` is ready enough for
+- [x] goban.3 Confirm whether Rubric V4 from `TODO-busok` is ready enough for
   this cross-layer run.
-- [ ] goban.4 If Rubric V4 is not ready, mark the run provisional and plan an
-  additive v4 rescore.
-- [ ] goban.5 Configure a small canary/GA slice with Pair A
+- [x] goban.4 If Rubric V4 is not ready, mark the run provisional and plan an
+  additive v4 rescore. V4 is ready, so no provisional fallback is needed.
+- [x] goban.5 Configure a small canary/GA slice with Pair A
   (`SIM-dalor` × `SIM-zukis`).
-- [ ] goban.6 Configure a small canary/GA slice with Pair B
+- [x] goban.6 Configure a small canary/GA slice with Pair B
   (`SIM-dalor` × `SIM-fovip`).
-- [ ] goban.7 Decide whether Pair C (`SIM-zukis` × `SIM-fovip`) is needed as a
-  baseline.
-- [ ] goban.8 Give Steve exact commands to run; do not run provider-backed
-  canary/GA commands from Codex.
+- [x] goban.7 Decide whether Pair C (`SIM-zukis` × `SIM-fovip`) is needed as a
+  baseline. Defer Pair C until Pair A/B results show a baseline gap.
+- [x] goban.8 Give Steve exact commands to run; do not run provider-backed
+  canary/GA commands from Codex: `/tmp/run-goban-dalor-breeding.sh`.
 - [ ] goban.9 Review generated children for PT fit, envelope correctness,
   kernel-boundary correctness, and vocabulary regressions.
 - [ ] goban.10 Cull weak children before promotion review.

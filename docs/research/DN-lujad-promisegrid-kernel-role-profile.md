@@ -97,11 +97,12 @@ An app does not command a kernel, and a kernel does not command an app. Each
 side is an autonomous promiser that may keep, refuse, be unable to perform, or
 break a promise. Evidence records make that visible.
 
-## Port promise records
+## Kernel implementation promise records
 
-A credible PromiseGrid port publishes a local promise record. The record says
-what the port promises, what it depends on, what it refuses or cannot do, and
-what evidence it will keep.
+A credible PromiseGrid implementation publishes local kernel implementation
+promises. The record says what the implementation promises, what it depends on,
+what it refuses or cannot do, and what evidence it will keep. Source:
+`DI-ripuz`.
 
 The minimum record includes:
 
@@ -118,7 +119,7 @@ The minimum record includes:
   and broken promises.
 
 The record is not a global conformance certificate. Each receiver evaluates the
-record and the port's make/break history locally.
+record and the implementation's make/break history locally.
 
 ## Namespaces and references
 
@@ -200,7 +201,7 @@ model while guide handoff remains a separate task.
 - `DI-fidot` records the design-resolution path.
 - `DR-davod` owns the kernel-developer porting-boundary decision.
 - `TE-jimar` narrows kernel to role/profile rather than process shape.
-- `TE-mazop` narrows the port promise record.
+- `TE-mazop` narrows the minimum credible kernel implementation promises.
 - `TE-pudiv` narrows app/kernel operations to pCID-selected messages with local
   APIs as adapters.
 - `TE-dunas` narrows safe prior-art pressure.

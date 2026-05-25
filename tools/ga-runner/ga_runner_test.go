@@ -162,6 +162,69 @@ func TestValidateResultFileRequiresV3Fields(t *testing.T) {
 	}
 }
 
+func TestValidateResultFileRequiresV4Fields(t *testing.T) {
+	repo := newTestRepo(t)
+	path := repo.Path("results", "SIM-alpha", "scenario-one", "model-a", "20260519-101500.json")
+	raw := `{
+  "schema": "promisegrid.ga.result.v4",
+  "result_id": "SIM-alpha-scenario-one-model-a-20260519-101500",
+  "run_group_id": "ga-test",
+  "cell_id": "ga-test-000001",
+  "sim_id": "SIM-alpha",
+  "scenario_id": "scenario-one",
+  "model_id": "model-a",
+  "timestamp_utc": "20260519-101500",
+  "result_path": "results/SIM-alpha/scenario-one/model-a/20260519-101500.json",
+  "runner": {"tool": "ga-runner"},
+  "source": {
+    "repo_commit": "abc123",
+    "sim_path": "simulations/SIM-alpha/",
+    "scenario_path": "scenarios/scenario-one/scenario-one.md",
+    "root_contract_paths": ["results/RUN-PROTOCOL.md", "scenarios/README.md"],
+    "files": [{"path": "simulations/SIM-alpha/README.md", "sha256": "` + strings.Repeat("a", 64) + `"}],
+    "simulation_tree_hash": "` + strings.Repeat("b", 64) + `"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260525-v4",
+    "score_scale": "0..5",
+    "score_meanings": {"0": "no fit", "5": "strong fit"},
+    "axes": ["scenario_fit", "promisegrid_alignment", "auditability", "evolution_safety", "layer_boundary_clarity", "failure_handling", "implementation_plausibility", "promise_vocabulary", "simplicity_durability", "envelope_discipline", "kernel_implementation_promises", "app_protocol_promise_semantics", "risk_penalty"],
+    "promise_theory_rules": ["Agents are autonomous.", "A promise is a scoped declaration of intent.", "No agent can make a promise on behalf of another agent.", "Promises do not guarantee outcomes.", "Trust is a local assessment of whether a promise will be kept.", "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."],
+    "promise_theory_references": ["Mark Burgess, In Search of Certainty"]
+  },
+  "scores": {
+    "scenario_fit": 4,
+    "promisegrid_alignment": 4,
+    "auditability": 4,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 3,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 4,
+    "simplicity_durability": 4,
+    "risk_penalty": 1
+  },
+  "fitness": {"raw": 0, "normalized_0_100": 0, "confidence_0_1": 0.7},
+  "assessment": {"rationale": "fixture", "strengths": [], "weaknesses": [], "risks": [], "open_questions": [], "authority_boundary": "Evidence only; does not settle PromiseGrid design.", "pt_gate": {"status":"pt_clean","autonomous_agents":{"status":"pass","note":"ok"},"scoped_intent":{"status":"pass","note":"ok"},"no_promises_for_others":{"status":"pass","note":"ok"},"no_guaranteed_outcomes":{"status":"pass","note":"ok"},"local_trust_assessment":{"status":"pass","note":"ok"},"accept_use_not_obligation":{"status":"pass","note":"ok"},"violations":[]}}
+}`
+	if err := ensureParent(path); err != nil {
+		t.Fatalf("make parent: %v", err)
+	}
+	if err := os.WriteFile(path, []byte(raw), 0o644); err != nil {
+		t.Fatalf("write result: %v", err)
+	}
+	issues := validateResultFile(repo, path)
+	for _, want := range []string{
+		"scores.envelope_discipline is required for " + resultSchemaV4,
+		"scores.kernel_implementation_promises is required for " + resultSchemaV4,
+		"scores.app_protocol_promise_semantics is required for " + resultSchemaV4,
+	} {
+		if !hasIssue(issues, want) {
+			t.Fatalf("expected %q, got %v", want, issues)
+		}
+	}
+}
+
 func TestValidateResultFileRejectsScoreRange(t *testing.T) {
 	repo := newTestRepo(t)
 	path := repo.Path("results", "SIM-alpha", "scenario-one", "model-a", "20260519-101500.json")
@@ -538,33 +601,33 @@ func TestRunScoreWritesValidatedFitnessResult(t *testing.T) {
 	if result.Runner.ServiceTier != defaultServiceTier || result.Runner.ServedServiceTier != defaultServiceTier {
 		t.Fatalf("result service tier not recorded: %#v", result.Runner)
 	}
-	if result.Schema != resultSchemaV3 {
-		t.Fatalf("score wrote schema %q, want %q", result.Schema, resultSchemaV3)
+	if result.Schema != resultSchemaV4 {
+		t.Fatalf("score wrote schema %q, want %q", result.Schema, resultSchemaV4)
 	}
-	if result.Rubric.RubricVersion != rubricVersionV3 {
-		t.Fatalf("score wrote rubric version %q, want %q", result.Rubric.RubricVersion, rubricVersionV3)
+	if result.Rubric.RubricVersion != rubricVersionV4 {
+		t.Fatalf("score wrote rubric version %q, want %q", result.Rubric.RubricVersion, rubricVersionV4)
 	}
 	if len(result.Rubric.PromiseTheoryRules) == 0 {
 		t.Fatalf("score wrote empty PT rule list")
 	}
-	if result.Scores.PromiseVocabulary != 4 || result.Scores.SimplicityDurability != 4 {
-		t.Fatalf("score did not capture PT-scored axes: %#v", result.Scores)
+	if result.Scores.PromiseVocabulary != 4 || result.Scores.SimplicityDurability != 4 || result.Scores.EnvelopeDiscipline != 4 || result.Scores.KernelImplementationPromises != 4 || result.Scores.AppProtocolPromiseSemantics != 4 {
+		t.Fatalf("score did not capture PT-scored and layer-aware axes: %#v", result.Scores)
 	}
 	if result.Assessment.PTGate.Status != ptGateStatusClean {
 		t.Fatalf("score wrote pt gate status %q, want %q", result.Assessment.PTGate.Status, ptGateStatusClean)
 	}
-	if result.Fitness.Raw != 38 || result.Fitness.Normalized0To100 != 76 {
+	if result.Fitness.Raw != 50 || result.Fitness.Normalized0To100 < 76.9 || result.Fitness.Normalized0To100 > 77.0 {
 		t.Fatalf("score did not recompute deterministic fitness: %#v", result.Fitness)
 	}
 }
 
-func TestRunScoreWritesZeroValuedV2Axes(t *testing.T) {
+func TestRunScoreWritesZeroValuedV4Axes(t *testing.T) {
 	repo := newGAFixtureRepo(t)
-	initGAStateForTest(t, repo, "ga-score-zero-v2-axes")
+	initGAStateForTest(t, repo, "ga-score-zero-v4-axes")
 	provider := fakeGAProvider{
 		generate: func(ctx context.Context, request ProviderRequest) (ProviderResponse, error) {
 			return ProviderResponse{
-				Text:        scorePayloadWithZeroV2AxesJSON(),
+				Text:        scorePayloadWithZeroV4AxesJSON(),
 				RequestID:   "req-score-zero",
 				ResponseID:  "resp-score-zero",
 				ServiceTier: defaultServiceTier,
@@ -574,7 +637,7 @@ func TestRunScoreWritesZeroValuedV2Axes(t *testing.T) {
 	}
 	var out strings.Builder
 	err := runScoreWithProvider(context.Background(), repo, provider, scoreOptions{
-		RunGroupID:       "ga-score-zero-v2-axes",
+		RunGroupID:       "ga-score-zero-v4-axes",
 		Target:           "parents",
 		ProviderName:     "fake",
 		APIModel:         "model-a",
@@ -585,21 +648,21 @@ func TestRunScoreWritesZeroValuedV2Axes(t *testing.T) {
 		OutputPrice:      defaultOutputUSDPerMTok,
 	}, &out)
 	if err != nil {
-		t.Fatalf("score with zero-valued v2 axes: %v\n%s", err, out.String())
+		t.Fatalf("score with zero-valued v4 axes: %v\n%s", err, out.String())
 	}
-	state := mustReadGAState(t, repo, "ga-score-zero-v2-axes")
+	state := mustReadGAState(t, repo, "ga-score-zero-v4-axes")
 	resultPath := repo.Abs(state.Cells[0].ResultPath)
 	bytes, err := os.ReadFile(resultPath)
 	if err != nil {
 		t.Fatalf("read result: %v", err)
 	}
-	for _, want := range []string{`"promise_vocabulary": 0`, `"simplicity_durability": 0`} {
+	for _, want := range []string{`"promise_vocabulary": 0`, `"simplicity_durability": 0`, `"envelope_discipline": 0`, `"kernel_implementation_promises": 0`, `"app_protocol_promise_semantics": 0`} {
 		if !strings.Contains(string(bytes), want) {
-			t.Fatalf("result omitted required zero-valued v2 axis %s:\n%s", want, string(bytes))
+			t.Fatalf("result omitted required zero-valued v4 axis %s:\n%s", want, string(bytes))
 		}
 	}
 	if issues := validateResultFile(repo, resultPath); len(issues) != 0 {
-		t.Fatalf("zero-valued v2 axes should validate as present scores, got %v", issues)
+		t.Fatalf("zero-valued v4 axes should validate as present scores, got %v", issues)
 	}
 }
 
@@ -1303,6 +1366,9 @@ func TestBuildScorePromptIncludesRequiredAxisChecklist(t *testing.T) {
 		"Required score-axis checklist:",
 		"`promise_vocabulary`",
 		"`simplicity_durability`",
+		"`envelope_discipline`",
+		"`kernel_implementation_promises`",
+		"`app_protocol_promise_semantics`",
 		"Promise Theory Fundamentals",
 		"Mark Burgess",
 		"`pt_clean`, `pt_reframe_needed`, or `pt_invalid`",
@@ -1310,6 +1376,8 @@ func TestBuildScorePromptIncludesRequiredAxisChecklist(t *testing.T) {
 		"selector-shopping stacks",
 		"universal statement capsules",
 		"higher-layer pCID-owned payload protocols",
+		"DN-jotob",
+		"kernel implementation promises",
 	} {
 		if !strings.Contains(prompt, want) {
 			t.Fatalf("prompt missing %q:\n%s", want, prompt)
@@ -1317,7 +1385,7 @@ func TestBuildScorePromptIncludesRequiredAxisChecklist(t *testing.T) {
 	}
 }
 
-func TestRunScoreRetriesMissingV2Axes(t *testing.T) {
+func TestRunScoreRetriesMissingV4Axes(t *testing.T) {
 	repo := newGAFixtureRepo(t)
 	initGAStateForTest(t, repo, "ga-score-schema-retry")
 	calls := 0
@@ -1327,14 +1395,14 @@ func TestRunScoreRetriesMissingV2Axes(t *testing.T) {
 			switch calls {
 			case 1:
 				return ProviderResponse{
-					Text:        invalidScorePayloadMissingV2AxesJSON(),
+					Text:        invalidScorePayloadMissingV4AxesJSON(),
 					RequestID:   "req-score-1",
 					ResponseID:  "resp-score-1",
 					ServiceTier: defaultServiceTier,
 					UsageJSON:   `{"input_tokens":1000,"input_tokens_details":{"cached_tokens":100},"output_tokens":500}`,
 				}, nil
 			case 2:
-				if !strings.Contains(request.Prompt, "## Schema Correction") || !strings.Contains(request.Prompt, "`scores.promise_vocabulary`") || !strings.Contains(request.Prompt, "`scores.simplicity_durability`") || !strings.Contains(request.Prompt, "`assessment.pt_gate`") {
+				if !strings.Contains(request.Prompt, "## Schema Correction") || !strings.Contains(request.Prompt, "`scores.promise_vocabulary`") || !strings.Contains(request.Prompt, "`scores.simplicity_durability`") || !strings.Contains(request.Prompt, "`scores.envelope_discipline`") || !strings.Contains(request.Prompt, "`scores.kernel_implementation_promises`") || !strings.Contains(request.Prompt, "`scores.app_protocol_promise_semantics`") || !strings.Contains(request.Prompt, "`assessment.pt_gate`") {
 					return ProviderResponse{}, fmt.Errorf("schema correction prompt missing missing-axis guidance")
 				}
 				return ProviderResponse{
@@ -1403,7 +1471,7 @@ func TestRunScoreFailsAfterSchemaRetryStillMissingAxes(t *testing.T) {
 		generate: func(ctx context.Context, request ProviderRequest) (ProviderResponse, error) {
 			calls++
 			return ProviderResponse{
-				Text:        invalidScorePayloadMissingV2AxesJSON(),
+				Text:        invalidScorePayloadMissingV4AxesJSON(),
 				RequestID:   fmt.Sprintf("req-score-%d", calls),
 				ResponseID:  fmt.Sprintf("resp-score-%d", calls),
 				ServiceTier: defaultServiceTier,
@@ -1451,11 +1519,11 @@ func TestRunScoreStrictStructuredOutputDoesNotSchemaRetry(t *testing.T) {
 			if request.OutputContract != outputContractJSONSchemaStrict {
 				return ProviderResponse{}, fmt.Errorf("output contract = %q, want %q", request.OutputContract, outputContractJSONSchemaStrict)
 			}
-			if request.OutputSchemaName != "ga_score_payload_v3" || len(request.OutputSchema) == 0 {
+			if request.OutputSchemaName != "ga_score_payload_v4" || len(request.OutputSchema) == 0 {
 				return ProviderResponse{}, fmt.Errorf("structured output schema missing from request")
 			}
 			return ProviderResponse{
-				Text:        invalidScorePayloadMissingV2AxesJSON(),
+				Text:        invalidScorePayloadMissingV4AxesJSON(),
 				RequestID:   fmt.Sprintf("req-score-%d", calls),
 				ResponseID:  fmt.Sprintf("resp-score-%d", calls),
 				ServiceTier: defaultServiceTier,
@@ -2013,8 +2081,8 @@ func TestOpenAIProviderSendsStructuredOutputFormat(t *testing.T) {
 		if body.Text.Format.Type != "json_schema" || !body.Text.Format.Strict {
 			t.Fatalf("unexpected text.format: %#v", body.Text.Format)
 		}
-		if body.Text.Format.Name != "ga_score_payload_v3" {
-			t.Fatalf("structured output schema name = %q, want ga_score_payload_v3", body.Text.Format.Name)
+		if body.Text.Format.Name != "ga_score_payload_v4" {
+			t.Fatalf("structured output schema name = %q, want ga_score_payload_v4", body.Text.Format.Name)
 		}
 		if _, ok := body.Text.Format.Schema["properties"]; !ok {
 			t.Fatalf("structured output schema missing properties: %#v", body.Text.Format.Schema)
@@ -2035,7 +2103,7 @@ func TestOpenAIProviderSendsStructuredOutputFormat(t *testing.T) {
 		ServiceTier:      serviceTierFlex,
 		Prompt:           "score this",
 		OutputContract:   outputContractJSONSchemaStrict,
-		OutputSchemaName: "ga_score_payload_v3",
+		OutputSchemaName: "ga_score_payload_v4",
 		OutputSchema:     scorePayloadJSONSchema(),
 	})
 	if err != nil {
@@ -3327,6 +3395,9 @@ func validScorePayloadJSON() string {
     "implementation_plausibility": 4,
     "promise_vocabulary": 4,
     "simplicity_durability": 4,
+    "envelope_discipline": 4,
+    "kernel_implementation_promises": 4,
+    "app_protocol_promise_semantics": 4,
     "risk_penalty": 1
   },
   "fitness": {
@@ -3355,7 +3426,7 @@ func validScorePayloadJSON() string {
 }`
 }
 
-func invalidScorePayloadMissingV2AxesJSON() string {
+func invalidScorePayloadMissingV4AxesJSON() string {
 	return `{
   "scores": {
     "scenario_fit": 2,
@@ -3375,7 +3446,7 @@ func invalidScorePayloadMissingV2AxesJSON() string {
   "assessment": {
     "rationale": "Old 8-axis fixture output.",
     "strengths": ["small fixture"],
-    "weaknesses": ["missing rubric-v2 axes"],
+    "weaknesses": ["missing rubric-v4 axes"],
     "risks": ["schema drift"],
     "open_questions": ["none for this test"],
     "authority_boundary": "Evidence only; does not settle PromiseGrid design."
@@ -3383,7 +3454,7 @@ func invalidScorePayloadMissingV2AxesJSON() string {
 }`
 }
 
-func scorePayloadWithZeroV2AxesJSON() string {
+func scorePayloadWithZeroV4AxesJSON() string {
 	return `{
   "scores": {
     "scenario_fit": 2,
@@ -3395,6 +3466,9 @@ func scorePayloadWithZeroV2AxesJSON() string {
     "implementation_plausibility": 3,
     "promise_vocabulary": 0,
     "simplicity_durability": 0,
+    "envelope_discipline": 0,
+    "kernel_implementation_promises": 0,
+    "app_protocol_promise_semantics": 0,
     "risk_penalty": 5
   },
   "fitness": {
@@ -3403,7 +3477,7 @@ func scorePayloadWithZeroV2AxesJSON() string {
     "confidence_0_1": 0.9
   },
   "assessment": {
-    "rationale": "Zero-valued rubric-v2 axes are valid low scores, not absent fields.",
+    "rationale": "Zero-valued rubric-v4 axes are valid low scores, not absent fields.",
     "strengths": ["explicit low-score fixture"],
     "weaknesses": ["fixture-only evaluation"],
     "risks": ["serialization regression"],

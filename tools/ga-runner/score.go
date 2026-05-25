@@ -594,7 +594,7 @@ func executeScoreJob(ctx context.Context, repo Repo, provider Provider, job scor
 		results <- scoreJobResult{Index: job.Index, Cell: cell, Status: "failed", Final: true}
 		return
 	}
-	if missingAxes := missingRequiredScoreAxes(resultSchemaV3, attempt.Raw); len(missingAxes) > 0 {
+	if missingAxes := missingRequiredScoreAxes(resultSchemaV4, attempt.Raw); len(missingAxes) > 0 {
 		// Intent: Fail strict structured-output responses that omit required axes
 		// instead of converting absent provider scores into local zero values.
 		// Source: DI-vonot
@@ -612,7 +612,7 @@ func executeScoreJob(ctx context.Context, repo Repo, provider Provider, job scor
 			return
 		}
 		attempt = mergeScoreAttempts(attempt, retryAttempt)
-		if missingAxes = missingRequiredScoreAxes(resultSchemaV3, attempt.Raw); len(missingAxes) > 0 {
+		if missingAxes = missingRequiredScoreAxes(resultSchemaV4, attempt.Raw); len(missingAxes) > 0 {
 			markGACell(&cell, "failed", fmt.Sprintf("schema-correction retry still missing required score fields: %s", strings.Join(missingAxes, ", ")))
 			results <- scoreJobResult{Index: job.Index, Cell: cell, Status: "failed", Final: true}
 			return
@@ -649,7 +649,7 @@ func executeScoreAttempt(ctx context.Context, provider Provider, options scoreOp
 		TextVerbosity:    options.TextVerbosity,
 		MaxOutputTokens:  options.MaxOutputTokens,
 		OutputContract:   effectiveScoreOutputContract(options, cell),
-		OutputSchemaName: "ga_score_payload_v3",
+		OutputSchemaName: "ga_score_payload_v4",
 		OutputSchema:     scorePayloadJSONSchema(),
 		Instructions:     "Return only valid JSON for the requested GA score payload. Do not include code fences or commentary.",
 		Prompt:           prompt,
@@ -733,11 +733,17 @@ func parseScorePayload(text string) (scorePayloadParse, error) {
 }
 
 func missingRequiredScoreAxes(schema string, raw scorePayloadEnvelope) []string {
-	if schema != resultSchemaV3 {
+	if schema != resultSchemaV4 {
 		return nil
 	}
 	var missing []string
-	for _, field := range []string{"promise_vocabulary", "simplicity_durability"} {
+	for _, field := range []string{
+		"promise_vocabulary",
+		"simplicity_durability",
+		"envelope_discipline",
+		"kernel_implementation_promises",
+		"app_protocol_promise_semantics",
+	} {
 		if _, ok := raw.Scores[field]; !ok {
 			missing = append(missing, "scores."+field)
 		}
@@ -753,9 +759,9 @@ func buildScoreSchemaCorrectionPrompt(prompt string, missingAxes []string) strin
 	var out strings.Builder
 	out.WriteString(prompt)
 	out.WriteString("\n## Schema Correction\n\n")
-	out.WriteString("Your previous JSON response was invalid because it omitted required fields for the rubric-v3 Promise Theory contract.\n")
+	out.WriteString("Your previous JSON response was invalid because it omitted required fields for the rubric-v4 layer-aware Promise Theory contract.\n")
 	fmt.Fprintf(&out, "Missing required fields: `%s`.\n", strings.Join(missingAxes, "`, `"))
-	out.WriteString("Return the full JSON object again, with all 10 `scores` axes present exactly once and a complete `assessment.pt_gate` object.\n")
+	out.WriteString("Return the full JSON object again, with all 13 `scores` axes present exactly once and a complete `assessment.pt_gate` object.\n")
 	out.WriteString("A response missing any required score field or `assessment.pt_gate` is invalid.\n")
 	return out.String()
 }
@@ -822,19 +828,25 @@ func scorePayloadJSONSchema() map[string]interface{} {
 					"implementation_plausibility",
 					"promise_vocabulary",
 					"simplicity_durability",
+					"envelope_discipline",
+					"kernel_implementation_promises",
+					"app_protocol_promise_semantics",
 					"risk_penalty",
 				},
 				"properties": map[string]interface{}{
-					"scenario_fit":                boundedIntegerSchema(),
-					"promisegrid_alignment":       boundedIntegerSchema(),
-					"auditability":                boundedIntegerSchema(),
-					"evolution_safety":            boundedIntegerSchema(),
-					"layer_boundary_clarity":      boundedIntegerSchema(),
-					"failure_handling":            boundedIntegerSchema(),
-					"implementation_plausibility": boundedIntegerSchema(),
-					"promise_vocabulary":          boundedIntegerSchema(),
-					"simplicity_durability":       boundedIntegerSchema(),
-					"risk_penalty":                boundedIntegerSchema(),
+					"scenario_fit":                   boundedIntegerSchema(),
+					"promisegrid_alignment":          boundedIntegerSchema(),
+					"auditability":                   boundedIntegerSchema(),
+					"evolution_safety":               boundedIntegerSchema(),
+					"layer_boundary_clarity":         boundedIntegerSchema(),
+					"failure_handling":               boundedIntegerSchema(),
+					"implementation_plausibility":    boundedIntegerSchema(),
+					"promise_vocabulary":             boundedIntegerSchema(),
+					"simplicity_durability":          boundedIntegerSchema(),
+					"envelope_discipline":            boundedIntegerSchema(),
+					"kernel_implementation_promises": boundedIntegerSchema(),
+					"app_protocol_promise_semantics": boundedIntegerSchema(),
+					"risk_penalty":                   boundedIntegerSchema(),
 				},
 			},
 			"fitness": map[string]interface{}{
@@ -908,6 +920,11 @@ func buildScorePrompt(repo Repo, state GAState, cell GACell, scenario Scenario) 
 	// without forbidding pCID-selected higher-layer payload protocols from owning
 	// their own evidence, freeze, transfer, or capability-token records. Source:
 	// DI-kafiz
+	//
+	// Intent: Make Rubric V4 layer-aware in the active scorer by separating
+	// envelope discipline, kernel implementation promises, and app-protocol
+	// promise semantics instead of forcing one generic PromiseGrid alignment
+	// score to carry all layer-specific concerns. Source: DI-ripuz
 	var out strings.Builder
 	out.WriteString("# GA Score Cell\n\n")
 	out.WriteString("Return only JSON with keys `scores`, `fitness`, and `assessment`.\n")
@@ -921,10 +938,13 @@ func buildScorePrompt(repo Repo, state GAState, cell GACell, scenario Scenario) 
 	fmt.Fprintf(&out, "- Result path: `%s`\n\n", cell.ResultPath)
 	out.WriteString("## Rubric\n\n")
 	out.WriteString("Score each axis from 0 to 5. Higher is better except `risk_penalty`, where 0 is low risk and 5 is severe risk.\n")
-	out.WriteString("Axes: scenario_fit, promisegrid_alignment, auditability, evolution_safety, layer_boundary_clarity, failure_handling, implementation_plausibility, promise_vocabulary, simplicity_durability, risk_penalty.\n")
+	out.WriteString("Axes: scenario_fit, promisegrid_alignment, auditability, evolution_safety, layer_boundary_clarity, failure_handling, implementation_plausibility, promise_vocabulary, simplicity_durability, envelope_discipline, kernel_implementation_promises, app_protocol_promise_semantics, risk_penalty.\n")
 	out.WriteString("- Score the candidate at its claimed layer. Do not penalize an envelope-layer design for leaving promise accounting, storage semantics, computation semantics, or application-specific trust updates to the payload protocol when the layer boundary is explicit.\n")
 	out.WriteString("- `promise_vocabulary`: reward Promise-Theory-correct, promise-first wording at the candidate's layer. For envelope sims, reward signed pCID-specific promises such as \"Alice promises these payload bytes are shaped according to the protocol specification named by this pCID.\" Penalize normative claim cards, generic claim headers/cards, conformance bundles, generic profile support claims, port claims, universal statement capsules, and central trust-ledger framing.\n")
 	out.WriteString("- `simplicity_durability`: reward small, explicit, deterministic, 100-year durable artifacts that fit small devices. Penalize generic maps, cards, ledgers, bundles, feature-shopping wrappers, and base-envelope selector-shopping stacks such as `env_pCID`/`sig_pCID`/`payload_pCID`.\n")
+	out.WriteString("- `envelope_discipline`: reward alignment with `DN-jotob` and the current envelope direction: CBOR `grid([42(pCID), payload, ...])`, `pCID` as Protocol CID, protocol-owned slot roles after slot 0, local unknown-pCID behavior, and no universal proof-slot overreach.\n")
+	out.WriteString("- `kernel_implementation_promises`: reward explicit local kernel implementation promises: app-facing storage/compute/send/receive/key/lifecycle/dispatch/evidence promises, host assumptions separated from promises, unsupported pCIDs/features, pCID adapter mappings, voluntary namespace/reference behavior, and no kernel-as-authority framing.\n")
+	out.WriteString("- `app_protocol_promise_semantics`: reward higher-layer/app protocols that model storage, computation, send/receive, reciprocal promises, selective sending, promise-as-capability-token behavior, make/break evidence, and local trust updates without command, permission, policy-enforcement, or conformance-authority framing.\n")
 	out.WriteString("- Do not treat higher-layer pCID-owned payload protocols as selector shopping merely because they define their own signed refusal records, exact-byte observation evidence, freeze successor records, transfer semantics, or capability-as-promise-token payload behavior.\n")
 	out.WriteString("- `scenario_fit` may be lower when a scenario asks for higher-layer behavior the candidate intentionally delegates to the payload protocol, but that delegation is not by itself a PT-gate violation when the layer boundary and local trust boundary are clear.\n")
 	out.WriteString("- The runner recomputes `fitness.raw` and `fitness.normalized_0_100` from your axis scores with normal weighting. Use `fitness.confidence_0_1` for your confidence.\n\n")
@@ -940,21 +960,21 @@ func buildScorePrompt(repo Repo, state GAState, cell GACell, scenario Scenario) 
 	out.WriteString("- `pt_reframe_needed`: technically interesting but drifts into non-PT framing; it may survive only as a question-home or rework candidate.\n")
 	out.WriteString("- `pt_invalid`: relies on authority, imposition, global trust, or RPC-style command semantics; it cannot be promotable.\n")
 	out.WriteString("Complete every PT rule check in `assessment.pt_gate`, and explain violations in `assessment.pt_gate.violations`.\n\n")
-	out.WriteString("Required score-axis checklist: `scenario_fit`, `promisegrid_alignment`, `auditability`, `evolution_safety`, `layer_boundary_clarity`, `failure_handling`, `implementation_plausibility`, `promise_vocabulary`, `simplicity_durability`, `risk_penalty`.\n")
+	out.WriteString("Required score-axis checklist: `scenario_fit`, `promisegrid_alignment`, `auditability`, `evolution_safety`, `layer_boundary_clarity`, `failure_handling`, `implementation_plausibility`, `promise_vocabulary`, `simplicity_durability`, `envelope_discipline`, `kernel_implementation_promises`, `app_protocol_promise_semantics`, `risk_penalty`.\n")
 	out.WriteString("A response missing any required `scores` axis or `assessment.pt_gate` is invalid.\n\n")
 	out.WriteString("## Source Documents\n\n")
 	for _, doc := range docs {
 		fmt.Fprintf(&out, "### `%s`\n\n```markdown\n%s\n```\n\n", doc.Path, strings.TrimSpace(doc.Text))
 	}
 	out.WriteString("## Required JSON Shape\n\n")
-	out.WriteString(`{"scores":{"scenario_fit":0,"promisegrid_alignment":0,"auditability":0,"evolution_safety":0,"layer_boundary_clarity":0,"failure_handling":0,"implementation_plausibility":0,"promise_vocabulary":0,"simplicity_durability":0,"risk_penalty":0},"fitness":{"raw":0,"normalized_0_100":0,"confidence_0_1":0.0},"assessment":{"rationale":"","strengths":[],"weaknesses":[],"risks":[],"open_questions":[],"authority_boundary":"Evidence only; does not settle PromiseGrid design.","pt_gate":{"status":"pt_clean","autonomous_agents":{"status":"pass","note":""},"scoped_intent":{"status":"pass","note":""},"no_promises_for_others":{"status":"pass","note":""},"no_guaranteed_outcomes":{"status":"pass","note":""},"local_trust_assessment":{"status":"pass","note":""},"accept_use_not_obligation":{"status":"pass","note":""},"violations":[]}}}`)
+	out.WriteString(`{"scores":{"scenario_fit":0,"promisegrid_alignment":0,"auditability":0,"evolution_safety":0,"layer_boundary_clarity":0,"failure_handling":0,"implementation_plausibility":0,"promise_vocabulary":0,"simplicity_durability":0,"envelope_discipline":0,"kernel_implementation_promises":0,"app_protocol_promise_semantics":0,"risk_penalty":0},"fitness":{"raw":0,"normalized_0_100":0,"confidence_0_1":0.0},"assessment":{"rationale":"","strengths":[],"weaknesses":[],"risks":[],"open_questions":[],"authority_boundary":"Evidence only; does not settle PromiseGrid design.","pt_gate":{"status":"pt_clean","autonomous_agents":{"status":"pass","note":""},"scoped_intent":{"status":"pass","note":""},"no_promises_for_others":{"status":"pass","note":""},"no_guaranteed_outcomes":{"status":"pass","note":""},"local_trust_assessment":{"status":"pass","note":""},"accept_use_not_obligation":{"status":"pass","note":""},"violations":[]}}}`)
 	out.WriteString("\n")
 	return out.String(), nil
 }
 
 // Intent: Persist only the current score/result envelope for new score runs
 // while the runner, not the provider, recomputes deterministic fitness from the
-// returned axis scores. Source: DI-roruj; DI-movur
+// returned axis scores. Source: DI-roruj; DI-movur; DI-ripuz
 func buildFitnessResult(repo Repo, state GAState, cell GACell, scenario Scenario, payload scorePayload) (FitnessResult, error) {
 	parts, issues := parseResultPath(repo, repo.Abs(cell.ResultPath))
 	if len(issues) > 0 {
@@ -971,7 +991,7 @@ func buildFitnessResult(repo Repo, state GAState, cell GACell, scenario Scenario
 	}
 	scores := applyPTGateScorePolicy(payload.Scores, payload.Assessment.PTGate)
 	return FitnessResult{
-		Schema:       resultSchemaV3,
+		Schema:       resultSchemaV4,
 		ResultID:     strings.Join([]string{parts.SimID, parts.ScenarioID, parts.ModelID, parts.Timestamp}, "-"),
 		RunGroupID:   state.RunGroupID,
 		CellID:       cell.CellID,
@@ -1004,15 +1024,15 @@ func buildFitnessResult(repo Repo, state GAState, cell GACell, scenario Scenario
 			SimulationTreeHash: simHash,
 		},
 		Rubric: RubricInfo{
-			RubricVersion:      rubricVersionForSchema(resultSchemaV3),
+			RubricVersion:      rubricVersionForSchema(resultSchemaV4),
 			ScoreScale:         "0..5",
-			ScoreMeanings:      rubricScoreMeaningsForSchema(resultSchemaV3),
-			Axes:               rubricAxesForSchema(resultSchemaV3),
-			PromiseTheoryRules: rubricPromiseTheoryRulesForSchema(resultSchemaV3),
-			PromiseTheoryRefs:  rubricPromiseTheoryReferencesForSchema(resultSchemaV3),
+			ScoreMeanings:      rubricScoreMeaningsForSchema(resultSchemaV4),
+			Axes:               rubricAxesForSchema(resultSchemaV4),
+			PromiseTheoryRules: rubricPromiseTheoryRulesForSchema(resultSchemaV4),
+			PromiseTheoryRefs:  rubricPromiseTheoryReferencesForSchema(resultSchemaV4),
 		},
 		Scores:     scores,
-		Fitness:    deterministicFitnessSummary(resultSchemaV3, scores, payload.Fitness.Confidence0To1),
+		Fitness:    deterministicFitnessSummary(resultSchemaV4, scores, payload.Fitness.Confidence0To1),
 		Assessment: payload.Assessment,
 	}, nil
 }
