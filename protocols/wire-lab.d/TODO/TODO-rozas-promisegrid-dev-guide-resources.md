@@ -121,6 +121,31 @@ Affects: `docs/thought-experiments/TE-mazop-kernel-promise-boundary-and-minimum-
 `DEV-GUIDE-RESOURCES.md`;
 `protocols/wire-lab.d/TODO/TODO-rozas-promisegrid-dev-guide-resources.md`.
 
+### DI-gumum
+
+ID: DI-gumum
+Date: 2026-05-25 08:43:37
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Add `TE-pudiv` as a narrow follow-up to `TE-mazop` to test whether
+the app/kernel boundary should use the same `grid([42(pCID), payload, ...])`
+message format as the wire boundary. Route that evidence into `DR-davod`,
+`DEV-GUIDE-RESOURCES.md`, and the TE indexes without rewriting `TE-mazop`'s
+historical body.
+Intent: `TE-mazop` allows pCID-selected local messaging but does not make the
+same-envelope app/kernel alternative first-class. The repo should test that
+alternative directly before deciding whether the kernel boundary is a local API,
+a profile record, or ordinary PromiseGrid messages between local agents.
+Constraints: Do not close `DR-davod`. Do not change the locked outer envelope
+shape. Do not run canary, GA, or scoring commands. Treat `TE-mazop` as
+historical evidence and add only a forward-pointer refinement there if needed.
+Affects: `docs/thought-experiments/TE-pudiv-app-kernel-grid-message-boundary.md`;
+`docs/thought-experiments/TE-mazop-kernel-promise-boundary-and-minimum-port-contract.md`;
+`DR/DR-davod-promisegrid-kernel-dev-porting-boundary.md`;
+`docs/thought-experiments/README.md`; `protocols/wire-lab.d/specs/harness-spec-draft.md`;
+`DEV-GUIDE-RESOURCES.md`;
+`protocols/wire-lab.d/TODO/TODO-rozas-promisegrid-dev-guide-resources.md`.
+
 ### DI-lukib
 
 ID: DI-lukib
@@ -340,3 +365,8 @@ guide's claims.
   simulations index, harness-spec TE summary, and `DEV-GUIDE-RESOURCES.md`
   without changing the locked envelope direction or closing `DR-davod`.
   Source: `DI-funaf`.
+- [x] rozas.18 Add `TE-pudiv` to test the same-grid app/kernel message-boundary
+  alternative that `TE-mazop` allowed but did not make first-class. Route it to
+  `DR-davod`, `DEV-GUIDE-RESOURCES.md`, the TE index, and the harness-spec TE
+  summary without rewriting `TE-mazop`'s body or closing `DR-davod`. Source:
+  `DI-gumum`.

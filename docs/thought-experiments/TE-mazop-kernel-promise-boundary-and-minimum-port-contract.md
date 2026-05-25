@@ -265,3 +265,12 @@ simulation-backed questions:
 
 `needs DF` - this TE narrows the next evidence packet but does not decide the
 stable kernel-developer porting boundary.
+
+## Refinements
+
+### 2026-05-25 - App/kernel grid-message boundary
+
+`TE-pudiv` follows this TE with a narrower question: whether the app/kernel
+boundary should use the same `grid([42(pCID), payload, ...])` message format as
+the wire boundary. This is a forward pointer only; the analysis above remains
+unchanged historical evidence. Source: `DI-gumum`.
