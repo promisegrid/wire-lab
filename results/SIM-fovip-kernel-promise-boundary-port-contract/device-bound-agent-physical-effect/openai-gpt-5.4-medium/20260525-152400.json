@@ -1,0 +1,176 @@
+{
+  "schema": "promisegrid.ga.result.v4",
+  "result_id": "SIM-fovip-kernel-promise-boundary-port-contract-device-bound-agent-physical-effect-openai-gpt-5.4-medium-20260525-152400",
+  "run_group_id": "ga-canary-20260525-kernel-resolution-rubric-v4",
+  "cell_id": "ga-canary-20260525-kernel-resolution-rubric-v4-000003-SIM-fovip-kernel-promise-boundary-port-contract--device-bound-agent-physical-effect--openai-gpt-5.4-medium",
+  "sim_id": "SIM-fovip-kernel-promise-boundary-port-contract",
+  "scenario_id": "device-bound-agent-physical-effect",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260525-152400",
+  "result_path": "results/SIM-fovip-kernel-promise-boundary-port-contract/device-bound-agent-physical-effect/openai-gpt-5.4-medium/20260525-152400.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_340d21b8ba5343f6898f3e2d9e32b0a2",
+    "response_id": "resp_0525dc862c46059c006a14cdd544548198a033b90f9609b18d",
+    "input_tokens": 10812,
+    "output_tokens": 1613,
+    "cost_usd": 0.041503
+  },
+  "source": {
+    "repo_commit": "611e8c1e1b703636674c1022ff559e5e6730a0fe",
+    "sim_path": "simulations/SIM-fovip-kernel-promise-boundary-port-contract/",
+    "scenario_path": "scenarios/device-bound-agent-physical-effect/device-bound-agent-physical-effect.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-fovip-kernel-promise-boundary-port-contract/README.md",
+        "sha256": "76401fe20d84f82f8951e432077d87adac22ad9faec5ed51ad6bd938d37fbada"
+      },
+      {
+        "path": "simulations/SIM-fovip-kernel-promise-boundary-port-contract/QUESTION.md",
+        "sha256": "7a5f8d8a7f58a2be143eff3a805c3ee1d56efe87970a237e2d14f7dd361ca71a"
+      },
+      {
+        "path": "simulations/SIM-fovip-kernel-promise-boundary-port-contract/protocols/kernel-port.d/specs/kernel-port-contract-draft.md",
+        "sha256": "398868ef9f86478d5e2719f0f3771ddb905a5e3fd65882c8985bf89967381260"
+      },
+      {
+        "path": "scenarios/device-bound-agent-physical-effect/device-bound-agent-physical-effect.md",
+        "sha256": "ffd2cee6094031ae77651ba8da6c3c76b54d200845f65f0e93d07c8e96aaeb2a"
+      }
+    ],
+    "simulation_tree_hash": "c687a3c548d7e9d1aebc6f314ca718d0bf83ab21c87b675c653e586161102361"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260525-v4",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "app_protocol_promise_semantics": "0 uses command/permission framing, 5 models storage, computation, send/receive, reciprocal promises, local trust, and make/break evidence",
+      "envelope_discipline": "0 ignores the settled envelope direction or confuses pCID, 5 aligns with grid([42(pCID), payload, ...]), Protocol-CID semantics, and protocol-owned later slots",
+      "kernel_implementation_promises": "0 treats the kernel as authority or generic port conformance, 5 names local kernel implementation promises, assumptions, unsupported behavior, and evidence",
+      "promise_vocabulary": "0 drifts into claims/profiles/generic statement capsules/central trust-ledger framing, 5 stays promise-first, layer-local, and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt, selector-shopping, or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "envelope_discipline",
+      "kernel_implementation_promises",
+      "app_protocol_promise_semantics",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 3,
+    "promisegrid_alignment": 5,
+    "auditability": 4,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 4,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 5,
+    "simplicity_durability": 4,
+    "envelope_discipline": 4,
+    "kernel_implementation_promises": 5,
+    "app_protocol_promise_semantics": 2,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 51,
+    "normalized_0_100": 78.46153846153847,
+    "confidence_0_1": 0.88
+  },
+  "assessment": {
+    "rationale": "Strong promise-first kernel-layer design. It cleanly separates kernel implementation promises, host assumptions, unsupported features, adapters, namespace/reference behavior, and evidence policy. For this physical-device scenario it provides useful kernel-side scaffolding—device access promises, exact-byte evidence, and broken-promise handling—but it intentionally stops short of defining the higher-layer replay/deduplication semantics needed for at-most-once non-idempotent effects.",
+    "strengths": [
+      "Excellent layer boundary clarity: app/kernel operations are mapped to pCID-selected grid messages or declared outside the boundary.",
+      "Very strong kernel implementation promise coverage, including storage/compute/send/receive/key/device/lifecycle/dispatch/evidence surfaces.",
+      "Good audit posture through explicit kept/refused/unavailable/broken evidence expectations and exact-byte preservation.",
+      "Promise vocabulary is consistently local, scoped, and non-authoritative."
+    ],
+    "weaknesses": [
+      "Scenario-specific physical-effect deduplication is delegated upward rather than solved here.",
+      "The draft does not by itself specify receipt or break-witness semantics for already-executed device actions after restart.",
+      "Envelope details are affirmed but not deeply specified beyond the boundary claim."
+    ],
+    "risks": [
+      "Replay and restart handling for physical effects is not closed at the kernel record layer, so different apps may invent incompatible semantics.",
+      "Owner delegation and driver-stack provenance may remain underspecified unless a higher-layer payload protocol binds them into durable evidence.",
+      "A port may overclaim device capability if host assumptions and actual driver behavior drift apart over time."
+    ],
+    "open_questions": [
+      "Which higher-layer pCID should carry replay-safe at-most-once semantics for non-idempotent physical effects such as printing?",
+      "What exact local evidence links owner delegation, kernel device-access promise, and host-driver assumptions after the original driver stack is gone?",
+      "How should a restarting daemon record already-done physical effects versus uncertain outcomes versus broken-promise witnesses?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design.",
+    "pt_gate": {
+      "status": "pt_clean",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "Kernel, app, host, and local services are treated as separate promisers with autonomous behavior."
+      },
+      "scoped_intent": {
+        "status": "pass",
+        "note": "Promises are scoped to the local implementation profile, supported pCIDs, and exposed app-facing surfaces."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "Host/runtime dependencies are separated into assumptions, so the kernel does not promise host or device-owner behavior on their behalf."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "The draft emphasizes evidence, refusal, unavailable, and broken-promise records rather than guaranteed success."
+      },
+      "local_trust_assessment": {
+        "status": "pass",
+        "note": "The record is explicitly not a global certificate; trust is updated from local make/break evidence."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "The design frames app/kernel interactions as local promises and adapters, not obligations or permissions."
+      },
+      "violations": []
+    }
+  }
+}
