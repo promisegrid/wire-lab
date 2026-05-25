@@ -20,6 +20,86 @@ evidence. Source: `DI-muniz`; `DI-pozom`.
 
 ## Decision Intent Log
 
+ID: DI-zozov
+Date: 2026-05-24 19:00:16
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Update `docs/research/DN-jotob-grid-envelope-tag42-variable-outer-slots.md`
+to give explicit heritage credit to the envelope-sim lineage that led to the
+current tagged-selector direction, with `SIM-dalor` named as the primary
+antecedent and `SIM-pobod`, `SIM-jufag`, and `SIM-zukis` named as the nearby
+comparison and specimen lineages.
+Intent: The note currently explains the chosen direction and the reason for tag
+`42`, but it reads as if that direction appeared fully formed at the TE/DI
+layer. The heritage should be visible in plain English so readers can see that
+the locked direction inherits concrete pressure and ideas from the earlier sim
+lineage, especially `SIM-dalor`'s protocol-owned outer-proof slot framing.
+Constraints: Keep this as a doc-only lineage clarification. Do not reopen
+`TE-fikoj` or `DI-sisak`. Do not claim that any single sim, including
+`SIM-dalor`, was itself the final protocol decision. Make clear that the TE/DI
+chain remains the actual locking authority, while the sims provided the design
+pressure and near-contender evidence.
+Affects: `protocols/wire-lab.d/TODO/TODO-mopob-pcid-protocol-cid-corpus-correction-and-envelope-successors.md`;
+`docs/research/DN-jotob-grid-envelope-tag42-variable-outer-slots.md`.
+
+ID: DI-bumon
+Date: 2026-05-24 18:52:00
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Rename the plain-English tagged-envelope design note to the
+proquint-named path
+`docs/research/DN-jotob-grid-envelope-tag42-variable-outer-slots.md` and
+clarify its slot-0 explanation so it says explicitly that `42` is the current
+tagged-selector instance chosen for IPLD / IPFS / Bluesky ecosystem
+compatibility. The note must explain what that compatibility buys and what it
+does not imply.
+Intent: The current note explains the chosen direction but does not yet say
+plainly why `42` is preferred or what “ecosystem compatibility” means in
+practical developer terms. The note should make that rationale explicit while
+keeping the semantic role distinction intact: slot `0` still means Protocol
+CID, while `42(pCID)` is the current wire instance chosen for interop with
+CID-bearing DAG-CBOR ecosystems.
+Constraints: Keep the note in `docs/research/`. Do not open a new TE, DR, or
+sim. Preserve the already locked `TE-fikoj` / `DI-sisak` direction. Make clear
+that IPLD / IPFS / Bluesky compatibility buys tooling and ecosystem alignment,
+not semantic delegation, global trust, or external authority. Use the proquint
+path in new references going forward.
+Affects: `protocols/wire-lab.d/TODO/TODO-mopob-pcid-protocol-cid-corpus-correction-and-envelope-successors.md`;
+`docs/research/DN-jotob-grid-envelope-tag42-variable-outer-slots.md`.
+
+ID: DI-mabit
+Date: 2026-05-24 18:45:00
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Add one direct, breed-eligible specimen simulation,
+`SIM-zukis-grid-envelope-tag42-protocol-owned-slot2-varsig`, plus one
+plain-English design note at
+`docs/research/grid-envelope-tag42-variable-outer-slots-20260524.md` to
+implement and explain the already locked `TE-fikoj` / `DI-sisak` direction.
+`SIM-zukis` must concretely exercise the family
+`grid([42(pCID), payload, ...])` by using one protocol-owned example later outer
+slot: slot `2` is a `varsig` proof for this specimen. The broader family rule
+remains that later outer-slot roles are defined by the protocol named by
+`pCID`, not by the universal envelope.
+Intent: The repo now has the locked outer-envelope direction in TE, TODO,
+harness-spec, and guide-resource form, but it still lacks one direct specimen
+simulation and one developer-facing explanatory note. This task fills both gaps
+without reopening the fixed-three-slot versus variable-arity decision. The sim
+must make variable arity concrete while staying PT-clean and avoiding
+selector-shopping machinery. The design note must explain the current direction
+in plain English for kernel and app developers.
+Constraints: Keep `pCID` = Protocol CID. Do not create `SIM-META.json`; the new
+sim remains breed-eligible. Do not add `sig_pcid`, `env_pcid`, `payload_pcid`,
+generic claim headers, statement capsules, or promise-accounting envelope
+fields. Do not write a new TE. Keep the design note outside the TE corpus and
+outside the formal spec tree. Cite `TE-fikoj`, `DI-sisak`, and the current
+`DEV-GUIDE-RESOURCES.md` snapshot from the design note.
+Affects: `protocols/wire-lab.d/TODO/TODO-mopob-pcid-protocol-cid-corpus-correction-and-envelope-successors.md`;
+`simulations/SIM-zukis-grid-envelope-tag42-protocol-owned-slot2-varsig/QUESTION.md`;
+`simulations/SIM-zukis-grid-envelope-tag42-protocol-owned-slot2-varsig/README.md`;
+`simulations/SIM-zukis-grid-envelope-tag42-protocol-owned-slot2-varsig/protocols/grid-envelope.d/specs/grid-envelope-draft.md`;
+`docs/research/grid-envelope-tag42-variable-outer-slots-20260524.md`.
+
 ID: DI-sisak
 Date: 2026-05-24 18:06:40
 Status: active
@@ -383,6 +463,27 @@ supersession:
   array length carrying arity, and later outer-slot roles defined by the
   protocol named by `pCID`. Update the TE status, harness evidence pointer, and
   `DEV-GUIDE-RESOURCES.md` in the same pass. Source: `DI-sisak`.
+- [x] mopob.19 Add direct specimen
+  `SIM-zukis-grid-envelope-tag42-protocol-owned-slot2-varsig` to implement the
+  locked `TE-fikoj` direction as one concrete
+  `grid([42(pCID), payload, varsig])` member of the broader
+  `grid([42(pCID), payload, ...])` family. Keep slot `2` protocol-owned, keep
+  the sim breed-eligible, and compare it against `SIM-dalor`, `SIM-pobod`, and
+  `SIM-jufag`. Source: `DI-mabit`.
+- [x] mopob.20 Add plain-English design note
+  `docs/research/grid-envelope-tag42-variable-outer-slots-20260524.md` to
+  explain the locked `TE-fikoj` / `DI-sisak` direction to developers without
+  TE scaffolding or formal-spec tone. Source: `DI-mabit`.
+- [x] mopob.21 Rename the plain-English design note to
+  `docs/research/DN-jotob-grid-envelope-tag42-variable-outer-slots.md` and make
+  its slot-0 explanation state explicitly that `42` is the current
+  IPLD / IPFS / Bluesky ecosystem-compatibility choice, including what that
+  compatibility buys and what it does not imply. Source: `DI-bumon`.
+- [x] mopob.22 Update `DN-jotob` to credit its design heritage explicitly,
+  especially `SIM-dalor` as the primary ancestor, while also naming `SIM-pobod`,
+  `SIM-jufag`, and `SIM-zukis` as the surrounding lineage. Keep `TE-fikoj` /
+  `DI-sisak` as the locking authority rather than attributing the final decision
+  to any one sim. Source: `DI-zozov`.
 
 ## Validation and acceptance criteria
 
