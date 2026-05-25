@@ -48,6 +48,7 @@ minted after that date carry only the proquint handle.
 | [TODO-tapur](./TODO-tapur-ga-runner-json-fitness-and-child-sim-search.md) | 2026-05-19 | GA runner JSON fitness and child sim search | — |
 | [TODO-lugag](./TODO-lugag-promise-theory-ga-prompt-scenario-and-rescore-correction.md) | 2026-05-23 | Promise Theory GA prompt, scenario, and rescore correction | — |
 | [TODO-busok](./TODO-busok-rubric-v4-layer-aware-ga-scoring.md) | 2026-05-25 | Rubric V4 layer-aware GA scoring **(planned: additive kernel rescore after v4 source changes)** | — |
+| [TODO-goban](./TODO-goban-dalor-zukis-fovip-breeding.md) | 2026-05-25 | Dalor, Zukis, and Fovip breeding run **(planned: dalor-anchored envelope/kernel composition slice)** | — |
 | [TODO-tugoz](./TODO-tugoz-grid-envelope-signable-view-and-gordian-comparison-sims.md) | 2026-05-22 | Grid-envelope signable-view and Gordian comparison sims | — |
 | [TODO-mujad](./TODO-mujad-grid-envelope-protocol-owned-signature-slot.md) | 2026-05-23 | Grid-envelope protocol-owned signature slot | — |
 | [TODO-mopob](./TODO-mopob-pcid-protocol-cid-corpus-correction-and-envelope-successors.md) | 2026-05-24 | pCID Protocol-CID corpus correction and envelope successors | — |
