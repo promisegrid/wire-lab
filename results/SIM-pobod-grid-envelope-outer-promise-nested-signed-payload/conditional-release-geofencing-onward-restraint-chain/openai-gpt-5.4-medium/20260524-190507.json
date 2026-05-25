@@ -1,0 +1,163 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-pobod-grid-envelope-outer-promise-nested-signed-payload-conditional-release-geofencing-onward-restraint-chain-openai-gpt-5.4-medium-20260524-190507",
+  "run_group_id": "ga-canary-20260524-dalor-pobod-forced",
+  "cell_id": "ga-canary-20260524-dalor-pobod-forced-000012-SIM-pobod-grid-envelope-outer-promise-nested-signed-payload--conditional-release-geofencing-onward-restraint-chain--openai-gpt-5.4-medium",
+  "sim_id": "SIM-pobod-grid-envelope-outer-promise-nested-signed-payload",
+  "scenario_id": "conditional-release-geofencing-onward-restraint-chain",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260524-190507",
+  "result_path": "results/SIM-pobod-grid-envelope-outer-promise-nested-signed-payload/conditional-release-geofencing-onward-restraint-chain/openai-gpt-5.4-medium/20260524-190507.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_7bccd3ba1e1b4cf397855535eae677ea",
+    "response_id": "resp_0736d161fc2a98d9006a134c213370819abbe23e8141490301",
+    "input_tokens": 8444,
+    "output_tokens": 1445,
+    "cost_usd": 0.035007
+  },
+  "source": {
+    "repo_commit": "8a977521fd3192972ffb08ab152c0740b46c7c5e",
+    "sim_path": "simulations/SIM-pobod-grid-envelope-outer-promise-nested-signed-payload/",
+    "scenario_path": "scenarios/conditional-release-geofencing-onward-restraint-chain/conditional-release-geofencing-onward-restraint-chain.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-pobod-grid-envelope-outer-promise-nested-signed-payload/README.md",
+        "sha256": "eb57e248895158aa53182aa525888b693905ec27813ce1618dc6de1ff50998b9"
+      },
+      {
+        "path": "simulations/SIM-pobod-grid-envelope-outer-promise-nested-signed-payload/QUESTION.md",
+        "sha256": "99fce8d0035d8056937da17da995ccb1b152837053e2621909883a6cf3afbb8d"
+      },
+      {
+        "path": "scenarios/conditional-release-geofencing-onward-restraint-chain/conditional-release-geofencing-onward-restraint-chain.md",
+        "sha256": "3c84fc46e1b14de5e5c6e9b029fcb891bd655238b45e516b20eda97dabe8ff24"
+      }
+    ],
+    "simulation_tree_hash": "941614f1c8ec15ab226d7b287e27dfd6e06074c920a61c1a5460d449f282d27b"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first, layer-local, and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 5,
+    "auditability": 4,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 3,
+    "implementation_plausibility": 5,
+    "promise_vocabulary": 5,
+    "simplicity_durability": 5,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 41,
+    "normalized_0_100": 82,
+    "confidence_0_1": 0.84
+  },
+  "assessment": {
+    "rationale": "Strong PT-clean envelope-layer design. It explicitly states the sender's outer-layer promise about byte shape and treats nested signatures as evidence, preserving local trust and clear layer boundaries. For this scenario, however, the recursive onward-restraint chain is mostly delegated to the payload protocol, so fit is limited but not invalid at the claimed layer.",
+    "strengths": [
+      "Explicit promise-first restatement of the outer envelope semantics.",
+      "Clear separation between envelope parsing/authorship evidence and higher-layer payload meaning.",
+      "Small signed-payload carrier is simple, durable, and plausible for constrained devices.",
+      "Unsigned outer fields are not treated as authority, reducing hidden transport trust."
+    ],
+    "weaknesses": [
+      "Does not itself model the recursive promise graph central to this scenario.",
+      "Limited direct handling of breach, refusal, or onward-restraint failure evidence.",
+      "Scenario semantics depend heavily on a separate payload family that is not defined here."
+    ],
+    "risks": [
+      "Users may over-read the envelope as enforcing conditional release when it only carries evidence for higher-layer policy claims.",
+      "Without a well-specified payload protocol, onward-restraint chains may become inconsistent or unauditable across hops.",
+      "Forwarding-chain semantics such as geofencing, expiry, and breach evidence remain underspecified here."
+    ],
+    "open_questions": [
+      "Which payload protocol would express Bob's onward-restraint promise to Carol without collapsing local trust into a global policy graph?",
+      "How would Alice or Carol record and audit breaches of the forwarding-chain condition using only local evidence?",
+      "How are geofencing predicates, expiry, and evolution of policy terms named and signed inside the nested payload?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design.",
+    "pt_gate": {
+      "status": "pt_clean",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "The design treats sender and receiver as autonomous agents making and assessing promises locally."
+      },
+      "scoped_intent": {
+        "status": "pass",
+        "note": "The outer promise is narrowly scoped to parsing and interpretation of the nested signed payload."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "The sender promises only about the carried bytes and evidence object; it does not bind later forwarders on their behalf."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "The envelope provides evidence about claimed structure and authorship, not guaranteed downstream behavior or release outcomes."
+      },
+      "local_trust_assessment": {
+        "status": "pass",
+        "note": "Trust stays explicitly local: receivers decide whether the sender's outer promise and nested signature are credible."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "Receivers are described as deciding locally whether to trust and use the envelope and nested signature; no receipt or use is framed as obligation."
+      },
+      "violations": []
+    }
+  }
+}

@@ -1,0 +1,163 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-pobod-grid-envelope-outer-promise-nested-signed-payload-promise-accounting-records-refused-service-openai-gpt-5.4-medium-20260524-190507",
+  "run_group_id": "ga-canary-20260524-dalor-pobod-forced",
+  "cell_id": "ga-canary-20260524-dalor-pobod-forced-000011-SIM-pobod-grid-envelope-outer-promise-nested-signed-payload--promise-accounting-records-refused-service--openai-gpt-5.4-medium",
+  "sim_id": "SIM-pobod-grid-envelope-outer-promise-nested-signed-payload",
+  "scenario_id": "promise-accounting-records-refused-service",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260524-190507",
+  "result_path": "results/SIM-pobod-grid-envelope-outer-promise-nested-signed-payload/promise-accounting-records-refused-service/openai-gpt-5.4-medium/20260524-190507.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_480664ff354d4c20a346ff41c17937ea",
+    "response_id": "resp_0b4908a26ade2868006a134c1e643c819aa7cb25dd1d7d59fb",
+    "input_tokens": 8393,
+    "output_tokens": 1176,
+    "cost_usd": 0.03115175
+  },
+  "source": {
+    "repo_commit": "8a977521fd3192972ffb08ab152c0740b46c7c5e",
+    "sim_path": "simulations/SIM-pobod-grid-envelope-outer-promise-nested-signed-payload/",
+    "scenario_path": "scenarios/promise-accounting-records-refused-service/promise-accounting-records-refused-service.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-pobod-grid-envelope-outer-promise-nested-signed-payload/README.md",
+        "sha256": "eb57e248895158aa53182aa525888b693905ec27813ce1618dc6de1ff50998b9"
+      },
+      {
+        "path": "simulations/SIM-pobod-grid-envelope-outer-promise-nested-signed-payload/QUESTION.md",
+        "sha256": "99fce8d0035d8056937da17da995ccb1b152837053e2621909883a6cf3afbb8d"
+      },
+      {
+        "path": "scenarios/promise-accounting-records-refused-service/promise-accounting-records-refused-service.md",
+        "sha256": "9a7d47455793988cfb9b0fb045b29086ed13ee22cd0db080584e259c0aa69313"
+      }
+    ],
+    "simulation_tree_hash": "941614f1c8ec15ab226d7b287e27dfd6e06074c920a61c1a5460d449f282d27b"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first, layer-local, and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 5,
+    "auditability": 4,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 2,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 5,
+    "simplicity_durability": 4,
+    "risk_penalty": 1
+  },
+  "fitness": {
+    "raw": 39,
+    "normalized_0_100": 78,
+    "confidence_0_1": 0.87
+  },
+  "assessment": {
+    "rationale": "A strong Promise-Theory-clean envelope design: it makes the outer-layer promise explicit, keeps trust local, and avoids unsigned authority claims. For this scenario, however, it mainly provides a transport/evidence wrapper and does not itself define promise-accounting semantics that distinguish refusal from failure, corruption, or timeout. That limits scenario fit without making the design PT-invalid.",
+    "strengths": [
+      "Explicit outer-layer promise wording is PT-correct and locally assessable.",
+      "Clear layer boundary: envelope semantics are separated from payload meaning and accounting policy.",
+      "Signed nested payload supports durable audit evidence without relying on transport authority.",
+      "Small, deterministic envelope shape is plausible for long-lived and constrained deployments."
+    ],
+    "weaknesses": [
+      "Does not by itself encode refusal-specific semantics or accounting records.",
+      "Scenario asks for differentiation among refusal, failure, corruption, and timeout, which is mostly delegated upward.",
+      "Auditability for refusal outcomes depends on payload-level conventions not specified here."
+    ],
+    "risks": [
+      "Implementers may overread the signed nested payload as solving refusal accounting when the distinction actually depends on a higher-layer payload protocol.",
+      "Different payload protocols may encode refusal inconsistently, reducing cross-peer audit comparability.",
+      "Absent a shared refusal record convention, later auditors may still struggle to distinguish honest refusal from silence."
+    ],
+    "open_questions": [
+      "What higher-layer payload protocol cleanly encodes an explicit refusal so peers can record it distinctly from timeout, corruption, or execution failure?",
+      "Should the outer envelope reserve any minimal refusal/error discriminator, or should all such semantics remain entirely in the nested payload protocol?",
+      "What local promise-accounting record format would let Carol later audit that Alice honestly refused service rather than simply failed to respond?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design.",
+    "pt_gate": {
+      "status": "pt_clean",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "Sender and receiver remain autonomous; the sender makes a limited outer-layer promise and receivers assess it locally."
+      },
+      "scoped_intent": {
+        "status": "pass",
+        "note": "The outer promise is narrowly scoped to parseability and interpretation of the nested signed payload."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "The sender promises only about the carried bytes and evidence object, not on behalf of other agents."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "The design offers evidence and structure claims, not guaranteed delivery, acceptance, or success outcomes."
+      },
+      "local_trust_assessment": {
+        "status": "pass",
+        "note": "Local trust is explicit: receivers decide whether to trust the sender's outer promise and the nested signature evidence."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "The design does not collapse receipt or verification into obligation; receivers choose locally whether to use the envelope and trust the nested signature."
+      },
+      "violations": []
+    }
+  }
+}

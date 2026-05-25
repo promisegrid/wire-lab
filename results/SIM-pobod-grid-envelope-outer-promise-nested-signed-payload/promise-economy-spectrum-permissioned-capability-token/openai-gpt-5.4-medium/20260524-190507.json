@@ -1,0 +1,162 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-pobod-grid-envelope-outer-promise-nested-signed-payload-promise-economy-spectrum-permissioned-capability-token-openai-gpt-5.4-medium-20260524-190507",
+  "run_group_id": "ga-canary-20260524-dalor-pobod-forced",
+  "cell_id": "ga-canary-20260524-dalor-pobod-forced-000016-SIM-pobod-grid-envelope-outer-promise-nested-signed-payload--promise-economy-spectrum-permissioned-capability-token--openai-gpt-5.4-medium",
+  "sim_id": "SIM-pobod-grid-envelope-outer-promise-nested-signed-payload",
+  "scenario_id": "promise-economy-spectrum-permissioned-capability-token",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260524-190507",
+  "result_path": "results/SIM-pobod-grid-envelope-outer-promise-nested-signed-payload/promise-economy-spectrum-permissioned-capability-token/openai-gpt-5.4-medium/20260524-190507.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_81071d06d4c34a1e8889a0342a2650d3",
+    "response_id": "resp_05940b3fef971507006a134c37c4c4819999877ae6cb049b7a",
+    "input_tokens": 8404,
+    "output_tokens": 1193,
+    "cost_usd": 0.031409
+  },
+  "source": {
+    "repo_commit": "8a977521fd3192972ffb08ab152c0740b46c7c5e",
+    "sim_path": "simulations/SIM-pobod-grid-envelope-outer-promise-nested-signed-payload/",
+    "scenario_path": "scenarios/promise-economy-spectrum-permissioned-capability-token/promise-economy-spectrum-permissioned-capability-token.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-pobod-grid-envelope-outer-promise-nested-signed-payload/README.md",
+        "sha256": "eb57e248895158aa53182aa525888b693905ec27813ce1618dc6de1ff50998b9"
+      },
+      {
+        "path": "simulations/SIM-pobod-grid-envelope-outer-promise-nested-signed-payload/QUESTION.md",
+        "sha256": "99fce8d0035d8056937da17da995ccb1b152837053e2621909883a6cf3afbb8d"
+      },
+      {
+        "path": "scenarios/promise-economy-spectrum-permissioned-capability-token/promise-economy-spectrum-permissioned-capability-token.md",
+        "sha256": "ac5ba8f29fb13e1d693bdbfb0a5cc1c516750bf4f3a142b8dee90128d13ce2e2"
+      }
+    ],
+    "simulation_tree_hash": "941614f1c8ec15ab226d7b287e27dfd6e06074c920a61c1a5460d449f282d27b"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first, layer-local, and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 3,
+    "promisegrid_alignment": 5,
+    "auditability": 4,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 3,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 5,
+    "simplicity_durability": 4,
+    "risk_penalty": 1
+  },
+  "fitness": {
+    "raw": 41,
+    "normalized_0_100": 82,
+    "confidence_0_1": 0.84
+  },
+  "assessment": {
+    "rationale": "Strong PT-clean envelope-layer design. It explicitly states the sender's outer-layer promise about nested bytes and leaves capability-token meaning to the signed payload protocol, which is the right boundary for this simulation. It fits the scenario only partially because permission and redemption semantics are mostly delegated inward, but that delegation is explicit and locally auditable rather than authority-led.",
+    "strengths": [
+      "Excellent layer-boundary clarity between envelope parsing promises and payload semantics.",
+      "Very strong Promise-Theory vocabulary at the claimed layer.",
+      "Small signed-evidence-oriented shape is durable, auditable, and plausible for constrained devices."
+    ],
+    "weaknesses": [
+      "Does not by itself define capability-token permission or redemption behavior.",
+      "Failure handling for revocation, expiry, and replay is mostly deferred to payload design.",
+      "Scenario fit is limited because marketplace-avoidance semantics are not expressed at the envelope layer."
+    ],
+    "risks": [
+      "Capability semantics may be underspecified if payload protocols do not clearly define non-transferability and redemption scope.",
+      "Different payload protocols could produce inconsistent local interpretations of permission without stronger conventions.",
+      "Replay or stale-token risks remain unless the nested payload protocol carries freshness and revocation evidence."
+    ],
+    "open_questions": [
+      "What payload-level promise shape best expresses non-transferable capability scope and redemption semantics without slipping into exchange-rate framing?",
+      "How should expiry, revocation, and replay resistance be evidenced inside the nested signed payload for long-lived offline audit?",
+      "What minimal payload conventions let different peers locally assess capability redemption while preserving the small outer envelope?"
+    ],
+    "authority_boundary": "Evidence only; envelope-layer design; capability semantics and trust updates remain payload-protocol-local.",
+    "pt_gate": {
+      "status": "pt_clean",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "Sender and receiver remain autonomous; the receiver evaluates trust locally."
+      },
+      "scoped_intent": {
+        "status": "pass",
+        "note": "The outer promise is narrowly scoped to parsing and evidencing the nested signed payload."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "The sender promises only about its own envelope-layer intent and carried evidence, not on behalf of other agents."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "The envelope offers evidence and structure claims, not guaranteed redemption outcomes."
+      },
+      "local_trust_assessment": {
+        "status": "pass",
+        "note": "Trust is explicitly local: receivers decide whether to trust the outer promise and inner signature evidence."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "The design lets receivers decide locally whether to accept or use the nested payload; receipt is not framed as obligation."
+      },
+      "violations": []
+    }
+  }
+}

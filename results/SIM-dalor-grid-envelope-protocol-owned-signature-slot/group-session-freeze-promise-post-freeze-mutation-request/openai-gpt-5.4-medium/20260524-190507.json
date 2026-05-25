@@ -1,0 +1,167 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-dalor-grid-envelope-protocol-owned-signature-slot-group-session-freeze-promise-post-freeze-mutation-request-openai-gpt-5.4-medium-20260524-190507",
+  "run_group_id": "ga-canary-20260524-dalor-pobod-forced",
+  "cell_id": "ga-canary-20260524-dalor-pobod-forced-000006-SIM-dalor-grid-envelope-protocol-owned-signature-slot--group-session-freeze-promise-post-freeze-mutation-request--openai-gpt-5.4-medium",
+  "sim_id": "SIM-dalor-grid-envelope-protocol-owned-signature-slot",
+  "scenario_id": "group-session-freeze-promise-post-freeze-mutation-request",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260524-190507",
+  "result_path": "results/SIM-dalor-grid-envelope-protocol-owned-signature-slot/group-session-freeze-promise-post-freeze-mutation-request/openai-gpt-5.4-medium/20260524-190507.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_7c65f07c56d347f0b261e9b7e0463ac1",
+    "response_id": "resp_02514c81794ee734006a134c02310c8199b759147c29f33659",
+    "input_tokens": 9387,
+    "output_tokens": 1264,
+    "cost_usd": 0.03412325
+  },
+  "source": {
+    "repo_commit": "8a977521fd3192972ffb08ab152c0740b46c7c5e",
+    "sim_path": "simulations/SIM-dalor-grid-envelope-protocol-owned-signature-slot/",
+    "scenario_path": "scenarios/group-session-freeze-promise-post-freeze-mutation-request/group-session-freeze-promise-post-freeze-mutation-request.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-dalor-grid-envelope-protocol-owned-signature-slot/README.md",
+        "sha256": "0dc421456d8c080291a4bfa4537cd438fea5b91237c1187861121c34e2009aff"
+      },
+      {
+        "path": "simulations/SIM-dalor-grid-envelope-protocol-owned-signature-slot/QUESTION.md",
+        "sha256": "3eaacdb5eb770a1634820f19a5b368083ff1dcca6dc6fd97c15886c3abd7d027"
+      },
+      {
+        "path": "simulations/SIM-dalor-grid-envelope-protocol-owned-signature-slot/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "9c0d5f719073affb891527085badf2150d4e63fc85c5f6d222a443556773e32e"
+      },
+      {
+        "path": "scenarios/group-session-freeze-promise-post-freeze-mutation-request/group-session-freeze-promise-post-freeze-mutation-request.md",
+        "sha256": "9083e149d879dcf5890bbcc3d3bb2fcf87b4490ba1878e59a73402bd5312ee52"
+      }
+    ],
+    "simulation_tree_hash": "a142441111efde7f2ec32c45fc388c6ad2a740fdf6b1f7f89e3c18ac1f1d3fda"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first, layer-local, and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 3,
+    "promisegrid_alignment": 5,
+    "auditability": 4,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 3,
+    "implementation_plausibility": 5,
+    "promise_vocabulary": 5,
+    "simplicity_durability": 5,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 42,
+    "normalized_0_100": 84,
+    "confidence_0_1": 0.87
+  },
+  "assessment": {
+    "rationale": "Strong Promise-Theory-clean envelope specimen. For this scenario it does not itself define group-session freeze lineage rules, but its explicit pCID binding and immutable signed [pCID,payload] bytes support the safe answer that a post-freeze breaking change should travel as a new specimen or new pCID rather than mutate old history. Scenario fit is therefore moderate rather than high because the crucial freeze semantics live in the payload protocol, not the envelope.",
+    "strengths": [
+      "Very clear layer boundary: envelope binds protocol identity and payload bytes without pretending to solve higher-layer session semantics.",
+      "Excellent promise-first wording about sender evidence, local trust, and receiver autonomy.",
+      "Small deterministic three-slot artifact is durable and plausible for long-term storage and transport.",
+      "Unknown-pCID policy preserves bytes without overclaiming interpretation, which helps historical evidence survive."
+    ],
+    "weaknesses": [
+      "Does not by itself specify whether a post-freeze group-session change is a superseding pCID, a new specimen, or an amendment relation.",
+      "Outer auditability of proof semantics is weaker than designs with an explicit outer proof-profile selector.",
+      "Failure handling is mostly limited to unknown pCID handling; lineage conflict resolution is delegated upward."
+    ],
+    "risks": [
+      "Proof-family semantics are hidden behind the payload protocol pCID, which may reduce quick outer-layer audit clarity during lineage disputes.",
+      "If small proof-rule changes require minting new protocol pCIDs, evolution pressure could fragment protocol lineages.",
+      "A weak payload protocol could still mishandle post-freeze mutation even though the envelope preserves byte-level history correctly."
+    ],
+    "open_questions": [
+      "For a frozen group-session protocol, should any post-freeze semantic change require a new pCID rather than an amendment under the old pCID?",
+      "Does protocol-owned proof semantics make later audit of freeze-era evidence too dependent on recovering the exact pCID spec bytes?",
+      "Should payload protocols carry an explicit supersedes/amends relation so post-freeze lineage stays legible without mutating historical specimens?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design.",
+    "pt_gate": {
+      "status": "pt_clean",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "The draft consistently treats senders and receivers as autonomous peers making local verification and trust decisions."
+      },
+      "scoped_intent": {
+        "status": "pass",
+        "note": "The envelope promise is narrowly scoped to '[pCID, payload] bytes are shaped according to the protocol named by pCID,' which is PT-correct at the envelope layer."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "The outer signature is only evidence for the current sender's own promise about payload shaping, not a promise on behalf of other parties."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "The signature is framed as evidence of sender intent, not as a guarantee that receivers will accept or that payload claims are true."
+      },
+      "local_trust_assessment": {
+        "status": "pass",
+        "note": "Trust is explicitly local: receivers decide whether they recognize the pCID, verify the proof family, and trust the sender."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "Receivers may verify, store, relay, or ignore the envelope locally; no obligation framing is introduced."
+      },
+      "violations": []
+    }
+  }
+}

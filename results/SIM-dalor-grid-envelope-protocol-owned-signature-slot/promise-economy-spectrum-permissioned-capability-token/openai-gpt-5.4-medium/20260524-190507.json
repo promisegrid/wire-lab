@@ -1,0 +1,167 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-dalor-grid-envelope-protocol-owned-signature-slot-promise-economy-spectrum-permissioned-capability-token-openai-gpt-5.4-medium-20260524-190507",
+  "run_group_id": "ga-canary-20260524-dalor-pobod-forced",
+  "cell_id": "ga-canary-20260524-dalor-pobod-forced-000008-SIM-dalor-grid-envelope-protocol-owned-signature-slot--promise-economy-spectrum-permissioned-capability-token--openai-gpt-5.4-medium",
+  "sim_id": "SIM-dalor-grid-envelope-protocol-owned-signature-slot",
+  "scenario_id": "promise-economy-spectrum-permissioned-capability-token",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260524-190507",
+  "result_path": "results/SIM-dalor-grid-envelope-protocol-owned-signature-slot/promise-economy-spectrum-permissioned-capability-token/openai-gpt-5.4-medium/20260524-190507.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_ced4ae740f4a4aa3b57e6354ae00246e",
+    "response_id": "resp_0f0c65dca005553c006a134c070118819ba2fd6c64739d3577",
+    "input_tokens": 9374,
+    "output_tokens": 1614,
+    "cost_usd": 0.0390005
+  },
+  "source": {
+    "repo_commit": "8a977521fd3192972ffb08ab152c0740b46c7c5e",
+    "sim_path": "simulations/SIM-dalor-grid-envelope-protocol-owned-signature-slot/",
+    "scenario_path": "scenarios/promise-economy-spectrum-permissioned-capability-token/promise-economy-spectrum-permissioned-capability-token.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-dalor-grid-envelope-protocol-owned-signature-slot/README.md",
+        "sha256": "0dc421456d8c080291a4bfa4537cd438fea5b91237c1187861121c34e2009aff"
+      },
+      {
+        "path": "simulations/SIM-dalor-grid-envelope-protocol-owned-signature-slot/QUESTION.md",
+        "sha256": "3eaacdb5eb770a1634820f19a5b368083ff1dcca6dc6fd97c15886c3abd7d027"
+      },
+      {
+        "path": "simulations/SIM-dalor-grid-envelope-protocol-owned-signature-slot/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "9c0d5f719073affb891527085badf2150d4e63fc85c5f6d222a443556773e32e"
+      },
+      {
+        "path": "scenarios/promise-economy-spectrum-permissioned-capability-token/promise-economy-spectrum-permissioned-capability-token.md",
+        "sha256": "ac5ba8f29fb13e1d693bdbfb0a5cc1c516750bf4f3a142b8dee90128d13ce2e2"
+      }
+    ],
+    "simulation_tree_hash": "a142441111efde7f2ec32c45fc388c6ad2a740fdf6b1f7f89e3c18ac1f1d3fda"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first, layer-local, and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 3,
+    "promisegrid_alignment": 5,
+    "auditability": 4,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 3,
+    "implementation_plausibility": 5,
+    "promise_vocabulary": 5,
+    "simplicity_durability": 5,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 42,
+    "normalized_0_100": 84,
+    "confidence_0_1": 0.85
+  },
+  "assessment": {
+    "rationale": "Strong Promise-Theory-clean envelope specimen. It gives a small, explicit, signed carrier that could transport permissioned capability tokens well, but the actual permission, non-transferability, and redemption semantics are intentionally left to the payload protocol, so scenario fit is only partial at this layer.",
+    "strengths": [
+      "Very clear layer boundary: outer envelope only binds protocol name and payload bytes.",
+      "Explicit PT wording: current-sender evidence for a scoped promise about payload shape.",
+      "Deterministic small artifact: three-slot CBOR array, mandatory proof slot, canonical signed prefix.",
+      "Good failure posture for unknown protocols: preserve bytes if desired, but do not overclaim parsing or verification."
+    ],
+    "weaknesses": [
+      "Does not itself express permission scope, audience restriction, or redemption rules for the capability scenario.",
+      "Generic auditors cannot infer proof-family details from the envelope alone without resolving the pCID spec.",
+      "Failure handling beyond unknown-pCID carriage is mostly delegated to payload protocols."
+    ],
+    "risks": [
+      "Proof semantics hidden behind the same pCID reduce generic audit clarity for peers that do not already know the protocol.",
+      "Capability-token safety depends heavily on payload-level signer binding, freshness, and revocation rules that this envelope does not standardize.",
+      "If proof-family changes require new protocol pCIDs, long-lived capability ecosystems may face migration churn."
+    ],
+    "open_questions": [
+      "How should a payload protocol bind a capability to Bob so forwarding the same envelope does not imply transferability?",
+      "What payload-level evidence handles freshness, revocation, or one-time redemption without introducing central authority assumptions?",
+      "Does proof-family evolution under one pCID force too-frequent protocol re-minting for long-lived capability schemes?"
+    ],
+    "authority_boundary": "Envelope-layer evidence only; payload protocol must define capability issuance, non-transferability, redemption, and local trust decisions.",
+    "pt_gate": {
+      "status": "pt_clean",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "Sender and receiver remain autonomous; the signature is evidence, and each receiver decides locally whether to trust or act."
+      },
+      "scoped_intent": {
+        "status": "pass",
+        "note": "The promise is narrowly scoped to canonical [pCID,payload] bytes and the named protocol specification."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "The sender signs only its own scoped claim about the carried bytes and protocol, not promises on behalf of Alice, Bob, or the protocol."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "The envelope provides signed evidence of intent about payload shape, not guaranteed redemption or capability outcomes."
+      },
+      "local_trust_assessment": {
+        "status": "pass",
+        "note": "Trust is explicitly local: unknown pCID peers may preserve bytes but must not claim to parse or verify."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "The design says receivers may verify, store, relay, or use locally; it does not frame receipt or use as obligation."
+      },
+      "violations": []
+    }
+  }
+}

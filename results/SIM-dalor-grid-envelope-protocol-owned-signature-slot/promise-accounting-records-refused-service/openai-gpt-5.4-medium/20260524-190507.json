@@ -1,0 +1,168 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-dalor-grid-envelope-protocol-owned-signature-slot-promise-accounting-records-refused-service-openai-gpt-5.4-medium-20260524-190507",
+  "run_group_id": "ga-canary-20260524-dalor-pobod-forced",
+  "cell_id": "ga-canary-20260524-dalor-pobod-forced-000003-SIM-dalor-grid-envelope-protocol-owned-signature-slot--promise-accounting-records-refused-service--openai-gpt-5.4-medium",
+  "sim_id": "SIM-dalor-grid-envelope-protocol-owned-signature-slot",
+  "scenario_id": "promise-accounting-records-refused-service",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260524-190507",
+  "result_path": "results/SIM-dalor-grid-envelope-protocol-owned-signature-slot/promise-accounting-records-refused-service/openai-gpt-5.4-medium/20260524-190507.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_d892ff9e16944a0f9082debdbcdc65e2",
+    "response_id": "resp_0a134a6d488b064b006a134be7311c819bb62b408d676316ae",
+    "input_tokens": 9363,
+    "output_tokens": 1661,
+    "cost_usd": 0.03963925
+  },
+  "source": {
+    "repo_commit": "8a977521fd3192972ffb08ab152c0740b46c7c5e",
+    "sim_path": "simulations/SIM-dalor-grid-envelope-protocol-owned-signature-slot/",
+    "scenario_path": "scenarios/promise-accounting-records-refused-service/promise-accounting-records-refused-service.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-dalor-grid-envelope-protocol-owned-signature-slot/README.md",
+        "sha256": "0dc421456d8c080291a4bfa4537cd438fea5b91237c1187861121c34e2009aff"
+      },
+      {
+        "path": "simulations/SIM-dalor-grid-envelope-protocol-owned-signature-slot/QUESTION.md",
+        "sha256": "3eaacdb5eb770a1634820f19a5b368083ff1dcca6dc6fd97c15886c3abd7d027"
+      },
+      {
+        "path": "simulations/SIM-dalor-grid-envelope-protocol-owned-signature-slot/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "9c0d5f719073affb891527085badf2150d4e63fc85c5f6d222a443556773e32e"
+      },
+      {
+        "path": "scenarios/promise-accounting-records-refused-service/promise-accounting-records-refused-service.md",
+        "sha256": "9a7d47455793988cfb9b0fb045b29086ed13ee22cd0db080584e259c0aa69313"
+      }
+    ],
+    "simulation_tree_hash": "a142441111efde7f2ec32c45fc388c6ad2a740fdf6b1f7f89e3c18ac1f1d3fda"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first, layer-local, and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 4,
+    "auditability": 4,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 2,
+    "implementation_plausibility": 5,
+    "promise_vocabulary": 5,
+    "simplicity_durability": 5,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 37,
+    "normalized_0_100": 74,
+    "confidence_0_1": 0.89
+  },
+  "assessment": {
+    "rationale": "Strong Promise-Theory-clean envelope design with explicit local trust and excellent layer boundaries. It is small, deterministic, and auditable at the envelope layer, but this scenario asks for promise-accounting semantics that distinguish honest refusal from failure classes, and the candidate intentionally delegates that to the payload protocol. That keeps it promotable as an envelope specimen but limits direct scenario fit.",
+    "strengths": [
+      "Explicit promise-first framing: sender signs evidence that payload bytes are shaped according to the protocol named by pCID.",
+      "Very clear envelope/payload boundary; it does not pretend to solve higher-layer promise accounting.",
+      "Deterministic three-slot CBOR envelope is small, durable, and plausible for constrained devices.",
+      "Unknown-pCID policy preserves bytes without false parsing claims, supporting local auditability."
+    ],
+    "weaknesses": [
+      "Does not itself encode or classify refused service records.",
+      "Failure/refusal distinctions depend entirely on payload protocol design.",
+      "Proof-family semantics hidden behind pCID reduce generic cross-protocol audit legibility.",
+      "Proof evolution may require minting new protocol pCIDs rather than changing an outer proof selector."
+    ],
+    "risks": [
+      "Payload protocols may fail to record honest refusal distinctly, leaving scenario pressure unresolved above the envelope.",
+      "Protocol-owned proof semantics may create pCID churn when proof families evolve.",
+      "Generic peers have reduced audit clarity for unknown pCIDs because proof semantics are not outer-universal."
+    ],
+    "open_questions": [
+      "How should payload protocols encode honest refusal distinctly from timeout, corruption, or transport failure?",
+      "Will proof-family evolution force excessive new pCIDs without a separate outer proof selector?",
+      "Can generic auditors compare refusal evidence across pCIDs when proof semantics are protocol-owned?"
+    ],
+    "authority_boundary": "Evidence only; envelope-layer specimen, not final PromiseGrid or promise-accounting authority.",
+    "pt_gate": {
+      "status": "pt_clean",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "Sender and receiver remain autonomous; the envelope only carries sender evidence and leaves receiver decisions local."
+      },
+      "scoped_intent": {
+        "status": "pass",
+        "note": "The promise is narrowly scoped to signed [pCID,payload] bytes and protocol-shaped payload claims at the envelope layer."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "The outer signature expresses only the current sender's promise about payload shape under the named protocol."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "The signature is framed as evidence of sender intent, not a guarantee of service or outcome."
+      },
+      "local_trust_assessment": {
+        "status": "pass",
+        "note": "Trust is explicitly local: receivers may recognize the pCID, verify the proof family, or preserve bytes without claiming understanding."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "Receivers decide locally whether to verify, store, relay, or use bytes; no obligation semantics are implied."
+      },
+      "violations": []
+    }
+  }
+}

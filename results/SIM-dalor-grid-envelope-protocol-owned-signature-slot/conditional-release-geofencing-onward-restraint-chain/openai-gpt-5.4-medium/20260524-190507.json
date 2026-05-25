@@ -1,0 +1,167 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-dalor-grid-envelope-protocol-owned-signature-slot-conditional-release-geofencing-onward-restraint-chain-openai-gpt-5.4-medium-20260524-190507",
+  "run_group_id": "ga-canary-20260524-dalor-pobod-forced",
+  "cell_id": "ga-canary-20260524-dalor-pobod-forced-000004-SIM-dalor-grid-envelope-protocol-owned-signature-slot--conditional-release-geofencing-onward-restraint-chain--openai-gpt-5.4-medium",
+  "sim_id": "SIM-dalor-grid-envelope-protocol-owned-signature-slot",
+  "scenario_id": "conditional-release-geofencing-onward-restraint-chain",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260524-190507",
+  "result_path": "results/SIM-dalor-grid-envelope-protocol-owned-signature-slot/conditional-release-geofencing-onward-restraint-chain/openai-gpt-5.4-medium/20260524-190507.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_62e8432b8c434fb8bbed32894c0e4b5b",
+    "response_id": "resp_0b44cc95e5609e5f006a134be73244819b8053fb847410f361",
+    "input_tokens": 9414,
+    "output_tokens": 1615,
+    "cost_usd": 0.0390845
+  },
+  "source": {
+    "repo_commit": "8a977521fd3192972ffb08ab152c0740b46c7c5e",
+    "sim_path": "simulations/SIM-dalor-grid-envelope-protocol-owned-signature-slot/",
+    "scenario_path": "scenarios/conditional-release-geofencing-onward-restraint-chain/conditional-release-geofencing-onward-restraint-chain.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-dalor-grid-envelope-protocol-owned-signature-slot/README.md",
+        "sha256": "0dc421456d8c080291a4bfa4537cd438fea5b91237c1187861121c34e2009aff"
+      },
+      {
+        "path": "simulations/SIM-dalor-grid-envelope-protocol-owned-signature-slot/QUESTION.md",
+        "sha256": "3eaacdb5eb770a1634820f19a5b368083ff1dcca6dc6fd97c15886c3abd7d027"
+      },
+      {
+        "path": "simulations/SIM-dalor-grid-envelope-protocol-owned-signature-slot/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "9c0d5f719073affb891527085badf2150d4e63fc85c5f6d222a443556773e32e"
+      },
+      {
+        "path": "scenarios/conditional-release-geofencing-onward-restraint-chain/conditional-release-geofencing-onward-restraint-chain.md",
+        "sha256": "3c84fc46e1b14de5e5c6e9b029fcb891bd655238b45e516b20eda97dabe8ff24"
+      }
+    ],
+    "simulation_tree_hash": "a142441111efde7f2ec32c45fc388c6ad2a740fdf6b1f7f89e3c18ac1f1d3fda"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/central trust-ledger framing, 5 stays promise-first, layer-local, and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 4,
+    "auditability": 3,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 3,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 5,
+    "simplicity_durability": 5,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 37,
+    "normalized_0_100": 74,
+    "confidence_0_1": 0.86
+  },
+  "assessment": {
+    "rationale": "Strong Promise-Theory-clean envelope specimen with a clear layer boundary: it offers signed evidence that payload bytes are shaped according to the protocol named by pCID, while leaving conditional-release and recursive onward-restraint semantics to the payload protocol. That makes it a reasonable carrier for this scenario but not a direct solution to the scenario's core graph semantics.",
+    "strengths": [
+      "Very clear envelope/payload boundary.",
+      "Promise-first wording is explicit and PT-correct.",
+      "Deterministic small artifact with mandatory outer proof slot.",
+      "Unknown-pCID behavior preserves bytes without false parsing claims."
+    ],
+    "weaknesses": [
+      "Does not itself represent the recursive restraint chain the scenario asks about.",
+      "Generic peers cannot fully audit signature semantics without fetching the pCID-defined protocol spec.",
+      "Proof semantics are coupled to payload protocol evolution rather than separated in the outer layer."
+    ],
+    "risks": [
+      "Scenario pressure may be under-served if payload protocols do not standardize onward-restraint accounting clearly.",
+      "Proof-family semantics hidden behind the payload pCID may reduce generic cross-protocol audit clarity.",
+      "Changing proof semantics may force new protocol pCIDs, creating coupling between payload evolution and signature policy."
+    ],
+    "open_questions": [
+      "Does coupling proof-family evolution to the payload protocol pCID create too many new protocol IDs over time?",
+      "Can generic auditors understand enough from the outer envelope when signature verification rules are only discoverable via the payload protocol spec?",
+      "What payload-level promise/accounting shape best represents recursive onward-restraint chains while preserving local trust and sparse knowledge?"
+    ],
+    "authority_boundary": "Evidence only; this envelope-layer design can carry but does not itself define onward-restraint or conditional-release semantics, which must live in the payload protocol and each peer's local trust assessment.",
+    "pt_gate": {
+      "status": "pt_clean",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "Senders and receivers remain autonomous; the signature is evidence of sender intent, not a command channel."
+      },
+      "scoped_intent": {
+        "status": "pass",
+        "note": "The outer promise is narrowly scoped to canonical [pCID,payload] bytes and protocol-shaped payload claims."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "The sender signs only its own scoped claim about the payload shape under the named protocol, not promises on behalf of downstream peers."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "The signature provides evidence about sender intent and byte binding, not guaranteed forwarding or restraint outcomes."
+      },
+      "local_trust_assessment": {
+        "status": "pass",
+        "note": "Trust stays local: each receiver decides whether it recognizes the pCID, can verify the proof family, and trusts the sender enough to use the payload."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "Receivers may verify, preserve, relay, or ignore bytes locally; the design does not turn receipt into obligation."
+      },
+      "violations": []
+    }
+  }
+}
