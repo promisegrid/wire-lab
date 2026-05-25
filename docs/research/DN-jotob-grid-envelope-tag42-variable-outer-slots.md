@@ -32,14 +32,12 @@ named by `pCID` owns any extra outer structure.
 `pCID` means **Protocol CID**. It is the CID of the protocol specification
 document, not the CID of a particular payload object.
 
-The current standard way to carry that selector in slot `0` is
-`42(pCID)`.  In IPLD / IPFS / Bluesky contexts, the `42` tag is a
-common way to indicate that the following bytes are a CID-based link
-to another document, in this case the specification document for the
-protocol the message is part of.  Using this IPLD link tag creates
-compatibility with those other ecosystems and their tooling. If those
-ecosystems later become less relevant, the `42` tag could later be
-succeeded by another tag.
+We wrap the protocol CID in a CBOR `42` tag.  In the IPLD / IPFS /
+Bluesky ecosystem, the `42` tag is a common way to indicate that the
+following bytes are a CID-based link to another document.  In this
+case, it's a link to the specification document for the protocol the
+message is part of.  Using this IPLD link tag creates compatibility
+with those other ecosystems and their tooling. 
 
 In practical terms, that compatibility buys:
 
@@ -62,6 +60,11 @@ because that interop value is worth the cost.
 The important semantic point is unchanged: slot `0` tells the receiver which
 protocol specification names the payload contract and any later outer-slot
 rules.
+
+If the IPLD-related ecosystems later become less relevant, the `42`
+tag could later be replaced by another tag.  The tag itself is only a
+few bytes of overhead, and in the worst case it can be ignored by
+receivers that don't understand it.
 
 ## What slot `1` means
 
