@@ -146,6 +146,56 @@ Affects: `docs/thought-experiments/TE-pudiv-app-kernel-grid-message-boundary.md`
 `DEV-GUIDE-RESOURCES.md`;
 `protocols/wire-lab.d/TODO/TODO-rozas-promisegrid-dev-guide-resources.md`.
 
+### DI-somok
+
+ID: DI-somok
+Date: 2026-05-25 09:12:02
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Add `TE-dunas` to evaluate how much the V distributed kernel,
+Amoeba, Plan 9 / 9P, and GNU Hurd translators should influence PromiseGrid
+kernel work after filtering out patent-riskier modern multikernel work and
+Spring.
+Intent: The repo needs prior-art influence without importing the wrong
+authority model. These older systems are useful as pattern pressure, but
+PromiseGrid must preserve autonomous promisers, visible trust boundaries,
+peer-local trust judgment, and promise make/break evidence.
+Constraints: Do not close `DR-davod`. Do not treat any prior-art system as
+PromiseGrid authority. Do not copy implementation details. Do not run canary,
+GA, or scoring commands. Treat patent status as an engineering caution, not
+legal advice.
+Affects: `docs/thought-experiments/TE-dunas-prior-art-influence-on-promisegrid-kernel.md`;
+`DR/DR-davod-promisegrid-kernel-dev-porting-boundary.md`;
+`docs/thought-experiments/README.md`; `protocols/wire-lab.d/specs/harness-spec-draft.md`;
+`DEV-GUIDE-RESOURCES.md`;
+`protocols/wire-lab.d/TODO/TODO-rozas-promisegrid-dev-guide-resources.md`.
+
+### DI-kuvum
+
+ID: DI-kuvum
+Date: 2026-05-25 10:01:19
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Add `TE-gakoh` to capture the post-`TE-dunas` synthesis that
+PromiseGrid can be explained as a decentralized mainframe: each agent sees a
+local, trust-filtered, file-like view over a shared promise/event hypergraph.
+Intent: The repo needs one umbrella analysis for the linked questions raised
+after `TE-dunas`: how Alice shares a local pathname Bob can open, whether
+"everything useful is a promise" is the right semantic slogan, how non-human or
+byte-level agents fit Burgess / Semantic Spacetime, whether IPLD can represent
+the hypergraph substrate, and how event/command sourcing fits the kernel TEs.
+Constraints: Do not close `DR-davod`. Do not turn this into settled guide prose
+or a whitepaper yet. Do not rewrite `TE-dunas` or `TE-pudiv`; add only
+forward-pointer refinements if useful. Do not run canary, GA, or scoring
+commands. Keep IPLD as compatible substrate, not PromiseGrid semantic authority.
+Affects: `docs/thought-experiments/TE-gakoh-local-views-over-promise-event-hypergraph.md`;
+`docs/thought-experiments/TE-dunas-prior-art-influence-on-promisegrid-kernel.md`;
+`docs/thought-experiments/TE-pudiv-app-kernel-grid-message-boundary.md`;
+`DR/DR-davod-promisegrid-kernel-dev-porting-boundary.md`;
+`docs/thought-experiments/README.md`; `protocols/wire-lab.d/specs/harness-spec-draft.md`;
+`DEV-GUIDE-RESOURCES.md`;
+`protocols/wire-lab.d/TODO/TODO-rozas-promisegrid-dev-guide-resources.md`.
+
 ### DI-lukib
 
 ID: DI-lukib
@@ -370,3 +420,14 @@ guide's claims.
   `DR-davod`, `DEV-GUIDE-RESOURCES.md`, the TE index, and the harness-spec TE
   summary without rewriting `TE-mazop`'s body or closing `DR-davod`. Source:
   `DI-gumum`.
+- [x] rozas.19 Add `TE-dunas` to evaluate lower-patent-risk prior-art
+  influences from V, Amoeba, Plan 9 / 9P, and GNU Hurd translators, while
+  excluding Spring and modern multikernel details from current PromiseGrid
+  kernel influence. Route it to `DR-davod`, `DEV-GUIDE-RESOURCES.md`, the TE
+  index, and the harness-spec TE summary without closing `DR-davod`. Source:
+  `DI-somok`.
+- [x] rozas.20 Add `TE-gakoh` to capture the decentralized-mainframe,
+  local-view, promise-first, IPLD-compatible promise/event-hypergraph synthesis
+  that followed `TE-dunas`. Route it to `DR-davod`, `DEV-GUIDE-RESOURCES.md`,
+  the TE index, and the harness-spec TE summary, with forward pointers from
+  related TEs rather than body rewrites. Source: `DI-kuvum`.

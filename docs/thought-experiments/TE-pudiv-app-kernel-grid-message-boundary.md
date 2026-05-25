@@ -204,3 +204,13 @@ Before deciding the stable kernel-developer porting boundary, answer:
 
 `needs DF` - this TE makes the same-grid app/kernel boundary first-class but
 does not decide the final kernel-developer porting boundary.
+
+## Refinements
+
+### 2026-05-25 - Local views and promise-bound path references
+
+`TE-gakoh` follows this TE with the file-like local-view question that arose
+from the same-grid app/kernel boundary: whether PromiseGrid should expose local,
+trust-filtered views over promise-bound references into a shared promise/event
+hypergraph. This is a forward pointer only; the analysis above remains
+unchanged historical evidence. Source: `DI-kuvum`.
