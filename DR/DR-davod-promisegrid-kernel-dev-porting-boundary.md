@@ -10,9 +10,9 @@ Affects: `DEV-GUIDE-RESOURCES.md`; `/home/stevegt/lab/promisegrid-dev-guide/READ
 Unblocks: `TODO-rozas.7`; `TODO-binap.7`
 Waiting on: stevegt@t7a.org (Steve Traugott)
 Decision:
-Linked DI: DI-zalak (wire-lab guide-resource guidance; DR remains open); DI-funaf (TE-mazop/SIM-fovip evidence packet; DR remains open); DI-gumum (TE-pudiv app/kernel grid-message evidence; DR remains open); DI-somok (TE-dunas prior-art influence guardrails; DR remains open); DI-kuvum (TE-gakoh local-view promise/event hypergraph synthesis; DR remains open)
+Linked DI: DI-zalak (wire-lab guide-resource guidance; DR remains open); DI-funaf (TE-mazop/SIM-fovip evidence packet; DR remains open); DI-gumum (TE-pudiv app/kernel grid-message evidence; DR remains open); DI-somok (TE-dunas prior-art influence guardrails; DR remains open); DI-kuvum (TE-gakoh local-view promise/event hypergraph synthesis; DR remains open); DI-fidot (TODO-binag/DN-lujad/SIM-fovip kernel resolution packet; DR remains open pending focused evidence review)
 Related commits:
-Last updated: 2026-05-25 10:01:19
+Last updated: 2026-05-25 13:30:54
 
 ## Event log
 
@@ -23,6 +23,7 @@ Last updated: 2026-05-25 10:01:19
 - 2026-05-25 08:43:37 — Added `TE-pudiv` as follow-up needs-DF evidence that the app/kernel boundary may use the same `grid([42(pCID), payload, ...])` message format as the wire boundary. This narrows the next simulation question without closing the DR.
 - 2026-05-25 09:12:02 — Added `TE-dunas` as needs-DF evidence for which lower-patent-risk distributed-OS prior art may influence PromiseGrid kernel work. V, Amoeba, Plan 9 / 9P, and GNU Hurd translators are retained as pattern or simulation pressure; Spring and modern multikernel details are excluded from current influence. This does not close the DR.
 - 2026-05-25 10:01:19 — Added `TE-gakoh` as needs-DF evidence for reconciling decentralized-mainframe UX, local trust-filtered views, promise-bound path references, Burgess-style non-human agents, IPLD-compatible hypergraph storage, and event/command sourcing. This does not close the DR.
+- 2026-05-25 13:30:54 — Added `TODO-binag`, `DI-fidot`, `DN-lujad`, and expanded `SIM-fovip` as the active kernel role/profile resolution packet. The packet keeps the kernel as a role/profile set, treats app/kernel operations as pCID-selected promises where supported, keeps local trust judgment local, and configures focused evidence review before this DR can close.
 
 ## Next DF packet
 
@@ -48,9 +49,10 @@ DR closes, wire-lab needs evidence for:
   frontiers by reciprocal promises, and whether IPLD-compatible objects should
   carry that graph without owning PromiseGrid semantics.
 
-`SIM-fovip-kernel-promise-boundary-port-contract` is the current simulation home
-for answering this packet, but `TE-pudiv`, `TE-dunas`, and `TE-gakoh` leave open
-whether `SIM-fovip` should be extended or succeeded by a narrower same-grid
-app/kernel boundary, prior-art-influence, and local-view hypergraph sim.
-`DR-davod` remains open until that evidence is reviewed and a later DI locks the
-guide-facing porting boundary.
+`SIM-fovip-kernel-promise-boundary-port-contract` is now the expanded active
+simulation home for answering this packet. `TODO-binag`, `DI-fidot`, and
+`DN-lujad` carry the current role/profile synthesis: the guide should describe
+portable kernel obligations as promises and evidence records, not as one
+universal process, one global namespace, or one external conformance authority.
+`DR-davod` remains open until Steve runs the focused canary slice and the
+resulting evidence is reviewed.

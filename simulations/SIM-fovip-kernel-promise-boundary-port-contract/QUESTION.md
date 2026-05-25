@@ -1,9 +1,12 @@
 # Question
 
-Which minimum PromiseGrid port contract can guide writers describe without
-turning one runtime shape into a false universal kernel?
+Which minimum PromiseGrid port promise record can guide writers describe without
+turning one runtime shape into a false universal kernel, and without treating
+kernel, host, namespace, app API, or prior-art patterns as external authority?
 
 The answer must be concrete enough to test app-facing promises, host/runtime
 assumptions, unsupported features, pCID coverage, exact-byte evidence records,
-and broken-promise handling across native, browser/WASM, mobile, MCU, and split
-local-service deployments. Source: `DI-funaf`; `DR-davod`; `TE-mazop`.
+broken-promise handling, app/kernel pCID messages, voluntary group namespaces,
+CID-rooted promise-bound references, and file/resource checkpoints over promise
+logs across native, browser/WASM, mobile, MCU, and split local-service
+deployments. Source: `DI-funaf`; `DI-fidot`; `DR-davod`; `TE-mazop`.

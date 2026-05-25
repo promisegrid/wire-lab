@@ -64,6 +64,7 @@ minted after that date carry only the proquint handle.
 | [TODO-zofan](./TODO-zofan-di-record-files.md) | 2026-05-10 | Move DI records to first-class files **(deferred: resume after replay cleanup)** | — |
 | [TODO-milum](./TODO-milum-agent-instruction-consolidation.md) | 2026-05-08 | Agent instruction consolidation | `TODO-34` |
 | [TODO-tapaf](./TODO-tapaf-codex-local-author-identity.md) | 2026-05-23 | Codex local author identity | — |
+| [TODO-binag](./TODO-binag-promisegrid-kernel-design-resolution.md) | 2026-05-25 | PromiseGrid kernel design resolution **(running: design note and SIM-fovip evidence prepared; canary review and DR-davod decision pending)** | — |
 | [TODO-rozas](./TODO-rozas-promisegrid-dev-guide-resources.md) | 2026-05-08 | PromiseGrid dev-guide writer resources **(running: periodic `DEV-GUIDE-RESOURCES.md` maintenance; rozas.10 open)** | — |
 
 ## group-session

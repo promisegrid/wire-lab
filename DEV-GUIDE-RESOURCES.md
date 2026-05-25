@@ -132,10 +132,10 @@ Source: `DI-sisak`; `DI-kafat`.
 | Unknown-`pCID` retention | Still a local-policy question: quota, privacy, relay labeling, and denial-of-service bounds remain open. |
 | Tagged-selector succession | Tag `42` is the current standard instance; future replacement would be a family-level evolution, not a new `grid2()` / `grid3()` envelope family. |
 | Canonical bytes | The outer envelope is CBOR; payload canonicalization, hash rules, and proof encoding remain protocol-specific unless later DIs narrow them. |
-| Kernel profile | The kernel remains provisional; `TE-mazop`, `TE-pudiv`, `TE-dunas`, `TE-gakoh`, and `SIM-fovip` now test app-facing promises, same-grid app/kernel messaging, voluntary group namespaces, CID-rooted promise-bound references, file-like resources over promise/event logs, lower-patent-risk prior-art influence guardrails, host assumptions, unsupported features, evidence records, and minimum credible port-promise records before `DR-davod` closes. |
+| Kernel profile | The kernel remains provisional; `DN-lujad`, `TODO-binag`, and the expanded `SIM-fovip` now synthesize `TE-mazop`, `TE-pudiv`, `TE-dunas`, and `TE-gakoh` into role/profile guidance for app-facing promises, same-grid app/kernel messaging, voluntary group namespaces, CID-rooted promise-bound references, file-like resources over promise/event logs, lower-patent-risk prior-art influence guardrails, host assumptions, unsupported features, evidence records, and minimum credible port-promise records before `DR-davod` closes. |
 
 Source: `DI-sisak`; `DI-rusup`; `DI-funaf`; `DI-gumum`; `DI-somok`;
-`DI-kuvum`.
+`DI-kuvum`; `DI-fidot`.
 
 ## Authority model
 
@@ -457,7 +457,7 @@ the prose.
 | `FB-nojit`, `FB-tisuf`, `FB-tulit` | `simulations/SIM-zisan-device-bound-agent/` | `scenarios/device-bound-agent-physical-effect/` | Provisional device-bound-app evidence for sensors, actuators, owner/operator delegation, and host-driver behavior promises. |
 | `FB-hurit`, `FB-nilat` | `simulations/SIM-kugap-live-sync-audit-split/` | `scenarios/live-crdt-audit-publication/` | Provisional live-state versus durable-audit evidence; does not freeze a reliable low-latency binding. |
 | `FB-zazon`, `FB-robif` | `simulations/SIM-nijuz-multi-embodiment-identity/` | `scenarios/multi-embodiment-app-identity/`; `scenarios/portable-signing-key-identity/` | Provisional multi-host identity and implementation-promise evidence; concrete signing-key recipe remains unsettled. |
-| `FB-vitih`, `FB-mulum`, `FB-potin` | `simulations/SIM-funas-kernel-porting-boundary/`; `simulations/SIM-fovip-kernel-promise-boundary-port-contract/`; `docs/thought-experiments/TE-jimar-kernel-runtime-portability-boundary.md`; `docs/thought-experiments/TE-mazop-kernel-promise-boundary-and-minimum-port-contract.md`; `docs/thought-experiments/TE-pudiv-app-kernel-grid-message-boundary.md`; `docs/thought-experiments/TE-dunas-prior-art-influence-on-promisegrid-kernel.md`; `docs/thought-experiments/TE-gakoh-local-views-over-promise-event-hypergraph.md` | `scenarios/kernel-porting-boundary/` | Provisional kernel/runtime/dispatcher, same-grid app/kernel messaging, voluntary namespace and local-view promise-log pressure, prior-art influence guardrails, and minimum-port promise-record evidence; settled porting target remains blocked by `DR-davod`. |
+| `FB-vitih`, `FB-mulum`, `FB-potin` | `simulations/SIM-funas-kernel-porting-boundary/`; `simulations/SIM-fovip-kernel-promise-boundary-port-contract/`; `docs/research/DN-lujad-promisegrid-kernel-role-profile.md`; `protocols/wire-lab.d/TODO/TODO-binag-promisegrid-kernel-design-resolution.md`; `docs/thought-experiments/TE-jimar-kernel-runtime-portability-boundary.md`; `docs/thought-experiments/TE-mazop-kernel-promise-boundary-and-minimum-port-contract.md`; `docs/thought-experiments/TE-pudiv-app-kernel-grid-message-boundary.md`; `docs/thought-experiments/TE-dunas-prior-art-influence-on-promisegrid-kernel.md`; `docs/thought-experiments/TE-gakoh-local-views-over-promise-event-hypergraph.md` | `scenarios/kernel-porting-boundary/` | Provisional kernel/runtime/dispatcher, same-grid app/kernel messaging, voluntary namespace and local-view promise-log pressure, prior-art influence guardrails, and minimum-port promise-record evidence; settled porting target remains blocked by `DR-davod` pending focused `SIM-fovip` evidence review. |
 | `FB-gigit` | Existing Laypeople readiness matrix and `DR-napum` | Existing 100-year and governance scenarios | No new sim required; this is a narrative-settlement question rather than a distinct run surface. |
 
 `DI-fihub` promotes two GA-derived guide-feedback specimens from
@@ -484,7 +484,7 @@ writer guidance, not a final PromiseGrid product/API freeze. Source:
 |---|---|---|---|---|
 | Laypeople | Ready for careful guide prose | PromiseGrid is designed for long-lived decentralized communities of autonomous/free agents; no central registry is a design constraint; protocol forking is normal; multi-generational durability is a first-order requirement. | Specific promise-accounting scoring, final wire format, app APIs, and kernel shape remain out of layperson settled prose. `DR-napum` remains open for final public wording. | The guide itself after stabilization; wire-lab sources stay provenance. |
 | App Devs | Provisional | The minimum current contract is: choose an explicit protocol spec, use its pCID when frozen, let that spec define payload/handler semantics, and publish implementation promises rather than relying on branch paths. | No stable SDK, handler ABI, universal app message API, or app protocol subset is frozen yet. `DR-tuhaz` remains open. | Future frozen `protocols/*/specs/*.md` docs by pCID, plus B-side `CHANGELOG.md` promise entries. |
-| Kernel Devs | Provisional / blocked for final porting instructions | The porting target is not wire-lab. A porter should expect explicit app-facing promises, possible same-grid app/kernel messages, local file-like views over CID-rooted promise-bound references, voluntary group namespaces, host/runtime assumptions, unsupported features, pCID coverage, evidence records, profile declarations, and prior-art guardrails around the substrate/feed/CAS/session/message layers the porter promises to implement. Daemon, microkernel, host-runtime, browser/WASM, MCU/header-only, and split-object shapes remain profiles, not one universal process shape. | The minimum credible port promise record, app/kernel message boundary, first required frozen spec set, safe prior-art influence set, voluntary namespace behavior, and local-view reference model are not locked yet. `TE-mazop`, `TE-pudiv`, `TE-dunas`, `TE-gakoh`, and `SIM-fovip` are the current evidence path; `DR-davod` remains open. | Future frozen binding/session/message specs by pCID, implementation promise records, `SIM-fovip` evidence, and guide prose once stabilized. |
+| Kernel Devs | Provisional / blocked for final porting instructions | The porting target is not wire-lab. `DN-lujad` is the current plain-English synthesis: a porter should expect explicit app-facing promises, possible same-grid app/kernel messages, local file-like views over CID-rooted promise-bound references, voluntary group namespaces, host/runtime assumptions, unsupported features, pCID coverage, evidence records, profile declarations, and prior-art guardrails around the substrate/feed/CAS/session/message layers the porter promises to implement. Daemon, microkernel, host-runtime, browser/WASM, MCU/header-only, and split-object shapes remain profiles, not one universal process shape. | The minimum credible port promise record, app/kernel message boundary, first required frozen spec set, safe prior-art influence set, voluntary namespace behavior, and local-view reference model are not locked yet. `DN-lujad`, `TODO-binag`, and expanded `SIM-fovip` are the current evidence path; `DR-davod` remains open pending focused evidence review. | Future frozen binding/session/message specs by pCID, implementation promise records, `SIM-fovip` evidence, and guide prose once stabilized. |
 
 ## Laypeople
 
@@ -587,6 +587,12 @@ section.
   promise/event-hypergraph synthesis that followed `TE-dunas`, including
   voluntary group namespaces, CID-rooted promise-bound references, and
   event-sourced file-like resources.
+- `docs/research/DN-lujad-promisegrid-kernel-role-profile.md` is the current
+  plain-English kernel role/profile synthesis for `DR-davod`; it is guide
+  prep and evidence routing, not a frozen PromiseGrid API.
+- `protocols/wire-lab.d/TODO/TODO-binag-promisegrid-kernel-design-resolution.md`
+  tracks the active resolution packet and the focused canary review required
+  before `DR-davod` can close.
 - `docs/thought-experiments/TE-sihih-substrate-agnostic-layered-model.md`
   records the current layered model for substrate, CAS, session, and message
   concerns.
@@ -601,7 +607,8 @@ section.
   contains current transport-message specimen evidence with verified CIDs.
 - `simulations/SIM-fovip-kernel-promise-boundary-port-contract/` is the current
   concrete simulation for `DR-davod`'s app-facing promises, host assumptions,
-  unsupported features, pCID coverage, and evidence-record questions.
+  unsupported features, pCID coverage, evidence-record questions, voluntary
+  namespace promises, CID-rooted references, and checkpointed resource views.
 - `protocols/wire-lab.d/archive/migrations/SIM-piloh-turns-149-208-recovery/archive/transports/README.md`
   preserves the old root transport design surface as historical evidence.
 
@@ -651,6 +658,12 @@ section.
   promises. IPLD-compatible objects may carry paths, selectors, and
   promise/event logs, but pCID-selected PromiseGrid protocols define agency,
   trust, and meaning. Source: `DI-kuvum`.
+- DN-lujad is the current synthesis packet for kernel prose: everything useful
+  at the boundary is a promise or promise evidence; the kernel is a role/profile
+  set rather than a mandatory process shape; local app/kernel APIs may be
+  adapters over pCID-selected grid messages; and ports should publish what they
+  promise, what evidence they record, and what they do not promise. Source:
+  `DI-fidot`.
 - Do not make IPLD, CAR, selectors, or Gordian-style structures mandatory
   runtime surfaces unless a specific frozen pCID requires them. Treat them as
   optional L6/CAS or payload/wrapper-family tools under the current evidence.
