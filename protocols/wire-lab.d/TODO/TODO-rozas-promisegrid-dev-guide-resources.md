@@ -93,6 +93,34 @@ Affects: `simulations/SIM-mikas-minimal-blob-app-contract/`;
 `DEV-GUIDE-RESOURCES.md`;
 `protocols/wire-lab.d/TODO/TODO-rozas-promisegrid-dev-guide-resources.md`.
 
+### DI-funaf
+
+ID: DI-funaf
+Date: 2026-05-25 08:26:41
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Build more kernel-porting evidence before deciding `DR-davod`.
+Add `TE-mazop` for the app/kernel/host promise surface and minimum credible
+first-port contract, update `DR-davod` with a sharper unanswered packet, and add
+`SIM-fovip` as the concrete simulation intended to answer that packet.
+Intent: `TE-jimar` rejected one universal process shape, but the repo still does
+not know enough to close `DR-davod`. The missing evidence is concrete:
+which promises a local PromiseGrid infrastructure surface makes to apps, which
+promises or assumptions come from the host runtime, which features may be
+explicitly unsupported, what evidence records prove kept or broken promises, and
+what minimum pCID-selected coverage makes a first port credible.
+Constraints: Do not close `DR-davod`. Do not edit the external
+`promisegrid-dev-guide` repo. Do not run canary, GA, or scoring commands in this
+implementation pass. Keep the current envelope lock
+`grid([42(pCID), payload, ...])` as input evidence, not a reopened decision.
+Affects: `docs/thought-experiments/TE-mazop-kernel-promise-boundary-and-minimum-port-contract.md`;
+`DR/DR-davod-promisegrid-kernel-dev-porting-boundary.md`;
+`simulations/SIM-fovip-kernel-promise-boundary-port-contract/`;
+`docs/thought-experiments/README.md`; `simulations/README.md`;
+`protocols/wire-lab.d/specs/harness-spec-draft.md`;
+`DEV-GUIDE-RESOURCES.md`;
+`protocols/wire-lab.d/TODO/TODO-rozas-promisegrid-dev-guide-resources.md`.
+
 ### DI-lukib
 
 ID: DI-lukib
@@ -300,3 +328,15 @@ guide's claims.
 - [x] rozas.13 Draft `TE-jimar` and route its provisional kernel/runtime
   portability findings into `DEV-GUIDE-RESOURCES.md` without closing
   `DR-davod`. Source: `DI-rusup`.
+- [x] rozas.14 Draft `TE-mazop` to test the kernel promise boundary and minimum
+  credible first-port contract before any `DR-davod` lock. Source: `DI-funaf`.
+- [x] rozas.15 Update `DR-davod` with the next unanswered DF packet from
+  `TE-mazop`, while keeping the DR open. Source: `DI-funaf`.
+- [x] rozas.16 Add `SIM-fovip-kernel-promise-boundary-port-contract` as the
+  concrete DR-answering simulation for app-facing promises, host assumptions,
+  unsupported features, pCID coverage, evidence records, and broken-promise
+  handling. Source: `DI-funaf`.
+- [x] rozas.17 Route `TE-mazop` and `SIM-fovip` through the TE index,
+  simulations index, harness-spec TE summary, and `DEV-GUIDE-RESOURCES.md`
+  without changing the locked envelope direction or closing `DR-davod`.
+  Source: `DI-funaf`.
