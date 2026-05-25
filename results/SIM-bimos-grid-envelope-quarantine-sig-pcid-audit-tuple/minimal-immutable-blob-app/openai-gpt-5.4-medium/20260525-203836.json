@@ -1,0 +1,173 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-bimos-grid-envelope-quarantine-sig-pcid-audit-tuple-minimal-immutable-blob-app-openai-gpt-5.4-medium-20260525-203836",
+  "run_group_id": "ga-canary-20260525-kernel-resolution",
+  "cell_id": "ga-canary-20260525-kernel-resolution-000012-SIM-bimos-grid-envelope-quarantine-sig-pcid-audit-tuple--minimal-immutable-blob-app--openai-gpt-5.4-medium",
+  "sim_id": "SIM-bimos-grid-envelope-quarantine-sig-pcid-audit-tuple",
+  "scenario_id": "minimal-immutable-blob-app",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260525-203836",
+  "result_path": "results/SIM-bimos-grid-envelope-quarantine-sig-pcid-audit-tuple/minimal-immutable-blob-app/openai-gpt-5.4-medium/20260525-203836.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_0269e7d060ad4564acbb1b1fc6421ca1",
+    "response_id": "resp_06176562ab333ede006a14b38b3298819abc56efd0296b8a46",
+    "input_tokens": 10216,
+    "output_tokens": 2328,
+    "cost_usd": 0.05047
+  },
+  "source": {
+    "repo_commit": "d461285146f087f8728ebdba15c21ae27f690c35",
+    "sim_path": "simulations/SIM-bimos-grid-envelope-quarantine-sig-pcid-audit-tuple/",
+    "scenario_path": "scenarios/minimal-immutable-blob-app/minimal-immutable-blob-app.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-bimos-grid-envelope-quarantine-sig-pcid-audit-tuple/README.md",
+        "sha256": "f83e7dd87aac214905632bce3a7d9343191a99b47e01851803432514f86093d9"
+      },
+      {
+        "path": "simulations/SIM-bimos-grid-envelope-quarantine-sig-pcid-audit-tuple/QUESTION.md",
+        "sha256": "682a08b2aa5bc6c23966a338b1d28a753b6cc053272463ae13694c64a8e5f376"
+      },
+      {
+        "path": "simulations/SIM-bimos-grid-envelope-quarantine-sig-pcid-audit-tuple/protocols/grid-envelope.d/CHANGELOG.md",
+        "sha256": "13c6d17d57ec8e528ea45cec1634c790ebe7cfc52e7d8244821875eecae0c2f4"
+      },
+      {
+        "path": "simulations/SIM-bimos-grid-envelope-quarantine-sig-pcid-audit-tuple/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "799d88d9f466a4ed258a36819f8eda73afcc0d08d854381d199f96fd7a5f281f"
+      },
+      {
+        "path": "scenarios/minimal-immutable-blob-app/minimal-immutable-blob-app.md",
+        "sha256": "187e449b0498cddda2a2b28192f6aa29e824dae72e60ff47c35d34df35115a73"
+      }
+    ],
+    "simulation_tree_hash": "b70c5ff51037ca47511e214bc341f6e029019d175de158273070542a462b6992"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/generic statement capsules/central trust-ledger framing, 5 stays promise-first, layer-local, and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt, selector-shopping, or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 3,
+    "promisegrid_alignment": 2,
+    "auditability": 5,
+    "evolution_safety": 5,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 4,
+    "implementation_plausibility": 5,
+    "promise_vocabulary": 2,
+    "simplicity_durability": 5,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 38,
+    "normalized_0_100": 76,
+    "confidence_0_1": 0.85
+  },
+  "assessment": {
+    "rationale": "Strong envelope-layer candidate for exact-byte evidence, explicit dispatch, and mixed-version survivability. It fits the minimal immutable blob app only partially because it cleanly supports durable object identity and audit trails but intentionally leaves hash semantics, retrieval, retention, authorization, and availability promises to a higher-layer payload protocol.",
+    "strengths": [
+      "Small four-slot positional envelope with explicit payload and signature protocol dispatch.",
+      "Unknown-quarantine preserves exact rejected bytes while keeping acceptance boundaries strict.",
+      "Local audit tuple improves human and LLM auditability under sparse knowledge and long time horizons.",
+      "No central registry or global trust ledger is required at this layer."
+    ],
+    "weaknesses": [
+      "Does not define the blob app's core promises around write receipts, retrieval, replication, retention, or access control.",
+      "Promise vocabulary is weak relative to the rubric because behavior is specified as protocol requirements rather than promises.",
+      "Failure handling is strong for unknown protocol parsing but not for blob-service failures like missing replicas or stale availability claims."
+    ],
+    "risks": [
+      "Users may overread signed or quarantined envelope presence as a promise of blob availability or successful future retrieval.",
+      "Quarantined opaque evidence can accumulate without a clear higher-layer retention or garbage-collection policy.",
+      "Long-term interpretation still depends on future access to the payload and signature protocol specs named by pCID."
+    ],
+    "open_questions": [
+      "What payload protocol states the minimal immutable-blob promises for write receipt, retrieval attempts, and failure records?",
+      "Is the app's returned hash over the outer envelope bytes, the payload bytes, or another higher-layer object?",
+      "Does possession of the hash function only as an address, or as an app-level read capability under a separate promise protocol?"
+    ],
+    "authority_boundary": "Envelope-layer evidence only; payload protocol must define immutable blob storage, availability, authorization, discovery, and retention promises.",
+    "pt_gate": {
+      "status": "pt_reframe_needed",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "Peers make local accept, reject, quarantine, archive, and relay decisions without a central authority."
+      },
+      "scoped_intent": {
+        "status": "warning",
+        "note": "The layer boundary is clear, but the draft is written mostly in RFC-style MUST/MAY language rather than explicit agent-scoped promises."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "It does not let one peer promise storage, verification, or interpretation outcomes on behalf of another peer."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "The design preserves evidence and validity boundaries without promising retrieval, freshness, trust, or availability outcomes."
+      },
+      "local_trust_assessment": {
+        "status": "pass",
+        "note": "Interpretation and verification outcomes are explicitly local and can be recorded with verifier version in the audit tuple."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "Relay and archive are optional local choices; receiving bytes does not create an obligation to store, serve, or trust them."
+      },
+      "violations": [
+        "Spec framing relies on normative MUST/MAY requirements instead of explicit promise-first statements at the envelope layer."
+      ]
+    }
+  }
+}

@@ -1,0 +1,167 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-fovip-kernel-promise-boundary-port-contract-live-crdt-audit-publication-openai-gpt-5.4-medium-20260525-203836",
+  "run_group_id": "ga-canary-20260525-kernel-resolution",
+  "cell_id": "ga-canary-20260525-kernel-resolution-000004-SIM-fovip-kernel-promise-boundary-port-contract--live-crdt-audit-publication--openai-gpt-5.4-medium",
+  "sim_id": "SIM-fovip-kernel-promise-boundary-port-contract",
+  "scenario_id": "live-crdt-audit-publication",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260525-203836",
+  "result_path": "results/SIM-fovip-kernel-promise-boundary-port-contract/live-crdt-audit-publication/openai-gpt-5.4-medium/20260525-203836.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_97a9b4c95fca489aba3e82016b1a6e49",
+    "response_id": "resp_0dfb8acd451f2d49006a14b35099c481998ed9868e41256500",
+    "input_tokens": 10515,
+    "output_tokens": 1858,
+    "cost_usd": 0.04441325
+  },
+  "source": {
+    "repo_commit": "d461285146f087f8728ebdba15c21ae27f690c35",
+    "sim_path": "simulations/SIM-fovip-kernel-promise-boundary-port-contract/",
+    "scenario_path": "scenarios/live-crdt-audit-publication/live-crdt-audit-publication.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-fovip-kernel-promise-boundary-port-contract/README.md",
+        "sha256": "c2547b5403270db921616cfee97df26c7c94550acaa57f08bb1e1334a82a01c6"
+      },
+      {
+        "path": "simulations/SIM-fovip-kernel-promise-boundary-port-contract/QUESTION.md",
+        "sha256": "dc6f7c1c4f4269ed77b7dcbce95400a878a44534774b0459eb8bc52304fa4915"
+      },
+      {
+        "path": "simulations/SIM-fovip-kernel-promise-boundary-port-contract/protocols/kernel-port.d/specs/kernel-port-contract-draft.md",
+        "sha256": "b83b380b267f191443268c3a82ca1ad4846b171d357821d40f0b59ee37c61165"
+      },
+      {
+        "path": "scenarios/live-crdt-audit-publication/live-crdt-audit-publication.md",
+        "sha256": "870887bbd5848db45bc4406e5369b492a516c2bd997de9226d24825214c49d94"
+      }
+    ],
+    "simulation_tree_hash": "375549806a5cb4d65b9d273e1febf51b39dc629d9883f0bf83089f1bfd82d0a0"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/generic statement capsules/central trust-ledger framing, 5 stays promise-first, layer-local, and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt, selector-shopping, or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 3,
+    "promisegrid_alignment": 5,
+    "auditability": 4,
+    "evolution_safety": 5,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 4,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 5,
+    "simplicity_durability": 3,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 41,
+    "normalized_0_100": 82,
+    "confidence_0_1": 0.84
+  },
+  "assessment": {
+    "rationale": "Strong PromiseGrid fit at the kernel-port layer: it cleanly separates port promises, host assumptions, unsupported features, and exact evidence records. For this scenario it helps keep live-channel claims separate from durable audit publication, but it intentionally does not define the reliable ordered live CRDT protocol or the exact audit snapshot object.",
+    "strengths": [
+      "Very clear layer boundary between kernel port, host assumptions, and higher-layer pCID payload behavior.",
+      "Good audit posture through explicit kept/refused/unavailable/broken evidence records and exact-byte preservation.",
+      "Strong evolution safety across native, browser, mobile, MCU, and split-service runtimes without asserting one universal kernel shape.",
+      "Promise-first wording is disciplined and locally trustable."
+    ],
+    "weaknesses": [
+      "Does not itself answer the scenario's reliable low-latency live sync mechanics.",
+      "Leaves the exact save-time audit object and publication payload shape unspecified.",
+      "Record shape is somewhat large for a minimum artifact and may invite checklist growth."
+    ],
+    "risks": [
+      "The broad record could drift into a quasi-certification profile if implementations market it as conformance rather than local promises.",
+      "Live CRDT transport requirements may be under-specified if teams assume the port contract itself covers ordering/reliability.",
+      "Different ports may publish incompatible adapter descriptions, reducing comparability across live/audit boundaries."
+    ],
+    "open_questions": [
+      "Should live CRDT sync stay outside PromiseGrid until a reliable ordered live pCID exists, or should ports advertise a bounded live-channel adapter promise now?",
+      "What exact snapshot object and pCID should the save-time audit message cite for long-term review?",
+      "How should a port distinguish local low-latency transport claims from durable audit-publication claims without drifting into conformance-bundle language?"
+    ],
+    "authority_boundary": "Evidence only; evaluates a kernel-port promise record and does not settle live transport or audit payload protocol design.",
+    "pt_gate": {
+      "status": "pt_clean",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "Ports, hosts, apps, and local services remain separate promisers with autonomous behavior."
+      },
+      "scoped_intent": {
+        "status": "pass",
+        "note": "Promises are scoped to the port record and its exposed app/kernel surfaces."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "Host assumptions are separated from port promises, avoiding promises on behalf of browser, OS, or other services."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "The design promises behavior and evidence handling, not successful delivery or convergence outcomes."
+      },
+      "local_trust_assessment": {
+        "status": "pass",
+        "note": "Trust is explicitly local through published records and make/break evidence, not a global registry."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "The draft describes receive/use surfaces and adapters as port promises, not obligations imposed on peers."
+      },
+      "violations": []
+    }
+  }
+}

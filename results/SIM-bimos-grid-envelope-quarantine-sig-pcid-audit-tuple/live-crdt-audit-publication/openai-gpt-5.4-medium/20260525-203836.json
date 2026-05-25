@@ -1,0 +1,171 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-bimos-grid-envelope-quarantine-sig-pcid-audit-tuple-live-crdt-audit-publication-openai-gpt-5.4-medium-20260525-203836",
+  "run_group_id": "ga-canary-20260525-kernel-resolution",
+  "cell_id": "ga-canary-20260525-kernel-resolution-000014-SIM-bimos-grid-envelope-quarantine-sig-pcid-audit-tuple--live-crdt-audit-publication--openai-gpt-5.4-medium",
+  "sim_id": "SIM-bimos-grid-envelope-quarantine-sig-pcid-audit-tuple",
+  "scenario_id": "live-crdt-audit-publication",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260525-203836",
+  "result_path": "results/SIM-bimos-grid-envelope-quarantine-sig-pcid-audit-tuple/live-crdt-audit-publication/openai-gpt-5.4-medium/20260525-203836.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_edd9df3f68ab4a2f8793fad52545b4db",
+    "response_id": "resp_055186404aa885e7006a14b3a5e994819ba43732ecd4c61afc",
+    "input_tokens": 10227,
+    "output_tokens": 1254,
+    "cost_usd": 0.03545325
+  },
+  "source": {
+    "repo_commit": "d461285146f087f8728ebdba15c21ae27f690c35",
+    "sim_path": "simulations/SIM-bimos-grid-envelope-quarantine-sig-pcid-audit-tuple/",
+    "scenario_path": "scenarios/live-crdt-audit-publication/live-crdt-audit-publication.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-bimos-grid-envelope-quarantine-sig-pcid-audit-tuple/README.md",
+        "sha256": "f83e7dd87aac214905632bce3a7d9343191a99b47e01851803432514f86093d9"
+      },
+      {
+        "path": "simulations/SIM-bimos-grid-envelope-quarantine-sig-pcid-audit-tuple/QUESTION.md",
+        "sha256": "682a08b2aa5bc6c23966a338b1d28a753b6cc053272463ae13694c64a8e5f376"
+      },
+      {
+        "path": "simulations/SIM-bimos-grid-envelope-quarantine-sig-pcid-audit-tuple/protocols/grid-envelope.d/CHANGELOG.md",
+        "sha256": "13c6d17d57ec8e528ea45cec1634c790ebe7cfc52e7d8244821875eecae0c2f4"
+      },
+      {
+        "path": "simulations/SIM-bimos-grid-envelope-quarantine-sig-pcid-audit-tuple/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "799d88d9f466a4ed258a36819f8eda73afcc0d08d854381d199f96fd7a5f281f"
+      },
+      {
+        "path": "scenarios/live-crdt-audit-publication/live-crdt-audit-publication.md",
+        "sha256": "870887bbd5848db45bc4406e5369b492a516c2bd997de9226d24825214c49d94"
+      }
+    ],
+    "simulation_tree_hash": "b70c5ff51037ca47511e214bc341f6e029019d175de158273070542a462b6992"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/generic statement capsules/central trust-ledger framing, 5 stays promise-first, layer-local, and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt, selector-shopping, or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 3,
+    "promisegrid_alignment": 4,
+    "auditability": 5,
+    "evolution_safety": 5,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 4,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 3,
+    "simplicity_durability": 4,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 40,
+    "normalized_0_100": 80,
+    "confidence_0_1": 0.85
+  },
+  "assessment": {
+    "rationale": "Strong envelope-layer candidate for durable audit publication: it cleanly signs dispatch identity plus payload, preserves exact bytes, and keeps unknown future protocol instances as quarantined evidence rather than silently accepting or discarding them. For this scenario it scores lower on fit because the scenario requires sub-second ordered live CRDT transport, which this design explicitly does not provide; that delegation is acceptable because the layer boundary is clear.",
+    "strengths": [
+      "Very clear layer boundary: envelope handles dispatch and evidence preservation, not live CRDT semantics.",
+      "Excellent auditability from exact canonical bytes, mandatory signature protocol slot, and local audit tuple guidance.",
+      "High evolution safety: unknown future payload or signature protocols can survive partitions and version skew as quarantined evidence.",
+      "Small positional four-slot envelope is durable and plausible for constrained devices."
+    ],
+    "weaknesses": [
+      "Does not solve the scenario's live ordered low-latency channel requirement.",
+      "Promise vocabulary is only moderately strong; the draft is mostly protocol-normative rather than explicit promise-first wording.",
+      "Failure handling stops at quarantine/relay and local evidence; it does not define replay, deduplication, or publication semantics for the audit payload layer."
+    ],
+    "risks": [
+      "A receiver may overuse quarantine as a compatibility crutch and delay implementation of needed live or payload-layer protocols.",
+      "Because the spec is still draft and unfrozen, pCID/spec stability risk remains for long-lived deployments.",
+      "Users or operators could confuse relayed quarantined evidence with valid interpreted audit publication unless UI and payload rules stay explicit."
+    ],
+    "open_questions": [
+      "Should live CRDT frames remain off-grid until a reliable low-latency binding exists, with this envelope used only for milestone audit publication?",
+      "What exact snapshot object and promise body shape should the audit payload pCID define for save-time publication?",
+      "How should quarantined unknown audit envelopes be surfaced to users and auditors without being mistaken for valid interpreted publication?"
+    ],
+    "authority_boundary": "Envelope-layer evidence only; it can carry and preserve auditable publication bytes but does not define live CRDT transport, ordering, or application trust policy.",
+    "pt_gate": {
+      "status": "pt_clean",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "Peers independently decide whether they can interpret, verify, accept, reject, quarantine, archive, or relay bytes."
+      },
+      "scoped_intent": {
+        "status": "pass",
+        "note": "Intent is tightly scoped to envelope dispatch, exact-byte preservation, signature dispatch, and local audit evidence."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "The envelope constrains local handling at this layer and does not claim authority to make promises on behalf of remote peers or auditors."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "The spec does not promise successful interpretation or trust; it explicitly says quarantine relay is not acceptance and does not settle freshness."
+      },
+      "local_trust_assessment": {
+        "status": "pass",
+        "note": "Trust and verification are explicitly local via local interpretation result, local verification result, and local audit tuples."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "The design separates local receipt, quarantine, archival, and optional relay; receipt or relay is not framed as obligation."
+      },
+      "violations": []
+    }
+  }
+}

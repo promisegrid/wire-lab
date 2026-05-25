@@ -1,0 +1,167 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-fovip-kernel-promise-boundary-port-contract-minimal-immutable-blob-app-openai-gpt-5.4-medium-20260525-203836",
+  "run_group_id": "ga-canary-20260525-kernel-resolution",
+  "cell_id": "ga-canary-20260525-kernel-resolution-000002-SIM-fovip-kernel-promise-boundary-port-contract--minimal-immutable-blob-app--openai-gpt-5.4-medium",
+  "sim_id": "SIM-fovip-kernel-promise-boundary-port-contract",
+  "scenario_id": "minimal-immutable-blob-app",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260525-203836",
+  "result_path": "results/SIM-fovip-kernel-promise-boundary-port-contract/minimal-immutable-blob-app/openai-gpt-5.4-medium/20260525-203836.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_bc07d21d467d4d9dbf32fe8f00474e36",
+    "response_id": "resp_0e5ba731a09608f8006a14b3509e60819aad380174a2c0648e",
+    "input_tokens": 10504,
+    "output_tokens": 1413,
+    "cost_usd": 0.038164
+  },
+  "source": {
+    "repo_commit": "d461285146f087f8728ebdba15c21ae27f690c35",
+    "sim_path": "simulations/SIM-fovip-kernel-promise-boundary-port-contract/",
+    "scenario_path": "scenarios/minimal-immutable-blob-app/minimal-immutable-blob-app.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-fovip-kernel-promise-boundary-port-contract/README.md",
+        "sha256": "c2547b5403270db921616cfee97df26c7c94550acaa57f08bb1e1334a82a01c6"
+      },
+      {
+        "path": "simulations/SIM-fovip-kernel-promise-boundary-port-contract/QUESTION.md",
+        "sha256": "dc6f7c1c4f4269ed77b7dcbce95400a878a44534774b0459eb8bc52304fa4915"
+      },
+      {
+        "path": "simulations/SIM-fovip-kernel-promise-boundary-port-contract/protocols/kernel-port.d/specs/kernel-port-contract-draft.md",
+        "sha256": "b83b380b267f191443268c3a82ca1ad4846b171d357821d40f0b59ee37c61165"
+      },
+      {
+        "path": "scenarios/minimal-immutable-blob-app/minimal-immutable-blob-app.md",
+        "sha256": "187e449b0498cddda2a2b28192f6aa29e824dae72e60ff47c35d34df35115a73"
+      }
+    ],
+    "simulation_tree_hash": "375549806a5cb4d65b9d273e1febf51b39dc629d9883f0bf83089f1bfd82d0a0"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/generic statement capsules/central trust-ledger framing, 5 stays promise-first, layer-local, and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt, selector-shopping, or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 3,
+    "promisegrid_alignment": 5,
+    "auditability": 4,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 4,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 5,
+    "simplicity_durability": 3,
+    "risk_penalty": 1
+  },
+  "fitness": {
+    "raw": 41,
+    "normalized_0_100": 82,
+    "confidence_0_1": 0.84
+  },
+  "assessment": {
+    "rationale": "Strong PromiseGrid fit at the kernel-port layer. For the immutable blob scenario it does not define blob semantics itself, but it cleanly separates who promises storage, retrieval, refusal, evidence, and host dependencies, which is exactly the boundary the scenario pressures. The main limitation is that hash/address/capability semantics remain delegated to higher-layer payload protocols.",
+    "strengths": [
+      "Explicit promise boundary between port behavior and host assumptions.",
+      "Very strong local-trust and non-authoritative framing.",
+      "Good support for exact-byte evidence, refusal, unavailable, and broken-promise records.",
+      "Clear accommodation of small or constrained runtimes without pretending universal kernel shape."
+    ],
+    "weaknesses": [
+      "Scenario fit is partial because immutable blob semantics are delegated rather than specified.",
+      "The record shape is somewhat large for a supposed minimum contract.",
+      "It leaves authorization and long-term availability semantics to payload protocols or local policy."
+    ],
+    "risks": [
+      "A broad record shape could become checklist-heavy and unevenly implemented across ports.",
+      "Without a companion blob-level protocol, different ports may describe storage/retrieval promises in incomparable ways.",
+      "Apps may overread a port promise record as if it implied retention or cross-site availability guarantees."
+    ],
+    "open_questions": [
+      "Does the port record need a more explicit minimal CAS/storage promise subtype for immutable blob publish/retrieve semantics?",
+      "How should a port record distinguish hash-as-identifier from hash-as-read-capability when payload protocols make different choices?",
+      "What minimum local evidence record should a tiny port keep when retrieval fails years later because retention or replication promises expired upstream?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design.",
+    "pt_gate": {
+      "status": "pt_clean",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "It treats ports, hosts, apps, and split local services as separate promisers with their own boundaries."
+      },
+      "scoped_intent": {
+        "status": "pass",
+        "note": "Promises are scoped to a named port, profile, supported pCIDs, and explicit unsupported features."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "Host/runtime assumptions are separated from port promises, avoiding promises on behalf of the host."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "It distinguishes promises from outcomes and requires evidence for unavailable and broken promises."
+      },
+      "local_trust_assessment": {
+        "status": "pass",
+        "note": "The record is explicitly local evidence, not a global certificate or trust ledger."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "The design describes receive/use/refusal behavior as port promises and evidence, not as obligations imposed on other agents."
+      },
+      "violations": []
+    }
+  }
+}

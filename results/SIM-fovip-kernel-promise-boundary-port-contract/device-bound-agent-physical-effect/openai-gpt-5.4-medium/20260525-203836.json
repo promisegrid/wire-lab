@@ -1,0 +1,168 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-fovip-kernel-promise-boundary-port-contract-device-bound-agent-physical-effect-openai-gpt-5.4-medium-20260525-203836",
+  "run_group_id": "ga-canary-20260525-kernel-resolution",
+  "cell_id": "ga-canary-20260525-kernel-resolution-000003-SIM-fovip-kernel-promise-boundary-port-contract--device-bound-agent-physical-effect--openai-gpt-5.4-medium",
+  "sim_id": "SIM-fovip-kernel-promise-boundary-port-contract",
+  "scenario_id": "device-bound-agent-physical-effect",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260525-203836",
+  "result_path": "results/SIM-fovip-kernel-promise-boundary-port-contract/device-bound-agent-physical-effect/openai-gpt-5.4-medium/20260525-203836.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_92f2fd921a5548d3839cd68bd2c47827",
+    "response_id": "resp_00248932478655d5006a14b350911c819a883314e6694a081e",
+    "input_tokens": 10516,
+    "output_tokens": 1351,
+    "cost_usd": 0.037317
+  },
+  "source": {
+    "repo_commit": "d461285146f087f8728ebdba15c21ae27f690c35",
+    "sim_path": "simulations/SIM-fovip-kernel-promise-boundary-port-contract/",
+    "scenario_path": "scenarios/device-bound-agent-physical-effect/device-bound-agent-physical-effect.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-fovip-kernel-promise-boundary-port-contract/README.md",
+        "sha256": "c2547b5403270db921616cfee97df26c7c94550acaa57f08bb1e1334a82a01c6"
+      },
+      {
+        "path": "simulations/SIM-fovip-kernel-promise-boundary-port-contract/QUESTION.md",
+        "sha256": "dc6f7c1c4f4269ed77b7dcbce95400a878a44534774b0459eb8bc52304fa4915"
+      },
+      {
+        "path": "simulations/SIM-fovip-kernel-promise-boundary-port-contract/protocols/kernel-port.d/specs/kernel-port-contract-draft.md",
+        "sha256": "b83b380b267f191443268c3a82ca1ad4846b171d357821d40f0b59ee37c61165"
+      },
+      {
+        "path": "scenarios/device-bound-agent-physical-effect/device-bound-agent-physical-effect.md",
+        "sha256": "ffd2cee6094031ae77651ba8da6c3c76b54d200845f65f0e93d07c8e96aaeb2a"
+      }
+    ],
+    "simulation_tree_hash": "375549806a5cb4d65b9d273e1febf51b39dc629d9883f0bf83089f1bfd82d0a0"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/generic statement capsules/central trust-ledger framing, 5 stays promise-first, layer-local, and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt, selector-shopping, or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 3,
+    "promisegrid_alignment": 5,
+    "auditability": 4,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 3,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 5,
+    "simplicity_durability": 4,
+    "risk_penalty": 2
+  },
+  "fitness": {
+    "raw": 40,
+    "normalized_0_100": 80,
+    "confidence_0_1": 0.81
+  },
+  "assessment": {
+    "rationale": "Strong Promise-Theory fit: the specimen is a local port promise record with explicit promiser identity, host assumptions, unsupported features, and local evidence. For this scenario it helps clarify who promises device access and what evidence survives restart, but it stops short of specifying a concrete at-most-once replay/dedup contract for non-idempotent physical effects. That lowers scenario fit and failure-handling somewhat, but the layer boundary is clear and appropriate.",
+    "strengths": [
+      "Explicitly separates port promises from host/runtime assumptions.",
+      "Names device access, lifecycle, refusal, receipt, and evidence as app-facing promise surfaces.",
+      "Requires exact evidence for kept, refused, unavailable, and broken promises.",
+      "Clear local-trust framing avoids central authority and global certification semantics.",
+      "Compact record shape looks implementable across native, browser, mobile, MCU, and split-service ports."
+    ],
+    "weaknesses": [
+      "No concrete restart-safe dedup rule for non-idempotent physical effects like label printing.",
+      "Owner delegation evidence is implied as a needed surface but not fully specified in the draft shape.",
+      "Scenario-specific receipt semantics for 'already done' versus 'break-witness' are left open."
+    ],
+    "risks": [
+      "Replay after restart could still cause duplicate physical effects unless a higher-layer or device-specific pCID defines durable dedup semantics.",
+      "Long-term auditability of physical effects may degrade if delegation and driver dependency evidence are not frozen in portable exact-byte records.",
+      "Operators may overread the port record as conformance or safety certification for host/device stacks it only lists as assumptions."
+    ],
+    "open_questions": [
+      "What exact replay/dedup evidence key should a device-bound port preserve across restart for non-idempotent physical effects like printing?",
+      "How should owner delegation to a host-bound device agent be encoded so Carol can audit it after the original driver stack is gone?",
+      "Which parts of CUPS/libusb/IIO/i2c/IPP/vendor-SDK dependency disclosure belong in host assumptions versus app-facing promises or adapter promises?"
+    ],
+    "authority_boundary": "Evidence only; evaluates a kernel-port promise record, not final device-effect semantics or a final PromiseGrid kernel API.",
+    "pt_gate": {
+      "status": "pt_clean",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "Ports, hosts, apps, and local services are treated as separate promisers with their own behavior."
+      },
+      "scoped_intent": {
+        "status": "pass",
+        "note": "Promises are scoped to the local port record and named surfaces such as device access, evidence, lifecycle, and adapters."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "Host/runtime behavior is separated into assumptions unless the host is an explicit promiser."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "The design records kept/refused/unavailable/broken promises rather than guaranteeing device outcomes."
+      },
+      "local_trust_assessment": {
+        "status": "pass",
+        "note": "The record is explicitly local evidence, not a global certificate or trust ledger."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "The draft stays promise-first and does not turn app use or receipt into obligation semantics."
+      },
+      "violations": []
+    }
+  }
+}

@@ -1,0 +1,166 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-funas-kernel-porting-boundary-device-bound-agent-physical-effect-openai-gpt-5.4-medium-20260525-203836",
+  "run_group_id": "ga-canary-20260525-kernel-resolution",
+  "cell_id": "ga-canary-20260525-kernel-resolution-000008-SIM-funas-kernel-porting-boundary--device-bound-agent-physical-effect--openai-gpt-5.4-medium",
+  "sim_id": "SIM-funas-kernel-porting-boundary",
+  "scenario_id": "device-bound-agent-physical-effect",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260525-203836",
+  "result_path": "results/SIM-funas-kernel-porting-boundary/device-bound-agent-physical-effect/openai-gpt-5.4-medium/20260525-203836.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_a54561aac5334d90806f7d87a69329f4",
+    "response_id": "resp_0fb6a166f50154ff006a14b36e571c819b823db89260556ea0",
+    "input_tokens": 8643,
+    "output_tokens": 1664,
+    "cost_usd": 0.03842125
+  },
+  "source": {
+    "repo_commit": "d461285146f087f8728ebdba15c21ae27f690c35",
+    "sim_path": "simulations/SIM-funas-kernel-porting-boundary/",
+    "scenario_path": "scenarios/device-bound-agent-physical-effect/device-bound-agent-physical-effect.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-funas-kernel-porting-boundary/README.md",
+        "sha256": "7610bd7589d30cbc7054afd5ec64be256ec3048adc6135cf2a85c48fa94c2363"
+      },
+      {
+        "path": "simulations/SIM-funas-kernel-porting-boundary/QUESTION.md",
+        "sha256": "c9b86b2a64e4a8ed5cebea5048ad7908752f168d36d68e9ff0c00d2542187486"
+      },
+      {
+        "path": "scenarios/device-bound-agent-physical-effect/device-bound-agent-physical-effect.md",
+        "sha256": "ffd2cee6094031ae77651ba8da6c3c76b54d200845f65f0e93d07c8e96aaeb2a"
+      }
+    ],
+    "simulation_tree_hash": "3036063b40b8f7f00637b0135a1962f32775f8d0abb3406a49cb169d7048cfe6"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/generic statement capsules/central trust-ledger framing, 5 stays promise-first, layer-local, and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt, selector-shopping, or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 1,
+    "promisegrid_alignment": 2,
+    "auditability": 3,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 1,
+    "implementation_plausibility": 2,
+    "promise_vocabulary": 1,
+    "simplicity_durability": 3,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 23,
+    "normalized_0_100": 46,
+    "confidence_0_1": 0.79
+  },
+  "assessment": {
+    "rationale": "Useful as a boundary-setting question home, especially for avoiding a false monolithic port target, but it does not yet provide a promise-first account of delegated device control, replay-safe physical effects, or durable receipt evidence for this scenario.",
+    "strengths": [
+      "Explicitly centers layer boundaries and warns against teaching an unsettled monolithic runtime target.",
+      "Supports evolution safety by keeping provisional versus blocked guidance visible.",
+      "Fits audit-oriented design work as a question home rather than pretending to be a finished protocol."
+    ],
+    "weaknesses": [
+      "Does not directly answer the scenario's at-most-once physical-effect, receipt, and break-witness requirements.",
+      "Promise vocabulary is weak; the docs speak mostly in terms of obligations, conformance, and runtime duties.",
+      "No concrete local evidence model for owner delegation, replay deduplication, or post-restart auditability."
+    ],
+    "risks": [
+      "A provisional kernel/runtime teaching target could be mistaken for a stable implementation contract.",
+      "Non-idempotent physical effects may be handled inconsistently across restart and replay if the responsible layer is left implicit.",
+      "Driver and host dependency claims could leak into core-port requirements and reduce long-term durability."
+    ],
+    "open_questions": [
+      "What minimal promise/evidence artifact proves Bob delegated a device-bound daemon to act for the printer or sensor?",
+      "Which layer should own replay deduplication, already-done receipts, and break-witness records for non-idempotent physical effects?",
+      "How should conformance language describe CUPS/libusb/IIO/i2c/IPP or vendor SDK dependencies without turning them into core kernel promises?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design.",
+    "pt_gate": {
+      "status": "pt_reframe_needed",
+      "autonomous_agents": {
+        "status": "warning",
+        "note": "It does not obviously violate agent autonomy, but it does not yet spell out autonomous promises for owner, daemon, auditor, and device host in this scenario."
+      },
+      "scoped_intent": {
+        "status": "warning",
+        "note": "The intent is scoped to a provisional porting boundary question, but the wording is more about targets and obligations than explicit promises."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "It does not explicitly make promises on behalf of other agents."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "It does not promise guaranteed physical outcomes; the boundary remains provisional."
+      },
+      "local_trust_assessment": {
+        "status": "warning",
+        "note": "Local trust and evidence handling for delegation, restart, replay, and receipts are not yet specified."
+      },
+      "accept_use_not_obligation": {
+        "status": "warning",
+        "note": "The simulation repeatedly uses runtime-obligation and conformance-target framing, so receive/use semantics are not kept cleanly separate from imposed duties."
+      },
+      "violations": [
+        "Uses obligation/conformance framing instead of promise-first wording at the claimed layer.",
+        "Does not specify local evidence and trust handling for delegation, replay, or receipts in the device-bound physical-effect scenario.",
+        "Leaves physical-effect agent promises implicit rather than explicitly scoped between owner, daemon, auditor, and peers."
+      ]
+    }
+  }
+}

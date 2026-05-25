@@ -1,0 +1,167 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-fovip-kernel-promise-boundary-port-contract-kernel-porting-boundary-openai-gpt-5.4-medium-20260525-203836",
+  "run_group_id": "ga-canary-20260525-kernel-resolution",
+  "cell_id": "ga-canary-20260525-kernel-resolution-000001-SIM-fovip-kernel-promise-boundary-port-contract--kernel-porting-boundary--openai-gpt-5.4-medium",
+  "sim_id": "SIM-fovip-kernel-promise-boundary-port-contract",
+  "scenario_id": "kernel-porting-boundary",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260525-203836",
+  "result_path": "results/SIM-fovip-kernel-promise-boundary-port-contract/kernel-porting-boundary/openai-gpt-5.4-medium/20260525-203836.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_ba4207d9e3d34c1a9dfcb4cd5c215354",
+    "response_id": "resp_0fee73e541822acb006a14b3509a808199813c8f8d1db6b299",
+    "input_tokens": 11164,
+    "output_tokens": 1302,
+    "cost_usd": 0.037765
+  },
+  "source": {
+    "repo_commit": "d461285146f087f8728ebdba15c21ae27f690c35",
+    "sim_path": "simulations/SIM-fovip-kernel-promise-boundary-port-contract/",
+    "scenario_path": "scenarios/kernel-porting-boundary/kernel-porting-boundary.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-fovip-kernel-promise-boundary-port-contract/README.md",
+        "sha256": "c2547b5403270db921616cfee97df26c7c94550acaa57f08bb1e1334a82a01c6"
+      },
+      {
+        "path": "simulations/SIM-fovip-kernel-promise-boundary-port-contract/QUESTION.md",
+        "sha256": "dc6f7c1c4f4269ed77b7dcbce95400a878a44534774b0459eb8bc52304fa4915"
+      },
+      {
+        "path": "simulations/SIM-fovip-kernel-promise-boundary-port-contract/protocols/kernel-port.d/specs/kernel-port-contract-draft.md",
+        "sha256": "b83b380b267f191443268c3a82ca1ad4846b171d357821d40f0b59ee37c61165"
+      },
+      {
+        "path": "scenarios/kernel-porting-boundary/kernel-porting-boundary.md",
+        "sha256": "93861572d3c7c3c67345683e6e743a3a85dbc5aed6540e219d7ab37a8b87b959"
+      }
+    ],
+    "simulation_tree_hash": "375549806a5cb4d65b9d273e1febf51b39dc629d9883f0bf83089f1bfd82d0a0"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/generic statement capsules/central trust-ledger framing, 5 stays promise-first, layer-local, and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt, selector-shopping, or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 5,
+    "promisegrid_alignment": 5,
+    "auditability": 4,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 4,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 5,
+    "simplicity_durability": 3,
+    "risk_penalty": 1
+  },
+  "fitness": {
+    "raw": 43,
+    "normalized_0_100": 86,
+    "confidence_0_1": 0.9
+  },
+  "assessment": {
+    "rationale": "Strong match for the scenario. The candidate explicitly defines a port-layer promise record, keeps the app/kernel boundary at pCID-selected messages, separates host assumptions from port promises, names unsupported features directly, and requires local evidence for kept/refused/unavailable/broken behavior. Its main weakness is size and breadth: the record risks becoming a fairly heavy profile template before the final guide boundary is frozen.",
+    "strengths": [
+      "Excellent boundary clarity between port promises, host assumptions, and higher-layer protocol behavior.",
+      "Very strong Promise Theory vocabulary and local-trust framing.",
+      "Directly addresses unsupported pCIDs, refusal behavior, exact-byte evidence, namespaces, references, and checkpoints.",
+      "Fits native, browser, mobile, MCU, and split-service variants without declaring one runtime shape universal."
+    ],
+    "weaknesses": [
+      "Record shape is somewhat broad and may be cumbersome for minimal implementations.",
+      "Some guidance remains provisional because DR-davod is not closed.",
+      "Auditability across multi-agent local service graphs needs more concrete field conventions."
+    ],
+    "risks": [
+      "The record could accrete too many fields and become a durable complexity burden for tiny ports.",
+      "Because the shape is still draft-level, different ports may fill fields inconsistently before freeze.",
+      "Split-service deployments may still need clearer conventions for naming multiple local promisers and evidence transfer."
+    ],
+    "open_questions": [
+      "How small can the record get while still covering split-service ports and MCU profiles without becoming a checklist bundle?",
+      "Which app-facing promise fields should remain provisional until DR-davod freezes the guide-facing boundary?",
+      "How should multi-promiser split local services identify evidence handoff between dispatch, storage, key, and network agents?"
+    ],
+    "authority_boundary": "Evidence only; proposes a local port promise record for guide and implementation discussion, not a final kernel API, global certificate, or frozen obligation set.",
+    "pt_gate": {
+      "status": "pt_clean",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "The design consistently treats ports, hosts, and local services as separate promisers with their own behavior."
+      },
+      "scoped_intent": {
+        "status": "pass",
+        "note": "The specimen is a scoped implementation promise record at the port boundary, not a universal kernel claim."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "Host assumptions are explicitly separated from port promises, avoiding promises on behalf of browsers, OSes, or other services."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "Promises are framed as declared behavior with refusal, unavailable, and broken-promise evidence, not guaranteed success."
+      },
+      "local_trust_assessment": {
+        "status": "pass",
+        "note": "Trust stays local through make/break history and local evidence records rather than any central trust ledger."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "The record describes what apps may rely on and what a port may refuse; it does not reframe receipt/use as obligation."
+      },
+      "violations": []
+    }
+  }
+}

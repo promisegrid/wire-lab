@@ -1,0 +1,165 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-funas-kernel-porting-boundary-multi-embodiment-app-identity-openai-gpt-5.4-medium-20260525-203836",
+  "run_group_id": "ga-canary-20260525-kernel-resolution",
+  "cell_id": "ga-canary-20260525-kernel-resolution-000010-SIM-funas-kernel-porting-boundary--multi-embodiment-app-identity--openai-gpt-5.4-medium",
+  "sim_id": "SIM-funas-kernel-porting-boundary",
+  "scenario_id": "multi-embodiment-app-identity",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260525-203836",
+  "result_path": "results/SIM-funas-kernel-porting-boundary/multi-embodiment-app-identity/openai-gpt-5.4-medium/20260525-203836.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_0091b3b9673540fe848e63180f7e9150",
+    "response_id": "resp_0cfeef1d27dd7472006a14b37eafe4819a9f6e8efac99a3c95",
+    "input_tokens": 8621,
+    "output_tokens": 1614,
+    "cost_usd": 0.03768275
+  },
+  "source": {
+    "repo_commit": "d461285146f087f8728ebdba15c21ae27f690c35",
+    "sim_path": "simulations/SIM-funas-kernel-porting-boundary/",
+    "scenario_path": "scenarios/multi-embodiment-app-identity/multi-embodiment-app-identity.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-funas-kernel-porting-boundary/README.md",
+        "sha256": "7610bd7589d30cbc7054afd5ec64be256ec3048adc6135cf2a85c48fa94c2363"
+      },
+      {
+        "path": "simulations/SIM-funas-kernel-porting-boundary/QUESTION.md",
+        "sha256": "c9b86b2a64e4a8ed5cebea5048ad7908752f168d36d68e9ff0c00d2542187486"
+      },
+      {
+        "path": "scenarios/multi-embodiment-app-identity/multi-embodiment-app-identity.md",
+        "sha256": "e05f78b9d46c47acecbf430a12fda015268e17d60fbea9e0609fa11e604e52cc"
+      }
+    ],
+    "simulation_tree_hash": "3036063b40b8f7f00637b0135a1962f32775f8d0abb3406a49cb169d7048cfe6"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/generic statement capsules/central trust-ledger framing, 5 stays promise-first, layer-local, and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt, selector-shopping, or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 2,
+    "auditability": 2,
+    "evolution_safety": 3,
+    "layer_boundary_clarity": 4,
+    "failure_handling": 1,
+    "implementation_plausibility": 2,
+    "promise_vocabulary": 1,
+    "simplicity_durability": 3,
+    "risk_penalty": 3
+  },
+  "fitness": {
+    "raw": 22,
+    "normalized_0_100": 44,
+    "confidence_0_1": 0.68
+  },
+  "assessment": {
+    "rationale": "This simulation helps by insisting on explicit layer boundaries and avoiding a monolithic harness-clone target, which is relevant when a browser tab and helper-backed plugin share one logical app. But it is mainly a provisional question home about porting boundaries, not a concrete answer for shared app identity, embodiment-scoped claims, or durable local audit evidence. It fits the scenario only indirectly.",
+    "strengths": [
+      "Strong emphasis on layer boundaries.",
+      "Explicitly avoids teaching a monolithic false implementation target.",
+      "Naturally supports different embodiments claiming different implementation scope."
+    ],
+    "weaknesses": [
+      "Does not define what makes multiple embodiments one app.",
+      "Does not specify required contents of embodiment conformance claims.",
+      "Little concrete failure-handling or audit-record detail for browser loss, helper upgrades, or long-term review."
+    ],
+    "risks": [
+      "A provisional kernel/runtime boundary could be mistaken for the app-identity contract itself.",
+      "Ambiguous conformance language could let Mallory blur 'same UX app' with 'same protocol contract'.",
+      "Without explicit local evidence records, long-term audit across host replacement or storage loss is weak."
+    ],
+    "open_questions": [
+      "What exact pCID-selected contract or contract family makes heterogeneous embodiments one app at the app layer rather than merely adjacent tools?",
+      "What minimum embodiment-specific promise/conformance record should a browser tab and helper-backed plugin each publish for long-term audit?",
+      "Which identity/accounting facts belong to the porting boundary versus the higher-layer app protocol?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design.",
+    "pt_gate": {
+      "status": "pt_reframe_needed",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "Nothing here denies agent autonomy; separate embodiments can state separate implementation scope."
+      },
+      "scoped_intent": {
+        "status": "warning",
+        "note": "Intent is scoped to a provisional porting boundary, but the wording is mostly about obligations and conformance, not explicit promises."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "The framing allows each embodiment to make its own claim rather than one agent promising on behalf of another."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "The simulation does not promise guaranteed outcomes."
+      },
+      "local_trust_assessment": {
+        "status": "warning",
+        "note": "Local trust/accounting for embodiment-specific claims is not defined; Carol's audit path is implied rather than specified."
+      },
+      "accept_use_not_obligation": {
+        "status": "warning",
+        "note": "The docs do not confuse use/acceptance with obligation, but they do lean on 'runtime obligations' terminology instead of promise-first wording."
+      },
+      "violations": [
+        "Uses obligation/conformance framing rather than clear promise-first statements at the claimed layer.",
+        "Does not specify a local trust/accounting model for embodiment-specific claims and audits."
+      ]
+    }
+  }
+}

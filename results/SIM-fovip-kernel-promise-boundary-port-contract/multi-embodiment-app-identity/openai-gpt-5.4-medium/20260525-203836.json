@@ -1,0 +1,168 @@
+{
+  "schema": "promisegrid.ga.result.v3",
+  "result_id": "SIM-fovip-kernel-promise-boundary-port-contract-multi-embodiment-app-identity-openai-gpt-5.4-medium-20260525-203836",
+  "run_group_id": "ga-canary-20260525-kernel-resolution",
+  "cell_id": "ga-canary-20260525-kernel-resolution-000005-SIM-fovip-kernel-promise-boundary-port-contract--multi-embodiment-app-identity--openai-gpt-5.4-medium",
+  "sim_id": "SIM-fovip-kernel-promise-boundary-port-contract",
+  "scenario_id": "multi-embodiment-app-identity",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260525-203836",
+  "result_path": "results/SIM-fovip-kernel-promise-boundary-port-contract/multi-embodiment-app-identity/openai-gpt-5.4-medium/20260525-203836.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_eb2489b453234eef9b23552166b815c7",
+    "response_id": "resp_0086daca52ee657a006a14b3660b24819983c4cb866bfa0c93",
+    "input_tokens": 10494,
+    "output_tokens": 1402,
+    "cost_usd": 0.0379925
+  },
+  "source": {
+    "repo_commit": "d461285146f087f8728ebdba15c21ae27f690c35",
+    "sim_path": "simulations/SIM-fovip-kernel-promise-boundary-port-contract/",
+    "scenario_path": "scenarios/multi-embodiment-app-identity/multi-embodiment-app-identity.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-fovip-kernel-promise-boundary-port-contract/README.md",
+        "sha256": "c2547b5403270db921616cfee97df26c7c94550acaa57f08bb1e1334a82a01c6"
+      },
+      {
+        "path": "simulations/SIM-fovip-kernel-promise-boundary-port-contract/QUESTION.md",
+        "sha256": "dc6f7c1c4f4269ed77b7dcbce95400a878a44534774b0459eb8bc52304fa4915"
+      },
+      {
+        "path": "simulations/SIM-fovip-kernel-promise-boundary-port-contract/protocols/kernel-port.d/specs/kernel-port-contract-draft.md",
+        "sha256": "b83b380b267f191443268c3a82ca1ad4846b171d357821d40f0b59ee37c61165"
+      },
+      {
+        "path": "scenarios/multi-embodiment-app-identity/multi-embodiment-app-identity.md",
+        "sha256": "e05f78b9d46c47acecbf430a12fda015268e17d60fbea9e0609fa11e604e52cc"
+      }
+    ],
+    "simulation_tree_hash": "375549806a5cb4d65b9d273e1febf51b39dc629d9883f0bf83089f1bfd82d0a0"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260523-v3",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "promise_vocabulary": "0 drifts into claims/profiles/generic statement capsules/central trust-ledger framing, 5 stays promise-first, layer-local, and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt, selector-shopping, or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 3,
+    "promisegrid_alignment": 5,
+    "auditability": 4,
+    "evolution_safety": 5,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 4,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 5,
+    "simplicity_durability": 4,
+    "risk_penalty": 1
+  },
+  "fitness": {
+    "raw": 43,
+    "normalized_0_100": 86,
+    "confidence_0_1": 0.81
+  },
+  "assessment": {
+    "rationale": "Strong PT-clean kernel-layer specimen. It handles heterogeneous embodiments well by letting each embodiment publish its own port promises, runtime profile, assumptions, unsupported features, and evidence policy under shared pCID-selected boundaries. It fits the scenario only partially because it does not itself define what makes multiple embodiments one app; that identity/conformance linkage is left to a higher-layer payload or app protocol.",
+    "strengths": [
+      "Very clear layer boundary between port promises, host assumptions, and higher-layer app semantics.",
+      "Excellent promise-first vocabulary and local-trust framing.",
+      "Good audit surface through exact evidence records for kept, refused, unavailable, and broken promises.",
+      "Supports heterogeneous runtime classes without forcing one universal kernel shape.",
+      "Explicit unsupported-feature and unsupported-pCID handling reduces ambiguity."
+    ],
+    "weaknesses": [
+      "Does not by itself define one-app identity across browser and plugin embodiments.",
+      "Does not provide a concrete app-level conformance-claim format for partial shared-contract coverage.",
+      "Scenario fit depends on a higher-layer protocol to express cross-embodiment contract family membership."
+    ],
+    "risks": [
+      "Reviewers may overread the port promise record as an app-level conformance certificate.",
+      "Shared app identity across embodiments remains underspecified and could drift into informal branding or central registry shortcuts.",
+      "Partial implementation claims may still be ambiguous unless a higher-layer contract names required vs optional protocol surfaces."
+    ],
+    "open_questions": [
+      "What higher-layer record binds multiple port promise records into one app identity without creating a central authority?",
+      "What is the minimum per-embodiment claim shape for partial contract coverage over a shared app contract family?",
+      "How should long-term audit link browser loss, helper upgrades, and successor ports to the same app identity history?"
+    ],
+    "authority_boundary": "Evidence only; scores the kernel-port promise-record layer, not app-identity semantics or final PromiseGrid design.",
+    "pt_gate": {
+      "status": "pt_clean",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "Ports, hosts, apps, and local services are modeled as separate promisers with their own behavior."
+      },
+      "scoped_intent": {
+        "status": "pass",
+        "note": "The candidate states a bounded port-level promise record with explicit supported pCIDs, assumptions, and unsupported features."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "Host assumptions are separated from port promises, avoiding promises on behalf of browser, OS, or helper processes."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "Promises are scoped behavioral intents with evidence for kept, refused, unavailable, and broken cases, not outcome guarantees."
+      },
+      "local_trust_assessment": {
+        "status": "pass",
+        "note": "The record is explicitly not a global certificate; trust is based on local assessment and make/break history."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "The design describes app-facing receive/use/refusal behavior without collapsing use into obligation semantics."
+      },
+      "violations": []
+    }
+  }
+}
