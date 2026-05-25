@@ -2,7 +2,7 @@
   "schema": "promisegrid.ga.state.v1",
   "run_group_id": "ga-canary-20260523-extracted-34x7",
   "created_at": "2026-05-23T23:02:12Z",
-  "updated_at": "2026-05-23T23:16:45Z",
+  "updated_at": "2026-05-25T22:14:54Z",
   "repo_commit": "6a58d2d7e61a8ab63fdc8429374b2c12d49298ee",
   "model_id": "openai-gpt-5.4-medium",
   "population": [
@@ -768,7 +768,7 @@
         }
       ],
       "tree_hash": "0bdd1a4e2733ade3beefee5a27e6f67fff5da2dc5e0696e43e0aabce3a6b84a6",
-      "status": "generated",
+      "status": "culled",
       "design_delta_summary": "1) Replace session-owned conditional-release state with a frozen payload-bound Release Capsule CID. 2) Keep the split-template parent strength, but make the normative surface concrete with mandatory sections for unknown handling, failure evidence, vocabulary/lineage, composition, and long-horizon assumptions. 3) Add explicit refusal/replay records and unknown-codec fallback so peers can stay opaque, auditable, and evolution-safe.",
       "validation_message": "validated child tree",
       "updated_at": "2026-05-23T23:15:11Z",
@@ -805,7 +805,7 @@
         }
       ],
       "tree_hash": "11abb052ed38ea6f2f86b131f13533bf43a46c7932d88b430ca1b75556572fe6",
-      "status": "generated",
+      "status": "culled",
       "design_delta_summary": "1) Replace reference-first authority with contract-first dual-surface freeze artifacts plus a non-normative executable witness. 2) Add a shared outer/feed evidence ledger for opaque-pass and refusal outcomes such as unknown codec preserve-forward, replay reject, and per-hop authorization deny. 3) Require per-surface supersession manifests with explicit merge links and spec-local vocabulary mappings when frozen surfaces evolve.",
       "validation_message": "validated child tree",
       "updated_at": "2026-05-23T23:15:42Z",
@@ -6618,6 +6618,24 @@
       "input_tokens": 8212,
       "output_tokens": 1009,
       "cost_usd": 0.028497
+    }
+  ],
+  "culling": [
+    {
+      "culled_child_ids": [
+        "SIM-dafod-child-dual-surface-contract-witness-ledger",
+        "SIM-mipag-child-split-release-capsule-template"
+      ],
+      "deleted_sim_paths": [
+        "proposals/ga-canary-20260523-extracted-34x7/simulations/SIM-dafod-child-dual-surface-contract-witness-ledger",
+        "proposals/ga-canary-20260523-extracted-34x7/simulations/SIM-mipag-child-split-release-capsule-template"
+      ],
+      "deleted_result_paths": [
+        "proposals/ga-canary-20260523-extracted-34x7/results/SIM-dafod-child-dual-surface-contract-witness-ledger",
+        "proposals/ga-canary-20260523-extracted-34x7/results/SIM-mipag-child-split-release-capsule-template"
+      ],
+      "reason": "reject pre-PT-correction proposal children; preserve ideas for rework under current promise-first rubric",
+      "culled_at": "2026-05-25T22:14:54Z"
     }
   ]
 }
