@@ -52,6 +52,15 @@ CBOR array length carries arity. The protocol named by `pCID` defines whether
 later outer slots are proof bytes, witness sets, relay evidence, nested
 selectors, or absent. Source: `DI-sisak`; `DI-pagin`.
 
+Plain-English explainer: `docs/research/DN-jotob-grid-envelope-tag42-variable-outer-slots.md`
+is the short developer note for this current direction. Use it when guide prose
+needs the plain-English explanation of why `grid([42(pCID), payload, ...])` is
+current, why `42(pCID)` is the present IPLD / IPFS / Bluesky compatibility
+choice, and how the immediate `SIM-dalor` / `SIM-pobod` / `SIM-jufag` /
+`SIM-zukis` lineage feeds the locked result. `TE-fikoj` / `DI-sisak` remain the
+locking authority; `DN-jotob` is explanatory guidance, not a frozen spec.
+Source: `DI-sisak`; `DI-bumon`; `DI-zozov`; `DI-hozal`.
+
 ### Example Payload Families
 
 Payload structure remains protocol-owned. These examples show the current level

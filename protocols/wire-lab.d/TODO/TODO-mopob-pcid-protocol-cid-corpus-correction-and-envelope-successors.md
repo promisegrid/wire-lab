@@ -20,6 +20,27 @@ evidence. Source: `DI-muniz`; `DI-pozom`.
 
 ## Decision Intent Log
 
+ID: DI-hozal
+Date: 2026-05-24 19:20:42
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Update `DEV-GUIDE-RESOURCES.md` so it explicitly points guide writers
+to `docs/research/DN-jotob-grid-envelope-tag42-variable-outer-slots.md` as the
+plain-English explainer for the currently locked tagged-selector envelope
+direction.
+Intent: `DEV-GUIDE-RESOURCES.md` already states the locked current wire
+direction, but it does not yet route readers to the short plain-English note
+that explains why `grid([42(pCID), payload, ...])` is current, why `42(pCID)`
+is the present IPLD / IPFS / Bluesky compatibility choice, and what sim lineage
+fed the final lock. The guide resource map should expose that explanatory note
+close to the top current-state snapshot.
+Constraints: Keep this as a source-map clarification only. Do not change the
+locked `TE-fikoj` / `DI-sisak` envelope direction. Do not edit `DN-jotob` in
+this pass. Make clear that `DN-jotob` is explanatory guidance, not the locking
+authority and not a frozen protocol spec.
+Affects: `protocols/wire-lab.d/TODO/TODO-mopob-pcid-protocol-cid-corpus-correction-and-envelope-successors.md`;
+`DEV-GUIDE-RESOURCES.md`.
+
 ID: DI-zozov
 Date: 2026-05-24 19:00:16
 Status: active
@@ -484,6 +505,10 @@ supersession:
   `SIM-jufag`, and `SIM-zukis` as the surrounding lineage. Keep `TE-fikoj` /
   `DI-sisak` as the locking authority rather than attributing the final decision
   to any one sim. Source: `DI-zozov`.
+- [x] mopob.23 Update `DEV-GUIDE-RESOURCES.md` so the top current-state envelope
+  snapshot explicitly points guide writers to `DN-jotob` as the plain-English
+  explainer for the locked `grid([42(pCID), payload, ...])` direction, while
+  keeping `TE-fikoj` / `DI-sisak` as the locking authority. Source: `DI-hozal`.
 
 ## Validation and acceptance criteria
 
