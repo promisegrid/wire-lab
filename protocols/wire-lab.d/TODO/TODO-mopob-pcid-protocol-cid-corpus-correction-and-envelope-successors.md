@@ -20,6 +20,123 @@ evidence. Source: `DI-muniz`; `DI-pozom`.
 
 ## Decision Intent Log
 
+ID: DI-sisak
+Date: 2026-05-24 18:06:40
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Lock the current PromiseGrid outer-envelope direction as the CBOR
+array `grid([42(pCID), payload, ...])`. Slot 0 belongs to a tagged CBOR
+protocol-selector family; tag `42` is the current standard instance. CBOR array
+length carries arity. The protocol named by `pCID` defines the roles and
+validity rules of later outer slots. Fixed three-slot
+`grid([42(pCID), payload, sig])` remains a considered alternative, but is not
+the chosen current direction.
+Intent: `TE-fikoj` narrowed the choice to fixed three-slot versus variable
+arity once slot 0 was universalized as `42(pCID)`. The user chose the
+variable-arity branch and the tagged-selector-family framing. This locks the
+current direction so the harness spec and dev-guide resource map stop
+presenting the older minimal `[pcid, payload]` wording as the dominant current
+shape. Treating tag `42` as the current family instance also leaves room for a
+future selector-tag successor without inventing `grid2()` or `grid3()` outer
+families.
+Constraints: Keep `pCID` = Protocol CID. Keep the outer envelope as CBOR. Do
+not rewrite `TE-fikoj`'s body; update only its `## Status` and
+`## Decision status` fields. Keep Promise Theory vocabulary: carriage is not
+semantic acceptance, and later-slot meaning remains protocol-owned rather than
+a generic claim-card map. Update `DEV-GUIDE-RESOURCES.md` in the same pass so
+the current design snapshot reflects the locked direction while still
+identifying fixed three-slot as a considered but unchosen alternative.
+Affects: `protocols/wire-lab.d/TODO/TODO-mopob-pcid-protocol-cid-corpus-correction-and-envelope-successors.md`;
+`docs/thought-experiments/TE-fikoj-universal-42-pcid-envelope-shape.md`;
+`protocols/wire-lab.d/specs/harness-spec-draft.md`;
+`DEV-GUIDE-RESOURCES.md`.
+Supersedes: DI-kafat
+
+ID: DI-kafat
+Date: 2026-05-24 17:06:23
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Add a new superseding TE, `TE-fikoj`, under `TODO-mopob` instead of
+editing `TE-tilir` in place. `TE-fikoj` must test the stronger premise that the
+outer PromiseGrid envelope standard itself may freeze slot 0 as `42(pCID)`,
+then compare fixed three-slot `grid([42(pCID), payload, sig])` versus
+variable-arity `grid([42(pCID), payload, ...])` under that premise. If both
+branches remain plausible after scenario analysis, the TE should lean variable
+arity.
+Intent: The new user position is stronger than `TE-tilir`: it treats the
+tag-42 wrapper as acceptable durable boilerplate, values native interop with
+the CID / DAG-CBOR ecosystem highly, and no longer finds "carrier profile" a
+helpful distinction for this decision. That is a substantive change under the
+TE editing policy, so it must land as a new superseding TE. The new TE should
+test whether CBOR-array arity plus pCID-defined outer slot roles is a better
+long-horizon story than freezing an exactly-three-slot outer contract too early.
+Constraints: Do not rewrite `TE-tilir`'s body; update only its `## Status` and
+`## Decision status` fields. Keep `pCID` = Protocol CID. Do not regress into
+payload-CID wording. Keep `TE-vujaj` alive as the wording/history facet. Do not
+erase `TE-pokul`'s older anti-unnecessary-outer-slot pressure, but test whether
+the stronger universal-`42(pCID)` premise changes the landing shape. Do not
+update `DEV-GUIDE-RESOURCES.md` or simulation lineages in this task.
+Affects: `protocols/wire-lab.d/TODO/TODO-mopob-pcid-protocol-cid-corpus-correction-and-envelope-successors.md`;
+`docs/thought-experiments/TE-fikoj-universal-42-pcid-envelope-shape.md`;
+`docs/thought-experiments/TE-tilir-slot0-ipld-interop-and-bootstrap-supersedence.md`;
+`docs/thought-experiments/README.md`;
+`protocols/wire-lab.d/specs/harness-spec-draft.md`.
+
+ID: DI-lasah
+Date: 2026-05-24 16:17:29
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Add a new superseding TE, `TE-tilir`, under `TODO-mopob` instead of
+editing `TE-titaj` in place. `TE-tilir` must add an explicit ATProto / Bluesky
+ecosystem-interop scenario and a byte-level bootstrap comparison between raw
+CID bytes and DAG-CBOR `42(pCID)` Link form, then rebalance the conclusion so
+that PromiseGrid keeps `pCID` as the semantic role of slot 0 while treating
+`42(pCID)` as the strongly preferred representation when the carrier profile is
+DAG-CBOR / IPLD.
+Intent: The requested change is substantive under the TE editing policy, so it
+must land as a new TE with supersedence markers rather than as an in-place
+rewrite of `TE-titaj`. The earlier TE was directionally right about separating
+role from representation, but it understated the practical interop value of
+aligning with the wider CID / DAG-CBOR ecosystem and overstated the byte-level
+burden of `42(pCID)` on constrained receivers.
+Constraints: Do not rewrite `TE-titaj`'s body; update only its `## Status` and
+`## Decision status` fields. Do not reopen `TE-pokul`'s two-slot-versus-three-
+slot family question. Do not collapse `42(pCID)` into the timeless semantic
+meaning of slot 0. Keep `TE-vujaj` alive as the wording-focused facet. Do not
+update `DEV-GUIDE-RESOURCES.md` or simulation lineages in this task.
+Affects: `protocols/wire-lab.d/TODO/TODO-mopob-pcid-protocol-cid-corpus-correction-and-envelope-successors.md`;
+`docs/thought-experiments/TE-tilir-slot0-ipld-interop-and-bootstrap-supersedence.md`;
+`docs/thought-experiments/TE-titaj-pcid-slot0-bootstrap-across-decades.md`;
+`docs/thought-experiments/README.md`;
+`protocols/wire-lab.d/specs/harness-spec-draft.md`.
+
+ID: DI-pikos
+Date: 2026-05-24 15:11:21
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Add a new standalone TE, `TE-titaj`, under `TODO-mopob` to test
+slot-0 standardization from the receiver's point of view across decades,
+devices, runtimes, and identifier-ecosystem drift. The TE compares
+`grid([42(pCID), payload, sig])`, `grid([pCID, payload, sig])`, and a corrected
+bootstrap-oriented `grid([slot0_bytes, payload, sig])` alternative in which the
+PromiseGrid envelope standard, not the protocol spec, defines how a receiver
+recovers `pCID` from slot-0 bytes.
+Intent: The earlier wording TE (`TE-vujaj`) established that `42(...)` is a
+representation question, not a role question, but it did not fully pressure the
+receiver bootstrap problem over a 100-year horizon. This TE is needed because a
+future receiver may know only CBOR plus local archives, while IPLD, CID, or
+multihash conventions may survive, fragment, or fade. The repo needs a
+receiver-centric record of what the lowest common denominator actually is before
+locking a slot-0 standard.
+Constraints: Keep `pCID` = Protocol CID throughout. Do not let the protocol spec
+bootstrap slot 0; that is circular. Keep `TE-pokul` as the owner of the
+two-slot-versus-three-slot family question. Keep the TE status at `needs DF`.
+Do not update `DEV-GUIDE-RESOURCES.md` or simulation lineages in this task.
+Affects: `protocols/wire-lab.d/TODO/TODO-mopob-pcid-protocol-cid-corpus-correction-and-envelope-successors.md`;
+`docs/thought-experiments/TE-titaj-pcid-slot0-bootstrap-across-decades.md`;
+`docs/thought-experiments/README.md`;
+`protocols/wire-lab.d/specs/harness-spec-draft.md`.
+
 ID: DI-falap
 Date: 2026-05-24 14:09:36
 Status: active
@@ -243,6 +360,29 @@ supersession:
   belongs under `TODO-mopob` because it clarifies how Protocol-CID semantics
   should be described without silently recasting `42(...)` as the semantic
   envelope shape. Source: `DI-falap`.
+- [x] mopob.15 Add `TE-titaj` as a receiver-centric thought experiment for
+  slot-0 bootstrap across decades, devices, runtimes, and identifier-ecosystem
+  drift. The TE should test what future receivers can still parse locally if
+  IPLD survives, if IPLD fades, or if CID/multihash conventions themselves
+  become archaeology, and it should keep the bootstrap rule outside the
+  protocol spec itself. Source: `DI-pikos`.
+- [x] mopob.16 Add `TE-tilir` as the substantive superseding TE for `TE-titaj`
+  so the corpus can incorporate ATProto / Bluesky ecosystem interop and the
+  small-byte-delta bootstrap packet without violating the TE editing policy.
+  Keep `pCID` as the semantic role, but rebalance the recommendation so
+  `42(pCID)` becomes the strongly preferred representation when the carrier
+  profile is DAG-CBOR / IPLD. Source: `DI-lasah`.
+- [x] mopob.17 Add `TE-fikoj` as the substantive superseding TE for `TE-tilir`
+  so the corpus can test the stronger universal-`42(pCID)` premise directly.
+  Compare fixed three-slot versus variable-arity outer arrays, and if both
+  survive, lean toward variable arity with pCID-defined slot roles. Source:
+  `DI-kafat`.
+- [x] mopob.18 Lock `TE-fikoj`'s recommended current direction as
+  `grid([42(pCID), payload, ...])`, with slot 0 in the tagged CBOR
+  protocol-selector family, tag `42` as the current standard instance, CBOR
+  array length carrying arity, and later outer-slot roles defined by the
+  protocol named by `pCID`. Update the TE status, harness evidence pointer, and
+  `DEV-GUIDE-RESOURCES.md` in the same pass. Source: `DI-sisak`.
 
 ## Validation and acceptance criteria
 

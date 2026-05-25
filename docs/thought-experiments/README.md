@@ -71,6 +71,9 @@ The proquint handle replaces both the integer alias (TE-1, TE-2, ...) and the ti
 | [TE-pokul](TE-pokul-cbor-array-extensibility-pcid-owned-proof-and-grid-envelope-landing-shape.md) | 2026-05-24 | CBOR array extensibility, pCID-owned proof, and likely grid-envelope landing shape |  |
 | [TE-jimar](TE-jimar-kernel-runtime-portability-boundary.md) | 2026-05-24 | Kernel runtime portability boundary |  |
 | [TE-vujaj](TE-vujaj-grid-envelope-dag-cbor-link-wording.md) | 2026-05-24 | Grid-envelope DAG-CBOR link wording |  |
+| [TE-titaj](TE-titaj-pcid-slot0-bootstrap-across-decades.md) | 2026-05-24 | pCID slot-0 bootstrap across decades |  |
+| [TE-tilir](TE-tilir-slot0-ipld-interop-and-bootstrap-supersedence.md) | 2026-05-24 | Slot-0 IPLD interop and bootstrap supersedence |  |
+| [TE-fikoj](TE-fikoj-universal-42-pcid-envelope-shape.md) | 2026-05-24 | Universal `42(pCID)` envelope shape |  |
 
 The proquint handle is **both** the stable identifier and the display nickname. It is collision-free at mint time, fork-stable across branches (each fork mints its own handles; collisions at merge time are handled by re-minting), and short enough to use directly in prose ("per TE-titur S5"). DF / DI / DR descendant numbering still uses the handle root: DF-titur.1, DI-titur-..., DR-009 (DR has its own numbering scheme). Backward citations to integer aliases (e.g., "per TE-25 S5") remain valid; readers may consult the cited file's `## Prior aliases` section or the `Prior alias` column above to recover the integer.
 
