@@ -132,7 +132,7 @@ Source: `DI-sisak`; `DI-kafat`.
 | Unknown-`pCID` retention | Still a local-policy question: quota, privacy, relay labeling, and denial-of-service bounds remain open. |
 | Tagged-selector succession | Tag `42` is the current standard instance; future replacement would be a family-level evolution, not a new `grid2()` / `grid3()` envelope family. |
 | Canonical bytes | The outer envelope is CBOR; payload canonicalization, hash rules, and proof encoding remain protocol-specific unless later DIs narrow them. |
-| Kernel profile | The kernel remains provisional; `TE-mazop`, `TE-pudiv`, `TE-dunas`, `TE-gakoh`, and `SIM-fovip` now test app-facing promises, same-grid app/kernel messaging, local trust-filtered views over promise/event hypergraphs, lower-patent-risk prior-art influence guardrails, host assumptions, unsupported features, evidence records, and minimum credible port-promise records before `DR-davod` closes. |
+| Kernel profile | The kernel remains provisional; `TE-mazop`, `TE-pudiv`, `TE-dunas`, `TE-gakoh`, and `SIM-fovip` now test app-facing promises, same-grid app/kernel messaging, voluntary group namespaces, CID-rooted promise-bound references, file-like resources over promise/event logs, lower-patent-risk prior-art influence guardrails, host assumptions, unsupported features, evidence records, and minimum credible port-promise records before `DR-davod` closes. |
 
 Source: `DI-sisak`; `DI-rusup`; `DI-funaf`; `DI-gumum`; `DI-somok`;
 `DI-kuvum`.
@@ -457,7 +457,7 @@ the prose.
 | `FB-nojit`, `FB-tisuf`, `FB-tulit` | `simulations/SIM-zisan-device-bound-agent/` | `scenarios/device-bound-agent-physical-effect/` | Provisional device-bound-app evidence for sensors, actuators, owner/operator delegation, and host-driver behavior promises. |
 | `FB-hurit`, `FB-nilat` | `simulations/SIM-kugap-live-sync-audit-split/` | `scenarios/live-crdt-audit-publication/` | Provisional live-state versus durable-audit evidence; does not freeze a reliable low-latency binding. |
 | `FB-zazon`, `FB-robif` | `simulations/SIM-nijuz-multi-embodiment-identity/` | `scenarios/multi-embodiment-app-identity/`; `scenarios/portable-signing-key-identity/` | Provisional multi-host identity and implementation-promise evidence; concrete signing-key recipe remains unsettled. |
-| `FB-vitih`, `FB-mulum`, `FB-potin` | `simulations/SIM-funas-kernel-porting-boundary/`; `simulations/SIM-fovip-kernel-promise-boundary-port-contract/`; `docs/thought-experiments/TE-jimar-kernel-runtime-portability-boundary.md`; `docs/thought-experiments/TE-mazop-kernel-promise-boundary-and-minimum-port-contract.md`; `docs/thought-experiments/TE-pudiv-app-kernel-grid-message-boundary.md`; `docs/thought-experiments/TE-dunas-prior-art-influence-on-promisegrid-kernel.md`; `docs/thought-experiments/TE-gakoh-local-views-over-promise-event-hypergraph.md` | `scenarios/kernel-porting-boundary/` | Provisional kernel/runtime/dispatcher, same-grid app/kernel messaging, local-view hypergraph pressure, prior-art influence guardrails, and minimum-port promise-record evidence; settled porting target remains blocked by `DR-davod`. |
+| `FB-vitih`, `FB-mulum`, `FB-potin` | `simulations/SIM-funas-kernel-porting-boundary/`; `simulations/SIM-fovip-kernel-promise-boundary-port-contract/`; `docs/thought-experiments/TE-jimar-kernel-runtime-portability-boundary.md`; `docs/thought-experiments/TE-mazop-kernel-promise-boundary-and-minimum-port-contract.md`; `docs/thought-experiments/TE-pudiv-app-kernel-grid-message-boundary.md`; `docs/thought-experiments/TE-dunas-prior-art-influence-on-promisegrid-kernel.md`; `docs/thought-experiments/TE-gakoh-local-views-over-promise-event-hypergraph.md` | `scenarios/kernel-porting-boundary/` | Provisional kernel/runtime/dispatcher, same-grid app/kernel messaging, voluntary namespace and local-view promise-log pressure, prior-art influence guardrails, and minimum-port promise-record evidence; settled porting target remains blocked by `DR-davod`. |
 | `FB-gigit` | Existing Laypeople readiness matrix and `DR-napum` | Existing 100-year and governance scenarios | No new sim required; this is a narrative-settlement question rather than a distinct run surface. |
 
 `DI-fihub` promotes two GA-derived guide-feedback specimens from
@@ -484,7 +484,7 @@ writer guidance, not a final PromiseGrid product/API freeze. Source:
 |---|---|---|---|---|
 | Laypeople | Ready for careful guide prose | PromiseGrid is designed for long-lived decentralized communities of autonomous/free agents; no central registry is a design constraint; protocol forking is normal; multi-generational durability is a first-order requirement. | Specific promise-accounting scoring, final wire format, app APIs, and kernel shape remain out of layperson settled prose. `DR-napum` remains open for final public wording. | The guide itself after stabilization; wire-lab sources stay provenance. |
 | App Devs | Provisional | The minimum current contract is: choose an explicit protocol spec, use its pCID when frozen, let that spec define payload/handler semantics, and publish implementation promises rather than relying on branch paths. | No stable SDK, handler ABI, universal app message API, or app protocol subset is frozen yet. `DR-tuhaz` remains open. | Future frozen `protocols/*/specs/*.md` docs by pCID, plus B-side `CHANGELOG.md` promise entries. |
-| Kernel Devs | Provisional / blocked for final porting instructions | The porting target is not wire-lab. A porter should expect explicit app-facing promises, possible same-grid app/kernel messages, local file-like views over promise-bound references, host/runtime assumptions, unsupported features, pCID coverage, evidence records, profile declarations, and prior-art guardrails around the substrate/feed/CAS/session/message layers the porter promises to implement. Daemon, microkernel, host-runtime, browser/WASM, MCU/header-only, and split-object shapes remain profiles, not one universal process shape. | The minimum credible port promise record, app/kernel message boundary, first required frozen spec set, safe prior-art influence set, and local-view reference model are not locked yet. `TE-mazop`, `TE-pudiv`, `TE-dunas`, `TE-gakoh`, and `SIM-fovip` are the current evidence path; `DR-davod` remains open. | Future frozen binding/session/message specs by pCID, implementation promise records, `SIM-fovip` evidence, and guide prose once stabilized. |
+| Kernel Devs | Provisional / blocked for final porting instructions | The porting target is not wire-lab. A porter should expect explicit app-facing promises, possible same-grid app/kernel messages, local file-like views over CID-rooted promise-bound references, voluntary group namespaces, host/runtime assumptions, unsupported features, pCID coverage, evidence records, profile declarations, and prior-art guardrails around the substrate/feed/CAS/session/message layers the porter promises to implement. Daemon, microkernel, host-runtime, browser/WASM, MCU/header-only, and split-object shapes remain profiles, not one universal process shape. | The minimum credible port promise record, app/kernel message boundary, first required frozen spec set, safe prior-art influence set, voluntary namespace behavior, and local-view reference model are not locked yet. `TE-mazop`, `TE-pudiv`, `TE-dunas`, `TE-gakoh`, and `SIM-fovip` are the current evidence path; `DR-davod` remains open. | Future frozen binding/session/message specs by pCID, implementation promise records, `SIM-fovip` evidence, and guide prose once stabilized. |
 
 ## Laypeople
 
@@ -584,7 +584,9 @@ section.
   GNU Hurd translators while excluding Spring and modern multikernel details.
 - `docs/thought-experiments/TE-gakoh-local-views-over-promise-event-hypergraph.md`
   tests the decentralized-mainframe, local-view, promise-first, IPLD-compatible
-  promise/event-hypergraph synthesis that followed `TE-dunas`.
+  promise/event-hypergraph synthesis that followed `TE-dunas`, including
+  voluntary group namespaces, CID-rooted promise-bound references, and
+  event-sourced file-like resources.
 - `docs/thought-experiments/TE-sihih-substrate-agnostic-layered-model.md`
   records the current layered model for substrate, CAS, session, and message
   concerns.
@@ -642,11 +644,13 @@ section.
   permission, filesystem-authority, Spring, or modern multikernel assumptions.
   Source: `DI-somok`.
 - TE-gakoh adds the decentralized-mainframe synthesis: guide writers may use
-  the metaphor only if they preserve local, trust-filtered views. Alice's
-  pathname is local; Bob opens a promise-bound reference that Bob maps into his
-  own view. IPLD-compatible objects may carry the promise/event hypergraph, but
-  pCID-selected PromiseGrid protocols define agency, trust, and meaning. Source:
-  `DI-kuvum`.
+  the metaphor only if they preserve local, trust-filtered views and distinguish
+  imposed universal namespaces from voluntary group-consensus namespaces.
+  Alice's pathname is local; Bob opens a CID-rooted promise-bound reference that
+  Bob maps into his own view or into a group namespace maintained by reciprocal
+  promises. IPLD-compatible objects may carry paths, selectors, and
+  promise/event logs, but pCID-selected PromiseGrid protocols define agency,
+  trust, and meaning. Source: `DI-kuvum`.
 - Do not make IPLD, CAR, selectors, or Gordian-style structures mandatory
   runtime surfaces unless a specific frozen pCID requires them. Treat them as
   optional L6/CAS or payload/wrapper-family tools under the current evidence.

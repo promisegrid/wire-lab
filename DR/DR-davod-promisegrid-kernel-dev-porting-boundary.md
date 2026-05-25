@@ -43,9 +43,10 @@ DR closes, wire-lab needs evidence for:
   services should influence the sim packet without importing transparency,
   global permission, or filesystem-authority assumptions.
 - whether the kernel/app model should expose local file-like views over
-  promise-bound references into a shared promise/event hypergraph, and whether
-  IPLD-compatible objects should carry that graph without owning PromiseGrid
-  semantics.
+  CID-rooted promise-bound references into a shared promise/event hypergraph,
+  whether trusted groups should be able to maintain voluntary namespace
+  frontiers by reciprocal promises, and whether IPLD-compatible objects should
+  carry that graph without owning PromiseGrid semantics.
 
 `SIM-fovip-kernel-promise-boundary-port-contract` is the current simulation home
 for answering this packet, but `TE-pudiv`, `TE-dunas`, and `TE-gakoh` leave open

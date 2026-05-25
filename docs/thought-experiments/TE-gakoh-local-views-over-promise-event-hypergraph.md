@@ -54,9 +54,20 @@ test.
 - **Local view:** An agent's own file-like arrangement of resources, services,
   executables, promises, and evidence. A local view is not a global namespace.
 - **Promise-bound reference:** A shareable reference that carries enough context
-  for another agent to resolve an object or service in its own view: target CID
-  or root, pCID, selector/path, version or frontier, promiser identity, promise
-  body, and evidence/capability references as needed.
+  for another agent to resolve an object or service in its own view: root CID,
+  pCID, selector/path, version or frontier, promiser identity, promise body, and
+  evidence/capability references as needed.
+- **Voluntary group namespace:** A namespace maintained by a group of agents that
+  each promise to publish, update, remember, and audit compatible names for a
+  shared purpose. It is local to that relationship group, not universal truth.
+- **CID-rooted portable reference:** A promise-bound reference rooted at content
+  or a view root, such as `<root-cid>/some/file.md`, plus the pCID,
+  frontier/version, promiser, promise body, and evidence needed for another
+  agent to evaluate it locally.
+- **Promise log:** An append-only sequence or DAG of promises, requests,
+  refusals, receipts, observations, computation events, and trust updates.
+- **Checkpoint:** The materialized current content or view of a resource after
+  applying a selected promise-log frontier.
 - **Promise/event hypergraph:** A durable content-addressed structure whose
   nodes and hyperedges describe agents, byte chunks, payloads, promises,
   requests, refusals, receipts, computations, observations, and trust updates.
@@ -66,7 +77,7 @@ test.
 
 ## Alternatives
 
-### Alt 1 - Global single-system image
+### Alt 1A - Imposed global single-system image
 
 PromiseGrid presents one universal filesystem-like namespace. Alice's path and
 Bob's path mean the same thing because "the system" defines a single global view.
@@ -79,6 +90,27 @@ what, erases local trust judgment, and implies a namespace authority.
 
 **New obligations:** This would require a global naming, access-control, and
 trust model. Those obligations are rejected for PromiseGrid.
+
+### Alt 1B - Voluntary group-consensus namespace
+
+Alice, Bob, and Carol can build enough trust to maintain a shared namespace
+inside their relationship group. Each agent promises to publish compatible
+namespace updates, cite the same frontiers, keep or refuse storage/computation
+promises explicitly, and record evidence when namespace promises are kept,
+refused, unavailable, or broken.
+
+**Easier:** Recovers the useful mainframe/minicomputer feeling inside a trusted
+group. Alice can say "open `/project/report`" to Bob when Alice and Bob have
+both promised to maintain the project namespace.
+
+**Harder:** The namespace is still not universal. Bob may have private local
+names, several group namespaces, stale branches, and untrusted lookalikes from
+Mallory. Each agent must still decide locally which namespace promises it
+trusts.
+
+**New obligations:** Define namespace-frontier promises, reciprocal maintenance
+promises, evidence records for namespace changes, and fork/decay behavior after
+broken promises.
 
 ### Alt 2 - Local file-like views over promise-bound references
 
@@ -93,8 +125,8 @@ Alice and Bob can each arrange resources in locally meaningful ways.
 context for Bob to resolve Alice's intended resource without treating Alice's
 path as global truth.
 
-**New obligations:** Define how a shareable reference names root content, pCID,
-selector/path, version/frontier, promise body, evidence, and optional
+**New obligations:** Define how a shareable reference names root CID, pCID,
+selector/path, version/frontier, promiser, promise body, evidence, and optional
 promise-as-capability-token behavior.
 
 ### Alt 3 - Message-only model
@@ -147,22 +179,42 @@ views, durable object identifiers, message envelopes, and graph traversal.
 object/event is the durable unit; message is the boundary-crossing unit;
 file-like view is the UX projection.
 
+### Alt 6 - Event-sourced file-like resources
+
+A file's current content is a checkpoint of a selected promise log. A directory
+is a file-like resource whose entries are the result of namespace promises. A
+device, named pipe, service, or executable is also a typed resource, but its pCID
+may promise behavior instead of stable bytes.
+
+**Easier:** Reconciles Git-like history, event sourcing, command sourcing, file
+UX, and Promise Theory. Branches naturally represent different promise histories
+for the same logical resource.
+
+**Harder:** Developers need clear rules for frontiers, checkpoints, branch
+selection, conflict display, and evidence retention.
+
+**New obligations:** Define file/resource pCIDs that distinguish byte
+checkpoints, namespace manifests, streaming endpoints, device agents,
+computation agents, executable invocation promises, and trust-evidence views.
+
 ## Scenario analysis
 
 ### S1 - Alice shares a pathname Bob can open
 
-Alice's local view contains `/work/plan`. Bob cannot open that path as global
-truth. Under Alt 1, Bob tries to open `/work/plan` directly, which assumes a
-global namespace authority. Under Alt 2, Alice sends Bob a promise-bound
+Alice's local view contains `/work/plan`. Bob cannot open that path as universal
+truth. Under Alt 1A, Bob tries to open `/work/plan` directly, which assumes a
+global namespace authority. Under Alt 1B, Alice and Bob may both project the
+same object into a voluntary project namespace if they have promised to maintain
+that namespace. Under Alt 2, Alice sends Bob a CID-rooted promise-bound
 reference:
 
 ```text
-local-name: "/work/plan"              ; Alice's local label, not global truth
-target-root: <CID>                    ; content, service, or view root
+local-name: "/work/plan"              ; Alice's local label only
+root: <CID>                           ; content, service, log, or view root
+path: "docs/plan.md"                  ; pCID-defined path or selector
 target-pcid: <pCID>                   ; protocol for interpreting the target
-selector: <path-or-query-within-root> ; optional local selection
-frontier: <event-or-version-CID>      ; what Alice meant at send time
-promiser: Alice or another agent
+frontier: <event-or-checkpoint-CID>   ; what Alice meant at send time
+promiser: Alice
 promise-body: "I promise this reference denotes the plan I intend to share"
 evidence: <promise/event refs>
 ```
@@ -171,8 +223,30 @@ Bob then decides whether to trust the promiser and where to mount the reference
 in Bob's own view, such as `/from/alice/plan`. The local pathname is UX. The
 shareable object is the promise-bound reference.
 
-Alt 2 survives. Alt 3 can carry the reference as a message. Alt 4 can store the
-reference as IPLD. Alt 5 explains the semantics. Alt 1 fails the trust model.
+Alt 1A fails the trust model. Alt 1B survives as a group-local convenience when
+maintained by reciprocal promises. Alt 2 carries the portable reference. Alt 3
+can carry the reference as a message. Alt 4 can store the reference as IPLD. Alt
+5 explains the semantics.
+
+### S1B - Alice, Bob, and Carol maintain a project namespace
+
+Alice, Bob, and Carol work for different legal entities. They trust one another
+enough to promise a shared project namespace:
+
+- Alice promises to publish project documents under agreed names.
+- Bob promises to store selected roots and publish storage receipts.
+- Carol promises to compute reports from selected roots and publish result
+  evidence.
+- Each promises to record namespace updates, frontiers, receipts, refusals, and
+  broken-promise observations.
+
+The group can now use convenient names like `/project/report/current`. That is
+not central authority. It is a bundle of reciprocal promises. If Bob stops
+keeping storage promises, Alice and Carol can lower trust, stop sending Bob
+data, and move the group namespace to a branch Bob does not maintain. If Carol
+asks Alice to send data, Carol must usually promise something too: what she will
+compute, how she will handle the data, what evidence she will return, and what
+she refuses or cannot promise.
 
 ### S2 - Shared executable without installation
 
@@ -259,18 +333,71 @@ her own trust policy.
 The durable object is not a path or URL. It is the content-addressed
 promise/event history plus pCID-defined interpretation.
 
+### S7 - File current state as a checkpoint of promises
+
+Heidi opens `/project/report/current`. The visible bytes are a checkpoint at a
+selected promise-log frontier:
+
+```text
+resource: "/project/report/current"
+root-log: <CID>
+frontier: <CID>
+checkpoint: <CID>
+applied-events:
+  - Alice promised source dataset root A.
+  - Bob promised storage receipt B.
+  - Carol promised computation result C.
+  - Heidi observed result C and accepted it into this branch.
+```
+
+Another branch may exclude Carol's result, include Ivan's competing computation,
+or mark Bob's storage receipt as broken. The "same file" can have different
+current contents under different branches because each branch is a different
+promise-history selection.
+
+This makes event sourcing and command sourcing compatible with file UX. The
+checkpoint is what the file currently looks like; the promise log explains how
+that state was reached.
+
+### S8 - Directory, device, named pipe, and executable as typed resources
+
+Judy's local view includes:
+
+```text
+/project/              ; directory resource: promises name-to-reference entries
+/project/report.md     ; file resource: promises bytes/checkpoint
+/devices/camera0       ; device resource: promises observations or refusals
+/pipes/status          ; stream resource: promises ordered messages
+/bin/analyze           ; executable resource: promises invocation behavior
+```
+
+These are not all byte files in the same low-level sense. They are file-like
+resources because the UX can open, list, run, or read them. Their pCIDs define
+what promises are meaningful for each resource kind. A camera pCID may define
+observation and refusal promises; an executable pCID may define invocation,
+resource-profile, and result-evidence promises; a directory pCID may define
+namespace-entry and frontier promises.
+
 ## Cross-cutting findings
 
 - "Decentralized mainframe" is compatible with Promise Theory if it describes
   the user experience, not a global authority model.
+- A voluntary group namespace is PromiseGrid-compatible when it is explicitly a
+  set of reciprocal promises among agents that locally trust one another.
 - Alice's pathname is local. Bob opens a promise-bound reference that Bob maps
-  into Bob's own local view.
+  into Bob's own local view or into a group namespace maintained by reciprocal
+  promises.
+- CID-rooted portable references are the likely bridge between file-like UX and
+  content-addressed durability.
+- Event sourcing and command sourcing fit naturally: current file contents are
+  checkpoints over promise histories, and branches are different
+  promise-history selections.
 - "Everything is a promise" is the right semantic slogan, but it needs layer
   discipline:
   - semantic layer: promise;
-  - durable substrate: content-addressed object/event/hyperedge;
+  - durable substrate: content-addressed object/event/hyperedge/log/checkpoint;
   - boundary layer: pCID-selected message;
-  - UX layer: file-like local view.
+  - UX layer: file-like local or group view.
 - IPLD can represent the durable substrate, including hypergraphs, by reifying
   hyperedges as linked objects.
 - IPLD compatibility does not require PromiseGrid to become IPLD-defined.
@@ -282,39 +409,45 @@ promise/event history plus pCID-defined interpretation.
 
 ## Conclusions
 
-- Reject Alt 1 as the conceptual model: a global single-system image hides
-  agency and conflicts with local trust.
-- Keep Alt 2 as the strongest UX model: local file-like views over
-  promise-bound references.
+- Reject Alt 1A as the conceptual model: an imposed global single-system image
+  hides agency and conflicts with local trust.
+- Keep Alt 1B as a valid relationship-local model: voluntary group-consensus
+  namespaces maintained by reciprocal promises.
+- Keep Alt 2 as the strongest portable-reference model: local file-like views
+  over CID-rooted promise-bound references.
 - Keep Alt 3 as the boundary-crossing mechanism: pCID-selected messages carry
   requests, promises, refusals, receipts, and evidence.
 - Keep Alt 4 as the likely durable substrate: IPLD-compatible
   content-addressed objects can encode promise/event hypergraphs.
 - Keep Alt 5 as the semantic model: everything useful is a promise, but each
   promise must be scoped to what the promiser can control or embody.
+- Keep Alt 6 as the file/resource state model: current contents are checkpoints
+  or projections over selected promise-log frontiers.
 
 The compact framing is:
 
 > PromiseGrid is a decentralized mainframe: each agent gets a coherent
-> file-like view over a shared promise/event hypergraph, but that view is local,
-> trust-filtered, and assembled from promises rather than imposed by a central
-> namespace authority.
+> file-like view over a shared promise/event hypergraph, and trusted groups can
+> voluntarily maintain shared namespaces, but coherence comes from reciprocal
+> promises and local trust rather than from a central namespace authority.
 
 ## Recommended next DF packet for DR-davod
 
 Before deciding the stable kernel-developer porting boundary, answer:
 
-1. Should guide prose describe PromiseGrid as a decentralized mainframe only if
-   it also states that views are local and trust-filtered?
-2. Should the app/kernel model include a first-class promise-bound reference
-   object for sharing local pathnames across agents?
+1. Should guide prose distinguish an imposed universal namespace from a
+   voluntary group-consensus namespace?
+2. Should the app/kernel model include a first-class CID-rooted promise-bound
+   reference object for sharing local pathnames across agents?
 3. Should "everything useful is a promise" become the semantic slogan, with
    file/message/object/event/graph separated by layer?
 4. Should IPLD-compatible objects be treated as the default representation for
    promise/event hypergraph storage, while pCID specs remain the source of
    meaning?
-5. Should future sims test local file-like projections over promise/event graph
-   frontiers, including broken-promise view decay?
+5. Should file current state be modeled as a checkpoint or materialized view of a
+   selected promise/event or command log frontier?
+6. Should future sims test voluntary group namespaces, CID-rooted references,
+   branch/frontier behavior, and broken-promise view decay?
 
 ## Implications for open work
 
@@ -325,9 +458,10 @@ Before deciding the stable kernel-developer porting boundary, answer:
   adds the file-like local-view and pathname-sharing pressure it should test.
 - `TE-hirap`, `TE-vilot`, and `TE-gurov` remain apparatus/specimen guidance;
   this TE should not force every repo artifact to become a PromiseGrid message.
-- `SIM-fovip` or a successor sim should test promise-bound references, local
-  file-like projections, IPLD-compatible hyperedge objects, and trust-filtered
-  view changes after broken promises.
+- `SIM-fovip` or a successor sim should test voluntary group namespaces,
+  CID-rooted promise-bound references, local file-like projections,
+  IPLD-compatible hyperedge objects, event-sourced resource checkpoints, and
+  trust-filtered view changes after broken promises.
 - A later design note can explain the decentralized-mainframe metaphor in plain
   English after this TE's DF questions are answered or narrowed.
 - A whitepaper should wait until at least one sim exercises the model.
