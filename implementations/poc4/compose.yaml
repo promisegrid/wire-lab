@@ -1,0 +1,25 @@
+services:
+  alice:
+    build: .
+    command: ["/usr/local/bin/run-alice.sh"]
+    networks: [poc4]
+  bob:
+    build: .
+    command: ["/usr/local/bin/run-bob.sh"]
+    networks: [poc4]
+  carol:
+    build: .
+    command: ["/usr/local/bin/run-carol.sh"]
+    networks: [poc4]
+  dave:
+    build: .
+    command: ["/usr/local/bin/run-dave.sh"]
+    networks: [poc4]
+  ellen:
+    build: .
+    command: ["/usr/local/bin/run-ellen.sh"]
+    networks: [poc4]
+
+networks:
+  poc4:
+

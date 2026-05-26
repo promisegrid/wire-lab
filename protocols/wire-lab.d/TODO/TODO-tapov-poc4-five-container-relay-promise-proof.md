@@ -7,11 +7,11 @@ No integer or timestamp alias exists.
 
 ## Status
 
-Planned. `poc4` follows `poc3` and should test multi-hop app promises across a
-five-container topology where each container talks to only two neighboring
-containers, runs one kernel, one relay, and two non-relay apps, and some apps
-must rely on relays on third or fourth containers to reach the app that can
-fulfill the promise.
+Implemented locally; awaiting Docker demo run. `poc4` follows `poc3` and tests
+multi-hop app promises across a five-container topology where each container
+talks to only two neighboring containers, runs one kernel, one relay, and two
+non-relay apps, and some apps must rely on relays on third or fourth containers
+to reach the app that can fulfill the promise.
 
 ## Decision Intent Log
 
@@ -42,6 +42,57 @@ runtime paths, and exact relay route representation require a later DF/DI before
 code edits.
 Affects: `implementations/poc4/**`; `protocols/wire-lab.d/TODO/TODO.md`; future
 kernel/app/relay guide evidence.
+
+### DI-simuk
+
+ID: DI-simuk
+Date: 2026-05-25 21:02:46
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Reuse `poc3`'s package/command split, pCID-selected envelope library,
+receive-promise registration, local kernel evidence discipline, app-local
+promise judgment, signed proof-slot pattern, Go tests, Dockerfile shape, and
+Compose-driven demo approach as starting material for `poc4`; do not reuse
+`poc3`'s single-peer kernel forwarding, two-container script assumptions,
+single-hop app destination field, or direct app-to-target mental model as final
+`poc4` architecture.
+Intent: `poc4` exists to test multi-hop relay promises, reciprocal receive
+promises, and app fulfillment across a bounded five-node mesh. The useful
+`poc3` parts keep the wire and package baseline stable, while the rejected parts
+are exactly the assumptions that would hide relay behavior or collapse back into
+RPC-like direct calls.
+Constraints: Keep `grid([42(pCID), payload, ...])` as the envelope baseline; keep
+kernels out of application keep/break judgment; make relay an app-level promiser;
+run DF before choosing exact command names, package/type names, route
+representation, reciprocal-promise message fields, runtime paths, or whether
+relay paths are source-routed, next-hop-routed, or locally promised hop-by-hop.
+Affects: `implementations/poc4/**`; `implementations/poc3/**`; this TODO.
+
+### DI-bigub
+
+ID: DI-bigub
+Date: 2026-05-25 21:15:15
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Implement `poc4` with relay-owned neighbor TCP, not kernel-owned
+multi-hop routing; use packages `kernel`, `relay`, `hello`, `echo`, `signed`,
+`fibonacci`, `storage`, and `lib`; expose named commands `poc4-kernel`,
+`poc4-relay`, `poc4-hello`, `poc4-echo`, `poc4-signed`, `poc4-fibonacci`, and
+`poc4-storage`; use per-package pCIDs; encode relay carriage as relay-pCID
+wrappers that carry exact inner envelope bytes; correlate confirmations/results
+by exact byte hash; use local route promises for only the demo flows; run five
+containers when Docker is available.
+Intent: Preserve the promise-first boundary from `poc3` while testing multi-hop
+application promises where relays are app-level promisers, not kernel routers,
+service registries, permission authorities, or hidden RPC dispatchers.
+Constraints: Kernels remain local app/kernel boundaries and local evidence
+writers; relays own neighbor transport and local next-hop promises; promisee apps
+judge keep/break locally; demo values are `fib(10)=55` and
+`poc4-key=poc4-value`; runtime temp paths may use `/tmp/wire-lab-gocache/**` and
+`/tmp/wire-lab-poc4-run/**`; committed implementation lives under
+`implementations/poc4/**`.
+Affects: `implementations/poc4/**`;
+`protocols/wire-lab.d/TODO/TODO-tapov-poc4-five-container-relay-promise-proof.md`.
 
 ## Topology
 
@@ -114,28 +165,28 @@ Each container runs one kernel, one relay, and two non-relay apps:
 
 ## Subtasks
 
-- [ ] tapov.1 Review `poc3` evidence and decide which package, command, kernel,
+- [x] tapov.1 Review `poc3` evidence and decide which package, command, kernel,
   envelope, pCID, signature, test, and Compose patterns can be reused without
   preserving accidental two-container assumptions.
-- [ ] tapov.2 Run DF for exact command names, package/type names, protocol
+- [x] tapov.2 Run DF for exact command names, package/type names, protocol
   surfaces, route representation, reciprocal promise message shapes, runtime
   paths, and demo topology before creating code.
-- [ ] tapov.3 Define the relay app's promises and non-promises, including relay
+- [x] tapov.3 Define the relay app's promises and non-promises, including relay
   confirmation and refusal behavior.
-- [ ] tapov.4 Define the fibonacci app and fibonacci-client promises and
+- [x] tapov.4 Define the fibonacci app and fibonacci-client promises and
   non-promises, including delayed result delivery.
-- [ ] tapov.5 Define the storage app and storage-client promises and
+- [x] tapov.5 Define the storage app and storage-client promises and
   non-promises, including store confirmation and later read-by-key.
-- [ ] tapov.6 Decide how hello, echo, and signed from `poc3` are reused, extended,
+- [x] tapov.6 Decide how hello, echo, and signed from `poc3` are reused, extended,
   or intentionally simplified for the larger topology.
-- [ ] tapov.7 Define the kernel's `poc4` implementation promises and confirm
+- [x] tapov.7 Define the kernel's `poc4` implementation promises and confirm
   what remains unchanged from `poc3`.
-- [ ] tapov.8 Implement the directory layout under `implementations/poc4/` after
+- [x] tapov.8 Implement the directory layout under `implementations/poc4/` after
   DF/DI is locked.
-- [ ] tapov.9 Add deterministic tests for relay path selection, reciprocal
+- [x] tapov.9 Add deterministic tests for relay path selection, reciprocal
   receive promises, fibonacci result delivery, storage confirmation/readback,
   signed relay carriage, local refusal, and app-local promise judgment.
-- [ ] tapov.10 Add a deterministic five-container Compose demo command that Steve
+- [x] tapov.10 Add a deterministic five-container Compose demo command that Steve
   can run directly.
 - [ ] tapov.11 Record final outcome: what worked, what was fake, what changed
   from `poc3`, and whether this evidence should update `DEV-GUIDE-RESOURCES.md`,
@@ -153,3 +204,44 @@ Each container runs one kernel, one relay, and two non-relay apps:
 - Kernel evidence remains local kernel evidence; application keep/break judgment
   remains local to the relevant promisee app or relay.
 - The POC remains small enough to read as an executable thought experiment.
+
+## `poc3` pattern review for `poc4`
+
+Reusable starting points:
+
+- Keep the importable package plus `cmd/` wrapper shape from `poc3`; it made
+  application behavior testable without turning command entrypoints into the
+  architecture.
+- Keep the shared `lib` envelope, pCID, CBOR, frame, evidence, receive-promise,
+  and signature helpers as the starting point.
+- Keep per-app pCIDs and a kernel-local receive-promise pCID. `poc4` can add
+  relay, fibonacci, and storage pCIDs without changing the outer envelope.
+- Keep the signed app's proof-slot pressure: exact signable envelope bytes can
+  be witnessed without claiming global trust.
+- Keep local kernel evidence phrasing: kernels record receive, send, deliver,
+  refusal, and broken transport evidence about their own behavior only.
+
+Reuse only after refactor:
+
+- The kernel's `PeerAddress` field must become a bounded neighbor set. `poc4`
+  containers have exactly two neighbors, not one peer.
+- App payloads need an explicit relay target and route/hop representation chosen
+  during DF. The `poc3` `to` field is too direct for third/fourth-container relay
+  promises.
+- The receive-promise helper should probably grow correlation IDs or promise IDs
+  so fibonacci, storage, and relay confirmations can be matched to the promise
+  they answer.
+- The Docker scripts should keep explicit process status handling, but need a
+  five-container startup plan and no hidden all-to-all network assumptions.
+
+Do not carry forward as architecture:
+
+- Do not let the kernel choose multi-hop routes. Relay is an app-level promise;
+  the kernel only handles local and neighbor message carriage.
+- Do not model relay as a service registry or transparent router. Each relay hop
+  is a promise by that relay app to carry a message and later account for the
+  relay outcome.
+- Do not preserve the direct app-to-target mental model where every app can name
+  a reachable destination and the kernel handles the rest.
+- Do not treat storage, fibonacci, or relay confirmations as kernel delivery
+  receipts. They are application promises and application-local judgments.
