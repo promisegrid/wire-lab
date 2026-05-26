@@ -7,11 +7,11 @@ No integer or timestamp alias exists.
 
 ## Status
 
-Planned. `poc2` is the second PromiseGrid proof-of-concept system and is
-separate from the external `grid-poc` repo. The immediate target is a minimal
-two-container executable proof that app/kernel and kernel/kernel boundaries can
-both use pCID-selected `grid([42(pCID), payload, ...])` messages without
-turning the kernel into an RPC authority.
+Implemented pending Docker demo verification. `poc2` is the second PromiseGrid
+proof-of-concept system and is separate from the external `grid-poc` repo. The
+current code builds a minimal two-container executable proof that app/kernel and
+kernel/kernel boundaries can both use pCID-selected `grid([42(pCID), payload,
+...])` messages without turning the kernel into an RPC authority.
 
 ## Decision Intent Log
 
@@ -34,6 +34,32 @@ implementation language; do not run provider-backed GA or canary work as part of
 this implementation task.
 Affects: `implementations/poc2/`; `protocols/wire-lab.d/TODO/TODO.md`;
 `DEV-GUIDE-RESOURCES.md` if the result changes guide evidence.
+
+### DI-tijat
+
+ID: DI-tijat
+Date: 2026-05-25 18:46:00
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Implement `poc2` as one root Go package under `implementations/poc2/`
+with one compiled binary installed under the two command names `poc2-kernel` and
+`poc2-hello`; use structs named `Kernel`, `HelloApp`, `Envelope`,
+`ProtocolCID`, `EvidenceLog`, and `FrameConn` for the main implementation
+surfaces.
+Intent: Keep the proof of concept small and readable while satisfying the
+locked two-command interface. One package avoids premature package structure;
+command-name dispatch keeps the `poc2-kernel` and `poc2-hello` user interfaces
+without duplicating command code. The named structs mirror the promise roles in
+`DI-ratij`: kernels route and record evidence, hello apps make local send or
+receive promises, envelopes carry pCID-selected messages, and evidence logs
+record exact bytes.
+Constraints: Do not introduce `internal/` or `pkg/`. Avoid external
+dependencies for v0; implement only the tightly scoped CBOR subset needed for
+`grid([42(pCID), payload, ...])`, deterministic string-map payloads, and tests.
+Keep app/kernel and kernel/kernel boundaries as length-framed CBOR envelopes.
+Use Promise Theory vocabulary in comments and docs.
+Affects: `implementations/poc2/`;
+`protocols/wire-lab.d/TODO/TODO-pasaz-poc2-simple-kernel-two-container-hello.md`.
 
 ## Summary
 
@@ -68,30 +94,30 @@ identity, storage, or security model.
 
 ## Subtasks
 
-- [ ] pasaz.1 Create `implementations/poc2/` with `README.md`, `CHANGELOG.md`,
+- [x] pasaz.1 Create `implementations/poc2/` with `README.md`, `CHANGELOG.md`,
   `go.mod`, Docker/Compose files, and a small Go implementation.
-- [ ] pasaz.2 Define the POC's minimal kernel implementation promises:
+- [x] pasaz.2 Define the POC's minimal kernel implementation promises:
   supported pCIDs, unsupported-pCID behavior, app-facing send/receive promises,
   kernel-to-kernel transport promise, local evidence log, and explicit
   non-promises.
-- [ ] pasaz.3 Add a minimal POC hello protocol spec document whose pCID is the
+- [x] pasaz.3 Add a minimal POC hello protocol spec document whose pCID is the
   Protocol CID for the hello payload shape.
-- [ ] pasaz.4 Encode all app/kernel and kernel/kernel boundary messages as CBOR
+- [x] pasaz.4 Encode all app/kernel and kernel/kernel boundary messages as CBOR
   `grid([42(pCID), payload, ...])`; use a small CBOR library or tightly scoped
   encoder rather than inventing a different wire shape.
-- [ ] pasaz.5 Implement `poc2-kernel`: local app listener, remote peer listener,
+- [x] pasaz.5 Implement `poc2-kernel`: local app listener, remote peer listener,
   pCID dispatcher, exact-byte logging, unsupported-pCID refusal, and app
   delivery.
-- [ ] pasaz.6 Implement `poc2-hello`: app process that connects to the local
+- [x] pasaz.6 Implement `poc2-hello`: app process that connects to the local
   kernel, sends or receives a hello promise-message, and prints received
   messages.
 - [ ] pasaz.7 Run two Docker containers, `alice` and `bob`, on one Compose
   network; each container starts one local kernel and one hello app process.
-- [ ] pasaz.8 Make the demo command deterministic:
+- [x] pasaz.8 Make the demo command deterministic:
   `cd implementations/poc2 && docker compose up --build --abort-on-container-exit`.
 - [ ] pasaz.9 Ensure expected output clearly shows Alice app -> Alice kernel ->
   Bob kernel -> Bob app, plus local evidence records on both sides.
-- [ ] pasaz.10 Add tests for envelope round-trip, pCID dispatch,
+- [x] pasaz.10 Add tests for envelope round-trip, pCID dispatch,
   unsupported-pCID refusal, local app/kernel delivery, remote kernel/kernel
   delivery, and evidence-log content.
 - [ ] pasaz.11 Update `DEV-GUIDE-RESOURCES.md` only if the POC produces evidence

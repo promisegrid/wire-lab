@@ -33,6 +33,8 @@ See [TE-zukug](../docs/thought-experiments/TE-zukug-spec-doc-inversion-and-confo
 
 This directory is just *our local* collection. Third parties' implementations live in their own external repos with the same `CHANGELOG.md` convention; the shape is location-independent. A registry of known external implementations is out of scope for v0 (see TE-liviv OQ-32.1).
 
-## Currently empty
+## Current implementations
 
-No implementations exist yet. TODO-jodon (UDP-binding v0 reference) and TODO-bihon (ns-3 harness fixture) will populate this directory when their work begins.
+- `poc2/` — proof-of-concept 2: a minimal two-container app/kernel and kernel/kernel hello flow using pCID-selected `grid([42(pCID), payload, ...])` messages. It is not a final PromiseGrid API. Source: `DI-ratij`; `DI-tijat`.
+
+TODO-jodon (UDP-binding v0 reference) and TODO-bihon (ns-3 harness fixture) remain future implementation work.
