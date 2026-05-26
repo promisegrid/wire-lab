@@ -37,6 +37,27 @@ require a later DF/DI before code edits.
 Affects: `implementations/poc3/`; `protocols/wire-lab.d/TODO/TODO.md`;
 future kernel/app design evidence.
 
+### DI-fubir
+
+ID: DI-fubir
+Date: 2026-05-25 19:22:37
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Reuse `poc2`'s envelope, pCID, framing, evidence, and promise-first
+boundary patterns as starting material for `poc3`, but do not reuse its
+single-app receiver slot, single-protocol dispatcher, single package layout, or
+hello-specific kernel behavior as final `poc3` architecture.
+Intent: `poc2` proved that app/kernel and kernel/kernel boundaries can share the
+same pCID-selected `grid([42(pCID), payload, ...])` shape. `poc3` should build
+on that evidence while intentionally testing app diversity, multiple payload
+kinds, local echo promises, and signed-message evidence without letting the
+kernel become a service registry or RPC dispatcher.
+Constraints: Keep Promise Theory vocabulary first; preserve local observation
+and local refusal semantics; keep exact-byte evidence; avoid global trust claims;
+run DF before naming commands, packages, functions, variables, or exact runtime
+topology for `poc3`.
+Affects: `implementations/poc3/`; `implementations/poc2/`; this TODO.
+
 ## Summary
 
 Build `poc3`, a multi-app continuation of `poc2`.
@@ -64,9 +85,57 @@ framework, identity model, signature suite, storage layer, or trust system.
 - `implementations/poc3/kernel/*.go`
 - `implementations/poc3/lib/` only if needed
 
+## `poc2` pattern review for `poc3`
+
+Reusable starting points:
+
+- The outer envelope shape is the right default for `poc3`: CBOR
+  `grid([42(pCID), payload, ...])` with slot 0 as the Protocol CID link and
+  slot 1 as protocol-owned payload bytes.
+- The lightweight `ProtocolCID` pattern is useful for a POC: it hashes embedded
+  spec bytes and produces deterministic CIDv1 raw/sha2-256 bytes without making
+  the POC depend on a full IPLD library.
+- The length-framed `FrameConn` transport boundary is useful because it keeps
+  the demo focused on message semantics rather than stream parsing.
+- The `EvidenceLog` pattern is worth carrying forward: every kept, refused,
+  broken, or not-promised outcome is a local observation, not a global authority
+  fact.
+- The refusal path is useful: unsupported or unreadable pCIDs produce local
+  evidence and an observation instead of an authorization failure or exception
+  framed as command rejection.
+
+Reuse only after refactor:
+
+- The kernel should keep separate app/kernel and kernel/kernel boundaries, but
+  `poc2`'s single `receiver` field must become an app-relationship or local
+  promise table keyed by pCID, app identity, or receive promise semantics chosen
+  during DF.
+- The `kind` field inside one hello payload was adequate for `poc2`; `poc3`
+  needs a clearer rule for whether `hello`, `echo`, and `signed` are separate
+  pCIDs or one pCID with protocol-owned payload kinds.
+- The observation envelope is useful, but `poc3` should distinguish local app
+  observations, peer observations, echo promises, and signed evidence without
+  collapsing them into a generic RPC response.
+- The Docker two-container demo is useful, but `poc3` may need either multiple
+  app processes per container or a local-only mode so tests remain deterministic.
+
+Do not carry forward as architecture:
+
+- Do not keep hello-specific kernel methods as the main kernel design; `poc3`
+  should make app behavior live in apps and keep the kernel focused on local
+  message acceptance, evidence, routing, delivery, and refusal promises.
+- Do not keep a single registered local receiver as the model for multiple apps;
+  that assumption hides the app-diversity question `poc3` exists to test.
+- Do not treat signatures as trust decisions. A signed app can witness exact
+  bytes or a claimed promiser, but Alice, Bob, and Carol still make local trust
+  judgments from evidence and relationships.
+- Do not let an `echo` app become a disguised remote procedure call. Echoing is
+  a local promise by the echo app to make a new message in response to a message
+  it chose to interpret and keep.
+
 ## Subtasks
 
-- [ ] hozaz.1 Review `poc2` evidence and decide which code patterns can be
+- [x] hozaz.1 Review `poc2` evidence and decide which code patterns can be
   reused without carrying over accidental single-app assumptions.
 - [ ] hozaz.2 Run DF for exact command names, package/type names, protocol
   surfaces, and runtime topology before creating code.
