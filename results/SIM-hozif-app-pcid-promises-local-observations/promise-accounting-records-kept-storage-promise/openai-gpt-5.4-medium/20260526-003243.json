@@ -1,0 +1,181 @@
+{
+  "schema": "promisegrid.ga.result.v4",
+  "result_id": "SIM-hozif-app-pcid-promises-local-observations-promise-accounting-records-kept-storage-promise-openai-gpt-5.4-medium-20260526-003243",
+  "run_group_id": "ga-canary-20260525-hozif-anti-rpc-calibration",
+  "cell_id": "ga-canary-20260525-hozif-anti-rpc-calibration-000002-SIM-hozif-app-pcid-promises-local-observations--promise-accounting-records-kept-storage-promise--openai-gpt-5.4-medium",
+  "sim_id": "SIM-hozif-app-pcid-promises-local-observations",
+  "scenario_id": "promise-accounting-records-kept-storage-promise",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260526-003243",
+  "result_path": "results/SIM-hozif-app-pcid-promises-local-observations/promise-accounting-records-kept-storage-promise/openai-gpt-5.4-medium/20260526-003243.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "flex",
+    "served_service_tier": "flex",
+    "request_id": "req_8b549ef8de734cb5bfe699a4aed513c3",
+    "response_id": "resp_09a83ea392d3fc56006a14ea2df71c819998f5ead3aeb8ec1d",
+    "input_tokens": 11541,
+    "output_tokens": 1228,
+    "cost_usd": 0.03738875
+  },
+  "source": {
+    "repo_commit": "e8e6fe7b627498f4acd4ba1bde7fb8067920b15e",
+    "sim_path": "simulations/SIM-hozif-app-pcid-promises-local-observations/",
+    "scenario_path": "scenarios/promise-accounting-records-kept-storage-promise/promise-accounting-records-kept-storage-promise.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-hozif-app-pcid-promises-local-observations/README.md",
+        "sha256": "3059c74526af8b8f7061dab1c8baae892f434adc377eba04c3a08c9538ba2aaa"
+      },
+      {
+        "path": "simulations/SIM-hozif-app-pcid-promises-local-observations/QUESTION.md",
+        "sha256": "d9c37e192296d6ca8b814cf057c7f3d88fefe51523592341f624f211634762fc"
+      },
+      {
+        "path": "simulations/SIM-hozif-app-pcid-promises-local-observations/protocols/app-kernel-local-promises.d/specs/app-kernel-local-promises-draft.md",
+        "sha256": "17c33eb9d2a31972901466ddb916f4c80b5e5e30a58606b23adb7e919b6229f0"
+      },
+      {
+        "path": "simulations/SIM-hozif-app-pcid-promises-local-observations/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "14a9f234d1ac755c22e8c482f1fb4dc6704ca0712b2bf0825fee41614f56f3d6"
+      },
+      {
+        "path": "scenarios/promise-accounting-records-kept-storage-promise/promise-accounting-records-kept-storage-promise.md",
+        "sha256": "9972dff7f20d9b4f3231c07a8eb332d2e75b43e84cf0d34af29c1d3ea9c1ad74"
+      }
+    ],
+    "simulation_tree_hash": "11ed7d4237731140ecd6775d5573c802058cabf5c451c18bf4cf4b73a5b40a2f"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260525-v4",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "app_protocol_promise_semantics": "0 uses command/request-response-service/permission framing or needless pCID fragmentation, 5 models storage, computation, send/receive, reciprocal promises, local trust, make/break evidence, and payload kinds under stable protocol pCIDs where appropriate",
+      "envelope_discipline": "0 ignores the settled envelope direction or confuses pCID with payload/message/request identity, 5 aligns with grid([42(pCID), payload, ...]), stable Protocol-CID semantics, and protocol-owned later slots",
+      "kernel_implementation_promises": "0 treats the kernel as RPC authority, service registry, capability registry, permission issuer, or generic conformance judge, 5 names local app/kernel promises, assumptions, unsupported behavior, and observations",
+      "promise_vocabulary": "0 drifts into claims/profiles/generic statement capsules/central trust-ledger/RPC/service-registry/capability-table or per-message-pCID framing, 5 stays promise-first, layer-local, and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt, selector-shopping, mode-matrix/service-catalog/capability-map heavy, per-record-pCID fragmented, or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "envelope_discipline",
+      "kernel_implementation_promises",
+      "app_protocol_promise_semantics",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 4,
+    "promisegrid_alignment": 5,
+    "auditability": 5,
+    "evolution_safety": 5,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 5,
+    "implementation_plausibility": 5,
+    "promise_vocabulary": 5,
+    "simplicity_durability": 5,
+    "envelope_discipline": 5,
+    "kernel_implementation_promises": 5,
+    "app_protocol_promise_semantics": 4,
+    "risk_penalty": 1
+  },
+  "fitness": {
+    "raw": 62,
+    "normalized_0_100": 95.38461538461539,
+    "confidence_0_1": 0.93
+  },
+  "assessment": {
+    "rationale": "Strong fit. The sim cleanly models a kept storage promise as an app_pcid_promise_v1 with promise_role=store plus a later local_observation_record_v1 showing kept behavior and local trust effect. It stays promise-first, keeps trust local, preserves the envelope boundary, and avoids registry/RPC drift. Scenario fit is slightly below perfect because concrete storage object and serve semantics are intentionally left to the higher-layer subject protocol rather than fully spelled out here.",
+    "strengths": [
+      "One stable pCID with kind variants avoids needless fragmentation.",
+      "Explicit store/send/evidence roles support this scenario directly.",
+      "Observation outcomes distinguish kept, refused, not-promised, broken, timed-out, unreadable, and host-unavailable.",
+      "Envelope semantics are disciplined: grid([42(pCID), payload, ...]) with protocol-owned later slots.",
+      "Kernel claims are local implementation promises, not service-registry authority."
+    ],
+    "weaknesses": [
+      "The scenario's concrete storage semantics are only sketched via generic promise_role and subject_pcid.",
+      "No storage-specific evidence profile is mandated for proving later serve behavior.",
+      "Observer_hint and generic named roles may need tighter conventions for interoperability."
+    ],
+    "risks": [
+      "A concrete storage deployment still needs a precise subject-pCID protocol for chunk naming, retention bounds, and serve evidence.",
+      "The generic role vocabulary could be applied inconsistently unless successor specs profile storage-specific fields more tightly.",
+      "Long-horizon evidence retention limits may weaken later proof of a kept promise if exact bytes are rotated away."
+    ],
+    "open_questions": [
+      "How should a concrete storage payload protocol represent chunk identity, retention interval, and later serve evidence under the promised subject pCID?",
+      "Should kept storage evidence usually cite exact served bytes, a CID-rooted witness, or both for small-device durability?",
+      "What minimal local observation fields best distinguish 'stored but later unreadable' from 'never stored' across long-horizon reprofile events?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design.",
+    "pt_gate": {
+      "status": "pt_clean",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "Apps, kernels, peers, and observers each make only their own promises and local observations."
+      },
+      "scoped_intent": {
+        "status": "pass",
+        "note": "Promises are relationship-scoped, pCID-scoped, and validity-bounded."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "The kernel does not certify app abilities; it records what the app promised and what it observed."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "Kept, refused, broken, timed-out, and host-unavailable are observations, not guaranteed outcomes."
+      },
+      "local_trust_assessment": {
+        "status": "pass",
+        "note": "Observation records explicitly support only local trust updates and avoid global reputation authority."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "Receive/handle/store promises are framed as voluntary declarations, not obligations imposed by the observer."
+      },
+      "violations": []
+    }
+  }
+}

@@ -1,0 +1,1029 @@
+{
+  "schema": "promisegrid.ga.state.v1",
+  "run_group_id": "ga-canary-20260525-goban-dalor-fovip-v4",
+  "created_at": "2026-05-25T22:47:26Z",
+  "updated_at": "2026-05-25T23:46:17Z",
+  "repo_commit": "685d4c3ba63b1486c4ff85930023c589d3e9e942",
+  "model_id": "openai-gpt-5.4-medium",
+  "population": [
+    {
+      "sim_id": "SIM-bahod-group-session-human-merge-promise",
+      "path": "simulations/SIM-bahod-group-session-human-merge-promise/",
+      "tree_hash": "bfbeb2ea13f8e4903a0479f07dabee6590d4b6b828775195f8b4861589eb5f91"
+    },
+    {
+      "sim_id": "SIM-bihim-cas-type-codec-plus-internal-kind",
+      "path": "simulations/SIM-bihim-cas-type-codec-plus-internal-kind/",
+      "tree_hash": "415f66cfc07267d51ba343b130cfa4da0b6625c18c05fefee3dc38b71f2d11b0"
+    },
+    {
+      "sim_id": "SIM-bilam-udp-feed-layer-composition-conformance",
+      "path": "simulations/SIM-bilam-udp-feed-layer-composition-conformance/",
+      "tree_hash": "fc9f51cd962d3438f6bb96a1c7baa9fa2be765dca50bb60b16dde4a672aede9f"
+    },
+    {
+      "sim_id": "SIM-bimos-grid-envelope-quarantine-sig-pcid-audit-tuple",
+      "path": "simulations/SIM-bimos-grid-envelope-quarantine-sig-pcid-audit-tuple/",
+      "tree_hash": "b70c5ff51037ca47511e214bc341f6e029019d175de158273070542a462b6992"
+    },
+    {
+      "sim_id": "SIM-bobud-l6-cas-starting-profile-bakeoff",
+      "path": "simulations/SIM-bobud-l6-cas-starting-profile-bakeoff/",
+      "tree_hash": "961093798fd4a11d91e6a12d3bff8ece12b9e6590ad561e7a7dcdb1179331967"
+    },
+    {
+      "sim_id": "SIM-bohof-group-session-freeze-promise",
+      "path": "simulations/SIM-bohof-group-session-freeze-promise/",
+      "tree_hash": "c81e4dff4038f2661504efb4560f8b72b4e1dec8ae8f31e9dde9322f86dd50b4"
+    },
+    {
+      "sim_id": "SIM-dalor-grid-envelope-protocol-owned-signature-slot",
+      "path": "simulations/SIM-dalor-grid-envelope-protocol-owned-signature-slot/",
+      "tree_hash": "a142441111efde7f2ec32c45fc388c6ad2a740fdf6b1f7f89e3c18ac1f1d3fda"
+    },
+    {
+      "sim_id": "SIM-dihiz-peer-adoption-metadata",
+      "path": "simulations/SIM-dihiz-peer-adoption-metadata/",
+      "tree_hash": "959e161d2c2eb1c4991ea46f8f265e77f9eba7b1a57e641e7cb8e80ce3c52314"
+    },
+    {
+      "sim_id": "SIM-dorut-grid-envelope-enc-cbor-unknown-hard-reject-sig-wrapper-pcid",
+      "path": "simulations/SIM-dorut-grid-envelope-enc-cbor-unknown-hard-reject-sig-wrapper-pcid/",
+      "tree_hash": "50242ebc807aae53051606d642abf07404c95576243dbe41336a113a8f6970bb"
+    },
+    {
+      "sim_id": "SIM-dujoh-conditional-release-transport-visible-constraint",
+      "path": "simulations/SIM-dujoh-conditional-release-transport-visible-constraint/",
+      "tree_hash": "993c6c480b07328fd67b857ec4258cd9b4ca2aaf4252e5490f9e7a6322e481cf"
+    },
+    {
+      "sim_id": "SIM-dutam-grid-envelope-fixed-header-variable-body",
+      "path": "simulations/SIM-dutam-grid-envelope-fixed-header-variable-body/",
+      "tree_hash": "41922bc0db1ac263325ae5ab91a03e187f0e61c5985a29f4f566745634f65fdb"
+    },
+    {
+      "sim_id": "SIM-falun-conditional-release-separate-protocol-family",
+      "path": "simulations/SIM-falun-conditional-release-separate-protocol-family/",
+      "tree_hash": "9c6f5be6a30bb69caa3c1aff7b2b2992ad54cf3f9fb9529db69c6329b941e751"
+    },
+    {
+      "sim_id": "SIM-fiboh-group-session-deferred-freeze",
+      "path": "simulations/SIM-fiboh-group-session-deferred-freeze/",
+      "tree_hash": "82f864d7ecf63092f2a95e63c7b0d422873220146ce76ca85070bce48efc86d8"
+    },
+    {
+      "sim_id": "SIM-fitin-gordian-payload-wrapper",
+      "path": "simulations/SIM-fitin-gordian-payload-wrapper/",
+      "tree_hash": "89e59244cc796db7feb98172fe4717350d151e0833647afb0891ec143141b835"
+    },
+    {
+      "sim_id": "SIM-fonig-grid-envelope-enc-cbor-unknown-best-effort-sig-unsigned-v0",
+      "path": "simulations/SIM-fonig-grid-envelope-enc-cbor-unknown-best-effort-sig-unsigned-v0/",
+      "tree_hash": "23f5d289e0986e4bb57324238374ffc087026f54fdea244bcf080a22de738036"
+    },
+    {
+      "sim_id": "SIM-fonol-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-mandatory-opaque-bytes",
+      "path": "simulations/SIM-fonol-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-mandatory-opaque-bytes/",
+      "tree_hash": "44f3c24c3bba709fc9084c9b7b00d63db3f0a9184926cc751ab92633c53a6bae"
+    },
+    {
+      "sim_id": "SIM-fonom-conditional-release-selective-send-onward-promises",
+      "path": "simulations/SIM-fonom-conditional-release-selective-send-onward-promises/",
+      "tree_hash": "cd3e88d89860fc3ab87f7d04a08a8cd16d6d8239eaba87b821f4fd07b65537d0"
+    },
+    {
+      "sim_id": "SIM-fovip-kernel-promise-boundary-port-contract",
+      "path": "simulations/SIM-fovip-kernel-promise-boundary-port-contract/",
+      "tree_hash": "c687a3c548d7e9d1aebc6f314ca718d0bf83ab21c87b675c653e586161102361"
+    },
+    {
+      "sim_id": "SIM-funas-kernel-porting-boundary",
+      "path": "simulations/SIM-funas-kernel-porting-boundary/",
+      "tree_hash": "3036063b40b8f7f00637b0135a1962f32775f8d0abb3406a49cb169d7048cfe6"
+    },
+    {
+      "sim_id": "SIM-gadol-peer-adoption-promise-message",
+      "path": "simulations/SIM-gadol-peer-adoption-promise-message/",
+      "tree_hash": "cc25bca5323b36b38c3d31b1314bf64a50e08e8631c97040b6e872ad0548e43a"
+    },
+    {
+      "sim_id": "SIM-gasus-grid-envelope-enc-cbor-unknown-opaque-sig-unsigned-v0",
+      "path": "simulations/SIM-gasus-grid-envelope-enc-cbor-unknown-opaque-sig-unsigned-v0/",
+      "tree_hash": "1a62ac77b896a9bb889f3312e61162d60d5e02c5fa1415afad123d5463a83ece"
+    },
+    {
+      "sim_id": "SIM-gazan-grid-envelope-enc-cbor-unknown-hard-reject-sig-unsigned-v0",
+      "path": "simulations/SIM-gazan-grid-envelope-enc-cbor-unknown-hard-reject-sig-unsigned-v0/",
+      "tree_hash": "988ac72d01c01d1a0ed98ef495d793957da140b4d288cb00aa0088c9cb9ca647"
+    },
+    {
+      "sim_id": "SIM-gibut-conditional-release-group-session-local",
+      "path": "simulations/SIM-gibut-conditional-release-group-session-local/",
+      "tree_hash": "0c70c89f96c9f082607d1bbfc746c86d35ebcf7aa7bfd14f7405b5d89d987386"
+    },
+    {
+      "sim_id": "SIM-gobaz-chunking-identity-bakeoff",
+      "path": "simulations/SIM-gobaz-chunking-identity-bakeoff/",
+      "tree_hash": "0618581b9666d06b2986afe1defb76ab46a5cb628becc3f2cf2498bc34ec9248"
+    },
+    {
+      "sim_id": "SIM-gojot-grid-envelope-enc-dag-cbor-unknown-opaque-sig-wrapper-pcid",
+      "path": "simulations/SIM-gojot-grid-envelope-enc-dag-cbor-unknown-opaque-sig-wrapper-pcid/",
+      "tree_hash": "9e114c7aa2aa728b929b6162d361c7f7fbb6d464ac69d30f8b4f563b5354d8df"
+    },
+    {
+      "sim_id": "SIM-gozin-spec-sections-required",
+      "path": "simulations/SIM-gozin-spec-sections-required/",
+      "tree_hash": "53bf3a7312230b2885693633632d800de388ba1cdf2b0646723f005d7b31a192"
+    },
+    {
+      "sim_id": "SIM-guhor-grid-envelope-enc-cbor-unknown-best-effort-sig-mandatory-opaque-bytes",
+      "path": "simulations/SIM-guhor-grid-envelope-enc-cbor-unknown-best-effort-sig-mandatory-opaque-bytes/",
+      "tree_hash": "d31569a6a684e574940f7156736bbf02b5789289cb2520469fd57807458c1a18"
+    },
+    {
+      "sim_id": "SIM-guhum-transport-cluster-of-clusters",
+      "path": "simulations/SIM-guhum-transport-cluster-of-clusters/",
+      "tree_hash": "0c3d3b4f767b25b25cd7017af80c516d7440b523c53d81768d763ddb4e97dfe2"
+    },
+    {
+      "sim_id": "SIM-gujav-chunking-descriptor-cid-identity",
+      "path": "simulations/SIM-gujav-chunking-descriptor-cid-identity/",
+      "tree_hash": "15d243cabdef61ba22264cb689324663680bcab3609423fe91b7c7667b8025f2"
+    },
+    {
+      "sim_id": "SIM-gujiv-conditional-release-hybrid-reference-graph",
+      "path": "simulations/SIM-gujiv-conditional-release-hybrid-reference-graph/",
+      "tree_hash": "bfaaa00c0154723abdec6de204c1fc67d79012cf94e8e62b83667423be99cb22"
+    },
+    {
+      "sim_id": "SIM-hagom-grid-envelope-enc-dag-cbor-unknown-opaque-sig-unsigned-v0",
+      "path": "simulations/SIM-hagom-grid-envelope-enc-dag-cbor-unknown-opaque-sig-unsigned-v0/",
+      "tree_hash": "228178578418dd49b30e5abae06099d74ee881b317085859e039cf08c8a0ebd6"
+    },
+    {
+      "sim_id": "SIM-haros-promise-economy-spectrum",
+      "path": "simulations/SIM-haros-promise-economy-spectrum/",
+      "tree_hash": "9bec8ccc55bf0facdc8b02ab1e4bef63f00c5365221db31af036b09b4ec1aaac"
+    },
+    {
+      "sim_id": "SIM-hiviv-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-unsigned-v0",
+      "path": "simulations/SIM-hiviv-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-unsigned-v0/",
+      "tree_hash": "d0c4f015c61aa7a511cf00b0bf45ce39d9ecc8a54b12363a6abd232a452342cf"
+    },
+    {
+      "sim_id": "SIM-hopiv-peer-adoption-spec-side-answer-vocabulary",
+      "path": "simulations/SIM-hopiv-peer-adoption-spec-side-answer-vocabulary/",
+      "tree_hash": "977f0ee4e8210e2d3d83b8418e464c1ee43f865ad6b15dd7167b05d43b90e374"
+    },
+    {
+      "sim_id": "SIM-hugoj-cas-usenetlike-gitlike",
+      "path": "simulations/SIM-hugoj-cas-usenetlike-gitlike/",
+      "tree_hash": "144951c8a39cbb610ac9d305fe823308c60e01e271c2f3b222a32276d4a196ef"
+    },
+    {
+      "sim_id": "SIM-hupir-grid-envelope-enc-cbor-unknown-hard-reject-sig-mandatory-opaque-bytes",
+      "path": "simulations/SIM-hupir-grid-envelope-enc-cbor-unknown-hard-reject-sig-mandatory-opaque-bytes/",
+      "tree_hash": "8cf2242305b6f3d92194a5e4881f8b3b8adf8a39e25bc1237713cc887e1ec805"
+    },
+    {
+      "sim_id": "SIM-jaboj-udp-feed-reference-first-conformance",
+      "path": "simulations/SIM-jaboj-udp-feed-reference-first-conformance/",
+      "tree_hash": "f289c5266e54709caa056201b96564ab65f920220f6cd9dd50db946813c2b7d1"
+    },
+    {
+      "sim_id": "SIM-janov-grid-envelope-layer-pcid-nested-signed-payload",
+      "path": "simulations/SIM-janov-grid-envelope-layer-pcid-nested-signed-payload/",
+      "tree_hash": "1cb0fa1b5456586427d1a876125497222128ade12f37486685f0de0e7812df4a"
+    },
+    {
+      "sim_id": "SIM-johum-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-wrapper-pcid",
+      "path": "simulations/SIM-johum-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-wrapper-pcid/",
+      "tree_hash": "cfea4f21c240950e568c6e59cdc5e33ecb81989d8d42c9188a1b52c94462cd6c"
+    },
+    {
+      "sim_id": "SIM-jokak-grid-envelope-enc-cbor-unknown-best-effort-sig-mandatory-sig-pcid-payload",
+      "path": "simulations/SIM-jokak-grid-envelope-enc-cbor-unknown-best-effort-sig-mandatory-sig-pcid-payload/",
+      "tree_hash": "70c6a17b236d0e9f1ba89621ed8e390e4169976db54f9ebcc2337ee9d9646834"
+    },
+    {
+      "sim_id": "SIM-jomag-cas-object-model",
+      "path": "simulations/SIM-jomag-cas-object-model/",
+      "tree_hash": "db2c26d2e739adab24964d5eaedae274932fae7b8259e05761250abc421e0e23"
+    },
+    {
+      "sim_id": "SIM-jomaj-transport-token-ring",
+      "path": "simulations/SIM-jomaj-transport-token-ring/",
+      "tree_hash": "1e99d614e1d78c2d36ea51a210ff9e5480e57752534b2cee956563c7c8d5f95f"
+    },
+    {
+      "sim_id": "SIM-jufag-grid-envelope-quarantine-sig-pcid-outcomes",
+      "path": "simulations/SIM-jufag-grid-envelope-quarantine-sig-pcid-outcomes/",
+      "tree_hash": "930b03d7306ea38f2f33749445213062788da08b6b8b211a2b5a66c09f723348"
+    },
+    {
+      "sim_id": "SIM-jumav-grid-envelope-wrapper-proof-ceramic-like",
+      "path": "simulations/SIM-jumav-grid-envelope-wrapper-proof-ceramic-like/",
+      "tree_hash": "3bafd6207899415f0dd2bac6a206354f0d9a1273593e0af477084bfc5ebc3db2"
+    },
+    {
+      "sim_id": "SIM-jurar-cas-backed-group-session",
+      "path": "simulations/SIM-jurar-cas-backed-group-session/",
+      "tree_hash": "cfc13d1751e31648002a01d4444f33c759361450ba245d0441bce016fede46be"
+    },
+    {
+      "sim_id": "SIM-kabiv-chunking-pcid-driven-identity",
+      "path": "simulations/SIM-kabiv-chunking-pcid-driven-identity/",
+      "tree_hash": "05b7a54cb26daa2675abb925708f149eaf46f08dd93700190a804876c953a3e9"
+    },
+    {
+      "sim_id": "SIM-kohad-cas-object-type-binding-bakeoff",
+      "path": "simulations/SIM-kohad-cas-object-type-binding-bakeoff/",
+      "tree_hash": "c6747fa8075555a1f41d334c1ac9f15c350cb9110678212e6a79ffa5d1f6991f"
+    },
+    {
+      "sim_id": "SIM-konit-pcid-promise-evidence-index",
+      "path": "simulations/SIM-konit-pcid-promise-evidence-index/",
+      "tree_hash": "227c9a080416752ab4c2fd51ae77ac84fad407f5deaf7843de114272995e423a"
+    },
+    {
+      "sim_id": "SIM-kovis-grid-envelope-enc-cbor-unknown-hard-reject-sig-mandatory-sig-pcid-payload",
+      "path": "simulations/SIM-kovis-grid-envelope-enc-cbor-unknown-hard-reject-sig-mandatory-sig-pcid-payload/",
+      "tree_hash": "eb72da938d67fc2ce8cce48ed81dd825940a7993a82a9dbc4bf42acd39a1dadc"
+    },
+    {
+      "sim_id": "SIM-kuful-udp-feed-v0-conformance",
+      "path": "simulations/SIM-kuful-udp-feed-v0-conformance/",
+      "tree_hash": "0ff5d197350fd3475fec2f96840fbac90cb7dabdb6daa8c9f54a51492ebcd5ff"
+    },
+    {
+      "sim_id": "SIM-kugap-live-sync-audit-split",
+      "path": "simulations/SIM-kugap-live-sync-audit-split/",
+      "tree_hash": "f88642638aa759074214d592d8be3398201cc6d7d3680894098cbc1df811030c"
+    },
+    {
+      "sim_id": "SIM-kurim-grid-envelope",
+      "path": "simulations/SIM-kurim-grid-envelope/",
+      "tree_hash": "f644f1f7130016bc26b62e903e784a948f962727c347009162f6b29dcc18e6e2"
+    },
+    {
+      "sim_id": "SIM-labit-feed-outer",
+      "path": "simulations/SIM-labit-feed-outer/",
+      "tree_hash": "060eb3fe3a7c63ee4e88f66a0c9af758b9e7d2219b68b87c5b132ff2fb7c50ff"
+    },
+    {
+      "sim_id": "SIM-ligan-promisebase-reference-naming",
+      "path": "simulations/SIM-ligan-promisebase-reference-naming/",
+      "tree_hash": "e5bd7100c41c5eadf9e6dc4ddf7490d3c40ebecb498e9b79801fa466762d723f"
+    },
+    {
+      "sim_id": "SIM-lilok-cas-type-path-suffix-negative-control",
+      "path": "simulations/SIM-lilok-cas-type-path-suffix-negative-control/",
+      "tree_hash": "0fe117659bfa499dd1f42891807e2ccdb2da83ab00099599578ffabf5fa458d6"
+    },
+    {
+      "sim_id": "SIM-lofij-peer-adoption-hybrid-pointer",
+      "path": "simulations/SIM-lofij-peer-adoption-hybrid-pointer/",
+      "tree_hash": "412e7ab674cb54201689072610a695ea0e8772f4e95597d7f7bc312af9c30d1d"
+    },
+    {
+      "sim_id": "SIM-lotiv-grid-envelope-cryptid-multisig-signature-proofs",
+      "path": "simulations/SIM-lotiv-grid-envelope-cryptid-multisig-signature-proofs/",
+      "tree_hash": "83f96165cff32abe7490c2176ed2265a57ad81868f6f614b069f209ffd8615bc"
+    },
+    {
+      "sim_id": "SIM-lozuk-l6-cas-ipfs-ipld-starting-profile",
+      "path": "simulations/SIM-lozuk-l6-cas-ipfs-ipld-starting-profile/",
+      "tree_hash": "60a5f82d2ae49fd25d4909ed71a2c0c8c577758a9fe863f70e5205958bc1d99c"
+    },
+    {
+      "sim_id": "SIM-ludaf-udp-feed",
+      "path": "simulations/SIM-ludaf-udp-feed/",
+      "tree_hash": "1f626da6f8c3305ac8a02bdbbbb9f66cdcfdba59ebd91dff2433acf4ec107c93"
+    },
+    {
+      "sim_id": "SIM-ludut-wire-lab-devs",
+      "path": "simulations/SIM-ludut-wire-lab-devs/",
+      "tree_hash": "0ea8781ea8d19089355073cde98e1e93ac60fbf3c7e2267a3dc85687acec43f1"
+    },
+    {
+      "sim_id": "SIM-lurip-capability-promise-token-payload",
+      "path": "simulations/SIM-lurip-capability-promise-token-payload/",
+      "tree_hash": "db35790937943df0531d0e312c1b07b72c41c8b81abb368c063696a9938e1ca7"
+    },
+    {
+      "sim_id": "SIM-mahih-grid-envelope-enc-cbor-unknown-opaque-sig-wrapper-pcid",
+      "path": "simulations/SIM-mahih-grid-envelope-enc-cbor-unknown-opaque-sig-wrapper-pcid/",
+      "tree_hash": "f4a70d5b05c7608d49fe60e0bfd51e87f1cf701aafad2970df62c7bcf9922a6d"
+    },
+    {
+      "sim_id": "SIM-maraz-grid-envelope-signed-summary-header-nested-schema",
+      "path": "simulations/SIM-maraz-grid-envelope-signed-summary-header-nested-schema/",
+      "tree_hash": "f19399cdfa3cc931cc48b8aacaf97a7afe1479d867d15d364706bc1a4d147c9f"
+    },
+    {
+      "sim_id": "SIM-mikas-minimal-blob-app-contract",
+      "path": "simulations/SIM-mikas-minimal-blob-app-contract/",
+      "tree_hash": "97358511b9d6fdb6a02c37fd0722f03dafb09104268a3c034a920d71dd711c93"
+    },
+    {
+      "sim_id": "SIM-mipum-grid-envelope-signed-body-envelope-ucan-like",
+      "path": "simulations/SIM-mipum-grid-envelope-signed-body-envelope-ucan-like/",
+      "tree_hash": "73977fda1730d6b06516e18e89c1cca807e7a11b09a68bf4442a1c4673e71dfc"
+    },
+    {
+      "sim_id": "SIM-nalug-chunking-raw-only-first-profile",
+      "path": "simulations/SIM-nalug-chunking-raw-only-first-profile/",
+      "tree_hash": "8196e3e0b535f402a9f37e9151e3857701f1c260b2db59f24f35f2bb6c077e74"
+    },
+    {
+      "sim_id": "SIM-narok-transport-family-bakeoff",
+      "path": "simulations/SIM-narok-transport-family-bakeoff/",
+      "tree_hash": "774d1eb9e36a1b3ce75263fffbf462c4587ded512257fdac3a81370a23467e80"
+    },
+    {
+      "sim_id": "SIM-natim-grid-envelope-nested-payload-outer-attestation-multisig",
+      "path": "simulations/SIM-natim-grid-envelope-nested-payload-outer-attestation-multisig/",
+      "tree_hash": "668854aaae32a3dc6bf13e5909bad575b36357d7af8d362f2ebc79ab053078ea"
+    },
+    {
+      "sim_id": "SIM-nijuz-multi-embodiment-identity",
+      "path": "simulations/SIM-nijuz-multi-embodiment-identity/",
+      "tree_hash": "f4f9f7df1f6fb39e72cdd5f6e792f278a36d400239ad6372909005125a92dab4"
+    },
+    {
+      "sim_id": "SIM-nipoh-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-wrapper-pcid",
+      "path": "simulations/SIM-nipoh-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-wrapper-pcid/",
+      "tree_hash": "90a6dd3091fcccc5e5fef0a39e859ae00100ea2a89b212ac10fc2fc2aca1d42e"
+    },
+    {
+      "sim_id": "SIM-nonib-udp-feed-harness-first-conformance",
+      "path": "simulations/SIM-nonib-udp-feed-harness-first-conformance/",
+      "tree_hash": "8994291972228d954b465cbf4735badeca0703bcb0e41dffd53a54494c86bf99"
+    },
+    {
+      "sim_id": "SIM-numop-transport-gossip",
+      "path": "simulations/SIM-numop-transport-gossip/",
+      "tree_hash": "b127e7ce2ae9b23ee24e459fdce3fd3aaae78323fad68ffb2ec6b2f5bcef155c"
+    },
+    {
+      "sim_id": "SIM-padin-group-session-freeze-evidence",
+      "path": "simulations/SIM-padin-group-session-freeze-evidence/",
+      "tree_hash": "8fbe9da939de6ecdba9776b2cc20f5cb8b910b7381d306b38a6017026c170175"
+    },
+    {
+      "sim_id": "SIM-pamap-grid-envelope-signable-view-atproto-like",
+      "path": "simulations/SIM-pamap-grid-envelope-signable-view-atproto-like/",
+      "tree_hash": "4807df0f3808e27bf7226487a8b2c06486c183f3911960da1e360f3a902ae736"
+    },
+    {
+      "sim_id": "SIM-pobod-grid-envelope-outer-promise-nested-signed-payload",
+      "path": "simulations/SIM-pobod-grid-envelope-outer-promise-nested-signed-payload/",
+      "tree_hash": "941614f1c8ec15ab226d7b287e27dfd6e06074c920a61c1a5460d449f282d27b"
+    },
+    {
+      "sim_id": "SIM-punaz-bgp-class-routing-app",
+      "path": "simulations/SIM-punaz-bgp-class-routing-app/",
+      "tree_hash": "26522373a19fa0133724841a623a140f3d283f0339c77cbea330d3d0c0679526"
+    },
+    {
+      "sim_id": "SIM-rakir-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-mandatory-sig-pcid-payload",
+      "path": "simulations/SIM-rakir-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-mandatory-sig-pcid-payload/",
+      "tree_hash": "92c5d8e985a5266b1219c5985a1305bcf0ecba2bd5929def1374240a00e8a528"
+    },
+    {
+      "sim_id": "SIM-rakot-group-session",
+      "path": "simulations/SIM-rakot-group-session/",
+      "tree_hash": "1525fe7dd6097b1f62bfc62bfc8f9bdcd452f9e7cc0f5ead8af9278b753e2e16"
+    },
+    {
+      "sim_id": "SIM-ranib-spec-requirement-sections",
+      "path": "simulations/SIM-ranib-spec-requirement-sections/",
+      "tree_hash": "128135b803ca4a9d9c8c7f3cde62940e26d0b857687ddebe1bc26fe460b215d7"
+    },
+    {
+      "sim_id": "SIM-ravad-freeze-successor-records",
+      "path": "simulations/SIM-ravad-freeze-successor-records/",
+      "tree_hash": "27964db096c8f3382dc19452a40fd76a7a6d19d46626aac4bdd7724778a66b3c"
+    },
+    {
+      "sim_id": "SIM-riliz-grid-envelope-enc-dag-cbor-unknown-opaque-sig-mandatory-sig-pcid-payload",
+      "path": "simulations/SIM-riliz-grid-envelope-enc-dag-cbor-unknown-opaque-sig-mandatory-sig-pcid-payload/",
+      "tree_hash": "d85aac8e8bda9ef21343c7364adf6fa3924c754abc3105e7384fda1d516fc3e7"
+    },
+    {
+      "sim_id": "SIM-robot-app-semantics-conformance",
+      "path": "simulations/SIM-robot-app-semantics-conformance/",
+      "tree_hash": "e57bc7679fd213e955302abe66d10f62f5e3f6e719093146f00c240f25158767"
+    },
+    {
+      "sim_id": "SIM-rokub-chunking-negotiated-profile-identity",
+      "path": "simulations/SIM-rokub-chunking-negotiated-profile-identity/",
+      "tree_hash": "c3ce26f7460e9b0bbcc1d7d3e8b77abb0d296a9b5e17831ccad58324e43be3f0"
+    },
+    {
+      "sim_id": "SIM-ruhog-udp-feed-vector-first-conformance",
+      "path": "simulations/SIM-ruhog-udp-feed-vector-first-conformance/",
+      "tree_hash": "3f3f6b06062f766bf3b8a7592cc6610df30b69e226bd913762840a0062714d41"
+    },
+    {
+      "sim_id": "SIM-rusap-promise-accounting-records",
+      "path": "simulations/SIM-rusap-promise-accounting-records/",
+      "tree_hash": "68329074b8fdfa8199d800aa9b183175c63a167ec55be34403848d91944509f8"
+    },
+    {
+      "sim_id": "SIM-ruzil-grid-envelope-enc-dag-cbor-unknown-opaque-sig-mandatory-opaque-bytes",
+      "path": "simulations/SIM-ruzil-grid-envelope-enc-dag-cbor-unknown-opaque-sig-mandatory-opaque-bytes/",
+      "tree_hash": "6f2afd5b2d31d78758925a1d4cc49a6ff4815410d9c349068bee0c088e5b43e1"
+    },
+    {
+      "sim_id": "SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields",
+      "path": "simulations/SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields/",
+      "tree_hash": "c87630e56b40a18f506bf9517038e4781f08860edaef5341d3c4edf4bd00c82b"
+    },
+    {
+      "sim_id": "SIM-savak-scoped-claim-card-audit-ledger",
+      "path": "simulations/SIM-savak-scoped-claim-card-audit-ledger/",
+      "tree_hash": "6f61c9ff8dff19e3166df4f55e604c8a0ea2480d1177083809ad73c72df1908a"
+    },
+    {
+      "sim_id": "SIM-sivus-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-mandatory-sig-pcid-payload",
+      "path": "simulations/SIM-sivus-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-mandatory-sig-pcid-payload/",
+      "tree_hash": "3ce175e89ae14c517939db9039e2af1f4ff2a4c2050a7556ac94d6435a2f0006"
+    },
+    {
+      "sim_id": "SIM-sutap-spec-sections-split-template",
+      "path": "simulations/SIM-sutap-spec-sections-split-template/",
+      "tree_hash": "7d2ed975444e7dd1a0a27e8dd1d6f4055a8b84e22175a957a8c981fb1f413dc8"
+    },
+    {
+      "sim_id": "SIM-suzuf-gordian-universal-envelope-negative-control",
+      "path": "simulations/SIM-suzuf-gordian-universal-envelope-negative-control/",
+      "tree_hash": "199100b54464c33bb4383f8ce9c3d5664b824838ff88d4161a8d690b03377eb4"
+    },
+    {
+      "sim_id": "SIM-tizad-scoped-conformance-citation-ledger",
+      "path": "simulations/SIM-tizad-scoped-conformance-citation-ledger/",
+      "tree_hash": "b375c48ea65da250eb49c0ceff62a07663815acc1c53cc386924cb3286fabc5f"
+    },
+    {
+      "sim_id": "SIM-togit-spec-sections-required-when-applicable",
+      "path": "simulations/SIM-togit-spec-sections-required-when-applicable/",
+      "tree_hash": "6a9e1226fa8914d1fd9767d6eedff77757e47a0a2b96f98d674a150770f0e20c"
+    },
+    {
+      "sim_id": "SIM-tohol-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-mandatory-opaque-bytes",
+      "path": "simulations/SIM-tohol-grid-envelope-enc-dag-cbor-unknown-hard-reject-sig-mandatory-opaque-bytes/",
+      "tree_hash": "86ce37ad43c89feda138427cb7edc9ad2cb1998b2b8412246fbc9ce1dc3d2490"
+    },
+    {
+      "sim_id": "SIM-tudar-l6-cas-promisebase-adapter-profile",
+      "path": "simulations/SIM-tudar-l6-cas-promisebase-adapter-profile/",
+      "tree_hash": "6c2abb880ff69e2a4b5e9895f65ee92dde3468ae93c11a0f546feff3eb8d0eee"
+    },
+    {
+      "sim_id": "SIM-tuhas-group-session-two-surface-freeze-gate",
+      "path": "simulations/SIM-tuhas-group-session-two-surface-freeze-gate/",
+      "tree_hash": "922fe155f0556c2815948fc7c7d60c4110e7e227d2cb2af2ab330e76d35c3f57"
+    },
+    {
+      "sim_id": "SIM-tupog-promise-accounting-observation-refusal-evidence",
+      "path": "simulations/SIM-tupog-promise-accounting-observation-refusal-evidence/",
+      "tree_hash": "9c3ccae4398b785afac97c1a894e685750d293b6e4040f7c3651704d7b539af5"
+    },
+    {
+      "sim_id": "SIM-vagak-l6-cas-minimal-pointer-raw-profile",
+      "path": "simulations/SIM-vagak-l6-cas-minimal-pointer-raw-profile/",
+      "tree_hash": "93ed6b00afc3d94381a3e4a416c793e7b201ed1f670dc0af547f8466c19fee07"
+    },
+    {
+      "sim_id": "SIM-vamaz-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-sig-pcid-payload",
+      "path": "simulations/SIM-vamaz-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-sig-pcid-payload/",
+      "tree_hash": "93c691c8787dbdc8be5fa107abae8706592ce57ce7b958a885d7cb1d577d0c1d"
+    },
+    {
+      "sim_id": "SIM-virim-manifested-embodiment-savepoint-receipts",
+      "path": "simulations/SIM-virim-manifested-embodiment-savepoint-receipts/",
+      "tree_hash": "7df2279006ed03cd2070bdecdef763477839a3e7b0229d048f53f21ed1d82849"
+    },
+    {
+      "sim_id": "SIM-vivus-grid-envelope-enc-cbor-unknown-best-effort-sig-wrapper-pcid",
+      "path": "simulations/SIM-vivus-grid-envelope-enc-cbor-unknown-best-effort-sig-wrapper-pcid/",
+      "tree_hash": "58aac6347a21eca760edb90e4c33f9105046b86ff556ebea7d7e85182b7d0552"
+    },
+    {
+      "sim_id": "SIM-vizan-gordian-selective-disclosure",
+      "path": "simulations/SIM-vizan-gordian-selective-disclosure/",
+      "tree_hash": "a0344f847a20f696402be4bb81705f998fb9a0f2c69b89a81e5bf75a0ddc305a"
+    },
+    {
+      "sim_id": "SIM-vopit-transport-receipts-at-scale",
+      "path": "simulations/SIM-vopit-transport-receipts-at-scale/",
+      "tree_hash": "0296d101bcc1d66b152b10009c3fd7e912eb0da942916f52f9bda4cf0d3c7c47"
+    },
+    {
+      "sim_id": "SIM-votoj-peer-adoption-structured-object",
+      "path": "simulations/SIM-votoj-peer-adoption-structured-object/",
+      "tree_hash": "adb3592995211962b89e86ffc4b78d8012af31efec475fd0649ce63a78a74238"
+    },
+    {
+      "sim_id": "SIM-vuliv-scoped-promise-evidence-records",
+      "path": "simulations/SIM-vuliv-scoped-promise-evidence-records/",
+      "tree_hash": "dad6e690288069f76dfec0e42facc6bd24c63b8ffe555e70b2edbc05959b1c35"
+    },
+    {
+      "sim_id": "SIM-vutar-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-opaque-bytes",
+      "path": "simulations/SIM-vutar-grid-envelope-enc-cbor-unknown-opaque-sig-mandatory-opaque-bytes/",
+      "tree_hash": "ae895e6a4a91751df8c391916c0c07169b9eacd5bb19a9992dfe10475f0a7419"
+    },
+    {
+      "sim_id": "SIM-zakil-spec-sections-guide-only",
+      "path": "simulations/SIM-zakil-spec-sections-guide-only/",
+      "tree_hash": "6a5c66d0ad4c70a583988375452abf7033e0bd0dfd2d62779b137b51635eff6c"
+    },
+    {
+      "sim_id": "SIM-zarud-conditional-release-geofencing",
+      "path": "simulations/SIM-zarud-conditional-release-geofencing/",
+      "tree_hash": "0a694dc9343b4a32f6fb9092e906d61194c2fe0fb0d63c4800125f47a3c5d961"
+    },
+    {
+      "sim_id": "SIM-zazit-chunk-feed-replication",
+      "path": "simulations/SIM-zazit-chunk-feed-replication/",
+      "tree_hash": "94381ef3396f4ec015b5541f34f6cad3d2c0b91cb56ed045c718bef55345de2e"
+    },
+    {
+      "sim_id": "SIM-zifik-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-unsigned-v0",
+      "path": "simulations/SIM-zifik-grid-envelope-enc-dag-cbor-unknown-best-effort-sig-unsigned-v0/",
+      "tree_hash": "588cdf7a9d0f14b9081b539d842ede027573f04c728321fa2ff7ea996f79a7da"
+    },
+    {
+      "sim_id": "SIM-zifoj-boundary-claim-promise-accounting-records",
+      "path": "simulations/SIM-zifoj-boundary-claim-promise-accounting-records/",
+      "tree_hash": "714bd034f0bcbacbafbf1e9db6f2d7cbc405a872b5390233f7c8390d511a3068"
+    },
+    {
+      "sim_id": "SIM-zisan-device-bound-agent",
+      "path": "simulations/SIM-zisan-device-bound-agent/",
+      "tree_hash": "4e24774dcf443da1a667e63bf1c84ecc23953d7a3ea2c7fb1d76baf96313d935"
+    },
+    {
+      "sim_id": "SIM-zubuf-cas-type-cid-codec-only",
+      "path": "simulations/SIM-zubuf-cas-type-cid-codec-only/",
+      "tree_hash": "8ed0fd394a31271380de3ed1e49a2700f22a654280e93e4c7bbb4d65bf0d89b5"
+    },
+    {
+      "sim_id": "SIM-zukis-grid-envelope-tag42-protocol-owned-slot2-varsig",
+      "path": "simulations/SIM-zukis-grid-envelope-tag42-protocol-owned-slot2-varsig/",
+      "tree_hash": "d26c43b11b40eb116bd45a59a1aa565c420a3060cc8b137bf87b06363978c55d"
+    }
+  ],
+  "scenario_sample": [
+    {
+      "scenario_id": "kernel-porting-boundary",
+      "path": "scenarios/kernel-porting-boundary/kernel-porting-boundary.md",
+      "sample_policy": "uniform root scenario sample",
+      "sha256": "9fb74983a513cb9a82f8708b22b937837d8a580187a7dd524cec23ca50bd63ed"
+    },
+    {
+      "scenario_id": "promise-accounting-records-kept-storage-promise",
+      "path": "scenarios/promise-accounting-records-kept-storage-promise/promise-accounting-records-kept-storage-promise.md",
+      "sample_policy": "uniform root scenario sample",
+      "sha256": "9972dff7f20d9b4f3231c07a8eb332d2e75b43e84cf0d34af29c1d3ea9c1ad74"
+    },
+    {
+      "scenario_id": "promise-accounting-records-refused-service",
+      "path": "scenarios/promise-accounting-records-refused-service/promise-accounting-records-refused-service.md",
+      "sample_policy": "uniform root scenario sample",
+      "sha256": "9a7d47455793988cfb9b0fb045b29086ed13ee22cd0db080584e259c0aa69313"
+    },
+    {
+      "scenario_id": "cas-object-model-dag-cbor-interop",
+      "path": "scenarios/cas-object-model-dag-cbor-interop/cas-object-model-dag-cbor-interop.md",
+      "sample_policy": "uniform root scenario sample",
+      "sha256": "d55a1b7926a7dd59d2709630231ddde5ba73f0f8f2b44e112755be7c25ba7bbe"
+    },
+    {
+      "scenario_id": "l6-cas-starting-profile-bakeoff-long-horizon-reprofile",
+      "path": "scenarios/l6-cas-starting-profile-bakeoff-long-horizon-reprofile/l6-cas-starting-profile-bakeoff-long-horizon-reprofile.md",
+      "sample_policy": "uniform root scenario sample",
+      "sha256": "ec26c30d1d7ec616449fba77cc9b73adbc8a68e8fd75d5aa8da40c3954163eb0"
+    }
+  ],
+  "parents": [
+    {
+      "sim_id": "SIM-fovip-kernel-promise-boundary-port-contract",
+      "explicit_include": true,
+      "rationale": "fitness-ranked selected-parent pool avg_normalized_0_100=84.92 samples=5"
+    },
+    {
+      "sim_id": "SIM-dalor-grid-envelope-protocol-owned-signature-slot",
+      "explicit_include": true,
+      "rationale": "fitness-ranked selected-parent pool avg_normalized_0_100=62.77 samples=5"
+    }
+  ],
+  "children": [
+    {
+      "child_id": "SIM-lasuv-child-kernel-port-capability-outcome-ledger",
+      "path": "proposals/ga-canary-20260525-goban-dalor-fovip-v4/simulations/SIM-lasuv-child-kernel-port-capability-outcome-ledger/",
+      "parent_ids": [
+        "SIM-fovip-kernel-promise-boundary-port-contract",
+        "SIM-dalor-grid-envelope-protocol-owned-signature-slot"
+      ],
+      "operation": "breed",
+      "prompt_hash": "d4501c86dbcd6e21669549b4888b81b16dd514c46af99f1f784e3fc25d4ffd50",
+      "response_hash": "5655bf55efd0ac857bf79a7a71c1fe45530b3ffcd659c5c2ec10803d715bc863",
+      "files": [
+        {
+          "path": "proposals/ga-canary-20260525-goban-dalor-fovip-v4/simulations/SIM-lasuv-child-kernel-port-capability-outcome-ledger/QUESTION.md",
+          "sha256": "672324f1045dc7042d70dfa2c6ac039ea05ded70522fcddd5778c41634dbe8d2"
+        },
+        {
+          "path": "proposals/ga-canary-20260525-goban-dalor-fovip-v4/simulations/SIM-lasuv-child-kernel-port-capability-outcome-ledger/README.md",
+          "sha256": "87203fb48b252df932f651b6f22569d386baa1f5d11d548af4fabfa3e3c8e25c"
+        },
+        {
+          "path": "proposals/ga-canary-20260525-goban-dalor-fovip-v4/simulations/SIM-lasuv-child-kernel-port-capability-outcome-ledger/protocols/kernel-port-ledger.d/specs/kernel-port-ledger-draft.md",
+          "sha256": "ca6a2cc3c5f7b4fefe841ae8152e7836a125b3338d465cfce8aedd7167cb8362"
+        }
+      ],
+      "tree_hash": "0da68ac85306344ae8e46e2e350634db6385ac8426873d7754efb0cf1660f3da",
+      "status": "culled",
+      "design_delta_summary": "Tightens the kernel port contract with three bounded moves: (1) replace the coarse supported-pCID list with per-pCID capability entries naming the local promiser plus receive/send/proof/byte-retention behavior, (2) add a deterministic DAG-CBOR local outcome ledger that distinguishes kept, refused, unavailable, broken, unsupported-pCID, unverifiable-proof, and timeout observations with exact-byte or CID witnesses, and (3) import protocol-owned proof auditing from the envelope parent only as an optional per-pCID capability declaration, not as a universal mandatory outer signature slot.",
+      "validation_message": "validated child tree",
+      "updated_at": "2026-05-25T22:50:48Z",
+      "provider": "openai",
+      "api_model": "gpt-5.4",
+      "reasoning_effort": "medium",
+      "service_tier": "default",
+      "served_service_tier": "default",
+      "request_id": "req_98f5a4a3f216449f91bf79ccc88328af",
+      "response_id": "resp_0066037af60b785d006a14d1dd8e5081999e505a0452785d65",
+      "usage_json": "{\"input_tokens\":12078,\"input_tokens_details\":{\"cached_tokens\":0},\"output_tokens\":7972,\"output_tokens_details\":{\"reasoning_tokens\":4846},\"total_tokens\":20050}",
+      "input_tokens": 12078,
+      "output_tokens": 7972,
+      "cost_usd": 0.1327445
+    }
+  ],
+  "cells": [
+    {
+      "cell_id": "ga-canary-20260525-goban-dalor-fovip-v4-000001-SIM-dalor-grid-envelope-protocol-owned-signature-slot--kernel-porting-boundary--openai-gpt-5.4-medium",
+      "sim_id": "SIM-dalor-grid-envelope-protocol-owned-signature-slot",
+      "scenario_id": "kernel-porting-boundary",
+      "model_id": "openai-gpt-5.4-medium",
+      "result_path": "results/SIM-dalor-grid-envelope-protocol-owned-signature-slot/kernel-porting-boundary/openai-gpt-5.4-medium/20260525-152502.json",
+      "status": "done",
+      "attempts": 1,
+      "validation_message": "validated result",
+      "updated_at": "2026-05-25T22:47:58Z",
+      "provider": "openai",
+      "api_model": "gpt-5.4",
+      "reasoning_effort": "medium",
+      "output_contract": "json_schema_strict",
+      "service_tier": "default",
+      "served_service_tier": "default",
+      "request_id": "req_b44be4f0608d43a389356f188f6b4ba3",
+      "response_id": "resp_072eb6b456279b02006a14d17fce248198905fcf9f85082e5b",
+      "usage_json": "{\"input_tokens\":10522,\"input_tokens_details\":{\"cached_tokens\":0},\"output_tokens\":1943,\"output_tokens_details\":{\"reasoning_tokens\":1257},\"total_tokens\":12465}",
+      "input_tokens": 10522,
+      "output_tokens": 1943,
+      "cost_usd": 0.0456155
+    },
+    {
+      "cell_id": "ga-canary-20260525-goban-dalor-fovip-v4-000002-SIM-dalor-grid-envelope-protocol-owned-signature-slot--promise-accounting-records-kept-storage-promise--openai-gpt-5.4-medium",
+      "sim_id": "SIM-dalor-grid-envelope-protocol-owned-signature-slot",
+      "scenario_id": "promise-accounting-records-kept-storage-promise",
+      "model_id": "openai-gpt-5.4-medium",
+      "result_path": "results/SIM-dalor-grid-envelope-protocol-owned-signature-slot/promise-accounting-records-kept-storage-promise/openai-gpt-5.4-medium/20260525-152502.json",
+      "status": "done",
+      "attempts": 1,
+      "validation_message": "validated result",
+      "updated_at": "2026-05-25T22:48:10Z",
+      "provider": "openai",
+      "api_model": "gpt-5.4",
+      "reasoning_effort": "medium",
+      "output_contract": "json_schema_strict",
+      "service_tier": "default",
+      "served_service_tier": "default",
+      "request_id": "req_87b4bbee3cce438f8e46ab86ab447fdd",
+      "response_id": "resp_0cb0752c26b02e56006a14d17fba98819887495330b3bb5af0",
+      "usage_json": "{\"input_tokens\":9748,\"input_tokens_details\":{\"cached_tokens\":0},\"output_tokens\":2634,\"output_tokens_details\":{\"reasoning_tokens\":1980},\"total_tokens\":12382}",
+      "input_tokens": 9748,
+      "output_tokens": 2634,
+      "cost_usd": 0.053935
+    },
+    {
+      "cell_id": "ga-canary-20260525-goban-dalor-fovip-v4-000003-SIM-dalor-grid-envelope-protocol-owned-signature-slot--promise-accounting-records-refused-service--openai-gpt-5.4-medium",
+      "sim_id": "SIM-dalor-grid-envelope-protocol-owned-signature-slot",
+      "scenario_id": "promise-accounting-records-refused-service",
+      "model_id": "openai-gpt-5.4-medium",
+      "result_path": "results/SIM-dalor-grid-envelope-protocol-owned-signature-slot/promise-accounting-records-refused-service/openai-gpt-5.4-medium/20260525-152502.json",
+      "status": "done",
+      "attempts": 1,
+      "validation_message": "validated result",
+      "updated_at": "2026-05-25T22:47:55Z",
+      "provider": "openai",
+      "api_model": "gpt-5.4",
+      "reasoning_effort": "medium",
+      "output_contract": "json_schema_strict",
+      "service_tier": "default",
+      "served_service_tier": "default",
+      "request_id": "req_b4a10b36ac904b828a486c3cd71486df",
+      "response_id": "resp_0e8f8a6781e66d15006a14d17fc918819bab8a36a1aa3bfacb",
+      "usage_json": "{\"input_tokens\":9733,\"input_tokens_details\":{\"cached_tokens\":0},\"output_tokens\":1673,\"output_tokens_details\":{\"reasoning_tokens\":945},\"total_tokens\":11406}",
+      "input_tokens": 9733,
+      "output_tokens": 1673,
+      "cost_usd": 0.04045475
+    },
+    {
+      "cell_id": "ga-canary-20260525-goban-dalor-fovip-v4-000004-SIM-dalor-grid-envelope-protocol-owned-signature-slot--cas-object-model-dag-cbor-interop--openai-gpt-5.4-medium",
+      "sim_id": "SIM-dalor-grid-envelope-protocol-owned-signature-slot",
+      "scenario_id": "cas-object-model-dag-cbor-interop",
+      "model_id": "openai-gpt-5.4-medium",
+      "result_path": "results/SIM-dalor-grid-envelope-protocol-owned-signature-slot/cas-object-model-dag-cbor-interop/openai-gpt-5.4-medium/20260525-152502.json",
+      "status": "done",
+      "attempts": 1,
+      "validation_message": "validated result",
+      "updated_at": "2026-05-25T22:47:54Z",
+      "provider": "openai",
+      "api_model": "gpt-5.4",
+      "reasoning_effort": "medium",
+      "output_contract": "json_schema_strict",
+      "service_tier": "default",
+      "served_service_tier": "default",
+      "request_id": "req_2c30b28aa9f64d2e8b564d3197a64d86",
+      "response_id": "resp_0a6a123780ae1e9f006a14d17fcbfc819a9e3ed73baf1e59db",
+      "usage_json": "{\"input_tokens\":9755,\"input_tokens_details\":{\"cached_tokens\":0},\"output_tokens\":1554,\"output_tokens_details\":{\"reasoning_tokens\":819},\"total_tokens\":11309}",
+      "input_tokens": 9755,
+      "output_tokens": 1554,
+      "cost_usd": 0.03882725
+    },
+    {
+      "cell_id": "ga-canary-20260525-goban-dalor-fovip-v4-000005-SIM-dalor-grid-envelope-protocol-owned-signature-slot--l6-cas-starting-profile-bakeoff-long-horizon-reprofile--openai-gpt-5.4-medium",
+      "sim_id": "SIM-dalor-grid-envelope-protocol-owned-signature-slot",
+      "scenario_id": "l6-cas-starting-profile-bakeoff-long-horizon-reprofile",
+      "model_id": "openai-gpt-5.4-medium",
+      "result_path": "results/SIM-dalor-grid-envelope-protocol-owned-signature-slot/l6-cas-starting-profile-bakeoff-long-horizon-reprofile/openai-gpt-5.4-medium/20260525-152502.json",
+      "status": "done",
+      "attempts": 1,
+      "validation_message": "validated result",
+      "updated_at": "2026-05-25T22:47:55Z",
+      "provider": "openai",
+      "api_model": "gpt-5.4",
+      "reasoning_effort": "medium",
+      "output_contract": "json_schema_strict",
+      "service_tier": "default",
+      "served_service_tier": "default",
+      "request_id": "req_72ae5f88c31f48aeb17bb5107537393c",
+      "response_id": "resp_05d62df5a931b122006a14d17fcd7081999d226019dad9d76d",
+      "usage_json": "{\"input_tokens\":9791,\"input_tokens_details\":{\"cached_tokens\":0},\"output_tokens\":1744,\"output_tokens_details\":{\"reasoning_tokens\":1017},\"total_tokens\":11535}",
+      "input_tokens": 9791,
+      "output_tokens": 1744,
+      "cost_usd": 0.04155025
+    },
+    {
+      "cell_id": "ga-canary-20260525-goban-dalor-fovip-v4-000006-SIM-fovip-kernel-promise-boundary-port-contract--kernel-porting-boundary--openai-gpt-5.4-medium",
+      "sim_id": "SIM-fovip-kernel-promise-boundary-port-contract",
+      "scenario_id": "kernel-porting-boundary",
+      "model_id": "openai-gpt-5.4-medium",
+      "result_path": "results/SIM-fovip-kernel-promise-boundary-port-contract/kernel-porting-boundary/openai-gpt-5.4-medium/20260525-152502.json",
+      "status": "done",
+      "attempts": 1,
+      "validation_message": "validated result",
+      "updated_at": "2026-05-25T22:48:19Z",
+      "provider": "openai",
+      "api_model": "gpt-5.4",
+      "reasoning_effort": "medium",
+      "output_contract": "json_schema_strict",
+      "service_tier": "default",
+      "served_service_tier": "default",
+      "request_id": "req_e8761af8f33a4a388eff703243aba0bd",
+      "response_id": "resp_04c8081807aa3852006a14d19a7390819b913ffb7260902615",
+      "usage_json": "{\"input_tokens\":11472,\"input_tokens_details\":{\"cached_tokens\":0},\"output_tokens\":1518,\"output_tokens_details\":{\"reasoning_tokens\":818},\"total_tokens\":12990}",
+      "input_tokens": 11472,
+      "output_tokens": 1518,
+      "cost_usd": 0.041328
+    },
+    {
+      "cell_id": "ga-canary-20260525-goban-dalor-fovip-v4-000007-SIM-fovip-kernel-promise-boundary-port-contract--promise-accounting-records-kept-storage-promise--openai-gpt-5.4-medium",
+      "sim_id": "SIM-fovip-kernel-promise-boundary-port-contract",
+      "scenario_id": "promise-accounting-records-kept-storage-promise",
+      "model_id": "openai-gpt-5.4-medium",
+      "result_path": "results/SIM-fovip-kernel-promise-boundary-port-contract/promise-accounting-records-kept-storage-promise/openai-gpt-5.4-medium/20260525-152502.json",
+      "status": "done",
+      "attempts": 1,
+      "validation_message": "validated result",
+      "updated_at": "2026-05-25T22:48:20Z",
+      "provider": "openai",
+      "api_model": "gpt-5.4",
+      "reasoning_effort": "medium",
+      "output_contract": "json_schema_strict",
+      "service_tier": "default",
+      "served_service_tier": "default",
+      "request_id": "req_9c48353a607849bebda3c874b12ad868",
+      "response_id": "resp_0e1ccb2663445bfd006a14d19b3644819b8158df7e1cb77f0a",
+      "usage_json": "{\"input_tokens\":10698,\"input_tokens_details\":{\"cached_tokens\":0},\"output_tokens\":1647,\"output_tokens_details\":{\"reasoning_tokens\":1034},\"total_tokens\":12345}",
+      "input_tokens": 10698,
+      "output_tokens": 1647,
+      "cost_usd": 0.0417795
+    },
+    {
+      "cell_id": "ga-canary-20260525-goban-dalor-fovip-v4-000008-SIM-fovip-kernel-promise-boundary-port-contract--promise-accounting-records-refused-service--openai-gpt-5.4-medium",
+      "sim_id": "SIM-fovip-kernel-promise-boundary-port-contract",
+      "scenario_id": "promise-accounting-records-refused-service",
+      "model_id": "openai-gpt-5.4-medium",
+      "result_path": "results/SIM-fovip-kernel-promise-boundary-port-contract/promise-accounting-records-refused-service/openai-gpt-5.4-medium/20260525-152502.json",
+      "status": "done",
+      "attempts": 1,
+      "validation_message": "validated result",
+      "updated_at": "2026-05-25T22:48:27Z",
+      "provider": "openai",
+      "api_model": "gpt-5.4",
+      "reasoning_effort": "medium",
+      "output_contract": "json_schema_strict",
+      "service_tier": "default",
+      "served_service_tier": "default",
+      "request_id": "req_0e300603c4154f3fa7a0183ab16524bf",
+      "response_id": "resp_0fee55942f4e6975006a14d19bdafc819bb5e52ce04c6a66da",
+      "usage_json": "{\"input_tokens\":10683,\"input_tokens_details\":{\"cached_tokens\":0},\"output_tokens\":1487,\"output_tokens_details\":{\"reasoning_tokens\":791},\"total_tokens\":12170}",
+      "input_tokens": 10683,
+      "output_tokens": 1487,
+      "cost_usd": 0.03951325
+    },
+    {
+      "cell_id": "ga-canary-20260525-goban-dalor-fovip-v4-000009-SIM-fovip-kernel-promise-boundary-port-contract--cas-object-model-dag-cbor-interop--openai-gpt-5.4-medium",
+      "sim_id": "SIM-fovip-kernel-promise-boundary-port-contract",
+      "scenario_id": "cas-object-model-dag-cbor-interop",
+      "model_id": "openai-gpt-5.4-medium",
+      "result_path": "results/SIM-fovip-kernel-promise-boundary-port-contract/cas-object-model-dag-cbor-interop/openai-gpt-5.4-medium/20260525-152502.json",
+      "status": "done",
+      "attempts": 1,
+      "validation_message": "validated result",
+      "updated_at": "2026-05-25T22:48:30Z",
+      "provider": "openai",
+      "api_model": "gpt-5.4",
+      "reasoning_effort": "medium",
+      "output_contract": "json_schema_strict",
+      "service_tier": "default",
+      "served_service_tier": "default",
+      "request_id": "req_08c1a0d7e9494a0a8ae9f070ea0c4712",
+      "response_id": "resp_042a2999d03a5fcb006a14d19e49ac819a91d67bbc70ba0d5e",
+      "usage_json": "{\"input_tokens\":10705,\"input_tokens_details\":{\"cached_tokens\":0},\"output_tokens\":2090,\"output_tokens_details\":{\"reasoning_tokens\":1347},\"total_tokens\":12795}",
+      "input_tokens": 10705,
+      "output_tokens": 2090,
+      "cost_usd": 0.04799375
+    },
+    {
+      "cell_id": "ga-canary-20260525-goban-dalor-fovip-v4-000010-SIM-fovip-kernel-promise-boundary-port-contract--l6-cas-starting-profile-bakeoff-long-horizon-reprofile--openai-gpt-5.4-medium",
+      "sim_id": "SIM-fovip-kernel-promise-boundary-port-contract",
+      "scenario_id": "l6-cas-starting-profile-bakeoff-long-horizon-reprofile",
+      "model_id": "openai-gpt-5.4-medium",
+      "result_path": "results/SIM-fovip-kernel-promise-boundary-port-contract/l6-cas-starting-profile-bakeoff-long-horizon-reprofile/openai-gpt-5.4-medium/20260525-152502.json",
+      "status": "done",
+      "attempts": 1,
+      "validation_message": "validated result",
+      "updated_at": "2026-05-25T22:48:34Z",
+      "provider": "openai",
+      "api_model": "gpt-5.4",
+      "reasoning_effort": "medium",
+      "output_contract": "json_schema_strict",
+      "service_tier": "default",
+      "served_service_tier": "default",
+      "request_id": "req_5e85d5c4ce4a4628a61ef989881424d8",
+      "response_id": "resp_014df19d1a67b2f1006a14d1aac26c819ab834f9b023ead088",
+      "usage_json": "{\"input_tokens\":10741,\"input_tokens_details\":{\"cached_tokens\":0},\"output_tokens\":1482,\"output_tokens_details\":{\"reasoning_tokens\":781},\"total_tokens\":12223}",
+      "input_tokens": 10741,
+      "output_tokens": 1482,
+      "cost_usd": 0.03954475
+    },
+    {
+      "cell_id": "ga-canary-20260525-goban-dalor-fovip-v4-000011-SIM-lasuv-child-kernel-port-capability-outcome-ledger--kernel-porting-boundary--openai-gpt-5.4-medium",
+      "sim_id": "SIM-lasuv-child-kernel-port-capability-outcome-ledger",
+      "scenario_id": "kernel-porting-boundary",
+      "model_id": "openai-gpt-5.4-medium",
+      "result_path": "proposals/ga-canary-20260525-goban-dalor-fovip-v4/results/SIM-lasuv-child-kernel-port-capability-outcome-ledger/kernel-porting-boundary/openai-gpt-5.4-medium/20260525-152502.json",
+      "status": "done",
+      "attempts": 1,
+      "validation_message": "validated result",
+      "updated_at": "2026-05-25T22:51:43Z",
+      "provider": "openai",
+      "api_model": "gpt-5.4",
+      "reasoning_effort": "medium",
+      "output_contract": "json_schema_strict",
+      "service_tier": "default",
+      "served_service_tier": "default",
+      "request_id": "req_c3fbaa5cb79c40a6b0570fd533e49ac7",
+      "response_id": "resp_03180a13a98aea19006a14d25c3624819a9abcec35707614e1",
+      "usage_json": "{\"input_tokens\":11952,\"input_tokens_details\":{\"cached_tokens\":0},\"output_tokens\":2312,\"output_tokens_details\":{\"reasoning_tokens\":1587},\"total_tokens\":14264}",
+      "input_tokens": 11952,
+      "output_tokens": 2312,
+      "cost_usd": 0.053284
+    },
+    {
+      "cell_id": "ga-canary-20260525-goban-dalor-fovip-v4-000012-SIM-lasuv-child-kernel-port-capability-outcome-ledger--promise-accounting-records-kept-storage-promise--openai-gpt-5.4-medium",
+      "sim_id": "SIM-lasuv-child-kernel-port-capability-outcome-ledger",
+      "scenario_id": "promise-accounting-records-kept-storage-promise",
+      "model_id": "openai-gpt-5.4-medium",
+      "result_path": "proposals/ga-canary-20260525-goban-dalor-fovip-v4/results/SIM-lasuv-child-kernel-port-capability-outcome-ledger/promise-accounting-records-kept-storage-promise/openai-gpt-5.4-medium/20260525-152502.json",
+      "status": "done",
+      "attempts": 1,
+      "validation_message": "validated result",
+      "updated_at": "2026-05-25T22:51:31Z",
+      "provider": "openai",
+      "api_model": "gpt-5.4",
+      "reasoning_effort": "medium",
+      "output_contract": "json_schema_strict",
+      "service_tier": "default",
+      "served_service_tier": "default",
+      "request_id": "req_eb67a8f596e74651882125933037e9b8",
+      "response_id": "resp_0044493ae4742fb4006a14d25c2c3c8199836e2534cf3687d8",
+      "usage_json": "{\"input_tokens\":11178,\"input_tokens_details\":{\"cached_tokens\":0},\"output_tokens\":1378,\"output_tokens_details\":{\"reasoning_tokens\":711},\"total_tokens\":12556}",
+      "input_tokens": 11178,
+      "output_tokens": 1378,
+      "cost_usd": 0.0388535
+    },
+    {
+      "cell_id": "ga-canary-20260525-goban-dalor-fovip-v4-000013-SIM-lasuv-child-kernel-port-capability-outcome-ledger--promise-accounting-records-refused-service--openai-gpt-5.4-medium",
+      "sim_id": "SIM-lasuv-child-kernel-port-capability-outcome-ledger",
+      "scenario_id": "promise-accounting-records-refused-service",
+      "model_id": "openai-gpt-5.4-medium",
+      "result_path": "proposals/ga-canary-20260525-goban-dalor-fovip-v4/results/SIM-lasuv-child-kernel-port-capability-outcome-ledger/promise-accounting-records-refused-service/openai-gpt-5.4-medium/20260525-152502.json",
+      "status": "done",
+      "attempts": 1,
+      "validation_message": "validated result",
+      "updated_at": "2026-05-25T22:51:35Z",
+      "provider": "openai",
+      "api_model": "gpt-5.4",
+      "reasoning_effort": "medium",
+      "output_contract": "json_schema_strict",
+      "service_tier": "default",
+      "served_service_tier": "default",
+      "request_id": "req_436eace649ed41488901b2878981612e",
+      "response_id": "resp_0201232d4b3acc1d006a14d25c2dcc819bb8dc261d1fe40d8c",
+      "usage_json": "{\"input_tokens\":11163,\"input_tokens_details\":{\"cached_tokens\":0},\"output_tokens\":1682,\"output_tokens_details\":{\"reasoning_tokens\":976},\"total_tokens\":12845}",
+      "input_tokens": 11163,
+      "output_tokens": 1682,
+      "cost_usd": 0.04308325
+    },
+    {
+      "cell_id": "ga-canary-20260525-goban-dalor-fovip-v4-000014-SIM-lasuv-child-kernel-port-capability-outcome-ledger--cas-object-model-dag-cbor-interop--openai-gpt-5.4-medium",
+      "sim_id": "SIM-lasuv-child-kernel-port-capability-outcome-ledger",
+      "scenario_id": "cas-object-model-dag-cbor-interop",
+      "model_id": "openai-gpt-5.4-medium",
+      "result_path": "proposals/ga-canary-20260525-goban-dalor-fovip-v4/results/SIM-lasuv-child-kernel-port-capability-outcome-ledger/cas-object-model-dag-cbor-interop/openai-gpt-5.4-medium/20260525-152502.json",
+      "status": "done",
+      "attempts": 1,
+      "validation_message": "validated result",
+      "updated_at": "2026-05-25T22:51:40Z",
+      "provider": "openai",
+      "api_model": "gpt-5.4",
+      "reasoning_effort": "medium",
+      "output_contract": "json_schema_strict",
+      "service_tier": "default",
+      "served_service_tier": "default",
+      "request_id": "req_d8578119df854e239cb9c0de4a7310ab",
+      "response_id": "resp_058bc64be175b87f006a14d25c53488199835a64315f42f008",
+      "usage_json": "{\"input_tokens\":11185,\"input_tokens_details\":{\"cached_tokens\":0},\"output_tokens\":2024,\"output_tokens_details\":{\"reasoning_tokens\":1286},\"total_tokens\":13209}",
+      "input_tokens": 11185,
+      "output_tokens": 2024,
+      "cost_usd": 0.04790975
+    },
+    {
+      "cell_id": "ga-canary-20260525-goban-dalor-fovip-v4-000015-SIM-lasuv-child-kernel-port-capability-outcome-ledger--l6-cas-starting-profile-bakeoff-long-horizon-reprofile--openai-gpt-5.4-medium",
+      "sim_id": "SIM-lasuv-child-kernel-port-capability-outcome-ledger",
+      "scenario_id": "l6-cas-starting-profile-bakeoff-long-horizon-reprofile",
+      "model_id": "openai-gpt-5.4-medium",
+      "result_path": "proposals/ga-canary-20260525-goban-dalor-fovip-v4/results/SIM-lasuv-child-kernel-port-capability-outcome-ledger/l6-cas-starting-profile-bakeoff-long-horizon-reprofile/openai-gpt-5.4-medium/20260525-152502.json",
+      "status": "done",
+      "attempts": 1,
+      "validation_message": "validated result",
+      "updated_at": "2026-05-25T22:51:30Z",
+      "provider": "openai",
+      "api_model": "gpt-5.4",
+      "reasoning_effort": "medium",
+      "output_contract": "json_schema_strict",
+      "service_tier": "default",
+      "served_service_tier": "default",
+      "request_id": "req_da0a8280c57b41eb834dd513fc21cb7d",
+      "response_id": "resp_09c3359e8b27444c006a14d25c66f0819b9cbf6be33e6f41cd",
+      "usage_json": "{\"input_tokens\":11221,\"input_tokens_details\":{\"cached_tokens\":0},\"output_tokens\":1411,\"output_tokens_details\":{\"reasoning_tokens\":721},\"total_tokens\":12632}",
+      "input_tokens": 11221,
+      "output_tokens": 1411,
+      "cost_usd": 0.03939075
+    }
+  ],
+  "culling": [
+    {
+      "culled_child_ids": [
+        "SIM-lasuv-child-kernel-port-capability-outcome-ledger"
+      ],
+      "deleted_sim_paths": [
+        "proposals/ga-canary-20260525-goban-dalor-fovip-v4/simulations/SIM-lasuv-child-kernel-port-capability-outcome-ledger"
+      ],
+      "deleted_result_paths": [
+        "proposals/ga-canary-20260525-goban-dalor-fovip-v4/results/SIM-lasuv-child-kernel-port-capability-outcome-ledger"
+      ],
+      "reason": "Rejected under DI-dikat: Lasuv drifts toward RPC/service-registry/capability-table design; mine only local observation/evidence lessons.",
+      "culled_at": "2026-05-25T23:46:17Z"
+    }
+  ]
+}

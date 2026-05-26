@@ -1,0 +1,176 @@
+{
+  "schema": "promisegrid.ga.result.v4",
+  "result_id": "SIM-fovip-kernel-promise-boundary-port-contract-promise-accounting-records-refused-service-openai-gpt-5.4-medium-20260525-152502",
+  "run_group_id": "ga-canary-20260525-goban-dalor-fovip-v4",
+  "cell_id": "ga-canary-20260525-goban-dalor-fovip-v4-000008-SIM-fovip-kernel-promise-boundary-port-contract--promise-accounting-records-refused-service--openai-gpt-5.4-medium",
+  "sim_id": "SIM-fovip-kernel-promise-boundary-port-contract",
+  "scenario_id": "promise-accounting-records-refused-service",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260525-152502",
+  "result_path": "results/SIM-fovip-kernel-promise-boundary-port-contract/promise-accounting-records-refused-service/openai-gpt-5.4-medium/20260525-152502.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "default",
+    "served_service_tier": "default",
+    "request_id": "req_0e300603c4154f3fa7a0183ab16524bf",
+    "response_id": "resp_0fee55942f4e6975006a14d19bdafc819bb5e52ce04c6a66da",
+    "input_tokens": 10683,
+    "output_tokens": 1487,
+    "cost_usd": 0.03951325
+  },
+  "source": {
+    "repo_commit": "685d4c3ba63b1486c4ff85930023c589d3e9e942",
+    "sim_path": "simulations/SIM-fovip-kernel-promise-boundary-port-contract/",
+    "scenario_path": "scenarios/promise-accounting-records-refused-service/promise-accounting-records-refused-service.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-fovip-kernel-promise-boundary-port-contract/README.md",
+        "sha256": "76401fe20d84f82f8951e432077d87adac22ad9faec5ed51ad6bd938d37fbada"
+      },
+      {
+        "path": "simulations/SIM-fovip-kernel-promise-boundary-port-contract/QUESTION.md",
+        "sha256": "7a5f8d8a7f58a2be143eff3a805c3ee1d56efe87970a237e2d14f7dd361ca71a"
+      },
+      {
+        "path": "simulations/SIM-fovip-kernel-promise-boundary-port-contract/protocols/kernel-port.d/specs/kernel-port-contract-draft.md",
+        "sha256": "398868ef9f86478d5e2719f0f3771ddb905a5e3fd65882c8985bf89967381260"
+      },
+      {
+        "path": "scenarios/promise-accounting-records-refused-service/promise-accounting-records-refused-service.md",
+        "sha256": "9a7d47455793988cfb9b0fb045b29086ed13ee22cd0db080584e259c0aa69313"
+      }
+    ],
+    "simulation_tree_hash": "c687a3c548d7e9d1aebc6f314ca718d0bf83ab21c87b675c653e586161102361"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260525-v4",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "app_protocol_promise_semantics": "0 uses command/permission framing, 5 models storage, computation, send/receive, reciprocal promises, local trust, and make/break evidence",
+      "envelope_discipline": "0 ignores the settled envelope direction or confuses pCID, 5 aligns with grid([42(pCID), payload, ...]), Protocol-CID semantics, and protocol-owned later slots",
+      "kernel_implementation_promises": "0 treats the kernel as authority or generic port conformance, 5 names local kernel implementation promises, assumptions, unsupported behavior, and evidence",
+      "promise_vocabulary": "0 drifts into claims/profiles/generic statement capsules/central trust-ledger framing, 5 stays promise-first, layer-local, and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt, selector-shopping, or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "envelope_discipline",
+      "kernel_implementation_promises",
+      "app_protocol_promise_semantics",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 4,
+    "promisegrid_alignment": 5,
+    "auditability": 5,
+    "evolution_safety": 5,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 5,
+    "implementation_plausibility": 5,
+    "promise_vocabulary": 5,
+    "simplicity_durability": 4,
+    "envelope_discipline": 5,
+    "kernel_implementation_promises": 5,
+    "app_protocol_promise_semantics": 3,
+    "risk_penalty": 1
+  },
+  "fitness": {
+    "raw": 60,
+    "normalized_0_100": 92.3076923076923,
+    "confidence_0_1": 0.88
+  },
+  "assessment": {
+    "rationale": "Strong fit at the claimed kernel layer. The specimen explicitly distinguishes refused, unavailable, kept, and broken promises in its evidence policy and makes refusal an honest local outcome rather than generic failure. It stays promise-first, keeps trust local, and cleanly separates kernel promises from host assumptions. Scenario coverage is slightly limited only because application-specific promise accounting semantics are intentionally delegated above the kernel boundary.",
+    "strengths": [
+      "Explicit evidence categories include refused, unavailable, kept, and broken promises.",
+      "Clear kernel/app and kernel/host boundary language supports honest refusal without authority framing.",
+      "Strong promise-first vocabulary with local trust and no global certificate semantics.",
+      "Explicit unsupported-feature and unsupported-pCID behavior improves refusal auditability and evolution safety."
+    ],
+    "weaknesses": [
+      "The draft names refusal evidence but does not fully specify a concrete refusal-record wire shape in the provided text.",
+      "Scenario handling is kernel-centric and stops short of richer higher-layer promise-accounting workflows.",
+      "The record shape is somewhat broad, which may increase implementation variance across runtime classes."
+    ],
+    "risks": [
+      "Because the record is still a draft, different ports could encode refusal evidence incompatibly before a stable pCID-defined shape exists.",
+      "Consumers may misread host assumptions as guaranteed kernel behavior if implementations do not keep the separation sharp.",
+      "In split-service deployments, refusal attribution could become ambiguous if multiple local promisers emit overlapping evidence."
+    ],
+    "open_questions": [
+      "What exact byte-level refusal record shape should ports emit so refusal stays distinguishable from unavailability, corruption, and broken promises across profiles?",
+      "How should split local-service ports correlate refusal evidence across dispatch, storage, network, and key promisers without implying a single authority?",
+      "What minimum app-facing mapping is needed so local apps can reliably consume refusal evidence without assuming higher-layer application semantics?"
+    ],
+    "authority_boundary": "Evidence only; draft kernel-port promise record, not a final PromiseGrid kernel API or global trust authority.",
+    "pt_gate": {
+      "status": "pt_clean",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "Ports, hosts, apps, and local services are modeled as separate promisers with autonomous behavior."
+      },
+      "scoped_intent": {
+        "status": "pass",
+        "note": "The kernel implementation promise record is a scoped declaration of the local port's behavior and limits."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "Host assumptions are separated from implementation promises unless the host is itself an explicit promiser."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "Promises cover intended behavior and evidence retention, not guaranteed service outcomes."
+      },
+      "local_trust_assessment": {
+        "status": "pass",
+        "note": "The record is explicitly not a global certificate; later agents assess make/break history locally."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "The draft keeps receive/use behavior as local promises and evidence, not obligations or imposed duties."
+      },
+      "violations": []
+    }
+  }
+}

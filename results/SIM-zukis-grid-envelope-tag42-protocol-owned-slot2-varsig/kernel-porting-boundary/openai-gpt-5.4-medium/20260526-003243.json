@@ -1,0 +1,176 @@
+{
+  "schema": "promisegrid.ga.result.v4",
+  "result_id": "SIM-zukis-grid-envelope-tag42-protocol-owned-slot2-varsig-kernel-porting-boundary-openai-gpt-5.4-medium-20260526-003243",
+  "run_group_id": "ga-canary-20260525-hozif-anti-rpc-calibration",
+  "cell_id": "ga-canary-20260525-hozif-anti-rpc-calibration-000007-SIM-zukis-grid-envelope-tag42-protocol-owned-slot2-varsig--kernel-porting-boundary--openai-gpt-5.4-medium",
+  "sim_id": "SIM-zukis-grid-envelope-tag42-protocol-owned-slot2-varsig",
+  "scenario_id": "kernel-porting-boundary",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260526-003243",
+  "result_path": "results/SIM-zukis-grid-envelope-tag42-protocol-owned-slot2-varsig/kernel-porting-boundary/openai-gpt-5.4-medium/20260526-003243.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "flex",
+    "served_service_tier": "flex",
+    "request_id": "req_be84324978fc4e6b9486efdf055badf5",
+    "response_id": "resp_0d4093ca8d37deb7006a14ea40b01c8198834aea39209913c0",
+    "input_tokens": 11404,
+    "output_tokens": 1514,
+    "cost_usd": 0.041153
+  },
+  "source": {
+    "repo_commit": "e8e6fe7b627498f4acd4ba1bde7fb8067920b15e",
+    "sim_path": "simulations/SIM-zukis-grid-envelope-tag42-protocol-owned-slot2-varsig/",
+    "scenario_path": "scenarios/kernel-porting-boundary/kernel-porting-boundary.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-zukis-grid-envelope-tag42-protocol-owned-slot2-varsig/README.md",
+        "sha256": "3d8f0dc34bb089ea869da3e7734449d6a9e63686d3771a1092f7a996ed5dbd38"
+      },
+      {
+        "path": "simulations/SIM-zukis-grid-envelope-tag42-protocol-owned-slot2-varsig/QUESTION.md",
+        "sha256": "6ac92c465fd8e4b3df471a5f1f5dc2ddb6b5a9a7327e99337283d48fcb655176"
+      },
+      {
+        "path": "simulations/SIM-zukis-grid-envelope-tag42-protocol-owned-slot2-varsig/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "bba64aaf5e62ab2f2eb657e36d24eed2d271d19f204ae496e9422d7bd3ac84df"
+      },
+      {
+        "path": "scenarios/kernel-porting-boundary/kernel-porting-boundary.md",
+        "sha256": "9fb74983a513cb9a82f8708b22b937837d8a580187a7dd524cec23ca50bd63ed"
+      }
+    ],
+    "simulation_tree_hash": "d26c43b11b40eb116bd45a59a1aa565c420a3060cc8b137bf87b06363978c55d"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260525-v4",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "app_protocol_promise_semantics": "0 uses command/request-response-service/permission framing or needless pCID fragmentation, 5 models storage, computation, send/receive, reciprocal promises, local trust, make/break evidence, and payload kinds under stable protocol pCIDs where appropriate",
+      "envelope_discipline": "0 ignores the settled envelope direction or confuses pCID with payload/message/request identity, 5 aligns with grid([42(pCID), payload, ...]), stable Protocol-CID semantics, and protocol-owned later slots",
+      "kernel_implementation_promises": "0 treats the kernel as RPC authority, service registry, capability registry, permission issuer, or generic conformance judge, 5 names local app/kernel promises, assumptions, unsupported behavior, and observations",
+      "promise_vocabulary": "0 drifts into claims/profiles/generic statement capsules/central trust-ledger/RPC/service-registry/capability-table or per-message-pCID framing, 5 stays promise-first, layer-local, and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt, selector-shopping, mode-matrix/service-catalog/capability-map heavy, per-record-pCID fragmented, or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "envelope_discipline",
+      "kernel_implementation_promises",
+      "app_protocol_promise_semantics",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 2,
+    "promisegrid_alignment": 5,
+    "auditability": 4,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 3,
+    "implementation_plausibility": 5,
+    "promise_vocabulary": 5,
+    "simplicity_durability": 5,
+    "envelope_discipline": 5,
+    "kernel_implementation_promises": 2,
+    "app_protocol_promise_semantics": 1,
+    "risk_penalty": 1
+  },
+  "fitness": {
+    "raw": 50,
+    "normalized_0_100": 76.92307692307693,
+    "confidence_0_1": 0.86
+  },
+  "assessment": {
+    "rationale": "Strong PT-clean envelope specimen with excellent boundary clarity, small deterministic shape, and explicit local trust handling. It fits the kernel-porting scenario only partially because it does not itself specify the higher-layer kernel implementation promise record, supported/refused pCID sets, or local service decomposition the scenario asks for.",
+    "strengths": [
+      "Clear `grid([42(pCID), payload, varsig])` specimen inside the broader protocol-owned slot family.",
+      "Excellent envelope discipline: one stable protocol selector, protocol-owned later slots, no selector shopping, and explicit unknown-pCID behavior.",
+      "Promise-first wording: sender promises byte shape per pCID; receivers decide trust and use locally.",
+      "Small, deterministic, MCU-plausible parsing and exact-byte auditability."
+    ],
+    "weaknesses": [
+      "Does not provide a concrete first-port kernel promise record naming supported, refused, and deferred pCIDs/features.",
+      "Defers most kernel/app semantics required by the scenario, including service decomposition and evidence movement among local promisers.",
+      "Failure/refusal handling is clearer for unknown pCIDs than for broader kernel operations such as storage, dispatch, lifecycle, and checkpointing."
+    ],
+    "risks": [
+      "A porter could mistake this specimen for the whole kernel target instead of one envelope-layer component.",
+      "Slot 2 as varsig in this specimen could be overgeneralized into universal envelope law despite the draft's warnings.",
+      "Kernel-facing refusal, evidence, and service-boundary promises remain underspecified for the porting scenario."
+    ],
+    "open_questions": [
+      "What minimal kernel implementation promise record should bind this envelope specimen to supported and refused pCIDs during a first port?",
+      "How should local APIs expose or wrap pCID-selected grid messages without hiding the promise boundary?",
+      "Is protocol-owned slot-2 varsig enough for porting-time audit evidence across native, browser, and MCU hosts?"
+    ],
+    "authority_boundary": "Evidence only; does not settle PromiseGrid design.",
+    "pt_gate": {
+      "status": "pt_clean",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "Senders and receivers act autonomously; no central dispatcher or authority is assumed."
+      },
+      "scoped_intent": {
+        "status": "pass",
+        "note": "Promises are narrowly scoped to the envelope bytes, pCID-selected interpretation, and protocol-owned slot roles."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "The sender promises only its own byte-shaping and proof evidence, not another agent's capabilities or behavior."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "The design offers evidence and parsing discipline, not guaranteed delivery, acceptance, or execution outcomes."
+      },
+      "local_trust_assessment": {
+        "status": "pass",
+        "note": "Trust and verification are receiver-local, especially for unknown pCIDs and varsig handling."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "The spec explicitly says carriage is not semantic acceptance and receivers choose locally whether to verify, store, relay, or use payloads."
+      },
+      "violations": []
+    }
+  }
+}

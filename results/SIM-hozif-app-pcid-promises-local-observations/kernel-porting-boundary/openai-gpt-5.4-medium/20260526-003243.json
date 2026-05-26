@@ -1,0 +1,181 @@
+{
+  "schema": "promisegrid.ga.result.v4",
+  "result_id": "SIM-hozif-app-pcid-promises-local-observations-kernel-porting-boundary-openai-gpt-5.4-medium-20260526-003243",
+  "run_group_id": "ga-canary-20260525-hozif-anti-rpc-calibration",
+  "cell_id": "ga-canary-20260525-hozif-anti-rpc-calibration-000001-SIM-hozif-app-pcid-promises-local-observations--kernel-porting-boundary--openai-gpt-5.4-medium",
+  "sim_id": "SIM-hozif-app-pcid-promises-local-observations",
+  "scenario_id": "kernel-porting-boundary",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260526-003243",
+  "result_path": "results/SIM-hozif-app-pcid-promises-local-observations/kernel-porting-boundary/openai-gpt-5.4-medium/20260526-003243.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "flex",
+    "served_service_tier": "flex",
+    "request_id": "req_60dc726c5ffa4ec78f699d53103c5046",
+    "response_id": "resp_0f791319f68474c8006a14ea2df1bc819aa5769f6b967d24e6",
+    "input_tokens": 12315,
+    "output_tokens": 1273,
+    "cost_usd": 0.03937325
+  },
+  "source": {
+    "repo_commit": "e8e6fe7b627498f4acd4ba1bde7fb8067920b15e",
+    "sim_path": "simulations/SIM-hozif-app-pcid-promises-local-observations/",
+    "scenario_path": "scenarios/kernel-porting-boundary/kernel-porting-boundary.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-hozif-app-pcid-promises-local-observations/README.md",
+        "sha256": "3059c74526af8b8f7061dab1c8baae892f434adc377eba04c3a08c9538ba2aaa"
+      },
+      {
+        "path": "simulations/SIM-hozif-app-pcid-promises-local-observations/QUESTION.md",
+        "sha256": "d9c37e192296d6ca8b814cf057c7f3d88fefe51523592341f624f211634762fc"
+      },
+      {
+        "path": "simulations/SIM-hozif-app-pcid-promises-local-observations/protocols/app-kernel-local-promises.d/specs/app-kernel-local-promises-draft.md",
+        "sha256": "17c33eb9d2a31972901466ddb916f4c80b5e5e30a58606b23adb7e919b6229f0"
+      },
+      {
+        "path": "simulations/SIM-hozif-app-pcid-promises-local-observations/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "14a9f234d1ac755c22e8c482f1fb4dc6704ca0712b2bf0825fee41614f56f3d6"
+      },
+      {
+        "path": "scenarios/kernel-porting-boundary/kernel-porting-boundary.md",
+        "sha256": "9fb74983a513cb9a82f8708b22b937837d8a580187a7dd524cec23ca50bd63ed"
+      }
+    ],
+    "simulation_tree_hash": "11ed7d4237731140ecd6775d5573c802058cabf5c451c18bf4cf4b73a5b40a2f"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260525-v4",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "app_protocol_promise_semantics": "0 uses command/request-response-service/permission framing or needless pCID fragmentation, 5 models storage, computation, send/receive, reciprocal promises, local trust, make/break evidence, and payload kinds under stable protocol pCIDs where appropriate",
+      "envelope_discipline": "0 ignores the settled envelope direction or confuses pCID with payload/message/request identity, 5 aligns with grid([42(pCID), payload, ...]), stable Protocol-CID semantics, and protocol-owned later slots",
+      "kernel_implementation_promises": "0 treats the kernel as RPC authority, service registry, capability registry, permission issuer, or generic conformance judge, 5 names local app/kernel promises, assumptions, unsupported behavior, and observations",
+      "promise_vocabulary": "0 drifts into claims/profiles/generic statement capsules/central trust-ledger/RPC/service-registry/capability-table or per-message-pCID framing, 5 stays promise-first, layer-local, and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt, selector-shopping, mode-matrix/service-catalog/capability-map heavy, per-record-pCID fragmented, or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "envelope_discipline",
+      "kernel_implementation_promises",
+      "app_protocol_promise_semantics",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 4,
+    "promisegrid_alignment": 5,
+    "auditability": 5,
+    "evolution_safety": 5,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 5,
+    "implementation_plausibility": 4,
+    "promise_vocabulary": 5,
+    "simplicity_durability": 5,
+    "envelope_discipline": 5,
+    "kernel_implementation_promises": 5,
+    "app_protocol_promise_semantics": 5,
+    "risk_penalty": 1
+  },
+  "fitness": {
+    "raw": 62,
+    "normalized_0_100": 95.38461538461539,
+    "confidence_0_1": 0.88
+  },
+  "assessment": {
+    "rationale": "Strong PromiseGrid-aligned envelope and local promise-accounting design. It cleanly reframes app/kernel support as local promises plus local observations, avoids registry/RPC authority drift, and uses one stable protocol pCID with payload kinds appropriately. It fits the kernel-porting-boundary scenario well at the app/kernel boundary, but it does not fully specify the broader first-port promise surface for storage, networking, keys, lifecycle, and checkpoint duties that the scenario also pressures.",
+    "strengths": [
+      "Excellent envelope discipline around CBOR grid([42(pCID), payload, ...]) and protocol-owned later slots.",
+      "Promise-first vocabulary is consistently local, scoped, and non-authoritative.",
+      "Observation records distinguish refused, not-promised, broken, timed-out, unreadable, and host-unavailable outcomes clearly.",
+      "Single stable protocol pCID with payload kind variants is simple and evolution-friendly.",
+      "Kernel implementation promises are framed as best-effort delivery and local evidence, not registry or capability authority."
+    ],
+    "weaknesses": [
+      "Scenario coverage is narrower than the full porting-boundary pressure; many kernel/runtime roles remain intentionally deferred.",
+      "Implementation guidance for multi-service split kernels and very constrained hosts is still high-level.",
+      "The protocol is still draft-status and leaves some retention/bounds details to future specs."
+    ],
+    "risks": [
+      "Broader porting audiences may still want a more explicit split between provisional kernel promises and higher-layer app/storage/network protocols.",
+      "The draft title and examples center on app/kernel receive-handle behavior, which may underspecify other porting-role promises unless extended carefully.",
+      "If local adapter wrappers are documented poorly, implementers could regress toward hidden RPC semantics despite the stated boundary."
+    ],
+    "open_questions": [
+      "What is the minimum guide-facing kernel/runtime promise set before DR-davod freezes broader porting obligations?",
+      "Should broader kernel roles such as networking, keys, lifecycle, and checkpoint reconstruction stay in this same payload family or move to separate higher-layer protocols?",
+      "What bounded evidence-retention promises are realistic on very small hosts without weakening later auditability?"
+    ],
+    "authority_boundary": "Evidence only; supports local app/kernel promise-accounting and envelope choices, not a final kernel API or frozen porting obligations.",
+    "pt_gate": {
+      "status": "pt_clean",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "Apps, kernels, peers, and observers each promise only their own behavior."
+      },
+      "scoped_intent": {
+        "status": "pass",
+        "note": "Promises are relationship-scoped, pCID-scoped, role-scoped declarations of intent."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "The kernel does not certify app abilities; it records what the app promised and what it observed."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "Kernel behavior is best-effort and outcomes are recorded as observations rather than guaranteed facts."
+      },
+      "local_trust_assessment": {
+        "status": "pass",
+        "note": "Observation records are explicitly local evidence for local trust updates, not global authority."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "Receive/handle promises and receiver behavior are kept distinct; acceptance is not framed as obligation."
+      },
+      "violations": []
+    }
+  }
+}
