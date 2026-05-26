@@ -7,9 +7,10 @@ No integer or timestamp alias exists.
 
 ## Status
 
-Planned. `poc3` follows `poc2` and should test the next level of kernel/app
-shape: several local apps sharing one PromiseGrid-style kernel boundary without
-turning the kernel into an RPC authority or app-specific service registry.
+Implemented and Docker-demo verified. `poc3` follows `poc2` and tests the next
+level of kernel/app shape: several local apps sharing one PromiseGrid-style
+kernel boundary without turning the kernel into an RPC authority or app-specific
+service registry.
 
 ## Decision Intent Log
 
@@ -57,6 +58,33 @@ and local refusal semantics; keep exact-byte evidence; avoid global trust claims
 run DF before naming commands, packages, functions, variables, or exact runtime
 topology for `poc3`.
 Affects: `implementations/poc3/`; `implementations/poc2/`; this TODO.
+
+### DI-horak
+
+ID: DI-horak
+Date: 2026-05-25 19:44:15
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Implement `poc3` as two containers, each running one kernel and all
+three apps; use importable Go packages under `implementations/poc3/kernel/`,
+`implementations/poc3/hello/`, `implementations/poc3/echo/`,
+`implementations/poc3/signed/`, and shared `implementations/poc3/lib/`, with
+command wrappers under each package's `cmd/`; use per-app pCIDs plus a
+kernel-local receive-promise pCID; keep kernel evidence internal/stdout-only;
+let promisee apps make local keep/break/uncertain judgments; sign the canonical
+envelope bytes for the `signed` app.
+Intent: Preserve `poc2`'s useful pCID-selected envelope evidence while testing
+the next kernel pressure point: multiple apps on each node sharing one local
+kernel boundary without converting the kernel into an RPC dispatcher, service
+registry, permission authority, or global trust judge.
+Constraints: All app/kernel and kernel/kernel payloads use CBOR
+`grid([42(pCID), payload, ...])`; pCID remains Protocol CID; receive promises
+describe what a local app promises to receive and do not grant permission;
+kernel evidence is local evidence about kernel actions, not application
+promise-status judgment; demo runtime evidence may use `/tmp/wire-lab-poc3-run/**`;
+Go validation may use `/tmp/wire-lab-gocache/**`.
+Affects: `implementations/poc3/**`;
+`protocols/wire-lab.d/TODO/TODO-hozaz-poc3-multi-app-kernel-proof.md`.
 
 ## Summary
 
@@ -137,25 +165,86 @@ Do not carry forward as architecture:
 
 - [x] hozaz.1 Review `poc2` evidence and decide which code patterns can be
   reused without carrying over accidental single-app assumptions.
-- [ ] hozaz.2 Run DF for exact command names, package/type names, protocol
+- [x] hozaz.2 Run DF for exact command names, package/type names, protocol
   surfaces, and runtime topology before creating code.
-- [ ] hozaz.3 Define the `hello` app's promises and non-promises.
-- [ ] hozaz.4 Define the `echo` app's promises and non-promises, including how
+- [x] hozaz.3 Define the `hello` app's promises and non-promises.
+- [x] hozaz.4 Define the `echo` app's promises and non-promises, including how
   echoing differs from obeying a remote command.
-- [ ] hozaz.5 Define the `signed` app's promises and non-promises, including
+- [x] hozaz.5 Define the `signed` app's promises and non-promises, including
   what the signature witnesses and what remains local trust judgment.
-- [ ] hozaz.6 Define the kernel's multi-app implementation promises: local
+- [x] hozaz.6 Define the kernel's multi-app implementation promises: local
   app boundary, pCID dispatch, evidence records, local refusal, and unsupported
   behavior.
-- [ ] hozaz.7 Implement the directory layout under `implementations/poc3/` after
+- [x] hozaz.7 Implement the directory layout under `implementations/poc3/` after
   DF/DI is locked.
-- [ ] hozaz.8 Add deterministic tests for app/kernel message flow, unsupported
+- [x] hozaz.8 Add deterministic tests for app/kernel message flow, unsupported
   pCID refusal, echo semantics, signed-message evidence, and multi-app routing.
-- [ ] hozaz.9 Add a deterministic local or container demo command that Steve can
+- [x] hozaz.9 Add a deterministic local or container demo command that Steve can
   run directly.
-- [ ] hozaz.10 Record final outcome: what worked, what was fake, what changed
+- [x] hozaz.10 Record final outcome: what worked, what was fake, what changed
   from `poc2`, and whether this evidence should update `DEV-GUIDE-RESOURCES.md`
   or `SIM-fovip`.
+
+## Implementation notes
+
+The first `poc3` implementation adds:
+
+- A standalone Go module under `implementations/poc3/`.
+- Importable `kernel`, `hello`, `echo`, `signed`, and `lib` packages with
+  command wrappers under each package's `cmd/` directory.
+- Per-app pCIDs for hello, echo, and signed messages plus a kernel-local
+  receive-promise pCID.
+- A two-container Compose demo where Alice and Bob each run one kernel plus all
+  three app commands.
+- Tests for envelope/proof-slot round-trip, signature-slot behavior,
+  signed-envelope verification, and kernel delivery to a promised local
+  receiver.
+
+Validation run during implementation:
+
+```sh
+cd implementations/poc3
+GOCACHE=/tmp/wire-lab-gocache go test ./...
+bash -n scripts/run-alice.sh scripts/run-bob.sh
+GOCACHE=/tmp/wire-lab-gocache errcheck ./...
+docker compose config
+```
+
+Docker demo verification:
+
+```sh
+cd implementations/poc3
+docker compose up --build --abort-on-container-exit
+```
+
+The first demo run exposed a bug: Bob's kernel had no peer address, so Bob's
+echo response was interpreted as local delivery and produced broken-pipe
+evidence. The implementation was corrected so Bob starts with `--peer
+alice:9100`.
+
+The corrected demo completed with both containers exiting `0`. Observed outcome:
+
+- Bob's hello app judged Alice's hello message kept locally.
+- Bob's echo app judged Alice's echo request kept locally and made a new echo
+  response promise-message back to Alice.
+- Alice's echo app judged Bob's echo response kept locally.
+- Bob's signed app verified Alice's signed envelope bytes and judged the signed
+  note kept locally.
+- Both kernels recorded local receive, send, deliver, and receive-promise
+  evidence without making app-level promise-status judgments.
+
+What worked: `poc3` demonstrates two containers, one kernel per container, all
+three apps per container, per-app pCIDs, a kernel-local receive-promise pCID,
+and an envelope proof slot for the signed app.
+
+What remains fake or intentionally narrow: deterministic demo keys, no durable
+storage, no production peer identity, no real trust history, no app lifecycle
+supervision, no queueing for late receive promises, and no final SDK/API claim.
+
+Follow-up: this evidence is strong enough to consider when updating
+`DEV-GUIDE-RESOURCES.md` or `SIM-fovip`, but those updates should be separate
+tasks so they can distinguish executable POC evidence from final PromiseGrid
+guidance.
 
 ## Acceptance criteria
 

@@ -1,0 +1,9 @@
+services:
+  bob:
+    build: .
+    command: ["/usr/local/bin/run-bob.sh"]
+  alice:
+    build: .
+    depends_on:
+      - bob
+    command: ["/usr/local/bin/run-alice.sh"]
