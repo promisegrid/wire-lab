@@ -2,7 +2,7 @@
   "schema": "promisegrid.ga.state.v1",
   "run_group_id": "ga-canary-20260525-hozif-anti-rpc-calibration",
   "created_at": "2026-05-26T00:32:44Z",
-  "updated_at": "2026-05-26T00:33:39Z",
+  "updated_at": "2026-05-26T00:51:30Z",
   "repo_commit": "e8e6fe7b627498f4acd4ba1bde7fb8067920b15e",
   "model_id": "openai-gpt-5.4-medium",
   "population": [
@@ -606,35 +606,77 @@
     {
       "sim_id": "SIM-hozif-app-pcid-promises-local-observations",
       "explicit_include": true,
-      "rationale": "explicit include override"
+      "rationale": "fitness-ranked selected-parent pool avg_normalized_0_100=94.87 samples=3"
     },
     {
       "sim_id": "SIM-fovip-kernel-promise-boundary-port-contract",
       "explicit_include": true,
-      "rationale": "explicit include override"
+      "rationale": "fitness-ranked selected-parent pool avg_normalized_0_100=87.18 samples=3"
     },
     {
       "sim_id": "SIM-zukis-grid-envelope-tag42-protocol-owned-slot2-varsig",
       "explicit_include": true,
-      "rationale": "explicit include override"
+      "rationale": "fitness-ranked selected-parent pool avg_normalized_0_100=75.90 samples=3"
     },
     {
       "sim_id": "SIM-dalor-grid-envelope-protocol-owned-signature-slot",
       "explicit_include": true,
-      "rationale": "explicit include override"
+      "rationale": "fitness-ranked selected-parent pool avg_normalized_0_100=69.74 samples=3"
     }
   ],
   "children": [
     {
-      "child_id": "SIM-fozid-child-pending-0001",
-      "path": "proposals/ga-canary-20260525-hozif-anti-rpc-calibration/simulations/SIM-fozid-child-pending-0001/",
+      "child_id": "SIM-fozid-child-slim-port-commitment-service-outcomes",
+      "path": "proposals/ga-canary-20260525-hozif-anti-rpc-calibration/simulations/SIM-fozid-child-slim-port-commitment-service-outcomes/",
       "parent_ids": [
-        "SIM-hozif-app-pcid-promises-local-observations",
-        "SIM-fovip-kernel-promise-boundary-port-contract"
+        "SIM-fovip-kernel-promise-boundary-port-contract",
+        "SIM-dalor-grid-envelope-protocol-owned-signature-slot"
       ],
       "operation": "breed",
-      "tree_hash": "",
-      "status": "queued"
+      "prompt_hash": "99009cc4f850dc922394d797cdd9ed42d3f6f7c3146dae9ce862f840d0eb9f6b",
+      "response_hash": "0b221ea20eddf0c5c5a24950cc0efaf1b2937ab80e010902351b21288a7b3020",
+      "files": [
+        {
+          "path": "proposals/ga-canary-20260525-hozif-anti-rpc-calibration/simulations/SIM-fozid-child-slim-port-commitment-service-outcomes/QUESTION.md",
+          "sha256": "e6669b0abffd12d279179d14632fdf8b42123418956450c941d4693056acdcbc"
+        },
+        {
+          "path": "proposals/ga-canary-20260525-hozif-anti-rpc-calibration/simulations/SIM-fozid-child-slim-port-commitment-service-outcomes/README.md",
+          "sha256": "5daa4d33be6618a1515412a8a9fc282222ace825323bca86588a3b896268ba91"
+        },
+        {
+          "path": "proposals/ga-canary-20260525-hozif-anti-rpc-calibration/simulations/SIM-fozid-child-slim-port-commitment-service-outcomes/examples/scenario-walkthroughs.md",
+          "sha256": "1c9d38604a6c742a5cdbfcd0dd232c707a5c1d5ac5bd80d2114965313b3dcff4"
+        },
+        {
+          "path": "proposals/ga-canary-20260525-hozif-anti-rpc-calibration/simulations/SIM-fozid-child-slim-port-commitment-service-outcomes/protocols/kernel-port-commitment.d/specs/kernel-port-commitment-draft.md",
+          "sha256": "a59079b9499c1acafc09b78ecc6cda1584d260299925d4c8e04a565750415ddf"
+        },
+        {
+          "path": "proposals/ga-canary-20260525-hozif-anti-rpc-calibration/simulations/SIM-fozid-child-slim-port-commitment-service-outcomes/protocols/service-outcome.d/specs/service-outcome-draft.md",
+          "sha256": "ff7007c86478d529906ecbcc0096122d60004e70b1d90806c5999ec9b5d9efb9"
+        },
+        {
+          "path": "proposals/ga-canary-20260525-hozif-anti-rpc-calibration/simulations/SIM-fozid-child-slim-port-commitment-service-outcomes/protocols/signed-grid-carriage-profile.d/specs/protocol-owned-signed-carriage-profile.md",
+          "sha256": "1878512dcdce10663abedfbb67fd9bb3623b061be923b8d157e7b0bf6da95220"
+        }
+      ],
+      "tree_hash": "c8ec37ca7b23de434fe758be313e90875f11cee8e273d5f9af78572e2f12d6e9",
+      "status": "generated",
+      "design_delta_summary": "1) replace the wide self-describing kernel record with a slimmer pCID-selected `kernel_port_commitment` payload that removes the inner `record_pcid` field and requires explicit per-surface promiser entries; 2) add a small `service_outcome` payload family for kept/refused/unavailable/broken/timeout observations plus receiver-local pull/keep/advertise effects; 3) keep `grid([pCID, payload, signature])` only as an optional signed-carriage profile for exact-byte audit evidence, not as a universal kernel requirement.",
+      "validation_message": "validated child tree",
+      "updated_at": "2026-05-26T00:51:03Z",
+      "provider": "openai",
+      "api_model": "gpt-5.4",
+      "reasoning_effort": "medium",
+      "service_tier": "flex",
+      "served_service_tier": "flex",
+      "request_id": "req_75fc7c9b86a44983a7eb7607ab4c3f85",
+      "response_id": "resp_066a877aa6577c34006a14ee318340819bbd7b24647f725b0d",
+      "usage_json": "{\"input_tokens\":9175,\"input_tokens_details\":{\"cached_tokens\":0},\"output_tokens\":8335,\"output_tokens_details\":{\"reasoning_tokens\":5696},\"total_tokens\":17510}",
+      "input_tokens": 9175,
+      "output_tokens": 8335,
+      "cost_usd": 0.13274625
     }
   ],
   "cells": [
@@ -915,27 +957,57 @@
       "cost_usd": 0.03960775
     },
     {
-      "cell_id": "ga-canary-20260525-hozif-anti-rpc-calibration-000013-SIM-fozid-child-pending-0001--kernel-porting-boundary--openai-gpt-5.4-medium",
-      "sim_id": "SIM-fozid-child-pending-0001",
+      "cell_id": "ga-canary-20260525-hozif-anti-rpc-calibration-000013-SIM-fozid-child-slim-port-commitment-service-outcomes--kernel-porting-boundary--openai-gpt-5.4-medium",
+      "sim_id": "SIM-fozid-child-slim-port-commitment-service-outcomes",
       "scenario_id": "kernel-porting-boundary",
       "model_id": "openai-gpt-5.4-medium",
-      "result_path": "proposals/ga-canary-20260525-hozif-anti-rpc-calibration/results/SIM-fozid-child-pending-0001/kernel-porting-boundary/openai-gpt-5.4-medium/20260526-003243.json",
-      "status": "queued"
+      "result_path": "proposals/ga-canary-20260525-hozif-anti-rpc-calibration/results/SIM-fozid-child-slim-port-commitment-service-outcomes/kernel-porting-boundary/openai-gpt-5.4-medium/20260526-003243.json",
+      "status": "done",
+      "attempts": 1,
+      "validation_message": "validated result",
+      "updated_at": "2026-05-26T00:51:17Z",
+      "provider": "openai",
+      "api_model": "gpt-5.4",
+      "reasoning_effort": "medium",
+      "output_contract": "json_schema_strict",
+      "service_tier": "flex",
+      "served_service_tier": "flex",
+      "request_id": "req_9857cd9d50684f1caa3596762a672d54",
+      "response_id": "resp_0961e3ce4b6be888006a14ee78dec08199afefd7ff247e7926",
+      "usage_json": "{\"input_tokens\":11905,\"input_tokens_details\":{\"cached_tokens\":0},\"output_tokens\":1269,\"output_tokens_details\":{\"reasoning_tokens\":516},\"total_tokens\":13174}",
+      "input_tokens": 11905,
+      "output_tokens": 1269,
+      "cost_usd": 0.03859975
     },
     {
-      "cell_id": "ga-canary-20260525-hozif-anti-rpc-calibration-000014-SIM-fozid-child-pending-0001--promise-accounting-records-kept-storage-promise--openai-gpt-5.4-medium",
-      "sim_id": "SIM-fozid-child-pending-0001",
+      "cell_id": "ga-canary-20260525-hozif-anti-rpc-calibration-000014-SIM-fozid-child-slim-port-commitment-service-outcomes--promise-accounting-records-kept-storage-promise--openai-gpt-5.4-medium",
+      "sim_id": "SIM-fozid-child-slim-port-commitment-service-outcomes",
       "scenario_id": "promise-accounting-records-kept-storage-promise",
       "model_id": "openai-gpt-5.4-medium",
-      "result_path": "proposals/ga-canary-20260525-hozif-anti-rpc-calibration/results/SIM-fozid-child-pending-0001/promise-accounting-records-kept-storage-promise/openai-gpt-5.4-medium/20260526-003243.json",
-      "status": "queued"
+      "result_path": "proposals/ga-canary-20260525-hozif-anti-rpc-calibration/results/SIM-fozid-child-slim-port-commitment-service-outcomes/promise-accounting-records-kept-storage-promise/openai-gpt-5.4-medium/20260526-003243.json",
+      "status": "done",
+      "attempts": 1,
+      "validation_message": "validated result",
+      "updated_at": "2026-05-26T00:51:30Z",
+      "provider": "openai",
+      "api_model": "gpt-5.4",
+      "reasoning_effort": "medium",
+      "output_contract": "json_schema_strict",
+      "service_tier": "flex",
+      "served_service_tier": "flex",
+      "request_id": "req_f829dbecef4e4707a181ea2e48917c04",
+      "response_id": "resp_0bf15919d3f9f85d006a14ee859774819a97157cf0b107cb97",
+      "usage_json": "{\"input_tokens\":11131,\"input_tokens_details\":{\"cached_tokens\":0},\"output_tokens\":1261,\"output_tokens_details\":{\"reasoning_tokens\":516},\"total_tokens\":12392}",
+      "input_tokens": 11131,
+      "output_tokens": 1261,
+      "cost_usd": 0.03713325
     },
     {
-      "cell_id": "ga-canary-20260525-hozif-anti-rpc-calibration-000015-SIM-fozid-child-pending-0001--promise-accounting-records-refused-service--openai-gpt-5.4-medium",
-      "sim_id": "SIM-fozid-child-pending-0001",
+      "cell_id": "ga-canary-20260525-hozif-anti-rpc-calibration-000015-SIM-fozid-child-slim-port-commitment-service-outcomes--promise-accounting-records-refused-service--openai-gpt-5.4-medium",
+      "sim_id": "SIM-fozid-child-slim-port-commitment-service-outcomes",
       "scenario_id": "promise-accounting-records-refused-service",
       "model_id": "openai-gpt-5.4-medium",
-      "result_path": "proposals/ga-canary-20260525-hozif-anti-rpc-calibration/results/SIM-fozid-child-pending-0001/promise-accounting-records-refused-service/openai-gpt-5.4-medium/20260526-003243.json",
+      "result_path": "proposals/ga-canary-20260525-hozif-anti-rpc-calibration/results/SIM-fozid-child-slim-port-commitment-service-outcomes/promise-accounting-records-refused-service/openai-gpt-5.4-medium/20260526-003243.json",
       "status": "queued"
     }
   ]
