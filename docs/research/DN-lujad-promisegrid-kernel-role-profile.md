@@ -82,11 +82,14 @@ agents may make these promises separately.
 The app/kernel boundary should be described as a promise boundary.
 
 Exposed app/kernel operations are pCID-selected PromiseGrid messages shaped by
-the current outer envelope direction:
+the current formal outer envelope rule:
 
 ```text
-grid([42(pCID), payload, ...])
+grid([42(pCID), ...protocol-defined-slots])
 ```
+
+The recommended example profile remains `grid([42(pCID), payload, ...])` for
+ordinary protocols. Source: `DI-rojij`; `DI-punam`.
 
 Local APIs may exist for ergonomics, but they are adapters. An adapter's promise
 is to faithfully emit, accept, preserve, or record the corresponding

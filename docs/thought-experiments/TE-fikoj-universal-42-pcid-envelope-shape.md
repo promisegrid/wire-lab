@@ -8,7 +8,7 @@ TE-fikoj
 
 ## Status
 
-decided
+superseded by TE-lamun / DI-rojij
 
 ## Decision under test
 
@@ -272,9 +272,20 @@ freezing the whole family at exactly three slots too early.
 
 ## Decision status
 
-Locked by `DI-sisak` - the current PromiseGrid direction is the variable-arity
-CBOR outer envelope `grid([42(pCID), payload, ...])`. Slot 0 belongs to a
-tagged CBOR protocol-selector family, with tag `42` as the current standard
-instance; CBOR array length carries arity; and the protocol named by `pCID`
-defines later outer-slot roles. Fixed three-slot
+Superseded by `TE-lamun` / `DI-rojij` for the formal slot-vector rule. The
+`TE-fikoj` conclusion remains the historical lock for universal slot `0` as
+`42(pCID)` and for CBOR-array arity as the outer extensibility mechanism, but
+its hard slot-1 payload wording is no longer the current formal rule.
+`DI-rojij` preserved `grid([42(pCID), payload, ...])` as the recommended profile
+and refined the formal rule to
+`grid([42(pCID), ...protocol-defined-slots])`, where the protocol named by
+`pCID` defines slots `1..N`. Fixed three-slot
 `grid([42(pCID), payload, sig])` remains considered but unchosen.
+
+## Refinements
+
+### 2026-05-26 — Example profile wording
+
+`DI-punam` further narrows current guidance: readers should interpret the
+payload-first profile as a recommended example profile, not an inherited
+slot-layout rule. The historical `TE-fikoj` body remains unchanged.

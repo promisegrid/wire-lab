@@ -8,9 +8,10 @@ None. This TODO was minted after the proquint-handle migration.
 
 Open. This TODO owns the corpus-wide correction that `pCID` means
 **Protocol CID**: the CID of the protocol spec document, not the CID of a
-payload object. The protocol named by a `pCID` can define both payload shape
-and proof/signature encoding. The whole message is encoded as CBOR, so arity is
-carried by the CBOR array header ahead of the `[pCID, ...]` array contents.
+payload object. The protocol named by a `pCID` can define the full following
+slot vector, including payload shape and proof/signature encoding. The whole
+message is encoded as CBOR, so arity is carried by the CBOR array header ahead
+of the `[pCID, ...]` array contents.
 This TODO plans direct source fixes where safe, successor sims where scored
 artifacts must remain immutable, and a source-side eradication pass for the
 wrong “payload pCID” framing. `SIM-dalor` has one explicit exception because
@@ -19,6 +20,84 @@ rubric; the stale run is removed and replaced rather than preserved as current
 evidence. Source: `DI-muniz`; `DI-pozom`.
 
 ## Decision Intent Log
+
+ID: DI-sizoh
+Date: 2026-05-26 11:13:09
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Add the current envelope/proof hierarchy to `DEV-GUIDE-RESOURCES.md`
+and expand `DN-jotob` so guide readers see the relationship between the formal
+envelope rule, the payload-first example profile, the signed-message example
+profile, single-signer varsig-style proofs, and pCID-defined multisig proof
+sets or proof chains.
+Intent: Make the proof guidance explicit without making a proof slot,
+`varsig`, multisig, or any other proof scheme a universal envelope requirement.
+The hierarchy should teach the common path while preserving pCID ownership of
+slot roles, signable views, proof encodings, and Promise Theory interpretation.
+Constraints: Use "example" rather than "default" for profile wording. Keep
+`grid([42(pCID), ...protocol-defined-slots])` as the formal rule. Keep
+`grid([42(pCID), payload, ...])` and `grid([42(pCID), payload, proof])` as
+examples, not inherited requirements.
+Affects: `DEV-GUIDE-RESOURCES.md`;
+`docs/research/DN-jotob-grid-envelope-tag42-variable-outer-slots.md`;
+this TODO.
+Supersedes:
+
+ID: DI-punam
+Date: 2026-05-26 10:58:44
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Replace "recommended default profile" wording with "recommended
+example profile" for `grid([42(pCID), payload, ...])`. The formal envelope rule
+remains `grid([42(pCID), ...protocol-defined-slots])`, and
+`grid([42(pCID), payload, ...])` remains the preferred teaching and specimen
+shape for ordinary payload-first protocols, but it is no longer described as a
+default that protocol authors are expected to inherit.
+Intent: Avoid accidental normative pressure that could make payload-first slot
+layout look mandatory or privileged. PromiseGrid should show simple examples
+without implying that the example constrains pCID-defined slot roles.
+Constraints: Do not rewrite historical TE bodies for this wording change. Add
+refinement notes where needed, update current developer-facing docs, and keep
+slot `0` as `42(pCID)`.
+Affects: `docs/thought-experiments/TE-lamun-pcid-defined-slot-vector.md`;
+`docs/thought-experiments/TE-fikoj-universal-42-pcid-envelope-shape.md`;
+`docs/research/DN-jotob-grid-envelope-tag42-variable-outer-slots.md`;
+`docs/research/DN-lujad-promisegrid-kernel-role-profile.md`;
+`protocols/wire-lab.d/specs/harness-spec-draft.md`; `DEV-GUIDE-RESOURCES.md`;
+this TODO.
+Supersedes: DI-rojij only for the "recommended default profile" phrase and
+its normative force; preserves DI-rojij's formal slot-vector rule.
+
+ID: DI-rojij
+Date: 2026-05-26 10:27:23
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Refine the current PromiseGrid outer-envelope rule from hard
+`grid([42(pCID), payload, ...])` to formal
+`grid([42(pCID), ...protocol-defined-slots])`, where slot `0` remains
+`42(pCID)` and the protocol specification named by `pCID` defines every
+following slot. Keep `grid([42(pCID), payload, ...])` as the recommended default
+profile for ordinary protocols, and require any protocol that gives slot `1` a
+different role to justify and specify that deviation explicitly.
+Intent: Preserve `TE-fikoj`'s useful universal slot-0 and CBOR-arity result
+while removing an unnecessary universal claim that slot `1` must always be the
+payload. The pCID-named spec already owns payload shape, proof encoding,
+signable view, and validation rules; letting it define the full slot vector
+keeps the envelope simpler and more durable without abandoning the payload-first
+profile that most protocols should use.
+Constraints: Keep `pCID` = Protocol CID. Keep slot `0` as the current
+`42(pCID)` standard instance. Do not treat protocol-defined slots as license for
+vague layouts: specs must define slot count, slot order, slot meanings,
+signable view, validation order, unsupported behavior, and promise semantics.
+Carriage remains distinct from semantic acceptance, and trust remains local.
+Affects: `docs/thought-experiments/TE-lamun-pcid-defined-slot-vector.md`;
+`docs/thought-experiments/TE-fikoj-universal-42-pcid-envelope-shape.md`;
+`docs/research/DN-jotob-grid-envelope-tag42-variable-outer-slots.md`;
+`docs/research/DN-lujad-promisegrid-kernel-role-profile.md`;
+`protocols/wire-lab.d/specs/harness-spec-draft.md`; `DEV-GUIDE-RESOURCES.md`;
+this TODO.
+Supersedes: DI-sisak for the hard slot-1 payload rule only; preserves
+DI-sisak's universal slot-0, tag-42, and CBOR-arity conclusions.
 
 ID: DI-hozal
 Date: 2026-05-24 19:20:42
@@ -387,8 +466,8 @@ The wrong framing has three recurring forms:
 All corrected successor artifacts should say the same thing plainly:
 
 - `pCID` = Protocol CID = CID of the protocol spec document;
-- the protocol named by a `pCID` defines payload shape, signable projection,
-  proof/signature encoding, and verification rules;
+- the protocol named by a `pCID` defines slots `1..N`, including payload shape,
+  signable projection, proof/signature encoding, and verification rules;
 - the whole message is CBOR;
 - CBOR array arity is already in the array header;
 - extra outer fields need a semantic reason, not an extensibility reason.
@@ -509,6 +588,16 @@ supersession:
   snapshot explicitly points guide writers to `DN-jotob` as the plain-English
   explainer for the locked `grid([42(pCID), payload, ...])` direction, while
   keeping `TE-fikoj` / `DI-sisak` as the locking authority. Source: `DI-hozal`.
+- [x] mopob.24 Add `TE-lamun` and lock `DI-rojij` so the formal outer-envelope
+  rule becomes `grid([42(pCID), ...protocol-defined-slots])`, with
+  `grid([42(pCID), payload, ...])` retained as the recommended example profile
+  rather than a universal slot-1 law. Source: `DI-rojij`.
+- [x] mopob.25 Lock `DI-punam` so current guidance says "recommended example
+  profile" rather than "recommended default profile" for
+  `grid([42(pCID), payload, ...])`. Source: `DI-punam`.
+- [x] mopob.26 Add the envelope/proof hierarchy to
+  `DEV-GUIDE-RESOURCES.md` and the fuller `DN-jotob` explanation, using example
+  profile language for payload and signed-message shapes. Source: `DI-sizoh`.
 
 ## Validation and acceptance criteria
 
