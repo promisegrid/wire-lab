@@ -241,7 +241,11 @@ results remain valid evidence and are not rewritten. Kernel designs score well
 when apps promise the local kernel which pCIDs they will receive or handle and
 the kernel records local delivery observations; they score poorly when they use
 service registries, capability tables, or RPC-style dispatch authority as the
-load-bearing abstraction. Source: `DI-roruj`; `DI-ripuz`; `DI-sitim`.
+load-bearing abstraction. Related app/kernel record variants should normally
+share one stable protocol pCID and use payload `kind` values for message-level
+variation; separate pCIDs score well only when the message families are
+independently deployable, independently understandable, or split by a real layer
+boundary. Source: `DI-roruj`; `DI-ripuz`; `DI-sitim`; `DI-gakij`.
 
 If `score` is run without `-api-model`, each selected cell uses the `api_model`
 already stored in the state file, falling back to a provider-model derivation

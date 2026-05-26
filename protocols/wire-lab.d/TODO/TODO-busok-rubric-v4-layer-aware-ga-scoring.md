@@ -65,6 +65,29 @@ Affects: `tools/ga-runner/score.go`; `tools/ga-runner/result.go`;
 `tools/ga-runner/ga_runner_test.go`; `tools/ga-runner/README.md`;
 future calibration commands for Lasuv/Vinag/Fovip-style kernel promise cases.
 
+### DI-gakij
+
+ID: DI-gakij
+Date: 2026-05-25 17:28:58
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Refine Rubric V4 so scoring rewards stable protocol pCIDs with
+payload-level record kinds for tightly coupled message variants and penalizes
+unnecessary per-record pCID fragmentation.
+Intent: Hozif exposed a subtle scoring gap: pCID names a protocol specification,
+closer to a network protocol/version identifier than a per-message type.
+Designs should normally keep related promise and observation records under one
+stable protocol pCID when they evolve and deploy together. Separate pCIDs remain
+valid when message families are independently deployable, independently
+understandable, or intentionally separated by layer boundary.
+Constraints: Keep `promisegrid.ga.result.v4` and `ga-rubric-20260525-v4`; this
+is a prompt and score-meaning refinement, not a schema change. Do not force all
+apps to one pCID; penalize only needless fragmentation or per-message pCID
+churn.
+Affects: `tools/ga-runner/score.go`; `tools/ga-runner/result.go`;
+`tools/ga-runner/ga_runner_test.go`; `tools/ga-runner/README.md`;
+Hozif and later app/kernel scoring calibration.
+
 ## Locked direction
 
 - Use a real new rubric/result version: `promisegrid.ga.result.v4` and
@@ -91,7 +114,10 @@ Keep existing v3 axes and add:
 - `app_protocol_promise_semantics`: rewards higher-layer/app protocols that
   model storage, computation, send/receive, reciprocal promises, selective
   sending, local trust, promise-as-capability-token behavior, and make/break
-  evidence without command/permission/request-response-service framing.
+  evidence without command/permission/request-response-service framing. Related
+  payload message variants should usually be record kinds under one stable
+  protocol pCID unless independent deployment or layer boundaries justify a
+  split.
 
 ## Subtasks
 
@@ -124,6 +150,8 @@ Keep existing v3 axes and add:
   contract.
 - [ ] busok.17 Run a small user-operated calibration slice over Lasuv, Vinag,
   Fovip, and related kernel promise cases before broad rescoring.
+- [x] busok.18 Refine V4 prompt text so pCID stability and payload-kind
+  variants are scored correctly for tightly coupled app/kernel records.
 
 ## Acceptance criteria
 

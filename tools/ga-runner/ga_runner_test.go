@@ -1384,6 +1384,10 @@ func TestBuildScorePromptIncludesRequiredAxisChecklist(t *testing.T) {
 		"authorized dispatch",
 		"apps promise a local kernel which pCIDs they will receive or handle",
 		"local observations of kept, broken, refused, or timed-out promises",
+		"Treat pCID as a stable protocol-spec identifier",
+		"not as a per-message type",
+		"payload `kind` variants under one stable protocol pCID",
+		"needless per-record pCID fragmentation",
 	} {
 		if !strings.Contains(prompt, want) {
 			t.Fatalf("prompt missing %q:\n%s", want, prompt)
