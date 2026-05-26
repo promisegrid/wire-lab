@@ -40,6 +40,59 @@ Affects: `simulations/SIM-dalor-grid-envelope-protocol-owned-signature-slot/`;
 future `proposals/<run-group-id>/`; future `results/state/<run-group-id>.json`;
 future `results/jobs/<run-group-id>/`.
 
+### DI-dikat
+
+ID: DI-dikat
+Date: 2026-05-25 16:45:41
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Reject `SIM-lasuv-child-kernel-port-capability-outcome-ledger` from
+the goban breeding proposals, mine only its local observation/evidence lesson,
+and create `SIM-hozif-app-pcid-promises-local-observations` as a simpler
+Vinag-derived successor rather than promoting `SIM-vinag-child-tag42-port-
+observation-pairing` as scored.
+Intent: The goban child review showed that Lasuv's kernel-port ledger,
+per-`pCID` capability table, service-promiser vocabulary, and outcome-ledger
+shape drift back toward RPC/service-registry/capability-table design. Vinag has
+better envelope heritage and local-trust boundaries, but its service vocabulary
+and supported-pCID lists should be reframed before canonical use. The durable
+successor should say that apps promise local kernels which pCIDs they will
+receive or handle, kernels promise best-effort delivery/observation behavior,
+and all outcomes remain local observations rather than authority facts.
+Constraints: Do not rewrite scored child bytes under `proposals/`. Use
+`tools/ga-runner cull` for rejected Lasuv so the state records the destructive
+review decision. Leave Vinag's scored proposal bytes unpromoted and unchanged;
+the successor is a new human-authored simulation, not a byte-identical
+promotion. Provider-backed recalibration is configured for Steve to run later,
+not run by Codex.
+Affects: `results/state/ga-canary-20260525-goban-dalor-fovip-v4.json`;
+`proposals/ga-canary-20260525-goban-dalor-fovip-v4/`;
+`simulations/SIM-hozif-app-pcid-promises-local-observations/`;
+`protocols/wire-lab.d/TODO/TODO-goban-dalor-zukis-fovip-breeding.md`;
+future `/tmp/canary-cells` or `/tmp/run-*` calibration commands.
+
+### DI-bozid
+
+ID: DI-bozid
+Date: 2026-05-25 17:19:22
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Revise Hozif so promise and observation records are two payload
+record kinds under one stable protocol pCID, not two separate pCID-selected
+payload protocols.
+Intent: A pCID names a protocol specification and should usually be stable
+across many messages, closer to a network protocol version than to a per-message
+type. Hozif's promise and observation records are tightly coupled halves of one
+local app/kernel promise-accounting protocol; splitting them into separate pCIDs
+would imply unnecessary churn and independent deployment surfaces.
+Constraints: Preserve Hozif's anti-RPC, pro-promise correction from `DI-dikat`.
+Keep the envelope shape `grid([42(pCID), payload, ...])`; only the Hozif
+payload protocol structure changes. Do not run provider-backed recalibration
+from Codex.
+Affects: `simulations/SIM-hozif-app-pcid-promises-local-observations/`;
+`protocols/wire-lab.d/TODO/TODO-goban-dalor-zukis-fovip-breeding.md`;
+`/tmp/run-hozif-anti-rpc-calibration.sh`.
+
 ## Breeding intent
 
 The run should test three questions:
@@ -148,10 +201,19 @@ Reject or rework generated children that:
   canary/GA commands from Codex: `/tmp/run-goban-dalor-breeding.sh`.
 - [ ] goban.9 Review generated children for PT fit, envelope correctness,
   kernel-boundary correctness, and vocabulary regressions.
-- [ ] goban.10 Cull weak children before promotion review.
+- [x] goban.10 Cull weak children before promotion review. Lasuv is rejected
+  under `DI-dikat`; Vinag is mined into a new successor rather than promoted
+  as scored.
 - [ ] goban.11 If a child survives, record acceptance/promotion intent through
   the GA promotion process before moving anything into canonical
   `simulations/`.
+- [x] goban.12 Create a simple promise-first Vinag successor that avoids
+  service-registry and capability-table vocabulary.
+- [x] goban.13 Configure a small Steve-run recalibration slice for the successor
+  after the rubric refinement and culling changes are committed:
+  `/tmp/run-hozif-anti-rpc-calibration.sh`.
+- [x] goban.14 Revise Hozif to use one stable payload protocol pCID with
+  promise and observation record kinds inside the payload.
 
 ## Acceptance criteria
 

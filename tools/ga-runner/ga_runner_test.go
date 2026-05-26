@@ -1378,6 +1378,12 @@ func TestBuildScorePromptIncludesRequiredAxisChecklist(t *testing.T) {
 		"higher-layer pCID-owned payload protocols",
 		"DN-jotob",
 		"kernel implementation promises",
+		"RPC dispatcher framing",
+		"service-registry framing",
+		"capability-table framing",
+		"authorized dispatch",
+		"apps promise a local kernel which pCIDs they will receive or handle",
+		"local observations of kept, broken, refused, or timed-out promises",
 	} {
 		if !strings.Contains(prompt, want) {
 			t.Fatalf("prompt missing %q:\n%s", want, prompt)

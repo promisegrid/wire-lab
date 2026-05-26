@@ -194,6 +194,7 @@ future candidate designs.
 | `SIM-nijuz-multi-embodiment-identity/` | One logical app spanning browser/plugin embodiments, per-component conformance, and portable signing-key identity. |
 | `SIM-funas-kernel-porting-boundary/` | Kernel/runtime/dispatcher terminology, minimum porting target, runtime surface, and conformance boundary. |
 | `SIM-fovip-kernel-promise-boundary-port-contract/` | Expanded active `DR-davod` evidence for app-facing promises, host assumptions, unsupported features, pCID coverage, same-grid app/kernel messages, voluntary namespaces, CID-rooted references, checkpointed resources, and minimum credible kernel implementation promise records. Source: `DI-funaf`; `DI-fidot`; `DI-ripuz`. |
+| `SIM-hozif-app-pcid-promises-local-observations/` | Vinag-derived successor that replaces RPC/service-registry/capability-table vocabulary with app-made pCID promises, kernel delivery/evidence promises, and local observation records. Source: `DI-dikat`. |
 | `SIM-savak-scoped-claim-card-audit-ledger/` | Promoted GA probe for scoped claim cards, exact audit-anchor citations, and peer-local promise-accounting records. Source: `DI-fihub`. |
 | `SIM-tizad-scoped-conformance-citation-ledger/` | Promoted GA probe for scoped conformance manifests, durable citation records, and guide-safe partial-conformance claims. Source: `DI-fihub`. |
 | `SIM-virim-manifested-embodiment-savepoint-receipts/` | Promoted GA probe for App Manifest, Embodiment Claim, Identity Continuity Receipt, and Savepoint Audit Envelope profiles. Source: `DI-lanuz`. |

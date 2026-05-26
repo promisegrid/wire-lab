@@ -256,8 +256,13 @@ func rubricScoreMeaningsForSchema(schema string) map[string]string {
 		// generic claim/statement wrappers and selector-shopping stacks are weak
 		// base-envelope evidence, while pCID-owned higher-layer records remain
 		// valid design space. Source: DI-kafiz
-		meanings["promise_vocabulary"] = "0 drifts into claims/profiles/generic statement capsules/central trust-ledger framing, 5 stays promise-first, layer-local, and pCID-specific"
-		meanings["simplicity_durability"] = "0 overbuilt, selector-shopping, or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+		//
+		// Intent: Persist the anti-RPC refinement in result metadata so future
+		// reviews can see that Promise-shaped wording is not enough when the
+		// design still depends on service registries, capability tables, or
+		// kernel authority. Source: DI-sitim
+		meanings["promise_vocabulary"] = "0 drifts into claims/profiles/generic statement capsules/central trust-ledger/RPC/service-registry/capability-table framing, 5 stays promise-first, layer-local, and pCID-specific"
+		meanings["simplicity_durability"] = "0 overbuilt, selector-shopping, mode-matrix/service-catalog/capability-map heavy, or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
 	}
 	if schema == resultSchemaV4 {
 		// Intent: Persist the layer-specific V4 axis meanings with every result
@@ -265,8 +270,8 @@ func rubricScoreMeaningsForSchema(schema string) map[string]string {
 		// higher-layer protocol/app fitness without rereading prompt history.
 		// Source: DI-ripuz
 		meanings["envelope_discipline"] = "0 ignores the settled envelope direction or confuses pCID, 5 aligns with grid([42(pCID), payload, ...]), Protocol-CID semantics, and protocol-owned later slots"
-		meanings["kernel_implementation_promises"] = "0 treats the kernel as authority or generic port conformance, 5 names local kernel implementation promises, assumptions, unsupported behavior, and evidence"
-		meanings["app_protocol_promise_semantics"] = "0 uses command/permission framing, 5 models storage, computation, send/receive, reciprocal promises, local trust, and make/break evidence"
+		meanings["kernel_implementation_promises"] = "0 treats the kernel as RPC authority, service registry, capability registry, permission issuer, or generic conformance judge, 5 names local app/kernel promises, assumptions, unsupported behavior, and observations"
+		meanings["app_protocol_promise_semantics"] = "0 uses command/request-response-service/permission framing, 5 models storage, computation, send/receive, reciprocal promises, local trust, and make/break evidence"
 	}
 	return meanings
 }

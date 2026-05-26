@@ -119,7 +119,11 @@ the provider, writes validated JSON fitness results, and checkpoints usage/cost
 metadata after each cell. New score runs write
 `promisegrid.ga.result.v4` / `ga-rubric-20260525-v4`, which keeps the v3 PT gate
 and adds `envelope_discipline`, `kernel_implementation_promises`, and
-`app_protocol_promise_semantics` for layer-aware scoring. Source: `DI-ripuz`.
+`app_protocol_promise_semantics` for layer-aware scoring. The V4 scorer also
+penalizes RPC dispatcher, service-registry, capability-table, dispatch
+authorization, and kernel-conformance-authority framing unless the design
+recasts that machinery as voluntary local promises plus local observations.
+Source: `DI-ripuz`; `DI-sitim`.
 Score runs now default to
 `-output-contract json_schema_strict`, which asks the provider to enforce the
 rubric-v4 JSON Schema instead of relying only on prompt wording. New score
@@ -233,8 +237,11 @@ Rubric-v4 scoring keeps `promise_vocabulary` and `simplicity_durability`, adds
 the layer-specific envelope/kernel/app axes, and recomputes `fitness.raw` /
 `fitness.normalized_0_100` inside the runner with normal weighting so
 comparisons do not depend on provider-specific math. Historical v1/v2/v3
-results remain valid evidence and are not rewritten. Source: `DI-roruj`;
-`DI-ripuz`.
+results remain valid evidence and are not rewritten. Kernel designs score well
+when apps promise the local kernel which pCIDs they will receive or handle and
+the kernel records local delivery observations; they score poorly when they use
+service registries, capability tables, or RPC-style dispatch authority as the
+load-bearing abstraction. Source: `DI-roruj`; `DI-ripuz`; `DI-sitim`.
 
 If `score` is run without `-api-model`, each selected cell uses the `api_model`
 already stored in the state file, falling back to a provider-model derivation
