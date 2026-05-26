@@ -93,6 +93,27 @@ Affects: `simulations/SIM-hozif-app-pcid-promises-local-observations/`;
 `protocols/wire-lab.d/TODO/TODO-goban-dalor-zukis-fovip-breeding.md`;
 `/tmp/run-hozif-anti-rpc-calibration.sh`.
 
+### DI-ditan
+
+ID: DI-ditan
+Date: 2026-05-25 17:34:31
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Cull `SIM-vinag-child-tag42-port-observation-pairing` from the goban
+proposal tree instead of promoting it.
+Intent: Vinag's useful envelope and audit pressure has been carried forward
+into Hozif, while Vinag itself still uses two tightly coupled pCID-selected
+payload protocols plus service/dispatch/support vocabulary that conflicts with
+the anti-RPC and pCID-stability refinements in `DI-sitim` and `DI-gakij`.
+Keeping Vinag under `proposals/` would invite stale promotion review based on
+pre-refinement scores.
+Constraints: Use `tools/ga-runner cull` so the rejection is recorded in the
+run state. Do not rewrite Vinag scored child bytes. Keep Hozif as the successor
+simulation path.
+Affects: `results/state/ga-canary-20260525-goban-dalor-zukis-v4.json`;
+`proposals/ga-canary-20260525-goban-dalor-zukis-v4/`;
+`protocols/wire-lab.d/TODO/TODO-goban-dalor-zukis-fovip-breeding.md`.
+
 ## Breeding intent
 
 The run should test three questions:
@@ -214,6 +235,8 @@ Reject or rework generated children that:
   `/tmp/run-hozif-anti-rpc-calibration.sh`.
 - [x] goban.14 Revise Hozif to use one stable payload protocol pCID with
   promise and observation record kinds inside the payload.
+- [x] goban.15 Cull Vinag after Hozif superseded it and Rubric V4 gained
+  anti-RPC plus pCID-stability refinements.
 
 ## Acceptance criteria
 
