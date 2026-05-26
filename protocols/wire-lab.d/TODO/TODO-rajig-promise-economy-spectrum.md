@@ -43,6 +43,10 @@ of the base protocol, and does not make promisebase authoritative. Source:
 - [ ] rajig.5 Map RFC-1005's test-tree / executable-tree / cache-on-pass
   vocabulary against PromiseGrid promise-economy terms before adopting or
   rejecting any of it.
+- [x] rajig.6 Add a root scenario for capability-token access promises,
+  redemption, revocation, bearer/non-transferable token exchange, and peer-local
+  floating exchange rates without choosing a base PromiseGrid economics model.
+  Done under `DI-hosuk`.
 
 ## Routed Elsewhere
 
@@ -69,3 +73,29 @@ of the base protocol, and does not make promisebase authoritative. Source:
 The creation and routing decision for this TODO is recorded as `DI-pidag` in
 `TODO-juhub-turns-149-208-chronological-rewalk.md`. Future locked decisions
 local to the promise-economy mechanism spectrum should be appended here.
+
+ID: DI-hosuk
+Date: 2026-05-26 13:28:21
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Add
+`scenarios/promise-economy-capability-token-exchange/promise-economy-capability-token-exchange.md`
+as a root scenario combining capability-token access promises, redemption,
+revocation, bearer-token transfer, non-transferable access tokens, peer-local
+exchange offers, and floating trust-based exchange rates.
+Intent: Existing root scenarios split permissioned capability tokens,
+transferable promise tokens, and floating exchange rates into separate pressure
+cases. The repo also needs one combined scenario where agents issue security
+capability tokens for resources they control, redeem tokens to fulfill promises,
+observe broken promises or revocations, trade bearer tokens as personal
+currencies, exchange bearer tokens for non-transferable access tokens, and value
+each issuer's token through local trust and keep/break history without a central
+exchange.
+Constraints: Keep this as root scenario evidence pressure only. Do not choose a
+base PromiseGrid economics model, token standard, central exchange, global price
+oracle, or permission authority. Do not edit simulations, GA config, rubric, or
+`DEV-GUIDE-RESOURCES.md` in this step. Preserve existing uncommitted atproto
+scenario changes.
+Affects:
+`scenarios/promise-economy-capability-token-exchange/promise-economy-capability-token-exchange.md`;
+`protocols/wire-lab.d/TODO/TODO-rajig-promise-economy-spectrum.md`.

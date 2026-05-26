@@ -274,6 +274,27 @@ Affects: `scenarios/`; `scenarios/README.md`; `tools/matrix-runner/`;
 `results/RUN-PROTOCOL.md`; `results/tools/`; `tools/README.md`;
 `protocols/wire-lab.d/TODO/TODO-dadub-root-scenario-skeleton-and-seed-catalog.md`.
 
+ID: DI-nidop
+Date: 2026-05-26 12:55:35
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Add `scenarios/atproto-repo-car-interop/atproto-repo-car-interop.md`
+as a dedicated root comparison scenario for AT Protocol / Bluesky ecosystem
+interop pressure around repo, CAR, DAG-CBOR, and CID-linked object boundaries.
+Intent: The repo had only partial atproto coverage: carrier-independence prose
+mentioned ATPROTO-adjacent carriers, and `SIM-pamap` tested an atproto-like
+signable-view pattern. A separate root scenario is needed to test whether
+PromiseGrid CAS/feed objects can cross an atproto-style repo/CAR/DAG-CBOR
+boundary while preserving exact bytes, local promise evidence, sparse knowledge,
+and local trust judgment without treating atproto, Bluesky, PDS, relay, appview,
+CAR, or DAG-CBOR as PromiseGrid authority.
+Constraints: Keep this as scenario apparatus only. Do not edit simulations in
+this step. Do not make atproto, Bluesky, PDS, relay, CAR, DAG-CBOR, or DID
+infrastructure mandatory for PromiseGrid. Keep the scenario under the
+cache-friendly root scenario shape from `DI-kizal`.
+Affects: `scenarios/atproto-repo-car-interop/atproto-repo-car-interop.md`;
+`protocols/wire-lab.d/TODO/TODO-dadub-root-scenario-skeleton-and-seed-catalog.md`.
+
 ## Scope
 
 - Define the root scenario-entry contract implied by `DI-faros`: a root scenario
@@ -343,6 +364,9 @@ Affects: `scenarios/`; `scenarios/README.md`; `tools/matrix-runner/`;
 - [x] dadub.16 Rewrite root scenarios to remove repeated boilerplate from
   per-scenario files and route the shared scenario contract through
   `scenarios/README.md`. Done under `DI-kizal`.
+- [x] dadub.17 Add a dedicated AT Protocol / Bluesky ecosystem interop scenario
+  for repo, CAR, DAG-CBOR, CID-linked object, sparse-knowledge, and local
+  promise-evidence pressure. Done under `DI-nidop`.
 
 ## Candidate scenario entries
 
