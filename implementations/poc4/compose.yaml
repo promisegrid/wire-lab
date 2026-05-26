@@ -3,23 +3,40 @@ services:
     build: .
     command: ["/usr/local/bin/run-alice.sh"]
     networks: [poc4]
+    volumes: [poc4-run:/run/poc4]
+    environment:
+      POC4_RUN_ID: ${POC4_RUN_ID:-manual}
   bob:
     build: .
     command: ["/usr/local/bin/run-bob.sh"]
     networks: [poc4]
+    volumes: [poc4-run:/run/poc4]
+    environment:
+      POC4_RUN_ID: ${POC4_RUN_ID:-manual}
   carol:
     build: .
     command: ["/usr/local/bin/run-carol.sh"]
     networks: [poc4]
+    volumes: [poc4-run:/run/poc4]
+    environment:
+      POC4_RUN_ID: ${POC4_RUN_ID:-manual}
   dave:
     build: .
     command: ["/usr/local/bin/run-dave.sh"]
     networks: [poc4]
+    volumes: [poc4-run:/run/poc4]
+    environment:
+      POC4_RUN_ID: ${POC4_RUN_ID:-manual}
   ellen:
     build: .
     command: ["/usr/local/bin/run-ellen.sh"]
     networks: [poc4]
+    volumes: [poc4-run:/run/poc4]
+    environment:
+      POC4_RUN_ID: ${POC4_RUN_ID:-manual}
 
 networks:
   poc4:
 
+volumes:
+  poc4-run:

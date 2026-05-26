@@ -94,6 +94,29 @@ judge keep/break locally; demo values are `fib(10)=55` and
 Affects: `implementations/poc4/**`;
 `protocols/wire-lab.d/TODO/TODO-tapov-poc4-five-container-relay-promise-proof.md`.
 
+### DI-rinuv
+
+ID: DI-rinuv
+Date: 2026-05-25 21:35:33
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Make the `poc4` Compose demo safe to run with
+`docker compose up --build --abort-on-container-exit` by adding an explicit
+shared completion gate. Each container marks local completion only after its
+expected app promises finish, then keeps its kernel and relay alive until all
+five containers have marked completion.
+Intent: Preserve the useful Compose shutdown behavior without letting
+short-lived idle/client apps abort the run before multi-hop relay, computation,
+storage, signed-evidence, and echo promises finish.
+Constraints: Keep one kernel, one relay, and two non-relay apps per container;
+do not add a central trust or routing authority; completion markers are local
+demo process coordination, not PromiseGrid protocol evidence; use the existing
+`implementations/poc4/scripts/*.sh` shape and a shared Compose volume mounted at
+`/run/poc4/$POC4_RUN_ID`.
+Affects: `implementations/poc4/compose.yaml`;
+`implementations/poc4/README.md`; `implementations/poc4/scripts/*.sh`; this
+TODO.
+
 ## Topology
 
 `poc4` uses a five-node ring:

@@ -14,4 +14,5 @@ fibonacci_pid="$LAST_PID"
 sleep 3
 poc4-storage --node carol --app carol-storage-client --kernel 127.0.0.1:7201 --mode client --target-node dave --target-app dave-storage-app --key poc4-key --value poc4-value
 wait_one fibonacci "$fibonacci_pid"
-sleep 2
+mark_done carol
+wait_done_all alice bob carol dave ellen

@@ -12,4 +12,5 @@ sleep 4
 
 poc4-hello --node alice --app alice-hello-app --kernel 127.0.0.1:7201 --mode ask-signed --target-node dave --target-app dave-signed-app --text "hello from Alice"
 poc4-fibonacci --node alice --app alice-fibonacci-client --kernel 127.0.0.1:7201 --mode client --target-node carol --target-app carol-fibonacci-app --n 10
-sleep 2
+mark_done alice
+wait_done_all alice bob carol dave ellen

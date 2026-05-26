@@ -12,4 +12,5 @@ sleep 1
 poc4-signed --node bob --app bob-signed-app --kernel 127.0.0.1:7201 --mode idle
 sleep 3
 poc4-echo --node bob --app bob-echo-app --kernel 127.0.0.1:7201 --mode client --target-node ellen --target-app ellen-echo-app --text "echo from Bob"
-sleep 2
+mark_done bob
+wait_done_all alice bob carol dave ellen

@@ -13,4 +13,5 @@ poc4-hello --node ellen --app ellen-hello-app --kernel 127.0.0.1:7201 --mode idl
 start_bg echo poc4-echo --node ellen --app ellen-echo-app --kernel 127.0.0.1:7201 --mode serve
 echo_pid="$LAST_PID"
 wait_one echo "$echo_pid"
-sleep 2
+mark_done ellen
+wait_done_all alice bob carol dave ellen

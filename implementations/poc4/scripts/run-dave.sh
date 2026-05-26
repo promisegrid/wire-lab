@@ -24,4 +24,8 @@ if wait_one signed "$signed_pid"; then
 else
 	status="$?"
 fi
+if [ "$status" -eq 0 ]; then
+	mark_done dave
+	wait_done_all alice bob carol dave ellen
+fi
 exit "$status"
