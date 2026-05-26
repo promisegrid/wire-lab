@@ -15,7 +15,7 @@ minted after that date carry only the proquint handle.
 
 | Handle | Mint date | Title | Prior alias |
 |---|---|---|---|
-| [TODO-tapov](./TODO-tapov-poc4-five-container-relay-promise-proof.md) | 2026-05-25 | poc4 five-container relay promise proof **(planned: top-priority multi-hop app/relay/kernel proof after poc3)** | — |
+| [TODO-tapov](./TODO-tapov-poc4-five-container-relay-promise-proof.md) | 2026-05-25 | poc4 five-container relay promise proof **(implemented and demo-validated: provisional multi-hop app/relay/kernel evidence after poc3)** | — |
 | [TODO-dutaz](./TODO-dutaz-perplexity-computer-onboarding.md) | 2026-04-29 | TODO 001 - Perplexity Computer onboarding | `TODO-1` / `TODO-20260429-030146` |
 | [TODO-fofas](./TODO-fofas-review-feedback-as-contest-artifact.md) | 2026-04-28 | TODO 002 - Durable review feedback as contest artifact | `TODO-2` / `TODO-20260429-033416` |
 | [TODO-kavug](./TODO-kavug-review-reply-as-promise.md) | 2026-04-29 | TODO 003 - Review reply as promise | `TODO-3` / `TODO-20260429-162412` |

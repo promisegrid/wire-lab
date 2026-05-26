@@ -7,11 +7,11 @@ No integer or timestamp alias exists.
 
 ## Status
 
-Implemented locally; awaiting Docker demo run. `poc4` follows `poc3` and tests
-multi-hop app promises across a five-container topology where each container
-talks to only two neighboring containers, runs one kernel, one relay, and two
-non-relay apps, and some apps must rely on relays on third or fourth containers
-to reach the app that can fulfill the promise.
+Implemented and demo-validated. `poc4` follows `poc3` and tests multi-hop app
+promises across a five-container topology where each container talks to only two
+neighboring containers, runs one kernel, one relay, and two non-relay apps, and
+some apps must rely on relays on third or fourth containers to reach the app
+that can fulfill the promise.
 
 ## Decision Intent Log
 
@@ -117,6 +117,30 @@ Affects: `implementations/poc4/compose.yaml`;
 `implementations/poc4/README.md`; `implementations/poc4/scripts/*.sh`; this
 TODO.
 
+### DI-ponor
+
+ID: DI-ponor
+Date: 2026-05-25 23:00:33
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Treat the successful `poc4` Docker Compose run as provisional
+executable evidence for multi-hop app promises over app-level relay promises,
+and update `DEV-GUIDE-RESOURCES.md` accordingly.
+Intent: Preserve the observed result that five containers each ran one kernel,
+one relay, and two non-relay apps; signed hello, fibonacci, storage
+confirmation/readback, and echo flows completed; relay hops crossed third and
+fourth containers; kernels stayed local app/kernel evidence boundaries; app
+promisees judged keep/break locally.
+Constraints: `poc4` remains executable POC evidence, not a final SDK, final
+kernel API, final relay protocol, or stable storage/computation API. The
+completion markers under `/run/poc4/$POC4_RUN_ID` are demo process coordination,
+not PromiseGrid protocol evidence. The result should inform guide-writer
+resources and `TODO-binag`/`SIM-fovip` review, but should not close `DR-davod`
+by itself.
+Affects: `implementations/poc4/**`; `DEV-GUIDE-RESOURCES.md`;
+`protocols/wire-lab.d/TODO/TODO-binag-promisegrid-kernel-design-resolution.md`;
+`simulations/SIM-fovip-kernel-promise-boundary-port-contract/`; this TODO.
+
 ## Topology
 
 `poc4` uses a five-node ring:
@@ -211,7 +235,7 @@ Each container runs one kernel, one relay, and two non-relay apps:
   signed relay carriage, local refusal, and app-local promise judgment.
 - [x] tapov.10 Add a deterministic five-container Compose demo command that Steve
   can run directly.
-- [ ] tapov.11 Record final outcome: what worked, what was fake, what changed
+- [x] tapov.11 Record final outcome: what worked, what was fake, what changed
   from `poc3`, and whether this evidence should update `DEV-GUIDE-RESOURCES.md`,
   `SIM-fovip`, or a new relay/storage/fibonacci simulation.
 
@@ -268,3 +292,53 @@ Do not carry forward as architecture:
   a reachable destination and the kernel handles the rest.
 - Do not treat storage, fibonacci, or relay confirmations as kernel delivery
   receipts. They are application promises and application-local judgments.
+
+## Final outcome
+
+What worked:
+
+- `docker compose up --build --abort-on-container-exit` completed with all five
+  containers exiting `0` after the cleanup fixes in `505df60`.
+- The demo ran Alice, Bob, Carol, Dave, and Ellen with one kernel, one relay, and
+  two non-relay apps per container.
+- Alice received signed hello evidence from Dave through Alice -> Ellen -> Dave
+  relay promises.
+- Alice received `fib(10)=55` from Carol through Alice -> Bob -> Carol relay
+  promises.
+- Carol stored and read back `poc4-key=poc4-value` through Carol -> Dave relay
+  promises.
+- Bob completed an echo round trip with Ellen through Bob -> Alice -> Ellen
+  relay promises.
+- Kernels recorded local app/kernel receive and delivery evidence only; relays
+  owned neighbor TCP and hop promises; apps made reciprocal receive promises and
+  judged their own app-level outcomes.
+
+What was fake or still bounded:
+
+- The completion markers under `/run/poc4/$POC4_RUN_ID` are Docker-demo process
+  coordination, not PromiseGrid protocol evidence.
+- Route tables are hand-configured local relay promises for the demo, not
+  discovery, routing consensus, or a stable relay protocol.
+- Storage is in-memory process-local state; fibonacci is a toy computation; echo
+  and signed hello are proof surfaces, not final app APIs.
+- The kernel accepts receive promises by pCID and delivers exact bytes; it does
+  not implement durable identity, trust decay, resource accounting, sandboxing,
+  host-driver promises, or a frozen porting contract.
+
+What changed from `poc3`:
+
+- `poc3` showed two containers with multiple local apps sharing one
+  pCID-selected app/kernel boundary.
+- `poc4` keeps that local-kernel boundary but moves cross-node reachability into
+  relay apps, proving the kernel does not need to become a multi-hop router or
+  service registry for app promises to cross non-neighbor paths.
+
+Follow-on implications:
+
+- `DEV-GUIDE-RESOURCES.md` should cite `poc4` as provisional executable evidence
+  for multi-hop app/relay/kernel separation.
+- `TODO-binag` and `SIM-fovip` should absorb the evidence when deciding whether
+  the current kernel implementation-promise packet is sufficient.
+- New focused sims may be useful for relay promises, storage promises, and
+  computation promises, but `poc4` itself should not be promoted as a stable API
+  surface.
