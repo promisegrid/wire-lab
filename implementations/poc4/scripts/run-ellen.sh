@@ -3,7 +3,7 @@ set -eu
 
 . /usr/local/bin/process.sh
 
-trap cleanup_bg EXIT INT TERM
+install_traps
 
 start_bg kernel poc4-kernel --node ellen --app-listen 127.0.0.1:7201
 sleep 1
