@@ -2,7 +2,7 @@
   "schema": "promisegrid.ga.state.v1",
   "run_group_id": "ga-canary-20260525-hozif-anti-rpc-calibration",
   "created_at": "2026-05-26T00:32:44Z",
-  "updated_at": "2026-05-26T00:51:30Z",
+  "updated_at": "2026-05-26T01:15:42Z",
   "repo_commit": "e8e6fe7b627498f4acd4ba1bde7fb8067920b15e",
   "model_id": "openai-gpt-5.4-medium",
   "population": [
@@ -662,7 +662,7 @@
         }
       ],
       "tree_hash": "c8ec37ca7b23de434fe758be313e90875f11cee8e273d5f9af78572e2f12d6e9",
-      "status": "generated",
+      "status": "culled",
       "design_delta_summary": "1) replace the wide self-describing kernel record with a slimmer pCID-selected `kernel_port_commitment` payload that removes the inner `record_pcid` field and requires explicit per-surface promiser entries; 2) add a small `service_outcome` payload family for kept/refused/unavailable/broken/timeout observations plus receiver-local pull/keep/advertise effects; 3) keep `grid([pCID, payload, signature])` only as an optional signed-carriage profile for exact-byte audit evidence, not as a universal kernel requirement.",
       "validation_message": "validated child tree",
       "updated_at": "2026-05-26T00:51:03Z",
@@ -1009,6 +1009,21 @@
       "model_id": "openai-gpt-5.4-medium",
       "result_path": "proposals/ga-canary-20260525-hozif-anti-rpc-calibration/results/SIM-fozid-child-slim-port-commitment-service-outcomes/promise-accounting-records-refused-service/openai-gpt-5.4-medium/20260526-003243.json",
       "status": "queued"
+    }
+  ],
+  "culling": [
+    {
+      "culled_child_ids": [
+        "SIM-fozid-child-slim-port-commitment-service-outcomes"
+      ],
+      "deleted_sim_paths": [
+        "proposals/ga-canary-20260525-hozif-anti-rpc-calibration/simulations/SIM-fozid-child-slim-port-commitment-service-outcomes"
+      ],
+      "deleted_result_paths": [
+        "proposals/ga-canary-20260525-hozif-anti-rpc-calibration/results/SIM-fozid-child-slim-port-commitment-service-outcomes"
+      ],
+      "reason": "Rejected under DI-pavub: mine only per-surface promiser and outcome-distinction ideas into a Hozif-derived successor; do not promote Fozid because it regresses toward service/request/dispatch/authorization vocabulary and grid([pCID,payload,signature]) envelope drift.",
+      "culled_at": "2026-05-26T01:15:42Z"
     }
   ]
 }

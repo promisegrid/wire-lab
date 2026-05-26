@@ -114,6 +114,33 @@ Affects: `results/state/ga-canary-20260525-goban-dalor-zukis-v4.json`;
 `proposals/ga-canary-20260525-goban-dalor-zukis-v4/`;
 `protocols/wire-lab.d/TODO/TODO-goban-dalor-zukis-fovip-breeding.md`.
 
+### DI-pavub
+
+ID: DI-pavub
+Date: 2026-05-25 18:15:22
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Cull `SIM-fozid-child-slim-port-commitment-service-outcomes` as a
+proposal and create `SIM-kifas-app-kernel-surface-promises-local-observations`
+as a Hozif-derived successor instead of promoting Fozid.
+Intent: Fozid usefully exposed slimmer per-surface promiser entries and
+kept/refused/unavailable/broken/timed-out distinctions, but it also regressed
+toward service/request/dispatch/authorization vocabulary and an optional
+`grid([pCID, payload, signature])` carriage shape. The successor should keep
+Hozif's one-stable-pCID, `grid([42(pCID), payload, ...])`, local-observation,
+and anti-RPC structure while mining only Fozid's useful surface-level promise
+and outcome distinctions.
+Constraints: Use `tools/ga-runner cull` so the rejected proposal is recorded in
+the run state. Do not promote or rewrite Fozid proposal bytes. Keep the
+successor human-authored under canonical `simulations/` and avoid service
+registry, capability table, dispatcher, authorization, permission, conformance,
+or external-authority semantics. Provider-backed scoring remains Steve-run.
+Affects: `results/state/ga-canary-20260525-hozif-anti-rpc-calibration.json`;
+`proposals/ga-canary-20260525-hozif-anti-rpc-calibration/`;
+`simulations/SIM-kifas-app-kernel-surface-promises-local-observations/`;
+`protocols/wire-lab.d/TODO/TODO-goban-dalor-zukis-fovip-breeding.md`;
+future `/tmp/run-*` calibration commands.
+
 ## Breeding intent
 
 The run should test three questions:
@@ -237,6 +264,10 @@ Reject or rework generated children that:
   promise and observation record kinds inside the payload.
 - [x] goban.15 Cull Vinag after Hozif superseded it and Rubric V4 gained
   anti-RPC plus pCID-stability refinements.
+- [x] goban.16 Cull Fozid as a generated proposal after review showed
+  service/request/dispatch/authorization vocabulary and envelope-shape drift.
+- [x] goban.17 Create a Hozif-derived successor that keeps per-surface
+  promisers and outcome distinctions without Fozid's service/RPC vocabulary.
 
 ## Acceptance criteria
 
