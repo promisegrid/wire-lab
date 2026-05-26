@@ -7,7 +7,7 @@ No integer or timestamp alias exists.
 
 ## Status
 
-Implemented pending Docker demo verification. `poc2` is the second PromiseGrid
+Implemented and Docker-demo verified. `poc2` is the second PromiseGrid
 proof-of-concept system and is separate from the external `grid-poc` repo. The
 current code builds a minimal two-container executable proof that app/kernel and
 kernel/kernel boundaries can both use pCID-selected `grid([42(pCID), payload,
@@ -111,20 +111,50 @@ identity, storage, or security model.
 - [x] pasaz.6 Implement `poc2-hello`: app process that connects to the local
   kernel, sends or receives a hello promise-message, and prints received
   messages.
-- [ ] pasaz.7 Run two Docker containers, `alice` and `bob`, on one Compose
+- [x] pasaz.7 Run two Docker containers, `alice` and `bob`, on one Compose
   network; each container starts one local kernel and one hello app process.
 - [x] pasaz.8 Make the demo command deterministic:
   `cd implementations/poc2 && docker compose up --build --abort-on-container-exit`.
-- [ ] pasaz.9 Ensure expected output clearly shows Alice app -> Alice kernel ->
+- [x] pasaz.9 Ensure expected output clearly shows Alice app -> Alice kernel ->
   Bob kernel -> Bob app, plus local evidence records on both sides.
 - [x] pasaz.10 Add tests for envelope round-trip, pCID dispatch,
   unsupported-pCID refusal, local app/kernel delivery, remote kernel/kernel
   delivery, and evidence-log content.
 - [ ] pasaz.11 Update `DEV-GUIDE-RESOURCES.md` only if the POC produces evidence
   worth citing as provisional kernel/app-boundary guidance.
-- [ ] pasaz.12 Record final outcome in this TODO: what worked, what was fake,
+- [x] pasaz.12 Record final outcome in this TODO: what worked, what was fake,
   what remains unresolved, and whether `DR-davod` or `SIM-fovip` should be
   updated.
+
+## Docker demo verification
+
+Steve ran the demo on 2026-05-26 UTC after installing Docker Compose v2:
+
+```sh
+cd implementations/poc2
+docker compose up --build --abort-on-container-exit
+```
+
+Observed outcome:
+
+- Bob's kernel recorded `peer_receive` with `outcome:"kept"` for the hello pCID.
+- Bob's kernel recorded `app_deliver` with `outcome:"kept"` at the app/kernel
+  boundary.
+- Bob's app printed `bob app received from alice-hello-app: hello from Alice`.
+- Alice's app observed `kept` for Bob's delivery result.
+- Both `alice` and `bob` containers exited with code `0`.
+
+What worked: a two-container path carried one pCID-selected
+`grid([42(pCID), payload, ...])` message from Alice's app through Alice's kernel
+and Bob's kernel to Bob's app, with local evidence on both kernel boundaries.
+
+What remains fake or intentionally narrow: identity, signatures, durable storage,
+cross-runtime portability, long-lived peer trust, and production app lifecycle
+management are still outside `poc2`.
+
+Follow-up: `DEV-GUIDE-RESOURCES.md`, `DR-davod`, and `SIM-fovip` should be
+updated only if we decide this narrow executable evidence is strong enough to
+cite as provisional kernel/app-boundary guidance.
 
 ## Minimum interfaces
 
