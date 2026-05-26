@@ -15,7 +15,7 @@ near-contender simulations and root `results/` JSON evidence; proposal children
 remain review evidence until promoted. Source: `DI-baral`; `DI-sisak`;
 `DI-pagin`; `DI-kafiz`; `DI-rusup`; `DI-funaf`; `DI-gumum`; `DI-somok`;
 `DI-kuvum`; `DI-ripuz`; `DI-horak`; `DI-ponor`; `DI-fofik`; `DI-rojij`;
-`DI-punam`; `DI-sizoh`.
+`DI-punam`; `DI-sizoh`; `DI-sagos`.
 
 ### Current Wire Direction
 
@@ -347,6 +347,13 @@ promise-accounting scheme from their existence. Source: `DI-navod`.
 | `simulations/SIM-rusap-promise-accounting-records/` | Tests peer-local promise accounting records for pull, keep, advertise, refusal, and 100-year mental-model pressure without defining a central accounting authority. | Provisional design-point evidence. |
 | `simulations/SIM-punaz-bgp-class-routing-app/` | Tests turn-178 BGP-class routing-policy application pressure as a standalone L7 app question rather than a generic promise-accounting example. | Provisional design-point evidence. |
 | `simulations/SIM-haros-promise-economy-spectrum/` | Tests turn-179 promise-economy mechanism neutrality across peer-local assessment, capability tokens, transferability, floating exchange rates, cryptocurrency-toxicity failure modes, and the turn-184 RFC-1005 test-driven-fabric prior-art seed. TODO owner: TODO-rajig. | Provisional design-point evidence. |
+
+`implementations/poc6-dag-cbor-interop/` is executable provisional evidence for
+the `scenarios/cas-object-model-dag-cbor-interop/` pressure: real IPLD /
+DAG-CBOR libraries can encode CID links, byte strings, and tag-42 link bytes,
+derive stable CIDv1 DAG-CBOR CIDs, and record local Alice/Bob evidence without
+requiring an IPFS daemon. It does not decide the final L6 CAS profile or make
+DAG-CBOR mandatory. Source: `DI-sagos`.
 
 Open turn-177 decision records: `DR-tumus` owns the concrete L6 CAS adoption
 question, `DR-gabif` owns additive CAS-backed group-session migration, and

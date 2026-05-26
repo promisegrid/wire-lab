@@ -141,6 +141,11 @@ since it locks the prototype-not-canon stance.
   which list supersedes which, clarify or quote Steve's ambiguous `ref` wording,
   and pick a fresh concise twig only when the actual TE-43 work starts. Source:
   `DI-rupuh`.
+- [x] kituj.9 Add `implementations/poc6-dag-cbor-interop/` as executable POC
+  evidence for the `cas-object-model-dag-cbor-interop` scenario, using real
+  IPLD / DAG-CBOR libraries to test CID links, byte strings, tag-42 link
+  encoding, stable CIDs, and local evidence without requiring an IPFS daemon.
+  Source: `DI-sagos`.
 
 ## Question log
 
@@ -178,4 +183,23 @@ since it locks the prototype-not-canon stance.
 
 ## Decision Intent Log
 
-(Will be populated as DFs lock and product lands.)
+ID: DI-sagos
+Date: 2026-05-26 11:42:44
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Create `implementations/poc6-dag-cbor-interop/` as the first POC
+using the new `pocN-{slug}` naming rule. The POC implements the
+`scenarios/cas-object-model-dag-cbor-interop/` pressure as standalone Go tests
+using real IPLD / DAG-CBOR libraries, not a hand-rolled CBOR encoder.
+Intent: Produce cheap executable evidence for whether CID links, byte strings,
+and tag-42 link encoding stay compatible with IPLD / IPFS-style tooling without
+requiring an IPFS daemon or deciding the final L6 CAS profile.
+Constraints: Keep this POC standalone and test-driven. Do not add a Docker demo
+or app/kernel flow. Use Promise Theory vocabulary: Alice and Bob make and judge
+local promises; the POC records evidence rather than global truth. Update
+`implementations/README.md` with the `pocN-{slug}` naming rule and cite this POC
+as provisional implementation evidence only.
+Affects: `implementations/poc6-dag-cbor-interop/**`;
+`implementations/README.md`;
+`protocols/wire-lab.d/TODO/TODO-kituj-te-43-promisebase-prior-art-adoption.md`.
+Supersedes:

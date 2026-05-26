@@ -13,6 +13,16 @@ The `<impl-name>` slug is human-readable and chosen by the implementer.
 Multiple implementations of the same protocol coexist as siblings; one
 implementation may implement many protocols.
 
+New proof-of-concept directories use this naming pattern:
+
+```
+implementations/pocN-{slug}/
+```
+
+Existing `poc2/` through `poc5/` directories keep their historical names.
+Future POCs should include a short descriptive slug, such as
+`poc6-dag-cbor-interop`. Source: `DI-sagos`.
+
 ## CHANGELOG requirement
 
 Every implementation directory MUST contain a `CHANGELOG.md` at its
@@ -36,5 +46,9 @@ This directory is just *our local* collection. Third parties' implementations li
 ## Current implementations
 
 - `poc2/` — proof-of-concept 2: a minimal two-container app/kernel and kernel/kernel hello flow using pCID-selected `grid([42(pCID), payload, ...])` messages. It is not a final PromiseGrid API. Source: `DI-ratij`; `DI-tijat`.
+- `poc3/` — proof-of-concept 3: two containers where each container runs one kernel plus hello, echo, and signed apps. It is executable evidence for same-grid app/kernel messaging, not a final SDK. Source: `DI-horak`.
+- `poc4/` — proof-of-concept 4: five containers where relay apps, not kernels, own multi-hop neighbor promises for hello, echo, signed, fibonacci, and storage flows. It is executable evidence, not a final relay API. Source: `DI-ponor`.
+- `poc5/` — proof-of-concept 5: local trust and selective sending after Alice observes a broken storage promise. It is executable evidence, not a final trust API. Source: `DI-rarim`; `DI-fofik`.
+- `poc6-dag-cbor-interop/` — proof-of-concept 6: standalone Go tests for DAG-CBOR/IPLD interop with CID links, byte strings, tag-42 link encoding, stable CIDs, and local evidence. It is executable evidence for `scenarios/cas-object-model-dag-cbor-interop/`, not a final L6 CAS API. Source: `DI-sagos`.
 
 TODO-jodon (UDP-binding v0 reference) and TODO-bihon (ns-3 harness fixture) remain future implementation work.
