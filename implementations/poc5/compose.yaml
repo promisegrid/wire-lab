@@ -1,0 +1,42 @@
+services:
+  alice:
+    build: .
+    command: ["/usr/local/bin/run-alice.sh"]
+    networks: [poc5]
+    volumes: [poc5-run:/run/poc5]
+    environment:
+      POC5_RUN_ID: ${POC5_RUN_ID:-manual}
+  bob:
+    build: .
+    command: ["/usr/local/bin/run-bob.sh"]
+    networks: [poc5]
+    volumes: [poc5-run:/run/poc5]
+    environment:
+      POC5_RUN_ID: ${POC5_RUN_ID:-manual}
+  carol:
+    build: .
+    command: ["/usr/local/bin/run-carol.sh"]
+    networks: [poc5]
+    volumes: [poc5-run:/run/poc5]
+    environment:
+      POC5_RUN_ID: ${POC5_RUN_ID:-manual}
+  dave:
+    build: .
+    command: ["/usr/local/bin/run-dave.sh"]
+    networks: [poc5]
+    volumes: [poc5-run:/run/poc5]
+    environment:
+      POC5_RUN_ID: ${POC5_RUN_ID:-manual}
+  ellen:
+    build: .
+    command: ["/usr/local/bin/run-ellen.sh"]
+    networks: [poc5]
+    volumes: [poc5-run:/run/poc5]
+    environment:
+      POC5_RUN_ID: ${POC5_RUN_ID:-manual}
+
+networks:
+  poc5:
+
+volumes:
+  poc5-run:

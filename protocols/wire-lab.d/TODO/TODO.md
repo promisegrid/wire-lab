@@ -15,6 +15,7 @@ minted after that date carry only the proquint handle.
 
 | Handle | Mint date | Title | Prior alias |
 |---|---|---|---|
+| [TODO-hipak](./TODO-hipak-poc5-local-trust-selective-sending.md) | 2026-05-25 | poc5 local trust selective sending **(implemented and demo-validated: local trust, broken-promise evidence, and selective-send proof after poc4)** | — |
 | [TODO-tapov](./TODO-tapov-poc4-five-container-relay-promise-proof.md) | 2026-05-25 | poc4 five-container relay promise proof **(implemented and demo-validated: provisional multi-hop app/relay/kernel evidence after poc3)** | — |
 | [TODO-dutaz](./TODO-dutaz-perplexity-computer-onboarding.md) | 2026-04-29 | TODO 001 - Perplexity Computer onboarding | `TODO-1` / `TODO-20260429-030146` |
 | [TODO-fofas](./TODO-fofas-review-feedback-as-contest-artifact.md) | 2026-04-28 | TODO 002 - Durable review feedback as contest artifact | `TODO-2` / `TODO-20260429-033416` |
