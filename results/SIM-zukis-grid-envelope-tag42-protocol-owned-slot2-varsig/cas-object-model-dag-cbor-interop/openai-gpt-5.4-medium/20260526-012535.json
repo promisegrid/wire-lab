@@ -1,0 +1,177 @@
+{
+  "schema": "promisegrid.ga.result.v4",
+  "result_id": "SIM-zukis-grid-envelope-tag42-protocol-owned-slot2-varsig-cas-object-model-dag-cbor-interop-openai-gpt-5.4-medium-20260526-012535",
+  "run_group_id": "ga-rescore-20260526-012535-goban-dalor-zukis-v4",
+  "cell_id": "ga-rescore-20260526-012535-goban-dalor-zukis-v4-000004-SIM-zukis-grid-envelope-tag42-protocol-owned-slot2-varsig--cas-object-model-dag-cbor-interop--openai-gpt-5.4-medium",
+  "sim_id": "SIM-zukis-grid-envelope-tag42-protocol-owned-slot2-varsig",
+  "scenario_id": "cas-object-model-dag-cbor-interop",
+  "model_id": "openai-gpt-5.4-medium",
+  "timestamp_utc": "20260526-012535",
+  "result_path": "results/SIM-zukis-grid-envelope-tag42-protocol-owned-slot2-varsig/cas-object-model-dag-cbor-interop/openai-gpt-5.4-medium/20260526-012535.json",
+  "runner": {
+    "tool": "ga-runner",
+    "provider": "openai",
+    "api_model": "gpt-5.4",
+    "reasoning_effort": "medium",
+    "output_contract": "json_schema_strict",
+    "service_tier": "flex",
+    "served_service_tier": "flex",
+    "request_id": "req_dc2e546e24354bcc95fd667f24c1e278",
+    "response_id": "resp_020a13bcc585e7f6006a14f86f00cc819a9f8879c974ff504b",
+    "input_tokens": 10645,
+    "output_tokens": 1493,
+    "cost_usd": 0.03953075
+  },
+  "source": {
+    "repo_commit": "4eed969539843234f8012f59620f0df87d1387e3",
+    "sim_path": "simulations/SIM-zukis-grid-envelope-tag42-protocol-owned-slot2-varsig/",
+    "scenario_path": "scenarios/cas-object-model-dag-cbor-interop/cas-object-model-dag-cbor-interop.md",
+    "root_contract_paths": [
+      "results/RUN-PROTOCOL.md",
+      "scenarios/README.md"
+    ],
+    "files": [
+      {
+        "path": "results/RUN-PROTOCOL.md",
+        "sha256": "dac615cf4da7d3b9d156d21e67a53a52bdc0cc6130bf913d2dd75dbb098f4a7c"
+      },
+      {
+        "path": "scenarios/README.md",
+        "sha256": "406c4c7f400df14788d1caea61406f83adbc474160806ce4f1aa6a88d409d483"
+      },
+      {
+        "path": "simulations/SIM-zukis-grid-envelope-tag42-protocol-owned-slot2-varsig/README.md",
+        "sha256": "3d8f0dc34bb089ea869da3e7734449d6a9e63686d3771a1092f7a996ed5dbd38"
+      },
+      {
+        "path": "simulations/SIM-zukis-grid-envelope-tag42-protocol-owned-slot2-varsig/QUESTION.md",
+        "sha256": "6ac92c465fd8e4b3df471a5f1f5dc2ddb6b5a9a7327e99337283d48fcb655176"
+      },
+      {
+        "path": "simulations/SIM-zukis-grid-envelope-tag42-protocol-owned-slot2-varsig/protocols/grid-envelope.d/specs/grid-envelope-draft.md",
+        "sha256": "bba64aaf5e62ab2f2eb657e36d24eed2d271d19f204ae496e9422d7bd3ac84df"
+      },
+      {
+        "path": "scenarios/cas-object-model-dag-cbor-interop/cas-object-model-dag-cbor-interop.md",
+        "sha256": "d55a1b7926a7dd59d2709630231ddde5ba73f0f8f2b44e112755be7c25ba7bbe"
+      }
+    ],
+    "simulation_tree_hash": "d26c43b11b40eb116bd45a59a1aa565c420a3060cc8b137bf87b06363978c55d"
+  },
+  "rubric": {
+    "rubric_version": "ga-rubric-20260525-v4",
+    "score_scale": "0..5",
+    "score_meanings": {
+      "0": "no fit or absent",
+      "5": "strong fit",
+      "app_protocol_promise_semantics": "0 uses command/request-response-service/permission framing or needless pCID fragmentation, 5 models storage, computation, send/receive, reciprocal promises, local trust, make/break evidence, and payload kinds under stable protocol pCIDs where appropriate",
+      "envelope_discipline": "0 ignores the settled envelope direction or confuses pCID with payload/message/request identity, 5 aligns with grid([42(pCID), payload, ...]), stable Protocol-CID semantics, and protocol-owned later slots",
+      "kernel_implementation_promises": "0 treats the kernel as RPC authority, service registry, capability registry, permission issuer, or generic conformance judge, 5 names local app/kernel promises, assumptions, unsupported behavior, and observations",
+      "promise_vocabulary": "0 drifts into claims/profiles/generic statement capsules/central trust-ledger/RPC/service-registry/capability-table or per-message-pCID framing, 5 stays promise-first, layer-local, and pCID-specific",
+      "risk_penalty": "0 low risk, 5 severe risk",
+      "simplicity_durability": "0 overbuilt, selector-shopping, mode-matrix/service-catalog/capability-map heavy, per-record-pCID fragmented, or fragile, 5 minimal, durable, and small-device-friendly under the 100-year goal"
+    },
+    "axes": [
+      "scenario_fit",
+      "promisegrid_alignment",
+      "auditability",
+      "evolution_safety",
+      "layer_boundary_clarity",
+      "failure_handling",
+      "implementation_plausibility",
+      "promise_vocabulary",
+      "simplicity_durability",
+      "envelope_discipline",
+      "kernel_implementation_promises",
+      "app_protocol_promise_semantics",
+      "risk_penalty"
+    ],
+    "promise_theory_rules": [
+      "Agents are autonomous.",
+      "A promise is a scoped declaration of intent.",
+      "No agent can make a promise on behalf of another agent.",
+      "Promises do not guarantee outcomes.",
+      "Trust is a local assessment of whether a promise will be kept.",
+      "Promises to receive or use are not equivalent to obligations, impositions, or promises to give."
+    ],
+    "promise_theory_references": [
+      "Mark Burgess, In Search of Certainty",
+      "Mark Burgess, Promise Theory: Principles and Applications",
+      "Mark Burgess, Thinking in Promises"
+    ]
+  },
+  "scores": {
+    "scenario_fit": 4,
+    "promisegrid_alignment": 5,
+    "auditability": 4,
+    "evolution_safety": 4,
+    "layer_boundary_clarity": 5,
+    "failure_handling": 4,
+    "implementation_plausibility": 5,
+    "promise_vocabulary": 5,
+    "simplicity_durability": 4,
+    "envelope_discipline": 5,
+    "kernel_implementation_promises": 3,
+    "app_protocol_promise_semantics": 2,
+    "risk_penalty": 1
+  },
+  "fitness": {
+    "raw": 54,
+    "normalized_0_100": 83.07692307692308,
+    "confidence_0_1": 0.84
+  },
+  "assessment": {
+    "rationale": "Strong PT-clean envelope specimen. It is well aligned with the current tagged grid direction, keeps pCID as protocol-spec identifier, and gives clear unknown-pCID behavior. For this DAG-CBOR interop scenario it scores well because it uses deterministic CBOR, tag 42, and CID-aware parsing without requiring a full IPLD stack. Scenario fit is not perfect because it intentionally stops at the envelope boundary and does not decide whether DAG-CBOR is the default payload object model or just one profile.",
+    "strengths": [
+      "Excellent envelope discipline: CBOR grid([42(pCID), payload, varsig]) with protocol-owned later slots and no selector shopping.",
+      "Promise vocabulary is clean and local: sender promises bytes conform to the protocol named by pCID; receivers decide trust locally.",
+      "Good DAG-CBOR/CID ecosystem fit through deterministic CBOR, tag usage, byte-string friendliness, and explicit CID parsing expectations.",
+      "Clear failure boundary for unknown pCID: preserve or blind-carry bytes, but do not claim parse or verification success.",
+      "Implementation is small and durable enough for constrained receivers."
+    ],
+    "weaknesses": [
+      "Does not answer the scenario's deeper TE-43 question about whether DAG-CBOR is the default object model versus an optional profile.",
+      "Kernel-local implementation promises are mostly implicit rather than developed in detail.",
+      "Higher-layer promise accounting, storage semantics, and observation/update semantics are intentionally absent, so app-protocol semantics coverage is low."
+    ],
+    "risks": [
+      "A protocol-owned slot-2 varsig may still feel like premature proof-shape freezing if later envelope families need different outer evidence layouts.",
+      "Because payload semantics are delegated, some evaluators may overread this as solving CAS object-model policy when it only improves carriage/interoperability at the envelope layer.",
+      "One-pCID discipline is clean, but future signer or associated-data evolution could become awkward if protocol families need more independent deployability."
+    ],
+    "open_questions": [
+      "Does fixing this specimen at slot 2 = varsig freeze proof structure too early relative to the broader grid([42(pCID), payload, ...]) family?",
+      "For DAG-CBOR interop pressure, should PromiseGrid treat DAG-CBOR as a common payload profile rather than leave all object-model decisions to pCID-owned payload protocols?",
+      "Is one pCID sufficient for long-term evolution of signer-binding and proof semantics without later selector pressure?"
+    ],
+    "authority_boundary": "Evidence only; evaluates this envelope specimen at the envelope layer and does not settle canonical PromiseGrid design or higher-layer payload semantics.",
+    "pt_gate": {
+      "status": "pt_clean",
+      "autonomous_agents": {
+        "status": "pass",
+        "note": "Senders make their own scoped promises and receivers decide locally whether to parse, verify, store, relay, or trust."
+      },
+      "scoped_intent": {
+        "status": "pass",
+        "note": "The main promise is narrowly scoped: these payload bytes and outer-slot arrangement meet the protocol spec named by this pCID."
+      },
+      "no_promises_for_others": {
+        "status": "pass",
+        "note": "The design does not let the kernel or envelope certify another agent's abilities globally."
+      },
+      "no_guaranteed_outcomes": {
+        "status": "pass",
+        "note": "varsig is evidence for a sender promise, not a guarantee that receivers will accept or that outcomes are achieved."
+      },
+      "local_trust_assessment": {
+        "status": "pass",
+        "note": "Unknown-pCID and varsig handling are explicitly local; no central trust oracle is assumed."
+      },
+      "accept_use_not_obligation": {
+        "status": "pass",
+        "note": "The spec explicitly says carriage is not acceptance and receivers may preserve bytes without promising semantic use."
+      },
+      "violations": []
+    }
+  }
+}
