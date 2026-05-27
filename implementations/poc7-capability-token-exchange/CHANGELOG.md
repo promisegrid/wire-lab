@@ -21,5 +21,13 @@ claim:           extends
 spec:            scenario:promise-economy-capability-token-exchange
 scope:           executable-proof-of-concept
 breaking-change: false
-notes:           Replaces HTTP wrapper transport with length-framed TCP and reframes app message kinds around resource promise requests, promise fulfillment presentations, promise receipts, reciprocal exchange promises, evidence requests, and issuer-local revocation notices. Source: `DI-tanat`.
+notes:           Replaces HTTP wrapper transport with length-framed TCP and reframes app message kinds around resource promise requests, promise fulfillment presentations, promise receipts, reciprocal exchange promises, local evidence observations, and issuer-local revocation notices. Source: `DI-tanat`.
+```
+
+```changelog-entry
+claim:           extends
+spec:            scenario:promise-economy-capability-token-exchange
+scope:           executable-proof-of-concept
+breaking-change: false
+notes:           Removes the special auditor role and Alice-to-Dave token shortcut; Mallory now voluntarily circulates the stale token to Dave, and Dave redeems it through ordinary trader behavior before updating local trust in Alice and Mallory. Source: `DI-pabot`.
 ```

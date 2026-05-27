@@ -14,7 +14,6 @@ import (
 	"strings"
 	"time"
 
-	"promisegrid.dev/wire-lab/implementations/poc7-capability-token-exchange/auditor"
 	"promisegrid.dev/wire-lab/implementations/poc7-capability-token-exchange/compute"
 	"promisegrid.dev/wire-lab/implementations/poc7-capability-token-exchange/data"
 	"promisegrid.dev/wire-lab/implementations/poc7-capability-token-exchange/issuer"
@@ -33,9 +32,9 @@ const (
 	kindPromiseReceived                = "promise_received_v1"
 	kindExchangeOfferPromise           = "exchange_offer_promise_v1"
 	kindReciprocalExchangePromise      = "reciprocal_exchange_promise_v1"
-	kindPromiseEvidenceRequest         = "promise_evidence_request_v1"
 	kindHeldPromiseFulfillmentRequest  = "held_promise_fulfillment_request_v1"
 	kindHeldReciprocalExchangeRequest  = "held_reciprocal_exchange_request_v1"
+	kindHeldPromiseTransferRequest     = "held_promise_transfer_request_v1"
 )
 
 type WireMessage struct {
@@ -85,6 +84,10 @@ type Node struct {
 	Evidence []token.Event
 	Storage  map[string]string
 	Data     map[string]string
+	// TokenSources records which peer voluntarily circulated a held token to
+	// this node. Intent: Dave judges Mallory's stale-token circulation locally
+	// instead of receiving Alice-provided out-of-band evidence. Source: DI-pabot
+	TokenSources map[string]string
 }
 
 var nodeAddrs = map[string]string{
@@ -102,13 +105,14 @@ func main() {
 		log.Fatal("missing -node")
 	}
 	node := &Node{
-		Name:    *nodeName,
-		RunID:   getenv("POC7_RUN_ID", "manual"),
-		RunRoot: "/run/poc7",
-		Issuer:  token.NewIssuer(*nodeName),
-		Wallet:  token.NewWallet(*nodeName),
-		Storage: make(map[string]string),
-		Data:    initialData(*nodeName),
+		Name:         *nodeName,
+		RunID:        getenv("POC7_RUN_ID", "manual"),
+		RunRoot:      "/run/poc7",
+		Issuer:       token.NewIssuer(*nodeName),
+		Wallet:       token.NewWallet(*nodeName),
+		Storage:      make(map[string]string),
+		Data:         initialData(*nodeName),
+		TokenSources: make(map[string]string),
 	}
 	listener, listenErr := net.Listen("tcp", ":8077")
 	if listenErr != nil {
@@ -203,8 +207,6 @@ func (node *Node) receiveFrame(envelopeBytes []byte) (WireResponse, error) {
 		return node.handleIssuer(message)
 	case trader.AppName:
 		return node.handleTrader(message)
-	case auditor.AppName:
-		return node.handleAuditor(message)
 	default:
 		return WireResponse{}, fmt.Errorf("%s has no app %s", node.Name, message.ToApp)
 	}
@@ -214,7 +216,7 @@ func (node *Node) receiveFrame(envelopeBytes []byte) (WireResponse, error) {
 // by the local holder before any issuer or exchange peer is contacted. Source:
 // DI-tanat
 func isHeldPromiseInstruction(kind string) bool {
-	return kind == kindHeldPromiseFulfillmentRequest || kind == kindHeldReciprocalExchangeRequest
+	return kind == kindHeldPromiseFulfillmentRequest || kind == kindHeldReciprocalExchangeRequest || kind == kindHeldPromiseTransferRequest
 }
 
 func (node *Node) forward(message WireMessage) (WireResponse, error) {
@@ -335,6 +337,9 @@ func (node *Node) handleTrader(message WireMessage) (WireResponse, error) {
 	switch message.Kind {
 	case kindPromiseReceived:
 		node.Wallet.Add(message.Token, message.FromNode+" transferred token")
+		if message.FromNode != "" {
+			node.TokenSources[message.Token.ID] = message.FromNode
+		}
 		node.record("token_received", token.OutcomeKept, message.Token.ID, node.Name+" trader received token")
 		return WireResponse{Outcome: token.OutcomeKept, Detail: "token received"}, nil
 	case kindExchangeOfferPromise:
@@ -369,20 +374,6 @@ func (node *Node) handleTrader(message WireMessage) (WireResponse, error) {
 	}
 }
 
-func (node *Node) handleAuditor(message WireMessage) (WireResponse, error) {
-	if message.Kind != kindPromiseEvidenceRequest {
-		return WireResponse{}, fmt.Errorf("auditor has no local evidence promise for %s", message.Kind)
-	}
-	node.Wallet.Add(message.Token, message.FromNode+" presented token for audit")
-	redeem, err := node.send("alice", issuer.AppName, kindPromisePresentedForFulfillment, []string{"mallory", "alice"}, map[string]string{}, message.Token)
-	if err != nil {
-		return WireResponse{}, err
-	}
-	node.Wallet.ApplyRedemption(token.Event{Observer: node.Name, Event: "audit_redemption", Outcome: redeem.Outcome, TokenID: message.Token.ID, Detail: redeem.Detail})
-	node.record("audit_completed", redeem.Outcome, message.Token.ID, node.Name+" audited token and updated local trust")
-	return WireResponse{Outcome: redeem.Outcome, Detail: "audit completed: " + redeem.Detail}, nil
-}
-
 // runCommand keeps local holder instructions on the same signed-envelope path
 // as inter-peer messages. Source: DI-tanat
 func (node *Node) runCommand(rawMessage WireMessage) (WireResponse, error) {
@@ -407,7 +398,12 @@ func (node *Node) runCommandMessage(message WireMessage) (WireResponse, error) {
 		if issuerNode == "" {
 			return WireResponse{}, fmt.Errorf("held promise fulfillment request has no promise_issuer_node")
 		}
-		return node.send(issuerNode, issuer.AppName, kindPromisePresentedForFulfillment, message.Route, message.Payload, message.Token)
+		response, redeemErr := node.send(issuerNode, issuer.AppName, kindPromisePresentedForFulfillment, message.Route, message.Payload, message.Token)
+		if redeemErr != nil {
+			return WireResponse{}, redeemErr
+		}
+		node.applyRedemptionEvidence(message.Token, response)
+		return response, nil
 	case kindHeldReciprocalExchangeRequest:
 		if !node.Wallet.Holds(message.Token.ID) {
 			return WireResponse{}, fmt.Errorf("%s has no local held-promise evidence for exchange token %s", node.Name, message.Token.ID)
@@ -424,11 +420,46 @@ func (node *Node) runCommandMessage(message WireMessage) (WireResponse, error) {
 			node.Wallet.Add(response.Token, "trade returned non-transferable access token")
 		}
 		return response, nil
+	case kindHeldPromiseTransferRequest:
+		if !node.Wallet.Holds(message.Token.ID) {
+			return WireResponse{}, fmt.Errorf("%s has no local held-promise evidence for transfer token %s", node.Name, message.Token.ID)
+		}
+		if message.Token.TransferRule != token.TransferBearer {
+			return WireResponse{}, fmt.Errorf("held token %s is not bearer-transferable", message.Token.ID)
+		}
+		recipientNode := message.Payload["recipient_node"]
+		if recipientNode == "" {
+			return WireResponse{}, fmt.Errorf("held promise transfer request has no recipient_node")
+		}
+		transferPayload := copyPayload(message.Payload)
+		transferPayload["presented_by_peer"] = node.Name
+		response, transferErr := node.send(recipientNode, trader.AppName, kindPromiseReceived, message.Route, transferPayload, message.Token)
+		if transferErr != nil {
+			return WireResponse{}, transferErr
+		}
+		node.record("token_circulated", response.Outcome, message.Token.ID, node.Name+" voluntarily circulated token to "+recipientNode)
+		return response, nil
 	case kindExchangeOfferPromise:
 		return node.receive(message)
 	default:
 		return WireResponse{}, fmt.Errorf("no local promise instruction named %s", message.Kind)
 	}
+}
+
+// applyRedemptionEvidence updates the holder's local trust after the issuer
+// keeps, breaks, or refuses a token promise. Intent: Dave judges both Alice's
+// issuer promise and Mallory's stale-token circulation without any auditor
+// authority or Alice-to-Dave evidence shortcut. Source: DI-pabot
+func (node *Node) applyRedemptionEvidence(heldToken token.Token, response WireResponse) {
+	event := token.Event{Observer: node.Name, Event: "held_redemption_observed", Outcome: response.Outcome, TokenID: heldToken.ID, Detail: response.Detail}
+	node.Wallet.ApplyRedemption(event)
+	node.record("holder_trust_updated", response.Outcome, heldToken.ID, node.Name+" updated local trust for issuer "+heldToken.Issuer+" after redemption outcome "+response.Outcome)
+	sourcePeer := node.TokenSources[heldToken.ID]
+	if sourcePeer == "" || sourcePeer == heldToken.Issuer {
+		return
+	}
+	node.Wallet.ApplyPeerObservation(sourcePeer, event)
+	node.record("circulator_trust_updated", response.Outcome, heldToken.ID, node.Name+" updated local trust for circulating peer "+sourcePeer+" after redemption outcome "+response.Outcome)
 }
 
 // runScenario is Alice's bounded script for the five-agent exchange. Intent:
@@ -538,12 +569,15 @@ func (node *Node) runScenario() error {
 	if _, err := node.send("mallory", trader.AppName, kindPromiseReceived, []string{"mallory"}, nil, revoked); err != nil {
 		return err
 	}
-	audit, err := node.send("dave", auditor.AppName, kindPromiseEvidenceRequest, []string{"mallory", "dave"}, nil, revoked)
+	if _, err := node.requestHolderTransfer("mallory", []string{"dave"}, "dave", revoked); err != nil {
+		return err
+	}
+	staleRedemption, err := node.requestHolderRedeem("dave", []string{"mallory", "alice"}, revoked, map[string]string{})
 	if err != nil {
 		return err
 	}
-	if audit.Outcome != token.OutcomeBroken {
-		return fmt.Errorf("expected revoked token audit to break, got %#v", audit)
+	if staleRedemption.Outcome != token.OutcomeBroken {
+		return fmt.Errorf("expected revoked token redemption to break, got %#v", staleRedemption)
 	}
 	if err := os.MkdirAll(filepath.Join(node.RunRoot, node.RunID), 0o755); err != nil {
 		return err
@@ -591,6 +625,21 @@ func (node *Node) requestHolderTrade(holderNode string, route []string, tok toke
 	commandPayload := copyPayload(payload)
 	commandPayload["exchange_peer_node"] = route[len(route)-1]
 	command, commandErr := node.newWireMessage("scenario", holderNode, trader.AppName, kindHeldReciprocalExchangeRequest, route, commandPayload, tok)
+	if commandErr != nil {
+		return WireResponse{}, commandErr
+	}
+	return transmit(nodeAddrs[holderNode], command)
+}
+
+// requestHolderTransfer asks the current holder to circulate a bearer token to a
+// chosen peer. Intent: Mallory must actively present the stale token to Dave;
+// Alice no longer sends Dave a second copy out-of-band. Source: DI-pabot
+func (node *Node) requestHolderTransfer(holderNode string, route []string, recipientNode string, tok token.Token) (WireResponse, error) {
+	if len(route) == 0 {
+		return WireResponse{}, fmt.Errorf("transfer route for holder %s is empty", holderNode)
+	}
+	commandPayload := map[string]string{"recipient_node": recipientNode}
+	command, commandErr := node.newWireMessage("scenario", holderNode, trader.AppName, kindHeldPromiseTransferRequest, route, commandPayload, tok)
 	if commandErr != nil {
 		return WireResponse{}, commandErr
 	}

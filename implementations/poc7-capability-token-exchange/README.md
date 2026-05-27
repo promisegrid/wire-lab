@@ -16,7 +16,7 @@ boring length-framed TCP; each app message is a signed CBOR
 evidence only. Relays carry app messages. Apps make local promise judgments.
 The visible app message kinds are promise-shaped: resource promise requests,
 promise presentations for fulfillment, promise receipts, reciprocal exchange
-promises, evidence requests, and issuer-local revocation notices.
+promises, holder-initiated transfers, and issuer-local revocation notices.
 
 The scenario now performs real POC work:
 
@@ -26,8 +26,9 @@ The scenario now performs real POC work:
 - Carol offers a Bob bearer token to Alice and receives a non-transferable Alice
   data token promised specifically to Carol.
 - Carol redeems that Alice data token and receives Alice's local data payload.
-- Dave audits a revoked Alice token and updates Dave-local trust from the broken
-  redemption outcome.
+- Mallory voluntarily circulates a revoked Alice bearer token to Dave; Dave
+  redeems it with Alice and locally updates trust in both Alice and Mallory from
+  the broken redemption outcome.
 
 Run:
 
@@ -39,3 +40,4 @@ POC7_RUN_ID="$(date -u +%Y%m%d%H%M%S)" docker compose up --build --abort-on-cont
 `poc7` is not a final token standard, economics model, exchange protocol, trust
 API, kernel API, storage API, compute API, TCP transport standard, or SDK.
 Source: `DI-tugih`; `DI-fibok`; `DI-tanat`.
+The Mallory-to-Dave stale-token flow is corrected under `DI-pabot`.

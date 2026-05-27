@@ -196,6 +196,19 @@ func (wallet *Wallet) ApplyRedemption(event Event) {
 	wallet.events = append(wallet.events, Event{Observer: wallet.Owner, Event: "local_trust_updated", Outcome: OutcomeKept, TokenID: event.TokenID, Detail: fmt.Sprintf("%s trust in %s is now %d after %s", wallet.Owner, issuer, wallet.trust[issuer], event.Outcome)})
 }
 
+// ApplyPeerObservation updates local trust in the peer who circulated a token.
+// Intent: Let Dave judge Mallory's stale-token circulation separately from
+// Dave's judgment about Alice's issuer promise. Source: DI-pabot
+func (wallet *Wallet) ApplyPeerObservation(peer string, event Event) {
+	switch event.Outcome {
+	case OutcomeKept:
+		wallet.trust[peer] += 1
+	case OutcomeBroken, OutcomeRefused:
+		wallet.trust[peer] -= 1
+	}
+	wallet.events = append(wallet.events, Event{Observer: wallet.Owner, Event: "local_peer_trust_updated", Outcome: OutcomeKept, TokenID: event.TokenID, Detail: fmt.Sprintf("%s trust in peer %s is now %d after circulated token outcome %s", wallet.Owner, peer, wallet.trust[peer], event.Outcome)})
+}
+
 // Quote prices one issuer's token against another using only this wallet's
 // holdings and trust history. Intent: Keep POC7 economics local and observable
 // without creating a central exchange or global exchange rate. Source: DI-fibok

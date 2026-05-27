@@ -57,6 +57,10 @@ of the base protocol, and does not make promisebase authoritative. Source:
 - [x] rajig.9 Refactor POC7 away from HTTP wrapper transport to framed TCP and
   reframe app message names around promises, reciprocal promises, local
   evidence, and local trust judgments. Done under `DI-tanat`.
+- [x] rajig.10 Correct POC7's stale-token transaction so Mallory voluntarily
+  circulates the token to Dave, Dave redeems it through normal trader behavior,
+  and POC7 no longer has a special auditor role or Alice-to-Dave token shortcut.
+  Done under `DI-pabot`.
 
 ## Routed Elsewhere
 
@@ -135,6 +139,35 @@ discipline but do not mutate POC5.
 Affects: `implementations/poc7-capability-token-exchange/**`;
 `implementations/README.md`; `DEV-GUIDE-RESOURCES.md`;
 `protocols/wire-lab.d/TODO/TODO-rajig-promise-economy-spectrum.md`.
+
+ID: DI-pabot
+Date: 2026-05-26 23:30:45
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Correct POC7's stale-token transaction by removing the special
+`auditor` role and `promise_evidence_request_v1` message kind. Mallory must
+voluntarily transfer or present the revoked Alice bearer token to Dave before
+Dave can hold it, and Dave must use normal trader/holder behavior to present the
+token to Alice for fulfillment evidence.
+Intent: The previous POC7 flow made Alice send the same token to Mallory and to
+Dave, routed through Mallory, which bypassed Mallory's agency and created a fake
+evidence chain. The corrected flow should demonstrate the actual PromiseGrid
+pressure case: Mallory circulates a stale or revoked promise token, Dave receives
+it from Mallory, Dave locally asks Alice to keep or break the issuer promise, and
+Dave updates local trust from both Alice's broken issuer promise and Mallory's
+stale-token circulation.
+Constraints: Keep the framed TCP refactor, signed CBOR
+`grid([42(pCID), payload, proof])` envelopes, local trust, issuer-local
+redemption/revocation, and evidence-only status from `DI-tanat`. Do not add a
+central exchange, auditor authority, trust authority, shared token-status
+ledger, or out-of-band Alice-to-Dave evidence shortcut. Use ordinary trader and
+wallet behavior for Dave.
+Affects: `implementations/poc7-capability-token-exchange/**`;
+`implementations/README.md`; `DEV-GUIDE-RESOURCES.md`;
+`protocols/wire-lab.d/TODO/TODO-rajig-promise-economy-spectrum.md`.
+Supersedes: The `promise_evidence_request_v1` / auditor-role portion of
+`DI-tanat`; `DI-tanat` remains active for framed TCP and the other
+promise-shaped message names.
 
 ID: DI-tanat
 Date: 2026-05-26 23:03:49
