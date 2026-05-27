@@ -53,6 +53,14 @@ func TestRevokedTokenRecordsBrokenPromiseEvidence(t *testing.T) {
 	}
 }
 
+func TestPeerObservationUpdatesCirculatorTrust(t *testing.T) {
+	dave := NewWallet("dave")
+	dave.ApplyPeerObservation("mallory", Event{Observer: "dave", Event: "held_redemption_observed", Outcome: OutcomeBroken, TokenID: "alice-revoked"})
+	if dave.Trust("mallory") >= 0 {
+		t.Fatalf("dave trust in mallory should decrease after mallory circulates broken token evidence")
+	}
+}
+
 func TestPeerLocalExchangeRatesDiffer(t *testing.T) {
 	bob := NewWallet("bob")
 	dave := NewWallet("dave")

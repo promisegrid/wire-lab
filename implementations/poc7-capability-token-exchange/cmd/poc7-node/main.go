@@ -17,6 +17,7 @@ import (
 	"promisegrid.dev/wire-lab/implementations/poc7-capability-token-exchange/compute"
 	"promisegrid.dev/wire-lab/implementations/poc7-capability-token-exchange/data"
 	"promisegrid.dev/wire-lab/implementations/poc7-capability-token-exchange/issuer"
+	"promisegrid.dev/wire-lab/implementations/poc7-capability-token-exchange/policy"
 	"promisegrid.dev/wire-lab/implementations/poc7-capability-token-exchange/protocol"
 	"promisegrid.dev/wire-lab/implementations/poc7-capability-token-exchange/relay"
 	"promisegrid.dev/wire-lab/implementations/poc7-capability-token-exchange/storage"
@@ -81,6 +82,7 @@ type Node struct {
 	RunRoot  string
 	Issuer   *token.Issuer
 	Wallet   *token.Wallet
+	Policy   policy.AgentPolicy
 	Evidence []token.Event
 	Storage  map[string]string
 	Data     map[string]string
@@ -110,6 +112,7 @@ func main() {
 		RunRoot:      "/run/poc7",
 		Issuer:       token.NewIssuer(*nodeName),
 		Wallet:       token.NewWallet(*nodeName),
+		Policy:       policy.ForNode(*nodeName),
 		Storage:      make(map[string]string),
 		Data:         initialData(*nodeName),
 		TokenSources: make(map[string]string),
@@ -246,6 +249,10 @@ func (node *Node) nextRouteHop(message WireMessage) (string, error) {
 func (node *Node) handleIssuer(message WireMessage) (WireResponse, error) {
 	switch message.Kind {
 	case kindResourcePromiseRequest:
+		decision := node.decide(policy.ActionIssue, message)
+		if !decision.Accepted {
+			return WireResponse{Outcome: token.OutcomeRefused, Detail: decision.Detail()}, nil
+		}
 		issued, err := node.Issuer.Issue(message.Payload["token_id"], message.Payload["original_peer"], message.Payload["resource_kind"], message.Payload["resource_id"], message.Payload["transfer_rule"])
 		if err != nil {
 			return WireResponse{}, err
@@ -336,6 +343,11 @@ func (node *Node) fulfillCompute(message WireMessage) (map[string]string, error)
 func (node *Node) handleTrader(message WireMessage) (WireResponse, error) {
 	switch message.Kind {
 	case kindPromiseReceived:
+		decision := node.decide(policy.ActionAccept, message)
+		if !decision.Accepted {
+			node.record("token_refused", token.OutcomeRefused, message.Token.ID, node.Name+" refused received token from "+message.FromNode)
+			return WireResponse{Outcome: token.OutcomeRefused, Detail: decision.Detail()}, nil
+		}
 		node.Wallet.Add(message.Token, message.FromNode+" transferred token")
 		if message.FromNode != "" {
 			node.TokenSources[message.Token.ID] = message.FromNode
@@ -343,6 +355,10 @@ func (node *Node) handleTrader(message WireMessage) (WireResponse, error) {
 		node.record("token_received", token.OutcomeKept, message.Token.ID, node.Name+" trader received token")
 		return WireResponse{Outcome: token.OutcomeKept, Detail: "token received"}, nil
 	case kindExchangeOfferPromise:
+		decision := node.decide(policy.ActionQuote, message)
+		if !decision.Accepted {
+			return WireResponse{Outcome: token.OutcomeRefused, Detail: decision.Detail()}, nil
+		}
 		offer := node.Wallet.Quote(message.Payload["offered_issuer"], message.Payload["wanted_issuer"])
 		payload := map[string]string{
 			"offered_count": fmt.Sprintf("%d", offer.OfferedCount),
@@ -351,6 +367,10 @@ func (node *Node) handleTrader(message WireMessage) (WireResponse, error) {
 		node.record("exchange_rate_quoted", token.OutcomeKept, "", node.Name+" quoted peer-local exchange rate")
 		return WireResponse{Outcome: token.OutcomeKept, Detail: "peer-local quote", Payload: payload}, nil
 	case kindReciprocalExchangePromise:
+		decision := node.decide(policy.ActionTrade, message)
+		if !decision.Accepted {
+			return WireResponse{Outcome: token.OutcomeRefused, Detail: decision.Detail()}, nil
+		}
 		node.Wallet.Add(message.Token, message.FromNode+" offered bearer token for non-transferable access")
 		recipientPeer := message.Payload["recipient_peer"]
 		if recipientPeer == "" {
@@ -394,6 +414,10 @@ func (node *Node) runCommandMessage(message WireMessage) (WireResponse, error) {
 		if !node.Wallet.Holds(message.Token.ID) {
 			return WireResponse{}, fmt.Errorf("%s has no local held-promise evidence for token %s", node.Name, message.Token.ID)
 		}
+		decision := node.decide(policy.ActionRedeem, message)
+		if !decision.Accepted {
+			return WireResponse{Outcome: token.OutcomeRefused, Detail: decision.Detail()}, nil
+		}
 		issuerNode := message.Payload["promise_issuer_node"]
 		if issuerNode == "" {
 			return WireResponse{}, fmt.Errorf("held promise fulfillment request has no promise_issuer_node")
@@ -407,6 +431,10 @@ func (node *Node) runCommandMessage(message WireMessage) (WireResponse, error) {
 	case kindHeldReciprocalExchangeRequest:
 		if !node.Wallet.Holds(message.Token.ID) {
 			return WireResponse{}, fmt.Errorf("%s has no local held-promise evidence for exchange token %s", node.Name, message.Token.ID)
+		}
+		decision := node.decide(policy.ActionTrade, message)
+		if !decision.Accepted {
+			return WireResponse{Outcome: token.OutcomeRefused, Detail: decision.Detail()}, nil
 		}
 		exchangePeer := message.Payload["exchange_peer_node"]
 		if exchangePeer == "" {
@@ -423,6 +451,10 @@ func (node *Node) runCommandMessage(message WireMessage) (WireResponse, error) {
 	case kindHeldPromiseTransferRequest:
 		if !node.Wallet.Holds(message.Token.ID) {
 			return WireResponse{}, fmt.Errorf("%s has no local held-promise evidence for transfer token %s", node.Name, message.Token.ID)
+		}
+		decision := node.decide(policy.ActionTransfer, message)
+		if !decision.Accepted {
+			return WireResponse{Outcome: token.OutcomeRefused, Detail: decision.Detail()}, nil
 		}
 		if message.Token.TransferRule != token.TransferBearer {
 			return WireResponse{}, fmt.Errorf("held token %s is not bearer-transferable", message.Token.ID)
@@ -444,6 +476,93 @@ func (node *Node) runCommandMessage(message WireMessage) (WireResponse, error) {
 	default:
 		return WireResponse{}, fmt.Errorf("no local promise instruction named %s", message.Kind)
 	}
+}
+
+// decide records the local economic judgment an agent makes before acting.
+// Intent: The scenario driver may present opportunities, but POC7 agents must
+// still accept or refuse from their own deterministic policy and local trust
+// evidence. Source: DI-rodog
+func (node *Node) decide(action string, message WireMessage) policy.Decision {
+	decision := node.Policy.Decide(node.policyContext(action, message))
+	outcome := token.OutcomeRefused
+	if decision.Accepted {
+		outcome = token.OutcomeKept
+	}
+	node.record("local_decision", outcome, message.Token.ID, decision.Detail())
+	return decision
+}
+
+// policyContext extracts the local facts visible to this node at the moment it
+// judges an opportunity. Intent: Keep POC7 economics local; trust values come
+// only from this wallet, and peer/source fields describe evidence this node has
+// actually observed. Source: DI-rodog
+func (node *Node) policyContext(action string, message WireMessage) policy.ActionContext {
+	payload := message.Payload
+	if payload == nil {
+		payload = map[string]string{}
+	}
+	context := policy.ActionContext{
+		Agent:        node.Name,
+		Action:       action,
+		Peer:         message.FromNode,
+		SourcePeer:   message.FromNode,
+		Recipient:    payload["recipient_node"],
+		Issuer:       message.Token.Issuer,
+		ResourceKind: message.Token.ResourceKind,
+		ResourceID:   message.Token.ResourceID,
+		TransferRule: message.Token.TransferRule,
+		Token:        message.Token,
+	}
+	if storedSource := node.TokenSources[message.Token.ID]; storedSource != "" {
+		context.SourcePeer = storedSource
+	}
+	if presentedBy := payload["presented_by_peer"]; presentedBy != "" {
+		context.Peer = presentedBy
+		context.SourcePeer = presentedBy
+	}
+	if originalPeer := payload["original_peer"]; originalPeer != "" {
+		context.Peer = originalPeer
+	}
+	if exchangePeer := payload["exchange_peer_node"]; exchangePeer != "" {
+		context.Peer = exchangePeer
+	}
+	if recipientPeer := payload["recipient_peer"]; recipientPeer != "" {
+		context.Recipient = recipientPeer
+	}
+	if context.Recipient == "" {
+		context.Recipient = context.Peer
+	}
+	if context.Issuer == "" {
+		context.Issuer = node.Name
+	}
+	if context.ResourceKind == "" {
+		context.ResourceKind = payload["resource_kind"]
+	}
+	if context.ResourceID == "" {
+		context.ResourceID = payload["resource_id"]
+	}
+	if action == policy.ActionTrade {
+		context.DesiredKind = payload["resource_kind"]
+		context.DesiredID = payload["resource_id"]
+	}
+	if context.TransferRule == "" {
+		context.TransferRule = payload["transfer_rule"]
+	}
+	context.IssuerTrust = node.trust(context.Issuer)
+	context.PeerTrust = node.trust(context.Peer)
+	context.SourcePeerTrust = node.trust(context.SourcePeer)
+	context.RecipientTrust = node.trust(context.Recipient)
+	return context
+}
+
+// trust returns this wallet's local trust score for a peer label. Intent: Ignore
+// orchestration labels such as "scenario" so scripted opportunities do not look
+// like real peer trust evidence. Source: DI-rodog
+func (node *Node) trust(peer string) int {
+	if peer == "" || peer == "scenario" {
+		return 0
+	}
+	return node.Wallet.Trust(peer)
 }
 
 // applyRedemptionEvidence updates the holder's local trust after the issuer
@@ -578,6 +697,27 @@ func (node *Node) runScenario() error {
 	}
 	if staleRedemption.Outcome != token.OutcomeBroken {
 		return fmt.Errorf("expected revoked token redemption to break, got %#v", staleRedemption)
+	}
+	secondRevoked, err := node.localIssue("alice-revoked-2", "mallory", data.Kind, "dataset-stale", token.TransferBearer)
+	if err != nil {
+		return err
+	}
+	secondRevokeMessage, err := node.newWireMessage(issuer.AppName, "alice", issuer.AppName, kindPromiseRevocationNotice, nil, map[string]string{"token_id": secondRevoked.ID, "reason": "Alice repeats stale-token probe after Dave's broken evidence"}, token.Token{})
+	if err != nil {
+		return err
+	}
+	if _, err := node.receive(secondRevokeMessage); err != nil {
+		return err
+	}
+	if _, err := node.send("mallory", trader.AppName, kindPromiseReceived, []string{"mallory"}, nil, secondRevoked); err != nil {
+		return err
+	}
+	secondTransfer, err := node.requestHolderTransfer("mallory", []string{"dave"}, "dave", secondRevoked)
+	if err != nil {
+		return err
+	}
+	if secondTransfer.Outcome != token.OutcomeRefused {
+		return fmt.Errorf("expected Dave to refuse second Mallory stale-token transfer, got %#v", secondTransfer)
 	}
 	if err := os.MkdirAll(filepath.Join(node.RunRoot, node.RunID), 0o755); err != nil {
 		return err

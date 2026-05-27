@@ -31,3 +31,11 @@ scope:           executable-proof-of-concept
 breaking-change: false
 notes:           Removes the special auditor role and Alice-to-Dave token shortcut; Mallory now voluntarily circulates the stale token to Dave, and Dave redeems it through ordinary trader behavior before updating local trust in Alice and Mallory. Source: `DI-pabot`.
 ```
+
+```changelog-entry
+claim:           extends
+spec:            scenario:promise-economy-capability-token-exchange
+scope:           executable-proof-of-concept
+breaking-change: false
+notes:           Adds deterministic per-agent local policy scoring before issue, accept, redeem, transfer, quote, and reciprocal exchange actions; Dave now refuses a later Mallory stale-token transfer after Dave's own broken-redemption evidence changes local trust. Source: `DI-rodog`.
+```

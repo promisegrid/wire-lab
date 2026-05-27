@@ -61,6 +61,9 @@ of the base protocol, and does not make promisebase authoritative. Source:
   circulates the token to Dave, Dave redeems it through normal trader behavior,
   and POC7 no longer has a special auditor role or Alice-to-Dave token shortcut.
   Done under `DI-pabot`.
+- [x] rajig.11 Add deterministic local economic scoring policies to POC7 so
+  agents accept, refuse, issue, redeem, transfer, and trade from local incentives
+  rather than from direct scenario imposition. Done under `DI-rodog`.
 
 ## Routed Elsewhere
 
@@ -168,6 +171,27 @@ Affects: `implementations/poc7-capability-token-exchange/**`;
 Supersedes: The `promise_evidence_request_v1` / auditor-role portion of
 `DI-tanat`; `DI-tanat` remains active for framed TCP and the other
 promise-shaped message names.
+
+ID: DI-rodog
+Date: 2026-05-27 00:18:14
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Improve existing POC7, not a new POC, with deterministic economic
+local-policy scoring. Each agent keeps local policy state and records local
+decisions before issuing resource promises, accepting tokens, redeeming held
+tokens, transferring bearer tokens, or accepting reciprocal exchanges.
+Intent: POC7 should remain reproducible executable evidence while showing that
+agents participate voluntarily because local expected utility clears their own
+thresholds. The scenario driver may introduce opportunities, but it must not
+force Bob, Carol, Dave, or Mallory to act without a local decision record.
+Constraints: Keep POC7 evidence-only and do not define a final economics model,
+policy API, trust API, token protocol, or transport standard. Keep all scoring
+local to each agent; do not add global prices, central exchanges, shared
+ledgers, global trust, or external authority. Use deterministic scores so Docker
+Compose output and tests remain reproducible.
+Affects: `implementations/poc7-capability-token-exchange/**`;
+`implementations/README.md`; `DEV-GUIDE-RESOURCES.md`;
+`protocols/wire-lab.d/TODO/TODO-rajig-promise-economy-spectrum.md`.
 
 ID: DI-tanat
 Date: 2026-05-26 23:03:49

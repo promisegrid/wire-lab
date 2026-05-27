@@ -29,6 +29,8 @@ The scenario now performs real POC work:
 - Mallory voluntarily circulates a revoked Alice bearer token to Dave; Dave
   redeems it with Alice and locally updates trust in both Alice and Mallory from
   the broken redemption outcome.
+- Dave then refuses Mallory's later stale-token transfer because Dave's own
+  deterministic local policy now scores Mallory and Alice below Dave's threshold.
 
 Run:
 
@@ -39,5 +41,5 @@ POC7_RUN_ID="$(date -u +%Y%m%d%H%M%S)" docker compose up --build --abort-on-cont
 
 `poc7` is not a final token standard, economics model, exchange protocol, trust
 API, kernel API, storage API, compute API, TCP transport standard, or SDK.
-Source: `DI-tugih`; `DI-fibok`; `DI-tanat`.
+Source: `DI-tugih`; `DI-fibok`; `DI-tanat`; `DI-rodog`.
 The Mallory-to-Dave stale-token flow is corrected under `DI-pabot`.
