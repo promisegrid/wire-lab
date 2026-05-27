@@ -105,7 +105,7 @@ func (issuer *Issuer) Issue(id string, originalPeer string, resourceKind string,
 
 func (issuer *Issuer) Revoke(id string, reason string) error {
 	if _, ok := issuer.tokens[id]; !ok {
-		return fmt.Errorf("cannot revoke unknown token %s", id)
+		return fmt.Errorf("issuer has no local revocation promise state for token %s", id)
 	}
 	issuer.revoked[id] = true
 	issuer.events = append(issuer.events, Event{Observer: issuer.Name, Event: "token_revoked", Outcome: OutcomeKept, TokenID: id, Detail: reason})
@@ -268,7 +268,7 @@ func SignToken(token Token) (string, error) {
 
 // VerifyToken checks that the presented bytes still match the issuer promise.
 // Intent: Treat proof failure as evidence about this presented promise token,
-// not as a global authorization decision. Source: DI-tugih
+// not as a global gatekeeping decision. Source: DI-tugih; DI-tanat
 func VerifyToken(token Token) error {
 	signature, sigErr := hex.DecodeString(token.SignatureHex)
 	if sigErr != nil {

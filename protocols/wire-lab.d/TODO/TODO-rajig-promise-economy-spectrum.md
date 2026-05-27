@@ -54,6 +54,9 @@ of the base protocol, and does not make promisebase authoritative. Source:
   CBOR grid envelopes, protocol-owned payloads, signed token bytes,
   storage/compute redemption work, peer-local exchange-state mutation, and the
   Carol access-token bug fixed. Done under `DI-fibok`.
+- [x] rajig.9 Refactor POC7 away from HTTP wrapper transport to framed TCP and
+  reframe app message names around promises, reciprocal promises, local
+  evidence, and local trust judgments. Done under `DI-tanat`.
 
 ## Routed Elsewhere
 
@@ -129,6 +132,37 @@ standard, exchange protocol, trust API, or economics model. Do not introduce a
 central exchange, shared token-status ledger, global price oracle, global trust
 authority, or permission authority. Reuse POC5-style app/kernel/relay
 discipline but do not mutate POC5.
+Affects: `implementations/poc7-capability-token-exchange/**`;
+`implementations/README.md`; `DEV-GUIDE-RESOURCES.md`;
+`protocols/wire-lab.d/TODO/TODO-rajig-promise-economy-spectrum.md`.
+
+ID: DI-tanat
+Date: 2026-05-26 23:03:49
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Refactor `implementations/poc7-capability-token-exchange/` so POC7
+uses framed TCP instead of HTTP wrapper transport, and rename/reframe its app
+message kinds so the visible protocol vocabulary is promise-first rather than
+RPC-like. The locked message vocabulary is
+`resource_promise_request_v1`, `promise_revocation_notice_v1`,
+`promise_presented_for_fulfillment_v1`, `promise_received_v1`,
+`exchange_offer_promise_v1`, `reciprocal_exchange_promise_v1`,
+`promise_evidence_request_v1`, `held_promise_fulfillment_request_v1`, and
+`held_reciprocal_exchange_request_v1`.
+Intent: POC7 already models signed capability tokens as issuer promises and
+keeps trust local, but its HTTP wrapper and command-like names made the
+implementation read too much like a conventional RPC service. This follow-on
+keeps the executable evidence but makes transport continuity match POC2 through
+POC5, and makes each visible message read as a promise request, promise
+presentation, promise receipt, reciprocal exchange promise, or local evidence
+request instead of as global permission, authorization, or command semantics.
+Constraints: Keep POC7 evidence-only and do not define a final PromiseGrid
+token, economics, storage, compute, kernel, transport, or app API. Keep trust,
+pricing, revocation, and redemption local. Do not add a central exchange,
+global trust authority, permission authority, shared token-status ledger, HTTP
+server, or non-standard daemon dependency. Preserve the signed CBOR
+`grid([42(pCID), payload, proof])` message envelope; TCP framing is transport
+plumbing and not the semantic protocol.
 Affects: `implementations/poc7-capability-token-exchange/**`;
 `implementations/README.md`; `DEV-GUIDE-RESOURCES.md`;
 `protocols/wire-lab.d/TODO/TODO-rajig-promise-economy-spectrum.md`.

@@ -1,13 +1,13 @@
 package main
 
 import (
-	"bytes"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"log"
-	"net/http"
+	"net"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -23,6 +23,19 @@ import (
 	"promisegrid.dev/wire-lab/implementations/poc7-capability-token-exchange/storage"
 	"promisegrid.dev/wire-lab/implementations/poc7-capability-token-exchange/token"
 	"promisegrid.dev/wire-lab/implementations/poc7-capability-token-exchange/trader"
+	"promisegrid.dev/wire-lab/implementations/poc7-capability-token-exchange/transport"
+)
+
+const (
+	kindResourcePromiseRequest         = "resource_promise_request_v1"
+	kindPromiseRevocationNotice        = "promise_revocation_notice_v1"
+	kindPromisePresentedForFulfillment = "promise_presented_for_fulfillment_v1"
+	kindPromiseReceived                = "promise_received_v1"
+	kindExchangeOfferPromise           = "exchange_offer_promise_v1"
+	kindReciprocalExchangePromise      = "reciprocal_exchange_promise_v1"
+	kindPromiseEvidenceRequest         = "promise_evidence_request_v1"
+	kindHeldPromiseFulfillmentRequest  = "held_promise_fulfillment_request_v1"
+	kindHeldReciprocalExchangeRequest  = "held_reciprocal_exchange_request_v1"
 )
 
 type WireMessage struct {
@@ -44,10 +57,20 @@ type WireResponse struct {
 	Payload map[string]string `json:"payload"`
 }
 
+// EnvelopeBytes returns the signed CBOR grid bytes carried by a local
+// WireMessage value. Intent: Keep the in-process struct as test scaffolding
+// while TCP peers exchange exact envelope bytes. Source: DI-tanat
+func (message WireMessage) EnvelopeBytes() ([]byte, error) {
+	if message.Envelope == "" {
+		return nil, fmt.Errorf("wire message missing signed envelope")
+	}
+	return hex.DecodeString(message.Envelope)
+}
+
 // appProtocolCID names the POC7 app-message protocol spec bytes.
 // Intent: Make every app message dispatch through a pCID-selected CBOR grid
 // envelope rather than through JSON field names. Source: DI-fibok
-var appProtocolCID = protocol.NewProtocolCID([]byte("poc7 app-message protocol: cbor grid envelope with signed payload map and optional token bytes"))
+var appProtocolCID = protocol.NewProtocolCID([]byte("poc7 app-message protocol: cbor grid envelope with signed route, promise-shaped kind, payload map, and optional token bytes"))
 
 // Node groups one local kernel boundary, one app-level relay, and the resource
 // apps that run inside a single container. Intent: Make each container's view
@@ -65,11 +88,11 @@ type Node struct {
 }
 
 var nodeAddrs = map[string]string{
-	"alice":   "http://alice:8080",
-	"bob":     "http://bob:8080",
-	"carol":   "http://carol:8080",
-	"dave":    "http://dave:8080",
-	"mallory": "http://mallory:8080",
+	"alice":   "alice:8077",
+	"bob":     "bob:8077",
+	"carol":   "carol:8077",
+	"dave":    "dave:8077",
+	"mallory": "mallory:8077",
 }
 
 func main() {
@@ -87,12 +110,12 @@ func main() {
 		Storage: make(map[string]string),
 		Data:    initialData(*nodeName),
 	}
-	server := &http.Server{Addr: ":8080", Handler: node.routes()}
-	go func() {
-		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Printf("%s server failed: %v", node.Name, err)
-		}
-	}()
+	listener, listenErr := net.Listen("tcp", ":8077")
+	if listenErr != nil {
+		log.Fatalf("%s listen failed: %v", node.Name, listenErr)
+	}
+	serverErrors := make(chan error, 1)
+	go node.serveTCP(listener, serverErrors)
 	if node.Name == "alice" {
 		if err := node.runScenario(); err != nil {
 			log.Printf("scenario failed: %v", err)
@@ -103,51 +126,77 @@ func main() {
 		log.Printf("%s wait failed: %v", node.Name, err)
 		os.Exit(1)
 	}
+	if closeErr := listener.Close(); closeErr != nil {
+		log.Printf("%s listener close failed: %v", node.Name, closeErr)
+	}
+	select {
+	case serverErr := <-serverErrors:
+		if serverErr != nil && !errors.Is(serverErr, net.ErrClosed) {
+			log.Printf("%s tcp server failed: %v", node.Name, serverErr)
+			os.Exit(1)
+		}
+	default:
+	}
 }
 
-func (node *Node) routes() http.Handler {
-	mux := http.NewServeMux()
-	mux.HandleFunc("/relay", node.handleRelay)
-	mux.HandleFunc("/script", node.handleScript)
-	return mux
+// serveTCP accepts bounded length-framed TCP messages from neighbor nodes.
+// Intent: Match POC2 through POC5 transport discipline while keeping the signed
+// CBOR envelope as the only app-protocol object. Source: DI-tanat
+func (node *Node) serveTCP(listener net.Listener, serverErrors chan<- error) {
+	for {
+		conn, acceptErr := listener.Accept()
+		if acceptErr != nil {
+			serverErrors <- acceptErr
+			return
+		}
+		go node.handleTCPConnection(conn)
+	}
 }
 
-func (node *Node) handleRelay(response http.ResponseWriter, request *http.Request) {
-	var message WireMessage
-	if err := json.NewDecoder(request.Body).Decode(&message); err != nil {
-		http.Error(response, err.Error(), http.StatusBadRequest)
+// handleTCPConnection reads one signed envelope frame and writes one local
+// observation response frame. The response is run-control evidence for this POC,
+// not a new global PromiseGrid response authority. Source: DI-tanat
+func (node *Node) handleTCPConnection(conn net.Conn) {
+	frameConn := transport.NewFrameConn(conn)
+	defer closeFrame(frameConn)
+	frameBytes, readErr := frameConn.ReadFrame()
+	if readErr != nil {
+		node.record("tcp_frame_read", token.OutcomeBroken, "", readErr.Error())
 		return
 	}
-	result, err := node.receive(message)
-	if err != nil {
-		http.Error(response, err.Error(), http.StatusBadRequest)
+	result, receiveErr := node.receiveFrame(frameBytes)
+	if receiveErr != nil {
+		result = WireResponse{Outcome: token.OutcomeBroken, Detail: receiveErr.Error()}
+	}
+	responseBytes, marshalErr := json.Marshal(result)
+	if marshalErr != nil {
+		node.record("tcp_response_encode", token.OutcomeBroken, "", marshalErr.Error())
 		return
 	}
-	writeJSON(response, result)
-}
-
-func (node *Node) handleScript(response http.ResponseWriter, request *http.Request) {
-	var command WireMessage
-	if err := json.NewDecoder(request.Body).Decode(&command); err != nil {
-		http.Error(response, err.Error(), http.StatusBadRequest)
-		return
+	if writeErr := frameConn.WriteFrame(responseBytes); writeErr != nil {
+		node.record("tcp_response_write", token.OutcomeBroken, "", writeErr.Error())
 	}
-	result, err := node.runCommand(command)
-	if err != nil {
-		http.Error(response, err.Error(), http.StatusBadRequest)
-		return
-	}
-	writeJSON(response, result)
 }
 
 func (node *Node) receive(rawMessage WireMessage) (WireResponse, error) {
-	message, exactBytes, decodeErr := node.decodeWireMessage(rawMessage)
+	envelopeBytes, envelopeErr := rawMessage.EnvelopeBytes()
+	if envelopeErr != nil {
+		return WireResponse{}, envelopeErr
+	}
+	return node.receiveFrame(envelopeBytes)
+}
+
+func (node *Node) receiveFrame(envelopeBytes []byte) (WireResponse, error) {
+	message, exactBytes, decodeErr := node.decodeEnvelopeBytes(envelopeBytes, WireMessage{})
 	if decodeErr != nil {
 		return WireResponse{}, decodeErr
 	}
 	node.record("kernel_receive", token.OutcomeKept, message.Token.ID, node.Name+" kernel observed "+message.Kind+" exact_sha256="+protocol.HashExactBytes(exactBytes))
 	if message.ToNode != node.Name {
 		return node.forward(message)
+	}
+	if isHeldPromiseInstruction(message.Kind) {
+		return node.runCommandMessage(message)
 	}
 	switch message.ToApp {
 	case issuer.AppName:
@@ -161,32 +210,53 @@ func (node *Node) receive(rawMessage WireMessage) (WireResponse, error) {
 	}
 }
 
+// isHeldPromiseInstruction identifies scenario messages that must be interpreted
+// by the local holder before any issuer or exchange peer is contacted. Source:
+// DI-tanat
+func isHeldPromiseInstruction(kind string) bool {
+	return kind == kindHeldPromiseFulfillmentRequest || kind == kindHeldReciprocalExchangeRequest
+}
+
 func (node *Node) forward(message WireMessage) (WireResponse, error) {
-	if len(message.Route) == 0 {
-		return WireResponse{}, fmt.Errorf("no route from %s to %s", node.Name, message.ToNode)
+	next, nextErr := node.nextRouteHop(message)
+	if nextErr != nil {
+		return WireResponse{}, nextErr
 	}
-	next := message.Route[0]
-	message.Route = message.Route[1:]
 	node.record("relay_forward", token.OutcomeKept, message.Token.ID, node.Name+" "+relay.AppName+" promised next hop "+next)
-	return post(nodeAddrs[next]+"/relay", message)
+	return transmit(nodeAddrs[next], message)
+}
+
+// nextRouteHop finds the next peer after this node inside the signed route.
+// Intent: Preserve one immutable route promise in the app message while each
+// relay only promises its own next hop. Source: DI-tanat
+func (node *Node) nextRouteHop(message WireMessage) (string, error) {
+	if len(message.Route) == 0 {
+		return "", fmt.Errorf("no route from %s to %s", node.Name, message.ToNode)
+	}
+	for index, routeNode := range message.Route {
+		if routeNode == node.Name && index+1 < len(message.Route) {
+			return message.Route[index+1], nil
+		}
+	}
+	return "", fmt.Errorf("route %s has no promised next hop after %s toward %s", strings.Join(message.Route, ","), node.Name, message.ToNode)
 }
 
 func (node *Node) handleIssuer(message WireMessage) (WireResponse, error) {
 	switch message.Kind {
-	case "issue_token_v1":
+	case kindResourcePromiseRequest:
 		issued, err := node.Issuer.Issue(message.Payload["token_id"], message.Payload["original_peer"], message.Payload["resource_kind"], message.Payload["resource_id"], message.Payload["transfer_rule"])
 		if err != nil {
 			return WireResponse{}, err
 		}
 		node.record("token_issued", token.OutcomeKept, issued.ID, node.Name+" issued "+issued.TransferRule+" token")
 		return WireResponse{Outcome: token.OutcomeKept, Detail: "token issued", Token: issued}, nil
-	case "revoke_token_v1":
+	case kindPromiseRevocationNotice:
 		if err := node.Issuer.Revoke(message.Payload["token_id"], message.Payload["reason"]); err != nil {
 			return WireResponse{}, err
 		}
 		node.record("token_revoked", token.OutcomeKept, message.Payload["token_id"], node.Name+" revoked token")
 		return WireResponse{Outcome: token.OutcomeKept, Detail: "token revoked"}, nil
-	case "redeem_token_v1":
+	case kindPromisePresentedForFulfillment:
 		event := node.Issuer.Redeem(message.FromNode, message.Token)
 		node.record("token_redeemed", event.Outcome, message.Token.ID, event.Detail)
 		payload := map[string]string{}
@@ -200,7 +270,7 @@ func (node *Node) handleIssuer(message WireMessage) (WireResponse, error) {
 		}
 		return WireResponse{Outcome: event.Outcome, Detail: event.Detail, Payload: payload}, nil
 	default:
-		return WireResponse{}, fmt.Errorf("issuer cannot handle %s", message.Kind)
+		return WireResponse{}, fmt.Errorf("issuer has no local promise handler for %s", message.Kind)
 	}
 }
 
@@ -241,7 +311,7 @@ func (node *Node) fulfillStorage(message WireMessage) (map[string]string, error)
 		}
 		return map[string]string{"resource_kind": storage.Kind, "op": "read", "key": key, "value": value}, nil
 	default:
-		return nil, fmt.Errorf("storage redemption has unsupported op %q", message.Payload["op"])
+		return nil, fmt.Errorf("storage promise has no local behavior for op %q", message.Payload["op"])
 	}
 }
 
@@ -263,11 +333,11 @@ func (node *Node) fulfillCompute(message WireMessage) (map[string]string, error)
 
 func (node *Node) handleTrader(message WireMessage) (WireResponse, error) {
 	switch message.Kind {
-	case "receive_token_v1":
+	case kindPromiseReceived:
 		node.Wallet.Add(message.Token, message.FromNode+" transferred token")
 		node.record("token_received", token.OutcomeKept, message.Token.ID, node.Name+" trader received token")
 		return WireResponse{Outcome: token.OutcomeKept, Detail: "token received"}, nil
-	case "quote_offer_v1":
+	case kindExchangeOfferPromise:
 		offer := node.Wallet.Quote(message.Payload["offered_issuer"], message.Payload["wanted_issuer"])
 		payload := map[string]string{
 			"offered_count": fmt.Sprintf("%d", offer.OfferedCount),
@@ -275,7 +345,7 @@ func (node *Node) handleTrader(message WireMessage) (WireResponse, error) {
 		}
 		node.record("exchange_rate_quoted", token.OutcomeKept, "", node.Name+" quoted peer-local exchange rate")
 		return WireResponse{Outcome: token.OutcomeKept, Detail: "peer-local quote", Payload: payload}, nil
-	case "trade_for_access_v1":
+	case kindReciprocalExchangePromise:
 		node.Wallet.Add(message.Token, message.FromNode+" offered bearer token for non-transferable access")
 		recipientPeer := message.Payload["recipient_peer"]
 		if recipientPeer == "" {
@@ -295,16 +365,16 @@ func (node *Node) handleTrader(message WireMessage) (WireResponse, error) {
 		node.record("trade_accepted", token.OutcomeKept, issued.ID, node.Name+" exchanged "+fmt.Sprintf("%d", quote.OfferedCount)+" "+message.Token.Issuer+" bearer token promise for non-transferable access token promised to "+recipientPeer)
 		return WireResponse{Outcome: token.OutcomeKept, Detail: "trade accepted", Token: issued, Payload: map[string]string{"offered_count": fmt.Sprintf("%d", quote.OfferedCount), "wanted_count": fmt.Sprintf("%d", quote.WantedCount), "recipient_peer": recipientPeer}}, nil
 	default:
-		return WireResponse{}, fmt.Errorf("trader cannot handle %s", message.Kind)
+		return WireResponse{}, fmt.Errorf("trader has no local promise handler for %s", message.Kind)
 	}
 }
 
 func (node *Node) handleAuditor(message WireMessage) (WireResponse, error) {
-	if message.Kind != "audit_token_v1" {
-		return WireResponse{}, fmt.Errorf("auditor cannot handle %s", message.Kind)
+	if message.Kind != kindPromiseEvidenceRequest {
+		return WireResponse{}, fmt.Errorf("auditor has no local evidence promise for %s", message.Kind)
 	}
 	node.Wallet.Add(message.Token, message.FromNode+" presented token for audit")
-	redeem, err := node.send("alice", issuer.AppName, "redeem_token_v1", []string{"mallory", "alice"}, map[string]string{}, message.Token)
+	redeem, err := node.send("alice", issuer.AppName, kindPromisePresentedForFulfillment, []string{"mallory", "alice"}, map[string]string{}, message.Token)
 	if err != nil {
 		return WireResponse{}, err
 	}
@@ -313,22 +383,40 @@ func (node *Node) handleAuditor(message WireMessage) (WireResponse, error) {
 	return WireResponse{Outcome: redeem.Outcome, Detail: "audit completed: " + redeem.Detail}, nil
 }
 
+// runCommand keeps local holder instructions on the same signed-envelope path
+// as inter-peer messages. Source: DI-tanat
 func (node *Node) runCommand(rawMessage WireMessage) (WireResponse, error) {
 	message, _, decodeErr := node.decodeWireMessage(rawMessage)
 	if decodeErr != nil {
 		return WireResponse{}, decodeErr
 	}
+	return node.runCommandMessage(message)
+}
+
+// runCommandMessage turns a holder-local instruction into the holder's own
+// outbound promise presentation or reciprocal exchange promise. Intent: Alice's
+// scenario driver may ask Bob or Carol to act, but Bob or Carol still make their
+// own local promise presentation. Source: DI-tanat
+func (node *Node) runCommandMessage(message WireMessage) (WireResponse, error) {
 	switch message.Kind {
-	case "redeem_held_token_v1":
+	case kindHeldPromiseFulfillmentRequest:
 		if !node.Wallet.Holds(message.Token.ID) {
-			return WireResponse{}, fmt.Errorf("%s cannot redeem token %s it does not hold", node.Name, message.Token.ID)
+			return WireResponse{}, fmt.Errorf("%s has no local held-promise evidence for token %s", node.Name, message.Token.ID)
 		}
-		return node.send(message.ToNode, issuer.AppName, "redeem_token_v1", message.Route, message.Payload, message.Token)
-	case "trade_for_access_v1":
+		issuerNode := message.Payload["promise_issuer_node"]
+		if issuerNode == "" {
+			return WireResponse{}, fmt.Errorf("held promise fulfillment request has no promise_issuer_node")
+		}
+		return node.send(issuerNode, issuer.AppName, kindPromisePresentedForFulfillment, message.Route, message.Payload, message.Token)
+	case kindHeldReciprocalExchangeRequest:
 		if !node.Wallet.Holds(message.Token.ID) {
-			return WireResponse{}, fmt.Errorf("%s cannot trade token %s it does not hold", node.Name, message.Token.ID)
+			return WireResponse{}, fmt.Errorf("%s has no local held-promise evidence for exchange token %s", node.Name, message.Token.ID)
 		}
-		response, tradeErr := node.send(message.ToNode, trader.AppName, "trade_for_access_v1", message.Route, message.Payload, message.Token)
+		exchangePeer := message.Payload["exchange_peer_node"]
+		if exchangePeer == "" {
+			return WireResponse{}, fmt.Errorf("held reciprocal exchange request has no exchange_peer_node")
+		}
+		response, tradeErr := node.send(exchangePeer, trader.AppName, kindReciprocalExchangePromise, message.Route, message.Payload, message.Token)
 		if tradeErr != nil {
 			return WireResponse{}, tradeErr
 		}
@@ -336,10 +424,10 @@ func (node *Node) runCommand(rawMessage WireMessage) (WireResponse, error) {
 			node.Wallet.Add(response.Token, "trade returned non-transferable access token")
 		}
 		return response, nil
-	case "quote_offer_v1":
+	case kindExchangeOfferPromise:
 		return node.receive(message)
 	default:
-		return WireResponse{}, fmt.Errorf("unknown script command %s", message.Kind)
+		return WireResponse{}, fmt.Errorf("no local promise instruction named %s", message.Kind)
 	}
 }
 
@@ -361,10 +449,10 @@ func (node *Node) runScenario() error {
 	if err != nil {
 		return err
 	}
-	if _, err := node.send("bob", trader.AppName, "receive_token_v1", []string{"bob"}, nil, aliceBearer); err != nil {
+	if _, err := node.send("bob", trader.AppName, kindPromiseReceived, []string{"bob"}, nil, aliceBearer); err != nil {
 		return err
 	}
-	if _, err := node.send("bob", trader.AppName, "receive_token_v1", []string{"bob"}, nil, bobAccess); err != nil {
+	if _, err := node.send("bob", trader.AppName, kindPromiseReceived, []string{"bob"}, nil, bobAccess); err != nil {
 		return err
 	}
 	if redeem, err := node.requestHolderRedeem("bob", []string{"alice"}, bobAccess, map[string]string{}); err != nil || redeem.Outcome != token.OutcomeKept {
@@ -386,13 +474,13 @@ func (node *Node) runScenario() error {
 	if err != nil {
 		return err
 	}
-	if _, err := node.send("carol", trader.AppName, "receive_token_v1", []string{"bob", "carol"}, nil, storageStoreToken); err != nil {
+	if _, err := node.send("carol", trader.AppName, kindPromiseReceived, []string{"bob", "carol"}, nil, storageStoreToken); err != nil {
 		return err
 	}
-	if _, err := node.send("carol", trader.AppName, "receive_token_v1", []string{"bob", "carol"}, nil, storageReadToken); err != nil {
+	if _, err := node.send("carol", trader.AppName, kindPromiseReceived, []string{"bob", "carol"}, nil, storageReadToken); err != nil {
 		return err
 	}
-	if _, err := node.send("carol", trader.AppName, "receive_token_v1", []string{"bob", "carol"}, nil, storageTradeToken); err != nil {
+	if _, err := node.send("carol", trader.AppName, kindPromiseReceived, []string{"bob", "carol"}, nil, storageTradeToken); err != nil {
 		return err
 	}
 	storeResult, err := node.requestHolderRedeem("carol", []string{"bob"}, storageStoreToken, map[string]string{"op": "store", "key": "carol-note", "value": "stored through Bob promise token"})
@@ -409,7 +497,7 @@ func (node *Node) runScenario() error {
 	if readResult.Outcome != token.OutcomeKept || readResult.Payload["value"] != "stored through Bob promise token" {
 		return fmt.Errorf("storage read redemption outcome=%#v", readResult)
 	}
-	if _, err := node.send("bob", trader.AppName, "receive_token_v1", []string{"bob"}, nil, computeToken); err != nil {
+	if _, err := node.send("bob", trader.AppName, kindPromiseReceived, []string{"bob"}, nil, computeToken); err != nil {
 		return err
 	}
 	computeResult, err := node.requestHolderRedeem("bob", []string{"carol"}, computeToken, map[string]string{"n": "10"})
@@ -419,11 +507,11 @@ func (node *Node) runScenario() error {
 	if computeResult.Outcome != token.OutcomeKept || computeResult.Payload["result"] != "55" {
 		return fmt.Errorf("compute redemption outcome=%#v", computeResult)
 	}
-	daveQuoteCommand, err := node.newWireMessage("scenario", "dave", trader.AppName, "quote_offer_v1", nil, map[string]string{"offered_issuer": "bob", "wanted_issuer": "carol"}, token.Token{})
+	daveQuoteCommand, err := node.newWireMessage("scenario", "dave", trader.AppName, kindExchangeOfferPromise, nil, map[string]string{"offered_issuer": "bob", "wanted_issuer": "carol"}, token.Token{})
 	if err != nil {
 		return err
 	}
-	if _, err := post(nodeAddrs["dave"]+"/script", daveQuoteCommand); err != nil {
+	if _, err := transmit(nodeAddrs["dave"], daveQuoteCommand); err != nil {
 		return err
 	}
 	trade, err := node.requestHolderTrade("carol", []string{"bob", "alice"}, storageTradeToken, map[string]string{"new_token_id": "alice-data-carol-1", "recipient_peer": "carol", "resource_kind": data.Kind, "resource_id": "dataset-private"})
@@ -440,17 +528,17 @@ func (node *Node) runScenario() error {
 	if carolDataResult.Outcome != token.OutcomeKept || carolDataResult.Payload["value"] == "" {
 		return fmt.Errorf("carol data redemption outcome=%#v", carolDataResult)
 	}
-	revokeMessage, err := node.newWireMessage(issuer.AppName, "alice", issuer.AppName, "revoke_token_v1", nil, map[string]string{"token_id": revoked.ID, "reason": "broken promise history changed Alice's local willingness"}, token.Token{})
+	revokeMessage, err := node.newWireMessage(issuer.AppName, "alice", issuer.AppName, kindPromiseRevocationNotice, nil, map[string]string{"token_id": revoked.ID, "reason": "broken promise history changed Alice's local willingness"}, token.Token{})
 	if err != nil {
 		return err
 	}
 	if _, err := node.receive(revokeMessage); err != nil {
 		return err
 	}
-	if _, err := node.send("mallory", trader.AppName, "receive_token_v1", []string{"mallory"}, nil, revoked); err != nil {
+	if _, err := node.send("mallory", trader.AppName, kindPromiseReceived, []string{"mallory"}, nil, revoked); err != nil {
 		return err
 	}
-	audit, err := node.send("dave", auditor.AppName, "audit_token_v1", []string{"mallory", "dave"}, nil, revoked)
+	audit, err := node.send("dave", auditor.AppName, kindPromiseEvidenceRequest, []string{"mallory", "dave"}, nil, revoked)
 	if err != nil {
 		return err
 	}
@@ -472,7 +560,7 @@ func (node *Node) localIssue(id string, originalPeer string, resourceKind string
 }
 
 func (node *Node) requestIssue(issuerNode string, route []string, id string, originalPeer string, resourceKind string, resourceID string, transferRule string) (token.Token, error) {
-	response, err := node.send(issuerNode, issuer.AppName, "issue_token_v1", route, map[string]string{"token_id": id, "original_peer": originalPeer, "resource_kind": resourceKind, "resource_id": resourceID, "transfer_rule": transferRule}, token.Token{})
+	response, err := node.send(issuerNode, issuer.AppName, kindResourcePromiseRequest, route, map[string]string{"token_id": id, "original_peer": originalPeer, "resource_kind": resourceKind, "resource_id": resourceID, "transfer_rule": transferRule}, token.Token{})
 	return response.Token, err
 }
 
@@ -484,28 +572,59 @@ func (node *Node) requestHolderRedeem(holderNode string, route []string, tok tok
 		return WireResponse{}, fmt.Errorf("redeem route for holder %s is empty", holderNode)
 	}
 	issuerNode := route[len(route)-1]
-	command, commandErr := node.newWireMessage("scenario", issuerNode, trader.AppName, "redeem_held_token_v1", route, payload, tok)
+	commandPayload := copyPayload(payload)
+	commandPayload["promise_issuer_node"] = issuerNode
+	command, commandErr := node.newWireMessage("scenario", holderNode, trader.AppName, kindHeldPromiseFulfillmentRequest, route, commandPayload, tok)
 	if commandErr != nil {
 		return WireResponse{}, commandErr
 	}
-	return post(nodeAddrs[holderNode]+"/script", command)
+	return transmit(nodeAddrs[holderNode], command)
 }
 
 // requestHolderTrade asks the holder to offer a bearer token to Alice.
 // Intent: Fix the first POC7 semantic bug by making Carol offer Bob's bearer
 // token and receive the resulting non-transferable Alice data token. Source: DI-fibok
 func (node *Node) requestHolderTrade(holderNode string, route []string, tok token.Token, payload map[string]string) (WireResponse, error) {
-	command, commandErr := node.newWireMessage("scenario", "alice", trader.AppName, "trade_for_access_v1", route, payload, tok)
+	if len(route) == 0 {
+		return WireResponse{}, fmt.Errorf("exchange route for holder %s is empty", holderNode)
+	}
+	commandPayload := copyPayload(payload)
+	commandPayload["exchange_peer_node"] = route[len(route)-1]
+	command, commandErr := node.newWireMessage("scenario", holderNode, trader.AppName, kindHeldReciprocalExchangeRequest, route, commandPayload, tok)
 	if commandErr != nil {
 		return WireResponse{}, commandErr
 	}
-	return post(nodeAddrs[holderNode]+"/script", command)
+	return transmit(nodeAddrs[holderNode], command)
 }
 
-// newWireMessage packages app fields into a signed CBOR grid envelope carried
-// by the HTTP test harness. Intent: Keep HTTP as disposable container plumbing
-// while making the protocol message itself be exact signed CBOR bytes.
-// Source: DI-fibok
+// copyPayload gives local scenario instructions their own map before adding
+// holder-only promise routing hints. Source: DI-tanat
+func copyPayload(payload map[string]string) map[string]string {
+	copiedPayload := make(map[string]string)
+	for key, value := range payload {
+		copiedPayload[key] = value
+	}
+	return copiedPayload
+}
+
+// encodeRoute stores the demo route in the signed payload as a compact string.
+// Node names in this POC are fixed labels without commas. Source: DI-tanat
+func encodeRoute(route []string) string {
+	return strings.Join(route, ",")
+}
+
+// decodeRoute rebuilds the signed route list used for local relay promises.
+// Source: DI-tanat
+func decodeRoute(routeText string) []string {
+	if strings.TrimSpace(routeText) == "" {
+		return nil
+	}
+	return strings.Split(routeText, ",")
+}
+
+// newWireMessage packages app fields into a signed CBOR grid envelope. Intent:
+// Make route, promise kind, promiser-facing payload, and optional token bytes
+// part of the exact pCID-selected message carried over TCP. Source: DI-tanat
 func (node *Node) newWireMessage(fromApp string, toNode string, toApp string, kind string, route []string, payload map[string]string, tok token.Token) (WireMessage, error) {
 	fields := make(map[string]string)
 	for key, value := range payload {
@@ -516,6 +635,7 @@ func (node *Node) newWireMessage(fromApp string, toNode string, toApp string, ki
 	fields["to_node"] = toNode
 	fields["to_app"] = toApp
 	fields["kind"] = kind
+	fields["route"] = encodeRoute(route)
 	if !tok.IsZero() {
 		tokenBytes, tokenErr := token.Encode(tok)
 		if tokenErr != nil {
@@ -545,23 +665,27 @@ func (node *Node) newWireMessage(fromApp string, toNode string, toApp string, ki
 	}, nil
 }
 
-// decodeWireMessage verifies and opens the signed CBOR grid envelope carried by
-// the HTTP harness. Intent: Treat the envelope bytes as the protocol message and
-// the JSON wrapper as transport-only test plumbing. Source: DI-fibok
+// decodeWireMessage verifies and opens a locally constructed signed CBOR grid
+// envelope. Intent: Let scenario code use the same exact bytes that TCP peers
+// exchange instead of a parallel in-process shortcut. Source: DI-tanat
 func (node *Node) decodeWireMessage(message WireMessage) (WireMessage, []byte, error) {
-	if message.Envelope == "" {
-		return message, nil, nil
+	envelopeBytes, envelopeErr := message.EnvelopeBytes()
+	if envelopeErr != nil {
+		return WireMessage{}, nil, envelopeErr
 	}
-	envelopeBytes, hexErr := hex.DecodeString(message.Envelope)
-	if hexErr != nil {
-		return WireMessage{}, nil, hexErr
-	}
+	return node.decodeEnvelopeBytes(envelopeBytes, message)
+}
+
+// decodeEnvelopeBytes verifies and opens the signed CBOR grid bytes received
+// from TCP. Intent: Treat the pCID-selected envelope as the app message and TCP
+// framing as non-semantic plumbing. Source: DI-tanat
+func (node *Node) decodeEnvelopeBytes(envelopeBytes []byte, message WireMessage) (WireMessage, []byte, error) {
 	envelope, parseErr := protocol.ParseEnvelope(envelopeBytes)
 	if parseErr != nil {
 		return WireMessage{}, nil, parseErr
 	}
 	if !envelope.ProtocolCID.Equal(appProtocolCID) {
-		return WireMessage{}, nil, fmt.Errorf("unsupported app envelope pCID %s", envelope.ProtocolCID)
+		return WireMessage{}, nil, fmt.Errorf("node %s has no local promise to interpret app envelope pCID %s", node.Name, envelope.ProtocolCID)
 	}
 	if verifyErr := protocol.VerifyEnvelope(envelope); verifyErr != nil {
 		return WireMessage{}, nil, verifyErr
@@ -576,7 +700,9 @@ func (node *Node) decodeWireMessage(message WireMessage) (WireMessage, []byte, e
 	decoded.ToNode = fields["to_node"]
 	decoded.ToApp = fields["to_app"]
 	decoded.Kind = fields["kind"]
+	decoded.Route = decodeRoute(fields["route"])
 	decoded.Payload = fields
+	decoded.Envelope = hex.EncodeToString(envelopeBytes)
 	if tokenHex := fields["token_bytes"]; tokenHex != "" {
 		tokenBytes, tokenHexErr := hex.DecodeString(tokenHex)
 		if tokenHexErr != nil {
@@ -591,10 +717,9 @@ func (node *Node) decodeWireMessage(message WireMessage) (WireMessage, []byte, e
 	return decoded, envelopeBytes, nil
 }
 
-// send hands the message to the first promised neighbor and leaves only the
-// remaining hops inside the envelope. Intent: Make the trace show app-level
-// relay promises between peers, not accidental self-forwards caused by keeping
-// the already-consumed first hop in the route. Source: DI-tugih
+// send hands the signed envelope to the first promised neighbor while keeping
+// the full route inside the signed payload. Intent: Let each relay make its
+// local next-hop promise without rewriting the app message. Source: DI-tanat
 func (node *Node) send(toNode string, toApp string, kind string, route []string, payload map[string]string, tok token.Token) (WireResponse, error) {
 	if len(route) == 0 {
 		return WireResponse{}, fmt.Errorf("empty route from %s to %s", node.Name, toNode)
@@ -603,39 +728,46 @@ func (node *Node) send(toNode string, toApp string, kind string, route []string,
 		payload = make(map[string]string)
 	}
 	nextHop := route[0]
-	remainingRoute := append([]string(nil), route[1:]...)
-	message, messageErr := node.newWireMessage("scenario", toNode, toApp, kind, remainingRoute, payload, tok)
+	message, messageErr := node.newWireMessage("scenario", toNode, toApp, kind, route, payload, tok)
 	if messageErr != nil {
 		return WireResponse{}, messageErr
 	}
-	return post(nodeAddrs[nextHop]+"/relay", message)
+	return transmit(nodeAddrs[nextHop], message)
 }
 
-func post(url string, message WireMessage) (WireResponse, error) {
-	body, marshalErr := json.Marshal(message)
-	if marshalErr != nil {
-		return WireResponse{}, marshalErr
+// transmit sends one signed envelope over one length-framed TCP connection and
+// reads one bounded local observation response for the POC scenario driver.
+// Intent: Remove HTTP while avoiding any claim that request/response transport
+// is the final PromiseGrid app protocol. Source: DI-tanat
+func transmit(address string, message WireMessage) (WireResponse, error) {
+	envelopeBytes, envelopeErr := message.EnvelopeBytes()
+	if envelopeErr != nil {
+		return WireResponse{}, envelopeErr
 	}
-	client := &http.Client{Timeout: 10 * time.Second}
 	var lastErr error
 	for attempt := 0; attempt < 20; attempt++ {
-		response, postErr := client.Post(url, "application/json", bytes.NewReader(body))
-		if postErr != nil {
-			lastErr = postErr
+		frameConn, dialErr := transport.DialFrameConn(address, 10*time.Second)
+		if dialErr != nil {
+			lastErr = dialErr
 			time.Sleep(250 * time.Millisecond)
 			continue
 		}
-		defer closeBody(response)
-		if response.StatusCode >= 300 {
-			return WireResponse{}, fmt.Errorf("post %s got %s", url, response.Status)
+		if writeErr := frameConn.WriteFrame(envelopeBytes); writeErr != nil {
+			closeFrame(frameConn)
+			return WireResponse{}, writeErr
+		}
+		responseBytes, readErr := frameConn.ReadFrame()
+		closeFrame(frameConn)
+		if readErr != nil {
+			return WireResponse{}, readErr
 		}
 		var result WireResponse
-		if decodeErr := json.NewDecoder(response.Body).Decode(&result); decodeErr != nil {
+		if decodeErr := json.Unmarshal(responseBytes, &result); decodeErr != nil {
 			return WireResponse{}, decodeErr
 		}
 		return result, nil
 	}
-	return WireResponse{}, fmt.Errorf("post %s failed after retries: %w", url, lastErr)
+	return WireResponse{}, fmt.Errorf("tcp frame to %s failed after retries: %w", address, lastErr)
 }
 
 func (node *Node) record(event string, outcome string, tokenID string, detail string) {
@@ -662,16 +794,9 @@ func (node *Node) waitForDone() error {
 	return fmt.Errorf("%s timed out waiting for %s", node.Name, donePath)
 }
 
-func writeJSON(response http.ResponseWriter, value WireResponse) {
-	response.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(response).Encode(value); err != nil {
-		log.Printf("encode response: %v", err)
-	}
-}
-
-func closeBody(response *http.Response) {
-	if err := response.Body.Close(); err != nil {
-		log.Printf("close response body: %v", err)
+func closeFrame(frameConn transport.FrameConn) {
+	if closeErr := frameConn.Close(); closeErr != nil {
+		log.Printf("close tcp frame: %v", closeErr)
 	}
 }
 

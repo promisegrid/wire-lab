@@ -72,13 +72,17 @@ only carry bytes and record their own observations. Source: `DI-fidot`;
 `poc7` adds executable evidence for promise-shaped capability tokens and local
 exchange: five containers run local kernel boundaries, app-level relays, issuer,
 trader, auditor, and resource roles; Alice, Bob, Carol, Dave, and Mallory
-exercise signed CBOR `grid([42(pCID), payload, proof])` app messages, CBOR
-token bytes, bearer tokens, non-transferable relationship-scoped access tokens,
-issuer-local redemption/revocation, real storage / compute / data redemption
-payloads, peer-local exchange-rate offers, holder-initiated trade, and local
-trust updates after a revoked promise breaks. It is evidence for app-level
-promise-economy pressure, not a base token standard, central exchange, trust API,
-storage API, compute API, or permission system. Source: `DI-tugih`; `DI-fibok`.
+exercise signed CBOR `grid([42(pCID), payload, proof])` app messages over
+length-framed TCP, CBOR token bytes, bearer tokens, non-transferable
+relationship-scoped access tokens, issuer-local redemption/revocation, real
+storage / compute / data redemption payloads, peer-local exchange-rate offers,
+holder-initiated trade, and local trust updates after a revoked promise breaks.
+The visible message kinds are promise-first rather than RPC-like: resource
+promise requests, promise fulfillment presentations, promise receipts,
+reciprocal exchange promises, evidence requests, and issuer-local revocation
+notices. It is evidence for app-level promise-economy pressure, not a base token
+standard, transport standard, central exchange, trust API, storage API, compute
+API, or permission system. Source: `DI-tugih`; `DI-fibok`; `DI-tanat`.
 
 ### Envelope Example
 
@@ -195,11 +199,11 @@ Source: `DI-sisak`; `DI-rojij`; `DI-punam`; `DI-sizoh`; `DI-kafat`.
 | Unknown-`pCID` retention | Still a local-policy question: quota, privacy, relay labeling, and denial-of-service bounds remain open. |
 | Tagged-selector succession | Tag `42` is the current standard instance; future replacement would be a family-level evolution, not a new `grid2()` / `grid3()` envelope family. |
 | Canonical bytes | The outer envelope is CBOR; payload canonicalization, hash rules, and proof encoding remain protocol-specific unless later DIs narrow them. |
-| Kernel profile | The kernel remains provisional; `DN-lujad`, `TODO-binag`, `TODO-hozaz`, `TODO-tapov`, `TODO-hipak`, the expanded `SIM-fovip`, executable `poc3`, executable `poc4`, executable `poc5`, and executable `poc7` evidence now synthesize `TE-mazop`, `TE-pudiv`, `TE-dunas`, and `TE-gakoh` into role/profile guidance for app-facing promises, same-grid app/kernel messaging, app-level relay promises, local trust decrease after broken promises, selective sending, app-level capability-token promises, signed CBOR-grid app messages, issuer-local revocation/redemption evidence, voluntary group namespaces, CID-rooted promise-bound references, file-like resources over promise/event logs, lower-patent-risk prior-art influence guardrails, host assumptions, unsupported features, kernel-local evidence records, app-local promise judgments, and minimum credible port-promise records before `DR-davod` closes. |
+| Kernel profile | The kernel remains provisional; `DN-lujad`, `TODO-binag`, `TODO-hozaz`, `TODO-tapov`, `TODO-hipak`, the expanded `SIM-fovip`, executable `poc3`, executable `poc4`, executable `poc5`, and executable `poc7` evidence now synthesize `TE-mazop`, `TE-pudiv`, `TE-dunas`, and `TE-gakoh` into role/profile guidance for app-facing promises, same-grid app/kernel messaging, app-level relay promises, local trust decrease after broken promises, selective sending, app-level capability-token promises, signed CBOR-grid app messages over length-framed TCP evidence, promise-shaped reciprocal exchange vocabulary, issuer-local revocation/redemption evidence, voluntary group namespaces, CID-rooted promise-bound references, file-like resources over promise/event logs, lower-patent-risk prior-art influence guardrails, host assumptions, unsupported features, kernel-local evidence records, app-local promise judgments, and minimum credible port-promise records before `DR-davod` closes. |
 
 Source: `DI-sisak`; `DI-rusup`; `DI-funaf`; `DI-gumum`; `DI-somok`;
 `DI-kuvum`; `DI-fidot`; `DI-horak`; `DI-ponor`; `DI-fofik`; `DI-tugih`;
-`DI-fibok`; `DI-rojij`; `DI-punam`.
+`DI-fibok`; `DI-tanat`; `DI-rojij`; `DI-punam`.
 
 ## Authority model
 

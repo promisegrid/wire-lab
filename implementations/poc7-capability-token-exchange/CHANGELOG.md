@@ -15,3 +15,11 @@ scope:           executable-proof-of-concept
 breaking-change: false
 notes:           Deepens POC7 with signed CBOR grid envelopes, CBOR token bytes, real storage/compute/data redemption payloads, holder-initiated trade, local exchange-state mutation, and a fix for the Carol access-token transaction. Source: `DI-fibok`.
 ```
+
+```changelog-entry
+claim:           extends
+spec:            scenario:promise-economy-capability-token-exchange
+scope:           executable-proof-of-concept
+breaking-change: false
+notes:           Replaces HTTP wrapper transport with length-framed TCP and reframes app message kinds around resource promise requests, promise fulfillment presentations, promise receipts, reciprocal exchange promises, evidence requests, and issuer-local revocation notices. Source: `DI-tanat`.
+```

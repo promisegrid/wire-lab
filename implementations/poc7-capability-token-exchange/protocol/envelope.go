@@ -73,8 +73,8 @@ type Proof struct {
 
 // Envelope represents grid([42(pCID), payload, proof]).
 // Intent: Replace the first POC7 JSON-as-protocol sketch with a real
-// PromiseGrid-shaped CBOR envelope while keeping HTTP only as the container
-// transport for this bounded run. Source: DI-fibok
+// PromiseGrid-shaped CBOR envelope and keep TCP framing as transport plumbing
+// outside the semantic message. Source: DI-fibok; DI-tanat
 type Envelope struct {
 	ProtocolCID ProtocolCID
 	Payload     []byte

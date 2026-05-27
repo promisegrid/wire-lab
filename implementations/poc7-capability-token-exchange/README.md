@@ -10,10 +10,13 @@ Alice -- Bob -- Carol -- Dave -- Mallory -- Alice
 ```
 
 Each container runs one local kernel role, one app-level relay role, and
-role-specific token/resource apps inside a single bounded process. HTTP is only
-the container transport harness; each app message is carried as a signed CBOR
+role-specific token/resource apps inside a single bounded process. Peers use
+boring length-framed TCP; each app message is a signed CBOR
 `grid([42(pCID), payload, proof])` envelope. Kernels record local delivery
 evidence only. Relays carry app messages. Apps make local promise judgments.
+The visible app message kinds are promise-shaped: resource promise requests,
+promise presentations for fulfillment, promise receipts, reciprocal exchange
+promises, evidence requests, and issuer-local revocation notices.
 
 The scenario now performs real POC work:
 
@@ -34,5 +37,5 @@ POC7_RUN_ID="$(date -u +%Y%m%d%H%M%S)" docker compose up --build --abort-on-cont
 ```
 
 `poc7` is not a final token standard, economics model, exchange protocol, trust
-API, kernel API, storage API, compute API, or SDK. Source: `DI-tugih`;
-`DI-fibok`.
+API, kernel API, storage API, compute API, TCP transport standard, or SDK.
+Source: `DI-tugih`; `DI-fibok`; `DI-tanat`.
