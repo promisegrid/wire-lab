@@ -8,6 +8,15 @@ import (
 	"fmt"
 )
 
+const (
+	// gridTag is the CBOR tag for the PromiseGrid grid wrapper: ASCII "grid"
+	// interpreted as 0x67726964 / decimal 1735551332. Intent: Make POC7's bytes
+	// match the claimed grid(...) envelope instead of only writing the inner slot
+	// vector. Source: DI-hanih
+	gridTag        = uint64(0x67726964)
+	dagCBORLinkTag = uint64(42)
+)
+
 // ProtocolCID identifies the protocol spec document that defines all following
 // slots. It is the protocol CID, not a payload CID.
 // Intent: Keep POC7 aligned with the current grid-envelope rule:
@@ -100,10 +109,13 @@ func NewEnvelope(protocolCID ProtocolCID, fields map[string]string, signer strin
 // SignableBytes serializes grid([42(pCID), payload]) for proof generation.
 func (envelope Envelope) SignableBytes() ([]byte, error) {
 	writer := &cborWriter{}
+	if err := writer.writeTag(gridTag); err != nil {
+		return nil, err
+	}
 	if err := writer.writeArrayHeader(2); err != nil {
 		return nil, err
 	}
-	if err := writer.writeTag(42); err != nil {
+	if err := writer.writeTag(dagCBORLinkTag); err != nil {
 		return nil, err
 	}
 	if err := writer.writeBytes(envelope.ProtocolCID.Tag42Bytes()); err != nil {
@@ -126,10 +138,13 @@ func (envelope Envelope) Bytes() ([]byte, error) {
 		return nil, proofErr
 	}
 	writer := &cborWriter{}
+	if err := writer.writeTag(gridTag); err != nil {
+		return nil, err
+	}
 	if err := writer.writeArrayHeader(3); err != nil {
 		return nil, err
 	}
-	if err := writer.writeTag(42); err != nil {
+	if err := writer.writeTag(dagCBORLinkTag); err != nil {
 		return nil, err
 	}
 	if err := writer.writeBytes(envelope.ProtocolCID.Tag42Bytes()); err != nil {
@@ -148,6 +163,13 @@ func (envelope Envelope) Bytes() ([]byte, error) {
 // proof bytes as protocol-owned payload evidence.
 func ParseEnvelope(envelopeBytes []byte) (Envelope, error) {
 	reader := &cborReader{data: envelopeBytes}
+	outerTag, outerTagErr := reader.readTypeAndLength(6)
+	if outerTagErr != nil {
+		return Envelope{}, outerTagErr
+	}
+	if outerTag != gridTag {
+		return Envelope{}, fmt.Errorf("outer envelope must be grid tag %d, got tag %d", gridTag, outerTag)
+	}
 	arrayLength, arrayErr := reader.readTypeAndLength(4)
 	if arrayErr != nil {
 		return Envelope{}, arrayErr
@@ -159,7 +181,7 @@ func ParseEnvelope(envelopeBytes []byte) (Envelope, error) {
 	if tagErr != nil {
 		return Envelope{}, tagErr
 	}
-	if tagNumber != 42 {
+	if tagNumber != dagCBORLinkTag {
 		return Envelope{}, fmt.Errorf("slot 0 must be tag 42, got tag %d", tagNumber)
 	}
 	tagBytes, tagBytesErr := reader.readBytes()

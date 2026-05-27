@@ -39,3 +39,11 @@ scope:           executable-proof-of-concept
 breaking-change: false
 notes:           Adds deterministic per-agent local policy scoring before issue, accept, redeem, transfer, quote, and reciprocal exchange actions; Dave now refuses a later Mallory stale-token transfer after Dave's own broken-redemption evidence changes local trust. Source: `DI-rodog`.
 ```
+
+```changelog-entry
+claim:           fixes
+spec:            scenario:promise-economy-capability-token-exchange
+scope:           executable-proof-of-concept
+breaking-change: true
+notes:           Wraps POC7 envelope and signable-view bytes in the outer CBOR grid tag `0x67726964` / decimal `1735551332`; older bare `[42(pCID), payload, proof]` POC7 bytes are now rejected. Source: `DI-hanih`.
+```

@@ -64,6 +64,9 @@ of the base protocol, and does not make promisebase authoritative. Source:
 - [x] rajig.11 Add deterministic local economic scoring policies to POC7 so
   agents accept, refuse, issue, redeem, transfer, and trade from local incentives
   rather than from direct scenario imposition. Done under `DI-rodog`.
+- [x] rajig.12 Correct POC7's envelope bytes so `grid(...)` is represented as
+  the outer CBOR tag `0x67726964` / decimal `1735551332`, wrapping the existing
+  `grid([42(pCID), payload, proof])` slot vector. Done under `DI-hanih`.
 
 ## Routed Elsewhere
 
@@ -191,6 +194,30 @@ ledgers, global trust, or external authority. Use deterministic scores so Docker
 Compose output and tests remain reproducible.
 Affects: `implementations/poc7-capability-token-exchange/**`;
 `implementations/README.md`; `DEV-GUIDE-RESOURCES.md`;
+`protocols/wire-lab.d/TODO/TODO-rajig-promise-economy-spectrum.md`.
+
+ID: DI-hanih
+Date: 2026-05-27 00:32:50
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Correct POC7's CBOR envelope encoding so the outer PromiseGrid
+`grid(...)` wrapper is the CBOR tag named `grid`: hexadecimal `0x67726964`,
+decimal `1735551332`. The existing slot vector remains
+`[42(pCID), payload, proof]`, and slot `0` remains the DAG-CBOR tag-42 pCID
+selector.
+Intent: The prior POC7 encoder produced the slot vector directly and therefore
+made `Envelope.Bytes()` claim `grid([42(pCID), payload, proof])` while omitting
+the actual outer CBOR `grid` tag. POC7 should exercise the byte-level shape it
+claims, so receivers see `grid(...)` as an explicit CBOR tag before reading the
+array, and proof bytes cover the same tagged `grid([42(pCID), payload])`
+signable view.
+Constraints: Keep this as a POC7 evidence correction, not a final frozen
+PromiseGrid envelope spec. Do not change pCID meaning, slot order, framed TCP,
+token semantics, local policy scoring, or the tag-42 selector. Reject untagged
+legacy POC7 envelope bytes in this POC so tests catch missing outer-grid tags.
+Affects: `implementations/poc7-capability-token-exchange/protocol/**`;
+`implementations/poc7-capability-token-exchange/README.md`;
+`implementations/poc7-capability-token-exchange/CHANGELOG.md`;
 `protocols/wire-lab.d/TODO/TODO-rajig-promise-economy-spectrum.md`.
 
 ID: DI-tanat
