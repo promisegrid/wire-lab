@@ -78,3 +78,25 @@ func TestTokenSignatureDetectsMutation(t *testing.T) {
 		t.Fatalf("mutated token proof unexpectedly verified")
 	}
 }
+
+func TestTokenCBORRoundTrip(t *testing.T) {
+	alice := NewIssuer("alice")
+	issued, issueErr := alice.Issue("alice-cbor-token", "bob", "data", "dataset-e", TransferBearer)
+	if issueErr != nil {
+		t.Fatalf("issue: %v", issueErr)
+	}
+	tokenBytes, encodeErr := Encode(issued)
+	if encodeErr != nil {
+		t.Fatalf("encode: %v", encodeErr)
+	}
+	decoded, decodeErr := Decode(tokenBytes)
+	if decodeErr != nil {
+		t.Fatalf("decode: %v", decodeErr)
+	}
+	if decoded.ID != issued.ID || decoded.PublicKeyHex == "" || decoded.SignatureHex == "" {
+		t.Fatalf("decoded token lost proof fields: %#v", decoded)
+	}
+	if verifyErr := VerifyToken(decoded); verifyErr != nil {
+		t.Fatalf("verify decoded: %v", verifyErr)
+	}
+}

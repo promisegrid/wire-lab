@@ -4,9 +4,10 @@ import (
 	"crypto/ed25519"
 	"crypto/sha256"
 	"encoding/hex"
-	"encoding/json"
 	"fmt"
 	"sort"
+
+	"promisegrid.dev/wire-lab/implementations/poc7-capability-token-exchange/protocol"
 )
 
 const (
@@ -28,7 +29,13 @@ type Token struct {
 	ResourceKind string `json:"resource_kind"`
 	ResourceID   string `json:"resource_id"`
 	TransferRule string `json:"transfer_rule"`
+	PublicKeyHex string `json:"public_key_hex"`
 	SignatureHex string `json:"signature_hex"`
+}
+
+// IsZero reports whether the wire message carries no promise token.
+func (token Token) IsZero() bool {
+	return token.ID == "" && token.Issuer == "" && token.SignatureHex == ""
 }
 
 // Event records what one observer saw. It is evidence, not global truth.
@@ -89,6 +96,7 @@ func (issuer *Issuer) Issue(id string, originalPeer string, resourceKind string,
 	if signErr != nil {
 		return Token{}, signErr
 	}
+	token.PublicKeyHex = hex.EncodeToString(deterministicPublicKey(token.Issuer))
 	token.SignatureHex = signature
 	issuer.tokens[id] = token
 	issuer.events = append(issuer.events, Event{Observer: issuer.Name, Event: "token_issued", Outcome: OutcomeKept, TokenID: id, Detail: issuer.Name + " promised " + resourceKind + ":" + resourceID})
@@ -111,7 +119,7 @@ func (issuer *Issuer) Redeem(holder string, presented Token) Event {
 	case !ok:
 		event.Outcome = OutcomeRefused
 		event.Detail = "unknown token"
-	case stored.SignatureHex != presented.SignatureHex || VerifyToken(presented) != nil:
+	case stored.SignatureHex != presented.SignatureHex || stored.PublicKeyHex != presented.PublicKeyHex || VerifyToken(presented) != nil:
 		event.Outcome = OutcomeRefused
 		event.Detail = "token proof did not match issuer promise"
 	case issuer.revoked[presented.ID]:
@@ -151,6 +159,12 @@ func (wallet *Wallet) Add(token Token, detail string) {
 	wallet.events = append(wallet.events, Event{Observer: wallet.Owner, Event: "token_received", Outcome: OutcomeKept, TokenID: token.ID, Detail: detail})
 }
 
+// Holds reports whether this local wallet currently holds a token.
+func (wallet *Wallet) Holds(id string) bool {
+	_, ok := wallet.tokens[id]
+	return ok
+}
+
 func (wallet *Wallet) Transfer(id string, recipient *Wallet) (Token, error) {
 	token, ok := wallet.tokens[id]
 	if !ok {
@@ -182,17 +196,38 @@ func (wallet *Wallet) ApplyRedemption(event Event) {
 	wallet.events = append(wallet.events, Event{Observer: wallet.Owner, Event: "local_trust_updated", Outcome: OutcomeKept, TokenID: event.TokenID, Detail: fmt.Sprintf("%s trust in %s is now %d after %s", wallet.Owner, issuer, wallet.trust[issuer], event.Outcome)})
 }
 
+// Quote prices one issuer's token against another using only this wallet's
+// holdings and trust history. Intent: Keep POC7 economics local and observable
+// without creating a central exchange or global exchange rate. Source: DI-fibok
 func (wallet *Wallet) Quote(issuer string, wantedIssuer string) ExchangeOffer {
 	issuerTrust := wallet.trust[issuer]
 	wantedTrust := wallet.trust[wantedIssuer]
+	offeredHeld := wallet.countByIssuer(issuer)
+	wantedHeld := wallet.countByIssuer(wantedIssuer)
 	rate := 1
 	if wantedTrust > issuerTrust {
-		rate = 2
+		rate += wantedTrust - issuerTrust
 	}
 	if issuerTrust < 0 {
-		rate = 3
+		rate += 2
+	}
+	if offeredHeld == 0 {
+		rate++
+	}
+	if wantedHeld > offeredHeld {
+		rate++
 	}
 	return ExchangeOffer{Observer: wallet.Owner, OfferedIssuer: issuer, WantedIssuer: wantedIssuer, OfferedCount: rate, WantedCount: 1}
+}
+
+func (wallet *Wallet) countByIssuer(issuer string) int {
+	count := 0
+	for _, heldToken := range wallet.tokens {
+		if heldToken.Issuer == issuer {
+			count++
+		}
+	}
+	return count
 }
 
 func (wallet *Wallet) Trust(issuer string) int {
@@ -221,7 +256,9 @@ type ExchangeOffer struct {
 // mutation visible to redeemers and tests. Source: DI-tugih
 func SignToken(token Token) (string, error) {
 	token.SignatureHex = ""
-	bytes, marshalErr := canonicalTokenBytes(token)
+	token.PublicKeyHex = ""
+	token.PublicKeyHex = hex.EncodeToString(deterministicPublicKey(token.Issuer))
+	bytes, marshalErr := CanonicalBytes(token)
 	if marshalErr != nil {
 		return "", marshalErr
 	}
@@ -237,26 +274,77 @@ func VerifyToken(token Token) error {
 	if sigErr != nil {
 		return sigErr
 	}
-	bytes, marshalErr := canonicalTokenBytes(Token{
+	publicKey, publicErr := hex.DecodeString(token.PublicKeyHex)
+	if publicErr != nil {
+		return publicErr
+	}
+	expectedPublicKey := deterministicPublicKey(token.Issuer)
+	if !equalBytes(publicKey, expectedPublicKey) {
+		return fmt.Errorf("token public key does not match issuer")
+	}
+	bytes, marshalErr := CanonicalBytes(Token{
 		ID:           token.ID,
 		Issuer:       token.Issuer,
 		OriginalPeer: token.OriginalPeer,
 		ResourceKind: token.ResourceKind,
 		ResourceID:   token.ResourceID,
 		TransferRule: token.TransferRule,
+		PublicKeyHex: token.PublicKeyHex,
 	})
 	if marshalErr != nil {
 		return marshalErr
 	}
-	publicKey := deterministicPublicKey(token.Issuer)
 	if !ed25519.Verify(publicKey, bytes, signature) {
 		return fmt.Errorf("token signature failed")
 	}
 	return nil
 }
 
-func canonicalTokenBytes(token Token) ([]byte, error) {
-	return json.Marshal(token)
+// CanonicalBytes encodes the token promise as deterministic CBOR fields.
+// Intent: Sign exact token bytes instead of Go struct layout or JSON text so
+// mutation evidence is protocol-shaped. Source: DI-fibok
+func CanonicalBytes(token Token) ([]byte, error) {
+	return protocol.MarshalStringMap(map[string]string{
+		"id":             token.ID,
+		"issuer":         token.Issuer,
+		"original_peer":  token.OriginalPeer,
+		"resource_kind":  token.ResourceKind,
+		"resource_id":    token.ResourceID,
+		"transfer_rule":  token.TransferRule,
+		"public_key_hex": token.PublicKeyHex,
+	})
+}
+
+// Encode serializes the full signed token as deterministic CBOR.
+func Encode(token Token) ([]byte, error) {
+	return protocol.MarshalStringMap(map[string]string{
+		"id":             token.ID,
+		"issuer":         token.Issuer,
+		"original_peer":  token.OriginalPeer,
+		"resource_kind":  token.ResourceKind,
+		"resource_id":    token.ResourceID,
+		"transfer_rule":  token.TransferRule,
+		"public_key_hex": token.PublicKeyHex,
+		"signature_hex":  token.SignatureHex,
+	})
+}
+
+// Decode rebuilds a signed token from deterministic CBOR fields.
+func Decode(tokenBytes []byte) (Token, error) {
+	fields, fieldsErr := protocol.UnmarshalStringMap(tokenBytes)
+	if fieldsErr != nil {
+		return Token{}, fieldsErr
+	}
+	return Token{
+		ID:           fields["id"],
+		Issuer:       fields["issuer"],
+		OriginalPeer: fields["original_peer"],
+		ResourceKind: fields["resource_kind"],
+		ResourceID:   fields["resource_id"],
+		TransferRule: fields["transfer_rule"],
+		PublicKeyHex: fields["public_key_hex"],
+		SignatureHex: fields["signature_hex"],
+	}, nil
 }
 
 func deterministicPrivateKey(seedText string) ed25519.PrivateKey {
@@ -266,6 +354,18 @@ func deterministicPrivateKey(seedText string) ed25519.PrivateKey {
 
 func deterministicPublicKey(seedText string) ed25519.PublicKey {
 	return deterministicPrivateKey(seedText).Public().(ed25519.PublicKey)
+}
+
+func equalBytes(left []byte, right []byte) bool {
+	if len(left) != len(right) {
+		return false
+	}
+	for index := range left {
+		if left[index] != right[index] {
+			return false
+		}
+	}
+	return true
 }
 
 func SortedEvents(events []Event) []Event {

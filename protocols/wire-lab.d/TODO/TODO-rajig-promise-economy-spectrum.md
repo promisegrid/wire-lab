@@ -50,6 +50,10 @@ of the base protocol, and does not make promisebase authoritative. Source:
 - [x] rajig.7 Add `implementations/poc7-capability-token-exchange/` as
   executable evidence for the combined capability-token exchange scenario. Done
   under `DI-tugih`.
+- [x] rajig.8 Deepen POC7 from a shallow JSON sketch into a protocol POC with
+  CBOR grid envelopes, protocol-owned payloads, signed token bytes,
+  storage/compute redemption work, peer-local exchange-state mutation, and the
+  Carol access-token bug fixed. Done under `DI-fibok`.
 
 ## Routed Elsewhere
 
@@ -125,6 +129,34 @@ standard, exchange protocol, trust API, or economics model. Do not introduce a
 central exchange, shared token-status ledger, global price oracle, global trust
 authority, or permission authority. Reuse POC5-style app/kernel/relay
 discipline but do not mutate POC5.
+Affects: `implementations/poc7-capability-token-exchange/**`;
+`implementations/README.md`; `DEV-GUIDE-RESOURCES.md`;
+`protocols/wire-lab.d/TODO/TODO-rajig-promise-economy-spectrum.md`.
+
+ID: DI-fibok
+Date: 2026-05-26 22:43:45
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Deepen `implementations/poc7-capability-token-exchange/` after the
+initial POC7 commit by replacing JSON-as-protocol with CBOR
+`grid([42(pCID), payload, proof])` envelopes, making storage and compute
+redemption perform real app payload work, using Ed25519 signatures over
+canonical token bytes and envelope signable views, making exchange offers mutate
+peer-local wallet state, and fixing the mistaken Alice-self-issued access token
+so the trade issues the promised non-transferable access token to Carol.
+Intent: POC7 should remain bounded evidence, but it should exercise the actual
+PromiseGrid protocol pressure points instead of only naming them: pCID-selected
+CBOR envelopes, exact signed bytes, resource work at redemption time, local
+economics without a central exchange, and transaction semantics that match the
+Alice/Bob/Carol/Dave/Mallory story.
+Constraints: Keep POC7 evidence-only and do not declare a final token,
+economics, storage, compute, kernel, or exchange API. Keep all trust,
+revocation, pricing, and redemption judgment local to the observing agent or
+issuer. Do not introduce a central exchange, global trust authority, shared
+token-status ledger, permission authority, or non-standard daemon dependency.
+Prefer existing POC4/POC5 CBOR-grid patterns and POC6 DAG-CBOR/IPLD evidence
+where practical, but keep the POC cheap and runnable in the existing five
+containers.
 Affects: `implementations/poc7-capability-token-exchange/**`;
 `implementations/README.md`; `DEV-GUIDE-RESOURCES.md`;
 `protocols/wire-lab.d/TODO/TODO-rajig-promise-economy-spectrum.md`.

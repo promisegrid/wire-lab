@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"encoding/hex"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -9,12 +10,15 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
+	"strings"
 	"time"
 
 	"promisegrid.dev/wire-lab/implementations/poc7-capability-token-exchange/auditor"
 	"promisegrid.dev/wire-lab/implementations/poc7-capability-token-exchange/compute"
 	"promisegrid.dev/wire-lab/implementations/poc7-capability-token-exchange/data"
 	"promisegrid.dev/wire-lab/implementations/poc7-capability-token-exchange/issuer"
+	"promisegrid.dev/wire-lab/implementations/poc7-capability-token-exchange/protocol"
 	"promisegrid.dev/wire-lab/implementations/poc7-capability-token-exchange/relay"
 	"promisegrid.dev/wire-lab/implementations/poc7-capability-token-exchange/storage"
 	"promisegrid.dev/wire-lab/implementations/poc7-capability-token-exchange/token"
@@ -30,6 +34,7 @@ type WireMessage struct {
 	Route    []string          `json:"route"`
 	Payload  map[string]string `json:"payload"`
 	Token    token.Token       `json:"token"`
+	Envelope string            `json:"envelope"`
 }
 
 type WireResponse struct {
@@ -39,10 +44,15 @@ type WireResponse struct {
 	Payload map[string]string `json:"payload"`
 }
 
+// appProtocolCID names the POC7 app-message protocol spec bytes.
+// Intent: Make every app message dispatch through a pCID-selected CBOR grid
+// envelope rather than through JSON field names. Source: DI-fibok
+var appProtocolCID = protocol.NewProtocolCID([]byte("poc7 app-message protocol: cbor grid envelope with signed payload map and optional token bytes"))
+
 // Node groups one local kernel boundary, one app-level relay, and the resource
 // apps that run inside a single container. Intent: Make each container's view
 // local and promise-based while still producing one bounded, reproducible demo
-// trace across five peers. Source: DI-tugih
+// trace across five peers. Source: DI-tugih; DI-fibok
 type Node struct {
 	Name     string
 	RunID    string
@@ -50,6 +60,8 @@ type Node struct {
 	Issuer   *token.Issuer
 	Wallet   *token.Wallet
 	Evidence []token.Event
+	Storage  map[string]string
+	Data     map[string]string
 }
 
 var nodeAddrs = map[string]string{
@@ -72,6 +84,8 @@ func main() {
 		RunRoot: "/run/poc7",
 		Issuer:  token.NewIssuer(*nodeName),
 		Wallet:  token.NewWallet(*nodeName),
+		Storage: make(map[string]string),
+		Data:    initialData(*nodeName),
 	}
 	server := &http.Server{Addr: ":8080", Handler: node.routes()}
 	go func() {
@@ -126,8 +140,12 @@ func (node *Node) handleScript(response http.ResponseWriter, request *http.Reque
 	writeJSON(response, result)
 }
 
-func (node *Node) receive(message WireMessage) (WireResponse, error) {
-	node.record("kernel_receive", token.OutcomeKept, message.Token.ID, node.Name+" kernel observed "+message.Kind)
+func (node *Node) receive(rawMessage WireMessage) (WireResponse, error) {
+	message, exactBytes, decodeErr := node.decodeWireMessage(rawMessage)
+	if decodeErr != nil {
+		return WireResponse{}, decodeErr
+	}
+	node.record("kernel_receive", token.OutcomeKept, message.Token.ID, node.Name+" kernel observed "+message.Kind+" exact_sha256="+protocol.HashExactBytes(exactBytes))
 	if message.ToNode != node.Name {
 		return node.forward(message)
 	}
@@ -171,10 +189,76 @@ func (node *Node) handleIssuer(message WireMessage) (WireResponse, error) {
 	case "redeem_token_v1":
 		event := node.Issuer.Redeem(message.FromNode, message.Token)
 		node.record("token_redeemed", event.Outcome, message.Token.ID, event.Detail)
-		return WireResponse{Outcome: event.Outcome, Detail: event.Detail}, nil
+		payload := map[string]string{}
+		if event.Outcome == token.OutcomeKept {
+			resourcePayload, resourceErr := node.fulfillResource(message)
+			if resourceErr != nil {
+				node.record("resource_fulfillment", token.OutcomeBroken, message.Token.ID, resourceErr.Error())
+				return WireResponse{Outcome: token.OutcomeBroken, Detail: resourceErr.Error()}, nil
+			}
+			payload = resourcePayload
+		}
+		return WireResponse{Outcome: event.Outcome, Detail: event.Detail, Payload: payload}, nil
 	default:
 		return WireResponse{}, fmt.Errorf("issuer cannot handle %s", message.Kind)
 	}
+}
+
+// fulfillResource performs the app-level work promised by a redeemed token.
+// Intent: Make POC7 redemption exercise actual storage, compute, and data
+// payload behavior instead of only changing token status. Source: DI-fibok
+func (node *Node) fulfillResource(message WireMessage) (map[string]string, error) {
+	switch message.Token.ResourceKind {
+	case data.Kind:
+		value, ok := node.Data[message.Token.ResourceID]
+		if !ok {
+			return nil, fmt.Errorf("%s has no promised data resource %s", node.Name, message.Token.ResourceID)
+		}
+		return map[string]string{"resource_kind": data.Kind, "resource_id": message.Token.ResourceID, "value": value}, nil
+	case storage.Kind:
+		return node.fulfillStorage(message)
+	case compute.Kind:
+		return node.fulfillCompute(message)
+	default:
+		return map[string]string{"resource_kind": message.Token.ResourceKind, "resource_id": message.Token.ResourceID}, nil
+	}
+}
+
+func (node *Node) fulfillStorage(message WireMessage) (map[string]string, error) {
+	key := message.Payload["key"]
+	if key == "" {
+		return nil, fmt.Errorf("storage redemption missing key")
+	}
+	switch message.Payload["op"] {
+	case "store":
+		value := message.Payload["value"]
+		node.Storage[key] = value
+		return map[string]string{"resource_kind": storage.Kind, "op": "store", "key": key, "stored": "true", "value_sha256": protocol.HashExactBytes([]byte(value))}, nil
+	case "read":
+		value, ok := node.Storage[key]
+		if !ok {
+			return nil, fmt.Errorf("%s has not stored key %s", node.Name, key)
+		}
+		return map[string]string{"resource_kind": storage.Kind, "op": "read", "key": key, "value": value}, nil
+	default:
+		return nil, fmt.Errorf("storage redemption has unsupported op %q", message.Payload["op"])
+	}
+}
+
+func (node *Node) fulfillCompute(message WireMessage) (map[string]string, error) {
+	nText := message.Payload["n"]
+	if nText == "" {
+		nText = message.Token.ResourceID
+	}
+	n, parseErr := parseFibonacciN(nText)
+	if parseErr != nil {
+		return nil, parseErr
+	}
+	result, resultErr := fibonacci(n)
+	if resultErr != nil {
+		return nil, resultErr
+	}
+	return map[string]string{"resource_kind": compute.Kind, "n": fmt.Sprintf("%d", n), "result": fmt.Sprintf("%d", result)}, nil
 }
 
 func (node *Node) handleTrader(message WireMessage) (WireResponse, error) {
@@ -193,12 +277,23 @@ func (node *Node) handleTrader(message WireMessage) (WireResponse, error) {
 		return WireResponse{Outcome: token.OutcomeKept, Detail: "peer-local quote", Payload: payload}, nil
 	case "trade_for_access_v1":
 		node.Wallet.Add(message.Token, message.FromNode+" offered bearer token for non-transferable access")
-		issued, err := node.Issuer.Issue(message.Payload["new_token_id"], message.FromNode, message.Payload["resource_kind"], message.Payload["resource_id"], token.TransferNonTransferable)
+		recipientPeer := message.Payload["recipient_peer"]
+		if recipientPeer == "" {
+			return WireResponse{}, fmt.Errorf("trade missing recipient_peer")
+		}
+		if message.Token.TransferRule != token.TransferBearer {
+			return WireResponse{}, fmt.Errorf("trade offer token %s is not bearer-transferable", message.Token.ID)
+		}
+		if verifyErr := token.VerifyToken(message.Token); verifyErr != nil {
+			return WireResponse{}, verifyErr
+		}
+		quote := node.Wallet.Quote(message.Token.Issuer, node.Name)
+		issued, err := node.Issuer.Issue(message.Payload["new_token_id"], recipientPeer, message.Payload["resource_kind"], message.Payload["resource_id"], token.TransferNonTransferable)
 		if err != nil {
 			return WireResponse{}, err
 		}
-		node.record("trade_accepted", token.OutcomeKept, issued.ID, node.Name+" exchanged bearer token for non-transferable access token")
-		return WireResponse{Outcome: token.OutcomeKept, Detail: "trade accepted", Token: issued}, nil
+		node.record("trade_accepted", token.OutcomeKept, issued.ID, node.Name+" exchanged "+fmt.Sprintf("%d", quote.OfferedCount)+" "+message.Token.Issuer+" bearer token promise for non-transferable access token promised to "+recipientPeer)
+		return WireResponse{Outcome: token.OutcomeKept, Detail: "trade accepted", Token: issued, Payload: map[string]string{"offered_count": fmt.Sprintf("%d", quote.OfferedCount), "wanted_count": fmt.Sprintf("%d", quote.WantedCount), "recipient_peer": recipientPeer}}, nil
 	default:
 		return WireResponse{}, fmt.Errorf("trader cannot handle %s", message.Kind)
 	}
@@ -218,10 +313,29 @@ func (node *Node) handleAuditor(message WireMessage) (WireResponse, error) {
 	return WireResponse{Outcome: redeem.Outcome, Detail: "audit completed: " + redeem.Detail}, nil
 }
 
-func (node *Node) runCommand(message WireMessage) (WireResponse, error) {
+func (node *Node) runCommand(rawMessage WireMessage) (WireResponse, error) {
+	message, _, decodeErr := node.decodeWireMessage(rawMessage)
+	if decodeErr != nil {
+		return WireResponse{}, decodeErr
+	}
 	switch message.Kind {
 	case "redeem_held_token_v1":
-		return node.send(message.ToNode, issuer.AppName, "redeem_token_v1", message.Route, map[string]string{}, message.Token)
+		if !node.Wallet.Holds(message.Token.ID) {
+			return WireResponse{}, fmt.Errorf("%s cannot redeem token %s it does not hold", node.Name, message.Token.ID)
+		}
+		return node.send(message.ToNode, issuer.AppName, "redeem_token_v1", message.Route, message.Payload, message.Token)
+	case "trade_for_access_v1":
+		if !node.Wallet.Holds(message.Token.ID) {
+			return WireResponse{}, fmt.Errorf("%s cannot trade token %s it does not hold", node.Name, message.Token.ID)
+		}
+		response, tradeErr := node.send(message.ToNode, trader.AppName, "trade_for_access_v1", message.Route, message.Payload, message.Token)
+		if tradeErr != nil {
+			return WireResponse{}, tradeErr
+		}
+		if response.Outcome == token.OutcomeKept && !response.Token.IsZero() {
+			node.Wallet.Add(response.Token, "trade returned non-transferable access token")
+		}
+		return response, nil
 	case "quote_offer_v1":
 		return node.receive(message)
 	default:
@@ -253,10 +367,18 @@ func (node *Node) runScenario() error {
 	if _, err := node.send("bob", trader.AppName, "receive_token_v1", []string{"bob"}, nil, bobAccess); err != nil {
 		return err
 	}
-	if redeem, err := post(nodeAddrs["bob"]+"/script", WireMessage{FromNode: "bob", FromApp: trader.AppName, ToNode: "alice", ToApp: issuer.AppName, Kind: "redeem_held_token_v1", Route: []string{"alice"}, Token: bobAccess}); err != nil || redeem.Outcome != token.OutcomeKept {
+	if redeem, err := node.requestHolderRedeem("bob", []string{"alice"}, bobAccess, map[string]string{}); err != nil || redeem.Outcome != token.OutcomeKept {
 		return fmt.Errorf("bob redeem outcome=%#v err=%v", redeem, err)
 	}
-	storageToken, err := node.requestIssue("bob", []string{"bob"}, "bob-storage-carol-1", "carol", storage.Kind, "storage-slot", token.TransferBearer)
+	storageStoreToken, err := node.requestIssue("bob", []string{"bob"}, "bob-storage-carol-store-1", "carol", storage.Kind, "storage-slot-store", token.TransferBearer)
+	if err != nil {
+		return err
+	}
+	storageReadToken, err := node.requestIssue("bob", []string{"bob"}, "bob-storage-carol-read-1", "carol", storage.Kind, "storage-slot-read", token.TransferBearer)
+	if err != nil {
+		return err
+	}
+	storageTradeToken, err := node.requestIssue("bob", []string{"bob"}, "bob-storage-carol-trade-1", "carol", storage.Kind, "storage-slot-trade", token.TransferBearer)
 	if err != nil {
 		return err
 	}
@@ -264,19 +386,65 @@ func (node *Node) runScenario() error {
 	if err != nil {
 		return err
 	}
-	if _, err := node.send("carol", trader.AppName, "receive_token_v1", []string{"bob", "carol"}, nil, storageToken); err != nil {
+	if _, err := node.send("carol", trader.AppName, "receive_token_v1", []string{"bob", "carol"}, nil, storageStoreToken); err != nil {
 		return err
+	}
+	if _, err := node.send("carol", trader.AppName, "receive_token_v1", []string{"bob", "carol"}, nil, storageReadToken); err != nil {
+		return err
+	}
+	if _, err := node.send("carol", trader.AppName, "receive_token_v1", []string{"bob", "carol"}, nil, storageTradeToken); err != nil {
+		return err
+	}
+	storeResult, err := node.requestHolderRedeem("carol", []string{"bob"}, storageStoreToken, map[string]string{"op": "store", "key": "carol-note", "value": "stored through Bob promise token"})
+	if err != nil {
+		return err
+	}
+	if storeResult.Outcome != token.OutcomeKept || storeResult.Payload["stored"] != "true" {
+		return fmt.Errorf("storage store redemption outcome=%#v", storeResult)
+	}
+	readResult, err := node.requestHolderRedeem("carol", []string{"bob"}, storageReadToken, map[string]string{"op": "read", "key": "carol-note"})
+	if err != nil {
+		return err
+	}
+	if readResult.Outcome != token.OutcomeKept || readResult.Payload["value"] != "stored through Bob promise token" {
+		return fmt.Errorf("storage read redemption outcome=%#v", readResult)
 	}
 	if _, err := node.send("bob", trader.AppName, "receive_token_v1", []string{"bob"}, nil, computeToken); err != nil {
 		return err
 	}
-	if _, err := post(nodeAddrs["dave"]+"/script", WireMessage{FromNode: "dave", FromApp: trader.AppName, ToNode: "dave", ToApp: trader.AppName, Kind: "quote_offer_v1", Payload: map[string]string{"offered_issuer": "bob", "wanted_issuer": "carol"}}); err != nil {
+	computeResult, err := node.requestHolderRedeem("bob", []string{"carol"}, computeToken, map[string]string{"n": "10"})
+	if err != nil {
 		return err
 	}
-	if trade, err := node.send("alice", trader.AppName, "trade_for_access_v1", []string{"alice"}, map[string]string{"new_token_id": "alice-data-carol-1", "resource_kind": data.Kind, "resource_id": "dataset-private"}, storageToken); err != nil || trade.Outcome != token.OutcomeKept {
+	if computeResult.Outcome != token.OutcomeKept || computeResult.Payload["result"] != "55" {
+		return fmt.Errorf("compute redemption outcome=%#v", computeResult)
+	}
+	daveQuoteCommand, err := node.newWireMessage("scenario", "dave", trader.AppName, "quote_offer_v1", nil, map[string]string{"offered_issuer": "bob", "wanted_issuer": "carol"}, token.Token{})
+	if err != nil {
+		return err
+	}
+	if _, err := post(nodeAddrs["dave"]+"/script", daveQuoteCommand); err != nil {
+		return err
+	}
+	trade, err := node.requestHolderTrade("carol", []string{"bob", "alice"}, storageTradeToken, map[string]string{"new_token_id": "alice-data-carol-1", "recipient_peer": "carol", "resource_kind": data.Kind, "resource_id": "dataset-private"})
+	if err != nil || trade.Outcome != token.OutcomeKept {
 		return fmt.Errorf("trade outcome=%#v err=%v", trade, err)
 	}
-	if _, err := node.receive(WireMessage{FromNode: "alice", FromApp: issuer.AppName, ToNode: "alice", ToApp: issuer.AppName, Kind: "revoke_token_v1", Payload: map[string]string{"token_id": revoked.ID, "reason": "broken promise history changed Alice's local willingness"}}); err != nil {
+	if trade.Token.OriginalPeer != "carol" {
+		return fmt.Errorf("trade issued access token to %s, want carol", trade.Token.OriginalPeer)
+	}
+	carolDataResult, err := node.requestHolderRedeem("carol", []string{"bob", "alice"}, trade.Token, map[string]string{})
+	if err != nil {
+		return err
+	}
+	if carolDataResult.Outcome != token.OutcomeKept || carolDataResult.Payload["value"] == "" {
+		return fmt.Errorf("carol data redemption outcome=%#v", carolDataResult)
+	}
+	revokeMessage, err := node.newWireMessage(issuer.AppName, "alice", issuer.AppName, "revoke_token_v1", nil, map[string]string{"token_id": revoked.ID, "reason": "broken promise history changed Alice's local willingness"}, token.Token{})
+	if err != nil {
+		return err
+	}
+	if _, err := node.receive(revokeMessage); err != nil {
 		return err
 	}
 	if _, err := node.send("mallory", trader.AppName, "receive_token_v1", []string{"mallory"}, nil, revoked); err != nil {
@@ -308,6 +476,121 @@ func (node *Node) requestIssue(issuerNode string, route []string, id string, ori
 	return response.Token, err
 }
 
+// requestHolderRedeem asks the token holder's local process to redeem its token.
+// Intent: Keep redemption initiated by the holder agent instead of having Alice
+// impersonate Bob or Carol during the scripted scenario. Source: DI-fibok
+func (node *Node) requestHolderRedeem(holderNode string, route []string, tok token.Token, payload map[string]string) (WireResponse, error) {
+	if len(route) == 0 {
+		return WireResponse{}, fmt.Errorf("redeem route for holder %s is empty", holderNode)
+	}
+	issuerNode := route[len(route)-1]
+	command, commandErr := node.newWireMessage("scenario", issuerNode, trader.AppName, "redeem_held_token_v1", route, payload, tok)
+	if commandErr != nil {
+		return WireResponse{}, commandErr
+	}
+	return post(nodeAddrs[holderNode]+"/script", command)
+}
+
+// requestHolderTrade asks the holder to offer a bearer token to Alice.
+// Intent: Fix the first POC7 semantic bug by making Carol offer Bob's bearer
+// token and receive the resulting non-transferable Alice data token. Source: DI-fibok
+func (node *Node) requestHolderTrade(holderNode string, route []string, tok token.Token, payload map[string]string) (WireResponse, error) {
+	command, commandErr := node.newWireMessage("scenario", "alice", trader.AppName, "trade_for_access_v1", route, payload, tok)
+	if commandErr != nil {
+		return WireResponse{}, commandErr
+	}
+	return post(nodeAddrs[holderNode]+"/script", command)
+}
+
+// newWireMessage packages app fields into a signed CBOR grid envelope carried
+// by the HTTP test harness. Intent: Keep HTTP as disposable container plumbing
+// while making the protocol message itself be exact signed CBOR bytes.
+// Source: DI-fibok
+func (node *Node) newWireMessage(fromApp string, toNode string, toApp string, kind string, route []string, payload map[string]string, tok token.Token) (WireMessage, error) {
+	fields := make(map[string]string)
+	for key, value := range payload {
+		fields[key] = value
+	}
+	fields["from_node"] = node.Name
+	fields["from_app"] = fromApp
+	fields["to_node"] = toNode
+	fields["to_app"] = toApp
+	fields["kind"] = kind
+	if !tok.IsZero() {
+		tokenBytes, tokenErr := token.Encode(tok)
+		if tokenErr != nil {
+			return WireMessage{}, tokenErr
+		}
+		fields["token_bytes"] = hex.EncodeToString(tokenBytes)
+	}
+	envelope, envelopeErr := protocol.NewEnvelope(appProtocolCID, fields, node.Name)
+	if envelopeErr != nil {
+		return WireMessage{}, envelopeErr
+	}
+	envelopeBytes, bytesErr := envelope.Bytes()
+	if bytesErr != nil {
+		return WireMessage{}, bytesErr
+	}
+	copiedRoute := append([]string(nil), route...)
+	return WireMessage{
+		FromNode: node.Name,
+		FromApp:  fromApp,
+		ToNode:   toNode,
+		ToApp:    toApp,
+		Kind:     kind,
+		Route:    copiedRoute,
+		Payload:  fields,
+		Token:    tok,
+		Envelope: hex.EncodeToString(envelopeBytes),
+	}, nil
+}
+
+// decodeWireMessage verifies and opens the signed CBOR grid envelope carried by
+// the HTTP harness. Intent: Treat the envelope bytes as the protocol message and
+// the JSON wrapper as transport-only test plumbing. Source: DI-fibok
+func (node *Node) decodeWireMessage(message WireMessage) (WireMessage, []byte, error) {
+	if message.Envelope == "" {
+		return message, nil, nil
+	}
+	envelopeBytes, hexErr := hex.DecodeString(message.Envelope)
+	if hexErr != nil {
+		return WireMessage{}, nil, hexErr
+	}
+	envelope, parseErr := protocol.ParseEnvelope(envelopeBytes)
+	if parseErr != nil {
+		return WireMessage{}, nil, parseErr
+	}
+	if !envelope.ProtocolCID.Equal(appProtocolCID) {
+		return WireMessage{}, nil, fmt.Errorf("unsupported app envelope pCID %s", envelope.ProtocolCID)
+	}
+	if verifyErr := protocol.VerifyEnvelope(envelope); verifyErr != nil {
+		return WireMessage{}, nil, verifyErr
+	}
+	fields, fieldsErr := envelope.PayloadFields()
+	if fieldsErr != nil {
+		return WireMessage{}, nil, fieldsErr
+	}
+	decoded := message
+	decoded.FromNode = fields["from_node"]
+	decoded.FromApp = fields["from_app"]
+	decoded.ToNode = fields["to_node"]
+	decoded.ToApp = fields["to_app"]
+	decoded.Kind = fields["kind"]
+	decoded.Payload = fields
+	if tokenHex := fields["token_bytes"]; tokenHex != "" {
+		tokenBytes, tokenHexErr := hex.DecodeString(tokenHex)
+		if tokenHexErr != nil {
+			return WireMessage{}, nil, tokenHexErr
+		}
+		decodedToken, tokenErr := token.Decode(tokenBytes)
+		if tokenErr != nil {
+			return WireMessage{}, nil, tokenErr
+		}
+		decoded.Token = decodedToken
+	}
+	return decoded, envelopeBytes, nil
+}
+
 // send hands the message to the first promised neighbor and leaves only the
 // remaining hops inside the envelope. Intent: Make the trace show app-level
 // relay promises between peers, not accidental self-forwards caused by keeping
@@ -321,7 +604,10 @@ func (node *Node) send(toNode string, toApp string, kind string, route []string,
 	}
 	nextHop := route[0]
 	remainingRoute := append([]string(nil), route[1:]...)
-	message := WireMessage{FromNode: node.Name, FromApp: "scenario", ToNode: toNode, ToApp: toApp, Kind: kind, Route: remainingRoute, Payload: payload, Token: tok}
+	message, messageErr := node.newWireMessage("scenario", toNode, toApp, kind, remainingRoute, payload, tok)
+	if messageErr != nil {
+		return WireResponse{}, messageErr
+	}
 	return post(nodeAddrs[nextHop]+"/relay", message)
 }
 
@@ -395,4 +681,45 @@ func getenv(name string, fallback string) string {
 		return fallback
 	}
 	return value
+}
+
+// initialData gives Alice actual data resources that redemption can return.
+// Intent: Keep data access as Alice's local promise about resources she controls
+// instead of a symbolic token label. Source: DI-fibok
+func initialData(nodeName string) map[string]string {
+	if nodeName != "alice" {
+		return map[string]string{}
+	}
+	return map[string]string{
+		"dataset-public":  "public weather sample",
+		"dataset-private": "private Alice dataset shared only after local trust and reciprocal promises",
+		"dataset-stale":   "stale revoked dataset",
+	}
+}
+
+func parseFibonacciN(value string) (int, error) {
+	trimmed := strings.TrimPrefix(value, "fib-")
+	n, parseErr := strconv.Atoi(trimmed)
+	if parseErr != nil {
+		return 0, parseErr
+	}
+	return n, nil
+}
+
+// fibonacci performs bounded compute work for the compute-token redemption.
+// Intent: Make compute redemption return a real deterministic result while
+// keeping the demo cheap enough for every container run. Source: DI-fibok
+func fibonacci(n int) (uint64, error) {
+	if n < 0 || n > 93 {
+		return 0, fmt.Errorf("fibonacci n %d is outside uint64 demo bounds", n)
+	}
+	if n == 0 {
+		return 0, nil
+	}
+	var previous uint64
+	current := uint64(1)
+	for index := 1; index < n; index++ {
+		previous, current = current, previous+current
+	}
+	return current, nil
 }
