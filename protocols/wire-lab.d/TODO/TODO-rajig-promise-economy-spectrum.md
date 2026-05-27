@@ -47,6 +47,9 @@ of the base protocol, and does not make promisebase authoritative. Source:
   redemption, revocation, bearer/non-transferable token exchange, and peer-local
   floating exchange rates without choosing a base PromiseGrid economics model.
   Done under `DI-hosuk`.
+- [x] rajig.7 Add `implementations/poc7-capability-token-exchange/` as
+  executable evidence for the combined capability-token exchange scenario. Done
+  under `DI-tugih`.
 
 ## Routed Elsewhere
 
@@ -98,4 +101,30 @@ oracle, or permission authority. Do not edit simulations, GA config, rubric, or
 scenario changes.
 Affects:
 `scenarios/promise-economy-capability-token-exchange/promise-economy-capability-token-exchange.md`;
+`protocols/wire-lab.d/TODO/TODO-rajig-promise-economy-spectrum.md`.
+
+ID: DI-tugih
+Date: 2026-05-26 15:58:15
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Implement `implementations/poc7-capability-token-exchange/` as a
+five-container proof of concept for
+`scenarios/promise-economy-capability-token-exchange/`. Each container runs one
+local kernel role, one app-level relay role, and role-specific token/resource
+apps. The demo uses fixed ticks, indivisible signed bearer and
+non-transferable tokens, issuer-local redemption/revocation state, peer-local
+exchange offers, and local trust updates.
+Intent: Produce executable evidence for the hardest promise-economy pressure
+without choosing a base economics model: resource-controlling agents issue
+tokens as promises, token redemption keeps or breaks those promises, bearer
+tokens can circulate as personal currency, non-transferable tokens remain
+relationship-scoped, and exchange rates remain local judgments instead of a
+central market fact.
+Constraints: Keep POC7 as evidence only, not a final SDK, kernel API, token
+standard, exchange protocol, trust API, or economics model. Do not introduce a
+central exchange, shared token-status ledger, global price oracle, global trust
+authority, or permission authority. Reuse POC5-style app/kernel/relay
+discipline but do not mutate POC5.
+Affects: `implementations/poc7-capability-token-exchange/**`;
+`implementations/README.md`; `DEV-GUIDE-RESOURCES.md`;
 `protocols/wire-lab.d/TODO/TODO-rajig-promise-economy-spectrum.md`.

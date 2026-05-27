@@ -1,0 +1,42 @@
+services:
+  alice:
+    build: .
+    command: ["-node", "alice"]
+    networks: [poc7]
+    volumes: [poc7-run:/run/poc7]
+    environment:
+      POC7_RUN_ID: ${POC7_RUN_ID:-manual}
+  bob:
+    build: .
+    command: ["-node", "bob"]
+    networks: [poc7]
+    volumes: [poc7-run:/run/poc7]
+    environment:
+      POC7_RUN_ID: ${POC7_RUN_ID:-manual}
+  carol:
+    build: .
+    command: ["-node", "carol"]
+    networks: [poc7]
+    volumes: [poc7-run:/run/poc7]
+    environment:
+      POC7_RUN_ID: ${POC7_RUN_ID:-manual}
+  dave:
+    build: .
+    command: ["-node", "dave"]
+    networks: [poc7]
+    volumes: [poc7-run:/run/poc7]
+    environment:
+      POC7_RUN_ID: ${POC7_RUN_ID:-manual}
+  mallory:
+    build: .
+    command: ["-node", "mallory"]
+    networks: [poc7]
+    volumes: [poc7-run:/run/poc7]
+    environment:
+      POC7_RUN_ID: ${POC7_RUN_ID:-manual}
+
+networks:
+  poc7:
+
+volumes:
+  poc7-run:
