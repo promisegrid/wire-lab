@@ -63,6 +63,7 @@ minted after that date carry only the proquint handle.
 | [TODO-dozak](./TODO-dozak-te-44-wire-lab-promisebase-merge-trajectory.md) | 2026-05-07 | TE-44 wire-lab/promisebase merge trajectory | `TODO-29` / `TODO-20260507-002306` |
 | [TODO-ralud](./TODO-ralud-te-45-conditional-release-geofencing.md) | 2026-05-07 | TE-45 conditional-release / geofencing / recursive promise-graph | `TODO-30` / `TODO-20260507-002306` |
 | [TODO-rajig](./TODO-rajig-promise-economy-spectrum.md) | 2026-05-17 | Promise-economy mechanism-spectrum simulation owner | — |
+| [TODO-rotul](./TODO-rotul-poc8-autonomous-promise-economy.md) | 2026-05-31 | POC8 autonomous promise economy **(implemented: one-pCID autonomous promise-economy POC after POC7)** | — |
 | [TODO-sinuv](./TODO-sinuv-anticipated-future-tes-transport-family.md) | 2026-05-07 | Anticipated future TEs: ring / cluster-of-clusters / gossip / receipts-at-scale | `TODO-31` / `TODO-20260507-002306` |
 | [TODO-bahaf](./TODO-bahaf-te-39-naming-reconciliation.md) | 2026-05-07 | TE-mumuv naming reconciliation (proquint filenames) | `TODO-32` / `TODO-20260507-025635` |
 | [TODO-topit](./TODO-topit-transcript-snapshot-procedure.md) | 2026-05-07 | Transcript-snapshot procedure replaces per-turn session-logging discipline **(deferred indefinitely: Perplexity-specific)** | `TODO-33` / `TODO-20260507-150000` |

@@ -1,0 +1,42 @@
+services:
+  alice:
+    build: .
+    command: ["-node", "alice"]
+    networks: [poc8]
+    volumes: [poc8-run:/run/poc8]
+    environment:
+      POC8_RUN_ID: ${POC8_RUN_ID:-manual}
+  bob:
+    build: .
+    command: ["-node", "bob"]
+    networks: [poc8]
+    volumes: [poc8-run:/run/poc8]
+    environment:
+      POC8_RUN_ID: ${POC8_RUN_ID:-manual}
+  carol:
+    build: .
+    command: ["-node", "carol"]
+    networks: [poc8]
+    volumes: [poc8-run:/run/poc8]
+    environment:
+      POC8_RUN_ID: ${POC8_RUN_ID:-manual}
+  dave:
+    build: .
+    command: ["-node", "dave"]
+    networks: [poc8]
+    volumes: [poc8-run:/run/poc8]
+    environment:
+      POC8_RUN_ID: ${POC8_RUN_ID:-manual}
+  mallory:
+    build: .
+    command: ["-node", "mallory"]
+    networks: [poc8]
+    volumes: [poc8-run:/run/poc8]
+    environment:
+      POC8_RUN_ID: ${POC8_RUN_ID:-manual}
+
+networks:
+  poc8:
+
+volumes:
+  poc8-run:
