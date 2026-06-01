@@ -1,0 +1,56 @@
+services:
+  alice:
+    build: .
+    command: ["-node", "alice"]
+    networks: [poc9]
+    volumes: [poc9-run:/run/poc9]
+    environment:
+      POC9_RUN_ID: ${POC9_RUN_ID:-manual}
+  bob:
+    build: .
+    command: ["-node", "bob"]
+    networks: [poc9]
+    volumes: [poc9-run:/run/poc9]
+    environment:
+      POC9_RUN_ID: ${POC9_RUN_ID:-manual}
+  carol:
+    build: .
+    command: ["-node", "carol"]
+    networks: [poc9]
+    volumes: [poc9-run:/run/poc9]
+    environment:
+      POC9_RUN_ID: ${POC9_RUN_ID:-manual}
+  dave:
+    build: .
+    command: ["-node", "dave"]
+    networks: [poc9]
+    volumes: [poc9-run:/run/poc9]
+    environment:
+      POC9_RUN_ID: ${POC9_RUN_ID:-manual}
+  ellen:
+    build: .
+    command: ["-node", "ellen"]
+    networks: [poc9]
+    volumes: [poc9-run:/run/poc9]
+    environment:
+      POC9_RUN_ID: ${POC9_RUN_ID:-manual}
+  frank:
+    build: .
+    command: ["-node", "frank"]
+    networks: [poc9]
+    volumes: [poc9-run:/run/poc9]
+    environment:
+      POC9_RUN_ID: ${POC9_RUN_ID:-manual}
+  mallory:
+    build: .
+    command: ["-node", "mallory"]
+    networks: [poc9]
+    volumes: [poc9-run:/run/poc9]
+    environment:
+      POC9_RUN_ID: ${POC9_RUN_ID:-manual}
+
+networks:
+  poc9:
+
+volumes:
+  poc9-run:
