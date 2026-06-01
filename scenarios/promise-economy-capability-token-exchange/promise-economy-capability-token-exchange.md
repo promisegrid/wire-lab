@@ -16,7 +16,7 @@ promise-economy-capability-token-exchange
 - Source row/title: Combined capability-token access, bearer-token transfer,
   non-transferable redemption, revocation, and peer-local floating exchange rates
 - Source DI / TODO / TE: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-nanih`;
-  `DI-pidag`; `DI-hosuk`
+  `DI-pidag`; `DI-hosuk`; `DI-sirus`; `DI-vorus`
 
 ## Purpose
 
@@ -63,6 +63,48 @@ evidence, how bearer and non-transferable tokens differ, how peer-local exchange
 offers create floating rates, and how agents accept or reject offers based on
 their own needs and trust judgments.
 
+## POC8 Evidence So Far
+
+`implementations/poc8-autonomous-promise-economy/` is useful evidence for this
+scenario because it keeps the whole promise-economy protocol under one pCID and
+uses signed CBOR `grid([42(pCID), payload, proof])` messages over framed TCP.
+Its payload `kind` values model need advertisements, offer promises,
+counter-promises, acceptance/refusal decisions, token issue promises, token
+redemption promises, outcome observations, collateral/stake promises, and
+peer-local exchange-rate quotes as variants of that one protocol rather than as
+separate protocols.
+
+POC8 also improves the agency model over POC7: Alice advertises needs as
+Alice-owned promises instead of commands, Bob and Carol locally choose whether
+to offer, counter, accept, issue, redeem, or refuse, Alice can trade a bearer
+stake promise for non-transferable compute access, and Dave can refuse Mallory's
+later stale-token circulation after Dave's own local trust decreases.
+
+## Additional Pressure After POC8
+
+The next pressure is discovery. POC8 still starts from a bounded deterministic
+world: the role plans, known peers, topology, stale-token history, routes, and
+completion marker are mostly fixed by the harness. A stronger design must show
+how agents learn who might be useful peers, what those peers promise, and how
+much risk each relationship can carry without introducing a central directory,
+global trust score, service registry, exchange authority, or permission system.
+
+Discovery should start from existing relationships and low-risk trials. Alice
+may begin with configured seed peers, prior trusted peers, local or physical
+pairing, imported references, or introductions from a peer she already knows.
+Bob may tell Alice that Carol promises storage, but that referral is Bob's
+promise and Alice-local evidence; it is not transitive authority. If Bob carries
+Carol's signed offer, Alice still decides locally whether Carol is trusted enough
+for this specific storage, compute, relay, or exchange risk.
+
+Transport behavior is evidence, not authority. Alice's local
+promise-accounting state for Bob may decide whether Alice opens, keeps, retries,
+or uses a TCP connection to Bob, and what data Alice is willing to send over it.
+TCP delivery, malformed bytes, disconnects, timeouts, retries, and latency then
+become Alice-local observations about Bob's transport promises. An open TCP
+connection never means Alice trusts Bob, and Alice may trust Carol while
+reaching Carol only through a relay promise from Bob or Dave.
+
 ## Scenario-Specific Evaluation Questions
 
 - Which agent issues each token, what resource does that agent control, and what
@@ -79,3 +121,13 @@ their own needs and trust judgments.
 - How do broken promises, revocations, stale offers, and Mallory's misleading
   trades change later exchange rates and access decisions for each observing
   agent?
+- How does Alice discover that Bob, Carol, or Dave might make useful storage,
+  compute, relay, exchange, or introduction promises without consulting a central
+  directory?
+- Which discovery statements are the speaker's own promises, which are signed
+  offers from another agent, and which are merely local observations?
+- What low-risk probe promises let Alice build enough local trust before sending
+  sensitive data, relying on returned computation, or accepting bearer-token
+  exchange risk?
+- How do promise relationships decide whether to open, keep, retry, or avoid TCP
+  connections, and how does TCP behavior feed back into local promise accounting?

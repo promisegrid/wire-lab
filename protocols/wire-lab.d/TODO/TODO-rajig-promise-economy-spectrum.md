@@ -67,6 +67,10 @@ of the base protocol, and does not make promisebase authoritative. Source:
 - [x] rajig.12 Correct POC7's envelope bytes so `grid(...)` is represented as
   the outer CBOR tag `0x67726964` / decimal `1735551332`, wrapping the existing
   `grid([42(pCID), payload, proof])` slot vector. Done under `DI-hanih`.
+- [x] rajig.13 Fold POC8 findings into the capability-token exchange scenario
+  and route the next executable pressure to TODO-vopus: POC9 peer discovery,
+  scoped trust, low-risk probes, dynamic route promises, TCP evidence, and
+  durable per-agent strategy. Done under `DI-vorus`.
 
 ## Routed Elsewhere
 
@@ -93,6 +97,8 @@ of the base protocol, and does not make promisebase authoritative. Source:
 The creation and routing decision for this TODO is recorded as `DI-pidag` in
 `TODO-juhub-turns-149-208-chronological-rewalk.md`. Future locked decisions
 local to the promise-economy mechanism spectrum should be appended here.
+The POC8 findings and POC9 discovery-strategy routing decision is recorded as
+`DI-vorus` in `TODO-vopus-poc9-peer-discovery-strategy.md`.
 
 ID: DI-hosuk
 Date: 2026-05-26 13:28:21
