@@ -50,14 +50,14 @@ type Event struct {
 // Decision is the only shape an agent LLM can return. Go validates it before
 // any protocol effect is produced.
 type Decision struct {
-	Action   string            `json:"action"`
-	Target   string            `json:"target"`
-	Kind     string            `json:"kind"`
-	Resource string            `json:"resource"`
-	Promise  string            `json:"promise"`
-	Reason   string            `json:"reason"`
-	Freeform string            `json:"freeform"`
-	Fields   map[string]string `json:"fields"`
+	Action   string         `json:"action"`
+	Target   string         `json:"target"`
+	Kind     string         `json:"kind"`
+	Resource string         `json:"resource"`
+	Promise  string         `json:"promise"`
+	Reason   string         `json:"reason"`
+	Freeform string         `json:"freeform"`
+	Fields   map[string]any `json:"fields"`
 }
 
 // MonitorReport is the observer-only LLM judgment after a run completes.
@@ -106,7 +106,7 @@ func Validate(profile config.AgentProfile, decision Decision, neighborPeers []st
 	decision.Reason = strings.TrimSpace(decision.Reason)
 	decision.Freeform = strings.TrimSpace(decision.Freeform)
 	if decision.Fields == nil {
-		decision.Fields = make(map[string]string)
+		decision.Fields = make(map[string]any)
 	}
 	if decision.Action == "" {
 		return Decision{}, fmt.Errorf("decision action is required")
@@ -139,7 +139,7 @@ func Fields(observation Observation, decision Decision) map[string]string {
 		"resource": decision.Resource,
 	}
 	for key, value := range decision.Fields {
-		fields["field_"+key] = value
+		fields["field_"+key] = stringifyField(value)
 	}
 	return fields
 }
@@ -166,9 +166,11 @@ func validateStructuredAction(decision Decision, neighborPeers []string) (Decisi
 		}
 		return decision, nil
 	}
-	if err := requireNeighborTarget(decision.Target, neighborPeers); err != nil {
-		return Decision{}, err
+	target, targetErr := requireNeighborTarget(decision.Target, neighborPeers)
+	if targetErr != nil {
+		return Decision{}, targetErr
 	}
+	decision.Target = target
 	decision.Kind = kindForAction(decision.Action)
 	if decision.Promise == "" {
 		decision.Promise = "I promise only my own local action: " + decision.Action
@@ -182,9 +184,11 @@ func validateStructuredPayload(decision Decision, neighborPeers []string) (Decis
 		decision.Kind = "outcome_observation"
 		return decision, nil
 	}
-	if err := requireNeighborTarget(decision.Target, neighborPeers); err != nil {
-		return Decision{}, err
+	target, targetErr := requireNeighborTarget(decision.Target, neighborPeers)
+	if targetErr != nil {
+		return Decision{}, targetErr
 	}
+	decision.Target = target
 	if decision.Kind == "" {
 		decision.Kind = kindForAction(decision.Action)
 	}
@@ -200,9 +204,11 @@ func validateFreeformIntent(decision Decision, neighborPeers []string) (Decision
 		decision.Kind = "outcome_observation"
 		return decision, nil
 	}
-	if err := requireNeighborTarget(decision.Target, neighborPeers); err != nil {
-		return Decision{}, err
+	target, targetErr := requireNeighborTarget(decision.Target, neighborPeers)
+	if targetErr != nil {
+		return Decision{}, targetErr
 	}
+	decision.Target = target
 	if decision.Freeform == "" && decision.Promise == "" {
 		return Decision{}, fmt.Errorf("freeform intent must include freeform or promise text")
 	}
@@ -213,16 +219,38 @@ func validateFreeformIntent(decision Decision, neighborPeers []string) (Decision
 	return decision, nil
 }
 
-func requireNeighborTarget(target string, neighborPeers []string) error {
+// requireNeighborTarget normalizes common live-LLM target lists to one direct
+// neighbor. Intent: Let POC10 keep moving when an LLM proposes several peers
+// while still sending exactly one signed message per local action. Source: DI-pijan
+func requireNeighborTarget(target string, neighborPeers []string) (string, error) {
 	if target == "" {
-		return fmt.Errorf("target is required")
+		return "", fmt.Errorf("target is required")
 	}
+	normalizedTarget, normalized := normalizeTarget(target, neighborPeers)
+	if normalized {
+		return normalizedTarget, nil
+	}
+	return "", fmt.Errorf("target %q is not a direct neighbor in this POC turn", target)
+}
+
+func normalizeTarget(target string, neighborPeers []string) (string, bool) {
 	for _, neighbor := range neighborPeers {
 		if target == neighbor {
-			return nil
+			return target, true
 		}
 	}
-	return fmt.Errorf("target %q is not a direct neighbor in this POC turn", target)
+	candidates := strings.FieldsFunc(target, func(char rune) bool {
+		return char == ',' || char == ';' || char == ' '
+	})
+	for _, candidate := range candidates {
+		trimmed := strings.TrimSpace(candidate)
+		for _, neighbor := range neighborPeers {
+			if trimmed == neighbor {
+				return trimmed, true
+			}
+		}
+	}
+	return "", false
 }
 
 func allowedAction(profile config.AgentProfile, action string) bool {
@@ -252,6 +280,21 @@ func kindForAction(action string) string {
 		return "route_promise"
 	default:
 		return "outcome_observation"
+	}
+}
+
+func stringifyField(value any) string {
+	switch typed := value.(type) {
+	case string:
+		return typed
+	case nil:
+		return ""
+	default:
+		encoded, err := json.Marshal(typed)
+		if err != nil {
+			return fmt.Sprint(typed)
+		}
+		return string(encoded)
 	}
 }
 
