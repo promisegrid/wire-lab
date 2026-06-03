@@ -1,0 +1,91 @@
+services:
+  alice:
+    build: .
+    command: ["-container", "alice", "-config", "/app/config.json"]
+    environment:
+      OPENAI_API_KEY_FILE: /run/secrets/openai_api_key
+    secrets: [openai_api_key]
+    networks: [poc11]
+    volumes:
+      - ./config.json:/app/config.json:ro
+      - poc11-run:/run/poc11
+  bob:
+    build: .
+    command: ["-container", "bob", "-config", "/app/config.json"]
+    environment:
+      OPENAI_API_KEY_FILE: /run/secrets/openai_api_key
+    secrets: [openai_api_key]
+    networks: [poc11]
+    volumes:
+      - ./config.json:/app/config.json:ro
+      - poc11-run:/run/poc11
+  carol:
+    build: .
+    command: ["-container", "carol", "-config", "/app/config.json"]
+    environment:
+      OPENAI_API_KEY_FILE: /run/secrets/openai_api_key
+    secrets: [openai_api_key]
+    networks: [poc11]
+    volumes:
+      - ./config.json:/app/config.json:ro
+      - poc11-run:/run/poc11
+  dave:
+    build: .
+    command: ["-container", "dave", "-config", "/app/config.json"]
+    environment:
+      OPENAI_API_KEY_FILE: /run/secrets/openai_api_key
+    secrets: [openai_api_key]
+    networks: [poc11]
+    volumes:
+      - ./config.json:/app/config.json:ro
+      - poc11-run:/run/poc11
+  ellen-frank:
+    build: .
+    command: ["-container", "ellen-frank", "-config", "/app/config.json"]
+    environment:
+      OPENAI_API_KEY_FILE: /run/secrets/openai_api_key
+    secrets: [openai_api_key]
+    networks: [poc11]
+    volumes:
+      - ./config.json:/app/config.json:ro
+      - poc11-run:/run/poc11
+  grace-heidi:
+    build: .
+    command: ["-container", "grace-heidi", "-config", "/app/config.json"]
+    environment:
+      OPENAI_API_KEY_FILE: /run/secrets/openai_api_key
+    secrets: [openai_api_key]
+    networks: [poc11]
+    volumes:
+      - ./config.json:/app/config.json:ro
+      - poc11-run:/run/poc11
+  ivan-judy:
+    build: .
+    command: ["-container", "ivan-judy", "-config", "/app/config.json"]
+    environment:
+      OPENAI_API_KEY_FILE: /run/secrets/openai_api_key
+    secrets: [openai_api_key]
+    networks: [poc11]
+    volumes:
+      - ./config.json:/app/config.json:ro
+      - poc11-run:/run/poc11
+  mallory-oscar:
+    build: .
+    command: ["-container", "mallory-oscar", "-config", "/app/config.json"]
+    environment:
+      OPENAI_API_KEY_FILE: /run/secrets/openai_api_key
+    secrets: [openai_api_key]
+    networks: [poc11]
+    volumes:
+      - ./config.json:/app/config.json:ro
+      - poc11-run:/run/poc11
+
+networks:
+  poc11:
+
+volumes:
+  poc11-run:
+
+secrets:
+  openai_api_key:
+    file: ./openai_api_key.txt

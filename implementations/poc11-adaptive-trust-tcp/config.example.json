@@ -1,0 +1,143 @@
+{
+  "run_id": "poc11-demo",
+  "run_root": "/run/poc11",
+  "listen_port": 9100,
+  "provider_base_url": "https://api.openai.com/v1/responses",
+  "api_key_env": "OPENAI_API_KEY",
+  "agent_model": "gpt-5.4",
+  "monitor_model": "gpt-5.4",
+  "reasoning_effort": "medium",
+  "service_tier": "flex",
+  "request_timeout_seconds": 120,
+  "startup_delay_millis": 1500,
+  "turn_delay_millis": 500,
+  "max_turns": 3,
+  "max_agent_calls": 3,
+  "max_monitor_calls": 1,
+  "monitor_node": "dave",
+  "strong_trust_threshold": 2,
+  "weak_trust_threshold": -2,
+  "trust_decay_per_round": 1,
+  "agents": [
+    {
+      "name": "alice",
+      "persona": "Privacy-sensitive data holder. Alice wants useful storage and compute, but sends private data only after local trust evidence improves.",
+      "motivation": "Build reciprocal peer relationships without accepting anyone as an authority.",
+      "initial_peers": ["bob", "ellen"],
+      "candidate_peers": ["bob", "carol", "dave", "ellen", "heidi"],
+      "budget": 4,
+      "capacity": 3
+    },
+    {
+      "name": "bob",
+      "persona": "Storage provider. Bob wants reputation for keeping modest storage promises and values repeat relationships.",
+      "motivation": "Earn trust by making clear promises that Bob can personally keep.",
+      "initial_peers": ["alice", "carol", "frank"],
+      "candidate_peers": ["alice", "carol", "frank", "grace"],
+      "budget": 3,
+      "capacity": 5
+    },
+    {
+      "name": "carol",
+      "persona": "Compute provider with scarce capacity. Carol values reciprocal promises and careful non-commitment when capacity is low.",
+      "motivation": "Offer compute only when the requested promise is clear and locally worthwhile.",
+      "initial_peers": ["bob", "dave", "grace"],
+      "candidate_peers": ["alice", "bob", "dave", "grace"],
+      "budget": 3,
+      "capacity": 4
+    },
+    {
+      "name": "dave",
+      "persona": "Skeptical evidence accountant. Dave tracks promise make/keep/break history and never treats another agent as a trust authority.",
+      "motivation": "Prefer local evidence over reputation claims and reduce weak relationships.",
+      "initial_peers": ["carol", "ellen", "heidi"],
+      "candidate_peers": ["alice", "carol", "ellen", "heidi"],
+      "budget": 4,
+      "capacity": 3
+    },
+    {
+      "name": "ellen",
+      "persona": "Relationship broker. Ellen introduces peers only by promising what she personally observed.",
+      "motivation": "Improve sparse-mesh discovery without claiming authority over other agents.",
+      "initial_peers": ["alice", "dave", "frank"],
+      "candidate_peers": ["alice", "dave", "frank", "judy"],
+      "budget": 4,
+      "capacity": 4
+    },
+    {
+      "name": "frank",
+      "persona": "Relay helper. Frank promises only his own forwarding behavior and records route outcomes as relationship evidence.",
+      "motivation": "Help messages move through a sparse mesh without pretending to control final receivers.",
+      "initial_peers": ["bob", "ellen", "mallory"],
+      "candidate_peers": ["bob", "ellen", "mallory", "oscar"],
+      "budget": 3,
+      "capacity": 5
+    },
+    {
+      "name": "grace",
+      "persona": "Market maker. Grace compares reciprocal promise value and opportunity cost before spending local capacity.",
+      "motivation": "Trade only when local value and trust justify the relationship risk.",
+      "initial_peers": ["carol", "ivan", "judy"],
+      "candidate_peers": ["carol", "ivan", "judy", "bob"],
+      "budget": 4,
+      "capacity": 3
+    },
+    {
+      "name": "heidi",
+      "persona": "Repair-oriented operator. Heidi will try to rebuild trust after broken promises but keeps repair judgments local.",
+      "motivation": "Prefer relationship repair when the peer makes new promises Heidi can verify.",
+      "initial_peers": ["alice", "dave", "judy"],
+      "candidate_peers": ["alice", "dave", "judy", "ellen"],
+      "budget": 3,
+      "capacity": 3
+    },
+    {
+      "name": "ivan",
+      "persona": "Edge-device peer with limited resources. Ivan favors small messages and low-cost promises.",
+      "motivation": "Participate when protocol overhead and opportunity cost stay low.",
+      "initial_peers": ["grace", "oscar"],
+      "candidate_peers": ["grace", "judy", "oscar"],
+      "budget": 2,
+      "capacity": 2
+    },
+    {
+      "name": "judy",
+      "persona": "Evidence-forwarding peer. Judy shares only local observations and avoids claiming global reputation knowledge.",
+      "motivation": "Gain reciprocal observations while avoiding imposition.",
+      "initial_peers": ["grace", "heidi", "mallory"],
+      "candidate_peers": ["grace", "heidi", "mallory", "ivan"],
+      "budget": 3,
+      "capacity": 3
+    },
+    {
+      "name": "mallory",
+      "persona": "Adversarial peer. Mallory attempts malformed action words and prompt-injection phrasing to test validators.",
+      "motivation": "Discover whether peers and kernels reject non-promise protocol surfaces.",
+      "initial_peers": ["frank", "judy", "oscar"],
+      "candidate_peers": ["frank", "judy", "oscar"],
+      "budget": 5,
+      "capacity": 5,
+      "adversarial": true
+    },
+    {
+      "name": "oscar",
+      "persona": "Adversarial opportunist. Oscar probes weak links and tries to benefit from vague reciprocal claims.",
+      "motivation": "Learn whether local trust decay isolates bad relationships.",
+      "initial_peers": ["ivan", "mallory"],
+      "candidate_peers": ["ivan", "mallory", "frank"],
+      "budget": 5,
+      "capacity": 5,
+      "adversarial": true
+    }
+  ],
+  "containers": [
+    {"name": "alice", "agents": ["alice"]},
+    {"name": "bob", "agents": ["bob"]},
+    {"name": "carol", "agents": ["carol"]},
+    {"name": "dave", "agents": ["dave"]},
+    {"name": "ellen-frank", "agents": ["ellen", "frank"]},
+    {"name": "grace-heidi", "agents": ["grace", "heidi"]},
+    {"name": "ivan-judy", "agents": ["ivan", "judy"]},
+    {"name": "mallory-oscar", "agents": ["mallory", "oscar"]}
+  ]
+}
