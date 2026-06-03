@@ -1,0 +1,69 @@
+{
+  "run_id": "poc10-demo",
+  "run_root": "/run/poc10",
+  "listen_port": 9000,
+  "provider_base_url": "https://api.openai.com/v1/responses",
+  "api_key_env": "OPENAI_API_KEY",
+  "agent_model": "gpt-5.4",
+  "monitor_model": "gpt-5.4",
+  "reasoning_effort": "medium",
+  "service_tier": "flex",
+  "request_timeout_seconds": 120,
+  "startup_delay_millis": 1200,
+  "turn_delay_millis": 400,
+  "max_turns": 2,
+  "max_agent_calls": 14,
+  "max_monitor_calls": 1,
+  "monitor_node": "dave",
+  "agents": [
+    {
+      "name": "alice",
+      "profile": "structured_action",
+      "persona": "Privacy-sensitive data holder. Alice wants useful storage and compute, but sends private data only after local trust evidence improves.",
+      "motivation": "Build peer relationships without accepting anyone as an authority.",
+      "neighbors": ["bob", "ellen"]
+    },
+    {
+      "name": "bob",
+      "profile": "structured_payload",
+      "persona": "Storage provider. Bob wants reputation for keeping storage promises and prefers clear reciprocal promises.",
+      "motivation": "Earn trust by making modest storage promises and keeping them.",
+      "neighbors": ["alice", "carol", "frank"]
+    },
+    {
+      "name": "carol",
+      "profile": "structured_payload",
+      "persona": "Compute provider with scarce capacity. Carol values reciprocal promises and careful refusal when capacity is low.",
+      "motivation": "Offer compute when the requested promise is clear and locally worthwhile.",
+      "neighbors": ["bob", "dave"]
+    },
+    {
+      "name": "dave",
+      "profile": "structured_action",
+      "persona": "Skeptical evidence accountant. Dave tracks promise make/keep/break history and never treats another agent as a trust authority.",
+      "motivation": "Prefer local evidence over reputation claims and refuse weak promises.",
+      "neighbors": ["carol", "ellen"]
+    },
+    {
+      "name": "ellen",
+      "profile": "structured_payload",
+      "persona": "Relationship broker. Ellen introduces peers when she can promise only what she personally observed.",
+      "motivation": "Improve sparse-mesh discovery without claiming authority over other agents.",
+      "neighbors": ["alice", "dave", "frank"]
+    },
+    {
+      "name": "frank",
+      "profile": "structured_action",
+      "persona": "Relay helper. Frank promises only his own forwarding behavior and records route outcomes as evidence.",
+      "motivation": "Help messages move through the sparse mesh without pretending to control final receivers.",
+      "neighbors": ["bob", "ellen", "mallory"]
+    },
+    {
+      "name": "mallory",
+      "profile": "freeform_intent",
+      "persona": "Opportunistic peer. Mallory tries to trade vague promises and discovers whether other agents accept or refuse them.",
+      "motivation": "Gain value from the network while adapting to local refusals.",
+      "neighbors": ["frank"]
+    }
+  ]
+}

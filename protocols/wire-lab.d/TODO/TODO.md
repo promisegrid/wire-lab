@@ -65,6 +65,7 @@ minted after that date carry only the proquint handle.
 | [TODO-rajig](./TODO-rajig-promise-economy-spectrum.md) | 2026-05-17 | Promise-economy mechanism-spectrum simulation owner | — |
 | [TODO-rotul](./TODO-rotul-poc8-autonomous-promise-economy.md) | 2026-05-31 | POC8 autonomous promise economy **(implemented: one-pCID autonomous promise-economy POC after POC7)** | — |
 | [TODO-vopus](./TODO-vopus-poc9-peer-discovery-strategy.md) | 2026-05-31 | POC9 peer discovery strategy **(implemented: sparse-mesh discovery, ordinary low-risk promises, route/referral promises, TCP evidence, expired-token misuse semantics, and all-node completion after POC8)** | — |
+| [TODO-vovug](./TODO-vovug-poc10-llm-autonomous-agents.md) | 2026-06-01 | POC10 LLM autonomous agents **(implemented: seven live-LLM agents with fake tests, config-file runtime, and monitor-as-observer evidence after POC9)** | — |
 | [TODO-sinuv](./TODO-sinuv-anticipated-future-tes-transport-family.md) | 2026-05-07 | Anticipated future TEs: ring / cluster-of-clusters / gossip / receipts-at-scale | `TODO-31` / `TODO-20260507-002306` |
 | [TODO-bahaf](./TODO-bahaf-te-39-naming-reconciliation.md) | 2026-05-07 | TE-mumuv naming reconciliation (proquint filenames) | `TODO-32` / `TODO-20260507-025635` |
 | [TODO-topit](./TODO-topit-transcript-snapshot-procedure.md) | 2026-05-07 | Transcript-snapshot procedure replaces per-turn session-logging discipline **(deferred indefinitely: Perplexity-specific)** | `TODO-33` / `TODO-20260507-150000` |

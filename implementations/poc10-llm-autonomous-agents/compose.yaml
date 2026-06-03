@@ -1,0 +1,70 @@
+services:
+  alice:
+    build: .
+    command: ["-node", "alice", "-config", "/app/config.json"]
+    environment:
+      - OPENAI_API_KEY
+    networks: [poc10]
+    volumes:
+      - ./config.json:/app/config.json:ro
+      - poc10-run:/run/poc10
+  bob:
+    build: .
+    command: ["-node", "bob", "-config", "/app/config.json"]
+    environment:
+      - OPENAI_API_KEY
+    networks: [poc10]
+    volumes:
+      - ./config.json:/app/config.json:ro
+      - poc10-run:/run/poc10
+  carol:
+    build: .
+    command: ["-node", "carol", "-config", "/app/config.json"]
+    environment:
+      - OPENAI_API_KEY
+    networks: [poc10]
+    volumes:
+      - ./config.json:/app/config.json:ro
+      - poc10-run:/run/poc10
+  dave:
+    build: .
+    command: ["-node", "dave", "-config", "/app/config.json"]
+    environment:
+      - OPENAI_API_KEY
+    networks: [poc10]
+    volumes:
+      - ./config.json:/app/config.json:ro
+      - poc10-run:/run/poc10
+  ellen:
+    build: .
+    command: ["-node", "ellen", "-config", "/app/config.json"]
+    environment:
+      - OPENAI_API_KEY
+    networks: [poc10]
+    volumes:
+      - ./config.json:/app/config.json:ro
+      - poc10-run:/run/poc10
+  frank:
+    build: .
+    command: ["-node", "frank", "-config", "/app/config.json"]
+    environment:
+      - OPENAI_API_KEY
+    networks: [poc10]
+    volumes:
+      - ./config.json:/app/config.json:ro
+      - poc10-run:/run/poc10
+  mallory:
+    build: .
+    command: ["-node", "mallory", "-config", "/app/config.json"]
+    environment:
+      - OPENAI_API_KEY
+    networks: [poc10]
+    volumes:
+      - ./config.json:/app/config.json:ro
+      - poc10-run:/run/poc10
+
+networks:
+  poc10:
+
+volumes:
+  poc10-run:
