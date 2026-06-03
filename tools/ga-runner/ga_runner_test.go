@@ -1386,7 +1386,11 @@ func TestBuildScorePromptIncludesRequiredAxisChecklist(t *testing.T) {
 		"local observations of kept, broken, refused, or timed-out promises",
 		"Treat pCID as a stable protocol-spec identifier",
 		"not as a per-message type",
-		"payload `kind` variants under one stable protocol pCID",
+		"default future-facing top-level semantic action is `promise`",
+		"observation should be a promise about local observation",
+		"refusal should be promise absence or a promise about local non-action/non-commitment",
+		"spurious action-kind proliferation",
+		"pCID-defined payload meaning or local interpretation",
 		"needless per-record pCID fragmentation",
 	} {
 		if !strings.Contains(prompt, want) {

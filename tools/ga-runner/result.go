@@ -65,6 +65,9 @@ var promiseTheoryRulesV1 = []string{
 	"Promises do not guarantee outcomes.",
 	"Trust is a local assessment of whether a promise will be kept.",
 	"Promises to receive or use are not equivalent to obligations, impositions, or promises to give.",
+	// Intent: Keep future GA results from encoding workflow/RPC verbs as if
+	// they were PromiseGrid primitives. Source: DI-mosoj
+	"Default future-facing protocol semantics use one top-level action, promise; observation and refusal are promise meanings, promise absence, or local interpretation unless a TE/DI proves a distinct wire-level role.",
 }
 
 // FitnessResult is the machine-readable evidence shape for one GA runner cell.
@@ -275,7 +278,7 @@ func rubricScoreMeaningsForSchema(schema string) map[string]string {
 		// Source: DI-ripuz
 		meanings["envelope_discipline"] = "0 ignores the settled envelope direction or confuses pCID with payload/message/request identity, 5 aligns with grid([42(pCID), payload, ...]), stable Protocol-CID semantics, and protocol-owned later slots"
 		meanings["kernel_implementation_promises"] = "0 treats the kernel as RPC authority, service registry, capability registry, permission issuer, or generic conformance judge, 5 names local app/kernel promises, assumptions, unsupported behavior, and observations"
-		meanings["app_protocol_promise_semantics"] = "0 uses command/request-response-service/permission framing or needless pCID fragmentation, 5 models storage, computation, send/receive, reciprocal promises, local trust, make/break evidence, and payload kinds under stable protocol pCIDs where appropriate"
+		meanings["app_protocol_promise_semantics"] = "0 uses command/request-response-service/permission framing, spurious workflow action kinds, or needless pCID fragmentation, 5 models storage, computation, send/receive, reciprocal promises, local trust, make/break evidence, and pCID-defined payload semantics under stable protocol pCIDs where appropriate"
 	}
 	return meanings
 }

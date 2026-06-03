@@ -121,9 +121,11 @@ metadata after each cell. New score runs write
 and adds `envelope_discipline`, `kernel_implementation_promises`, and
 `app_protocol_promise_semantics` for layer-aware scoring. The V4 scorer also
 penalizes RPC dispatcher, service-registry, capability-table, dispatch
-authorization, and kernel-conformance-authority framing unless the design
-recasts that machinery as voluntary local promises plus local observations.
-Source: `DI-ripuz`; `DI-sitim`.
+authorization, kernel-conformance-authority framing, and spurious
+workflow-specific action kinds unless the design recasts that machinery as
+voluntary local promises with pCID-defined payload semantics. Observation is a
+promise about local observation; refusal is promise absence or a promise about
+local non-action/non-commitment. Source: `DI-ripuz`; `DI-sitim`; `DI-mosoj`.
 Score runs now default to
 `-output-contract json_schema_strict`, which asks the provider to enforce the
 rubric-v4 JSON Schema instead of relying only on prompt wording. New score
@@ -242,10 +244,11 @@ when apps promise the local kernel which pCIDs they will receive or handle and
 the kernel records local delivery observations; they score poorly when they use
 service registries, capability tables, or RPC-style dispatch authority as the
 load-bearing abstraction. Related app/kernel record variants should normally
-share one stable protocol pCID and use payload `kind` values for message-level
-variation; separate pCIDs score well only when the message families are
+share one stable protocol pCID and keep workflow meaning in pCID-defined payload
+semantics under the minimal future-facing top-level action surface: `promise`.
+Separate pCIDs score well only when the message families are
 independently deployable, independently understandable, or split by a real layer
-boundary. Source: `DI-roruj`; `DI-ripuz`; `DI-sitim`; `DI-gakij`.
+boundary. Source: `DI-roruj`; `DI-ripuz`; `DI-sitim`; `DI-gakij`; `DI-mosoj`.
 
 If `score` is run without `-api-model`, each selected cell uses the `api_model`
 already stored in the state file, falling back to a provider-model derivation

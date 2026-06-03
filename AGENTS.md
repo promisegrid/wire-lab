@@ -13,6 +13,13 @@
 - `AGENTS.md` is the canonical home for repo-wide protocol, workflow, and vocabulary rules. Role-specific files such as `AGENTS-codex.md` and `AGENTS-ppx.md` are overlays: they may add stricter role constraints, environment setup, and role-specific procedures, but they must not duplicate or relax canonical repo-wide rules. (DI-034-20260508-060134)
 - When a rule applies to every agent or every repo artifact, move it here and replace role-file copies with pointers. When a rule applies only to one agent's runtime environment, identity, credentials, branch lifecycle, or private logging system, keep it in that role overlay. (DI-034-20260508-060134)
 
+## Promise Action Minimalism (Required)
+- Future PromiseGrid protocol, simulation, POC, scoring, generation, and guide work must not invent workflow-specific top-level action kinds by default. The default future-facing top-level semantic action is `promise`. (DI-mosoj)
+- Treat observation as a promise that the promiser observed something from its local vantage. Treat refusal as absence of a promise, a promise not to do something, or a promise that the agent does not currently promise the requested behavior. (DI-mosoj)
+- Treat repair, offer, counteroffer, acceptance, routing, introduction, redemption, transfer, storage, computation, TCP-link changes, authorization, dispatch, grant, registration, and enforcement as pCID-defined payload semantics, local trust/evidence interpretation, or implementation-local mechanics unless a scoped TE/DI proves a distinct wire-level role. (DI-mosoj)
+- Before adding any new top-level action kind, stop and answer: why is this not just an agent's voluntary promise with pCID-defined payload meaning? If that answer is not explicit in a locked TE/DI, do not add the action kind. (DI-mosoj)
+- POC7 through POC10 action names, including refusal and observation labels, are historical executable evidence, not the forward naming pattern. Do not rewrite scored/generated artifacts in place; supersede or reframe them when reused. (DI-mosoj; supersedes DI-fitav)
+
 ## DEV-GUIDE-RESOURCES.md
 
 - Update DEV-GUIDE-RESOURCES.md file when a cited or relevant DR, DI, TE, or TODO is updated, when a cited draft spec freezes, or when the PromiseGrid Development Guide (https://github.com/ciwg/promisegrid-dev-guide) settles prose that supersedes a wire-lab note. Source: `DI-nunut`.

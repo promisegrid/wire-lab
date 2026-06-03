@@ -905,6 +905,12 @@ func buildGeneratePrompt(repo Repo, state GAState, child GAChild) (string, error
 	// envelope-layer selector stacks while still letting higher-layer payload
 	// protocols model refusal evidence, freeze records, and capability promises.
 	// Source: DI-kafiz
+	//
+	// Intent: Stop future children from promoting workflow labels into spurious
+	// top-level actions. PromiseGrid action surfaces should stay promise-first:
+	// agents promise; pCID-owned payloads carry observation, non-commitment,
+	// repair, economics, routing, token, storage, compute, and link semantics.
+	// Source: DI-mosoj
 	var out strings.Builder
 	childPrefix, err := generatedChildIDPrefix(child.ID())
 	if err != nil {
@@ -921,6 +927,7 @@ func buildGeneratePrompt(repo Repo, state GAState, child GAChild) (string, error
 	out.WriteString("- Treat `pCID` as Protocol CID: the pCID-named protocol spec may define payload shape, signature/proof encoding, refusal evidence, freeze-successor records, or capability promise-token records.\n")
 	out.WriteString("- For base-envelope children, avoid selector-shopping stacks such as `env_pCID`/`sig_pCID`/`payload_pCID`, generic `claim_header` or claim-card layers, generic claim cards, and universal `statement_capsule` wrappers.\n")
 	out.WriteString("- Do not ban higher-layer payload protocols from defining their own promise-accounting records. Put signed refusal versus silence/timeout, exact-byte local evidence, freeze successor records, transfer semantics, and capability-as-promise-token behavior inside the pCID-selected payload/specimen layer unless the scenario explicitly asks to test an envelope negative control.\n")
+	out.WriteString("- Default future-facing protocol semantics to one top-level action: `promise`. Treat observation as a promise about local observation; treat refusal as promise absence or a promise about local non-action/non-commitment; treat repair, offer, counteroffer, acceptance, route, introduction, redemption, transfer, storage, computation, TCP-link changes, authorization, dispatch, grant, registration, and enforcement as pCID-owned payload semantics or local interpretation unless a TE/DI proves a distinct wire-level role.\n")
 	out.WriteString("- Keep outer signatures scoped to the current sender's own promise; no agent promises for another agent, and every receiver keeps local trust assessments.\n\n")
 	fmt.Fprintf(&out, "- Run group ID: `%s`\n", state.RunGroupID)
 	fmt.Fprintf(&out, "- Planned child ID prefix: `%s`\n", childPrefix)
