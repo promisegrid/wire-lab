@@ -1,0 +1,1268 @@
+package runtime
+
+import (
+	"context"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"net"
+	"os"
+	"path/filepath"
+	"strconv"
+	"sync"
+	"time"
+
+	"promisegrid.dev/wire-lab/implementations/poc12-production-progress/config"
+	"promisegrid.dev/wire-lab/implementations/poc12-production-progress/decision"
+	"promisegrid.dev/wire-lab/implementations/poc12-production-progress/economy"
+	"promisegrid.dev/wire-lab/implementations/poc12-production-progress/pcid"
+	"promisegrid.dev/wire-lab/implementations/poc12-production-progress/production"
+	"promisegrid.dev/wire-lab/implementations/poc12-production-progress/protocol"
+	"promisegrid.dev/wire-lab/implementations/poc12-production-progress/relationship"
+	"promisegrid.dev/wire-lab/implementations/poc12-production-progress/transport"
+)
+
+const sendTimeout = 5 * time.Second
+const shutdownDrainTimeout = 750 * time.Millisecond
+const fulfillmentOrderID = "ORDER-1001"
+const fulfillmentPackageID = "PKG-1001"
+
+// Node runs one autonomous POC12 agent process. A container may run several
+// Node processes, but each process keeps its own local relationship ledger,
+// listener, log, and live-LLM boundary.
+// Intent: POC12 tests agent autonomy and adaptive TCP adjacency without
+// collapsing co-located agents into a shared authority. Source: DI-timah
+type Node struct {
+	Config    config.Config
+	Agent     config.AgentConfig
+	Protocols pcid.Registry
+	Decider   decision.Decider
+	Monitor   decision.Monitor
+
+	mu        sync.Mutex
+	events    []decision.Event
+	ledger    *relationship.Ledger
+	evaluator economy.Evaluator
+	listener  net.Listener
+	logFile   *os.File
+	budget    int
+	capacity  int
+
+	activeHandlers sync.WaitGroup
+	stopping       bool
+	drainRecorded  bool
+	listenerDone   chan struct{}
+}
+
+type parsedMessage struct {
+	Fields       map[string]string
+	ExactHash    string
+	ProtocolCID  protocol.ProtocolCID
+	ProtocolName string
+}
+
+// NewNode creates a node with a private trust ledger for every configured peer.
+func NewNode(cfg config.Config, agent config.AgentConfig, decider decision.Decider, monitor decision.Monitor) *Node {
+	peerNames := make([]string, 0, len(cfg.Agents)-1)
+	for _, peer := range cfg.Agents {
+		if peer.Name != agent.Name {
+			peerNames = append(peerNames, peer.Name)
+		}
+	}
+	return &Node{
+		Config:    cfg,
+		Agent:     agent,
+		Protocols: pcid.NewRegistry(),
+		Decider:   decider,
+		Monitor:   monitor,
+		ledger:    relationship.NewLedger(peerNames, agent.InitialPeers, cfg.StrongTrustThreshold, cfg.WeakTrustThreshold, cfg.TrustDecayPerRound),
+		evaluator: economy.Evaluator{},
+		budget:    agent.Budget,
+		capacity:  agent.Capacity,
+	}
+}
+
+// Run executes bounded autonomous turns, writes a done marker, and waits for
+// the observer-only monitor report.
+func (node *Node) Run(ctx context.Context) error {
+	if err := node.openLog(); err != nil {
+		return err
+	}
+	defer node.closeLog()
+	if err := node.loadRelationshipState(); err != nil {
+		return err
+	}
+	if err := node.maybeStartServer(ctx); err != nil {
+		return err
+	}
+	defer node.closeListener()
+	time.Sleep(node.Config.StartupDelay())
+	if err := node.runStartupWorkflow(ctx); err != nil {
+		node.record("startup_workflow_failed", "broken", "", err.Error())
+	}
+	for turnIndex := 0; turnIndex < node.Config.MaxTurns && turnIndex < node.Config.MaxAgentCalls; turnIndex++ {
+		if err := node.runTurn(ctx, turnIndex); err != nil {
+			node.record("decision_error", "broken", "", err.Error())
+		}
+		time.Sleep(node.Config.TurnDelay())
+	}
+	if err := node.writeTurnsDoneMarker(); err != nil {
+		return err
+	}
+	node.waitForShutdownGrace(ctx)
+	// Intent: Stop accepting new TCP frames before the local done marker is
+	// written so `node_done` does not race with late receive receipts.
+	// Source: DI-timah
+	node.closeListener()
+	node.drainInflight(ctx)
+	if err := node.saveRelationshipState(); err != nil {
+		return err
+	}
+	if err := node.writeDoneMarker(); err != nil {
+		return err
+	}
+	if node.Agent.Name == node.Config.MonitorNode {
+		if err := node.runMonitor(ctx); err != nil {
+			node.record("monitor_error", "broken", "", err.Error())
+		}
+	}
+	return node.waitForMonitor(ctx)
+}
+
+func (node *Node) runStartupWorkflow(ctx context.Context) error {
+	if ctx.Err() != nil {
+		return ctx.Err()
+	}
+	// Intent: Only the fulfillment agent owns the startup production workflow;
+	// other agents keep their normal local turn behavior. Source: DI-parok
+	if node.Agent.Kind != "fulfillment" {
+		return nil
+	}
+	return node.runFulfillmentShipmentWorkflow()
+}
+
+func (node *Node) runFulfillmentShipmentWorkflow() error {
+	// Intent: A prompt-only fulfillment agent can discuss shipping without
+	// producing evidence. This deterministic startup sequence makes the
+	// production workflow executable while later turns remain live/autonomous.
+	// Source: DI-parok
+	addressAck, addressErr := node.sendAndReceive("accounting", map[string]string{
+		"act":                 decision.ActPromise,
+		"from":                node.Agent.Name,
+		"to":                  "accounting",
+		"turn":                "startup",
+		"promise":             "I promise to receive accounting's local address evidence for this order and use it only for this shipment sequence.",
+		"reason":              "fulfillment needs address evidence before it can promise label-print evidence",
+		"field_promise_about": production.PromiseAddressLookup,
+		"field_order_id":      fulfillmentOrderID,
+	})
+	if addressErr != nil {
+		return fmt.Errorf("address lookup: %w", addressErr)
+	}
+	weightAck, weightErr := node.sendAndReceive("postal_scale", map[string]string{
+		"act":                 decision.ActPromise,
+		"from":                node.Agent.Name,
+		"to":                  "postal_scale",
+		"turn":                "startup",
+		"promise":             "I promise to receive postal_scale's local package weight evidence and use it only for this shipment sequence.",
+		"reason":              "fulfillment needs local device weight evidence before label printing",
+		"field_promise_about": production.PromiseWeighPackage,
+		"field_package_id":    fulfillmentPackageID,
+	})
+	if weightErr != nil {
+		return fmt.Errorf("package weighing: %w", weightErr)
+	}
+	labelAck, labelErr := node.sendAndReceive("ups_label_printer", map[string]string{
+		"act":                    decision.ActPromise,
+		"from":                   node.Agent.Name,
+		"to":                     "ups_label_printer",
+		"turn":                   "startup",
+		"promise":                "I promise to receive UPS label evidence generated from this address and weight evidence and use it only for this shipment sequence.",
+		"reason":                 "fulfillment has address and weight evidence and needs a label promise",
+		"field_promise_about":    production.PromisePrintLabel,
+		"field_package_id":       fulfillmentPackageID,
+		"field_shipping_address": addressAck.Fields["field_shipping_address"],
+		"field_weight_ounces":    weightAck.Fields["field_weight_ounces"],
+	})
+	if labelErr != nil {
+		return fmt.Errorf("label printing: %w", labelErr)
+	}
+	_, updateErr := node.sendAndReceive("accounting", map[string]string{
+		"act":                   decision.ActPromise,
+		"from":                  node.Agent.Name,
+		"to":                    "accounting",
+		"turn":                  "startup",
+		"promise":               "I promise to report the shipment cost and tracking evidence I received back to accounting for this order.",
+		"reason":                "fulfillment closes its shipment sequence by returning local label evidence to accounting",
+		"field_promise_about":   production.PromiseShipmentUpdate,
+		"field_order_id":        fulfillmentOrderID,
+		"field_tracking_number": labelAck.Fields["field_tracking_number"],
+		"field_cost_cents":      labelAck.Fields["field_cost_cents"],
+	})
+	if updateErr != nil {
+		return fmt.Errorf("accounting update: %w", updateErr)
+	}
+	node.record("fulfillment_workflow_completed", "kept", "accounting", "order_id="+fulfillmentOrderID+" package_id="+fulfillmentPackageID)
+	return nil
+}
+
+func (node *Node) runTurn(ctx context.Context, turnIndex int) error {
+	if node.Agent.Deterministic() {
+		node.record("deterministic_agent_waiting", "kept", "", "deterministic production agent waits for pCID-routed promises")
+		return nil
+	}
+	node.decayRelationships()
+	observation := node.observation(turnIndex)
+	if len(observation.DirectPeers) == 0 {
+		node.record("local_non_commitment", "non_commitment", "", "no direct peer currently has enough local trust for a TCP promise")
+		return nil
+	}
+	rawDecision, decideErr := node.Decider.Decide(ctx, observation)
+	if decideErr != nil {
+		return decideErr
+	}
+	validDecision, validateErr := decision.ValidateObservedPromiseDecision(rawDecision, observation)
+	if validateErr != nil {
+		repairedDecision, repaired, repairErr := decision.RepairPromiseDecision(rawDecision, observation, validateErr)
+		if repairErr != nil {
+			node.observeOutcome(rawDecision.Target, relationship.OutcomeMalformed)
+			node.record("decision_rejected", "malformed", rawDecision.Target, validateErr.Error())
+			return nil
+		}
+		if repaired {
+			node.record("decision_repaired", "kept", repairedDecision.Target, repairErrDetail(validateErr))
+		}
+		validDecision = repairedDecision
+	}
+	fields := decision.Fields(observation, validDecision)
+	if resourceErr := node.checkLocalResourcePromise(fields); resourceErr != nil {
+		node.observeOutcome(validDecision.Target, relationship.OutcomeBroken)
+		node.applyBrokenPromiseCost(validDecision.Target, fields, resourceErr.Error())
+		node.record("resource_promise_broken", "broken", validDecision.Target, resourceErr.Error())
+		return nil
+	}
+	if economicsDecision := node.evaluateEconomics(validDecision.Target, fields); !economicsDecision.PromiseWorthMaking {
+		node.observeOutcome(validDecision.Target, relationship.OutcomeNonCommitment)
+		node.record("promise_withheld", "non_commitment", validDecision.Target, economicsDecision.Reason)
+		return nil
+	}
+	if sendErr := node.send(validDecision.Target, fields); sendErr != nil {
+		node.observeOutcome(validDecision.Target, relationship.OutcomeBroken)
+		node.applyBrokenPromiseCost(validDecision.Target, fields, sendErr.Error())
+		node.record("send_failed", "broken", validDecision.Target, sendErr.Error())
+		return nil
+	}
+	node.spendLocalCapacity()
+	node.record("promise_sent", "kept", validDecision.Target, validDecision.Promise)
+	return nil
+}
+
+func (node *Node) maybeStartServer(ctx context.Context) error {
+	listenPort, portFound := node.Config.ListenPortFor(node.Agent.Name)
+	if !portFound || listenPort <= 0 {
+		node.record("server_skipped", "kept", "", "no listener for local-only test run")
+		return nil
+	}
+	address := net.JoinHostPort("", strconv.Itoa(listenPort))
+	listener, err := net.Listen("tcp", address)
+	if err != nil {
+		return err
+	}
+	node.listener = listener
+	node.listenerDone = make(chan struct{})
+	go node.acceptLoop(ctx, listener, node.listenerDone)
+	return nil
+}
+
+func (node *Node) acceptLoop(ctx context.Context, listener net.Listener, done chan struct{}) {
+	defer close(done)
+	for {
+		conn, err := listener.Accept()
+		if err != nil {
+			if node.isStopping() || errors.Is(err, net.ErrClosed) {
+				node.record("listener_closed", "kept", "", "listener closed during normal shutdown")
+				return
+			}
+			select {
+			case <-ctx.Done():
+				return
+			default:
+				node.record("accept_failed", "broken", "", err.Error())
+				return
+			}
+		}
+		node.activeHandlers.Add(1)
+		go func() {
+			defer node.activeHandlers.Done()
+			node.handleConn(conn)
+		}()
+	}
+}
+
+func (node *Node) handleConn(conn net.Conn) {
+	frameConn := transport.NewFrameConn(conn)
+	defer node.closeFrameConn(frameConn, "conn_close_failed", "")
+	frameBytes, readErr := frameConn.ReadFrame()
+	if readErr != nil {
+		node.record("frame_read_failed", "broken", "", readErr.Error())
+		return
+	}
+	parsed, parseErr := node.parseEnvelope(frameBytes)
+	if parseErr != nil {
+		node.record("frame_parse_failed", "broken", "", parseErr.Error())
+		return
+	}
+	fields := parsed.Fields
+	fromAgent := fields["from"]
+	if !node.supportsProtocol(parsed.ProtocolName) {
+		node.observeOutcome(fromAgent, relationship.OutcomeNonCommitment)
+		node.record("unsupported_pcid", "non_commitment", fromAgent, "no local handler promised for "+parsed.ProtocolName)
+		node.writeAck(frameConn, fromAgent, "not_promised", "I promise to remember that I did not promise to handle this pCID.", parsed.ProtocolCID, nil)
+		return
+	}
+	if fields["act"] != decision.ActPromise {
+		node.observeOutcome(fromAgent, relationship.OutcomeMalformed)
+		node.record("message_rejected", "malformed", fromAgent, "message act is not promise")
+		node.writeAck(frameConn, fromAgent, "malformed", "I promise I rejected this non-promise message.", parsed.ProtocolCID, nil)
+		return
+	}
+	if !node.canAcceptFrom(fromAgent, fields) {
+		node.observeOutcome(fromAgent, relationship.OutcomeNonCommitment)
+		node.record("message_not_promised", "non_commitment", fromAgent, "no current local promise to accept direct TCP exchange")
+		node.writeAck(frameConn, fromAgent, "not_promised", "I promise to remember that I did not currently promise this direct exchange.", parsed.ProtocolCID, nil)
+		return
+	}
+	if resourceErr := node.checkIncomingResourcePromise(fields); resourceErr != nil {
+		node.observeOutcome(fromAgent, relationship.OutcomeBroken)
+		node.applyBrokenPromiseCost(fromAgent, fields, resourceErr.Error())
+		node.record("resource_promise_rejected", "broken", fromAgent, resourceErr.Error())
+		node.writeAck(frameConn, fromAgent, "broken", "I promise I rejected this resource promise because local checks failed.", parsed.ProtocolCID, nil)
+		return
+	}
+	ackFields, handlerErr := node.handleProtocolPromise(parsed)
+	if handlerErr != nil {
+		node.observeOutcome(fromAgent, relationship.OutcomeBroken)
+		node.applyBrokenPromiseCost(fromAgent, fields, handlerErr.Error())
+		node.record("protocol_handler_rejected", "broken", fromAgent, handlerErr.Error())
+		node.writeAck(frameConn, fromAgent, "broken", "I promise I rejected this protocol promise because local handler checks failed.", parsed.ProtocolCID, nil)
+		return
+	}
+	acceptedAsCandidate := isLinkDiscoveryPromise(fields) && !node.canAccept(fromAgent)
+	node.observeOutcome(fromAgent, outcomeForPromise(fields))
+	eventName := "message_received"
+	if acceptedAsCandidate {
+		eventName = "candidate_message_received"
+	}
+	node.record(eventName, "kept", fromAgent, "received "+parsed.ProtocolName+" signed promise exact_sha256="+parsed.ExactHash)
+	node.writeAck(frameConn, fromAgent, "kept", "I promise I received and recorded your signed promise message.", parsed.ProtocolCID, ackFields)
+}
+
+func (node *Node) writeAck(frameConn transport.FrameConn, target, outcome, promiseText string, protocolCID protocol.ProtocolCID, extraFields map[string]string) {
+	ackFields := map[string]string{
+		"act":     decision.ActPromise,
+		"from":    node.Agent.Name,
+		"to":      target,
+		"outcome": outcome,
+		"promise": promiseText,
+		"reason":  "transport acknowledgement expressed as local promise content",
+	}
+	for key, value := range extraFields {
+		ackFields[key] = value
+	}
+	ack, ackErr := protocol.NewEnvelope(protocolCID, ackFields, node.Agent.Name)
+	if ackErr != nil {
+		node.record("ack_sign_failed", "broken", target, ackErr.Error())
+		return
+	}
+	ackBytes, bytesErr := ack.Bytes()
+	if bytesErr != nil {
+		node.record("ack_bytes_failed", "broken", target, bytesErr.Error())
+		return
+	}
+	if writeErr := frameConn.WriteFrame(ackBytes); writeErr != nil {
+		node.record("ack_write_failed", "broken", target, writeErr.Error())
+	}
+}
+
+func (node *Node) send(target string, fields map[string]string) error {
+	_, err := node.sendAndReceive(target, fields)
+	return err
+}
+
+// sendAndReceive performs one signed promise exchange and returns the receiver's
+// ACK evidence to the local caller.
+// Intent: The fulfillment workflow needs concrete address, weight, label, and
+// accounting evidence from pCID handlers without inventing an RPC surface.
+// Source: DI-parok
+func (node *Node) sendAndReceive(target string, fields map[string]string) (parsedMessage, error) {
+	if !node.canDialTarget(target, fields) {
+		return parsedMessage{}, fmt.Errorf("no local TCP promise to %s", target)
+	}
+	protocolName, protocolCID := node.protocolForFields(fields)
+	fields["protocol"] = protocolName
+	envelope, envelopeErr := protocol.NewEnvelope(protocolCID, fields, node.Agent.Name)
+	if envelopeErr != nil {
+		return parsedMessage{}, envelopeErr
+	}
+	envelopeBytes, bytesErr := envelope.Bytes()
+	if bytesErr != nil {
+		return parsedMessage{}, bytesErr
+	}
+	hostName, listenPort, endpointFound := node.Config.EndpointFor(target)
+	if !endpointFound {
+		return parsedMessage{}, fmt.Errorf("no endpoint for target %s", target)
+	}
+	address := net.JoinHostPort(hostName, strconv.Itoa(listenPort))
+	frameConn, dialErr := transport.DialFrameConn(address, sendTimeout)
+	if dialErr != nil {
+		return parsedMessage{}, dialErr
+	}
+	defer node.closeFrameConn(frameConn, "send_close_failed", target)
+	if writeErr := frameConn.WriteFrame(envelopeBytes); writeErr != nil {
+		return parsedMessage{}, writeErr
+	}
+	ackBytes, readErr := frameConn.ReadFrame()
+	if readErr != nil {
+		return parsedMessage{}, readErr
+	}
+	ackMessage, parseErr := node.parseEnvelope(ackBytes)
+	if parseErr != nil {
+		return parsedMessage{}, parseErr
+	}
+	ackFields := ackMessage.Fields
+	if ackFields["outcome"] != "kept" {
+		node.observeOutcome(target, relationship.OutcomeNonCommitment)
+		return parsedMessage{}, fmt.Errorf("ack outcome %q", ackFields["outcome"])
+	}
+	node.recordAckEvidence(target, ackMessage)
+	node.observeOutcome(target, outcomeForPromise(fields))
+	return ackMessage, nil
+}
+
+func (node *Node) parseEnvelope(frameBytes []byte) (parsedMessage, error) {
+	envelope, parseErr := protocol.ParseEnvelope(frameBytes)
+	if parseErr != nil {
+		return parsedMessage{}, parseErr
+	}
+	if verifyErr := protocol.VerifyEnvelope(envelope); verifyErr != nil {
+		return parsedMessage{}, verifyErr
+	}
+	fields, fieldsErr := envelope.PayloadFields()
+	if fieldsErr != nil {
+		return parsedMessage{}, fieldsErr
+	}
+	if fields["from"] == "" {
+		return parsedMessage{}, fmt.Errorf("payload from field is required")
+	}
+	protocolName, known := node.Protocols.Name(envelope.ProtocolCID)
+	if !known {
+		protocolName = "unknown:" + envelope.ProtocolCID.String()
+	}
+	return parsedMessage{
+		Fields:       fields,
+		ExactHash:    protocol.HashExactBytes(frameBytes),
+		ProtocolCID:  envelope.ProtocolCID,
+		ProtocolName: protocolName,
+	}, nil
+}
+
+// protocolForFields chooses the pCID for an outbound promise from protocol or
+// promise_about payload meaning. The pCID is still protocol identity, not a
+// per-message-type selector; promise_about remains inside the pCID-owned body.
+// Source: DI-bikit
+func (node *Node) protocolForFields(fields map[string]string) (string, protocol.ProtocolCID) {
+	for _, key := range []string{"field_protocol", "protocol"} {
+		if protocolName := fields[key]; node.Protocols.Known(protocolName) {
+			return protocolName, node.Protocols.MustCID(protocolName)
+		}
+	}
+	switch fields["field_promise_about"] {
+	case production.PromiseWeighPackage:
+		return pcid.PostalScaleV1, node.Protocols.MustCID(pcid.PostalScaleV1)
+	case production.PromiseAddressLookup, production.PromiseShipmentUpdate:
+		return pcid.AccountingV1, node.Protocols.MustCID(pcid.AccountingV1)
+	case production.PromisePrintLabel:
+		return pcid.UPSLabelV1, node.Protocols.MustCID(pcid.UPSLabelV1)
+	default:
+		return pcid.RelationshipV1, node.Protocols.MustCID(pcid.RelationshipV1)
+	}
+}
+
+func (node *Node) supportsProtocol(protocolName string) bool {
+	for _, supportedProtocol := range node.Agent.Protocols() {
+		if protocolName == supportedProtocol {
+			return true
+		}
+	}
+	return false
+}
+
+func (node *Node) handleProtocolPromise(message parsedMessage) (map[string]string, error) {
+	switch message.ProtocolName {
+	case pcid.RelationshipV1:
+		return nil, nil
+	case pcid.PostalScaleV1:
+		return node.handlePostalScalePromise(message.Fields)
+	case pcid.UPSLabelV1:
+		return node.handleUPSLabelPromise(message.Fields)
+	case pcid.AccountingV1:
+		return node.handleAccountingPromise(message.Fields)
+	default:
+		return nil, fmt.Errorf("unsupported protocol %s", message.ProtocolName)
+	}
+}
+
+func (node *Node) handlePostalScalePromise(fields map[string]string) (map[string]string, error) {
+	if node.Agent.Kind != "postal_scale" {
+		return nil, nil
+	}
+	if fields["field_promise_about"] != production.PromiseWeighPackage {
+		return nil, fmt.Errorf("postal scale cannot handle promise_about=%q", fields["field_promise_about"])
+	}
+	packageID := firstStringField(fields, "field_package_id", "package_id")
+	weightOunces, err := production.WeightForPackage(packageID)
+	if err != nil {
+		return nil, err
+	}
+	node.record("package_weighed", "kept", fields["from"], fmt.Sprintf("package_id=%s weight_ounces=%d", packageID, weightOunces))
+	return map[string]string{
+		"field_promise_about": production.PromiseWeighPackage,
+		"field_package_id":    packageID,
+		"field_weight_ounces": strconv.Itoa(weightOunces),
+	}, nil
+}
+
+func (node *Node) handleUPSLabelPromise(fields map[string]string) (map[string]string, error) {
+	if node.Agent.Kind != "ups_label_printer" {
+		return nil, nil
+	}
+	if fields["field_promise_about"] != production.PromisePrintLabel {
+		return nil, fmt.Errorf("ups label printer cannot handle promise_about=%q", fields["field_promise_about"])
+	}
+	packageID := firstStringField(fields, "field_package_id", "package_id")
+	address := firstStringField(fields, "field_shipping_address", "shipping_address", "field_address")
+	weightOunces := intField(fields, "field_weight_ounces", "weight_ounces")
+	trackingNumber, costCents, err := production.LabelForShipment(packageID, address, weightOunces)
+	if err != nil {
+		return nil, err
+	}
+	node.record("shipping_label_printed", "kept", fields["from"], fmt.Sprintf("package_id=%s tracking_number=%s cost_cents=%d", packageID, trackingNumber, costCents))
+	return map[string]string{
+		"field_promise_about":   production.PromisePrintLabel,
+		"field_package_id":      packageID,
+		"field_tracking_number": trackingNumber,
+		"field_cost_cents":      strconv.Itoa(costCents),
+	}, nil
+}
+
+func (node *Node) handleAccountingPromise(fields map[string]string) (map[string]string, error) {
+	if node.Agent.Kind != "accounting" {
+		return nil, nil
+	}
+	switch fields["field_promise_about"] {
+	case production.PromiseAddressLookup:
+		orderID := firstStringField(fields, "field_order_id", "order_id")
+		address, err := production.AddressForOrder(orderID)
+		if err != nil {
+			return nil, err
+		}
+		node.record("shipping_address_promised", "kept", fields["from"], fmt.Sprintf("order_id=%s shipping_address=%s", orderID, address))
+		return map[string]string{
+			"field_promise_about":    production.PromiseAddressLookup,
+			"field_order_id":         orderID,
+			"field_shipping_address": address,
+		}, nil
+	case production.PromiseShipmentUpdate:
+		orderID := firstStringField(fields, "field_order_id", "order_id")
+		trackingNumber := firstStringField(fields, "field_tracking_number", "tracking_number")
+		costCents := intField(fields, "field_cost_cents", "cost_cents")
+		if err := production.ValidateAccountingUpdate(orderID, trackingNumber, costCents); err != nil {
+			return nil, err
+		}
+		node.record("accounting_updated", "kept", fields["from"], fmt.Sprintf("order_id=%s tracking_number=%s cost_cents=%d", orderID, trackingNumber, costCents))
+		return map[string]string{
+			"field_promise_about":   production.PromiseShipmentUpdate,
+			"field_order_id":        orderID,
+			"field_tracking_number": trackingNumber,
+			"field_cost_cents":      strconv.Itoa(costCents),
+		}, nil
+	default:
+		return nil, fmt.Errorf("accounting cannot handle promise_about=%q", fields["field_promise_about"])
+	}
+}
+
+func (node *Node) recordAckEvidence(target string, message parsedMessage) {
+	switch message.Fields["field_promise_about"] {
+	case production.PromiseWeighPackage:
+		node.record("package_weight_received", "kept", target, "weight_ounces="+message.Fields["field_weight_ounces"])
+	case production.PromiseAddressLookup:
+		node.record("shipping_address_received", "kept", target, "shipping_address="+message.Fields["field_shipping_address"])
+	case production.PromisePrintLabel:
+		node.record("shipping_label_received", "kept", target, "tracking_number="+message.Fields["field_tracking_number"]+" cost_cents="+message.Fields["field_cost_cents"])
+	case production.PromiseShipmentUpdate:
+		node.record("accounting_update_confirmed", "kept", target, "tracking_number="+message.Fields["field_tracking_number"]+" cost_cents="+message.Fields["field_cost_cents"])
+	}
+}
+
+func (node *Node) observation(turnIndex int) decision.Observation {
+	node.mu.Lock()
+	defer node.mu.Unlock()
+	recentEvents := make([]decision.Event, len(node.events))
+	copy(recentEvents, node.events)
+	if len(recentEvents) > 16 {
+		recentEvents = recentEvents[len(recentEvents)-16:]
+	}
+	return decision.Observation{
+		AgentName:      node.Agent.Name,
+		Persona:        node.Agent.Persona,
+		Motivation:     node.Agent.Motivation,
+		Turn:           turnIndex,
+		KnownPeers:     node.Config.AgentNames(),
+		DirectPeers:    node.ledger.DirectPeers(),
+		CandidatePeers: node.Config.CandidatePeersFor(node.Agent),
+		LocalTrust:     node.ledger.Snapshot(),
+		Budget:         node.budget,
+		Capacity:       node.capacity,
+		Adversarial:    node.Agent.Adversarial,
+		SupportedPCIDs: node.Agent.Protocols(),
+		RecentEvents:   recentEvents,
+		RequiredAct:    decision.ActPromise,
+	}
+}
+
+func (node *Node) evaluateEconomics(target string, fields map[string]string) economy.Decision {
+	node.mu.Lock()
+	defer node.mu.Unlock()
+	reciprocalValue := 1
+	if fields["field_promise_about"] == "reciprocal_economics" {
+		reciprocalValue = 4
+	}
+	offer := economy.Offer{
+		Promiser:        node.Agent.Name,
+		Promisee:        target,
+		Resource:        fields["field_promise_about"],
+		PromisedValue:   2,
+		ReciprocalValue: reciprocalValue,
+		OpportunityCost: 1,
+		Trust:           node.ledger.Trust(target),
+		Budget:          node.budget,
+		Capacity:        node.capacity,
+	}
+	return node.evaluator.Decide(offer)
+}
+
+func (node *Node) spendLocalCapacity() {
+	node.mu.Lock()
+	defer node.mu.Unlock()
+	if node.budget > 0 {
+		node.budget--
+	}
+	if node.capacity > 0 {
+		node.capacity--
+	}
+}
+
+func (node *Node) decayRelationships() {
+	node.mu.Lock()
+	beforePeers := stringSet(node.ledger.DirectPeers())
+	node.ledger.DecayRound()
+	afterPeers := stringSet(node.ledger.DirectPeers())
+	node.mu.Unlock()
+	for peerName := range beforePeers {
+		if !afterPeers[peerName] {
+			node.record(string(relationship.TransitionRemoved), "kept", peerName, "relationship decay crossed weak threshold")
+		}
+	}
+	for peerName := range afterPeers {
+		if !beforePeers[peerName] {
+			node.record(string(relationship.TransitionAdded), "kept", peerName, "relationship decay/reconfiguration crossed strong threshold")
+		}
+	}
+}
+
+func (node *Node) canDial(peerName string) bool {
+	node.mu.Lock()
+	defer node.mu.Unlock()
+	return node.ledger.CanDial(peerName)
+}
+
+func (node *Node) canAccept(peerName string) bool {
+	node.mu.Lock()
+	defer node.mu.Unlock()
+	return node.ledger.CanAccept(peerName)
+}
+
+// canDialTarget reports whether this node currently promises to initiate one TCP
+// exchange with a peer. Intent: Existing direct peers remain the ordinary path;
+// candidate peers are reachable only for explicit low-risk link-discovery
+// promises, not arbitrary traffic. Source: DI-timah
+func (node *Node) canDialTarget(peerName string, fields map[string]string) bool {
+	node.mu.Lock()
+	defer node.mu.Unlock()
+	if node.ledger.CanDial(peerName) {
+		return true
+	}
+	return isLinkDiscoveryPromise(fields) && containsName(node.Agent.CandidatePeers, peerName)
+}
+
+// canAcceptFrom reports whether this node currently promises to accept one TCP
+// exchange from a peer. Intent: Candidate-peer discovery is a narrow voluntary
+// acceptance promise, not broad permission or a global routing rule.
+// Source: DI-timah
+func (node *Node) canAcceptFrom(peerName string, fields map[string]string) bool {
+	node.mu.Lock()
+	defer node.mu.Unlock()
+	if node.ledger.CanAccept(peerName) {
+		return true
+	}
+	return isLinkDiscoveryPromise(fields) && containsName(node.Agent.CandidatePeers, peerName)
+}
+
+func (node *Node) observeOutcome(peerName string, outcome relationship.Outcome) {
+	if peerName == "" || peerName == node.Agent.Name {
+		return
+	}
+	node.mu.Lock()
+	transition := node.ledger.ObserveOutcome(peerName, outcome)
+	trustScore := node.ledger.Trust(peerName)
+	node.mu.Unlock()
+	node.record(string(transition), "kept", peerName, fmt.Sprintf("outcome=%s trust=%d", outcome, trustScore))
+}
+
+func repairErrDetail(validateErr error) string {
+	return "repaired common live decision formatting issue: " + validateErr.Error()
+}
+
+// outcomeForPromise maps a kept payload to the local trust effect it should have.
+// Intent: Successful candidate discovery can form a direct relationship while
+// ordinary kept promises keep the previous incremental trust behavior.
+// Source: DI-timah
+func outcomeForPromise(fields map[string]string) relationship.Outcome {
+	if isLinkDiscoveryPromise(fields) {
+		return relationship.OutcomeDiscoveryKept
+	}
+	return relationship.OutcomeKept
+}
+
+// isLinkDiscoveryPromise recognizes the pCID-owned payload meaning used for
+// candidate-peer link formation.
+// Intent: Link discovery is represented as promise content under the same
+// top-level act, not as a separate protocol verb. Source: DI-timah
+func isLinkDiscoveryPromise(fields map[string]string) bool {
+	for _, key := range []string{"field_promise_about", "field_meaning", "field_intent", "field_link_intent"} {
+		if fields[key] == decision.PromiseAboutLinkDiscovery {
+			return true
+		}
+	}
+	return false
+}
+
+func containsName(names []string, wantedName string) bool {
+	for _, name := range names {
+		if name == wantedName {
+			return true
+		}
+	}
+	return false
+}
+
+func stringSet(names []string) map[string]bool {
+	set := make(map[string]bool, len(names))
+	for _, name := range names {
+		set[name] = true
+	}
+	return set
+}
+
+// checkLocalResourcePromise verifies that the local agent has enough current
+// budget and capacity before making a storage or compute promise.
+// Intent: Keep resource promises tied to locally fulfillable behavior rather
+// than allowing the LLM to promise impossible storage/compute work.
+// Source: DI-timah
+func (node *Node) checkLocalResourcePromise(fields map[string]string) error {
+	resourceType := resourceField(fields)
+	if resourceType == "" {
+		return nil
+	}
+	requestedUnits := intField(fields, "field_units", "field_requested_units", "field_capacity", "field_capacity_mb")
+	if requestedUnits <= 0 {
+		return fmt.Errorf("resource promise for %s must declare positive units", resourceType)
+	}
+	node.mu.Lock()
+	defer node.mu.Unlock()
+	if requestedUnits > node.capacity {
+		return fmt.Errorf("resource promise for %s asks %d units but local capacity is %d", resourceType, requestedUnits, node.capacity)
+	}
+	if requestedUnits > node.budget {
+		return fmt.Errorf("resource promise for %s asks %d units but local budget is %d", resourceType, requestedUnits, node.budget)
+	}
+	return nil
+}
+
+// checkIncomingResourcePromise rejects inbound resource promises that cannot be
+// safely interpreted by this bounded POC receiver.
+// Intent: Treat malformed or extreme resource promises as local evidence about
+// the sender, not as commands the receiver must obey. Source: DI-timah
+func (node *Node) checkIncomingResourcePromise(fields map[string]string) error {
+	resourceType := resourceField(fields)
+	if resourceType == "" {
+		return nil
+	}
+	requestedUnits := intField(fields, "field_units", "field_requested_units", "field_capacity", "field_capacity_mb")
+	if requestedUnits <= 0 {
+		return fmt.Errorf("incoming resource promise for %s lacks positive units", resourceType)
+	}
+	if requestedUnits > 1000 {
+		return fmt.Errorf("incoming resource promise for %s exceeds POC safety limit: %d units", resourceType, requestedUnits)
+	}
+	return nil
+}
+
+// applyBrokenPromiseCost spends locally posted stake/collateral when this node
+// observes a broken promise with an explicit economic field.
+// Intent: Make promise-breaking economically visible inside the POC without
+// creating a central penalty authority. Source: DI-timah
+func (node *Node) applyBrokenPromiseCost(peerName string, fields map[string]string, detail string) {
+	stakeAmount := intField(fields, "field_stake", "field_collateral", "stake", "collateral")
+	if stakeAmount <= 0 {
+		return
+	}
+	node.mu.Lock()
+	if stakeAmount > node.budget {
+		stakeAmount = node.budget
+	}
+	node.budget -= stakeAmount
+	node.mu.Unlock()
+	node.record("stake_forfeited", "broken", peerName, fmt.Sprintf("%s; forfeited %d local budget units", detail, stakeAmount))
+}
+
+// resourceField identifies the small set of resource-fulfillment promises this
+// POC can check directly. Need advertisements such as "storage_need" are not
+// treated as fulfillment promises because they do not claim local capacity.
+// Intent: Keep storage/compute checks concrete and avoid misclassifying an
+// agent's stated need as a promise to fulfill that need. Source: DI-timah
+func resourceField(fields map[string]string) string {
+	for _, key := range []string{"field_resource", "field_resource_type", "resource", "field_promise_about"} {
+		value := fields[key]
+		if value == "storage" || value == "compute" {
+			return value
+		}
+	}
+	return ""
+}
+
+func intField(fields map[string]string, keys ...string) int {
+	for _, key := range keys {
+		value := fields[key]
+		if value == "" {
+			continue
+		}
+		parsedValue, parseErr := strconv.Atoi(value)
+		if parseErr == nil {
+			return parsedValue
+		}
+	}
+	return 0
+}
+
+func firstStringField(fields map[string]string, keys ...string) string {
+	for _, key := range keys {
+		if value := fields[key]; value != "" {
+			return value
+		}
+	}
+	return ""
+}
+
+func (node *Node) record(eventName, outcome, peer, detail string) {
+	event := decision.Event{
+		Observer: node.Agent.Name,
+		Event:    eventName,
+		Outcome:  outcome,
+		Peer:     peer,
+		Detail:   detail,
+	}
+	node.mu.Lock()
+	node.events = append(node.events, event)
+	node.mu.Unlock()
+	encoded, err := json.Marshal(event)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "marshal event: %v\n", err)
+		return
+	}
+	fmt.Println(string(encoded))
+	if node.logFile != nil {
+		if _, writeErr := node.logFile.Write(append(encoded, '\n')); writeErr != nil {
+			fmt.Fprintf(os.Stderr, "write event: %v\n", writeErr)
+		}
+	}
+}
+
+func (node *Node) openLog() error {
+	runDir := node.runDir()
+	if err := os.MkdirAll(runDir, 0o755); err != nil {
+		return err
+	}
+	logPath := filepath.Join(runDir, node.Agent.Name+".jsonl")
+	logFile, err := os.OpenFile(logPath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0o644)
+	if err != nil {
+		return err
+	}
+	node.logFile = logFile
+	return nil
+}
+
+func (node *Node) closeLog() {
+	if node.logFile != nil {
+		closeErr := node.logFile.Close()
+		if closeErr != nil {
+			fmt.Fprintf(os.Stderr, "close log: %v\n", closeErr)
+		}
+	}
+}
+
+func (node *Node) closeListener() {
+	if node.listener != nil {
+		node.setStopping()
+		closeErr := node.listener.Close()
+		if closeErr != nil && !errors.Is(closeErr, net.ErrClosed) {
+			fmt.Fprintf(os.Stderr, "close listener: %v\n", closeErr)
+		}
+		node.waitForListenerClosed()
+	}
+}
+
+func (node *Node) setStopping() {
+	node.mu.Lock()
+	defer node.mu.Unlock()
+	node.stopping = true
+}
+
+func (node *Node) isStopping() bool {
+	node.mu.Lock()
+	defer node.mu.Unlock()
+	return node.stopping
+}
+
+// waitForShutdownGrace leaves the listener open briefly after active turns end.
+// Intent: Peers that made late but still legitimate promises get a bounded
+// chance to finish their exchange before this node writes `node_done`.
+// Source: DI-timah
+func (node *Node) waitForShutdownGrace(ctx context.Context) {
+	graceDuration := node.Config.ShutdownGrace()
+	if graceDuration <= 0 {
+		return
+	}
+	if err := node.waitForAllTurnsDone(ctx, graceDuration); err != nil {
+		node.record("shutdown_grace_timeout", "non_commitment", "", err.Error())
+		return
+	}
+	node.record("shutdown_grace_elapsed", "kept", "", "all agents reached turns_done before listener close")
+}
+
+func (node *Node) waitForListenerClosed() {
+	if node.listenerDone == nil {
+		return
+	}
+	timer := time.NewTimer(shutdownDrainTimeout)
+	defer timer.Stop()
+	select {
+	case <-node.listenerDone:
+	case <-timer.C:
+		node.record("listener_close_timeout", "non_commitment", "", "listener accept loop did not finish before timeout")
+	}
+}
+
+func (node *Node) closeFrameConn(frameConn transport.FrameConn, eventName, peerName string) {
+	closeErr := frameConn.Close()
+	if closeErr != nil {
+		node.record(eventName, "broken", peerName, closeErr.Error())
+	}
+}
+
+func (node *Node) runDir() string {
+	return filepath.Join(node.Config.RunRoot, node.Config.RunID)
+}
+
+// relationshipStatePath is the durable local memory file for this agent's
+// private trust ledger.
+// Intent: Keep relationship learning across POC12 runs without introducing a
+// global trust database or shared authority. Source: DI-timah
+func (node *Node) relationshipStatePath() string {
+	return filepath.Join(node.Config.RunRoot, "relationships", node.Agent.Name+".json")
+}
+
+// loadRelationshipState restores this agent's prior local trust snapshot if it
+// exists; absence simply means this is the first run for that agent.
+// Intent: Let multi-run POC12 experiments test relationship decay and repair
+// over time while preserving local-only trust semantics. Source: DI-timah
+func (node *Node) loadRelationshipState() error {
+	statePath := node.relationshipStatePath()
+	stateBytes, readErr := os.ReadFile(statePath)
+	if readErr != nil {
+		if errors.Is(readErr, os.ErrNotExist) {
+			return nil
+		}
+		return readErr
+	}
+	var state relationship.State
+	if unmarshalErr := json.Unmarshal(stateBytes, &state); unmarshalErr != nil {
+		return unmarshalErr
+	}
+	node.mu.Lock()
+	node.ledger.ApplyState(state)
+	node.mu.Unlock()
+	node.record("relationship_state_loaded", "kept", "", "loaded durable local relationship snapshot")
+	return nil
+}
+
+// saveRelationshipState writes the local trust snapshot via a temporary file
+// and rename so readers never see a partial JSON document.
+// Intent: Persist relationship memory after each run while keeping incomplete
+// writes from corrupting the next run's local evidence. Source: DI-timah
+func (node *Node) saveRelationshipState() error {
+	statePath := node.relationshipStatePath()
+	if err := os.MkdirAll(filepath.Dir(statePath), 0o755); err != nil {
+		return err
+	}
+	node.mu.Lock()
+	state := node.ledger.Export()
+	node.mu.Unlock()
+	stateBytes, marshalErr := json.MarshalIndent(state, "", "  ")
+	if marshalErr != nil {
+		return marshalErr
+	}
+	tempPath := statePath + ".tmp"
+	if err := os.WriteFile(tempPath, append(stateBytes, '\n'), 0o644); err != nil {
+		return err
+	}
+	if err := os.Rename(tempPath, statePath); err != nil {
+		return err
+	}
+	node.record("relationship_state_saved", "kept", "", "saved durable local relationship snapshot")
+	return nil
+}
+
+// writeDoneMarker records idempotent local completion for one agent.
+// Intent: Re-running or restarting a bounded POC node should not turn an
+// already-written completion marker into broken evidence. Source: DI-timah
+func (node *Node) writeDoneMarker() error {
+	donePath := filepath.Join(node.runDir(), node.Agent.Name+".done")
+	if _, err := os.Stat(donePath); err == nil {
+		node.record("node_done_existing", "kept", "", "done marker already existed")
+		return nil
+	} else if !errors.Is(err, os.ErrNotExist) {
+		return err
+	}
+	if err := os.WriteFile(donePath, []byte("done\n"), 0o644); err != nil {
+		return err
+	}
+	node.record("node_done", "kept", "", "wrote local done marker")
+	return nil
+}
+
+// writeTurnsDoneMarker records that this agent has finished making active turn
+// decisions but is still keeping its listener open for peers that are finishing
+// their own planned sends.
+// Intent: Coordinate shutdown on agent-turn completion instead of letting early
+// finishers close listeners while slower peers are still making promises.
+// Source: DI-timah
+func (node *Node) writeTurnsDoneMarker() error {
+	turnsDonePath := filepath.Join(node.runDir(), node.Agent.Name+".turns_done")
+	if _, err := os.Stat(turnsDonePath); err == nil {
+		node.record("turns_done_existing", "kept", "", "turns-done marker already existed")
+		return nil
+	} else if !errors.Is(err, os.ErrNotExist) {
+		return err
+	}
+	if err := os.WriteFile(turnsDonePath, []byte("turns_done\n"), 0o644); err != nil {
+		return err
+	}
+	node.record("turns_done", "kept", "", "finished active turns and kept listener open for shutdown grace")
+	return nil
+}
+
+func (node *Node) waitForMonitor(ctx context.Context) error {
+	monitorDone := filepath.Join(node.runDir(), "monitor.done")
+	ticker := time.NewTicker(250 * time.Millisecond)
+	defer ticker.Stop()
+	timeout := time.After(90 * time.Second)
+	for {
+		if _, err := os.Stat(monitorDone); err == nil {
+			return nil
+		}
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case <-timeout:
+			return fmt.Errorf("timed out waiting for monitor.done")
+		case <-ticker.C:
+		}
+	}
+}
+
+// runMonitor writes the observer-only report after all nodes have completed and
+// late receive handlers have had a bounded chance to drain.
+// Intent: Make monitor completion idempotent and reduce false drift from
+// reading logs before in-flight receipts settle. Source: DI-timah
+func (node *Node) runMonitor(ctx context.Context) error {
+	donePath := filepath.Join(node.runDir(), "monitor.done")
+	if _, err := os.Stat(donePath); err == nil {
+		node.record("monitor_done_existing", "kept", "", "monitor marker already existed")
+		return nil
+	} else if !errors.Is(err, os.ErrNotExist) {
+		return err
+	}
+	if err := node.waitForAllDone(ctx); err != nil {
+		return err
+	}
+	node.drainInflight(ctx)
+	events, readErr := node.readAllEvents()
+	if readErr != nil {
+		return readErr
+	}
+	report, evaluateErr := node.Monitor.Evaluate(ctx, events)
+	if evaluateErr != nil {
+		return evaluateErr
+	}
+	reportBytes, marshalErr := json.MarshalIndent(report, "", "  ")
+	if marshalErr != nil {
+		return marshalErr
+	}
+	reportPath := filepath.Join(node.runDir(), "monitor-report.json")
+	if err := os.WriteFile(reportPath, append(reportBytes, '\n'), 0o644); err != nil {
+		return err
+	}
+	if err := os.WriteFile(donePath, []byte("done\n"), 0o644); err != nil {
+		return err
+	}
+	node.record("monitor_done", "kept", "", report.Summary)
+	return nil
+}
+
+// drainInflight waits briefly for active receive handlers before done/monitor
+// evidence is finalized.
+// Intent: Preserve receipts that were already accepted without letting shutdown
+// hang indefinitely. Source: DI-timah
+func (node *Node) drainInflight(ctx context.Context) {
+	if !node.markDrainStarted() {
+		return
+	}
+	drained := make(chan struct{})
+	go func() {
+		node.activeHandlers.Wait()
+		close(drained)
+	}()
+	timer := time.NewTimer(shutdownDrainTimeout)
+	defer timer.Stop()
+	select {
+	case <-drained:
+		node.record("inflight_drained", "kept", "", "all active receive handlers completed before done marker")
+	case <-ctx.Done():
+		node.record("inflight_drain_cancelled", "broken", "", ctx.Err().Error())
+	case <-timer.C:
+		node.record("inflight_drain_timeout", "non_commitment", "", "some receive handlers may still be running")
+	}
+}
+
+func (node *Node) markDrainStarted() bool {
+	node.mu.Lock()
+	defer node.mu.Unlock()
+	if node.drainRecorded {
+		return false
+	}
+	node.drainRecorded = true
+	return true
+}
+
+func (node *Node) waitForAllDone(ctx context.Context) error {
+	ticker := time.NewTicker(250 * time.Millisecond)
+	defer ticker.Stop()
+	timeout := time.After(90 * time.Second)
+	for {
+		if node.allDone() {
+			return nil
+		}
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case <-timeout:
+			return fmt.Errorf("timed out waiting for all node done markers")
+		case <-ticker.C:
+		}
+	}
+}
+
+func (node *Node) waitForAllTurnsDone(ctx context.Context, timeoutDuration time.Duration) error {
+	ticker := time.NewTicker(250 * time.Millisecond)
+	defer ticker.Stop()
+	timer := time.NewTimer(timeoutDuration)
+	defer timer.Stop()
+	for {
+		if node.allTurnsDone() {
+			return nil
+		}
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case <-timer.C:
+			return fmt.Errorf("timed out waiting for all turns_done markers")
+		case <-ticker.C:
+		}
+	}
+}
+
+func (node *Node) allDone() bool {
+	for _, agentName := range node.Config.AgentNames() {
+		if _, err := os.Stat(filepath.Join(node.runDir(), agentName+".done")); err != nil {
+			return false
+		}
+	}
+	return true
+}
+
+func (node *Node) allTurnsDone() bool {
+	for _, agentName := range node.Config.AgentNames() {
+		if _, err := os.Stat(filepath.Join(node.runDir(), agentName+".turns_done")); err != nil {
+			return false
+		}
+	}
+	return true
+}
+
+func (node *Node) readAllEvents() ([]decision.Event, error) {
+	var events []decision.Event
+	for _, agentName := range node.Config.AgentNames() {
+		logPath := filepath.Join(node.runDir(), agentName+".jsonl")
+		logBytes, readErr := os.ReadFile(logPath)
+		if readErr != nil {
+			return nil, readErr
+		}
+		lines := splitLines(string(logBytes))
+		for _, line := range lines {
+			var event decision.Event
+			if err := json.Unmarshal([]byte(line), &event); err != nil {
+				return nil, err
+			}
+			events = append(events, event)
+		}
+	}
+	return events, nil
+}
+
+func splitLines(text string) []string {
+	var lines []string
+	startIndex := 0
+	for charIndex, charValue := range text {
+		if charValue == '\n' {
+			if charIndex > startIndex {
+				lines = append(lines, text[startIndex:charIndex])
+			}
+			startIndex = charIndex + 1
+		}
+	}
+	if startIndex < len(text) {
+		lines = append(lines, text[startIndex:])
+	}
+	return lines
+}
