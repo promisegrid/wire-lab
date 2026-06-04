@@ -3,6 +3,7 @@ package decision
 import (
 	"context"
 	"encoding/json"
+	"strings"
 	"testing"
 )
 
@@ -109,6 +110,34 @@ func TestValidatePromiseDecisionRejectsMultiTarget(t *testing.T) {
 	}
 }
 
+func TestValidateObservedPromiseDecisionAllowsCandidateDiscovery(t *testing.T) {
+	promiseDecision, err := ValidateObservedPromiseDecision(PromiseDecision{
+		Act:     ActPromise,
+		Target:  "carol",
+		Promise: "Alice promises one low-risk candidate-link discovery message to Carol.",
+		Fields: map[string]any{
+			"promise_about": PromiseAboutLinkDiscovery,
+		},
+	}, Observation{AgentName: "alice", DirectPeers: []string{"bob"}, CandidatePeers: []string{"carol"}})
+	if err != nil {
+		t.Fatalf("candidate discovery should validate: %v", err)
+	}
+	if promiseDecision.Target != "carol" {
+		t.Fatalf("candidate target = %q, want carol", promiseDecision.Target)
+	}
+}
+
+func TestValidateObservedPromiseDecisionRejectsCandidateWithoutDiscovery(t *testing.T) {
+	_, err := ValidateObservedPromiseDecision(PromiseDecision{
+		Act:     ActPromise,
+		Target:  "carol",
+		Promise: "Alice promises an ordinary message to Carol.",
+	}, Observation{AgentName: "alice", DirectPeers: []string{"bob"}, CandidatePeers: []string{"carol"}})
+	if err == nil {
+		t.Fatalf("candidate target without link discovery should be rejected")
+	}
+}
+
 func TestRepairPromiseDecisionAddsMissingActAndOnlyTarget(t *testing.T) {
 	repairedDecision, repaired, err := RepairPromiseDecision(PromiseDecision{
 		Promise: "Alice promises one bounded local exchange.",
@@ -121,6 +150,20 @@ func TestRepairPromiseDecisionAddsMissingActAndOnlyTarget(t *testing.T) {
 	}
 }
 
+func TestRepairPromiseDecisionNarrowsBundledTargetToFirstDirectPeer(t *testing.T) {
+	repairedDecision, repaired, err := RepairPromiseDecision(PromiseDecision{
+		Act:     ActPromise,
+		Target:  "carol, bob, ellen",
+		Promise: "Alice promises one bounded local exchange.",
+	}, Observation{AgentName: "alice", DirectPeers: []string{"bob", "ellen"}, CandidatePeers: []string{"carol"}}, errTestValidation)
+	if err != nil {
+		t.Fatalf("repair bundled target: %v", err)
+	}
+	if !repaired || repairedDecision.Target != "bob" {
+		t.Fatalf("bundled target repair = repaired %v decision %#v, want bob", repaired, repairedDecision)
+	}
+}
+
 func TestRepairPromiseDecisionRejectsForbiddenIntent(t *testing.T) {
 	_, repaired, err := RepairPromiseDecision(PromiseDecision{
 		Act:     "route_message",
@@ -129,6 +172,18 @@ func TestRepairPromiseDecisionRejectsForbiddenIntent(t *testing.T) {
 	}, Observation{AgentName: "alice", DirectPeers: []string{"bob"}}, errTestValidation)
 	if err == nil || repaired {
 		t.Fatalf("forbidden repair should fail: repaired=%v err=%v", repaired, err)
+	}
+}
+
+func TestPromptMentionsTargetAndResourceFieldRules(t *testing.T) {
+	prompt, err := Prompt(Observation{AgentName: "alice", DirectPeers: []string{"bob"}, CandidatePeers: []string{"carol"}})
+	if err != nil {
+		t.Fatalf("prompt: %v", err)
+	}
+	for _, want := range []string{"Never return a comma-separated target list", "link_discovery", "resource=storage", "resource=compute", "stake"} {
+		if !strings.Contains(prompt, want) {
+			t.Fatalf("prompt missing %q: %s", want, prompt)
+		}
 	}
 }
 

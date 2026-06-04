@@ -46,6 +46,8 @@ type Node struct {
 
 	activeHandlers sync.WaitGroup
 	stopping       bool
+	drainRecorded  bool
+	listenerDone   chan struct{}
 }
 
 // NewNode creates a node with a private trust ledger for every configured peer.
@@ -90,6 +92,10 @@ func (node *Node) Run(ctx context.Context) error {
 		}
 		time.Sleep(node.Config.TurnDelay())
 	}
+	if err := node.writeTurnsDoneMarker(); err != nil {
+		return err
+	}
+	node.waitForShutdownGrace(ctx)
 	// Intent: Stop accepting new TCP frames before the local done marker is
 	// written so `node_done` does not race with late receive receipts.
 	// Source: DI-duhub
@@ -120,7 +126,7 @@ func (node *Node) runTurn(ctx context.Context, turnIndex int) error {
 	if decideErr != nil {
 		return decideErr
 	}
-	validDecision, validateErr := decision.ValidatePromiseDecision(rawDecision, observation.DirectPeers)
+	validDecision, validateErr := decision.ValidateObservedPromiseDecision(rawDecision, observation)
 	if validateErr != nil {
 		repairedDecision, repaired, repairErr := decision.RepairPromiseDecision(rawDecision, observation, validateErr)
 		if repairErr != nil {
@@ -168,11 +174,13 @@ func (node *Node) maybeStartServer(ctx context.Context) error {
 		return err
 	}
 	node.listener = listener
-	go node.acceptLoop(ctx, listener)
+	node.listenerDone = make(chan struct{})
+	go node.acceptLoop(ctx, listener, node.listenerDone)
 	return nil
 }
 
-func (node *Node) acceptLoop(ctx context.Context, listener net.Listener) {
+func (node *Node) acceptLoop(ctx context.Context, listener net.Listener, done chan struct{}) {
+	defer close(done)
 	for {
 		conn, err := listener.Accept()
 		if err != nil {
@@ -215,7 +223,7 @@ func (node *Node) handleConn(conn net.Conn) {
 		node.record("message_rejected", "malformed", fromAgent, "message act is not promise")
 		return
 	}
-	if !node.canAccept(fromAgent) {
+	if !node.canAcceptFrom(fromAgent, fields) {
 		node.observeOutcome(fromAgent, relationship.OutcomeNonCommitment)
 		node.record("message_not_promised", "non_commitment", fromAgent, "no current local promise to accept direct TCP exchange")
 		node.writeAck(frameConn, fromAgent, "not_promised", "I promise to remember that I did not currently promise this direct exchange.")
@@ -228,8 +236,13 @@ func (node *Node) handleConn(conn net.Conn) {
 		node.writeAck(frameConn, fromAgent, "broken", "I promise I rejected this resource promise because local checks failed.")
 		return
 	}
-	node.observeOutcome(fromAgent, relationship.OutcomeKept)
-	node.record("message_received", "kept", fromAgent, "received valid signed promise exact_sha256="+exactHash)
+	acceptedAsCandidate := isLinkDiscoveryPromise(fields) && !node.canAccept(fromAgent)
+	node.observeOutcome(fromAgent, outcomeForPromise(fields))
+	eventName := "message_received"
+	if acceptedAsCandidate {
+		eventName = "candidate_message_received"
+	}
+	node.record(eventName, "kept", fromAgent, "received valid signed promise exact_sha256="+exactHash)
 	node.writeAck(frameConn, fromAgent, "kept", "I promise I received and recorded your signed promise message.")
 }
 
@@ -258,8 +271,8 @@ func (node *Node) writeAck(frameConn transport.FrameConn, target, outcome, promi
 }
 
 func (node *Node) send(target string, fields map[string]string) error {
-	if !node.canDial(target) {
-		return fmt.Errorf("no local direct TCP promise to %s", target)
+	if !node.canDialTarget(target, fields) {
+		return fmt.Errorf("no local TCP promise to %s", target)
 	}
 	envelope, envelopeErr := protocol.NewEnvelope(node.ProtocolCID, fields, node.Agent.Name)
 	if envelopeErr != nil {
@@ -294,7 +307,7 @@ func (node *Node) send(target string, fields map[string]string) error {
 		node.observeOutcome(target, relationship.OutcomeNonCommitment)
 		return fmt.Errorf("ack outcome %q", ackFields["outcome"])
 	}
-	node.observeOutcome(target, relationship.OutcomeKept)
+	node.observeOutcome(target, outcomeForPromise(fields))
 	return nil
 }
 
@@ -394,6 +407,32 @@ func (node *Node) canAccept(peerName string) bool {
 	return node.ledger.CanAccept(peerName)
 }
 
+// canDialTarget reports whether this node currently promises to initiate one TCP
+// exchange with a peer. Intent: Existing direct peers remain the ordinary path;
+// candidate peers are reachable only for explicit low-risk link-discovery
+// promises, not arbitrary traffic. Source: DI-nanud
+func (node *Node) canDialTarget(peerName string, fields map[string]string) bool {
+	node.mu.Lock()
+	defer node.mu.Unlock()
+	if node.ledger.CanDial(peerName) {
+		return true
+	}
+	return isLinkDiscoveryPromise(fields) && containsName(node.Agent.CandidatePeers, peerName)
+}
+
+// canAcceptFrom reports whether this node currently promises to accept one TCP
+// exchange from a peer. Intent: Candidate-peer discovery is a narrow voluntary
+// acceptance promise, not broad permission or a global routing rule.
+// Source: DI-nanud
+func (node *Node) canAcceptFrom(peerName string, fields map[string]string) bool {
+	node.mu.Lock()
+	defer node.mu.Unlock()
+	if node.ledger.CanAccept(peerName) {
+		return true
+	}
+	return isLinkDiscoveryPromise(fields) && containsName(node.Agent.CandidatePeers, peerName)
+}
+
 func (node *Node) observeOutcome(peerName string, outcome relationship.Outcome) {
 	if peerName == "" || peerName == node.Agent.Name {
 		return
@@ -405,6 +444,39 @@ func (node *Node) observeOutcome(peerName string, outcome relationship.Outcome) 
 
 func repairErrDetail(validateErr error) string {
 	return "repaired common live decision formatting issue: " + validateErr.Error()
+}
+
+// outcomeForPromise maps a kept payload to the local trust effect it should have.
+// Intent: Successful candidate discovery can form a direct relationship while
+// ordinary kept promises keep the previous incremental trust behavior.
+// Source: DI-nanud
+func outcomeForPromise(fields map[string]string) relationship.Outcome {
+	if isLinkDiscoveryPromise(fields) {
+		return relationship.OutcomeDiscoveryKept
+	}
+	return relationship.OutcomeKept
+}
+
+// isLinkDiscoveryPromise recognizes the pCID-owned payload meaning used for
+// candidate-peer link formation.
+// Intent: Link discovery is represented as promise content under the same
+// top-level act, not as a separate protocol verb. Source: DI-nanud
+func isLinkDiscoveryPromise(fields map[string]string) bool {
+	for _, key := range []string{"field_promise_about", "field_meaning", "field_intent", "field_link_intent"} {
+		if fields[key] == decision.PromiseAboutLinkDiscovery {
+			return true
+		}
+	}
+	return false
+}
+
+func containsName(names []string, wantedName string) bool {
+	for _, name := range names {
+		if name == wantedName {
+			return true
+		}
+	}
+	return false
 }
 
 // checkLocalResourcePromise verifies that the local agent has enough current
@@ -552,6 +624,7 @@ func (node *Node) closeListener() {
 		if closeErr != nil && !errors.Is(closeErr, net.ErrClosed) {
 			fmt.Fprintf(os.Stderr, "close listener: %v\n", closeErr)
 		}
+		node.waitForListenerClosed()
 	}
 }
 
@@ -565,6 +638,35 @@ func (node *Node) isStopping() bool {
 	node.mu.Lock()
 	defer node.mu.Unlock()
 	return node.stopping
+}
+
+// waitForShutdownGrace leaves the listener open briefly after active turns end.
+// Intent: Peers that made late but still legitimate promises get a bounded
+// chance to finish their exchange before this node writes `node_done`.
+// Source: DI-nanud
+func (node *Node) waitForShutdownGrace(ctx context.Context) {
+	graceDuration := node.Config.ShutdownGrace()
+	if graceDuration <= 0 {
+		return
+	}
+	if err := node.waitForAllTurnsDone(ctx, graceDuration); err != nil {
+		node.record("shutdown_grace_timeout", "non_commitment", "", err.Error())
+		return
+	}
+	node.record("shutdown_grace_elapsed", "kept", "", "all agents reached turns_done before listener close")
+}
+
+func (node *Node) waitForListenerClosed() {
+	if node.listenerDone == nil {
+		return
+	}
+	timer := time.NewTimer(shutdownDrainTimeout)
+	defer timer.Stop()
+	select {
+	case <-node.listenerDone:
+	case <-timer.C:
+		node.record("listener_close_timeout", "non_commitment", "", "listener accept loop did not finish before timeout")
+	}
 }
 
 func (node *Node) closeFrameConn(frameConn transport.FrameConn, eventName, peerName string) {
@@ -655,6 +757,27 @@ func (node *Node) writeDoneMarker() error {
 	return nil
 }
 
+// writeTurnsDoneMarker records that this agent has finished making active turn
+// decisions but is still keeping its listener open for peers that are finishing
+// their own planned sends.
+// Intent: Coordinate shutdown on agent-turn completion instead of letting early
+// finishers close listeners while slower peers are still making promises.
+// Source: DI-nanud
+func (node *Node) writeTurnsDoneMarker() error {
+	turnsDonePath := filepath.Join(node.runDir(), node.Agent.Name+".turns_done")
+	if _, err := os.Stat(turnsDonePath); err == nil {
+		node.record("turns_done_existing", "kept", "", "turns-done marker already existed")
+		return nil
+	} else if !errors.Is(err, os.ErrNotExist) {
+		return err
+	}
+	if err := os.WriteFile(turnsDonePath, []byte("turns_done\n"), 0o644); err != nil {
+		return err
+	}
+	node.record("turns_done", "kept", "", "finished active turns and kept listener open for shutdown grace")
+	return nil
+}
+
 func (node *Node) waitForMonitor(ctx context.Context) error {
 	monitorDone := filepath.Join(node.runDir(), "monitor.done")
 	ticker := time.NewTicker(250 * time.Millisecond)
@@ -718,6 +841,9 @@ func (node *Node) runMonitor(ctx context.Context) error {
 // Intent: Preserve receipts that were already accepted without letting shutdown
 // hang indefinitely. Source: DI-duhub
 func (node *Node) drainInflight(ctx context.Context) {
+	if !node.markDrainStarted() {
+		return
+	}
 	drained := make(chan struct{})
 	go func() {
 		node.activeHandlers.Wait()
@@ -733,6 +859,16 @@ func (node *Node) drainInflight(ctx context.Context) {
 	case <-timer.C:
 		node.record("inflight_drain_timeout", "non_commitment", "", "some receive handlers may still be running")
 	}
+}
+
+func (node *Node) markDrainStarted() bool {
+	node.mu.Lock()
+	defer node.mu.Unlock()
+	if node.drainRecorded {
+		return false
+	}
+	node.drainRecorded = true
+	return true
 }
 
 func (node *Node) waitForAllDone(ctx context.Context) error {
@@ -753,9 +889,37 @@ func (node *Node) waitForAllDone(ctx context.Context) error {
 	}
 }
 
+func (node *Node) waitForAllTurnsDone(ctx context.Context, timeoutDuration time.Duration) error {
+	ticker := time.NewTicker(250 * time.Millisecond)
+	defer ticker.Stop()
+	timer := time.NewTimer(timeoutDuration)
+	defer timer.Stop()
+	for {
+		if node.allTurnsDone() {
+			return nil
+		}
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case <-timer.C:
+			return fmt.Errorf("timed out waiting for all turns_done markers")
+		case <-ticker.C:
+		}
+	}
+}
+
 func (node *Node) allDone() bool {
 	for _, agentName := range node.Config.AgentNames() {
 		if _, err := os.Stat(filepath.Join(node.runDir(), agentName+".done")); err != nil {
+			return false
+		}
+	}
+	return true
+}
+
+func (node *Node) allTurnsDone() bool {
+	for _, agentName := range node.Config.AgentNames() {
+		if _, err := os.Stat(filepath.Join(node.runDir(), agentName+".turns_done")); err != nil {
 			return false
 		}
 	}

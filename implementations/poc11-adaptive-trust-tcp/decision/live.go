@@ -80,7 +80,7 @@ func (client LiveClient) Decide(ctx context.Context, observation Observation) (P
 	if promptErr != nil {
 		return PromiseDecision{}, promptErr
 	}
-	text, callErr := client.callResponses(ctx, client.AgentModel, agentSystemPrompt(), prompt, promiseDecisionTextFormat())
+	text, callErr := client.callResponses(ctx, client.AgentModel, agentSystemPrompt(), prompt, promiseDecisionTextFormat(observation))
 	if callErr != nil {
 		return PromiseDecision{}, callErr
 	}
@@ -174,10 +174,16 @@ func (client LiveClient) callResponses(ctx context.Context, model, systemPrompt,
 }
 
 // promiseDecisionTextFormat is the provider-side schema for one live agent
-// decision; it intentionally permits only the single top-level promise action.
-// Intent: Keep repairs, refusals, observations, and economics inside promise
-// content instead of reintroducing RPC-style action kinds. Source: DI-duhub
-func promiseDecisionTextFormat() map[string]any {
+// decision; it intentionally permits only the single top-level promise action
+// and constrains targets to names visible in this turn's local observation.
+// Intent: Keep repairs, refusals, observations, economics, and candidate-link
+// discovery inside promise content while preventing arbitrary target strings.
+// Source: DI-duhub; DI-nanud
+func promiseDecisionTextFormat(observation Observation) map[string]any {
+	targetSchema := map[string]any{"type": "string"}
+	if targets := structuredTargetNames(observation); len(targets) > 0 {
+		targetSchema["enum"] = targets
+	}
 	return map[string]any{
 		"type":   "json_schema",
 		"name":   "poc11_promise_decision",
@@ -188,7 +194,7 @@ func promiseDecisionTextFormat() map[string]any {
 			"required":             []string{"act", "target", "promise", "reason", "fields"},
 			"properties": map[string]any{
 				"act":     map[string]any{"type": "string", "enum": []string{ActPromise}},
-				"target":  map[string]any{"type": "string"},
+				"target":  targetSchema,
 				"promise": map[string]any{"type": "string"},
 				"reason":  map[string]any{"type": "string"},
 				"fields": map[string]any{
@@ -206,6 +212,24 @@ func promiseDecisionTextFormat() map[string]any {
 			},
 		},
 	}
+}
+
+// structuredTargetNames returns the provider-visible target enum for one turn.
+// Intent: The live model can choose one visible direct peer, or one candidate
+// peer only when the later Go validator sees a link-discovery promise payload.
+// Source: DI-nanud
+func structuredTargetNames(observation Observation) []string {
+	seenTargets := make(map[string]bool)
+	var targets []string
+	for _, target := range append(append([]string{}, observation.DirectPeers...), observation.CandidatePeers...) {
+		target = strings.TrimSpace(target)
+		if target == "" || target == observation.AgentName || seenTargets[target] {
+			continue
+		}
+		seenTargets[target] = true
+		targets = append(targets, target)
+	}
+	return targets
 }
 
 // monitorReportTextFormat is the provider-side schema for the observer-only

@@ -91,6 +91,12 @@ config` does not render the key value. Source: `DI-mudar`.
 Runtime logs are written to the shared Docker volume under
 `/run/poc11/<run_id>/` and mirrored to stdout as JSONL.
 
+Summarize one completed run from inside the Compose volume:
+
+```sh
+docker compose run --rm --entrypoint /usr/local/bin/poc11-analyze dave /run/poc11/poc11-demo
+```
+
 ## First Live Run
 
 The first live Docker run completed successfully: all twelve agents wrote done
@@ -138,6 +144,34 @@ are rejected as local evidence. Broken promises with stake or collateral fields
 spend local budget units; no central penalty authority is introduced. Source:
 `DI-duhub`.
 
+## Targeting And Discovery Follow-up
+
+The hifud.16-hifud.24 pass tightens live targeting and adds a real candidate-link
+path while preserving the same single top-level `promise` act. Provider-side
+structured output now constrains `target` to locally visible direct or candidate
+peer names. Runtime validation still rejects ordinary candidate traffic: a
+candidate peer is valid only when the promise payload says
+`promise_about=link_discovery`. Bundled targets such as `bob,ellen` are repaired
+by narrowing to the first locally valid target; unresolved ambiguous targets are
+still rejected. Source: `DI-nanud`.
+
+Shutdown now has a configurable `shutdown_grace_millis` interval. During that
+interval, a node writes `turns_done` evidence and keeps its listener open until
+all agents have finished active turns, or until the grace interval expires, so
+lagging peers can finish already-planned sends before listeners close. The
+monitor no longer emits duplicate `inflight_drained` evidence. Source:
+`DI-nanud`.
+
+The follow-up live run completed with all containers exiting `0`. The analyzer
+reported `143` events, `12` `turns_done` markers, `12` `node_done` markers,
+`12` clean `shutdown_grace_elapsed` events, `12` `inflight_drained` events, no
+`decision_rejected` events, no refused-connection transport failures, `2`
+`send_failed` events caused by explicit `not_promised` acknowledgements, `2`
+`message_not_promised` events, and `2` `promise_withheld` non-commitments. The
+monitor scored Promise Theory fit `4/5`, autonomy `5/5`, protocol validity
+`4/5`, local trust correctness `4/5`, and imposition avoidance `4/5`. Source:
+`DI-nanud`.
+
 ## Current Limits
 
 POC11 is intentionally nondeterministic at runtime. Config limits bound turns,
@@ -148,4 +182,4 @@ This is executable evidence, not a final LLM-agent API, trust API, discovery
 protocol, monitor standard, economics protocol, SDK, or provider abstraction.
 The structured-output field list is a provider-boundary accommodation, not a
 new wire format; the CBOR payload remains the pCID-owned string map. Source:
-`DI-hotos`; `DI-duhub`.
+`DI-hotos`; `DI-duhub`; `DI-nanud`.

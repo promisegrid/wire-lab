@@ -8,6 +8,7 @@ import (
 
 	"promisegrid.dev/wire-lab/implementations/poc11-adaptive-trust-tcp/config"
 	"promisegrid.dev/wire-lab/implementations/poc11-adaptive-trust-tcp/decision"
+	"promisegrid.dev/wire-lab/implementations/poc11-adaptive-trust-tcp/relationship"
 )
 
 func TestNodeWithNoDirectPeersRecordsLocalNonCommitment(t *testing.T) {
@@ -77,6 +78,45 @@ func TestRunTurnRepairsMissingActAndTarget(t *testing.T) {
 	}
 }
 
+func TestCandidateDiscoveryCanFormDirectPeer(t *testing.T) {
+	cfg := candidateOnlyTestConfig(t)
+	alice := NewNode(cfg, cfg.Agents[0], &decision.FakeDecider{}, decision.FakeMonitor{})
+	discoveryFields := map[string]string{"field_promise_about": decision.PromiseAboutLinkDiscovery}
+	if !alice.canDialTarget("bob", discoveryFields) {
+		t.Fatalf("candidate discovery should be dialable")
+	}
+	alice.observeOutcome("bob", relationship.OutcomeDiscoveryKept)
+	if !alice.canDial("bob") {
+		t.Fatalf("kept candidate discovery should form a direct peer")
+	}
+}
+
+func TestShutdownGraceRecordsBeforeDone(t *testing.T) {
+	cfg := singleNodeTestConfig(t)
+	cfg.ShutdownGraceMillis = 1
+	node := NewNode(cfg, cfg.Agents[0], &decision.FakeDecider{}, decision.FakeMonitor{})
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	if err := node.Run(ctx); err != nil {
+		t.Fatalf("run node: %v", err)
+	}
+	graceIndex := eventIndex(node.events, "shutdown_grace_elapsed")
+	doneIndex := eventIndex(node.events, "node_done")
+	if graceIndex < 0 || doneIndex < 0 || graceIndex > doneIndex {
+		t.Fatalf("shutdown grace should be recorded before node_done: %#v", node.events)
+	}
+}
+
+func TestDrainInflightRecordsOnce(t *testing.T) {
+	cfg := singleNodeTestConfig(t)
+	node := NewNode(cfg, cfg.Agents[0], &decision.FakeDecider{}, decision.FakeMonitor{})
+	node.drainInflight(context.Background())
+	node.drainInflight(context.Background())
+	if countEvents(node.events, "inflight_drained") != 1 {
+		t.Fatalf("drain should be recorded once: %#v", node.events)
+	}
+}
+
 func singleNodeTestConfig(t *testing.T) config.Config {
 	t.Helper()
 	return config.Config{
@@ -110,6 +150,15 @@ func singleNodeTestConfig(t *testing.T) config.Config {
 	}
 }
 
+func candidateOnlyTestConfig(t *testing.T) config.Config {
+	cfg := twoNodeTestConfig(t)
+	cfg.Agents[0].InitialPeers = nil
+	cfg.Agents[0].CandidatePeers = []string{"bob"}
+	cfg.Agents[1].InitialPeers = nil
+	cfg.Agents[1].CandidatePeers = []string{"alice"}
+	return cfg
+}
+
 func twoNodeTestConfig(t *testing.T) config.Config {
 	t.Helper()
 	return config.Config{
@@ -133,19 +182,21 @@ func twoNodeTestConfig(t *testing.T) config.Config {
 		WeakTrustThreshold:    -2,
 		TrustDecayPerRound:    0,
 		Agents: []config.AgentConfig{{
-			Name:         "alice",
-			Persona:      "tester",
-			Motivation:   "test",
-			InitialPeers: []string{"bob"},
-			Budget:       5,
-			Capacity:     1,
+			Name:           "alice",
+			Persona:        "tester",
+			Motivation:     "test",
+			InitialPeers:   []string{"bob"},
+			CandidatePeers: []string{"bob"},
+			Budget:         5,
+			Capacity:       1,
 		}, {
-			Name:         "bob",
-			Persona:      "tester",
-			Motivation:   "test",
-			InitialPeers: []string{"alice"},
-			Budget:       5,
-			Capacity:     1,
+			Name:           "bob",
+			Persona:        "tester",
+			Motivation:     "test",
+			InitialPeers:   []string{"alice"},
+			CandidatePeers: []string{"alice"},
+			Budget:         5,
+			Capacity:       1,
 		}},
 		Containers: []config.ContainerConfig{
 			{Name: "alice", Agents: []string{"alice"}},
@@ -170,4 +221,23 @@ func hasEvent(events []decision.Event, eventName string) bool {
 		}
 	}
 	return false
+}
+
+func eventIndex(events []decision.Event, eventName string) int {
+	for eventIndex, event := range events {
+		if event.Event == eventName {
+			return eventIndex
+		}
+	}
+	return -1
+}
+
+func countEvents(events []decision.Event, eventName string) int {
+	count := 0
+	for _, event := range events {
+		if event.Event == eventName {
+			count++
+		}
+	}
+	return count
 }

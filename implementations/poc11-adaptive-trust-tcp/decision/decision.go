@@ -9,6 +9,7 @@ import (
 )
 
 const ActPromise = "promise"
+const PromiseAboutLinkDiscovery = "link_discovery"
 
 // Observation is the local-only packet shown to one agent LLM for one turn.
 // Intent: The LLM may adapt strategy from local state, economics, and direct
@@ -76,6 +77,14 @@ type Monitor interface {
 // Intent: POC11 tests autonomy without letting the model expand the protocol
 // action vocabulary back into RPC verbs or authority claims. Source: DI-hotos
 func ValidatePromiseDecision(decision PromiseDecision, directPeers []string) (PromiseDecision, error) {
+	return ValidateObservedPromiseDecision(decision, Observation{DirectPeers: directPeers})
+}
+
+// ValidateObservedPromiseDecision normalizes a live or fake LLM decision against
+// the full local observation. Intent: Candidate-peer link discovery is allowed
+// only as a low-risk promise payload meaning, while ordinary promises still
+// target exactly one current direct peer. Source: DI-nanud
+func ValidateObservedPromiseDecision(decision PromiseDecision, observation Observation) (PromiseDecision, error) {
 	decision.Act = strings.TrimSpace(decision.Act)
 	decision.Target = strings.TrimSpace(decision.Target)
 	decision.Promise = strings.TrimSpace(decision.Promise)
@@ -89,7 +98,7 @@ func ValidatePromiseDecision(decision PromiseDecision, directPeers []string) (Pr
 	if decision.Act != ActPromise {
 		return PromiseDecision{}, fmt.Errorf("decision act %q is invalid; only %q is allowed", decision.Act, ActPromise)
 	}
-	target, targetErr := requireDirectPeerTarget(decision.Target, directPeers)
+	target, targetErr := requireObservedTarget(decision, observation)
 	if targetErr != nil {
 		return PromiseDecision{}, targetErr
 	}
@@ -117,13 +126,16 @@ func RepairPromiseDecision(rawDecision PromiseDecision, observation Observation,
 	if strings.TrimSpace(repairedDecision.Act) == "" {
 		repairedDecision.Act = ActPromise
 	}
-	if strings.TrimSpace(repairedDecision.Target) == "" && len(observation.DirectPeers) == 1 {
-		repairedDecision.Target = observation.DirectPeers[0]
+	if strings.TrimSpace(repairedDecision.Target) == "" {
+		repairedDecision.Target = singleRepairTarget(observation, IsLinkDiscoveryDecision(repairedDecision))
+	} else if repairedTarget, ok := firstRepairTarget(repairedDecision.Target, observation, IsLinkDiscoveryDecision(repairedDecision)); ok {
+		repairedDecision.Target = repairedTarget
+		repairedDecision.Fields["repair_target_policy"] = "first allowed target from bundled target text"
 	}
 	if strings.TrimSpace(repairedDecision.Promise) == "" {
 		repairedDecision.Promise = observation.AgentName + " promises only its own bounded non-commitment for this turn."
 	}
-	validDecision, repairErr := ValidatePromiseDecision(repairedDecision, observation.DirectPeers)
+	validDecision, repairErr := ValidateObservedPromiseDecision(repairedDecision, observation)
 	if repairErr != nil {
 		return PromiseDecision{}, false, repairErr
 	}
@@ -157,24 +169,90 @@ func Prompt(observation Observation) (string, error) {
 	}
 	return "Return exactly one JSON object matching this shape: " +
 		`{"act":"promise","target":"","promise":"","reason":"","fields":[{"key":"","value":""}]}` +
-		"\nThe only valid top-level act is promise. Put refusal, repair, " +
-		"observation, economics, and link-preference meaning inside the promise " +
-		"text or the fields key/value list. Do not create action kinds. Do not " +
-		"claim authority over other agents. Do not write CBOR or signatures; the kernel encodes and " +
-		"signs the pCID-defined envelope.\n\nLocal observation:\n" +
+		"\nThe target must be exactly one agent name, copied from direct_peers for ordinary promises. " +
+		"Never return a comma-separated target list. A candidate_peers target is valid only for a low-risk link-discovery promise with fields including {\"key\":\"promise_about\",\"value\":\"link_discovery\"}. " +
+		"Useful field keys are promise_about, resource, units, stake, collateral, and discovery_reason. Use resource=storage or resource=compute only when you personally promise fulfillment capacity, not when you advertise a need. " +
+		"The only valid top-level act is promise. Put refusal, repair, observation, economics, and link-preference meaning inside the promise text or the fields key/value list. " +
+		"Do not create action kinds. Do not claim authority over other agents. Do not write CBOR or signatures; the kernel encodes and signs the pCID-defined envelope.\n\nLocal observation:\n" +
 		string(encoded), nil
 }
 
-func requireDirectPeerTarget(target string, directPeers []string) (string, error) {
+func requireObservedTarget(decision PromiseDecision, observation Observation) (string, error) {
+	target := decision.Target
 	if target == "" {
 		return "", fmt.Errorf("target is required")
 	}
-	for _, directPeer := range directPeers {
+	for _, directPeer := range observation.DirectPeers {
 		if target == directPeer {
 			return target, nil
 		}
 	}
+	if IsLinkDiscoveryDecision(decision) {
+		for _, candidatePeer := range observation.CandidatePeers {
+			if target == candidatePeer && target != observation.AgentName {
+				return target, nil
+			}
+		}
+	}
 	return "", fmt.Errorf("target %q is not a direct trusted peer in this POC turn", target)
+}
+
+func singleRepairTarget(observation Observation, linkDiscovery bool) string {
+	if len(observation.DirectPeers) == 1 {
+		return observation.DirectPeers[0]
+	}
+	if linkDiscovery && len(observation.CandidatePeers) == 1 {
+		return observation.CandidatePeers[0]
+	}
+	return ""
+}
+
+func firstRepairTarget(targetText string, observation Observation, linkDiscovery bool) (string, bool) {
+	tokens := targetTokens(targetText)
+	for _, token := range tokens {
+		for _, directPeer := range observation.DirectPeers {
+			if token == directPeer {
+				return token, true
+			}
+		}
+	}
+	if linkDiscovery {
+		for _, token := range tokens {
+			for _, candidatePeer := range observation.CandidatePeers {
+				if token == candidatePeer && token != observation.AgentName {
+					return token, true
+				}
+			}
+		}
+	}
+	return "", false
+}
+
+func targetTokens(targetText string) []string {
+	split := strings.FieldsFunc(targetText, func(charValue rune) bool {
+		return charValue == ',' || charValue == ';' || charValue == '|' || charValue == '/' || charValue == '&' || charValue == '\n' || charValue == '\t' || charValue == ' '
+	})
+	var tokens []string
+	for _, token := range split {
+		token = strings.TrimSpace(token)
+		if token != "" && token != "and" {
+			tokens = append(tokens, token)
+		}
+	}
+	return tokens
+}
+
+// IsLinkDiscoveryDecision reports whether a promise asks for low-risk
+// candidate-peer discovery rather than an ordinary direct-peer exchange.
+// Intent: Link formation remains a promise payload meaning under the same pCID,
+// not a new action kind or global routing command. Source: DI-nanud
+func IsLinkDiscoveryDecision(decision PromiseDecision) bool {
+	for _, key := range []string{"promise_about", "meaning", "intent", "link_intent"} {
+		if stringifyField(decision.Fields[key]) == PromiseAboutLinkDiscovery {
+			return true
+		}
+	}
+	return false
 }
 
 func containsForbiddenIntent(decision PromiseDecision) bool {

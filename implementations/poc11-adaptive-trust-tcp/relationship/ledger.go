@@ -13,6 +13,7 @@ const (
 	OutcomeMalformed     Outcome = "malformed"
 	OutcomeNonCommitment Outcome = "non_commitment"
 	OutcomeRepairKept    Outcome = "repair_kept"
+	OutcomeDiscoveryKept Outcome = "discovery_kept"
 )
 
 // Ledger stores one agent's private trust and direct-link choices.
@@ -101,6 +102,11 @@ func (ledger *Ledger) ObserveOutcome(peerName string, outcome Outcome) {
 	case OutcomeKept:
 		ledger.trustByPeer[peerName]++
 	case OutcomeRepairKept:
+		ledger.trustByPeer[peerName] += 2
+	case OutcomeDiscoveryKept:
+		// Intent: One kept low-risk discovery promise can form a direct peer
+		// because the strong-trust threshold is deliberately small in POC11.
+		// Source: DI-nanud
 		ledger.trustByPeer[peerName] += 2
 	case OutcomeBroken, OutcomeMalformed:
 		ledger.trustByPeer[peerName] -= 3

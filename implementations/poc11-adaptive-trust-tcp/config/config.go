@@ -26,6 +26,7 @@ type Config struct {
 	RequestTimeoutSeconds int               `json:"request_timeout_seconds"`
 	StartupDelayMillis    int               `json:"startup_delay_millis"`
 	TurnDelayMillis       int               `json:"turn_delay_millis"`
+	ShutdownGraceMillis   int               `json:"shutdown_grace_millis"`
 	MaxTurns              int               `json:"max_turns"`
 	MaxAgentCalls         int               `json:"max_agent_calls"`
 	MaxMonitorCalls       int               `json:"max_monitor_calls"`
@@ -116,6 +117,9 @@ func (cfg Config) Validate() error {
 	}
 	if cfg.TrustDecayPerRound < 0 {
 		return fmt.Errorf("trust_decay_per_round must not be negative")
+	}
+	if cfg.ShutdownGraceMillis < 0 {
+		return fmt.Errorf("shutdown_grace_millis must not be negative")
 	}
 	if len(cfg.Agents) < 11 {
 		return fmt.Errorf("at least 11 agents are required")
@@ -209,6 +213,14 @@ func (cfg Config) StartupDelay() time.Duration {
 // TurnDelay returns the delay between autonomous turns.
 func (cfg Config) TurnDelay() time.Duration {
 	return time.Duration(cfg.TurnDelayMillis) * time.Millisecond
+}
+
+// ShutdownGrace returns the listener grace period after active turns finish.
+// Intent: Give lagging peers a bounded chance to complete already-planned sends
+// before this node closes its TCP listener and writes done evidence.
+// Source: DI-nanud
+func (cfg Config) ShutdownGrace() time.Duration {
+	return time.Duration(cfg.ShutdownGraceMillis) * time.Millisecond
 }
 
 // Agent returns a named agent config.

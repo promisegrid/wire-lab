@@ -99,6 +99,28 @@ Affects: `implementations/poc11-adaptive-trust-tcp/**`;
 `protocols/wire-lab.d/TODO/TODO-hifud-poc11-adaptive-trust-tcp.md`;
 `DEV-GUIDE-RESOURCES.md`.
 
+ID: DI-nanud
+Date: 2026-06-04 05:23:41
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Implement the next ten POC11 fixes in place: bundled-target repair,
+schema/prompt target constraints, coordinated shutdown grace, duplicate drain-log
+removal, log-analysis tooling, updated clean-run documentation, deterministic
+shutdown-race tests, live prompt fields for storage/compute/stake promises,
+candidate-peer link discovery/formation, and a fresh Docker run comparison.
+Intent: The hifud.8-hifud.15 run proved the hardened boundary works, but the
+remaining weak points are operational: the LLM still sometimes chooses bundled
+or non-direct targets, peers may close before lagging sends complete, and POC11
+mostly demonstrates link removal rather than candidate-peer link formation.
+Constraints: Keep one top-level semantic act (`promise`). Discovery, storage,
+compute, stake, and shutdown behavior remain pCID-owned payload meanings or
+runtime-local evidence, not new action kinds. Docker network membership remains
+static; dynamic links mean local dial/accept promises. Keep provider outputs,
+Docker volume state, and secrets out of git.
+Affects: `implementations/poc11-adaptive-trust-tcp/**`;
+`protocols/wire-lab.d/TODO/TODO-hifud-poc11-adaptive-trust-tcp.md`;
+`DEV-GUIDE-RESOURCES.md`.
+
 ## Status
 
 Implemented as an initial POC11 live-LLM-capable runtime and deterministic fake
@@ -147,6 +169,16 @@ correctness, and `5/5` imposition avoidance. Source: `DI-hotos`; `DI-horuh`.
 - [x] hifud.13 Add resource-fulfillment and stake/collateral accounting checks.
 - [x] hifud.14 Add adversarial prompt-injection and malformed-CBOR tests.
 - [x] hifud.15 Update POC11 docs/source map with the hardening outcome.
+- [x] hifud.16 Repair bundled target choices and tighten live target prompts.
+- [x] hifud.17 Add coordinated shutdown grace and deterministic race tests.
+- [x] hifud.18 Remove duplicate monitor `inflight_drained` evidence.
+- [x] hifud.19 Add a POC11 log-analysis command for event and score summaries.
+- [x] hifud.20 Record the latest clean run scores and remaining gaps.
+- [x] hifud.21 Add provider target enum constraints from direct/candidate peers.
+- [x] hifud.22 Exercise storage, compute, and stake fields in live prompt text.
+- [x] hifud.23 Add candidate-peer link discovery and formation behavior.
+- [x] hifud.24 Rerun POC11 and compare scores against the prior clean run.
+- [x] hifud.25 Update docs/source map with hifud.16-hifud.24 outcomes.
 
 ## First Live Run Assessment
 
@@ -194,3 +226,35 @@ Storage/compute fulfillment promises are checked against local budget/capacity
 before sending, inbound extreme resource promises are rejected locally, and
 stake/collateral fields can spend local budget after broken-promise evidence.
 Source: `DI-duhub`.
+
+## Targeting, Discovery, And Shutdown Follow-up
+
+The hifud.16-hifud.24 pass tightened the live target boundary and added a narrow
+candidate-link formation path without introducing new top-level action kinds.
+Provider-side structured output now enumerates locally visible target names; the
+prompt says ordinary promises target one `direct_peers` name, candidate targets
+are valid only for `promise_about=link_discovery`, and bundled target strings are
+repaired to the first locally valid target when that repair is safe. Go remains
+the final validator. Source: `DI-nanud`.
+
+Candidate-peer discovery is now executable behavior: a node may dial a candidate
+peer only for an explicit link-discovery promise, a receiver may accept a
+candidate sender only for the same low-risk promise meaning, and a kept discovery
+promise records `discovery_kept` local trust that can form a direct peer. This
+is still local trust and static Docker networking; it is not a global peering
+authority. Source: `DI-nanud`.
+
+The follow-up Docker run completed with all containers exiting `0`. Compared to
+the previous clean run, monitor scores stayed at autonomy `5/5`, improved
+protocol validity from `3/5` to `4/5`, held imposition avoidance at `4/5`, and
+settled at Promise Theory fit `4/5` and local trust correctness `4/5` after the
+monitor penalized duplicate-ish commitments and two unaligned send attempts.
+The new analyzer counted `143` events, no `decision_rejected` events, no
+refused-connection transport failures, `2` `send_failed` events caused by
+explicit `not_promised` acknowledgements, `2` `message_not_promised` events,
+`2` `promise_withheld` events, `12` `turns_done` events, `12`
+`shutdown_grace_elapsed` events, and `12` `inflight_drained` events. Remaining
+gaps are sender-side alignment with current acceptance promises, duplicate-ish
+promise churn, more substantive storage/compute fulfillment evidence, and
+getting live agents to exercise candidate discovery more often. Source:
+`DI-nanud`.

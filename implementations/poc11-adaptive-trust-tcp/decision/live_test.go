@@ -70,7 +70,7 @@ func TestLiveClientRequestsStructuredDecisionOutput(t *testing.T) {
 			Request:    request,
 		}, nil
 	})}
-	promiseDecision, err := client.Decide(context.Background(), Observation{AgentName: "alice", DirectPeers: []string{"bob"}})
+	promiseDecision, err := client.Decide(context.Background(), Observation{AgentName: "alice", DirectPeers: []string{"bob"}, CandidatePeers: []string{"carol"}})
 	if err != nil {
 		t.Fatalf("decide: %v", err)
 	}
@@ -96,6 +96,11 @@ func TestLiveClientRequestsStructuredDecisionOutput(t *testing.T) {
 	fieldsObject := propertiesObject["fields"].(map[string]any)
 	if fieldsObject["type"] != "array" {
 		t.Fatalf("live fields should use a strict key/value array: %#v", fieldsObject)
+	}
+	targetObject := propertiesObject["target"].(map[string]any)
+	targetEnum := targetObject["enum"].([]any)
+	if len(targetEnum) != 2 || targetEnum[0] != "bob" || targetEnum[1] != "carol" {
+		t.Fatalf("target enum = %#v, want bob and carol", targetEnum)
 	}
 }
 

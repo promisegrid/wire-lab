@@ -331,14 +331,95 @@ Source: `DI-sisak`; `DI-rojij`; `DI-punam`; `DI-sizoh`; `DI-kafat`.
 | Canonical bytes | The outer envelope is CBOR; payload canonicalization, hash rules, and proof encoding remain protocol-specific unless later DIs narrow them. |
 | Action vocabulary | The future-facing top-level semantic action is `promise`. Observation, refusal, repair, offer/counter/acceptance, route, introduction, redemption, transfer, storage, compute, and TCP-link changes are payload meaning, promise absence, local non-action promises, or local interpretation unless a later TE/DI proves a distinct wire-level role. |
 | Kernel profile | The kernel remains provisional; `DN-lujad`, `TODO-binag`, `TODO-hozaz`, `TODO-tapov`, `TODO-hipak`, the expanded `SIM-fovip`, executable `poc3`, executable `poc4`, executable `poc5`, executable `poc7`, executable `poc8`, executable `poc9`, executable `poc10`, and executable `poc11` evidence now synthesize `TE-mazop`, `TE-pudiv`, `TE-dunas`, and `TE-gakoh` into role/profile guidance for app-facing promises, same-grid app/kernel messaging, app-level relay promises, local trust decrease after broken promises, selective sending, app-level capability-token promises, signed CBOR-grid app messages over length-framed TCP evidence, promise-shaped reciprocal exchange vocabulary, autonomous need/offer/counter/acceptance payload variants, sparse-mesh route/referral/introduction promises, ordinary low-risk promises before private escalation, malformed TCP evidence, local route refusal, Mallory-to-Dave expired-token misuse evidence, LLM-selected local decisions behind Go-owned protocol validation, deterministic local economic decisions before app action, adaptive direct TCP link promises based on local trust, issuer-local revocation/redemption/expiry evidence, voluntary group namespaces, CID-rooted promise-bound references, file-like resources over promise/event logs, lower-patent-risk prior-art influence guardrails, host assumptions, unsupported features, kernel-local evidence records, app-local promise judgments, and minimum credible port-promise records before `DR-davod` closes. |
-| Promise-economy autonomy | POC8 demonstrates one-pCID payload variants for autonomous need advertisements, offer/counter/acceptance promises, token issue/redemption promises, outcome observations, collateral/stake promises, bearer-for-non-transferable exchange, peer-local exchange-rate quotes, and stale-token trust decay. POC9 adds sparse-mesh discovery, dynamic route promises, referral/introduction promises, ordinary public/known promises before private escalation, local TCP evidence feedback, malformed-byte evidence, scoped route refusal, signed-expiry evidence that is neutral for the issuer, Mallory trust decay for presenting expired bytes as useful, and all-node completion. POC10 adds live LLM-selected local decisions, fake-LLM tests, mixed autonomy profiles, non-secret config-file runtime, and monitor-as-observer fitness reporting while keeping Go responsible for valid signed grid messages. POC11 adds the stricter promise-only top-level action boundary, malformed-decision rejection, local reciprocal economics, budget/capacity pressure, multi-round relationship decay/repair, trust-correlated direct TCP link promises, strict provider-side structured output, bounded missing-shape repair, idempotent done/monitor ordering, bounded receive-handler drain, restart-durable local relationship snapshots, executable storage/compute capacity checks, stake/collateral cost accounting, and adversarial prompt-injection/malformed-CBOR tests. Treat historical named variants as payload semantics unless a later TE/DI promotes a distinct wire-level role. The first live POC11 run improved autonomy/local-trust/imposition evidence, but protocol validity remained `3/5` before the hifud.8-hifud.15 hardening because live outputs still had missing/non-direct/self targets, one invalid JSON response, repeated promises, late events, and noisy shutdown evidence. Remaining open work: rerun live POC11 after the hardening pass, richer economics beyond bounded POCs, larger-scale discovery pressure, stricter freeform-intent scoping, longer multi-run relationship-memory experiments, and deciding whether any POC10/POC11 LLM boundary should influence final app/kernel APIs. |
+| Promise-economy autonomy | POC8 demonstrates one-pCID payload variants for autonomous need advertisements, offer/counter/acceptance promises, token issue/redemption promises, outcome observations, collateral/stake promises, bearer-for-non-transferable exchange, peer-local exchange-rate quotes, and stale-token trust decay. POC9 adds sparse-mesh discovery, dynamic route promises, referral/introduction promises, ordinary public/known promises before private escalation, local TCP evidence feedback, malformed-byte evidence, scoped route refusal, signed-expiry evidence that is neutral for the issuer, Mallory trust decay for presenting expired bytes as useful, and all-node completion. POC10 adds live LLM-selected local decisions, fake-LLM tests, mixed autonomy profiles, non-secret config-file runtime, and monitor-as-observer fitness reporting while keeping Go responsible for valid signed grid messages. POC11 adds the stricter promise-only top-level action boundary, malformed-decision rejection, local reciprocal economics, budget/capacity pressure, multi-round relationship decay/repair, trust-correlated direct TCP link promises, strict provider-side structured output, bounded missing-shape repair, idempotent done/monitor ordering, bounded receive-handler drain, restart-durable local relationship snapshots, executable storage/compute capacity checks, stake/collateral cost accounting, adversarial prompt-injection/malformed-CBOR tests, target enums from local direct/candidate peers, bundled-target repair, all-turns coordinated shutdown grace, analyzer summaries, and candidate-peer link discovery/formation as a promise payload meaning. Treat historical named variants as payload semantics unless a later TE/DI promotes a distinct wire-level role. The latest live POC11 run scored Promise Theory fit `4/5`, autonomy `5/5`, protocol validity `4/5`, local trust correctness `4/5`, and imposition avoidance `4/5`, with no `decision_rejected` events and no refused-connection transport failures, but remaining gaps in attempted sends without current acceptance promises, duplicate-ish promise churn, substantive fulfillment evidence, and heavier candidate discovery. Remaining open work: richer economics beyond bounded POCs, larger-scale discovery pressure, longer multi-run relationship-memory experiments, reducing sender-side acceptance mismatches further, and deciding whether any POC10/POC11 LLM boundary should influence final app/kernel APIs. |
 | LLM autonomy boundary | The current safe boundary is: LLMs choose local promise intent and pCID-owned payload meaning; implementation code normalizes and validates that intent; only implementation code emits protocol bytes. Observation and refusal are promise meanings or promise absence, while workflow words such as repair, route, introduce, redeem, transfer, store, compute, or link are payload meaning or local interpretation, not reusable top-level action vocabulary. POC11 strengthens this by rejecting non-`promise` top-level acts before signing. Freeform intent is useful adversarial pressure, not yet a recommended app pattern. |
 
 Source: `DI-sisak`; `DI-rusup`; `DI-funaf`; `DI-gumum`; `DI-somok`;
 `DI-kuvum`; `DI-fidot`; `DI-horak`; `DI-ponor`; `DI-fofik`; `DI-tugih`;
 `DI-fibok`; `DI-tanat`; `DI-pabot`; `DI-rodog`; `DI-sirus`; `DI-rojij`;
 `DI-punam`; `DI-vorus`; `DI-sipuz`; `DI-vujil`; `DI-pijan`; `DI-mosoj`;
-`DI-hotos`; `DI-horuh`; `DI-duhub`.
+`DI-hotos`; `DI-horuh`; `DI-duhub`; `DI-nanud`.
+
+### POC11 Latest Assessment
+
+POC11 works as a credible executable pressure test for live autonomous
+promise-making over signed CBOR-grid messages and adaptive direct TCP
+relationships. It is not production-ready: the latest live run had no malformed
+decision rejections and no refused-connection transport failures, but still had
+two explicit `not_promised` send failures, two withheld promises, repeated
+near-duplicate commitments, and limited evidence of substantive storage/compute
+fulfillment beyond communication promises. The monitor scored the run `4/5`
+Promise Theory fit, `5/5` autonomy, `4/5` protocol validity, `4/5` local trust
+correctness, and `4/5` imposition avoidance. Source: `DI-nanud`.
+
+The transaction loop is: an agent observes its local budget, capacity, direct
+peers, candidate peers, and local trust ledger; an LLM chooses one local promise
+intent; Go validates and, if safe, repairs only missing shape or bundled targets;
+Go signs a CBOR `grid([42(pCID), payload, proof])` envelope; the agent sends one
+length-framed TCP message to one peer; the receiver validates the pCID, proof,
+top-level `promise` act, direct-peer or low-risk discovery relationship, and
+local resource bounds; both sides record local keep/break/non-commitment
+evidence. Candidate peers may exchange only explicit
+`promise_about=link_discovery` messages; ordinary storage, compute, relay,
+valuation, evidence, and coordination meanings stay in pCID-owned payload fields.
+Source: `DI-duhub`; `DI-nanud`.
+
+The latest run's useful conversations were mostly scoped, local, and voluntary.
+Alice made privacy-preserving low-risk coordination promises to Bob and Ellen
+rather than sending private data prematurely. Bob made bounded storage-capacity
+promises to Alice and Grace. Carol made cautious compute-review promises to Bob
+and Dave without pretending to guarantee work she had not locally accepted.
+Dave made evidence-accounting promises to Carol, Ellen, and Heidi. Ellen and
+Frank made observation/introduction/forwarding-shaped promises while limiting
+claims to their own observations. Grace, Heidi, Ivan, Judy, Mallory, and Oscar
+created reciprocal-value, discovery, adversarial-pressure, and low-risk
+coordination traffic. Two senders still attempted exchanges their receivers had
+not currently promised to accept; those were rejected as `not_promised`, which is
+correct receiver behavior and remaining sender-side alignment work. Source:
+`DI-nanud`.
+
+The PromiseGrid / Promise Theory fit is good but incomplete. The strong parts
+are one top-level `promise` act, no global trust authority, local evidence
+records, local trust decay/repair, scoped non-commitment, pCID-owned payload
+meaning, and implementation-owned protocol bytes. The weaker parts are that live
+agents still sometimes repeat near-identical commitments, do not yet demonstrate
+enough real storage/compute fulfillment, and need tighter local reasoning about
+whether a target currently promises to receive the exchange. No receiver-side
+imposition is evident in the hardened run: receivers locally reject unpromised
+traffic instead of being commanded. The residual imposition risk is sender-side
+language or behavior that assumes a peer will receive or value an exchange before
+that peer's local promise evidence supports it. Source: `DI-duhub`; `DI-nanud`.
+
+Agent incentives are intentionally local and reciprocal. Agents gain direct TCP
+relationship value by keeping useful low-risk promises; lose trust after broken,
+malformed, or unpromised outcomes; spend local budget/capacity when making
+resource promises; can withhold promises when economics or trust are weak; and
+can use stake/collateral fields as local-cost evidence after broken promises.
+There is no central exchange, penalty authority, reputation oracle, or router.
+Autonomy is working well enough to be useful experimental pressure: LLM agents
+choose peer targets and promise content dynamically, while Go constrains those
+choices to locally visible names, one top-level promise act, signed CBOR bytes,
+and local validation. Source: `DI-duhub`; `DI-nanud`.
+
+TCP relationships are dynamic at the PromiseGrid layer but static at the Docker
+network layer. Containers remain on one Compose network for the POC; a dynamic
+relationship means the local ledger decides whether this agent currently
+promises to dial or accept one direct TCP exchange from a peer. Kept discovery
+promises can raise local trust enough to form a direct peer; broken,
+malformed, or unpromised outcomes can lower trust enough to remove that local
+direct-peer promise. This preserves Promise Theory semantics without pretending
+Docker networking is the trust model. Source: `DI-hotos`; `DI-nanud`.
+
+The next POCs should test real production pressure: longer multi-run memory with
+relationship repair after breaks; richer fulfilled storage/compute work rather
+than only coordination promises; stronger sender-side receive-promise reasoning;
+larger sparse meshes with churn and partial failures; adversarial prompt
+injection and malformed but syntactically valid payloads; discovery via
+introductions that can be accepted or ignored locally; privacy-preserving
+selective sending of sensitive data only after trust improves; economic markets
+with opportunity cost and exchange-rate drift; app/kernel separation with the
+same grid envelope; and deterministic replay/audit tooling for exact
+promise-history evidence. Source: `DI-nanud`.
 
 ## Authority model
 
@@ -792,13 +873,16 @@ Use this section for the guide's App Devs / How to write a grid app section.
   field list, one bounded missing-shape repair attempt, idempotent done/monitor
   evidence, bounded receive-handler drain, restart-durable local relationship
   snapshots, storage/compute capacity checks, stake/collateral local cost
-  accounting, and prompt-injection/malformed-CBOR tests. It produced a
-  successful first live run with strong autonomy, local trust, and
-  imposition-avoidance evidence, but that run predated the hifud.8-hifud.15
-  hardening and should be rerun before treating POC11 as stronger protocol
-  evidence. It is not a stable LLM-agent, monitor, discovery, topology,
-  adaptive transport, trust, provider, or economics API. Source: `DI-hotos`;
-  `DI-horuh`; `DI-mosoj`; `DI-duhub`.
+  accounting, prompt-injection/malformed-CBOR tests, target enums from local
+  peer context, bundled-target repair, all-turns coordinated shutdown grace,
+  analyzer summaries, and candidate-peer link discovery/formation as a promise
+  payload meaning. The latest live run scored `4/5` Promise Theory fit, `5/5`
+  autonomy, `4/5` protocol validity, `4/5` local trust correctness, and `4/5`
+  imposition avoidance, with no malformed decision rejections and no
+  refused-connection transport failures, but still with two not-promised
+  attempts and two withheld promises. It is not a stable LLM-agent, monitor,
+  discovery, topology, adaptive transport, trust, provider, or economics API.
+  Source: `DI-hotos`; `DI-horuh`; `DI-mosoj`; `DI-duhub`; `DI-nanud`.
 - `simulations/SIM-rakot-group-session/protocols/group-session.d/specs/*.md`
   and `simulations/SIM-ludaf-udp-feed/protocols/udp-feed.d/specs/*.md` are
   current draft protocol specimens after the rusis split. App-facing guidance

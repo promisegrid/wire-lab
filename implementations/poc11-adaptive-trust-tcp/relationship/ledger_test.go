@@ -21,6 +21,14 @@ func TestRepairCanRestoreDirectPeer(t *testing.T) {
 	}
 }
 
+func TestDiscoveryCanCreateDirectPeer(t *testing.T) {
+	ledger := NewLedger([]string{"bob"}, nil, 2, -2, 0)
+	ledger.ObserveOutcome("bob", OutcomeDiscoveryKept)
+	if !ledger.CanDial("bob") {
+		t.Fatalf("kept discovery promise should create direct adjacency")
+	}
+}
+
 func TestDecayReducesPositiveTrust(t *testing.T) {
 	ledger := NewLedger([]string{"bob"}, []string{"bob"}, 2, -2, 1)
 	ledger.ObserveOutcome("bob", OutcomeKept)
