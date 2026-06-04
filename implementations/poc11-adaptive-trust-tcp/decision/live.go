@@ -25,6 +25,42 @@ type LiveClient struct {
 	HTTPClient      *http.Client
 }
 
+type liveDecisionResponse struct {
+	Act     string              `json:"act"`
+	Target  string              `json:"target"`
+	Promise string              `json:"promise"`
+	Reason  string              `json:"reason"`
+	Fields  []liveDecisionField `json:"fields"`
+}
+
+type liveDecisionField struct {
+	Key   string `json:"key"`
+	Value string `json:"value"`
+}
+
+// promiseDecision converts the strict provider shape back into the runtime's
+// map form. The wire payload still uses pCID-defined string fields; the array
+// exists only because strict Structured Outputs require closed object schemas.
+// Intent: Use provider schema enforcement without changing the POC11 protocol
+// payload vocabulary or allowing arbitrary provider-shaped objects.
+// Source: DI-duhub
+func (response liveDecisionResponse) promiseDecision() PromiseDecision {
+	fields := make(map[string]any, len(response.Fields))
+	for _, field := range response.Fields {
+		key := strings.TrimSpace(field.Key)
+		if key != "" {
+			fields[key] = field.Value
+		}
+	}
+	return PromiseDecision{
+		Act:     response.Act,
+		Target:  response.Target,
+		Promise: response.Promise,
+		Reason:  response.Reason,
+		Fields:  fields,
+	}
+}
+
 // NewLiveClient constructs a live decider with an explicit timeout.
 func NewLiveClient(baseURL, apiKeyEnv, agentModel, monitorModel, reasoningEffort, serviceTier string, timeout time.Duration) LiveClient {
 	return LiveClient{
@@ -44,15 +80,15 @@ func (client LiveClient) Decide(ctx context.Context, observation Observation) (P
 	if promptErr != nil {
 		return PromiseDecision{}, promptErr
 	}
-	text, callErr := client.callResponses(ctx, client.AgentModel, agentSystemPrompt(), prompt)
+	text, callErr := client.callResponses(ctx, client.AgentModel, agentSystemPrompt(), prompt, promiseDecisionTextFormat())
 	if callErr != nil {
 		return PromiseDecision{}, callErr
 	}
-	var decision PromiseDecision
-	if err := json.Unmarshal([]byte(extractJSONObject(text)), &decision); err != nil {
+	var liveDecision liveDecisionResponse
+	if err := json.Unmarshal([]byte(extractJSONObject(text)), &liveDecision); err != nil {
 		return PromiseDecision{}, fmt.Errorf("decode live decision JSON: %w: %s", err, text)
 	}
-	return decision, nil
+	return liveDecision.promiseDecision(), nil
 }
 
 // Evaluate asks the live provider for an observer-only monitor report.
@@ -64,7 +100,7 @@ func (client LiveClient) Evaluate(ctx context.Context, events []Event) (MonitorR
 	userPrompt := "Evaluate this POC11 run as an observer only. Return exactly one JSON object matching " +
 		`{"promise_theory_fit":0,"autonomy":0,"protocol_validity":0,"local_trust_correctness":0,"imposition_avoidance":0,"summary":"","concerns":[]}` +
 		". Score each integer from 0 to 5. Do not issue commands to agents.\n\nEvents:\n" + string(encodedEvents)
-	text, callErr := client.callResponses(ctx, client.MonitorModel, monitorSystemPrompt(), userPrompt)
+	text, callErr := client.callResponses(ctx, client.MonitorModel, monitorSystemPrompt(), userPrompt, monitorReportTextFormat())
 	if callErr != nil {
 		return MonitorReport{}, callErr
 	}
@@ -75,7 +111,12 @@ func (client LiveClient) Evaluate(ctx context.Context, events []Event) (MonitorR
 	return report, nil
 }
 
-func (client LiveClient) callResponses(ctx context.Context, model, systemPrompt, userPrompt string) (string, error) {
+// callResponses sends the compact POC-local Responses request. The optional
+// text format asks the provider to enforce the same JSON object shape that the
+// Go validator checks again after receipt.
+// Intent: Reduce malformed live decisions without letting provider schema
+// enforcement become the source of PromiseGrid semantics. Source: DI-duhub
+func (client LiveClient) callResponses(ctx context.Context, model, systemPrompt, userPrompt string, textFormat map[string]any) (string, error) {
 	apiKey, apiKeyErr := client.apiKey()
 	if apiKeyErr != nil {
 		return "", apiKeyErr
@@ -90,6 +131,9 @@ func (client LiveClient) callResponses(ctx context.Context, model, systemPrompt,
 	}
 	if client.ReasoningEffort != "" {
 		requestBody["reasoning"] = map[string]string{"effort": client.ReasoningEffort}
+	}
+	if textFormat != nil {
+		requestBody["text"] = map[string]any{"format": textFormat}
 	}
 	encodedBody, marshalErr := json.Marshal(requestBody)
 	if marshalErr != nil {
@@ -127,6 +171,67 @@ func (client LiveClient) callResponses(ctx context.Context, model, systemPrompt,
 		return "", parseErr
 	}
 	return outputText, nil
+}
+
+// promiseDecisionTextFormat is the provider-side schema for one live agent
+// decision; it intentionally permits only the single top-level promise action.
+// Intent: Keep repairs, refusals, observations, and economics inside promise
+// content instead of reintroducing RPC-style action kinds. Source: DI-duhub
+func promiseDecisionTextFormat() map[string]any {
+	return map[string]any{
+		"type":   "json_schema",
+		"name":   "poc11_promise_decision",
+		"strict": true,
+		"schema": map[string]any{
+			"type":                 "object",
+			"additionalProperties": false,
+			"required":             []string{"act", "target", "promise", "reason", "fields"},
+			"properties": map[string]any{
+				"act":     map[string]any{"type": "string", "enum": []string{ActPromise}},
+				"target":  map[string]any{"type": "string"},
+				"promise": map[string]any{"type": "string"},
+				"reason":  map[string]any{"type": "string"},
+				"fields": map[string]any{
+					"type": "array",
+					"items": map[string]any{
+						"type":                 "object",
+						"additionalProperties": false,
+						"required":             []string{"key", "value"},
+						"properties": map[string]any{
+							"key":   map[string]any{"type": "string"},
+							"value": map[string]any{"type": "string"},
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
+// monitorReportTextFormat is the provider-side schema for the observer-only
+// monitor report.
+// Intent: Keep monitor output structured and comparable while preserving the
+// monitor as local evidence, not an authority over agents. Source: DI-duhub
+func monitorReportTextFormat() map[string]any {
+	return map[string]any{
+		"type":   "json_schema",
+		"name":   "poc11_monitor_report",
+		"strict": true,
+		"schema": map[string]any{
+			"type":                 "object",
+			"additionalProperties": false,
+			"required":             []string{"promise_theory_fit", "autonomy", "protocol_validity", "local_trust_correctness", "imposition_avoidance", "summary", "concerns"},
+			"properties": map[string]any{
+				"promise_theory_fit":      map[string]any{"type": "integer", "minimum": 0, "maximum": 5},
+				"autonomy":                map[string]any{"type": "integer", "minimum": 0, "maximum": 5},
+				"protocol_validity":       map[string]any{"type": "integer", "minimum": 0, "maximum": 5},
+				"local_trust_correctness": map[string]any{"type": "integer", "minimum": 0, "maximum": 5},
+				"imposition_avoidance":    map[string]any{"type": "integer", "minimum": 0, "maximum": 5},
+				"summary":                 map[string]any{"type": "string"},
+				"concerns":                map[string]any{"type": "array", "items": map[string]any{"type": "string"}},
+			},
+		},
+	}
 }
 
 func (client LiveClient) apiKey() (string, error) {

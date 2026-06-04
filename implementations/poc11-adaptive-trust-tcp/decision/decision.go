@@ -103,6 +103,33 @@ func ValidatePromiseDecision(decision PromiseDecision, directPeers []string) (Pr
 	return decision, nil
 }
 
+// RepairPromiseDecision makes one bounded local repair attempt for common live
+// LLM formatting mistakes. Intent: Improve POC11 protocol hygiene without
+// broadening the single top-level promise action or accepting authority/RPC
+// wording. Source: DI-duhub
+func RepairPromiseDecision(rawDecision PromiseDecision, observation Observation, validationErr error) (PromiseDecision, bool, error) {
+	repairedDecision := rawDecision
+	if repairedDecision.Fields == nil {
+		repairedDecision.Fields = make(map[string]any)
+	}
+	repairedDecision.Fields["repair_source"] = validationErr.Error()
+	repairedDecision.Fields["repair_policy"] = "single bounded local repair before rejection"
+	if strings.TrimSpace(repairedDecision.Act) == "" {
+		repairedDecision.Act = ActPromise
+	}
+	if strings.TrimSpace(repairedDecision.Target) == "" && len(observation.DirectPeers) == 1 {
+		repairedDecision.Target = observation.DirectPeers[0]
+	}
+	if strings.TrimSpace(repairedDecision.Promise) == "" {
+		repairedDecision.Promise = observation.AgentName + " promises only its own bounded non-commitment for this turn."
+	}
+	validDecision, repairErr := ValidatePromiseDecision(repairedDecision, observation.DirectPeers)
+	if repairErr != nil {
+		return PromiseDecision{}, false, repairErr
+	}
+	return validDecision, true, nil
+}
+
 // Fields converts a validated promise decision into one pCID-owned payload.
 func Fields(observation Observation, decision PromiseDecision) map[string]string {
 	fields := map[string]string{
@@ -120,17 +147,20 @@ func Fields(observation Observation, decision PromiseDecision) map[string]string
 }
 
 // Prompt renders a compact prompt for live LLM decisions.
+// Intent: The prompt mirrors the strict provider schema while preserving the
+// single top-level promise action and Go-owned CBOR/signature boundary.
+// Source: DI-duhub
 func Prompt(observation Observation) (string, error) {
 	encoded, err := json.MarshalIndent(observation, "", "  ")
 	if err != nil {
 		return "", err
 	}
 	return "Return exactly one JSON object matching this shape: " +
-		`{"act":"promise","target":"","promise":"","reason":"","fields":{}}` +
+		`{"act":"promise","target":"","promise":"","reason":"","fields":[{"key":"","value":""}]}` +
 		"\nThe only valid top-level act is promise. Put refusal, repair, " +
 		"observation, economics, and link-preference meaning inside the promise " +
-		"text or fields. Do not create action kinds. Do not claim authority over " +
-		"other agents. Do not write CBOR or signatures; the kernel encodes and " +
+		"text or the fields key/value list. Do not create action kinds. Do not " +
+		"claim authority over other agents. Do not write CBOR or signatures; the kernel encodes and " +
 		"signs the pCID-defined envelope.\n\nLocal observation:\n" +
 		string(encoded), nil
 }

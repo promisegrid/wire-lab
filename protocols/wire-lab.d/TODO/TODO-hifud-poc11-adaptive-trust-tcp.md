@@ -76,6 +76,29 @@ Affects: `implementations/poc11-adaptive-trust-tcp/.gitignore`;
 `implementations/poc11-adaptive-trust-tcp/decision/live_test.go`;
 `protocols/wire-lab.d/TODO/TODO-hifud-poc11-adaptive-trust-tcp.md`.
 
+ID: DI-duhub
+Date: 2026-06-03 08:31:22
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Implement the first nine POC11 hardening items in place: clean
+shutdown lifecycle, provider-structured decision requests, bounded
+malformed-decision repair, idempotent done/monitor ordering with a short receive
+drain, durable local relationship snapshots across runs, explicit 10+ round
+trust-decay/repair tests, resource-fulfillment checks for storage/compute-like
+promise payloads, stake/collateral cost accounting for broken promises, and
+adversarial prompt-injection/malformed-CBOR tests.
+Intent: The first live run showed good autonomy and Promise Theory fit, but only
+medium protocol validity. These changes harden POC11 without broadening the
+top-level action vocabulary or making a production API claim.
+Constraints: Keep one top-level semantic act (`promise`). Keep trust local.
+Keep storage/compute/resource/stake semantics as pCID-owned payload fields and
+runtime-local checks, not new top-level verbs. Do not import `tools/ga-runner`.
+Do not commit Docker volume state, provider outputs, or secrets. Keep changes
+inside POC11 plus its TODO/docs unless a source-map update is directly needed.
+Affects: `implementations/poc11-adaptive-trust-tcp/**`;
+`protocols/wire-lab.d/TODO/TODO-hifud-poc11-adaptive-trust-tcp.md`;
+`DEV-GUIDE-RESOURCES.md`.
+
 ## Status
 
 Implemented as an initial POC11 live-LLM-capable runtime and deterministic fake
@@ -113,6 +136,17 @@ correctness, and `5/5` imposition avoidance. Source: `DI-hotos`; `DI-horuh`.
   refusal as promise semantics, trust decay/repair, economics, and fake runtime.
 - [x] hifud.7 Update implementation/resource docs and provide a user-run Docker
   command.
+- [x] hifud.8 Treat normal listener shutdown as clean lifecycle evidence, not a
+  broken promise.
+- [x] hifud.9 Request structured live decision outputs and add bounded repair
+  before final rejection.
+- [x] hifud.10 Make done/monitor ordering idempotent and drain in-flight receipts
+  before `node_done`.
+- [x] hifud.11 Persist and reload local relationship snapshots across runs.
+- [x] hifud.12 Add explicit 10+ round trust-decay/repair coverage.
+- [x] hifud.13 Add resource-fulfillment and stake/collateral accounting checks.
+- [x] hifud.14 Add adversarial prompt-injection and malformed-CBOR tests.
+- [x] hifud.15 Update POC11 docs/source map with the hardening outcome.
 
 ## First Live Run Assessment
 
@@ -139,3 +173,24 @@ self-targeting; Grace produced one invalid JSON response; several agents sent
 near-duplicate promises; some message receipts happened after `node_done`; and
 normal listener shutdown was recorded as `accept_failed`. These are the next
 production-readiness targets. Source: `DI-horuh`.
+
+## Hardening Outcome
+
+The hifud.8-hifud.15 pass keeps POC11 on the same single top-level `promise`
+action while tightening the runtime boundary around live LLM autonomy. Live
+provider calls now ask for strict structured output; the decision `fields`
+boundary is a strict key/value list at the provider edge and is converted back
+to the existing pCID-owned runtime map before signing. Go validation remains the
+semantic authority for POC behavior: it rejects non-`promise` action kinds,
+non-direct or self targets, authority/RPC language, and prompt-injection
+language, and it permits only one bounded repair attempt for missing common
+shape fields. Source: `DI-duhub`.
+
+The runtime now treats normal listener close as clean shutdown evidence, stops
+accepting new frames before draining active receive handlers and writing
+`node_done`, treats done/monitor markers as idempotent, and persists local
+relationship snapshots under the run root for restart-durable trust experiments.
+Storage/compute fulfillment promises are checked against local budget/capacity
+before sending, inbound extreme resource promises are rejected locally, and
+stake/collateral fields can spend local budget after broken-promise evidence.
+Source: `DI-duhub`.

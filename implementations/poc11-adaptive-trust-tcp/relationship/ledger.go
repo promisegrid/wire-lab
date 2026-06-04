@@ -27,6 +27,14 @@ type Ledger struct {
 	decay       int
 }
 
+// State is the durable, local-only relationship snapshot for one agent.
+// Intent: Persist only this agent's private trust and current direct-link
+// promises, never a global trust authority. Source: DI-duhub
+type State struct {
+	TrustByPeer map[string]int `json:"trust_by_peer"`
+	DirectPeers []string       `json:"direct_peers"`
+}
+
 // NewLedger initializes one local relationship ledger.
 func NewLedger(allPeers []string, initialDirectPeers []string, strongTrust, weakTrust, decay int) *Ledger {
 	trustByPeer := make(map[string]int, len(allPeers))
@@ -100,6 +108,37 @@ func (ledger *Ledger) ObserveOutcome(peerName string, outcome Outcome) {
 		ledger.trustByPeer[peerName]--
 	}
 	ledger.reconfigure(peerName)
+}
+
+// Export returns a durable copy of the local relationship state.
+// Intent: Make restart tests inspectable without exposing mutable ledger maps.
+// Source: DI-duhub
+func (ledger *Ledger) Export() State {
+	return State{
+		TrustByPeer: ledger.Snapshot(),
+		DirectPeers: ledger.DirectPeers(),
+	}
+}
+
+// ApplyState restores locally known peer state without accepting unknown peers.
+// Intent: A persisted file may restore only relationships this configuration
+// already recognizes, preventing stale files from inventing peers.
+// Source: DI-duhub
+func (ledger *Ledger) ApplyState(state State) {
+	for peerName, trustScore := range state.TrustByPeer {
+		if _, exists := ledger.trustByPeer[peerName]; exists {
+			ledger.trustByPeer[peerName] = trustScore
+		}
+	}
+	ledger.directPeers = make(map[string]bool, len(state.DirectPeers))
+	for _, peerName := range state.DirectPeers {
+		if _, exists := ledger.trustByPeer[peerName]; exists {
+			ledger.directPeers[peerName] = true
+		}
+	}
+	for peerName := range ledger.trustByPeer {
+		ledger.reconfigure(peerName)
+	}
 }
 
 // DecayRound slowly moves idle relationships toward lower confidence.

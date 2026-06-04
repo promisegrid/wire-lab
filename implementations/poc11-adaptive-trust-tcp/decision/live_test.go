@@ -1,8 +1,13 @@
 package decision
 
 import (
+	"context"
+	"encoding/json"
+	"io"
+	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 )
@@ -40,4 +45,65 @@ func TestAPIKeyRejectsMissingSources(t *testing.T) {
 	if _, err := client.apiKey(); err == nil {
 		t.Fatalf("missing API key sources should fail")
 	}
+}
+
+func TestLiveClientRequestsStructuredDecisionOutput(t *testing.T) {
+	t.Setenv("POC11_TEST_API_KEY", "test-key")
+	var requestBody map[string]any
+	client := NewLiveClient("https://example.invalid/v1/responses", "POC11_TEST_API_KEY", "agent", "monitor", "medium", "flex", time.Second)
+	client.HTTPClient = &http.Client{Transport: roundTripFunc(func(request *http.Request) (*http.Response, error) {
+		bodyBytes, readErr := io.ReadAll(request.Body)
+		if readErr != nil {
+			return nil, readErr
+		}
+		if closeErr := request.Body.Close(); closeErr != nil {
+			return nil, closeErr
+		}
+		if err := json.Unmarshal(bodyBytes, &requestBody); err != nil {
+			return nil, err
+		}
+		responseText := `{"output_text":"{\"act\":\"promise\",\"target\":\"bob\",\"promise\":\"Alice promises one local exchange.\",\"reason\":\"test\",\"fields\":[{\"key\":\"promise_about\",\"value\":\"local_observation\"}]}"}`
+		return &http.Response{
+			StatusCode: http.StatusOK,
+			Body:       io.NopCloser(strings.NewReader(responseText)),
+			Header:     make(http.Header),
+			Request:    request,
+		}, nil
+	})}
+	promiseDecision, err := client.Decide(context.Background(), Observation{AgentName: "alice", DirectPeers: []string{"bob"}})
+	if err != nil {
+		t.Fatalf("decide: %v", err)
+	}
+	if promiseDecision.Act != ActPromise {
+		t.Fatalf("decision act = %q, want promise", promiseDecision.Act)
+	}
+	if promiseDecision.Fields["promise_about"] != "local_observation" {
+		t.Fatalf("decision fields not converted from strict live shape: %#v", promiseDecision.Fields)
+	}
+	textObject, ok := requestBody["text"].(map[string]any)
+	if !ok {
+		t.Fatalf("request missing text format: %#v", requestBody)
+	}
+	formatObject, ok := textObject["format"].(map[string]any)
+	if !ok {
+		t.Fatalf("request missing format object: %#v", textObject)
+	}
+	if formatObject["type"] != "json_schema" || formatObject["name"] != "poc11_promise_decision" {
+		t.Fatalf("unexpected structured output format: %#v", formatObject)
+	}
+	schemaObject := formatObject["schema"].(map[string]any)
+	propertiesObject := schemaObject["properties"].(map[string]any)
+	fieldsObject := propertiesObject["fields"].(map[string]any)
+	if fieldsObject["type"] != "array" {
+		t.Fatalf("live fields should use a strict key/value array: %#v", fieldsObject)
+	}
+}
+
+// roundTripFunc lets live-client tests inspect provider requests without opening
+// a test TCP listener. Intent: Keep tests deterministic and sandbox-compatible
+// while still validating the provider request shape. Source: DI-duhub
+type roundTripFunc func(*http.Request) (*http.Response, error)
+
+func (roundTripFuncValue roundTripFunc) RoundTrip(request *http.Request) (*http.Response, error) {
+	return roundTripFuncValue(request)
 }

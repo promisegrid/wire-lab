@@ -3,6 +3,7 @@ package runtime
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net"
 	"os"
@@ -20,6 +21,7 @@ import (
 )
 
 const sendTimeout = 5 * time.Second
+const shutdownDrainTimeout = 750 * time.Millisecond
 
 // Node runs one autonomous POC11 agent process. A container may run several
 // Node processes, but each process keeps its own local relationship ledger,
@@ -41,6 +43,9 @@ type Node struct {
 	logFile   *os.File
 	budget    int
 	capacity  int
+
+	activeHandlers sync.WaitGroup
+	stopping       bool
 }
 
 // NewNode creates a node with a private trust ledger for every configured peer.
@@ -71,6 +76,9 @@ func (node *Node) Run(ctx context.Context) error {
 		return err
 	}
 	defer node.closeLog()
+	if err := node.loadRelationshipState(); err != nil {
+		return err
+	}
 	if err := node.maybeStartServer(ctx); err != nil {
 		return err
 	}
@@ -81,6 +89,14 @@ func (node *Node) Run(ctx context.Context) error {
 			node.record("decision_error", "broken", "", err.Error())
 		}
 		time.Sleep(node.Config.TurnDelay())
+	}
+	// Intent: Stop accepting new TCP frames before the local done marker is
+	// written so `node_done` does not race with late receive receipts.
+	// Source: DI-duhub
+	node.closeListener()
+	node.drainInflight(ctx)
+	if err := node.saveRelationshipState(); err != nil {
+		return err
 	}
 	if err := node.writeDoneMarker(); err != nil {
 		return err
@@ -106,11 +122,24 @@ func (node *Node) runTurn(ctx context.Context, turnIndex int) error {
 	}
 	validDecision, validateErr := decision.ValidatePromiseDecision(rawDecision, observation.DirectPeers)
 	if validateErr != nil {
-		node.observeOutcome(rawDecision.Target, relationship.OutcomeMalformed)
-		node.record("decision_rejected", "malformed", rawDecision.Target, validateErr.Error())
-		return nil
+		repairedDecision, repaired, repairErr := decision.RepairPromiseDecision(rawDecision, observation, validateErr)
+		if repairErr != nil {
+			node.observeOutcome(rawDecision.Target, relationship.OutcomeMalformed)
+			node.record("decision_rejected", "malformed", rawDecision.Target, validateErr.Error())
+			return nil
+		}
+		if repaired {
+			node.record("decision_repaired", "kept", repairedDecision.Target, repairErrDetail(validateErr))
+		}
+		validDecision = repairedDecision
 	}
 	fields := decision.Fields(observation, validDecision)
+	if resourceErr := node.checkLocalResourcePromise(fields); resourceErr != nil {
+		node.observeOutcome(validDecision.Target, relationship.OutcomeBroken)
+		node.applyBrokenPromiseCost(validDecision.Target, fields, resourceErr.Error())
+		node.record("resource_promise_broken", "broken", validDecision.Target, resourceErr.Error())
+		return nil
+	}
 	if economicsDecision := node.evaluateEconomics(validDecision.Target, fields); !economicsDecision.PromiseWorthMaking {
 		node.observeOutcome(validDecision.Target, relationship.OutcomeNonCommitment)
 		node.record("promise_withheld", "non_commitment", validDecision.Target, economicsDecision.Reason)
@@ -118,6 +147,7 @@ func (node *Node) runTurn(ctx context.Context, turnIndex int) error {
 	}
 	if sendErr := node.send(validDecision.Target, fields); sendErr != nil {
 		node.observeOutcome(validDecision.Target, relationship.OutcomeBroken)
+		node.applyBrokenPromiseCost(validDecision.Target, fields, sendErr.Error())
 		node.record("send_failed", "broken", validDecision.Target, sendErr.Error())
 		return nil
 	}
@@ -146,6 +176,10 @@ func (node *Node) acceptLoop(ctx context.Context, listener net.Listener) {
 	for {
 		conn, err := listener.Accept()
 		if err != nil {
+			if node.isStopping() || errors.Is(err, net.ErrClosed) {
+				node.record("listener_closed", "kept", "", "listener closed during normal shutdown")
+				return
+			}
 			select {
 			case <-ctx.Done():
 				return
@@ -154,7 +188,11 @@ func (node *Node) acceptLoop(ctx context.Context, listener net.Listener) {
 				return
 			}
 		}
-		go node.handleConn(conn)
+		node.activeHandlers.Add(1)
+		go func() {
+			defer node.activeHandlers.Done()
+			node.handleConn(conn)
+		}()
 	}
 }
 
@@ -181,6 +219,13 @@ func (node *Node) handleConn(conn net.Conn) {
 		node.observeOutcome(fromAgent, relationship.OutcomeNonCommitment)
 		node.record("message_not_promised", "non_commitment", fromAgent, "no current local promise to accept direct TCP exchange")
 		node.writeAck(frameConn, fromAgent, "not_promised", "I promise to remember that I did not currently promise this direct exchange.")
+		return
+	}
+	if resourceErr := node.checkIncomingResourcePromise(fields); resourceErr != nil {
+		node.observeOutcome(fromAgent, relationship.OutcomeBroken)
+		node.applyBrokenPromiseCost(fromAgent, fields, resourceErr.Error())
+		node.record("resource_promise_rejected", "broken", fromAgent, resourceErr.Error())
+		node.writeAck(frameConn, fromAgent, "broken", "I promise I rejected this resource promise because local checks failed.")
 		return
 	}
 	node.observeOutcome(fromAgent, relationship.OutcomeKept)
@@ -358,6 +403,101 @@ func (node *Node) observeOutcome(peerName string, outcome relationship.Outcome) 
 	node.ledger.ObserveOutcome(peerName, outcome)
 }
 
+func repairErrDetail(validateErr error) string {
+	return "repaired common live decision formatting issue: " + validateErr.Error()
+}
+
+// checkLocalResourcePromise verifies that the local agent has enough current
+// budget and capacity before making a storage or compute promise.
+// Intent: Keep resource promises tied to locally fulfillable behavior rather
+// than allowing the LLM to promise impossible storage/compute work.
+// Source: DI-duhub
+func (node *Node) checkLocalResourcePromise(fields map[string]string) error {
+	resourceType := resourceField(fields)
+	if resourceType == "" {
+		return nil
+	}
+	requestedUnits := intField(fields, "field_units", "field_requested_units", "field_capacity", "field_capacity_mb")
+	if requestedUnits <= 0 {
+		return fmt.Errorf("resource promise for %s must declare positive units", resourceType)
+	}
+	node.mu.Lock()
+	defer node.mu.Unlock()
+	if requestedUnits > node.capacity {
+		return fmt.Errorf("resource promise for %s asks %d units but local capacity is %d", resourceType, requestedUnits, node.capacity)
+	}
+	if requestedUnits > node.budget {
+		return fmt.Errorf("resource promise for %s asks %d units but local budget is %d", resourceType, requestedUnits, node.budget)
+	}
+	return nil
+}
+
+// checkIncomingResourcePromise rejects inbound resource promises that cannot be
+// safely interpreted by this bounded POC receiver.
+// Intent: Treat malformed or extreme resource promises as local evidence about
+// the sender, not as commands the receiver must obey. Source: DI-duhub
+func (node *Node) checkIncomingResourcePromise(fields map[string]string) error {
+	resourceType := resourceField(fields)
+	if resourceType == "" {
+		return nil
+	}
+	requestedUnits := intField(fields, "field_units", "field_requested_units", "field_capacity", "field_capacity_mb")
+	if requestedUnits <= 0 {
+		return fmt.Errorf("incoming resource promise for %s lacks positive units", resourceType)
+	}
+	if requestedUnits > 1000 {
+		return fmt.Errorf("incoming resource promise for %s exceeds POC safety limit: %d units", resourceType, requestedUnits)
+	}
+	return nil
+}
+
+// applyBrokenPromiseCost spends locally posted stake/collateral when this node
+// observes a broken promise with an explicit economic field.
+// Intent: Make promise-breaking economically visible inside the POC without
+// creating a central penalty authority. Source: DI-duhub
+func (node *Node) applyBrokenPromiseCost(peerName string, fields map[string]string, detail string) {
+	stakeAmount := intField(fields, "field_stake", "field_collateral", "stake", "collateral")
+	if stakeAmount <= 0 {
+		return
+	}
+	node.mu.Lock()
+	if stakeAmount > node.budget {
+		stakeAmount = node.budget
+	}
+	node.budget -= stakeAmount
+	node.mu.Unlock()
+	node.record("stake_forfeited", "broken", peerName, fmt.Sprintf("%s; forfeited %d local budget units", detail, stakeAmount))
+}
+
+// resourceField identifies the small set of resource-fulfillment promises this
+// POC can check directly. Need advertisements such as "storage_need" are not
+// treated as fulfillment promises because they do not claim local capacity.
+// Intent: Keep storage/compute checks concrete and avoid misclassifying an
+// agent's stated need as a promise to fulfill that need. Source: DI-duhub
+func resourceField(fields map[string]string) string {
+	for _, key := range []string{"field_resource", "field_resource_type", "resource", "field_promise_about"} {
+		value := fields[key]
+		if value == "storage" || value == "compute" {
+			return value
+		}
+	}
+	return ""
+}
+
+func intField(fields map[string]string, keys ...string) int {
+	for _, key := range keys {
+		value := fields[key]
+		if value == "" {
+			continue
+		}
+		parsedValue, parseErr := strconv.Atoi(value)
+		if parseErr == nil {
+			return parsedValue
+		}
+	}
+	return 0
+}
+
 func (node *Node) record(eventName, outcome, peer, detail string) {
 	event := decision.Event{
 		Observer: node.Agent.Name,
@@ -407,11 +547,24 @@ func (node *Node) closeLog() {
 
 func (node *Node) closeListener() {
 	if node.listener != nil {
+		node.setStopping()
 		closeErr := node.listener.Close()
-		if closeErr != nil {
+		if closeErr != nil && !errors.Is(closeErr, net.ErrClosed) {
 			fmt.Fprintf(os.Stderr, "close listener: %v\n", closeErr)
 		}
 	}
+}
+
+func (node *Node) setStopping() {
+	node.mu.Lock()
+	defer node.mu.Unlock()
+	node.stopping = true
+}
+
+func (node *Node) isStopping() bool {
+	node.mu.Lock()
+	defer node.mu.Unlock()
+	return node.stopping
 }
 
 func (node *Node) closeFrameConn(frameConn transport.FrameConn, eventName, peerName string) {
@@ -425,8 +578,76 @@ func (node *Node) runDir() string {
 	return filepath.Join(node.Config.RunRoot, node.Config.RunID)
 }
 
+// relationshipStatePath is the durable local memory file for this agent's
+// private trust ledger.
+// Intent: Keep relationship learning across POC11 runs without introducing a
+// global trust database or shared authority. Source: DI-duhub
+func (node *Node) relationshipStatePath() string {
+	return filepath.Join(node.Config.RunRoot, "relationships", node.Agent.Name+".json")
+}
+
+// loadRelationshipState restores this agent's prior local trust snapshot if it
+// exists; absence simply means this is the first run for that agent.
+// Intent: Let multi-run POC11 experiments test relationship decay and repair
+// over time while preserving local-only trust semantics. Source: DI-duhub
+func (node *Node) loadRelationshipState() error {
+	statePath := node.relationshipStatePath()
+	stateBytes, readErr := os.ReadFile(statePath)
+	if readErr != nil {
+		if errors.Is(readErr, os.ErrNotExist) {
+			return nil
+		}
+		return readErr
+	}
+	var state relationship.State
+	if unmarshalErr := json.Unmarshal(stateBytes, &state); unmarshalErr != nil {
+		return unmarshalErr
+	}
+	node.mu.Lock()
+	node.ledger.ApplyState(state)
+	node.mu.Unlock()
+	node.record("relationship_state_loaded", "kept", "", "loaded durable local relationship snapshot")
+	return nil
+}
+
+// saveRelationshipState writes the local trust snapshot via a temporary file
+// and rename so readers never see a partial JSON document.
+// Intent: Persist relationship memory after each run while keeping incomplete
+// writes from corrupting the next run's local evidence. Source: DI-duhub
+func (node *Node) saveRelationshipState() error {
+	statePath := node.relationshipStatePath()
+	if err := os.MkdirAll(filepath.Dir(statePath), 0o755); err != nil {
+		return err
+	}
+	node.mu.Lock()
+	state := node.ledger.Export()
+	node.mu.Unlock()
+	stateBytes, marshalErr := json.MarshalIndent(state, "", "  ")
+	if marshalErr != nil {
+		return marshalErr
+	}
+	tempPath := statePath + ".tmp"
+	if err := os.WriteFile(tempPath, append(stateBytes, '\n'), 0o644); err != nil {
+		return err
+	}
+	if err := os.Rename(tempPath, statePath); err != nil {
+		return err
+	}
+	node.record("relationship_state_saved", "kept", "", "saved durable local relationship snapshot")
+	return nil
+}
+
+// writeDoneMarker records idempotent local completion for one agent.
+// Intent: Re-running or restarting a bounded POC node should not turn an
+// already-written completion marker into broken evidence. Source: DI-duhub
 func (node *Node) writeDoneMarker() error {
 	donePath := filepath.Join(node.runDir(), node.Agent.Name+".done")
+	if _, err := os.Stat(donePath); err == nil {
+		node.record("node_done_existing", "kept", "", "done marker already existed")
+		return nil
+	} else if !errors.Is(err, os.ErrNotExist) {
+		return err
+	}
 	if err := os.WriteFile(donePath, []byte("done\n"), 0o644); err != nil {
 		return err
 	}
@@ -453,10 +674,22 @@ func (node *Node) waitForMonitor(ctx context.Context) error {
 	}
 }
 
+// runMonitor writes the observer-only report after all nodes have completed and
+// late receive handlers have had a bounded chance to drain.
+// Intent: Make monitor completion idempotent and reduce false drift from
+// reading logs before in-flight receipts settle. Source: DI-duhub
 func (node *Node) runMonitor(ctx context.Context) error {
+	donePath := filepath.Join(node.runDir(), "monitor.done")
+	if _, err := os.Stat(donePath); err == nil {
+		node.record("monitor_done_existing", "kept", "", "monitor marker already existed")
+		return nil
+	} else if !errors.Is(err, os.ErrNotExist) {
+		return err
+	}
 	if err := node.waitForAllDone(ctx); err != nil {
 		return err
 	}
+	node.drainInflight(ctx)
 	events, readErr := node.readAllEvents()
 	if readErr != nil {
 		return readErr
@@ -473,12 +706,33 @@ func (node *Node) runMonitor(ctx context.Context) error {
 	if err := os.WriteFile(reportPath, append(reportBytes, '\n'), 0o644); err != nil {
 		return err
 	}
-	donePath := filepath.Join(node.runDir(), "monitor.done")
 	if err := os.WriteFile(donePath, []byte("done\n"), 0o644); err != nil {
 		return err
 	}
 	node.record("monitor_done", "kept", "", report.Summary)
 	return nil
+}
+
+// drainInflight waits briefly for active receive handlers before done/monitor
+// evidence is finalized.
+// Intent: Preserve receipts that were already accepted without letting shutdown
+// hang indefinitely. Source: DI-duhub
+func (node *Node) drainInflight(ctx context.Context) {
+	drained := make(chan struct{})
+	go func() {
+		node.activeHandlers.Wait()
+		close(drained)
+	}()
+	timer := time.NewTimer(shutdownDrainTimeout)
+	defer timer.Stop()
+	select {
+	case <-drained:
+		node.record("inflight_drained", "kept", "", "all active receive handlers completed before done marker")
+	case <-ctx.Done():
+		node.record("inflight_drain_cancelled", "broken", "", ctx.Err().Error())
+	case <-timer.C:
+		node.record("inflight_drain_timeout", "non_commitment", "", "some receive handlers may still be running")
+	}
 }
 
 func (node *Node) waitForAllDone(ctx context.Context) error {

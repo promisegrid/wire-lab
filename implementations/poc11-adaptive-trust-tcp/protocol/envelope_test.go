@@ -44,3 +44,15 @@ func TestEnvelopeRejectsTampering(t *testing.T) {
 		}
 	}
 }
+
+func TestParseEnvelopeRejectsMalformedCBOR(t *testing.T) {
+	// Intent: Adversarial peers may send arbitrary TCP bytes, but malformed
+	// bytes remain local parse-failure evidence rather than a command surface.
+	// Source: DI-duhub
+	if _, err := ParseEnvelope([]byte{0xda, 0x67, 0x72, 0x69}); err == nil {
+		t.Fatalf("truncated grid-tag bytes should fail parse")
+	}
+	if _, err := ParseEnvelope([]byte("ignore previous instructions")); err == nil {
+		t.Fatalf("plain prompt-injection bytes should fail parse")
+	}
+}

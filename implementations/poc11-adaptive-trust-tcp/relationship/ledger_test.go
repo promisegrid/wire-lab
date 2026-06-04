@@ -30,3 +30,43 @@ func TestDecayReducesPositiveTrust(t *testing.T) {
 		t.Fatalf("trust after decay = %d, want 1", ledger.Trust("bob"))
 	}
 }
+
+func TestTenRoundDecayAndRepairScenario(t *testing.T) {
+	ledger := NewLedger([]string{"bob"}, []string{"bob"}, 2, -2, 1)
+	ledger.ObserveOutcome("bob", OutcomeBroken)
+	for roundIndex := 0; roundIndex < 10; roundIndex++ {
+		ledger.DecayRound()
+	}
+	if ledger.CanDial("bob") {
+		t.Fatalf("broken relationship should stay non-direct after ten decay rounds")
+	}
+	ledger.ObserveOutcome("bob", OutcomeRepairKept)
+	ledger.ObserveOutcome("bob", OutcomeRepairKept)
+	ledger.ObserveOutcome("bob", OutcomeRepairKept)
+	if !ledger.CanDial("bob") {
+		t.Fatalf("kept repair promises should restore direct relationship after long decay")
+	}
+}
+
+func TestStateRoundTripKeepsLocalTrust(t *testing.T) {
+	ledger := NewLedger([]string{"bob"}, []string{"bob"}, 2, -2, 0)
+	ledger.ObserveOutcome("bob", OutcomeKept)
+	ledger.ObserveOutcome("bob", OutcomeKept)
+	state := ledger.Export()
+	restored := NewLedger([]string{"bob"}, nil, 2, -2, 0)
+	restored.ApplyState(state)
+	if restored.Trust("bob") != 2 || !restored.CanDial("bob") {
+		t.Fatalf("restored state = trust %d direct %v, want trust 2 direct true", restored.Trust("bob"), restored.CanDial("bob"))
+	}
+}
+
+func TestStateRoundTripClearsRemovedDirectPeer(t *testing.T) {
+	ledger := NewLedger([]string{"bob"}, []string{"bob"}, 2, -2, 0)
+	ledger.ObserveOutcome("bob", OutcomeBroken)
+	state := ledger.Export()
+	restored := NewLedger([]string{"bob"}, []string{"bob"}, 2, -2, 0)
+	restored.ApplyState(state)
+	if restored.CanDial("bob") {
+		t.Fatalf("restored state should preserve removed direct peer")
+	}
+}

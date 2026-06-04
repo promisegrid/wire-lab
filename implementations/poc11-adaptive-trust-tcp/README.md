@@ -14,7 +14,9 @@ removes POC10's multi-action surface. Source: `DI-hotos`.
   evidence, and direct TCP link choices.
 - Strong local trust can create or preserve a direct TCP peer relationship.
   Broken or malformed promise evidence can remove that direct link.
-- Live decisions come from an OpenAI-compatible Responses API call.
+- Live decisions come from an OpenAI-compatible Responses API call with a
+  strict structured-output schema, followed by Go-owned validation and one
+  bounded repair attempt for common missing-shape errors.
 - Tests use fake decisions and do not require network or API keys.
 - A monitor LLM evaluates completed logs after the run. The monitor is an
   observer only; it never controls agent decisions.
@@ -112,6 +114,30 @@ shutdown logged as `accept_failed`. These are protocol hygiene and lifecycle
 issues, not reasons to reintroduce top-level RPC-like action kinds. Source:
 `DI-horuh`; `DI-mosoj`.
 
+## Hardening After First Live Run
+
+The next hardening pass addresses those protocol-hygiene gaps without changing
+the one-action Promise Theory boundary. Normal listener close is now clean
+`listener_closed` evidence; each node stops accepting new frames, drains active
+receive handlers for a bounded interval, persists its local relationship
+snapshot, and then writes idempotent `node_done` evidence. The monitor also
+treats `monitor.done` as idempotent and drains in-flight receipts before reading
+logs. Source: `DI-duhub`.
+
+Live provider calls now request structured JSON: decisions return `act`,
+`target`, `promise`, `reason`, and a strict key/value `fields` list; monitor
+reports return the five bounded scores plus summary and concerns. The runtime
+still validates every decision locally, rejects authority/RPC/prompt-injection
+wording, and allows only a single bounded repair for missing `act`, missing
+single direct-peer `target`, or missing promise text. Source: `DI-duhub`.
+
+Resource promises now have executable POC checks. Storage or compute fulfillment
+promises must declare positive units that fit local budget and capacity before
+they are sent. Inbound resource promises with malformed or extreme unit claims
+are rejected as local evidence. Broken promises with stake or collateral fields
+spend local budget units; no central penalty authority is introduced. Source:
+`DI-duhub`.
+
 ## Current Limits
 
 POC11 is intentionally nondeterministic at runtime. Config limits bound turns,
@@ -120,4 +146,6 @@ provider outputs. Direct link reconfiguration is a local runtime promise about
 dialing or accepting TCP from a peer; the POC does not mutate Docker networks.
 This is executable evidence, not a final LLM-agent API, trust API, discovery
 protocol, monitor standard, economics protocol, SDK, or provider abstraction.
-Source: `DI-hotos`.
+The structured-output field list is a provider-boundary accommodation, not a
+new wire format; the CBOR payload remains the pCID-owned string map. Source:
+`DI-hotos`; `DI-duhub`.
