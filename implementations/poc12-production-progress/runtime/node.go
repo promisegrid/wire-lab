@@ -50,6 +50,7 @@ type Node struct {
 	capacity  int
 
 	shipmentUpdates map[string]bool
+	promiseJournal  map[string]promiseRecord
 
 	activeHandlers sync.WaitGroup
 	receiveConns   []transport.FrameConn
@@ -62,6 +63,40 @@ type parsedMessage struct {
 	ExactHash    string
 	ProtocolCID  protocol.ProtocolCID
 	ProtocolName string
+}
+
+// promiseStatus is the app-local journal state for one promise this process has
+// enough exact-byte evidence to track.
+// Intent: POC12 needs promise-state words that distinguish local failure,
+// non-commitment, duplicate evidence, and actual kept/broken outcomes before
+// any peer trust update is considered. Source: DI-vujob
+type promiseStatus string
+
+const (
+	promiseStatusOutstanding   promiseStatus = "outstanding"
+	promiseStatusKept          promiseStatus = "kept"
+	promiseStatusBroken        promiseStatus = "broken"
+	promiseStatusMalformed     promiseStatus = "malformed"
+	promiseStatusNonCommitment promiseStatus = "non_commitment"
+	promiseStatusDuplicate     promiseStatus = "duplicate"
+	promiseStatusLocalFailure  promiseStatus = "local_failure"
+)
+
+// promiseRecord is one app-local journal entry for promise evidence this app is
+// currently tracking.
+// Intent: POC12 applies peer trust only after local promise evidence is recorded
+// in the app, never because the kernel, transport, or an unrelated local
+// resource check says so. Source: DI-vujob
+type promiseRecord struct {
+	Key              string
+	Fingerprint      string
+	Peer             string
+	ProtocolName     string
+	ExactHash        string
+	PromiseAbout     string
+	PromiseText      string
+	ExpectedEvidence string
+	Status           promiseStatus
 }
 
 // NewNode creates a node with a private trust ledger for every configured peer.
@@ -84,6 +119,7 @@ func NewNode(cfg config.Config, agent config.AgentConfig, decider decision.Decid
 		capacity:  agent.Capacity,
 
 		shipmentUpdates: make(map[string]bool),
+		promiseJournal:  make(map[string]promiseRecord),
 	}
 }
 
@@ -193,7 +229,7 @@ func (node *Node) runFulfillmentShipmentWorkflow() error {
 	if labelErr != nil {
 		return fmt.Errorf("label printing: %w", labelErr)
 	}
-	_, updateErr := node.sendAndReceive("accounting", map[string]string{
+	accountingUpdateFields := map[string]string{
 		"act":                   decision.ActPromise,
 		"from":                  node.Agent.Name,
 		"to":                    "accounting",
@@ -204,9 +240,17 @@ func (node *Node) runFulfillmentShipmentWorkflow() error {
 		"field_order_id":        fulfillmentOrderID,
 		"field_tracking_number": labelAck.Fields["field_tracking_number"],
 		"field_cost_cents":      labelAck.Fields["field_cost_cents"],
-	})
+	}
+	_, updateErr := node.sendAndReceive("accounting", accountingUpdateFields)
 	if updateErr != nil {
 		return fmt.Errorf("accounting update: %w", updateErr)
+	}
+	duplicateUpdateAck, duplicateUpdateErr := node.sendAndReceive("accounting", accountingUpdateFields)
+	if duplicateUpdateErr != nil {
+		return fmt.Errorf("duplicate accounting update: %w", duplicateUpdateErr)
+	}
+	if duplicateUpdateAck.Fields[duplicateShipmentEvidenceField] != "true" {
+		return fmt.Errorf("duplicate accounting update was not checkpointed")
 	}
 	node.record("fulfillment_workflow_completed", "kept", "accounting", "order_id="+fulfillmentOrderID+" package_id="+fulfillmentPackageID)
 	return nil
@@ -241,24 +285,29 @@ func (node *Node) runTurn(ctx context.Context, turnIndex int) error {
 		validDecision = repairedDecision
 	}
 	fields := decision.Fields(observation, validDecision)
+	if node.suppressRepeatedPromise(validDecision.Target, fields) {
+		return nil
+	}
 	if resourceErr := node.checkLocalResourcePromise(fields); resourceErr != nil {
-		node.observeOutcome(validDecision.Target, relationship.OutcomeBroken)
-		node.applyBrokenPromiseCost(validDecision.Target, fields, resourceErr.Error())
-		node.record("resource_promise_broken", "broken", validDecision.Target, resourceErr.Error())
+		node.recordLocalResourceExhaustion(validDecision.Target, fields, resourceErr.Error())
 		return nil
 	}
 	if economicsDecision := node.evaluateEconomics(validDecision.Target, fields); !economicsDecision.PromiseWorthMaking {
-		node.observeOutcome(validDecision.Target, relationship.OutcomeNonCommitment)
+		if economicsDecision.Reason == "budget exhausted" || economicsDecision.Reason == "capacity exhausted" {
+			node.recordLocalResourceExhaustion(validDecision.Target, fields, economicsDecision.Reason)
+			return nil
+		}
 		node.record("promise_withheld", "non_commitment", validDecision.Target, economicsDecision.Reason)
 		return nil
 	}
 	if sendErr := node.send(validDecision.Target, fields); sendErr != nil {
-		sendOutcome := outcomeForSendError(sendErr)
-		node.observeOutcome(validDecision.Target, sendOutcome)
-		if sendOutcome != relationship.OutcomeNonCommitment {
+		sendOutcome, updatesPeerTrust := outcomeForSendError(sendErr)
+		if updatesPeerTrust {
+			node.observeOutcome(validDecision.Target, sendOutcome)
 			node.applyBrokenPromiseCost(validDecision.Target, fields, sendErr.Error())
 		}
-		node.record("send_failed", string(sendOutcome), validDecision.Target, sendErr.Error())
+		sendEventName, sendEventOutcome := sendEventForError(sendErr)
+		node.record(sendEventName, sendEventOutcome, validDecision.Target, sendErr.Error())
 		return nil
 	}
 	node.spendLocalCapacity()
@@ -367,7 +416,6 @@ func (node *Node) handleFrame(frameBytes []byte) ([]byte, error) {
 	fields := parsed.Fields
 	fromAgent := fields["from"]
 	if !node.supportsProtocol(parsed.ProtocolName) {
-		node.observeOutcome(fromAgent, relationship.OutcomeNonCommitment)
 		node.record("unsupported_pcid", "non_commitment", fromAgent, "no local app receive promise for "+parsed.ProtocolName)
 		return node.newAckBytes(fromAgent, "not_promised", "I promise to remember that I did not promise to handle this pCID.", parsed.ProtocolCID, nil)
 	}
@@ -377,11 +425,12 @@ func (node *Node) handleFrame(frameBytes []byte) ([]byte, error) {
 		return node.newAckBytes(fromAgent, "malformed", "I promise I rejected this non-promise message.", parsed.ProtocolCID, nil)
 	}
 	if !node.canAcceptFrom(fromAgent, fields) {
-		node.observeOutcome(fromAgent, relationship.OutcomeNonCommitment)
 		node.record("message_not_promised", "non_commitment", fromAgent, "no current local promise to accept direct TCP exchange")
 		return node.newAckBytes(fromAgent, "not_promised", "I promise to remember that I did not currently promise this direct exchange.", parsed.ProtocolCID, nil)
 	}
+	promiseID := node.rememberOutstandingPromise(fromAgent, parsed.ProtocolName, parsed.ExactHash, fields)
 	if resourceErr := node.checkIncomingResourcePromise(fields); resourceErr != nil {
+		node.resolveOutstandingPromise(promiseID, promiseStatusBroken, resourceErr.Error())
 		node.observeOutcome(fromAgent, relationship.OutcomeBroken)
 		node.applyBrokenPromiseCost(fromAgent, fields, resourceErr.Error())
 		node.record("resource_promise_rejected", "broken", fromAgent, resourceErr.Error())
@@ -389,6 +438,7 @@ func (node *Node) handleFrame(frameBytes []byte) ([]byte, error) {
 	}
 	ackFields, handlerErr := node.handleProtocolPromise(parsed)
 	if handlerErr != nil {
+		node.resolveOutstandingPromise(promiseID, promiseStatusBroken, handlerErr.Error())
 		node.observeOutcome(fromAgent, relationship.OutcomeBroken)
 		node.applyBrokenPromiseCost(fromAgent, fields, handlerErr.Error())
 		node.record("protocol_handler_rejected", "broken", fromAgent, handlerErr.Error())
@@ -396,7 +446,11 @@ func (node *Node) handleFrame(frameBytes []byte) ([]byte, error) {
 	}
 	acceptedAsCandidate := isLinkDiscoveryPromise(fields) && !node.canAccept(fromAgent)
 	if evidenceUpdatesTrust(ackFields) {
-		node.observeOutcome(fromAgent, outcomeForPromise(fields))
+		trustOutcome := outcomeForPromise(fields)
+		node.resolveOutstandingPromise(promiseID, promiseStatusFromOutcome(trustOutcome), "accepted inbound promise")
+		node.observeOutcome(fromAgent, trustOutcome)
+	} else {
+		node.resolveOutstandingPromise(promiseID, promiseStatusDuplicate, "duplicate evidence recorded without trust change")
 	}
 	eventName := "message_received"
 	if acceptedAsCandidate {
@@ -440,7 +494,9 @@ func (node *Node) send(target string, fields map[string]string) error {
 // ACK evidence to the local caller.
 // Intent: The fulfillment workflow needs concrete address, weight, label, and
 // accounting evidence from pCID handlers while the app sends only through its
-// local kernel rather than dialing peer app processes directly. Source: DI-galin
+// local kernel rather than dialing peer app processes directly; each outbound
+// promise is also journaled before its ACK can affect trust. Source: DI-galin;
+// DI-vujob
 func (node *Node) sendAndReceive(target string, fields map[string]string) (parsedMessage, error) {
 	if !node.canDialTarget(target, fields) {
 		return parsedMessage{}, fmt.Errorf("no local TCP promise to %s", target)
@@ -455,33 +511,46 @@ func (node *Node) sendAndReceive(target string, fields map[string]string) (parse
 	if bytesErr != nil {
 		return parsedMessage{}, bytesErr
 	}
+	exactHash := protocol.HashExactBytes(envelopeBytes)
+	promiseID := node.rememberOutstandingPromise(target, protocolName, exactHash, fields)
 	kernelAddress, addressFound := node.Config.KernelAppAddressForAgent(node.Agent.Name)
 	if !addressFound {
+		node.resolveOutstandingPromise(promiseID, promiseStatusLocalFailure, "missing local kernel endpoint")
 		return parsedMessage{}, fmt.Errorf("no local kernel endpoint for app %s", node.Agent.Name)
 	}
 	frameConn, dialErr := transport.DialFrameConn(kernelAddress, sendTimeout)
 	if dialErr != nil {
+		node.resolveOutstandingPromise(promiseID, promiseStatusLocalFailure, dialErr.Error())
 		return parsedMessage{}, dialErr
 	}
 	defer node.closeFrameConn(frameConn, "send_close_failed", target)
 	if writeErr := frameConn.WriteFrame(envelopeBytes); writeErr != nil {
+		node.resolveOutstandingPromise(promiseID, promiseStatusLocalFailure, writeErr.Error())
 		return parsedMessage{}, writeErr
 	}
 	ackBytes, readErr := frameConn.ReadFrame()
 	if readErr != nil {
+		node.resolveOutstandingPromise(promiseID, promiseStatusLocalFailure, readErr.Error())
 		return parsedMessage{}, readErr
 	}
 	ackMessage, parseErr := node.parseEnvelope(ackBytes)
 	if parseErr != nil {
+		node.resolveOutstandingPromise(promiseID, promiseStatusLocalFailure, parseErr.Error())
 		return parsedMessage{}, parseErr
 	}
 	ackFields := ackMessage.Fields
 	if ackFields["outcome"] != "kept" {
+		ackOutcome, _ := outcomeForSendError(ackOutcomeError{outcome: ackFields["outcome"]})
+		node.resolveOutstandingPromise(promiseID, promiseStatusFromOutcome(ackOutcome), "ack outcome "+ackFields["outcome"])
 		return parsedMessage{}, ackOutcomeError{outcome: ackFields["outcome"]}
 	}
 	node.recordAckEvidence(target, ackMessage)
 	if evidenceUpdatesTrust(ackFields) {
-		node.observeOutcome(target, outcomeForPromise(fields))
+		trustOutcome := outcomeForPromise(fields)
+		node.resolveOutstandingPromise(promiseID, promiseStatusFromOutcome(trustOutcome), "ack kept")
+		node.observeOutcome(target, trustOutcome)
+	} else {
+		node.resolveOutstandingPromise(promiseID, promiseStatusDuplicate, "duplicate ack evidence recorded without trust change")
 	}
 	return ackMessage, nil
 }
@@ -793,6 +862,90 @@ func (node *Node) observeOutcome(peerName string, outcome relationship.Outcome) 
 	node.record(string(transition), "kept", peerName, fmt.Sprintf("outcome=%s trust=%d", outcome, trustScore))
 }
 
+// rememberOutstandingPromise adds one exact promise record to this app's local
+// journal before later ACK or receive handling can resolve it.
+// Intent: Trust changes should be explainable from a local promise-evidence
+// record rather than from transport success, kernel routing, or local resource
+// pressure alone. Source: DI-vujob
+func (node *Node) rememberOutstandingPromise(peerName, protocolName, exactHash string, fields map[string]string) string {
+	fingerprint := promiseRecordKey(peerName, protocolName, "", fields)
+	record := promiseRecord{
+		Key:              promiseRecordKey(peerName, protocolName, exactHash, fields),
+		Fingerprint:      fingerprint,
+		Peer:             peerName,
+		ProtocolName:     protocolName,
+		ExactHash:        exactHash,
+		PromiseAbout:     fields["field_promise_about"],
+		PromiseText:      fields["promise"],
+		ExpectedEvidence: fields["reason"],
+		Status:           promiseStatusOutstanding,
+	}
+	node.mu.Lock()
+	node.promiseJournal[record.Key] = record
+	node.mu.Unlock()
+	node.record("promise_outstanding", "kept", peerName, fmt.Sprintf("status=%s protocol=%s exact_sha256=%s promise_about=%s", record.Status, record.ProtocolName, record.ExactHash, record.PromiseAbout))
+	return record.Key
+}
+
+// resolveOutstandingPromise records the local outcome of a previously journaled
+// promise without itself deciding whether peer trust should change.
+// Intent: Promise resolution evidence and trust mutation are deliberately
+// separate so duplicate, local-failure, and non-commitment cases stay visible
+// without being treated as broken peer promises. Source: DI-vujob
+func (node *Node) resolveOutstandingPromise(recordKey string, status promiseStatus, detail string) {
+	if recordKey == "" {
+		return
+	}
+	node.mu.Lock()
+	record, exists := node.promiseJournal[recordKey]
+	if exists {
+		record.Status = status
+		node.promiseJournal[recordKey] = record
+	}
+	node.mu.Unlock()
+	if !exists {
+		node.record("promise_resolution_unmatched", promiseStatusOutcome(status), "", "status="+string(status)+" detail="+detail)
+		return
+	}
+	node.record("promise_resolved", promiseStatusOutcome(status), record.Peer, fmt.Sprintf("status=%s protocol=%s exact_sha256=%s promise_about=%s detail=%s", status, record.ProtocolName, record.ExactHash, record.PromiseAbout, detail))
+}
+
+// recordLocalResourceExhaustion records this app's own inability or refusal to
+// spend local resources without changing trust in the target peer.
+// Intent: Alice exhausting Alice's budget or capacity is evidence about Alice's
+// local state, not evidence that Bob kept or broke a promise. Source: DI-vujob
+func (node *Node) recordLocalResourceExhaustion(target string, fields map[string]string, detail string) {
+	resourceName := resourceField(fields)
+	if resourceName == "" {
+		resourceName = fields["field_promise_about"]
+	}
+	node.record("local_resource_exhausted", "non_commitment", target, "resource="+resourceName+" detail="+detail)
+}
+
+// suppressRepeatedPromise avoids sending the same live-agent promise text to the
+// same target/protocol once this app already has journal evidence for it.
+// Intent: Repetition after a prior promise outcome creates pressure that looks
+// RPC-like; POC12 should instead record local non-commitment and wait for a new
+// promise meaning. Source: DI-vujob
+func (node *Node) suppressRepeatedPromise(target string, fields map[string]string) bool {
+	protocolName, _ := node.protocolForFields(fields)
+	fingerprint := promiseRecordKey(target, protocolName, "", fields)
+	node.mu.Lock()
+	repeated := false
+	for _, record := range node.promiseJournal {
+		if record.Fingerprint == fingerprint && record.Status != promiseStatusLocalFailure {
+			repeated = true
+			break
+		}
+	}
+	node.mu.Unlock()
+	if !repeated {
+		return false
+	}
+	node.record("promise_repeated_suppressed", "non_commitment", target, "protocol="+protocolName+" promise_about="+fields["field_promise_about"])
+	return true
+}
+
 func repairErrDetail(validateErr error) string {
 	return "repaired common live decision formatting issue: " + validateErr.Error()
 }
@@ -814,23 +967,42 @@ func (err ackOutcomeError) Error() string {
 	return fmt.Sprintf("ack outcome %q", err.outcome)
 }
 
-// outcomeForSendError converts a transport or ACK failure into the local
-// relationship outcome it actually supports.
+// outcomeForSendError converts a transport or ACK failure into the peer-trust
+// outcome it actually supports.
 // Intent: A receiver's `not_promised` ACK is evidence of non-commitment, not a
-// broken peer promise; only explicit broken/malformed evidence should carry a
-// trust penalty. Source: DI-jinoz
-func outcomeForSendError(err error) relationship.Outcome {
+// broken peer promise; local transport failures are not peer evidence at all.
+// Source: DI-jinoz; DI-vujob
+func outcomeForSendError(err error) (relationship.Outcome, bool) {
 	var ackErr ackOutcomeError
 	if !errors.As(err, &ackErr) {
-		return relationship.OutcomeBroken
+		return relationship.OutcomeNonCommitment, false
 	}
 	switch ackErr.outcome {
 	case "not_promised", string(relationship.OutcomeNonCommitment):
-		return relationship.OutcomeNonCommitment
+		return relationship.OutcomeNonCommitment, false
 	case string(relationship.OutcomeMalformed):
-		return relationship.OutcomeMalformed
+		return relationship.OutcomeMalformed, true
 	default:
-		return relationship.OutcomeBroken
+		return relationship.OutcomeBroken, true
+	}
+}
+
+// sendEventForError names send failures without collapsing local transport
+// failure, receiver non-commitment, and explicit malformed/broken ACKs.
+// Intent: Analyzer output and logs should show why a send did not complete
+// without implying a peer broke a promise it never made. Source: DI-vujob
+func sendEventForError(err error) (string, string) {
+	var ackErr ackOutcomeError
+	if !errors.As(err, &ackErr) {
+		return "send_unavailable", "non_commitment"
+	}
+	switch ackErr.outcome {
+	case "not_promised", string(relationship.OutcomeNonCommitment):
+		return "send_not_promised", "non_commitment"
+	case string(relationship.OutcomeMalformed):
+		return "send_failed", string(relationship.OutcomeMalformed)
+	default:
+		return "send_failed", string(relationship.OutcomeBroken)
 	}
 }
 
@@ -852,6 +1024,54 @@ func outcomeForPromise(fields map[string]string) relationship.Outcome {
 // checkpoint. Source: DI-jinoz
 func evidenceUpdatesTrust(fields map[string]string) bool {
 	return fields == nil || fields[duplicateShipmentEvidenceField] != "true"
+}
+
+// promiseRecordKey uses exact bytes for concrete promise instances and promise
+// text/about fields for repeat-suppression fingerprints before bytes exist.
+// Intent: POC12 needs exact-byte promise accounting for real sends while still
+// detecting repeated live-agent promise intent before sending again. Source:
+// DI-vujob
+func promiseRecordKey(peerName, protocolName, exactHash string, fields map[string]string) string {
+	if exactHash != "" {
+		return peerName + "|" + protocolName + "|" + exactHash
+	}
+	return peerName + "|" + protocolName + "|" + fields["field_promise_about"] + "|" + fields["promise"]
+}
+
+// promiseStatusOutcome maps journal-only statuses into the small outcome
+// vocabulary used by existing POC12 logs and analyzer summaries.
+// Intent: Local failures and non-commitments should remain non-commitment in
+// reports, while duplicate evidence stays kept-but-non-mutating. Source:
+// DI-vujob
+func promiseStatusOutcome(status promiseStatus) string {
+	switch status {
+	case promiseStatusBroken:
+		return string(relationship.OutcomeBroken)
+	case promiseStatusMalformed:
+		return string(relationship.OutcomeMalformed)
+	case promiseStatusNonCommitment, promiseStatusLocalFailure:
+		return string(relationship.OutcomeNonCommitment)
+	default:
+		return string(relationship.OutcomeKept)
+	}
+}
+
+// promiseStatusFromOutcome keeps relationship outcomes and journal statuses
+// aligned at the boundary where a real ACK or inbound promise is resolved.
+// Intent: The journal records the same kept/broken/malformed/non-commitment
+// distinction that peer trust code uses, but the journal record happens first.
+// Source: DI-vujob
+func promiseStatusFromOutcome(outcome relationship.Outcome) promiseStatus {
+	switch outcome {
+	case relationship.OutcomeBroken:
+		return promiseStatusBroken
+	case relationship.OutcomeMalformed:
+		return promiseStatusMalformed
+	case relationship.OutcomeNonCommitment:
+		return promiseStatusNonCommitment
+	default:
+		return promiseStatusKept
+	}
 }
 
 func shipmentUpdateKey(orderID, trackingNumber string, costCents int) string {

@@ -157,6 +157,49 @@ Affects: `implementations/poc12-production-progress/**`;
 `DEV-GUIDE-RESOURCES.md`;
 `protocols/wire-lab.d/TODO/TODO-dunoz-poc12-production-progress.md`.
 
+ID: DI-vujob
+Date: 2026-06-05 06:25:02
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Implement the remaining promise-trust correctness improvements
+in-place in POC12 rather than deferring them to POC13. Add an app-local
+outstanding promise journal inside the POC12 runtime, record local
+budget/capacity exhaustion as local resource evidence rather than peer trust
+evidence, classify local transport/kernel send failures separately from
+receiver non-commitment and explicit peer break/malformed acknowledgements,
+deduplicate repeated live-agent promise text per target/protocol, add analyzer
+counts that flag trust transitions adjacent to local resource exhaustion, and
+add deterministic regression coverage for duplicate shipment updates across the
+same app message path used by Docker.
+Intent: POC12 is the current executable evidence for kernel/app boundaries,
+shipping workflow, live autonomy, and local trust. Keeping these corrections in
+POC12 makes the evidence model coherent before further POCs build on it: trust
+should change because a locally tracked promise was kept, broken, malformed, or
+accepted as discovery evidence, not because this agent ran out of capacity,
+failed to connect to its own kernel, repeated a promise, or saw a receiver
+decline an exchange it never promised to accept.
+Constraints: Do not add new pCIDs, top-level action kinds, RPC verbs, durable
+queues, protocol-level idempotency layers, kernel-owned trust, service-registry
+authority, Docker network mutation, or envelope-shape changes. The promise
+journal is in-memory and app-local for POC12. Naming is locked to
+`promiseJournal`, `promiseRecord`, `promiseStatus`, `rememberOutstandingPromise`,
+`resolveOutstandingPromise`, `recordLocalResourceExhaustion`, and
+`suppressRepeatedPromise`, with supporting status constants named
+`promiseStatusOutstanding`, `promiseStatusKept`, `promiseStatusBroken`,
+`promiseStatusMalformed`, `promiseStatusNonCommitment`,
+`promiseStatusDuplicate`, and `promiseStatusLocalFailure`; supporting helper
+names are locked to `promiseRecordKey`, `promiseStatusOutcome`,
+`promiseStatusFromOutcome`, `outcomeForSendError`, and `sendEventForError`.
+Path scope is limited to
+`implementations/poc12-production-progress/**`, `DEV-GUIDE-RESOURCES.md`, and
+this TODO file.
+Affects: `implementations/poc12-production-progress/**`;
+`implementations/poc12-production-progress/README.md`;
+`DEV-GUIDE-RESOURCES.md`;
+`protocols/wire-lab.d/TODO/TODO-dunoz-poc12-production-progress.md`.
+Supersedes: DI-jinoz for the local resource exhaustion and outstanding-promise
+journal scope only.
+
 ## Prior aliases
 
 - None.
@@ -192,6 +235,8 @@ Affects: `implementations/poc12-production-progress/**`;
   local app processes with app-owned trust and promise judgment.
 - [x] dunoz.16 Correct post-split POC12 non-commitment trust semantics,
   provider-error evidence classification, and duplicate shipment checkpoints.
+- [x] dunoz.17 Implement in-place POC12 promise journal, local resource
+  exhaustion separation, repeated-promise suppression, and analyzer checks.
 
 ## Implementation status
 
@@ -212,9 +257,11 @@ the local kernel over loopback TCP; the kernel routes exact pCID-selected
 envelopes and records operational delivery evidence only. Apps retain trust,
 workflow, device behavior, and promise judgment. Validation run on 2026-06-05
 after `DI-galin`: `go test ./...` passed with
-`GOCACHE=/tmp/wire-lab-gocache`; a fresh Docker run is still needed before the
-post-split process model is treated as live-run evidence. Source: `DI-timah`;
-`DI-bikit`; `DI-parok`; `DI-gagok`; `DI-galin`.
+`GOCACHE=/tmp/wire-lab-gocache`; at that point a fresh Docker run was still
+needed before the post-split process model could be treated as live-run
+evidence. Later `DI-jinoz` and `DI-vujob` runs satisfied that need. Source:
+`DI-timah`; `DI-bikit`; `DI-parok`; `DI-gagok`; `DI-galin`; `DI-jinoz`;
+`DI-vujob`.
 
 After the clean post-split run exposed false trust drift, `DI-jinoz` corrected
 POC12 evidence semantics: non-commitment and `not_promised` acknowledgements are
@@ -230,3 +277,18 @@ Shipping evidence appeared once for address, weight, label, and accounting
 update/confirmation. Remaining concern: the monitor still saw some trust changes
 that appear tied to local budget/capacity exhaustion rather than peer evidence.
 Source: `DI-jinoz`.
+
+`DI-vujob` keeps those remaining corrections in POC12. Validation run on
+2026-06-05 after `DI-vujob`: POC12 `go test ./...`, `go vet ./...`,
+`errcheck ./...`, and `git diff --check` passed with
+`GOCACHE=/tmp/wire-lab-gocache`. The fresh Docker run
+`poc12-vujob-20260605-063213` exited cleanly, and analyzer output reported 598
+events with 569 kept and 29 non-commitment outcomes. The run recorded 86
+`promise_outstanding` events, 86 `promise_resolved` events, 7
+`local_resource_exhausted` events, 6 `send_not_promised` events, 4
+`promise_repeated_suppressed` events, and no broken outcomes. Duplicate shipment
+checkpointing was exercised through the real app/kernel path with one
+`accounting_update_duplicate` and one `accounting_update_duplicate_confirmed`
+event. Analyzer `resource_trust_coupling_counts` was empty, which is the
+intended regression check that local capacity/budget exhaustion did not
+immediately leak into peer-trust transitions. Source: `DI-vujob`.

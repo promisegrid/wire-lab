@@ -75,6 +75,24 @@ func TestResourcePromiseChecksLocalCapacity(t *testing.T) {
 	}
 }
 
+func TestLocalResourceExhaustionDoesNotTouchPeerTrust(t *testing.T) {
+	cfg := twoNodeTestConfig(t)
+	cfg.Agents[0].Capacity = 0
+	alice := NewNode(cfg, cfg.Agents[0], &decision.FakeDecider{}, decision.FakeMonitor{})
+	if err := alice.runTurn(context.Background(), 0); err != nil {
+		t.Fatalf("run turn: %v", err)
+	}
+	if alice.ledger.Trust("bob") != 0 {
+		t.Fatalf("local exhaustion changed peer trust to %d, want 0", alice.ledger.Trust("bob"))
+	}
+	if hasEvent(alice.events, string(relationship.TransitionUnchanged)) {
+		t.Fatalf("local exhaustion should not create peer trust transition evidence: %#v", alice.events)
+	}
+	if !hasEvent(alice.events, "local_resource_exhausted") {
+		t.Fatalf("local exhaustion should be recorded locally: %#v", alice.events)
+	}
+}
+
 func TestBrokenPromiseStakeCostReducesBudget(t *testing.T) {
 	cfg := twoNodeTestConfig(t)
 	alice := NewNode(cfg, cfg.Agents[0], &decision.FakeDecider{}, decision.FakeMonitor{})
@@ -85,9 +103,47 @@ func TestBrokenPromiseStakeCostReducesBudget(t *testing.T) {
 }
 
 func TestNotPromisedAckStaysNonCommitment(t *testing.T) {
-	outcome := outcomeForSendError(ackOutcomeError{outcome: "not_promised"})
+	outcome, updatesPeerTrust := outcomeForSendError(ackOutcomeError{outcome: "not_promised"})
 	if outcome != relationship.OutcomeNonCommitment {
 		t.Fatalf("not_promised outcome = %s, want %s", outcome, relationship.OutcomeNonCommitment)
+	}
+	if updatesPeerTrust {
+		t.Fatalf("not_promised should not update peer trust")
+	}
+	eventName, eventOutcome := sendEventForError(ackOutcomeError{outcome: "not_promised"})
+	if eventName != "send_not_promised" || eventOutcome != "non_commitment" {
+		t.Fatalf("not_promised send event = %s/%s, want send_not_promised/non_commitment", eventName, eventOutcome)
+	}
+}
+
+func TestLocalSendFailureDoesNotUpdatePeerTrust(t *testing.T) {
+	outcome, updatesPeerTrust := outcomeForSendError(context.DeadlineExceeded)
+	if outcome != relationship.OutcomeNonCommitment {
+		t.Fatalf("local send failure outcome = %s, want %s", outcome, relationship.OutcomeNonCommitment)
+	}
+	if updatesPeerTrust {
+		t.Fatalf("local send failure should not update peer trust")
+	}
+	eventName, eventOutcome := sendEventForError(context.DeadlineExceeded)
+	if eventName != "send_unavailable" || eventOutcome != "non_commitment" {
+		t.Fatalf("local send failure event = %s/%s, want send_unavailable/non_commitment", eventName, eventOutcome)
+	}
+}
+
+func TestRepeatedPromiseSuppressedAfterJournalEvidence(t *testing.T) {
+	cfg := twoNodeTestConfig(t)
+	alice := NewNode(cfg, cfg.Agents[0], &decision.FakeDecider{}, decision.FakeMonitor{})
+	fields := map[string]string{
+		"promise":             "I promise to send one repeated relationship promise.",
+		"field_promise_about": "local_observation",
+	}
+	recordKey := alice.rememberOutstandingPromise("bob", pcid.RelationshipV1, "exact", fields)
+	alice.resolveOutstandingPromise(recordKey, promiseStatusKept, "test")
+	if !alice.suppressRepeatedPromise("bob", fields) {
+		t.Fatalf("expected repeated promise to be suppressed")
+	}
+	if !hasEvent(alice.events, "promise_repeated_suppressed") {
+		t.Fatalf("suppressed repeat should be visible in local evidence: %#v", alice.events)
 	}
 }
 

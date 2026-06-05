@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"strings"
 
 	"promisegrid.dev/wire-lab/implementations/poc12-production-progress/decision"
 )
@@ -23,6 +24,8 @@ type RunSummary struct {
 	FailureCounts                map[string]int          `json:"failure_counts"`
 	ShippingCounts               map[string]int          `json:"shipping_counts"`
 	RelationshipTransitionCounts map[string]int          `json:"relationship_transition_counts"`
+	LocalResourceCounts          map[string]int          `json:"local_resource_counts"`
+	ResourceTrustCouplingCounts  map[string]int          `json:"resource_trust_coupling_counts"`
 	MonitorReport                *decision.MonitorReport `json:"monitor_report,omitempty"`
 }
 
@@ -57,6 +60,8 @@ func analyzeRun(runDir string) (RunSummary, error) {
 		FailureCounts:                make(map[string]int),
 		ShippingCounts:               make(map[string]int),
 		RelationshipTransitionCounts: make(map[string]int),
+		LocalResourceCounts:          make(map[string]int),
+		ResourceTrustCouplingCounts:  make(map[string]int),
 	}
 	logPaths, globErr := filepath.Glob(filepath.Join(runDir, "*.jsonl"))
 	if globErr != nil {
@@ -88,6 +93,8 @@ func summarizeLog(logPath string, summary *RunSummary) error {
 		}
 	}()
 	scanner := bufio.NewScanner(logFile)
+	var previousEvent decision.Event
+	hasPreviousEvent := false
 	for scanner.Scan() {
 		var event decision.Event
 		if err := json.Unmarshal(scanner.Bytes(), &event); err != nil {
@@ -106,6 +113,14 @@ func summarizeLog(logPath string, summary *RunSummary) error {
 		if isRelationshipTransition(event.Event) {
 			summary.RelationshipTransitionCounts[event.Event]++
 		}
+		if isLocalResourceEvent(event) {
+			summary.LocalResourceCounts[event.Event]++
+		}
+		if hasPreviousEvent && isResourceTrustCoupling(previousEvent, event) {
+			summary.ResourceTrustCouplingCounts[event.Observer]++
+		}
+		previousEvent = event
+		hasPreviousEvent = true
 	}
 	if err := scanner.Err(); err != nil {
 		return err
@@ -115,7 +130,7 @@ func summarizeLog(logPath string, summary *RunSummary) error {
 
 func isShippingEvent(eventName string) bool {
 	switch eventName {
-	case "package_weighed", "package_weight_received", "shipping_address_promised", "shipping_address_received", "shipping_label_printed", "shipping_label_received", "accounting_updated", "accounting_update_confirmed":
+	case "package_weighed", "package_weight_received", "shipping_address_promised", "shipping_address_received", "shipping_label_printed", "shipping_label_received", "accounting_updated", "accounting_update_confirmed", "accounting_update_duplicate", "accounting_update_duplicate_confirmed":
 		return true
 	default:
 		return false
@@ -129,6 +144,36 @@ func isRelationshipTransition(eventName string) bool {
 	default:
 		return false
 	}
+}
+
+// isLocalResourceEvent recognizes evidence about the observing app's own
+// budget/capacity state.
+// Intent: Analyzer output should make it visible if local resource exhaustion is
+// accidentally coupled back into peer trust transitions. Source: DI-vujob
+func isLocalResourceEvent(event decision.Event) bool {
+	if event.Event == "local_resource_exhausted" {
+		return true
+	}
+	if event.Event == "promise_withheld" && (strings.Contains(event.Detail, "budget exhausted") || strings.Contains(event.Detail, "capacity exhausted")) {
+		return true
+	}
+	if event.Event == "resource_promise_broken" && strings.Contains(event.Detail, "local") {
+		return true
+	}
+	return false
+}
+
+// isResourceTrustCoupling reports suspicious adjacency between local resource
+// exhaustion and peer relationship transitions for one observer.
+// Intent: This is a regression tripwire; local budget/capacity state should not
+// immediately mutate peer trust without intervening promise evidence. Source:
+// DI-vujob
+func isResourceTrustCoupling(previousEvent, event decision.Event) bool {
+	if previousEvent.Observer != event.Observer {
+		return false
+	}
+	return (isRelationshipTransition(previousEvent.Event) && isLocalResourceEvent(event)) ||
+		(isLocalResourceEvent(previousEvent) && isRelationshipTransition(event.Event))
 }
 
 func readMonitorReport(reportPath string) (*decision.MonitorReport, error) {

@@ -28,6 +28,10 @@ and updates `accounting` with cost and tracking evidence. Source: `DI-timah`;
   evidence, provider/runtime decision failures stay local, and duplicate
   shipment updates are checkpointed without repeated trust inflation.
   Source: `DI-jinoz`.
+- App-local promise journal: POC12 now records an outstanding promise before
+  applying kept/broken/malformed trust evidence, separates `send_unavailable`
+  from `send_not_promised`, suppresses repeated live-agent promises, and keeps
+  local budget/capacity exhaustion out of peer trust. Source: `DI-vujob`.
 
 ## Protocol Shape
 
@@ -108,3 +112,21 @@ package weight, label printing, and accounting update/confirmation. The monitor
 still flagged a real remaining concern: some trust changes are driven by local
 budget/capacity exhaustion and should be separated from peer trust in a later
 POC. Source: `DI-jinoz`.
+
+`DI-vujob` keeps those follow-up corrections in POC12. The runtime now records
+`promise_outstanding` before resolving local promise evidence, records
+`promise_resolved` before applying trust effects, treats local send failures as
+`send_unavailable`, treats receiver non-commitment as `send_not_promised`,
+records `local_resource_exhausted` without changing peer trust, and suppresses
+repeated live-agent promise text for the same target/protocol. The startup
+shipping workflow intentionally repeats the accounting update once so Docker
+runs exercise duplicate shipment checkpointing through the real app/kernel path.
+The analyzer reports `local_resource_counts` and
+`resource_trust_coupling_counts` so future runs can show whether local
+budget/capacity state is leaking back into peer-trust transitions. The
+2026-06-05 `poc12-vujob-20260605-063213` Docker run exited cleanly and analyzed
+to 598 events: 569 kept, 29 non-commitment, 86 `promise_outstanding`, 86
+`promise_resolved`, 7 `local_resource_exhausted`, 6 `send_not_promised`, 4
+`promise_repeated_suppressed`, 1 `accounting_update_duplicate`, 1
+`accounting_update_duplicate_confirmed`, and empty
+`resource_trust_coupling_counts`. Source: `DI-vujob`.
