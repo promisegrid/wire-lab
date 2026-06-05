@@ -101,6 +101,35 @@ provider logs, Docker volume state, secrets, or local runtime config.
 Affects: `DEV-GUIDE-RESOURCES.md`;
 `protocols/wire-lab.d/TODO/TODO-dunoz-poc12-production-progress.md`.
 
+ID: DI-galin
+Date: 2026-06-05 05:10:59
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Refactor POC12 so every app is a separate local process with its own
+command entrypoint, every container runs one separate `poc12-kernel` process,
+and apps communicate with that local kernel over loopback TCP using the same
+length-framed `grid([42(pCID), ...])` envelope format used between kernels.
+The kernel owns only transport, pCID parsing, local receive-promise
+registration, exact-byte routing to app processes, peer forwarding, and
+operational delivery evidence. Apps own trust, promise interpretation,
+keep/break/non-commitment judgments, relationship ledgers, deterministic device
+behavior, shipping workflow behavior, and provider-backed autonomy.
+Intent: POC12 had drifted back toward a combined agent/kernel process and risked
+making the kernel look like a trust ledger, service registry, RPC authority, or
+business workflow engine. PromiseGrid apps are local processes that promise to
+handle pCIDs; the kernel should only carry exact messages between local app
+processes and peer kernels without pretending to command agents or judge trust.
+Constraints: Do not add a generic `poc12-app` entrypoint. Do not add new
+top-level acts, RPC verbs, idempotency layers, durable queues, retry/backoff
+machinery, trust clamping, service-registry authority, or changes to pCID
+semantics or envelope shape. Keep a single semantic act, `promise`, and keep
+the local receive-promise protocol as promise content under one pCID.
+Affects: `implementations/poc12-production-progress/**`;
+`implementations/README.md`; `DEV-GUIDE-RESOURCES.md`;
+`protocols/wire-lab.d/TODO/TODO-dunoz-poc12-production-progress.md`.
+Supersedes: DI-timah for the app/kernel process boundary; DI-bikit for where
+pCID routing responsibility lives.
+
 ## Prior aliases
 
 - None.
@@ -132,6 +161,8 @@ Affects: `DEV-GUIDE-RESOURCES.md`;
 - [x] dunoz.13 Make the fulfillment workflow produce concrete pCID-routed
   shipping evidence during live Docker validation.
 - [x] dunoz.14 Record the latest POC12 assessment in guide resources.
+- [x] dunoz.15 Split POC12 into one kernel process per container and separate
+  local app processes with app-owned trust and promise judgment.
 
 ## Implementation status
 
@@ -146,4 +177,12 @@ weighed/received, label printed/received, and accounting updated/confirmed.
 The guide assessment now records the transaction details, Promise Theory fit,
 remaining imposition/alignment risks, incentives, autonomy status, dynamic TCP
 relationship evidence, shipping-message details, and next POC pressure points.
-Source: `DI-timah`; `DI-bikit`; `DI-parok`; `DI-gagok`.
+The implementation now also has a separate `poc12-kernel` process per container
+and separate local app command entrypoints. Apps register receive promises with
+the local kernel over loopback TCP; the kernel routes exact pCID-selected
+envelopes and records operational delivery evidence only. Apps retain trust,
+workflow, device behavior, and promise judgment. Validation run on 2026-06-05
+after `DI-galin`: `go test ./...` passed with
+`GOCACHE=/tmp/wire-lab-gocache`; a fresh Docker run is still needed before the
+post-split process model is treated as live-run evidence. Source: `DI-timah`;
+`DI-bikit`; `DI-parok`; `DI-gagok`; `DI-galin`.

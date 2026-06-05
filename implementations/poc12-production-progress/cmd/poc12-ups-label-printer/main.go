@@ -22,7 +22,7 @@ func main() {
 
 func run() error {
 	configPath := flag.String("config", "config.json", "POC12 config path")
-	nodeName := flag.String("node", "", "agent node name")
+	nodeName := flag.String("node", "", "UPS label printer app name")
 	flag.Parse()
 	if *nodeName == "" {
 		return fmt.Errorf("-node is required")
@@ -35,9 +35,12 @@ func run() error {
 	if !ok {
 		return fmt.Errorf("unknown node %q", *nodeName)
 	}
-	// Intent: Live runtime uses the config-selected provider and API-key
-	// environment variable, while tests instantiate FakeDecider directly.
-	// Source: DI-timah
+	if agent.Kind != "ups_label_printer" {
+		return fmt.Errorf("node %q is kind %q, want ups_label_printer", agent.Name, agent.Kind)
+	}
+	// Intent: The label printer remains an app process that promises label,
+	// cost, and tracking evidence; the kernel only delivers its pCID frames.
+	// Source: DI-galin
 	liveClient := decision.NewLiveClient(
 		cfg.ProviderBaseURL,
 		cfg.APIKeyEnv,

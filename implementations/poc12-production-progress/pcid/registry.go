@@ -8,17 +8,18 @@ import (
 )
 
 const (
-	RelationshipV1 = "relationship_v1"
-	PostalScaleV1  = "postal_scale_v1"
-	UPSLabelV1     = "ups_label_v1"
-	AccountingV1   = "accounting_v1"
+	RelationshipV1  = "relationship_v1"
+	PostalScaleV1   = "postal_scale_v1"
+	UPSLabelV1      = "ups_label_v1"
+	AccountingV1    = "accounting_v1"
+	KernelReceiveV1 = "kernel_receive_v1"
 )
 
 // Registry is the POC12 kernel's local pCID table. It is not a central service
 // registry; it is only the local mapping from known protocol-spec names to
 // content-derived pCIDs used by this executable experiment.
-// Intent: Test slot-0 pCID routing to local handlers while keeping pCIDs as
-// protocol-spec identities, not message-type selectors. Source: DI-bikit
+// Intent: Test slot-0 pCID routing to app receive promises while keeping pCIDs
+// as protocol-spec identities, not message-type selectors. Source: DI-galin
 type Registry struct {
 	byName map[string]protocol.ProtocolCID
 	byCID  map[string]string
@@ -40,6 +41,7 @@ func NewRegistry() Registry {
 		{PostalScaleV1, "poc12 postal scale package weighing protocol v1"},
 		{UPSLabelV1, "poc12 ups label printing cost tracking protocol v1"},
 		{AccountingV1, "poc12 accounting address lookup shipment update protocol v1"},
+		{KernelReceiveV1, "poc12 local app receive promise registration protocol v1"},
 	} {
 		registry.register(entry.name, protocol.NewProtocolCID([]byte(entry.spec)))
 	}

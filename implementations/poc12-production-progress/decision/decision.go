@@ -162,7 +162,7 @@ func Fields(observation Observation, decision PromiseDecision) map[string]string
 // Prompt renders a compact prompt for live LLM decisions.
 // Intent: The prompt mirrors the strict provider schema while preserving the
 // single top-level promise action and Go-owned CBOR/signature boundary.
-// Source: DI-timah
+// Source: DI-timah; DI-galin
 func Prompt(observation Observation) (string, error) {
 	encoded, err := json.MarshalIndent(observation, "", "  ")
 	if err != nil {
@@ -176,7 +176,7 @@ func Prompt(observation Observation) (string, error) {
 		"Use protocol=relationship_v1 for trust/discovery/observation promises, protocol=postal_scale_v1 for package weighing, protocol=accounting_v1 for address lookup or shipment updates, and protocol=ups_label_v1 for label/cost/tracking promises. " +
 		"Use resource=storage or resource=compute only when you personally promise fulfillment capacity, not when you advertise a need. " +
 		"The only valid top-level act is promise. Put refusal, repair, observation, economics, and link-preference meaning inside the promise text or the fields key/value list. " +
-		"Do not create action kinds. Do not claim authority over other agents. Do not write CBOR or signatures; the kernel encodes and signs the pCID-defined envelope.\n\nLocal observation:\n" +
+		"Do not create action kinds. Do not claim authority over other agents. Do not write CBOR or signatures; implementation code encodes and signs the pCID-defined envelope before the local kernel routes exact bytes.\n\nLocal observation:\n" +
 		string(encoded), nil
 }
 

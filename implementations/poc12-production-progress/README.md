@@ -5,14 +5,18 @@ deterministic production device/system agents. It keeps the POC11 sparse mesh an
 adds a shipping workflow: `fulfillment` weighs a package with `postal_scale`,
 gets an address from `accounting`, prints a UPS label with `ups_label_printer`,
 and updates `accounting` with cost and tracking evidence. Source: `DI-timah`;
-`DI-bikit`.
+`DI-bikit`; `DI-galin`.
 
 ## What This Tests
 
-- Multiple pCIDs in one runtime: `relationship_v1`, `postal_scale_v1`,
-  `ups_label_v1`, and `accounting_v1`.
-- Kernel-style pCID routing: the node parses slot 0 `42(pCID)` and dispatches to
-  a local handler that promises to handle that protocol.
+- Multiple app pCIDs through one local container kernel: `relationship_v1`,
+  `postal_scale_v1`, `ups_label_v1`, and `accounting_v1`.
+- Real app/kernel process boundary: each container runs one `poc12-kernel`
+  process plus separate local app processes for relationship, fulfillment,
+  postal scale, UPS label printer, and accounting roles.
+- Kernel-style pCID routing: the kernel parses slot 0 `42(pCID)`, checks local
+  app receive promises, and delivers exact bytes to the app process that
+  promised the target pCID.
 - Deterministic device/system agents for scale, label printer, and accounting
   alongside live LLM business/social agents.
 - One top-level semantic act, `promise`; workflow steps are payload meanings,
@@ -34,15 +38,21 @@ payload meanings inside their protocol, not separate pCIDs. Source: `DI-bikit`.
 
 ## Shipping Agents
 
-- `fulfillment`: hybrid workflow coordinator that executes one deterministic
+- `poc12-fulfillment`: hybrid workflow coordinator that executes one deterministic
   startup shipment sequence across the production pCIDs, then continues normal
-  live LLM relationship turns.
-- `postal_scale`: deterministic handler for `postal_scale_v1`; promises package
-  weight evidence only.
-- `ups_label_printer`: deterministic handler for `ups_label_v1`; promises label,
-  cost, and tracking evidence only.
-- `accounting`: deterministic handler for `accounting_v1`; promises address
+  live LLM relationship turns. It sends shipping pCIDs but receives only the
+  relationship pCID in this POC.
+- `poc12-postal-scale`: deterministic app for `postal_scale_v1`; promises
+  package weight evidence only.
+- `poc12-ups-label-printer`: deterministic app for `ups_label_v1`; promises
+  label, cost, and tracking evidence only.
+- `poc12-accounting`: deterministic app for `accounting_v1`; promises address
   lookup and shipment update evidence only.
+- `poc12-relationship-agent`: generic live LLM relationship app for
+  `relationship_v1`.
+- `poc12-kernel`: container-local transport process that records operational
+  routing evidence only; it does not own trust, workflow, device behavior, or
+  promise judgment. Source: `DI-galin`.
 
 ## Run
 
@@ -69,7 +79,11 @@ volume state are ignored and must not be committed.
 POC12 is provisional executable evidence, not a stable shipping, device,
 accounting, kernel-routing, monitor, trust, provider, or workflow API. Docker
 networking remains static; dynamic TCP relationships are local promises to dial
-or accept direct exchanges. The fulfillment startup sequence is a POC guardrail
-so the run produces concrete pCID-routed shipment evidence instead of relying on
-a live LLM to choose that sequence unaided. Source: `DI-timah`; `DI-bikit`;
-`DI-parok`.
+or accept direct exchanges between app agents, carried by local kernels. The
+kernel records only app receive-promise registration, exact-byte delivery,
+peer-forwarding, unregistered pCID, and transport outcomes. Apps own trust,
+keep/break/non-commitment judgment, relationship ledgers, workflow state, and
+deterministic device/system behavior. The fulfillment startup sequence is a POC
+guardrail so the run produces concrete pCID-routed shipment evidence instead of
+relying on a live LLM to choose that sequence unaided. Source: `DI-timah`;
+`DI-bikit`; `DI-parok`; `DI-galin`.

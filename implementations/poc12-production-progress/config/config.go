@@ -57,9 +57,11 @@ type AgentConfig struct {
 	SupportedPCIDs []string `json:"supported_pcids"`
 }
 
-// ContainerConfig names the agents that share one Docker container and kernel
-// supervisor. Each agent still runs as a separate process with its own TCP
-// listener and local relationship ledger.
+// ContainerConfig names the app processes that share one Docker container and
+// one local kernel process. Each app still owns its relationship ledger and
+// promise judgment; the kernel only routes exact framed envelopes.
+// Intent: Preserve the local-process app/kernel boundary instead of folding app
+// trust or workflow policy into the container kernel. Source: DI-galin
 type ContainerConfig struct {
 	Name   string   `json:"name"`
 	Agents []string `json:"agents"`
@@ -219,10 +221,10 @@ func (cfg Config) TurnDelay() time.Duration {
 	return time.Duration(cfg.TurnDelayMillis) * time.Millisecond
 }
 
-// ShutdownGrace returns the listener grace period after active turns finish.
+// ShutdownGrace returns the receive-promise grace period after active turns finish.
 // Intent: Give lagging peers a bounded chance to complete already-planned sends
-// before this node closes its TCP listener and writes done evidence.
-// Source: DI-timah
+// before this app closes its local kernel receive promises and writes done
+// evidence. Source: DI-galin
 func (cfg Config) ShutdownGrace() time.Duration {
 	return time.Duration(cfg.ShutdownGraceMillis) * time.Millisecond
 }
@@ -256,9 +258,12 @@ func (cfg Config) AgentNames() []string {
 	return names
 }
 
-// ListenPortFor gives each agent process a deterministic TCP port inside the
-// container. Intent: Multiple agents can share one container while each keeps a
-// separate local kernel boundary and listener. Source: DI-timah
+// ListenPortFor gives legacy tests a deterministic per-agent TCP port. The live
+// POC12 runtime uses KernelAppPortForContainer and KernelPeerPortForContainer
+// instead so every container has one kernel boundary and local app processes
+// register receive promises with that kernel.
+// Intent: Keep old test helpers stable while moving production POC12 routing to
+// the explicit local kernel/app split. Source: DI-galin
 func (cfg Config) ListenPortFor(agentName string) (int, bool) {
 	for agentIndex, agent := range cfg.Agents {
 		if agent.Name == agentName {
@@ -266,6 +271,59 @@ func (cfg Config) ListenPortFor(agentName string) (int, bool) {
 		}
 	}
 	return 0, false
+}
+
+// ContainerIndex returns the stable index of one configured container.
+func (cfg Config) ContainerIndex(containerName string) (int, bool) {
+	for containerIndex, container := range cfg.Containers {
+		if container.Name == containerName {
+			return containerIndex, true
+		}
+	}
+	return 0, false
+}
+
+// KernelAppPortForContainer returns the loopback port used by local app
+// processes inside one container to promise receive capability and send
+// outbound envelopes through their local kernel.
+// Intent: Apps are local processes; they do not expose peer-listening sockets to
+// other containers, and they do not bypass the local kernel for wire traffic.
+// Source: DI-galin
+func (cfg Config) KernelAppPortForContainer(containerName string) (int, bool) {
+	containerIndex, ok := cfg.ContainerIndex(containerName)
+	if !ok {
+		return 0, false
+	}
+	return cfg.ListenPort + containerIndex*2, true
+}
+
+// KernelPeerPortForContainer returns the Docker-network port used by peer
+// kernels to forward exact framed envelopes into one container.
+// Intent: Kernel-to-kernel TCP carries bytes only; trust and promise judgment
+// remain in app processes after local delivery. Source: DI-galin
+func (cfg Config) KernelPeerPortForContainer(containerName string) (int, bool) {
+	containerIndex, ok := cfg.ContainerIndex(containerName)
+	if !ok {
+		return 0, false
+	}
+	return cfg.ListenPort + containerIndex*2 + 1, true
+}
+
+// KernelAppAddressForAgent returns the loopback address of the local kernel for
+// an app process. It deliberately returns 127.0.0.1 because apps are local
+// processes in the same container as their kernel.
+// Intent: Avoid modeling apps as remote services; app/kernel communication is a
+// local process boundary. Source: DI-galin
+func (cfg Config) KernelAppAddressForAgent(agentName string) (string, bool) {
+	containerName, containerFound := cfg.ContainerForAgent(agentName)
+	if !containerFound {
+		return "", false
+	}
+	appPort, portFound := cfg.KernelAppPortForContainer(containerName)
+	if !portFound {
+		return "", false
+	}
+	return fmt.Sprintf("127.0.0.1:%d", appPort), true
 }
 
 // ContainerForAgent returns the Docker service name that hosts one agent.
@@ -280,7 +338,7 @@ func (cfg Config) ContainerForAgent(agentName string) (string, bool) {
 	return "", false
 }
 
-// EndpointFor resolves the TCP host and port for a target agent.
+// EndpointFor resolves the legacy per-agent endpoint used by older tests.
 func (cfg Config) EndpointFor(agentName string) (string, int, bool) {
 	hostName, hostFound := cfg.ContainerForAgent(agentName)
 	if !hostFound {
@@ -291,6 +349,23 @@ func (cfg Config) EndpointFor(agentName string) (string, int, bool) {
 		return "", 0, false
 	}
 	return hostName, listenPort, true
+}
+
+// KernelPeerEndpointForAgent resolves the peer-kernel endpoint for the
+// container that hosts a target app. Kernels forward by target app name after
+// parsing only enough payload to find the local receiver.
+// Intent: The container kernel remains a transport router, not a service
+// registry authority over app semantics. Source: DI-galin
+func (cfg Config) KernelPeerEndpointForAgent(agentName string) (string, int, bool) {
+	hostName, hostFound := cfg.ContainerForAgent(agentName)
+	if !hostFound {
+		return "", 0, false
+	}
+	peerPort, portFound := cfg.KernelPeerPortForContainer(hostName)
+	if !portFound {
+		return "", 0, false
+	}
+	return hostName, peerPort, true
 }
 
 // CandidatePeersFor returns an agent's candidate peer names in deterministic
@@ -328,10 +403,10 @@ func (agent AgentConfig) Validate() error {
 	return nil
 }
 
-// Protocols returns the protocol pCIDs this agent locally promises to handle.
-// Intent: POC12 tests kernel routing by slot-0 pCID to local handlers; absence
-// defaults to relationship_v1 so older generic agents remain relationship-only.
-// Source: DI-bikit
+// Protocols returns the protocol pCIDs this app locally promises to receive.
+// Intent: POC12 tests kernel routing by slot-0 pCID to app receive promises;
+// absence defaults to relationship_v1 so older generic agents remain
+// relationship-only. Source: DI-galin
 func (agent AgentConfig) Protocols() []string {
 	if len(agent.SupportedPCIDs) == 0 {
 		return []string{pcid.RelationshipV1}

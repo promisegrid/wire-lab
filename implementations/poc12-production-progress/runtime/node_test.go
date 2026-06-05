@@ -25,9 +25,9 @@ func TestNodeWithNoDirectPeersRecordsLocalNonCommitment(t *testing.T) {
 		t.Fatalf("node should record local evidence")
 	}
 	if len(node.events) < 2 {
-		t.Fatalf("node should record server and turn events: %#v", node.events)
+		t.Fatalf("node should record kernel registration and turn events: %#v", node.events)
 	}
-	if node.events[0].Event != "server_skipped" || node.events[1].Event != "local_non_commitment" {
+	if node.events[0].Event != "app_kernel_registration_skipped" || node.events[1].Event != "local_non_commitment" {
 		t.Fatalf("node events did not record local non-commitment: %#v", node.events)
 	}
 }
@@ -196,8 +196,8 @@ func TestSupportedProtocolIsLocalToAgent(t *testing.T) {
 	cfg := shippingTestConfig(t)
 	fulfillment := NewNode(cfg, cfg.Agents[0], &decision.FakeDecider{}, decision.FakeMonitor{})
 	scale := NewNode(cfg, cfg.Agents[1], &decision.FakeDecider{}, decision.FakeMonitor{})
-	if !fulfillment.supportsProtocol(pcid.AccountingV1) {
-		t.Fatalf("fulfillment should support accounting pCID")
+	if fulfillment.supportsProtocol(pcid.AccountingV1) {
+		t.Fatalf("fulfillment should send accounting pCID but should not receive it")
 	}
 	if scale.supportsProtocol(pcid.AccountingV1) {
 		t.Fatalf("postal scale should not support accounting pCID")
@@ -347,7 +347,7 @@ func shippingTestConfig(t *testing.T) config.Config {
 			Motivation:     "ship package",
 			InitialPeers:   []string{"postal_scale", "ups_label_printer", "accounting"},
 			CandidatePeers: []string{"postal_scale", "ups_label_printer", "accounting"},
-			SupportedPCIDs: []string{pcid.RelationshipV1, pcid.PostalScaleV1, pcid.UPSLabelV1, pcid.AccountingV1},
+			SupportedPCIDs: []string{pcid.RelationshipV1},
 			Budget:         5,
 			Capacity:       5,
 		}, {

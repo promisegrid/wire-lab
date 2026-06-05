@@ -5,9 +5,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"net"
 	"os"
 	"path/filepath"
+	"sort"
 	"strconv"
 	"sync"
 	"time"
@@ -27,11 +27,12 @@ const shutdownDrainTimeout = 750 * time.Millisecond
 const fulfillmentOrderID = "ORDER-1001"
 const fulfillmentPackageID = "PKG-1001"
 
-// Node runs one autonomous POC12 agent process. A container may run several
-// Node processes, but each process keeps its own local relationship ledger,
-// listener, log, and live-LLM boundary.
-// Intent: POC12 tests agent autonomy and adaptive TCP adjacency without
-// collapsing co-located agents into a shared authority. Source: DI-timah
+// Node runs one local POC12 app process. A container may run several app
+// processes, but each process keeps its own local relationship ledger, log, and
+// live-LLM boundary while a separate container kernel handles byte routing.
+// Intent: Apps are local processes that promise to handle pCIDs through their
+// local kernel; the kernel does not own app trust or business workflow policy.
+// Source: DI-galin
 type Node struct {
 	Config    config.Config
 	Agent     config.AgentConfig
@@ -43,15 +44,14 @@ type Node struct {
 	events    []decision.Event
 	ledger    *relationship.Ledger
 	evaluator economy.Evaluator
-	listener  net.Listener
 	logFile   *os.File
 	budget    int
 	capacity  int
 
 	activeHandlers sync.WaitGroup
+	receiveConns   []transport.FrameConn
 	stopping       bool
 	drainRecorded  bool
-	listenerDone   chan struct{}
 }
 
 type parsedMessage struct {
@@ -82,8 +82,9 @@ func NewNode(cfg config.Config, agent config.AgentConfig, decider decision.Decid
 	}
 }
 
-// Run executes bounded autonomous turns, writes a done marker, and waits for
-// the observer-only monitor report.
+// Run registers local receive promises with the container kernel, executes
+// bounded autonomous turns, writes a done marker, and waits for the
+// observer-only monitor report.
 func (node *Node) Run(ctx context.Context) error {
 	if err := node.openLog(); err != nil {
 		return err
@@ -92,10 +93,10 @@ func (node *Node) Run(ctx context.Context) error {
 	if err := node.loadRelationshipState(); err != nil {
 		return err
 	}
-	if err := node.maybeStartServer(ctx); err != nil {
+	if err := node.registerReceivePromises(ctx); err != nil {
 		return err
 	}
-	defer node.closeListener()
+	defer node.closeReceivePromises()
 	time.Sleep(node.Config.StartupDelay())
 	if err := node.runStartupWorkflow(ctx); err != nil {
 		node.record("startup_workflow_failed", "broken", "", err.Error())
@@ -110,10 +111,10 @@ func (node *Node) Run(ctx context.Context) error {
 		return err
 	}
 	node.waitForShutdownGrace(ctx)
-	// Intent: Stop accepting new TCP frames before the local done marker is
-	// written so `node_done` does not race with late receive receipts.
-	// Source: DI-timah
-	node.closeListener()
+	// Intent: Stop receiving kernel-delivered frames before the local done
+	// marker is written so `node_done` does not race with late app receipts.
+	// Source: DI-galin
+	node.closeReceivePromises()
 	node.drainInflight(ctx)
 	if err := node.saveRelationshipState(); err != nil {
 		return err
@@ -257,95 +258,133 @@ func (node *Node) runTurn(ctx context.Context, turnIndex int) error {
 	return nil
 }
 
-func (node *Node) maybeStartServer(ctx context.Context) error {
-	listenPort, portFound := node.Config.ListenPortFor(node.Agent.Name)
-	if !portFound || listenPort <= 0 {
-		node.record("server_skipped", "kept", "", "no listener for local-only test run")
+func (node *Node) registerReceivePromises(ctx context.Context) error {
+	if node.Config.ListenPort <= 0 {
+		node.record("app_kernel_registration_skipped", "kept", "", "no local kernel in unit-test config")
 		return nil
 	}
-	address := net.JoinHostPort("", strconv.Itoa(listenPort))
-	listener, err := net.Listen("tcp", address)
-	if err != nil {
-		return err
+	kernelAddress, addressFound := node.Config.KernelAppAddressForAgent(node.Agent.Name)
+	if !addressFound {
+		node.record("app_kernel_registration_skipped", "kept", "", "no local kernel address for app")
+		return nil
 	}
-	node.listener = listener
-	node.listenerDone = make(chan struct{})
-	go node.acceptLoop(ctx, listener, node.listenerDone)
+	for _, protocolName := range node.Agent.Protocols() {
+		if err := node.registerReceivePromise(ctx, kernelAddress, protocolName); err != nil {
+			return err
+		}
+	}
 	return nil
 }
 
-func (node *Node) acceptLoop(ctx context.Context, listener net.Listener, done chan struct{}) {
-	defer close(done)
-	for {
-		conn, err := listener.Accept()
-		if err != nil {
-			if node.isStopping() || errors.Is(err, net.ErrClosed) {
-				node.record("listener_closed", "kept", "", "listener closed during normal shutdown")
-				return
-			}
-			select {
-			case <-ctx.Done():
-				return
-			default:
-				node.record("accept_failed", "broken", "", err.Error())
-				return
-			}
+func (node *Node) registerReceivePromise(ctx context.Context, kernelAddress, protocolName string) error {
+	if ctx.Err() != nil {
+		return ctx.Err()
+	}
+	receiveCID, knownReceiveCID := node.Protocols.CID(pcid.KernelReceiveV1)
+	if !knownReceiveCID {
+		return fmt.Errorf("missing kernel receive pCID")
+	}
+	targetCID, knownTargetCID := node.Protocols.CID(protocolName)
+	if !knownTargetCID {
+		return fmt.Errorf("unknown receive pCID %s", protocolName)
+	}
+	fields := map[string]string{
+		"act":      decision.ActPromise,
+		"from":     node.Agent.Name,
+		"to":       "kernel",
+		"app":      node.Agent.Name,
+		"pcid":     protocolName,
+		"promise":  "I promise to receive exact envelopes for this pCID and judge their promise content locally.",
+		"reason":   "local app receive promise registration",
+		"pcid_cid": targetCID.String(),
+	}
+	envelope, envelopeErr := protocol.NewEnvelope(receiveCID, fields, node.Agent.Name)
+	if envelopeErr != nil {
+		return envelopeErr
+	}
+	envelopeBytes, bytesErr := envelope.Bytes()
+	if bytesErr != nil {
+		return bytesErr
+	}
+	frameConn, dialErr := transport.DialFrameConn(kernelAddress, sendTimeout)
+	if dialErr != nil {
+		return dialErr
+	}
+	if writeErr := frameConn.WriteFrame(envelopeBytes); writeErr != nil {
+		closeErr := frameConn.Close()
+		if closeErr != nil {
+			node.record("app_kernel_register_close_failed", "broken", "kernel", closeErr.Error())
 		}
-		node.activeHandlers.Add(1)
-		go func() {
-			defer node.activeHandlers.Done()
-			node.handleConn(conn)
-		}()
+		return writeErr
+	}
+	node.mu.Lock()
+	node.receiveConns = append(node.receiveConns, frameConn)
+	node.mu.Unlock()
+	node.activeHandlers.Add(1)
+	go node.receiveLoop(protocolName, frameConn)
+	node.record("app_receive_promise_sent", "kept", "kernel", "pcid="+protocolName+" kernel="+kernelAddress)
+	return nil
+}
+
+func (node *Node) receiveLoop(protocolName string, frameConn transport.FrameConn) {
+	defer node.activeHandlers.Done()
+	for {
+		frameBytes, readErr := frameConn.ReadFrame()
+		if readErr != nil {
+			if node.isStopping() {
+				node.record("app_receive_loop_closed", "kept", "kernel", "pcid="+protocolName)
+				return
+			}
+			node.record("app_receive_frame_read_failed", "broken", "kernel", readErr.Error())
+			return
+		}
+		ackBytes, handleErr := node.handleFrame(frameBytes)
+		if handleErr != nil {
+			node.record("app_receive_frame_rejected", "broken", "kernel", handleErr.Error())
+			return
+		}
+		if writeErr := frameConn.WriteFrame(ackBytes); writeErr != nil {
+			node.record("app_receive_ack_write_failed", "broken", "kernel", writeErr.Error())
+			return
+		}
 	}
 }
 
-func (node *Node) handleConn(conn net.Conn) {
-	frameConn := transport.NewFrameConn(conn)
-	defer node.closeFrameConn(frameConn, "conn_close_failed", "")
-	frameBytes, readErr := frameConn.ReadFrame()
-	if readErr != nil {
-		node.record("frame_read_failed", "broken", "", readErr.Error())
-		return
-	}
+func (node *Node) handleFrame(frameBytes []byte) ([]byte, error) {
 	parsed, parseErr := node.parseEnvelope(frameBytes)
 	if parseErr != nil {
 		node.record("frame_parse_failed", "broken", "", parseErr.Error())
-		return
+		return nil, parseErr
 	}
 	fields := parsed.Fields
 	fromAgent := fields["from"]
 	if !node.supportsProtocol(parsed.ProtocolName) {
 		node.observeOutcome(fromAgent, relationship.OutcomeNonCommitment)
-		node.record("unsupported_pcid", "non_commitment", fromAgent, "no local handler promised for "+parsed.ProtocolName)
-		node.writeAck(frameConn, fromAgent, "not_promised", "I promise to remember that I did not promise to handle this pCID.", parsed.ProtocolCID, nil)
-		return
+		node.record("unsupported_pcid", "non_commitment", fromAgent, "no local app receive promise for "+parsed.ProtocolName)
+		return node.newAckBytes(fromAgent, "not_promised", "I promise to remember that I did not promise to handle this pCID.", parsed.ProtocolCID, nil)
 	}
 	if fields["act"] != decision.ActPromise {
 		node.observeOutcome(fromAgent, relationship.OutcomeMalformed)
 		node.record("message_rejected", "malformed", fromAgent, "message act is not promise")
-		node.writeAck(frameConn, fromAgent, "malformed", "I promise I rejected this non-promise message.", parsed.ProtocolCID, nil)
-		return
+		return node.newAckBytes(fromAgent, "malformed", "I promise I rejected this non-promise message.", parsed.ProtocolCID, nil)
 	}
 	if !node.canAcceptFrom(fromAgent, fields) {
 		node.observeOutcome(fromAgent, relationship.OutcomeNonCommitment)
 		node.record("message_not_promised", "non_commitment", fromAgent, "no current local promise to accept direct TCP exchange")
-		node.writeAck(frameConn, fromAgent, "not_promised", "I promise to remember that I did not currently promise this direct exchange.", parsed.ProtocolCID, nil)
-		return
+		return node.newAckBytes(fromAgent, "not_promised", "I promise to remember that I did not currently promise this direct exchange.", parsed.ProtocolCID, nil)
 	}
 	if resourceErr := node.checkIncomingResourcePromise(fields); resourceErr != nil {
 		node.observeOutcome(fromAgent, relationship.OutcomeBroken)
 		node.applyBrokenPromiseCost(fromAgent, fields, resourceErr.Error())
 		node.record("resource_promise_rejected", "broken", fromAgent, resourceErr.Error())
-		node.writeAck(frameConn, fromAgent, "broken", "I promise I rejected this resource promise because local checks failed.", parsed.ProtocolCID, nil)
-		return
+		return node.newAckBytes(fromAgent, "broken", "I promise I rejected this resource promise because local checks failed.", parsed.ProtocolCID, nil)
 	}
 	ackFields, handlerErr := node.handleProtocolPromise(parsed)
 	if handlerErr != nil {
 		node.observeOutcome(fromAgent, relationship.OutcomeBroken)
 		node.applyBrokenPromiseCost(fromAgent, fields, handlerErr.Error())
 		node.record("protocol_handler_rejected", "broken", fromAgent, handlerErr.Error())
-		node.writeAck(frameConn, fromAgent, "broken", "I promise I rejected this protocol promise because local handler checks failed.", parsed.ProtocolCID, nil)
-		return
+		return node.newAckBytes(fromAgent, "broken", "I promise I rejected this protocol promise because local app checks failed.", parsed.ProtocolCID, nil)
 	}
 	acceptedAsCandidate := isLinkDiscoveryPromise(fields) && !node.canAccept(fromAgent)
 	node.observeOutcome(fromAgent, outcomeForPromise(fields))
@@ -354,10 +393,10 @@ func (node *Node) handleConn(conn net.Conn) {
 		eventName = "candidate_message_received"
 	}
 	node.record(eventName, "kept", fromAgent, "received "+parsed.ProtocolName+" signed promise exact_sha256="+parsed.ExactHash)
-	node.writeAck(frameConn, fromAgent, "kept", "I promise I received and recorded your signed promise message.", parsed.ProtocolCID, ackFields)
+	return node.newAckBytes(fromAgent, "kept", "I promise I received and recorded your signed promise message.", parsed.ProtocolCID, ackFields)
 }
 
-func (node *Node) writeAck(frameConn transport.FrameConn, target, outcome, promiseText string, protocolCID protocol.ProtocolCID, extraFields map[string]string) {
+func (node *Node) newAckBytes(target, outcome, promiseText string, protocolCID protocol.ProtocolCID, extraFields map[string]string) ([]byte, error) {
 	ackFields := map[string]string{
 		"act":     decision.ActPromise,
 		"from":    node.Agent.Name,
@@ -372,16 +411,14 @@ func (node *Node) writeAck(frameConn transport.FrameConn, target, outcome, promi
 	ack, ackErr := protocol.NewEnvelope(protocolCID, ackFields, node.Agent.Name)
 	if ackErr != nil {
 		node.record("ack_sign_failed", "broken", target, ackErr.Error())
-		return
+		return nil, ackErr
 	}
 	ackBytes, bytesErr := ack.Bytes()
 	if bytesErr != nil {
 		node.record("ack_bytes_failed", "broken", target, bytesErr.Error())
-		return
+		return nil, bytesErr
 	}
-	if writeErr := frameConn.WriteFrame(ackBytes); writeErr != nil {
-		node.record("ack_write_failed", "broken", target, writeErr.Error())
-	}
+	return ackBytes, nil
 }
 
 func (node *Node) send(target string, fields map[string]string) error {
@@ -392,8 +429,8 @@ func (node *Node) send(target string, fields map[string]string) error {
 // sendAndReceive performs one signed promise exchange and returns the receiver's
 // ACK evidence to the local caller.
 // Intent: The fulfillment workflow needs concrete address, weight, label, and
-// accounting evidence from pCID handlers without inventing an RPC surface.
-// Source: DI-parok
+// accounting evidence from pCID handlers while the app sends only through its
+// local kernel rather than dialing peer app processes directly. Source: DI-galin
 func (node *Node) sendAndReceive(target string, fields map[string]string) (parsedMessage, error) {
 	if !node.canDialTarget(target, fields) {
 		return parsedMessage{}, fmt.Errorf("no local TCP promise to %s", target)
@@ -408,12 +445,11 @@ func (node *Node) sendAndReceive(target string, fields map[string]string) (parse
 	if bytesErr != nil {
 		return parsedMessage{}, bytesErr
 	}
-	hostName, listenPort, endpointFound := node.Config.EndpointFor(target)
-	if !endpointFound {
-		return parsedMessage{}, fmt.Errorf("no endpoint for target %s", target)
+	kernelAddress, addressFound := node.Config.KernelAppAddressForAgent(node.Agent.Name)
+	if !addressFound {
+		return parsedMessage{}, fmt.Errorf("no local kernel endpoint for app %s", node.Agent.Name)
 	}
-	address := net.JoinHostPort(hostName, strconv.Itoa(listenPort))
-	frameConn, dialErr := transport.DialFrameConn(address, sendTimeout)
+	frameConn, dialErr := transport.DialFrameConn(kernelAddress, sendTimeout)
 	if dialErr != nil {
 		return parsedMessage{}, dialErr
 	}
@@ -921,14 +957,14 @@ func (node *Node) closeLog() {
 	}
 }
 
-func (node *Node) closeListener() {
-	if node.listener != nil {
-		node.setStopping()
-		closeErr := node.listener.Close()
-		if closeErr != nil && !errors.Is(closeErr, net.ErrClosed) {
-			fmt.Fprintf(os.Stderr, "close listener: %v\n", closeErr)
-		}
-		node.waitForListenerClosed()
+func (node *Node) closeReceivePromises() {
+	node.setStopping()
+	node.mu.Lock()
+	receiveConns := append([]transport.FrameConn{}, node.receiveConns...)
+	node.receiveConns = nil
+	node.mu.Unlock()
+	for _, frameConn := range receiveConns {
+		node.closeFrameConn(frameConn, "app_receive_conn_close_failed", "kernel")
 	}
 }
 
@@ -944,10 +980,10 @@ func (node *Node) isStopping() bool {
 	return node.stopping
 }
 
-// waitForShutdownGrace leaves the listener open briefly after active turns end.
+// waitForShutdownGrace leaves receive promises open briefly after active turns end.
 // Intent: Peers that made late but still legitimate promises get a bounded
 // chance to finish their exchange before this node writes `node_done`.
-// Source: DI-timah
+// Source: DI-galin
 func (node *Node) waitForShutdownGrace(ctx context.Context) {
 	graceDuration := node.Config.ShutdownGrace()
 	if graceDuration <= 0 {
@@ -957,20 +993,7 @@ func (node *Node) waitForShutdownGrace(ctx context.Context) {
 		node.record("shutdown_grace_timeout", "non_commitment", "", err.Error())
 		return
 	}
-	node.record("shutdown_grace_elapsed", "kept", "", "all agents reached turns_done before listener close")
-}
-
-func (node *Node) waitForListenerClosed() {
-	if node.listenerDone == nil {
-		return
-	}
-	timer := time.NewTimer(shutdownDrainTimeout)
-	defer timer.Stop()
-	select {
-	case <-node.listenerDone:
-	case <-timer.C:
-		node.record("listener_close_timeout", "non_commitment", "", "listener accept loop did not finish before timeout")
-	}
+	node.record("shutdown_grace_elapsed", "kept", "", "all agents reached turns_done before receive promises close")
 }
 
 func (node *Node) closeFrameConn(frameConn transport.FrameConn, eventName, peerName string) {
@@ -1061,12 +1084,12 @@ func (node *Node) writeDoneMarker() error {
 	return nil
 }
 
-// writeTurnsDoneMarker records that this agent has finished making active turn
-// decisions but is still keeping its listener open for peers that are finishing
-// their own planned sends.
+// writeTurnsDoneMarker records that this app has finished making active turn
+// decisions but is still keeping its receive promises open for peers that are
+// finishing their own planned sends.
 // Intent: Coordinate shutdown on agent-turn completion instead of letting early
-// finishers close listeners while slower peers are still making promises.
-// Source: DI-timah
+// finishers close receive promises while slower peers are still making
+// promises. Source: DI-galin
 func (node *Node) writeTurnsDoneMarker() error {
 	turnsDonePath := filepath.Join(node.runDir(), node.Agent.Name+".turns_done")
 	if _, err := os.Stat(turnsDonePath); err == nil {
@@ -1078,7 +1101,7 @@ func (node *Node) writeTurnsDoneMarker() error {
 	if err := os.WriteFile(turnsDonePath, []byte("turns_done\n"), 0o644); err != nil {
 		return err
 	}
-	node.record("turns_done", "kept", "", "finished active turns and kept listener open for shutdown grace")
+	node.record("turns_done", "kept", "", "finished active turns and kept receive promises open for shutdown grace")
 	return nil
 }
 
@@ -1232,8 +1255,15 @@ func (node *Node) allTurnsDone() bool {
 
 func (node *Node) readAllEvents() ([]decision.Event, error) {
 	var events []decision.Event
-	for _, agentName := range node.Config.AgentNames() {
-		logPath := filepath.Join(node.runDir(), agentName+".jsonl")
+	// Intent: The observer-only monitor should see app-local evidence and
+	// kernel-local operational evidence without giving the kernel authority over
+	// trust interpretation. Source: DI-galin
+	logPaths, globErr := filepath.Glob(filepath.Join(node.runDir(), "*.jsonl"))
+	if globErr != nil {
+		return nil, globErr
+	}
+	sort.Strings(logPaths)
+	for _, logPath := range logPaths {
 		logBytes, readErr := os.ReadFile(logPath)
 		if readErr != nil {
 			return nil, readErr

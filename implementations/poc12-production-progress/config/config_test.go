@@ -41,12 +41,18 @@ func TestExampleConfigLoads(t *testing.T) {
 	if _, _, endpointFound := cfg.EndpointFor("mallory"); !endpointFound {
 		t.Fatalf("expected endpoint for mallory")
 	}
+	if appAddress, appAddressFound := cfg.KernelAppAddressForAgent("mallory"); !appAddressFound || appAddress != "127.0.0.1:9114" {
+		t.Fatalf("mallory kernel app address = %q, %v; want 127.0.0.1:9114, true", appAddress, appAddressFound)
+	}
+	if host, port, endpointFound := cfg.KernelPeerEndpointForAgent("mallory"); !endpointFound || host != "mallory-oscar" || port != 9115 {
+		t.Fatalf("mallory peer kernel endpoint = %q %d %v, want mallory-oscar 9115 true", host, port, endpointFound)
+	}
 	fulfillment, ok := cfg.Agent("fulfillment")
 	if !ok {
 		t.Fatalf("expected fulfillment agent")
 	}
-	if len(fulfillment.Protocols()) != 4 {
-		t.Fatalf("fulfillment protocols = %#v, want four protocol handlers", fulfillment.Protocols())
+	if len(fulfillment.Protocols()) != 1 {
+		t.Fatalf("fulfillment protocols = %#v, want relationship-only receive promise", fulfillment.Protocols())
 	}
 }
 

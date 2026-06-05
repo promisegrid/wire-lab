@@ -149,7 +149,7 @@
       "motivation": "Complete shipping work by building local evidence from device/system promises before sharing order data.",
       "initial_peers": ["postal_scale", "accounting", "ups_label_printer", "alice"],
       "candidate_peers": ["postal_scale", "accounting", "ups_label_printer", "alice", "ellen"],
-      "supported_pcids": ["relationship_v1", "postal_scale_v1", "ups_label_v1", "accounting_v1"],
+      "supported_pcids": ["relationship_v1"],
       "budget": 6,
       "capacity": 6
     },
