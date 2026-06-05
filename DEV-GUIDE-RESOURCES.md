@@ -339,7 +339,7 @@ Source: `DI-sisak`; `DI-rusup`; `DI-funaf`; `DI-gumum`; `DI-somok`;
 `DI-fibok`; `DI-tanat`; `DI-pabot`; `DI-rodog`; `DI-sirus`; `DI-rojij`;
 `DI-punam`; `DI-vorus`; `DI-sipuz`; `DI-vujil`; `DI-pijan`; `DI-mosoj`;
 `DI-hotos`; `DI-horuh`; `DI-duhub`; `DI-nanud`; `DI-timah`;
-`DI-bikit`; `DI-parok`.
+`DI-bikit`; `DI-parok`; `DI-gagok`.
 
 ### POC11 Latest Assessment
 
@@ -421,6 +421,119 @@ selective sending of sensitive data only after trust improves; economic markets
 with opportunity cost and exchange-rate drift; app/kernel separation with the
 same grid envelope; and deterministic replay/audit tooling for exact
 promise-history evidence. Source: `DI-nanud`.
+
+### POC12 Latest Assessment
+
+POC12 works as a credible bridge from generic autonomous relationship traffic
+toward production-shaped protocol work. The latest live run produced 330 local
+events: 317 kept outcomes, 10 non-commitments, and 3 broken outcomes. It also
+produced concrete shipping evidence, not just coordination talk:
+`shipping_address_promised/received`, `package_weighed/received`,
+`shipping_label_printed/received`, and `accounting_updated/confirmed`. The
+monitor scored Promise Theory fit `4/5`, autonomy `5/5`, protocol validity
+`3/5`, local trust correctness `3/5`, and imposition avoidance `4/5`. Source:
+`DI-gagok`.
+
+The transactions fall into two classes. The production workflow uses
+pCID-routed signed CBOR messages over length-framed TCP: `fulfillment` talks to
+`accounting` with `accounting_v1`, to `postal_scale` with `postal_scale_v1`, to
+`ups_label_printer` with `ups_label_v1`, then back to `accounting` with
+`accounting_v1`. The sparse-mesh autonomy traffic uses `relationship_v1` among
+Alice, Bob, Carol, Dave, Ellen, Frank, Grace, Heidi, Ivan, Judy, Mallory, and
+Oscar. Those live agents make local low-risk promises, link-discovery promises,
+storage/compute-adjacent promises, observation promises, and non-commitments;
+the runtime records direct-peer additions/removals, rejected unpromised receives,
+withheld promises, and broken resource promises as local evidence. Source:
+`DI-gagok`.
+
+The shipping flow in the latest run was mechanically successful and easy to
+audit. First, `fulfillment` sent an `accounting_v1` promise to receive
+`accounting`'s local address evidence for `ORDER-1001`; `accounting` recorded
+`shipping_address_promised` with `100 Promise Way, Suite 100, Example City, CA
+94000` and accepted exact bytes `7a805b...37c5`. Second, `fulfillment` sent a
+`postal_scale_v1` promise to receive local weight evidence for `PKG-1001`;
+`postal_scale` recorded `package_weighed` with `weight_ounces=40` and exact
+bytes `6655ad...86c9`. Third, `fulfillment` sent an `ups_label_v1` promise using
+the address and weight evidence; `ups_label_printer` recorded
+`shipping_label_printed` with tracking number `1Z71051733616616` and
+`cost_cents=860`, accepting exact bytes `b27c0d...3b57`. Fourth,
+`fulfillment` sent an `accounting_v1` shipment update back to `accounting`;
+`accounting` recorded `accounting_updated` for `ORDER-1001`, tracking
+`1Z71051733616616`, and cost `860`, accepting exact bytes `ded8a9...78b`.
+`fulfillment` then recorded `fulfillment_workflow_completed`. Source:
+`DI-gagok`.
+
+The shipping flow also exposed two important gaps. After the deterministic
+startup workflow, live `fulfillment` sent four more accounting update /
+availability promises with the same order, tracking number, and cost. Accounting
+kept them all, which is useful evidence that repeated pCID-routed messages work,
+but it also shows missing idempotency, duplicate suppression, and semantic
+checkpointing. Accounting's local trust in `fulfillment` climbed to `6`, which
+the monitor correctly called a range anomaly. The current POC proves routing and
+handler evidence; it does not yet prove production-grade workflow state,
+idempotency, reconciliation, or trust-bound clamping. Source: `DI-gagok`.
+
+The PromiseGrid / Promise Theory fit is strong where the POC keeps authority
+local. Every message is a signed `grid([42(pCID), payload, proof])` promise, the
+pCID selects a protocol rather than a message type, device/system agents promise
+only their own local evidence, the monitor observes rather than governs, and
+trust updates remain per-agent local ledger entries. There is no global trust
+authority, no central router, and no receiver-side command semantics. The weak
+spots are sender-side alignment and workflow semantics: two send attempts were
+rejected as `not_promised`, one storage promise broke because Bob observed Carol
+asking for more storage than Bob's current budget allowed, repeated shipment
+updates were accepted without idempotency semantics, and some trust decreases
+were tied to local exhaustion or ack failures rather than clearly peer-caused
+breakage. Source: `DI-gagok`.
+
+There are no successful receiver-side impositions in the latest run. Alice and
+Judy locally rejected unpromised direct exchanges as `not_promised`; other agents
+withheld promises when budget or capacity was exhausted. The remaining imposition
+risk is behavioral, not architectural: some live senders still attempt traffic
+before the receiver's current local promise evidence supports it. That is the
+right failure mode for a PromiseGrid POC, but future work should make senders
+reason better about current receive promises before dialing. Source: `DI-gagok`.
+
+Incentives are present but still simple. Agents gain local trust when their
+promises are kept, lose local trust when promises are broken or rejected, spend
+budget/capacity when promising work, and can decline work with non-commitment
+when economics are poor. Device/system agents are incentivized by narrow local
+promise scope: `postal_scale` gains trust by returning weight evidence only,
+`ups_label_printer` by returning label/cost/tracking evidence only, and
+`accounting` by returning address/update evidence only. There is no central
+penalty or reward authority, so the incentive model is compatible with Promise
+Theory, but it still needs richer opportunity cost, repeated-market behavior,
+and application-level compensation semantics. Source: `DI-gagok`.
+
+Autonomy is working for relationship pressure but not yet for complete business
+workflow planning. Live agents chose targets and promise text dynamically, and
+the monitor scored autonomy `5/5`. That score is credible for the sparse-mesh
+relationship traffic. The shipping workflow, however, is intentionally hybrid:
+deterministic startup code forces one concrete shipment sequence so the POC
+produces production evidence, then live `fulfillment` continues relationship
+turns and repeats accounting-update promises. Future POCs should test whether a
+live agent can plan the sequence without losing the concrete pCID evidence,
+idempotency, and local-trust discipline. Source: `DI-gagok`.
+
+TCP relationships are dynamic at the local PromiseGrid layer and static at the
+Docker network layer. The latest run recorded 6 `direct_peer_added`, 2
+`direct_peer_removed`, and 97 `direct_peer_unchanged` events. Kept
+link-discovery promises formed local direct-peer promises such as Alice/Dave,
+Bob/Grace, Frank/Oscar, and reciprocal views where both agents observed enough
+evidence. Broken or unpromised outcomes removed local direct-peer promises such
+as Heidi/Alice and Bob/Carol. This is the intended semantics: TCP reachability in
+Compose is not trust; the local ledger decides whether an agent currently
+promises to dial or accept one direct exchange. Source: `DI-gagok`.
+
+The next POCs should prepare for production by testing: idempotent business
+workflow checkpoints; duplicate promise suppression; trust-score bounds and
+calibration; sender-side receive-promise prediction before dial; multi-run
+relationship memory with decay and repair; production storage and computation
+flows with real inputs/outputs; live-agent planning of multi-step pCID workflows;
+privacy-sensitive selective sending after trust improves; partial device/system
+failure with retry or alternate peers; and deterministic replay/audit of exact
+signed bytes, pCID payloads, local evidence, and trust transitions. Source:
+`DI-gagok`.
 
 ## Authority model
 

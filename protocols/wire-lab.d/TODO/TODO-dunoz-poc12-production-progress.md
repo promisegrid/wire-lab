@@ -80,6 +80,27 @@ Affects: `implementations/poc12-production-progress/runtime/node.go`;
 `protocols/wire-lab.d/TODO/TODO-dunoz-poc12-production-progress.md`.
 Supersedes: DI-timah for prompt-only fulfillment workflow execution only.
 
+ID: DI-gagok
+Date: 2026-06-05 04:47:47
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Record the latest POC12 assessment in `DEV-GUIDE-RESOURCES.md`,
+including what happened in the transactions, how the shipping workflow behaved,
+where Promise Theory fit is strong or weak, whether impositions remain, how
+local incentives operate, whether autonomy and dynamic TCP relationships are
+working, and which next POCs should prepare the project for real production
+use.
+Intent: POC12 is now executable evidence rather than only a scaffold. The guide
+needs a concrete run interpretation so future design work does not over-read
+the POC as a stable API and does not miss the remaining production-readiness
+gaps exposed by the latest run.
+Constraints: Treat the latest run as evidence, not specification. Preserve
+Promise Theory framing: local promises, local trust, no global authority, no
+receiver command semantics, and pCID-owned payload meanings. Do not commit
+provider logs, Docker volume state, secrets, or local runtime config.
+Affects: `DEV-GUIDE-RESOURCES.md`;
+`protocols/wire-lab.d/TODO/TODO-dunoz-poc12-production-progress.md`.
+
 ## Prior aliases
 
 - None.
@@ -110,6 +131,7 @@ Supersedes: DI-timah for prompt-only fulfillment workflow execution only.
 - [x] dunoz.12 Run Go validation and record implementation status.
 - [x] dunoz.13 Make the fulfillment workflow produce concrete pCID-routed
   shipping evidence during live Docker validation.
+- [x] dunoz.14 Record the latest POC12 assessment in guide resources.
 
 ## Implementation status
 
@@ -121,4 +143,7 @@ Validation run on 2026-06-04 after `DI-parok`: `go test ./...`, `go vet
 corrected live Docker run exited cleanly and analyzer output reported 330 total
 events with non-empty `shipping_counts`: address promised/received, package
 weighed/received, label printed/received, and accounting updated/confirmed.
-Source: `DI-timah`; `DI-bikit`; `DI-parok`.
+The guide assessment now records the transaction details, Promise Theory fit,
+remaining imposition/alignment risks, incentives, autonomy status, dynamic TCP
+relationship evidence, shipping-message details, and next POC pressure points.
+Source: `DI-timah`; `DI-bikit`; `DI-parok`; `DI-gagok`.
