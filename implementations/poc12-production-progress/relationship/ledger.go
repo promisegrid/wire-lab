@@ -118,7 +118,9 @@ func (ledger *Ledger) ObserveOutcome(peerName string, outcome Outcome) Transitio
 	case OutcomeBroken, OutcomeMalformed:
 		ledger.trustByPeer[peerName] -= 3
 	case OutcomeNonCommitment:
-		ledger.trustByPeer[peerName]--
+		// Intent: A local non-commitment means the peer did not promise the
+		// requested exchange; it is not evidence that the peer broke an explicit
+		// promise. Source: DI-jinoz
 	}
 	ledger.reconfigure(peerName)
 	isDirect := ledger.directPeers[peerName]

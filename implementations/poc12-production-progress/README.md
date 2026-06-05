@@ -23,6 +23,11 @@ and updates `accounting` with cost and tracking evidence. Source: `DI-timah`;
   not RPC verbs.
 - Explicit direct TCP relationship transition evidence:
   `direct_peer_added`, `direct_peer_removed`, and `direct_peer_unchanged`.
+- Corrected promise evidence semantics: ordinary `not_promised` /
+  `non_commitment` evidence is neutral rather than broken peer-promise
+  evidence, provider/runtime decision failures stay local, and duplicate
+  shipment updates are checkpointed without repeated trust inflation.
+  Source: `DI-jinoz`.
 
 ## Protocol Shape
 
@@ -87,3 +92,19 @@ deterministic device/system behavior. The fulfillment startup sequence is a POC
 guardrail so the run produces concrete pCID-routed shipment evidence instead of
 relying on a live LLM to choose that sequence unaided. Source: `DI-timah`;
 `DI-bikit`; `DI-parok`; `DI-galin`.
+
+Post-split evidence semantics are intentionally conservative:
+`not_promised` means the receiver did not promise the requested exchange, not
+that the receiver broke a promise. Transient provider/runtime decision failures
+are local app/runtime evidence, not peer trust evidence. The accounting app
+keeps an app-local shipment checkpoint keyed by order, tracking number, and
+cost; duplicate confirmations remain visible in logs but do not repeatedly
+increase trust. Source: `DI-jinoz`.
+
+The 2026-06-05 `poc12-jinoz-20260605-055916` validation run exited cleanly and
+the analyzer reported 454 events: 433 kept, 20 non-commitment, and 1 broken
+resource promise. Shipping evidence appeared exactly once for address lookup,
+package weight, label printing, and accounting update/confirmation. The monitor
+still flagged a real remaining concern: some trust changes are driven by local
+budget/capacity exhaustion and should be separated from peer trust in a later
+POC. Source: `DI-jinoz`.

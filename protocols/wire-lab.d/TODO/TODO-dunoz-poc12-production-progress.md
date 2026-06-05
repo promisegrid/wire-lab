@@ -130,6 +130,33 @@ Affects: `implementations/poc12-production-progress/**`;
 Supersedes: DI-timah for the app/kernel process boundary; DI-bikit for where
 pCID routing responsibility lives.
 
+ID: DI-jinoz
+Date: 2026-06-05 05:54:08
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Correct POC12 post-split evidence semantics so ordinary
+non-commitment, `not_promised` acknowledgements, and local provider/runtime
+decision failures are not treated as broken peer promises. Add minimal
+app-local accounting shipment-update checkpointing so duplicate confirmations
+for the same order/tracking/cost tuple are recorded as duplicate evidence
+without repeatedly increasing relationship trust.
+Intent: The clean post-split Docker run showed the right app/kernel process
+shape but also showed false trust drift: some non-commitments were counted as
+broken promises, one transient provider error was reported as broken evidence,
+and repeated accounting confirmations inflated trust for the same shipment
+checkpoint. Promise Theory requires distinguishing "I did not promise that"
+from "I broke a promise I made"; trust should change only when local evidence
+supports a kept, broken, repaired, malformed, or discovery promise outcome.
+Constraints: Do not add new top-level acts, RPC verbs, pCIDs, durable queues,
+retry/backoff machinery, kernel-owned trust, service-registry authority,
+protocol-level idempotency layers, trust clamping, or changes to the envelope
+shape. Keep duplicate shipment handling app-local to the accounting/fulfillment
+evidence loop.
+Affects: `implementations/poc12-production-progress/**`;
+`implementations/poc12-production-progress/README.md`;
+`DEV-GUIDE-RESOURCES.md`;
+`protocols/wire-lab.d/TODO/TODO-dunoz-poc12-production-progress.md`.
+
 ## Prior aliases
 
 - None.
@@ -163,6 +190,8 @@ pCID routing responsibility lives.
 - [x] dunoz.14 Record the latest POC12 assessment in guide resources.
 - [x] dunoz.15 Split POC12 into one kernel process per container and separate
   local app processes with app-owned trust and promise judgment.
+- [x] dunoz.16 Correct post-split POC12 non-commitment trust semantics,
+  provider-error evidence classification, and duplicate shipment checkpoints.
 
 ## Implementation status
 
@@ -186,3 +215,18 @@ after `DI-galin`: `go test ./...` passed with
 `GOCACHE=/tmp/wire-lab-gocache`; a fresh Docker run is still needed before the
 post-split process model is treated as live-run evidence. Source: `DI-timah`;
 `DI-bikit`; `DI-parok`; `DI-gagok`; `DI-galin`.
+
+After the clean post-split run exposed false trust drift, `DI-jinoz` corrected
+POC12 evidence semantics: non-commitment and `not_promised` acknowledgements are
+neutral unless a prior explicit promise was broken, local provider/runtime
+decision failures are recorded as local non-commitment evidence, and duplicate
+accounting shipment checkpoints remain visible without repeatedly increasing
+trust. Validation run on 2026-06-05 after `DI-jinoz`: POC12 `go test ./...`
+passed with `GOCACHE=/tmp/wire-lab-gocache`; `go vet ./...`, `errcheck ./...`,
+and `git diff --check` also passed. The fresh Docker run
+`poc12-jinoz-20260605-055916` exited cleanly, and analyzer output reported 454
+events with 433 kept, 20 non-commitment, and 1 broken resource promise.
+Shipping evidence appeared once for address, weight, label, and accounting
+update/confirmation. Remaining concern: the monitor still saw some trust changes
+that appear tied to local budget/capacity exhaustion rather than peer evidence.
+Source: `DI-jinoz`.

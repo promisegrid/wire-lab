@@ -10,6 +10,7 @@ import (
 	"promisegrid.dev/wire-lab/implementations/poc12-production-progress/decision"
 	"promisegrid.dev/wire-lab/implementations/poc12-production-progress/pcid"
 	"promisegrid.dev/wire-lab/implementations/poc12-production-progress/production"
+	"promisegrid.dev/wire-lab/implementations/poc12-production-progress/protocol"
 	"promisegrid.dev/wire-lab/implementations/poc12-production-progress/relationship"
 )
 
@@ -48,6 +49,20 @@ func TestRelationshipStatePersistsAcrossRuns(t *testing.T) {
 	}
 }
 
+func TestProviderDecisionErrorRecordsLocalNonCommitment(t *testing.T) {
+	cfg := twoNodeTestConfig(t)
+	node := NewNode(cfg, cfg.Agents[0], errorDecider{}, decision.FakeMonitor{})
+	if err := node.runTurn(context.Background(), 0); err != nil {
+		node.recordDecisionError(err)
+	}
+	for _, event := range node.events {
+		if event.Event == "decision_error" && event.Outcome == "non_commitment" {
+			return
+		}
+	}
+	t.Fatalf("provider decision error should be local non-commitment evidence: %#v", node.events)
+}
+
 func TestResourcePromiseChecksLocalCapacity(t *testing.T) {
 	cfg := twoNodeTestConfig(t)
 	alice := NewNode(cfg, cfg.Agents[0], &decision.FakeDecider{}, decision.FakeMonitor{})
@@ -66,6 +81,13 @@ func TestBrokenPromiseStakeCostReducesBudget(t *testing.T) {
 	alice.applyBrokenPromiseCost("bob", map[string]string{"field_stake": "2"}, "test broken promise")
 	if alice.budget != 3 {
 		t.Fatalf("budget after stake cost = %d, want 3", alice.budget)
+	}
+}
+
+func TestNotPromisedAckStaysNonCommitment(t *testing.T) {
+	outcome := outcomeForSendError(ackOutcomeError{outcome: "not_promised"})
+	if outcome != relationship.OutcomeNonCommitment {
+		t.Fatalf("not_promised outcome = %s, want %s", outcome, relationship.OutcomeNonCommitment)
 	}
 }
 
@@ -189,6 +211,41 @@ func TestFulfillmentStartupWorkflowStepsUseDeterministicHandlers(t *testing.T) {
 	}
 	if !hasEvent(fulfillment.events, "fulfillment_workflow_completed") {
 		t.Fatalf("fulfillment did not record workflow completion: %#v", fulfillment.events)
+	}
+}
+
+func TestDuplicateAccountingUpdateDoesNotRepeatTrust(t *testing.T) {
+	cfg := shippingTestConfig(t)
+	accounting := NewNode(cfg, cfg.Agents[3], &decision.FakeDecider{}, decision.FakeMonitor{})
+	frameBytes := signedAccountingUpdateFrame(t, accounting)
+	for attempt := 0; attempt < 2; attempt++ {
+		ackBytes, err := accounting.handleFrame(frameBytes)
+		if err != nil {
+			t.Fatalf("handle accounting update attempt %d: %v", attempt+1, err)
+		}
+		ackEnvelope, parseErr := protocol.ParseEnvelope(ackBytes)
+		if parseErr != nil {
+			t.Fatalf("parse accounting ack attempt %d: %v", attempt+1, parseErr)
+		}
+		ackFields, fieldsErr := ackEnvelope.PayloadFields()
+		if fieldsErr != nil {
+			t.Fatalf("parse accounting ack fields attempt %d: %v", attempt+1, fieldsErr)
+		}
+		if attempt == 0 && ackFields[duplicateShipmentEvidenceField] == "true" {
+			t.Fatalf("first accounting update should not be duplicate: %#v", ackFields)
+		}
+		if attempt == 1 && ackFields[duplicateShipmentEvidenceField] != "true" {
+			t.Fatalf("second accounting update should be duplicate: %#v", ackFields)
+		}
+	}
+	if accounting.ledger.Trust("fulfillment") != 1 {
+		t.Fatalf("duplicate accounting trust = %d, want 1", accounting.ledger.Trust("fulfillment"))
+	}
+	if countEvents(accounting.events, "accounting_updated") != 1 {
+		t.Fatalf("accounting update should be recorded once: %#v", accounting.events)
+	}
+	if countEvents(accounting.events, "accounting_update_duplicate") != 1 {
+		t.Fatalf("duplicate accounting update should be recorded once: %#v", accounting.events)
 	}
 }
 
@@ -394,6 +451,36 @@ func (missingShapeDecider) Decide(_ context.Context, _ decision.Observation) (de
 		Promise: "Alice promises one bounded local exchange.",
 		Fields:  map[string]any{"purpose": "repair-test"},
 	}, nil
+}
+
+type errorDecider struct{}
+
+func (errorDecider) Decide(_ context.Context, _ decision.Observation) (decision.PromiseDecision, error) {
+	return decision.PromiseDecision{}, context.DeadlineExceeded
+}
+
+func signedAccountingUpdateFrame(t *testing.T, node *Node) []byte {
+	t.Helper()
+	envelope, err := protocol.NewEnvelope(node.Protocols.MustCID(pcid.AccountingV1), map[string]string{
+		"act":                   decision.ActPromise,
+		"from":                  "fulfillment",
+		"to":                    "accounting",
+		"turn":                  "test",
+		"promise":               "I promise to receive accounting's shipment checkpoint evidence for this order and tracking number.",
+		"reason":                "duplicate checkpoint regression test",
+		"field_promise_about":   production.PromiseShipmentUpdate,
+		"field_order_id":        fulfillmentOrderID,
+		"field_tracking_number": "1Z999AA10123456784",
+		"field_cost_cents":      "1776",
+	}, "fulfillment")
+	if err != nil {
+		t.Fatalf("new accounting update envelope: %v", err)
+	}
+	frameBytes, err := envelope.Bytes()
+	if err != nil {
+		t.Fatalf("accounting update envelope bytes: %v", err)
+	}
+	return frameBytes
 }
 
 func hasEvent(events []decision.Event, eventName string) bool {

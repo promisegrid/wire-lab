@@ -26,6 +26,7 @@ const sendTimeout = 5 * time.Second
 const shutdownDrainTimeout = 750 * time.Millisecond
 const fulfillmentOrderID = "ORDER-1001"
 const fulfillmentPackageID = "PKG-1001"
+const duplicateShipmentEvidenceField = "field_duplicate_shipment_update"
 
 // Node runs one local POC12 app process. A container may run several app
 // processes, but each process keeps its own local relationship ledger, log, and
@@ -47,6 +48,8 @@ type Node struct {
 	logFile   *os.File
 	budget    int
 	capacity  int
+
+	shipmentUpdates map[string]bool
 
 	activeHandlers sync.WaitGroup
 	receiveConns   []transport.FrameConn
@@ -79,6 +82,8 @@ func NewNode(cfg config.Config, agent config.AgentConfig, decider decision.Decid
 		evaluator: economy.Evaluator{},
 		budget:    agent.Budget,
 		capacity:  agent.Capacity,
+
+		shipmentUpdates: make(map[string]bool),
 	}
 }
 
@@ -103,7 +108,7 @@ func (node *Node) Run(ctx context.Context) error {
 	}
 	for turnIndex := 0; turnIndex < node.Config.MaxTurns && turnIndex < node.Config.MaxAgentCalls; turnIndex++ {
 		if err := node.runTurn(ctx, turnIndex); err != nil {
-			node.record("decision_error", "broken", "", err.Error())
+			node.recordDecisionError(err)
 		}
 		time.Sleep(node.Config.TurnDelay())
 	}
@@ -248,9 +253,12 @@ func (node *Node) runTurn(ctx context.Context, turnIndex int) error {
 		return nil
 	}
 	if sendErr := node.send(validDecision.Target, fields); sendErr != nil {
-		node.observeOutcome(validDecision.Target, relationship.OutcomeBroken)
-		node.applyBrokenPromiseCost(validDecision.Target, fields, sendErr.Error())
-		node.record("send_failed", "broken", validDecision.Target, sendErr.Error())
+		sendOutcome := outcomeForSendError(sendErr)
+		node.observeOutcome(validDecision.Target, sendOutcome)
+		if sendOutcome != relationship.OutcomeNonCommitment {
+			node.applyBrokenPromiseCost(validDecision.Target, fields, sendErr.Error())
+		}
+		node.record("send_failed", string(sendOutcome), validDecision.Target, sendErr.Error())
 		return nil
 	}
 	node.spendLocalCapacity()
@@ -387,7 +395,9 @@ func (node *Node) handleFrame(frameBytes []byte) ([]byte, error) {
 		return node.newAckBytes(fromAgent, "broken", "I promise I rejected this protocol promise because local app checks failed.", parsed.ProtocolCID, nil)
 	}
 	acceptedAsCandidate := isLinkDiscoveryPromise(fields) && !node.canAccept(fromAgent)
-	node.observeOutcome(fromAgent, outcomeForPromise(fields))
+	if evidenceUpdatesTrust(ackFields) {
+		node.observeOutcome(fromAgent, outcomeForPromise(fields))
+	}
 	eventName := "message_received"
 	if acceptedAsCandidate {
 		eventName = "candidate_message_received"
@@ -467,11 +477,12 @@ func (node *Node) sendAndReceive(target string, fields map[string]string) (parse
 	}
 	ackFields := ackMessage.Fields
 	if ackFields["outcome"] != "kept" {
-		node.observeOutcome(target, relationship.OutcomeNonCommitment)
-		return parsedMessage{}, fmt.Errorf("ack outcome %q", ackFields["outcome"])
+		return parsedMessage{}, ackOutcomeError{outcome: ackFields["outcome"]}
 	}
 	node.recordAckEvidence(target, ackMessage)
-	node.observeOutcome(target, outcomeForPromise(fields))
+	if evidenceUpdatesTrust(ackFields) {
+		node.observeOutcome(target, outcomeForPromise(fields))
+	}
 	return ackMessage, nil
 }
 
@@ -615,13 +626,26 @@ func (node *Node) handleAccountingPromise(fields map[string]string) (map[string]
 		if err := production.ValidateAccountingUpdate(orderID, trackingNumber, costCents); err != nil {
 			return nil, err
 		}
-		node.record("accounting_updated", "kept", fields["from"], fmt.Sprintf("order_id=%s tracking_number=%s cost_cents=%d", orderID, trackingNumber, costCents))
-		return map[string]string{
+		ackFields := map[string]string{
 			"field_promise_about":   production.PromiseShipmentUpdate,
 			"field_order_id":        orderID,
 			"field_tracking_number": trackingNumber,
 			"field_cost_cents":      strconv.Itoa(costCents),
-		}, nil
+		}
+		updateKey := shipmentUpdateKey(orderID, trackingNumber, costCents)
+		node.mu.Lock()
+		alreadyRecorded := node.shipmentUpdates[updateKey]
+		if !alreadyRecorded {
+			node.shipmentUpdates[updateKey] = true
+		}
+		node.mu.Unlock()
+		if alreadyRecorded {
+			ackFields[duplicateShipmentEvidenceField] = "true"
+			node.record("accounting_update_duplicate", "kept", fields["from"], fmt.Sprintf("order_id=%s tracking_number=%s cost_cents=%d", orderID, trackingNumber, costCents))
+			return ackFields, nil
+		}
+		node.record("accounting_updated", "kept", fields["from"], fmt.Sprintf("order_id=%s tracking_number=%s cost_cents=%d", orderID, trackingNumber, costCents))
+		return ackFields, nil
 	default:
 		return nil, fmt.Errorf("accounting cannot handle promise_about=%q", fields["field_promise_about"])
 	}
@@ -636,6 +660,10 @@ func (node *Node) recordAckEvidence(target string, message parsedMessage) {
 	case production.PromisePrintLabel:
 		node.record("shipping_label_received", "kept", target, "tracking_number="+message.Fields["field_tracking_number"]+" cost_cents="+message.Fields["field_cost_cents"])
 	case production.PromiseShipmentUpdate:
+		if message.Fields[duplicateShipmentEvidenceField] == "true" {
+			node.record("accounting_update_duplicate_confirmed", "kept", target, "tracking_number="+message.Fields["field_tracking_number"]+" cost_cents="+message.Fields["field_cost_cents"])
+			return
+		}
 		node.record("accounting_update_confirmed", "kept", target, "tracking_number="+message.Fields["field_tracking_number"]+" cost_cents="+message.Fields["field_cost_cents"])
 	}
 }
@@ -769,6 +797,43 @@ func repairErrDetail(validateErr error) string {
 	return "repaired common live decision formatting issue: " + validateErr.Error()
 }
 
+// recordDecisionError records LLM/provider/runtime failures as local evidence,
+// not as broken peer promises.
+// Intent: A transient provider failure or runtime decision failure does not mean
+// any peer broke a promise, so it should not enter peer trust as broken
+// evidence. Source: DI-jinoz
+func (node *Node) recordDecisionError(err error) {
+	node.record("decision_error", "non_commitment", "", "local provider/runtime error: "+err.Error())
+}
+
+type ackOutcomeError struct {
+	outcome string
+}
+
+func (err ackOutcomeError) Error() string {
+	return fmt.Sprintf("ack outcome %q", err.outcome)
+}
+
+// outcomeForSendError converts a transport or ACK failure into the local
+// relationship outcome it actually supports.
+// Intent: A receiver's `not_promised` ACK is evidence of non-commitment, not a
+// broken peer promise; only explicit broken/malformed evidence should carry a
+// trust penalty. Source: DI-jinoz
+func outcomeForSendError(err error) relationship.Outcome {
+	var ackErr ackOutcomeError
+	if !errors.As(err, &ackErr) {
+		return relationship.OutcomeBroken
+	}
+	switch ackErr.outcome {
+	case "not_promised", string(relationship.OutcomeNonCommitment):
+		return relationship.OutcomeNonCommitment
+	case string(relationship.OutcomeMalformed):
+		return relationship.OutcomeMalformed
+	default:
+		return relationship.OutcomeBroken
+	}
+}
+
 // outcomeForPromise maps a kept payload to the local trust effect it should have.
 // Intent: Successful candidate discovery can form a direct relationship while
 // ordinary kept promises keep the previous incremental trust behavior.
@@ -778,6 +843,19 @@ func outcomeForPromise(fields map[string]string) relationship.Outcome {
 		return relationship.OutcomeDiscoveryKept
 	}
 	return relationship.OutcomeKept
+}
+
+// evidenceUpdatesTrust reports whether ACK payload evidence should change peer
+// trust or merely be recorded as already-seen local evidence.
+// Intent: Duplicate shipment-update confirmations should remain visible in logs
+// without repeatedly increasing trust for the same order/tracking/cost
+// checkpoint. Source: DI-jinoz
+func evidenceUpdatesTrust(fields map[string]string) bool {
+	return fields == nil || fields[duplicateShipmentEvidenceField] != "true"
+}
+
+func shipmentUpdateKey(orderID, trackingNumber string, costCents int) string {
+	return fmt.Sprintf("%s|%s|%d", orderID, trackingNumber, costCents)
 }
 
 // isLinkDiscoveryPromise recognizes the pCID-owned payload meaning used for

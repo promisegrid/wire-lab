@@ -35,6 +35,20 @@ func TestDiscoveryCanCreateDirectPeer(t *testing.T) {
 	}
 }
 
+func TestNonCommitmentDoesNotReduceTrust(t *testing.T) {
+	ledger := NewLedger([]string{"bob"}, []string{"bob"}, 2, -2, 0)
+	transition := ledger.ObserveOutcome("bob", OutcomeNonCommitment)
+	if ledger.Trust("bob") != 0 {
+		t.Fatalf("non-commitment trust = %d, want 0", ledger.Trust("bob"))
+	}
+	if !ledger.CanDial("bob") {
+		t.Fatalf("ordinary non-commitment should not remove an existing direct peer promise")
+	}
+	if transition != TransitionUnchanged {
+		t.Fatalf("transition = %s, want %s", transition, TransitionUnchanged)
+	}
+}
+
 func TestDecayReducesPositiveTrust(t *testing.T) {
 	ledger := NewLedger([]string{"bob"}, []string{"bob"}, 2, -2, 1)
 	ledger.ObserveOutcome("bob", OutcomeKept)
