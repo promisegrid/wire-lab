@@ -60,6 +60,38 @@ Affects: `implementations/poc13-cas-compute-functions/**`;
 `DEV-GUIDE-RESOURCES.md`;
 `protocols/wire-lab.d/TODO/TODO-godad-poc13-cas-compute-functions.md`.
 
+ID: DI-lasuh
+Date: 2026-06-06 06:44:02
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Improve POC13's live-provider path without changing the POC13
+architecture, pCID set, envelope shape, or role-script topology. The decider
+must extract meaningful text from current Responses API shapes instead of
+recording the placeholder `provider returned no output_text` when nested output
+content is available. The analyzer must flag placeholder live decisions as an
+evidence quality problem. The allowed implementation names for this change are
+`ProviderResponse`, `ProviderOutput`, `ProviderContent`, `ResponseText`,
+`PlaceholderLiveDecisionCounts`, `HasPlaceholderLiveDecision`, and local
+variables derived from those names.
+Intent: The latest live run proved that provider calls can happen, but the
+recorded decision evidence was weak because the parser only checked a top-level
+`output_text` field. POC13 should produce auditable live-local promise
+judgments when a provider key is present, and should make placeholder decisions
+visible as analyzer failures rather than silently treating them as equivalent to
+autonomous behavior.
+Constraints: Keep POC13 self-contained. Do not import GA-runner, POC12, or a
+shared library. Do not store API keys. Do not add new protocol pCIDs, top-level
+action kinds, RPC verbs, permission/conformance framing, or global authority.
+Keep existing role scripts as bounded deterministic scenario evidence; this DI
+improves live-decision evidence extraction and analyzer quality gates rather
+than adding real transport or full autonomous negotiation.
+Affects: `implementations/poc13-cas-compute-functions/decision.go`;
+`implementations/poc13-cas-compute-functions/analyze.go`;
+`implementations/poc13-cas-compute-functions/analyze_test.go`;
+`implementations/poc13-cas-compute-functions/decision_test.go`;
+`implementations/poc13-cas-compute-functions/README.md`;
+`protocols/wire-lab.d/TODO/TODO-godad-poc13-cas-compute-functions.md`.
+
 ## Prior aliases
 
 - None.
@@ -85,6 +117,8 @@ not freeze final storage, compute, cache, provider, kernel, or app APIs.
   so POC13 is visible as storage/compute evidence, not a stable API.
 - [x] godad.7 Implement `implementations/poc13-cas-compute-functions/` as a
   self-contained first executable POC with analyzer gates.
+- [x] godad.8 Improve live decision extraction and analyzer gates so provider
+  runs record meaningful local promise judgments instead of silent placeholders.
 
 ## Acceptance criteria
 

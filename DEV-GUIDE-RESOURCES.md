@@ -168,7 +168,10 @@ promise availability, retention, access, serving, or trustworthy computation.
 Pure compute results are cached only by exact protocol/function/input/context
 and result identity; impure work externalizes timestamp, randomness, sensor
 reads, or other ambient inputs as context objects so the run is replayable and
-pure-after-the-fact. Source: `DI-gopag`; `DI-bibom`; `DI-notig`.
+pure-after-the-fact. POC13's live-provider evidence now must contain actual
+role-aligned local promise judgment text; placeholder provider reachability
+records are analyzer failures, not autonomous promise evidence. Source:
+`DI-gopag`; `DI-bibom`; `DI-notig`; `DI-lasuh`.
 
 `poc7` adds executable evidence for promise-shaped capability tokens and local
 exchange: five containers run local kernel boundaries, app-level relays, issuer,
@@ -1294,8 +1297,11 @@ section.
   evidence for decentralized CAS storage promises and CID-named function-call
   compute promises, with `cas_storage_v1` and `cid_compute_v1` as protocol
   pCID names and content/function/context/result CIDs as payload-level values.
-  It should be cited as POC evidence only, not as a final storage, compute,
-  cache, provider, or kernel API. Source: `DI-bibom`; `DI-notig`; `TODO-godad`.
+  Its live-provider gate extracts nested Responses text, records role-aligned
+  local promise judgments, and fails placeholder live-decision evidence. It
+  should be cited as POC evidence only, not as a final storage, compute, cache,
+  provider, or kernel API. Source: `DI-bibom`; `DI-notig`; `DI-lasuh`;
+  `TODO-godad`.
 - `protocols/wire-lab.d/archive/migrations/SIM-piloh-turns-149-208-recovery/archive/transports/README.md`
   preserves the old root transport design surface as historical evidence.
 

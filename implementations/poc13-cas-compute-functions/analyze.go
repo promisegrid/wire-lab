@@ -13,14 +13,15 @@ import (
 
 // AnalysisSummary is the deterministic POC13 analyzer report.
 type AnalysisSummary struct {
-	RunDir                    string         `json:"run_dir"`
-	TotalEvents               int            `json:"total_events"`
-	EventCounts               map[string]int `json:"event_counts"`
-	OutcomeCounts             map[string]int `json:"outcome_counts"`
-	AgentCounts               map[string]int `json:"agent_counts"`
-	ProtocolCounts            map[string]int `json:"protocol_counts"`
-	RPCDriftCounts            map[string]int `json:"rpc_drift_counts"`
-	MissingRequiredEventNames []string       `json:"missing_required_event_names,omitempty"`
+	RunDir                        string         `json:"run_dir"`
+	TotalEvents                   int            `json:"total_events"`
+	EventCounts                   map[string]int `json:"event_counts"`
+	OutcomeCounts                 map[string]int `json:"outcome_counts"`
+	AgentCounts                   map[string]int `json:"agent_counts"`
+	ProtocolCounts                map[string]int `json:"protocol_counts"`
+	RPCDriftCounts                map[string]int `json:"rpc_drift_counts"`
+	PlaceholderLiveDecisionCounts map[string]int `json:"placeholder_live_decision_counts"`
+	MissingRequiredEventNames     []string       `json:"missing_required_event_names,omitempty"`
 }
 
 // AnalyzeRun summarizes one POC13 JSONL directory or its parent run directory.
@@ -30,12 +31,13 @@ func AnalyzeRun(inputPath string) (AnalysisSummary, error) {
 		return AnalysisSummary{}, resolveErr
 	}
 	summary := AnalysisSummary{
-		RunDir:         logDir,
-		EventCounts:    make(map[string]int),
-		OutcomeCounts:  make(map[string]int),
-		AgentCounts:    make(map[string]int),
-		ProtocolCounts: make(map[string]int),
-		RPCDriftCounts: make(map[string]int),
+		RunDir:                        logDir,
+		EventCounts:                   make(map[string]int),
+		OutcomeCounts:                 make(map[string]int),
+		AgentCounts:                   make(map[string]int),
+		ProtocolCounts:                make(map[string]int),
+		RPCDriftCounts:                make(map[string]int),
+		PlaceholderLiveDecisionCounts: make(map[string]int),
 	}
 	logPaths := jsonlLogPaths(logDir)
 	sort.Strings(logPaths)
@@ -99,6 +101,9 @@ func summarizePOC13Log(logPath string, summary *AnalysisSummary) error {
 		if isRPCDrift(event) {
 			summary.RPCDriftCounts[event.Observer]++
 		}
+		if HasPlaceholderLiveDecision(event) {
+			summary.PlaceholderLiveDecisionCounts[event.Observer]++
+		}
 	}
 	return scanner.Err()
 }
@@ -117,6 +122,9 @@ func ValidateAnalysis(summary AnalysisSummary) error {
 	}
 	if len(summary.RPCDriftCounts) > 0 {
 		failures = append(failures, fmt.Sprintf("rpc_drift_counts=%v want empty", summary.RPCDriftCounts))
+	}
+	if len(summary.PlaceholderLiveDecisionCounts) > 0 {
+		failures = append(failures, fmt.Sprintf("placeholder_live_decision_counts=%v want empty", summary.PlaceholderLiveDecisionCounts))
 	}
 	if summary.ProtocolCounts[CASStorageV1] == 0 {
 		failures = append(failures, "cas_storage_v1 evidence missing")
@@ -160,4 +168,15 @@ func isRPCDrift(event Event) bool {
 		}
 	}
 	return false
+}
+
+// HasPlaceholderLiveDecision identifies live provider evidence that did not
+// include a real provider judgment.
+// Intent: A live POC13 run should not pass analyzer gates if provider calls
+// succeeded but produced only placeholder text. Source: DI-lasuh
+func HasPlaceholderLiveDecision(event Event) bool {
+	if event.Event != "llm_decision_live" {
+		return false
+	}
+	return strings.Contains(strings.ToLower(event.Detail), "provider returned no output_text")
 }

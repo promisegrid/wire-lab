@@ -51,7 +51,10 @@ func (runner Runner) Run(ctx context.Context) error {
 	}()
 	recorder := &Recorder{log: log, agent: runner.Agent, registry: runner.Registry}
 	recorder.Record("app_receive_promise_registered", "kept", "", "", "cas_storage_v1 and cid_compute_v1 payloads are accepted only as local promises")
-	decision, decisionErr := runner.Decider.Decide(ctx, runner.Config, runner.Agent, "Choose which local storage or compute promise you can make in this bounded POC13 turn.")
+	// Intent: Live provider judgments should be role-aligned promise evidence,
+	// not generic storage-or-compute text that drifts away from the configured
+	// POC13 agent role. Source: DI-lasuh
+	decision, decisionErr := runner.Decider.Decide(ctx, runner.Config, runner.Agent, fmt.Sprintf("Choose one local promise consistent with your configured POC13 role %q and peers %q in this bounded turn. Stay inside your role: data_holder asks for CAS storage and CID compute promises; storage_peer discusses CAS storage, retention, and serving; compute_peer discusses CID-named compute; cache_peer discusses exact result cache evidence; context_peer discusses explicit context objects; replication_peer discusses sparse CAS replicas; verifier_peer discusses local CID verification and corrupt-byte evidence; adversary_peer presents malformed storage evidence for local rejection. Do not claim permission, authority, commands, or another role.", runner.Agent.Role, runner.Agent.Peers))
 	if decisionErr != nil {
 		recorder.Record("llm_decision_error", "non_commitment", "", "", decisionErr.Error())
 	} else {

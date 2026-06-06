@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strings"
 )
 
 // Decider supplies local autonomy text for one agent turn.
@@ -19,6 +20,42 @@ type Decider interface {
 type DecisionResult struct {
 	Mode string
 	Text string
+}
+
+// ProviderResponse models only the stable text-bearing parts of the Responses
+// API shape POC13 needs for local promise evidence.
+// Intent: Live runs should record the provider's actual local promise judgment
+// instead of a placeholder when nested output text is present. Source:
+// DI-lasuh
+type ProviderResponse struct {
+	OutputText string           `json:"output_text"`
+	Output     []ProviderOutput `json:"output"`
+}
+
+// ProviderOutput is one Responses API output item.
+type ProviderOutput struct {
+	Content []ProviderContent `json:"content"`
+}
+
+// ProviderContent is one text-bearing content item inside a provider output.
+type ProviderContent struct {
+	Text string `json:"text"`
+}
+
+// ResponseText returns the first non-empty text field found in the provider
+// response, checking both the top-level convenience field and nested content.
+func (response ProviderResponse) ResponseText() string {
+	if text := strings.TrimSpace(response.OutputText); text != "" {
+		return text
+	}
+	for _, output := range response.Output {
+		for _, content := range output.Content {
+			if text := strings.TrimSpace(content.Text); text != "" {
+				return text
+			}
+		}
+	}
+	return ""
 }
 
 // LiveOrScriptedDecider uses a provider only when configured and credentialed;
@@ -71,14 +108,13 @@ func (decider LiveOrScriptedDecider) Decide(ctx context.Context, cfg Config, age
 	if response.StatusCode < 200 || response.StatusCode >= 300 {
 		return DecisionResult{}, fmt.Errorf("provider status %d", response.StatusCode)
 	}
-	var responseBody struct {
-		OutputText string `json:"output_text"`
-	}
+	var responseBody ProviderResponse
 	if err := json.NewDecoder(response.Body).Decode(&responseBody); err != nil {
 		return DecisionResult{}, err
 	}
-	if responseBody.OutputText == "" {
-		responseBody.OutputText = "provider returned no output_text"
+	responseText := responseBody.ResponseText()
+	if responseText == "" {
+		responseText = "provider returned no output_text"
 	}
-	return DecisionResult{Mode: "live", Text: responseBody.OutputText}, nil
+	return DecisionResult{Mode: "live", Text: responseText}, nil
 }

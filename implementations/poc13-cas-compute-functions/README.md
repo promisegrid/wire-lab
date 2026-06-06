@@ -15,6 +15,9 @@ cache, app, or kernel API. Source: `DI-bibom`; `DI-notig`.
   corrupt bytes, explicit context objects, compute results, and cache keys.
 - LLM decisions are attempted only when `live_decisions` is true and the named
   API-key environment variable is present; config files must not store keys.
+- Live provider runs must emit meaningful provider text. The analyzer rejects
+  placeholder live-decision evidence such as `provider returned no output_text`
+  because that proves reachability, not useful local promise judgment.
 
 ## Run
 

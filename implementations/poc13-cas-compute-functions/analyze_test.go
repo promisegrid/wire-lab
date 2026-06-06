@@ -39,13 +39,27 @@ func TestAnalyzeRunAcceptsParentDirectoryAndValidates(t *testing.T) {
 
 func TestValidateAnalysisRejectsRPCDrift(t *testing.T) {
 	summary := AnalysisSummary{
-		TotalEvents:    1,
-		EventCounts:    map[string]int{},
-		ProtocolCounts: map[string]int{CASStorageV1: 1, CIDComputeV1: 1},
-		RPCDriftCounts: map[string]int{"alice": 1},
+		TotalEvents:                   1,
+		EventCounts:                   map[string]int{},
+		ProtocolCounts:                map[string]int{CASStorageV1: 1, CIDComputeV1: 1},
+		RPCDriftCounts:                map[string]int{"alice": 1},
+		PlaceholderLiveDecisionCounts: map[string]int{},
 	}
 	if err := ValidateAnalysis(summary); err == nil {
 		t.Fatalf("rpc drift should fail validation")
+	}
+}
+
+func TestValidateAnalysisRejectsPlaceholderLiveDecision(t *testing.T) {
+	summary := AnalysisSummary{
+		TotalEvents:                   1,
+		EventCounts:                   map[string]int{},
+		ProtocolCounts:                map[string]int{CASStorageV1: 1, CIDComputeV1: 1},
+		RPCDriftCounts:                map[string]int{},
+		PlaceholderLiveDecisionCounts: map[string]int{"alice": 1},
+	}
+	if err := ValidateAnalysis(summary); err == nil {
+		t.Fatalf("placeholder live decision should fail validation")
 	}
 }
 
