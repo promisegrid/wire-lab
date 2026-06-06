@@ -229,6 +229,18 @@ func (cfg Config) ShutdownGrace() time.Duration {
 	return time.Duration(cfg.ShutdownGraceMillis) * time.Millisecond
 }
 
+// MonitorWaitTimeout returns the longest time a completed node should wait for
+// the observer-only monitor marker before treating the run lifecycle as stuck.
+// Intent: Early-finishing deterministic apps must not kill a valid run merely
+// because live agents and the monitor can each spend their configured provider
+// request budget before `monitor.done` appears. Source: DI-jupob
+func (cfg Config) MonitorWaitTimeout() time.Duration {
+	agentCallBudget := cfg.RequestTimeout() * time.Duration(cfg.MaxAgentCalls)
+	monitorCallBudget := cfg.RequestTimeout() * time.Duration(cfg.MaxMonitorCalls)
+	turnDelayBudget := cfg.TurnDelay() * time.Duration(cfg.MaxTurns+1)
+	return cfg.StartupDelay() + cfg.ShutdownGrace() + turnDelayBudget + agentCallBudget + monitorCallBudget
+}
+
 // Agent returns a named agent config.
 func (cfg Config) Agent(name string) (AgentConfig, bool) {
 	for _, agent := range cfg.Agents {

@@ -38,6 +38,10 @@ evidence. Source: `DI-timah`; `DI-bikit`; `DI-galin`; `DI-pohaj`.
   `printer_port` resource owner for a scoped future-print promise token, then
   redeem that token with bounded label bytes before it can return print evidence
   to fulfillment. Source: `DI-pohaj`; `DI-vutok`.
+- Observer-only monitor lifecycle: completed nodes wait for `monitor.done` using
+  a config-derived provider/turn/grace budget, and a completed run can still
+  write the non-authoritative marker if the observer report fails. Source:
+  `DI-jupob`.
 
 ## Protocol Shape
 
@@ -152,5 +156,8 @@ ID, and byte limit; `ups_label_printer` sends `redeem_print_capability` with the
 token and exact hex label bytes; `printer_port` returns deterministic local
 spool evidence. Unit tests cover the token issue/redemption path, wrong-token
 rejection, routing pCID registration, and analyzer shipping-event recognition.
-Live Docker evidence still needs a fresh run after this change. Source:
-`DI-pohaj`; `DI-vutok`.
+The fresh Docker run `poc12-jupob-20260606-030610` exited cleanly after Dave
+wrote `monitor_done`; analyzer output reported 625 events, 17 `node_done`, 17
+`shutdown_grace_elapsed`, one `monitor_done`, all printer-port shipping counts,
+and empty `resource_trust_coupling_counts`. Source: `DI-pohaj`; `DI-vutok`;
+`DI-jupob`.

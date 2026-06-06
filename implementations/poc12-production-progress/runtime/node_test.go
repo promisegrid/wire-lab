@@ -3,6 +3,8 @@ package runtime
 import (
 	"context"
 	"encoding/hex"
+	"errors"
+	"os"
 	"path/filepath"
 	"strconv"
 	"testing"
@@ -375,6 +377,25 @@ func TestShutdownGraceRecordsBeforeDone(t *testing.T) {
 	}
 }
 
+func TestMonitorFailureWritesNonAuthoritativeDoneMarker(t *testing.T) {
+	cfg := singleNodeTestConfig(t)
+	node := NewNode(cfg, cfg.Agents[0], &decision.FakeDecider{}, failingMonitor{})
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	if err := node.Run(ctx); err != nil {
+		t.Fatalf("run node with failing monitor: %v", err)
+	}
+	if _, err := os.Stat(filepath.Join(cfg.RunRoot, cfg.RunID, "monitor.done")); err != nil {
+		t.Fatalf("monitor done marker should exist after observer failure: %v", err)
+	}
+	if !hasEventOutcome(node.events, "monitor_error", "non_commitment") {
+		t.Fatalf("monitor error should be local non-commitment evidence: %#v", node.events)
+	}
+	if !hasEventOutcome(node.events, "monitor_done", "non_commitment") {
+		t.Fatalf("fallback monitor marker should be non-authoritative evidence: %#v", node.events)
+	}
+}
+
 func TestDrainInflightRecordsOnce(t *testing.T) {
 	cfg := singleNodeTestConfig(t)
 	node := NewNode(cfg, cfg.Agents[0], &decision.FakeDecider{}, decision.FakeMonitor{})
@@ -567,6 +588,12 @@ func (errorDecider) Decide(_ context.Context, _ decision.Observation) (decision.
 	return decision.PromiseDecision{}, context.DeadlineExceeded
 }
 
+type failingMonitor struct{}
+
+func (failingMonitor) Evaluate(_ context.Context, _ []decision.Event) (decision.MonitorReport, error) {
+	return decision.MonitorReport{}, errors.New("monitor provider unavailable")
+}
+
 func signedAccountingUpdateFrame(t *testing.T, node *Node) []byte {
 	t.Helper()
 	envelope, err := protocol.NewEnvelope(node.Protocols.MustCID(pcid.AccountingV1), map[string]string{
@@ -594,6 +621,15 @@ func signedAccountingUpdateFrame(t *testing.T, node *Node) []byte {
 func hasEvent(events []decision.Event, eventName string) bool {
 	for _, event := range events {
 		if event.Event == eventName {
+			return true
+		}
+	}
+	return false
+}
+
+func hasEventOutcome(events []decision.Event, eventName, outcome string) bool {
+	for _, event := range events {
+		if event.Event == eventName && event.Outcome == outcome {
 			return true
 		}
 	}

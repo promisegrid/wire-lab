@@ -166,7 +166,16 @@ func (node *Node) Run(ctx context.Context) error {
 	}
 	if node.Agent.Name == node.Config.MonitorNode {
 		if err := node.runMonitor(ctx); err != nil {
-			node.record("monitor_error", "broken", "", err.Error())
+			node.record("monitor_error", "non_commitment", "", err.Error())
+			if !node.allDone() {
+				return err
+			}
+			// Intent: Once every app has written `node_done`, a monitor/provider
+			// failure is observer evidence rather than a reason to strand all
+			// completed nodes. Source: DI-jupob
+			if markerErr := node.writeMonitorDoneMarker("non_commitment", "monitor unavailable after completed run: "+err.Error()); markerErr != nil {
+				return markerErr
+			}
 		}
 	}
 	return node.waitForMonitor(ctx)
@@ -1539,7 +1548,8 @@ func (node *Node) waitForMonitor(ctx context.Context) error {
 	monitorDone := filepath.Join(node.runDir(), "monitor.done")
 	ticker := time.NewTicker(250 * time.Millisecond)
 	defer ticker.Stop()
-	timeout := time.After(90 * time.Second)
+	monitorWaitTimeout := node.Config.MonitorWaitTimeout()
+	timeout := time.After(monitorWaitTimeout)
 	for {
 		if _, err := os.Stat(monitorDone); err == nil {
 			return nil
@@ -1548,7 +1558,7 @@ func (node *Node) waitForMonitor(ctx context.Context) error {
 		case <-ctx.Done():
 			return ctx.Err()
 		case <-timeout:
-			return fmt.Errorf("timed out waiting for monitor.done")
+			return fmt.Errorf("timed out waiting for monitor.done after %s", monitorWaitTimeout)
 		case <-ticker.C:
 		}
 	}
@@ -1559,8 +1569,7 @@ func (node *Node) waitForMonitor(ctx context.Context) error {
 // Intent: Make monitor completion idempotent and reduce false drift from
 // reading logs before in-flight receipts settle. Source: DI-timah
 func (node *Node) runMonitor(ctx context.Context) error {
-	donePath := filepath.Join(node.runDir(), "monitor.done")
-	if _, err := os.Stat(donePath); err == nil {
+	if _, err := os.Stat(filepath.Join(node.runDir(), "monitor.done")); err == nil {
 		node.record("monitor_done_existing", "kept", "", "monitor marker already existed")
 		return nil
 	} else if !errors.Is(err, os.ErrNotExist) {
@@ -1586,10 +1595,27 @@ func (node *Node) runMonitor(ctx context.Context) error {
 	if err := os.WriteFile(reportPath, append(reportBytes, '\n'), 0o644); err != nil {
 		return err
 	}
+	return node.writeMonitorDoneMarker("kept", report.Summary)
+}
+
+// writeMonitorDoneMarker writes the observer marker that lets other completed
+// nodes exit without making the monitor a global authority over the protocol
+// run.
+// Intent: Monitor success, latency, or provider failure is local evidence about
+// the observer; it must not retroactively break a completed promise exchange.
+// Source: DI-jupob
+func (node *Node) writeMonitorDoneMarker(outcome, detail string) error {
+	donePath := filepath.Join(node.runDir(), "monitor.done")
+	if _, err := os.Stat(donePath); err == nil {
+		node.record("monitor_done_existing", "kept", "", "monitor marker already existed")
+		return nil
+	} else if !errors.Is(err, os.ErrNotExist) {
+		return err
+	}
 	if err := os.WriteFile(donePath, []byte("done\n"), 0o644); err != nil {
 		return err
 	}
-	node.record("monitor_done", "kept", "", report.Summary)
+	node.record("monitor_done", outcome, "", detail)
 	return nil
 }
 
@@ -1631,7 +1657,8 @@ func (node *Node) markDrainStarted() bool {
 func (node *Node) waitForAllDone(ctx context.Context) error {
 	ticker := time.NewTicker(250 * time.Millisecond)
 	defer ticker.Stop()
-	timeout := time.After(90 * time.Second)
+	monitorWaitTimeout := node.Config.MonitorWaitTimeout()
+	timeout := time.After(monitorWaitTimeout)
 	for {
 		if node.allDone() {
 			return nil
@@ -1640,7 +1667,7 @@ func (node *Node) waitForAllDone(ctx context.Context) error {
 		case <-ctx.Done():
 			return ctx.Err()
 		case <-timeout:
-			return fmt.Errorf("timed out waiting for all node done markers")
+			return fmt.Errorf("timed out waiting for all node done markers after %s", monitorWaitTimeout)
 		case <-ticker.C:
 		}
 	}

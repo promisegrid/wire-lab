@@ -4,6 +4,7 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+	"time"
 )
 
 func TestLoadRejectsSecretBearingFields(t *testing.T) {
@@ -65,6 +66,25 @@ func TestAgentRejectsUnknownProtocolName(t *testing.T) {
 	}
 	if err := agent.Validate(); err == nil {
 		t.Fatalf("unknown supported pCID should be rejected")
+	}
+}
+
+func TestMonitorWaitTimeoutCoversAgentAndMonitorBudgets(t *testing.T) {
+	cfg := Config{
+		RequestTimeoutSeconds: 120,
+		StartupDelayMillis:    500,
+		TurnDelayMillis:       500,
+		ShutdownGraceMillis:   45000,
+		MaxTurns:              4,
+		MaxAgentCalls:         4,
+		MaxMonitorCalls:       1,
+	}
+	want := 648 * time.Second
+	if got := cfg.MonitorWaitTimeout(); got != want {
+		t.Fatalf("monitor wait timeout = %s, want %s", got, want)
+	}
+	if cfg.MonitorWaitTimeout() <= 90*time.Second {
+		t.Fatalf("monitor wait timeout should exceed the old hard-coded 90s limit")
 	}
 }
 

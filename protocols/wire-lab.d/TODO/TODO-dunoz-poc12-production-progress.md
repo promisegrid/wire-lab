@@ -275,6 +275,36 @@ commands.
 Affects: `implementations/poc12-production-progress/**`;
 `protocols/wire-lab.d/TODO/TODO-dunoz-poc12-production-progress.md`.
 
+ID: DI-jupob
+Date: 2026-06-05 20:02:47
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Fix the POC12 monitor lifecycle in place. Nodes must wait for
+`monitor.done` using a timeout derived from the configured provider request
+budget, monitor-call budget, turn delay, and shutdown grace rather than a
+hard-coded 90 seconds. If the observer-only monitor fails after the protocol run
+has otherwise completed, the monitor node must record `monitor_error` and still
+write `monitor.done` as a non-authoritative marker so other agents do not treat
+the monitor as a global authority or block forever.
+Intent: The printer-port Docker run proved the shipping protocol path but
+exited nonzero because early nodes timed out waiting for the monitor marker
+before Dave could finish the observer report. The monitor is evidence, not a
+governing participant; monitor latency or provider failure should not turn a
+completed promise exchange into a failed protocol run.
+Constraints: Keep the fix in POC12. Do not add pCIDs, top-level actions, RPC
+verbs, durable queues, Docker network mutation, kernel-owned trust, or
+envelope-shape changes. Do not commit provider logs, Docker volume state,
+secrets, or local runtime config. Approved helper and event names are
+`MonitorWaitTimeout`, `monitorWaitTimeout`, `writeMonitorDoneMarker`, and
+`monitor_done`.
+Affects: `implementations/poc12-production-progress/config/config.go`;
+`implementations/poc12-production-progress/config/config_test.go`;
+`implementations/poc12-production-progress/runtime/node.go`;
+`implementations/poc12-production-progress/runtime/node_test.go`;
+`implementations/poc12-production-progress/README.md`;
+`DEV-GUIDE-RESOURCES.md`;
+`protocols/wire-lab.d/TODO/TODO-dunoz-poc12-production-progress.md`.
+
 ## Prior aliases
 
 - None.
@@ -314,6 +344,7 @@ Affects: `implementations/poc12-production-progress/**`;
   exhaustion separation, repeated-promise suppression, and analyzer checks.
 - [x] dunoz.18 Add printer-port kernel-role capability tokens for future label
   printing and local hardware access evidence.
+- [x] dunoz.19 Fix observer-only monitor lifecycle after printer-port run.
 
 ## Implementation status
 
@@ -376,6 +407,15 @@ POC12. Validation run on 2026-06-05 after `DI-pohaj`: POC12 `go test ./...`,
 `GOCACHE=/tmp/wire-lab-gocache`. The implementation adds `printer_port_v1`,
 `poc12-printer-port`, deterministic print capability token issue/redemption,
 wrong-token rejection coverage, pCID routing registration, analyzer shipping
-event recognition, README guidance, and guide-resource notes. A fresh Docker run
-is still needed before live printer-port event counts can be cited. Source:
-`DI-pohaj`; `DI-vutok`.
+event recognition, README guidance, and guide-resource notes. The first fresh
+printer-port Docker run proved the shipping path but exited nonzero because
+early nodes timed out waiting for the observer-only monitor marker. `DI-jupob`
+replaced the hard-coded monitor wait with a config-derived budget and lets a
+completed run write `monitor.done` even if the observer report fails. Validation
+run on 2026-06-05 after `DI-jupob`: POC12 `go test ./...`, `go vet ./...`, and
+`errcheck ./...` passed with `GOCACHE=/tmp/wire-lab-gocache`. The fresh Docker
+run `poc12-jupob-20260606-030610` exited cleanly; analyzer output reported 625
+events, 595 kept, 30 non-commitment, 17 `node_done`, 17
+`shutdown_grace_elapsed`, 1 `monitor_done`, all printer-port shipping counts,
+and empty `resource_trust_coupling_counts`. Source: `DI-pohaj`; `DI-vutok`;
+`DI-jupob`.
