@@ -41,6 +41,36 @@ Affects: `simulations/SIM-fovip-kernel-promise-boundary-port-contract/`;
 `DEV-GUIDE-RESOURCES.md`; `protocols/wire-lab.d/specs/harness-spec-draft.md`;
 kernel TEs under `docs/thought-experiments/`; `protocols/wire-lab.d/TODO/TODO.md`.
 
+### DI-punuf
+
+ID: DI-punuf
+Date: 2026-06-05 19:46:28
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Record the non-monolithic kernel model as an explicit extension of
+the existing role/profile synthesis. A PromiseGrid kernel is a local collection
+of bounded promise-making roles, not necessarily one process. Those roles can be
+implemented by one daemon, several local processes, cooperating objects, a WASM
+host, MCU/library functions, or other runtime-specific profiles. POC12
+`printer_port` is current executable evidence for a local hardware/resource
+owner role that issues and redeems capability-promise tokens without making the
+message kernel an authorization server.
+Intent: The recent POC12 printer-port split makes the abstract role/profile
+model concrete. Kernel prose should now say that dispatch, transport, lifecycle,
+storage, compute, key/signing, hardware/resource access, and evidence recording
+are role promises that may be carried by different local agents or objects,
+while preserving the Promise Theory rule that no role commands another
+autonomous agent.
+Constraints: Do not create another TE for this unless a new architectural fork
+appears. Do not freeze a final SDK, required pCID set, process topology, USB
+API, token API, or production hardware contract. Do not describe these roles as
+permission, authorization, service registry, policy enforcement, conformance, or
+global trust authority. Keep POC12 as provisional evidence and keep `DR-davod`
+open until the focused kernel evidence review is complete.
+Affects: `docs/research/DN-lujad-promisegrid-kernel-role-profile.md`;
+`DEV-GUIDE-RESOURCES.md`;
+`protocols/wire-lab.d/TODO/TODO-binag-promisegrid-kernel-design-resolution.md`.
+
 ## Basic principles to preserve
 
 - Everything useful is a promise.
@@ -136,6 +166,8 @@ kernel TEs under `docs/thought-experiments/`; `protocols/wire-lab.d/TODO/TODO.md
   for authority drift, and verify no deleted false-split reference IDs remain.
 - [ ] binag.14 Commit with explicit file staging and an AGENTS-compliant body
   after final validation.
+- [x] binag.15 Fold POC12 printer-port evidence into the non-monolithic
+  kernel role/profile synthesis without freezing a final kernel API.
 
 ## Acceptance criteria
 

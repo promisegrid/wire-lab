@@ -4,7 +4,8 @@ This design note explains the current PromiseGrid kernel direction in plain
 English. It is not a TE, not a frozen protocol spec, and not final SDK prose. It
 is the current design synthesis for resolving `DR-davod`: what guide writers can
 say about kernel developers after the kernel TEs converged, and what still waits
-for focused evidence and future frozen pCID specs. Source: `DI-fidot`.
+for focused evidence and future frozen pCID specs. Source: `DI-fidot`;
+`DI-punuf`.
 
 ## Basic principles
 
@@ -72,10 +73,22 @@ A deployment may realize the role set as:
 
 These are profiles. They are not competing definitions of PromiseGrid itself.
 
-The kernel role set may include dispatch, storage, compute, networking, key use,
-device access, lifecycle, pCID handling, evidence recording, namespace
-projection, and reference resolution. In a split deployment, different local
-agents may make these promises separately.
+The kernel role set may include dispatch, transport, app lifecycle, storage,
+compute, key use or signing, hardware/resource access, pCID handling, evidence
+recording, namespace projection, and reference resolution. These are roles
+because each one is a bounded local promise surface: what the role promises to
+do, what it does not promise, what evidence it records, and what host/runtime
+assumptions it depends on. Source: `DI-fidot`; `DI-punuf`.
+
+In a split deployment, different local agents, processes, objects, adapters, or
+library functions may make these promises separately. POC12's `printer_port`
+role is the current concrete example: it owns a simulated local hardware
+resource, promises scoped future printing by issuing a capability-promise token,
+and later promises print evidence when the token is redeemed with bounded label
+bytes. The message kernel only carries the pCID-selected bytes and records its
+own transport evidence; it does not become a USB authority, permission server,
+business workflow engine, or trust oracle. Source: `DI-pohaj`; `DI-vutok`;
+`DI-punuf`.
 
 ## App/kernel boundary
 
@@ -202,6 +215,8 @@ model while guide handoff remains a separate task.
 ## Source trail
 
 - `DI-fidot` records the design-resolution path.
+- `DI-punuf` records the non-monolithic kernel-role synthesis after POC12 made a
+  local hardware/resource role concrete.
 - `DR-davod` owns the kernel-developer porting-boundary decision.
 - `TE-jimar` narrows kernel to role/profile rather than process shape.
 - `TE-mazop` narrows the minimum credible kernel implementation promises.
