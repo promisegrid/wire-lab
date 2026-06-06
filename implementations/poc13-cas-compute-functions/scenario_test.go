@@ -3,16 +3,21 @@ package poc13
 import (
 	"context"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
 func TestAllPOC13AgentsProduceRequiredEvidence(t *testing.T) {
 	cfg := testConfig(t)
-	for _, agent := range cfg.Agents {
-		runner := NewRunner(cfg, agent, scriptedOnlyDecider{})
-		if err := runner.Run(context.Background()); err != nil {
-			t.Fatalf("run %s: %v", agent.Name, err)
+	runtime, runtimeErr := NewTCPRuntime(cfg, cfg.Containers[0], scriptedOnlyDecider{})
+	if runtimeErr != nil {
+		t.Fatalf("new runtime: %v", runtimeErr)
+	}
+	if err := runtime.Run(context.Background()); err != nil {
+		if strings.Contains(err.Error(), "operation not permitted") {
+			t.Skipf("sandbox does not permit TCP listener: %v", err)
 		}
+		t.Fatalf("run runtime: %v", err)
 	}
 	summary, err := AnalyzeRun(filepath.Join(cfg.RunRoot, cfg.RunID))
 	if err != nil {
@@ -39,11 +44,11 @@ func testConfig(t *testing.T) Config {
 		AgentModel:            "gpt-5.4",
 		ReasoningEffort:       "medium",
 		RequestTimeoutSeconds: 1,
+		ListenPort:            0,
+		StartupDelayMillis:    0,
+		SettleDelayMillis:     500,
 		Containers: []ContainerConfig{
-			{Name: "alice-bob", Agents: []string{"alice", "bob"}},
-			{Name: "carol-dave", Agents: []string{"carol", "dave"}},
-			{Name: "ellen-frank", Agents: []string{"ellen", "frank"}},
-			{Name: "grace-mallory", Agents: []string{"grace", "mallory"}},
+			{Name: "all", Agents: []string{"alice", "bob", "carol", "dave", "ellen", "frank", "grace", "mallory"}},
 		},
 		Agents: []AgentConfig{
 			{Name: "alice", Role: "data_holder", Persona: "Alice", Peers: []string{"bob", "carol"}},

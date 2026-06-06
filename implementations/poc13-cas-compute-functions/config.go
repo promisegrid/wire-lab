@@ -21,6 +21,9 @@ type Config struct {
 	ServiceTier           string            `json:"service_tier"`
 	RequestTimeoutSeconds int               `json:"request_timeout_seconds"`
 	LiveDecisions         bool              `json:"live_decisions"`
+	ListenPort            int               `json:"listen_port"`
+	StartupDelayMillis    int               `json:"startup_delay_millis"`
+	SettleDelayMillis     int               `json:"settle_delay_millis"`
 	Containers            []ContainerConfig `json:"containers"`
 	Agents                []AgentConfig     `json:"agents"`
 }
@@ -77,6 +80,15 @@ func (cfg Config) Validate() error {
 	if cfg.RequestTimeoutSeconds <= 0 {
 		return fmt.Errorf("request_timeout_seconds must be positive")
 	}
+	if cfg.ListenPort < 0 {
+		return fmt.Errorf("listen_port must be non-negative")
+	}
+	if cfg.StartupDelayMillis < 0 {
+		return fmt.Errorf("startup_delay_millis must be non-negative")
+	}
+	if cfg.SettleDelayMillis < 0 {
+		return fmt.Errorf("settle_delay_millis must be non-negative")
+	}
 	if len(cfg.Containers) == 0 {
 		return fmt.Errorf("at least one container is required")
 	}
@@ -112,6 +124,21 @@ func (cfg Config) Validate() error {
 // Timeout returns the provider decision timeout for live LLM calls.
 func (cfg Config) Timeout() time.Duration {
 	return time.Duration(cfg.RequestTimeoutSeconds) * time.Second
+}
+
+// StartupDelay gives peer containers time to open their TCP listeners before
+// local agents start sending promise envelopes.
+// Intent: POC13 keeps TCP startup deterministic enough for Docker validation
+// without adding a central coordinator or global service registry. Source:
+// DI-fumol
+func (cfg Config) StartupDelay() time.Duration {
+	return time.Duration(cfg.StartupDelayMillis) * time.Millisecond
+}
+
+// SettleDelay keeps the supervisor alive briefly after local sends so triggered
+// peer responses can arrive and be recorded. Source: DI-fumol
+func (cfg Config) SettleDelay() time.Duration {
+	return time.Duration(cfg.SettleDelayMillis) * time.Millisecond
 }
 
 // Container returns one named container config.

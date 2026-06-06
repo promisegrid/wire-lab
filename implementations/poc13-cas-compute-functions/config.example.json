@@ -8,6 +8,9 @@
   "service_tier": "flex",
   "request_timeout_seconds": 120,
   "live_decisions": true,
+  "listen_port": 39113,
+  "startup_delay_millis": 750,
+  "settle_delay_millis": 1500,
   "containers": [
     {"name": "alice-bob", "agents": ["alice", "bob"]},
     {"name": "carol-dave", "agents": ["carol", "dave"]},

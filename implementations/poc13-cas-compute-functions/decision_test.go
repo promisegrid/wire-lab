@@ -36,3 +36,22 @@ func TestResponseText(t *testing.T) {
 		})
 	}
 }
+
+func TestDecisionPromises(t *testing.T) {
+	tests := []struct {
+		name     string
+		decision DecisionResult
+		want     bool
+	}{
+		{name: "promise", decision: DecisionResult{Text: "I promise bounded CAS storage."}, want: true},
+		{name: "no promise", decision: DecisionResult{Text: "I cannot promise that."}, want: false},
+		{name: "unrelated text", decision: DecisionResult{Text: "Maybe later."}, want: false},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			if got := test.decision.Promises(); got != test.want {
+				t.Fatalf("Promises() = %v, want %v", got, test.want)
+			}
+		})
+	}
+}

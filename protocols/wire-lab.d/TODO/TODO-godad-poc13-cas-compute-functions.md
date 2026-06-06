@@ -92,6 +92,74 @@ Affects: `implementations/poc13-cas-compute-functions/decision.go`;
 `implementations/poc13-cas-compute-functions/README.md`;
 `protocols/wire-lab.d/TODO/TODO-godad-poc13-cas-compute-functions.md`.
 
+ID: DI-fumol
+Date: 2026-06-06 07:03:14
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Expand POC13 in place from local evidence generation into a bounded
+TCP-delivered protocol proof while preserving the existing directory
+`implementations/poc13-cas-compute-functions/`, the existing commands, the
+existing Docker Compose service set, the two existing provisional pCID names
+`cas_storage_v1` and `cid_compute_v1`, and the envelope discipline
+`grid([42(pCID), payload, proof])`. The POC13 supervisor becomes the primary
+runtime: each container listens on TCP, sends length-framed raw signed grid
+envelopes to peer containers, parses and verifies received envelopes before
+delivery, and records local evidence per observing agent. LLM/local decision
+text gates whether an agent acts, and signed payloads carry that decision text.
+Concrete behavior must include real CAS store/serve/retrieve/replicate checks,
+CID-named compute over payload-provided function/input/context bytes, local
+trust updates, voluntary repair promises, credit-style economics promises, and
+issuer-local capability-token issue/redeem evidence.
+Intent: POC13 was useful protocol-shape evidence but too shallow: role scripts
+recorded evidence without real transport, storage, retrieval, dynamic compute,
+or trust/economy/capability pressure. The next version should still be a bounded
+POC, not a final API, but it should make the storage/compute promises concrete
+enough that analyzer gates prove peer messages crossed TCP, bytes were stored
+and retrieved by CID, compute results came from payload-provided function/input
+material, and trust/economics/capability records stayed local and voluntary.
+Constraints: Keep POC13 self-contained; do not import POC12, GA-runner, or a
+new shared library. Do not add new protocol pCIDs, top-level action kinds,
+global authorities, permission/conformance framing, stored API keys, or final
+storage/compute APIs. Keep TCP framing simple and local to POC13. The approved
+new file path is
+`implementations/poc13-cas-compute-functions/runtime.go`. Approved changed paths
+are `implementations/poc13-cas-compute-functions/{analyze.go,analyze_test.go,cmd/poc13-supervisor/main.go,config.example.json,config.go,README.md,runtime.go,runtime_test.go,scenario_test.go}`;
+`DEV-GUIDE-RESOURCES.md`; `implementations/README.md`;
+`protocols/wire-lab.d/TODO/TODO.md`; and this TODO file. Approved runtime path
+patterns are Docker-managed `poc13-run` volume paths under `/run/poc13/**`,
+container-local TCP listeners on the configured POC13 port, and `/tmp/wire-lab-gocache`
+for validation. Approved implementation names include `TCPRuntime`,
+`AgentState`, `OutboundPromise`, `RuntimeMessage`, `FrameReader`,
+`FrameWriter`, `ExecuteFunction`, `NewTCPRuntime`, `Run`, `runLocalAgents`,
+`runLocalAgent`, `handleEnvelope`, `sendPromise`, `recordAgentEvent`,
+`adjustTrust`, `issueCapabilityToken`, `redeemCapabilityToken`,
+`containerForAgent`, `dialAddressForAgent`, `listenAddress`, `Promises`,
+`StartupDelay`, `SettleDelay`, `ListenPort`, `StartupDelayMillis`, and
+`SettleDelayMillis`, plus local variables derived from those names.
+Affects: `implementations/poc13-cas-compute-functions/**`;
+`implementations/README.md`;
+`DEV-GUIDE-RESOURCES.md`;
+`protocols/wire-lab.d/TODO/TODO-godad-poc13-cas-compute-functions.md`;
+`protocols/wire-lab.d/TODO/TODO.md`.
+
+ID: DI-hohuf
+Date: 2026-06-06 07:12:17
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Add the POC13 clean Docker regression runner at
+`implementations/poc13-cas-compute-functions/scripts/run-clean.sh` instead of
+using an untracked `/tmp` script. The script resets the Docker Compose state,
+rebuilds and runs POC13, and then runs the analyzer against
+`/run/poc13/poc13-demo`.
+Intent: POC13's expanded TCP runtime needs a repeatable repo-local command that
+Steve can run directly, while preserving explicit exit-code handling and
+avoiding hidden local helper scripts.
+Constraints: Do not store secrets in the script. Do not use `|| true`. Keep the
+script under the POC13 directory and keep Docker-managed runtime state in the
+existing `poc13-run` volume under `/run/poc13/**`.
+Affects: `implementations/poc13-cas-compute-functions/scripts/run-clean.sh`;
+`protocols/wire-lab.d/TODO/TODO-godad-poc13-cas-compute-functions.md`.
+
 ## Prior aliases
 
 - None.
@@ -119,6 +187,9 @@ not freeze final storage, compute, cache, provider, kernel, or app APIs.
   self-contained first executable POC with analyzer gates.
 - [x] godad.8 Improve live decision extraction and analyzer gates so provider
   runs record meaningful local promise judgments instead of silent placeholders.
+- [x] godad.9 Expand POC13 into a TCP-delivered bounded runtime with concrete
+  CAS storage/retrieval/replication, dynamic compute, local trust, voluntary
+  repair, credit economics, and capability-token evidence.
 
 ## Acceptance criteria
 

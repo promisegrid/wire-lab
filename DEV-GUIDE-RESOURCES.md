@@ -168,10 +168,17 @@ promise availability, retention, access, serving, or trustworthy computation.
 Pure compute results are cached only by exact protocol/function/input/context
 and result identity; impure work externalizes timestamp, randomness, sensor
 reads, or other ambient inputs as context objects so the run is replayable and
-pure-after-the-fact. POC13's live-provider evidence now must contain actual
-role-aligned local promise judgment text; placeholder provider reachability
-records are analyzer failures, not autonomous promise evidence. Source:
-`DI-gopag`; `DI-bibom`; `DI-notig`; `DI-lasuh`.
+pure-after-the-fact. POC13 now exercises those ideas over length-framed TCP
+between containers: Alice sends storage/compute promise envelopes, Bob stores
+and serves bytes through an issuer-local capability token, Frank replicates CAS
+bytes, Carol executes payload-provided Fibonacci code with explicit context from
+Ellen, Dave checkpoints the exact compute tuple, Grace records Mallory's
+corrupt-byte evidence, and local trust/economics/repair records remain local
+promise evidence rather than authority. POC13's live-provider evidence must
+contain actual role-aligned local promise judgment text; placeholder provider
+reachability records are analyzer failures, not autonomous promise evidence.
+Source: `DI-gopag`; `DI-bibom`; `DI-notig`; `DI-lasuh`; `DI-fumol`;
+`DI-hohuf`.
 
 `poc7` adds executable evidence for promise-shaped capability tokens and local
 exchange: five containers run local kernel boundaries, app-level relays, issuer,
@@ -1297,11 +1304,16 @@ section.
   evidence for decentralized CAS storage promises and CID-named function-call
   compute promises, with `cas_storage_v1` and `cid_compute_v1` as protocol
   pCID names and content/function/context/result CIDs as payload-level values.
-  Its live-provider gate extracts nested Responses text, records role-aligned
-  local promise judgments, and fails placeholder live-decision evidence. It
-  should be cited as POC evidence only, not as a final storage, compute, cache,
-  provider, or kernel API. Source: `DI-bibom`; `DI-notig`; `DI-lasuh`;
-  `TODO-godad`.
+  It sends signed grid envelopes over length-framed TCP, stores and retrieves
+  real CAS bytes by CID, replicates bytes to Frank, executes payload-provided
+  Fibonacci compute with explicit context, checkpoints the exact compute tuple,
+  rejects corrupt CAS evidence, records local trust updates, accepts bounded
+  credit offers, and issues/redeems issuer-local capability tokens. Its
+  live-provider gate extracts nested Responses text, records role-aligned local
+  promise judgments, and fails placeholder live-decision evidence. It should be
+  cited as POC evidence only, not as a final storage, compute, cache, provider,
+  token, economics, trust, transport, or kernel API. Source: `DI-bibom`;
+  `DI-notig`; `DI-lasuh`; `DI-fumol`; `DI-hohuf`; `TODO-godad`.
 - `protocols/wire-lab.d/archive/migrations/SIM-piloh-turns-149-208-recovery/archive/transports/README.md`
   preserves the old root transport design surface as historical evidence.
 

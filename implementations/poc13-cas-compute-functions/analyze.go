@@ -108,10 +108,11 @@ func summarizePOC13Log(logPath string, summary *AnalysisSummary) error {
 	return scanner.Err()
 }
 
-// ValidateAnalysis enforces the first POC13 acceptance gates.
+// ValidateAnalysis enforces the POC13 acceptance gates.
 // Intent: CAS and compute evidence should fail fast if it drifts toward RPC,
-// loses corrupt-byte handling, or stops recording exact cache evidence. Source:
-// DI-notig
+// loses corrupt-byte handling, stops recording exact cache evidence, or fails
+// to prove TCP delivery, concrete storage/retrieval, dynamic compute, trust,
+// economics, repair, and capability-token evidence. Source: DI-notig; DI-fumol
 func ValidateAnalysis(summary AnalysisSummary) error {
 	var failures []string
 	if summary.TotalEvents == 0 {
@@ -140,15 +141,28 @@ func ValidateAnalysis(summary AnalysisSummary) error {
 
 func missingRequiredEvents(summary AnalysisSummary) []string {
 	requiredEvents := []string{
+		"tcp_message_sent",
+		"tcp_message_received",
 		"cas_storage_promised",
 		"cas_retention_promised",
 		"cas_replication_promised",
+		"cas_bytes_stored",
+		"cas_bytes_retrieved",
+		"cas_replica_stored",
 		"cas_corrupt_bytes_rejected",
 		"cas_corrupt_evidence_recorded",
 		"compute_context_promised",
+		"compute_function_executed",
 		"cid_compute_promised",
 		"compute_result_promised",
+		"compute_result_received",
 		"compute_cache_checkpointed",
+		"capability_token_issued",
+		"capability_token_received",
+		"capability_token_redeemed",
+		"economics_credit_accepted",
+		"trust_updated",
+		"trust_repair_promise_recorded",
 		"promise_envelope_validated",
 	}
 	var missing []string

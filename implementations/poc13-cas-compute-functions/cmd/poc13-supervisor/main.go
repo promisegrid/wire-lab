@@ -5,7 +5,6 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"sync"
 
 	poc13 "promisegrid.dev/wire-lab/implementations/poc13-cas-compute-functions"
 )
@@ -32,28 +31,12 @@ func run(ctx context.Context, configPath, containerName string) error {
 	if !ok {
 		return fmt.Errorf("unknown container %s", containerName)
 	}
-	var wg sync.WaitGroup
-	errs := make(chan error, len(container.Agents))
-	for _, agentName := range container.Agents {
-		agent, agentOK := cfg.Agent(agentName)
-		if !agentOK {
-			return fmt.Errorf("unknown agent %s", agentName)
-		}
-		wg.Add(1)
-		go func(localAgent poc13.AgentConfig) {
-			defer wg.Done()
-			runner := poc13.NewRunner(cfg, localAgent, poc13.LiveOrScriptedDecider{})
-			if err := runner.Run(ctx); err != nil {
-				errs <- err
-			}
-		}(agent)
+	// Intent: The supervisor now owns the container-local TCP runtime so POC13
+	// proves inter-container promise delivery instead of only per-agent log
+	// generation. Source: DI-fumol
+	runtime, runtimeErr := poc13.NewTCPRuntime(cfg, container, poc13.LiveOrScriptedDecider{})
+	if runtimeErr != nil {
+		return runtimeErr
 	}
-	wg.Wait()
-	close(errs)
-	for err := range errs {
-		if err != nil {
-			return err
-		}
-	}
-	return nil
+	return runtime.Run(ctx)
 }

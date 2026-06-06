@@ -22,6 +22,24 @@ type DecisionResult struct {
 	Text string
 }
 
+// Promises reports whether the provider/local judgment contains a voluntary
+// promise rather than a non-commitment.
+// Intent: POC13 protocol behavior should be gated by the agent's local promise
+// judgment, so LLM text can stop action instead of being passive decoration.
+// Source: DI-fumol
+func (decision DecisionResult) Promises() bool {
+	lowerText := strings.ToLower(decision.Text)
+	if !strings.Contains(lowerText, "promise") {
+		return false
+	}
+	for _, negativePhrase := range []string{"do not promise", "cannot promise", "can't promise", "no promise", "non-commitment"} {
+		if strings.Contains(lowerText, negativePhrase) {
+			return false
+		}
+	}
+	return true
+}
+
 // ProviderResponse models only the stable text-bearing parts of the Responses
 // API shape POC13 needs for local promise evidence.
 // Intent: Live runs should record the provider's actual local promise judgment

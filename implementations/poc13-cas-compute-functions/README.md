@@ -11,8 +11,14 @@ cache, app, or kernel API. Source: `DI-bibom`; `DI-notig`.
   context CIDs, and result CIDs live in payloads.
 - Every message keeps one top-level act, `promise`, inside
   `grid([42(pCID), payload, proof])`.
-- Agents record local evidence for storage, retention, serving, replication,
-  corrupt bytes, explicit context objects, compute results, and cache keys.
+- Agents exchange signed envelopes over length-framed TCP between Docker
+  containers; the analyzer requires both sent and received TCP evidence.
+- Agents record local evidence for real CAS storage, token-scoped serving,
+  retrieval, replication, corrupt bytes, explicit context objects, dynamic
+  function execution, compute results, and cache keys.
+- Capability tokens, credit-style economics, trust updates, and voluntary repair
+  promises are modeled as local pCID-owned promise payloads and evidence, not as
+  global authority.
 - LLM decisions are attempted only when `live_decisions` is true and the named
   API-key environment variable is present; config files must not store keys.
 - Live provider runs must emit meaningful provider text. The analyzer rejects
@@ -32,6 +38,13 @@ To run without creating local config, point Compose at the committed example:
 ```sh
 POC13_CONFIG=./config.example.json docker compose up --build
 POC13_CONFIG=./config.example.json docker compose run --rm --entrypoint /usr/local/bin/poc13-analyze alice-bob /run/poc13/poc13-demo
+```
+
+The repo-local clean regression runner resets the Docker volume before running
+and analyzing:
+
+```sh
+implementations/poc13-cas-compute-functions/scripts/run-clean.sh
 ```
 
 If no provider key is available, agents use explicit local fallback decisions
