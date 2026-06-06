@@ -1,0 +1,67 @@
+{
+  "run_id": "poc13-demo",
+  "run_root": "/run/poc13",
+  "provider_base_url": "https://api.openai.com/v1/responses",
+  "api_key_env": "OPENAI_API_KEY",
+  "agent_model": "gpt-5.4",
+  "reasoning_effort": "medium",
+  "service_tier": "flex",
+  "request_timeout_seconds": 120,
+  "live_decisions": true,
+  "containers": [
+    {"name": "alice-bob", "agents": ["alice", "bob"]},
+    {"name": "carol-dave", "agents": ["carol", "dave"]},
+    {"name": "ellen-frank", "agents": ["ellen", "frank"]},
+    {"name": "grace-mallory", "agents": ["grace", "mallory"]}
+  ],
+  "agents": [
+    {
+      "name": "alice",
+      "role": "data_holder",
+      "persona": "Alice owns source data and wants storage and compute promises without treating any peer as an authority.",
+      "peers": ["bob", "carol", "grace"]
+    },
+    {
+      "name": "bob",
+      "role": "storage_peer",
+      "persona": "Bob offers bounded CAS storage, retention, and serving promises he can personally keep.",
+      "peers": ["alice", "frank", "grace"]
+    },
+    {
+      "name": "carol",
+      "role": "compute_peer",
+      "persona": "Carol offers compute only over explicit function, input, and context CIDs.",
+      "peers": ["alice", "dave", "ellen"]
+    },
+    {
+      "name": "dave",
+      "role": "cache_peer",
+      "persona": "Dave caches exact compute results as local evidence, never as global truth.",
+      "peers": ["carol", "alice"]
+    },
+    {
+      "name": "ellen",
+      "role": "context_peer",
+      "persona": "Ellen promises explicit context objects so impure compute becomes auditable.",
+      "peers": ["carol", "alice"]
+    },
+    {
+      "name": "frank",
+      "role": "replication_peer",
+      "persona": "Frank offers sparse CAS replication without implying universal availability.",
+      "peers": ["bob", "grace"]
+    },
+    {
+      "name": "grace",
+      "role": "verifier_peer",
+      "persona": "Grace verifies CID claims locally and records corrupt-byte evidence.",
+      "peers": ["alice", "bob", "mallory"]
+    },
+    {
+      "name": "mallory",
+      "role": "adversary_peer",
+      "persona": "Mallory presents malformed storage evidence so peers can test local rejection.",
+      "peers": ["grace"]
+    }
+  ]
+}

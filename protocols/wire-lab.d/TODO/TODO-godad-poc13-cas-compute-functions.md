@@ -33,14 +33,41 @@ Affects: `protocols/wire-lab.d/TODO/TODO-godad-poc13-cas-compute-functions.md`;
 `DEV-GUIDE-RESOURCES.md`; storage/compute scenarios; future
 `implementations/poc13-cas-compute-functions/**`.
 
+ID: DI-notig
+Date: 2026-06-06 02:04:59
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Implement POC13 as a self-contained Go proof of concept under
+`implementations/poc13-cas-compute-functions/`, with commands
+`poc13-supervisor`, `poc13-agent`, and `poc13-analyze`. The first executable
+version uses LLM-backed local agents Alice, Bob, Carol, Dave, Ellen, Frank,
+Grace, and Mallory across Docker containers, with deterministic protocol
+validation in Go before any LLM decision is trusted.
+Intent: POC13 should pressure-test CAS storage and CID-named compute as
+PromiseGrid promises rather than RPC calls. The POC needs enough live autonomy
+to expose local decision and malformed-input pressure, while keeping wire shape,
+pCID handling, signatures, CID verification, cache keys, and analyzer gates
+deterministic enough to diagnose.
+Constraints: Keep POC13 self-contained and do not import POC12 code or extract
+a shared library yet. Use only provisional protocol pCID names
+`cas_storage_v1` and `cid_compute_v1`; message variants, content CIDs, function
+CIDs, and context CIDs live inside pCID-owned payloads. Keep one top-level
+semantic act, `promise`, and do not add global registries, central storage or
+compute authority, hidden RPC verbs, permission/conformance framing, or stored
+API keys.
+Affects: `implementations/poc13-cas-compute-functions/**`;
+`implementations/README.md`;
+`DEV-GUIDE-RESOURCES.md`;
+`protocols/wire-lab.d/TODO/TODO-godad-poc13-cas-compute-functions.md`.
+
 ## Prior aliases
 
 - None.
 
 ## Status
 
-Planned. This TODO locks the POC13 shape and scenario pressure. The executable
-POC13 implementation remains a later task.
+Implemented as first executable evidence. POC13 remains provisional and does
+not freeze final storage, compute, cache, provider, kernel, or app APIs.
 
 ## Tasks
 
@@ -55,13 +82,13 @@ POC13 implementation remains a later task.
 - [x] godad.5 Expand or add scenarios for CAS storage and CID-named function
   compute pressure before implementing the executable POC.
 - [x] godad.6 Update `DEV-GUIDE-RESOURCES.md` and `implementations/README.md`
-  so POC13 is visible as planned evidence, not a stable API.
-- [ ] godad.7 Implement `implementations/poc13-cas-compute-functions/` in a
-  later batch after this definition is reviewed.
+  so POC13 is visible as storage/compute evidence, not a stable API.
+- [x] godad.7 Implement `implementations/poc13-cas-compute-functions/` as a
+  self-contained first executable POC with analyzer gates.
 
 ## Acceptance criteria
 
-- POC13's planned storage and compute protocols keep one top-level semantic act:
+- POC13's storage and compute protocols keep one top-level semantic act:
   `promise`.
 - `cas_storage_v1` and `cid_compute_v1` are protocol pCID names, not message
   type names.

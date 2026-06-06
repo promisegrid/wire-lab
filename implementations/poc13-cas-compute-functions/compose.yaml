@@ -1,0 +1,36 @@
+services:
+  alice-bob:
+    build: .
+    command: ["-container", "alice-bob", "-config", "/app/config.json"]
+    volumes:
+      - poc13-run:/run/poc13
+      - ${POC13_CONFIG:-./config.json}:/app/config.json:ro
+    environment:
+      - OPENAI_API_KEY
+  carol-dave:
+    build: .
+    command: ["-container", "carol-dave", "-config", "/app/config.json"]
+    volumes:
+      - poc13-run:/run/poc13
+      - ${POC13_CONFIG:-./config.json}:/app/config.json:ro
+    environment:
+      - OPENAI_API_KEY
+  ellen-frank:
+    build: .
+    command: ["-container", "ellen-frank", "-config", "/app/config.json"]
+    volumes:
+      - poc13-run:/run/poc13
+      - ${POC13_CONFIG:-./config.json}:/app/config.json:ro
+    environment:
+      - OPENAI_API_KEY
+  grace-mallory:
+    build: .
+    command: ["-container", "grace-mallory", "-config", "/app/config.json"]
+    volumes:
+      - poc13-run:/run/poc13
+      - ${POC13_CONFIG:-./config.json}:/app/config.json:ro
+    environment:
+      - OPENAI_API_KEY
+
+volumes:
+  poc13-run:

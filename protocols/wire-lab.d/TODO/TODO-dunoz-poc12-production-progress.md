@@ -339,6 +339,32 @@ Affects: `implementations/poc12-production-progress/runtime/node.go`;
 `protocols/wire-lab.d/TODO/TODO-dunoz-poc12-production-progress.md`;
 `protocols/wire-lab.d/TODO/TODO.md`.
 
+ID: DI-jidah
+Date: 2026-06-06 02:04:59
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Harden POC12 regression operation by making `poc12-analyze` accept
+either the JSONL log directory itself or the parent run directory that contains
+`run/`, fail loudly when no JSONL logs exist, and validate explicit clean-run
+acceptance criteria. Add
+`implementations/poc12-production-progress/scripts/run-clean-regression.sh` as
+the operator command that resets the POC12 Docker volume, runs compose, finds
+the newest run directory, runs analyzer, and exits nonzero on failed gates.
+Intent: The fresh POC12 run succeeded, but a manual analyzer invocation against
+the run parent returned a misleading zero-event report. Regression tooling must
+make the correct evidence path hard to misuse and must turn the current
+clean-run expectations into executable checks rather than chat-only memory.
+Constraints: Keep POC12 evidence local to the operator's Docker volume and do
+not commit runtime logs, provider outputs, local config, secrets, or Docker
+state. Treat these gates as POC12 evidence checks, not final protocol
+specification. Do not make local resource exhaustion, provider failures, or
+receiver non-commitment into peer promise breaks.
+Affects: `implementations/poc12-production-progress/cmd/poc12-analyze/main.go`;
+`implementations/poc12-production-progress/cmd/poc12-analyze/main_test.go`;
+`implementations/poc12-production-progress/scripts/run-clean-regression.sh`;
+`implementations/poc12-production-progress/README.md`;
+`protocols/wire-lab.d/TODO/TODO-dunoz-poc12-production-progress.md`.
+
 ## Prior aliases
 
 - None.
@@ -381,6 +407,8 @@ Affects: `implementations/poc12-production-progress/runtime/node.go`;
 - [x] dunoz.19 Fix observer-only monitor lifecycle after printer-port run.
 - [x] dunoz.20 Add app-local non-commitment retry restraint and generic
   checkpoint evidence journals.
+- [x] dunoz.21 Harden `poc12-analyze` path handling and add the clean regression
+  wrapper with executable acceptance gates.
 
 ## Implementation status
 
@@ -463,3 +491,10 @@ the shipment-only duplicate map with a generic app-local checkpoint journal.
 `promise_not_promised_suppressed` without peer trust changes. Duplicate shipment
 updates now use `checkpointJournal`, preserving the existing accounting duplicate
 evidence while making the pattern reusable. Source: `DI-zapab`.
+
+`DI-jidah` hardens POC12 regression operation. `poc12-analyze` now accepts the
+parent run directory or the nested JSONL directory, fails when no JSONL evidence
+exists, and enforces clean-run gates for workflow completion, duplicate
+checkpoint evidence, receiver-non-commitment suppression, monitor scores, and
+absence of resource/trust coupling. `scripts/run-clean-regression.sh` resets the
+Compose volume before running and analyzing a fresh run. Source: `DI-jidah`.

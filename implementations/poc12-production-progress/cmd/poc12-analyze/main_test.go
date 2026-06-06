@@ -4,6 +4,8 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+
+	"promisegrid.dev/wire-lab/implementations/poc12-production-progress/decision"
 )
 
 func TestAnalyzeRunSummarizesEventsAndMonitorReport(t *testing.T) {
@@ -55,6 +57,87 @@ func TestAnalyzeRunSummarizesEventsAndMonitorReport(t *testing.T) {
 	}
 	if summary.ResourceTrustCouplingCounts["alice"] != 1 {
 		t.Fatalf("resource/trust coupling not summarized: %#v", summary.ResourceTrustCouplingCounts)
+	}
+}
+
+func TestAnalyzeRunAcceptsParentRunDirectory(t *testing.T) {
+	parentDir := t.TempDir()
+	logDir := filepath.Join(parentDir, "run")
+	if err := os.Mkdir(logDir, 0o755); err != nil {
+		t.Fatalf("make log dir: %v", err)
+	}
+	writeFile(t, filepath.Join(logDir, "alice.jsonl"), `{"observer":"alice","event":"promise_sent","outcome":"kept","peer":"bob","detail":"sent"}`+"\n")
+
+	summary, err := analyzeRun(parentDir)
+	if err != nil {
+		t.Fatalf("analyze parent run dir: %v", err)
+	}
+	if summary.RunDir != logDir {
+		t.Fatalf("summary run dir = %q, want %q", summary.RunDir, logDir)
+	}
+	if summary.TotalEvents != 1 {
+		t.Fatalf("total events = %d, want 1", summary.TotalEvents)
+	}
+}
+
+func TestAnalyzeRunRejectsDirectoryWithoutLogs(t *testing.T) {
+	_, err := analyzeRun(t.TempDir())
+	if err == nil {
+		t.Fatalf("analyze without logs should fail")
+	}
+}
+
+func TestValidateSummaryAcceptsCleanRegressionEvidence(t *testing.T) {
+	summary := cleanRegressionSummary()
+	if err := validateSummary(summary, cleanRegressionCriteria()); err != nil {
+		t.Fatalf("clean regression summary should pass: %v", err)
+	}
+}
+
+func TestValidateSummaryRejectsMissingSuppression(t *testing.T) {
+	summary := cleanRegressionSummary()
+	summary.EventCounts["promise_not_promised_suppressed"] = 0
+	err := validateSummary(summary, cleanRegressionCriteria())
+	if err == nil {
+		t.Fatalf("missing suppression should fail")
+	}
+}
+
+func TestValidateSummaryRejectsResourceTrustCoupling(t *testing.T) {
+	summary := cleanRegressionSummary()
+	summary.ResourceTrustCouplingCounts["alice"] = 1
+	err := validateSummary(summary, cleanRegressionCriteria())
+	if err == nil {
+		t.Fatalf("resource/trust coupling should fail")
+	}
+}
+
+func cleanRegressionSummary() RunSummary {
+	return RunSummary{
+		RunDir:      "test/run",
+		TotalEvents: 10,
+		EventCounts: map[string]int{
+			"fulfillment_workflow_completed":  1,
+			"promise_not_promised_suppressed": 1,
+		},
+		OutcomeCounts: map[string]int{},
+		AgentCounts:   map[string]int{},
+		FailureCounts: map[string]int{},
+		ShippingCounts: map[string]int{
+			"accounting_updated":                    1,
+			"accounting_update_duplicate":           1,
+			"accounting_update_duplicate_confirmed": 1,
+		},
+		RelationshipTransitionCounts: map[string]int{},
+		LocalResourceCounts:          map[string]int{},
+		ResourceTrustCouplingCounts:  map[string]int{},
+		MonitorReport: &decision.MonitorReport{
+			PromiseTheoryFit:      5,
+			Autonomy:              5,
+			ProtocolValidity:      4,
+			LocalTrustCorrectness: 5,
+			ImpositionAvoidance:   5,
+		},
 	}
 }
 

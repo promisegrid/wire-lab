@@ -102,12 +102,12 @@ protocol, or SDK as the single correct implementation shape.
 The current envelope shape `grid([42(pCID), payload, ...])` is input evidence,
 not a reopened decision.
 
-Static review after POC12 and POC13 planning indicates that `SIM-fovip` remains
+Static review after POC12 and first POC13 implementation indicates that `SIM-fovip` remains
 the right active evidence surface: POC12's split kernel/printer-port roles fit
-the non-monolithic role/profile model, and planned POC13 storage/compute work
+the non-monolithic role/profile model, and POC13 storage/compute work
 adds pressure to the existing storage and compute axes instead of requiring a
 successor sim. This review does not decide `DR-davod`; it only clarifies what
-evidence should be examined next. Source: `DI-gopag`; `DI-bibom`.
+evidence should be examined next. Source: `DI-gopag`; `DI-bibom`; `DI-notig`.
 
 ## Related evidence
 

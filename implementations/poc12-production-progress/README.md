@@ -93,13 +93,15 @@ Copy the committed template and keep secrets out of it:
 cp config.example.json config.json
 printf '%s' "$OPENAI_API_KEY" > openai_api_key.txt
 chmod 600 openai_api_key.txt
-docker compose up --build --abort-on-container-exit
+scripts/run-clean-regression.sh
 ```
 
-Summarize one completed run from inside the Compose volume:
+For manual runs, `poc12-analyze` accepts either the parent run directory or its
+`run/` JSONL directory and fails loudly if no JSONL evidence exists:
 
 ```sh
-docker compose run --rm --entrypoint /usr/local/bin/poc12-analyze dave /run/poc12/poc12-demo
+docker compose up --build --abort-on-container-exit
+docker compose run --rm --entrypoint /usr/local/bin/poc12-analyze dave /run/poc12/<run_id>
 ```
 
 `config.json`, `poc12.env`, `openai_api_key.txt`, provider outputs, and Docker

@@ -218,7 +218,7 @@ timestamp, randomness, sensor reads, network observations, or other ambient
 inputs explicit context objects, so the completed run is replayable and
 pure-after-the-fact.
 
-This pressure is assigned to `TODO-godad` / planned POC13. It should inform
+This pressure is assigned to `TODO-godad` / executable POC13. It should inform
 `SIM-fovip` and `DR-davod`, but it does not freeze final storage, CAS,
 function-call, cache, or host API shapes. Source: `DI-bibom`; `DI-gopag`.
 
@@ -261,7 +261,8 @@ model while guide handoff remains a separate task.
 - `DI-punuf` records the non-monolithic kernel-role synthesis after POC12 made a
   local hardware/resource role concrete.
 - `DI-gopag` records the static packet-map and storage/compute pressure pass.
-- `DI-bibom` records the planned POC13 CAS storage and CID-named compute shape.
+- `DI-bibom` records the POC13 CAS storage and CID-named compute shape.
+- `DI-notig` records the first executable POC13 implementation shape.
 - `DR-davod` owns the kernel-developer porting-boundary decision.
 - `TE-jimar` narrows kernel to role/profile rather than process shape.
 - `TE-mazop` narrows the minimum credible kernel implementation promises.
