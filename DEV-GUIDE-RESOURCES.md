@@ -18,7 +18,7 @@ remain review evidence until promoted. Source: `DI-baral`; `DI-sisak`;
 `DI-punam`; `DI-sizoh`; `DI-sagos`; `DI-tugih`; `DI-fibok`; `DI-tanat`;
 `DI-pabot`; `DI-rodog`; `DI-hanih`; `DI-sirus`; `DI-vorus`; `DI-sipuz`;
 `DI-vujil`; `DI-pijan`; `DI-mosoj`; `DI-hotos`; `DI-horuh`; `DI-galin`;
-`DI-jinoz`; `DI-vujob`.
+`DI-jinoz`; `DI-vujob`; `DI-pohaj`; `DI-vutok`.
 
 ### Current Wire Direction
 
@@ -44,7 +44,7 @@ Current envelope/proof hierarchy:
   multiple single-signer proofs, not a universal envelope requirement.
 
 Source: `DI-sisak`; `DI-rojij`; `DI-punam`; `DI-sizoh`; `DI-pagin`;
-`DI-kafiz`; `DI-hanih`; `DI-mosoj`.
+`DI-kafiz`; `DI-hanih`; `DI-mosoj`; `DI-pohaj`; `DI-vutok`.
 
 ### Kernel Boundary Current State
 
@@ -114,6 +114,18 @@ exited cleanly and analyzed to 598 events: 569 kept, 29 non-commitment, 86
 `send_not_promised`, 4 `promise_repeated_suppressed`, 1
 `accounting_update_duplicate`, 1 `accounting_update_duplicate_confirmed`, and
 empty `resource_trust_coupling_counts`. Source: `DI-vujob`.
+
+`poc12` now also adds a concrete local-hardware kernel-role split: the
+`printer_port` app owns the simulated printer-port resource and promises future
+printing by issuing a scoped token to `ups_label_printer`; the label-printer app
+redeems that token with bounded label bytes before returning label evidence to
+fulfillment. This is not permission, authorization, or service registration by
+the message kernel. It is a local promise exchange between app agents carried
+over the same pCID-routed grid-message boundary, with deterministic local spool
+evidence at redemption time. Unit validation covers token issue/redemption,
+wrong-token rejection, pCID routing registration, and analyzer recognition; a
+fresh Docker run is still needed before guide prose cites live event counts.
+Source: `DI-pohaj`; `DI-vutok`.
 
 `poc7` adds executable evidence for promise-shaped capability tokens and local
 exchange: five containers run local kernel boundaries, app-level relays, issuer,
@@ -372,8 +384,8 @@ Source: `DI-sisak`; `DI-rojij`; `DI-punam`; `DI-sizoh`; `DI-kafat`.
 | Tagged-selector succession | Tag `42` is the current standard instance; future replacement would be a family-level evolution, not a new `grid2()` / `grid3()` envelope family. |
 | Canonical bytes | The outer envelope is CBOR; payload canonicalization, hash rules, and proof encoding remain protocol-specific unless later DIs narrow them. |
 | Action vocabulary | The future-facing top-level semantic action is `promise`. Observation, refusal, repair, offer/counter/acceptance, route, introduction, redemption, transfer, storage, compute, and TCP-link changes are payload meaning, promise absence, local non-action promises, or local interpretation unless a later TE/DI proves a distinct wire-level role. |
-| Kernel profile | The kernel remains provisional; `DN-lujad`, `TODO-binag`, `TODO-hozaz`, `TODO-tapov`, `TODO-hipak`, the expanded `SIM-fovip`, executable `poc3`, executable `poc4`, executable `poc5`, executable `poc7`, executable `poc8`, executable `poc9`, executable `poc10`, executable `poc11`, and executable `poc12` evidence now synthesize `TE-mazop`, `TE-pudiv`, `TE-dunas`, and `TE-gakoh` into role/profile guidance for app-facing promises, same-grid app/kernel messaging, app-level relay promises, local trust decrease after broken promises, selective sending, app-level capability-token promises, signed CBOR-grid app messages over length-framed TCP evidence, promise-shaped reciprocal exchange vocabulary, autonomous need/offer/counter/acceptance payload variants, sparse-mesh route/referral/introduction promises, ordinary low-risk promises before private escalation, malformed TCP evidence, local route refusal, Mallory-to-Dave expired-token misuse evidence, LLM-selected local decisions behind Go-owned protocol validation, deterministic local economic decisions before app action, adaptive direct TCP link promises based on local trust, issuer-local revocation/redemption/expiry evidence, voluntary group namespaces, CID-rooted promise-bound references, file-like resources over promise/event logs, lower-patent-risk prior-art influence guardrails, host assumptions, unsupported features, app receive-promise registration, separate local app processes, one kernel process per container, exact-byte pCID routing, concrete multi-pCID shipping apps, kernel-local operational evidence records, app-local trust and promise judgments, and minimum credible port-promise records before `DR-davod` closes. |
-| Promise-economy autonomy | POC8 demonstrates one-pCID payload variants for autonomous need advertisements, offer/counter/acceptance promises, token issue/redemption promises, outcome observations, collateral/stake promises, bearer-for-non-transferable exchange, peer-local exchange-rate quotes, and stale-token trust decay. POC9 adds sparse-mesh discovery, dynamic route promises, referral/introduction promises, ordinary public/known promises before private escalation, local TCP evidence feedback, malformed-byte evidence, scoped route refusal, signed-expiry evidence that is neutral for the issuer, Mallory trust decay for presenting expired bytes as useful, and all-node completion. POC10 adds live LLM-selected local decisions, fake-LLM tests, mixed autonomy profiles, non-secret config-file runtime, and monitor-as-observer fitness reporting while keeping Go responsible for valid signed grid messages. POC11 adds the stricter promise-only top-level action boundary, malformed-decision rejection, local reciprocal economics, budget/capacity pressure, multi-round relationship decay/repair, trust-correlated direct TCP link promises, strict provider-side structured output, bounded missing-shape repair, idempotent done/monitor ordering, bounded receive-handler drain, restart-durable local relationship snapshots, executable storage/compute capacity checks, stake/collateral cost accounting, adversarial prompt-injection/malformed-CBOR tests, target enums from local direct/candidate peers, bundled-target repair, all-turns coordinated shutdown grace, analyzer summaries, and candidate-peer link discovery/formation as a promise payload meaning. POC12 adds multiple app protocol pCIDs through one local kernel per container and a hybrid fulfillment sequence that produced address lookup, package weighing, UPS label, and accounting update evidence before live relationship turns continued. Treat historical named variants as payload semantics unless a later TE/DI promotes a distinct wire-level role. Remaining open work: richer economics beyond bounded POCs, larger-scale discovery pressure, longer multi-run relationship-memory experiments, reducing sender-side acceptance mismatches further, calibrating trust updates, proving the refactored POC12 split in a live Docker run, and deciding whether any POC10/POC11/POC12 LLM boundary should influence final app/kernel APIs. |
+| Kernel profile | The kernel remains provisional; `DN-lujad`, `TODO-binag`, `TODO-hozaz`, `TODO-tapov`, `TODO-hipak`, the expanded `SIM-fovip`, executable `poc3`, executable `poc4`, executable `poc5`, executable `poc7`, executable `poc8`, executable `poc9`, executable `poc10`, executable `poc11`, and executable `poc12` evidence now synthesize `TE-mazop`, `TE-pudiv`, `TE-dunas`, and `TE-gakoh` into role/profile guidance for app-facing promises, same-grid app/kernel messaging, app-level relay promises, local trust decrease after broken promises, selective sending, app-level capability-token promises, signed CBOR-grid app messages over length-framed TCP evidence, promise-shaped reciprocal exchange vocabulary, autonomous need/offer/counter/acceptance payload variants, sparse-mesh route/referral/introduction promises, ordinary low-risk promises before private escalation, malformed TCP evidence, local route refusal, Mallory-to-Dave expired-token misuse evidence, LLM-selected local decisions behind Go-owned protocol validation, deterministic local economic decisions before app action, adaptive direct TCP link promises based on local trust, issuer-local revocation/redemption/expiry evidence, voluntary group namespaces, CID-rooted promise-bound references, file-like resources over promise/event logs, lower-patent-risk prior-art influence guardrails, host assumptions, unsupported features, app receive-promise registration, separate local app processes, one kernel process per container, exact-byte pCID routing, concrete multi-pCID shipping apps, local hardware-resource promise tokens, kernel-local operational evidence records, app-local trust and promise judgments, and minimum credible port-promise records before `DR-davod` closes. |
+| Promise-economy autonomy | POC8 demonstrates one-pCID payload variants for autonomous need advertisements, offer/counter/acceptance promises, token issue/redemption promises, outcome observations, collateral/stake promises, bearer-for-non-transferable exchange, peer-local exchange-rate quotes, and stale-token trust decay. POC9 adds sparse-mesh discovery, dynamic route promises, referral/introduction promises, ordinary public/known promises before private escalation, local TCP evidence feedback, malformed-byte evidence, scoped route refusal, signed-expiry evidence that is neutral for the issuer, Mallory trust decay for presenting expired bytes as useful, and all-node completion. POC10 adds live LLM-selected local decisions, fake-LLM tests, mixed autonomy profiles, non-secret config-file runtime, and monitor-as-observer fitness reporting while keeping Go responsible for valid signed grid messages. POC11 adds the stricter promise-only top-level action boundary, malformed-decision rejection, local reciprocal economics, budget/capacity pressure, multi-round relationship decay/repair, trust-correlated direct TCP link promises, strict provider-side structured output, bounded missing-shape repair, idempotent done/monitor ordering, bounded receive-handler drain, restart-durable local relationship snapshots, executable storage/compute capacity checks, stake/collateral cost accounting, adversarial prompt-injection/malformed-CBOR tests, target enums from local direct/candidate peers, bundled-target repair, all-turns coordinated shutdown grace, analyzer summaries, and candidate-peer link discovery/formation as a promise payload meaning. POC12 adds multiple app protocol pCIDs through one local kernel per container, a hybrid fulfillment sequence that produced address lookup, package weighing, UPS label, and accounting update evidence before live relationship turns continued, and a printer-port capability-promise token path that models local hardware access without making the kernel an authorization server. Treat historical named variants as payload semantics unless a later TE/DI promotes a distinct wire-level role. Remaining open work: richer economics beyond bounded POCs, larger-scale discovery pressure, longer multi-run relationship-memory experiments, reducing sender-side acceptance mismatches further, calibrating trust updates, proving the latest POC12 printer-port split in a live Docker run, and deciding whether any POC10/POC11/POC12 LLM boundary should influence final app/kernel APIs. |
 | LLM autonomy boundary | The current safe boundary is: LLMs choose local promise intent and pCID-owned payload meaning; implementation code normalizes and validates that intent; only implementation code emits protocol bytes. Observation and refusal are promise meanings or promise absence, while workflow words such as repair, route, introduce, redeem, transfer, store, compute, or link are payload meaning or local interpretation, not reusable top-level action vocabulary. POC11 strengthens this by rejecting non-`promise` top-level acts before signing. Freeform intent is useful adversarial pressure, not yet a recommended app pattern. |
 
 Source: `DI-sisak`; `DI-rusup`; `DI-funaf`; `DI-gumum`; `DI-somok`;
@@ -381,7 +393,8 @@ Source: `DI-sisak`; `DI-rusup`; `DI-funaf`; `DI-gumum`; `DI-somok`;
 `DI-fibok`; `DI-tanat`; `DI-pabot`; `DI-rodog`; `DI-sirus`; `DI-rojij`;
 `DI-punam`; `DI-vorus`; `DI-sipuz`; `DI-vujil`; `DI-pijan`; `DI-mosoj`;
 `DI-hotos`; `DI-horuh`; `DI-duhub`; `DI-nanud`; `DI-timah`;
-`DI-bikit`; `DI-parok`; `DI-gagok`; `DI-galin`.
+`DI-bikit`; `DI-parok`; `DI-gagok`; `DI-galin`; `DI-jinoz`;
+`DI-vujob`; `DI-pohaj`; `DI-vutok`.
 
 ### POC11 Latest Assessment
 
@@ -1058,14 +1071,17 @@ Use this section for the guide's App Devs / How to write a grid app section.
   evidence that one container-local kernel can inspect slot 0 `42(pCID)`, route
   exact envelopes by app receive promises, and keep app trust/workflow/promise
   judgment outside the kernel. It also adds deterministic production app
-  processes for a postal scale, UPS label printer, and accounting system
-  alongside live LLM agents. Corrected live runs produced non-empty shipping
-  evidence for address lookup, package weighing, UPS label generation,
-  accounting update confirmation, duplicate accounting-update checkpointing, and
-  app-local promise-journal evidence after the process split. It is not a stable
-  shipping, device, accounting, kernel-routing, monitor, trust, provider, or
+  processes for a postal scale, UPS label printer, printer-port resource owner,
+  and accounting system alongside live LLM agents. Corrected live runs produced
+  non-empty shipping evidence for address lookup, package weighing, UPS label
+  generation, accounting update confirmation, duplicate accounting-update
+  checkpointing, and app-local promise-journal evidence after the process split.
+  The printer-port extension adds unit-tested capability-promise token issue and
+  redemption before local print evidence, but still needs a fresh live Docker
+  run before event counts are cited. It is not a stable shipping, device,
+  accounting, kernel-routing, monitor, trust, provider, hardware-token, or
   workflow API. Source: `DI-timah`; `DI-bikit`; `DI-parok`; `DI-galin`;
-  `DI-jinoz`; `DI-vujob`.
+  `DI-jinoz`; `DI-vujob`; `DI-pohaj`; `DI-vutok`.
 - `simulations/SIM-rakot-group-session/protocols/group-session.d/specs/*.md`
   and `simulations/SIM-ludaf-udp-feed/protocols/udp-feed.d/specs/*.md` are
   current draft protocol specimens after the rusis split. App-facing guidance
@@ -1129,6 +1145,12 @@ Use this section for the guide's App Devs / How to write a grid app section.
   fake adversarial behavior, prompt text, monitor scores, run-specific
   transaction wording, or toy economics formula into guide prose as final API.
   Source: `DI-hotos`; `DI-horuh`; `DI-mosoj`.
+- `poc12` is safe to cite as executable evidence for the discipline "a local
+  hardware resource can be modeled as an app/kernel-role agent making and
+  redeeming promise tokens, while the message kernel only routes exact
+  pCID-selected bytes." Do not copy its app names, token fields, deterministic
+  spool IDs, Docker topology, or shipping workflow as final API. Source:
+  `DI-pohaj`; `DI-vutok`.
 
 ## Kernel Devs
 
@@ -1199,6 +1221,14 @@ section.
   refuse outcomes. It should be cited as POC evidence only, not as a final token,
   trust, exchange, pricing, storage, compute, or transport API. Source:
   `DI-tugih`; `DI-fibok`; `DI-tanat`; `DI-pabot`; `DI-rodog`; `DI-hanih`.
+- `implementations/poc12-production-progress/` is executable provisional
+  evidence for a richer local kernel boundary: one kernel process per container,
+  separate local app processes, pCID receive-promise registration, exact-byte
+  routing, app-local workflow/trust judgment, and a printer-port app that owns
+  simulated hardware-access promises through capability-token issue/redemption.
+  It should be cited as POC evidence only, not as a final kernel, USB, device,
+  token, shipping, or workflow API. Source: `DI-galin`; `DI-vujob`; `DI-pohaj`;
+  `DI-vutok`.
 - `protocols/wire-lab.d/archive/migrations/SIM-piloh-turns-149-208-recovery/archive/transports/README.md`
   preserves the old root transport design surface as historical evidence.
 

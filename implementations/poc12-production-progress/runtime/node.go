@@ -2,6 +2,7 @@ package runtime
 
 import (
 	"context"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -599,6 +600,8 @@ func (node *Node) protocolForFields(fields map[string]string) (string, protocol.
 		return pcid.AccountingV1, node.Protocols.MustCID(pcid.AccountingV1)
 	case production.PromisePrintLabel:
 		return pcid.UPSLabelV1, node.Protocols.MustCID(pcid.UPSLabelV1)
+	case production.PromiseIssuePrintCapability, production.PromiseRedeemPrintCapability:
+		return pcid.PrinterPortV1, node.Protocols.MustCID(pcid.PrinterPortV1)
 	default:
 		return pcid.RelationshipV1, node.Protocols.MustCID(pcid.RelationshipV1)
 	}
@@ -623,6 +626,8 @@ func (node *Node) handleProtocolPromise(message parsedMessage) (map[string]strin
 		return node.handleUPSLabelPromise(message.Fields)
 	case pcid.AccountingV1:
 		return node.handleAccountingPromise(message.Fields)
+	case pcid.PrinterPortV1:
+		return node.handlePrinterPortPromise(message.Fields)
 	default:
 		return nil, fmt.Errorf("unsupported protocol %s", message.ProtocolName)
 	}
@@ -662,13 +667,136 @@ func (node *Node) handleUPSLabelPromise(fields map[string]string) (map[string]st
 	if err != nil {
 		return nil, err
 	}
-	node.record("shipping_label_printed", "kept", fields["from"], fmt.Sprintf("package_id=%s tracking_number=%s cost_cents=%d", packageID, trackingNumber, costCents))
-	return map[string]string{
-		"field_promise_about":   production.PromisePrintLabel,
+	capabilityAck, err := node.requestPrinterPortCapability()
+	if err != nil {
+		return nil, err
+	}
+	labelBytes, err := production.LabelBytesForShipment(map[string]string{
 		"field_package_id":      packageID,
 		"field_tracking_number": trackingNumber,
 		"field_cost_cents":      strconv.Itoa(costCents),
+	})
+	if err != nil {
+		return nil, err
+	}
+	printAck, err := node.redeemPrinterPortCapability(capabilityAck, labelBytes)
+	if err != nil {
+		return nil, err
+	}
+	node.record("shipping_label_printed", "kept", fields["from"], fmt.Sprintf("package_id=%s tracking_number=%s cost_cents=%d", packageID, trackingNumber, costCents))
+	return map[string]string{
+		"field_promise_about":    production.PromisePrintLabel,
+		"field_package_id":       packageID,
+		"field_tracking_number":  trackingNumber,
+		"field_cost_cents":       strconv.Itoa(costCents),
+		"field_printer_spool_id": printAck.Fields["field_printer_spool_id"],
 	}, nil
+}
+
+// requestPrinterPortCapability asks the local printer-port kernel role for a
+// bounded future-print promise token before any label bytes are presented.
+// Intent: The UPS label app receives promise-token evidence from the local
+// printer resource owner instead of assuming hardware access or treating the
+// message kernel as an authorization service. Source: DI-pohaj; DI-vutok
+func (node *Node) requestPrinterPortCapability() (parsedMessage, error) {
+	tokenID := "printcap-" + node.Agent.Name
+	capabilityFields := map[string]string{
+		"act":                              decision.ActPromise,
+		"from":                             node.Agent.Name,
+		"to":                               "printer_port",
+		"turn":                             "startup",
+		"promise":                          "I promise to receive printer_port's scoped future-print capability token and use it only for bounded UPS label bytes.",
+		"reason":                           "ups_label_printer needs local printer-port promise evidence before asking for hardware printing",
+		"field_promise_about":              production.PromiseIssuePrintCapability,
+		"field_print_capability_issuee":    node.Agent.Name,
+		"field_print_capability_token_id":  tokenID,
+		"field_print_capability_scope":     production.PrintCapabilityScope,
+		"field_print_capability_max_bytes": strconv.Itoa(production.PrintCapabilityMaxBytes),
+	}
+	capabilityAck, err := node.sendAndReceive("printer_port", capabilityFields)
+	if err != nil {
+		return parsedMessage{}, err
+	}
+	return capabilityAck, nil
+}
+
+// redeemPrinterPortCapability presents bounded label bytes with the token that
+// printer_port previously issued to this app.
+// Intent: Hardware access is a reciprocal promise exchange with the local
+// resource owner: the label app promises bounded bytes, and printer_port returns
+// local print evidence if its own token is still recognizable. Source: DI-pohaj;
+// DI-vutok
+func (node *Node) redeemPrinterPortCapability(capabilityAck parsedMessage, labelBytes []byte) (parsedMessage, error) {
+	redemptionFields := map[string]string{
+		"act":                              decision.ActPromise,
+		"from":                             node.Agent.Name,
+		"to":                               "printer_port",
+		"turn":                             "startup",
+		"promise":                          "I promise to present only bounded UPS label bytes under this printer_port capability token and to receive printer_port's local print evidence.",
+		"reason":                           "ups_label_printer has a scoped future-print token and now asks printer_port to write exact label bytes",
+		"field_promise_about":              production.PromiseRedeemPrintCapability,
+		"field_print_capability_issuee":    node.Agent.Name,
+		"field_print_capability_token":     capabilityAck.Fields["field_print_capability_token"],
+		"field_print_capability_token_id":  capabilityAck.Fields["field_print_capability_token_id"],
+		"field_print_capability_scope":     capabilityAck.Fields["field_print_capability_scope"],
+		"field_print_capability_max_bytes": capabilityAck.Fields["field_print_capability_max_bytes"],
+		"field_label_bytes_hex":            hex.EncodeToString(labelBytes),
+	}
+	printAck, err := node.sendAndReceive("printer_port", redemptionFields)
+	if err != nil {
+		return parsedMessage{}, err
+	}
+	return printAck, nil
+}
+
+// handlePrinterPortPromise is the local printer-port resource owner's promise
+// surface for future print tokens and bounded label-byte redemption.
+// Intent: Keep hardware access as voluntary local promises by the agent that
+// owns the port, while the kernel only transports exact bytes and the label app
+// only receives explicit print evidence after token redemption. Source:
+// DI-pohaj; DI-vutok
+func (node *Node) handlePrinterPortPromise(fields map[string]string) (map[string]string, error) {
+	if node.Agent.Kind != "printer_port" {
+		return nil, nil
+	}
+	switch fields["field_promise_about"] {
+	case production.PromiseIssuePrintCapability:
+		token, err := production.IssuePrintCapabilityToken(fields)
+		if err != nil {
+			return nil, err
+		}
+		tokenID := firstStringField(fields, "field_print_capability_token_id")
+		scope := firstStringField(fields, "field_print_capability_scope")
+		if scope == "" {
+			scope = production.PrintCapabilityScope
+		}
+		maxBytes := firstStringField(fields, "field_print_capability_max_bytes")
+		if maxBytes == "" {
+			maxBytes = strconv.Itoa(production.PrintCapabilityMaxBytes)
+		}
+		node.record("printer_capability_issued", "kept", fields["from"], fmt.Sprintf("token_id=%s scope=%s max_bytes=%s", tokenID, scope, maxBytes))
+		return map[string]string{
+			"field_promise_about":              production.PromiseIssuePrintCapability,
+			"field_print_capability_issuee":    firstStringField(fields, "field_print_capability_issuee", "from"),
+			"field_print_capability_token":     token,
+			"field_print_capability_token_id":  tokenID,
+			"field_print_capability_scope":     scope,
+			"field_print_capability_max_bytes": maxBytes,
+		}, nil
+	case production.PromiseRedeemPrintCapability:
+		spoolID, err := production.PrintLabelToLocalDevice(fields)
+		if err != nil {
+			return nil, err
+		}
+		printEvidence := firstStringField(fields, "field_label_bytes_hex")
+		node.record("printer_port_printed", "kept", fields["from"], fmt.Sprintf("spool_id=%s label_hex_bytes=%d", spoolID, len(printEvidence)))
+		return map[string]string{
+			"field_promise_about":    production.PromiseRedeemPrintCapability,
+			"field_printer_spool_id": spoolID,
+		}, nil
+	default:
+		return nil, fmt.Errorf("printer_port cannot handle promise_about=%q", fields["field_promise_about"])
+	}
 }
 
 func (node *Node) handleAccountingPromise(fields map[string]string) (map[string]string, error) {
@@ -734,6 +862,10 @@ func (node *Node) recordAckEvidence(target string, message parsedMessage) {
 			return
 		}
 		node.record("accounting_update_confirmed", "kept", target, "tracking_number="+message.Fields["field_tracking_number"]+" cost_cents="+message.Fields["field_cost_cents"])
+	case production.PromiseIssuePrintCapability:
+		node.record("printer_capability_received", "kept", target, "token_id="+message.Fields["field_print_capability_token_id"]+" scope="+message.Fields["field_print_capability_scope"])
+	case production.PromiseRedeemPrintCapability:
+		node.record("printer_port_print_confirmed", "kept", target, "spool_id="+message.Fields["field_printer_spool_id"])
 	}
 }
 

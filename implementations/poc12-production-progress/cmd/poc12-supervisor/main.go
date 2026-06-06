@@ -138,6 +138,8 @@ func appBinaryForAgent(cfg config.Config, agentName string) (string, error) {
 		return "poc12-postal-scale", nil
 	case "ups_label_printer":
 		return "poc12-ups-label-printer", nil
+	case "printer_port":
+		return "poc12-printer-port", nil
 	case "accounting":
 		return "poc12-accounting", nil
 	default:

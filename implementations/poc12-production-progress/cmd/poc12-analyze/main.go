@@ -130,7 +130,7 @@ func summarizeLog(logPath string, summary *RunSummary) error {
 
 func isShippingEvent(eventName string) bool {
 	switch eventName {
-	case "package_weighed", "package_weight_received", "shipping_address_promised", "shipping_address_received", "shipping_label_printed", "shipping_label_received", "accounting_updated", "accounting_update_confirmed", "accounting_update_duplicate", "accounting_update_duplicate_confirmed":
+	case "package_weighed", "package_weight_received", "shipping_address_promised", "shipping_address_received", "shipping_label_printed", "shipping_label_received", "accounting_updated", "accounting_update_confirmed", "accounting_update_duplicate", "accounting_update_duplicate_confirmed", "printer_capability_issued", "printer_capability_received", "printer_port_printed", "printer_port_print_confirmed":
 		return true
 	default:
 		return false

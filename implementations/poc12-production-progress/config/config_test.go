@@ -35,8 +35,8 @@ func TestExampleConfigLoads(t *testing.T) {
 	if err != nil {
 		t.Fatalf("load example config: %v", err)
 	}
-	if len(cfg.Agents) != 16 {
-		t.Fatalf("example config agents = %d, want 16", len(cfg.Agents))
+	if len(cfg.Agents) != 17 {
+		t.Fatalf("example config agents = %d, want 17", len(cfg.Agents))
 	}
 	if _, _, endpointFound := cfg.EndpointFor("mallory"); !endpointFound {
 		t.Fatalf("expected endpoint for mallory")

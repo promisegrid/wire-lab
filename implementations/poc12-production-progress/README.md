@@ -4,21 +4,23 @@
 deterministic production device/system agents. It keeps the POC11 sparse mesh and
 adds a shipping workflow: `fulfillment` weighs a package with `postal_scale`,
 gets an address from `accounting`, prints a UPS label with `ups_label_printer`,
-and updates `accounting` with cost and tracking evidence. Source: `DI-timah`;
-`DI-bikit`; `DI-galin`.
+which first obtains and redeems a future-print capability-promise token from
+the local `printer_port`, and updates `accounting` with cost and tracking
+evidence. Source: `DI-timah`; `DI-bikit`; `DI-galin`; `DI-pohaj`.
 
 ## What This Tests
 
 - Multiple app pCIDs through one local container kernel: `relationship_v1`,
-  `postal_scale_v1`, `ups_label_v1`, and `accounting_v1`.
+  `postal_scale_v1`, `ups_label_v1`, `printer_port_v1`, and `accounting_v1`.
 - Real app/kernel process boundary: each container runs one `poc12-kernel`
   process plus separate local app processes for relationship, fulfillment,
-  postal scale, UPS label printer, and accounting roles.
+  postal scale, UPS label printer, printer port, and accounting roles.
 - Kernel-style pCID routing: the kernel parses slot 0 `42(pCID)`, checks local
   app receive promises, and delivers exact bytes to the app process that
   promised the target pCID.
-- Deterministic device/system agents for scale, label printer, and accounting
-  alongside live LLM business/social agents.
+- Deterministic device/system agents for scale, printer-port hardware access,
+  label-printer business logic, and accounting alongside live LLM
+  business/social agents.
 - One top-level semantic act, `promise`; workflow steps are payload meanings,
   not RPC verbs.
 - Explicit direct TCP relationship transition evidence:
@@ -32,6 +34,10 @@ and updates `accounting` with cost and tracking evidence. Source: `DI-timah`;
   applying kept/broken/malformed trust evidence, separates `send_unavailable`
   from `send_not_promised`, suppresses repeated live-agent promises, and keeps
   local budget/capacity exhaustion out of peer trust. Source: `DI-vujob`.
+- Local hardware promise tokens: the UPS label printer must ask the local
+  `printer_port` resource owner for a scoped future-print promise token, then
+  redeem that token with bounded label bytes before it can return print evidence
+  to fulfillment. Source: `DI-pohaj`; `DI-vutok`.
 
 ## Protocol Shape
 
@@ -42,8 +48,9 @@ grid([42(pCID), payload, proof])
 ```
 
 The pCID identifies the protocol spec. Message variants such as
-`weigh_package`, `address_lookup`, `print_label`, and `shipment_update` are
-payload meanings inside their protocol, not separate pCIDs. Source: `DI-bikit`.
+`weigh_package`, `address_lookup`, `print_label`, `issue_print_capability`,
+`redeem_print_capability`, and `shipment_update` are payload meanings inside
+their protocol, not separate pCIDs. Source: `DI-bikit`; `DI-pohaj`.
 
 ## Shipping Agents
 
@@ -54,7 +61,13 @@ payload meanings inside their protocol, not separate pCIDs. Source: `DI-bikit`.
 - `poc12-postal-scale`: deterministic app for `postal_scale_v1`; promises
   package weight evidence only.
 - `poc12-ups-label-printer`: deterministic app for `ups_label_v1`; promises
-  label, cost, and tracking evidence only.
+  label, cost, and tracking evidence only after it receives and redeems a local
+  printer-port capability-promise token.
+- `poc12-printer-port`: deterministic app for `printer_port_v1`; represents
+  the local hardware-access kernel role for a simulated USB printer port. It
+  promises bounded future printing by issuing a scoped token to the label
+  printer, then promises print evidence when that token is redeemed with label
+  bytes.
 - `poc12-accounting`: deterministic app for `accounting_v1`; promises address
   lookup and shipment update evidence only.
 - `poc12-relationship-agent`: generic live LLM relationship app for
@@ -95,7 +108,7 @@ keep/break/non-commitment judgment, relationship ledgers, workflow state, and
 deterministic device/system behavior. The fulfillment startup sequence is a POC
 guardrail so the run produces concrete pCID-routed shipment evidence instead of
 relying on a live LLM to choose that sequence unaided. Source: `DI-timah`;
-`DI-bikit`; `DI-parok`; `DI-galin`.
+`DI-bikit`; `DI-parok`; `DI-galin`; `DI-pohaj`.
 
 Post-split evidence semantics are intentionally conservative:
 `not_promised` means the receiver did not promise the requested exchange, not
@@ -130,3 +143,14 @@ to 598 events: 569 kept, 29 non-commitment, 86 `promise_outstanding`, 86
 `promise_repeated_suppressed`, 1 `accounting_update_duplicate`, 1
 `accounting_update_duplicate_confirmed`, and empty
 `resource_trust_coupling_counts`. Source: `DI-vujob`.
+
+`DI-pohaj` adds a local printer-port kernel-role app without turning the
+message kernel into a USB authority or RPC service. During label printing,
+`ups_label_printer` sends `issue_print_capability` to `printer_port`;
+`printer_port` returns a deterministic token bound to the issuee, scope, token
+ID, and byte limit; `ups_label_printer` sends `redeem_print_capability` with the
+token and exact hex label bytes; `printer_port` returns deterministic local
+spool evidence. Unit tests cover the token issue/redemption path, wrong-token
+rejection, routing pCID registration, and analyzer shipping-event recognition.
+Live Docker evidence still needs a fresh run after this change. Source:
+`DI-pohaj`; `DI-vutok`.

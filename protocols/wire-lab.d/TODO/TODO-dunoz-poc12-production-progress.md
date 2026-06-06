@@ -200,6 +200,81 @@ Affects: `implementations/poc12-production-progress/**`;
 Supersedes: DI-jinoz for the local resource exhaustion and outstanding-promise
 journal scope only.
 
+ID: DI-pohaj
+Date: 2026-06-05 18:50:50
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Extend POC12 in place with a separate `printer_port` local
+kernel-role app in the existing `shipping` container. Add one new
+`printer_port_v1` protocol pCID for printer-port capability-promise token issue
+and redemption. The `ups_label_printer` app must ask `printer_port` for a
+scoped future-print capability token, redeem that token with bounded label
+bytes before returning label evidence to `fulfillment`, and treat the
+printer-port outcome as local resource evidence rather than an external
+authorization decision.
+Intent: POC12 currently proves a message-routing kernel and separate app
+processes, but it under-explores kernel roles for local hardware resources. A
+printer-port app should demonstrate that a kernel can be a collection of narrow
+local promise surfaces: the printer port promises bounded access to local USB or
+spool-like printer hardware, while the UPS label app promises label workflow
+behavior, and neither process becomes a monolithic authority.
+Constraints: Keep the architecture in POC12, not POC13. Keep `printer_port` in
+the existing `shipping` container. Keep one top-level semantic act,
+`promise`. Do not add RPC verbs, permission language, a service registry,
+kernel-owned trust, Docker network mutation, envelope-shape changes, durable
+queues, or real USB dependencies. Use the approved names `printer_port`,
+`poc12-printer-port`, `printer_port_v1`, `PromiseIssuePrintCapability`, and
+`PromiseRedeemPrintCapability`. Path scope is limited to
+`protocols/wire-lab.d/TODO/TODO-dunoz-poc12-production-progress.md`,
+`implementations/poc12-production-progress/runtime/node.go`,
+`implementations/poc12-production-progress/runtime/node_test.go`,
+`implementations/poc12-production-progress/production/workflow.go`,
+`implementations/poc12-production-progress/production/workflow_test.go`,
+`implementations/poc12-production-progress/pcid/registry.go`,
+`implementations/poc12-production-progress/pcid/registry_test.go`,
+`implementations/poc12-production-progress/config/config.go`,
+`implementations/poc12-production-progress/config.example.json`,
+`implementations/poc12-production-progress/config/config_test.go`,
+`implementations/poc12-production-progress/cmd/poc12-supervisor/main.go`,
+`implementations/poc12-production-progress/cmd/poc12-printer-port/main.go`,
+`implementations/poc12-production-progress/Dockerfile`,
+`implementations/poc12-production-progress/cmd/poc12-analyze/main.go`,
+`implementations/poc12-production-progress/cmd/poc12-analyze/main_test.go`,
+`implementations/poc12-production-progress/README.md`, and
+`DEV-GUIDE-RESOURCES.md`.
+Affects: `implementations/poc12-production-progress/**`;
+`DEV-GUIDE-RESOURCES.md`;
+`protocols/wire-lab.d/TODO/TODO-dunoz-poc12-production-progress.md`.
+
+ID: DI-vutok
+Date: 2026-06-05 18:52:53
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Lock the supporting names for the POC12 printer-port capability-token
+implementation: `PrinterPortV1`, `PrintCapabilityScope`,
+`PrintCapabilityMaxBytes`, `IssuePrintCapabilityToken`,
+`ValidatePrintCapabilityToken`, `LabelBytesForShipment`,
+`PrintLabelToLocalDevice`, `handlePrinterPortPromise`,
+`requestPrinterPortCapability`, `redeemPrinterPortCapability`,
+`field_print_capability_issuee`, `field_print_capability_token`,
+`field_print_capability_token_id`, `field_print_capability_scope`,
+`field_print_capability_max_bytes`, `field_label_bytes_hex`,
+`field_printer_spool_id`, `printer_capability_issued`,
+`printer_capability_received`, `printer_port_printed`,
+`printer_port_print_confirmed`, `capabilityAck`, `printAck`, `token`,
+`tokenID`, `labelBytes`, `scope`, `maxBytes`, `spoolID`, `printEvidence`,
+`capabilityFields`, and `redemptionFields`.
+Intent: The new printer-port kernel-role evidence needs small, explicit names
+that describe promise-token issue, token validation, label bytes, local hardware
+printing, and outcome observations without drifting into permission, RPC, or
+authorization vocabulary.
+Constraints: Use these names only inside the approved `DI-pohaj` POC12 scope.
+Do not add unapproved helper names for behavior-bearing functions without
+another decision lock. Keep event names local evidence labels, not protocol
+commands.
+Affects: `implementations/poc12-production-progress/**`;
+`protocols/wire-lab.d/TODO/TODO-dunoz-poc12-production-progress.md`.
+
 ## Prior aliases
 
 - None.
@@ -237,6 +312,8 @@ journal scope only.
   provider-error evidence classification, and duplicate shipment checkpoints.
 - [x] dunoz.17 Implement in-place POC12 promise journal, local resource
   exhaustion separation, repeated-promise suppression, and analyzer checks.
+- [x] dunoz.18 Add printer-port kernel-role capability tokens for future label
+  printing and local hardware access evidence.
 
 ## Implementation status
 
@@ -292,3 +369,13 @@ checkpointing was exercised through the real app/kernel path with one
 event. Analyzer `resource_trust_coupling_counts` was empty, which is the
 intended regression check that local capacity/budget exhaustion did not
 immediately leak into peer-trust transitions. Source: `DI-vujob`.
+
+`DI-pohaj` and `DI-vutok` add the printer-port kernel-role resource owner in
+POC12. Validation run on 2026-06-05 after `DI-pohaj`: POC12 `go test ./...`,
+`go vet ./...`, `errcheck ./...`, and `git diff --check` passed with
+`GOCACHE=/tmp/wire-lab-gocache`. The implementation adds `printer_port_v1`,
+`poc12-printer-port`, deterministic print capability token issue/redemption,
+wrong-token rejection coverage, pCID routing registration, analyzer shipping
+event recognition, README guidance, and guide-resource notes. A fresh Docker run
+is still needed before live printer-port event counts can be cited. Source:
+`DI-pohaj`; `DI-vutok`.

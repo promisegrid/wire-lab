@@ -167,11 +167,22 @@
     {
       "name": "ups_label_printer",
       "kind": "ups_label_printer",
-      "persona": "UPS label printer device. The printer promises label, tracking number, and cost evidence from validated package facts.",
-      "motivation": "Promise only local label-printing results derived from supplied address and weight evidence.",
-      "initial_peers": ["fulfillment"],
-      "candidate_peers": ["fulfillment"],
+      "persona": "UPS label printer app. The printer promises label, tracking number, and cost evidence from validated package facts after receiving local printer-port hardware evidence.",
+      "motivation": "Promise only local label workflow results derived from supplied address, weight evidence, and printer-port capability evidence.",
+      "initial_peers": ["fulfillment", "printer_port"],
+      "candidate_peers": ["fulfillment", "printer_port"],
       "supported_pcids": ["relationship_v1", "ups_label_v1"],
+      "budget": 3,
+      "capacity": 10
+    },
+    {
+      "name": "printer_port",
+      "kind": "printer_port",
+      "persona": "Printer port kernel-role app. The printer port promises scoped future-print capability tokens and local printer-device write evidence from simulated USB/spool state.",
+      "motivation": "Promise only bounded local hardware access evidence; never promise shipment, label correctness, accounting, or global permission.",
+      "initial_peers": ["ups_label_printer"],
+      "candidate_peers": ["ups_label_printer"],
+      "supported_pcids": ["relationship_v1", "printer_port_v1"],
       "budget": 3,
       "capacity": 10
     },
@@ -196,6 +207,6 @@
     {"name": "grace-heidi", "agents": ["grace", "heidi"]},
     {"name": "ivan-judy", "agents": ["ivan", "judy"]},
     {"name": "mallory-oscar", "agents": ["mallory", "oscar"]},
-    {"name": "shipping", "agents": ["fulfillment", "postal_scale", "ups_label_printer", "accounting"]}
+    {"name": "shipping", "agents": ["fulfillment", "postal_scale", "ups_label_printer", "printer_port", "accounting"]}
   ]
 }

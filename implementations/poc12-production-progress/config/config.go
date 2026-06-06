@@ -418,9 +418,13 @@ func (agent AgentConfig) Protocols() []string {
 
 // Deterministic reports whether the agent is a local device/system handler
 // rather than a live autonomous LLM actor.
+// Intent: Keep local hardware and business-system roles, including the
+// printer_port kernel-role resource owner, under Go-owned protocol behavior so
+// LLM autonomy chooses relationship intent without inventing device outcomes.
+// Source: DI-pohaj
 func (agent AgentConfig) Deterministic() bool {
 	switch agent.Kind {
-	case "postal_scale", "ups_label_printer", "accounting":
+	case "postal_scale", "ups_label_printer", "printer_port", "accounting":
 		return true
 	default:
 		return false

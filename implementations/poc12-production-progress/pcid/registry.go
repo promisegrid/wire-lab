@@ -12,6 +12,7 @@ const (
 	PostalScaleV1   = "postal_scale_v1"
 	UPSLabelV1      = "ups_label_v1"
 	AccountingV1    = "accounting_v1"
+	PrinterPortV1   = "printer_port_v1"
 	KernelReceiveV1 = "kernel_receive_v1"
 )
 
@@ -41,6 +42,7 @@ func NewRegistry() Registry {
 		{PostalScaleV1, "poc12 postal scale package weighing protocol v1"},
 		{UPSLabelV1, "poc12 ups label printing cost tracking protocol v1"},
 		{AccountingV1, "poc12 accounting address lookup shipment update protocol v1"},
+		{PrinterPortV1, "poc12 printer port capability token issue redemption protocol v1"},
 		{KernelReceiveV1, "poc12 local app receive promise registration protocol v1"},
 	} {
 		registry.register(entry.name, protocol.NewProtocolCID([]byte(entry.spec)))

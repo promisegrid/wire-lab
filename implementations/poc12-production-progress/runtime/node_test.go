@@ -2,7 +2,9 @@ package runtime
 
 import (
 	"context"
+	"encoding/hex"
 	"path/filepath"
+	"strconv"
 	"testing"
 	"time"
 
@@ -189,6 +191,10 @@ func TestProtocolForFieldsRoutesShippingPromises(t *testing.T) {
 	if protocolName != pcid.AccountingV1 {
 		t.Fatalf("shipment update protocol = %s, want %s", protocolName, pcid.AccountingV1)
 	}
+	protocolName, _ = fulfillment.protocolForFields(map[string]string{"field_promise_about": production.PromiseIssuePrintCapability})
+	if protocolName != pcid.PrinterPortV1 {
+		t.Fatalf("print capability protocol = %s, want %s", protocolName, pcid.PrinterPortV1)
+	}
 }
 
 func TestDeterministicShippingHandlersReturnEvidence(t *testing.T) {
@@ -219,7 +225,7 @@ func TestDeterministicShippingHandlersReturnEvidence(t *testing.T) {
 func TestFulfillmentStartupWorkflowStepsUseDeterministicHandlers(t *testing.T) {
 	cfg := shippingTestConfig(t)
 	fulfillment := NewNode(cfg, cfg.Agents[0], &decision.FakeDecider{}, decision.FakeMonitor{})
-	accounting := NewNode(cfg, cfg.Agents[3], &decision.FakeDecider{}, decision.FakeMonitor{})
+	accounting := NewNode(cfg, cfg.Agents[4], &decision.FakeDecider{}, decision.FakeMonitor{})
 	addressAck, err := accounting.handleAccountingPromise(map[string]string{
 		"from":                "fulfillment",
 		"field_promise_about": production.PromiseAddressLookup,
@@ -237,30 +243,62 @@ func TestFulfillmentStartupWorkflowStepsUseDeterministicHandlers(t *testing.T) {
 	if err != nil {
 		t.Fatalf("package weighing: %v", err)
 	}
-	printer := NewNode(cfg, cfg.Agents[2], &decision.FakeDecider{}, decision.FakeMonitor{})
-	labelAck, err := printer.handleUPSLabelPromise(map[string]string{
-		"from":                   "fulfillment",
-		"field_promise_about":    production.PromisePrintLabel,
-		"field_package_id":       fulfillmentPackageID,
-		"field_shipping_address": addressAck["field_shipping_address"],
-		"field_weight_ounces":    weightAck["field_weight_ounces"],
+	trackingNumber, costCents, err := production.LabelForShipment(fulfillmentPackageID, addressAck["field_shipping_address"], intField(weightAck, "field_weight_ounces"))
+	if err != nil {
+		t.Fatalf("label facts: %v", err)
+	}
+	labelBytes, err := production.LabelBytesForShipment(map[string]string{
+		"field_package_id":      fulfillmentPackageID,
+		"field_tracking_number": trackingNumber,
+		"field_cost_cents":      strconv.Itoa(costCents),
 	})
 	if err != nil {
-		t.Fatalf("label printing: %v", err)
+		t.Fatalf("label bytes: %v", err)
+	}
+	printerPort := NewNode(cfg, cfg.Agents[3], &decision.FakeDecider{}, decision.FakeMonitor{})
+	capabilityFields := map[string]string{
+		"from":                             "ups_label_printer",
+		"to":                               "printer_port",
+		"field_promise_about":              production.PromiseIssuePrintCapability,
+		"field_print_capability_issuee":    "ups_label_printer",
+		"field_print_capability_token_id":  "printcap-ups_label_printer",
+		"field_print_capability_scope":     production.PrintCapabilityScope,
+		"field_print_capability_max_bytes": strconv.Itoa(production.PrintCapabilityMaxBytes),
+	}
+	capabilityAck, err := printerPort.handlePrinterPortPromise(capabilityFields)
+	if err != nil {
+		t.Fatalf("capability issue: %v", err)
+	}
+	redemptionFields := map[string]string{
+		"from":                             "ups_label_printer",
+		"field_promise_about":              production.PromiseRedeemPrintCapability,
+		"field_print_capability_issuee":    "ups_label_printer",
+		"field_print_capability_token":     capabilityAck["field_print_capability_token"],
+		"field_print_capability_token_id":  capabilityAck["field_print_capability_token_id"],
+		"field_print_capability_scope":     capabilityAck["field_print_capability_scope"],
+		"field_print_capability_max_bytes": capabilityAck["field_print_capability_max_bytes"],
+		"field_label_bytes_hex":            hex.EncodeToString(labelBytes),
+	}
+	printAck, err := printerPort.handlePrinterPortPromise(redemptionFields)
+	if err != nil {
+		t.Fatalf("capability redemption: %v", err)
 	}
 	_, err = accounting.handleAccountingPromise(map[string]string{
 		"from":                  "fulfillment",
 		"field_promise_about":   production.PromiseShipmentUpdate,
 		"field_order_id":        fulfillmentOrderID,
-		"field_tracking_number": labelAck["field_tracking_number"],
-		"field_cost_cents":      labelAck["field_cost_cents"],
+		"field_tracking_number": trackingNumber,
+		"field_cost_cents":      strconv.Itoa(costCents),
 	})
 	if err != nil {
 		t.Fatalf("accounting update: %v", err)
 	}
+	if printAck["field_printer_spool_id"] == "" {
+		t.Fatalf("printer port did not return spool evidence: %#v", printAck)
+	}
 	fulfillment.record("fulfillment_workflow_completed", "kept", "accounting", "test")
-	allReceiverEvents := append(append(accounting.events, scale.events...), printer.events...)
-	for _, eventName := range []string{"shipping_address_promised", "package_weighed", "shipping_label_printed", "accounting_updated"} {
+	allReceiverEvents := append(append(accounting.events, scale.events...), printerPort.events...)
+	for _, eventName := range []string{"shipping_address_promised", "package_weighed", "printer_capability_issued", "printer_port_printed", "accounting_updated"} {
 		if !hasEvent(allReceiverEvents, eventName) {
 			t.Fatalf("receiver logs missing %s event: %#v", eventName, allReceiverEvents)
 		}
@@ -272,7 +310,7 @@ func TestFulfillmentStartupWorkflowStepsUseDeterministicHandlers(t *testing.T) {
 
 func TestDuplicateAccountingUpdateDoesNotRepeatTrust(t *testing.T) {
 	cfg := shippingTestConfig(t)
-	accounting := NewNode(cfg, cfg.Agents[3], &decision.FakeDecider{}, decision.FakeMonitor{})
+	accounting := NewNode(cfg, cfg.Agents[4], &decision.FakeDecider{}, decision.FakeMonitor{})
 	frameBytes := signedAccountingUpdateFrame(t, accounting)
 	for attempt := 0; attempt < 2; attempt++ {
 		ackBytes, err := accounting.handleFrame(frameBytes)
@@ -314,6 +352,10 @@ func TestSupportedProtocolIsLocalToAgent(t *testing.T) {
 	}
 	if scale.supportsProtocol(pcid.AccountingV1) {
 		t.Fatalf("postal scale should not support accounting pCID")
+	}
+	printerPort := NewNode(cfg, cfg.Agents[3], &decision.FakeDecider{}, decision.FakeMonitor{})
+	if !printerPort.supportsProtocol(pcid.PrinterPortV1) {
+		t.Fatalf("printer_port should support printer_port pCID")
 	}
 }
 
@@ -478,9 +520,19 @@ func shippingTestConfig(t *testing.T) config.Config {
 			Kind:           "ups_label_printer",
 			Persona:        "printer",
 			Motivation:     "print label",
-			InitialPeers:   []string{"fulfillment"},
-			CandidatePeers: []string{"fulfillment"},
+			InitialPeers:   []string{"fulfillment", "printer_port"},
+			CandidatePeers: []string{"fulfillment", "printer_port"},
 			SupportedPCIDs: []string{pcid.RelationshipV1, pcid.UPSLabelV1},
+			Budget:         5,
+			Capacity:       5,
+		}, {
+			Name:           "printer_port",
+			Kind:           "printer_port",
+			Persona:        "printer port",
+			Motivation:     "local hardware access",
+			InitialPeers:   []string{"ups_label_printer"},
+			CandidatePeers: []string{"ups_label_printer"},
+			SupportedPCIDs: []string{pcid.RelationshipV1, pcid.PrinterPortV1},
 			Budget:         5,
 			Capacity:       5,
 		}, {
@@ -495,7 +547,7 @@ func shippingTestConfig(t *testing.T) config.Config {
 			Capacity:       5,
 		}},
 		Containers: []config.ContainerConfig{
-			{Name: "shipping", Agents: []string{"fulfillment", "postal_scale", "ups_label_printer", "accounting"}},
+			{Name: "shipping", Agents: []string{"fulfillment", "postal_scale", "ups_label_printer", "printer_port", "accounting"}},
 		},
 	}
 }
