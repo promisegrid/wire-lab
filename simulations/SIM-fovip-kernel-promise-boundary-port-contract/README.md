@@ -4,7 +4,7 @@ This simulation is the active evidence surface for the `DR-davod` kernel design
 packet. It follows `TE-mazop`, which found that `TE-jimar` was not enough to
 close the kernel-developer porting boundary, and now incorporates the follow-on
 `TE-pudiv`, `TE-dunas`, and `TE-gakoh` questions. Source: `DI-funaf`;
-`DI-fidot`.
+`DI-fidot`; `DI-gopag`.
 
 ## Question
 
@@ -42,6 +42,12 @@ implementation promises its own behavior by publishing:
   hardware/device promise.
 - **Split local services:** Ellen separates dispatch, storage, keys, networking,
   and evidence into local services with separate promises.
+- **Resource roles from POC12:** Frank separates message routing from a
+  printer-port resource promiser that issues and redeems future-print
+  capability-promise tokens.
+- **Storage/compute pressure from POC13:** Grace promises decentralized CAS
+  storage behavior, while Heidi promises CID-named function-call compute behavior
+  with explicit input/context evidence.
 
 ## Basic principles under test
 
@@ -82,6 +88,8 @@ The simulation should let reviewers ask whether the candidate:
   without treating Alice's local path as global truth;
 - represents file/resource state as checkpoints or projections over selected
   promise/event log frontiers.
+- separates content/function identity from availability, retention, access,
+  serving, execution, result delivery, and result-trust promises.
 
 ## Boundaries
 
@@ -93,6 +101,13 @@ protocol, or SDK as the single correct implementation shape.
 
 The current envelope shape `grid([42(pCID), payload, ...])` is input evidence,
 not a reopened decision.
+
+Static review after POC12 and POC13 planning indicates that `SIM-fovip` remains
+the right active evidence surface: POC12's split kernel/printer-port roles fit
+the non-monolithic role/profile model, and planned POC13 storage/compute work
+adds pressure to the existing storage and compute axes instead of requiring a
+successor sim. This review does not decide `DR-davod`; it only clarifies what
+evidence should be examined next. Source: `DI-gopag`; `DI-bibom`.
 
 ## Related evidence
 

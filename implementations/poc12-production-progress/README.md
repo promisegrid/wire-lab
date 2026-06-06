@@ -6,7 +6,7 @@ adds a shipping workflow: `fulfillment` weighs a package with `postal_scale`,
 gets an address from `accounting`, prints a UPS label with `ups_label_printer`,
 which first obtains and redeems a future-print capability-promise token from
 the local `printer_port`, and updates `accounting` with cost and tracking
-evidence. Source: `DI-timah`; `DI-bikit`; `DI-galin`; `DI-pohaj`.
+evidence. Source: `DI-timah`; `DI-bikit`; `DI-galin`; `DI-pohaj`; `DI-zapab`.
 
 ## What This Tests
 
@@ -34,6 +34,11 @@ evidence. Source: `DI-timah`; `DI-bikit`; `DI-galin`; `DI-pohaj`.
   applying kept/broken/malformed trust evidence, separates `send_unavailable`
   from `send_not_promised`, suppresses repeated live-agent promises, and keeps
   local budget/capacity exhaustion out of peer trust. Source: `DI-vujob`.
+- Sender-side non-commitment restraint: receiver `not_promised` evidence is
+  remembered in an app-local `nonCommitmentJournal`, and later same-run semantic
+  retries are recorded as `promise_not_promised_suppressed` without changing
+  peer trust. Generic app-local checkpoints now use `checkpointJournal` rather
+  than a shipment-only map. Source: `DI-zapab`.
 - Local hardware promise tokens: the UPS label printer must ask the local
   `printer_port` resource owner for a scoped future-print promise token, then
   redeem that token with bounded label bytes before it can return print evidence
@@ -147,6 +152,14 @@ to 598 events: 569 kept, 29 non-commitment, 86 `promise_outstanding`, 86
 `promise_repeated_suppressed`, 1 `accounting_update_duplicate`, 1
 `accounting_update_duplicate_confirmed`, and empty
 `resource_trust_coupling_counts`. Source: `DI-vujob`.
+
+`DI-zapab` tightens the same evidence model. The runtime now remembers receiver
+`not_promised` outcomes by target, pCID name, and `field_promise_about`, then
+suppresses a later live-agent retry for the same semantic promise as
+`promise_not_promised_suppressed`. That suppression is Alice's local restraint,
+not a penalty against Bob. Duplicate evidence now flows through a reusable
+`checkpointJournal`; the accounting shipment update remains the first concrete
+checkpoint. Source: `DI-zapab`.
 
 `DI-pohaj` adds a local printer-port kernel-role app without turning the
 message kernel into a USB authority or RPC service. During label printing,

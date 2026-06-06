@@ -151,6 +151,50 @@ func TestRepeatedPromiseSuppressedAfterJournalEvidence(t *testing.T) {
 	}
 }
 
+func TestNotPromisedSuppressesSemanticRetryWithoutTrustChange(t *testing.T) {
+	cfg := twoNodeTestConfig(t)
+	alice := NewNode(cfg, cfg.Agents[0], &decision.FakeDecider{}, decision.FakeMonitor{})
+	fields := map[string]string{
+		"promise":             "I promise to make one storage offer.",
+		"field_promise_about": "storage_offer",
+	}
+	alice.rememberNonCommitment("bob", pcid.RelationshipV1, fields, "ack outcome not_promised")
+	retryFields := map[string]string{
+		"promise":             "I promise to make a revised storage offer.",
+		"field_promise_about": "storage_offer",
+	}
+	if !alice.shouldSuppressNonCommittedPromise("bob", retryFields) {
+		t.Fatalf("semantic retry after not_promised should be suppressed")
+	}
+	if alice.ledger.Trust("bob") != 0 {
+		t.Fatalf("not_promised suppression changed peer trust to %d, want 0", alice.ledger.Trust("bob"))
+	}
+	if !hasEvent(alice.events, "promise_not_promised_suppressed") {
+		t.Fatalf("suppressed not_promised retry should be visible in local evidence: %#v", alice.events)
+	}
+}
+
+func TestCheckpointJournalIsReusableBeyondShipmentMap(t *testing.T) {
+	cfg := twoNodeTestConfig(t)
+	alice := NewNode(cfg, cfg.Agents[0], &decision.FakeDecider{}, decision.FakeMonitor{})
+	record := checkpointRecord{
+		Key:          checkpointKey(pcid.PrinterPortV1, production.PromiseRedeemPrintCapability, "spool-1"),
+		ProtocolName: pcid.PrinterPortV1,
+		PromiseAbout: production.PromiseRedeemPrintCapability,
+		Subject:      "spool-1",
+		Detail:       "printer port checkpoint regression test",
+	}
+	if alice.rememberCheckpoint(record) {
+		t.Fatalf("first checkpoint record should be new")
+	}
+	if !alice.rememberCheckpoint(record) {
+		t.Fatalf("second checkpoint record should be recognized as duplicate")
+	}
+	if len(alice.checkpointJournal) != 1 {
+		t.Fatalf("checkpoint journal length = %d, want 1", len(alice.checkpointJournal))
+	}
+}
+
 func TestRunTurnRepairsMissingActAndTarget(t *testing.T) {
 	cfg := twoNodeTestConfig(t)
 	alice := NewNode(cfg, cfg.Agents[0], missingShapeDecider{}, decision.FakeMonitor{})
@@ -342,6 +386,9 @@ func TestDuplicateAccountingUpdateDoesNotRepeatTrust(t *testing.T) {
 	}
 	if countEvents(accounting.events, "accounting_update_duplicate") != 1 {
 		t.Fatalf("duplicate accounting update should be recorded once: %#v", accounting.events)
+	}
+	if len(accounting.checkpointJournal) != 1 {
+		t.Fatalf("accounting checkpoint journal length = %d, want 1", len(accounting.checkpointJournal))
 	}
 }
 

@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"sort"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 
@@ -50,8 +51,9 @@ type Node struct {
 	budget    int
 	capacity  int
 
-	shipmentUpdates map[string]bool
-	promiseJournal  map[string]promiseRecord
+	nonCommitmentJournal map[string]nonCommitmentRecord
+	checkpointJournal    map[string]checkpointRecord
+	promiseJournal       map[string]promiseRecord
 
 	activeHandlers sync.WaitGroup
 	receiveConns   []transport.FrameConn
@@ -100,6 +102,31 @@ type promiseRecord struct {
 	Status           promiseStatus
 }
 
+// nonCommitmentRecord remembers one receiver-side `not_promised` outcome from
+// this app's local vantage.
+// Intent: Receiver non-commitment is evidence that this app should stop
+// pressuring the same peer for the same semantic promise during the current run;
+// it is not evidence that the peer broke a promise. Source: DI-zapab
+type nonCommitmentRecord struct {
+	Key          string
+	Peer         string
+	ProtocolName string
+	PromiseAbout string
+	Detail       string
+}
+
+// checkpointRecord is a reusable app-local marker for promise evidence that
+// should be visible but should not keep changing trust when replayed.
+// Intent: Duplicate detection belongs to the app's local evidence journal, not
+// to a global idempotency layer or receiver command surface. Source: DI-zapab
+type checkpointRecord struct {
+	Key          string
+	ProtocolName string
+	PromiseAbout string
+	Subject      string
+	Detail       string
+}
+
 // NewNode creates a node with a private trust ledger for every configured peer.
 func NewNode(cfg config.Config, agent config.AgentConfig, decider decision.Decider, monitor decision.Monitor) *Node {
 	peerNames := make([]string, 0, len(cfg.Agents)-1)
@@ -119,8 +146,9 @@ func NewNode(cfg config.Config, agent config.AgentConfig, decider decision.Decid
 		budget:    agent.Budget,
 		capacity:  agent.Capacity,
 
-		shipmentUpdates: make(map[string]bool),
-		promiseJournal:  make(map[string]promiseRecord),
+		nonCommitmentJournal: make(map[string]nonCommitmentRecord),
+		checkpointJournal:    make(map[string]checkpointRecord),
+		promiseJournal:       make(map[string]promiseRecord),
 	}
 }
 
@@ -295,6 +323,9 @@ func (node *Node) runTurn(ctx context.Context, turnIndex int) error {
 		validDecision = repairedDecision
 	}
 	fields := decision.Fields(observation, validDecision)
+	if node.shouldSuppressNonCommittedPromise(validDecision.Target, fields) {
+		return nil
+	}
 	if node.suppressRepeatedPromise(validDecision.Target, fields) {
 		return nil
 	}
@@ -550,6 +581,9 @@ func (node *Node) sendAndReceive(target string, fields map[string]string) (parse
 	}
 	ackFields := ackMessage.Fields
 	if ackFields["outcome"] != "kept" {
+		if ackFields["outcome"] == "not_promised" || ackFields["outcome"] == string(relationship.OutcomeNonCommitment) {
+			node.rememberNonCommitment(target, protocolName, fields, "ack outcome "+ackFields["outcome"])
+		}
 		ackOutcome, _ := outcomeForSendError(ackOutcomeError{outcome: ackFields["outcome"]})
 		node.resolveOutstandingPromise(promiseID, promiseStatusFromOutcome(ackOutcome), "ack outcome "+ackFields["outcome"])
 		return parsedMessage{}, ackOutcomeError{outcome: ackFields["outcome"]}
@@ -838,13 +872,14 @@ func (node *Node) handleAccountingPromise(fields map[string]string) (map[string]
 			"field_tracking_number": trackingNumber,
 			"field_cost_cents":      strconv.Itoa(costCents),
 		}
-		updateKey := shipmentUpdateKey(orderID, trackingNumber, costCents)
-		node.mu.Lock()
-		alreadyRecorded := node.shipmentUpdates[updateKey]
-		if !alreadyRecorded {
-			node.shipmentUpdates[updateKey] = true
-		}
-		node.mu.Unlock()
+		updateKey := checkpointKey(pcid.AccountingV1, production.PromiseShipmentUpdate, orderID, trackingNumber, strconv.Itoa(costCents))
+		alreadyRecorded := node.rememberCheckpoint(checkpointRecord{
+			Key:          updateKey,
+			ProtocolName: pcid.AccountingV1,
+			PromiseAbout: production.PromiseShipmentUpdate,
+			Subject:      orderID,
+			Detail:       fmt.Sprintf("tracking_number=%s cost_cents=%d", trackingNumber, costCents),
+		})
 		if alreadyRecorded {
 			ackFields[duplicateShipmentEvidenceField] = "true"
 			node.record("accounting_update_duplicate", "kept", fields["from"], fmt.Sprintf("order_id=%s tracking_number=%s cost_cents=%d", orderID, trackingNumber, costCents))
@@ -1063,6 +1098,43 @@ func (node *Node) recordLocalResourceExhaustion(target string, fields map[string
 	node.record("local_resource_exhausted", "non_commitment", target, "resource="+resourceName+" detail="+detail)
 }
 
+// rememberNonCommitment stores one receiver `not_promised` outcome as local
+// restraint evidence for later turns in the same POC12 run.
+// Intent: A peer that did not promise the requested exchange should not be
+// asked again for the same target/protocol/promise-about tuple until a later
+// design adds an explicit new-evidence release rule. Source: DI-zapab
+func (node *Node) rememberNonCommitment(target, protocolName string, fields map[string]string, detail string) {
+	promiseAbout := fields["field_promise_about"]
+	record := nonCommitmentRecord{
+		Key:          nonCommitmentKey(target, protocolName, promiseAbout),
+		Peer:         target,
+		ProtocolName: protocolName,
+		PromiseAbout: promiseAbout,
+		Detail:       detail,
+	}
+	node.mu.Lock()
+	node.nonCommitmentJournal[record.Key] = record
+	node.mu.Unlock()
+}
+
+// shouldSuppressNonCommittedPromise checks whether this app already has local
+// non-commitment evidence for the same semantic promise target.
+// Intent: Suppression turns a prior `not_promised` into Alice's restraint, not
+// Bob's punishment; it records no peer-trust transition. Source: DI-zapab
+func (node *Node) shouldSuppressNonCommittedPromise(target string, fields map[string]string) bool {
+	protocolName, _ := node.protocolForFields(fields)
+	promiseAbout := fields["field_promise_about"]
+	key := nonCommitmentKey(target, protocolName, promiseAbout)
+	node.mu.Lock()
+	record, exists := node.nonCommitmentJournal[key]
+	node.mu.Unlock()
+	if !exists {
+		return false
+	}
+	node.record("promise_not_promised_suppressed", "non_commitment", target, "protocol="+record.ProtocolName+" promise_about="+record.PromiseAbout+" detail="+record.Detail)
+	return true
+}
+
 // suppressRepeatedPromise avoids sending the same live-agent promise text to the
 // same target/protocol once this app already has journal evidence for it.
 // Intent: Repetition after a prior promise outcome creates pressure that looks
@@ -1215,8 +1287,45 @@ func promiseStatusFromOutcome(outcome relationship.Outcome) promiseStatus {
 	}
 }
 
-func shipmentUpdateKey(orderID, trackingNumber string, costCents int) string {
-	return fmt.Sprintf("%s|%s|%d", orderID, trackingNumber, costCents)
+// nonCommitmentKey keeps receiver non-commitment scoped to one peer, one
+// protocol, and one protocol-owned promise meaning.
+// Intent: A `not_promised` ACK should restrain only the semantic exchange that
+// was actually declined, not all future cooperation with that peer. Source:
+// DI-zapab
+func nonCommitmentKey(peerName, protocolName, promiseAbout string) string {
+	return strings.Join([]string{peerName, protocolName, promiseAbout}, "|")
+}
+
+// rememberCheckpoint records a reusable local checkpoint and reports whether it
+// was already present.
+// Intent: Replayed evidence should stay auditable while avoiding repeated trust
+// mutation for the same app-local checkpoint. Source: DI-zapab
+func (node *Node) rememberCheckpoint(record checkpointRecord) bool {
+	node.mu.Lock()
+	defer node.mu.Unlock()
+	alreadySeen := node.checkpointAlreadySeen(record.Key)
+	if !alreadySeen {
+		node.checkpointJournal[record.Key] = record
+	}
+	return alreadySeen
+}
+
+// checkpointAlreadySeen assumes the caller holds node.mu and performs only the
+// local map lookup.
+// Intent: Keeping the lookup small makes checkpoint semantics reusable without
+// turning them into a protocol-level idempotency authority. Source: DI-zapab
+func (node *Node) checkpointAlreadySeen(key string) bool {
+	_, alreadySeen := node.checkpointJournal[key]
+	return alreadySeen
+}
+
+// checkpointKey builds stable local checkpoint identifiers from pCID-selected
+// protocol meaning plus deterministic subject fields.
+// Intent: Checkpoint identity is local evidence over promise content, not a
+// universal transaction ID or global command key. Source: DI-zapab
+func checkpointKey(protocolName, promiseAbout string, parts ...string) string {
+	keyParts := append([]string{protocolName, promiseAbout}, parts...)
+	return strings.Join(keyParts, "|")
 }
 
 // isLinkDiscoveryPromise recognizes the pCID-owned payload meaning used for

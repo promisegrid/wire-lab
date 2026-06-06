@@ -305,6 +305,40 @@ Affects: `implementations/poc12-production-progress/config/config.go`;
 `DEV-GUIDE-RESOURCES.md`;
 `protocols/wire-lab.d/TODO/TODO-dunoz-poc12-production-progress.md`.
 
+ID: DI-zapab
+Date: 2026-06-06 01:12:50
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Extend POC12 in place with two app-local restraint mechanisms:
+`nonCommitmentJournal` records receiver `not_promised` evidence by target,
+protocol pCID name, and `field_promise_about`, and `checkpointJournal` replaces
+the shipment-only duplicate map with generic local checkpoint evidence.
+`not_promised` responses suppress same-run retries for the same semantic
+promise target until new implementation work proves a safe release rule; generic
+checkpoints keep duplicate accounting updates visible without repeating trust
+changes.
+Intent: The current runtime already avoids treating `not_promised` as a broken
+peer promise, but it can still let a live agent keep making the same offer after
+the receiver has explicitly not promised that exchange. POC12 should model
+voluntary cooperation more strictly: Alice records Bob's non-commitment as
+Alice's local evidence and waits instead of pressuring Bob. The shipment
+checkpoint fix should also become a reusable app-local pattern rather than a
+one-off accounting map.
+Constraints: Keep all state in memory and app-local for POC12. Do not add new
+pCIDs, top-level action kinds, RPC verbs, durable queues, protocol-level
+idempotency layers, kernel-owned trust, authorization vocabulary, Docker
+network mutation, or envelope-shape changes. Approved names are
+`nonCommitmentJournal`, `nonCommitmentRecord`, `rememberNonCommitment`,
+`shouldSuppressNonCommittedPromise`, `nonCommitmentKey`, `checkpointJournal`,
+`checkpointRecord`, `rememberCheckpoint`, `checkpointAlreadySeen`,
+`checkpointKey`, and `promise_not_promised_suppressed`.
+Affects: `implementations/poc12-production-progress/runtime/node.go`;
+`implementations/poc12-production-progress/runtime/node_test.go`;
+`implementations/poc12-production-progress/README.md`;
+`implementations/README.md`; `DEV-GUIDE-RESOURCES.md`;
+`protocols/wire-lab.d/TODO/TODO-dunoz-poc12-production-progress.md`;
+`protocols/wire-lab.d/TODO/TODO.md`.
+
 ## Prior aliases
 
 - None.
@@ -345,6 +379,8 @@ Affects: `implementations/poc12-production-progress/config/config.go`;
 - [x] dunoz.18 Add printer-port kernel-role capability tokens for future label
   printing and local hardware access evidence.
 - [x] dunoz.19 Fix observer-only monitor lifecycle after printer-port run.
+- [x] dunoz.20 Add app-local non-commitment retry restraint and generic
+  checkpoint evidence journals.
 
 ## Implementation status
 
@@ -419,3 +455,11 @@ events, 595 kept, 30 non-commitment, 17 `node_done`, 17
 `shutdown_grace_elapsed`, 1 `monitor_done`, all printer-port shipping counts,
 and empty `resource_trust_coupling_counts`. Source: `DI-pohaj`; `DI-vutok`;
 `DI-jupob`.
+
+`DI-zapab` adds sender-side restraint after receiver non-commitment and replaces
+the shipment-only duplicate map with a generic app-local checkpoint journal.
+`not_promised` outcomes are remembered by target, pCID name, and
+`field_promise_about`; later same-run semantic retries are recorded as
+`promise_not_promised_suppressed` without peer trust changes. Duplicate shipment
+updates now use `checkpointJournal`, preserving the existing accounting duplicate
+evidence while making the pattern reusable. Source: `DI-zapab`.

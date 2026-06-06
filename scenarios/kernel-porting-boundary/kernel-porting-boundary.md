@@ -9,7 +9,8 @@ kernel-porting-boundary
 - Source type: new harness scenario
 - Source path: `/home/stevegt/lab/promisegrid-dev-guide/FEEDBACK.md`
 - Source row/title: `FB-vitih`, `FB-mulum`, and `FB-potin`
-- Source DI / TODO / TE: `DI-ragaz`; `TODO-rozas`; `DR-davod`
+- Source DI / TODO / TE: `DI-ragaz`; `TODO-rozas`; `DR-davod`; `DI-gopag`;
+  `DI-bibom`
 
 ## Purpose
 
@@ -21,10 +22,10 @@ the kernel/runtime terminology remains unsettled. Source: `DI-ragaz`;
 
 Alice wants to port PromiseGrid infrastructure to a new host environment. Bob
 offers a native service, Carol offers a browser/WASM adapter, Dave offers an
-MCU/header-only profile, Ellen offers split local services, and Mallory claims
-that copying the wire-lab harness or one microkernel shape is the porting
-target. The available specs are drafts, and only some future frozen pCIDs will
-become obligations.
+MCU/header-only profile, Ellen offers split local services, and Frank offers a
+storage/compute profile. Mallory claims that copying the wire-lab harness or one
+microkernel shape is the porting target. The available specs are drafts, and
+only some future frozen pCIDs will become obligations.
 
 ## Stimulus
 
@@ -74,6 +75,13 @@ It must also show whether:
 - **Split local services:** Frank separates dispatch, storage, keys, networking,
   and evidence among local promisers. The record must show which service makes
   each promise and how evidence moves between them.
+- **Decentralized CAS:** Grace promises local CAS storage for selected CIDs,
+  retention windows, corrupt-byte rejection, and serving evidence without
+  claiming that a CID alone implies availability or access.
+- **CID-named compute:** Heidi promises to execute CAS-stored function code named
+  by `function_cid` under a compute pCID, cache pure results by exact
+  code/input/context identity, and require explicit context objects for impure
+  time/random/sensor/network inputs.
 - **Voluntary namespace:** Alice, Bob, and Carol maintain `/project/report` by
   reciprocal namespace promises. Mallory's lookalike namespace is rejected unless
   a local agent trusts Mallory's promise history.
@@ -96,3 +104,5 @@ It must also show whether:
   universal process-shape assumptions?
 - Are local APIs faithful adapters over pCID-selected messages, or do they hide
   the promise boundary?
+- Do storage and compute ports separate content/function identity from
+  availability, retention, access, execution, and result-trust promises?

@@ -13,7 +13,7 @@ atproto-repo-car-interop
 - Source row/title: AT Protocol / Bluesky ecosystem repo, CAR, DAG-CBOR, and
   signable-view interop pressure
 - Source DI / TODO / TE: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-kizal`;
-  `DI-kafot`; `DI-nohir`; `DI-nidop`
+  `DI-kafot`; `DI-nohir`; `DI-nidop`; `DI-bibom`
 
 ## Purpose
 
@@ -52,6 +52,11 @@ bytes, CID/link identity, signable-view or proof evidence when present, and
 local promise-accounting records without assuming global completeness or
 external identity/trust authority.
 
+The storage pressure is the same as planned POC13: an atproto-compatible CID,
+CAR block, or DAG-CBOR link can identify content and help move exact bytes, but
+it does not itself promise retention, availability, access, serving, or local
+trustworthiness. Those remain PromiseGrid promises by specific agents.
+
 ## Scenario-Specific Evaluation Questions
 
 - Which PromiseGrid objects can be represented directly as atproto-compatible
@@ -64,3 +69,5 @@ external identity/trust authority.
 - What happens when Mallory provides a stale CAR export, omits a linked object,
   rewrites metadata, or presents a valid atproto object that is irrelevant to
   Alice's PromiseGrid promises?
+- Which PromiseGrid agent promises to retain or serve each imported CAR block,
+  and what evidence survives if the atproto-side source later disappears?

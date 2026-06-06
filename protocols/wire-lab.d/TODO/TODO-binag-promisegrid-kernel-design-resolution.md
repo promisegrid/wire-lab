@@ -71,6 +71,33 @@ Affects: `docs/research/DN-lujad-promisegrid-kernel-role-profile.md`;
 `DEV-GUIDE-RESOURCES.md`;
 `protocols/wire-lab.d/TODO/TODO-binag-promisegrid-kernel-design-resolution.md`.
 
+### DI-gopag
+
+ID: DI-gopag
+Date: 2026-06-06 01:12:50
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Add a static kernel evidence synthesis pass that explains the
+`DN-lujad` / `DR-davod` / `SIM-fovip` packet, folds POC12 printer-port and
+POC13 storage/compute pressure into the role/profile model, and improves
+scenario coverage without deciding `DR-davod`.
+Intent: The current kernel packet is coherent but hard to read as a set:
+`DN-lujad` is the plain-English synthesis, `DR-davod` is the still-open
+decision request, and `SIM-fovip` is the active simulation/evidence surface.
+The next implementation work should make that relationship explicit and add
+storage/compute pressure before any final porting-boundary decision is made.
+Constraints: Do not close `DR-davod`, rewrite scored artifacts, run
+provider-backed canary/GA, freeze a final SDK, or present POC12/POC13 as stable
+PromiseGrid APIs. Preserve Promise Theory vocabulary: promises, local trust,
+local evidence, voluntary cooperation, pCID-selected payload meanings, and no
+global authority.
+Affects: `docs/research/DN-lujad-promisegrid-kernel-role-profile.md`;
+`simulations/SIM-fovip-kernel-promise-boundary-port-contract/`;
+`scenarios/kernel-porting-boundary/`; storage/compute scenarios;
+`DEV-GUIDE-RESOURCES.md`;
+`protocols/wire-lab.d/TODO/TODO-binag-promisegrid-kernel-design-resolution.md`;
+`protocols/wire-lab.d/TODO/TODO.md`.
+
 ## Basic principles to preserve
 
 - Everything useful is a promise.
@@ -168,6 +195,8 @@ Affects: `docs/research/DN-lujad-promisegrid-kernel-role-profile.md`;
   after final validation.
 - [x] binag.15 Fold POC12 printer-port evidence into the non-monolithic
   kernel role/profile synthesis without freezing a final kernel API.
+- [x] binag.16 Add a static `DN-lujad` / `DR-davod` / `SIM-fovip` packet map
+  and storage/compute pressure notes without deciding `DR-davod`.
 
 ## Acceptance criteria
 

@@ -5,7 +5,7 @@ English. It is not a TE, not a frozen protocol spec, and not final SDK prose. It
 is the current design synthesis for resolving `DR-davod`: what guide writers can
 say about kernel developers after the kernel TEs converged, and what still waits
 for focused evidence and future frozen pCID specs. Source: `DI-fidot`;
-`DI-punuf`.
+`DI-punuf`; `DI-gopag`.
 
 ## Basic principles
 
@@ -89,6 +89,28 @@ bytes. The message kernel only carries the pCID-selected bytes and records its
 own transport evidence; it does not become a USB authority, permission server,
 business workflow engine, or trust oracle. Source: `DI-pohaj`; `DI-vutok`;
 `DI-punuf`.
+
+## How to read the current packet
+
+The current kernel evidence packet has three distinct roles:
+
+- `DN-lujad` is this design note. It is the plain-English synthesis of the
+  kernel role/profile model for guide writers and implementers.
+- `DR-davod` is the open decision request. It owns the unresolved question of
+  what a stable developer-facing porting boundary should say.
+- `SIM-fovip` is the active simulation/evidence surface. It tests whether
+  kernel implementation promises, app-facing storage/compute/network/device
+  promises, host assumptions, unsupported behavior, pCID coverage, namespace and
+  reference promises, and checkpoint evidence are enough to decide `DR-davod`.
+
+POC12 adds executable pressure to this packet but does not close it. Its kernel
+process proves that exact pCID-selected bytes can cross app/kernel and
+kernel/kernel boundaries while app processes keep trust and promise judgment.
+Its `printer_port` role proves that a "kernel" capability can be a separate
+local resource promiser rather than part of one monolithic daemon. POC13 is the
+next planned pressure because storage and compute are first-class kernel roles
+that need the same promise-first treatment. Source: `DI-gopag`; `DI-punuf`;
+`DI-bibom`.
 
 ## App/kernel boundary
 
@@ -179,6 +201,27 @@ Branches are different promise-history selections. If Bob breaks a storage
 promise, Alice may stop projecting Bob-maintained resources into her convenient
 view while preserving evidence of the break.
 
+## Storage and compute pressure
+
+Storage should be described as decentralized sparse CAS promises, not as a
+global storage service. A CID can identify bytes or an object, but it does not by
+itself promise availability, retention, replication, access, or serving. Alice
+may trust Bob to retain and serve an object only after Bob makes that promise and
+Alice accumulates local evidence that Bob keeps similar promises.
+
+Compute should be described as pCID-selected function-call promises whose code
+identity lives inside the payload. The pCID names the compute protocol, while a
+payload-level `function_cid` names the CAS-stored function code. Pure compute
+results can be cached by exact function CID, input CIDs or scalar values,
+declared context CIDs, ABI/version, and protocol pCID. Impure work should make
+timestamp, randomness, sensor reads, network observations, or other ambient
+inputs explicit context objects, so the completed run is replayable and
+pure-after-the-fact.
+
+This pressure is assigned to `TODO-godad` / planned POC13. It should inform
+`SIM-fovip` and `DR-davod`, but it does not freeze final storage, CAS,
+function-call, cache, or host API shapes. Source: `DI-bibom`; `DI-gopag`.
+
 ## Prior-art pressure
 
 Prior art should influence PromiseGrid only after being reframed as local
@@ -217,6 +260,8 @@ model while guide handoff remains a separate task.
 - `DI-fidot` records the design-resolution path.
 - `DI-punuf` records the non-monolithic kernel-role synthesis after POC12 made a
   local hardware/resource role concrete.
+- `DI-gopag` records the static packet-map and storage/compute pressure pass.
+- `DI-bibom` records the planned POC13 CAS storage and CID-named compute shape.
 - `DR-davod` owns the kernel-developer porting-boundary decision.
 - `TE-jimar` narrows kernel to role/profile rather than process shape.
 - `TE-mazop` narrows the minimum credible kernel implementation promises.

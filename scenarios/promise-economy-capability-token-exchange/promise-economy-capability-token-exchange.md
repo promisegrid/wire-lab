@@ -16,7 +16,7 @@ promise-economy-capability-token-exchange
 - Source row/title: Combined capability-token access, bearer-token transfer,
   non-transferable redemption, revocation, and peer-local floating exchange rates
 - Source DI / TODO / TE: `DI-faros`; `DI-vabor`; `DI-botup`; `DI-nanih`;
-  `DI-pidag`; `DI-hosuk`; `DI-sirus`; `DI-vorus`
+  `DI-pidag`; `DI-hosuk`; `DI-sirus`; `DI-vorus`; `DI-bibom`
 
 ## Purpose
 
@@ -105,6 +105,13 @@ become Alice-local observations about Bob's transport promises. An open TCP
 connection never means Alice trusts Bob, and Alice may trust Carol while
 reaching Carol only through a relay promise from Bob or Dave.
 
+Storage and compute access tokens should be tested against the POC13 model. A
+token can be a promise that Alice will store, retain, serve, or compute under
+specific terms, but the token is not a global permission. For compute, a
+non-transferable token may promise one call to a CAS-stored `function_cid` with
+explicit input/context objects; a bearer token may be traded as personal
+currency only because each holder locally values Alice's future promise.
+
 ## Scenario-Specific Evaluation Questions
 
 - Which agent issues each token, what resource does that agent control, and what
@@ -131,3 +138,7 @@ reaching Carol only through a relay promise from Bob or Dave.
   exchange risk?
 - How do promise relationships decide whether to open, keep, retry, or avoid TCP
   connections, and how does TCP behavior feed back into local promise accounting?
+- When a bearer token buys access to storage or compute, who promises retention,
+  serving, execution, result delivery, and result evidence?
+- How do local exchange rates change when a compute result was cached from a pure
+  `function_cid` call versus produced from impure context objects?
