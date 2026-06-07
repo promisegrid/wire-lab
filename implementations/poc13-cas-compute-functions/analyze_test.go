@@ -14,6 +14,9 @@ func TestAnalyzeRunAcceptsParentDirectoryAndValidates(t *testing.T) {
 		t.Fatalf("make log dir: %v", err)
 	}
 	writePOC13Log(t, filepath.Join(logDir, "alice.jsonl"), []Event{
+		{Observer: "alice", Event: "runtime_readiness_promised", Outcome: "kept", Detail: "ready"},
+		{Observer: "alice", Event: "peer_readiness_observed", Outcome: "kept", Detail: "peer ready"},
+		{Observer: "alice", Event: "runtime_done_promised", Outcome: "kept", Detail: "done"},
 		{Observer: "alice", Event: "tcp_message_sent", Outcome: "kept", PCID: CASStorageV1, Detail: "sent"},
 		{Observer: "bob", Event: "tcp_message_received", Outcome: "kept", PCID: CASStorageV1, Detail: "received"},
 		{Observer: "bob", Event: "cas_storage_promised", Outcome: "kept", PCID: CASStorageV1, Detail: "storage"},

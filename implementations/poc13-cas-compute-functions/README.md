@@ -13,6 +13,9 @@ cache, app, or kernel API. Source: `DI-bibom`; `DI-notig`.
   `grid([42(pCID), payload, proof])`.
 - Agents exchange signed envelopes over length-framed TCP between Docker
   containers; the analyzer requires both sent and received TCP evidence.
+- Containers write readiness and done evidence under the Docker run volume so
+  startup waits for peer readiness and shutdown waits for local runtime
+  quiescence instead of fixed sleeps.
 - Agents record local evidence for real CAS storage, token-scoped serving,
   retrieval, replication, corrupt bytes, explicit context objects, dynamic
   function execution, compute results, and cache keys.

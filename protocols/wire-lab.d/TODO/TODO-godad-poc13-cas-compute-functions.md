@@ -160,6 +160,42 @@ existing `poc13-run` volume under `/run/poc13/**`.
 Affects: `implementations/poc13-cas-compute-functions/scripts/run-clean.sh`;
 `protocols/wire-lab.d/TODO/TODO-godad-poc13-cas-compute-functions.md`.
 
+ID: DI-mosil
+Date: 2026-06-06 07:20:15
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Harden POC13 startup and shutdown by replacing fixed
+`StartupDelayMillis` / `SettleDelayMillis` sleeps with explicit readiness and
+done evidence plus bounded readiness and idle-completion gates. Each container
+records a local readiness promise marker after its TCP listener is open, waits
+for peer readiness markers before running local agents, and records a local done
+promise only after local agents have finished and the runtime has observed an
+idle period with no active TCP handlers. The analyzer must require readiness,
+peer-readiness observation, and runtime-done evidence.
+Intent: The expanded TCP POC should not depend on arbitrary fixed startup and
+settle sleeps. Startup should wait for explicit peer readiness evidence, and
+shutdown should be tied to runtime quiescence rather than a blind timeout, while
+remaining bounded and diagnosable in Docker.
+Constraints: Keep this as POC13-local runtime coordination, not a PromiseGrid
+global authority or final API. Do not add new pCIDs or top-level action kinds.
+Runtime marker files are local evidence in the existing Docker-managed run
+volume, not protocol authority. Approved changed paths are
+`implementations/poc13-cas-compute-functions/{analyze.go,analyze_test.go,config.example.json,config.go,runtime.go,scenario_test.go,README.md}`;
+`DEV-GUIDE-RESOURCES.md`;
+`protocols/wire-lab.d/TODO/TODO-godad-poc13-cas-compute-functions.md`;
+and `protocols/wire-lab.d/TODO/TODO.md`. Approved runtime path pattern:
+`/run/poc13/<run_id>/runtime/*.ready` and
+`/run/poc13/<run_id>/runtime/*.done`, created/overwritten by Docker containers
+and removed by the existing clean-run volume reset. Approved implementation
+names include `ReadinessTimeoutMillis`, `CompletionIdleMillis`,
+`ReadinessTimeout`, `CompletionIdle`, `recordRuntimeReadiness`,
+`waitForPeerReadiness`, `waitForRuntimeCompletion`, `recordRuntimeDone`,
+`runtimeMarkerDir`, `runtimeMarkerPath`, `markActivity`, `activeHandlers`,
+`lastActivity`, and local variables derived from those names.
+Affects: `implementations/poc13-cas-compute-functions/**`;
+`DEV-GUIDE-RESOURCES.md`;
+`protocols/wire-lab.d/TODO/TODO-godad-poc13-cas-compute-functions.md`.
+
 ## Prior aliases
 
 - None.
@@ -190,6 +226,8 @@ not freeze final storage, compute, cache, provider, kernel, or app APIs.
 - [x] godad.9 Expand POC13 into a TCP-delivered bounded runtime with concrete
   CAS storage/retrieval/replication, dynamic compute, local trust, voluntary
   repair, credit economics, and capability-token evidence.
+- [x] godad.10 Replace fixed POC13 startup/settle sleeps with explicit
+  readiness and done evidence plus bounded readiness and idle-completion gates.
 
 ## Acceptance criteria
 

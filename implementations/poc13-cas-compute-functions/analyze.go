@@ -141,6 +141,9 @@ func ValidateAnalysis(summary AnalysisSummary) error {
 
 func missingRequiredEvents(summary AnalysisSummary) []string {
 	requiredEvents := []string{
+		"runtime_readiness_promised",
+		"peer_readiness_observed",
+		"runtime_done_promised",
 		"tcp_message_sent",
 		"tcp_message_received",
 		"cas_storage_promised",

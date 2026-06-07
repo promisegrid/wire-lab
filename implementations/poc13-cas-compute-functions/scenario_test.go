@@ -37,16 +37,16 @@ func (scriptedOnlyDecider) Decide(context.Context, Config, AgentConfig, string) 
 func testConfig(t *testing.T) Config {
 	t.Helper()
 	return Config{
-		RunID:                 "test",
-		RunRoot:               filepath.Join(t.TempDir(), "run"),
-		ProviderBaseURL:       "https://example.invalid/v1/responses",
-		APIKeyEnv:             "OPENAI_API_KEY",
-		AgentModel:            "gpt-5.4",
-		ReasoningEffort:       "medium",
-		RequestTimeoutSeconds: 1,
-		ListenPort:            0,
-		StartupDelayMillis:    0,
-		SettleDelayMillis:     500,
+		RunID:                  "test",
+		RunRoot:                filepath.Join(t.TempDir(), "run"),
+		ProviderBaseURL:        "https://example.invalid/v1/responses",
+		APIKeyEnv:              "OPENAI_API_KEY",
+		AgentModel:             "gpt-5.4",
+		ReasoningEffort:        "medium",
+		RequestTimeoutSeconds:  1,
+		ListenPort:             0,
+		ReadinessTimeoutMillis: 500,
+		CompletionIdleMillis:   20,
 		Containers: []ContainerConfig{
 			{Name: "all", Agents: []string{"alice", "bob", "carol", "dave", "ellen", "frank", "grace", "mallory"}},
 		},

@@ -9,6 +9,7 @@ import (
 	"io"
 	"net"
 	"os"
+	"path/filepath"
 	"strings"
 	"sync"
 	"time"
@@ -63,14 +64,16 @@ type FrameWriter struct {
 // proves real inter-agent transport without inventing a central router. Source:
 // DI-fumol
 type TCPRuntime struct {
-	Config     Config
-	Container  ContainerConfig
-	Registry   Registry
-	Decider    Decider
-	states     map[string]*AgentState
-	listener   net.Listener
-	listenPort int
-	mu         sync.Mutex
+	Config         Config
+	Container      ContainerConfig
+	Registry       Registry
+	Decider        Decider
+	states         map[string]*AgentState
+	listener       net.Listener
+	listenPort     int
+	activeHandlers int
+	lastActivity   time.Time
+	mu             sync.Mutex
 }
 
 // NewTCPRuntime constructs one container-local POC13 runtime.
@@ -103,8 +106,10 @@ func NewTCPRuntime(cfg Config, container ContainerConfig, decider Decider) (*TCP
 	return runtime, nil
 }
 
-// Run opens the local listener, runs local agents, then waits briefly for peer
-// responses before closing the listener.
+// Run opens the local listener, records readiness, waits for peer readiness,
+// runs local agents, then records done after local runtime quiescence.
+// Intent: POC13 startup and shutdown should be evidence-driven instead of
+// arbitrary fixed sleeps. Source: DI-mosil
 func (runtime *TCPRuntime) Run(ctx context.Context) error {
 	listener, listenErr := net.Listen("tcp", runtime.listenAddress())
 	if listenErr != nil {
@@ -119,12 +124,18 @@ func (runtime *TCPRuntime) Run(ctx context.Context) error {
 	go func() {
 		serveErrs <- runtime.serve(ctx, &handlerWG)
 	}()
-	if delay := runtime.Config.StartupDelay(); delay > 0 {
-		time.Sleep(delay)
+	if err := runtime.recordRuntimeReadiness(); err != nil {
+		return err
+	}
+	if err := runtime.waitForPeerReadiness(ctx); err != nil {
+		return err
 	}
 	runErr := runtime.runLocalAgents(ctx)
-	if delay := runtime.Config.SettleDelay(); delay > 0 {
-		time.Sleep(delay)
+	if waitErr := runtime.waitForRuntimeCompletion(ctx); waitErr != nil && runErr == nil {
+		runErr = waitErr
+	}
+	if doneErr := runtime.recordRuntimeDone(); doneErr != nil && runErr == nil {
+		runErr = doneErr
 	}
 	closeErr := listener.Close()
 	handlerWG.Wait()
@@ -148,8 +159,18 @@ func (runtime *TCPRuntime) serve(ctx context.Context, handlerWG *sync.WaitGroup)
 			return acceptErr
 		}
 		handlerWG.Add(1)
+		runtime.mu.Lock()
+		runtime.activeHandlers++
+		runtime.lastActivity = time.Now()
+		runtime.mu.Unlock()
 		go func(accepted net.Conn) {
-			defer handlerWG.Done()
+			defer func() {
+				runtime.mu.Lock()
+				runtime.activeHandlers--
+				runtime.lastActivity = time.Now()
+				runtime.mu.Unlock()
+				handlerWG.Done()
+			}()
 			if err := runtime.handleConnection(ctx, accepted); err != nil {
 				fmt.Fprintf(os.Stderr, "poc13-runtime: handle connection: %v\n", err)
 			}
@@ -168,6 +189,7 @@ func (runtime *TCPRuntime) handleConnection(ctx context.Context, conn net.Conn) 
 	if frameErr != nil {
 		return frameErr
 	}
+	runtime.markActivity()
 	return runtime.handleEnvelope(ctx, frameBytes)
 }
 
@@ -713,6 +735,7 @@ func (runtime *TCPRuntime) sendPromise(ctx context.Context, outbound OutboundPro
 	if err := (FrameWriter{writer: conn}).WriteFrame(exactBytes); err != nil {
 		return err
 	}
+	runtime.markActivity()
 	return runtime.recordAgentEvent(outbound.From, "tcp_message_sent", "kept", outbound.To, outbound.ProtocolName, "variant="+fields["variant"]+" exact_sha256="+HashExactBytes(exactBytes))
 }
 
@@ -732,6 +755,107 @@ func (runtime *TCPRuntime) dialWithRetry(ctx context.Context, agentName string) 
 		time.Sleep(100 * time.Millisecond)
 	}
 	return nil, lastErr
+}
+
+func (runtime *TCPRuntime) recordRuntimeReadiness() error {
+	if err := os.MkdirAll(runtime.runtimeMarkerDir(), 0o755); err != nil {
+		return err
+	}
+	if err := os.WriteFile(runtime.runtimeMarkerPath("ready"), []byte(time.Now().UTC().Format(time.RFC3339Nano)+"\n"), 0o644); err != nil {
+		return err
+	}
+	for _, agentName := range runtime.Container.Agents {
+		if err := runtime.recordAgentEvent(agentName, "runtime_readiness_promised", "kept", "", "", "container "+runtime.Container.Name+" promises its TCP listener is open"); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (runtime *TCPRuntime) waitForPeerReadiness(ctx context.Context) error {
+	deadline := time.Now().Add(runtime.Config.ReadinessTimeout())
+	observed := make(map[string]bool)
+	for {
+		allReady := true
+		for _, container := range runtime.Config.Containers {
+			readyPath := filepath.Join(runtime.runtimeMarkerDir(), container.Name+".ready")
+			if _, statErr := os.Stat(readyPath); statErr != nil {
+				allReady = false
+				continue
+			}
+			if !observed[container.Name] {
+				observed[container.Name] = true
+				for _, agentName := range runtime.Container.Agents {
+					if err := runtime.recordAgentEvent(agentName, "peer_readiness_observed", "kept", "", "", "observed container "+container.Name+" readiness marker"); err != nil {
+						return err
+					}
+				}
+			}
+		}
+		if allReady {
+			return nil
+		}
+		if time.Now().After(deadline) {
+			return fmt.Errorf("timed out waiting for peer readiness after %s", runtime.Config.ReadinessTimeout())
+		}
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case <-time.After(50 * time.Millisecond):
+		}
+	}
+}
+
+func (runtime *TCPRuntime) waitForRuntimeCompletion(ctx context.Context) error {
+	idle := runtime.Config.CompletionIdle()
+	deadline := time.Now().Add(runtime.Config.Timeout())
+	runtime.markActivity()
+	for {
+		runtime.mu.Lock()
+		activeHandlers := runtime.activeHandlers
+		quietFor := time.Since(runtime.lastActivity)
+		runtime.mu.Unlock()
+		if activeHandlers == 0 && quietFor >= idle {
+			return nil
+		}
+		if time.Now().After(deadline) {
+			return fmt.Errorf("timed out waiting for runtime completion: active_handlers=%d quiet_for=%s idle=%s", activeHandlers, quietFor, idle)
+		}
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case <-time.After(25 * time.Millisecond):
+		}
+	}
+}
+
+func (runtime *TCPRuntime) recordRuntimeDone() error {
+	if err := os.MkdirAll(runtime.runtimeMarkerDir(), 0o755); err != nil {
+		return err
+	}
+	if err := os.WriteFile(runtime.runtimeMarkerPath("done"), []byte(time.Now().UTC().Format(time.RFC3339Nano)+"\n"), 0o644); err != nil {
+		return err
+	}
+	for _, agentName := range runtime.Container.Agents {
+		if err := runtime.recordAgentEvent(agentName, "runtime_done_promised", "kept", "", "", "container "+runtime.Container.Name+" promises local runtime is idle and done"); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (runtime *TCPRuntime) runtimeMarkerDir() string {
+	return filepath.Join(runtime.Config.RunRoot, runtime.Config.RunID, "runtime")
+}
+
+func (runtime *TCPRuntime) runtimeMarkerPath(kind string) string {
+	return filepath.Join(runtime.runtimeMarkerDir(), runtime.Container.Name+"."+kind)
+}
+
+func (runtime *TCPRuntime) markActivity() {
+	runtime.mu.Lock()
+	runtime.lastActivity = time.Now()
+	runtime.mu.Unlock()
 }
 
 func (runtime *TCPRuntime) recordAgentEvent(agentName, eventName, outcome, peer, protocolName, detail string) error {
