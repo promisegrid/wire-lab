@@ -17,6 +17,12 @@ import (
 
 const maxFrameBytes = 1 << 20
 
+const (
+	storageCapacity = 2
+	computeCapacity = 1
+	computePrice    = 5
+)
+
 // AgentState is one local agent's mutable evidence state for the bounded POC.
 // Intent: POC13 keeps trust, credits, capabilities, and storage local to the
 // observing agent instead of creating global authorities. Source: DI-fumol
@@ -249,16 +255,30 @@ func (runtime *TCPRuntime) runDataHolder(ctx context.Context, agent AgentConfig,
 	functionBytes := sampleFunctionBytes()
 	inputBytes := []byte("n=9")
 	contextBytes := sampleContextBytes()
+	// Intent: Alice's first actions now expose local trust-driven peer choice
+	// and bounded economics before protocol sends, rather than treating Bob and
+	// Carol as hard-coded RPC destinations. Source: DI-lupag
+	storagePeer := runtime.preferredStoragePeer(agent.Name)
+	computePeer := runtime.preferredComputePeer(agent.Name)
+	if err := runtime.recordTrustDrivenChoice(agent.Name, storagePeer, CASStorageV1, "Alice chooses Bob as primary storage peer from local trust and plans Frank as replica fallback"); err != nil {
+		return err
+	}
+	if err := runtime.recordTrustDrivenChoice(agent.Name, computePeer, CIDComputeV1, "Alice chooses Carol for compute and plans Dave/Grace verification from prior evidence"); err != nil {
+		return err
+	}
+	if err := runtime.recordEconomics(agent.Name, "economics_price_probe", "kept", storagePeer, CASStorageV1, "Alice first offers low storage credit to test Bob's local price boundary"); err != nil {
+		return err
+	}
 	if err := runtime.sendPromise(ctx, OutboundPromise{
 		From:         agent.Name,
-		To:           "bob",
+		To:           storagePeer,
 		ProtocolName: CASStorageV1,
 		Fields: map[string]string{
 			"variant":           "store_request",
 			"promise_about":     "store_content",
 			"content_cid":       contentCID,
 			"content_b64":       base64.StdEncoding.EncodeToString(contentBytes),
-			"credit_offer":      "3",
+			"credit_offer":      "1",
 			"requested_token":   "serve-once",
 			"decision_text":     decisionText,
 			"promise_condition": "bob may decline locally",
@@ -266,9 +286,32 @@ func (runtime *TCPRuntime) runDataHolder(ctx context.Context, agent AgentConfig,
 	}); err != nil {
 		return err
 	}
+	if err := runtime.recordEconomics(agent.Name, "economics_credit_offered", "kept", storagePeer, CASStorageV1, "Alice offers storage credit_offer=4 after low-price probe"); err != nil {
+		return err
+	}
+	if err := runtime.sendPromise(ctx, OutboundPromise{
+		From:         agent.Name,
+		To:           storagePeer,
+		ProtocolName: CASStorageV1,
+		Fields: map[string]string{
+			"variant":           "store_request",
+			"promise_about":     "store_content",
+			"content_cid":       contentCID,
+			"content_b64":       base64.StdEncoding.EncodeToString(contentBytes),
+			"credit_offer":      "4",
+			"requested_token":   "serve-once",
+			"decision_text":     decisionText,
+			"promise_condition": "bob may decline locally",
+		},
+	}); err != nil {
+		return err
+	}
+	if err := runtime.recordEconomics(agent.Name, "economics_credit_offered", "kept", computePeer, CIDComputeV1, "Alice offers compute credit_offer=5 for payload-provided Fibonacci compute"); err != nil {
+		return err
+	}
 	return runtime.sendPromise(ctx, OutboundPromise{
 		From:         agent.Name,
-		To:           "carol",
+		To:           computePeer,
 		ProtocolName: CIDComputeV1,
 		Fields: map[string]string{
 			"variant":           "compute_request",
@@ -351,16 +394,24 @@ func (runtime *TCPRuntime) handleEnvelope(ctx context.Context, exactBytes []byte
 	switch message.Fields["variant"] {
 	case "store_request":
 		return runtime.handleStoreRequest(ctx, message)
+	case "price_refusal":
+		return runtime.handlePriceRefusal(message)
 	case "store_acceptance":
 		return runtime.handleStoreAcceptance(ctx, message)
 	case "serve_request":
 		return runtime.handleServeRequest(ctx, message)
 	case "serve_response":
 		return runtime.handleServeResponse(message)
+	case "primary_unavailable_notice":
+		return runtime.handlePrimaryUnavailableNotice(message)
+	case "replica_available":
+		return runtime.handleReplicaAvailable(ctx, message)
+	case "replica_serve_request":
+		return runtime.handleReplicaServeRequest(ctx, message)
 	case "replicate_request":
 		return runtime.handleReplicateRequest(ctx, message)
 	case "replicate_acceptance":
-		return runtime.handleReplicateAcceptance(message)
+		return runtime.handleReplicateAcceptance(ctx, message)
 	case "compute_request":
 		return runtime.handleComputeRequest(ctx, message)
 	case "context_request":
@@ -368,7 +419,11 @@ func (runtime *TCPRuntime) handleEnvelope(ctx context.Context, exactBytes []byte
 	case "context_response":
 		return runtime.handleContextResponse(ctx, message)
 	case "compute_result":
-		return runtime.handleComputeResult(message)
+		return runtime.handleComputeResult(ctx, message)
+	case "compute_verification_request":
+		return runtime.handleComputeVerificationRequest(ctx, message)
+	case "compute_verification_result":
+		return runtime.handleComputeVerificationResult(message)
 	case "corrupt_bytes_offer":
 		return runtime.handleCorruptBytesOffer(message)
 	case "trust_repair_promise":
@@ -388,10 +443,32 @@ func (runtime *TCPRuntime) handleStoreRequest(ctx context.Context, message Runti
 		runtime.adjustTrust(message.To, message.From, -3)
 		return runtime.recordAgentEvent(message.To, "cas_corrupt_bytes_rejected", "malformed", message.From, message.ProtocolName, "store_request bytes did not match content_cid="+contentCID)
 	}
+	creditOffer := parseCreditOffer(message.Fields["credit_offer"])
+	if creditOffer < 3 {
+		if err := runtime.recordEconomics(message.To, "economics_price_refused", "non_commitment", message.From, message.ProtocolName, fmt.Sprintf("storage credit_offer=%d below local opportunity_cost=3", creditOffer)); err != nil {
+			return err
+		}
+		return runtime.sendPromise(ctx, OutboundPromise{
+			From:         message.To,
+			To:           message.From,
+			ProtocolName: CASStorageV1,
+			Fields: map[string]string{
+				"variant":        "price_refusal",
+				"promise_about":  "price_boundary",
+				"content_cid":    contentCID,
+				"minimum_credit": "3",
+				"credit_offer":   message.Fields["credit_offer"],
+			},
+		})
+	}
 	state := runtime.states[message.To]
 	state.mu.Lock()
+	if len(state.Store) >= storageCapacity {
+		state.mu.Unlock()
+		return runtime.recordEconomics(message.To, "economics_capacity_refused", "non_commitment", message.From, message.ProtocolName, fmt.Sprintf("storage capacity exhausted capacity=%d", storageCapacity))
+	}
 	state.Store[contentCID] = append([]byte(nil), contentBytes...)
-	state.Credits[message.From] += 3
+	state.Credits[message.From] += creditOffer
 	state.mu.Unlock()
 	runtime.adjustTrust(message.To, message.From, 1)
 	token := runtime.issueCapabilityToken(message.To, message.From, contentCID)
@@ -407,7 +484,13 @@ func (runtime *TCPRuntime) handleStoreRequest(ctx context.Context, message Runti
 	if err := runtime.recordAgentEvent(message.To, "cas_serve_promised", "kept", message.From, message.ProtocolName, "Bob promises token-scoped serving for content_cid="+contentCID); err != nil {
 		return err
 	}
-	if err := runtime.recordAgentEvent(message.To, "economics_credit_accepted", "kept", message.From, message.ProtocolName, "accepted storage credit_offer="+message.Fields["credit_offer"]); err != nil {
+	if err := runtime.recordEconomics(message.To, "economics_credit_accepted", "kept", message.From, message.ProtocolName, "accepted storage credit_offer="+message.Fields["credit_offer"]); err != nil {
+		return err
+	}
+	if err := runtime.recordEconomics(message.To, "economics_capacity_reserved", "kept", message.From, message.ProtocolName, fmt.Sprintf("reserved storage slot capacity=%d", storageCapacity)); err != nil {
+		return err
+	}
+	if err := runtime.recordEconomics(message.To, "economics_credits_earned", "kept", message.From, message.ProtocolName, fmt.Sprintf("Bob earned storage credits=%d capacity=%d", creditOffer, storageCapacity)); err != nil {
 		return err
 	}
 	if err := runtime.recordAgentEvent(message.To, "capability_token_issued", "kept", message.From, message.ProtocolName, "token="+token+" content_cid="+contentCID); err != nil {
@@ -437,6 +520,7 @@ func (runtime *TCPRuntime) handleStoreRequest(ctx context.Context, message Runti
 			"content_cid":   contentCID,
 			"content_b64":   base64.StdEncoding.EncodeToString(contentBytes),
 			"credit_offer":  "1",
+			"requester":     message.From,
 		},
 	})
 }
@@ -450,17 +534,25 @@ func (runtime *TCPRuntime) handleStoreAcceptance(ctx context.Context, message Ru
 	if err := runtime.recordAgentEvent(message.To, "capability_token_received", "kept", message.From, message.ProtocolName, "token="+message.Fields["token"]+" content_cid="+message.Fields["content_cid"]); err != nil {
 		return err
 	}
+	if err := runtime.recordEconomics(message.To, "economics_credits_spent", "kept", message.From, message.ProtocolName, "Alice spends storage credits=4 after Bob's promise is accepted"); err != nil {
+		return err
+	}
 	return runtime.sendPromise(ctx, OutboundPromise{
 		From:         message.To,
 		To:           message.From,
 		ProtocolName: CASStorageV1,
 		Fields: map[string]string{
-			"variant":       "serve_request",
-			"promise_about": "redeem_storage_capability",
-			"content_cid":   message.Fields["content_cid"],
-			"token":         message.Fields["token"],
+			"variant":              "serve_request",
+			"promise_about":        "redeem_storage_capability",
+			"content_cid":          message.Fields["content_cid"],
+			"token":                message.Fields["token"],
+			"simulate_unavailable": "true",
 		},
 	})
+}
+
+func (runtime *TCPRuntime) handlePriceRefusal(message RuntimeMessage) error {
+	return runtime.recordEconomics(message.To, "economics_price_refused", "non_commitment", message.From, message.ProtocolName, "peer minimum_credit="+message.Fields["minimum_credit"]+" rejected credit_offer="+message.Fields["credit_offer"])
 }
 
 func (runtime *TCPRuntime) handleServeRequest(ctx context.Context, message RuntimeMessage) error {
@@ -477,6 +569,78 @@ func (runtime *TCPRuntime) handleServeRequest(ctx context.Context, message Runti
 		return runtime.recordAgentEvent(message.To, "cas_serve_not_promised", "non_commitment", message.From, message.ProtocolName, "content not present content_cid="+contentCID)
 	}
 	if err := runtime.recordAgentEvent(message.To, "capability_token_redeemed", "kept", message.From, message.ProtocolName, "token="+message.Fields["token"]+" content_cid="+contentCID); err != nil {
+		return err
+	}
+	if message.Fields["simulate_unavailable"] == "true" {
+		if err := runtime.recordAgentEvent(message.To, "primary_storage_unavailable", "non_commitment", message.From, message.ProtocolName, "Bob redeems Alice's token but does not currently promise immediate serving"); err != nil {
+			return err
+		}
+		return runtime.sendPromise(ctx, OutboundPromise{
+			From:         message.To,
+			To:           message.From,
+			ProtocolName: CASStorageV1,
+			Fields: map[string]string{
+				"variant":       "primary_unavailable_notice",
+				"promise_about": "primary_storage_unavailable",
+				"content_cid":   contentCID,
+			},
+		})
+	}
+	return runtime.sendPromise(ctx, OutboundPromise{
+		From:         message.To,
+		To:           message.From,
+		ProtocolName: CASStorageV1,
+		Fields: map[string]string{
+			"variant":       "serve_response",
+			"promise_about": "serve_content_bytes",
+			"content_cid":   contentCID,
+			"content_b64":   base64.StdEncoding.EncodeToString(contentBytes),
+		},
+	})
+}
+
+func (runtime *TCPRuntime) handlePrimaryUnavailableNotice(message RuntimeMessage) error {
+	return runtime.recordAgentEvent(message.To, "primary_storage_unavailable", "non_commitment", message.From, message.ProtocolName, "Alice observes Bob unavailable for immediate retrieval and waits for replica evidence")
+}
+
+// handleReplicaAvailable lets Alice recover from Bob's current serving
+// non-commitment by asking a trusted-enough replica peer.
+// Intent: Replica recovery is a local trust decision by Alice, not an automatic
+// global failover or availability guarantee. Source: DI-lupag
+func (runtime *TCPRuntime) handleReplicaAvailable(ctx context.Context, message RuntimeMessage) error {
+	replicaPeer := message.Fields["replica_peer"]
+	contentCID := message.Fields["content_cid"]
+	if runtime.trustScore(message.To, replicaPeer) < 0 {
+		return runtime.recordAgentEvent(message.To, "replica_recovery_not_promised", "non_commitment", replicaPeer, message.ProtocolName, "local trust below replica recovery threshold")
+	}
+	if err := runtime.recordTrustDrivenChoice(message.To, replicaPeer, message.ProtocolName, "Alice chooses Frank for replica retrieval because Bob is unavailable and Frank's local trust is sufficient"); err != nil {
+		return err
+	}
+	if err := runtime.recordAgentEvent(message.To, "replica_recovery_requested", "kept", replicaPeer, message.ProtocolName, "requesting replica content_cid="+contentCID); err != nil {
+		return err
+	}
+	return runtime.sendPromise(ctx, OutboundPromise{
+		From:         message.To,
+		To:           replicaPeer,
+		ProtocolName: CASStorageV1,
+		Fields: map[string]string{
+			"variant":       "replica_serve_request",
+			"promise_about": "serve_replica_content",
+			"content_cid":   contentCID,
+		},
+	})
+}
+
+func (runtime *TCPRuntime) handleReplicaServeRequest(ctx context.Context, message RuntimeMessage) error {
+	contentCID := message.Fields["content_cid"]
+	state := runtime.states[message.To]
+	state.mu.Lock()
+	contentBytes, ok := state.Store[contentCID]
+	state.mu.Unlock()
+	if !ok {
+		return runtime.recordAgentEvent(message.To, "cas_replica_serve_not_promised", "non_commitment", message.From, message.ProtocolName, "replica content not present content_cid="+contentCID)
+	}
+	if err := runtime.recordAgentEvent(message.To, "cas_replica_serve_promised", "kept", message.From, message.ProtocolName, "Frank promises replica serving for content_cid="+contentCID); err != nil {
 		return err
 	}
 	return runtime.sendPromise(ctx, OutboundPromise{
@@ -503,6 +667,11 @@ func (runtime *TCPRuntime) handleServeResponse(message RuntimeMessage) error {
 		return runtime.recordAgentEvent(message.To, "cas_corrupt_bytes_rejected", "malformed", message.From, message.ProtocolName, "serve_response bytes did not match content_cid="+contentCID)
 	}
 	runtime.adjustTrust(message.To, message.From, 1)
+	if message.From == "frank" {
+		if err := runtime.recordAgentEvent(message.To, "replica_recovery_succeeded", "kept", message.From, message.ProtocolName, "retrieved content from trusted replica content_cid="+contentCID); err != nil {
+			return err
+		}
+	}
 	return runtime.recordAgentEvent(message.To, "cas_bytes_retrieved", "kept", message.From, message.ProtocolName, "retrieved content_cid="+contentCID)
 }
 
@@ -528,7 +697,10 @@ func (runtime *TCPRuntime) handleReplicateRequest(ctx context.Context, message R
 	if err := runtime.recordAgentEvent(message.To, "cas_replication_promised", "kept", message.From, message.ProtocolName, "Frank promises one local replica for content_cid="+contentCID); err != nil {
 		return err
 	}
-	if err := runtime.recordAgentEvent(message.To, "economics_credit_accepted", "kept", message.From, message.ProtocolName, "accepted replication credit_offer="+message.Fields["credit_offer"]); err != nil {
+	if err := runtime.recordEconomics(message.To, "economics_credit_accepted", "kept", message.From, message.ProtocolName, "accepted replication credit_offer="+message.Fields["credit_offer"]); err != nil {
+		return err
+	}
+	if err := runtime.recordEconomics(message.To, "economics_credits_earned", "kept", message.From, message.ProtocolName, "Frank earned replication credits="+message.Fields["credit_offer"]); err != nil {
 		return err
 	}
 	return runtime.sendPromise(ctx, OutboundPromise{
@@ -539,23 +711,55 @@ func (runtime *TCPRuntime) handleReplicateRequest(ctx context.Context, message R
 			"variant":       "replicate_acceptance",
 			"promise_about": "replicate_content",
 			"content_cid":   contentCID,
+			"requester":     message.Fields["requester"],
 		},
 	})
 }
 
-func (runtime *TCPRuntime) handleReplicateAcceptance(message RuntimeMessage) error {
+func (runtime *TCPRuntime) handleReplicateAcceptance(ctx context.Context, message RuntimeMessage) error {
 	runtime.adjustTrust(message.To, message.From, 1)
-	return runtime.recordAgentEvent(message.To, "cas_replication_confirmed", "kept", message.From, message.ProtocolName, "replica accepted content_cid="+message.Fields["content_cid"])
+	if err := runtime.recordAgentEvent(message.To, "cas_replication_confirmed", "kept", message.From, message.ProtocolName, "replica accepted content_cid="+message.Fields["content_cid"]); err != nil {
+		return err
+	}
+	requester := message.Fields["requester"]
+	if requester == "" {
+		return nil
+	}
+	return runtime.sendPromise(ctx, OutboundPromise{
+		From:         message.To,
+		To:           requester,
+		ProtocolName: CASStorageV1,
+		Fields: map[string]string{
+			"variant":       "replica_available",
+			"promise_about": "replica_location",
+			"content_cid":   message.Fields["content_cid"],
+			"replica_peer":  message.From,
+		},
+	})
 }
 
 func (runtime *TCPRuntime) handleComputeRequest(ctx context.Context, message RuntimeMessage) error {
 	state := runtime.states[message.To]
 	requestID := message.Fields["function_cid"] + "|" + message.Fields["input_cid"]
+	creditOffer := parseCreditOffer(message.Fields["credit_offer"])
+	if creditOffer < computePrice {
+		return runtime.recordEconomics(message.To, "economics_price_refused", "non_commitment", message.From, message.ProtocolName, fmt.Sprintf("compute credit_offer=%d below local opportunity_cost=%d", creditOffer, computePrice))
+	}
 	state.mu.Lock()
+	if len(state.PendingCompute) >= computeCapacity {
+		state.mu.Unlock()
+		return runtime.recordEconomics(message.To, "economics_capacity_refused", "non_commitment", message.From, message.ProtocolName, fmt.Sprintf("compute capacity exhausted capacity=%d", computeCapacity))
+	}
 	state.PendingCompute[requestID] = message.Fields
-	state.Credits[message.From] += 5
+	state.Credits[message.From] += creditOffer
 	state.mu.Unlock()
-	if err := runtime.recordAgentEvent(message.To, "economics_credit_accepted", "kept", message.From, message.ProtocolName, "accepted compute credit_offer="+message.Fields["credit_offer"]); err != nil {
+	if err := runtime.recordEconomics(message.To, "economics_credit_accepted", "kept", message.From, message.ProtocolName, "accepted compute credit_offer="+message.Fields["credit_offer"]); err != nil {
+		return err
+	}
+	if err := runtime.recordEconomics(message.To, "economics_capacity_reserved", "kept", message.From, message.ProtocolName, fmt.Sprintf("reserved compute slot capacity=%d", computeCapacity)); err != nil {
+		return err
+	}
+	if err := runtime.recordEconomics(message.To, "economics_credits_earned", "kept", message.From, message.ProtocolName, fmt.Sprintf("Carol earned compute credits=%d capacity=%d", creditOffer, computeCapacity)); err != nil {
 		return err
 	}
 	return runtime.sendPromise(ctx, OutboundPromise{
@@ -638,8 +842,11 @@ func (runtime *TCPRuntime) handleContextResponse(ctx context.Context, message Ru
 		"variant":       "compute_result",
 		"promise_about": "execute_function",
 		"function_cid":  pending["function_cid"],
+		"function_b64":  pending["function_b64"],
 		"input_cid":     pending["input_cid"],
+		"input_b64":     pending["input_b64"],
 		"context_cid":   contextCID,
+		"context_b64":   base64.StdEncoding.EncodeToString(contextBytes),
 		"result_cid":    resultCID,
 		"result_b64":    base64.StdEncoding.EncodeToString(resultBytes),
 	}
@@ -649,7 +856,7 @@ func (runtime *TCPRuntime) handleContextResponse(ctx context.Context, message Ru
 	return runtime.sendPromise(ctx, OutboundPromise{From: message.To, To: "dave", ProtocolName: CIDComputeV1, Fields: resultFields})
 }
 
-func (runtime *TCPRuntime) handleComputeResult(message RuntimeMessage) error {
+func (runtime *TCPRuntime) handleComputeResult(ctx context.Context, message RuntimeMessage) error {
 	resultBytes, decodeErr := base64.StdEncoding.DecodeString(message.Fields["result_b64"])
 	if decodeErr != nil {
 		return decodeErr
@@ -664,7 +871,40 @@ func (runtime *TCPRuntime) handleComputeResult(message RuntimeMessage) error {
 		cacheKey := ComputeCacheKey(message.ProtocolName, message.Fields["function_cid"], message.Fields["input_cid"], message.Fields["context_cid"], resultCID)
 		return runtime.recordAgentEvent(message.To, "compute_cache_checkpointed", "kept", message.From, message.ProtocolName, "Dave caches exact tuple cache_key="+cacheKey)
 	}
-	return runtime.recordAgentEvent(message.To, "compute_result_received", "kept", message.From, message.ProtocolName, "result_cid="+resultCID+" result="+string(resultBytes))
+	if err := runtime.recordAgentEvent(message.To, "compute_result_received", "kept", message.From, message.ProtocolName, "result_cid="+resultCID+" result="+string(resultBytes)); err != nil {
+		return err
+	}
+	if runtime.states[message.To].Agent.Role != "data_holder" {
+		return nil
+	}
+	if err := runtime.recordEconomics(message.To, "economics_credits_spent", "kept", message.From, message.ProtocolName, "Alice spends compute credits=5 after Carol's result arrives"); err != nil {
+		return err
+	}
+	if err := runtime.verifyComputeResultLocally(message); err != nil {
+		return err
+	}
+	for _, verifier := range []string{"dave", "grace"} {
+		if err := runtime.sendPromise(ctx, OutboundPromise{
+			From:         message.To,
+			To:           verifier,
+			ProtocolName: CIDComputeV1,
+			Fields: map[string]string{
+				"variant":       "compute_verification_request",
+				"promise_about": "verify_compute_result",
+				"function_cid":  message.Fields["function_cid"],
+				"function_b64":  message.Fields["function_b64"],
+				"input_cid":     message.Fields["input_cid"],
+				"input_b64":     message.Fields["input_b64"],
+				"context_cid":   message.Fields["context_cid"],
+				"context_b64":   message.Fields["context_b64"],
+				"result_cid":    message.Fields["result_cid"],
+				"result_b64":    message.Fields["result_b64"],
+			},
+		}); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (runtime *TCPRuntime) handleCorruptBytesOffer(message RuntimeMessage) error {
@@ -684,6 +924,32 @@ func (runtime *TCPRuntime) handleCorruptBytesOffer(message RuntimeMessage) error
 		return err
 	}
 	return runtime.recordAgentEvent(message.To, "cas_corrupt_evidence_recorded", "kept", message.From, message.ProtocolName, "Grace records corrupt-byte evidence locally")
+}
+
+func (runtime *TCPRuntime) handleComputeVerificationRequest(ctx context.Context, message RuntimeMessage) error {
+	if err := runtime.verifyComputeResultLocally(message); err != nil {
+		runtime.adjustTrust(message.To, message.From, -2)
+		return runtime.recordAgentEvent(message.To, "compute_verification_rejected", "malformed", message.From, message.ProtocolName, err.Error())
+	}
+	if err := runtime.recordAgentEvent(message.To, "compute_result_peer_verified", "kept", message.From, message.ProtocolName, "verified result_cid="+message.Fields["result_cid"]); err != nil {
+		return err
+	}
+	return runtime.sendPromise(ctx, OutboundPromise{
+		From:         message.To,
+		To:           message.From,
+		ProtocolName: CIDComputeV1,
+		Fields: map[string]string{
+			"variant":       "compute_verification_result",
+			"promise_about": "verify_compute_result",
+			"result_cid":    message.Fields["result_cid"],
+			"verdict":       "kept",
+		},
+	})
+}
+
+func (runtime *TCPRuntime) handleComputeVerificationResult(message RuntimeMessage) error {
+	runtime.adjustTrust(message.To, message.From, 1)
+	return runtime.recordAgentEvent(message.To, "compute_verification_received", "kept", message.From, message.ProtocolName, "peer verified result_cid="+message.Fields["result_cid"])
 }
 
 func (runtime *TCPRuntime) handleTrustRepairPromise(message RuntimeMessage) error {
@@ -874,6 +1140,61 @@ func (runtime *TCPRuntime) recordAgentEvent(agentName, eventName, outcome, peer,
 	return nil
 }
 
+func (runtime *TCPRuntime) recordTrustDrivenChoice(agentName, peer, protocolName, detail string) error {
+	return runtime.recordAgentEvent(agentName, "trust_driven_peer_choice", "kept", peer, protocolName, detail)
+}
+
+// recordEconomics writes one local economics evidence record.
+// Intent: POC13 economics remain local promise evidence about capacity,
+// opportunity cost, and credits; there is no central price authority. Source:
+// DI-lupag
+func (runtime *TCPRuntime) recordEconomics(agentName, eventName, outcome, peer, protocolName, detail string) error {
+	return runtime.recordAgentEvent(agentName, eventName, outcome, peer, protocolName, detail)
+}
+
+// verifyComputeResultLocally recomputes the signed payload material from the
+// observer's local vantage.
+// Intent: Alice, Dave, and Grace verify Carol's compute result using the same
+// pCID-owned payload bytes instead of trusting Carol as an authority. Source:
+// DI-lupag
+func (runtime *TCPRuntime) verifyComputeResultLocally(message RuntimeMessage) error {
+	functionBytes, functionErr := base64.StdEncoding.DecodeString(message.Fields["function_b64"])
+	if functionErr != nil {
+		return functionErr
+	}
+	inputBytes, inputErr := base64.StdEncoding.DecodeString(message.Fields["input_b64"])
+	if inputErr != nil {
+		return inputErr
+	}
+	contextBytes, contextErr := base64.StdEncoding.DecodeString(message.Fields["context_b64"])
+	if contextErr != nil {
+		return contextErr
+	}
+	expectedBytes, executeErr := ExecuteFunction(functionBytes, inputBytes, contextBytes)
+	if executeErr != nil {
+		return executeErr
+	}
+	expectedCID := ContentCID(expectedBytes)
+	if expectedCID != message.Fields["result_cid"] {
+		return fmt.Errorf("local recompute result_cid=%s want %s", expectedCID, message.Fields["result_cid"])
+	}
+	return runtime.recordAgentEvent(message.To, "compute_result_locally_verified", "kept", message.From, message.ProtocolName, "local recompute matched result_cid="+expectedCID)
+}
+
+func (runtime *TCPRuntime) preferredStoragePeer(agentName string) string {
+	if runtime.trustScore(agentName, "bob") >= runtime.trustScore(agentName, "frank") {
+		return "bob"
+	}
+	return "frank"
+}
+
+func (runtime *TCPRuntime) preferredComputePeer(agentName string) string {
+	if runtime.trustScore(agentName, "carol") >= 0 {
+		return "carol"
+	}
+	return "dave"
+}
+
 func (runtime *TCPRuntime) adjustTrust(observer, peer string, delta int) {
 	state := runtime.states[observer]
 	if state == nil {
@@ -890,6 +1211,24 @@ func (runtime *TCPRuntime) adjustTrust(observer, peer string, delta int) {
 	if err := runtime.recordAgentEvent(observer, "trust_updated", outcome, peer, "", fmt.Sprintf("delta=%d local_trust=%d", delta, currentTrust)); err != nil {
 		fmt.Fprintf(os.Stderr, "poc13-runtime: record trust update: %v\n", err)
 	}
+}
+
+func (runtime *TCPRuntime) trustScore(observer, peer string) int {
+	state := runtime.states[observer]
+	if state == nil {
+		return 0
+	}
+	state.mu.Lock()
+	defer state.mu.Unlock()
+	return state.Trust[peer]
+}
+
+func parseCreditOffer(value string) int {
+	var creditOffer int
+	if _, err := fmt.Sscanf(value, "%d", &creditOffer); err != nil {
+		return 0
+	}
+	return creditOffer
 }
 
 func (runtime *TCPRuntime) issueCapabilityToken(issuer, issuee, contentCID string) string {

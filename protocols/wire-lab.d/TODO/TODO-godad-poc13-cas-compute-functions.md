@@ -196,6 +196,46 @@ Affects: `implementations/poc13-cas-compute-functions/**`;
 `DEV-GUIDE-RESOURCES.md`;
 `protocols/wire-lab.d/TODO/TODO-godad-poc13-cas-compute-functions.md`.
 
+ID: DI-lupag
+Date: 2026-06-07 07:27:39
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Extend POC13 in place with the six selected next-step improvements:
+retrieve from Frank when Bob is unavailable and Frank is locally trusted enough;
+verify Carol's compute result through Alice-local recomputation and Dave/Grace
+verification evidence; add richer bounded economics with capacity limits,
+opportunity cost, price refusal, credits spent, and credits earned; add
+trust-driven peer choice evidence where Alice chooses storage and compute peers
+from local trust and prior evidence; add per-agent narrative documentation with
+the exact message sequence and incentives; and add analyzer score/report fields
+in addition to raw event counts.
+Intent: The TCP POC should now demonstrate not only that storage/compute
+messages can move, but that agents make local choices based on trust and
+economics, can recover from a peer outage by asking a replica peer, can verify
+compute evidence, and can produce a readable run report for guide work.
+Constraints: Keep POC13 self-contained and bounded. Do not add new protocol
+pCIDs, top-level action kinds, global trust, permissions, or central pricing.
+Treat Bob's outage as a scenario event and local non-commitment, not a global
+failure. Keep economics as local promise/evidence fields inside existing
+pCID-owned payloads. Approved changed paths are
+`implementations/poc13-cas-compute-functions/{analyze.go,analyze_test.go,runtime.go,runtime_test.go,README.md}`;
+`implementations/poc13-cas-compute-functions/docs/RUN-NARRATIVE.md`;
+`DEV-GUIDE-RESOURCES.md`; `implementations/README.md`;
+`protocols/wire-lab.d/TODO/TODO-godad-poc13-cas-compute-functions.md`; and
+`protocols/wire-lab.d/TODO/TODO.md`. Approved implementation names include
+`ScoreReport`, `Narrative`, `scores`, `computeScores`, `addScore`,
+`TrustDrivenChoiceCounts`, `EconomicsCounts`, `VerificationCounts`,
+`ReplicaRecoveryCounts`, `recordTrustDrivenChoice`, `recordEconomics`,
+`handleReplicaServeRequest`, `handleComputeVerificationRequest`,
+`handleComputeVerificationResult`, `verifyComputeResultLocally`,
+`computePrice`, `storageCapacity`, `computeCapacity`, `preferredStoragePeer`,
+`preferredComputePeer`, and local variables derived from those names.
+Affects: `implementations/poc13-cas-compute-functions/**`;
+`DEV-GUIDE-RESOURCES.md`;
+`implementations/README.md`;
+`protocols/wire-lab.d/TODO/TODO-godad-poc13-cas-compute-functions.md`;
+`protocols/wire-lab.d/TODO/TODO.md`.
+
 ## Prior aliases
 
 - None.
@@ -228,6 +268,9 @@ not freeze final storage, compute, cache, provider, kernel, or app APIs.
   repair, credit economics, and capability-token evidence.
 - [x] godad.10 Replace fixed POC13 startup/settle sleeps with explicit
   readiness and done evidence plus bounded readiness and idle-completion gates.
+- [x] godad.11 Add selected POC13 improvements: replica recovery, compute
+  verification, richer economics, trust-driven peer choice, narrative docs, and
+  analyzer score/report fields.
 
 ## Acceptance criteria
 

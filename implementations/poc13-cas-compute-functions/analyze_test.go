@@ -25,6 +25,8 @@ func TestAnalyzeRunAcceptsParentDirectoryAndValidates(t *testing.T) {
 		{Observer: "bob", Event: "cas_bytes_stored", Outcome: "kept", PCID: CASStorageV1, Detail: "stored"},
 		{Observer: "alice", Event: "cas_bytes_retrieved", Outcome: "kept", PCID: CASStorageV1, Detail: "retrieved"},
 		{Observer: "frank", Event: "cas_replica_stored", Outcome: "kept", PCID: CASStorageV1, Detail: "replica stored"},
+		{Observer: "frank", Event: "cas_replica_serve_promised", Outcome: "kept", PCID: CASStorageV1, Detail: "replica served"},
+		{Observer: "alice", Event: "primary_storage_unavailable", Outcome: "non_commitment", PCID: CASStorageV1, Detail: "primary unavailable"},
 		{Observer: "mallory", Event: "cas_corrupt_bytes_rejected", Outcome: "malformed", PCID: CASStorageV1, Detail: "corrupt"},
 		{Observer: "grace", Event: "cas_corrupt_evidence_recorded", Outcome: "kept", PCID: CASStorageV1, Detail: "evidence"},
 		{Observer: "ellen", Event: "compute_context_promised", Outcome: "kept", PCID: CIDComputeV1, Detail: "context"},
@@ -33,10 +35,20 @@ func TestAnalyzeRunAcceptsParentDirectoryAndValidates(t *testing.T) {
 		{Observer: "carol", Event: "compute_result_promised", Outcome: "kept", PCID: CIDComputeV1, Detail: "result"},
 		{Observer: "alice", Event: "compute_result_received", Outcome: "kept", PCID: CIDComputeV1, Detail: "result received"},
 		{Observer: "dave", Event: "compute_cache_checkpointed", Outcome: "kept", PCID: CIDComputeV1, Detail: "cache"},
+		{Observer: "alice", Event: "compute_result_locally_verified", Outcome: "kept", PCID: CIDComputeV1, Detail: "local verify"},
+		{Observer: "grace", Event: "compute_result_peer_verified", Outcome: "kept", PCID: CIDComputeV1, Detail: "peer verify"},
+		{Observer: "alice", Event: "compute_verification_received", Outcome: "kept", PCID: CIDComputeV1, Detail: "verify received"},
 		{Observer: "bob", Event: "capability_token_issued", Outcome: "kept", PCID: CASStorageV1, Detail: "issued"},
 		{Observer: "alice", Event: "capability_token_received", Outcome: "kept", PCID: CASStorageV1, Detail: "received"},
 		{Observer: "bob", Event: "capability_token_redeemed", Outcome: "kept", PCID: CASStorageV1, Detail: "redeemed"},
+		{Observer: "alice", Event: "trust_driven_peer_choice", Outcome: "kept", PCID: CASStorageV1, Detail: "choice"},
 		{Observer: "bob", Event: "economics_credit_accepted", Outcome: "kept", PCID: CASStorageV1, Detail: "credit"},
+		{Observer: "bob", Event: "economics_price_refused", Outcome: "non_commitment", PCID: CASStorageV1, Detail: "price"},
+		{Observer: "bob", Event: "economics_capacity_reserved", Outcome: "kept", PCID: CASStorageV1, Detail: "capacity"},
+		{Observer: "alice", Event: "economics_credits_spent", Outcome: "kept", PCID: CASStorageV1, Detail: "spent"},
+		{Observer: "bob", Event: "economics_credits_earned", Outcome: "kept", PCID: CASStorageV1, Detail: "earned"},
+		{Observer: "alice", Event: "replica_recovery_requested", Outcome: "kept", PCID: CASStorageV1, Detail: "requested"},
+		{Observer: "alice", Event: "replica_recovery_succeeded", Outcome: "kept", PCID: CASStorageV1, Detail: "succeeded"},
 		{Observer: "alice", Event: "trust_updated", Outcome: "kept", Detail: "trust"},
 		{Observer: "grace", Event: "trust_repair_promise_recorded", Outcome: "kept", PCID: CASStorageV1, Detail: "repair"},
 		{Observer: "alice", Event: "promise_envelope_validated", Outcome: "kept", PCID: CASStorageV1, Detail: "exact"},
@@ -50,6 +62,9 @@ func TestAnalyzeRunAcceptsParentDirectoryAndValidates(t *testing.T) {
 	}
 	if err := ValidateAnalysis(summary); err != nil {
 		t.Fatalf("validate analysis: %v", err)
+	}
+	if summary.ScoreReport.Overall != 5 {
+		t.Fatalf("overall score = %d, want 5", summary.ScoreReport.Overall)
 	}
 }
 

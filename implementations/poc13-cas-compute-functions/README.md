@@ -22,6 +22,8 @@ cache, app, or kernel API. Source: `DI-bibom`; `DI-notig`.
 - Capability tokens, credit-style economics, trust updates, and voluntary repair
   promises are modeled as local pCID-owned promise payloads and evidence, not as
   global authority.
+- Replica recovery, compute verification, trust-driven peer choice, and richer
+  economics are summarized in `docs/RUN-NARRATIVE.md`.
 - LLM decisions are attempted only when `live_decisions` is true and the named
   API-key environment variable is present; config files must not store keys.
 - Live provider runs must emit meaningful provider text. The analyzer rejects

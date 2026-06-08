@@ -19,9 +19,29 @@ type AnalysisSummary struct {
 	OutcomeCounts                 map[string]int `json:"outcome_counts"`
 	AgentCounts                   map[string]int `json:"agent_counts"`
 	ProtocolCounts                map[string]int `json:"protocol_counts"`
+	TrustDrivenChoiceCounts       map[string]int `json:"trust_driven_choice_counts"`
+	EconomicsCounts               map[string]int `json:"economics_counts"`
+	VerificationCounts            map[string]int `json:"verification_counts"`
+	ReplicaRecoveryCounts         map[string]int `json:"replica_recovery_counts"`
 	RPCDriftCounts                map[string]int `json:"rpc_drift_counts"`
 	PlaceholderLiveDecisionCounts map[string]int `json:"placeholder_live_decision_counts"`
+	ScoreReport                   ScoreReport    `json:"score_report"`
 	MissingRequiredEventNames     []string       `json:"missing_required_event_names,omitempty"`
+}
+
+// ScoreReport is a compact POC13 fitness report for humans and scripts.
+// Intent: The analyzer should report evidence quality directly, not force
+// readers to infer POC health from raw event counts only. Source: DI-lupag
+type ScoreReport struct {
+	Overall      int      `json:"overall"`
+	Transport    int      `json:"transport"`
+	Storage      int      `json:"storage"`
+	Compute      int      `json:"compute"`
+	Economics    int      `json:"economics"`
+	Trust        int      `json:"trust"`
+	Verification int      `json:"verification"`
+	Replica      int      `json:"replica"`
+	Concerns     []string `json:"concerns,omitempty"`
 }
 
 // AnalyzeRun summarizes one POC13 JSONL directory or its parent run directory.
@@ -36,6 +56,10 @@ func AnalyzeRun(inputPath string) (AnalysisSummary, error) {
 		OutcomeCounts:                 make(map[string]int),
 		AgentCounts:                   make(map[string]int),
 		ProtocolCounts:                make(map[string]int),
+		TrustDrivenChoiceCounts:       make(map[string]int),
+		EconomicsCounts:               make(map[string]int),
+		VerificationCounts:            make(map[string]int),
+		ReplicaRecoveryCounts:         make(map[string]int),
 		RPCDriftCounts:                make(map[string]int),
 		PlaceholderLiveDecisionCounts: make(map[string]int),
 	}
@@ -47,6 +71,7 @@ func AnalyzeRun(inputPath string) (AnalysisSummary, error) {
 		}
 	}
 	summary.MissingRequiredEventNames = missingRequiredEvents(summary)
+	summary.ScoreReport = computeScores(summary)
 	return summary, nil
 }
 
@@ -98,6 +123,18 @@ func summarizePOC13Log(logPath string, summary *AnalysisSummary) error {
 		if event.PCID != "" {
 			summary.ProtocolCounts[event.PCID]++
 		}
+		if event.Event == "trust_driven_peer_choice" {
+			summary.TrustDrivenChoiceCounts[event.Observer]++
+		}
+		if strings.HasPrefix(event.Event, "economics_") {
+			summary.EconomicsCounts[event.Observer]++
+		}
+		if strings.Contains(event.Event, "verification") || event.Event == "compute_result_locally_verified" || event.Event == "compute_result_peer_verified" {
+			summary.VerificationCounts[event.Observer]++
+		}
+		if strings.HasPrefix(event.Event, "replica_recovery") || event.Event == "cas_replica_serve_promised" {
+			summary.ReplicaRecoveryCounts[event.Observer]++
+		}
 		if isRPCDrift(event) {
 			summary.RPCDriftCounts[event.Observer]++
 		}
@@ -112,7 +149,8 @@ func summarizePOC13Log(logPath string, summary *AnalysisSummary) error {
 // Intent: CAS and compute evidence should fail fast if it drifts toward RPC,
 // loses corrupt-byte handling, stops recording exact cache evidence, or fails
 // to prove TCP delivery, concrete storage/retrieval, dynamic compute, trust,
-// economics, repair, and capability-token evidence. Source: DI-notig; DI-fumol
+// economics, repair, capability-token, replica-recovery, verification, and
+// score/report evidence. Source: DI-notig; DI-fumol; DI-lupag
 func ValidateAnalysis(summary AnalysisSummary) error {
 	var failures []string
 	if summary.TotalEvents == 0 {
@@ -133,6 +171,9 @@ func ValidateAnalysis(summary AnalysisSummary) error {
 	if summary.ProtocolCounts[CIDComputeV1] == 0 {
 		failures = append(failures, "cid_compute_v1 evidence missing")
 	}
+	if summary.ScoreReport.Overall < 4 {
+		failures = append(failures, fmt.Sprintf("score_report.overall=%d want >=4", summary.ScoreReport.Overall))
+	}
 	if len(failures) > 0 {
 		return errors.New(strings.Join(failures, "; "))
 	}
@@ -152,6 +193,8 @@ func missingRequiredEvents(summary AnalysisSummary) []string {
 		"cas_bytes_stored",
 		"cas_bytes_retrieved",
 		"cas_replica_stored",
+		"cas_replica_serve_promised",
+		"primary_storage_unavailable",
 		"cas_corrupt_bytes_rejected",
 		"cas_corrupt_evidence_recorded",
 		"compute_context_promised",
@@ -160,10 +203,20 @@ func missingRequiredEvents(summary AnalysisSummary) []string {
 		"compute_result_promised",
 		"compute_result_received",
 		"compute_cache_checkpointed",
+		"compute_result_locally_verified",
+		"compute_result_peer_verified",
+		"compute_verification_received",
 		"capability_token_issued",
 		"capability_token_received",
 		"capability_token_redeemed",
+		"trust_driven_peer_choice",
 		"economics_credit_accepted",
+		"economics_price_refused",
+		"economics_capacity_reserved",
+		"economics_credits_spent",
+		"economics_credits_earned",
+		"replica_recovery_requested",
+		"replica_recovery_succeeded",
 		"trust_updated",
 		"trust_repair_promise_recorded",
 		"promise_envelope_validated",
@@ -175,6 +228,36 @@ func missingRequiredEvents(summary AnalysisSummary) []string {
 		}
 	}
 	return missing
+}
+
+func computeScores(summary AnalysisSummary) ScoreReport {
+	scores := ScoreReport{}
+	addScore(&scores.Transport, summary.EventCounts["tcp_message_sent"] > 0 && summary.EventCounts["tcp_message_received"] > 0)
+	addScore(&scores.Storage, summary.EventCounts["cas_bytes_stored"] > 0 && summary.EventCounts["cas_bytes_retrieved"] > 0)
+	addScore(&scores.Compute, summary.EventCounts["compute_function_executed"] > 0 && summary.EventCounts["compute_result_received"] > 0)
+	addScore(&scores.Economics, summary.EventCounts["economics_price_refused"] > 0 && summary.EventCounts["economics_credits_spent"] > 0 && summary.EventCounts["economics_credits_earned"] > 0)
+	addScore(&scores.Trust, summary.EventCounts["trust_updated"] > 0 && summary.EventCounts["trust_driven_peer_choice"] > 0)
+	addScore(&scores.Verification, summary.EventCounts["compute_result_locally_verified"] > 0 && summary.EventCounts["compute_result_peer_verified"] > 0)
+	addScore(&scores.Replica, summary.EventCounts["replica_recovery_succeeded"] > 0)
+	scores.Overall = (scores.Transport + scores.Storage + scores.Compute + scores.Economics + scores.Trust + scores.Verification + scores.Replica) / 7
+	if len(summary.MissingRequiredEventNames) > 0 {
+		scores.Concerns = append(scores.Concerns, "missing required events: "+strings.Join(summary.MissingRequiredEventNames, ", "))
+	}
+	if len(summary.RPCDriftCounts) > 0 {
+		scores.Concerns = append(scores.Concerns, "RPC drift detected")
+	}
+	if len(summary.PlaceholderLiveDecisionCounts) > 0 {
+		scores.Concerns = append(scores.Concerns, "placeholder live decisions detected")
+	}
+	return scores
+}
+
+func addScore(score *int, kept bool) {
+	if kept {
+		*score = 5
+		return
+	}
+	*score = 1
 }
 
 func isRPCDrift(event Event) bool {
