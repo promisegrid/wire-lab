@@ -283,6 +283,53 @@ Affects: `implementations/poc13-cas-compute-functions/**`;
 `protocols/wire-lab.d/TODO/TODO-godad-poc13-cas-compute-functions.md`;
 `protocols/wire-lab.d/TODO/TODO.md`.
 
+ID: DI-kikoj
+Date: 2026-06-08 07:00:50
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Extend POC13 in place with the selected next evidence pressure items:
+container/network-level Bob outage variants; capability-token TTL, expiry,
+revocation, and renewal paths; multi-object CAS storage/retrieval pressure;
+compute cache miss, hit, and reuse evidence; at least one additional
+payload-provided compute function beyond Fibonacci; verifier disagreement with
+Alice-local resolution; dynamic peer choice driven by persisted local trust
+history; and signature/key-rotation plus bad-proof rejection cases.
+Intent: POC13 should now pressure the runtime beyond the single happy-path
+shape. The new evidence should show local agents dealing with transport failure
+variants, token lifecycle changes, multiple stored objects, cache reuse,
+non-identical compute functions, disagreeing verifiers, persisted trust inputs,
+and cryptographic proof/key-lifecycle pressure while preserving Promise Theory:
+all outcomes remain local promises, non-commitments, and observations.
+Constraints: Keep POC13 self-contained and bounded. Do not import POC12,
+GA-runner, or a new shared library. Keep one top-level semantic act, `promise`.
+Do not add message-type pCIDs, global trust, permission/conformance framing,
+centralized routing, or central pricing. Persisted trust history is
+container-local evidence under the existing Docker run volume, not a global
+trust authority. Approved changed paths are
+`implementations/poc13-cas-compute-functions/{analyze.go,analyze_test.go,protocol.go,protocol_test.go,runtime.go,runtime_test.go,scenario.go,README.md}`;
+`implementations/poc13-cas-compute-functions/docs/{RUN-NARRATIVE.md,RUN-ANALYSIS-20260608.md}`;
+`DEV-GUIDE-RESOURCES.md`; `implementations/README.md`;
+`protocols/wire-lab.d/TODO/TODO-godad-poc13-cas-compute-functions.md`; and
+`protocols/wire-lab.d/TODO/TODO.md`. Approved runtime path patterns remain
+Docker-managed `poc13-run` volume paths under `/run/poc13/**`,
+container-local TCP listeners on the configured POC13 port,
+`/run/poc13/<run_id>/runtime/*.trust-history.json`, and
+`/tmp/wire-lab-gocache` for validation. Approved implementation names include
+`OutageVariant`, `outageAddressForVariant`, `persistedTrustHistoryPath`,
+`loadPersistedTrustHistory`, `defaultPersistedTrustHistory`,
+`recordTokenLifecycle`, `handleTokenRevocationNotice`,
+`handleReplicaTokenRenewalRequest`, `handleReplicaTokenRenewal`,
+`handleComputeCacheLookup`, `handleComputeCacheResponse`,
+`computeCacheKeyFromFields`, `sampleSumFunctionBytes`, `sampleSumInputBytes`,
+`functionKind`, `sendBadProofPromise`, `handleKeyRotationPromise`,
+`handleBadProofEnvelope`, `recordDynamicPeerChoice`, and local variables
+derived from those names.
+Affects: `implementations/poc13-cas-compute-functions/**`;
+`DEV-GUIDE-RESOURCES.md`;
+`implementations/README.md`;
+`protocols/wire-lab.d/TODO/TODO-godad-poc13-cas-compute-functions.md`;
+`protocols/wire-lab.d/TODO/TODO.md`.
+
 ## Prior aliases
 
 - None.
@@ -322,6 +369,10 @@ not freeze final storage, compute, cache, provider, kernel, or app APIs.
   adversarial compute rejection, evidence pCID routing, unknown-pCID and
   unsupported-variant non-commitment, competing requester capacity pressure, and
   archived clean-run analyzer output.
+- [x] godad.13 Add container/network outage variants, token lifecycle,
+  multi-object CAS pressure, cache reuse, alternate compute functions, verifier
+  disagreement resolution, persisted-trust peer choice, and bad-proof/key
+  rotation evidence.
 
 ## Acceptance criteria
 

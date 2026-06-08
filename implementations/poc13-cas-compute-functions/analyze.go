@@ -150,8 +150,9 @@ func summarizePOC13Log(logPath string, summary *AnalysisSummary) error {
 // loses corrupt-byte handling, stops recording exact cache evidence, or fails
 // to prove TCP delivery, concrete storage/retrieval, dynamic compute, trust,
 // economics, repair, capability-token, replica-recovery, verification,
-// evidence-report pCID routing, local non-commitment, and score/report
-// evidence. Source: DI-notig; DI-fumol; DI-lupag; DI-nisaz
+// evidence-report pCID routing, local non-commitment, token lifecycle, cache
+// reuse, verifier disagreement, persisted trust, and score/report evidence.
+// Source: DI-notig; DI-fumol; DI-lupag; DI-nisaz; DI-kikoj
 func ValidateAnalysis(summary AnalysisSummary) error {
 	var failures []string
 	if summary.TotalEvents == 0 {
@@ -192,6 +193,7 @@ func missingRequiredEvents(summary AnalysisSummary) []string {
 		"tcp_message_sent",
 		"tcp_message_received",
 		"tcp_message_send_failed",
+		"network_outage_variant_selected",
 		"cas_storage_promised",
 		"cas_retention_promised",
 		"cas_replication_promised",
@@ -199,28 +201,45 @@ func missingRequiredEvents(summary AnalysisSummary) []string {
 		"cas_bytes_retrieved",
 		"cas_replica_stored",
 		"cas_replica_serve_promised",
+		"cas_multi_object_pressure",
 		"primary_storage_unavailable",
 		"replica_capability_token_issued",
 		"replica_capability_token_received",
 		"replica_capability_token_redeemed",
+		"capability_token_ttl_promised",
+		"capability_token_ttl_observed",
+		"capability_token_expired",
+		"capability_token_revoked",
+		"capability_token_renewal_requested",
+		"capability_token_renewed",
 		"cas_corrupt_bytes_rejected",
 		"cas_corrupt_evidence_recorded",
 		"compute_context_promised",
 		"compute_function_executed",
+		"compute_alternate_function_executed",
+		"compute_followup_function_requested",
 		"cid_compute_promised",
 		"compute_result_promised",
 		"compute_result_received",
 		"compute_bad_result_promised",
 		"compute_cache_checkpointed",
+		"compute_cache_miss",
+		"compute_cache_miss_observed",
+		"compute_cache_hit",
+		"compute_cache_reused",
 		"compute_result_locally_verified",
 		"compute_result_locally_rejected",
 		"compute_result_peer_verified",
 		"compute_result_peer_rejected",
+		"compute_verifier_disagreement",
+		"compute_disagreement_resolved_locally",
 		"compute_verification_received",
 		"evidence_report_received",
 		"capability_token_issued",
 		"capability_token_received",
 		"trust_driven_peer_choice",
+		"persisted_trust_history_loaded",
+		"dynamic_peer_choice_from_persisted_trust",
 		"economics_credit_accepted",
 		"economics_price_refused",
 		"economics_capacity_reserved",
@@ -234,6 +253,9 @@ func missingRequiredEvents(summary AnalysisSummary) []string {
 		"trust_repair_promise_recorded",
 		"unknown_pcid_not_promised",
 		"promise_variant_not_promised",
+		"bad_proof_sent",
+		"bad_proof_rejected",
+		"key_rotation_promise_recorded",
 		"promise_envelope_validated",
 	}
 	var missing []string
@@ -247,12 +269,12 @@ func missingRequiredEvents(summary AnalysisSummary) []string {
 
 func computeScores(summary AnalysisSummary) ScoreReport {
 	scores := ScoreReport{}
-	addScore(&scores.Transport, summary.EventCounts["tcp_message_sent"] > 0 && summary.EventCounts["tcp_message_received"] > 0)
-	addScore(&scores.Storage, summary.EventCounts["cas_bytes_stored"] > 0 && summary.EventCounts["cas_bytes_retrieved"] > 0)
-	addScore(&scores.Compute, summary.EventCounts["compute_function_executed"] > 0 && summary.EventCounts["compute_result_received"] > 0 && summary.EventCounts["compute_bad_result_promised"] > 0)
+	addScore(&scores.Transport, summary.EventCounts["tcp_message_sent"] > 0 && summary.EventCounts["tcp_message_received"] > 0 && summary.EventCounts["tcp_message_send_failed"] > 0 && summary.EventCounts["bad_proof_rejected"] > 0)
+	addScore(&scores.Storage, summary.EventCounts["cas_bytes_stored"] > 0 && summary.EventCounts["cas_bytes_retrieved"] > 0 && summary.EventCounts["cas_multi_object_pressure"] > 0 && summary.EventCounts["capability_token_renewed"] > 0)
+	addScore(&scores.Compute, summary.EventCounts["compute_function_executed"] > 0 && summary.EventCounts["compute_alternate_function_executed"] > 0 && summary.EventCounts["compute_result_received"] > 0 && summary.EventCounts["compute_bad_result_promised"] > 0 && summary.EventCounts["compute_cache_reused"] > 0)
 	addScore(&scores.Economics, summary.EventCounts["economics_price_refused"] > 0 && summary.EventCounts["economics_capacity_refused"] > 0 && summary.EventCounts["economics_credits_spent"] > 0 && summary.EventCounts["economics_credits_earned"] > 0)
-	addScore(&scores.Trust, summary.EventCounts["trust_updated"] > 0 && summary.EventCounts["trust_driven_peer_choice"] > 0)
-	addScore(&scores.Verification, summary.EventCounts["compute_result_locally_verified"] > 0 && summary.EventCounts["compute_result_locally_rejected"] > 0 && summary.EventCounts["compute_result_peer_verified"] > 0 && summary.EventCounts["compute_result_peer_rejected"] > 0 && summary.EventCounts["evidence_report_received"] > 0)
+	addScore(&scores.Trust, summary.EventCounts["trust_updated"] > 0 && summary.EventCounts["trust_driven_peer_choice"] > 0 && summary.EventCounts["persisted_trust_history_loaded"] > 0 && summary.EventCounts["dynamic_peer_choice_from_persisted_trust"] > 0)
+	addScore(&scores.Verification, summary.EventCounts["compute_result_locally_verified"] > 0 && summary.EventCounts["compute_result_locally_rejected"] > 0 && summary.EventCounts["compute_result_peer_verified"] > 0 && summary.EventCounts["compute_result_peer_rejected"] > 0 && summary.EventCounts["compute_verifier_disagreement"] > 0 && summary.EventCounts["compute_disagreement_resolved_locally"] > 0 && summary.EventCounts["evidence_report_received"] > 0)
 	addScore(&scores.Replica, summary.EventCounts["replica_recovery_succeeded"] > 0 && summary.EventCounts["replica_capability_token_redeemed"] > 0)
 	scores.Overall = (scores.Transport + scores.Storage + scores.Compute + scores.Economics + scores.Trust + scores.Verification + scores.Replica) / 7
 	if len(summary.MissingRequiredEventNames) > 0 {

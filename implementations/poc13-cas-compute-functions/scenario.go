@@ -253,6 +253,10 @@ func sampleContentBytes() []byte {
 	return []byte("poc13 sample invoice bytes")
 }
 
+func sampleSecondContentBytes() []byte {
+	return []byte("poc13 second sample receipt bytes")
+}
+
 func corruptContentBytes() []byte {
 	return []byte("poc13 sample invoice bytes corrupted by mallory")
 }
@@ -261,8 +265,16 @@ func sampleFunctionBytes() []byte {
 	return []byte("poc13 function: fibonacci(n) v1")
 }
 
+func sampleSumFunctionBytes() []byte {
+	return []byte("poc13 function: sum(values) v1")
+}
+
 func sampleInputBytes() []byte {
 	return []byte("n=7")
+}
+
+func sampleSumInputBytes() []byte {
+	return []byte("values=2,3,5")
 }
 
 func sampleContextBytes() []byte {

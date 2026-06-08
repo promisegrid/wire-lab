@@ -30,6 +30,11 @@ cache, app, or kernel API. Source: `DI-bibom`; `DI-notig`.
 - Trust-driven peer choice, richer economics, unknown-pCID non-commitment,
   unsupported-variant non-commitment, and competing-requester capacity pressure
   are summarized in `docs/RUN-NARRATIVE.md`.
+- POC13 now also tests named outage variants, token TTL/expiry/revocation/
+  renewal, multi-object CAS storage and retrieval, cache miss/hit/reuse,
+  a second `sum(values)` compute function, verifier disagreement with
+  Alice-local resolution, persisted-trust peer choice, key-rotation promises,
+  and bad-proof rejection.
 - The 2026-06-08 clean-run analyzer JSON is archived in
   `docs/RUN-ANALYSIS-20260608.md`.
 - LLM decisions are attempted only when `live_decisions` is true and the named
