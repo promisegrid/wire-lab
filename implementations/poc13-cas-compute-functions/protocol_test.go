@@ -53,3 +53,15 @@ func TestComputeCacheKeyIncludesContext(t *testing.T) {
 		t.Fatalf("cache key must include context identity")
 	}
 }
+
+func TestRegistryIncludesEvidenceReportProtocol(t *testing.T) {
+	registry := NewRegistry()
+	protocolCID := registry.MustCID(EvidenceReportV1)
+	name, ok := registry.Name(protocolCID)
+	if !ok {
+		t.Fatalf("evidence report protocol pCID should resolve")
+	}
+	if name != EvidenceReportV1 {
+		t.Fatalf("protocol name = %q, want %q", name, EvidenceReportV1)
+	}
+}

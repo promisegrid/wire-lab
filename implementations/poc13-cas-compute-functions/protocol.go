@@ -15,8 +15,9 @@ const (
 	gridTag        = uint64(0x67726964)
 	dagCBORLinkTag = uint64(42)
 
-	CASStorageV1 = "cas_storage_v1"
-	CIDComputeV1 = "cid_compute_v1"
+	CASStorageV1     = "cas_storage_v1"
+	CIDComputeV1     = "cid_compute_v1"
+	EvidenceReportV1 = "evidence_report_v1"
 )
 
 // ProtocolCID is the content-derived identity of a protocol spec document, not
@@ -43,6 +44,7 @@ func NewRegistry() Registry {
 	}{
 		{CASStorageV1, "poc13 decentralized cas storage promise protocol v1"},
 		{CIDComputeV1, "poc13 cid named function compute promise protocol v1"},
+		{EvidenceReportV1, "poc13 local evidence report promise protocol v1"},
 	} {
 		registry.register(entry.name, NewProtocolCID([]byte(entry.spec)))
 	}

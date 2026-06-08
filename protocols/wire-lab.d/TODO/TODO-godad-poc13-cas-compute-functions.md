@@ -236,6 +236,53 @@ Affects: `implementations/poc13-cas-compute-functions/**`;
 `protocols/wire-lab.d/TODO/TODO-godad-poc13-cas-compute-functions.md`;
 `protocols/wire-lab.d/TODO/TODO.md`.
 
+ID: DI-nisaz
+Date: 2026-06-08 05:40:19
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Extend POC13 in place with the selected follow-up improvements:
+archive a clean analyzer run; make Alice's primary retrieval from Bob fail at
+the TCP dial layer before recovering from Frank; require Frank-issued replica
+capability tokens before Frank serves replica bytes; have Carol send one
+hash-valid but semantically wrong compute result that Alice, Dave, and Grace
+reject by recomputation before accepting a correct result; add a third
+provisional protocol pCID, `evidence_report_v1`, for local observation reports
+so storage, compute, and evidence envelopes exercise distinct pCID routing; add
+unknown-pCID and unsupported-variant `not_promised` evidence; and add competing
+requester capacity-pressure evidence.
+Intent: The prior POC13 pass proved the basic happy path. The next pass should
+make failure, recovery, evidence routing, and local non-commitment more
+diagnostic without turning POC13 into a final API or a centralized service.
+Bob's outage should be a real TCP send failure observed by Alice. Replica
+serving should depend on a promise token issued by Frank, not on Bob promising
+on Frank's behalf. Compute verification should catch a result whose bytes match
+its own CID but do not match the pCID-owned function/input/context semantics.
+Constraints: Keep POC13 self-contained and bounded. Do not import POC12,
+GA-runner, or a new shared library. Keep one top-level semantic act, `promise`.
+Do not add message-type pCIDs, global trust, permissions, conformance,
+centralized routing, or central pricing. `evidence_report_v1` is a provisional
+protocol pCID for local observation promises, not a message-type pCID registry.
+Approved changed paths are
+`implementations/poc13-cas-compute-functions/{analyze.go,analyze_test.go,protocol.go,protocol_test.go,runtime.go,runtime_test.go,scenario.go,README.md}`;
+`implementations/poc13-cas-compute-functions/docs/{RUN-NARRATIVE.md,RUN-ANALYSIS-20260608.md}`;
+`DEV-GUIDE-RESOURCES.md`; `implementations/README.md`;
+`protocols/wire-lab.d/TODO/TODO-godad-poc13-cas-compute-functions.md`; and
+`protocols/wire-lab.d/TODO/TODO.md`. Approved runtime path patterns remain
+Docker-managed `poc13-run` volume paths under `/run/poc13/**`,
+container-local TCP listeners on the configured POC13 port, and
+`/tmp/wire-lab-gocache` for validation. Approved implementation names include
+`EvidenceReportV1`, `dialAddressForPromise`, `forceTCPUnreachableAddress`,
+`sendUnknownProtocolPromise`, `handleEvidenceReport`,
+`sendComputeVerificationRequest`, `sendReplicaAvailable`,
+`badComputeResultBytes`, `replicaCapabilityKey`,
+`handleUnknownProtocolEnvelope`, `recordCapacityPressure`, and local variables
+derived from those names.
+Affects: `implementations/poc13-cas-compute-functions/**`;
+`DEV-GUIDE-RESOURCES.md`;
+`implementations/README.md`;
+`protocols/wire-lab.d/TODO/TODO-godad-poc13-cas-compute-functions.md`;
+`protocols/wire-lab.d/TODO/TODO.md`.
+
 ## Prior aliases
 
 - None.
@@ -271,13 +318,17 @@ not freeze final storage, compute, cache, provider, kernel, or app APIs.
 - [x] godad.11 Add selected POC13 improvements: replica recovery, compute
   verification, richer economics, trust-driven peer choice, narrative docs, and
   analyzer score/report fields.
+- [x] godad.12 Add TCP-level Bob outage, Frank-issued replica tokens,
+  adversarial compute rejection, evidence pCID routing, unknown-pCID and
+  unsupported-variant non-commitment, competing requester capacity pressure, and
+  archived clean-run analyzer output.
 
 ## Acceptance criteria
 
 - POC13's storage and compute protocols keep one top-level semantic act:
   `promise`.
-- `cas_storage_v1` and `cid_compute_v1` are protocol pCID names, not message
-  type names.
+- `cas_storage_v1`, `cid_compute_v1`, and `evidence_report_v1` are protocol
+  pCID names, not message type names.
 - Function code identity is payload-level CAS identity, not envelope pCID
   identity.
 - Content identity never implies availability, retention, access, or serving

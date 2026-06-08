@@ -9,6 +9,8 @@ cache, app, or kernel API. Source: `DI-bibom`; `DI-notig`.
 - `cas_storage_v1` is the storage protocol pCID; content CIDs live in payloads.
 - `cid_compute_v1` is the compute protocol pCID; `function_cid`, input CIDs,
   context CIDs, and result CIDs live in payloads.
+- `evidence_report_v1` is a provisional evidence protocol pCID for local
+  observation promises about storage or compute outcomes.
 - Every message keeps one top-level act, `promise`, inside
   `grid([42(pCID), payload, proof])`.
 - Agents exchange signed envelopes over length-framed TCP between Docker
@@ -22,8 +24,14 @@ cache, app, or kernel API. Source: `DI-bibom`; `DI-notig`.
 - Capability tokens, credit-style economics, trust updates, and voluntary repair
   promises are modeled as local pCID-owned promise payloads and evidence, not as
   global authority.
-- Replica recovery, compute verification, trust-driven peer choice, and richer
-  economics are summarized in `docs/RUN-NARRATIVE.md`.
+- Replica recovery now uses a Frank-issued replica token after Alice observes a
+  TCP-level Bob retrieval failure; compute verification includes one bad
+  Carol result that Alice, Dave, and Grace reject by recomputation.
+- Trust-driven peer choice, richer economics, unknown-pCID non-commitment,
+  unsupported-variant non-commitment, and competing-requester capacity pressure
+  are summarized in `docs/RUN-NARRATIVE.md`.
+- The 2026-06-08 clean-run analyzer JSON is archived in
+  `docs/RUN-ANALYSIS-20260608.md`.
 - LLM decisions are attempted only when `live_decisions` is true and the named
   API-key environment variable is present; config files must not store keys.
 - Live provider runs must emit meaningful provider text. The analyzer rejects

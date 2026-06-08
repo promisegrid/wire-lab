@@ -149,8 +149,9 @@ func summarizePOC13Log(logPath string, summary *AnalysisSummary) error {
 // Intent: CAS and compute evidence should fail fast if it drifts toward RPC,
 // loses corrupt-byte handling, stops recording exact cache evidence, or fails
 // to prove TCP delivery, concrete storage/retrieval, dynamic compute, trust,
-// economics, repair, capability-token, replica-recovery, verification, and
-// score/report evidence. Source: DI-notig; DI-fumol; DI-lupag
+// economics, repair, capability-token, replica-recovery, verification,
+// evidence-report pCID routing, local non-commitment, and score/report
+// evidence. Source: DI-notig; DI-fumol; DI-lupag; DI-nisaz
 func ValidateAnalysis(summary AnalysisSummary) error {
 	var failures []string
 	if summary.TotalEvents == 0 {
@@ -171,6 +172,9 @@ func ValidateAnalysis(summary AnalysisSummary) error {
 	if summary.ProtocolCounts[CIDComputeV1] == 0 {
 		failures = append(failures, "cid_compute_v1 evidence missing")
 	}
+	if summary.ProtocolCounts[EvidenceReportV1] == 0 {
+		failures = append(failures, "evidence_report_v1 evidence missing")
+	}
 	if summary.ScoreReport.Overall < 4 {
 		failures = append(failures, fmt.Sprintf("score_report.overall=%d want >=4", summary.ScoreReport.Overall))
 	}
@@ -187,6 +191,7 @@ func missingRequiredEvents(summary AnalysisSummary) []string {
 		"runtime_done_promised",
 		"tcp_message_sent",
 		"tcp_message_received",
+		"tcp_message_send_failed",
 		"cas_storage_promised",
 		"cas_retention_promised",
 		"cas_replication_promised",
@@ -195,6 +200,9 @@ func missingRequiredEvents(summary AnalysisSummary) []string {
 		"cas_replica_stored",
 		"cas_replica_serve_promised",
 		"primary_storage_unavailable",
+		"replica_capability_token_issued",
+		"replica_capability_token_received",
+		"replica_capability_token_redeemed",
 		"cas_corrupt_bytes_rejected",
 		"cas_corrupt_evidence_recorded",
 		"compute_context_promised",
@@ -202,23 +210,30 @@ func missingRequiredEvents(summary AnalysisSummary) []string {
 		"cid_compute_promised",
 		"compute_result_promised",
 		"compute_result_received",
+		"compute_bad_result_promised",
 		"compute_cache_checkpointed",
 		"compute_result_locally_verified",
+		"compute_result_locally_rejected",
 		"compute_result_peer_verified",
+		"compute_result_peer_rejected",
 		"compute_verification_received",
+		"evidence_report_received",
 		"capability_token_issued",
 		"capability_token_received",
-		"capability_token_redeemed",
 		"trust_driven_peer_choice",
 		"economics_credit_accepted",
 		"economics_price_refused",
 		"economics_capacity_reserved",
+		"economics_capacity_refused",
 		"economics_credits_spent",
 		"economics_credits_earned",
+		"economics_payment_withheld",
 		"replica_recovery_requested",
 		"replica_recovery_succeeded",
 		"trust_updated",
 		"trust_repair_promise_recorded",
+		"unknown_pcid_not_promised",
+		"promise_variant_not_promised",
 		"promise_envelope_validated",
 	}
 	var missing []string
@@ -234,11 +249,11 @@ func computeScores(summary AnalysisSummary) ScoreReport {
 	scores := ScoreReport{}
 	addScore(&scores.Transport, summary.EventCounts["tcp_message_sent"] > 0 && summary.EventCounts["tcp_message_received"] > 0)
 	addScore(&scores.Storage, summary.EventCounts["cas_bytes_stored"] > 0 && summary.EventCounts["cas_bytes_retrieved"] > 0)
-	addScore(&scores.Compute, summary.EventCounts["compute_function_executed"] > 0 && summary.EventCounts["compute_result_received"] > 0)
-	addScore(&scores.Economics, summary.EventCounts["economics_price_refused"] > 0 && summary.EventCounts["economics_credits_spent"] > 0 && summary.EventCounts["economics_credits_earned"] > 0)
+	addScore(&scores.Compute, summary.EventCounts["compute_function_executed"] > 0 && summary.EventCounts["compute_result_received"] > 0 && summary.EventCounts["compute_bad_result_promised"] > 0)
+	addScore(&scores.Economics, summary.EventCounts["economics_price_refused"] > 0 && summary.EventCounts["economics_capacity_refused"] > 0 && summary.EventCounts["economics_credits_spent"] > 0 && summary.EventCounts["economics_credits_earned"] > 0)
 	addScore(&scores.Trust, summary.EventCounts["trust_updated"] > 0 && summary.EventCounts["trust_driven_peer_choice"] > 0)
-	addScore(&scores.Verification, summary.EventCounts["compute_result_locally_verified"] > 0 && summary.EventCounts["compute_result_peer_verified"] > 0)
-	addScore(&scores.Replica, summary.EventCounts["replica_recovery_succeeded"] > 0)
+	addScore(&scores.Verification, summary.EventCounts["compute_result_locally_verified"] > 0 && summary.EventCounts["compute_result_locally_rejected"] > 0 && summary.EventCounts["compute_result_peer_verified"] > 0 && summary.EventCounts["compute_result_peer_rejected"] > 0 && summary.EventCounts["evidence_report_received"] > 0)
+	addScore(&scores.Replica, summary.EventCounts["replica_recovery_succeeded"] > 0 && summary.EventCounts["replica_capability_token_redeemed"] > 0)
 	scores.Overall = (scores.Transport + scores.Storage + scores.Compute + scores.Economics + scores.Trust + scores.Verification + scores.Replica) / 7
 	if len(summary.MissingRequiredEventNames) > 0 {
 		scores.Concerns = append(scores.Concerns, "missing required events: "+strings.Join(summary.MissingRequiredEventNames, ", "))

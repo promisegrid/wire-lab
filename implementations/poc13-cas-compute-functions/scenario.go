@@ -50,7 +50,7 @@ func (runner Runner) Run(ctx context.Context) error {
 		}
 	}()
 	recorder := &Recorder{log: log, agent: runner.Agent, registry: runner.Registry}
-	recorder.Record("app_receive_promise_registered", "kept", "", "", "cas_storage_v1 and cid_compute_v1 payloads are accepted only as local promises")
+	recorder.Record("app_receive_promise_registered", "kept", "", "", "cas_storage_v1, cid_compute_v1, and evidence_report_v1 payloads are accepted only as local promises")
 	// Intent: Live provider judgments should be role-aligned promise evidence,
 	// not generic storage-or-compute text that drifts away from the configured
 	// POC13 agent role. Source: DI-lasuh

@@ -17,6 +17,8 @@ import (
 
 const maxFrameBytes = 1 << 20
 
+const forceTCPUnreachableAddress = "127.0.0.1:9"
+
 const (
 	storageCapacity = 2
 	computeCapacity = 1
@@ -226,7 +228,7 @@ func (runtime *TCPRuntime) runLocalAgents(ctx context.Context) error {
 
 func (runtime *TCPRuntime) runLocalAgent(ctx context.Context, state *AgentState) error {
 	agent := state.Agent
-	if err := runtime.recordAgentEvent(agent.Name, "app_receive_promise_registered", "kept", "", "", "cas_storage_v1 and cid_compute_v1 payloads are accepted only as local promises"); err != nil {
+	if err := runtime.recordAgentEvent(agent.Name, "app_receive_promise_registered", "kept", "", "", "cas_storage_v1, cid_compute_v1, and evidence_report_v1 payloads are accepted only as local promises"); err != nil {
 		return err
 	}
 	decision, decisionErr := runtime.Decider.Decide(ctx, runtime.Config, agent, fmt.Sprintf("Choose one local promise consistent with POC13 role %q and peers %q. Your text gates whether this agent sends protocol promises.", agent.Role, agent.Peers))
@@ -344,7 +346,7 @@ func (runtime *TCPRuntime) runAdversaryPeer(ctx context.Context, agent AgentConf
 	}); err != nil {
 		return err
 	}
-	return runtime.sendPromise(ctx, OutboundPromise{
+	if err := runtime.sendPromise(ctx, OutboundPromise{
 		From:         agent.Name,
 		To:           "grace",
 		ProtocolName: CASStorageV1,
@@ -352,6 +354,47 @@ func (runtime *TCPRuntime) runAdversaryPeer(ctx context.Context, agent AgentConf
 			"variant":       "trust_repair_promise",
 			"promise_about": "label_future_malformed_evidence",
 			"decision_text": "Mallory promises to label future malformed evidence explicitly; Grace remains free to distrust this until future evidence is kept.",
+		},
+	}); err != nil {
+		return err
+	}
+	if err := runtime.sendUnknownProtocolPromise(ctx, agent.Name, "grace", map[string]string{
+		"variant":       "mystery_storage_claim",
+		"promise_about": "unknown_protocol_probe",
+		"decision_text": decisionText,
+	}); err != nil {
+		return err
+	}
+	if err := runtime.sendPromise(ctx, OutboundPromise{
+		From:         agent.Name,
+		To:           "grace",
+		ProtocolName: CASStorageV1,
+		Fields: map[string]string{
+			"variant":       "unsupported_storage_variant",
+			"promise_about": "unsupported_variant_probe",
+			"decision_text": decisionText,
+		},
+	}); err != nil {
+		return err
+	}
+	functionBytes := sampleFunctionBytes()
+	inputBytes := []byte("n=7")
+	contextBytes := sampleContextBytes()
+	return runtime.sendPromise(ctx, OutboundPromise{
+		From:         agent.Name,
+		To:           "carol",
+		ProtocolName: CIDComputeV1,
+		Fields: map[string]string{
+			"variant":        "compute_request",
+			"promise_about":  "execute_function",
+			"function_cid":   ContentCID(functionBytes),
+			"function_b64":   base64.StdEncoding.EncodeToString(functionBytes),
+			"input_cid":      ContentCID(inputBytes),
+			"input_b64":      base64.StdEncoding.EncodeToString(inputBytes),
+			"context_cid":    ContentCID(contextBytes),
+			"credit_offer":   "5",
+			"capacity_probe": "true",
+			"decision_text":  decisionText,
 		},
 	})
 }
@@ -364,13 +407,13 @@ func (runtime *TCPRuntime) handleEnvelope(ctx context.Context, exactBytes []byte
 	if verifyErr := VerifyEnvelope(envelope); verifyErr != nil {
 		return verifyErr
 	}
-	protocolName, known := runtime.Registry.Name(envelope.ProtocolCID)
-	if !known {
-		return fmt.Errorf("unknown protocol pCID %s", envelope.ProtocolCID.String())
-	}
 	fields, fieldsErr := envelope.PayloadFields()
 	if fieldsErr != nil {
 		return fieldsErr
+	}
+	protocolName, known := runtime.Registry.Name(envelope.ProtocolCID)
+	if !known {
+		protocolName = envelope.ProtocolCID.String()
 	}
 	message := RuntimeMessage{
 		From:         fields["sender"],
@@ -390,6 +433,9 @@ func (runtime *TCPRuntime) handleEnvelope(ctx context.Context, exactBytes []byte
 	}
 	if err := runtime.recordAgentEvent(message.To, "promise_envelope_validated", "kept", message.From, protocolName, "exact_sha256="+HashExactBytes(exactBytes)+" promise_about="+message.Fields["promise_about"]); err != nil {
 		return err
+	}
+	if !known {
+		return runtime.handleUnknownProtocolEnvelope(message)
 	}
 	switch message.Fields["variant"] {
 	case "store_request":
@@ -424,6 +470,8 @@ func (runtime *TCPRuntime) handleEnvelope(ctx context.Context, exactBytes []byte
 		return runtime.handleComputeVerificationRequest(ctx, message)
 	case "compute_verification_result":
 		return runtime.handleComputeVerificationResult(message)
+	case "evidence_report":
+		return runtime.handleEvidenceReport(message)
 	case "corrupt_bytes_offer":
 		return runtime.handleCorruptBytesOffer(message)
 	case "trust_repair_promise":
@@ -537,18 +585,22 @@ func (runtime *TCPRuntime) handleStoreAcceptance(ctx context.Context, message Ru
 	if err := runtime.recordEconomics(message.To, "economics_credits_spent", "kept", message.From, message.ProtocolName, "Alice spends storage credits=4 after Bob's promise is accepted"); err != nil {
 		return err
 	}
-	return runtime.sendPromise(ctx, OutboundPromise{
+	sendErr := runtime.sendPromise(ctx, OutboundPromise{
 		From:         message.To,
 		To:           message.From,
 		ProtocolName: CASStorageV1,
 		Fields: map[string]string{
-			"variant":              "serve_request",
-			"promise_about":        "redeem_storage_capability",
-			"content_cid":          message.Fields["content_cid"],
-			"token":                message.Fields["token"],
-			"simulate_unavailable": "true",
+			"variant":               "serve_request",
+			"promise_about":         "redeem_storage_capability",
+			"content_cid":           message.Fields["content_cid"],
+			"token":                 message.Fields["token"],
+			"force_tcp_unreachable": "true",
 		},
 	})
+	if sendErr == nil {
+		return nil
+	}
+	return runtime.recordAgentEvent(message.To, "primary_storage_unavailable", "non_commitment", message.From, message.ProtocolName, "Alice could not open a TCP path to Bob for immediate retrieval: "+sendErr.Error())
 }
 
 func (runtime *TCPRuntime) handlePriceRefusal(message RuntimeMessage) error {
@@ -610,8 +662,16 @@ func (runtime *TCPRuntime) handlePrimaryUnavailableNotice(message RuntimeMessage
 func (runtime *TCPRuntime) handleReplicaAvailable(ctx context.Context, message RuntimeMessage) error {
 	replicaPeer := message.Fields["replica_peer"]
 	contentCID := message.Fields["content_cid"]
+	replicaToken := message.Fields["replica_token"]
 	if runtime.trustScore(message.To, replicaPeer) < 0 {
 		return runtime.recordAgentEvent(message.To, "replica_recovery_not_promised", "non_commitment", replicaPeer, message.ProtocolName, "local trust below replica recovery threshold")
+	}
+	state := runtime.states[message.To]
+	state.mu.Lock()
+	state.Capabilities[replicaCapabilityKey(replicaPeer, contentCID)] = replicaToken
+	state.mu.Unlock()
+	if err := runtime.recordAgentEvent(message.To, "replica_capability_token_received", "kept", replicaPeer, message.ProtocolName, "Frank-issued replica token received content_cid="+contentCID); err != nil {
+		return err
 	}
 	if err := runtime.recordTrustDrivenChoice(message.To, replicaPeer, message.ProtocolName, "Alice chooses Frank for replica retrieval because Bob is unavailable and Frank's local trust is sufficient"); err != nil {
 		return err
@@ -627,18 +687,26 @@ func (runtime *TCPRuntime) handleReplicaAvailable(ctx context.Context, message R
 			"variant":       "replica_serve_request",
 			"promise_about": "serve_replica_content",
 			"content_cid":   contentCID,
+			"replica_token": replicaToken,
 		},
 	})
 }
 
 func (runtime *TCPRuntime) handleReplicaServeRequest(ctx context.Context, message RuntimeMessage) error {
 	contentCID := message.Fields["content_cid"]
+	if !runtime.redeemCapabilityToken(message.To, message.From, contentCID, message.Fields["replica_token"]) {
+		runtime.adjustTrust(message.To, message.From, -1)
+		return runtime.recordAgentEvent(message.To, "replica_capability_token_rejected", "malformed", message.From, message.ProtocolName, "replica token did not match Frank-local promise for content_cid="+contentCID)
+	}
 	state := runtime.states[message.To]
 	state.mu.Lock()
 	contentBytes, ok := state.Store[contentCID]
 	state.mu.Unlock()
 	if !ok {
 		return runtime.recordAgentEvent(message.To, "cas_replica_serve_not_promised", "non_commitment", message.From, message.ProtocolName, "replica content not present content_cid="+contentCID)
+	}
+	if err := runtime.recordAgentEvent(message.To, "replica_capability_token_redeemed", "kept", message.From, message.ProtocolName, "Frank redeems replica token content_cid="+contentCID); err != nil {
+		return err
 	}
 	if err := runtime.recordAgentEvent(message.To, "cas_replica_serve_promised", "kept", message.From, message.ProtocolName, "Frank promises replica serving for content_cid="+contentCID); err != nil {
 		return err
@@ -691,6 +759,8 @@ func (runtime *TCPRuntime) handleReplicateRequest(ctx context.Context, message R
 	state.Credits[message.From] += 1
 	state.mu.Unlock()
 	runtime.adjustTrust(message.To, message.From, 1)
+	requester := message.Fields["requester"]
+	replicaToken := runtime.issueCapabilityToken(message.To, requester, contentCID)
 	if err := runtime.recordAgentEvent(message.To, "cas_replica_stored", "kept", message.From, message.ProtocolName, "replica content_cid="+contentCID); err != nil {
 		return err
 	}
@@ -703,7 +773,12 @@ func (runtime *TCPRuntime) handleReplicateRequest(ctx context.Context, message R
 	if err := runtime.recordEconomics(message.To, "economics_credits_earned", "kept", message.From, message.ProtocolName, "Frank earned replication credits="+message.Fields["credit_offer"]); err != nil {
 		return err
 	}
-	return runtime.sendPromise(ctx, OutboundPromise{
+	if requester != "" {
+		if err := runtime.recordAgentEvent(message.To, "replica_capability_token_issued", "kept", requester, message.ProtocolName, "Frank issues replica token content_cid="+contentCID); err != nil {
+			return err
+		}
+	}
+	if err := runtime.sendPromise(ctx, OutboundPromise{
 		From:         message.To,
 		To:           message.From,
 		ProtocolName: CASStorageV1,
@@ -713,35 +788,27 @@ func (runtime *TCPRuntime) handleReplicateRequest(ctx context.Context, message R
 			"content_cid":   contentCID,
 			"requester":     message.Fields["requester"],
 		},
-	})
+	}); err != nil {
+		return err
+	}
+	if requester == "" {
+		return nil
+	}
+	return runtime.sendReplicaAvailable(ctx, message.To, requester, contentCID, replicaToken)
 }
 
 func (runtime *TCPRuntime) handleReplicateAcceptance(ctx context.Context, message RuntimeMessage) error {
 	runtime.adjustTrust(message.To, message.From, 1)
-	if err := runtime.recordAgentEvent(message.To, "cas_replication_confirmed", "kept", message.From, message.ProtocolName, "replica accepted content_cid="+message.Fields["content_cid"]); err != nil {
-		return err
-	}
-	requester := message.Fields["requester"]
-	if requester == "" {
-		return nil
-	}
-	return runtime.sendPromise(ctx, OutboundPromise{
-		From:         message.To,
-		To:           requester,
-		ProtocolName: CASStorageV1,
-		Fields: map[string]string{
-			"variant":       "replica_available",
-			"promise_about": "replica_location",
-			"content_cid":   message.Fields["content_cid"],
-			"replica_peer":  message.From,
-		},
-	})
+	return runtime.recordAgentEvent(message.To, "cas_replication_confirmed", "kept", message.From, message.ProtocolName, "replica accepted content_cid="+message.Fields["content_cid"])
 }
 
 func (runtime *TCPRuntime) handleComputeRequest(ctx context.Context, message RuntimeMessage) error {
 	state := runtime.states[message.To]
 	requestID := message.Fields["function_cid"] + "|" + message.Fields["input_cid"]
 	creditOffer := parseCreditOffer(message.Fields["credit_offer"])
+	if message.Fields["capacity_probe"] == "true" {
+		return runtime.recordCapacityPressure(message.To, message.From, message.ProtocolName, fmt.Sprintf("Carol declines competing compute request from %s because capacity is reserved for prior local promises capacity=%d", message.From, computeCapacity))
+	}
 	if creditOffer < computePrice {
 		return runtime.recordEconomics(message.To, "economics_price_refused", "non_commitment", message.From, message.ProtocolName, fmt.Sprintf("compute credit_offer=%d below local opportunity_cost=%d", creditOffer, computePrice))
 	}
@@ -850,6 +917,26 @@ func (runtime *TCPRuntime) handleContextResponse(ctx context.Context, message Ru
 		"result_cid":    resultCID,
 		"result_b64":    base64.StdEncoding.EncodeToString(resultBytes),
 	}
+	badResultBytes := badComputeResultBytes(resultBytes)
+	badResultFields := map[string]string{
+		"variant":           "compute_result",
+		"promise_about":     "execute_function",
+		"function_cid":      pending["function_cid"],
+		"function_b64":      pending["function_b64"],
+		"input_cid":         pending["input_cid"],
+		"input_b64":         pending["input_b64"],
+		"context_cid":       contextCID,
+		"context_b64":       base64.StdEncoding.EncodeToString(contextBytes),
+		"result_cid":        ContentCID(badResultBytes),
+		"result_b64":        base64.StdEncoding.EncodeToString(badResultBytes),
+		"adversarial_probe": "true",
+	}
+	if err := runtime.recordAgentEvent(message.To, "compute_bad_result_promised", "malformed", pending["sender"], message.ProtocolName, "Carol sends one hash-valid but semantically wrong result for verifier pressure"); err != nil {
+		return err
+	}
+	if err := runtime.sendPromise(ctx, OutboundPromise{From: message.To, To: pending["sender"], ProtocolName: CIDComputeV1, Fields: badResultFields}); err != nil {
+		return err
+	}
 	if err := runtime.sendPromise(ctx, OutboundPromise{From: message.To, To: pending["sender"], ProtocolName: CIDComputeV1, Fields: resultFields}); err != nil {
 		return err
 	}
@@ -877,30 +964,27 @@ func (runtime *TCPRuntime) handleComputeResult(ctx context.Context, message Runt
 	if runtime.states[message.To].Agent.Role != "data_holder" {
 		return nil
 	}
-	if err := runtime.recordEconomics(message.To, "economics_credits_spent", "kept", message.From, message.ProtocolName, "Alice spends compute credits=5 after Carol's result arrives"); err != nil {
-		return err
+	verifyErr := runtime.verifyComputeResultLocally(message)
+	if verifyErr != nil {
+		runtime.adjustTrust(message.To, message.From, -2)
+		if err := runtime.recordAgentEvent(message.To, "compute_result_locally_rejected", "malformed", message.From, message.ProtocolName, verifyErr.Error()); err != nil {
+			return err
+		}
+		if err := runtime.recordEconomics(message.To, "economics_payment_withheld", "non_commitment", message.From, message.ProtocolName, "Alice withholds compute credits after local recompute rejected result_cid="+resultCID); err != nil {
+			return err
+		}
+		for _, verifier := range []string{"dave", "grace"} {
+			if err := runtime.sendComputeVerificationRequest(ctx, message, verifier); err != nil {
+				return err
+			}
+		}
+		return nil
 	}
-	if err := runtime.verifyComputeResultLocally(message); err != nil {
+	if err := runtime.recordEconomics(message.To, "economics_credits_spent", "kept", message.From, message.ProtocolName, "Alice spends compute credits=5 after Carol's result verifies locally"); err != nil {
 		return err
 	}
 	for _, verifier := range []string{"dave", "grace"} {
-		if err := runtime.sendPromise(ctx, OutboundPromise{
-			From:         message.To,
-			To:           verifier,
-			ProtocolName: CIDComputeV1,
-			Fields: map[string]string{
-				"variant":       "compute_verification_request",
-				"promise_about": "verify_compute_result",
-				"function_cid":  message.Fields["function_cid"],
-				"function_b64":  message.Fields["function_b64"],
-				"input_cid":     message.Fields["input_cid"],
-				"input_b64":     message.Fields["input_b64"],
-				"context_cid":   message.Fields["context_cid"],
-				"context_b64":   message.Fields["context_b64"],
-				"result_cid":    message.Fields["result_cid"],
-				"result_b64":    message.Fields["result_b64"],
-			},
-		}); err != nil {
+		if err := runtime.sendComputeVerificationRequest(ctx, message, verifier); err != nil {
 			return err
 		}
 	}
@@ -928,8 +1012,23 @@ func (runtime *TCPRuntime) handleCorruptBytesOffer(message RuntimeMessage) error
 
 func (runtime *TCPRuntime) handleComputeVerificationRequest(ctx context.Context, message RuntimeMessage) error {
 	if err := runtime.verifyComputeResultLocally(message); err != nil {
-		runtime.adjustTrust(message.To, message.From, -2)
-		return runtime.recordAgentEvent(message.To, "compute_verification_rejected", "malformed", message.From, message.ProtocolName, err.Error())
+		if recordErr := runtime.recordAgentEvent(message.To, "compute_result_peer_rejected", "malformed", message.Fields["result_promiser"], message.ProtocolName, err.Error()); recordErr != nil {
+			return recordErr
+		}
+		return runtime.sendPromise(ctx, OutboundPromise{
+			From:         message.To,
+			To:           message.From,
+			ProtocolName: EvidenceReportV1,
+			Fields: map[string]string{
+				"variant":            "evidence_report",
+				"promise_about":      "local_compute_observation",
+				"subject_pcid":       CIDComputeV1,
+				"subject_peer":       message.Fields["result_promiser"],
+				"subject_result_cid": message.Fields["result_cid"],
+				"verdict":            "broken",
+				"reason":             err.Error(),
+			},
+		})
 	}
 	if err := runtime.recordAgentEvent(message.To, "compute_result_peer_verified", "kept", message.From, message.ProtocolName, "verified result_cid="+message.Fields["result_cid"]); err != nil {
 		return err
@@ -937,12 +1036,14 @@ func (runtime *TCPRuntime) handleComputeVerificationRequest(ctx context.Context,
 	return runtime.sendPromise(ctx, OutboundPromise{
 		From:         message.To,
 		To:           message.From,
-		ProtocolName: CIDComputeV1,
+		ProtocolName: EvidenceReportV1,
 		Fields: map[string]string{
-			"variant":       "compute_verification_result",
-			"promise_about": "verify_compute_result",
-			"result_cid":    message.Fields["result_cid"],
-			"verdict":       "kept",
+			"variant":            "evidence_report",
+			"promise_about":      "local_compute_observation",
+			"subject_pcid":       CIDComputeV1,
+			"subject_peer":       message.Fields["result_promiser"],
+			"subject_result_cid": message.Fields["result_cid"],
+			"verdict":            "kept",
 		},
 	})
 }
@@ -952,8 +1053,123 @@ func (runtime *TCPRuntime) handleComputeVerificationResult(message RuntimeMessag
 	return runtime.recordAgentEvent(message.To, "compute_verification_received", "kept", message.From, message.ProtocolName, "peer verified result_cid="+message.Fields["result_cid"])
 }
 
+// handleEvidenceReport applies a verifier's local observation report to the
+// receiving agent's evidence log and trust state.
+// Intent: Evidence reports are promises about local observations; they inform
+// Alice's local trust without becoming global truth. Source: DI-nisaz
+func (runtime *TCPRuntime) handleEvidenceReport(message RuntimeMessage) error {
+	verdict := message.Fields["verdict"]
+	outcome := "kept"
+	if verdict != "kept" {
+		outcome = "malformed"
+		runtime.adjustTrust(message.To, message.Fields["subject_peer"], -1)
+	} else {
+		runtime.adjustTrust(message.To, message.From, 1)
+	}
+	if err := runtime.recordAgentEvent(message.To, "evidence_report_received", outcome, message.From, message.ProtocolName, "subject_pcid="+message.Fields["subject_pcid"]+" verdict="+verdict+" result_cid="+message.Fields["subject_result_cid"]); err != nil {
+		return err
+	}
+	if message.Fields["subject_pcid"] == CIDComputeV1 {
+		return runtime.recordAgentEvent(message.To, "compute_verification_received", outcome, message.From, message.ProtocolName, "peer verdict="+verdict+" result_cid="+message.Fields["subject_result_cid"])
+	}
+	return nil
+}
+
 func (runtime *TCPRuntime) handleTrustRepairPromise(message RuntimeMessage) error {
 	return runtime.recordAgentEvent(message.To, "trust_repair_promise_recorded", "kept", message.From, message.ProtocolName, message.Fields["decision_text"])
+}
+
+// handleUnknownProtocolEnvelope records local non-commitment for a valid
+// envelope whose pCID is not in this runtime's local protocol table.
+// Intent: Unknown pCIDs should not become hard authority failures; a receiver
+// can simply promise that it does not currently promise that protocol. Source:
+// DI-nisaz
+func (runtime *TCPRuntime) handleUnknownProtocolEnvelope(message RuntimeMessage) error {
+	return runtime.recordAgentEvent(message.To, "unknown_pcid_not_promised", "non_commitment", message.From, message.ProtocolName, "unknown protocol pCID variant="+message.Fields["variant"])
+}
+
+// sendComputeVerificationRequest asks one verifier to recompute a result from
+// the exact pCID-owned function, input, context, and result bytes.
+// Intent: Verification is another voluntary promise exchange; Dave and Grace
+// report local observations instead of becoming compute authorities. Source:
+// DI-nisaz
+func (runtime *TCPRuntime) sendComputeVerificationRequest(ctx context.Context, message RuntimeMessage, verifier string) error {
+	return runtime.sendPromise(ctx, OutboundPromise{
+		From:         message.To,
+		To:           verifier,
+		ProtocolName: CIDComputeV1,
+		Fields: map[string]string{
+			"variant":         "compute_verification_request",
+			"promise_about":   "verify_compute_result",
+			"function_cid":    message.Fields["function_cid"],
+			"function_b64":    message.Fields["function_b64"],
+			"input_cid":       message.Fields["input_cid"],
+			"input_b64":       message.Fields["input_b64"],
+			"context_cid":     message.Fields["context_cid"],
+			"context_b64":     message.Fields["context_b64"],
+			"result_cid":      message.Fields["result_cid"],
+			"result_b64":      message.Fields["result_b64"],
+			"result_promiser": message.From,
+		},
+	})
+}
+
+// sendReplicaAvailable lets the replica peer announce its own serving promise
+// and token, rather than having Bob promise on Frank's behalf.
+// Intent: Replica access must be backed by Frank's own token promise before
+// Alice treats Frank as a retrieval option. Source: DI-nisaz
+func (runtime *TCPRuntime) sendReplicaAvailable(ctx context.Context, from, to, contentCID, replicaToken string) error {
+	return runtime.sendPromise(ctx, OutboundPromise{
+		From:         from,
+		To:           to,
+		ProtocolName: CASStorageV1,
+		Fields: map[string]string{
+			"variant":       "replica_available",
+			"promise_about": "replica_location",
+			"content_cid":   contentCID,
+			"replica_peer":  from,
+			"replica_token": replicaToken,
+		},
+	})
+}
+
+// sendUnknownProtocolPromise emits a syntactically valid signed envelope with a
+// pCID that this POC registry intentionally does not know.
+// Intent: POC13 needs an executable unknown-pCID case to prove receivers choose
+// local non-commitment rather than crashing or inventing authority. Source:
+// DI-nisaz
+func (runtime *TCPRuntime) sendUnknownProtocolPromise(ctx context.Context, from, to string, fields map[string]string) error {
+	copiedFields := make(map[string]string, len(fields)+3)
+	for key, value := range fields {
+		copiedFields[key] = value
+	}
+	copiedFields["act"] = "promise"
+	copiedFields["sender"] = from
+	copiedFields["recipient"] = to
+	protocolCID := NewProtocolCID([]byte("poc13 unknown protocol probe v1"))
+	envelope, envelopeErr := NewEnvelope(protocolCID, copiedFields, from)
+	if envelopeErr != nil {
+		return envelopeErr
+	}
+	exactBytes, bytesErr := envelope.Bytes()
+	if bytesErr != nil {
+		return bytesErr
+	}
+	conn, dialErr := runtime.dialWithRetry(ctx, OutboundPromise{From: from, To: to, ProtocolName: protocolCID.String(), Fields: copiedFields})
+	if dialErr != nil {
+		return runtime.recordAgentEvent(from, "tcp_message_send_failed", "non_commitment", to, protocolCID.String(), dialErr.Error())
+	}
+	defer func() {
+		closeErr := conn.Close()
+		if closeErr != nil {
+			fmt.Fprintf(os.Stderr, "poc13-runtime: close unknown-protocol connection: %v\n", closeErr)
+		}
+	}()
+	if err := (FrameWriter{writer: conn}).WriteFrame(exactBytes); err != nil {
+		return err
+	}
+	runtime.markActivity()
+	return runtime.recordAgentEvent(from, "tcp_message_sent", "kept", to, protocolCID.String(), "variant="+copiedFields["variant"]+" exact_sha256="+HashExactBytes(exactBytes))
 }
 
 // sendPromise signs, validates, and sends one raw grid envelope over TCP.
@@ -984,7 +1200,7 @@ func (runtime *TCPRuntime) sendPromise(ctx context.Context, outbound OutboundPro
 	if err := runtime.recordAgentEvent(outbound.From, "promise_envelope_validated", "kept", outbound.To, outbound.ProtocolName, "exact_sha256="+HashExactBytes(exactBytes)+" promise_about="+fields["promise_about"]); err != nil {
 		return err
 	}
-	conn, dialErr := runtime.dialWithRetry(ctx, outbound.To)
+	conn, dialErr := runtime.dialWithRetry(ctx, outbound)
 	if dialErr != nil {
 		recordErr := runtime.recordAgentEvent(outbound.From, "tcp_message_send_failed", "non_commitment", outbound.To, outbound.ProtocolName, dialErr.Error())
 		if recordErr != nil {
@@ -1005,8 +1221,8 @@ func (runtime *TCPRuntime) sendPromise(ctx context.Context, outbound OutboundPro
 	return runtime.recordAgentEvent(outbound.From, "tcp_message_sent", "kept", outbound.To, outbound.ProtocolName, "variant="+fields["variant"]+" exact_sha256="+HashExactBytes(exactBytes))
 }
 
-func (runtime *TCPRuntime) dialWithRetry(ctx context.Context, agentName string) (net.Conn, error) {
-	address, addressErr := runtime.dialAddressForAgent(agentName)
+func (runtime *TCPRuntime) dialWithRetry(ctx context.Context, outbound OutboundPromise) (net.Conn, error) {
+	address, addressErr := runtime.dialAddressForPromise(outbound)
 	if addressErr != nil {
 		return nil, addressErr
 	}
@@ -1152,6 +1368,14 @@ func (runtime *TCPRuntime) recordEconomics(agentName, eventName, outcome, peer, 
 	return runtime.recordAgentEvent(agentName, eventName, outcome, peer, protocolName, detail)
 }
 
+// recordCapacityPressure records a local refusal when a peer asks for work
+// that would exceed the bounded POC capacity.
+// Intent: Capacity refusal is an agent's voluntary non-commitment, not an
+// externally enforced quota or global scheduler decision. Source: DI-nisaz
+func (runtime *TCPRuntime) recordCapacityPressure(agentName, peer, protocolName, detail string) error {
+	return runtime.recordEconomics(agentName, "economics_capacity_refused", "non_commitment", peer, protocolName, detail)
+}
+
 // verifyComputeResultLocally recomputes the signed payload material from the
 // observer's local vantage.
 // Intent: Alice, Dave, and Grace verify Carol's compute result using the same
@@ -1231,6 +1455,22 @@ func parseCreditOffer(value string) int {
 	return creditOffer
 }
 
+// badComputeResultBytes creates a hash-valid but semantically wrong result.
+// Intent: The verifier path must catch results whose bytes match their own CID
+// but do not match the promised function/input/context semantics. Source:
+// DI-nisaz
+func badComputeResultBytes(correctResultBytes []byte) []byte {
+	return append(append([]byte(nil), correctResultBytes...), []byte(";bad-poc13-result")...)
+}
+
+// replicaCapabilityKey stores Alice's local copy of a token issued by one
+// replica peer for one content CID.
+// Intent: Received tokens stay local to the observing agent and do not become a
+// global access list or central capability registry. Source: DI-nisaz
+func replicaCapabilityKey(replicaPeer, contentCID string) string {
+	return replicaPeer + "|" + contentCID
+}
+
 func (runtime *TCPRuntime) issueCapabilityToken(issuer, issuee, contentCID string) string {
 	token := ContentCID([]byte(issuer + "|" + issuee + "|" + contentCID + "|serve-once"))
 	state := runtime.states[issuer]
@@ -1256,6 +1496,17 @@ func (runtime *TCPRuntime) containerForAgent(agentName string) (ContainerConfig,
 		}
 	}
 	return ContainerConfig{}, false
+}
+
+// dialAddressForPromise optionally routes one scenario promise to a deliberately
+// closed local TCP port so failure is observed at the transport layer.
+// Intent: Bob's simulated outage should be a real dial failure in the POC, not
+// a cooperative application-level "unavailable" reply. Source: DI-nisaz
+func (runtime *TCPRuntime) dialAddressForPromise(outbound OutboundPromise) (string, error) {
+	if outbound.Fields["force_tcp_unreachable"] == "true" {
+		return forceTCPUnreachableAddress, nil
+	}
+	return runtime.dialAddressForAgent(outbound.To)
 }
 
 func (runtime *TCPRuntime) dialAddressForAgent(agentName string) (string, error) {
