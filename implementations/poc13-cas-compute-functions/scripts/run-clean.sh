@@ -1,57 +1,61 @@
 #!/usr/bin/env bash
-set -u
+set -euo pipefail
 
-# Intent: Provide a repo-local clean regression runner that resets Docker state,
-# runs the POC13 TCP scenario, and immediately analyzes the evidence. Source:
-# DI-hohuf
-script_dir="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
-script_status="$?"
-if [ "$script_status" -ne 0 ]; then
-  printf 'failed to resolve script directory status=%s\n' "$script_status" >&2
-  exit "$script_status"
-fi
-repo_dir="$(CDPATH= cd -- "$script_dir/.." && pwd)"
-repo_status="$?"
-if [ "$repo_status" -ne 0 ]; then
-  printf 'failed to resolve repo directory status=%s\n' "$repo_status" >&2
-  exit "$repo_status"
-fi
-config_path="${POC13_CONFIG:-./config.example.json}"
-run_dir="/run/poc13/poc13-demo"
+# Intent: Give operators one repeatable command for the POC13 clean regression:
+# reset runtime state, run compose, discover the fresh evidence directory, and
+# let poc13-analyze enforce the clean-run gates. Source: DI-jidah; DI-sinur;
+# DI-punib
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+poc_dir="$(cd "${script_dir}/.." && pwd)"
 
-run_step() {
-  step_name="$1"
-  shift
-  printf '\n== %s ==\n' "$step_name"
-  "$@"
-  status="$?"
-  if [ "$status" -ne 0 ]; then
-    printf 'step failed: %s status=%s\n' "$step_name" "$status" >&2
-    exit "$status"
-  fi
-}
+cd "${poc_dir}"
 
-if [ ! -d "$repo_dir" ]; then
-  printf 'missing repo dir: %s\n' "$repo_dir" >&2
-  exit 1
-fi
-
-cd "$repo_dir"
-cd_status="$?"
-if [ "$cd_status" -ne 0 ]; then
-  printf 'failed to enter repo dir: %s status=%s\n' "$repo_dir" "$cd_status" >&2
-  exit "$cd_status"
-fi
-export POC13_CONFIG="$config_path"
-
-printf 'repo: %s\n' "$repo_dir"
-printf 'config: %s\n' "$POC13_CONFIG"
-if [ -n "${OPENAI_API_KEY:-}" ]; then
-  printf 'OPENAI_API_KEY: present\n'
+echo "== reset POC13 docker runtime state =="
+if docker compose down -v --remove-orphans; then
+	echo "reset complete"
 else
-  printf 'OPENAI_API_KEY: missing; scripted fallback will be used\n'
+	status=$?
+	echo "docker compose down failed with status ${status}" >&2
+	exit "${status}"
 fi
 
-run_step 'reset docker volume state' docker compose down -v --remove-orphans
-run_step 'build and run poc13' docker compose up --build
-run_step 'analyze poc13' docker compose run --rm --entrypoint /usr/local/bin/poc13-analyze alice-bob "$run_dir"
+echo "== run POC13 compose regression =="
+if docker compose up --build --abort-on-container-exit; then
+	echo "compose run complete"
+else
+	status=$?
+	echo "docker compose up failed with status ${status}" >&2
+	exit "${status}"
+fi
+
+echo "== discover fresh POC13 run directory =="
+if run_id="$(docker compose run --rm --entrypoint sh dave -c '
+count=0
+latest=""
+for dir in /run/poc13/*; do
+	if [ -f "${dir}/monitor-report.json" ]; then
+		count=$((count + 1))
+		latest="${dir##*/}"
+	fi
+done
+if [ "${count}" -ne 1 ]; then
+	echo "expected exactly one /run/poc13/<run_id> directory, found ${count}" >&2
+	exit 1
+fi
+echo "${latest}"
+')"; then
+	echo "run id: ${run_id}"
+else
+	status=$?
+	echo "run directory discovery failed with status ${status}" >&2
+	exit "${status}"
+fi
+
+echo "== analyze POC13 clean regression =="
+if docker compose run --rm --entrypoint /usr/local/bin/poc13-analyze dave "/run/poc13/${run_id}"; then
+	echo "POC13 clean regression PASS"
+else
+	status=$?
+	echo "POC13 clean regression FAIL with status ${status}" >&2
+	exit "${status}"
+fi

@@ -1,36 +1,101 @@
 services:
-  alice-bob:
+  alice:
     build: .
-    command: ["-container", "alice-bob", "-config", "/app/config.json"]
-    volumes:
-      - poc13-run:/run/poc13
-      - ${POC13_CONFIG:-./config.json}:/app/config.json:ro
+    command: ["-container", "alice", "-config", "/app/config.json"]
     environment:
-      - OPENAI_API_KEY
-  carol-dave:
+      OPENAI_API_KEY_FILE: /run/secrets/openai_api_key
+    secrets: [openai_api_key]
+    networks: [poc13]
+    volumes:
+      - ./config.json:/app/config.json:ro
+      - poc13-run:/run/poc13
+  bob:
     build: .
-    command: ["-container", "carol-dave", "-config", "/app/config.json"]
-    volumes:
-      - poc13-run:/run/poc13
-      - ${POC13_CONFIG:-./config.json}:/app/config.json:ro
+    command: ["-container", "bob", "-config", "/app/config.json"]
     environment:
-      - OPENAI_API_KEY
+      OPENAI_API_KEY_FILE: /run/secrets/openai_api_key
+    secrets: [openai_api_key]
+    networks: [poc13]
+    volumes:
+      - ./config.json:/app/config.json:ro
+      - poc13-run:/run/poc13
+  carol:
+    build: .
+    command: ["-container", "carol", "-config", "/app/config.json"]
+    environment:
+      OPENAI_API_KEY_FILE: /run/secrets/openai_api_key
+    secrets: [openai_api_key]
+    networks: [poc13]
+    volumes:
+      - ./config.json:/app/config.json:ro
+      - poc13-run:/run/poc13
+  dave:
+    build: .
+    command: ["-container", "dave", "-config", "/app/config.json"]
+    environment:
+      OPENAI_API_KEY_FILE: /run/secrets/openai_api_key
+    secrets: [openai_api_key]
+    networks: [poc13]
+    volumes:
+      - ./config.json:/app/config.json:ro
+      - poc13-run:/run/poc13
   ellen-frank:
     build: .
     command: ["-container", "ellen-frank", "-config", "/app/config.json"]
-    volumes:
-      - poc13-run:/run/poc13
-      - ${POC13_CONFIG:-./config.json}:/app/config.json:ro
     environment:
-      - OPENAI_API_KEY
-  grace-mallory:
+      OPENAI_API_KEY_FILE: /run/secrets/openai_api_key
+    secrets: [openai_api_key]
+    networks: [poc13]
+    volumes:
+      - ./config.json:/app/config.json:ro
+      - poc13-run:/run/poc13
+  grace-heidi:
     build: .
-    command: ["-container", "grace-mallory", "-config", "/app/config.json"]
-    volumes:
-      - poc13-run:/run/poc13
-      - ${POC13_CONFIG:-./config.json}:/app/config.json:ro
+    command: ["-container", "grace-heidi", "-config", "/app/config.json"]
     environment:
-      - OPENAI_API_KEY
+      OPENAI_API_KEY_FILE: /run/secrets/openai_api_key
+    secrets: [openai_api_key]
+    networks: [poc13]
+    volumes:
+      - ./config.json:/app/config.json:ro
+      - poc13-run:/run/poc13
+  ivan-judy:
+    build: .
+    command: ["-container", "ivan-judy", "-config", "/app/config.json"]
+    environment:
+      OPENAI_API_KEY_FILE: /run/secrets/openai_api_key
+    secrets: [openai_api_key]
+    networks: [poc13]
+    volumes:
+      - ./config.json:/app/config.json:ro
+      - poc13-run:/run/poc13
+  mallory-oscar:
+    build: .
+    command: ["-container", "mallory-oscar", "-config", "/app/config.json"]
+    environment:
+      OPENAI_API_KEY_FILE: /run/secrets/openai_api_key
+    secrets: [openai_api_key]
+    networks: [poc13]
+    volumes:
+      - ./config.json:/app/config.json:ro
+      - poc13-run:/run/poc13
+  shipping:
+    build: .
+    command: ["-container", "shipping", "-config", "/app/config.json"]
+    environment:
+      OPENAI_API_KEY_FILE: /run/secrets/openai_api_key
+    secrets: [openai_api_key]
+    networks: [poc13]
+    volumes:
+      - ./config.json:/app/config.json:ro
+      - poc13-run:/run/poc13
+
+networks:
+  poc13:
 
 volumes:
   poc13-run:
+
+secrets:
+  openai_api_key:
+    file: ./openai_api_key.txt

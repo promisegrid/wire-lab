@@ -20,6 +20,11 @@
 - Before adding any new top-level action kind, stop and answer: why is this not just an agent's voluntary promise with pCID-defined payload meaning? If that answer is not explicit in a locked TE/DI, do not add the action kind. (DI-mosoj)
 - POC7 through POC10 action names, including refusal and observation labels, are historical executable evidence, not the forward naming pattern. Do not rewrite scored/generated artifacts in place; supersede or reframe them when reused. (DI-mosoj; supersedes DI-fitav)
 
+## POC Superset Discipline (Required)
+- Future PromiseGrid POCs must be supersets of the previous POC's implemented behavior, architecture lessons, analyzer gates, and documented acceptance criteria unless a scoped DI explicitly declares the new POC non-superset and lists every intentionally dropped feature. (DI-sinur)
+- A new POC may add focus, specialization, or new protocol surfaces, but it must not silently regress app/kernel boundaries, local trust semantics, monitor/analyzer gates, pCID routing, Promise Theory vocabulary, or previously proven workflows. (DI-sinur)
+- When repairing or extending a POC, the analyzer must include inherited regression gates for the prior POC lineage, and the README or run narrative must state whether the POC is a superset or cite the DI authorizing an exception. (DI-sinur)
+
 ## DEV-GUIDE-RESOURCES.md
 
 - Update DEV-GUIDE-RESOURCES.md file when a cited or relevant DR, DI, TE, or TODO is updated, when a cited draft spec freezes, or when the PromiseGrid Development Guide (https://github.com/ciwg/promisegrid-dev-guide) settles prose that supersedes a wire-lab note. Source: `DI-nunut`.
