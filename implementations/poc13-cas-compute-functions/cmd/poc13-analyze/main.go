@@ -34,6 +34,10 @@ type RunSummary struct {
 	RelationshipTransitionCounts map[string]int          `json:"relationship_transition_counts"`
 	LocalResourceCounts          map[string]int          `json:"local_resource_counts"`
 	ResourceTrustCouplingCounts  map[string]int          `json:"resource_trust_coupling_counts"`
+	DurabilityCounts             map[string]int          `json:"durability_counts"`
+	RetentionCounts              map[string]int          `json:"retention_counts"`
+	PressureCounts               map[string]int          `json:"pressure_counts"`
+	ReplayCounts                 map[string]int          `json:"replay_counts"`
 	ScoreReport                  ScoreReport             `json:"score_report"`
 	MissingRequiredEventNames    []string                `json:"missing_required_event_names,omitempty"`
 	MonitorReport                *decision.MonitorReport `json:"monitor_report,omitempty"`
@@ -53,6 +57,10 @@ type ScoreReport struct {
 	Trust        int      `json:"trust"`
 	Verification int      `json:"verification"`
 	Replica      int      `json:"replica"`
+	Durability   int      `json:"durability"`
+	Retention    int      `json:"retention"`
+	Pressure     int      `json:"pressure"`
+	Replay       int      `json:"replay"`
 	Concerns     []string `json:"concerns,omitempty"`
 }
 
@@ -123,6 +131,10 @@ func analyzeRun(runDir string) (RunSummary, error) {
 		RelationshipTransitionCounts: make(map[string]int),
 		LocalResourceCounts:          make(map[string]int),
 		ResourceTrustCouplingCounts:  make(map[string]int),
+		DurabilityCounts:             make(map[string]int),
+		RetentionCounts:              make(map[string]int),
+		PressureCounts:               make(map[string]int),
+		ReplayCounts:                 make(map[string]int),
 	}
 	logPaths := jsonlLogPaths(logDir)
 	sort.Strings(logPaths)
@@ -321,6 +333,18 @@ func summarizeLog(logPath string, summary *RunSummary) error {
 		if isLocalResourceEvent(event) {
 			summary.LocalResourceCounts[event.Event]++
 		}
+		if isDurabilityEvent(event.Event) {
+			summary.DurabilityCounts[event.Event]++
+		}
+		if isRetentionEvent(event.Event) {
+			summary.RetentionCounts[event.Event]++
+		}
+		if isPressureEvent(event.Event) {
+			summary.PressureCounts[event.Event]++
+		}
+		if isReplayEvent(event.Event) {
+			summary.ReplayCounts[event.Event]++
+		}
 		if hasPreviousEvent && isResourceTrustCoupling(previousEvent, event) {
 			summary.ResourceTrustCouplingCounts[event.Observer]++
 		}
@@ -414,6 +438,36 @@ func requiredRegressionEvents() []string {
 		"bad_proof_rejected",
 		"key_rotation_promise_recorded",
 		"promise_envelope_validated",
+		// Intent: POC13's regression gate now covers run-scoped stores,
+		// promise-shaped retention/GC, pressure promises, and replay protection
+		// so those operational concerns cannot regress behind raw event counts.
+		// Source: DI-sunuf
+		"run_scoped_store_empty",
+		"run_scoped_store_saved",
+		"cas_run_store_saved",
+		"evidence_run_store_saved",
+		"compute_cache_run_store_saved",
+		"retention_promise_recorded",
+		"retention_until_promised",
+		"delete_after_promised",
+		"token_expiry_gc_promised",
+		"disk_pressure_gc_promised",
+		"superseded_checkpoint_gc_promised",
+		"gc_object_retained",
+		"gc_promise_ended",
+		"gc_object_removed",
+		"app_kernel_backpressure_promised",
+		"app_kernel_rate_limit_promised",
+		"backpressure_capacity_promised",
+		"backpressure_capacity_refused",
+		"send_rate_promised",
+		"accept_rate_promised",
+		"rate_limit_self_promise_recorded",
+		"replay_window_promised",
+		"replay_envelope_recorded",
+		"capability_token_replay_rejected",
+		"capability_token_replay_observed",
+		"replay_probe_rejected",
 	}
 }
 
@@ -426,7 +480,14 @@ func computeScores(summary RunSummary) ScoreReport {
 	addScore(&scores.Trust, summary.EventCounts["trust_updated"] > 0 && summary.EventCounts["trust_driven_peer_choice"] > 0 && summary.EventCounts["persisted_trust_history_loaded"] > 0 && summary.EventCounts["dynamic_peer_choice_from_persisted_trust"] > 0)
 	addScore(&scores.Verification, summary.EventCounts["compute_result_locally_verified"] > 0 && summary.EventCounts["compute_result_locally_rejected"] > 0 && summary.EventCounts["compute_result_peer_verified"] > 0 && summary.EventCounts["compute_verifier_disagreement"] > 0 && summary.EventCounts["compute_disagreement_resolved_locally"] > 0 && summary.EventCounts["evidence_report_received"] > 0)
 	addScore(&scores.Replica, summary.EventCounts["replica_recovery_succeeded"] > 0 && summary.EventCounts["replica_capability_token_redeemed"] > 0)
-	scores.Overall = (scores.Transport + scores.Storage + scores.Compute + scores.Economics + scores.Trust + scores.Verification + scores.Replica) / 7
+	// Intent: Analyzer scoring should treat durability, retention, pressure, and
+	// replay as first-class POC13 fitness dimensions instead of burying them under
+	// generic protocol validity. Source: DI-sunuf
+	addScore(&scores.Durability, summary.EventCounts["run_scoped_store_saved"] > 0 && summary.EventCounts["cas_run_store_saved"] > 0 && summary.EventCounts["evidence_run_store_saved"] > 0 && summary.EventCounts["compute_cache_run_store_saved"] > 0)
+	addScore(&scores.Retention, summary.EventCounts["retention_promise_recorded"] > 0 && summary.EventCounts["gc_object_retained"] > 0 && summary.EventCounts["gc_object_removed"] > 0)
+	addScore(&scores.Pressure, summary.EventCounts["backpressure_capacity_promised"] > 0 && summary.EventCounts["backpressure_capacity_refused"] > 0 && summary.EventCounts["send_rate_promised"] > 0 && summary.EventCounts["accept_rate_promised"] > 0)
+	addScore(&scores.Replay, summary.EventCounts["replay_window_promised"] > 0 && summary.EventCounts["replay_envelope_recorded"] > 0 && summary.EventCounts["capability_token_replay_rejected"] > 0 && summary.EventCounts["replay_probe_rejected"] > 0)
+	scores.Overall = (scores.Transport + scores.Storage + scores.Compute + scores.Economics + scores.Trust + scores.Verification + scores.Replica + scores.Durability + scores.Retention + scores.Pressure + scores.Replay) / 11
 	if len(summary.MissingRequiredEventNames) > 0 {
 		scores.Concerns = append(scores.Concerns, "missing required events: "+strings.Join(summary.MissingRequiredEventNames, ", "))
 	}
@@ -470,6 +531,22 @@ func isRelationshipTransition(eventName string) bool {
 	default:
 		return false
 	}
+}
+
+func isDurabilityEvent(eventName string) bool {
+	return strings.Contains(eventName, "run_store") || strings.HasPrefix(eventName, "run_scoped_store_")
+}
+
+func isRetentionEvent(eventName string) bool {
+	return strings.Contains(eventName, "retention") || strings.HasPrefix(eventName, "gc_") || strings.Contains(eventName, "expiry_gc") || strings.Contains(eventName, "delete_after") || strings.Contains(eventName, "disk_pressure")
+}
+
+func isPressureEvent(eventName string) bool {
+	return strings.Contains(eventName, "backpressure") || strings.Contains(eventName, "rate_limit") || eventName == "send_rate_promised" || eventName == "accept_rate_promised"
+}
+
+func isReplayEvent(eventName string) bool {
+	return strings.Contains(eventName, "replay")
 }
 
 // isLocalResourceEvent recognizes evidence about the observing app's own

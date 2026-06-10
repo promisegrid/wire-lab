@@ -6,8 +6,10 @@ superset repair of POC11 and POC12: it keeps POC11's autonomous sparse-mesh
 relationship/economics pressure, keeps POC12's separate app/kernel processes and
 shipping/device workflow, and adds POC13's decentralized CAS storage,
 CID-named compute, replica recovery, token lifecycle, cache, verifier
-disagreement, bad-proof, unknown-pCID, and evidence-report pressure. Source:
-`DI-timah`; `DI-bikit`; `DI-galin`; `DI-pohaj`; `DI-zapab`; `DI-sinur`.
+disagreement, bad-proof, unknown-pCID, evidence-report pressure, run-scoped
+durability, retention/GC, backpressure, rate-limit, and replay-protection
+pressure. Source: `DI-timah`; `DI-bikit`; `DI-galin`; `DI-pohaj`;
+`DI-zapab`; `DI-sinur`; `DI-sunuf`.
 
 ## What This Tests
 
@@ -51,8 +53,20 @@ disagreement, bad-proof, unknown-pCID, and evidence-report pressure. Source:
   verifies the result, Grace supplies disagreement pressure, and Mallory sends
   corrupt bytes, an unknown pCID, an unsupported variant, a bad proof, a key
   rotation promise, and a capacity probe. Source: `DI-sinur`.
+- Run-scoped durability promises: apps persist CAS objects, compute cache
+  checkpoints, capability tokens, replay windows, and local evidence journals
+  under the current run root so an app can recover inside one run, while
+  `scripts/run-clean.sh` remains the experiment boundary that resets state.
+  Source: `DI-sunuf`.
+- Retention, GC, backpressure, rate-limit, and replay evidence: apps promise
+  local retain-until/delete-after/token-expiry/disk-pressure behavior, record
+  retained/removed/ended/broken GC cases, model sender and receiver rate limits
+  as reciprocal self-promises, and reject exact envelope or serve-once token
+  replays as local non-commitment evidence. Source: `DI-sunuf`.
 - Superset analyzer gates: `poc13-analyze` now fails if inherited POC11/POC12
-  behavior or POC13 storage/compute evidence disappears. Source: `DI-sinur`.
+  behavior, POC13 storage/compute evidence, run-scoped durability, retention/GC,
+  pressure, rate-limit, or replay evidence disappears. Source: `DI-sinur`;
+  `DI-sunuf`.
 - Observer-only monitor lifecycle: completed nodes wait for `monitor.done` using
   a config-derived provider/turn/grace budget, and a completed run can still
   write the non-authoritative marker if the observer report fails. Source:
@@ -181,6 +195,11 @@ not a penalty against Bob. Duplicate evidence now flows through a reusable
 `checkpointJournal`; the accounting shipment update remains the first concrete
 checkpoint. Source: `DI-zapab`.
 
+`DI-vahan` makes the alternate compute path follow local trust evidence. Alice
+still obtains arbitrary payload-defined compute coverage, but after Carol exposes
+malformed bad-result evidence, Alice sends the second sum-function promise to
+Dave rather than forcing another fresh compute promise to Carol.
+
 `DI-pohaj` adds a local printer-port kernel-role app without turning the
 message kernel into a USB authority or RPC service. During label printing,
 `ups_label_printer` sends `issue_print_capability` to `printer_port`;
@@ -194,3 +213,18 @@ wrote `monitor_done`; analyzer output reported 625 events, 17 `node_done`, 17
 `shutdown_grace_elapsed`, one `monitor_done`, all printer-port shipping counts,
 and empty `resource_trust_coupling_counts`. Source: `DI-pohaj`; `DI-vutok`;
 `DI-jupob`.
+
+`DI-sunuf` adds run-scoped durability and operational-pressure evidence without
+promoting POC13 state into cross-run infrastructure. Each app writes
+`stores/<agent>/durable-state.json` under the current run root with CAS bytes,
+compute checkpoints, capability tokens, replay hashes, and local journals.
+Retention and GC are promise/evidence records (`retention_until_promised`,
+`delete_after_promised`, `gc_object_retained`, `gc_object_removed`,
+`retention_promise_broken`) rather than a central cleanup authority. Sender and
+receiver rate/capacity behavior is modeled through `send_rate_promised`,
+`accept_rate_promised`, and `backpressure_capacity_promised`; replay handling
+records exact-envelope and serve-once-token rejections as local non-commitment
+evidence. Analyzer scoring now includes durability, retention, pressure, and
+replay dimensions, and tests cover within-run recovery, token replay, exact
+envelope replay, CBOR fuzzing, delayed partial reads, and short writes. Source:
+`DI-sunuf`.

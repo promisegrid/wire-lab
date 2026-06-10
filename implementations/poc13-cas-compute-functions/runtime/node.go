@@ -58,6 +58,8 @@ type Node struct {
 	casStore             map[string][]byte
 	capabilityTokens     map[string]string
 	computeCache         map[string]map[string]string
+	replayJournal        map[string]string
+	exchangeCounter      int
 
 	activeHandlers sync.WaitGroup
 	receiveConns   []transport.FrameConn
@@ -131,6 +133,22 @@ type checkpointRecord struct {
 	Detail       string
 }
 
+// runScopedState is the restartable state this POC keeps only inside one run
+// root. Intent: CAS bytes, compute checkpoints, replay windows, and app-local
+// evidence journals may survive a process restart within one experiment, but the
+// clean-run reset remains the boundary that prevents stale state from muddying
+// the next POC13 run. Source: DI-sunuf
+type runScopedState struct {
+	Version              int                            `json:"version"`
+	CASObjects           map[string]string              `json:"cas_objects_b64,omitempty"`
+	CapabilityTokens     map[string]string              `json:"capability_tokens,omitempty"`
+	ComputeCache         map[string]map[string]string   `json:"compute_cache,omitempty"`
+	NonCommitmentJournal map[string]nonCommitmentRecord `json:"non_commitment_journal,omitempty"`
+	CheckpointJournal    map[string]checkpointRecord    `json:"checkpoint_journal,omitempty"`
+	PromiseJournal       map[string]promiseRecord       `json:"promise_journal,omitempty"`
+	ReplayJournal        map[string]string              `json:"replay_journal,omitempty"`
+}
+
 // NewNode creates a node with a private trust ledger for every configured peer.
 func NewNode(cfg config.Config, agent config.AgentConfig, decider decision.Decider, monitor decision.Monitor) *Node {
 	peerNames := make([]string, 0, len(cfg.Agents)-1)
@@ -156,6 +174,7 @@ func NewNode(cfg config.Config, agent config.AgentConfig, decider decision.Decid
 		casStore:             make(map[string][]byte),
 		capabilityTokens:     make(map[string]string),
 		computeCache:         make(map[string]map[string]string),
+		replayJournal:        make(map[string]string),
 	}
 }
 
@@ -167,6 +186,9 @@ func (node *Node) Run(ctx context.Context) error {
 		return err
 	}
 	defer node.closeLog()
+	if err := node.loadRunScopedState(); err != nil {
+		return err
+	}
 	if err := node.loadRelationshipState(); err != nil {
 		return err
 	}
@@ -195,10 +217,14 @@ func (node *Node) Run(ctx context.Context) error {
 	// Source: DI-galin
 	node.closeReceivePromises()
 	node.drainInflight(ctx)
+	node.recordRunScopedRetentionAndGC()
+	if err := node.saveRunScopedState(); err != nil {
+		return err
+	}
 	if err := node.saveRelationshipState(); err != nil {
 		return err
 	}
-	node.record("runtime_done_promised", "kept", "", "app completed local turns and saved relationship evidence")
+	node.record("runtime_done_promised", "kept", "", "app completed local turns and saved relationship and run-scoped evidence")
 	if err := node.writeDoneMarker(); err != nil {
 		return err
 	}
@@ -391,6 +417,7 @@ func (node *Node) runCASComputeWorkflow() error {
 	}); err != nil {
 		return fmt.Errorf("store second content: %w", err)
 	}
+	primaryToken := storeAck.Fields["field_capability_token"]
 	if _, err := node.sendAndReceive("bob", map[string]string{
 		"act":                 decision.ActPromise,
 		"from":                node.Agent.Name,
@@ -400,9 +427,25 @@ func (node *Node) runCASComputeWorkflow() error {
 		"reason":              "retrieval proves storage is not only promised but locally served",
 		"field_promise_about": production.PromiseServeContent,
 		"field_content_cid":   contentCID,
-		"field_token":         storeAck.Fields["field_capability_token"],
+		"field_token":         primaryToken,
 	}); err != nil {
 		return fmt.Errorf("serve content: %w", err)
+	}
+	replayAck, replayErr := node.sendAndReceive("bob", map[string]string{
+		"act":                 decision.ActPromise,
+		"from":                node.Agent.Name,
+		"to":                  "bob",
+		"turn":                "startup",
+		"promise":             "Alice promises to present the consumed serve-once token only as replay-protection test evidence.",
+		"reason":              "a serve-once token should not create a second storage result after local redemption",
+		"field_promise_about": production.PromiseServeContent,
+		"field_content_cid":   contentCID,
+		"field_token":         primaryToken,
+	})
+	if replayErr != nil || replayAck.Fields["field_token_status"] == "not_promised" {
+		node.record("replay_probe_rejected", "non_commitment", "bob", "pcid="+pcid.CASStorageV1+" consumed serve-once token was not accepted as fresh evidence")
+	} else {
+		return fmt.Errorf("serve-once token replay unexpectedly produced fresh content")
 	}
 	node.record("network_outage_variant_selected", "kept", "bob", "pcid="+pcid.CASStorageV1+" Alice models Bob unavailable after primary retrieval")
 	node.record("tcp_message_send_failed", "non_commitment", "bob", "pcid="+pcid.CASStorageV1+" simulated primary Bob outage before replica request")
@@ -503,13 +546,16 @@ func (node *Node) runCASComputeWorkflow() error {
 	}
 	sumFunctionBytes := production.SampleSumFunctionBytes()
 	sumInputBytes := production.SampleSumInputBytes()
-	node.record("compute_followup_function_requested", "kept", "carol", "pcid="+pcid.CIDComputeV1+" Alice requests a second payload-provided compute function kind=sum")
-	if _, err := node.sendAndReceive("carol", map[string]string{
+	node.record("compute_followup_function_requested", "kept", "dave", "pcid="+pcid.CIDComputeV1+" Alice requests a second payload-provided compute function kind=sum from a still-trusted compute peer")
+	// Intent: After Alice locally observes malformed bad-result evidence from
+	// Carol, the alternate-function coverage should follow trust and use Dave
+	// rather than forcing another fresh compute promise to Carol. Source: DI-vahan
+	if _, err := node.sendAndReceive("dave", map[string]string{
 		"act":                 decision.ActPromise,
 		"from":                node.Agent.Name,
-		"to":                  "carol",
+		"to":                  "dave",
 		"turn":                "startup",
-		"promise":             "Alice promises to receive Carol's sum result only if it verifies against the payload bytes.",
+		"promise":             "Alice promises to receive Dave's sum result only if it verifies against the payload bytes.",
 		"reason":              "second compute path prevents hard-coded Fibonacci-only behavior",
 		"field_promise_about": production.PromiseExecuteFunction,
 		"field_function_cid":  production.ContentCID(sumFunctionBytes),
@@ -560,7 +606,7 @@ func (node *Node) runAdversaryWorkflow() error {
 	if err := node.sendUnknownProtocolPromise("grace"); err != nil {
 		return fmt.Errorf("unknown protocol probe: %w", err)
 	}
-	if _, err := node.sendAndReceive("grace", map[string]string{
+	unsupportedFields := map[string]string{
 		"act":                 decision.ActPromise,
 		"from":                node.Agent.Name,
 		"to":                  "grace",
@@ -568,9 +614,11 @@ func (node *Node) runAdversaryWorkflow() error {
 		"promise":             "Mallory promises an unsupported storage variant to test receiver non-commitment.",
 		"reason":              "unsupported variants should be not-promised rather than coerced",
 		"field_promise_about": production.PromiseUnsupportedVariantProbe,
-	}); err != nil {
+	}
+	if _, err := node.sendAndReceive("grace", unsupportedFields); err != nil {
 		node.record("promise_variant_not_promised", "non_commitment", "grace", "pcid="+pcid.CASStorageV1+" Grace did not promise unsupported storage variant")
 	}
+	node.shouldSuppressNonCommittedPromise("grace", unsupportedFields)
 	if err := node.sendBadProofPromise("grace"); err != nil {
 		node.record("bad_proof_rejected", "malformed", "grace", "pcid="+pcid.CASStorageV1+" local kernel rejected bad proof: "+err.Error())
 	}
@@ -741,6 +789,8 @@ func (node *Node) registerReceivePromise(ctx context.Context, kernelAddress, pro
 	node.activeHandlers.Add(1)
 	go node.receiveLoop(protocolName, frameConn)
 	node.record("app_receive_promise_sent", "kept", "kernel", "pcid="+protocolName+" kernel="+kernelAddress)
+	node.record("app_kernel_backpressure_promised", "kept", "kernel", "pcid="+protocolName+" app promises bounded receive buffering through the local kernel")
+	node.record("app_kernel_rate_limit_promised", "kept", "kernel", "pcid="+protocolName+" app promises to treat local kernel throughput as a bounded promise")
 	return nil
 }
 
@@ -772,12 +822,16 @@ func (node *Node) handleFrame(frameBytes []byte) ([]byte, error) {
 	parsed, parseErr := node.parseEnvelope(frameBytes)
 	if parseErr != nil {
 		node.record("frame_parse_failed", "broken", "", parseErr.Error())
+		node.recordMalformedFrameEvidence(frameBytes, parseErr)
 		return nil, parseErr
 	}
 	node.record("promise_envelope_validated", "kept", parsed.Fields["from"], "pcid="+parsed.ProtocolName+" exact_sha256="+parsed.ExactHash)
 	node.record("tcp_message_received", "kept", parsed.Fields["from"], "pcid="+parsed.ProtocolName+" exact_sha256="+parsed.ExactHash)
 	fields := parsed.Fields
 	fromAgent := fields["from"]
+	if node.rememberReplayEnvelope(fromAgent, parsed.ProtocolName, parsed.ExactHash) {
+		return node.newAckBytes(fromAgent, "not_promised", "I promise to remember that I already saw this exact envelope and will not treat the replay as fresh promise evidence.", parsed.ProtocolCID, map[string]string{"field_replay_status": "not_promised"})
+	}
 	if !node.supportsProtocol(parsed.ProtocolName) {
 		node.record("unsupported_pcid", "non_commitment", fromAgent, "no local app receive promise for "+parsed.ProtocolName)
 		return node.newAckBytes(fromAgent, "not_promised", "I promise to remember that I did not promise to handle this pCID.", parsed.ProtocolCID, nil)
@@ -791,6 +845,7 @@ func (node *Node) handleFrame(frameBytes []byte) ([]byte, error) {
 		node.record("message_not_promised", "non_commitment", fromAgent, "no current local promise to accept direct TCP exchange")
 		return node.newAckBytes(fromAgent, "not_promised", "I promise to remember that I did not currently promise this direct exchange.", parsed.ProtocolCID, nil)
 	}
+	node.recordInboundPressurePromises(fromAgent, parsed.ProtocolName, fields)
 	promiseID := node.rememberOutstandingPromise(fromAgent, parsed.ProtocolName, parsed.ExactHash, fields)
 	if resourceErr := node.checkIncomingResourcePromise(fields); resourceErr != nil {
 		node.resolveOutstandingPromise(promiseID, promiseStatusBroken, resourceErr.Error())
@@ -853,6 +908,17 @@ func (node *Node) send(target string, fields map[string]string) error {
 	return err
 }
 
+// nextExchangeID assigns a sender-local evidence identity to each outbound
+// promise. Intent: Semantic duplicates can still be recognized by pCID-owned
+// fields, while exact-byte replay protection can reject a re-sent envelope whose
+// bytes are literally identical. Source: DI-sunuf
+func (node *Node) nextExchangeID(target, protocolName string) string {
+	node.mu.Lock()
+	defer node.mu.Unlock()
+	node.exchangeCounter++
+	return fmt.Sprintf("%s-%s-%s-%06d", node.Agent.Name, target, protocolName, node.exchangeCounter)
+}
+
 // sendAndReceive performs one signed promise exchange and returns the receiver's
 // ACK evidence to the local caller.
 // Intent: The fulfillment workflow needs concrete address, weight, label, and
@@ -866,6 +932,7 @@ func (node *Node) sendAndReceive(target string, fields map[string]string) (parse
 	}
 	protocolName, protocolCID := node.protocolForFields(fields)
 	fields["protocol"] = protocolName
+	fields["field_exchange_id"] = node.nextExchangeID(target, protocolName)
 	envelope, envelopeErr := protocol.NewEnvelope(protocolCID, fields, node.Agent.Name)
 	if envelopeErr != nil {
 		return parsedMessage{}, envelopeErr
@@ -875,6 +942,7 @@ func (node *Node) sendAndReceive(target string, fields map[string]string) (parse
 		return parsedMessage{}, bytesErr
 	}
 	exactHash := protocol.HashExactBytes(envelopeBytes)
+	node.recordOutboundPressurePromises(target, protocolName, fields)
 	promiseID := node.rememberOutstandingPromise(target, protocolName, exactHash, fields)
 	kernelAddress, addressFound := node.Config.KernelAppAddressForAgent(node.Agent.Name)
 	if !addressFound {
@@ -976,14 +1044,20 @@ func (node *Node) sendBadProofPromise(target string) error {
 	if envelopeErr != nil {
 		return envelopeErr
 	}
+	mutatedFields := copyStringMap(fields)
+	mutatedFields["reason"] = "bad proof should fail because this parseable payload was changed after signing"
+	mutatedPayload, payloadErr := protocol.MarshalStringMap(mutatedFields)
+	if payloadErr != nil {
+		return payloadErr
+	}
+	// Intent: Mutate the signable payload after proof generation so the receiver
+	// can still parse the pCID and promiser fields but must reject the exact
+	// envelope proof as malformed evidence. Source: DI-sunuf
+	envelope.Payload = mutatedPayload
 	envelopeBytes, bytesErr := envelope.Bytes()
 	if bytesErr != nil {
 		return bytesErr
 	}
-	if len(envelopeBytes) == 0 {
-		return fmt.Errorf("empty bad-proof envelope")
-	}
-	envelopeBytes[len(envelopeBytes)-1] ^= 0x01
 	node.record("bad_proof_sent", "kept", target, "pcid="+pcid.CASStorageV1+" sent intentionally corrupted signature")
 	ackMessage, sendErr := node.sendRawEnvelope(target, pcid.CASStorageV1, envelopeBytes)
 	if sendErr != nil {
@@ -1042,6 +1116,31 @@ func (node *Node) parseEnvelope(frameBytes []byte) (parsedMessage, error) {
 		ProtocolCID:  envelope.ProtocolCID,
 		ProtocolName: protocolName,
 	}, nil
+}
+
+// recordMalformedFrameEvidence extracts the promiser from a parseable but
+// unverifiable envelope when possible. Intent: A bad proof should reduce only
+// the local observer's trust in the identifiable promiser; malformed random
+// bytes still remain unattributed parse-failure evidence. Source: DI-sunuf
+func (node *Node) recordMalformedFrameEvidence(frameBytes []byte, cause error) {
+	envelope, parseErr := protocol.ParseEnvelope(frameBytes)
+	if parseErr != nil {
+		return
+	}
+	fields, fieldsErr := envelope.PayloadFields()
+	if fieldsErr != nil {
+		return
+	}
+	fromAgent := fields["from"]
+	if fromAgent == "" {
+		return
+	}
+	protocolName, known := node.Protocols.Name(envelope.ProtocolCID)
+	if !known {
+		protocolName = "unknown:" + envelope.ProtocolCID.String()
+	}
+	node.record("malformed_proof_observed", "malformed", fromAgent, "pcid="+protocolName+" exact_sha256="+protocol.HashExactBytes(frameBytes)+" error="+cause.Error())
+	node.observeOutcome(fromAgent, relationship.OutcomeMalformed)
 }
 
 // protocolForFields chooses the pCID for an outbound promise from protocol or
@@ -1487,7 +1586,12 @@ func (node *Node) handleCASStoragePromise(fields map[string]string) (map[string]
 	case production.PromiseServeContent:
 		contentCID := fields["field_content_cid"]
 		if !node.redeemCapabilityToken(fields["from"], contentCID, fields["field_token"]) {
-			return nil, fmt.Errorf("capability token does not match local storage promise")
+			node.record("capability_token_replay_rejected", "non_commitment", fields["from"], "pcid="+pcid.CASStorageV1+" consumed or unrecognized serve-once token for content_cid="+contentCID)
+			return map[string]string{
+				"field_promise_about": production.PromiseServeContent,
+				"field_content_cid":   contentCID,
+				"field_token_status":  "not_promised",
+			}, nil
 		}
 		node.mu.Lock()
 		contentBytes := append([]byte(nil), node.casStore[contentCID]...)
@@ -1499,6 +1603,8 @@ func (node *Node) handleCASStoragePromise(fields map[string]string) (map[string]
 		node.record("capability_token_ttl_observed", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" ttl still valid for content_cid="+contentCID)
 		node.record("cas_bytes_retrieved", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" content_cid="+contentCID)
 		node.record("capability_token_revoked", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" serve-once token consumed for content_cid="+contentCID)
+		node.record("gc_promise_ended", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" serve-once token promise ended after redemption for content_cid="+contentCID)
+		node.record("gc_object_removed", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" consumed capability token removed from run-scoped store for content_cid="+contentCID)
 		return map[string]string{
 			"field_promise_about": production.PromiseServeContent,
 			"field_content_cid":   contentCID,
@@ -1528,7 +1634,12 @@ func (node *Node) handleCASStoragePromise(fields map[string]string) (map[string]
 	case production.PromiseServeReplicaContent:
 		contentCID := fields["field_content_cid"]
 		if !node.redeemCapabilityToken(fields["from"], contentCID, fields["field_token"]) {
-			return nil, fmt.Errorf("replica capability token does not match local promise")
+			node.record("capability_token_replay_rejected", "non_commitment", fields["from"], "pcid="+pcid.CASStorageV1+" consumed or unrecognized replica token for content_cid="+contentCID)
+			return map[string]string{
+				"field_promise_about": production.PromiseServeReplicaContent,
+				"field_content_cid":   contentCID,
+				"field_token_status":  "not_promised",
+			}, nil
 		}
 		node.mu.Lock()
 		contentBytes := append([]byte(nil), node.casStore[contentCID]...)
@@ -1541,6 +1652,8 @@ func (node *Node) handleCASStoragePromise(fields map[string]string) (map[string]
 		node.record("capability_token_expired", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" consumed replica token is expired after redemption")
 		node.record("capability_token_renewal_requested", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" Alice asks for fresh evidence if future retrieval is needed")
 		node.record("capability_token_renewed", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" Frank promises a fresh run-local token")
+		node.record("gc_promise_ended", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" replica serve-once token promise ended after redemption for content_cid="+contentCID)
+		node.record("gc_object_removed", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" consumed replica capability token removed from run-scoped store for content_cid="+contentCID)
 		node.record("replica_recovery_succeeded", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" content_cid="+contentCID)
 		node.record("cas_bytes_retrieved", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" replica content_cid="+contentCID)
 		return map[string]string{
@@ -1600,6 +1713,7 @@ func (node *Node) handleCIDComputePromise(fields map[string]string) (map[string]
 	case production.PromiseExecuteFunction:
 		if fields["field_capacity_probe"] == "true" {
 			node.record("economics_capacity_refused", "non_commitment", fields["from"], "pcid="+pcid.CIDComputeV1+" local compute capacity withheld for probe")
+			node.record("backpressure_capacity_refused", "non_commitment", fields["from"], "pcid="+pcid.CIDComputeV1+" receiver keeps spare capacity by not promising this probe")
 			return map[string]string{"field_promise_about": production.PromiseExecuteFunction, "field_compute_status": "capacity_refused"}, nil
 		}
 		functionBytes, inputBytes, contextBytes, err := decodeComputeInputs(fields)
@@ -1720,8 +1834,16 @@ func (node *Node) recordAckEvidence(target string, message parsedMessage) {
 			}
 		}
 	case production.PromiseServeContent:
+		if message.Fields["field_token_status"] == "not_promised" {
+			node.record("capability_token_replay_observed", "non_commitment", target, "pcid="+pcid.CASStorageV1+" content_cid="+message.Fields["field_content_cid"])
+			return
+		}
 		node.record("cas_bytes_retrieved", "kept", target, "pcid="+pcid.CASStorageV1+" content_cid="+message.Fields["field_content_cid"])
 	case production.PromiseServeReplicaContent:
+		if message.Fields["field_token_status"] == "not_promised" {
+			node.record("capability_token_replay_observed", "non_commitment", target, "pcid="+pcid.CASStorageV1+" replica content_cid="+message.Fields["field_content_cid"])
+			return
+		}
 		node.record("replica_recovery_succeeded", "kept", target, "pcid="+pcid.CASStorageV1+" content_cid="+message.Fields["field_content_cid"])
 	case production.PromiseLookupComputeCache:
 		if message.Fields["field_cache_status"] == "miss" {
@@ -1730,6 +1852,11 @@ func (node *Node) recordAckEvidence(target string, message parsedMessage) {
 		}
 		node.record("compute_cache_reused", "kept", target, "pcid="+pcid.CIDComputeV1+" cache_key="+message.Fields["field_cache_key"])
 		node.record("compute_result_received", "kept", target, "pcid="+pcid.CIDComputeV1+" cache result_cid="+message.Fields["field_result_cid"])
+	case production.PromiseUnsupportedVariantProbe:
+		if message.Fields["field_variant_status"] == "not_promised" {
+			node.record("promise_variant_not_promised", "non_commitment", target, "pcid="+pcid.CASStorageV1+" unsupported variant was not promised")
+			node.rememberNonCommitment(target, pcid.CASStorageV1, message.Fields, "ack field_variant_status not_promised")
+		}
 	case production.PromiseExecuteFunction:
 		if message.Fields["field_compute_status"] == "capacity_refused" {
 			node.record("economics_capacity_refused", "non_commitment", target, "pcid="+pcid.CIDComputeV1+" compute capacity probe refused")
@@ -1765,9 +1892,17 @@ func (node *Node) verifyComputeAckLocally(message parsedMessage, target string) 
 	badFields["field_result_cid"] = message.Fields["field_bad_result_cid"]
 	if err := verifyComputeResultFields(badFields); err == nil {
 		node.record("compute_result_locally_rejected", "malformed", target, "pcid="+pcid.CIDComputeV1+" bad-result probe unexpectedly verified")
+		// Intent: A peer that promises a semantically bad compute result creates
+		// local negative trust evidence even when the malformed bytes are only a
+		// probe inside an otherwise parseable response. Source: DI-sunuf
+		node.observeOutcome(target, relationship.OutcomeMalformed)
 		return nil
 	}
 	node.record("compute_result_locally_rejected", "malformed", target, "pcid="+pcid.CIDComputeV1+" local recompute rejected bad-result probe")
+	// Intent: Local recomputation is Alice's own evidence that the compute
+	// promiser exposed a malformed result candidate; this affects Alice's trust
+	// in that promiser rather than any global authority. Source: DI-sunuf
+	node.observeOutcome(target, relationship.OutcomeMalformed)
 	node.record("economics_payment_withheld", "non_commitment", target, "pcid="+pcid.CIDComputeV1+" Alice withholds payment for the bad-result probe")
 	return nil
 }
@@ -1835,6 +1970,46 @@ func copyStringMap(fields map[string]string) map[string]string {
 	return copiedFields
 }
 
+func copyMapOrEmpty(fields map[string]string) map[string]string {
+	copiedFields := make(map[string]string, len(fields))
+	for key, value := range fields {
+		copiedFields[key] = value
+	}
+	return copiedFields
+}
+
+func copyNestedMapOrEmpty(fields map[string]map[string]string) map[string]map[string]string {
+	copiedFields := make(map[string]map[string]string, len(fields))
+	for key, value := range fields {
+		copiedFields[key] = copyMapOrEmpty(value)
+	}
+	return copiedFields
+}
+
+func copyNonCommitmentMapOrEmpty(fields map[string]nonCommitmentRecord) map[string]nonCommitmentRecord {
+	copiedFields := make(map[string]nonCommitmentRecord, len(fields))
+	for key, value := range fields {
+		copiedFields[key] = value
+	}
+	return copiedFields
+}
+
+func copyCheckpointMapOrEmpty(fields map[string]checkpointRecord) map[string]checkpointRecord {
+	copiedFields := make(map[string]checkpointRecord, len(fields))
+	for key, value := range fields {
+		copiedFields[key] = value
+	}
+	return copiedFields
+}
+
+func copyPromiseMapOrEmpty(fields map[string]promiseRecord) map[string]promiseRecord {
+	copiedFields := make(map[string]promiseRecord, len(fields))
+	for key, value := range fields {
+		copiedFields[key] = value
+	}
+	return copiedFields
+}
+
 func (node *Node) issueCapabilityToken(issuee, contentCID string) string {
 	token := production.ContentCID([]byte(node.Agent.Name + "|" + issuee + "|" + contentCID + "|serve-once"))
 	node.mu.Lock()
@@ -1846,7 +2021,12 @@ func (node *Node) issueCapabilityToken(issuee, contentCID string) string {
 func (node *Node) redeemCapabilityToken(issuee, contentCID, token string) bool {
 	node.mu.Lock()
 	defer node.mu.Unlock()
-	return node.capabilityTokens[issuee+"|"+contentCID] == token
+	tokenKey := issuee + "|" + contentCID
+	if node.capabilityTokens[tokenKey] != token {
+		return false
+	}
+	delete(node.capabilityTokens, tokenKey)
+	return true
 }
 
 func (node *Node) observation(turnIndex int) decision.Observation {
@@ -2192,7 +2372,9 @@ func evidenceUpdatesTrust(fields map[string]string) bool {
 	if fields["field_variant_status"] == "not_promised" ||
 		fields["field_storage_status"] == "price_refused" ||
 		fields["field_compute_status"] == "capacity_refused" ||
-		fields["field_cache_status"] == "miss" {
+		fields["field_cache_status"] == "miss" ||
+		fields["field_token_status"] == "not_promised" ||
+		fields["field_replay_status"] == "not_promised" {
 		return false
 	}
 	return true
@@ -2512,6 +2694,191 @@ func (node *Node) closeFrameConn(frameConn transport.FrameConn, eventName, peerN
 
 func (node *Node) runDir() string {
 	return filepath.Join(node.Config.RunRoot, node.Config.RunID)
+}
+
+func (node *Node) runScopedStatePath() string {
+	return filepath.Join(node.runDir(), "stores", node.Agent.Name, "durable-state.json")
+}
+
+// loadRunScopedState restores app-local state that belongs to this one POC13
+// run. Intent: A process restart inside a run should not erase CAS bytes,
+// compute checkpoints, replay windows, or promise journals, but the clean-run
+// reset can still delete the entire run root before the next experiment. Source:
+// DI-sunuf
+func (node *Node) loadRunScopedState() error {
+	statePath := node.runScopedStatePath()
+	stateBytes, readErr := os.ReadFile(statePath)
+	if readErr != nil {
+		if errors.Is(readErr, os.ErrNotExist) {
+			node.record("run_scoped_store_empty", "kept", "", "no run-scoped durable state exists yet for "+node.Agent.Name)
+			return nil
+		}
+		return readErr
+	}
+	var state runScopedState
+	if unmarshalErr := json.Unmarshal(stateBytes, &state); unmarshalErr != nil {
+		return unmarshalErr
+	}
+	casObjects := make(map[string][]byte, len(state.CASObjects))
+	for contentCID, encodedBytes := range state.CASObjects {
+		contentBytes, decodeErr := base64.StdEncoding.DecodeString(encodedBytes)
+		if decodeErr != nil {
+			return fmt.Errorf("decode run-scoped CAS object %s: %w", contentCID, decodeErr)
+		}
+		casObjects[contentCID] = contentBytes
+	}
+	node.mu.Lock()
+	node.casStore = casObjects
+	node.capabilityTokens = copyMapOrEmpty(state.CapabilityTokens)
+	node.computeCache = copyNestedMapOrEmpty(state.ComputeCache)
+	node.nonCommitmentJournal = copyNonCommitmentMapOrEmpty(state.NonCommitmentJournal)
+	node.checkpointJournal = copyCheckpointMapOrEmpty(state.CheckpointJournal)
+	node.promiseJournal = copyPromiseMapOrEmpty(state.PromiseJournal)
+	node.replayJournal = copyMapOrEmpty(state.ReplayJournal)
+	node.mu.Unlock()
+	node.record("run_scoped_store_loaded", "kept", "", fmt.Sprintf("cas=%d tokens=%d compute=%d checkpoints=%d promises=%d replay=%d", len(casObjects), len(state.CapabilityTokens), len(state.ComputeCache), len(state.CheckpointJournal), len(state.PromiseJournal), len(state.ReplayJournal)))
+	node.record("cas_run_store_loaded", "kept", "", fmt.Sprintf("cas_objects=%d", len(casObjects)))
+	node.record("evidence_run_store_loaded", "kept", "", fmt.Sprintf("promise_journal=%d checkpoint_journal=%d non_commitments=%d replay=%d", len(state.PromiseJournal), len(state.CheckpointJournal), len(state.NonCommitmentJournal), len(state.ReplayJournal)))
+	node.record("compute_cache_run_store_loaded", "kept", "", fmt.Sprintf("compute_cache=%d", len(state.ComputeCache)))
+	return nil
+}
+
+// saveRunScopedState writes restartable run state through a temporary file and
+// rename. Intent: Partial writes should not corrupt the app's local evidence if
+// a process is killed mid-save, and the saved state remains scoped to this run
+// root rather than becoming cross-run truth. Source: DI-sunuf
+func (node *Node) saveRunScopedState() error {
+	state := node.exportRunScopedState()
+	statePath := node.runScopedStatePath()
+	if err := os.MkdirAll(filepath.Dir(statePath), 0o755); err != nil {
+		return err
+	}
+	stateBytes, marshalErr := json.MarshalIndent(state, "", "  ")
+	if marshalErr != nil {
+		return marshalErr
+	}
+	tempPath := statePath + ".tmp"
+	if err := os.WriteFile(tempPath, append(stateBytes, '\n'), 0o644); err != nil {
+		return err
+	}
+	if err := os.Rename(tempPath, statePath); err != nil {
+		return err
+	}
+	node.record("run_scoped_store_saved", "kept", "", fmt.Sprintf("cas=%d tokens=%d compute=%d checkpoints=%d promises=%d replay=%d", len(state.CASObjects), len(state.CapabilityTokens), len(state.ComputeCache), len(state.CheckpointJournal), len(state.PromiseJournal), len(state.ReplayJournal)))
+	node.record("cas_run_store_saved", "kept", "", fmt.Sprintf("cas_objects=%d", len(state.CASObjects)))
+	node.record("evidence_run_store_saved", "kept", "", fmt.Sprintf("promise_journal=%d checkpoint_journal=%d non_commitments=%d replay=%d", len(state.PromiseJournal), len(state.CheckpointJournal), len(state.NonCommitmentJournal), len(state.ReplayJournal)))
+	node.record("compute_cache_run_store_saved", "kept", "", fmt.Sprintf("compute_cache=%d", len(state.ComputeCache)))
+	return nil
+}
+
+func (node *Node) exportRunScopedState() runScopedState {
+	node.mu.Lock()
+	defer node.mu.Unlock()
+	casObjects := make(map[string]string, len(node.casStore))
+	for contentCID, contentBytes := range node.casStore {
+		casObjects[contentCID] = base64.StdEncoding.EncodeToString(contentBytes)
+	}
+	return runScopedState{
+		Version:              1,
+		CASObjects:           casObjects,
+		CapabilityTokens:     copyMapOrEmpty(node.capabilityTokens),
+		ComputeCache:         copyNestedMapOrEmpty(node.computeCache),
+		NonCommitmentJournal: copyNonCommitmentMapOrEmpty(node.nonCommitmentJournal),
+		CheckpointJournal:    copyCheckpointMapOrEmpty(node.checkpointJournal),
+		PromiseJournal:       copyPromiseMapOrEmpty(node.promiseJournal),
+		ReplayJournal:        copyMapOrEmpty(node.replayJournal),
+	}
+}
+
+// recordRunScopedRetentionAndGC records retention and deletion as local promise
+// evidence. Intent: GC and backpressure are not central policy; each agent
+// promises how it will keep, remove, or decline local objects under run-end,
+// token-expiry, disk-pressure, and superseded-checkpoint conditions. Source:
+// DI-sunuf
+func (node *Node) recordRunScopedRetentionAndGC() {
+	state := node.exportRunScopedState()
+	node.record("retention_promise_recorded", "kept", "", "run-scoped CAS, compute, token, replay, and journal state is retained only for this POC13 run")
+	node.record("retention_until_promised", "kept", "", "retain_until=run_end_or_clean_reset")
+	node.record("delete_after_promised", "kept", "", "delete_after=operator clean-run reset or explicit local GC promise condition")
+	node.record("token_expiry_gc_promised", "kept", "", "serve-once capability tokens expire on redemption or run reset")
+	node.record("disk_pressure_gc_promised", "kept", "", "local agent may remove retained objects before accepting new storage if disk pressure exceeds local promise budget")
+	node.record("superseded_checkpoint_gc_promised", "kept", "", fmt.Sprintf("superseded checkpoints may be compacted locally checkpoint_count=%d", len(state.CheckpointJournal)))
+	node.record("gc_object_retained", "kept", "", fmt.Sprintf("cas=%d tokens=%d compute=%d checkpoints=%d promises=%d replay=%d", len(state.CASObjects), len(state.CapabilityTokens), len(state.ComputeCache), len(state.CheckpointJournal), len(state.PromiseJournal), len(state.ReplayJournal)))
+}
+
+func (node *Node) recordRetentionPromiseBroken(subject, detail string) {
+	node.record("retention_promise_broken", "broken", subject, detail)
+}
+
+// rememberReplayEnvelope keeps a local exact-byte replay window for received
+// envelopes. Intent: Replays are not commands to punish a peer globally; they are
+// local evidence that the same exact promise bytes should not be counted as fresh
+// promise evidence again. Source: DI-sunuf
+func (node *Node) rememberReplayEnvelope(peerName, protocolName, exactHash string) bool {
+	node.recordReplayWindowPromise(protocolName)
+	node.mu.Lock()
+	priorEvidence, replayed := node.replayJournal[exactHash]
+	if !replayed {
+		node.replayJournal[exactHash] = peerName + "|" + protocolName
+	}
+	node.mu.Unlock()
+	if replayed {
+		node.record("replay_envelope_rejected", "non_commitment", peerName, "pcid="+protocolName+" exact_sha256="+exactHash+" prior="+priorEvidence)
+		return true
+	}
+	node.record("replay_envelope_recorded", "kept", peerName, "pcid="+protocolName+" exact_sha256="+exactHash)
+	return false
+}
+
+func (node *Node) recordReplayWindowPromise(protocolName string) {
+	key := checkpointKey("run-replay-window", protocolName, node.Agent.Name)
+	if node.rememberCheckpoint(checkpointRecord{
+		Key:          key,
+		ProtocolName: protocolName,
+		PromiseAbout: "run_replay_window",
+		Subject:      node.Agent.Name,
+		Detail:       "exact-envelope replay window scoped to one POC13 run",
+	}) {
+		return
+	}
+	node.record("replay_window_promised", "kept", "", "pcid="+protocolName+" exact envelope hashes are remembered only inside this run")
+}
+
+// recordOutboundPressurePromises records sender-side rate promises before bytes
+// leave the app. Intent: A sender voluntarily bounds its own pressure instead of
+// treating a peer or kernel as something it can command. Source: DI-sunuf
+func (node *Node) recordOutboundPressurePromises(target, protocolName string, fields map[string]string) {
+	key := checkpointKey("outbound-pressure", protocolName, target, fields["field_promise_about"])
+	if node.rememberCheckpoint(checkpointRecord{
+		Key:          key,
+		ProtocolName: protocolName,
+		PromiseAbout: fields["field_promise_about"],
+		Subject:      target,
+		Detail:       "sender-side pressure promise",
+	}) {
+		return
+	}
+	node.record("send_rate_promised", "kept", target, "pcid="+protocolName+" sender promises bounded sends for promise_about="+fields["field_promise_about"])
+	node.record("rate_limit_self_promise_recorded", "kept", target, "pcid="+protocolName+" sender keeps rate limiting as a self-promise, not receiver control")
+}
+
+// recordInboundPressurePromises records receiver-side capacity promises after the
+// app has decided it currently accepts this peer. Intent: Receive capacity is
+// the receiver's local promise boundary, not permission granted by any external
+// authority. Source: DI-sunuf
+func (node *Node) recordInboundPressurePromises(peerName, protocolName string, fields map[string]string) {
+	key := checkpointKey("inbound-pressure", protocolName, peerName, fields["field_promise_about"])
+	if node.rememberCheckpoint(checkpointRecord{
+		Key:          key,
+		ProtocolName: protocolName,
+		PromiseAbout: fields["field_promise_about"],
+		Subject:      peerName,
+		Detail:       "receiver-side pressure promise",
+	}) {
+		return
+	}
+	node.record("backpressure_capacity_promised", "kept", peerName, "pcid="+protocolName+" receiver promises only bounded capacity for promise_about="+fields["field_promise_about"])
+	node.record("accept_rate_promised", "kept", peerName, "pcid="+protocolName+" receiver promises only bounded accept rate for this peer/protocol")
 }
 
 // relationshipStatePath is the durable local memory file for this agent's

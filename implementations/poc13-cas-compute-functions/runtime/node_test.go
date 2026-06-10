@@ -2,6 +2,7 @@ package runtime
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/hex"
 	"errors"
 	"os"
@@ -419,8 +420,8 @@ func TestFulfillmentStartupWorkflowStepsUseDeterministicHandlers(t *testing.T) {
 func TestDuplicateAccountingUpdateDoesNotRepeatTrust(t *testing.T) {
 	cfg := shippingTestConfig(t)
 	accounting := NewNode(cfg, cfg.Agents[4], &decision.FakeDecider{}, decision.FakeMonitor{})
-	frameBytes := signedAccountingUpdateFrame(t, accounting)
 	for attempt := 0; attempt < 2; attempt++ {
+		frameBytes := signedAccountingUpdateFrame(t, accounting, "semantic-duplicate-"+strconv.Itoa(attempt+1))
 		ackBytes, err := accounting.handleFrame(frameBytes)
 		if err != nil {
 			t.Fatalf("handle accounting update attempt %d: %v", attempt+1, err)
@@ -449,8 +450,194 @@ func TestDuplicateAccountingUpdateDoesNotRepeatTrust(t *testing.T) {
 	if countEvents(accounting.events, "accounting_update_duplicate") != 1 {
 		t.Fatalf("duplicate accounting update should be recorded once: %#v", accounting.events)
 	}
-	if len(accounting.checkpointJournal) != 1 {
-		t.Fatalf("accounting checkpoint journal length = %d, want 1", len(accounting.checkpointJournal))
+	if len(accounting.checkpointJournal) == 0 {
+		t.Fatalf("accounting checkpoint journal should contain semantic duplicate evidence")
+	}
+}
+
+func TestExactEnvelopeReplayRejectedWithoutTrustGain(t *testing.T) {
+	cfg := shippingTestConfig(t)
+	accounting := NewNode(cfg, cfg.Agents[4], &decision.FakeDecider{}, decision.FakeMonitor{})
+	frameBytes := signedAccountingUpdateFrame(t, accounting, "exact-replay")
+	if _, err := accounting.handleFrame(frameBytes); err != nil {
+		t.Fatalf("first accounting frame should be accepted: %v", err)
+	}
+	ackBytes, err := accounting.handleFrame(frameBytes)
+	if err != nil {
+		t.Fatalf("exact replay should return non-commitment ACK, not a transport error: %v", err)
+	}
+	ackEnvelope, parseErr := protocol.ParseEnvelope(ackBytes)
+	if parseErr != nil {
+		t.Fatalf("parse replay ack: %v", parseErr)
+	}
+	ackFields, fieldsErr := ackEnvelope.PayloadFields()
+	if fieldsErr != nil {
+		t.Fatalf("parse replay ack fields: %v", fieldsErr)
+	}
+	if ackFields["field_replay_status"] != "not_promised" {
+		t.Fatalf("replay ack fields = %#v, want field_replay_status=not_promised", ackFields)
+	}
+	if accounting.ledger.Trust("fulfillment") != 1 {
+		t.Fatalf("exact replay trust = %d, want first-message-only trust 1", accounting.ledger.Trust("fulfillment"))
+	}
+	if !hasEventOutcome(accounting.events, "replay_envelope_rejected", "non_commitment") {
+		t.Fatalf("exact replay rejection should be local non-commitment evidence: %#v", accounting.events)
+	}
+}
+
+func TestRunScopedStatePersistsWithinRun(t *testing.T) {
+	cfg := twoNodeTestConfig(t)
+	bob := NewNode(cfg, cfg.Agents[1], &decision.FakeDecider{}, decision.FakeMonitor{})
+	contentBytes := production.SampleContentBytes()
+	contentCID := production.ContentCID(contentBytes)
+	bob.casStore[contentCID] = contentBytes
+	bob.capabilityTokens["alice|"+contentCID] = "token-1"
+	bob.computeCache["compute-1"] = map[string]string{"field_result_cid": "result-1"}
+	bob.nonCommitmentJournal["nc-1"] = nonCommitmentRecord{Key: "nc-1", Peer: "alice", ProtocolName: pcid.CASStorageV1, PromiseAbout: production.PromiseStoreContent}
+	bob.checkpointJournal["cp-1"] = checkpointRecord{Key: "cp-1", ProtocolName: pcid.CASStorageV1, PromiseAbout: production.PromiseStoreContent}
+	bob.promiseJournal["pr-1"] = promiseRecord{Key: "pr-1", Peer: "alice", ProtocolName: pcid.CASStorageV1, Status: promiseStatusOutstanding}
+	bob.replayJournal["hash-1"] = "alice|" + pcid.CASStorageV1
+	if err := bob.saveRunScopedState(); err != nil {
+		t.Fatalf("save run-scoped state: %v", err)
+	}
+
+	reloadedBob := NewNode(cfg, cfg.Agents[1], &decision.FakeDecider{}, decision.FakeMonitor{})
+	if err := reloadedBob.loadRunScopedState(); err != nil {
+		t.Fatalf("load run-scoped state: %v", err)
+	}
+	if string(reloadedBob.casStore[contentCID]) != string(contentBytes) {
+		t.Fatalf("reloaded CAS object mismatch")
+	}
+	if reloadedBob.capabilityTokens["alice|"+contentCID] != "token-1" {
+		t.Fatalf("reloaded capability token mismatch: %#v", reloadedBob.capabilityTokens)
+	}
+	if reloadedBob.computeCache["compute-1"]["field_result_cid"] != "result-1" {
+		t.Fatalf("reloaded compute cache mismatch: %#v", reloadedBob.computeCache)
+	}
+	if reloadedBob.promiseJournal["pr-1"].Status != promiseStatusOutstanding || reloadedBob.replayJournal["hash-1"] == "" {
+		t.Fatalf("reloaded journals mismatch promises=%#v replay=%#v", reloadedBob.promiseJournal, reloadedBob.replayJournal)
+	}
+	if !hasEvent(reloadedBob.events, "run_scoped_store_loaded") {
+		t.Fatalf("load should record run-scoped store evidence: %#v", reloadedBob.events)
+	}
+}
+
+func TestCapabilityTokenReplayReturnsNonCommitmentEvidence(t *testing.T) {
+	cfg := twoNodeTestConfig(t)
+	bob := NewNode(cfg, cfg.Agents[1], &decision.FakeDecider{}, decision.FakeMonitor{})
+	contentBytes := production.SampleContentBytes()
+	contentCID := production.ContentCID(contentBytes)
+	storeAck, storeErr := bob.handleCASStoragePromise(map[string]string{
+		"from":                "alice",
+		"field_promise_about": production.PromiseStoreContent,
+		"field_content_cid":   contentCID,
+		"field_content_b64":   base64.StdEncoding.EncodeToString(contentBytes),
+		"field_credit_offer":  "4",
+		"field_units":         "1",
+	})
+	if storeErr != nil {
+		t.Fatalf("store content: %v", storeErr)
+	}
+	token := storeAck["field_capability_token"]
+	if _, serveErr := bob.handleCASStoragePromise(map[string]string{
+		"from":                "alice",
+		"field_promise_about": production.PromiseServeContent,
+		"field_content_cid":   contentCID,
+		"field_token":         token,
+	}); serveErr != nil {
+		t.Fatalf("serve content: %v", serveErr)
+	}
+	replayAck, replayErr := bob.handleCASStoragePromise(map[string]string{
+		"from":                "alice",
+		"field_promise_about": production.PromiseServeContent,
+		"field_content_cid":   contentCID,
+		"field_token":         token,
+	})
+	if replayErr != nil {
+		t.Fatalf("token replay should be non-commitment evidence, not handler error: %v", replayErr)
+	}
+	if replayAck["field_token_status"] != "not_promised" {
+		t.Fatalf("replay ack = %#v, want token_status=not_promised", replayAck)
+	}
+	if !hasEventOutcome(bob.events, "capability_token_replay_rejected", "non_commitment") {
+		t.Fatalf("token replay should be recorded as local non-commitment: %#v", bob.events)
+	}
+	if !hasEvent(bob.events, "gc_object_removed") || !hasEvent(bob.events, "gc_promise_ended") {
+		t.Fatalf("token redemption should record GC evidence: %#v", bob.events)
+	}
+}
+
+func TestRetentionPromiseBrokenRecordsLocalEvidence(t *testing.T) {
+	cfg := singleNodeTestConfig(t)
+	alice := NewNode(cfg, cfg.Agents[0], &decision.FakeDecider{}, decision.FakeMonitor{})
+	alice.recordRetentionPromiseBroken("alice", "test retention miss after simulated crash")
+	if !hasEventOutcome(alice.events, "retention_promise_broken", "broken") {
+		t.Fatalf("retention break case should be explicit local evidence: %#v", alice.events)
+	}
+}
+
+func TestBadResultProbeReducesComputePromiserTrust(t *testing.T) {
+	// Intent: Alice's own recomputation evidence should reduce trust in the
+	// compute promiser and leave a still-trusted alternate compute peer usable for
+	// follow-up work. Source: DI-vahan
+	cfg := computeRoutingTestConfig(t)
+	alice := NewNode(cfg, cfg.Agents[0], &decision.FakeDecider{}, decision.FakeMonitor{})
+	message := parsedMessage{Fields: computeAckFields(t)}
+	if err := alice.verifyComputeAckLocally(message, "carol"); err != nil {
+		t.Fatalf("verify compute ack locally: %v", err)
+	}
+	if alice.ledger.Trust("carol") != -3 {
+		t.Fatalf("carol trust = %d, want -3 after malformed bad-result evidence", alice.ledger.Trust("carol"))
+	}
+	if alice.canDial("carol") {
+		t.Fatalf("Alice should stop promising direct sends to Carol after malformed compute evidence")
+	}
+	if !alice.canDial("dave") {
+		t.Fatalf("Alice should still be able to use Dave as the alternate compute peer")
+	}
+	if !hasEventOutcome(alice.events, "compute_result_locally_rejected", "malformed") {
+		t.Fatalf("local bad-result rejection should be recorded: %#v", alice.events)
+	}
+}
+
+func TestMalformedProofEvidenceReducesIdentifiedPromiserTrust(t *testing.T) {
+	// Intent: A parseable envelope with a stale proof should be attributed to the
+	// claimed promiser as local malformed evidence, not counted as random
+	// transport noise. Source: DI-sunuf
+	cfg := computeRoutingTestConfig(t)
+	grace := NewNode(cfg, cfg.Agents[2], &decision.FakeDecider{}, decision.FakeMonitor{})
+	fields := map[string]string{
+		"act":                 decision.ActPromise,
+		"from":                "mallory",
+		"to":                  "grace",
+		"turn":                "test",
+		"promise":             "Mallory promises this parseable but mutated proof is valid.",
+		"reason":              "test bad proof attribution",
+		"field_promise_about": production.PromisePresentStorageEvidence,
+	}
+	envelope, envelopeErr := protocol.NewEnvelope(grace.Protocols.MustCID(pcid.CASStorageV1), fields, "mallory")
+	if envelopeErr != nil {
+		t.Fatalf("new envelope: %v", envelopeErr)
+	}
+	mutatedFields := copyStringMap(fields)
+	mutatedFields["reason"] = "payload changed after signing"
+	mutatedPayload, payloadErr := protocol.MarshalStringMap(mutatedFields)
+	if payloadErr != nil {
+		t.Fatalf("marshal mutated payload: %v", payloadErr)
+	}
+	envelope.Payload = mutatedPayload
+	envelopeBytes, bytesErr := envelope.Bytes()
+	if bytesErr != nil {
+		t.Fatalf("envelope bytes: %v", bytesErr)
+	}
+	if _, err := grace.handleFrame(envelopeBytes); err == nil {
+		t.Fatalf("mutated payload under stale proof should be rejected")
+	}
+	if grace.ledger.Trust("mallory") != -3 {
+		t.Fatalf("mallory trust = %d, want -3 after bad proof", grace.ledger.Trust("mallory"))
+	}
+	if !hasEventOutcome(grace.events, "malformed_proof_observed", "malformed") {
+		t.Fatalf("bad proof should be attributed as malformed evidence: %#v", grace.events)
 	}
 }
 
@@ -603,6 +790,88 @@ func twoNodeTestConfig(t *testing.T) config.Config {
 	}
 }
 
+func computeRoutingTestConfig(t *testing.T) config.Config {
+	t.Helper()
+	// Intent: Keep compute-route tests deterministic without opening sockets:
+	// Alice begins with Carol and Dave as direct peers, while Grace/Mallory let
+	// malformed-proof attribution run through the same local ledger code.
+	// Source: DI-vahan; DI-sunuf
+	return config.Config{
+		RunID:                 "compute-routing-test",
+		RunRoot:               filepath.Join(t.TempDir(), "run"),
+		ListenPort:            0,
+		ProviderBaseURL:       "https://example.invalid/v1/responses",
+		APIKeyEnv:             "OPENAI_API_KEY",
+		AgentModel:            "model",
+		MonitorModel:          "model",
+		ReasoningEffort:       "medium",
+		ServiceTier:           "default",
+		RequestTimeoutSeconds: 1,
+		StartupDelayMillis:    1,
+		TurnDelayMillis:       1,
+		MaxTurns:              1,
+		MaxAgentCalls:         1,
+		MaxMonitorCalls:       1,
+		MonitorNode:           "alice",
+		StrongTrustThreshold:  2,
+		WeakTrustThreshold:    -2,
+		TrustDecayPerRound:    0,
+		Agents: []config.AgentConfig{{
+			Name:           "alice",
+			Persona:        "tester",
+			Motivation:     "test",
+			InitialPeers:   []string{"carol", "dave"},
+			CandidatePeers: []string{"carol", "dave"},
+			SupportedPCIDs: []string{pcid.RelationshipV1, pcid.CIDComputeV1, pcid.CASStorageV1},
+			Budget:         5,
+			Capacity:       5,
+		}, {
+			Name:           "carol",
+			Persona:        "compute",
+			Motivation:     "test",
+			InitialPeers:   []string{"alice"},
+			CandidatePeers: []string{"alice"},
+			SupportedPCIDs: []string{pcid.RelationshipV1, pcid.CIDComputeV1},
+			Budget:         5,
+			Capacity:       5,
+		}, {
+			Name:           "grace",
+			Persona:        "receiver",
+			Motivation:     "test",
+			InitialPeers:   []string{"mallory"},
+			CandidatePeers: []string{"mallory"},
+			SupportedPCIDs: []string{pcid.RelationshipV1, pcid.CASStorageV1},
+			Budget:         5,
+			Capacity:       5,
+		}, {
+			Name:           "dave",
+			Persona:        "compute verifier",
+			Motivation:     "test",
+			InitialPeers:   []string{"alice"},
+			CandidatePeers: []string{"alice"},
+			SupportedPCIDs: []string{pcid.RelationshipV1, pcid.CIDComputeV1},
+			Budget:         5,
+			Capacity:       5,
+		}, {
+			Name:           "mallory",
+			Persona:        "adversary",
+			Motivation:     "test",
+			InitialPeers:   []string{"grace"},
+			CandidatePeers: []string{"grace"},
+			SupportedPCIDs: []string{pcid.RelationshipV1, pcid.CASStorageV1},
+			Budget:         5,
+			Capacity:       5,
+		}},
+		Containers: []config.ContainerConfig{
+			{Name: "alice", Agents: []string{"alice"}},
+			{Name: "carol", Agents: []string{"carol"}},
+			{Name: "grace", Agents: []string{"grace"}},
+			{Name: "dave", Agents: []string{"dave"}},
+			{Name: "mallory", Agents: []string{"mallory"}},
+		},
+	}
+}
+
 func shippingTestConfig(t *testing.T) config.Config {
 	t.Helper()
 	return config.Config{
@@ -703,7 +972,7 @@ func (failingMonitor) Evaluate(_ context.Context, _ []decision.Event) (decision.
 	return decision.MonitorReport{}, errors.New("monitor provider unavailable")
 }
 
-func signedAccountingUpdateFrame(t *testing.T, node *Node) []byte {
+func signedAccountingUpdateFrame(t *testing.T, node *Node, exchangeID string) []byte {
 	t.Helper()
 	envelope, err := protocol.NewEnvelope(node.Protocols.MustCID(pcid.AccountingV1), map[string]string{
 		"act":                   decision.ActPromise,
@@ -712,6 +981,7 @@ func signedAccountingUpdateFrame(t *testing.T, node *Node) []byte {
 		"turn":                  "test",
 		"promise":               "I promise to receive accounting's shipment checkpoint evidence for this order and tracking number.",
 		"reason":                "duplicate checkpoint regression test",
+		"field_exchange_id":     exchangeID,
 		"field_promise_about":   production.PromiseShipmentUpdate,
 		"field_order_id":        fulfillmentOrderID,
 		"field_tracking_number": "1Z999AA10123456784",
@@ -725,6 +995,33 @@ func signedAccountingUpdateFrame(t *testing.T, node *Node) []byte {
 		t.Fatalf("accounting update envelope bytes: %v", err)
 	}
 	return frameBytes
+}
+
+func computeAckFields(t *testing.T) map[string]string {
+	t.Helper()
+	functionBytes := production.SampleFunctionBytes()
+	inputBytes := production.SampleInputBytes()
+	contextBytes := production.SampleContextBytes()
+	resultBytes, executeErr := production.ExecuteFunction(functionBytes, inputBytes, contextBytes)
+	if executeErr != nil {
+		t.Fatalf("execute sample function: %v", executeErr)
+	}
+	badResultBytes := production.BadComputeResultBytes(resultBytes)
+	return map[string]string{
+		"field_promise_about": production.PromiseExecuteFunction,
+		"field_function_cid":  production.ContentCID(functionBytes),
+		"field_function_b64":  base64.StdEncoding.EncodeToString(functionBytes),
+		"field_input_cid":     production.ContentCID(inputBytes),
+		"field_input_b64":     base64.StdEncoding.EncodeToString(inputBytes),
+		"field_context_cid":   production.ContentCID(contextBytes),
+		"field_context_b64":   base64.StdEncoding.EncodeToString(contextBytes),
+		"field_result_cid":    production.ContentCID(resultBytes),
+		"field_result_b64":    base64.StdEncoding.EncodeToString(resultBytes),
+		"field_bad_result_cid": production.ContentCID(
+			badResultBytes,
+		),
+		"field_bad_result_b64": base64.StdEncoding.EncodeToString(badResultBytes),
+	}
 }
 
 func hasEvent(events []decision.Event, eventName string) bool {

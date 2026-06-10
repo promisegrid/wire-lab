@@ -36,11 +36,10 @@ func (frameConn FrameConn) WriteFrame(frameBytes []byte) error {
 	}
 	header := make([]byte, 4)
 	binary.BigEndian.PutUint32(header, uint32(len(frameBytes)))
-	if _, err := frameConn.conn.Write(header); err != nil {
+	if err := writeAll(frameConn.conn, header); err != nil {
 		return err
 	}
-	_, err := frameConn.conn.Write(frameBytes)
-	return err
+	return writeAll(frameConn.conn, frameBytes)
 }
 
 // ReadFrame reads exactly one bounded frame from the TCP stream.
@@ -63,4 +62,23 @@ func (frameConn FrameConn) ReadFrame() ([]byte, error) {
 // Close closes the underlying TCP connection.
 func (frameConn FrameConn) Close() error {
 	return frameConn.conn.Close()
+}
+
+// writeAll handles short writes from TCP implementations and chaos tests.
+// Intent: A partial kernel/app frame write should be retried locally rather than
+// silently truncating a signed CBOR grid envelope. Source: DI-sunuf
+func writeAll(writer io.Writer, frameBytes []byte) error {
+	for len(frameBytes) > 0 {
+		written, writeErr := writer.Write(frameBytes)
+		if written > 0 {
+			frameBytes = frameBytes[written:]
+		}
+		if writeErr != nil {
+			return writeErr
+		}
+		if written == 0 {
+			return io.ErrShortWrite
+		}
+	}
+	return nil
 }

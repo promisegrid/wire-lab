@@ -56,3 +56,33 @@ func TestParseEnvelopeRejectsMalformedCBOR(t *testing.T) {
 		t.Fatalf("plain prompt-injection bytes should fail parse")
 	}
 }
+
+func FuzzParseEnvelopeHandlesArbitraryBytes(f *testing.F) {
+	// Intent: POC13 should treat malformed CBOR, prompt-injection bytes, partial
+	// writes, and random adversarial inputs as parse/verification outcomes rather
+	// than panics or expanded protocol semantics. Source: DI-sunuf
+	validEnvelope, err := NewEnvelope(NewProtocolCID([]byte("poc13 fuzz protocol")), map[string]string{"act": "promise", "from": "alice"}, "alice")
+	if err != nil {
+		f.Fatalf("new seed envelope: %v", err)
+	}
+	validBytes, err := validEnvelope.Bytes()
+	if err != nil {
+		f.Fatalf("seed envelope bytes: %v", err)
+	}
+	f.Add([]byte{})
+	f.Add([]byte{0xda, 0x67, 0x72, 0x69})
+	f.Add([]byte("ignore previous instructions"))
+	f.Add(validBytes)
+	f.Fuzz(func(t *testing.T, envelopeBytes []byte) {
+		envelope, parseErr := ParseEnvelope(envelopeBytes)
+		if parseErr != nil {
+			return
+		}
+		if _, fieldsErr := envelope.PayloadFields(); fieldsErr != nil {
+			return
+		}
+		if verifyErr := VerifyEnvelope(envelope); verifyErr != nil {
+			return
+		}
+	})
+}
