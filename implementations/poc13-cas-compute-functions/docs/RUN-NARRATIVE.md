@@ -9,6 +9,10 @@ original POC13 CAS/compute work. Source: `DI-sinur`.
    the local container kernel. The kernel records only operational delivery
    evidence; each app owns trust, economics, workflow, and keep/break judgment.
 2. Alice performs CAS storage pressure:
+   - Alice first runs a dynamic TCP topology probe against fulfillment: local
+     broken-promise evidence removes direct reachability, an ordinary promise is
+     blocked before kernel send, repair evidence restores direct reachability,
+     and a later `relationship_v1` promise crosses the real app/kernel path.
    - Alice offers Bob too little credit for `store_content`.
    - Bob records `economics_price_refused` as local non-commitment evidence.
    - Alice offers enough credit; Bob stores exact bytes, issues a serve token,
@@ -51,7 +55,27 @@ original POC13 CAS/compute work. Source: `DI-sinur`.
 - POC13 CAS storage, replica, token lifecycle, corrupt-byte, compute, cache,
   verifier disagreement, bad-proof, unknown-pCID, key-rotation, economics, and
   local-trust evidence.
+- `DI-fijov` trust-caution behavior: malformed/broken evidence records recovery
+  caution, ordinary kept evidence is delayed while caution remains, and
+  future-only repair promises do not immediately restore trust.
+- Dynamic topology behavior: removed direct relationships block ordinary
+  sends, and restored relationships carry actual kernel-routed messages again.
 - Empty resource/trust coupling counts.
 - No obvious RPC drift terms in event names or event details.
 
 POC13 remains provisional executable evidence, not a stable PromiseGrid API.
+
+## Latest Clean Run: `poc13-demo`
+
+The 2026-06-11 hardened clean run passed and produced 1,948 events. Analyzer
+scoring was 5/5 across all deterministic dimensions, including trust-caution
+and dynamic-topology gates. The run recorded 64 non-commitment outcomes,
+3 `trust_caution_recorded`, 4 `trust_caution_consumed`, 1
+`trust_recovery_delayed`, 1 `trust_repair_future_only`, and one full dynamic
+topology sequence: probe started, send blocked, send succeeded after repair.
+The observer-only monitor scored autonomy 5 and scored promise-theory fit,
+protocol validity, local-trust correctness, and imposition avoidance at 4. The
+remaining production-fitness blockers are protocol cleanliness around
+adversarial pressure, shutdown coordination, and evidence/log clarity, not
+missing POC13 regression coverage.
+Source: `DI-sihuz`.

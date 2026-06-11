@@ -52,14 +52,15 @@ type Node struct {
 	budget    int
 	capacity  int
 
-	nonCommitmentJournal map[string]nonCommitmentRecord
-	checkpointJournal    map[string]checkpointRecord
-	promiseJournal       map[string]promiseRecord
-	casStore             map[string][]byte
-	capabilityTokens     map[string]string
-	computeCache         map[string]map[string]string
-	replayJournal        map[string]string
-	exchangeCounter      int
+	nonCommitmentJournal  map[string]nonCommitmentRecord
+	checkpointJournal     map[string]checkpointRecord
+	promiseJournal        map[string]promiseRecord
+	evidenceOutcomeCounts map[string]int
+	casStore              map[string][]byte
+	capabilityTokens      map[string]string
+	computeCache          map[string]map[string]string
+	replayJournal         map[string]string
+	exchangeCounter       int
 
 	activeHandlers sync.WaitGroup
 	receiveConns   []transport.FrameConn
@@ -139,14 +140,15 @@ type checkpointRecord struct {
 // clean-run reset remains the boundary that prevents stale state from muddying
 // the next POC13 run. Source: DI-sunuf
 type runScopedState struct {
-	Version              int                            `json:"version"`
-	CASObjects           map[string]string              `json:"cas_objects_b64,omitempty"`
-	CapabilityTokens     map[string]string              `json:"capability_tokens,omitempty"`
-	ComputeCache         map[string]map[string]string   `json:"compute_cache,omitempty"`
-	NonCommitmentJournal map[string]nonCommitmentRecord `json:"non_commitment_journal,omitempty"`
-	CheckpointJournal    map[string]checkpointRecord    `json:"checkpoint_journal,omitempty"`
-	PromiseJournal       map[string]promiseRecord       `json:"promise_journal,omitempty"`
-	ReplayJournal        map[string]string              `json:"replay_journal,omitempty"`
+	Version               int                            `json:"version"`
+	CASObjects            map[string]string              `json:"cas_objects_b64,omitempty"`
+	CapabilityTokens      map[string]string              `json:"capability_tokens,omitempty"`
+	ComputeCache          map[string]map[string]string   `json:"compute_cache,omitempty"`
+	NonCommitmentJournal  map[string]nonCommitmentRecord `json:"non_commitment_journal,omitempty"`
+	CheckpointJournal     map[string]checkpointRecord    `json:"checkpoint_journal,omitempty"`
+	PromiseJournal        map[string]promiseRecord       `json:"promise_journal,omitempty"`
+	EvidenceOutcomeCounts map[string]int                 `json:"evidence_outcome_counts,omitempty"`
+	ReplayJournal         map[string]string              `json:"replay_journal,omitempty"`
 }
 
 // NewNode creates a node with a private trust ledger for every configured peer.
@@ -168,13 +170,14 @@ func NewNode(cfg config.Config, agent config.AgentConfig, decider decision.Decid
 		budget:    agent.Budget,
 		capacity:  agent.Capacity,
 
-		nonCommitmentJournal: make(map[string]nonCommitmentRecord),
-		checkpointJournal:    make(map[string]checkpointRecord),
-		promiseJournal:       make(map[string]promiseRecord),
-		casStore:             make(map[string][]byte),
-		capabilityTokens:     make(map[string]string),
-		computeCache:         make(map[string]map[string]string),
-		replayJournal:        make(map[string]string),
+		nonCommitmentJournal:  make(map[string]nonCommitmentRecord),
+		checkpointJournal:     make(map[string]checkpointRecord),
+		promiseJournal:        make(map[string]promiseRecord),
+		evidenceOutcomeCounts: make(map[string]int),
+		casStore:              make(map[string][]byte),
+		capabilityTokens:      make(map[string]string),
+		computeCache:          make(map[string]map[string]string),
+		replayJournal:         make(map[string]string),
 	}
 }
 
@@ -367,6 +370,9 @@ func (node *Node) runCASComputeWorkflow() error {
 	node.record("dynamic_peer_choice_from_persisted_trust", "kept", "bob", "pcid="+pcid.CASStorageV1+" storage choice uses durable local relationship evidence")
 	node.record("trust_driven_peer_choice", "kept", "carol", "pcid="+pcid.CIDComputeV1+" Alice chooses Carol as compute peer and Dave/Grace as verifiers")
 	node.record("dynamic_peer_choice_from_persisted_trust", "kept", "carol", "pcid="+pcid.CIDComputeV1+" compute choice uses durable local relationship evidence")
+	if err := node.runDynamicTCPTopologyWorkflow(); err != nil {
+		return err
+	}
 	node.record("economics_price_probe", "kept", "bob", "pcid="+pcid.CASStorageV1+" Alice first offers below Bob's local storage price")
 	if _, err := node.sendAndReceive("bob", map[string]string{
 		"act":                 decision.ActPromise,
@@ -569,6 +575,53 @@ func (node *Node) runCASComputeWorkflow() error {
 	}); err != nil {
 		return fmt.Errorf("sum compute request: %w", err)
 	}
+	return nil
+}
+
+// runDynamicTCPTopologyWorkflow proves that relationship ledger changes affect
+// real send/receive reachability through the local kernel.
+// Intent: Dynamic TCP topology should be more than a log label: an ordinary
+// promise to a removed direct peer is blocked locally, repair evidence can
+// restore the relationship, and a later relationship promise then crosses the
+// same app/kernel TCP path as other POC13 messages. Source: DI-sihuz
+func (node *Node) runDynamicTCPTopologyWorkflow() error {
+	target := "fulfillment"
+	node.record("dynamic_tcp_topology_probe_started", "kept", target, "Alice tests whether local direct-peer changes affect actual kernel-routed sends")
+	node.observeOutcome(target, relationship.OutcomeBroken)
+	blockedFields := map[string]string{
+		"act":                 decision.ActPromise,
+		"from":                node.Agent.Name,
+		"to":                  target,
+		"turn":                "startup",
+		"promise":             "Alice promises a routine relationship observation after local trust dropped.",
+		"reason":              "ordinary traffic should not cross a removed direct-peer relationship",
+		"field_promise_about": "local_observation",
+	}
+	if _, err := node.sendAndReceive(target, blockedFields); err == nil {
+		return fmt.Errorf("dynamic topology blocked send unexpectedly succeeded")
+	}
+	node.record("dynamic_tcp_topology_send_blocked", "non_commitment", target, "ordinary relationship promise was not sent because local direct TCP promise was removed")
+	// Intent: One ordinary kept outcome after broken evidence must consume
+	// caution without raising trust, giving the analyzer deterministic
+	// `trust_recovery_delayed` evidence independent of live-agent choices.
+	// Source: DI-sihuz
+	node.observeOutcome(target, relationship.OutcomeKept)
+	for repairIndex := 0; repairIndex < 3; repairIndex++ {
+		node.observeOutcome(target, relationship.OutcomeRepairKept)
+	}
+	restoredFields := map[string]string{
+		"act":                 decision.ActPromise,
+		"from":                node.Agent.Name,
+		"to":                  target,
+		"turn":                "startup",
+		"promise":             "Alice promises a routine relationship observation after local repair evidence restored direct reachability.",
+		"reason":              "restored direct relationship should allow actual kernel-routed send/receive again",
+		"field_promise_about": "local_observation",
+	}
+	if _, err := node.sendAndReceive(target, restoredFields); err != nil {
+		return fmt.Errorf("dynamic topology restored send: %w", err)
+	}
+	node.record("dynamic_tcp_topology_send_succeeded", "kept", target, "restored direct TCP relationship carried an actual relationship_v1 promise")
 	return nil
 }
 
@@ -871,7 +924,7 @@ func (node *Node) handleFrame(frameBytes []byte) ([]byte, error) {
 		node.resolveOutstandingPromise(promiseID, promiseStatusFromOutcome(trustOutcome), "accepted inbound promise")
 		node.observeOutcome(fromAgent, trustOutcome)
 	} else {
-		node.resolveOutstandingPromise(promiseID, promiseStatusDuplicate, "duplicate evidence recorded without trust change")
+		node.resolveOutstandingPromise(promiseID, promiseStatusForNonTrustingEvidence(ackFields), "non-mutating inbound evidence recorded without trust change")
 	}
 	eventName := "message_received"
 	if acceptedAsCandidate {
@@ -988,7 +1041,7 @@ func (node *Node) sendAndReceive(target string, fields map[string]string) (parse
 		node.resolveOutstandingPromise(promiseID, promiseStatusFromOutcome(trustOutcome), "ack kept")
 		node.observeOutcome(target, trustOutcome)
 	} else {
-		node.resolveOutstandingPromise(promiseID, promiseStatusDuplicate, "duplicate ack evidence recorded without trust change")
+		node.resolveOutstandingPromise(promiseID, promiseStatusForNonTrustingEvidence(ackFields), "non-mutating ack evidence recorded without trust change")
 	}
 	return ackMessage, nil
 }
@@ -1684,6 +1737,7 @@ func (node *Node) handleCASStoragePromise(fields map[string]string) (map[string]
 		return map[string]string{"field_promise_about": production.PromisePresentStorageEvidence, "field_verdict": "broken"}, nil
 	case production.PromiseTrustRepair:
 		node.record("trust_repair_promise_recorded", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" future repair promise recorded as local evidence")
+		node.record("trust_repair_future_only", "non_commitment", fields["from"], "pcid="+pcid.CASStorageV1+" future repair promise is remembered but does not prove repair has already been kept")
 		return map[string]string{"field_promise_about": production.PromiseTrustRepair, "field_repair_status": "future_only"}, nil
 	case production.PromiseUnsupportedVariantProbe:
 		node.record("promise_variant_not_promised", "non_commitment", fields["from"], "pcid="+pcid.CASStorageV1+" unsupported storage variant not promised")
@@ -1986,6 +2040,14 @@ func copyMapOrEmpty(fields map[string]string) map[string]string {
 	return copiedFields
 }
 
+func copyIntMapOrEmpty(fields map[string]int) map[string]int {
+	copiedFields := make(map[string]int, len(fields))
+	for key, value := range fields {
+		copiedFields[key] = value
+	}
+	return copiedFields
+}
+
 func copyNestedMapOrEmpty(fields map[string]map[string]string) map[string]map[string]string {
 	copiedFields := make(map[string]map[string]string, len(fields))
 	for key, value := range fields {
@@ -2157,15 +2219,27 @@ func (node *Node) observeOutcome(peerName string, outcome relationship.Outcome) 
 		return
 	}
 	node.mu.Lock()
+	priorTrust := node.ledger.Trust(peerName)
+	priorCaution := node.ledger.Caution(peerName)
 	transition := node.ledger.ObserveOutcome(peerName, outcome)
 	trustScore := node.ledger.Trust(peerName)
+	cautionScore := node.ledger.Caution(peerName)
 	node.mu.Unlock()
-	node.record(string(transition), "kept", peerName, fmt.Sprintf("outcome=%s trust=%d", outcome, trustScore))
+	node.record(string(transition), "kept", peerName, fmt.Sprintf("outcome=%s trust=%d caution=%d", outcome, trustScore, cautionScore))
+	if cautionScore > priorCaution {
+		node.record("trust_caution_recorded", string(outcome), peerName, fmt.Sprintf("outcome=%s trust=%d caution=%d", outcome, trustScore, cautionScore))
+	}
+	if priorCaution > cautionScore {
+		node.record("trust_caution_consumed", string(outcome), peerName, fmt.Sprintf("outcome=%s trust=%d caution=%d prior_caution=%d", outcome, trustScore, cautionScore, priorCaution))
+	}
+	if priorCaution > cautionScore && trustScore == priorTrust {
+		node.record("trust_recovery_delayed", "kept", peerName, fmt.Sprintf("outcome=%s trust=%d caution=%d prior_caution=%d", outcome, trustScore, cautionScore, priorCaution))
+	}
 	// Intent: POC13 keeps POC12 relationship-transition events and also emits
 	// the inherited POC13 analyzer's `trust_updated` evidence name so future
 	// POCs cannot silently drop trust behavior while refactoring analyzers.
 	// Source: DI-sinur
-	node.record("trust_updated", string(outcome), peerName, fmt.Sprintf("outcome=%s trust=%d transition=%s", outcome, trustScore, transition))
+	node.record("trust_updated", string(outcome), peerName, fmt.Sprintf("outcome=%s trust=%d caution=%d transition=%s", outcome, trustScore, cautionScore, transition))
 }
 
 // rememberOutstandingPromise adds one exact promise record to this app's local
@@ -2438,6 +2512,39 @@ func promiseStatusFromOutcome(outcome relationship.Outcome) promiseStatus {
 	}
 }
 
+// promiseStatusForNonTrustingEvidence classifies ACK payload evidence that is
+// visible but deliberately does not update peer trust.
+// Intent: Refusals, cache misses, replay refusals, future-only repair, and
+// unsupported variants are peer non-commitments rather than duplicate kept
+// evidence; only semantic checkpoints such as duplicate shipment updates should
+// resolve as duplicate evidence. Source: DI-sihuz
+func promiseStatusForNonTrustingEvidence(fields map[string]string) promiseStatus {
+	if fields == nil {
+		return promiseStatusDuplicate
+	}
+	if fields[duplicateShipmentEvidenceField] == "true" {
+		return promiseStatusDuplicate
+	}
+	switch fields["field_verdict"] {
+	case "broken":
+		return promiseStatusBroken
+	case "malformed":
+		return promiseStatusMalformed
+	case "disagree", "not_promised":
+		return promiseStatusNonCommitment
+	}
+	if fields["field_variant_status"] == "not_promised" ||
+		fields["field_storage_status"] == "price_refused" ||
+		fields["field_compute_status"] == "capacity_refused" ||
+		fields["field_cache_status"] == "miss" ||
+		fields["field_token_status"] == "not_promised" ||
+		fields["field_repair_status"] == "future_only" ||
+		fields["field_replay_status"] == "not_promised" {
+		return promiseStatusNonCommitment
+	}
+	return promiseStatusDuplicate
+}
+
 // nonCommitmentKey keeps receiver non-commitment scoped to one peer, one
 // protocol, and one protocol-owned promise meaning.
 // Intent: A `not_promised` ACK should restrain only the semantic exchange that
@@ -2628,6 +2735,10 @@ func (node *Node) record(eventName, outcome, peer, detail string) {
 	}
 	node.mu.Lock()
 	node.events = append(node.events, event)
+	if node.evidenceOutcomeCounts == nil {
+		node.evidenceOutcomeCounts = make(map[string]int)
+	}
+	node.evidenceOutcomeCounts[outcome]++
 	node.mu.Unlock()
 	encoded, err := json.Marshal(event)
 	if err != nil {
@@ -2753,11 +2864,12 @@ func (node *Node) loadRunScopedState() error {
 	node.nonCommitmentJournal = copyNonCommitmentMapOrEmpty(state.NonCommitmentJournal)
 	node.checkpointJournal = copyCheckpointMapOrEmpty(state.CheckpointJournal)
 	node.promiseJournal = copyPromiseMapOrEmpty(state.PromiseJournal)
+	node.evidenceOutcomeCounts = copyIntMapOrEmpty(state.EvidenceOutcomeCounts)
 	node.replayJournal = copyMapOrEmpty(state.ReplayJournal)
 	node.mu.Unlock()
 	node.record("run_scoped_store_loaded", "kept", "", fmt.Sprintf("cas=%d tokens=%d compute=%d checkpoints=%d promises=%d replay=%d", len(casObjects), len(state.CapabilityTokens), len(state.ComputeCache), len(state.CheckpointJournal), len(state.PromiseJournal), len(state.ReplayJournal)))
 	node.record("cas_run_store_loaded", "kept", "", fmt.Sprintf("cas_objects=%d", len(casObjects)))
-	node.record("evidence_run_store_loaded", "kept", "", fmt.Sprintf("promise_journal=%d checkpoint_journal=%d non_commitments=%d replay=%d", len(state.PromiseJournal), len(state.CheckpointJournal), len(state.NonCommitmentJournal), len(state.ReplayJournal)))
+	node.record("evidence_run_store_loaded", "kept", "", fmt.Sprintf("promise_journal=%d checkpoint_journal=%d non_commitments=%d receiver_non_commitments=%d replay=%d", len(state.PromiseJournal), len(state.CheckpointJournal), state.EvidenceOutcomeCounts[string(relationship.OutcomeNonCommitment)], len(state.NonCommitmentJournal), len(state.ReplayJournal)))
 	node.record("compute_cache_run_store_loaded", "kept", "", fmt.Sprintf("compute_cache=%d", len(state.ComputeCache)))
 	return nil
 }
@@ -2785,7 +2897,7 @@ func (node *Node) saveRunScopedState() error {
 	}
 	node.record("run_scoped_store_saved", "kept", "", fmt.Sprintf("cas=%d tokens=%d compute=%d checkpoints=%d promises=%d replay=%d", len(state.CASObjects), len(state.CapabilityTokens), len(state.ComputeCache), len(state.CheckpointJournal), len(state.PromiseJournal), len(state.ReplayJournal)))
 	node.record("cas_run_store_saved", "kept", "", fmt.Sprintf("cas_objects=%d", len(state.CASObjects)))
-	node.record("evidence_run_store_saved", "kept", "", fmt.Sprintf("promise_journal=%d checkpoint_journal=%d non_commitments=%d replay=%d", len(state.PromiseJournal), len(state.CheckpointJournal), len(state.NonCommitmentJournal), len(state.ReplayJournal)))
+	node.record("evidence_run_store_saved", "kept", "", fmt.Sprintf("promise_journal=%d checkpoint_journal=%d non_commitments=%d receiver_non_commitments=%d replay=%d", len(state.PromiseJournal), len(state.CheckpointJournal), state.EvidenceOutcomeCounts[string(relationship.OutcomeNonCommitment)], len(state.NonCommitmentJournal), len(state.ReplayJournal)))
 	node.record("compute_cache_run_store_saved", "kept", "", fmt.Sprintf("compute_cache=%d", len(state.ComputeCache)))
 	return nil
 }
@@ -2798,14 +2910,15 @@ func (node *Node) exportRunScopedState() runScopedState {
 		casObjects[contentCID] = base64.StdEncoding.EncodeToString(contentBytes)
 	}
 	return runScopedState{
-		Version:              1,
-		CASObjects:           casObjects,
-		CapabilityTokens:     copyMapOrEmpty(node.capabilityTokens),
-		ComputeCache:         copyNestedMapOrEmpty(node.computeCache),
-		NonCommitmentJournal: copyNonCommitmentMapOrEmpty(node.nonCommitmentJournal),
-		CheckpointJournal:    copyCheckpointMapOrEmpty(node.checkpointJournal),
-		PromiseJournal:       copyPromiseMapOrEmpty(node.promiseJournal),
-		ReplayJournal:        copyMapOrEmpty(node.replayJournal),
+		Version:               1,
+		CASObjects:            casObjects,
+		CapabilityTokens:      copyMapOrEmpty(node.capabilityTokens),
+		ComputeCache:          copyNestedMapOrEmpty(node.computeCache),
+		NonCommitmentJournal:  copyNonCommitmentMapOrEmpty(node.nonCommitmentJournal),
+		CheckpointJournal:     copyCheckpointMapOrEmpty(node.checkpointJournal),
+		PromiseJournal:        copyPromiseMapOrEmpty(node.promiseJournal),
+		EvidenceOutcomeCounts: copyIntMapOrEmpty(node.evidenceOutcomeCounts),
+		ReplayJournal:         copyMapOrEmpty(node.replayJournal),
 	}
 }
 

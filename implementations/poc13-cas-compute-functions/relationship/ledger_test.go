@@ -70,6 +70,40 @@ func TestMalformedEvidenceDelaysOrdinaryTrustRecovery(t *testing.T) {
 	}
 }
 
+func TestTrustScoresSaturate(t *testing.T) {
+	// Intent: Trust scores are local relationship evidence, not absolute
+	// reputation points, so they stay in a small comparable range. Source:
+	// DI-sihuz
+	ledger := NewLedger([]string{"bob"}, []string{"bob"}, 2, -2, 0)
+	for keptIndex := 0; keptIndex < 20; keptIndex++ {
+		ledger.ObserveOutcome("bob", OutcomeKept)
+	}
+	if ledger.Trust("bob") != maxTrustScore {
+		t.Fatalf("positive trust = %d, want max %d", ledger.Trust("bob"), maxTrustScore)
+	}
+	for brokenIndex := 0; brokenIndex < 20; brokenIndex++ {
+		ledger.ObserveOutcome("bob", OutcomeBroken)
+	}
+	if ledger.Trust("bob") != minTrustScore {
+		t.Fatalf("negative trust = %d, want min %d", ledger.Trust("bob"), minTrustScore)
+	}
+}
+
+func TestCautionIsObservableWithoutMutableState(t *testing.T) {
+	// Intent: Runtime tests and analyzer gates need to observe recovery caution
+	// without reaching into ledger internals or creating shared authority.
+	// Source: DI-sihuz
+	ledger := NewLedger([]string{"mallory"}, []string{"mallory"}, 2, -2, 0)
+	ledger.ObserveOutcome("mallory", OutcomeMalformed)
+	if ledger.Caution("mallory") != recoveryCautionAfterNegativeEvidence {
+		t.Fatalf("caution = %d, want %d", ledger.Caution("mallory"), recoveryCautionAfterNegativeEvidence)
+	}
+	ledger.ObserveOutcome("mallory", OutcomeKept)
+	if ledger.Caution("mallory") != recoveryCautionAfterNegativeEvidence-1 {
+		t.Fatalf("caution after kept = %d, want %d", ledger.Caution("mallory"), recoveryCautionAfterNegativeEvidence-1)
+	}
+}
+
 func TestDecayReducesPositiveTrust(t *testing.T) {
 	ledger := NewLedger([]string{"bob"}, []string{"bob"}, 2, -2, 1)
 	ledger.ObserveOutcome("bob", OutcomeKept)

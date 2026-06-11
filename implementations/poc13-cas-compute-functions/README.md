@@ -63,10 +63,16 @@ pressure. Source: `DI-timah`; `DI-bikit`; `DI-galin`; `DI-pohaj`;
   retained/removed/ended/broken GC cases, model sender and receiver rate limits
   as reciprocal self-promises, and reject exact envelope or serve-once token
   replays as local non-commitment evidence. Source: `DI-sunuf`.
+- POC13 hardening evidence: saved evidence summaries count all local
+  non-commitment outcomes, non-mutating ACKs distinguish true duplicates from
+  refusals/cache misses/replay refusals/future-only repair, trust scores stay on
+  a bounded local scale, recovery caution is analyzer-visible, and dynamic TCP
+  topology changes affect real app/kernel send reachability. Source:
+  `DI-sihuz`.
 - Superset analyzer gates: `poc13-analyze` now fails if inherited POC11/POC12
   behavior, POC13 storage/compute evidence, run-scoped durability, retention/GC,
   pressure, rate-limit, or replay evidence disappears. Source: `DI-sinur`;
-  `DI-sunuf`.
+  `DI-sunuf`; `DI-sihuz`.
 - Observer-only monitor lifecycle: completed nodes wait for `monitor.done` using
   a config-derived provider/turn/grace budget, and a completed run can still
   write the non-authoritative marker if the observer report fails. Source:
@@ -131,6 +137,9 @@ For manual runs, `poc13-analyze` accepts either the parent run directory or its
 docker compose up --build --abort-on-container-exit
 docker compose run --rm --entrypoint /usr/local/bin/poc13-analyze dave /run/poc13/<run_id>
 ```
+
+The latest run narrative is in `docs/RUN-NARRATIVE.md`; current production
+fitness and blockers are in `docs/PRODUCTION-FITNESS.md`.
 
 `config.json`, `poc13.env`, `openai_api_key.txt`, provider outputs, and Docker
 volume state are ignored and must not be committed.

@@ -22,6 +22,8 @@ const (
 )
 
 const recoveryCautionAfterNegativeEvidence = 4
+const minTrustScore = -5
+const maxTrustScore = 5
 
 // Ledger stores one agent's private trust and direct-link choices.
 // Intent: POC13 correlates strong local trust with direct TCP adjacency and
@@ -74,6 +76,14 @@ func NewLedger(allPeers []string, initialDirectPeers []string, strongTrust, weak
 // Trust returns the local trust score for a peer.
 func (ledger *Ledger) Trust(peerName string) int {
 	return ledger.trustByPeer[peerName]
+}
+
+// Caution returns the remaining positive-evidence delay for one peer.
+// Intent: Runtime and analyzer evidence should be able to prove that recent
+// malformed/broken evidence delays recovery without exposing mutable ledger
+// state or creating a global reputation authority. Source: DI-sihuz
+func (ledger *Ledger) Caution(peerName string) int {
+	return ledger.cautionByPeer[peerName]
 }
 
 // Snapshot returns a copy of all local trust scores.
@@ -142,6 +152,7 @@ func (ledger *Ledger) ObserveOutcome(peerName string, outcome Outcome) Transitio
 		// requested exchange; it is not evidence that the peer broke an explicit
 		// promise. Source: DI-jinoz
 	}
+	ledger.saturateTrust(peerName)
 	ledger.reconfigure(peerName)
 	isDirect := ledger.directPeers[peerName]
 	if !wasDirect && isDirect {
@@ -176,6 +187,19 @@ func (ledger *Ledger) addRecoveryCaution(peerName string) {
 	}
 }
 
+// saturateTrust keeps the local trust score in a small comparable range.
+// Intent: POC13 monitor output should not show unbounded local trust values
+// that look like absolute reputation; trust remains only this agent's bounded
+// relationship evidence for this run. Source: DI-sihuz
+func (ledger *Ledger) saturateTrust(peerName string) {
+	if ledger.trustByPeer[peerName] > maxTrustScore {
+		ledger.trustByPeer[peerName] = maxTrustScore
+	}
+	if ledger.trustByPeer[peerName] < minTrustScore {
+		ledger.trustByPeer[peerName] = minTrustScore
+	}
+}
+
 // Export returns a durable copy of the local relationship state.
 // Intent: Make restart tests inspectable without exposing mutable ledger maps.
 // Source: DI-timah
@@ -201,6 +225,7 @@ func (ledger *Ledger) ApplyState(state State) {
 	for peerName, trustScore := range state.TrustByPeer {
 		if _, exists := ledger.trustByPeer[peerName]; exists {
 			ledger.trustByPeer[peerName] = trustScore
+			ledger.saturateTrust(peerName)
 		}
 	}
 	for peerName, cautionCount := range state.CautionByPeer {

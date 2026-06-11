@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"testing"
 	"time"
 
@@ -328,6 +329,76 @@ func TestNegativeAckVerdictsDoNotUpdateTrust(t *testing.T) {
 	}
 	if !evidenceUpdatesTrust(map[string]string{"field_verdict": "kept"}) {
 		t.Fatalf("kept ACK verdict should update trust")
+	}
+}
+
+func TestNonTrustingAckEvidenceUsesPrecisePromiseStatus(t *testing.T) {
+	// Intent: Non-mutating ACK evidence should distinguish true duplicate
+	// checkpoints from peer non-commitments and malformed/broken verdicts.
+	// Source: DI-sihuz
+	cases := []struct {
+		name       string
+		fields     map[string]string
+		wantStatus promiseStatus
+	}{{
+		name:       "duplicate shipment checkpoint",
+		fields:     map[string]string{duplicateShipmentEvidenceField: "true"},
+		wantStatus: promiseStatusDuplicate,
+	}, {
+		name:       "storage price refused",
+		fields:     map[string]string{"field_storage_status": "price_refused"},
+		wantStatus: promiseStatusNonCommitment,
+	}, {
+		name:       "compute capacity refused",
+		fields:     map[string]string{"field_compute_status": "capacity_refused"},
+		wantStatus: promiseStatusNonCommitment,
+	}, {
+		name:       "cache miss",
+		fields:     map[string]string{"field_cache_status": "miss"},
+		wantStatus: promiseStatusNonCommitment,
+	}, {
+		name:       "future repair only",
+		fields:     map[string]string{"field_repair_status": "future_only"},
+		wantStatus: promiseStatusNonCommitment,
+	}, {
+		name:       "unsupported variant",
+		fields:     map[string]string{"field_variant_status": "not_promised"},
+		wantStatus: promiseStatusNonCommitment,
+	}, {
+		name:       "replay refused",
+		fields:     map[string]string{"field_replay_status": "not_promised"},
+		wantStatus: promiseStatusNonCommitment,
+	}, {
+		name:       "broken verdict",
+		fields:     map[string]string{"field_verdict": "broken"},
+		wantStatus: promiseStatusBroken,
+	}, {
+		name:       "malformed verdict",
+		fields:     map[string]string{"field_verdict": "malformed"},
+		wantStatus: promiseStatusMalformed,
+	}}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			if gotStatus := promiseStatusForNonTrustingEvidence(tc.fields); gotStatus != tc.wantStatus {
+				t.Fatalf("status = %s, want %s for %#v", gotStatus, tc.wantStatus, tc.fields)
+			}
+		})
+	}
+}
+
+func TestRunScopedEvidenceSummaryCountsAllNonCommitments(t *testing.T) {
+	// Intent: Saved evidence summaries should reflect all local
+	// non-commitment outcomes, not only receiver-side not-promised restraint
+	// journal entries. Source: DI-sihuz
+	cfg := singleNodeTestConfig(t)
+	node := NewNode(cfg, cfg.Agents[0], &decision.FakeDecider{}, decision.FakeMonitor{})
+	node.record("local_non_commitment", "non_commitment", "", "no direct peer")
+	node.record("promise_resolved", "non_commitment", "bob", "status=non_commitment")
+	if err := node.saveRunScopedState(); err != nil {
+		t.Fatalf("save run scoped state: %v", err)
+	}
+	if !hasEventDetail(node.events, "evidence_run_store_saved", "non_commitments=2") {
+		t.Fatalf("saved evidence summary did not include all non-commitments: %#v", node.events)
 	}
 }
 
@@ -707,6 +778,30 @@ func TestFutureRepairPromiseDoesNotImmediatelyIncreaseTrust(t *testing.T) {
 	}
 	if evidenceUpdatesTrust(ackFields) {
 		t.Fatalf("future-only repair promise should not immediately update trust: %#v", ackFields)
+	}
+}
+
+func TestTrustCautionAllowsOnlyFutureRepairCandidateTraffic(t *testing.T) {
+	// Intent: After malformed evidence, a peer may be heard only for the narrow
+	// future-repair candidate promise; unsupported ordinary variants remain
+	// non-promised until local trust is rebuilt. Source: DI-sihuz
+	cfg := computeRoutingTestConfig(t)
+	grace := NewNode(cfg, cfg.Agents[2], &decision.FakeDecider{}, decision.FakeMonitor{})
+	grace.observeOutcome("mallory", relationship.OutcomeMalformed)
+	unsupportedFields := map[string]string{"field_promise_about": production.PromiseUnsupportedVariantProbe}
+	if grace.canAcceptFrom("mallory", unsupportedFields) {
+		t.Fatalf("unsupported ordinary promise should not be accepted during trust caution")
+	}
+	repairFields := map[string]string{"field_promise_about": production.PromiseTrustRepair}
+	if !grace.canAcceptFrom("mallory", repairFields) {
+		t.Fatalf("future repair promise should remain hearable as candidate traffic")
+	}
+	grace.observeOutcome("mallory", relationship.OutcomeKept)
+	if !hasEvent(grace.events, "trust_caution_recorded") {
+		t.Fatalf("malformed evidence should record trust caution: %#v", grace.events)
+	}
+	if !hasEvent(grace.events, "trust_recovery_delayed") {
+		t.Fatalf("kept evidence during caution should record delayed recovery: %#v", grace.events)
 	}
 }
 
@@ -1105,6 +1200,15 @@ func hasEvent(events []decision.Event, eventName string) bool {
 func hasEventOutcome(events []decision.Event, eventName, outcome string) bool {
 	for _, event := range events {
 		if event.Event == eventName && event.Outcome == outcome {
+			return true
+		}
+	}
+	return false
+}
+
+func hasEventDetail(events []decision.Event, eventName, detailPart string) bool {
+	for _, event := range events {
+		if event.Event == eventName && strings.Contains(event.Detail, detailPart) {
 			return true
 		}
 	}

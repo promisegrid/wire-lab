@@ -32,13 +32,16 @@ type RunSummary struct {
 	RPCDriftCounts               map[string]int          `json:"rpc_drift_counts"`
 	ShippingCounts               map[string]int          `json:"shipping_counts"`
 	RelationshipTransitionCounts map[string]int          `json:"relationship_transition_counts"`
+	DynamicTopologyCounts        map[string]int          `json:"dynamic_topology_counts"`
 	LocalResourceCounts          map[string]int          `json:"local_resource_counts"`
 	ResourceTrustCouplingCounts  map[string]int          `json:"resource_trust_coupling_counts"`
 	DurabilityCounts             map[string]int          `json:"durability_counts"`
 	RetentionCounts              map[string]int          `json:"retention_counts"`
 	PressureCounts               map[string]int          `json:"pressure_counts"`
 	ReplayCounts                 map[string]int          `json:"replay_counts"`
+	TrustCautionCounts           map[string]int          `json:"trust_caution_counts"`
 	ScoreReport                  ScoreReport             `json:"score_report"`
+	ProductionFitness            ProductionFitnessReport `json:"production_fitness"`
 	MissingRequiredEventNames    []string                `json:"missing_required_event_names,omitempty"`
 	MonitorReport                *decision.MonitorReport `json:"monitor_report,omitempty"`
 }
@@ -62,6 +65,18 @@ type ScoreReport struct {
 	Pressure     int      `json:"pressure"`
 	Replay       int      `json:"replay"`
 	Concerns     []string `json:"concerns,omitempty"`
+}
+
+// ProductionFitnessReport states the current POC-to-production gap in terms an
+// operator can compare across clean runs.
+// Intent: POC13 should produce a concise production-fitness summary from
+// analyzer and monitor evidence without pretending a successful POC run is
+// production readiness. Source: DI-sihuz
+type ProductionFitnessReport struct {
+	Baseline           string   `json:"baseline"`
+	ReadyForProduction bool     `json:"ready_for_production"`
+	Verdict            string   `json:"verdict"`
+	BlockingGaps       []string `json:"blocking_gaps,omitempty"`
 }
 
 // AcceptanceCriteria describes the evidence gates for a clean POC13 regression
@@ -129,12 +144,14 @@ func analyzeRun(runDir string) (RunSummary, error) {
 		RPCDriftCounts:               make(map[string]int),
 		ShippingCounts:               make(map[string]int),
 		RelationshipTransitionCounts: make(map[string]int),
+		DynamicTopologyCounts:        make(map[string]int),
 		LocalResourceCounts:          make(map[string]int),
 		ResourceTrustCouplingCounts:  make(map[string]int),
 		DurabilityCounts:             make(map[string]int),
 		RetentionCounts:              make(map[string]int),
 		PressureCounts:               make(map[string]int),
 		ReplayCounts:                 make(map[string]int),
+		TrustCautionCounts:           make(map[string]int),
 	}
 	logPaths := jsonlLogPaths(logDir)
 	sort.Strings(logPaths)
@@ -150,6 +167,7 @@ func analyzeRun(runDir string) (RunSummary, error) {
 	summary.MonitorReport = report
 	summary.MissingRequiredEventNames = missingRequiredEvents(summary)
 	summary.ScoreReport = computeScores(summary)
+	summary.ProductionFitness = computeProductionFitness(summary)
 	return summary, nil
 }
 
@@ -330,6 +348,9 @@ func summarizeLog(logPath string, summary *RunSummary) error {
 		if isRelationshipTransition(event.Event) {
 			summary.RelationshipTransitionCounts[event.Event]++
 		}
+		if isDynamicTopologyEvent(event.Event) {
+			summary.DynamicTopologyCounts[event.Event]++
+		}
 		if isLocalResourceEvent(event) {
 			summary.LocalResourceCounts[event.Event]++
 		}
@@ -344,6 +365,9 @@ func summarizeLog(logPath string, summary *RunSummary) error {
 		}
 		if isReplayEvent(event.Event) {
 			summary.ReplayCounts[event.Event]++
+		}
+		if isTrustCautionEvent(event.Event) {
+			summary.TrustCautionCounts[event.Event]++
 		}
 		if hasPreviousEvent && isResourceTrustCoupling(previousEvent, event) {
 			summary.ResourceTrustCouplingCounts[event.Observer]++
@@ -432,6 +456,16 @@ func requiredRegressionEvents() []string {
 		"replica_recovery_succeeded",
 		"trust_updated",
 		"trust_repair_promise_recorded",
+		// Intent: POC13 must keep DI-fijov recovery caution visible in analyzer
+		// gates, not only in monitor prose, so malformed/broken evidence cannot
+		// be followed by silent instant trust recovery. Source: DI-sihuz
+		"trust_caution_recorded",
+		"trust_caution_consumed",
+		"trust_recovery_delayed",
+		"trust_repair_future_only",
+		"dynamic_tcp_topology_probe_started",
+		"dynamic_tcp_topology_send_blocked",
+		"dynamic_tcp_topology_send_succeeded",
 		"unknown_pcid_not_promised",
 		"promise_variant_not_promised",
 		"bad_proof_sent",
@@ -477,7 +511,7 @@ func computeScores(summary RunSummary) ScoreReport {
 	addScore(&scores.Storage, summary.EventCounts["cas_bytes_stored"] > 0 && summary.EventCounts["cas_bytes_retrieved"] > 0 && summary.EventCounts["cas_multi_object_pressure"] > 0 && summary.EventCounts["capability_token_renewed"] > 0)
 	addScore(&scores.Compute, summary.EventCounts["compute_function_executed"] > 0 && summary.EventCounts["compute_alternate_function_executed"] > 0 && summary.EventCounts["compute_result_received"] > 0 && summary.EventCounts["compute_bad_result_promised"] > 0 && summary.EventCounts["compute_cache_reused"] > 0)
 	addScore(&scores.Economics, summary.EventCounts["economics_price_refused"] > 0 && summary.EventCounts["economics_capacity_refused"] > 0 && summary.EventCounts["economics_credits_spent"] > 0 && summary.EventCounts["economics_credits_earned"] > 0)
-	addScore(&scores.Trust, summary.EventCounts["trust_updated"] > 0 && summary.EventCounts["trust_driven_peer_choice"] > 0 && summary.EventCounts["persisted_trust_history_loaded"] > 0 && summary.EventCounts["dynamic_peer_choice_from_persisted_trust"] > 0)
+	addScore(&scores.Trust, summary.EventCounts["trust_updated"] > 0 && summary.EventCounts["trust_driven_peer_choice"] > 0 && summary.EventCounts["persisted_trust_history_loaded"] > 0 && summary.EventCounts["dynamic_peer_choice_from_persisted_trust"] > 0 && summary.EventCounts["trust_caution_recorded"] > 0 && summary.EventCounts["trust_recovery_delayed"] > 0 && summary.EventCounts["dynamic_tcp_topology_send_blocked"] > 0 && summary.EventCounts["dynamic_tcp_topology_send_succeeded"] > 0)
 	addScore(&scores.Verification, summary.EventCounts["compute_result_locally_verified"] > 0 && summary.EventCounts["compute_result_locally_rejected"] > 0 && summary.EventCounts["compute_result_peer_verified"] > 0 && summary.EventCounts["compute_verifier_disagreement"] > 0 && summary.EventCounts["compute_disagreement_resolved_locally"] > 0 && summary.EventCounts["evidence_report_received"] > 0)
 	addScore(&scores.Replica, summary.EventCounts["replica_recovery_succeeded"] > 0 && summary.EventCounts["replica_capability_token_redeemed"] > 0)
 	// Intent: Analyzer scoring should treat durability, retention, pressure, and
@@ -495,6 +529,34 @@ func computeScores(summary RunSummary) ScoreReport {
 		scores.Concerns = append(scores.Concerns, "RPC drift detected")
 	}
 	return scores
+}
+
+func computeProductionFitness(summary RunSummary) ProductionFitnessReport {
+	report := ProductionFitnessReport{
+		Baseline: "POC13 regression baseline for POC14; not production software",
+		Verdict:  "fit for continued POC work, not production deployment",
+	}
+	if summary.ScoreReport.Overall < 5 {
+		report.BlockingGaps = append(report.BlockingGaps, fmt.Sprintf("score_report.overall=%d below 5", summary.ScoreReport.Overall))
+	}
+	if summary.MonitorReport == nil {
+		report.BlockingGaps = append(report.BlockingGaps, "monitor_report missing")
+	} else {
+		for _, failure := range monitorScoreFailures(*summary.MonitorReport, 5) {
+			report.BlockingGaps = append(report.BlockingGaps, failure)
+		}
+	}
+	if len(summary.MissingRequiredEventNames) > 0 {
+		report.BlockingGaps = append(report.BlockingGaps, "missing required regression events")
+	}
+	if len(summary.RPCDriftCounts) > 0 {
+		report.BlockingGaps = append(report.BlockingGaps, "RPC drift terms detected")
+	}
+	report.ReadyForProduction = len(report.BlockingGaps) == 0
+	if report.ReadyForProduction {
+		report.Verdict = "production-candidate evidence complete for current POC scope"
+	}
+	return report
 }
 
 func addScore(score *int, kept bool) {
@@ -533,6 +595,10 @@ func isRelationshipTransition(eventName string) bool {
 	}
 }
 
+func isDynamicTopologyEvent(eventName string) bool {
+	return strings.HasPrefix(eventName, "dynamic_tcp_topology_")
+}
+
 func isDurabilityEvent(eventName string) bool {
 	return strings.Contains(eventName, "run_store") || strings.HasPrefix(eventName, "run_scoped_store_")
 }
@@ -547,6 +613,10 @@ func isPressureEvent(eventName string) bool {
 
 func isReplayEvent(eventName string) bool {
 	return strings.Contains(eventName, "replay")
+}
+
+func isTrustCautionEvent(eventName string) bool {
+	return strings.HasPrefix(eventName, "trust_caution_") || eventName == "trust_recovery_delayed" || eventName == "trust_repair_future_only"
 }
 
 // isLocalResourceEvent recognizes evidence about the observing app's own

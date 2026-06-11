@@ -162,9 +162,9 @@ func Fields(observation Observation, decision PromiseDecision) map[string]string
 
 // Prompt renders a compact prompt for live LLM decisions.
 // Intent: The prompt mirrors the strict provider schema while preserving the
-// single top-level promise action, Go-owned CBOR/signature boundary, and pCID
-// hygiene rule that concrete protocol pCIDs require concrete payload fields.
-// Source: DI-timah; DI-galin; DI-punib
+// single top-level promise action, Go-owned CBOR/signature boundary, pCID
+// hygiene rule, and a preference for useful next promise work over repeated
+// generic relationship chatter. Source: DI-timah; DI-galin; DI-punib; DI-sihuz
 func Prompt(observation Observation) (string, error) {
 	encoded, err := json.MarshalIndent(observation, "", "  ")
 	if err != nil {
@@ -177,6 +177,7 @@ func Prompt(observation Observation) (string, error) {
 		"Useful field keys are protocol, promise_about, package_id, order_id, weight_ounces, shipping_address, cost_cents, tracking_number, content_cid, function_cid, input_cid, context_cid, resource, units, stake, collateral, and discovery_reason. " +
 		"Use protocol=relationship_v1 for ordinary trust, discovery, observation, capacity, or pricing promises unless you can provide every required payload field for another pCID. Use protocol=postal_scale_v1 for package weighing, protocol=accounting_v1 for address lookup or shipment updates, protocol=ups_label_v1 for label/cost/tracking promises, protocol=cas_storage_v1 only for content-addressed storage payloads with concrete content/token fields, protocol=cid_compute_v1 only for CID-named compute/cache/verifier payloads with concrete function/input/context/result fields, and protocol=evidence_report_v1 only for concrete local evidence reports. " +
 		"Use resource=storage or resource=compute only when you personally promise fulfillment capacity, not when you advertise a need. " +
+		"Prefer a concrete, useful next promise that advances local motivation, reciprocal economics, relationship repair, storage, compute, verification, or evidence sharing visible in recent_events. Do not repeat the same promise_about/promise text to the same peer unless recent_events show new evidence that changes its meaning. " +
 		"The only valid top-level act is promise. Put refusal, repair, observation, economics, and link-preference meaning inside the promise text or the fields key/value list. " +
 		"Do not create action kinds. Do not claim authority over other agents. Do not write CBOR or signatures; implementation code encodes and signs the pCID-defined envelope before the local kernel routes exact bytes.\n\nLocal observation:\n" +
 		string(encoded), nil

@@ -180,7 +180,7 @@ func TestPromptMentionsTargetAndResourceFieldRules(t *testing.T) {
 	if err != nil {
 		t.Fatalf("prompt: %v", err)
 	}
-	for _, want := range []string{"Never return a comma-separated target list", "link_discovery", "resource=storage", "resource=compute", "stake"} {
+	for _, want := range []string{"Never return a comma-separated target list", "link_discovery", "resource=storage", "resource=compute", "stake", "Prefer a concrete, useful next promise", "Do not repeat the same promise_about"} {
 		if !strings.Contains(prompt, want) {
 			t.Fatalf("prompt missing %q: %s", want, prompt)
 		}
