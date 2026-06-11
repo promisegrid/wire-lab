@@ -49,6 +49,27 @@ func TestNonCommitmentDoesNotReduceTrust(t *testing.T) {
 	}
 }
 
+func TestMalformedEvidenceDelaysOrdinaryTrustRecovery(t *testing.T) {
+	// Intent: Neat-looking kept promises after malformed evidence should first
+	// work off local recovery caution instead of immediately rebuilding direct
+	// trust in the peer. Source: DI-fijov
+	ledger := NewLedger([]string{"mallory"}, []string{"mallory"}, 2, -2, 0)
+	ledger.ObserveOutcome("mallory", OutcomeMalformed)
+	for keptIndex := 0; keptIndex < recoveryCautionAfterNegativeEvidence; keptIndex++ {
+		ledger.ObserveOutcome("mallory", OutcomeKept)
+	}
+	if ledger.Trust("mallory") != -3 {
+		t.Fatalf("ordinary kept promises during caution changed trust to %d, want -3", ledger.Trust("mallory"))
+	}
+	if ledger.CanDial("mallory") {
+		t.Fatalf("ordinary kept promises during caution should not restore direct adjacency")
+	}
+	ledger.ObserveOutcome("mallory", OutcomeKept)
+	if ledger.Trust("mallory") != -2 {
+		t.Fatalf("first post-caution kept promise changed trust to %d, want -2", ledger.Trust("mallory"))
+	}
+}
+
 func TestDecayReducesPositiveTrust(t *testing.T) {
 	ledger := NewLedger([]string{"bob"}, []string{"bob"}, 2, -2, 1)
 	ledger.ObserveOutcome("bob", OutcomeKept)

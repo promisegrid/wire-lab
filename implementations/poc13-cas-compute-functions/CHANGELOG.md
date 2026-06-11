@@ -17,3 +17,8 @@ date:            2026-06-09
 version:         poc13-cas-compute-functions-run-scoped-durability
 summary:         Adds run-scoped durability, retention/GC, backpressure, rate-limit, replay, recovery, and chaos evidence.
 notes:           POC13 now persists CAS/evidence state under the current run root, keeps clean-run reset as the experiment boundary, records retention/GC/backpressure/rate-limit as local promises, rejects exact-envelope and capability-token replays as non-commitment evidence, expands analyzer score gates, covers recovery plus CBOR/TCP chaos cases, and routes Alice's alternate compute promise to Dave after Carol's malformed result evidence. Source: `DI-sunuf`; `DI-vahan`.
+
+date:            2026-06-10
+version:         poc13-cas-compute-functions-trust-caution
+summary:         Delays positive trust recovery after malformed or broken peer evidence.
+notes:           POC13 now records corrupt CAS evidence in the local relationship ledger, persists per-peer recovery caution inside the run-scoped relationship state, and requires ordinary kept promises to work off that caution before they can increase trust again. Future-only repair promises are remembered as local evidence but do not immediately raise trust. Source: `DI-fijov`.

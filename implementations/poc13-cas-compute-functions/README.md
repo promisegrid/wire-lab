@@ -228,3 +228,11 @@ evidence. Analyzer scoring now includes durability, retention, pressure, and
 replay dimensions, and tests cover within-run recovery, token replay, exact
 envelope replay, CBOR fuzzing, delayed partial reads, and short writes. Source:
 `DI-sunuf`.
+
+`DI-fijov` tightens local trust recovery after malformed or broken peer
+evidence. Corrupt CAS evidence now enters the same relationship-ledger path as
+bad proofs and bad compute results. The ledger records per-peer recovery caution
+inside the run-scoped relationship state, so ordinary kept promises after recent
+malformed/broken evidence first work off caution before they can raise trust.
+Future-only repair promises are retained as local evidence but do not
+immediately prove that repair has already been kept. Source: `DI-fijov`.

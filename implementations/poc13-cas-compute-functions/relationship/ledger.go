@@ -21,31 +21,39 @@ const (
 	TransitionUnchanged Transition = "direct_peer_unchanged"
 )
 
+const recoveryCautionAfterNegativeEvidence = 4
+
 // Ledger stores one agent's private trust and direct-link choices.
 // Intent: POC13 correlates strong local trust with direct TCP adjacency and
 // weak trust with removed adjacency without creating a global peering
 // authority. Source: DI-timah
 type Ledger struct {
-	trustByPeer map[string]int
-	directPeers map[string]bool
-	strongTrust int
-	weakTrust   int
-	decay       int
+	trustByPeer   map[string]int
+	cautionByPeer map[string]int
+	directPeers   map[string]bool
+	strongTrust   int
+	weakTrust     int
+	decay         int
 }
 
 // State is the durable, local-only relationship snapshot for one agent.
 // Intent: Persist only this agent's private trust and current direct-link
-// promises, never a global trust authority. Source: DI-timah
+// promises, never a global trust authority. Recovery caution is persisted with
+// trust so a process restart inside the same run cannot erase recent
+// malformed/broken evidence. Source: DI-timah; DI-fijov
 type State struct {
-	TrustByPeer map[string]int `json:"trust_by_peer"`
-	DirectPeers []string       `json:"direct_peers"`
+	TrustByPeer   map[string]int `json:"trust_by_peer"`
+	CautionByPeer map[string]int `json:"caution_by_peer,omitempty"`
+	DirectPeers   []string       `json:"direct_peers"`
 }
 
 // NewLedger initializes one local relationship ledger.
 func NewLedger(allPeers []string, initialDirectPeers []string, strongTrust, weakTrust, decay int) *Ledger {
 	trustByPeer := make(map[string]int, len(allPeers))
+	cautionByPeer := make(map[string]int, len(allPeers))
 	for _, peerName := range allPeers {
 		trustByPeer[peerName] = 0
+		cautionByPeer[peerName] = 0
 	}
 	directPeers := make(map[string]bool, len(initialDirectPeers))
 	for _, peerName := range initialDirectPeers {
@@ -54,11 +62,12 @@ func NewLedger(allPeers []string, initialDirectPeers []string, strongTrust, weak
 		}
 	}
 	return &Ledger{
-		trustByPeer: trustByPeer,
-		directPeers: directPeers,
-		strongTrust: strongTrust,
-		weakTrust:   weakTrust,
-		decay:       decay,
+		trustByPeer:   trustByPeer,
+		cautionByPeer: cautionByPeer,
+		directPeers:   directPeers,
+		strongTrust:   strongTrust,
+		weakTrust:     weakTrust,
+		decay:         decay,
 	}
 }
 
@@ -107,16 +116,27 @@ func (ledger *Ledger) ObserveOutcome(peerName string, outcome Outcome) Transitio
 	wasDirect := ledger.directPeers[peerName]
 	switch outcome {
 	case OutcomeKept:
-		ledger.trustByPeer[peerName]++
+		if !ledger.consumeRecoveryCaution(peerName) {
+			ledger.trustByPeer[peerName]++
+		}
 	case OutcomeRepairKept:
+		// Intent: Explicitly kept repair promises may rebuild local confidence,
+		// but the separate caution counter still records that recent negative
+		// evidence existed. Source: DI-fijov
+		ledger.consumeRecoveryCaution(peerName)
 		ledger.trustByPeer[peerName] += 2
 	case OutcomeDiscoveryKept:
 		// Intent: One kept low-risk discovery promise can form a direct peer
 		// because the strong-trust threshold is deliberately small in POC13.
-		// Source: DI-timah
-		ledger.trustByPeer[peerName] += 2
+		// If this peer has recent malformed/broken evidence, discovery first
+		// works off local caution instead of immediately forming adjacency.
+		// Source: DI-timah; DI-fijov
+		if !ledger.consumeRecoveryCaution(peerName) {
+			ledger.trustByPeer[peerName] += 2
+		}
 	case OutcomeBroken, OutcomeMalformed:
 		ledger.trustByPeer[peerName] -= 3
+		ledger.addRecoveryCaution(peerName)
 	case OutcomeNonCommitment:
 		// Intent: A local non-commitment means the peer did not promise the
 		// requested exchange; it is not evidence that the peer broke an explicit
@@ -133,13 +153,43 @@ func (ledger *Ledger) ObserveOutcome(peerName string, outcome Outcome) Transitio
 	return TransitionUnchanged
 }
 
+// consumeRecoveryCaution makes ordinary positive evidence pay down recent
+// malformed/broken evidence before it can raise trust again.
+// Intent: Local trust should recover through a sequence of observed kept
+// promises, not by immediately accepting several neat-looking messages after a
+// malformed or broken promise. Source: DI-fijov
+func (ledger *Ledger) consumeRecoveryCaution(peerName string) bool {
+	if ledger.cautionByPeer[peerName] <= 0 {
+		return false
+	}
+	ledger.cautionByPeer[peerName]--
+	return true
+}
+
+// addRecoveryCaution records that this peer now needs extra locally observed
+// kept behavior before positive trust can climb again.
+// Intent: The caution counter is local relationship memory, not a punishment
+// imposed by another agent or a global reputation system. Source: DI-fijov
+func (ledger *Ledger) addRecoveryCaution(peerName string) {
+	if ledger.cautionByPeer[peerName] < recoveryCautionAfterNegativeEvidence {
+		ledger.cautionByPeer[peerName] = recoveryCautionAfterNegativeEvidence
+	}
+}
+
 // Export returns a durable copy of the local relationship state.
 // Intent: Make restart tests inspectable without exposing mutable ledger maps.
 // Source: DI-timah
 func (ledger *Ledger) Export() State {
+	cautionSnapshot := make(map[string]int, len(ledger.cautionByPeer))
+	for peerName, cautionCount := range ledger.cautionByPeer {
+		if cautionCount > 0 {
+			cautionSnapshot[peerName] = cautionCount
+		}
+	}
 	return State{
-		TrustByPeer: ledger.Snapshot(),
-		DirectPeers: ledger.DirectPeers(),
+		TrustByPeer:   ledger.Snapshot(),
+		CautionByPeer: cautionSnapshot,
+		DirectPeers:   ledger.DirectPeers(),
 	}
 }
 
@@ -151,6 +201,11 @@ func (ledger *Ledger) ApplyState(state State) {
 	for peerName, trustScore := range state.TrustByPeer {
 		if _, exists := ledger.trustByPeer[peerName]; exists {
 			ledger.trustByPeer[peerName] = trustScore
+		}
+	}
+	for peerName, cautionCount := range state.CautionByPeer {
+		if _, exists := ledger.cautionByPeer[peerName]; exists && cautionCount > 0 {
+			ledger.cautionByPeer[peerName] = cautionCount
 		}
 	}
 	ledger.directPeers = make(map[string]bool, len(state.DirectPeers))

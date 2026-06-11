@@ -223,6 +223,31 @@ func TestCandidateDiscoveryCanFormDirectPeer(t *testing.T) {
 	}
 }
 
+func TestFutureRepairCandidatePromiseCanBeHeardAfterMalformedEvidence(t *testing.T) {
+	// Intent: A peer may choose to hear a narrow future-repair promise after
+	// malformed evidence without treating that as permission for arbitrary
+	// traffic or immediate trust repair. Source: DI-fijov
+	cfg := computeRoutingTestConfig(t)
+	grace := NewNode(cfg, cfg.Agents[2], &decision.FakeDecider{}, decision.FakeMonitor{})
+	mallory := NewNode(cfg, cfg.Agents[4], &decision.FakeDecider{}, decision.FakeMonitor{})
+	grace.observeOutcome("mallory", relationship.OutcomeMalformed)
+	mallory.observeOutcome("grace", relationship.OutcomeMalformed)
+	ordinaryFields := map[string]string{"field_promise_about": "ordinary_followup"}
+	if grace.canAcceptFrom("mallory", ordinaryFields) {
+		t.Fatalf("Grace should not accept arbitrary candidate traffic after malformed evidence")
+	}
+	if mallory.canDialTarget("grace", ordinaryFields) {
+		t.Fatalf("Mallory should not dial arbitrary candidate traffic after malformed evidence")
+	}
+	repairFields := map[string]string{"field_promise_about": production.PromiseTrustRepair}
+	if !grace.canAcceptFrom("mallory", repairFields) {
+		t.Fatalf("Grace should be able to hear a narrow future-repair promise")
+	}
+	if !mallory.canDialTarget("grace", repairFields) {
+		t.Fatalf("Mallory should be able to offer a narrow future-repair promise")
+	}
+}
+
 func TestProtocolForFieldsRoutesShippingPromises(t *testing.T) {
 	cfg := shippingTestConfig(t)
 	fulfillment := NewNode(cfg, cfg.Agents[0], &decision.FakeDecider{}, decision.FakeMonitor{})
@@ -638,6 +663,50 @@ func TestMalformedProofEvidenceReducesIdentifiedPromiserTrust(t *testing.T) {
 	}
 	if !hasEventOutcome(grace.events, "malformed_proof_observed", "malformed") {
 		t.Fatalf("bad proof should be attributed as malformed evidence: %#v", grace.events)
+	}
+}
+
+func TestCorruptCASEvidenceReducesIdentifiedPromiserTrust(t *testing.T) {
+	// Intent: Corrupt content-addressed storage evidence is malformed promise
+	// evidence by the presenting peer, so it must reduce local trust just like a
+	// bad proof or bad compute result. Source: DI-fijov
+	cfg := computeRoutingTestConfig(t)
+	grace := NewNode(cfg, cfg.Agents[2], &decision.FakeDecider{}, decision.FakeMonitor{})
+	goodBytes := []byte("expected content")
+	badBytes := []byte("different content")
+	ackFields, err := grace.handleCASStoragePromise(map[string]string{
+		"from":                "mallory",
+		"field_promise_about": production.PromisePresentStorageEvidence,
+		"field_content_cid":   production.ContentCID(goodBytes),
+		"field_content_b64":   base64.StdEncoding.EncodeToString(badBytes),
+	})
+	if err != nil {
+		t.Fatalf("corrupt CAS evidence should return a broken verdict ACK, not handler error: %v", err)
+	}
+	if ackFields["field_verdict"] != "broken" {
+		t.Fatalf("corrupt CAS verdict = %#v, want broken", ackFields)
+	}
+	if grace.ledger.Trust("mallory") != -3 {
+		t.Fatalf("mallory trust = %d, want -3 after corrupt CAS evidence", grace.ledger.Trust("mallory"))
+	}
+	if grace.canDial("mallory") {
+		t.Fatalf("Grace should stop promising direct sends to Mallory after corrupt CAS evidence")
+	}
+	if !hasEventOutcome(grace.events, "cas_corrupt_bytes_rejected", "malformed") {
+		t.Fatalf("corrupt CAS evidence should be recorded as malformed: %#v", grace.events)
+	}
+}
+
+func TestFutureRepairPromiseDoesNotImmediatelyIncreaseTrust(t *testing.T) {
+	// Intent: A promise to repair future behavior is useful local evidence to
+	// remember, but it is not proof that the future repair has already been kept.
+	// Source: DI-fijov
+	ackFields := map[string]string{
+		"field_promise_about": production.PromiseTrustRepair,
+		"field_repair_status": "future_only",
+	}
+	if evidenceUpdatesTrust(ackFields) {
+		t.Fatalf("future-only repair promise should not immediately update trust: %#v", ackFields)
 	}
 }
 

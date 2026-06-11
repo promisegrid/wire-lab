@@ -18,6 +18,14 @@ Intent: Negative compute evidence should have visible routing consequences witho
 Constraints: Keep all behavior promise-first; do not introduce RPC-style dispatch or global trust; keep the single top-level `promise` action; preserve `compute_alternate_function_executed` coverage through a peer that currently has enough local trust for Alice to contact.
 Affects: implementations/poc13-cas-compute-functions/runtime/node.go; implementations/poc13-cas-compute-functions/README.md; DEV-GUIDE-RESOURCES.md.
 
+ID: DI-fijov
+Date: 2026-06-10 14:03:18
+Status: active
+Decision: POC13 local trust ledgers must delay positive trust recovery after malformed or broken peer evidence, and corrupt CAS evidence must enter the same local trust path as bad proofs and bad compute results.
+Intent: A peer should not regain strong local trust merely by sending several parseable promises immediately after malformed behavior. PromiseGrid trust is local, evidence-based, and relationship-specific, so malformed/broken evidence should create local recovery caution that ordinary kept promises must work off before they can raise trust again. Explicit future repair promises are evidence to remember, but they are not themselves proof that the promised future repair has already been kept.
+Constraints: Keep trust local to each agent; do not add global trust authority, RPC enforcement, permissions, or new top-level action kinds; preserve existing POC13 transport and pCID routing behavior; keep clean-run state run-scoped.
+Affects: implementations/poc13-cas-compute-functions/relationship/ledger.go; implementations/poc13-cas-compute-functions/runtime/node.go; implementations/poc13-cas-compute-functions/runtime/node_test.go; implementations/poc13-cas-compute-functions/relationship/ledger_test.go; DEV-GUIDE-RESOURCES.md.
+
 ## Tasks
 
 - [x] juput.1 Add run-scoped durable CAS/evidence stores with a clean-run reset invariant.
@@ -29,3 +37,4 @@ Affects: implementations/poc13-cas-compute-functions/runtime/node.go; implementa
 - [x] juput.7 Add analyzer gates for retention, GC, backpressure, and rate-limit promise evidence.
 - [x] juput.8 Add replay protection for exact envelopes and capability tokens as promise/evidence semantics.
 - [x] juput.9 Add fuzz/chaos tests for CBOR parsing, pCID routing, crashes, delayed ACKs, and partial writes.
+- [x] juput.10 Fix malformed/broken peer evidence so positive trust recovery is delayed until local caution is worked off.

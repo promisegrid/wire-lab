@@ -578,31 +578,6 @@ func (node *Node) runCASComputeWorkflow() error {
 // unknown pCIDs, and bad proofs without gaining authority over Mallory.
 // Source: DI-sinur
 func (node *Node) runAdversaryWorkflow() error {
-	claimedCID := production.ContentCID(production.SampleContentBytes())
-	if _, err := node.sendAndReceive("grace", map[string]string{
-		"act":                 decision.ActPromise,
-		"from":                node.Agent.Name,
-		"to":                  "grace",
-		"turn":                "startup",
-		"promise":             "Mallory promises these bytes match the claimed content CID.",
-		"reason":              "adversarial corrupt-byte evidence should be locally rejected",
-		"field_promise_about": production.PromisePresentStorageEvidence,
-		"field_content_cid":   claimedCID,
-		"field_content_b64":   base64.StdEncoding.EncodeToString(production.CorruptContentBytes()),
-	}); err != nil {
-		return fmt.Errorf("corrupt bytes offer: %w", err)
-	}
-	if _, err := node.sendAndReceive("grace", map[string]string{
-		"act":                 decision.ActPromise,
-		"from":                node.Agent.Name,
-		"to":                  "grace",
-		"turn":                "startup",
-		"promise":             "Mallory promises to label future malformed storage evidence explicitly.",
-		"reason":              "repair remains only a future promise Grace may distrust",
-		"field_promise_about": production.PromiseTrustRepair,
-	}); err != nil {
-		return fmt.Errorf("trust repair promise: %w", err)
-	}
 	if err := node.sendUnknownProtocolPromise("grace"); err != nil {
 		return fmt.Errorf("unknown protocol probe: %w", err)
 	}
@@ -619,9 +594,6 @@ func (node *Node) runAdversaryWorkflow() error {
 		node.record("promise_variant_not_promised", "non_commitment", "grace", "pcid="+pcid.CASStorageV1+" Grace did not promise unsupported storage variant")
 	}
 	node.shouldSuppressNonCommittedPromise("grace", unsupportedFields)
-	if err := node.sendBadProofPromise("grace"); err != nil {
-		node.record("bad_proof_rejected", "malformed", "grace", "pcid="+pcid.CASStorageV1+" local kernel rejected bad proof: "+err.Error())
-	}
 	if _, err := node.sendAndReceive("grace", map[string]string{
 		"act":                  decision.ActPromise,
 		"from":                 node.Agent.Name,
@@ -657,6 +629,37 @@ func (node *Node) runAdversaryWorkflow() error {
 		"field_units":          "999",
 	}); err != nil {
 		return fmt.Errorf("capacity probe: %w", err)
+	}
+	claimedCID := production.ContentCID(production.SampleContentBytes())
+	if _, err := node.sendAndReceive("grace", map[string]string{
+		"act":                 decision.ActPromise,
+		"from":                node.Agent.Name,
+		"to":                  "grace",
+		"turn":                "startup",
+		"promise":             "Mallory promises these bytes match the claimed content CID.",
+		"reason":              "adversarial corrupt-byte evidence should be locally rejected",
+		"field_promise_about": production.PromisePresentStorageEvidence,
+		"field_content_cid":   claimedCID,
+		"field_content_b64":   base64.StdEncoding.EncodeToString(production.CorruptContentBytes()),
+	}); err != nil {
+		return fmt.Errorf("corrupt bytes offer: %w", err)
+	}
+	// Intent: The repair promise deliberately follows malformed evidence. It is
+	// narrow candidate traffic that Grace may choose to receive, but it records
+	// future repair only and does not immediately restore trust. Source: DI-fijov
+	if _, err := node.sendAndReceive("grace", map[string]string{
+		"act":                 decision.ActPromise,
+		"from":                node.Agent.Name,
+		"to":                  "grace",
+		"turn":                "startup",
+		"promise":             "Mallory promises to label future malformed storage evidence explicitly.",
+		"reason":              "repair remains only a future promise Grace may distrust",
+		"field_promise_about": production.PromiseTrustRepair,
+	}); err != nil {
+		return fmt.Errorf("trust repair promise: %w", err)
+	}
+	if err := node.sendBadProofPromise("grace"); err != nil {
+		node.record("bad_proof_rejected", "malformed", "grace", "pcid="+pcid.CASStorageV1+" local kernel rejected bad proof: "+err.Error())
 	}
 	return nil
 }
@@ -1673,10 +1676,15 @@ func (node *Node) handleCASStoragePromise(fields map[string]string) (map[string]
 		}
 		node.record("cas_corrupt_bytes_rejected", "malformed", fields["from"], "pcid="+pcid.CASStorageV1+" bytes did not match content_cid="+contentCID)
 		node.record("cas_corrupt_evidence_recorded", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" local corrupt-byte evidence recorded")
+		// Intent: Corrupt CAS evidence is an observable malformed promise by an
+		// identifiable peer, so it must enter the same local trust path as bad
+		// proofs and bad compute results instead of remaining a log-only event.
+		// Source: DI-fijov
+		node.observeOutcome(fields["from"], relationship.OutcomeMalformed)
 		return map[string]string{"field_promise_about": production.PromisePresentStorageEvidence, "field_verdict": "broken"}, nil
 	case production.PromiseTrustRepair:
 		node.record("trust_repair_promise_recorded", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" future repair promise recorded as local evidence")
-		return map[string]string{"field_promise_about": production.PromiseTrustRepair}, nil
+		return map[string]string{"field_promise_about": production.PromiseTrustRepair, "field_repair_status": "future_only"}, nil
 	case production.PromiseUnsupportedVariantProbe:
 		node.record("promise_variant_not_promised", "non_commitment", fields["from"], "pcid="+pcid.CASStorageV1+" unsupported storage variant not promised")
 		return map[string]string{"field_promise_about": production.PromiseUnsupportedVariantProbe, "field_variant_status": "not_promised"}, nil
@@ -2119,28 +2127,29 @@ func (node *Node) canAccept(peerName string) bool {
 
 // canDialTarget reports whether this node currently promises to initiate one TCP
 // exchange with a peer. Intent: Existing direct peers remain the ordinary path;
-// candidate peers are reachable only for explicit low-risk link-discovery
-// promises, not arbitrary traffic. Source: DI-timah
+// candidate peers are reachable only for explicit low-risk discovery or
+// future-repair promises, not arbitrary traffic. Source: DI-timah; DI-fijov
 func (node *Node) canDialTarget(peerName string, fields map[string]string) bool {
 	node.mu.Lock()
 	defer node.mu.Unlock()
 	if node.ledger.CanDial(peerName) {
 		return true
 	}
-	return isLinkDiscoveryPromise(fields) && containsName(node.Agent.CandidatePeers, peerName)
+	return isLowRiskCandidatePromise(fields) && containsName(node.Agent.CandidatePeers, peerName)
 }
 
 // canAcceptFrom reports whether this node currently promises to accept one TCP
 // exchange from a peer. Intent: Candidate-peer discovery is a narrow voluntary
-// acceptance promise, not broad permission or a global routing rule.
-// Source: DI-timah
+// acceptance promise, and future repair after malformed evidence is similarly
+// narrow. Neither creates broad permission or a global routing rule.
+// Source: DI-timah; DI-fijov
 func (node *Node) canAcceptFrom(peerName string, fields map[string]string) bool {
 	node.mu.Lock()
 	defer node.mu.Unlock()
 	if node.ledger.CanAccept(peerName) {
 		return true
 	}
-	return isLinkDiscoveryPromise(fields) && containsName(node.Agent.CandidatePeers, peerName)
+	return isLowRiskCandidatePromise(fields) && containsName(node.Agent.CandidatePeers, peerName)
 }
 
 func (node *Node) observeOutcome(peerName string, outcome relationship.Outcome) {
@@ -2355,9 +2364,9 @@ func outcomeForPromise(fields map[string]string) relationship.Outcome {
 // trust or merely be recorded as already-seen local evidence.
 // Intent: Duplicate shipment-update confirmations should remain visible in logs
 // without repeatedly increasing trust for the same order/tracking/cost
-// checkpoint, and negative ACK payload verdicts should not inflate local trust
-// merely because the receiver returned a parseable ACK. Source: DI-jinoz;
-// DI-punib
+// checkpoint. Negative ACK payload verdicts and future-only repair promises
+// should not inflate local trust merely because the receiver returned a
+// parseable ACK. Source: DI-jinoz; DI-punib; DI-fijov
 func evidenceUpdatesTrust(fields map[string]string) bool {
 	if fields == nil {
 		return true
@@ -2374,6 +2383,7 @@ func evidenceUpdatesTrust(fields map[string]string) bool {
 		fields["field_compute_status"] == "capacity_refused" ||
 		fields["field_cache_status"] == "miss" ||
 		fields["field_token_status"] == "not_promised" ||
+		fields["field_repair_status"] == "future_only" ||
 		fields["field_replay_status"] == "not_promised" {
 		return false
 	}
@@ -2480,6 +2490,15 @@ func isLinkDiscoveryPromise(fields map[string]string) bool {
 		}
 	}
 	return false
+}
+
+// isLowRiskCandidatePromise recognizes promise meanings a peer may voluntarily
+// receive even before ordinary direct-trust adjacency exists.
+// Intent: A future-repair promise after malformed evidence is low risk enough to
+// hear, but it still does not prove repair or permit arbitrary follow-up
+// messages. Source: DI-fijov
+func isLowRiskCandidatePromise(fields map[string]string) bool {
+	return isLinkDiscoveryPromise(fields) || fields["field_promise_about"] == production.PromiseTrustRepair
 }
 
 func containsName(names []string, wantedName string) bool {
