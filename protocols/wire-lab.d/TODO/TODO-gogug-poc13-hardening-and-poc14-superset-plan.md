@@ -10,6 +10,22 @@ Intent: The latest POC13 run passed, but its monitor and analyzer evidence expos
 Constraints: Keep the single top-level `promise` action; do not add RPC verbs, global trust, central routing authority, or permission/conformance language; preserve pCID-defined payload semantics; keep local trust per-agent and evidence-based; keep run state scoped to the current clean-run root; do not persist POC state across clean runs.
 Affects: implementations/poc13-cas-compute-functions/; protocols/wire-lab.d/TODO/TODO.md; DEV-GUIDE-RESOURCES.md.
 
+ID: DI-sifot
+Date: 2026-06-11 14:35:43
+Status: active
+Decision: The POC14 plan must include heterogeneous process-boundary agents: one or more WASM agents in their own process and one or more agents that do all messaging through stdio.
+Intent: POC14 should test PromiseGrid's portability and kernel/app boundary model beyond same-language TCP-only Go processes. WASM agents test sandboxed runtimes and host-call boundaries; stdio-only agents test whether the same promise envelope and local-kernel routing model can work for subprocesses that have no direct network API and communicate only through standard input/output.
+Constraints: Keep the single top-level `promise` action; keep app trust and workflow judgment outside the kernel; do not turn stdio or WASM adapters into RPC command surfaces; preserve pCID-defined payload semantics and exact envelope evidence.
+Affects: implementations/poc14-production-progress/docs/POC14-SUPERSET-PLAN.md.
+
+ID: DI-fimoh
+Date: 2026-06-11 14:54:40
+Status: active
+Decision: Rename the POC14 planning directory to `implementations/poc14-wasm/`.
+Intent: The POC14 plan now has a concrete WASM/stdio portability emphasis, so the directory slug should name that axis directly instead of the broader production-progress label.
+Constraints: Preserve the POC14 superset baseline from `DI-sihuz`; preserve the heterogeneous process-boundary requirements from `DI-sifot`; move the plan rather than duplicating it.
+Affects: implementations/poc14-wasm/docs/POC14-SUPERSET-PLAN.md.
+
 ## Tasks
 
 - [x] gogug.1 Fix POC13 evidence summary mismatch so saved evidence counts include all local non-commitment outcomes, not only receiver-side `not_promised` journal entries.
