@@ -3,7 +3,7 @@
 POC14 should begin as a superset of POC13 unless a later DI explicitly narrows
 scope. It should also test heterogeneous process boundaries beyond same-language
 TCP-only Go agents. Source: `DI-sihuz`; `DI-sifot`; `DI-fimoh`;
-`DI-lulof`.
+`DI-lulof`; `DI-linof`.
 
 ## Baseline Promises To Preserve
 
@@ -37,6 +37,25 @@ TCP-only Go agents. Source: `DI-sihuz`; `DI-sifot`; `DI-fimoh`;
 - Add richer POC-local operators for analyzer/monitor comparison, failed-run
   triage, and explicit evidence export for review while keeping those tools out
   of the production trust model.
+
+## Implemented First Slice
+
+- Scaffolded `implementations/poc14-wasm/` from POC13 as a superset baseline
+  with POC14-local module, command, Docker, run-root, and analyzer names.
+- Added Peggy as a deterministic WASM-boundary app process. Peggy validates a
+  small WASM module fixture, then exchanges ordinary `relationship_v1`
+  PromiseGrid envelopes through the local kernel.
+- Added Victor as a deterministic stdio-boundary app. Victor's worker process
+  emits and observes exact PromiseGrid envelope bytes only over stdin/stdout;
+  the adapter forwards those bytes through the local kernel.
+- Added analyzer gates for WASM, stdio, and decentralized monitoring evidence
+  so POC14 cannot pass by merely preserving the POC13 baseline.
+- Added decentralized monitoring evidence for local summaries, peer-carried
+  attestations, bearer-token exchange-rate signals, topology signals, and
+  voluntary gossip. Source: `DI-linof`; `DI-lulof`.
+- Added explicit mixed-version pCID migration evidence and same-run restart
+  recovery evidence so those planned POC14 concerns have analyzer gates rather
+  than remaining prose-only intentions. Source: `DI-linof`.
 
 ## Production Monitoring Boundary
 

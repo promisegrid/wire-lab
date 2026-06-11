@@ -226,6 +226,23 @@ ACK verdicts such as broken, malformed, disagreement, cache miss, price refusal,
 capacity refusal, or unsupported variant are recorded as evidence without
 increasing local trust. Source: `DI-sinur`; `DI-punib`.
 
+POC14 is the current next-step POC target for heterogeneous runtime boundaries.
+It is scaffolded as a POC13 superset under `implementations/poc14-wasm/`, keeps
+the inherited kernel/app, shipping, CAS, compute, trust, replay, and pressure
+gates, and adds Peggy/Victor boundary evidence: Peggy is a separate
+WASM-boundary app process that validates module bytes and sends normal
+`relationship_v1` promises, while Victor is a stdio-worker agent behind a local
+adapter whose application messaging path is stdin/stdout carrying exact
+PromiseGrid envelope bytes. POC14 also adds analyzer dimensions for boundary,
+decentralized monitoring, mixed-version pCID migration, and same-run restart
+evidence. The monitoring lesson is important for guide prose: POC analyzers and
+monitors are development tools, not production authorities. Production agents
+owned by different legal entities can only exchange local evidence summaries,
+peer-carried attestations, token exchange-rate signals, topology signals, and
+voluntary gossip as ordinary promises; no global observer, trust score, exchange
+rate, or audit trail exists by default. Source: `DI-sihuz`; `DI-linof`;
+`DI-lulof`.
+
 `poc7` adds executable evidence for promise-shaped capability tokens and local
 exchange: five containers run local kernel boundaries, app-level relays, issuer,
 trader, and resource roles; Alice, Bob, Carol, Dave, and Mallory exercise signed
@@ -1375,14 +1392,25 @@ section.
   protocol exchanges, negative ACK verdicts do not inflate local trust, and
   malformed/broken peer evidence creates local recovery caution that delays
   later positive trust growth. Its analyzer now
-  gates inherited POC11/POC12 evidence, POC13 storage/compute evidence, and the
-  run-scoped durability/retention/pressure/replay evidence so future POCs cannot
-  silently regress unless a scoped DI declares an explicit non-superset exception.
-  It should be cited as POC evidence only, not as a final storage, compute,
-  cache, provider, token, economics, trust, transport, retention, replay, or
-  kernel API. Source: `DI-bibom`; `DI-notig`; `DI-lasuh`; `DI-fumol`;
-  `DI-hohuf`; `DI-mosil`; `DI-lupag`; `DI-nisaz`; `DI-kikoj`; `DI-sinur`;
-  `DI-punib`; `DI-sunuf`; `DI-fijov`; `TODO-godad`; `TODO-pazif`; `TODO-juput`.
+	  gates inherited POC11/POC12 evidence, POC13 storage/compute evidence, and the
+	  run-scoped durability/retention/pressure/replay evidence so future POCs cannot
+	  silently regress unless a scoped DI declares an explicit non-superset exception.
+	  It should be cited as POC evidence only, not as a final storage, compute,
+	  cache, provider, token, economics, trust, transport, retention, replay, or
+	  kernel API. Source: `DI-bibom`; `DI-notig`; `DI-lasuh`; `DI-fumol`;
+	  `DI-hohuf`; `DI-mosil`; `DI-lupag`; `DI-nisaz`; `DI-kikoj`; `DI-sinur`;
+	  `DI-punib`; `DI-sunuf`; `DI-fijov`; `TODO-godad`; `TODO-pazif`; `TODO-juput`.
+- `implementations/poc14-wasm/` is executable provisional superset evidence for
+  POC13 plus heterogeneous app/runtime boundaries. It adds a WASM-boundary agent
+  process, a stdio-only worker process behind a local adapter, exact-envelope
+  forwarding through the same local kernel path, decentralized-monitoring
+  evidence that avoids global observer assumptions, mixed-version pCID migration
+  evidence, and same-run restart/recovery evidence. Its analyzer gates `boundary`,
+  `monitoring`, `migration`, and `restart` dimensions in addition to inherited
+  POC13 gates. It should be cited as POC evidence only, not as a final WASM host,
+  stdio adapter, monitor, pCID migration, crash-recovery, kernel, or app API.
+  Source: `DI-sihuz`; `DI-sifot`; `DI-fimoh`; `DI-lulof`; `DI-linof`;
+  `TODO-gogug`.
 - `protocols/wire-lab.d/archive/migrations/SIM-piloh-turns-149-208-recovery/archive/transports/README.md`
   preserves the old root transport design surface as historical evidence.
 

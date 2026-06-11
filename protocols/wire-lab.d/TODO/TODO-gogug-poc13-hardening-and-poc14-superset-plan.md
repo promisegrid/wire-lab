@@ -34,6 +34,14 @@ Intent: Real PromiseGrid agents may run in geographically diverse runtimes contr
 Constraints: Do not introduce global monitoring, global analysis, centralized trust scores, central exchange rates, or cross-agent authority. Treat analyzer and monitor components as POC/local-development tools unless explicitly reframed as ordinary agents making voluntary promises from their own local evidence.
 Affects: implementations/poc14-wasm/docs/POC14-SUPERSET-PLAN.md.
 
+ID: DI-linof
+Date: 2026-06-11 16:07:05
+Status: active
+Decision: Implement POC14 by copying POC13 into `implementations/poc14-wasm/`, renaming POC-local commands and module paths to POC14, and adding deterministic WASM-boundary and stdio-boundary agent roles without dropping POC11/POC12/POC13 behavior.
+Intent: POC14 needs executable evidence for heterogeneous process boundaries while remaining a strict superset baseline. The WASM role should exercise a separate process that treats sandboxed module bytes as locally hosted agent logic; the stdio role should exercise a separate worker process whose only application messaging path is stdin/stdout through a local adapter. Both roles must exchange ordinary PromiseGrid envelopes and record local evidence rather than introducing RPC commands or global analysis.
+Constraints: Preserve one top-level semantic action `promise`; keep trust/workflow judgment in apps rather than the kernel; keep analyzer/monitor global views as POC-only development tools; preserve pCID-defined envelope semantics; use POC14 command names derived from existing POC13 command names plus `poc14-wasm-agent`, `poc14-stdio-adapter`, and `poc14-stdio-worker`; keep runtime state under the POC14 run root.
+Affects: implementations/poc14-wasm/; protocols/wire-lab.d/TODO/TODO-gogug-poc13-hardening-and-poc14-superset-plan.md.
+
 ## Tasks
 
 - [x] gogug.1 Fix POC13 evidence summary mismatch so saved evidence counts include all local non-commitment outcomes, not only receiver-side `not_promised` journal entries.
@@ -46,3 +54,13 @@ Affects: implementations/poc14-wasm/docs/POC14-SUPERSET-PLAN.md.
 - [x] gogug.8 Improve live-agent autonomy prompts and evidence so agents choose useful pCID-scoped promise work without losing protocol safety.
 - [x] gogug.9 Add a true dynamic TCP topology experiment where direct links affect real send/receive reachability during the run.
 - [x] gogug.10 Start POC14 planning as the next production-progress superset while keeping POC13 as the regression baseline.
+- [x] gogug.11 Scaffold `implementations/poc14-wasm/` from POC13 as a local POC14 module and command set.
+- [x] gogug.12 Add Peggy as a WASM-boundary app process with exact-envelope evidence.
+- [x] gogug.13 Add Victor as a stdio-worker app process behind a local adapter.
+- [x] gogug.14 Keep WASM and stdio exchanges inside ordinary `grid([42(pCID), ...])` promise envelopes.
+- [x] gogug.15 Preserve POC12 local app/kernel/device workflow in the POC14 scaffold.
+- [x] gogug.16 Preserve POC13 CAS, compute, replica, verification, trust, replay, and pressure gates.
+- [x] gogug.17 Add mixed-version pCID migration evidence and analyzer gates.
+- [x] gogug.18 Add run-internal restart/recovery evidence and analyzer gates.
+- [x] gogug.19 Replace global monitor assumptions with decentralized evidence-summary experiments.
+- [x] gogug.20 Model bearer-token exchange rates as local trust/economic signals.

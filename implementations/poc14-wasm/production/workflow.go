@@ -1,0 +1,369 @@
+package production
+
+import (
+	"crypto/sha256"
+	"encoding/hex"
+	"fmt"
+	"strconv"
+	"strings"
+)
+
+const (
+	PromiseWeighPackage            = "weigh_package"
+	PromiseAddressLookup           = "address_lookup"
+	PromisePrintLabel              = "print_label"
+	PromiseShipmentUpdate          = "shipment_update"
+	PromiseIssuePrintCapability    = "issue_print_capability"
+	PromiseRedeemPrintCapability   = "redeem_print_capability"
+	PromiseStoreContent            = "store_content"
+	PromiseServeContent            = "serve_content"
+	PromiseReplicateContent        = "replicate_content"
+	PromiseServeReplicaContent     = "serve_replica_content"
+	PromiseReplicaTokenLifecycle   = "replica_token_lifecycle"
+	PromisePresentStorageEvidence  = "present_storage_evidence"
+	PromiseExecuteFunction         = "execute_function"
+	PromiseLookupComputeCache      = "lookup_compute_cache"
+	PromiseProvideComputeContext   = "provide_compute_context"
+	PromiseVerifyComputeResult     = "verify_compute_result"
+	PromiseLocalComputeObservation = "local_compute_observation"
+	PromiseRotateSigningKey        = "rotate_signing_key"
+	PromiseTrustRepair             = "label_future_malformed_evidence"
+	PromiseUnsupportedVariantProbe = "unsupported_variant_probe"
+	PrintCapabilityScope           = "print_label"
+	PrintCapabilityMaxBytes        = 4096
+)
+
+// WeightForPackage simulates a deterministic postal scale reading.
+// Intent: Device agents make promises about local device state; they do not
+// invent weights or accept commands from workflow agents. Source: DI-timah
+func WeightForPackage(packageID string) (int, error) {
+	packageID = strings.TrimSpace(packageID)
+	if packageID == "" {
+		return 0, fmt.Errorf("package_id is required")
+	}
+	if strings.Contains(strings.ToLower(packageID), "jammed") {
+		return 0, fmt.Errorf("scale cannot currently read package %s", packageID)
+	}
+	return 16 + len(packageID)*3, nil
+}
+
+// AddressForOrder simulates an accounting-system address lookup.
+// Intent: The accounting agent promises only address records it locally has,
+// leaving the fulfillment agent to judge whether that evidence is enough.
+// Source: DI-timah
+func AddressForOrder(orderID string) (string, error) {
+	orderID = strings.TrimSpace(orderID)
+	if orderID == "" {
+		return "", fmt.Errorf("order_id is required")
+	}
+	if strings.Contains(strings.ToLower(orderID), "unknown") {
+		return "", fmt.Errorf("order %s is unknown to accounting", orderID)
+	}
+	return "100 Promise Way, Suite " + strconv.Itoa(len(orderID)*10) + ", Example City, CA 94000", nil
+}
+
+// LabelForShipment simulates a UPS label printer response from shipment facts.
+// Intent: The printer promises label evidence derived from supplied package and
+// address evidence; it does not promise shipment success outside its device
+// boundary. Source: DI-timah
+func LabelForShipment(packageID, address string, weightOunces int) (string, int, error) {
+	packageID = strings.TrimSpace(packageID)
+	address = strings.TrimSpace(address)
+	if packageID == "" {
+		return "", 0, fmt.Errorf("package_id is required")
+	}
+	if address == "" {
+		return "", 0, fmt.Errorf("shipping address is required")
+	}
+	if weightOunces <= 0 {
+		return "", 0, fmt.Errorf("positive weight_ounces is required")
+	}
+	digest := sha256.Sum256([]byte(packageID + "|" + address + "|" + strconv.Itoa(weightOunces)))
+	trackingNumber := "1Z" + strings.ToUpper(hex.EncodeToString(digest[:]))[:14]
+	costCents := 700 + weightOunces*4
+	return trackingNumber, costCents, nil
+}
+
+// IssuePrintCapabilityToken creates a deterministic capability-promise token
+// from the printer-port issuer's local promise fields.
+// Intent: The token is evidence that `printer_port` promises bounded future
+// label printing for one issuee and scope; it is not permission from an
+// authority. Source: DI-pohaj; DI-vutok
+func IssuePrintCapabilityToken(fields map[string]string) (string, error) {
+	tokenID := strings.TrimSpace(fields["field_print_capability_token_id"])
+	if tokenID == "" {
+		tokenID = "printcap-" + strings.TrimSpace(fields["field_print_capability_issuee"])
+	}
+	scope := strings.TrimSpace(fields["field_print_capability_scope"])
+	if scope == "" {
+		scope = PrintCapabilityScope
+	}
+	maxBytes := fields["field_print_capability_max_bytes"]
+	if maxBytes == "" {
+		maxBytes = strconv.Itoa(PrintCapabilityMaxBytes)
+	}
+	token := strings.TrimSpace(fields["field_print_capability_issuee"])
+	if token == "" {
+		token = strings.TrimSpace(fields["to"])
+	}
+	if token == "" {
+		return "", fmt.Errorf("print capability issuee is required")
+	}
+	if scope != PrintCapabilityScope {
+		return "", fmt.Errorf("print capability scope %q is not supported", scope)
+	}
+	printEvidence := sha256.Sum256([]byte("printer_port|" + token + "|" + tokenID + "|" + scope + "|" + maxBytes))
+	token = "pcap1:" + hex.EncodeToString(printEvidence[:])
+	return token, nil
+}
+
+// ValidatePrintCapabilityToken verifies that a redemption presents the exact
+// future-print promise token the printer-port app would have issued locally.
+// Intent: Token redemption is local promise recognition by the issuer, not a
+// global authorization check. Source: DI-pohaj; DI-vutok
+func ValidatePrintCapabilityToken(fields map[string]string) error {
+	token := strings.TrimSpace(fields["field_print_capability_token"])
+	if token == "" {
+		return fmt.Errorf("print capability token is required")
+	}
+	tokenID := strings.TrimSpace(fields["field_print_capability_token_id"])
+	if tokenID == "" {
+		return fmt.Errorf("print capability token_id is required")
+	}
+	scope := strings.TrimSpace(fields["field_print_capability_scope"])
+	if scope != PrintCapabilityScope {
+		return fmt.Errorf("print capability scope %q is not supported", scope)
+	}
+	maxBytes := intField(fields, "field_print_capability_max_bytes")
+	if maxBytes <= 0 || maxBytes > PrintCapabilityMaxBytes {
+		return fmt.Errorf("print capability max_bytes %d is outside local bounds", maxBytes)
+	}
+	labelBytes, decodeErr := hex.DecodeString(strings.TrimSpace(fields["field_label_bytes_hex"]))
+	if decodeErr != nil {
+		return fmt.Errorf("label bytes are not valid hex: %w", decodeErr)
+	}
+	if len(labelBytes) == 0 {
+		return fmt.Errorf("label bytes are required")
+	}
+	if len(labelBytes) > maxBytes {
+		return fmt.Errorf("label bytes length %d exceeds capability max_bytes %d", len(labelBytes), maxBytes)
+	}
+	capabilityFields := map[string]string{
+		"to":                               strings.TrimSpace(fields["from"]),
+		"field_print_capability_issuee":    strings.TrimSpace(fields["from"]),
+		"field_print_capability_token_id":  tokenID,
+		"field_print_capability_scope":     scope,
+		"field_print_capability_max_bytes": strconv.Itoa(maxBytes),
+	}
+	printEvidence, issueErr := IssuePrintCapabilityToken(capabilityFields)
+	if issueErr != nil {
+		return issueErr
+	}
+	if token != printEvidence {
+		return fmt.Errorf("print capability token does not match printer_port promise")
+	}
+	return nil
+}
+
+// LabelBytesForShipment returns the bounded bytes that the label-printer app
+// asks the printer-port app to write to local printer hardware.
+// Intent: The UPS label app can promise label-content generation, while the
+// printer-port app separately promises local hardware access evidence.
+// Source: DI-pohaj; DI-vutok
+func LabelBytesForShipment(fields map[string]string) ([]byte, error) {
+	if strings.TrimSpace(fields["field_package_id"]) == "" {
+		return nil, fmt.Errorf("package_id is required")
+	}
+	if strings.TrimSpace(fields["field_tracking_number"]) == "" {
+		return nil, fmt.Errorf("tracking_number is required")
+	}
+	if strings.TrimSpace(fields["field_cost_cents"]) == "" {
+		return nil, fmt.Errorf("cost_cents is required")
+	}
+	labelBytes := []byte("UPS-LABEL\npackage=" + fields["field_package_id"] + "\ntracking=" + fields["field_tracking_number"] + "\ncost_cents=" + fields["field_cost_cents"] + "\n")
+	if len(labelBytes) > PrintCapabilityMaxBytes {
+		return nil, fmt.Errorf("label bytes length %d exceeds local max %d", len(labelBytes), PrintCapabilityMaxBytes)
+	}
+	return labelBytes, nil
+}
+
+// PrintLabelToLocalDevice simulates writing bounded label bytes to the local
+// printer device owned by the printer-port kernel role.
+// Intent: POC14 avoids real USB dependencies while still making hardware access
+// a separate local promise surface with exact print evidence. Source: DI-pohaj;
+// DI-vutok
+func PrintLabelToLocalDevice(fields map[string]string) (string, error) {
+	if validateErr := ValidatePrintCapabilityToken(fields); validateErr != nil {
+		return "", validateErr
+	}
+	labelBytes, decodeErr := hex.DecodeString(strings.TrimSpace(fields["field_label_bytes_hex"]))
+	if decodeErr != nil {
+		return "", fmt.Errorf("label bytes are not valid hex: %w", decodeErr)
+	}
+	printEvidence := sha256.Sum256(labelBytes)
+	spoolID := "spool-" + hex.EncodeToString(printEvidence[:])[:16]
+	return spoolID, nil
+}
+
+// ContentCID returns a POC CIDv1 raw sha2-256 identity for stored content,
+// function source bytes, inputs, contexts, and compute results.
+// Intent: POC14 preserves the distinction between pCID protocol identity and
+// payload-level CIDs while making CAS and compute evidence exact-byte checkable.
+// Source: DI-sinur
+func ContentCID(content []byte) string {
+	digest := sha256.Sum256(content)
+	return "cidv1-raw-sha2-256:" + hex.EncodeToString(digest[:])
+}
+
+// VerifyContentCID checks that a byte string matches the payload-level CID an
+// agent promised it represented.
+// Intent: Receivers independently verify bytes from their local vantage instead
+// of accepting sender claims as authority. Source: DI-sinur
+func VerifyContentCID(content []byte, cid string) bool {
+	return ContentCID(content) == cid
+}
+
+// SampleContentBytes supplies deterministic private bytes for the executable
+// CAS path without committing real user data.
+func SampleContentBytes() []byte {
+	return []byte("poc14 sample invoice bytes")
+}
+
+// SampleSecondContentBytes creates independent storage pressure so the CAS path
+// cannot pass by handling only one hard-coded object.
+func SampleSecondContentBytes() []byte {
+	return []byte("poc14 second sample receipt bytes")
+}
+
+// CorruptContentBytes is Mallory's malformed evidence probe; its claimed CID is
+// intentionally different from the byte content.
+func CorruptContentBytes() []byte {
+	return []byte("poc14 sample invoice bytes corrupted by mallory")
+}
+
+func SampleFunctionBytes() []byte {
+	return []byte("poc14 function: fibonacci(n) v1")
+}
+
+func SampleSumFunctionBytes() []byte {
+	return []byte("poc14 function: sum(values) v1")
+}
+
+func SampleInputBytes() []byte {
+	return []byte("n=9")
+}
+
+func SampleSumInputBytes() []byte {
+	return []byte("values=2,3,5")
+}
+
+func SampleContextBytes() []byte {
+	return []byte("timestamp=2026-06-06T00:00:00Z;randomness=explicit-none")
+}
+
+// ComputeCacheKey names one exact local compute checkpoint over all bytes that
+// make the result meaningful.
+// Intent: Cache reuse is evidence over a pCID-defined tuple, not a global
+// execution result authority. Source: DI-sinur
+func ComputeCacheKey(protocolName, functionCID, inputCID, contextCID, resultCID string) string {
+	return ContentCID([]byte(protocolName + "|" + functionCID + "|" + inputCID + "|" + contextCID + "|" + resultCID))
+}
+
+// ExecuteFunction runs only the two bounded function forms used by this POC.
+// Intent: POC14 tests CID-named arbitrary function bytes without embedding a
+// general-purpose remote execution engine or RPC command surface. Source: DI-sinur
+func ExecuteFunction(functionBytes, inputBytes, contextBytes []byte) ([]byte, error) {
+	functionText := strings.TrimSpace(string(functionBytes))
+	inputText := strings.TrimSpace(string(inputBytes))
+	switch {
+	case strings.Contains(functionText, "fibonacci"):
+		if !strings.HasPrefix(inputText, "n=") {
+			return nil, fmt.Errorf("unsupported fibonacci input %q", inputText)
+		}
+		var n int
+		if _, err := fmt.Sscanf(inputText, "n=%d", &n); err != nil {
+			return nil, err
+		}
+		if n < 0 || n > 40 {
+			return nil, fmt.Errorf("fibonacci input out of bounded POC range: %d", n)
+		}
+		return []byte(fmt.Sprintf("fibonacci(%d)=%d;context_cid=%s", n, fibonacci(n), ContentCID(contextBytes))), nil
+	case strings.Contains(functionText, "sum"):
+		if !strings.HasPrefix(inputText, "values=") {
+			return nil, fmt.Errorf("unsupported sum input %q", inputText)
+		}
+		rawValues := strings.TrimPrefix(inputText, "values=")
+		total := 0
+		for _, rawValue := range strings.Split(rawValues, ",") {
+			value, err := strconv.Atoi(strings.TrimSpace(rawValue))
+			if err != nil {
+				return nil, err
+			}
+			total += value
+		}
+		return []byte(fmt.Sprintf("sum(%s)=%d;context_cid=%s", rawValues, total, ContentCID(contextBytes))), nil
+	default:
+		return nil, fmt.Errorf("unsupported function source %q", functionText)
+	}
+}
+
+func fibonacci(n int) int {
+	if n < 2 {
+		return n
+	}
+	previous, current := 0, 1
+	for index := 2; index <= n; index++ {
+		previous, current = current, previous+current
+	}
+	return current
+}
+
+// BadComputeResultBytes produces bytes that have their own valid CID but fail
+// the promised function/input/context semantics.
+// Intent: Verifiers must detect semantic breakage, not just malformed hashes.
+// Source: DI-sinur
+func BadComputeResultBytes(correctResultBytes []byte) []byte {
+	return append(append([]byte(nil), correctResultBytes...), []byte(";bad-poc14-result")...)
+}
+
+// FunctionKind gives logs a compact label without changing the pCID-owned
+// payload contract.
+func FunctionKind(functionBytes []byte) string {
+	functionText := strings.TrimSpace(string(functionBytes))
+	if strings.Contains(functionText, "fibonacci") {
+		return "fibonacci"
+	}
+	if strings.Contains(functionText, "sum") {
+		return "sum"
+	}
+	return "unknown"
+}
+
+// ValidateAccountingUpdate checks that a shipment update carries the minimum
+// evidence the accounting agent needs before it promises to record the update.
+func ValidateAccountingUpdate(orderID, trackingNumber string, costCents int) error {
+	if strings.TrimSpace(orderID) == "" {
+		return fmt.Errorf("order_id is required")
+	}
+	if !strings.HasPrefix(strings.TrimSpace(trackingNumber), "1Z") {
+		return fmt.Errorf("tracking_number must start with 1Z")
+	}
+	if costCents <= 0 {
+		return fmt.Errorf("positive shipping cost_cents is required")
+	}
+	return nil
+}
+
+func intField(fields map[string]string, keys ...string) int {
+	for _, key := range keys {
+		value := fields[key]
+		if value == "" {
+			continue
+		}
+		parsedValue, parseErr := strconv.Atoi(value)
+		if parseErr == nil {
+			return parsedValue
+		}
+	}
+	return 0
+}
