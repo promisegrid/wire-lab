@@ -26,6 +26,14 @@ Intent: The POC14 plan now has a concrete WASM/stdio portability emphasis, so th
 Constraints: Preserve the POC14 superset baseline from `DI-sihuz`; preserve the heterogeneous process-boundary requirements from `DI-sifot`; move the plan rather than duplicating it.
 Affects: implementations/poc14-wasm/docs/POC14-SUPERSET-PLAN.md.
 
+ID: DI-lulof
+Date: 2026-06-11 15:03:55
+Status: active
+Decision: POC14 monitoring and analysis planning must assume production has no global observer and no global analyzer.
+Intent: Real PromiseGrid agents may run in geographically diverse runtimes controlled by different legal entities, so each agent only has local evidence and voluntary peer disclosures. POC14 should therefore test decentralized monitoring signals such as local evidence exchange, peer-carried attestations, reciprocal promise histories, and bearer-token exchange rates that may reveal local market estimates of relative trustworthiness without creating a monitoring authority.
+Constraints: Do not introduce global monitoring, global analysis, centralized trust scores, central exchange rates, or cross-agent authority. Treat analyzer and monitor components as POC/local-development tools unless explicitly reframed as ordinary agents making voluntary promises from their own local evidence.
+Affects: implementations/poc14-wasm/docs/POC14-SUPERSET-PLAN.md.
+
 ## Tasks
 
 - [x] gogug.1 Fix POC13 evidence summary mismatch so saved evidence counts include all local non-commitment outcomes, not only receiver-side `not_promised` journal entries.

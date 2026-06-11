@@ -2,7 +2,8 @@
 
 POC14 should begin as a superset of POC13 unless a later DI explicitly narrows
 scope. It should also test heterogeneous process boundaries beyond same-language
-TCP-only Go agents. Source: `DI-sihuz`; `DI-sifot`; `DI-fimoh`.
+TCP-only Go agents. Source: `DI-sihuz`; `DI-sifot`; `DI-fimoh`;
+`DI-lulof`.
 
 ## Baseline Promises To Preserve
 
@@ -33,8 +34,43 @@ TCP-only Go agents. Source: `DI-sihuz`; `DI-sifot`; `DI-fimoh`.
   sending and receiving PromiseGrid envelopes.
 - Add resource-isolation kernel roles for CPU, memory, filesystem, and device
   access without moving app trust into the kernel.
-- Add richer production operators: analyzer/monitor comparison, failed-run
-  triage, and explicit evidence export for review.
+- Add richer POC-local operators for analyzer/monitor comparison, failed-run
+  triage, and explicit evidence export for review while keeping those tools out
+  of the production trust model.
+
+## Production Monitoring Boundary
+
+- Assume production agents are geographically distributed and owned by different
+  legal entities. No process gets a global view of messages, local evidence,
+  trust updates, exchange offers, or failures unless other agents voluntarily
+  promise to disclose them.
+- Treat POC analyzers and monitors as development-time local observers, not as
+  production authorities. In production, an analyzer can only be an ordinary
+  agent promising what it observed, what evidence it retained, and what local
+  interpretation it made from that evidence.
+- Do not design POC14 around a global health dashboard, global trust score,
+  global exchange rate, or central audit trail. Those would contradict the
+  PromiseGrid assumption that trust and evidence interpretation are local to
+  each agent relationship.
+
+## Decentralized Monitoring Candidates
+
+- Local evidence summaries: each agent may promise signed summaries of its own
+  keep/break observations, but peers decide locally whether those summaries are
+  credible.
+- Peer-carried attestations: Alice can carry Bob's signed promise history to
+  Carol as evidence, while Carol remains free to discount it based on Carol's
+  trust in Alice and Bob.
+- Bearer-token exchange rates: the price peers offer for tokens issued by Alice,
+  Bob, Carol, or Dave can act as a decentralized market signal for perceived
+  trustworthiness, usefulness, scarcity, and recent promise behavior.
+- Relationship topology: direct TCP links, relay willingness, storage
+  replication choices, and compute-verification choices can be measured as local
+  signals of relationship strength rather than as centrally managed routing
+  policy.
+- Voluntary gossip: agents may promise to share selected local observations with
+  trusted peers, but recipients keep those reports as evidence, not as facts
+  imposed by an authority.
 
 ## Non-Goals Until Decided
 
