@@ -43,6 +43,22 @@ func (node *Node) runWASMBoundaryWorkflow() error {
 	}
 	node.record("wasm_boundary_promise_sent", "kept", target, "pcid="+pcid.RelationshipV1+" module_sha256="+moduleHash)
 	node.record("wasm_boundary_ack_received", "kept", target, "pcid="+pcid.RelationshipV1+" stdio peer accepted WASM-boundary evidence as a local promise")
+	usefulTarget := "dave"
+	usefulFields := boundary.PromiseFields(
+		node.Agent.Name,
+		usefulTarget,
+		boundary.PromiseAboutWASMModuleUse,
+		"Peggy promises Dave a reusable WASM module-validation observation: these module bytes have the WebAssembly magic/version header and can be judged before any sandbox host call is trusted.",
+	)
+	usefulFields["field_wasm_module_sha256"] = moduleHash
+	usefulFields["field_protocol"] = pcid.RelationshipV1
+	if _, err := node.sendAndReceive(usefulTarget, usefulFields); err != nil {
+		return fmt.Errorf("wasm useful-work promise: %w", err)
+	}
+	// Intent: Peggy's WASM process should do useful PromiseGrid work, not merely
+	// prove that a sandbox boundary exists. Source: DI-pamob
+	node.record("wasm_useful_work_promised", "kept", usefulTarget, "pcid="+pcid.RelationshipV1+" module_sha256="+moduleHash)
+	node.record("wasm_useful_work_ack_received", "kept", usefulTarget, "pcid="+pcid.RelationshipV1+" Dave received reusable module-validation evidence")
 	return nil
 }
 
@@ -100,6 +116,23 @@ func (node *Node) runStdioBoundaryWorkflow(ctx context.Context) error {
 		return node.finishStdioWorker(command, stdin, observedErr)
 	}
 	node.record("stdio_worker_ack_observed", observed.Outcome, target, "exact_sha256="+observed.ExactSHA256)
+	usefulTarget := "dave"
+	usefulFields := boundary.PromiseFields(
+		node.Agent.Name,
+		usefulTarget,
+		boundary.PromiseAboutStdioWorkerUse,
+		"Victor promises Dave that a stdio-only subprocess round-tripped an exact signed PromiseGrid envelope and observed the peer ACK bytes without direct network access.",
+	)
+	usefulFields["field_ack_exact_sha256"] = observed.ExactSHA256
+	usefulFields["field_protocol"] = pcid.RelationshipV1
+	if _, err := node.sendAndReceive(usefulTarget, usefulFields); err != nil {
+		return node.finishStdioWorker(command, stdin, fmt.Errorf("stdio useful-work promise: %w", err))
+	}
+	// Intent: Victor's stdio worker should produce reusable relationship evidence
+	// about subprocess messaging, not only adapter plumbing logs. Source:
+	// DI-pamob
+	node.record("stdio_useful_work_promised", "kept", usefulTarget, "pcid="+pcid.RelationshipV1+" ack_exact_sha256="+observed.ExactSHA256)
+	node.record("stdio_useful_work_ack_received", "kept", usefulTarget, "pcid="+pcid.RelationshipV1+" Dave received stdio subprocess round-trip evidence")
 	return node.finishStdioWorker(command, stdin, nil)
 }
 

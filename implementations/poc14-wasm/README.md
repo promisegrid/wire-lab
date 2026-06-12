@@ -112,12 +112,12 @@ The pCID identifies the protocol spec. Message variants such as
 `verify_compute_result` are payload meanings inside their protocol, not
 separate pCIDs. Source: `DI-bikit`; `DI-pohaj`; `DI-sinur`.
 
-Payload shape is owned by the pCID. Most POC14 payloads still use the older
-`field_*` map scaffold so the existing agents can interoperate while the POC
-evolves, but that map is not a PromiseGrid-wide payload standard.
-`identity_key_v1` is the first narrow cleanup example: its key-rotation request
-and ACK payloads are CBOR arrays defined by that pCID, then decoded into
-compatibility fields only at the local runtime boundary. Source: `DI-vipih`.
+Payload shape is owned by the pCID. Older POC14 payloads still use the
+`field_*` map scaffold so existing agents can interoperate while the POC evolves,
+but that map is not a PromiseGrid-wide payload standard. `identity_key_v1`,
+scripted `cas_storage_v1`, and scripted `cid_compute_v1` now use CBOR arrays
+defined by those pCIDs, then decode into compatibility fields only at the local
+runtime boundary. Source: `DI-vipih`; `DI-gahuh`.
 
 ## Shipping Agents
 
@@ -140,14 +140,16 @@ compatibility fields only at the local runtime boundary. Source: `DI-vipih`.
 - `poc14-relationship-agent`: generic live LLM relationship app. Depending on
   the configured agent, it can also promise `cas_storage_v1` or
   `cid_compute_v1` handling while keeping the same single top-level `promise`
-  action. `identity_key_v1` is reserved for scripted key-rotation array payloads
-  in this cleanup slice. Source: `DI-vipih`.
+  action. Scripted identity-key, CAS, and compute flows now use pCID-owned array
+  payloads in this cleanup slice. Source: `DI-vipih`; `DI-gahuh`.
 - `poc14-wasm-agent`: deterministic Peggy app process that validates WASM module
-  bytes and sends WASM-boundary evidence as a normal `relationship_v1` promise.
+  bytes, sends WASM-boundary evidence as a normal `relationship_v1` promise, and
+  promises Dave reusable module-validation evidence. Source: `DI-pamob`.
 - `poc14-stdio-adapter`: deterministic Victor adapter process that starts
   `poc14-stdio-worker`, receives exact envelope bytes over stdout, forwards
-  those bytes through the local kernel, and returns the exact peer ACK over
-  stdin.
+  those bytes through the local kernel, returns the exact peer ACK over stdin,
+  and promises Dave reusable stdio subprocess round-trip evidence. Source:
+  `DI-pamob`.
 - `poc14-stdio-worker`: subprocess agent whose application messaging path is
   stdin/stdout only; it signs one PromiseGrid envelope and locally verifies the
   returned ACK envelope.
@@ -177,11 +179,19 @@ docker compose run --rm --entrypoint /usr/local/bin/poc14-analyze dave /run/poc1
 
 The expected run narrative is in `docs/RUN-NARRATIVE.md`; current POC-to-
 production fitness notes are in `docs/PRODUCTION-FITNESS.md`; implementation
-notes are in `docs/IMPLEMENTATION-NOTES.md`.
+notes are in `docs/IMPLEMENTATION-NOTES.md`; kernel role notes are in
+`docs/KERNEL-ROLE-COLLECTION.md`.
 
 `config.json`, `poc14.env`, provider outputs, and Docker volume state are
 ignored and must not be committed. `openai_api_key.txt` remains ignored for
 older local workflows but is not required by the current Compose setup.
+
+The latest pre-`DI-gahuh` clean baseline is the 2026-06-12 `poc14-demo` run:
+2092 total events, all analyzer score dimensions at `5`, empty
+`rpc_drift_counts`, empty `resource_trust_coupling_counts`, and production
+fitness still blocked by monitor scores of `4/5` for Promise Theory fit,
+protocol validity, and local trust correctness. The next clean run should add
+the migrated CAS/compute array evidence gates. Source: `DI-gahuh`.
 
 ## Current Limits
 
@@ -197,9 +207,11 @@ sequence is a POC guardrail so the run produces concrete pCID-routed shipment
 evidence instead of relying on a live LLM to choose that sequence unaided.
 Production monitoring cannot rely on POC14's whole-run analyzer because real
 agents are distributed across legal entities; POC14's decentralized-monitoring
-events are candidate local evidence signals, not a global dashboard. Source:
-`DI-timah`; `DI-bikit`; `DI-parok`; `DI-galin`; `DI-pohaj`; `DI-sinur`;
-`DI-lulof`; `DI-linof`.
+events are candidate local evidence signals, not a global dashboard. The kernel
+should be read as a role collection: transport, app-boundary, pCID routing,
+local-resource, adapter, and evidence roles may be split or collapsed depending
+on runtime. Source: `DI-timah`; `DI-bikit`; `DI-parok`; `DI-galin`; `DI-pohaj`;
+`DI-sinur`; `DI-lulof`; `DI-linof`; `DI-pamob`.
 
 The repaired POC14 should be treated as the current superset baseline for future
 POCs unless a later scoped DI explicitly declares a non-superset exception and

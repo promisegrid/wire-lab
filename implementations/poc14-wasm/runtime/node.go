@@ -888,6 +888,9 @@ func (node *Node) handleFrame(frameBytes []byte) ([]byte, error) {
 	node.record("tcp_message_received", "kept", parsed.Fields["from"], "pcid="+parsed.ProtocolName+" exact_sha256="+parsed.ExactHash)
 	fields := parsed.Fields
 	fromAgent := fields["from"]
+	if isPcidOwnedArrayPayload(fields) {
+		node.record("pcid_owned_array_payload_received", "kept", fromAgent, "pcid="+parsed.ProtocolName+" promise_about="+fields["field_promise_about"]+" exact_sha256="+parsed.ExactHash)
+	}
 	if node.rememberReplayEnvelope(fromAgent, parsed.ProtocolName, parsed.ExactHash) {
 		return node.newAckBytes(fromAgent, "not_promised", "I promise to remember that I already saw this exact envelope and will not treat the replay as fresh promise evidence.", parsed.ProtocolCID, map[string]string{"field_replay_status": "not_promised"})
 	}
@@ -949,6 +952,15 @@ func (node *Node) newAckBytes(target, outcome, promiseText string, protocolCID p
 	for key, value := range extraFields {
 		ackFields[key] = value
 	}
+	// Intent: Handler evidence may include copied request fields, but the ACK is
+	// still a fresh promise by this local agent to the original sender. Source:
+	// DI-gahuh
+	ackFields["act"] = decision.ActPromise
+	ackFields["from"] = node.Agent.Name
+	ackFields["to"] = target
+	ackFields["outcome"] = outcome
+	ackFields["promise"] = promiseText
+	ackFields["reason"] = "transport acknowledgement expressed as local promise content"
 	if protocolCID.Equal(node.Protocols.MustCID(pcid.IdentityKeyV1)) && extraFields["field_promise_about"] == production.PromiseRotateSigningKey {
 		// Intent: identity_key_v1 is the first POC14 protocol whose request and
 		// ACK payloads are pCID-owned arrays rather than legacy field maps.
@@ -976,6 +988,26 @@ func (node *Node) newAckBytes(target, outcome, promiseText string, protocolCID p
 			return nil, bytesErr
 		}
 		return ackBytes, nil
+	}
+	protocolName, protocolKnown := node.Protocols.Name(protocolCID)
+	if protocolKnown && ackFields["field_promise_about"] != "" {
+		ack, arrayPayload, ackErr := node.buildEnvelopeFromFields(protocolName, protocolCID, ackFields)
+		if ackErr != nil {
+			node.record("ack_sign_failed", "broken", target, ackErr.Error())
+			return nil, ackErr
+		}
+		if arrayPayload {
+			// Intent: Migrated pCIDs must keep ACKs in the same pCID-owned
+			// positional payload family as their requests, rather than falling
+			// back to a generic field-map acknowledgement. Source: DI-gahuh
+			ackBytes, bytesErr := ack.Bytes()
+			if bytesErr != nil {
+				node.record("ack_bytes_failed", "broken", target, bytesErr.Error())
+				return nil, bytesErr
+			}
+			node.record("pcid_owned_array_ack_sent", "kept", target, "pcid="+protocolName+" promise_about="+ackFields["field_promise_about"])
+			return ackBytes, nil
+		}
 	}
 	ack, ackErr := protocol.NewEnvelope(protocolCID, ackFields, node.Agent.Name)
 	if ackErr != nil {
@@ -1020,7 +1052,7 @@ func (node *Node) sendAndReceive(target string, fields map[string]string) (parse
 	protocolName, protocolCID := node.protocolForFields(fields)
 	fields["protocol"] = protocolName
 	fields["field_exchange_id"] = node.nextExchangeID(target, protocolName)
-	envelope, envelopeErr := protocol.NewEnvelope(protocolCID, fields, node.Agent.Name)
+	envelope, arrayPayload, envelopeErr := node.buildEnvelopeFromFields(protocolName, protocolCID, fields)
 	if envelopeErr != nil {
 		return parsedMessage{}, envelopeErr
 	}
@@ -1046,6 +1078,9 @@ func (node *Node) sendAndReceive(target string, fields map[string]string) (parse
 		node.resolveOutstandingPromise(promiseID, promiseStatusLocalFailure, writeErr.Error())
 		return parsedMessage{}, writeErr
 	}
+	if arrayPayload {
+		node.record("pcid_owned_array_payload_sent", "kept", target, "pcid="+protocolName+" promise_about="+fields["field_promise_about"]+" exact_sha256="+exactHash)
+	}
 	node.record("tcp_message_sent", "kept", target, "pcid="+protocolName+" exact_sha256="+exactHash)
 	ackBytes, readErr := frameConn.ReadFrame()
 	if readErr != nil {
@@ -1066,6 +1101,9 @@ func (node *Node) sendAndReceive(target string, fields map[string]string) (parse
 		node.resolveOutstandingPromise(promiseID, promiseStatusFromOutcome(ackOutcome), "ack outcome "+ackFields["outcome"])
 		return parsedMessage{}, ackOutcomeError{outcome: ackFields["outcome"]}
 	}
+	if isPcidOwnedArrayPayload(ackFields) {
+		node.record("pcid_owned_array_ack_received", "kept", target, "pcid="+ackMessage.ProtocolName+" promise_about="+ackFields["field_promise_about"]+" exact_sha256="+ackMessage.ExactHash)
+	}
 	node.recordAckEvidence(target, ackMessage)
 	if evidenceUpdatesTrust(ackFields) {
 		trustOutcome := outcomeForPromise(fields)
@@ -1075,6 +1113,25 @@ func (node *Node) sendAndReceive(target string, fields map[string]string) (parse
 		node.resolveOutstandingPromise(promiseID, promiseStatusForNonTrustingEvidence(ackFields), "non-mutating ack evidence recorded without trust change")
 	}
 	return ackMessage, nil
+}
+
+// buildEnvelopeFromFields preserves legacy map payloads for pCIDs that have not
+// been migrated, while encoding migrated storage/compute protocols as
+// pCID-owned CBOR arrays.
+// Intent: The kernel can still route by compatibility fields locally, but the
+// wire payload for migrated pCIDs is no longer a universal field_* map. Source:
+// DI-gahuh
+func (node *Node) buildEnvelopeFromFields(protocolName string, protocolCID protocol.ProtocolCID, fields map[string]string) (protocol.Envelope, bool, error) {
+	payloadBytes, arrayPayload, payloadErr := protocol.MarshalKnownArrayPayload(protocolName, fields)
+	if payloadErr != nil {
+		return protocol.Envelope{}, false, payloadErr
+	}
+	if arrayPayload {
+		envelope, envelopeErr := protocol.NewEnvelopeFromPayload(protocolCID, payloadBytes, node.Agent.Name)
+		return envelope, true, envelopeErr
+	}
+	envelope, envelopeErr := protocol.NewEnvelope(protocolCID, fields, node.Agent.Name)
+	return envelope, false, envelopeErr
 }
 
 // sendUnknownProtocolPromise sends a syntactically valid envelope whose pCID is
@@ -1247,12 +1304,20 @@ func (node *Node) parseEnvelope(frameBytes []byte) (parsedMessage, error) {
 	if !known {
 		protocolName = "unknown:" + envelope.ProtocolCID.String()
 	}
+	// Intent: pCID-owned array decoders expose only local compatibility fields;
+	// the parser attaches the locally known protocol name for handlers that still
+	// compare evidence across legacy and migrated payloads. Source: DI-gahuh
+	fields["protocol"] = protocolName
 	return parsedMessage{
 		Fields:       fields,
 		ExactHash:    protocol.HashExactBytes(frameBytes),
 		ProtocolCID:  envelope.ProtocolCID,
 		ProtocolName: protocolName,
 	}, nil
+}
+
+func isPcidOwnedArrayPayload(fields map[string]string) bool {
+	return fields["field_payload_shape"] == "cbor_array"
 }
 
 // recordMalformedFrameEvidence extracts the promiser from a parseable but

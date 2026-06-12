@@ -104,6 +104,77 @@ func TestIdentityKeyPayloadUsesArrayShape(t *testing.T) {
 	}
 }
 
+func TestStorageAndComputePayloadsUseArrayShape(t *testing.T) {
+	// Intent: CAS and compute are migrated pCIDs whose wire payloads are
+	// pCID-owned arrays; field_* names are only runtime compatibility
+	// projections for existing handlers. Source: DI-gahuh
+	testCases := []struct {
+		name         string
+		protocolName string
+		fields       map[string]string
+		wantField    string
+	}{
+		{
+			name:         "cas storage",
+			protocolName: protocolCASStorageV1,
+			fields: map[string]string{
+				"from":                "alice",
+				"to":                  "bob",
+				"field_promise_about": "store_content",
+				"field_content_cid":   "cidv1-raw-sha2-256:abc",
+				"field_content_b64":   "YWJj",
+				"field_credit_offer":  "3",
+				"field_units":         "1",
+			},
+			wantField: "field_content_cid",
+		},
+		{
+			name:         "cid compute",
+			protocolName: protocolCIDComputeV1,
+			fields: map[string]string{
+				"from":                 "alice",
+				"to":                   "carol",
+				"field_promise_about":  "execute_function",
+				"field_function_cid":   "cidv1-raw-sha2-256:function",
+				"field_function_b64":   "ZnVuY3Rpb24=",
+				"field_input_cid":      "cidv1-raw-sha2-256:input",
+				"field_input_b64":      "aW5wdXQ=",
+				"field_context_cid":    "cidv1-raw-sha2-256:context",
+				"field_context_b64":    "Y29udGV4dA==",
+				"field_credit_offer":   "5",
+				"field_units":          "2",
+				"field_capacity_probe": "false",
+			},
+			wantField: "field_function_cid",
+		},
+	}
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			payloadBytes, arrayPayload, err := MarshalKnownArrayPayload(testCase.protocolName, testCase.fields)
+			if err != nil {
+				t.Fatalf("marshal known array payload: %v", err)
+			}
+			if !arrayPayload {
+				t.Fatalf("%s should use array payload", testCase.protocolName)
+			}
+			if len(payloadBytes) == 0 || payloadBytes[0]>>5 != 4 {
+				t.Fatalf("%s payload should be a CBOR array, got %x", testCase.protocolName, payloadBytes)
+			}
+			envelope, err := NewEnvelopeFromPayload(NewProtocolCID([]byte(testCase.protocolName+" test spec")), payloadBytes, testCase.fields["from"])
+			if err != nil {
+				t.Fatalf("new array envelope: %v", err)
+			}
+			fields, err := envelope.PayloadFields()
+			if err != nil {
+				t.Fatalf("payload fields: %v", err)
+			}
+			if fields["field_payload_shape"] != "cbor_array" || fields[testCase.wantField] == "" {
+				t.Fatalf("%s compatibility fields = %#v", testCase.protocolName, fields)
+			}
+		})
+	}
+}
+
 func FuzzParseEnvelopeHandlesArbitraryBytes(f *testing.F) {
 	// Intent: POC14 should treat malformed CBOR, prompt-injection bytes, partial
 	// writes, and random adversarial inputs as parse/verification outcomes rather

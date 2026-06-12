@@ -245,6 +245,14 @@ func (envelope Envelope) PayloadFields() (map[string]string, error) {
 	if identityKeyErr == nil {
 		return identityKeyFields, nil
 	}
+	casStorageFields, casStorageErr := CASStoragePayloadFields(envelope.Payload)
+	if casStorageErr == nil {
+		return casStorageFields, nil
+	}
+	cidComputeFields, cidComputeErr := CIDComputePayloadFields(envelope.Payload)
+	if cidComputeErr == nil {
+		return cidComputeFields, nil
+	}
 	return nil, fieldsErr
 }
 

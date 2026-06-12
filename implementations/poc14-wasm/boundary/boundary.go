@@ -8,6 +8,8 @@ import (
 const (
 	PromiseAboutWASMBoundary    = "wasm_boundary_evidence"
 	PromiseAboutStdioBoundary   = "stdio_boundary_evidence"
+	PromiseAboutWASMModuleUse   = "wasm_module_validation"
+	PromiseAboutStdioWorkerUse  = "stdio_worker_roundtrip"
 	PromiseAboutLocalSummary    = "local_evidence_summary"
 	PromiseAboutPeerAttestation = "peer_carried_attestation"
 	PromiseAboutExchangeRate    = "bearer_token_exchange_rate"

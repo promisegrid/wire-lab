@@ -167,11 +167,11 @@ simulation evidence surface. POC13 is now first executable storage/compute
 evidence: decentralized sparse CAS storage promises under `cas_storage_v1`,
 CID-named function-call compute promises under `cid_compute_v1`, and local
 relationship/observation promises under `relationship_v1`. POC14 adds a narrow
-`identity_key_v1` protocol for identity/key-rotation promises and begins moving
-new protocol payloads away from universal `field_*` maps toward pCID-owned CBOR
-arrays. A CID names content or function code inside protocol-owned payloads; it
-does not by itself promise availability, retention, access, serving, or
-trustworthy computation.
+`identity_key_v1` protocol for identity/key-rotation promises and has begun
+moving scripted `cas_storage_v1` and `cid_compute_v1` exchanges away from
+universal `field_*` maps toward pCID-owned CBOR arrays. A CID names content or
+function code inside protocol-owned payloads; it does not by itself promise
+availability, retention, access, serving, or trustworthy computation.
 Pure compute results are cached only by exact protocol/function/input/context
 and result identity; impure work externalizes timestamp, randomness, sensor
 reads, or other ambient inputs as context objects so the run is replayable and
@@ -230,34 +230,39 @@ ACK verdicts such as broken, malformed, disagreement, cache miss, price refusal,
 capacity refusal, or unsupported variant are recorded as evidence without
 increasing local trust. Source: `DI-sinur`; `DI-punib`.
 
-POC14 is the current next-step POC target for heterogeneous runtime boundaries.
-It is scaffolded as a POC13 superset under `implementations/poc14-wasm/`, keeps
-the inherited kernel/app, shipping, CAS, compute, trust, replay, and pressure
-gates, and adds Peggy/Victor boundary evidence: Peggy is a separate
-WASM-boundary app process that validates module bytes and sends normal
-`relationship_v1` promises, while Victor is a stdio-worker agent behind a local
-adapter whose application messaging path is stdin/stdout carrying exact
-PromiseGrid envelope bytes. POC14 also adds analyzer dimensions for boundary,
-decentralized monitoring, mixed-version pCID migration, and same-run restart
-evidence. The monitoring lesson is important for guide prose: POC analyzers and
-monitors are development tools, not production authorities. Production agents
-owned by different legal entities can only exchange local evidence summaries,
-peer-carried attestations, token exchange-rate signals, topology signals, and
-voluntary gossip as ordinary promises; no global observer, trust score, exchange
-rate, or audit trail exists by default. POC14 now also records hard local
-trust-boundary evidence: Alice can permanently distrust Mallory locally, and
-Alice can promise that Alice's inbound/outbound traffic should not transit
-Mallory, without imposing a network-wide ban or central route policy. `DI-dubih`
-makes those scenarios behavioral inside Alice's local ledger: future Mallory
-sends are blocked by local permanent-distrust state, and route candidates
-containing Mallory as a transit hop are locally rejected. The 2026-06-11
-`poc14-demo` clean run passed after `DI-dubih` with 2079 events, all analyzer
-score dimensions at `5`, empty `rpc_drift_counts`, empty
-`resource_trust_coupling_counts`, one event each for
-`permanent_distrust_send_blocked` and `transit_route_candidate_blocked`, and
-monitor scores of `5` for Promise Theory fit and autonomy but `4` for protocol
-validity, local trust correctness, and imposition avoidance. Source:
-`DI-sihuz`; `DI-linof`; `DI-lulof`; `DI-kinaf`; `DI-dubih`.
+POC14 is the current heterogeneous-runtime POC target. It is scaffolded as a
+POC13 superset under `implementations/poc14-wasm/`, keeps the inherited
+kernel/app, shipping, CAS, compute, trust, replay, and pressure gates, and adds
+Peggy/Victor boundary evidence: Peggy is a separate WASM-boundary app process
+that validates module bytes and sends normal `relationship_v1` promises, while
+Victor is a stdio-worker agent behind a local adapter whose application
+messaging path is stdin/stdout carrying exact PromiseGrid envelope bytes. Peggy
+and Victor now also send useful relationship promises to Dave about reusable
+module-validation and subprocess round-trip evidence. POC14 adds analyzer
+dimensions for boundary, decentralized monitoring, mixed-version pCID migration,
+same-run restart evidence, and migrated pCID-owned array payload evidence for
+scripted `cas_storage_v1` and `cid_compute_v1`; `field_*` names remain local
+compatibility projections, not wire-shape guidance. The monitoring lesson is
+important for guide prose: POC analyzers and monitors are development tools, not
+production authorities. Production agents owned by different legal entities can
+only exchange local evidence summaries, peer-carried attestations, token
+exchange-rate signals, topology signals, and voluntary gossip as ordinary
+promises; no global observer, trust score, exchange rate, or audit trail exists
+by default. POC14 also records hard local trust-boundary evidence: Alice can
+permanently distrust Mallory locally, and Alice can promise that Alice's
+inbound/outbound traffic should not transit Mallory, without imposing a
+network-wide ban or central route policy. `DI-dubih` makes those scenarios
+behavioral inside Alice's local ledger: future Mallory sends are blocked by
+local permanent-distrust state, and route candidates containing Mallory as a
+transit hop are locally rejected. The 2026-06-12 `poc14-demo` clean run passed
+with 2092 events, all analyzer score dimensions at `5`, empty
+`rpc_drift_counts`, empty `resource_trust_coupling_counts`, and monitor scores
+of `5` for autonomy and imposition avoidance but `4` for Promise Theory fit,
+protocol validity, and local trust correctness. POC15 is now planned under
+`implementations/poc15-multihop/` to add real multi-hop forwarding, useful
+routed WASM/stdio work, route exclusion through peer promises, and an explicit
+kernel-as-role-collection model. Source: `DI-sihuz`; `DI-linof`; `DI-lulof`;
+`DI-kinaf`; `DI-dubih`; `DI-gahuh`; `DI-pamob`.
 
 `poc7` adds executable evidence for promise-shaped capability tokens and local
 exchange: five containers run local kernel boundaries, app-level relays, issuer,

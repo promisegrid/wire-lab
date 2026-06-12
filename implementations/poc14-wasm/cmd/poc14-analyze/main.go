@@ -522,6 +522,14 @@ func requiredRegressionEvents() []string {
 		"bad_proof_rejected",
 		"key_rotation_promise_recorded",
 		"promise_envelope_validated",
+		// Intent: CAS and compute have begun moving away from universal
+		// field_* maps; the regression must see pCID-owned array payloads in
+		// both directions before the run is considered clean. Source:
+		// DI-gahuh
+		"pcid_owned_array_payload_sent",
+		"pcid_owned_array_payload_received",
+		"pcid_owned_array_ack_sent",
+		"pcid_owned_array_ack_received",
 		// Intent: POC14's regression gate now covers run-scoped stores,
 		// promise-shaped retention/GC, pressure promises, and replay protection
 		// so those operational concerns cannot regress behind raw event counts.
@@ -558,10 +566,16 @@ func requiredRegressionEvents() []string {
 		"wasm_module_header_validated",
 		"wasm_boundary_promise_sent",
 		"wasm_boundary_ack_received",
+		// Intent: Peggy and Victor must perform useful routed promise work, not
+		// only record that WASM/stdio boundaries exist. Source: DI-pamob
+		"wasm_useful_work_promised",
+		"wasm_useful_work_ack_received",
 		"stdio_worker_started",
 		"stdio_worker_envelope_received",
 		"stdio_adapter_kernel_forwarded",
 		"stdio_worker_ack_observed",
+		"stdio_useful_work_promised",
+		"stdio_useful_work_ack_received",
 		// Intent: POC14 monitoring experiments must be decentralized because
 		// production agents do not share a global observer. Source: DI-lulof
 		"production_monitor_boundary_recorded",
@@ -614,7 +628,7 @@ func computeScores(summary RunSummary) ScoreReport {
 	// Intent: POC14 adds process-boundary and decentralized-monitoring dimensions
 	// without relaxing inherited POC13 storage/compute/trust gates. Source:
 	// DI-linof; DI-lulof
-	addScore(&scores.Boundary, summary.EventCounts["wasm_boundary_ack_received"] > 0 && summary.EventCounts["stdio_worker_ack_observed"] > 0 && summary.EventCounts["stdio_adapter_kernel_forwarded"] > 0)
+	addScore(&scores.Boundary, summary.EventCounts["wasm_boundary_ack_received"] > 0 && summary.EventCounts["wasm_useful_work_promised"] > 0 && summary.EventCounts["stdio_worker_ack_observed"] > 0 && summary.EventCounts["stdio_adapter_kernel_forwarded"] > 0 && summary.EventCounts["stdio_useful_work_promised"] > 0)
 	addScore(&scores.Monitoring, summary.EventCounts["production_monitor_boundary_recorded"] > 0 && summary.EventCounts["bearer_token_exchange_rate_observed"] > 0 && summary.EventCounts["voluntary_gossip_promised"] > 0)
 	addScore(&scores.Migration, summary.EventCounts["mixed_version_pcid_migration_promised"] > 0 && summary.EventCounts["mixed_version_successor_pcid_selected"] > 0)
 	addScore(&scores.Restart, summary.EventCounts["run_internal_restart_orchestration_promised"] > 0 && summary.EventCounts["run_internal_restart_recovery_observed"] > 0)

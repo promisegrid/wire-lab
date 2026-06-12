@@ -74,6 +74,22 @@ Intent: The clean POC14 Docker run should use Compose's secret mount path alread
 Constraints: Keep containers reading `/run/secrets/openai_api_key`; do not write the API key into config files, docs, command lines, or committed files; require the host shell to export `OPENAI_API_KEY` before running Compose.
 Affects: implementations/poc14-wasm/compose.yaml; implementations/poc14-wasm/README.md; implementations/poc14-wasm/scripts/run-clean.sh.
 
+ID: DI-gahuh
+Date: 2026-06-12 00:59:56
+Status: active
+Decision: Continue the POC14 pCID-owned payload migration by encoding scripted `cas_storage_v1` and `cid_compute_v1` exchanges as protocol-owned CBOR arrays with runtime-only compatibility projections.
+Intent: The POC should stop treating the legacy `field_*` string map as the apparent target shape for storage and compute protocols while preserving current handlers, analyzer evidence, and run comparability.
+Constraints: Keep `grid([42(pCID), payload, proof])`; keep live LLM non-relationship field-map turns reframed unless they supply concrete protocol payloads; do not invent new top-level action kinds; do not make one universal payload shape across pCIDs; retain compatibility fields only at the runtime boundary.
+Affects: implementations/poc14-wasm/protocol/; implementations/poc14-wasm/runtime/; implementations/poc14-wasm/cmd/poc14-analyze/; implementations/poc14-wasm/docs/; implementations/poc14-wasm/README.md.
+
+ID: DI-pamob
+Date: 2026-06-12 00:59:56
+Status: active
+Decision: Start POC15 as a planned successor focused on real multi-hop forwarding, promise-correct route exclusion, useful WASM/stdio work, and explicit non-monolithic kernel roles.
+Intent: POC15 should be a superset-oriented successor to POC14 that exercises routing through voluntary peer promises and decomposes "kernel" into transport, app-boundary, routing, and local-resource roles rather than treating the kernel as one monolith or a global monitor.
+Constraints: Do not implement production-grade route authority or global monitoring; all routing and exclusion choices remain local promises and local trust judgments; do not regress POC14 shipping, CAS, compute, WASM, stdio, trust, and analyzer evidence; keep POC15 under `implementations/poc15-*` planning until code work is explicitly started.
+Affects: implementations/poc15-multihop/; implementations/poc14-wasm/docs/; implementations/poc14-wasm/README.md; DEV-GUIDE-RESOURCES.md.
+
 ## Tasks
 
 - [x] gogug.1 Fix POC13 evidence summary mismatch so saved evidence counts include all local non-commitment outcomes, not only receiver-side `not_promised` journal entries.
@@ -103,3 +119,12 @@ Affects: implementations/poc14-wasm/compose.yaml; implementations/poc14-wasm/REA
 - [x] gogug.25 Remove `evidence_report_v1` from POC14 and replace key rotation with `identity_key_v1`.
 - [x] gogug.26 Add pCID-owned CBOR-array payload support for the new identity/key protocol.
 - [x] gogug.27 Source the POC14 OpenAI key from host environment through Compose secrets.
+- [x] gogug.28 Convert scripted `cas_storage_v1` request and ACK payloads to pCID-owned CBOR arrays.
+- [x] gogug.29 Convert scripted `cid_compute_v1` request and ACK payloads to pCID-owned CBOR arrays.
+- [x] gogug.30 Add analyzer gates for migrated pCID-owned array payload evidence.
+- [x] gogug.31 Update POC14 run docs with latest `poc14-demo` clean-run metrics.
+- [x] gogug.32 Make Peggy and Victor perform useful routed work, not only boundary evidence.
+- [x] gogug.33 Draft POC15 multi-hop forwarding plan under `implementations/poc15-multihop/`.
+- [x] gogug.34 Add POC15 route-exclusion plan based on peer promises rather than omniscient filtering.
+- [x] gogug.35 Document non-monolithic kernel roles using POC14/POC15 evidence.
+- [x] gogug.36 Add production-fitness follow-up plan for protocol validity, local trust correctness, and Promise Theory fit blockers.

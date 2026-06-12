@@ -191,6 +191,17 @@ func TestValidateSummaryRejectsMissingTransitExclusionEvidence(t *testing.T) {
 	}
 }
 
+func TestValidateSummaryRejectsMissingMigratedArrayPayloadEvidence(t *testing.T) {
+	summary := cleanRegressionSummary()
+	summary.EventCounts["pcid_owned_array_payload_received"] = 0
+	summary.MissingRequiredEventNames = missingRequiredEvents(summary)
+	summary.ScoreReport = computeScores(summary)
+	err := validateSummary(summary, cleanRegressionCriteria())
+	if err == nil {
+		t.Fatalf("missing migrated array payload evidence should fail")
+	}
+}
+
 func cleanRegressionSummary() RunSummary {
 	eventCounts := map[string]int{
 		"fulfillment_workflow_completed":  1,
