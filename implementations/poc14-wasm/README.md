@@ -157,12 +157,13 @@ compatibility fields only at the local runtime boundary. Source: `DI-vipih`.
 
 ## Run
 
-Copy the committed template and keep secrets out of it:
+Copy the committed template and keep secrets out of it. `compose.yaml` mounts
+the host `OPENAI_API_KEY` value as `/run/secrets/openai_api_key`, so the key does
+not need a repo-local secret file and does not need to appear on the command
+line. Source: `DI-pohoh`.
 
 ```sh
 cp config.example.json config.json
-printf '%s' "$OPENAI_API_KEY" > openai_api_key.txt
-chmod 600 openai_api_key.txt
 scripts/run-clean.sh
 ```
 
@@ -178,8 +179,9 @@ The expected run narrative is in `docs/RUN-NARRATIVE.md`; current POC-to-
 production fitness notes are in `docs/PRODUCTION-FITNESS.md`; implementation
 notes are in `docs/IMPLEMENTATION-NOTES.md`.
 
-`config.json`, `poc14.env`, `openai_api_key.txt`, provider outputs, and Docker
-volume state are ignored and must not be committed.
+`config.json`, `poc14.env`, provider outputs, and Docker volume state are
+ignored and must not be committed. `openai_api_key.txt` remains ignored for
+older local workflows but is not required by the current Compose setup.
 
 ## Current Limits
 

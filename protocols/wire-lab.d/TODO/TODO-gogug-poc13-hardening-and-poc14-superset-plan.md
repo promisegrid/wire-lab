@@ -66,6 +66,14 @@ Intent: The POC14 envelope should stay `grid([42(pCID), payload, proof])`, but p
 Constraints: Do not impose one universal payload shape across all pCIDs; keep existing legacy map payloads only as incremental POC scaffolding until their owning pCIDs are rewritten; keep kernel routing working during the transition; do not add relay forwarding or Peggy/Victor useful-work scope in this cleanup.
 Affects: implementations/poc14-wasm/protocol/; implementations/poc14-wasm/pcid/; implementations/poc14-wasm/runtime/; implementations/poc14-wasm/cmd/poc14-analyze/; implementations/poc14-wasm/config.example.json; implementations/poc14-wasm/docs/; implementations/poc14-wasm/README.md; DEV-GUIDE-RESOURCES.md.
 
+ID: DI-pohoh
+Date: 2026-06-12 00:20:36
+Status: active
+Decision: Source the POC14 OpenAI API key from the host `OPENAI_API_KEY` environment variable through the `compose.yaml` secret definition instead of requiring a local `openai_api_key.txt` file.
+Intent: The clean POC14 Docker run should use Compose's secret mount path already expected by the binaries while avoiding a repo-local secret file and avoiding command-line key exposure.
+Constraints: Keep containers reading `/run/secrets/openai_api_key`; do not write the API key into config files, docs, command lines, or committed files; require the host shell to export `OPENAI_API_KEY` before running Compose.
+Affects: implementations/poc14-wasm/compose.yaml; implementations/poc14-wasm/README.md; implementations/poc14-wasm/scripts/run-clean.sh.
+
 ## Tasks
 
 - [x] gogug.1 Fix POC13 evidence summary mismatch so saved evidence counts include all local non-commitment outcomes, not only receiver-side `not_promised` journal entries.
@@ -94,3 +102,4 @@ Affects: implementations/poc14-wasm/protocol/; implementations/poc14-wasm/pcid/;
 - [x] gogug.24 Make untrusted-transit exclusion reject concrete local route candidates before send.
 - [x] gogug.25 Remove `evidence_report_v1` from POC14 and replace key rotation with `identity_key_v1`.
 - [x] gogug.26 Add pCID-owned CBOR-array payload support for the new identity/key protocol.
+- [x] gogug.27 Source the POC14 OpenAI key from host environment through Compose secrets.

@@ -108,4 +108,4 @@ volumes:
 
 secrets:
   openai_api_key:
-    file: ./openai_api_key.txt
+    environment: OPENAI_API_KEY
