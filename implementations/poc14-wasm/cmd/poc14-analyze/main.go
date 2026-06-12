@@ -274,8 +274,11 @@ func validateSummary(summary RunSummary, criteria AcceptanceCriteria) error {
 		if summary.ProtocolCounts[pcid.CIDComputeV1] == 0 {
 			failures = append(failures, "cid_compute_v1 evidence missing")
 		}
-		if summary.ProtocolCounts[pcid.EvidenceReportV1] == 0 {
-			failures = append(failures, "evidence_report_v1 evidence missing")
+		// Intent: POC14 should prove that the vague evidence-report pCID was
+		// replaced by a narrow identity/key protocol without losing exact pCID
+		// routing coverage. Source: DI-vipih
+		if summary.ProtocolCounts[pcid.IdentityKeyV1] == 0 {
+			failures = append(failures, "identity_key_v1 evidence missing")
 		}
 		if summary.ScoreReport.Overall < criteria.MinScoreOverall {
 			failures = append(failures, fmt.Sprintf("score_report.overall=%d below minimum %d", summary.ScoreReport.Overall, criteria.MinScoreOverall))
@@ -354,7 +357,7 @@ func summarizeLog(logPath string, summary *RunSummary) error {
 		if event.Outcome != "kept" {
 			summary.FailureCounts[event.Event]++
 		}
-		for _, protocolName := range []string{pcid.CASStorageV1, pcid.CIDComputeV1, pcid.EvidenceReportV1, pcid.RelationshipV1, pcid.AccountingV1, pcid.UPSLabelV1, pcid.PostalScaleV1, pcid.PrinterPortV1} {
+		for _, protocolName := range []string{pcid.CASStorageV1, pcid.CIDComputeV1, pcid.IdentityKeyV1, pcid.RelationshipV1, pcid.AccountingV1, pcid.UPSLabelV1, pcid.PostalScaleV1, pcid.PrinterPortV1} {
 			if strings.Contains(event.Detail, "pcid="+protocolName) || strings.Contains(event.Detail, "protocol="+protocolName) {
 				summary.ProtocolCounts[protocolName]++
 			}
@@ -485,7 +488,10 @@ func requiredRegressionEvents() []string {
 		"compute_verifier_disagreement",
 		"compute_disagreement_resolved_locally",
 		"compute_verification_received",
-		"evidence_report_received",
+		// Intent: Compute verification evidence now stays under cid_compute_v1;
+		// it must not depend on the removed evidence_report_v1 pCID. Source:
+		// DI-vipih
+		"compute_verification_report_received",
 		"trust_driven_peer_choice",
 		"persisted_trust_history_loaded",
 		"dynamic_peer_choice_from_persisted_trust",
@@ -596,7 +602,7 @@ func computeScores(summary RunSummary) ScoreReport {
 	addScore(&scores.Compute, summary.EventCounts["compute_function_executed"] > 0 && summary.EventCounts["compute_alternate_function_executed"] > 0 && summary.EventCounts["compute_result_received"] > 0 && summary.EventCounts["compute_bad_result_promised"] > 0 && summary.EventCounts["compute_cache_reused"] > 0)
 	addScore(&scores.Economics, summary.EventCounts["economics_price_refused"] > 0 && summary.EventCounts["economics_capacity_refused"] > 0 && summary.EventCounts["economics_credits_spent"] > 0 && summary.EventCounts["economics_credits_earned"] > 0)
 	addScore(&scores.Trust, summary.EventCounts["trust_updated"] > 0 && summary.EventCounts["trust_driven_peer_choice"] > 0 && summary.EventCounts["persisted_trust_history_loaded"] > 0 && summary.EventCounts["dynamic_peer_choice_from_persisted_trust"] > 0 && summary.EventCounts["trust_caution_recorded"] > 0 && summary.EventCounts["trust_recovery_delayed"] > 0 && summary.EventCounts["dynamic_tcp_topology_send_blocked"] > 0 && summary.EventCounts["dynamic_tcp_topology_send_succeeded"] > 0)
-	addScore(&scores.Verification, summary.EventCounts["compute_result_locally_verified"] > 0 && summary.EventCounts["compute_result_locally_rejected"] > 0 && summary.EventCounts["compute_result_peer_verified"] > 0 && summary.EventCounts["compute_verifier_disagreement"] > 0 && summary.EventCounts["compute_disagreement_resolved_locally"] > 0 && summary.EventCounts["evidence_report_received"] > 0)
+	addScore(&scores.Verification, summary.EventCounts["compute_result_locally_verified"] > 0 && summary.EventCounts["compute_result_locally_rejected"] > 0 && summary.EventCounts["compute_result_peer_verified"] > 0 && summary.EventCounts["compute_verifier_disagreement"] > 0 && summary.EventCounts["compute_disagreement_resolved_locally"] > 0 && summary.EventCounts["compute_verification_report_received"] > 0)
 	addScore(&scores.Replica, summary.EventCounts["replica_recovery_succeeded"] > 0 && summary.EventCounts["replica_capability_token_redeemed"] > 0)
 	// Intent: Analyzer scoring should treat durability, retention, pressure, and
 	// replay as first-class POC14 fitness dimensions instead of burying them under

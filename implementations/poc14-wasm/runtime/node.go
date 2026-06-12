@@ -660,17 +660,7 @@ func (node *Node) runAdversaryWorkflow() error {
 		node.record("promise_variant_not_promised", "non_commitment", "grace", "pcid="+pcid.CASStorageV1+" Grace did not promise unsupported storage variant")
 	}
 	node.shouldSuppressNonCommittedPromise("grace", unsupportedFields)
-	if _, err := node.sendAndReceive("grace", map[string]string{
-		"act":                  decision.ActPromise,
-		"from":                 node.Agent.Name,
-		"to":                   "grace",
-		"turn":                 "startup",
-		"promise":              "Mallory promises that future evidence may use a new signing key label.",
-		"reason":               "key rotation is evidence-report payload semantics, not a separate action",
-		"field_promise_about":  production.PromiseRotateSigningKey,
-		"field_new_key_label":  "mallory-next-key",
-		"field_rotation_scope": "future-poc14-evidence",
-	}); err != nil {
+	if _, err := node.sendIdentityKeyRotationPromise("grace", "mallory-next-key", "future-poc14-identity"); err != nil {
 		return fmt.Errorf("key rotation promise: %w", err)
 	}
 	functionBytes := production.SampleFunctionBytes()
@@ -959,6 +949,34 @@ func (node *Node) newAckBytes(target, outcome, promiseText string, protocolCID p
 	for key, value := range extraFields {
 		ackFields[key] = value
 	}
+	if protocolCID.Equal(node.Protocols.MustCID(pcid.IdentityKeyV1)) && extraFields["field_promise_about"] == production.PromiseRotateSigningKey {
+		// Intent: identity_key_v1 is the first POC14 protocol whose request and
+		// ACK payloads are pCID-owned arrays rather than legacy field maps.
+		// Source: DI-vipih
+		payloadBytes, payloadErr := protocol.MarshalIdentityKeyRotationAckPayload(protocol.IdentityKeyRotationAckPayload{
+			Promiser:      node.Agent.Name,
+			Promisee:      target,
+			Outcome:       outcome,
+			PromiseText:   promiseText,
+			NewKeyLabel:   extraFields["field_new_key_label"],
+			RotationScope: extraFields["field_rotation_scope"],
+		})
+		if payloadErr != nil {
+			node.record("ack_sign_failed", "broken", target, payloadErr.Error())
+			return nil, payloadErr
+		}
+		ack, ackErr := protocol.NewEnvelopeFromPayload(protocolCID, payloadBytes, node.Agent.Name)
+		if ackErr != nil {
+			node.record("ack_sign_failed", "broken", target, ackErr.Error())
+			return nil, ackErr
+		}
+		ackBytes, bytesErr := ack.Bytes()
+		if bytesErr != nil {
+			node.record("ack_bytes_failed", "broken", target, bytesErr.Error())
+			return nil, bytesErr
+		}
+		return ackBytes, nil
+	}
 	ack, ackErr := protocol.NewEnvelope(protocolCID, ackFields, node.Agent.Name)
 	if ackErr != nil {
 		node.record("ack_sign_failed", "broken", target, ackErr.Error())
@@ -1144,6 +1162,39 @@ func (node *Node) sendRawEnvelope(target, protocolName string, envelopeBytes []b
 	return message, err
 }
 
+// sendIdentityKeyRotationPromise sends identity_key_v1 using a pCID-owned CBOR
+// array payload instead of the legacy field_* map scaffold.
+// Intent: Key rotation belongs to identity/key protocol semantics, and this is
+// the first POC14 payload migrated under `DI-vipih`. Source: DI-vipih
+func (node *Node) sendIdentityKeyRotationPromise(target, newKeyLabel, rotationScope string) (parsedMessage, error) {
+	payloadBytes, payloadErr := protocol.MarshalIdentityKeyRotationPayload(protocol.IdentityKeyRotationPayload{
+		Promiser:      node.Agent.Name,
+		Promisee:      target,
+		NewKeyLabel:   newKeyLabel,
+		RotationScope: rotationScope,
+	})
+	if payloadErr != nil {
+		return parsedMessage{}, payloadErr
+	}
+	envelope, envelopeErr := protocol.NewEnvelopeFromPayload(node.Protocols.MustCID(pcid.IdentityKeyV1), payloadBytes, node.Agent.Name)
+	if envelopeErr != nil {
+		return parsedMessage{}, envelopeErr
+	}
+	envelopeBytes, bytesErr := envelope.Bytes()
+	if bytesErr != nil {
+		return parsedMessage{}, bytesErr
+	}
+	message, sendErr := node.sendRawEnvelope(target, pcid.IdentityKeyV1, envelopeBytes)
+	if sendErr != nil {
+		return parsedMessage{}, sendErr
+	}
+	if message.Fields["outcome"] != "kept" {
+		return parsedMessage{}, ackOutcomeError{outcome: message.Fields["outcome"]}
+	}
+	node.record("identity_key_rotation_ack_received", "kept", target, "pcid="+pcid.IdentityKeyV1+" new_key_label="+newKeyLabel)
+	return message, nil
+}
+
 // sendRawEnvelopeBytes forwards an already-signed envelope and returns both the
 // parsed ACK and the exact ACK bytes.
 // Intent: POC14 stdio workers must observe the peer's original ACK envelope
@@ -1252,8 +1303,8 @@ func (node *Node) protocolForFields(fields map[string]string) (string, protocol.
 		return pcid.CASStorageV1, node.Protocols.MustCID(pcid.CASStorageV1)
 	case production.PromiseExecuteFunction, production.PromiseLookupComputeCache, production.PromiseProvideComputeContext, production.PromiseVerifyComputeResult:
 		return pcid.CIDComputeV1, node.Protocols.MustCID(pcid.CIDComputeV1)
-	case production.PromiseLocalComputeObservation, production.PromiseRotateSigningKey:
-		return pcid.EvidenceReportV1, node.Protocols.MustCID(pcid.EvidenceReportV1)
+	case production.PromiseRotateSigningKey:
+		return pcid.IdentityKeyV1, node.Protocols.MustCID(pcid.IdentityKeyV1)
 	default:
 		return pcid.RelationshipV1, node.Protocols.MustCID(pcid.RelationshipV1)
 	}
@@ -1296,10 +1347,11 @@ func autonomousProtocolPayloadSupported(protocolName string, fields map[string]s
 		return casPayloadShapePresent(fields)
 	case pcid.CIDComputeV1:
 		return computePayloadShapePresent(fields)
-	case pcid.EvidenceReportV1:
-		return fields["field_promise_about"] == production.PromiseLocalComputeObservation &&
-			fields["field_subject_pcid"] != "" &&
-			fields["field_verdict"] != ""
+	case pcid.IdentityKeyV1:
+		// Intent: Live LLM field-map turns must not synthesize identity_key_v1
+		// payloads; POC14 only sends this pCID through explicit array encoders.
+		// Source: DI-vipih
+		return false
 	case pcid.PostalScaleV1, pcid.AccountingV1, pcid.UPSLabelV1, pcid.PrinterPortV1:
 		return productionPayloadShapePresent(protocolName, fields)
 	default:
@@ -1380,8 +1432,8 @@ func (node *Node) handleProtocolPromise(message parsedMessage) (map[string]strin
 		return node.handleCASStoragePromise(message.Fields)
 	case pcid.CIDComputeV1:
 		return node.handleCIDComputePromise(message.Fields)
-	case pcid.EvidenceReportV1:
-		return node.handleEvidenceReportPromise(message.Fields)
+	case pcid.IdentityKeyV1:
+		return node.handleIdentityKeyPromise(message.Fields)
 	default:
 		return nil, fmt.Errorf("unsupported protocol %s", message.ProtocolName)
 	}
@@ -1883,17 +1935,22 @@ func (node *Node) handleCIDComputePromise(fields map[string]string) (map[string]
 	}
 }
 
-func (node *Node) handleEvidenceReportPromise(fields map[string]string) (map[string]string, error) {
+// handleIdentityKeyPromise records the narrow identity/key promises currently
+// modeled by POC14.
+// Intent: Key rotation is identity protocol behavior, not generic evidence
+// reporting or a new top-level action kind. Source: DI-vipih
+func (node *Node) handleIdentityKeyPromise(fields map[string]string) (map[string]string, error) {
 	switch fields["field_promise_about"] {
 	case production.PromiseRotateSigningKey:
-		node.record("key_rotation_promise_recorded", "kept", fields["from"], "pcid="+pcid.EvidenceReportV1+" new_key_label="+fields["field_new_key_label"])
-		node.record("evidence_report_received", "kept", fields["from"], "pcid="+pcid.EvidenceReportV1+" key rotation promise recorded as local evidence")
-		return map[string]string{"field_promise_about": production.PromiseRotateSigningKey, "field_verdict": "kept"}, nil
-	case production.PromiseLocalComputeObservation:
-		node.record("evidence_report_received", "kept", fields["from"], "pcid="+pcid.EvidenceReportV1+" subject_pcid="+fields["field_subject_pcid"]+" verdict="+fields["field_verdict"])
-		return map[string]string{"field_promise_about": production.PromiseLocalComputeObservation}, nil
+		node.record("key_rotation_promise_recorded", "kept", fields["from"], "pcid="+pcid.IdentityKeyV1+" new_key_label="+fields["field_new_key_label"])
+		return map[string]string{
+			"field_promise_about":  production.PromiseRotateSigningKey,
+			"field_new_key_label":  fields["field_new_key_label"],
+			"field_rotation_scope": fields["field_rotation_scope"],
+			"field_verdict":        "kept",
+		}, nil
 	default:
-		return nil, fmt.Errorf("evidence report cannot handle promise_about=%q", fields["field_promise_about"])
+		return nil, fmt.Errorf("identity key cannot handle promise_about=%q", fields["field_promise_about"])
 	}
 }
 
@@ -1956,7 +2013,10 @@ func (node *Node) recordAckEvidence(target string, message parsedMessage) {
 		}
 		node.record("compute_result_received", "kept", target, "pcid="+pcid.CIDComputeV1+" result_cid="+message.Fields["field_result_cid"])
 	case production.PromiseVerifyComputeResult:
-		node.record("evidence_report_received", "kept", target, "pcid="+pcid.CIDComputeV1+" verifier verdict="+message.Fields["field_verdict"]+" result_cid="+message.Fields["field_subject_result_cid"])
+		// Intent: Verification reports are cid_compute_v1 promises about a
+		// compute result, not generic evidence_report_v1 messages. Source:
+		// DI-vipih
+		node.record("compute_verification_report_received", "kept", target, "pcid="+pcid.CIDComputeV1+" verifier verdict="+message.Fields["field_verdict"]+" result_cid="+message.Fields["field_subject_result_cid"])
 		if message.Fields["field_verdict"] == "disagree" {
 			node.record("compute_verifier_disagreement", "non_commitment", target, "pcid="+pcid.CIDComputeV1+" verifier disagreement received")
 			node.record("compute_disagreement_resolved_locally", "kept", message.Fields["field_subject_peer"], "pcid="+pcid.CIDComputeV1+" Alice resolves disagreement by local recompute plus Dave evidence")

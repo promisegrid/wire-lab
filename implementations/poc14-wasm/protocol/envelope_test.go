@@ -57,6 +57,53 @@ func TestParseEnvelopeRejectsMalformedCBOR(t *testing.T) {
 	}
 }
 
+func TestIdentityKeyPayloadUsesArrayShape(t *testing.T) {
+	// Intent: identity_key_v1 is the first POC14 pCID moved to pCID-owned CBOR
+	// arrays, proving new protocols need not inherit legacy field maps.
+	// Source: DI-vipih
+	payloadBytes, err := MarshalIdentityKeyRotationPayload(IdentityKeyRotationPayload{
+		Promiser:      "mallory",
+		Promisee:      "grace",
+		NewKeyLabel:   "mallory-next-key",
+		RotationScope: "future-poc14-identity",
+	})
+	if err != nil {
+		t.Fatalf("marshal identity payload: %v", err)
+	}
+	if len(payloadBytes) == 0 || payloadBytes[0]>>5 != 4 {
+		t.Fatalf("identity payload should be a CBOR array, got %x", payloadBytes)
+	}
+	envelope, err := NewEnvelopeFromPayload(NewProtocolCID([]byte("poc14 identity key rotation promise protocol v1")), payloadBytes, "mallory")
+	if err != nil {
+		t.Fatalf("new array envelope: %v", err)
+	}
+	fields, err := envelope.PayloadFields()
+	if err != nil {
+		t.Fatalf("payload fields: %v", err)
+	}
+	if fields["act"] != "promise" || fields["from"] != "mallory" || fields["to"] != "grace" || fields["field_new_key_label"] != "mallory-next-key" {
+		t.Fatalf("identity routing fields = %#v", fields)
+	}
+	ackPayloadBytes, err := MarshalIdentityKeyRotationAckPayload(IdentityKeyRotationAckPayload{
+		Promiser:      "grace",
+		Promisee:      "mallory",
+		Outcome:       "kept",
+		PromiseText:   "I promise I recorded this future key label locally.",
+		NewKeyLabel:   "mallory-next-key",
+		RotationScope: "future-poc14-identity",
+	})
+	if err != nil {
+		t.Fatalf("marshal identity ack payload: %v", err)
+	}
+	ackFields, err := IdentityKeyPayloadFields(ackPayloadBytes)
+	if err != nil {
+		t.Fatalf("identity ack fields: %v", err)
+	}
+	if ackFields["act"] != "promise" || ackFields["outcome"] != "kept" || ackFields["promise"] == "" {
+		t.Fatalf("identity ack fields = %#v", ackFields)
+	}
+}
+
 func FuzzParseEnvelopeHandlesArbitraryBytes(f *testing.F) {
 	// Intent: POC14 should treat malformed CBOR, prompt-injection bytes, partial
 	// writes, and random adversarial inputs as parse/verification outcomes rather

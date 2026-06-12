@@ -8,22 +8,24 @@ import (
 )
 
 const (
-	RelationshipV1   = "relationship_v1"
-	PostalScaleV1    = "postal_scale_v1"
-	UPSLabelV1       = "ups_label_v1"
-	AccountingV1     = "accounting_v1"
-	PrinterPortV1    = "printer_port_v1"
-	KernelReceiveV1  = "kernel_receive_v1"
-	CASStorageV1     = "cas_storage_v1"
-	CIDComputeV1     = "cid_compute_v1"
-	EvidenceReportV1 = "evidence_report_v1"
+	RelationshipV1  = "relationship_v1"
+	PostalScaleV1   = "postal_scale_v1"
+	UPSLabelV1      = "ups_label_v1"
+	AccountingV1    = "accounting_v1"
+	PrinterPortV1   = "printer_port_v1"
+	KernelReceiveV1 = "kernel_receive_v1"
+	CASStorageV1    = "cas_storage_v1"
+	CIDComputeV1    = "cid_compute_v1"
+	IdentityKeyV1   = "identity_key_v1"
 )
 
 // Registry is the POC14 kernel's local pCID table. It is not a central service
 // registry; it is only the local mapping from known protocol-spec names to
 // content-derived pCIDs used by this executable experiment.
 // Intent: Test slot-0 pCID routing to app receive promises while keeping pCIDs
-// as protocol-spec identities, not message-type selectors. Source: DI-galin
+// as protocol-spec identities, not message-type selectors, and while replacing
+// generic evidence reports with narrower pCID-owned protocols. Source:
+// DI-galin; DI-vipih
 type Registry struct {
 	byName map[string]protocol.ProtocolCID
 	byCID  map[string]string
@@ -49,7 +51,7 @@ func NewRegistry() Registry {
 		{KernelReceiveV1, "poc14 local app receive promise registration protocol v1"},
 		{CASStorageV1, "poc14 decentralized cas storage promise protocol v1"},
 		{CIDComputeV1, "poc14 cid named function compute promise protocol v1"},
-		{EvidenceReportV1, "poc14 local evidence report promise protocol v1"},
+		{IdentityKeyV1, "poc14 identity key rotation promise protocol v1"},
 	} {
 		registry.register(entry.name, protocol.NewProtocolCID([]byte(entry.spec)))
 	}

@@ -207,9 +207,9 @@ func cleanRegressionSummary() RunSummary {
 		AgentCounts:   map[string]int{},
 		FailureCounts: map[string]int{},
 		ProtocolCounts: map[string]int{
-			pcid.CASStorageV1:     1,
-			pcid.CIDComputeV1:     1,
-			pcid.EvidenceReportV1: 1,
+			pcid.CASStorageV1:  1,
+			pcid.CIDComputeV1:  1,
+			pcid.IdentityKeyV1: 1,
 		},
 		ShippingCounts: map[string]int{
 			"accounting_updated":                    1,

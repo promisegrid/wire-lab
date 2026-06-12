@@ -166,9 +166,12 @@ open developer-facing porting-boundary decision, and `SIM-fovip` is the active
 simulation evidence surface. POC13 is now first executable storage/compute
 evidence: decentralized sparse CAS storage promises under `cas_storage_v1`,
 CID-named function-call compute promises under `cid_compute_v1`, and local
-observation promises under provisional `evidence_report_v1`. A CID names content
-or function code inside protocol-owned payloads; it does not by itself promise
-availability, retention, access, serving, or trustworthy computation.
+relationship/observation promises under `relationship_v1`. POC14 adds a narrow
+`identity_key_v1` protocol for identity/key-rotation promises and begins moving
+new protocol payloads away from universal `field_*` maps toward pCID-owned CBOR
+arrays. A CID names content or function code inside protocol-owned payloads; it
+does not by itself promise availability, retention, access, serving, or
+trustworthy computation.
 Pure compute results are cached only by exact protocol/function/input/context
 and result identity; impure work externalizes timestamp, randomness, sensor
 reads, or other ambient inputs as context objects so the run is replayable and
@@ -1381,9 +1384,11 @@ section.
   workflow, and POC13 decentralized CAS storage plus CID-named function-call
   compute promises. It keeps one kernel process per container, separate app
   entrypoints, app receive-promise registration, exact pCID routing, and
-  app-local trust/workflow judgment while adding `cas_storage_v1`,
-  `cid_compute_v1`, and `evidence_report_v1` with content/function/context/result
-  CIDs as payload-level values. It sends signed grid envelopes over
+  app-local trust/workflow judgment while adding `cas_storage_v1` and
+  `cid_compute_v1` with content/function/context/result CIDs as payload-level
+  values, plus a narrow POC14 `identity_key_v1` key-rotation protocol whose
+  payload is a pCID-owned CBOR array rather than another universal `field_*`
+  map. It sends signed grid envelopes over
   length-framed TCP, records app receive/runtime done evidence around bounded
   startup/turn/grace timing, stores and retrieves multiple real CAS byte objects
   by CID, replicates bytes to Frank, recovers from modeled Bob unavailability by

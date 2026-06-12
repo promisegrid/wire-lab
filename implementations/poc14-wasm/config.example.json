@@ -26,7 +26,7 @@
       "motivation": "Build reciprocal peer relationships without accepting anyone as an authority.",
       "initial_peers": ["bob", "carol", "dave", "frank", "grace", "ellen", "fulfillment"],
       "candidate_peers": ["bob", "carol", "dave", "frank", "grace", "ellen", "fulfillment"],
-      "supported_pcids": ["relationship_v1", "cas_storage_v1", "cid_compute_v1", "evidence_report_v1"],
+      "supported_pcids": ["relationship_v1", "cas_storage_v1", "cid_compute_v1", "identity_key_v1"],
       "budget": 4,
       "capacity": 3
     },
@@ -56,7 +56,7 @@
       "motivation": "Prefer local evidence over reputation claims and reduce weak relationships.",
       "initial_peers": ["alice", "carol", "ellen", "grace", "heidi"],
       "candidate_peers": ["alice", "carol", "ellen", "grace", "heidi"],
-      "supported_pcids": ["relationship_v1", "cid_compute_v1", "evidence_report_v1"],
+      "supported_pcids": ["relationship_v1", "cid_compute_v1", "identity_key_v1"],
       "budget": 4,
       "capacity": 3
     },
@@ -86,7 +86,7 @@
       "motivation": "Trade only when local value and trust justify the relationship risk.",
       "initial_peers": ["alice", "carol", "ivan", "judy", "mallory"],
       "candidate_peers": ["alice", "carol", "ivan", "judy", "bob", "mallory"],
-      "supported_pcids": ["relationship_v1", "cas_storage_v1", "cid_compute_v1", "evidence_report_v1"],
+      "supported_pcids": ["relationship_v1", "cas_storage_v1", "cid_compute_v1", "identity_key_v1"],
       "budget": 4,
       "capacity": 3
     },
@@ -126,7 +126,7 @@
       "motivation": "Discover whether peers and kernels reject non-promise protocol surfaces.",
       "initial_peers": ["carol", "frank", "grace", "judy", "oscar"],
       "candidate_peers": ["carol", "frank", "grace", "judy", "oscar"],
-      "supported_pcids": ["relationship_v1", "cas_storage_v1", "cid_compute_v1", "evidence_report_v1"],
+      "supported_pcids": ["relationship_v1", "cas_storage_v1", "cid_compute_v1", "identity_key_v1"],
       "budget": 5,
       "capacity": 5,
       "adversarial": true
@@ -204,7 +204,7 @@
       "motivation": "Show that a sandboxed runtime can participate without host calls becoming RPC commands or trust authority.",
       "initial_peers": ["victor", "alice", "dave"],
       "candidate_peers": ["victor", "alice", "dave", "grace"],
-      "supported_pcids": ["relationship_v1", "evidence_report_v1"],
+      "supported_pcids": ["relationship_v1", "identity_key_v1"],
       "budget": 3,
       "capacity": 3
     },
@@ -215,7 +215,7 @@
       "motivation": "Show that subprocess-style agents can use PromiseGrid without direct network APIs or RPC command surfaces.",
       "initial_peers": ["peggy", "alice", "dave"],
       "candidate_peers": ["peggy", "alice", "dave", "grace"],
-      "supported_pcids": ["relationship_v1", "evidence_report_v1"],
+      "supported_pcids": ["relationship_v1", "identity_key_v1"],
       "budget": 3,
       "capacity": 3
     }

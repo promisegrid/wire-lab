@@ -8,6 +8,11 @@ import (
 	"strings"
 )
 
+// These promise-about names are payload-level meanings used inside pCID-owned
+// protocols; they are not top-level wire actions or independent pCIDs.
+// Intent: Keep PromiseGrid protocol vocabulary promise-first while moving key
+// rotation into identity_key_v1 instead of generic evidence reporting. Source:
+// DI-bikit; DI-vipih
 const (
 	PromiseWeighPackage            = "weigh_package"
 	PromiseAddressLookup           = "address_lookup"
@@ -25,7 +30,6 @@ const (
 	PromiseLookupComputeCache      = "lookup_compute_cache"
 	PromiseProvideComputeContext   = "provide_compute_context"
 	PromiseVerifyComputeResult     = "verify_compute_result"
-	PromiseLocalComputeObservation = "local_compute_observation"
 	PromiseRotateSigningKey        = "rotate_signing_key"
 	PromiseTrustRepair             = "label_future_malformed_evidence"
 	PromiseUnsupportedVariantProbe = "unsupported_variant_probe"

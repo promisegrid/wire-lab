@@ -58,6 +58,14 @@ Intent: Permanent distrust should prevent future direct sends and narrow candida
 Constraints: Keep the behavior local to the observing app; do not create a global ban, network authority, permission system, or RPC route command; persist the local state only in the run-scoped relationship snapshot; keep route behavior simple until a later POC implements real multi-hop forwarding.
 Affects: implementations/poc14-wasm/relationship/; implementations/poc14-wasm/runtime/; implementations/poc14-wasm/cmd/poc14-analyze/; implementations/poc14-wasm/docs/; implementations/poc14-wasm/README.md.
 
+ID: DI-vipih
+Date: 2026-06-11 22:55:34
+Status: active
+Decision: Remove the vague `evidence_report_v1` pCID from POC14, move key rotation to `identity_key_v1`, and start new/reworked protocol payloads as pCID-owned CBOR arrays rather than universal `field_*` string maps.
+Intent: The POC14 envelope should stay `grid([42(pCID), payload, proof])`, but payload shape belongs to the protocol spec named by pCID. `evidence_report_v1` blurred compute, storage, relationship, and identity semantics; key rotation is identity/key behavior, compute observations belong under `cid_compute_v1`, storage observations belong under `cas_storage_v1`, and relationship observations belong under `relationship_v1`. New protocol work should not extend the `field_*` map habit.
+Constraints: Do not impose one universal payload shape across all pCIDs; keep existing legacy map payloads only as incremental POC scaffolding until their owning pCIDs are rewritten; keep kernel routing working during the transition; do not add relay forwarding or Peggy/Victor useful-work scope in this cleanup.
+Affects: implementations/poc14-wasm/protocol/; implementations/poc14-wasm/pcid/; implementations/poc14-wasm/runtime/; implementations/poc14-wasm/cmd/poc14-analyze/; implementations/poc14-wasm/config.example.json; implementations/poc14-wasm/docs/; implementations/poc14-wasm/README.md; DEV-GUIDE-RESOURCES.md.
+
 ## Tasks
 
 - [x] gogug.1 Fix POC13 evidence summary mismatch so saved evidence counts include all local non-commitment outcomes, not only receiver-side `not_promised` journal entries.
@@ -84,3 +92,5 @@ Affects: implementations/poc14-wasm/relationship/; implementations/poc14-wasm/ru
 - [x] gogug.22 Add POC14 untrusted-transit exclusion scenario evidence and analyzer gate.
 - [x] gogug.23 Make permanent distrust a persisted local relationship-ledger state.
 - [x] gogug.24 Make untrusted-transit exclusion reject concrete local route candidates before send.
+- [x] gogug.25 Remove `evidence_report_v1` from POC14 and replace key rotation with `identity_key_v1`.
+- [x] gogug.26 Add pCID-owned CBOR-array payload support for the new identity/key protocol.

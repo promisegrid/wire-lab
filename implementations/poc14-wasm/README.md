@@ -16,7 +16,7 @@ Source: `DI-sihuz`; `DI-sifot`; `DI-fimoh`; `DI-lulof`; `DI-linof`.
 
 - Multiple app pCIDs through one local container kernel: `relationship_v1`,
   `postal_scale_v1`, `ups_label_v1`, `printer_port_v1`, `accounting_v1`,
-  `cas_storage_v1`, `cid_compute_v1`, and `evidence_report_v1`.
+  `cas_storage_v1`, `cid_compute_v1`, and `identity_key_v1`.
 - Real app/kernel process boundary: each container runs one `poc14-kernel`
   process plus separate local app processes for relationship, fulfillment,
   postal scale, UPS label printer, printer port, and accounting roles.
@@ -112,6 +112,13 @@ The pCID identifies the protocol spec. Message variants such as
 `verify_compute_result` are payload meanings inside their protocol, not
 separate pCIDs. Source: `DI-bikit`; `DI-pohaj`; `DI-sinur`.
 
+Payload shape is owned by the pCID. Most POC14 payloads still use the older
+`field_*` map scaffold so the existing agents can interoperate while the POC
+evolves, but that map is not a PromiseGrid-wide payload standard.
+`identity_key_v1` is the first narrow cleanup example: its key-rotation request
+and ACK payloads are CBOR arrays defined by that pCID, then decoded into
+compatibility fields only at the local runtime boundary. Source: `DI-vipih`.
+
 ## Shipping Agents
 
 - `poc14-fulfillment`: hybrid workflow coordinator that executes one deterministic
@@ -131,9 +138,10 @@ separate pCIDs. Source: `DI-bikit`; `DI-pohaj`; `DI-sinur`.
 - `poc14-accounting`: deterministic app for `accounting_v1`; promises address
   lookup and shipment update evidence only.
 - `poc14-relationship-agent`: generic live LLM relationship app. Depending on
-  the configured agent, it can also promise `cas_storage_v1`,
-  `cid_compute_v1`, or `evidence_report_v1` handling while keeping the same
-  single top-level `promise` action.
+  the configured agent, it can also promise `cas_storage_v1` or
+  `cid_compute_v1` handling while keeping the same single top-level `promise`
+  action. `identity_key_v1` is reserved for scripted key-rotation array payloads
+  in this cleanup slice. Source: `DI-vipih`.
 - `poc14-wasm-agent`: deterministic Peggy app process that validates WASM module
   bytes and sends WASM-boundary evidence as a normal `relationship_v1` promise.
 - `poc14-stdio-adapter`: deterministic Victor adapter process that starts

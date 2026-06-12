@@ -85,14 +85,26 @@ type Envelope struct {
 	Proof       Proof
 }
 
-// NewEnvelope builds a protocol-owned CBOR payload and signs the envelope's
-// two-slot signable view.
+// NewEnvelope builds a legacy map payload and signs the envelope's two-slot
+// signable view. New or reworked pCIDs should prefer NewEnvelopeFromPayload with
+// pCID-owned CBOR arrays rather than extending the legacy field-map scaffold.
+// Intent: Preserve existing POC14 flows while `DI-vipih` migrates new protocol
+// work toward pCID-owned array payloads. Source: DI-vipih
 func NewEnvelope(protocolCID ProtocolCID, fields map[string]string, signer string) (Envelope, error) {
 	payloadBytes, marshalErr := MarshalStringMap(fields)
 	if marshalErr != nil {
 		return Envelope{}, marshalErr
 	}
-	envelope := Envelope{ProtocolCID: protocolCID, Payload: payloadBytes}
+	return NewEnvelopeFromPayload(protocolCID, payloadBytes, signer)
+}
+
+// NewEnvelopeFromPayload signs an already-encoded pCID-owned payload.
+// Intent: The envelope layer must not impose one universal payload shape; the
+// pCID spec owns the bytes in slot 1. Source: DI-vipih
+func NewEnvelopeFromPayload(protocolCID ProtocolCID, payloadBytes []byte, signer string) (Envelope, error) {
+	copiedPayload := make([]byte, len(payloadBytes))
+	copy(copiedPayload, payloadBytes)
+	envelope := Envelope{ProtocolCID: protocolCID, Payload: copiedPayload}
 	proof, proofErr := SignEnvelope(envelope, signer)
 	if proofErr != nil {
 		return Envelope{}, proofErr
@@ -219,9 +231,21 @@ func ParseEnvelope(envelopeBytes []byte) (Envelope, error) {
 	}, nil
 }
 
-// PayloadFields decodes the pCID-owned payload fields.
+// PayloadFields decodes legacy map payloads and the small set of transitional
+// pCID-owned array payloads whose routing fields the POC14 kernel still needs.
+// Intent: Kernel routing still needs promiser/promisee during the migration away
+// from field maps, but the envelope layer should not make field maps the target
+// protocol pattern. Source: DI-vipih
 func (envelope Envelope) PayloadFields() (map[string]string, error) {
-	return UnmarshalStringMap(envelope.Payload)
+	fields, fieldsErr := UnmarshalStringMap(envelope.Payload)
+	if fieldsErr == nil {
+		return fields, nil
+	}
+	identityKeyFields, identityKeyErr := IdentityKeyPayloadFields(envelope.Payload)
+	if identityKeyErr == nil {
+		return identityKeyFields, nil
+	}
+	return nil, fieldsErr
 }
 
 // SignEnvelope signs the envelope's pCID-defined signable view.
