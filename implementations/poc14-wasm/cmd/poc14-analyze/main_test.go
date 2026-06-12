@@ -169,6 +169,28 @@ func TestValidateSummaryRejectsMissingRestartEvidence(t *testing.T) {
 	}
 }
 
+func TestValidateSummaryRejectsMissingPermanentDistrustEvidence(t *testing.T) {
+	summary := cleanRegressionSummary()
+	summary.EventCounts["permanent_distrust_decided"] = 0
+	summary.MissingRequiredEventNames = missingRequiredEvents(summary)
+	summary.ScoreReport = computeScores(summary)
+	err := validateSummary(summary, cleanRegressionCriteria())
+	if err == nil {
+		t.Fatalf("missing permanent distrust evidence should fail")
+	}
+}
+
+func TestValidateSummaryRejectsMissingTransitExclusionEvidence(t *testing.T) {
+	summary := cleanRegressionSummary()
+	summary.EventCounts["transit_safe_route_selected"] = 0
+	summary.MissingRequiredEventNames = missingRequiredEvents(summary)
+	summary.ScoreReport = computeScores(summary)
+	err := validateSummary(summary, cleanRegressionCriteria())
+	if err == nil {
+		t.Fatalf("missing transit exclusion evidence should fail")
+	}
+}
+
 func cleanRegressionSummary() RunSummary {
 	eventCounts := map[string]int{
 		"fulfillment_workflow_completed":  1,

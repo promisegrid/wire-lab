@@ -86,6 +86,12 @@ Source: `DI-sihuz`; `DI-sifot`; `DI-fimoh`; `DI-lulof`; `DI-linof`.
   peer-carried attestations, bearer-token exchange-rate signals, relationship
   topology signals, and voluntary gossip as ordinary local promises rather than
   global monitor facts. Source: `DI-lulof`.
+- Local hard trust boundaries: Alice records a permanent local distrust decision
+  about Mallory and a local promise that Alice's inbound/outbound traffic should
+  not transit Mallory. The ledger now blocks Alice's future Mallory sends and
+  rejects route candidates with Mallory as a transit hop. This is local evidence
+  and local route choice, not a network-wide ban or authorization policy. Source:
+  `DI-kinaf`; `DI-dubih`.
 - Mixed-version and restart evidence: POC14 records local pCID migration
   promises and same-run restart/recovery promises so future work can test
   protocol evolution and process crashes without relying on cross-run state.

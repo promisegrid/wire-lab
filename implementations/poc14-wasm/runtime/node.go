@@ -380,6 +380,9 @@ func (node *Node) runCASComputeWorkflow() error {
 	if err := node.runDynamicTCPTopologyWorkflow(); err != nil {
 		return err
 	}
+	if err := node.recordPermanentDistrustAndTransitExclusionEvidence(); err != nil {
+		return err
+	}
 	node.recordDecentralizedMonitoringEvidence()
 	node.recordMixedVersionPCIDMigrationEvidence()
 	node.recordRunInternalRestartEvidence()
@@ -1147,6 +1150,9 @@ func (node *Node) sendRawEnvelope(target, protocolName string, envelopeBytes []b
 // through stdin/stdout rather than a locally re-signed adapter copy. Source:
 // DI-linof
 func (node *Node) sendRawEnvelopeBytes(target, protocolName string, envelopeBytes []byte) (parsedMessage, []byte, error) {
+	if !node.canDialTarget(target, nil) {
+		return parsedMessage{}, nil, fmt.Errorf("no local TCP promise to %s", target)
+	}
 	kernelAddress, addressFound := node.Config.KernelAppAddressForAgent(node.Agent.Name)
 	if !addressFound {
 		return parsedMessage{}, nil, fmt.Errorf("no local kernel endpoint for app %s", node.Agent.Name)
@@ -2218,6 +2224,9 @@ func (node *Node) canAccept(peerName string) bool {
 func (node *Node) canDialTarget(peerName string, fields map[string]string) bool {
 	node.mu.Lock()
 	defer node.mu.Unlock()
+	if node.ledger.PermanentlyDistrusted(peerName) {
+		return false
+	}
 	if node.ledger.CanDial(peerName) {
 		return true
 	}
@@ -2232,10 +2241,31 @@ func (node *Node) canDialTarget(peerName string, fields map[string]string) bool 
 func (node *Node) canAcceptFrom(peerName string, fields map[string]string) bool {
 	node.mu.Lock()
 	defer node.mu.Unlock()
+	if node.ledger.PermanentlyDistrusted(peerName) {
+		return false
+	}
 	if node.ledger.CanAccept(peerName) {
 		return true
 	}
 	return isLowRiskCandidatePromise(fields) && containsName(node.Agent.CandidatePeers, peerName)
+}
+
+// markPermanentDistrustAndTransitExclusion updates Alice-local trust and route
+// state for the hard boundary scenario.
+// Intent: The decision changes only this app's own future sends and path choices;
+// it does not command other agents or publish global reputation. Source:
+// DI-dubih
+func (node *Node) markPermanentDistrustAndTransitExclusion(peerName string) {
+	node.mu.Lock()
+	defer node.mu.Unlock()
+	node.ledger.PermanentlyDistrust(peerName)
+	node.ledger.ExcludeTransit(peerName)
+}
+
+func (node *Node) routeAllowed(route []string) bool {
+	node.mu.Lock()
+	defer node.mu.Unlock()
+	return node.ledger.RouteAllowed(route)
 }
 
 func (node *Node) observeOutcome(peerName string, outcome relationship.Outcome) {

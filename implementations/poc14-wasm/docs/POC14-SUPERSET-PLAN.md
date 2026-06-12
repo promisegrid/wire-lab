@@ -53,6 +53,12 @@ TCP-only Go agents. Source: `DI-sihuz`; `DI-sifot`; `DI-fimoh`;
 - Added decentralized monitoring evidence for local summaries, peer-carried
   attestations, bearer-token exchange-rate signals, topology signals, and
   voluntary gossip. Source: `DI-linof`; `DI-lulof`.
+- Added hard local trust-boundary scenario evidence for permanent local distrust
+  of Mallory and local rejection of Mallory-transit route candidates for Alice's
+  own traffic. Source: `DI-kinaf`.
+- Added app-local behavior for those hard boundaries: the relationship ledger
+  persists permanent distrust, send gates reject ordinary future Mallory sends,
+  and route-candidate checks reject Mallory as a transit hop. Source: `DI-dubih`.
 - Added explicit mixed-version pCID migration evidence and same-run restart
   recovery evidence so those planned POC14 concerns have analyzer gates rather
   than remaining prose-only intentions. Source: `DI-linof`.

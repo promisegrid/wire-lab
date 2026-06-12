@@ -30,23 +30,29 @@ const maxTrustScore = 5
 // weak trust with removed adjacency without creating a global peering
 // authority. Source: DI-timah
 type Ledger struct {
-	trustByPeer   map[string]int
-	cautionByPeer map[string]int
-	directPeers   map[string]bool
-	strongTrust   int
-	weakTrust     int
-	decay         int
+	trustByPeer           map[string]int
+	cautionByPeer         map[string]int
+	directPeers           map[string]bool
+	permanentDistrust     map[string]bool
+	transitExcludedByPeer map[string]bool
+	strongTrust           int
+	weakTrust             int
+	decay                 int
 }
 
 // State is the durable, local-only relationship snapshot for one agent.
 // Intent: Persist only this agent's private trust and current direct-link
 // promises, never a global trust authority. Recovery caution is persisted with
 // trust so a process restart inside the same run cannot erase recent
-// malformed/broken evidence. Source: DI-timah; DI-fijov
+// malformed/broken evidence. Permanent distrust and transit exclusion are also
+// local restraint promises, not global reputation or route policy. Source:
+// DI-timah; DI-fijov; DI-dubih
 type State struct {
-	TrustByPeer   map[string]int `json:"trust_by_peer"`
-	CautionByPeer map[string]int `json:"caution_by_peer,omitempty"`
-	DirectPeers   []string       `json:"direct_peers"`
+	TrustByPeer           map[string]int `json:"trust_by_peer"`
+	CautionByPeer         map[string]int `json:"caution_by_peer,omitempty"`
+	DirectPeers           []string       `json:"direct_peers"`
+	PermanentDistrust     []string       `json:"permanent_distrust,omitempty"`
+	TransitExcludedByPeer []string       `json:"transit_excluded_by_peer,omitempty"`
 }
 
 // NewLedger initializes one local relationship ledger.
@@ -64,12 +70,14 @@ func NewLedger(allPeers []string, initialDirectPeers []string, strongTrust, weak
 		}
 	}
 	return &Ledger{
-		trustByPeer:   trustByPeer,
-		cautionByPeer: cautionByPeer,
-		directPeers:   directPeers,
-		strongTrust:   strongTrust,
-		weakTrust:     weakTrust,
-		decay:         decay,
+		trustByPeer:           trustByPeer,
+		cautionByPeer:         cautionByPeer,
+		directPeers:           directPeers,
+		permanentDistrust:     make(map[string]bool, len(allPeers)),
+		transitExcludedByPeer: make(map[string]bool, len(allPeers)),
+		strongTrust:           strongTrust,
+		weakTrust:             weakTrust,
+		decay:                 decay,
 	}
 }
 
@@ -97,30 +105,94 @@ func (ledger *Ledger) Snapshot() map[string]int {
 
 // DirectPeers returns currently promised direct TCP peers.
 func (ledger *Ledger) DirectPeers() []string {
-	peers := make([]string, 0, len(ledger.directPeers))
-	for peerName, direct := range ledger.directPeers {
-		if direct {
-			peers = append(peers, peerName)
-		}
-	}
-	sort.Strings(peers)
-	return peers
+	return sortedEnabledPeers(ledger.directPeers)
+}
+
+// PermanentDistrustPeers returns peers this local agent has decided not to
+// repair or contact without a separate future local decision.
+func (ledger *Ledger) PermanentDistrustPeers() []string {
+	return sortedEnabledPeers(ledger.permanentDistrust)
+}
+
+// TransitExcludedPeers returns peers this local agent will not use as transit
+// hops for this agent's own inbound or outbound traffic.
+func (ledger *Ledger) TransitExcludedPeers() []string {
+	return sortedEnabledPeers(ledger.transitExcludedByPeer)
+}
+
+// PermanentlyDistrusted reports whether this local agent has decided not to use
+// ordinary future evidence from the peer to restore contact automatically.
+func (ledger *Ledger) PermanentlyDistrusted(peerName string) bool {
+	return ledger.permanentDistrust[peerName]
+}
+
+// TransitExcluded reports whether this local agent refuses to use the peer as a
+// transit hop for this agent's own traffic.
+func (ledger *Ledger) TransitExcluded(peerName string) bool {
+	return ledger.transitExcludedByPeer[peerName]
 }
 
 // CanDial reports whether the local agent currently promises to dial a peer.
 func (ledger *Ledger) CanDial(peerName string) bool {
+	if ledger.permanentDistrust[peerName] {
+		return false
+	}
 	return ledger.directPeers[peerName]
 }
 
 // CanAccept reports whether the local agent currently promises to accept a peer.
 func (ledger *Ledger) CanAccept(peerName string) bool {
+	if ledger.permanentDistrust[peerName] {
+		return false
+	}
 	return ledger.directPeers[peerName]
+}
+
+// PermanentlyDistrust records a local durable decision not to treat future
+// ordinary contact or repair from this peer as enough to restore relationship.
+// Intent: Permanent distrust is Alice's local restraint promise, not punishment
+// imposed on Mallory or a global reputation fact. Source: DI-dubih
+func (ledger *Ledger) PermanentlyDistrust(peerName string) {
+	if _, exists := ledger.trustByPeer[peerName]; !exists {
+		return
+	}
+	ledger.permanentDistrust[peerName] = true
+	ledger.trustByPeer[peerName] = minTrustScore
+	delete(ledger.directPeers, peerName)
+}
+
+// ExcludeTransit records a local route promise: this peer must not appear as a
+// transit hop in this agent's own traffic candidates.
+// Intent: Transit exclusion is local path selection, not network-wide route
+// enforcement or permission. Source: DI-dubih
+func (ledger *Ledger) ExcludeTransit(peerName string) {
+	if _, exists := ledger.trustByPeer[peerName]; exists {
+		ledger.transitExcludedByPeer[peerName] = true
+	}
+}
+
+// RouteAllowed reports whether this local agent can use a candidate path without
+// crossing a locally excluded transit peer.
+func (ledger *Ledger) RouteAllowed(route []string) bool {
+	for routeIndex, peerName := range route {
+		if routeIndex == 0 || routeIndex == len(route)-1 {
+			continue
+		}
+		if ledger.transitExcludedByPeer[peerName] || ledger.permanentDistrust[peerName] {
+			return false
+		}
+	}
+	return true
 }
 
 // ObserveOutcome updates local trust from one observed promise outcome and
 // reports how that evidence changed this agent's direct TCP relationship.
 func (ledger *Ledger) ObserveOutcome(peerName string, outcome Outcome) Transition {
 	if _, exists := ledger.trustByPeer[peerName]; !exists {
+		return TransitionUnchanged
+	}
+	if ledger.permanentDistrust[peerName] {
+		delete(ledger.directPeers, peerName)
 		return TransitionUnchanged
 	}
 	wasDirect := ledger.directPeers[peerName]
@@ -211,9 +283,11 @@ func (ledger *Ledger) Export() State {
 		}
 	}
 	return State{
-		TrustByPeer:   ledger.Snapshot(),
-		CautionByPeer: cautionSnapshot,
-		DirectPeers:   ledger.DirectPeers(),
+		TrustByPeer:           ledger.Snapshot(),
+		CautionByPeer:         cautionSnapshot,
+		DirectPeers:           ledger.DirectPeers(),
+		PermanentDistrust:     ledger.PermanentDistrustPeers(),
+		TransitExcludedByPeer: ledger.TransitExcludedPeers(),
 	}
 }
 
@@ -239,6 +313,19 @@ func (ledger *Ledger) ApplyState(state State) {
 			ledger.directPeers[peerName] = true
 		}
 	}
+	ledger.permanentDistrust = make(map[string]bool, len(state.PermanentDistrust))
+	for _, peerName := range state.PermanentDistrust {
+		if _, exists := ledger.trustByPeer[peerName]; exists {
+			ledger.permanentDistrust[peerName] = true
+			delete(ledger.directPeers, peerName)
+		}
+	}
+	ledger.transitExcludedByPeer = make(map[string]bool, len(state.TransitExcludedByPeer))
+	for _, peerName := range state.TransitExcludedByPeer {
+		if _, exists := ledger.trustByPeer[peerName]; exists {
+			ledger.transitExcludedByPeer[peerName] = true
+		}
+	}
 	for peerName := range ledger.trustByPeer {
 		ledger.reconfigure(peerName)
 	}
@@ -261,6 +348,10 @@ func (ledger *Ledger) DecayRound() {
 }
 
 func (ledger *Ledger) reconfigure(peerName string) {
+	if ledger.permanentDistrust[peerName] {
+		delete(ledger.directPeers, peerName)
+		return
+	}
 	trustScore := ledger.trustByPeer[peerName]
 	if trustScore >= ledger.strongTrust {
 		ledger.directPeers[peerName] = true
@@ -269,4 +360,15 @@ func (ledger *Ledger) reconfigure(peerName string) {
 	if trustScore <= ledger.weakTrust {
 		delete(ledger.directPeers, peerName)
 	}
+}
+
+func sortedEnabledPeers(peerMap map[string]bool) []string {
+	peers := make([]string, 0, len(peerMap))
+	for peerName, enabled := range peerMap {
+		if enabled {
+			peers = append(peers, peerName)
+		}
+	}
+	sort.Strings(peers)
+	return peers
 }

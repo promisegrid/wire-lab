@@ -21,7 +21,8 @@ remain review evidence until promoted. Source: `DI-baral`; `DI-sisak`;
 `DI-jinoz`; `DI-vujob`; `DI-pohaj`; `DI-vutok`; `DI-jupob`; `DI-punuf`;
 `DI-zapab`; `DI-jidah`; `DI-gopag`; `DI-bibom`; `DI-notig`; `DI-lasuh`;
 `DI-fumol`; `DI-hohuf`; `DI-mosil`; `DI-lupag`; `DI-nisaz`; `DI-kikoj`;
-`DI-sinur`; `DI-punib`; `DI-sunuf`; `DI-vahan`; `DI-fijov`.
+`DI-sinur`; `DI-punib`; `DI-sunuf`; `DI-vahan`; `DI-fijov`; `DI-kinaf`;
+`DI-dubih`.
 
 ### Current Wire Direction
 
@@ -240,8 +241,20 @@ monitors are development tools, not production authorities. Production agents
 owned by different legal entities can only exchange local evidence summaries,
 peer-carried attestations, token exchange-rate signals, topology signals, and
 voluntary gossip as ordinary promises; no global observer, trust score, exchange
-rate, or audit trail exists by default. Source: `DI-sihuz`; `DI-linof`;
-`DI-lulof`.
+rate, or audit trail exists by default. POC14 now also records hard local
+trust-boundary evidence: Alice can permanently distrust Mallory locally, and
+Alice can promise that Alice's inbound/outbound traffic should not transit
+Mallory, without imposing a network-wide ban or central route policy. `DI-dubih`
+makes those scenarios behavioral inside Alice's local ledger: future Mallory
+sends are blocked by local permanent-distrust state, and route candidates
+containing Mallory as a transit hop are locally rejected. The 2026-06-11
+`poc14-demo` clean run passed after `DI-dubih` with 2079 events, all analyzer
+score dimensions at `5`, empty `rpc_drift_counts`, empty
+`resource_trust_coupling_counts`, one event each for
+`permanent_distrust_send_blocked` and `transit_route_candidate_blocked`, and
+monitor scores of `5` for Promise Theory fit and autonomy but `4` for protocol
+validity, local trust correctness, and imposition avoidance. Source:
+`DI-sihuz`; `DI-linof`; `DI-lulof`; `DI-kinaf`; `DI-dubih`.
 
 `poc7` adds executable evidence for promise-shaped capability tokens and local
 exchange: five containers run local kernel boundaries, app-level relays, issuer,

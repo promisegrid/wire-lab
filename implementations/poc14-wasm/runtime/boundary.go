@@ -172,6 +172,47 @@ func (node *Node) recordDecentralizedMonitoringEvidence() {
 	node.record("voluntary_gossip_promised", "kept", "ellen", "Ellen may promise selected local observations; recipients treat them as evidence only")
 }
 
+// recordPermanentDistrustAndTransitExclusionEvidence records two POC14 local
+// trust-boundary scenarios before later protocol work implements true multi-hop
+// route selection.
+// Intent: Alice can decide to permanently distrust Mallory, and Alice can promise
+// that Alice's own inbound/outbound traffic should not transit Mallory, without
+// pretending to impose a global ban or route policy on other agents. Source:
+// DI-kinaf
+func (node *Node) recordPermanentDistrustAndTransitExclusionEvidence() error {
+	node.markPermanentDistrustAndTransitExclusion("mallory")
+	node.record("permanent_distrust_decided", "kept", "mallory", "Alice locally decides Mallory is permanently distrusted after repeated malformed/broken promise evidence")
+	node.record("permanent_distrust_future_repair_not_promised", "non_commitment", "mallory", "Alice does not promise to consider future Mallory repair promises without a separate explicit local decision")
+	node.record("permanent_distrust_direct_peer_removed", "kept", "mallory", "Alice removes Mallory from Alice's local direct-peer set for Alice-owned traffic")
+	node.record("transit_exclusion_promised", "kept", "mallory", "Alice promises that Alice's input and output traffic should not use Mallory as a transit peer")
+	node.record("input_transit_exclusion_recorded", "kept", "mallory", "Alice records that inbound traffic claiming Mallory as transit is not acceptable evidence for sensitive payload delivery")
+	node.record("output_transit_exclusion_recorded", "kept", "mallory", "Alice records that outbound traffic candidates naming Mallory as transit are locally rejected")
+	if _, err := node.sendAndReceive("mallory", map[string]string{
+		"act":                 "promise",
+		"from":                node.Agent.Name,
+		"to":                  "mallory",
+		"turn":                "startup",
+		"promise":             "Alice would normally promise a low-risk discovery probe, but Alice's permanent distrust state blocks this local send.",
+		"reason":              "permanent distrust should override ordinary candidate-peer repair or discovery",
+		"field_promise_about": "link_discovery",
+	}); err == nil {
+		return fmt.Errorf("permanent distrust unexpectedly allowed send to mallory")
+	}
+	node.record("permanent_distrust_send_blocked", "non_commitment", "mallory", "Alice's local permanent-distrust state blocked a candidate discovery send before bytes left Alice")
+	blockedRoute := []string{"alice", "mallory", "carol"}
+	if node.routeAllowed(blockedRoute) {
+		return fmt.Errorf("transit exclusion unexpectedly allowed route %v", blockedRoute)
+	}
+	node.record("transit_candidate_rejected", "non_commitment", "mallory", "Alice rejects route candidate alice->mallory->carol because Mallory is locally untrusted as transit")
+	node.record("transit_route_candidate_blocked", "non_commitment", "mallory", "Alice's route-selection check rejected a candidate path containing Mallory as transit")
+	safeRoute := []string{"alice", "frank", "carol"}
+	if !node.routeAllowed(safeRoute) {
+		return fmt.Errorf("transit exclusion unexpectedly rejected route %v", safeRoute)
+	}
+	node.record("transit_safe_route_selected", "kept", "frank", "Alice selects a non-Mallory transit candidate from Alice's own trusted peer evidence")
+	return nil
+}
+
 // recordMixedVersionPCIDMigrationEvidence records how an app can reason about a
 // legacy pCID and the current pCID without any central registry.
 // Intent: Mixed-version compatibility remains local evidence and pCID-selected

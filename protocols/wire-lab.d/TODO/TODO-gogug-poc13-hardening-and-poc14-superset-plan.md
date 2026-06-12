@@ -42,6 +42,22 @@ Intent: POC14 needs executable evidence for heterogeneous process boundaries whi
 Constraints: Preserve one top-level semantic action `promise`; keep trust/workflow judgment in apps rather than the kernel; keep analyzer/monitor global views as POC-only development tools; preserve pCID-defined envelope semantics; use POC14 command names derived from existing POC13 command names plus `poc14-wasm-agent`, `poc14-stdio-adapter`, and `poc14-stdio-worker`; keep runtime state under the POC14 run root.
 Affects: implementations/poc14-wasm/; protocols/wire-lab.d/TODO/TODO-gogug-poc13-hardening-and-poc14-superset-plan.md.
 
+ID: DI-kinaf
+Date: 2026-06-11 17:16:42
+Status: active
+Decision: Add two POC14 regression scenarios: Alice locally decides to permanently distrust Mallory, and Alice locally promises that neither inbound nor outbound traffic should transit Mallory.
+Intent: POC14 should exercise stronger local trust boundaries than temporary caution. Permanent distrust must remain Alice's local relationship decision, not punishment, enforcement, or global reputation. Transit exclusion must be Alice's local routing/peering promise about Alice's own traffic, not an imposed network-wide ban on Mallory.
+Constraints: Preserve one top-level semantic action `promise`; do not add RPC verbs, permission, authorization, global policy, or central route enforcement; keep the scenario as local evidence and analyzer gates until a later POC implements real multi-hop route selection.
+Affects: implementations/poc14-wasm/runtime/; implementations/poc14-wasm/cmd/poc14-analyze/; implementations/poc14-wasm/docs/; implementations/poc14-wasm/README.md.
+
+ID: DI-dubih
+Date: 2026-06-11 17:32:00
+Status: active
+Decision: Make the POC14 hard trust-boundary scenarios behavioral by adding app-local permanent distrust state and app-local transit exclusion state to the relationship ledger and send gate.
+Intent: Permanent distrust should prevent future direct sends and narrow candidate-peer sends from Alice to Mallory until Alice makes a separate local state change. Transit exclusion should reject any route candidate for Alice-owned traffic that contains Mallory as a transit hop, while still treating the decision as Alice's local promise rather than global route enforcement.
+Constraints: Keep the behavior local to the observing app; do not create a global ban, network authority, permission system, or RPC route command; persist the local state only in the run-scoped relationship snapshot; keep route behavior simple until a later POC implements real multi-hop forwarding.
+Affects: implementations/poc14-wasm/relationship/; implementations/poc14-wasm/runtime/; implementations/poc14-wasm/cmd/poc14-analyze/; implementations/poc14-wasm/docs/; implementations/poc14-wasm/README.md.
+
 ## Tasks
 
 - [x] gogug.1 Fix POC13 evidence summary mismatch so saved evidence counts include all local non-commitment outcomes, not only receiver-side `not_promised` journal entries.
@@ -64,3 +80,7 @@ Affects: implementations/poc14-wasm/; protocols/wire-lab.d/TODO/TODO-gogug-poc13
 - [x] gogug.18 Add run-internal restart/recovery evidence and analyzer gates.
 - [x] gogug.19 Replace global monitor assumptions with decentralized evidence-summary experiments.
 - [x] gogug.20 Model bearer-token exchange rates as local trust/economic signals.
+- [x] gogug.21 Add POC14 permanent local distrust scenario evidence and analyzer gate.
+- [x] gogug.22 Add POC14 untrusted-transit exclusion scenario evidence and analyzer gate.
+- [x] gogug.23 Make permanent distrust a persisted local relationship-ledger state.
+- [x] gogug.24 Make untrusted-transit exclusion reject concrete local route candidates before send.

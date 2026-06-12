@@ -19,9 +19,12 @@ boundaries plus decentralized monitoring evidence. Source: `DI-sihuz`;
 5. Alice records decentralized monitoring candidates as local evidence: local
    evidence summaries, peer-carried attestations, bearer-token exchange-rate
    signals, topology signals, and voluntary gossip.
-6. Alice records mixed-version pCID migration and same-run restart recovery
+6. Alice records hard local trust-boundary evidence: permanent local distrust of
+   Mallory and Alice's promise that Alice's inbound/outbound traffic should not
+   transit Mallory.
+7. Alice records mixed-version pCID migration and same-run restart recovery
    evidence as local promises.
-7. `poc14-analyze` counts inherited POC13 evidence plus POC14 boundary,
+8. `poc14-analyze` counts inherited POC13 evidence plus POC14 boundary,
    decentralized-monitoring, migration, and restart events.
 
 ## Boundary Evidence
@@ -44,6 +47,19 @@ boundaries plus decentralized monitoring evidence. Source: `DI-sihuz`;
 - `relationship_topology_signal_observed`
 - `voluntary_gossip_promised`
 
+## Hard Trust-Boundary Evidence
+
+- `permanent_distrust_decided`
+- `permanent_distrust_future_repair_not_promised`
+- `permanent_distrust_direct_peer_removed`
+- `permanent_distrust_send_blocked`
+- `transit_exclusion_promised`
+- `input_transit_exclusion_recorded`
+- `output_transit_exclusion_recorded`
+- `transit_candidate_rejected`
+- `transit_route_candidate_blocked`
+- `transit_safe_route_selected`
+
 ## Migration And Restart Evidence
 
 - `mixed_version_pcid_migration_promised`
@@ -55,7 +71,15 @@ boundaries plus decentralized monitoring evidence. Source: `DI-sihuz`;
 
 ## Current Status
 
-No fresh POC14 Docker result is recorded in this document yet. The first clean
-run should be executed with `scripts/run-clean.sh`, then this narrative should be
-updated with the actual run ID, event totals, analyzer score report, and any
-production-fitness gaps. Source: `DI-linof`.
+The 2026-06-11 `poc14-demo` clean Docker run passed `poc14-analyze` after adding
+the `DI-dubih` behavioral hard-boundary scenarios. The run produced 2079 total
+events, all analyzer score dimensions were `5`, and the run included one event
+each for `permanent_distrust_send_blocked` and
+`transit_route_candidate_blocked` in addition to the earlier hard-boundary
+evidence events. `rpc_drift_counts` and `resource_trust_coupling_counts` were
+empty.
+
+The run remains not production-ready: the production-fitness report kept
+`ready_for_production=false` because the monitor scored `protocol_validity`,
+`local_trust_correctness`, and `imposition_avoidance` at `4/5`. Source:
+`DI-linof`; `DI-lulof`; `DI-kinaf`; `DI-dubih`.

@@ -573,6 +573,19 @@ func requiredRegressionEvents() []string {
 		"run_internal_restart_orchestration_promised",
 		"run_internal_restart_checkpoint_promised",
 		"run_internal_restart_recovery_observed",
+		// Intent: POC14 should exercise permanent local distrust and
+		// untrusted-transit exclusion as local promises/evidence, not as global
+		// bans or route enforcement. Source: DI-kinaf
+		"permanent_distrust_decided",
+		"permanent_distrust_future_repair_not_promised",
+		"permanent_distrust_direct_peer_removed",
+		"permanent_distrust_send_blocked",
+		"transit_exclusion_promised",
+		"input_transit_exclusion_recorded",
+		"output_transit_exclusion_recorded",
+		"transit_candidate_rejected",
+		"transit_route_candidate_blocked",
+		"transit_safe_route_selected",
 	}
 }
 
@@ -694,7 +707,7 @@ func isReplayEvent(eventName string) bool {
 }
 
 func isTrustCautionEvent(eventName string) bool {
-	return strings.HasPrefix(eventName, "trust_caution_") || eventName == "trust_recovery_delayed" || eventName == "trust_repair_future_only"
+	return strings.HasPrefix(eventName, "trust_caution_") || strings.HasPrefix(eventName, "permanent_distrust_") || eventName == "trust_recovery_delayed" || eventName == "trust_repair_future_only"
 }
 
 func isHeterogeneousBoundaryEvent(eventName string) bool {
@@ -708,7 +721,13 @@ func isDecentralizedMonitorEvent(eventName string) bool {
 		"peer_carried_attestation_promised",
 		"bearer_token_exchange_rate_observed",
 		"relationship_topology_signal_observed",
-		"voluntary_gossip_promised":
+		"voluntary_gossip_promised",
+		"transit_exclusion_promised",
+		"input_transit_exclusion_recorded",
+		"output_transit_exclusion_recorded",
+		"transit_candidate_rejected",
+		"transit_route_candidate_blocked",
+		"transit_safe_route_selected":
 		return true
 	default:
 		return false
