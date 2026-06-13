@@ -7,15 +7,15 @@ promise boundaries visible. Source: `DI-pamob`.
 ## Roles To Split Or Name
 
 1. **Transport role:** owns direct TCP framing, peer dialing/listening, send
-   failure evidence, and exact-byte forwarding to a direct peer.
+   failure event, and exact-byte forwarding to a direct peer.
 2. **App-boundary role:** owns local app registration, pCID receive promises, and
    local delivery queues.
-3. **Routing role:** owns route-promise selection from local evidence and
+3. **Routing role:** owns route-promise selection from local events and
    per-hop forwarding promises; it does not own a global route table.
 4. **Local-resource role:** owns hardware/storage/compute resource promises such
    as printer-port capability tokens, CAS retention promises, or compute capacity
    promises.
-5. **Evidence role:** owns local evidence journals and voluntary summary
+5. **Event role:** owns local events journals and voluntary summary
    promises; it does not become a global monitor.
 
 ## First Executable Shape
@@ -31,7 +31,7 @@ processes only where the boundary matters:
   capability-token and capacity promises.
 - Keep app receive registration as an app-boundary promise rather than making the
   transport role decide app semantics.
-- Add analyzer evidence that records which roles were split and which were
+- Add analyzer event that records which roles were split and which were
   intentionally collapsed for the Docker runtime.
 
 ## Production Interpretation
@@ -40,4 +40,4 @@ A production node may implement these roles as one daemon, several daemons,
 browser APIs, WASM host functions, firmware functions, or local objects. The
 portable requirement is not the process layout; it is the promise boundary:
 agents must be able to tell which local role promised transport, app delivery,
-resource access, route selection, and evidence retention.
+resource access, route selection, and event retention.

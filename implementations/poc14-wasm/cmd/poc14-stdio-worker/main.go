@@ -32,7 +32,7 @@ func run() error {
 	fields := boundary.PromiseFields(
 		request.From,
 		request.To,
-		boundary.PromiseAboutStdioBoundary,
+		boundary.PromiseAboutStdioAdapter,
 		"Victor promises that this worker process sends and receives PromiseGrid envelopes only through stdio.",
 	)
 	fields["field_protocol"] = pcid.RelationshipV1
@@ -78,8 +78,8 @@ func run() error {
 	if fieldsErr != nil {
 		return fieldsErr
 	}
-	return encoder.Encode(boundary.StdioObservedMessage{
-		Type:        "ack_observed",
+	return encoder.Encode(boundary.StdioEventMessage{
+		Type:        "ack_event",
 		Outcome:     ackFields["outcome"],
 		ExactSHA256: protocol.HashExactBytes(ackBytes),
 	})

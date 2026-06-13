@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # Intent: Give operators one repeatable command for the POC14 clean regression:
-# reset runtime state, run compose, discover the fresh evidence directory, and
+# reset runtime state, run compose, discover the fresh event directory, and
 # let poc14-analyze enforce the clean-run gates. Source: DI-jidah; DI-sinur;
 # DI-punib; DI-sunuf
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

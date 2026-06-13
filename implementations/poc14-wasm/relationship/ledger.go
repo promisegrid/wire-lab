@@ -2,7 +2,7 @@ package relationship
 
 import "sort"
 
-// Outcome names the local interpretation of a peer's promise evidence. These
+// Outcome names the local interpretation of a peer's promise event record. These
 // are not protocol actions; they are local ledger conclusions about observed
 // promise keep/break history.
 type Outcome string
@@ -21,7 +21,7 @@ const (
 	TransitionUnchanged Transition = "direct_peer_unchanged"
 )
 
-const recoveryCautionAfterNegativeEvidence = 4
+const recoveryCautionAfterNegativeEvent = 4
 const minTrustScore = -5
 const maxTrustScore = 5
 
@@ -44,7 +44,7 @@ type Ledger struct {
 // Intent: Persist only this agent's private trust and current direct-link
 // promises, never a global trust authority. Recovery caution is persisted with
 // trust so a process restart inside the same run cannot erase recent
-// malformed/broken evidence. Permanent distrust and transit exclusion are also
+// malformed/broken events. Permanent distrust and transit exclusion are also
 // local restraint promises, not global reputation or route policy. Source:
 // DI-timah; DI-fijov; DI-dubih
 type State struct {
@@ -86,9 +86,9 @@ func (ledger *Ledger) Trust(peerName string) int {
 	return ledger.trustByPeer[peerName]
 }
 
-// Caution returns the remaining positive-evidence delay for one peer.
-// Intent: Runtime and analyzer evidence should be able to prove that recent
-// malformed/broken evidence delays recovery without exposing mutable ledger
+// Caution returns the remaining positive-event delay for one peer.
+// Intent: Runtime and analyzer event records should be able to show that recent
+// malformed/broken events delay recovery without exposing mutable ledger
 // state or creating a global reputation authority. Source: DI-sihuz
 func (ledger *Ledger) Caution(peerName string) int {
 	return ledger.cautionByPeer[peerName]
@@ -121,7 +121,7 @@ func (ledger *Ledger) TransitExcludedPeers() []string {
 }
 
 // PermanentlyDistrusted reports whether this local agent has decided not to use
-// ordinary future evidence from the peer to restore contact automatically.
+// ordinary future event records from the peer to restore contact automatically.
 func (ledger *Ledger) PermanentlyDistrusted(peerName string) bool {
 	return ledger.permanentDistrust[peerName]
 }
@@ -186,7 +186,7 @@ func (ledger *Ledger) RouteAllowed(route []string) bool {
 }
 
 // ObserveOutcome updates local trust from one observed promise outcome and
-// reports how that evidence changed this agent's direct TCP relationship.
+// reports how that event record changed this agent's direct TCP relationship.
 func (ledger *Ledger) ObserveOutcome(peerName string, outcome Outcome) Transition {
 	if _, exists := ledger.trustByPeer[peerName]; !exists {
 		return TransitionUnchanged
@@ -204,13 +204,13 @@ func (ledger *Ledger) ObserveOutcome(peerName string, outcome Outcome) Transitio
 	case OutcomeRepairKept:
 		// Intent: Explicitly kept repair promises may rebuild local confidence,
 		// but the separate caution counter still records that recent negative
-		// evidence existed. Source: DI-fijov
+		// event existed. Source: DI-fijov
 		ledger.consumeRecoveryCaution(peerName)
 		ledger.trustByPeer[peerName] += 2
 	case OutcomeDiscoveryKept:
 		// Intent: One kept low-risk discovery promise can form a direct peer
 		// because the strong-trust threshold is deliberately small in POC14.
-		// If this peer has recent malformed/broken evidence, discovery first
+		// If this peer has recent malformed/broken events, discovery first
 		// works off local caution instead of immediately forming adjacency.
 		// Source: DI-timah; DI-fijov
 		if !ledger.consumeRecoveryCaution(peerName) {
@@ -221,7 +221,7 @@ func (ledger *Ledger) ObserveOutcome(peerName string, outcome Outcome) Transitio
 		ledger.addRecoveryCaution(peerName)
 	case OutcomeNonCommitment:
 		// Intent: A local non-commitment means the peer did not promise the
-		// requested exchange; it is not evidence that the peer broke an explicit
+		// requested exchange; it is not an event showing that the peer broke an explicit
 		// promise. Source: DI-jinoz
 	}
 	ledger.saturateTrust(peerName)
@@ -236,8 +236,8 @@ func (ledger *Ledger) ObserveOutcome(peerName string, outcome Outcome) Transitio
 	return TransitionUnchanged
 }
 
-// consumeRecoveryCaution makes ordinary positive evidence pay down recent
-// malformed/broken evidence before it can raise trust again.
+// consumeRecoveryCaution makes ordinary positive events pay down recent
+// malformed/broken events before they can raise trust again.
 // Intent: Local trust should recover through a sequence of observed kept
 // promises, not by immediately accepting several neat-looking messages after a
 // malformed or broken promise. Source: DI-fijov
@@ -254,15 +254,15 @@ func (ledger *Ledger) consumeRecoveryCaution(peerName string) bool {
 // Intent: The caution counter is local relationship memory, not a punishment
 // imposed by another agent or a global reputation system. Source: DI-fijov
 func (ledger *Ledger) addRecoveryCaution(peerName string) {
-	if ledger.cautionByPeer[peerName] < recoveryCautionAfterNegativeEvidence {
-		ledger.cautionByPeer[peerName] = recoveryCautionAfterNegativeEvidence
+	if ledger.cautionByPeer[peerName] < recoveryCautionAfterNegativeEvent {
+		ledger.cautionByPeer[peerName] = recoveryCautionAfterNegativeEvent
 	}
 }
 
 // saturateTrust keeps the local trust score in a small comparable range.
 // Intent: POC14 monitor output should not show unbounded local trust values
 // that look like absolute reputation; trust remains only this agent's bounded
-// relationship evidence for this run. Source: DI-sihuz
+// relationship event records for this run. Source: DI-sihuz
 func (ledger *Ledger) saturateTrust(peerName string) {
 	if ledger.trustByPeer[peerName] > maxTrustScore {
 		ledger.trustByPeer[peerName] = maxTrustScore

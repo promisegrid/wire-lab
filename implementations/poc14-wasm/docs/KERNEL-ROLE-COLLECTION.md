@@ -1,6 +1,6 @@
 # Kernel As Role Collection
 
-POC14 evidence suggests that "kernel" should be treated as a collection of local
+POC14 event suggests that "kernel" should be treated as a collection of local
 roles, not one mandatory monolithic process. Some runtimes can run those roles in
 one process; others should split them across processes, objects, firmware
 functions, browser APIs, or host adapters. Source: `DI-galin`; `DI-pohaj`;
@@ -19,7 +19,7 @@ functions, browser APIs, or host adapters. Source: `DI-galin`; `DI-pohaj`;
    with the app/protocol handler.
 4. **Local resource role.** `printer_port` behaves like a kernel-adjacent local
    resource owner: it promises scoped future access tokens and later promises
-   print evidence after token redemption. It does not grant global permission.
+   print event records after token redemption. It does not grant global permission.
 5. **Boundary adapter role.** Victor's stdio adapter and Peggy's WASM process
    show that a runtime boundary can be a local role that translates process I/O
    into exact PromiseGrid envelopes without inventing RPC commands.
@@ -52,9 +52,9 @@ POC15 should make this role split more explicit:
 - App-boundary role: local app registration and receive queues by pCID.
 - Routing role: multi-hop route-promise selection without global authority.
 - Local-resource role: device/storage/compute capability promises.
-- Evidence role: app-owned local journals and optional voluntary summaries.
+- Event role: app-owned local journals and optional voluntary summaries.
 
 The analyzer can inspect all roles in a POC run, but production agents cannot
 assume a global analyzer. Production-shaped monitoring must be ordinary local
-evidence promises, peer-carried attestations, and economic/trust signals such as
+event promises, peer-carried attestations, and economic/trust signals such as
 bearer-token exchange-rate offers.

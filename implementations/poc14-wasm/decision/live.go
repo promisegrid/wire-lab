@@ -235,7 +235,7 @@ func structuredTargetNames(observation Observation) []string {
 // monitorReportTextFormat is the provider-side schema for the observer-only
 // monitor report.
 // Intent: Keep monitor output structured and comparable while preserving the
-// monitor as local evidence, not an authority over agents. Source: DI-timah
+// monitor as local events, not an authority over agents. Source: DI-timah
 func monitorReportTextFormat() map[string]any {
 	return map[string]any{
 		"type":   "json_schema",

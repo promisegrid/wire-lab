@@ -22,7 +22,7 @@ func main() {
 
 func run() error {
 	configPath := flag.String("config", "config.json", "POC14 config path")
-	nodeName := flag.String("node", "", "stdio-boundary adapter app name")
+	nodeName := flag.String("node", "", "stdio-adapter adapter app name")
 	flag.Parse()
 	if *nodeName == "" {
 		return fmt.Errorf("-node is required")

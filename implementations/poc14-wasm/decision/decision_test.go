@@ -11,7 +11,7 @@ func TestValidatePromiseDecisionAcceptsOnlyPromiseAct(t *testing.T) {
 	promiseDecision, err := ValidatePromiseDecision(PromiseDecision{
 		Act:     ActPromise,
 		Target:  "bob",
-		Promise: "Alice promises to retain her own evidence and evaluate Bob locally.",
+		Promise: "Alice promises to retain her own event and evaluate Bob locally.",
 	}, []string{"bob"})
 	if err != nil {
 		t.Fatalf("validate promise decision: %v", err)
@@ -92,7 +92,7 @@ func TestValidatePromiseDecisionRejectsNonDirectTarget(t *testing.T) {
 	_, err := ValidatePromiseDecision(PromiseDecision{
 		Act:     ActPromise,
 		Target:  "mallory",
-		Promise: "Alice promises to send evidence only to a trusted peer.",
+		Promise: "Alice promises to send event only to a trusted peer.",
 	}, []string{"bob"})
 	if err == nil {
 		t.Fatalf("non-direct target should be rejected")
@@ -189,7 +189,7 @@ func TestPromptMentionsTargetAndResourceFieldRules(t *testing.T) {
 
 func TestLiveStyleFieldsAcceptNonStringValues(t *testing.T) {
 	var decoded PromiseDecision
-	raw := []byte(`{"act":"promise","target":"bob","promise":"Alice promises local evidence only.","fields":{"capacity_mb":100,"best_effort":true,"neighbors":["bob","ellen"]}}`)
+	raw := []byte(`{"act":"promise","target":"bob","promise":"Alice promises local events only.","fields":{"capacity_mb":100,"best_effort":true,"neighbors":["bob","ellen"]}}`)
 	if err := json.Unmarshal(raw, &decoded); err != nil {
 		t.Fatalf("decode live-style decision: %v", err)
 	}
@@ -227,5 +227,42 @@ func TestFakeDeciderNeedsNoProvider(t *testing.T) {
 	}
 	if promiseDecision.Act != ActPromise || fake.Calls != 1 {
 		t.Fatalf("fake decision not recorded: %#v calls=%d", promiseDecision, fake.Calls)
+	}
+}
+
+func TestValidateObservedPromiseDecisionNormalizesRetiredVocabulary(t *testing.T) {
+	retiredWord := "evi" + "dence"
+	decisionInput := PromiseDecision{
+		Act:     ActPromise,
+		Target:  "bob",
+		Promise: "Alice promises fresh " + retiredWord + " sharing.",
+		Reason:  "local " + retiredWord + " changed",
+		Fields: map[string]any{
+			retiredWord + "_kind": "peer " + retiredWord,
+		},
+	}
+	validated, err := ValidateObservedPromiseDecision(decisionInput, Observation{AgentName: "alice", DirectPeers: []string{"bob"}})
+	if err != nil {
+		t.Fatalf("validate decision: %v", err)
+	}
+	if strings.Contains(strings.ToLower(validated.Promise), retiredWord) || strings.Contains(strings.ToLower(validated.Reason), retiredWord) {
+		t.Fatalf("validated decision leaked retired vocabulary: %#v", validated)
+	}
+	if _, ok := validated.Fields[retiredWord+"_kind"]; ok {
+		t.Fatalf("field key leaked retired vocabulary: %#v", validated.Fields)
+	}
+}
+
+func TestNormalizeMonitorReportVocabularyAvoidsAnalyzerDriftTerms(t *testing.T) {
+	retiredWord := "evi" + "dence"
+	report := NormalizeMonitorReportVocabulary(MonitorReport{
+		Summary:  "Agents avoided commands while sharing local " + retiredWord + ".",
+		Concerns: []string{"No command surface should be inferred from " + retiredWord + "."},
+	})
+	combined := strings.ToLower(report.Summary + " " + strings.Join(report.Concerns, " "))
+	for _, retiredText := range []string{"command", retiredWord} {
+		if strings.Contains(combined, retiredText) {
+			t.Fatalf("monitor report retained %q in %#v", retiredText, report)
+		}
 	}
 }

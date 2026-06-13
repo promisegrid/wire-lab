@@ -22,7 +22,7 @@
   "agents": [
     {
       "name": "alice",
-      "persona": "Privacy-sensitive data holder. Alice wants useful storage, compute, and shipping workflow help, but sends private data only after local trust evidence improves.",
+      "persona": "Privacy-sensitive data holder. Alice wants useful storage, compute, and shipping workflow help, but sends private data only after local trust event improves.",
       "motivation": "Build reciprocal peer relationships without accepting anyone as an authority.",
       "initial_peers": ["bob", "carol", "dave", "frank", "grace", "ellen", "fulfillment"],
       "candidate_peers": ["bob", "carol", "dave", "frank", "grace", "ellen", "fulfillment"],
@@ -52,8 +52,8 @@
     },
     {
       "name": "dave",
-      "persona": "Skeptical evidence accountant. Dave tracks promise make/keep/break history and never treats another agent as a trust authority.",
-      "motivation": "Prefer local evidence over reputation claims and reduce weak relationships.",
+      "persona": "Skeptical event accountant. Dave tracks promise make/keep/break history and never treats another agent as a trust authority.",
+      "motivation": "Prefer local events over reputation claims and reduce weak relationships.",
       "initial_peers": ["alice", "carol", "ellen", "grace", "heidi", "peggy", "victor"],
       "candidate_peers": ["alice", "carol", "ellen", "grace", "heidi", "peggy", "victor"],
       "supported_pcids": ["relationship_v1", "cid_compute_v1", "identity_key_v1"],
@@ -72,7 +72,7 @@
     },
     {
       "name": "frank",
-      "persona": "Relay helper. Frank promises only his own forwarding behavior and records route outcomes as relationship evidence.",
+      "persona": "Relay helper. Frank promises only his own forwarding behavior and records route outcomes as relationship event.",
       "motivation": "Help messages move through a sparse mesh without pretending to control final receivers.",
       "initial_peers": ["alice", "bob", "ellen", "mallory"],
       "candidate_peers": ["alice", "bob", "ellen", "mallory", "oscar"],
@@ -112,7 +112,7 @@
     },
     {
       "name": "judy",
-      "persona": "Evidence-forwarding peer. Judy shares only local observations and avoids claiming global reputation knowledge.",
+      "persona": "Event-forwarding peer. Judy shares only local observations and avoids claiming global reputation knowledge.",
       "motivation": "Gain reciprocal observations while avoiding imposition.",
       "initial_peers": ["grace", "heidi", "mallory"],
       "candidate_peers": ["grace", "heidi", "mallory", "ivan"],
@@ -146,7 +146,7 @@
       "name": "fulfillment",
       "kind": "fulfillment",
       "persona": "Shipping workflow coordinator. Fulfillment promises only its own sequencing work: weigh package, ask accounting for address, ask printer for label, and report cost/tracking back to accounting.",
-      "motivation": "Complete shipping work by building local evidence from device/system promises before sharing order data.",
+      "motivation": "Complete shipping work by building local events from device/system promises before sharing order data.",
       "initial_peers": ["postal_scale", "accounting", "ups_label_printer", "alice"],
       "candidate_peers": ["postal_scale", "accounting", "ups_label_printer", "alice", "ellen"],
       "supported_pcids": ["relationship_v1"],
@@ -167,8 +167,8 @@
     {
       "name": "ups_label_printer",
       "kind": "ups_label_printer",
-      "persona": "UPS label printer app. The printer promises label, tracking number, and cost evidence from validated package facts after receiving local printer-port hardware evidence.",
-      "motivation": "Promise only local label workflow results derived from supplied address, weight evidence, and printer-port capability evidence.",
+      "persona": "UPS label printer app. The printer promises label, tracking number, and cost event from validated package facts after receiving local printer-port hardware event.",
+      "motivation": "Promise only local label workflow results derived from supplied address, weight event, and printer-port capability event.",
       "initial_peers": ["fulfillment", "printer_port"],
       "candidate_peers": ["fulfillment", "printer_port"],
       "supported_pcids": ["relationship_v1", "ups_label_v1"],
@@ -178,8 +178,8 @@
     {
       "name": "printer_port",
       "kind": "printer_port",
-      "persona": "Printer port kernel-role app. The printer port promises scoped future-print capability tokens and local printer-device write evidence from simulated USB/spool state.",
-      "motivation": "Promise only bounded local hardware access evidence; never promise shipment, label correctness, accounting, or global permission.",
+      "persona": "Printer port kernel-role app. The printer port promises scoped future-print capability tokens and local printer-device write event records from simulated USB/spool state.",
+      "motivation": "Promise only bounded local hardware access event records; never promise shipment, label correctness, accounting, or global permission.",
       "initial_peers": ["ups_label_printer"],
       "candidate_peers": ["ups_label_printer"],
       "supported_pcids": ["relationship_v1", "printer_port_v1"],
@@ -200,7 +200,7 @@
     {
       "name": "peggy",
       "kind": "wasm_agent",
-      "persona": "WASM-boundary peer. Peggy runs as a separate process that validates sandbox module bytes and promises only pCID-defined envelope exchanges across the sandbox boundary.",
+      "persona": "WASM-adapter peer. Peggy runs as a separate process that validates sandbox module bytes and promises only pCID-defined envelope exchanges across the sandbox boundary.",
       "motivation": "Show that a sandboxed runtime can participate without host calls becoming RPC commands or trust authority.",
       "initial_peers": ["victor", "alice", "dave"],
       "candidate_peers": ["victor", "alice", "dave", "grace"],

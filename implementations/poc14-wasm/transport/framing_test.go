@@ -22,7 +22,7 @@ func TestWriteAllRetriesPartialWrites(t *testing.T) {
 
 func TestReadFrameAcceptsDelayedPartialBytes(t *testing.T) {
 	// Intent: Delayed ACKs and byte-at-a-time TCP delivery should remain ordinary
-	// frame parsing behavior, not malformed promise evidence. Source: DI-sunuf
+	// frame parsing behavior, not malformed promise event records. Source: DI-sunuf
 	serverConn, clientConn := net.Pipe()
 	defer closeTestConn(t, serverConn, "server")
 	defer closeTestConn(t, clientConn, "client")

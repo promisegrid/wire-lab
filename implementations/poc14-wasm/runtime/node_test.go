@@ -29,7 +29,7 @@ func TestNodeWithNoDirectPeersRecordsLocalNonCommitment(t *testing.T) {
 		t.Fatalf("run node: %v", err)
 	}
 	if len(node.events) == 0 {
-		t.Fatalf("node should record local evidence")
+		t.Fatalf("node should record local events")
 	}
 	if len(node.events) < 2 {
 		t.Fatalf("node should record kernel registration and turn events: %#v", node.events)
@@ -66,7 +66,7 @@ func TestProviderDecisionErrorRecordsLocalNonCommitment(t *testing.T) {
 			return
 		}
 	}
-	t.Fatalf("provider decision error should be local non-commitment evidence: %#v", node.events)
+	t.Fatalf("provider decision error should be local non-commitment event: %#v", node.events)
 }
 
 func TestResourcePromiseChecksLocalCapacity(t *testing.T) {
@@ -92,7 +92,7 @@ func TestLocalResourceExhaustionDoesNotTouchPeerTrust(t *testing.T) {
 		t.Fatalf("local exhaustion changed peer trust to %d, want 0", alice.ledger.Trust("bob"))
 	}
 	if hasEvent(alice.events, string(relationship.TransitionUnchanged)) {
-		t.Fatalf("local exhaustion should not create peer trust transition evidence: %#v", alice.events)
+		t.Fatalf("local exhaustion should not create peer trust transition event: %#v", alice.events)
 	}
 	if !hasEvent(alice.events, "local_resource_exhausted") {
 		t.Fatalf("local exhaustion should be recorded locally: %#v", alice.events)
@@ -136,7 +136,7 @@ func TestLocalSendFailureDoesNotUpdatePeerTrust(t *testing.T) {
 	}
 }
 
-func TestRepeatedPromiseSuppressedAfterJournalEvidence(t *testing.T) {
+func TestRepeatedPromiseSuppressedAfterJournalEvent(t *testing.T) {
 	cfg := twoNodeTestConfig(t)
 	alice := NewNode(cfg, cfg.Agents[0], &decision.FakeDecider{}, decision.FakeMonitor{})
 	fields := map[string]string{
@@ -149,7 +149,7 @@ func TestRepeatedPromiseSuppressedAfterJournalEvidence(t *testing.T) {
 		t.Fatalf("expected repeated promise to be suppressed")
 	}
 	if !hasEvent(alice.events, "promise_repeated_suppressed") {
-		t.Fatalf("suppressed repeat should be visible in local evidence: %#v", alice.events)
+		t.Fatalf("suppressed repeat should be visible in local events: %#v", alice.events)
 	}
 }
 
@@ -172,7 +172,7 @@ func TestNotPromisedSuppressesSemanticRetryWithoutTrustChange(t *testing.T) {
 		t.Fatalf("not_promised suppression changed peer trust to %d, want 0", alice.ledger.Trust("bob"))
 	}
 	if !hasEvent(alice.events, "promise_not_promised_suppressed") {
-		t.Fatalf("suppressed not_promised retry should be visible in local evidence: %#v", alice.events)
+		t.Fatalf("suppressed not_promised retry should be visible in local events: %#v", alice.events)
 	}
 }
 
@@ -224,9 +224,9 @@ func TestCandidateDiscoveryCanFormDirectPeer(t *testing.T) {
 	}
 }
 
-func TestFutureRepairCandidatePromiseCanBeHeardAfterMalformedEvidence(t *testing.T) {
+func TestFutureRepairCandidatePromiseCanBeHeardAfterMalformedEvent(t *testing.T) {
 	// Intent: A peer may choose to hear a narrow future-repair promise after
-	// malformed evidence without treating that as permission for arbitrary
+	// malformed event records without treating that as permission for arbitrary
 	// traffic or immediate trust repair. Source: DI-fijov
 	cfg := computeRoutingTestConfig(t)
 	grace := NewNode(cfg, cfg.Agents[2], &decision.FakeDecider{}, decision.FakeMonitor{})
@@ -235,12 +235,12 @@ func TestFutureRepairCandidatePromiseCanBeHeardAfterMalformedEvidence(t *testing
 	mallory.observeOutcome("grace", relationship.OutcomeMalformed)
 	ordinaryFields := map[string]string{"field_promise_about": "ordinary_followup"}
 	if grace.canAcceptFrom("mallory", ordinaryFields) {
-		t.Fatalf("Grace should not accept arbitrary candidate traffic after malformed evidence")
+		t.Fatalf("Grace should not accept arbitrary candidate traffic after malformed event")
 	}
 	if mallory.canDialTarget("grace", ordinaryFields) {
-		t.Fatalf("Mallory should not dial arbitrary candidate traffic after malformed evidence")
+		t.Fatalf("Mallory should not dial arbitrary candidate traffic after malformed event")
 	}
-	repairFields := map[string]string{"field_promise_about": production.PromiseTrustRepair}
+	repairFields := map[string]string{"field_promise_about": production.PromiseLabelFutureMalformedReport}
 	if !grace.canAcceptFrom("mallory", repairFields) {
 		t.Fatalf("Grace should be able to hear a narrow future-repair promise")
 	}
@@ -276,7 +276,7 @@ func TestAutonomousProtocolMismatchReframesToRelationship(t *testing.T) {
 	fields := map[string]string{
 		"field_protocol":      pcid.CASStorageV1,
 		"field_promise_about": "storage_capacity",
-		"promise":             "Alice promises only local storage-capacity evidence.",
+		"promise":             "Alice promises only local storage-capacity event.",
 	}
 	alice.normalizeAutonomousPromiseFields("bob", fields)
 	if fields["field_protocol"] != pcid.RelationshipV1 {
@@ -289,7 +289,7 @@ func TestAutonomousProtocolMismatchReframesToRelationship(t *testing.T) {
 		t.Fatalf("original protocol fields missing after reframe: %#v", fields)
 	}
 	if !hasEvent(alice.events, "promise_reframed_for_pcid_fit") {
-		t.Fatalf("pCID reframe should be visible in local evidence: %#v", alice.events)
+		t.Fatalf("pCID reframe should be visible in local events: %#v", alice.events)
 	}
 }
 
@@ -302,7 +302,7 @@ func TestAutonomousConcreteCASPayloadKeepsProtocol(t *testing.T) {
 		"field_promise_about": production.PromiseStoreContent,
 		"field_content_cid":   production.ContentCID(contentBytes),
 		"field_content_b64":   "nonempty-test-bytes",
-		"promise":             "Alice promises to receive concrete CAS storage evidence.",
+		"promise":             "Alice promises to receive concrete CAS storage event.",
 	}
 	alice.normalizeAutonomousPromiseFields("bob", fields)
 	if fields["field_protocol"] != pcid.CASStorageV1 {
@@ -323,17 +323,17 @@ func TestNegativeAckVerdictsDoNotUpdateTrust(t *testing.T) {
 		{"field_cache_status": "miss"},
 	}
 	for _, ackFields := range negativeVerdicts {
-		if evidenceUpdatesTrust(ackFields) {
+		if eventUpdatesTrust(ackFields) {
 			t.Fatalf("negative ACK fields should not update trust: %#v", ackFields)
 		}
 	}
-	if !evidenceUpdatesTrust(map[string]string{"field_verdict": "kept"}) {
+	if !eventUpdatesTrust(map[string]string{"field_verdict": "kept"}) {
 		t.Fatalf("kept ACK verdict should update trust")
 	}
 }
 
-func TestNonTrustingAckEvidenceUsesPrecisePromiseStatus(t *testing.T) {
-	// Intent: Non-mutating ACK evidence should distinguish true duplicate
+func TestNonTrustingAckEventUsesPrecisePromiseStatus(t *testing.T) {
+	// Intent: Non-mutating ACK events should distinguish true duplicate
 	// checkpoints from peer non-commitments and malformed/broken verdicts.
 	// Source: DI-sihuz
 	cases := []struct {
@@ -342,7 +342,7 @@ func TestNonTrustingAckEvidenceUsesPrecisePromiseStatus(t *testing.T) {
 		wantStatus promiseStatus
 	}{{
 		name:       "duplicate shipment checkpoint",
-		fields:     map[string]string{duplicateShipmentEvidenceField: "true"},
+		fields:     map[string]string{duplicateShipmentEventField: "true"},
 		wantStatus: promiseStatusDuplicate,
 	}, {
 		name:       "storage price refused",
@@ -379,15 +379,15 @@ func TestNonTrustingAckEvidenceUsesPrecisePromiseStatus(t *testing.T) {
 	}}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			if gotStatus := promiseStatusForNonTrustingEvidence(tc.fields); gotStatus != tc.wantStatus {
+			if gotStatus := promiseStatusForNonTrustingEvent(tc.fields); gotStatus != tc.wantStatus {
 				t.Fatalf("status = %s, want %s for %#v", gotStatus, tc.wantStatus, tc.fields)
 			}
 		})
 	}
 }
 
-func TestRunScopedEvidenceSummaryCountsAllNonCommitments(t *testing.T) {
-	// Intent: Saved evidence summaries should reflect all local
+func TestRunScopedEventSummaryCountsAllNonCommitments(t *testing.T) {
+	// Intent: Saved event summaries should reflect all local
 	// non-commitment outcomes, not only receiver-side not-promised restraint
 	// journal entries. Source: DI-sihuz
 	cfg := singleNodeTestConfig(t)
@@ -397,12 +397,12 @@ func TestRunScopedEvidenceSummaryCountsAllNonCommitments(t *testing.T) {
 	if err := node.saveRunScopedState(); err != nil {
 		t.Fatalf("save run scoped state: %v", err)
 	}
-	if !hasEventDetail(node.events, "evidence_run_store_saved", "non_commitments=2") {
-		t.Fatalf("saved evidence summary did not include all non-commitments: %#v", node.events)
+	if !hasEventDetail(node.events, "event_run_store_saved", "non_commitments=2") {
+		t.Fatalf("saved event summary did not include all non-commitments: %#v", node.events)
 	}
 }
 
-func TestDeterministicShippingHandlersReturnEvidence(t *testing.T) {
+func TestDeterministicShippingHandlersReturnEvent(t *testing.T) {
 	cfg := shippingTestConfig(t)
 	scale := NewNode(cfg, cfg.Agents[1], &decision.FakeDecider{}, decision.FakeMonitor{})
 	message := parsedMessage{
@@ -418,14 +418,14 @@ func TestDeterministicShippingHandlersReturnEvidence(t *testing.T) {
 		t.Fatalf("scale handler: %v", err)
 	}
 	if ackFields["field_weight_ounces"] == "" || !hasEvent(scale.events, "package_weighed") {
-		t.Fatalf("scale did not return weight evidence: %#v events %#v", ackFields, scale.events)
+		t.Fatalf("scale did not return weight event: %#v events %#v", ackFields, scale.events)
 	}
 }
 
 // TestFulfillmentStartupWorkflowStepsUseDeterministicHandlers checks the
 // deterministic handler sequence behind the live Docker workflow.
 // Intent: Unit tests cannot open local TCP sockets in the Codex sandbox, so the
-// handler-level test preserves the evidence chain while Docker Compose remains
+// handler-level test preserves the event chain while Docker Compose remains
 // the live TCP validation path. Source: DI-parok
 func TestFulfillmentStartupWorkflowStepsUseDeterministicHandlers(t *testing.T) {
 	cfg := shippingTestConfig(t)
@@ -499,7 +499,7 @@ func TestFulfillmentStartupWorkflowStepsUseDeterministicHandlers(t *testing.T) {
 		t.Fatalf("accounting update: %v", err)
 	}
 	if printAck["field_printer_spool_id"] == "" {
-		t.Fatalf("printer port did not return spool evidence: %#v", printAck)
+		t.Fatalf("printer port did not return spool event: %#v", printAck)
 	}
 	fulfillment.record("fulfillment_workflow_completed", "kept", "accounting", "test")
 	allReceiverEvents := append(append(accounting.events, scale.events...), printerPort.events...)
@@ -530,10 +530,10 @@ func TestDuplicateAccountingUpdateDoesNotRepeatTrust(t *testing.T) {
 		if fieldsErr != nil {
 			t.Fatalf("parse accounting ack fields attempt %d: %v", attempt+1, fieldsErr)
 		}
-		if attempt == 0 && ackFields[duplicateShipmentEvidenceField] == "true" {
+		if attempt == 0 && ackFields[duplicateShipmentEventField] == "true" {
 			t.Fatalf("first accounting update should not be duplicate: %#v", ackFields)
 		}
-		if attempt == 1 && ackFields[duplicateShipmentEvidenceField] != "true" {
+		if attempt == 1 && ackFields[duplicateShipmentEventField] != "true" {
 			t.Fatalf("second accounting update should be duplicate: %#v", ackFields)
 		}
 	}
@@ -547,7 +547,7 @@ func TestDuplicateAccountingUpdateDoesNotRepeatTrust(t *testing.T) {
 		t.Fatalf("duplicate accounting update should be recorded once: %#v", accounting.events)
 	}
 	if len(accounting.checkpointJournal) == 0 {
-		t.Fatalf("accounting checkpoint journal should contain semantic duplicate evidence")
+		t.Fatalf("accounting checkpoint journal should contain semantic duplicate event")
 	}
 }
 
@@ -577,7 +577,7 @@ func TestExactEnvelopeReplayRejectedWithoutTrustGain(t *testing.T) {
 		t.Fatalf("exact replay trust = %d, want first-message-only trust 1", accounting.ledger.Trust("fulfillment"))
 	}
 	if !hasEventOutcome(accounting.events, "replay_envelope_rejected", "non_commitment") {
-		t.Fatalf("exact replay rejection should be local non-commitment evidence: %#v", accounting.events)
+		t.Fatalf("exact replay rejection should be local non-commitment event: %#v", accounting.events)
 	}
 }
 
@@ -614,11 +614,11 @@ func TestRunScopedStatePersistsWithinRun(t *testing.T) {
 		t.Fatalf("reloaded journals mismatch promises=%#v replay=%#v", reloadedBob.promiseJournal, reloadedBob.replayJournal)
 	}
 	if !hasEvent(reloadedBob.events, "run_scoped_store_loaded") {
-		t.Fatalf("load should record run-scoped store evidence: %#v", reloadedBob.events)
+		t.Fatalf("load should record run-scoped store event: %#v", reloadedBob.events)
 	}
 }
 
-func TestCapabilityTokenReplayReturnsNonCommitmentEvidence(t *testing.T) {
+func TestCapabilityTokenReplayReturnsNonCommitmentEvent(t *testing.T) {
 	cfg := twoNodeTestConfig(t)
 	bob := NewNode(cfg, cfg.Agents[1], &decision.FakeDecider{}, decision.FakeMonitor{})
 	contentBytes := production.SampleContentBytes()
@@ -650,7 +650,7 @@ func TestCapabilityTokenReplayReturnsNonCommitmentEvidence(t *testing.T) {
 		"field_token":         token,
 	})
 	if replayErr != nil {
-		t.Fatalf("token replay should be non-commitment evidence, not handler error: %v", replayErr)
+		t.Fatalf("token replay should be non-commitment event, not handler error: %v", replayErr)
 	}
 	if replayAck["field_token_status"] != "not_promised" {
 		t.Fatalf("replay ack = %#v, want token_status=not_promised", replayAck)
@@ -659,21 +659,21 @@ func TestCapabilityTokenReplayReturnsNonCommitmentEvidence(t *testing.T) {
 		t.Fatalf("token replay should be recorded as local non-commitment: %#v", bob.events)
 	}
 	if !hasEvent(bob.events, "gc_object_removed") || !hasEvent(bob.events, "gc_promise_ended") {
-		t.Fatalf("token redemption should record GC evidence: %#v", bob.events)
+		t.Fatalf("token redemption should record GC event: %#v", bob.events)
 	}
 }
 
-func TestRetentionPromiseBrokenRecordsLocalEvidence(t *testing.T) {
+func TestRetentionPromiseBrokenRecordsLocalEvent(t *testing.T) {
 	cfg := singleNodeTestConfig(t)
 	alice := NewNode(cfg, cfg.Agents[0], &decision.FakeDecider{}, decision.FakeMonitor{})
 	alice.recordRetentionPromiseBroken("alice", "test retention miss after simulated crash")
 	if !hasEventOutcome(alice.events, "retention_promise_broken", "broken") {
-		t.Fatalf("retention break case should be explicit local evidence: %#v", alice.events)
+		t.Fatalf("retention break case should be explicit local events: %#v", alice.events)
 	}
 }
 
 func TestBadResultProbeReducesComputePromiserTrust(t *testing.T) {
-	// Intent: Alice's own recomputation evidence should reduce trust in the
+	// Intent: Alice's own recomputation event record should reduce trust in the
 	// compute promiser and leave a still-trusted alternate compute peer usable for
 	// follow-up work. Source: DI-vahan
 	cfg := computeRoutingTestConfig(t)
@@ -683,10 +683,10 @@ func TestBadResultProbeReducesComputePromiserTrust(t *testing.T) {
 		t.Fatalf("verify compute ack locally: %v", err)
 	}
 	if alice.ledger.Trust("carol") != -3 {
-		t.Fatalf("carol trust = %d, want -3 after malformed bad-result evidence", alice.ledger.Trust("carol"))
+		t.Fatalf("carol trust = %d, want -3 after malformed bad-result event", alice.ledger.Trust("carol"))
 	}
 	if alice.canDial("carol") {
-		t.Fatalf("Alice should stop promising direct sends to Carol after malformed compute evidence")
+		t.Fatalf("Alice should stop promising direct sends to Carol after malformed compute event")
 	}
 	if !alice.canDial("dave") {
 		t.Fatalf("Alice should still be able to use Dave as the alternate compute peer")
@@ -696,9 +696,9 @@ func TestBadResultProbeReducesComputePromiserTrust(t *testing.T) {
 	}
 }
 
-func TestMalformedProofEvidenceReducesIdentifiedPromiserTrust(t *testing.T) {
+func TestMalformedProofEventReducesIdentifiedPromiserTrust(t *testing.T) {
 	// Intent: A parseable envelope with a stale proof should be attributed to the
-	// claimed promiser as local malformed evidence, not counted as random
+	// claimed promiser as a local malformed event, not counted as random
 	// transport noise. Source: DI-sunuf
 	cfg := computeRoutingTestConfig(t)
 	grace := NewNode(cfg, cfg.Agents[2], &decision.FakeDecider{}, decision.FakeMonitor{})
@@ -709,7 +709,7 @@ func TestMalformedProofEvidenceReducesIdentifiedPromiserTrust(t *testing.T) {
 		"turn":                "test",
 		"promise":             "Mallory promises this parseable but mutated proof is valid.",
 		"reason":              "test bad proof attribution",
-		"field_promise_about": production.PromisePresentStorageEvidence,
+		"field_promise_about": production.PromisePresentStorageReport,
 	}
 	envelope, envelopeErr := protocol.NewEnvelope(grace.Protocols.MustCID(pcid.CASStorageV1), fields, "mallory")
 	if envelopeErr != nil {
@@ -733,13 +733,13 @@ func TestMalformedProofEvidenceReducesIdentifiedPromiserTrust(t *testing.T) {
 		t.Fatalf("mallory trust = %d, want -3 after bad proof", grace.ledger.Trust("mallory"))
 	}
 	if !hasEventOutcome(grace.events, "malformed_proof_observed", "malformed") {
-		t.Fatalf("bad proof should be attributed as malformed evidence: %#v", grace.events)
+		t.Fatalf("bad proof should be attributed as malformed event: %#v", grace.events)
 	}
 }
 
-func TestCorruptCASEvidenceReducesIdentifiedPromiserTrust(t *testing.T) {
-	// Intent: Corrupt content-addressed storage evidence is malformed promise
-	// evidence by the presenting peer, so it must reduce local trust just like a
+func TestCorruptCASEventReducesIdentifiedPromiserTrust(t *testing.T) {
+	// Intent: A corrupt content-addressed storage event records a malformed
+	// promise by the presenting peer, so it must reduce local trust just like a
 	// bad proof or bad compute result. Source: DI-fijov
 	cfg := computeRoutingTestConfig(t)
 	grace := NewNode(cfg, cfg.Agents[2], &decision.FakeDecider{}, decision.FakeMonitor{})
@@ -747,42 +747,42 @@ func TestCorruptCASEvidenceReducesIdentifiedPromiserTrust(t *testing.T) {
 	badBytes := []byte("different content")
 	ackFields, err := grace.handleCASStoragePromise(map[string]string{
 		"from":                "mallory",
-		"field_promise_about": production.PromisePresentStorageEvidence,
+		"field_promise_about": production.PromisePresentStorageReport,
 		"field_content_cid":   production.ContentCID(goodBytes),
 		"field_content_b64":   base64.StdEncoding.EncodeToString(badBytes),
 	})
 	if err != nil {
-		t.Fatalf("corrupt CAS evidence should return a broken verdict ACK, not handler error: %v", err)
+		t.Fatalf("corrupt CAS event should return a broken verdict ACK, not handler error: %v", err)
 	}
 	if ackFields["field_verdict"] != "broken" {
 		t.Fatalf("corrupt CAS verdict = %#v, want broken", ackFields)
 	}
 	if grace.ledger.Trust("mallory") != -3 {
-		t.Fatalf("mallory trust = %d, want -3 after corrupt CAS evidence", grace.ledger.Trust("mallory"))
+		t.Fatalf("mallory trust = %d, want -3 after corrupt CAS event", grace.ledger.Trust("mallory"))
 	}
 	if grace.canDial("mallory") {
-		t.Fatalf("Grace should stop promising direct sends to Mallory after corrupt CAS evidence")
+		t.Fatalf("Grace should stop promising direct sends to Mallory after corrupt CAS event")
 	}
 	if !hasEventOutcome(grace.events, "cas_corrupt_bytes_rejected", "malformed") {
-		t.Fatalf("corrupt CAS evidence should be recorded as malformed: %#v", grace.events)
+		t.Fatalf("corrupt CAS event should be recorded as malformed: %#v", grace.events)
 	}
 }
 
 func TestFutureRepairPromiseDoesNotImmediatelyIncreaseTrust(t *testing.T) {
-	// Intent: A promise to repair future behavior is useful local evidence to
+	// Intent: A promise to repair future behavior is a useful local event to
 	// remember, but it is not proof that the future repair has already been kept.
 	// Source: DI-fijov
 	ackFields := map[string]string{
-		"field_promise_about": production.PromiseTrustRepair,
+		"field_promise_about": production.PromiseLabelFutureMalformedReport,
 		"field_repair_status": "future_only",
 	}
-	if evidenceUpdatesTrust(ackFields) {
+	if eventUpdatesTrust(ackFields) {
 		t.Fatalf("future-only repair promise should not immediately update trust: %#v", ackFields)
 	}
 }
 
 func TestTrustCautionAllowsOnlyFutureRepairCandidateTraffic(t *testing.T) {
-	// Intent: After malformed evidence, a peer may be heard only for the narrow
+	// Intent: After malformed events, a peer may be heard only for the narrow
 	// future-repair candidate promise; unsupported ordinary variants remain
 	// non-promised until local trust is rebuilt. Source: DI-sihuz
 	cfg := computeRoutingTestConfig(t)
@@ -792,16 +792,16 @@ func TestTrustCautionAllowsOnlyFutureRepairCandidateTraffic(t *testing.T) {
 	if grace.canAcceptFrom("mallory", unsupportedFields) {
 		t.Fatalf("unsupported ordinary promise should not be accepted during trust caution")
 	}
-	repairFields := map[string]string{"field_promise_about": production.PromiseTrustRepair}
+	repairFields := map[string]string{"field_promise_about": production.PromiseLabelFutureMalformedReport}
 	if !grace.canAcceptFrom("mallory", repairFields) {
 		t.Fatalf("future repair promise should remain hearable as candidate traffic")
 	}
 	grace.observeOutcome("mallory", relationship.OutcomeKept)
 	if !hasEvent(grace.events, "trust_caution_recorded") {
-		t.Fatalf("malformed evidence should record trust caution: %#v", grace.events)
+		t.Fatalf("malformed event should record trust caution: %#v", grace.events)
 	}
 	if !hasEvent(grace.events, "trust_recovery_delayed") {
-		t.Fatalf("kept evidence during caution should record delayed recovery: %#v", grace.events)
+		t.Fatalf("kept event during caution should record delayed recovery: %#v", grace.events)
 	}
 }
 
@@ -849,10 +849,10 @@ func TestMonitorFailureWritesNonAuthoritativeDoneMarker(t *testing.T) {
 		t.Fatalf("monitor done marker should exist after observer failure: %v", err)
 	}
 	if !hasEventOutcome(node.events, "monitor_error", "non_commitment") {
-		t.Fatalf("monitor error should be local non-commitment evidence: %#v", node.events)
+		t.Fatalf("monitor error should be local non-commitment event: %#v", node.events)
 	}
 	if !hasEventOutcome(node.events, "monitor_done", "non_commitment") {
-		t.Fatalf("fallback monitor marker should be non-authoritative evidence: %#v", node.events)
+		t.Fatalf("fallback monitor marker should be non-authoritative event: %#v", node.events)
 	}
 }
 
@@ -1143,7 +1143,7 @@ func signedAccountingUpdateFrame(t *testing.T, node *Node, exchangeID string) []
 		"from":                  "fulfillment",
 		"to":                    "accounting",
 		"turn":                  "test",
-		"promise":               "I promise to receive accounting's shipment checkpoint evidence for this order and tracking number.",
+		"promise":               "I promise to receive accounting's shipment checkpoint event for this order and tracking number.",
 		"reason":                "duplicate checkpoint regression test",
 		"field_exchange_id":     exchangeID,
 		"field_promise_about":   production.PromiseShipmentUpdate,

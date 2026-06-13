@@ -36,7 +36,7 @@ func TestProductionWorkflowRejectsBadFacts(t *testing.T) {
 	}
 }
 
-func TestPrintCapabilityTokenAndLocalPrintEvidence(t *testing.T) {
+func TestPrintCapabilityTokenAndLocalPrintEvent(t *testing.T) {
 	capabilityFields := map[string]string{
 		"to":                               "ups_label_printer",
 		"field_print_capability_issuee":    "ups_label_printer",

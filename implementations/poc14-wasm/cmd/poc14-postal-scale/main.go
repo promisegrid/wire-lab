@@ -39,7 +39,7 @@ func run() error {
 		return fmt.Errorf("node %q is kind %q, want postal_scale", agent.Name, agent.Kind)
 	}
 	// Intent: The postal scale is a deterministic local device app, not a
-	// kernel service. It promises package-weight evidence through its app
+	// kernel service. It promises package-weight event records through its app
 	// process boundary. Source: DI-galin
 	liveClient := decision.NewLiveClient(
 		cfg.ProviderBaseURL,

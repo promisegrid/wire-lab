@@ -40,10 +40,11 @@ type RunSummary struct {
 	PressureCounts               map[string]int          `json:"pressure_counts"`
 	ReplayCounts                 map[string]int          `json:"replay_counts"`
 	TrustCautionCounts           map[string]int          `json:"trust_caution_counts"`
-	HeterogeneousBoundaryCounts  map[string]int          `json:"heterogeneous_boundary_counts"`
+	RuntimeAdapterEventCounts    map[string]int          `json:"runtime_adapter_event_counts"`
 	DecentralizedMonitorCounts   map[string]int          `json:"decentralized_monitor_counts"`
 	MigrationCounts              map[string]int          `json:"migration_counts"`
 	RestartCounts                map[string]int          `json:"restart_counts"`
+	ForbiddenVocabularyCounts    map[string]int          `json:"forbidden_vocabulary_counts,omitempty"`
 	ScoreReport                  ScoreReport             `json:"score_report"`
 	ProductionFitness            ProductionFitnessReport `json:"production_fitness"`
 	MissingRequiredEventNames    []string                `json:"missing_required_event_names,omitempty"`
@@ -54,31 +55,31 @@ type RunSummary struct {
 // raw event counters.
 // Intent: Future POCs must not be able to look healthy while silently dropping
 // inherited transport, storage, compute, economics, trust, verification, or
-// replica-recovery evidence. Source: DI-sinur
+// replica-recovery event records. Source: DI-sinur
 type ScoreReport struct {
-	Overall      int      `json:"overall"`
-	Transport    int      `json:"transport"`
-	Storage      int      `json:"storage"`
-	Compute      int      `json:"compute"`
-	Economics    int      `json:"economics"`
-	Trust        int      `json:"trust"`
-	Verification int      `json:"verification"`
-	Replica      int      `json:"replica"`
-	Durability   int      `json:"durability"`
-	Retention    int      `json:"retention"`
-	Pressure     int      `json:"pressure"`
-	Replay       int      `json:"replay"`
-	Boundary     int      `json:"boundary"`
-	Monitoring   int      `json:"monitoring"`
-	Migration    int      `json:"migration"`
-	Restart      int      `json:"restart"`
-	Concerns     []string `json:"concerns,omitempty"`
+	Overall        int      `json:"overall"`
+	Transport      int      `json:"transport"`
+	Storage        int      `json:"storage"`
+	Compute        int      `json:"compute"`
+	Economics      int      `json:"economics"`
+	Trust          int      `json:"trust"`
+	Verification   int      `json:"verification"`
+	Replica        int      `json:"replica"`
+	Durability     int      `json:"durability"`
+	Retention      int      `json:"retention"`
+	Pressure       int      `json:"pressure"`
+	Replay         int      `json:"replay"`
+	RuntimeAdapter int      `json:"runtime_adapter"`
+	Monitoring     int      `json:"monitoring"`
+	Migration      int      `json:"migration"`
+	Restart        int      `json:"restart"`
+	Concerns       []string `json:"concerns,omitempty"`
 }
 
 // ProductionFitnessReport states the current POC-to-production gap in terms an
 // operator can compare across clean runs.
 // Intent: POC14 should produce a concise production-fitness summary from
-// analyzer and monitor evidence without pretending a successful POC run is
+// analyzer and monitor event records without pretending a successful POC run is
 // production readiness. Source: DI-sihuz
 type ProductionFitnessReport struct {
 	Baseline           string   `json:"baseline"`
@@ -87,7 +88,7 @@ type ProductionFitnessReport struct {
 	BlockingGaps       []string `json:"blocking_gaps,omitempty"`
 }
 
-// AcceptanceCriteria describes the evidence gates for a clean POC14 regression
+// AcceptanceCriteria describes the event-record gates for a clean POC14 regression
 // run.
 // Intent: Keep the current clean-run expectations executable so a wrong log
 // path, missing shipping workflow, lost non-commitment suppression, or renewed
@@ -104,10 +105,11 @@ type AcceptanceCriteria struct {
 	RequireNoResourceTrustCoupling    bool
 	RequireAccountingDuplicateConfirm bool
 	RequireCASComputeSuperset         bool
-	RequireBoundarySuperset           bool
+	RequireRuntimeAdapterSuperset     bool
 	RequireDecentralizedMonitoring    bool
 	RequireMixedVersionMigration      bool
 	RequireRunInternalRestart         bool
+	RequireEventVocabulary            bool
 	MinScoreOverall                   int
 }
 
@@ -135,7 +137,7 @@ func main() {
 
 // analyzeRun summarizes one POC14 run directory containing agent JSONL files and
 // an optional monitor-report.json.
-// Intent: The analyzer treats logs as evidence to count, not as authority over
+// Intent: The analyzer treats logs as event records to count, not as authority over
 // agents; it does not mutate run state. Source: DI-timah
 func analyzeRun(runDir string) (RunSummary, error) {
 	logDir, resolveErr := resolveRunLogDir(runDir)
@@ -164,10 +166,11 @@ func analyzeRun(runDir string) (RunSummary, error) {
 		PressureCounts:               make(map[string]int),
 		ReplayCounts:                 make(map[string]int),
 		TrustCautionCounts:           make(map[string]int),
-		HeterogeneousBoundaryCounts:  make(map[string]int),
+		RuntimeAdapterEventCounts:    make(map[string]int),
 		DecentralizedMonitorCounts:   make(map[string]int),
 		MigrationCounts:              make(map[string]int),
 		RestartCounts:                make(map[string]int),
+		ForbiddenVocabularyCounts:    make(map[string]int),
 	}
 	logPaths := jsonlLogPaths(logDir)
 	sort.Strings(logPaths)
@@ -181,6 +184,7 @@ func analyzeRun(runDir string) (RunSummary, error) {
 		return RunSummary{}, reportErr
 	}
 	summary.MonitorReport = report
+	countMonitorVocabulary(report, &summary)
 	summary.MissingRequiredEventNames = missingRequiredEvents(summary)
 	summary.ScoreReport = computeScores(summary)
 	summary.ProductionFitness = computeProductionFitness(summary)
@@ -188,7 +192,7 @@ func analyzeRun(runDir string) (RunSummary, error) {
 }
 
 // resolveRunLogDir accepts either the concrete JSONL log directory or the
-// parent run directory that contains the `run/` evidence subdirectory.
+// parent run directory that contains the `run/` event-record subdirectory.
 // Intent: Operators should not be able to accidentally analyze the parent path
 // and receive a misleading zero-event success report. Source: DI-jidah
 func resolveRunLogDir(inputPath string) (string, error) {
@@ -225,17 +229,18 @@ func cleanRegressionCriteria() AcceptanceCriteria {
 		RequireNoResourceTrustCoupling:    true,
 		RequireAccountingDuplicateConfirm: true,
 		RequireCASComputeSuperset:         true,
-		RequireBoundarySuperset:           true,
+		RequireRuntimeAdapterSuperset:     true,
 		RequireDecentralizedMonitoring:    true,
 		RequireMixedVersionMigration:      true,
 		RequireRunInternalRestart:         true,
+		RequireEventVocabulary:            true,
 		MinScoreOverall:                   4,
 	}
 }
 
-// validateSummary checks the POC14 clean-run evidence gates without mutating
+// validateSummary checks the POC14 clean-run event-record gates without mutating
 // logs or relationship state.
-// Intent: The acceptance contract should catch regression evidence directly in
+// Intent: The acceptance contract should catch regression events directly in
 // analyzer output instead of requiring the operator to interpret counts by eye.
 // Source: DI-jidah
 func validateSummary(summary RunSummary, criteria AcceptanceCriteria) error {
@@ -269,23 +274,23 @@ func validateSummary(summary RunSummary, criteria AcceptanceCriteria) error {
 			failures = append(failures, fmt.Sprintf("rpc_drift_counts=%v want empty", summary.RPCDriftCounts))
 		}
 		if summary.ProtocolCounts[pcid.CASStorageV1] == 0 {
-			failures = append(failures, "cas_storage_v1 evidence missing")
+			failures = append(failures, "cas_storage_v1 event missing")
 		}
 		if summary.ProtocolCounts[pcid.CIDComputeV1] == 0 {
-			failures = append(failures, "cid_compute_v1 evidence missing")
+			failures = append(failures, "cid_compute_v1 event missing")
 		}
-		// Intent: POC14 should prove that the vague evidence-report pCID was
+		// Intent: POC14 should prove that the vague generic-report pCID was
 		// replaced by a narrow identity/key protocol without losing exact pCID
 		// routing coverage. Source: DI-vipih
 		if summary.ProtocolCounts[pcid.IdentityKeyV1] == 0 {
-			failures = append(failures, "identity_key_v1 evidence missing")
+			failures = append(failures, "identity_key_v1 event missing")
 		}
 		if summary.ScoreReport.Overall < criteria.MinScoreOverall {
 			failures = append(failures, fmt.Sprintf("score_report.overall=%d below minimum %d", summary.ScoreReport.Overall, criteria.MinScoreOverall))
 		}
 	}
-	if criteria.RequireBoundarySuperset && summary.ScoreReport.Boundary < 5 {
-		failures = append(failures, fmt.Sprintf("score_report.boundary=%d want 5", summary.ScoreReport.Boundary))
+	if criteria.RequireRuntimeAdapterSuperset && summary.ScoreReport.RuntimeAdapter < 5 {
+		failures = append(failures, fmt.Sprintf("score_report.runtime_adapter=%d want 5", summary.ScoreReport.RuntimeAdapter))
 	}
 	if criteria.RequireDecentralizedMonitoring && summary.ScoreReport.Monitoring < 5 {
 		failures = append(failures, fmt.Sprintf("score_report.monitoring=%d want 5", summary.ScoreReport.Monitoring))
@@ -295,6 +300,9 @@ func validateSummary(summary RunSummary, criteria AcceptanceCriteria) error {
 	}
 	if criteria.RequireRunInternalRestart && summary.ScoreReport.Restart < 5 {
 		failures = append(failures, fmt.Sprintf("score_report.restart=%d want 5", summary.ScoreReport.Restart))
+	}
+	if criteria.RequireEventVocabulary && len(summary.ForbiddenVocabularyCounts) > 0 {
+		failures = append(failures, fmt.Sprintf("forbidden vocabulary counts: %v", summary.ForbiddenVocabularyCounts))
 	}
 	if criteria.RequireMonitorReport {
 		if summary.MonitorReport == nil {
@@ -331,6 +339,37 @@ func monitorScoreFailures(report decision.MonitorReport, minimum int) []string {
 	return failures
 }
 
+// countMonitorVocabulary adds monitor-report vocabulary findings to the same
+// run summary gate used for JSONL events.
+// Intent: DI-kirat applies to POC development-tool output as well as agent
+// events, because otherwise the retired term can re-enter guide prose through
+// analyzer summaries. Source: DI-kirat
+func countMonitorVocabulary(report *decision.MonitorReport, summary *RunSummary) {
+	if report == nil {
+		return
+	}
+	count := countForbiddenVocabulary(report.Summary)
+	for _, concern := range report.Concerns {
+		count += countForbiddenVocabulary(concern)
+	}
+	if count > 0 {
+		summary.ForbiddenVocabularyCounts["monitor_report"] += count
+	}
+}
+
+func countForbiddenVocabulary(values ...string) int {
+	term := forbiddenVocabularyTerm()
+	count := 0
+	for _, value := range values {
+		count += strings.Count(strings.ToLower(value), term)
+	}
+	return count
+}
+
+func forbiddenVocabularyTerm() string {
+	return "evi" + "dence"
+}
+
 func summarizeLog(logPath string, summary *RunSummary) error {
 	logFile, openErr := os.Open(logPath)
 	if openErr != nil {
@@ -349,6 +388,9 @@ func summarizeLog(logPath string, summary *RunSummary) error {
 		var event decision.Event
 		if err := json.Unmarshal(scanner.Bytes(), &event); err != nil {
 			return fmt.Errorf("%s: %w", logPath, err)
+		}
+		if count := countForbiddenVocabulary(event.Observer, event.Event, event.Outcome, event.Peer, event.Detail); count > 0 {
+			summary.ForbiddenVocabularyCounts["run_events"] += count
 		}
 		summary.TotalEvents++
 		summary.EventCounts[event.Event]++
@@ -404,8 +446,8 @@ func summarizeLog(logPath string, summary *RunSummary) error {
 		if isTrustCautionEvent(event.Event) {
 			summary.TrustCautionCounts[event.Event]++
 		}
-		if isHeterogeneousBoundaryEvent(event.Event) {
-			summary.HeterogeneousBoundaryCounts[event.Event]++
+		if isRuntimeAdapterEvent(event.Event) {
+			summary.RuntimeAdapterEventCounts[event.Event]++
 		}
 		if isDecentralizedMonitorEvent(event.Event) {
 			summary.DecentralizedMonitorCounts[event.Event]++
@@ -468,7 +510,7 @@ func requiredRegressionEvents() []string {
 		"capability_token_renewal_requested",
 		"capability_token_renewed",
 		"cas_corrupt_bytes_rejected",
-		"cas_corrupt_evidence_recorded",
+		"cas_corrupt_report_recorded",
 		"compute_context_promised",
 		"compute_function_executed",
 		"compute_alternate_function_executed",
@@ -488,8 +530,8 @@ func requiredRegressionEvents() []string {
 		"compute_verifier_disagreement",
 		"compute_disagreement_resolved_locally",
 		"compute_verification_received",
-		// Intent: Compute verification evidence now stays under cid_compute_v1;
-		// it must not depend on the removed evidence_report_v1 pCID. Source:
+		// Intent: Compute verification event records now stay under cid_compute_v1;
+		// they must not depend on the removed generic report pCID. Source:
 		// DI-vipih
 		"compute_verification_report_received",
 		"trust_driven_peer_choice",
@@ -507,7 +549,7 @@ func requiredRegressionEvents() []string {
 		"trust_updated",
 		"trust_repair_promise_recorded",
 		// Intent: POC14 must keep DI-fijov recovery caution visible in analyzer
-		// gates, not only in monitor prose, so malformed/broken evidence cannot
+		// gates, not only in monitor prose, so malformed/broken events cannot
 		// be followed by silent instant trust recovery. Source: DI-sihuz
 		"trust_caution_recorded",
 		"trust_caution_consumed",
@@ -537,7 +579,7 @@ func requiredRegressionEvents() []string {
 		"run_scoped_store_empty",
 		"run_scoped_store_saved",
 		"cas_run_store_saved",
-		"evidence_run_store_saved",
+		"event_run_store_saved",
 		"compute_cache_run_store_saved",
 		"retention_promise_recorded",
 		"retention_until_promised",
@@ -561,11 +603,11 @@ func requiredRegressionEvents() []string {
 		"capability_token_replay_observed",
 		"replay_probe_rejected",
 		// Intent: POC14 must remain a POC13 superset while adding heterogeneous
-		// WASM and stdio process-boundary evidence. Source: DI-linof
+		// WASM and stdio process-runtime adapter events. Source: DI-linof
 		"wasm_process_agent_started",
 		"wasm_module_header_validated",
-		"wasm_boundary_promise_sent",
-		"wasm_boundary_ack_received",
+		"wasm_adapter_promise_sent",
+		"wasm_adapter_ack_received",
 		// Intent: Peggy and Victor must perform useful routed promise work, not
 		// only record that WASM/stdio boundaries exist. Source: DI-pamob
 		"wasm_useful_work_promised",
@@ -573,13 +615,13 @@ func requiredRegressionEvents() []string {
 		"stdio_worker_started",
 		"stdio_worker_envelope_received",
 		"stdio_adapter_kernel_forwarded",
-		"stdio_worker_ack_observed",
+		"stdio_worker_ack_event",
 		"stdio_useful_work_promised",
 		"stdio_useful_work_ack_received",
 		// Intent: POC14 monitoring experiments must be decentralized because
 		// production agents do not share a global observer. Source: DI-lulof
-		"production_monitor_boundary_recorded",
-		"local_evidence_summary_promised",
+		"decentralized_monitoring_model_recorded",
+		"local_event_summary_promised",
 		"peer_carried_attestation_promised",
 		"bearer_token_exchange_rate_observed",
 		"relationship_topology_signal_observed",
@@ -594,7 +636,7 @@ func requiredRegressionEvents() []string {
 		"run_internal_restart_checkpoint_promised",
 		"run_internal_restart_recovery_observed",
 		// Intent: POC14 should exercise permanent local distrust and
-		// untrusted-transit exclusion as local promises/evidence, not as global
+		// untrusted-transit exclusion as local promises and event records, not as global
 		// bans or route enforcement. Source: DI-kinaf
 		"permanent_distrust_decided",
 		"permanent_distrust_future_repair_not_promised",
@@ -621,18 +663,18 @@ func computeScores(summary RunSummary) ScoreReport {
 	// Intent: Analyzer scoring should treat durability, retention, pressure, and
 	// replay as first-class POC14 fitness dimensions instead of burying them under
 	// generic protocol validity. Source: DI-sunuf
-	addScore(&scores.Durability, summary.EventCounts["run_scoped_store_saved"] > 0 && summary.EventCounts["cas_run_store_saved"] > 0 && summary.EventCounts["evidence_run_store_saved"] > 0 && summary.EventCounts["compute_cache_run_store_saved"] > 0)
+	addScore(&scores.Durability, summary.EventCounts["run_scoped_store_saved"] > 0 && summary.EventCounts["cas_run_store_saved"] > 0 && summary.EventCounts["event_run_store_saved"] > 0 && summary.EventCounts["compute_cache_run_store_saved"] > 0)
 	addScore(&scores.Retention, summary.EventCounts["retention_promise_recorded"] > 0 && summary.EventCounts["gc_object_retained"] > 0 && summary.EventCounts["gc_object_removed"] > 0)
 	addScore(&scores.Pressure, summary.EventCounts["backpressure_capacity_promised"] > 0 && summary.EventCounts["backpressure_capacity_refused"] > 0 && summary.EventCounts["send_rate_promised"] > 0 && summary.EventCounts["accept_rate_promised"] > 0)
 	addScore(&scores.Replay, summary.EventCounts["replay_window_promised"] > 0 && summary.EventCounts["replay_envelope_recorded"] > 0 && summary.EventCounts["capability_token_replay_rejected"] > 0 && summary.EventCounts["replay_probe_rejected"] > 0)
-	// Intent: POC14 adds process-boundary and decentralized-monitoring dimensions
+	// Intent: POC14 adds runtime-adapter and decentralized-monitoring dimensions
 	// without relaxing inherited POC13 storage/compute/trust gates. Source:
 	// DI-linof; DI-lulof
-	addScore(&scores.Boundary, summary.EventCounts["wasm_boundary_ack_received"] > 0 && summary.EventCounts["wasm_useful_work_promised"] > 0 && summary.EventCounts["stdio_worker_ack_observed"] > 0 && summary.EventCounts["stdio_adapter_kernel_forwarded"] > 0 && summary.EventCounts["stdio_useful_work_promised"] > 0)
-	addScore(&scores.Monitoring, summary.EventCounts["production_monitor_boundary_recorded"] > 0 && summary.EventCounts["bearer_token_exchange_rate_observed"] > 0 && summary.EventCounts["voluntary_gossip_promised"] > 0)
+	addScore(&scores.RuntimeAdapter, summary.EventCounts["wasm_adapter_ack_received"] > 0 && summary.EventCounts["wasm_useful_work_promised"] > 0 && summary.EventCounts["stdio_worker_ack_event"] > 0 && summary.EventCounts["stdio_adapter_kernel_forwarded"] > 0 && summary.EventCounts["stdio_useful_work_promised"] > 0)
+	addScore(&scores.Monitoring, summary.EventCounts["decentralized_monitoring_model_recorded"] > 0 && summary.EventCounts["bearer_token_exchange_rate_observed"] > 0 && summary.EventCounts["voluntary_gossip_promised"] > 0)
 	addScore(&scores.Migration, summary.EventCounts["mixed_version_pcid_migration_promised"] > 0 && summary.EventCounts["mixed_version_successor_pcid_selected"] > 0)
 	addScore(&scores.Restart, summary.EventCounts["run_internal_restart_orchestration_promised"] > 0 && summary.EventCounts["run_internal_restart_recovery_observed"] > 0)
-	scores.Overall = (scores.Transport + scores.Storage + scores.Compute + scores.Economics + scores.Trust + scores.Verification + scores.Replica + scores.Durability + scores.Retention + scores.Pressure + scores.Replay + scores.Boundary + scores.Monitoring + scores.Migration + scores.Restart) / 15
+	scores.Overall = (scores.Transport + scores.Storage + scores.Compute + scores.Economics + scores.Trust + scores.Verification + scores.Replica + scores.Durability + scores.Retention + scores.Pressure + scores.Replay + scores.RuntimeAdapter + scores.Monitoring + scores.Migration + scores.Restart) / 15
 	if len(summary.MissingRequiredEventNames) > 0 {
 		scores.Concerns = append(scores.Concerns, "missing required events: "+strings.Join(summary.MissingRequiredEventNames, ", "))
 	}
@@ -665,7 +707,7 @@ func computeProductionFitness(summary RunSummary) ProductionFitnessReport {
 	}
 	report.ReadyForProduction = len(report.BlockingGaps) == 0
 	if report.ReadyForProduction {
-		report.Verdict = "production-candidate evidence complete for current POC scope"
+		report.Verdict = "production-candidate event complete for current POC scope"
 	}
 	return report
 }
@@ -730,14 +772,14 @@ func isTrustCautionEvent(eventName string) bool {
 	return strings.HasPrefix(eventName, "trust_caution_") || strings.HasPrefix(eventName, "permanent_distrust_") || eventName == "trust_recovery_delayed" || eventName == "trust_repair_future_only"
 }
 
-func isHeterogeneousBoundaryEvent(eventName string) bool {
+func isRuntimeAdapterEvent(eventName string) bool {
 	return strings.HasPrefix(eventName, "wasm_") || strings.HasPrefix(eventName, "stdio_")
 }
 
 func isDecentralizedMonitorEvent(eventName string) bool {
 	switch eventName {
-	case "production_monitor_boundary_recorded",
-		"local_evidence_summary_promised",
+	case "decentralized_monitoring_model_recorded",
+		"local_event_summary_promised",
 		"peer_carried_attestation_promised",
 		"bearer_token_exchange_rate_observed",
 		"relationship_topology_signal_observed",
@@ -762,7 +804,7 @@ func isRestartEvent(eventName string) bool {
 	return strings.HasPrefix(eventName, "run_internal_restart_")
 }
 
-// isLocalResourceEvent recognizes evidence about the observing app's own
+// isLocalResourceEvent recognizes event records about the observing app's own
 // budget/capacity state.
 // Intent: Analyzer output should make it visible if local resource exhaustion is
 // accidentally coupled back into peer trust transitions. Source: DI-vujob
@@ -782,7 +824,7 @@ func isLocalResourceEvent(event decision.Event) bool {
 // isResourceTrustCoupling reports suspicious adjacency between local resource
 // exhaustion and peer relationship transitions for one observer.
 // Intent: This is a regression tripwire; local budget/capacity state should not
-// immediately mutate peer trust without intervening promise evidence. Source:
+// immediately mutate peer trust without intervening promise event records. Source:
 // DI-vujob
 func isResourceTrustCoupling(previousEvent, event decision.Event) bool {
 	if previousEvent.Observer != event.Observer {

@@ -147,7 +147,7 @@ func appBinaryForAgent(cfg config.Config, agentName string) (string, error) {
 	case "accounting":
 		return "poc14-accounting", nil
 	case "wasm_agent":
-		// Intent: POC14 adds heterogeneous boundary app roles as separate
+		// Intent: POC14 adds heterogeneous runtime-adapter app roles as separate
 		// supervised processes while preserving the same local-kernel routing
 		// model used by POC12/POC13 agents. Source: DI-linof
 		return "poc14-wasm-agent", nil

@@ -57,11 +57,11 @@ func TestExampleConfigLoads(t *testing.T) {
 	}
 	peggy, peggyFound := cfg.Agent("peggy")
 	if !peggyFound || !peggy.Deterministic() {
-		t.Fatalf("expected deterministic peggy WASM-boundary agent")
+		t.Fatalf("expected deterministic peggy WASM-adapter agent")
 	}
 	victor, victorFound := cfg.Agent("victor")
 	if !victorFound || !victor.Deterministic() {
-		t.Fatalf("expected deterministic victor stdio-boundary agent")
+		t.Fatalf("expected deterministic victor stdio-adapter agent")
 	}
 }
 

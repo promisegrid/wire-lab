@@ -1,14 +1,14 @@
 package protocol
 
 const (
-	casPromiseStoreContent            = "store_content"
-	casPromiseServeContent            = "serve_content"
-	casPromiseReplicateContent        = "replicate_content"
-	casPromiseServeReplicaContent     = "serve_replica_content"
-	casPromiseReplicaTokenLifecycle   = "replica_token_lifecycle"
-	casPromisePresentStorageEvidence  = "present_storage_evidence"
-	casPromiseTrustRepair             = "label_future_malformed_evidence"
-	casPromiseUnsupportedVariantProbe = "unsupported_variant_probe"
+	casPromiseStoreContent               = "store_content"
+	casPromiseServeContent               = "serve_content"
+	casPromiseReplicateContent           = "replicate_content"
+	casPromiseServeReplicaContent        = "serve_replica_content"
+	casPromiseReplicaTokenLifecycle      = "replica_token_lifecycle"
+	casPromisePresentStorageReport       = "present_storage_report"
+	casPromiseLabelFutureMalformedReport = "label_future_malformed_report"
+	casPromiseUnsupportedVariantProbe    = "unsupported_variant_probe"
 )
 
 var casStorageSchemas = []arrayPayloadSchema{
@@ -62,7 +62,7 @@ var casStorageSchemas = []arrayPayloadSchema{
 		},
 	},
 	{
-		promiseAbout: casPromisePresentStorageEvidence,
+		promiseAbout: casPromisePresentStorageReport,
 		bodyFields: []string{
 			"field_verdict",
 			"field_content_cid",
@@ -70,7 +70,7 @@ var casStorageSchemas = []arrayPayloadSchema{
 		},
 	},
 	{
-		promiseAbout: casPromiseTrustRepair,
+		promiseAbout: casPromiseLabelFutureMalformedReport,
 		bodyFields: []string{
 			"field_repair_status",
 		},

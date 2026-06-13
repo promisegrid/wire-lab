@@ -35,56 +35,56 @@ TCP-only Go agents. Source: `DI-sihuz`; `DI-sifot`; `DI-fimoh`;
 - Add resource-isolation kernel roles for CPU, memory, filesystem, and device
   access without moving app trust into the kernel.
 - Add richer POC-local operators for analyzer/monitor comparison, failed-run
-  triage, and explicit evidence export for review while keeping those tools out
+  triage, and explicit event export for review while keeping those tools out
   of the production trust model.
 
 ## Implemented First Slice
 
 - Scaffolded `implementations/poc14-wasm/` from POC13 as a superset baseline
   with POC14-local module, command, Docker, run-root, and analyzer names.
-- Added Peggy as a deterministic WASM-boundary app process. Peggy validates a
+- Added Peggy as a deterministic WASM-adapter app process. Peggy validates a
   small WASM module fixture, then exchanges ordinary `relationship_v1`
   PromiseGrid envelopes through the local kernel.
-- Added Victor as a deterministic stdio-boundary app. Victor's worker process
+- Added Victor as a deterministic stdio-adapter app. Victor's worker process
   emits and observes exact PromiseGrid envelope bytes only over stdin/stdout;
   the adapter forwards those bytes through the local kernel.
-- Added analyzer gates for WASM, stdio, and decentralized monitoring evidence
+- Added analyzer gates for WASM, stdio, and decentralized monitoring event records
   so POC14 cannot pass by merely preserving the POC13 baseline.
-- Added decentralized monitoring evidence for local summaries, peer-carried
+- Added decentralized monitoring event records for local summaries, peer-carried
   attestations, bearer-token exchange-rate signals, topology signals, and
   voluntary gossip. Source: `DI-linof`; `DI-lulof`.
-- Added hard local trust-boundary scenario evidence for permanent local distrust
+- Added hard local trust-boundary scenario event for permanent local distrust
   of Mallory and local rejection of Mallory-transit route candidates for Alice's
   own traffic. Source: `DI-kinaf`.
 - Added app-local behavior for those hard boundaries: the relationship ledger
   persists permanent distrust, send gates reject ordinary future Mallory sends,
   and route-candidate checks reject Mallory as a transit hop. Source: `DI-dubih`.
-- Added explicit mixed-version pCID migration evidence and same-run restart
-  recovery evidence so those planned POC14 concerns have analyzer gates rather
+- Added explicit mixed-version pCID migration event records and same-run restart
+  recovery event records so those planned POC14 concerns have analyzer gates rather
   than remaining prose-only intentions. Source: `DI-linof`.
 
 ## Production Monitoring Boundary
 
 - Assume production agents are geographically distributed and owned by different
-  legal entities. No process gets a global view of messages, local evidence,
+  legal entities. No process gets a global view of messages, local events,
   trust updates, exchange offers, or failures unless other agents voluntarily
   promise to disclose them.
 - Treat POC analyzers and monitors as development-time local observers, not as
   production authorities. In production, an analyzer can only be an ordinary
-  agent promising what it observed, what evidence it retained, and what local
-  interpretation it made from that evidence.
+  agent promising what it observed, what event it retained, and what local
+  interpretation it made from that event.
 - Do not design POC14 around a global health dashboard, global trust score,
   global exchange rate, or central audit trail. Those would contradict the
-  PromiseGrid assumption that trust and evidence interpretation are local to
+  PromiseGrid assumption that trust and event interpretation are local to
   each agent relationship.
 
 ## Decentralized Monitoring Candidates
 
-- Local evidence summaries: each agent may promise signed summaries of its own
+- Local events summaries: each agent may promise signed summaries of its own
   keep/break observations, but peers decide locally whether those summaries are
   credible.
 - Peer-carried attestations: Alice can carry Bob's signed promise history to
-  Carol as evidence, while Carol remains free to discount it based on Carol's
+  Carol as event, while Carol remains free to discount it based on Carol's
   trust in Alice and Bob.
 - Bearer-token exchange rates: the price peers offer for tokens issued by Alice,
   Bob, Carol, or Dave can act as a decentralized market signal for perceived
@@ -94,7 +94,7 @@ TCP-only Go agents. Source: `DI-sihuz`; `DI-sifot`; `DI-fimoh`;
   signals of relationship strength rather than as centrally managed routing
   policy.
 - Voluntary gossip: agents may promise to share selected local observations with
-  trusted peers, but recipients keep those reports as evidence, not as facts
+  trusted peers, but recipients keep those reports as event, not as facts
   imposed by an authority.
 
 ## Non-Goals Until Decided
@@ -103,6 +103,6 @@ TCP-only Go agents. Source: `DI-sihuz`; `DI-sifot`; `DI-fimoh`;
   cross-run persistent POC state by default.
 - Do not drop POC13 behavior silently to make POC14 simpler.
 - Do not treat monitor output as authority over agents; it remains observer
-  evidence.
+  event.
 - Do not let WASM host calls or stdio adapters become RPC command channels; they
-  should carry promises and exact envelope evidence, not external authority.
+  should carry promises and exact envelope event, not external authority.

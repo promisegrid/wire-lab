@@ -49,13 +49,13 @@ func TestNonCommitmentDoesNotReduceTrust(t *testing.T) {
 	}
 }
 
-func TestMalformedEvidenceDelaysOrdinaryTrustRecovery(t *testing.T) {
-	// Intent: Neat-looking kept promises after malformed evidence should first
+func TestMalformedEventDelaysOrdinaryTrustRecovery(t *testing.T) {
+	// Intent: Neat-looking kept promises after malformed events should first
 	// work off local recovery caution instead of immediately rebuilding direct
 	// trust in the peer. Source: DI-fijov
 	ledger := NewLedger([]string{"mallory"}, []string{"mallory"}, 2, -2, 0)
 	ledger.ObserveOutcome("mallory", OutcomeMalformed)
-	for keptIndex := 0; keptIndex < recoveryCautionAfterNegativeEvidence; keptIndex++ {
+	for keptIndex := 0; keptIndex < recoveryCautionAfterNegativeEvent; keptIndex++ {
 		ledger.ObserveOutcome("mallory", OutcomeKept)
 	}
 	if ledger.Trust("mallory") != -3 {
@@ -71,7 +71,7 @@ func TestMalformedEvidenceDelaysOrdinaryTrustRecovery(t *testing.T) {
 }
 
 func TestTrustScoresSaturate(t *testing.T) {
-	// Intent: Trust scores are local relationship evidence, not absolute
+	// Intent: Trust scores are local relationship event records, not absolute
 	// reputation points, so they stay in a small comparable range. Source:
 	// DI-sihuz
 	ledger := NewLedger([]string{"bob"}, []string{"bob"}, 2, -2, 0)
@@ -95,12 +95,12 @@ func TestCautionIsObservableWithoutMutableState(t *testing.T) {
 	// Source: DI-sihuz
 	ledger := NewLedger([]string{"mallory"}, []string{"mallory"}, 2, -2, 0)
 	ledger.ObserveOutcome("mallory", OutcomeMalformed)
-	if ledger.Caution("mallory") != recoveryCautionAfterNegativeEvidence {
-		t.Fatalf("caution = %d, want %d", ledger.Caution("mallory"), recoveryCautionAfterNegativeEvidence)
+	if ledger.Caution("mallory") != recoveryCautionAfterNegativeEvent {
+		t.Fatalf("caution = %d, want %d", ledger.Caution("mallory"), recoveryCautionAfterNegativeEvent)
 	}
 	ledger.ObserveOutcome("mallory", OutcomeKept)
-	if ledger.Caution("mallory") != recoveryCautionAfterNegativeEvidence-1 {
-		t.Fatalf("caution after kept = %d, want %d", ledger.Caution("mallory"), recoveryCautionAfterNegativeEvidence-1)
+	if ledger.Caution("mallory") != recoveryCautionAfterNegativeEvent-1 {
+		t.Fatalf("caution after kept = %d, want %d", ledger.Caution("mallory"), recoveryCautionAfterNegativeEvent-1)
 	}
 }
 

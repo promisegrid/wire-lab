@@ -11,30 +11,30 @@ import (
 // These promise-about names are payload-level meanings used inside pCID-owned
 // protocols; they are not top-level wire actions or independent pCIDs.
 // Intent: Keep PromiseGrid protocol vocabulary promise-first while moving key
-// rotation into identity_key_v1 instead of generic evidence reporting. Source:
+// rotation into identity_key_v1 instead of generic report pCIDs. Source:
 // DI-bikit; DI-vipih
 const (
-	PromiseWeighPackage            = "weigh_package"
-	PromiseAddressLookup           = "address_lookup"
-	PromisePrintLabel              = "print_label"
-	PromiseShipmentUpdate          = "shipment_update"
-	PromiseIssuePrintCapability    = "issue_print_capability"
-	PromiseRedeemPrintCapability   = "redeem_print_capability"
-	PromiseStoreContent            = "store_content"
-	PromiseServeContent            = "serve_content"
-	PromiseReplicateContent        = "replicate_content"
-	PromiseServeReplicaContent     = "serve_replica_content"
-	PromiseReplicaTokenLifecycle   = "replica_token_lifecycle"
-	PromisePresentStorageEvidence  = "present_storage_evidence"
-	PromiseExecuteFunction         = "execute_function"
-	PromiseLookupComputeCache      = "lookup_compute_cache"
-	PromiseProvideComputeContext   = "provide_compute_context"
-	PromiseVerifyComputeResult     = "verify_compute_result"
-	PromiseRotateSigningKey        = "rotate_signing_key"
-	PromiseTrustRepair             = "label_future_malformed_evidence"
-	PromiseUnsupportedVariantProbe = "unsupported_variant_probe"
-	PrintCapabilityScope           = "print_label"
-	PrintCapabilityMaxBytes        = 4096
+	PromiseWeighPackage               = "weigh_package"
+	PromiseAddressLookup              = "address_lookup"
+	PromisePrintLabel                 = "print_label"
+	PromiseShipmentUpdate             = "shipment_update"
+	PromiseIssuePrintCapability       = "issue_print_capability"
+	PromiseRedeemPrintCapability      = "redeem_print_capability"
+	PromiseStoreContent               = "store_content"
+	PromiseServeContent               = "serve_content"
+	PromiseReplicateContent           = "replicate_content"
+	PromiseServeReplicaContent        = "serve_replica_content"
+	PromiseReplicaTokenLifecycle      = "replica_token_lifecycle"
+	PromisePresentStorageReport       = "present_storage_report"
+	PromiseExecuteFunction            = "execute_function"
+	PromiseLookupComputeCache         = "lookup_compute_cache"
+	PromiseProvideComputeContext      = "provide_compute_context"
+	PromiseVerifyComputeResult        = "verify_compute_result"
+	PromiseRotateSigningKey           = "rotate_signing_key"
+	PromiseLabelFutureMalformedReport = "label_future_malformed_report"
+	PromiseUnsupportedVariantProbe    = "unsupported_variant_probe"
+	PrintCapabilityScope              = "print_label"
+	PrintCapabilityMaxBytes           = 4096
 )
 
 // WeightForPackage simulates a deterministic postal scale reading.
@@ -53,7 +53,7 @@ func WeightForPackage(packageID string) (int, error) {
 
 // AddressForOrder simulates an accounting-system address lookup.
 // Intent: The accounting agent promises only address records it locally has,
-// leaving the fulfillment agent to judge whether that evidence is enough.
+// leaving the fulfillment agent to judge whether those event records are enough.
 // Source: DI-timah
 func AddressForOrder(orderID string) (string, error) {
 	orderID = strings.TrimSpace(orderID)
@@ -67,8 +67,8 @@ func AddressForOrder(orderID string) (string, error) {
 }
 
 // LabelForShipment simulates a UPS label printer response from shipment facts.
-// Intent: The printer promises label evidence derived from supplied package and
-// address evidence; it does not promise shipment success outside its device
+// Intent: The printer promises label event records derived from supplied package
+// and address event records; it does not promise shipment success outside its device
 // boundary. Source: DI-timah
 func LabelForShipment(packageID, address string, weightOunces int) (string, int, error) {
 	packageID = strings.TrimSpace(packageID)
@@ -90,7 +90,7 @@ func LabelForShipment(packageID, address string, weightOunces int) (string, int,
 
 // IssuePrintCapabilityToken creates a deterministic capability-promise token
 // from the printer-port issuer's local promise fields.
-// Intent: The token is evidence that `printer_port` promises bounded future
+// Intent: The token is an event record that `printer_port` promises bounded future
 // label printing for one issuee and scope; it is not permission from an
 // authority. Source: DI-pohaj; DI-vutok
 func IssuePrintCapabilityToken(fields map[string]string) (string, error) {
@@ -116,8 +116,8 @@ func IssuePrintCapabilityToken(fields map[string]string) (string, error) {
 	if scope != PrintCapabilityScope {
 		return "", fmt.Errorf("print capability scope %q is not supported", scope)
 	}
-	printEvidence := sha256.Sum256([]byte("printer_port|" + token + "|" + tokenID + "|" + scope + "|" + maxBytes))
-	token = "pcap1:" + hex.EncodeToString(printEvidence[:])
+	printEvent := sha256.Sum256([]byte("printer_port|" + token + "|" + tokenID + "|" + scope + "|" + maxBytes))
+	token = "pcap1:" + hex.EncodeToString(printEvent[:])
 	return token, nil
 }
 
@@ -159,11 +159,11 @@ func ValidatePrintCapabilityToken(fields map[string]string) error {
 		"field_print_capability_scope":     scope,
 		"field_print_capability_max_bytes": strconv.Itoa(maxBytes),
 	}
-	printEvidence, issueErr := IssuePrintCapabilityToken(capabilityFields)
+	printEvent, issueErr := IssuePrintCapabilityToken(capabilityFields)
 	if issueErr != nil {
 		return issueErr
 	}
-	if token != printEvidence {
+	if token != printEvent {
 		return fmt.Errorf("print capability token does not match printer_port promise")
 	}
 	return nil
@@ -172,7 +172,7 @@ func ValidatePrintCapabilityToken(fields map[string]string) error {
 // LabelBytesForShipment returns the bounded bytes that the label-printer app
 // asks the printer-port app to write to local printer hardware.
 // Intent: The UPS label app can promise label-content generation, while the
-// printer-port app separately promises local hardware access evidence.
+// printer-port app separately promises local hardware access event records.
 // Source: DI-pohaj; DI-vutok
 func LabelBytesForShipment(fields map[string]string) ([]byte, error) {
 	if strings.TrimSpace(fields["field_package_id"]) == "" {
@@ -194,7 +194,7 @@ func LabelBytesForShipment(fields map[string]string) ([]byte, error) {
 // PrintLabelToLocalDevice simulates writing bounded label bytes to the local
 // printer device owned by the printer-port kernel role.
 // Intent: POC14 avoids real USB dependencies while still making hardware access
-// a separate local promise surface with exact print evidence. Source: DI-pohaj;
+// a separate local promise surface with exact print event records. Source: DI-pohaj;
 // DI-vutok
 func PrintLabelToLocalDevice(fields map[string]string) (string, error) {
 	if validateErr := ValidatePrintCapabilityToken(fields); validateErr != nil {
@@ -204,15 +204,15 @@ func PrintLabelToLocalDevice(fields map[string]string) (string, error) {
 	if decodeErr != nil {
 		return "", fmt.Errorf("label bytes are not valid hex: %w", decodeErr)
 	}
-	printEvidence := sha256.Sum256(labelBytes)
-	spoolID := "spool-" + hex.EncodeToString(printEvidence[:])[:16]
+	printEvent := sha256.Sum256(labelBytes)
+	spoolID := "spool-" + hex.EncodeToString(printEvent[:])[:16]
 	return spoolID, nil
 }
 
 // ContentCID returns a POC CIDv1 raw sha2-256 identity for stored content,
 // function source bytes, inputs, contexts, and compute results.
 // Intent: POC14 preserves the distinction between pCID protocol identity and
-// payload-level CIDs while making CAS and compute evidence exact-byte checkable.
+// payload-level CIDs while making CAS and compute event records exact-byte checkable.
 // Source: DI-sinur
 func ContentCID(content []byte) string {
 	digest := sha256.Sum256(content)
@@ -239,7 +239,7 @@ func SampleSecondContentBytes() []byte {
 	return []byte("poc14 second sample receipt bytes")
 }
 
-// CorruptContentBytes is Mallory's malformed evidence probe; its claimed CID is
+// CorruptContentBytes is Mallory's malformed event probe; its claimed CID is
 // intentionally different from the byte content.
 func CorruptContentBytes() []byte {
 	return []byte("poc14 sample invoice bytes corrupted by mallory")
@@ -267,7 +267,7 @@ func SampleContextBytes() []byte {
 
 // ComputeCacheKey names one exact local compute checkpoint over all bytes that
 // make the result meaningful.
-// Intent: Cache reuse is evidence over a pCID-defined tuple, not a global
+// Intent: Cache reuse is an event record over a pCID-defined tuple, not a global
 // execution result authority. Source: DI-sinur
 func ComputeCacheKey(protocolName, functionCID, inputCID, contextCID, resultCID string) string {
 	return ContentCID([]byte(protocolName + "|" + functionCID + "|" + inputCID + "|" + contextCID + "|" + resultCID))
@@ -344,7 +344,7 @@ func FunctionKind(functionBytes []byte) string {
 }
 
 // ValidateAccountingUpdate checks that a shipment update carries the minimum
-// evidence the accounting agent needs before it promises to record the update.
+// event records the accounting agent needs before it promises to record the update.
 func ValidateAccountingUpdate(orderID, trackingNumber string, costCents int) error {
 	if strings.TrimSpace(orderID) == "" {
 		return fmt.Errorf("order_id is required")

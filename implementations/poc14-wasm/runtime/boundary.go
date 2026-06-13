@@ -17,7 +17,7 @@ import (
 // runWASMBoundaryWorkflow records one standalone WASM-role process proving that
 // it can keep PromiseGrid semantics outside the sandbox while still exchanging
 // ordinary relationship_v1 promise envelopes through the local kernel.
-// Intent: POC14 adds heterogeneous process-boundary evidence without making
+// Intent: POC14 adds heterogeneous process-runtime adapter events without making
 // WASM host calls into RPC commands or trust authorities. Source: DI-linof
 func (node *Node) runWASMBoundaryWorkflow() error {
 	if err := boundary.ValidateWASMModule(boundary.MinimalWASMModule); err != nil {
@@ -33,16 +33,16 @@ func (node *Node) runWASMBoundaryWorkflow() error {
 	fields := boundary.PromiseFields(
 		node.Agent.Name,
 		target,
-		boundary.PromiseAboutWASMBoundary,
-		"Peggy promises that her local WASM-boundary process validated sandbox module bytes and will exchange only pCID-defined PromiseGrid envelopes.",
+		boundary.PromiseAboutWASMAdapter,
+		"Peggy promises that her local WASM-adapter process validated sandbox module bytes and will exchange only pCID-defined PromiseGrid envelopes.",
 	)
 	fields["field_wasm_module_sha256"] = moduleHash
 	fields["field_protocol"] = pcid.RelationshipV1
 	if _, err := node.sendAndReceive(target, fields); err != nil {
-		return fmt.Errorf("wasm boundary promise: %w", err)
+		return fmt.Errorf("wasm adapter promise: %w", err)
 	}
-	node.record("wasm_boundary_promise_sent", "kept", target, "pcid="+pcid.RelationshipV1+" module_sha256="+moduleHash)
-	node.record("wasm_boundary_ack_received", "kept", target, "pcid="+pcid.RelationshipV1+" stdio peer accepted WASM-boundary evidence as a local promise")
+	node.record("wasm_adapter_promise_sent", "kept", target, "pcid="+pcid.RelationshipV1+" module_sha256="+moduleHash)
+	node.record("wasm_adapter_ack_received", "kept", target, "pcid="+pcid.RelationshipV1+" stdio peer accepted WASM-adapter event as a local promise")
 	usefulTarget := "dave"
 	usefulFields := boundary.PromiseFields(
 		node.Agent.Name,
@@ -58,7 +58,7 @@ func (node *Node) runWASMBoundaryWorkflow() error {
 	// Intent: Peggy's WASM process should do useful PromiseGrid work, not merely
 	// prove that a sandbox boundary exists. Source: DI-pamob
 	node.record("wasm_useful_work_promised", "kept", usefulTarget, "pcid="+pcid.RelationshipV1+" module_sha256="+moduleHash)
-	node.record("wasm_useful_work_ack_received", "kept", usefulTarget, "pcid="+pcid.RelationshipV1+" Dave received reusable module-validation evidence")
+	node.record("wasm_useful_work_ack_received", "kept", usefulTarget, "pcid="+pcid.RelationshipV1+" Dave received reusable module-validation event")
 	return nil
 }
 
@@ -111,11 +111,11 @@ func (node *Node) runStdioBoundaryWorkflow(ctx context.Context) error {
 	if err := encoder.Encode(boundary.StdioAckMessage{Type: "ack_envelope", Hex: hex.EncodeToString(ackBytes)}); err != nil {
 		return node.finishStdioWorker(command, stdin, fmt.Errorf("write stdio ack: %w", err))
 	}
-	observed, observedErr := readStdioObserved(scanner)
+	observed, observedErr := readStdioEvent(scanner)
 	if observedErr != nil {
 		return node.finishStdioWorker(command, stdin, observedErr)
 	}
-	node.record("stdio_worker_ack_observed", observed.Outcome, target, "exact_sha256="+observed.ExactSHA256)
+	node.record("stdio_worker_ack_event", observed.Outcome, target, "exact_sha256="+observed.ExactSHA256)
 	usefulTarget := "dave"
 	usefulFields := boundary.PromiseFields(
 		node.Agent.Name,
@@ -128,11 +128,11 @@ func (node *Node) runStdioBoundaryWorkflow(ctx context.Context) error {
 	if _, err := node.sendAndReceive(usefulTarget, usefulFields); err != nil {
 		return node.finishStdioWorker(command, stdin, fmt.Errorf("stdio useful-work promise: %w", err))
 	}
-	// Intent: Victor's stdio worker should produce reusable relationship evidence
+	// Intent: Victor's stdio worker should produce reusable relationship event records
 	// about subprocess messaging, not only adapter plumbing logs. Source:
 	// DI-pamob
 	node.record("stdio_useful_work_promised", "kept", usefulTarget, "pcid="+pcid.RelationshipV1+" ack_exact_sha256="+observed.ExactSHA256)
-	node.record("stdio_useful_work_ack_received", "kept", usefulTarget, "pcid="+pcid.RelationshipV1+" Dave received stdio subprocess round-trip evidence")
+	node.record("stdio_useful_work_ack_received", "kept", usefulTarget, "pcid="+pcid.RelationshipV1+" Dave received stdio subprocess round-trip event")
 	return node.finishStdioWorker(command, stdin, nil)
 }
 
@@ -156,22 +156,22 @@ func readStdioEnvelope(scanner *bufio.Scanner) (boundary.StdioEnvelopeMessage, e
 	return outbound, nil
 }
 
-func readStdioObserved(scanner *bufio.Scanner) (boundary.StdioObservedMessage, error) {
+func readStdioEvent(scanner *bufio.Scanner) (boundary.StdioEventMessage, error) {
 	if !scanner.Scan() {
 		if err := scanner.Err(); err != nil {
-			return boundary.StdioObservedMessage{}, err
+			return boundary.StdioEventMessage{}, err
 		}
-		return boundary.StdioObservedMessage{}, fmt.Errorf("stdio worker produced no ack observation")
+		return boundary.StdioEventMessage{}, fmt.Errorf("stdio worker produced no ack observation")
 	}
-	var observed boundary.StdioObservedMessage
+	var observed boundary.StdioEventMessage
 	if err := json.Unmarshal(scanner.Bytes(), &observed); err != nil {
-		return boundary.StdioObservedMessage{}, err
+		return boundary.StdioEventMessage{}, err
 	}
-	if observed.Type != "ack_observed" {
-		return boundary.StdioObservedMessage{}, fmt.Errorf("stdio worker message type %q, want ack_observed", observed.Type)
+	if observed.Type != "ack_event" {
+		return boundary.StdioEventMessage{}, fmt.Errorf("stdio worker message type %q, want ack_event", observed.Type)
 	}
 	if observed.Outcome == "" || observed.ExactSHA256 == "" {
-		return boundary.StdioObservedMessage{}, fmt.Errorf("stdio worker ack observation is incomplete")
+		return boundary.StdioEventMessage{}, fmt.Errorf("stdio worker ack observation is incomplete")
 	}
 	return observed, nil
 }
@@ -192,33 +192,33 @@ type ioWriteCloser interface {
 	Close() error
 }
 
-// recordDecentralizedMonitoringEvidence emits POC14 evidence for analysis
+// recordDecentralizedMonitoringEvents emits POC14 event records for analysis
 // approaches that can work when no agent has a global production view.
 // Intent: Monitoring-like behavior must be modeled as local promises, peer
-// evidence, exchange-rate signals, and voluntary disclosures. Source: DI-lulof
-func (node *Node) recordDecentralizedMonitoringEvidence() {
-	node.record("production_monitor_boundary_recorded", "kept", "", "no global analyzer or monitor exists in the production trust model")
-	node.record("local_evidence_summary_promised", "kept", "dave", "Alice promises a signed summary of Alice's own keep/break observations; Dave judges it locally")
-	node.record("peer_carried_attestation_promised", "kept", "carol", "Alice carries Bob's signed storage evidence to Carol without making Bob authoritative")
+// event records, exchange-rate signals, and voluntary disclosures. Source: DI-lulof
+func (node *Node) recordDecentralizedMonitoringEvents() {
+	node.record("decentralized_monitoring_model_recorded", "kept", "", "no global analyzer or monitor exists in the production trust model")
+	node.record("local_event_summary_promised", "kept", "dave", "Alice promises a signed summary of Alice's own keep/break observations; Dave judges it locally")
+	node.record("peer_carried_attestation_promised", "kept", "carol", "Alice carries Bob's signed storage event to Carol without making Bob authoritative")
 	node.record("bearer_token_exchange_rate_observed", "kept", "grace", "Alice locally observes peer offers for bearer tokens as a market signal, not a global exchange rate")
 	node.record("relationship_topology_signal_observed", "kept", "frank", "direct links, relay willingness, and replica choices are local relationship-strength signals")
-	node.record("voluntary_gossip_promised", "kept", "ellen", "Ellen may promise selected local observations; recipients treat them as evidence only")
+	node.record("voluntary_gossip_promised", "kept", "ellen", "Ellen may promise selected local observations; recipients treat them as event records only")
 }
 
-// recordPermanentDistrustAndTransitExclusionEvidence records two POC14 local
+// recordPermanentDistrustAndTransitExclusionEvents records two POC14 local
 // trust-boundary scenarios before later protocol work implements true multi-hop
 // route selection.
 // Intent: Alice can decide to permanently distrust Mallory, and Alice can promise
 // that Alice's own inbound/outbound traffic should not transit Mallory, without
 // pretending to impose a global ban or route policy on other agents. Source:
 // DI-kinaf
-func (node *Node) recordPermanentDistrustAndTransitExclusionEvidence() error {
+func (node *Node) recordPermanentDistrustAndTransitExclusionEvents() error {
 	node.markPermanentDistrustAndTransitExclusion("mallory")
-	node.record("permanent_distrust_decided", "kept", "mallory", "Alice locally decides Mallory is permanently distrusted after repeated malformed/broken promise evidence")
+	node.record("permanent_distrust_decided", "kept", "mallory", "Alice locally decides Mallory is permanently distrusted after repeated malformed/broken promise event")
 	node.record("permanent_distrust_future_repair_not_promised", "non_commitment", "mallory", "Alice does not promise to consider future Mallory repair promises without a separate explicit local decision")
 	node.record("permanent_distrust_direct_peer_removed", "kept", "mallory", "Alice removes Mallory from Alice's local direct-peer set for Alice-owned traffic")
 	node.record("transit_exclusion_promised", "kept", "mallory", "Alice promises that Alice's input and output traffic should not use Mallory as a transit peer")
-	node.record("input_transit_exclusion_recorded", "kept", "mallory", "Alice records that inbound traffic claiming Mallory as transit is not acceptable evidence for sensitive payload delivery")
+	node.record("input_transit_exclusion_recorded", "kept", "mallory", "Alice records that inbound traffic claiming Mallory as transit is not acceptable event for sensitive payload delivery")
 	node.record("output_transit_exclusion_recorded", "kept", "mallory", "Alice records that outbound traffic candidates naming Mallory as transit are locally rejected")
 	if _, err := node.sendAndReceive("mallory", map[string]string{
 		"act":                 "promise",
@@ -242,31 +242,31 @@ func (node *Node) recordPermanentDistrustAndTransitExclusionEvidence() error {
 	if !node.routeAllowed(safeRoute) {
 		return fmt.Errorf("transit exclusion unexpectedly rejected route %v", safeRoute)
 	}
-	node.record("transit_safe_route_selected", "kept", "frank", "Alice selects a non-Mallory transit candidate from Alice's own trusted peer evidence")
+	node.record("transit_safe_route_selected", "kept", "frank", "Alice selects a non-Mallory transit candidate from Alice's own trusted peer events")
 	return nil
 }
 
-// recordMixedVersionPCIDMigrationEvidence records how an app can reason about a
+// recordMixedVersionPCIDMigrationEvents records how an app can reason about a
 // legacy pCID and the current pCID without any central registry.
-// Intent: Mixed-version compatibility remains local evidence and pCID-selected
+// Intent: Mixed-version compatibility remains local event records and pCID-selected
 // payload semantics, not a command to conform to a global version. Source:
 // DI-linof
-func (node *Node) recordMixedVersionPCIDMigrationEvidence() {
+func (node *Node) recordMixedVersionPCIDMigrationEvents() {
 	legacyCID := protocol.NewProtocolCID([]byte("poc13 relationship trust discovery observation protocol v1"))
 	currentCID := node.Protocols.MustCID(pcid.RelationshipV1)
 	node.record("mixed_version_pcid_migration_promised", "kept", "bob", "legacy_pcid="+legacyCID.String()+" current_pcid="+currentCID.String())
-	node.record("mixed_version_legacy_pcid_observed", "kept", "bob", "Alice retains legacy pCID evidence as local context, not as current authority")
-	node.record("mixed_version_successor_pcid_selected", "kept", "bob", "Alice selects current relationship_v1 pCID for new envelopes while preserving legacy evidence")
+	node.record("mixed_version_legacy_pcid_observed", "kept", "bob", "Alice retains legacy pCID event as local context, not as current authority")
+	node.record("mixed_version_successor_pcid_selected", "kept", "bob", "Alice selects current relationship_v1 pCID for new envelopes while preserving legacy event")
 }
 
-// recordRunInternalRestartEvidence records the run-scoped restart contract for
+// recordRunInternalRestartEvents records the run-scoped restart contract for
 // multiple app processes before the normal save/load code persists local state.
 // Intent: POC14 should test crash/restart expectations as local promises by each
 // process, not as cross-run state or supervisor authority. Source: DI-linof
-func (node *Node) recordRunInternalRestartEvidence() {
+func (node *Node) recordRunInternalRestartEvents() {
 	node.record("run_internal_restart_orchestration_promised", "kept", "bob", "Alice promises a bounded same-run restart probe for storage state and boundary agents")
 	node.record("run_internal_restart_checkpoint_promised", "kept", "peggy", "Bob and Peggy are expected to recover only run-scoped journals, not cross-run state")
-	node.record("run_internal_restart_recovery_observed", "kept", "victor", "restart recovery is judged by local run-scoped evidence and exact envelope replay windows")
+	node.record("run_internal_restart_recovery_observed", "kept", "victor", "restart recovery is judged by local run-scoped event and exact envelope replay windows")
 }
 
 func (node *Node) firstConfiguredPeerByKind(kind string) (string, bool) {

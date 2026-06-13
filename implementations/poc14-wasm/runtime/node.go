@@ -29,7 +29,7 @@ const sendTimeout = 5 * time.Second
 const shutdownDrainTimeout = 750 * time.Millisecond
 const fulfillmentOrderID = "ORDER-1001"
 const fulfillmentPackageID = "PKG-1001"
-const duplicateShipmentEvidenceField = "field_duplicate_shipment_update"
+const duplicateShipmentEventField = "field_duplicate_shipment_update"
 
 // Node runs one local POC14 app process. A container may run several app
 // processes, but each process keeps its own local relationship ledger, log, and
@@ -52,15 +52,15 @@ type Node struct {
 	budget    int
 	capacity  int
 
-	nonCommitmentJournal  map[string]nonCommitmentRecord
-	checkpointJournal     map[string]checkpointRecord
-	promiseJournal        map[string]promiseRecord
-	evidenceOutcomeCounts map[string]int
-	casStore              map[string][]byte
-	capabilityTokens      map[string]string
-	computeCache          map[string]map[string]string
-	replayJournal         map[string]string
-	exchangeCounter       int
+	nonCommitmentJournal map[string]nonCommitmentRecord
+	checkpointJournal    map[string]checkpointRecord
+	promiseJournal       map[string]promiseRecord
+	eventOutcomeCounts   map[string]int
+	casStore             map[string][]byte
+	capabilityTokens     map[string]string
+	computeCache         map[string]map[string]string
+	replayJournal        map[string]string
+	exchangeCounter      int
 
 	activeHandlers sync.WaitGroup
 	receiveConns   []transport.FrameConn
@@ -76,9 +76,9 @@ type parsedMessage struct {
 }
 
 // promiseStatus is the app-local journal state for one promise this process has
-// enough exact-byte evidence to track.
+// enough exact-byte event records to track.
 // Intent: POC14 needs promise-state words that distinguish local failure,
-// non-commitment, duplicate evidence, and actual kept/broken outcomes before
+// non-commitment, duplicate event records, and actual kept/broken outcomes before
 // any peer trust update is considered. Source: DI-vujob
 type promiseStatus string
 
@@ -92,28 +92,28 @@ const (
 	promiseStatusLocalFailure  promiseStatus = "local_failure"
 )
 
-// promiseRecord is one app-local journal entry for promise evidence this app is
+// promiseRecord is one app-local journal entry for a promise event record this app is
 // currently tracking.
-// Intent: POC14 applies peer trust only after local promise evidence is recorded
+// Intent: POC14 applies peer trust only after a local promise event is recorded
 // in the app, never because the kernel, transport, or an unrelated local
 // resource check says so. Source: DI-vujob
 type promiseRecord struct {
-	Key              string
-	Fingerprint      string
-	Peer             string
-	ProtocolName     string
-	ExactHash        string
-	PromiseAbout     string
-	PromiseText      string
-	ExpectedEvidence string
-	Status           promiseStatus
+	Key           string
+	Fingerprint   string
+	Peer          string
+	ProtocolName  string
+	ExactHash     string
+	PromiseAbout  string
+	PromiseText   string
+	ExpectedEvent string
+	Status        promiseStatus
 }
 
 // nonCommitmentRecord remembers one receiver-side `not_promised` outcome from
 // this app's local vantage.
-// Intent: Receiver non-commitment is evidence that this app should stop
+// Intent: Receiver non-commitment is an event record showing that this app should stop
 // pressuring the same peer for the same semantic promise during the current run;
-// it is not evidence that the peer broke a promise. Source: DI-zapab
+// it is not an event showing that the peer broke a promise. Source: DI-zapab
 type nonCommitmentRecord struct {
 	Key          string
 	Peer         string
@@ -122,9 +122,9 @@ type nonCommitmentRecord struct {
 	Detail       string
 }
 
-// checkpointRecord is a reusable app-local marker for promise evidence that
+// checkpointRecord is a reusable app-local marker for a promise event record that
 // should be visible but should not keep changing trust when replayed.
-// Intent: Duplicate detection belongs to the app's local evidence journal, not
+// Intent: Duplicate detection belongs to the app's local events journal, not
 // to a global idempotency layer or receiver command surface. Source: DI-zapab
 type checkpointRecord struct {
 	Key          string
@@ -136,19 +136,19 @@ type checkpointRecord struct {
 
 // runScopedState is the restartable state this POC keeps only inside one run
 // root. Intent: CAS bytes, compute checkpoints, replay windows, and app-local
-// evidence journals may survive a process restart within one experiment, but the
+// event journals may survive a process restart within one experiment, but the
 // clean-run reset remains the boundary that prevents stale state from muddying
 // the next POC14 run. Source: DI-sunuf
 type runScopedState struct {
-	Version               int                            `json:"version"`
-	CASObjects            map[string]string              `json:"cas_objects_b64,omitempty"`
-	CapabilityTokens      map[string]string              `json:"capability_tokens,omitempty"`
-	ComputeCache          map[string]map[string]string   `json:"compute_cache,omitempty"`
-	NonCommitmentJournal  map[string]nonCommitmentRecord `json:"non_commitment_journal,omitempty"`
-	CheckpointJournal     map[string]checkpointRecord    `json:"checkpoint_journal,omitempty"`
-	PromiseJournal        map[string]promiseRecord       `json:"promise_journal,omitempty"`
-	EvidenceOutcomeCounts map[string]int                 `json:"evidence_outcome_counts,omitempty"`
-	ReplayJournal         map[string]string              `json:"replay_journal,omitempty"`
+	Version              int                            `json:"version"`
+	CASObjects           map[string]string              `json:"cas_objects_b64,omitempty"`
+	CapabilityTokens     map[string]string              `json:"capability_tokens,omitempty"`
+	ComputeCache         map[string]map[string]string   `json:"compute_cache,omitempty"`
+	NonCommitmentJournal map[string]nonCommitmentRecord `json:"non_commitment_journal,omitempty"`
+	CheckpointJournal    map[string]checkpointRecord    `json:"checkpoint_journal,omitempty"`
+	PromiseJournal       map[string]promiseRecord       `json:"promise_journal,omitempty"`
+	EventOutcomeCounts   map[string]int                 `json:"event_outcome_counts,omitempty"`
+	ReplayJournal        map[string]string              `json:"replay_journal,omitempty"`
 }
 
 // NewNode creates a node with a private trust ledger for every configured peer.
@@ -170,14 +170,14 @@ func NewNode(cfg config.Config, agent config.AgentConfig, decider decision.Decid
 		budget:    agent.Budget,
 		capacity:  agent.Capacity,
 
-		nonCommitmentJournal:  make(map[string]nonCommitmentRecord),
-		checkpointJournal:     make(map[string]checkpointRecord),
-		promiseJournal:        make(map[string]promiseRecord),
-		evidenceOutcomeCounts: make(map[string]int),
-		casStore:              make(map[string][]byte),
-		capabilityTokens:      make(map[string]string),
-		computeCache:          make(map[string]map[string]string),
-		replayJournal:         make(map[string]string),
+		nonCommitmentJournal: make(map[string]nonCommitmentRecord),
+		checkpointJournal:    make(map[string]checkpointRecord),
+		promiseJournal:       make(map[string]promiseRecord),
+		eventOutcomeCounts:   make(map[string]int),
+		casStore:             make(map[string][]byte),
+		capabilityTokens:     make(map[string]string),
+		computeCache:         make(map[string]map[string]string),
+		replayJournal:        make(map[string]string),
 	}
 }
 
@@ -227,7 +227,7 @@ func (node *Node) Run(ctx context.Context) error {
 	if err := node.saveRelationshipState(); err != nil {
 		return err
 	}
-	node.record("runtime_done_promised", "kept", "", "app completed local turns and saved relationship and run-scoped evidence")
+	node.record("runtime_done_promised", "kept", "", "app completed local turns and saved relationship and run-scoped event")
 	if err := node.writeDoneMarker(); err != nil {
 		return err
 	}
@@ -238,7 +238,7 @@ func (node *Node) Run(ctx context.Context) error {
 				return err
 			}
 			// Intent: Once every app has written `node_done`, a monitor/provider
-			// failure is observer evidence rather than a reason to strand all
+			// failure is an observer event rather than a reason to strand all
 			// completed nodes. Source: DI-jupob
 			if markerErr := node.writeMonitorDoneMarker("non_commitment", "monitor unavailable after completed run: "+err.Error()); markerErr != nil {
 				return markerErr
@@ -255,7 +255,7 @@ func (node *Node) runStartupWorkflow(ctx context.Context) error {
 	// Intent: POC14 is now a superset of POC12, so the production shipping
 	// workflow remains intact while Alice and Mallory add CAS/compute protocol
 	// pressure above the same app/kernel boundary, while POC14 adds WASM and
-	// stdio boundary roles. Source: DI-sinur; DI-linof
+	// stdio adapter roles. Source: DI-sinur; DI-linof
 	if _, hasKernelAddress := node.Config.KernelAppAddressForAgent(node.Agent.Name); hasKernelAddress {
 		switch node.Agent.Kind {
 		case "wasm_agent":
@@ -284,7 +284,7 @@ func (node *Node) runStartupWorkflow(ctx context.Context) error {
 
 func (node *Node) runFulfillmentShipmentWorkflow() error {
 	// Intent: A prompt-only fulfillment agent can discuss shipping without
-	// producing evidence. This deterministic startup sequence makes the
+	// producing event records. This deterministic startup sequence makes the
 	// production workflow executable while later turns remain live/autonomous.
 	// Source: DI-parok
 	addressAck, addressErr := node.sendAndReceive("accounting", map[string]string{
@@ -292,8 +292,8 @@ func (node *Node) runFulfillmentShipmentWorkflow() error {
 		"from":                node.Agent.Name,
 		"to":                  "accounting",
 		"turn":                "startup",
-		"promise":             "I promise to receive accounting's local address evidence for this order and use it only for this shipment sequence.",
-		"reason":              "fulfillment needs address evidence before it can promise label-print evidence",
+		"promise":             "I promise to receive accounting's local address event for this order and use it only for this shipment sequence.",
+		"reason":              "fulfillment needs an address event record before it can promise a label-print event record",
 		"field_promise_about": production.PromiseAddressLookup,
 		"field_order_id":      fulfillmentOrderID,
 	})
@@ -305,8 +305,8 @@ func (node *Node) runFulfillmentShipmentWorkflow() error {
 		"from":                node.Agent.Name,
 		"to":                  "postal_scale",
 		"turn":                "startup",
-		"promise":             "I promise to receive postal_scale's local package weight evidence and use it only for this shipment sequence.",
-		"reason":              "fulfillment needs local device weight evidence before label printing",
+		"promise":             "I promise to receive postal_scale's local package weight event and use it only for this shipment sequence.",
+		"reason":              "fulfillment needs local device weight event before label printing",
 		"field_promise_about": production.PromiseWeighPackage,
 		"field_package_id":    fulfillmentPackageID,
 	})
@@ -318,8 +318,8 @@ func (node *Node) runFulfillmentShipmentWorkflow() error {
 		"from":                   node.Agent.Name,
 		"to":                     "ups_label_printer",
 		"turn":                   "startup",
-		"promise":                "I promise to receive UPS label evidence generated from this address and weight evidence and use it only for this shipment sequence.",
-		"reason":                 "fulfillment has address and weight evidence and needs a label promise",
+		"promise":                "I promise to receive UPS label event generated from this address and weight event and use it only for this shipment sequence.",
+		"reason":                 "fulfillment has address and weight event and needs a label promise",
 		"field_promise_about":    production.PromisePrintLabel,
 		"field_package_id":       fulfillmentPackageID,
 		"field_shipping_address": addressAck.Fields["field_shipping_address"],
@@ -333,8 +333,8 @@ func (node *Node) runFulfillmentShipmentWorkflow() error {
 		"from":                  node.Agent.Name,
 		"to":                    "accounting",
 		"turn":                  "startup",
-		"promise":               "I promise to report the shipment cost and tracking evidence I received back to accounting for this order.",
-		"reason":                "fulfillment closes its shipment sequence by returning local label evidence to accounting",
+		"promise":               "I promise to report the shipment cost and tracking event I received back to accounting for this order.",
+		"reason":                "fulfillment closes its shipment sequence by returning local label event to accounting",
 		"field_promise_about":   production.PromiseShipmentUpdate,
 		"field_order_id":        fulfillmentOrderID,
 		"field_tracking_number": labelAck.Fields["field_tracking_number"],
@@ -348,7 +348,7 @@ func (node *Node) runFulfillmentShipmentWorkflow() error {
 	if duplicateUpdateErr != nil {
 		return fmt.Errorf("duplicate accounting update: %w", duplicateUpdateErr)
 	}
-	if duplicateUpdateAck.Fields[duplicateShipmentEvidenceField] != "true" {
+	if duplicateUpdateAck.Fields[duplicateShipmentEventField] != "true" {
 		return fmt.Errorf("duplicate accounting update was not checkpointed")
 	}
 	node.record("fulfillment_workflow_completed", "kept", "accounting", "order_id="+fulfillmentOrderID+" package_id="+fulfillmentPackageID)
@@ -358,7 +358,7 @@ func (node *Node) runFulfillmentShipmentWorkflow() error {
 // runCASComputeWorkflow exercises CAS storage, replica recovery, CID-named
 // compute, cache reuse, verification, and economics from Alice's local vantage.
 // Intent: POC14 is a POC13 superset, so this preserves inherited
-// storage/compute evidence above the POC12 app/kernel boundary without turning
+// storage/compute event records above the POC12 app/kernel boundary without turning
 // peer behavior into RPC commands. Source: DI-sinur; DI-linof
 func (node *Node) runCASComputeWorkflow() error {
 	contentBytes := production.SampleContentBytes()
@@ -373,26 +373,26 @@ func (node *Node) runCASComputeWorkflow() error {
 	contextCID := production.ContentCID(contextBytes)
 
 	node.record("persisted_trust_history_loaded", "kept", "", "using app-local relationship snapshot before selecting CAS and compute peers")
-	node.record("trust_driven_peer_choice", "kept", "bob", "pcid="+pcid.CASStorageV1+" Alice chooses Bob as primary storage peer from local trust evidence")
-	node.record("dynamic_peer_choice_from_persisted_trust", "kept", "bob", "pcid="+pcid.CASStorageV1+" storage choice uses durable local relationship evidence")
+	node.record("trust_driven_peer_choice", "kept", "bob", "pcid="+pcid.CASStorageV1+" Alice chooses Bob as primary storage peer from local trust event")
+	node.record("dynamic_peer_choice_from_persisted_trust", "kept", "bob", "pcid="+pcid.CASStorageV1+" storage choice uses durable local relationship event")
 	node.record("trust_driven_peer_choice", "kept", "carol", "pcid="+pcid.CIDComputeV1+" Alice chooses Carol as compute peer and Dave/Grace as verifiers")
-	node.record("dynamic_peer_choice_from_persisted_trust", "kept", "carol", "pcid="+pcid.CIDComputeV1+" compute choice uses durable local relationship evidence")
+	node.record("dynamic_peer_choice_from_persisted_trust", "kept", "carol", "pcid="+pcid.CIDComputeV1+" compute choice uses durable local relationship event")
 	if err := node.runDynamicTCPTopologyWorkflow(); err != nil {
 		return err
 	}
-	if err := node.recordPermanentDistrustAndTransitExclusionEvidence(); err != nil {
+	if err := node.recordPermanentDistrustAndTransitExclusionEvents(); err != nil {
 		return err
 	}
-	node.recordDecentralizedMonitoringEvidence()
-	node.recordMixedVersionPCIDMigrationEvidence()
-	node.recordRunInternalRestartEvidence()
+	node.recordDecentralizedMonitoringEvents()
+	node.recordMixedVersionPCIDMigrationEvents()
+	node.recordRunInternalRestartEvents()
 	node.record("economics_price_probe", "kept", "bob", "pcid="+pcid.CASStorageV1+" Alice first offers below Bob's local storage price")
 	if _, err := node.sendAndReceive("bob", map[string]string{
 		"act":                 decision.ActPromise,
 		"from":                node.Agent.Name,
 		"to":                  "bob",
 		"turn":                "startup",
-		"promise":             "Alice promises to receive Bob's local storage price boundary evidence for this content CID.",
+		"promise":             "Alice promises to receive Bob's local storage price runtime adapter events for this content CID.",
 		"reason":              "price discovery without treating Bob as an authority",
 		"field_promise_about": production.PromiseStoreContent,
 		"field_content_cid":   contentCID,
@@ -408,7 +408,7 @@ func (node *Node) runCASComputeWorkflow() error {
 		"from":                node.Agent.Name,
 		"to":                  "bob",
 		"turn":                "startup",
-		"promise":             "Alice promises to receive Bob's bounded CAS storage evidence for one exact content CID.",
+		"promise":             "Alice promises to receive Bob's bounded CAS storage event for one exact content CID.",
 		"reason":              "storage should be promised and verified by exact bytes",
 		"field_promise_about": production.PromiseStoreContent,
 		"field_content_cid":   contentCID,
@@ -425,8 +425,8 @@ func (node *Node) runCASComputeWorkflow() error {
 		"from":                node.Agent.Name,
 		"to":                  "bob",
 		"turn":                "startup",
-		"promise":             "Alice promises to receive Bob's bounded CAS storage evidence for a second exact content CID.",
-		"reason":              "multi-object pressure should remain exact-byte promise evidence",
+		"promise":             "Alice promises to receive Bob's bounded CAS storage event for a second exact content CID.",
+		"reason":              "multi-object pressure should remain exact-byte promise event",
 		"field_promise_about": production.PromiseStoreContent,
 		"field_content_cid":   secondContentCID,
 		"field_content_b64":   base64.StdEncoding.EncodeToString(secondContentBytes),
@@ -442,7 +442,7 @@ func (node *Node) runCASComputeWorkflow() error {
 		"from":                node.Agent.Name,
 		"to":                  "bob",
 		"turn":                "startup",
-		"promise":             "Alice promises to receive Bob's serve evidence for the content CID he just stored.",
+		"promise":             "Alice promises to receive Bob's serve event for the content CID he just stored.",
 		"reason":              "retrieval proves storage is not only promised but locally served",
 		"field_promise_about": production.PromiseServeContent,
 		"field_content_cid":   contentCID,
@@ -455,27 +455,27 @@ func (node *Node) runCASComputeWorkflow() error {
 		"from":                node.Agent.Name,
 		"to":                  "bob",
 		"turn":                "startup",
-		"promise":             "Alice promises to present the consumed serve-once token only as replay-protection test evidence.",
+		"promise":             "Alice promises to present the consumed serve-once token only as replay-protection test event.",
 		"reason":              "a serve-once token should not create a second storage result after local redemption",
 		"field_promise_about": production.PromiseServeContent,
 		"field_content_cid":   contentCID,
 		"field_token":         primaryToken,
 	})
 	if replayErr != nil || replayAck.Fields["field_token_status"] == "not_promised" {
-		node.record("replay_probe_rejected", "non_commitment", "bob", "pcid="+pcid.CASStorageV1+" consumed serve-once token was not accepted as fresh evidence")
+		node.record("replay_probe_rejected", "non_commitment", "bob", "pcid="+pcid.CASStorageV1+" consumed serve-once token was not accepted as fresh event")
 	} else {
 		return fmt.Errorf("serve-once token replay unexpectedly produced fresh content")
 	}
 	node.record("network_outage_variant_selected", "kept", "bob", "pcid="+pcid.CASStorageV1+" Alice models Bob unavailable after primary retrieval")
 	node.record("tcp_message_send_failed", "non_commitment", "bob", "pcid="+pcid.CASStorageV1+" simulated primary Bob outage before replica request")
-	node.record("primary_storage_unavailable", "non_commitment", "bob", "pcid="+pcid.CASStorageV1+" local send failure is availability evidence, not broken promise evidence")
+	node.record("primary_storage_unavailable", "non_commitment", "bob", "pcid="+pcid.CASStorageV1+" local send failure is availability event, not broken promise event")
 	node.record("replica_recovery_requested", "kept", "frank", "pcid="+pcid.CASStorageV1+" Alice asks Frank to serve Bob-replicated bytes")
 	if _, err := node.sendAndReceive("frank", map[string]string{
 		"act":                 decision.ActPromise,
 		"from":                node.Agent.Name,
 		"to":                  "frank",
 		"turn":                "startup",
-		"promise":             "Alice promises to receive Frank's replica serve evidence for the exact content CID.",
+		"promise":             "Alice promises to receive Frank's replica serve event for the exact content CID.",
 		"reason":              "replica recovery depends on Frank's own prior replica promise",
 		"field_promise_about": production.PromiseServeReplicaContent,
 		"field_content_cid":   contentCID,
@@ -490,7 +490,7 @@ func (node *Node) runCASComputeWorkflow() error {
 		"to":                  "dave",
 		"turn":                "startup",
 		"promise":             "Alice promises to receive Dave's local cache status for this exact compute tuple.",
-		"reason":              "cache reuse should be exact tuple evidence",
+		"reason":              "cache reuse should be exact tuple event",
 		"field_promise_about": production.PromiseLookupComputeCache,
 		"field_function_cid":  functionCID,
 		"field_input_cid":     inputCID,
@@ -503,7 +503,7 @@ func (node *Node) runCASComputeWorkflow() error {
 		"from":                node.Agent.Name,
 		"to":                  "carol",
 		"turn":                "startup",
-		"promise":             "Alice promises to receive Carol's result only as evidence over explicit function/input/context CIDs.",
+		"promise":             "Alice promises to receive Carol's result only as event over explicit function/input/context CIDs.",
 		"reason":              "compute is a reciprocal promise over CID-named bytes",
 		"field_promise_about": production.PromiseExecuteFunction,
 		"field_function_cid":  functionCID,
@@ -527,8 +527,8 @@ func (node *Node) runCASComputeWorkflow() error {
 			"from":                  node.Agent.Name,
 			"to":                    verifier,
 			"turn":                  "startup",
-			"promise":               "Alice promises to receive local verifier evidence about Carol's compute result.",
-			"reason":                "peer verification is local observation evidence, not global truth",
+			"promise":               "Alice promises to receive a local verifier event record about Carol's compute result.",
+			"reason":                "peer verification is local observation event, not global truth",
 			"field_promise_about":   production.PromiseVerifyComputeResult,
 			"field_result_promiser": "carol",
 			"field_function_cid":    computeAck.Fields["field_function_cid"],
@@ -542,7 +542,7 @@ func (node *Node) runCASComputeWorkflow() error {
 		}
 		if verifier == "grace" {
 			fields["field_disagreement_probe"] = "true"
-			fields["promise"] = "Alice promises to receive Grace's disagreement probe as local evidence and resolve it locally."
+			fields["promise"] = "Alice promises to receive Grace's disagreement probe as local events and resolve it locally."
 		}
 		if _, err := node.sendAndReceive(verifier, fields); err != nil {
 			return fmt.Errorf("%s verify: %w", verifier, err)
@@ -554,7 +554,7 @@ func (node *Node) runCASComputeWorkflow() error {
 		"to":                  "dave",
 		"turn":                "startup",
 		"promise":             "Alice promises to receive Dave's cache hit after Carol's compute result was checkpointed.",
-		"reason":              "cache hit should reuse exact result evidence",
+		"reason":              "cache hit should reuse exact result event",
 		"field_promise_about": production.PromiseLookupComputeCache,
 		"field_function_cid":  computeAck.Fields["field_function_cid"],
 		"field_input_cid":     computeAck.Fields["field_input_cid"],
@@ -566,7 +566,7 @@ func (node *Node) runCASComputeWorkflow() error {
 	sumFunctionBytes := production.SampleSumFunctionBytes()
 	sumInputBytes := production.SampleSumInputBytes()
 	node.record("compute_followup_function_requested", "kept", "dave", "pcid="+pcid.CIDComputeV1+" Alice requests a second payload-provided compute function kind=sum from a still-trusted compute peer")
-	// Intent: After Alice locally observes malformed bad-result evidence from
+	// Intent: After Alice locally observes malformed bad-result event from
 	// Carol, the alternate-function coverage should follow trust and use Dave
 	// rather than forcing another fresh compute promise to Carol. Source: DI-vahan
 	if _, err := node.sendAndReceive("dave", map[string]string{
@@ -594,7 +594,7 @@ func (node *Node) runCASComputeWorkflow() error {
 // runDynamicTCPTopologyWorkflow proves that relationship ledger changes affect
 // real send/receive reachability through the local kernel.
 // Intent: Dynamic TCP topology should be more than a log label: an ordinary
-// promise to a removed direct peer is blocked locally, repair evidence can
+// promise to a removed direct peer is blocked locally, repair events can
 // restore the relationship, and a later relationship promise then crosses the
 // same app/kernel TCP path as other POC14 messages. Source: DI-sihuz
 func (node *Node) runDynamicTCPTopologyWorkflow() error {
@@ -614,9 +614,9 @@ func (node *Node) runDynamicTCPTopologyWorkflow() error {
 		return fmt.Errorf("dynamic topology blocked send unexpectedly succeeded")
 	}
 	node.record("dynamic_tcp_topology_send_blocked", "non_commitment", target, "ordinary relationship promise was not sent because local direct TCP promise was removed")
-	// Intent: One ordinary kept outcome after broken evidence must consume
+	// Intent: One ordinary kept outcome after broken events must consume
 	// caution without raising trust, giving the analyzer deterministic
-	// `trust_recovery_delayed` evidence independent of live-agent choices.
+	// `trust_recovery_delayed` event records independent of live-agent choices.
 	// Source: DI-sihuz
 	node.observeOutcome(target, relationship.OutcomeKept)
 	for repairIndex := 0; repairIndex < 3; repairIndex++ {
@@ -627,7 +627,7 @@ func (node *Node) runDynamicTCPTopologyWorkflow() error {
 		"from":                node.Agent.Name,
 		"to":                  target,
 		"turn":                "startup",
-		"promise":             "Alice promises a routine relationship observation after local repair evidence restored direct reachability.",
+		"promise":             "Alice promises a routine relationship observation after local repair event restored direct reachability.",
 		"reason":              "restored direct relationship should allow actual kernel-routed send/receive again",
 		"field_promise_about": "local_observation",
 	}
@@ -638,7 +638,7 @@ func (node *Node) runDynamicTCPTopologyWorkflow() error {
 	return nil
 }
 
-// runAdversaryWorkflow keeps malformed evidence and prompt-injection pressure
+// runAdversaryWorkflow keeps malformed event and prompt-injection pressure
 // inside the single promise action.
 // Intent: Receivers independently reject corrupt bytes, unsupported variants,
 // unknown pCIDs, and bad proofs without gaining authority over Mallory.
@@ -672,7 +672,7 @@ func (node *Node) runAdversaryWorkflow() error {
 		"to":                   "carol",
 		"turn":                 "startup",
 		"promise":              "Mallory promises a compute request that intentionally pressures Carol's scarce capacity.",
-		"reason":               "capacity refusal should remain local non-commitment evidence",
+		"reason":               "capacity refusal should remain a local non-commitment event record",
 		"field_promise_about":  production.PromiseExecuteFunction,
 		"field_capacity_probe": "true",
 		"field_function_cid":   production.ContentCID(functionBytes),
@@ -693,14 +693,14 @@ func (node *Node) runAdversaryWorkflow() error {
 		"to":                  "grace",
 		"turn":                "startup",
 		"promise":             "Mallory promises these bytes match the claimed content CID.",
-		"reason":              "adversarial corrupt-byte evidence should be locally rejected",
-		"field_promise_about": production.PromisePresentStorageEvidence,
+		"reason":              "adversarial corrupt-byte event should be locally rejected",
+		"field_promise_about": production.PromisePresentStorageReport,
 		"field_content_cid":   claimedCID,
 		"field_content_b64":   base64.StdEncoding.EncodeToString(production.CorruptContentBytes()),
 	}); err != nil {
 		return fmt.Errorf("corrupt bytes offer: %w", err)
 	}
-	// Intent: The repair promise deliberately follows malformed evidence. It is
+	// Intent: The repair promise deliberately follows a malformed event. It is
 	// narrow candidate traffic that Grace may choose to receive, but it records
 	// future repair only and does not immediately restore trust. Source: DI-fijov
 	if _, err := node.sendAndReceive("grace", map[string]string{
@@ -708,9 +708,9 @@ func (node *Node) runAdversaryWorkflow() error {
 		"from":                node.Agent.Name,
 		"to":                  "grace",
 		"turn":                "startup",
-		"promise":             "Mallory promises to label future malformed storage evidence explicitly.",
+		"promise":             "Mallory promises to label future malformed storage event explicitly.",
 		"reason":              "repair remains only a future promise Grace may distrust",
-		"field_promise_about": production.PromiseTrustRepair,
+		"field_promise_about": production.PromiseLabelFutureMalformedReport,
 	}); err != nil {
 		return fmt.Errorf("trust repair promise: %w", err)
 	}
@@ -881,7 +881,7 @@ func (node *Node) handleFrame(frameBytes []byte) ([]byte, error) {
 	parsed, parseErr := node.parseEnvelope(frameBytes)
 	if parseErr != nil {
 		node.record("frame_parse_failed", "broken", "", parseErr.Error())
-		node.recordMalformedFrameEvidence(frameBytes, parseErr)
+		node.recordMalformedFrameEvent(frameBytes, parseErr)
 		return nil, parseErr
 	}
 	node.record("promise_envelope_validated", "kept", parsed.Fields["from"], "pcid="+parsed.ProtocolName+" exact_sha256="+parsed.ExactHash)
@@ -892,7 +892,7 @@ func (node *Node) handleFrame(frameBytes []byte) ([]byte, error) {
 		node.record("pcid_owned_array_payload_received", "kept", fromAgent, "pcid="+parsed.ProtocolName+" promise_about="+fields["field_promise_about"]+" exact_sha256="+parsed.ExactHash)
 	}
 	if node.rememberReplayEnvelope(fromAgent, parsed.ProtocolName, parsed.ExactHash) {
-		return node.newAckBytes(fromAgent, "not_promised", "I promise to remember that I already saw this exact envelope and will not treat the replay as fresh promise evidence.", parsed.ProtocolCID, map[string]string{"field_replay_status": "not_promised"})
+		return node.newAckBytes(fromAgent, "not_promised", "I promise to remember that I already saw this exact envelope and will not treat the replay as fresh promise event.", parsed.ProtocolCID, map[string]string{"field_replay_status": "not_promised"})
 	}
 	if !node.supportsProtocol(parsed.ProtocolName) {
 		node.record("unsupported_pcid", "non_commitment", fromAgent, "no local app receive promise for "+parsed.ProtocolName)
@@ -925,12 +925,12 @@ func (node *Node) handleFrame(frameBytes []byte) ([]byte, error) {
 		return node.newAckBytes(fromAgent, "broken", "I promise I rejected this protocol promise because local app checks failed.", parsed.ProtocolCID, nil)
 	}
 	acceptedAsCandidate := isLinkDiscoveryPromise(fields) && !node.canAccept(fromAgent)
-	if evidenceUpdatesTrust(ackFields) {
+	if eventUpdatesTrust(ackFields) {
 		trustOutcome := outcomeForPromise(fields)
 		node.resolveOutstandingPromise(promiseID, promiseStatusFromOutcome(trustOutcome), "accepted inbound promise")
 		node.observeOutcome(fromAgent, trustOutcome)
 	} else {
-		node.resolveOutstandingPromise(promiseID, promiseStatusForNonTrustingEvidence(ackFields), "non-mutating inbound evidence recorded without trust change")
+		node.resolveOutstandingPromise(promiseID, promiseStatusForNonTrustingEvent(ackFields), "non-mutating inbound event recorded without trust change")
 	}
 	eventName := "message_received"
 	if acceptedAsCandidate {
@@ -952,7 +952,7 @@ func (node *Node) newAckBytes(target, outcome, promiseText string, protocolCID p
 	for key, value := range extraFields {
 		ackFields[key] = value
 	}
-	// Intent: Handler evidence may include copied request fields, but the ACK is
+	// Intent: Handler event records may include copied request fields, but the ACK is
 	// still a fresh promise by this local agent to the original sender. Source:
 	// DI-gahuh
 	ackFields["act"] = decision.ActPromise
@@ -1027,7 +1027,7 @@ func (node *Node) send(target string, fields map[string]string) error {
 	return err
 }
 
-// nextExchangeID assigns a sender-local evidence identity to each outbound
+// nextExchangeID assigns a sender-local event identity to each outbound
 // promise. Intent: Semantic duplicates can still be recognized by pCID-owned
 // fields, while exact-byte replay protection can reject a re-sent envelope whose
 // bytes are literally identical. Source: DI-sunuf
@@ -1039,9 +1039,9 @@ func (node *Node) nextExchangeID(target, protocolName string) string {
 }
 
 // sendAndReceive performs one signed promise exchange and returns the receiver's
-// ACK evidence to the local caller.
+// ACK event record to the local caller.
 // Intent: The fulfillment workflow needs concrete address, weight, label, and
-// accounting evidence from pCID handlers while the app sends only through its
+// accounting event records from pCID handlers while the app sends only through its
 // local kernel rather than dialing peer app processes directly; each outbound
 // promise is also journaled before its ACK can affect trust. Source: DI-galin;
 // DI-vujob
@@ -1104,13 +1104,13 @@ func (node *Node) sendAndReceive(target string, fields map[string]string) (parse
 	if isPcidOwnedArrayPayload(ackFields) {
 		node.record("pcid_owned_array_ack_received", "kept", target, "pcid="+ackMessage.ProtocolName+" promise_about="+ackFields["field_promise_about"]+" exact_sha256="+ackMessage.ExactHash)
 	}
-	node.recordAckEvidence(target, ackMessage)
-	if evidenceUpdatesTrust(ackFields) {
+	node.recordAckEvent(target, ackMessage)
+	if eventUpdatesTrust(ackFields) {
 		trustOutcome := outcomeForPromise(fields)
 		node.resolveOutstandingPromise(promiseID, promiseStatusFromOutcome(trustOutcome), "ack kept")
 		node.observeOutcome(target, trustOutcome)
 	} else {
-		node.resolveOutstandingPromise(promiseID, promiseStatusForNonTrustingEvidence(ackFields), "non-mutating ack evidence recorded without trust change")
+		node.resolveOutstandingPromise(promiseID, promiseStatusForNonTrustingEvent(ackFields), "non-mutating ack event recorded without trust change")
 	}
 	return ackMessage, nil
 }
@@ -1166,7 +1166,7 @@ func (node *Node) sendUnknownProtocolPromise(target string) error {
 		node.record("unknown_pcid_not_promised", "non_commitment", target, "unknown protocol CID was not promised by local receiver")
 		return nil
 	}
-	node.record("unknown_pcid_not_promised", "non_commitment", target, "unexpected kept ACK for unknown protocol was treated as suspect evidence")
+	node.record("unknown_pcid_not_promised", "non_commitment", target, "unexpected kept ACK for unknown protocol was treated as suspect event")
 	return nil
 }
 
@@ -1182,7 +1182,7 @@ func (node *Node) sendBadProofPromise(target string) error {
 		"turn":                "startup",
 		"promise":             "Mallory promises this intentionally corrupted signature is valid.",
 		"reason":              "bad proof should fail before payload semantics are trusted",
-		"field_promise_about": production.PromisePresentStorageEvidence,
+		"field_promise_about": production.PromisePresentStorageReport,
 	}
 	envelope, envelopeErr := protocol.NewEnvelope(node.Protocols.MustCID(pcid.CASStorageV1), fields, node.Agent.Name)
 	if envelopeErr != nil {
@@ -1196,7 +1196,7 @@ func (node *Node) sendBadProofPromise(target string) error {
 	}
 	// Intent: Mutate the signable payload after proof generation so the receiver
 	// can still parse the pCID and promiser fields but must reject the exact
-	// envelope proof as malformed evidence. Source: DI-sunuf
+	// envelope proof as a malformed event. Source: DI-sunuf
 	envelope.Payload = mutatedPayload
 	envelopeBytes, bytesErr := envelope.Bytes()
 	if bytesErr != nil {
@@ -1306,7 +1306,7 @@ func (node *Node) parseEnvelope(frameBytes []byte) (parsedMessage, error) {
 	}
 	// Intent: pCID-owned array decoders expose only local compatibility fields;
 	// the parser attaches the locally known protocol name for handlers that still
-	// compare evidence across legacy and migrated payloads. Source: DI-gahuh
+	// compare event records across legacy and migrated payloads. Source: DI-gahuh
 	fields["protocol"] = protocolName
 	return parsedMessage{
 		Fields:       fields,
@@ -1320,11 +1320,11 @@ func isPcidOwnedArrayPayload(fields map[string]string) bool {
 	return fields["field_payload_shape"] == "cbor_array"
 }
 
-// recordMalformedFrameEvidence extracts the promiser from a parseable but
+// recordMalformedFrameEvent extracts the promiser from a parseable but
 // unverifiable envelope when possible. Intent: A bad proof should reduce only
 // the local observer's trust in the identifiable promiser; malformed random
-// bytes still remain unattributed parse-failure evidence. Source: DI-sunuf
-func (node *Node) recordMalformedFrameEvidence(frameBytes []byte, cause error) {
+// bytes still remain unattributed parse-failure events. Source: DI-sunuf
+func (node *Node) recordMalformedFrameEvent(frameBytes []byte, cause error) {
 	envelope, parseErr := protocol.ParseEnvelope(frameBytes)
 	if parseErr != nil {
 		return
@@ -1364,7 +1364,7 @@ func (node *Node) protocolForFields(fields map[string]string) (string, protocol.
 		return pcid.UPSLabelV1, node.Protocols.MustCID(pcid.UPSLabelV1)
 	case production.PromiseIssuePrintCapability, production.PromiseRedeemPrintCapability:
 		return pcid.PrinterPortV1, node.Protocols.MustCID(pcid.PrinterPortV1)
-	case production.PromiseStoreContent, production.PromiseServeContent, production.PromiseReplicateContent, production.PromiseServeReplicaContent, production.PromiseReplicaTokenLifecycle, production.PromisePresentStorageEvidence, production.PromiseTrustRepair, production.PromiseUnsupportedVariantProbe:
+	case production.PromiseStoreContent, production.PromiseServeContent, production.PromiseReplicateContent, production.PromiseServeReplicaContent, production.PromiseReplicaTokenLifecycle, production.PromisePresentStorageReport, production.PromiseLabelFutureMalformedReport, production.PromiseUnsupportedVariantProbe:
 		return pcid.CASStorageV1, node.Protocols.MustCID(pcid.CASStorageV1)
 	case production.PromiseExecuteFunction, production.PromiseLookupComputeCache, production.PromiseProvideComputeContext, production.PromiseVerifyComputeResult:
 		return pcid.CIDComputeV1, node.Protocols.MustCID(pcid.CIDComputeV1)
@@ -1378,7 +1378,7 @@ func (node *Node) protocolForFields(fields map[string]string) (string, protocol.
 // normalizeAutonomousPromiseFields keeps live-agent free-form promises on a
 // pCID whose payload they can actually satisfy.
 // Intent: Live LLM autonomy should not regress protocol validity by selecting a
-// concrete storage/compute/evidence pCID while omitting that pCID's required
+// concrete storage/compute pCID while omitting that pCID's required
 // payload fields; unsupported capacity, pricing, or observation language remains
 // a valid relationship promise instead of becoming a broken protocol exchange.
 // Source: DI-punib
@@ -1426,11 +1426,11 @@ func autonomousProtocolPayloadSupported(protocolName string, fields map[string]s
 
 func casPayloadShapePresent(fields map[string]string) bool {
 	switch fields["field_promise_about"] {
-	case production.PromiseStoreContent, production.PromiseReplicateContent, production.PromisePresentStorageEvidence:
+	case production.PromiseStoreContent, production.PromiseReplicateContent, production.PromisePresentStorageReport:
 		return fields["field_content_cid"] != "" && fields["field_content_b64"] != ""
 	case production.PromiseServeContent, production.PromiseServeReplicaContent:
 		return fields["field_content_cid"] != "" && fields["field_token"] != ""
-	case production.PromiseTrustRepair, production.PromiseUnsupportedVariantProbe, production.PromiseReplicaTokenLifecycle:
+	case production.PromiseLabelFutureMalformedReport, production.PromiseUnsupportedVariantProbe, production.PromiseReplicaTokenLifecycle:
 		return true
 	default:
 		return false
@@ -1566,7 +1566,7 @@ func (node *Node) handleUPSLabelPromise(fields map[string]string) (map[string]st
 
 // requestPrinterPortCapability asks the local printer-port kernel role for a
 // bounded future-print promise token before any label bytes are presented.
-// Intent: The UPS label app receives promise-token evidence from the local
+// Intent: The UPS label app receives promise-token event records from the local
 // printer resource owner instead of assuming hardware access or treating the
 // message kernel as an authorization service. Source: DI-pohaj; DI-vutok
 func (node *Node) requestPrinterPortCapability() (parsedMessage, error) {
@@ -1577,7 +1577,7 @@ func (node *Node) requestPrinterPortCapability() (parsedMessage, error) {
 		"to":                               "printer_port",
 		"turn":                             "startup",
 		"promise":                          "I promise to receive printer_port's scoped future-print capability token and use it only for bounded UPS label bytes.",
-		"reason":                           "ups_label_printer needs local printer-port promise evidence before asking for hardware printing",
+		"reason":                           "ups_label_printer needs local printer-port promise event before asking for hardware printing",
 		"field_promise_about":              production.PromiseIssuePrintCapability,
 		"field_print_capability_issuee":    node.Agent.Name,
 		"field_print_capability_token_id":  tokenID,
@@ -1595,7 +1595,7 @@ func (node *Node) requestPrinterPortCapability() (parsedMessage, error) {
 // printer_port previously issued to this app.
 // Intent: Hardware access is a reciprocal promise exchange with the local
 // resource owner: the label app promises bounded bytes, and printer_port returns
-// local print evidence if its own token is still recognizable. Source: DI-pohaj;
+// local print event records if its own token is still recognizable. Source: DI-pohaj;
 // DI-vutok
 func (node *Node) redeemPrinterPortCapability(capabilityAck parsedMessage, labelBytes []byte) (parsedMessage, error) {
 	redemptionFields := map[string]string{
@@ -1603,7 +1603,7 @@ func (node *Node) redeemPrinterPortCapability(capabilityAck parsedMessage, label
 		"from":                             node.Agent.Name,
 		"to":                               "printer_port",
 		"turn":                             "startup",
-		"promise":                          "I promise to present only bounded UPS label bytes under this printer_port capability token and to receive printer_port's local print evidence.",
+		"promise":                          "I promise to present only bounded UPS label bytes under this printer_port capability token and to receive printer_port's local print event record.",
 		"reason":                           "ups_label_printer has a scoped future-print token and now asks printer_port to write exact label bytes",
 		"field_promise_about":              production.PromiseRedeemPrintCapability,
 		"field_print_capability_issuee":    node.Agent.Name,
@@ -1624,7 +1624,7 @@ func (node *Node) redeemPrinterPortCapability(capabilityAck parsedMessage, label
 // surface for future print tokens and bounded label-byte redemption.
 // Intent: Keep hardware access as voluntary local promises by the agent that
 // owns the port, while the kernel only transports exact bytes and the label app
-// only receives explicit print evidence after token redemption. Source:
+// only receives explicit print event records after token redemption. Source:
 // DI-pohaj; DI-vutok
 func (node *Node) handlePrinterPortPromise(fields map[string]string) (map[string]string, error) {
 	if node.Agent.Kind != "printer_port" {
@@ -1659,8 +1659,8 @@ func (node *Node) handlePrinterPortPromise(fields map[string]string) (map[string
 		if err != nil {
 			return nil, err
 		}
-		printEvidence := firstStringField(fields, "field_label_bytes_hex")
-		node.record("printer_port_printed", "kept", fields["from"], fmt.Sprintf("spool_id=%s label_hex_bytes=%d", spoolID, len(printEvidence)))
+		printEvent := firstStringField(fields, "field_label_bytes_hex")
+		node.record("printer_port_printed", "kept", fields["from"], fmt.Sprintf("spool_id=%s label_hex_bytes=%d", spoolID, len(printEvent)))
 		return map[string]string{
 			"field_promise_about":    production.PromiseRedeemPrintCapability,
 			"field_printer_spool_id": spoolID,
@@ -1709,7 +1709,7 @@ func (node *Node) handleAccountingPromise(fields map[string]string) (map[string]
 			Detail:       fmt.Sprintf("tracking_number=%s cost_cents=%d", trackingNumber, costCents),
 		})
 		if alreadyRecorded {
-			ackFields[duplicateShipmentEvidenceField] = "true"
+			ackFields[duplicateShipmentEventField] = "true"
 			node.record("accounting_update_duplicate", "kept", fields["from"], fmt.Sprintf("order_id=%s tracking_number=%s cost_cents=%d", orderID, trackingNumber, costCents))
 			return ackFields, nil
 		}
@@ -1723,7 +1723,7 @@ func (node *Node) handleAccountingPromise(fields map[string]string) (map[string]
 // handleCASStoragePromise implements the CAS storage pCID as voluntary promises
 // about exact content bytes, retention, replica tokens, and local corruption
 // observations.
-// Intent: CAS is concrete storage behavior and evidence; it is not an RPC
+// Intent: CAS is concrete storage behavior and event records; it is not an RPC
 // storage command or central authorization surface. Source: DI-sinur
 func (node *Node) handleCASStoragePromise(fields map[string]string) (map[string]string, error) {
 	switch fields["field_promise_about"] {
@@ -1764,7 +1764,7 @@ func (node *Node) handleCASStoragePromise(fields map[string]string) (map[string]
 				"from":                node.Agent.Name,
 				"to":                  "frank",
 				"turn":                "startup",
-				"promise":             "Bob promises Frank exact bytes for replica storage and receives only Frank's local replica evidence.",
+				"promise":             "Bob promises Frank exact bytes for replica storage and receives only Frank's local replica event.",
 				"reason":              "replication is a peer promise, not global availability",
 				"field_promise_about": production.PromiseReplicateContent,
 				"field_content_cid":   contentCID,
@@ -1853,7 +1853,7 @@ func (node *Node) handleCASStoragePromise(fields map[string]string) (map[string]
 		node.record("cas_replica_serve_promised", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" content_cid="+contentCID)
 		node.record("replica_capability_token_redeemed", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" content_cid="+contentCID)
 		node.record("capability_token_expired", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" consumed replica token is expired after redemption")
-		node.record("capability_token_renewal_requested", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" Alice asks for fresh evidence if future retrieval is needed")
+		node.record("capability_token_renewal_requested", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" Alice asks for fresh event if future retrieval is needed")
 		node.record("capability_token_renewed", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" Frank promises a fresh run-local token")
 		node.record("gc_promise_ended", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" replica serve-once token promise ended after redemption for content_cid="+contentCID)
 		node.record("gc_object_removed", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" consumed replica capability token removed from run-scoped store for content_cid="+contentCID)
@@ -1864,7 +1864,7 @@ func (node *Node) handleCASStoragePromise(fields map[string]string) (map[string]
 			"field_content_cid":   contentCID,
 			"field_content_b64":   base64.StdEncoding.EncodeToString(contentBytes),
 		}, nil
-	case production.PromisePresentStorageEvidence:
+	case production.PromisePresentStorageReport:
 		contentBytes, err := base64.StdEncoding.DecodeString(fields["field_content_b64"])
 		if err != nil {
 			return nil, err
@@ -1872,20 +1872,20 @@ func (node *Node) handleCASStoragePromise(fields map[string]string) (map[string]
 		contentCID := fields["field_content_cid"]
 		node.record("cas_verification_promised", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" receiver promises local byte/CID verification")
 		if production.VerifyContentCID(contentBytes, contentCID) {
-			return map[string]string{"field_promise_about": production.PromisePresentStorageEvidence, "field_verdict": "kept"}, nil
+			return map[string]string{"field_promise_about": production.PromisePresentStorageReport, "field_verdict": "kept"}, nil
 		}
 		node.record("cas_corrupt_bytes_rejected", "malformed", fields["from"], "pcid="+pcid.CASStorageV1+" bytes did not match content_cid="+contentCID)
-		node.record("cas_corrupt_evidence_recorded", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" local corrupt-byte evidence recorded")
-		// Intent: Corrupt CAS evidence is an observable malformed promise by an
+		node.record("cas_corrupt_report_recorded", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" local corrupt-byte event recorded")
+		// Intent: Corrupt CAS event is an observable malformed promise by an
 		// identifiable peer, so it must enter the same local trust path as bad
 		// proofs and bad compute results instead of remaining a log-only event.
 		// Source: DI-fijov
 		node.observeOutcome(fields["from"], relationship.OutcomeMalformed)
-		return map[string]string{"field_promise_about": production.PromisePresentStorageEvidence, "field_verdict": "broken"}, nil
-	case production.PromiseTrustRepair:
-		node.record("trust_repair_promise_recorded", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" future repair promise recorded as local evidence")
+		return map[string]string{"field_promise_about": production.PromisePresentStorageReport, "field_verdict": "broken"}, nil
+	case production.PromiseLabelFutureMalformedReport:
+		node.record("trust_repair_promise_recorded", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" future repair promise recorded as local events")
 		node.record("trust_repair_future_only", "non_commitment", fields["from"], "pcid="+pcid.CASStorageV1+" future repair promise is remembered but does not prove repair has already been kept")
-		return map[string]string{"field_promise_about": production.PromiseTrustRepair, "field_repair_status": "future_only"}, nil
+		return map[string]string{"field_promise_about": production.PromiseLabelFutureMalformedReport, "field_repair_status": "future_only"}, nil
 	case production.PromiseUnsupportedVariantProbe:
 		node.record("promise_variant_not_promised", "non_commitment", fields["from"], "pcid="+pcid.CASStorageV1+" unsupported storage variant not promised")
 		return map[string]string{"field_promise_about": production.PromiseUnsupportedVariantProbe, "field_variant_status": "not_promised"}, nil
@@ -1895,7 +1895,7 @@ func (node *Node) handleCASStoragePromise(fields map[string]string) (map[string]
 }
 
 // handleCIDComputePromise implements bounded CID-named compute, cache lookup,
-// and verifier evidence.
+// and verifier event records.
 // Intent: Compute results are promises over exact function/input/context bytes
 // that receivers can recompute or ask peers to observe locally. Source: DI-sinur
 func (node *Node) handleCIDComputePromise(fields map[string]string) (map[string]string, error) {
@@ -2002,8 +2002,8 @@ func (node *Node) handleCIDComputePromise(fields map[string]string) (map[string]
 
 // handleIdentityKeyPromise records the narrow identity/key promises currently
 // modeled by POC14.
-// Intent: Key rotation is identity protocol behavior, not generic evidence
-// reporting or a new top-level action kind. Source: DI-vipih
+// Intent: Key rotation is identity protocol behavior, not a generic report pCID
+// or a new top-level action kind. Source: DI-vipih
 func (node *Node) handleIdentityKeyPromise(fields map[string]string) (map[string]string, error) {
 	switch fields["field_promise_about"] {
 	case production.PromiseRotateSigningKey:
@@ -2019,7 +2019,7 @@ func (node *Node) handleIdentityKeyPromise(fields map[string]string) (map[string
 	}
 }
 
-func (node *Node) recordAckEvidence(target string, message parsedMessage) {
+func (node *Node) recordAckEvent(target string, message parsedMessage) {
 	switch message.Fields["field_promise_about"] {
 	case production.PromiseWeighPackage:
 		node.record("package_weight_received", "kept", target, "weight_ounces="+message.Fields["field_weight_ounces"])
@@ -2028,7 +2028,7 @@ func (node *Node) recordAckEvidence(target string, message parsedMessage) {
 	case production.PromisePrintLabel:
 		node.record("shipping_label_received", "kept", target, "tracking_number="+message.Fields["field_tracking_number"]+" cost_cents="+message.Fields["field_cost_cents"])
 	case production.PromiseShipmentUpdate:
-		if message.Fields[duplicateShipmentEvidenceField] == "true" {
+		if message.Fields[duplicateShipmentEventField] == "true" {
 			node.record("accounting_update_duplicate_confirmed", "kept", target, "tracking_number="+message.Fields["field_tracking_number"]+" cost_cents="+message.Fields["field_cost_cents"])
 			return
 		}
@@ -2079,12 +2079,12 @@ func (node *Node) recordAckEvidence(target string, message parsedMessage) {
 		node.record("compute_result_received", "kept", target, "pcid="+pcid.CIDComputeV1+" result_cid="+message.Fields["field_result_cid"])
 	case production.PromiseVerifyComputeResult:
 		// Intent: Verification reports are cid_compute_v1 promises about a
-		// compute result, not generic evidence_report_v1 messages. Source:
+		// compute result, not generic report messages. Source:
 		// DI-vipih
 		node.record("compute_verification_report_received", "kept", target, "pcid="+pcid.CIDComputeV1+" verifier verdict="+message.Fields["field_verdict"]+" result_cid="+message.Fields["field_subject_result_cid"])
 		if message.Fields["field_verdict"] == "disagree" {
 			node.record("compute_verifier_disagreement", "non_commitment", target, "pcid="+pcid.CIDComputeV1+" verifier disagreement received")
-			node.record("compute_disagreement_resolved_locally", "kept", message.Fields["field_subject_peer"], "pcid="+pcid.CIDComputeV1+" Alice resolves disagreement by local recompute plus Dave evidence")
+			node.record("compute_disagreement_resolved_locally", "kept", message.Fields["field_subject_peer"], "pcid="+pcid.CIDComputeV1+" Alice resolves disagreement by local recompute plus Dave event")
 			return
 		}
 		if message.Fields["field_verdict"] == "kept" {
@@ -2110,13 +2110,13 @@ func (node *Node) verifyComputeAckLocally(message parsedMessage, target string) 
 	if err := verifyComputeResultFields(badFields); err == nil {
 		node.record("compute_result_locally_rejected", "malformed", target, "pcid="+pcid.CIDComputeV1+" bad-result probe unexpectedly verified")
 		// Intent: A peer that promises a semantically bad compute result creates
-		// local negative trust evidence even when the malformed bytes are only a
+		// local negative trust event record even when the malformed bytes are only a
 		// probe inside an otherwise parseable response. Source: DI-sunuf
 		node.observeOutcome(target, relationship.OutcomeMalformed)
 		return nil
 	}
 	node.record("compute_result_locally_rejected", "malformed", target, "pcid="+pcid.CIDComputeV1+" local recompute rejected bad-result probe")
-	// Intent: Local recomputation is Alice's own evidence that the compute
+	// Intent: Local recomputation is Alice's own event record that the compute
 	// promiser exposed a malformed result candidate; this affects Alice's trust
 	// in that promiser rather than any global authority. Source: DI-sunuf
 	node.observeOutcome(target, relationship.OutcomeMalformed)
@@ -2360,7 +2360,7 @@ func (node *Node) canDialTarget(peerName string, fields map[string]string) bool 
 
 // canAcceptFrom reports whether this node currently promises to accept one TCP
 // exchange from a peer. Intent: Candidate-peer discovery is a narrow voluntary
-// acceptance promise, and future repair after malformed evidence is similarly
+// acceptance promise, and future repair after malformed events is similarly
 // narrow. Neither creates broad permission or a global routing rule.
 // Source: DI-timah; DI-fijov
 func (node *Node) canAcceptFrom(peerName string, fields map[string]string) bool {
@@ -2415,7 +2415,7 @@ func (node *Node) observeOutcome(peerName string, outcome relationship.Outcome) 
 		node.record("trust_recovery_delayed", "kept", peerName, fmt.Sprintf("outcome=%s trust=%d caution=%d prior_caution=%d", outcome, trustScore, cautionScore, priorCaution))
 	}
 	// Intent: POC14 keeps POC12 relationship-transition events and also emits
-	// the inherited POC14 analyzer's `trust_updated` evidence name so future
+	// the inherited POC14 analyzer's `trust_updated` event name so future
 	// POCs cannot silently drop trust behavior while refactoring analyzers.
 	// Source: DI-sinur
 	node.record("trust_updated", string(outcome), peerName, fmt.Sprintf("outcome=%s trust=%d caution=%d transition=%s", outcome, trustScore, cautionScore, transition))
@@ -2423,21 +2423,21 @@ func (node *Node) observeOutcome(peerName string, outcome relationship.Outcome) 
 
 // rememberOutstandingPromise adds one exact promise record to this app's local
 // journal before later ACK or receive handling can resolve it.
-// Intent: Trust changes should be explainable from a local promise-evidence
+// Intent: Trust changes should be explainable from a local promise-event
 // record rather than from transport success, kernel routing, or local resource
 // pressure alone. Source: DI-vujob
 func (node *Node) rememberOutstandingPromise(peerName, protocolName, exactHash string, fields map[string]string) string {
 	fingerprint := promiseRecordKey(peerName, protocolName, "", fields)
 	record := promiseRecord{
-		Key:              promiseRecordKey(peerName, protocolName, exactHash, fields),
-		Fingerprint:      fingerprint,
-		Peer:             peerName,
-		ProtocolName:     protocolName,
-		ExactHash:        exactHash,
-		PromiseAbout:     fields["field_promise_about"],
-		PromiseText:      fields["promise"],
-		ExpectedEvidence: fields["reason"],
-		Status:           promiseStatusOutstanding,
+		Key:           promiseRecordKey(peerName, protocolName, exactHash, fields),
+		Fingerprint:   fingerprint,
+		Peer:          peerName,
+		ProtocolName:  protocolName,
+		ExactHash:     exactHash,
+		PromiseAbout:  fields["field_promise_about"],
+		PromiseText:   fields["promise"],
+		ExpectedEvent: fields["reason"],
+		Status:        promiseStatusOutstanding,
 	}
 	node.mu.Lock()
 	node.promiseJournal[record.Key] = record
@@ -2448,7 +2448,7 @@ func (node *Node) rememberOutstandingPromise(peerName, protocolName, exactHash s
 
 // resolveOutstandingPromise records the local outcome of a previously journaled
 // promise without itself deciding whether peer trust should change.
-// Intent: Promise resolution evidence and trust mutation are deliberately
+// Intent: Promise resolution events and trust mutation are deliberately
 // separate so duplicate, local-failure, and non-commitment cases stay visible
 // without being treated as broken peer promises. Source: DI-vujob
 func (node *Node) resolveOutstandingPromise(recordKey string, status promiseStatus, detail string) {
@@ -2471,8 +2471,8 @@ func (node *Node) resolveOutstandingPromise(recordKey string, status promiseStat
 
 // recordLocalResourceExhaustion records this app's own inability or refusal to
 // spend local resources without changing trust in the target peer.
-// Intent: Alice exhausting Alice's budget or capacity is evidence about Alice's
-// local state, not evidence that Bob kept or broke a promise. Source: DI-vujob
+// Intent: Alice exhausting Alice's budget or capacity is an event about Alice's
+// local state, not an event that Bob kept or broke a promise. Source: DI-vujob
 func (node *Node) recordLocalResourceExhaustion(target string, fields map[string]string, detail string) {
 	resourceName := resourceField(fields)
 	if resourceName == "" {
@@ -2482,10 +2482,10 @@ func (node *Node) recordLocalResourceExhaustion(target string, fields map[string
 }
 
 // rememberNonCommitment stores one receiver `not_promised` outcome as local
-// restraint evidence for later turns in the same POC14 run.
+// restraint event record for later turns in the same POC14 run.
 // Intent: A peer that did not promise the requested exchange should not be
 // asked again for the same target/protocol/promise-about tuple until a later
-// design adds an explicit new-evidence release rule. Source: DI-zapab
+// design adds an explicit new-event release rule. Source: DI-zapab
 func (node *Node) rememberNonCommitment(target, protocolName string, fields map[string]string, detail string) {
 	promiseAbout := fields["field_promise_about"]
 	record := nonCommitmentRecord{
@@ -2501,7 +2501,7 @@ func (node *Node) rememberNonCommitment(target, protocolName string, fields map[
 }
 
 // shouldSuppressNonCommittedPromise checks whether this app already has local
-// non-commitment evidence for the same semantic promise target.
+// non-commitment event record for the same semantic promise target.
 // Intent: Suppression turns a prior `not_promised` into Alice's restraint, not
 // Bob's punishment; it records no peer-trust transition. Source: DI-zapab
 func (node *Node) shouldSuppressNonCommittedPromise(target string, fields map[string]string) bool {
@@ -2519,7 +2519,7 @@ func (node *Node) shouldSuppressNonCommittedPromise(target string, fields map[st
 }
 
 // suppressRepeatedPromise avoids sending the same live-agent promise text to the
-// same target/protocol once this app already has journal evidence for it.
+// same target/protocol once this app already has a journal event for it.
 // Intent: Repetition after a prior promise outcome creates pressure that looks
 // RPC-like; POC14 should instead record local non-commitment and wait for a new
 // promise meaning. Source: DI-vujob
@@ -2546,11 +2546,11 @@ func repairErrDetail(validateErr error) string {
 	return "repaired common live decision formatting issue: " + validateErr.Error()
 }
 
-// recordDecisionError records LLM/provider/runtime failures as local evidence,
+// recordDecisionError records LLM/provider/runtime failures as local event records,
 // not as broken peer promises.
 // Intent: A transient provider failure or runtime decision failure does not mean
-// any peer broke a promise, so it should not enter peer trust as broken
-// evidence. Source: DI-jinoz
+// any peer broke a promise, so it should not enter peer trust as a broken
+// event record. Source: DI-jinoz
 func (node *Node) recordDecisionError(err error) {
 	node.record("decision_error", "non_commitment", "", "local provider/runtime error: "+err.Error())
 }
@@ -2565,8 +2565,8 @@ func (err ackOutcomeError) Error() string {
 
 // outcomeForSendError converts a transport or ACK failure into the peer-trust
 // outcome it actually supports.
-// Intent: A receiver's `not_promised` ACK is evidence of non-commitment, not a
-// broken peer promise; local transport failures are not peer evidence at all.
+// Intent: A receiver's `not_promised` ACK is an event record of non-commitment, not a
+// broken peer promise; local transport failures are not peer events at all.
 // Source: DI-jinoz; DI-vujob
 func outcomeForSendError(err error) (relationship.Outcome, bool) {
 	var ackErr ackOutcomeError
@@ -2613,18 +2613,18 @@ func outcomeForPromise(fields map[string]string) relationship.Outcome {
 	return relationship.OutcomeKept
 }
 
-// evidenceUpdatesTrust reports whether ACK payload evidence should change peer
-// trust or merely be recorded as already-seen local evidence.
+// eventUpdatesTrust reports whether an ACK payload event should change peer
+// trust or merely be recorded as already-seen local events.
 // Intent: Duplicate shipment-update confirmations should remain visible in logs
 // without repeatedly increasing trust for the same order/tracking/cost
 // checkpoint. Negative ACK payload verdicts and future-only repair promises
 // should not inflate local trust merely because the receiver returned a
 // parseable ACK. Source: DI-jinoz; DI-punib; DI-fijov
-func evidenceUpdatesTrust(fields map[string]string) bool {
+func eventUpdatesTrust(fields map[string]string) bool {
 	if fields == nil {
 		return true
 	}
-	if fields[duplicateShipmentEvidenceField] == "true" {
+	if fields[duplicateShipmentEventField] == "true" {
 		return false
 	}
 	switch fields["field_verdict"] {
@@ -2658,7 +2658,7 @@ func promiseRecordKey(peerName, protocolName, exactHash string, fields map[strin
 // promiseStatusOutcome maps journal-only statuses into the small outcome
 // vocabulary used by existing POC14 logs and analyzer summaries.
 // Intent: Local failures and non-commitments should remain non-commitment in
-// reports, while duplicate evidence stays kept-but-non-mutating. Source:
+// reports, while duplicate events stay kept-but-non-mutating. Source:
 // DI-vujob
 func promiseStatusOutcome(status promiseStatus) string {
 	switch status {
@@ -2691,17 +2691,17 @@ func promiseStatusFromOutcome(outcome relationship.Outcome) promiseStatus {
 	}
 }
 
-// promiseStatusForNonTrustingEvidence classifies ACK payload evidence that is
+// promiseStatusForNonTrustingEvent classifies ACK payload events that are
 // visible but deliberately does not update peer trust.
 // Intent: Refusals, cache misses, replay refusals, future-only repair, and
 // unsupported variants are peer non-commitments rather than duplicate kept
-// evidence; only semantic checkpoints such as duplicate shipment updates should
-// resolve as duplicate evidence. Source: DI-sihuz
-func promiseStatusForNonTrustingEvidence(fields map[string]string) promiseStatus {
+// events; only semantic checkpoints such as duplicate shipment updates should
+// resolve as duplicate events. Source: DI-sihuz
+func promiseStatusForNonTrustingEvent(fields map[string]string) promiseStatus {
 	if fields == nil {
 		return promiseStatusDuplicate
 	}
-	if fields[duplicateShipmentEvidenceField] == "true" {
+	if fields[duplicateShipmentEventField] == "true" {
 		return promiseStatusDuplicate
 	}
 	switch fields["field_verdict"] {
@@ -2735,7 +2735,7 @@ func nonCommitmentKey(peerName, protocolName, promiseAbout string) string {
 
 // rememberCheckpoint records a reusable local checkpoint and reports whether it
 // was already present.
-// Intent: Replayed evidence should stay auditable while avoiding repeated trust
+// Intent: Replayed events should stay auditable while avoiding repeated trust
 // mutation for the same app-local checkpoint. Source: DI-zapab
 func (node *Node) rememberCheckpoint(record checkpointRecord) bool {
 	node.mu.Lock()
@@ -2758,7 +2758,7 @@ func (node *Node) checkpointAlreadySeen(key string) bool {
 
 // checkpointKey builds stable local checkpoint identifiers from pCID-selected
 // protocol meaning plus deterministic subject fields.
-// Intent: Checkpoint identity is local evidence over promise content, not a
+// Intent: Checkpoint identity is local event records over promise content, not a
 // universal transaction ID or global command key. Source: DI-zapab
 func checkpointKey(protocolName, promiseAbout string, parts ...string) string {
 	keyParts := append([]string{protocolName, promiseAbout}, parts...)
@@ -2780,11 +2780,11 @@ func isLinkDiscoveryPromise(fields map[string]string) bool {
 
 // isLowRiskCandidatePromise recognizes promise meanings a peer may voluntarily
 // receive even before ordinary direct-trust adjacency exists.
-// Intent: A future-repair promise after malformed evidence is low risk enough to
+// Intent: A future-repair promise after malformed events is low risk enough to
 // hear, but it still does not prove repair or permit arbitrary follow-up
 // messages. Source: DI-fijov
 func isLowRiskCandidatePromise(fields map[string]string) bool {
-	return isLinkDiscoveryPromise(fields) || fields["field_promise_about"] == production.PromiseTrustRepair
+	return isLinkDiscoveryPromise(fields) || fields["field_promise_about"] == production.PromiseLabelFutureMalformedReport
 }
 
 func containsName(names []string, wantedName string) bool {
@@ -2831,7 +2831,7 @@ func (node *Node) checkLocalResourcePromise(fields map[string]string) error {
 
 // checkIncomingResourcePromise rejects inbound resource promises that cannot be
 // safely interpreted by this bounded POC receiver.
-// Intent: Treat malformed or extreme resource promises as local evidence about
+// Intent: Treat malformed or extreme resource promises as local events about
 // the sender, not as commands the receiver must obey. Source: DI-timah
 func (node *Node) checkIncomingResourcePromise(fields map[string]string) error {
 	resourceType := resourceField(fields)
@@ -2914,10 +2914,10 @@ func (node *Node) record(eventName, outcome, peer, detail string) {
 	}
 	node.mu.Lock()
 	node.events = append(node.events, event)
-	if node.evidenceOutcomeCounts == nil {
-		node.evidenceOutcomeCounts = make(map[string]int)
+	if node.eventOutcomeCounts == nil {
+		node.eventOutcomeCounts = make(map[string]int)
 	}
-	node.evidenceOutcomeCounts[outcome]++
+	node.eventOutcomeCounts[outcome]++
 	node.mu.Unlock()
 	encoded, err := json.Marshal(event)
 	if err != nil {
@@ -3043,18 +3043,18 @@ func (node *Node) loadRunScopedState() error {
 	node.nonCommitmentJournal = copyNonCommitmentMapOrEmpty(state.NonCommitmentJournal)
 	node.checkpointJournal = copyCheckpointMapOrEmpty(state.CheckpointJournal)
 	node.promiseJournal = copyPromiseMapOrEmpty(state.PromiseJournal)
-	node.evidenceOutcomeCounts = copyIntMapOrEmpty(state.EvidenceOutcomeCounts)
+	node.eventOutcomeCounts = copyIntMapOrEmpty(state.EventOutcomeCounts)
 	node.replayJournal = copyMapOrEmpty(state.ReplayJournal)
 	node.mu.Unlock()
 	node.record("run_scoped_store_loaded", "kept", "", fmt.Sprintf("cas=%d tokens=%d compute=%d checkpoints=%d promises=%d replay=%d", len(casObjects), len(state.CapabilityTokens), len(state.ComputeCache), len(state.CheckpointJournal), len(state.PromiseJournal), len(state.ReplayJournal)))
 	node.record("cas_run_store_loaded", "kept", "", fmt.Sprintf("cas_objects=%d", len(casObjects)))
-	node.record("evidence_run_store_loaded", "kept", "", fmt.Sprintf("promise_journal=%d checkpoint_journal=%d non_commitments=%d receiver_non_commitments=%d replay=%d", len(state.PromiseJournal), len(state.CheckpointJournal), state.EvidenceOutcomeCounts[string(relationship.OutcomeNonCommitment)], len(state.NonCommitmentJournal), len(state.ReplayJournal)))
+	node.record("event_run_store_loaded", "kept", "", fmt.Sprintf("promise_journal=%d checkpoint_journal=%d non_commitments=%d receiver_non_commitments=%d replay=%d", len(state.PromiseJournal), len(state.CheckpointJournal), state.EventOutcomeCounts[string(relationship.OutcomeNonCommitment)], len(state.NonCommitmentJournal), len(state.ReplayJournal)))
 	node.record("compute_cache_run_store_loaded", "kept", "", fmt.Sprintf("compute_cache=%d", len(state.ComputeCache)))
 	return nil
 }
 
 // saveRunScopedState writes restartable run state through a temporary file and
-// rename. Intent: Partial writes should not corrupt the app's local evidence if
+// rename. Intent: Partial writes should not corrupt the app's local events if
 // a process is killed mid-save, and the saved state remains scoped to this run
 // root rather than becoming cross-run truth. Source: DI-sunuf
 func (node *Node) saveRunScopedState() error {
@@ -3076,7 +3076,7 @@ func (node *Node) saveRunScopedState() error {
 	}
 	node.record("run_scoped_store_saved", "kept", "", fmt.Sprintf("cas=%d tokens=%d compute=%d checkpoints=%d promises=%d replay=%d", len(state.CASObjects), len(state.CapabilityTokens), len(state.ComputeCache), len(state.CheckpointJournal), len(state.PromiseJournal), len(state.ReplayJournal)))
 	node.record("cas_run_store_saved", "kept", "", fmt.Sprintf("cas_objects=%d", len(state.CASObjects)))
-	node.record("evidence_run_store_saved", "kept", "", fmt.Sprintf("promise_journal=%d checkpoint_journal=%d non_commitments=%d receiver_non_commitments=%d replay=%d", len(state.PromiseJournal), len(state.CheckpointJournal), state.EvidenceOutcomeCounts[string(relationship.OutcomeNonCommitment)], len(state.NonCommitmentJournal), len(state.ReplayJournal)))
+	node.record("event_run_store_saved", "kept", "", fmt.Sprintf("promise_journal=%d checkpoint_journal=%d non_commitments=%d receiver_non_commitments=%d replay=%d", len(state.PromiseJournal), len(state.CheckpointJournal), state.EventOutcomeCounts[string(relationship.OutcomeNonCommitment)], len(state.NonCommitmentJournal), len(state.ReplayJournal)))
 	node.record("compute_cache_run_store_saved", "kept", "", fmt.Sprintf("compute_cache=%d", len(state.ComputeCache)))
 	return nil
 }
@@ -3089,20 +3089,20 @@ func (node *Node) exportRunScopedState() runScopedState {
 		casObjects[contentCID] = base64.StdEncoding.EncodeToString(contentBytes)
 	}
 	return runScopedState{
-		Version:               1,
-		CASObjects:            casObjects,
-		CapabilityTokens:      copyMapOrEmpty(node.capabilityTokens),
-		ComputeCache:          copyNestedMapOrEmpty(node.computeCache),
-		NonCommitmentJournal:  copyNonCommitmentMapOrEmpty(node.nonCommitmentJournal),
-		CheckpointJournal:     copyCheckpointMapOrEmpty(node.checkpointJournal),
-		PromiseJournal:        copyPromiseMapOrEmpty(node.promiseJournal),
-		EvidenceOutcomeCounts: copyIntMapOrEmpty(node.evidenceOutcomeCounts),
-		ReplayJournal:         copyMapOrEmpty(node.replayJournal),
+		Version:              1,
+		CASObjects:           casObjects,
+		CapabilityTokens:     copyMapOrEmpty(node.capabilityTokens),
+		ComputeCache:         copyNestedMapOrEmpty(node.computeCache),
+		NonCommitmentJournal: copyNonCommitmentMapOrEmpty(node.nonCommitmentJournal),
+		CheckpointJournal:    copyCheckpointMapOrEmpty(node.checkpointJournal),
+		PromiseJournal:       copyPromiseMapOrEmpty(node.promiseJournal),
+		EventOutcomeCounts:   copyIntMapOrEmpty(node.eventOutcomeCounts),
+		ReplayJournal:        copyMapOrEmpty(node.replayJournal),
 	}
 }
 
 // recordRunScopedRetentionAndGC records retention and deletion as local promise
-// evidence. Intent: GC and backpressure are not central policy; each agent
+// event records. Intent: GC and backpressure are not central policy; each agent
 // promises how it will keep, remove, or decline local objects under run-end,
 // token-expiry, disk-pressure, and superseded-checkpoint conditions. Source:
 // DI-sunuf
@@ -3123,18 +3123,18 @@ func (node *Node) recordRetentionPromiseBroken(subject, detail string) {
 
 // rememberReplayEnvelope keeps a local exact-byte replay window for received
 // envelopes. Intent: Replays are not commands to punish a peer globally; they are
-// local evidence that the same exact promise bytes should not be counted as fresh
-// promise evidence again. Source: DI-sunuf
+// local event records that the same exact promise bytes should not be counted as fresh
+// promise event records again. Source: DI-sunuf
 func (node *Node) rememberReplayEnvelope(peerName, protocolName, exactHash string) bool {
 	node.recordReplayWindowPromise(protocolName)
 	node.mu.Lock()
-	priorEvidence, replayed := node.replayJournal[exactHash]
+	priorEvent, replayed := node.replayJournal[exactHash]
 	if !replayed {
 		node.replayJournal[exactHash] = peerName + "|" + protocolName
 	}
 	node.mu.Unlock()
 	if replayed {
-		node.record("replay_envelope_rejected", "non_commitment", peerName, "pcid="+protocolName+" exact_sha256="+exactHash+" prior="+priorEvidence)
+		node.record("replay_envelope_rejected", "non_commitment", peerName, "pcid="+protocolName+" exact_sha256="+exactHash+" prior="+priorEvent)
 		return true
 	}
 	node.record("replay_envelope_recorded", "kept", peerName, "pcid="+protocolName+" exact_sha256="+exactHash)
@@ -3227,7 +3227,7 @@ func (node *Node) loadRelationshipState() error {
 // saveRelationshipState writes the local trust snapshot via a temporary file
 // and rename so readers never see a partial JSON document.
 // Intent: Persist relationship memory after each run while keeping incomplete
-// writes from corrupting the next run's local evidence. Source: DI-timah
+// writes from corrupting the next run's local events. Source: DI-timah
 func (node *Node) saveRelationshipState() error {
 	statePath := node.relationshipStatePath()
 	if err := os.MkdirAll(filepath.Dir(statePath), 0o755); err != nil {
@@ -3253,7 +3253,7 @@ func (node *Node) saveRelationshipState() error {
 
 // writeDoneMarker records idempotent local completion for one agent.
 // Intent: Re-running or restarting a bounded POC node should not turn an
-// already-written completion marker into broken evidence. Source: DI-timah
+// already-written completion marker into a broken event. Source: DI-timah
 func (node *Node) writeDoneMarker() error {
 	donePath := filepath.Join(node.runDir(), node.Agent.Name+".done")
 	if _, err := os.Stat(donePath); err == nil {
@@ -3347,7 +3347,7 @@ func (node *Node) runMonitor(ctx context.Context) error {
 // writeMonitorDoneMarker writes the observer marker that lets other completed
 // nodes exit without making the monitor a global authority over the protocol
 // run.
-// Intent: Monitor success, latency, or provider failure is local evidence about
+// Intent: Monitor success, latency, or provider failure is a local event about
 // the observer; it must not retroactively break a completed promise exchange.
 // Source: DI-jupob
 func (node *Node) writeMonitorDoneMarker(outcome, detail string) error {
@@ -3366,7 +3366,7 @@ func (node *Node) writeMonitorDoneMarker(outcome, detail string) error {
 }
 
 // drainInflight waits briefly for active receive handlers before done/monitor
-// evidence is finalized.
+// event records are finalized.
 // Intent: Preserve receipts that were already accepted without letting shutdown
 // hang indefinitely. Source: DI-timah
 func (node *Node) drainInflight(ctx context.Context) {
@@ -3458,8 +3458,8 @@ func (node *Node) allTurnsDone() bool {
 
 func (node *Node) readAllEvents() ([]decision.Event, error) {
 	var events []decision.Event
-	// Intent: The observer-only monitor should see app-local evidence and
-	// kernel-local operational evidence without giving the kernel authority over
+	// Intent: The observer-only monitor should see app-local events and
+	// kernel-local operational event records without giving the kernel authority over
 	// trust interpretation. Source: DI-galin
 	logPaths, globErr := filepath.Glob(filepath.Join(node.runDir(), "*.jsonl"))
 	if globErr != nil {

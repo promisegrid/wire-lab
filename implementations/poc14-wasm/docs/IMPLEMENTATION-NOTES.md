@@ -12,16 +12,16 @@ superset of prior POCs unless a scoped DI explicitly says otherwise. Source:
   named `poc14` / `poc14-run`.
 - Peggy and Victor were added to `config.example.json` in a new `wasm-stdio`
   container.
-- `poc14-wasm-agent` records WASM module-boundary evidence without adding a WASM
+- `poc14-wasm-agent` records WASM module-runtime adapter events without adding a WASM
   host-call RPC surface.
 - `poc14-stdio-adapter` and `poc14-stdio-worker` record stdio-only worker
   messaging while preserving exact PromiseGrid envelopes.
-- `poc14-analyze` now reports `heterogeneous_boundary_counts`,
+- `poc14-analyze` now reports `runtime_adapter_event_counts`,
   `decentralized_monitor_counts`, `migration_counts`, `restart_counts`, and
   score dimensions for `boundary`, `monitoring`, `migration`, and `restart`.
 - Scripted `cas_storage_v1` and `cid_compute_v1` messages now use pCID-owned
   CBOR array payloads on the wire, with `field_*` compatibility projections only
-  inside local handlers and analyzer evidence. Source: `DI-gahuh`.
+  inside local handlers and analyzer event records. Source: `DI-gahuh`.
 - Peggy and Victor now each send one useful routed `relationship_v1` promise to
   Dave so the heterogeneous-boundary agents do more than record boundary
   existence. Source: `DI-pamob`.
@@ -37,5 +37,5 @@ superset of prior POCs unless a scoped DI explicitly says otherwise. Source:
 - POC14 does not replace app-local trust judgment with kernel or analyzer
   judgment.
 - POC14 does not implement real multi-hop forwarding; it records route-candidate
-  and route-exclusion evidence so POC15 can implement forwarding without
+  and route-exclusion event so POC15 can implement forwarding without
   pretending to own a global route view.

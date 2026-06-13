@@ -1,13 +1,13 @@
 # poc14-wasm
 
-`poc14-wasm` is executable POC evidence for PromiseGrid storage, compute,
-kernel, shipping, live-agent, WASM-boundary, stdio-boundary, and decentralized
+`poc14-wasm` is executable POC event for PromiseGrid storage, compute,
+kernel, shipping, live-agent, WASM-adapter, stdio-adapter, and decentralized
 monitoring behavior. It is intentionally a superset of POC13: it keeps POC11's
 autonomous sparse-mesh relationship/economics pressure, POC12's separate
 app/kernel processes and shipping/device workflow, and POC13's CAS, compute,
 replica recovery, token lifecycle, verifier disagreement, run-scoped durability,
 retention/GC, backpressure, rate-limit, replay protection, bounded trust, and
-dynamic topology gates. POC14 adds Peggy as a WASM-boundary process, Victor as a
+dynamic topology gates. POC14 adds Peggy as a WASM-adapter process, Victor as a
 stdio-worker process behind a local adapter, and analyzer gates for
 decentralized monitoring signals that do not assume a production-wide observer.
 Source: `DI-sihuz`; `DI-sifot`; `DI-fimoh`; `DI-lulof`; `DI-linof`.
@@ -32,67 +32,67 @@ Source: `DI-sihuz`; `DI-sifot`; `DI-fimoh`; `DI-lulof`; `DI-linof`.
   Source: `DI-linof`.
 - One top-level semantic act, `promise`; workflow steps are payload meanings,
   not RPC verbs.
-- Explicit direct TCP relationship transition evidence:
+- Explicit direct TCP relationship transition event:
   `direct_peer_added`, `direct_peer_removed`, and `direct_peer_unchanged`.
-- Corrected promise evidence semantics: ordinary `not_promised` /
-  `non_commitment` evidence is neutral rather than broken peer-promise
-  evidence, provider/runtime decision failures stay local, and duplicate
+- Corrected promise event semantics: ordinary `not_promised` /
+  `non_commitment` event is neutral rather than broken peer-promise
+  event, provider/runtime decision failures stay local, and duplicate
   shipment updates are checkpointed without repeated trust inflation.
   Source: `DI-jinoz`.
 - App-local promise journal: POC14 now records an outstanding promise before
-  applying kept/broken/malformed trust evidence, separates `send_unavailable`
+  applying kept/broken/malformed trust event, separates `send_unavailable`
   from `send_not_promised`, suppresses repeated live-agent promises, and keeps
   local budget/capacity exhaustion out of peer trust. Source: `DI-vujob`.
-- Sender-side non-commitment restraint: receiver `not_promised` evidence is
+- Sender-side non-commitment restraint: receiver `not_promised` event is
   remembered in an app-local `nonCommitmentJournal`, and later same-run semantic
   retries are recorded as `promise_not_promised_suppressed` without changing
   peer trust. Generic app-local checkpoints now use `checkpointJournal` rather
   than a shipment-only map. Source: `DI-zapab`.
 - Local hardware promise tokens: the UPS label printer must ask the local
   `printer_port` resource owner for a scoped future-print promise token, then
-  redeem that token with bounded label bytes before it can return print evidence
+  redeem that token with bounded label bytes before it can return print event records
   to fulfillment. Source: `DI-pohaj`; `DI-vutok`.
 - CAS and compute protocol promises: Alice stores exact content bytes with Bob,
   Bob replicates to Frank, Alice retrieves by primary and replica promise-token
-  evidence, Alice asks Carol for CID-named function execution, Dave caches and
+  event, Alice asks Carol for CID-named function execution, Dave caches and
   verifies the result, Grace supplies disagreement pressure, and Mallory sends
   corrupt bytes, an unknown pCID, an unsupported variant, a bad proof, a key
   rotation promise, and a capacity probe. Source: `DI-sinur`.
 - Run-scoped durability promises: apps persist CAS objects, compute cache
-  checkpoints, capability tokens, replay windows, and local evidence journals
+  checkpoints, capability tokens, replay windows, and local events journals
   under the current run root so an app can recover inside one run, while
   `scripts/run-clean.sh` remains the experiment boundary that resets state.
   Source: `DI-sunuf`.
-- Retention, GC, backpressure, rate-limit, and replay evidence: apps promise
+- Retention, GC, backpressure, rate-limit, and replay event: apps promise
   local retain-until/delete-after/token-expiry/disk-pressure behavior, record
   retained/removed/ended/broken GC cases, model sender and receiver rate limits
   as reciprocal self-promises, and reject exact envelope or serve-once token
-  replays as local non-commitment evidence. Source: `DI-sunuf`.
-- POC14 hardening evidence: saved evidence summaries count all local
+  replays as local non-commitment event records. Source: `DI-sunuf`.
+- POC14 hardening event: saved event summaries count all local
   non-commitment outcomes, non-mutating ACKs distinguish true duplicates from
   refusals/cache misses/replay refusals/future-only repair, trust scores stay on
   a bounded local scale, recovery caution is analyzer-visible, and dynamic TCP
   topology changes affect real app/kernel send reachability. Source:
   `DI-sihuz`.
 - Superset analyzer gates: `poc14-analyze` now fails if inherited POC11/POC12
-  behavior, POC14 storage/compute evidence, run-scoped durability, retention/GC,
-  pressure, rate-limit, or replay evidence disappears. Source: `DI-sinur`;
+  behavior, POC14 storage/compute event records, run-scoped durability, retention/GC,
+  pressure, rate-limit, or replay event records disappear. Source: `DI-sinur`;
   `DI-sunuf`; `DI-sihuz`.
 - Observer-only monitor lifecycle: completed nodes wait for `monitor.done` using
   a config-derived provider/turn/grace budget, and a completed run can still
   write the non-authoritative marker if the observer report fails. Source:
   `DI-jupob`.
-- Decentralized monitoring evidence: POC14 records local evidence summaries,
+- Decentralized monitoring event: POC14 records local events summaries,
   peer-carried attestations, bearer-token exchange-rate signals, relationship
   topology signals, and voluntary gossip as ordinary local promises rather than
   global monitor facts. Source: `DI-lulof`.
 - Local hard trust boundaries: Alice records a permanent local distrust decision
   about Mallory and a local promise that Alice's inbound/outbound traffic should
   not transit Mallory. The ledger now blocks Alice's future Mallory sends and
-  rejects route candidates with Mallory as a transit hop. This is local evidence
+  rejects route candidates with Mallory as a transit hop. This is local events
   and local route choice, not a network-wide ban or authorization policy. Source:
   `DI-kinaf`; `DI-dubih`.
-- Mixed-version and restart evidence: POC14 records local pCID migration
+- Mixed-version and restart event records: POC14 records local pCID migration
   promises and same-run restart/recovery promises so future work can test
   protocol evolution and process crashes without relying on cross-run state.
   Source: `DI-linof`.
@@ -126,35 +126,35 @@ runtime boundary. Source: `DI-vipih`; `DI-gahuh`.
   live LLM relationship turns. It sends shipping pCIDs but receives only the
   relationship pCID in this POC.
 - `poc14-postal-scale`: deterministic app for `postal_scale_v1`; promises
-  package weight evidence only.
+  package weight event records only.
 - `poc14-ups-label-printer`: deterministic app for `ups_label_v1`; promises
-  label, cost, and tracking evidence only after it receives and redeems a local
+  label, cost, and tracking event records only after it receives and redeems a local
   printer-port capability-promise token.
 - `poc14-printer-port`: deterministic app for `printer_port_v1`; represents
   the local hardware-access kernel role for a simulated USB printer port. It
   promises bounded future printing by issuing a scoped token to the label
-  printer, then promises print evidence when that token is redeemed with label
+  printer, then promises print event records when that token is redeemed with label
   bytes.
 - `poc14-accounting`: deterministic app for `accounting_v1`; promises address
-  lookup and shipment update evidence only.
+  lookup and shipment update event records only.
 - `poc14-relationship-agent`: generic live LLM relationship app. Depending on
   the configured agent, it can also promise `cas_storage_v1` or
   `cid_compute_v1` handling while keeping the same single top-level `promise`
   action. Scripted identity-key, CAS, and compute flows now use pCID-owned array
   payloads in this cleanup slice. Source: `DI-vipih`; `DI-gahuh`.
 - `poc14-wasm-agent`: deterministic Peggy app process that validates WASM module
-  bytes, sends WASM-boundary evidence as a normal `relationship_v1` promise, and
-  promises Dave reusable module-validation evidence. Source: `DI-pamob`.
+  bytes, sends WASM-adapter event as a normal `relationship_v1` promise, and
+  promises Dave reusable module-validation event records. Source: `DI-pamob`.
 - `poc14-stdio-adapter`: deterministic Victor adapter process that starts
   `poc14-stdio-worker`, receives exact envelope bytes over stdout, forwards
   those bytes through the local kernel, returns the exact peer ACK over stdin,
-  and promises Dave reusable stdio subprocess round-trip evidence. Source:
+  and promises Dave reusable stdio subprocess round-trip event records. Source:
   `DI-pamob`.
 - `poc14-stdio-worker`: subprocess agent whose application messaging path is
   stdin/stdout only; it signs one PromiseGrid envelope and locally verifies the
   returned ACK envelope.
 - `poc14-kernel`: container-local transport process that records operational
-  routing evidence only; it does not own trust, workflow, device behavior, or
+  routing event records only; it does not own trust, workflow, device behavior, or
   promise judgment. Source: `DI-galin`.
 
 ## Run
@@ -170,7 +170,7 @@ scripts/run-clean.sh
 ```
 
 For manual runs, `poc14-analyze` accepts either the parent run directory or its
-`run/` JSONL directory and fails loudly if no JSONL evidence exists:
+`run/` JSONL directory and fails loudly if no JSONL event exists:
 
 ```sh
 docker compose up --build --abort-on-container-exit
@@ -191,11 +191,11 @@ The latest pre-`DI-gahuh` clean baseline is the 2026-06-12 `poc14-demo` run:
 `rpc_drift_counts`, empty `resource_trust_coupling_counts`, and production
 fitness still blocked by monitor scores of `4/5` for Promise Theory fit,
 protocol validity, and local trust correctness. The next clean run should add
-the migrated CAS/compute array evidence gates. Source: `DI-gahuh`.
+the migrated CAS/compute array event gates. Source: `DI-gahuh`.
 
 ## Current Limits
 
-POC14 is provisional executable evidence, not a stable shipping, device,
+POC14 is provisional executable event, not a stable shipping, device,
 accounting, WASM, stdio, kernel-routing, monitor, trust, provider, or workflow
 API. Docker networking remains static; dynamic TCP relationships are local
 promises to dial or accept direct exchanges between app agents, carried by local
@@ -204,12 +204,12 @@ delivery, peer-forwarding, unregistered pCID, and transport outcomes. Apps own
 trust, keep/break/non-commitment judgment, relationship ledgers, workflow state,
 and deterministic device/system/boundary behavior. The fulfillment startup
 sequence is a POC guardrail so the run produces concrete pCID-routed shipment
-evidence instead of relying on a live LLM to choose that sequence unaided.
+event instead of relying on a live LLM to choose that sequence unaided.
 Production monitoring cannot rely on POC14's whole-run analyzer because real
 agents are distributed across legal entities; POC14's decentralized-monitoring
-events are candidate local evidence signals, not a global dashboard. The kernel
+events are candidate local events signals, not a global dashboard. The kernel
 should be read as a role collection: transport, app-boundary, pCID routing,
-local-resource, adapter, and evidence roles may be split or collapsed depending
+local-resource, adapter, and event roles may be split or collapsed depending
 on runtime. Source: `DI-timah`; `DI-bikit`; `DI-parok`; `DI-galin`; `DI-pohaj`;
 `DI-sinur`; `DI-lulof`; `DI-linof`; `DI-pamob`.
 
@@ -217,24 +217,24 @@ The repaired POC14 should be treated as the current superset baseline for future
 POCs unless a later scoped DI explicitly declares a non-superset exception and
 lists the features being dropped. Source: `DI-sinur`.
 
-Post-split evidence semantics are intentionally conservative:
+Post-split event semantics are intentionally conservative:
 `not_promised` means the receiver did not promise the requested exchange, not
 that the receiver broke a promise. Transient provider/runtime decision failures
-are local app/runtime evidence, not peer trust evidence. The accounting app
+are local app/runtime event, not peer trust event. The accounting app
 keeps an app-local shipment checkpoint keyed by order, tracking number, and
 cost; duplicate confirmations remain visible in logs but do not repeatedly
 increase trust. Source: `DI-jinoz`.
 
 The 2026-06-05 `poc14-jinoz-20260605-055916` validation run exited cleanly and
 the analyzer reported 454 events: 433 kept, 20 non-commitment, and 1 broken
-resource promise. Shipping evidence appeared exactly once for address lookup,
+resource promise. Shipping event appeared exactly once for address lookup,
 package weight, label printing, and accounting update/confirmation. The monitor
 still flagged a real remaining concern: some trust changes are driven by local
 budget/capacity exhaustion and should be separated from peer trust in a later
 POC. Source: `DI-jinoz`.
 
 `DI-vujob` keeps those follow-up corrections in POC14. The runtime now records
-`promise_outstanding` before resolving local promise evidence, records
+`promise_outstanding` before resolving local promise event, records
 `promise_resolved` before applying trust effects, treats local send failures as
 `send_unavailable`, treats receiver non-commitment as `send_not_promised`,
 records `local_resource_exhausted` without changing peer trust, and suppresses
@@ -251,17 +251,17 @@ to 598 events: 569 kept, 29 non-commitment, 86 `promise_outstanding`, 86
 `accounting_update_duplicate_confirmed`, and empty
 `resource_trust_coupling_counts`. Source: `DI-vujob`.
 
-`DI-zapab` tightens the same evidence model. The runtime now remembers receiver
+`DI-zapab` tightens the same event model. The runtime now remembers receiver
 `not_promised` outcomes by target, pCID name, and `field_promise_about`, then
 suppresses a later live-agent retry for the same semantic promise as
 `promise_not_promised_suppressed`. That suppression is Alice's local restraint,
-not a penalty against Bob. Duplicate evidence now flows through a reusable
+not a penalty against Bob. Duplicate event now flows through a reusable
 `checkpointJournal`; the accounting shipment update remains the first concrete
 checkpoint. Source: `DI-zapab`.
 
-`DI-vahan` makes the alternate compute path follow local trust evidence. Alice
+`DI-vahan` makes the alternate compute path follow local trust event. Alice
 still obtains arbitrary payload-defined compute coverage, but after Carol exposes
-malformed bad-result evidence, Alice sends the second sum-function promise to
+malformed bad-result event, Alice sends the second sum-function promise to
 Dave rather than forcing another fresh compute promise to Carol.
 
 `DI-pohaj` adds a local printer-port kernel-role app without turning the
@@ -270,7 +270,7 @@ message kernel into a USB authority or RPC service. During label printing,
 `printer_port` returns a deterministic token bound to the issuee, scope, token
 ID, and byte limit; `ups_label_printer` sends `redeem_print_capability` with the
 token and exact hex label bytes; `printer_port` returns deterministic local
-spool evidence. Unit tests cover the token issue/redemption path, wrong-token
+spool event. Unit tests cover the token issue/redemption path, wrong-token
 rejection, routing pCID registration, and analyzer shipping-event recognition.
 The fresh Docker run `poc14-jupob-20260606-030610` exited cleanly after Dave
 wrote `monitor_done`; analyzer output reported 625 events, 17 `node_done`, 17
@@ -278,25 +278,25 @@ wrote `monitor_done`; analyzer output reported 625 events, 17 `node_done`, 17
 and empty `resource_trust_coupling_counts`. Source: `DI-pohaj`; `DI-vutok`;
 `DI-jupob`.
 
-`DI-sunuf` adds run-scoped durability and operational-pressure evidence without
+`DI-sunuf` adds run-scoped durability and operational-pressure event without
 promoting POC14 state into cross-run infrastructure. Each app writes
 `stores/<agent>/durable-state.json` under the current run root with CAS bytes,
 compute checkpoints, capability tokens, replay hashes, and local journals.
-Retention and GC are promise/evidence records (`retention_until_promised`,
+Retention and GC are promise/event records (`retention_until_promised`,
 `delete_after_promised`, `gc_object_retained`, `gc_object_removed`,
 `retention_promise_broken`) rather than a central cleanup authority. Sender and
 receiver rate/capacity behavior is modeled through `send_rate_promised`,
 `accept_rate_promised`, and `backpressure_capacity_promised`; replay handling
 records exact-envelope and serve-once-token rejections as local non-commitment
-evidence. Analyzer scoring now includes durability, retention, pressure, and
+event. Analyzer scoring now includes durability, retention, pressure, and
 replay dimensions, and tests cover within-run recovery, token replay, exact
 envelope replay, CBOR fuzzing, delayed partial reads, and short writes. Source:
 `DI-sunuf`.
 
 `DI-fijov` tightens local trust recovery after malformed or broken peer
-evidence. Corrupt CAS evidence now enters the same relationship-ledger path as
+event. Corrupt CAS event now enters the same relationship-ledger path as
 bad proofs and bad compute results. The ledger records per-peer recovery caution
 inside the run-scoped relationship state, so ordinary kept promises after recent
-malformed/broken evidence first work off caution before they can raise trust.
-Future-only repair promises are retained as local evidence but do not
+malformed/broken event first work off caution before they can raise trust.
+Future-only repair promises are retained as local events but do not
 immediately prove that repair has already been kept. Source: `DI-fijov`.

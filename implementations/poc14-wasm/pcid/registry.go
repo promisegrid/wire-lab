@@ -24,7 +24,7 @@ const (
 // content-derived pCIDs used by this executable experiment.
 // Intent: Test slot-0 pCID routing to app receive promises while keeping pCIDs
 // as protocol-spec identities, not message-type selectors, and while replacing
-// generic evidence reports with narrower pCID-owned protocols. Source:
+// generic report pCIDs with narrower pCID-owned protocols. Source:
 // DI-galin; DI-vipih
 type Registry struct {
 	byName map[string]protocol.ProtocolCID

@@ -40,7 +40,7 @@ func run() error {
 	}
 	// Intent: printer_port is a local kernel-role app around a simulated printer
 	// device. It promises capability-token issue and bounded local print
-	// evidence, while the message kernel only routes exact pCID frames.
+	// event records, while the message kernel only routes exact pCID frames.
 	// Source: DI-pohaj
 	liveClient := decision.NewLiveClient(
 		cfg.ProviderBaseURL,

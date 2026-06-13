@@ -17,11 +17,11 @@ func TestValidateWASMModuleRejectsBadMagic(t *testing.T) {
 }
 
 func TestPromiseFieldsUsesSinglePromiseAction(t *testing.T) {
-	fields := PromiseFields("victor", "peggy", PromiseAboutStdioBoundary, "Victor promises one stdio-carried envelope.")
+	fields := PromiseFields("victor", "peggy", PromiseAboutStdioAdapter, "Victor promises one stdio-carried envelope.")
 	if fields["act"] != "promise" {
 		t.Fatalf("act = %q, want promise", fields["act"])
 	}
-	if fields["field_promise_about"] != PromiseAboutStdioBoundary {
-		t.Fatalf("field_promise_about = %q, want %q", fields["field_promise_about"], PromiseAboutStdioBoundary)
+	if fields["field_promise_about"] != PromiseAboutStdioAdapter {
+		t.Fatalf("field_promise_about = %q, want %q", fields["field_promise_about"], PromiseAboutStdioAdapter)
 	}
 }

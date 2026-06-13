@@ -31,7 +31,7 @@ func (fake *FakeDecider) Decide(_ context.Context, observation Observation) (Pro
 		Act:     ActPromise,
 		Target:  target,
 		Promise: fmt.Sprintf("%s promises only its own bounded behavior for this turn.", observation.AgentName),
-		Reason:  "build relationship evidence through a voluntary, locally scoped promise",
+		Reason:  "build relationship event through a voluntary, locally scoped promise",
 		Fields: map[string]any{
 			"promise_about": promiseAbout(observation),
 			"budget":        observation.Budget,
@@ -74,6 +74,6 @@ func (FakeMonitor) Evaluate(_ context.Context, events []Event) (MonitorReport, e
 		LocalTrustCorrectness: 4,
 		ImpositionAvoidance:   5,
 		Summary:               fmt.Sprintf("fake monitor observed %d events", len(events)),
-		Concerns:              []string{"fake monitor is not evidence of live LLM judgment"},
+		Concerns:              []string{"fake monitor is not event of live LLM judgment"},
 	}, nil
 }

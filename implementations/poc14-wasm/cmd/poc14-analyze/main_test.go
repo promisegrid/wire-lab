@@ -18,7 +18,7 @@ func TestAnalyzeRunSummarizesEventsAndMonitorReport(t *testing.T) {
 		`{"observer":"alice","event":"printer_port_print_confirmed","outcome":"kept","peer":"printer_port","detail":"spool"}`+"\n"+
 		`{"observer":"alice","event":"local_resource_exhausted","outcome":"non_commitment","peer":"bob","detail":"capacity exhausted"}`+"\n"+
 		`{"observer":"alice","event":"direct_peer_unchanged","outcome":"kept","peer":"bob","detail":"outcome=non_commitment trust=0"}`+"\n"+
-		`{"observer":"alice","event":"wasm_boundary_ack_received","outcome":"kept","peer":"victor","detail":"pcid=relationship_v1"}`+"\n"+
+		`{"observer":"alice","event":"wasm_adapter_ack_received","outcome":"kept","peer":"victor","detail":"pcid=relationship_v1"}`+"\n"+
 		`{"observer":"alice","event":"bearer_token_exchange_rate_observed","outcome":"kept","peer":"grace","detail":"local market signal"}`+"\n"+
 		`{"observer":"alice","event":"mixed_version_successor_pcid_selected","outcome":"kept","peer":"bob","detail":"current pCID"}`+"\n"+
 		`{"observer":"alice","event":"run_internal_restart_recovery_observed","outcome":"kept","peer":"victor","detail":"same-run recovery"}`+"\n")
@@ -63,8 +63,8 @@ func TestAnalyzeRunSummarizesEventsAndMonitorReport(t *testing.T) {
 	if summary.ResourceTrustCouplingCounts["alice"] != 1 {
 		t.Fatalf("resource/trust coupling not summarized: %#v", summary.ResourceTrustCouplingCounts)
 	}
-	if summary.HeterogeneousBoundaryCounts["wasm_boundary_ack_received"] != 1 {
-		t.Fatalf("heterogeneous boundary counts not summarized: %#v", summary.HeterogeneousBoundaryCounts)
+	if summary.RuntimeAdapterEventCounts["wasm_adapter_ack_received"] != 1 {
+		t.Fatalf("runtime adapter event counts not summarized: %#v", summary.RuntimeAdapterEventCounts)
 	}
 	if summary.DecentralizedMonitorCounts["bearer_token_exchange_rate_observed"] != 1 {
 		t.Fatalf("decentralized monitor counts not summarized: %#v", summary.DecentralizedMonitorCounts)
@@ -104,7 +104,7 @@ func TestAnalyzeRunRejectsDirectoryWithoutLogs(t *testing.T) {
 	}
 }
 
-func TestValidateSummaryAcceptsCleanRegressionEvidence(t *testing.T) {
+func TestValidateSummaryAcceptsCleanRegressionEvent(t *testing.T) {
 	summary := cleanRegressionSummary()
 	if err := validateSummary(summary, cleanRegressionCriteria()); err != nil {
 		t.Fatalf("clean regression summary should pass: %v", err)
@@ -129,13 +129,36 @@ func TestValidateSummaryRejectsResourceTrustCoupling(t *testing.T) {
 	}
 }
 
-func TestValidateSummaryRejectsMissingBoundaryEvidence(t *testing.T) {
+func TestValidateSummaryRejectsMissingBoundaryEvent(t *testing.T) {
 	summary := cleanRegressionSummary()
-	summary.EventCounts["stdio_worker_ack_observed"] = 0
+	summary.EventCounts["stdio_worker_ack_event"] = 0
 	summary.ScoreReport = computeScores(summary)
 	err := validateSummary(summary, cleanRegressionCriteria())
 	if err == nil {
-		t.Fatalf("missing stdio boundary evidence should fail")
+		t.Fatalf("missing stdio adapter event should fail")
+	}
+}
+
+func TestValidateSummaryRejectsForbiddenVocabulary(t *testing.T) {
+	summary := cleanRegressionSummary()
+	summary.ForbiddenVocabularyCounts["run_events"] = 1
+	err := validateSummary(summary, cleanRegressionCriteria())
+	if err == nil {
+		t.Fatalf("forbidden vocabulary should fail")
+	}
+}
+
+func TestAnalyzeRunCountsForbiddenVocabulary(t *testing.T) {
+	retiredWord := "evi" + "dence"
+	runDir := t.TempDir()
+	writeFile(t, filepath.Join(runDir, "alice.jsonl"), `{"observer":"alice","event":"promise_sent","outcome":"kept","peer":"bob","detail":"fresh `+retiredWord+`"}`+"\n")
+	writeFile(t, filepath.Join(runDir, "monitor-report.json"), `{"promise_theory_fit":5,"autonomy":5,"protocol_validity":5,"local_trust_correctness":5,"imposition_avoidance":5,"summary":"clean","concerns":["no issues"]}`)
+	summary, err := analyzeRun(runDir)
+	if err != nil {
+		t.Fatalf("analyze run: %v", err)
+	}
+	if summary.ForbiddenVocabularyCounts["run_events"] == 0 {
+		t.Fatalf("forbidden vocabulary not counted: %#v", summary.ForbiddenVocabularyCounts)
 	}
 }
 
@@ -145,60 +168,60 @@ func TestValidateSummaryRejectsMissingDecentralizedMonitoring(t *testing.T) {
 	summary.ScoreReport = computeScores(summary)
 	err := validateSummary(summary, cleanRegressionCriteria())
 	if err == nil {
-		t.Fatalf("missing decentralized monitoring evidence should fail")
+		t.Fatalf("missing decentralized monitoring event should fail")
 	}
 }
 
-func TestValidateSummaryRejectsMissingMigrationEvidence(t *testing.T) {
+func TestValidateSummaryRejectsMissingMigrationEvent(t *testing.T) {
 	summary := cleanRegressionSummary()
 	summary.EventCounts["mixed_version_successor_pcid_selected"] = 0
 	summary.ScoreReport = computeScores(summary)
 	err := validateSummary(summary, cleanRegressionCriteria())
 	if err == nil {
-		t.Fatalf("missing migration evidence should fail")
+		t.Fatalf("missing migration event should fail")
 	}
 }
 
-func TestValidateSummaryRejectsMissingRestartEvidence(t *testing.T) {
+func TestValidateSummaryRejectsMissingRestartEvent(t *testing.T) {
 	summary := cleanRegressionSummary()
 	summary.EventCounts["run_internal_restart_recovery_observed"] = 0
 	summary.ScoreReport = computeScores(summary)
 	err := validateSummary(summary, cleanRegressionCriteria())
 	if err == nil {
-		t.Fatalf("missing restart evidence should fail")
+		t.Fatalf("missing restart event should fail")
 	}
 }
 
-func TestValidateSummaryRejectsMissingPermanentDistrustEvidence(t *testing.T) {
+func TestValidateSummaryRejectsMissingPermanentDistrustEvent(t *testing.T) {
 	summary := cleanRegressionSummary()
 	summary.EventCounts["permanent_distrust_decided"] = 0
 	summary.MissingRequiredEventNames = missingRequiredEvents(summary)
 	summary.ScoreReport = computeScores(summary)
 	err := validateSummary(summary, cleanRegressionCriteria())
 	if err == nil {
-		t.Fatalf("missing permanent distrust evidence should fail")
+		t.Fatalf("missing permanent distrust event should fail")
 	}
 }
 
-func TestValidateSummaryRejectsMissingTransitExclusionEvidence(t *testing.T) {
+func TestValidateSummaryRejectsMissingTransitExclusionEvent(t *testing.T) {
 	summary := cleanRegressionSummary()
 	summary.EventCounts["transit_safe_route_selected"] = 0
 	summary.MissingRequiredEventNames = missingRequiredEvents(summary)
 	summary.ScoreReport = computeScores(summary)
 	err := validateSummary(summary, cleanRegressionCriteria())
 	if err == nil {
-		t.Fatalf("missing transit exclusion evidence should fail")
+		t.Fatalf("missing transit exclusion event should fail")
 	}
 }
 
-func TestValidateSummaryRejectsMissingMigratedArrayPayloadEvidence(t *testing.T) {
+func TestValidateSummaryRejectsMissingMigratedArrayPayloadEvent(t *testing.T) {
 	summary := cleanRegressionSummary()
 	summary.EventCounts["pcid_owned_array_payload_received"] = 0
 	summary.MissingRequiredEventNames = missingRequiredEvents(summary)
 	summary.ScoreReport = computeScores(summary)
 	err := validateSummary(summary, cleanRegressionCriteria())
 	if err == nil {
-		t.Fatalf("missing migrated array payload evidence should fail")
+		t.Fatalf("missing migrated array payload event should fail")
 	}
 }
 
@@ -230,6 +253,7 @@ func cleanRegressionSummary() RunSummary {
 		RelationshipTransitionCounts: map[string]int{},
 		LocalResourceCounts:          map[string]int{},
 		ResourceTrustCouplingCounts:  map[string]int{},
+		ForbiddenVocabularyCounts:    map[string]int{},
 		MonitorReport: &decision.MonitorReport{
 			PromiseTheoryFit:      5,
 			Autonomy:              5,

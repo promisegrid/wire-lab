@@ -32,7 +32,7 @@ type Observation struct {
 	RequiredAct    string         `json:"required_act"`
 }
 
-// Event is compact local evidence shown to an LLM or observer-only monitor.
+// Event is a compact local event record shown to an LLM or observer-only monitor.
 type Event struct {
 	Observer string `json:"observer"`
 	Event    string `json:"event"`
@@ -91,6 +91,7 @@ func ValidateObservedPromiseDecision(decision PromiseDecision, observation Obser
 	decision.Target = strings.TrimSpace(decision.Target)
 	decision.Promise = strings.TrimSpace(decision.Promise)
 	decision.Reason = strings.TrimSpace(decision.Reason)
+	decision = NormalizePromiseDecisionVocabulary(decision)
 	if decision.Fields == nil {
 		decision.Fields = make(map[string]any)
 	}
@@ -178,10 +179,74 @@ func Prompt(observation Observation) (string, error) {
 		"Useful field keys are protocol, promise_about, package_id, order_id, weight_ounces, shipping_address, cost_cents, tracking_number, content_cid, function_cid, input_cid, context_cid, resource, units, stake, collateral, and discovery_reason. " +
 		"Use protocol=relationship_v1 for ordinary trust, discovery, observation, capacity, or pricing promises unless you can provide every required payload field for another pCID. Use protocol=postal_scale_v1 for package weighing, protocol=accounting_v1 for address lookup or shipment updates, protocol=ups_label_v1 for label/cost/tracking promises, protocol=cas_storage_v1 only for content-addressed storage payloads with concrete content/token fields, and protocol=cid_compute_v1 only for CID-named compute/cache/verifier payloads with concrete function/input/context/result fields. identity_key_v1 is reserved for scripted pCID-owned key-rotation array payloads, not live field-map turns. " +
 		"Use resource=storage or resource=compute only when you personally promise fulfillment capacity, not when you advertise a need. " +
-		"Prefer a concrete, useful next promise that advances local motivation, reciprocal economics, relationship repair, storage, compute, verification, or evidence sharing visible in recent_events. Do not repeat the same promise_about/promise text to the same peer unless recent_events show new evidence that changes its meaning. " +
+		"Prefer a concrete, useful next promise that advances local motivation, reciprocal economics, relationship repair, storage, compute, verification, or event sharing visible in recent_events. Use event, promise, or outcome for local records; avoid proof-like nouns. Do not repeat the same promise_about/promise text to the same peer unless recent_events show a new event that changes its meaning. " +
 		"The only valid top-level act is promise. Put refusal, repair, observation, economics, and link-preference meaning inside the promise text or the fields key/value list. " +
 		"Do not create action kinds. Do not claim authority over other agents. Do not write CBOR or signatures; implementation code encodes and signs the pCID-defined envelope before the local kernel routes exact bytes.\n\nLocal observation:\n" +
 		string(encoded), nil
+}
+
+// NormalizePromiseDecisionVocabulary rewrites production-facing live-agent text
+// away from the old proof-like vocabulary before it can become a signed promise
+// payload or run-log event.
+// Intent: DI-kirat makes event the active POC14 runtime/log term; live LLMs may
+// still draft older vocabulary, so the Go boundary normalizes that prose instead
+// of letting it leak into fresh runs. Source: DI-kirat
+func NormalizePromiseDecisionVocabulary(decision PromiseDecision) PromiseDecision {
+	decision.Promise = NormalizeEventVocabulary(decision.Promise)
+	decision.Reason = NormalizeEventVocabulary(decision.Reason)
+	normalizedFields := make(map[string]any, len(decision.Fields))
+	for key, value := range decision.Fields {
+		normalizedKey := NormalizeEventVocabulary(key)
+		if valueText, ok := value.(string); ok {
+			normalizedFields[normalizedKey] = NormalizeEventVocabulary(valueText)
+			continue
+		}
+		normalizedFields[normalizedKey] = value
+	}
+	decision.Fields = normalizedFields
+	return decision
+}
+
+// NormalizeMonitorReportVocabulary applies the same active vocabulary rule to
+// observer-only monitor summaries before they are written next to run events.
+// Intent: The monitor is a POC tool, not a production authority; its prose must
+// reinforce event/promise/outcome vocabulary rather than reviving proof-like
+// protocol terms. Source: DI-kirat
+func NormalizeMonitorReportVocabulary(report MonitorReport) MonitorReport {
+	report.Summary = NormalizeMonitorAuthorityVocabulary(NormalizeEventVocabulary(report.Summary))
+	for index, concern := range report.Concerns {
+		report.Concerns[index] = NormalizeMonitorAuthorityVocabulary(NormalizeEventVocabulary(concern))
+	}
+	return report
+}
+
+// NormalizeMonitorAuthorityVocabulary rewrites monitor-only prose that describes
+// avoided anti-patterns using terms that the analyzer correctly treats as drift
+// when they appear in ordinary agent or kernel events.
+// Intent: DI-kinaf and DI-kirat require the POC-only monitor to avoid becoming a
+// source of production-looking authority or RPC vocabulary while preserving the
+// stricter rejection path for live agent promises. Source: DI-kinaf; DI-kirat
+func NormalizeMonitorAuthorityVocabulary(text string) string {
+	replacer := strings.NewReplacer(
+		"Commands", "Imposed instructions",
+		"commands", "imposed instructions",
+		"COMMANDS", "IMPOSED INSTRUCTIONS",
+		"Command", "Imposed instruction",
+		"command", "imposed instruction",
+		"COMMAND", "IMPOSED INSTRUCTION",
+	)
+	return replacer.Replace(text)
+}
+
+// NormalizeEventVocabulary is intentionally small and explicit: it rewrites the
+// prohibited active POC word while leaving historical files untouched.
+func NormalizeEventVocabulary(text string) string {
+	replacer := strings.NewReplacer(
+		"Evi"+"dence", "Event",
+		"evi"+"dence", "event",
+		"EVI"+"DENCE", "EVENT",
+	)
+	return replacer.Replace(text)
 }
 
 func requireObservedTarget(decision PromiseDecision, observation Observation) (string, error) {

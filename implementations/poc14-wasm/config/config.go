@@ -224,7 +224,7 @@ func (cfg Config) TurnDelay() time.Duration {
 // ShutdownGrace returns the receive-promise grace period after active turns finish.
 // Intent: Give lagging peers a bounded chance to complete already-planned sends
 // before this app closes its local kernel receive promises and writes done
-// evidence. Source: DI-galin
+// event records. Source: DI-galin
 func (cfg Config) ShutdownGrace() time.Duration {
 	return time.Duration(cfg.ShutdownGraceMillis) * time.Millisecond
 }
@@ -430,7 +430,7 @@ func (agent AgentConfig) Protocols() []string {
 
 // Deterministic reports whether the agent is a local device/system handler
 // rather than a live autonomous LLM actor.
-// Intent: Keep local hardware, business-system, and heterogeneous boundary
+// Intent: Keep local hardware, business-system, and heterogeneous runtime-adapter
 // roles under Go-owned protocol behavior so LLM autonomy chooses relationship
 // intent without inventing device, WASM, or stdio outcomes. Source: DI-pohaj;
 // DI-linof

@@ -39,7 +39,7 @@ func run() error {
 		return fmt.Errorf("node %q is kind %q, want ups_label_printer", agent.Name, agent.Kind)
 	}
 	// Intent: The label printer remains an app process that promises label,
-	// cost, and tracking evidence; the kernel only delivers its pCID frames.
+	// cost, and tracking event records; the kernel only delivers its pCID frames.
 	// Source: DI-galin
 	liveClient := decision.NewLiveClient(
 		cfg.ProviderBaseURL,

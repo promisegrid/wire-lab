@@ -59,7 +59,7 @@ func (protocolCID ProtocolCID) Tag42Bytes() []byte {
 	return tagBytes
 }
 
-// String renders a stable debug and evidence form.
+// String renders a stable debug form for event records.
 func (protocolCID ProtocolCID) String() string {
 	return "cidv1-raw-sha2-256:" + hex.EncodeToString(protocolCID.digest[:])
 }
@@ -299,7 +299,7 @@ func DeterministicPublicKey(seedText string) ed25519.PublicKey {
 	return DeterministicPrivateKey(seedText).Public().(ed25519.PublicKey)
 }
 
-// HashExactBytes returns a sha256 hex digest for local evidence correlation.
+// HashExactBytes returns a sha256 hex digest for correlating local event records.
 func HashExactBytes(exactBytes []byte) string {
 	if len(exactBytes) == 0 {
 		return ""

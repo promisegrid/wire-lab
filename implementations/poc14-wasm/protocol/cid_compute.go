@@ -82,7 +82,7 @@ func MarshalCIDComputePayloadFields(fields map[string]string) ([]byte, error) {
 }
 
 // CIDComputePayloadFields projects cid_compute_v1 arrays back into runtime
-// fields while the POC keeps existing compute handlers and analyzer evidence.
+// fields while the POC keeps existing compute handlers and analyzer event records.
 func CIDComputePayloadFields(payloadBytes []byte) (map[string]string, error) {
 	return payloadFieldsFromArray(protocolCIDComputeV1, payloadBytes, cidComputeSchemas)
 }

@@ -90,6 +90,14 @@ Intent: POC15 should be a superset-oriented successor to POC14 that exercises ro
 Constraints: Do not implement production-grade route authority or global monitoring; all routing and exclusion choices remain local promises and local trust judgments; do not regress POC14 shipping, CAS, compute, WASM, stdio, trust, and analyzer evidence; keep POC15 under `implementations/poc15-*` planning until code work is explicitly started.
 Affects: implementations/poc15-multihop/; implementations/poc14-wasm/docs/; implementations/poc14-wasm/README.md; DEV-GUIDE-RESOURCES.md.
 
+ID: DI-kirat
+Date: 2026-06-13 17:14:50
+Status: active
+Decision: Active POC14/POC15 PromiseGrid-facing vocabulary must use `event`, `promise`, and `outcome` instead of production-looking `evidence`, and must reserve `boundary` for real interface or trust-line prose rather than generic event categories.
+Intent: `Evidence` is useful for human design/testing claims but can leak into production semantics as if agents exchange authoritative proof. POC14 and POC15 should instead show that agents make promises, local software records events and outcomes, and every trust judgment remains local. Runtime portability pressure from Peggy and Victor should be named as runtime adapter events, not boundary evidence.
+Constraints: Preserve historical DI/TODO text as append-only records; do not add compatibility aliases for old POC14 run logs because clean-run JSONL files are resettable POC artifacts; keep `grid([42(pCID), payload, proof])`; do not add new top-level action kinds; keep production-facing code, active docs, analyzer output, and fresh run events free of `evidence` names.
+Affects: implementations/poc14-wasm/; implementations/poc15-multihop/; DEV-GUIDE-RESOURCES.md; protocols/wire-lab.d/TODO/TODO-gogug-poc13-hardening-and-poc14-superset-plan.md.
+
 ## Tasks
 
 - [x] gogug.1 Fix POC13 evidence summary mismatch so saved evidence counts include all local non-commitment outcomes, not only receiver-side `not_promised` journal entries.
@@ -128,3 +136,4 @@ Affects: implementations/poc15-multihop/; implementations/poc14-wasm/docs/; impl
 - [x] gogug.34 Add POC15 route-exclusion plan based on peer promises rather than omniscient filtering.
 - [x] gogug.35 Document non-monolithic kernel roles using POC14/POC15 evidence.
 - [x] gogug.36 Add production-fitness follow-up plan for protocol validity, local trust correctness, and Promise Theory fit blockers.
+- [x] gogug.37 Rename active POC14/POC15 vocabulary from evidence/boundary categories to event/promise/outcome and runtime adapter terms.

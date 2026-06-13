@@ -39,7 +39,7 @@ func run() error {
 		return fmt.Errorf("node %q is kind %q, want accounting", agent.Name, agent.Kind)
 	}
 	// Intent: Accounting is a deterministic app process that promises address
-	// and shipment-update evidence; it is not a kernel-owned service registry.
+	// and shipment-update event records; it is not a kernel-owned service registry.
 	// Source: DI-galin
 	liveClient := decision.NewLiveClient(
 		cfg.ProviderBaseURL,

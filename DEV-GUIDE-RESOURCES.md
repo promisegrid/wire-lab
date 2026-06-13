@@ -58,7 +58,7 @@ or conformance certificate. A PromiseGrid implementation promises only its own
 behavior to local apps/operators: supported pCIDs, unsupported behavior,
 app-facing storage / compute / send / receive / key / lifecycle / dispatch /
 evidence promises, host assumptions, adapter mappings, voluntary
-namespace/reference behavior, and local evidence about its own actions. Local
+namespace/reference behavior, and local events about its own actions. Local
 APIs may be ergonomic adapters, but the PromiseGrid boundary remains
 pCID-selected `grid([42(pCID), ...protocol-defined-slots])` messages when an
 operation crosses that boundary, with `grid([42(pCID), payload, ...])` as the
@@ -108,7 +108,7 @@ journal before applying kept/broken/malformed trust effects. Local budget or
 capacity exhaustion is recorded as `local_resource_exhausted`, not as evidence
 about the target peer. Local transport/kernel send failures are
 `send_unavailable`; receiver non-commitment is `send_not_promised`; explicit
-broken/malformed ACKs remain peer evidence. Live agents suppress repeated
+broken/malformed ACKs remain peer events. Live agents suppress repeated
 promise text to the same target/protocol after local journal evidence exists,
 and the analyzer reports `local_resource_counts` plus
 `resource_trust_coupling_counts` to expose regressions where local state leaks
@@ -185,14 +185,14 @@ payload-provided Fibonacci function while also exposing bad-result evidence that
 Alice/Dave/Grace reject by recomputation, Alice then follows local trust evidence
 and sends the second sum-function compute promise to Dave, Dave checkpoints exact
 compute tuples and returns cache miss/hit/reuse evidence,
-Grace verifies compute, can disagree as local evidence that Alice resolves
+Grace verifies compute, can disagree as local events that Alice resolves
 locally, and records Mallory's corrupt-byte, unknown-pCID, unsupported-variant,
 bad-proof, and key-rotation evidence. Run-scoped CAS/evidence state is now
 restartable inside one run root but still erased by a clean-run reset; retention,
 GC, backpressure, rate-limit, and replay behavior are local promises and local
 observations rather than a global cleanup, throttling, or replay authority. Local
 trust/economics/repair records remain local promise evidence rather than
-authority. Malformed or broken peer evidence now creates local recovery caution:
+authority. Malformed or broken peer events now creates local recovery caution:
 ordinary kept promises must work off that per-peer caution before positive trust
 can rise again, and future-only repair promises are recorded without immediately
 proving repair has been kept. POC13's analyzer now reports a bounded score
@@ -227,28 +227,28 @@ do not supply a concrete non-relationship pCID payload are reframed as
 `relationship_v1` local-observation promises, while scripted storage, compute,
 shipping, and device flows still exercise their exact pCID payloads. Negative
 ACK verdicts such as broken, malformed, disagreement, cache miss, price refusal,
-capacity refusal, or unsupported variant are recorded as evidence without
-increasing local trust. Source: `DI-sinur`; `DI-punib`.
+capacity refusal, or unsupported variant are recorded as local events without
+increasing local trust. Source: `DI-sinur`; `DI-punib`; `DI-kirat`.
 
 POC14 is the current heterogeneous-runtime POC target. It is scaffolded as a
 POC13 superset under `implementations/poc14-wasm/`, keeps the inherited
 kernel/app, shipping, CAS, compute, trust, replay, and pressure gates, and adds
-Peggy/Victor boundary evidence: Peggy is a separate WASM-boundary app process
+Peggy/Victor runtime adapter events: Peggy is a separate WASM-adapter app process
 that validates module bytes and sends normal `relationship_v1` promises, while
 Victor is a stdio-worker agent behind a local adapter whose application
 messaging path is stdin/stdout carrying exact PromiseGrid envelope bytes. Peggy
 and Victor now also send useful relationship promises to Dave about reusable
-module-validation and subprocess round-trip evidence. POC14 adds analyzer
-dimensions for boundary, decentralized monitoring, mixed-version pCID migration,
-same-run restart evidence, and migrated pCID-owned array payload evidence for
+module-validation and subprocess round-trip events. POC14 adds analyzer
+dimensions for runtime adapters, decentralized monitoring, mixed-version pCID migration,
+same-run restart events, and migrated pCID-owned array payload events for
 scripted `cas_storage_v1` and `cid_compute_v1`; `field_*` names remain local
 compatibility projections, not wire-shape guidance. The monitoring lesson is
 important for guide prose: POC analyzers and monitors are development tools, not
 production authorities. Production agents owned by different legal entities can
-only exchange local evidence summaries, peer-carried attestations, token
+only exchange local events summaries, peer-carried attestations, token
 exchange-rate signals, topology signals, and voluntary gossip as ordinary
 promises; no global observer, trust score, exchange rate, or audit trail exists
-by default. POC14 also records hard local trust-boundary evidence: Alice can
+by default. POC14 also records hard local trust and routing events: Alice can
 permanently distrust Mallory locally, and Alice can promise that Alice's
 inbound/outbound traffic should not transit Mallory, without imposing a
 network-wide ban or central route policy. `DI-dubih` makes those scenarios
@@ -274,7 +274,7 @@ tokens, issuer-local redemption/revocation, real storage / compute / data
 redemption payloads, peer-local exchange-rate offers, holder-initiated trade,
 Mallory-to-Dave stale-token circulation, deterministic per-agent local economic
 decisions, and local trust updates after a revoked promise breaks. Dave accepts
-Mallory's first stale-token transfer for local evidence, observes the broken
+Mallory's first stale-token transfer for local events, observes the broken
 redemption, then refuses Mallory's later stale-token transfer because Dave's own
 trust scores changed. The visible message labels are historical POC vocabulary:
 guide writers should extract the single-promise discipline and the pCID-defined
@@ -338,10 +338,10 @@ storage, compute, or economics API. Source: `DI-vorus`; `DI-sipuz`; `DI-vujil`.
 actors keep the same one-pCID signed CBOR `grid([42(pCID), payload, proof])`
 discipline and sparse-neighbor TCP carriage, but the local strategy source moves
 from deterministic code to live LLM decisions at runtime. Each LLM sees only its
-agent persona, motivation, local trust ledger, recent local evidence, direct
+agent persona, motivation, local trust ledger, recent local events, direct
 neighbors, and allowed action surface. Go code still owns config bounds,
 decision validation, CBOR encoding, Ed25519 proof creation, TCP framing, and
-local evidence records. POC10 deliberately mixes structured-action,
+local events records. POC10 deliberately mixes structured-action,
 structured-payload, and freeform-intent profiles so guide writers can discuss
 where autonomy can safely enter without letting LLMs write raw CBOR or claim
 authority over other agents. The monitor LLM reads logs after completion and
@@ -573,7 +573,7 @@ correct receiver behavior and remaining sender-side alignment work. Source:
 `DI-nanud`.
 
 The PromiseGrid / Promise Theory fit is good but incomplete. The strong parts
-are one top-level `promise` act, no global trust authority, local evidence
+are one top-level `promise` act, no global trust authority, local events
 records, local trust decay/repair, scoped non-commitment, pCID-owned payload
 meaning, and implementation-owned protocol bytes. The weaker parts are that live
 agents still sometimes repeat near-identical commitments, do not yet demonstrate
@@ -636,7 +636,7 @@ Alice, Bob, Carol, Dave, Ellen, Frank, Grace, Heidi, Ivan, Judy, Mallory, and
 Oscar. Those live agents make local low-risk promises, link-discovery promises,
 storage/compute-adjacent promises, observation promises, and non-commitments;
 the runtime records direct-peer additions/removals, rejected unpromised receives,
-withheld promises, and broken resource promises as local evidence. Source:
+withheld promises, and broken resource promises as local events. Source:
 `DI-gagok`.
 
 After that assessment, POC12 was refactored so those pCID-routed messages move
@@ -695,13 +695,13 @@ trust-bound calibration. Source: `DI-gagok`; `DI-jinoz`; `DI-vujob`.
 The PromiseGrid / Promise Theory fit is strong where the POC keeps authority
 local. Every message is a signed `grid([42(pCID), payload, proof])` promise, the
 pCID selects a protocol rather than a message type, device/system agents promise
-only their own local evidence, the monitor observes rather than governs, and
+only their own local events, the monitor observes rather than governs, and
 trust updates remain per-agent local ledger entries. There is no global trust
 authority, no central router, and no receiver-side command semantics. The weak
 spots are sender-side alignment and workflow semantics: the latest run still
 had six `message_not_promised` / `send_not_promised` outcomes, five repeated
 promise suppressions, six local resource-exhaustion events, and one provider
-503 `decision_error`. Those are local evidence or non-commitment outcomes rather
+503 `decision_error`. Those are local events or non-commitment outcomes rather
 than global failures, and the analyzer reported empty
 `resource_trust_coupling_counts`. Source: `DI-gagok`; `DI-vujob`; `DI-jupob`.
 
@@ -750,7 +750,7 @@ relationship memory with decay and repair; production storage and computation
 flows with real inputs/outputs; live-agent planning of multi-step pCID workflows;
 privacy-sensitive selective sending after trust improves; partial device/system
 failure with retry or alternate peers; and deterministic replay/audit of exact
-signed bytes, pCID payloads, local evidence, and trust transitions. Source:
+signed bytes, pCID payloads, local events, and trust transitions. Source:
 `DI-gagok`; `DI-vujob`.
 
 ## Authority model
@@ -1111,7 +1111,7 @@ writer guidance, not a final PromiseGrid product/API freeze. Source:
 |---|---|---|---|---|
 | Laypeople | Ready for careful guide prose | PromiseGrid is designed for long-lived decentralized communities of autonomous/free agents; no central registry is a design constraint; protocol forking is normal; multi-generational durability is a first-order requirement. | Specific promise-accounting scoring, final wire format, app APIs, and kernel shape remain out of layperson settled prose. `DR-napum` remains open for final public wording. | The guide itself after stabilization; wire-lab sources stay provenance. |
 | App Devs | Provisional | The minimum current contract is: choose an explicit protocol spec, use its pCID when frozen, let that spec define payload/handler semantics, and publish implementation promises rather than relying on branch paths. | No stable SDK, handler ABI, universal app message API, or app protocol subset is frozen yet. `DR-tuhaz` remains open. | Future frozen `protocols/*/specs/*.md` docs by pCID, plus B-side `CHANGELOG.md` promise entries. |
-| Kernel Devs | Provisional / blocked for final porting instructions | The porting target is not wire-lab. `DN-lujad` is the current plain-English synthesis, and `DN-nuras` defines POC13 storage/compute pressure. `poc3` is executable evidence that same-grid app/kernel boundaries can support multiple apps per node without making the kernel an RPC authority, and `poc4` is executable evidence that multi-hop app promises can cross relay apps without making the kernel a router, service registry, or trust authority. A porter should expect explicit app-facing promises, possible same-grid app/kernel messages, local file-like views over CID-rooted promise-bound references, voluntary group namespaces, host/runtime assumptions, unsupported features, pCID coverage, kernel-local evidence records, app-local promise judgments, relay/app separation where applicable, profile declarations, and prior-art guardrails around the substrate/feed/CAS/session/message layers the porter promises to implement. Daemon, microkernel, host-runtime, browser/WASM, MCU/header-only, split-object, hardware/resource-owner, storage-role, and compute-role shapes remain profiles in one non-monolithic local role set, not one universal process shape. | The minimum credible kernel implementation promises, app/kernel message boundary, first required frozen spec set, safe prior-art influence set, voluntary namespace behavior, local-view reference model, and relay/storage/compute protocol surfaces are not locked yet. `DN-lujad`, `DN-nuras`, `TODO-binag`, `TODO-godad`, `TODO-hozaz`, `TODO-tapov`, executable `poc3`, executable `poc4`, executable `poc12`, executable `poc13`, and expanded `SIM-fovip` are the current evidence path; `DR-davod` remains open pending focused evidence review. | Future frozen binding/session/message specs by pCID, implementation promise records, `SIM-fovip` evidence, executable POC evidence where clearly labeled, and guide prose once stabilized. |
+| Kernel Devs | Provisional / blocked for final porting instructions | The porting target is not wire-lab. `DN-lujad` is the current plain-English synthesis, and `DN-nuras` defines POC13 storage/compute pressure. `poc3` is executable evidence that same-grid app/kernel boundaries can support multiple apps per node without making the kernel an RPC authority, and `poc4` is executable evidence that multi-hop app promises can cross relay apps without making the kernel a router, service registry, or trust authority. A porter should expect explicit app-facing promises, possible same-grid app/kernel messages, local file-like views over CID-rooted promise-bound references, voluntary group namespaces, host/runtime assumptions, unsupported features, pCID coverage, kernel-local events records, app-local promise judgments, relay/app separation where applicable, profile declarations, and prior-art guardrails around the substrate/feed/CAS/session/message layers the porter promises to implement. Daemon, microkernel, host-runtime, browser/WASM, MCU/header-only, split-object, hardware/resource-owner, storage-role, and compute-role shapes remain profiles in one non-monolithic local role set, not one universal process shape. | The minimum credible kernel implementation promises, app/kernel message boundary, first required frozen spec set, safe prior-art influence set, voluntary namespace behavior, local-view reference model, and relay/storage/compute protocol surfaces are not locked yet. `DN-lujad`, `DN-nuras`, `TODO-binag`, `TODO-godad`, `TODO-hozaz`, `TODO-tapov`, executable `poc3`, executable `poc4`, executable `poc12`, executable `poc13`, and expanded `SIM-fovip` are the current evidence path; `DR-davod` remains open pending focused evidence review. | Future frozen binding/session/message specs by pCID, implementation promise records, `SIM-fovip` evidence, executable POC evidence where clearly labeled, and guide prose once stabilized. |
 
 ## Laypeople
 
@@ -1184,13 +1184,13 @@ Use this section for the guide's App Devs / How to write a grid app section.
   evidence that apps can discover peers through route, referral, and
   introduction promises; treat low-risk public work as ordinary promises before
   private escalation; treat signed token expiry as neutral issuer evidence; and
-  use TCP behavior as local evidence without making TCP connectivity equal
+  use TCP behavior as local events without making TCP connectivity equal
   trust. It is not a stable discovery, routing, trust, transport, token, storage,
   compute, or economics API. Source: `DI-sipuz`; `DI-vujil`.
 - `implementations/poc10-llm-autonomous-agents/` is executable provisional
   evidence that app strategy can be LLM-directed while Go code still owns
   pCID-selected message shape, CBOR encoding, signatures, transport framing,
-  config bounds, and local evidence. Its monitor is an observer-only evaluator,
+  config bounds, and local events. Its monitor is an observer-only evaluator,
   not a trust authority. The first live run produced real autonomous offers,
   refusals, introductions, freeform trade pressure, and local observations, but
   also exposed duplicate/late events and freeform scoping gaps. It is not a
@@ -1413,7 +1413,7 @@ section.
   free-form promises are guarded so unsupported concrete-pCID payloads are
   reframed to relationship-level local observations instead of becoming broken
   protocol exchanges, negative ACK verdicts do not inflate local trust, and
-  malformed/broken peer evidence creates local recovery caution that delays
+  malformed/broken peer events creates local recovery caution that delays
   later positive trust growth. Its analyzer now
 	  gates inherited POC11/POC12 evidence, POC13 storage/compute evidence, and the
 	  run-scoped durability/retention/pressure/replay evidence so future POCs cannot
@@ -1423,14 +1423,14 @@ section.
 	  kernel API. Source: `DI-bibom`; `DI-notig`; `DI-lasuh`; `DI-fumol`;
 	  `DI-hohuf`; `DI-mosil`; `DI-lupag`; `DI-nisaz`; `DI-kikoj`; `DI-sinur`;
 	  `DI-punib`; `DI-sunuf`; `DI-fijov`; `TODO-godad`; `TODO-pazif`; `TODO-juput`.
-- `implementations/poc14-wasm/` is executable provisional superset evidence for
-  POC13 plus heterogeneous app/runtime boundaries. It adds a WASM-boundary agent
+- `implementations/poc14-wasm/` is executable provisional superset event coverage for
+  POC13 plus heterogeneous app/runtime boundaries. It adds a WASM-adapter agent
   process, a stdio-only worker process behind a local adapter, exact-envelope
   forwarding through the same local kernel path, decentralized-monitoring
-  evidence that avoids global observer assumptions, mixed-version pCID migration
-  evidence, and same-run restart/recovery evidence. Its analyzer gates `boundary`,
+  events that avoid global observer assumptions, mixed-version pCID migration
+  events, and same-run restart/recovery events. Its analyzer gates `runtime_adapter`,
   `monitoring`, `migration`, and `restart` dimensions in addition to inherited
-  POC13 gates. It should be cited as POC evidence only, not as a final WASM host,
+  POC13 gates. It should be cited as POC event coverage only, not as a final WASM host,
   stdio adapter, monitor, pCID migration, crash-recovery, kernel, or app API.
   Source: `DI-sihuz`; `DI-sifot`; `DI-fimoh`; `DI-lulof`; `DI-linof`;
   `TODO-gogug`.
@@ -1495,7 +1495,7 @@ section.
   availability, retention, access, serving, execution, result delivery, and
   result trust are promises by specific agents. Source: `DI-bibom`.
 - `poc3` narrows the same-grid app/kernel hypothesis with an executable
-  distinction guide writers should preserve: kernel-local evidence is evidence
+  distinction guide writers should preserve: kernel-local events is evidence
   about kernel actions, while application keep/break judgment belongs to the
   promisee app. The kernel accepts receive promises and routes/refuses bytes; it
   does not decide whether Alice, Bob, or Carol kept an application-level promise.

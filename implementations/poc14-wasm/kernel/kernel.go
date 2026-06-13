@@ -25,7 +25,7 @@ const listenerDrainTimeout = 750 * time.Millisecond
 // Kernel runs one container-local PromiseGrid transport boundary. It accepts
 // receive promises from local app processes, routes exact signed envelopes to a
 // promised local receiver, and forwards cross-container bytes to peer kernels.
-// Intent: Keep POC14's kernel as transport and operational evidence only; apps
+// Intent: Keep POC14's kernel as transport and operational event records only; apps
 // own trust, business workflow, relationship learning, and keep/break judgment.
 // Source: DI-galin
 type Kernel struct {
@@ -280,7 +280,7 @@ func (kernel *Kernel) deliverToLocalApp(frameBytes []byte, message parsedEnvelop
 	ackBytes, readErr := receiver.frameConn.ReadFrame()
 	if readErr != nil {
 		kernel.record("kernel_app_ack_read_failed", "broken", target, readErr.Error())
-		return kernel.notPromisedAck(message, "I promise local app delivery failed while waiting for app evidence.")
+		return kernel.notPromisedAck(message, "I promise local app delivery failed while waiting for app event.")
 	}
 	kernel.record("kernel_app_delivered", "kept", target, "pcid="+message.protocolName+" exact_sha256="+message.exactHash)
 	return ackBytes

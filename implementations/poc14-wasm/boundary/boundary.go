@@ -6,15 +6,15 @@ import (
 )
 
 const (
-	PromiseAboutWASMBoundary    = "wasm_boundary_evidence"
-	PromiseAboutStdioBoundary   = "stdio_boundary_evidence"
-	PromiseAboutWASMModuleUse   = "wasm_module_validation"
-	PromiseAboutStdioWorkerUse  = "stdio_worker_roundtrip"
-	PromiseAboutLocalSummary    = "local_evidence_summary"
-	PromiseAboutPeerAttestation = "peer_carried_attestation"
-	PromiseAboutExchangeRate    = "bearer_token_exchange_rate"
-	PromiseAboutTopologySignal  = "relationship_topology_signal"
-	PromiseAboutVoluntaryGossip = "voluntary_gossip"
+	PromiseAboutWASMAdapter       = "wasm_adapter_event"
+	PromiseAboutStdioAdapter      = "stdio_adapter_event"
+	PromiseAboutWASMModuleUse     = "wasm_module_validation"
+	PromiseAboutStdioWorkerUse    = "stdio_worker_roundtrip"
+	PromiseAboutLocalEventSummary = "local_event_summary"
+	PromiseAboutPeerAttestation   = "peer_carried_attestation"
+	PromiseAboutExchangeRate      = "bearer_token_exchange_rate"
+	PromiseAboutTopologySignal    = "relationship_topology_signal"
+	PromiseAboutVoluntaryGossip   = "voluntary_gossip"
 )
 
 // MinimalWASMModule is a valid empty WebAssembly module. POC14 uses it as a
@@ -26,7 +26,7 @@ const (
 var MinimalWASMModule = []byte{0x00, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00}
 
 // ValidateWASMModule checks the stable magic and version bytes for the module
-// fixture used by the POC14 WASM process-boundary agent.
+// fixture used by the POC14 WASM process-runtime adapter agent.
 func ValidateWASMModule(moduleBytes []byte) error {
 	if len(moduleBytes) < len(MinimalWASMModule) {
 		return fmt.Errorf("wasm module too short: %d bytes", len(moduleBytes))
@@ -41,7 +41,7 @@ func ValidateWASMModule(moduleBytes []byte) error {
 }
 
 // PromiseFields returns the common relationship_v1 payload used by the
-// heterogeneous boundary agents. The caller still signs and routes the envelope
+// heterogeneous runtime-adapter agents. The caller still signs and routes the envelope
 // through the normal POC14 app/kernel path.
 func PromiseFields(fromAgent, toAgent, promiseAbout, promiseText string) map[string]string {
 	return map[string]string{
@@ -50,7 +50,7 @@ func PromiseFields(fromAgent, toAgent, promiseAbout, promiseText string) map[str
 		"to":                  toAgent,
 		"turn":                "startup",
 		"promise":             promiseText,
-		"reason":              "heterogeneous runtime boundary evidence expressed as a local promise",
+		"reason":              "heterogeneous runtime runtime adapter events expressed as a local promise",
 		"field_promise_about": promiseAbout,
 	}
 }
@@ -75,15 +75,15 @@ type StdioEnvelopeMessage struct {
 }
 
 // StdioAckMessage is the adapter-to-worker acknowledgement envelope after the
-// adapter receives peer evidence through the local kernel.
+// adapter receives peer events through the local kernel.
 type StdioAckMessage struct {
 	Type string `json:"type"`
 	Hex  string `json:"hex"`
 }
 
-// StdioObservedMessage is the worker's final stdout evidence after it parses
+// StdioEventMessage is the worker's final stdout event after it parses
 // the ACK envelope locally.
-type StdioObservedMessage struct {
+type StdioEventMessage struct {
 	Type        string `json:"type"`
 	Outcome     string `json:"outcome"`
 	ExactSHA256 string `json:"exact_sha256"`
