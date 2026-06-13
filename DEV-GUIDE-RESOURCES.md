@@ -234,11 +234,12 @@ POC14 is the current heterogeneous-runtime POC target. It is scaffolded as a
 POC13 superset under `implementations/poc14-wasm/`, keeps the inherited
 kernel/app, shipping, CAS, compute, trust, replay, and pressure gates, and adds
 Peggy/Victor runtime adapter events: Peggy is a separate WASM-adapter app process
-that validates module bytes and sends normal `relationship_v1` promises, while
-Victor is a stdio-worker agent behind a local adapter whose application
-messaging path is stdin/stdout carrying exact PromiseGrid envelope bytes. Peggy
-and Victor now also send useful relationship promises to Dave about reusable
-module-validation and subprocess round-trip events. POC14 adds analyzer
+that executes an embedded no-import module with wazero and sends normal
+`relationship_v1` promises, while Victor is a stdio-worker agent behind a local
+adapter whose application messaging path is length-prefixed CBOR frames on
+stdin/stdout carrying exact PromiseGrid envelope bytes as CBOR byte strings.
+Peggy and Victor now also send useful relationship promises to Dave about
+reusable module-execution and subprocess round-trip events. POC14 adds analyzer
 dimensions for runtime adapters, decentralized monitoring, mixed-version pCID migration,
 same-run restart events, and migrated pCID-owned array payload events for
 scripted `cas_storage_v1` and `cid_compute_v1`; `field_*` names remain local
@@ -1425,15 +1426,16 @@ section.
 	  `DI-punib`; `DI-sunuf`; `DI-fijov`; `TODO-godad`; `TODO-pazif`; `TODO-juput`.
 - `implementations/poc14-wasm/` is executable provisional superset event coverage for
   POC13 plus heterogeneous app/runtime boundaries. It adds a WASM-adapter agent
-  process, a stdio-only worker process behind a local adapter, exact-envelope
-  forwarding through the same local kernel path, decentralized-monitoring
-  events that avoid global observer assumptions, mixed-version pCID migration
-  events, and same-run restart/recovery events. Its analyzer gates `runtime_adapter`,
+  process that executes an embedded module with wazero, a stdio-only worker
+  process behind a local adapter that uses length-prefixed CBOR frames,
+  exact-envelope forwarding through the same local kernel path,
+  decentralized-monitoring events that avoid global observer assumptions,
+  mixed-version pCID migration events, and same-run restart/recovery events. Its analyzer gates `runtime_adapter`,
   `monitoring`, `migration`, and `restart` dimensions in addition to inherited
   POC13 gates. It should be cited as POC event coverage only, not as a final WASM host,
   stdio adapter, monitor, pCID migration, crash-recovery, kernel, or app API.
   Source: `DI-sihuz`; `DI-sifot`; `DI-fimoh`; `DI-lulof`; `DI-linof`;
-  `TODO-gogug`.
+  `DI-kimim`; `TODO-gogug`.
 - `protocols/wire-lab.d/archive/migrations/SIM-piloh-turns-149-208-recovery/archive/transports/README.md`
   preserves the old root transport design surface as historical evidence.
 

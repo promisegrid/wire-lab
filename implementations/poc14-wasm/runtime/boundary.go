@@ -1,11 +1,9 @@
 package runtime
 
 import (
-	"bufio"
 	"context"
-	"encoding/hex"
-	"encoding/json"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 
@@ -18,9 +16,11 @@ import (
 // it can keep PromiseGrid semantics outside the sandbox while still exchanging
 // ordinary relationship_v1 promise envelopes through the local kernel.
 // Intent: POC14 adds heterogeneous process-runtime adapter events without making
-// WASM host calls into RPC commands or trust authorities. Source: DI-linof
-func (node *Node) runWASMBoundaryWorkflow() error {
-	if err := boundary.ValidateWASMModule(boundary.MinimalWASMModule); err != nil {
+// WASM host calls into RPC commands or trust authorities. Source: DI-linof;
+// DI-kimim
+func (node *Node) runWASMBoundaryWorkflow(ctx context.Context) error {
+	result, err := boundary.RunWASMModule(ctx, boundary.MinimalWASMModule)
+	if err != nil {
 		return err
 	}
 	target, targetFound := node.firstConfiguredPeerByKind("stdio_agent")
@@ -29,14 +29,18 @@ func (node *Node) runWASMBoundaryWorkflow() error {
 	}
 	moduleHash := protocol.HashExactBytes(boundary.MinimalWASMModule)
 	node.record("wasm_process_agent_started", "kept", "", "agent="+node.Agent.Name+" module_sha256="+moduleHash)
-	node.record("wasm_module_header_validated", "kept", "", "module_magic=0061736d module_version=01000000")
+	node.record("wasm_module_instantiated", "kept", "", "module_sha256="+moduleHash+" runtime=wazero")
+	node.record("wasm_export_called", "kept", "", "export="+result.ExportName)
+	node.record("wasm_export_result_observed", "kept", "", fmt.Sprintf("export=%s value=%d", result.ExportName, result.ExportValue))
 	fields := boundary.PromiseFields(
 		node.Agent.Name,
 		target,
 		boundary.PromiseAboutWASMAdapter,
-		"Peggy promises that her local WASM-adapter process validated sandbox module bytes and will exchange only pCID-defined PromiseGrid envelopes.",
+		"Peggy promises that her local WASM-adapter process executed an embedded wazero module and will exchange only pCID-defined PromiseGrid envelopes.",
 	)
 	fields["field_wasm_module_sha256"] = moduleHash
+	fields["field_wasm_export"] = result.ExportName
+	fields["field_wasm_export_value"] = fmt.Sprintf("%d", result.ExportValue)
 	fields["field_protocol"] = pcid.RelationshipV1
 	if _, err := node.sendAndReceive(target, fields); err != nil {
 		return fmt.Errorf("wasm adapter promise: %w", err)
@@ -48,9 +52,11 @@ func (node *Node) runWASMBoundaryWorkflow() error {
 		node.Agent.Name,
 		usefulTarget,
 		boundary.PromiseAboutWASMModuleUse,
-		"Peggy promises Dave a reusable WASM module-validation observation: these module bytes have the WebAssembly magic/version header and can be judged before any sandbox host call is trusted.",
+		"Peggy promises Dave a reusable WASM module-execution event: these module bytes were compiled, instantiated, and called with wazero, returning the expected deterministic value.",
 	)
 	usefulFields["field_wasm_module_sha256"] = moduleHash
+	usefulFields["field_wasm_export"] = result.ExportName
+	usefulFields["field_wasm_export_value"] = fmt.Sprintf("%d", result.ExportValue)
 	usefulFields["field_protocol"] = pcid.RelationshipV1
 	if _, err := node.sendAndReceive(usefulTarget, usefulFields); err != nil {
 		return fmt.Errorf("wasm useful-work promise: %w", err)
@@ -58,7 +64,7 @@ func (node *Node) runWASMBoundaryWorkflow() error {
 	// Intent: Peggy's WASM process should do useful PromiseGrid work, not merely
 	// prove that a sandbox boundary exists. Source: DI-pamob
 	node.record("wasm_useful_work_promised", "kept", usefulTarget, "pcid="+pcid.RelationshipV1+" module_sha256="+moduleHash)
-	node.record("wasm_useful_work_ack_received", "kept", usefulTarget, "pcid="+pcid.RelationshipV1+" Dave received reusable module-validation event")
+	node.record("wasm_useful_work_ack_received", "kept", usefulTarget, "pcid="+pcid.RelationshipV1+" Dave received reusable module-execution event")
 	return nil
 }
 
@@ -67,7 +73,7 @@ func (node *Node) runWASMBoundaryWorkflow() error {
 // through the same local kernel path every other app uses.
 // Intent: POC14 tests subprocess adapters without giving stdio messages RPC
 // semantics; the worker emits and observes PromiseGrid envelopes as bytes.
-// Source: DI-linof
+// Source: DI-linof; DI-kimim
 func (node *Node) runStdioBoundaryWorkflow(ctx context.Context) error {
 	target, targetFound := node.firstConfiguredPeerByKind("wasm_agent")
 	if !targetFound {
@@ -87,35 +93,40 @@ func (node *Node) runStdioBoundaryWorkflow(ctx context.Context) error {
 		return startErr
 	}
 	node.record("stdio_worker_started", "kept", target, "worker=poc14-stdio-worker")
-	scanner := bufio.NewScanner(stdout)
-	scanner.Buffer(make([]byte, 1024), 1024*1024)
-	encoder := json.NewEncoder(stdin)
-	request := boundary.StdioRequest{Type: "promise_request", From: node.Agent.Name, To: target}
-	if err := encoder.Encode(request); err != nil {
+	requestBytes, err := boundary.MarshalStdioCBORRequest(boundary.StdioCBORRequest{Type: "promise_request", From: node.Agent.Name, To: target})
+	if err != nil {
+		return node.finishStdioWorker(command, stdin, err)
+	}
+	if err := boundary.WriteCBORFrame(stdin, requestBytes); err != nil {
 		return node.finishStdioWorker(command, stdin, fmt.Errorf("write stdio request: %w", err))
 	}
-	outbound, outboundErr := readStdioEnvelope(scanner)
+	node.record("stdio_cbor_request_sent", "kept", target, "frame=promise_request format=cbor")
+	outbound, outboundErr := readStdioEnvelope(stdout)
 	if outboundErr != nil {
 		return node.finishStdioWorker(command, stdin, outboundErr)
 	}
-	envelopeBytes, decodeErr := hex.DecodeString(outbound.Hex)
-	if decodeErr != nil {
-		return node.finishStdioWorker(command, stdin, decodeErr)
-	}
+	envelopeBytes := outbound.EnvelopeBytes
 	node.record("stdio_worker_envelope_received", "kept", target, "protocol="+outbound.Protocol+" exact_sha256="+protocol.HashExactBytes(envelopeBytes))
+	node.record("stdio_cbor_envelope_received", "kept", target, "protocol="+outbound.Protocol+" exact_sha256="+protocol.HashExactBytes(envelopeBytes))
 	_, ackBytes, sendErr := node.sendRawEnvelopeBytes(outbound.To, outbound.Protocol, envelopeBytes)
 	if sendErr != nil {
 		return node.finishStdioWorker(command, stdin, fmt.Errorf("stdio envelope forward: %w", sendErr))
 	}
 	node.record("stdio_adapter_kernel_forwarded", "kept", outbound.To, "pcid="+outbound.Protocol+" worker="+outbound.From)
-	if err := encoder.Encode(boundary.StdioAckMessage{Type: "ack_envelope", Hex: hex.EncodeToString(ackBytes)}); err != nil {
+	ackFrameBytes, err := boundary.MarshalStdioCBORAck(boundary.StdioCBORAck{Type: "ack_envelope", EnvelopeBytes: ackBytes})
+	if err != nil {
+		return node.finishStdioWorker(command, stdin, err)
+	}
+	if err := boundary.WriteCBORFrame(stdin, ackFrameBytes); err != nil {
 		return node.finishStdioWorker(command, stdin, fmt.Errorf("write stdio ack: %w", err))
 	}
-	observed, observedErr := readStdioEvent(scanner)
+	node.record("stdio_cbor_ack_sent", "kept", target, "exact_sha256="+protocol.HashExactBytes(ackBytes))
+	observed, observedErr := readStdioEvent(stdout)
 	if observedErr != nil {
 		return node.finishStdioWorker(command, stdin, observedErr)
 	}
 	node.record("stdio_worker_ack_event", observed.Outcome, target, "exact_sha256="+observed.ExactSHA256)
+	node.record("stdio_cbor_ack_event", observed.Outcome, target, "exact_sha256="+observed.ExactSHA256)
 	usefulTarget := "dave"
 	usefulFields := boundary.PromiseFields(
 		node.Agent.Name,
@@ -136,42 +147,38 @@ func (node *Node) runStdioBoundaryWorkflow(ctx context.Context) error {
 	return node.finishStdioWorker(command, stdin, nil)
 }
 
-func readStdioEnvelope(scanner *bufio.Scanner) (boundary.StdioEnvelopeMessage, error) {
-	if !scanner.Scan() {
-		if err := scanner.Err(); err != nil {
-			return boundary.StdioEnvelopeMessage{}, err
-		}
-		return boundary.StdioEnvelopeMessage{}, fmt.Errorf("stdio worker produced no envelope")
+func readStdioEnvelope(reader io.Reader) (boundary.StdioCBOREnvelope, error) {
+	frameBytes, err := boundary.ReadCBORFrame(reader)
+	if err != nil {
+		return boundary.StdioCBOREnvelope{}, err
 	}
-	var outbound boundary.StdioEnvelopeMessage
-	if err := json.Unmarshal(scanner.Bytes(), &outbound); err != nil {
-		return boundary.StdioEnvelopeMessage{}, err
+	outbound, err := boundary.ParseStdioCBOREnvelope(frameBytes)
+	if err != nil {
+		return boundary.StdioCBOREnvelope{}, err
 	}
 	if outbound.Type != "outbound_envelope" {
-		return boundary.StdioEnvelopeMessage{}, fmt.Errorf("stdio worker message type %q, want outbound_envelope", outbound.Type)
+		return boundary.StdioCBOREnvelope{}, fmt.Errorf("stdio worker message type %q, want outbound_envelope", outbound.Type)
 	}
-	if outbound.Hex == "" || outbound.From == "" || outbound.To == "" || outbound.Protocol == "" {
-		return boundary.StdioEnvelopeMessage{}, fmt.Errorf("stdio worker envelope message is incomplete")
+	if len(outbound.EnvelopeBytes) == 0 || outbound.From == "" || outbound.To == "" || outbound.Protocol == "" {
+		return boundary.StdioCBOREnvelope{}, fmt.Errorf("stdio worker envelope message is incomplete")
 	}
 	return outbound, nil
 }
 
-func readStdioEvent(scanner *bufio.Scanner) (boundary.StdioEventMessage, error) {
-	if !scanner.Scan() {
-		if err := scanner.Err(); err != nil {
-			return boundary.StdioEventMessage{}, err
-		}
-		return boundary.StdioEventMessage{}, fmt.Errorf("stdio worker produced no ack observation")
+func readStdioEvent(reader io.Reader) (boundary.StdioCBOREvent, error) {
+	frameBytes, err := boundary.ReadCBORFrame(reader)
+	if err != nil {
+		return boundary.StdioCBOREvent{}, err
 	}
-	var observed boundary.StdioEventMessage
-	if err := json.Unmarshal(scanner.Bytes(), &observed); err != nil {
-		return boundary.StdioEventMessage{}, err
+	observed, err := boundary.ParseStdioCBOREvent(frameBytes)
+	if err != nil {
+		return boundary.StdioCBOREvent{}, err
 	}
 	if observed.Type != "ack_event" {
-		return boundary.StdioEventMessage{}, fmt.Errorf("stdio worker message type %q, want ack_event", observed.Type)
+		return boundary.StdioCBOREvent{}, fmt.Errorf("stdio worker message type %q, want ack_event", observed.Type)
 	}
 	if observed.Outcome == "" || observed.ExactSHA256 == "" {
-		return boundary.StdioEventMessage{}, fmt.Errorf("stdio worker ack observation is incomplete")
+		return boundary.StdioCBOREvent{}, fmt.Errorf("stdio worker ack observation is incomplete")
 	}
 	return observed, nil
 }

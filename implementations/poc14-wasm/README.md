@@ -7,10 +7,11 @@ autonomous sparse-mesh relationship/economics pressure, POC12's separate
 app/kernel processes and shipping/device workflow, and POC13's CAS, compute,
 replica recovery, token lifecycle, verifier disagreement, run-scoped durability,
 retention/GC, backpressure, rate-limit, replay protection, bounded trust, and
-dynamic topology gates. POC14 adds Peggy as a WASM-adapter process, Victor as a
-stdio-worker process behind a local adapter, and analyzer gates for
-decentralized monitoring signals that do not assume a production-wide observer.
-Source: `DI-sihuz`; `DI-sifot`; `DI-fimoh`; `DI-lulof`; `DI-linof`.
+dynamic topology gates. POC14 adds Peggy as a WASM-adapter process that executes
+an embedded module with wazero, Victor as a stdio-worker process behind a local
+adapter using binary CBOR frames, and analyzer gates for decentralized
+monitoring signals that do not assume a production-wide observer. Source:
+`DI-sihuz`; `DI-sifot`; `DI-fimoh`; `DI-lulof`; `DI-linof`; `DI-kimim`.
 
 ## What This Tests
 
@@ -26,10 +27,11 @@ Source: `DI-sihuz`; `DI-sifot`; `DI-fimoh`; `DI-lulof`; `DI-linof`.
 - Deterministic device/system agents for scale, printer-port hardware access,
   label-printer business logic, and accounting alongside live LLM
   business/social agents.
-- Deterministic heterogeneous-boundary agents: Peggy validates a WASM module
-  fixture in her own app process, and Victor's worker process sends and receives
-  exact PromiseGrid envelopes only through stdin/stdout with a local adapter.
-  Source: `DI-linof`.
+- Deterministic heterogeneous-boundary agents: Peggy executes an embedded
+  no-import WASM module with wazero in her own app process, and Victor's worker
+  process sends and receives exact PromiseGrid envelopes as CBOR byte strings
+  inside length-prefixed CBOR frames on stdin/stdout. Source: `DI-linof`;
+  `DI-kimim`.
 - One top-level semantic act, `promise`; workflow steps are payload meanings,
   not RPC verbs.
 - Explicit direct TCP relationship transition event:
@@ -142,17 +144,18 @@ runtime boundary. Source: `DI-vipih`; `DI-gahuh`.
   `cid_compute_v1` handling while keeping the same single top-level `promise`
   action. Scripted identity-key, CAS, and compute flows now use pCID-owned array
   payloads in this cleanup slice. Source: `DI-vipih`; `DI-gahuh`.
-- `poc14-wasm-agent`: deterministic Peggy app process that validates WASM module
-  bytes, sends WASM-adapter event as a normal `relationship_v1` promise, and
-  promises Dave reusable module-validation event records. Source: `DI-pamob`.
+- `poc14-wasm-agent`: deterministic Peggy app process that compiles,
+  instantiates, and calls an embedded wazero module, sends WASM-adapter event as
+  a normal `relationship_v1` promise, and promises Dave reusable module-execution
+  event records. Source: `DI-pamob`; `DI-kimim`.
 - `poc14-stdio-adapter`: deterministic Victor adapter process that starts
-  `poc14-stdio-worker`, receives exact envelope bytes over stdout, forwards
-  those bytes through the local kernel, returns the exact peer ACK over stdin,
-  and promises Dave reusable stdio subprocess round-trip event records. Source:
-  `DI-pamob`.
+  `poc14-stdio-worker`, receives exact envelope bytes as CBOR byte strings over
+  stdout, forwards those bytes through the local kernel, returns the exact peer
+  ACK as a CBOR byte string over stdin, and promises Dave reusable stdio
+  subprocess round-trip event records. Source: `DI-pamob`; `DI-kimim`.
 - `poc14-stdio-worker`: subprocess agent whose application messaging path is
-  stdin/stdout only; it signs one PromiseGrid envelope and locally verifies the
-  returned ACK envelope.
+  stdin/stdout only; it signs one PromiseGrid envelope, writes and reads binary
+  CBOR frames, and locally verifies the returned ACK envelope.
 - `poc14-kernel`: container-local transport process that records operational
   routing event records only; it does not own trust, workflow, device behavior, or
   promise judgment. Source: `DI-galin`.
@@ -186,12 +189,12 @@ notes are in `docs/IMPLEMENTATION-NOTES.md`; kernel role notes are in
 ignored and must not be committed. `openai_api_key.txt` remains ignored for
 older local workflows but is not required by the current Compose setup.
 
-The latest pre-`DI-gahuh` clean baseline is the 2026-06-12 `poc14-demo` run:
-2092 total events, all analyzer score dimensions at `5`, empty
-`rpc_drift_counts`, empty `resource_trust_coupling_counts`, and production
-fitness still blocked by monitor scores of `4/5` for Promise Theory fit,
-protocol validity, and local trust correctness. The next clean run should add
-the migrated CAS/compute array event gates. Source: `DI-gahuh`.
+The latest clean baseline is the 2026-06-13 `poc14-demo` run after the Peggy
+wazero execution and Victor CBOR stdio upgrade: 2218 total events, all analyzer
+score dimensions at `5`, one each of the new wazero and stdio-CBOR runtime
+adapter events, empty `rpc_drift_counts`, empty `resource_trust_coupling_counts`,
+and production fitness still blocked by monitor scores of `4/5` for protocol
+validity and imposition avoidance. Source: `DI-gahuh`; `DI-kimim`.
 
 ## Current Limits
 

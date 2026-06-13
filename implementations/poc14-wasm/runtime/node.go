@@ -255,11 +255,11 @@ func (node *Node) runStartupWorkflow(ctx context.Context) error {
 	// Intent: POC14 is now a superset of POC12, so the production shipping
 	// workflow remains intact while Alice and Mallory add CAS/compute protocol
 	// pressure above the same app/kernel boundary, while POC14 adds WASM and
-	// stdio adapter roles. Source: DI-sinur; DI-linof
+	// stdio adapter roles. Source: DI-sinur; DI-linof; DI-kimim
 	if _, hasKernelAddress := node.Config.KernelAppAddressForAgent(node.Agent.Name); hasKernelAddress {
 		switch node.Agent.Kind {
 		case "wasm_agent":
-			return node.runWASMBoundaryWorkflow()
+			return node.runWASMBoundaryWorkflow(ctx)
 		case "stdio_agent":
 			return node.runStdioBoundaryWorkflow(ctx)
 		}

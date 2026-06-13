@@ -18,7 +18,9 @@ func TestAnalyzeRunSummarizesEventsAndMonitorReport(t *testing.T) {
 		`{"observer":"alice","event":"printer_port_print_confirmed","outcome":"kept","peer":"printer_port","detail":"spool"}`+"\n"+
 		`{"observer":"alice","event":"local_resource_exhausted","outcome":"non_commitment","peer":"bob","detail":"capacity exhausted"}`+"\n"+
 		`{"observer":"alice","event":"direct_peer_unchanged","outcome":"kept","peer":"bob","detail":"outcome=non_commitment trust=0"}`+"\n"+
+		`{"observer":"alice","event":"wasm_module_instantiated","outcome":"kept","peer":"victor","detail":"runtime=wazero"}`+"\n"+
 		`{"observer":"alice","event":"wasm_adapter_ack_received","outcome":"kept","peer":"victor","detail":"pcid=relationship_v1"}`+"\n"+
+		`{"observer":"alice","event":"stdio_cbor_ack_event","outcome":"kept","peer":"victor","detail":"exact_sha256=test"}`+"\n"+
 		`{"observer":"alice","event":"bearer_token_exchange_rate_observed","outcome":"kept","peer":"grace","detail":"local market signal"}`+"\n"+
 		`{"observer":"alice","event":"mixed_version_successor_pcid_selected","outcome":"kept","peer":"bob","detail":"current pCID"}`+"\n"+
 		`{"observer":"alice","event":"run_internal_restart_recovery_observed","outcome":"kept","peer":"victor","detail":"same-run recovery"}`+"\n")
@@ -39,8 +41,8 @@ func TestAnalyzeRunSummarizesEventsAndMonitorReport(t *testing.T) {
 	if err != nil {
 		t.Fatalf("analyze run: %v", err)
 	}
-	if summary.TotalEvents != 12 {
-		t.Fatalf("total events = %d, want 12", summary.TotalEvents)
+	if summary.TotalEvents != 14 {
+		t.Fatalf("total events = %d, want 14", summary.TotalEvents)
 	}
 	if summary.EventCounts["promise_sent"] != 1 || summary.FailureCounts["send_failed"] != 1 || summary.FailureCounts["decision_rejected"] != 1 {
 		t.Fatalf("unexpected counts: %#v failures %#v", summary.EventCounts, summary.FailureCounts)
@@ -131,7 +133,7 @@ func TestValidateSummaryRejectsResourceTrustCoupling(t *testing.T) {
 
 func TestValidateSummaryRejectsMissingBoundaryEvent(t *testing.T) {
 	summary := cleanRegressionSummary()
-	summary.EventCounts["stdio_worker_ack_event"] = 0
+	summary.EventCounts["stdio_cbor_ack_event"] = 0
 	summary.ScoreReport = computeScores(summary)
 	err := validateSummary(summary, cleanRegressionCriteria())
 	if err == nil {

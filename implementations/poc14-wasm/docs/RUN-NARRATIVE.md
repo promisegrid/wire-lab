@@ -3,7 +3,7 @@
 POC14 is the current executable superset target after POC13. It preserves the
 POC11/POC12/POC13 behavior set and adds heterogeneous WASM/stdio runtime
 adapters plus decentralized monitoring event records. Source: `DI-sihuz`;
-`DI-linof`; `DI-lulof`.
+`DI-linof`; `DI-lulof`; `DI-kimim`.
 
 ## Expected Clean-Run Shape
 
@@ -11,13 +11,15 @@ adapters plus decentralized monitoring event records. Source: `DI-sihuz`;
    processes.
 2. Relationship, storage, compute, shipping, device, and accounting agents keep
    the inherited POC13 startup and turn event.
-3. Peggy starts as `poc14-wasm-agent`, validates the minimal WASM module fixture,
-   sends WASM-adapter event as an ordinary `relationship_v1` promise, and
-   promises Dave reusable module-validation event.
+3. Peggy starts as `poc14-wasm-agent`, compiles, instantiates, and calls an
+   embedded no-import WASM module with wazero, sends WASM-adapter event as an
+   ordinary `relationship_v1` promise, and promises Dave reusable
+   module-execution event.
 4. Victor starts as `poc14-stdio-adapter`, launches `poc14-stdio-worker`, receives
-   an exact signed envelope over stdout, forwards it through the local kernel,
-   returns the exact peer ACK over stdin, and promises Dave reusable subprocess
-   round-trip event.
+   an exact signed envelope as a CBOR byte string inside a length-prefixed CBOR
+   frame over stdout, forwards it through the local kernel, returns the exact
+   peer ACK as a CBOR byte string over stdin, and promises Dave reusable
+   subprocess round-trip event.
 5. Alice records decentralized monitoring candidates as local events: local
    event summaries, peer-carried attestations, bearer-token exchange-rate
    signals, topology signals, and voluntary gossip.
@@ -35,15 +37,21 @@ adapters plus decentralized monitoring event records. Source: `DI-sihuz`;
 ## Runtime Adapter Events
 
 - `wasm_process_agent_started`
-- `wasm_module_header_validated`
+- `wasm_module_instantiated`
+- `wasm_export_called`
+- `wasm_export_result_observed`
 - `wasm_adapter_promise_sent`
 - `wasm_adapter_ack_received`
 - `wasm_useful_work_promised`
 - `wasm_useful_work_ack_received`
 - `stdio_worker_started`
+- `stdio_cbor_request_sent`
 - `stdio_worker_envelope_received`
+- `stdio_cbor_envelope_received`
 - `stdio_adapter_kernel_forwarded`
+- `stdio_cbor_ack_sent`
 - `stdio_worker_ack_event`
+- `stdio_cbor_ack_event`
 - `stdio_useful_work_promised`
 - `stdio_useful_work_ack_received`
 
@@ -87,16 +95,19 @@ adapters plus decentralized monitoring event records. Source: `DI-sihuz`;
 
 ## Current Status
 
-The 2026-06-12 `poc14-demo` clean Docker run passed `poc14-analyze` after the
-environment-backed secret and identity-key cleanup. The run produced 2092 total
-events; all analyzer score dimensions were `5`; `protocol_counts` included
-`identity_key_v1=42`, `cas_storage_v1=225`, `cid_compute_v1=163`,
-`relationship_v1=669`, `accounting_v1=41`, `postal_scale_v1=19`,
-`printer_port_v1=32`, and `ups_label_v1=19`; and `rpc_drift_counts` plus
+The 2026-06-13 `poc14-demo` clean Docker run passed `poc14-analyze` after the
+Peggy wazero execution and Victor CBOR stdio upgrade. The run produced 2218
+total events; all analyzer score dimensions were `5`; `runtime_adapter_event_counts`
+included one each of `wasm_module_instantiated`, `wasm_export_called`,
+`wasm_export_result_observed`, `stdio_cbor_request_sent`,
+`stdio_cbor_envelope_received`, `stdio_cbor_ack_sent`, and
+`stdio_cbor_ack_event`; `protocol_counts` included `identity_key_v1=42`,
+`cas_storage_v1=269`, `cid_compute_v1=191`, `relationship_v1=696`,
+`accounting_v1=41`, `postal_scale_v1=19`, `printer_port_v1=32`, and
+`ups_label_v1=19`; and `rpc_drift_counts` plus
 `resource_trust_coupling_counts` were empty.
 
 The run remains not production-ready: the production-fitness report kept
-`ready_for_production=false` because the monitor scored `promise_theory_fit`,
-`protocol_validity`, and `local_trust_correctness` at `4/5`. The next clean run
-after `DI-gahuh` should additionally satisfy the migrated array payload event
-above. Source: `DI-linof`; `DI-lulof`; `DI-kinaf`; `DI-dubih`; `DI-gahuh`.
+`ready_for_production=false` because the monitor scored `protocol_validity` and
+`imposition_avoidance` at `4/5`. Source: `DI-linof`; `DI-lulof`; `DI-kinaf`;
+`DI-dubih`; `DI-gahuh`; `DI-kimim`.

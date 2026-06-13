@@ -1,8 +1,6 @@
 package main
 
 import (
-	"encoding/hex"
-	"encoding/json"
 	"fmt"
 	"os"
 
@@ -19,11 +17,13 @@ func main() {
 }
 
 func run() error {
-	decoder := json.NewDecoder(os.Stdin)
-	encoder := json.NewEncoder(os.Stdout)
-	var request boundary.StdioRequest
-	if err := decoder.Decode(&request); err != nil {
+	requestFrameBytes, err := boundary.ReadCBORFrame(os.Stdin)
+	if err != nil {
 		return fmt.Errorf("decode request: %w", err)
+	}
+	request, err := boundary.ParseStdioCBORRequest(requestFrameBytes)
+	if err != nil {
+		return fmt.Errorf("parse request: %w", err)
 	}
 	if request.Type != "promise_request" || request.From == "" || request.To == "" {
 		return fmt.Errorf("invalid stdio request")
@@ -44,30 +44,34 @@ func run() error {
 	if bytesErr != nil {
 		return bytesErr
 	}
-	// Intent: The stdio worker writes exact envelope bytes as data, not commands;
-	// the adapter decides locally whether to forward them through the kernel.
-	// Source: DI-linof
-	if err := encoder.Encode(boundary.StdioEnvelopeMessage{
-		Type:     "outbound_envelope",
-		From:     request.From,
-		To:       request.To,
-		Protocol: pcid.RelationshipV1,
-		Hex:      hex.EncodeToString(envelopeBytes),
-	}); err != nil {
+	// Intent: The stdio worker writes exact envelope bytes inside a CBOR byte
+	// string, not JSON text or RPC commands; the adapter decides locally
+	// whether to forward them through the kernel. Source: DI-linof; DI-kimim
+	outboundFrameBytes, err := boundary.MarshalStdioCBOREnvelope(boundary.StdioCBOREnvelope{
+		Type:          "outbound_envelope",
+		From:          request.From,
+		To:            request.To,
+		Protocol:      pcid.RelationshipV1,
+		EnvelopeBytes: envelopeBytes,
+	})
+	if err != nil {
+		return fmt.Errorf("marshal outbound envelope: %w", err)
+	}
+	if err := boundary.WriteCBORFrame(os.Stdout, outboundFrameBytes); err != nil {
 		return fmt.Errorf("encode outbound envelope: %w", err)
 	}
-	var ack boundary.StdioAckMessage
-	if err := decoder.Decode(&ack); err != nil {
+	ackFrameBytes, err := boundary.ReadCBORFrame(os.Stdin)
+	if err != nil {
 		return fmt.Errorf("decode ack: %w", err)
 	}
-	if ack.Type != "ack_envelope" || ack.Hex == "" {
+	ack, err := boundary.ParseStdioCBORAck(ackFrameBytes)
+	if err != nil {
+		return fmt.Errorf("parse ack: %w", err)
+	}
+	if ack.Type != "ack_envelope" || len(ack.EnvelopeBytes) == 0 {
 		return fmt.Errorf("invalid ack message")
 	}
-	ackBytes, decodeErr := hex.DecodeString(ack.Hex)
-	if decodeErr != nil {
-		return decodeErr
-	}
-	ackEnvelope, parseErr := protocol.ParseEnvelope(ackBytes)
+	ackEnvelope, parseErr := protocol.ParseEnvelope(ack.EnvelopeBytes)
 	if parseErr != nil {
 		return parseErr
 	}
@@ -78,9 +82,13 @@ func run() error {
 	if fieldsErr != nil {
 		return fieldsErr
 	}
-	return encoder.Encode(boundary.StdioEventMessage{
+	eventFrameBytes, err := boundary.MarshalStdioCBOREvent(boundary.StdioCBOREvent{
 		Type:        "ack_event",
 		Outcome:     ackFields["outcome"],
-		ExactSHA256: protocol.HashExactBytes(ackBytes),
+		ExactSHA256: protocol.HashExactBytes(ack.EnvelopeBytes),
 	})
+	if err != nil {
+		return fmt.Errorf("marshal ack event: %w", err)
+	}
+	return boundary.WriteCBORFrame(os.Stdout, eventFrameBytes)
 }

@@ -98,6 +98,14 @@ Intent: `Evidence` is useful for human design/testing claims but can leak into p
 Constraints: Preserve historical DI/TODO text as append-only records; do not add compatibility aliases for old POC14 run logs because clean-run JSONL files are resettable POC artifacts; keep `grid([42(pCID), payload, proof])`; do not add new top-level action kinds; keep production-facing code, active docs, analyzer output, and fresh run events free of `evidence` names.
 Affects: implementations/poc14-wasm/; implementations/poc15-multihop/; DEV-GUIDE-RESOURCES.md; protocols/wire-lab.d/TODO/TODO-gogug-poc13-hardening-and-poc14-superset-plan.md.
 
+ID: DI-kimim
+Date: 2026-06-13 14:08:38
+Status: active
+Decision: Upgrade POC14 Peggy and Victor in place so Peggy executes an embedded WebAssembly module with wazero, and Victor replaces JSON-plus-hex stdio control messages with length-prefixed CBOR frames carrying exact envelope bytes.
+Intent: POC14 previously had useful process-boundary coverage, but Peggy only validated WASM header bytes and Victor used JSON wrappers around hex-encoded envelope bytes. The runtime-adapter slice should now show real WASM execution and binary CBOR subprocess I/O while staying PromiseGrid-correct: ordinary signed envelopes still carry promises, adapters do not become RPC command surfaces, and all trust/workflow judgment remains local to agents.
+Constraints: Preserve one top-level semantic action `promise`; keep `grid([42(pCID), payload, proof])`; keep the WASM module deterministic and embedded for this POC; do not accept arbitrary user-provided WASM modules; keep stdio as local subprocess framing, not a new wire protocol; do not edit ignored `config.json`; keep runtime state scoped to clean-run roots and Docker volumes.
+Affects: implementations/poc14-wasm/; DEV-GUIDE-RESOURCES.md; protocols/wire-lab.d/TODO/TODO-gogug-poc13-hardening-and-poc14-superset-plan.md.
+
 ## Tasks
 
 - [x] gogug.1 Fix POC13 evidence summary mismatch so saved evidence counts include all local non-commitment outcomes, not only receiver-side `not_promised` journal entries.
@@ -137,3 +145,4 @@ Affects: implementations/poc14-wasm/; implementations/poc15-multihop/; DEV-GUIDE
 - [x] gogug.35 Document non-monolithic kernel roles using POC14/POC15 evidence.
 - [x] gogug.36 Add production-fitness follow-up plan for protocol validity, local trust correctness, and Promise Theory fit blockers.
 - [x] gogug.37 Rename active POC14/POC15 vocabulary from evidence/boundary categories to event/promise/outcome and runtime adapter terms.
+- [x] gogug.38 Upgrade Peggy to real wazero WASM execution and Victor to binary CBOR stdio I/O.

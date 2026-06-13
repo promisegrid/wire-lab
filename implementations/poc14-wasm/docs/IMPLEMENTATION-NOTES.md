@@ -12,13 +12,16 @@ superset of prior POCs unless a scoped DI explicitly says otherwise. Source:
   named `poc14` / `poc14-run`.
 - Peggy and Victor were added to `config.example.json` in a new `wasm-stdio`
   container.
-- `poc14-wasm-agent` records WASM module-runtime adapter events without adding a WASM
-  host-call RPC surface.
+- `poc14-wasm-agent` records real wazero compile/instantiate/call events for an
+  embedded no-import module without adding a WASM host-call RPC surface. Source:
+  `DI-kimim`.
 - `poc14-stdio-adapter` and `poc14-stdio-worker` record stdio-only worker
-  messaging while preserving exact PromiseGrid envelopes.
+  messaging with length-prefixed CBOR frames while preserving exact PromiseGrid
+  envelopes as CBOR byte strings. Source: `DI-kimim`.
 - `poc14-analyze` now reports `runtime_adapter_event_counts`,
   `decentralized_monitor_counts`, `migration_counts`, `restart_counts`, and
-  score dimensions for `boundary`, `monitoring`, `migration`, and `restart`.
+  score dimensions for `runtime_adapter`, `monitoring`, `migration`, and
+  `restart`.
 - Scripted `cas_storage_v1` and `cid_compute_v1` messages now use pCID-owned
   CBOR array payloads on the wire, with `field_*` compatibility projections only
   inside local handlers and analyzer event records. Source: `DI-gahuh`.

@@ -200,7 +200,7 @@
     {
       "name": "peggy",
       "kind": "wasm_agent",
-      "persona": "WASM-adapter peer. Peggy runs as a separate process that validates sandbox module bytes and promises only pCID-defined envelope exchanges across the sandbox boundary.",
+      "persona": "WASM-adapter peer. Peggy runs as a separate process that executes an embedded wazero module and promises only pCID-defined envelope exchanges across the sandbox boundary.",
       "motivation": "Show that a sandboxed runtime can participate without host calls becoming RPC commands or trust authority.",
       "initial_peers": ["victor", "alice", "dave"],
       "candidate_peers": ["victor", "alice", "dave", "grace"],
@@ -211,7 +211,7 @@
     {
       "name": "victor",
       "kind": "stdio_agent",
-      "persona": "Stdio-only peer. Victor's worker process sends and receives PromiseGrid envelopes only through stdin/stdout with a local adapter.",
+      "persona": "Stdio-only peer. Victor's worker process sends and receives PromiseGrid envelopes only through length-prefixed CBOR frames on stdin/stdout with a local adapter.",
       "motivation": "Show that subprocess-style agents can use PromiseGrid without direct network APIs or RPC command surfaces.",
       "initial_peers": ["peggy", "alice", "dave"],
       "candidate_peers": ["peggy", "alice", "dave", "grace"],

@@ -3,20 +3,19 @@
 POC14 is executable POC event, not production software. Its purpose is to test
 whether the POC13 superset can survive heterogeneous app processes,
 decentralized monitoring, hard local distrust, and untrusted-transit exclusion.
-Source: `DI-linof`; `DI-lulof`; `DI-kinaf`; `DI-dubih`.
+Source: `DI-linof`; `DI-lulof`; `DI-kinaf`; `DI-dubih`; `DI-kimim`.
 
 ## Current Fitness Claim
 
 - POC14 should remain fit for continued POC work if `poc14-analyze` reports all
   inherited POC13 gates plus `runtime_adapter=5`, `monitoring=5`, `migration=5`, and
   `restart=5`.
-- The 2026-06-12 `poc14-demo` clean Docker run passed those analyzer gates with
-  2092 total events, all score dimensions at `5`, explicit behavioral event
-  for permanent local distrust plus untrusted-transit exclusion, identity-key
-  cleanup event, and empty `rpc_drift_counts` /
+- The 2026-06-13 `poc14-demo` clean Docker run passed those analyzer gates with
+  2218 total events, all score dimensions at `5`, one each of the new wazero and
+  stdio-CBOR runtime adapter events, explicit behavioral event for permanent
+  local distrust plus untrusted-transit exclusion, migrated CAS/compute array
+  payload events, and empty `rpc_drift_counts` /
   `resource_trust_coupling_counts`.
-- The next clean run must satisfy the new `DI-gahuh` migrated-payload gates for
-  `cas_storage_v1` and `cid_compute_v1` array requests and ACKs.
 - POC14 is not production-fit until a later implementation replaces POC-local
   whole-run analysis with ordinary agents that exchange local events promises.
 - POC14's analyzer and monitor remain development-time observers. In real
@@ -25,12 +24,14 @@ Source: `DI-linof`; `DI-lulof`; `DI-kinaf`; `DI-dubih`.
 
 ## Expected Blockers After First Run
 
-- The WASM role validates a module fixture and now sends a useful relationship
-  promise about reusable module-validation event, but it still does not
-  execute arbitrary WASM application logic.
-- The stdio role demonstrates exact envelope exchange through a worker process,
-  and now sends a useful relationship promise about subprocess round-trip
-  event, but it still covers one deterministic subprocess fixture.
+- The WASM role now executes one embedded no-import module with wazero and sends
+  a useful relationship promise about reusable module-execution event, but it
+  still does not execute arbitrary WASM application logic or expose production
+  host-call APIs. Source: `DI-kimim`.
+- The stdio role demonstrates exact envelope exchange through a worker process
+  using length-prefixed CBOR frames and now sends a useful relationship promise
+  about subprocess round-trip event, but it still covers one deterministic
+  subprocess fixture. Source: `DI-kimim`.
 - Decentralized monitoring signals are recorded as event, but agents do not
   yet adapt peer choice from token exchange rates or peer-carried attestations.
 - Permanent distrust and transit exclusion now have app-local behavior: the

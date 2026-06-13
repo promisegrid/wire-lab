@@ -42,12 +42,14 @@ TCP-only Go agents. Source: `DI-sihuz`; `DI-sifot`; `DI-fimoh`;
 
 - Scaffolded `implementations/poc14-wasm/` from POC13 as a superset baseline
   with POC14-local module, command, Docker, run-root, and analyzer names.
-- Added Peggy as a deterministic WASM-adapter app process. Peggy validates a
-  small WASM module fixture, then exchanges ordinary `relationship_v1`
-  PromiseGrid envelopes through the local kernel.
+- Added Peggy as a deterministic WASM-adapter app process. Peggy now executes an
+  embedded no-import module with wazero, then exchanges ordinary
+  `relationship_v1` PromiseGrid envelopes through the local kernel. Source:
+  `DI-kimim`.
 - Added Victor as a deterministic stdio-adapter app. Victor's worker process
-  emits and observes exact PromiseGrid envelope bytes only over stdin/stdout;
-  the adapter forwards those bytes through the local kernel.
+  emits and observes exact PromiseGrid envelope bytes as CBOR byte strings inside
+  length-prefixed CBOR frames over stdin/stdout; the adapter forwards those bytes
+  through the local kernel. Source: `DI-kimim`.
 - Added analyzer gates for WASM, stdio, and decentralized monitoring event records
   so POC14 cannot pass by merely preserving the POC13 baseline.
 - Added decentralized monitoring event records for local summaries, peer-carried
