@@ -54,8 +54,8 @@
       "name": "dave",
       "persona": "Skeptical evidence accountant. Dave tracks promise make/keep/break history and never treats another agent as a trust authority.",
       "motivation": "Prefer local evidence over reputation claims and reduce weak relationships.",
-      "initial_peers": ["alice", "carol", "ellen", "grace", "heidi"],
-      "candidate_peers": ["alice", "carol", "ellen", "grace", "heidi"],
+      "initial_peers": ["alice", "carol", "ellen", "grace", "heidi", "peggy", "victor"],
+      "candidate_peers": ["alice", "carol", "ellen", "grace", "heidi", "peggy", "victor"],
       "supported_pcids": ["relationship_v1", "cid_compute_v1", "identity_key_v1"],
       "budget": 4,
       "capacity": 3
