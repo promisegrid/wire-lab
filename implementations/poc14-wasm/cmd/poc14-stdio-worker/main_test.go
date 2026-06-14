@@ -5,10 +5,10 @@ import (
 	"encoding/base64"
 	"testing"
 
-	"promisegrid.dev/wire-lab/implementations/poc14-wasm/boundary"
 	"promisegrid.dev/wire-lab/implementations/poc14-wasm/pcid"
 	"promisegrid.dev/wire-lab/implementations/poc14-wasm/production"
 	"promisegrid.dev/wire-lab/implementations/poc14-wasm/protocol"
+	"promisegrid.dev/wire-lab/implementations/poc14-wasm/runtimeadapter"
 )
 
 func TestRunWithIOComputesCIDPromise(t *testing.T) {
@@ -45,7 +45,7 @@ func TestRunWithIOComputesCIDPromise(t *testing.T) {
 	if bytesErr != nil {
 		t.Fatalf("request bytes: %v", bytesErr)
 	}
-	requestBytes, requestErr := boundary.MarshalStdioCBOREnvelope(boundary.StdioCBOREnvelope{
+	requestBytes, requestErr := runtimeadapter.MarshalStdioCBOREnvelope(runtimeadapter.StdioCBOREnvelope{
 		Type:          "compute_request",
 		From:          "alice",
 		To:            "victor",
@@ -56,18 +56,18 @@ func TestRunWithIOComputesCIDPromise(t *testing.T) {
 		t.Fatalf("marshal stdio request: %v", requestErr)
 	}
 	var input bytes.Buffer
-	if err := boundary.WriteCBORFrame(&input, requestBytes); err != nil {
+	if err := runtimeadapter.WriteCBORFrame(&input, requestBytes); err != nil {
 		t.Fatalf("write stdio request: %v", err)
 	}
 	var output bytes.Buffer
 	if err := runWithIO(&input, &output); err != nil {
 		t.Fatalf("run worker: %v", err)
 	}
-	ackFrameBytes, frameErr := boundary.ReadCBORFrame(&output)
+	ackFrameBytes, frameErr := runtimeadapter.ReadCBORFrame(&output)
 	if frameErr != nil {
 		t.Fatalf("read ack frame: %v", frameErr)
 	}
-	ack, ackErr := boundary.ParseStdioCBORAck(ackFrameBytes)
+	ack, ackErr := runtimeadapter.ParseStdioCBORAck(ackFrameBytes)
 	if ackErr != nil {
 		t.Fatalf("parse ack: %v", ackErr)
 	}

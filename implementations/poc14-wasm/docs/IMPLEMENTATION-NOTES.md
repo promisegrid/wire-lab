@@ -30,7 +30,7 @@ superset of prior POCs unless a scoped DI explicitly says otherwise. Source:
   inside local handlers and analyzer event records. Source: `DI-gahuh`.
 - Peggy and Victor now each send one useful routed `relationship_v1` promise to
   Dave and each keep one useful `cid_compute_v1` promise for Alice so the
-  heterogeneous-boundary agents do more than record runtime-adapter existence.
+  heterogeneous-runtime-adapter agents do more than record runtime-adapter existence.
   Source: `DI-pamob`; `DI-sivis`.
 - POC15 planning lives under `implementations/poc15-multihop/` and should make
   real multi-hop forwarding and route-exclusion-by-peer-promise executable.

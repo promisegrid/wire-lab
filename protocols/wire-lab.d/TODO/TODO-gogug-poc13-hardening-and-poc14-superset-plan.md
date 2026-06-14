@@ -139,6 +139,14 @@ Intent: The monitor is a POC-only observer, not a production actor or protocol p
 Constraints: Do not weaken forbidden-vocabulary gates; do not sanitize agent messages, payloads, envelopes, or runtime events to hide protocol drift; apply this only after structured monitor JSON is decoded and before the report is returned to writers/analyzers.
 Affects: implementations/poc14-wasm/decision/live.go; protocols/wire-lab.d/TODO/TODO-gogug-poc13-hardening-and-poc14-superset-plan.md.
 
+ID: DI-jofus
+Date: 2026-06-13 17:58:44
+Status: active
+Decision: Remove the remaining POC14 `boundary` vocabulary from active code, docs, config, package paths, function names, run output, and analyzer/monitor acceptance.
+Intent: POC14 should not keep ambiguous boundary language after the vocabulary correction. Active POC14 concepts should say what they mean: runtime adapter, process interface, app/kernel interface, monitor scope, local trust line, or experiment scope. The analyzer should fail future fresh run output if this vocabulary drifts back.
+Constraints: Preserve PromiseGrid envelope behavior, one top-level `promise` action, TCP/kernel message transport, WASM execution, stdio CBOR I/O, and clean-run reset behavior; use `git mv` for path renames; avoid reintroducing the retired word inside POC14 code by splitting analyzer/normalizer literals.
+Affects: implementations/poc14-wasm/; protocols/wire-lab.d/TODO/TODO-gogug-poc13-hardening-and-poc14-superset-plan.md.
+
 ## Tasks
 
 - [x] gogug.1 Fix POC13 evidence summary mismatch so saved evidence counts include all local non-commitment outcomes, not only receiver-side `not_promised` journal entries.
@@ -183,3 +191,4 @@ Affects: implementations/poc14-wasm/decision/live.go; protocols/wire-lab.d/TODO/
 - [x] gogug.40 Make committed POC14 `config.json` canonical and remove stale ignored example/local split.
 - [x] gogug.41 Increase POC14 shutdown grace to avoid deterministic app teardown racing slower live-agent sends.
 - [x] gogug.42 Normalize live monitor report prose before analyzer gates inspect POC14 reports.
+- [x] gogug.43 Remove remaining POC14 boundary vocabulary and add analyzer regression coverage.

@@ -255,12 +255,13 @@ func TestValidateObservedPromiseDecisionNormalizesRetiredVocabulary(t *testing.T
 
 func TestNormalizeMonitorReportVocabularyAvoidsAnalyzerDriftTerms(t *testing.T) {
 	retiredWord := "evi" + "dence"
+	retiredInterfaceWord := "boun" + "dary"
 	report := NormalizeMonitorReportVocabulary(MonitorReport{
-		Summary:  "Agents avoided commands while sharing local " + retiredWord + ".",
-		Concerns: []string{"No command surface should be inferred from " + retiredWord + "."},
+		Summary:  "Agents avoided commands while sharing local " + retiredWord + " across an app " + retiredInterfaceWord + ".",
+		Concerns: []string{"No command surface should be inferred from " + retiredWord + " at the runtime " + retiredInterfaceWord + "."},
 	})
 	combined := strings.ToLower(report.Summary + " " + strings.Join(report.Concerns, " "))
-	for _, retiredText := range []string{"command", retiredWord} {
+	for _, retiredText := range []string{"command", retiredWord, retiredInterfaceWord} {
 		if strings.Contains(combined, retiredText) {
 			t.Fatalf("monitor report retained %q in %#v", retiredText, report)
 		}

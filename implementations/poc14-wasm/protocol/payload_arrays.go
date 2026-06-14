@@ -20,7 +20,7 @@ type arrayPayloadSchema struct {
 
 // MarshalKnownArrayPayload encodes the POC14 pCIDs that have been migrated from
 // legacy field maps to pCID-owned CBOR arrays.
-// Intent: This helper is a migration boundary, not a PromiseGrid-wide payload
+// Intent: This helper is a migration adapter, not a PromiseGrid-wide payload
 // standard; each pCID still owns its own slot order and local compatibility
 // projection. Source: DI-gahuh
 func MarshalKnownArrayPayload(protocolName string, fields map[string]string) ([]byte, bool, error) {

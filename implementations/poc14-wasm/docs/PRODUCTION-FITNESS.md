@@ -64,5 +64,5 @@ Source: `DI-linof`; `DI-lulof`; `DI-kinaf`; `DI-dubih`; `DI-kimim`;
   permission, authorization, conformance, or route enforcement. Source:
   `DI-pamob`.
 - **Kernel model:** Continue documenting kernel roles as local promise surfaces
-  that can be split or collapsed by runtime: transport, app boundary, pCID
+  that can be split or collapsed by runtime: transport, app interface, pCID
   routing, local resource, adapter, and event roles.

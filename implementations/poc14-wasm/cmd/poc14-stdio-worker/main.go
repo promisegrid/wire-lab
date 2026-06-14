@@ -5,10 +5,10 @@ import (
 	"io"
 	"os"
 
-	"promisegrid.dev/wire-lab/implementations/poc14-wasm/boundary"
 	"promisegrid.dev/wire-lab/implementations/poc14-wasm/pcid"
 	"promisegrid.dev/wire-lab/implementations/poc14-wasm/production"
 	"promisegrid.dev/wire-lab/implementations/poc14-wasm/protocol"
+	"promisegrid.dev/wire-lab/implementations/poc14-wasm/runtimeadapter"
 )
 
 func main() {
@@ -27,15 +27,15 @@ func run() error {
 // Intent: Victor's stdio worker must remain a subprocess-I/O PromiseGrid adapter
 // rather than an in-process test fake or RPC command handler. Source: DI-sivis
 func runWithIO(input io.Reader, output io.Writer) error {
-	requestFrameBytes, err := boundary.ReadCBORFrame(input)
+	requestFrameBytes, err := runtimeadapter.ReadCBORFrame(input)
 	if err != nil {
 		return fmt.Errorf("decode request: %w", err)
 	}
-	computeRequest, computeParseErr := boundary.ParseStdioCBOREnvelope(requestFrameBytes)
+	computeRequest, computeParseErr := runtimeadapter.ParseStdioCBOREnvelope(requestFrameBytes)
 	if computeParseErr == nil && computeRequest.Type == "compute_request" {
 		return runComputeRequest(computeRequest, output)
 	}
-	request, err := boundary.ParseStdioCBORRequest(requestFrameBytes)
+	request, err := runtimeadapter.ParseStdioCBORRequest(requestFrameBytes)
 	if err != nil {
 		return fmt.Errorf("parse request: %w", err)
 	}
@@ -43,10 +43,10 @@ func runWithIO(input io.Reader, output io.Writer) error {
 		return fmt.Errorf("invalid stdio request")
 	}
 	registry := pcid.NewRegistry()
-	fields := boundary.PromiseFields(
+	fields := runtimeadapter.PromiseFields(
 		request.From,
 		request.To,
-		boundary.PromiseAboutStdioAdapter,
+		runtimeadapter.PromiseAboutStdioAdapter,
 		"Victor promises that this worker process sends and receives PromiseGrid envelopes only through stdio.",
 	)
 	fields["field_protocol"] = pcid.RelationshipV1
@@ -61,7 +61,7 @@ func runWithIO(input io.Reader, output io.Writer) error {
 	// Intent: The stdio worker writes exact envelope bytes inside a CBOR byte
 	// string, not JSON text or RPC commands; the adapter decides locally
 	// whether to forward them through the kernel. Source: DI-linof; DI-kimim
-	outboundFrameBytes, err := boundary.MarshalStdioCBOREnvelope(boundary.StdioCBOREnvelope{
+	outboundFrameBytes, err := runtimeadapter.MarshalStdioCBOREnvelope(runtimeadapter.StdioCBOREnvelope{
 		Type:          "outbound_envelope",
 		From:          request.From,
 		To:            request.To,
@@ -71,14 +71,14 @@ func runWithIO(input io.Reader, output io.Writer) error {
 	if err != nil {
 		return fmt.Errorf("marshal outbound envelope: %w", err)
 	}
-	if err := boundary.WriteCBORFrame(output, outboundFrameBytes); err != nil {
+	if err := runtimeadapter.WriteCBORFrame(output, outboundFrameBytes); err != nil {
 		return fmt.Errorf("encode outbound envelope: %w", err)
 	}
-	ackFrameBytes, err := boundary.ReadCBORFrame(input)
+	ackFrameBytes, err := runtimeadapter.ReadCBORFrame(input)
 	if err != nil {
 		return fmt.Errorf("decode ack: %w", err)
 	}
-	ack, err := boundary.ParseStdioCBORAck(ackFrameBytes)
+	ack, err := runtimeadapter.ParseStdioCBORAck(ackFrameBytes)
 	if err != nil {
 		return fmt.Errorf("parse ack: %w", err)
 	}
@@ -96,7 +96,7 @@ func runWithIO(input io.Reader, output io.Writer) error {
 	if fieldsErr != nil {
 		return fieldsErr
 	}
-	eventFrameBytes, err := boundary.MarshalStdioCBOREvent(boundary.StdioCBOREvent{
+	eventFrameBytes, err := runtimeadapter.MarshalStdioCBOREvent(runtimeadapter.StdioCBOREvent{
 		Type:        "ack_event",
 		Outcome:     ackFields["outcome"],
 		ExactSHA256: protocol.HashExactBytes(ack.EnvelopeBytes),
@@ -104,14 +104,14 @@ func runWithIO(input io.Reader, output io.Writer) error {
 	if err != nil {
 		return fmt.Errorf("marshal ack event: %w", err)
 	}
-	return boundary.WriteCBORFrame(output, eventFrameBytes)
+	return runtimeadapter.WriteCBORFrame(output, eventFrameBytes)
 }
 
 // runComputeRequest parses Alice's exact compute envelope, keeps the compute
 // promise locally, and writes a signed ACK envelope to stdout.
 // Intent: The worker, not the adapter, performs Victor's useful compute work
 // while preserving the same cid_compute_v1 promise semantics. Source: DI-sivis
-func runComputeRequest(request boundary.StdioCBOREnvelope, output io.Writer) error {
+func runComputeRequest(request runtimeadapter.StdioCBOREnvelope, output io.Writer) error {
 	if request.From == "" || request.To == "" || request.Protocol != pcid.CIDComputeV1 || len(request.EnvelopeBytes) == 0 {
 		return fmt.Errorf("invalid stdio compute request")
 	}
@@ -160,12 +160,12 @@ func runComputeRequest(request boundary.StdioCBOREnvelope, output io.Writer) err
 	if bytesErr != nil {
 		return bytesErr
 	}
-	ackFrameBytes, marshalErr := boundary.MarshalStdioCBORAck(boundary.StdioCBORAck{Type: "compute_ack_envelope", EnvelopeBytes: ackBytes})
+	ackFrameBytes, marshalErr := runtimeadapter.MarshalStdioCBORAck(runtimeadapter.StdioCBORAck{Type: "compute_ack_envelope", EnvelopeBytes: ackBytes})
 	if marshalErr != nil {
 		return marshalErr
 	}
 	// Intent: The worker returns a real signed compute ACK envelope as binary
 	// CBOR-framed bytes; Victor's adapter forwards those exact bytes back to
 	// Alice instead of translating them into an RPC result. Source: DI-sivis
-	return boundary.WriteCBORFrame(output, ackFrameBytes)
+	return runtimeadapter.WriteCBORFrame(output, ackFrameBytes)
 }

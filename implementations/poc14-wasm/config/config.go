@@ -60,7 +60,7 @@ type AgentConfig struct {
 // ContainerConfig names the app processes that share one Docker container and
 // one local kernel process. Each app still owns its relationship ledger and
 // promise judgment; the kernel only routes exact framed envelopes.
-// Intent: Preserve the local-process app/kernel boundary instead of folding app
+// Intent: Preserve the local-process app/kernel interface instead of folding app
 // trust or workflow policy into the container kernel. Source: DI-galin
 type ContainerConfig struct {
 	Name   string   `json:"name"`
@@ -272,7 +272,7 @@ func (cfg Config) AgentNames() []string {
 
 // ListenPortFor gives legacy tests a deterministic per-agent TCP port. The live
 // POC14 runtime uses KernelAppPortForContainer and KernelPeerPortForContainer
-// instead so every container has one kernel boundary and local app processes
+// instead so every container has one kernel interface and local app processes
 // register receive promises with that kernel.
 // Intent: Keep old test helpers stable while moving production POC14 routing to
 // the explicit local kernel/app split. Source: DI-galin
@@ -325,7 +325,7 @@ func (cfg Config) KernelPeerPortForContainer(containerName string) (int, bool) {
 // an app process. It deliberately returns 127.0.0.1 because apps are local
 // processes in the same container as their kernel.
 // Intent: Avoid modeling apps as remote services; app/kernel communication is a
-// local process boundary. Source: DI-galin
+// local process interface. Source: DI-galin
 func (cfg Config) KernelAppAddressForAgent(agentName string) (string, bool) {
 	containerName, containerFound := cfg.ContainerForAgent(agentName)
 	if !containerFound {

@@ -40,7 +40,7 @@ func run() error {
 	}
 	// Intent: The postal scale is a deterministic local device app, not a
 	// kernel service. It promises package-weight event records through its app
-	// process boundary. Source: DI-galin
+	// process interface. Source: DI-galin
 	liveClient := decision.NewLiveClient(
 		cfg.ProviderBaseURL,
 		cfg.APIKeyEnv,

@@ -22,7 +22,7 @@ import (
 const peerSendTimeout = 5 * time.Second
 const listenerDrainTimeout = 750 * time.Millisecond
 
-// Kernel runs one container-local PromiseGrid transport boundary. It accepts
+// Kernel runs one container-local PromiseGrid transport interface. It accepts
 // receive promises from local app processes, routes exact signed envelopes to a
 // promised local receiver, and forwards cross-container bytes to peer kernels.
 // Intent: Keep POC14's kernel as transport and operational event records only; apps

@@ -7,19 +7,19 @@ import (
 	"os"
 	"os/exec"
 
-	"promisegrid.dev/wire-lab/implementations/poc14-wasm/boundary"
 	"promisegrid.dev/wire-lab/implementations/poc14-wasm/pcid"
 	"promisegrid.dev/wire-lab/implementations/poc14-wasm/protocol"
+	"promisegrid.dev/wire-lab/implementations/poc14-wasm/runtimeadapter"
 )
 
-// runWASMBoundaryWorkflow records one standalone WASM-role process proving that
+// runWASMAdapterWorkflow records one standalone WASM-role process proving that
 // it can keep PromiseGrid semantics outside the sandbox while still exchanging
 // ordinary relationship_v1 promise envelopes through the local kernel.
 // Intent: POC14 adds heterogeneous process-runtime adapter events without making
 // WASM host calls into RPC commands or trust authorities. Source: DI-linof;
 // DI-kimim
-func (node *Node) runWASMBoundaryWorkflow(ctx context.Context) error {
-	result, err := boundary.RunWASMModule(ctx, boundary.MinimalWASMModule, boundary.ExpectedWASMInput)
+func (node *Node) runWASMAdapterWorkflow(ctx context.Context) error {
+	result, err := runtimeadapter.RunWASMModule(ctx, runtimeadapter.MinimalWASMModule, runtimeadapter.ExpectedWASMInput)
 	if err != nil {
 		return err
 	}
@@ -27,15 +27,15 @@ func (node *Node) runWASMBoundaryWorkflow(ctx context.Context) error {
 	if !targetFound {
 		target = "victor"
 	}
-	moduleHash := protocol.HashExactBytes(boundary.MinimalWASMModule)
+	moduleHash := protocol.HashExactBytes(runtimeadapter.MinimalWASMModule)
 	node.record("wasm_process_agent_started", "kept", "", "agent="+node.Agent.Name+" module_sha256="+moduleHash)
 	node.record("wasm_module_instantiated", "kept", "", "module_sha256="+moduleHash+" runtime=wazero")
 	node.record("wasm_export_called", "kept", "", "export="+result.ExportName)
 	node.record("wasm_export_result_observed", "kept", "", fmt.Sprintf("export=%s input=%d value=%d", result.ExportName, result.InputValue, result.ExportValue))
-	fields := boundary.PromiseFields(
+	fields := runtimeadapter.PromiseFields(
 		node.Agent.Name,
 		target,
-		boundary.PromiseAboutWASMAdapter,
+		runtimeadapter.PromiseAboutWASMAdapter,
 		"Peggy promises that her local WASM-adapter process executed an embedded wazero module and will exchange only pCID-defined PromiseGrid envelopes.",
 	)
 	fields["field_wasm_module_sha256"] = moduleHash
@@ -48,10 +48,10 @@ func (node *Node) runWASMBoundaryWorkflow(ctx context.Context) error {
 	node.record("wasm_adapter_promise_sent", "kept", target, "pcid="+pcid.RelationshipV1+" module_sha256="+moduleHash)
 	node.record("wasm_adapter_ack_received", "kept", target, "pcid="+pcid.RelationshipV1+" stdio peer accepted WASM-adapter event as a local promise")
 	usefulTarget := "dave"
-	usefulFields := boundary.PromiseFields(
+	usefulFields := runtimeadapter.PromiseFields(
 		node.Agent.Name,
 		usefulTarget,
-		boundary.PromiseAboutWASMModuleUse,
+		runtimeadapter.PromiseAboutWASMModuleUse,
 		"Peggy promises Dave a reusable WASM module-execution event: these module bytes were compiled, instantiated, and called with wazero, returning the expected deterministic value.",
 	)
 	usefulFields["field_wasm_module_sha256"] = moduleHash
@@ -63,7 +63,7 @@ func (node *Node) runWASMBoundaryWorkflow(ctx context.Context) error {
 		return fmt.Errorf("wasm useful-work promise: %w", err)
 	}
 	// Intent: Peggy's WASM process should do useful PromiseGrid work, not merely
-	// prove that a sandbox boundary exists. Source: DI-pamob
+	// prove that a sandbox interface exists. Source: DI-pamob
 	node.record("wasm_useful_work_promised", "kept", usefulTarget, "pcid="+pcid.RelationshipV1+" module_sha256="+moduleHash)
 	node.record("wasm_useful_work_ack_received", "kept", usefulTarget, "pcid="+pcid.RelationshipV1+" Dave received reusable module-execution event")
 	return nil
@@ -90,7 +90,7 @@ func (node *Node) runStdioComputeWorker(message parsedMessage) ([]byte, error) {
 	}
 	target := message.Fields["from"]
 	node.record("stdio_compute_worker_started", "kept", target, "worker=poc14-stdio-worker pcid="+pcid.CIDComputeV1)
-	requestBytes, err := boundary.MarshalStdioCBOREnvelope(boundary.StdioCBOREnvelope{
+	requestBytes, err := runtimeadapter.MarshalStdioCBOREnvelope(runtimeadapter.StdioCBOREnvelope{
 		Type:          "compute_request",
 		From:          target,
 		To:            node.Agent.Name,
@@ -100,15 +100,15 @@ func (node *Node) runStdioComputeWorker(message parsedMessage) ([]byte, error) {
 	if err != nil {
 		return nil, node.finishStdioWorker(command, stdin, err)
 	}
-	if err := boundary.WriteCBORFrame(stdin, requestBytes); err != nil {
+	if err := runtimeadapter.WriteCBORFrame(stdin, requestBytes); err != nil {
 		return nil, node.finishStdioWorker(command, stdin, fmt.Errorf("write stdio compute request: %w", err))
 	}
 	node.record("stdio_compute_request_forwarded", "kept", target, "pcid="+message.ProtocolName+" exact_sha256="+message.ExactHash)
-	ackFrameBytes, err := boundary.ReadCBORFrame(stdout)
+	ackFrameBytes, err := runtimeadapter.ReadCBORFrame(stdout)
 	if err != nil {
 		return nil, node.finishStdioWorker(command, stdin, fmt.Errorf("read stdio compute ack: %w", err))
 	}
-	ack, err := boundary.ParseStdioCBORAck(ackFrameBytes)
+	ack, err := runtimeadapter.ParseStdioCBORAck(ackFrameBytes)
 	if err != nil {
 		return nil, node.finishStdioWorker(command, stdin, err)
 	}
@@ -127,13 +127,13 @@ func (node *Node) runStdioComputeWorker(message parsedMessage) ([]byte, error) {
 	return ack.EnvelopeBytes, nil
 }
 
-// runStdioBoundaryWorkflow starts a worker process whose only application
+// runStdioAdapterWorkflow starts a worker process whose only application
 // messaging path is stdin/stdout. The adapter forwards the exact signed envelope
 // through the same local kernel path every other app uses.
 // Intent: POC14 tests subprocess adapters without giving stdio messages RPC
 // semantics; the worker emits and observes PromiseGrid envelopes as bytes.
 // Source: DI-linof; DI-kimim
-func (node *Node) runStdioBoundaryWorkflow(ctx context.Context) error {
+func (node *Node) runStdioAdapterWorkflow(ctx context.Context) error {
 	target, targetFound := node.firstConfiguredPeerByKind("wasm_agent")
 	if !targetFound {
 		target = "peggy"
@@ -152,11 +152,11 @@ func (node *Node) runStdioBoundaryWorkflow(ctx context.Context) error {
 		return startErr
 	}
 	node.record("stdio_worker_started", "kept", target, "worker=poc14-stdio-worker")
-	requestBytes, err := boundary.MarshalStdioCBORRequest(boundary.StdioCBORRequest{Type: "promise_request", From: node.Agent.Name, To: target})
+	requestBytes, err := runtimeadapter.MarshalStdioCBORRequest(runtimeadapter.StdioCBORRequest{Type: "promise_request", From: node.Agent.Name, To: target})
 	if err != nil {
 		return node.finishStdioWorker(command, stdin, err)
 	}
-	if err := boundary.WriteCBORFrame(stdin, requestBytes); err != nil {
+	if err := runtimeadapter.WriteCBORFrame(stdin, requestBytes); err != nil {
 		return node.finishStdioWorker(command, stdin, fmt.Errorf("write stdio request: %w", err))
 	}
 	node.record("stdio_cbor_request_sent", "kept", target, "frame=promise_request format=cbor")
@@ -172,11 +172,11 @@ func (node *Node) runStdioBoundaryWorkflow(ctx context.Context) error {
 		return node.finishStdioWorker(command, stdin, fmt.Errorf("stdio envelope forward: %w", sendErr))
 	}
 	node.record("stdio_adapter_kernel_forwarded", "kept", outbound.To, "pcid="+outbound.Protocol+" worker="+outbound.From)
-	ackFrameBytes, err := boundary.MarshalStdioCBORAck(boundary.StdioCBORAck{Type: "ack_envelope", EnvelopeBytes: ackBytes})
+	ackFrameBytes, err := runtimeadapter.MarshalStdioCBORAck(runtimeadapter.StdioCBORAck{Type: "ack_envelope", EnvelopeBytes: ackBytes})
 	if err != nil {
 		return node.finishStdioWorker(command, stdin, err)
 	}
-	if err := boundary.WriteCBORFrame(stdin, ackFrameBytes); err != nil {
+	if err := runtimeadapter.WriteCBORFrame(stdin, ackFrameBytes); err != nil {
 		return node.finishStdioWorker(command, stdin, fmt.Errorf("write stdio ack: %w", err))
 	}
 	node.record("stdio_cbor_ack_sent", "kept", target, "exact_sha256="+protocol.HashExactBytes(ackBytes))
@@ -187,10 +187,10 @@ func (node *Node) runStdioBoundaryWorkflow(ctx context.Context) error {
 	node.record("stdio_worker_ack_event", observed.Outcome, target, "exact_sha256="+observed.ExactSHA256)
 	node.record("stdio_cbor_ack_event", observed.Outcome, target, "exact_sha256="+observed.ExactSHA256)
 	usefulTarget := "dave"
-	usefulFields := boundary.PromiseFields(
+	usefulFields := runtimeadapter.PromiseFields(
 		node.Agent.Name,
 		usefulTarget,
-		boundary.PromiseAboutStdioWorkerUse,
+		runtimeadapter.PromiseAboutStdioWorkerUse,
 		"Victor promises Dave that a stdio-only subprocess round-tripped an exact signed PromiseGrid envelope and observed the peer ACK bytes without direct network access.",
 	)
 	usefulFields["field_ack_exact_sha256"] = observed.ExactSHA256
@@ -206,38 +206,38 @@ func (node *Node) runStdioBoundaryWorkflow(ctx context.Context) error {
 	return node.finishStdioWorker(command, stdin, nil)
 }
 
-func readStdioEnvelope(reader io.Reader) (boundary.StdioCBOREnvelope, error) {
-	frameBytes, err := boundary.ReadCBORFrame(reader)
+func readStdioEnvelope(reader io.Reader) (runtimeadapter.StdioCBOREnvelope, error) {
+	frameBytes, err := runtimeadapter.ReadCBORFrame(reader)
 	if err != nil {
-		return boundary.StdioCBOREnvelope{}, err
+		return runtimeadapter.StdioCBOREnvelope{}, err
 	}
-	outbound, err := boundary.ParseStdioCBOREnvelope(frameBytes)
+	outbound, err := runtimeadapter.ParseStdioCBOREnvelope(frameBytes)
 	if err != nil {
-		return boundary.StdioCBOREnvelope{}, err
+		return runtimeadapter.StdioCBOREnvelope{}, err
 	}
 	if outbound.Type != "outbound_envelope" {
-		return boundary.StdioCBOREnvelope{}, fmt.Errorf("stdio worker message type %q, want outbound_envelope", outbound.Type)
+		return runtimeadapter.StdioCBOREnvelope{}, fmt.Errorf("stdio worker message type %q, want outbound_envelope", outbound.Type)
 	}
 	if len(outbound.EnvelopeBytes) == 0 || outbound.From == "" || outbound.To == "" || outbound.Protocol == "" {
-		return boundary.StdioCBOREnvelope{}, fmt.Errorf("stdio worker envelope message is incomplete")
+		return runtimeadapter.StdioCBOREnvelope{}, fmt.Errorf("stdio worker envelope message is incomplete")
 	}
 	return outbound, nil
 }
 
-func readStdioEvent(reader io.Reader) (boundary.StdioCBOREvent, error) {
-	frameBytes, err := boundary.ReadCBORFrame(reader)
+func readStdioEvent(reader io.Reader) (runtimeadapter.StdioCBOREvent, error) {
+	frameBytes, err := runtimeadapter.ReadCBORFrame(reader)
 	if err != nil {
-		return boundary.StdioCBOREvent{}, err
+		return runtimeadapter.StdioCBOREvent{}, err
 	}
-	observed, err := boundary.ParseStdioCBOREvent(frameBytes)
+	observed, err := runtimeadapter.ParseStdioCBOREvent(frameBytes)
 	if err != nil {
-		return boundary.StdioCBOREvent{}, err
+		return runtimeadapter.StdioCBOREvent{}, err
 	}
 	if observed.Type != "ack_event" {
-		return boundary.StdioCBOREvent{}, fmt.Errorf("stdio worker message type %q, want ack_event", observed.Type)
+		return runtimeadapter.StdioCBOREvent{}, fmt.Errorf("stdio worker message type %q, want ack_event", observed.Type)
 	}
 	if observed.Outcome == "" || observed.ExactSHA256 == "" {
-		return boundary.StdioCBOREvent{}, fmt.Errorf("stdio worker ack observation is incomplete")
+		return runtimeadapter.StdioCBOREvent{}, fmt.Errorf("stdio worker ack observation is incomplete")
 	}
 	return observed, nil
 }
@@ -272,7 +272,7 @@ func (node *Node) recordDecentralizedMonitoringEvents() {
 }
 
 // recordPermanentDistrustAndTransitExclusionEvents records two POC14 local
-// trust-boundary scenarios before later protocol work implements true multi-hop
+// trust-line scenarios before later protocol work implements true multi-hop
 // route selection.
 // Intent: Alice can decide to permanently distrust Mallory, and Alice can promise
 // that Alice's own inbound/outbound traffic should not transit Mallory, without
@@ -330,7 +330,7 @@ func (node *Node) recordMixedVersionPCIDMigrationEvents() {
 // Intent: POC14 should test crash/restart expectations as local promises by each
 // process, not as cross-run state or supervisor authority. Source: DI-linof
 func (node *Node) recordRunInternalRestartEvents() {
-	node.record("run_internal_restart_orchestration_promised", "kept", "bob", "Alice promises a bounded same-run restart probe for storage state and boundary agents")
+	node.record("run_internal_restart_orchestration_promised", "kept", "bob", "Alice promises a bounded same-run restart probe for storage state and runtime adapter agents")
 	node.record("run_internal_restart_checkpoint_promised", "kept", "peggy", "Bob and Peggy are expected to recover only run-scoped journals, not cross-run state")
 	node.record("run_internal_restart_recovery_observed", "kept", "victor", "restart recovery is judged by local run-scoped event and exact envelope replay windows")
 }

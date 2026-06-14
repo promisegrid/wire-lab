@@ -6,7 +6,7 @@ import (
 )
 
 // FakeDecider gives tests deterministic LLM-shaped choices without any network
-// dependency. Intent: Tests should prove the POC14 promise-only action boundary
+// dependency. Intent: Tests should prove the POC14 promise-only action interface
 // and protocol effects without spending provider calls. Source: DI-timah
 type FakeDecider struct {
 	Calls int

@@ -1,4 +1,4 @@
-package boundary
+package runtimeadapter
 
 import (
 	"bytes"

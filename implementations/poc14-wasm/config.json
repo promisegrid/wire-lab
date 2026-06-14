@@ -200,7 +200,7 @@
     {
       "name": "peggy",
       "kind": "wasm_agent",
-      "persona": "WASM-adapter peer. Peggy runs as a separate process that executes an embedded wazero Fibonacci module and promises pCID-defined compute results across the sandbox boundary.",
+      "persona": "WASM-adapter peer. Peggy runs as a separate process that executes an embedded wazero Fibonacci module and promises pCID-defined compute results across the sandbox interface.",
       "motivation": "Show that a sandboxed runtime can keep useful compute promises without host calls becoming RPC commands or trust authority.",
       "initial_peers": ["victor", "alice", "dave"],
       "candidate_peers": ["victor", "alice", "dave", "grace"],

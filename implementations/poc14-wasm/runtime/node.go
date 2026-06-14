@@ -15,7 +15,6 @@ import (
 	"sync"
 	"time"
 
-	"promisegrid.dev/wire-lab/implementations/poc14-wasm/boundary"
 	"promisegrid.dev/wire-lab/implementations/poc14-wasm/config"
 	"promisegrid.dev/wire-lab/implementations/poc14-wasm/decision"
 	"promisegrid.dev/wire-lab/implementations/poc14-wasm/economy"
@@ -23,6 +22,7 @@ import (
 	"promisegrid.dev/wire-lab/implementations/poc14-wasm/production"
 	"promisegrid.dev/wire-lab/implementations/poc14-wasm/protocol"
 	"promisegrid.dev/wire-lab/implementations/poc14-wasm/relationship"
+	"promisegrid.dev/wire-lab/implementations/poc14-wasm/runtimeadapter"
 	"promisegrid.dev/wire-lab/implementations/poc14-wasm/transport"
 )
 
@@ -34,7 +34,7 @@ const duplicateShipmentEventField = "field_duplicate_shipment_update"
 
 // Node runs one local POC14 app process. A container may run several app
 // processes, but each process keeps its own local relationship ledger, log, and
-// live-LLM boundary while a separate container kernel handles byte routing.
+// live-LLM interface while a separate container kernel handles byte routing.
 // Intent: Apps are local processes that promise to handle pCIDs through their
 // local kernel; the kernel does not own app trust or business workflow policy.
 // Source: DI-galin
@@ -149,7 +149,7 @@ type checkpointRecord struct {
 // runScopedState is the restartable state this POC keeps only inside one run
 // root. Intent: CAS bytes, compute checkpoints, replay windows, and app-local
 // event journals may survive a process restart within one experiment, but the
-// clean-run reset remains the boundary that prevents stale state from muddying
+// clean-run reset remains the experiment scope that prevents stale state from muddying
 // the next POC14 run. Source: DI-sunuf
 type runScopedState struct {
 	Version              int                            `json:"version"`
@@ -266,14 +266,14 @@ func (node *Node) runStartupWorkflow(ctx context.Context) error {
 	}
 	// Intent: POC14 is now a superset of POC12, so the production shipping
 	// workflow remains intact while Alice and Mallory add CAS/compute protocol
-	// pressure above the same app/kernel boundary, while POC14 adds WASM and
+	// pressure above the same app/kernel interface, while POC14 adds WASM and
 	// stdio adapter roles. Source: DI-sinur; DI-linof; DI-kimim
 	if _, hasKernelAddress := node.Config.KernelAppAddressForAgent(node.Agent.Name); hasKernelAddress {
 		switch node.Agent.Kind {
 		case "wasm_agent":
-			return node.runWASMBoundaryWorkflow(ctx)
+			return node.runWASMAdapterWorkflow(ctx)
 		case "stdio_agent":
-			return node.runStdioBoundaryWorkflow(ctx)
+			return node.runStdioAdapterWorkflow(ctx)
 		}
 		switch node.Agent.Name {
 		case "alice":
@@ -370,7 +370,7 @@ func (node *Node) runFulfillmentShipmentWorkflow() error {
 // runCASComputeWorkflow exercises CAS storage, replica recovery, CID-named
 // compute, cache reuse, verification, and economics from Alice's local vantage.
 // Intent: POC14 is a POC13 superset, so this preserves inherited
-// storage/compute event records above the POC12 app/kernel boundary without turning
+// storage/compute event records above the POC12 app/kernel interface without turning
 // peer behavior into RPC commands. Source: DI-sinur; DI-linof
 func (node *Node) runCASComputeWorkflow() error {
 	contentBytes := production.SampleContentBytes()
@@ -608,7 +608,7 @@ func (node *Node) runCASComputeWorkflow() error {
 
 // runRuntimeAdapterComputeWorkflow asks Peggy and Victor to keep ordinary
 // cid_compute_v1 promises so runtime adapters prove useful compute work, not
-// just process-boundary existence.
+// just process-interface existence.
 // Intent: Alice is the requester for both exchanges; Peggy uses local WASM and
 // Victor uses a stdio worker, but Alice sees both as normal PromiseGrid compute
 // peers under the same pCID-owned payload contract. Source: DI-sivis
@@ -2126,7 +2126,7 @@ func (node *Node) executeComputeFunction(fields map[string]string) ([]byte, erro
 	if inputErr != nil {
 		return nil, inputErr
 	}
-	result, runErr := boundary.RunWASMModule(context.Background(), boundary.MinimalWASMModule, uint64(n))
+	result, runErr := runtimeadapter.RunWASMModule(context.Background(), runtimeadapter.MinimalWASMModule, uint64(n))
 	if runErr != nil {
 		return nil, runErr
 	}
@@ -2138,7 +2138,7 @@ func (node *Node) executeComputeFunction(fields map[string]string) ([]byte, erro
 	if production.ContentCID(resultBytes) != production.ContentCID(expectedBytes) {
 		return nil, fmt.Errorf("WASM compute result CID mismatch")
 	}
-	moduleHash := protocol.HashExactBytes(boundary.MinimalWASMModule)
+	moduleHash := protocol.HashExactBytes(runtimeadapter.MinimalWASMModule)
 	node.record("wasm_compute_request_received", "kept", fields["from"], "pcid="+pcid.CIDComputeV1+" module_sha256="+moduleHash+" input_n="+fmt.Sprintf("%d", n))
 	node.record("wasm_compute_function_executed", "kept", fields["from"], "pcid="+pcid.CIDComputeV1+" export="+result.ExportName+" value="+fmt.Sprintf("%d", result.ExportValue))
 	node.record("wasm_compute_result_promised", "kept", fields["from"], "pcid="+pcid.CIDComputeV1+" result_cid="+production.ContentCID(resultBytes))
@@ -2508,7 +2508,7 @@ func (node *Node) canAcceptFrom(peerName string, fields map[string]string) bool 
 }
 
 // markPermanentDistrustAndTransitExclusion updates Alice-local trust and route
-// state for the hard boundary scenario.
+// state for the hard trust-line scenario.
 // Intent: The decision changes only this app's own future sends and path choices;
 // it does not command other agents or publish global reputation. Source:
 // DI-dubih
@@ -2806,7 +2806,7 @@ func promiseStatusOutcome(status promiseStatus) string {
 }
 
 // promiseStatusFromOutcome keeps relationship outcomes and journal statuses
-// aligned at the boundary where a real ACK or inbound promise is resolved.
+// aligned at the interface where a real ACK or inbound promise is resolved.
 // Intent: The journal records the same kept/broken/malformed/non-commitment
 // distinction that peer trust code uses, but the journal record happens first.
 // Source: DI-vujob
@@ -3307,7 +3307,7 @@ func (node *Node) recordOutboundPressurePromises(target, protocolName string, fi
 
 // recordInboundPressurePromises records receiver-side capacity promises after the
 // app has decided it currently accepts this peer. Intent: Receive capacity is
-// the receiver's local promise boundary, not permission granted by any external
+// the receiver's local promise interface, not permission granted by any external
 // authority. Source: DI-sunuf
 func (node *Node) recordInboundPressurePromises(peerName, protocolName string, fields map[string]string) {
 	key := checkpointKey("inbound-pressure", protocolName, peerName, fields["field_promise_about"])

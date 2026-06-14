@@ -358,16 +358,20 @@ func countMonitorVocabulary(report *decision.MonitorReport, summary *RunSummary)
 }
 
 func countForbiddenVocabulary(values ...string) int {
-	term := forbiddenVocabularyTerm()
 	count := 0
 	for _, value := range values {
-		count += strings.Count(strings.ToLower(value), term)
+		for _, term := range forbiddenVocabularyTerms() {
+			count += strings.Count(strings.ToLower(value), term)
+		}
 	}
 	return count
 }
 
-func forbiddenVocabularyTerm() string {
-	return "evi" + "dence"
+func forbiddenVocabularyTerms() []string {
+	// Intent: Keep active POC14 run output from drifting back to retired
+	// production-looking vocabulary while avoiding literal reintroduction of those
+	// words in the codebase sweep itself. Source: DI-jofus
+	return []string{"evi" + "dence", "boun" + "dary"}
 }
 
 func summarizeLog(logPath string, summary *RunSummary) error {

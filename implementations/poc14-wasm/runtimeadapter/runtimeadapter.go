@@ -1,4 +1,4 @@
-package boundary
+package runtimeadapter
 
 import (
 	"bytes"
@@ -157,7 +157,7 @@ type StdioCBOREvent struct {
 }
 
 // WriteCBORFrame writes one bounded length-prefixed CBOR control frame.
-// Intent: Victor's subprocess boundary should carry binary CBOR records and
+// Intent: Victor's subprocess interface should carry binary CBOR records and
 // exact envelope byte strings, replacing the previous JSON-plus-hex shim.
 // Source: DI-kimim
 func WriteCBORFrame(writer io.Writer, payloadBytes []byte) error {

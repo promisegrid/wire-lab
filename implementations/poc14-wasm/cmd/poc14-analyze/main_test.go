@@ -131,7 +131,7 @@ func TestValidateSummaryRejectsResourceTrustCoupling(t *testing.T) {
 	}
 }
 
-func TestValidateSummaryRejectsMissingBoundaryEvent(t *testing.T) {
+func TestValidateSummaryRejectsMissingAdapterEvent(t *testing.T) {
 	summary := cleanRegressionSummary()
 	summary.EventCounts["stdio_cbor_ack_event"] = 0
 	summary.ScoreReport = computeScores(summary)
@@ -152,14 +152,15 @@ func TestValidateSummaryRejectsForbiddenVocabulary(t *testing.T) {
 
 func TestAnalyzeRunCountsForbiddenVocabulary(t *testing.T) {
 	retiredWord := "evi" + "dence"
+	retiredInterfaceWord := "boun" + "dary"
 	runDir := t.TempDir()
-	writeFile(t, filepath.Join(runDir, "alice.jsonl"), `{"observer":"alice","event":"promise_sent","outcome":"kept","peer":"bob","detail":"fresh `+retiredWord+`"}`+"\n")
+	writeFile(t, filepath.Join(runDir, "alice.jsonl"), `{"observer":"alice","event":"promise_sent","outcome":"kept","peer":"bob","detail":"fresh `+retiredWord+` and `+retiredInterfaceWord+`"}`+"\n")
 	writeFile(t, filepath.Join(runDir, "monitor-report.json"), `{"promise_theory_fit":5,"autonomy":5,"protocol_validity":5,"local_trust_correctness":5,"imposition_avoidance":5,"summary":"clean","concerns":["no issues"]}`)
 	summary, err := analyzeRun(runDir)
 	if err != nil {
 		t.Fatalf("analyze run: %v", err)
 	}
-	if summary.ForbiddenVocabularyCounts["run_events"] == 0 {
+	if summary.ForbiddenVocabularyCounts["run_events"] < 2 {
 		t.Fatalf("forbidden vocabulary not counted: %#v", summary.ForbiddenVocabularyCounts)
 	}
 }

@@ -70,7 +70,7 @@ func AddressForOrder(orderID string) (string, error) {
 // LabelForShipment simulates a UPS label printer response from shipment facts.
 // Intent: The printer promises label event records derived from supplied package
 // and address event records; it does not promise shipment success outside its device
-// boundary. Source: DI-timah
+// runtime adapter. Source: DI-timah
 func LabelForShipment(packageID, address string, weightOunces int) (string, int, error) {
 	packageID = strings.TrimSpace(packageID)
 	address = strings.TrimSpace(address)

@@ -11,7 +11,7 @@ functions, browser APIs, or host adapters. Source: `DI-galin`; `DI-pohaj`;
 1. **Transport role.** The local `poc14-kernel` accepts length-framed TCP from
    local apps, forwards exact CBOR envelopes to peer kernels, and records
    transport outcomes. It does not judge trust for the app.
-2. **App-boundary role.** Local apps register receive promises by pCID. The
+2. **App-interface role.** Local apps register receive promises by pCID. The
    kernel can deliver exact bytes only to apps that made local receive promises
    for that pCID.
 3. **pCID routing role.** The kernel parses slot 0 `42(pCID)` and chooses the
@@ -20,8 +20,8 @@ functions, browser APIs, or host adapters. Source: `DI-galin`; `DI-pohaj`;
 4. **Local resource role.** `printer_port` behaves like a kernel-adjacent local
    resource owner: it promises scoped future access tokens and later promises
    print event records after token redemption. It does not grant global permission.
-5. **Boundary adapter role.** Victor's stdio adapter and Peggy's WASM process
-   show that a runtime boundary can be a local role that translates process I/O
+5. **Runtime adapter role.** Victor's stdio adapter and Peggy's WASM process
+   show that a runtime interface can be a local role that translates process I/O
    into exact PromiseGrid envelopes without inventing RPC commands.
 6. **Trust/workflow role.** Trust judgment, relationship ledgers, storage,
    compute, shipping workflow, and keep/break interpretation stay in apps, not in
@@ -36,10 +36,10 @@ ability to send, receive, sign, parse, route, remember, and evaluate
 That means:
 
 - A Docker runtime may run one kernel process plus many app processes.
-- A WASM host may expose only an envelope send/receive boundary to the sandbox.
+- A WASM host may expose only an envelope send/receive interface to the sandbox.
 - A stdio subprocess may never see the network and still exchange exact
   PromiseGrid envelopes through an adapter.
-- A microcontroller may collapse transport, app-boundary, and local-resource
+- A microcontroller may collapse transport, app-interface, and local-resource
   roles into firmware functions.
 - A production node owned by a legal entity may split roles into separate
   services for operations, safety, or resource isolation.
@@ -49,7 +49,7 @@ That means:
 POC15 should make this role split more explicit:
 
 - Transport role: direct TCP and later peer-to-peer forwarding.
-- App-boundary role: local app registration and receive queues by pCID.
+- App-interface role: local app registration and receive queues by pCID.
 - Routing role: multi-hop route-promise selection without global authority.
 - Local-resource role: device/storage/compute capability promises.
 - Event role: app-owned local journals and optional voluntary summaries.

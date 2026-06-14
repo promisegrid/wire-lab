@@ -58,7 +58,7 @@ TCP-only Go agents. Source: `DI-sihuz`; `DI-sifot`; `DI-fimoh`;
 - Added decentralized monitoring event records for local summaries, peer-carried
   attestations, bearer-token exchange-rate signals, topology signals, and
   voluntary gossip. Source: `DI-linof`; `DI-lulof`.
-- Added hard local trust-boundary scenario event for permanent local distrust
+- Added hard local trust-line scenario event for permanent local distrust
   of Mallory and local rejection of Mallory-transit route candidates for Alice's
   own traffic. Source: `DI-kinaf`.
 - Added app-local behavior for those hard boundaries: the relationship ledger
@@ -68,7 +68,7 @@ TCP-only Go agents. Source: `DI-sihuz`; `DI-sifot`; `DI-fimoh`;
   recovery event records so those planned POC14 concerns have analyzer gates rather
   than remaining prose-only intentions. Source: `DI-linof`.
 
-## Production Monitoring Boundary
+## Production Monitoring Scope
 
 - Assume production agents are geographically distributed and owned by different
   legal entities. No process gets a global view of messages, local events,

@@ -163,7 +163,7 @@ func Fields(observation Observation, decision PromiseDecision) map[string]string
 
 // Prompt renders a compact prompt for live LLM decisions.
 // Intent: The prompt mirrors the strict provider schema while preserving the
-// single top-level promise action, Go-owned CBOR/signature boundary, pCID
+// single top-level promise action, Go-owned CBOR/signature interface, pCID
 // hygiene rule, pCID-owned payload shapes, and a preference for useful next
 // promise work over repeated generic relationship chatter. Source: DI-timah;
 // DI-galin; DI-punib; DI-sihuz; DI-vipih
@@ -189,7 +189,7 @@ func Prompt(observation Observation) (string, error) {
 // away from the old proof-like vocabulary before it can become a signed promise
 // payload or run-log event.
 // Intent: DI-kirat makes event the active POC14 runtime/log term; live LLMs may
-// still draft older vocabulary, so the Go boundary normalizes that prose instead
+// still draft older vocabulary, so the Go interface normalizes that prose instead
 // of letting it leak into fresh runs. Source: DI-kirat
 func NormalizePromiseDecisionVocabulary(decision PromiseDecision) PromiseDecision {
 	decision.Promise = NormalizeEventVocabulary(decision.Promise)
@@ -245,6 +245,9 @@ func NormalizeEventVocabulary(text string) string {
 		"Evi"+"dence", "Event",
 		"evi"+"dence", "event",
 		"EVI"+"DENCE", "EVENT",
+		"Boun"+"dary", "Interface",
+		"boun"+"dary", "interface",
+		"BOUN"+"DARY", "INTERFACE",
 	)
 	return replacer.Replace(text)
 }

@@ -20,7 +20,7 @@ respective runtime adapters. Source: `DI-sihuz`; `DI-sifot`; `DI-fimoh`;
 - Multiple app pCIDs through one local container kernel: `relationship_v1`,
   `postal_scale_v1`, `ups_label_v1`, `printer_port_v1`, `accounting_v1`,
   `cas_storage_v1`, `cid_compute_v1`, and `identity_key_v1`.
-- Real app/kernel process boundary: each container runs one `poc14-kernel`
+- Real app/kernel process interface: each container runs one `poc14-kernel`
   process plus separate local app processes for relationship, fulfillment,
   postal scale, UPS label printer, printer port, and accounting roles.
 - Kernel-style pCID routing: the kernel parses slot 0 `42(pCID)`, checks local
@@ -29,7 +29,7 @@ respective runtime adapters. Source: `DI-sihuz`; `DI-sifot`; `DI-fimoh`;
 - Deterministic device/system agents for scale, printer-port hardware access,
   label-printer business logic, and accounting alongside live LLM
   business/social agents.
-- Deterministic heterogeneous-boundary agents: Peggy executes an embedded
+- Deterministic heterogeneous-runtime-adapter agents: Peggy executes an embedded
   no-import WASM Fibonacci module with wazero in her own app process, and
   Victor's worker process sends and receives exact PromiseGrid envelopes as CBOR
   byte strings inside length-prefixed CBOR frames on stdin/stdout. Alice can ask
@@ -66,7 +66,7 @@ respective runtime adapters. Source: `DI-sihuz`; `DI-sifot`; `DI-fimoh`;
 - Run-scoped durability promises: apps persist CAS objects, compute cache
   checkpoints, capability tokens, replay windows, and local events journals
   under the current run root so an app can recover inside one run, while
-  `scripts/run-clean.sh` remains the experiment boundary that resets state.
+  `scripts/run-clean.sh` remains the experiment scope that resets state.
   Source: `DI-sunuf`.
 - Retention, GC, backpressure, rate-limit, and replay event: apps promise
   local retain-until/delete-after/token-expiry/disk-pressure behavior, record
@@ -122,7 +122,7 @@ Payload shape is owned by the pCID. Older POC14 payloads still use the
 but that map is not a PromiseGrid-wide payload standard. `identity_key_v1`,
 scripted `cas_storage_v1`, and scripted `cid_compute_v1` now use CBOR arrays
 defined by those pCIDs, then decode into compatibility fields only at the local
-runtime boundary. Source: `DI-vipih`; `DI-gahuh`.
+runtime adapter. Source: `DI-vipih`; `DI-gahuh`.
 
 ## Shipping Agents
 
@@ -214,13 +214,13 @@ promises to dial or accept direct exchanges between app agents, carried by local
 kernels. The kernel records only app receive-promise registration, exact-byte
 delivery, peer-forwarding, unregistered pCID, and transport outcomes. Apps own
 trust, keep/break/non-commitment judgment, relationship ledgers, workflow state,
-and deterministic device/system/boundary behavior. The fulfillment startup
+and deterministic device/system/adapter behavior. The fulfillment startup
 sequence is a POC guardrail so the run produces concrete pCID-routed shipment
 event instead of relying on a live LLM to choose that sequence unaided.
 Production monitoring cannot rely on POC14's whole-run analyzer because real
 agents are distributed across legal entities; POC14's decentralized-monitoring
 events are candidate local events signals, not a global dashboard. The kernel
-should be read as a role collection: transport, app-boundary, pCID routing,
+should be read as a role collection: transport, app-interface, pCID routing,
 local-resource, adapter, and event roles may be split or collapsed depending
 on runtime. Source: `DI-timah`; `DI-bikit`; `DI-parok`; `DI-galin`; `DI-pohaj`;
 `DI-sinur`; `DI-lulof`; `DI-linof`; `DI-pamob`.
