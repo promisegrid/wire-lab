@@ -131,6 +131,14 @@ Intent: The clean container run after `DI-rofiz` showed broken-pipe kernel deliv
 Constraints: Keep the run bounded; do not hide malformed/adversarial protocol probes; do not weaken analyzer gates; preserve app-local trust semantics and clean-run volume reset behavior.
 Affects: implementations/poc14-wasm/config.json; protocols/wire-lab.d/TODO/TODO-gogug-poc13-hardening-and-poc14-superset-plan.md.
 
+ID: DI-rulul
+Date: 2026-06-13 17:49:04
+Status: active
+Decision: Normalize live POC14 monitor report prose before analyzer gates inspect the report.
+Intent: The monitor is a POC-only observer, not a production actor or protocol participant. Live monitor output can still choose retired production-looking vocabulary even when the run events and agent payloads are correct, so POC14 should normalize only monitor prose to the active event/promise/outcome vocabulary while preserving strict analyzer rejection for protocol traffic.
+Constraints: Do not weaken forbidden-vocabulary gates; do not sanitize agent messages, payloads, envelopes, or runtime events to hide protocol drift; apply this only after structured monitor JSON is decoded and before the report is returned to writers/analyzers.
+Affects: implementations/poc14-wasm/decision/live.go; protocols/wire-lab.d/TODO/TODO-gogug-poc13-hardening-and-poc14-superset-plan.md.
+
 ## Tasks
 
 - [x] gogug.1 Fix POC13 evidence summary mismatch so saved evidence counts include all local non-commitment outcomes, not only receiver-side `not_promised` journal entries.
@@ -174,3 +182,4 @@ Affects: implementations/poc14-wasm/config.json; protocols/wire-lab.d/TODO/TODO-
 - [x] gogug.39 Make Peggy and Victor keep real `cid_compute_v1` compute promises for Alice through WASM and stdio worker execution.
 - [x] gogug.40 Make committed POC14 `config.json` canonical and remove stale ignored example/local split.
 - [x] gogug.41 Increase POC14 shutdown grace to avoid deterministic app teardown racing slower live-agent sends.
+- [x] gogug.42 Normalize live monitor report prose before analyzer gates inspect POC14 reports.

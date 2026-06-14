@@ -108,7 +108,10 @@ func (client LiveClient) Evaluate(ctx context.Context, events []Event) (MonitorR
 	if err := json.Unmarshal([]byte(extractJSONObject(text)), &report); err != nil {
 		return MonitorReport{}, fmt.Errorf("decode live monitor JSON: %w: %s", err, text)
 	}
-	return report, nil
+	// Intent: Normalize only observer-tool prose before analyzer gates read it;
+	// agent protocol messages and payloads still fail when they contain retired
+	// production-looking vocabulary. Source: DI-rulul
+	return NormalizeMonitorReportVocabulary(report), nil
 }
 
 // callResponses sends the compact POC-local Responses request. The optional
