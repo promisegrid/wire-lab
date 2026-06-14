@@ -123,6 +123,14 @@ Constraints: Keep secrets out of `config.json`; continue sourcing `OPENAI_API_KE
 Affects: implementations/poc14-wasm/config.json; implementations/poc14-wasm/config.example.json; implementations/poc14-wasm/.gitignore; implementations/poc14-wasm/Dockerfile; implementations/poc14-wasm/README.md; implementations/poc14-wasm/docs/IMPLEMENTATION-NOTES.md; implementations/poc14-wasm/config/config_test.go; implementations/poc14-wasm/scripts/run-clean.sh; DEV-GUIDE-RESOURCES.md.
 Supersedes: DI-kimim; DI-sivis
 
+ID: DI-kulik
+Date: 2026-06-13 17:05:29
+Status: active
+Decision: Increase POC14 shutdown grace in committed `config.json` so deterministic apps keep receive promises open while slower live agents finish their turns.
+Intent: The clean container run after `DI-rofiz` showed broken-pipe kernel delivery failures and shutdown grace timeouts when deterministic device/runtime apps closed before live agents completed. POC14 should treat shutdown coordination as part of the regression contract so protocol-validity scoring is not dominated by local process teardown races.
+Constraints: Keep the run bounded; do not hide malformed/adversarial protocol probes; do not weaken analyzer gates; preserve app-local trust semantics and clean-run volume reset behavior.
+Affects: implementations/poc14-wasm/config.json; protocols/wire-lab.d/TODO/TODO-gogug-poc13-hardening-and-poc14-superset-plan.md.
+
 ## Tasks
 
 - [x] gogug.1 Fix POC13 evidence summary mismatch so saved evidence counts include all local non-commitment outcomes, not only receiver-side `not_promised` journal entries.
@@ -165,3 +173,4 @@ Supersedes: DI-kimim; DI-sivis
 - [x] gogug.38 Upgrade Peggy to real wazero WASM execution and Victor to binary CBOR stdio I/O.
 - [x] gogug.39 Make Peggy and Victor keep real `cid_compute_v1` compute promises for Alice through WASM and stdio worker execution.
 - [x] gogug.40 Make committed POC14 `config.json` canonical and remove stale ignored example/local split.
+- [x] gogug.41 Increase POC14 shutdown grace to avoid deterministic app teardown racing slower live-agent sends.
