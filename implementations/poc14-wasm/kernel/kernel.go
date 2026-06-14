@@ -319,7 +319,12 @@ func (kernel *Kernel) notPromisedAck(message parsedEnvelope, promiseText string)
 		"promise": promiseText,
 		"reason":  "kernel transport non-commitment expressed as local promise content",
 	}
-	ack, ackErr := protocol.NewEnvelope(message.protocolCID, ackFields, "kernel:"+kernel.ContainerName)
+	if promiseAbout := message.fields["field_promise_about"]; promiseAbout != "" {
+		ackFields["field_promise_about"] = promiseAbout
+	} else if message.protocolName == pcid.RelationshipV1 {
+		ackFields["field_promise_about"] = "local_observation"
+	}
+	ack, ackErr := kernel.newAckEnvelope(message, ackFields)
 	if ackErr != nil {
 		kernel.record("kernel_not_promised_ack_sign_failed", "broken", message.fields["from"], ackErr.Error())
 		return []byte{0x00}
@@ -330,6 +335,16 @@ func (kernel *Kernel) notPromisedAck(message parsedEnvelope, promiseText string)
 		return []byte{0x00}
 	}
 	return ackBytes
+}
+
+func (kernel *Kernel) newAckEnvelope(message parsedEnvelope, ackFields map[string]string) (protocol.Envelope, error) {
+	// Intent: Kernel ACKs are transport non-commitment promises, but their payload
+	// still belongs to the original pCID when that pCID has a migrated array
+	// encoder. Source: DI-dirat
+	if payloadBytes, arrayPayload, payloadErr := protocol.MarshalKnownArrayPayload(message.protocolName, ackFields); payloadErr == nil && arrayPayload {
+		return protocol.NewEnvelopeFromPayload(message.protocolCID, payloadBytes, "kernel:"+kernel.ContainerName)
+	}
+	return protocol.NewEnvelope(message.protocolCID, ackFields, "kernel:"+kernel.ContainerName)
 }
 
 func firstField(fields map[string]string, keys ...string) string {

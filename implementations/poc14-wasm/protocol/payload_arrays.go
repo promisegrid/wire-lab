@@ -1,10 +1,20 @@
 package protocol
 
-import "fmt"
+import (
+	"fmt"
+	"sort"
+	"strings"
+)
 
 const (
-	protocolCASStorageV1 = "cas_storage_v1"
-	protocolCIDComputeV1 = "cid_compute_v1"
+	protocolRelationshipV1  = "relationship_v1"
+	protocolPostalScaleV1   = "postal_scale_v1"
+	protocolUPSLabelV1      = "ups_label_v1"
+	protocolAccountingV1    = "accounting_v1"
+	protocolPrinterPortV1   = "printer_port_v1"
+	protocolKernelReceiveV1 = "kernel_receive_v1"
+	protocolCASStorageV1    = "cas_storage_v1"
+	protocolCIDComputeV1    = "cid_compute_v1"
 )
 
 type arrayPayloadState struct {
@@ -25,6 +35,24 @@ type arrayPayloadSchema struct {
 // projection. Source: DI-gahuh
 func MarshalKnownArrayPayload(protocolName string, fields map[string]string) ([]byte, bool, error) {
 	switch protocolName {
+	case protocolRelationshipV1:
+		payloadBytes, err := MarshalRelationshipPayloadFields(fields)
+		return payloadBytes, true, err
+	case protocolPostalScaleV1:
+		payloadBytes, err := MarshalPostalScalePayloadFields(fields)
+		return payloadBytes, true, err
+	case protocolUPSLabelV1:
+		payloadBytes, err := MarshalUPSLabelPayloadFields(fields)
+		return payloadBytes, true, err
+	case protocolAccountingV1:
+		payloadBytes, err := MarshalAccountingPayloadFields(fields)
+		return payloadBytes, true, err
+	case protocolPrinterPortV1:
+		payloadBytes, err := MarshalPrinterPortPayloadFields(fields)
+		return payloadBytes, true, err
+	case protocolKernelReceiveV1:
+		payloadBytes, err := MarshalKernelReceivePayloadFields(fields)
+		return payloadBytes, true, err
 	case protocolCASStorageV1:
 		payloadBytes, err := MarshalCASStoragePayloadFields(fields)
 		return payloadBytes, true, err
@@ -34,6 +62,180 @@ func MarshalKnownArrayPayload(protocolName string, fields map[string]string) ([]
 	default:
 		return nil, false, nil
 	}
+}
+
+type pairPayloadField struct {
+	key   string
+	value string
+}
+
+// marshalPairPayload encodes flexible pCID-owned payloads whose protocol specs
+// intentionally allow an extensible body of local key/value promise details.
+// Intent: Relationship and kernel-receive payloads need extension room for live
+// LLM fields and app registration details, but those fields are still body slots
+// owned by their pCID rather than a universal field_* map on the wire. Source:
+// DI-dirat
+func marshalPairPayload(protocolName string, fields map[string]string) ([]byte, error) {
+	promiseAbout := fields["field_promise_about"]
+	if promiseAbout == "" {
+		promiseAbout = "local_observation"
+	}
+	writer := &cborWriter{}
+	if err := writer.writeArrayHeader(5); err != nil {
+		return nil, err
+	}
+	for _, value := range []string{fields["from"], fields["to"], promiseAbout} {
+		if err := writer.writeString(value); err != nil {
+			return nil, err
+		}
+	}
+	if err := writer.writeArrayHeader(4); err != nil {
+		return nil, err
+	}
+	for _, value := range []string{fields["outcome"], fields["promise"], fields["reason"], fields["turn"]} {
+		if err := writer.writeString(value); err != nil {
+			return nil, err
+		}
+	}
+	pairs := pairPayloadFields(fields)
+	if err := writer.writeArrayHeader(len(pairs)); err != nil {
+		return nil, err
+	}
+	for _, pair := range pairs {
+		if err := writer.writeArrayHeader(2); err != nil {
+			return nil, err
+		}
+		if err := writer.writeString(pair.key); err != nil {
+			return nil, err
+		}
+		if err := writer.writeString(pair.value); err != nil {
+			return nil, err
+		}
+	}
+	_ = protocolName
+	return writer.buffer.Bytes(), nil
+}
+
+func pairPayloadFields(fields map[string]string) []pairPayloadField {
+	pairs := make([]pairPayloadField, 0, len(fields))
+	for key, value := range fields {
+		if value == "" || pairPayloadCoreField(key) {
+			continue
+		}
+		wireKey := strings.TrimPrefix(key, "field_")
+		if wireKey == "payload_protocol" || wireKey == "payload_shape" || wireKey == "promise_about" {
+			continue
+		}
+		pairs = append(pairs, pairPayloadField{key: wireKey, value: value})
+	}
+	sort.Slice(pairs, func(leftIndex, rightIndex int) bool {
+		return pairs[leftIndex].key < pairs[rightIndex].key
+	})
+	return pairs
+}
+
+func pairPayloadCoreField(key string) bool {
+	switch key {
+	case "act", "from", "to", "outcome", "promise", "reason", "turn", "protocol":
+		return true
+	default:
+		return false
+	}
+}
+
+func payloadFieldsFromPairs(protocolName string, payloadBytes []byte) (map[string]string, error) {
+	reader := &cborReader{data: payloadBytes}
+	arrayLength, err := reader.readTypeAndLength(4)
+	if err != nil {
+		return nil, err
+	}
+	if arrayLength != 5 {
+		return nil, fmt.Errorf("%s pair payload must have 5 slots, got %d", protocolName, arrayLength)
+	}
+	promiser, err := reader.readString()
+	if err != nil {
+		return nil, err
+	}
+	promisee, err := reader.readString()
+	if err != nil {
+		return nil, err
+	}
+	promiseAbout, err := reader.readString()
+	if err != nil {
+		return nil, err
+	}
+	stateLength, err := reader.readTypeAndLength(4)
+	if err != nil {
+		return nil, err
+	}
+	if stateLength != 4 {
+		return nil, fmt.Errorf("%s pair-payload state must have 4 slots, got %d", protocolName, stateLength)
+	}
+	outcome, err := reader.readString()
+	if err != nil {
+		return nil, err
+	}
+	promiseText, err := reader.readString()
+	if err != nil {
+		return nil, err
+	}
+	reason, err := reader.readString()
+	if err != nil {
+		return nil, err
+	}
+	turn, err := reader.readString()
+	if err != nil {
+		return nil, err
+	}
+	fields := map[string]string{
+		"act":                    "promise",
+		"from":                   promiser,
+		"to":                     promisee,
+		"field_promise_about":    promiseAbout,
+		"field_payload_protocol": protocolName,
+		"field_payload_shape":    "cbor_array",
+	}
+	for _, optional := range []struct {
+		key   string
+		value string
+	}{
+		{key: "outcome", value: outcome},
+		{key: "promise", value: promiseText},
+		{key: "reason", value: reason},
+		{key: "turn", value: turn},
+	} {
+		if optional.value != "" {
+			fields[optional.key] = optional.value
+		}
+	}
+	pairCount, err := reader.readTypeAndLength(4)
+	if err != nil {
+		return nil, err
+	}
+	for pairIndex := uint64(0); pairIndex < pairCount; pairIndex++ {
+		pairLength, pairLengthErr := reader.readTypeAndLength(4)
+		if pairLengthErr != nil {
+			return nil, pairLengthErr
+		}
+		if pairLength != 2 {
+			return nil, fmt.Errorf("%s pair payload entry must have 2 slots, got %d", protocolName, pairLength)
+		}
+		key, keyErr := reader.readString()
+		if keyErr != nil {
+			return nil, keyErr
+		}
+		value, valueErr := reader.readString()
+		if valueErr != nil {
+			return nil, valueErr
+		}
+		if key != "" && value != "" {
+			fields["field_"+key] = value
+		}
+	}
+	if reader.offset != len(reader.data) {
+		return nil, fmt.Errorf("trailing cbor bytes in %s pair payload: %d", protocolName, len(reader.data)-reader.offset)
+	}
+	return fields, nil
 }
 
 func marshalArrayPayload(fields map[string]string, schemas []arrayPayloadSchema) ([]byte, error) {

@@ -12,6 +12,7 @@ RUN go build -o /out/poc14-wasm-agent ./cmd/poc14-wasm-agent
 RUN go build -o /out/poc14-stdio-adapter ./cmd/poc14-stdio-adapter
 RUN go build -o /out/poc14-stdio-worker ./cmd/poc14-stdio-worker
 RUN go build -o /out/poc14-supervisor ./cmd/poc14-supervisor
+RUN go build -o /out/poc14-event-collector ./cmd/poc14-event-collector
 RUN go build -o /out/poc14-analyze ./cmd/poc14-analyze
 
 FROM alpine:3.20
@@ -27,6 +28,7 @@ COPY --from=build /out/poc14-wasm-agent /usr/local/bin/poc14-wasm-agent
 COPY --from=build /out/poc14-stdio-adapter /usr/local/bin/poc14-stdio-adapter
 COPY --from=build /out/poc14-stdio-worker /usr/local/bin/poc14-stdio-worker
 COPY --from=build /out/poc14-supervisor /usr/local/bin/poc14-supervisor
+COPY --from=build /out/poc14-event-collector /usr/local/bin/poc14-event-collector
 COPY --from=build /out/poc14-analyze /usr/local/bin/poc14-analyze
 COPY config.json /app/config.json
 ENTRYPOINT ["/usr/local/bin/poc14-supervisor"]

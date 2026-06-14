@@ -8,8 +8,9 @@ superset of prior POCs unless a scoped DI explicitly says otherwise. Source:
 ## What Changed From POC13
 
 - Module path and command names now use `promisegrid.dev/wire-lab/implementations/poc14-wasm` and `poc14-*` binaries.
-- Docker run state moved to `/run/poc14` and the compose network/volume are
-  named `poc14` / `poc14-run`.
+- Docker run state visible to the observer-only collector lives at `/run/poc14`.
+  Agent containers do not mount that observer run volume or coordinate through
+  marker files. Source: `DI-dirat`.
 - Peggy and Victor were added to committed `config.json` in a new `wasm-stdio`
   container.
 - `poc14-wasm-agent` records real wazero compile/instantiate/call events for an
@@ -25,9 +26,9 @@ superset of prior POCs unless a scoped DI explicitly says otherwise. Source:
   `decentralized_monitor_counts`, `migration_counts`, `restart_counts`, and
   score dimensions for `runtime_adapter`, `monitoring`, `migration`, and
   `restart`.
-- Scripted `cas_storage_v1` and `cid_compute_v1` messages now use pCID-owned
-  CBOR array payloads on the wire, with `field_*` compatibility projections only
-  inside local handlers and analyzer event records. Source: `DI-gahuh`.
+- Known POC14 protocol messages now use pCID-owned CBOR array payloads on the
+  wire, with `field_*` compatibility projections only inside local handlers and
+  analyzer event records. Source: `DI-gahuh`; `DI-dirat`.
 - Peggy and Victor now each send one useful routed `relationship_v1` promise to
   Dave and each keep one useful `cid_compute_v1` promise for Alice so the
   heterogeneous-runtime-adapter agents do more than record runtime-adapter existence.

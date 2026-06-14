@@ -228,6 +228,15 @@ func TestValidateSummaryRejectsMissingMigratedArrayPayloadEvent(t *testing.T) {
 	}
 }
 
+func TestValidateSummaryRejectsMissingArrayPayloadProtocol(t *testing.T) {
+	summary := cleanRegressionSummary()
+	delete(summary.ArrayPayloadProtocolCounts, pcid.RelationshipV1)
+	err := validateSummary(summary, cleanRegressionCriteria())
+	if err == nil {
+		t.Fatalf("missing relationship array payload coverage should fail")
+	}
+}
+
 func cleanRegressionSummary() RunSummary {
 	eventCounts := map[string]int{
 		"fulfillment_workflow_completed":  1,
@@ -244,10 +253,17 @@ func cleanRegressionSummary() RunSummary {
 		AgentCounts:   map[string]int{},
 		FailureCounts: map[string]int{},
 		ProtocolCounts: map[string]int{
-			pcid.CASStorageV1:  1,
-			pcid.CIDComputeV1:  1,
-			pcid.IdentityKeyV1: 1,
+			pcid.KernelReceiveV1: 1,
+			pcid.CASStorageV1:    1,
+			pcid.CIDComputeV1:    1,
+			pcid.IdentityKeyV1:   1,
+			pcid.RelationshipV1:  1,
+			pcid.AccountingV1:    1,
+			pcid.UPSLabelV1:      1,
+			pcid.PostalScaleV1:   1,
+			pcid.PrinterPortV1:   1,
 		},
+		ArrayPayloadProtocolCounts: map[string]int{},
 		ShippingCounts: map[string]int{
 			"accounting_updated":                    1,
 			"accounting_update_duplicate":           1,
@@ -264,6 +280,9 @@ func cleanRegressionSummary() RunSummary {
 			LocalTrustCorrectness: 5,
 			ImpositionAvoidance:   5,
 		},
+	}
+	for _, protocolName := range requiredArrayPayloadProtocols() {
+		summary.ArrayPayloadProtocolCounts[protocolName] = 1
 	}
 	summary.ScoreReport = computeScores(summary)
 	return summary

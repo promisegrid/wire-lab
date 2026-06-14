@@ -19,6 +19,7 @@ type Config struct {
 	RunID                 string            `json:"run_id"`
 	RunRoot               string            `json:"run_root"`
 	ListenPort            int               `json:"listen_port"`
+	EventCollectorAddress string            `json:"event_collector_address"`
 	ProviderBaseURL       string            `json:"provider_base_url"`
 	APIKeyEnv             string            `json:"api_key_env"`
 	AgentModel            string            `json:"agent_model"`
@@ -32,7 +33,6 @@ type Config struct {
 	MaxTurns              int               `json:"max_turns"`
 	MaxAgentCalls         int               `json:"max_agent_calls"`
 	MaxMonitorCalls       int               `json:"max_monitor_calls"`
-	MonitorNode           string            `json:"monitor_node"`
 	StrongTrustThreshold  int               `json:"strong_trust_threshold"`
 	WeakTrustThreshold    int               `json:"weak_trust_threshold"`
 	TrustDecayPerRound    int               `json:"trust_decay_per_round"`
@@ -97,6 +97,9 @@ func (cfg Config) Validate() error {
 	if cfg.ListenPort <= 0 {
 		return fmt.Errorf("listen_port must be positive")
 	}
+	if strings.TrimSpace(cfg.EventCollectorAddress) == "" {
+		return fmt.Errorf("event_collector_address is required")
+	}
 	if strings.TrimSpace(cfg.ProviderBaseURL) == "" {
 		return fmt.Errorf("provider_base_url is required")
 	}
@@ -133,9 +136,6 @@ func (cfg Config) Validate() error {
 	seenAgents, agentErr := cfg.validateAgents()
 	if agentErr != nil {
 		return agentErr
-	}
-	if !seenAgents[cfg.MonitorNode] {
-		return fmt.Errorf("monitor_node %q is not an agent", cfg.MonitorNode)
 	}
 	if containerErr := cfg.validateContainers(seenAgents); containerErr != nil {
 		return containerErr
@@ -229,11 +229,12 @@ func (cfg Config) ShutdownGrace() time.Duration {
 	return time.Duration(cfg.ShutdownGraceMillis) * time.Millisecond
 }
 
-// MonitorWaitTimeout returns the longest time a completed node should wait for
-// the observer-only monitor marker before treating the run lifecycle as stuck.
-// Intent: Early-finishing deterministic apps must not kill a valid run merely
-// because live agents and the monitor can each spend their configured provider
-// request budget before `monitor.done` appears. Source: DI-jupob
+// MonitorWaitTimeout returns the longest time the observer-only collector should
+// wait for supervisors and the live monitor call before treating the run
+// lifecycle as stuck.
+// Intent: POC14 clean runs should allow live agents and the collector-side
+// monitor to spend their configured provider request budgets without letting
+// agents coordinate through shared marker files. Source: DI-jupob; DI-dirat
 func (cfg Config) MonitorWaitTimeout() time.Duration {
 	agentCallBudget := cfg.RequestTimeout() * time.Duration(cfg.MaxAgentCalls)
 	monitorCallBudget := cfg.RequestTimeout() * time.Duration(cfg.MaxMonitorCalls)

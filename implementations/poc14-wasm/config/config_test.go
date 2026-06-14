@@ -3,6 +3,7 @@ package config
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 )
@@ -28,6 +29,9 @@ func TestLoadAllowsAPIKeyEnvironmentName(t *testing.T) {
 	}
 	if cfg.APIKeyEnv != "OPENAI_API_KEY" {
 		t.Fatalf("api key env = %q, want OPENAI_API_KEY", cfg.APIKeyEnv)
+	}
+	if cfg.EventCollectorAddress != "event-collector:9200" {
+		t.Fatalf("event collector address = %q, want event-collector:9200", cfg.EventCollectorAddress)
 	}
 }
 
@@ -65,6 +69,20 @@ func TestCommittedConfigLoads(t *testing.T) {
 	}
 }
 
+func TestComposeMountsRunVolumeOnlyForCollector(t *testing.T) {
+	composeBytes, err := os.ReadFile(filepath.Join("..", "compose.yaml"))
+	if err != nil {
+		t.Fatalf("read compose: %v", err)
+	}
+	composeText := string(composeBytes)
+	if strings.Contains(composeText, "poc14-run") {
+		t.Fatalf("compose should not retain the old shared poc14-run volume")
+	}
+	if count := strings.Count(composeText, "/run/poc14"); count != 1 {
+		t.Fatalf("compose /run/poc14 mount count = %d, want exactly collector-only mount", count)
+	}
+}
+
 func TestAgentRejectsUnknownProtocolName(t *testing.T) {
 	agent := AgentConfig{
 		Name:           "alice",
@@ -99,9 +117,10 @@ func TestMonitorWaitTimeoutCoversAgentAndMonitorBudgets(t *testing.T) {
 func validConfigBytes() []byte {
 	return []byte(`{
 		"run_id":"test",
-		"run_root":"/run/poc14",
-		"listen_port":9100,
-		"provider_base_url":"https://example.invalid/v1/responses",
+			"run_root":"/run/poc14",
+			"listen_port":9100,
+			"event_collector_address":"event-collector:9200",
+			"provider_base_url":"https://example.invalid/v1/responses",
 		"api_key_env":"OPENAI_API_KEY",
 		"agent_model":"model",
 		"monitor_model":"model",
@@ -110,11 +129,10 @@ func validConfigBytes() []byte {
 		"request_timeout_seconds":1,
 		"startup_delay_millis":1,
 		"turn_delay_millis":1,
-		"max_turns":1,
-		"max_agent_calls":12,
-		"max_monitor_calls":1,
-		"monitor_node":"alice",
-		"strong_trust_threshold":2,
+			"max_turns":1,
+			"max_agent_calls":12,
+			"max_monitor_calls":1,
+			"strong_trust_threshold":2,
 		"weak_trust_threshold":-2,
 		"trust_decay_per_round":0,
 		"agents":[

@@ -147,6 +147,14 @@ Intent: POC14 should not keep ambiguous boundary language after the vocabulary c
 Constraints: Preserve PromiseGrid envelope behavior, one top-level `promise` action, TCP/kernel message transport, WASM execution, stdio CBOR I/O, and clean-run reset behavior; use `git mv` for path renames; avoid reintroducing the retired word inside POC14 code by splitting analyzer/normalizer literals.
 Affects: implementations/poc14-wasm/; protocols/wire-lab.d/TODO/TODO-gogug-poc13-hardening-and-poc14-superset-plan.md.
 
+ID: DI-dirat
+Date: 2026-06-13 20:50:32
+Status: active
+Decision: Remove POC14 shared-volume agent coordination, move run analysis to an observer-only collector service, let supervisors exit naturally, and migrate remaining POC14 pCIDs to pCID-owned CBOR array payloads.
+Intent: POC14 should not let agents coordinate through a Docker volume or in-run marker files. Agent/kernel processes should communicate only by PromiseGrid envelopes over TCP or local runtime-adapter interfaces, while POC-only analysis observes after the fact through an explicit collector that cannot send control messages back to agents. The same pass should finish the `field_*` payload migration so fresh wire payloads are pCID-owned CBOR arrays rather than universal field maps.
+Constraints: Preserve one top-level semantic action `promise`; keep `grid([42(pCID), payload, proof])`; keep analyzer/monitor output as POC-only tooling; do not add global trust, route authority, RPC verbs, permission/conformance language, or a universal payload shape; keep secrets out of config and command lines; keep clean-run state resettable and scoped to the POC run.
+Affects: implementations/poc14-wasm/; DEV-GUIDE-RESOURCES.md; protocols/wire-lab.d/TODO/TODO-gogug-poc13-hardening-and-poc14-superset-plan.md.
+
 ## Tasks
 
 - [x] gogug.1 Fix POC13 evidence summary mismatch so saved evidence counts include all local non-commitment outcomes, not only receiver-side `not_promised` journal entries.
@@ -192,3 +200,8 @@ Affects: implementations/poc14-wasm/; protocols/wire-lab.d/TODO/TODO-gogug-poc13
 - [x] gogug.41 Increase POC14 shutdown grace to avoid deterministic app teardown racing slower live-agent sends.
 - [x] gogug.42 Normalize live monitor report prose before analyzer gates inspect POC14 reports.
 - [x] gogug.43 Remove remaining POC14 boundary vocabulary and add analyzer regression coverage.
+- [x] gogug.44 Remove shared Docker volume and marker-file coordination from POC14 agents and kernels.
+- [x] gogug.45 Add an observer-only POC14 event collector service and route analyzer input through it.
+- [x] gogug.46 Change POC14 clean runs to natural container exit instead of abort-on-container-exit.
+- [x] gogug.47 Migrate all remaining POC14 pCIDs to pCID-owned CBOR array payloads with runtime compatibility projections only.
+- [x] gogug.48 Update POC14 docs, analyzer gates, and run scripts for the no-shared-volume array-payload regression.

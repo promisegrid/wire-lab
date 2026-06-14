@@ -711,15 +711,19 @@ func TestMalformedProofEventReducesIdentifiedPromiserTrust(t *testing.T) {
 		"reason":              "test bad proof attribution",
 		"field_promise_about": production.PromisePresentStorageReport,
 	}
-	envelope, envelopeErr := protocol.NewEnvelope(grace.Protocols.MustCID(pcid.CASStorageV1), fields, "mallory")
+	payloadBytes, _, payloadErr := protocol.MarshalKnownArrayPayload(pcid.CASStorageV1, fields)
+	if payloadErr != nil {
+		t.Fatalf("marshal payload: %v", payloadErr)
+	}
+	envelope, envelopeErr := protocol.NewEnvelopeFromPayload(grace.Protocols.MustCID(pcid.CASStorageV1), payloadBytes, "mallory")
 	if envelopeErr != nil {
 		t.Fatalf("new envelope: %v", envelopeErr)
 	}
 	mutatedFields := copyStringMap(fields)
 	mutatedFields["reason"] = "payload changed after signing"
-	mutatedPayload, payloadErr := protocol.MarshalStringMap(mutatedFields)
-	if payloadErr != nil {
-		t.Fatalf("marshal mutated payload: %v", payloadErr)
+	mutatedPayload, _, mutatedPayloadErr := protocol.MarshalKnownArrayPayload(pcid.CASStorageV1, mutatedFields)
+	if mutatedPayloadErr != nil {
+		t.Fatalf("marshal mutated payload: %v", mutatedPayloadErr)
 	}
 	envelope.Payload = mutatedPayload
 	envelopeBytes, bytesErr := envelope.Bytes()
@@ -837,22 +841,23 @@ func TestShutdownGraceRecordsBeforeDone(t *testing.T) {
 	}
 }
 
-func TestMonitorFailureWritesNonAuthoritativeDoneMarker(t *testing.T) {
+func TestNodeRunDoesNotUseMonitorMarkerFiles(t *testing.T) {
 	cfg := singleNodeTestConfig(t)
 	node := NewNode(cfg, cfg.Agents[0], &decision.FakeDecider{}, failingMonitor{})
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	if err := node.Run(ctx); err != nil {
-		t.Fatalf("run node with failing monitor: %v", err)
+		t.Fatalf("run node with unused monitor: %v", err)
 	}
-	if _, err := os.Stat(filepath.Join(cfg.RunRoot, cfg.RunID, "monitor.done")); err != nil {
-		t.Fatalf("monitor done marker should exist after observer failure: %v", err)
+	for _, markerName := range []string{"monitor.done", "alice.done", "alice.turns_done"} {
+		if _, err := os.Stat(filepath.Join(cfg.RunRoot, cfg.RunID, markerName)); err == nil {
+			t.Fatalf("marker file %s should not exist after natural-exit run", markerName)
+		} else if !errors.Is(err, os.ErrNotExist) {
+			t.Fatalf("stat marker file %s: %v", markerName, err)
+		}
 	}
-	if !hasEventOutcome(node.events, "monitor_error", "non_commitment") {
-		t.Fatalf("monitor error should be local non-commitment event: %#v", node.events)
-	}
-	if !hasEventOutcome(node.events, "monitor_done", "non_commitment") {
-		t.Fatalf("fallback monitor marker should be non-authoritative event: %#v", node.events)
+	if hasEventOutcome(node.events, "monitor_error", "non_commitment") || hasEventOutcome(node.events, "monitor_done", "non_commitment") {
+		t.Fatalf("node runtime should not run the observer monitor: %#v", node.events)
 	}
 }
 
@@ -872,6 +877,7 @@ func singleNodeTestConfig(t *testing.T) config.Config {
 		RunID:                 "test",
 		RunRoot:               filepath.Join(t.TempDir(), "run"),
 		ListenPort:            0,
+		EventCollectorAddress: "event-collector:9200",
 		ProviderBaseURL:       "https://example.invalid/v1/responses",
 		APIKeyEnv:             "OPENAI_API_KEY",
 		AgentModel:            "model",
@@ -884,7 +890,6 @@ func singleNodeTestConfig(t *testing.T) config.Config {
 		MaxTurns:              1,
 		MaxAgentCalls:         1,
 		MaxMonitorCalls:       1,
-		MonitorNode:           "alice",
 		StrongTrustThreshold:  2,
 		WeakTrustThreshold:    -2,
 		TrustDecayPerRound:    0,
@@ -914,6 +919,7 @@ func twoNodeTestConfig(t *testing.T) config.Config {
 		RunID:                 "test",
 		RunRoot:               filepath.Join(t.TempDir(), "run"),
 		ListenPort:            0,
+		EventCollectorAddress: "event-collector:9200",
 		ProviderBaseURL:       "https://example.invalid/v1/responses",
 		APIKeyEnv:             "OPENAI_API_KEY",
 		AgentModel:            "model",
@@ -926,7 +932,6 @@ func twoNodeTestConfig(t *testing.T) config.Config {
 		MaxTurns:              1,
 		MaxAgentCalls:         1,
 		MaxMonitorCalls:       1,
-		MonitorNode:           "alice",
 		StrongTrustThreshold:  2,
 		WeakTrustThreshold:    -2,
 		TrustDecayPerRound:    0,
@@ -964,6 +969,7 @@ func computeRoutingTestConfig(t *testing.T) config.Config {
 		RunID:                 "compute-routing-test",
 		RunRoot:               filepath.Join(t.TempDir(), "run"),
 		ListenPort:            0,
+		EventCollectorAddress: "event-collector:9200",
 		ProviderBaseURL:       "https://example.invalid/v1/responses",
 		APIKeyEnv:             "OPENAI_API_KEY",
 		AgentModel:            "model",
@@ -976,7 +982,6 @@ func computeRoutingTestConfig(t *testing.T) config.Config {
 		MaxTurns:              1,
 		MaxAgentCalls:         1,
 		MaxMonitorCalls:       1,
-		MonitorNode:           "alice",
 		StrongTrustThreshold:  2,
 		WeakTrustThreshold:    -2,
 		TrustDecayPerRound:    0,
@@ -1042,6 +1047,7 @@ func shippingTestConfig(t *testing.T) config.Config {
 		RunID:                 "shipping-test",
 		RunRoot:               filepath.Join(t.TempDir(), "run"),
 		ListenPort:            0,
+		EventCollectorAddress: "event-collector:9200",
 		ProviderBaseURL:       "https://example.invalid/v1/responses",
 		APIKeyEnv:             "OPENAI_API_KEY",
 		AgentModel:            "model",
@@ -1054,7 +1060,6 @@ func shippingTestConfig(t *testing.T) config.Config {
 		MaxTurns:              1,
 		MaxAgentCalls:         1,
 		MaxMonitorCalls:       1,
-		MonitorNode:           "fulfillment",
 		StrongTrustThreshold:  2,
 		WeakTrustThreshold:    -2,
 		TrustDecayPerRound:    0,
@@ -1138,7 +1143,7 @@ func (failingMonitor) Evaluate(_ context.Context, _ []decision.Event) (decision.
 
 func signedAccountingUpdateFrame(t *testing.T, node *Node, exchangeID string) []byte {
 	t.Helper()
-	envelope, err := protocol.NewEnvelope(node.Protocols.MustCID(pcid.AccountingV1), map[string]string{
+	fields := map[string]string{
 		"act":                   decision.ActPromise,
 		"from":                  "fulfillment",
 		"to":                    "accounting",
@@ -1150,7 +1155,12 @@ func signedAccountingUpdateFrame(t *testing.T, node *Node, exchangeID string) []
 		"field_order_id":        fulfillmentOrderID,
 		"field_tracking_number": "1Z999AA10123456784",
 		"field_cost_cents":      "1776",
-	}, "fulfillment")
+	}
+	payloadBytes, _, payloadErr := protocol.MarshalKnownArrayPayload(pcid.AccountingV1, fields)
+	if payloadErr != nil {
+		t.Fatalf("marshal accounting update payload: %v", payloadErr)
+	}
+	envelope, err := protocol.NewEnvelopeFromPayload(node.Protocols.MustCID(pcid.AccountingV1), payloadBytes, "fulfillment")
 	if err != nil {
 		t.Fatalf("new accounting update envelope: %v", err)
 	}

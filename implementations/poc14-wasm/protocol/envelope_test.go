@@ -1,6 +1,9 @@
 package protocol
 
-import "testing"
+import (
+	"bytes"
+	"testing"
+)
 
 func TestEnvelopeUsesGridTag42AndVerifies(t *testing.T) {
 	protocolCID := NewProtocolCID([]byte("poc14 test protocol"))
@@ -104,16 +107,92 @@ func TestIdentityKeyPayloadUsesArrayShape(t *testing.T) {
 	}
 }
 
-func TestStorageAndComputePayloadsUseArrayShape(t *testing.T) {
-	// Intent: CAS and compute are migrated pCIDs whose wire payloads are
-	// pCID-owned arrays; field_* names are only runtime compatibility
-	// projections for existing handlers. Source: DI-gahuh
+func TestKnownPayloadsUseArrayShape(t *testing.T) {
+	// Intent: Fresh POC14 wire payloads are pCID-owned arrays; field_* names are
+	// only runtime compatibility projections for existing handlers. Source:
+	// DI-gahuh; DI-dirat
 	testCases := []struct {
 		name         string
 		protocolName string
 		fields       map[string]string
 		wantField    string
 	}{
+		{
+			name:         "relationship",
+			protocolName: protocolRelationshipV1,
+			fields: map[string]string{
+				"from":                "alice",
+				"to":                  "bob",
+				"promise":             "Alice promises one local relationship event.",
+				"reason":              "relationship test",
+				"field_promise_about": "local_observation",
+				"field_resource":      "storage",
+			},
+			wantField: "field_resource",
+		},
+		{
+			name:         "kernel receive",
+			protocolName: protocolKernelReceiveV1,
+			fields: map[string]string{
+				"from":     "alice",
+				"to":       "kernel",
+				"app":      "alice",
+				"pcid":     "relationship_v1",
+				"pcid_cid": "cidv1-raw-sha2-256:relationship",
+			},
+			wantField: "field_app",
+		},
+		{
+			name:         "postal scale",
+			protocolName: protocolPostalScaleV1,
+			fields: map[string]string{
+				"from":                "fulfillment",
+				"to":                  "postal_scale",
+				"field_promise_about": "weigh_package",
+				"field_package_id":    "PKG-1001",
+			},
+			wantField: "field_package_id",
+		},
+		{
+			name:         "accounting",
+			protocolName: protocolAccountingV1,
+			fields: map[string]string{
+				"from":                  "fulfillment",
+				"to":                    "accounting",
+				"field_promise_about":   "shipment_update",
+				"field_order_id":        "ORDER-1001",
+				"field_tracking_number": "1Z71051733616616",
+				"field_cost_cents":      "860",
+			},
+			wantField: "field_tracking_number",
+		},
+		{
+			name:         "ups label",
+			protocolName: protocolUPSLabelV1,
+			fields: map[string]string{
+				"from":                   "fulfillment",
+				"to":                     "ups_label_printer",
+				"field_promise_about":    "print_label",
+				"field_package_id":       "PKG-1001",
+				"field_shipping_address": "100 Promise Way",
+				"field_weight_ounces":    "43",
+			},
+			wantField: "field_shipping_address",
+		},
+		{
+			name:         "printer port",
+			protocolName: protocolPrinterPortV1,
+			fields: map[string]string{
+				"from":                             "ups_label_printer",
+				"to":                               "printer_port",
+				"field_promise_about":              "issue_print_capability",
+				"field_print_capability_issuee":    "ups_label_printer",
+				"field_print_capability_token_id":  "printcap-ups_label_printer",
+				"field_print_capability_scope":     "print_label",
+				"field_print_capability_max_bytes": "4096",
+			},
+			wantField: "field_print_capability_issuee",
+		},
 		{
 			name:         "cas storage",
 			protocolName: protocolCASStorageV1,
@@ -159,6 +238,9 @@ func TestStorageAndComputePayloadsUseArrayShape(t *testing.T) {
 			}
 			if len(payloadBytes) == 0 || payloadBytes[0]>>5 != 4 {
 				t.Fatalf("%s payload should be a CBOR array, got %x", testCase.protocolName, payloadBytes)
+			}
+			if bytes.Contains(payloadBytes, []byte("field_")) {
+				t.Fatalf("%s payload should not serialize compatibility field names: %x", testCase.protocolName, payloadBytes)
 			}
 			envelope, err := NewEnvelopeFromPayload(NewProtocolCID([]byte(testCase.protocolName+" test spec")), payloadBytes, testCase.fields["from"])
 			if err != nil {

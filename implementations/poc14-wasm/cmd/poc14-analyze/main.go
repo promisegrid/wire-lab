@@ -42,6 +42,7 @@ type RunSummary struct {
 	TrustCautionCounts           map[string]int          `json:"trust_caution_counts"`
 	RuntimeAdapterEventCounts    map[string]int          `json:"runtime_adapter_event_counts"`
 	DecentralizedMonitorCounts   map[string]int          `json:"decentralized_monitor_counts"`
+	ArrayPayloadProtocolCounts   map[string]int          `json:"array_payload_protocol_counts"`
 	MigrationCounts              map[string]int          `json:"migration_counts"`
 	RestartCounts                map[string]int          `json:"restart_counts"`
 	ForbiddenVocabularyCounts    map[string]int          `json:"forbidden_vocabulary_counts,omitempty"`
@@ -107,6 +108,7 @@ type AcceptanceCriteria struct {
 	RequireCASComputeSuperset         bool
 	RequireRuntimeAdapterSuperset     bool
 	RequireDecentralizedMonitoring    bool
+	RequireAllKnownArrayPayloads      bool
 	RequireMixedVersionMigration      bool
 	RequireRunInternalRestart         bool
 	RequireEventVocabulary            bool
@@ -168,6 +170,7 @@ func analyzeRun(runDir string) (RunSummary, error) {
 		TrustCautionCounts:           make(map[string]int),
 		RuntimeAdapterEventCounts:    make(map[string]int),
 		DecentralizedMonitorCounts:   make(map[string]int),
+		ArrayPayloadProtocolCounts:   make(map[string]int),
 		MigrationCounts:              make(map[string]int),
 		RestartCounts:                make(map[string]int),
 		ForbiddenVocabularyCounts:    make(map[string]int),
@@ -231,6 +234,7 @@ func cleanRegressionCriteria() AcceptanceCriteria {
 		RequireCASComputeSuperset:         true,
 		RequireRuntimeAdapterSuperset:     true,
 		RequireDecentralizedMonitoring:    true,
+		RequireAllKnownArrayPayloads:      true,
 		RequireMixedVersionMigration:      true,
 		RequireRunInternalRestart:         true,
 		RequireEventVocabulary:            true,
@@ -294,6 +298,13 @@ func validateSummary(summary RunSummary, criteria AcceptanceCriteria) error {
 	}
 	if criteria.RequireDecentralizedMonitoring && summary.ScoreReport.Monitoring < 5 {
 		failures = append(failures, fmt.Sprintf("score_report.monitoring=%d want 5", summary.ScoreReport.Monitoring))
+	}
+	if criteria.RequireAllKnownArrayPayloads {
+		for _, protocolName := range requiredArrayPayloadProtocols() {
+			if summary.ArrayPayloadProtocolCounts[protocolName] == 0 {
+				failures = append(failures, "array payload missing for "+protocolName)
+			}
+		}
 	}
 	if criteria.RequireMixedVersionMigration && summary.ScoreReport.Migration < 5 {
 		failures = append(failures, fmt.Sprintf("score_report.migration=%d want 5", summary.ScoreReport.Migration))
@@ -367,6 +378,27 @@ func countForbiddenVocabulary(values ...string) int {
 	return count
 }
 
+func knownProtocolNamesForAnalysis() []string {
+	return []string{pcid.KernelReceiveV1, pcid.CASStorageV1, pcid.CIDComputeV1, pcid.IdentityKeyV1, pcid.RelationshipV1, pcid.AccountingV1, pcid.UPSLabelV1, pcid.PostalScaleV1, pcid.PrinterPortV1}
+}
+
+func requiredArrayPayloadProtocols() []string {
+	// Intent: POC14's fresh clean-run traffic should exercise pCID-owned arrays
+	// across relationship, kernel receive, device, CAS, compute, and identity
+	// protocols so field-map payloads cannot remain the implicit target shape.
+	// Source: DI-dirat
+	return knownProtocolNamesForAnalysis()
+}
+
+func isArrayPayloadEvent(eventName string) bool {
+	switch eventName {
+	case "pcid_owned_array_payload_sent", "pcid_owned_array_payload_received", "pcid_owned_array_ack_sent", "pcid_owned_array_ack_received":
+		return true
+	default:
+		return false
+	}
+}
+
 func forbiddenVocabularyTerms() []string {
 	// Intent: Keep active POC14 run output from drifting back to retired
 	// production-looking vocabulary while avoiding literal reintroduction of those
@@ -403,9 +435,12 @@ func summarizeLog(logPath string, summary *RunSummary) error {
 		if event.Outcome != "kept" {
 			summary.FailureCounts[event.Event]++
 		}
-		for _, protocolName := range []string{pcid.CASStorageV1, pcid.CIDComputeV1, pcid.IdentityKeyV1, pcid.RelationshipV1, pcid.AccountingV1, pcid.UPSLabelV1, pcid.PostalScaleV1, pcid.PrinterPortV1} {
+		for _, protocolName := range knownProtocolNamesForAnalysis() {
 			if strings.Contains(event.Detail, "pcid="+protocolName) || strings.Contains(event.Detail, "protocol="+protocolName) {
 				summary.ProtocolCounts[protocolName]++
+				if isArrayPayloadEvent(event.Event) {
+					summary.ArrayPayloadProtocolCounts[protocolName]++
+				}
 			}
 		}
 		if event.Event == "trust_driven_peer_choice" {

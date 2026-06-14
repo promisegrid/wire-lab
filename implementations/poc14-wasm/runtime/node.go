@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"sort"
 	"strconv"
 	"strings"
 	"sync"
@@ -194,8 +193,11 @@ func NewNode(cfg config.Config, agent config.AgentConfig, decider decision.Decid
 }
 
 // Run registers local receive promises with the container kernel, executes
-// bounded autonomous turns, writes a done marker, and waits for the
-// observer-only monitor report.
+// bounded autonomous turns, and exits after a local receive-grace period.
+// Intent: Earlier POC14 nodes wrote marker files and one node ran the monitor
+// after all markers appeared; DI-dirat moves that observer lifecycle to the
+// supervisor and collector so app processes no longer coordinate through the
+// Docker observer volume. Source: DI-galin; DI-jupob; DI-dirat
 func (node *Node) Run(ctx context.Context) error {
 	if err := node.openLog(); err != nil {
 		return err
@@ -223,13 +225,10 @@ func (node *Node) Run(ctx context.Context) error {
 		}
 		time.Sleep(node.Config.TurnDelay())
 	}
-	if err := node.writeTurnsDoneMarker(); err != nil {
-		return err
-	}
 	node.waitForShutdownGrace(ctx)
 	// Intent: Stop receiving kernel-delivered frames before the local done
-	// marker is written so `node_done` does not race with late app receipts.
-	// Source: DI-galin
+	// event record is written so process completion does not race with late app
+	// receipts. Source: DI-galin; DI-dirat
 	node.closeReceivePromises()
 	node.drainInflight(ctx)
 	node.recordRunScopedRetentionAndGC()
@@ -240,24 +239,8 @@ func (node *Node) Run(ctx context.Context) error {
 		return err
 	}
 	node.record("runtime_done_promised", "kept", "", "app completed local turns and saved relationship and run-scoped event")
-	if err := node.writeDoneMarker(); err != nil {
-		return err
-	}
-	if node.Agent.Name == node.Config.MonitorNode {
-		if err := node.runMonitor(ctx); err != nil {
-			node.record("monitor_error", "non_commitment", "", err.Error())
-			if !node.allDone() {
-				return err
-			}
-			// Intent: Once every app has written `node_done`, a monitor/provider
-			// failure is an observer event rather than a reason to strand all
-			// completed nodes. Source: DI-jupob
-			if markerErr := node.writeMonitorDoneMarker("non_commitment", "monitor unavailable after completed run: "+err.Error()); markerErr != nil {
-				return markerErr
-			}
-		}
-	}
-	return node.waitForMonitor(ctx)
+	node.record("node_done", "kept", "", "local process finished without observer-volume coordination")
+	return nil
 }
 
 func (node *Node) runStartupWorkflow(ctx context.Context) error {
@@ -891,7 +874,11 @@ func (node *Node) registerReceivePromise(ctx context.Context, kernelAddress, pro
 		"reason":   "local app receive promise registration",
 		"pcid_cid": targetCID.String(),
 	}
-	envelope, envelopeErr := protocol.NewEnvelope(receiveCID, fields, node.Agent.Name)
+	payloadBytes, _, payloadErr := protocol.MarshalKnownArrayPayload(pcid.KernelReceiveV1, fields)
+	if payloadErr != nil {
+		return payloadErr
+	}
+	envelope, envelopeErr := protocol.NewEnvelopeFromPayload(receiveCID, payloadBytes, node.Agent.Name)
 	if envelopeErr != nil {
 		return envelopeErr
 	}
@@ -915,6 +902,7 @@ func (node *Node) registerReceivePromise(ctx context.Context, kernelAddress, pro
 	node.mu.Unlock()
 	node.activeHandlers.Add(1)
 	go node.receiveLoop(protocolName, frameConn)
+	node.record("pcid_owned_array_payload_sent", "kept", "kernel", "pcid="+pcid.KernelReceiveV1+" promise_about="+fields["field_promise_about"]+" exact_sha256="+protocol.HashExactBytes(envelopeBytes))
 	node.record("app_receive_promise_sent", "kept", "kernel", "pcid="+protocolName+" kernel="+kernelAddress)
 	node.record("app_kernel_backpressure_promised", "kept", "kernel", "pcid="+protocolName+" app promises bounded receive buffering through the local kernel")
 	node.record("app_kernel_rate_limit_promised", "kept", "kernel", "pcid="+protocolName+" app promises to treat local kernel throughput as a bounded promise")
@@ -1071,19 +1059,20 @@ func (node *Node) newAckBytes(target, outcome, promiseText string, protocolCID p
 			node.record("ack_bytes_failed", "broken", target, bytesErr.Error())
 			return nil, bytesErr
 		}
+		node.record("pcid_owned_array_ack_sent", "kept", target, "pcid="+pcid.IdentityKeyV1+" promise_about="+ackFields["field_promise_about"])
 		return ackBytes, nil
 	}
 	protocolName, protocolKnown := node.Protocols.Name(protocolCID)
-	if protocolKnown && ackFields["field_promise_about"] != "" {
-		ack, arrayPayload, ackErr := node.buildEnvelopeFromFields(protocolName, protocolCID, ackFields)
-		if ackErr != nil {
-			node.record("ack_sign_failed", "broken", target, ackErr.Error())
-			return nil, ackErr
+	if protocolKnown {
+		if ackFields["field_promise_about"] == "" && (protocolName == pcid.RelationshipV1 || protocolName == pcid.KernelReceiveV1) {
+			ackFields["field_promise_about"] = "local_observation"
 		}
-		if arrayPayload {
+		ack, arrayPayload, ackErr := node.buildEnvelopeFromFields(protocolName, protocolCID, ackFields)
+		if ackErr == nil && arrayPayload {
 			// Intent: Migrated pCIDs must keep ACKs in the same pCID-owned
 			// positional payload family as their requests, rather than falling
-			// back to a generic field-map acknowledgement. Source: DI-gahuh
+			// back to a generic field-map acknowledgement. Source: DI-gahuh;
+			// DI-dirat
 			ackBytes, bytesErr := ack.Bytes()
 			if bytesErr != nil {
 				node.record("ack_bytes_failed", "broken", target, bytesErr.Error())
@@ -1268,15 +1257,19 @@ func (node *Node) sendBadProofPromise(target string) error {
 		"reason":              "bad proof should fail before payload semantics are trusted",
 		"field_promise_about": production.PromisePresentStorageReport,
 	}
-	envelope, envelopeErr := protocol.NewEnvelope(node.Protocols.MustCID(pcid.CASStorageV1), fields, node.Agent.Name)
+	payloadBytes, _, payloadErr := protocol.MarshalKnownArrayPayload(pcid.CASStorageV1, fields)
+	if payloadErr != nil {
+		return payloadErr
+	}
+	envelope, envelopeErr := protocol.NewEnvelopeFromPayload(node.Protocols.MustCID(pcid.CASStorageV1), payloadBytes, node.Agent.Name)
 	if envelopeErr != nil {
 		return envelopeErr
 	}
 	mutatedFields := copyStringMap(fields)
 	mutatedFields["reason"] = "bad proof should fail because this parseable payload was changed after signing"
-	mutatedPayload, payloadErr := protocol.MarshalStringMap(mutatedFields)
-	if payloadErr != nil {
-		return payloadErr
+	mutatedPayload, _, mutatedPayloadErr := protocol.MarshalKnownArrayPayload(pcid.CASStorageV1, mutatedFields)
+	if mutatedPayloadErr != nil {
+		return mutatedPayloadErr
 	}
 	// Intent: Mutate the signable payload after proof generation so the receiver
 	// can still parse the pCID and promiser fields but must reject the exact
@@ -1357,6 +1350,9 @@ func (node *Node) sendRawEnvelopeBytes(target, protocolName string, envelopeByte
 	if writeErr := frameConn.WriteFrame(envelopeBytes); writeErr != nil {
 		return parsedMessage{}, nil, writeErr
 	}
+	if sentMessage, parseErr := node.parseEnvelope(envelopeBytes); parseErr == nil && isPcidOwnedArrayPayload(sentMessage.Fields) {
+		node.record("pcid_owned_array_payload_sent", "kept", target, "pcid="+sentMessage.ProtocolName+" promise_about="+sentMessage.Fields["field_promise_about"]+" exact_sha256="+sentMessage.ExactHash)
+	}
 	node.record("tcp_message_sent", "kept", target, "pcid="+protocolName+" exact_sha256="+protocol.HashExactBytes(envelopeBytes))
 	ackBytes, readErr := frameConn.ReadFrame()
 	if readErr != nil {
@@ -1365,6 +1361,9 @@ func (node *Node) sendRawEnvelopeBytes(target, protocolName string, envelopeByte
 	message, parseErr := node.parseEnvelope(ackBytes)
 	if parseErr != nil {
 		return parsedMessage{}, nil, parseErr
+	}
+	if isPcidOwnedArrayPayload(message.Fields) {
+		node.record("pcid_owned_array_ack_received", "kept", target, "pcid="+message.ProtocolName+" promise_about="+message.Fields["field_promise_about"]+" exact_sha256="+message.ExactHash)
 	}
 	return message, ackBytes, nil
 }
@@ -1550,7 +1549,7 @@ func productionPayloadShapePresent(protocolName string, fields map[string]string
 	case pcid.UPSLabelV1:
 		return fields["field_promise_about"] == production.PromisePrintLabel && fields["field_package_id"] != "" && fields["field_shipping_address"] != ""
 	case pcid.PrinterPortV1:
-		return fields["field_promise_about"] == production.PromiseIssuePrintCapability && fields["field_issuee"] != "" ||
+		return fields["field_promise_about"] == production.PromiseIssuePrintCapability && fields["field_print_capability_issuee"] != "" ||
 			fields["field_promise_about"] == production.PromiseRedeemPrintCapability && fields["field_print_capability_token_id"] != ""
 	default:
 		return false
@@ -3112,18 +3111,21 @@ func (node *Node) isStopping() bool {
 
 // waitForShutdownGrace leaves receive promises open briefly after active turns end.
 // Intent: Peers that made late but still legitimate promises get a bounded
-// chance to finish their exchange before this node writes `node_done`.
-// Source: DI-galin
+// chance to finish their exchange without consulting observer-owned run files.
+// Source: DI-galin; DI-dirat
 func (node *Node) waitForShutdownGrace(ctx context.Context) {
 	graceDuration := node.Config.ShutdownGrace()
 	if graceDuration <= 0 {
 		return
 	}
-	if err := node.waitForAllTurnsDone(ctx, graceDuration); err != nil {
-		node.record("shutdown_grace_timeout", "non_commitment", "", err.Error())
-		return
+	timer := time.NewTimer(graceDuration)
+	defer timer.Stop()
+	select {
+	case <-ctx.Done():
+		node.record("shutdown_grace_timeout", "non_commitment", "", ctx.Err().Error())
+	case <-timer.C:
+		node.record("shutdown_grace_elapsed", "kept", "", "local receive grace elapsed before receive promises close")
 	}
-	node.record("shutdown_grace_elapsed", "kept", "", "all agents reached turns_done before receive promises close")
 }
 
 func (node *Node) closeFrameConn(frameConn transport.FrameConn, eventName, peerName string) {
@@ -3383,121 +3385,7 @@ func (node *Node) saveRelationshipState() error {
 	return nil
 }
 
-// writeDoneMarker records idempotent local completion for one agent.
-// Intent: Re-running or restarting a bounded POC node should not turn an
-// already-written completion marker into a broken event. Source: DI-timah
-func (node *Node) writeDoneMarker() error {
-	donePath := filepath.Join(node.runDir(), node.Agent.Name+".done")
-	if _, err := os.Stat(donePath); err == nil {
-		node.record("node_done_existing", "kept", "", "done marker already existed")
-		return nil
-	} else if !errors.Is(err, os.ErrNotExist) {
-		return err
-	}
-	if err := os.WriteFile(donePath, []byte("done\n"), 0o644); err != nil {
-		return err
-	}
-	node.record("node_done", "kept", "", "wrote local done marker")
-	return nil
-}
-
-// writeTurnsDoneMarker records that this app has finished making active turn
-// decisions but is still keeping its receive promises open for peers that are
-// finishing their own planned sends.
-// Intent: Coordinate shutdown on agent-turn completion instead of letting early
-// finishers close receive promises while slower peers are still making
-// promises. Source: DI-galin
-func (node *Node) writeTurnsDoneMarker() error {
-	turnsDonePath := filepath.Join(node.runDir(), node.Agent.Name+".turns_done")
-	if _, err := os.Stat(turnsDonePath); err == nil {
-		node.record("turns_done_existing", "kept", "", "turns-done marker already existed")
-		return nil
-	} else if !errors.Is(err, os.ErrNotExist) {
-		return err
-	}
-	if err := os.WriteFile(turnsDonePath, []byte("turns_done\n"), 0o644); err != nil {
-		return err
-	}
-	node.record("turns_done", "kept", "", "finished active turns and kept receive promises open for shutdown grace")
-	return nil
-}
-
-func (node *Node) waitForMonitor(ctx context.Context) error {
-	monitorDone := filepath.Join(node.runDir(), "monitor.done")
-	ticker := time.NewTicker(250 * time.Millisecond)
-	defer ticker.Stop()
-	monitorWaitTimeout := node.Config.MonitorWaitTimeout()
-	timeout := time.After(monitorWaitTimeout)
-	for {
-		if _, err := os.Stat(monitorDone); err == nil {
-			return nil
-		}
-		select {
-		case <-ctx.Done():
-			return ctx.Err()
-		case <-timeout:
-			return fmt.Errorf("timed out waiting for monitor.done after %s", monitorWaitTimeout)
-		case <-ticker.C:
-		}
-	}
-}
-
-// runMonitor writes the observer-only report after all nodes have completed and
-// late receive handlers have had a bounded chance to drain.
-// Intent: Make monitor completion idempotent and reduce false drift from
-// reading logs before in-flight receipts settle. Source: DI-timah
-func (node *Node) runMonitor(ctx context.Context) error {
-	if _, err := os.Stat(filepath.Join(node.runDir(), "monitor.done")); err == nil {
-		node.record("monitor_done_existing", "kept", "", "monitor marker already existed")
-		return nil
-	} else if !errors.Is(err, os.ErrNotExist) {
-		return err
-	}
-	if err := node.waitForAllDone(ctx); err != nil {
-		return err
-	}
-	node.drainInflight(ctx)
-	events, readErr := node.readAllEvents()
-	if readErr != nil {
-		return readErr
-	}
-	report, evaluateErr := node.Monitor.Evaluate(ctx, events)
-	if evaluateErr != nil {
-		return evaluateErr
-	}
-	reportBytes, marshalErr := json.MarshalIndent(report, "", "  ")
-	if marshalErr != nil {
-		return marshalErr
-	}
-	reportPath := filepath.Join(node.runDir(), "monitor-report.json")
-	if err := os.WriteFile(reportPath, append(reportBytes, '\n'), 0o644); err != nil {
-		return err
-	}
-	return node.writeMonitorDoneMarker("kept", report.Summary)
-}
-
-// writeMonitorDoneMarker writes the observer marker that lets other completed
-// nodes exit without making the monitor a global authority over the protocol
-// run.
-// Intent: Monitor success, latency, or provider failure is a local event about
-// the observer; it must not retroactively break a completed promise exchange.
-// Source: DI-jupob
-func (node *Node) writeMonitorDoneMarker(outcome, detail string) error {
-	donePath := filepath.Join(node.runDir(), "monitor.done")
-	if _, err := os.Stat(donePath); err == nil {
-		node.record("monitor_done_existing", "kept", "", "monitor marker already existed")
-		return nil
-	} else if !errors.Is(err, os.ErrNotExist) {
-		return err
-	}
-	if err := os.WriteFile(donePath, []byte("done\n"), 0o644); err != nil {
-		return err
-	}
-	node.record("monitor_done", outcome, "", detail)
-	return nil
-}
-
-// drainInflight waits briefly for active receive handlers before done/monitor
+// drainInflight waits briefly for active receive handlers before process-exit
 // event records are finalized.
 // Intent: Preserve receipts that were already accepted without letting shutdown
 // hang indefinitely. Source: DI-timah
@@ -3514,7 +3402,7 @@ func (node *Node) drainInflight(ctx context.Context) {
 	defer timer.Stop()
 	select {
 	case <-drained:
-		node.record("inflight_drained", "kept", "", "all active receive handlers completed before done marker")
+		node.record("inflight_drained", "kept", "", "all active receive handlers completed before process exit")
 	case <-ctx.Done():
 		node.record("inflight_drain_cancelled", "broken", "", ctx.Err().Error())
 	case <-timer.C:
@@ -3530,104 +3418,4 @@ func (node *Node) markDrainStarted() bool {
 	}
 	node.drainRecorded = true
 	return true
-}
-
-func (node *Node) waitForAllDone(ctx context.Context) error {
-	ticker := time.NewTicker(250 * time.Millisecond)
-	defer ticker.Stop()
-	monitorWaitTimeout := node.Config.MonitorWaitTimeout()
-	timeout := time.After(monitorWaitTimeout)
-	for {
-		if node.allDone() {
-			return nil
-		}
-		select {
-		case <-ctx.Done():
-			return ctx.Err()
-		case <-timeout:
-			return fmt.Errorf("timed out waiting for all node done markers after %s", monitorWaitTimeout)
-		case <-ticker.C:
-		}
-	}
-}
-
-func (node *Node) waitForAllTurnsDone(ctx context.Context, timeoutDuration time.Duration) error {
-	ticker := time.NewTicker(250 * time.Millisecond)
-	defer ticker.Stop()
-	timer := time.NewTimer(timeoutDuration)
-	defer timer.Stop()
-	for {
-		if node.allTurnsDone() {
-			return nil
-		}
-		select {
-		case <-ctx.Done():
-			return ctx.Err()
-		case <-timer.C:
-			return fmt.Errorf("timed out waiting for all turns_done markers")
-		case <-ticker.C:
-		}
-	}
-}
-
-func (node *Node) allDone() bool {
-	for _, agentName := range node.Config.AgentNames() {
-		if _, err := os.Stat(filepath.Join(node.runDir(), agentName+".done")); err != nil {
-			return false
-		}
-	}
-	return true
-}
-
-func (node *Node) allTurnsDone() bool {
-	for _, agentName := range node.Config.AgentNames() {
-		if _, err := os.Stat(filepath.Join(node.runDir(), agentName+".turns_done")); err != nil {
-			return false
-		}
-	}
-	return true
-}
-
-func (node *Node) readAllEvents() ([]decision.Event, error) {
-	var events []decision.Event
-	// Intent: The observer-only monitor should see app-local events and
-	// kernel-local operational event records without giving the kernel authority over
-	// trust interpretation. Source: DI-galin
-	logPaths, globErr := filepath.Glob(filepath.Join(node.runDir(), "*.jsonl"))
-	if globErr != nil {
-		return nil, globErr
-	}
-	sort.Strings(logPaths)
-	for _, logPath := range logPaths {
-		logBytes, readErr := os.ReadFile(logPath)
-		if readErr != nil {
-			return nil, readErr
-		}
-		lines := splitLines(string(logBytes))
-		for _, line := range lines {
-			var event decision.Event
-			if err := json.Unmarshal([]byte(line), &event); err != nil {
-				return nil, err
-			}
-			events = append(events, event)
-		}
-	}
-	return events, nil
-}
-
-func splitLines(text string) []string {
-	var lines []string
-	startIndex := 0
-	for charIndex, charValue := range text {
-		if charValue == '\n' {
-			if charIndex > startIndex {
-				lines = append(lines, text[startIndex:charIndex])
-			}
-			startIndex = charIndex + 1
-		}
-	}
-	if startIndex < len(text) {
-		lines = append(lines, text[startIndex:])
-	}
-	return lines
 }

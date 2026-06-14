@@ -12,6 +12,7 @@ var cidComputeSchemas = []arrayPayloadSchema{
 		promiseAbout: computePromiseExecuteFunction,
 		bodyFields: []string{
 			"field_compute_status",
+			"field_exchange_id",
 			"field_function_cid",
 			"field_function_b64",
 			"field_input_cid",
@@ -31,6 +32,7 @@ var cidComputeSchemas = []arrayPayloadSchema{
 		promiseAbout: computePromiseLookupComputeCache,
 		bodyFields: []string{
 			"field_cache_key",
+			"field_exchange_id",
 			"field_cache_status",
 			"field_function_cid",
 			"field_function_b64",
@@ -46,6 +48,7 @@ var cidComputeSchemas = []arrayPayloadSchema{
 		promiseAbout: computePromiseProvideContext,
 		bodyFields: []string{
 			"field_function_cid",
+			"field_exchange_id",
 			"field_input_cid",
 			"field_context_cid",
 			"field_context_b64",
@@ -55,6 +58,7 @@ var cidComputeSchemas = []arrayPayloadSchema{
 		promiseAbout: computePromiseVerifyResult,
 		bodyFields: []string{
 			"field_verdict",
+			"field_exchange_id",
 			"field_subject_peer",
 			"field_subject_result_cid",
 			"field_result_promiser",

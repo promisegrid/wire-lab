@@ -50,7 +50,11 @@ func runWithIO(input io.Reader, output io.Writer) error {
 		"Victor promises that this worker process sends and receives PromiseGrid envelopes only through stdio.",
 	)
 	fields["field_protocol"] = pcid.RelationshipV1
-	envelope, envelopeErr := protocol.NewEnvelope(registry.MustCID(pcid.RelationshipV1), fields, request.From)
+	payloadBytes, _, payloadErr := protocol.MarshalKnownArrayPayload(pcid.RelationshipV1, fields)
+	if payloadErr != nil {
+		return payloadErr
+	}
+	envelope, envelopeErr := protocol.NewEnvelopeFromPayload(registry.MustCID(pcid.RelationshipV1), payloadBytes, request.From)
 	if envelopeErr != nil {
 		return envelopeErr
 	}

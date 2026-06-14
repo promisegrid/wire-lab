@@ -1,8 +1,8 @@
 # POC14 Superset Plan
 
 POC14 should begin as a superset of POC13 unless a later DI explicitly narrows
-scope. It should also test heterogeneous process boundaries beyond same-language
-TCP-only Go agents. Source: `DI-sihuz`; `DI-sifot`; `DI-fimoh`;
+scope. It should also test heterogeneous process interfaces beyond
+same-language TCP-only Go agents. Source: `DI-sihuz`; `DI-sifot`; `DI-fimoh`;
 `DI-lulof`; `DI-linof`.
 
 ## Baseline Promises To Preserve
@@ -25,7 +25,7 @@ TCP-only Go agents. Source: `DI-sihuz`; `DI-sifot`; `DI-fimoh`;
 - Add run-internal crash/restart orchestration for multiple app processes, not
   only durable-state unit tests.
 - Add one or more WASM agents that run in their own process. The point is to
-  test sandboxed agent execution, host-call boundaries, and the ability to keep
+  test sandboxed agent execution, host-call interfaces, and the ability to keep
   PromiseGrid message semantics outside the WASM runtime while still exchanging
   exact pCID-defined envelopes.
 - Add one or more agents that run in their own process and do all messaging via
@@ -61,9 +61,12 @@ TCP-only Go agents. Source: `DI-sihuz`; `DI-sifot`; `DI-fimoh`;
 - Added hard local trust-line scenario event for permanent local distrust
   of Mallory and local rejection of Mallory-transit route candidates for Alice's
   own traffic. Source: `DI-kinaf`.
-- Added app-local behavior for those hard boundaries: the relationship ledger
+- Added app-local behavior for those hard trust lines: the relationship ledger
   persists permanent distrust, send gates reject ordinary future Mallory sends,
   and route-candidate checks reject Mallory as a transit hop. Source: `DI-dubih`.
+- Added observer-only collection: supervisors forward stdout event records to the
+  collector, agents do not mount the observer run volume, and analyzer/monitor
+  output is written only after supervisors finish. Source: `DI-dirat`.
 - Added explicit mixed-version pCID migration event records and same-run restart
   recovery event records so those planned POC14 concerns have analyzer gates rather
   than remaining prose-only intentions. Source: `DI-linof`.

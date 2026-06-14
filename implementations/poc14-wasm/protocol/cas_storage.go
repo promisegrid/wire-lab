@@ -16,6 +16,7 @@ var casStorageSchemas = []arrayPayloadSchema{
 		promiseAbout: casPromiseStoreContent,
 		bodyFields: []string{
 			"field_storage_status",
+			"field_exchange_id",
 			"field_content_cid",
 			"field_content_b64",
 			"field_credit_offer",
@@ -29,6 +30,7 @@ var casStorageSchemas = []arrayPayloadSchema{
 		promiseAbout: casPromiseServeContent,
 		bodyFields: []string{
 			"field_token_status",
+			"field_exchange_id",
 			"field_content_cid",
 			"field_content_b64",
 			"field_token",
@@ -38,6 +40,7 @@ var casStorageSchemas = []arrayPayloadSchema{
 		promiseAbout: casPromiseReplicateContent,
 		bodyFields: []string{
 			"field_content_cid",
+			"field_exchange_id",
 			"field_content_b64",
 			"field_issuee",
 			"field_units",
@@ -48,6 +51,7 @@ var casStorageSchemas = []arrayPayloadSchema{
 		promiseAbout: casPromiseServeReplicaContent,
 		bodyFields: []string{
 			"field_token_status",
+			"field_exchange_id",
 			"field_content_cid",
 			"field_content_b64",
 			"field_token",
@@ -57,6 +61,7 @@ var casStorageSchemas = []arrayPayloadSchema{
 		promiseAbout: casPromiseReplicaTokenLifecycle,
 		bodyFields: []string{
 			"field_token_status",
+			"field_exchange_id",
 			"field_content_cid",
 			"field_token",
 		},
@@ -65,6 +70,7 @@ var casStorageSchemas = []arrayPayloadSchema{
 		promiseAbout: casPromisePresentStorageReport,
 		bodyFields: []string{
 			"field_verdict",
+			"field_exchange_id",
 			"field_content_cid",
 			"field_content_b64",
 		},
@@ -73,12 +79,14 @@ var casStorageSchemas = []arrayPayloadSchema{
 		promiseAbout: casPromiseLabelFutureMalformedReport,
 		bodyFields: []string{
 			"field_repair_status",
+			"field_exchange_id",
 		},
 	},
 	{
 		promiseAbout: casPromiseUnsupportedVariantProbe,
 		bodyFields: []string{
 			"field_variant_status",
+			"field_exchange_id",
 		},
 	},
 }

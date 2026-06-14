@@ -231,11 +231,11 @@ func ParseEnvelope(envelopeBytes []byte) (Envelope, error) {
 	}, nil
 }
 
-// PayloadFields decodes legacy map payloads and the small set of transitional
-// pCID-owned array payloads whose routing fields the POC14 kernel still needs.
+// PayloadFields decodes legacy map payloads and pCID-owned array payloads into
+// local compatibility fields whose routing fields the POC14 kernel still needs.
 // Intent: Kernel routing still needs promiser/promisee during the migration away
 // from field maps, but the envelope layer should not make field maps the target
-// protocol pattern. Source: DI-vipih
+// protocol pattern. Source: DI-vipih; DI-dirat
 func (envelope Envelope) PayloadFields() (map[string]string, error) {
 	fields, fieldsErr := UnmarshalStringMap(envelope.Payload)
 	if fieldsErr == nil {
@@ -252,6 +252,30 @@ func (envelope Envelope) PayloadFields() (map[string]string, error) {
 	cidComputeFields, cidComputeErr := CIDComputePayloadFields(envelope.Payload)
 	if cidComputeErr == nil {
 		return cidComputeFields, nil
+	}
+	postalScaleFields, postalScaleErr := PostalScalePayloadFields(envelope.Payload)
+	if postalScaleErr == nil {
+		return postalScaleFields, nil
+	}
+	upsLabelFields, upsLabelErr := UPSLabelPayloadFields(envelope.Payload)
+	if upsLabelErr == nil {
+		return upsLabelFields, nil
+	}
+	accountingFields, accountingErr := AccountingPayloadFields(envelope.Payload)
+	if accountingErr == nil {
+		return accountingFields, nil
+	}
+	printerPortFields, printerPortErr := PrinterPortPayloadFields(envelope.Payload)
+	if printerPortErr == nil {
+		return printerPortFields, nil
+	}
+	kernelReceiveFields, kernelReceiveErr := KernelReceivePayloadFields(envelope.Payload)
+	if kernelReceiveErr == nil {
+		return kernelReceiveFields, nil
+	}
+	relationshipFields, relationshipErr := RelationshipPayloadFields(envelope.Payload)
+	if relationshipErr == nil {
+		return relationshipFields, nil
 	}
 	return nil, fieldsErr
 }

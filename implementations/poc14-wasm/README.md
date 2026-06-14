@@ -83,15 +83,16 @@ respective runtime adapters. Source: `DI-sihuz`; `DI-sifot`; `DI-fimoh`;
   behavior, POC14 storage/compute event records, run-scoped durability, retention/GC,
   pressure, rate-limit, or replay event records disappear. Source: `DI-sinur`;
   `DI-sunuf`; `DI-sihuz`.
-- Observer-only monitor lifecycle: completed nodes wait for `monitor.done` using
-  a config-derived provider/turn/grace budget, and a completed run can still
-  write the non-authoritative marker if the observer report fails. Source:
-  `DI-jupob`.
+- Observer-only collector lifecycle: supervisors copy app stdout event records to
+  `poc14-event-collector`, the collector waits for supervisor completion records,
+  and only the collector writes `events.jsonl` and `monitor-report.json` to the
+  observer run volume. Agents do not coordinate through shared marker files.
+  Source: `DI-jupob`; `DI-dirat`.
 - Decentralized monitoring event: POC14 records local events summaries,
   peer-carried attestations, bearer-token exchange-rate signals, relationship
   topology signals, and voluntary gossip as ordinary local promises rather than
   global monitor facts. Source: `DI-lulof`.
-- Local hard trust boundaries: Alice records a permanent local distrust decision
+- Local hard trust lines: Alice records a permanent local distrust decision
   about Mallory and a local promise that Alice's inbound/outbound traffic should
   not transit Mallory. The ledger now blocks Alice's future Mallory sends and
   rejects route candidates with Mallory as a transit hop. This is local events
@@ -117,12 +118,11 @@ The pCID identifies the protocol spec. Message variants such as
 `verify_compute_result` are payload meanings inside their protocol, not
 separate pCIDs. Source: `DI-bikit`; `DI-pohaj`; `DI-sinur`.
 
-Payload shape is owned by the pCID. Older POC14 payloads still use the
-`field_*` map scaffold so existing agents can interoperate while the POC evolves,
-but that map is not a PromiseGrid-wide payload standard. `identity_key_v1`,
-scripted `cas_storage_v1`, and scripted `cid_compute_v1` now use CBOR arrays
-defined by those pCIDs, then decode into compatibility fields only at the local
-runtime adapter. Source: `DI-vipih`; `DI-gahuh`.
+Payload shape is owned by the pCID. Fresh POC14 protocol traffic for the known
+POC14 pCIDs uses pCID-owned CBOR array payloads, then decodes into compatibility
+fields only inside local handlers and analyzer counters. The `field_*`
+projection is local implementation scaffolding, not a PromiseGrid-wide payload
+standard. Source: `DI-vipih`; `DI-gahuh`; `DI-dirat`.
 
 ## Shipping Agents
 
@@ -183,8 +183,8 @@ For manual runs, `poc14-analyze` accepts either the parent run directory or its
 `run/` JSONL directory and fails loudly if no JSONL event exists:
 
 ```sh
-docker compose up --build --abort-on-container-exit
-docker compose run --rm --entrypoint /usr/local/bin/poc14-analyze dave /run/poc14/<run_id>
+docker compose up --build
+docker compose run --rm --entrypoint /usr/local/bin/poc14-analyze event-collector /run/poc14/<run_id>
 ```
 
 The expected run narrative is in `docs/RUN-NARRATIVE.md`; current POC-to-
@@ -192,18 +192,20 @@ production fitness notes are in `docs/PRODUCTION-FITNESS.md`; implementation
 notes are in `docs/IMPLEMENTATION-NOTES.md`; kernel role notes are in
 `docs/KERNEL-ROLE-COLLECTION.md`.
 
-`poc14.env`, provider outputs, and Docker volume state are ignored and must not
-be committed. `openai_api_key.txt` remains ignored for older local workflows but
-is not required by the current Compose setup. `config.json` is committed because
-it is non-secret and must not drift away from clean-regression behavior. Source:
-`DI-rofiz`.
+`poc14.env`, provider outputs, and Docker observer-volume state are ignored and
+must not be committed. `openai_api_key.txt` remains ignored for older local
+workflows but is not required by the current Compose setup. `config.json` is
+committed because it is non-secret and must not drift away from clean-regression
+behavior. Source: `DI-rofiz`; `DI-dirat`.
 
-The latest clean baseline after the `DI-sivis` compute-useful upgrade is the
-2026-06-13 `poc14-demo` run: 2269 total events, all analyzer score dimensions at
-`5`, one Peggy `wasm_compute_*` promise sequence, one Victor `stdio_compute_*`
-promise sequence, empty `rpc_drift_counts`, empty
-`resource_trust_coupling_counts`, and production fitness still blocked only by
-monitor `protocol_validity=4/5`. Source: `DI-gahuh`; `DI-kimim`; `DI-sivis`.
+The latest clean baseline after the `DI-dirat` observer-collector and array
+payload cleanup is the 2026-06-14 `poc14-demo` run: 2466 total events, all
+analyzer score dimensions at `5`, nonzero pCID-owned array payload coverage for
+every known POC14 pCID, empty `rpc_drift_counts`, empty
+`resource_trust_coupling_counts`, and production fitness still blocked by
+monitor `protocol_validity=4/5`, `local_trust_correctness=4/5`, and
+`imposition_avoidance=4/5`. Source: `DI-gahuh`; `DI-kimim`; `DI-sivis`;
+`DI-dirat`.
 
 ## Current Limits
 
@@ -284,11 +286,10 @@ ID, and byte limit; `ups_label_printer` sends `redeem_print_capability` with the
 token and exact hex label bytes; `printer_port` returns deterministic local
 spool event. Unit tests cover the token issue/redemption path, wrong-token
 rejection, routing pCID registration, and analyzer shipping-event recognition.
-The fresh Docker run `poc14-jupob-20260606-030610` exited cleanly after Dave
-wrote `monitor_done`; analyzer output reported 625 events, 17 `node_done`, 17
-`shutdown_grace_elapsed`, one `monitor_done`, all printer-port shipping counts,
-and empty `resource_trust_coupling_counts`. Source: `DI-pohaj`; `DI-vutok`;
-`DI-jupob`.
+The Docker run `poc14-jupob-20260606-030610` was the last marker-file monitor
+baseline before `DI-dirat`; current runs should be compared against the
+collector-owned `events.jsonl` and `monitor-report.json` instead. Source:
+`DI-pohaj`; `DI-vutok`; `DI-jupob`; `DI-dirat`.
 
 `DI-sunuf` adds run-scoped durability and operational-pressure event without
 promoting POC14 state into cross-run infrastructure. Each app writes
