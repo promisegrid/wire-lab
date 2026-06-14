@@ -106,6 +106,23 @@ Intent: POC14 previously had useful process-boundary coverage, but Peggy only va
 Constraints: Preserve one top-level semantic action `promise`; keep `grid([42(pCID), payload, proof])`; keep the WASM module deterministic and embedded for this POC; do not accept arbitrary user-provided WASM modules; keep stdio as local subprocess framing, not a new wire protocol; do not edit ignored `config.json`; keep runtime state scoped to clean-run roots and Docker volumes.
 Affects: implementations/poc14-wasm/; DEV-GUIDE-RESOURCES.md; protocols/wire-lab.d/TODO/TODO-gogug-poc13-hardening-and-poc14-superset-plan.md.
 
+ID: DI-sivis
+Date: 2026-06-13 22:24:04
+Status: active
+Decision: Extend the POC14 runtime-adapter slice so Alice can request real `cid_compute_v1` work from Peggy and Victor: Peggy keeps the promise by executing deterministic Fibonacci logic inside wazero, and Victor keeps the promise by delegating the exact inbound compute envelope to the stdio worker over binary CBOR frames.
+Intent: Peggy and Victor should no longer merely report runtime-adapter event records. They should participate as ordinary compute peers under the existing compute pCID so the POC shows that heterogeneous runtimes can keep useful promises without adding RPC verbs, global authority, a new pCID, or a special-purpose adapter protocol.
+Constraints: Preserve one top-level semantic action `promise`; keep `cid_compute_v1` payloads as pCID-owned CBOR arrays; keep Alice as the requester for both compute exchanges; keep the worker subprocess local to Victor; keep the WASM module deterministic and embedded; do not accept arbitrary user-provided WASM modules; do not edit ignored `config.json`; keep analyzer/monitor output as POC-only development tooling.
+Affects: implementations/poc14-wasm/; DEV-GUIDE-RESOURCES.md; protocols/wire-lab.d/TODO/TODO-gogug-poc13-hardening-and-poc14-superset-plan.md.
+
+ID: DI-rofiz
+Date: 2026-06-13 16:56:19
+Status: active
+Decision: Make `implementations/poc14-wasm/config.json` the committed canonical non-secret runtime config for POC14, remove the separate `config.example.json`, and stop ignoring `config.json`.
+Intent: POC14 clean regression runs must exercise the committed runtime config. A separate ignored `config.json` can drift behind the committed template and cause container runs to validate stale local behavior instead of the current code and docs.
+Constraints: Keep secrets out of `config.json`; continue sourcing `OPENAI_API_KEY` through Compose secrets; keep runtime Docker volume state ignored; supersede the `DI-kimim` and `DI-sivis` constraint that prohibited editing ignored `config.json` by making `config.json` tracked and non-secret.
+Affects: implementations/poc14-wasm/config.json; implementations/poc14-wasm/config.example.json; implementations/poc14-wasm/.gitignore; implementations/poc14-wasm/Dockerfile; implementations/poc14-wasm/README.md; implementations/poc14-wasm/docs/IMPLEMENTATION-NOTES.md; implementations/poc14-wasm/config/config_test.go; implementations/poc14-wasm/scripts/run-clean.sh; DEV-GUIDE-RESOURCES.md.
+Supersedes: DI-kimim; DI-sivis
+
 ## Tasks
 
 - [x] gogug.1 Fix POC13 evidence summary mismatch so saved evidence counts include all local non-commitment outcomes, not only receiver-side `not_promised` journal entries.
@@ -146,3 +163,5 @@ Affects: implementations/poc14-wasm/; DEV-GUIDE-RESOURCES.md; protocols/wire-lab
 - [x] gogug.36 Add production-fitness follow-up plan for protocol validity, local trust correctness, and Promise Theory fit blockers.
 - [x] gogug.37 Rename active POC14/POC15 vocabulary from evidence/boundary categories to event/promise/outcome and runtime adapter terms.
 - [x] gogug.38 Upgrade Peggy to real wazero WASM execution and Victor to binary CBOR stdio I/O.
+- [x] gogug.39 Make Peggy and Victor keep real `cid_compute_v1` compute promises for Alice through WASM and stdio worker execution.
+- [x] gogug.40 Make committed POC14 `config.json` canonical and remove stale ignored example/local split.

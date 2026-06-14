@@ -21,12 +21,15 @@ func TestValidateWASMModuleRejectsBadMagic(t *testing.T) {
 }
 
 func TestRunWASMModuleExecutesExport(t *testing.T) {
-	result, err := RunWASMModule(context.Background(), MinimalWASMModule)
+	result, err := RunWASMModule(context.Background(), MinimalWASMModule, ExpectedWASMInput)
 	if err != nil {
 		t.Fatalf("run wasm module: %v", err)
 	}
 	if result.ExportName != WASMExportName {
 		t.Fatalf("export name = %q, want %q", result.ExportName, WASMExportName)
+	}
+	if result.InputValue != ExpectedWASMInput {
+		t.Fatalf("input value = %d, want %d", result.InputValue, ExpectedWASMInput)
 	}
 	if result.ExportValue != ExpectedWASMResult {
 		t.Fatalf("export value = %d, want %d", result.ExportValue, ExpectedWASMResult)
@@ -36,7 +39,7 @@ func TestRunWASMModuleExecutesExport(t *testing.T) {
 func TestRunWASMModuleRejectsInvalidWASM(t *testing.T) {
 	moduleBytes := append([]byte(nil), MinimalWASMModule...)
 	moduleBytes[len(moduleBytes)-1] = 0xff
-	if _, err := RunWASMModule(context.Background(), moduleBytes); err == nil {
+	if _, err := RunWASMModule(context.Background(), moduleBytes, ExpectedWASMInput); err == nil {
 		t.Fatalf("invalid wasm body should be rejected")
 	}
 }

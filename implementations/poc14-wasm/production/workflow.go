@@ -2,6 +2,7 @@ package production
 
 import (
 	"crypto/sha256"
+	"encoding/base64"
 	"encoding/hex"
 	"fmt"
 	"strconv"
@@ -265,6 +266,16 @@ func SampleContextBytes() []byte {
 	return []byte("timestamp=2026-06-06T00:00:00Z;randomness=explicit-none")
 }
 
+// ComputeInputs carries the exact bytes named by a cid_compute_v1 promise.
+// Intent: Runtime adapters should share the same decode and CID-check path as
+// ordinary Go compute peers, so WASM and stdio execution differ only by local
+// runtime mechanics rather than by protocol semantics. Source: DI-sivis
+type ComputeInputs struct {
+	FunctionBytes []byte
+	InputBytes    []byte
+	ContextBytes  []byte
+}
+
 // ComputeCacheKey names one exact local compute checkpoint over all bytes that
 // make the result meaningful.
 // Intent: Cache reuse is an event record over a pCID-defined tuple, not a global
@@ -281,17 +292,11 @@ func ExecuteFunction(functionBytes, inputBytes, contextBytes []byte) ([]byte, er
 	inputText := strings.TrimSpace(string(inputBytes))
 	switch {
 	case strings.Contains(functionText, "fibonacci"):
-		if !strings.HasPrefix(inputText, "n=") {
-			return nil, fmt.Errorf("unsupported fibonacci input %q", inputText)
-		}
-		var n int
-		if _, err := fmt.Sscanf(inputText, "n=%d", &n); err != nil {
+		n, err := ParseFibonacciInput(inputBytes)
+		if err != nil {
 			return nil, err
 		}
-		if n < 0 || n > 40 {
-			return nil, fmt.Errorf("fibonacci input out of bounded POC range: %d", n)
-		}
-		return []byte(fmt.Sprintf("fibonacci(%d)=%d;context_cid=%s", n, fibonacci(n), ContentCID(contextBytes))), nil
+		return FibonacciResultBytes(n, uint64(fibonacci(n)), contextBytes), nil
 	case strings.Contains(functionText, "sum"):
 		if !strings.HasPrefix(inputText, "values=") {
 			return nil, fmt.Errorf("unsupported sum input %q", inputText)
@@ -309,6 +314,88 @@ func ExecuteFunction(functionBytes, inputBytes, contextBytes []byte) ([]byte, er
 	default:
 		return nil, fmt.Errorf("unsupported function source %q", functionText)
 	}
+}
+
+// DecodeComputeInputs decodes the compatibility field projection of a
+// cid_compute_v1 payload back into exact function/input/context bytes.
+// Intent: Runtime adapters and ordinary compute peers should verify the same
+// exact bytes before promising compute results. Source: DI-sivis
+func DecodeComputeInputs(fields map[string]string) (ComputeInputs, error) {
+	functionBytes, functionErr := base64.StdEncoding.DecodeString(fields["field_function_b64"])
+	if functionErr != nil {
+		return ComputeInputs{}, functionErr
+	}
+	inputBytes, inputErr := base64.StdEncoding.DecodeString(fields["field_input_b64"])
+	if inputErr != nil {
+		return ComputeInputs{}, inputErr
+	}
+	contextBytes, contextErr := base64.StdEncoding.DecodeString(fields["field_context_b64"])
+	if contextErr != nil {
+		return ComputeInputs{}, contextErr
+	}
+	return ComputeInputs{FunctionBytes: functionBytes, InputBytes: inputBytes, ContextBytes: contextBytes}, nil
+}
+
+// VerifyComputeInputCIDs checks that the exact bytes carried in a compute
+// promise match the CIDs that make the promise meaningful.
+// Intent: Heterogeneous compute runtimes must not bypass pCID-owned byte/CID
+// checks while proving useful work. Source: DI-sivis
+func VerifyComputeInputCIDs(fields map[string]string, inputs ComputeInputs) error {
+	if !VerifyContentCID(inputs.FunctionBytes, fields["field_function_cid"]) {
+		return fmt.Errorf("function bytes do not match function CID")
+	}
+	if !VerifyContentCID(inputs.InputBytes, fields["field_input_cid"]) {
+		return fmt.Errorf("input bytes do not match input CID")
+	}
+	if !VerifyContentCID(inputs.ContextBytes, fields["field_context_cid"]) {
+		return fmt.Errorf("context bytes do not match context CID")
+	}
+	return nil
+}
+
+// ExecuteComputePromiseFields runs a cid_compute_v1 execute_function promise and
+// returns the ACK fields common to Go, WASM, and stdio compute peers.
+// Intent: Peggy and Victor should differ only in local execution mechanics; the
+// ACK payload remains the existing compute promise shape. Source: DI-sivis
+func ExecuteComputePromiseFields(fields map[string]string, resultBytes []byte) map[string]string {
+	return map[string]string{
+		"field_promise_about": PromiseExecuteFunction,
+		"field_function_cid":  fields["field_function_cid"],
+		"field_function_b64":  fields["field_function_b64"],
+		"field_input_cid":     fields["field_input_cid"],
+		"field_input_b64":     fields["field_input_b64"],
+		"field_context_cid":   fields["field_context_cid"],
+		"field_context_b64":   fields["field_context_b64"],
+		"field_result_cid":    ContentCID(resultBytes),
+		"field_result_b64":    base64.StdEncoding.EncodeToString(resultBytes),
+	}
+}
+
+// ParseFibonacciInput returns the bounded Fibonacci input from existing POC14
+// compute payload bytes.
+// Intent: Peggy's embedded WASM module accepts a numeric input but the protocol
+// still carries the existing exact input bytes. Source: DI-sivis
+func ParseFibonacciInput(inputBytes []byte) (int, error) {
+	inputText := strings.TrimSpace(string(inputBytes))
+	if !strings.HasPrefix(inputText, "n=") {
+		return 0, fmt.Errorf("unsupported fibonacci input %q", inputText)
+	}
+	var n int
+	if _, err := fmt.Sscanf(inputText, "n=%d", &n); err != nil {
+		return 0, err
+	}
+	if n < 0 || n > 40 {
+		return 0, fmt.Errorf("fibonacci input out of bounded POC range: %d", n)
+	}
+	return n, nil
+}
+
+// FibonacciResultBytes formats a result from a local runtime-specific Fibonacci
+// executor into the same bytes expected by cid_compute_v1 verification.
+// Intent: WASM execution should produce the same promise-visible result bytes as
+// ordinary compute verification expects. Source: DI-sivis
+func FibonacciResultBytes(n int, value uint64, contextBytes []byte) []byte {
+	return []byte(fmt.Sprintf("fibonacci(%d)=%d;context_cid=%s", n, value, ContentCID(contextBytes)))
 }
 
 func fibonacci(n int) int {

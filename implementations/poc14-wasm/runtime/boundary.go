@@ -19,7 +19,7 @@ import (
 // WASM host calls into RPC commands or trust authorities. Source: DI-linof;
 // DI-kimim
 func (node *Node) runWASMBoundaryWorkflow(ctx context.Context) error {
-	result, err := boundary.RunWASMModule(ctx, boundary.MinimalWASMModule)
+	result, err := boundary.RunWASMModule(ctx, boundary.MinimalWASMModule, boundary.ExpectedWASMInput)
 	if err != nil {
 		return err
 	}
@@ -31,7 +31,7 @@ func (node *Node) runWASMBoundaryWorkflow(ctx context.Context) error {
 	node.record("wasm_process_agent_started", "kept", "", "agent="+node.Agent.Name+" module_sha256="+moduleHash)
 	node.record("wasm_module_instantiated", "kept", "", "module_sha256="+moduleHash+" runtime=wazero")
 	node.record("wasm_export_called", "kept", "", "export="+result.ExportName)
-	node.record("wasm_export_result_observed", "kept", "", fmt.Sprintf("export=%s value=%d", result.ExportName, result.ExportValue))
+	node.record("wasm_export_result_observed", "kept", "", fmt.Sprintf("export=%s input=%d value=%d", result.ExportName, result.InputValue, result.ExportValue))
 	fields := boundary.PromiseFields(
 		node.Agent.Name,
 		target,
@@ -56,6 +56,7 @@ func (node *Node) runWASMBoundaryWorkflow(ctx context.Context) error {
 	)
 	usefulFields["field_wasm_module_sha256"] = moduleHash
 	usefulFields["field_wasm_export"] = result.ExportName
+	usefulFields["field_wasm_input_value"] = fmt.Sprintf("%d", result.InputValue)
 	usefulFields["field_wasm_export_value"] = fmt.Sprintf("%d", result.ExportValue)
 	usefulFields["field_protocol"] = pcid.RelationshipV1
 	if _, err := node.sendAndReceive(usefulTarget, usefulFields); err != nil {
@@ -66,6 +67,64 @@ func (node *Node) runWASMBoundaryWorkflow(ctx context.Context) error {
 	node.record("wasm_useful_work_promised", "kept", usefulTarget, "pcid="+pcid.RelationshipV1+" module_sha256="+moduleHash)
 	node.record("wasm_useful_work_ack_received", "kept", usefulTarget, "pcid="+pcid.RelationshipV1+" Dave received reusable module-execution event")
 	return nil
+}
+
+// runStdioComputeWorker sends one exact inbound compute envelope to Victor's
+// worker and receives the worker-signed ACK bytes.
+// Intent: Victor's useful compute work should happen inside the stdio-only
+// subprocess while the adapter preserves exact PromiseGrid envelope bytes rather
+// than translating the exchange into RPC fields. Source: DI-sivis
+func (node *Node) runStdioComputeWorker(message parsedMessage) ([]byte, error) {
+	command := exec.Command("poc14-stdio-worker")
+	command.Stderr = os.Stderr
+	stdin, stdinErr := command.StdinPipe()
+	if stdinErr != nil {
+		return nil, stdinErr
+	}
+	stdout, stdoutErr := command.StdoutPipe()
+	if stdoutErr != nil {
+		return nil, stdoutErr
+	}
+	if startErr := command.Start(); startErr != nil {
+		return nil, startErr
+	}
+	target := message.Fields["from"]
+	node.record("stdio_compute_worker_started", "kept", target, "worker=poc14-stdio-worker pcid="+pcid.CIDComputeV1)
+	requestBytes, err := boundary.MarshalStdioCBOREnvelope(boundary.StdioCBOREnvelope{
+		Type:          "compute_request",
+		From:          target,
+		To:            node.Agent.Name,
+		Protocol:      message.ProtocolName,
+		EnvelopeBytes: message.RawBytes,
+	})
+	if err != nil {
+		return nil, node.finishStdioWorker(command, stdin, err)
+	}
+	if err := boundary.WriteCBORFrame(stdin, requestBytes); err != nil {
+		return nil, node.finishStdioWorker(command, stdin, fmt.Errorf("write stdio compute request: %w", err))
+	}
+	node.record("stdio_compute_request_forwarded", "kept", target, "pcid="+message.ProtocolName+" exact_sha256="+message.ExactHash)
+	ackFrameBytes, err := boundary.ReadCBORFrame(stdout)
+	if err != nil {
+		return nil, node.finishStdioWorker(command, stdin, fmt.Errorf("read stdio compute ack: %w", err))
+	}
+	ack, err := boundary.ParseStdioCBORAck(ackFrameBytes)
+	if err != nil {
+		return nil, node.finishStdioWorker(command, stdin, err)
+	}
+	if ack.Type != "compute_ack_envelope" || len(ack.EnvelopeBytes) == 0 {
+		return nil, node.finishStdioWorker(command, stdin, fmt.Errorf("stdio compute worker returned invalid ACK type %q", ack.Type))
+	}
+	ackMessage, parseErr := node.parseEnvelope(ack.EnvelopeBytes)
+	if parseErr != nil {
+		return nil, node.finishStdioWorker(command, stdin, parseErr)
+	}
+	node.record("stdio_compute_worker_executed", "kept", target, "pcid="+ackMessage.ProtocolName+" result_cid="+ackMessage.Fields["field_result_cid"])
+	node.record("stdio_compute_ack_received", "kept", target, "pcid="+ackMessage.ProtocolName+" exact_sha256="+ackMessage.ExactHash)
+	if finishErr := node.finishStdioWorker(command, stdin, nil); finishErr != nil {
+		return nil, finishErr
+	}
+	return ack.EnvelopeBytes, nil
 }
 
 // runStdioBoundaryWorkflow starts a worker process whose only application

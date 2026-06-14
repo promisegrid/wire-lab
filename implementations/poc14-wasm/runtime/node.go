@@ -15,6 +15,7 @@ import (
 	"sync"
 	"time"
 
+	"promisegrid.dev/wire-lab/implementations/poc14-wasm/boundary"
 	"promisegrid.dev/wire-lab/implementations/poc14-wasm/config"
 	"promisegrid.dev/wire-lab/implementations/poc14-wasm/decision"
 	"promisegrid.dev/wire-lab/implementations/poc14-wasm/economy"
@@ -71,8 +72,19 @@ type Node struct {
 type parsedMessage struct {
 	Fields       map[string]string
 	ExactHash    string
+	RawBytes     []byte
 	ProtocolCID  protocol.ProtocolCID
 	ProtocolName string
+}
+
+// protocolHandlerResult is the app-local handler result for one inbound
+// pCID-owned promise.
+// Intent: Most handlers return compatibility fields that the local app signs as
+// a fresh ACK, while Victor's stdio compute handler returns exact ACK bytes that
+// the worker signed after computing through stdin/stdout. Source: DI-sivis
+type protocolHandlerResult struct {
+	Fields   map[string]string
+	AckBytes []byte
 }
 
 // promiseStatus is the app-local journal state for one promise this process has
@@ -588,6 +600,62 @@ func (node *Node) runCASComputeWorkflow() error {
 	}); err != nil {
 		return fmt.Errorf("sum compute request: %w", err)
 	}
+	if err := node.runRuntimeAdapterComputeWorkflow(functionBytes, inputBytes, contextBytes); err != nil {
+		return err
+	}
+	return nil
+}
+
+// runRuntimeAdapterComputeWorkflow asks Peggy and Victor to keep ordinary
+// cid_compute_v1 promises so runtime adapters prove useful compute work, not
+// just process-boundary existence.
+// Intent: Alice is the requester for both exchanges; Peggy uses local WASM and
+// Victor uses a stdio worker, but Alice sees both as normal PromiseGrid compute
+// peers under the same pCID-owned payload contract. Source: DI-sivis
+func (node *Node) runRuntimeAdapterComputeWorkflow(functionBytes, inputBytes, contextBytes []byte) error {
+	targets := []struct {
+		name        string
+		eventPrefix string
+		promiseText string
+	}{
+		{
+			name:        "peggy",
+			eventPrefix: "wasm",
+			promiseText: "Alice promises to receive Peggy's WASM-kept compute result only as a cid_compute_v1 promise over exact function/input/context CIDs.",
+		},
+		{
+			name:        "victor",
+			eventPrefix: "stdio",
+			promiseText: "Alice promises to receive Victor's stdio-worker-kept compute result only as a cid_compute_v1 promise over exact function/input/context CIDs.",
+		},
+	}
+	for _, target := range targets {
+		node.record(target.eventPrefix+"_compute_request_promised", "kept", target.name, "pcid="+pcid.CIDComputeV1+" Alice requests useful compute from runtime adapter")
+		ack, err := node.sendAndReceive(target.name, map[string]string{
+			"act":                 decision.ActPromise,
+			"from":                node.Agent.Name,
+			"to":                  target.name,
+			"turn":                "startup",
+			"promise":             target.promiseText,
+			"reason":              "runtime adapter useful work must stay inside the existing compute pCID",
+			"field_promise_about": production.PromiseExecuteFunction,
+			"field_function_cid":  production.ContentCID(functionBytes),
+			"field_function_b64":  base64.StdEncoding.EncodeToString(functionBytes),
+			"field_input_cid":     production.ContentCID(inputBytes),
+			"field_input_b64":     base64.StdEncoding.EncodeToString(inputBytes),
+			"field_context_cid":   production.ContentCID(contextBytes),
+			"field_context_b64":   base64.StdEncoding.EncodeToString(contextBytes),
+			"field_credit_offer":  "5",
+			"field_units":         "1",
+		})
+		if err != nil {
+			return fmt.Errorf("%s runtime-adapter compute request: %w", target.name, err)
+		}
+		if err := node.verifyComputeAckLocally(ack, target.name); err != nil {
+			return fmt.Errorf("%s runtime-adapter compute verify: %w", target.name, err)
+		}
+		node.record(target.eventPrefix+"_compute_result_verified", "kept", target.name, "pcid="+pcid.CIDComputeV1+" result_cid="+ack.Fields["field_result_cid"])
+	}
 	return nil
 }
 
@@ -916,13 +984,26 @@ func (node *Node) handleFrame(frameBytes []byte) ([]byte, error) {
 		node.record("resource_promise_rejected", "broken", fromAgent, resourceErr.Error())
 		return node.newAckBytes(fromAgent, "broken", "I promise I rejected this resource promise because local checks failed.", parsed.ProtocolCID, nil)
 	}
-	ackFields, handlerErr := node.handleProtocolPromise(parsed)
+	handlerResult, handlerErr := node.handleProtocolPromise(parsed)
 	if handlerErr != nil {
 		node.resolveOutstandingPromise(promiseID, promiseStatusBroken, handlerErr.Error())
 		node.observeOutcome(fromAgent, relationship.OutcomeBroken)
 		node.applyBrokenPromiseCost(fromAgent, fields, handlerErr.Error())
 		node.record("protocol_handler_rejected", "broken", fromAgent, handlerErr.Error())
 		return node.newAckBytes(fromAgent, "broken", "I promise I rejected this protocol promise because local app checks failed.", parsed.ProtocolCID, nil)
+	}
+	ackFields := handlerResult.Fields
+	ackBytes := handlerResult.AckBytes
+	if len(ackBytes) > 0 {
+		ackMessage, parseErr := node.parseEnvelope(ackBytes)
+		if parseErr != nil {
+			node.resolveOutstandingPromise(promiseID, promiseStatusBroken, parseErr.Error())
+			node.observeOutcome(fromAgent, relationship.OutcomeBroken)
+			node.applyBrokenPromiseCost(fromAgent, fields, parseErr.Error())
+			node.record("protocol_handler_rejected", "broken", fromAgent, parseErr.Error())
+			return node.newAckBytes(fromAgent, "broken", "I promise I rejected this protocol promise because local app checks failed.", parsed.ProtocolCID, nil)
+		}
+		ackFields = ackMessage.Fields
 	}
 	acceptedAsCandidate := isLinkDiscoveryPromise(fields) && !node.canAccept(fromAgent)
 	if eventUpdatesTrust(ackFields) {
@@ -937,6 +1018,9 @@ func (node *Node) handleFrame(frameBytes []byte) ([]byte, error) {
 		eventName = "candidate_message_received"
 	}
 	node.record(eventName, "kept", fromAgent, "received "+parsed.ProtocolName+" signed promise exact_sha256="+parsed.ExactHash)
+	if len(ackBytes) > 0 {
+		return ackBytes, nil
+	}
 	return node.newAckBytes(fromAgent, "kept", "I promise I received and recorded your signed promise message.", parsed.ProtocolCID, ackFields)
 }
 
@@ -1311,6 +1395,7 @@ func (node *Node) parseEnvelope(frameBytes []byte) (parsedMessage, error) {
 	return parsedMessage{
 		Fields:       fields,
 		ExactHash:    protocol.HashExactBytes(frameBytes),
+		RawBytes:     append([]byte(nil), frameBytes...),
 		ProtocolCID:  envelope.ProtocolCID,
 		ProtocolName: protocolName,
 	}, nil
@@ -1481,26 +1566,32 @@ func (node *Node) supportsProtocol(protocolName string) bool {
 	return false
 }
 
-func (node *Node) handleProtocolPromise(message parsedMessage) (map[string]string, error) {
+func (node *Node) handleProtocolPromise(message parsedMessage) (protocolHandlerResult, error) {
 	switch message.ProtocolName {
 	case pcid.RelationshipV1:
-		return nil, nil
+		return protocolHandlerResult{}, nil
 	case pcid.PostalScaleV1:
-		return node.handlePostalScalePromise(message.Fields)
+		fields, err := node.handlePostalScalePromise(message.Fields)
+		return protocolHandlerResult{Fields: fields}, err
 	case pcid.UPSLabelV1:
-		return node.handleUPSLabelPromise(message.Fields)
+		fields, err := node.handleUPSLabelPromise(message.Fields)
+		return protocolHandlerResult{Fields: fields}, err
 	case pcid.AccountingV1:
-		return node.handleAccountingPromise(message.Fields)
+		fields, err := node.handleAccountingPromise(message.Fields)
+		return protocolHandlerResult{Fields: fields}, err
 	case pcid.PrinterPortV1:
-		return node.handlePrinterPortPromise(message.Fields)
+		fields, err := node.handlePrinterPortPromise(message.Fields)
+		return protocolHandlerResult{Fields: fields}, err
 	case pcid.CASStorageV1:
-		return node.handleCASStoragePromise(message.Fields)
+		fields, err := node.handleCASStoragePromise(message.Fields)
+		return protocolHandlerResult{Fields: fields}, err
 	case pcid.CIDComputeV1:
-		return node.handleCIDComputePromise(message.Fields)
+		return node.handleCIDComputePromise(message)
 	case pcid.IdentityKeyV1:
-		return node.handleIdentityKeyPromise(message.Fields)
+		fields, err := node.handleIdentityKeyPromise(message.Fields)
+		return protocolHandlerResult{Fields: fields}, err
 	default:
-		return nil, fmt.Errorf("unsupported protocol %s", message.ProtocolName)
+		return protocolHandlerResult{}, fmt.Errorf("unsupported protocol %s", message.ProtocolName)
 	}
 }
 
@@ -1898,7 +1989,8 @@ func (node *Node) handleCASStoragePromise(fields map[string]string) (map[string]
 // and verifier event records.
 // Intent: Compute results are promises over exact function/input/context bytes
 // that receivers can recompute or ask peers to observe locally. Source: DI-sinur
-func (node *Node) handleCIDComputePromise(fields map[string]string) (map[string]string, error) {
+func (node *Node) handleCIDComputePromise(message parsedMessage) (protocolHandlerResult, error) {
+	fields := message.Fields
 	switch fields["field_promise_about"] {
 	case production.PromiseLookupComputeCache:
 		cacheKey := production.ComputeCacheKey(pcid.CIDComputeV1, fields["field_function_cid"], fields["field_input_cid"], fields["field_context_cid"], fields["field_result_cid"])
@@ -1907,49 +1999,60 @@ func (node *Node) handleCIDComputePromise(fields map[string]string) (map[string]
 		node.mu.Unlock()
 		if !ok {
 			node.record("compute_cache_miss", "non_commitment", fields["from"], "pcid="+pcid.CIDComputeV1+" cache_key="+cacheKey)
-			return map[string]string{
+			return protocolHandlerResult{Fields: map[string]string{
 				"field_promise_about": production.PromiseLookupComputeCache,
 				"field_cache_key":     cacheKey,
 				"field_cache_status":  "miss",
-			}, nil
+			}}, nil
 		}
 		node.record("compute_cache_hit", "kept", fields["from"], "pcid="+pcid.CIDComputeV1+" cache_key="+cacheKey)
 		ackFields := copyStringMap(cachedFields)
 		ackFields["field_promise_about"] = production.PromiseLookupComputeCache
 		ackFields["field_cache_key"] = cacheKey
 		ackFields["field_cache_status"] = "hit"
-		return ackFields, nil
+		return protocolHandlerResult{Fields: ackFields}, nil
 	case production.PromiseExecuteFunction:
 		if fields["field_capacity_probe"] == "true" {
 			node.record("economics_capacity_refused", "non_commitment", fields["from"], "pcid="+pcid.CIDComputeV1+" local compute capacity withheld for probe")
 			node.record("backpressure_capacity_refused", "non_commitment", fields["from"], "pcid="+pcid.CIDComputeV1+" receiver keeps spare capacity by not promising this probe")
-			return map[string]string{"field_promise_about": production.PromiseExecuteFunction, "field_compute_status": "capacity_refused"}, nil
+			return protocolHandlerResult{Fields: map[string]string{"field_promise_about": production.PromiseExecuteFunction, "field_compute_status": "capacity_refused"}}, nil
 		}
-		functionBytes, inputBytes, contextBytes, err := decodeComputeInputs(fields)
+		if node.Agent.Kind == "stdio_agent" {
+			ackBytes, err := node.runStdioComputeWorker(message)
+			if err != nil {
+				return protocolHandlerResult{}, err
+			}
+			ackMessage, parseErr := node.parseEnvelope(ackBytes)
+			if parseErr != nil {
+				return protocolHandlerResult{}, parseErr
+			}
+			return protocolHandlerResult{Fields: ackMessage.Fields, AckBytes: ackBytes}, nil
+		}
+		resultBytes, err := node.executeComputeFunction(fields)
 		if err != nil {
-			return nil, err
-		}
-		if err := verifyComputeInputCIDs(fields, functionBytes, inputBytes, contextBytes); err != nil {
-			return nil, err
-		}
-		resultBytes, err := production.ExecuteFunction(functionBytes, inputBytes, contextBytes)
-		if err != nil {
-			return nil, err
+			return protocolHandlerResult{}, err
 		}
 		resultCID := production.ContentCID(resultBytes)
+		inputs, inputErr := production.DecodeComputeInputs(fields)
+		if inputErr != nil {
+			return protocolHandlerResult{}, inputErr
+		}
 		node.record("compute_context_promised", "kept", fields["from"], "pcid="+pcid.CIDComputeV1+" context_cid="+fields["field_context_cid"])
 		node.record("compute_function_executed", "kept", fields["from"], "pcid="+pcid.CIDComputeV1+" function_cid="+fields["field_function_cid"]+" result_cid="+resultCID)
-		if production.FunctionKind(functionBytes) != "fibonacci" {
-			node.record("compute_alternate_function_executed", "kept", fields["from"], "pcid="+pcid.CIDComputeV1+" function_kind="+production.FunctionKind(functionBytes)+" result_cid="+resultCID)
+		if production.FunctionKind(inputs.FunctionBytes) != "fibonacci" {
+			node.record("compute_alternate_function_executed", "kept", fields["from"], "pcid="+pcid.CIDComputeV1+" function_kind="+production.FunctionKind(inputs.FunctionBytes)+" result_cid="+resultCID)
 		}
 		node.record("cid_compute_promised", "kept", fields["from"], "pcid="+pcid.CIDComputeV1+" compute promised only for stated CIDs")
 		node.record("compute_result_promised", "kept", fields["from"], "pcid="+pcid.CIDComputeV1+" result_cid="+resultCID)
 		node.record("economics_credit_accepted", "kept", fields["from"], "pcid="+pcid.CIDComputeV1+" credit_offer="+fields["field_credit_offer"])
 		node.record("economics_capacity_reserved", "kept", fields["from"], "pcid="+pcid.CIDComputeV1+" units="+firstStringField(fields, "field_units"))
-		node.record("economics_credits_earned", "kept", fields["from"], "pcid="+pcid.CIDComputeV1+" Carol earns compute credits")
+		node.record("economics_credits_earned", "kept", fields["from"], "pcid="+pcid.CIDComputeV1+" "+node.Agent.Name+" earns compute credits")
+		if node.Agent.Kind == "wasm_agent" {
+			return protocolHandlerResult{Fields: production.ExecuteComputePromiseFields(fields, resultBytes)}, nil
+		}
 		badResultBytes := production.BadComputeResultBytes(resultBytes)
 		node.record("compute_bad_result_promised", "malformed", fields["from"], "pcid="+pcid.CIDComputeV1+" hash-valid but semantically wrong result_cid="+production.ContentCID(badResultBytes))
-		return map[string]string{
+		return protocolHandlerResult{Fields: map[string]string{
 			"field_promise_about":  production.PromiseExecuteFunction,
 			"field_function_cid":   fields["field_function_cid"],
 			"field_function_b64":   fields["field_function_b64"],
@@ -1961,27 +2064,27 @@ func (node *Node) handleCIDComputePromise(fields map[string]string) (map[string]
 			"field_result_b64":     base64.StdEncoding.EncodeToString(resultBytes),
 			"field_bad_result_cid": production.ContentCID(badResultBytes),
 			"field_bad_result_b64": base64.StdEncoding.EncodeToString(badResultBytes),
-		}, nil
+		}}, nil
 	case production.PromiseVerifyComputeResult:
 		resultPromiser := firstStringField(fields, "field_result_promiser", "from")
 		verifyErr := verifyComputeResultFields(fields)
 		if fields["field_disagreement_probe"] == "true" {
 			node.record("compute_verifier_disagreement", "non_commitment", resultPromiser, "pcid="+pcid.CIDComputeV1+" verifier withholds endorsement for disagreement pressure")
-			return map[string]string{
+			return protocolHandlerResult{Fields: map[string]string{
 				"field_promise_about":      production.PromiseVerifyComputeResult,
 				"field_verdict":            "disagree",
 				"field_subject_peer":       resultPromiser,
 				"field_subject_result_cid": fields["field_result_cid"],
-			}, nil
+			}}, nil
 		}
 		if verifyErr != nil {
 			node.record("compute_result_peer_rejected", "malformed", resultPromiser, "pcid="+pcid.CIDComputeV1+" "+verifyErr.Error())
-			return map[string]string{
+			return protocolHandlerResult{Fields: map[string]string{
 				"field_promise_about":      production.PromiseVerifyComputeResult,
 				"field_verdict":            "broken",
 				"field_subject_peer":       resultPromiser,
 				"field_subject_result_cid": fields["field_result_cid"],
-			}, nil
+			}}, nil
 		}
 		node.record("compute_result_peer_verified", "kept", resultPromiser, "pcid="+pcid.CIDComputeV1+" result_cid="+fields["field_result_cid"])
 		cacheKey := production.ComputeCacheKey(pcid.CIDComputeV1, fields["field_function_cid"], fields["field_input_cid"], fields["field_context_cid"], fields["field_result_cid"])
@@ -1989,15 +2092,57 @@ func (node *Node) handleCIDComputePromise(fields map[string]string) (map[string]
 		node.computeCache[cacheKey] = copyStringMap(fields)
 		node.mu.Unlock()
 		node.record("compute_cache_checkpointed", "kept", resultPromiser, "pcid="+pcid.CIDComputeV1+" cache_key="+cacheKey)
-		return map[string]string{
+		return protocolHandlerResult{Fields: map[string]string{
 			"field_promise_about":      production.PromiseVerifyComputeResult,
 			"field_verdict":            "kept",
 			"field_subject_peer":       resultPromiser,
 			"field_subject_result_cid": fields["field_result_cid"],
-		}, nil
+		}}, nil
 	default:
-		return nil, fmt.Errorf("CID compute cannot handle promise_about=%q", fields["field_promise_about"])
+		return protocolHandlerResult{}, fmt.Errorf("CID compute cannot handle promise_about=%q", fields["field_promise_about"])
 	}
+}
+
+// executeComputeFunction keeps one execute_function promise through the local
+// runtime appropriate to this agent.
+// Intent: Ordinary Go compute peers keep the existing production helper path,
+// while Peggy proves useful WASM execution without changing cid_compute_v1
+// semantics or introducing a runtime-specific pCID. Source: DI-sivis
+func (node *Node) executeComputeFunction(fields map[string]string) ([]byte, error) {
+	inputs, err := production.DecodeComputeInputs(fields)
+	if err != nil {
+		return nil, err
+	}
+	if err := production.VerifyComputeInputCIDs(fields, inputs); err != nil {
+		return nil, err
+	}
+	if node.Agent.Kind != "wasm_agent" {
+		return production.ExecuteFunction(inputs.FunctionBytes, inputs.InputBytes, inputs.ContextBytes)
+	}
+	if production.FunctionKind(inputs.FunctionBytes) != "fibonacci" {
+		return nil, fmt.Errorf("WASM compute peer cannot handle function kind %q", production.FunctionKind(inputs.FunctionBytes))
+	}
+	n, inputErr := production.ParseFibonacciInput(inputs.InputBytes)
+	if inputErr != nil {
+		return nil, inputErr
+	}
+	result, runErr := boundary.RunWASMModule(context.Background(), boundary.MinimalWASMModule, uint64(n))
+	if runErr != nil {
+		return nil, runErr
+	}
+	resultBytes := production.FibonacciResultBytes(n, result.ExportValue, inputs.ContextBytes)
+	expectedBytes, expectedErr := production.ExecuteFunction(inputs.FunctionBytes, inputs.InputBytes, inputs.ContextBytes)
+	if expectedErr != nil {
+		return nil, expectedErr
+	}
+	if production.ContentCID(resultBytes) != production.ContentCID(expectedBytes) {
+		return nil, fmt.Errorf("WASM compute result CID mismatch")
+	}
+	moduleHash := protocol.HashExactBytes(boundary.MinimalWASMModule)
+	node.record("wasm_compute_request_received", "kept", fields["from"], "pcid="+pcid.CIDComputeV1+" module_sha256="+moduleHash+" input_n="+fmt.Sprintf("%d", n))
+	node.record("wasm_compute_function_executed", "kept", fields["from"], "pcid="+pcid.CIDComputeV1+" export="+result.ExportName+" value="+fmt.Sprintf("%d", result.ExportValue))
+	node.record("wasm_compute_result_promised", "kept", fields["from"], "pcid="+pcid.CIDComputeV1+" result_cid="+production.ContentCID(resultBytes))
+	return resultBytes, nil
 }
 
 // handleIdentityKeyPromise records the narrow identity/key promises currently
@@ -2125,32 +2270,19 @@ func (node *Node) verifyComputeAckLocally(message parsedMessage, target string) 
 }
 
 func decodeComputeInputs(fields map[string]string) ([]byte, []byte, []byte, error) {
-	functionBytes, functionErr := base64.StdEncoding.DecodeString(fields["field_function_b64"])
-	if functionErr != nil {
-		return nil, nil, nil, functionErr
+	inputs, err := production.DecodeComputeInputs(fields)
+	if err != nil {
+		return nil, nil, nil, err
 	}
-	inputBytes, inputErr := base64.StdEncoding.DecodeString(fields["field_input_b64"])
-	if inputErr != nil {
-		return nil, nil, nil, inputErr
-	}
-	contextBytes, contextErr := base64.StdEncoding.DecodeString(fields["field_context_b64"])
-	if contextErr != nil {
-		return nil, nil, nil, contextErr
-	}
-	return functionBytes, inputBytes, contextBytes, nil
+	return inputs.FunctionBytes, inputs.InputBytes, inputs.ContextBytes, nil
 }
 
 func verifyComputeInputCIDs(fields map[string]string, functionBytes, inputBytes, contextBytes []byte) error {
-	if !production.VerifyContentCID(functionBytes, fields["field_function_cid"]) {
-		return fmt.Errorf("function bytes do not match function CID")
-	}
-	if !production.VerifyContentCID(inputBytes, fields["field_input_cid"]) {
-		return fmt.Errorf("input bytes do not match input CID")
-	}
-	if !production.VerifyContentCID(contextBytes, fields["field_context_cid"]) {
-		return fmt.Errorf("context bytes do not match context CID")
-	}
-	return nil
+	return production.VerifyComputeInputCIDs(fields, production.ComputeInputs{
+		FunctionBytes: functionBytes,
+		InputBytes:    inputBytes,
+		ContextBytes:  contextBytes,
+	})
 }
 
 func verifyComputeResultFields(fields map[string]string) error {

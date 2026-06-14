@@ -24,8 +24,8 @@
       "name": "alice",
       "persona": "Privacy-sensitive data holder. Alice wants useful storage, compute, and shipping workflow help, but sends private data only after local trust event improves.",
       "motivation": "Build reciprocal peer relationships without accepting anyone as an authority.",
-      "initial_peers": ["bob", "carol", "dave", "frank", "grace", "ellen", "fulfillment"],
-      "candidate_peers": ["bob", "carol", "dave", "frank", "grace", "ellen", "fulfillment"],
+      "initial_peers": ["bob", "carol", "dave", "frank", "grace", "ellen", "fulfillment", "peggy", "victor"],
+      "candidate_peers": ["bob", "carol", "dave", "frank", "grace", "ellen", "fulfillment", "peggy", "victor"],
       "supported_pcids": ["relationship_v1", "cas_storage_v1", "cid_compute_v1", "identity_key_v1"],
       "budget": 4,
       "capacity": 3
@@ -200,22 +200,22 @@
     {
       "name": "peggy",
       "kind": "wasm_agent",
-      "persona": "WASM-adapter peer. Peggy runs as a separate process that executes an embedded wazero module and promises only pCID-defined envelope exchanges across the sandbox boundary.",
-      "motivation": "Show that a sandboxed runtime can participate without host calls becoming RPC commands or trust authority.",
+      "persona": "WASM-adapter peer. Peggy runs as a separate process that executes an embedded wazero Fibonacci module and promises pCID-defined compute results across the sandbox boundary.",
+      "motivation": "Show that a sandboxed runtime can keep useful compute promises without host calls becoming RPC commands or trust authority.",
       "initial_peers": ["victor", "alice", "dave"],
       "candidate_peers": ["victor", "alice", "dave", "grace"],
-      "supported_pcids": ["relationship_v1", "identity_key_v1"],
+      "supported_pcids": ["relationship_v1", "cid_compute_v1", "identity_key_v1"],
       "budget": 3,
       "capacity": 3
     },
     {
       "name": "victor",
       "kind": "stdio_agent",
-      "persona": "Stdio-only peer. Victor's worker process sends and receives PromiseGrid envelopes only through length-prefixed CBOR frames on stdin/stdout with a local adapter.",
-      "motivation": "Show that subprocess-style agents can use PromiseGrid without direct network APIs or RPC command surfaces.",
+      "persona": "Stdio-only peer. Victor's worker process sends and receives PromiseGrid envelopes only through length-prefixed CBOR frames on stdin/stdout with a local adapter and keeps bounded compute promises.",
+      "motivation": "Show that subprocess-style agents can keep useful compute promises without direct network APIs or RPC command surfaces.",
       "initial_peers": ["peggy", "alice", "dave"],
       "candidate_peers": ["peggy", "alice", "dave", "grace"],
-      "supported_pcids": ["relationship_v1", "identity_key_v1"],
+      "supported_pcids": ["relationship_v1", "cid_compute_v1", "identity_key_v1"],
       "budget": 3,
       "capacity": 3
     }

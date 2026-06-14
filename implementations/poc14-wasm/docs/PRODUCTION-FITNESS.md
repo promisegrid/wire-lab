@@ -3,19 +3,20 @@
 POC14 is executable POC event, not production software. Its purpose is to test
 whether the POC13 superset can survive heterogeneous app processes,
 decentralized monitoring, hard local distrust, and untrusted-transit exclusion.
-Source: `DI-linof`; `DI-lulof`; `DI-kinaf`; `DI-dubih`; `DI-kimim`.
+Source: `DI-linof`; `DI-lulof`; `DI-kinaf`; `DI-dubih`; `DI-kimim`;
+`DI-sivis`.
 
 ## Current Fitness Claim
 
 - POC14 should remain fit for continued POC work if `poc14-analyze` reports all
   inherited POC13 gates plus `runtime_adapter=5`, `monitoring=5`, `migration=5`, and
   `restart=5`.
-- The 2026-06-13 `poc14-demo` clean Docker run passed those analyzer gates with
-  2218 total events, all score dimensions at `5`, one each of the new wazero and
-  stdio-CBOR runtime adapter events, explicit behavioral event for permanent
-  local distrust plus untrusted-transit exclusion, migrated CAS/compute array
-  payload events, and empty `rpc_drift_counts` /
-  `resource_trust_coupling_counts`.
+- The latest clean Docker baseline after `DI-sivis` passed those analyzer gates
+  with 2269 total events, all score dimensions at `5`, one full Peggy
+  `wasm_compute_*` promise sequence, one full Victor `stdio_compute_*` promise
+  sequence, explicit behavioral event for permanent local distrust plus
+  untrusted-transit exclusion, migrated CAS/compute array payload events, and
+  empty `rpc_drift_counts` / `resource_trust_coupling_counts`.
 - POC14 is not production-fit until a later implementation replaces POC-local
   whole-run analysis with ordinary agents that exchange local events promises.
 - POC14's analyzer and monitor remain development-time observers. In real
@@ -24,14 +25,15 @@ Source: `DI-linof`; `DI-lulof`; `DI-kinaf`; `DI-dubih`; `DI-kimim`.
 
 ## Expected Blockers After First Run
 
-- The WASM role now executes one embedded no-import module with wazero and sends
-  a useful relationship promise about reusable module-execution event, but it
-  still does not execute arbitrary WASM application logic or expose production
-  host-call APIs. Source: `DI-kimim`.
+- The WASM role now executes one embedded no-import Fibonacci module with wazero
+  and keeps Alice's `cid_compute_v1` promise through that export, but it still
+  does not load arbitrary WASM application modules or expose production host-call
+  APIs. Source: `DI-kimim`; `DI-sivis`.
 - The stdio role demonstrates exact envelope exchange through a worker process
-  using length-prefixed CBOR frames and now sends a useful relationship promise
-  about subprocess round-trip event, but it still covers one deterministic
-  subprocess fixture. Source: `DI-kimim`.
+  using length-prefixed CBOR frames and now keeps Alice's `cid_compute_v1`
+  promise by having the worker parse the exact request and return a signed
+  compute ACK, but it still covers one deterministic subprocess fixture. Source:
+  `DI-kimim`; `DI-sivis`.
 - Decentralized monitoring signals are recorded as event, but agents do not
   yet adapt peer choice from token exchange rates or peer-carried attestations.
 - Permanent distrust and transit exclusion now have app-local behavior: the

@@ -611,6 +611,14 @@ func requiredRegressionEvents() []string {
 		"wasm_export_result_observed",
 		"wasm_adapter_promise_sent",
 		"wasm_adapter_ack_received",
+		// Intent: Runtime-adapter usefulness now means Alice can ask Peggy to
+		// keep a real cid_compute_v1 promise through WASM execution. Source:
+		// DI-sivis
+		"wasm_compute_request_promised",
+		"wasm_compute_request_received",
+		"wasm_compute_function_executed",
+		"wasm_compute_result_promised",
+		"wasm_compute_result_verified",
 		// Intent: Peggy and Victor must perform useful routed promise work, not
 		// only record that WASM/stdio runtime adapters exist. Source:
 		// DI-pamob; DI-kimim
@@ -624,6 +632,15 @@ func requiredRegressionEvents() []string {
 		"stdio_cbor_ack_sent",
 		"stdio_worker_ack_event",
 		"stdio_cbor_ack_event",
+		// Intent: Victor's stdio adapter must prove useful compute work by
+		// delegating exact inbound cid_compute_v1 bytes to the worker and
+		// returning the worker-signed ACK unchanged. Source: DI-sivis
+		"stdio_compute_request_promised",
+		"stdio_compute_worker_started",
+		"stdio_compute_request_forwarded",
+		"stdio_compute_worker_executed",
+		"stdio_compute_ack_received",
+		"stdio_compute_result_verified",
 		"stdio_useful_work_promised",
 		"stdio_useful_work_ack_received",
 		// Intent: POC14 monitoring experiments must be decentralized because
@@ -678,7 +695,7 @@ func computeScores(summary RunSummary) ScoreReport {
 	// Intent: POC14 adds runtime-adapter and decentralized-monitoring dimensions
 	// without relaxing inherited POC13 storage/compute/trust gates. Source:
 	// DI-linof; DI-lulof
-	addScore(&scores.RuntimeAdapter, summary.EventCounts["wasm_module_instantiated"] > 0 && summary.EventCounts["wasm_export_result_observed"] > 0 && summary.EventCounts["wasm_adapter_ack_received"] > 0 && summary.EventCounts["wasm_useful_work_promised"] > 0 && summary.EventCounts["stdio_cbor_envelope_received"] > 0 && summary.EventCounts["stdio_cbor_ack_event"] > 0 && summary.EventCounts["stdio_adapter_kernel_forwarded"] > 0 && summary.EventCounts["stdio_useful_work_promised"] > 0)
+	addScore(&scores.RuntimeAdapter, summary.EventCounts["wasm_module_instantiated"] > 0 && summary.EventCounts["wasm_export_result_observed"] > 0 && summary.EventCounts["wasm_adapter_ack_received"] > 0 && summary.EventCounts["wasm_useful_work_promised"] > 0 && summary.EventCounts["wasm_compute_result_verified"] > 0 && summary.EventCounts["stdio_cbor_envelope_received"] > 0 && summary.EventCounts["stdio_cbor_ack_event"] > 0 && summary.EventCounts["stdio_adapter_kernel_forwarded"] > 0 && summary.EventCounts["stdio_useful_work_promised"] > 0 && summary.EventCounts["stdio_compute_result_verified"] > 0)
 	addScore(&scores.Monitoring, summary.EventCounts["decentralized_monitoring_model_recorded"] > 0 && summary.EventCounts["bearer_token_exchange_rate_observed"] > 0 && summary.EventCounts["voluntary_gossip_promised"] > 0)
 	addScore(&scores.Migration, summary.EventCounts["mixed_version_pcid_migration_promised"] > 0 && summary.EventCounts["mixed_version_successor_pcid_selected"] > 0)
 	addScore(&scores.Restart, summary.EventCounts["run_internal_restart_orchestration_promised"] > 0 && summary.EventCounts["run_internal_restart_recovery_observed"] > 0)

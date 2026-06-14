@@ -28,5 +28,5 @@ COPY --from=build /out/poc14-stdio-adapter /usr/local/bin/poc14-stdio-adapter
 COPY --from=build /out/poc14-stdio-worker /usr/local/bin/poc14-stdio-worker
 COPY --from=build /out/poc14-supervisor /usr/local/bin/poc14-supervisor
 COPY --from=build /out/poc14-analyze /usr/local/bin/poc14-analyze
-COPY config.example.json /app/config.example.json
+COPY config.json /app/config.json
 ENTRYPOINT ["/usr/local/bin/poc14-supervisor"]

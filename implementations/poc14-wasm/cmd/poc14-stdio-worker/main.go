@@ -2,10 +2,12 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"os"
 
 	"promisegrid.dev/wire-lab/implementations/poc14-wasm/boundary"
 	"promisegrid.dev/wire-lab/implementations/poc14-wasm/pcid"
+	"promisegrid.dev/wire-lab/implementations/poc14-wasm/production"
 	"promisegrid.dev/wire-lab/implementations/poc14-wasm/protocol"
 )
 
@@ -17,9 +19,21 @@ func main() {
 }
 
 func run() error {
-	requestFrameBytes, err := boundary.ReadCBORFrame(os.Stdin)
+	return runWithIO(os.Stdin, os.Stdout)
+}
+
+// runWithIO executes one stdio worker exchange against explicit streams so the
+// same binary behavior can be tested without Docker.
+// Intent: Victor's stdio worker must remain a subprocess-I/O PromiseGrid adapter
+// rather than an in-process test fake or RPC command handler. Source: DI-sivis
+func runWithIO(input io.Reader, output io.Writer) error {
+	requestFrameBytes, err := boundary.ReadCBORFrame(input)
 	if err != nil {
 		return fmt.Errorf("decode request: %w", err)
+	}
+	computeRequest, computeParseErr := boundary.ParseStdioCBOREnvelope(requestFrameBytes)
+	if computeParseErr == nil && computeRequest.Type == "compute_request" {
+		return runComputeRequest(computeRequest, output)
 	}
 	request, err := boundary.ParseStdioCBORRequest(requestFrameBytes)
 	if err != nil {
@@ -57,10 +71,10 @@ func run() error {
 	if err != nil {
 		return fmt.Errorf("marshal outbound envelope: %w", err)
 	}
-	if err := boundary.WriteCBORFrame(os.Stdout, outboundFrameBytes); err != nil {
+	if err := boundary.WriteCBORFrame(output, outboundFrameBytes); err != nil {
 		return fmt.Errorf("encode outbound envelope: %w", err)
 	}
-	ackFrameBytes, err := boundary.ReadCBORFrame(os.Stdin)
+	ackFrameBytes, err := boundary.ReadCBORFrame(input)
 	if err != nil {
 		return fmt.Errorf("decode ack: %w", err)
 	}
@@ -90,5 +104,68 @@ func run() error {
 	if err != nil {
 		return fmt.Errorf("marshal ack event: %w", err)
 	}
-	return boundary.WriteCBORFrame(os.Stdout, eventFrameBytes)
+	return boundary.WriteCBORFrame(output, eventFrameBytes)
+}
+
+// runComputeRequest parses Alice's exact compute envelope, keeps the compute
+// promise locally, and writes a signed ACK envelope to stdout.
+// Intent: The worker, not the adapter, performs Victor's useful compute work
+// while preserving the same cid_compute_v1 promise semantics. Source: DI-sivis
+func runComputeRequest(request boundary.StdioCBOREnvelope, output io.Writer) error {
+	if request.From == "" || request.To == "" || request.Protocol != pcid.CIDComputeV1 || len(request.EnvelopeBytes) == 0 {
+		return fmt.Errorf("invalid stdio compute request")
+	}
+	registry := pcid.NewRegistry()
+	envelope, parseErr := protocol.ParseEnvelope(request.EnvelopeBytes)
+	if parseErr != nil {
+		return parseErr
+	}
+	if verifyErr := protocol.VerifyEnvelope(envelope); verifyErr != nil {
+		return verifyErr
+	}
+	fields, fieldsErr := envelope.PayloadFields()
+	if fieldsErr != nil {
+		return fieldsErr
+	}
+	if fields["field_promise_about"] != production.PromiseExecuteFunction || fields["from"] != request.From || fields["to"] != request.To {
+		return fmt.Errorf("stdio compute request payload does not match request frame")
+	}
+	inputs, decodeErr := production.DecodeComputeInputs(fields)
+	if decodeErr != nil {
+		return decodeErr
+	}
+	if verifyErr := production.VerifyComputeInputCIDs(fields, inputs); verifyErr != nil {
+		return verifyErr
+	}
+	resultBytes, executeErr := production.ExecuteFunction(inputs.FunctionBytes, inputs.InputBytes, inputs.ContextBytes)
+	if executeErr != nil {
+		return executeErr
+	}
+	ackFields := production.ExecuteComputePromiseFields(fields, resultBytes)
+	ackFields["act"] = "promise"
+	ackFields["from"] = request.To
+	ackFields["to"] = request.From
+	ackFields["outcome"] = "kept"
+	ackFields["promise"] = "Victor promises that the stdio worker computed this cid_compute_v1 result from exact function/input/context bytes."
+	ackFields["reason"] = "stdio worker compute result returned as a signed pCID-owned array ACK"
+	payloadBytes, _, payloadErr := protocol.MarshalKnownArrayPayload(pcid.CIDComputeV1, ackFields)
+	if payloadErr != nil {
+		return payloadErr
+	}
+	ackEnvelope, envelopeErr := protocol.NewEnvelopeFromPayload(registry.MustCID(pcid.CIDComputeV1), payloadBytes, request.To)
+	if envelopeErr != nil {
+		return envelopeErr
+	}
+	ackBytes, bytesErr := ackEnvelope.Bytes()
+	if bytesErr != nil {
+		return bytesErr
+	}
+	ackFrameBytes, marshalErr := boundary.MarshalStdioCBORAck(boundary.StdioCBORAck{Type: "compute_ack_envelope", EnvelopeBytes: ackBytes})
+	if marshalErr != nil {
+		return marshalErr
+	}
+	// Intent: The worker returns a real signed compute ACK envelope as binary
+	// CBOR-framed bytes; Victor's adapter forwards those exact bytes back to
+	// Alice instead of translating them into an RPC result. Source: DI-sivis
+	return boundary.WriteCBORFrame(output, ackFrameBytes)
 }

@@ -10,14 +10,17 @@ superset of prior POCs unless a scoped DI explicitly says otherwise. Source:
 - Module path and command names now use `promisegrid.dev/wire-lab/implementations/poc14-wasm` and `poc14-*` binaries.
 - Docker run state moved to `/run/poc14` and the compose network/volume are
   named `poc14` / `poc14-run`.
-- Peggy and Victor were added to `config.example.json` in a new `wasm-stdio`
+- Peggy and Victor were added to committed `config.json` in a new `wasm-stdio`
   container.
 - `poc14-wasm-agent` records real wazero compile/instantiate/call events for an
-  embedded no-import module without adding a WASM host-call RPC surface. Source:
-  `DI-kimim`.
+  embedded no-import Fibonacci module and keeps Alice's `cid_compute_v1` promise
+  through that export without adding a WASM host-call RPC surface. Source:
+  `DI-kimim`; `DI-sivis`.
 - `poc14-stdio-adapter` and `poc14-stdio-worker` record stdio-only worker
   messaging with length-prefixed CBOR frames while preserving exact PromiseGrid
-  envelopes as CBOR byte strings. Source: `DI-kimim`.
+  envelopes as CBOR byte strings. Victor now delegates Alice's exact inbound
+  `cid_compute_v1` envelope to the worker, and the worker returns an exact signed
+  compute ACK over stdout. Source: `DI-kimim`; `DI-sivis`.
 - `poc14-analyze` now reports `runtime_adapter_event_counts`,
   `decentralized_monitor_counts`, `migration_counts`, `restart_counts`, and
   score dimensions for `runtime_adapter`, `monitoring`, `migration`, and
@@ -26,8 +29,9 @@ superset of prior POCs unless a scoped DI explicitly says otherwise. Source:
   CBOR array payloads on the wire, with `field_*` compatibility projections only
   inside local handlers and analyzer event records. Source: `DI-gahuh`.
 - Peggy and Victor now each send one useful routed `relationship_v1` promise to
-  Dave so the heterogeneous-boundary agents do more than record boundary
-  existence. Source: `DI-pamob`.
+  Dave and each keep one useful `cid_compute_v1` promise for Alice so the
+  heterogeneous-boundary agents do more than record runtime-adapter existence.
+  Source: `DI-pamob`; `DI-sivis`.
 - POC15 planning lives under `implementations/poc15-multihop/` and should make
   real multi-hop forwarding and route-exclusion-by-peer-promise executable.
   Source: `DI-pamob`.

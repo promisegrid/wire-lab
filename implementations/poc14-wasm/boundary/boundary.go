@@ -22,23 +22,26 @@ const (
 	PromiseAboutTopologySignal    = "relationship_topology_signal"
 	PromiseAboutVoluntaryGossip   = "voluntary_gossip"
 
-	WASMExportName     = "promise_value"
-	ExpectedWASMResult = 42
+	WASMExportName     = "promise_fibonacci"
+	ExpectedWASMInput  = 9
+	ExpectedWASMResult = 34
 
 	maxStdioCBORFrameSize = 16 * 1024 * 1024
 )
 
 // MinimalWASMModule is a deterministic no-import WebAssembly module that
-// exports promise_value() -> i32 and returns 42.
+// exports promise_fibonacci(i32) -> i32.
 // Intent: Peggy must execute real WASM with wazero, not merely validate module
 // header bytes, while still keeping PromiseGrid semantics in ordinary
-// pCID-defined envelopes outside the sandbox. Source: DI-kimim
+// pCID-defined envelopes outside the sandbox. Source: DI-kimim; DI-sivis
 var MinimalWASMModule = []byte{
 	0x00, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00,
-	0x01, 0x05, 0x01, 0x60, 0x00, 0x01, 0x7f,
+	0x01, 0x06, 0x01, 0x60, 0x01, 0x7f, 0x01, 0x7f,
 	0x03, 0x02, 0x01, 0x00,
-	0x07, 0x11, 0x01, 0x0d, 0x70, 0x72, 0x6f, 0x6d, 0x69, 0x73, 0x65, 0x5f, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x00, 0x00,
-	0x0a, 0x06, 0x01, 0x04, 0x00, 0x41, 0x2a, 0x0b,
+	0x07, 0x15, 0x01, 0x11, 0x70, 0x72, 0x6f, 0x6d, 0x69, 0x73, 0x65, 0x5f, 0x66, 0x69, 0x62, 0x6f, 0x6e, 0x61, 0x63, 0x63, 0x69, 0x00, 0x00,
+	0x0a, 0x1e, 0x01, 0x1c, 0x00,
+	0x20, 0x00, 0x41, 0x02, 0x48, 0x04, 0x7f, 0x20, 0x00, 0x05,
+	0x20, 0x00, 0x41, 0x01, 0x6b, 0x10, 0x00, 0x20, 0x00, 0x41, 0x02, 0x6b, 0x10, 0x00, 0x6a, 0x0b, 0x0b,
 }
 
 // WASMRunResult records the small amount of deterministic runtime output that
@@ -46,6 +49,7 @@ var MinimalWASMModule = []byte{
 // PromiseGrid command surface.
 type WASMRunResult struct {
 	ExportName  string
+	InputValue  uint64
 	ExportValue uint64
 }
 
@@ -65,12 +69,12 @@ func ValidateWASMModule(moduleBytes []byte) error {
 	return nil
 }
 
-// RunWASMModule compiles, instantiates, and calls Peggy's deterministic WASM
-// module with wazero.
+// RunWASMModule compiles, instantiates, and calls Peggy's deterministic
+// Fibonacci WASM module with wazero.
 // Intent: POC14 should now distinguish real runtime execution from the older
 // header-only placeholder, while keeping arbitrary untrusted module loading out
-// of scope for this POC. Source: DI-kimim
-func RunWASMModule(ctx context.Context, moduleBytes []byte) (result WASMRunResult, err error) {
+// of scope for this POC. Source: DI-kimim; DI-sivis
+func RunWASMModule(ctx context.Context, moduleBytes []byte, inputValue uint64) (result WASMRunResult, err error) {
 	if err := ValidateWASMModule(moduleBytes); err != nil {
 		return WASMRunResult{}, err
 	}
@@ -92,17 +96,14 @@ func RunWASMModule(ctx context.Context, moduleBytes []byte) (result WASMRunResul
 	if exportedFunction == nil {
 		return WASMRunResult{}, fmt.Errorf("wasm export %q not found", WASMExportName)
 	}
-	values, err := exportedFunction.Call(ctx)
+	values, err := exportedFunction.Call(ctx, inputValue)
 	if err != nil {
 		return WASMRunResult{}, fmt.Errorf("call wasm export %q: %w", WASMExportName, err)
 	}
 	if len(values) != 1 {
 		return WASMRunResult{}, fmt.Errorf("wasm export %q returned %d values, want 1", WASMExportName, len(values))
 	}
-	if values[0] != ExpectedWASMResult {
-		return WASMRunResult{}, fmt.Errorf("wasm export %q returned %d, want %d", WASMExportName, values[0], ExpectedWASMResult)
-	}
-	return WASMRunResult{ExportName: WASMExportName, ExportValue: values[0]}, nil
+	return WASMRunResult{ExportName: WASMExportName, InputValue: inputValue, ExportValue: values[0]}, nil
 }
 
 // PromiseFields returns the common relationship_v1 payload used by the

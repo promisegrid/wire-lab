@@ -31,13 +31,13 @@ func TestLoadAllowsAPIKeyEnvironmentName(t *testing.T) {
 	}
 }
 
-func TestExampleConfigLoads(t *testing.T) {
-	cfg, err := Load(filepath.Join("..", "config.example.json"))
+func TestCommittedConfigLoads(t *testing.T) {
+	cfg, err := Load(filepath.Join("..", "config.json"))
 	if err != nil {
-		t.Fatalf("load example config: %v", err)
+		t.Fatalf("load committed config: %v", err)
 	}
 	if len(cfg.Agents) != 19 {
-		t.Fatalf("example config agents = %d, want 19", len(cfg.Agents))
+		t.Fatalf("committed config agents = %d, want 19", len(cfg.Agents))
 	}
 	if _, _, endpointFound := cfg.EndpointFor("mallory"); !endpointFound {
 		t.Fatalf("expected endpoint for mallory")

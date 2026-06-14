@@ -10,8 +10,10 @@ retention/GC, backpressure, rate-limit, replay protection, bounded trust, and
 dynamic topology gates. POC14 adds Peggy as a WASM-adapter process that executes
 an embedded module with wazero, Victor as a stdio-worker process behind a local
 adapter using binary CBOR frames, and analyzer gates for decentralized
-monitoring signals that do not assume a production-wide observer. Source:
-`DI-sihuz`; `DI-sifot`; `DI-fimoh`; `DI-lulof`; `DI-linof`; `DI-kimim`.
+monitoring signals that do not assume a production-wide observer. Peggy and
+Victor now also keep real `cid_compute_v1` promises for Alice through their
+respective runtime adapters. Source: `DI-sihuz`; `DI-sifot`; `DI-fimoh`;
+`DI-lulof`; `DI-linof`; `DI-kimim`; `DI-sivis`.
 
 ## What This Tests
 
@@ -28,10 +30,11 @@ monitoring signals that do not assume a production-wide observer. Source:
   label-printer business logic, and accounting alongside live LLM
   business/social agents.
 - Deterministic heterogeneous-boundary agents: Peggy executes an embedded
-  no-import WASM module with wazero in her own app process, and Victor's worker
-  process sends and receives exact PromiseGrid envelopes as CBOR byte strings
-  inside length-prefixed CBOR frames on stdin/stdout. Source: `DI-linof`;
-  `DI-kimim`.
+  no-import WASM Fibonacci module with wazero in her own app process, and
+  Victor's worker process sends and receives exact PromiseGrid envelopes as CBOR
+  byte strings inside length-prefixed CBOR frames on stdin/stdout. Alice can ask
+  both agents for useful `cid_compute_v1` work without adding RPC verbs or
+  runtime-specific pCIDs. Source: `DI-linof`; `DI-kimim`; `DI-sivis`.
 - One top-level semantic act, `promise`; workflow steps are payload meanings,
   not RPC verbs.
 - Explicit direct TCP relationship transition event:
@@ -145,30 +148,34 @@ runtime boundary. Source: `DI-vipih`; `DI-gahuh`.
   action. Scripted identity-key, CAS, and compute flows now use pCID-owned array
   payloads in this cleanup slice. Source: `DI-vipih`; `DI-gahuh`.
 - `poc14-wasm-agent`: deterministic Peggy app process that compiles,
-  instantiates, and calls an embedded wazero module, sends WASM-adapter event as
-  a normal `relationship_v1` promise, and promises Dave reusable module-execution
-  event records. Source: `DI-pamob`; `DI-kimim`.
+  instantiates, and calls an embedded wazero Fibonacci module, sends
+  WASM-adapter event as a normal `relationship_v1` promise, promises Dave
+  reusable module-execution event records, and keeps Alice's `cid_compute_v1`
+  compute promise through the WASM export. Source: `DI-pamob`; `DI-kimim`;
+  `DI-sivis`.
 - `poc14-stdio-adapter`: deterministic Victor adapter process that starts
   `poc14-stdio-worker`, receives exact envelope bytes as CBOR byte strings over
   stdout, forwards those bytes through the local kernel, returns the exact peer
-  ACK as a CBOR byte string over stdin, and promises Dave reusable stdio
-  subprocess round-trip event records. Source: `DI-pamob`; `DI-kimim`.
+  ACK as a CBOR byte string over stdin, promises Dave reusable stdio subprocess
+  round-trip event records, and delegates Alice's `cid_compute_v1` request to
+  the worker so the worker returns an exact signed compute ACK. Source:
+  `DI-pamob`; `DI-kimim`; `DI-sivis`.
 - `poc14-stdio-worker`: subprocess agent whose application messaging path is
   stdin/stdout only; it signs one PromiseGrid envelope, writes and reads binary
-  CBOR frames, and locally verifies the returned ACK envelope.
+  CBOR frames, locally verifies the returned ACK envelope, and can compute a
+  bounded `cid_compute_v1` result from exact request bytes.
 - `poc14-kernel`: container-local transport process that records operational
   routing event records only; it does not own trust, workflow, device behavior, or
   promise judgment. Source: `DI-galin`.
 
 ## Run
 
-Copy the committed template and keep secrets out of it. `compose.yaml` mounts
-the host `OPENAI_API_KEY` value as `/run/secrets/openai_api_key`, so the key does
-not need a repo-local secret file and does not need to appear on the command
-line. Source: `DI-pohoh`.
+POC14 uses the committed non-secret `config.json` as its canonical runtime
+config. `compose.yaml` mounts the host `OPENAI_API_KEY` value as
+`/run/secrets/openai_api_key`, so the key does not need a repo-local secret file
+and does not need to appear on the command line. Source: `DI-pohoh`; `DI-rofiz`.
 
 ```sh
-cp config.example.json config.json
 scripts/run-clean.sh
 ```
 
@@ -185,16 +192,18 @@ production fitness notes are in `docs/PRODUCTION-FITNESS.md`; implementation
 notes are in `docs/IMPLEMENTATION-NOTES.md`; kernel role notes are in
 `docs/KERNEL-ROLE-COLLECTION.md`.
 
-`config.json`, `poc14.env`, provider outputs, and Docker volume state are
-ignored and must not be committed. `openai_api_key.txt` remains ignored for
-older local workflows but is not required by the current Compose setup.
+`poc14.env`, provider outputs, and Docker volume state are ignored and must not
+be committed. `openai_api_key.txt` remains ignored for older local workflows but
+is not required by the current Compose setup. `config.json` is committed because
+it is non-secret and must not drift away from clean-regression behavior. Source:
+`DI-rofiz`.
 
-The latest clean baseline is the 2026-06-13 `poc14-demo` run after the Peggy
-wazero execution and Victor CBOR stdio upgrade: 2218 total events, all analyzer
-score dimensions at `5`, one each of the new wazero and stdio-CBOR runtime
-adapter events, empty `rpc_drift_counts`, empty `resource_trust_coupling_counts`,
-and production fitness still blocked by monitor scores of `4/5` for protocol
-validity and imposition avoidance. Source: `DI-gahuh`; `DI-kimim`.
+The latest clean baseline after the `DI-sivis` compute-useful upgrade is the
+2026-06-13 `poc14-demo` run: 2269 total events, all analyzer score dimensions at
+`5`, one Peggy `wasm_compute_*` promise sequence, one Victor `stdio_compute_*`
+promise sequence, empty `rpc_drift_counts`, empty
+`resource_trust_coupling_counts`, and production fitness still blocked only by
+monitor `protocol_validity=4/5`. Source: `DI-gahuh`; `DI-kimim`; `DI-sivis`.
 
 ## Current Limits
 

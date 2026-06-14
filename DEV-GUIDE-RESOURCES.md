@@ -234,13 +234,18 @@ POC14 is the current heterogeneous-runtime POC target. It is scaffolded as a
 POC13 superset under `implementations/poc14-wasm/`, keeps the inherited
 kernel/app, shipping, CAS, compute, trust, replay, and pressure gates, and adds
 Peggy/Victor runtime adapter events: Peggy is a separate WASM-adapter app process
-that executes an embedded no-import module with wazero and sends normal
+that executes an embedded no-import Fibonacci module with wazero and sends normal
 `relationship_v1` promises, while Victor is a stdio-worker agent behind a local
 adapter whose application messaging path is length-prefixed CBOR frames on
 stdin/stdout carrying exact PromiseGrid envelope bytes as CBOR byte strings.
-Peggy and Victor now also send useful relationship promises to Dave about
-reusable module-execution and subprocess round-trip events. POC14 adds analyzer
-dimensions for runtime adapters, decentralized monitoring, mixed-version pCID migration,
+Peggy and Victor now also send useful relationship promises to Dave and keep
+Alice-requested `cid_compute_v1` promises through WASM and stdio-worker
+execution, respectively. The latest clean `poc14-demo` run after that upgrade
+records 2269 events, gives every analyzer score dimension `5`, records empty
+`rpc_drift_counts` and `resource_trust_coupling_counts`, and remains blocked
+from production only because the development monitor rates protocol validity at
+`4/5`. POC14 adds analyzer dimensions for runtime adapters, decentralized
+monitoring, mixed-version pCID migration,
 same-run restart events, and migrated pCID-owned array payload events for
 scripted `cas_storage_v1` and `cid_compute_v1`; `field_*` names remain local
 compatibility projections, not wire-shape guidance. The monitoring lesson is
@@ -263,7 +268,7 @@ protocol validity, and local trust correctness. POC15 is now planned under
 `implementations/poc15-multihop/` to add real multi-hop forwarding, useful
 routed WASM/stdio work, route exclusion through peer promises, and an explicit
 kernel-as-role-collection model. Source: `DI-sihuz`; `DI-linof`; `DI-lulof`;
-`DI-kinaf`; `DI-dubih`; `DI-gahuh`; `DI-pamob`.
+`DI-kinaf`; `DI-dubih`; `DI-gahuh`; `DI-pamob`; `DI-sivis`.
 
 `poc7` adds executable evidence for promise-shaped capability tokens and local
 exchange: five containers run local kernel boundaries, app-level relays, issuer,
@@ -1432,10 +1437,12 @@ section.
   decentralized-monitoring events that avoid global observer assumptions,
   mixed-version pCID migration events, and same-run restart/recovery events. Its analyzer gates `runtime_adapter`,
   `monitoring`, `migration`, and `restart` dimensions in addition to inherited
-  POC13 gates. It should be cited as POC event coverage only, not as a final WASM host,
-  stdio adapter, monitor, pCID migration, crash-recovery, kernel, or app API.
+POC13 gates. Peggy and Victor also keep Alice-requested `cid_compute_v1`
+  promises through WASM and stdio-worker execution respectively. It should be
+  cited as POC event coverage only, not as a final WASM host, stdio adapter,
+  monitor, pCID migration, crash-recovery, kernel, or app API.
   Source: `DI-sihuz`; `DI-sifot`; `DI-fimoh`; `DI-lulof`; `DI-linof`;
-  `DI-kimim`; `TODO-gogug`.
+  `DI-kimim`; `DI-sivis`; `TODO-gogug`.
 - `protocols/wire-lab.d/archive/migrations/SIM-piloh-turns-149-208-recovery/archive/transports/README.md`
   preserves the old root transport design surface as historical evidence.
 

@@ -413,12 +413,12 @@ func TestDeterministicShippingHandlersReturnEvent(t *testing.T) {
 			"field_package_id":    "PKG-1001",
 		},
 	}
-	ackFields, err := scale.handleProtocolPromise(message)
+	ackResult, err := scale.handleProtocolPromise(message)
 	if err != nil {
 		t.Fatalf("scale handler: %v", err)
 	}
-	if ackFields["field_weight_ounces"] == "" || !hasEvent(scale.events, "package_weighed") {
-		t.Fatalf("scale did not return weight event: %#v events %#v", ackFields, scale.events)
+	if ackResult.Fields["field_weight_ounces"] == "" || !hasEvent(scale.events, "package_weighed") {
+		t.Fatalf("scale did not return weight event: %#v events %#v", ackResult.Fields, scale.events)
 	}
 }
 
