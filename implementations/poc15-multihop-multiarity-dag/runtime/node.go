@@ -17,6 +17,7 @@ import (
 	"promisegrid.dev/wire-lab/implementations/poc15-multihop-multiarity-dag/config"
 	"promisegrid.dev/wire-lab/implementations/poc15-multihop-multiarity-dag/decision"
 	"promisegrid.dev/wire-lab/implementations/poc15-multihop-multiarity-dag/economy"
+	"promisegrid.dev/wire-lab/implementations/poc15-multihop-multiarity-dag/eventstream"
 	"promisegrid.dev/wire-lab/implementations/poc15-multihop-multiarity-dag/pcid"
 	"promisegrid.dev/wire-lab/implementations/poc15-multihop-multiarity-dag/production"
 	"promisegrid.dev/wire-lab/implementations/poc15-multihop-multiarity-dag/protocol"
@@ -44,7 +45,12 @@ type Node struct {
 	Decider   decision.Decider
 	Monitor   decision.Monitor
 
-	mu        sync.Mutex
+	mu sync.Mutex
+	// stdoutMu keeps event and artifact JSON lines from interleaving when
+	// receive loops emit large base64 artifact records concurrently. Intent:
+	// Supervisors parse stdout line-by-line, so each line must remain intact as
+	// observer-only harness input. Source: DI-tuhop
+	stdoutMu  sync.Mutex
 	events    []decision.Event
 	ledger    *relationship.Ledger
 	evaluator economy.Evaluator
@@ -889,6 +895,7 @@ func (node *Node) registerReceivePromise(ctx context.Context, kernelAddress, pro
 	if bytesErr != nil {
 		return bytesErr
 	}
+	node.emitMessageArtifact("receive_promise_sent", "kernel", pcid.KernelReceiveV1, envelopeBytes, fields)
 	frameConn, dialErr := transport.DialFrameConn(kernelAddress, sendTimeout)
 	if dialErr != nil {
 		return dialErr
@@ -939,10 +946,12 @@ func (node *Node) receiveLoop(protocolName string, frameConn transport.FrameConn
 func (node *Node) handleFrame(frameBytes []byte) ([]byte, error) {
 	parsed, parseErr := node.parseEnvelope(frameBytes)
 	if parseErr != nil {
+		node.emitMessageArtifact("received_malformed", "", "unknown", frameBytes, nil)
 		node.record("frame_parse_failed", "broken", "", parseErr.Error())
 		node.recordMalformedFrameEvent(frameBytes, parseErr)
 		return nil, parseErr
 	}
+	node.emitMessageArtifact("received", parsed.Fields["from"], parsed.ProtocolName, frameBytes, parsed.Fields)
 	node.record("promise_envelope_validated", "kept", parsed.Fields["from"], "pcid="+parsed.ProtocolName+" exact_sha256="+parsed.ExactHash)
 	node.record("tcp_message_received", "kept", parsed.Fields["from"], "pcid="+parsed.ProtocolName+" exact_sha256="+parsed.ExactHash)
 	fields := parsed.Fields
@@ -995,6 +1004,7 @@ func (node *Node) handleFrame(frameBytes []byte) ([]byte, error) {
 			return node.newAckBytes(fromAgent, "broken", "I promise I rejected this protocol promise because local app checks failed.", parsed.ProtocolCID, nil)
 		}
 		ackFields = ackMessage.Fields
+		node.emitMessageArtifact("ack_sent", fromAgent, ackMessage.ProtocolName, ackBytes, ackFields)
 	}
 	acceptedAsCandidate := isLinkDiscoveryPromise(fields) && !node.canAccept(fromAgent)
 	if eventUpdatesTrust(ackFields) {
@@ -1062,6 +1072,7 @@ func (node *Node) newAckBytes(target, outcome, promiseText string, protocolCID p
 			node.record("ack_bytes_failed", "broken", target, bytesErr.Error())
 			return nil, bytesErr
 		}
+		node.emitMessageArtifact("ack_sent", target, pcid.IdentityKeyV1, ackBytes, ackFields)
 		node.record("pcid_owned_array_ack_sent", "kept", target, "pcid="+pcid.IdentityKeyV1+" promise_about="+ackFields["field_promise_about"])
 		return ackBytes, nil
 	}
@@ -1081,6 +1092,7 @@ func (node *Node) newAckBytes(target, outcome, promiseText string, protocolCID p
 				node.record("ack_bytes_failed", "broken", target, bytesErr.Error())
 				return nil, bytesErr
 			}
+			node.emitMessageArtifact("ack_sent", target, protocolName, ackBytes, ackFields)
 			node.record("pcid_owned_array_ack_sent", "kept", target, "pcid="+protocolName+" promise_about="+ackFields["field_promise_about"])
 			return ackBytes, nil
 		}
@@ -1095,6 +1107,7 @@ func (node *Node) newAckBytes(target, outcome, promiseText string, protocolCID p
 		node.record("ack_bytes_failed", "broken", target, bytesErr.Error())
 		return nil, bytesErr
 	}
+	node.emitMessageArtifact("ack_sent", target, firstNonEmpty(protocolName, "unknown"), ackBytes, ackFields)
 	return ackBytes, nil
 }
 
@@ -1154,6 +1167,7 @@ func (node *Node) sendAndReceive(target string, fields map[string]string) (parse
 		node.resolveOutstandingPromise(promiseID, promiseStatusLocalFailure, writeErr.Error())
 		return parsedMessage{}, writeErr
 	}
+	node.emitMessageArtifact("sent", target, protocolName, envelopeBytes, fields)
 	if arrayPayload {
 		node.record("pcid_owned_array_payload_sent", "kept", target, "pcid="+protocolName+" promise_about="+fields["field_promise_about"]+" exact_sha256="+exactHash)
 	}
@@ -1165,9 +1179,11 @@ func (node *Node) sendAndReceive(target string, fields map[string]string) (parse
 	}
 	ackMessage, parseErr := node.parseEnvelope(ackBytes)
 	if parseErr != nil {
+		node.emitMessageArtifact("ack_received_malformed", target, "unknown", ackBytes, nil)
 		node.resolveOutstandingPromise(promiseID, promiseStatusLocalFailure, parseErr.Error())
 		return parsedMessage{}, parseErr
 	}
+	node.emitMessageArtifact("ack_received", target, ackMessage.ProtocolName, ackBytes, ackMessage.Fields)
 	ackFields := ackMessage.Fields
 	if ackFields["outcome"] != "kept" {
 		if ackFields["outcome"] == "not_promised" || ackFields["outcome"] == string(relationship.OutcomeNonCommitment) {
@@ -1353,8 +1369,13 @@ func (node *Node) sendRawEnvelopeBytes(target, protocolName string, envelopeByte
 	if writeErr := frameConn.WriteFrame(envelopeBytes); writeErr != nil {
 		return parsedMessage{}, nil, writeErr
 	}
-	if sentMessage, parseErr := node.parseEnvelope(envelopeBytes); parseErr == nil && isPcidOwnedArrayPayload(sentMessage.Fields) {
-		node.record("pcid_owned_array_payload_sent", "kept", target, "pcid="+sentMessage.ProtocolName+" promise_about="+sentMessage.Fields["field_promise_about"]+" exact_sha256="+sentMessage.ExactHash)
+	if sentMessage, parseErr := node.parseEnvelope(envelopeBytes); parseErr == nil {
+		node.emitMessageArtifact("sent", target, sentMessage.ProtocolName, envelopeBytes, sentMessage.Fields)
+		if isPcidOwnedArrayPayload(sentMessage.Fields) {
+			node.record("pcid_owned_array_payload_sent", "kept", target, "pcid="+sentMessage.ProtocolName+" promise_about="+sentMessage.Fields["field_promise_about"]+" exact_sha256="+sentMessage.ExactHash)
+		}
+	} else {
+		node.emitMessageArtifact("sent_malformed", target, protocolName, envelopeBytes, nil)
 	}
 	node.record("tcp_message_sent", "kept", target, "pcid="+protocolName+" exact_sha256="+protocol.HashExactBytes(envelopeBytes))
 	ackBytes, readErr := frameConn.ReadFrame()
@@ -1363,8 +1384,10 @@ func (node *Node) sendRawEnvelopeBytes(target, protocolName string, envelopeByte
 	}
 	message, parseErr := node.parseEnvelope(ackBytes)
 	if parseErr != nil {
+		node.emitMessageArtifact("ack_received_malformed", target, "unknown", ackBytes, nil)
 		return parsedMessage{}, nil, parseErr
 	}
+	node.emitMessageArtifact("ack_received", target, message.ProtocolName, ackBytes, message.Fields)
 	if isPcidOwnedArrayPayload(message.Fields) {
 		node.record("pcid_owned_array_ack_received", "kept", target, "pcid="+message.ProtocolName+" promise_about="+message.Fields["field_promise_about"]+" exact_sha256="+message.ExactHash)
 	}
@@ -3041,6 +3064,15 @@ func firstStringField(fields map[string]string, keys ...string) string {
 	return ""
 }
 
+func firstNonEmpty(values ...string) string {
+	for _, value := range values {
+		if value != "" {
+			return value
+		}
+	}
+	return ""
+}
+
 func (node *Node) record(eventName, outcome, peer, detail string) {
 	event := decision.Event{
 		Observer: node.Agent.Name,
@@ -3061,12 +3093,57 @@ func (node *Node) record(eventName, outcome, peer, detail string) {
 		fmt.Fprintf(os.Stderr, "marshal event: %v\n", err)
 		return
 	}
+	node.stdoutMu.Lock()
 	fmt.Println(string(encoded))
+	node.stdoutMu.Unlock()
 	if node.logFile != nil {
 		if _, writeErr := node.logFile.Write(append(encoded, '\n')); writeErr != nil {
 			fmt.Fprintf(os.Stderr, "write event: %v\n", writeErr)
 		}
 	}
+}
+
+// emitMessageArtifact sends exact PromiseGrid envelope bytes to the
+// observer-only collector for post-run review.
+// Intent: Operators need raw messages, not only event records about messages.
+// Apps still do not share the observer Docker volume and cannot read these
+// artifacts back; this one-way stdout record is harness plumbing that does not
+// affect trust, routing, ACKs, or protocol semantics. Source: DI-tuhop
+func (node *Node) emitMessageArtifact(direction, peer, protocolName string, envelopeBytes []byte, fields map[string]string) {
+	if len(envelopeBytes) == 0 {
+		return
+	}
+	artifactProtocol := protocolName
+	if strings.TrimSpace(artifactProtocol) == "" {
+		artifactProtocol = "unknown"
+	}
+	artifact := eventstream.MessageArtifact{
+		Observer:            node.Agent.Name,
+		Direction:           direction,
+		Peer:                peer,
+		Protocol:            artifactProtocol,
+		ExactSHA256:         protocol.HashExactBytes(envelopeBytes),
+		EnvelopeBytesBase64: base64.StdEncoding.EncodeToString(envelopeBytes),
+		SourceEvent:         "runtime." + direction,
+	}
+	if fields != nil {
+		artifact.ParentExactSHA256 = firstNonEmpty(fields["field_parent_exact_sha256"], fields["parent_exact_sha256"])
+		artifact.PromiseAbout = firstNonEmpty(fields["field_promise_about"], fields["promise_about"])
+	}
+	record := eventstream.Record{
+		Kind:            eventstream.KindMessageArtifact,
+		Source:          "agent:" + node.Agent.Name,
+		MessageArtifact: &artifact,
+	}
+	recordBytes, marshalErr := json.Marshal(record)
+	if marshalErr != nil {
+		node.record("raw_message_artifact_emit_failed", "broken", peer, marshalErr.Error())
+		return
+	}
+	node.stdoutMu.Lock()
+	fmt.Println(string(recordBytes))
+	node.stdoutMu.Unlock()
+	node.record("raw_message_artifact_emitted", "kept", peer, "direction="+direction+" pcid="+artifactProtocol+" exact_sha256="+artifact.ExactSHA256)
 }
 
 func (node *Node) openLog() error {

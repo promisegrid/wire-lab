@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"flag"
@@ -18,6 +19,7 @@ import (
 	"promisegrid.dev/wire-lab/implementations/poc15-multihop-multiarity-dag/config"
 	"promisegrid.dev/wire-lab/implementations/poc15-multihop-multiarity-dag/decision"
 	"promisegrid.dev/wire-lab/implementations/poc15-multihop-multiarity-dag/eventstream"
+	"promisegrid.dev/wire-lab/implementations/poc15-multihop-multiarity-dag/protocol"
 	"promisegrid.dev/wire-lab/implementations/poc15-multihop-multiarity-dag/transport"
 )
 
@@ -34,6 +36,24 @@ type collector struct {
 	logFile     *os.File
 	done        chan struct{}
 	doneOnce    sync.Once
+}
+
+// messageDAGRecord is the operator-facing index row for one raw envelope file.
+// Intent: The index names the exact `.cbor` artifact and optional parent hash
+// without embedding raw bytes, so humans and follow-on tools can review the
+// message DAG after a run without treating the event log as the message itself.
+// Source: DI-tuhop
+type messageDAGRecord struct {
+	Source            string `json:"source"`
+	Observer          string `json:"observer"`
+	Direction         string `json:"direction"`
+	Peer              string `json:"peer"`
+	Protocol          string `json:"protocol"`
+	ExactSHA256       string `json:"exact_sha256"`
+	ParentExactSHA256 string `json:"parent_exact_sha256,omitempty"`
+	PromiseAbout      string `json:"promise_about,omitempty"`
+	SourceEvent       string `json:"source_event,omitempty"`
+	Path              string `json:"path"`
 }
 
 func main() {
@@ -152,6 +172,11 @@ func (runCollector *collector) handleRecord(record eventstream.Record) error {
 			return fmt.Errorf("event record from %s is missing event", record.Source)
 		}
 		return runCollector.recordEvent(*record.Event)
+	case eventstream.KindMessageArtifact:
+		if record.MessageArtifact == nil {
+			return fmt.Errorf("message artifact record from %s is missing artifact", record.Source)
+		}
+		return runCollector.recordMessageArtifact(record.Source, *record.MessageArtifact)
 	case eventstream.KindSupervisorDone:
 		runCollector.recordSupervisorDone(record.Source)
 		return nil
@@ -169,6 +194,67 @@ func (runCollector *collector) recordEvent(event decision.Event) error {
 	defer runCollector.mu.Unlock()
 	runCollector.events = append(runCollector.events, event)
 	if _, writeErr := runCollector.logFile.Write(append(encoded, '\n')); writeErr != nil {
+		return writeErr
+	}
+	return nil
+}
+
+// recordMessageArtifact persists exact PromiseGrid envelope bytes for later
+// review by operators and tools.
+// Intent: This observer-only write path is deliberately outside app/kernel
+// behavior: artifacts cannot affect routing, trust, or ACK outcomes, but a clean
+// run can now prove that real messages are inspectable after containers exit.
+// Source: DI-tuhop
+func (runCollector *collector) recordMessageArtifact(source string, artifact eventstream.MessageArtifact) error {
+	rawBytes, decodeErr := base64.StdEncoding.DecodeString(artifact.EnvelopeBytesBase64)
+	if decodeErr != nil {
+		return fmt.Errorf("decode message artifact from %s: %w", source, decodeErr)
+	}
+	if artifact.ExactSHA256 == "" {
+		return fmt.Errorf("message artifact from %s missing exact_sha256", source)
+	}
+	actualHash := protocol.HashExactBytes(rawBytes)
+	if actualHash != artifact.ExactSHA256 {
+		return fmt.Errorf("message artifact from %s hash mismatch: record=%s actual=%s", source, artifact.ExactSHA256, actualHash)
+	}
+	runDir := filepath.Join(runCollector.cfg.RunRoot, runCollector.cfg.RunID)
+	casDir := filepath.Join(runDir, "message-cas")
+	if mkdirErr := os.MkdirAll(casDir, 0o755); mkdirErr != nil {
+		return mkdirErr
+	}
+	artifactPath := filepath.Join(casDir, artifact.ExactSHA256+".cbor")
+	indexPath := filepath.Join(runDir, "message-dag.jsonl")
+	indexRecord := messageDAGRecord{
+		Source:            source,
+		Observer:          artifact.Observer,
+		Direction:         artifact.Direction,
+		Peer:              artifact.Peer,
+		Protocol:          artifact.Protocol,
+		ExactSHA256:       artifact.ExactSHA256,
+		ParentExactSHA256: artifact.ParentExactSHA256,
+		PromiseAbout:      artifact.PromiseAbout,
+		SourceEvent:       artifact.SourceEvent,
+		Path:              filepath.ToSlash(filepath.Join("message-cas", artifact.ExactSHA256+".cbor")),
+	}
+	indexBytes, marshalErr := json.Marshal(indexRecord)
+	if marshalErr != nil {
+		return marshalErr
+	}
+	runCollector.mu.Lock()
+	defer runCollector.mu.Unlock()
+	if writeErr := os.WriteFile(artifactPath, rawBytes, 0o644); writeErr != nil {
+		return writeErr
+	}
+	indexFile, openErr := os.OpenFile(indexPath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0o644)
+	if openErr != nil {
+		return openErr
+	}
+	defer func() {
+		if closeErr := indexFile.Close(); closeErr != nil {
+			fmt.Fprintf(os.Stderr, "close message DAG index: %v\n", closeErr)
+		}
+	}()
+	if _, writeErr := indexFile.Write(append(indexBytes, '\n')); writeErr != nil {
 		return writeErr
 	}
 	return nil

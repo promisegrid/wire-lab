@@ -193,6 +193,19 @@ func (forwarder *processForwarder) copyOutput(waitGroup *sync.WaitGroup, roleNam
 }
 
 func (forwarder *processForwarder) forwardEventLine(roleName, streamName, line string) {
+	var record eventstream.Record
+	if unmarshalErr := json.Unmarshal([]byte(line), &record); unmarshalErr == nil && record.Kind == eventstream.KindMessageArtifact && record.MessageArtifact != nil {
+		// Intent: Raw message artifacts are observer-only run review records.
+		// The supervisor forwards them to the collector without interpreting the
+		// envelope bytes or exposing the observer volume to app processes. Source:
+		// DI-tuhop
+		record.Source = forwarder.containerName + "/" + roleName + "/" + streamName
+		sendErr := forwarder.client.Send(record)
+		if sendErr != nil {
+			forwarder.rememberErr(sendErr)
+		}
+		return
+	}
 	var event decision.Event
 	if unmarshalErr := json.Unmarshal([]byte(line), &event); unmarshalErr != nil {
 		return

@@ -14,8 +14,9 @@ import (
 )
 
 const (
-	KindEvent          = "event"
-	KindSupervisorDone = "supervisor_done"
+	KindEvent           = "event"
+	KindMessageArtifact = "message_artifact"
+	KindSupervisorDone  = "supervisor_done"
 )
 
 const dialRetryDelay = 250 * time.Millisecond
@@ -25,10 +26,30 @@ const dialRetryDelay = 250 * time.Millisecond
 // affect agent behavior; it exists only so the development harness can analyze
 // stdout events without giving agents a shared run volume. Source: DI-dirat
 type Record struct {
-	Kind   string          `json:"kind"`
-	Source string          `json:"source"`
-	Event  *decision.Event `json:"event,omitempty"`
-	Detail string          `json:"detail,omitempty"`
+	Kind            string           `json:"kind"`
+	Source          string           `json:"source"`
+	Event           *decision.Event  `json:"event,omitempty"`
+	MessageArtifact *MessageArtifact `json:"message_artifact,omitempty"`
+	Detail          string           `json:"detail,omitempty"`
+}
+
+// MessageArtifact carries exact PromiseGrid envelope bytes to the observer-only
+// collector for run-scoped operator review.
+// Intent: Agents must not coordinate through the Docker observer volume, but the
+// POC harness still needs intact message bytes after the run. Supervisors forward
+// these base64 transport records one way to the collector, which writes binary
+// `.cbor` artifacts and a DAG-style index without influencing agents. Source:
+// DI-tuhop
+type MessageArtifact struct {
+	Observer            string `json:"observer"`
+	Direction           string `json:"direction"`
+	Peer                string `json:"peer"`
+	Protocol            string `json:"protocol"`
+	ExactSHA256         string `json:"exact_sha256"`
+	ParentExactSHA256   string `json:"parent_exact_sha256,omitempty"`
+	PromiseAbout        string `json:"promise_about,omitempty"`
+	SourceEvent         string `json:"source_event,omitempty"`
+	EnvelopeBytesBase64 string `json:"envelope_bytes_b64"`
 }
 
 // Client is one supervisor's long-lived connection to the observer-only

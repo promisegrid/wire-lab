@@ -12,45 +12,51 @@ import (
 
 	"promisegrid.dev/wire-lab/implementations/poc15-multihop-multiarity-dag/decision"
 	"promisegrid.dev/wire-lab/implementations/poc15-multihop-multiarity-dag/pcid"
+	"promisegrid.dev/wire-lab/implementations/poc15-multihop-multiarity-dag/protocol"
 )
 
 // RunSummary is the deterministic JSON report emitted by poc15-analyze.
 // Intent: Keep POC15 live runs comparable without committing provider logs or
 // Docker volume state. Source: DI-timah
 type RunSummary struct {
-	RunDir                       string                  `json:"run_dir"`
-	TotalEvents                  int                     `json:"total_events"`
-	EventCounts                  map[string]int          `json:"event_counts"`
-	OutcomeCounts                map[string]int          `json:"outcome_counts"`
-	AgentCounts                  map[string]int          `json:"agent_counts"`
-	FailureCounts                map[string]int          `json:"failure_counts"`
-	ProtocolCounts               map[string]int          `json:"protocol_counts"`
-	TrustDrivenChoiceCounts      map[string]int          `json:"trust_driven_choice_counts"`
-	EconomicsCounts              map[string]int          `json:"economics_counts"`
-	VerificationCounts           map[string]int          `json:"verification_counts"`
-	ReplicaRecoveryCounts        map[string]int          `json:"replica_recovery_counts"`
-	RPCDriftCounts               map[string]int          `json:"rpc_drift_counts"`
-	ShippingCounts               map[string]int          `json:"shipping_counts"`
-	RelationshipTransitionCounts map[string]int          `json:"relationship_transition_counts"`
-	DynamicTopologyCounts        map[string]int          `json:"dynamic_topology_counts"`
-	LocalResourceCounts          map[string]int          `json:"local_resource_counts"`
-	ResourceTrustCouplingCounts  map[string]int          `json:"resource_trust_coupling_counts"`
-	DurabilityCounts             map[string]int          `json:"durability_counts"`
-	RetentionCounts              map[string]int          `json:"retention_counts"`
-	PressureCounts               map[string]int          `json:"pressure_counts"`
-	ReplayCounts                 map[string]int          `json:"replay_counts"`
-	TrustCautionCounts           map[string]int          `json:"trust_caution_counts"`
-	RuntimeAdapterEventCounts    map[string]int          `json:"runtime_adapter_event_counts"`
-	DecentralizedMonitorCounts   map[string]int          `json:"decentralized_monitor_counts"`
-	RouteCounts                  map[string]int          `json:"route_counts"`
-	ArrayPayloadProtocolCounts   map[string]int          `json:"array_payload_protocol_counts"`
-	MigrationCounts              map[string]int          `json:"migration_counts"`
-	RestartCounts                map[string]int          `json:"restart_counts"`
-	ForbiddenVocabularyCounts    map[string]int          `json:"forbidden_vocabulary_counts,omitempty"`
-	ScoreReport                  ScoreReport             `json:"score_report"`
-	ProductionFitness            ProductionFitnessReport `json:"production_fitness"`
-	MissingRequiredEventNames    []string                `json:"missing_required_event_names,omitempty"`
-	MonitorReport                *decision.MonitorReport `json:"monitor_report,omitempty"`
+	RunDir                         string                  `json:"run_dir"`
+	TotalEvents                    int                     `json:"total_events"`
+	EventCounts                    map[string]int          `json:"event_counts"`
+	OutcomeCounts                  map[string]int          `json:"outcome_counts"`
+	AgentCounts                    map[string]int          `json:"agent_counts"`
+	FailureCounts                  map[string]int          `json:"failure_counts"`
+	ProtocolCounts                 map[string]int          `json:"protocol_counts"`
+	TrustDrivenChoiceCounts        map[string]int          `json:"trust_driven_choice_counts"`
+	EconomicsCounts                map[string]int          `json:"economics_counts"`
+	VerificationCounts             map[string]int          `json:"verification_counts"`
+	ReplicaRecoveryCounts          map[string]int          `json:"replica_recovery_counts"`
+	RPCDriftCounts                 map[string]int          `json:"rpc_drift_counts"`
+	ShippingCounts                 map[string]int          `json:"shipping_counts"`
+	RelationshipTransitionCounts   map[string]int          `json:"relationship_transition_counts"`
+	DynamicTopologyCounts          map[string]int          `json:"dynamic_topology_counts"`
+	LocalResourceCounts            map[string]int          `json:"local_resource_counts"`
+	ResourceTrustCouplingCounts    map[string]int          `json:"resource_trust_coupling_counts"`
+	DurabilityCounts               map[string]int          `json:"durability_counts"`
+	RetentionCounts                map[string]int          `json:"retention_counts"`
+	PressureCounts                 map[string]int          `json:"pressure_counts"`
+	ReplayCounts                   map[string]int          `json:"replay_counts"`
+	TrustCautionCounts             map[string]int          `json:"trust_caution_counts"`
+	RuntimeAdapterEventCounts      map[string]int          `json:"runtime_adapter_event_counts"`
+	DecentralizedMonitorCounts     map[string]int          `json:"decentralized_monitor_counts"`
+	RouteCounts                    map[string]int          `json:"route_counts"`
+	ArrayPayloadProtocolCounts     map[string]int          `json:"array_payload_protocol_counts"`
+	MessageArtifactCount           int                     `json:"message_artifact_count"`
+	MessageCASObjectCount          int                     `json:"message_cas_object_count"`
+	MessageDAGRecordCount          int                     `json:"message_dag_record_count"`
+	MessageArtifactDirectionCounts map[string]int          `json:"message_artifact_direction_counts"`
+	MessageArtifactProtocolCounts  map[string]int          `json:"message_artifact_protocol_counts"`
+	MigrationCounts                map[string]int          `json:"migration_counts"`
+	RestartCounts                  map[string]int          `json:"restart_counts"`
+	ForbiddenVocabularyCounts      map[string]int          `json:"forbidden_vocabulary_counts,omitempty"`
+	ScoreReport                    ScoreReport             `json:"score_report"`
+	ProductionFitness              ProductionFitnessReport `json:"production_fitness"`
+	MissingRequiredEventNames      []string                `json:"missing_required_event_names,omitempty"`
+	MonitorReport                  *decision.MonitorReport `json:"monitor_report,omitempty"`
 }
 
 // ScoreReport gives the operator a fast POC15 fitness view in addition to the
@@ -91,6 +97,23 @@ type ProductionFitnessReport struct {
 	BlockingGaps       []string `json:"blocking_gaps,omitempty"`
 }
 
+// messageDAGRecord mirrors the collector's run-scoped message DAG index.
+// Intent: The analyzer validates actual binary `.cbor` artifacts by hash so a
+// clean run cannot pass by logging message-like events without retaining the
+// messages themselves. Source: DI-tuhop
+type messageDAGRecord struct {
+	Source            string `json:"source"`
+	Observer          string `json:"observer"`
+	Direction         string `json:"direction"`
+	Peer              string `json:"peer"`
+	Protocol          string `json:"protocol"`
+	ExactSHA256       string `json:"exact_sha256"`
+	ParentExactSHA256 string `json:"parent_exact_sha256,omitempty"`
+	PromiseAbout      string `json:"promise_about,omitempty"`
+	SourceEvent       string `json:"source_event,omitempty"`
+	Path              string `json:"path"`
+}
+
 // AcceptanceCriteria describes the event-record gates for a clean POC15 regression
 // run.
 // Intent: Keep the current clean-run expectations executable so a wrong log
@@ -114,6 +137,7 @@ type AcceptanceCriteria struct {
 	RequireMixedVersionMigration      bool
 	RequireRunInternalRestart         bool
 	RequireEventVocabulary            bool
+	RequireRawMessageArtifacts        bool
 	MinScoreOverall                   int
 }
 
@@ -149,34 +173,36 @@ func analyzeRun(runDir string) (RunSummary, error) {
 		return RunSummary{}, resolveErr
 	}
 	summary := RunSummary{
-		RunDir:                       logDir,
-		EventCounts:                  make(map[string]int),
-		OutcomeCounts:                make(map[string]int),
-		AgentCounts:                  make(map[string]int),
-		FailureCounts:                make(map[string]int),
-		ProtocolCounts:               make(map[string]int),
-		TrustDrivenChoiceCounts:      make(map[string]int),
-		EconomicsCounts:              make(map[string]int),
-		VerificationCounts:           make(map[string]int),
-		ReplicaRecoveryCounts:        make(map[string]int),
-		RPCDriftCounts:               make(map[string]int),
-		ShippingCounts:               make(map[string]int),
-		RelationshipTransitionCounts: make(map[string]int),
-		DynamicTopologyCounts:        make(map[string]int),
-		LocalResourceCounts:          make(map[string]int),
-		ResourceTrustCouplingCounts:  make(map[string]int),
-		DurabilityCounts:             make(map[string]int),
-		RetentionCounts:              make(map[string]int),
-		PressureCounts:               make(map[string]int),
-		ReplayCounts:                 make(map[string]int),
-		TrustCautionCounts:           make(map[string]int),
-		RuntimeAdapterEventCounts:    make(map[string]int),
-		DecentralizedMonitorCounts:   make(map[string]int),
-		RouteCounts:                  make(map[string]int),
-		ArrayPayloadProtocolCounts:   make(map[string]int),
-		MigrationCounts:              make(map[string]int),
-		RestartCounts:                make(map[string]int),
-		ForbiddenVocabularyCounts:    make(map[string]int),
+		RunDir:                         logDir,
+		EventCounts:                    make(map[string]int),
+		OutcomeCounts:                  make(map[string]int),
+		AgentCounts:                    make(map[string]int),
+		FailureCounts:                  make(map[string]int),
+		ProtocolCounts:                 make(map[string]int),
+		TrustDrivenChoiceCounts:        make(map[string]int),
+		EconomicsCounts:                make(map[string]int),
+		VerificationCounts:             make(map[string]int),
+		ReplicaRecoveryCounts:          make(map[string]int),
+		RPCDriftCounts:                 make(map[string]int),
+		ShippingCounts:                 make(map[string]int),
+		RelationshipTransitionCounts:   make(map[string]int),
+		DynamicTopologyCounts:          make(map[string]int),
+		LocalResourceCounts:            make(map[string]int),
+		ResourceTrustCouplingCounts:    make(map[string]int),
+		DurabilityCounts:               make(map[string]int),
+		RetentionCounts:                make(map[string]int),
+		PressureCounts:                 make(map[string]int),
+		ReplayCounts:                   make(map[string]int),
+		TrustCautionCounts:             make(map[string]int),
+		RuntimeAdapterEventCounts:      make(map[string]int),
+		DecentralizedMonitorCounts:     make(map[string]int),
+		RouteCounts:                    make(map[string]int),
+		ArrayPayloadProtocolCounts:     make(map[string]int),
+		MessageArtifactDirectionCounts: make(map[string]int),
+		MessageArtifactProtocolCounts:  make(map[string]int),
+		MigrationCounts:                make(map[string]int),
+		RestartCounts:                  make(map[string]int),
+		ForbiddenVocabularyCounts:      make(map[string]int),
 	}
 	logPaths := jsonlLogPaths(logDir)
 	sort.Strings(logPaths)
@@ -190,6 +216,9 @@ func analyzeRun(runDir string) (RunSummary, error) {
 		return RunSummary{}, reportErr
 	}
 	summary.MonitorReport = report
+	if artifactErr := summarizeMessageArtifacts(logDir, &summary); artifactErr != nil {
+		return RunSummary{}, artifactErr
+	}
 	countMonitorVocabulary(report, &summary)
 	summary.MissingRequiredEventNames = missingRequiredEvents(summary)
 	summary.ScoreReport = computeScores(summary)
@@ -220,7 +249,17 @@ func jsonlLogPaths(runDir string) []string {
 	if globErr != nil {
 		return nil
 	}
-	return logPaths
+	filteredPaths := make([]string, 0, len(logPaths))
+	for _, logPath := range logPaths {
+		if filepath.Base(logPath) == "message-dag.jsonl" {
+			// Intent: The message DAG index is raw-message review metadata, not
+			// a decision.Event stream. It is validated separately by
+			// summarizeMessageArtifacts. Source: DI-tuhop
+			continue
+		}
+		filteredPaths = append(filteredPaths, logPath)
+	}
+	return filteredPaths
 }
 
 func cleanRegressionCriteria() AcceptanceCriteria {
@@ -241,6 +280,7 @@ func cleanRegressionCriteria() AcceptanceCriteria {
 		RequireMixedVersionMigration:      true,
 		RequireRunInternalRestart:         true,
 		RequireEventVocabulary:            true,
+		RequireRawMessageArtifacts:        true,
 		MinScoreOverall:                   4,
 	}
 }
@@ -318,6 +358,9 @@ func validateSummary(summary RunSummary, criteria AcceptanceCriteria) error {
 	if criteria.RequireEventVocabulary && len(summary.ForbiddenVocabularyCounts) > 0 {
 		failures = append(failures, fmt.Sprintf("forbidden vocabulary counts: %v", summary.ForbiddenVocabularyCounts))
 	}
+	if criteria.RequireRawMessageArtifacts {
+		failures = append(failures, rawMessageArtifactFailures(summary)...)
+	}
 	if criteria.RequireMonitorReport {
 		if summary.MonitorReport == nil {
 			failures = append(failures, "monitor_report missing")
@@ -348,6 +391,99 @@ func monitorScoreFailures(report decision.MonitorReport, minimum int) []string {
 	for _, name := range names {
 		if scores[name] < minimum {
 			failures = append(failures, fmt.Sprintf("%s=%d below minimum %d", name, scores[name], minimum))
+		}
+	}
+	return failures
+}
+
+// summarizeMessageArtifacts verifies the observer-collected raw message CAS and
+// message DAG index for one run.
+// Intent: POC15 should fail loudly if it only records summaries about messages.
+// The analyzer reads the collector-owned index, validates each binary `.cbor`
+// artifact by exact hash, and counts directions/protocols without mutating run
+// state or treating the artifacts as authority over any agent. Source: DI-tuhop
+func summarizeMessageArtifacts(runDir string, summary *RunSummary) error {
+	indexPath := filepath.Join(runDir, "message-dag.jsonl")
+	indexFile, openErr := os.Open(indexPath)
+	if openErr != nil {
+		if errors.Is(openErr, os.ErrNotExist) {
+			return nil
+		}
+		return openErr
+	}
+	defer func() {
+		closeErr := indexFile.Close()
+		if closeErr != nil {
+			fmt.Fprintf(os.Stderr, "poc15-analyze: close %s: %v\n", indexPath, closeErr)
+		}
+	}()
+	casObjects := make(map[string]bool)
+	scanner := bufio.NewScanner(indexFile)
+	lineNumber := 0
+	for scanner.Scan() {
+		lineNumber++
+		var record messageDAGRecord
+		if unmarshalErr := json.Unmarshal(scanner.Bytes(), &record); unmarshalErr != nil {
+			return fmt.Errorf("%s:%d: %w", indexPath, lineNumber, unmarshalErr)
+		}
+		artifactPath, pathErr := artifactPathWithinRun(runDir, record.Path)
+		if pathErr != nil {
+			return fmt.Errorf("%s:%d: %w", indexPath, lineNumber, pathErr)
+		}
+		artifactBytes, readErr := os.ReadFile(artifactPath)
+		if readErr != nil {
+			return fmt.Errorf("%s:%d: read %s: %w", indexPath, lineNumber, artifactPath, readErr)
+		}
+		actualHash := protocol.HashExactBytes(artifactBytes)
+		if actualHash != record.ExactSHA256 {
+			return fmt.Errorf("%s:%d: artifact hash mismatch record=%s actual=%s", indexPath, lineNumber, record.ExactSHA256, actualHash)
+		}
+		summary.MessageDAGRecordCount++
+		summary.MessageArtifactDirectionCounts[record.Direction]++
+		summary.MessageArtifactProtocolCounts[record.Protocol]++
+		casObjects[record.ExactSHA256] = true
+	}
+	if scanErr := scanner.Err(); scanErr != nil {
+		return scanErr
+	}
+	summary.MessageArtifactCount = summary.MessageDAGRecordCount
+	summary.MessageCASObjectCount = len(casObjects)
+	return nil
+}
+
+func artifactPathWithinRun(runDir, relativePath string) (string, error) {
+	if relativePath == "" {
+		return "", fmt.Errorf("message artifact path is empty")
+	}
+	if filepath.IsAbs(relativePath) {
+		return "", fmt.Errorf("message artifact path %q must be relative", relativePath)
+	}
+	cleanPath := filepath.Clean(filepath.FromSlash(relativePath))
+	if cleanPath == "." || cleanPath == ".." || strings.HasPrefix(cleanPath, ".."+string(os.PathSeparator)) {
+		return "", fmt.Errorf("message artifact path %q escapes run directory", relativePath)
+	}
+	return filepath.Join(runDir, cleanPath), nil
+}
+
+func rawMessageArtifactFailures(summary RunSummary) []string {
+	var failures []string
+	if summary.EventCounts["raw_message_artifact_emitted"] == 0 {
+		failures = append(failures, "raw_message_artifact_emitted=0 want >0")
+	}
+	if summary.MessageArtifactCount == 0 {
+		failures = append(failures, "message_artifact_count=0 want >0")
+	}
+	if summary.MessageCASObjectCount == 0 {
+		failures = append(failures, "message_cas_object_count=0 want >0")
+	}
+	for _, direction := range []string{"sent", "received", "ack_sent", "ack_received"} {
+		if summary.MessageArtifactDirectionCounts[direction] == 0 {
+			failures = append(failures, "message artifact direction missing: "+direction)
+		}
+	}
+	for _, protocolName := range []string{pcid.KernelReceiveV1, pcid.CASStorageV1, pcid.CIDComputeV1, pcid.RouteV1, pcid.RelationshipV1} {
+		if summary.MessageArtifactProtocolCounts[protocolName] == 0 {
+			failures = append(failures, "message artifact protocol missing: "+protocolName)
 		}
 	}
 	return failures
@@ -790,6 +926,7 @@ func computeProductionFitness(summary RunSummary) ProductionFitnessReport {
 	if len(summary.RPCDriftCounts) > 0 {
 		report.BlockingGaps = append(report.BlockingGaps, "RPC drift terms detected")
 	}
+	report.BlockingGaps = append(report.BlockingGaps, rawMessageArtifactFailures(summary)...)
 	report.ReadyForProduction = len(report.BlockingGaps) == 0
 	if report.ReadyForProduction {
 		report.Verdict = "production-candidate event complete for current POC scope"

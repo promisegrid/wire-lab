@@ -203,6 +203,14 @@ Intent: The live monitor lowered protocol validity because the clean regression 
 Constraints: Do not weaken analyzer hard gates for actual malformed accepted messages, RPC drift, forbidden vocabulary, or missing required events; do not sanitize agent traffic; keep the monitor observer-only and POC-only; preserve structured JSON monitor output.
 Affects: implementations/poc15-multihop-multiarity-dag/decision/live.go; implementations/poc15-multihop-multiarity-dag/decision/live_test.go; protocols/wire-lab.d/TODO/TODO-gogug-poc13-hardening-and-poc14-superset-plan.md.
 
+ID: DI-tuhop
+Date: 2026-06-14 20:26:41
+Status: active
+Decision: POC15 raw message review stores exact PromiseGrid envelope bytes through an observer-only artifact stream, with collector-owned run-scoped files under `/run/poc15/<run_id>/message-cas/<exact_sha256>.cbor` and a `message-dag.jsonl` index.
+Intent: POC15 must let operators inspect actual messages, not only event records about messages. Because app containers must not coordinate through the observer Docker volume, apps emit raw envelope artifacts over stdout to their local supervisor, the supervisor forwards those records to the observer-only collector, and only the collector writes the shared run artifact files. The artifact stream records sent, received, ACK, and receive-promise envelopes by exact bytes so later DAG/parent-link work can compare message CIDs with pCID-owned payload parent fields.
+Constraints: Preserve one top-level semantic action `promise`; do not let artifact storage affect app trust, routing, delivery, or peer behavior; do not mount the observer volume into app containers; keep retention scoped to one clean-run root; encode raw bytes as base64 only inside observer transport records, while persisted artifacts remain binary `.cbor`; use names `MessageArtifact`, `KindMessageArtifact`, `emitMessageArtifact`, `recordMessageArtifact`, `message-cas`, and `message-dag.jsonl`.
+Affects: implementations/poc15-multihop-multiarity-dag/eventstream/; implementations/poc15-multihop-multiarity-dag/cmd/poc15-supervisor/; implementations/poc15-multihop-multiarity-dag/cmd/poc15-event-collector/; implementations/poc15-multihop-multiarity-dag/cmd/poc15-analyze/; implementations/poc15-multihop-multiarity-dag/runtime/; implementations/poc15-multihop-multiarity-dag/README.md; protocols/wire-lab.d/TODO/TODO-gogug-poc13-hardening-and-poc14-superset-plan.md; DEV-GUIDE-RESOURCES.md.
+
 ## Tasks
 
 - [x] gogug.1 Fix POC13 evidence summary mismatch so saved evidence counts include all local non-commitment outcomes, not only receiver-side `not_promised` journal entries.
@@ -259,6 +267,7 @@ Affects: implementations/poc15-multihop-multiarity-dag/decision/live.go; impleme
 - [x] gogug.52 Add POC15 message-shape planning docs for pCID-owned arity, parent-link locations, COSE specimens, and raw artifact CAS.
 - [x] gogug.53 Implement executable POC15 from the POC14 baseline under `implementations/poc15-multihop-multiarity-dag/`.
 - [x] gogug.54 Add POC15 clean-run analyzer gates for `route_v1` multi-hop setup and carried-message delivery.
-- [ ] gogug.55 Add POC15 clean-run analyzer gates for multiarity, parent DAGs, raw CAS retention, COSE validation, advanced route economics, durable/asymmetric routes, and useful routed WASM/stdio work.
+- [ ] gogug.55 Add POC15 clean-run analyzer gates for multiarity, parent DAGs, COSE validation, advanced route economics, durable/asymmetric routes, and useful routed WASM/stdio work.
 - [x] gogug.56 Make peer-kernel delivery wait for configured app receive-promise registration before reporting startup non-commitment.
 - [x] gogug.57 Harden POC15 monitor scoring instructions so intentional negative probes are scored by containment rather than presence.
+- [x] gogug.58 Add POC15 raw message CAS/DAG retention and analyzer gates for operator review of exact envelope bytes.

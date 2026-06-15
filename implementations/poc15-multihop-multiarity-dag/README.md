@@ -16,8 +16,10 @@ CAS, compute, WASM, stdio, event-collector, and analyzer behavior under a
 separate POC15 module path and run root. It now also includes the first
 `route_v1` slice: Alice confirms and uses an Alice->Bob->Carol->Dave route
 through voluntary neighboring route promises. It does not yet implement the
-later POC15 multiarity, parent-link, raw-message-CAS, COSE, durable-route, or
-asymmetric-route behavior described below. Source: `DI-lutuv`; `DI-lihir`.
+later POC15 multiarity, wire-visible parent-link, COSE, durable-route, or
+asymmetric-route behavior described below. It now retains raw message artifacts
+for operator review through an observer-only artifact stream. Source:
+`DI-lutuv`; `DI-lihir`; `DI-tuhop`.
 
 ## Superset Requirement
 
@@ -54,9 +56,9 @@ exception:
    discovery, and return-route tokens.
 6. **pCID-owned multiarity.** POC15 should test pCIDs that define different
    arity, slot order, parent-link location, proof location, and COSE usage.
-7. **Raw message review.** Every raw artifact should be retained in run-scoped
-   CAS for later review, while valid message parent links form a wire-visible
-   causal DAG.
+7. **Raw message review.** Every raw envelope artifact should be retained in
+   run-scoped CAS for later review, while valid message parent links form a
+   wire-visible causal DAG.
 8. **Useful routed WASM/stdio work.** Peggy and Victor should do valuable work
    for other agents over routed paths, not merely prove adapter plumbing exists.
 9. **Kernel as role collection.** POC15 should name transport, app-boundary,
@@ -79,6 +81,23 @@ A route setup is a chain of conditional reciprocal promises:
 
 Each peer owns only its own promise. Bob does not promise that Carol will keep
 Carol's promise, and no peer obtains authority over another peer.
+
+## Raw Message Review
+
+The executable POC15 run now stores exact envelope bytes for operator review.
+Apps do not mount or read the observer volume; instead, each app emits a one-way
+`message_artifact` record to stdout, the local supervisor forwards it to the
+observer-only collector, and the collector writes:
+
+- `/run/poc15/<run_id>/message-cas/<exact_sha256>.cbor` — binary CBOR envelope
+  bytes exactly as sent, received, or acknowledged.
+- `/run/poc15/<run_id>/message-dag.jsonl` — one JSON index row per artifact,
+  including observer, direction, peer, pCID name, exact hash, optional parent
+  exact hash, promise meaning, and relative artifact path.
+
+`poc15-analyze` validates the index by reading each `.cbor` artifact and
+recomputing its exact SHA-256 before the clean regression can pass. Source:
+`DI-tuhop`.
 
 ## Multiarity Specimens
 

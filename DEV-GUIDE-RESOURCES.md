@@ -275,15 +275,19 @@ POC15 pCIDs, and monitor scores of `5/5` after two important corrections: peer
 kernels wait a bounded interval for configured app receive-promise registration
 before reporting startup non-commitment, and the observer-only monitor scores
 deliberate malformed/adversarial probes by containment rather than mere
-presence. The remaining POC15 behavior remains planned delta: useful routed
-WASM/stdio work, more advanced route exclusion through peer promises, an
+presence. POC15 now also sends exact envelope artifacts through the
+observer-only collector and stores binary `.cbor` files plus a
+`message-dag.jsonl` index under the run root, so operators can inspect actual
+messages rather than only event records about messages; the verified clean run
+produced 357 message-DAG rows and 198 exact-byte CAS artifacts. Remaining POC15
+design work includes more advanced route exclusion through peer promises, an
 explicit kernel-as-role-collection model, pCID-owned slot-vector variety,
-run-scoped raw-message CAS/DAG review, wire-visible parent links, COSE
+wire-visible parent links, COSE
 payload/proof specimens, promise-based route economics, bounded route
 durability, asymmetric routes, and transport/session proof pressure. Source:
 `DI-sihuz`; `DI-linof`; `DI-lulof`; `DI-kinaf`; `DI-dubih`; `DI-gahuh`;
 `DI-pamob`; `DI-sivis`; `DI-dirat`; `DI-podut`; `DI-lutuv`; `DI-nivon`;
-`DI-lihir`; `DI-darur`; `DI-daruf`.
+`DI-lihir`; `DI-darur`; `DI-daruf`; `DI-tuhop`.
 
 `poc7` adds executable evidence for promise-shaped capability tokens and local
 exchange: five containers run local kernel boundaries, app-level relays, issuer,
@@ -1470,11 +1474,14 @@ section.
   known POC15 pCIDs, and fixes startup-order false non-commitments by making
   peer kernels wait briefly for configured app receive-promise registration. Its
   observer-only monitor now scores intentional malformed/adversarial probes by
-  containment, not by probe presence. It should be cited as POC event coverage
+  containment, not by probe presence. It also retains exact raw envelope bytes
+  as run-scoped `.cbor` artifacts plus a `message-dag.jsonl` index through the
+  observer-only collector, without mounting the observer volume into app
+  containers. It should be cited as POC event and raw-message artifact coverage
   only, not as a final route, kernel, monitor, WASM/stdio, COSE, parent-DAG, or
   app API.
   Source: `DI-podut`; `DI-lutuv`; `DI-nivon`; `DI-lihir`; `DI-darur`;
-  `DI-daruf`; `TODO-gogug`.
+  `DI-daruf`; `DI-tuhop`; `TODO-gogug`.
 - `protocols/wire-lab.d/archive/migrations/SIM-piloh-turns-149-208-recovery/archive/transports/README.md`
   preserves the old root transport design surface as historical evidence.
 

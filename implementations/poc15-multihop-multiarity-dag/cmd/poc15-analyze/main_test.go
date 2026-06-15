@@ -7,6 +7,7 @@ import (
 
 	"promisegrid.dev/wire-lab/implementations/poc15-multihop-multiarity-dag/decision"
 	"promisegrid.dev/wire-lab/implementations/poc15-multihop-multiarity-dag/pcid"
+	"promisegrid.dev/wire-lab/implementations/poc15-multihop-multiarity-dag/protocol"
 )
 
 func TestAnalyzeRunSummarizesEventsAndMonitorReport(t *testing.T) {
@@ -237,10 +238,52 @@ func TestValidateSummaryRejectsMissingArrayPayloadProtocol(t *testing.T) {
 	}
 }
 
+func TestAnalyzeRunSummarizesRawMessageArtifacts(t *testing.T) {
+	runDir := t.TempDir()
+	rawEnvelope := []byte{0xd9, 0x67, 0x72, 0x69, 0x64, 0x83, 0x01, 0x02, 0x03}
+	exactHash := protocol.HashExactBytes(rawEnvelope)
+	writeFile(t, filepath.Join(runDir, "alice.jsonl"), `{"observer":"alice","event":"raw_message_artifact_emitted","outcome":"kept","peer":"bob","detail":"direction=sent pcid=route_v1 exact_sha256=`+exactHash+`"}`+"\n")
+	writeFile(t, filepath.Join(runDir, "monitor-report.json"), `{"promise_theory_fit":5,"autonomy":5,"protocol_validity":5,"local_trust_correctness":5,"imposition_avoidance":5,"summary":"clean","concerns":[]}`)
+	messageCASDir := filepath.Join(runDir, "message-cas")
+	if err := os.Mkdir(messageCASDir, 0o755); err != nil {
+		t.Fatalf("make message CAS dir: %v", err)
+	}
+	writeBytes(t, filepath.Join(messageCASDir, exactHash+".cbor"), rawEnvelope)
+	writeFile(t, filepath.Join(runDir, "message-dag.jsonl"), `{"source":"alice/agent:alice/stdout","observer":"alice","direction":"sent","peer":"bob","protocol":"route_v1","exact_sha256":"`+exactHash+`","path":"message-cas/`+exactHash+`.cbor"}`+"\n")
+
+	summary, err := analyzeRun(runDir)
+	if err != nil {
+		t.Fatalf("analyze run: %v", err)
+	}
+	if summary.MessageArtifactCount != 1 || summary.MessageCASObjectCount != 1 || summary.MessageDAGRecordCount != 1 {
+		t.Fatalf("message artifact counts not summarized: %#v", summary)
+	}
+	if summary.MessageArtifactDirectionCounts["sent"] != 1 {
+		t.Fatalf("message direction counts not summarized: %#v", summary.MessageArtifactDirectionCounts)
+	}
+	if summary.MessageArtifactProtocolCounts[pcid.RouteV1] != 1 {
+		t.Fatalf("message protocol counts not summarized: %#v", summary.MessageArtifactProtocolCounts)
+	}
+}
+
+func TestValidateSummaryRejectsMissingRawMessageArtifacts(t *testing.T) {
+	summary := cleanRegressionSummary()
+	summary.MessageArtifactCount = 0
+	summary.MessageCASObjectCount = 0
+	summary.MessageDAGRecordCount = 0
+	summary.MessageArtifactDirectionCounts = map[string]int{}
+	summary.MessageArtifactProtocolCounts = map[string]int{}
+	err := validateSummary(summary, cleanRegressionCriteria())
+	if err == nil {
+		t.Fatalf("missing raw message artifacts should fail")
+	}
+}
+
 func cleanRegressionSummary() RunSummary {
 	eventCounts := map[string]int{
 		"fulfillment_workflow_completed":  1,
 		"promise_not_promised_suppressed": 1,
+		"raw_message_artifact_emitted":    1,
 	}
 	for _, eventName := range requiredRegressionEvents() {
 		eventCounts[eventName] = 1
@@ -257,6 +300,7 @@ func cleanRegressionSummary() RunSummary {
 			pcid.CASStorageV1:    1,
 			pcid.CIDComputeV1:    1,
 			pcid.IdentityKeyV1:   1,
+			pcid.RouteV1:         1,
 			pcid.RelationshipV1:  1,
 			pcid.AccountingV1:    1,
 			pcid.UPSLabelV1:      1,
@@ -264,6 +308,22 @@ func cleanRegressionSummary() RunSummary {
 			pcid.PrinterPortV1:   1,
 		},
 		ArrayPayloadProtocolCounts: map[string]int{},
+		MessageArtifactCount:       4,
+		MessageCASObjectCount:      4,
+		MessageDAGRecordCount:      4,
+		MessageArtifactDirectionCounts: map[string]int{
+			"sent":         1,
+			"received":     1,
+			"ack_sent":     1,
+			"ack_received": 1,
+		},
+		MessageArtifactProtocolCounts: map[string]int{
+			pcid.KernelReceiveV1: 1,
+			pcid.CASStorageV1:    1,
+			pcid.CIDComputeV1:    1,
+			pcid.RouteV1:         1,
+			pcid.RelationshipV1:  1,
+		},
 		ShippingCounts: map[string]int{
 			"accounting_updated":                    1,
 			"accounting_update_duplicate":           1,
@@ -291,6 +351,13 @@ func cleanRegressionSummary() RunSummary {
 func writeFile(t *testing.T, path string, content string) {
 	t.Helper()
 	if err := os.WriteFile(path, []byte(content), 0o644); err != nil {
+		t.Fatalf("write %s: %v", path, err)
+	}
+}
+
+func writeBytes(t *testing.T, path string, content []byte) {
+	t.Helper()
+	if err := os.WriteFile(path, content, 0o644); err != nil {
 		t.Fatalf("write %s: %v", path, err)
 	}
 }
