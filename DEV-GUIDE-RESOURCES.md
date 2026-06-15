@@ -266,10 +266,14 @@ network-wide ban or central route policy. `DI-dubih` makes those scenarios
 behavioral inside Alice's local ledger: future Mallory sends are blocked by
 local permanent-distrust state, and route candidates containing Mallory as a
 transit hop are locally rejected. POC15 is now planned under
-`implementations/poc15-multihop/` to add real multi-hop forwarding, useful
-routed WASM/stdio work, route exclusion through peer promises, and an explicit
-kernel-as-role-collection model. Source: `DI-sihuz`; `DI-linof`; `DI-lulof`;
-`DI-kinaf`; `DI-dubih`; `DI-gahuh`; `DI-pamob`; `DI-sivis`; `DI-dirat`.
+`implementations/poc15-multihop-multiarity-dag/` to add real multi-hop
+forwarding, useful routed WASM/stdio work, route exclusion through peer
+promises, an explicit kernel-as-role-collection model, pCID-owned slot-vector
+variety, run-scoped raw-message CAS/DAG review, wire-visible parent links, COSE
+payload/proof specimens, promise-based route economics, bounded route
+durability, asymmetric routes, and transport/session proof pressure. Source:
+`DI-sihuz`; `DI-linof`; `DI-lulof`; `DI-kinaf`; `DI-dubih`; `DI-gahuh`;
+`DI-pamob`; `DI-sivis`; `DI-dirat`; `DI-podut`.
 
 `poc7` adds executable evidence for promise-shaped capability tokens and local
 exchange: five containers run local kernel boundaries, app-level relays, issuer,

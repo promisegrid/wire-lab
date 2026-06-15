@@ -155,6 +155,14 @@ Intent: POC14 should not let agents coordinate through a Docker volume or in-run
 Constraints: Preserve one top-level semantic action `promise`; keep `grid([42(pCID), payload, proof])`; keep analyzer/monitor output as POC-only tooling; do not add global trust, route authority, RPC verbs, permission/conformance language, or a universal payload shape; keep secrets out of config and command lines; keep clean-run state resettable and scoped to the POC run.
 Affects: implementations/poc14-wasm/; DEV-GUIDE-RESOURCES.md; protocols/wire-lab.d/TODO/TODO-gogug-poc13-hardening-and-poc14-superset-plan.md.
 
+ID: DI-podut
+Date: 2026-06-14 18:38:30
+Status: active
+Decision: Rename POC15 to `implementations/poc15-multihop-multiarity-dag/` and expand its planned target from multihop routing alone to multihop forwarding, pCID-owned multiarity, raw-message CAS/DAG review, wire-visible parent links, COSE specimens, promise-based route economics, route durability, asymmetric routes, and transport-vs-envelope proof pressure.
+Intent: POC15 should test the next set of unsettled PromiseGrid design questions together because they interact: multihop route promises need incentives and failure semantics; raw-message review needs exact bytes before parsing; message DAGs need parent links to exact envelope CIDs; pCID-owned slot vectors need specimens that vary arity and slot meaning; COSE may fit as payload or proof; and transport/session signatures prove direct-hop behavior but do not automatically replace durable object-level promise proofs.
+Constraints: Preserve one top-level semantic action `promise`; keep `42(pCID)` as the slot-0 bootstrap; do not introduce route authority, global trust, permission/conformance vocabulary, RPC verbs, central monitoring, or a universal payload shape; keep retention run-scoped for POC clean runs; keep POC15 non-executable until the later implementation pass starts from an explicit executable-scope DI.
+Affects: implementations/poc15-multihop-multiarity-dag/; docs/thought-experiments/TE-vakah-poc15-multihop-multiarity-dag.md; DEV-GUIDE-RESOURCES.md; protocols/wire-lab.d/TODO/TODO-gogug-poc13-hardening-and-poc14-superset-plan.md.
+
 ## Tasks
 
 - [x] gogug.1 Fix POC13 evidence summary mismatch so saved evidence counts include all local non-commitment outcomes, not only receiver-side `not_promised` journal entries.
@@ -205,3 +213,9 @@ Affects: implementations/poc14-wasm/; DEV-GUIDE-RESOURCES.md; protocols/wire-lab
 - [x] gogug.46 Change POC14 clean runs to natural container exit instead of abort-on-container-exit.
 - [x] gogug.47 Migrate all remaining POC14 pCIDs to pCID-owned CBOR array payloads with runtime compatibility projections only.
 - [x] gogug.48 Update POC14 docs, analyzer gates, and run scripts for the no-shared-volume array-payload regression.
+- [x] gogug.49 Rename the POC15 planning directory to `implementations/poc15-multihop-multiarity-dag/`.
+- [x] gogug.50 Write TE-vakah for POC15 multihop, multiarity, raw-message CAS/DAG, parent links, COSE, and proof layering.
+- [x] gogug.51 Expand POC15 docs for promise-based route setup, incentives, durability, asymmetric routes, and failure semantics.
+- [x] gogug.52 Add POC15 message-shape planning docs for pCID-owned arity, parent-link locations, COSE specimens, and raw artifact CAS.
+- [ ] gogug.53 Implement executable POC15 from the POC14 baseline under `implementations/poc15-multihop-multiarity-dag/`.
+- [ ] gogug.54 Add POC15 clean-run analyzer gates for multihop, multiarity, parent DAGs, raw CAS retention, COSE validation, route economics, and useful routed WASM/stdio work.

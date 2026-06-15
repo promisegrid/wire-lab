@@ -33,9 +33,10 @@ superset of prior POCs unless a scoped DI explicitly says otherwise. Source:
   Dave and each keep one useful `cid_compute_v1` promise for Alice so the
   heterogeneous-runtime-adapter agents do more than record runtime-adapter existence.
   Source: `DI-pamob`; `DI-sivis`.
-- POC15 planning lives under `implementations/poc15-multihop/` and should make
-  real multi-hop forwarding and route-exclusion-by-peer-promise executable.
-  Source: `DI-pamob`.
+- POC15 planning lives under `implementations/poc15-multihop-multiarity-dag/`
+  and should make real multi-hop forwarding, route-exclusion-by-peer-promise,
+  pCID-owned multiarity, raw-message DAG review, and parent-link specimens
+  executable. Source: `DI-pamob`; `DI-podut`.
 
 ## Non-Goals
 
