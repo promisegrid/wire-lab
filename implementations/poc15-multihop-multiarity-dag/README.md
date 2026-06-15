@@ -15,11 +15,14 @@ The current executable scaffold preserves inherited POC14 app/kernel, shipping,
 CAS, compute, WASM, stdio, event-collector, and analyzer behavior under a
 separate POC15 module path and run root. It now also includes the first
 `route_v1` slice: Alice confirms and uses an Alice->Bob->Carol->Dave route
-through voluntary neighboring route promises. It does not yet implement the
-later POC15 multiarity, wire-visible parent-link, COSE, durable-route, or
-asymmetric-route behavior described below. It now retains raw message artifacts
-for operator review through an observer-only artifact stream. Source:
-`DI-lutuv`; `DI-lihir`; `DI-tuhop`.
+through voluntary neighboring route promises. It now also emits run-local exact
+CBOR specimens for pCID-owned multiarity, wire-visible parent-link placement,
+COSE-as-payload, COSE-as-proof, and native-proof comparison, then gates those
+specimens in the analyzer. It does not yet implement durable-route,
+asymmetric-route, advanced route-economics, or useful routed WASM/stdio behavior
+as normal app traffic. It retains raw message artifacts for operator review
+through an observer-only artifact stream. Source: `DI-lutuv`; `DI-lihir`;
+`DI-tuhop`; `DI-mosat`.
 
 ## Superset Requirement
 
@@ -61,7 +64,7 @@ exception:
    wire-visible causal DAG.
 8. **Useful routed WASM/stdio work.** Peggy and Victor should do valuable work
    for other agents over routed paths, not merely prove adapter plumbing exists.
-9. **Kernel as role collection.** POC15 should name transport, app-boundary,
+9. **Kernel as role collection.** POC15 should name transport, app-interface,
    routing, local-resource, and event-retention roles explicitly even when the
    Docker runtime collapses some roles into one process.
 
@@ -99,16 +102,29 @@ observer-only collector, and the collector writes:
 recomputing its exact SHA-256 before the clean regression can pass. Source:
 `DI-tuhop`.
 
+`poc15-cbor-diag` is included in the collector image for operator inspection of
+the retained artifacts:
+
+```sh
+docker compose run --rm --entrypoint /usr/local/bin/poc15-cbor-diag \
+  event-collector -hash <exact_sha256>
+```
+
+The tool reads `message-dag.jsonl`, opens the matching
+`message-cas/<exact_sha256>.cbor` artifact, and prints CBOR diagnostic notation
+with nested payload/proof byte strings expanded when they contain valid CBOR.
+It is read-only and does not affect app/kernel behavior. Source: `DI-bapif`.
+
 ## Multiarity Specimens
 
-POC15 should add pCIDs that define these slot-vector specimens:
+POC15 now emits and analyzes pCIDs that define these slot-vector specimens:
 
 - `grid([42(pCID), payload])` for transport/session-auth-only pressure.
 - `grid([42(pCID), payload, proof])` for the current signed-message specimen.
 - `grid([42(pCID), parents, payload, proof])` for envelope parents before body.
 - `grid([42(pCID), payload, parents, proof])` for body before envelope parents.
-- `grid([42(pCID), payload, proof])` where parent links live inside the
-  pCID-owned payload.
+- A payload-owned-parent form remains planned; the current executable parent
+  specimens cover envelope-parent slot placement before and after payload.
 - `grid([42(pCID), cose_sign1])` for COSE-as-payload.
 - `grid([42(pCID), payload, cose_sign1_detached])` for COSE-as-proof.
 
@@ -131,9 +147,11 @@ artifacts, but they are not valid PromiseGrid parent-linked messages.
 
 ## Analyzer Targets
 
-POC15 should add analyzer gates for:
+POC15 analyzer gates now cover the route slice, raw message retention,
+multiarity specimens, parent-link specimen artifacts, COSE payload/proof
+verification, COSE tamper rejection, and an explicit kernel-role profile event.
+Remaining analyzer targets are:
 
-- At least one successful multi-hop route setup and forwarded actual message.
 - At least one forwarding non-commitment due to capacity, trust, pCID support,
   route constraints, or compensation mismatch.
 - At least one one-shot route and one bounded durable route.
@@ -145,18 +163,16 @@ POC15 should add analyzer gates for:
   item.
 - Raw CAS objects for every sent, received, forwarded, ACKed, rejected,
   malformed, decision, monitor, WASM, and stdio artifact.
-- Valid parent DAG reconstruction for envelope-parent and payload-parent
-  specimens.
-- COSE payload and COSE proof validation plus tamper rejection.
-- Parser dispatch by pCID-owned arity and slot semantics.
-- Explicit event that kernel roles are separated or intentionally collapsed for
-  a named runtime.
+- Full parent DAG reconstruction across envelope-parent and payload-parent
+  specimens, not only exact parent hashes in the run index.
+- Parser dispatch by pCID-owned arity and slot semantics in normal app traffic,
+  not only specimen parsing.
 
 ## Planning Docs
 
 - `docs/ROUTE-PROMISES.md` covers promise-based multi-hop forwarding, incentives,
   durability, asymmetric routes, and failure semantics.
-- `docs/KERNEL-ROLES.md` covers the transport, app-boundary, routing,
+- `docs/KERNEL-ROLES.md` covers the transport, app-interface, routing,
   local-resource, and event-retention role split.
 - `docs/MESSAGE-SHAPES.md` covers pCID-owned arity, parent links, COSE specimens,
   transport-session proofs, and raw CAS/DAG review.

@@ -279,11 +279,30 @@ func TestValidateSummaryRejectsMissingRawMessageArtifacts(t *testing.T) {
 	}
 }
 
+func TestValidateSummaryRejectsMissingMessageShapeSpecimens(t *testing.T) {
+	summary := cleanRegressionSummary()
+	summary.EventCounts["message_shape_cose_proof_verified"] = 0
+	err := validateSummary(summary, cleanRegressionCriteria())
+	if err == nil {
+		t.Fatalf("missing message shape specimen coverage should fail")
+	}
+}
+
 func cleanRegressionSummary() RunSummary {
 	eventCounts := map[string]int{
-		"fulfillment_workflow_completed":  1,
-		"promise_not_promised_suppressed": 1,
-		"raw_message_artifact_emitted":    1,
+		"fulfillment_workflow_completed":                 1,
+		"promise_not_promised_suppressed":                1,
+		"raw_message_artifact_emitted":                   1,
+		"message_shape_transport_specimen_emitted":       1,
+		"message_shape_native_proof_specimen_emitted":    1,
+		"message_shape_envelope_parent_specimen_emitted": 1,
+		"message_shape_payload_parent_specimen_emitted":  1,
+		"message_shape_cose_payload_specimen_emitted":    1,
+		"message_shape_cose_proof_specimen_emitted":      1,
+		"message_shape_cose_payload_verified":            1,
+		"message_shape_cose_proof_verified":              1,
+		"message_shape_cose_tamper_rejected":             1,
+		"kernel_role_profile_recorded":                   1,
 	}
 	for _, eventName := range requiredRegressionEvents() {
 		eventCounts[eventName] = 1
@@ -311,19 +330,28 @@ func cleanRegressionSummary() RunSummary {
 		MessageArtifactCount:       4,
 		MessageCASObjectCount:      4,
 		MessageDAGRecordCount:      4,
+		MessageDAGParentLinkCount:  2,
 		MessageArtifactDirectionCounts: map[string]int{
-			"sent":         1,
-			"received":     1,
-			"ack_sent":     1,
-			"ack_received": 1,
+			"sent":           1,
+			"received":       1,
+			"ack_sent":       1,
+			"ack_received":   1,
+			"shape_specimen": 1,
 		},
 		MessageArtifactProtocolCounts: map[string]int{
-			pcid.KernelReceiveV1: 1,
-			pcid.CASStorageV1:    1,
-			pcid.CIDComputeV1:    1,
-			pcid.RouteV1:         1,
-			pcid.RelationshipV1:  1,
+			pcid.KernelReceiveV1:               1,
+			pcid.CASStorageV1:                  1,
+			pcid.CIDComputeV1:                  1,
+			pcid.RouteV1:                       1,
+			pcid.RelationshipV1:                1,
+			pcid.MessageShapeTransportV1:       1,
+			pcid.MessageShapeNativeProofV1:     1,
+			pcid.MessageShapeEnvelopeParentsV1: 1,
+			pcid.MessageShapePayloadParentsV1:  1,
+			pcid.MessageShapeCOSEPayloadV1:     1,
+			pcid.MessageShapeCOSEProofV1:       1,
 		},
+		MessageShapeSpecimenCounts: map[string]int{},
 		ShippingCounts: map[string]int{
 			"accounting_updated":                    1,
 			"accounting_update_duplicate":           1,

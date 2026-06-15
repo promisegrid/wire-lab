@@ -63,6 +63,22 @@ func (writer *cborWriter) writeBytes(value []byte) error {
 	return err
 }
 
+func (writer *cborWriter) writeRawCBOR(value []byte) error {
+	_, err := writer.buffer.Write(value)
+	return err
+}
+
+func (writer *cborWriter) writeSignedInt(value int64) error {
+	if value >= 0 {
+		return writer.writeTypeAndLength(0, uint64(value))
+	}
+	return writer.writeTypeAndLength(1, uint64(-value-1))
+}
+
+func (writer *cborWriter) writeNull() error {
+	return writer.buffer.WriteByte(0xf6)
+}
+
 func (writer *cborWriter) writeString(value string) error {
 	if !utf8.ValidString(value) {
 		return fmt.Errorf("invalid utf8 string")
@@ -120,7 +136,10 @@ func (reader *cborReader) readTypeAndLength(expectedMajor byte) (uint64, error) 
 	if major != expectedMajor {
 		return 0, fmt.Errorf("expected cbor major %d, got %d", expectedMajor, major)
 	}
-	additional := initial & 0x1f
+	return reader.readAdditionalLength(initial & 0x1f)
+}
+
+func (reader *cborReader) readAdditionalLength(additional byte) (uint64, error) {
 	switch additional {
 	case 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23:
 		return uint64(additional), nil
@@ -153,6 +172,31 @@ func (reader *cborReader) readTypeAndLength(expectedMajor byte) (uint64, error) 
 	}
 }
 
+func (reader *cborReader) readSignedInt() (int64, error) {
+	initial, err := reader.readByte()
+	if err != nil {
+		return 0, err
+	}
+	major := initial >> 5
+	if major != 0 && major != 1 {
+		return 0, fmt.Errorf("expected cbor signed int, got major %d", major)
+	}
+	value, lengthErr := reader.readAdditionalLength(initial & 0x1f)
+	if lengthErr != nil {
+		return 0, lengthErr
+	}
+	if major == 0 {
+		if value > uint64(^uint64(0)>>1) {
+			return 0, fmt.Errorf("positive cbor int overflows int64")
+		}
+		return int64(value), nil
+	}
+	if value >= uint64(^uint64(0)>>1) {
+		return 0, fmt.Errorf("negative cbor int overflows int64")
+	}
+	return -1 - int64(value), nil
+}
+
 func (reader *cborReader) readBytes() ([]byte, error) {
 	length, err := reader.readTypeAndLength(2)
 	if err != nil {
@@ -165,6 +209,100 @@ func (reader *cborReader) readBytes() ([]byte, error) {
 	copy(value, reader.data[reader.offset:reader.offset+int(length)])
 	reader.offset += int(length)
 	return value, nil
+}
+
+func (reader *cborReader) readRawItem() ([]byte, error) {
+	startOffset := reader.offset
+	if err := reader.skipItem(); err != nil {
+		return nil, err
+	}
+	value := make([]byte, reader.offset-startOffset)
+	copy(value, reader.data[startOffset:reader.offset])
+	return value, nil
+}
+
+func (reader *cborReader) skipItem() error {
+	initial, err := reader.readByte()
+	if err != nil {
+		return err
+	}
+	major := initial >> 5
+	additional := initial & 0x1f
+	switch major {
+	case 0, 1:
+		_, lengthErr := reader.readAdditionalLength(additional)
+		return lengthErr
+	case 2, 3:
+		length, lengthErr := reader.readAdditionalLength(additional)
+		if lengthErr != nil {
+			return lengthErr
+		}
+		if reader.offset+int(length) > len(reader.data) {
+			return fmt.Errorf("truncated cbor item")
+		}
+		reader.offset += int(length)
+		return nil
+	case 4:
+		length, lengthErr := reader.readAdditionalLength(additional)
+		if lengthErr != nil {
+			return lengthErr
+		}
+		for index := uint64(0); index < length; index++ {
+			if err := reader.skipItem(); err != nil {
+				return err
+			}
+		}
+		return nil
+	case 5:
+		length, lengthErr := reader.readAdditionalLength(additional)
+		if lengthErr != nil {
+			return lengthErr
+		}
+		for index := uint64(0); index < length*2; index++ {
+			if err := reader.skipItem(); err != nil {
+				return err
+			}
+		}
+		return nil
+	case 6:
+		if _, lengthErr := reader.readAdditionalLength(additional); lengthErr != nil {
+			return lengthErr
+		}
+		return reader.skipItem()
+	case 7:
+		switch additional {
+		case 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23:
+			return nil
+		case 24:
+			if reader.offset+1 > len(reader.data) {
+				return fmt.Errorf("truncated cbor simple value")
+			}
+			reader.offset++
+			return nil
+		case 25:
+			if reader.offset+2 > len(reader.data) {
+				return fmt.Errorf("truncated cbor float16")
+			}
+			reader.offset += 2
+			return nil
+		case 26:
+			if reader.offset+4 > len(reader.data) {
+				return fmt.Errorf("truncated cbor float32")
+			}
+			reader.offset += 4
+			return nil
+		case 27:
+			if reader.offset+8 > len(reader.data) {
+				return fmt.Errorf("truncated cbor float64")
+			}
+			reader.offset += 8
+			return nil
+		default:
+			return fmt.Errorf("unsupported cbor simple additional information %d", additional)
+		}
+	default:
+		return fmt.Errorf("unsupported cbor major type %d", major)
+	}
 }
 
 func (reader *cborReader) readString() (string, error) {

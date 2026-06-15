@@ -387,6 +387,10 @@ func (node *Node) runCASComputeWorkflow() error {
 	if err := node.runRoutePromiseWorkflow(); err != nil {
 		return err
 	}
+	if err := node.runMessageShapeSpecimenWorkflow(); err != nil {
+		return err
+	}
+	node.recordMessageShapeSpecimenCoverage()
 	node.recordDecentralizedMonitoringEvents()
 	node.recordMixedVersionPCIDMigrationEvents()
 	node.recordRunInternalRestartEvents()

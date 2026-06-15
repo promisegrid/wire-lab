@@ -14,6 +14,7 @@ RUN go build -o /out/poc15-stdio-worker ./cmd/poc15-stdio-worker
 RUN go build -o /out/poc15-supervisor ./cmd/poc15-supervisor
 RUN go build -o /out/poc15-event-collector ./cmd/poc15-event-collector
 RUN go build -o /out/poc15-analyze ./cmd/poc15-analyze
+RUN go build -o /out/poc15-cbor-diag ./cmd/poc15-cbor-diag
 
 FROM alpine:3.20
 WORKDIR /app
@@ -30,5 +31,6 @@ COPY --from=build /out/poc15-stdio-worker /usr/local/bin/poc15-stdio-worker
 COPY --from=build /out/poc15-supervisor /usr/local/bin/poc15-supervisor
 COPY --from=build /out/poc15-event-collector /usr/local/bin/poc15-event-collector
 COPY --from=build /out/poc15-analyze /usr/local/bin/poc15-analyze
+COPY --from=build /out/poc15-cbor-diag /usr/local/bin/poc15-cbor-diag
 COPY config.json /app/config.json
 ENTRYPOINT ["/usr/local/bin/poc15-supervisor"]

@@ -260,7 +260,7 @@ func (kernel *Kernel) forwardToPeerKernel(target string, frameBytes []byte) ([]b
 			return nil, dialErr
 		}
 		// Intent: Startup DNS/container ordering is a transport readiness issue,
-		// not evidence that the peer refused the promise. Retry only the
+		// not an event showing that the peer refused the promise. Retry only the
 		// peer-kernel dial for a bounded window, then preserve the original
 		// failure as a local route failure. Source: DI-nivon
 		time.Sleep(peerRouteRetryDelay)

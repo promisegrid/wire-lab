@@ -8,7 +8,7 @@ promise boundaries visible. Source: `DI-pamob`.
 
 1. **Transport role:** owns direct TCP framing, peer dialing/listening, send
    failure event, and exact-byte forwarding to a direct peer.
-2. **App-boundary role:** owns local app registration, pCID receive promises, and
+2. **App-interface role:** owns local app registration, pCID receive promises, and
    local delivery queues.
 3. **Routing role:** owns route-promise selection from local events and
    per-hop forwarding promises; it does not own a global route table.
@@ -21,7 +21,7 @@ promise boundaries visible. Source: `DI-pamob`.
 ## First Executable Shape
 
 The first POC15 implementation should prefer separate objects first, then split
-processes only where the boundary matters:
+processes only where the interface matters:
 
 - Keep one local transport process per container if that preserves POC14
   stability.
@@ -29,7 +29,7 @@ processes only where the boundary matters:
   forwarding non-commitment.
 - Keep `printer_port`, CAS, and compute as local-resource app roles with clear
   capability-token and capacity promises.
-- Keep app receive registration as an app-boundary promise rather than making the
+- Keep app receive registration as an app-interface promise rather than making the
   transport role decide app semantics.
 - Add analyzer event that records which roles were split and which were
   intentionally collapsed for the Docker runtime.
@@ -38,6 +38,6 @@ processes only where the boundary matters:
 
 A production node may implement these roles as one daemon, several daemons,
 browser APIs, WASM host functions, firmware functions, or local objects. The
-portable requirement is not the process layout; it is the promise boundary:
+portable requirement is not the process layout; it is the promise interface:
 agents must be able to tell which local role promised transport, app delivery,
 resource access, route selection, and event retention.

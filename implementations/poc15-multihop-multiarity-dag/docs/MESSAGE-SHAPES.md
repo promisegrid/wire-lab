@@ -1,9 +1,9 @@
 # POC15 Message Shapes, Parent Links, COSE, and Raw CAS DAG
 
-POC15 should test that `pCID` really owns arity, slot meaning, signable view,
+POC15 tests that `pCID` really owns arity, slot meaning, signable view,
 proof location, and payload interpretation. The outer invariant remains a CBOR
 `grid(...)` array whose slot 0 is `42(pCID)`, but slots 1..N are defined by the
-protocol spec named by that pCID. Source: `DI-podut`.
+protocol spec named by that pCID. Source: `DI-podut`; `DI-mosat`.
 
 ## Raw Artifact CAS
 
@@ -46,7 +46,7 @@ envelope CIDs so replay and review are byte-faithful.
 
 ## Slot-Vector Specimens
 
-POC15 should add pCIDs for these specimens:
+POC15 now emits exact raw-message specimens for these pCID-owned slot vectors:
 
 1. **Transport/session-auth-only:** `grid([42(pCID), payload])`.
 2. **Common signed message:** `grid([42(pCID), payload, proof])`.
@@ -57,21 +57,25 @@ POC15 should add pCIDs for these specimens:
 6. **COSE as payload:** `grid([42(pCID), cose_sign1])`.
 7. **COSE as proof:** `grid([42(pCID), payload, cose_sign1_detached])`.
 
-Root messages use an empty parent array for specimens with explicit parent
-slots. Parent links use CBOR tag-42 IPLD links where present.
+The current executable slice covers items 1, 2, 3, 4, 6, and 7 as run-local
+operator-review specimens. Payload-owned parent links remain a planned follow-up
+because they require a pCID-specific payload body revision rather than only an
+outer slot-vector specimen. Parent links use CBOR tag-42 IPLD links where
+present.
 
 ## COSE Specimens
 
-POC15 should test COSE in two roles:
+POC15 tests COSE in two roles:
 
 - **COSE-as-payload:** slot 1 is a COSE object, such as `COSE_Sign1`, whose
   payload is the promise body under the pCID's rules.
 - **COSE-as-proof:** a later slot is a detached COSE proof over the pCID-defined
   signable view.
 
-The first executable slice should use EdDSA/Ed25519 and require COSE `alg` in the
-protected header. Analyzer gates should reject wrong algorithms, unprotected
-algorithm-only claims, tampered payloads, and mismatched detached signable views.
+The current executable slice uses EdDSA/Ed25519, requires COSE `alg` in the
+protected header, verifies COSE-as-payload and detached COSE-as-proof specimens,
+and records a tamper rejection. Wrong algorithms, unprotected algorithm-only
+claims, and mismatched detached signable views remain planned negative cases.
 
 ## Transport Proof Versus Message Proof
 
@@ -84,14 +88,15 @@ that semantics and the corresponding transport/session events are present.
 
 ## Analyzer Expectations
 
-The analyzer should report:
+The analyzer now reports and gates the first specimen layer:
 
 - counts by pCID specimen and arity,
 - counts by proof style: native proof, COSE payload, COSE proof,
   transport-auth-only,
-- parent-link counts and DAG reconstruction success,
-- raw CAS object counts by artifact kind,
-- orphaned parent links,
-- malformed artifacts retained before parse failure,
-- events that reference missing raw artifacts,
+- parent-link artifact counts,
+- raw CAS object counts for retained exact message bytes,
 - any accidental return to one universal payload shape.
+
+Full DAG reconstruction, orphaned parent-link detection, raw artifact counts by
+every POC artifact kind, and events that reference missing raw artifacts remain
+planned follow-up gates.

@@ -211,6 +211,22 @@ Intent: POC15 must let operators inspect actual messages, not only event records
 Constraints: Preserve one top-level semantic action `promise`; do not let artifact storage affect app trust, routing, delivery, or peer behavior; do not mount the observer volume into app containers; keep retention scoped to one clean-run root; encode raw bytes as base64 only inside observer transport records, while persisted artifacts remain binary `.cbor`; use names `MessageArtifact`, `KindMessageArtifact`, `emitMessageArtifact`, `recordMessageArtifact`, `message-cas`, and `message-dag.jsonl`.
 Affects: implementations/poc15-multihop-multiarity-dag/eventstream/; implementations/poc15-multihop-multiarity-dag/cmd/poc15-supervisor/; implementations/poc15-multihop-multiarity-dag/cmd/poc15-event-collector/; implementations/poc15-multihop-multiarity-dag/cmd/poc15-analyze/; implementations/poc15-multihop-multiarity-dag/runtime/; implementations/poc15-multihop-multiarity-dag/README.md; protocols/wire-lab.d/TODO/TODO-gogug-poc13-hardening-and-poc14-superset-plan.md; DEV-GUIDE-RESOURCES.md.
 
+ID: DI-bapif
+Date: 2026-06-14 20:57:16
+Status: active
+Decision: POC15 includes a Go-based `poc15-cbor-diag` diagnostic decoder in the collector image for read-only inspection of retained raw CBOR message artifacts.
+Intent: Human review should see CBOR diagnostic structure for exact message bytes, not only hashes, sizes, or event metadata; the tool must not become protocol behavior or agent-visible coordination.
+Constraints: Read files only from an operator-supplied path or run-root query; do not mutate run state; keep the decoder in the POC15 module and final image; avoid adding third-party CBOR dependencies for this POC; render nested payload/proof byte strings when they contain valid CBOR; keep names `poc15-cbor-diag`, `diagnosticDecoder`, and `diagnosticValue`.
+Affects: implementations/poc15-multihop-multiarity-dag/cmd/poc15-cbor-diag/main.go; implementations/poc15-multihop-multiarity-dag/cmd/poc15-cbor-diag/main_test.go; implementations/poc15-multihop-multiarity-dag/Dockerfile; implementations/poc15-multihop-multiarity-dag/README.md; DEV-GUIDE-RESOURCES.md.
+
+ID: DI-mosat
+Date: 2026-06-14 21:51:28
+Status: active
+Decision: Add the next executable POC15 slice as run-local message-shape specimens and analyzer gates for pCID-owned outer arity, wire-visible parent links, COSE-as-payload, COSE-as-proof, and native-proof comparison without changing normal app traffic away from `grid([42(pCID), payload, proof])`.
+Intent: The first POC15 run proved a route slice and raw-message retention, but the POC still only exercised one envelope shape. The next slice should emit exact CBOR specimens into the same observer-only raw-message CAS so operators can inspect the actual bytes, and the analyzer should fail if those specimens disappear. This closes the documented multiarity/parent/COSE coverage gap without pretending the normal app/kernel API has settled on every shape yet.
+Constraints: Preserve one top-level semantic action `promise`; preserve `42(pCID)` in slot 0; keep normal app traffic on the existing signed three-slot envelope until a later DI changes app transport; do not add route authority, global trust, permission/conformance vocabulary, RPC verbs, central monitoring, or a universal payload shape; keep specimen artifacts run-scoped and observer-only; use names `GridSlot`, `ByteStringGridSlot`, `RawCBORGridSlot`, `EncodeGridMessage`, `ParseGridMessage`, `GridMessage`, `COSESign1`, `EncodeCOSESign1`, `VerifyCOSESign1`, `MessageShapeSpecimen`, and `runMessageShapeSpecimenWorkflow`.
+Affects: implementations/poc15-multihop-multiarity-dag/protocol/; implementations/poc15-multihop-multiarity-dag/pcid/registry.go; implementations/poc15-multihop-multiarity-dag/runtime/; implementations/poc15-multihop-multiarity-dag/cmd/poc15-analyze/; implementations/poc15-multihop-multiarity-dag/docs/; implementations/poc15-multihop-multiarity-dag/README.md; DEV-GUIDE-RESOURCES.md; protocols/wire-lab.d/TODO/TODO-gogug-poc13-hardening-and-poc14-superset-plan.md.
+
 ## Tasks
 
 - [x] gogug.1 Fix POC13 evidence summary mismatch so saved evidence counts include all local non-commitment outcomes, not only receiver-side `not_promised` journal entries.
@@ -271,3 +287,5 @@ Affects: implementations/poc15-multihop-multiarity-dag/eventstream/; implementat
 - [x] gogug.56 Make peer-kernel delivery wait for configured app receive-promise registration before reporting startup non-commitment.
 - [x] gogug.57 Harden POC15 monitor scoring instructions so intentional negative probes are scored by containment rather than presence.
 - [x] gogug.58 Add POC15 raw message CAS/DAG retention and analyzer gates for operator review of exact envelope bytes.
+- [x] gogug.59 Add POC15 `poc15-cbor-diag` to the collector image for operator diagnostic-format inspection of raw CBOR artifacts.
+- [x] gogug.60 Add POC15 run-local multiarity, parent-link, COSE payload/proof, native-proof, and COSE tamper-rejection specimen gates.

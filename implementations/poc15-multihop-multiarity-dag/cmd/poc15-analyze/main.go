@@ -48,8 +48,10 @@ type RunSummary struct {
 	MessageArtifactCount           int                     `json:"message_artifact_count"`
 	MessageCASObjectCount          int                     `json:"message_cas_object_count"`
 	MessageDAGRecordCount          int                     `json:"message_dag_record_count"`
+	MessageDAGParentLinkCount      int                     `json:"message_dag_parent_link_count"`
 	MessageArtifactDirectionCounts map[string]int          `json:"message_artifact_direction_counts"`
 	MessageArtifactProtocolCounts  map[string]int          `json:"message_artifact_protocol_counts"`
+	MessageShapeSpecimenCounts     map[string]int          `json:"message_shape_specimen_counts"`
 	MigrationCounts                map[string]int          `json:"migration_counts"`
 	RestartCounts                  map[string]int          `json:"restart_counts"`
 	ForbiddenVocabularyCounts      map[string]int          `json:"forbidden_vocabulary_counts,omitempty"`
@@ -138,6 +140,7 @@ type AcceptanceCriteria struct {
 	RequireRunInternalRestart         bool
 	RequireEventVocabulary            bool
 	RequireRawMessageArtifacts        bool
+	RequireMessageShapeSpecimens      bool
 	MinScoreOverall                   int
 }
 
@@ -200,6 +203,7 @@ func analyzeRun(runDir string) (RunSummary, error) {
 		ArrayPayloadProtocolCounts:     make(map[string]int),
 		MessageArtifactDirectionCounts: make(map[string]int),
 		MessageArtifactProtocolCounts:  make(map[string]int),
+		MessageShapeSpecimenCounts:     make(map[string]int),
 		MigrationCounts:                make(map[string]int),
 		RestartCounts:                  make(map[string]int),
 		ForbiddenVocabularyCounts:      make(map[string]int),
@@ -281,6 +285,7 @@ func cleanRegressionCriteria() AcceptanceCriteria {
 		RequireRunInternalRestart:         true,
 		RequireEventVocabulary:            true,
 		RequireRawMessageArtifacts:        true,
+		RequireMessageShapeSpecimens:      true,
 		MinScoreOverall:                   4,
 	}
 }
@@ -361,6 +366,9 @@ func validateSummary(summary RunSummary, criteria AcceptanceCriteria) error {
 	if criteria.RequireRawMessageArtifacts {
 		failures = append(failures, rawMessageArtifactFailures(summary)...)
 	}
+	if criteria.RequireMessageShapeSpecimens {
+		failures = append(failures, messageShapeSpecimenFailures(summary)...)
+	}
 	if criteria.RequireMonitorReport {
 		if summary.MonitorReport == nil {
 			failures = append(failures, "monitor_report missing")
@@ -439,6 +447,9 @@ func summarizeMessageArtifacts(runDir string, summary *RunSummary) error {
 			return fmt.Errorf("%s:%d: artifact hash mismatch record=%s actual=%s", indexPath, lineNumber, record.ExactSHA256, actualHash)
 		}
 		summary.MessageDAGRecordCount++
+		if record.ParentExactSHA256 != "" {
+			summary.MessageDAGParentLinkCount++
+		}
 		summary.MessageArtifactDirectionCounts[record.Direction]++
 		summary.MessageArtifactProtocolCounts[record.Protocol]++
 		casObjects[record.ExactSHA256] = true
@@ -489,6 +500,38 @@ func rawMessageArtifactFailures(summary RunSummary) []string {
 	return failures
 }
 
+func messageShapeSpecimenFailures(summary RunSummary) []string {
+	var failures []string
+	for _, eventName := range []string{
+		"message_shape_transport_specimen_emitted",
+		"message_shape_native_proof_specimen_emitted",
+		"message_shape_envelope_parent_specimen_emitted",
+		"message_shape_payload_parent_specimen_emitted",
+		"message_shape_cose_payload_specimen_emitted",
+		"message_shape_cose_proof_specimen_emitted",
+		"message_shape_cose_payload_verified",
+		"message_shape_cose_proof_verified",
+		"message_shape_cose_tamper_rejected",
+		"kernel_role_profile_recorded",
+	} {
+		if summary.EventCounts[eventName] == 0 {
+			failures = append(failures, eventName+"=0 want >0")
+		}
+	}
+	if summary.MessageArtifactDirectionCounts["shape_specimen"] == 0 {
+		failures = append(failures, "message artifact direction missing: shape_specimen")
+	}
+	if summary.MessageDAGParentLinkCount < 2 {
+		failures = append(failures, fmt.Sprintf("message_dag_parent_link_count=%d want >=2", summary.MessageDAGParentLinkCount))
+	}
+	for _, protocolName := range messageShapeSpecimenProtocols() {
+		if summary.MessageArtifactProtocolCounts[protocolName] == 0 {
+			failures = append(failures, "message shape artifact protocol missing: "+protocolName)
+		}
+	}
+	return failures
+}
+
 // countMonitorVocabulary adds monitor-report vocabulary findings to the same
 // run summary gate used for JSONL events.
 // Intent: DI-kirat applies to POC development-tool output as well as agent
@@ -518,7 +561,9 @@ func countForbiddenVocabulary(values ...string) int {
 }
 
 func knownProtocolNamesForAnalysis() []string {
-	return []string{pcid.KernelReceiveV1, pcid.CASStorageV1, pcid.CIDComputeV1, pcid.IdentityKeyV1, pcid.RouteV1, pcid.RelationshipV1, pcid.AccountingV1, pcid.UPSLabelV1, pcid.PostalScaleV1, pcid.PrinterPortV1}
+	protocolNames := []string{pcid.KernelReceiveV1, pcid.CASStorageV1, pcid.CIDComputeV1, pcid.IdentityKeyV1, pcid.RouteV1, pcid.RelationshipV1, pcid.AccountingV1, pcid.UPSLabelV1, pcid.PostalScaleV1, pcid.PrinterPortV1}
+	protocolNames = append(protocolNames, messageShapeSpecimenProtocols()...)
+	return protocolNames
 }
 
 func requiredArrayPayloadProtocols() []string {
@@ -526,7 +571,21 @@ func requiredArrayPayloadProtocols() []string {
 	// across relationship, kernel receive, device, CAS, compute, and identity
 	// protocols so field-map payloads cannot remain the implicit target shape.
 	// Source: DI-dirat
-	return knownProtocolNamesForAnalysis()
+	return []string{pcid.KernelReceiveV1, pcid.CASStorageV1, pcid.CIDComputeV1, pcid.IdentityKeyV1, pcid.RouteV1, pcid.RelationshipV1, pcid.AccountingV1, pcid.UPSLabelV1, pcid.PostalScaleV1, pcid.PrinterPortV1}
+}
+
+func messageShapeSpecimenProtocols() []string {
+	// Intent: Specimen pCIDs are analyzed as raw message artifacts, not as app
+	// receive-promise protocols. They pressure outer arity, parent-link, and COSE
+	// parsing without expanding normal app traffic. Source: DI-mosat
+	return []string{
+		pcid.MessageShapeTransportV1,
+		pcid.MessageShapeNativeProofV1,
+		pcid.MessageShapeEnvelopeParentsV1,
+		pcid.MessageShapePayloadParentsV1,
+		pcid.MessageShapeCOSEPayloadV1,
+		pcid.MessageShapeCOSEProofV1,
+	}
 }
 
 func isArrayPayloadEvent(eventName string) bool {
@@ -573,6 +632,9 @@ func summarizeLog(logPath string, summary *RunSummary) error {
 		summary.AgentCounts[event.Observer]++
 		if event.Outcome != "kept" {
 			summary.FailureCounts[event.Event]++
+		}
+		if strings.HasPrefix(event.Event, "message_shape_") {
+			summary.MessageShapeSpecimenCounts[event.Event]++
 		}
 		for _, protocolName := range knownProtocolNamesForAnalysis() {
 			if strings.Contains(event.Detail, "pcid="+protocolName) || strings.Contains(event.Detail, "protocol="+protocolName) {

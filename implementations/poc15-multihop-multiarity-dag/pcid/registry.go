@@ -18,6 +18,13 @@ const (
 	CIDComputeV1    = "cid_compute_v1"
 	IdentityKeyV1   = "identity_key_v1"
 	RouteV1         = "route_v1"
+
+	MessageShapeTransportV1       = "message_shape_transport_v1"
+	MessageShapeNativeProofV1     = "message_shape_native_proof_v1"
+	MessageShapeEnvelopeParentsV1 = "message_shape_envelope_parents_v1"
+	MessageShapePayloadParentsV1  = "message_shape_payload_parents_v1"
+	MessageShapeCOSEPayloadV1     = "message_shape_cose_payload_v1"
+	MessageShapeCOSEProofV1       = "message_shape_cose_proof_v1"
 )
 
 // Registry is the POC15 kernel's local pCID table. It is not a central service
@@ -54,6 +61,12 @@ func NewRegistry() Registry {
 		{CIDComputeV1, "poc15 cid named function compute promise protocol v1"},
 		{IdentityKeyV1, "poc15 identity key rotation promise protocol v1"},
 		{RouteV1, "poc15 multi hop route promise protocol v1"},
+		{MessageShapeTransportV1, "poc15 specimen protocol grid([42(pCID), payload]) transport authenticated message shape v1"},
+		{MessageShapeNativeProofV1, "poc15 specimen protocol grid([42(pCID), payload, proof]) native proof message shape v1"},
+		{MessageShapeEnvelopeParentsV1, "poc15 specimen protocol grid([42(pCID), parents, payload, proof]) envelope parent links message shape v1"},
+		{MessageShapePayloadParentsV1, "poc15 specimen protocol grid([42(pCID), payload, parents, proof]) payload parent links message shape v1"},
+		{MessageShapeCOSEPayloadV1, "poc15 specimen protocol grid([42(pCID), COSE_Sign1]) cose payload message shape v1"},
+		{MessageShapeCOSEProofV1, "poc15 specimen protocol grid([42(pCID), payload, COSE_Sign1_detached]) cose proof message shape v1"},
 	} {
 		registry.register(entry.name, protocol.NewProtocolCID([]byte(entry.spec)))
 	}

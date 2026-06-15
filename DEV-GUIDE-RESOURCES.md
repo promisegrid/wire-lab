@@ -269,25 +269,31 @@ transit hop are locally rejected. POC15 now has an executable scaffold under
 `implementations/poc15-multihop-multiarity-dag/` as a mechanically renamed POC14
 baseline plus a first `route_v1` slice where Alice confirms and uses an
 Alice->Bob->Carol->Dave route through voluntary neighboring app promises. The
-latest clean POC15 run records 2621 events, all analyzer score dimensions at
+latest clean POC15 run records 2961 events, all analyzer score dimensions at
 `5`, empty `rpc_drift_counts`, nonzero array-payload coverage for all known
 POC15 pCIDs, and monitor scores of `5/5` after two important corrections: peer
 kernels wait a bounded interval for configured app receive-promise registration
 before reporting startup non-commitment, and the observer-only monitor scores
 deliberate malformed/adversarial probes by containment rather than mere
-presence. POC15 now also sends exact envelope artifacts through the
+presence. POC15 now also emits run-local exact CBOR specimens for pCID-owned
+outer arity, native proof, envelope-parent slot placement before and after
+payload, COSE-as-payload, COSE-as-proof, and COSE tamper rejection, while leaving
+normal app traffic on the existing signed three-slot envelope until a later DI
+changes that traffic. POC15 now also sends exact envelope artifacts through the
 observer-only collector and stores binary `.cbor` files plus a
 `message-dag.jsonl` index under the run root, so operators can inspect actual
 messages rather than only event records about messages; the verified clean run
-produced 357 message-DAG rows and 198 exact-byte CAS artifacts. Remaining POC15
-design work includes more advanced route exclusion through peer promises, an
-explicit kernel-as-role-collection model, pCID-owned slot-vector variety,
-wire-visible parent links, COSE
-payload/proof specimens, promise-based route economics, bounded route
-durability, asymmetric routes, and transport/session proof pressure. Source:
+produced 355 message-DAG rows and 201 exact-byte CAS artifacts. The collector
+image includes `poc15-cbor-diag` so those retained artifacts can be rendered as
+CBOR diagnostic notation from the run root without mutating run state.
+Remaining POC15 design work includes more advanced route exclusion through peer
+promises, payload-owned parent-link specimens, full parent-DAG reconstruction,
+normal-traffic pCID-owned slot dispatch, promise-based route economics, bounded
+route durability, asymmetric routes, useful routed WASM/stdio work, and
+transport/session proof pressure. Source:
 `DI-sihuz`; `DI-linof`; `DI-lulof`; `DI-kinaf`; `DI-dubih`; `DI-gahuh`;
 `DI-pamob`; `DI-sivis`; `DI-dirat`; `DI-podut`; `DI-lutuv`; `DI-nivon`;
-`DI-lihir`; `DI-darur`; `DI-daruf`; `DI-tuhop`.
+`DI-lihir`; `DI-darur`; `DI-daruf`; `DI-tuhop`; `DI-bapif`; `DI-mosat`.
 
 `poc7` adds executable evidence for promise-shaped capability tokens and local
 exchange: five containers run local kernel boundaries, app-level relays, issuer,
@@ -1477,11 +1483,15 @@ section.
   containment, not by probe presence. It also retains exact raw envelope bytes
   as run-scoped `.cbor` artifacts plus a `message-dag.jsonl` index through the
   observer-only collector, without mounting the observer volume into app
-  containers. It should be cited as POC event and raw-message artifact coverage
-  only, not as a final route, kernel, monitor, WASM/stdio, COSE, parent-DAG, or
-  app API.
+  containers. It now emits and gates exact CBOR message-shape specimens for
+  pCID-owned arity, native proof, envelope-parent slot placement, COSE payload,
+  COSE detached proof, and COSE tamper rejection. The final image includes
+  `poc15-cbor-diag` for read-only CBOR diagnostic rendering of those retained
+  artifacts. It should be cited as POC event, raw-message artifact, and specimen
+  coverage only, not as a final route, kernel, monitor, WASM/stdio,
+  parent-DAG, or app API.
   Source: `DI-podut`; `DI-lutuv`; `DI-nivon`; `DI-lihir`; `DI-darur`;
-  `DI-daruf`; `DI-tuhop`; `TODO-gogug`.
+  `DI-daruf`; `DI-tuhop`; `DI-bapif`; `DI-mosat`; `TODO-gogug`.
 - `protocols/wire-lab.d/archive/migrations/SIM-piloh-turns-149-208-recovery/archive/transports/README.md`
   preserves the old root transport design surface as historical evidence.
 
