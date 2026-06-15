@@ -1,11 +1,23 @@
 # poc15-multihop-multiarity-dag
 
 `poc15-multihop-multiarity-dag` is the planned successor to `poc14-wasm`.
-It is not executable yet. The purpose is to keep POC14 as the regression
-baseline while adding real multi-hop forwarding, pCID-owned slot-vector variety,
+It is executable as a mechanically renamed POC14 baseline so POC15 additions can
+be measured against a known regression floor. The purpose is to preserve POC14
+while adding real multi-hop forwarding, pCID-owned slot-vector variety,
 raw-message CAS/DAG review, wire-visible parent links, COSE specimens, useful
 routed WASM/stdio work, promise-correct route exclusion, route economics, and
-explicit non-monolithic kernel roles. Source: `DI-pamob`; `DI-podut`.
+explicit non-monolithic kernel roles. Source: `DI-pamob`; `DI-podut`;
+`DI-lutuv`.
+
+## Current Executable State
+
+The current executable scaffold preserves inherited POC14 app/kernel, shipping,
+CAS, compute, WASM, stdio, event-collector, and analyzer behavior under a
+separate POC15 module path and run root. It now also includes the first
+`route_v1` slice: Alice confirms and uses an Alice->Bob->Carol->Dave route
+through voluntary neighboring route promises. It does not yet implement the
+later POC15 multiarity, parent-link, raw-message-CAS, COSE, durable-route, or
+asymmetric-route behavior described below. Source: `DI-lutuv`; `DI-lihir`.
 
 ## Superset Requirement
 

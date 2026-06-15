@@ -163,6 +163,46 @@ Intent: POC15 should test the next set of unsettled PromiseGrid design questions
 Constraints: Preserve one top-level semantic action `promise`; keep `42(pCID)` as the slot-0 bootstrap; do not introduce route authority, global trust, permission/conformance vocabulary, RPC verbs, central monitoring, or a universal payload shape; keep retention run-scoped for POC clean runs; keep POC15 non-executable until the later implementation pass starts from an explicit executable-scope DI.
 Affects: implementations/poc15-multihop-multiarity-dag/; docs/thought-experiments/TE-vakah-poc15-multihop-multiarity-dag.md; DEV-GUIDE-RESOURCES.md; protocols/wire-lab.d/TODO/TODO-gogug-poc13-hardening-and-poc14-superset-plan.md.
 
+ID: DI-lutuv
+Date: 2026-06-14 19:04:10
+Status: active
+Decision: Start executable POC15 by copying the POC14 executable baseline into `implementations/poc15-multihop-multiarity-dag/`, renaming module paths, command names, Compose names, config run IDs, and scripts from POC14 to POC15 while preserving the POC15 planning docs already in that directory.
+Intent: The first executable POC15 slice should be a mechanically validated superset baseline before adding new raw-CAS, multihop, multiarity, parent-link, or COSE behavior. Starting from POC14 keeps prior app/kernel, shipping, CAS, compute, WASM, stdio, event collector, and analyzer gates intact so later POC15 additions can be measured as deltas rather than accidental regressions.
+Constraints: Preserve one top-level semantic action `promise`; do not add route authority, global monitoring, RPC verbs, permission/conformance vocabulary, or new protocol behavior in this scaffold slice; keep POC15 run state under `/run/poc15`; keep POC15 clean runs separate from POC14; preserve existing POC15 planning docs; keep secrets out of config and command lines.
+Affects: implementations/poc15-multihop-multiarity-dag/; protocols/wire-lab.d/TODO/TODO-gogug-poc13-hardening-and-poc14-superset-plan.md; DEV-GUIDE-RESOURCES.md.
+
+ID: DI-nivon
+Date: 2026-06-14 19:26:00
+Status: active
+Decision: In POC15, peer-kernel forwarding retries transient peer endpoint dial failures for a short bounded window during clean-run startup.
+Intent: The executable POC15 scaffold should fail on real protocol errors, not on Docker DNS/container startup ordering. Retrying only the peer-kernel dial preserves the promise semantics of the message: the sender still receives the receiver's own kept/not-promised/malformed ACK once the peer kernel is reachable, while a persistent transport failure remains a local kernel route failure.
+Constraints: Do not retry app-level not-promised ACKs, malformed proofs, unsupported pCIDs, or peer trust decisions; keep the retry bounded by the existing peer send timeout; do not add route authority, central discovery, or global readiness coordination; preserve exact envelope bytes across retries.
+Affects: implementations/poc15-multihop-multiarity-dag/kernel/kernel.go; protocols/wire-lab.d/TODO/TODO-gogug-poc13-hardening-and-poc14-superset-plan.md.
+
+ID: DI-lihir
+Date: 2026-06-14 20:09:00
+Status: active
+Decision: Add the first executable POC15 `route_v1` slice as an Alice->Bob->Carol->Dave route setup chain using pCID-owned array payloads, app-level forwarding promises, parent exact-hash fields, and analyzer route gates.
+Intent: POC15 needs real multi-hop behavior before adding more advanced route durability, asymmetric paths, raw-CAS DAGs, COSE, or variable outer arity. The first route slice should prove that neighboring apps voluntarily promise and keep one hop each, that Dave locally promises reachability, and that Alice only treats the route as usable after receiving the returned confirmation chain. This is not a kernel route authority and not a command to forward.
+Constraints: Preserve one top-level semantic action `promise`; keep `route_v1` payload meanings under the pCID; do not add global route tables, route enforcement, permission vocabulary, RPC verbs, or a universal payload shape; route functions are named `runRoutePromiseWorkflow`, `handleRoutePromise`, `routePathParts`, `routePathIndex`, and `routeHopFields`; runtime state remains under `/run/poc15`; analyzer route counts are POC-only run review.
+Affects: implementations/poc15-multihop-multiarity-dag/; protocols/wire-lab.d/TODO/TODO-gogug-poc13-hardening-and-poc14-superset-plan.md; DEV-GUIDE-RESOURCES.md.
+
+ID: DI-darur
+Date: 2026-06-14 19:53:31
+Status: active
+Decision: POC15 peer kernels wait a short bounded window for a config-supported target app to register its local receive promise before synthesizing a kernel `not_promised` ACK.
+Intent: The clean-run failure showed Peggy and Victor reaching Dave's peer kernel before Dave's app had registered `relationship_v1`, so the kernel produced a misleading transport non-commitment for a configured receive promise that was still starting. The kernel should wait only for pCIDs the target app is configured to support, preserving app-level semantic refusals while removing startup-order false negatives.
+Constraints: Do not retry app-level kept/not-promised/malformed ACKs; do not wait for unknown target apps or pCIDs the target app is not configured to support; keep the wait bounded by the existing peer send timeout; preserve exact envelope bytes; do not add global readiness coordination or route authority.
+Affects: implementations/poc15-multihop-multiarity-dag/kernel/kernel.go; protocols/wire-lab.d/TODO/TODO-gogug-poc13-hardening-and-poc14-superset-plan.md.
+
+ID: DI-daruf
+Date: 2026-06-14 20:02:23
+Status: active
+Decision: POC15 monitor scoring instructions must rate deliberate malformed, adversarial, replay, and unsupported-pCID probes by whether agents and kernels contained them correctly, not by whether the probes appeared in the run.
+Intent: The live monitor lowered protocol validity because the clean regression intentionally included malformed/adversarial cases. That makes the monitor gate punish successful negative tests. The monitor should treat protocol validity as high when valid envelopes are accepted, invalid probes are rejected or recorded as non-commitment/malformed, and trust remains local.
+Constraints: Do not weaken analyzer hard gates for actual malformed accepted messages, RPC drift, forbidden vocabulary, or missing required events; do not sanitize agent traffic; keep the monitor observer-only and POC-only; preserve structured JSON monitor output.
+Affects: implementations/poc15-multihop-multiarity-dag/decision/live.go; implementations/poc15-multihop-multiarity-dag/decision/live_test.go; protocols/wire-lab.d/TODO/TODO-gogug-poc13-hardening-and-poc14-superset-plan.md.
+
 ## Tasks
 
 - [x] gogug.1 Fix POC13 evidence summary mismatch so saved evidence counts include all local non-commitment outcomes, not only receiver-side `not_promised` journal entries.
@@ -217,5 +257,8 @@ Affects: implementations/poc15-multihop-multiarity-dag/; docs/thought-experiment
 - [x] gogug.50 Write TE-vakah for POC15 multihop, multiarity, raw-message CAS/DAG, parent links, COSE, and proof layering.
 - [x] gogug.51 Expand POC15 docs for promise-based route setup, incentives, durability, asymmetric routes, and failure semantics.
 - [x] gogug.52 Add POC15 message-shape planning docs for pCID-owned arity, parent-link locations, COSE specimens, and raw artifact CAS.
-- [ ] gogug.53 Implement executable POC15 from the POC14 baseline under `implementations/poc15-multihop-multiarity-dag/`.
-- [ ] gogug.54 Add POC15 clean-run analyzer gates for multihop, multiarity, parent DAGs, raw CAS retention, COSE validation, route economics, and useful routed WASM/stdio work.
+- [x] gogug.53 Implement executable POC15 from the POC14 baseline under `implementations/poc15-multihop-multiarity-dag/`.
+- [x] gogug.54 Add POC15 clean-run analyzer gates for `route_v1` multi-hop setup and carried-message delivery.
+- [ ] gogug.55 Add POC15 clean-run analyzer gates for multiarity, parent DAGs, raw CAS retention, COSE validation, advanced route economics, durable/asymmetric routes, and useful routed WASM/stdio work.
+- [x] gogug.56 Make peer-kernel delivery wait for configured app receive-promise registration before reporting startup non-commitment.
+- [x] gogug.57 Harden POC15 monitor scoring instructions so intentional negative probes are scored by containment rather than presence.
