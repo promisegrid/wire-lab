@@ -58,10 +58,12 @@ POC15 now emits exact raw-message specimens for these pCID-owned slot vectors:
 7. **COSE as proof:** `grid([42(pCID), payload, cose_sign1_detached])`.
 
 The current executable slice covers items 1, 2, 3, 4, 6, and 7 as run-local
-operator-review specimens. Payload-owned parent links remain a planned follow-up
-because they require a pCID-specific payload body revision rather than only an
-outer slot-vector specimen. Parent links use CBOR tag-42 IPLD links where
-present.
+operator-review specimens, and it also exercises item 5 in ordinary `route_v1`
+traffic by carrying a payload parent field that points at an exact prior message
+hash. Normal `route_v1` forwarding can now use envelope-parent slots, while the
+route payload can separately carry payload-owned parent links. Parent links use
+CBOR tag-42 IPLD links where they appear as envelope slots; payload-owned parent
+links remain pCID-defined payload fields in this POC slice. Source: `DI-kohuj`.
 
 ## COSE Specimens
 
@@ -74,8 +76,9 @@ POC15 tests COSE in two roles:
 
 The current executable slice uses EdDSA/Ed25519, requires COSE `alg` in the
 protected header, verifies COSE-as-payload and detached COSE-as-proof specimens,
-and records a tamper rejection. Wrong algorithms, unprotected algorithm-only
-claims, and mismatched detached signable views remain planned negative cases.
+records a tamper rejection, and has unit tests that reject wrong algorithms,
+unprotected-header variants, and mismatched detached payloads. Source:
+`DI-kohuj`.
 
 ## Transport Proof Versus Message Proof
 
@@ -85,6 +88,10 @@ bytes that can survive CAS storage, forwarding, replay, and offline review.
 POC15 should test transport-auth-only messages, but it must not report them as
 self-contained Alice-authored promise objects unless the pCID explicitly defines
 that semantics and the corresponding transport/session events are present.
+The current POC records this as `transport_proof_comparison_recorded`: a
+transport/session signature is useful hop-local context, while the retained
+envelope proof remains the durable object-level promise record for offline CAS
+review unless a future pCID explicitly chooses otherwise. Source: `DI-kohuj`.
 
 ## Analyzer Expectations
 
@@ -97,6 +104,12 @@ The analyzer now reports and gates the first specimen layer:
 - raw CAS object counts for retained exact message bytes,
 - any accidental return to one universal payload shape.
 
-Full DAG reconstruction, orphaned parent-link detection, raw artifact counts by
-every POC artifact kind, and events that reference missing raw artifacts remain
-planned follow-up gates.
+The analyzer now reconstructs the retained raw-message DAG enough to report root
+count, reachable count, maximum depth, missing-parent count, parent-link count,
+and parent-link location counts. Missing parents, non-reachable records, and
+loss of either envelope or payload parent-link coverage fail the clean
+regression. Duplicate observations of the same exact envelope are retained as
+artifact rows, but DAG reachability is judged over unique exact-message hashes
+so retransmits and sender/receiver observations do not look like missing graph
+nodes. Raw artifact counts by every POC artifact kind remain a planned
+follow-up gate. Source: `DI-kohuj`.

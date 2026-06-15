@@ -2,7 +2,7 @@
 
 TE ID: TE-vakah
 ## Status
-decided
+decided, refined
 
 ## Decision under test
 
@@ -140,3 +140,18 @@ The key separation is:
 ## Decision status
 
 Decided by `DI-podut`.
+
+## Refinements
+
+### 2026-06-15 — POC15 convergence slice for normal-traffic route multiarity
+
+`DI-kohuj` implements the next executable comparison implied by this TE without
+changing the TE's original conclusion. The POC now keeps the universal
+`grid([42(pCID), ...])` parse surface while letting `route_v1` use
+`grid([42(pCID), parents, payload, proof])` in selected normal app traffic;
+records payload-owned parent links through `route_v1` payload fields; traverses
+the retained raw-message DAG; models route lifetime, asymmetric response-path
+terms, and reciprocal route credits; carries exact `cid_compute_v1` envelopes to
+Peggy and Victor over `route_v1`; and records that transport/session signatures
+remain hop-local comparison context rather than replacing durable object-level
+envelope proofs.

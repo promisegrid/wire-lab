@@ -47,6 +47,7 @@ type MessageArtifact struct {
 	Protocol            string `json:"protocol"`
 	ExactSHA256         string `json:"exact_sha256"`
 	ParentExactSHA256   string `json:"parent_exact_sha256,omitempty"`
+	ParentLinkLocation  string `json:"parent_link_location,omitempty"`
 	PromiseAbout        string `json:"promise_about,omitempty"`
 	SourceEvent         string `json:"source_event,omitempty"`
 	EnvelopeBytesBase64 string `json:"envelope_bytes_b64"`

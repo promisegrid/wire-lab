@@ -30,6 +30,36 @@ func TestEnvelopeUsesGridTag42AndVerifies(t *testing.T) {
 	}
 }
 
+func TestEnvelopeWithParentSlotsVerifies(t *testing.T) {
+	// Intent: DI-kohuj lets selected pCIDs use normal-traffic parent slots while
+	// preserving the same grid([42(pCID), ...]) invariant and signed signable
+	// view. Source: DI-kohuj
+	protocolCID := NewProtocolCID([]byte("poc15 route parent protocol"))
+	payloadBytes, err := MarshalStringMap(map[string]string{"from": "alice", "to": "bob"})
+	if err != nil {
+		t.Fatalf("payload: %v", err)
+	}
+	parentExact := HashExactBytes([]byte("prior exact envelope"))
+	envelope, err := NewEnvelopeFromPayloadWithParents(protocolCID, payloadBytes, []string{parentExact}, "alice")
+	if err != nil {
+		t.Fatalf("new envelope: %v", err)
+	}
+	envelopeBytes, err := envelope.Bytes()
+	if err != nil {
+		t.Fatalf("envelope bytes: %v", err)
+	}
+	parsed, err := ParseEnvelope(envelopeBytes)
+	if err != nil {
+		t.Fatalf("parse envelope: %v", err)
+	}
+	if len(parsed.ParentExactSHA256s) != 1 || parsed.ParentExactSHA256s[0] != parentExact {
+		t.Fatalf("parents = %#v want %s", parsed.ParentExactSHA256s, parentExact)
+	}
+	if err := VerifyEnvelope(parsed); err != nil {
+		t.Fatalf("verify envelope: %v", err)
+	}
+}
+
 func TestEnvelopeRejectsTampering(t *testing.T) {
 	envelope, err := NewEnvelope(NewProtocolCID([]byte("poc15 tamper protocol")), map[string]string{"kind": "need_advertisement"}, "alice")
 	if err != nil {

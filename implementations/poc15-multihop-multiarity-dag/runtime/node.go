@@ -75,11 +75,12 @@ type Node struct {
 }
 
 type parsedMessage struct {
-	Fields       map[string]string
-	ExactHash    string
-	RawBytes     []byte
-	ProtocolCID  protocol.ProtocolCID
-	ProtocolName string
+	Fields             map[string]string
+	ExactHash          string
+	RawBytes           []byte
+	ProtocolCID        protocol.ProtocolCID
+	ProtocolName       string
+	ParentExactSHA256s []string
 }
 
 // protocolHandlerResult is the app-local handler result for one inbound
@@ -1223,11 +1224,23 @@ func (node *Node) buildEnvelopeFromFields(protocolName string, protocolCID proto
 		return protocol.Envelope{}, false, payloadErr
 	}
 	if arrayPayload {
-		envelope, envelopeErr := protocol.NewEnvelopeFromPayload(protocolCID, payloadBytes, node.Agent.Name)
+		parentExactSHA256s := envelopeParentExactSHA256sForFields(protocolName, fields)
+		envelope, envelopeErr := protocol.NewEnvelopeFromPayloadWithParents(protocolCID, payloadBytes, parentExactSHA256s, node.Agent.Name)
 		return envelope, true, envelopeErr
 	}
 	envelope, envelopeErr := protocol.NewEnvelope(protocolCID, fields, node.Agent.Name)
 	return envelope, false, envelopeErr
+}
+
+func envelopeParentExactSHA256sForFields(protocolName string, fields map[string]string) []string {
+	if protocolName != pcid.RouteV1 {
+		return nil
+	}
+	parentExactSHA256 := strings.TrimSpace(fields["field_envelope_parent_exact_sha256"])
+	if parentExactSHA256 == "" {
+		return nil
+	}
+	return []string{parentExactSHA256}
 }
 
 // sendUnknownProtocolPromise sends a syntactically valid envelope whose pCID is
@@ -1421,12 +1434,22 @@ func (node *Node) parseEnvelope(frameBytes []byte) (parsedMessage, error) {
 	// the parser attaches the locally known protocol name for handlers that still
 	// compare event records across legacy and migrated payloads. Source: DI-gahuh
 	fields["protocol"] = protocolName
+	if len(envelope.ParentExactSHA256s) > 0 {
+		fields["field_envelope_parent_exact_sha256"] = envelope.ParentExactSHA256s[0]
+		if fields["field_parent_exact_sha256"] == "" {
+			fields["field_parent_exact_sha256"] = envelope.ParentExactSHA256s[0]
+		}
+		if fields["field_parent_link_location"] == "" {
+			fields["field_parent_link_location"] = "envelope"
+		}
+	}
 	return parsedMessage{
-		Fields:       fields,
-		ExactHash:    protocol.HashExactBytes(frameBytes),
-		RawBytes:     append([]byte(nil), frameBytes...),
-		ProtocolCID:  envelope.ProtocolCID,
-		ProtocolName: protocolName,
+		Fields:             fields,
+		ExactHash:          protocol.HashExactBytes(frameBytes),
+		RawBytes:           append([]byte(nil), frameBytes...),
+		ProtocolCID:        envelope.ProtocolCID,
+		ProtocolName:       protocolName,
+		ParentExactSHA256s: append([]string(nil), envelope.ParentExactSHA256s...),
 	}, nil
 }
 
@@ -3131,7 +3154,8 @@ func (node *Node) emitMessageArtifact(direction, peer, protocolName string, enve
 		SourceEvent:         "runtime." + direction,
 	}
 	if fields != nil {
-		artifact.ParentExactSHA256 = firstNonEmpty(fields["field_parent_exact_sha256"], fields["parent_exact_sha256"])
+		artifact.ParentExactSHA256 = firstNonEmpty(fields["field_envelope_parent_exact_sha256"], fields["field_payload_parent_exact_sha256"], fields["field_parent_exact_sha256"], fields["parent_exact_sha256"])
+		artifact.ParentLinkLocation = firstNonEmpty(fields["field_parent_link_location"], parentLinkLocationFromFields(fields))
 		artifact.PromiseAbout = firstNonEmpty(fields["field_promise_about"], fields["promise_about"])
 	}
 	record := eventstream.Record{
@@ -3148,6 +3172,19 @@ func (node *Node) emitMessageArtifact(direction, peer, protocolName string, enve
 	fmt.Println(string(recordBytes))
 	node.stdoutMu.Unlock()
 	node.record("raw_message_artifact_emitted", "kept", peer, "direction="+direction+" pcid="+artifactProtocol+" exact_sha256="+artifact.ExactSHA256)
+}
+
+func parentLinkLocationFromFields(fields map[string]string) string {
+	if fields["field_envelope_parent_exact_sha256"] != "" {
+		return "envelope"
+	}
+	if fields["field_payload_parent_exact_sha256"] != "" {
+		return "payload"
+	}
+	if fields["field_parent_exact_sha256"] != "" || fields["parent_exact_sha256"] != "" {
+		return "payload"
+	}
+	return ""
 }
 
 func (node *Node) openLog() error {

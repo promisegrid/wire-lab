@@ -227,6 +227,15 @@ Intent: The first POC15 run proved a route slice and raw-message retention, but 
 Constraints: Preserve one top-level semantic action `promise`; preserve `42(pCID)` in slot 0; keep normal app traffic on the existing signed three-slot envelope until a later DI changes app transport; do not add route authority, global trust, permission/conformance vocabulary, RPC verbs, central monitoring, or a universal payload shape; keep specimen artifacts run-scoped and observer-only; use names `GridSlot`, `ByteStringGridSlot`, `RawCBORGridSlot`, `EncodeGridMessage`, `ParseGridMessage`, `GridMessage`, `COSESign1`, `EncodeCOSESign1`, `VerifyCOSESign1`, `MessageShapeSpecimen`, and `runMessageShapeSpecimenWorkflow`.
 Affects: implementations/poc15-multihop-multiarity-dag/protocol/; implementations/poc15-multihop-multiarity-dag/pcid/registry.go; implementations/poc15-multihop-multiarity-dag/runtime/; implementations/poc15-multihop-multiarity-dag/cmd/poc15-analyze/; implementations/poc15-multihop-multiarity-dag/docs/; implementations/poc15-multihop-multiarity-dag/README.md; DEV-GUIDE-RESOURCES.md; protocols/wire-lab.d/TODO/TODO-gogug-poc13-hardening-and-poc14-superset-plan.md.
 
+ID: DI-kohuj
+Date: 2026-06-15 05:36:48
+Status: active
+Decision: Implement the next POC15 convergence slice by moving pCID-owned multiarity from specimen-only coverage into selected normal route traffic, adding full raw-message DAG traversal, adding route durability/asymmetry/economics/failure events, routing Peggy and Victor through useful route-carried compute promises, adding COSE negative tests, and documenting transport-layer proof pressure without replacing durable envelope proofs.
+Intent: The prior POC15 slice proved byte-level specimens but left normal app traffic mostly on the default three-slot signed envelope. The next slice should make the protocol pressure executable without pretending the final standard is settled: route_v1 is the narrow normal-traffic pCID allowed to use envelope-parent slots now, payload-parent links are exercised through ordinary route-carried promises, route promises become reusable within explicit local lifetime terms, asymmetric response paths are modeled as separate voluntary promises, and transport/session proofs remain hop-local comparison events rather than a replacement for object-level message proofs.
+Constraints: Preserve one top-level semantic action `promise`; preserve `42(pCID)` in slot 0; do not add route authority, global trust, permission/conformance vocabulary, RPC verbs, central monitoring, or a universal payload shape; route durability is a local promise lifetime, not a network lease; route economics are reciprocal credit promises, not imposed payment; Peggy and Victor remain ordinary compute peers whose runtime adapters are local mechanics; transport-layer proof comparison is POC documentation/event pressure only; supersede only the `DI-mosat` constraint that normal app traffic must remain entirely on `grid([42(pCID), payload, proof])`.
+Affects: implementations/poc15-multihop-multiarity-dag/protocol/; implementations/poc15-multihop-multiarity-dag/runtime/; implementations/poc15-multihop-multiarity-dag/cmd/poc15-analyze/; implementations/poc15-multihop-multiarity-dag/docs/; implementations/poc15-multihop-multiarity-dag/README.md; DEV-GUIDE-RESOURCES.md; docs/thought-experiments/TE-vakah-poc15-multihop-multiarity-dag.md; protocols/wire-lab.d/TODO/TODO-gogug-poc13-hardening-and-poc14-superset-plan.md.
+Supersedes: DI-mosat
+
 ## Tasks
 
 - [x] gogug.1 Fix POC13 evidence summary mismatch so saved evidence counts include all local non-commitment outcomes, not only receiver-side `not_promised` journal entries.
@@ -283,9 +292,19 @@ Affects: implementations/poc15-multihop-multiarity-dag/protocol/; implementation
 - [x] gogug.52 Add POC15 message-shape planning docs for pCID-owned arity, parent-link locations, COSE specimens, and raw artifact CAS.
 - [x] gogug.53 Implement executable POC15 from the POC14 baseline under `implementations/poc15-multihop-multiarity-dag/`.
 - [x] gogug.54 Add POC15 clean-run analyzer gates for `route_v1` multi-hop setup and carried-message delivery.
-- [ ] gogug.55 Add POC15 clean-run analyzer gates for multiarity, parent DAGs, COSE validation, advanced route economics, durable/asymmetric routes, and useful routed WASM/stdio work.
+- [x] gogug.55 Add POC15 clean-run analyzer gates for multiarity, parent DAGs, COSE validation, advanced route economics, durable/asymmetric routes, and useful routed WASM/stdio work.
 - [x] gogug.56 Make peer-kernel delivery wait for configured app receive-promise registration before reporting startup non-commitment.
 - [x] gogug.57 Harden POC15 monitor scoring instructions so intentional negative probes are scored by containment rather than presence.
 - [x] gogug.58 Add POC15 raw message CAS/DAG retention and analyzer gates for operator review of exact envelope bytes.
 - [x] gogug.59 Add POC15 `poc15-cbor-diag` to the collector image for operator diagnostic-format inspection of raw CBOR artifacts.
 - [x] gogug.60 Add POC15 run-local multiarity, parent-link, COSE payload/proof, native-proof, and COSE tamper-rejection specimen gates.
+- [x] gogug.61 Make route_v1 normal app traffic use pCID-owned multiarity with envelope-parent slots.
+- [x] gogug.62 Reconstruct and traverse the retained raw-message DAG from CAS artifacts.
+- [x] gogug.63 Promote payload-parent links into an ordinary protocol flow.
+- [x] gogug.64 Add route durability with explicit reusable-route lifetime events.
+- [x] gogug.65 Add asymmetric route setup and response-path handling events.
+- [x] gogug.66 Add forwarding incentives through reciprocal route credit promises.
+- [x] gogug.67 Route Peggy's useful WASM compute work through route_v1.
+- [x] gogug.68 Route Victor's useful stdio compute work through route_v1.
+- [x] gogug.69 Add COSE negative tests for bad algorithm, protected header, and detached payload mismatch.
+- [x] gogug.70 Record the POC15 envelope-proof versus transport-layer signature comparison.

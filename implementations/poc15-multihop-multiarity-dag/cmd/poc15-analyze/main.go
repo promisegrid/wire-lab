@@ -48,9 +48,15 @@ type RunSummary struct {
 	MessageArtifactCount           int                     `json:"message_artifact_count"`
 	MessageCASObjectCount          int                     `json:"message_cas_object_count"`
 	MessageDAGRecordCount          int                     `json:"message_dag_record_count"`
+	MessageDAGNodeCount            int                     `json:"message_dag_node_count"`
 	MessageDAGParentLinkCount      int                     `json:"message_dag_parent_link_count"`
+	MessageDAGRootCount            int                     `json:"message_dag_root_count"`
+	MessageDAGReachableCount       int                     `json:"message_dag_reachable_count"`
+	MessageDAGMaxDepth             int                     `json:"message_dag_max_depth"`
+	MessageDAGMissingParentCount   int                     `json:"message_dag_missing_parent_count"`
 	MessageArtifactDirectionCounts map[string]int          `json:"message_artifact_direction_counts"`
 	MessageArtifactProtocolCounts  map[string]int          `json:"message_artifact_protocol_counts"`
+	MessageDAGParentLocationCounts map[string]int          `json:"message_dag_parent_location_counts"`
 	MessageShapeSpecimenCounts     map[string]int          `json:"message_shape_specimen_counts"`
 	MigrationCounts                map[string]int          `json:"migration_counts"`
 	RestartCounts                  map[string]int          `json:"restart_counts"`
@@ -104,16 +110,17 @@ type ProductionFitnessReport struct {
 // clean run cannot pass by logging message-like events without retaining the
 // messages themselves. Source: DI-tuhop
 type messageDAGRecord struct {
-	Source            string `json:"source"`
-	Observer          string `json:"observer"`
-	Direction         string `json:"direction"`
-	Peer              string `json:"peer"`
-	Protocol          string `json:"protocol"`
-	ExactSHA256       string `json:"exact_sha256"`
-	ParentExactSHA256 string `json:"parent_exact_sha256,omitempty"`
-	PromiseAbout      string `json:"promise_about,omitempty"`
-	SourceEvent       string `json:"source_event,omitempty"`
-	Path              string `json:"path"`
+	Source             string `json:"source"`
+	Observer           string `json:"observer"`
+	Direction          string `json:"direction"`
+	Peer               string `json:"peer"`
+	Protocol           string `json:"protocol"`
+	ExactSHA256        string `json:"exact_sha256"`
+	ParentExactSHA256  string `json:"parent_exact_sha256,omitempty"`
+	ParentLinkLocation string `json:"parent_link_location,omitempty"`
+	PromiseAbout       string `json:"promise_about,omitempty"`
+	SourceEvent        string `json:"source_event,omitempty"`
+	Path               string `json:"path"`
 }
 
 // AcceptanceCriteria describes the event-record gates for a clean POC15 regression
@@ -203,6 +210,7 @@ func analyzeRun(runDir string) (RunSummary, error) {
 		ArrayPayloadProtocolCounts:     make(map[string]int),
 		MessageArtifactDirectionCounts: make(map[string]int),
 		MessageArtifactProtocolCounts:  make(map[string]int),
+		MessageDAGParentLocationCounts: make(map[string]int),
 		MessageShapeSpecimenCounts:     make(map[string]int),
 		MigrationCounts:                make(map[string]int),
 		RestartCounts:                  make(map[string]int),
@@ -426,6 +434,7 @@ func summarizeMessageArtifacts(runDir string, summary *RunSummary) error {
 		}
 	}()
 	casObjects := make(map[string]bool)
+	recordsByHash := make(map[string]messageDAGRecord)
 	scanner := bufio.NewScanner(indexFile)
 	lineNumber := 0
 	for scanner.Scan() {
@@ -449,17 +458,82 @@ func summarizeMessageArtifacts(runDir string, summary *RunSummary) error {
 		summary.MessageDAGRecordCount++
 		if record.ParentExactSHA256 != "" {
 			summary.MessageDAGParentLinkCount++
+			summary.MessageDAGParentLocationCounts[firstNonEmpty(record.ParentLinkLocation, "unspecified")]++
 		}
 		summary.MessageArtifactDirectionCounts[record.Direction]++
 		summary.MessageArtifactProtocolCounts[record.Protocol]++
 		casObjects[record.ExactSHA256] = true
+		recordsByHash[record.ExactSHA256] = record
 	}
 	if scanErr := scanner.Err(); scanErr != nil {
 		return scanErr
 	}
+	summarizeMessageDAGTraversal(recordsByHash, summary)
 	summary.MessageArtifactCount = summary.MessageDAGRecordCount
 	summary.MessageCASObjectCount = len(casObjects)
 	return nil
+}
+
+// summarizeMessageDAGTraversal walks parent links inside the retained
+// raw-message index after collapsing duplicate exact-message artifacts into
+// unique DAG nodes.
+// Intent: POC15 should prove the retained CAS/index can be traversed as a DAG,
+// not only counted as independent files. Missing parents or cycles are POC
+// failures because they make later message-history review unreliable. Source:
+// DI-kohuj
+func summarizeMessageDAGTraversal(recordsByHash map[string]messageDAGRecord, summary *RunSummary) {
+	summary.MessageDAGNodeCount = len(recordsByHash)
+	depthMemo := make(map[string]int, len(recordsByHash))
+	visiting := make(map[string]bool, len(recordsByHash))
+	for exactHash, record := range recordsByHash {
+		if record.ParentExactSHA256 == "" {
+			summary.MessageDAGRootCount++
+		}
+		depth, ok := messageDAGDepth(exactHash, recordsByHash, depthMemo, visiting)
+		if ok {
+			summary.MessageDAGReachableCount++
+			if depth > summary.MessageDAGMaxDepth {
+				summary.MessageDAGMaxDepth = depth
+			}
+		} else {
+			summary.MessageDAGMissingParentCount++
+		}
+	}
+}
+
+func messageDAGDepth(exactHash string, recordsByHash map[string]messageDAGRecord, depthMemo map[string]int, visiting map[string]bool) (int, bool) {
+	if depth, ok := depthMemo[exactHash]; ok {
+		return depth, true
+	}
+	record, ok := recordsByHash[exactHash]
+	if !ok {
+		return 0, false
+	}
+	if record.ParentExactSHA256 == "" {
+		depthMemo[exactHash] = 1
+		return 1, true
+	}
+	if visiting[exactHash] {
+		return 0, false
+	}
+	visiting[exactHash] = true
+	parentDepth, parentOK := messageDAGDepth(record.ParentExactSHA256, recordsByHash, depthMemo, visiting)
+	delete(visiting, exactHash)
+	if !parentOK {
+		return 0, false
+	}
+	depth := parentDepth + 1
+	depthMemo[exactHash] = depth
+	return depth, true
+}
+
+func firstNonEmpty(values ...string) string {
+	for _, value := range values {
+		if strings.TrimSpace(value) != "" {
+			return value
+		}
+	}
+	return ""
 }
 
 func artifactPathWithinRun(runDir, relativePath string) (string, error) {
@@ -486,6 +560,15 @@ func rawMessageArtifactFailures(summary RunSummary) []string {
 	}
 	if summary.MessageCASObjectCount == 0 {
 		failures = append(failures, "message_cas_object_count=0 want >0")
+	}
+	if summary.MessageDAGMissingParentCount != 0 {
+		failures = append(failures, fmt.Sprintf("message_dag_missing_parent_count=%d want 0", summary.MessageDAGMissingParentCount))
+	}
+	if summary.MessageDAGReachableCount != summary.MessageDAGNodeCount {
+		failures = append(failures, fmt.Sprintf("message_dag_reachable_count=%d want node_count=%d", summary.MessageDAGReachableCount, summary.MessageDAGNodeCount))
+	}
+	if summary.MessageDAGMaxDepth < 2 {
+		failures = append(failures, fmt.Sprintf("message_dag_max_depth=%d want >=2", summary.MessageDAGMaxDepth))
 	}
 	for _, direction := range []string{"sent", "received", "ack_sent", "ack_received"} {
 		if summary.MessageArtifactDirectionCounts[direction] == 0 {
@@ -523,6 +606,11 @@ func messageShapeSpecimenFailures(summary RunSummary) []string {
 	}
 	if summary.MessageDAGParentLinkCount < 2 {
 		failures = append(failures, fmt.Sprintf("message_dag_parent_link_count=%d want >=2", summary.MessageDAGParentLinkCount))
+	}
+	for _, location := range []string{"envelope", "payload"} {
+		if summary.MessageDAGParentLocationCounts[location] == 0 {
+			failures = append(failures, "message DAG parent location missing: "+location)
+		}
 	}
 	for _, protocolName := range messageShapeSpecimenProtocols() {
 		if summary.MessageArtifactProtocolCounts[protocolName] == 0 {
@@ -930,6 +1018,26 @@ func requiredRegressionEvents() []string {
 		"route_carried_message_sent",
 		"route_carried_message_received",
 		"route_carried_message_delivered",
+		// Intent: DI-kohuj moves POC15 route pressure beyond one-shot route
+		// specimens: normal route_v1 traffic must now exercise parent slots,
+		// payload parent links, explicit route lifetime, asymmetric response
+		// terms, reciprocal credit, and routed runtime compute. Source: DI-kohuj
+		"route_multiarity_parent_slot_received",
+		"route_payload_parent_link_received",
+		"route_durability_promised",
+		"route_reused_message_sent",
+		"route_reused_message_delivered",
+		"route_asymmetric_response_path_promised",
+		"route_asymmetric_response_path_handled",
+		"route_credit_offered",
+		"route_credit_earned",
+		"route_credit_spent",
+		"route_carried_envelope_validated",
+		"route_runtime_compute_message_sent",
+		"route_runtime_compute_message_delivered",
+		"wasm_routed_compute_result_verified",
+		"stdio_routed_compute_result_verified",
+		"transport_proof_comparison_recorded",
 	}
 }
 
@@ -952,9 +1060,9 @@ func computeScores(summary RunSummary) ScoreReport {
 	// Intent: POC15 adds runtime-adapter and decentralized-monitoring dimensions
 	// without relaxing inherited POC13 storage/compute/trust gates. Source:
 	// DI-linof; DI-lulof
-	addScore(&scores.RuntimeAdapter, summary.EventCounts["wasm_module_instantiated"] > 0 && summary.EventCounts["wasm_export_result_observed"] > 0 && summary.EventCounts["wasm_adapter_ack_received"] > 0 && summary.EventCounts["wasm_useful_work_promised"] > 0 && summary.EventCounts["wasm_compute_result_verified"] > 0 && summary.EventCounts["stdio_cbor_envelope_received"] > 0 && summary.EventCounts["stdio_cbor_ack_event"] > 0 && summary.EventCounts["stdio_adapter_kernel_forwarded"] > 0 && summary.EventCounts["stdio_useful_work_promised"] > 0 && summary.EventCounts["stdio_compute_result_verified"] > 0)
+	addScore(&scores.RuntimeAdapter, summary.EventCounts["wasm_module_instantiated"] > 0 && summary.EventCounts["wasm_export_result_observed"] > 0 && summary.EventCounts["wasm_adapter_ack_received"] > 0 && summary.EventCounts["wasm_useful_work_promised"] > 0 && summary.EventCounts["wasm_compute_result_verified"] > 0 && summary.EventCounts["wasm_routed_compute_result_verified"] > 0 && summary.EventCounts["stdio_cbor_envelope_received"] > 0 && summary.EventCounts["stdio_cbor_ack_event"] > 0 && summary.EventCounts["stdio_adapter_kernel_forwarded"] > 0 && summary.EventCounts["stdio_useful_work_promised"] > 0 && summary.EventCounts["stdio_compute_result_verified"] > 0 && summary.EventCounts["stdio_routed_compute_result_verified"] > 0)
 	addScore(&scores.Monitoring, summary.EventCounts["decentralized_monitoring_model_recorded"] > 0 && summary.EventCounts["bearer_token_exchange_rate_observed"] > 0 && summary.EventCounts["voluntary_gossip_promised"] > 0)
-	addScore(&scores.Route, summary.EventCounts["route_setup_promise_made"] > 0 && summary.EventCounts["route_forward_promise_made"] >= 2 && summary.EventCounts["route_forward_promise_kept"] >= 2 && summary.EventCounts["route_reachability_confirmed"] > 0 && summary.EventCounts["route_carried_message_delivered"] > 0 && summary.ProtocolCounts[pcid.RouteV1] > 0)
+	addScore(&scores.Route, summary.EventCounts["route_setup_promise_made"] > 0 && summary.EventCounts["route_forward_promise_made"] >= 2 && summary.EventCounts["route_forward_promise_kept"] >= 2 && summary.EventCounts["route_reachability_confirmed"] > 0 && summary.EventCounts["route_carried_message_delivered"] > 0 && summary.EventCounts["route_multiarity_parent_slot_received"] > 0 && summary.EventCounts["route_payload_parent_link_received"] > 0 && summary.EventCounts["route_reused_message_delivered"] > 0 && summary.EventCounts["route_asymmetric_response_path_handled"] > 0 && summary.EventCounts["route_credit_earned"] > 0 && summary.ProtocolCounts[pcid.RouteV1] > 0)
 	addScore(&scores.Migration, summary.EventCounts["mixed_version_pcid_migration_promised"] > 0 && summary.EventCounts["mixed_version_successor_pcid_selected"] > 0)
 	addScore(&scores.Restart, summary.EventCounts["run_internal_restart_orchestration_promised"] > 0 && summary.EventCounts["run_internal_restart_recovery_observed"] > 0)
 	scores.Overall = (scores.Transport + scores.Storage + scores.Compute + scores.Economics + scores.Trust + scores.Verification + scores.Replica + scores.Durability + scores.Retention + scores.Pressure + scores.Replay + scores.RuntimeAdapter + scores.Monitoring + scores.Route + scores.Migration + scores.Restart) / 16

@@ -204,7 +204,7 @@
       "motivation": "Show that a sandboxed runtime can keep useful compute promises without host calls becoming RPC commands or trust authority.",
       "initial_peers": ["victor", "alice", "dave"],
       "candidate_peers": ["victor", "alice", "dave", "grace"],
-      "supported_pcids": ["relationship_v1", "cid_compute_v1", "identity_key_v1"],
+      "supported_pcids": ["relationship_v1", "cid_compute_v1", "identity_key_v1", "route_v1"],
       "budget": 3,
       "capacity": 3
     },
@@ -215,7 +215,7 @@
       "motivation": "Show that subprocess-style agents can keep useful compute promises without direct network APIs or RPC command surfaces.",
       "initial_peers": ["peggy", "alice", "dave"],
       "candidate_peers": ["peggy", "alice", "dave", "grace"],
-      "supported_pcids": ["relationship_v1", "cid_compute_v1", "identity_key_v1"],
+      "supported_pcids": ["relationship_v1", "cid_compute_v1", "identity_key_v1", "route_v1"],
       "budget": 3,
       "capacity": 3
     }

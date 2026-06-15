@@ -2,6 +2,7 @@ package protocol
 
 import (
 	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 )
 
@@ -155,4 +156,53 @@ func EncodeTag42LinkArray(cidValues ...[]byte) ([]byte, error) {
 		}
 	}
 	return writer.buffer.Bytes(), nil
+}
+
+// DecodeTag42LinkArray reads the narrow parent-link shape used by POC15 route
+// traffic: an array of DAG-CBOR tag-42 CID links.
+// Intent: Normal route traffic can carry pCID-owned parent slots without making
+// parent links a universal envelope requirement for every pCID. Source:
+// DI-kohuj
+func DecodeTag42LinkArray(arrayBytes []byte) ([][]byte, error) {
+	reader := &cborReader{data: arrayBytes}
+	arrayLength, arrayErr := reader.readTypeAndLength(4)
+	if arrayErr != nil {
+		return nil, arrayErr
+	}
+	cidValues := make([][]byte, 0, int(arrayLength))
+	for linkIndex := uint64(0); linkIndex < arrayLength; linkIndex++ {
+		tagNumber, tagErr := reader.readTypeAndLength(6)
+		if tagErr != nil {
+			return nil, fmt.Errorf("parent link %d: %w", linkIndex, tagErr)
+		}
+		if tagNumber != dagCBORLinkTag {
+			return nil, fmt.Errorf("parent link %d must be tag 42, got tag %d", linkIndex, tagNumber)
+		}
+		tagBytes, bytesErr := reader.readBytes()
+		if bytesErr != nil {
+			return nil, fmt.Errorf("parent link %d: %w", linkIndex, bytesErr)
+		}
+		if len(tagBytes) < 2 || tagBytes[0] != 0x00 {
+			return nil, fmt.Errorf("parent link %d tag 42 payload must start with DAG-CBOR CID sentinel", linkIndex)
+		}
+		cidBytes := make([]byte, len(tagBytes)-1)
+		copy(cidBytes, tagBytes[1:])
+		cidValues = append(cidValues, cidBytes)
+	}
+	if reader.offset != len(reader.data) {
+		return nil, fmt.Errorf("trailing cbor bytes in tag42 link array: %d", len(reader.data)-reader.offset)
+	}
+	return cidValues, nil
+}
+
+// ExactSHA256FromRawCIDV1 returns the hex digest when a POC raw CIDv1 sha2-256
+// link names exact message bytes retained in the run CAS.
+// Intent: Parent links should name exact retained message bytes, not payload
+// bytes or protocol CIDs, so the analyzer can traverse byte-faithful history.
+// Source: DI-kohuj
+func ExactSHA256FromRawCIDV1(cidBytes []byte) (string, bool) {
+	if len(cidBytes) != 36 || cidBytes[0] != 0x01 || cidBytes[1] != 0x55 || cidBytes[2] != 0x12 || cidBytes[3] != 0x20 {
+		return "", false
+	}
+	return hex.EncodeToString(cidBytes[4:]), true
 }

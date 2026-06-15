@@ -406,16 +406,17 @@ func parseDiagnosticValue(data []byte) (diagnosticValue, error) {
 }
 
 type messageDAGRecord struct {
-	Source            string `json:"source"`
-	Observer          string `json:"observer"`
-	Direction         string `json:"direction"`
-	Peer              string `json:"peer"`
-	Protocol          string `json:"protocol"`
-	ExactSHA256       string `json:"exact_sha256"`
-	ParentExactSHA256 string `json:"parent_exact_sha256,omitempty"`
-	PromiseAbout      string `json:"promise_about"`
-	SourceEvent       string `json:"source_event"`
-	Path              string `json:"path"`
+	Source             string `json:"source"`
+	Observer           string `json:"observer"`
+	Direction          string `json:"direction"`
+	Peer               string `json:"peer"`
+	Protocol           string `json:"protocol"`
+	ExactSHA256        string `json:"exact_sha256"`
+	ParentExactSHA256  string `json:"parent_exact_sha256,omitempty"`
+	ParentLinkLocation string `json:"parent_link_location,omitempty"`
+	PromiseAbout       string `json:"promise_about"`
+	SourceEvent        string `json:"source_event"`
+	Path               string `json:"path"`
 }
 
 type hashList []string
@@ -620,6 +621,9 @@ func formatMessageDAGRecord(record messageDAGRecord) string {
 	}
 	if record.ParentExactSHA256 != "" {
 		fields = append(fields, "parent_exact_sha256="+record.ParentExactSHA256)
+	}
+	if record.ParentLinkLocation != "" {
+		fields = append(fields, "parent_link_location="+record.ParentLinkLocation)
 	}
 	return strings.Join(fields, " ")
 }

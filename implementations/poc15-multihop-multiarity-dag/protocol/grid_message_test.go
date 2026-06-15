@@ -1,6 +1,9 @@
 package protocol
 
-import "testing"
+import (
+	"crypto/ed25519"
+	"testing"
+)
 
 func TestGridMessageParsesVariableArity(t *testing.T) {
 	// Intent: POC15 must be able to inspect pCID-owned slot vectors without
@@ -56,7 +59,7 @@ func TestGridMessageAcceptsTransportOnlyShape(t *testing.T) {
 		t.Fatalf("parsed slots=%d want 1", len(parsed.Slots))
 	}
 	if _, parseErr := ParseEnvelope(messageBytes); parseErr == nil {
-		t.Fatalf("legacy ParseEnvelope should still reject non-three-slot traffic")
+		t.Fatalf("ParseEnvelope should still reject transport-only traffic without a proof")
 	}
 }
 
@@ -81,4 +84,106 @@ func TestCOSESign1VerifiesAndRejectsTampering(t *testing.T) {
 	if err := VerifyCOSESign1(tampered, payload, "alice"); err == nil {
 		t.Fatalf("tampered detached COSE should fail verification")
 	}
+}
+
+func TestCOSESign1RejectsWrongAlgorithm(t *testing.T) {
+	protectedHeader, err := testCOSEProtectedHeader(-7)
+	if err != nil {
+		t.Fatalf("protected header: %v", err)
+	}
+	coseBytes, err := testCOSESign1WithHeader([]byte("payload"), protectedHeader, nil)
+	if err != nil {
+		t.Fatalf("encode COSE: %v", err)
+	}
+	if err := VerifyCOSESign1(coseBytes, nil, "alice"); err == nil {
+		t.Fatalf("COSE with wrong protected alg should fail")
+	}
+}
+
+func TestCOSESign1RejectsUnprotectedHeader(t *testing.T) {
+	protectedHeader, err := testCOSEProtectedHeader(coseAlgorithmEdDSA)
+	if err != nil {
+		t.Fatalf("protected header: %v", err)
+	}
+	unprotectedHeader, err := testCOSEUnprotectedHeader()
+	if err != nil {
+		t.Fatalf("unprotected header: %v", err)
+	}
+	coseBytes, err := testCOSESign1WithHeader([]byte("payload"), protectedHeader, unprotectedHeader)
+	if err != nil {
+		t.Fatalf("encode COSE: %v", err)
+	}
+	if err := VerifyCOSESign1(coseBytes, nil, "alice"); err == nil {
+		t.Fatalf("COSE with unprotected header should fail")
+	}
+}
+
+func TestCOSESign1RejectsMismatchedDetachedPayload(t *testing.T) {
+	detached, err := EncodeCOSESign1([]byte("payload-a"), "alice", true)
+	if err != nil {
+		t.Fatalf("encode detached COSE: %v", err)
+	}
+	if err := VerifyCOSESign1(detached, []byte("payload-b"), "alice"); err == nil {
+		t.Fatalf("detached COSE with mismatched payload should fail")
+	}
+}
+
+func testCOSEProtectedHeader(algorithm int64) ([]byte, error) {
+	writer := &cborWriter{}
+	if err := writer.writeMapHeader(1); err != nil {
+		return nil, err
+	}
+	if err := writer.writeSignedInt(coseHeaderAlg); err != nil {
+		return nil, err
+	}
+	if err := writer.writeSignedInt(algorithm); err != nil {
+		return nil, err
+	}
+	return writer.buffer.Bytes(), nil
+}
+
+func testCOSEUnprotectedHeader() ([]byte, error) {
+	writer := &cborWriter{}
+	if err := writer.writeMapHeader(1); err != nil {
+		return nil, err
+	}
+	if err := writer.writeSignedInt(4); err != nil {
+		return nil, err
+	}
+	if err := writer.writeString("kid"); err != nil {
+		return nil, err
+	}
+	return writer.buffer.Bytes(), nil
+}
+
+func testCOSESign1WithHeader(payload, protectedHeader, unprotectedHeader []byte) ([]byte, error) {
+	toSign, signErr := encodeCOSESignatureStructure(protectedHeader, payload)
+	if signErr != nil {
+		return nil, signErr
+	}
+	writer := &cborWriter{}
+	if err := writer.writeTag(coseSign1Tag); err != nil {
+		return nil, err
+	}
+	if err := writer.writeArrayHeader(4); err != nil {
+		return nil, err
+	}
+	if err := writer.writeBytes(protectedHeader); err != nil {
+		return nil, err
+	}
+	if len(unprotectedHeader) == 0 {
+		if err := writer.writeMapHeader(0); err != nil {
+			return nil, err
+		}
+	} else if err := writer.writeRawCBOR(unprotectedHeader); err != nil {
+		return nil, err
+	}
+	if err := writer.writeBytes(payload); err != nil {
+		return nil, err
+	}
+	signature := ed25519.Sign(DeterministicPrivateKey("alice"), toSign)
+	if err := writer.writeBytes(signature); err != nil {
+		return nil, err
+	}
+	return writer.buffer.Bytes(), nil
 }

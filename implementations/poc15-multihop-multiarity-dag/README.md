@@ -18,10 +18,18 @@ separate POC15 module path and run root. It now also includes the first
 through voluntary neighboring route promises. It now also emits run-local exact
 CBOR specimens for pCID-owned multiarity, wire-visible parent-link placement,
 COSE-as-payload, COSE-as-proof, and native-proof comparison, then gates those
-specimens in the analyzer. It does not yet implement durable-route,
-asymmetric-route, advanced route-economics, or useful routed WASM/stdio behavior
-as normal app traffic. It retains raw message artifacts for operator review
-through an observer-only artifact stream. Source: `DI-lutuv`; `DI-lihir`;
+specimens in the analyzer. The current convergence slice also moves
+`route_v1` normal app traffic beyond specimen-only coverage: forwarded route
+traffic can use `grid([42(pCID), parents, payload, proof])`, payload parent
+links are exercised by a route-carried message, Alice reuses a route under an
+explicit local lifetime, asymmetric response-path terms are recorded, route
+credits are promised/earned/spent, and Peggy/Victor receive route-carried
+compute envelopes as useful runtime-adapter work. It retains raw message
+artifacts for operator review through an observer-only artifact stream. A
+validated clean run for this update reconstructs a reachable 230-node
+exact-message DAG from 413
+artifact observations, with parent-link coverage in both envelope slots and
+pCID-defined payload fields. Source: `DI-lutuv`; `DI-lihir`; `DI-kohuj`;
 `DI-tuhop`; `DI-mosat`.
 
 ## Superset Requirement
@@ -99,8 +107,10 @@ observer-only collector, and the collector writes:
   exact hash, promise meaning, and relative artifact path.
 
 `poc15-analyze` validates the index by reading each `.cbor` artifact and
-recomputing its exact SHA-256 before the clean regression can pass. Source:
-`DI-tuhop`.
+recomputing its exact SHA-256 before the clean regression can pass. It traverses
+the unique exact-message DAG rather than double-counting duplicate observations
+of the same message, then fails the clean regression if a valid parent link is
+missing or unreachable. Source: `DI-tuhop`; `DI-kohuj`.
 
 `poc15-cbor-diag` is included in the collector image for operator inspection of
 the retained artifacts:
@@ -123,8 +133,9 @@ POC15 now emits and analyzes pCIDs that define these slot-vector specimens:
 - `grid([42(pCID), payload, proof])` for the current signed-message specimen.
 - `grid([42(pCID), parents, payload, proof])` for envelope parents before body.
 - `grid([42(pCID), payload, parents, proof])` for body before envelope parents.
-- A payload-owned-parent form remains planned; the current executable parent
-  specimens cover envelope-parent slot placement before and after payload.
+- A payload-owned-parent form is also exercised by ordinary `route_v1` payload
+  fields that name prior exact message bytes while the outer route envelope
+  stays in the pCID's chosen slot vector.
 - `grid([42(pCID), cose_sign1])` for COSE-as-payload.
 - `grid([42(pCID), payload, cose_sign1_detached])` for COSE-as-proof.
 
@@ -149,24 +160,21 @@ artifacts, but they are not valid PromiseGrid parent-linked messages.
 
 POC15 analyzer gates now cover the route slice, raw message retention,
 multiarity specimens, parent-link specimen artifacts, COSE payload/proof
-verification, COSE tamper rejection, and an explicit kernel-role profile event.
+verification, COSE tamper rejection, normal-traffic route parent slots,
+payload-parent route links, raw-message DAG traversal, route durability,
+asymmetric response-path handling, reciprocal route credits, useful routed
+Peggy/Victor compute, and an explicit kernel-role profile event.
 Remaining analyzer targets are:
 
 - At least one forwarding non-commitment due to capacity, trust, pCID support,
   route constraints, or compensation mismatch.
-- At least one one-shot route and one bounded durable route.
-- At least one asymmetric reply route.
-- At least one incentive, payment, or reciprocal-token exchange.
 - At least one route-exclusion promise used in route choice and later judged kept
   or broken from Alice's local events.
-- At least one useful routed Peggy work item and one useful routed Victor work
-  item.
 - Raw CAS objects for every sent, received, forwarded, ACKed, rejected,
   malformed, decision, monitor, WASM, and stdio artifact.
-- Full parent DAG reconstruction across envelope-parent and payload-parent
-  specimens, not only exact parent hashes in the run index.
-- Parser dispatch by pCID-owned arity and slot semantics in normal app traffic,
-  not only specimen parsing.
+- Deeper route economics than one reciprocal route credit.
+- True independent asymmetric return-route traffic, not only response-path terms
+  and handling events.
 
 ## Planning Docs
 

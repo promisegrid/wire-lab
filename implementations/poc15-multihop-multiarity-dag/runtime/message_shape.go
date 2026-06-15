@@ -15,10 +15,11 @@ import (
 // making normal app/kernel traffic depend on every experimental shape. Source:
 // DI-mosat
 type MessageShapeSpecimen struct {
-	Name              string
-	ProtocolName      string
-	EnvelopeBytes     []byte
-	ParentExactSHA256 string
+	Name               string
+	ProtocolName       string
+	EnvelopeBytes      []byte
+	ParentExactSHA256  string
+	ParentLinkLocation string
 }
 
 // runMessageShapeSpecimenWorkflow emits exact raw messages for the POC15
@@ -37,6 +38,7 @@ func (node *Node) runMessageShapeSpecimenWorkflow() error {
 		}
 		if specimen.ParentExactSHA256 != "" {
 			fields["field_parent_exact_sha256"] = specimen.ParentExactSHA256
+			fields["field_parent_link_location"] = specimen.ParentLinkLocation
 		}
 		node.emitMessageArtifact("shape_specimen", specimen.Name, specimen.ProtocolName, specimen.EnvelopeBytes, fields)
 		node.record("message_shape_specimen_emitted", "kept", specimen.Name, "pcid="+specimen.ProtocolName+" shape="+specimen.Name+" exact_sha256="+protocol.HashExactBytes(specimen.EnvelopeBytes))
@@ -142,8 +144,8 @@ func (node *Node) messageShapeSpecimens() ([]MessageShapeSpecimen, error) {
 	return []MessageShapeSpecimen{
 		{Name: "transport_payload_only", ProtocolName: pcid.MessageShapeTransportV1, EnvelopeBytes: transportBytes},
 		{Name: "native_payload_proof", ProtocolName: pcid.MessageShapeNativeProofV1, EnvelopeBytes: nativeBytes},
-		{Name: "envelope_parents_payload_proof", ProtocolName: pcid.MessageShapeEnvelopeParentsV1, EnvelopeBytes: envelopeParentBytes, ParentExactSHA256: parentExactHash},
-		{Name: "payload_parents_proof", ProtocolName: pcid.MessageShapePayloadParentsV1, EnvelopeBytes: payloadParentBytes, ParentExactSHA256: parentExactHash},
+		{Name: "envelope_parents_payload_proof", ProtocolName: pcid.MessageShapeEnvelopeParentsV1, EnvelopeBytes: envelopeParentBytes, ParentExactSHA256: parentExactHash, ParentLinkLocation: "envelope"},
+		{Name: "payload_parents_proof", ProtocolName: pcid.MessageShapePayloadParentsV1, EnvelopeBytes: payloadParentBytes, ParentExactSHA256: parentExactHash, ParentLinkLocation: "payload"},
 		{Name: "cose_as_payload", ProtocolName: pcid.MessageShapeCOSEPayloadV1, EnvelopeBytes: cosePayloadBytes},
 		{Name: "cose_as_proof", ProtocolName: pcid.MessageShapeCOSEProofV1, EnvelopeBytes: coseProofBytes},
 	}, nil
@@ -153,4 +155,5 @@ func (node *Node) recordMessageShapeSpecimenCoverage() {
 	node.record("kernel_role_profile_recorded", "kept", "operator", "transport, app-interface, routing, local-resource, and event roles may be split or collapsed by runtime profile")
 	node.record("message_shape_specimen_scope_recorded", "kept", "operator", "specimens are run-local raw artifacts, not receive promises or production APIs")
 	node.record("message_shape_sample_workload_recorded", "kept", "operator", "sample_content_cid="+production.ContentCID(production.SampleContentBytes()))
+	node.record("transport_proof_comparison_recorded", "kept", "operator", "transport/session signatures are hop-local promises; envelope proofs remain durable object-level promise records for retained message bytes")
 }

@@ -255,7 +255,7 @@ func TestAnalyzeRunSummarizesRawMessageArtifacts(t *testing.T) {
 	if err != nil {
 		t.Fatalf("analyze run: %v", err)
 	}
-	if summary.MessageArtifactCount != 1 || summary.MessageCASObjectCount != 1 || summary.MessageDAGRecordCount != 1 {
+	if summary.MessageArtifactCount != 1 || summary.MessageCASObjectCount != 1 || summary.MessageDAGRecordCount != 1 || summary.MessageDAGNodeCount != 1 {
 		t.Fatalf("message artifact counts not summarized: %#v", summary)
 	}
 	if summary.MessageArtifactDirectionCounts["sent"] != 1 {
@@ -263,6 +263,17 @@ func TestAnalyzeRunSummarizesRawMessageArtifacts(t *testing.T) {
 	}
 	if summary.MessageArtifactProtocolCounts[pcid.RouteV1] != 1 {
 		t.Fatalf("message protocol counts not summarized: %#v", summary.MessageArtifactProtocolCounts)
+	}
+}
+
+func TestRawMessageArtifactFailuresCompareReachabilityToUniqueNodes(t *testing.T) {
+	summary := cleanRegressionSummary()
+	summary.MessageDAGRecordCount = 4
+	summary.MessageDAGNodeCount = 2
+	summary.MessageDAGReachableCount = 2
+
+	if failures := rawMessageArtifactFailures(summary); len(failures) != 0 {
+		t.Fatalf("duplicate artifact records should not fail unique-node DAG reachability: %v", failures)
 	}
 }
 
@@ -330,7 +341,11 @@ func cleanRegressionSummary() RunSummary {
 		MessageArtifactCount:       4,
 		MessageCASObjectCount:      4,
 		MessageDAGRecordCount:      4,
+		MessageDAGNodeCount:        4,
 		MessageDAGParentLinkCount:  2,
+		MessageDAGRootCount:        2,
+		MessageDAGReachableCount:   4,
+		MessageDAGMaxDepth:         2,
 		MessageArtifactDirectionCounts: map[string]int{
 			"sent":           1,
 			"received":       1,
@@ -350,6 +365,10 @@ func cleanRegressionSummary() RunSummary {
 			pcid.MessageShapePayloadParentsV1:  1,
 			pcid.MessageShapeCOSEPayloadV1:     1,
 			pcid.MessageShapeCOSEProofV1:       1,
+		},
+		MessageDAGParentLocationCounts: map[string]int{
+			"envelope": 1,
+			"payload":  1,
 		},
 		MessageShapeSpecimenCounts: map[string]int{},
 		ShippingCounts: map[string]int{

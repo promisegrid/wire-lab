@@ -44,16 +44,17 @@ type collector struct {
 // message DAG after a run without treating the event log as the message itself.
 // Source: DI-tuhop
 type messageDAGRecord struct {
-	Source            string `json:"source"`
-	Observer          string `json:"observer"`
-	Direction         string `json:"direction"`
-	Peer              string `json:"peer"`
-	Protocol          string `json:"protocol"`
-	ExactSHA256       string `json:"exact_sha256"`
-	ParentExactSHA256 string `json:"parent_exact_sha256,omitempty"`
-	PromiseAbout      string `json:"promise_about,omitempty"`
-	SourceEvent       string `json:"source_event,omitempty"`
-	Path              string `json:"path"`
+	Source             string `json:"source"`
+	Observer           string `json:"observer"`
+	Direction          string `json:"direction"`
+	Peer               string `json:"peer"`
+	Protocol           string `json:"protocol"`
+	ExactSHA256        string `json:"exact_sha256"`
+	ParentExactSHA256  string `json:"parent_exact_sha256,omitempty"`
+	ParentLinkLocation string `json:"parent_link_location,omitempty"`
+	PromiseAbout       string `json:"promise_about,omitempty"`
+	SourceEvent        string `json:"source_event,omitempty"`
+	Path               string `json:"path"`
 }
 
 func main() {
@@ -225,16 +226,17 @@ func (runCollector *collector) recordMessageArtifact(source string, artifact eve
 	artifactPath := filepath.Join(casDir, artifact.ExactSHA256+".cbor")
 	indexPath := filepath.Join(runDir, "message-dag.jsonl")
 	indexRecord := messageDAGRecord{
-		Source:            source,
-		Observer:          artifact.Observer,
-		Direction:         artifact.Direction,
-		Peer:              artifact.Peer,
-		Protocol:          artifact.Protocol,
-		ExactSHA256:       artifact.ExactSHA256,
-		ParentExactSHA256: artifact.ParentExactSHA256,
-		PromiseAbout:      artifact.PromiseAbout,
-		SourceEvent:       artifact.SourceEvent,
-		Path:              filepath.ToSlash(filepath.Join("message-cas", artifact.ExactSHA256+".cbor")),
+		Source:             source,
+		Observer:           artifact.Observer,
+		Direction:          artifact.Direction,
+		Peer:               artifact.Peer,
+		Protocol:           artifact.Protocol,
+		ExactSHA256:        artifact.ExactSHA256,
+		ParentExactSHA256:  artifact.ParentExactSHA256,
+		ParentLinkLocation: artifact.ParentLinkLocation,
+		PromiseAbout:       artifact.PromiseAbout,
+		SourceEvent:        artifact.SourceEvent,
+		Path:               filepath.ToSlash(filepath.Join("message-cas", artifact.ExactSHA256+".cbor")),
 	}
 	indexBytes, marshalErr := json.Marshal(indexRecord)
 	if marshalErr != nil {

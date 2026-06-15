@@ -80,9 +80,10 @@ type Proof struct {
 // Intent: The LLM can influence payload semantics, but Go owns the CBOR grid
 // envelope and exact-byte signature mechanics. Source: DI-timah
 type Envelope struct {
-	ProtocolCID ProtocolCID
-	Payload     []byte
-	Proof       Proof
+	ProtocolCID        ProtocolCID
+	Payload            []byte
+	Proof              Proof
+	ParentExactSHA256s []string
 }
 
 // NewEnvelope builds a legacy map payload and signs the envelope's two-slot
@@ -102,9 +103,19 @@ func NewEnvelope(protocolCID ProtocolCID, fields map[string]string, signer strin
 // Intent: The envelope layer must not impose one universal payload shape; the
 // pCID spec owns the bytes in slot 1. Source: DI-vipih
 func NewEnvelopeFromPayload(protocolCID ProtocolCID, payloadBytes []byte, signer string) (Envelope, error) {
+	return NewEnvelopeFromPayloadWithParents(protocolCID, payloadBytes, nil, signer)
+}
+
+// NewEnvelopeFromPayloadWithParents signs an already-encoded pCID-owned payload
+// with optional envelope-parent links.
+// Intent: DI-kohuj moves route_v1 parent-link pressure into ordinary traffic
+// while keeping parent slots pCID-owned rather than universal. Source: DI-kohuj
+func NewEnvelopeFromPayloadWithParents(protocolCID ProtocolCID, payloadBytes []byte, parentExactSHA256s []string, signer string) (Envelope, error) {
 	copiedPayload := make([]byte, len(payloadBytes))
 	copy(copiedPayload, payloadBytes)
-	envelope := Envelope{ProtocolCID: protocolCID, Payload: copiedPayload}
+	copiedParents := make([]string, len(parentExactSHA256s))
+	copy(copiedParents, parentExactSHA256s)
+	envelope := Envelope{ProtocolCID: protocolCID, Payload: copiedPayload, ParentExactSHA256s: copiedParents}
 	proof, proofErr := SignEnvelope(envelope, signer)
 	if proofErr != nil {
 		return Envelope{}, proofErr
@@ -113,122 +124,178 @@ func NewEnvelopeFromPayload(protocolCID ProtocolCID, payloadBytes []byte, signer
 	return envelope, nil
 }
 
-// SignableBytes serializes grid([42(pCID), payload]) for proof generation.
+// SignableBytes serializes the pCID-defined signable view for proof generation.
+// Intent: Parent slots must be covered by the durable envelope proof when a pCID
+// chooses to place parent links outside the payload. Source: DI-kohuj
 func (envelope Envelope) SignableBytes() ([]byte, error) {
-	writer := &cborWriter{}
-	if err := writer.writeTag(gridTag); err != nil {
-		return nil, err
+	payloadSlot, payloadSlotErr := ByteStringGridSlot(envelope.Payload)
+	if payloadSlotErr != nil {
+		return nil, payloadSlotErr
 	}
-	if err := writer.writeArrayHeader(2); err != nil {
-		return nil, err
+	if len(envelope.ParentExactSHA256s) == 0 {
+		return EncodeGridMessage(envelope.ProtocolCID, payloadSlot)
 	}
-	if err := writer.writeTag(dagCBORLinkTag); err != nil {
-		return nil, err
+	parentSlot, parentSlotErr := parentExactSHA256GridSlot(envelope.ParentExactSHA256s)
+	if parentSlotErr != nil {
+		return nil, parentSlotErr
 	}
-	if err := writer.writeBytes(envelope.ProtocolCID.Tag42Bytes()); err != nil {
-		return nil, err
-	}
-	if err := writer.writeBytes(envelope.Payload); err != nil {
-		return nil, err
-	}
-	return writer.buffer.Bytes(), nil
+	return EncodeGridMessage(envelope.ProtocolCID, parentSlot, payloadSlot)
 }
 
-// Bytes serializes the complete signed envelope as grid([42(pCID), payload, proof]).
-func (envelope Envelope) Bytes() ([]byte, error) {
-	proofBytes, proofErr := MarshalStringMap(map[string]string{
+func parentExactSHA256GridSlot(parentExactSHA256s []string) (GridSlot, error) {
+	parentCIDs := make([][]byte, 0, len(parentExactSHA256s))
+	for _, parentExactSHA256 := range parentExactSHA256s {
+		parentDigest, decodeErr := hex.DecodeString(parentExactSHA256)
+		if decodeErr != nil {
+			return GridSlot{}, decodeErr
+		}
+		if len(parentDigest) != sha256.Size {
+			return GridSlot{}, fmt.Errorf("parent exact sha256 must be %d bytes, got %d", sha256.Size, len(parentDigest))
+		}
+		cidBytes := make([]byte, 0, 36)
+		cidBytes = append(cidBytes, 0x01, 0x55, 0x12, 0x20)
+		cidBytes = append(cidBytes, parentDigest...)
+		parentCIDs = append(parentCIDs, cidBytes)
+	}
+	parentArrayBytes, parentArrayErr := EncodeTag42LinkArray(parentCIDs...)
+	if parentArrayErr != nil {
+		return GridSlot{}, parentArrayErr
+	}
+	return RawCBORGridSlot(parentArrayBytes), nil
+}
+
+func decodeParentExactSHA256s(slot GridSlot) ([]string, error) {
+	parentCIDs, parentErr := DecodeTag42LinkArray(slot.RawCBOR)
+	if parentErr != nil {
+		return nil, parentErr
+	}
+	parentExactSHA256s := make([]string, 0, len(parentCIDs))
+	for _, parentCID := range parentCIDs {
+		parentExactSHA256, ok := ExactSHA256FromRawCIDV1(parentCID)
+		if !ok {
+			return nil, fmt.Errorf("parent link must be CIDv1 raw sha2-256")
+		}
+		parentExactSHA256s = append(parentExactSHA256s, parentExactSHA256)
+	}
+	return parentExactSHA256s, nil
+}
+
+func proofBytesForEnvelope(envelope Envelope) ([]byte, error) {
+	return MarshalStringMap(map[string]string{
 		"signer":     envelope.Proof.Signer,
 		"public_key": hex.EncodeToString(envelope.Proof.PublicKey),
 		"signature":  hex.EncodeToString(envelope.Proof.Signature),
 	})
-	if proofErr != nil {
-		return nil, proofErr
-	}
-	writer := &cborWriter{}
-	if err := writer.writeTag(gridTag); err != nil {
-		return nil, err
-	}
-	if err := writer.writeArrayHeader(3); err != nil {
-		return nil, err
-	}
-	if err := writer.writeTag(dagCBORLinkTag); err != nil {
-		return nil, err
-	}
-	if err := writer.writeBytes(envelope.ProtocolCID.Tag42Bytes()); err != nil {
-		return nil, err
-	}
-	if err := writer.writeBytes(envelope.Payload); err != nil {
-		return nil, err
-	}
-	if err := writer.writeBytes(proofBytes); err != nil {
-		return nil, err
-	}
-	return writer.buffer.Bytes(), nil
 }
 
-// ParseEnvelope parses grid([42(pCID), payload, proof]).
-func ParseEnvelope(envelopeBytes []byte) (Envelope, error) {
-	reader := &cborReader{data: envelopeBytes}
-	outerTag, outerTagErr := reader.readTypeAndLength(6)
-	if outerTagErr != nil {
-		return Envelope{}, outerTagErr
-	}
-	if outerTag != gridTag {
-		return Envelope{}, fmt.Errorf("outer envelope must be grid tag %d, got tag %d", gridTag, outerTag)
-	}
-	arrayLength, arrayErr := reader.readTypeAndLength(4)
-	if arrayErr != nil {
-		return Envelope{}, arrayErr
-	}
-	if arrayLength != 3 {
-		return Envelope{}, fmt.Errorf("poc15 envelope must have three slots, got %d", arrayLength)
-	}
-	tagNumber, tagErr := reader.readTypeAndLength(6)
-	if tagErr != nil {
-		return Envelope{}, tagErr
-	}
-	if tagNumber != dagCBORLinkTag {
-		return Envelope{}, fmt.Errorf("slot 0 must be tag 42, got tag %d", tagNumber)
-	}
-	tagBytes, tagBytesErr := reader.readBytes()
-	if tagBytesErr != nil {
-		return Envelope{}, tagBytesErr
-	}
-	if len(tagBytes) < 2 || tagBytes[0] != 0x00 {
-		return Envelope{}, fmt.Errorf("tag 42 payload must start with DAG-CBOR CID sentinel")
-	}
-	payloadBytes, payloadErr := reader.readBytes()
-	if payloadErr != nil {
-		return Envelope{}, payloadErr
-	}
-	proofBytes, proofErr := reader.readBytes()
-	if proofErr != nil {
-		return Envelope{}, proofErr
-	}
-	if reader.offset != len(reader.data) {
-		return Envelope{}, fmt.Errorf("trailing cbor bytes in envelope: %d", len(reader.data)-reader.offset)
-	}
+func proofFromBytes(proofBytes []byte) (Proof, error) {
 	proofFields, fieldsErr := UnmarshalStringMap(proofBytes)
 	if fieldsErr != nil {
-		return Envelope{}, fieldsErr
+		return Proof{}, fieldsErr
 	}
 	publicKey, publicErr := hex.DecodeString(proofFields["public_key"])
 	if publicErr != nil {
-		return Envelope{}, publicErr
+		return Proof{}, publicErr
 	}
 	signature, signatureErr := hex.DecodeString(proofFields["signature"])
 	if signatureErr != nil {
-		return Envelope{}, signatureErr
+		return Proof{}, signatureErr
 	}
-	return Envelope{
-		ProtocolCID: NewProtocolCIDFromBytes(tagBytes[1:]),
-		Payload:     payloadBytes,
-		Proof: Proof{
-			Signer:    proofFields["signer"],
-			PublicKey: publicKey,
-			Signature: signature,
-		},
+	return Proof{
+		Signer:    proofFields["signer"],
+		PublicKey: publicKey,
+		Signature: signature,
 	}, nil
+}
+
+func gridByteStringSlot(slot GridSlot, name string) ([]byte, error) {
+	value, ok := slot.ByteString()
+	if !ok {
+		return nil, fmt.Errorf("%s must be a byte string", name)
+	}
+	return value, nil
+}
+
+func envelopeFromGridMessage(gridMessage GridMessage) (Envelope, error) {
+	switch len(gridMessage.Slots) {
+	case 2:
+		payloadBytes, payloadErr := gridByteStringSlot(gridMessage.Slots[0], "payload slot")
+		if payloadErr != nil {
+			return Envelope{}, payloadErr
+		}
+		proofBytes, proofErr := gridByteStringSlot(gridMessage.Slots[1], "proof slot")
+		if proofErr != nil {
+			return Envelope{}, proofErr
+		}
+		proof, decodeErr := proofFromBytes(proofBytes)
+		if decodeErr != nil {
+			return Envelope{}, decodeErr
+		}
+		return Envelope{ProtocolCID: gridMessage.ProtocolCID, Payload: payloadBytes, Proof: proof}, nil
+	case 3:
+		parentExactSHA256s, parentErr := decodeParentExactSHA256s(gridMessage.Slots[0])
+		if parentErr != nil {
+			return Envelope{}, parentErr
+		}
+		payloadBytes, payloadErr := gridByteStringSlot(gridMessage.Slots[1], "payload slot")
+		if payloadErr != nil {
+			return Envelope{}, payloadErr
+		}
+		proofBytes, proofErr := gridByteStringSlot(gridMessage.Slots[2], "proof slot")
+		if proofErr != nil {
+			return Envelope{}, proofErr
+		}
+		proof, decodeErr := proofFromBytes(proofBytes)
+		if decodeErr != nil {
+			return Envelope{}, decodeErr
+		}
+		return Envelope{ProtocolCID: gridMessage.ProtocolCID, Payload: payloadBytes, Proof: proof, ParentExactSHA256s: parentExactSHA256s}, nil
+	default:
+		return Envelope{}, fmt.Errorf("poc15 envelope must have payload/proof or parents/payload/proof slots, got %d protocol-defined slots", len(gridMessage.Slots))
+	}
+}
+
+// Bytes serializes the complete signed envelope using the slot shape selected by
+// this envelope's pCID-owned parent-link state.
+// Intent: Preserve the common grid([42(pCID), payload, proof]) shape for most
+// traffic while allowing selected pCIDs to exercise
+// grid([42(pCID), parents, payload, proof]) in normal POC15 traffic. Source:
+// DI-kohuj
+func (envelope Envelope) Bytes() ([]byte, error) {
+	proofBytes, proofErr := proofBytesForEnvelope(envelope)
+	if proofErr != nil {
+		return nil, proofErr
+	}
+	payloadSlot, payloadSlotErr := ByteStringGridSlot(envelope.Payload)
+	if payloadSlotErr != nil {
+		return nil, payloadSlotErr
+	}
+	proofSlot, proofSlotErr := ByteStringGridSlot(proofBytes)
+	if proofSlotErr != nil {
+		return nil, proofSlotErr
+	}
+	if len(envelope.ParentExactSHA256s) == 0 {
+		return EncodeGridMessage(envelope.ProtocolCID, payloadSlot, proofSlot)
+	}
+	parentSlot, parentSlotErr := parentExactSHA256GridSlot(envelope.ParentExactSHA256s)
+	if parentSlotErr != nil {
+		return nil, parentSlotErr
+	}
+	return EncodeGridMessage(envelope.ProtocolCID, parentSlot, payloadSlot, proofSlot)
+}
+
+// ParseEnvelope parses the POC15 signed envelope variants currently exercised by
+// normal traffic: grid([42(pCID), payload, proof]) and route_v1's
+// grid([42(pCID), parents, payload, proof]).
+// Intent: Keep parsing strict for the current executable pCID-owned slot shapes
+// so route multiarity is real without accepting arbitrary envelope layouts.
+// Source: DI-kohuj
+func ParseEnvelope(envelopeBytes []byte) (Envelope, error) {
+	gridMessage, gridErr := ParseGridMessage(envelopeBytes)
+	if gridErr != nil {
+		return Envelope{}, gridErr
+	}
+	return envelopeFromGridMessage(gridMessage)
 }
 
 // PayloadFields decodes legacy map payloads and pCID-owned array payloads into
