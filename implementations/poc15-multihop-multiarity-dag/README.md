@@ -34,11 +34,14 @@ pCID-defined payload fields. Source: `DI-lutuv`; `DI-lihir`; `DI-kohuj`;
 
 The current CAS/DAG slice now also gives each app its own local sparse CAS view.
 Agents may store exact messages, local state bytes, encrypted blobs named by
-ciphertext CID, or peer-served content. Those stores are intentionally
+ciphertext CID, or peer-served content. Object bytes are now stored as per-agent
+filesystem CAS files under `stores/<agent>/cas-objects/`, while
+`durable-state.json` remains the mutable root/index for metadata, tokens,
+journals, compute cache, and message-DAG entries. Those stores are intentionally
 incomplete: a local message-DAG index may record missing parents, peer storage is
 voluntary, bearer storage tokens can compensate a holder for retrieving bytes
 from the issuer, and local GC retains paid/pinned/encrypted objects while
-removing pressure-tagged temporary objects. Source: `DI-manul`.
+removing pressure-tagged temporary objects. Source: `DI-manul`; `DI-fagog`.
 
 ## Superset Requirement
 
@@ -139,9 +142,11 @@ It is read-only and does not affect app/kernel behavior. Source: `DI-bapif`.
 ## Agent-Accessible Sparse CAS
 
 The observer-only `message-cas/` archive is for operator review. It is not the
-same thing as an app's local CAS. Each app now keeps run-scoped CAS metadata in
-its own `stores/<agent>/durable-state.json` file, and that metadata describes
-objects the agent chose to retain:
+same thing as an app's local CAS. Each app now keeps run-scoped CAS object files
+in its own `stores/<agent>/cas-objects/` directory plus metadata in
+`stores/<agent>/durable-state.json`. The JSON file is an index/root, not the
+normal byte store; old `cas_objects_b64` state is read only for migration and is
+omitted on new saves. Metadata describes objects the agent chose to retain:
 
 - Exact message bytes emitted or received by that app.
 - Local state or checkpoint bytes the app wants to retain for the run.
@@ -154,7 +159,16 @@ records a missing-parent event instead of treating the system as inconsistent.
 Peer CAS promises are similarly local and voluntary. Bob may promise paid storage
 for one CID, Frank may store a replica, and Alice may transfer Bob's bearer
 storage token to Frank as an incentive; none of those promises creates a global
-store, global retention rule, or global trust decision. Source: `DI-manul`.
+store, global retention rule, or global trust decision.
+
+POC15 deliberately mixes local filesystem formats across agents. Some agents
+write generic `<safe-cid>.bin` files, some write `.cbor` when the exact object
+bytes parse as one complete CBOR item, and some write a local CBOR wrapper file
+whose metadata records both the logical/original CID and the stored wrapper CID.
+That wrapper is only local storage format pressure: when a peer asks for content
+CID `X` that this app promised to store, retrieval still returns the exact
+original bytes named by `X` unless a future pCID explicitly negotiates wrapper
+bytes. Source: `DI-manul`; `DI-fagog`.
 
 ## Multiarity Specimens
 

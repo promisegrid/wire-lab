@@ -29,11 +29,21 @@ removes it unless the user explicitly exports a run.
 
 The raw artifact CAS is also separate from each app's own sparse CAS. In the
 current executable slice, apps mirror exact sent/received message bytes into
-their local run-scoped CAS metadata, may keep arbitrary local bytes, may retain
-encrypted blobs by ciphertext CID, and may keep peer-served content after
-storage or bearer-token promises. These app stores are intentionally incomplete:
-an app-local message DAG can record that a parent CID is missing without making
-the run-level artifact DAG invalid. Source: `DI-manul`.
+their local run-scoped CAS, may keep arbitrary local bytes, may retain encrypted
+blobs by ciphertext CID, and may keep peer-served content after storage or
+bearer-token promises. Agent CAS object bytes are filesystem-backed under
+`stores/<agent>/cas-objects/`; `durable-state.json` is the small mutable
+metadata/root file for tokens, journals, compute cache, CAS metadata, and local
+message-DAG metadata. These app stores are intentionally incomplete: an
+app-local message DAG can record that a parent CID is missing without making the
+run-level artifact DAG invalid. Source: `DI-manul`; `DI-fagog`.
+
+POC15 uses mixed per-agent file profiles. A local CAS object may be a generic
+`.bin` file, a `.cbor` file when the exact bytes are a complete CBOR item, or a
+local `.cbor` wrapper file whose metadata records the original logical CID,
+stored wrapper CID, byte format, storage profile, and wrapper mode. Peer
+retrieval remains exact-byte by the original promised content CID unless a
+future pCID explicitly changes that rule. Source: `DI-fagog`.
 
 ## Run DAG Versus Wire DAG
 
@@ -112,9 +122,9 @@ The analyzer now reports and gates the first specimen layer:
   transport-auth-only,
 - parent-link artifact counts,
 - raw CAS object counts for retained exact message bytes,
-- agent-local sparse CAS counts for retained app bytes, encrypted-object CIDs,
-  peer storage/retrieval promises, bearer storage-token flow, local GC, and
-  sparse message-DAG missing-parent records,
+- agent-local sparse CAS counts for retained app bytes, filesystem CAS metadata,
+  encrypted-object CIDs, peer storage/retrieval promises, bearer storage-token
+  flow, local GC, and sparse message-DAG missing-parent records,
 - any accidental return to one universal payload shape.
 
 The analyzer now reconstructs the retained raw-message DAG enough to report root

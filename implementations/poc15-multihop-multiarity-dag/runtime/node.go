@@ -62,7 +62,6 @@ type Node struct {
 	checkpointJournal    map[string]checkpointRecord
 	promiseJournal       map[string]promiseRecord
 	eventOutcomeCounts   map[string]int
-	casStore             map[string][]byte
 	agentCASStore        map[string]agentCASObject
 	agentMessageDAG      map[string]agentMessageDAGNode
 	capabilityTokens     map[string]string
@@ -155,13 +154,16 @@ type checkpointRecord struct {
 }
 
 // runScopedState is the restartable state this POC keeps only inside one run
-// root. Intent: CAS bytes, per-agent sparse CAS metadata, message-DAG indexes,
-// compute checkpoints, replay windows, and app-local event journals may survive a
-// process restart within one experiment, but the clean-run reset remains the
-// experiment scope that prevents stale state from muddying the next POC15 run.
-// Source: DI-sunuf; DI-manul
+// root. Intent: Per-agent sparse CAS metadata, message-DAG indexes, compute
+// checkpoints, replay windows, and app-local event journals may survive a process
+// restart within one experiment, but object bytes live in filesystem CAS files and
+// the clean-run reset remains the experiment scope that prevents stale state from
+// muddying the next POC15 run. Source: DI-sunuf; DI-manul; DI-fagog
 type runScopedState struct {
-	Version              int                            `json:"version"`
+	Version int `json:"version"`
+	// CASObjects is read-only legacy migration input from earlier POC15 state
+	// files. Intent: New saves omit base64 CAS bytes so durable-state.json remains
+	// a small mutable root and index. Source: DI-fagog
 	CASObjects           map[string]string              `json:"cas_objects_b64,omitempty"`
 	CapabilityTokens     map[string]string              `json:"capability_tokens,omitempty"`
 	ComputeCache         map[string]map[string]string   `json:"compute_cache,omitempty"`
@@ -197,7 +199,6 @@ func NewNode(cfg config.Config, agent config.AgentConfig, decider decision.Decid
 		checkpointJournal:    make(map[string]checkpointRecord),
 		promiseJournal:       make(map[string]promiseRecord),
 		eventOutcomeCounts:   make(map[string]int),
-		casStore:             make(map[string][]byte),
 		agentCASStore:        make(map[string]agentCASObject),
 		agentMessageDAG:      make(map[string]agentMessageDAGNode),
 		capabilityTokens:     make(map[string]string),
@@ -1938,13 +1939,15 @@ func (node *Node) handleCASStoragePromise(fields map[string]string) (map[string]
 				"field_content_cid":    contentCID,
 			}, nil
 		}
-		node.storeLocalCASObject(contentBytes, agentCASStoreOptions{
+		if _, storeErr := node.storeLocalCASObject(contentBytes, agentCASStoreOptions{
 			Kind:         agentCASKindPeer,
 			SourcePeer:   fields["from"],
 			ProtocolName: pcid.CASStorageV1,
 			Retention:    "paid-run-local",
 			Paid:         true,
-		})
+		}); storeErr != nil {
+			return nil, storeErr
+		}
 		token := node.issueCapabilityToken(fields["from"], contentCID)
 		bearerToken := ""
 		if fields["field_token_style"] == "bearer" {
@@ -2013,10 +2016,11 @@ func (node *Node) handleCASStoragePromise(fields map[string]string) (map[string]
 				"field_token_status":  "not_promised",
 			}, nil
 		}
-		node.mu.Lock()
-		contentBytes := append([]byte(nil), node.casStore[contentCID]...)
-		node.mu.Unlock()
-		if len(contentBytes) == 0 {
+		contentBytes, stored, readErr := node.readLocalCASObject(contentCID)
+		if readErr != nil {
+			return nil, readErr
+		}
+		if !stored || len(contentBytes) == 0 {
 			return nil, fmt.Errorf("content %s not stored", contentCID)
 		}
 		node.record("capability_token_received", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" content_cid="+contentCID)
@@ -2040,13 +2044,15 @@ func (node *Node) handleCASStoragePromise(fields map[string]string) (map[string]
 		if !production.VerifyContentCID(contentBytes, contentCID) {
 			return nil, fmt.Errorf("replica bytes do not match content CID")
 		}
-		node.storeLocalCASObject(contentBytes, agentCASStoreOptions{
+		if _, storeErr := node.storeLocalCASObject(contentBytes, agentCASStoreOptions{
 			Kind:         agentCASKindPeer,
 			SourcePeer:   fields["from"],
 			ProtocolName: pcid.CASStorageV1,
 			Retention:    "replica-run-local",
 			Paid:         true,
-		})
+		}); storeErr != nil {
+			return nil, storeErr
+		}
 		issuee := firstStringField(fields, "field_issuee", "from")
 		token := node.issueCapabilityToken(issuee, contentCID)
 		node.record("cas_replica_stored", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" content_cid="+contentCID)
@@ -2069,10 +2075,11 @@ func (node *Node) handleCASStoragePromise(fields map[string]string) (map[string]
 				"field_token_status":  "not_promised",
 			}, nil
 		}
-		node.mu.Lock()
-		contentBytes := append([]byte(nil), node.casStore[contentCID]...)
-		node.mu.Unlock()
-		if len(contentBytes) == 0 {
+		contentBytes, stored, readErr := node.readLocalCASObject(contentCID)
+		if readErr != nil {
+			return nil, readErr
+		}
+		if !stored || len(contentBytes) == 0 {
 			return nil, fmt.Errorf("replica content %s not stored", contentCID)
 		}
 		node.record("cas_replica_serve_promised", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" content_cid="+contentCID)
@@ -2130,13 +2137,15 @@ func (node *Node) handleCASStoragePromise(fields map[string]string) (map[string]
 		if !production.VerifyContentCID(contentBytes, contentCID) {
 			return nil, fmt.Errorf("bearer token redeemed bytes do not match content CID")
 		}
-		node.storeLocalCASObject(contentBytes, agentCASStoreOptions{
+		if _, storeErr := node.storeLocalCASObject(contentBytes, agentCASStoreOptions{
 			Kind:         agentCASKindPeer,
 			SourcePeer:   issuerPeer,
 			ProtocolName: pcid.CASStorageV1,
 			Retention:    "bearer-token-paid-run-local",
 			Paid:         true,
-		})
+		}); storeErr != nil {
+			return nil, storeErr
+		}
 		node.record("agent_cas_bearer_storage_token_redeemed", "kept", issuerPeer, "pcid="+pcid.CASStorageV1+" holder="+node.Agent.Name+" content_cid="+contentCID)
 		return map[string]string{
 			"field_promise_about": production.PromiseReplicaTokenLifecycle,
@@ -2610,10 +2619,7 @@ func (node *Node) redeemBearerStorageToken(contentCID, token string) bool {
 // did not promise to retain. Source: DI-manul
 func (node *Node) handleSparseCASProbe(fields map[string]string, promiseAbout string) map[string]string {
 	contentCID := fields["field_content_cid"]
-	node.mu.Lock()
-	_, stored := node.casStore[contentCID]
-	node.mu.Unlock()
-	if stored {
+	if node.localCASObjectExists(contentCID) {
 		node.record("agent_cas_sparse_object_present", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" content_cid="+contentCID)
 		return map[string]string{
 			"field_promise_about": promiseAbout,
@@ -3458,10 +3464,10 @@ func (node *Node) runScopedStatePath() string {
 }
 
 // loadRunScopedState restores app-local state that belongs to this one POC15
-// run. Intent: A process restart inside a run should not erase CAS bytes,
+// run. Intent: A process restart inside a run should not erase CAS files,
 // sparse-CAS metadata, compute checkpoints, replay windows, or promise journals,
 // but the clean-run reset can still delete the entire run root before the next
-// experiment. Source: DI-sunuf; DI-manul
+// experiment. Source: DI-sunuf; DI-manul; DI-fagog
 func (node *Node) loadRunScopedState() error {
 	statePath := node.runScopedStatePath()
 	stateBytes, readErr := os.ReadFile(statePath)
@@ -3476,16 +3482,7 @@ func (node *Node) loadRunScopedState() error {
 	if unmarshalErr := json.Unmarshal(stateBytes, &state); unmarshalErr != nil {
 		return unmarshalErr
 	}
-	casObjects := make(map[string][]byte, len(state.CASObjects))
-	for contentCID, encodedBytes := range state.CASObjects {
-		contentBytes, decodeErr := base64.StdEncoding.DecodeString(encodedBytes)
-		if decodeErr != nil {
-			return fmt.Errorf("decode run-scoped CAS object %s: %w", contentCID, decodeErr)
-		}
-		casObjects[contentCID] = contentBytes
-	}
 	node.mu.Lock()
-	node.casStore = casObjects
 	node.capabilityTokens = copyMapOrEmpty(state.CapabilityTokens)
 	node.computeCache = copyNestedMapOrEmpty(state.ComputeCache)
 	node.nonCommitmentJournal = copyNonCommitmentMapOrEmpty(state.NonCommitmentJournal)
@@ -3496,18 +3493,67 @@ func (node *Node) loadRunScopedState() error {
 	node.agentCASStore = copyAgentCASMapOrEmpty(state.AgentCASObjects)
 	node.agentMessageDAG = copyAgentMessageDAGMapOrEmpty(state.AgentMessageDAG)
 	node.mu.Unlock()
-	node.record("run_scoped_store_loaded", "kept", "", fmt.Sprintf("cas=%d agent_cas=%d agent_dag=%d tokens=%d compute=%d checkpoints=%d promises=%d replay=%d", len(casObjects), len(state.AgentCASObjects), len(state.AgentMessageDAG), len(state.CapabilityTokens), len(state.ComputeCache), len(state.CheckpointJournal), len(state.PromiseJournal), len(state.ReplayJournal)))
-	node.record("cas_run_store_loaded", "kept", "", fmt.Sprintf("cas_objects=%d", len(casObjects)))
+	migratedCount, migrateErr := node.migrateLegacyRunScopedCASObjects(state.CASObjects, state.AgentCASObjects)
+	if migrateErr != nil {
+		return migrateErr
+	}
+	node.record("run_scoped_store_loaded", "kept", "", fmt.Sprintf("agent_cas=%d agent_dag=%d tokens=%d compute=%d checkpoints=%d promises=%d replay=%d legacy_cas_migrated=%d", len(state.AgentCASObjects), len(state.AgentMessageDAG), len(state.CapabilityTokens), len(state.ComputeCache), len(state.CheckpointJournal), len(state.PromiseJournal), len(state.ReplayJournal), migratedCount))
+	node.record("cas_run_store_loaded", "kept", "", fmt.Sprintf("agent_cas_objects=%d legacy_cas_migrated=%d", len(state.AgentCASObjects), migratedCount))
 	node.record("event_run_store_loaded", "kept", "", fmt.Sprintf("promise_journal=%d checkpoint_journal=%d non_commitments=%d receiver_non_commitments=%d replay=%d", len(state.PromiseJournal), len(state.CheckpointJournal), state.EventOutcomeCounts[string(relationship.OutcomeNonCommitment)], len(state.NonCommitmentJournal), len(state.ReplayJournal)))
 	node.record("compute_cache_run_store_loaded", "kept", "", fmt.Sprintf("compute_cache=%d", len(state.ComputeCache)))
 	return nil
 }
 
+// migrateLegacyRunScopedCASObjects imports pre-filesystem CAS byte blobs into
+// this agent's filesystem CAS and leaves new saves metadata-only.
+// Intent: DI-fagog changes the durable-state split without losing restartability
+// for any already-written POC15 run state that still has `cas_objects_b64`.
+// Source: DI-fagog
+func (node *Node) migrateLegacyRunScopedCASObjects(legacyCASObjects map[string]string, legacyMetadata map[string]agentCASObject) (int, error) {
+	migratedCount := 0
+	for contentCID, encodedBytes := range legacyCASObjects {
+		contentBytes, decodeErr := base64.StdEncoding.DecodeString(encodedBytes)
+		if decodeErr != nil {
+			return migratedCount, fmt.Errorf("decode run-scoped CAS object %s: %w", contentCID, decodeErr)
+		}
+		if !production.VerifyContentCID(contentBytes, contentCID) {
+			return migratedCount, fmt.Errorf("legacy CAS object %s bytes do not match content CID", contentCID)
+		}
+		legacyRecord := legacyMetadata[contentCID]
+		storeOptions := agentCASStoreOptions{
+			Kind:         firstNonEmpty(legacyRecord.Kind, agentCASKindPeer),
+			SourcePeer:   legacyRecord.SourcePeer,
+			ProtocolName: firstNonEmpty(legacyRecord.ProtocolName, "legacy_cas_objects_b64"),
+			Retention:    firstNonEmpty(legacyRecord.Retention, "migrated-run-local"),
+			Encrypted:    legacyRecord.Encrypted,
+			Pinned:       legacyRecord.Pinned,
+			Paid:         legacyRecord.Paid,
+			ParentCIDs:   legacyRecord.ParentCIDs,
+		}
+		if _, storeErr := node.storeLocalCASObject(contentBytes, storeOptions); storeErr != nil {
+			return migratedCount, storeErr
+		}
+		if len(legacyRecord.MissingParentCIDs) > 0 {
+			node.mu.Lock()
+			if migratedRecord, ok := node.agentCASStore[contentCID]; ok {
+				migratedRecord.MissingParentCIDs = append([]string(nil), legacyRecord.MissingParentCIDs...)
+				node.agentCASStore[contentCID] = migratedRecord
+			}
+			node.mu.Unlock()
+		}
+		migratedCount++
+	}
+	if migratedCount > 0 {
+		node.record("agent_cas_legacy_json_bytes_migrated", "kept", "", fmt.Sprintf("objects=%d", migratedCount))
+	}
+	return migratedCount, nil
+}
+
 // saveRunScopedState writes restartable run state through a temporary file and
 // rename. Intent: Partial writes should not corrupt the app's local events or
-// sparse-CAS metadata if a process is killed mid-save, and the saved state
-// remains scoped to this run root rather than becoming cross-run truth. Source:
-// DI-sunuf; DI-manul
+// sparse-CAS metadata if a process is killed mid-save, filesystem CAS bytes stay
+// outside JSON, and the saved state remains scoped to this run root rather than
+// becoming cross-run truth. Source: DI-sunuf; DI-manul; DI-fagog
 func (node *Node) saveRunScopedState() error {
 	state := node.exportRunScopedState()
 	statePath := node.runScopedStatePath()
@@ -3525,8 +3571,8 @@ func (node *Node) saveRunScopedState() error {
 	if err := os.Rename(tempPath, statePath); err != nil {
 		return err
 	}
-	node.record("run_scoped_store_saved", "kept", "", fmt.Sprintf("cas=%d agent_cas=%d agent_dag=%d tokens=%d compute=%d checkpoints=%d promises=%d replay=%d", len(state.CASObjects), len(state.AgentCASObjects), len(state.AgentMessageDAG), len(state.CapabilityTokens), len(state.ComputeCache), len(state.CheckpointJournal), len(state.PromiseJournal), len(state.ReplayJournal)))
-	node.record("cas_run_store_saved", "kept", "", fmt.Sprintf("cas_objects=%d", len(state.CASObjects)))
+	node.record("run_scoped_store_saved", "kept", "", fmt.Sprintf("agent_cas=%d agent_dag=%d tokens=%d compute=%d checkpoints=%d promises=%d replay=%d", len(state.AgentCASObjects), len(state.AgentMessageDAG), len(state.CapabilityTokens), len(state.ComputeCache), len(state.CheckpointJournal), len(state.PromiseJournal), len(state.ReplayJournal)))
+	node.record("cas_run_store_saved", "kept", "", fmt.Sprintf("agent_cas_objects=%d", len(state.AgentCASObjects)))
 	node.record("event_run_store_saved", "kept", "", fmt.Sprintf("promise_journal=%d checkpoint_journal=%d non_commitments=%d receiver_non_commitments=%d replay=%d", len(state.PromiseJournal), len(state.CheckpointJournal), state.EventOutcomeCounts[string(relationship.OutcomeNonCommitment)], len(state.NonCommitmentJournal), len(state.ReplayJournal)))
 	node.record("compute_cache_run_store_saved", "kept", "", fmt.Sprintf("compute_cache=%d", len(state.ComputeCache)))
 	return nil
@@ -3535,13 +3581,8 @@ func (node *Node) saveRunScopedState() error {
 func (node *Node) exportRunScopedState() runScopedState {
 	node.mu.Lock()
 	defer node.mu.Unlock()
-	casObjects := make(map[string]string, len(node.casStore))
-	for contentCID, contentBytes := range node.casStore {
-		casObjects[contentCID] = base64.StdEncoding.EncodeToString(contentBytes)
-	}
 	return runScopedState{
 		Version:              1,
-		CASObjects:           casObjects,
 		CapabilityTokens:     copyMapOrEmpty(node.capabilityTokens),
 		ComputeCache:         copyNestedMapOrEmpty(node.computeCache),
 		NonCommitmentJournal: copyNonCommitmentMapOrEmpty(node.nonCommitmentJournal),
@@ -3568,7 +3609,7 @@ func (node *Node) recordRunScopedRetentionAndGC() {
 	node.record("token_expiry_gc_promised", "kept", "", "serve-once capability tokens expire on redemption or run reset")
 	node.record("disk_pressure_gc_promised", "kept", "", "local agent may remove retained objects before accepting new storage if disk pressure exceeds local promise budget")
 	node.record("superseded_checkpoint_gc_promised", "kept", "", fmt.Sprintf("superseded checkpoints may be compacted locally checkpoint_count=%d", len(state.CheckpointJournal)))
-	node.record("gc_object_retained", "kept", "", fmt.Sprintf("cas=%d tokens=%d compute=%d checkpoints=%d promises=%d replay=%d", len(state.CASObjects), len(state.CapabilityTokens), len(state.ComputeCache), len(state.CheckpointJournal), len(state.PromiseJournal), len(state.ReplayJournal)))
+	node.record("gc_object_retained", "kept", "", fmt.Sprintf("agent_cas=%d tokens=%d compute=%d checkpoints=%d promises=%d replay=%d", len(state.AgentCASObjects), len(state.CapabilityTokens), len(state.ComputeCache), len(state.CheckpointJournal), len(state.PromiseJournal), len(state.ReplayJournal)))
 }
 
 func (node *Node) recordRetentionPromiseBroken(subject, detail string) {

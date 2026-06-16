@@ -297,10 +297,15 @@ collector image includes `poc15-cbor-diag` so those retained artifacts can be
 rendered as CBOR diagnostic notation from the run root without mutating run
 state. POC15 now also distinguishes that observer-only archive from each app's
 own sparse CAS: apps can retain exact message bytes, local state bytes,
-encrypted blobs named by ciphertext CID, and peer-served content; app-local
-message DAGs may have missing parents; storage for peers remains voluntary and
-may be compensated with bearer storage tokens; and local GC retains paid,
-pinned, or encrypted objects while removing pressure-tagged temporary bytes.
+encrypted blobs named by ciphertext CID, and peer-served content as per-agent
+filesystem CAS files under `stores/<agent>/cas-objects/`; `durable-state.json`
+is the mutable local root/index for CAS metadata, message-DAG metadata, tokens,
+journals, and compute cache, not the normal object-byte store. App-local message
+DAGs may have missing parents; storage for peers remains voluntary and may be
+compensated with bearer storage tokens; local GC retains paid, pinned, or
+encrypted objects while removing pressure-tagged temporary bytes; and mixed
+agent profiles write generic `.bin`, typed `.cbor`, or local CBOR wrapper files
+without changing exact-byte peer retrieval semantics.
 Remaining POC15 design work includes more advanced route exclusion through peer
 promises, deeper route economics than one reciprocal credit, truly independent
 return-route traffic, raw artifact counts by every POC artifact kind, and
@@ -309,7 +314,7 @@ Source:
 `DI-sihuz`; `DI-linof`; `DI-lulof`; `DI-kinaf`; `DI-dubih`; `DI-gahuh`;
 `DI-pamob`; `DI-sivis`; `DI-dirat`; `DI-podut`; `DI-lutuv`; `DI-nivon`;
 `DI-lihir`; `DI-darur`; `DI-daruf`; `DI-tuhop`; `DI-bapif`; `DI-mosat`;
-`DI-kohuj`; `DI-manul`.
+`DI-kohuj`; `DI-manul`; `DI-fagog`.
 
 `poc7` adds executable evidence for promise-shaped capability tokens and local
 exchange: five containers run local kernel boundaries, app-level relays, issuer,
@@ -1509,12 +1514,14 @@ section.
   `poc15-cbor-diag` for read-only CBOR diagnostic rendering of those retained
   artifacts. It now also gates agent-owned sparse CAS metadata, encrypted-object
   CIDs, sparse local message-DAG indexes, peer CAS storage/retrieval promises,
-  bearer storage-token flow, and local CAS GC. It should be cited as POC event,
-  raw-message artifact, sparse-CAS, and specimen coverage only, not as a final
-  route, kernel, monitor, WASM/stdio, parent-DAG, CAS economics, or app API.
+  bearer storage-token flow, local CAS GC, and filesystem-backed per-agent CAS
+  object storage with metadata-only durable roots. It should be cited as POC
+  event, raw-message artifact, sparse-CAS, and specimen coverage only, not as a
+  final route, kernel, monitor, WASM/stdio, parent-DAG, CAS economics, or app
+  API.
   Source: `DI-podut`; `DI-lutuv`; `DI-nivon`; `DI-lihir`; `DI-darur`;
   `DI-daruf`; `DI-tuhop`; `DI-bapif`; `DI-mosat`; `DI-kohuj`; `DI-manul`;
-  `TODO-gogug`.
+  `DI-fagog`; `TODO-gogug`.
 - `protocols/wire-lab.d/archive/migrations/SIM-piloh-turns-149-208-recovery/archive/transports/README.md`
   preserves the old root transport design surface as historical evidence.
 

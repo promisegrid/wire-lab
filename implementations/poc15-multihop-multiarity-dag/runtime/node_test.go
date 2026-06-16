@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/hex"
+	"encoding/json"
 	"errors"
 	"os"
 	"path/filepath"
@@ -586,7 +587,14 @@ func TestRunScopedStatePersistsWithinRun(t *testing.T) {
 	bob := NewNode(cfg, cfg.Agents[1], &decision.FakeDecider{}, decision.FakeMonitor{})
 	contentBytes := production.SampleContentBytes()
 	contentCID := production.ContentCID(contentBytes)
-	bob.casStore[contentCID] = contentBytes
+	if _, err := bob.storeLocalCASObject(contentBytes, agentCASStoreOptions{
+		Kind:         agentCASKindPeer,
+		ProtocolName: pcid.CASStorageV1,
+		Retention:    "test-run-local",
+		Paid:         true,
+	}); err != nil {
+		t.Fatalf("store filesystem CAS object: %v", err)
+	}
 	bob.capabilityTokens["alice|"+contentCID] = "token-1"
 	bob.computeCache["compute-1"] = map[string]string{"field_result_cid": "result-1"}
 	bob.nonCommitmentJournal["nc-1"] = nonCommitmentRecord{Key: "nc-1", Peer: "alice", ProtocolName: pcid.CASStorageV1, PromiseAbout: production.PromiseStoreContent}
@@ -601,8 +609,16 @@ func TestRunScopedStatePersistsWithinRun(t *testing.T) {
 	if err := reloadedBob.loadRunScopedState(); err != nil {
 		t.Fatalf("load run-scoped state: %v", err)
 	}
-	if string(reloadedBob.casStore[contentCID]) != string(contentBytes) {
+	reloadedBytes, stored, readErr := reloadedBob.readLocalCASObject(contentCID)
+	if readErr != nil {
+		t.Fatalf("read reloaded filesystem CAS object: %v", readErr)
+	}
+	if !stored || string(reloadedBytes) != string(contentBytes) {
 		t.Fatalf("reloaded CAS object mismatch")
+	}
+	savedState := bob.exportRunScopedState()
+	if len(savedState.CASObjects) != 0 {
+		t.Fatalf("new run-scoped state should omit base64 CAS bytes: %#v", savedState.CASObjects)
 	}
 	if reloadedBob.capabilityTokens["alice|"+contentCID] != "token-1" {
 		t.Fatalf("reloaded capability token mismatch: %#v", reloadedBob.capabilityTokens)
@@ -615,6 +631,128 @@ func TestRunScopedStatePersistsWithinRun(t *testing.T) {
 	}
 	if !hasEvent(reloadedBob.events, "run_scoped_store_loaded") {
 		t.Fatalf("load should record run-scoped store event: %#v", reloadedBob.events)
+	}
+}
+
+func TestAgentCASStorageProfilesWriteExpectedFormats(t *testing.T) {
+	cfg := casProfileCoverageTestConfig(t)
+	cfg.RunID = "filesystem-profile-test"
+	agentsByProfile := map[string]*Node{}
+	for _, agentConfig := range cfg.Agents {
+		node := NewNode(cfg, agentConfig, &decision.FakeDecider{}, decision.FakeMonitor{})
+		agentsByProfile[node.agentCASStorageProfileFor()] = node
+	}
+	for _, profile := range []string{agentCASStorageProfileGenericBinary, agentCASStorageProfileTypedExtension, agentCASStorageProfileCBORWrapper} {
+		if agentsByProfile[profile] == nil {
+			t.Fatalf("profile %s was not assigned in test config", profile)
+		}
+	}
+	genericNode := agentsByProfile[agentCASStorageProfileGenericBinary]
+	genericCID, genericErr := genericNode.storeLocalCASObject([]byte("plain bytes"), agentCASStoreOptions{Kind: agentCASKindInternal})
+	if genericErr != nil {
+		t.Fatalf("store generic profile object: %v", genericErr)
+	}
+	if genericNode.agentCASStore[genericCID].ByteFormat != agentCASByteFormatBinary || !strings.HasSuffix(genericNode.agentCASStore[genericCID].RelativePath, ".bin") {
+		t.Fatalf("generic profile metadata = %#v", genericNode.agentCASStore[genericCID])
+	}
+	typedNode := agentsByProfile[agentCASStorageProfileTypedExtension]
+	cborBytes, cborErr := protocol.MarshalStringMap(map[string]string{"kind": "profile-test"})
+	if cborErr != nil {
+		t.Fatalf("marshal test cbor: %v", cborErr)
+	}
+	typedCID, typedErr := typedNode.storeLocalCASObject(cborBytes, agentCASStoreOptions{Kind: agentCASKindMessage})
+	if typedErr != nil {
+		t.Fatalf("store typed profile object: %v", typedErr)
+	}
+	if typedNode.agentCASStore[typedCID].ByteFormat != agentCASByteFormatCBOR || !strings.HasSuffix(typedNode.agentCASStore[typedCID].RelativePath, ".cbor") {
+		t.Fatalf("typed profile metadata = %#v", typedNode.agentCASStore[typedCID])
+	}
+	wrapperNode := agentsByProfile[agentCASStorageProfileCBORWrapper]
+	wrapperCID, wrapperErr := wrapperNode.storeLocalCASObject([]byte("wrapped exact bytes"), agentCASStoreOptions{Kind: agentCASKindPeer})
+	if wrapperErr != nil {
+		t.Fatalf("store wrapper profile object: %v", wrapperErr)
+	}
+	wrapperRecord := wrapperNode.agentCASStore[wrapperCID]
+	if wrapperRecord.ByteFormat != agentCASByteFormatCBORWrapper || wrapperRecord.StoredCID == wrapperCID || !strings.HasSuffix(wrapperRecord.RelativePath, ".cbor") {
+		t.Fatalf("wrapper profile metadata = %#v", wrapperRecord)
+	}
+	originalBytes, stored, readErr := wrapperNode.readLocalCASObject(wrapperCID)
+	if readErr != nil {
+		t.Fatalf("read wrapper profile object: %v", readErr)
+	}
+	if !stored || string(originalBytes) != "wrapped exact bytes" {
+		t.Fatalf("wrapper read = %q stored=%v", string(originalBytes), stored)
+	}
+}
+
+func TestAgentCASWrapperModesCoverCurrentAgents(t *testing.T) {
+	cfg := casProfileCoverageTestConfig(t)
+	cfg.RunID = "wrapper-mode-coverage-test"
+	seenModes := map[string]bool{}
+	for _, agentConfig := range cfg.Agents {
+		node := NewNode(cfg, agentConfig, &decision.FakeDecider{}, decision.FakeMonitor{})
+		if node.agentCASStorageProfileFor() == agentCASStorageProfileCBORWrapper {
+			seenModes[node.agentCASWrapperModeFor()] = true
+		}
+	}
+	for _, wrapperMode := range []string{agentCASWrapperModeOriginalKey, agentCASWrapperModeWrapperKey, agentCASWrapperModeDualKey} {
+		if !seenModes[wrapperMode] {
+			t.Fatalf("wrapper mode %s was not assigned across current agents: %#v", wrapperMode, seenModes)
+		}
+	}
+}
+
+func TestLegacyCASObjectsMigrateToFilesystemCAS(t *testing.T) {
+	cfg := twoNodeTestConfig(t)
+	bob := NewNode(cfg, cfg.Agents[1], &decision.FakeDecider{}, decision.FakeMonitor{})
+	contentBytes := production.SampleContentBytes()
+	contentCID := production.ContentCID(contentBytes)
+	legacyState := runScopedState{
+		Version: 1,
+		CASObjects: map[string]string{
+			contentCID: base64.StdEncoding.EncodeToString(contentBytes),
+		},
+		AgentCASObjects: map[string]agentCASObject{
+			contentCID: {
+				CID:          contentCID,
+				Kind:         agentCASKindPeer,
+				Owner:        "bob",
+				ProtocolName: pcid.CASStorageV1,
+				Retention:    "legacy-test",
+				Paid:         true,
+			},
+		},
+	}
+	stateBytes, marshalErr := json.MarshalIndent(legacyState, "", "  ")
+	if marshalErr != nil {
+		t.Fatalf("marshal legacy state: %v", marshalErr)
+	}
+	statePath := bob.runScopedStatePath()
+	if err := os.MkdirAll(filepath.Dir(statePath), 0o755); err != nil {
+		t.Fatalf("create state dir: %v", err)
+	}
+	if err := os.WriteFile(statePath, append(stateBytes, '\n'), 0o644); err != nil {
+		t.Fatalf("write legacy state: %v", err)
+	}
+	if err := bob.loadRunScopedState(); err != nil {
+		t.Fatalf("load legacy state: %v", err)
+	}
+	migratedBytes, stored, readErr := bob.readLocalCASObject(contentCID)
+	if readErr != nil {
+		t.Fatalf("read migrated CAS object: %v", readErr)
+	}
+	if !stored || string(migratedBytes) != string(contentBytes) {
+		t.Fatalf("migrated CAS mismatch stored=%v bytes=%q", stored, string(migratedBytes))
+	}
+	if err := bob.saveRunScopedState(); err != nil {
+		t.Fatalf("save migrated state: %v", err)
+	}
+	savedBytes, readStateErr := os.ReadFile(statePath)
+	if readStateErr != nil {
+		t.Fatalf("read migrated state: %v", readStateErr)
+	}
+	if strings.Contains(string(savedBytes), "cas_objects_b64") {
+		t.Fatalf("new state should omit legacy base64 CAS bytes: %s", string(savedBytes))
 	}
 }
 
@@ -957,6 +1095,28 @@ func twoNodeTestConfig(t *testing.T) config.Config {
 			{Name: "bob", Agents: []string{"bob"}},
 		},
 	}
+}
+
+func casProfileCoverageTestConfig(t *testing.T) config.Config {
+	t.Helper()
+	cfg := twoNodeTestConfig(t)
+	cfg.RunRoot = filepath.Join(t.TempDir(), "run")
+	agentNames := []string{"alice", "bob", "carol", "dave", "ellen", "frank", "grace", "mallory", "victor"}
+	cfg.Agents = make([]config.AgentConfig, 0, len(agentNames))
+	cfg.Containers = make([]config.ContainerConfig, 0, len(agentNames))
+	for _, agentName := range agentNames {
+		cfg.Agents = append(cfg.Agents, config.AgentConfig{
+			Name:           agentName,
+			Persona:        "cas profile tester",
+			Motivation:     "test local CAS storage profile assignment",
+			InitialPeers:   []string{"alice"},
+			CandidatePeers: []string{"alice"},
+			Budget:         5,
+			Capacity:       5,
+		})
+		cfg.Containers = append(cfg.Containers, config.ContainerConfig{Name: agentName, Agents: []string{agentName}})
+	}
+	return cfg
 }
 
 func computeRoutingTestConfig(t *testing.T) config.Config {

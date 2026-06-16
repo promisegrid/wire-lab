@@ -244,6 +244,15 @@ Intent: POC15 should no longer model CAS only as observer-owned run artifacts or
 Constraints: Preserve one top-level semantic action `promise`; preserve run-scoped clean-run storage; do not make any CAS store global, complete, authoritative, or mounted through the observer volume; CIDs name exact stored bytes, so encrypted objects are addressed by ciphertext CID, not cleartext CID; local message DAGs are partial indexes built only from bytes the agent has; use names `agentCASStore`, `agentMessageDAG`, `storeLocalCASObject`, `indexMessageDAGObject`, `recordAgentCASAccessEvents`, `recordAgentCASGCEvents`, and analyzer event names prefixed with `agent_cas_` or `message_dag_` where possible.
 Affects: implementations/poc15-multihop-multiarity-dag/runtime/; implementations/poc15-multihop-multiarity-dag/cmd/poc15-analyze/; implementations/poc15-multihop-multiarity-dag/docs/; implementations/poc15-multihop-multiarity-dag/README.md; DEV-GUIDE-RESOURCES.md; protocols/wire-lab.d/TODO/TODO-gogug-poc13-hardening-and-poc14-superset-plan.md.
 
+ID: DI-fagog
+Date: 2026-06-16 12:06:14
+Status: active
+Decision: Convert POC15 agent-local CAS object bytes from in-memory maps and `durable-state.json` base64 fields into filesystem-backed per-agent CAS object files, while leaving `durable-state.json` as the small mutable root and index.
+Intent: Agents should have ordinary local CAS stores that survive process restarts inside a clean run without pretending one complete global store exists. Storing object bytes as files makes raw bytes reviewable and keeps mutable JSON state small, while metadata still records each agent's partial local promises, parent-DAG view, storage profile, and exact-byte semantics for peer retrieval.
+Constraints: Preserve observer-only `message-cas/*.cbor`; preserve run-scoped clean-run storage; migrate old `cas_objects_b64` state read-only and omit it on new saves; keep exact original bytes retrievable for peer-promised content CIDs even when an agent uses a local CBOR wrapper profile; balance deterministic per-run storage profiles across agents; use names `agentCASRootDir`, `safeCASFilenameCID`, `readLocalCASObject`, `localCASObjectExists`, `removeLocalCASObject`, `agentCASStorageProfileFor`, and `agentCASWrapperModeFor`.
+Affects: implementations/poc15-multihop-multiarity-dag/runtime/; implementations/poc15-multihop-multiarity-dag/docs/; implementations/poc15-multihop-multiarity-dag/README.md; DEV-GUIDE-RESOURCES.md; protocols/wire-lab.d/TODO/TODO-gogug-poc13-hardening-and-poc14-superset-plan.md.
+Supersedes: DI-manul
+
 ## Tasks
 
 - [x] gogug.1 Fix POC13 evidence summary mismatch so saved evidence counts include all local non-commitment outcomes, not only receiver-side `not_promised` journal entries.
@@ -326,3 +335,13 @@ Affects: implementations/poc15-multihop-multiarity-dag/runtime/; implementations
 - [x] gogug.78 Add analyzer checks for sparse stores, local DAGs, tokens, encrypted storage, and GC.
 - [x] gogug.79 Update POC15 and DEV guide docs for agent-accessible sparse CAS.
 - [x] gogug.80 Run Go validation and clean POC15 containers after the CAS/DAG slice.
+- [x] gogug.81 Move POC15 agent CAS object bytes from memory/base64 JSON into per-agent filesystem CAS files.
+- [x] gogug.82 Add deterministic per-run agent CAS storage profiles for generic binary, typed extension, and CBOR wrapper files.
+- [x] gogug.83 Add deterministic wrapper CID modes for wrapper-profile agents while preserving original-CID retrieval semantics.
+- [x] gogug.84 Keep `durable-state.json` as metadata/root state and migrate legacy `cas_objects_b64` entries into filesystem CAS.
+- [x] gogug.85 Replace direct in-memory CAS reads/deletes with filesystem helpers.
+- [x] gogug.86 Add unit coverage for filesystem CAS profiles, wrapper modes, migration, and restart persistence.
+- [x] gogug.87 Update POC15 docs for filesystem CAS file formats and durable-state split.
+- [x] gogug.88 Update DEV guide current design state for per-agent filesystem CAS.
+- [x] gogug.89 Run Go validation, errcheck, and clean POC15 containers.
+- [x] gogug.90 Review POC15 results for agent CAS score, exact-byte retrieval, and observer-CAS separation.
