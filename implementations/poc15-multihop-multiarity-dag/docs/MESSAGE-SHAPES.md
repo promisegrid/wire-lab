@@ -25,6 +25,16 @@ run-scoped output tree as CAS-addressed bytes or text:
 The raw CAS is a local review archive, not a production global store. Clean/reset
 removes it unless the user explicitly exports a run.
 
+## Agent Sparse CAS
+
+The raw artifact CAS is also separate from each app's own sparse CAS. In the
+current executable slice, apps mirror exact sent/received message bytes into
+their local run-scoped CAS metadata, may keep arbitrary local bytes, may retain
+encrypted blobs by ciphertext CID, and may keep peer-served content after
+storage or bearer-token promises. These app stores are intentionally incomplete:
+an app-local message DAG can record that a parent CID is missing without making
+the run-level artifact DAG invalid. Source: `DI-manul`.
+
 ## Run DAG Versus Wire DAG
 
 POC15 should keep two DAG concepts separate:
@@ -102,6 +112,9 @@ The analyzer now reports and gates the first specimen layer:
   transport-auth-only,
 - parent-link artifact counts,
 - raw CAS object counts for retained exact message bytes,
+- agent-local sparse CAS counts for retained app bytes, encrypted-object CIDs,
+  peer storage/retrieval promises, bearer storage-token flow, local GC, and
+  sparse message-DAG missing-parent records,
 - any accidental return to one universal payload shape.
 
 The analyzer now reconstructs the retained raw-message DAG enough to report root

@@ -4,10 +4,10 @@
 It is executable as a mechanically renamed POC14 baseline so POC15 additions can
 be measured against a known regression floor. The purpose is to preserve POC14
 while adding real multi-hop forwarding, pCID-owned slot-vector variety,
-raw-message CAS/DAG review, wire-visible parent links, COSE specimens, useful
-routed WASM/stdio work, promise-correct route exclusion, route economics, and
-explicit non-monolithic kernel roles. Source: `DI-pamob`; `DI-podut`;
-`DI-lutuv`.
+raw-message CAS/DAG review, agent-accessible sparse CAS, wire-visible parent
+links, COSE specimens, useful routed WASM/stdio work, promise-correct route
+exclusion, route economics, and explicit non-monolithic kernel roles. Source:
+`DI-pamob`; `DI-podut`; `DI-lutuv`; `DI-manul`.
 
 ## Current Executable State
 
@@ -26,11 +26,19 @@ explicit local lifetime, asymmetric response-path terms are recorded, route
 credits are promised/earned/spent, and Peggy/Victor receive route-carried
 compute envelopes as useful runtime-adapter work. It retains raw message
 artifacts for operator review through an observer-only artifact stream. A
-validated clean run for this update reconstructs a reachable 230-node
+validated clean run for this update reconstructs a reachable 222-node
 exact-message DAG from 413
 artifact observations, with parent-link coverage in both envelope slots and
 pCID-defined payload fields. Source: `DI-lutuv`; `DI-lihir`; `DI-kohuj`;
 `DI-tuhop`; `DI-mosat`.
+
+The current CAS/DAG slice now also gives each app its own local sparse CAS view.
+Agents may store exact messages, local state bytes, encrypted blobs named by
+ciphertext CID, or peer-served content. Those stores are intentionally
+incomplete: a local message-DAG index may record missing parents, peer storage is
+voluntary, bearer storage tokens can compensate a holder for retrieving bytes
+from the issuer, and local GC retains paid/pinned/encrypted objects while
+removing pressure-tagged temporary objects. Source: `DI-manul`.
 
 ## Superset Requirement
 
@@ -75,6 +83,9 @@ exception:
 9. **Kernel as role collection.** POC15 should name transport, app-interface,
    routing, local-resource, and event-retention roles explicitly even when the
    Docker runtime collapses some roles into one process.
+10. **Agent-accessible sparse CAS.** Each agent should be able to maintain its
+    own incomplete CAS and optional local message DAG, or rely on peer CAS
+    promises paid through credits or bearer storage tokens.
 
 ## Multihop Promise Sketch
 
@@ -125,6 +136,26 @@ The tool reads `message-dag.jsonl`, opens the matching
 with nested payload/proof byte strings expanded when they contain valid CBOR.
 It is read-only and does not affect app/kernel behavior. Source: `DI-bapif`.
 
+## Agent-Accessible Sparse CAS
+
+The observer-only `message-cas/` archive is for operator review. It is not the
+same thing as an app's local CAS. Each app now keeps run-scoped CAS metadata in
+its own `stores/<agent>/durable-state.json` file, and that metadata describes
+objects the agent chose to retain:
+
+- Exact message bytes emitted or received by that app.
+- Local state or checkpoint bytes the app wants to retain for the run.
+- Encrypted local bytes addressed by ciphertext CID rather than cleartext CID.
+- Peer-served bytes retained after storage, replica, or bearer-token promises.
+
+Some apps maintain a local message DAG over exact message bytes they retained.
+The DAG is sparse by design: if a parent CID is not in the local store, the app
+records a missing-parent event instead of treating the system as inconsistent.
+Peer CAS promises are similarly local and voluntary. Bob may promise paid storage
+for one CID, Frank may store a replica, and Alice may transfer Bob's bearer
+storage token to Frank as an incentive; none of those promises creates a global
+store, global retention rule, or global trust decision. Source: `DI-manul`.
+
 ## Multiarity Specimens
 
 POC15 now emits and analyzes pCIDs that define these slot-vector specimens:
@@ -163,7 +194,9 @@ multiarity specimens, parent-link specimen artifacts, COSE payload/proof
 verification, COSE tamper rejection, normal-traffic route parent slots,
 payload-parent route links, raw-message DAG traversal, route durability,
 asymmetric response-path handling, reciprocal route credits, useful routed
-Peggy/Victor compute, and an explicit kernel-role profile event.
+Peggy/Victor compute, agent-accessible sparse CAS, bearer storage-token
+incentives, encrypted-object CIDs, local CAS GC, and an explicit kernel-role
+profile event.
 Remaining analyzer targets are:
 
 - At least one forwarding non-commitment due to capacity, trust, pCID support,

@@ -45,6 +45,7 @@ type RunSummary struct {
 	DecentralizedMonitorCounts     map[string]int          `json:"decentralized_monitor_counts"`
 	RouteCounts                    map[string]int          `json:"route_counts"`
 	ArrayPayloadProtocolCounts     map[string]int          `json:"array_payload_protocol_counts"`
+	AgentCASCounts                 map[string]int          `json:"agent_cas_counts"`
 	MessageArtifactCount           int                     `json:"message_artifact_count"`
 	MessageCASObjectCount          int                     `json:"message_cas_object_count"`
 	MessageDAGRecordCount          int                     `json:"message_dag_record_count"`
@@ -88,6 +89,7 @@ type ScoreReport struct {
 	RuntimeAdapter int      `json:"runtime_adapter"`
 	Monitoring     int      `json:"monitoring"`
 	Route          int      `json:"route"`
+	AgentCAS       int      `json:"agent_cas"`
 	Migration      int      `json:"migration"`
 	Restart        int      `json:"restart"`
 	Concerns       []string `json:"concerns,omitempty"`
@@ -208,6 +210,7 @@ func analyzeRun(runDir string) (RunSummary, error) {
 		DecentralizedMonitorCounts:     make(map[string]int),
 		RouteCounts:                    make(map[string]int),
 		ArrayPayloadProtocolCounts:     make(map[string]int),
+		AgentCASCounts:                 make(map[string]int),
 		MessageArtifactDirectionCounts: make(map[string]int),
 		MessageArtifactProtocolCounts:  make(map[string]int),
 		MessageDAGParentLocationCounts: make(map[string]int),
@@ -783,6 +786,9 @@ func summarizeLog(logPath string, summary *RunSummary) error {
 		if isRouteEvent(event.Event) {
 			summary.RouteCounts[event.Event]++
 		}
+		if isAgentCASEvent(event.Event) {
+			summary.AgentCASCounts[event.Event]++
+		}
 		if isMigrationEvent(event.Event) {
 			summary.MigrationCounts[event.Event]++
 		}
@@ -1038,6 +1044,30 @@ func requiredRegressionEvents() []string {
 		"wasm_routed_compute_result_verified",
 		"stdio_routed_compute_result_verified",
 		"transport_proof_comparison_recorded",
+		// Intent: POC15 now requires agent-accessible sparse CAS, local message
+		// DAG indexing, peer storage/retrieval promises, bearer storage tokens,
+		// encrypted-object CIDs, and local GC records. Source: DI-manul
+		"agent_cas_access_promised",
+		"agent_cas_store_incomplete",
+		"agent_cas_object_stored",
+		"agent_cas_message_stored",
+		"agent_cas_internal_object_stored",
+		"agent_cas_encrypted_object_stored",
+		"agent_cas_ciphertext_cid_selected",
+		"agent_cas_cleartext_cid_not_used",
+		"agent_cas_peer_storage_promised",
+		"agent_cas_peer_retrieval_promised",
+		"agent_cas_peer_object_stored",
+		"agent_cas_sparse_object_missing",
+		"agent_cas_retrieval_not_promised",
+		"agent_cas_bearer_storage_token_issued",
+		"agent_cas_bearer_storage_token_received",
+		"agent_cas_bearer_storage_token_transferred",
+		"agent_cas_bearer_storage_token_redeemed",
+		"agent_cas_gc_object_retained",
+		"agent_cas_gc_object_removed",
+		"message_dag_node_indexed",
+		"message_dag_missing_parent_recorded",
 	}
 }
 
@@ -1063,9 +1093,14 @@ func computeScores(summary RunSummary) ScoreReport {
 	addScore(&scores.RuntimeAdapter, summary.EventCounts["wasm_module_instantiated"] > 0 && summary.EventCounts["wasm_export_result_observed"] > 0 && summary.EventCounts["wasm_adapter_ack_received"] > 0 && summary.EventCounts["wasm_useful_work_promised"] > 0 && summary.EventCounts["wasm_compute_result_verified"] > 0 && summary.EventCounts["wasm_routed_compute_result_verified"] > 0 && summary.EventCounts["stdio_cbor_envelope_received"] > 0 && summary.EventCounts["stdio_cbor_ack_event"] > 0 && summary.EventCounts["stdio_adapter_kernel_forwarded"] > 0 && summary.EventCounts["stdio_useful_work_promised"] > 0 && summary.EventCounts["stdio_compute_result_verified"] > 0 && summary.EventCounts["stdio_routed_compute_result_verified"] > 0)
 	addScore(&scores.Monitoring, summary.EventCounts["decentralized_monitoring_model_recorded"] > 0 && summary.EventCounts["bearer_token_exchange_rate_observed"] > 0 && summary.EventCounts["voluntary_gossip_promised"] > 0)
 	addScore(&scores.Route, summary.EventCounts["route_setup_promise_made"] > 0 && summary.EventCounts["route_forward_promise_made"] >= 2 && summary.EventCounts["route_forward_promise_kept"] >= 2 && summary.EventCounts["route_reachability_confirmed"] > 0 && summary.EventCounts["route_carried_message_delivered"] > 0 && summary.EventCounts["route_multiarity_parent_slot_received"] > 0 && summary.EventCounts["route_payload_parent_link_received"] > 0 && summary.EventCounts["route_reused_message_delivered"] > 0 && summary.EventCounts["route_asymmetric_response_path_handled"] > 0 && summary.EventCounts["route_credit_earned"] > 0 && summary.ProtocolCounts[pcid.RouteV1] > 0)
+	// Intent: Agent CAS fitness is distinct from the collector-owned raw message
+	// CAS: the run must show sparse local stores, DAG indexing, peer storage,
+	// bearer-token incentives, encrypted-object CIDs, and local GC. Source:
+	// DI-manul
+	addScore(&scores.AgentCAS, summary.EventCounts["agent_cas_access_promised"] > 0 && summary.EventCounts["agent_cas_store_incomplete"] > 0 && summary.EventCounts["agent_cas_message_stored"] > 0 && summary.EventCounts["message_dag_node_indexed"] > 0 && summary.EventCounts["agent_cas_peer_storage_promised"] > 0 && summary.EventCounts["agent_cas_bearer_storage_token_redeemed"] > 0 && summary.EventCounts["agent_cas_encrypted_object_stored"] > 0 && summary.EventCounts["agent_cas_gc_object_removed"] > 0)
 	addScore(&scores.Migration, summary.EventCounts["mixed_version_pcid_migration_promised"] > 0 && summary.EventCounts["mixed_version_successor_pcid_selected"] > 0)
 	addScore(&scores.Restart, summary.EventCounts["run_internal_restart_orchestration_promised"] > 0 && summary.EventCounts["run_internal_restart_recovery_observed"] > 0)
-	scores.Overall = (scores.Transport + scores.Storage + scores.Compute + scores.Economics + scores.Trust + scores.Verification + scores.Replica + scores.Durability + scores.Retention + scores.Pressure + scores.Replay + scores.RuntimeAdapter + scores.Monitoring + scores.Route + scores.Migration + scores.Restart) / 16
+	scores.Overall = (scores.Transport + scores.Storage + scores.Compute + scores.Economics + scores.Trust + scores.Verification + scores.Replica + scores.Durability + scores.Retention + scores.Pressure + scores.Replay + scores.RuntimeAdapter + scores.Monitoring + scores.Route + scores.AgentCAS + scores.Migration + scores.Restart) / 17
 	if len(summary.MissingRequiredEventNames) > 0 {
 		scores.Concerns = append(scores.Concerns, "missing required events: "+strings.Join(summary.MissingRequiredEventNames, ", "))
 	}
@@ -1190,6 +1225,10 @@ func isDecentralizedMonitorEvent(eventName string) bool {
 
 func isRouteEvent(eventName string) bool {
 	return strings.HasPrefix(eventName, "route_")
+}
+
+func isAgentCASEvent(eventName string) bool {
+	return strings.HasPrefix(eventName, "agent_cas_") || strings.HasPrefix(eventName, "message_dag_")
 }
 
 func isMigrationEvent(eventName string) bool {

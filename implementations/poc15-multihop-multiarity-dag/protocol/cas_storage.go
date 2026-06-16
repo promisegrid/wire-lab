@@ -22,6 +22,8 @@ var casStorageSchemas = []arrayPayloadSchema{
 			"field_credit_offer",
 			"field_units",
 			"field_capability_token",
+			"field_token_style",
+			"field_bearer_token",
 			"field_replica_peer",
 			"field_replica_token",
 		},
@@ -34,6 +36,8 @@ var casStorageSchemas = []arrayPayloadSchema{
 			"field_content_cid",
 			"field_content_b64",
 			"field_token",
+			"field_token_style",
+			"field_missing_object_probe",
 		},
 	},
 	{
@@ -55,6 +59,7 @@ var casStorageSchemas = []arrayPayloadSchema{
 			"field_content_cid",
 			"field_content_b64",
 			"field_token",
+			"field_missing_object_probe",
 		},
 	},
 	{
@@ -64,6 +69,10 @@ var casStorageSchemas = []arrayPayloadSchema{
 			"field_exchange_id",
 			"field_content_cid",
 			"field_token",
+			"field_bearer_token",
+			"field_token_style",
+			"field_issuer_peer",
+			"field_redeem_peer",
 		},
 	},
 	{
@@ -95,8 +104,9 @@ var casStorageSchemas = []arrayPayloadSchema{
 // array. The field names remain local compatibility names only; they are not
 // serialized on the wire.
 // Intent: CAS storage promises should exercise pCID-owned positional payloads so
-// the POC no longer advertises field_* maps as the protocol target. Source:
-// DI-gahuh
+// the POC no longer advertises field_* maps as the protocol target. Bearer-token
+// and sparse-probe fields are still pCID-owned slots inside cas_storage_v1 rather
+// than separate message kinds. Source: DI-gahuh; DI-manul
 func MarshalCASStoragePayloadFields(fields map[string]string) ([]byte, error) {
 	return marshalArrayPayload(fields, casStorageSchemas)
 }

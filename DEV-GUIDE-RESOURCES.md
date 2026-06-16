@@ -269,15 +269,15 @@ transit hop are locally rejected. POC15 now has an executable scaffold under
 `implementations/poc15-multihop-multiarity-dag/` as a mechanically renamed POC14
 baseline plus a first `route_v1` slice where Alice confirms and uses an
 Alice->Bob->Carol->Dave route through voluntary neighboring app promises. One
-validated POC15 clean run for this update records 3367 events, all analyzer
-score dimensions at
-`5`, empty `rpc_drift_counts`, nonzero array-payload coverage for all known
-POC15 pCIDs, and monitor scores of `5` for promise-theory fit, autonomy, and
-protocol validity plus `4` for local-trust correctness. The remaining monitor
-`4` is a production-fitness caution, not a clean-run failure: the POC is still a
-bounded local scaffold, not a production network with independent legal-entity
-nodes, adversarial operators, or durable cross-run stores. POC15 now also emits
-run-local exact CBOR specimens for
+validated POC15 clean run for this update records 4863 events, all analyzer
+score dimensions at `5`, empty `rpc_drift_counts`, nonzero array-payload
+coverage for all known POC15 pCIDs, and monitor scores of `5` for
+promise-theory fit, autonomy, protocol validity, local-trust correctness, and
+imposition avoidance. The clean-run result is POC-scope completeness, not proof
+of production readiness: the POC is still a bounded local scaffold, not a
+production network with independent legal-entity nodes, adversarial operators,
+or durable cross-run stores. POC15 now also emits run-local exact CBOR specimens
+for
 pCID-owned outer arity, native proof, envelope-parent slot placement before and
 after payload, COSE-as-payload, COSE-as-proof, and COSE tamper rejection. The
 `DI-kohuj` convergence slice then moves a narrow part of that pressure into
@@ -290,20 +290,26 @@ as useful runtime-adapter work. POC15 now also sends exact envelope artifacts
 through the observer-only collector and stores binary `.cbor` files plus a
 `message-dag.jsonl` index under the run root, so operators can inspect actual
 messages rather than only event records about messages; that verified clean run
-produced 413 message-DAG artifact rows, 230 unique exact-message CAS objects, a
-reachable 230-node raw-message DAG, 22 parent links, zero missing parents, and
+produced 413 message-DAG artifact rows, 222 unique exact-message CAS objects, a
+reachable 222-node raw-message DAG, 22 parent links, zero missing parents, and
 parent-link coverage in both envelope slots and pCID-defined payload fields. The
 collector image includes `poc15-cbor-diag` so those retained artifacts can be
 rendered as CBOR diagnostic notation from the run root without mutating run
-state. Remaining POC15 design work includes more advanced route exclusion
-through peer promises, deeper route economics than one reciprocal credit, truly
-independent return-route traffic, raw artifact counts by every POC artifact
-kind, and transport/session proof alternatives beyond the current comparison
-event. Source:
+state. POC15 now also distinguishes that observer-only archive from each app's
+own sparse CAS: apps can retain exact message bytes, local state bytes,
+encrypted blobs named by ciphertext CID, and peer-served content; app-local
+message DAGs may have missing parents; storage for peers remains voluntary and
+may be compensated with bearer storage tokens; and local GC retains paid,
+pinned, or encrypted objects while removing pressure-tagged temporary bytes.
+Remaining POC15 design work includes more advanced route exclusion through peer
+promises, deeper route economics than one reciprocal credit, truly independent
+return-route traffic, raw artifact counts by every POC artifact kind, and
+transport/session proof alternatives beyond the current comparison event.
+Source:
 `DI-sihuz`; `DI-linof`; `DI-lulof`; `DI-kinaf`; `DI-dubih`; `DI-gahuh`;
 `DI-pamob`; `DI-sivis`; `DI-dirat`; `DI-podut`; `DI-lutuv`; `DI-nivon`;
 `DI-lihir`; `DI-darur`; `DI-daruf`; `DI-tuhop`; `DI-bapif`; `DI-mosat`;
-`DI-kohuj`.
+`DI-kohuj`; `DI-manul`.
 
 `poc7` adds executable evidence for promise-shaped capability tokens and local
 exchange: five containers run local kernel boundaries, app-level relays, issuer,
@@ -1501,11 +1507,14 @@ section.
   route-credit events, useful route-carried Peggy/Victor compute, and a
   transport-vs-envelope proof comparison event. The final image includes
   `poc15-cbor-diag` for read-only CBOR diagnostic rendering of those retained
-  artifacts. It should be cited as POC event, raw-message artifact, and specimen
-  coverage only, not as a final route, kernel, monitor, WASM/stdio,
-  parent-DAG, or app API.
+  artifacts. It now also gates agent-owned sparse CAS metadata, encrypted-object
+  CIDs, sparse local message-DAG indexes, peer CAS storage/retrieval promises,
+  bearer storage-token flow, and local CAS GC. It should be cited as POC event,
+  raw-message artifact, sparse-CAS, and specimen coverage only, not as a final
+  route, kernel, monitor, WASM/stdio, parent-DAG, CAS economics, or app API.
   Source: `DI-podut`; `DI-lutuv`; `DI-nivon`; `DI-lihir`; `DI-darur`;
-  `DI-daruf`; `DI-tuhop`; `DI-bapif`; `DI-mosat`; `DI-kohuj`; `TODO-gogug`.
+  `DI-daruf`; `DI-tuhop`; `DI-bapif`; `DI-mosat`; `DI-kohuj`; `DI-manul`;
+  `TODO-gogug`.
 - `protocols/wire-lab.d/archive/migrations/SIM-piloh-turns-149-208-recovery/archive/transports/README.md`
   preserves the old root transport design surface as historical evidence.
 

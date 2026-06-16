@@ -63,6 +63,8 @@ type Node struct {
 	promiseJournal       map[string]promiseRecord
 	eventOutcomeCounts   map[string]int
 	casStore             map[string][]byte
+	agentCASStore        map[string]agentCASObject
+	agentMessageDAG      map[string]agentMessageDAGNode
 	capabilityTokens     map[string]string
 	computeCache         map[string]map[string]string
 	replayJournal        map[string]string
@@ -153,10 +155,11 @@ type checkpointRecord struct {
 }
 
 // runScopedState is the restartable state this POC keeps only inside one run
-// root. Intent: CAS bytes, compute checkpoints, replay windows, and app-local
-// event journals may survive a process restart within one experiment, but the
-// clean-run reset remains the experiment scope that prevents stale state from muddying
-// the next POC15 run. Source: DI-sunuf
+// root. Intent: CAS bytes, per-agent sparse CAS metadata, message-DAG indexes,
+// compute checkpoints, replay windows, and app-local event journals may survive a
+// process restart within one experiment, but the clean-run reset remains the
+// experiment scope that prevents stale state from muddying the next POC15 run.
+// Source: DI-sunuf; DI-manul
 type runScopedState struct {
 	Version              int                            `json:"version"`
 	CASObjects           map[string]string              `json:"cas_objects_b64,omitempty"`
@@ -167,6 +170,8 @@ type runScopedState struct {
 	PromiseJournal       map[string]promiseRecord       `json:"promise_journal,omitempty"`
 	EventOutcomeCounts   map[string]int                 `json:"event_outcome_counts,omitempty"`
 	ReplayJournal        map[string]string              `json:"replay_journal,omitempty"`
+	AgentCASObjects      map[string]agentCASObject      `json:"agent_cas_objects,omitempty"`
+	AgentMessageDAG      map[string]agentMessageDAGNode `json:"agent_message_dag,omitempty"`
 }
 
 // NewNode creates a node with a private trust ledger for every configured peer.
@@ -193,6 +198,8 @@ func NewNode(cfg config.Config, agent config.AgentConfig, decider decision.Decid
 		promiseJournal:       make(map[string]promiseRecord),
 		eventOutcomeCounts:   make(map[string]int),
 		casStore:             make(map[string][]byte),
+		agentCASStore:        make(map[string]agentCASObject),
+		agentMessageDAG:      make(map[string]agentMessageDAGNode),
 		capabilityTokens:     make(map[string]string),
 		computeCache:         make(map[string]map[string]string),
 		replayJournal:        make(map[string]string),
@@ -223,6 +230,7 @@ func (node *Node) Run(ctx context.Context) error {
 	defer node.closeReceivePromises()
 	time.Sleep(node.Config.StartupDelay())
 	node.record("peer_readiness_observed", "kept", "", "startup delay elapsed after local receive promises")
+	node.recordAgentCASAccessEvents()
 	if err := node.runStartupWorkflow(ctx); err != nil {
 		node.record("startup_workflow_failed", "broken", "", err.Error())
 	}
@@ -361,7 +369,8 @@ func (node *Node) runFulfillmentShipmentWorkflow() error {
 // compute, cache reuse, verification, and economics from Alice's local vantage.
 // Intent: POC15 is a POC13 superset, so this preserves inherited
 // storage/compute event records above the POC12 app/kernel interface without turning
-// peer behavior into RPC commands. Source: DI-sinur; DI-linof
+// peer behavior into RPC commands, while adding sparse per-agent CAS and token
+// incentive pressure. Source: DI-sinur; DI-linof; DI-manul
 func (node *Node) runCASComputeWorkflow() error {
 	contentBytes := production.SampleContentBytes()
 	contentCID := production.ContentCID(contentBytes)
@@ -429,7 +438,7 @@ func (node *Node) runCASComputeWorkflow() error {
 		return fmt.Errorf("store content: %w", err)
 	}
 	node.record("cas_multi_object_pressure", "kept", "bob", "pcid="+pcid.CASStorageV1+" Alice sends a second independent object")
-	if _, err := node.sendAndReceive("bob", map[string]string{
+	secondStoreAck, err := node.sendAndReceive("bob", map[string]string{
 		"act":                 decision.ActPromise,
 		"from":                node.Agent.Name,
 		"to":                  "bob",
@@ -442,7 +451,9 @@ func (node *Node) runCASComputeWorkflow() error {
 		"field_credit_offer":  "4",
 		"field_units":         "1",
 		"field_object_label":  "second-object",
-	}); err != nil {
+		"field_token_style":   "bearer",
+	})
+	if err != nil {
 		return fmt.Errorf("store second content: %w", err)
 	}
 	primaryToken := storeAck.Fields["field_capability_token"]
@@ -491,6 +502,41 @@ func (node *Node) runCASComputeWorkflow() error {
 		"field_token":         storeAck.Fields["field_replica_token"],
 	}); err != nil {
 		return fmt.Errorf("serve replica content: %w", err)
+	}
+	secondBearerToken := secondStoreAck.Fields["field_bearer_token"]
+	if secondBearerToken != "" {
+		node.record("agent_cas_bearer_storage_token_transferred", "kept", "frank", "pcid="+pcid.CASStorageV1+" issuer=bob content_cid="+secondContentCID)
+		if _, err := node.sendAndReceive("frank", map[string]string{
+			"act":                 decision.ActPromise,
+			"from":                node.Agent.Name,
+			"to":                  "frank",
+			"turn":                "startup",
+			"promise":             "Alice promises to transfer Bob's bearer storage token to Frank as payment for Frank's future storage work.",
+			"reason":              "bearer storage tokens should be peer-held incentives rather than global authority",
+			"field_promise_about": production.PromiseReplicaTokenLifecycle,
+			"field_content_cid":   secondContentCID,
+			"field_bearer_token":  secondBearerToken,
+			"field_token_style":   "bearer",
+			"field_token_status":  "transferred",
+			"field_issuer_peer":   "bob",
+			"field_redeem_peer":   "bob",
+		}); err != nil {
+			return fmt.Errorf("transfer bearer storage token: %w", err)
+		}
+	}
+	missingObjectCID := production.ContentCID([]byte("poc15 missing sparse CAS object|" + node.Config.RunID))
+	if _, err := node.sendAndReceive("frank", map[string]string{
+		"act":                        decision.ActPromise,
+		"from":                       node.Agent.Name,
+		"to":                         "frank",
+		"turn":                       "startup",
+		"promise":                    "Alice promises to treat Frank's missing-object response as a sparse CAS non-commitment, not as a broken storage promise.",
+		"reason":                     "sparse peer stores are expected to lack many objects",
+		"field_promise_about":        production.PromiseServeReplicaContent,
+		"field_content_cid":          missingObjectCID,
+		"field_missing_object_probe": "true",
+	}); err != nil {
+		return fmt.Errorf("sparse CAS missing-object probe: %w", err)
 	}
 	node.record("economics_credit_offered", "kept", "carol", "pcid="+pcid.CIDComputeV1+" Alice offers compute credit_offer=5")
 	if _, err := node.sendAndReceive("dave", map[string]string{
@@ -1870,7 +1916,8 @@ func (node *Node) handleAccountingPromise(fields map[string]string) (map[string]
 // about exact content bytes, retention, replica tokens, and local corruption
 // observations.
 // Intent: CAS is concrete storage behavior and event records; it is not an RPC
-// storage command or central authorization surface. Source: DI-sinur
+// storage command or central authorization surface. Sparse-store and bearer-token
+// behavior remain pCID-owned promises between peers. Source: DI-sinur; DI-manul
 func (node *Node) handleCASStoragePromise(fields map[string]string) (map[string]string, error) {
 	switch fields["field_promise_about"] {
 	case production.PromiseStoreContent:
@@ -1891,11 +1938,21 @@ func (node *Node) handleCASStoragePromise(fields map[string]string) (map[string]
 				"field_content_cid":    contentCID,
 			}, nil
 		}
-		node.mu.Lock()
-		node.casStore[contentCID] = append([]byte(nil), contentBytes...)
-		node.mu.Unlock()
+		node.storeLocalCASObject(contentBytes, agentCASStoreOptions{
+			Kind:         agentCASKindPeer,
+			SourcePeer:   fields["from"],
+			ProtocolName: pcid.CASStorageV1,
+			Retention:    "paid-run-local",
+			Paid:         true,
+		})
 		token := node.issueCapabilityToken(fields["from"], contentCID)
+		bearerToken := ""
+		if fields["field_token_style"] == "bearer" {
+			bearerToken = node.issueBearerStorageToken(contentCID)
+			node.record("agent_cas_bearer_storage_token_issued", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" token_scope=bearer content_cid="+contentCID)
+		}
 		node.record("cas_storage_promised", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" content_cid="+contentCID)
+		node.record("agent_cas_peer_storage_promised", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" content_cid="+contentCID+" retention=paid-run-local")
 		node.record("cas_retention_promised", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" retention=run-local")
 		node.record("cas_bytes_stored", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" content_cid="+contentCID)
 		node.record("economics_credit_accepted", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" credit_offer="+fields["field_credit_offer"])
@@ -1929,12 +1986,26 @@ func (node *Node) handleCASStoragePromise(fields map[string]string) (map[string]
 			"field_storage_status":   "stored",
 			"field_content_cid":      contentCID,
 			"field_capability_token": token,
+			"field_bearer_token":     bearerToken,
 			"field_replica_peer":     "frank",
 			"field_replica_token":    replicaToken,
 		}, nil
 	case production.PromiseServeContent:
 		contentCID := fields["field_content_cid"]
-		if !node.redeemCapabilityToken(fields["from"], contentCID, fields["field_token"]) {
+		if fields["field_missing_object_probe"] == "true" {
+			return node.handleSparseCASProbe(fields, production.PromiseServeContent), nil
+		}
+		if fields["field_token_style"] == "bearer" {
+			if !node.redeemBearerStorageToken(contentCID, fields["field_token"]) {
+				node.record("agent_cas_bearer_storage_token_rejected", "non_commitment", fields["from"], "pcid="+pcid.CASStorageV1+" bearer token not promised for content_cid="+contentCID)
+				return map[string]string{
+					"field_promise_about": production.PromiseServeContent,
+					"field_content_cid":   contentCID,
+					"field_token_status":  "not_promised",
+				}, nil
+			}
+			node.record("agent_cas_bearer_storage_token_redeemed", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" bearer content_cid="+contentCID)
+		} else if !node.redeemCapabilityToken(fields["from"], contentCID, fields["field_token"]) {
 			node.record("capability_token_replay_rejected", "non_commitment", fields["from"], "pcid="+pcid.CASStorageV1+" consumed or unrecognized serve-once token for content_cid="+contentCID)
 			return map[string]string{
 				"field_promise_about": production.PromiseServeContent,
@@ -1951,6 +2022,7 @@ func (node *Node) handleCASStoragePromise(fields map[string]string) (map[string]
 		node.record("capability_token_received", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" content_cid="+contentCID)
 		node.record("capability_token_ttl_observed", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" ttl still valid for content_cid="+contentCID)
 		node.record("cas_bytes_retrieved", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" content_cid="+contentCID)
+		node.record("agent_cas_peer_retrieval_promised", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" content_cid="+contentCID)
 		node.record("capability_token_revoked", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" serve-once token consumed for content_cid="+contentCID)
 		node.record("gc_promise_ended", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" serve-once token promise ended after redemption for content_cid="+contentCID)
 		node.record("gc_object_removed", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" consumed capability token removed from run-scoped store for content_cid="+contentCID)
@@ -1968,9 +2040,13 @@ func (node *Node) handleCASStoragePromise(fields map[string]string) (map[string]
 		if !production.VerifyContentCID(contentBytes, contentCID) {
 			return nil, fmt.Errorf("replica bytes do not match content CID")
 		}
-		node.mu.Lock()
-		node.casStore[contentCID] = append([]byte(nil), contentBytes...)
-		node.mu.Unlock()
+		node.storeLocalCASObject(contentBytes, agentCASStoreOptions{
+			Kind:         agentCASKindPeer,
+			SourcePeer:   fields["from"],
+			ProtocolName: pcid.CASStorageV1,
+			Retention:    "replica-run-local",
+			Paid:         true,
+		})
 		issuee := firstStringField(fields, "field_issuee", "from")
 		token := node.issueCapabilityToken(issuee, contentCID)
 		node.record("cas_replica_stored", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" content_cid="+contentCID)
@@ -1982,6 +2058,9 @@ func (node *Node) handleCASStoragePromise(fields map[string]string) (map[string]
 		}, nil
 	case production.PromiseServeReplicaContent:
 		contentCID := fields["field_content_cid"]
+		if fields["field_missing_object_probe"] == "true" {
+			return node.handleSparseCASProbe(fields, production.PromiseServeReplicaContent), nil
+		}
 		if !node.redeemCapabilityToken(fields["from"], contentCID, fields["field_token"]) {
 			node.record("capability_token_replay_rejected", "non_commitment", fields["from"], "pcid="+pcid.CASStorageV1+" consumed or unrecognized replica token for content_cid="+contentCID)
 			return map[string]string{
@@ -1997,6 +2076,7 @@ func (node *Node) handleCASStoragePromise(fields map[string]string) (map[string]
 			return nil, fmt.Errorf("replica content %s not stored", contentCID)
 		}
 		node.record("cas_replica_serve_promised", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" content_cid="+contentCID)
+		node.record("agent_cas_peer_retrieval_promised", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" replica content_cid="+contentCID)
 		node.record("replica_capability_token_redeemed", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" content_cid="+contentCID)
 		node.record("capability_token_expired", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" consumed replica token is expired after redemption")
 		node.record("capability_token_renewal_requested", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" Alice asks for fresh event if future retrieval is needed")
@@ -2009,6 +2089,59 @@ func (node *Node) handleCASStoragePromise(fields map[string]string) (map[string]
 			"field_promise_about": production.PromiseServeReplicaContent,
 			"field_content_cid":   contentCID,
 			"field_content_b64":   base64.StdEncoding.EncodeToString(contentBytes),
+		}, nil
+	case production.PromiseReplicaTokenLifecycle:
+		contentCID := fields["field_content_cid"]
+		if fields["field_token_status"] != "transferred" || fields["field_token_style"] != "bearer" {
+			node.record("agent_cas_bearer_storage_token_rejected", "non_commitment", fields["from"], "pcid="+pcid.CASStorageV1+" token lifecycle was not a bearer transfer promise")
+			return map[string]string{
+				"field_promise_about": production.PromiseReplicaTokenLifecycle,
+				"field_content_cid":   contentCID,
+				"field_token_status":  "not_promised",
+			}, nil
+		}
+		issuerPeer := firstStringField(fields, "field_issuer_peer", "field_redeem_peer")
+		bearerToken := firstStringField(fields, "field_bearer_token", "field_token")
+		node.record("agent_cas_bearer_storage_token_received", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" issuer="+issuerPeer+" content_cid="+contentCID)
+		redeemAck, redeemErr := node.sendAndReceive(issuerPeer, map[string]string{
+			"act":                 decision.ActPromise,
+			"from":                node.Agent.Name,
+			"to":                  issuerPeer,
+			"turn":                "startup",
+			"promise":             node.Agent.Name + " promises to present a bearer storage token and receive only the issuer's local serve event.",
+			"reason":              "bearer token redemption should be voluntary peer storage work, not authority",
+			"field_promise_about": production.PromiseServeContent,
+			"field_content_cid":   contentCID,
+			"field_token":         bearerToken,
+			"field_token_style":   "bearer",
+		})
+		if redeemErr != nil {
+			node.record("agent_cas_bearer_storage_token_rejected", "non_commitment", issuerPeer, "pcid="+pcid.CASStorageV1+" "+redeemErr.Error())
+			return map[string]string{
+				"field_promise_about": production.PromiseReplicaTokenLifecycle,
+				"field_content_cid":   contentCID,
+				"field_token_status":  "not_promised",
+			}, nil
+		}
+		contentBytes, decodeErr := base64.StdEncoding.DecodeString(redeemAck.Fields["field_content_b64"])
+		if decodeErr != nil {
+			return nil, decodeErr
+		}
+		if !production.VerifyContentCID(contentBytes, contentCID) {
+			return nil, fmt.Errorf("bearer token redeemed bytes do not match content CID")
+		}
+		node.storeLocalCASObject(contentBytes, agentCASStoreOptions{
+			Kind:         agentCASKindPeer,
+			SourcePeer:   issuerPeer,
+			ProtocolName: pcid.CASStorageV1,
+			Retention:    "bearer-token-paid-run-local",
+			Paid:         true,
+		})
+		node.record("agent_cas_bearer_storage_token_redeemed", "kept", issuerPeer, "pcid="+pcid.CASStorageV1+" holder="+node.Agent.Name+" content_cid="+contentCID)
+		return map[string]string{
+			"field_promise_about": production.PromiseReplicaTokenLifecycle,
+			"field_content_cid":   contentCID,
+			"field_token_status":  "redeemed",
 		}, nil
 	case production.PromisePresentStorageReport:
 		contentBytes, err := base64.StdEncoding.DecodeString(fields["field_content_b64"])
@@ -2430,6 +2563,19 @@ func (node *Node) issueCapabilityToken(issuee, contentCID string) string {
 	return token
 }
 
+// issueBearerStorageToken records a transferable storage token promise by the
+// local storage issuer.
+// Intent: POC15 needs a minimal bearer-token incentive path where the current
+// holder can redeem storage without treating the token as external authority.
+// Source: DI-manul
+func (node *Node) issueBearerStorageToken(contentCID string) string {
+	token := production.ContentCID([]byte(node.Agent.Name + "|" + contentCID + "|bearer-storage"))
+	node.mu.Lock()
+	node.capabilityTokens["bearer|"+contentCID+"|"+token] = token
+	node.mu.Unlock()
+	return token
+}
+
 func (node *Node) redeemCapabilityToken(issuee, contentCID, token string) bool {
 	node.mu.Lock()
 	defer node.mu.Unlock()
@@ -2439,6 +2585,49 @@ func (node *Node) redeemCapabilityToken(issuee, contentCID, token string) bool {
 	}
 	delete(node.capabilityTokens, tokenKey)
 	return true
+}
+
+// redeemBearerStorageToken consumes one transferable storage token from the
+// issuer's local token table.
+// Intent: Token redemption is an issuer-kept promise over local bytes; it does
+// not impose storage, routing, or trust decisions on any other agent. Source:
+// DI-manul
+func (node *Node) redeemBearerStorageToken(contentCID, token string) bool {
+	node.mu.Lock()
+	defer node.mu.Unlock()
+	tokenKey := "bearer|" + contentCID + "|" + token
+	if node.capabilityTokens[tokenKey] != token {
+		return false
+	}
+	delete(node.capabilityTokens, tokenKey)
+	return true
+}
+
+// handleSparseCASProbe reports whether this agent currently has local bytes for
+// a probed CID.
+// Intent: Sparse CAS misses are ordinary non-commitment records, because an
+// incomplete peer store has not broken a promise merely by lacking an object it
+// did not promise to retain. Source: DI-manul
+func (node *Node) handleSparseCASProbe(fields map[string]string, promiseAbout string) map[string]string {
+	contentCID := fields["field_content_cid"]
+	node.mu.Lock()
+	_, stored := node.casStore[contentCID]
+	node.mu.Unlock()
+	if stored {
+		node.record("agent_cas_sparse_object_present", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" content_cid="+contentCID)
+		return map[string]string{
+			"field_promise_about": promiseAbout,
+			"field_content_cid":   contentCID,
+			"field_token_status":  "present",
+		}
+	}
+	node.record("agent_cas_sparse_object_missing", "non_commitment", fields["from"], "pcid="+pcid.CASStorageV1+" content_cid="+contentCID)
+	node.record("agent_cas_retrieval_not_promised", "non_commitment", fields["from"], "pcid="+pcid.CASStorageV1+" sparse store has no local bytes for content_cid="+contentCID)
+	return map[string]string{
+		"field_promise_about": promiseAbout,
+		"field_content_cid":   contentCID,
+		"field_token_status":  "not_promised",
+	}
 }
 
 func (node *Node) observation(turnIndex int) decision.Observation {
@@ -3140,6 +3329,7 @@ func (node *Node) emitMessageArtifact(direction, peer, protocolName string, enve
 	if len(envelopeBytes) == 0 {
 		return
 	}
+	node.recordAgentCASMessageArtifact(direction, peer, protocolName, envelopeBytes, fields)
 	artifactProtocol := protocolName
 	if strings.TrimSpace(artifactProtocol) == "" {
 		artifactProtocol = "unknown"
@@ -3269,9 +3459,9 @@ func (node *Node) runScopedStatePath() string {
 
 // loadRunScopedState restores app-local state that belongs to this one POC15
 // run. Intent: A process restart inside a run should not erase CAS bytes,
-// compute checkpoints, replay windows, or promise journals, but the clean-run
-// reset can still delete the entire run root before the next experiment. Source:
-// DI-sunuf
+// sparse-CAS metadata, compute checkpoints, replay windows, or promise journals,
+// but the clean-run reset can still delete the entire run root before the next
+// experiment. Source: DI-sunuf; DI-manul
 func (node *Node) loadRunScopedState() error {
 	statePath := node.runScopedStatePath()
 	stateBytes, readErr := os.ReadFile(statePath)
@@ -3303,8 +3493,10 @@ func (node *Node) loadRunScopedState() error {
 	node.promiseJournal = copyPromiseMapOrEmpty(state.PromiseJournal)
 	node.eventOutcomeCounts = copyIntMapOrEmpty(state.EventOutcomeCounts)
 	node.replayJournal = copyMapOrEmpty(state.ReplayJournal)
+	node.agentCASStore = copyAgentCASMapOrEmpty(state.AgentCASObjects)
+	node.agentMessageDAG = copyAgentMessageDAGMapOrEmpty(state.AgentMessageDAG)
 	node.mu.Unlock()
-	node.record("run_scoped_store_loaded", "kept", "", fmt.Sprintf("cas=%d tokens=%d compute=%d checkpoints=%d promises=%d replay=%d", len(casObjects), len(state.CapabilityTokens), len(state.ComputeCache), len(state.CheckpointJournal), len(state.PromiseJournal), len(state.ReplayJournal)))
+	node.record("run_scoped_store_loaded", "kept", "", fmt.Sprintf("cas=%d agent_cas=%d agent_dag=%d tokens=%d compute=%d checkpoints=%d promises=%d replay=%d", len(casObjects), len(state.AgentCASObjects), len(state.AgentMessageDAG), len(state.CapabilityTokens), len(state.ComputeCache), len(state.CheckpointJournal), len(state.PromiseJournal), len(state.ReplayJournal)))
 	node.record("cas_run_store_loaded", "kept", "", fmt.Sprintf("cas_objects=%d", len(casObjects)))
 	node.record("event_run_store_loaded", "kept", "", fmt.Sprintf("promise_journal=%d checkpoint_journal=%d non_commitments=%d receiver_non_commitments=%d replay=%d", len(state.PromiseJournal), len(state.CheckpointJournal), state.EventOutcomeCounts[string(relationship.OutcomeNonCommitment)], len(state.NonCommitmentJournal), len(state.ReplayJournal)))
 	node.record("compute_cache_run_store_loaded", "kept", "", fmt.Sprintf("compute_cache=%d", len(state.ComputeCache)))
@@ -3312,9 +3504,10 @@ func (node *Node) loadRunScopedState() error {
 }
 
 // saveRunScopedState writes restartable run state through a temporary file and
-// rename. Intent: Partial writes should not corrupt the app's local events if
-// a process is killed mid-save, and the saved state remains scoped to this run
-// root rather than becoming cross-run truth. Source: DI-sunuf
+// rename. Intent: Partial writes should not corrupt the app's local events or
+// sparse-CAS metadata if a process is killed mid-save, and the saved state
+// remains scoped to this run root rather than becoming cross-run truth. Source:
+// DI-sunuf; DI-manul
 func (node *Node) saveRunScopedState() error {
 	state := node.exportRunScopedState()
 	statePath := node.runScopedStatePath()
@@ -3332,7 +3525,7 @@ func (node *Node) saveRunScopedState() error {
 	if err := os.Rename(tempPath, statePath); err != nil {
 		return err
 	}
-	node.record("run_scoped_store_saved", "kept", "", fmt.Sprintf("cas=%d tokens=%d compute=%d checkpoints=%d promises=%d replay=%d", len(state.CASObjects), len(state.CapabilityTokens), len(state.ComputeCache), len(state.CheckpointJournal), len(state.PromiseJournal), len(state.ReplayJournal)))
+	node.record("run_scoped_store_saved", "kept", "", fmt.Sprintf("cas=%d agent_cas=%d agent_dag=%d tokens=%d compute=%d checkpoints=%d promises=%d replay=%d", len(state.CASObjects), len(state.AgentCASObjects), len(state.AgentMessageDAG), len(state.CapabilityTokens), len(state.ComputeCache), len(state.CheckpointJournal), len(state.PromiseJournal), len(state.ReplayJournal)))
 	node.record("cas_run_store_saved", "kept", "", fmt.Sprintf("cas_objects=%d", len(state.CASObjects)))
 	node.record("event_run_store_saved", "kept", "", fmt.Sprintf("promise_journal=%d checkpoint_journal=%d non_commitments=%d receiver_non_commitments=%d replay=%d", len(state.PromiseJournal), len(state.CheckpointJournal), state.EventOutcomeCounts[string(relationship.OutcomeNonCommitment)], len(state.NonCommitmentJournal), len(state.ReplayJournal)))
 	node.record("compute_cache_run_store_saved", "kept", "", fmt.Sprintf("compute_cache=%d", len(state.ComputeCache)))
@@ -3356,6 +3549,8 @@ func (node *Node) exportRunScopedState() runScopedState {
 		PromiseJournal:       copyPromiseMapOrEmpty(node.promiseJournal),
 		EventOutcomeCounts:   copyIntMapOrEmpty(node.eventOutcomeCounts),
 		ReplayJournal:        copyMapOrEmpty(node.replayJournal),
+		AgentCASObjects:      copyAgentCASMapOrEmpty(node.agentCASStore),
+		AgentMessageDAG:      copyAgentMessageDAGMapOrEmpty(node.agentMessageDAG),
 	}
 }
 
@@ -3365,6 +3560,7 @@ func (node *Node) exportRunScopedState() runScopedState {
 // token-expiry, disk-pressure, and superseded-checkpoint conditions. Source:
 // DI-sunuf
 func (node *Node) recordRunScopedRetentionAndGC() {
+	node.recordAgentCASGCEvents()
 	state := node.exportRunScopedState()
 	node.record("retention_promise_recorded", "kept", "", "run-scoped CAS, compute, token, replay, and journal state is retained only for this POC15 run")
 	node.record("retention_until_promised", "kept", "", "retain_until=run_end_or_clean_reset")

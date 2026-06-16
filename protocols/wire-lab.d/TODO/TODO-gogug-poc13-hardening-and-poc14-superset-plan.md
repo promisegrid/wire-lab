@@ -236,6 +236,14 @@ Constraints: Preserve one top-level semantic action `promise`; preserve `42(pCID
 Affects: implementations/poc15-multihop-multiarity-dag/protocol/; implementations/poc15-multihop-multiarity-dag/runtime/; implementations/poc15-multihop-multiarity-dag/cmd/poc15-analyze/; implementations/poc15-multihop-multiarity-dag/docs/; implementations/poc15-multihop-multiarity-dag/README.md; DEV-GUIDE-RESOURCES.md; docs/thought-experiments/TE-vakah-poc15-multihop-multiarity-dag.md; protocols/wire-lab.d/TODO/TODO-gogug-poc13-hardening-and-poc14-superset-plan.md.
 Supersedes: DI-mosat
 
+ID: DI-manul
+Date: 2026-06-15 07:07:38
+Status: active
+Decision: Implement the next POC15 CAS slice by giving agents local sparse CAS stores, optional message-DAG indexes over stored exact message bytes, peer CAS storage/retrieval promises, bearer storage-token incentives, encrypted-object storage semantics, and local GC events.
+Intent: POC15 should no longer model CAS only as observer-owned run artifacts or as a single mostly-complete storage peer. Each agent may maintain its own incomplete CAS or rely on peer CAS promises, and each agent may store whatever bytes it chooses, including messages, payloads, encrypted blobs, internal state, or checkpoints. Some agents should index parent fields from messages they actually store, with missing parents treated as normal sparse-store state. Storage for peers must be voluntary and incentivized through local credits or bearer capability tokens, and garbage collection must be a local promise about retention rather than global policy.
+Constraints: Preserve one top-level semantic action `promise`; preserve run-scoped clean-run storage; do not make any CAS store global, complete, authoritative, or mounted through the observer volume; CIDs name exact stored bytes, so encrypted objects are addressed by ciphertext CID, not cleartext CID; local message DAGs are partial indexes built only from bytes the agent has; use names `agentCASStore`, `agentMessageDAG`, `storeLocalCASObject`, `indexMessageDAGObject`, `recordAgentCASAccessEvents`, `recordAgentCASGCEvents`, and analyzer event names prefixed with `agent_cas_` or `message_dag_` where possible.
+Affects: implementations/poc15-multihop-multiarity-dag/runtime/; implementations/poc15-multihop-multiarity-dag/cmd/poc15-analyze/; implementations/poc15-multihop-multiarity-dag/docs/; implementations/poc15-multihop-multiarity-dag/README.md; DEV-GUIDE-RESOURCES.md; protocols/wire-lab.d/TODO/TODO-gogug-poc13-hardening-and-poc14-superset-plan.md.
+
 ## Tasks
 
 - [x] gogug.1 Fix POC13 evidence summary mismatch so saved evidence counts include all local non-commitment outcomes, not only receiver-side `not_promised` journal entries.
@@ -308,3 +316,13 @@ Supersedes: DI-mosat
 - [x] gogug.68 Route Victor's useful stdio compute work through route_v1.
 - [x] gogug.69 Add COSE negative tests for bad algorithm, protected header, and detached payload mismatch.
 - [x] gogug.70 Record the POC15 envelope-proof versus transport-layer signature comparison.
+- [x] gogug.71 Add agent-local sparse CAS store metadata separate from observer `message-cas`.
+- [x] gogug.72 Store local exact message bytes and arbitrary internal bytes in agent CAS.
+- [x] gogug.73 Add per-agent message DAG indexing with normal missing-parent records.
+- [x] gogug.74 Add encrypted-object CAS behavior where ciphertext CID is the storage key.
+- [x] gogug.75 Add peer CAS storage/retrieval events with sparse-store non-commitment.
+- [x] gogug.76 Add bearer storage-token incentive issue, transfer, redemption, and rejection events.
+- [x] gogug.77 Add local CAS GC retention/removal promises for paid, pinned, expired, and pressure-triggered objects.
+- [x] gogug.78 Add analyzer checks for sparse stores, local DAGs, tokens, encrypted storage, and GC.
+- [x] gogug.79 Update POC15 and DEV guide docs for agent-accessible sparse CAS.
+- [x] gogug.80 Run Go validation and clean POC15 containers after the CAS/DAG slice.
