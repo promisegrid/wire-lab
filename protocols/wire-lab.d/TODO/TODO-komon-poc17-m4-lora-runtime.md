@@ -5,7 +5,10 @@
 Planned. Owns the future `implementations/poc17-m4-lora-runtime/` proof of
 concept, targeted after POC16. POC17 should add a constrained Cortex-M4/LoRa
 runtime agent without using a UART or host bridge as the PromiseGrid message
-transport. Source: `DI-lazal`.
+transport. POC16 planning now lives in
+`TODO-zugok-poc16-secure-tokens-maps-encrypted-payloads.md` and should feed the
+constrained-device token, encryption, and payload-shape decisions here. Source:
+`DI-lazal`; `DI-ruvot`.
 
 ## Decision Intent Log
 
@@ -33,6 +36,9 @@ Affects: implementations/poc17-m4-lora-runtime/; protocols/wire-lab.d/TODO/TODO-
 - Preserve the POC superset rule unless an explicit later DI narrows POC17:
   POC17 should inherit the relevant POC15/POC16 protocol lessons rather than
   resetting to a toy transport.
+- Treat POC16's map, secure-token, CWT-shaped, and encrypted-payload work as
+  design pressure that constrained M4/LoRa agents may profile down rather than
+  silently omit.
 
 ## Architecture Targets
 
