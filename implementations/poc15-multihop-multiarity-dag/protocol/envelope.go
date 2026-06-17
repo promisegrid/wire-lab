@@ -86,9 +86,9 @@ type Envelope struct {
 	ParentExactSHA256s []string
 }
 
-// NewEnvelope builds a legacy map payload and signs the envelope's two-slot
+// NewEnvelope builds an older generic map payload and signs the envelope's two-slot
 // signable view. New or reworked pCIDs should prefer NewEnvelopeFromPayload with
-// pCID-owned CBOR arrays rather than extending the legacy field-map scaffold.
+// pCID-owned CBOR arrays rather than extending the older generic map scaffold.
 // Intent: Preserve existing POC15 flows while `DI-vipih` migrates new protocol
 // work toward pCID-owned array payloads. Source: DI-vipih
 func NewEnvelope(protocolCID ProtocolCID, fields map[string]string, signer string) (Envelope, error) {
@@ -298,11 +298,11 @@ func ParseEnvelope(envelopeBytes []byte) (Envelope, error) {
 	return envelopeFromGridMessage(gridMessage)
 }
 
-// PayloadFields decodes legacy map payloads and pCID-owned array payloads into
+// PayloadFields decodes older map payloads and pCID-owned array payloads into
 // local compatibility fields whose routing fields the POC15 kernel still needs.
 // Intent: Kernel routing still needs promiser/promisee during the migration away
-// from field maps, but the envelope layer should not make field maps the target
-// protocol pattern. Source: DI-vipih; DI-dirat
+// from generic map payloads, but the envelope layer should not make generic maps
+// the target protocol pattern. Source: DI-vipih; DI-dirat
 func (envelope Envelope) PayloadFields() (map[string]string, error) {
 	fields, fieldsErr := UnmarshalStringMap(envelope.Payload)
 	if fieldsErr == nil {

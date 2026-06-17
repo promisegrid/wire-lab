@@ -98,19 +98,19 @@ func LabelForShipment(packageID, address string, weightOunces int) (string, int,
 // label printing for one issuee and scope; it is not permission from an
 // authority. Source: DI-pohaj; DI-vutok
 func IssuePrintCapabilityToken(fields map[string]string) (string, error) {
-	tokenID := strings.TrimSpace(fields["field_print_capability_token_id"])
+	tokenID := strings.TrimSpace(fields["print_capability_token_id"])
 	if tokenID == "" {
-		tokenID = "printcap-" + strings.TrimSpace(fields["field_print_capability_issuee"])
+		tokenID = "printcap-" + strings.TrimSpace(fields["print_capability_issuee"])
 	}
-	scope := strings.TrimSpace(fields["field_print_capability_scope"])
+	scope := strings.TrimSpace(fields["print_capability_scope"])
 	if scope == "" {
 		scope = PrintCapabilityScope
 	}
-	maxBytes := fields["field_print_capability_max_bytes"]
+	maxBytes := fields["print_capability_max_bytes"]
 	if maxBytes == "" {
 		maxBytes = strconv.Itoa(PrintCapabilityMaxBytes)
 	}
-	token := strings.TrimSpace(fields["field_print_capability_issuee"])
+	token := strings.TrimSpace(fields["print_capability_issuee"])
 	if token == "" {
 		token = strings.TrimSpace(fields["to"])
 	}
@@ -130,23 +130,23 @@ func IssuePrintCapabilityToken(fields map[string]string) (string, error) {
 // Intent: Token redemption is local promise recognition by the issuer, not a
 // global authorization check. Source: DI-pohaj; DI-vutok
 func ValidatePrintCapabilityToken(fields map[string]string) error {
-	token := strings.TrimSpace(fields["field_print_capability_token"])
+	token := strings.TrimSpace(fields["print_capability_token"])
 	if token == "" {
 		return fmt.Errorf("print capability token is required")
 	}
-	tokenID := strings.TrimSpace(fields["field_print_capability_token_id"])
+	tokenID := strings.TrimSpace(fields["print_capability_token_id"])
 	if tokenID == "" {
 		return fmt.Errorf("print capability token_id is required")
 	}
-	scope := strings.TrimSpace(fields["field_print_capability_scope"])
+	scope := strings.TrimSpace(fields["print_capability_scope"])
 	if scope != PrintCapabilityScope {
 		return fmt.Errorf("print capability scope %q is not supported", scope)
 	}
-	maxBytes := intField(fields, "field_print_capability_max_bytes")
+	maxBytes := intField(fields, "print_capability_max_bytes")
 	if maxBytes <= 0 || maxBytes > PrintCapabilityMaxBytes {
 		return fmt.Errorf("print capability max_bytes %d is outside local bounds", maxBytes)
 	}
-	labelBytes, decodeErr := hex.DecodeString(strings.TrimSpace(fields["field_label_bytes_hex"]))
+	labelBytes, decodeErr := hex.DecodeString(strings.TrimSpace(fields["label_bytes_hex"]))
 	if decodeErr != nil {
 		return fmt.Errorf("label bytes are not valid hex: %w", decodeErr)
 	}
@@ -157,11 +157,11 @@ func ValidatePrintCapabilityToken(fields map[string]string) error {
 		return fmt.Errorf("label bytes length %d exceeds capability max_bytes %d", len(labelBytes), maxBytes)
 	}
 	capabilityFields := map[string]string{
-		"to":                               strings.TrimSpace(fields["from"]),
-		"field_print_capability_issuee":    strings.TrimSpace(fields["from"]),
-		"field_print_capability_token_id":  tokenID,
-		"field_print_capability_scope":     scope,
-		"field_print_capability_max_bytes": strconv.Itoa(maxBytes),
+		"to":                         strings.TrimSpace(fields["from"]),
+		"print_capability_issuee":    strings.TrimSpace(fields["from"]),
+		"print_capability_token_id":  tokenID,
+		"print_capability_scope":     scope,
+		"print_capability_max_bytes": strconv.Itoa(maxBytes),
 	}
 	printEvent, issueErr := IssuePrintCapabilityToken(capabilityFields)
 	if issueErr != nil {
@@ -179,16 +179,16 @@ func ValidatePrintCapabilityToken(fields map[string]string) error {
 // printer-port app separately promises local hardware access event records.
 // Source: DI-pohaj; DI-vutok
 func LabelBytesForShipment(fields map[string]string) ([]byte, error) {
-	if strings.TrimSpace(fields["field_package_id"]) == "" {
+	if strings.TrimSpace(fields["package_id"]) == "" {
 		return nil, fmt.Errorf("package_id is required")
 	}
-	if strings.TrimSpace(fields["field_tracking_number"]) == "" {
+	if strings.TrimSpace(fields["tracking_number"]) == "" {
 		return nil, fmt.Errorf("tracking_number is required")
 	}
-	if strings.TrimSpace(fields["field_cost_cents"]) == "" {
+	if strings.TrimSpace(fields["cost_cents"]) == "" {
 		return nil, fmt.Errorf("cost_cents is required")
 	}
-	labelBytes := []byte("UPS-LABEL\npackage=" + fields["field_package_id"] + "\ntracking=" + fields["field_tracking_number"] + "\ncost_cents=" + fields["field_cost_cents"] + "\n")
+	labelBytes := []byte("UPS-LABEL\npackage=" + fields["package_id"] + "\ntracking=" + fields["tracking_number"] + "\ncost_cents=" + fields["cost_cents"] + "\n")
 	if len(labelBytes) > PrintCapabilityMaxBytes {
 		return nil, fmt.Errorf("label bytes length %d exceeds local max %d", len(labelBytes), PrintCapabilityMaxBytes)
 	}
@@ -204,7 +204,7 @@ func PrintLabelToLocalDevice(fields map[string]string) (string, error) {
 	if validateErr := ValidatePrintCapabilityToken(fields); validateErr != nil {
 		return "", validateErr
 	}
-	labelBytes, decodeErr := hex.DecodeString(strings.TrimSpace(fields["field_label_bytes_hex"]))
+	labelBytes, decodeErr := hex.DecodeString(strings.TrimSpace(fields["label_bytes_hex"]))
 	if decodeErr != nil {
 		return "", fmt.Errorf("label bytes are not valid hex: %w", decodeErr)
 	}
@@ -324,15 +324,15 @@ func ExecuteFunction(functionBytes, inputBytes, contextBytes []byte) ([]byte, er
 // Intent: Runtime adapters and ordinary compute peers should verify the same
 // exact bytes before promising compute results. Source: DI-sivis
 func DecodeComputeInputs(fields map[string]string) (ComputeInputs, error) {
-	functionBytes, functionErr := base64.StdEncoding.DecodeString(fields["field_function_b64"])
+	functionBytes, functionErr := base64.StdEncoding.DecodeString(fields["function_b64"])
 	if functionErr != nil {
 		return ComputeInputs{}, functionErr
 	}
-	inputBytes, inputErr := base64.StdEncoding.DecodeString(fields["field_input_b64"])
+	inputBytes, inputErr := base64.StdEncoding.DecodeString(fields["input_b64"])
 	if inputErr != nil {
 		return ComputeInputs{}, inputErr
 	}
-	contextBytes, contextErr := base64.StdEncoding.DecodeString(fields["field_context_b64"])
+	contextBytes, contextErr := base64.StdEncoding.DecodeString(fields["context_b64"])
 	if contextErr != nil {
 		return ComputeInputs{}, contextErr
 	}
@@ -344,13 +344,13 @@ func DecodeComputeInputs(fields map[string]string) (ComputeInputs, error) {
 // Intent: Heterogeneous compute runtimes must not bypass pCID-owned byte/CID
 // checks while proving useful work. Source: DI-sivis
 func VerifyComputeInputCIDs(fields map[string]string, inputs ComputeInputs) error {
-	if !VerifyContentCID(inputs.FunctionBytes, fields["field_function_cid"]) {
+	if !VerifyContentCID(inputs.FunctionBytes, fields["function_cid"]) {
 		return fmt.Errorf("function bytes do not match function CID")
 	}
-	if !VerifyContentCID(inputs.InputBytes, fields["field_input_cid"]) {
+	if !VerifyContentCID(inputs.InputBytes, fields["input_cid"]) {
 		return fmt.Errorf("input bytes do not match input CID")
 	}
-	if !VerifyContentCID(inputs.ContextBytes, fields["field_context_cid"]) {
+	if !VerifyContentCID(inputs.ContextBytes, fields["context_cid"]) {
 		return fmt.Errorf("context bytes do not match context CID")
 	}
 	return nil
@@ -362,15 +362,15 @@ func VerifyComputeInputCIDs(fields map[string]string, inputs ComputeInputs) erro
 // ACK payload remains the existing compute promise shape. Source: DI-sivis
 func ExecuteComputePromiseFields(fields map[string]string, resultBytes []byte) map[string]string {
 	return map[string]string{
-		"field_promise_about": PromiseExecuteFunction,
-		"field_function_cid":  fields["field_function_cid"],
-		"field_function_b64":  fields["field_function_b64"],
-		"field_input_cid":     fields["field_input_cid"],
-		"field_input_b64":     fields["field_input_b64"],
-		"field_context_cid":   fields["field_context_cid"],
-		"field_context_b64":   fields["field_context_b64"],
-		"field_result_cid":    ContentCID(resultBytes),
-		"field_result_b64":    base64.StdEncoding.EncodeToString(resultBytes),
+		"promise_about": PromiseExecuteFunction,
+		"function_cid":  fields["function_cid"],
+		"function_b64":  fields["function_b64"],
+		"input_cid":     fields["input_cid"],
+		"input_b64":     fields["input_b64"],
+		"context_cid":   fields["context_cid"],
+		"context_b64":   fields["context_b64"],
+		"result_cid":    ContentCID(resultBytes),
+		"result_b64":    base64.StdEncoding.EncodeToString(resultBytes),
 	}
 }
 

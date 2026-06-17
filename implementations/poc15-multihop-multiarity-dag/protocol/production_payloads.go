@@ -13,9 +13,9 @@ var postalScaleSchemas = []arrayPayloadSchema{
 	{
 		promiseAbout: productionPromiseWeighPackage,
 		bodyFields: []string{
-			"field_package_id",
-			"field_exchange_id",
-			"field_weight_ounces",
+			"package_id",
+			"exchange_id",
+			"weight_ounces",
 		},
 	},
 }
@@ -24,13 +24,13 @@ var upsLabelSchemas = []arrayPayloadSchema{
 	{
 		promiseAbout: productionPromisePrintLabel,
 		bodyFields: []string{
-			"field_package_id",
-			"field_exchange_id",
-			"field_shipping_address",
-			"field_weight_ounces",
-			"field_tracking_number",
-			"field_cost_cents",
-			"field_printer_spool_id",
+			"package_id",
+			"exchange_id",
+			"shipping_address",
+			"weight_ounces",
+			"tracking_number",
+			"cost_cents",
+			"printer_spool_id",
 		},
 	},
 }
@@ -39,19 +39,19 @@ var accountingSchemas = []arrayPayloadSchema{
 	{
 		promiseAbout: productionPromiseAddressLookup,
 		bodyFields: []string{
-			"field_order_id",
-			"field_exchange_id",
-			"field_shipping_address",
+			"order_id",
+			"exchange_id",
+			"shipping_address",
 		},
 	},
 	{
 		promiseAbout: productionPromiseShipmentUpdate,
 		bodyFields: []string{
-			"field_order_id",
-			"field_exchange_id",
-			"field_tracking_number",
-			"field_cost_cents",
-			"field_duplicate_shipment_update",
+			"order_id",
+			"exchange_id",
+			"tracking_number",
+			"cost_cents",
+			"duplicate_shipment_update",
 		},
 	},
 }
@@ -60,33 +60,33 @@ var printerPortSchemas = []arrayPayloadSchema{
 	{
 		promiseAbout: productionPromiseIssuePrintCapability,
 		bodyFields: []string{
-			"field_issuee",
-			"field_exchange_id",
-			"field_print_capability_issuee",
-			"field_print_capability_token",
-			"field_print_capability_token_id",
-			"field_print_capability_scope",
-			"field_print_capability_max_bytes",
+			"issuee",
+			"exchange_id",
+			"print_capability_issuee",
+			"print_capability_token",
+			"print_capability_token_id",
+			"print_capability_scope",
+			"print_capability_max_bytes",
 		},
 	},
 	{
 		promiseAbout: productionPromiseRedeemPrintCapability,
 		bodyFields: []string{
-			"field_print_capability_issuee",
-			"field_exchange_id",
-			"field_print_capability_token",
-			"field_print_capability_token_id",
-			"field_print_capability_scope",
-			"field_print_capability_max_bytes",
-			"field_label_bytes_hex",
-			"field_printer_spool_id",
+			"print_capability_issuee",
+			"exchange_id",
+			"print_capability_token",
+			"print_capability_token_id",
+			"print_capability_scope",
+			"print_capability_max_bytes",
+			"label_bytes_hex",
+			"printer_spool_id",
 		},
 	},
 }
 
 // MarshalPostalScalePayloadFields encodes postal_scale_v1 as a pCID-owned CBOR
 // array. Intent: Device payloads should be protocol-owned slot values, not
-// generic field-map messages. Source: DI-dirat
+// generic map messages. Source: DI-dirat
 func MarshalPostalScalePayloadFields(fields map[string]string) ([]byte, error) {
 	return marshalArrayPayload(fields, postalScaleSchemas)
 }

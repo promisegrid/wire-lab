@@ -30,7 +30,7 @@ const sendTimeout = 5 * time.Second
 const shutdownDrainTimeout = 750 * time.Millisecond
 const fulfillmentOrderID = "ORDER-1001"
 const fulfillmentPackageID = "PKG-1001"
-const duplicateShipmentEventField = "field_duplicate_shipment_update"
+const duplicateShipmentEventField = "duplicate_shipment_update"
 
 // Node runs one local POC15 app process. A container may run several app
 // processes, but each process keeps its own local relationship ledger, log, and
@@ -299,57 +299,57 @@ func (node *Node) runFulfillmentShipmentWorkflow() error {
 	// production workflow executable while later turns remain live/autonomous.
 	// Source: DI-parok
 	addressAck, addressErr := node.sendAndReceive("accounting", map[string]string{
-		"act":                 decision.ActPromise,
-		"from":                node.Agent.Name,
-		"to":                  "accounting",
-		"turn":                "startup",
-		"promise":             "I promise to receive accounting's local address event for this order and use it only for this shipment sequence.",
-		"reason":              "fulfillment needs an address event record before it can promise a label-print event record",
-		"field_promise_about": production.PromiseAddressLookup,
-		"field_order_id":      fulfillmentOrderID,
+		"act":           decision.ActPromise,
+		"from":          node.Agent.Name,
+		"to":            "accounting",
+		"turn":          "startup",
+		"promise":       "I promise to receive accounting's local address event for this order and use it only for this shipment sequence.",
+		"reason":        "fulfillment needs an address event record before it can promise a label-print event record",
+		"promise_about": production.PromiseAddressLookup,
+		"order_id":      fulfillmentOrderID,
 	})
 	if addressErr != nil {
 		return fmt.Errorf("address lookup: %w", addressErr)
 	}
 	weightAck, weightErr := node.sendAndReceive("postal_scale", map[string]string{
-		"act":                 decision.ActPromise,
-		"from":                node.Agent.Name,
-		"to":                  "postal_scale",
-		"turn":                "startup",
-		"promise":             "I promise to receive postal_scale's local package weight event and use it only for this shipment sequence.",
-		"reason":              "fulfillment needs local device weight event before label printing",
-		"field_promise_about": production.PromiseWeighPackage,
-		"field_package_id":    fulfillmentPackageID,
+		"act":           decision.ActPromise,
+		"from":          node.Agent.Name,
+		"to":            "postal_scale",
+		"turn":          "startup",
+		"promise":       "I promise to receive postal_scale's local package weight event and use it only for this shipment sequence.",
+		"reason":        "fulfillment needs local device weight event before label printing",
+		"promise_about": production.PromiseWeighPackage,
+		"package_id":    fulfillmentPackageID,
 	})
 	if weightErr != nil {
 		return fmt.Errorf("package weighing: %w", weightErr)
 	}
 	labelAck, labelErr := node.sendAndReceive("ups_label_printer", map[string]string{
-		"act":                    decision.ActPromise,
-		"from":                   node.Agent.Name,
-		"to":                     "ups_label_printer",
-		"turn":                   "startup",
-		"promise":                "I promise to receive UPS label event generated from this address and weight event and use it only for this shipment sequence.",
-		"reason":                 "fulfillment has address and weight event and needs a label promise",
-		"field_promise_about":    production.PromisePrintLabel,
-		"field_package_id":       fulfillmentPackageID,
-		"field_shipping_address": addressAck.Fields["field_shipping_address"],
-		"field_weight_ounces":    weightAck.Fields["field_weight_ounces"],
+		"act":              decision.ActPromise,
+		"from":             node.Agent.Name,
+		"to":               "ups_label_printer",
+		"turn":             "startup",
+		"promise":          "I promise to receive UPS label event generated from this address and weight event and use it only for this shipment sequence.",
+		"reason":           "fulfillment has address and weight event and needs a label promise",
+		"promise_about":    production.PromisePrintLabel,
+		"package_id":       fulfillmentPackageID,
+		"shipping_address": addressAck.Fields["shipping_address"],
+		"weight_ounces":    weightAck.Fields["weight_ounces"],
 	})
 	if labelErr != nil {
 		return fmt.Errorf("label printing: %w", labelErr)
 	}
 	accountingUpdateFields := map[string]string{
-		"act":                   decision.ActPromise,
-		"from":                  node.Agent.Name,
-		"to":                    "accounting",
-		"turn":                  "startup",
-		"promise":               "I promise to report the shipment cost and tracking event I received back to accounting for this order.",
-		"reason":                "fulfillment closes its shipment sequence by returning local label event to accounting",
-		"field_promise_about":   production.PromiseShipmentUpdate,
-		"field_order_id":        fulfillmentOrderID,
-		"field_tracking_number": labelAck.Fields["field_tracking_number"],
-		"field_cost_cents":      labelAck.Fields["field_cost_cents"],
+		"act":             decision.ActPromise,
+		"from":            node.Agent.Name,
+		"to":              "accounting",
+		"turn":            "startup",
+		"promise":         "I promise to report the shipment cost and tracking event I received back to accounting for this order.",
+		"reason":          "fulfillment closes its shipment sequence by returning local label event to accounting",
+		"promise_about":   production.PromiseShipmentUpdate,
+		"order_id":        fulfillmentOrderID,
+		"tracking_number": labelAck.Fields["tracking_number"],
+		"cost_cents":      labelAck.Fields["cost_cents"],
 	}
 	_, updateErr := node.sendAndReceive("accounting", accountingUpdateFields)
 	if updateErr != nil {
@@ -407,82 +407,82 @@ func (node *Node) runCASComputeWorkflow() error {
 	node.recordRunInternalRestartEvents()
 	node.record("economics_price_probe", "kept", "bob", "pcid="+pcid.CASStorageV1+" Alice first offers below Bob's local storage price")
 	if _, err := node.sendAndReceive("bob", map[string]string{
-		"act":                 decision.ActPromise,
-		"from":                node.Agent.Name,
-		"to":                  "bob",
-		"turn":                "startup",
-		"promise":             "Alice promises to receive Bob's local storage price runtime adapter events for this content CID.",
-		"reason":              "price discovery without treating Bob as an authority",
-		"field_promise_about": production.PromiseStoreContent,
-		"field_content_cid":   contentCID,
-		"field_content_b64":   base64.StdEncoding.EncodeToString(contentBytes),
-		"field_credit_offer":  "1",
-		"field_units":         "1",
+		"act":           decision.ActPromise,
+		"from":          node.Agent.Name,
+		"to":            "bob",
+		"turn":          "startup",
+		"promise":       "Alice promises to receive Bob's local storage price runtime adapter events for this content CID.",
+		"reason":        "price discovery without treating Bob as an authority",
+		"promise_about": production.PromiseStoreContent,
+		"content_cid":   contentCID,
+		"content_b64":   base64.StdEncoding.EncodeToString(contentBytes),
+		"credit_offer":  "1",
+		"units":         "1",
 	}); err != nil {
 		node.record("economics_price_refused", "non_commitment", "bob", "pcid="+pcid.CASStorageV1+" Bob did not promise storage at credit_offer=1")
 	}
 	node.record("economics_credit_offered", "kept", "bob", "pcid="+pcid.CASStorageV1+" Alice offers storage credit_offer=4 after the low-price probe")
 	storeAck, err := node.sendAndReceive("bob", map[string]string{
-		"act":                 decision.ActPromise,
-		"from":                node.Agent.Name,
-		"to":                  "bob",
-		"turn":                "startup",
-		"promise":             "Alice promises to receive Bob's bounded CAS storage event for one exact content CID.",
-		"reason":              "storage should be promised and verified by exact bytes",
-		"field_promise_about": production.PromiseStoreContent,
-		"field_content_cid":   contentCID,
-		"field_content_b64":   base64.StdEncoding.EncodeToString(contentBytes),
-		"field_credit_offer":  "4",
-		"field_units":         "1",
+		"act":           decision.ActPromise,
+		"from":          node.Agent.Name,
+		"to":            "bob",
+		"turn":          "startup",
+		"promise":       "Alice promises to receive Bob's bounded CAS storage event for one exact content CID.",
+		"reason":        "storage should be promised and verified by exact bytes",
+		"promise_about": production.PromiseStoreContent,
+		"content_cid":   contentCID,
+		"content_b64":   base64.StdEncoding.EncodeToString(contentBytes),
+		"credit_offer":  "4",
+		"units":         "1",
 	})
 	if err != nil {
 		return fmt.Errorf("store content: %w", err)
 	}
 	node.record("cas_multi_object_pressure", "kept", "bob", "pcid="+pcid.CASStorageV1+" Alice sends a second independent object")
 	secondStoreAck, err := node.sendAndReceive("bob", map[string]string{
-		"act":                 decision.ActPromise,
-		"from":                node.Agent.Name,
-		"to":                  "bob",
-		"turn":                "startup",
-		"promise":             "Alice promises to receive Bob's bounded CAS storage event for a second exact content CID.",
-		"reason":              "multi-object pressure should remain exact-byte promise event",
-		"field_promise_about": production.PromiseStoreContent,
-		"field_content_cid":   secondContentCID,
-		"field_content_b64":   base64.StdEncoding.EncodeToString(secondContentBytes),
-		"field_credit_offer":  "4",
-		"field_units":         "1",
-		"field_object_label":  "second-object",
-		"field_token_style":   "bearer",
+		"act":           decision.ActPromise,
+		"from":          node.Agent.Name,
+		"to":            "bob",
+		"turn":          "startup",
+		"promise":       "Alice promises to receive Bob's bounded CAS storage event for a second exact content CID.",
+		"reason":        "multi-object pressure should remain exact-byte promise event",
+		"promise_about": production.PromiseStoreContent,
+		"content_cid":   secondContentCID,
+		"content_b64":   base64.StdEncoding.EncodeToString(secondContentBytes),
+		"credit_offer":  "4",
+		"units":         "1",
+		"object_label":  "second-object",
+		"token_style":   "bearer",
 	})
 	if err != nil {
 		return fmt.Errorf("store second content: %w", err)
 	}
-	primaryToken := storeAck.Fields["field_capability_token"]
+	primaryToken := storeAck.Fields["capability_token"]
 	if _, err := node.sendAndReceive("bob", map[string]string{
-		"act":                 decision.ActPromise,
-		"from":                node.Agent.Name,
-		"to":                  "bob",
-		"turn":                "startup",
-		"promise":             "Alice promises to receive Bob's serve event for the content CID he just stored.",
-		"reason":              "retrieval proves storage is not only promised but locally served",
-		"field_promise_about": production.PromiseServeContent,
-		"field_content_cid":   contentCID,
-		"field_token":         primaryToken,
+		"act":           decision.ActPromise,
+		"from":          node.Agent.Name,
+		"to":            "bob",
+		"turn":          "startup",
+		"promise":       "Alice promises to receive Bob's serve event for the content CID he just stored.",
+		"reason":        "retrieval proves storage is not only promised but locally served",
+		"promise_about": production.PromiseServeContent,
+		"content_cid":   contentCID,
+		"token":         primaryToken,
 	}); err != nil {
 		return fmt.Errorf("serve content: %w", err)
 	}
 	replayAck, replayErr := node.sendAndReceive("bob", map[string]string{
-		"act":                 decision.ActPromise,
-		"from":                node.Agent.Name,
-		"to":                  "bob",
-		"turn":                "startup",
-		"promise":             "Alice promises to present the consumed serve-once token only as replay-protection test event.",
-		"reason":              "a serve-once token should not create a second storage result after local redemption",
-		"field_promise_about": production.PromiseServeContent,
-		"field_content_cid":   contentCID,
-		"field_token":         primaryToken,
+		"act":           decision.ActPromise,
+		"from":          node.Agent.Name,
+		"to":            "bob",
+		"turn":          "startup",
+		"promise":       "Alice promises to present the consumed serve-once token only as replay-protection test event.",
+		"reason":        "a serve-once token should not create a second storage result after local redemption",
+		"promise_about": production.PromiseServeContent,
+		"content_cid":   contentCID,
+		"token":         primaryToken,
 	})
-	if replayErr != nil || replayAck.Fields["field_token_status"] == "not_promised" {
+	if replayErr != nil || replayAck.Fields["token_status"] == "not_promised" {
 		node.record("replay_probe_rejected", "non_commitment", "bob", "pcid="+pcid.CASStorageV1+" consumed serve-once token was not accepted as fresh event")
 	} else {
 		return fmt.Errorf("serve-once token replay unexpectedly produced fresh content")
@@ -492,84 +492,84 @@ func (node *Node) runCASComputeWorkflow() error {
 	node.record("primary_storage_unavailable", "non_commitment", "bob", "pcid="+pcid.CASStorageV1+" local send failure is availability event, not broken promise event")
 	node.record("replica_recovery_requested", "kept", "frank", "pcid="+pcid.CASStorageV1+" Alice asks Frank to serve Bob-replicated bytes")
 	if _, err := node.sendAndReceive("frank", map[string]string{
-		"act":                 decision.ActPromise,
-		"from":                node.Agent.Name,
-		"to":                  "frank",
-		"turn":                "startup",
-		"promise":             "Alice promises to receive Frank's replica serve event for the exact content CID.",
-		"reason":              "replica recovery depends on Frank's own prior replica promise",
-		"field_promise_about": production.PromiseServeReplicaContent,
-		"field_content_cid":   contentCID,
-		"field_token":         storeAck.Fields["field_replica_token"],
+		"act":           decision.ActPromise,
+		"from":          node.Agent.Name,
+		"to":            "frank",
+		"turn":          "startup",
+		"promise":       "Alice promises to receive Frank's replica serve event for the exact content CID.",
+		"reason":        "replica recovery depends on Frank's own prior replica promise",
+		"promise_about": production.PromiseServeReplicaContent,
+		"content_cid":   contentCID,
+		"token":         storeAck.Fields["replica_token"],
 	}); err != nil {
 		return fmt.Errorf("serve replica content: %w", err)
 	}
-	secondBearerToken := secondStoreAck.Fields["field_bearer_token"]
+	secondBearerToken := secondStoreAck.Fields["bearer_token"]
 	if secondBearerToken != "" {
 		node.record("agent_cas_bearer_storage_token_transferred", "kept", "frank", "pcid="+pcid.CASStorageV1+" issuer=bob content_cid="+secondContentCID)
 		if _, err := node.sendAndReceive("frank", map[string]string{
-			"act":                 decision.ActPromise,
-			"from":                node.Agent.Name,
-			"to":                  "frank",
-			"turn":                "startup",
-			"promise":             "Alice promises to transfer Bob's bearer storage token to Frank as payment for Frank's future storage work.",
-			"reason":              "bearer storage tokens should be peer-held incentives rather than global authority",
-			"field_promise_about": production.PromiseReplicaTokenLifecycle,
-			"field_content_cid":   secondContentCID,
-			"field_bearer_token":  secondBearerToken,
-			"field_token_style":   "bearer",
-			"field_token_status":  "transferred",
-			"field_issuer_peer":   "bob",
-			"field_redeem_peer":   "bob",
+			"act":           decision.ActPromise,
+			"from":          node.Agent.Name,
+			"to":            "frank",
+			"turn":          "startup",
+			"promise":       "Alice promises to transfer Bob's bearer storage token to Frank as payment for Frank's future storage work.",
+			"reason":        "bearer storage tokens should be peer-held incentives rather than global authority",
+			"promise_about": production.PromiseReplicaTokenLifecycle,
+			"content_cid":   secondContentCID,
+			"bearer_token":  secondBearerToken,
+			"token_style":   "bearer",
+			"token_status":  "transferred",
+			"issuer_peer":   "bob",
+			"redeem_peer":   "bob",
 		}); err != nil {
 			return fmt.Errorf("transfer bearer storage token: %w", err)
 		}
 	}
 	missingObjectCID := production.ContentCID([]byte("poc15 missing sparse CAS object|" + node.Config.RunID))
 	if _, err := node.sendAndReceive("frank", map[string]string{
-		"act":                        decision.ActPromise,
-		"from":                       node.Agent.Name,
-		"to":                         "frank",
-		"turn":                       "startup",
-		"promise":                    "Alice promises to treat Frank's missing-object response as a sparse CAS non-commitment, not as a broken storage promise.",
-		"reason":                     "sparse peer stores are expected to lack many objects",
-		"field_promise_about":        production.PromiseServeReplicaContent,
-		"field_content_cid":          missingObjectCID,
-		"field_missing_object_probe": "true",
+		"act":                  decision.ActPromise,
+		"from":                 node.Agent.Name,
+		"to":                   "frank",
+		"turn":                 "startup",
+		"promise":              "Alice promises to treat Frank's missing-object response as a sparse CAS non-commitment, not as a broken storage promise.",
+		"reason":               "sparse peer stores are expected to lack many objects",
+		"promise_about":        production.PromiseServeReplicaContent,
+		"content_cid":          missingObjectCID,
+		"missing_object_probe": "true",
 	}); err != nil {
 		return fmt.Errorf("sparse CAS missing-object probe: %w", err)
 	}
 	node.record("economics_credit_offered", "kept", "carol", "pcid="+pcid.CIDComputeV1+" Alice offers compute credit_offer=5")
 	if _, err := node.sendAndReceive("dave", map[string]string{
-		"act":                 decision.ActPromise,
-		"from":                node.Agent.Name,
-		"to":                  "dave",
-		"turn":                "startup",
-		"promise":             "Alice promises to receive Dave's local cache status for this exact compute tuple.",
-		"reason":              "cache reuse should be exact tuple event",
-		"field_promise_about": production.PromiseLookupComputeCache,
-		"field_function_cid":  functionCID,
-		"field_input_cid":     inputCID,
-		"field_context_cid":   contextCID,
+		"act":           decision.ActPromise,
+		"from":          node.Agent.Name,
+		"to":            "dave",
+		"turn":          "startup",
+		"promise":       "Alice promises to receive Dave's local cache status for this exact compute tuple.",
+		"reason":        "cache reuse should be exact tuple event",
+		"promise_about": production.PromiseLookupComputeCache,
+		"function_cid":  functionCID,
+		"input_cid":     inputCID,
+		"context_cid":   contextCID,
 	}); err != nil {
 		return fmt.Errorf("compute cache miss: %w", err)
 	}
 	computeAck, err := node.sendAndReceive("carol", map[string]string{
-		"act":                 decision.ActPromise,
-		"from":                node.Agent.Name,
-		"to":                  "carol",
-		"turn":                "startup",
-		"promise":             "Alice promises to receive Carol's result only as event over explicit function/input/context CIDs.",
-		"reason":              "compute is a reciprocal promise over CID-named bytes",
-		"field_promise_about": production.PromiseExecuteFunction,
-		"field_function_cid":  functionCID,
-		"field_function_b64":  base64.StdEncoding.EncodeToString(functionBytes),
-		"field_input_cid":     inputCID,
-		"field_input_b64":     base64.StdEncoding.EncodeToString(inputBytes),
-		"field_context_cid":   contextCID,
-		"field_context_b64":   base64.StdEncoding.EncodeToString(contextBytes),
-		"field_credit_offer":  "5",
-		"field_units":         "1",
+		"act":           decision.ActPromise,
+		"from":          node.Agent.Name,
+		"to":            "carol",
+		"turn":          "startup",
+		"promise":       "Alice promises to receive Carol's result only as event over explicit function/input/context CIDs.",
+		"reason":        "compute is a reciprocal promise over CID-named bytes",
+		"promise_about": production.PromiseExecuteFunction,
+		"function_cid":  functionCID,
+		"function_b64":  base64.StdEncoding.EncodeToString(functionBytes),
+		"input_cid":     inputCID,
+		"input_b64":     base64.StdEncoding.EncodeToString(inputBytes),
+		"context_cid":   contextCID,
+		"context_b64":   base64.StdEncoding.EncodeToString(contextBytes),
+		"credit_offer":  "5",
+		"units":         "1",
 	})
 	if err != nil {
 		return fmt.Errorf("compute request: %w", err)
@@ -579,25 +579,25 @@ func (node *Node) runCASComputeWorkflow() error {
 	}
 	for _, verifier := range []string{"dave", "grace"} {
 		fields := map[string]string{
-			"act":                   decision.ActPromise,
-			"from":                  node.Agent.Name,
-			"to":                    verifier,
-			"turn":                  "startup",
-			"promise":               "Alice promises to receive a local verifier event record about Carol's compute result.",
-			"reason":                "peer verification is local observation event, not global truth",
-			"field_promise_about":   production.PromiseVerifyComputeResult,
-			"field_result_promiser": "carol",
-			"field_function_cid":    computeAck.Fields["field_function_cid"],
-			"field_function_b64":    computeAck.Fields["field_function_b64"],
-			"field_input_cid":       computeAck.Fields["field_input_cid"],
-			"field_input_b64":       computeAck.Fields["field_input_b64"],
-			"field_context_cid":     computeAck.Fields["field_context_cid"],
-			"field_context_b64":     computeAck.Fields["field_context_b64"],
-			"field_result_cid":      computeAck.Fields["field_result_cid"],
-			"field_result_b64":      computeAck.Fields["field_result_b64"],
+			"act":             decision.ActPromise,
+			"from":            node.Agent.Name,
+			"to":              verifier,
+			"turn":            "startup",
+			"promise":         "Alice promises to receive a local verifier event record about Carol's compute result.",
+			"reason":          "peer verification is local observation event, not global truth",
+			"promise_about":   production.PromiseVerifyComputeResult,
+			"result_promiser": "carol",
+			"function_cid":    computeAck.Fields["function_cid"],
+			"function_b64":    computeAck.Fields["function_b64"],
+			"input_cid":       computeAck.Fields["input_cid"],
+			"input_b64":       computeAck.Fields["input_b64"],
+			"context_cid":     computeAck.Fields["context_cid"],
+			"context_b64":     computeAck.Fields["context_b64"],
+			"result_cid":      computeAck.Fields["result_cid"],
+			"result_b64":      computeAck.Fields["result_b64"],
 		}
 		if verifier == "grace" {
-			fields["field_disagreement_probe"] = "true"
+			fields["disagreement_probe"] = "true"
 			fields["promise"] = "Alice promises to receive Grace's disagreement probe as local events and resolve it locally."
 		}
 		if _, err := node.sendAndReceive(verifier, fields); err != nil {
@@ -605,17 +605,17 @@ func (node *Node) runCASComputeWorkflow() error {
 		}
 	}
 	if _, err := node.sendAndReceive("dave", map[string]string{
-		"act":                 decision.ActPromise,
-		"from":                node.Agent.Name,
-		"to":                  "dave",
-		"turn":                "startup",
-		"promise":             "Alice promises to receive Dave's cache hit after Carol's compute result was checkpointed.",
-		"reason":              "cache hit should reuse exact result event",
-		"field_promise_about": production.PromiseLookupComputeCache,
-		"field_function_cid":  computeAck.Fields["field_function_cid"],
-		"field_input_cid":     computeAck.Fields["field_input_cid"],
-		"field_context_cid":   computeAck.Fields["field_context_cid"],
-		"field_result_cid":    computeAck.Fields["field_result_cid"],
+		"act":           decision.ActPromise,
+		"from":          node.Agent.Name,
+		"to":            "dave",
+		"turn":          "startup",
+		"promise":       "Alice promises to receive Dave's cache hit after Carol's compute result was checkpointed.",
+		"reason":        "cache hit should reuse exact result event",
+		"promise_about": production.PromiseLookupComputeCache,
+		"function_cid":  computeAck.Fields["function_cid"],
+		"input_cid":     computeAck.Fields["input_cid"],
+		"context_cid":   computeAck.Fields["context_cid"],
+		"result_cid":    computeAck.Fields["result_cid"],
 	}); err != nil {
 		return fmt.Errorf("compute cache hit: %w", err)
 	}
@@ -626,21 +626,21 @@ func (node *Node) runCASComputeWorkflow() error {
 	// Carol, the alternate-function coverage should follow trust and use Dave
 	// rather than forcing another fresh compute promise to Carol. Source: DI-vahan
 	if _, err := node.sendAndReceive("dave", map[string]string{
-		"act":                 decision.ActPromise,
-		"from":                node.Agent.Name,
-		"to":                  "dave",
-		"turn":                "startup",
-		"promise":             "Alice promises to receive Dave's sum result only if it verifies against the payload bytes.",
-		"reason":              "second compute path prevents hard-coded Fibonacci-only behavior",
-		"field_promise_about": production.PromiseExecuteFunction,
-		"field_function_cid":  production.ContentCID(sumFunctionBytes),
-		"field_function_b64":  base64.StdEncoding.EncodeToString(sumFunctionBytes),
-		"field_input_cid":     production.ContentCID(sumInputBytes),
-		"field_input_b64":     base64.StdEncoding.EncodeToString(sumInputBytes),
-		"field_context_cid":   contextCID,
-		"field_context_b64":   base64.StdEncoding.EncodeToString(contextBytes),
-		"field_credit_offer":  "5",
-		"field_units":         "1",
+		"act":           decision.ActPromise,
+		"from":          node.Agent.Name,
+		"to":            "dave",
+		"turn":          "startup",
+		"promise":       "Alice promises to receive Dave's sum result only if it verifies against the payload bytes.",
+		"reason":        "second compute path prevents hard-coded Fibonacci-only behavior",
+		"promise_about": production.PromiseExecuteFunction,
+		"function_cid":  production.ContentCID(sumFunctionBytes),
+		"function_b64":  base64.StdEncoding.EncodeToString(sumFunctionBytes),
+		"input_cid":     production.ContentCID(sumInputBytes),
+		"input_b64":     base64.StdEncoding.EncodeToString(sumInputBytes),
+		"context_cid":   contextCID,
+		"context_b64":   base64.StdEncoding.EncodeToString(contextBytes),
+		"credit_offer":  "5",
+		"units":         "1",
 	}); err != nil {
 		return fmt.Errorf("sum compute request: %w", err)
 	}
@@ -676,21 +676,21 @@ func (node *Node) runRuntimeAdapterComputeWorkflow(functionBytes, inputBytes, co
 	for _, target := range targets {
 		node.record(target.eventPrefix+"_compute_request_promised", "kept", target.name, "pcid="+pcid.CIDComputeV1+" Alice requests useful compute from runtime adapter")
 		ack, err := node.sendAndReceive(target.name, map[string]string{
-			"act":                 decision.ActPromise,
-			"from":                node.Agent.Name,
-			"to":                  target.name,
-			"turn":                "startup",
-			"promise":             target.promiseText,
-			"reason":              "runtime adapter useful work must stay inside the existing compute pCID",
-			"field_promise_about": production.PromiseExecuteFunction,
-			"field_function_cid":  production.ContentCID(functionBytes),
-			"field_function_b64":  base64.StdEncoding.EncodeToString(functionBytes),
-			"field_input_cid":     production.ContentCID(inputBytes),
-			"field_input_b64":     base64.StdEncoding.EncodeToString(inputBytes),
-			"field_context_cid":   production.ContentCID(contextBytes),
-			"field_context_b64":   base64.StdEncoding.EncodeToString(contextBytes),
-			"field_credit_offer":  "5",
-			"field_units":         "1",
+			"act":           decision.ActPromise,
+			"from":          node.Agent.Name,
+			"to":            target.name,
+			"turn":          "startup",
+			"promise":       target.promiseText,
+			"reason":        "runtime adapter useful work must stay inside the existing compute pCID",
+			"promise_about": production.PromiseExecuteFunction,
+			"function_cid":  production.ContentCID(functionBytes),
+			"function_b64":  base64.StdEncoding.EncodeToString(functionBytes),
+			"input_cid":     production.ContentCID(inputBytes),
+			"input_b64":     base64.StdEncoding.EncodeToString(inputBytes),
+			"context_cid":   production.ContentCID(contextBytes),
+			"context_b64":   base64.StdEncoding.EncodeToString(contextBytes),
+			"credit_offer":  "5",
+			"units":         "1",
 		})
 		if err != nil {
 			return fmt.Errorf("%s runtime-adapter compute request: %w", target.name, err)
@@ -698,7 +698,7 @@ func (node *Node) runRuntimeAdapterComputeWorkflow(functionBytes, inputBytes, co
 		if err := node.verifyComputeAckLocally(ack, target.name); err != nil {
 			return fmt.Errorf("%s runtime-adapter compute verify: %w", target.name, err)
 		}
-		node.record(target.eventPrefix+"_compute_result_verified", "kept", target.name, "pcid="+pcid.CIDComputeV1+" result_cid="+ack.Fields["field_result_cid"])
+		node.record(target.eventPrefix+"_compute_result_verified", "kept", target.name, "pcid="+pcid.CIDComputeV1+" result_cid="+ack.Fields["result_cid"])
 	}
 	return nil
 }
@@ -714,13 +714,13 @@ func (node *Node) runDynamicTCPTopologyWorkflow() error {
 	node.record("dynamic_tcp_topology_probe_started", "kept", target, "Alice tests whether local direct-peer changes affect actual kernel-routed sends")
 	node.observeOutcome(target, relationship.OutcomeBroken)
 	blockedFields := map[string]string{
-		"act":                 decision.ActPromise,
-		"from":                node.Agent.Name,
-		"to":                  target,
-		"turn":                "startup",
-		"promise":             "Alice promises a routine relationship observation after local trust dropped.",
-		"reason":              "ordinary traffic should not cross a removed direct-peer relationship",
-		"field_promise_about": "local_observation",
+		"act":           decision.ActPromise,
+		"from":          node.Agent.Name,
+		"to":            target,
+		"turn":          "startup",
+		"promise":       "Alice promises a routine relationship observation after local trust dropped.",
+		"reason":        "ordinary traffic should not cross a removed direct-peer relationship",
+		"promise_about": "local_observation",
 	}
 	if _, err := node.sendAndReceive(target, blockedFields); err == nil {
 		return fmt.Errorf("dynamic topology blocked send unexpectedly succeeded")
@@ -735,13 +735,13 @@ func (node *Node) runDynamicTCPTopologyWorkflow() error {
 		node.observeOutcome(target, relationship.OutcomeRepairKept)
 	}
 	restoredFields := map[string]string{
-		"act":                 decision.ActPromise,
-		"from":                node.Agent.Name,
-		"to":                  target,
-		"turn":                "startup",
-		"promise":             "Alice promises a routine relationship observation after local repair event restored direct reachability.",
-		"reason":              "restored direct relationship should allow actual kernel-routed send/receive again",
-		"field_promise_about": "local_observation",
+		"act":           decision.ActPromise,
+		"from":          node.Agent.Name,
+		"to":            target,
+		"turn":          "startup",
+		"promise":       "Alice promises a routine relationship observation after local repair event restored direct reachability.",
+		"reason":        "restored direct relationship should allow actual kernel-routed send/receive again",
+		"promise_about": "local_observation",
 	}
 	if _, err := node.sendAndReceive(target, restoredFields); err != nil {
 		return fmt.Errorf("dynamic topology restored send: %w", err)
@@ -760,13 +760,13 @@ func (node *Node) runAdversaryWorkflow() error {
 		return fmt.Errorf("unknown protocol probe: %w", err)
 	}
 	unsupportedFields := map[string]string{
-		"act":                 decision.ActPromise,
-		"from":                node.Agent.Name,
-		"to":                  "grace",
-		"turn":                "startup",
-		"promise":             "Mallory promises an unsupported storage variant to test receiver non-commitment.",
-		"reason":              "unsupported variants should be not-promised rather than coerced",
-		"field_promise_about": production.PromiseUnsupportedVariantProbe,
+		"act":           decision.ActPromise,
+		"from":          node.Agent.Name,
+		"to":            "grace",
+		"turn":          "startup",
+		"promise":       "Mallory promises an unsupported storage variant to test receiver non-commitment.",
+		"reason":        "unsupported variants should be not-promised rather than coerced",
+		"promise_about": production.PromiseUnsupportedVariantProbe,
 	}
 	if _, err := node.sendAndReceive("grace", unsupportedFields); err != nil {
 		node.record("promise_variant_not_promised", "non_commitment", "grace", "pcid="+pcid.CASStorageV1+" Grace did not promise unsupported storage variant")
@@ -779,36 +779,36 @@ func (node *Node) runAdversaryWorkflow() error {
 	inputBytes := []byte("n=7")
 	contextBytes := production.SampleContextBytes()
 	if _, err := node.sendAndReceive("carol", map[string]string{
-		"act":                  decision.ActPromise,
-		"from":                 node.Agent.Name,
-		"to":                   "carol",
-		"turn":                 "startup",
-		"promise":              "Mallory promises a compute request that intentionally pressures Carol's scarce capacity.",
-		"reason":               "capacity refusal should remain a local non-commitment event record",
-		"field_promise_about":  production.PromiseExecuteFunction,
-		"field_capacity_probe": "true",
-		"field_function_cid":   production.ContentCID(functionBytes),
-		"field_function_b64":   base64.StdEncoding.EncodeToString(functionBytes),
-		"field_input_cid":      production.ContentCID(inputBytes),
-		"field_input_b64":      base64.StdEncoding.EncodeToString(inputBytes),
-		"field_context_cid":    production.ContentCID(contextBytes),
-		"field_context_b64":    base64.StdEncoding.EncodeToString(contextBytes),
-		"field_credit_offer":   "5",
-		"field_units":          "999",
+		"act":            decision.ActPromise,
+		"from":           node.Agent.Name,
+		"to":             "carol",
+		"turn":           "startup",
+		"promise":        "Mallory promises a compute request that intentionally pressures Carol's scarce capacity.",
+		"reason":         "capacity refusal should remain a local non-commitment event record",
+		"promise_about":  production.PromiseExecuteFunction,
+		"capacity_probe": "true",
+		"function_cid":   production.ContentCID(functionBytes),
+		"function_b64":   base64.StdEncoding.EncodeToString(functionBytes),
+		"input_cid":      production.ContentCID(inputBytes),
+		"input_b64":      base64.StdEncoding.EncodeToString(inputBytes),
+		"context_cid":    production.ContentCID(contextBytes),
+		"context_b64":    base64.StdEncoding.EncodeToString(contextBytes),
+		"credit_offer":   "5",
+		"units":          "999",
 	}); err != nil {
 		return fmt.Errorf("capacity probe: %w", err)
 	}
 	claimedCID := production.ContentCID(production.SampleContentBytes())
 	if _, err := node.sendAndReceive("grace", map[string]string{
-		"act":                 decision.ActPromise,
-		"from":                node.Agent.Name,
-		"to":                  "grace",
-		"turn":                "startup",
-		"promise":             "Mallory promises these bytes match the claimed content CID.",
-		"reason":              "adversarial corrupt-byte event should be locally rejected",
-		"field_promise_about": production.PromisePresentStorageReport,
-		"field_content_cid":   claimedCID,
-		"field_content_b64":   base64.StdEncoding.EncodeToString(production.CorruptContentBytes()),
+		"act":           decision.ActPromise,
+		"from":          node.Agent.Name,
+		"to":            "grace",
+		"turn":          "startup",
+		"promise":       "Mallory promises these bytes match the claimed content CID.",
+		"reason":        "adversarial corrupt-byte event should be locally rejected",
+		"promise_about": production.PromisePresentStorageReport,
+		"content_cid":   claimedCID,
+		"content_b64":   base64.StdEncoding.EncodeToString(production.CorruptContentBytes()),
 	}); err != nil {
 		return fmt.Errorf("corrupt bytes offer: %w", err)
 	}
@@ -816,13 +816,13 @@ func (node *Node) runAdversaryWorkflow() error {
 	// narrow candidate traffic that Grace may choose to receive, but it records
 	// future repair only and does not immediately restore trust. Source: DI-fijov
 	if _, err := node.sendAndReceive("grace", map[string]string{
-		"act":                 decision.ActPromise,
-		"from":                node.Agent.Name,
-		"to":                  "grace",
-		"turn":                "startup",
-		"promise":             "Mallory promises to label future malformed storage event explicitly.",
-		"reason":              "repair remains only a future promise Grace may distrust",
-		"field_promise_about": production.PromiseLabelFutureMalformedReport,
+		"act":           decision.ActPromise,
+		"from":          node.Agent.Name,
+		"to":            "grace",
+		"turn":          "startup",
+		"promise":       "Mallory promises to label future malformed storage event explicitly.",
+		"reason":        "repair remains only a future promise Grace may distrust",
+		"promise_about": production.PromiseLabelFutureMalformedReport,
 	}); err != nil {
 		return fmt.Errorf("trust repair promise: %w", err)
 	}
@@ -964,7 +964,7 @@ func (node *Node) registerReceivePromise(ctx context.Context, kernelAddress, pro
 	node.mu.Unlock()
 	node.activeHandlers.Add(1)
 	go node.receiveLoop(protocolName, frameConn)
-	node.record("pcid_owned_array_payload_sent", "kept", "kernel", "pcid="+pcid.KernelReceiveV1+" promise_about="+fields["field_promise_about"]+" exact_sha256="+protocol.HashExactBytes(envelopeBytes))
+	node.record("pcid_owned_array_payload_sent", "kept", "kernel", "pcid="+pcid.KernelReceiveV1+" promise_about="+fields["promise_about"]+" exact_sha256="+protocol.HashExactBytes(envelopeBytes))
 	node.record("app_receive_promise_sent", "kept", "kernel", "pcid="+protocolName+" kernel="+kernelAddress)
 	node.record("app_kernel_backpressure_promised", "kept", "kernel", "pcid="+protocolName+" app promises bounded receive buffering through the local kernel")
 	node.record("app_kernel_rate_limit_promised", "kept", "kernel", "pcid="+protocolName+" app promises to treat local kernel throughput as a bounded promise")
@@ -1009,10 +1009,10 @@ func (node *Node) handleFrame(frameBytes []byte) ([]byte, error) {
 	fields := parsed.Fields
 	fromAgent := fields["from"]
 	if isPcidOwnedArrayPayload(fields) {
-		node.record("pcid_owned_array_payload_received", "kept", fromAgent, "pcid="+parsed.ProtocolName+" promise_about="+fields["field_promise_about"]+" exact_sha256="+parsed.ExactHash)
+		node.record("pcid_owned_array_payload_received", "kept", fromAgent, "pcid="+parsed.ProtocolName+" promise_about="+fields["promise_about"]+" exact_sha256="+parsed.ExactHash)
 	}
 	if node.rememberReplayEnvelope(fromAgent, parsed.ProtocolName, parsed.ExactHash) {
-		return node.newAckBytes(fromAgent, "not_promised", "I promise to remember that I already saw this exact envelope and will not treat the replay as fresh promise event.", parsed.ProtocolCID, map[string]string{"field_replay_status": "not_promised"})
+		return node.newAckBytes(fromAgent, "not_promised", "I promise to remember that I already saw this exact envelope and will not treat the replay as fresh promise event.", parsed.ProtocolCID, map[string]string{"replay_status": "not_promised"})
 	}
 	if !node.supportsProtocol(parsed.ProtocolName) {
 		node.record("unsupported_pcid", "non_commitment", fromAgent, "no local app receive promise for "+parsed.ProtocolName)
@@ -1098,17 +1098,17 @@ func (node *Node) newAckBytes(target, outcome, promiseText string, protocolCID p
 	ackFields["outcome"] = outcome
 	ackFields["promise"] = promiseText
 	ackFields["reason"] = "transport acknowledgement expressed as local promise content"
-	if protocolCID.Equal(node.Protocols.MustCID(pcid.IdentityKeyV1)) && extraFields["field_promise_about"] == production.PromiseRotateSigningKey {
+	if protocolCID.Equal(node.Protocols.MustCID(pcid.IdentityKeyV1)) && extraFields["promise_about"] == production.PromiseRotateSigningKey {
 		// Intent: identity_key_v1 is the first POC15 protocol whose request and
-		// ACK payloads are pCID-owned arrays rather than legacy field maps.
+		// ACK payloads are pCID-owned arrays rather than older generic maps.
 		// Source: DI-vipih
 		payloadBytes, payloadErr := protocol.MarshalIdentityKeyRotationAckPayload(protocol.IdentityKeyRotationAckPayload{
 			Promiser:      node.Agent.Name,
 			Promisee:      target,
 			Outcome:       outcome,
 			PromiseText:   promiseText,
-			NewKeyLabel:   extraFields["field_new_key_label"],
-			RotationScope: extraFields["field_rotation_scope"],
+			NewKeyLabel:   extraFields["new_key_label"],
+			RotationScope: extraFields["rotation_scope"],
 		})
 		if payloadErr != nil {
 			node.record("ack_sign_failed", "broken", target, payloadErr.Error())
@@ -1125,19 +1125,19 @@ func (node *Node) newAckBytes(target, outcome, promiseText string, protocolCID p
 			return nil, bytesErr
 		}
 		node.emitMessageArtifact("ack_sent", target, pcid.IdentityKeyV1, ackBytes, ackFields)
-		node.record("pcid_owned_array_ack_sent", "kept", target, "pcid="+pcid.IdentityKeyV1+" promise_about="+ackFields["field_promise_about"])
+		node.record("pcid_owned_array_ack_sent", "kept", target, "pcid="+pcid.IdentityKeyV1+" promise_about="+ackFields["promise_about"])
 		return ackBytes, nil
 	}
 	protocolName, protocolKnown := node.Protocols.Name(protocolCID)
 	if protocolKnown {
-		if ackFields["field_promise_about"] == "" && (protocolName == pcid.RelationshipV1 || protocolName == pcid.KernelReceiveV1) {
-			ackFields["field_promise_about"] = "local_observation"
+		if ackFields["promise_about"] == "" && (protocolName == pcid.RelationshipV1 || protocolName == pcid.KernelReceiveV1) {
+			ackFields["promise_about"] = "local_observation"
 		}
 		ack, arrayPayload, ackErr := node.buildEnvelopeFromFields(protocolName, protocolCID, ackFields)
 		if ackErr == nil && arrayPayload {
 			// Intent: Migrated pCIDs must keep ACKs in the same pCID-owned
 			// positional payload family as their requests, rather than falling
-			// back to a generic field-map acknowledgement. Source: DI-gahuh;
+			// back to a generic map acknowledgement. Source: DI-gahuh;
 			// DI-dirat
 			ackBytes, bytesErr := ack.Bytes()
 			if bytesErr != nil {
@@ -1145,7 +1145,7 @@ func (node *Node) newAckBytes(target, outcome, promiseText string, protocolCID p
 				return nil, bytesErr
 			}
 			node.emitMessageArtifact("ack_sent", target, protocolName, ackBytes, ackFields)
-			node.record("pcid_owned_array_ack_sent", "kept", target, "pcid="+protocolName+" promise_about="+ackFields["field_promise_about"])
+			node.record("pcid_owned_array_ack_sent", "kept", target, "pcid="+protocolName+" promise_about="+ackFields["promise_about"])
 			return ackBytes, nil
 		}
 	}
@@ -1192,7 +1192,7 @@ func (node *Node) sendAndReceive(target string, fields map[string]string) (parse
 	}
 	protocolName, protocolCID := node.protocolForFields(fields)
 	fields["protocol"] = protocolName
-	fields["field_exchange_id"] = node.nextExchangeID(target, protocolName)
+	fields["exchange_id"] = node.nextExchangeID(target, protocolName)
 	envelope, arrayPayload, envelopeErr := node.buildEnvelopeFromFields(protocolName, protocolCID, fields)
 	if envelopeErr != nil {
 		return parsedMessage{}, envelopeErr
@@ -1221,7 +1221,7 @@ func (node *Node) sendAndReceive(target string, fields map[string]string) (parse
 	}
 	node.emitMessageArtifact("sent", target, protocolName, envelopeBytes, fields)
 	if arrayPayload {
-		node.record("pcid_owned_array_payload_sent", "kept", target, "pcid="+protocolName+" promise_about="+fields["field_promise_about"]+" exact_sha256="+exactHash)
+		node.record("pcid_owned_array_payload_sent", "kept", target, "pcid="+protocolName+" promise_about="+fields["promise_about"]+" exact_sha256="+exactHash)
 	}
 	node.record("tcp_message_sent", "kept", target, "pcid="+protocolName+" exact_sha256="+exactHash)
 	ackBytes, readErr := frameConn.ReadFrame()
@@ -1246,7 +1246,7 @@ func (node *Node) sendAndReceive(target string, fields map[string]string) (parse
 		return parsedMessage{}, ackOutcomeError{outcome: ackFields["outcome"]}
 	}
 	if isPcidOwnedArrayPayload(ackFields) {
-		node.record("pcid_owned_array_ack_received", "kept", target, "pcid="+ackMessage.ProtocolName+" promise_about="+ackFields["field_promise_about"]+" exact_sha256="+ackMessage.ExactHash)
+		node.record("pcid_owned_array_ack_received", "kept", target, "pcid="+ackMessage.ProtocolName+" promise_about="+ackFields["promise_about"]+" exact_sha256="+ackMessage.ExactHash)
 	}
 	node.recordAckEvent(target, ackMessage)
 	if eventUpdatesTrust(ackFields) {
@@ -1263,8 +1263,8 @@ func (node *Node) sendAndReceive(target string, fields map[string]string) (parse
 // been migrated, while encoding migrated storage/compute protocols as
 // pCID-owned CBOR arrays.
 // Intent: The kernel can still route by compatibility fields locally, but the
-// wire payload for migrated pCIDs is no longer a universal field_* map. Source:
-// DI-gahuh
+// wire payload for migrated pCIDs is no longer a universal named map.
+// Source: DI-gahuh; DI-pusak
 func (node *Node) buildEnvelopeFromFields(protocolName string, protocolCID protocol.ProtocolCID, fields map[string]string) (protocol.Envelope, bool, error) {
 	payloadBytes, arrayPayload, payloadErr := protocol.MarshalKnownArrayPayload(protocolName, fields)
 	if payloadErr != nil {
@@ -1283,7 +1283,7 @@ func envelopeParentExactSHA256sForFields(protocolName string, fields map[string]
 	if protocolName != pcid.RouteV1 {
 		return nil
 	}
-	parentExactSHA256 := strings.TrimSpace(fields["field_envelope_parent_exact_sha256"])
+	parentExactSHA256 := strings.TrimSpace(fields["envelope_parent_exact_sha256"])
 	if parentExactSHA256 == "" {
 		return nil
 	}
@@ -1297,13 +1297,13 @@ func envelopeParentExactSHA256sForFields(protocolName string, fields map[string]
 // Source: DI-sinur
 func (node *Node) sendUnknownProtocolPromise(target string) error {
 	fields := map[string]string{
-		"act":                 decision.ActPromise,
-		"from":                node.Agent.Name,
-		"to":                  target,
-		"turn":                "startup",
-		"promise":             "Mallory promises an envelope under an unknown protocol CID.",
-		"reason":              "unknown pCID should produce local non-commitment",
-		"field_promise_about": production.PromiseUnsupportedVariantProbe,
+		"act":           decision.ActPromise,
+		"from":          node.Agent.Name,
+		"to":            target,
+		"turn":          "startup",
+		"promise":       "Mallory promises an envelope under an unknown protocol CID.",
+		"reason":        "unknown pCID should produce local non-commitment",
+		"promise_about": production.PromiseUnsupportedVariantProbe,
 	}
 	unknownCID := protocol.NewProtocolCID([]byte("poc15 unknown mallory probe protocol"))
 	envelope, envelopeErr := protocol.NewEnvelope(unknownCID, fields, node.Agent.Name)
@@ -1332,13 +1332,13 @@ func (node *Node) sendUnknownProtocolPromise(target string) error {
 // Source: DI-sinur; DI-punib
 func (node *Node) sendBadProofPromise(target string) error {
 	fields := map[string]string{
-		"act":                 decision.ActPromise,
-		"from":                node.Agent.Name,
-		"to":                  target,
-		"turn":                "startup",
-		"promise":             "Mallory promises this intentionally corrupted signature is valid.",
-		"reason":              "bad proof should fail before payload semantics are trusted",
-		"field_promise_about": production.PromisePresentStorageReport,
+		"act":           decision.ActPromise,
+		"from":          node.Agent.Name,
+		"to":            target,
+		"turn":          "startup",
+		"promise":       "Mallory promises this intentionally corrupted signature is valid.",
+		"reason":        "bad proof should fail before payload semantics are trusted",
+		"promise_about": production.PromisePresentStorageReport,
 	}
 	payloadBytes, _, payloadErr := protocol.MarshalKnownArrayPayload(pcid.CASStorageV1, fields)
 	if payloadErr != nil {
@@ -1380,7 +1380,7 @@ func (node *Node) sendRawEnvelope(target, protocolName string, envelopeBytes []b
 }
 
 // sendIdentityKeyRotationPromise sends identity_key_v1 using a pCID-owned CBOR
-// array payload instead of the legacy field_* map scaffold.
+// array payload instead of the earlier generic map scaffold.
 // Intent: Key rotation belongs to identity/key protocol semantics, and this is
 // the first POC15 payload migrated under `DI-vipih`. Source: DI-vipih
 func (node *Node) sendIdentityKeyRotationPromise(target, newKeyLabel, rotationScope string) (parsedMessage, error) {
@@ -1436,7 +1436,7 @@ func (node *Node) sendRawEnvelopeBytes(target, protocolName string, envelopeByte
 	if sentMessage, parseErr := node.parseEnvelope(envelopeBytes); parseErr == nil {
 		node.emitMessageArtifact("sent", target, sentMessage.ProtocolName, envelopeBytes, sentMessage.Fields)
 		if isPcidOwnedArrayPayload(sentMessage.Fields) {
-			node.record("pcid_owned_array_payload_sent", "kept", target, "pcid="+sentMessage.ProtocolName+" promise_about="+sentMessage.Fields["field_promise_about"]+" exact_sha256="+sentMessage.ExactHash)
+			node.record("pcid_owned_array_payload_sent", "kept", target, "pcid="+sentMessage.ProtocolName+" promise_about="+sentMessage.Fields["promise_about"]+" exact_sha256="+sentMessage.ExactHash)
 		}
 	} else {
 		node.emitMessageArtifact("sent_malformed", target, protocolName, envelopeBytes, nil)
@@ -1453,7 +1453,7 @@ func (node *Node) sendRawEnvelopeBytes(target, protocolName string, envelopeByte
 	}
 	node.emitMessageArtifact("ack_received", target, message.ProtocolName, ackBytes, message.Fields)
 	if isPcidOwnedArrayPayload(message.Fields) {
-		node.record("pcid_owned_array_ack_received", "kept", target, "pcid="+message.ProtocolName+" promise_about="+message.Fields["field_promise_about"]+" exact_sha256="+message.ExactHash)
+		node.record("pcid_owned_array_ack_received", "kept", target, "pcid="+message.ProtocolName+" promise_about="+message.Fields["promise_about"]+" exact_sha256="+message.ExactHash)
 	}
 	return message, ackBytes, nil
 }
@@ -1466,28 +1466,28 @@ func (node *Node) parseEnvelope(frameBytes []byte) (parsedMessage, error) {
 	if verifyErr := protocol.VerifyEnvelope(envelope); verifyErr != nil {
 		return parsedMessage{}, verifyErr
 	}
-	fields, fieldsErr := envelope.PayloadFields()
+	protocolName, known := node.Protocols.Name(envelope.ProtocolCID)
+	if !known {
+		protocolName = "unknown:" + envelope.ProtocolCID.String()
+	}
+	fields, fieldsErr := fieldsForEnvelopeProtocol(envelope, protocolName, known)
 	if fieldsErr != nil {
 		return parsedMessage{}, fieldsErr
 	}
 	if fields["from"] == "" {
 		return parsedMessage{}, fmt.Errorf("payload from field is required")
 	}
-	protocolName, known := node.Protocols.Name(envelope.ProtocolCID)
-	if !known {
-		protocolName = "unknown:" + envelope.ProtocolCID.String()
-	}
 	// Intent: pCID-owned array decoders expose only local compatibility fields;
 	// the parser attaches the locally known protocol name for handlers that still
 	// compare event records across legacy and migrated payloads. Source: DI-gahuh
 	fields["protocol"] = protocolName
 	if len(envelope.ParentExactSHA256s) > 0 {
-		fields["field_envelope_parent_exact_sha256"] = envelope.ParentExactSHA256s[0]
-		if fields["field_parent_exact_sha256"] == "" {
-			fields["field_parent_exact_sha256"] = envelope.ParentExactSHA256s[0]
+		fields["envelope_parent_exact_sha256"] = envelope.ParentExactSHA256s[0]
+		if fields["parent_exact_sha256"] == "" {
+			fields["parent_exact_sha256"] = envelope.ParentExactSHA256s[0]
 		}
-		if fields["field_parent_link_location"] == "" {
-			fields["field_parent_link_location"] = "envelope"
+		if fields["parent_link_location"] == "" {
+			fields["parent_link_location"] = "envelope"
 		}
 	}
 	return parsedMessage{
@@ -1501,7 +1501,17 @@ func (node *Node) parseEnvelope(frameBytes []byte) (parsedMessage, error) {
 }
 
 func isPcidOwnedArrayPayload(fields map[string]string) bool {
-	return fields["field_payload_shape"] == "cbor_array"
+	return fields["payload_protocol"] != ""
+}
+
+func fieldsForEnvelopeProtocol(envelope protocol.Envelope, protocolName string, known bool) (map[string]string, error) {
+	// Intent: Slot 0 pCID owns slot 1 decoding; blindly trying compatible array
+	// grammars can turn a relationship promise into a kernel-receive promise.
+	// Source: DI-pusak
+	if known {
+		return protocol.PayloadFieldsForProtocolName(protocolName, envelope.Payload)
+	}
+	return envelope.PayloadFields()
 }
 
 // recordMalformedFrameEvent extracts the promiser from a parseable but
@@ -1513,17 +1523,17 @@ func (node *Node) recordMalformedFrameEvent(frameBytes []byte, cause error) {
 	if parseErr != nil {
 		return
 	}
-	fields, fieldsErr := envelope.PayloadFields()
+	protocolName, known := node.Protocols.Name(envelope.ProtocolCID)
+	if !known {
+		protocolName = "unknown:" + envelope.ProtocolCID.String()
+	}
+	fields, fieldsErr := fieldsForEnvelopeProtocol(envelope, protocolName, known)
 	if fieldsErr != nil {
 		return
 	}
 	fromAgent := fields["from"]
 	if fromAgent == "" {
 		return
-	}
-	protocolName, known := node.Protocols.Name(envelope.ProtocolCID)
-	if !known {
-		protocolName = "unknown:" + envelope.ProtocolCID.String()
 	}
 	node.record("malformed_proof_observed", "malformed", fromAgent, "pcid="+protocolName+" exact_sha256="+protocol.HashExactBytes(frameBytes)+" error="+cause.Error())
 	node.observeOutcome(fromAgent, relationship.OutcomeMalformed)
@@ -1534,12 +1544,10 @@ func (node *Node) recordMalformedFrameEvent(frameBytes []byte, cause error) {
 // per-message-type selector; promise_about remains inside the pCID-owned body.
 // Source: DI-bikit
 func (node *Node) protocolForFields(fields map[string]string) (string, protocol.ProtocolCID) {
-	for _, key := range []string{"field_protocol", "protocol"} {
-		if protocolName := fields[key]; node.Protocols.Known(protocolName) {
-			return protocolName, node.Protocols.MustCID(protocolName)
-		}
+	if protocolName := fields["protocol"]; node.Protocols.Known(protocolName) {
+		return protocolName, node.Protocols.MustCID(protocolName)
 	}
-	switch fields["field_promise_about"] {
+	switch fields["promise_about"] {
 	case production.PromiseWeighPackage:
 		return pcid.PostalScaleV1, node.Protocols.MustCID(pcid.PostalScaleV1)
 	case production.PromiseAddressLookup, production.PromiseShipmentUpdate:
@@ -1567,21 +1575,21 @@ func (node *Node) protocolForFields(fields map[string]string) (string, protocol.
 // a valid relationship promise instead of becoming a broken protocol exchange.
 // Source: DI-punib
 func (node *Node) normalizeAutonomousPromiseFields(target string, fields map[string]string) {
-	if fields["field_promise_about"] == "" {
-		fields["field_promise_about"] = "local_observation"
+	if fields["promise_about"] == "" {
+		fields["promise_about"] = "local_observation"
 	}
-	requestedProtocol := fields["field_protocol"]
+	requestedProtocol := fields["protocol"]
 	if requestedProtocol == "" || requestedProtocol == pcid.RelationshipV1 {
 		return
 	}
 	if autonomousProtocolPayloadSupported(requestedProtocol, fields) {
 		return
 	}
-	originalPromiseAbout := fields["field_promise_about"]
-	fields["field_original_protocol"] = requestedProtocol
-	fields["field_original_promise_about"] = originalPromiseAbout
-	fields["field_protocol"] = pcid.RelationshipV1
-	fields["field_promise_about"] = "local_observation"
+	originalPromiseAbout := fields["promise_about"]
+	fields["original_protocol"] = requestedProtocol
+	fields["original_promise_about"] = originalPromiseAbout
+	fields["protocol"] = pcid.RelationshipV1
+	fields["promise_about"] = "local_observation"
 	node.record("promise_reframed_for_pcid_fit", "kept", target, "original_protocol="+requestedProtocol+" original_promise_about="+originalPromiseAbout+" reframed_protocol="+pcid.RelationshipV1)
 }
 
@@ -1597,7 +1605,7 @@ func autonomousProtocolPayloadSupported(protocolName string, fields map[string]s
 	case pcid.CIDComputeV1:
 		return computePayloadShapePresent(fields)
 	case pcid.IdentityKeyV1:
-		// Intent: Live LLM field-map turns must not synthesize identity_key_v1
+		// Intent: Live LLM generic-map turns must not synthesize identity_key_v1
 		// payloads; POC15 only sends this pCID through explicit array encoders.
 		// Source: DI-vipih
 		return false
@@ -1609,11 +1617,11 @@ func autonomousProtocolPayloadSupported(protocolName string, fields map[string]s
 }
 
 func casPayloadShapePresent(fields map[string]string) bool {
-	switch fields["field_promise_about"] {
+	switch fields["promise_about"] {
 	case production.PromiseStoreContent, production.PromiseReplicateContent, production.PromisePresentStorageReport:
-		return fields["field_content_cid"] != "" && fields["field_content_b64"] != ""
+		return fields["content_cid"] != "" && fields["content_b64"] != ""
 	case production.PromiseServeContent, production.PromiseServeReplicaContent:
-		return fields["field_content_cid"] != "" && fields["field_token"] != ""
+		return fields["content_cid"] != "" && fields["token"] != ""
 	case production.PromiseLabelFutureMalformedReport, production.PromiseUnsupportedVariantProbe, production.PromiseReplicaTokenLifecycle:
 		return true
 	default:
@@ -1622,18 +1630,18 @@ func casPayloadShapePresent(fields map[string]string) bool {
 }
 
 func computePayloadShapePresent(fields map[string]string) bool {
-	switch fields["field_promise_about"] {
+	switch fields["promise_about"] {
 	case production.PromiseExecuteFunction:
-		return fields["field_function_cid"] != "" && fields["field_function_b64"] != "" &&
-			fields["field_input_cid"] != "" && fields["field_input_b64"] != "" &&
-			fields["field_context_cid"] != "" && fields["field_context_b64"] != ""
+		return fields["function_cid"] != "" && fields["function_b64"] != "" &&
+			fields["input_cid"] != "" && fields["input_b64"] != "" &&
+			fields["context_cid"] != "" && fields["context_b64"] != ""
 	case production.PromiseLookupComputeCache:
-		return fields["field_function_cid"] != "" && fields["field_input_cid"] != "" && fields["field_context_cid"] != ""
+		return fields["function_cid"] != "" && fields["input_cid"] != "" && fields["context_cid"] != ""
 	case production.PromiseVerifyComputeResult:
-		return fields["field_function_cid"] != "" && fields["field_function_b64"] != "" &&
-			fields["field_input_cid"] != "" && fields["field_input_b64"] != "" &&
-			fields["field_context_cid"] != "" && fields["field_context_b64"] != "" &&
-			fields["field_result_cid"] != "" && fields["field_result_b64"] != ""
+		return fields["function_cid"] != "" && fields["function_b64"] != "" &&
+			fields["input_cid"] != "" && fields["input_b64"] != "" &&
+			fields["context_cid"] != "" && fields["context_b64"] != "" &&
+			fields["result_cid"] != "" && fields["result_b64"] != ""
 	default:
 		return false
 	}
@@ -1642,15 +1650,15 @@ func computePayloadShapePresent(fields map[string]string) bool {
 func productionPayloadShapePresent(protocolName string, fields map[string]string) bool {
 	switch protocolName {
 	case pcid.PostalScaleV1:
-		return fields["field_promise_about"] == production.PromiseWeighPackage && fields["field_package_id"] != ""
+		return fields["promise_about"] == production.PromiseWeighPackage && fields["package_id"] != ""
 	case pcid.AccountingV1:
-		return fields["field_promise_about"] == production.PromiseAddressLookup && fields["field_order_id"] != "" ||
-			fields["field_promise_about"] == production.PromiseShipmentUpdate && fields["field_order_id"] != "" && fields["field_tracking_number"] != ""
+		return fields["promise_about"] == production.PromiseAddressLookup && fields["order_id"] != "" ||
+			fields["promise_about"] == production.PromiseShipmentUpdate && fields["order_id"] != "" && fields["tracking_number"] != ""
 	case pcid.UPSLabelV1:
-		return fields["field_promise_about"] == production.PromisePrintLabel && fields["field_package_id"] != "" && fields["field_shipping_address"] != ""
+		return fields["promise_about"] == production.PromisePrintLabel && fields["package_id"] != "" && fields["shipping_address"] != ""
 	case pcid.PrinterPortV1:
-		return fields["field_promise_about"] == production.PromiseIssuePrintCapability && fields["field_print_capability_issuee"] != "" ||
-			fields["field_promise_about"] == production.PromiseRedeemPrintCapability && fields["field_print_capability_token_id"] != ""
+		return fields["promise_about"] == production.PromiseIssuePrintCapability && fields["print_capability_issuee"] != "" ||
+			fields["promise_about"] == production.PromiseRedeemPrintCapability && fields["print_capability_token_id"] != ""
 	default:
 		return false
 	}
@@ -1701,19 +1709,19 @@ func (node *Node) handlePostalScalePromise(fields map[string]string) (map[string
 	if node.Agent.Kind != "postal_scale" {
 		return nil, nil
 	}
-	if fields["field_promise_about"] != production.PromiseWeighPackage {
-		return nil, fmt.Errorf("postal scale cannot handle promise_about=%q", fields["field_promise_about"])
+	if fields["promise_about"] != production.PromiseWeighPackage {
+		return nil, fmt.Errorf("postal scale cannot handle promise_about=%q", fields["promise_about"])
 	}
-	packageID := firstStringField(fields, "field_package_id", "package_id")
+	packageID := firstStringField(fields, "package_id", "package_id")
 	weightOunces, err := production.WeightForPackage(packageID)
 	if err != nil {
 		return nil, err
 	}
 	node.record("package_weighed", "kept", fields["from"], fmt.Sprintf("package_id=%s weight_ounces=%d", packageID, weightOunces))
 	return map[string]string{
-		"field_promise_about": production.PromiseWeighPackage,
-		"field_package_id":    packageID,
-		"field_weight_ounces": strconv.Itoa(weightOunces),
+		"promise_about": production.PromiseWeighPackage,
+		"package_id":    packageID,
+		"weight_ounces": strconv.Itoa(weightOunces),
 	}, nil
 }
 
@@ -1721,12 +1729,12 @@ func (node *Node) handleUPSLabelPromise(fields map[string]string) (map[string]st
 	if node.Agent.Kind != "ups_label_printer" {
 		return nil, nil
 	}
-	if fields["field_promise_about"] != production.PromisePrintLabel {
-		return nil, fmt.Errorf("ups label printer cannot handle promise_about=%q", fields["field_promise_about"])
+	if fields["promise_about"] != production.PromisePrintLabel {
+		return nil, fmt.Errorf("ups label printer cannot handle promise_about=%q", fields["promise_about"])
 	}
-	packageID := firstStringField(fields, "field_package_id", "package_id")
-	address := firstStringField(fields, "field_shipping_address", "shipping_address", "field_address")
-	weightOunces := intField(fields, "field_weight_ounces", "weight_ounces")
+	packageID := firstStringField(fields, "package_id", "package_id")
+	address := firstStringField(fields, "shipping_address", "shipping_address", "address")
+	weightOunces := intField(fields, "weight_ounces", "weight_ounces")
 	trackingNumber, costCents, err := production.LabelForShipment(packageID, address, weightOunces)
 	if err != nil {
 		return nil, err
@@ -1736,9 +1744,9 @@ func (node *Node) handleUPSLabelPromise(fields map[string]string) (map[string]st
 		return nil, err
 	}
 	labelBytes, err := production.LabelBytesForShipment(map[string]string{
-		"field_package_id":      packageID,
-		"field_tracking_number": trackingNumber,
-		"field_cost_cents":      strconv.Itoa(costCents),
+		"package_id":      packageID,
+		"tracking_number": trackingNumber,
+		"cost_cents":      strconv.Itoa(costCents),
 	})
 	if err != nil {
 		return nil, err
@@ -1749,11 +1757,11 @@ func (node *Node) handleUPSLabelPromise(fields map[string]string) (map[string]st
 	}
 	node.record("shipping_label_printed", "kept", fields["from"], fmt.Sprintf("package_id=%s tracking_number=%s cost_cents=%d", packageID, trackingNumber, costCents))
 	return map[string]string{
-		"field_promise_about":    production.PromisePrintLabel,
-		"field_package_id":       packageID,
-		"field_tracking_number":  trackingNumber,
-		"field_cost_cents":       strconv.Itoa(costCents),
-		"field_printer_spool_id": printAck.Fields["field_printer_spool_id"],
+		"promise_about":    production.PromisePrintLabel,
+		"package_id":       packageID,
+		"tracking_number":  trackingNumber,
+		"cost_cents":       strconv.Itoa(costCents),
+		"printer_spool_id": printAck.Fields["printer_spool_id"],
 	}, nil
 }
 
@@ -1765,17 +1773,17 @@ func (node *Node) handleUPSLabelPromise(fields map[string]string) (map[string]st
 func (node *Node) requestPrinterPortCapability() (parsedMessage, error) {
 	tokenID := "printcap-" + node.Agent.Name
 	capabilityFields := map[string]string{
-		"act":                              decision.ActPromise,
-		"from":                             node.Agent.Name,
-		"to":                               "printer_port",
-		"turn":                             "startup",
-		"promise":                          "I promise to receive printer_port's scoped future-print capability token and use it only for bounded UPS label bytes.",
-		"reason":                           "ups_label_printer needs local printer-port promise event before asking for hardware printing",
-		"field_promise_about":              production.PromiseIssuePrintCapability,
-		"field_print_capability_issuee":    node.Agent.Name,
-		"field_print_capability_token_id":  tokenID,
-		"field_print_capability_scope":     production.PrintCapabilityScope,
-		"field_print_capability_max_bytes": strconv.Itoa(production.PrintCapabilityMaxBytes),
+		"act":                        decision.ActPromise,
+		"from":                       node.Agent.Name,
+		"to":                         "printer_port",
+		"turn":                       "startup",
+		"promise":                    "I promise to receive printer_port's scoped future-print capability token and use it only for bounded UPS label bytes.",
+		"reason":                     "ups_label_printer needs local printer-port promise event before asking for hardware printing",
+		"promise_about":              production.PromiseIssuePrintCapability,
+		"print_capability_issuee":    node.Agent.Name,
+		"print_capability_token_id":  tokenID,
+		"print_capability_scope":     production.PrintCapabilityScope,
+		"print_capability_max_bytes": strconv.Itoa(production.PrintCapabilityMaxBytes),
 	}
 	capabilityAck, err := node.sendAndReceive("printer_port", capabilityFields)
 	if err != nil {
@@ -1792,19 +1800,19 @@ func (node *Node) requestPrinterPortCapability() (parsedMessage, error) {
 // DI-vutok
 func (node *Node) redeemPrinterPortCapability(capabilityAck parsedMessage, labelBytes []byte) (parsedMessage, error) {
 	redemptionFields := map[string]string{
-		"act":                              decision.ActPromise,
-		"from":                             node.Agent.Name,
-		"to":                               "printer_port",
-		"turn":                             "startup",
-		"promise":                          "I promise to present only bounded UPS label bytes under this printer_port capability token and to receive printer_port's local print event record.",
-		"reason":                           "ups_label_printer has a scoped future-print token and now asks printer_port to write exact label bytes",
-		"field_promise_about":              production.PromiseRedeemPrintCapability,
-		"field_print_capability_issuee":    node.Agent.Name,
-		"field_print_capability_token":     capabilityAck.Fields["field_print_capability_token"],
-		"field_print_capability_token_id":  capabilityAck.Fields["field_print_capability_token_id"],
-		"field_print_capability_scope":     capabilityAck.Fields["field_print_capability_scope"],
-		"field_print_capability_max_bytes": capabilityAck.Fields["field_print_capability_max_bytes"],
-		"field_label_bytes_hex":            hex.EncodeToString(labelBytes),
+		"act":                        decision.ActPromise,
+		"from":                       node.Agent.Name,
+		"to":                         "printer_port",
+		"turn":                       "startup",
+		"promise":                    "I promise to present only bounded UPS label bytes under this printer_port capability token and to receive printer_port's local print event record.",
+		"reason":                     "ups_label_printer has a scoped future-print token and now asks printer_port to write exact label bytes",
+		"promise_about":              production.PromiseRedeemPrintCapability,
+		"print_capability_issuee":    node.Agent.Name,
+		"print_capability_token":     capabilityAck.Fields["print_capability_token"],
+		"print_capability_token_id":  capabilityAck.Fields["print_capability_token_id"],
+		"print_capability_scope":     capabilityAck.Fields["print_capability_scope"],
+		"print_capability_max_bytes": capabilityAck.Fields["print_capability_max_bytes"],
+		"label_bytes_hex":            hex.EncodeToString(labelBytes),
 	}
 	printAck, err := node.sendAndReceive("printer_port", redemptionFields)
 	if err != nil {
@@ -1823,43 +1831,43 @@ func (node *Node) handlePrinterPortPromise(fields map[string]string) (map[string
 	if node.Agent.Kind != "printer_port" {
 		return nil, nil
 	}
-	switch fields["field_promise_about"] {
+	switch fields["promise_about"] {
 	case production.PromiseIssuePrintCapability:
 		token, err := production.IssuePrintCapabilityToken(fields)
 		if err != nil {
 			return nil, err
 		}
-		tokenID := firstStringField(fields, "field_print_capability_token_id")
-		scope := firstStringField(fields, "field_print_capability_scope")
+		tokenID := firstStringField(fields, "print_capability_token_id")
+		scope := firstStringField(fields, "print_capability_scope")
 		if scope == "" {
 			scope = production.PrintCapabilityScope
 		}
-		maxBytes := firstStringField(fields, "field_print_capability_max_bytes")
+		maxBytes := firstStringField(fields, "print_capability_max_bytes")
 		if maxBytes == "" {
 			maxBytes = strconv.Itoa(production.PrintCapabilityMaxBytes)
 		}
 		node.record("printer_capability_issued", "kept", fields["from"], fmt.Sprintf("token_id=%s scope=%s max_bytes=%s", tokenID, scope, maxBytes))
 		return map[string]string{
-			"field_promise_about":              production.PromiseIssuePrintCapability,
-			"field_print_capability_issuee":    firstStringField(fields, "field_print_capability_issuee", "from"),
-			"field_print_capability_token":     token,
-			"field_print_capability_token_id":  tokenID,
-			"field_print_capability_scope":     scope,
-			"field_print_capability_max_bytes": maxBytes,
+			"promise_about":              production.PromiseIssuePrintCapability,
+			"print_capability_issuee":    firstStringField(fields, "print_capability_issuee", "from"),
+			"print_capability_token":     token,
+			"print_capability_token_id":  tokenID,
+			"print_capability_scope":     scope,
+			"print_capability_max_bytes": maxBytes,
 		}, nil
 	case production.PromiseRedeemPrintCapability:
 		spoolID, err := production.PrintLabelToLocalDevice(fields)
 		if err != nil {
 			return nil, err
 		}
-		printEvent := firstStringField(fields, "field_label_bytes_hex")
+		printEvent := firstStringField(fields, "label_bytes_hex")
 		node.record("printer_port_printed", "kept", fields["from"], fmt.Sprintf("spool_id=%s label_hex_bytes=%d", spoolID, len(printEvent)))
 		return map[string]string{
-			"field_promise_about":    production.PromiseRedeemPrintCapability,
-			"field_printer_spool_id": spoolID,
+			"promise_about":    production.PromiseRedeemPrintCapability,
+			"printer_spool_id": spoolID,
 		}, nil
 	default:
-		return nil, fmt.Errorf("printer_port cannot handle promise_about=%q", fields["field_promise_about"])
+		return nil, fmt.Errorf("printer_port cannot handle promise_about=%q", fields["promise_about"])
 	}
 }
 
@@ -1867,31 +1875,31 @@ func (node *Node) handleAccountingPromise(fields map[string]string) (map[string]
 	if node.Agent.Kind != "accounting" {
 		return nil, nil
 	}
-	switch fields["field_promise_about"] {
+	switch fields["promise_about"] {
 	case production.PromiseAddressLookup:
-		orderID := firstStringField(fields, "field_order_id", "order_id")
+		orderID := firstStringField(fields, "order_id", "order_id")
 		address, err := production.AddressForOrder(orderID)
 		if err != nil {
 			return nil, err
 		}
 		node.record("shipping_address_promised", "kept", fields["from"], fmt.Sprintf("order_id=%s shipping_address=%s", orderID, address))
 		return map[string]string{
-			"field_promise_about":    production.PromiseAddressLookup,
-			"field_order_id":         orderID,
-			"field_shipping_address": address,
+			"promise_about":    production.PromiseAddressLookup,
+			"order_id":         orderID,
+			"shipping_address": address,
 		}, nil
 	case production.PromiseShipmentUpdate:
-		orderID := firstStringField(fields, "field_order_id", "order_id")
-		trackingNumber := firstStringField(fields, "field_tracking_number", "tracking_number")
-		costCents := intField(fields, "field_cost_cents", "cost_cents")
+		orderID := firstStringField(fields, "order_id", "order_id")
+		trackingNumber := firstStringField(fields, "tracking_number", "tracking_number")
+		costCents := intField(fields, "cost_cents", "cost_cents")
 		if err := production.ValidateAccountingUpdate(orderID, trackingNumber, costCents); err != nil {
 			return nil, err
 		}
 		ackFields := map[string]string{
-			"field_promise_about":   production.PromiseShipmentUpdate,
-			"field_order_id":        orderID,
-			"field_tracking_number": trackingNumber,
-			"field_cost_cents":      strconv.Itoa(costCents),
+			"promise_about":   production.PromiseShipmentUpdate,
+			"order_id":        orderID,
+			"tracking_number": trackingNumber,
+			"cost_cents":      strconv.Itoa(costCents),
 		}
 		updateKey := checkpointKey(pcid.AccountingV1, production.PromiseShipmentUpdate, orderID, trackingNumber, strconv.Itoa(costCents))
 		alreadyRecorded := node.rememberCheckpoint(checkpointRecord{
@@ -1909,7 +1917,7 @@ func (node *Node) handleAccountingPromise(fields map[string]string) (map[string]
 		node.record("accounting_updated", "kept", fields["from"], fmt.Sprintf("order_id=%s tracking_number=%s cost_cents=%d", orderID, trackingNumber, costCents))
 		return ackFields, nil
 	default:
-		return nil, fmt.Errorf("accounting cannot handle promise_about=%q", fields["field_promise_about"])
+		return nil, fmt.Errorf("accounting cannot handle promise_about=%q", fields["promise_about"])
 	}
 }
 
@@ -1920,10 +1928,10 @@ func (node *Node) handleAccountingPromise(fields map[string]string) (map[string]
 // storage command or central authorization surface. Sparse-store and bearer-token
 // behavior remain pCID-owned promises between peers. Source: DI-sinur; DI-manul
 func (node *Node) handleCASStoragePromise(fields map[string]string) (map[string]string, error) {
-	switch fields["field_promise_about"] {
+	switch fields["promise_about"] {
 	case production.PromiseStoreContent:
-		contentCID := fields["field_content_cid"]
-		contentBytes, err := base64.StdEncoding.DecodeString(fields["field_content_b64"])
+		contentCID := fields["content_cid"]
+		contentBytes, err := base64.StdEncoding.DecodeString(fields["content_b64"])
 		if err != nil {
 			return nil, err
 		}
@@ -1931,12 +1939,12 @@ func (node *Node) handleCASStoragePromise(fields map[string]string) (map[string]
 			node.record("cas_corrupt_bytes_rejected", "malformed", fields["from"], "pcid="+pcid.CASStorageV1+" presented bytes did not match content_cid="+contentCID)
 			return nil, fmt.Errorf("content bytes do not match content CID")
 		}
-		if intField(fields, "field_credit_offer") < 3 {
+		if intField(fields, "credit_offer") < 3 {
 			node.record("economics_price_refused", "non_commitment", fields["from"], "pcid="+pcid.CASStorageV1+" storage credit_offer below local price")
 			return map[string]string{
-				"field_promise_about":  production.PromiseStoreContent,
-				"field_storage_status": "price_refused",
-				"field_content_cid":    contentCID,
+				"promise_about":  production.PromiseStoreContent,
+				"storage_status": "price_refused",
+				"content_cid":    contentCID,
 			}, nil
 		}
 		if _, storeErr := node.storeLocalCASObject(contentBytes, agentCASStoreOptions{
@@ -1950,7 +1958,7 @@ func (node *Node) handleCASStoragePromise(fields map[string]string) (map[string]
 		}
 		token := node.issueCapabilityToken(fields["from"], contentCID)
 		bearerToken := ""
-		if fields["field_token_style"] == "bearer" {
+		if fields["token_style"] == "bearer" {
 			bearerToken = node.issueBearerStorageToken(contentCID)
 			node.record("agent_cas_bearer_storage_token_issued", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" token_scope=bearer content_cid="+contentCID)
 		}
@@ -1958,62 +1966,62 @@ func (node *Node) handleCASStoragePromise(fields map[string]string) (map[string]
 		node.record("agent_cas_peer_storage_promised", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" content_cid="+contentCID+" retention=paid-run-local")
 		node.record("cas_retention_promised", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" retention=run-local")
 		node.record("cas_bytes_stored", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" content_cid="+contentCID)
-		node.record("economics_credit_accepted", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" credit_offer="+fields["field_credit_offer"])
-		node.record("economics_capacity_reserved", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" units="+firstStringField(fields, "field_units"))
+		node.record("economics_credit_accepted", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" credit_offer="+fields["credit_offer"])
+		node.record("economics_capacity_reserved", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" units="+firstStringField(fields, "units"))
 		node.record("economics_credits_earned", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" Bob earns storage credits")
 		node.record("capability_token_issued", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" token_scope=serve-once content_cid="+contentCID)
 		node.record("capability_token_ttl_promised", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" ttl=run-local content_cid="+contentCID)
 		replicaToken := ""
 		if node.Agent.Name == "bob" {
 			replicaAck, replicaErr := node.sendAndReceive("frank", map[string]string{
-				"act":                 decision.ActPromise,
-				"from":                node.Agent.Name,
-				"to":                  "frank",
-				"turn":                "startup",
-				"promise":             "Bob promises Frank exact bytes for replica storage and receives only Frank's local replica event.",
-				"reason":              "replication is a peer promise, not global availability",
-				"field_promise_about": production.PromiseReplicateContent,
-				"field_content_cid":   contentCID,
-				"field_content_b64":   fields["field_content_b64"],
-				"field_issuee":        fields["from"],
-				"field_units":         "1",
+				"act":           decision.ActPromise,
+				"from":          node.Agent.Name,
+				"to":            "frank",
+				"turn":          "startup",
+				"promise":       "Bob promises Frank exact bytes for replica storage and receives only Frank's local replica event.",
+				"reason":        "replication is a peer promise, not global availability",
+				"promise_about": production.PromiseReplicateContent,
+				"content_cid":   contentCID,
+				"content_b64":   fields["content_b64"],
+				"issuee":        fields["from"],
+				"units":         "1",
 			})
 			if replicaErr == nil {
-				replicaToken = replicaAck.Fields["field_replica_token"]
+				replicaToken = replicaAck.Fields["replica_token"]
 				node.record("cas_replication_promised", "kept", "frank", "pcid="+pcid.CASStorageV1+" content_cid="+contentCID)
 				node.record("replica_capability_token_received", "kept", "frank", "pcid="+pcid.CASStorageV1+" content_cid="+contentCID)
 			}
 		}
 		return map[string]string{
-			"field_promise_about":    production.PromiseStoreContent,
-			"field_storage_status":   "stored",
-			"field_content_cid":      contentCID,
-			"field_capability_token": token,
-			"field_bearer_token":     bearerToken,
-			"field_replica_peer":     "frank",
-			"field_replica_token":    replicaToken,
+			"promise_about":    production.PromiseStoreContent,
+			"storage_status":   "stored",
+			"content_cid":      contentCID,
+			"capability_token": token,
+			"bearer_token":     bearerToken,
+			"replica_peer":     "frank",
+			"replica_token":    replicaToken,
 		}, nil
 	case production.PromiseServeContent:
-		contentCID := fields["field_content_cid"]
-		if fields["field_missing_object_probe"] == "true" {
+		contentCID := fields["content_cid"]
+		if fields["missing_object_probe"] == "true" {
 			return node.handleSparseCASProbe(fields, production.PromiseServeContent), nil
 		}
-		if fields["field_token_style"] == "bearer" {
-			if !node.redeemBearerStorageToken(contentCID, fields["field_token"]) {
+		if fields["token_style"] == "bearer" {
+			if !node.redeemBearerStorageToken(contentCID, fields["token"]) {
 				node.record("agent_cas_bearer_storage_token_rejected", "non_commitment", fields["from"], "pcid="+pcid.CASStorageV1+" bearer token not promised for content_cid="+contentCID)
 				return map[string]string{
-					"field_promise_about": production.PromiseServeContent,
-					"field_content_cid":   contentCID,
-					"field_token_status":  "not_promised",
+					"promise_about": production.PromiseServeContent,
+					"content_cid":   contentCID,
+					"token_status":  "not_promised",
 				}, nil
 			}
 			node.record("agent_cas_bearer_storage_token_redeemed", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" bearer content_cid="+contentCID)
-		} else if !node.redeemCapabilityToken(fields["from"], contentCID, fields["field_token"]) {
+		} else if !node.redeemCapabilityToken(fields["from"], contentCID, fields["token"]) {
 			node.record("capability_token_replay_rejected", "non_commitment", fields["from"], "pcid="+pcid.CASStorageV1+" consumed or unrecognized serve-once token for content_cid="+contentCID)
 			return map[string]string{
-				"field_promise_about": production.PromiseServeContent,
-				"field_content_cid":   contentCID,
-				"field_token_status":  "not_promised",
+				"promise_about": production.PromiseServeContent,
+				"content_cid":   contentCID,
+				"token_status":  "not_promised",
 			}, nil
 		}
 		contentBytes, stored, readErr := node.readLocalCASObject(contentCID)
@@ -2031,13 +2039,13 @@ func (node *Node) handleCASStoragePromise(fields map[string]string) (map[string]
 		node.record("gc_promise_ended", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" serve-once token promise ended after redemption for content_cid="+contentCID)
 		node.record("gc_object_removed", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" consumed capability token removed from run-scoped store for content_cid="+contentCID)
 		return map[string]string{
-			"field_promise_about": production.PromiseServeContent,
-			"field_content_cid":   contentCID,
-			"field_content_b64":   base64.StdEncoding.EncodeToString(contentBytes),
+			"promise_about": production.PromiseServeContent,
+			"content_cid":   contentCID,
+			"content_b64":   base64.StdEncoding.EncodeToString(contentBytes),
 		}, nil
 	case production.PromiseReplicateContent:
-		contentCID := fields["field_content_cid"]
-		contentBytes, err := base64.StdEncoding.DecodeString(fields["field_content_b64"])
+		contentCID := fields["content_cid"]
+		contentBytes, err := base64.StdEncoding.DecodeString(fields["content_b64"])
 		if err != nil {
 			return nil, err
 		}
@@ -2053,26 +2061,26 @@ func (node *Node) handleCASStoragePromise(fields map[string]string) (map[string]
 		}); storeErr != nil {
 			return nil, storeErr
 		}
-		issuee := firstStringField(fields, "field_issuee", "from")
+		issuee := firstStringField(fields, "issuee", "from")
 		token := node.issueCapabilityToken(issuee, contentCID)
 		node.record("cas_replica_stored", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" content_cid="+contentCID)
 		node.record("replica_capability_token_issued", "kept", issuee, "pcid="+pcid.CASStorageV1+" content_cid="+contentCID)
 		return map[string]string{
-			"field_promise_about": production.PromiseReplicateContent,
-			"field_content_cid":   contentCID,
-			"field_replica_token": token,
+			"promise_about": production.PromiseReplicateContent,
+			"content_cid":   contentCID,
+			"replica_token": token,
 		}, nil
 	case production.PromiseServeReplicaContent:
-		contentCID := fields["field_content_cid"]
-		if fields["field_missing_object_probe"] == "true" {
+		contentCID := fields["content_cid"]
+		if fields["missing_object_probe"] == "true" {
 			return node.handleSparseCASProbe(fields, production.PromiseServeReplicaContent), nil
 		}
-		if !node.redeemCapabilityToken(fields["from"], contentCID, fields["field_token"]) {
+		if !node.redeemCapabilityToken(fields["from"], contentCID, fields["token"]) {
 			node.record("capability_token_replay_rejected", "non_commitment", fields["from"], "pcid="+pcid.CASStorageV1+" consumed or unrecognized replica token for content_cid="+contentCID)
 			return map[string]string{
-				"field_promise_about": production.PromiseServeReplicaContent,
-				"field_content_cid":   contentCID,
-				"field_token_status":  "not_promised",
+				"promise_about": production.PromiseServeReplicaContent,
+				"content_cid":   contentCID,
+				"token_status":  "not_promised",
 			}, nil
 		}
 		contentBytes, stored, readErr := node.readLocalCASObject(contentCID)
@@ -2093,44 +2101,44 @@ func (node *Node) handleCASStoragePromise(fields map[string]string) (map[string]
 		node.record("replica_recovery_succeeded", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" content_cid="+contentCID)
 		node.record("cas_bytes_retrieved", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" replica content_cid="+contentCID)
 		return map[string]string{
-			"field_promise_about": production.PromiseServeReplicaContent,
-			"field_content_cid":   contentCID,
-			"field_content_b64":   base64.StdEncoding.EncodeToString(contentBytes),
+			"promise_about": production.PromiseServeReplicaContent,
+			"content_cid":   contentCID,
+			"content_b64":   base64.StdEncoding.EncodeToString(contentBytes),
 		}, nil
 	case production.PromiseReplicaTokenLifecycle:
-		contentCID := fields["field_content_cid"]
-		if fields["field_token_status"] != "transferred" || fields["field_token_style"] != "bearer" {
+		contentCID := fields["content_cid"]
+		if fields["token_status"] != "transferred" || fields["token_style"] != "bearer" {
 			node.record("agent_cas_bearer_storage_token_rejected", "non_commitment", fields["from"], "pcid="+pcid.CASStorageV1+" token lifecycle was not a bearer transfer promise")
 			return map[string]string{
-				"field_promise_about": production.PromiseReplicaTokenLifecycle,
-				"field_content_cid":   contentCID,
-				"field_token_status":  "not_promised",
+				"promise_about": production.PromiseReplicaTokenLifecycle,
+				"content_cid":   contentCID,
+				"token_status":  "not_promised",
 			}, nil
 		}
-		issuerPeer := firstStringField(fields, "field_issuer_peer", "field_redeem_peer")
-		bearerToken := firstStringField(fields, "field_bearer_token", "field_token")
+		issuerPeer := firstStringField(fields, "issuer_peer", "redeem_peer")
+		bearerToken := firstStringField(fields, "bearer_token", "token")
 		node.record("agent_cas_bearer_storage_token_received", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" issuer="+issuerPeer+" content_cid="+contentCID)
 		redeemAck, redeemErr := node.sendAndReceive(issuerPeer, map[string]string{
-			"act":                 decision.ActPromise,
-			"from":                node.Agent.Name,
-			"to":                  issuerPeer,
-			"turn":                "startup",
-			"promise":             node.Agent.Name + " promises to present a bearer storage token and receive only the issuer's local serve event.",
-			"reason":              "bearer token redemption should be voluntary peer storage work, not authority",
-			"field_promise_about": production.PromiseServeContent,
-			"field_content_cid":   contentCID,
-			"field_token":         bearerToken,
-			"field_token_style":   "bearer",
+			"act":           decision.ActPromise,
+			"from":          node.Agent.Name,
+			"to":            issuerPeer,
+			"turn":          "startup",
+			"promise":       node.Agent.Name + " promises to present a bearer storage token and receive only the issuer's local serve event.",
+			"reason":        "bearer token redemption should be voluntary peer storage work, not authority",
+			"promise_about": production.PromiseServeContent,
+			"content_cid":   contentCID,
+			"token":         bearerToken,
+			"token_style":   "bearer",
 		})
 		if redeemErr != nil {
 			node.record("agent_cas_bearer_storage_token_rejected", "non_commitment", issuerPeer, "pcid="+pcid.CASStorageV1+" "+redeemErr.Error())
 			return map[string]string{
-				"field_promise_about": production.PromiseReplicaTokenLifecycle,
-				"field_content_cid":   contentCID,
-				"field_token_status":  "not_promised",
+				"promise_about": production.PromiseReplicaTokenLifecycle,
+				"content_cid":   contentCID,
+				"token_status":  "not_promised",
 			}, nil
 		}
-		contentBytes, decodeErr := base64.StdEncoding.DecodeString(redeemAck.Fields["field_content_b64"])
+		contentBytes, decodeErr := base64.StdEncoding.DecodeString(redeemAck.Fields["content_b64"])
 		if decodeErr != nil {
 			return nil, decodeErr
 		}
@@ -2148,19 +2156,19 @@ func (node *Node) handleCASStoragePromise(fields map[string]string) (map[string]
 		}
 		node.record("agent_cas_bearer_storage_token_redeemed", "kept", issuerPeer, "pcid="+pcid.CASStorageV1+" holder="+node.Agent.Name+" content_cid="+contentCID)
 		return map[string]string{
-			"field_promise_about": production.PromiseReplicaTokenLifecycle,
-			"field_content_cid":   contentCID,
-			"field_token_status":  "redeemed",
+			"promise_about": production.PromiseReplicaTokenLifecycle,
+			"content_cid":   contentCID,
+			"token_status":  "redeemed",
 		}, nil
 	case production.PromisePresentStorageReport:
-		contentBytes, err := base64.StdEncoding.DecodeString(fields["field_content_b64"])
+		contentBytes, err := base64.StdEncoding.DecodeString(fields["content_b64"])
 		if err != nil {
 			return nil, err
 		}
-		contentCID := fields["field_content_cid"]
+		contentCID := fields["content_cid"]
 		node.record("cas_verification_promised", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" receiver promises local byte/CID verification")
 		if production.VerifyContentCID(contentBytes, contentCID) {
-			return map[string]string{"field_promise_about": production.PromisePresentStorageReport, "field_verdict": "kept"}, nil
+			return map[string]string{"promise_about": production.PromisePresentStorageReport, "verdict": "kept"}, nil
 		}
 		node.record("cas_corrupt_bytes_rejected", "malformed", fields["from"], "pcid="+pcid.CASStorageV1+" bytes did not match content_cid="+contentCID)
 		node.record("cas_corrupt_report_recorded", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" local corrupt-byte event recorded")
@@ -2169,16 +2177,16 @@ func (node *Node) handleCASStoragePromise(fields map[string]string) (map[string]
 		// proofs and bad compute results instead of remaining a log-only event.
 		// Source: DI-fijov
 		node.observeOutcome(fields["from"], relationship.OutcomeMalformed)
-		return map[string]string{"field_promise_about": production.PromisePresentStorageReport, "field_verdict": "broken"}, nil
+		return map[string]string{"promise_about": production.PromisePresentStorageReport, "verdict": "broken"}, nil
 	case production.PromiseLabelFutureMalformedReport:
 		node.record("trust_repair_promise_recorded", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" future repair promise recorded as local events")
 		node.record("trust_repair_future_only", "non_commitment", fields["from"], "pcid="+pcid.CASStorageV1+" future repair promise is remembered but does not prove repair has already been kept")
-		return map[string]string{"field_promise_about": production.PromiseLabelFutureMalformedReport, "field_repair_status": "future_only"}, nil
+		return map[string]string{"promise_about": production.PromiseLabelFutureMalformedReport, "repair_status": "future_only"}, nil
 	case production.PromiseUnsupportedVariantProbe:
 		node.record("promise_variant_not_promised", "non_commitment", fields["from"], "pcid="+pcid.CASStorageV1+" unsupported storage variant not promised")
-		return map[string]string{"field_promise_about": production.PromiseUnsupportedVariantProbe, "field_variant_status": "not_promised"}, nil
+		return map[string]string{"promise_about": production.PromiseUnsupportedVariantProbe, "variant_status": "not_promised"}, nil
 	default:
-		return nil, fmt.Errorf("CAS storage cannot handle promise_about=%q", fields["field_promise_about"])
+		return nil, fmt.Errorf("CAS storage cannot handle promise_about=%q", fields["promise_about"])
 	}
 }
 
@@ -2188,31 +2196,31 @@ func (node *Node) handleCASStoragePromise(fields map[string]string) (map[string]
 // that receivers can recompute or ask peers to observe locally. Source: DI-sinur
 func (node *Node) handleCIDComputePromise(message parsedMessage) (protocolHandlerResult, error) {
 	fields := message.Fields
-	switch fields["field_promise_about"] {
+	switch fields["promise_about"] {
 	case production.PromiseLookupComputeCache:
-		cacheKey := production.ComputeCacheKey(pcid.CIDComputeV1, fields["field_function_cid"], fields["field_input_cid"], fields["field_context_cid"], fields["field_result_cid"])
+		cacheKey := production.ComputeCacheKey(pcid.CIDComputeV1, fields["function_cid"], fields["input_cid"], fields["context_cid"], fields["result_cid"])
 		node.mu.Lock()
 		cachedFields, ok := node.computeCache[cacheKey]
 		node.mu.Unlock()
 		if !ok {
 			node.record("compute_cache_miss", "non_commitment", fields["from"], "pcid="+pcid.CIDComputeV1+" cache_key="+cacheKey)
 			return protocolHandlerResult{Fields: map[string]string{
-				"field_promise_about": production.PromiseLookupComputeCache,
-				"field_cache_key":     cacheKey,
-				"field_cache_status":  "miss",
+				"promise_about": production.PromiseLookupComputeCache,
+				"cache_key":     cacheKey,
+				"cache_status":  "miss",
 			}}, nil
 		}
 		node.record("compute_cache_hit", "kept", fields["from"], "pcid="+pcid.CIDComputeV1+" cache_key="+cacheKey)
 		ackFields := copyStringMap(cachedFields)
-		ackFields["field_promise_about"] = production.PromiseLookupComputeCache
-		ackFields["field_cache_key"] = cacheKey
-		ackFields["field_cache_status"] = "hit"
+		ackFields["promise_about"] = production.PromiseLookupComputeCache
+		ackFields["cache_key"] = cacheKey
+		ackFields["cache_status"] = "hit"
 		return protocolHandlerResult{Fields: ackFields}, nil
 	case production.PromiseExecuteFunction:
-		if fields["field_capacity_probe"] == "true" {
+		if fields["capacity_probe"] == "true" {
 			node.record("economics_capacity_refused", "non_commitment", fields["from"], "pcid="+pcid.CIDComputeV1+" local compute capacity withheld for probe")
 			node.record("backpressure_capacity_refused", "non_commitment", fields["from"], "pcid="+pcid.CIDComputeV1+" receiver keeps spare capacity by not promising this probe")
-			return protocolHandlerResult{Fields: map[string]string{"field_promise_about": production.PromiseExecuteFunction, "field_compute_status": "capacity_refused"}}, nil
+			return protocolHandlerResult{Fields: map[string]string{"promise_about": production.PromiseExecuteFunction, "compute_status": "capacity_refused"}}, nil
 		}
 		if node.Agent.Kind == "stdio_agent" {
 			ackBytes, err := node.runStdioComputeWorker(message)
@@ -2234,15 +2242,15 @@ func (node *Node) handleCIDComputePromise(message parsedMessage) (protocolHandle
 		if inputErr != nil {
 			return protocolHandlerResult{}, inputErr
 		}
-		node.record("compute_context_promised", "kept", fields["from"], "pcid="+pcid.CIDComputeV1+" context_cid="+fields["field_context_cid"])
-		node.record("compute_function_executed", "kept", fields["from"], "pcid="+pcid.CIDComputeV1+" function_cid="+fields["field_function_cid"]+" result_cid="+resultCID)
+		node.record("compute_context_promised", "kept", fields["from"], "pcid="+pcid.CIDComputeV1+" context_cid="+fields["context_cid"])
+		node.record("compute_function_executed", "kept", fields["from"], "pcid="+pcid.CIDComputeV1+" function_cid="+fields["function_cid"]+" result_cid="+resultCID)
 		if production.FunctionKind(inputs.FunctionBytes) != "fibonacci" {
 			node.record("compute_alternate_function_executed", "kept", fields["from"], "pcid="+pcid.CIDComputeV1+" function_kind="+production.FunctionKind(inputs.FunctionBytes)+" result_cid="+resultCID)
 		}
 		node.record("cid_compute_promised", "kept", fields["from"], "pcid="+pcid.CIDComputeV1+" compute promised only for stated CIDs")
 		node.record("compute_result_promised", "kept", fields["from"], "pcid="+pcid.CIDComputeV1+" result_cid="+resultCID)
-		node.record("economics_credit_accepted", "kept", fields["from"], "pcid="+pcid.CIDComputeV1+" credit_offer="+fields["field_credit_offer"])
-		node.record("economics_capacity_reserved", "kept", fields["from"], "pcid="+pcid.CIDComputeV1+" units="+firstStringField(fields, "field_units"))
+		node.record("economics_credit_accepted", "kept", fields["from"], "pcid="+pcid.CIDComputeV1+" credit_offer="+fields["credit_offer"])
+		node.record("economics_capacity_reserved", "kept", fields["from"], "pcid="+pcid.CIDComputeV1+" units="+firstStringField(fields, "units"))
 		node.record("economics_credits_earned", "kept", fields["from"], "pcid="+pcid.CIDComputeV1+" "+node.Agent.Name+" earns compute credits")
 		if node.Agent.Kind == "wasm_agent" {
 			return protocolHandlerResult{Fields: production.ExecuteComputePromiseFields(fields, resultBytes)}, nil
@@ -2250,53 +2258,53 @@ func (node *Node) handleCIDComputePromise(message parsedMessage) (protocolHandle
 		badResultBytes := production.BadComputeResultBytes(resultBytes)
 		node.record("compute_bad_result_promised", "malformed", fields["from"], "pcid="+pcid.CIDComputeV1+" hash-valid but semantically wrong result_cid="+production.ContentCID(badResultBytes))
 		return protocolHandlerResult{Fields: map[string]string{
-			"field_promise_about":  production.PromiseExecuteFunction,
-			"field_function_cid":   fields["field_function_cid"],
-			"field_function_b64":   fields["field_function_b64"],
-			"field_input_cid":      fields["field_input_cid"],
-			"field_input_b64":      fields["field_input_b64"],
-			"field_context_cid":    fields["field_context_cid"],
-			"field_context_b64":    fields["field_context_b64"],
-			"field_result_cid":     resultCID,
-			"field_result_b64":     base64.StdEncoding.EncodeToString(resultBytes),
-			"field_bad_result_cid": production.ContentCID(badResultBytes),
-			"field_bad_result_b64": base64.StdEncoding.EncodeToString(badResultBytes),
+			"promise_about":  production.PromiseExecuteFunction,
+			"function_cid":   fields["function_cid"],
+			"function_b64":   fields["function_b64"],
+			"input_cid":      fields["input_cid"],
+			"input_b64":      fields["input_b64"],
+			"context_cid":    fields["context_cid"],
+			"context_b64":    fields["context_b64"],
+			"result_cid":     resultCID,
+			"result_b64":     base64.StdEncoding.EncodeToString(resultBytes),
+			"bad_result_cid": production.ContentCID(badResultBytes),
+			"bad_result_b64": base64.StdEncoding.EncodeToString(badResultBytes),
 		}}, nil
 	case production.PromiseVerifyComputeResult:
-		resultPromiser := firstStringField(fields, "field_result_promiser", "from")
+		resultPromiser := firstStringField(fields, "result_promiser", "from")
 		verifyErr := verifyComputeResultFields(fields)
-		if fields["field_disagreement_probe"] == "true" {
+		if fields["disagreement_probe"] == "true" {
 			node.record("compute_verifier_disagreement", "non_commitment", resultPromiser, "pcid="+pcid.CIDComputeV1+" verifier withholds endorsement for disagreement pressure")
 			return protocolHandlerResult{Fields: map[string]string{
-				"field_promise_about":      production.PromiseVerifyComputeResult,
-				"field_verdict":            "disagree",
-				"field_subject_peer":       resultPromiser,
-				"field_subject_result_cid": fields["field_result_cid"],
+				"promise_about":      production.PromiseVerifyComputeResult,
+				"verdict":            "disagree",
+				"subject_peer":       resultPromiser,
+				"subject_result_cid": fields["result_cid"],
 			}}, nil
 		}
 		if verifyErr != nil {
 			node.record("compute_result_peer_rejected", "malformed", resultPromiser, "pcid="+pcid.CIDComputeV1+" "+verifyErr.Error())
 			return protocolHandlerResult{Fields: map[string]string{
-				"field_promise_about":      production.PromiseVerifyComputeResult,
-				"field_verdict":            "broken",
-				"field_subject_peer":       resultPromiser,
-				"field_subject_result_cid": fields["field_result_cid"],
+				"promise_about":      production.PromiseVerifyComputeResult,
+				"verdict":            "broken",
+				"subject_peer":       resultPromiser,
+				"subject_result_cid": fields["result_cid"],
 			}}, nil
 		}
-		node.record("compute_result_peer_verified", "kept", resultPromiser, "pcid="+pcid.CIDComputeV1+" result_cid="+fields["field_result_cid"])
-		cacheKey := production.ComputeCacheKey(pcid.CIDComputeV1, fields["field_function_cid"], fields["field_input_cid"], fields["field_context_cid"], fields["field_result_cid"])
+		node.record("compute_result_peer_verified", "kept", resultPromiser, "pcid="+pcid.CIDComputeV1+" result_cid="+fields["result_cid"])
+		cacheKey := production.ComputeCacheKey(pcid.CIDComputeV1, fields["function_cid"], fields["input_cid"], fields["context_cid"], fields["result_cid"])
 		node.mu.Lock()
 		node.computeCache[cacheKey] = copyStringMap(fields)
 		node.mu.Unlock()
 		node.record("compute_cache_checkpointed", "kept", resultPromiser, "pcid="+pcid.CIDComputeV1+" cache_key="+cacheKey)
 		return protocolHandlerResult{Fields: map[string]string{
-			"field_promise_about":      production.PromiseVerifyComputeResult,
-			"field_verdict":            "kept",
-			"field_subject_peer":       resultPromiser,
-			"field_subject_result_cid": fields["field_result_cid"],
+			"promise_about":      production.PromiseVerifyComputeResult,
+			"verdict":            "kept",
+			"subject_peer":       resultPromiser,
+			"subject_result_cid": fields["result_cid"],
 		}}, nil
 	default:
-		return protocolHandlerResult{}, fmt.Errorf("CID compute cannot handle promise_about=%q", fields["field_promise_about"])
+		return protocolHandlerResult{}, fmt.Errorf("CID compute cannot handle promise_about=%q", fields["promise_about"])
 	}
 }
 
@@ -2347,89 +2355,89 @@ func (node *Node) executeComputeFunction(fields map[string]string) ([]byte, erro
 // Intent: Key rotation is identity protocol behavior, not a generic report pCID
 // or a new top-level action kind. Source: DI-vipih
 func (node *Node) handleIdentityKeyPromise(fields map[string]string) (map[string]string, error) {
-	switch fields["field_promise_about"] {
+	switch fields["promise_about"] {
 	case production.PromiseRotateSigningKey:
-		node.record("key_rotation_promise_recorded", "kept", fields["from"], "pcid="+pcid.IdentityKeyV1+" new_key_label="+fields["field_new_key_label"])
+		node.record("key_rotation_promise_recorded", "kept", fields["from"], "pcid="+pcid.IdentityKeyV1+" new_key_label="+fields["new_key_label"])
 		return map[string]string{
-			"field_promise_about":  production.PromiseRotateSigningKey,
-			"field_new_key_label":  fields["field_new_key_label"],
-			"field_rotation_scope": fields["field_rotation_scope"],
-			"field_verdict":        "kept",
+			"promise_about":  production.PromiseRotateSigningKey,
+			"new_key_label":  fields["new_key_label"],
+			"rotation_scope": fields["rotation_scope"],
+			"verdict":        "kept",
 		}, nil
 	default:
-		return nil, fmt.Errorf("identity key cannot handle promise_about=%q", fields["field_promise_about"])
+		return nil, fmt.Errorf("identity key cannot handle promise_about=%q", fields["promise_about"])
 	}
 }
 
 func (node *Node) recordAckEvent(target string, message parsedMessage) {
-	switch message.Fields["field_promise_about"] {
+	switch message.Fields["promise_about"] {
 	case production.PromiseWeighPackage:
-		node.record("package_weight_received", "kept", target, "weight_ounces="+message.Fields["field_weight_ounces"])
+		node.record("package_weight_received", "kept", target, "weight_ounces="+message.Fields["weight_ounces"])
 	case production.PromiseAddressLookup:
-		node.record("shipping_address_received", "kept", target, "shipping_address="+message.Fields["field_shipping_address"])
+		node.record("shipping_address_received", "kept", target, "shipping_address="+message.Fields["shipping_address"])
 	case production.PromisePrintLabel:
-		node.record("shipping_label_received", "kept", target, "tracking_number="+message.Fields["field_tracking_number"]+" cost_cents="+message.Fields["field_cost_cents"])
+		node.record("shipping_label_received", "kept", target, "tracking_number="+message.Fields["tracking_number"]+" cost_cents="+message.Fields["cost_cents"])
 	case production.PromiseShipmentUpdate:
 		if message.Fields[duplicateShipmentEventField] == "true" {
-			node.record("accounting_update_duplicate_confirmed", "kept", target, "tracking_number="+message.Fields["field_tracking_number"]+" cost_cents="+message.Fields["field_cost_cents"])
+			node.record("accounting_update_duplicate_confirmed", "kept", target, "tracking_number="+message.Fields["tracking_number"]+" cost_cents="+message.Fields["cost_cents"])
 			return
 		}
-		node.record("accounting_update_confirmed", "kept", target, "tracking_number="+message.Fields["field_tracking_number"]+" cost_cents="+message.Fields["field_cost_cents"])
+		node.record("accounting_update_confirmed", "kept", target, "tracking_number="+message.Fields["tracking_number"]+" cost_cents="+message.Fields["cost_cents"])
 	case production.PromiseIssuePrintCapability:
-		node.record("printer_capability_received", "kept", target, "token_id="+message.Fields["field_print_capability_token_id"]+" scope="+message.Fields["field_print_capability_scope"])
+		node.record("printer_capability_received", "kept", target, "token_id="+message.Fields["print_capability_token_id"]+" scope="+message.Fields["print_capability_scope"])
 	case production.PromiseRedeemPrintCapability:
-		node.record("printer_port_print_confirmed", "kept", target, "spool_id="+message.Fields["field_printer_spool_id"])
+		node.record("printer_port_print_confirmed", "kept", target, "spool_id="+message.Fields["printer_spool_id"])
 	case production.PromiseStoreContent:
-		switch message.Fields["field_storage_status"] {
+		switch message.Fields["storage_status"] {
 		case "price_refused":
-			node.record("economics_price_refused", "non_commitment", target, "pcid="+pcid.CASStorageV1+" content_cid="+message.Fields["field_content_cid"])
+			node.record("economics_price_refused", "non_commitment", target, "pcid="+pcid.CASStorageV1+" content_cid="+message.Fields["content_cid"])
 		case "stored":
-			node.record("capability_token_received", "kept", target, "pcid="+pcid.CASStorageV1+" content_cid="+message.Fields["field_content_cid"])
-			if message.Fields["field_replica_token"] != "" {
-				node.record("replica_capability_token_received", "kept", target, "pcid="+pcid.CASStorageV1+" replica_peer="+message.Fields["field_replica_peer"])
+			node.record("capability_token_received", "kept", target, "pcid="+pcid.CASStorageV1+" content_cid="+message.Fields["content_cid"])
+			if message.Fields["replica_token"] != "" {
+				node.record("replica_capability_token_received", "kept", target, "pcid="+pcid.CASStorageV1+" replica_peer="+message.Fields["replica_peer"])
 			}
 		}
 	case production.PromiseServeContent:
-		if message.Fields["field_token_status"] == "not_promised" {
-			node.record("capability_token_replay_observed", "non_commitment", target, "pcid="+pcid.CASStorageV1+" content_cid="+message.Fields["field_content_cid"])
+		if message.Fields["token_status"] == "not_promised" {
+			node.record("capability_token_replay_observed", "non_commitment", target, "pcid="+pcid.CASStorageV1+" content_cid="+message.Fields["content_cid"])
 			return
 		}
-		node.record("cas_bytes_retrieved", "kept", target, "pcid="+pcid.CASStorageV1+" content_cid="+message.Fields["field_content_cid"])
+		node.record("cas_bytes_retrieved", "kept", target, "pcid="+pcid.CASStorageV1+" content_cid="+message.Fields["content_cid"])
 	case production.PromiseServeReplicaContent:
-		if message.Fields["field_token_status"] == "not_promised" {
-			node.record("capability_token_replay_observed", "non_commitment", target, "pcid="+pcid.CASStorageV1+" replica content_cid="+message.Fields["field_content_cid"])
+		if message.Fields["token_status"] == "not_promised" {
+			node.record("capability_token_replay_observed", "non_commitment", target, "pcid="+pcid.CASStorageV1+" replica content_cid="+message.Fields["content_cid"])
 			return
 		}
-		node.record("replica_recovery_succeeded", "kept", target, "pcid="+pcid.CASStorageV1+" content_cid="+message.Fields["field_content_cid"])
+		node.record("replica_recovery_succeeded", "kept", target, "pcid="+pcid.CASStorageV1+" content_cid="+message.Fields["content_cid"])
 	case production.PromiseLookupComputeCache:
-		if message.Fields["field_cache_status"] == "miss" {
-			node.record("compute_cache_miss_observed", "non_commitment", target, "pcid="+pcid.CIDComputeV1+" cache_key="+message.Fields["field_cache_key"])
+		if message.Fields["cache_status"] == "miss" {
+			node.record("compute_cache_miss_observed", "non_commitment", target, "pcid="+pcid.CIDComputeV1+" cache_key="+message.Fields["cache_key"])
 			return
 		}
-		node.record("compute_cache_reused", "kept", target, "pcid="+pcid.CIDComputeV1+" cache_key="+message.Fields["field_cache_key"])
-		node.record("compute_result_received", "kept", target, "pcid="+pcid.CIDComputeV1+" cache result_cid="+message.Fields["field_result_cid"])
+		node.record("compute_cache_reused", "kept", target, "pcid="+pcid.CIDComputeV1+" cache_key="+message.Fields["cache_key"])
+		node.record("compute_result_received", "kept", target, "pcid="+pcid.CIDComputeV1+" cache result_cid="+message.Fields["result_cid"])
 	case production.PromiseUnsupportedVariantProbe:
-		if message.Fields["field_variant_status"] == "not_promised" {
+		if message.Fields["variant_status"] == "not_promised" {
 			node.record("promise_variant_not_promised", "non_commitment", target, "pcid="+pcid.CASStorageV1+" unsupported variant was not promised")
-			node.rememberNonCommitment(target, pcid.CASStorageV1, message.Fields, "ack field_variant_status not_promised")
+			node.rememberNonCommitment(target, pcid.CASStorageV1, message.Fields, "ack variant_status not_promised")
 		}
 	case production.PromiseExecuteFunction:
-		if message.Fields["field_compute_status"] == "capacity_refused" {
+		if message.Fields["compute_status"] == "capacity_refused" {
 			node.record("economics_capacity_refused", "non_commitment", target, "pcid="+pcid.CIDComputeV1+" compute capacity probe refused")
 			return
 		}
-		node.record("compute_result_received", "kept", target, "pcid="+pcid.CIDComputeV1+" result_cid="+message.Fields["field_result_cid"])
+		node.record("compute_result_received", "kept", target, "pcid="+pcid.CIDComputeV1+" result_cid="+message.Fields["result_cid"])
 	case production.PromiseVerifyComputeResult:
 		// Intent: Verification reports are cid_compute_v1 promises about a
 		// compute result, not generic report messages. Source:
 		// DI-vipih
-		node.record("compute_verification_report_received", "kept", target, "pcid="+pcid.CIDComputeV1+" verifier verdict="+message.Fields["field_verdict"]+" result_cid="+message.Fields["field_subject_result_cid"])
-		if message.Fields["field_verdict"] == "disagree" {
+		node.record("compute_verification_report_received", "kept", target, "pcid="+pcid.CIDComputeV1+" verifier verdict="+message.Fields["verdict"]+" result_cid="+message.Fields["subject_result_cid"])
+		if message.Fields["verdict"] == "disagree" {
 			node.record("compute_verifier_disagreement", "non_commitment", target, "pcid="+pcid.CIDComputeV1+" verifier disagreement received")
-			node.record("compute_disagreement_resolved_locally", "kept", message.Fields["field_subject_peer"], "pcid="+pcid.CIDComputeV1+" Alice resolves disagreement by local recompute plus Dave event")
+			node.record("compute_disagreement_resolved_locally", "kept", message.Fields["subject_peer"], "pcid="+pcid.CIDComputeV1+" Alice resolves disagreement by local recompute plus Dave event")
 			return
 		}
-		if message.Fields["field_verdict"] == "kept" {
+		if message.Fields["verdict"] == "kept" {
 			node.record("compute_verification_received", "kept", target, "pcid="+pcid.CIDComputeV1+" peer verified result")
 			return
 		}
@@ -2441,14 +2449,14 @@ func (node *Node) verifyComputeAckLocally(message parsedMessage, target string) 
 	if err := verifyComputeResultFields(message.Fields); err != nil {
 		return err
 	}
-	node.record("compute_result_locally_verified", "kept", target, "pcid="+pcid.CIDComputeV1+" result_cid="+message.Fields["field_result_cid"])
+	node.record("compute_result_locally_verified", "kept", target, "pcid="+pcid.CIDComputeV1+" result_cid="+message.Fields["result_cid"])
 	node.record("economics_credits_spent", "kept", target, "pcid="+pcid.CIDComputeV1+" Alice spends compute credits after local verification")
-	if message.Fields["field_bad_result_b64"] == "" {
+	if message.Fields["bad_result_b64"] == "" {
 		return nil
 	}
 	badFields := copyStringMap(message.Fields)
-	badFields["field_result_b64"] = message.Fields["field_bad_result_b64"]
-	badFields["field_result_cid"] = message.Fields["field_bad_result_cid"]
+	badFields["result_b64"] = message.Fields["bad_result_b64"]
+	badFields["result_cid"] = message.Fields["bad_result_cid"]
 	if err := verifyComputeResultFields(badFields); err == nil {
 		node.record("compute_result_locally_rejected", "malformed", target, "pcid="+pcid.CIDComputeV1+" bad-result probe unexpectedly verified")
 		// Intent: A peer that promises a semantically bad compute result creates
@@ -2490,11 +2498,11 @@ func verifyComputeResultFields(fields map[string]string) error {
 	if err := verifyComputeInputCIDs(fields, functionBytes, inputBytes, contextBytes); err != nil {
 		return err
 	}
-	resultBytes, resultErr := base64.StdEncoding.DecodeString(fields["field_result_b64"])
+	resultBytes, resultErr := base64.StdEncoding.DecodeString(fields["result_b64"])
 	if resultErr != nil {
 		return resultErr
 	}
-	if !production.VerifyContentCID(resultBytes, fields["field_result_cid"]) {
+	if !production.VerifyContentCID(resultBytes, fields["result_cid"]) {
 		return fmt.Errorf("result bytes do not match result CID")
 	}
 	expectedBytes, executeErr := production.ExecuteFunction(functionBytes, inputBytes, contextBytes)
@@ -2502,8 +2510,8 @@ func verifyComputeResultFields(fields map[string]string) error {
 		return executeErr
 	}
 	expectedCID := production.ContentCID(expectedBytes)
-	if expectedCID != fields["field_result_cid"] {
-		return fmt.Errorf("local recompute result_cid=%s want %s", expectedCID, fields["field_result_cid"])
+	if expectedCID != fields["result_cid"] {
+		return fmt.Errorf("local recompute result_cid=%s want %s", expectedCID, fields["result_cid"])
 	}
 	return nil
 }
@@ -2618,21 +2626,21 @@ func (node *Node) redeemBearerStorageToken(contentCID, token string) bool {
 // incomplete peer store has not broken a promise merely by lacking an object it
 // did not promise to retain. Source: DI-manul
 func (node *Node) handleSparseCASProbe(fields map[string]string, promiseAbout string) map[string]string {
-	contentCID := fields["field_content_cid"]
+	contentCID := fields["content_cid"]
 	if node.localCASObjectExists(contentCID) {
 		node.record("agent_cas_sparse_object_present", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" content_cid="+contentCID)
 		return map[string]string{
-			"field_promise_about": promiseAbout,
-			"field_content_cid":   contentCID,
-			"field_token_status":  "present",
+			"promise_about": promiseAbout,
+			"content_cid":   contentCID,
+			"token_status":  "present",
 		}
 	}
 	node.record("agent_cas_sparse_object_missing", "non_commitment", fields["from"], "pcid="+pcid.CASStorageV1+" content_cid="+contentCID)
 	node.record("agent_cas_retrieval_not_promised", "non_commitment", fields["from"], "pcid="+pcid.CASStorageV1+" sparse store has no local bytes for content_cid="+contentCID)
 	return map[string]string{
-		"field_promise_about": promiseAbout,
-		"field_content_cid":   contentCID,
-		"field_token_status":  "not_promised",
+		"promise_about": promiseAbout,
+		"content_cid":   contentCID,
+		"token_status":  "not_promised",
 	}
 }
 
@@ -2666,13 +2674,13 @@ func (node *Node) evaluateEconomics(target string, fields map[string]string) eco
 	node.mu.Lock()
 	defer node.mu.Unlock()
 	reciprocalValue := 1
-	if fields["field_promise_about"] == "reciprocal_economics" {
+	if fields["promise_about"] == "reciprocal_economics" {
 		reciprocalValue = 4
 	}
 	offer := economy.Offer{
 		Promiser:        node.Agent.Name,
 		Promisee:        target,
-		Resource:        fields["field_promise_about"],
+		Resource:        fields["promise_about"],
 		PromisedValue:   2,
 		ReciprocalValue: reciprocalValue,
 		OpportunityCost: 1,
@@ -2816,7 +2824,7 @@ func (node *Node) rememberOutstandingPromise(peerName, protocolName, exactHash s
 		Peer:          peerName,
 		ProtocolName:  protocolName,
 		ExactHash:     exactHash,
-		PromiseAbout:  fields["field_promise_about"],
+		PromiseAbout:  fields["promise_about"],
 		PromiseText:   fields["promise"],
 		ExpectedEvent: fields["reason"],
 		Status:        promiseStatusOutstanding,
@@ -2858,7 +2866,7 @@ func (node *Node) resolveOutstandingPromise(recordKey string, status promiseStat
 func (node *Node) recordLocalResourceExhaustion(target string, fields map[string]string, detail string) {
 	resourceName := resourceField(fields)
 	if resourceName == "" {
-		resourceName = fields["field_promise_about"]
+		resourceName = fields["promise_about"]
 	}
 	node.record("local_resource_exhausted", "non_commitment", target, "resource="+resourceName+" detail="+detail)
 }
@@ -2869,7 +2877,7 @@ func (node *Node) recordLocalResourceExhaustion(target string, fields map[string
 // asked again for the same target/protocol/promise-about tuple until a later
 // design adds an explicit new-event release rule. Source: DI-zapab
 func (node *Node) rememberNonCommitment(target, protocolName string, fields map[string]string, detail string) {
-	promiseAbout := fields["field_promise_about"]
+	promiseAbout := fields["promise_about"]
 	record := nonCommitmentRecord{
 		Key:          nonCommitmentKey(target, protocolName, promiseAbout),
 		Peer:         target,
@@ -2888,7 +2896,7 @@ func (node *Node) rememberNonCommitment(target, protocolName string, fields map[
 // Bob's punishment; it records no peer-trust transition. Source: DI-zapab
 func (node *Node) shouldSuppressNonCommittedPromise(target string, fields map[string]string) bool {
 	protocolName, _ := node.protocolForFields(fields)
-	promiseAbout := fields["field_promise_about"]
+	promiseAbout := fields["promise_about"]
 	key := nonCommitmentKey(target, protocolName, promiseAbout)
 	node.mu.Lock()
 	record, exists := node.nonCommitmentJournal[key]
@@ -2920,7 +2928,7 @@ func (node *Node) suppressRepeatedPromise(target string, fields map[string]strin
 	if !repeated {
 		return false
 	}
-	node.record("promise_repeated_suppressed", "non_commitment", target, "protocol="+protocolName+" promise_about="+fields["field_promise_about"])
+	node.record("promise_repeated_suppressed", "non_commitment", target, "protocol="+protocolName+" promise_about="+fields["promise_about"])
 	return true
 }
 
@@ -3009,17 +3017,17 @@ func eventUpdatesTrust(fields map[string]string) bool {
 	if fields[duplicateShipmentEventField] == "true" {
 		return false
 	}
-	switch fields["field_verdict"] {
+	switch fields["verdict"] {
 	case "broken", "malformed", "disagree", "not_promised":
 		return false
 	}
-	if fields["field_variant_status"] == "not_promised" ||
-		fields["field_storage_status"] == "price_refused" ||
-		fields["field_compute_status"] == "capacity_refused" ||
-		fields["field_cache_status"] == "miss" ||
-		fields["field_token_status"] == "not_promised" ||
-		fields["field_repair_status"] == "future_only" ||
-		fields["field_replay_status"] == "not_promised" {
+	if fields["variant_status"] == "not_promised" ||
+		fields["storage_status"] == "price_refused" ||
+		fields["compute_status"] == "capacity_refused" ||
+		fields["cache_status"] == "miss" ||
+		fields["token_status"] == "not_promised" ||
+		fields["repair_status"] == "future_only" ||
+		fields["replay_status"] == "not_promised" {
 		return false
 	}
 	return true
@@ -3034,7 +3042,7 @@ func promiseRecordKey(peerName, protocolName, exactHash string, fields map[strin
 	if exactHash != "" {
 		return peerName + "|" + protocolName + "|" + exactHash
 	}
-	return peerName + "|" + protocolName + "|" + fields["field_promise_about"] + "|" + fields["promise"]
+	return peerName + "|" + protocolName + "|" + fields["promise_about"] + "|" + fields["promise"]
 }
 
 // promiseStatusOutcome maps journal-only statuses into the small outcome
@@ -3086,7 +3094,7 @@ func promiseStatusForNonTrustingEvent(fields map[string]string) promiseStatus {
 	if fields[duplicateShipmentEventField] == "true" {
 		return promiseStatusDuplicate
 	}
-	switch fields["field_verdict"] {
+	switch fields["verdict"] {
 	case "broken":
 		return promiseStatusBroken
 	case "malformed":
@@ -3094,13 +3102,13 @@ func promiseStatusForNonTrustingEvent(fields map[string]string) promiseStatus {
 	case "disagree", "not_promised":
 		return promiseStatusNonCommitment
 	}
-	if fields["field_variant_status"] == "not_promised" ||
-		fields["field_storage_status"] == "price_refused" ||
-		fields["field_compute_status"] == "capacity_refused" ||
-		fields["field_cache_status"] == "miss" ||
-		fields["field_token_status"] == "not_promised" ||
-		fields["field_repair_status"] == "future_only" ||
-		fields["field_replay_status"] == "not_promised" {
+	if fields["variant_status"] == "not_promised" ||
+		fields["storage_status"] == "price_refused" ||
+		fields["compute_status"] == "capacity_refused" ||
+		fields["cache_status"] == "miss" ||
+		fields["token_status"] == "not_promised" ||
+		fields["repair_status"] == "future_only" ||
+		fields["replay_status"] == "not_promised" {
 		return promiseStatusNonCommitment
 	}
 	return promiseStatusDuplicate
@@ -3152,7 +3160,7 @@ func checkpointKey(protocolName, promiseAbout string, parts ...string) string {
 // Intent: Link discovery is represented as promise content under the same
 // top-level act, not as a separate protocol verb. Source: DI-timah
 func isLinkDiscoveryPromise(fields map[string]string) bool {
-	for _, key := range []string{"field_promise_about", "field_meaning", "field_intent", "field_link_intent"} {
+	for _, key := range []string{"promise_about", "meaning", "intent", "link_intent"} {
 		if fields[key] == decision.PromiseAboutLinkDiscovery {
 			return true
 		}
@@ -3166,7 +3174,7 @@ func isLinkDiscoveryPromise(fields map[string]string) bool {
 // hear, but it still does not prove repair or permit arbitrary follow-up
 // messages. Source: DI-fijov
 func isLowRiskCandidatePromise(fields map[string]string) bool {
-	return isLinkDiscoveryPromise(fields) || fields["field_promise_about"] == production.PromiseLabelFutureMalformedReport
+	return isLinkDiscoveryPromise(fields) || fields["promise_about"] == production.PromiseLabelFutureMalformedReport
 }
 
 func containsName(names []string, wantedName string) bool {
@@ -3196,7 +3204,7 @@ func (node *Node) checkLocalResourcePromise(fields map[string]string) error {
 	if resourceType == "" {
 		return nil
 	}
-	requestedUnits := intField(fields, "field_units", "field_requested_units", "field_capacity", "field_capacity_mb")
+	requestedUnits := intField(fields, "units", "requested_units", "capacity", "capacity_mb")
 	if requestedUnits <= 0 {
 		return fmt.Errorf("resource promise for %s must declare positive units", resourceType)
 	}
@@ -3220,7 +3228,7 @@ func (node *Node) checkIncomingResourcePromise(fields map[string]string) error {
 	if resourceType == "" {
 		return nil
 	}
-	requestedUnits := intField(fields, "field_units", "field_requested_units", "field_capacity", "field_capacity_mb")
+	requestedUnits := intField(fields, "units", "requested_units", "capacity", "capacity_mb")
 	if requestedUnits <= 0 {
 		return fmt.Errorf("incoming resource promise for %s lacks positive units", resourceType)
 	}
@@ -3235,7 +3243,7 @@ func (node *Node) checkIncomingResourcePromise(fields map[string]string) error {
 // Intent: Make promise-breaking economically visible inside the POC without
 // creating a central penalty authority. Source: DI-timah
 func (node *Node) applyBrokenPromiseCost(peerName string, fields map[string]string, detail string) {
-	stakeAmount := intField(fields, "field_stake", "field_collateral", "stake", "collateral")
+	stakeAmount := intField(fields, "stake", "collateral", "stake", "collateral")
 	if stakeAmount <= 0 {
 		return
 	}
@@ -3254,7 +3262,7 @@ func (node *Node) applyBrokenPromiseCost(peerName string, fields map[string]stri
 // Intent: Keep storage/compute checks concrete and avoid misclassifying an
 // agent's stated need as a promise to fulfill that need. Source: DI-timah
 func resourceField(fields map[string]string) string {
-	for _, key := range []string{"field_resource", "field_resource_type", "resource", "field_promise_about"} {
+	for _, key := range []string{"resource", "resource_type", "resource", "promise_about"} {
 		value := fields[key]
 		if value == "storage" || value == "compute" {
 			return value
@@ -3350,9 +3358,9 @@ func (node *Node) emitMessageArtifact(direction, peer, protocolName string, enve
 		SourceEvent:         "runtime." + direction,
 	}
 	if fields != nil {
-		artifact.ParentExactSHA256 = firstNonEmpty(fields["field_envelope_parent_exact_sha256"], fields["field_payload_parent_exact_sha256"], fields["field_parent_exact_sha256"], fields["parent_exact_sha256"])
-		artifact.ParentLinkLocation = firstNonEmpty(fields["field_parent_link_location"], parentLinkLocationFromFields(fields))
-		artifact.PromiseAbout = firstNonEmpty(fields["field_promise_about"], fields["promise_about"])
+		artifact.ParentExactSHA256 = firstNonEmpty(fields["envelope_parent_exact_sha256"], fields["payload_parent_exact_sha256"], fields["parent_exact_sha256"])
+		artifact.ParentLinkLocation = firstNonEmpty(fields["parent_link_location"], parentLinkLocationFromFields(fields))
+		artifact.PromiseAbout = fields["promise_about"]
 	}
 	record := eventstream.Record{
 		Kind:            eventstream.KindMessageArtifact,
@@ -3371,13 +3379,13 @@ func (node *Node) emitMessageArtifact(direction, peer, protocolName string, enve
 }
 
 func parentLinkLocationFromFields(fields map[string]string) string {
-	if fields["field_envelope_parent_exact_sha256"] != "" {
+	if fields["envelope_parent_exact_sha256"] != "" {
 		return "envelope"
 	}
-	if fields["field_payload_parent_exact_sha256"] != "" {
+	if fields["payload_parent_exact_sha256"] != "" {
 		return "payload"
 	}
-	if fields["field_parent_exact_sha256"] != "" || fields["parent_exact_sha256"] != "" {
+	if fields["parent_exact_sha256"] != "" {
 		return "payload"
 	}
 	return ""
@@ -3654,17 +3662,17 @@ func (node *Node) recordReplayWindowPromise(protocolName string) {
 // leave the app. Intent: A sender voluntarily bounds its own pressure instead of
 // treating a peer or kernel as something it can command. Source: DI-sunuf
 func (node *Node) recordOutboundPressurePromises(target, protocolName string, fields map[string]string) {
-	key := checkpointKey("outbound-pressure", protocolName, target, fields["field_promise_about"])
+	key := checkpointKey("outbound-pressure", protocolName, target, fields["promise_about"])
 	if node.rememberCheckpoint(checkpointRecord{
 		Key:          key,
 		ProtocolName: protocolName,
-		PromiseAbout: fields["field_promise_about"],
+		PromiseAbout: fields["promise_about"],
 		Subject:      target,
 		Detail:       "sender-side pressure promise",
 	}) {
 		return
 	}
-	node.record("send_rate_promised", "kept", target, "pcid="+protocolName+" sender promises bounded sends for promise_about="+fields["field_promise_about"])
+	node.record("send_rate_promised", "kept", target, "pcid="+protocolName+" sender promises bounded sends for promise_about="+fields["promise_about"])
 	node.record("rate_limit_self_promise_recorded", "kept", target, "pcid="+protocolName+" sender keeps rate limiting as a self-promise, not receiver control")
 }
 
@@ -3673,17 +3681,17 @@ func (node *Node) recordOutboundPressurePromises(target, protocolName string, fi
 // the receiver's local promise interface, not permission granted by any external
 // authority. Source: DI-sunuf
 func (node *Node) recordInboundPressurePromises(peerName, protocolName string, fields map[string]string) {
-	key := checkpointKey("inbound-pressure", protocolName, peerName, fields["field_promise_about"])
+	key := checkpointKey("inbound-pressure", protocolName, peerName, fields["promise_about"])
 	if node.rememberCheckpoint(checkpointRecord{
 		Key:          key,
 		ProtocolName: protocolName,
-		PromiseAbout: fields["field_promise_about"],
+		PromiseAbout: fields["promise_about"],
 		Subject:      peerName,
 		Detail:       "receiver-side pressure promise",
 	}) {
 		return
 	}
-	node.record("backpressure_capacity_promised", "kept", peerName, "pcid="+protocolName+" receiver promises only bounded capacity for promise_about="+fields["field_promise_about"])
+	node.record("backpressure_capacity_promised", "kept", peerName, "pcid="+protocolName+" receiver promises only bounded capacity for promise_about="+fields["promise_about"])
 	node.record("accept_rate_promised", "kept", peerName, "pcid="+protocolName+" receiver promises only bounded accept rate for this peer/protocol")
 }
 

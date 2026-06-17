@@ -3,7 +3,6 @@ package protocol
 import (
 	"fmt"
 	"sort"
-	"strings"
 )
 
 const (
@@ -30,7 +29,7 @@ type arrayPayloadSchema struct {
 }
 
 // MarshalKnownArrayPayload encodes the POC15 pCIDs that have been migrated from
-// legacy field maps to pCID-owned CBOR arrays.
+// earlier generic map payloads to pCID-owned CBOR arrays.
 // Intent: This helper is a migration adapter, not a PromiseGrid-wide payload
 // standard; each pCID still owns its own slot order and local compatibility
 // projection. Source: DI-gahuh
@@ -68,6 +67,42 @@ func MarshalKnownArrayPayload(protocolName string, fields map[string]string) ([]
 	}
 }
 
+// PayloadFieldsForProtocolName decodes slot-1 bytes with the local pCID name
+// that came from slot 0.
+// Intent: Several pCID-owned array payloads intentionally share the same outer
+// array grammar, so trial-decoding without the pCID can misclassify
+// relationship, route, and kernel-receive messages. Source: DI-pusak
+func PayloadFieldsForProtocolName(protocolName string, payloadBytes []byte) (map[string]string, error) {
+	fields, fieldsErr := UnmarshalStringMap(payloadBytes)
+	if fieldsErr == nil {
+		return fields, nil
+	}
+	switch protocolName {
+	case protocolRelationshipV1:
+		return RelationshipPayloadFields(payloadBytes)
+	case protocolPostalScaleV1:
+		return PostalScalePayloadFields(payloadBytes)
+	case protocolUPSLabelV1:
+		return UPSLabelPayloadFields(payloadBytes)
+	case protocolAccountingV1:
+		return AccountingPayloadFields(payloadBytes)
+	case protocolPrinterPortV1:
+		return PrinterPortPayloadFields(payloadBytes)
+	case protocolKernelReceiveV1:
+		return KernelReceivePayloadFields(payloadBytes)
+	case protocolCASStorageV1:
+		return CASStoragePayloadFields(payloadBytes)
+	case protocolCIDComputeV1:
+		return CIDComputePayloadFields(payloadBytes)
+	case protocolRouteV1:
+		return RoutePayloadFields(payloadBytes)
+	case protocolIdentityKeyV1:
+		return IdentityKeyPayloadFields(payloadBytes)
+	default:
+		return nil, fieldsErr
+	}
+}
+
 type pairPayloadField struct {
 	key   string
 	value string
@@ -76,11 +111,11 @@ type pairPayloadField struct {
 // marshalPairPayload encodes flexible pCID-owned payloads whose protocol specs
 // intentionally allow an extensible body of local key/value promise details.
 // Intent: Relationship and kernel-receive payloads need extension room for live
-// LLM fields and app registration details, but those fields are still body slots
-// owned by their pCID rather than a universal field_* map on the wire. Source:
-// DI-dirat
+// LLM details and app registration details, but those details are still body
+// slots owned by their pCID rather than a universal named map on the wire.
+// Source: DI-dirat; DI-pusak
 func marshalPairPayload(protocolName string, fields map[string]string) ([]byte, error) {
-	promiseAbout := fields["field_promise_about"]
+	promiseAbout := fields["promise_about"]
 	if promiseAbout == "" {
 		promiseAbout = "local_observation"
 	}
@@ -126,8 +161,8 @@ func pairPayloadFields(fields map[string]string) []pairPayloadField {
 		if value == "" || pairPayloadCoreField(key) {
 			continue
 		}
-		wireKey := strings.TrimPrefix(key, "field_")
-		if wireKey == "payload_protocol" || wireKey == "payload_shape" || wireKey == "promise_about" {
+		wireKey := key
+		if wireKey == "payload_protocol" || wireKey == "promise_about" {
 			continue
 		}
 		pairs = append(pairs, pairPayloadField{key: wireKey, value: value})
@@ -192,12 +227,11 @@ func payloadFieldsFromPairs(protocolName string, payloadBytes []byte) (map[strin
 		return nil, err
 	}
 	fields := map[string]string{
-		"act":                    "promise",
-		"from":                   promiser,
-		"to":                     promisee,
-		"field_promise_about":    promiseAbout,
-		"field_payload_protocol": protocolName,
-		"field_payload_shape":    "cbor_array",
+		"act":              "promise",
+		"from":             promiser,
+		"to":               promisee,
+		"promise_about":    promiseAbout,
+		"payload_protocol": protocolName,
 	}
 	for _, optional := range []struct {
 		key   string
@@ -233,7 +267,7 @@ func payloadFieldsFromPairs(protocolName string, payloadBytes []byte) (map[strin
 			return nil, valueErr
 		}
 		if key != "" && value != "" {
-			fields["field_"+key] = value
+			fields[""+key] = value
 		}
 	}
 	if reader.offset != len(reader.data) {
@@ -243,9 +277,9 @@ func payloadFieldsFromPairs(protocolName string, payloadBytes []byte) (map[strin
 }
 
 func marshalArrayPayload(fields map[string]string, schemas []arrayPayloadSchema) ([]byte, error) {
-	schema, schemaFound := findArrayPayloadSchema(fields["field_promise_about"], schemas)
+	schema, schemaFound := findArrayPayloadSchema(fields["promise_about"], schemas)
 	if !schemaFound {
-		return nil, fmt.Errorf("unsupported pCID-owned array payload promise_about %q", fields["field_promise_about"])
+		return nil, fmt.Errorf("unsupported pCID-owned array payload promise_about %q", fields["promise_about"])
 	}
 	state := arrayPayloadState{
 		Outcome:     fields["outcome"],
@@ -332,12 +366,11 @@ func payloadFieldsFromArray(protocolName string, payloadBytes []byte, schemas []
 		return nil, fmt.Errorf("%s body for %s must have %d slots, got %d", protocolName, promiseAbout, len(schema.bodyFields), bodyLength)
 	}
 	fields := map[string]string{
-		"act":                    "promise",
-		"from":                   promiser,
-		"to":                     promisee,
-		"field_promise_about":    promiseAbout,
-		"field_payload_protocol": protocolName,
-		"field_payload_shape":    "cbor_array",
+		"act":              "promise",
+		"from":             promiser,
+		"to":               promisee,
+		"promise_about":    promiseAbout,
+		"payload_protocol": protocolName,
 	}
 	for _, optional := range []struct {
 		key   string

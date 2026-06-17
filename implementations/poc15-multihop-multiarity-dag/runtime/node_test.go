@@ -74,8 +74,8 @@ func TestResourcePromiseChecksLocalCapacity(t *testing.T) {
 	cfg := twoNodeTestConfig(t)
 	alice := NewNode(cfg, cfg.Agents[0], &decision.FakeDecider{}, decision.FakeMonitor{})
 	err := alice.checkLocalResourcePromise(map[string]string{
-		"field_resource": "storage",
-		"field_units":    "3",
+		"resource": "storage",
+		"units":    "3",
 	})
 	if err == nil {
 		t.Fatalf("storage promise beyond local capacity should fail")
@@ -103,7 +103,7 @@ func TestLocalResourceExhaustionDoesNotTouchPeerTrust(t *testing.T) {
 func TestBrokenPromiseStakeCostReducesBudget(t *testing.T) {
 	cfg := twoNodeTestConfig(t)
 	alice := NewNode(cfg, cfg.Agents[0], &decision.FakeDecider{}, decision.FakeMonitor{})
-	alice.applyBrokenPromiseCost("bob", map[string]string{"field_stake": "2"}, "test broken promise")
+	alice.applyBrokenPromiseCost("bob", map[string]string{"stake": "2"}, "test broken promise")
 	if alice.budget != 3 {
 		t.Fatalf("budget after stake cost = %d, want 3", alice.budget)
 	}
@@ -141,8 +141,8 @@ func TestRepeatedPromiseSuppressedAfterJournalEvent(t *testing.T) {
 	cfg := twoNodeTestConfig(t)
 	alice := NewNode(cfg, cfg.Agents[0], &decision.FakeDecider{}, decision.FakeMonitor{})
 	fields := map[string]string{
-		"promise":             "I promise to send one repeated relationship promise.",
-		"field_promise_about": "local_observation",
+		"promise":       "I promise to send one repeated relationship promise.",
+		"promise_about": "local_observation",
 	}
 	recordKey := alice.rememberOutstandingPromise("bob", pcid.RelationshipV1, "exact", fields)
 	alice.resolveOutstandingPromise(recordKey, promiseStatusKept, "test")
@@ -158,13 +158,13 @@ func TestNotPromisedSuppressesSemanticRetryWithoutTrustChange(t *testing.T) {
 	cfg := twoNodeTestConfig(t)
 	alice := NewNode(cfg, cfg.Agents[0], &decision.FakeDecider{}, decision.FakeMonitor{})
 	fields := map[string]string{
-		"promise":             "I promise to make one storage offer.",
-		"field_promise_about": "storage_offer",
+		"promise":       "I promise to make one storage offer.",
+		"promise_about": "storage_offer",
 	}
 	alice.rememberNonCommitment("bob", pcid.RelationshipV1, fields, "ack outcome not_promised")
 	retryFields := map[string]string{
-		"promise":             "I promise to make a revised storage offer.",
-		"field_promise_about": "storage_offer",
+		"promise":       "I promise to make a revised storage offer.",
+		"promise_about": "storage_offer",
 	}
 	if !alice.shouldSuppressNonCommittedPromise("bob", retryFields) {
 		t.Fatalf("semantic retry after not_promised should be suppressed")
@@ -212,7 +212,7 @@ func TestRunTurnRepairsMissingActAndTarget(t *testing.T) {
 func TestCandidateDiscoveryCanFormDirectPeer(t *testing.T) {
 	cfg := candidateOnlyTestConfig(t)
 	alice := NewNode(cfg, cfg.Agents[0], &decision.FakeDecider{}, decision.FakeMonitor{})
-	discoveryFields := map[string]string{"field_promise_about": decision.PromiseAboutLinkDiscovery}
+	discoveryFields := map[string]string{"promise_about": decision.PromiseAboutLinkDiscovery}
 	if !alice.canDialTarget("bob", discoveryFields) {
 		t.Fatalf("candidate discovery should be dialable")
 	}
@@ -234,14 +234,14 @@ func TestFutureRepairCandidatePromiseCanBeHeardAfterMalformedEvent(t *testing.T)
 	mallory := NewNode(cfg, cfg.Agents[4], &decision.FakeDecider{}, decision.FakeMonitor{})
 	grace.observeOutcome("mallory", relationship.OutcomeMalformed)
 	mallory.observeOutcome("grace", relationship.OutcomeMalformed)
-	ordinaryFields := map[string]string{"field_promise_about": "ordinary_followup"}
+	ordinaryFields := map[string]string{"promise_about": "ordinary_followup"}
 	if grace.canAcceptFrom("mallory", ordinaryFields) {
 		t.Fatalf("Grace should not accept arbitrary candidate traffic after malformed event")
 	}
 	if mallory.canDialTarget("grace", ordinaryFields) {
 		t.Fatalf("Mallory should not dial arbitrary candidate traffic after malformed event")
 	}
-	repairFields := map[string]string{"field_promise_about": production.PromiseLabelFutureMalformedReport}
+	repairFields := map[string]string{"promise_about": production.PromiseLabelFutureMalformedReport}
 	if !grace.canAcceptFrom("mallory", repairFields) {
 		t.Fatalf("Grace should be able to hear a narrow future-repair promise")
 	}
@@ -253,19 +253,19 @@ func TestFutureRepairCandidatePromiseCanBeHeardAfterMalformedEvent(t *testing.T)
 func TestProtocolForFieldsRoutesShippingPromises(t *testing.T) {
 	cfg := shippingTestConfig(t)
 	fulfillment := NewNode(cfg, cfg.Agents[0], &decision.FakeDecider{}, decision.FakeMonitor{})
-	protocolName, _ := fulfillment.protocolForFields(map[string]string{"field_promise_about": production.PromiseWeighPackage})
+	protocolName, _ := fulfillment.protocolForFields(map[string]string{"promise_about": production.PromiseWeighPackage})
 	if protocolName != pcid.PostalScaleV1 {
 		t.Fatalf("weigh package protocol = %s, want %s", protocolName, pcid.PostalScaleV1)
 	}
-	protocolName, _ = fulfillment.protocolForFields(map[string]string{"field_promise_about": production.PromisePrintLabel})
+	protocolName, _ = fulfillment.protocolForFields(map[string]string{"promise_about": production.PromisePrintLabel})
 	if protocolName != pcid.UPSLabelV1 {
 		t.Fatalf("print label protocol = %s, want %s", protocolName, pcid.UPSLabelV1)
 	}
-	protocolName, _ = fulfillment.protocolForFields(map[string]string{"field_promise_about": production.PromiseShipmentUpdate})
+	protocolName, _ = fulfillment.protocolForFields(map[string]string{"promise_about": production.PromiseShipmentUpdate})
 	if protocolName != pcid.AccountingV1 {
 		t.Fatalf("shipment update protocol = %s, want %s", protocolName, pcid.AccountingV1)
 	}
-	protocolName, _ = fulfillment.protocolForFields(map[string]string{"field_promise_about": production.PromiseIssuePrintCapability})
+	protocolName, _ = fulfillment.protocolForFields(map[string]string{"promise_about": production.PromiseIssuePrintCapability})
 	if protocolName != pcid.PrinterPortV1 {
 		t.Fatalf("print capability protocol = %s, want %s", protocolName, pcid.PrinterPortV1)
 	}
@@ -275,18 +275,18 @@ func TestAutonomousProtocolMismatchReframesToRelationship(t *testing.T) {
 	cfg := twoNodeTestConfig(t)
 	alice := NewNode(cfg, cfg.Agents[0], &decision.FakeDecider{}, decision.FakeMonitor{})
 	fields := map[string]string{
-		"field_protocol":      pcid.CASStorageV1,
-		"field_promise_about": "storage_capacity",
-		"promise":             "Alice promises only local storage-capacity event.",
+		"protocol":      pcid.CASStorageV1,
+		"promise_about": "storage_capacity",
+		"promise":       "Alice promises only local storage-capacity event.",
 	}
 	alice.normalizeAutonomousPromiseFields("bob", fields)
-	if fields["field_protocol"] != pcid.RelationshipV1 {
-		t.Fatalf("reframed protocol = %s, want %s", fields["field_protocol"], pcid.RelationshipV1)
+	if fields["protocol"] != pcid.RelationshipV1 {
+		t.Fatalf("reframed protocol = %s, want %s", fields["protocol"], pcid.RelationshipV1)
 	}
-	if fields["field_promise_about"] != "local_observation" {
-		t.Fatalf("reframed promise_about = %s, want local_observation", fields["field_promise_about"])
+	if fields["promise_about"] != "local_observation" {
+		t.Fatalf("reframed promise_about = %s, want local_observation", fields["promise_about"])
 	}
-	if fields["field_original_protocol"] != pcid.CASStorageV1 || fields["field_original_promise_about"] != "storage_capacity" {
+	if fields["original_protocol"] != pcid.CASStorageV1 || fields["original_promise_about"] != "storage_capacity" {
 		t.Fatalf("original protocol fields missing after reframe: %#v", fields)
 	}
 	if !hasEvent(alice.events, "promise_reframed_for_pcid_fit") {
@@ -299,15 +299,15 @@ func TestAutonomousConcreteCASPayloadKeepsProtocol(t *testing.T) {
 	alice := NewNode(cfg, cfg.Agents[0], &decision.FakeDecider{}, decision.FakeMonitor{})
 	contentBytes := production.SampleContentBytes()
 	fields := map[string]string{
-		"field_protocol":      pcid.CASStorageV1,
-		"field_promise_about": production.PromiseStoreContent,
-		"field_content_cid":   production.ContentCID(contentBytes),
-		"field_content_b64":   "nonempty-test-bytes",
-		"promise":             "Alice promises to receive concrete CAS storage event.",
+		"protocol":      pcid.CASStorageV1,
+		"promise_about": production.PromiseStoreContent,
+		"content_cid":   production.ContentCID(contentBytes),
+		"content_b64":   "nonempty-test-bytes",
+		"promise":       "Alice promises to receive concrete CAS storage event.",
 	}
 	alice.normalizeAutonomousPromiseFields("bob", fields)
-	if fields["field_protocol"] != pcid.CASStorageV1 {
-		t.Fatalf("concrete CAS payload protocol = %s, want %s", fields["field_protocol"], pcid.CASStorageV1)
+	if fields["protocol"] != pcid.CASStorageV1 {
+		t.Fatalf("concrete CAS payload protocol = %s, want %s", fields["protocol"], pcid.CASStorageV1)
 	}
 	if hasEvent(alice.events, "promise_reframed_for_pcid_fit") {
 		t.Fatalf("concrete CAS payload should not be reframed: %#v", alice.events)
@@ -316,19 +316,19 @@ func TestAutonomousConcreteCASPayloadKeepsProtocol(t *testing.T) {
 
 func TestNegativeAckVerdictsDoNotUpdateTrust(t *testing.T) {
 	negativeVerdicts := []map[string]string{
-		{"field_verdict": "broken"},
-		{"field_verdict": "disagree"},
-		{"field_variant_status": "not_promised"},
-		{"field_storage_status": "price_refused"},
-		{"field_compute_status": "capacity_refused"},
-		{"field_cache_status": "miss"},
+		{"verdict": "broken"},
+		{"verdict": "disagree"},
+		{"variant_status": "not_promised"},
+		{"storage_status": "price_refused"},
+		{"compute_status": "capacity_refused"},
+		{"cache_status": "miss"},
 	}
 	for _, ackFields := range negativeVerdicts {
 		if eventUpdatesTrust(ackFields) {
 			t.Fatalf("negative ACK fields should not update trust: %#v", ackFields)
 		}
 	}
-	if !eventUpdatesTrust(map[string]string{"field_verdict": "kept"}) {
+	if !eventUpdatesTrust(map[string]string{"verdict": "kept"}) {
 		t.Fatalf("kept ACK verdict should update trust")
 	}
 }
@@ -347,35 +347,35 @@ func TestNonTrustingAckEventUsesPrecisePromiseStatus(t *testing.T) {
 		wantStatus: promiseStatusDuplicate,
 	}, {
 		name:       "storage price refused",
-		fields:     map[string]string{"field_storage_status": "price_refused"},
+		fields:     map[string]string{"storage_status": "price_refused"},
 		wantStatus: promiseStatusNonCommitment,
 	}, {
 		name:       "compute capacity refused",
-		fields:     map[string]string{"field_compute_status": "capacity_refused"},
+		fields:     map[string]string{"compute_status": "capacity_refused"},
 		wantStatus: promiseStatusNonCommitment,
 	}, {
 		name:       "cache miss",
-		fields:     map[string]string{"field_cache_status": "miss"},
+		fields:     map[string]string{"cache_status": "miss"},
 		wantStatus: promiseStatusNonCommitment,
 	}, {
 		name:       "future repair only",
-		fields:     map[string]string{"field_repair_status": "future_only"},
+		fields:     map[string]string{"repair_status": "future_only"},
 		wantStatus: promiseStatusNonCommitment,
 	}, {
 		name:       "unsupported variant",
-		fields:     map[string]string{"field_variant_status": "not_promised"},
+		fields:     map[string]string{"variant_status": "not_promised"},
 		wantStatus: promiseStatusNonCommitment,
 	}, {
 		name:       "replay refused",
-		fields:     map[string]string{"field_replay_status": "not_promised"},
+		fields:     map[string]string{"replay_status": "not_promised"},
 		wantStatus: promiseStatusNonCommitment,
 	}, {
 		name:       "broken verdict",
-		fields:     map[string]string{"field_verdict": "broken"},
+		fields:     map[string]string{"verdict": "broken"},
 		wantStatus: promiseStatusBroken,
 	}, {
 		name:       "malformed verdict",
-		fields:     map[string]string{"field_verdict": "malformed"},
+		fields:     map[string]string{"verdict": "malformed"},
 		wantStatus: promiseStatusMalformed,
 	}}
 	for _, tc := range cases {
@@ -409,16 +409,16 @@ func TestDeterministicShippingHandlersReturnEvent(t *testing.T) {
 	message := parsedMessage{
 		ProtocolName: pcid.PostalScaleV1,
 		Fields: map[string]string{
-			"from":                "fulfillment",
-			"field_promise_about": production.PromiseWeighPackage,
-			"field_package_id":    "PKG-1001",
+			"from":          "fulfillment",
+			"promise_about": production.PromiseWeighPackage,
+			"package_id":    "PKG-1001",
 		},
 	}
 	ackResult, err := scale.handleProtocolPromise(message)
 	if err != nil {
 		t.Fatalf("scale handler: %v", err)
 	}
-	if ackResult.Fields["field_weight_ounces"] == "" || !hasEvent(scale.events, "package_weighed") {
+	if ackResult.Fields["weight_ounces"] == "" || !hasEvent(scale.events, "package_weighed") {
 		t.Fatalf("scale did not return weight event: %#v events %#v", ackResult.Fields, scale.events)
 	}
 }
@@ -433,73 +433,73 @@ func TestFulfillmentStartupWorkflowStepsUseDeterministicHandlers(t *testing.T) {
 	fulfillment := NewNode(cfg, cfg.Agents[0], &decision.FakeDecider{}, decision.FakeMonitor{})
 	accounting := NewNode(cfg, cfg.Agents[4], &decision.FakeDecider{}, decision.FakeMonitor{})
 	addressAck, err := accounting.handleAccountingPromise(map[string]string{
-		"from":                "fulfillment",
-		"field_promise_about": production.PromiseAddressLookup,
-		"field_order_id":      fulfillmentOrderID,
+		"from":          "fulfillment",
+		"promise_about": production.PromiseAddressLookup,
+		"order_id":      fulfillmentOrderID,
 	})
 	if err != nil {
 		t.Fatalf("address lookup: %v", err)
 	}
 	scale := NewNode(cfg, cfg.Agents[1], &decision.FakeDecider{}, decision.FakeMonitor{})
 	weightAck, err := scale.handlePostalScalePromise(map[string]string{
-		"from":                "fulfillment",
-		"field_promise_about": production.PromiseWeighPackage,
-		"field_package_id":    fulfillmentPackageID,
+		"from":          "fulfillment",
+		"promise_about": production.PromiseWeighPackage,
+		"package_id":    fulfillmentPackageID,
 	})
 	if err != nil {
 		t.Fatalf("package weighing: %v", err)
 	}
-	trackingNumber, costCents, err := production.LabelForShipment(fulfillmentPackageID, addressAck["field_shipping_address"], intField(weightAck, "field_weight_ounces"))
+	trackingNumber, costCents, err := production.LabelForShipment(fulfillmentPackageID, addressAck["shipping_address"], intField(weightAck, "weight_ounces"))
 	if err != nil {
 		t.Fatalf("label facts: %v", err)
 	}
 	labelBytes, err := production.LabelBytesForShipment(map[string]string{
-		"field_package_id":      fulfillmentPackageID,
-		"field_tracking_number": trackingNumber,
-		"field_cost_cents":      strconv.Itoa(costCents),
+		"package_id":      fulfillmentPackageID,
+		"tracking_number": trackingNumber,
+		"cost_cents":      strconv.Itoa(costCents),
 	})
 	if err != nil {
 		t.Fatalf("label bytes: %v", err)
 	}
 	printerPort := NewNode(cfg, cfg.Agents[3], &decision.FakeDecider{}, decision.FakeMonitor{})
 	capabilityFields := map[string]string{
-		"from":                             "ups_label_printer",
-		"to":                               "printer_port",
-		"field_promise_about":              production.PromiseIssuePrintCapability,
-		"field_print_capability_issuee":    "ups_label_printer",
-		"field_print_capability_token_id":  "printcap-ups_label_printer",
-		"field_print_capability_scope":     production.PrintCapabilityScope,
-		"field_print_capability_max_bytes": strconv.Itoa(production.PrintCapabilityMaxBytes),
+		"from":                       "ups_label_printer",
+		"to":                         "printer_port",
+		"promise_about":              production.PromiseIssuePrintCapability,
+		"print_capability_issuee":    "ups_label_printer",
+		"print_capability_token_id":  "printcap-ups_label_printer",
+		"print_capability_scope":     production.PrintCapabilityScope,
+		"print_capability_max_bytes": strconv.Itoa(production.PrintCapabilityMaxBytes),
 	}
 	capabilityAck, err := printerPort.handlePrinterPortPromise(capabilityFields)
 	if err != nil {
 		t.Fatalf("capability issue: %v", err)
 	}
 	redemptionFields := map[string]string{
-		"from":                             "ups_label_printer",
-		"field_promise_about":              production.PromiseRedeemPrintCapability,
-		"field_print_capability_issuee":    "ups_label_printer",
-		"field_print_capability_token":     capabilityAck["field_print_capability_token"],
-		"field_print_capability_token_id":  capabilityAck["field_print_capability_token_id"],
-		"field_print_capability_scope":     capabilityAck["field_print_capability_scope"],
-		"field_print_capability_max_bytes": capabilityAck["field_print_capability_max_bytes"],
-		"field_label_bytes_hex":            hex.EncodeToString(labelBytes),
+		"from":                       "ups_label_printer",
+		"promise_about":              production.PromiseRedeemPrintCapability,
+		"print_capability_issuee":    "ups_label_printer",
+		"print_capability_token":     capabilityAck["print_capability_token"],
+		"print_capability_token_id":  capabilityAck["print_capability_token_id"],
+		"print_capability_scope":     capabilityAck["print_capability_scope"],
+		"print_capability_max_bytes": capabilityAck["print_capability_max_bytes"],
+		"label_bytes_hex":            hex.EncodeToString(labelBytes),
 	}
 	printAck, err := printerPort.handlePrinterPortPromise(redemptionFields)
 	if err != nil {
 		t.Fatalf("capability redemption: %v", err)
 	}
 	_, err = accounting.handleAccountingPromise(map[string]string{
-		"from":                  "fulfillment",
-		"field_promise_about":   production.PromiseShipmentUpdate,
-		"field_order_id":        fulfillmentOrderID,
-		"field_tracking_number": trackingNumber,
-		"field_cost_cents":      strconv.Itoa(costCents),
+		"from":            "fulfillment",
+		"promise_about":   production.PromiseShipmentUpdate,
+		"order_id":        fulfillmentOrderID,
+		"tracking_number": trackingNumber,
+		"cost_cents":      strconv.Itoa(costCents),
 	})
 	if err != nil {
 		t.Fatalf("accounting update: %v", err)
 	}
-	if printAck["field_printer_spool_id"] == "" {
+	if printAck["printer_spool_id"] == "" {
 		t.Fatalf("printer port did not return spool event: %#v", printAck)
 	}
 	fulfillment.record("fulfillment_workflow_completed", "kept", "accounting", "test")
@@ -571,8 +571,8 @@ func TestExactEnvelopeReplayRejectedWithoutTrustGain(t *testing.T) {
 	if fieldsErr != nil {
 		t.Fatalf("parse replay ack fields: %v", fieldsErr)
 	}
-	if ackFields["field_replay_status"] != "not_promised" {
-		t.Fatalf("replay ack fields = %#v, want field_replay_status=not_promised", ackFields)
+	if ackFields["replay_status"] != "not_promised" {
+		t.Fatalf("replay ack fields = %#v, want replay_status=not_promised", ackFields)
 	}
 	if accounting.ledger.Trust("fulfillment") != 1 {
 		t.Fatalf("exact replay trust = %d, want first-message-only trust 1", accounting.ledger.Trust("fulfillment"))
@@ -596,7 +596,7 @@ func TestRunScopedStatePersistsWithinRun(t *testing.T) {
 		t.Fatalf("store filesystem CAS object: %v", err)
 	}
 	bob.capabilityTokens["alice|"+contentCID] = "token-1"
-	bob.computeCache["compute-1"] = map[string]string{"field_result_cid": "result-1"}
+	bob.computeCache["compute-1"] = map[string]string{"result_cid": "result-1"}
 	bob.nonCommitmentJournal["nc-1"] = nonCommitmentRecord{Key: "nc-1", Peer: "alice", ProtocolName: pcid.CASStorageV1, PromiseAbout: production.PromiseStoreContent}
 	bob.checkpointJournal["cp-1"] = checkpointRecord{Key: "cp-1", ProtocolName: pcid.CASStorageV1, PromiseAbout: production.PromiseStoreContent}
 	bob.promiseJournal["pr-1"] = promiseRecord{Key: "pr-1", Peer: "alice", ProtocolName: pcid.CASStorageV1, Status: promiseStatusOutstanding}
@@ -623,7 +623,7 @@ func TestRunScopedStatePersistsWithinRun(t *testing.T) {
 	if reloadedBob.capabilityTokens["alice|"+contentCID] != "token-1" {
 		t.Fatalf("reloaded capability token mismatch: %#v", reloadedBob.capabilityTokens)
 	}
-	if reloadedBob.computeCache["compute-1"]["field_result_cid"] != "result-1" {
+	if reloadedBob.computeCache["compute-1"]["result_cid"] != "result-1" {
 		t.Fatalf("reloaded compute cache mismatch: %#v", reloadedBob.computeCache)
 	}
 	if reloadedBob.promiseJournal["pr-1"].Status != promiseStatusOutstanding || reloadedBob.replayJournal["hash-1"] == "" {
@@ -762,35 +762,35 @@ func TestCapabilityTokenReplayReturnsNonCommitmentEvent(t *testing.T) {
 	contentBytes := production.SampleContentBytes()
 	contentCID := production.ContentCID(contentBytes)
 	storeAck, storeErr := bob.handleCASStoragePromise(map[string]string{
-		"from":                "alice",
-		"field_promise_about": production.PromiseStoreContent,
-		"field_content_cid":   contentCID,
-		"field_content_b64":   base64.StdEncoding.EncodeToString(contentBytes),
-		"field_credit_offer":  "4",
-		"field_units":         "1",
+		"from":          "alice",
+		"promise_about": production.PromiseStoreContent,
+		"content_cid":   contentCID,
+		"content_b64":   base64.StdEncoding.EncodeToString(contentBytes),
+		"credit_offer":  "4",
+		"units":         "1",
 	})
 	if storeErr != nil {
 		t.Fatalf("store content: %v", storeErr)
 	}
-	token := storeAck["field_capability_token"]
+	token := storeAck["capability_token"]
 	if _, serveErr := bob.handleCASStoragePromise(map[string]string{
-		"from":                "alice",
-		"field_promise_about": production.PromiseServeContent,
-		"field_content_cid":   contentCID,
-		"field_token":         token,
+		"from":          "alice",
+		"promise_about": production.PromiseServeContent,
+		"content_cid":   contentCID,
+		"token":         token,
 	}); serveErr != nil {
 		t.Fatalf("serve content: %v", serveErr)
 	}
 	replayAck, replayErr := bob.handleCASStoragePromise(map[string]string{
-		"from":                "alice",
-		"field_promise_about": production.PromiseServeContent,
-		"field_content_cid":   contentCID,
-		"field_token":         token,
+		"from":          "alice",
+		"promise_about": production.PromiseServeContent,
+		"content_cid":   contentCID,
+		"token":         token,
 	})
 	if replayErr != nil {
 		t.Fatalf("token replay should be non-commitment event, not handler error: %v", replayErr)
 	}
-	if replayAck["field_token_status"] != "not_promised" {
+	if replayAck["token_status"] != "not_promised" {
 		t.Fatalf("replay ack = %#v, want token_status=not_promised", replayAck)
 	}
 	if !hasEventOutcome(bob.events, "capability_token_replay_rejected", "non_commitment") {
@@ -841,13 +841,13 @@ func TestMalformedProofEventReducesIdentifiedPromiserTrust(t *testing.T) {
 	cfg := computeRoutingTestConfig(t)
 	grace := NewNode(cfg, cfg.Agents[2], &decision.FakeDecider{}, decision.FakeMonitor{})
 	fields := map[string]string{
-		"act":                 decision.ActPromise,
-		"from":                "mallory",
-		"to":                  "grace",
-		"turn":                "test",
-		"promise":             "Mallory promises this parseable but mutated proof is valid.",
-		"reason":              "test bad proof attribution",
-		"field_promise_about": production.PromisePresentStorageReport,
+		"act":           decision.ActPromise,
+		"from":          "mallory",
+		"to":            "grace",
+		"turn":          "test",
+		"promise":       "Mallory promises this parseable but mutated proof is valid.",
+		"reason":        "test bad proof attribution",
+		"promise_about": production.PromisePresentStorageReport,
 	}
 	payloadBytes, _, payloadErr := protocol.MarshalKnownArrayPayload(pcid.CASStorageV1, fields)
 	if payloadErr != nil {
@@ -888,15 +888,15 @@ func TestCorruptCASEventReducesIdentifiedPromiserTrust(t *testing.T) {
 	goodBytes := []byte("expected content")
 	badBytes := []byte("different content")
 	ackFields, err := grace.handleCASStoragePromise(map[string]string{
-		"from":                "mallory",
-		"field_promise_about": production.PromisePresentStorageReport,
-		"field_content_cid":   production.ContentCID(goodBytes),
-		"field_content_b64":   base64.StdEncoding.EncodeToString(badBytes),
+		"from":          "mallory",
+		"promise_about": production.PromisePresentStorageReport,
+		"content_cid":   production.ContentCID(goodBytes),
+		"content_b64":   base64.StdEncoding.EncodeToString(badBytes),
 	})
 	if err != nil {
 		t.Fatalf("corrupt CAS event should return a broken verdict ACK, not handler error: %v", err)
 	}
-	if ackFields["field_verdict"] != "broken" {
+	if ackFields["verdict"] != "broken" {
 		t.Fatalf("corrupt CAS verdict = %#v, want broken", ackFields)
 	}
 	if grace.ledger.Trust("mallory") != -3 {
@@ -915,8 +915,8 @@ func TestFutureRepairPromiseDoesNotImmediatelyIncreaseTrust(t *testing.T) {
 	// remember, but it is not proof that the future repair has already been kept.
 	// Source: DI-fijov
 	ackFields := map[string]string{
-		"field_promise_about": production.PromiseLabelFutureMalformedReport,
-		"field_repair_status": "future_only",
+		"promise_about": production.PromiseLabelFutureMalformedReport,
+		"repair_status": "future_only",
 	}
 	if eventUpdatesTrust(ackFields) {
 		t.Fatalf("future-only repair promise should not immediately update trust: %#v", ackFields)
@@ -930,11 +930,11 @@ func TestTrustCautionAllowsOnlyFutureRepairCandidateTraffic(t *testing.T) {
 	cfg := computeRoutingTestConfig(t)
 	grace := NewNode(cfg, cfg.Agents[2], &decision.FakeDecider{}, decision.FakeMonitor{})
 	grace.observeOutcome("mallory", relationship.OutcomeMalformed)
-	unsupportedFields := map[string]string{"field_promise_about": production.PromiseUnsupportedVariantProbe}
+	unsupportedFields := map[string]string{"promise_about": production.PromiseUnsupportedVariantProbe}
 	if grace.canAcceptFrom("mallory", unsupportedFields) {
 		t.Fatalf("unsupported ordinary promise should not be accepted during trust caution")
 	}
-	repairFields := map[string]string{"field_promise_about": production.PromiseLabelFutureMalformedReport}
+	repairFields := map[string]string{"promise_about": production.PromiseLabelFutureMalformedReport}
 	if !grace.canAcceptFrom("mallory", repairFields) {
 		t.Fatalf("future repair promise should remain hearable as candidate traffic")
 	}
@@ -1304,17 +1304,17 @@ func (failingMonitor) Evaluate(_ context.Context, _ []decision.Event) (decision.
 func signedAccountingUpdateFrame(t *testing.T, node *Node, exchangeID string) []byte {
 	t.Helper()
 	fields := map[string]string{
-		"act":                   decision.ActPromise,
-		"from":                  "fulfillment",
-		"to":                    "accounting",
-		"turn":                  "test",
-		"promise":               "I promise to receive accounting's shipment checkpoint event for this order and tracking number.",
-		"reason":                "duplicate checkpoint regression test",
-		"field_exchange_id":     exchangeID,
-		"field_promise_about":   production.PromiseShipmentUpdate,
-		"field_order_id":        fulfillmentOrderID,
-		"field_tracking_number": "1Z999AA10123456784",
-		"field_cost_cents":      "1776",
+		"act":             decision.ActPromise,
+		"from":            "fulfillment",
+		"to":              "accounting",
+		"turn":            "test",
+		"promise":         "I promise to receive accounting's shipment checkpoint event for this order and tracking number.",
+		"reason":          "duplicate checkpoint regression test",
+		"exchange_id":     exchangeID,
+		"promise_about":   production.PromiseShipmentUpdate,
+		"order_id":        fulfillmentOrderID,
+		"tracking_number": "1Z999AA10123456784",
+		"cost_cents":      "1776",
 	}
 	payloadBytes, _, payloadErr := protocol.MarshalKnownArrayPayload(pcid.AccountingV1, fields)
 	if payloadErr != nil {
@@ -1342,19 +1342,19 @@ func computeAckFields(t *testing.T) map[string]string {
 	}
 	badResultBytes := production.BadComputeResultBytes(resultBytes)
 	return map[string]string{
-		"field_promise_about": production.PromiseExecuteFunction,
-		"field_function_cid":  production.ContentCID(functionBytes),
-		"field_function_b64":  base64.StdEncoding.EncodeToString(functionBytes),
-		"field_input_cid":     production.ContentCID(inputBytes),
-		"field_input_b64":     base64.StdEncoding.EncodeToString(inputBytes),
-		"field_context_cid":   production.ContentCID(contextBytes),
-		"field_context_b64":   base64.StdEncoding.EncodeToString(contextBytes),
-		"field_result_cid":    production.ContentCID(resultBytes),
-		"field_result_b64":    base64.StdEncoding.EncodeToString(resultBytes),
-		"field_bad_result_cid": production.ContentCID(
+		"promise_about": production.PromiseExecuteFunction,
+		"function_cid":  production.ContentCID(functionBytes),
+		"function_b64":  base64.StdEncoding.EncodeToString(functionBytes),
+		"input_cid":     production.ContentCID(inputBytes),
+		"input_b64":     base64.StdEncoding.EncodeToString(inputBytes),
+		"context_cid":   production.ContentCID(contextBytes),
+		"context_b64":   base64.StdEncoding.EncodeToString(contextBytes),
+		"result_cid":    production.ContentCID(resultBytes),
+		"result_b64":    base64.StdEncoding.EncodeToString(resultBytes),
+		"bad_result_cid": production.ContentCID(
 			badResultBytes,
 		),
-		"field_bad_result_b64": base64.StdEncoding.EncodeToString(badResultBytes),
+		"bad_result_b64": base64.StdEncoding.EncodeToString(badResultBytes),
 	}
 }
 

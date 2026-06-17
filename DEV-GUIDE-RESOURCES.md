@@ -136,7 +136,7 @@ with protocol validity and imposition avoidance `4/5`. Source: `DI-pohaj`;
 
 The latest POC12 correction tightens sender-side restraint and checkpoint
 evidence. Apps now remember receiver `not_promised` outcomes in an app-local
-`nonCommitmentJournal` keyed by target, pCID name, and `field_promise_about`;
+`nonCommitmentJournal` keyed by target, pCID name, and `promise_about`;
 later live turns suppress the same semantic retry as
 `promise_not_promised_suppressed` without changing peer trust. Duplicate
 evidence now flows through a generic app-local `checkpointJournal`, with the
@@ -169,7 +169,7 @@ CID-named function-call compute promises under `cid_compute_v1`, and local
 relationship/observation promises under `relationship_v1`. POC14 adds a narrow
 `identity_key_v1` protocol for identity/key-rotation promises and has begun
 moving scripted `cas_storage_v1` and `cid_compute_v1` exchanges away from
-universal `field_*` maps toward pCID-owned CBOR arrays. A CID names content or
+universal map payloads toward pCID-owned CBOR arrays. A CID names content or
 function code inside protocol-owned payloads; it does not by itself promise
 availability, retention, access, serving, or trustworthy computation.
 Pure compute results are cached only by exact protocol/function/input/context
@@ -248,8 +248,9 @@ coverage for every known POC14 pCID, and remains blocked from production by
 monitor `protocol_validity=4/5`, `local_trust_correctness=4/5`, and
 `imposition_avoidance=4/5`. POC14 adds analyzer dimensions for runtime adapters, decentralized
 monitoring, mixed-version pCID migration, same-run restart events, and
-pCID-owned array payload events for the known POC14 pCIDs. `field_*` names are
-local compatibility projections after decoding, not wire-shape guidance. The
+pCID-owned array payload events for the known POC14 pCIDs. POC15 removes the
+old prefixed compatibility payload names entirely; decoded local routing fields
+are implementation projections, not wire-shape guidance. The
 development monitor also moved out of agent runtime: supervisors forward stdout
 event records to an observer-only collector, only the collector mounts the
 observer run volume, and agents no longer coordinate through shared marker files.
@@ -1444,8 +1445,8 @@ section.
   app-local trust/workflow judgment while adding `cas_storage_v1` and
   `cid_compute_v1` with content/function/context/result CIDs as payload-level
   values, plus a narrow POC14 `identity_key_v1` key-rotation protocol whose
-  payload is a pCID-owned CBOR array rather than another universal `field_*`
-  map. It sends signed grid envelopes over
+  payload is a pCID-owned CBOR array rather than another universal map. It
+  sends signed grid envelopes over
   length-framed TCP, records app receive/runtime done evidence around bounded
   startup/turn/grace timing, stores and retrieves multiple real CAS byte objects
   by CID, replicates bytes to Frank, recovers from modeled Bob unavailability by

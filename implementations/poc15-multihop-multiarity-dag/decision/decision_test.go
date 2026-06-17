@@ -195,14 +195,14 @@ func TestLiveStyleFieldsAcceptNonStringValues(t *testing.T) {
 	}
 	obs := Observation{AgentName: "alice", Turn: 1}
 	fields := Fields(obs, decoded)
-	if fields["field_capacity_mb"] != "100" {
-		t.Fatalf("capacity field = %q, want 100", fields["field_capacity_mb"])
+	if fields["capacity_mb"] != "100" {
+		t.Fatalf("capacity field = %q, want 100", fields["capacity_mb"])
 	}
-	if fields["field_best_effort"] != "true" {
-		t.Fatalf("best_effort field = %q, want true", fields["field_best_effort"])
+	if fields["best_effort"] != "true" {
+		t.Fatalf("best_effort field = %q, want true", fields["best_effort"])
 	}
-	if fields["field_neighbors"] != `["bob","ellen"]` {
-		t.Fatalf("neighbors field = %q, want JSON array", fields["field_neighbors"])
+	if fields["neighbors"] != `["bob","ellen"]` {
+		t.Fatalf("neighbors field = %q, want JSON array", fields["neighbors"])
 	}
 }
 

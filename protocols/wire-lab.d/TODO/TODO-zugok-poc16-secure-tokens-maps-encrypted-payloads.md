@@ -68,7 +68,7 @@ Affects: implementations/poc16-secure-tokens-maps-encrypted-payloads/; protocols
     whether the payload is a map or array unless its own promise requires that.
 - Add diagnostics showing map key choices, map canonicalization expectations,
   and how unknown optional keys are treated by the pCID spec.
-- Avoid `field_*` compatibility maps as the design target. If compatibility
+- Avoid old prefixed compatibility maps as the design target. If compatibility
   projections remain in code, label them as runtime adapters, not protocol
   payload recommendations.
 

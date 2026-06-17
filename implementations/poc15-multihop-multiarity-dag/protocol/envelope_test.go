@@ -92,7 +92,7 @@ func TestParseEnvelopeRejectsMalformedCBOR(t *testing.T) {
 
 func TestIdentityKeyPayloadUsesArrayShape(t *testing.T) {
 	// Intent: identity_key_v1 is the first POC15 pCID moved to pCID-owned CBOR
-	// arrays, proving new protocols need not inherit legacy field maps.
+	// arrays, proving new protocols need not inherit older generic map payloads.
 	// Source: DI-vipih
 	payloadBytes, err := MarshalIdentityKeyRotationPayload(IdentityKeyRotationPayload{
 		Promiser:      "mallory",
@@ -114,7 +114,7 @@ func TestIdentityKeyPayloadUsesArrayShape(t *testing.T) {
 	if err != nil {
 		t.Fatalf("payload fields: %v", err)
 	}
-	if fields["act"] != "promise" || fields["from"] != "mallory" || fields["to"] != "grace" || fields["field_new_key_label"] != "mallory-next-key" {
+	if fields["act"] != "promise" || fields["from"] != "mallory" || fields["to"] != "grace" || fields["new_key_label"] != "mallory-next-key" {
 		t.Fatalf("identity routing fields = %#v", fields)
 	}
 	ackPayloadBytes, err := MarshalIdentityKeyRotationAckPayload(IdentityKeyRotationAckPayload{
@@ -138,8 +138,8 @@ func TestIdentityKeyPayloadUsesArrayShape(t *testing.T) {
 }
 
 func TestKnownPayloadsUseArrayShape(t *testing.T) {
-	// Intent: Fresh POC15 wire payloads are pCID-owned arrays; field_* names are
-	// only runtime compatibility projections for existing handlers. Source:
+	// Intent: Fresh POC15 wire payloads are pCID-owned arrays; local routing
+	// field names are only runtime compatibility projections for existing handlers. Source:
 	// DI-gahuh; DI-dirat
 	testCases := []struct {
 		name         string
@@ -151,14 +151,14 @@ func TestKnownPayloadsUseArrayShape(t *testing.T) {
 			name:         "relationship",
 			protocolName: protocolRelationshipV1,
 			fields: map[string]string{
-				"from":                "alice",
-				"to":                  "bob",
-				"promise":             "Alice promises one local relationship event.",
-				"reason":              "relationship test",
-				"field_promise_about": "local_observation",
-				"field_resource":      "storage",
+				"from":          "alice",
+				"to":            "bob",
+				"promise":       "Alice promises one local relationship event.",
+				"reason":        "relationship test",
+				"promise_about": "local_observation",
+				"resource":      "storage",
 			},
-			wantField: "field_resource",
+			wantField: "resource",
 		},
 		{
 			name:         "kernel receive",
@@ -170,91 +170,91 @@ func TestKnownPayloadsUseArrayShape(t *testing.T) {
 				"pcid":     "relationship_v1",
 				"pcid_cid": "cidv1-raw-sha2-256:relationship",
 			},
-			wantField: "field_app",
+			wantField: "app",
 		},
 		{
 			name:         "postal scale",
 			protocolName: protocolPostalScaleV1,
 			fields: map[string]string{
-				"from":                "fulfillment",
-				"to":                  "postal_scale",
-				"field_promise_about": "weigh_package",
-				"field_package_id":    "PKG-1001",
+				"from":          "fulfillment",
+				"to":            "postal_scale",
+				"promise_about": "weigh_package",
+				"package_id":    "PKG-1001",
 			},
-			wantField: "field_package_id",
+			wantField: "package_id",
 		},
 		{
 			name:         "accounting",
 			protocolName: protocolAccountingV1,
 			fields: map[string]string{
-				"from":                  "fulfillment",
-				"to":                    "accounting",
-				"field_promise_about":   "shipment_update",
-				"field_order_id":        "ORDER-1001",
-				"field_tracking_number": "1Z71051733616616",
-				"field_cost_cents":      "860",
+				"from":            "fulfillment",
+				"to":              "accounting",
+				"promise_about":   "shipment_update",
+				"order_id":        "ORDER-1001",
+				"tracking_number": "1Z71051733616616",
+				"cost_cents":      "860",
 			},
-			wantField: "field_tracking_number",
+			wantField: "tracking_number",
 		},
 		{
 			name:         "ups label",
 			protocolName: protocolUPSLabelV1,
 			fields: map[string]string{
-				"from":                   "fulfillment",
-				"to":                     "ups_label_printer",
-				"field_promise_about":    "print_label",
-				"field_package_id":       "PKG-1001",
-				"field_shipping_address": "100 Promise Way",
-				"field_weight_ounces":    "43",
+				"from":             "fulfillment",
+				"to":               "ups_label_printer",
+				"promise_about":    "print_label",
+				"package_id":       "PKG-1001",
+				"shipping_address": "100 Promise Way",
+				"weight_ounces":    "43",
 			},
-			wantField: "field_shipping_address",
+			wantField: "shipping_address",
 		},
 		{
 			name:         "printer port",
 			protocolName: protocolPrinterPortV1,
 			fields: map[string]string{
-				"from":                             "ups_label_printer",
-				"to":                               "printer_port",
-				"field_promise_about":              "issue_print_capability",
-				"field_print_capability_issuee":    "ups_label_printer",
-				"field_print_capability_token_id":  "printcap-ups_label_printer",
-				"field_print_capability_scope":     "print_label",
-				"field_print_capability_max_bytes": "4096",
+				"from":                       "ups_label_printer",
+				"to":                         "printer_port",
+				"promise_about":              "issue_print_capability",
+				"print_capability_issuee":    "ups_label_printer",
+				"print_capability_token_id":  "printcap-ups_label_printer",
+				"print_capability_scope":     "print_label",
+				"print_capability_max_bytes": "4096",
 			},
-			wantField: "field_print_capability_issuee",
+			wantField: "print_capability_issuee",
 		},
 		{
 			name:         "cas storage",
 			protocolName: protocolCASStorageV1,
 			fields: map[string]string{
-				"from":                "alice",
-				"to":                  "bob",
-				"field_promise_about": "store_content",
-				"field_content_cid":   "cidv1-raw-sha2-256:abc",
-				"field_content_b64":   "YWJj",
-				"field_credit_offer":  "3",
-				"field_units":         "1",
+				"from":          "alice",
+				"to":            "bob",
+				"promise_about": "store_content",
+				"content_cid":   "cidv1-raw-sha2-256:abc",
+				"content_b64":   "YWJj",
+				"credit_offer":  "3",
+				"units":         "1",
 			},
-			wantField: "field_content_cid",
+			wantField: "content_cid",
 		},
 		{
 			name:         "cid compute",
 			protocolName: protocolCIDComputeV1,
 			fields: map[string]string{
-				"from":                 "alice",
-				"to":                   "carol",
-				"field_promise_about":  "execute_function",
-				"field_function_cid":   "cidv1-raw-sha2-256:function",
-				"field_function_b64":   "ZnVuY3Rpb24=",
-				"field_input_cid":      "cidv1-raw-sha2-256:input",
-				"field_input_b64":      "aW5wdXQ=",
-				"field_context_cid":    "cidv1-raw-sha2-256:context",
-				"field_context_b64":    "Y29udGV4dA==",
-				"field_credit_offer":   "5",
-				"field_units":          "2",
-				"field_capacity_probe": "false",
+				"from":           "alice",
+				"to":             "carol",
+				"promise_about":  "execute_function",
+				"function_cid":   "cidv1-raw-sha2-256:function",
+				"function_b64":   "ZnVuY3Rpb24=",
+				"input_cid":      "cidv1-raw-sha2-256:input",
+				"input_b64":      "aW5wdXQ=",
+				"context_cid":    "cidv1-raw-sha2-256:context",
+				"context_b64":    "Y29udGV4dA==",
+				"credit_offer":   "5",
+				"units":          "2",
+				"capacity_probe": "false",
 			},
-			wantField: "field_function_cid",
+			wantField: "function_cid",
 		},
 	}
 	for _, testCase := range testCases {
@@ -269,22 +269,26 @@ func TestKnownPayloadsUseArrayShape(t *testing.T) {
 			if len(payloadBytes) == 0 || payloadBytes[0]>>5 != 4 {
 				t.Fatalf("%s payload should be a CBOR array, got %x", testCase.protocolName, payloadBytes)
 			}
-			if bytes.Contains(payloadBytes, []byte("field_")) {
-				t.Fatalf("%s payload should not serialize compatibility field names: %x", testCase.protocolName, payloadBytes)
+			if bytes.Contains(payloadBytes, retiredPayloadPrefixBytes()) {
+				t.Fatalf("%s payload should not serialize retired prefixed key names: %x", testCase.protocolName, payloadBytes)
 			}
 			envelope, err := NewEnvelopeFromPayload(NewProtocolCID([]byte(testCase.protocolName+" test spec")), payloadBytes, testCase.fields["from"])
 			if err != nil {
 				t.Fatalf("new array envelope: %v", err)
 			}
-			fields, err := envelope.PayloadFields()
+			fields, err := PayloadFieldsForProtocolName(testCase.protocolName, envelope.Payload)
 			if err != nil {
 				t.Fatalf("payload fields: %v", err)
 			}
-			if fields["field_payload_shape"] != "cbor_array" || fields[testCase.wantField] == "" {
+			if fields["payload_protocol"] != testCase.protocolName || fields[testCase.wantField] == "" {
 				t.Fatalf("%s compatibility fields = %#v", testCase.protocolName, fields)
 			}
 		})
 	}
+}
+
+func retiredPayloadPrefixBytes() []byte {
+	return []byte("field" + "_")
 }
 
 func FuzzParseEnvelopeHandlesArbitraryBytes(f *testing.F) {

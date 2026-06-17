@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -57,6 +58,7 @@ type RunSummary struct {
 	MessageDAGMissingParentCount   int                     `json:"message_dag_missing_parent_count"`
 	MessageArtifactDirectionCounts map[string]int          `json:"message_artifact_direction_counts"`
 	MessageArtifactProtocolCounts  map[string]int          `json:"message_artifact_protocol_counts"`
+	MessageArtifactBadPrefixCount  int                     `json:"message_artifact_bad_prefix_count"`
 	MessageDAGParentLocationCounts map[string]int          `json:"message_dag_parent_location_counts"`
 	MessageShapeSpecimenCounts     map[string]int          `json:"message_shape_specimen_counts"`
 	MigrationCounts                map[string]int          `json:"migration_counts"`
@@ -458,6 +460,9 @@ func summarizeMessageArtifacts(runDir string, summary *RunSummary) error {
 		if actualHash != record.ExactSHA256 {
 			return fmt.Errorf("%s:%d: artifact hash mismatch record=%s actual=%s", indexPath, lineNumber, record.ExactSHA256, actualHash)
 		}
+		if bytes.Contains(artifactBytes, obsoletePayloadPrefixBytes()) {
+			summary.MessageArtifactBadPrefixCount++
+		}
 		summary.MessageDAGRecordCount++
 		if record.ParentExactSHA256 != "" {
 			summary.MessageDAGParentLinkCount++
@@ -564,6 +569,9 @@ func rawMessageArtifactFailures(summary RunSummary) []string {
 	if summary.MessageCASObjectCount == 0 {
 		failures = append(failures, "message_cas_object_count=0 want >0")
 	}
+	if summary.MessageArtifactBadPrefixCount != 0 {
+		failures = append(failures, fmt.Sprintf("message_artifact_bad_prefix_count=%d want 0", summary.MessageArtifactBadPrefixCount))
+	}
 	if summary.MessageDAGMissingParentCount != 0 {
 		failures = append(failures, fmt.Sprintf("message_dag_missing_parent_count=%d want 0", summary.MessageDAGMissingParentCount))
 	}
@@ -660,9 +668,15 @@ func knownProtocolNamesForAnalysis() []string {
 func requiredArrayPayloadProtocols() []string {
 	// Intent: POC15's fresh clean-run traffic should exercise pCID-owned arrays
 	// across relationship, kernel receive, device, CAS, compute, and identity
-	// protocols so field-map payloads cannot remain the implicit target shape.
-	// Source: DI-dirat
+	// protocols so generic map payloads cannot remain the implicit target shape.
+	// Source: DI-dirat; DI-pusak
 	return []string{pcid.KernelReceiveV1, pcid.CASStorageV1, pcid.CIDComputeV1, pcid.IdentityKeyV1, pcid.RouteV1, pcid.RelationshipV1, pcid.AccountingV1, pcid.UPSLabelV1, pcid.PostalScaleV1, pcid.PrinterPortV1}
+}
+
+func obsoletePayloadPrefixBytes() []byte {
+	// Intent: Keep the forbidden token out of source text while still checking
+	// retained raw CBOR bytes for the old naming mistake. Source: DI-pusak
+	return []byte("field" + "_")
 }
 
 func messageShapeSpecimenProtocols() []string {
@@ -901,10 +915,10 @@ func requiredRegressionEvents() []string {
 		"bad_proof_rejected",
 		"key_rotation_promise_recorded",
 		"promise_envelope_validated",
-		// Intent: CAS and compute have begun moving away from universal
-		// field_* maps; the regression must see pCID-owned array payloads in
-		// both directions before the run is considered clean. Source:
-		// DI-gahuh
+		// Intent: CAS and compute have begun moving away from universal generic
+		// maps; the regression must see pCID-owned array payloads in both
+		// directions before the run is considered clean. Source: DI-gahuh;
+		// DI-pusak
 		"pcid_owned_array_payload_sent",
 		"pcid_owned_array_payload_received",
 		"pcid_owned_array_ack_sent",

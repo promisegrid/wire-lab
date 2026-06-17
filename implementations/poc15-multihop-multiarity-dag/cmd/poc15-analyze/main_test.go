@@ -266,6 +266,36 @@ func TestAnalyzeRunSummarizesRawMessageArtifacts(t *testing.T) {
 	}
 }
 
+func TestAnalyzeRunCountsBadPayloadPrefixInRawMessageArtifacts(t *testing.T) {
+	// Intent: POC15 keeps raw CBOR messages for later review, so the analyzer
+	// must inspect the retained bytes and reject any return to the retired
+	// prefixed payload vocabulary. Source: DI-pusak
+	runDir := t.TempDir()
+	rawEnvelope := []byte{0xd9, 0x67, 0x72, 0x69, 0x64, 0x83, 0x01, 0x02, 0x03}
+	rawEnvelope = append(rawEnvelope, obsoletePayloadPrefixBytes()...)
+	exactHash := protocol.HashExactBytes(rawEnvelope)
+	writeFile(t, filepath.Join(runDir, "alice.jsonl"), `{"observer":"alice","event":"raw_message_artifact_emitted","outcome":"kept","peer":"bob","detail":"direction=sent pcid=route_v1 exact_sha256=`+exactHash+`"}`+"\n")
+	writeFile(t, filepath.Join(runDir, "monitor-report.json"), `{"promise_theory_fit":5,"autonomy":5,"protocol_validity":5,"local_trust_correctness":5,"imposition_avoidance":5,"summary":"clean","concerns":[]}`)
+	messageCASDir := filepath.Join(runDir, "message-cas")
+	if err := os.Mkdir(messageCASDir, 0o755); err != nil {
+		t.Fatalf("make message CAS dir: %v", err)
+	}
+	artifactPath := filepath.Join(messageCASDir, exactHash+".cbor")
+	writeBytes(t, artifactPath, rawEnvelope)
+	writeFile(t, filepath.Join(runDir, "message-dag.jsonl"), `{"cid":"cid://message","path":"message-cas/`+exactHash+`.cbor","exact_sha256":"`+exactHash+`","direction":"sent","protocol":"`+pcid.RouteV1+`","parents":[]}`+"\n")
+
+	summary, err := analyzeRun(runDir)
+	if err != nil {
+		t.Fatalf("analyze run: %v", err)
+	}
+	if summary.MessageArtifactBadPrefixCount != 1 {
+		t.Fatalf("bad prefix not counted: %#v", summary)
+	}
+	if failures := rawMessageArtifactFailures(summary); len(failures) == 0 {
+		t.Fatalf("bad prefix should fail raw message artifact checks")
+	}
+}
+
 func TestRawMessageArtifactFailuresCompareReachabilityToUniqueNodes(t *testing.T) {
 	summary := cleanRegressionSummary()
 	summary.MessageDAGRecordCount = 4

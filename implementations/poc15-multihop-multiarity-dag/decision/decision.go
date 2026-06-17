@@ -156,7 +156,7 @@ func Fields(observation Observation, decision PromiseDecision) map[string]string
 		"reason":  decision.Reason,
 	}
 	for key, value := range decision.Fields {
-		fields["field_"+key] = stringifyField(value)
+		fields[""+key] = stringifyField(value)
 	}
 	return fields
 }
@@ -177,7 +177,7 @@ func Prompt(observation Observation) (string, error) {
 		"\nThe target must be exactly one agent name, copied from direct_peers for ordinary promises. " +
 		"Never return a comma-separated target list. A candidate_peers target is valid only for a low-risk link-discovery promise with fields including {\"key\":\"promise_about\",\"value\":\"link_discovery\"}. " +
 		"Useful field keys are protocol, promise_about, package_id, order_id, weight_ounces, shipping_address, cost_cents, tracking_number, content_cid, function_cid, input_cid, context_cid, resource, units, stake, collateral, and discovery_reason. " +
-		"Use protocol=relationship_v1 for ordinary trust, discovery, observation, capacity, or pricing promises unless you can provide every required payload field for another pCID. Use protocol=postal_scale_v1 for package weighing, protocol=accounting_v1 for address lookup or shipment updates, protocol=ups_label_v1 for label/cost/tracking promises, protocol=cas_storage_v1 only for content-addressed storage payloads with concrete content/token fields, and protocol=cid_compute_v1 only for CID-named compute/cache/verifier payloads with concrete function/input/context/result fields. identity_key_v1 is reserved for scripted pCID-owned key-rotation array payloads, not live field-map turns. " +
+		"Use protocol=relationship_v1 for ordinary trust, discovery, observation, capacity, or pricing promises unless you can provide every required payload field for another pCID. Use protocol=postal_scale_v1 for package weighing, protocol=accounting_v1 for address lookup or shipment updates, protocol=ups_label_v1 for label/cost/tracking promises, protocol=cas_storage_v1 only for content-addressed storage payloads with concrete content/token fields, and protocol=cid_compute_v1 only for CID-named compute/cache/verifier payloads with concrete function/input/context/result fields. identity_key_v1 is reserved for scripted pCID-owned key-rotation array payloads, not live generic-map turns. " +
 		"Use resource=storage or resource=compute only when you personally promise fulfillment capacity, not when you advertise a need. " +
 		"Prefer a concrete, useful next promise that advances local motivation, reciprocal economics, relationship repair, storage, compute, verification, or event sharing visible in recent_events. Use event, promise, or outcome for local records; avoid proof-like nouns. Do not repeat the same promise_about/promise text to the same peer unless recent_events show a new event that changes its meaning. " +
 		"The only valid top-level act is promise. Put refusal, repair, observation, economics, and link-preference meaning inside the promise text or the fields key/value list. " +

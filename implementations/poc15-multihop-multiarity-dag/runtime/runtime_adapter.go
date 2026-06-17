@@ -38,10 +38,10 @@ func (node *Node) runWASMAdapterWorkflow(ctx context.Context) error {
 		runtimeadapter.PromiseAboutWASMAdapter,
 		"Peggy promises that her local WASM-adapter process executed an embedded wazero module and will exchange only pCID-defined PromiseGrid envelopes.",
 	)
-	fields["field_wasm_module_sha256"] = moduleHash
-	fields["field_wasm_export"] = result.ExportName
-	fields["field_wasm_export_value"] = fmt.Sprintf("%d", result.ExportValue)
-	fields["field_protocol"] = pcid.RelationshipV1
+	fields["wasm_module_sha256"] = moduleHash
+	fields["wasm_export"] = result.ExportName
+	fields["wasm_export_value"] = fmt.Sprintf("%d", result.ExportValue)
+	fields["protocol"] = pcid.RelationshipV1
 	if _, err := node.sendAndReceive(target, fields); err != nil {
 		return fmt.Errorf("wasm adapter promise: %w", err)
 	}
@@ -54,11 +54,11 @@ func (node *Node) runWASMAdapterWorkflow(ctx context.Context) error {
 		runtimeadapter.PromiseAboutWASMModuleUse,
 		"Peggy promises Dave a reusable WASM module-execution event: these module bytes were compiled, instantiated, and called with wazero, returning the expected deterministic value.",
 	)
-	usefulFields["field_wasm_module_sha256"] = moduleHash
-	usefulFields["field_wasm_export"] = result.ExportName
-	usefulFields["field_wasm_input_value"] = fmt.Sprintf("%d", result.InputValue)
-	usefulFields["field_wasm_export_value"] = fmt.Sprintf("%d", result.ExportValue)
-	usefulFields["field_protocol"] = pcid.RelationshipV1
+	usefulFields["wasm_module_sha256"] = moduleHash
+	usefulFields["wasm_export"] = result.ExportName
+	usefulFields["wasm_input_value"] = fmt.Sprintf("%d", result.InputValue)
+	usefulFields["wasm_export_value"] = fmt.Sprintf("%d", result.ExportValue)
+	usefulFields["protocol"] = pcid.RelationshipV1
 	if _, err := node.sendAndReceive(usefulTarget, usefulFields); err != nil {
 		return fmt.Errorf("wasm useful-work promise: %w", err)
 	}
@@ -119,7 +119,7 @@ func (node *Node) runStdioComputeWorker(message parsedMessage) ([]byte, error) {
 	if parseErr != nil {
 		return nil, node.finishStdioWorker(command, stdin, parseErr)
 	}
-	node.record("stdio_compute_worker_executed", "kept", target, "pcid="+ackMessage.ProtocolName+" result_cid="+ackMessage.Fields["field_result_cid"])
+	node.record("stdio_compute_worker_executed", "kept", target, "pcid="+ackMessage.ProtocolName+" result_cid="+ackMessage.Fields["result_cid"])
 	node.record("stdio_compute_ack_received", "kept", target, "pcid="+ackMessage.ProtocolName+" exact_sha256="+ackMessage.ExactHash)
 	if finishErr := node.finishStdioWorker(command, stdin, nil); finishErr != nil {
 		return nil, finishErr
@@ -193,8 +193,8 @@ func (node *Node) runStdioAdapterWorkflow(ctx context.Context) error {
 		runtimeadapter.PromiseAboutStdioWorkerUse,
 		"Victor promises Dave that a stdio-only subprocess round-tripped an exact signed PromiseGrid envelope and observed the peer ACK bytes without direct network access.",
 	)
-	usefulFields["field_ack_exact_sha256"] = observed.ExactSHA256
-	usefulFields["field_protocol"] = pcid.RelationshipV1
+	usefulFields["ack_exact_sha256"] = observed.ExactSHA256
+	usefulFields["protocol"] = pcid.RelationshipV1
 	if _, err := node.sendAndReceive(usefulTarget, usefulFields); err != nil {
 		return node.finishStdioWorker(command, stdin, fmt.Errorf("stdio useful-work promise: %w", err))
 	}
@@ -287,13 +287,13 @@ func (node *Node) recordPermanentDistrustAndTransitExclusionEvents() error {
 	node.record("input_transit_exclusion_recorded", "kept", "mallory", "Alice records that inbound traffic claiming Mallory as transit is not acceptable event for sensitive payload delivery")
 	node.record("output_transit_exclusion_recorded", "kept", "mallory", "Alice records that outbound traffic candidates naming Mallory as transit are locally rejected")
 	if _, err := node.sendAndReceive("mallory", map[string]string{
-		"act":                 "promise",
-		"from":                node.Agent.Name,
-		"to":                  "mallory",
-		"turn":                "startup",
-		"promise":             "Alice would normally promise a low-risk discovery probe, but Alice's permanent distrust state blocks this local send.",
-		"reason":              "permanent distrust should override ordinary candidate-peer repair or discovery",
-		"field_promise_about": "link_discovery",
+		"act":           "promise",
+		"from":          node.Agent.Name,
+		"to":            "mallory",
+		"turn":          "startup",
+		"promise":       "Alice would normally promise a low-risk discovery probe, but Alice's permanent distrust state blocks this local send.",
+		"reason":        "permanent distrust should override ordinary candidate-peer repair or discovery",
+		"promise_about": "link_discovery",
 	}); err == nil {
 		return fmt.Errorf("permanent distrust unexpectedly allowed send to mallory")
 	}

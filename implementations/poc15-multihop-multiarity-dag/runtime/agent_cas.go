@@ -843,9 +843,8 @@ func parentCIDsFromFields(fields map[string]string) []string {
 		return nil
 	}
 	parentHashes := []string{
-		fields["field_envelope_parent_exact_sha256"],
-		fields["field_payload_parent_exact_sha256"],
-		fields["field_parent_exact_sha256"],
+		fields["envelope_parent_exact_sha256"],
+		fields["payload_parent_exact_sha256"],
 		fields["parent_exact_sha256"],
 	}
 	parentCIDs := make([]string, 0, len(parentHashes))

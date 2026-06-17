@@ -4,7 +4,7 @@ package protocol
 // array with an extensible promise-body pair list.
 // Intent: Live LLM relationship promises need flexible body details, but fresh
 // wire bytes should still be arrays owned by relationship_v1 rather than a
-// generic field_* map. Source: DI-dirat
+// generic map. Source: DI-dirat
 func MarshalRelationshipPayloadFields(fields map[string]string) ([]byte, error) {
 	return marshalPairPayload(protocolRelationshipV1, fields)
 }
@@ -21,8 +21,8 @@ func RelationshipPayloadFields(payloadBytes []byte) (map[string]string, error) {
 // kernel, not an out-of-band control map or shared-volume registration file.
 // Source: DI-dirat
 func MarshalKernelReceivePayloadFields(fields map[string]string) ([]byte, error) {
-	if fields["field_promise_about"] == "" {
-		fields["field_promise_about"] = "receive_pcid"
+	if fields["promise_about"] == "" {
+		fields["promise_about"] = "receive_pcid"
 	}
 	return marshalPairPayload(protocolKernelReceiveV1, fields)
 }

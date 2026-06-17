@@ -38,32 +38,32 @@ func TestProductionWorkflowRejectsBadFacts(t *testing.T) {
 
 func TestPrintCapabilityTokenAndLocalPrintEvent(t *testing.T) {
 	capabilityFields := map[string]string{
-		"to":                               "ups_label_printer",
-		"field_print_capability_issuee":    "ups_label_printer",
-		"field_print_capability_token_id":  "printcap-ups_label_printer",
-		"field_print_capability_scope":     PrintCapabilityScope,
-		"field_print_capability_max_bytes": strconv.Itoa(PrintCapabilityMaxBytes),
+		"to":                         "ups_label_printer",
+		"print_capability_issuee":    "ups_label_printer",
+		"print_capability_token_id":  "printcap-ups_label_printer",
+		"print_capability_scope":     PrintCapabilityScope,
+		"print_capability_max_bytes": strconv.Itoa(PrintCapabilityMaxBytes),
 	}
 	token, tokenErr := IssuePrintCapabilityToken(capabilityFields)
 	if tokenErr != nil {
 		t.Fatalf("issue token: %v", tokenErr)
 	}
 	labelBytes, labelErr := LabelBytesForShipment(map[string]string{
-		"field_package_id":      "PKG-1001",
-		"field_tracking_number": "1Z71051733616616",
-		"field_cost_cents":      "860",
+		"package_id":      "PKG-1001",
+		"tracking_number": "1Z71051733616616",
+		"cost_cents":      "860",
 	})
 	if labelErr != nil {
 		t.Fatalf("label bytes: %v", labelErr)
 	}
 	redemptionFields := map[string]string{
-		"from":                             "ups_label_printer",
-		"field_print_capability_issuee":    "ups_label_printer",
-		"field_print_capability_token":     token,
-		"field_print_capability_token_id":  "printcap-ups_label_printer",
-		"field_print_capability_scope":     PrintCapabilityScope,
-		"field_print_capability_max_bytes": strconv.Itoa(PrintCapabilityMaxBytes),
-		"field_label_bytes_hex":            hex.EncodeToString(labelBytes),
+		"from":                       "ups_label_printer",
+		"print_capability_issuee":    "ups_label_printer",
+		"print_capability_token":     token,
+		"print_capability_token_id":  "printcap-ups_label_printer",
+		"print_capability_scope":     PrintCapabilityScope,
+		"print_capability_max_bytes": strconv.Itoa(PrintCapabilityMaxBytes),
+		"label_bytes_hex":            hex.EncodeToString(labelBytes),
 	}
 	if err := ValidatePrintCapabilityToken(redemptionFields); err != nil {
 		t.Fatalf("validate token: %v", err)
@@ -79,13 +79,13 @@ func TestPrintCapabilityTokenAndLocalPrintEvent(t *testing.T) {
 
 func TestPrintCapabilityRejectsWrongToken(t *testing.T) {
 	redemptionFields := map[string]string{
-		"from":                             "ups_label_printer",
-		"field_print_capability_issuee":    "ups_label_printer",
-		"field_print_capability_token":     "pcap1:bad",
-		"field_print_capability_token_id":  "printcap-ups_label_printer",
-		"field_print_capability_scope":     PrintCapabilityScope,
-		"field_print_capability_max_bytes": strconv.Itoa(PrintCapabilityMaxBytes),
-		"field_label_bytes_hex":            hex.EncodeToString([]byte("label")),
+		"from":                       "ups_label_printer",
+		"print_capability_issuee":    "ups_label_printer",
+		"print_capability_token":     "pcap1:bad",
+		"print_capability_token_id":  "printcap-ups_label_printer",
+		"print_capability_scope":     PrintCapabilityScope,
+		"print_capability_max_bytes": strconv.Itoa(PrintCapabilityMaxBytes),
+		"label_bytes_hex":            hex.EncodeToString([]byte("label")),
 	}
 	if err := ValidatePrintCapabilityToken(redemptionFields); err == nil {
 		t.Fatalf("wrong token should be rejected")

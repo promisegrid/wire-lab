@@ -34,11 +34,11 @@ func (node *Node) runMessageShapeSpecimenWorkflow() error {
 	}
 	for _, specimen := range specimens {
 		fields := map[string]string{
-			"field_promise_about": "message_shape_specimen",
+			"promise_about": "message_shape_specimen",
 		}
 		if specimen.ParentExactSHA256 != "" {
-			fields["field_parent_exact_sha256"] = specimen.ParentExactSHA256
-			fields["field_parent_link_location"] = specimen.ParentLinkLocation
+			fields["parent_exact_sha256"] = specimen.ParentExactSHA256
+			fields["parent_link_location"] = specimen.ParentLinkLocation
 		}
 		node.emitMessageArtifact("shape_specimen", specimen.Name, specimen.ProtocolName, specimen.EnvelopeBytes, fields)
 		node.record("message_shape_specimen_emitted", "kept", specimen.Name, "pcid="+specimen.ProtocolName+" shape="+specimen.Name+" exact_sha256="+protocol.HashExactBytes(specimen.EnvelopeBytes))
@@ -48,14 +48,14 @@ func (node *Node) runMessageShapeSpecimenWorkflow() error {
 
 func (node *Node) messageShapeSpecimens() ([]MessageShapeSpecimen, error) {
 	payloadBytes, payloadErr := protocol.MarshalRelationshipPayloadFields(map[string]string{
-		"act":                 decision.ActPromise,
-		"from":                node.Agent.Name,
-		"to":                  "operator",
-		"turn":                "startup",
-		"promise":             "Alice promises this message-shape specimen is local POC15 coverage, not a command to any peer.",
-		"reason":              "POC15 must compare pCID-owned slot vectors by exact bytes",
-		"field_promise_about": "message_shape_specimen",
-		"field_shape_scope":   "operator_review",
+		"act":           decision.ActPromise,
+		"from":          node.Agent.Name,
+		"to":            "operator",
+		"turn":          "startup",
+		"promise":       "Alice promises this message-shape specimen is local POC15 coverage, not a command to any peer.",
+		"reason":        "POC15 must compare pCID-owned slot vectors by exact bytes",
+		"promise_about": "message_shape_specimen",
+		"shape_scope":   "operator_review",
 	})
 	if payloadErr != nil {
 		return nil, payloadErr

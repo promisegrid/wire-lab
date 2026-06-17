@@ -111,13 +111,13 @@ func RunWASMModule(ctx context.Context, moduleBytes []byte, inputValue uint64) (
 // envelope through the normal POC15 app/kernel path.
 func PromiseFields(fromAgent, toAgent, promiseAbout, promiseText string) map[string]string {
 	return map[string]string{
-		"act":                 "promise",
-		"from":                fromAgent,
-		"to":                  toAgent,
-		"turn":                "startup",
-		"promise":             promiseText,
-		"reason":              "heterogeneous runtime adapter events expressed as a local promise",
-		"field_promise_about": promiseAbout,
+		"act":           "promise",
+		"from":          fromAgent,
+		"to":            toAgent,
+		"turn":          "startup",
+		"promise":       promiseText,
+		"reason":        "heterogeneous runtime adapter events expressed as a local promise",
+		"promise_about": promiseAbout,
 	}
 }
 

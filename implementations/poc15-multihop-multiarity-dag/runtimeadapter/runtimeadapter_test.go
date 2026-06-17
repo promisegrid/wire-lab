@@ -49,8 +49,8 @@ func TestPromiseFieldsUsesSinglePromiseAction(t *testing.T) {
 	if fields["act"] != "promise" {
 		t.Fatalf("act = %q, want promise", fields["act"])
 	}
-	if fields["field_promise_about"] != PromiseAboutStdioAdapter {
-		t.Fatalf("field_promise_about = %q, want %q", fields["field_promise_about"], PromiseAboutStdioAdapter)
+	if fields["promise_about"] != PromiseAboutStdioAdapter {
+		t.Fatalf("promise_about = %q, want %q", fields["promise_about"], PromiseAboutStdioAdapter)
 	}
 }
 

@@ -2,13 +2,15 @@ package protocol
 
 import "fmt"
 
+const protocolIdentityKeyV1 = "identity_key_v1"
+
 const identityKeyRotateSigningKey = "rotate_signing_key"
 const identityKeyRotateSigningKeyAck = "rotate_signing_key_ack"
 
 // IdentityKeyRotationPayload is the POC15 identity_key_v1 request payload.
 // Intent: `identity_key_v1` is the first POC15 pCID migrated away from the
-// legacy field_* string-map scaffold into a pCID-owned CBOR array. Source:
-// DI-vipih
+// earlier generic string-map scaffold into a pCID-owned CBOR array. Source:
+// DI-vipih; DI-pusak
 type IdentityKeyRotationPayload struct {
 	Promiser      string
 	Promisee      string
@@ -18,7 +20,7 @@ type IdentityKeyRotationPayload struct {
 
 // IdentityKeyRotationAckPayload is the POC15 identity_key_v1 ACK payload.
 // Intent: ACKs for migrated pCIDs should also remain pCID-owned arrays instead
-// of reintroducing field maps through generic ACK construction. Source:
+// of reintroducing generic map payloads through ACK construction. Source:
 // DI-vipih
 type IdentityKeyRotationAckPayload struct {
 	Promiser      string
@@ -106,10 +108,10 @@ func IdentityKeyPayloadFields(payloadBytes []byte) (map[string]string, error) {
 		return nil, err
 	}
 	fields := map[string]string{
-		"act":                 "promise",
-		"from":                promiser,
-		"to":                  promisee,
-		"field_promise_about": identityKeyRotateSigningKey,
+		"act":           "promise",
+		"from":          promiser,
+		"to":            promisee,
+		"promise_about": identityKeyRotateSigningKey,
 	}
 	switch promiseKind {
 	case identityKeyRotateSigningKey:
@@ -124,8 +126,8 @@ func IdentityKeyPayloadFields(payloadBytes []byte) (map[string]string, error) {
 		if readErr != nil {
 			return nil, readErr
 		}
-		fields["field_new_key_label"] = newKeyLabel
-		fields["field_rotation_scope"] = rotationScope
+		fields["new_key_label"] = newKeyLabel
+		fields["rotation_scope"] = rotationScope
 	case identityKeyRotateSigningKeyAck:
 		if bodyLength != 4 {
 			return nil, fmt.Errorf("rotate_signing_key_ack body must have 4 slots, got %d", bodyLength)
@@ -146,11 +148,11 @@ func IdentityKeyPayloadFields(payloadBytes []byte) (map[string]string, error) {
 		if readErr != nil {
 			return nil, readErr
 		}
-		fields["field_promise_about"] = identityKeyRotateSigningKey
+		fields["promise_about"] = identityKeyRotateSigningKey
 		fields["outcome"] = outcome
 		fields["promise"] = promiseText
-		fields["field_new_key_label"] = newKeyLabel
-		fields["field_rotation_scope"] = rotationScope
+		fields["new_key_label"] = newKeyLabel
+		fields["rotation_scope"] = rotationScope
 	default:
 		return nil, fmt.Errorf("unsupported identity_key_v1 promise kind %q", promiseKind)
 	}

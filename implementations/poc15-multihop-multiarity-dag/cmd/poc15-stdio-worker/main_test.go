@@ -17,21 +17,21 @@ func TestRunWithIOComputesCIDPromise(t *testing.T) {
 	inputBytes := production.SampleInputBytes()
 	contextBytes := production.SampleContextBytes()
 	fields := map[string]string{
-		"act":                 "promise",
-		"from":                "alice",
-		"to":                  "victor",
-		"turn":                "test",
-		"promise":             "Alice promises to receive Victor's stdio compute result.",
-		"reason":              "test stdio compute promise",
-		"field_promise_about": production.PromiseExecuteFunction,
-		"field_function_cid":  production.ContentCID(functionBytes),
-		"field_function_b64":  base64.StdEncoding.EncodeToString(functionBytes),
-		"field_input_cid":     production.ContentCID(inputBytes),
-		"field_input_b64":     base64.StdEncoding.EncodeToString(inputBytes),
-		"field_context_cid":   production.ContentCID(contextBytes),
-		"field_context_b64":   base64.StdEncoding.EncodeToString(contextBytes),
-		"field_credit_offer":  "5",
-		"field_units":         "1",
+		"act":           "promise",
+		"from":          "alice",
+		"to":            "victor",
+		"turn":          "test",
+		"promise":       "Alice promises to receive Victor's stdio compute result.",
+		"reason":        "test stdio compute promise",
+		"promise_about": production.PromiseExecuteFunction,
+		"function_cid":  production.ContentCID(functionBytes),
+		"function_b64":  base64.StdEncoding.EncodeToString(functionBytes),
+		"input_cid":     production.ContentCID(inputBytes),
+		"input_b64":     base64.StdEncoding.EncodeToString(inputBytes),
+		"context_cid":   production.ContentCID(contextBytes),
+		"context_b64":   base64.StdEncoding.EncodeToString(contextBytes),
+		"credit_offer":  "5",
+		"units":         "1",
 	}
 	payloadBytes, _, payloadErr := protocol.MarshalKnownArrayPayload(pcid.CIDComputeV1, fields)
 	if payloadErr != nil {
@@ -85,14 +85,14 @@ func TestRunWithIOComputesCIDPromise(t *testing.T) {
 	if fieldsErr != nil {
 		t.Fatalf("ack fields: %v", fieldsErr)
 	}
-	if ackFields["from"] != "victor" || ackFields["to"] != "alice" || ackFields["field_result_cid"] == "" {
+	if ackFields["from"] != "victor" || ackFields["to"] != "alice" || ackFields["result_cid"] == "" {
 		t.Fatalf("unexpected ack fields: %#v", ackFields)
 	}
 	expectedBytes, expectedErr := production.ExecuteFunction(functionBytes, inputBytes, contextBytes)
 	if expectedErr != nil {
 		t.Fatalf("expected compute: %v", expectedErr)
 	}
-	if ackFields["field_result_cid"] != production.ContentCID(expectedBytes) {
-		t.Fatalf("result cid = %s, want %s", ackFields["field_result_cid"], production.ContentCID(expectedBytes))
+	if ackFields["result_cid"] != production.ContentCID(expectedBytes) {
+		t.Fatalf("result cid = %s, want %s", ackFields["result_cid"], production.ContentCID(expectedBytes))
 	}
 }

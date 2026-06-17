@@ -198,8 +198,8 @@ func (kernel *Kernel) handlePeerConn(conn net.Conn) {
 }
 
 func (kernel *Kernel) registerReceiver(frameConn transport.FrameConn, message parsedEnvelope) {
-	appName := firstField(message.fields, "app", "field_app", "from")
-	protocolName := firstField(message.fields, "pcid", "field_pcid", "protocol", "field_protocol")
+	appName := firstField(message.fields, "app", "from")
+	protocolName := firstField(message.fields, "pcid", "protocol")
 	if appName == "" || protocolName == "" {
 		kernel.closeFrameConn(frameConn, "kernel_receive_conn_close_failed", appName)
 		kernel.record("kernel_receive_promise_malformed", "malformed", appName, "receive promise requires app and pcid fields")
@@ -346,13 +346,13 @@ func (kernel *Kernel) parseEnvelope(frameBytes []byte) (parsedEnvelope, error) {
 	if verifyErr := protocol.VerifyEnvelope(envelope); verifyErr != nil {
 		return parsedEnvelope{}, verifyErr
 	}
-	fields, fieldsErr := envelope.PayloadFields()
-	if fieldsErr != nil {
-		return parsedEnvelope{}, fieldsErr
-	}
 	protocolName, known := kernel.Protocols.Name(envelope.ProtocolCID)
 	if !known {
 		protocolName = "unknown:" + envelope.ProtocolCID.String()
+	}
+	fields, fieldsErr := fieldsForProtocolName(envelope, protocolName, known)
+	if fieldsErr != nil {
+		return parsedEnvelope{}, fieldsErr
 	}
 	return parsedEnvelope{
 		fields:       fields,
@@ -360,6 +360,16 @@ func (kernel *Kernel) parseEnvelope(frameBytes []byte) (parsedEnvelope, error) {
 		protocolCID:  envelope.ProtocolCID,
 		protocolName: protocolName,
 	}, nil
+}
+
+func fieldsForProtocolName(envelope protocol.Envelope, protocolName string, known bool) (map[string]string, error) {
+	// Intent: The local kernel routes by the pCID from slot 0 before projecting
+	// slot 1 into local compatibility fields, avoiding shape-compatible decoder
+	// confusion between protocols. Source: DI-pusak
+	if known {
+		return protocol.PayloadFieldsForProtocolName(protocolName, envelope.Payload)
+	}
+	return envelope.PayloadFields()
 }
 
 func (kernel *Kernel) notPromisedAck(message parsedEnvelope, promiseText string) []byte {
@@ -371,10 +381,10 @@ func (kernel *Kernel) notPromisedAck(message parsedEnvelope, promiseText string)
 		"promise": promiseText,
 		"reason":  "kernel transport non-commitment expressed as local promise content",
 	}
-	if promiseAbout := message.fields["field_promise_about"]; promiseAbout != "" {
-		ackFields["field_promise_about"] = promiseAbout
+	if promiseAbout := message.fields["promise_about"]; promiseAbout != "" {
+		ackFields["promise_about"] = promiseAbout
 	} else if message.protocolName == pcid.RelationshipV1 {
-		ackFields["field_promise_about"] = "local_observation"
+		ackFields["promise_about"] = "local_observation"
 	}
 	ack, ackErr := kernel.newAckEnvelope(message, ackFields)
 	if ackErr != nil {

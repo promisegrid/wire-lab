@@ -49,7 +49,7 @@ func runWithIO(input io.Reader, output io.Writer) error {
 		runtimeadapter.PromiseAboutStdioAdapter,
 		"Victor promises that this worker process sends and receives PromiseGrid envelopes only through stdio.",
 	)
-	fields["field_protocol"] = pcid.RelationshipV1
+	fields["protocol"] = pcid.RelationshipV1
 	payloadBytes, _, payloadErr := protocol.MarshalKnownArrayPayload(pcid.RelationshipV1, fields)
 	if payloadErr != nil {
 		return payloadErr
@@ -96,7 +96,8 @@ func runWithIO(input io.Reader, output io.Writer) error {
 	if verifyErr := protocol.VerifyEnvelope(ackEnvelope); verifyErr != nil {
 		return verifyErr
 	}
-	ackFields, fieldsErr := ackEnvelope.PayloadFields()
+	ackProtocolName, ackKnown := registry.Name(ackEnvelope.ProtocolCID)
+	ackFields, fieldsErr := fieldsForProtocolName(ackEnvelope, ackProtocolName, ackKnown)
 	if fieldsErr != nil {
 		return fieldsErr
 	}
@@ -127,11 +128,12 @@ func runComputeRequest(request runtimeadapter.StdioCBOREnvelope, output io.Write
 	if verifyErr := protocol.VerifyEnvelope(envelope); verifyErr != nil {
 		return verifyErr
 	}
-	fields, fieldsErr := envelope.PayloadFields()
+	protocolName, known := registry.Name(envelope.ProtocolCID)
+	fields, fieldsErr := fieldsForProtocolName(envelope, protocolName, known)
 	if fieldsErr != nil {
 		return fieldsErr
 	}
-	if fields["field_promise_about"] != production.PromiseExecuteFunction || fields["from"] != request.From || fields["to"] != request.To {
+	if fields["promise_about"] != production.PromiseExecuteFunction || fields["from"] != request.From || fields["to"] != request.To {
 		return fmt.Errorf("stdio compute request payload does not match request frame")
 	}
 	inputs, decodeErr := production.DecodeComputeInputs(fields)
@@ -172,4 +174,14 @@ func runComputeRequest(request runtimeadapter.StdioCBOREnvelope, output io.Write
 	// CBOR-framed bytes; Victor's adapter forwards those exact bytes back to
 	// Alice instead of translating them into an RPC result. Source: DI-sivis
 	return runtimeadapter.WriteCBORFrame(output, ackFrameBytes)
+}
+
+func fieldsForProtocolName(envelope protocol.Envelope, protocolName string, known bool) (map[string]string, error) {
+	// Intent: Victor's stdio worker receives exact envelopes and must decode
+	// payload bytes according to the pCID in slot 0, not by guessing compatible
+	// array shapes. Source: DI-pusak
+	if known {
+		return protocol.PayloadFieldsForProtocolName(protocolName, envelope.Payload)
+	}
+	return envelope.PayloadFields()
 }

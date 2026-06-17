@@ -253,6 +253,15 @@ Constraints: Preserve observer-only `message-cas/*.cbor`; preserve run-scoped cl
 Affects: implementations/poc15-multihop-multiarity-dag/runtime/; implementations/poc15-multihop-multiarity-dag/docs/; implementations/poc15-multihop-multiarity-dag/README.md; DEV-GUIDE-RESOURCES.md; protocols/wire-lab.d/TODO/TODO-gogug-poc13-hardening-and-poc14-superset-plan.md.
 Supersedes: DI-manul
 
+ID: DI-pusak
+Date: 2026-06-16 21:19:56
+Status: active
+Decision: Remove the bad `field_` prefix vocabulary from POC15 payload names entirely, without preserving historical-input compatibility, while allowing pCID specs to choose either compact CBOR arrays or self-documenting CBOR maps.
+Intent: POC15 should no longer leak the earlier universal field-map scaffold into runtime code, tests, docs, analyzer checks, or retained artifacts. Payload names should be ordinary pCID-local names such as `promise_about`, `content_cid`, and `function_cid`; payload shape is defined by the pCID rather than by a `payload_shape` field. CBOR maps are permissible when a pCID deliberately chooses self-documenting payloads, but compact arrays remain preferred for constrained or IoT-facing protocols.
+Constraints: No normal POC15 code path may accept, emit, translate, or document `field_` payload names; do not add historical compatibility adapters; do not introduce `payload_shape` as a protocol key; preserve one top-level semantic action `promise`; preserve `grid([42(pCID), ...])`; preserve existing POC15 behavior except the naming cleanup; add static and run-artifact gates so `field_` cannot regress.
+Affects: implementations/poc15-multihop-multiarity-dag/; protocols/wire-lab.d/TODO/TODO-gogug-poc13-hardening-and-poc14-superset-plan.md; DEV-GUIDE-RESOURCES.md.
+Supersedes: DI-gahuh; DI-dirat
+
 ## Tasks
 
 - [x] gogug.1 Fix POC13 evidence summary mismatch so saved evidence counts include all local non-commitment outcomes, not only receiver-side `not_promised` journal entries.
@@ -345,3 +354,9 @@ Supersedes: DI-manul
 - [x] gogug.88 Update DEV guide current design state for per-agent filesystem CAS.
 - [x] gogug.89 Run Go validation, errcheck, and clean POC15 containers.
 - [x] gogug.90 Review POC15 results for agent CAS score, exact-byte retrieval, and observer-CAS separation.
+- [x] gogug.91 Remove `field_` payload prefixes from POC15 code, tests, and docs.
+- [x] gogug.92 Remove `payload_shape` as a decoded/protocol payload key.
+- [x] gogug.93 Document that pCIDs may choose CBOR maps, while constrained/IoT profiles should prefer arrays.
+- [x] gogug.94 Add static regression coverage forbidding `field_` under POC15.
+- [x] gogug.95 Add analyzer/run-artifact coverage forbidding literal `field_` in retained raw CBOR messages.
+- [x] gogug.96 Run Go validation, errcheck, and clean POC15 containers after the naming cleanup.
