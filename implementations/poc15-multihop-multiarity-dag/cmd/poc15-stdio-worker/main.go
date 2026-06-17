@@ -158,7 +158,11 @@ func runComputeRequest(request runtimeadapter.StdioCBOREnvelope, output io.Write
 	if payloadErr != nil {
 		return payloadErr
 	}
-	ackEnvelope, envelopeErr := protocol.NewEnvelopeFromPayload(registry.MustCID(pcid.CIDComputeV1), payloadBytes, request.To)
+	// Intent: The stdio worker signs a real pCID-owned ACK envelope and links it
+	// to the exact request bytes it received, preserving persistent-session DAG
+	// correlation without extending the local stdio frame shape. Source:
+	// DI-vopab
+	ackEnvelope, envelopeErr := protocol.NewEnvelopeFromPayloadWithParents(registry.MustCID(pcid.CIDComputeV1), payloadBytes, []string{protocol.HashExactBytes(request.EnvelopeBytes)}, request.To)
 	if envelopeErr != nil {
 		return envelopeErr
 	}

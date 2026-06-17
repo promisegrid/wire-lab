@@ -262,6 +262,15 @@ Constraints: No normal POC15 code path may accept, emit, translate, or document 
 Affects: implementations/poc15-multihop-multiarity-dag/; protocols/wire-lab.d/TODO/TODO-gogug-poc13-hardening-and-poc14-superset-plan.md; DEV-GUIDE-RESOURCES.md.
 Supersedes: DI-gahuh; DI-dirat
 
+ID: DI-vopab
+Date: 2026-06-17 05:19:44
+Status: active
+Decision: Patch POC15 so all TCP paths use persistent multiplexed `persistent_session` connections, with exact message CIDs as local pending-request keys and ACK/response envelopes parent-linking the request message CID.
+Intent: POC15 should test production-shaped long-lived transport without inventing RPC request IDs or authority-like session commands. Persistent sessions reduce per-message dial churn, exercise concurrent in-flight promises, and use the existing raw-message DAG identity model: a response names the request by parent link, while each agent/kernel still makes local promises about what it will send, receive, queue, reconnect, or refuse.
+Constraints: Preserve one top-level semantic action `promise`; keep app trust and workflow judgment outside the kernel; do not add RPC method/request-ID vocabulary; use event names beginning with `persistent_session_`; make app/kernel and kernel/kernel TCP paths persistent; require POC15-generated ACKs/responses to include the request exact hash as an envelope parent; keep all persistence run-scoped; add analyzer and unit gates; run Go tests, errcheck, forbidden-term scans, and clean POC15 containers.
+Affects: docs/thought-experiments/TE-lubid-poc15-persistent-multiplexed-sessions.md; implementations/poc15-multihop-multiarity-dag/; DEV-GUIDE-RESOURCES.md; protocols/wire-lab.d/TODO/TODO-gogug-poc13-hardening-and-poc14-superset-plan.md.
+Supersedes: none
+
 ## Tasks
 
 - [x] gogug.1 Fix POC13 evidence summary mismatch so saved evidence counts include all local non-commitment outcomes, not only receiver-side `not_promised` journal entries.
@@ -360,3 +369,10 @@ Supersedes: DI-gahuh; DI-dirat
 - [x] gogug.94 Add static regression coverage forbidding `field_` under POC15.
 - [x] gogug.95 Add analyzer/run-artifact coverage forbidding literal `field_` in retained raw CBOR messages.
 - [x] gogug.96 Run Go validation, errcheck, and clean POC15 containers after the naming cleanup.
+- [x] gogug.97 Write TE-lubid for POC15 persistent multiplexed TCP sessions.
+- [x] gogug.98 Add persistent session transport code keyed by request message CID.
+- [x] gogug.99 Convert app/kernel TCP traffic to persistent multiplexed sessions.
+- [x] gogug.100 Convert kernel/kernel peer forwarding to persistent multiplexed sessions.
+- [x] gogug.101 Require ACK/response parent links and add analyzer gates.
+- [x] gogug.102 Update POC15 docs and DEV guide for persistent sessions.
+- [x] gogug.103 Run Go validation, errcheck, scans, and clean POC15 containers.

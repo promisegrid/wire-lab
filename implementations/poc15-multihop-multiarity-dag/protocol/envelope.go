@@ -92,11 +92,20 @@ type Envelope struct {
 // Intent: Preserve existing POC15 flows while `DI-vipih` migrates new protocol
 // work toward pCID-owned array payloads. Source: DI-vipih
 func NewEnvelope(protocolCID ProtocolCID, fields map[string]string, signer string) (Envelope, error) {
+	return NewEnvelopeWithParents(protocolCID, fields, nil, signer)
+}
+
+// NewEnvelopeWithParents builds an older generic map payload and signs it with
+// parent links over the same signable view used by pCID-owned array payloads.
+// Intent: POC15 ACKs must be able to parent-link the request message CID even
+// when a not-yet-migrated pCID still uses the generic map scaffold. Source:
+// DI-vopab
+func NewEnvelopeWithParents(protocolCID ProtocolCID, fields map[string]string, parentExactSHA256s []string, signer string) (Envelope, error) {
 	payloadBytes, marshalErr := MarshalStringMap(fields)
 	if marshalErr != nil {
 		return Envelope{}, marshalErr
 	}
-	return NewEnvelopeFromPayload(protocolCID, payloadBytes, signer)
+	return NewEnvelopeFromPayloadWithParents(protocolCID, payloadBytes, parentExactSHA256s, signer)
 }
 
 // NewEnvelopeFromPayload signs an already-encoded pCID-owned payload.

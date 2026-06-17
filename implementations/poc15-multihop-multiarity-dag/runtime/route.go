@@ -234,7 +234,7 @@ func (node *Node) handleRouteCarriedEnvelope(fields map[string]string) (string, 
 	ackBytes := handlerResult.AckBytes
 	ackFields := handlerResult.Fields
 	if len(ackBytes) == 0 {
-		builtAck, buildErr := node.newRouteCarriedAckBytes(carriedMessage.Fields["from"], carriedMessage.ProtocolCID, ackFields)
+		builtAck, buildErr := node.newRouteCarriedAckBytes(carriedMessage.Fields["from"], carriedMessage.ProtocolCID, carriedMessage.ExactHash, ackFields)
 		if buildErr != nil {
 			return "", buildErr
 		}
@@ -254,7 +254,7 @@ func (node *Node) handleRouteCarriedEnvelope(fields map[string]string) (string, 
 	return ackMessage.ExactHash, nil
 }
 
-func (node *Node) newRouteCarriedAckBytes(target string, protocolCID protocol.ProtocolCID, extraFields map[string]string) ([]byte, error) {
+func (node *Node) newRouteCarriedAckBytes(target string, protocolCID protocol.ProtocolCID, parentExactSHA256 string, extraFields map[string]string) ([]byte, error) {
 	ackFields := map[string]string{
 		"act":     decision.ActPromise,
 		"from":    node.Agent.Name,
@@ -270,7 +270,11 @@ func (node *Node) newRouteCarriedAckBytes(target string, protocolCID protocol.Pr
 	if !protocolKnown {
 		return nil, fmt.Errorf("route carried ACK protocol is unknown")
 	}
-	ackEnvelope, _, buildErr := node.buildEnvelopeFromFields(protocolName, protocolCID, ackFields)
+	// Intent: The route-carried reply remains a normal pCID ACK, but its
+	// envelope parent link names the exact carried request so the message DAG can
+	// correlate it over persistent sessions without an RPC request ID. Source:
+	// DI-vopab
+	ackEnvelope, _, buildErr := node.buildEnvelopeFromFieldsWithParents(protocolName, protocolCID, ackFields, []string{parentExactSHA256})
 	if buildErr != nil {
 		return nil, buildErr
 	}

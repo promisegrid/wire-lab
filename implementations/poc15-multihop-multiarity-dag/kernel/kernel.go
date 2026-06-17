@@ -9,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 
@@ -37,6 +38,7 @@ type Kernel struct {
 
 	mu             sync.Mutex
 	receivers      map[receiverKey]*receiver
+	peerSessions   map[string]*transport.PersistentSession
 	appListener    net.Listener
 	peerListener   net.Listener
 	logFile        *os.File
@@ -55,8 +57,7 @@ type receiver struct {
 	appName      string
 	protocolName string
 	protocolCID  protocol.ProtocolCID
-	frameConn    transport.FrameConn
-	mu           sync.Mutex
+	session      *transport.PersistentSession
 }
 
 type parsedEnvelope struct {
@@ -73,6 +74,7 @@ func New(cfg config.Config, containerName string) *Kernel {
 		ContainerName: containerName,
 		Protocols:     pcid.NewRegistry(),
 		receivers:     make(map[receiverKey]*receiver),
+		peerSessions:  make(map[string]*transport.PersistentSession),
 	}
 }
 
@@ -88,8 +90,9 @@ func (kernel *Kernel) Run(ctx context.Context) error {
 	}
 	<-ctx.Done()
 	kernel.closeListeners()
-	kernel.drainHandlers(ctx)
 	kernel.closeReceivers()
+	kernel.closePeerSessions()
+	kernel.drainHandlers(ctx)
 	return nil
 }
 
@@ -151,63 +154,93 @@ func (kernel *Kernel) acceptLoop(ctx context.Context, listener net.Listener, don
 
 func (kernel *Kernel) handleAppConn(conn net.Conn) {
 	frameConn := transport.NewFrameConn(conn)
-	frameBytes, readErr := frameConn.ReadFrame()
-	if readErr != nil {
-		kernel.closeFrameConn(frameConn, "kernel_app_conn_close_failed", "")
-		kernel.record("kernel_app_frame_read_failed", "broken", "", readErr.Error())
-		return
-	}
+	var session *transport.PersistentSession
+	sessionReady := make(chan struct{})
+	// Intent: One local app TCP stream now carries receive-promise registration,
+	// outbound app requests, and inbound kernel deliveries. The session demuxes
+	// replies by parent-linked exact message CIDs, not by RPC IDs. Source:
+	// DI-vopab
+	session = transport.NewPersistentSession(
+		"kernel-app:"+kernel.ContainerName+":"+conn.RemoteAddr().String(),
+		frameConn,
+		kernel.frameParentExactSHA256s,
+		kernel.frameIsResponse,
+		func(frameBytes []byte) ([]byte, error) {
+			<-sessionReady
+			return kernel.handleAppSessionFrame(session, frameBytes)
+		},
+		func(eventName, outcome, detail string) {
+			kernel.record(eventName, outcome, "app", detail)
+		},
+	)
+	close(sessionReady)
+	<-session.Done()
+}
+
+func (kernel *Kernel) handlePeerConn(conn net.Conn) {
+	frameConn := transport.NewFrameConn(conn)
+	// Intent: Peer kernels keep one TCP frame stream open long enough to carry
+	// many exact envelopes in either direction; app trust remains outside this
+	// transport reuse decision. Source: DI-vopab
+	session := transport.NewPersistentSession(
+		"kernel-peer-in:"+kernel.ContainerName+":"+conn.RemoteAddr().String(),
+		frameConn,
+		kernel.frameParentExactSHA256s,
+		kernel.frameIsResponse,
+		kernel.handlePeerSessionFrame,
+		func(eventName, outcome, detail string) {
+			kernel.record(eventName, outcome, "peer", detail)
+		},
+	)
+	<-session.Done()
+}
+
+func (kernel *Kernel) handleAppSessionFrame(session *transport.PersistentSession, frameBytes []byte) ([]byte, error) {
+	// Intent: Kernel receive registrations update only the local routing table;
+	// all other app frames are routed as exact promise envelopes on the same
+	// persistent session. Source: DI-vopab
 	message, parseErr := kernel.parseEnvelope(frameBytes)
 	if parseErr != nil {
-		kernel.closeFrameConn(frameConn, "kernel_app_conn_close_failed", "")
 		kernel.record("kernel_app_frame_parse_failed", "broken", "", parseErr.Error())
-		return
+		return nil, parseErr
 	}
 	if message.protocolName == pcid.KernelReceiveV1 {
-		kernel.registerReceiver(frameConn, message)
-		return
+		kernel.registerReceiver(session, message)
+		return nil, nil
 	}
-	defer kernel.closeFrameConn(frameConn, "kernel_app_conn_close_failed", message.fields["to"])
 	ackBytes, routeErr := kernel.routeFromLocalApp(frameBytes, message)
 	if routeErr != nil {
 		kernel.record("kernel_route_failed", "broken", message.fields["to"], routeErr.Error())
 		ackBytes = kernel.notPromisedAck(message, "I promise I could not route this exact envelope through the local kernel.")
 	}
-	if writeErr := frameConn.WriteFrame(ackBytes); writeErr != nil {
-		kernel.record("kernel_app_ack_write_failed", "broken", message.fields["from"], writeErr.Error())
-	}
+	return ackBytes, nil
 }
 
-func (kernel *Kernel) handlePeerConn(conn net.Conn) {
-	frameConn := transport.NewFrameConn(conn)
-	defer kernel.closeFrameConn(frameConn, "kernel_peer_conn_close_failed", "")
-	frameBytes, readErr := frameConn.ReadFrame()
-	if readErr != nil {
-		kernel.record("kernel_peer_frame_read_failed", "broken", "", readErr.Error())
-		return
-	}
+func (kernel *Kernel) handlePeerSessionFrame(frameBytes []byte) ([]byte, error) {
+	// Intent: A peer frame is only an exact signed envelope to deliver locally;
+	// this handler does not infer global authority from the peer TCP session.
+	// Source: DI-vopab
 	message, parseErr := kernel.parseEnvelope(frameBytes)
 	if parseErr != nil {
 		kernel.record("kernel_peer_frame_parse_failed", "broken", "", parseErr.Error())
-		return
+		return nil, parseErr
 	}
-	ackBytes := kernel.deliverToLocalApp(frameBytes, message)
-	if writeErr := frameConn.WriteFrame(ackBytes); writeErr != nil {
-		kernel.record("kernel_peer_ack_write_failed", "broken", message.fields["from"], writeErr.Error())
-	}
+	return kernel.deliverToLocalApp(frameBytes, message), nil
 }
 
-func (kernel *Kernel) registerReceiver(frameConn transport.FrameConn, message parsedEnvelope) {
+func (kernel *Kernel) registerReceiver(session *transport.PersistentSession, message parsedEnvelope) {
+	// Intent: A local app promises pCID receive capability over its existing
+	// app/kernel session. The kernel remembers that promise as routing state but
+	// does not judge whether later payload promises are trustworthy. Source:
+	// DI-vopab
 	appName := firstField(message.fields, "app", "from")
 	protocolName := firstField(message.fields, "pcid", "protocol")
 	if appName == "" || protocolName == "" {
-		kernel.closeFrameConn(frameConn, "kernel_receive_conn_close_failed", appName)
 		kernel.record("kernel_receive_promise_malformed", "malformed", appName, "receive promise requires app and pcid fields")
 		return
 	}
 	protocolCID, known := kernel.Protocols.CID(protocolName)
 	if !known || protocolName == pcid.KernelReceiveV1 {
-		kernel.closeFrameConn(frameConn, "kernel_receive_conn_close_failed", appName)
 		kernel.record("kernel_receive_promise_rejected", "non_commitment", appName, "unknown or kernel-internal pCID "+protocolName)
 		return
 	}
@@ -218,11 +251,13 @@ func (kernel *Kernel) registerReceiver(frameConn transport.FrameConn, message pa
 		appName:      appName,
 		protocolName: protocolName,
 		protocolCID:  protocolCID,
-		frameConn:    frameConn,
+		session:      session,
 	}
 	kernel.mu.Unlock()
-	if oldReceiver != nil {
-		kernel.closeFrameConn(oldReceiver.frameConn, "kernel_receive_conn_replaced", appName)
+	if oldReceiver != nil && oldReceiver.session != session {
+		if closeErr := oldReceiver.session.Close(); closeErr != nil {
+			kernel.record("kernel_receive_conn_replaced_close_failed", "broken", appName, closeErr.Error())
+		}
 	}
 	kernel.record("app_receive_promise_registered", "kept", appName, "pcid="+protocolName+" promise="+message.fields["promise"])
 }
@@ -248,33 +283,87 @@ func (kernel *Kernel) forwardToPeerKernel(target string, frameBytes []byte) ([]b
 		return nil, fmt.Errorf("no peer kernel endpoint for target %s", target)
 	}
 	endpoint := net.JoinHostPort(hostName, strconv.Itoa(peerPort))
-	deadline := time.Now().Add(peerSendTimeout)
-	var frameConn transport.FrameConn
-	var dialErr error
-	for {
-		frameConn, dialErr = transport.DialFrameConn(endpoint, peerRouteAttemptTimeout)
-		if dialErr == nil {
-			break
-		}
-		if time.Now().Add(peerRouteRetryDelay).After(deadline) {
-			return nil, dialErr
-		}
-		// Intent: Startup DNS/container ordering is a transport readiness issue,
-		// not an event showing that the peer refused the promise. Retry only the
-		// peer-kernel dial for a bounded window, then preserve the original
-		// failure as a local route failure. Source: DI-nivon
-		time.Sleep(peerRouteRetryDelay)
+	session, sessionErr := kernel.peerSessionForEndpoint(endpoint, target)
+	if sessionErr != nil {
+		return nil, sessionErr
 	}
-	defer kernel.closeFrameConn(frameConn, "kernel_peer_send_close_failed", target)
-	if writeErr := frameConn.WriteFrame(frameBytes); writeErr != nil {
-		return nil, writeErr
-	}
-	ackBytes, readErr := frameConn.ReadFrame()
+	ctx, cancel := context.WithTimeout(context.Background(), peerSendTimeout)
+	defer cancel()
+	ackBytes, readErr := session.RoundTrip(ctx, protocol.HashExactBytes(frameBytes), frameBytes)
 	if readErr != nil {
+		kernel.removePeerSession(endpoint, session, target)
 		return nil, readErr
 	}
 	kernel.record("kernel_peer_forwarded", "kept", target, "forwarded exact envelope to peer kernel")
 	return ackBytes, nil
+}
+
+func (kernel *Kernel) peerSessionForEndpoint(endpoint, target string) (*transport.PersistentSession, error) {
+	// Intent: Reuse one outbound peer-kernel stream per endpoint so routing
+	// tests exercise persistent TCP behavior while preserving exact message CIDs
+	// as the only correlation IDs. Source: DI-vopab
+	kernel.mu.Lock()
+	existingSession := kernel.peerSessions[endpoint]
+	kernel.mu.Unlock()
+	if existingSession != nil {
+		return existingSession, nil
+	}
+	frameConn, dialErr := kernel.dialPeerEndpoint(endpoint)
+	if dialErr != nil {
+		return nil, dialErr
+	}
+	session := transport.NewPersistentSession(
+		"kernel-peer-out:"+kernel.ContainerName+":"+endpoint,
+		frameConn,
+		kernel.frameParentExactSHA256s,
+		kernel.frameIsResponse,
+		kernel.handlePeerSessionFrame,
+		func(eventName, outcome, detail string) {
+			kernel.record(eventName, outcome, target, detail)
+		},
+	)
+	kernel.mu.Lock()
+	defer kernel.mu.Unlock()
+	if existingSession = kernel.peerSessions[endpoint]; existingSession != nil {
+		if closeErr := session.Close(); closeErr != nil {
+			kernel.record("kernel_peer_duplicate_session_close_failed", "broken", target, closeErr.Error())
+		}
+		return existingSession, nil
+	}
+	kernel.peerSessions[endpoint] = session
+	return session, nil
+}
+
+func (kernel *Kernel) dialPeerEndpoint(endpoint string) (transport.FrameConn, error) {
+	deadline := time.Now().Add(peerSendTimeout)
+	for {
+		frameConn, dialErr := transport.DialFrameConn(endpoint, peerRouteAttemptTimeout)
+		if dialErr == nil {
+			return frameConn, nil
+		}
+		if time.Now().Add(peerRouteRetryDelay).After(deadline) {
+			return transport.FrameConn{}, dialErr
+		}
+		// Intent: Startup DNS/container ordering is a transport readiness issue,
+		// not an event showing that the peer refused the promise. Retry only the
+		// peer-kernel dial for a bounded window, then preserve the original
+		// failure as a local route failure. Source: DI-nivon; DI-vopab
+		time.Sleep(peerRouteRetryDelay)
+	}
+}
+
+func (kernel *Kernel) removePeerSession(endpoint string, session *transport.PersistentSession, target string) {
+	// Intent: A failed persistent peer stream is a local transport event only;
+	// removing it permits a later fresh promise attempt without mutating app
+	// trust directly. Source: DI-vopab
+	kernel.mu.Lock()
+	if kernel.peerSessions[endpoint] == session {
+		delete(kernel.peerSessions, endpoint)
+	}
+	kernel.mu.Unlock()
+	if closeErr := session.Close(); closeErr != nil {
+		kernel.record("kernel_peer_session_close_failed", "broken", target, closeErr.Error())
+	}
 }
 
 func (kernel *Kernel) deliverToLocalApp(frameBytes []byte, message parsedEnvelope) []byte {
@@ -323,13 +412,9 @@ func (kernel *Kernel) deliverToLocalApp(frameBytes []byte, message parsedEnvelop
 		kernel.record("kernel_unregistered_pcid", "non_commitment", target, "no local app promised pcid="+message.protocolName)
 		return kernel.notPromisedAck(message, "I promise no local app has promised to receive this pCID.")
 	}
-	receiver.mu.Lock()
-	defer receiver.mu.Unlock()
-	if writeErr := receiver.frameConn.WriteFrame(frameBytes); writeErr != nil {
-		kernel.record("kernel_app_deliver_failed", "broken", target, writeErr.Error())
-		return kernel.notPromisedAck(message, "I promise local app delivery failed before the app could judge the message.")
-	}
-	ackBytes, readErr := receiver.frameConn.ReadFrame()
+	ctx, cancel := context.WithTimeout(context.Background(), peerSendTimeout)
+	defer cancel()
+	ackBytes, readErr := receiver.session.RoundTrip(ctx, message.exactHash, frameBytes)
 	if readErr != nil {
 		kernel.record("kernel_app_ack_read_failed", "broken", target, readErr.Error())
 		return kernel.notPromisedAck(message, "I promise local app delivery failed while waiting for app event.")
@@ -360,6 +445,29 @@ func (kernel *Kernel) parseEnvelope(frameBytes []byte) (parsedEnvelope, error) {
 		protocolCID:  envelope.ProtocolCID,
 		protocolName: protocolName,
 	}, nil
+}
+
+func (kernel *Kernel) frameParentExactSHA256s(frameBytes []byte) ([]string, error) {
+	// Intent: Persistent-session demux reads parent links from the signed
+	// envelope itself, keeping correlation in the message DAG instead of a
+	// separate transport header. Source: DI-vopab
+	envelope, parseErr := protocol.ParseEnvelope(frameBytes)
+	if parseErr != nil {
+		return nil, parseErr
+	}
+	return append([]string(nil), envelope.ParentExactSHA256s...), nil
+}
+
+func (kernel *Kernel) frameIsResponse(frameBytes []byte) (bool, error) {
+	// Intent: Kernel persistent sessions should drop unmatched ACK-like responses
+	// instead of delivering them to apps or peer kernels as new promises. This is
+	// a pCID-decoded transport demux check; apps still own semantic judgment.
+	// Source: DI-vopab
+	message, parseErr := kernel.parseEnvelope(frameBytes)
+	if parseErr != nil {
+		return false, parseErr
+	}
+	return strings.TrimSpace(message.fields["outcome"]) != "", nil
 }
 
 func fieldsForProtocolName(envelope protocol.Envelope, protocolName string, known bool) (map[string]string, error) {
@@ -402,11 +510,13 @@ func (kernel *Kernel) notPromisedAck(message parsedEnvelope, promiseText string)
 func (kernel *Kernel) newAckEnvelope(message parsedEnvelope, ackFields map[string]string) (protocol.Envelope, error) {
 	// Intent: Kernel ACKs are transport non-commitment promises, but their payload
 	// still belongs to the original pCID when that pCID has a migrated array
-	// encoder. Source: DI-dirat
+	// encoder. Persistent-session ACKs also parent-link the request exact hash so
+	// peers can correlate responses by message DAG rather than RPC IDs. Source:
+	// DI-dirat; DI-vopab
 	if payloadBytes, arrayPayload, payloadErr := protocol.MarshalKnownArrayPayload(message.protocolName, ackFields); payloadErr == nil && arrayPayload {
-		return protocol.NewEnvelopeFromPayload(message.protocolCID, payloadBytes, "kernel:"+kernel.ContainerName)
+		return protocol.NewEnvelopeFromPayloadWithParents(message.protocolCID, payloadBytes, []string{message.exactHash}, "kernel:"+kernel.ContainerName)
 	}
-	return protocol.NewEnvelope(message.protocolCID, ackFields, "kernel:"+kernel.ContainerName)
+	return protocol.NewEnvelopeWithParents(message.protocolCID, ackFields, []string{message.exactHash}, "kernel:"+kernel.ContainerName)
 }
 
 func firstField(fields map[string]string, keys ...string) string {
@@ -491,21 +601,44 @@ func (kernel *Kernel) waitForListener(done chan struct{}, listenerName string) {
 }
 
 func (kernel *Kernel) closeReceivers() {
+	// Intent: Multiple pCID receive promises can share one app/kernel session,
+	// so shutdown closes each session once rather than once per protocol. Source:
+	// DI-vopab
 	kernel.mu.Lock()
-	receivers := make([]*receiver, 0, len(kernel.receivers))
+	receiverSessions := make(map[*transport.PersistentSession]string)
 	for _, registeredReceiver := range kernel.receivers {
-		receivers = append(receivers, registeredReceiver)
+		receiverSessions[registeredReceiver.session] = registeredReceiver.appName
 	}
 	kernel.receivers = make(map[receiverKey]*receiver)
 	kernel.mu.Unlock()
-	for _, registeredReceiver := range receivers {
-		kernel.closeFrameConn(registeredReceiver.frameConn, "kernel_receive_conn_close_failed", registeredReceiver.appName)
+	for registeredSession, appName := range receiverSessions {
+		if registeredSession == nil {
+			continue
+		}
+		if closeErr := registeredSession.Close(); closeErr != nil {
+			kernel.record("kernel_receive_session_close_failed", "broken", appName, closeErr.Error())
+		}
 	}
 }
 
-func (kernel *Kernel) closeFrameConn(frameConn transport.FrameConn, eventName, peerName string) {
-	if err := frameConn.Close(); err != nil {
-		kernel.record(eventName, "broken", peerName, err.Error())
+func (kernel *Kernel) closePeerSessions() {
+	// Intent: Peer-kernel sessions are run-scoped transport promises; closing
+	// them at shutdown prevents durable TCP state from leaking into later POC
+	// runs. Source: DI-vopab
+	kernel.mu.Lock()
+	peerSessions := make(map[string]*transport.PersistentSession, len(kernel.peerSessions))
+	for endpoint, session := range kernel.peerSessions {
+		peerSessions[endpoint] = session
+	}
+	kernel.peerSessions = make(map[string]*transport.PersistentSession)
+	kernel.mu.Unlock()
+	for endpoint, session := range peerSessions {
+		if session == nil {
+			continue
+		}
+		if closeErr := session.Close(); closeErr != nil {
+			kernel.record("kernel_peer_session_close_failed", "broken", endpoint, closeErr.Error())
+		}
 	}
 }
 

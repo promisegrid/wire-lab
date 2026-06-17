@@ -70,7 +70,7 @@ type Node struct {
 	exchangeCounter      int
 
 	activeHandlers sync.WaitGroup
-	receiveConns   []transport.FrameConn
+	appSession     *transport.PersistentSession
 	stopping       bool
 	drainRecorded  bool
 }
@@ -905,15 +905,39 @@ func (node *Node) registerReceivePromises(ctx context.Context) error {
 		node.record("app_kernel_registration_skipped", "kept", "", "no local kernel address for app")
 		return nil
 	}
+	frameConn, dialErr := transport.DialFrameConn(kernelAddress, sendTimeout)
+	if dialErr != nil {
+		return dialErr
+	}
+	// Intent: The app keeps one app/kernel session for both registering local
+	// receive promises and sending exact envelopes. Replies are correlated by
+	// parent-linked message CIDs, not by an RPC request table in payloads. Source:
+	// DI-vopab
+	session := transport.NewPersistentSession(
+		"app-kernel:"+node.Agent.Name,
+		frameConn,
+		frameParentExactSHA256s,
+		node.frameIsResponse,
+		node.handleAppSessionFrame,
+		func(eventName, outcome, detail string) {
+			node.record(eventName, outcome, "kernel", detail)
+		},
+	)
+	node.mu.Lock()
+	node.appSession = session
+	node.mu.Unlock()
 	for _, protocolName := range node.Agent.Protocols() {
-		if err := node.registerReceivePromise(ctx, kernelAddress, protocolName); err != nil {
+		if err := node.registerReceivePromise(ctx, session, kernelAddress, protocolName); err != nil {
+			if closeErr := session.Close(); closeErr != nil {
+				node.record("app_kernel_session_close_failed", "broken", "kernel", closeErr.Error())
+			}
 			return err
 		}
 	}
 	return nil
 }
 
-func (node *Node) registerReceivePromise(ctx context.Context, kernelAddress, protocolName string) error {
+func (node *Node) registerReceivePromise(ctx context.Context, session *transport.PersistentSession, kernelAddress, protocolName string) error {
 	if ctx.Err() != nil {
 		return ctx.Err()
 	}
@@ -948,22 +972,9 @@ func (node *Node) registerReceivePromise(ctx context.Context, kernelAddress, pro
 		return bytesErr
 	}
 	node.emitMessageArtifact("receive_promise_sent", "kernel", pcid.KernelReceiveV1, envelopeBytes, fields)
-	frameConn, dialErr := transport.DialFrameConn(kernelAddress, sendTimeout)
-	if dialErr != nil {
-		return dialErr
-	}
-	if writeErr := frameConn.WriteFrame(envelopeBytes); writeErr != nil {
-		closeErr := frameConn.Close()
-		if closeErr != nil {
-			node.record("app_kernel_register_close_failed", "broken", "kernel", closeErr.Error())
-		}
+	if writeErr := session.Send(ctx, envelopeBytes); writeErr != nil {
 		return writeErr
 	}
-	node.mu.Lock()
-	node.receiveConns = append(node.receiveConns, frameConn)
-	node.mu.Unlock()
-	node.activeHandlers.Add(1)
-	go node.receiveLoop(protocolName, frameConn)
 	node.record("pcid_owned_array_payload_sent", "kept", "kernel", "pcid="+pcid.KernelReceiveV1+" promise_about="+fields["promise_about"]+" exact_sha256="+protocol.HashExactBytes(envelopeBytes))
 	node.record("app_receive_promise_sent", "kept", "kernel", "pcid="+protocolName+" kernel="+kernelAddress)
 	node.record("app_kernel_backpressure_promised", "kept", "kernel", "pcid="+protocolName+" app promises bounded receive buffering through the local kernel")
@@ -971,28 +982,14 @@ func (node *Node) registerReceivePromise(ctx context.Context, kernelAddress, pro
 	return nil
 }
 
-func (node *Node) receiveLoop(protocolName string, frameConn transport.FrameConn) {
+func (node *Node) handleAppSessionFrame(frameBytes []byte) ([]byte, error) {
+	// Intent: The app/kernel TCP stream is shared by receive promises and app
+	// sends, so each inbound kernel delivery is handled as an ordinary local app
+	// promise event while the persistent session owns byte correlation. Source:
+	// DI-vopab
+	node.activeHandlers.Add(1)
 	defer node.activeHandlers.Done()
-	for {
-		frameBytes, readErr := frameConn.ReadFrame()
-		if readErr != nil {
-			if node.isStopping() {
-				node.record("app_receive_loop_closed", "kept", "kernel", "pcid="+protocolName)
-				return
-			}
-			node.record("app_receive_frame_read_failed", "broken", "kernel", readErr.Error())
-			return
-		}
-		ackBytes, handleErr := node.handleFrame(frameBytes)
-		if handleErr != nil {
-			node.record("app_receive_frame_rejected", "broken", "kernel", handleErr.Error())
-			return
-		}
-		if writeErr := frameConn.WriteFrame(ackBytes); writeErr != nil {
-			node.record("app_receive_ack_write_failed", "broken", "kernel", writeErr.Error())
-			return
-		}
-	}
+	return node.handleFrame(frameBytes)
 }
 
 func (node *Node) handleFrame(frameBytes []byte) ([]byte, error) {
@@ -1012,20 +1009,20 @@ func (node *Node) handleFrame(frameBytes []byte) ([]byte, error) {
 		node.record("pcid_owned_array_payload_received", "kept", fromAgent, "pcid="+parsed.ProtocolName+" promise_about="+fields["promise_about"]+" exact_sha256="+parsed.ExactHash)
 	}
 	if node.rememberReplayEnvelope(fromAgent, parsed.ProtocolName, parsed.ExactHash) {
-		return node.newAckBytes(fromAgent, "not_promised", "I promise to remember that I already saw this exact envelope and will not treat the replay as fresh promise event.", parsed.ProtocolCID, map[string]string{"replay_status": "not_promised"})
+		return node.newAckBytes(fromAgent, "not_promised", "I promise to remember that I already saw this exact envelope and will not treat the replay as fresh promise event.", parsed.ProtocolCID, parsed.ExactHash, map[string]string{"replay_status": "not_promised"})
 	}
 	if !node.supportsProtocol(parsed.ProtocolName) {
 		node.record("unsupported_pcid", "non_commitment", fromAgent, "no local app receive promise for "+parsed.ProtocolName)
-		return node.newAckBytes(fromAgent, "not_promised", "I promise to remember that I did not promise to handle this pCID.", parsed.ProtocolCID, nil)
+		return node.newAckBytes(fromAgent, "not_promised", "I promise to remember that I did not promise to handle this pCID.", parsed.ProtocolCID, parsed.ExactHash, nil)
 	}
 	if fields["act"] != decision.ActPromise {
 		node.observeOutcome(fromAgent, relationship.OutcomeMalformed)
 		node.record("message_rejected", "malformed", fromAgent, "message act is not promise")
-		return node.newAckBytes(fromAgent, "malformed", "I promise I rejected this non-promise message.", parsed.ProtocolCID, nil)
+		return node.newAckBytes(fromAgent, "malformed", "I promise I rejected this non-promise message.", parsed.ProtocolCID, parsed.ExactHash, nil)
 	}
 	if !node.canAcceptFrom(fromAgent, fields) {
 		node.record("message_not_promised", "non_commitment", fromAgent, "no current local promise to accept direct TCP exchange")
-		return node.newAckBytes(fromAgent, "not_promised", "I promise to remember that I did not currently promise this direct exchange.", parsed.ProtocolCID, nil)
+		return node.newAckBytes(fromAgent, "not_promised", "I promise to remember that I did not currently promise this direct exchange.", parsed.ProtocolCID, parsed.ExactHash, nil)
 	}
 	node.recordInboundPressurePromises(fromAgent, parsed.ProtocolName, fields)
 	promiseID := node.rememberOutstandingPromise(fromAgent, parsed.ProtocolName, parsed.ExactHash, fields)
@@ -1034,7 +1031,7 @@ func (node *Node) handleFrame(frameBytes []byte) ([]byte, error) {
 		node.observeOutcome(fromAgent, relationship.OutcomeBroken)
 		node.applyBrokenPromiseCost(fromAgent, fields, resourceErr.Error())
 		node.record("resource_promise_rejected", "broken", fromAgent, resourceErr.Error())
-		return node.newAckBytes(fromAgent, "broken", "I promise I rejected this resource promise because local checks failed.", parsed.ProtocolCID, nil)
+		return node.newAckBytes(fromAgent, "broken", "I promise I rejected this resource promise because local checks failed.", parsed.ProtocolCID, parsed.ExactHash, nil)
 	}
 	handlerResult, handlerErr := node.handleProtocolPromise(parsed)
 	if handlerErr != nil {
@@ -1042,7 +1039,7 @@ func (node *Node) handleFrame(frameBytes []byte) ([]byte, error) {
 		node.observeOutcome(fromAgent, relationship.OutcomeBroken)
 		node.applyBrokenPromiseCost(fromAgent, fields, handlerErr.Error())
 		node.record("protocol_handler_rejected", "broken", fromAgent, handlerErr.Error())
-		return node.newAckBytes(fromAgent, "broken", "I promise I rejected this protocol promise because local app checks failed.", parsed.ProtocolCID, nil)
+		return node.newAckBytes(fromAgent, "broken", "I promise I rejected this protocol promise because local app checks failed.", parsed.ProtocolCID, parsed.ExactHash, nil)
 	}
 	ackFields := handlerResult.Fields
 	ackBytes := handlerResult.AckBytes
@@ -1053,7 +1050,7 @@ func (node *Node) handleFrame(frameBytes []byte) ([]byte, error) {
 			node.observeOutcome(fromAgent, relationship.OutcomeBroken)
 			node.applyBrokenPromiseCost(fromAgent, fields, parseErr.Error())
 			node.record("protocol_handler_rejected", "broken", fromAgent, parseErr.Error())
-			return node.newAckBytes(fromAgent, "broken", "I promise I rejected this protocol promise because local app checks failed.", parsed.ProtocolCID, nil)
+			return node.newAckBytes(fromAgent, "broken", "I promise I rejected this protocol promise because local app checks failed.", parsed.ProtocolCID, parsed.ExactHash, nil)
 		}
 		ackFields = ackMessage.Fields
 		node.emitMessageArtifact("ack_sent", fromAgent, ackMessage.ProtocolName, ackBytes, ackFields)
@@ -1074,10 +1071,10 @@ func (node *Node) handleFrame(frameBytes []byte) ([]byte, error) {
 	if len(ackBytes) > 0 {
 		return ackBytes, nil
 	}
-	return node.newAckBytes(fromAgent, "kept", "I promise I received and recorded your signed promise message.", parsed.ProtocolCID, ackFields)
+	return node.newAckBytes(fromAgent, "kept", "I promise I received and recorded your signed promise message.", parsed.ProtocolCID, parsed.ExactHash, ackFields)
 }
 
-func (node *Node) newAckBytes(target, outcome, promiseText string, protocolCID protocol.ProtocolCID, extraFields map[string]string) ([]byte, error) {
+func (node *Node) newAckBytes(target, outcome, promiseText string, protocolCID protocol.ProtocolCID, parentExactSHA256 string, extraFields map[string]string) ([]byte, error) {
 	ackFields := map[string]string{
 		"act":     decision.ActPromise,
 		"from":    node.Agent.Name,
@@ -1114,7 +1111,7 @@ func (node *Node) newAckBytes(target, outcome, promiseText string, protocolCID p
 			node.record("ack_sign_failed", "broken", target, payloadErr.Error())
 			return nil, payloadErr
 		}
-		ack, ackErr := protocol.NewEnvelopeFromPayload(protocolCID, payloadBytes, node.Agent.Name)
+		ack, ackErr := protocol.NewEnvelopeFromPayloadWithParents(protocolCID, payloadBytes, []string{parentExactSHA256}, node.Agent.Name)
 		if ackErr != nil {
 			node.record("ack_sign_failed", "broken", target, ackErr.Error())
 			return nil, ackErr
@@ -1133,7 +1130,7 @@ func (node *Node) newAckBytes(target, outcome, promiseText string, protocolCID p
 		if ackFields["promise_about"] == "" && (protocolName == pcid.RelationshipV1 || protocolName == pcid.KernelReceiveV1) {
 			ackFields["promise_about"] = "local_observation"
 		}
-		ack, arrayPayload, ackErr := node.buildEnvelopeFromFields(protocolName, protocolCID, ackFields)
+		ack, arrayPayload, ackErr := node.buildEnvelopeFromFieldsWithParents(protocolName, protocolCID, ackFields, []string{parentExactSHA256})
 		if ackErr == nil && arrayPayload {
 			// Intent: Migrated pCIDs must keep ACKs in the same pCID-owned
 			// positional payload family as their requests, rather than falling
@@ -1149,7 +1146,7 @@ func (node *Node) newAckBytes(target, outcome, promiseText string, protocolCID p
 			return ackBytes, nil
 		}
 	}
-	ack, ackErr := protocol.NewEnvelope(protocolCID, ackFields, node.Agent.Name)
+	ack, ackErr := protocol.NewEnvelopeWithParents(protocolCID, ackFields, []string{parentExactSHA256}, node.Agent.Name)
 	if ackErr != nil {
 		node.record("ack_sign_failed", "broken", target, ackErr.Error())
 		return nil, ackErr
@@ -1204,27 +1201,19 @@ func (node *Node) sendAndReceive(target string, fields map[string]string) (parse
 	exactHash := protocol.HashExactBytes(envelopeBytes)
 	node.recordOutboundPressurePromises(target, protocolName, fields)
 	promiseID := node.rememberOutstandingPromise(target, protocolName, exactHash, fields)
-	kernelAddress, addressFound := node.Config.KernelAppAddressForAgent(node.Agent.Name)
-	if !addressFound {
-		node.resolveOutstandingPromise(promiseID, promiseStatusLocalFailure, "missing local kernel endpoint")
-		return parsedMessage{}, fmt.Errorf("no local kernel endpoint for app %s", node.Agent.Name)
-	}
-	frameConn, dialErr := transport.DialFrameConn(kernelAddress, sendTimeout)
-	if dialErr != nil {
-		node.resolveOutstandingPromise(promiseID, promiseStatusLocalFailure, dialErr.Error())
-		return parsedMessage{}, dialErr
-	}
-	defer node.closeFrameConn(frameConn, "send_close_failed", target)
-	if writeErr := frameConn.WriteFrame(envelopeBytes); writeErr != nil {
-		node.resolveOutstandingPromise(promiseID, promiseStatusLocalFailure, writeErr.Error())
-		return parsedMessage{}, writeErr
+	session := node.appKernelSession()
+	if session == nil {
+		node.resolveOutstandingPromise(promiseID, promiseStatusLocalFailure, "missing local persistent app-kernel session")
+		return parsedMessage{}, fmt.Errorf("no local persistent app-kernel session for app %s", node.Agent.Name)
 	}
 	node.emitMessageArtifact("sent", target, protocolName, envelopeBytes, fields)
 	if arrayPayload {
 		node.record("pcid_owned_array_payload_sent", "kept", target, "pcid="+protocolName+" promise_about="+fields["promise_about"]+" exact_sha256="+exactHash)
 	}
 	node.record("tcp_message_sent", "kept", target, "pcid="+protocolName+" exact_sha256="+exactHash)
-	ackBytes, readErr := frameConn.ReadFrame()
+	roundTripCtx, cancel := context.WithTimeout(context.Background(), sendTimeout)
+	defer cancel()
+	ackBytes, readErr := session.RoundTrip(roundTripCtx, exactHash, envelopeBytes)
 	if readErr != nil {
 		node.resolveOutstandingPromise(promiseID, promiseStatusLocalFailure, readErr.Error())
 		return parsedMessage{}, readErr
@@ -1266,17 +1255,41 @@ func (node *Node) sendAndReceive(target string, fields map[string]string) (parse
 // wire payload for migrated pCIDs is no longer a universal named map.
 // Source: DI-gahuh; DI-pusak
 func (node *Node) buildEnvelopeFromFields(protocolName string, protocolCID protocol.ProtocolCID, fields map[string]string) (protocol.Envelope, bool, error) {
+	return node.buildEnvelopeFromFieldsWithParents(protocolName, protocolCID, fields, nil)
+}
+
+func (node *Node) buildEnvelopeFromFieldsWithParents(protocolName string, protocolCID protocol.ProtocolCID, fields map[string]string, parentExactSHA256s []string) (protocol.Envelope, bool, error) {
 	payloadBytes, arrayPayload, payloadErr := protocol.MarshalKnownArrayPayload(protocolName, fields)
 	if payloadErr != nil {
 		return protocol.Envelope{}, false, payloadErr
 	}
+	mergedParents := mergeParentExactSHA256s(parentExactSHA256s, envelopeParentExactSHA256sForFields(protocolName, fields))
 	if arrayPayload {
-		parentExactSHA256s := envelopeParentExactSHA256sForFields(protocolName, fields)
-		envelope, envelopeErr := protocol.NewEnvelopeFromPayloadWithParents(protocolCID, payloadBytes, parentExactSHA256s, node.Agent.Name)
+		// Intent: ACKs and route-carried messages both use envelope parent links,
+		// but ACK parents come from the exact request CID while route parents can
+		// also be pCID-defined fields. Merge them without adding RPC IDs. Source:
+		// DI-vopab
+		envelope, envelopeErr := protocol.NewEnvelopeFromPayloadWithParents(protocolCID, payloadBytes, mergedParents, node.Agent.Name)
 		return envelope, true, envelopeErr
 	}
-	envelope, envelopeErr := protocol.NewEnvelope(protocolCID, fields, node.Agent.Name)
+	envelope, envelopeErr := protocol.NewEnvelopeWithParents(protocolCID, fields, mergedParents, node.Agent.Name)
 	return envelope, false, envelopeErr
+}
+
+func mergeParentExactSHA256s(parentLists ...[]string) []string {
+	seenParents := make(map[string]bool)
+	mergedParents := make([]string, 0)
+	for _, parentList := range parentLists {
+		for _, parentExactSHA256 := range parentList {
+			parentExactSHA256 = strings.TrimSpace(parentExactSHA256)
+			if parentExactSHA256 == "" || seenParents[parentExactSHA256] {
+				continue
+			}
+			seenParents[parentExactSHA256] = true
+			mergedParents = append(mergedParents, parentExactSHA256)
+		}
+	}
+	return mergedParents
 }
 
 func envelopeParentExactSHA256sForFields(protocolName string, fields map[string]string) []string {
@@ -1421,17 +1434,9 @@ func (node *Node) sendRawEnvelopeBytes(target, protocolName string, envelopeByte
 	if !node.canDialTarget(target, nil) {
 		return parsedMessage{}, nil, fmt.Errorf("no local TCP promise to %s", target)
 	}
-	kernelAddress, addressFound := node.Config.KernelAppAddressForAgent(node.Agent.Name)
-	if !addressFound {
-		return parsedMessage{}, nil, fmt.Errorf("no local kernel endpoint for app %s", node.Agent.Name)
-	}
-	frameConn, dialErr := transport.DialFrameConn(kernelAddress, sendTimeout)
-	if dialErr != nil {
-		return parsedMessage{}, nil, dialErr
-	}
-	defer node.closeFrameConn(frameConn, "send_close_failed", target)
-	if writeErr := frameConn.WriteFrame(envelopeBytes); writeErr != nil {
-		return parsedMessage{}, nil, writeErr
+	session := node.appKernelSession()
+	if session == nil {
+		return parsedMessage{}, nil, fmt.Errorf("no local persistent app-kernel session for app %s", node.Agent.Name)
 	}
 	if sentMessage, parseErr := node.parseEnvelope(envelopeBytes); parseErr == nil {
 		node.emitMessageArtifact("sent", target, sentMessage.ProtocolName, envelopeBytes, sentMessage.Fields)
@@ -1442,7 +1447,9 @@ func (node *Node) sendRawEnvelopeBytes(target, protocolName string, envelopeByte
 		node.emitMessageArtifact("sent_malformed", target, protocolName, envelopeBytes, nil)
 	}
 	node.record("tcp_message_sent", "kept", target, "pcid="+protocolName+" exact_sha256="+protocol.HashExactBytes(envelopeBytes))
-	ackBytes, readErr := frameConn.ReadFrame()
+	roundTripCtx, cancel := context.WithTimeout(context.Background(), sendTimeout)
+	defer cancel()
+	ackBytes, readErr := session.RoundTrip(roundTripCtx, protocol.HashExactBytes(envelopeBytes), envelopeBytes)
 	if readErr != nil {
 		return parsedMessage{}, nil, readErr
 	}
@@ -1512,6 +1519,39 @@ func fieldsForEnvelopeProtocol(envelope protocol.Envelope, protocolName string, 
 		return protocol.PayloadFieldsForProtocolName(protocolName, envelope.Payload)
 	}
 	return envelope.PayloadFields()
+}
+
+func frameParentExactSHA256s(frameBytes []byte) ([]string, error) {
+	envelope, parseErr := protocol.ParseEnvelope(frameBytes)
+	if parseErr != nil {
+		return nil, parseErr
+	}
+	return append([]string(nil), envelope.ParentExactSHA256s...), nil
+}
+
+func (node *Node) frameIsResponse(frameBytes []byte) (bool, error) {
+	// Intent: Persistent app/kernel sessions must not treat an unmatched ACK as a
+	// fresh peer promise. ACK-ness is pCID-decoded from local compatibility fields
+	// while parent links remain the actual correlation key. Source: DI-vopab
+	envelope, parseErr := protocol.ParseEnvelope(frameBytes)
+	if parseErr != nil {
+		return false, parseErr
+	}
+	protocolName, known := node.Protocols.Name(envelope.ProtocolCID)
+	if !known {
+		protocolName = "unknown:" + envelope.ProtocolCID.String()
+	}
+	fields, fieldsErr := fieldsForEnvelopeProtocol(envelope, protocolName, known)
+	if fieldsErr != nil {
+		return false, fieldsErr
+	}
+	return strings.TrimSpace(fields["outcome"]) != "", nil
+}
+
+func (node *Node) appKernelSession() *transport.PersistentSession {
+	node.mu.Lock()
+	defer node.mu.Unlock()
+	return node.appSession
 }
 
 // recordMalformedFrameEvent extracts the promiser from a parseable but
@@ -3362,6 +3402,14 @@ func (node *Node) emitMessageArtifact(direction, peer, protocolName string, enve
 		artifact.ParentLinkLocation = firstNonEmpty(fields["parent_link_location"], parentLinkLocationFromFields(fields))
 		artifact.PromiseAbout = fields["promise_about"]
 	}
+	if envelope, parseErr := protocol.ParseEnvelope(envelopeBytes); parseErr == nil && len(envelope.ParentExactSHA256s) > 0 {
+		// Intent: ACK artifact records should derive envelope parent links from
+		// the signed bytes themselves, not only from caller-supplied compatibility
+		// fields. This keeps raw-message DAG review aligned with the demux data
+		// that persistent sessions actually use. Source: DI-vopab
+		artifact.ParentExactSHA256 = envelope.ParentExactSHA256s[0]
+		artifact.ParentLinkLocation = "envelope"
+	}
 	record := eventstream.Record{
 		Kind:            eventstream.KindMessageArtifact,
 		Source:          "agent:" + node.Agent.Name,
@@ -3417,11 +3465,13 @@ func (node *Node) closeLog() {
 func (node *Node) closeReceivePromises() {
 	node.setStopping()
 	node.mu.Lock()
-	receiveConns := append([]transport.FrameConn{}, node.receiveConns...)
-	node.receiveConns = nil
+	appSession := node.appSession
+	node.appSession = nil
 	node.mu.Unlock()
-	for _, frameConn := range receiveConns {
-		node.closeFrameConn(frameConn, "app_receive_conn_close_failed", "kernel")
+	if appSession != nil {
+		if closeErr := appSession.Close(); closeErr != nil {
+			node.record("app_receive_conn_close_failed", "broken", "kernel", closeErr.Error())
+		}
 	}
 }
 
@@ -3453,13 +3503,6 @@ func (node *Node) waitForShutdownGrace(ctx context.Context) {
 		node.record("shutdown_grace_timeout", "non_commitment", "", ctx.Err().Error())
 	case <-timer.C:
 		node.record("shutdown_grace_elapsed", "kept", "", "local receive grace elapsed before receive promises close")
-	}
-}
-
-func (node *Node) closeFrameConn(frameConn transport.FrameConn, eventName, peerName string) {
-	closeErr := frameConn.Close()
-	if closeErr != nil {
-		node.record(eventName, "broken", peerName, closeErr.Error())
 	}
 }
 

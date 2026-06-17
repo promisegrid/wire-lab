@@ -306,7 +306,16 @@ DAGs may have missing parents; storage for peers remains voluntary and may be
 compensated with bearer storage tokens; local GC retains paid, pinned, or
 encrypted objects while removing pressure-tagged temporary bytes; and mixed
 agent profiles write generic `.bin`, typed `.cbor`, or local CBOR wrapper files
-without changing exact-byte peer retrieval semantics.
+without changing exact-byte peer retrieval semantics. POC15 now also uses
+persistent multiplexed app/kernel and kernel/kernel TCP sessions during a run.
+The app/kernel stream carries receive-promise registration, outbound envelopes,
+inbound deliveries, and ACKs; peer-kernel streams are reused per endpoint.
+Generated ACKs and responses parent-link the exact request message hash, and the
+pending session map uses that hash as its correlation key. This is transport
+reuse, not RPC: no universal method/request ID is added, and app-local promise
+meaning, trust, and economics remain outside the kernel. Analyzer gates require
+`persistent_session_*` event coverage and reject retained ACK artifacts that lack
+request parent links.
 Remaining POC15 design work includes more advanced route exclusion through peer
 promises, deeper route economics than one reciprocal credit, truly independent
 return-route traffic, raw artifact counts by every POC artifact kind, and
@@ -315,7 +324,7 @@ Source:
 `DI-sihuz`; `DI-linof`; `DI-lulof`; `DI-kinaf`; `DI-dubih`; `DI-gahuh`;
 `DI-pamob`; `DI-sivis`; `DI-dirat`; `DI-podut`; `DI-lutuv`; `DI-nivon`;
 `DI-lihir`; `DI-darur`; `DI-daruf`; `DI-tuhop`; `DI-bapif`; `DI-mosat`;
-`DI-kohuj`; `DI-manul`; `DI-fagog`.
+`DI-kohuj`; `DI-manul`; `DI-fagog`; `DI-vopab`; `TE-lubid`.
 
 `poc7` adds executable evidence for promise-shaped capability tokens and local
 exchange: five containers run local kernel boundaries, app-level relays, issuer,
@@ -1518,11 +1527,11 @@ section.
   bearer storage-token flow, local CAS GC, and filesystem-backed per-agent CAS
   object storage with metadata-only durable roots. It should be cited as POC
   event, raw-message artifact, sparse-CAS, and specimen coverage only, not as a
-  final route, kernel, monitor, WASM/stdio, parent-DAG, CAS economics, or app
-  API.
+  final route, kernel, monitor, WASM/stdio, parent-DAG, CAS economics, persistent
+  transport, or app API.
   Source: `DI-podut`; `DI-lutuv`; `DI-nivon`; `DI-lihir`; `DI-darur`;
   `DI-daruf`; `DI-tuhop`; `DI-bapif`; `DI-mosat`; `DI-kohuj`; `DI-manul`;
-  `DI-fagog`; `TODO-gogug`.
+  `DI-fagog`; `DI-vopab`; `TE-lubid`; `TODO-gogug`.
 - `protocols/wire-lab.d/archive/migrations/SIM-piloh-turns-149-208-recovery/archive/transports/README.md`
   preserves the old root transport design surface as historical evidence.
 

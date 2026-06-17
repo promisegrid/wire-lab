@@ -56,6 +56,7 @@ type RunSummary struct {
 	MessageDAGReachableCount       int                     `json:"message_dag_reachable_count"`
 	MessageDAGMaxDepth             int                     `json:"message_dag_max_depth"`
 	MessageDAGMissingParentCount   int                     `json:"message_dag_missing_parent_count"`
+	AckMessageMissingParentCount   int                     `json:"ack_message_missing_parent_count"`
 	MessageArtifactDirectionCounts map[string]int          `json:"message_artifact_direction_counts"`
 	MessageArtifactProtocolCounts  map[string]int          `json:"message_artifact_protocol_counts"`
 	MessageArtifactBadPrefixCount  int                     `json:"message_artifact_bad_prefix_count"`
@@ -152,6 +153,7 @@ type AcceptanceCriteria struct {
 	RequireEventVocabulary            bool
 	RequireRawMessageArtifacts        bool
 	RequireMessageShapeSpecimens      bool
+	RequirePersistentSessions         bool
 	MinScoreOverall                   int
 }
 
@@ -299,6 +301,7 @@ func cleanRegressionCriteria() AcceptanceCriteria {
 		RequireEventVocabulary:            true,
 		RequireRawMessageArtifacts:        true,
 		RequireMessageShapeSpecimens:      true,
+		RequirePersistentSessions:         true,
 		MinScoreOverall:                   4,
 	}
 }
@@ -381,6 +384,9 @@ func validateSummary(summary RunSummary, criteria AcceptanceCriteria) error {
 	}
 	if criteria.RequireMessageShapeSpecimens {
 		failures = append(failures, messageShapeSpecimenFailures(summary)...)
+	}
+	if criteria.RequirePersistentSessions {
+		failures = append(failures, persistentSessionFailures(summary)...)
 	}
 	if criteria.RequireMonitorReport {
 		if summary.MonitorReport == nil {
@@ -467,6 +473,8 @@ func summarizeMessageArtifacts(runDir string, summary *RunSummary) error {
 		if record.ParentExactSHA256 != "" {
 			summary.MessageDAGParentLinkCount++
 			summary.MessageDAGParentLocationCounts[firstNonEmpty(record.ParentLinkLocation, "unspecified")]++
+		} else if isAckArtifactDirection(record.Direction) {
+			summary.AckMessageMissingParentCount++
 		}
 		summary.MessageArtifactDirectionCounts[record.Direction]++
 		summary.MessageArtifactProtocolCounts[record.Protocol]++
@@ -581,6 +589,9 @@ func rawMessageArtifactFailures(summary RunSummary) []string {
 	if summary.MessageDAGMaxDepth < 2 {
 		failures = append(failures, fmt.Sprintf("message_dag_max_depth=%d want >=2", summary.MessageDAGMaxDepth))
 	}
+	if summary.AckMessageMissingParentCount != 0 {
+		failures = append(failures, fmt.Sprintf("ack_message_missing_parent_count=%d want 0", summary.AckMessageMissingParentCount))
+	}
 	for _, direction := range []string{"sent", "received", "ack_sent", "ack_received"} {
 		if summary.MessageArtifactDirectionCounts[direction] == 0 {
 			failures = append(failures, "message artifact direction missing: "+direction)
@@ -590,6 +601,29 @@ func rawMessageArtifactFailures(summary RunSummary) []string {
 		if summary.MessageArtifactProtocolCounts[protocolName] == 0 {
 			failures = append(failures, "message artifact protocol missing: "+protocolName)
 		}
+	}
+	return failures
+}
+
+func isAckArtifactDirection(direction string) bool {
+	// Intent: The raw-message index may use flow-specific ACK direction names,
+	// but every retained ACK-like artifact should link back to its request in the
+	// message DAG. Source: DI-vopab
+	return direction == "ack_sent" || direction == "ack_received" || strings.HasSuffix(direction, "_ack")
+}
+
+func persistentSessionFailures(summary RunSummary) []string {
+	// Intent: POC15 should fail loudly if transport silently regresses to
+	// one-shot TCP or if ACK artifacts stop parent-linking the exact request
+	// message CIDs used by persistent-session demux. Source: DI-vopab
+	var failures []string
+	for _, eventName := range []string{"persistent_session_opened", "persistent_session_reused", "persistent_session_closed"} {
+		if summary.EventCounts[eventName] == 0 {
+			failures = append(failures, eventName+"=0 want >0")
+		}
+	}
+	if summary.AckMessageMissingParentCount != 0 {
+		failures = append(failures, fmt.Sprintf("ack_message_missing_parent_count=%d want 0", summary.AckMessageMissingParentCount))
 	}
 	return failures
 }
@@ -839,6 +873,9 @@ func requiredRegressionEvents() []string {
 		"tcp_message_sent",
 		"tcp_message_received",
 		"tcp_message_send_failed",
+		"persistent_session_opened",
+		"persistent_session_reused",
+		"persistent_session_closed",
 		"network_outage_variant_selected",
 		"cas_storage_promised",
 		"cas_retention_promised",
@@ -1087,7 +1124,10 @@ func requiredRegressionEvents() []string {
 
 func computeScores(summary RunSummary) ScoreReport {
 	scores := ScoreReport{}
-	addScore(&scores.Transport, summary.EventCounts["tcp_message_sent"] > 0 && summary.EventCounts["tcp_message_received"] > 0 && summary.EventCounts["tcp_message_send_failed"] > 0 && summary.EventCounts["bad_proof_rejected"] > 0)
+	// Intent: Transport fitness now includes persistent-session reuse and ACK
+	// parent-link coverage so a run cannot pass by reopening one TCP connection
+	// per message. Source: DI-vopab
+	addScore(&scores.Transport, summary.EventCounts["tcp_message_sent"] > 0 && summary.EventCounts["tcp_message_received"] > 0 && summary.EventCounts["tcp_message_send_failed"] > 0 && summary.EventCounts["bad_proof_rejected"] > 0 && summary.EventCounts["persistent_session_opened"] > 0 && summary.EventCounts["persistent_session_reused"] > 0 && summary.AckMessageMissingParentCount == 0)
 	addScore(&scores.Storage, summary.EventCounts["cas_bytes_stored"] > 0 && summary.EventCounts["cas_bytes_retrieved"] > 0 && summary.EventCounts["cas_multi_object_pressure"] > 0 && summary.EventCounts["capability_token_renewed"] > 0)
 	addScore(&scores.Compute, summary.EventCounts["compute_function_executed"] > 0 && summary.EventCounts["compute_alternate_function_executed"] > 0 && summary.EventCounts["compute_result_received"] > 0 && summary.EventCounts["compute_bad_result_promised"] > 0 && summary.EventCounts["compute_cache_reused"] > 0)
 	addScore(&scores.Economics, summary.EventCounts["economics_price_refused"] > 0 && summary.EventCounts["economics_capacity_refused"] > 0 && summary.EventCounts["economics_credits_spent"] > 0 && summary.EventCounts["economics_credits_earned"] > 0)

@@ -25,12 +25,16 @@ links are exercised by a route-carried message, Alice reuses a route under an
 explicit local lifetime, asymmetric response-path terms are recorded, route
 credits are promised/earned/spent, and Peggy/Victor receive route-carried
 compute envelopes as useful runtime-adapter work. It retains raw message
-artifacts for operator review through an observer-only artifact stream. A
-validated clean run for this update reconstructs a reachable 222-node
+artifacts for operator review through an observer-only artifact stream. The
+current transport slice replaces per-message TCP dials with run-scoped
+persistent app/kernel and kernel/kernel sessions. Replies are correlated by
+ACK/response envelope parent links to exact request message hashes, not by RPC
+request IDs, so the same raw-message DAG used for operator review also supports
+session demux. A validated clean run for this update reconstructs a reachable 222-node
 exact-message DAG from 413
 artifact observations, with parent-link coverage in both envelope slots and
 pCID-defined payload fields. Source: `DI-lutuv`; `DI-lihir`; `DI-kohuj`;
-`DI-tuhop`; `DI-mosat`.
+`DI-tuhop`; `DI-mosat`; `DI-vopab`.
 
 The current CAS/DAG slice now also gives each app its own local sparse CAS view.
 Agents may store exact messages, local state bytes, encrypted blobs named by
@@ -89,6 +93,10 @@ exception:
 10. **Agent-accessible sparse CAS.** Each agent should be able to maintain its
     own incomplete CAS and optional local message DAG, or rely on peer CAS
     promises paid through credits or bearer storage tokens.
+11. **Persistent multiplexed TCP sessions.** App/kernel and kernel/kernel TCP
+    paths should stay open during a run and carry many exact envelopes. A local
+    pending map uses the request message hash as the key, and generated ACKs
+    parent-link that hash so no payload-level RPC request ID is needed.
 
 ## Multihop Promise Sketch
 
@@ -189,6 +197,23 @@ CBOR tag-42 IPLD links where the specimen includes parent links. The run CAS DAG
 is separate: malformed bytes and non-message artifacts are reviewable run
 artifacts, but they are not valid PromiseGrid parent-linked messages.
 
+## Persistent Sessions
+
+POC15 now treats TCP persistence as a transport promise made locally for the
+duration of one clean run. Each app opens one app/kernel frame stream, registers
+its pCID receive promises on that stream, sends outbound envelopes on that same
+stream, and receives kernel-delivered peer messages on that same stream. Kernels
+also keep reusable peer-kernel sessions per endpoint. Fresh inbound frames are
+handled as ordinary signed PromiseGrid envelopes; replies are matched to pending
+requests only when their envelope parent links include the exact request hash.
+
+This is intentionally not an RPC channel. There is no universal method name,
+request number, route authority, or kernel-owned trust judgment. The kernel owns
+byte routing and local receive-promise tables; apps own promise meaning, trust,
+economics, and keep/break judgment. Analyzer gates now require
+`persistent_session_*` events and fail if retained ACK artifacts lack request
+parent links. Source: `DI-vopab`; `TE-lubid`.
+
 ## Candidate Agent Work
 
 - Alice discovers and uses a route to Dave, then sends actual traffic over it.
@@ -233,3 +258,6 @@ Remaining analyzer targets are:
   transport-session proofs, and raw CAS/DAG review.
 - `../../docs/thought-experiments/TE-vakah-poc15-multihop-multiarity-dag.md`
   records the TE that motivates the POC15 design.
+- `../../docs/thought-experiments/TE-lubid-poc15-persistent-multiplexed-sessions.md`
+  records the TE for persistent multiplexed app/kernel and kernel/kernel
+  sessions keyed by exact request message hashes.
