@@ -2,10 +2,13 @@ package transport
 
 import (
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"io"
 	"sync"
+	"sync/atomic"
 )
 
 // ParentExtractor returns exact request hashes named by an incoming frame. The
@@ -35,12 +38,42 @@ type pendingFrame struct {
 	result    chan sessionResult
 }
 
+// SessionTerminalReason names why a run-scoped persistent stream ended.
+// Intent: POC15 needs strict terminal accounting for every session object so
+// analyzer output can distinguish shutdown, peer EOF, and failed I/O without
+// turning transport events into peer trust judgments. Source: DI-mapop
+type SessionTerminalReason string
+
+const (
+	SessionTerminalReasonLocalClose      SessionTerminalReason = "local_close"
+	SessionTerminalReasonRemoteEOF       SessionTerminalReason = "remote_eof"
+	SessionTerminalReasonReadFailed      SessionTerminalReason = "read_failed"
+	SessionTerminalReasonWriteFailed     SessionTerminalReason = "write_failed"
+	SessionTerminalReasonProcessShutdown SessionTerminalReason = "process_shutdown"
+)
+
+// SessionStats is a snapshot of one session object's local counters.
+// Intent: The counters are local transport accounting only; PromiseGrid message
+// CIDs and parent links remain the semantic correlation mechanism. Source:
+// DI-mapop
+type SessionStats struct {
+	SessionID      string
+	Name           string
+	FramesSent     int
+	FramesReceived int
+	Requests       int
+	Responses      int
+}
+
+var persistentSessionCounter uint64
+
 // PersistentSession carries many length-prefixed PromiseGrid frames over one TCP
 // connection and correlates replies by parent-linked request message CID.
 // Intent: POC15 tests production-shaped long-lived transport while keeping
 // correlation in the message DAG instead of adding RPC request IDs. Source:
 // DI-vopab
 type PersistentSession struct {
+	sessionID      string
 	name           string
 	frameConn      FrameConn
 	extractParents ParentExtractor
@@ -53,6 +86,7 @@ type PersistentSession struct {
 	mu      sync.Mutex
 	pending map[string]pendingFrame
 	closed  bool
+	stats   SessionStats
 
 	closeOnce sync.Once
 	done      chan struct{}
@@ -60,7 +94,9 @@ type PersistentSession struct {
 
 // NewPersistentSession starts a read loop for one already-open TCP frame stream.
 func NewPersistentSession(name string, frameConn FrameConn, extractParents ParentExtractor, isResponse ResponseClassifier, handleInbound InboundFrameHandler, record SessionRecorder) *PersistentSession {
+	sessionID := newSessionID(name)
 	session := &PersistentSession{
+		sessionID:      sessionID,
 		name:           name,
 		frameConn:      frameConn,
 		extractParents: extractParents,
@@ -68,9 +104,13 @@ func NewPersistentSession(name string, frameConn FrameConn, extractParents Paren
 		handleInbound:  handleInbound,
 		record:         record,
 		pending:        make(map[string]pendingFrame),
-		done:           make(chan struct{}),
+		stats: SessionStats{
+			SessionID: sessionID,
+			Name:      name,
+		},
+		done: make(chan struct{}),
 	}
-	session.recordEvent("persistent_session_opened", "kept", "session="+name)
+	session.recordEvent("persistent_session_opened", "kept", session.detailString(""))
 	go session.readLoop()
 	return session
 }
@@ -99,7 +139,8 @@ func (session *PersistentSession) RoundTrip(ctx context.Context, requestID strin
 		session.removePending(requestID)
 		return nil, err
 	}
-	session.recordEvent("persistent_session_reused", "kept", "session="+session.name+" request="+requestID)
+	session.recordSessionRequestStarted(requestID)
+	session.recordEvent("persistent_session_reused", "kept", session.detailString("request="+requestID))
 	select {
 	case result := <-pending.result:
 		if result.err != nil {
@@ -117,6 +158,11 @@ func (session *PersistentSession) RoundTrip(ctx context.Context, requestID strin
 
 // Close closes the underlying TCP stream and releases all pending requests.
 func (session *PersistentSession) Close() error {
+	return session.CloseWithReason(SessionTerminalReasonLocalClose)
+}
+
+// CloseWithReason closes the stream and records exactly one terminal reason.
+func (session *PersistentSession) CloseWithReason(reason SessionTerminalReason) error {
 	var closeErr error
 	session.closeOnce.Do(func() {
 		session.mu.Lock()
@@ -130,7 +176,8 @@ func (session *PersistentSession) Close() error {
 		session.mu.Unlock()
 		closeErr = session.frameConn.Close()
 		close(session.done)
-		session.recordEvent("persistent_session_closed", "kept", "session="+session.name)
+		session.recordEvent("persistent_session_closed", "kept", session.detailString("reason="+string(reason)))
+		session.recordSessionTerminal(reason)
 	})
 	return closeErr
 }
@@ -149,23 +196,24 @@ func (session *PersistentSession) readLoop() {
 		if readErr != nil {
 			if !session.isClosed() {
 				if isGracefulSessionClose(readErr) {
-					session.recordEvent("persistent_session_remote_closed", "kept", "session="+session.name)
-					if closeErr := session.Close(); closeErr != nil {
-						session.recordEvent("persistent_session_close_failed", "broken", "session="+session.name+" "+closeErr.Error())
+					session.recordEvent("persistent_session_remote_closed", "kept", session.detailString(""))
+					if closeErr := session.CloseWithReason(SessionTerminalReasonRemoteEOF); closeErr != nil {
+						session.recordEvent("persistent_session_close_failed", "broken", session.detailString(closeErr.Error()))
 					}
 					return
 				}
-				session.recordEvent("persistent_session_read_failed", "broken", "session="+session.name+" "+readErr.Error())
-				if closeErr := session.Close(); closeErr != nil {
-					session.recordEvent("persistent_session_close_failed", "broken", "session="+session.name+" "+closeErr.Error())
+				session.recordEvent("persistent_session_read_failed", "broken", session.detailString(readErr.Error()))
+				if closeErr := session.CloseWithReason(SessionTerminalReasonReadFailed); closeErr != nil {
+					session.recordEvent("persistent_session_close_failed", "broken", session.detailString(closeErr.Error()))
 				}
 			}
 			return
 		}
+		session.recordSessionFrameReceived(len(frameBytes))
 		if session.isResponse != nil {
 			responseFrame, classifyErr := session.isResponse(frameBytes)
 			if classifyErr != nil {
-				session.recordEvent("persistent_session_response_classify_failed", "broken", "session="+session.name+" "+classifyErr.Error())
+				session.recordEvent("persistent_session_response_classify_failed", "broken", session.detailString(classifyErr.Error()))
 			}
 			if responseFrame {
 				if session.deliverPending(frameBytes) {
@@ -182,7 +230,7 @@ func (session *PersistentSession) readLoop() {
 			continue
 		}
 		if session.handleInbound == nil {
-			session.recordEvent("persistent_session_unmatched_frame", "non_commitment", "session="+session.name)
+			session.recordEvent("persistent_session_unmatched_frame", "non_commitment", session.detailString(""))
 			continue
 		}
 		session.handleFreshFrame(frameBytes)
@@ -199,14 +247,14 @@ func (session *PersistentSession) handleFreshFrame(frameBytes []byte) {
 		// DI-vopab
 		responseBytes, handleErr := session.handleInbound(copiedFrame)
 		if handleErr != nil {
-			session.recordEvent("persistent_session_inbound_failed", "broken", "session="+session.name+" "+handleErr.Error())
+			session.recordEvent("persistent_session_inbound_failed", "broken", session.detailString(handleErr.Error()))
 			return
 		}
 		if len(responseBytes) == 0 {
 			return
 		}
 		if writeErr := session.writeFrame(context.Background(), responseBytes); writeErr != nil {
-			session.recordEvent("persistent_session_response_write_failed", "broken", "session="+session.name+" "+writeErr.Error())
+			session.recordEvent("persistent_session_response_write_failed", "broken", session.detailString(writeErr.Error()))
 		}
 	}()
 }
@@ -224,6 +272,7 @@ func (session *PersistentSession) deliverPending(frameBytes []byte) bool {
 		if !found {
 			continue
 		}
+		session.recordSessionResponseMatched(parentID)
 		pending.result <- sessionResult{frameBytes: append([]byte(nil), frameBytes...)}
 		return true
 	}
@@ -236,7 +285,7 @@ func (session *PersistentSession) dropUnmatchedResponse() {
 	// again. This prevents persistent sessions from creating ACK-of-ACK storms
 	// while preserving message-CID correlation as the only demux key. Source:
 	// DI-vopab
-	session.recordEvent("persistent_session_unmatched_response", "non_commitment", "session="+session.name)
+	session.recordEvent("persistent_session_unmatched_response", "non_commitment", session.detailString(""))
 }
 
 func (session *PersistentSession) writeFrame(ctx context.Context, frameBytes []byte) error {
@@ -252,9 +301,11 @@ func (session *PersistentSession) writeFrame(ctx context.Context, frameBytes []b
 	select {
 	case err := <-done:
 		if err != nil {
-			if closeErr := session.Close(); closeErr != nil {
-				session.recordEvent("persistent_session_close_failed", "broken", "session="+session.name+" "+closeErr.Error())
+			if closeErr := session.CloseWithReason(SessionTerminalReasonWriteFailed); closeErr != nil {
+				session.recordEvent("persistent_session_close_failed", "broken", session.detailString(closeErr.Error()))
 			}
+		} else {
+			session.recordSessionFrameSent(len(frameBytes))
 		}
 		return err
 	case <-ctx.Done():
@@ -312,6 +363,64 @@ func (session *PersistentSession) recordEvent(eventName, outcome, detail string)
 	if session.record != nil {
 		session.record(eventName, outcome, detail)
 	}
+}
+
+func (session *PersistentSession) recordSessionFrameSent(frameBytes int) {
+	session.mu.Lock()
+	session.stats.FramesSent++
+	stats := session.stats
+	session.mu.Unlock()
+	session.recordEvent("persistent_session_frame_sent", "kept", session.detailString(fmt.Sprintf("bytes=%d frames_sent=%d", frameBytes, stats.FramesSent)))
+}
+
+func (session *PersistentSession) recordSessionFrameReceived(frameBytes int) {
+	session.mu.Lock()
+	session.stats.FramesReceived++
+	stats := session.stats
+	session.mu.Unlock()
+	session.recordEvent("persistent_session_frame_received", "kept", session.detailString(fmt.Sprintf("bytes=%d frames_received=%d", frameBytes, stats.FramesReceived)))
+}
+
+func (session *PersistentSession) recordSessionRequestStarted(requestID string) {
+	session.mu.Lock()
+	session.stats.Requests++
+	stats := session.stats
+	session.mu.Unlock()
+	session.recordEvent("persistent_session_request_started", "kept", session.detailString(fmt.Sprintf("request=%s requests=%d", requestID, stats.Requests)))
+}
+
+func (session *PersistentSession) recordSessionResponseMatched(requestID string) {
+	session.mu.Lock()
+	session.stats.Responses++
+	stats := session.stats
+	session.mu.Unlock()
+	session.recordEvent("persistent_session_response_matched", "kept", session.detailString(fmt.Sprintf("request=%s responses=%d", requestID, stats.Responses)))
+}
+
+func (session *PersistentSession) recordSessionTerminal(reason SessionTerminalReason) {
+	session.mu.Lock()
+	stats := session.stats
+	session.mu.Unlock()
+	detail := fmt.Sprintf("reason=%s frames_sent=%d frames_received=%d requests=%d responses=%d", reason, stats.FramesSent, stats.FramesReceived, stats.Requests, stats.Responses)
+	session.recordEvent("persistent_session_terminal", "kept", session.detailString(detail))
+}
+
+func (session *PersistentSession) detailString(extra string) string {
+	detail := "session=" + session.name + " session_id=" + session.sessionID
+	if extra != "" {
+		detail += " " + extra
+	}
+	return detail
+}
+
+func newSessionID(name string) string {
+	// Intent: Session IDs are local log correlation names only. The counter
+	// disambiguates reconnects with the same endpoint name, while the hash keeps
+	// logs compact and avoids leaking raw network addresses into analyzer keys.
+	// Source: DI-mapop
+	sequence := atomic.AddUint64(&persistentSessionCounter, 1)
+	sum := sha256.Sum256([]byte(fmt.Sprintf("%s|%d", name, sequence)))
+	return hex.EncodeToString(sum[:8])
 }
 
 func isGracefulSessionClose(err error) bool {

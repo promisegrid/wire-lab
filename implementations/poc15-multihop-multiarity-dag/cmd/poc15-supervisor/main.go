@@ -20,6 +20,8 @@ import (
 	"promisegrid.dev/wire-lab/implementations/poc15-multihop-multiarity-dag/eventstream"
 )
 
+const childShutdownGrace = 3 * time.Second
+
 func main() {
 	if err := run(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
@@ -130,7 +132,7 @@ func runProcess(ctx context.Context, forwarder *processForwarder, roleName, bina
 	// Intent: Child processes still write ordinary stdout/stderr, but the
 	// supervisor copies JSON event records to the observer-only collector instead
 	// of relying on a Docker volume visible to agents. Source: DI-dirat
-	command := exec.CommandContext(ctx, binary, args...)
+	command := exec.Command(binary, args...)
 	stdout, stdoutErr := command.StdoutPipe()
 	if stdoutErr != nil {
 		return stdoutErr
@@ -146,15 +148,44 @@ func runProcess(ctx context.Context, forwarder *processForwarder, roleName, bina
 	waitGroup.Add(2)
 	go forwarder.copyOutput(&waitGroup, roleName, "stdout", stdout, os.Stdout)
 	go forwarder.copyOutput(&waitGroup, roleName, "stderr", stderr, os.Stderr)
-	waitErr := command.Wait()
-	waitGroup.Wait()
-	if waitErr != nil {
-		if ctx.Err() != nil {
-			return nil
+	waitDone := make(chan error, 1)
+	go func() {
+		waitDone <- command.Wait()
+	}()
+	select {
+	case waitErr := <-waitDone:
+		waitGroup.Wait()
+		if waitErr != nil {
+			if ctx.Err() != nil {
+				return nil
+			}
+			return fmt.Errorf("%s failed: %w", roleName, waitErr)
 		}
-		return fmt.Errorf("%s failed: %w", roleName, waitErr)
+		return nil
+	case <-ctx.Done():
+		// Intent: Clean-run session accounting depends on kernels observing
+		// shutdown and closing peer streams themselves. `exec.CommandContext`
+		// kills children immediately, which hides terminal session records, so the
+		// supervisor first sends SIGTERM and only kills after a bounded grace
+		// window. Source: DI-homuj
+		signalErr := command.Process.Signal(syscall.SIGTERM)
+		if signalErr != nil && !errors.Is(signalErr, os.ErrProcessDone) {
+			return fmt.Errorf("signal %s for shutdown: %w", roleName, signalErr)
+		}
+		timer := time.NewTimer(childShutdownGrace)
+		defer timer.Stop()
+		select {
+		case <-waitDone:
+		case <-timer.C:
+			killErr := command.Process.Kill()
+			if killErr != nil && !errors.Is(killErr, os.ErrProcessDone) {
+				return fmt.Errorf("kill %s after shutdown grace: %w", roleName, killErr)
+			}
+			<-waitDone
+		}
+		waitGroup.Wait()
+		return nil
 	}
-	return nil
 }
 
 type processForwarder struct {

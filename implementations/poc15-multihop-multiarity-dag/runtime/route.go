@@ -60,6 +60,8 @@ func runtimeRouteSpec(id, path, final string) routeSpec {
 func (node *Node) runRoutePromiseWorkflow() error {
 	primaryRoute := primaryRouteSpec()
 	node.record("route_exclusion_promise_made", "kept", "bob", "pcid="+pcid.RouteV1+" Alice asks route peers for a route that avoids Mallory as transit")
+	node.record("route_transit_exclusion_peer_promised", "kept", "bob", "pcid="+pcid.RouteV1+" Bob promises this route will not intentionally transit Mallory")
+	node.record("route_transit_exclusion_peer_promised", "kept", "carol", "pcid="+pcid.RouteV1+" Carol promises this route will not intentionally transit Mallory")
 	node.record("route_exclusion_used_in_choice", "kept", "bob", "pcid="+pcid.RouteV1+" selected_path="+primaryRoute.Path+" excluded_transit=mallory")
 	node.record("route_payment_promised", "kept", "bob", "pcid="+pcid.RouteV1+" Alice promises reciprocal forwarding credit for one bounded route setup")
 	node.record("route_credit_offered", "kept", "bob", "pcid="+pcid.RouteV1+" credit="+primaryRoute.Payment)
@@ -100,6 +102,22 @@ func (node *Node) runRoutePromiseWorkflow() error {
 	}
 	node.record("route_reused_message_delivered", "kept", "dave", "pcid="+pcid.RouteV1+" route_id="+primaryRoute.ID+" carried_pcid="+pcid.RelationshipV1)
 	node.record("route_credit_spent", "kept", "bob", "pcid="+pcid.RouteV1+" route_id="+primaryRoute.ID+" credit="+primaryRoute.Payment)
+	// Intent: Route lifetime is a local promise term, not a global lease. Alice
+	// treats the two-message route as expired after using both promised sends,
+	// then asks for a fresh neighboring promise before relying on it again.
+	// Source: DI-mapop
+	node.record("route_lifetime_exhausted", "kept", "bob", "pcid="+pcid.RouteV1+" route_id="+primaryRoute.ID+" ttl_messages="+primaryRoute.TTLMessages+" used_messages=2")
+	node.record("route_expired_message_not_sent", "non_commitment", "bob", "pcid="+pcid.RouteV1+" route_id="+primaryRoute.ID+" Alice does not send a third carried message after local route expiry")
+	renewalFields := routeHopFieldsForSpec(primaryRoute, node.Agent.Name, "bob", production.PromiseRouteSetup, routeMessageKindSetup, reusedAck.ExactHash)
+	node.record("route_renewal_requested", "kept", "bob", "pcid="+pcid.RouteV1+" route_id="+primaryRoute.ID+" parent="+reusedAck.ExactHash)
+	renewalAck, renewalErr := node.sendAndReceive("bob", renewalFields)
+	if renewalErr != nil {
+		return fmt.Errorf("route renewal: %w", renewalErr)
+	}
+	if renewalAck.Fields["route_status"] != "reachable" {
+		return fmt.Errorf("route renewal status %q", renewalAck.Fields["route_status"])
+	}
+	node.record("route_renewal_confirmed", "kept", "dave", "pcid="+pcid.RouteV1+" route_id="+primaryRoute.ID+" status=reachable")
 	if err := node.runRoutedRuntimeComputeWorkflow("peggy", runtimeRouteSpec(poc15PeggyRouteID, poc15PeggyRoutePath, "peggy")); err != nil {
 		return err
 	}

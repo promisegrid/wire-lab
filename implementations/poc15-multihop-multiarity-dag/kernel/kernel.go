@@ -36,16 +36,17 @@ type Kernel struct {
 	ContainerName string
 	Protocols     pcid.Registry
 
-	mu             sync.Mutex
-	receivers      map[receiverKey]*receiver
-	peerSessions   map[string]*transport.PersistentSession
-	appListener    net.Listener
-	peerListener   net.Listener
-	logFile        *os.File
-	activeHandlers sync.WaitGroup
-	stopping       bool
-	appDone        chan struct{}
-	peerDone       chan struct{}
+	mu                  sync.Mutex
+	receivers           map[receiverKey]*receiver
+	peerSessions        map[string]*transport.PersistentSession
+	inboundPeerSessions map[*transport.PersistentSession]string
+	appListener         net.Listener
+	peerListener        net.Listener
+	logFile             *os.File
+	activeHandlers      sync.WaitGroup
+	stopping            bool
+	appDone             chan struct{}
+	peerDone            chan struct{}
 }
 
 type receiverKey struct {
@@ -70,11 +71,12 @@ type parsedEnvelope struct {
 // New returns a kernel with an empty local receive-promise table.
 func New(cfg config.Config, containerName string) *Kernel {
 	return &Kernel{
-		Config:        cfg,
-		ContainerName: containerName,
-		Protocols:     pcid.NewRegistry(),
-		receivers:     make(map[receiverKey]*receiver),
-		peerSessions:  make(map[string]*transport.PersistentSession),
+		Config:              cfg,
+		ContainerName:       containerName,
+		Protocols:           pcid.NewRegistry(),
+		receivers:           make(map[receiverKey]*receiver),
+		peerSessions:        make(map[string]*transport.PersistentSession),
+		inboundPeerSessions: make(map[*transport.PersistentSession]string),
 	}
 }
 
@@ -92,6 +94,7 @@ func (kernel *Kernel) Run(ctx context.Context) error {
 	kernel.closeListeners()
 	kernel.closeReceivers()
 	kernel.closePeerSessions()
+	kernel.closeInboundPeerSessions()
 	kernel.drainHandlers(ctx)
 	return nil
 }
@@ -192,6 +195,8 @@ func (kernel *Kernel) handlePeerConn(conn net.Conn) {
 			kernel.record(eventName, outcome, "peer", detail)
 		},
 	)
+	kernel.trackInboundPeerSession(session, conn.RemoteAddr().String())
+	defer kernel.untrackInboundPeerSession(session)
 	<-session.Done()
 }
 
@@ -255,7 +260,7 @@ func (kernel *Kernel) registerReceiver(session *transport.PersistentSession, mes
 	}
 	kernel.mu.Unlock()
 	if oldReceiver != nil && oldReceiver.session != session {
-		if closeErr := oldReceiver.session.Close(); closeErr != nil {
+		if closeErr := oldReceiver.session.CloseWithReason(transport.SessionTerminalReasonLocalClose); closeErr != nil {
 			kernel.record("kernel_receive_conn_replaced_close_failed", "broken", appName, closeErr.Error())
 		}
 	}
@@ -325,7 +330,7 @@ func (kernel *Kernel) peerSessionForEndpoint(endpoint, target string) (*transpor
 	kernel.mu.Lock()
 	defer kernel.mu.Unlock()
 	if existingSession = kernel.peerSessions[endpoint]; existingSession != nil {
-		if closeErr := session.Close(); closeErr != nil {
+		if closeErr := session.CloseWithReason(transport.SessionTerminalReasonLocalClose); closeErr != nil {
 			kernel.record("kernel_peer_duplicate_session_close_failed", "broken", target, closeErr.Error())
 		}
 		return existingSession, nil
@@ -361,9 +366,26 @@ func (kernel *Kernel) removePeerSession(endpoint string, session *transport.Pers
 		delete(kernel.peerSessions, endpoint)
 	}
 	kernel.mu.Unlock()
-	if closeErr := session.Close(); closeErr != nil {
+	if closeErr := session.CloseWithReason(transport.SessionTerminalReasonLocalClose); closeErr != nil {
 		kernel.record("kernel_peer_session_close_failed", "broken", target, closeErr.Error())
 	}
+}
+
+func (kernel *Kernel) trackInboundPeerSession(session *transport.PersistentSession, remoteAddress string) {
+	// Intent: Accepted peer streams are owned by the local kernel for lifecycle
+	// accounting even though the remote peer initiated the TCP socket. Tracking
+	// them here lets clean-run shutdown emit one terminal record per opened
+	// inbound session without treating the connection as trust evidence. Source:
+	// DI-fobuv
+	kernel.mu.Lock()
+	kernel.inboundPeerSessions[session] = remoteAddress
+	kernel.mu.Unlock()
+}
+
+func (kernel *Kernel) untrackInboundPeerSession(session *transport.PersistentSession) {
+	kernel.mu.Lock()
+	delete(kernel.inboundPeerSessions, session)
+	kernel.mu.Unlock()
 }
 
 func (kernel *Kernel) deliverToLocalApp(frameBytes []byte, message parsedEnvelope) []byte {
@@ -615,7 +637,7 @@ func (kernel *Kernel) closeReceivers() {
 		if registeredSession == nil {
 			continue
 		}
-		if closeErr := registeredSession.Close(); closeErr != nil {
+		if closeErr := registeredSession.CloseWithReason(transport.SessionTerminalReasonProcessShutdown); closeErr != nil {
 			kernel.record("kernel_receive_session_close_failed", "broken", appName, closeErr.Error())
 		}
 	}
@@ -636,8 +658,30 @@ func (kernel *Kernel) closePeerSessions() {
 		if session == nil {
 			continue
 		}
-		if closeErr := session.Close(); closeErr != nil {
+		if closeErr := session.CloseWithReason(transport.SessionTerminalReasonProcessShutdown); closeErr != nil {
 			kernel.record("kernel_peer_session_close_failed", "broken", endpoint, closeErr.Error())
+		}
+	}
+}
+
+func (kernel *Kernel) closeInboundPeerSessions() {
+	// Intent: Inbound peer-kernel sessions are the accepted side of the same
+	// run-scoped transport promise as outbound peer sessions. Closing them during
+	// kernel shutdown makes terminal accounting symmetric without changing app
+	// trust or routing decisions. Source: DI-fobuv
+	kernel.mu.Lock()
+	inboundPeerSessions := make(map[*transport.PersistentSession]string, len(kernel.inboundPeerSessions))
+	for session, remoteAddress := range kernel.inboundPeerSessions {
+		inboundPeerSessions[session] = remoteAddress
+	}
+	kernel.inboundPeerSessions = make(map[*transport.PersistentSession]string)
+	kernel.mu.Unlock()
+	for session, remoteAddress := range inboundPeerSessions {
+		if session == nil {
+			continue
+		}
+		if closeErr := session.CloseWithReason(transport.SessionTerminalReasonProcessShutdown); closeErr != nil {
+			kernel.record("kernel_inbound_peer_session_close_failed", "broken", remoteAddress, closeErr.Error())
 		}
 	}
 }

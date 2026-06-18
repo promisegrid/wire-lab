@@ -315,7 +315,14 @@ pending session map uses that hash as its correlation key. This is transport
 reuse, not RPC: no universal method/request ID is added, and app-local promise
 meaning, trust, and economics remain outside the kernel. Analyzer gates require
 `persistent_session_*` event coverage and reject retained ACK artifacts that lack
-request parent links.
+request parent links. The newest POC15 slice adds per-session frame, request,
+and response counters, exactly one terminal event per opened session, and a real
+trust-change close/reopen event for Alice's app/kernel stream. It also records
+route lifetime exhaustion, local non-send after expiry, renewal before reuse,
+peer promises not to transit Mallory, CAS retrieval from primary and replica
+peers over persistent sessions, sparse and untrusted retrieval non-commitments,
+and signed CBOR/COSE_Sign1 capability-token bytes. This token work is executable
+pressure only; it does not claim final CWT adoption. Source: `DI-mapop`.
 Remaining POC15 design work includes more advanced route exclusion through peer
 promises, deeper route economics than one reciprocal credit, truly independent
 return-route traffic, raw artifact counts by every POC artifact kind, and
@@ -1525,13 +1532,19 @@ section.
   artifacts. It now also gates agent-owned sparse CAS metadata, encrypted-object
   CIDs, sparse local message-DAG indexes, peer CAS storage/retrieval promises,
   bearer storage-token flow, local CAS GC, and filesystem-backed per-agent CAS
-  object storage with metadata-only durable roots. It should be cited as POC
+  object storage with metadata-only durable roots. The newest convergence slice
+  adds strict session terminal accounting, a trust-driven session close/reopen
+  event, route expiry/renewal and transit-exclusion promises, CAS retrieval from
+  primary and replica peers over persistent sessions, sparse and untrusted
+  retrieval non-commitments, signed CBOR/COSE_Sign1 capability-token bytes, and
+  analyzer score fields for session, CAS-retrieval, and token-security health.
+  It should be cited as POC
   event, raw-message artifact, sparse-CAS, and specimen coverage only, not as a
   final route, kernel, monitor, WASM/stdio, parent-DAG, CAS economics, persistent
   transport, or app API.
   Source: `DI-podut`; `DI-lutuv`; `DI-nivon`; `DI-lihir`; `DI-darur`;
   `DI-daruf`; `DI-tuhop`; `DI-bapif`; `DI-mosat`; `DI-kohuj`; `DI-manul`;
-  `DI-fagog`; `DI-vopab`; `TE-lubid`; `TODO-gogug`.
+  `DI-fagog`; `DI-vopab`; `DI-mapop`; `TE-lubid`; `TODO-gogug`.
 - `protocols/wire-lab.d/archive/migrations/SIM-piloh-turns-149-208-recovery/archive/transports/README.md`
   preserves the old root transport design surface as historical evidence.
 

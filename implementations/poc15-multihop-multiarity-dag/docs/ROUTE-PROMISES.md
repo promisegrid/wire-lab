@@ -139,10 +139,18 @@ Analyzer and runtime logs must distinguish:
 - `route_payment_promised`: a peer accepts compensation or reciprocal terms.
 - `route_exclusion_promise_made`: a peer promises not to forward through Mallory
   for Alice's named route class.
+- `route_transit_exclusion_peer_promised`: each forwarding peer promises its own
+  hop will not intentionally use Mallory as transit for Alice's named route.
 - `route_exclusion_used_in_choice`: Alice chooses a route because local peer
   promises match Alice's local constraints.
 - `route_exclusion_broken_observed`: Alice records local events that a chosen
   peer broke a route-exclusion promise.
+- `route_lifetime_exhausted`: Alice records that the bounded route lifetime has
+  been consumed.
+- `route_expired_message_not_sent`: Alice locally declines to send after the
+  route's promised lifetime is exhausted.
+- `route_renewal_requested` / `route_renewal_confirmed`: Alice asks for and
+  receives a fresh neighboring route promise before relying on the path again.
 
 These names are planning names, not locked wire action kinds. They should remain
 events or payload meanings unless POC15 locks a specific pCID-owned payload.

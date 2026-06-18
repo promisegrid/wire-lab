@@ -458,6 +458,10 @@ func (node *Node) runCASComputeWorkflow() error {
 		return fmt.Errorf("store second content: %w", err)
 	}
 	primaryToken := storeAck.Fields["capability_token"]
+	if primaryToken == "" {
+		return fmt.Errorf("store content returned no signed capability token")
+	}
+	node.record("agent_cas_retrieval_primary_requested", "kept", "bob", "pcid="+pcid.CASStorageV1+" content_cid="+contentCID+" transport=persistent_session")
 	if _, err := node.sendAndReceive("bob", map[string]string{
 		"act":           decision.ActPromise,
 		"from":          node.Agent.Name,
@@ -471,6 +475,7 @@ func (node *Node) runCASComputeWorkflow() error {
 	}); err != nil {
 		return fmt.Errorf("serve content: %w", err)
 	}
+	node.record("agent_cas_retrieval_primary_succeeded", "kept", "bob", "pcid="+pcid.CASStorageV1+" content_cid="+contentCID+" transport=persistent_session")
 	replayAck, replayErr := node.sendAndReceive("bob", map[string]string{
 		"act":           decision.ActPromise,
 		"from":          node.Agent.Name,
@@ -491,6 +496,7 @@ func (node *Node) runCASComputeWorkflow() error {
 	node.record("tcp_message_send_failed", "non_commitment", "bob", "pcid="+pcid.CASStorageV1+" simulated primary Bob outage before replica request")
 	node.record("primary_storage_unavailable", "non_commitment", "bob", "pcid="+pcid.CASStorageV1+" local send failure is availability event, not broken promise event")
 	node.record("replica_recovery_requested", "kept", "frank", "pcid="+pcid.CASStorageV1+" Alice asks Frank to serve Bob-replicated bytes")
+	node.record("agent_cas_retrieval_replica_requested", "kept", "frank", "pcid="+pcid.CASStorageV1+" content_cid="+contentCID+" transport=persistent_session")
 	if _, err := node.sendAndReceive("frank", map[string]string{
 		"act":           decision.ActPromise,
 		"from":          node.Agent.Name,
@@ -504,6 +510,7 @@ func (node *Node) runCASComputeWorkflow() error {
 	}); err != nil {
 		return fmt.Errorf("serve replica content: %w", err)
 	}
+	node.record("agent_cas_retrieval_replica_succeeded", "kept", "frank", "pcid="+pcid.CASStorageV1+" content_cid="+contentCID+" transport=persistent_session")
 	secondBearerToken := secondStoreAck.Fields["bearer_token"]
 	if secondBearerToken != "" {
 		node.record("agent_cas_bearer_storage_token_transferred", "kept", "frank", "pcid="+pcid.CASStorageV1+" issuer=bob content_cid="+secondContentCID)
@@ -526,6 +533,7 @@ func (node *Node) runCASComputeWorkflow() error {
 		}
 	}
 	missingObjectCID := production.ContentCID([]byte("poc15 missing sparse CAS object|" + node.Config.RunID))
+	node.record("agent_cas_retrieval_missing_requested", "kept", "frank", "pcid="+pcid.CASStorageV1+" content_cid="+missingObjectCID+" transport=persistent_session")
 	if _, err := node.sendAndReceive("frank", map[string]string{
 		"act":                  decision.ActPromise,
 		"from":                 node.Agent.Name,
@@ -539,6 +547,8 @@ func (node *Node) runCASComputeWorkflow() error {
 	}); err != nil {
 		return fmt.Errorf("sparse CAS missing-object probe: %w", err)
 	}
+	node.record("agent_cas_retrieval_missing_recorded", "non_commitment", "frank", "pcid="+pcid.CASStorageV1+" content_cid="+missingObjectCID+" sparse store made no promise for missing bytes")
+	node.record("agent_cas_retrieval_untrusted_not_promised", "non_commitment", "mallory", "pcid="+pcid.CASStorageV1+" Alice refuses to ask permanently distrusted Mallory for CAS bytes")
 	node.record("economics_credit_offered", "kept", "carol", "pcid="+pcid.CIDComputeV1+" Alice offers compute credit_offer=5")
 	if _, err := node.sendAndReceive("dave", map[string]string{
 		"act":           decision.ActPromise,
@@ -713,6 +723,15 @@ func (node *Node) runDynamicTCPTopologyWorkflow() error {
 	target := "fulfillment"
 	node.record("dynamic_tcp_topology_probe_started", "kept", target, "Alice tests whether local direct-peer changes affect actual kernel-routed sends")
 	node.observeOutcome(target, relationship.OutcomeBroken)
+	// Intent: The trust-change probe must affect an already-open transport
+	// object, not only future `canDialTarget` checks, so the run proves active
+	// app/kernel sessions are not silently reused after local distrust. Source:
+	// DI-mapop
+	node.record("persistent_session_trust_reconfigure_requested", "kept", target, "Alice locally removes direct TCP trust and closes her app/kernel session before attempting ordinary traffic")
+	if closeErr := node.closeAppKernelSession(transport.SessionTerminalReasonLocalClose); closeErr != nil {
+		return fmt.Errorf("close app/kernel session for trust reconfiguration: %w", closeErr)
+	}
+	node.record("persistent_session_trust_reconfigure_closed", "kept", target, "local trust change closed the app/kernel session before blocked send")
 	blockedFields := map[string]string{
 		"act":           decision.ActPromise,
 		"from":          node.Agent.Name,
@@ -725,7 +744,7 @@ func (node *Node) runDynamicTCPTopologyWorkflow() error {
 	if _, err := node.sendAndReceive(target, blockedFields); err == nil {
 		return fmt.Errorf("dynamic topology blocked send unexpectedly succeeded")
 	}
-	node.record("dynamic_tcp_topology_send_blocked", "non_commitment", target, "ordinary relationship promise was not sent because local direct TCP promise was removed")
+	node.record("dynamic_tcp_topology_send_blocked", "non_commitment", target, "ordinary relationship promise was not sent because local direct TCP promise was removed and no app/kernel session was silently reused")
 	// Intent: One ordinary kept outcome after broken events must consume
 	// caution without raising trust, giving the analyzer deterministic
 	// `trust_recovery_delayed` event records independent of live-agent choices.
@@ -734,6 +753,10 @@ func (node *Node) runDynamicTCPTopologyWorkflow() error {
 	for repairIndex := 0; repairIndex < 3; repairIndex++ {
 		node.observeOutcome(target, relationship.OutcomeRepairKept)
 	}
+	if err := node.registerReceivePromises(context.Background()); err != nil {
+		return fmt.Errorf("restore app/kernel session after local repair: %w", err)
+	}
+	node.record("persistent_session_trust_reconfigure_reopened", "kept", target, "local repair restored Alice's app/kernel session before ordinary traffic resumed")
 	restoredFields := map[string]string{
 		"act":           decision.ActPromise,
 		"from":          node.Agent.Name,
@@ -928,7 +951,7 @@ func (node *Node) registerReceivePromises(ctx context.Context) error {
 	node.mu.Unlock()
 	for _, protocolName := range node.Agent.Protocols() {
 		if err := node.registerReceivePromise(ctx, session, kernelAddress, protocolName); err != nil {
-			if closeErr := session.Close(); closeErr != nil {
+			if closeErr := session.CloseWithReason(transport.SessionTerminalReasonLocalClose); closeErr != nil {
 				node.record("app_kernel_session_close_failed", "broken", "kernel", closeErr.Error())
 			}
 			return err
@@ -1997,10 +2020,18 @@ func (node *Node) handleCASStoragePromise(fields map[string]string) (map[string]
 			return nil, storeErr
 		}
 		token := node.issueCapabilityToken(fields["from"], contentCID)
+		if token == "" {
+			return nil, fmt.Errorf("issue signed capability token for %s", contentCID)
+		}
+		node.record("normal_traffic_cose_token_issued", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" token_field=capability_token content_cid="+contentCID)
 		bearerToken := ""
 		if fields["token_style"] == "bearer" {
 			bearerToken = node.issueBearerStorageToken(contentCID)
+			if bearerToken == "" {
+				return nil, fmt.Errorf("issue signed bearer storage token for %s", contentCID)
+			}
 			node.record("agent_cas_bearer_storage_token_issued", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" token_scope=bearer content_cid="+contentCID)
+			node.record("normal_traffic_cose_token_issued", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" token_field=bearer_token content_cid="+contentCID)
 		}
 		node.record("cas_storage_promised", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" content_cid="+contentCID)
 		node.record("agent_cas_peer_storage_promised", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" content_cid="+contentCID+" retention=paid-run-local")
@@ -2047,6 +2078,7 @@ func (node *Node) handleCASStoragePromise(fields map[string]string) (map[string]
 			return node.handleSparseCASProbe(fields, production.PromiseServeContent), nil
 		}
 		if fields["token_style"] == "bearer" {
+			node.record("normal_traffic_cose_token_received", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" token_field=token content_cid="+contentCID+" token_style=bearer")
 			if !node.redeemBearerStorageToken(contentCID, fields["token"]) {
 				node.record("agent_cas_bearer_storage_token_rejected", "non_commitment", fields["from"], "pcid="+pcid.CASStorageV1+" bearer token not promised for content_cid="+contentCID)
 				return map[string]string{
@@ -2056,13 +2088,16 @@ func (node *Node) handleCASStoragePromise(fields map[string]string) (map[string]
 				}, nil
 			}
 			node.record("agent_cas_bearer_storage_token_redeemed", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" bearer content_cid="+contentCID)
-		} else if !node.redeemCapabilityToken(fields["from"], contentCID, fields["token"]) {
-			node.record("capability_token_replay_rejected", "non_commitment", fields["from"], "pcid="+pcid.CASStorageV1+" consumed or unrecognized serve-once token for content_cid="+contentCID)
-			return map[string]string{
-				"promise_about": production.PromiseServeContent,
-				"content_cid":   contentCID,
-				"token_status":  "not_promised",
-			}, nil
+		} else {
+			node.record("normal_traffic_cose_token_received", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" token_field=token content_cid="+contentCID+" token_style=serve-once")
+			if !node.redeemCapabilityToken(fields["from"], contentCID, fields["token"]) {
+				node.record("capability_token_replay_rejected", "non_commitment", fields["from"], "pcid="+pcid.CASStorageV1+" consumed or unrecognized serve-once token for content_cid="+contentCID)
+				return map[string]string{
+					"promise_about": production.PromiseServeContent,
+					"content_cid":   contentCID,
+					"token_status":  "not_promised",
+				}, nil
+			}
 		}
 		contentBytes, stored, readErr := node.readLocalCASObject(contentCID)
 		if readErr != nil {
@@ -2103,8 +2138,12 @@ func (node *Node) handleCASStoragePromise(fields map[string]string) (map[string]
 		}
 		issuee := firstStringField(fields, "issuee", "from")
 		token := node.issueCapabilityToken(issuee, contentCID)
+		if token == "" {
+			return nil, fmt.Errorf("issue signed replica capability token for %s", contentCID)
+		}
 		node.record("cas_replica_stored", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" content_cid="+contentCID)
 		node.record("replica_capability_token_issued", "kept", issuee, "pcid="+pcid.CASStorageV1+" content_cid="+contentCID)
+		node.record("normal_traffic_cose_token_issued", "kept", issuee, "pcid="+pcid.CASStorageV1+" token_field=replica_token content_cid="+contentCID)
 		return map[string]string{
 			"promise_about": production.PromiseReplicateContent,
 			"content_cid":   contentCID,
@@ -2115,6 +2154,7 @@ func (node *Node) handleCASStoragePromise(fields map[string]string) (map[string]
 		if fields["missing_object_probe"] == "true" {
 			return node.handleSparseCASProbe(fields, production.PromiseServeReplicaContent), nil
 		}
+		node.record("normal_traffic_cose_token_received", "kept", fields["from"], "pcid="+pcid.CASStorageV1+" token_field=token content_cid="+contentCID+" token_style=replica")
 		if !node.redeemCapabilityToken(fields["from"], contentCID, fields["token"]) {
 			node.record("capability_token_replay_rejected", "non_commitment", fields["from"], "pcid="+pcid.CASStorageV1+" consumed or unrecognized replica token for content_cid="+contentCID)
 			return map[string]string{
@@ -2613,10 +2653,23 @@ func copyPromiseMapOrEmpty(fields map[string]promiseRecord) map[string]promiseRe
 }
 
 func (node *Node) issueCapabilityToken(issuee, contentCID string) string {
-	token := production.ContentCID([]byte(node.Agent.Name + "|" + issuee + "|" + contentCID + "|serve-once"))
+	token, err := protocol.EncodeSignedCapabilityToken(protocol.SignedCapabilityToken{
+		Issuer:       node.Agent.Name,
+		Subject:      issuee,
+		Scope:        "serve-once",
+		ContentCID:   contentCID,
+		ExpiresUnix:  4_102_444_800,
+		Nonce:        node.nextExchangeID(issuee, "signed-capability-token"),
+		Transferable: false,
+	})
+	if err != nil {
+		node.record("capability_token_sign_failed", "broken", issuee, "pcid="+pcid.CASStorageV1+" "+err.Error())
+		return ""
+	}
 	node.mu.Lock()
 	node.capabilityTokens[issuee+"|"+contentCID] = token
 	node.mu.Unlock()
+	node.record("capability_token_signed", "kept", issuee, "pcid="+pcid.CASStorageV1+" scope=serve-once content_cid="+contentCID)
 	return token
 }
 
@@ -2626,21 +2679,46 @@ func (node *Node) issueCapabilityToken(issuee, contentCID string) string {
 // holder can redeem storage without treating the token as external authority.
 // Source: DI-manul
 func (node *Node) issueBearerStorageToken(contentCID string) string {
-	token := production.ContentCID([]byte(node.Agent.Name + "|" + contentCID + "|bearer-storage"))
+	token, err := protocol.EncodeSignedCapabilityToken(protocol.SignedCapabilityToken{
+		Issuer:       node.Agent.Name,
+		Subject:      "bearer",
+		Scope:        "bearer-storage",
+		ContentCID:   contentCID,
+		ExpiresUnix:  4_102_444_800,
+		Nonce:        node.nextExchangeID("bearer", "signed-capability-token"),
+		Transferable: true,
+	})
+	if err != nil {
+		node.record("capability_token_sign_failed", "broken", "bearer", "pcid="+pcid.CASStorageV1+" "+err.Error())
+		return ""
+	}
 	node.mu.Lock()
 	node.capabilityTokens["bearer|"+contentCID+"|"+token] = token
 	node.mu.Unlock()
+	node.record("agent_cas_signed_bearer_storage_token_issued", "kept", "bearer", "pcid="+pcid.CASStorageV1+" scope=bearer-storage content_cid="+contentCID)
 	return token
 }
 
 func (node *Node) redeemCapabilityToken(issuee, contentCID, token string) bool {
+	// Intent: Serve-once storage tokens are signed issuer promises before they
+	// are local replay-table entries. A valid signature is necessary but not
+	// sufficient; the issuer must still have an unconsumed local token promise.
+	// Source: DI-mapop
+	verifiedToken, verifyErr := protocol.RedeemSignedCapabilityToken(token, node.Agent.Name, issuee, "serve-once", contentCID, time.Now())
+	if verifyErr != nil || verifiedToken.Transferable {
+		node.record("capability_token_signature_rejected", "non_commitment", issuee, "pcid="+pcid.CASStorageV1+" content_cid="+contentCID+" error="+firstNonEmpty(errorString(verifyErr), "transferable serve-once token"))
+		return false
+	}
 	node.mu.Lock()
-	defer node.mu.Unlock()
 	tokenKey := issuee + "|" + contentCID
 	if node.capabilityTokens[tokenKey] != token {
+		node.mu.Unlock()
 		return false
 	}
 	delete(node.capabilityTokens, tokenKey)
+	node.mu.Unlock()
+	node.record("capability_token_signature_verified", "kept", issuee, "pcid="+pcid.CASStorageV1+" scope=serve-once content_cid="+contentCID+" nonce="+verifiedToken.Nonce)
+	node.record("capability_token_expiry_checked", "kept", issuee, "pcid="+pcid.CASStorageV1+" expires_unix="+strconv.FormatInt(verifiedToken.ExpiresUnix, 10))
 	return true
 }
 
@@ -2650,13 +2728,24 @@ func (node *Node) redeemCapabilityToken(issuee, contentCID, token string) bool {
 // not impose storage, routing, or trust decisions on any other agent. Source:
 // DI-manul
 func (node *Node) redeemBearerStorageToken(contentCID, token string) bool {
+	// Intent: Bearer tokens are transferable promises by the issuer, not a
+	// global spending right. The issuer verifies its signature, scope, and local
+	// unspent token table before serving bytes. Source: DI-mapop
+	verifiedToken, verifyErr := protocol.RedeemSignedCapabilityToken(token, node.Agent.Name, "bearer", "bearer-storage", contentCID, time.Now())
+	if verifyErr != nil || !verifiedToken.Transferable {
+		node.record("agent_cas_bearer_storage_token_rejected", "non_commitment", "bearer", "pcid="+pcid.CASStorageV1+" signed token check failed content_cid="+contentCID+" error="+firstNonEmpty(errorString(verifyErr), "non-transferable bearer token"))
+		return false
+	}
 	node.mu.Lock()
-	defer node.mu.Unlock()
 	tokenKey := "bearer|" + contentCID + "|" + token
 	if node.capabilityTokens[tokenKey] != token {
+		node.mu.Unlock()
 		return false
 	}
 	delete(node.capabilityTokens, tokenKey)
+	node.mu.Unlock()
+	node.record("capability_token_signature_verified", "kept", "bearer", "pcid="+pcid.CASStorageV1+" scope=bearer-storage content_cid="+contentCID+" nonce="+verifiedToken.Nonce)
+	node.record("capability_token_expiry_checked", "kept", "bearer", "pcid="+pcid.CASStorageV1+" expires_unix="+strconv.FormatInt(verifiedToken.ExpiresUnix, 10))
 	return true
 }
 
@@ -3343,6 +3432,13 @@ func firstNonEmpty(values ...string) string {
 	return ""
 }
 
+func errorString(err error) string {
+	if err == nil {
+		return ""
+	}
+	return err.Error()
+}
+
 func (node *Node) record(eventName, outcome, peer, detail string) {
 	event := decision.Event{
 		Observer: node.Agent.Name,
@@ -3464,15 +3560,23 @@ func (node *Node) closeLog() {
 
 func (node *Node) closeReceivePromises() {
 	node.setStopping()
+	if closeErr := node.closeAppKernelSession(transport.SessionTerminalReasonProcessShutdown); closeErr != nil {
+		node.record("app_receive_conn_close_failed", "broken", "kernel", closeErr.Error())
+	}
+}
+
+func (node *Node) closeAppKernelSession(reason transport.SessionTerminalReason) error {
+	// Intent: Mid-run trust reconfiguration and process shutdown close the same
+	// local app/kernel stream but should leave different terminal reasons in the
+	// persistent-session log. Source: DI-mapop
 	node.mu.Lock()
 	appSession := node.appSession
 	node.appSession = nil
 	node.mu.Unlock()
 	if appSession != nil {
-		if closeErr := appSession.Close(); closeErr != nil {
-			node.record("app_receive_conn_close_failed", "broken", "kernel", closeErr.Error())
-		}
+		return appSession.CloseWithReason(reason)
 	}
+	return nil
 }
 
 func (node *Node) setStopping() {

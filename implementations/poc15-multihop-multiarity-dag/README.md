@@ -36,6 +36,18 @@ artifact observations, with parent-link coverage in both envelope slots and
 pCID-defined payload fields. Source: `DI-lutuv`; `DI-lihir`; `DI-kohuj`;
 `DI-tuhop`; `DI-mosat`; `DI-vopab`.
 
+The current convergence slice hardens that transport and storage pressure:
+every persistent session now carries a local `session_id`, frame/request/response
+counters, and exactly one terminal event with a close reason. Alice's local
+trust-change scenario closes and later reopens the active app/kernel session so
+the run proves an existing stream is not silently reused after local distrust.
+CAS capability tokens are now signed CBOR/COSE_Sign1 issuer promises with scope,
+subject, content CID, expiry, nonce, and transferability claims. This is not a
+full CWT adoption claim; it is executable pressure for signed promise tokens
+before a later pCID decides the final token profile. The route workflow also
+records peer transit-exclusion promises, explicit route lifetime exhaustion,
+local non-send after expiry, and route renewal before reuse. Source: `DI-mapop`.
+
 The current CAS/DAG slice now also gives each app its own local sparse CAS view.
 Agents may store exact messages, local state bytes, encrypted blobs named by
 ciphertext CID, or peer-served content. Object bytes are now stored as per-agent
@@ -97,6 +109,9 @@ exception:
     paths should stay open during a run and carry many exact envelopes. A local
     pending map uses the request message hash as the key, and generated ACKs
     parent-link that hash so no payload-level RPC request ID is needed.
+12. **Signed capability-token bytes.** CAS storage and bearer tokens should be
+    signed issuer promises carried as normal pCID-owned payload fields, with
+    replay/expiry/scope checks performed by the issuer's local state.
 
 ## Multihop Promise Sketch
 
@@ -212,7 +227,10 @@ request number, route authority, or kernel-owned trust judgment. The kernel owns
 byte routing and local receive-promise tables; apps own promise meaning, trust,
 economics, and keep/break judgment. Analyzer gates now require
 `persistent_session_*` events and fail if retained ACK artifacts lack request
-parent links. Source: `DI-vopab`; `TE-lubid`.
+parent links. The current gate also requires frame-sent/frame-received counts,
+request-start/response-match counts, one terminal event per opened session, at
+least one shutdown terminal reason, and explicit close/reopen events for the
+trust-driven reconfiguration slice. Source: `DI-vopab`; `DI-mapop`; `TE-lubid`.
 
 ## Candidate Agent Work
 
@@ -235,7 +253,10 @@ payload-parent route links, raw-message DAG traversal, route durability,
 asymmetric response-path handling, reciprocal route credits, useful routed
 Peggy/Victor compute, agent-accessible sparse CAS, bearer storage-token
 incentives, encrypted-object CIDs, local CAS GC, and an explicit kernel-role
-profile event.
+profile event. The newest gates add strict persistent-session lifecycle
+accounting, route expiry/renewal/transit-exclusion pressure, local/primary,
+peer/replica, missing-object, and untrusted-peer CAS retrieval outcomes, plus
+signed-token issue/verify/expiry/replay events.
 Remaining analyzer targets are:
 
 - At least one forwarding non-commitment due to capacity, trust, pCID support,

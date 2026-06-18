@@ -271,6 +271,33 @@ Constraints: Preserve one top-level semantic action `promise`; keep app trust an
 Affects: docs/thought-experiments/TE-lubid-poc15-persistent-multiplexed-sessions.md; implementations/poc15-multihop-multiarity-dag/; DEV-GUIDE-RESOURCES.md; protocols/wire-lab.d/TODO/TODO-gogug-poc13-hardening-and-poc14-superset-plan.md.
 Supersedes: none
 
+ID: DI-mapop
+Date: 2026-06-17 14:17:56
+Status: active
+Decision: Implement the next POC15 convergence slice in place with strict persistent-session terminal accounting, trust-driven session reconfiguration events, route expiry/exclusion pressure, peer CAS retrieval over persistent sessions, signed CBOR capability tokens using the existing COSE_Sign1/Ed25519 subset, selected normal-traffic multiarity/COSE pressure, and expanded analyzer/docs.
+Intent: POC15 should move beyond showing that persistent sessions, sparse CAS, bearer tokens, route promises, and COSE specimens exist. The next clean run should make those mechanisms observable enough to evaluate production-shaped behavior: every opened session has a terminal state, local trust changes affect active transport, routes have bounded lifetime and voluntary transit promises, agents retrieve CAS objects from local or peer stores without assuming a complete global CAS, and capability tokens are real signed bytes rather than deterministic hash strings. Full CWT compliance remains a later adoption question; this slice uses signed CBOR/COSE_Sign1 tokens as executable pressure without claiming final token standardization.
+Constraints: Preserve one top-level semantic action `promise`; preserve `grid([42(pCID), ...])` and pCID-owned slot meanings; preserve exact message CIDs and parent links as the only correlation layer; do not add RPC IDs, global monitors, global trust, global routing policy, or cross-run durable state; keep app trust and workflow judgment outside the kernel; use names `SessionStats`, `SessionTerminalReason`, `sessionID`, `recordSessionFrameSent`, `recordSessionFrameReceived`, `recordSessionTerminal`, `SignedCapabilityToken`, `EncodeSignedCapabilityToken`, `VerifySignedCapabilityToken`, and `RedeemSignedCapabilityToken`; add analyzer gates and run Go tests, errcheck, static scans, and clean POC15 containers.
+Affects: implementations/poc15-multihop-multiarity-dag/transport/; implementations/poc15-multihop-multiarity-dag/kernel/; implementations/poc15-multihop-multiarity-dag/runtime/; implementations/poc15-multihop-multiarity-dag/protocol/; implementations/poc15-multihop-multiarity-dag/cmd/poc15-analyze/; implementations/poc15-multihop-multiarity-dag/docs/; implementations/poc15-multihop-multiarity-dag/README.md; DEV-GUIDE-RESOURCES.md; protocols/wire-lab.d/TODO/TODO-gogug-poc13-hardening-and-poc14-superset-plan.md.
+Supersedes: none
+
+ID: DI-homuj
+Date: 2026-06-17 07:39:28
+Status: active
+Decision: POC15 supervisors must terminate child processes with a graceful SIGTERM window before using kill, so local kernels can record persistent-session terminal events during clean-run shutdown.
+Intent: Strict persistent-session accounting exposed that `exec.CommandContext` kills kernel processes before `kernel.Run` can close peer sessions and flush `persistent_session_terminal` records. Shutdown accounting is part of the transport behavior under test, so the supervisor should ask child processes to stop voluntarily, wait for their stdout/stderr forwarders to drain, and only kill after the grace window expires.
+Constraints: Preserve one top-level semantic action `promise`; do not move trust or workflow judgment into the supervisor; keep supervisor events as POC-only process plumbing; use existing `runProcess` ownership and the names `childShutdownGrace`, `waitDone`, and `signalErr`; keep the fallback kill path bounded; rerun Go tests, errcheck, static scans, and clean POC15 containers.
+Affects: implementations/poc15-multihop-multiarity-dag/cmd/poc15-supervisor/; implementations/poc15-multihop-multiarity-dag/cmd/poc15-analyze/; protocols/wire-lab.d/TODO/TODO-gogug-poc13-hardening-and-poc14-superset-plan.md.
+Supersedes: none
+
+ID: DI-fobuv
+Date: 2026-06-17 07:47:33
+Status: active
+Decision: POC15 kernels must own accepted inbound peer sessions as run-scoped transport state and close them during graceful shutdown, just like outbound peer sessions.
+Intent: After supervisor shutdown became graceful, remaining unterminated sessions were accepted inbound `kernel-peer-in:*` streams. Those sessions are real persistent TCP objects opened by the local kernel, even though the remote peer initiated the socket. The local kernel therefore needs explicit ownership so shutdown can close them deterministically and emit one terminal event per opened session.
+Constraints: Preserve one top-level semantic action `promise`; keep inbound peer tracking as local transport accounting only; do not infer peer trust from inbound socket ownership; use names `inboundPeerSessions`, `trackInboundPeerSession`, `untrackInboundPeerSession`, and `closeInboundPeerSessions`; keep outbound session behavior unchanged; rerun Go tests, errcheck, static scans, and clean POC15 containers.
+Affects: implementations/poc15-multihop-multiarity-dag/kernel/; implementations/poc15-multihop-multiarity-dag/cmd/poc15-analyze/; protocols/wire-lab.d/TODO/TODO-gogug-poc13-hardening-and-poc14-superset-plan.md.
+Supersedes: none
+
 ## Tasks
 
 - [x] gogug.1 Fix POC13 evidence summary mismatch so saved evidence counts include all local non-commitment outcomes, not only receiver-side `not_promised` journal entries.
@@ -376,3 +403,12 @@ Supersedes: none
 - [x] gogug.101 Require ACK/response parent links and add analyzer gates.
 - [x] gogug.102 Update POC15 docs and DEV guide for persistent sessions.
 - [x] gogug.103 Run Go validation, errcheck, scans, and clean POC15 containers.
+- [x] gogug.104 Add strict persistent-session IDs, counters, terminal reasons, and analyzer gates.
+- [x] gogug.105 Add trust-driven persistent-session close/refuse/reopen pressure.
+- [x] gogug.106 Add route expiry, renewal/failure, asymmetric response, and peer transit-exclusion gates.
+- [x] gogug.107 Add peer CAS retrieval over persistent sessions with local, peer, replica, missing, and untrusted outcomes.
+- [x] gogug.108 Replace POC15 hash-string CAS capability tokens with signed CBOR/COSE_Sign1 tokens.
+- [x] gogug.109 Move selected multiarity, COSE, and parent-link message shapes into ordinary route/CAS traffic.
+- [x] gogug.110 Expand analyzer score/report fields for session, route, CAS retrieval, token security, and economics health.
+- [x] gogug.111 Update POC15 docs and DEV guide for the convergence slice.
+- [x] gogug.112 Run Go validation, errcheck, static scans, and clean POC15 containers.

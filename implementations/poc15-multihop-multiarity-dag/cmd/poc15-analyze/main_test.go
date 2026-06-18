@@ -410,6 +410,18 @@ func cleanRegressionSummary() RunSummary {
 		LocalResourceCounts:          map[string]int{},
 		ResourceTrustCouplingCounts:  map[string]int{},
 		ForbiddenVocabularyCounts:    map[string]int{},
+		CASRetrievalCounts:           map[string]int{},
+		TokenSecurityCounts:          map[string]int{},
+		PersistentSessionCounts:      map[string]int{},
+		PersistentSessionOpenCounts: map[string]int{
+			"test-session": 1,
+		},
+		PersistentSessionTerminalCounts: map[string]int{
+			"test-session": 1,
+		},
+		PersistentSessionTerminalReasonCounts: map[string]int{
+			"process_shutdown": 1,
+		},
 		MonitorReport: &decision.MonitorReport{
 			PromiseTheoryFit:      5,
 			Autonomy:              5,

@@ -20,55 +20,63 @@ import (
 // Intent: Keep POC15 live runs comparable without committing provider logs or
 // Docker volume state. Source: DI-timah
 type RunSummary struct {
-	RunDir                         string                  `json:"run_dir"`
-	TotalEvents                    int                     `json:"total_events"`
-	EventCounts                    map[string]int          `json:"event_counts"`
-	OutcomeCounts                  map[string]int          `json:"outcome_counts"`
-	AgentCounts                    map[string]int          `json:"agent_counts"`
-	FailureCounts                  map[string]int          `json:"failure_counts"`
-	ProtocolCounts                 map[string]int          `json:"protocol_counts"`
-	TrustDrivenChoiceCounts        map[string]int          `json:"trust_driven_choice_counts"`
-	EconomicsCounts                map[string]int          `json:"economics_counts"`
-	VerificationCounts             map[string]int          `json:"verification_counts"`
-	ReplicaRecoveryCounts          map[string]int          `json:"replica_recovery_counts"`
-	RPCDriftCounts                 map[string]int          `json:"rpc_drift_counts"`
-	ShippingCounts                 map[string]int          `json:"shipping_counts"`
-	RelationshipTransitionCounts   map[string]int          `json:"relationship_transition_counts"`
-	DynamicTopologyCounts          map[string]int          `json:"dynamic_topology_counts"`
-	LocalResourceCounts            map[string]int          `json:"local_resource_counts"`
-	ResourceTrustCouplingCounts    map[string]int          `json:"resource_trust_coupling_counts"`
-	DurabilityCounts               map[string]int          `json:"durability_counts"`
-	RetentionCounts                map[string]int          `json:"retention_counts"`
-	PressureCounts                 map[string]int          `json:"pressure_counts"`
-	ReplayCounts                   map[string]int          `json:"replay_counts"`
-	TrustCautionCounts             map[string]int          `json:"trust_caution_counts"`
-	RuntimeAdapterEventCounts      map[string]int          `json:"runtime_adapter_event_counts"`
-	DecentralizedMonitorCounts     map[string]int          `json:"decentralized_monitor_counts"`
-	RouteCounts                    map[string]int          `json:"route_counts"`
-	ArrayPayloadProtocolCounts     map[string]int          `json:"array_payload_protocol_counts"`
-	AgentCASCounts                 map[string]int          `json:"agent_cas_counts"`
-	MessageArtifactCount           int                     `json:"message_artifact_count"`
-	MessageCASObjectCount          int                     `json:"message_cas_object_count"`
-	MessageDAGRecordCount          int                     `json:"message_dag_record_count"`
-	MessageDAGNodeCount            int                     `json:"message_dag_node_count"`
-	MessageDAGParentLinkCount      int                     `json:"message_dag_parent_link_count"`
-	MessageDAGRootCount            int                     `json:"message_dag_root_count"`
-	MessageDAGReachableCount       int                     `json:"message_dag_reachable_count"`
-	MessageDAGMaxDepth             int                     `json:"message_dag_max_depth"`
-	MessageDAGMissingParentCount   int                     `json:"message_dag_missing_parent_count"`
-	AckMessageMissingParentCount   int                     `json:"ack_message_missing_parent_count"`
-	MessageArtifactDirectionCounts map[string]int          `json:"message_artifact_direction_counts"`
-	MessageArtifactProtocolCounts  map[string]int          `json:"message_artifact_protocol_counts"`
-	MessageArtifactBadPrefixCount  int                     `json:"message_artifact_bad_prefix_count"`
-	MessageDAGParentLocationCounts map[string]int          `json:"message_dag_parent_location_counts"`
-	MessageShapeSpecimenCounts     map[string]int          `json:"message_shape_specimen_counts"`
-	MigrationCounts                map[string]int          `json:"migration_counts"`
-	RestartCounts                  map[string]int          `json:"restart_counts"`
-	ForbiddenVocabularyCounts      map[string]int          `json:"forbidden_vocabulary_counts,omitempty"`
-	ScoreReport                    ScoreReport             `json:"score_report"`
-	ProductionFitness              ProductionFitnessReport `json:"production_fitness"`
-	MissingRequiredEventNames      []string                `json:"missing_required_event_names,omitempty"`
-	MonitorReport                  *decision.MonitorReport `json:"monitor_report,omitempty"`
+	RunDir                                  string                  `json:"run_dir"`
+	TotalEvents                             int                     `json:"total_events"`
+	EventCounts                             map[string]int          `json:"event_counts"`
+	OutcomeCounts                           map[string]int          `json:"outcome_counts"`
+	AgentCounts                             map[string]int          `json:"agent_counts"`
+	FailureCounts                           map[string]int          `json:"failure_counts"`
+	ProtocolCounts                          map[string]int          `json:"protocol_counts"`
+	TrustDrivenChoiceCounts                 map[string]int          `json:"trust_driven_choice_counts"`
+	EconomicsCounts                         map[string]int          `json:"economics_counts"`
+	VerificationCounts                      map[string]int          `json:"verification_counts"`
+	ReplicaRecoveryCounts                   map[string]int          `json:"replica_recovery_counts"`
+	RPCDriftCounts                          map[string]int          `json:"rpc_drift_counts"`
+	ShippingCounts                          map[string]int          `json:"shipping_counts"`
+	RelationshipTransitionCounts            map[string]int          `json:"relationship_transition_counts"`
+	DynamicTopologyCounts                   map[string]int          `json:"dynamic_topology_counts"`
+	LocalResourceCounts                     map[string]int          `json:"local_resource_counts"`
+	ResourceTrustCouplingCounts             map[string]int          `json:"resource_trust_coupling_counts"`
+	DurabilityCounts                        map[string]int          `json:"durability_counts"`
+	RetentionCounts                         map[string]int          `json:"retention_counts"`
+	PressureCounts                          map[string]int          `json:"pressure_counts"`
+	ReplayCounts                            map[string]int          `json:"replay_counts"`
+	TrustCautionCounts                      map[string]int          `json:"trust_caution_counts"`
+	RuntimeAdapterEventCounts               map[string]int          `json:"runtime_adapter_event_counts"`
+	DecentralizedMonitorCounts              map[string]int          `json:"decentralized_monitor_counts"`
+	RouteCounts                             map[string]int          `json:"route_counts"`
+	ArrayPayloadProtocolCounts              map[string]int          `json:"array_payload_protocol_counts"`
+	AgentCASCounts                          map[string]int          `json:"agent_cas_counts"`
+	CASRetrievalCounts                      map[string]int          `json:"cas_retrieval_counts"`
+	TokenSecurityCounts                     map[string]int          `json:"token_security_counts"`
+	PersistentSessionCounts                 map[string]int          `json:"persistent_session_counts"`
+	PersistentSessionOpenCounts             map[string]int          `json:"persistent_session_open_counts"`
+	PersistentSessionTerminalCounts         map[string]int          `json:"persistent_session_terminal_counts"`
+	PersistentSessionTerminalReasonCounts   map[string]int          `json:"persistent_session_terminal_reason_counts"`
+	PersistentSessionUnterminatedCount      int                     `json:"persistent_session_unterminated_count"`
+	PersistentSessionDuplicateTerminalCount int                     `json:"persistent_session_duplicate_terminal_count"`
+	MessageArtifactCount                    int                     `json:"message_artifact_count"`
+	MessageCASObjectCount                   int                     `json:"message_cas_object_count"`
+	MessageDAGRecordCount                   int                     `json:"message_dag_record_count"`
+	MessageDAGNodeCount                     int                     `json:"message_dag_node_count"`
+	MessageDAGParentLinkCount               int                     `json:"message_dag_parent_link_count"`
+	MessageDAGRootCount                     int                     `json:"message_dag_root_count"`
+	MessageDAGReachableCount                int                     `json:"message_dag_reachable_count"`
+	MessageDAGMaxDepth                      int                     `json:"message_dag_max_depth"`
+	MessageDAGMissingParentCount            int                     `json:"message_dag_missing_parent_count"`
+	AckMessageMissingParentCount            int                     `json:"ack_message_missing_parent_count"`
+	MessageArtifactDirectionCounts          map[string]int          `json:"message_artifact_direction_counts"`
+	MessageArtifactProtocolCounts           map[string]int          `json:"message_artifact_protocol_counts"`
+	MessageArtifactBadPrefixCount           int                     `json:"message_artifact_bad_prefix_count"`
+	MessageDAGParentLocationCounts          map[string]int          `json:"message_dag_parent_location_counts"`
+	MessageShapeSpecimenCounts              map[string]int          `json:"message_shape_specimen_counts"`
+	MigrationCounts                         map[string]int          `json:"migration_counts"`
+	RestartCounts                           map[string]int          `json:"restart_counts"`
+	ForbiddenVocabularyCounts               map[string]int          `json:"forbidden_vocabulary_counts,omitempty"`
+	ScoreReport                             ScoreReport             `json:"score_report"`
+	ProductionFitness                       ProductionFitnessReport `json:"production_fitness"`
+	MissingRequiredEventNames               []string                `json:"missing_required_event_names,omitempty"`
+	MonitorReport                           *decision.MonitorReport `json:"monitor_report,omitempty"`
 }
 
 // ScoreReport gives the operator a fast POC15 fitness view in addition to the
@@ -93,6 +101,9 @@ type ScoreReport struct {
 	Monitoring     int      `json:"monitoring"`
 	Route          int      `json:"route"`
 	AgentCAS       int      `json:"agent_cas"`
+	CASRetrieval   int      `json:"cas_retrieval"`
+	TokenSecurity  int      `json:"token_security"`
+	Session        int      `json:"session"`
 	Migration      int      `json:"migration"`
 	Restart        int      `json:"restart"`
 	Concerns       []string `json:"concerns,omitempty"`
@@ -189,39 +200,45 @@ func analyzeRun(runDir string) (RunSummary, error) {
 		return RunSummary{}, resolveErr
 	}
 	summary := RunSummary{
-		RunDir:                         logDir,
-		EventCounts:                    make(map[string]int),
-		OutcomeCounts:                  make(map[string]int),
-		AgentCounts:                    make(map[string]int),
-		FailureCounts:                  make(map[string]int),
-		ProtocolCounts:                 make(map[string]int),
-		TrustDrivenChoiceCounts:        make(map[string]int),
-		EconomicsCounts:                make(map[string]int),
-		VerificationCounts:             make(map[string]int),
-		ReplicaRecoveryCounts:          make(map[string]int),
-		RPCDriftCounts:                 make(map[string]int),
-		ShippingCounts:                 make(map[string]int),
-		RelationshipTransitionCounts:   make(map[string]int),
-		DynamicTopologyCounts:          make(map[string]int),
-		LocalResourceCounts:            make(map[string]int),
-		ResourceTrustCouplingCounts:    make(map[string]int),
-		DurabilityCounts:               make(map[string]int),
-		RetentionCounts:                make(map[string]int),
-		PressureCounts:                 make(map[string]int),
-		ReplayCounts:                   make(map[string]int),
-		TrustCautionCounts:             make(map[string]int),
-		RuntimeAdapterEventCounts:      make(map[string]int),
-		DecentralizedMonitorCounts:     make(map[string]int),
-		RouteCounts:                    make(map[string]int),
-		ArrayPayloadProtocolCounts:     make(map[string]int),
-		AgentCASCounts:                 make(map[string]int),
-		MessageArtifactDirectionCounts: make(map[string]int),
-		MessageArtifactProtocolCounts:  make(map[string]int),
-		MessageDAGParentLocationCounts: make(map[string]int),
-		MessageShapeSpecimenCounts:     make(map[string]int),
-		MigrationCounts:                make(map[string]int),
-		RestartCounts:                  make(map[string]int),
-		ForbiddenVocabularyCounts:      make(map[string]int),
+		RunDir:                                logDir,
+		EventCounts:                           make(map[string]int),
+		OutcomeCounts:                         make(map[string]int),
+		AgentCounts:                           make(map[string]int),
+		FailureCounts:                         make(map[string]int),
+		ProtocolCounts:                        make(map[string]int),
+		TrustDrivenChoiceCounts:               make(map[string]int),
+		EconomicsCounts:                       make(map[string]int),
+		VerificationCounts:                    make(map[string]int),
+		ReplicaRecoveryCounts:                 make(map[string]int),
+		RPCDriftCounts:                        make(map[string]int),
+		ShippingCounts:                        make(map[string]int),
+		RelationshipTransitionCounts:          make(map[string]int),
+		DynamicTopologyCounts:                 make(map[string]int),
+		LocalResourceCounts:                   make(map[string]int),
+		ResourceTrustCouplingCounts:           make(map[string]int),
+		DurabilityCounts:                      make(map[string]int),
+		RetentionCounts:                       make(map[string]int),
+		PressureCounts:                        make(map[string]int),
+		ReplayCounts:                          make(map[string]int),
+		TrustCautionCounts:                    make(map[string]int),
+		RuntimeAdapterEventCounts:             make(map[string]int),
+		DecentralizedMonitorCounts:            make(map[string]int),
+		RouteCounts:                           make(map[string]int),
+		ArrayPayloadProtocolCounts:            make(map[string]int),
+		AgentCASCounts:                        make(map[string]int),
+		CASRetrievalCounts:                    make(map[string]int),
+		TokenSecurityCounts:                   make(map[string]int),
+		PersistentSessionCounts:               make(map[string]int),
+		PersistentSessionOpenCounts:           make(map[string]int),
+		PersistentSessionTerminalCounts:       make(map[string]int),
+		PersistentSessionTerminalReasonCounts: make(map[string]int),
+		MessageArtifactDirectionCounts:        make(map[string]int),
+		MessageArtifactProtocolCounts:         make(map[string]int),
+		MessageDAGParentLocationCounts:        make(map[string]int),
+		MessageShapeSpecimenCounts:            make(map[string]int),
+		MigrationCounts:                       make(map[string]int),
+		RestartCounts:                         make(map[string]int),
+		ForbiddenVocabularyCounts:             make(map[string]int),
 	}
 	logPaths := jsonlLogPaths(logDir)
 	sort.Strings(logPaths)
@@ -230,6 +247,7 @@ func analyzeRun(runDir string) (RunSummary, error) {
 			return RunSummary{}, err
 		}
 	}
+	finalizePersistentSessionLifecycle(&summary)
 	report, reportErr := readMonitorReport(filepath.Join(logDir, "monitor-report.json"))
 	if reportErr != nil {
 		return RunSummary{}, reportErr
@@ -617,10 +635,22 @@ func persistentSessionFailures(summary RunSummary) []string {
 	// one-shot TCP or if ACK artifacts stop parent-linking the exact request
 	// message CIDs used by persistent-session demux. Source: DI-vopab
 	var failures []string
-	for _, eventName := range []string{"persistent_session_opened", "persistent_session_reused", "persistent_session_closed"} {
+	for _, eventName := range []string{"persistent_session_opened", "persistent_session_reused", "persistent_session_closed", "persistent_session_frame_sent", "persistent_session_frame_received", "persistent_session_request_started", "persistent_session_response_matched", "persistent_session_terminal"} {
 		if summary.EventCounts[eventName] == 0 {
 			failures = append(failures, eventName+"=0 want >0")
 		}
+	}
+	if summary.PersistentSessionUnterminatedCount != 0 {
+		failures = append(failures, fmt.Sprintf("persistent_session_unterminated_count=%d want 0", summary.PersistentSessionUnterminatedCount))
+	}
+	if summary.PersistentSessionDuplicateTerminalCount != 0 {
+		failures = append(failures, fmt.Sprintf("persistent_session_duplicate_terminal_count=%d want 0", summary.PersistentSessionDuplicateTerminalCount))
+	}
+	if summary.PersistentSessionTerminalReasonCounts["process_shutdown"] == 0 {
+		failures = append(failures, "persistent_session_terminal_reason_counts.process_shutdown=0 want >0")
+	}
+	if summary.EventCounts["persistent_session_trust_reconfigure_closed"] == 0 || summary.EventCounts["persistent_session_trust_reconfigure_reopened"] == 0 {
+		failures = append(failures, "trust-driven persistent session close/reopen events missing")
 	}
 	if summary.AckMessageMissingParentCount != 0 {
 		failures = append(failures, fmt.Sprintf("ack_message_missing_parent_count=%d want 0", summary.AckMessageMissingParentCount))
@@ -837,6 +867,26 @@ func summarizeLog(logPath string, summary *RunSummary) error {
 		if isAgentCASEvent(event.Event) {
 			summary.AgentCASCounts[event.Event]++
 		}
+		if isCASRetrievalEvent(event.Event) {
+			summary.CASRetrievalCounts[event.Event]++
+		}
+		if isTokenSecurityEvent(event.Event) {
+			summary.TokenSecurityCounts[event.Event]++
+		}
+		if isPersistentSessionEvent(event.Event) {
+			summary.PersistentSessionCounts[event.Event]++
+			sessionID := detailValue(event.Detail, "session_id")
+			if sessionID != "" {
+				if event.Event == "persistent_session_opened" {
+					summary.PersistentSessionOpenCounts[sessionID]++
+				}
+				if event.Event == "persistent_session_terminal" {
+					summary.PersistentSessionTerminalCounts[sessionID]++
+					reason := firstNonEmpty(detailValue(event.Detail, "reason"), "unspecified")
+					summary.PersistentSessionTerminalReasonCounts[reason]++
+				}
+			}
+		}
 		if isMigrationEvent(event.Event) {
 			summary.MigrationCounts[event.Event]++
 		}
@@ -853,6 +903,32 @@ func summarizeLog(logPath string, summary *RunSummary) error {
 		return err
 	}
 	return nil
+}
+
+func finalizePersistentSessionLifecycle(summary *RunSummary) {
+	// Intent: Session lifecycle accounting is local transport health, not peer
+	// trust. The analyzer requires one terminal state per opened session object
+	// so shutdown races and leaked streams are visible in POC15 reports. Source:
+	// DI-mapop
+	for sessionID, openCount := range summary.PersistentSessionOpenCounts {
+		terminalCount := summary.PersistentSessionTerminalCounts[sessionID]
+		if terminalCount < openCount {
+			summary.PersistentSessionUnterminatedCount += openCount - terminalCount
+		}
+		if terminalCount > openCount {
+			summary.PersistentSessionDuplicateTerminalCount += terminalCount - openCount
+		}
+	}
+}
+
+func detailValue(detail, key string) string {
+	prefix := key + "="
+	for _, token := range strings.Fields(detail) {
+		if strings.HasPrefix(token, prefix) {
+			return strings.TrimPrefix(token, prefix)
+		}
+	}
+	return ""
 }
 
 func missingRequiredEvents(summary RunSummary) []string {
@@ -876,6 +952,14 @@ func requiredRegressionEvents() []string {
 		"persistent_session_opened",
 		"persistent_session_reused",
 		"persistent_session_closed",
+		"persistent_session_frame_sent",
+		"persistent_session_frame_received",
+		"persistent_session_request_started",
+		"persistent_session_response_matched",
+		"persistent_session_terminal",
+		"persistent_session_trust_reconfigure_requested",
+		"persistent_session_trust_reconfigure_closed",
+		"persistent_session_trust_reconfigure_reopened",
 		"network_outage_variant_selected",
 		"cas_storage_promised",
 		"cas_retention_promised",
@@ -1089,6 +1173,11 @@ func requiredRegressionEvents() []string {
 		"route_credit_offered",
 		"route_credit_earned",
 		"route_credit_spent",
+		"route_transit_exclusion_peer_promised",
+		"route_lifetime_exhausted",
+		"route_expired_message_not_sent",
+		"route_renewal_requested",
+		"route_renewal_confirmed",
 		"route_carried_envelope_validated",
 		"route_runtime_compute_message_sent",
 		"route_runtime_compute_message_delivered",
@@ -1111,12 +1200,24 @@ func requiredRegressionEvents() []string {
 		"agent_cas_peer_object_stored",
 		"agent_cas_sparse_object_missing",
 		"agent_cas_retrieval_not_promised",
+		"agent_cas_retrieval_primary_requested",
+		"agent_cas_retrieval_primary_succeeded",
+		"agent_cas_retrieval_replica_requested",
+		"agent_cas_retrieval_replica_succeeded",
+		"agent_cas_retrieval_missing_requested",
+		"agent_cas_retrieval_missing_recorded",
+		"agent_cas_retrieval_untrusted_not_promised",
 		"agent_cas_bearer_storage_token_issued",
 		"agent_cas_bearer_storage_token_received",
 		"agent_cas_bearer_storage_token_transferred",
 		"agent_cas_bearer_storage_token_redeemed",
 		"agent_cas_gc_object_retained",
 		"agent_cas_gc_object_removed",
+		"capability_token_signed",
+		"capability_token_signature_verified",
+		"capability_token_expiry_checked",
+		"normal_traffic_cose_token_issued",
+		"normal_traffic_cose_token_received",
 		"message_dag_node_indexed",
 		"message_dag_missing_parent_recorded",
 	}
@@ -1146,15 +1247,21 @@ func computeScores(summary RunSummary) ScoreReport {
 	// DI-linof; DI-lulof
 	addScore(&scores.RuntimeAdapter, summary.EventCounts["wasm_module_instantiated"] > 0 && summary.EventCounts["wasm_export_result_observed"] > 0 && summary.EventCounts["wasm_adapter_ack_received"] > 0 && summary.EventCounts["wasm_useful_work_promised"] > 0 && summary.EventCounts["wasm_compute_result_verified"] > 0 && summary.EventCounts["wasm_routed_compute_result_verified"] > 0 && summary.EventCounts["stdio_cbor_envelope_received"] > 0 && summary.EventCounts["stdio_cbor_ack_event"] > 0 && summary.EventCounts["stdio_adapter_kernel_forwarded"] > 0 && summary.EventCounts["stdio_useful_work_promised"] > 0 && summary.EventCounts["stdio_compute_result_verified"] > 0 && summary.EventCounts["stdio_routed_compute_result_verified"] > 0)
 	addScore(&scores.Monitoring, summary.EventCounts["decentralized_monitoring_model_recorded"] > 0 && summary.EventCounts["bearer_token_exchange_rate_observed"] > 0 && summary.EventCounts["voluntary_gossip_promised"] > 0)
-	addScore(&scores.Route, summary.EventCounts["route_setup_promise_made"] > 0 && summary.EventCounts["route_forward_promise_made"] >= 2 && summary.EventCounts["route_forward_promise_kept"] >= 2 && summary.EventCounts["route_reachability_confirmed"] > 0 && summary.EventCounts["route_carried_message_delivered"] > 0 && summary.EventCounts["route_multiarity_parent_slot_received"] > 0 && summary.EventCounts["route_payload_parent_link_received"] > 0 && summary.EventCounts["route_reused_message_delivered"] > 0 && summary.EventCounts["route_asymmetric_response_path_handled"] > 0 && summary.EventCounts["route_credit_earned"] > 0 && summary.ProtocolCounts[pcid.RouteV1] > 0)
+	addScore(&scores.Route, summary.EventCounts["route_setup_promise_made"] > 0 && summary.EventCounts["route_forward_promise_made"] >= 2 && summary.EventCounts["route_forward_promise_kept"] >= 2 && summary.EventCounts["route_reachability_confirmed"] > 0 && summary.EventCounts["route_carried_message_delivered"] > 0 && summary.EventCounts["route_multiarity_parent_slot_received"] > 0 && summary.EventCounts["route_payload_parent_link_received"] > 0 && summary.EventCounts["route_reused_message_delivered"] > 0 && summary.EventCounts["route_asymmetric_response_path_handled"] > 0 && summary.EventCounts["route_credit_earned"] > 0 && summary.EventCounts["route_transit_exclusion_peer_promised"] > 0 && summary.EventCounts["route_lifetime_exhausted"] > 0 && summary.EventCounts["route_expired_message_not_sent"] > 0 && summary.EventCounts["route_renewal_confirmed"] > 0 && summary.ProtocolCounts[pcid.RouteV1] > 0)
 	// Intent: Agent CAS fitness is distinct from the collector-owned raw message
 	// CAS: the run must show sparse local stores, DAG indexing, peer storage,
 	// bearer-token incentives, encrypted-object CIDs, and local GC. Source:
 	// DI-manul
 	addScore(&scores.AgentCAS, summary.EventCounts["agent_cas_access_promised"] > 0 && summary.EventCounts["agent_cas_store_incomplete"] > 0 && summary.EventCounts["agent_cas_message_stored"] > 0 && summary.EventCounts["message_dag_node_indexed"] > 0 && summary.EventCounts["agent_cas_peer_storage_promised"] > 0 && summary.EventCounts["agent_cas_bearer_storage_token_redeemed"] > 0 && summary.EventCounts["agent_cas_encrypted_object_stored"] > 0 && summary.EventCounts["agent_cas_gc_object_removed"] > 0)
+	// Intent: DI-mapop makes session lifecycle, CAS retrieval paths, and signed
+	// token behavior first-class score dimensions so a clean run cannot pass
+	// while those production-shaped pressures silently regress.
+	addScore(&scores.Session, summary.EventCounts["persistent_session_frame_sent"] > 0 && summary.EventCounts["persistent_session_frame_received"] > 0 && summary.EventCounts["persistent_session_request_started"] > 0 && summary.EventCounts["persistent_session_response_matched"] > 0 && summary.EventCounts["persistent_session_terminal"] > 0 && summary.PersistentSessionUnterminatedCount == 0 && summary.PersistentSessionDuplicateTerminalCount == 0 && summary.EventCounts["persistent_session_trust_reconfigure_reopened"] > 0)
+	addScore(&scores.CASRetrieval, summary.EventCounts["agent_cas_retrieval_primary_succeeded"] > 0 && summary.EventCounts["agent_cas_retrieval_replica_succeeded"] > 0 && summary.EventCounts["agent_cas_retrieval_missing_recorded"] > 0 && summary.EventCounts["agent_cas_retrieval_untrusted_not_promised"] > 0)
+	addScore(&scores.TokenSecurity, summary.EventCounts["capability_token_signed"] > 0 && summary.EventCounts["capability_token_signature_verified"] > 0 && summary.EventCounts["capability_token_expiry_checked"] > 0 && summary.EventCounts["normal_traffic_cose_token_issued"] > 0 && summary.EventCounts["normal_traffic_cose_token_received"] > 0 && summary.EventCounts["capability_token_replay_rejected"] > 0)
 	addScore(&scores.Migration, summary.EventCounts["mixed_version_pcid_migration_promised"] > 0 && summary.EventCounts["mixed_version_successor_pcid_selected"] > 0)
 	addScore(&scores.Restart, summary.EventCounts["run_internal_restart_orchestration_promised"] > 0 && summary.EventCounts["run_internal_restart_recovery_observed"] > 0)
-	scores.Overall = (scores.Transport + scores.Storage + scores.Compute + scores.Economics + scores.Trust + scores.Verification + scores.Replica + scores.Durability + scores.Retention + scores.Pressure + scores.Replay + scores.RuntimeAdapter + scores.Monitoring + scores.Route + scores.AgentCAS + scores.Migration + scores.Restart) / 17
+	scores.Overall = (scores.Transport + scores.Storage + scores.Compute + scores.Economics + scores.Trust + scores.Verification + scores.Replica + scores.Durability + scores.Retention + scores.Pressure + scores.Replay + scores.RuntimeAdapter + scores.Monitoring + scores.Route + scores.AgentCAS + scores.CASRetrieval + scores.TokenSecurity + scores.Session + scores.Migration + scores.Restart) / 20
 	if len(summary.MissingRequiredEventNames) > 0 {
 		scores.Concerns = append(scores.Concerns, "missing required events: "+strings.Join(summary.MissingRequiredEventNames, ", "))
 	}
@@ -1283,6 +1390,18 @@ func isRouteEvent(eventName string) bool {
 
 func isAgentCASEvent(eventName string) bool {
 	return strings.HasPrefix(eventName, "agent_cas_") || strings.HasPrefix(eventName, "message_dag_")
+}
+
+func isCASRetrievalEvent(eventName string) bool {
+	return strings.HasPrefix(eventName, "agent_cas_retrieval_")
+}
+
+func isTokenSecurityEvent(eventName string) bool {
+	return strings.Contains(eventName, "cose_token") || strings.Contains(eventName, "capability_token_signature") || eventName == "capability_token_signed" || eventName == "capability_token_expiry_checked"
+}
+
+func isPersistentSessionEvent(eventName string) bool {
+	return strings.HasPrefix(eventName, "persistent_session_")
 }
 
 func isMigrationEvent(eventName string) bool {
