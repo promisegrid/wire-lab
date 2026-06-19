@@ -1,0 +1,123 @@
+services:
+  event-collector:
+    build: .
+    entrypoint: ["/usr/local/bin/poc16-event-collector"]
+    command: ["-config", "/app/config.json"]
+    environment:
+      OPENAI_API_KEY_FILE: /run/secrets/openai_api_key
+    secrets: [openai_api_key]
+    networks: [poc16]
+    volumes:
+      - ./config.json:/app/config.json:ro
+      - poc16-observer-run:/run/poc16
+
+  alice:
+    build: .
+    command: ["-container", "alice", "-config", "/app/config.json"]
+    depends_on: [event-collector]
+    environment:
+      OPENAI_API_KEY_FILE: /run/secrets/openai_api_key
+    secrets: [openai_api_key]
+    networks: [poc16]
+    volumes:
+      - ./config.json:/app/config.json:ro
+  bob:
+    build: .
+    command: ["-container", "bob", "-config", "/app/config.json"]
+    depends_on: [event-collector]
+    environment:
+      OPENAI_API_KEY_FILE: /run/secrets/openai_api_key
+    secrets: [openai_api_key]
+    networks: [poc16]
+    volumes:
+      - ./config.json:/app/config.json:ro
+  carol:
+    build: .
+    command: ["-container", "carol", "-config", "/app/config.json"]
+    depends_on: [event-collector]
+    environment:
+      OPENAI_API_KEY_FILE: /run/secrets/openai_api_key
+    secrets: [openai_api_key]
+    networks: [poc16]
+    volumes:
+      - ./config.json:/app/config.json:ro
+  dave:
+    build: .
+    command: ["-container", "dave", "-config", "/app/config.json"]
+    depends_on: [event-collector]
+    environment:
+      OPENAI_API_KEY_FILE: /run/secrets/openai_api_key
+    secrets: [openai_api_key]
+    networks: [poc16]
+    volumes:
+      - ./config.json:/app/config.json:ro
+  ellen-frank:
+    build: .
+    command: ["-container", "ellen-frank", "-config", "/app/config.json"]
+    depends_on: [event-collector]
+    environment:
+      OPENAI_API_KEY_FILE: /run/secrets/openai_api_key
+    secrets: [openai_api_key]
+    networks: [poc16]
+    volumes:
+      - ./config.json:/app/config.json:ro
+  grace-heidi:
+    build: .
+    command: ["-container", "grace-heidi", "-config", "/app/config.json"]
+    depends_on: [event-collector]
+    environment:
+      OPENAI_API_KEY_FILE: /run/secrets/openai_api_key
+    secrets: [openai_api_key]
+    networks: [poc16]
+    volumes:
+      - ./config.json:/app/config.json:ro
+  ivan-judy:
+    build: .
+    command: ["-container", "ivan-judy", "-config", "/app/config.json"]
+    depends_on: [event-collector]
+    environment:
+      OPENAI_API_KEY_FILE: /run/secrets/openai_api_key
+    secrets: [openai_api_key]
+    networks: [poc16]
+    volumes:
+      - ./config.json:/app/config.json:ro
+  mallory-oscar:
+    build: .
+    command: ["-container", "mallory-oscar", "-config", "/app/config.json"]
+    depends_on: [event-collector]
+    environment:
+      OPENAI_API_KEY_FILE: /run/secrets/openai_api_key
+    secrets: [openai_api_key]
+    networks: [poc16]
+    volumes:
+      - ./config.json:/app/config.json:ro
+  shipping:
+    build: .
+    command: ["-container", "shipping", "-config", "/app/config.json"]
+    depends_on: [event-collector]
+    environment:
+      OPENAI_API_KEY_FILE: /run/secrets/openai_api_key
+    secrets: [openai_api_key]
+    networks: [poc16]
+    volumes:
+      - ./config.json:/app/config.json:ro
+  wasm-stdio:
+    build: .
+    command: ["-container", "wasm-stdio", "-config", "/app/config.json"]
+    depends_on: [event-collector]
+    environment:
+      OPENAI_API_KEY_FILE: /run/secrets/openai_api_key
+    secrets: [openai_api_key]
+    networks: [poc16]
+    volumes:
+      - ./config.json:/app/config.json:ro
+
+networks:
+  poc16:
+
+volumes:
+  poc16-observer-run:
+
+secrets:
+  openai_api_key:
+    environment: OPENAI_API_KEY
