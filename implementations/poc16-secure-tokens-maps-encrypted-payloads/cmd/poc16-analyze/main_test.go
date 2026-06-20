@@ -349,9 +349,9 @@ func cleanRegressionSummary() RunSummary {
 		eventCounts[eventName] = 1
 	}
 	eventCounts["poc15_superset_named_agent_preserved"] = 19
-	eventCounts["poc16_protocol_spec_doc_recorded"] = 9
-	eventCounts["llm_spec_context_embedded"] = 9
-	eventCounts["llm_spec_context_cid_recorded"] = 9
+	eventCounts["poc16_protocol_spec_doc_recorded"] = 10
+	eventCounts["llm_spec_context_embedded"] = 10
+	eventCounts["llm_spec_context_cid_recorded"] = 10
 	summary := RunSummary{
 		RunDir:        "test/run",
 		TotalEvents:   len(eventCounts),
@@ -360,20 +360,17 @@ func cleanRegressionSummary() RunSummary {
 		AgentCounts:   map[string]int{},
 		FailureCounts: map[string]int{},
 		ProtocolCounts: map[string]int{
-			pcid.KernelReceiveV1:     1,
-			pcid.CASStorageV1:        1,
-			pcid.CIDComputeV1:        1,
-			pcid.IdentityKeyV1:       1,
-			pcid.RouteV1:             1,
-			pcid.RelationshipV1:      1,
-			pcid.AccountingV1:        1,
-			pcid.UPSLabelV1:          1,
-			pcid.PostalScaleV1:       1,
-			pcid.PrinterPortV1:       1,
-			pcid.SecureCapabilityV1:  1,
-			pcid.EncryptedPayloadV1:  1,
-			pcid.ParserBuilderRoleV1: 1,
-			pcid.MapPayloadProfileV1: 1,
+			pcid.KernelTransportV1:    1,
+			pcid.CASStorageV1:         1,
+			pcid.CIDComputeV1:         1,
+			pcid.IdentityKeyV1:        1,
+			pcid.RouteV1:              1,
+			pcid.RelationshipV1:       1,
+			pcid.ProductionShippingV1: 1,
+			pcid.SecureCapabilityV1:   1,
+			pcid.EncryptedPayloadV1:   1,
+			pcid.ParserBuilderRoleV1:  1,
+			pcid.MapPayloadProfileV1:  1,
 		},
 		ArrayPayloadProtocolCounts: map[string]int{},
 		MessageArtifactCount:       4,
@@ -392,11 +389,12 @@ func cleanRegressionSummary() RunSummary {
 			"shape_specimen": 1,
 		},
 		MessageArtifactProtocolCounts: map[string]int{
-			pcid.KernelReceiveV1:               1,
+			pcid.KernelTransportV1:             1,
 			pcid.CASStorageV1:                  1,
 			pcid.CIDComputeV1:                  1,
 			pcid.RouteV1:                       1,
 			pcid.RelationshipV1:                1,
+			pcid.ProductionShippingV1:          1,
 			pcid.MessageShapeTransportV1:       1,
 			pcid.MessageShapeNativeProofV1:     1,
 			pcid.MessageShapeEnvelopeParentsV1: 1,

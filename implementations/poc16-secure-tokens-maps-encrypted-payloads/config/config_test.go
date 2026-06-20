@@ -46,11 +46,11 @@ func TestCommittedConfigLoads(t *testing.T) {
 	if _, _, endpointFound := cfg.EndpointFor("mallory"); !endpointFound {
 		t.Fatalf("expected endpoint for mallory")
 	}
-	if appAddress, appAddressFound := cfg.KernelAppAddressForAgent("mallory"); !appAddressFound || appAddress != "127.0.0.1:9114" {
-		t.Fatalf("mallory kernel app address = %q, %v; want 127.0.0.1:9114, true", appAddress, appAddressFound)
+	if appAddress, appAddressFound := cfg.KernelAppAddressForAgent("mallory"); !appAddressFound || appAddress != "127.0.0.1:9121" {
+		t.Fatalf("mallory parser app address = %q, %v; want 127.0.0.1:9121, true", appAddress, appAddressFound)
 	}
-	if host, port, endpointFound := cfg.KernelPeerEndpointForAgent("mallory"); !endpointFound || host != "mallory-oscar" || port != 9115 {
-		t.Fatalf("mallory peer kernel endpoint = %q %d %v, want mallory-oscar 9115 true", host, port, endpointFound)
+	if host, port, endpointFound := cfg.KernelPeerEndpointForAgent("mallory"); !endpointFound || host != "mallory-oscar" || port != 9123 {
+		t.Fatalf("mallory peer kernel endpoint = %q %d %v, want mallory-oscar 9123 true", host, port, endpointFound)
 	}
 	fulfillment, ok := cfg.Agent("fulfillment")
 	if !ok {

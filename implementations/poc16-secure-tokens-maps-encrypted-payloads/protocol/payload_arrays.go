@@ -6,19 +6,21 @@ import (
 )
 
 const (
-	protocolRelationshipV1      = "relationship_v1"
-	protocolPostalScaleV1       = "postal_scale_v1"
-	protocolUPSLabelV1          = "ups_label_v1"
-	protocolAccountingV1        = "accounting_v1"
-	protocolPrinterPortV1       = "printer_port_v1"
-	protocolKernelReceiveV1     = "kernel_receive_v1"
-	protocolCASStorageV1        = "cas_storage_v1"
-	protocolCIDComputeV1        = "cid_compute_v1"
-	protocolRouteV1             = "route_v1"
-	protocolSecureCapabilityV1  = "secure_capability_v1"
-	protocolEncryptedPayloadV1  = "encrypted_payload_v1"
-	protocolParserBuilderRoleV1 = "parser_builder_role_v1"
-	protocolMapPayloadProfileV1 = "map_payload_profile_v1"
+	protocolRelationshipV1       = "relationship_v1"
+	protocolPostalScaleV1        = "postal_scale_v1"
+	protocolUPSLabelV1           = "ups_label_v1"
+	protocolAccountingV1         = "accounting_v1"
+	protocolPrinterPortV1        = "printer_port_v1"
+	protocolKernelReceiveV1      = "kernel_receive_v1"
+	protocolKernelTransportV1    = "kernel_transport_v1"
+	protocolProductionShippingV1 = "production_shipping_v1"
+	protocolCASStorageV1         = "cas_storage_v1"
+	protocolCIDComputeV1         = "cid_compute_v1"
+	protocolRouteV1              = "route_v1"
+	protocolSecureCapabilityV1   = "secure_capability_v1"
+	protocolEncryptedPayloadV1   = "encrypted_payload_v1"
+	protocolParserBuilderRoleV1  = "parser_builder_role_v1"
+	protocolMapPayloadProfileV1  = "map_payload_profile_v1"
 )
 
 type arrayPayloadState struct {
@@ -56,6 +58,12 @@ func MarshalKnownArrayPayload(protocolName string, fields map[string]string) ([]
 		return payloadBytes, true, err
 	case protocolKernelReceiveV1:
 		payloadBytes, err := MarshalKernelReceivePayloadFields(fields)
+		return payloadBytes, true, err
+	case protocolKernelTransportV1:
+		payloadBytes, err := MarshalKernelTransportPayloadFields(fields)
+		return payloadBytes, true, err
+	case protocolProductionShippingV1:
+		payloadBytes, err := MarshalProductionShippingPayloadFields(fields)
 		return payloadBytes, true, err
 	case protocolCASStorageV1:
 		payloadBytes, err := MarshalCASStoragePayloadFields(fields)
@@ -95,6 +103,10 @@ func PayloadFieldsForProtocolName(protocolName string, payloadBytes []byte) (map
 		return PrinterPortPayloadFields(payloadBytes)
 	case protocolKernelReceiveV1:
 		return KernelReceivePayloadFields(payloadBytes)
+	case protocolKernelTransportV1:
+		return KernelTransportPayloadFields(payloadBytes)
+	case protocolProductionShippingV1:
+		return ProductionShippingPayloadFields(payloadBytes)
 	case protocolCASStorageV1:
 		return CASStoragePayloadFields(payloadBytes)
 	case protocolCIDComputeV1:

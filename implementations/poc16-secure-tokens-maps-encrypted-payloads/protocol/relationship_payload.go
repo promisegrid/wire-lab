@@ -33,6 +33,24 @@ func KernelReceivePayloadFields(payloadBytes []byte) (map[string]string, error) 
 	return payloadFieldsFromPairs(protocolKernelReceiveV1, payloadBytes)
 }
 
+// MarshalKernelTransportPayloadFields encodes kernel_transport_v1 parser/kernel
+// control promises as pCID-owned arrays.
+// Intent: Parser roles, not apps, make transport-control promises to the local
+// kernel; the kernel may decode this pCID without learning normal app payload
+// routing fields. Source: DI-gazin
+func MarshalKernelTransportPayloadFields(fields map[string]string) ([]byte, error) {
+	if fields["promise_about"] == "" {
+		fields["promise_about"] = "kernel_transport"
+	}
+	return marshalPairPayload(protocolKernelTransportV1, fields)
+}
+
+// KernelTransportPayloadFields projects kernel_transport_v1 arrays into local
+// compatibility fields used only by the parser-role/transport-kernel interface.
+func KernelTransportPayloadFields(payloadBytes []byte) (map[string]string, error) {
+	return payloadFieldsFromPairs(protocolKernelTransportV1, payloadBytes)
+}
+
 // MarshalRoutePayloadFields encodes route_v1 as a pCID-owned array payload.
 // Intent: Route setup and forwarding are promise meanings owned by route_v1,
 // not a new top-level action or a reusable command vocabulary. Source: DI-lihir

@@ -26,7 +26,7 @@
       "motivation": "Build reciprocal peer relationships without accepting anyone as an authority.",
       "initial_peers": ["bob", "carol", "dave", "frank", "grace", "ellen", "fulfillment", "peggy", "victor"],
       "candidate_peers": ["bob", "carol", "dave", "frank", "grace", "ellen", "fulfillment", "peggy", "victor"],
-      "supported_pcids": ["relationship_v1", "cas_storage_v1", "cid_compute_v1", "identity_key_v1", "route_v1", "secure_capability_v1", "encrypted_payload_v1", "parser_builder_role_v1", "map_payload_profile_v1"],
+      "supported_pcids": ["relationship_v1", "cas_storage_v1", "cid_compute_v1", "identity_key_v1", "route_v1", "secure_capability_v1", "encrypted_payload_v1", "parser_builder_role_v1"],
       "budget": 4,
       "capacity": 3
     },
@@ -36,7 +36,7 @@
       "motivation": "Earn trust by making clear promises that Bob can personally keep.",
       "initial_peers": ["alice", "carol", "frank"],
       "candidate_peers": ["alice", "carol", "frank", "grace"],
-      "supported_pcids": ["relationship_v1", "cas_storage_v1", "route_v1", "secure_capability_v1", "encrypted_payload_v1", "parser_builder_role_v1", "map_payload_profile_v1"],
+      "supported_pcids": ["relationship_v1", "cas_storage_v1", "route_v1", "secure_capability_v1", "encrypted_payload_v1", "parser_builder_role_v1"],
       "budget": 3,
       "capacity": 5
     },
@@ -160,7 +160,7 @@
       "motivation": "Promise only local weight observations; never promise shipment, address, cost, or label outcomes.",
       "initial_peers": ["fulfillment"],
       "candidate_peers": ["fulfillment"],
-      "supported_pcids": ["relationship_v1", "postal_scale_v1"],
+      "supported_pcids": ["relationship_v1", "production_shipping_v1"],
       "budget": 3,
       "capacity": 10
     },
@@ -171,7 +171,7 @@
       "motivation": "Promise only local label workflow results derived from supplied address, weight event, and printer-port capability event.",
       "initial_peers": ["fulfillment", "printer_port"],
       "candidate_peers": ["fulfillment", "printer_port"],
-      "supported_pcids": ["relationship_v1", "ups_label_v1"],
+      "supported_pcids": ["relationship_v1", "production_shipping_v1"],
       "budget": 3,
       "capacity": 10
     },
@@ -182,7 +182,7 @@
       "motivation": "Promise only bounded local hardware access event records; never promise shipment, label correctness, accounting, or global permission.",
       "initial_peers": ["ups_label_printer"],
       "candidate_peers": ["ups_label_printer"],
-      "supported_pcids": ["relationship_v1", "printer_port_v1"],
+      "supported_pcids": ["relationship_v1", "production_shipping_v1"],
       "budget": 3,
       "capacity": 10
     },
@@ -193,7 +193,7 @@
       "motivation": "Promise only local order records and local shipment update acceptance.",
       "initial_peers": ["fulfillment"],
       "candidate_peers": ["fulfillment"],
-      "supported_pcids": ["relationship_v1", "accounting_v1"],
+      "supported_pcids": ["relationship_v1", "production_shipping_v1"],
       "budget": 3,
       "capacity": 10
     },

@@ -47,6 +47,7 @@ func (node *Node) recordPOC16SpecContextEvents() error {
 		pcid.CIDComputeV1,
 		pcid.IdentityKeyV1,
 		pcid.RouteV1,
+		pcid.ProductionShippingV1,
 		pcid.SecureCapabilityV1,
 		pcid.EncryptedPayloadV1,
 		pcid.ParserBuilderRoleV1,

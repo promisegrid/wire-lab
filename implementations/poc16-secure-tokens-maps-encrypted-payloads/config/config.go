@@ -296,18 +296,30 @@ func (cfg Config) ContainerIndex(containerName string) (int, bool) {
 	return 0, false
 }
 
-// KernelAppPortForContainer returns the loopback port used by local app
-// processes inside one container to promise receive capability and send
-// outbound envelopes through their local kernel.
-// Intent: Apps are local processes; they do not expose peer-listening sockets to
-// other containers, and they do not bypass the local kernel for wire traffic.
-// Source: DI-galin
+// ParserRoleAppPortForContainer returns the loopback port used by local app
+// processes inside one container to talk to the pCID-specific parser role.
+// Intent: Apps stay local processes, but POC16 now inserts a real parser-role
+// process before the transport kernel so app payload semantics do not leak into
+// the kernel. Source: DI-gazin
+func (cfg Config) ParserRoleAppPortForContainer(containerName string) (int, bool) {
+	containerIndex, ok := cfg.ContainerIndex(containerName)
+	if !ok {
+		return 0, false
+	}
+	return cfg.ListenPort + containerIndex*3, true
+}
+
+// KernelAppPortForContainer returns the loopback port used only by the local
+// parser role to make kernel_transport_v1 promises to the transport kernel.
+// Intent: The transport kernel app-side listener is no longer app-facing; it is
+// a parser/kernel control interface that may decode kernel_transport_v1 only.
+// Source: DI-gazin
 func (cfg Config) KernelAppPortForContainer(containerName string) (int, bool) {
 	containerIndex, ok := cfg.ContainerIndex(containerName)
 	if !ok {
 		return 0, false
 	}
-	return cfg.ListenPort + containerIndex*2, true
+	return cfg.ListenPort + containerIndex*3 + 1, true
 }
 
 // KernelPeerPortForContainer returns the Docker-network port used by peer
@@ -319,24 +331,34 @@ func (cfg Config) KernelPeerPortForContainer(containerName string) (int, bool) {
 	if !ok {
 		return 0, false
 	}
-	return cfg.ListenPort + containerIndex*2 + 1, true
+	return cfg.ListenPort + containerIndex*3 + 2, true
 }
 
-// KernelAppAddressForAgent returns the loopback address of the local kernel for
-// an app process. It deliberately returns 127.0.0.1 because apps are local
-// processes in the same container as their kernel.
-// Intent: Avoid modeling apps as remote services; app/kernel communication is a
-// local process interface. Source: DI-galin
+// KernelAppAddressForAgent returns the loopback address of the local parser role
+// for an app process. The name is retained for existing app code, but the address
+// now terminates at the parser role, not at the transport kernel.
+// Intent: Avoid modeling apps as remote services while making the parser role a
+// real process between apps and transport. Source: DI-gazin
 func (cfg Config) KernelAppAddressForAgent(agentName string) (string, bool) {
 	containerName, containerFound := cfg.ContainerForAgent(agentName)
 	if !containerFound {
 		return "", false
 	}
-	appPort, portFound := cfg.KernelAppPortForContainer(containerName)
+	appPort, portFound := cfg.ParserRoleAppPortForContainer(containerName)
 	if !portFound {
 		return "", false
 	}
 	return fmt.Sprintf("127.0.0.1:%d", appPort), true
+}
+
+// KernelTransportAddressForContainer returns the loopback address where the
+// parser role reaches the local transport kernel.
+func (cfg Config) KernelTransportAddressForContainer(containerName string) (string, bool) {
+	kernelPort, portFound := cfg.KernelAppPortForContainer(containerName)
+	if !portFound {
+		return "", false
+	}
+	return fmt.Sprintf("127.0.0.1:%d", kernelPort), true
 }
 
 // ContainerForAgent returns the Docker service name that hosts one agent.

@@ -70,6 +70,9 @@ type RunSummary struct {
 	AckMessageMissingParentCount            int                     `json:"ack_message_missing_parent_count"`
 	MessageArtifactDirectionCounts          map[string]int          `json:"message_artifact_direction_counts"`
 	MessageArtifactProtocolCounts           map[string]int          `json:"message_artifact_protocol_counts"`
+	ActiveRuntimeProtocolCount              int                     `json:"active_runtime_protocol_count"`
+	ActiveRuntimeProtocols                  []string                `json:"active_runtime_protocols,omitempty"`
+	RetiredActiveProtocolCounts             map[string]int          `json:"retired_active_protocol_counts,omitempty"`
 	MessageArtifactBadPrefixCount           int                     `json:"message_artifact_bad_prefix_count"`
 	MessageDAGParentLocationCounts          map[string]int          `json:"message_dag_parent_location_counts"`
 	MessageShapeSpecimenCounts              map[string]int          `json:"message_shape_specimen_counts"`
@@ -175,6 +178,10 @@ type AcceptanceCriteria struct {
 	RequirePersistentSessions         bool
 	RequirePOC15Superset              bool
 	RequirePOC16ProtocolProfiles      bool
+	RequireParserRoleProcess          bool
+	RequireOpaqueTransportKernel      bool
+	RequireConsolidatedShippingPCID   bool
+	MaxActiveRuntimeProtocols         int
 	MinScoreOverall                   int
 }
 
@@ -247,6 +254,7 @@ func analyzeRun(runDir string) (RunSummary, error) {
 		PersistentSessionTerminalReasonCounts: make(map[string]int),
 		MessageArtifactDirectionCounts:        make(map[string]int),
 		MessageArtifactProtocolCounts:         make(map[string]int),
+		RetiredActiveProtocolCounts:           make(map[string]int),
 		MessageDAGParentLocationCounts:        make(map[string]int),
 		MessageShapeSpecimenCounts:            make(map[string]int),
 		MigrationCounts:                       make(map[string]int),
@@ -269,6 +277,7 @@ func analyzeRun(runDir string) (RunSummary, error) {
 	if artifactErr := summarizeMessageArtifacts(logDir, &summary); artifactErr != nil {
 		return RunSummary{}, artifactErr
 	}
+	finalizeRuntimeProtocolInventory(&summary)
 	countMonitorVocabulary(report, &summary)
 	summary.MissingRequiredEventNames = missingRequiredEvents(summary)
 	summary.ScoreReport = computeScores(summary)
@@ -335,6 +344,10 @@ func cleanRegressionCriteria() AcceptanceCriteria {
 		RequirePersistentSessions:         true,
 		RequirePOC15Superset:              true,
 		RequirePOC16ProtocolProfiles:      true,
+		RequireParserRoleProcess:          true,
+		RequireOpaqueTransportKernel:      true,
+		RequireConsolidatedShippingPCID:   true,
+		MaxActiveRuntimeProtocols:         10,
 		MinScoreOverall:                   4,
 	}
 }
@@ -426,6 +439,18 @@ func validateSummary(summary RunSummary, criteria AcceptanceCriteria) error {
 	}
 	if criteria.RequirePOC16ProtocolProfiles {
 		failures = append(failures, poc16ProtocolProfileFailures(summary)...)
+	}
+	if criteria.RequireParserRoleProcess {
+		failures = append(failures, parserRoleProcessFailures(summary)...)
+	}
+	if criteria.RequireOpaqueTransportKernel {
+		failures = append(failures, opaqueTransportKernelFailures(summary)...)
+	}
+	if criteria.RequireConsolidatedShippingPCID {
+		failures = append(failures, consolidatedShippingPCIDFailures(summary)...)
+	}
+	if criteria.MaxActiveRuntimeProtocols > 0 && summary.ActiveRuntimeProtocolCount > criteria.MaxActiveRuntimeProtocols {
+		failures = append(failures, fmt.Sprintf("active_runtime_protocol_count=%d exceeds max %d protocols=%s", summary.ActiveRuntimeProtocolCount, criteria.MaxActiveRuntimeProtocols, strings.Join(summary.ActiveRuntimeProtocols, ",")))
 	}
 	if criteria.RequireMonitorReport {
 		if summary.MonitorReport == nil {
@@ -636,12 +661,55 @@ func rawMessageArtifactFailures(summary RunSummary) []string {
 			failures = append(failures, "message artifact direction missing: "+direction)
 		}
 	}
-	for _, protocolName := range []string{pcid.KernelReceiveV1, pcid.CASStorageV1, pcid.CIDComputeV1, pcid.RouteV1, pcid.RelationshipV1} {
+	for _, protocolName := range []string{pcid.KernelTransportV1, pcid.ProductionShippingV1, pcid.CASStorageV1, pcid.CIDComputeV1, pcid.RouteV1, pcid.RelationshipV1} {
 		if summary.MessageArtifactProtocolCounts[protocolName] == 0 {
 			failures = append(failures, "message artifact protocol missing: "+protocolName)
 		}
 	}
 	return failures
+}
+
+func finalizeRuntimeProtocolInventory(summary *RunSummary) {
+	// Intent: Count active runtime pCIDs from retained message artifacts rather
+	// than from spec-doc mentions, so profile/specimen docs do not masquerade as
+	// normal app traffic. Source: DI-gazin
+	for _, protocolName := range activeRuntimeProtocolNames() {
+		if summary.MessageArtifactProtocolCounts[protocolName] > 0 {
+			summary.ActiveRuntimeProtocols = append(summary.ActiveRuntimeProtocols, protocolName)
+		}
+	}
+	sort.Strings(summary.ActiveRuntimeProtocols)
+	summary.ActiveRuntimeProtocolCount = len(summary.ActiveRuntimeProtocols)
+	for _, protocolName := range retiredRuntimeProtocolNames() {
+		if count := summary.MessageArtifactProtocolCounts[protocolName]; count > 0 {
+			summary.RetiredActiveProtocolCounts[protocolName] = count
+		}
+	}
+}
+
+func activeRuntimeProtocolNames() []string {
+	return []string{
+		pcid.KernelTransportV1,
+		pcid.RelationshipV1,
+		pcid.RouteV1,
+		pcid.ProductionShippingV1,
+		pcid.CASStorageV1,
+		pcid.CIDComputeV1,
+		pcid.IdentityKeyV1,
+		pcid.SecureCapabilityV1,
+		pcid.EncryptedPayloadV1,
+		pcid.ParserBuilderRoleV1,
+	}
+}
+
+func retiredRuntimeProtocolNames() []string {
+	return []string{
+		pcid.KernelReceiveV1,
+		pcid.PostalScaleV1,
+		pcid.UPSLabelV1,
+		pcid.AccountingV1,
+		pcid.PrinterPortV1,
+	}
 }
 
 func isAckArtifactDirection(direction string) bool {
@@ -763,6 +831,61 @@ func poc16ProtocolProfileFailures(summary RunSummary) []string {
 	return failures
 }
 
+func parserRoleProcessFailures(summary RunSummary) []string {
+	// Intent: POC16 must prove the parser/builder role is a real process in the
+	// app/kernel path, not only a function call or design note. Source: DI-gazin
+	var failures []string
+	for _, eventName := range []string{
+		"parser_role_started",
+		"parser_role_app_receive_registered",
+		"parser_role_kernel_receive_promise_sent",
+		"kernel_transport_receive_registered",
+		"parser_role_kernel_carry_requested",
+		"kernel_transport_carry_requested",
+		"kernel_parser_delivered",
+		"parser_role_app_delivered",
+	} {
+		if summary.EventCounts[eventName] == 0 {
+			failures = append(failures, eventName+"=0 want >0")
+		}
+	}
+	return failures
+}
+
+func opaqueTransportKernelFailures(summary RunSummary) []string {
+	// Intent: The transport kernel may decode kernel_transport_v1 and ACK status
+	// for demux, but normal routing must be driven by parser-carried exact bytes,
+	// not kernel projection of app payload fields such as `to`. Source: DI-gazin
+	var failures []string
+	if summary.EventCounts["kernel_transport_carry_requested"] == 0 {
+		failures = append(failures, "kernel_transport_carry_requested=0 want >0")
+	}
+	if summary.EventCounts["kernel_parser_delivered"] == 0 {
+		failures = append(failures, "kernel_parser_delivered=0 want >0")
+	}
+	if summary.EventCounts["kernel_app_delivered"] != 0 {
+		failures = append(failures, fmt.Sprintf("kernel_app_delivered=%d want 0 after parser-role split", summary.EventCounts["kernel_app_delivered"]))
+	}
+	return failures
+}
+
+func consolidatedShippingPCIDFailures(summary RunSummary) []string {
+	// Intent: POC16 active shipping/device traffic should exercise one
+	// production_shipping_v1 protocol-family pCID, with operation meaning inside
+	// pCID-owned payloads, not a pCID per business step. Source: DI-gazin
+	var failures []string
+	if summary.MessageArtifactProtocolCounts[pcid.ProductionShippingV1] == 0 {
+		failures = append(failures, "production_shipping_v1 raw message artifact missing")
+	}
+	if summary.ArrayPayloadProtocolCounts[pcid.ProductionShippingV1] == 0 {
+		failures = append(failures, "production_shipping_v1 array payload missing")
+	}
+	if len(summary.RetiredActiveProtocolCounts) != 0 {
+		failures = append(failures, fmt.Sprintf("retired active protocol artifacts present: %v", summary.RetiredActiveProtocolCounts))
+	}
+	return failures
+}
+
 // countMonitorVocabulary adds monitor-report vocabulary findings to the same
 // run summary gate used for JSONL events.
 // Intent: DI-kirat applies to POC development-tool output as well as agent
@@ -792,17 +915,17 @@ func countForbiddenVocabulary(values ...string) int {
 }
 
 func knownProtocolNamesForAnalysis() []string {
-	protocolNames := []string{pcid.KernelReceiveV1, pcid.CASStorageV1, pcid.CIDComputeV1, pcid.IdentityKeyV1, pcid.RouteV1, pcid.RelationshipV1, pcid.AccountingV1, pcid.UPSLabelV1, pcid.PostalScaleV1, pcid.PrinterPortV1, pcid.SecureCapabilityV1, pcid.EncryptedPayloadV1, pcid.ParserBuilderRoleV1, pcid.MapPayloadProfileV1}
+	protocolNames := []string{pcid.KernelReceiveV1, pcid.KernelTransportV1, pcid.CASStorageV1, pcid.CIDComputeV1, pcid.IdentityKeyV1, pcid.RouteV1, pcid.RelationshipV1, pcid.ProductionShippingV1, pcid.AccountingV1, pcid.UPSLabelV1, pcid.PostalScaleV1, pcid.PrinterPortV1, pcid.SecureCapabilityV1, pcid.EncryptedPayloadV1, pcid.ParserBuilderRoleV1, pcid.MapPayloadProfileV1}
 	protocolNames = append(protocolNames, messageShapeSpecimenProtocols()...)
 	return protocolNames
 }
 
 func requiredArrayPayloadProtocols() []string {
 	// Intent: POC16's fresh clean-run traffic should exercise pCID-owned arrays
-	// across relationship, kernel receive, device, CAS, compute, and identity
-	// protocols so generic map payloads cannot remain the implicit target shape.
-	// Source: DI-dirat; DI-pusak
-	return []string{pcid.KernelReceiveV1, pcid.CASStorageV1, pcid.CIDComputeV1, pcid.IdentityKeyV1, pcid.RouteV1, pcid.RelationshipV1, pcid.AccountingV1, pcid.UPSLabelV1, pcid.PostalScaleV1, pcid.PrinterPortV1}
+	// across relationship, parser/kernel transport, production-shipping, CAS,
+	// compute, and identity protocols so generic map payloads cannot remain the
+	// implicit target shape. Source: DI-dirat; DI-pusak; DI-gazin
+	return []string{pcid.KernelTransportV1, pcid.CASStorageV1, pcid.CIDComputeV1, pcid.IdentityKeyV1, pcid.RouteV1, pcid.RelationshipV1, pcid.ProductionShippingV1}
 }
 
 func obsoletePayloadPrefixBytes() []byte {
@@ -1330,6 +1453,18 @@ func requiredRegressionEvents() []string {
 		"parser_role_local_ack_promised",
 		"parser_role_backpressure_promised",
 		"parser_role_malformed_payload_rejected",
+		// Intent: POC16 now has an executable parser-role process in the local
+		// app/kernel path; the regression must see real parser/kernel and
+		// parser/app traffic, not only profile specimens. Source: DI-gazin
+		"parser_role_started",
+		"parser_role_app_receive_registered",
+		"parser_role_kernel_receive_promise_sent",
+		"parser_role_kernel_carry_requested",
+		"parser_role_inbound_from_kernel",
+		"parser_role_app_delivered",
+		"kernel_transport_receive_registered",
+		"kernel_transport_carry_requested",
+		"kernel_parser_delivered",
 		"message_dag_node_indexed",
 		"message_dag_missing_parent_recorded",
 	}
@@ -1376,9 +1511,9 @@ func computeScores(summary RunSummary) ScoreReport {
 	// inherited-agent requirements visible instead of hiding them inside the
 	// overall score average. Source: DI-vulit
 	addScore(&scores.Encryption, summary.EventCounts["encrypted_payload_e2e_promised"] > 0 && summary.EventCounts["encrypted_payload_ciphertext_stored"] > 0 && summary.EventCounts["encrypted_payload_decrypted"] > 0 && summary.EventCounts["encrypted_payload_wrong_recipient_rejected"] > 0 && summary.EventCounts["encrypted_payload_tamper_rejected"] > 0 && summary.EventCounts["encrypted_payload_unsupported_pcid_not_promised"] > 0)
-	addScore(&scores.ParserBuilder, summary.EventCounts["pcid_slot0_selected_parser"] > 0 && summary.EventCounts["pcid_only_dispatch_recorded"] > 0 && summary.EventCounts["pcid_address_separation_recorded"] > 0 && summary.EventCounts["builder_role_payload_built"] > 0 && summary.EventCounts["parser_role_payload_parsed"] > 0 && summary.EventCounts["parser_role_malformed_payload_rejected"] > 0)
+	addScore(&scores.ParserBuilder, summary.EventCounts["pcid_slot0_selected_parser"] > 0 && summary.EventCounts["pcid_only_dispatch_recorded"] > 0 && summary.EventCounts["pcid_address_separation_recorded"] > 0 && summary.EventCounts["builder_role_payload_built"] > 0 && summary.EventCounts["parser_role_payload_parsed"] > 0 && summary.EventCounts["parser_role_malformed_payload_rejected"] > 0 && summary.EventCounts["parser_role_started"] > 0 && summary.EventCounts["kernel_transport_carry_requested"] > 0 && summary.EventCounts["parser_role_app_delivered"] > 0)
 	addScore(&scores.PayloadProfile, summary.EventCounts["poc16_map_payload_specimen_emitted"] > 0 && summary.EventCounts["poc16_map_payload_parsed"] > 0 && summary.MessageArtifactProtocolCounts[pcid.MapPayloadProfileV1] > 0)
-	addScore(&scores.SpecContext, summary.EventCounts["poc16_protocol_spec_doc_recorded"] >= 9 && summary.EventCounts["llm_spec_context_embedded"] >= 9 && summary.EventCounts["llm_spec_context_cid_recorded"] >= 9)
+	addScore(&scores.SpecContext, summary.EventCounts["poc16_protocol_spec_doc_recorded"] >= 10 && summary.EventCounts["llm_spec_context_embedded"] >= 10 && summary.EventCounts["llm_spec_context_cid_recorded"] >= 10)
 	addScore(&scores.POC15Superset, summary.EventCounts["poc15_superset_named_agent_preserved"] >= 19)
 	addScore(&scores.Migration, summary.EventCounts["mixed_version_pcid_migration_promised"] > 0 && summary.EventCounts["mixed_version_successor_pcid_selected"] > 0)
 	addScore(&scores.Restart, summary.EventCounts["run_internal_restart_orchestration_promised"] > 0 && summary.EventCounts["run_internal_restart_recovery_observed"] > 0)

@@ -2,6 +2,7 @@ package kernel
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -40,6 +41,7 @@ type Kernel struct {
 	receivers           map[receiverKey]*receiver
 	peerSessions        map[string]*transport.PersistentSession
 	inboundPeerSessions map[*transport.PersistentSession]string
+	appSessions         map[*transport.PersistentSession]string
 	appListener         net.Listener
 	peerListener        net.Listener
 	logFile             *os.File
@@ -63,9 +65,11 @@ type receiver struct {
 
 type parsedEnvelope struct {
 	fields       map[string]string
+	payload      []byte
 	exactHash    string
 	protocolCID  protocol.ProtocolCID
 	protocolName string
+	signer       string
 }
 
 // New returns a kernel with an empty local receive-promise table.
@@ -77,6 +81,7 @@ func New(cfg config.Config, containerName string) *Kernel {
 		receivers:           make(map[receiverKey]*receiver),
 		peerSessions:        make(map[string]*transport.PersistentSession),
 		inboundPeerSessions: make(map[*transport.PersistentSession]string),
+		appSessions:         make(map[*transport.PersistentSession]string),
 	}
 }
 
@@ -93,6 +98,7 @@ func (kernel *Kernel) Run(ctx context.Context) error {
 	<-ctx.Done()
 	kernel.closeListeners()
 	kernel.closeReceivers()
+	kernel.closeAppSessions()
 	kernel.closePeerSessions()
 	kernel.closeInboundPeerSessions()
 	kernel.drainHandlers(ctx)
@@ -177,6 +183,13 @@ func (kernel *Kernel) handleAppConn(conn net.Conn) {
 		},
 	)
 	close(sessionReady)
+	kernel.trackAppSession(session, conn.RemoteAddr().String())
+	defer kernel.untrackAppSession(session)
+	if kernel.isStopping() {
+		if closeErr := session.CloseWithReason(transport.SessionTerminalReasonProcessShutdown); closeErr != nil {
+			kernel.record("kernel_app_session_close_failed", "broken", conn.RemoteAddr().String(), closeErr.Error())
+		}
+	}
 	<-session.Done()
 }
 
@@ -215,43 +228,53 @@ func (kernel *Kernel) handlePeerConn(conn net.Conn) {
 }
 
 func (kernel *Kernel) handleAppSessionFrame(session *transport.PersistentSession, frameBytes []byte) ([]byte, error) {
-	// Intent: Kernel receive registrations update only the local routing table;
-	// all other app frames are routed as exact promise envelopes on the same
-	// persistent session. Source: DI-vopab
-	message, parseErr := kernel.parseEnvelope(frameBytes)
+	// Intent: The app-side kernel listener is now parser-facing. It may decode
+	// only kernel_transport_v1 control promises; normal app payloads must already
+	// have been parsed by the separate parser role. Source: DI-gazin
+	message, parseErr := kernel.parseTransportEnvelope(frameBytes)
 	if parseErr != nil {
 		kernel.record("kernel_app_frame_parse_failed", "broken", "", parseErr.Error())
 		return nil, parseErr
 	}
-	if message.protocolName == pcid.KernelReceiveV1 {
+	if message.protocolName != pcid.KernelTransportV1 {
+		kernel.record("kernel_direct_app_payload_rejected", "non_commitment", message.signer, "pcid="+message.protocolName+" transport kernel accepts only "+pcid.KernelTransportV1+" on app-side listener")
+		return kernel.notPromisedAck(message, "I promise the transport kernel did not accept this direct app payload because parser-role control is required."), nil
+	}
+	controlFields, fieldsErr := kernel.kernelTransportFields(message)
+	if fieldsErr != nil {
+		kernel.record("kernel_transport_control_parse_failed", "broken", message.signer, fieldsErr.Error())
+		return nil, fieldsErr
+	}
+	message.fields = controlFields
+	switch controlFields["transport_action"] {
+	case "receive_pcid":
 		kernel.registerReceiver(session, message)
 		return nil, nil
+	case "carry_exact_envelope":
+		return kernel.routeParserCarriedEnvelope(message)
+	default:
+		kernel.record("kernel_transport_action_not_promised", "non_commitment", message.signer, "transport_action="+controlFields["transport_action"])
+		return kernel.notPromisedAck(message, "I promise the transport kernel did not recognize this parser-role transport action."), nil
 	}
-	ackBytes, routeErr := kernel.routeFromLocalApp(frameBytes, message)
-	if routeErr != nil {
-		kernel.record("kernel_route_failed", "broken", message.fields["to"], routeErr.Error())
-		ackBytes = kernel.notPromisedAck(message, "I promise I could not route this exact envelope through the local kernel.")
-	}
-	return ackBytes, nil
 }
 
 func (kernel *Kernel) handlePeerSessionFrame(frameBytes []byte) ([]byte, error) {
 	// Intent: A peer frame is only an exact signed envelope to deliver locally;
 	// this handler does not infer global authority from the peer TCP session.
 	// Source: DI-vopab
-	message, parseErr := kernel.parseEnvelope(frameBytes)
+	message, parseErr := kernel.parseTransportEnvelope(frameBytes)
 	if parseErr != nil {
 		kernel.record("kernel_peer_frame_parse_failed", "broken", "", parseErr.Error())
 		return nil, parseErr
 	}
-	return kernel.deliverToLocalApp(frameBytes, message), nil
+	return kernel.deliverToLocalParser(frameBytes, message), nil
 }
 
 func (kernel *Kernel) registerReceiver(session *transport.PersistentSession, message parsedEnvelope) {
-	// Intent: A local app promises pCID receive capability over its existing
-	// app/kernel session. The kernel remembers that promise as routing state but
-	// does not judge whether later payload promises are trustworthy. Source:
-	// DI-vopab
+	// Intent: A local parser role promises pCID receive capability over its
+	// parser/kernel session. The kernel remembers that promise as transport state
+	// but does not judge whether later payload promises are trustworthy. Source:
+	// DI-vopab; DI-gazin
 	appName := firstField(message.fields, "app", "from")
 	protocolName := firstField(message.fields, "pcid", "protocol")
 	if appName == "" || protocolName == "" {
@@ -259,7 +282,7 @@ func (kernel *Kernel) registerReceiver(session *transport.PersistentSession, mes
 		return
 	}
 	protocolCID, known := kernel.Protocols.CID(protocolName)
-	if !known || protocolName == pcid.KernelReceiveV1 {
+	if !known || protocolName == pcid.KernelReceiveV1 || protocolName == pcid.KernelTransportV1 {
 		kernel.record("kernel_receive_promise_rejected", "non_commitment", appName, "unknown or kernel-internal pCID "+protocolName)
 		return
 	}
@@ -278,20 +301,35 @@ func (kernel *Kernel) registerReceiver(session *transport.PersistentSession, mes
 			kernel.record("kernel_receive_conn_replaced_close_failed", "broken", appName, closeErr.Error())
 		}
 	}
-	kernel.record("app_receive_promise_registered", "kept", appName, "pcid="+protocolName+" promise="+message.fields["promise"])
+	kernel.record("kernel_transport_receive_registered", "kept", appName, "pcid="+protocolName+" promise="+message.fields["promise"])
 }
 
-func (kernel *Kernel) routeFromLocalApp(frameBytes []byte, message parsedEnvelope) ([]byte, error) {
-	target := message.fields["to"]
+func (kernel *Kernel) routeParserCarriedEnvelope(controlMessage parsedEnvelope) ([]byte, error) {
+	target := controlMessage.fields["target"]
 	if target == "" {
-		return kernel.notPromisedAck(message, "I promise I could not route this envelope because it names no target app."), nil
+		return kernel.notPromisedAck(controlMessage, "I promise I could not route this parser-carried envelope because the parser named no target app."), nil
 	}
+	frameBytes, decodeErr := base64.StdEncoding.DecodeString(controlMessage.fields["envelope_b64"])
+	if decodeErr != nil {
+		kernel.record("kernel_transport_embedded_decode_failed", "broken", controlMessage.signer, decodeErr.Error())
+		return kernel.notPromisedAck(controlMessage, "I promise the transport kernel could not decode the parser-supplied exact envelope bytes."), nil
+	}
+	embeddedMessage, parseErr := kernel.parseTransportEnvelope(frameBytes)
+	if parseErr != nil {
+		kernel.record("kernel_transport_embedded_parse_failed", "broken", controlMessage.signer, parseErr.Error())
+		return kernel.notPromisedAck(controlMessage, "I promise the transport kernel could not parse the parser-supplied exact envelope bytes."), nil
+	}
+	if expectedHash := controlMessage.fields["embedded_exact_hash"]; expectedHash != "" && expectedHash != embeddedMessage.exactHash {
+		kernel.record("kernel_transport_embedded_hash_mismatch", "broken", controlMessage.signer, "expected="+expectedHash+" actual="+embeddedMessage.exactHash)
+		return kernel.notPromisedAck(controlMessage, "I promise the transport kernel could not carry an exact envelope whose bytes did not match the parser-supplied hash."), nil
+	}
+	kernel.record("kernel_transport_carry_requested", "kept", target, "pcid="+embeddedMessage.protocolName+" exact_sha256="+embeddedMessage.exactHash)
 	targetContainer, containerFound := kernel.Config.ContainerForAgent(target)
 	if !containerFound {
-		return kernel.notPromisedAck(message, "I promise I could not route this envelope because the target app is unknown."), nil
+		return kernel.notPromisedAck(embeddedMessage, "I promise I could not route this parser-carried envelope because the target app is unknown."), nil
 	}
 	if targetContainer == kernel.ContainerName {
-		return kernel.deliverToLocalApp(frameBytes, message), nil
+		return kernel.deliverToLocalParser(frameBytes, embeddedMessage), nil
 	}
 	return kernel.forwardToPeerKernel(target, frameBytes)
 }
@@ -414,25 +452,25 @@ func (kernel *Kernel) untrackInboundPeerSession(session *transport.PersistentSes
 	kernel.mu.Unlock()
 }
 
-func (kernel *Kernel) deliverToLocalApp(frameBytes []byte, message parsedEnvelope) []byte {
-	target := message.fields["to"]
-	key := receiverKey{appName: target, protocolCID: message.protocolCID.String()}
-	targetAgent, agentFound := kernel.Config.Agent(target)
-	if !agentFound {
-		kernel.record("kernel_target_app_unknown", "non_commitment", target, "no configured local app named "+target)
-		return kernel.notPromisedAck(message, "I promise no configured local app matches this target.")
-	}
-	configuredReceivePromise := false
-	for _, protocolName := range targetAgent.Protocols() {
-		if protocolName == message.protocolName {
-			configuredReceivePromise = true
-			break
-		}
-	}
-	if !configuredReceivePromise {
-		kernel.record("kernel_target_pcid_not_configured", "non_commitment", target, "target app is not configured to promise pcid="+message.protocolName)
-		return kernel.notPromisedAck(message, "I promise the configured target app does not promise to receive this pCID.")
-	}
+func (kernel *Kernel) trackAppSession(session *transport.PersistentSession, remoteAddress string) {
+	// Intent: The parser-role control stream is an app-side kernel session even
+	// when no current receiver table entry points at it, so shutdown must own the
+	// session directly rather than inferring ownership from routing state.
+	// Source: DI-gazin
+	kernel.mu.Lock()
+	kernel.appSessions[session] = remoteAddress
+	kernel.mu.Unlock()
+}
+
+func (kernel *Kernel) untrackAppSession(session *transport.PersistentSession) {
+	kernel.mu.Lock()
+	delete(kernel.appSessions, session)
+	kernel.mu.Unlock()
+}
+
+func (kernel *Kernel) deliverToLocalParser(frameBytes []byte, message parsedEnvelope) []byte {
+	parserName := "parser:" + kernel.ContainerName
+	key := receiverKey{appName: parserName, protocolCID: message.protocolCID.String()}
 	var receiver *receiver
 	deadline := time.Now().Add(peerSendTimeout)
 	readinessWaitRecorded := false
@@ -447,31 +485,36 @@ func (kernel *Kernel) deliverToLocalApp(frameBytes []byte, message parsedEnvelop
 			break
 		}
 		if !readinessWaitRecorded {
-			// Intent: A target app listed as supporting this pCID may still be
-			// registering its receive promise during container startup. Waiting here
-			// removes startup-order false non-commitments without retrying any
-			// app-level semantic ACK. Source: DI-darur
-			kernel.record("kernel_app_receive_readiness_waited", "kept", target, "configured receive promise not registered yet for pcid="+message.protocolName)
+			// Intent: Peer frames may arrive while the local parser role is still
+			// promising its receive pCIDs during container startup. Waiting here
+			// removes startup-order false non-commitments without decoding normal
+			// payload routing fields in the transport kernel. Source: DI-darur;
+			// DI-gazin
+			kernel.record("kernel_parser_receive_readiness_waited", "kept", parserName, "parser receive promise not registered yet for pcid="+message.protocolName)
 			readinessWaitRecorded = true
 		}
 		time.Sleep(peerRouteRetryDelay)
 	}
 	if receiver == nil {
-		kernel.record("kernel_unregistered_pcid", "non_commitment", target, "no local app promised pcid="+message.protocolName)
-		return kernel.notPromisedAck(message, "I promise no local app has promised to receive this pCID.")
+		kernel.record("kernel_unregistered_parser_pcid", "non_commitment", parserName, "no local parser promised pcid="+message.protocolName)
+		return kernel.notPromisedAck(message, "I promise no local parser role has promised to receive this pCID.")
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), peerSendTimeout)
 	defer cancel()
 	ackBytes, readErr := receiver.session.RoundTrip(ctx, message.exactHash, frameBytes)
 	if readErr != nil {
-		kernel.record("kernel_app_ack_read_failed", "broken", target, readErr.Error())
-		return kernel.notPromisedAck(message, "I promise local app delivery failed while waiting for app event.")
+		kernel.record("kernel_parser_ack_read_failed", "broken", parserName, readErr.Error())
+		return kernel.notPromisedAck(message, "I promise local parser-role delivery failed while waiting for its ACK.")
 	}
-	kernel.record("kernel_app_delivered", "kept", target, "pcid="+message.protocolName+" exact_sha256="+message.exactHash)
+	kernel.record("kernel_parser_delivered", "kept", parserName, "pcid="+message.protocolName+" exact_sha256="+message.exactHash)
 	return ackBytes
 }
 
-func (kernel *Kernel) parseEnvelope(frameBytes []byte) (parsedEnvelope, error) {
+func (kernel *Kernel) parseTransportEnvelope(frameBytes []byte) (parsedEnvelope, error) {
+	// Intent: Transport routing inspects only the envelope shell: slot-0 pCID,
+	// exact bytes, parent links, and proof signer. Normal slot-1 payload fields
+	// remain opaque to this kernel unless the pCID is kernel_transport_v1.
+	// Source: DI-gazin
 	envelope, parseErr := protocol.ParseEnvelope(frameBytes)
 	if parseErr != nil {
 		return parsedEnvelope{}, parseErr
@@ -483,16 +526,26 @@ func (kernel *Kernel) parseEnvelope(frameBytes []byte) (parsedEnvelope, error) {
 	if !known {
 		protocolName = "unknown:" + envelope.ProtocolCID.String()
 	}
-	fields, fieldsErr := fieldsForProtocolName(envelope, protocolName, known)
-	if fieldsErr != nil {
-		return parsedEnvelope{}, fieldsErr
-	}
 	return parsedEnvelope{
-		fields:       fields,
+		fields:       map[string]string{},
+		payload:      append([]byte(nil), envelope.Payload...),
 		exactHash:    protocol.HashExactBytes(frameBytes),
 		protocolCID:  envelope.ProtocolCID,
 		protocolName: protocolName,
+		signer:       envelope.Proof.Signer,
 	}, nil
+}
+
+func (kernel *Kernel) kernelTransportFields(message parsedEnvelope) (map[string]string, error) {
+	// Intent: kernel_transport_v1 is the only slot-1 payload decoded by the
+	// transport kernel. It is local parser/kernel control, not an app protocol.
+	// Source: DI-gazin
+	fields, fieldsErr := protocol.PayloadFieldsForProtocolName(pcid.KernelTransportV1, message.payload)
+	if fieldsErr != nil {
+		return nil, fieldsErr
+	}
+	fields["protocol"] = pcid.KernelTransportV1
+	return fields, nil
 }
 
 func (kernel *Kernel) frameParentExactSHA256s(frameBytes []byte) ([]string, error) {
@@ -508,14 +561,31 @@ func (kernel *Kernel) frameParentExactSHA256s(frameBytes []byte) ([]string, erro
 
 func (kernel *Kernel) frameIsResponse(frameBytes []byte) (bool, error) {
 	// Intent: Kernel persistent sessions should drop unmatched ACK-like responses
-	// instead of delivering them to apps or peer kernels as new promises. This is
-	// a pCID-decoded transport demux check; apps still own semantic judgment.
-	// Source: DI-vopab
-	message, parseErr := kernel.parseEnvelope(frameBytes)
+	// instead of delivering them to parser roles or peer kernels as new promises.
+	// A payload `outcome` field is ACK-like only when the envelope carries a
+	// parent link to correlate; fresh promises may discuss outcomes as normal
+	// pCID-owned content. This is a bounded demux check, not a route decision:
+	// normal payload fields decoded here are never used to choose a target.
+	// Source: DI-vopab; DI-gazin
+	envelope, parseErr := protocol.ParseEnvelope(frameBytes)
 	if parseErr != nil {
 		return false, parseErr
 	}
-	return strings.TrimSpace(message.fields["outcome"]) != "", nil
+	if len(envelope.ParentExactSHA256s) == 0 {
+		return false, nil
+	}
+	if verifyErr := protocol.VerifyEnvelope(envelope); verifyErr != nil {
+		return false, verifyErr
+	}
+	protocolName, known := kernel.Protocols.Name(envelope.ProtocolCID)
+	if !known {
+		protocolName = "unknown:" + envelope.ProtocolCID.String()
+	}
+	fields, fieldsErr := fieldsForProtocolName(envelope, protocolName, known)
+	if fieldsErr != nil {
+		return false, fieldsErr
+	}
+	return strings.TrimSpace(fields["outcome"]) != "", nil
 }
 
 func fieldsForProtocolName(envelope protocol.Envelope, protocolName string, known bool) (map[string]string, error) {
@@ -529,27 +599,31 @@ func fieldsForProtocolName(envelope protocol.Envelope, protocolName string, know
 }
 
 func (kernel *Kernel) notPromisedAck(message parsedEnvelope, promiseText string) []byte {
+	target := firstField(message.fields, "from")
+	if target == "" {
+		target = message.signer
+	}
 	ackFields := map[string]string{
 		"act":     decision.ActPromise,
 		"from":    "kernel:" + kernel.ContainerName,
-		"to":      message.fields["from"],
+		"to":      target,
 		"outcome": "not_promised",
 		"promise": promiseText,
 		"reason":  "kernel transport non-commitment expressed as local promise content",
 	}
 	if promiseAbout := message.fields["promise_about"]; promiseAbout != "" {
 		ackFields["promise_about"] = promiseAbout
-	} else if message.protocolName == pcid.RelationshipV1 {
+	} else if message.protocolName == pcid.RelationshipV1 || message.protocolName == pcid.KernelTransportV1 {
 		ackFields["promise_about"] = "local_observation"
 	}
 	ack, ackErr := kernel.newAckEnvelope(message, ackFields)
 	if ackErr != nil {
-		kernel.record("kernel_not_promised_ack_sign_failed", "broken", message.fields["from"], ackErr.Error())
+		kernel.record("kernel_not_promised_ack_sign_failed", "broken", target, ackErr.Error())
 		return []byte{0x00}
 	}
 	ackBytes, bytesErr := ack.Bytes()
 	if bytesErr != nil {
-		kernel.record("kernel_not_promised_ack_bytes_failed", "broken", message.fields["from"], bytesErr.Error())
+		kernel.record("kernel_not_promised_ack_bytes_failed", "broken", target, bytesErr.Error())
 		return []byte{0x00}
 	}
 	return ackBytes
@@ -649,22 +723,33 @@ func (kernel *Kernel) waitForListener(done chan struct{}, listenerName string) {
 }
 
 func (kernel *Kernel) closeReceivers() {
-	// Intent: Multiple pCID receive promises can share one app/kernel session,
-	// so shutdown closes each session once rather than once per protocol. Source:
-	// DI-vopab
+	// Intent: The receiver table is routing state promised by parser roles; the
+	// actual parser/kernel TCP sessions are closed by closeAppSessions so a
+	// session without a current receiver entry still records terminal state.
+	// Source: DI-gazin
 	kernel.mu.Lock()
-	receiverSessions := make(map[*transport.PersistentSession]string)
-	for _, registeredReceiver := range kernel.receivers {
-		receiverSessions[registeredReceiver.session] = registeredReceiver.appName
-	}
 	kernel.receivers = make(map[receiverKey]*receiver)
 	kernel.mu.Unlock()
-	for registeredSession, appName := range receiverSessions {
-		if registeredSession == nil {
+}
+
+func (kernel *Kernel) closeAppSessions() {
+	// Intent: App-side sessions are now parser-role control streams, not normal
+	// app payload streams. Closing every tracked control stream during shutdown
+	// keeps persistent-session accounting complete without decoding app payloads.
+	// Source: DI-gazin
+	kernel.mu.Lock()
+	appSessions := make(map[*transport.PersistentSession]string, len(kernel.appSessions))
+	for session, remoteAddress := range kernel.appSessions {
+		appSessions[session] = remoteAddress
+	}
+	kernel.appSessions = make(map[*transport.PersistentSession]string)
+	kernel.mu.Unlock()
+	for session, remoteAddress := range appSessions {
+		if session == nil {
 			continue
 		}
-		if closeErr := registeredSession.CloseWithReason(transport.SessionTerminalReasonProcessShutdown); closeErr != nil {
-			kernel.record("kernel_receive_session_close_failed", "broken", appName, closeErr.Error())
+		if closeErr := session.CloseWithReason(transport.SessionTerminalReasonProcessShutdown); closeErr != nil {
+			kernel.record("kernel_app_session_close_failed", "broken", remoteAddress, closeErr.Error())
 		}
 	}
 }

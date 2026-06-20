@@ -1,0 +1,41 @@
+package main
+
+import (
+	"context"
+	"flag"
+	"fmt"
+	"os"
+	"os/signal"
+	"syscall"
+
+	"promisegrid.dev/wire-lab/implementations/poc16-secure-tokens-maps-encrypted-payloads/config"
+	"promisegrid.dev/wire-lab/implementations/poc16-secure-tokens-maps-encrypted-payloads/parserrole"
+)
+
+func main() {
+	if err := run(); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+}
+
+func run() error {
+	configPath := flag.String("config", "config.json", "POC16 config path")
+	containerName := flag.String("container", "", "container name from config")
+	flag.Parse()
+	if *containerName == "" {
+		return fmt.Errorf("-container is required")
+	}
+	cfg, loadErr := config.Load(*configPath)
+	if loadErr != nil {
+		return loadErr
+	}
+	if _, containerFound := cfg.Container(*containerName); !containerFound {
+		return fmt.Errorf("unknown container %q", *containerName)
+	}
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
+	// Intent: The parser role is an independent local kernel role, not a helper
+	// function hidden inside app or transport-kernel code. Source: DI-gazin
+	return parserrole.New(cfg, *containerName).Run(ctx)
+}

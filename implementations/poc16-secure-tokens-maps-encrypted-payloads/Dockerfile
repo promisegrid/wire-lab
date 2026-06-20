@@ -2,6 +2,7 @@ FROM golang:1.25.7-alpine AS build
 WORKDIR /src
 COPY . .
 RUN go build -o /out/poc16-kernel ./cmd/poc16-kernel
+RUN go build -o /out/poc16-parser-role ./cmd/poc16-parser-role
 RUN go build -o /out/poc16-relationship-agent ./cmd/poc16-relationship-agent
 RUN go build -o /out/poc16-fulfillment ./cmd/poc16-fulfillment
 RUN go build -o /out/poc16-postal-scale ./cmd/poc16-postal-scale
@@ -19,6 +20,7 @@ RUN go build -o /out/poc16-cbor-diag ./cmd/poc16-cbor-diag
 FROM alpine:3.20
 WORKDIR /app
 COPY --from=build /out/poc16-kernel /usr/local/bin/poc16-kernel
+COPY --from=build /out/poc16-parser-role /usr/local/bin/poc16-parser-role
 COPY --from=build /out/poc16-relationship-agent /usr/local/bin/poc16-relationship-agent
 COPY --from=build /out/poc16-fulfillment /usr/local/bin/poc16-fulfillment
 COPY --from=build /out/poc16-postal-scale /usr/local/bin/poc16-postal-scale

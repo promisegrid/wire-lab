@@ -20,7 +20,11 @@ import (
 	"promisegrid.dev/wire-lab/implementations/poc16-secure-tokens-maps-encrypted-payloads/eventstream"
 )
 
-const childShutdownGrace = 3 * time.Second
+// Intent: Parser-role sessions add more independent app/parser/kernel/peer TCP
+// streams, so child processes need enough SIGTERM grace to close sessions and
+// emit terminal records before the supervisor escalates to Kill. Source:
+// DI-javuz
+const childShutdownGrace = 15 * time.Second
 
 func main() {
 	if err := run(); err != nil {
@@ -33,6 +37,7 @@ func run() error {
 	configPath := flag.String("config", "config.json", "POC16 config path")
 	containerName := flag.String("container", "", "container name from config")
 	kernelBinary := flag.String("kernel-bin", "poc16-kernel", "POC16 kernel binary path")
+	parserRoleBinary := flag.String("parser-role-bin", "poc16-parser-role", "POC16 parser-role binary path")
 	flag.Parse()
 	if *containerName == "" {
 		return fmt.Errorf("-container is required")
@@ -47,10 +52,10 @@ func run() error {
 	}
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
-	return runContainerProcesses(ctx, cfg, *kernelBinary, *configPath, container)
+	return runContainerProcesses(ctx, cfg, *kernelBinary, *parserRoleBinary, *configPath, container)
 }
 
-func runContainerProcesses(ctx context.Context, cfg config.Config, kernelBinary, configPath string, container config.ContainerConfig) error {
+func runContainerProcesses(ctx context.Context, cfg config.Config, kernelBinary, parserRoleBinary, configPath string, container config.ContainerConfig) error {
 	// Intent: The supervisor now proves inter-container promise delivery by
 	// starting one container-local kernel plus independent app processes, rather
 	// than hiding delivery inside one monolithic runtime object. Source:
@@ -76,6 +81,34 @@ func runContainerProcesses(ctx context.Context, cfg config.Config, kernelBinary,
 		return fmt.Errorf("kernel for container %s exited before apps started", container.Name)
 	case <-time.After(250 * time.Millisecond):
 	case <-ctx.Done():
+		return ctx.Err()
+	}
+	parserErrs := make(chan error, 1)
+	go func() {
+		parserErrs <- runParserRoleProcess(ctx, forwarder, parserRoleBinary, configPath, container.Name)
+	}()
+	select {
+	case parserErr := <-parserErrs:
+		cancel()
+		if parserErr != nil {
+			<-kernelErrs
+			return parserErr
+		}
+		<-kernelErrs
+		return fmt.Errorf("parser role for container %s exited before apps started", container.Name)
+	case kernelErr := <-kernelErrs:
+		cancel()
+		if kernelErr != nil {
+			<-parserErrs
+			return kernelErr
+		}
+		<-parserErrs
+		return fmt.Errorf("kernel for container %s exited before parser role started apps", container.Name)
+	case <-time.After(250 * time.Millisecond):
+	case <-ctx.Done():
+		cancel()
+		<-kernelErrs
+		<-parserErrs
 		return ctx.Err()
 	}
 	errs := make(chan error, len(container.Agents))
@@ -105,8 +138,12 @@ func runContainerProcesses(ctx context.Context, cfg config.Config, kernelBinary,
 	}
 	cancel()
 	kernelErr := <-kernelErrs
+	parserErr := <-parserErrs
 	if firstErr == nil && kernelErr != nil {
 		firstErr = kernelErr
+	}
+	if firstErr == nil && parserErr != nil {
+		firstErr = parserErr
 	}
 	if forwardErr := forwarder.err(); firstErr == nil && forwardErr != nil {
 		firstErr = forwardErr
@@ -119,6 +156,13 @@ func runKernelProcess(ctx context.Context, forwarder *processForwarder, kernelBi
 	// plumbing for app promises, not a trust authority or workflow owner.
 	// Source: DI-galin
 	return runProcess(ctx, forwarder, "kernel:"+containerName, kernelBinary, "-config", configPath, "-container", containerName)
+}
+
+func runParserRoleProcess(ctx context.Context, forwarder *processForwarder, parserRoleBinary, configPath, containerName string) error {
+	// Intent: Start one local parser/builder role per container between apps and
+	// the transport kernel so pCID-owned payload semantics stay out of the
+	// transport kernel. Source: DI-gazin
+	return runProcess(ctx, forwarder, "parser:"+containerName, parserRoleBinary, "-config", configPath, "-container", containerName)
 }
 
 func runAgentProcess(ctx context.Context, forwarder *processForwarder, agentBinary, configPath, agentName string) error {

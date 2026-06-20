@@ -18,6 +18,15 @@ Intent: Current POC16 has app and peer TCP listeners, pCID-selected payload deco
 Constraints: Preserve POC16 as a strict POC15 superset; preserve one top-level semantic action `promise`; preserve `grid([42(pCID), ...protocol-defined-slots])`; do not let the transport kernel decode normal app payload routing fields; do not make parser roles sign promises on behalf of apps; consolidate shipping/device operation pCIDs into a protocol-family pCID; keep old shipping/device pCID docs as historical/specimen evidence, not active runtime receive promises; keep specimen/profile pCIDs separate from active runtime pCIDs; run POC16 clean containers after implementation.
 Affects: implementations/poc16-secure-tokens-maps-encrypted-payloads/; docs/protocols/; protocols/wire-lab.d/TODO/TODO-sosoj-poc16-parser-role-followup.md; protocols/wire-lab.d/TODO/TODO-zugok-poc16-secure-tokens-maps-encrypted-payloads.md; protocols/wire-lab.d/TODO/TODO.md; DEV-GUIDE-RESOURCES.md.
 
+ID: DI-javuz
+Date: 2026-06-19 18:14:20
+Author: stevegt@t7a.org (Steve Traugott)
+Status: active
+Decision: Give POC16 child processes a longer SIGTERM grace window after introducing parser-role sessions.
+Intent: The parser-role follow-up creates more independent persistent TCP sessions per container, and clean-run analysis needs those sessions to close and emit terminal records before any process is killed. The supervisor should still bound shutdown, but the bound must be long enough for kernels and parser roles to drain their local app, parser, and peer session closure records.
+Constraints: Preserve fail-fast behavior after the bounded grace expires; do not weaken the analyzer's zero-unterminated-session gate; keep the change scoped to the POC16 supervisor shutdown path.
+Affects: implementations/poc16-secure-tokens-maps-encrypted-payloads/cmd/poc16-supervisor/main.go; implementations/poc16-secure-tokens-maps-encrypted-payloads/scripts/run-clean.sh.
+
 ## Current Gap
 
 - Current POC16 implements separate local app and peer TCP listeners in the

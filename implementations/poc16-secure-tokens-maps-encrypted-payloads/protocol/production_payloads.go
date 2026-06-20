@@ -84,6 +84,12 @@ var printerPortSchemas = []arrayPayloadSchema{
 	},
 }
 
+var productionShippingSchemas = append(append(append(append([]arrayPayloadSchema{},
+	postalScaleSchemas...),
+	upsLabelSchemas...),
+	accountingSchemas...),
+	printerPortSchemas...)
+
 // MarshalPostalScalePayloadFields encodes postal_scale_v1 as a pCID-owned CBOR
 // array. Intent: Device payloads should be protocol-owned slot values, not
 // generic map messages. Source: DI-dirat
@@ -127,4 +133,20 @@ func MarshalPrinterPortPayloadFields(fields map[string]string) ([]byte, error) {
 
 func PrinterPortPayloadFields(payloadBytes []byte) (map[string]string, error) {
 	return payloadFieldsFromArray(protocolPrinterPortV1, payloadBytes, printerPortSchemas)
+}
+
+// MarshalProductionShippingPayloadFields encodes the active
+// production_shipping_v1 protocol-family payload.
+// Intent: POC16 now treats weighing, address lookup, label printing,
+// printer-port token issue/redeem, and shipment update as operations inside one
+// production-shipping protocol family instead of active pCID-per-operation
+// fragments. Source: DI-gazin
+func MarshalProductionShippingPayloadFields(fields map[string]string) ([]byte, error) {
+	return marshalArrayPayload(fields, productionShippingSchemas)
+}
+
+// ProductionShippingPayloadFields projects production_shipping_v1 arrays into
+// local compatibility fields for the existing shipping workflow handlers.
+func ProductionShippingPayloadFields(payloadBytes []byte) (map[string]string, error) {
+	return payloadFieldsFromArray(protocolProductionShippingV1, payloadBytes, productionShippingSchemas)
 }

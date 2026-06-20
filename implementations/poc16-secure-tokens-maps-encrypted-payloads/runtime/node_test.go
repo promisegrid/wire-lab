@@ -181,8 +181,8 @@ func TestCheckpointJournalIsReusableBeyondShipmentMap(t *testing.T) {
 	cfg := twoNodeTestConfig(t)
 	alice := NewNode(cfg, cfg.Agents[0], &decision.FakeDecider{}, decision.FakeMonitor{})
 	record := checkpointRecord{
-		Key:          checkpointKey(pcid.PrinterPortV1, production.PromiseRedeemPrintCapability, "spool-1"),
-		ProtocolName: pcid.PrinterPortV1,
+		Key:          checkpointKey(pcid.ProductionShippingV1, production.PromiseRedeemPrintCapability, "spool-1"),
+		ProtocolName: pcid.ProductionShippingV1,
 		PromiseAbout: production.PromiseRedeemPrintCapability,
 		Subject:      "spool-1",
 		Detail:       "printer port checkpoint regression test",
@@ -254,20 +254,20 @@ func TestProtocolForFieldsRoutesShippingPromises(t *testing.T) {
 	cfg := shippingTestConfig(t)
 	fulfillment := NewNode(cfg, cfg.Agents[0], &decision.FakeDecider{}, decision.FakeMonitor{})
 	protocolName, _ := fulfillment.protocolForFields(map[string]string{"promise_about": production.PromiseWeighPackage})
-	if protocolName != pcid.PostalScaleV1 {
-		t.Fatalf("weigh package protocol = %s, want %s", protocolName, pcid.PostalScaleV1)
+	if protocolName != pcid.ProductionShippingV1 {
+		t.Fatalf("weigh package protocol = %s, want %s", protocolName, pcid.ProductionShippingV1)
 	}
 	protocolName, _ = fulfillment.protocolForFields(map[string]string{"promise_about": production.PromisePrintLabel})
-	if protocolName != pcid.UPSLabelV1 {
-		t.Fatalf("print label protocol = %s, want %s", protocolName, pcid.UPSLabelV1)
+	if protocolName != pcid.ProductionShippingV1 {
+		t.Fatalf("print label protocol = %s, want %s", protocolName, pcid.ProductionShippingV1)
 	}
 	protocolName, _ = fulfillment.protocolForFields(map[string]string{"promise_about": production.PromiseShipmentUpdate})
-	if protocolName != pcid.AccountingV1 {
-		t.Fatalf("shipment update protocol = %s, want %s", protocolName, pcid.AccountingV1)
+	if protocolName != pcid.ProductionShippingV1 {
+		t.Fatalf("shipment update protocol = %s, want %s", protocolName, pcid.ProductionShippingV1)
 	}
 	protocolName, _ = fulfillment.protocolForFields(map[string]string{"promise_about": production.PromiseIssuePrintCapability})
-	if protocolName != pcid.PrinterPortV1 {
-		t.Fatalf("print capability protocol = %s, want %s", protocolName, pcid.PrinterPortV1)
+	if protocolName != pcid.ProductionShippingV1 {
+		t.Fatalf("print capability protocol = %s, want %s", protocolName, pcid.ProductionShippingV1)
 	}
 }
 
@@ -407,7 +407,7 @@ func TestDeterministicShippingHandlersReturnEvent(t *testing.T) {
 	cfg := shippingTestConfig(t)
 	scale := NewNode(cfg, cfg.Agents[1], &decision.FakeDecider{}, decision.FakeMonitor{})
 	message := parsedMessage{
-		ProtocolName: pcid.PostalScaleV1,
+		ProtocolName: pcid.ProductionShippingV1,
 		Fields: map[string]string{
 			"from":          "fulfillment",
 			"promise_about": production.PromiseWeighPackage,
@@ -958,8 +958,8 @@ func TestSupportedProtocolIsLocalToAgent(t *testing.T) {
 		t.Fatalf("postal scale should not support accounting pCID")
 	}
 	printerPort := NewNode(cfg, cfg.Agents[3], &decision.FakeDecider{}, decision.FakeMonitor{})
-	if !printerPort.supportsProtocol(pcid.PrinterPortV1) {
-		t.Fatalf("printer_port should support printer_port pCID")
+	if !printerPort.supportsProtocol(pcid.ProductionShippingV1) {
+		t.Fatalf("printer_port should support production shipping pCID")
 	}
 }
 
@@ -1240,7 +1240,7 @@ func shippingTestConfig(t *testing.T) config.Config {
 			Motivation:     "weigh",
 			InitialPeers:   []string{"fulfillment"},
 			CandidatePeers: []string{"fulfillment"},
-			SupportedPCIDs: []string{pcid.RelationshipV1, pcid.PostalScaleV1},
+			SupportedPCIDs: []string{pcid.RelationshipV1, pcid.ProductionShippingV1},
 			Budget:         5,
 			Capacity:       5,
 		}, {
@@ -1250,7 +1250,7 @@ func shippingTestConfig(t *testing.T) config.Config {
 			Motivation:     "print label",
 			InitialPeers:   []string{"fulfillment", "printer_port"},
 			CandidatePeers: []string{"fulfillment", "printer_port"},
-			SupportedPCIDs: []string{pcid.RelationshipV1, pcid.UPSLabelV1},
+			SupportedPCIDs: []string{pcid.RelationshipV1, pcid.ProductionShippingV1},
 			Budget:         5,
 			Capacity:       5,
 		}, {
@@ -1260,7 +1260,7 @@ func shippingTestConfig(t *testing.T) config.Config {
 			Motivation:     "local hardware access",
 			InitialPeers:   []string{"ups_label_printer"},
 			CandidatePeers: []string{"ups_label_printer"},
-			SupportedPCIDs: []string{pcid.RelationshipV1, pcid.PrinterPortV1},
+			SupportedPCIDs: []string{pcid.RelationshipV1, pcid.ProductionShippingV1},
 			Budget:         5,
 			Capacity:       5,
 		}, {
@@ -1270,7 +1270,7 @@ func shippingTestConfig(t *testing.T) config.Config {
 			Motivation:     "records",
 			InitialPeers:   []string{"fulfillment"},
 			CandidatePeers: []string{"fulfillment"},
-			SupportedPCIDs: []string{pcid.RelationshipV1, pcid.AccountingV1},
+			SupportedPCIDs: []string{pcid.RelationshipV1, pcid.ProductionShippingV1},
 			Budget:         5,
 			Capacity:       5,
 		}},
@@ -1316,11 +1316,11 @@ func signedAccountingUpdateFrame(t *testing.T, node *Node, exchangeID string) []
 		"tracking_number": "1Z999AA10123456784",
 		"cost_cents":      "1776",
 	}
-	payloadBytes, _, payloadErr := protocol.MarshalKnownArrayPayload(pcid.AccountingV1, fields)
+	payloadBytes, _, payloadErr := protocol.MarshalKnownArrayPayload(pcid.ProductionShippingV1, fields)
 	if payloadErr != nil {
 		t.Fatalf("marshal accounting update payload: %v", payloadErr)
 	}
-	envelope, err := protocol.NewEnvelopeFromPayload(node.Protocols.MustCID(pcid.AccountingV1), payloadBytes, "fulfillment")
+	envelope, err := protocol.NewEnvelopeFromPayload(node.Protocols.MustCID(pcid.ProductionShippingV1), payloadBytes, "fulfillment")
 	if err != nil {
 		t.Fatalf("new accounting update envelope: %v", err)
 	}

@@ -9,16 +9,18 @@ import (
 )
 
 const (
-	RelationshipV1  = "relationship_v1"
-	PostalScaleV1   = "postal_scale_v1"
-	UPSLabelV1      = "ups_label_v1"
-	AccountingV1    = "accounting_v1"
-	PrinterPortV1   = "printer_port_v1"
-	KernelReceiveV1 = "kernel_receive_v1"
-	CASStorageV1    = "cas_storage_v1"
-	CIDComputeV1    = "cid_compute_v1"
-	IdentityKeyV1   = "identity_key_v1"
-	RouteV1         = "route_v1"
+	RelationshipV1       = "relationship_v1"
+	PostalScaleV1        = "postal_scale_v1"
+	UPSLabelV1           = "ups_label_v1"
+	AccountingV1         = "accounting_v1"
+	PrinterPortV1        = "printer_port_v1"
+	KernelReceiveV1      = "kernel_receive_v1"
+	KernelTransportV1    = "kernel_transport_v1"
+	ProductionShippingV1 = "production_shipping_v1"
+	CASStorageV1         = "cas_storage_v1"
+	CIDComputeV1         = "cid_compute_v1"
+	IdentityKeyV1        = "identity_key_v1"
+	RouteV1              = "route_v1"
 
 	MessageShapeTransportV1       = "message_shape_transport_v1"
 	MessageShapeNativeProofV1     = "message_shape_native_proof_v1"
@@ -61,6 +63,8 @@ func NewRegistry() Registry {
 		AccountingV1,
 		PrinterPortV1,
 		KernelReceiveV1,
+		KernelTransportV1,
+		ProductionShippingV1,
 		CASStorageV1,
 		CIDComputeV1,
 		IdentityKeyV1,

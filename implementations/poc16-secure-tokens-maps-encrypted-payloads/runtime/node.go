@@ -936,10 +936,10 @@ func (node *Node) registerReceivePromises(ctx context.Context) error {
 	if dialErr != nil {
 		return dialErr
 	}
-	// Intent: The app keeps one app/kernel session for both registering local
-	// receive promises and sending exact envelopes. Replies are correlated by
-	// parent-linked message CIDs, not by an RPC request table in payloads. Source:
-	// DI-vopab
+	// Intent: The app keeps one app/parser-role session for registering local
+	// receive promises and sending exact envelopes. Replies are still correlated
+	// by parent-linked message CIDs, not by an RPC request table in payloads.
+	// Source: DI-vopab; DI-gazin
 	session := transport.NewPersistentSession(
 		"app-kernel:"+node.Agent.Name,
 		frameConn,
@@ -968,25 +968,27 @@ func (node *Node) registerReceivePromise(ctx context.Context, session *transport
 	if ctx.Err() != nil {
 		return ctx.Err()
 	}
-	receiveCID, knownReceiveCID := node.Protocols.CID(pcid.KernelReceiveV1)
+	receiveCID, knownReceiveCID := node.Protocols.CID(pcid.KernelTransportV1)
 	if !knownReceiveCID {
-		return fmt.Errorf("missing kernel receive pCID")
+		return fmt.Errorf("missing kernel transport pCID")
 	}
 	targetCID, knownTargetCID := node.Protocols.CID(protocolName)
 	if !knownTargetCID {
 		return fmt.Errorf("unknown receive pCID %s", protocolName)
 	}
 	fields := map[string]string{
-		"act":      decision.ActPromise,
-		"from":     node.Agent.Name,
-		"to":       "kernel",
-		"app":      node.Agent.Name,
-		"pcid":     protocolName,
-		"promise":  "I promise to receive exact envelopes for this pCID and judge their promise content locally.",
-		"reason":   "local app receive promise registration",
-		"pcid_cid": targetCID.String(),
+		"act":              decision.ActPromise,
+		"from":             node.Agent.Name,
+		"to":               "parser",
+		"app":              node.Agent.Name,
+		"pcid":             protocolName,
+		"promise_about":    "app_receive_promise",
+		"transport_action": "app_receive_promise",
+		"promise":          "I promise to receive exact envelopes for this pCID and judge their promise content locally.",
+		"reason":           "local app receive promise registration through parser role",
+		"pcid_cid":         targetCID.String(),
 	}
-	payloadBytes, _, payloadErr := protocol.MarshalKnownArrayPayload(pcid.KernelReceiveV1, fields)
+	payloadBytes, _, payloadErr := protocol.MarshalKnownArrayPayload(pcid.KernelTransportV1, fields)
 	if payloadErr != nil {
 		return payloadErr
 	}
@@ -998,14 +1000,14 @@ func (node *Node) registerReceivePromise(ctx context.Context, session *transport
 	if bytesErr != nil {
 		return bytesErr
 	}
-	node.emitMessageArtifact("receive_promise_sent", "kernel", pcid.KernelReceiveV1, envelopeBytes, fields)
+	node.emitMessageArtifact("receive_promise_sent", "parser", pcid.KernelTransportV1, envelopeBytes, fields)
 	if writeErr := session.Send(ctx, envelopeBytes); writeErr != nil {
 		return writeErr
 	}
-	node.record("pcid_owned_array_payload_sent", "kept", "kernel", "pcid="+pcid.KernelReceiveV1+" promise_about="+fields["promise_about"]+" exact_sha256="+protocol.HashExactBytes(envelopeBytes))
-	node.record("app_receive_promise_sent", "kept", "kernel", "pcid="+protocolName+" kernel="+kernelAddress)
-	node.record("app_kernel_backpressure_promised", "kept", "kernel", "pcid="+protocolName+" app promises bounded receive buffering through the local kernel")
-	node.record("app_kernel_rate_limit_promised", "kept", "kernel", "pcid="+protocolName+" app promises to treat local kernel throughput as a bounded promise")
+	node.record("pcid_owned_array_payload_sent", "kept", "parser", "pcid="+pcid.KernelTransportV1+" promise_about="+fields["promise_about"]+" exact_sha256="+protocol.HashExactBytes(envelopeBytes))
+	node.record("app_receive_promise_sent", "kept", "parser", "pcid="+protocolName+" parser="+kernelAddress)
+	node.record("app_kernel_backpressure_promised", "kept", "parser", "pcid="+protocolName+" app promises bounded receive buffering through the local parser role")
+	node.record("app_kernel_rate_limit_promised", "kept", "parser", "pcid="+protocolName+" app promises to treat local parser-role throughput as a bounded promise")
 	return nil
 }
 
@@ -1154,7 +1156,7 @@ func (node *Node) newAckBytes(target, outcome, promiseText string, protocolCID p
 	}
 	protocolName, protocolKnown := node.Protocols.Name(protocolCID)
 	if protocolKnown {
-		if ackFields["promise_about"] == "" && (protocolName == pcid.RelationshipV1 || protocolName == pcid.KernelReceiveV1) {
+		if ackFields["promise_about"] == "" && (protocolName == pcid.RelationshipV1 || protocolName == pcid.KernelReceiveV1 || protocolName == pcid.KernelTransportV1) {
 			ackFields["promise_about"] = "local_observation"
 		}
 		ack, arrayPayload, ackErr := node.buildEnvelopeFromFieldsWithParents(protocolName, protocolCID, ackFields, []string{parentExactSHA256})
@@ -1559,10 +1561,15 @@ func frameParentExactSHA256s(frameBytes []byte) ([]string, error) {
 func (node *Node) frameIsResponse(frameBytes []byte) (bool, error) {
 	// Intent: Persistent app/kernel sessions must not treat an unmatched ACK as a
 	// fresh peer promise. ACK-ness is pCID-decoded from local compatibility fields
-	// while parent links remain the actual correlation key. Source: DI-vopab
+	// only after an envelope parent link proves the frame is correlated to a prior
+	// request; fresh promises may use pCID-owned `outcome` vocabulary without
+	// being swallowed by session demux. Source: DI-vopab; DI-gazin
 	envelope, parseErr := protocol.ParseEnvelope(frameBytes)
 	if parseErr != nil {
 		return false, parseErr
+	}
+	if len(envelope.ParentExactSHA256s) == 0 {
+		return false, nil
 	}
 	protocolName, known := node.Protocols.Name(envelope.ProtocolCID)
 	if !known {
@@ -1615,14 +1622,13 @@ func (node *Node) protocolForFields(fields map[string]string) (string, protocol.
 		return protocolName, node.Protocols.MustCID(protocolName)
 	}
 	switch fields["promise_about"] {
-	case production.PromiseWeighPackage:
-		return pcid.PostalScaleV1, node.Protocols.MustCID(pcid.PostalScaleV1)
-	case production.PromiseAddressLookup, production.PromiseShipmentUpdate:
-		return pcid.AccountingV1, node.Protocols.MustCID(pcid.AccountingV1)
-	case production.PromisePrintLabel:
-		return pcid.UPSLabelV1, node.Protocols.MustCID(pcid.UPSLabelV1)
-	case production.PromiseIssuePrintCapability, production.PromiseRedeemPrintCapability:
-		return pcid.PrinterPortV1, node.Protocols.MustCID(pcid.PrinterPortV1)
+	case production.PromiseWeighPackage,
+		production.PromiseAddressLookup,
+		production.PromiseShipmentUpdate,
+		production.PromisePrintLabel,
+		production.PromiseIssuePrintCapability,
+		production.PromiseRedeemPrintCapability:
+		return pcid.ProductionShippingV1, node.Protocols.MustCID(pcid.ProductionShippingV1)
 	case production.PromiseStoreContent, production.PromiseServeContent, production.PromiseReplicateContent, production.PromiseServeReplicaContent, production.PromiseReplicaTokenLifecycle, production.PromisePresentStorageReport, production.PromiseLabelFutureMalformedReport, production.PromiseUnsupportedVariantProbe:
 		return pcid.CASStorageV1, node.Protocols.MustCID(pcid.CASStorageV1)
 	case production.PromiseExecuteFunction, production.PromiseLookupComputeCache, production.PromiseProvideComputeContext, production.PromiseVerifyComputeResult:
@@ -1676,7 +1682,7 @@ func autonomousProtocolPayloadSupported(protocolName string, fields map[string]s
 		// payloads; POC16 only sends this pCID through explicit array encoders.
 		// Source: DI-vipih
 		return false
-	case pcid.PostalScaleV1, pcid.AccountingV1, pcid.UPSLabelV1, pcid.PrinterPortV1:
+	case pcid.ProductionShippingV1:
 		return productionPayloadShapePresent(protocolName, fields)
 	default:
 		return true
@@ -1716,15 +1722,17 @@ func computePayloadShapePresent(fields map[string]string) bool {
 
 func productionPayloadShapePresent(protocolName string, fields map[string]string) bool {
 	switch protocolName {
-	case pcid.PostalScaleV1:
-		return fields["promise_about"] == production.PromiseWeighPackage && fields["package_id"] != ""
-	case pcid.AccountingV1:
+	case pcid.ProductionShippingV1:
+		// Intent: The active shipping workflow uses one protocol-family pCID,
+		// while promise_about selects the pCID-owned operation inside that
+		// protocol's payload contract. Source: DI-gazin
+		if fields["promise_about"] == production.PromiseWeighPackage {
+			return fields["package_id"] != ""
+		}
 		return fields["promise_about"] == production.PromiseAddressLookup && fields["order_id"] != "" ||
-			fields["promise_about"] == production.PromiseShipmentUpdate && fields["order_id"] != "" && fields["tracking_number"] != ""
-	case pcid.UPSLabelV1:
-		return fields["promise_about"] == production.PromisePrintLabel && fields["package_id"] != "" && fields["shipping_address"] != ""
-	case pcid.PrinterPortV1:
-		return fields["promise_about"] == production.PromiseIssuePrintCapability && fields["print_capability_issuee"] != "" ||
+			fields["promise_about"] == production.PromiseShipmentUpdate && fields["order_id"] != "" && fields["tracking_number"] != "" ||
+			fields["promise_about"] == production.PromisePrintLabel && fields["package_id"] != "" && fields["shipping_address"] != "" ||
+			fields["promise_about"] == production.PromiseIssuePrintCapability && fields["print_capability_issuee"] != "" ||
 			fields["promise_about"] == production.PromiseRedeemPrintCapability && fields["print_capability_token_id"] != ""
 	default:
 		return false
@@ -1744,17 +1752,8 @@ func (node *Node) handleProtocolPromise(message parsedMessage) (protocolHandlerR
 	switch message.ProtocolName {
 	case pcid.RelationshipV1:
 		return protocolHandlerResult{}, nil
-	case pcid.PostalScaleV1:
-		fields, err := node.handlePostalScalePromise(message.Fields)
-		return protocolHandlerResult{Fields: fields}, err
-	case pcid.UPSLabelV1:
-		fields, err := node.handleUPSLabelPromise(message.Fields)
-		return protocolHandlerResult{Fields: fields}, err
-	case pcid.AccountingV1:
-		fields, err := node.handleAccountingPromise(message.Fields)
-		return protocolHandlerResult{Fields: fields}, err
-	case pcid.PrinterPortV1:
-		fields, err := node.handlePrinterPortPromise(message.Fields)
+	case pcid.ProductionShippingV1:
+		fields, err := node.handleProductionShippingPromise(message.Fields)
 		return protocolHandlerResult{Fields: fields}, err
 	case pcid.CASStorageV1:
 		fields, err := node.handleCASStoragePromise(message.Fields)
@@ -1769,6 +1768,24 @@ func (node *Node) handleProtocolPromise(message parsedMessage) (protocolHandlerR
 		return protocolHandlerResult{Fields: fields}, err
 	default:
 		return protocolHandlerResult{}, fmt.Errorf("unsupported protocol %s", message.ProtocolName)
+	}
+}
+
+func (node *Node) handleProductionShippingPromise(fields map[string]string) (map[string]string, error) {
+	// Intent: POC16 keeps shipping/device behavior under one protocol-family pCID
+	// while the app, not the transport kernel, dispatches by pCID-owned payload
+	// meaning and local agent kind. Source: DI-gazin
+	switch fields["promise_about"] {
+	case production.PromiseWeighPackage:
+		return node.handlePostalScalePromise(fields)
+	case production.PromisePrintLabel:
+		return node.handleUPSLabelPromise(fields)
+	case production.PromiseAddressLookup, production.PromiseShipmentUpdate:
+		return node.handleAccountingPromise(fields)
+	case production.PromiseIssuePrintCapability, production.PromiseRedeemPrintCapability:
+		return node.handlePrinterPortPromise(fields)
+	default:
+		return nil, fmt.Errorf("production_shipping_v1 cannot handle promise_about=%q", fields["promise_about"])
 	}
 }
 
@@ -1968,10 +1985,10 @@ func (node *Node) handleAccountingPromise(fields map[string]string) (map[string]
 			"tracking_number": trackingNumber,
 			"cost_cents":      strconv.Itoa(costCents),
 		}
-		updateKey := checkpointKey(pcid.AccountingV1, production.PromiseShipmentUpdate, orderID, trackingNumber, strconv.Itoa(costCents))
+		updateKey := checkpointKey(pcid.ProductionShippingV1, production.PromiseShipmentUpdate, orderID, trackingNumber, strconv.Itoa(costCents))
 		alreadyRecorded := node.rememberCheckpoint(checkpointRecord{
 			Key:          updateKey,
-			ProtocolName: pcid.AccountingV1,
+			ProtocolName: pcid.ProductionShippingV1,
 			PromiseAbout: production.PromiseShipmentUpdate,
 			Subject:      orderID,
 			Detail:       fmt.Sprintf("tracking_number=%s cost_cents=%d", trackingNumber, costCents),
