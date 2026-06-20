@@ -4,7 +4,7 @@ TE ID: TE-ritig
 
 ## Status
 
-needs DF
+decided, refined
 
 ## Decision under test
 
@@ -341,7 +341,30 @@ transport kernel or byte-level parser.
 
 ## Decision status
 
-Needs DF. The recommended DF starting point is Alternative B with parser model 3:
-pCID by protocol family/major version, slot 0 selecting parser/builder kernel
-roles, and payload/nested payloads carrying protocol-specific routing and
-operation semantics.
+Decided. `DI-nogij` locked the parser/builder-role interpretation before POC16
+implementation: slot 0 selects the pCID-specific parser or builder role, while
+pCID-defined payloads or nested payloads carry app, operation, destination,
+route, economic, and local-addressing semantics. `DI-vulit` locked POC16
+implementation from that default, and `DI-gazin` later corrected the executable
+POC16 runtime so a real parser-role process sits between apps and the transport
+kernel.
+
+## Refinements
+
+### 2026-06-20 — POC16 executable parser-role correction
+
+`TODO-sosoj` / `DI-gazin` implements this TE's parser model 3 in POC16 rather
+than leaving it as profile pressure. The corrected executable flow is:
+
+```text
+app -> parser role -> transport kernel -> peer kernel -> parser role -> app
+```
+
+The transport kernel now accepts normal app-side frames only through
+`kernel_transport_v1`, routes exact envelopes by pCID to parser roles that have
+promised receive capability, and does not decode normal application payload
+fields such as `to`. The parser role owns pCID-owned payload projection, local
+app delivery, ACK/non-commitment behavior, and raw diagnostic artifacts for the
+app/parser/kernel byte flow. This refinement does not change the TE's
+alternatives or conclusions; it records that the surviving/default path has now
+been made executable.

@@ -837,6 +837,10 @@ func parserRoleProcessFailures(summary RunSummary) []string {
 	var failures []string
 	for _, eventName := range []string{
 		"parser_role_started",
+		"parser_role_payload_parsed",
+		"parser_role_local_ack_promised",
+		"parser_role_backpressure_promised",
+		"parser_role_malformed_payload_rejected",
 		"parser_role_app_receive_registered",
 		"parser_role_kernel_receive_promise_sent",
 		"kernel_transport_receive_registered",
@@ -847,6 +851,19 @@ func parserRoleProcessFailures(summary RunSummary) []string {
 	} {
 		if summary.EventCounts[eventName] == 0 {
 			failures = append(failures, eventName+"=0 want >0")
+		}
+	}
+	for _, direction := range []string{
+		"app_to_parser",
+		"parser_to_kernel_receive",
+		"parser_to_kernel_carry",
+		"kernel_to_parser",
+		"parser_to_app",
+		"app_to_parser_ack",
+		"parser_to_kernel_ack",
+	} {
+		if summary.MessageArtifactDirectionCounts[direction] == 0 {
+			failures = append(failures, "parser-role artifact direction missing: "+direction)
 		}
 	}
 	return failures

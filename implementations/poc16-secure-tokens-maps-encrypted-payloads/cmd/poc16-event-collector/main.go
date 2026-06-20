@@ -11,6 +11,7 @@ import (
 	"net"
 	"os"
 	"path/filepath"
+	"sort"
 	"strconv"
 	"strings"
 	"sync"
@@ -56,6 +57,9 @@ type messageDAGRecord struct {
 	SourceEvent        string `json:"source_event,omitempty"`
 	Path               string `json:"path"`
 }
+
+const monitorEventLimit = 240
+const monitorDetailLimit = 160
 
 func main() {
 	if err := run(); err != nil {
@@ -280,6 +284,7 @@ func (runCollector *collector) writeMonitorReport(ctx context.Context) error {
 	runCollector.mu.Lock()
 	events := append([]decision.Event{}, runCollector.events...)
 	runCollector.mu.Unlock()
+	monitorEvents := compactMonitorEvents(events)
 	liveClient := decision.NewLiveClient(
 		runCollector.cfg.ProviderBaseURL,
 		runCollector.cfg.APIKeyEnv,
@@ -289,7 +294,7 @@ func (runCollector *collector) writeMonitorReport(ctx context.Context) error {
 		runCollector.cfg.ServiceTier,
 		runCollector.cfg.RequestTimeout(),
 	)
-	report, evaluateErr := liveClient.Evaluate(ctx, events)
+	report, evaluateErr := liveClient.Evaluate(ctx, monitorEvents)
 	if evaluateErr != nil {
 		return evaluateErr
 	}
@@ -299,6 +304,112 @@ func (runCollector *collector) writeMonitorReport(ctx context.Context) error {
 	}
 	reportPath := filepath.Join(runCollector.cfg.RunRoot, runCollector.cfg.RunID, "monitor-report.json")
 	return os.WriteFile(reportPath, append(reportBytes, '\n'), 0o644)
+}
+
+// compactMonitorEvents selects a bounded cross-section for the POC-only live
+// monitor while leaving events.jsonl, message-dag.jsonl, and message-cas/*.cbor
+// complete on disk.
+// Intent: Parser-role diagnostics make full clean-run logs too large for a
+// single monitor prompt; the monitor should see representative local events, not
+// become the durable store or the source of analyzer truth. Source: DI-jozos
+func compactMonitorEvents(events []decision.Event) []decision.Event {
+	if len(events) <= monitorEventLimit {
+		return truncatedMonitorEvents(events)
+	}
+	actualBudget := monitorEventLimit - 1
+	selected := make(map[int]bool)
+	addIndex := func(index int) {
+		if index >= 0 && index < len(events) && len(selected) < actualBudget {
+			selected[index] = true
+		}
+	}
+	for index := 0; index < 32 && index < len(events); index++ {
+		addIndex(index)
+	}
+	for index := len(events) - 32; index < len(events); index++ {
+		addIndex(index)
+	}
+	for index, event := range events {
+		if len(selected) >= actualBudget {
+			break
+		}
+		if isCriticalMonitorEvent(event) {
+			addIndex(index)
+		}
+	}
+	eventCounts := make(map[string]int)
+	for index, event := range events {
+		if len(selected) >= actualBudget {
+			break
+		}
+		key := event.Event + "\x00" + event.Outcome
+		if eventCounts[key] < 2 {
+			addIndex(index)
+			eventCounts[key]++
+		}
+	}
+	indexes := make([]int, 0, len(selected))
+	for index := range selected {
+		indexes = append(indexes, index)
+	}
+	sort.Ints(indexes)
+	compacted := make([]decision.Event, 0, len(indexes)+1)
+	compacted = append(compacted, decision.Event{
+		Observer: "collector",
+		Event:    "monitor_input_compacted",
+		Outcome:  "kept",
+		Detail:   fmt.Sprintf("total_events=%d selected_events=%d complete_events_jsonl_and_cbor_artifacts_preserved=true", len(events), len(indexes)),
+	})
+	for _, index := range indexes {
+		compacted = append(compacted, truncateMonitorEvent(events[index]))
+	}
+	return compacted
+}
+
+func truncatedMonitorEvents(events []decision.Event) []decision.Event {
+	truncated := make([]decision.Event, 0, len(events))
+	for _, event := range events {
+		truncated = append(truncated, truncateMonitorEvent(event))
+	}
+	return truncated
+}
+
+func truncateMonitorEvent(event decision.Event) decision.Event {
+	if len(event.Detail) <= monitorDetailLimit {
+		return event
+	}
+	event.Detail = event.Detail[:monitorDetailLimit] + "...[truncated for monitor prompt]"
+	return event
+}
+
+func isCriticalMonitorEvent(event decision.Event) bool {
+	if event.Outcome != "kept" {
+		return true
+	}
+	criticalNames := []string{
+		"parser_role",
+		"kernel_transport",
+		"kernel_parser",
+		"raw_message_artifact",
+		"message_dag",
+		"malformed",
+		"monitor",
+		"non_commitment",
+		"route_exclusion",
+		"hard_distrust",
+		"bearer_token",
+		"cwt",
+		"encrypted",
+		"capability",
+		"production_shipping",
+		"persistent_session_terminal",
+	}
+	for _, criticalName := range criticalNames {
+		if strings.Contains(event.Event, criticalName) {
+			return true
+		}
+	}
+	return false
 }
 
 func closeListener(listener net.Listener) {

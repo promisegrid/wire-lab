@@ -30,15 +30,17 @@ explicit local lifetime, asymmetric response-path terms are recorded, route
 credits are promised/earned/spent, and Peggy/Victor receive route-carried
 compute envelopes as useful runtime-adapter work. It retains raw message
 artifacts for operator review through an observer-only artifact stream. The
-current transport slice replaces per-message TCP dials with run-scoped
-persistent app/kernel and kernel/kernel sessions. Replies are correlated by
-ACK/response envelope parent links to exact request message hashes, not by RPC
-request IDs, so the same raw-message DAG used for operator review also supports
-session demux. A validated clean run for this update reconstructs a reachable 222-node
-exact-message DAG from 413
-artifact observations, with parent-link coverage in both envelope slots and
-pCID-defined payload fields. Source: `DI-lutuv`; `DI-lihir`; `DI-kohuj`;
-`DI-tuhop`; `DI-mosat`; `DI-vopab`; `DI-vulit`.
+current parser-role correction makes the TE-ritig flow executable: local apps
+talk to a container-local parser role, parser roles talk to the transport kernel
+with `kernel_transport_v1`, and peer kernels forward exact envelopes to parser
+roles that promised the matching pCID. The transport kernel inspects the grid
+tag, slot-0 pCID, parent links, exact hash, proof, and kernel-transport control
+payloads; it does not parse normal application payload fields such as `to` to
+choose app behavior. Replies are correlated by ACK/response envelope parent
+links to exact request message hashes, not by RPC request IDs, so the same
+raw-message DAG used for operator review also supports session demux. Source:
+`DI-lutuv`; `DI-lihir`; `DI-kohuj`; `DI-tuhop`; `DI-mosat`; `DI-vopab`;
+`DI-vulit`; `DI-gazin`.
 
 The POC16-specific slice adds four broad profile pCIDs rather than
 pCID-per-operation fragmentation: `secure_capability_v1`,
@@ -52,6 +54,14 @@ selection of a local parser or builder role while keeping destination and route
 semantics inside pCID-owned payloads. The map-payload profile shows that maps are
 permitted when a pCID spec chooses them, while constrained arrays remain preferred
 for limited devices. Source: `DI-vulit`.
+
+The active shipping/device workflow now uses one protocol-family pCID,
+`production_shipping_v1`, rather than active runtime pCIDs for
+`postal_scale_v1`, `ups_label_v1`, `accounting_v1`, and `printer_port_v1`.
+Those older specs remain in `specdocs/` only as historical/specimen evidence.
+Inside `production_shipping_v1`, `promise_about` selects weighing, address
+lookup, label printing, print capability issue/redeem, or shipment update body
+slots. Source: `DI-gazin`.
 
 The current convergence slice hardens that transport and storage pressure:
 every persistent session now carries a local `session_id`, frame/request/response
@@ -186,7 +196,73 @@ docker compose run --rm --entrypoint /usr/local/bin/poc16-cbor-diag \
 The tool reads `message-dag.jsonl`, opens the matching
 `message-cas/<exact_sha256>.cbor` artifact, and prints CBOR diagnostic notation
 with nested payload/proof byte strings expanded when they contain valid CBOR.
-It is read-only and does not affect app/kernel behavior. Source: `DI-bapif`.
+It is read-only and does not affect app, parser-role, or transport-kernel
+behavior. Source: `DI-bapif`.
+
+The parser-role correction adds reviewable raw artifacts for the local and peer
+flow boundaries:
+
+- `app_to_parser` — an app's exact signed envelope as the local parser role saw
+  it.
+- `parser_to_kernel_receive` — a parser role's `kernel_transport_v1` promise
+  that it can receive exact envelopes for a pCID.
+- `parser_to_kernel_carry` — a parser role's `kernel_transport_v1` request to
+  carry exact app envelope bytes toward a target agent.
+- `kernel_to_parser` — exact peer-originated envelope bytes delivered from the
+  transport kernel to the local parser role.
+- `parser_to_app` — exact peer-originated envelope bytes delivered by the parser
+  role to the local app that promised the pCID.
+- `app_to_parser_ack` and `parser_to_kernel_ack` — parent-linked ACK bytes
+  flowing back through the same local role chain.
+
+These are observer-only artifacts. They make the role split inspectable after a
+run; they do not give apps a shared volume and do not change promise outcomes.
+Source: `DI-gazin`.
+
+Parser-flow diagnostics from a clean run look like ordinary PromiseGrid
+envelopes with different pCID-selected payload meanings at each boundary:
+
+```cbor-diag
+# direction=parser_to_kernel_receive protocol=kernel_transport_v1
+1735551332([
+  42(h'0001551220...kernel-transport-v1...'),
+  << [
+      "parser:grace-heidi",
+      "kernel:grace-heidi",
+      "receive_pcid",
+      ["", "I promise this parser role can receive exact envelopes for this pCID ...", "...", ""],
+      [["pcid", "cas_storage_v1"], ["transport_action", "receive_pcid"]],
+    ] >>,
+  << { "signer": "parser:grace-heidi", "signature": "..." } >>,
+])
+
+# direction=parser_to_app protocol=production_shipping_v1
+1735551332([
+  42(h'0001551220...production-shipping-v1...'),
+  << [
+      "fulfillment",
+      "accounting",
+      "address_lookup",
+      ["", "I promise to receive accounting's local address event ...", "..."],
+      ["ORDER-1001", "fulfillment-accounting-production_shipping_v1-000001", ""],
+    ] >>,
+  << { "signer": "fulfillment", "signature": "..." } >>,
+])
+
+# direction=app_to_parser_ack / parser_to_kernel_ack
+1735551332([
+  42(h'0001551220...production-shipping-v1...'),
+  [42(h'0001551220...parent-message...')],
+  << [
+      "accounting",
+      "fulfillment",
+      "address_lookup",
+      ["kept", "I promise I received and recorded your signed promise message.", "..."],
+      ["ORDER-1001", "", "100 Promise Way, Suite 100, Example City, CA 94000"],
+    ] >>,
+  << { "signer": "accounting", "signature": "..." } >>,
+])
+```
 
 Shortened examples from a clean run show the intended review surface:
 
@@ -316,22 +392,26 @@ artifacts, but they are not valid PromiseGrid parent-linked messages.
 ## Persistent Sessions
 
 POC16 now treats TCP persistence as a transport promise made locally for the
-duration of one clean run. Each app opens one app/kernel frame stream, registers
-its pCID receive promises on that stream, sends outbound envelopes on that same
-stream, and receives kernel-delivered peer messages on that same stream. Kernels
-also keep reusable peer-kernel sessions per endpoint. Fresh inbound frames are
-handled as ordinary signed PromiseGrid envelopes; replies are matched to pending
-requests only when their envelope parent links include the exact request hash.
+duration of one clean run. Each app opens one app/parser-role frame stream,
+registers its pCID receive promises on that stream, sends outbound envelopes on
+that same stream, and receives parser-delivered peer messages on that same
+stream. Each parser role opens one parser/kernel control stream using
+`kernel_transport_v1`, and kernels keep reusable peer-kernel sessions per
+endpoint. Fresh inbound frames are handled as ordinary signed PromiseGrid
+envelopes; replies are matched to pending requests only when their envelope
+parent links include the exact request hash.
 
 This is intentionally not an RPC channel. There is no universal method name,
 request number, route authority, or kernel-owned trust judgment. The kernel owns
-byte routing and local receive-promise tables; apps own promise meaning, trust,
-economics, and keep/break judgment. Analyzer gates now require
+exact-byte transport and parser-role receive-promise tables; parser roles own
+pCID-owned app payload projection; apps own promise meaning, trust, economics,
+and keep/break judgment. Analyzer gates now require
 `persistent_session_*` events and fail if retained ACK artifacts lack request
 parent links. The current gate also requires frame-sent/frame-received counts,
 request-start/response-match counts, one terminal event per opened session, at
 least one shutdown terminal reason, and explicit close/reopen events for the
-trust-driven reconfiguration slice. Source: `DI-vopab`; `DI-mapop`; `TE-lubid`.
+trust-driven reconfiguration slice. Source: `DI-vopab`; `DI-mapop`; `TE-lubid`;
+`DI-gazin`.
 
 ## Candidate Agent Work
 
@@ -358,6 +438,11 @@ profile event. The newest gates add strict persistent-session lifecycle
 accounting, route expiry/renewal/transit-exclusion pressure, local/primary,
 peer/replica, missing-object, and untrusted-peer CAS retrieval outcomes, plus
 signed-token issue/verify/expiry/replay events.
+The newest parser-role gates require real parser-role process events,
+`kernel_transport_v1` control traffic, positive parser-role delivery, local ACK
+and backpressure promises, malformed-payload rejection, zero active artifacts for
+retired `kernel_receive_v1`/shipping-step pCIDs, active runtime pCID count of
+ten, and raw parser-flow artifact directions.
 Remaining analyzer targets are:
 
 - At least one forwarding non-commitment due to capacity, trust, pCID support,

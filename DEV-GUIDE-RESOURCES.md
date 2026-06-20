@@ -23,7 +23,7 @@ remain review evidence until promoted. Source: `DI-baral`; `DI-sisak`;
 `DI-fumol`; `DI-hohuf`; `DI-mosil`; `DI-lupag`; `DI-nisaz`; `DI-kikoj`;
 `DI-sinur`; `DI-punib`; `DI-sunuf`; `DI-vahan`; `DI-fijov`; `DI-kinaf`;
 `DI-dubih`; `DI-dirat`; `DI-lihir`; `DI-darur`; `DI-daruf`; `DI-mubul`;
-`DI-nogij`; `DI-rigup`; `DI-vulit`.
+`DI-nogij`; `DI-rigup`; `DI-vulit`; `DI-gazin`.
 
 ### Current Wire Direction
 
@@ -87,12 +87,18 @@ POC16 now separates pCID selection from app or network addressing in executable
 form: slot 0 selects a pCID-specific parser/builder role, while the pCID-defined
 payload or nested payload carries operation, app, destination, route, DID,
 key-fingerprint, CID-rooted-path, or other local-addressing semantics. The
-transport listener should not parse arbitrary application payloads to find a
-universal `to` field, should not treat pCID as a service registry entry or RPC
-method, and should not turn malformed or unsupported input into global
-conformance judgment. Analyzer tripwires now catch pCID-as-address,
-service-registry, RPC-method, and authority-like regressions in fresh POC16 run
-events. Source: `DI-mubul`; `DI-nogij`; `DI-vulit`.
+post-implementation parser-role correction makes that boundary a real process
+boundary in the Docker POC: local apps speak exact envelopes to a container-local
+parser role, parser roles speak `kernel_transport_v1` control promises to the
+transport kernel, and peer kernels deliver exact envelopes only to parser roles
+that promised the matching pCID. The transport listener should not parse
+arbitrary application payloads to find a universal `to` field, should not treat
+pCID as a service registry entry or RPC method, and should not turn malformed or
+unsupported input into global conformance judgment. Analyzer tripwires now catch
+pCID-as-address, service-registry, RPC-method, authority-like regressions, missing
+parser-role ACK/backpressure behavior, missing parser-flow raw artifacts, and
+retired active pCID leakage in fresh POC16 run events. Source: `DI-mubul`;
+`DI-nogij`; `DI-vulit`; `DI-gazin`.
 
 POC16 is implemented as a strict POC15 superset in concrete agents and analyzer
 requirements, not only in abstract acceptance categories. The POC16 config
@@ -104,7 +110,10 @@ compute, persistent-session, sparse-CAS, raw-message DAG, route-economics,
 signed-token, adversarial, and analyzer behavior. POC16 adds broad profile pCIDs
 for COSE-signed CWT-style capability tokens, AEAD encrypted payloads,
 pCID-owned maps, and pCID-selected parser/builder roles without using pCID as an
-address or fragmenting pCIDs by operation. Source: `DI-rigup`; `DI-vulit`.
+address or fragmenting pCIDs by operation. Active POC16 shipping/device traffic
+now uses `production_shipping_v1`; the older `postal_scale_v1`, `ups_label_v1`,
+`accounting_v1`, and `printer_port_v1` specs remain historical/specimen docs
+rather than active runtime pCIDs. Source: `DI-rigup`; `DI-vulit`; `DI-gazin`.
 
 `poc12` now adds explicit executable pressure on the process boundary:
 each Docker container starts one local `poc12-kernel` process plus separate app

@@ -7,6 +7,9 @@ proof of concept. POC16 must be a strict superset of POC15, should add
 security and payload-shape pressure before the constrained M4/LoRa work planned
 for POC17, and should make the pCID-selected parser/builder kernel-role split
 explicit. Source: `DI-ruvot`; `DI-mubul`; `DI-nogij`; `DI-rigup`; `DI-vulit`.
+The post-implementation parser-role correction is owned by `TODO-sosoj` /
+`DI-gazin`; that follow-up makes `TE-ritig`'s parser model 3 executable by
+inserting a real parser-role process between apps and the transport kernel.
 
 ## Decision Intent Log
 

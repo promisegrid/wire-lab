@@ -329,6 +329,19 @@ func TestValidateSummaryRejectsMissingMessageShapeSpecimens(t *testing.T) {
 	}
 }
 
+func TestValidateSummaryRejectsMissingParserRoleArtifactDirection(t *testing.T) {
+	// Intent: The parser-role process is only reviewable if the raw-message CAS
+	// contains exact bytes from the app->parser->kernel and
+	// kernel->parser->app paths, not only app-level send/receive summaries.
+	// Source: DI-gazin
+	summary := cleanRegressionSummary()
+	delete(summary.MessageArtifactDirectionCounts, "parser_to_kernel_carry")
+	err := validateSummary(summary, cleanRegressionCriteria())
+	if err == nil {
+		t.Fatalf("missing parser-role artifact direction should fail")
+	}
+}
+
 func cleanRegressionSummary() RunSummary {
 	eventCounts := map[string]int{
 		"fulfillment_workflow_completed":                 1,
@@ -382,11 +395,18 @@ func cleanRegressionSummary() RunSummary {
 		MessageDAGReachableCount:   4,
 		MessageDAGMaxDepth:         2,
 		MessageArtifactDirectionCounts: map[string]int{
-			"sent":           1,
-			"received":       1,
-			"ack_sent":       1,
-			"ack_received":   1,
-			"shape_specimen": 1,
+			"sent":                     1,
+			"received":                 1,
+			"ack_sent":                 1,
+			"ack_received":             1,
+			"shape_specimen":           1,
+			"app_to_parser":            1,
+			"parser_to_kernel_receive": 1,
+			"parser_to_kernel_carry":   1,
+			"kernel_to_parser":         1,
+			"parser_to_app":            1,
+			"app_to_parser_ack":        1,
+			"parser_to_kernel_ack":     1,
 		},
 		MessageArtifactProtocolCounts: map[string]int{
 			pcid.KernelTransportV1:             1,
