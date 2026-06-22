@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"sort"
 
+	"promisegrid.dev/wire-lab/implementations/poc16-secure-tokens-maps-encrypted-payloads/docs/protocols"
 	"promisegrid.dev/wire-lab/implementations/poc16-secure-tokens-maps-encrypted-payloads/protocol"
-	"promisegrid.dev/wire-lab/implementations/poc16-secure-tokens-maps-encrypted-payloads/specdocs"
 )
 
 const (
@@ -48,9 +48,11 @@ type Registry struct {
 }
 
 // NewRegistry returns the fixed protocol set for this POC. The pCIDs are
-// derived from embedded markdown spec bytes so the runtime registry, prompt
-// context, and docs/protocols symlink targets can converge on the same spec
-// identity.
+// derived from embedded markdown spec bytes under the implementation-local
+// docs/protocols source of truth so the runtime registry and prompt context
+// converge on the same spec identity.
+// Intent: Keep POC16 protocol specs implementation-local instead of maintaining a
+// stale root-level duplicate corpus. Source: DI-magug
 func NewRegistry() Registry {
 	registry := Registry{
 		byName: make(map[string]protocol.ProtocolCID),

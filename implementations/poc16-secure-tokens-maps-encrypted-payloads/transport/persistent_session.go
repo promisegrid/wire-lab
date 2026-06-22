@@ -9,6 +9,7 @@ import (
 	"io"
 	"sync"
 	"sync/atomic"
+	"time"
 )
 
 // ParentExtractor returns exact request hashes named by an incoming frame. The
@@ -27,6 +28,8 @@ type InboundFrameHandler func(frameBytes []byte) ([]byte, error)
 // SessionRecorder records local session events without making transport code
 // depend on the POC runtime or kernel event packages.
 type SessionRecorder func(eventName, outcome, detail string)
+
+const sessionFrameCloseTimeout = 250 * time.Millisecond
 
 type sessionResult struct {
 	frameBytes []byte
@@ -156,7 +159,8 @@ func (session *PersistentSession) RoundTrip(ctx context.Context, requestID strin
 	}
 }
 
-// Close closes the underlying TCP stream and releases all pending requests.
+// Close closes the session, releases pending requests, and then attempts to
+// close the underlying TCP stream.
 func (session *PersistentSession) Close() error {
 	return session.CloseWithReason(SessionTerminalReasonLocalClose)
 }
@@ -165,6 +169,10 @@ func (session *PersistentSession) Close() error {
 func (session *PersistentSession) CloseWithReason(reason SessionTerminalReason) error {
 	var closeErr error
 	session.closeOnce.Do(func() {
+		// Intent: Emit local lifecycle accounting before the underlying socket
+		// close, because shutdown validation cares that this agent reached a
+		// terminal state even if a busy TCP close stalls or returns late. Source:
+		// DI-kunad
 		session.mu.Lock()
 		if !session.closed {
 			session.closed = true
@@ -174,10 +182,28 @@ func (session *PersistentSession) CloseWithReason(reason SessionTerminalReason) 
 			}
 		}
 		session.mu.Unlock()
-		closeErr = session.frameConn.Close()
 		close(session.done)
 		session.recordEvent("persistent_session_closed", "kept", session.detailString("reason="+string(reason)))
 		session.recordSessionTerminal(reason)
+		// Intent: Do not let one slow TCP close serialize or hide terminal records
+		// for other persistent sessions during process shutdown. Local lifecycle
+		// accounting is already complete above; the actual socket close is still
+		// attempted and either its failure or deferral is recorded. Source:
+		// DI-kunad; DI-nuriv
+		closeResult := make(chan error, 1)
+		go func() {
+			closeResult <- session.frameConn.Close()
+		}()
+		timer := time.NewTimer(sessionFrameCloseTimeout)
+		defer timer.Stop()
+		select {
+		case closeErr = <-closeResult:
+			if closeErr != nil {
+				session.recordEvent("persistent_session_close_failed", "broken", session.detailString(closeErr.Error()))
+			}
+		case <-timer.C:
+			session.recordEvent("persistent_session_close_deferred", "non_commitment", session.detailString("underlying TCP close exceeded local close timeout"))
+		}
 	})
 	return closeErr
 }

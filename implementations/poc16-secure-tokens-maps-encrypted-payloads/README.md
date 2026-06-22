@@ -58,7 +58,8 @@ for limited devices. Source: `DI-vulit`.
 The active shipping/device workflow now uses one protocol-family pCID,
 `production_shipping_v1`, rather than active runtime pCIDs for
 `postal_scale_v1`, `ups_label_v1`, `accounting_v1`, and `printer_port_v1`.
-Those older specs remain in `specdocs/` only as historical/specimen evidence.
+Those older specs remain in `docs/protocols/` only as historical/specimen
+evidence.
 Inside `production_shipping_v1`, `promise_about` selects weighing, address
 lookup, label printing, print capability issue/redeem, or shipment update body
 slots. Source: `DI-gazin`.

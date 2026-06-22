@@ -9,11 +9,14 @@ import (
 	"strings"
 )
 
-// docs embeds the POC16 protocol specs used as live-agent prompt context.
+// docs embeds the implementation-local POC16 protocol specs used for pCID
+// derivation and live-agent prompt context.
 //
 // Intent: LLM-backed agents should see pCID spec prose for the protocols they
 // promise to use, while runtime code still treats slot 0 as bytes and never does
-// network routing by prose lookup. Source: DI-vulit
+// network routing by prose lookup. The source corpus stays under this POC's
+// docs/protocols path so root docs do not become a stale competing authority.
+// Source: DI-vulit; DI-magug
 //
 //go:embed *.md
 var docs embed.FS

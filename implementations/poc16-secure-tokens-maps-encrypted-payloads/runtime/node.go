@@ -16,6 +16,7 @@ import (
 
 	"promisegrid.dev/wire-lab/implementations/poc16-secure-tokens-maps-encrypted-payloads/config"
 	"promisegrid.dev/wire-lab/implementations/poc16-secure-tokens-maps-encrypted-payloads/decision"
+	"promisegrid.dev/wire-lab/implementations/poc16-secure-tokens-maps-encrypted-payloads/docs/protocols"
 	"promisegrid.dev/wire-lab/implementations/poc16-secure-tokens-maps-encrypted-payloads/economy"
 	"promisegrid.dev/wire-lab/implementations/poc16-secure-tokens-maps-encrypted-payloads/eventstream"
 	"promisegrid.dev/wire-lab/implementations/poc16-secure-tokens-maps-encrypted-payloads/pcid"
@@ -23,7 +24,6 @@ import (
 	"promisegrid.dev/wire-lab/implementations/poc16-secure-tokens-maps-encrypted-payloads/protocol"
 	"promisegrid.dev/wire-lab/implementations/poc16-secure-tokens-maps-encrypted-payloads/relationship"
 	"promisegrid.dev/wire-lab/implementations/poc16-secure-tokens-maps-encrypted-payloads/runtimeadapter"
-	"promisegrid.dev/wire-lab/implementations/poc16-secure-tokens-maps-encrypted-payloads/specdocs"
 	"promisegrid.dev/wire-lab/implementations/poc16-secure-tokens-maps-encrypted-payloads/transport"
 )
 
@@ -784,7 +784,10 @@ func (node *Node) runDynamicTCPTopologyWorkflow() error {
 // Source: DI-sinur
 func (node *Node) runAdversaryWorkflow() error {
 	if err := node.sendUnknownProtocolPromise("grace"); err != nil {
-		return fmt.Errorf("unknown protocol probe: %w", err)
+		// Intent: Unknown pCIDs are expected non-commitment probes. A parser or
+		// receiver may decline to ACK an unknown protocol without aborting the
+		// rest of Mallory's adversarial pressure sequence. Source: DI-kiduj
+		node.record("unknown_pcid_not_promised", "non_commitment", "grace", "unknown protocol probe produced local non-commitment: "+err.Error())
 	}
 	unsupportedFields := map[string]string{
 		"act":           decision.ActPromise,

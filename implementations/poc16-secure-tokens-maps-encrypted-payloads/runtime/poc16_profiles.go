@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"time"
 
+	"promisegrid.dev/wire-lab/implementations/poc16-secure-tokens-maps-encrypted-payloads/docs/protocols"
 	"promisegrid.dev/wire-lab/implementations/poc16-secure-tokens-maps-encrypted-payloads/pcid"
 	"promisegrid.dev/wire-lab/implementations/poc16-secure-tokens-maps-encrypted-payloads/protocol"
-	"promisegrid.dev/wire-lab/implementations/poc16-secure-tokens-maps-encrypted-payloads/specdocs"
 )
 
 func (node *Node) runPOC16ProtocolProfileWorkflow(contentCID string) error {

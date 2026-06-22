@@ -25,6 +25,7 @@ const peerSendTimeout = 5 * time.Second
 const peerRouteAttemptTimeout = 750 * time.Millisecond
 const peerRouteRetryDelay = 100 * time.Millisecond
 const listenerDrainTimeout = 750 * time.Millisecond
+const handlerDrainTimeout = 5 * time.Second
 
 // Kernel runs one container-local PromiseGrid transport interface. It accepts
 // receive promises from local app processes, routes exact signed envelopes to a
@@ -101,7 +102,7 @@ func (kernel *Kernel) Run(ctx context.Context) error {
 	kernel.closeAppSessions()
 	kernel.closePeerSessions()
 	kernel.closeInboundPeerSessions()
-	kernel.drainHandlers(ctx)
+	kernel.drainHandlers()
 	return nil
 }
 
@@ -386,20 +387,28 @@ func (kernel *Kernel) peerSessionForEndpoint(endpoint, target string) (*transpor
 		},
 	)
 	kernel.mu.Lock()
-	defer kernel.mu.Unlock()
-	if kernel.stopping {
+	stopping = kernel.stopping
+	existingSession = kernel.peerSessions[endpoint]
+	if !stopping && existingSession == nil {
+		// Intent: Publish the reusable outbound peer session while the routing
+		// mutex is held, but close duplicate or late-started sessions only after
+		// releasing it so transport shutdown cannot block session-table
+		// snapshotting during clean-run teardown. Source: DI-jojoj
+		kernel.peerSessions[endpoint] = session
+	}
+	kernel.mu.Unlock()
+	if stopping {
 		if closeErr := session.CloseWithReason(transport.SessionTerminalReasonProcessShutdown); closeErr != nil {
 			kernel.record("kernel_peer_session_close_failed", "broken", target, closeErr.Error())
 		}
 		return nil, fmt.Errorf("kernel is stopping after opening peer session to %s", target)
 	}
-	if existingSession = kernel.peerSessions[endpoint]; existingSession != nil {
+	if existingSession != nil {
 		if closeErr := session.CloseWithReason(transport.SessionTerminalReasonLocalClose); closeErr != nil {
 			kernel.record("kernel_peer_duplicate_session_close_failed", "broken", target, closeErr.Error())
 		}
 		return existingSession, nil
 	}
-	kernel.peerSessions[endpoint] = session
 	return session, nil
 }
 
@@ -797,19 +806,22 @@ func (kernel *Kernel) closeInboundPeerSessions() {
 	}
 }
 
-func (kernel *Kernel) drainHandlers(ctx context.Context) {
+func (kernel *Kernel) drainHandlers() {
+	// Intent: The run context is already canceled when shutdown reaches this
+	// point, so handler draining needs its own bounded timer. Otherwise the
+	// kernel can return and close process resources while accepted app/peer
+	// handlers are still emitting terminal records for sessions the kernel just
+	// closed. Source: DI-nuhit
 	drained := make(chan struct{})
 	go func() {
 		kernel.activeHandlers.Wait()
 		close(drained)
 	}()
-	timer := time.NewTimer(listenerDrainTimeout)
+	timer := time.NewTimer(handlerDrainTimeout)
 	defer timer.Stop()
 	select {
 	case <-drained:
 		kernel.record("kernel_handlers_drained", "kept", "", "all active handlers completed before kernel shutdown")
-	case <-ctx.Done():
-		kernel.record("kernel_handler_drain_cancelled", "non_commitment", "", ctx.Err().Error())
 	case <-timer.C:
 		kernel.record("kernel_handler_drain_timeout", "non_commitment", "", "some kernel handlers may still be running")
 	}

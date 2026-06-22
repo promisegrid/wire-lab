@@ -10,6 +10,10 @@ explicit. Source: `DI-ruvot`; `DI-mubul`; `DI-nogij`; `DI-rigup`; `DI-vulit`.
 The post-implementation parser-role correction is owned by `TODO-sosoj` /
 `DI-gazin`; that follow-up makes `TE-ritig`'s parser model 3 executable by
 inserting a real parser-role process between apps and the transport kernel.
+`DI-magug` supersedes the stale root-level `docs/protocols/` path portions of
+the earlier DIs; current POC16 protocol specs live under the implementation-local
+`implementations/poc16-secure-tokens-maps-encrypted-payloads/docs/protocols/`
+source of truth.
 
 ## Decision Intent Log
 
@@ -53,6 +57,78 @@ Decision: Implement POC16 from the POC15 baseline using TE-ritig's default concl
 Intent: The POC16 implementation needs a concrete locked default before code changes begin. This keeps the transport listener from becoming an RPC dispatcher or universal address parser while still letting POC16 test secure tokens, CBOR maps, encrypted payloads, protocol spec docs, embedded LLM spec context, and POC15 superset preservation in one executable run.
 Constraints: Preserve all `DI-rigup` POC15 named-agent and functionality requirements; preserve one top-level semantic action `promise`; preserve `grid([42(pCID), ...protocol-defined-slots])`; do not add pCID-per-operation fragmentation as the default; do not require a universal `to` field; keep parser/builder, ACK/error, and backpressure events as local implementation promises unless a pCID spec explicitly defines a wire-visible promise; keep analyzer and collector passive.
 Affects: implementations/poc16-secure-tokens-maps-encrypted-payloads/; docs/protocols/; protocols/wire-lab.d/TODO/TODO-zugok-poc16-secure-tokens-maps-encrypted-payloads.md; DEV-GUIDE-RESOURCES.md.
+
+ID: DI-titik
+Date: 2026-06-19 23:21:16
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: POC16 supervisors must use the configured `shutdown_grace_millis` value as the SIGTERM grace window for kernel, parser-role, and app child processes instead of a hard-coded shorter timeout.
+Intent: POC16 clean runs emit many parser/kernel/app terminal session records at shutdown. A shorter supervisor kill window can terminate children before those local lifecycle promises are closed and forwarded to the passive collector, causing false analyzer failures even when the protocol traffic completed. The configured shutdown grace is already part of the POC16 runtime contract and monitor wait budget, so the supervisor should honor that same value.
+Constraints: Keep the collector passive; do not weaken analyzer terminal-session gates; do not use observer files for agent coordination; preserve the existing process-per-role architecture; treat this as shutdown accounting and validation plumbing, not protocol behavior.
+Affects: implementations/poc16-secure-tokens-maps-encrypted-payloads/cmd/poc16-supervisor/main.go; implementations/poc16-secure-tokens-maps-encrypted-payloads/config.json; protocols/wire-lab.d/TODO/TODO-zugok-poc16-secure-tokens-maps-encrypted-payloads.md.
+
+ID: DI-jojoj
+Date: 2026-06-21 10:40:07
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: POC16 kernel peer-session setup must not close duplicate or late-started persistent sessions while holding the kernel routing mutex.
+Intent: Clean shutdown must be able to snapshot app, outbound-peer, and inbound-peer sessions and emit terminal records for every opened stream. Closing a TCP-backed persistent session while holding `kernel.mu` is unnecessary and can couple transport close behavior to routing-table locks, which makes late duplicate sessions and shutdown races harder to reason about.
+Constraints: Do not weaken analyzer terminal-session gates; do not treat transport lifecycle accounting as peer trust evidence; preserve persistent TCP reuse keyed by endpoint; preserve shutdown rejection of sessions opened after the kernel is stopping.
+Affects: implementations/poc16-secure-tokens-maps-encrypted-payloads/kernel/kernel.go; protocols/wire-lab.d/TODO/TODO-zugok-poc16-secure-tokens-maps-encrypted-payloads.md.
+
+ID: DI-nuhit
+Date: 2026-06-21 10:46:34
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: POC16 kernel shutdown must wait for accepted app/peer handler goroutines to drain using a bounded drain timer that is independent of the already-canceled run context.
+Intent: The run context is canceled before shutdown starts, so using that same context as a handler-drain stop condition lets the kernel return immediately, close its log, and let the process exit while handler goroutines are still emitting persistent-session terminal records. Clean-run lifecycle accounting requires the kernel to close sessions and then give handlers a bounded chance to observe those closures and finish.
+Constraints: Do not make shutdown unbounded; do not weaken analyzer terminal-session gates; keep drain records as local transport lifecycle accounting, not peer trust evidence; preserve supervisor-level SIGTERM grace as the outer kill bound.
+Affects: implementations/poc16-secure-tokens-maps-encrypted-payloads/kernel/kernel.go; protocols/wire-lab.d/TODO/TODO-zugok-poc16-secure-tokens-maps-encrypted-payloads.md.
+
+ID: DI-vazoz
+Date: 2026-06-22 09:24:56 PDT
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: POC16 container supervisors must shut child roles down in phases: app processes finish first, the parser-role process closes its parser/kernel and parser/app sessions second, and the transport kernel closes listeners, app sessions, peer sessions, and handler drains last.
+Intent: Parser roles are the local app-facing kernel role. If the supervisor cancels parser and transport-kernel children at the same time, busy containers can truncate one side of a persistent parser/kernel or kernel peer stream before terminal records are emitted. A phased shutdown preserves the local process model while letting each role close the streams it owns in dependency order.
+Constraints: Do not weaken analyzer terminal-session gates; do not add observer-volume coordination; keep supervisor shutdown bounded by `shutdown_grace_millis`; preserve the process-per-role architecture and local Promise Theory semantics.
+Affects: implementations/poc16-secure-tokens-maps-encrypted-payloads/cmd/poc16-supervisor/main.go; protocols/wire-lab.d/TODO/TODO-zugok-poc16-secure-tokens-maps-encrypted-payloads.md.
+
+ID: DI-kiduj
+Date: 2026-06-22 09:34:11 PDT
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: POC16 adversarial unknown-pCID probes must be recorded as expected local non-commitments and must not abort Mallory's remaining adversarial startup probes.
+Intent: Unknown protocol CIDs are precisely the case where a receiver or parser role may decline to promise a parse, ACK, or delivery. Treating that expected non-commitment as a fatal startup error suppresses the later corrupt-CAS, bad-proof, key-rotation, capacity-refusal, and repair-promise probes that make the clean-run regression meaningful.
+Constraints: Do not weaken unknown-pCID analyzer coverage; do not reinterpret unknown pCIDs as globally invalid; keep the event as local non-commitment, not enforcement or authority; preserve the rest of Mallory's startup workflow so later probes still exercise receiver autonomy.
+Affects: implementations/poc16-secure-tokens-maps-encrypted-payloads/runtime/node.go; protocols/wire-lab.d/TODO/TODO-zugok-poc16-secure-tokens-maps-encrypted-payloads.md.
+
+ID: DI-kunad
+Date: 2026-06-22 09:59:53 PDT
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: POC16 persistent-session shutdown must emit local closed and terminal lifecycle records before invoking the underlying TCP close.
+Intent: The analyzer is checking local lifecycle accounting, not global transport authority. A busy or slow socket close must not hide the local fact that the owning session promised to close, notified pending requests, and reached a terminal state during bounded shutdown.
+Constraints: Do not weaken analyzer terminal-session gates; do not treat session lifecycle records as peer trust evidence; still attempt the underlying TCP close and record close failures; preserve exactly one terminal record per persistent session.
+Affects: implementations/poc16-secure-tokens-maps-encrypted-payloads/transport/persistent_session.go; protocols/wire-lab.d/TODO/TODO-zugok-poc16-secure-tokens-maps-encrypted-payloads.md.
+
+ID: DI-pajih
+Date: 2026-06-22 10:15:53 PDT
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: POC16 parser-role shutdown must close and drain app-facing parser sessions before closing the parser/kernel control session.
+Intent: Parser roles bridge local app promises to the transport kernel. During shutdown, app-facing sessions may still be delivering ACKs or local non-commitments through the parser role. Closing and draining those local app sessions first removes concurrent parser activity before the parser records terminal lifecycle accounting for its kernel control stream.
+Constraints: Do not weaken analyzer terminal-session gates; keep shutdown bounded by supervisor grace and existing app-session close behavior; preserve the parser role as the owner of pCID payload parsing, not a transport-kernel RPC dispatcher.
+Affects: implementations/poc16-secure-tokens-maps-encrypted-payloads/parserrole/parserrole.go; protocols/wire-lab.d/TODO/TODO-zugok-poc16-secure-tokens-maps-encrypted-payloads.md.
+
+ID: DI-nuriv
+Date: 2026-06-22 14:25:38 PDT
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: POC16 persistent-session close must bound the underlying TCP close after local terminal lifecycle records have been emitted.
+Intent: Clean-run shutdown closes many app, parser, inbound-peer, and outbound-peer streams. One slow or wedged socket close must not prevent the owning process from emitting terminal lifecycle records for later sessions. The local session terminal record is the analyzer-relevant promise that the owner reached a terminal state; TCP close is still attempted and failures or deferred close are recorded, but it must not serialize all other session accounting behind one stream.
+Constraints: Do not weaken analyzer terminal-session gates; preserve exactly one terminal record per persistent session; still attempt underlying TCP close; keep deferred-close records as transport lifecycle accounting, not peer trust evidence; do not add observer-volume coordination or global monitoring semantics.
+Affects: implementations/poc16-secure-tokens-maps-encrypted-payloads/transport/persistent_session.go; protocols/wire-lab.d/TODO/TODO-zugok-poc16-secure-tokens-maps-encrypted-payloads.md.
 
 ## Scope
 
@@ -131,14 +207,14 @@ Affects: implementations/poc16-secure-tokens-maps-encrypted-payloads/; docs/prot
 
 ## Protocol Specification Source Targets
 
-- Add `docs/protocols/` as the repo-level home for POC16 protocol spec docs
-  that are meant to be hashed into pCIDs.
+- Keep POC16 protocol spec docs that are meant to be hashed into pCIDs under
+  `implementations/poc16-secure-tokens-maps-encrypted-payloads/docs/protocols/`.
 - Keep editable draft specs at human-readable slug paths such as
-  `docs/protocols/route-v1.md`.
-- Freeze a spec by adding a symlink named with the canonical CIDv1 text form:
-  `docs/protocols/<cidv1-encoded>.md -> <slug>.md`.
-- Add validation that every POC16 pCID has a corresponding CIDv1 symlink and
-  that each symlink target hashes back to the pCID named by the symlink.
+  `implementations/poc16-secure-tokens-maps-encrypted-payloads/docs/protocols/route-v1.md`.
+- Do not maintain a root-level `docs/protocols/` POC16 mirror or stale CIDv1
+  symlink corpus; POC16 uses embedded spec bytes as the pCID source of truth.
+- Add validation that every POC16 pCID has a corresponding embedded local
+  protocol spec and that runtime pCIDs derive from those exact bytes.
 - Treat spec docs as provenance, review, diagnostics, and LLM prompt-context
   sources. Deterministic runtime routing may use compiled/static pCID registry
   data and does not need to read prose specs during message dispatch.
@@ -342,8 +418,8 @@ Affects: implementations/poc16-secure-tokens-maps-encrypted-payloads/; docs/prot
 - Add POC16 protocol notes describing:
   - the POC15 named-agent and executable-functionality baseline that POC16
     preserves,
-  - the `docs/protocols/` spec-doc layout,
-  - CIDv1 symlink freezing for pCID provenance,
+	  - the implementation-local `docs/protocols/` spec-doc layout,
+	  - embedded spec-byte hashing for pCID provenance,
   - `go:embed` spec context for LLM agents,
   - slot-0 pCID selection of parser/builder roles,
   - why pCID is not an app address, message kind, RPC method, or service-registry
@@ -366,7 +442,7 @@ Affects: implementations/poc16-secure-tokens-maps-encrypted-payloads/; docs/prot
 
 - [x] zugok.1 Scaffold `implementations/poc16-secure-tokens-maps-encrypted-payloads/` from the POC15 baseline.
 - [x] zugok.2 Add an analyzer superset gate proving POC15 acceptance categories still appear in POC16 clean runs.
-- [x] zugok.3 Add `docs/protocols/` specs and CIDv1 symlinks for every POC16 pCID.
+- [x] zugok.3 Add implementation-local `docs/protocols/` specs for every POC16 pCID and remove the stale root mirror per `DI-magug`.
 - [x] zugok.4 Add pCID-owned CBOR map payload specimens and at least one normal map-based protocol flow.
 - [x] zugok.5 Add pCID-owned compact CBOR array alternatives for constrained-profile agents.
 - [x] zugok.6 Replace toy bearer tokens with cryptographically secure bearer tokens.

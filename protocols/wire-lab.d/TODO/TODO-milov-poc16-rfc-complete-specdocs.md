@@ -2,10 +2,12 @@
 
 ## Status
 
-Implemented and validated by the current specdoc rewrite task. This TODO exists
-because POC16's embedded specdocs are pCID inputs, LLM-agent prompt context, and
-developer-facing protocol specifications; short notes are not sufficient for
-production-shaped implementation.
+Implemented and validated by the current specdoc rewrite task, then corrected by
+`DI-magug` to consolidate the POC16 protocol specs under the implementation-local
+`docs/protocols/` path. This TODO exists because POC16's embedded protocol specs
+are pCID inputs, LLM-agent prompt context, and developer-facing protocol
+specifications; short notes are not sufficient for production-shaped
+implementation.
 
 ## Decision Intent Log
 
@@ -17,6 +19,16 @@ Intent: A pCID names the content of a protocol specification. If the specdoc is 
 Constraints: Cover all Markdown files embedded by `specdocs/*.md`, including active, specimen/profile, and retired/historical pCIDs; preserve `grid([42(pCID), ...protocol-defined-slots])`; keep pCID as protocol spec selector, not destination address; keep trust local and promise-first; do not introduce global authority, conformance, permission, or command semantics; acknowledge that editing spec bytes changes derived pCIDs; keep runtime behavior unchanged unless validation exposes a mismatch.
 Affects: implementations/poc16-secure-tokens-maps-encrypted-payloads/specdocs/*.md; implementations/poc16-secure-tokens-maps-encrypted-payloads/specdocs/specdocs_test.go; protocols/wire-lab.d/TODO/TODO-milov-poc16-rfc-complete-specdocs.md; protocols/wire-lab.d/TODO/TODO.md.
 
+ID: DI-magug
+Date: 2026-06-19 21:18:26
+Author: stevegt@t7a.org (Steve Traugott)
+Status: active
+Decision: Consolidate POC16 protocol specification documents under `implementations/poc16-secure-tokens-maps-encrypted-payloads/docs/protocols/`, move the embedded Go spec package there, and remove the stale root-level `docs/protocols/` POC16 duplicate.
+Intent: POC16 needs one protocol-spec source of truth. The implementation-local path makes it clear that these docs are executable POC16 inputs and prompt context, not repo-wide final PromiseGrid standards. Keeping both root `docs/protocols/` and implementation-local embedded specs creates stale pCID docs, ambiguous provenance, and misleading next-step work.
+Constraints: Preserve all RFC-complete spec content from `DI-bitug`; preserve `grid([42(pCID), ...protocol-defined-slots])`; keep pCID as protocol spec selector, not address; keep the Go package API names stable where practical so the path move does not become a behavior refactor; update code, TODOs, and guide references away from root `docs/protocols/`; remove stale root POC16 protocol docs instead of regenerating them.
+Affects: docs/protocols/; implementations/poc16-secure-tokens-maps-encrypted-payloads/specdocs/; implementations/poc16-secure-tokens-maps-encrypted-payloads/docs/protocols/; implementations/poc16-secure-tokens-maps-encrypted-payloads/pcid/registry.go; implementations/poc16-secure-tokens-maps-encrypted-payloads/runtime/; DEV-GUIDE-RESOURCES.md; protocols/wire-lab.d/TODO/TODO*.md.
+Supersedes: stale path portions of DI-mubul, DI-nogij, DI-vulit, DI-gazin, and DI-bitug.
+
 ## Scope
 
 - [x] milov.1 Rewrite every active POC16 specdoc as an RFC-style protocol spec.
@@ -26,6 +38,7 @@ Affects: implementations/poc16-secure-tokens-maps-encrypted-payloads/specdocs/*.
 - [x] milov.5 Add a completeness regression test for required specdoc sections.
 - [x] milov.6 Run `go test ./...`, `errcheck ./...`, and the POC16 clean regression.
 - [x] milov.7 Commit the specdoc rewrite separately from the parser-role checkpoint.
+- [x] milov.8 Consolidate the embedded specs to the implementation-local `docs/protocols/` source of truth.
 
 ## Required Spec Structure
 

@@ -524,13 +524,17 @@ func (role *ParserRole) stop() {
 			role.record("parser_role_listener_close_failed", "broken", "", closeErr.Error())
 		}
 	}
+	// Intent: App-facing parser sessions can still be producing ACKs or
+	// non-commitments that traverse the parser/kernel control stream. Close and
+	// drain those local sessions first so parser/kernel terminal accounting is
+	// emitted after app-side parser activity has quiesced. Source: DI-pajih
+	role.closeAppSessions()
+	role.active.Wait()
 	if role.kernelClient != nil && role.kernelClient.session != nil {
 		if closeErr := role.kernelClient.session.CloseWithReason(transport.SessionTerminalReasonProcessShutdown); closeErr != nil {
 			role.record("parser_kernel_session_close_failed", "broken", "kernel", closeErr.Error())
 		}
 	}
-	role.closeAppSessions()
-	role.active.Wait()
 }
 
 func (role *ParserRole) trackAppSession(session *transport.PersistentSession, remoteAddress string) {

@@ -20,12 +20,6 @@ import (
 	"promisegrid.dev/wire-lab/implementations/poc16-secure-tokens-maps-encrypted-payloads/eventstream"
 )
 
-// Intent: Parser-role sessions add more independent app/parser/kernel/peer TCP
-// streams, so child processes need enough SIGTERM grace to close sessions and
-// emit terminal records before the supervisor escalates to Kill. Source:
-// DI-javuz
-const childShutdownGrace = 15 * time.Second
-
 func main() {
 	if err := run(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
@@ -60,9 +54,20 @@ func runContainerProcesses(ctx context.Context, cfg config.Config, kernelBinary,
 	// starting one container-local kernel plus independent app processes, rather
 	// than hiding delivery inside one monolithic runtime object. Source:
 	// DI-fumol; DI-sinur
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
-	collectorClient, collectorErr := eventstream.Dial(ctx, cfg.EventCollectorAddress, cfg.StartupDelay()+30*time.Second)
+	lifecycleCtx, cancelAll := context.WithCancel(ctx)
+	defer cancelAll()
+	kernelCtx, cancelKernel := context.WithCancel(lifecycleCtx)
+	defer cancelKernel()
+	parserCtx, cancelParser := context.WithCancel(lifecycleCtx)
+	defer cancelParser()
+	agentCtx, cancelAgents := context.WithCancel(lifecycleCtx)
+	defer cancelAgents()
+	// Intent: Use the same configured shutdown grace for supervisor SIGTERM
+	// escalation that app runtimes use for local receive-promise grace, so verbose
+	// parser/kernel terminal records are not truncated by a stale hard-coded kill
+	// window. Source: DI-titik
+	shutdownGrace := cfg.ShutdownGrace()
+	collectorClient, collectorErr := eventstream.Dial(lifecycleCtx, cfg.EventCollectorAddress, cfg.StartupDelay()+30*time.Second)
 	if collectorErr != nil {
 		return collectorErr
 	}
@@ -71,7 +76,7 @@ func runContainerProcesses(ctx context.Context, cfg config.Config, kernelBinary,
 	defer forwarder.sendDone("container supervisor exited")
 	kernelErrs := make(chan error, 1)
 	go func() {
-		kernelErrs <- runKernelProcess(ctx, forwarder, kernelBinary, configPath, container.Name)
+		kernelErrs <- runKernelProcess(kernelCtx, forwarder, shutdownGrace, kernelBinary, configPath, container.Name)
 	}()
 	select {
 	case kernelErr := <-kernelErrs:
@@ -80,16 +85,16 @@ func runContainerProcesses(ctx context.Context, cfg config.Config, kernelBinary,
 		}
 		return fmt.Errorf("kernel for container %s exited before apps started", container.Name)
 	case <-time.After(250 * time.Millisecond):
-	case <-ctx.Done():
-		return ctx.Err()
+	case <-lifecycleCtx.Done():
+		return lifecycleCtx.Err()
 	}
 	parserErrs := make(chan error, 1)
 	go func() {
-		parserErrs <- runParserRoleProcess(ctx, forwarder, parserRoleBinary, configPath, container.Name)
+		parserErrs <- runParserRoleProcess(parserCtx, forwarder, shutdownGrace, parserRoleBinary, configPath, container.Name)
 	}()
 	select {
 	case parserErr := <-parserErrs:
-		cancel()
+		cancelAll()
 		if parserErr != nil {
 			<-kernelErrs
 			return parserErr
@@ -97,7 +102,7 @@ func runContainerProcesses(ctx context.Context, cfg config.Config, kernelBinary,
 		<-kernelErrs
 		return fmt.Errorf("parser role for container %s exited before apps started", container.Name)
 	case kernelErr := <-kernelErrs:
-		cancel()
+		cancelAll()
 		if kernelErr != nil {
 			<-parserErrs
 			return kernelErr
@@ -105,24 +110,26 @@ func runContainerProcesses(ctx context.Context, cfg config.Config, kernelBinary,
 		<-parserErrs
 		return fmt.Errorf("kernel for container %s exited before parser role started apps", container.Name)
 	case <-time.After(250 * time.Millisecond):
-	case <-ctx.Done():
-		cancel()
+	case <-lifecycleCtx.Done():
+		cancelAll()
 		<-kernelErrs
 		<-parserErrs
-		return ctx.Err()
+		return lifecycleCtx.Err()
 	}
 	errs := make(chan error, len(container.Agents))
 	var waitGroup sync.WaitGroup
 	for _, agentName := range container.Agents {
 		agentBinary, binaryErr := appBinaryForAgent(cfg, agentName)
 		if binaryErr != nil {
-			cancel()
+			cancelAll()
+			<-parserErrs
+			<-kernelErrs
 			return binaryErr
 		}
 		waitGroup.Add(1)
 		go func(localAgentName, localAgentBinary string) {
 			defer waitGroup.Done()
-			errs <- runAgentProcess(ctx, forwarder, localAgentBinary, configPath, localAgentName)
+			errs <- runAgentProcess(agentCtx, forwarder, shutdownGrace, localAgentBinary, configPath, localAgentName)
 		}(agentName, agentBinary)
 	}
 	go func() {
@@ -133,17 +140,23 @@ func runContainerProcesses(ctx context.Context, cfg config.Config, kernelBinary,
 	for agentErr := range errs {
 		if agentErr != nil && firstErr == nil {
 			firstErr = agentErr
-			cancel()
+			cancelAgents()
 		}
 	}
-	cancel()
-	kernelErr := <-kernelErrs
+	cancelAgents()
+	// Intent: Parser roles own app-facing payload parsing and the parser/kernel
+	// control stream. Shutting the parser down before the transport kernel lets
+	// it close those local streams and emit terminal records before the kernel
+	// closes peer transport sessions. Source: DI-vazoz
+	cancelParser()
 	parserErr := <-parserErrs
-	if firstErr == nil && kernelErr != nil {
-		firstErr = kernelErr
-	}
 	if firstErr == nil && parserErr != nil {
 		firstErr = parserErr
+	}
+	cancelKernel()
+	kernelErr := <-kernelErrs
+	if firstErr == nil && kernelErr != nil {
+		firstErr = kernelErr
 	}
 	if forwardErr := forwarder.err(); firstErr == nil && forwardErr != nil {
 		firstErr = forwardErr
@@ -151,28 +164,28 @@ func runContainerProcesses(ctx context.Context, cfg config.Config, kernelBinary,
 	return firstErr
 }
 
-func runKernelProcess(ctx context.Context, forwarder *processForwarder, kernelBinary, configPath, containerName string) error {
+func runKernelProcess(ctx context.Context, forwarder *processForwarder, shutdownGrace time.Duration, kernelBinary, configPath, containerName string) error {
 	// Intent: Start exactly one local kernel per container. It is transport
 	// plumbing for app promises, not a trust authority or workflow owner.
 	// Source: DI-galin
-	return runProcess(ctx, forwarder, "kernel:"+containerName, kernelBinary, "-config", configPath, "-container", containerName)
+	return runProcess(ctx, forwarder, "kernel:"+containerName, shutdownGrace, kernelBinary, "-config", configPath, "-container", containerName)
 }
 
-func runParserRoleProcess(ctx context.Context, forwarder *processForwarder, parserRoleBinary, configPath, containerName string) error {
+func runParserRoleProcess(ctx context.Context, forwarder *processForwarder, shutdownGrace time.Duration, parserRoleBinary, configPath, containerName string) error {
 	// Intent: Start one local parser/builder role per container between apps and
 	// the transport kernel so pCID-owned payload semantics stay out of the
 	// transport kernel. Source: DI-gazin
-	return runProcess(ctx, forwarder, "parser:"+containerName, parserRoleBinary, "-config", configPath, "-container", containerName)
+	return runProcess(ctx, forwarder, "parser:"+containerName, shutdownGrace, parserRoleBinary, "-config", configPath, "-container", containerName)
 }
 
-func runAgentProcess(ctx context.Context, forwarder *processForwarder, agentBinary, configPath, agentName string) error {
+func runAgentProcess(ctx context.Context, forwarder *processForwarder, shutdownGrace time.Duration, agentBinary, configPath, agentName string) error {
 	// Intent: A container supervisor starts independent local app processes
 	// without sharing decision state; stdout/stderr pass through so the run log
 	// remains auditable from Docker output. Source: DI-galin
-	return runProcess(ctx, forwarder, "agent:"+agentName, agentBinary, "-config", configPath, "-node", agentName)
+	return runProcess(ctx, forwarder, "agent:"+agentName, shutdownGrace, agentBinary, "-config", configPath, "-node", agentName)
 }
 
-func runProcess(ctx context.Context, forwarder *processForwarder, roleName, binary string, args ...string) error {
+func runProcess(ctx context.Context, forwarder *processForwarder, roleName string, shutdownGrace time.Duration, binary string, args ...string) error {
 	// Intent: Child processes still write ordinary stdout/stderr, but the
 	// supervisor copies JSON event records to the observer-only collector instead
 	// of relying on a Docker volume visible to agents. Source: DI-dirat
@@ -216,7 +229,7 @@ func runProcess(ctx context.Context, forwarder *processForwarder, roleName, bina
 		if signalErr != nil && !errors.Is(signalErr, os.ErrProcessDone) {
 			return fmt.Errorf("signal %s for shutdown: %w", roleName, signalErr)
 		}
-		timer := time.NewTimer(childShutdownGrace)
+		timer := time.NewTimer(shutdownGrace)
 		defer timer.Stop()
 		select {
 		case <-waitDone:
