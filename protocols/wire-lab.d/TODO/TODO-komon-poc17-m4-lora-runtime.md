@@ -20,6 +20,14 @@ Intent: The M4/LoRa runtime is useful enough to deserve its own POC, but it shou
 Constraints: Preserve one top-level semantic action `promise`; preserve `grid([42(pCID), ...])`; no global monitor, global CAS, global route authority, global trust authority, service registry, permission authority, authorization authority, or conformance authority; no UART/host bridge as message transport; no claim of exact Adafruit Feather M4 Express plus RFM95W simulation until pin mappings, SAMD51 peripheral behavior, SPI behavior, radio-driver behavior, and packet semantics are validated; all device-to-peer PromiseGrid traffic must cross the simulated LoRa path; any harness observer must be passive and must not affect trust, routing, ACKs, retransmission, or protocol semantics.
 Affects: implementations/poc17-m4-lora-runtime/; protocols/wire-lab.d/TODO/TODO-komon-poc17-m4-lora-runtime.md; DEV-GUIDE-RESOURCES.md; future POC16/POC17 planning docs.
 
+ID: DI-dugog
+Date: 2026-06-22 16:10:18 PDT
+Status: active
+Decision: Keep the POC17 Codex handoff bootstrap in this TODO so a separate Codex operator can start POC17 while POC16 cleanup continues in parallel.
+Intent: POC17 needs POC16's executable lessons and session-only operating habits without forcing the next operator to reconstruct them from chat logs. The handoff must preserve the radio-only constrained-device goal, avoid POC16 regressions already discovered, and name POC16 cleanup items that should influence POC17 even if they are not finished in POC16 yet.
+Constraints: Do not scaffold or implement POC17 as part of the handoff; do not move POC16 cleanup into POC17; keep this handoff as TODO-local coordination, not a second source of protocol truth; preserve no-UART/no-host-bridge transport, Promise Theory vocabulary, pCID-as-protocol-spec, `grid([42(pCID), ...])`, passive harness/analyzer semantics, and honest simulator-fidelity claims.
+Affects: protocols/wire-lab.d/TODO/TODO-komon-poc17-m4-lora-runtime.md; protocols/wire-lab.d/TODO/TODO.md; future implementations/poc17-m4-lora-runtime/.
+
 ## Scope
 
 - Treat POC17 as executable design evidence for constrained embedded
@@ -123,8 +131,102 @@ Affects: implementations/poc17-m4-lora-runtime/; protocols/wire-lab.d/TODO/TODO-
   modeled behavior, diagnostics-only behavior, and not-yet-modeled hardware
   behavior.
 
+## Codex Handoff Bootstrap
+
+This section is the starting context for the next Codex operator. Complete
+`komon.14` before editing POC17 files.
+
+### Required First Reads
+
+- Read repo rules and workflow first: root `AGENTS.md`, then this TODO from top
+  to bottom.
+- Read POC16 decision context: `TODO-zugok-poc16-secure-tokens-maps-encrypted-payloads.md`
+  and `TODO-sosoj-poc16-parser-role-followup.md`.
+- Read POC16 executable design notes:
+  `implementations/poc16-secure-tokens-maps-encrypted-payloads/README.md`,
+  `implementations/poc16-secure-tokens-maps-encrypted-payloads/docs/KERNEL-ROLES.md`,
+  and `implementations/poc16-secure-tokens-maps-encrypted-payloads/docs/MESSAGE-SHAPES.md`.
+- Read `DEV-GUIDE-RESOURCES.md` for current cross-POC design state, but treat
+  POC evidence as pressure and lessons, not final PromiseGrid APIs.
+
+### Non-Negotiables
+
+- POC17 PromiseGrid traffic from the M4 agent crosses only the simulated
+  RFM95/SX127x-style LoRa path. UART, stdout, semihosting, debug logs, host
+  files, and simulator monitor channels are diagnostics only.
+- No component may become a global monitor, trust authority, CAS authority,
+  route authority, registry authority, permission service, authorization service,
+  conformance authority, or RPC controller.
+- pCID is a protocol-spec selector, not an address, app name, operation code,
+  message kind, route target, service name, or universal dispatch key.
+- Preserve the outer message invariant `grid([42(pCID), ...])`; every slot after
+  slot 0 is defined by the pCID spec.
+- Keep the top-level semantic action minimal: ordinary protocol behavior should
+  be voluntary `promise` payload semantics, not new action kinds.
+- Do not claim exact Feather M4 Express plus RFM95W simulation fidelity until pin
+  mappings, SAMD51 peripherals, SPI behavior, radio-driver behavior, and packet
+  semantics are explicitly modeled and gated.
+
+### POC16 Lessons To Inherit
+
+- Preserve relevant POC16 coverage as a regression floor: parser/builder role
+  separation, pCID-owned payload and arity, raw CBOR artifacts, exact-message
+  parent links, per-agent sparse CAS, promise-based GC/backpressure, secure
+  token pressure, encrypted payload pressure, and route economics.
+- Keep kernel roles as promise boundaries. A runtime may collapse roles into one
+  process or firmware loop, but the design must still identify who promises
+  transport, app delivery, radio access, resource allocation, storage, route
+  selection, and event retention.
+- Treat radio delivery as transport only. The radio medium may lose, duplicate,
+  delay, or bound packets; it must not judge promises or mutate trust.
+- Keep ACK/reply correlation based on exact request message hashes and parent
+  links, not payload-level RPC request IDs.
+- Keep local scarcity separate from peer promise-breaking. Battery, RAM, flash,
+  MTU, retry-budget, and airtime pressure can justify local non-commitment, but
+  must not automatically lower trust in a peer.
+- Preserve raw-message review. Retain exact CBOR envelopes and malformed radio
+  bytes for operator review, but keep harness artifacts separate from production
+  protocol behavior.
+- Preserve honest analyzer language. Passing gates means "POC evidence complete"
+  or "candidate for the current POC scope", not production readiness.
+
+### POC16 Cleanup Still Relevant To POC17
+
+- POC16 still needs implementation-local CID-named spec aliases under its
+  `docs/protocols/` directory; POC17 should plan CID-named spec aliases from the
+  start once its spec docs exist.
+- POC16 still needs a guard preventing stale root `docs/protocols/` POC mirrors;
+  POC17 should not reintroduce a root-level protocol mirror.
+- POC16 analyzer wording around "production-candidate" needs tightening; POC17
+  analyzer output must avoid stronger production claims.
+- POC16 builder-role behavior needs more real coverage beyond profile/specimen
+  evidence; POC17 should make parser/builder or firmware parser/builder behavior
+  executable if it claims coverage.
+- POC16 needs diagnostic CBOR examples for each active protocol; POC17 should
+  include diagnostic renderings for every small-device pCID it introduces.
+- POC16 pCID inventory needs auditing against spec docs, parser, builder, and
+  runtime use; POC17 should keep that inventory explicit from the beginning.
+
+### Session-Only Operating Habits
+
+- Always run the clean simulator/container command after behavior changes before
+  calling a POC change done. If POC17 has no clean command yet, create one before
+  claiming executable success.
+- Do not describe shortcuts, harness-only behavior, fake WASM/radio behavior,
+  simulated security, or diagnostics as production or fully functioning.
+- Keep all raw messages intact for later review. Prefer exact CBOR artifacts and
+  diagnostic renderings over summarized logs when validating wire behavior.
+- Separate harness/analyzer/observer facts from agent-visible protocol facts.
+  Analyzer output is design evidence, not a global system view.
+- Record approximations explicitly: exact modeled behavior, approximate modeled
+  behavior, diagnostics-only behavior, and not-yet-modeled hardware behavior.
+- When unsure whether a new concept should be a top-level action, default to a
+  pCID-owned promise payload unless a TE/DI proves otherwise.
+
 ## Subtasks
 
+- [ ] komon.14 Read and acknowledge the Codex handoff bootstrap before any POC17
+  implementation work.
 - [ ] komon.1 Decide whether POC16 must land first and what POC16 contributes
   that POC17 should inherit.
 - [ ] komon.2 Run a TE for M4/LoRa runtime alternatives: Renode custom platform,
