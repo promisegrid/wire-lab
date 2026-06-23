@@ -36,6 +36,14 @@ Intent: `bintags` gives POC17 a concrete Feather M4/RFM9x LoRa reference system 
 Constraints: Use `bintags` for behavior, vocabulary, hardware pressure, ACK/retry examples, display/button constraints, and role boundaries; do not inherit its CSV-like text packet format, MQTT bridge semantics, or host-mediated control model as PromiseGrid protocol design; do not edit `/home/angela/lab/bintags` as part of POC17 planning; preserve the radio-only POC17 transport rule.
 Affects: protocols/wire-lab.d/TODO/TODO-komon-poc17-m4-lora-runtime.md; /home/angela/lab/bintags/README.md; /home/angela/lab/bintags/devices/m4/m4.py; /home/angela/lab/bintags/devices/pi/pi.py; /home/angela/lab/bintags/application/bt/main.go; future POC17 TE and implementation decisions.
 
+ID: DI-libis
+Date: 2026-06-22 17:56:11 PDT
+Status: active
+Decision: Implement POC17 with an early Go behavior simulator that uses `bintags` CircuitPython-shaped device vocabulary, then pursue Rust/Renode as the later fidelity lane after the Go simulator passes radio-only and artifact gates.
+Intent: The key first POC17 question is whether a constrained-device-shaped agent can make PromiseGrid promises over a lossy, bounded, radio-only path with exact CBOR artifacts and passive analyzer evidence. A Go simulator can prove that behavior quickly and fit the repo's existing test/analyzer style. CircuitPython should inform device behavior, but making CircuitPython itself the simulator runtime would front-load board/runtime/library emulation. Rust plus Renode is a better later fidelity path once the behavior contract is executable.
+Constraints: The Go simulator must be labeled as behavior evidence, not Feather M4 Express/RFM95W firmware proof; preserve the no-UART/no-host-bridge transport rule; keep `bintags` as prior-art vocabulary, not a wire format or runtime dependency; plan Rust/Renode as a follow-on fidelity lane, not as a blocker for the first POC17 clean run; do not claim production device readiness until a later fidelity lane proves hardware, SPI, radio-driver, memory, energy, and packet-semantics constraints.
+Affects: protocols/wire-lab.d/TODO/TODO-komon-poc17-m4-lora-runtime.md; docs/thought-experiments/TE-topam-m4-agent-language-source.md; docs/thought-experiments/TE-juzif-poc17-simulator-choice-and-timing.md; future implementations/poc17-m4-lora-runtime/.
+
 ## Scope
 
 - Treat POC17 as executable design evidence for constrained embedded
@@ -152,10 +160,30 @@ Affects: protocols/wire-lab.d/TODO/TODO-komon-poc17-m4-lora-runtime.md; /home/an
   semantics, or host-mediated control model as PromiseGrid protocol design.
   POC17 still needs pCID-owned CBOR payloads, radio-only M4 traffic, local
   agent judgment, and passive harness evidence. Source: `DI-solih`.
-- Run a TE before choosing the simulated M4 agent language source. The TE must
-  compare CircuitPython-shaped behavior from `bintags`, native firmware in C/C++
-  or Rust, and a Go-only simulation under the same simulator, radio-fidelity,
-  memory, parser/builder, testing, and migration scenarios. Source: `DI-solih`.
+- TE-topam completed the first language-source pass and TE-juzif completed the
+  simulator/timing pass. `DI-libis` locks the resulting sequence: use
+  CircuitPython-shaped `bintags` behavior as the M4 agent language source, build
+  the first simulator in Go, and pursue Rust/Renode later for fidelity.
+
+## Locked POC17 Simulator Sequence
+
+- Start POC17 with a Go behavior simulator. The first simulator should prove
+  radio-only PromiseGrid traffic, exact CBOR artifacts, loss/retry/MTU behavior,
+  sparse local state, pCID-owned payload parsing/building, and analyzer gates
+  against hidden host transport. Source: `DI-libis`.
+- Use `bintags` CircuitPython-shaped device vocabulary for the simulated M4
+  agent: radio, button, display, message parse/build, ACK/retry budget, display
+  refresh pressure, order/status or device-status behavior, and local event
+  loop. Do not make CircuitPython the first simulator runtime. Source:
+  `DI-libis`.
+- Treat the Go simulator as behavior evidence only. It must not claim exact
+  Feather M4 Express, SAMD51, SPI, RFM95W/RFM95, CircuitPython runtime,
+  radio-driver, packet, memory, energy, or production-device fidelity. Source:
+  `DI-libis`.
+- Plan Rust plus Renode as the later fidelity lane after the Go simulator passes
+  clean radio-only and artifact gates. The later lane should test firmware-shaped
+  constraints and stronger platform/peripheral fidelity without blocking the
+  first POC17 executable evidence. Source: `DI-libis`.
 
 ## Codex Handoff Bootstrap
 
@@ -257,16 +285,20 @@ This section is the starting context for the next Codex operator. Complete
 
 - [ ] komon.14 Read and acknowledge the Codex handoff bootstrap before any POC17
   implementation work.
-- [ ] komon.15 Run a TE on simulated M4 agent language sources: CircuitPython-shaped
+- [x] komon.15 Run a TE on simulated M4 agent language sources: CircuitPython-shaped
   behavior from `bintags`, native firmware in C/C++ or Rust, and Go-only
   simulation. Compare each option under simulator support, LoRa/radio fidelity,
   constrained-memory behavior, PromiseGrid parser/builder coverage, testability,
-  and long-term migration.
+  and long-term migration. Completed by
+  `docs/thought-experiments/TE-topam-m4-agent-language-source.md`; resulting
+  decision status: locked by `DI-libis`.
 - [ ] komon.1 Decide whether POC16 must land first and what POC16 contributes
   that POC17 should inherit.
-- [ ] komon.2 Run a TE for M4/LoRa runtime alternatives: Renode custom platform,
+- [x] komon.2 Run a TE for M4/LoRa runtime alternatives: Renode custom platform,
   QEMU MPS2 plus external radio model, Wokwi/custom chips, hardware-in-loop, and
-  pure Go radio simulation.
+  pure Go radio simulation. Completed by
+  `docs/thought-experiments/TE-juzif-poc17-simulator-choice-and-timing.md`;
+  resulting decision status: locked by `DI-libis`.
 - [ ] komon.3 Lock simulator choice, fidelity target, and naming decisions via
   DI before creating `implementations/poc17-m4-lora-runtime/`.
 - [ ] komon.4 Scaffold the POC17 directory only after DF approval for paths,
