@@ -52,6 +52,14 @@ Intent: The bintags radio note is broader than POC17 implementation code because
 Constraints: Treat the DN as research/design pressure, not as a normative protocol spec; verify regulatory, radio-driver, hardware, region, simulator, packet-header, and timing claims before using them as acceptance criteria; preserve the POC17 no-UART/no-host-bridge transport rule and honest simulator-fidelity caveats.
 Affects: docs/research/DN-zaraz-bintags-lora-frame-budget.md; protocols/wire-lab.d/TODO/TODO-komon-poc17-m4-lora-runtime.md; future implementations/poc17-m4-lora-runtime/.
 
+ID: DI-zidaf
+Date: 2026-06-23 13:56:45 PDT
+Status: active
+Decision: Steve acknowledged the POC17 Codex handoff bootstrap and authorized marking `komon.14` complete.
+Intent: POC17 implementation work may proceed only after the bootstrap constraints are acknowledged. The acknowledgment confirms the next POC17 operator must preserve radio-only transport for the simulated M4 agent, passive harness behavior, no hidden host bridge, no authority drift, `bintags` as prior-art vocabulary rather than runtime or wire format, and the Go-first/Rust-Renode-later simulator sequence.
+Constraints: This acknowledgment does not approve scaffolding paths, package names, command names, runtime-generated paths, or remaining implementation details; those still belong to later DF/DI work, especially `komon.3` and `komon.4`.
+Affects: protocols/wire-lab.d/TODO/TODO-komon-poc17-m4-lora-runtime.md; future implementations/poc17-m4-lora-runtime/.
+
 ## Scope
 
 - Treat POC17 as executable design evidence for constrained embedded
@@ -300,8 +308,9 @@ This section is the starting context for the next Codex operator. Complete
 
 ## Subtasks
 
-- [ ] komon.14 Read and acknowledge the Codex handoff bootstrap before any POC17
-  implementation work.
+- [x] komon.14 Read and acknowledge the Codex handoff bootstrap before any POC17
+  implementation work. Steve acknowledged the bootstrap on 2026-06-23; recorded
+  by `DI-zidaf`.
 - [x] komon.15 Run a TE on simulated M4 agent language sources: CircuitPython-shaped
   behavior from `bintags`, native firmware in C/C++ or Rust, and Go-only
   simulation. Compare each option under simulator support, LoRa/radio fidelity,
