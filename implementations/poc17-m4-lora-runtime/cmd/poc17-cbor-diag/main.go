@@ -23,7 +23,11 @@ func main() {
 		fmt.Fprintf(os.Stderr, "parse CBOR: %v\n", err)
 		os.Exit(1)
 	}
-	fmt.Printf("grid([42(%q), h'%s'", msg.PCID, hex.EncodeToString(msg.Payload))
+	protocolName := msg.ProtocolName
+	if protocolName == "" {
+		protocolName = "unknown"
+	}
+	fmt.Printf("grid([42(%s /* %s */), h'%s'", msg.PCID, protocolName, hex.EncodeToString(msg.Payload))
 	if msg.Proof != nil {
 		fmt.Printf(", h'%s'", hex.EncodeToString(msg.Proof))
 	}

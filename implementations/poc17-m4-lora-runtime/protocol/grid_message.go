@@ -1,13 +1,22 @@
 package protocol
 
-import "fmt"
+import (
+	"encoding/base32"
+	"fmt"
+	"strings"
+
+	specdocs "promisegrid.dev/wire-lab/implementations/poc17-m4-lora-runtime/docs/protocols"
+)
 
 const (
-	PCIDDeviceStatus = "device_status_v1"
-	PCIDLoRaLink     = "lora_link_v1"
-	PCIDOrderStatus  = "order_status_v1"
-	PCIDPeerStorage  = "peer_storage_v1"
+	ProtocolDeviceStatus = specdocs.DeviceStatusV1
+	ProtocolLoRaLink     = specdocs.LoRaLinkV1
+	ProtocolOrderStatus  = specdocs.OrderStatusV1
+	ProtocolPeerStorage  = specdocs.PeerStorageV1
+	ProtocolUnknownProbe = specdocs.UnknownProbeV1
 )
+
+var protocolRegistry = specdocs.MustRegistry()
 
 // OrderStatusPayload mirrors bintags' MSG/ACK order fields inside CBOR.
 type OrderStatusPayload struct {
@@ -21,17 +30,21 @@ type OrderStatusPayload struct {
 
 // Message is a decoded PromiseGrid envelope for the first POC17 behavior slice.
 type Message struct {
-	PCID    string
-	Payload []byte
-	Proof   []byte
+	ProtocolName string
+	PCID         string
+	Payload      []byte
+	Proof        []byte
 }
 
 // Build creates a pCID-selected grid envelope.
 func Build(msg Message) ([]byte, error) {
-	if msg.PCID == "" {
-		return nil, fmt.Errorf("pcid must be set")
+	cid, ok := protocolCIDForMessage(msg)
+	if !ok {
+		return nil, fmt.Errorf("known protocol name or pCID must be set")
 	}
-	slots := []Item{TagItem(CIDTag, TextItem(msg.PCID)), BytesItem(msg.Payload)}
+	// Intent: Slot 0 carries the actual spec CID bytes, not a readable
+	// placeholder protocol name. Source: DI-dutah
+	slots := []Item{TagItem(CIDTag, BytesItem(cid.Tag42Data())), BytesItem(msg.Payload)}
 	if msg.Proof != nil {
 		slots = append(slots, BytesItem(msg.Proof))
 	}
@@ -52,15 +65,21 @@ func Parse(data []byte) (Message, error) {
 		return Message{}, fmt.Errorf("unsupported grid slot count %d", len(slots))
 	}
 	pcidTag := slots[0].Tag
-	if pcidTag == nil || pcidTag.Number != CIDTag || pcidTag.Value.Text == nil {
-		return Message{}, fmt.Errorf("slot 0 must be tag 42 text pCID")
+	if pcidTag == nil || pcidTag.Number != CIDTag || pcidTag.Value.Bytes == nil {
+		return Message{}, fmt.Errorf("slot 0 must be tag 42 CID bytes")
 	}
 	if slots[1].Bytes == nil {
 		return Message{}, fmt.Errorf("slot 1 must be payload bytes")
 	}
+	pcidText, err := cidTextFromTag42Data(pcidTag.Value.Bytes)
+	if err != nil {
+		return Message{}, err
+	}
+	protocolName, _ := protocolRegistry.NameForCID(pcidText)
 	msg := Message{
-		PCID:    *pcidTag.Value.Text,
-		Payload: append([]byte(nil), slots[1].Bytes...),
+		ProtocolName: protocolName,
+		PCID:         pcidText,
+		Payload:      append([]byte(nil), slots[1].Bytes...),
 	}
 	if len(slots) == 3 {
 		if slots[2].Bytes == nil {
@@ -69,6 +88,50 @@ func Parse(data []byte) (Message, error) {
 		msg.Proof = append([]byte(nil), slots[2].Bytes...)
 	}
 	return msg, nil
+}
+
+// PCIDForName returns the CID text form for a local protocol name.
+func PCIDForName(protocolName string) (string, bool) {
+	cid, ok := protocolRegistry.CIDFor(protocolName)
+	if !ok {
+		return "", false
+	}
+	return cid.String(), true
+}
+
+// MustPCIDForName returns the CID text form for a local protocol name.
+func MustPCIDForName(protocolName string) string {
+	cid, ok := PCIDForName(protocolName)
+	if !ok {
+		panic(fmt.Sprintf("unknown protocol %q", protocolName))
+	}
+	return cid
+}
+
+func protocolCIDForMessage(msg Message) (specdocs.CID, bool) {
+	if msg.ProtocolName != "" {
+		return protocolRegistry.CIDFor(msg.ProtocolName)
+	}
+	if msg.PCID != "" {
+		name, ok := protocolRegistry.NameForCID(msg.PCID)
+		if !ok {
+			return specdocs.CID{}, false
+		}
+		return protocolRegistry.CIDFor(name)
+	}
+	return specdocs.CID{}, false
+}
+
+func cidTextFromTag42Data(data []byte) (string, error) {
+	if len(data) != 37 || data[0] != 0x00 {
+		return "", fmt.Errorf("slot 0 tag 42 data must be DAG-CBOR CID bytes")
+	}
+	return cidTextFromBinaryCID(data[1:]), nil
+}
+
+func cidTextFromBinaryCID(data []byte) string {
+	encoded := base32.StdEncoding.WithPadding(base32.NoPadding).EncodeToString(data)
+	return "b" + strings.ToLower(encoded)
 }
 
 // BuildStatusPayload keeps the small-device payload positional and compact.

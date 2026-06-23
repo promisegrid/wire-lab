@@ -26,10 +26,10 @@ remain review evidence until promoted. Source: `DI-baral`; `DI-sisak`;
 `DI-nogij`; `DI-rigup`; `DI-vulit`; `DI-gazin`; `DI-bitug`; `DI-magug`.
 Constrained-radio POC17 adds behavior evidence that production-like app
 messages can stay pCID-selected and compact: bintags-shaped order status
-traffic uses `grid([42("order_status_v1"), payload])` while the pCID-defined
-payload carries source, destination, counter, order number, status, and MSG/ACK
-meaning. This is not a final device API or firmware-fidelity claim. Source:
-`DI-mokit`.
+traffic uses `grid([42(pCID), payload])` with actual CID bytes for slot 0, while
+the pCID-defined payload carries source, destination, counter, order number,
+status, and MSG/ACK meaning. This is not a final device API or
+firmware-fidelity claim. Source: `DI-mokit`; `DI-dutah`.
 
 ### Current Wire Direction
 
@@ -1464,9 +1464,10 @@ section.
   Source: `DI-govat`; `DI-mokit`.
 - `implementations/poc17-m4-lora-runtime/` is first-slice Go behavior evidence
   for a radio-only constrained device exchange. It now includes bintags-shaped
-  order status traffic under `order_status_v1`, but it remains simulator
-  evidence rather than Feather M4, CircuitPython, RFM95, or production-device
-  proof. Source: `DI-libis`; `DI-pobir`; `DI-mokit`.
+  order status traffic under a spec-derived `order_status_v1` pCID and uses a
+  200-byte simulated LoRa application MTU, but it remains simulator evidence
+  rather than Feather M4, CircuitPython, RFM95, or production-device proof.
+  Source: `DI-libis`; `DI-pobir`; `DI-mokit`; `DI-dutah`.
 - `protocols/wire-lab.d/TODO/TODO-binag-promisegrid-kernel-design-resolution.md`
   tracks the active resolution packet and the focused canary review required
   before `DR-davod` can close.

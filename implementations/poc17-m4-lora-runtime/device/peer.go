@@ -30,7 +30,7 @@ func (p *Peer) ReceiveRadio(packet radio.Packet) error {
 	if err := p.Writer.WriteEvent(artifact.Event{Type: "peer_envelope_received", Actor: p.Name, Peer: packet.From, PCID: msg.PCID, Hash: hash, Path: rel, Transport: "simulated_lora", Outcome: "received"}); err != nil {
 		return err
 	}
-	if msg.PCID != protocol.PCIDOrderStatus {
+	if msg.ProtocolName != protocol.ProtocolOrderStatus {
 		return nil
 	}
 	payload, err := protocol.ParseOrderStatusPayload(msg.Payload)
@@ -43,7 +43,7 @@ func (p *Peer) ReceiveRadio(packet radio.Packet) error {
 			Type:      "peer_order_status_received",
 			Actor:     p.Name,
 			Peer:      payload.Source,
-			PCID:      protocol.PCIDOrderStatus,
+			PCID:      protocol.MustPCIDForName(protocol.ProtocolOrderStatus),
 			Hash:      hash,
 			Transport: "simulated_lora",
 			Outcome:   "database_update_promised",
@@ -61,7 +61,7 @@ func (p *Peer) ReceiveRadio(packet radio.Packet) error {
 			Type:      "peer_order_ack_received",
 			Actor:     p.Name,
 			Peer:      payload.Source,
-			PCID:      protocol.PCIDOrderStatus,
+			PCID:      protocol.MustPCIDForName(protocol.ProtocolOrderStatus),
 			Hash:      hash,
 			Transport: "simulated_lora",
 			Outcome:   "acknowledged",
@@ -72,7 +72,7 @@ func (p *Peer) ReceiveRadio(packet radio.Packet) error {
 			},
 		})
 	default:
-		return p.Writer.WriteEvent(artifact.Event{Type: "peer_order_status_non_commitment", Actor: p.Name, PCID: protocol.PCIDOrderStatus, Hash: hash, Transport: "simulated_lora", Outcome: "unknown_order_message_type"})
+		return p.Writer.WriteEvent(artifact.Event{Type: "peer_order_status_non_commitment", Actor: p.Name, PCID: protocol.MustPCIDForName(protocol.ProtocolOrderStatus), Hash: hash, Transport: "simulated_lora", Outcome: "unknown_order_message_type"})
 	}
 }
 
@@ -88,7 +88,7 @@ func (p *Peer) sendOrderAck(payload protocol.OrderStatusPayload) error {
 	if err != nil {
 		return err
 	}
-	raw, err := protocol.Build(protocol.Message{PCID: protocol.PCIDOrderStatus, Payload: ackPayload})
+	raw, err := protocol.Build(protocol.Message{ProtocolName: protocol.ProtocolOrderStatus, Payload: ackPayload})
 	if err != nil {
 		return err
 	}

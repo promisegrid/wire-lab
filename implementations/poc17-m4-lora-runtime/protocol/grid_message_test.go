@@ -7,7 +7,7 @@ func TestBuildParseGridMessage(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	raw, err := Build(Message{PCID: PCIDDeviceStatus, Payload: payload, Proof: []byte("proof")})
+	raw, err := Build(Message{ProtocolName: ProtocolDeviceStatus, Payload: payload, Proof: []byte("proof")})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -15,7 +15,7 @@ func TestBuildParseGridMessage(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if msg.PCID != PCIDDeviceStatus || string(msg.Proof) != "proof" {
+	if msg.ProtocolName != ProtocolDeviceStatus || msg.PCID != MustPCIDForName(ProtocolDeviceStatus) || string(msg.Proof) != "proof" {
 		t.Fatalf("unexpected message: %+v", msg)
 	}
 	device, status, battery, parents, err := ParseStatusPayload(msg.Payload)
@@ -24,6 +24,24 @@ func TestBuildParseGridMessage(t *testing.T) {
 	}
 	if device != "m4-ivan" || status != "ready" || battery != 87 || len(parents) != 1 || parents[0] != "missing-parent" {
 		t.Fatalf("unexpected payload %q %q %d %#v", device, status, battery, parents)
+	}
+}
+
+func TestBuildUsesCIDBytesInSlotZero(t *testing.T) {
+	raw, err := Build(Message{ProtocolName: ProtocolOrderStatus, Payload: []byte("payload")})
+	if err != nil {
+		t.Fatal(err)
+	}
+	item, err := Decode(raw)
+	if err != nil {
+		t.Fatal(err)
+	}
+	slotZero := item.Tag.Value.Array[0]
+	if slotZero.Tag == nil || slotZero.Tag.Number != CIDTag || slotZero.Tag.Value.Bytes == nil {
+		t.Fatalf("slot 0 must be tag-42 CID bytes: %+v", slotZero)
+	}
+	if len(slotZero.Tag.Value.Bytes) != 37 || slotZero.Tag.Value.Bytes[0] != 0x00 {
+		t.Fatalf("slot 0 must contain DAG-CBOR CID data, got %x", slotZero.Tag.Value.Bytes)
 	}
 }
 

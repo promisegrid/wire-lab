@@ -76,6 +76,14 @@ Intent: The first simulator run proved radio-only CBOR exchange, but its synthet
 Constraints: Preserve `bintags` as vocabulary and behavior pressure, not a runtime dependency; keep the Go simulator labeled behavior evidence only; keep all Ivan/Bob PromiseGrid messages on the simulated LoRa path; preserve exact CBOR artifacts, passive analyzer gates, malformed/replay/loss/MTU/asymmetric evidence, sparse CAS, and peer-storage evidence.
 Affects: protocols/wire-lab.d/TODO/TODO-komon-poc17-m4-lora-runtime.md; implementations/poc17-m4-lora-runtime/.
 
+ID: DI-dutah
+Date: 2026-06-23 15:25:00 PDT
+Status: active
+Decision: Give each POC17 protocol an RFC-like embedded spec document, derive actual CIDv1 raw sha2-256 pCIDs from those exact bytes, put binary CID bytes in envelope slot 0, and raise the simulated LoRa application MTU to 200 bytes.
+Intent: POC17 should stop using readable placeholder pCID strings on the wire. The pCID must identify the protocol spec document itself. `DN-zaraz` also makes the prior 96-byte simulator budget too conservative for the intended wideband/store-forward LoRa profile; 200 bytes gives enough space for real CID selectors while staying below the 238-byte application-buffer ceiling described there.
+Constraints: The embedded specs are POC17-local behavior specs, not frozen PromiseGrid APIs; editing a spec intentionally changes its CID; keep CID bytes in slot 0 and keep readable names only for local dispatch/logging; do not claim exact hardware, radio-driver, regulatory, or firmware fidelity; keep MTU refusal coverage by sending an intentionally oversized frame.
+Affects: implementations/poc17-m4-lora-runtime/docs/protocols/; implementations/poc17-m4-lora-runtime/protocol/; implementations/poc17-m4-lora-runtime/config.json; implementations/poc17-m4-lora-runtime/config/; protocols/wire-lab.d/TODO/TODO-komon-poc17-m4-lora-runtime.md.
+
 ## Scope
 
 - Treat POC17 as executable design evidence for constrained embedded

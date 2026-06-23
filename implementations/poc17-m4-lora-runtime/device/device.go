@@ -64,8 +64,8 @@ func (a *Agent) ReceiveRadio(packet radio.Packet) error {
 			return err
 		}
 	}
-	switch msg.PCID {
-	case protocol.PCIDDeviceStatus:
+	switch msg.ProtocolName {
+	case protocol.ProtocolDeviceStatus:
 		_, status, _, parents, err := protocol.ParseStatusPayload(msg.Payload)
 		if err != nil {
 			return fmt.Errorf("parse status payload: %w", err)
@@ -79,9 +79,9 @@ func (a *Agent) ReceiveRadio(packet radio.Packet) error {
 		}
 		a.Status = status
 		return a.promiseStatus(localHash)
-	case protocol.PCIDOrderStatus:
+	case protocol.ProtocolOrderStatus:
 		return a.receiveOrderStatus(msg.Payload, localHash)
-	case protocol.PCIDLoRaLink:
+	case protocol.ProtocolLoRaLink:
 		return a.Writer.WriteEvent(artifact.Event{Type: "lora_link_promise", Actor: a.Name, PCID: msg.PCID, Outcome: "accepted", Transport: "simulated_lora"})
 	default:
 		return a.Writer.WriteEvent(artifact.Event{
@@ -103,7 +103,7 @@ func (a *Agent) receiveOrderStatus(data []byte, hash string) error {
 	switch payload.Type {
 	case "MSG":
 		if payload.Dest != a.Name {
-			return a.Writer.WriteEvent(artifact.Event{Type: "order_status_ignored", Actor: a.Name, Peer: payload.Source, PCID: protocol.PCIDOrderStatus, Hash: hash, Outcome: "wrong_destination"})
+			return a.Writer.WriteEvent(artifact.Event{Type: "order_status_ignored", Actor: a.Name, Peer: payload.Source, PCID: protocol.MustPCIDForName(protocol.ProtocolOrderStatus), Hash: hash, Outcome: "wrong_destination"})
 		}
 		a.OrderNumber = payload.OrderNumber
 		a.Status = payload.Status
@@ -111,7 +111,7 @@ func (a *Agent) receiveOrderStatus(data []byte, hash string) error {
 			Type:      "order_status_received",
 			Actor:     a.Name,
 			Peer:      payload.Source,
-			PCID:      protocol.PCIDOrderStatus,
+			PCID:      protocol.MustPCIDForName(protocol.ProtocolOrderStatus),
 			Hash:      hash,
 			Transport: "simulated_lora",
 			Outcome:   "display_update_promised",
@@ -129,7 +129,7 @@ func (a *Agent) receiveOrderStatus(data []byte, hash string) error {
 			Type:      "order_ack_received",
 			Actor:     a.Name,
 			Peer:      payload.Source,
-			PCID:      protocol.PCIDOrderStatus,
+			PCID:      protocol.MustPCIDForName(protocol.ProtocolOrderStatus),
 			Hash:      hash,
 			Transport: "simulated_lora",
 			Outcome:   "acknowledged",
@@ -140,7 +140,7 @@ func (a *Agent) receiveOrderStatus(data []byte, hash string) error {
 			},
 		})
 	default:
-		return a.Writer.WriteEvent(artifact.Event{Type: "order_status_non_commitment", Actor: a.Name, PCID: protocol.PCIDOrderStatus, Hash: hash, Transport: "simulated_lora", Outcome: "unknown_order_message_type"})
+		return a.Writer.WriteEvent(artifact.Event{Type: "order_status_non_commitment", Actor: a.Name, PCID: protocol.MustPCIDForName(protocol.ProtocolOrderStatus), Hash: hash, Transport: "simulated_lora", Outcome: "unknown_order_message_type"})
 	}
 }
 
@@ -156,7 +156,7 @@ func (a *Agent) sendOrderAck(payload protocol.OrderStatusPayload) error {
 	if err != nil {
 		return err
 	}
-	raw, err := protocol.Build(protocol.Message{PCID: protocol.PCIDOrderStatus, Payload: ackPayload})
+	raw, err := protocol.Build(protocol.Message{ProtocolName: protocol.ProtocolOrderStatus, Payload: ackPayload})
 	if err != nil {
 		return err
 	}
@@ -181,7 +181,7 @@ func (a *Agent) PromiseOrderStatus(status string) error {
 	if err != nil {
 		return err
 	}
-	raw, err := protocol.Build(protocol.Message{PCID: protocol.PCIDOrderStatus, Payload: payload})
+	raw, err := protocol.Build(protocol.Message{ProtocolName: protocol.ProtocolOrderStatus, Payload: payload})
 	if err != nil {
 		return err
 	}
@@ -190,7 +190,7 @@ func (a *Agent) PromiseOrderStatus(status string) error {
 		Type:      "order_status_promise",
 		Actor:     a.Name,
 		Peer:      a.Peer,
-		PCID:      protocol.PCIDOrderStatus,
+		PCID:      protocol.MustPCIDForName(protocol.ProtocolOrderStatus),
 		Transport: "simulated_lora",
 		Outcome:   "promised",
 		Details: map[string]any{
@@ -209,14 +209,14 @@ func (a *Agent) promiseStatus(parent string) error {
 	if err != nil {
 		return err
 	}
-	raw, err := protocol.Build(protocol.Message{PCID: protocol.PCIDDeviceStatus, Payload: payload})
+	raw, err := protocol.Build(protocol.Message{ProtocolName: protocol.ProtocolDeviceStatus, Payload: payload})
 	if err != nil {
 		return err
 	}
 	if err := a.Writer.WriteEvent(artifact.Event{
 		Type:    "device_status_promise",
 		Actor:   a.Name,
-		PCID:    protocol.PCIDDeviceStatus,
+		PCID:    protocol.MustPCIDForName(protocol.ProtocolDeviceStatus),
 		Outcome: "promised",
 		Details: map[string]any{
 			"retry_budget": a.RetryBudget,
@@ -234,7 +234,7 @@ func (a *Agent) PromisePeerStorage(contentHash string) error {
 		Type:    "peer_storage_promise",
 		Actor:   a.Name,
 		Peer:    a.Peer,
-		PCID:    protocol.PCIDPeerStorage,
+		PCID:    protocol.MustPCIDForName(protocol.ProtocolPeerStorage),
 		Hash:    contentHash,
 		Outcome: "requested",
 	})

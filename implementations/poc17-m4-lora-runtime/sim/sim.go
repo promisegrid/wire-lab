@@ -61,7 +61,7 @@ func Run(cfg config.Config) error {
 	if err != nil {
 		return err
 	}
-	orderFrame, err := protocol.Build(protocol.Message{PCID: protocol.PCIDOrderStatus, Payload: orderPayload})
+	orderFrame, err := protocol.Build(protocol.Message{ProtocolName: protocol.ProtocolOrderStatus, Payload: orderPayload})
 	if err != nil {
 		return err
 	}
@@ -77,14 +77,14 @@ func Run(cfg config.Config) error {
 	if err != nil {
 		return err
 	}
-	statusFrame, err := protocol.Build(protocol.Message{PCID: protocol.PCIDDeviceStatus, Payload: statusPayload})
+	statusFrame, err := protocol.Build(protocol.Message{ProtocolName: protocol.ProtocolDeviceStatus, Payload: statusPayload})
 	if err != nil {
 		return err
 	}
 	if err := medium.Send(radio.Packet{From: peer.Name, To: m4.Name, Bytes: []byte{0xff, 0x01, 0x02}, Label: "malformed"}); err != nil {
 		return err
 	}
-	unknownFrame, err := protocol.Build(protocol.Message{PCID: "unknown_probe_v1", Payload: []byte("probe")})
+	unknownFrame, err := protocol.Build(protocol.Message{ProtocolName: protocol.ProtocolUnknownProbe, Payload: []byte("probe")})
 	if err != nil {
 		return err
 	}
@@ -92,7 +92,7 @@ func Run(cfg config.Config) error {
 		return err
 	}
 	for i := 1; i <= 4; i++ {
-		linkFrame, err := protocol.Build(protocol.Message{PCID: protocol.PCIDLoRaLink, Payload: []byte(fmt.Sprintf("link-budget-%d", i))})
+		linkFrame, err := protocol.Build(protocol.Message{ProtocolName: protocol.ProtocolLoRaLink, Payload: []byte(fmt.Sprintf("link-budget-%d", i))})
 		if err != nil {
 			return err
 		}

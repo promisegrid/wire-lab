@@ -28,11 +28,16 @@ The clean run writes artifacts under `/tmp/wire-lab-poc17/poc17-demo/`:
 - PromiseGrid messages cross the simulated radio path only.
 - The device parses `grid([42(pCID), payload])` and
   `grid([42(pCID), payload, proof])`.
+- Slot 0 carries actual CIDv1 raw sha2-256 bytes for the embedded RFC-like
+  protocol document, not a readable placeholder name. Source: `DI-dutah`.
 - Ivan and Bob exchange bintags-shaped order status messages with order
   number, status, source, destination, counter, and MSG/ACK flow under
   `order_status_v1`. The workflow comes from bintags, while the wire shape
   stays PromiseGrid CBOR. Source: `DI-mokit`.
 - The radio model covers MTU refusal, loss, duplicate, replay, delay, malformed
   bytes, and asymmetric reachability as transport effects.
+- The default simulated application MTU is 200 bytes, leaving margin under the
+  238-byte application-buffer ceiling discussed in `DN-zaraz`. Source:
+  `DI-dutah`.
 - The device keeps a tiny sparse CAS, records missing parents, asks for
   peer-storage help, and performs local GC under pressure.

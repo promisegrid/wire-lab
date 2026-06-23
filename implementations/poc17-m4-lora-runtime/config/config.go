@@ -18,12 +18,13 @@ type Config struct {
 	LocalCASLimit int    `json:"local_cas_limit"`
 }
 
-// Default returns conservative behavior-simulator defaults.
+// Default returns behavior-simulator defaults shaped by DN-zaraz's wideband
+// LoRa frame-budget pressure without claiming hardware fidelity.
 func Default() Config {
 	return Config{
 		RunID:         "poc17-demo",
 		RunRoot:       "/tmp/wire-lab-poc17",
-		RadioMTUBytes: 96,
+		RadioMTUBytes: 200,
 		RetryBudget:   2,
 		LocalCASLimit: 4,
 	}
