@@ -5,8 +5,19 @@ import "fmt"
 const (
 	PCIDDeviceStatus = "device_status_v1"
 	PCIDLoRaLink     = "lora_link_v1"
+	PCIDOrderStatus  = "order_status_v1"
 	PCIDPeerStorage  = "peer_storage_v1"
 )
+
+// OrderStatusPayload mirrors bintags' MSG/ACK order fields inside CBOR.
+type OrderStatusPayload struct {
+	Type        string
+	Source      string
+	Dest        string
+	Counter     uint64
+	OrderNumber string
+	Status      string
+}
 
 // Message is a decoded PromiseGrid envelope for the first POC17 behavior slice.
 type Message struct {
@@ -87,4 +98,38 @@ func ParseStatusPayload(data []byte) (deviceID string, status string, batteryPer
 		parents = append(parents, *parent.Text)
 	}
 	return *item.Array[0].Text, *item.Array[1].Text, *item.Array[2].Uint, parents, nil
+}
+
+// BuildOrderStatusPayload keeps the bintags message fields compact and positional.
+func BuildOrderStatusPayload(payload OrderStatusPayload) ([]byte, error) {
+	return Encode(ArrayItem(
+		TextItem(payload.Type),
+		TextItem(payload.Source),
+		TextItem(payload.Dest),
+		UintItem(payload.Counter),
+		TextItem(payload.OrderNumber),
+		TextItem(payload.Status),
+	))
+}
+
+// ParseOrderStatusPayload decodes the order_status_v1 positional payload.
+func ParseOrderStatusPayload(data []byte) (OrderStatusPayload, error) {
+	item, err := Decode(data)
+	if err != nil {
+		return OrderStatusPayload{}, err
+	}
+	if len(item.Array) != 6 {
+		return OrderStatusPayload{}, fmt.Errorf("invalid order status slot count")
+	}
+	if item.Array[0].Text == nil || item.Array[1].Text == nil || item.Array[2].Text == nil || item.Array[3].Uint == nil || item.Array[4].Text == nil || item.Array[5].Text == nil {
+		return OrderStatusPayload{}, fmt.Errorf("invalid order status payload")
+	}
+	return OrderStatusPayload{
+		Type:        *item.Array[0].Text,
+		Source:      *item.Array[1].Text,
+		Dest:        *item.Array[2].Text,
+		Counter:     *item.Array[3].Uint,
+		OrderNumber: *item.Array[4].Text,
+		Status:      *item.Array[5].Text,
+	}, nil
 }

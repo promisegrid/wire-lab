@@ -10,6 +10,7 @@ import (
 type Peer struct {
 	Name   string
 	Writer *artifact.Writer
+	Medium *radio.Medium
 }
 
 // ReceiveRadio records exact messages received over radio.
@@ -26,5 +27,71 @@ func (p *Peer) ReceiveRadio(packet radio.Packet) error {
 	if err != nil {
 		return err
 	}
-	return p.Writer.WriteEvent(artifact.Event{Type: "peer_envelope_received", Actor: p.Name, Peer: packet.From, PCID: msg.PCID, Hash: hash, Path: rel, Transport: "simulated_lora", Outcome: "received"})
+	if err := p.Writer.WriteEvent(artifact.Event{Type: "peer_envelope_received", Actor: p.Name, Peer: packet.From, PCID: msg.PCID, Hash: hash, Path: rel, Transport: "simulated_lora", Outcome: "received"}); err != nil {
+		return err
+	}
+	if msg.PCID != protocol.PCIDOrderStatus {
+		return nil
+	}
+	payload, err := protocol.ParseOrderStatusPayload(msg.Payload)
+	if err != nil {
+		return err
+	}
+	switch payload.Type {
+	case "MSG":
+		if err := p.Writer.WriteEvent(artifact.Event{
+			Type:      "peer_order_status_received",
+			Actor:     p.Name,
+			Peer:      payload.Source,
+			PCID:      protocol.PCIDOrderStatus,
+			Hash:      hash,
+			Transport: "simulated_lora",
+			Outcome:   "database_update_promised",
+			Details: map[string]any{
+				"counter": payload.Counter,
+				"order":   payload.OrderNumber,
+				"status":  payload.Status,
+			},
+		}); err != nil {
+			return err
+		}
+		return p.sendOrderAck(payload)
+	case "ACK":
+		return p.Writer.WriteEvent(artifact.Event{
+			Type:      "peer_order_ack_received",
+			Actor:     p.Name,
+			Peer:      payload.Source,
+			PCID:      protocol.PCIDOrderStatus,
+			Hash:      hash,
+			Transport: "simulated_lora",
+			Outcome:   "acknowledged",
+			Details: map[string]any{
+				"counter": payload.Counter,
+				"order":   payload.OrderNumber,
+				"status":  payload.Status,
+			},
+		})
+	default:
+		return p.Writer.WriteEvent(artifact.Event{Type: "peer_order_status_non_commitment", Actor: p.Name, PCID: protocol.PCIDOrderStatus, Hash: hash, Transport: "simulated_lora", Outcome: "unknown_order_message_type"})
+	}
+}
+
+func (p *Peer) sendOrderAck(payload protocol.OrderStatusPayload) error {
+	ackPayload, err := protocol.BuildOrderStatusPayload(protocol.OrderStatusPayload{
+		Type:        "ACK",
+		Source:      p.Name,
+		Dest:        payload.Source,
+		Counter:     payload.Counter,
+		OrderNumber: payload.OrderNumber,
+		Status:      payload.Status,
+	})
+	if err != nil {
+		return err
+	}
+	raw, err := protocol.Build(protocol.Message{PCID: protocol.PCIDOrderStatus, Payload: ackPayload})
+	if err != nil {
+		return err
+	}
+	// Intent: Model the bintags gateway ACK without letting the gateway become a hidden reliable bridge. Source: DI-mokit
+	return p.Medium.Send(radio.Packet{From: p.Name, To: payload.Source, Bytes: raw, Label: "order-ack"})
 }

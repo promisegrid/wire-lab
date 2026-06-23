@@ -23,6 +23,7 @@ type Summary struct {
 	CASGC              int `json:"cas_gc"`
 	PeerStorage        int `json:"peer_storage"`
 	FidelityNotices    int `json:"fidelity_notices"`
+	OrderStatusEvents  int `json:"order_status_events"`
 }
 
 // Analyze checks the first POC17 behavior evidence gates.
@@ -81,6 +82,8 @@ func Analyze(runDir string) (Summary, error) {
 			summary.PeerStorage++
 		case "simulator_fidelity_notice":
 			summary.FidelityNotices++
+		case "order_status_received", "order_status_promise", "order_ack_received", "peer_order_status_received", "peer_order_ack_received":
+			summary.OrderStatusEvents++
 		}
 	}
 	if summary.RadioSends == 0 || summary.RadioReceives == 0 {
@@ -100,6 +103,9 @@ func Analyze(runDir string) (Summary, error) {
 	}
 	if summary.FidelityNotices == 0 {
 		return summary, fmt.Errorf("missing simulator fidelity notice")
+	}
+	if summary.OrderStatusEvents < 4 {
+		return summary, fmt.Errorf("missing production-like order status evidence")
 	}
 	return summary, nil
 }

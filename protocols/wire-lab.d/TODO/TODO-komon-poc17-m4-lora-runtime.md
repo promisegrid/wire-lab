@@ -68,6 +68,14 @@ Intent: POC16 is mostly done and should not block POC17, but POC17 must preserve
 Constraints: Approved root path `implementations/poc17-m4-lora-runtime/`; approved Go module `promisegrid.dev/wire-lab/implementations/poc17-m4-lora-runtime`; approved commands `poc17-sim`, `poc17-analyze`, and `poc17-cbor-diag`; approved packages `protocol`, `radio`, `device`, `sim`, `artifact`, `state`, and `analyzer`; approved runtime artifact root pattern `/tmp/wire-lab-poc17/<run_id>/`; use Go behavior evidence only and do not claim exact Feather M4 Express, SAMD51, SPI, RFM95W/RFM95, CircuitPython runtime, radio-driver, packet, memory, energy, regulatory, or production-device fidelity.
 Affects: protocols/wire-lab.d/TODO/TODO-komon-poc17-m4-lora-runtime.md; implementations/poc17-m4-lora-runtime/; docs/research/DN-zaraz-bintags-lora-frame-budget.md.
 
+ID: DI-mokit
+Date: 2026-06-23 14:57:22 PDT
+Status: active
+Decision: Extend the first POC17 Go behavior simulator so Ivan and Bob exchange bintags-shaped order status messages under a new `order_status_v1` pCID.
+Intent: The first simulator run proved radio-only CBOR exchange, but its synthetic status/link payloads were too far from the source project. The bintags prior art uses order numbers, order statuses, counters, MSG/ACK flow, a gateway, and a small device with button-driven status changes. POC17 should now exercise that production-like shape while still using PromiseGrid `grid([42(pCID), payload])` envelopes instead of inheriting bintags' comma-separated text wire format.
+Constraints: Preserve `bintags` as vocabulary and behavior pressure, not a runtime dependency; keep the Go simulator labeled behavior evidence only; keep all Ivan/Bob PromiseGrid messages on the simulated LoRa path; preserve exact CBOR artifacts, passive analyzer gates, malformed/replay/loss/MTU/asymmetric evidence, sparse CAS, and peer-storage evidence.
+Affects: protocols/wire-lab.d/TODO/TODO-komon-poc17-m4-lora-runtime.md; implementations/poc17-m4-lora-runtime/.
+
 ## Scope
 
 - Treat POC17 as executable design evidence for constrained embedded

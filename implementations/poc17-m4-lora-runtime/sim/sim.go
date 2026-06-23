@@ -43,21 +43,42 @@ func Run(cfg config.Config) error {
 		Medium:      medium,
 		Peer:        "gateway-bob",
 	}
-	peer := &device.Peer{Name: "gateway-bob", Writer: writer}
+	peer := &device.Peer{Name: "gateway-bob", Writer: writer, Medium: medium}
 	medium.Register(m4.Name, m4)
 	medium.Register(peer.Name, peer)
 	medium.SetReachable(peer.Name, m4.Name, true)
 	medium.SetReachable(m4.Name, peer.Name, true)
 
+	// Intent: Use bintags' order-number/status workflow as production-like traffic while retaining PromiseGrid CBOR envelopes. Source: DI-mokit
+	orderPayload, err := protocol.BuildOrderStatusPayload(protocol.OrderStatusPayload{
+		Type:        "MSG",
+		Source:      peer.Name,
+		Dest:        m4.Name,
+		Counter:     1,
+		OrderNumber: "BT-1042",
+		Status:      "created",
+	})
+	if err != nil {
+		return err
+	}
+	orderFrame, err := protocol.Build(protocol.Message{PCID: protocol.PCIDOrderStatus, Payload: orderPayload})
+	if err != nil {
+		return err
+	}
+	if err := medium.Send(radio.Packet{From: peer.Name, To: m4.Name, Bytes: orderFrame, Label: "order-reset-bt-1042"}, "duplicate"); err != nil {
+		return err
+	}
+	for _, status := range []string{"cut", "stripped", "soldered", "completed"} {
+		if err := m4.PromiseOrderStatus(status); err != nil {
+			return err
+		}
+	}
 	statusPayload, err := protocol.BuildStatusPayload(m4.Name, "ready", 87, []string{"missing-parent-cid"})
 	if err != nil {
 		return err
 	}
 	statusFrame, err := protocol.Build(protocol.Message{PCID: protocol.PCIDDeviceStatus, Payload: statusPayload})
 	if err != nil {
-		return err
-	}
-	if err := medium.Send(radio.Packet{From: peer.Name, To: m4.Name, Bytes: statusFrame, Label: "status-request"}, "duplicate"); err != nil {
 		return err
 	}
 	if err := medium.Send(radio.Packet{From: peer.Name, To: m4.Name, Bytes: []byte{0xff, 0x01, 0x02}, Label: "malformed"}); err != nil {

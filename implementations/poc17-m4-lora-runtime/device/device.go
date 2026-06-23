@@ -19,6 +19,8 @@ type Agent struct {
 	Writer      *artifact.Writer
 	Medium      *radio.Medium
 	Peer        string
+	OrderNumber string
+	Counter     uint64
 }
 
 // ReceiveRadio parses exact radio bytes and applies local promise judgment.
@@ -77,6 +79,8 @@ func (a *Agent) ReceiveRadio(packet radio.Packet) error {
 		}
 		a.Status = status
 		return a.promiseStatus(localHash)
+	case protocol.PCIDOrderStatus:
+		return a.receiveOrderStatus(msg.Payload, localHash)
 	case protocol.PCIDLoRaLink:
 		return a.Writer.WriteEvent(artifact.Event{Type: "lora_link_promise", Actor: a.Name, PCID: msg.PCID, Outcome: "accepted", Transport: "simulated_lora"})
 	default:
@@ -89,6 +93,115 @@ func (a *Agent) ReceiveRadio(packet radio.Packet) error {
 			Outcome:   "local_non_commitment",
 		})
 	}
+}
+
+func (a *Agent) receiveOrderStatus(data []byte, hash string) error {
+	payload, err := protocol.ParseOrderStatusPayload(data)
+	if err != nil {
+		return fmt.Errorf("parse order status payload: %w", err)
+	}
+	switch payload.Type {
+	case "MSG":
+		if payload.Dest != a.Name {
+			return a.Writer.WriteEvent(artifact.Event{Type: "order_status_ignored", Actor: a.Name, Peer: payload.Source, PCID: protocol.PCIDOrderStatus, Hash: hash, Outcome: "wrong_destination"})
+		}
+		a.OrderNumber = payload.OrderNumber
+		a.Status = payload.Status
+		if err := a.Writer.WriteEvent(artifact.Event{
+			Type:      "order_status_received",
+			Actor:     a.Name,
+			Peer:      payload.Source,
+			PCID:      protocol.PCIDOrderStatus,
+			Hash:      hash,
+			Transport: "simulated_lora",
+			Outcome:   "display_update_promised",
+			Details: map[string]any{
+				"counter": payload.Counter,
+				"order":   payload.OrderNumber,
+				"status":  payload.Status,
+			},
+		}); err != nil {
+			return err
+		}
+		return a.sendOrderAck(payload)
+	case "ACK":
+		return a.Writer.WriteEvent(artifact.Event{
+			Type:      "order_ack_received",
+			Actor:     a.Name,
+			Peer:      payload.Source,
+			PCID:      protocol.PCIDOrderStatus,
+			Hash:      hash,
+			Transport: "simulated_lora",
+			Outcome:   "acknowledged",
+			Details: map[string]any{
+				"counter": payload.Counter,
+				"order":   payload.OrderNumber,
+				"status":  payload.Status,
+			},
+		})
+	default:
+		return a.Writer.WriteEvent(artifact.Event{Type: "order_status_non_commitment", Actor: a.Name, PCID: protocol.PCIDOrderStatus, Hash: hash, Transport: "simulated_lora", Outcome: "unknown_order_message_type"})
+	}
+}
+
+func (a *Agent) sendOrderAck(payload protocol.OrderStatusPayload) error {
+	ackPayload, err := protocol.BuildOrderStatusPayload(protocol.OrderStatusPayload{
+		Type:        "ACK",
+		Source:      a.Name,
+		Dest:        payload.Source,
+		Counter:     payload.Counter,
+		OrderNumber: payload.OrderNumber,
+		Status:      payload.Status,
+	})
+	if err != nil {
+		return err
+	}
+	raw, err := protocol.Build(protocol.Message{PCID: protocol.PCIDOrderStatus, Payload: ackPayload})
+	if err != nil {
+		return err
+	}
+	// Intent: Keep the bintags MSG/ACK behavior, but send the ACK as CBOR over the simulated LoRa path. Source: DI-mokit
+	return a.Medium.Send(radio.Packet{From: a.Name, To: payload.Source, Bytes: raw, Label: "order-ack"})
+}
+
+// PromiseOrderStatus simulates a button-driven bintags order status update.
+func (a *Agent) PromiseOrderStatus(status string) error {
+	if a.OrderNumber == "" {
+		return fmt.Errorf("cannot promise order status without an assigned order")
+	}
+	a.Counter++
+	payload, err := protocol.BuildOrderStatusPayload(protocol.OrderStatusPayload{
+		Type:        "MSG",
+		Source:      a.Name,
+		Dest:        a.Peer,
+		Counter:     a.Counter,
+		OrderNumber: a.OrderNumber,
+		Status:      status,
+	})
+	if err != nil {
+		return err
+	}
+	raw, err := protocol.Build(protocol.Message{PCID: protocol.PCIDOrderStatus, Payload: payload})
+	if err != nil {
+		return err
+	}
+	a.Status = status
+	if err := a.Writer.WriteEvent(artifact.Event{
+		Type:      "order_status_promise",
+		Actor:     a.Name,
+		Peer:      a.Peer,
+		PCID:      protocol.PCIDOrderStatus,
+		Transport: "simulated_lora",
+		Outcome:   "promised",
+		Details: map[string]any{
+			"counter": a.Counter,
+			"order":   a.OrderNumber,
+			"status":  status,
+		},
+	}); err != nil {
+		return err
+	}
+	return a.Medium.Send(radio.Packet{From: a.Name, To: a.Peer, Bytes: raw, Label: "order-status-" + status})
 }
 
 func (a *Agent) promiseStatus(parent string) error {

@@ -21,7 +21,7 @@ func TestAnalyzeCleanRun(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if summary.RadioSends == 0 || summary.MessageArtifacts == 0 || summary.PeerStorage == 0 {
+	if summary.RadioSends == 0 || summary.MessageArtifacts == 0 || summary.PeerStorage == 0 || summary.OrderStatusEvents == 0 {
 		t.Fatalf("incomplete summary: %+v", summary)
 	}
 	if _, err := os.Stat(cfg.RunDir()); err != nil {

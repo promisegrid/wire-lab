@@ -32,3 +32,24 @@ func TestParseRejectsBrokenGrid(t *testing.T) {
 		t.Fatal("expected malformed CBOR rejection")
 	}
 }
+
+func TestBuildParseOrderStatusPayload(t *testing.T) {
+	payload, err := BuildOrderStatusPayload(OrderStatusPayload{
+		Type:        "MSG",
+		Source:      "gateway-bob",
+		Dest:        "m4-ivan",
+		Counter:     7,
+		OrderNumber: "BT-1042",
+		Status:      "cut",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	decoded, err := ParseOrderStatusPayload(payload)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if decoded.Type != "MSG" || decoded.Source != "gateway-bob" || decoded.Dest != "m4-ivan" || decoded.Counter != 7 || decoded.OrderNumber != "BT-1042" || decoded.Status != "cut" {
+		t.Fatalf("unexpected order payload: %+v", decoded)
+	}
+}
