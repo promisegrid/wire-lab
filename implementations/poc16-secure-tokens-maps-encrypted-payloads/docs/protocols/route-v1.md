@@ -32,7 +32,7 @@ failure lowers trust only where a local agent judges that a promise was broken.
 
 ## Payload grammar
 
-The payload is the pCID-owned pair-payload profile:
+The payload is the pCID-owned map-body profile:
 
 ```text
 payload = [
@@ -40,13 +40,14 @@ payload = [
   promisee: text,
   promise_about: text,
   state: [outcome: text, promise_text: text, reason: text, turn: text],
-  details: [[key: text, value: text], ...]
+  body: {detail_key: text => detail_value: text, ...}
 ]
 ```
 
-All core slots are REQUIRED. `details` contains protocol-owned text key/value
-pairs. A parser MUST reject non-arrays, wrong array lengths, non-text core
-fields, malformed detail pairs, or trailing CBOR bytes.
+All core slots are REQUIRED. `body` contains protocol-owned text key/value
+details in a nested CBOR map namespace. A parser MUST reject non-arrays, wrong
+array lengths, non-text core fields, non-map bodies, duplicate body keys,
+reserved/core body keys, non-text body keys or values, or trailing CBOR bytes.
 
 Common `promise_about` values are `route_probe`, `forward_if_next_promises`,
 `route_confirmation`, `route_use`, `route_renewal`, `route_failure`, and
@@ -114,8 +115,8 @@ grid([42(pCID),
   ["bob", "alice", "forward_if_next_promises",
     ["kept", "I promise to forward route r7 traffic to Carol for three turns if Carol promises the next hop.",
      "Alice offered relay credit", "turn-12"],
-    [["route_id", "r7"], ["next_peer", "carol"], ["final_peer", "grace"],
-     ["ttl_turns", "3"], ["credit_offer", "alice-relay-credit:5"]]
+    {"route_id": "r7", "next_peer": "carol", "final_peer": "grace",
+     "ttl_turns": "3", "credit_offer": "alice-relay-credit:5"}
   ], proof
 ])
 ```

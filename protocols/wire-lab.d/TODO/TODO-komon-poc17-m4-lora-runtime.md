@@ -231,6 +231,10 @@ This section is the starting context for the next Codex operator. Complete
   separation, pCID-owned payload and arity, raw CBOR artifacts, exact-message
   parent links, per-agent sparse CAS, promise-based GC/backpressure, secure
   token pressure, encrypted payload pressure, and route economics.
+- Inherit the POC16 `DI-mapah` payload-shape correction: flexible keyed bodies
+  use a nested CBOR map namespace, while constrained small-device protocols use
+  pCID-specific positional body arrays; do not copy the old array-of-pairs body
+  shape.
 - Keep kernel roles as promise boundaries. A runtime may collapse roles into one
   process or firmware loop, but the design must still identify who promises
   transport, app delivery, radio access, resource allocation, storage, route

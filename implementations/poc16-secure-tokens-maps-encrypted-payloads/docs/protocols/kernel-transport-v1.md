@@ -37,7 +37,7 @@ promise. The kernel promises only local carriage or local non-commitment.
 
 ## Payload grammar
 
-The payload is the pCID-owned pair-payload profile:
+The payload is the pCID-owned map-body profile:
 
 ```text
 payload = [
@@ -45,13 +45,14 @@ payload = [
   promisee: text,
   promise_about: text,
   state: [outcome: text, promise_text: text, reason: text, turn: text],
-  details: [[key: text, value: text], ...]
+  body: {detail_key: text => detail_value: text, ...}
 ]
 ```
 
-All core slots are REQUIRED. `details` contains protocol-owned text key/value
-pairs. A parser MUST reject non-arrays, wrong array lengths, non-text core
-fields, malformed detail pairs, or trailing CBOR bytes.
+All core slots are REQUIRED. `body` contains protocol-owned text key/value
+details in a nested CBOR map namespace. A parser MUST reject non-arrays, wrong
+array lengths, non-text core fields, non-map bodies, duplicate body keys,
+reserved/core body keys, non-text body keys or values, or trailing CBOR bytes.
 
 `promise_about` values defined by this spec are:
 
@@ -123,9 +124,9 @@ grid([42(pCID),
   ["parser-a", "kernel-a", "carry_exact_envelope",
     ["kept", "I promise these exact bytes should be carried toward Bob.",
      "parser found Bob in production_shipping_v1 payload", "turn-010"],
-    [["target", "bob"], ["target_protocol", "production_shipping_v1"],
-     ["target_exact_sha256", "9a..."], ["envelope_b64", "2GRncmlk..."],
-     ["transport_action", "carry_exact_envelope"]]
+    {"target": "bob", "target_protocol": "production_shipping_v1",
+     "target_exact_sha256": "9a...", "envelope_b64": "2GRncmlk...",
+     "transport_action": "carry_exact_envelope"}
   ], proof
 ])
 ```

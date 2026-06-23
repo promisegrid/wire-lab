@@ -29,7 +29,7 @@ obligated by this registration.
 
 ## Payload grammar
 
-The payload is the pCID-owned pair-payload profile:
+The payload is the pCID-owned map-body profile:
 
 ```text
 payload = [
@@ -37,13 +37,14 @@ payload = [
   promisee: text,
   promise_about: text,
   state: [outcome: text, promise_text: text, reason: text, turn: text],
-  details: [[key: text, value: text], ...]
+  body: {detail_key: text => detail_value: text, ...}
 ]
 ```
 
-All core slots are REQUIRED. `details` contains protocol-owned text key/value
-pairs. A parser MUST reject non-arrays, wrong array lengths, non-text core
-fields, malformed detail pairs, or trailing CBOR bytes.
+All core slots are REQUIRED. `body` contains protocol-owned text key/value
+details in a nested CBOR map namespace. A parser MUST reject non-arrays, wrong
+array lengths, non-text core fields, non-map bodies, duplicate body keys,
+reserved/core body keys, non-text body keys or values, or trailing CBOR bytes.
 
 The main `promise_about` value was `receive_pcid`. Common details were
 `app_name`, `pcid_name`, `pcid_cid`, and local endpoint information.
@@ -56,7 +57,7 @@ Active POC16 parser roles now make equivalent receive promises through
 
 ## Receiver and parser behavior
 
-A historical kernel decoded the pair payload and installed a local receive entry.
+A historical kernel decoded the map-body payload and installed a local receive entry.
 Active POC16 should not use this pCID for normal registration.
 
 ## Protocol state machine
@@ -91,5 +92,5 @@ POC16.
 ```text
 grid([42(pCID), ["alice-app", "kernel", "receive_pcid",
   ["kept", "I promise to receive relationship_v1 envelopes.", "app startup", "startup"],
-  [["app_name", "alice-app"], ["pcid_name", "relationship_v1"]]], proof])
+  {"app_name": "alice-app", "pcid_name": "relationship_v1"}], proof])
 ```

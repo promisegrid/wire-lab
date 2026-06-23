@@ -135,18 +135,17 @@ func normalizeMapFieldsForProtocolName(protocolName string, fields map[string]st
 	fields["payload_protocol"] = protocolName
 }
 
-type pairPayloadField struct {
+type mapBodyPayloadField struct {
 	key   string
 	value string
 }
 
-// marshalPairPayload encodes flexible pCID-owned payloads whose protocol specs
-// intentionally allow an extensible body of local key/value promise details.
-// Intent: Relationship and kernel-receive payloads need extension room for live
-// LLM details and app registration details, but those details are still body
-// slots owned by their pCID rather than a universal named map on the wire.
-// Source: DI-dirat; DI-pusak
-func marshalPairPayload(protocolName string, fields map[string]string) ([]byte, error) {
+// marshalMapBodyPayload encodes flexible pCID-owned payloads whose protocol
+// specs intentionally allow an extensible body of local promise details.
+// Intent: Flexible bodies that already carry text keys should use a nested CBOR
+// map instead of an array of [key, value] pairs so body details cannot be
+// confused with core positional promise fields. Source: DI-mapah
+func marshalMapBodyPayload(protocolName string, fields map[string]string) ([]byte, error) {
 	promiseAbout := fields["promise_about"]
 	if promiseAbout == "" {
 		promiseAbout = "local_observation"
@@ -168,18 +167,15 @@ func marshalPairPayload(protocolName string, fields map[string]string) ([]byte, 
 			return nil, err
 		}
 	}
-	pairs := pairPayloadFields(fields)
-	if err := writer.writeArrayHeader(len(pairs)); err != nil {
+	bodyFields := mapBodyPayloadFields(fields)
+	if err := writer.writeMapHeader(len(bodyFields)); err != nil {
 		return nil, err
 	}
-	for _, pair := range pairs {
-		if err := writer.writeArrayHeader(2); err != nil {
+	for _, bodyField := range bodyFields {
+		if err := writer.writeString(bodyField.key); err != nil {
 			return nil, err
 		}
-		if err := writer.writeString(pair.key); err != nil {
-			return nil, err
-		}
-		if err := writer.writeString(pair.value); err != nil {
+		if err := writer.writeString(bodyField.value); err != nil {
 			return nil, err
 		}
 	}
@@ -187,41 +183,37 @@ func marshalPairPayload(protocolName string, fields map[string]string) ([]byte, 
 	return writer.buffer.Bytes(), nil
 }
 
-func pairPayloadFields(fields map[string]string) []pairPayloadField {
-	pairs := make([]pairPayloadField, 0, len(fields))
+func mapBodyPayloadFields(fields map[string]string) []mapBodyPayloadField {
+	bodyFields := make([]mapBodyPayloadField, 0, len(fields))
 	for key, value := range fields {
-		if value == "" || pairPayloadCoreField(key) {
+		if value == "" || mapBodyPayloadReservedKey(key) {
 			continue
 		}
-		wireKey := key
-		if wireKey == "payload_protocol" || wireKey == "promise_about" {
-			continue
-		}
-		pairs = append(pairs, pairPayloadField{key: wireKey, value: value})
+		bodyFields = append(bodyFields, mapBodyPayloadField{key: key, value: value})
 	}
-	sort.Slice(pairs, func(leftIndex, rightIndex int) bool {
-		return pairs[leftIndex].key < pairs[rightIndex].key
+	sort.Slice(bodyFields, func(leftIndex, rightIndex int) bool {
+		return bodyFields[leftIndex].key < bodyFields[rightIndex].key
 	})
-	return pairs
+	return bodyFields
 }
 
-func pairPayloadCoreField(key string) bool {
+func mapBodyPayloadReservedKey(key string) bool {
 	switch key {
-	case "act", "from", "to", "outcome", "promise", "reason", "turn", "protocol":
+	case "", "act", "from", "to", "promiser", "promisee", "promise_about", "payload_protocol", "outcome", "promise", "reason", "turn", "protocol", "state", "body":
 		return true
 	default:
 		return false
 	}
 }
 
-func payloadFieldsFromPairs(protocolName string, payloadBytes []byte) (map[string]string, error) {
+func payloadFieldsFromMapBody(protocolName string, payloadBytes []byte) (map[string]string, error) {
 	reader := &cborReader{data: payloadBytes}
 	arrayLength, err := reader.readTypeAndLength(4)
 	if err != nil {
 		return nil, err
 	}
 	if arrayLength != 5 {
-		return nil, fmt.Errorf("%s pair payload must have 5 slots, got %d", protocolName, arrayLength)
+		return nil, fmt.Errorf("%s map-body payload must have 5 slots, got %d", protocolName, arrayLength)
 	}
 	promiser, err := reader.readString()
 	if err != nil {
@@ -240,7 +232,7 @@ func payloadFieldsFromPairs(protocolName string, payloadBytes []byte) (map[strin
 		return nil, err
 	}
 	if stateLength != 4 {
-		return nil, fmt.Errorf("%s pair-payload state must have 4 slots, got %d", protocolName, stateLength)
+		return nil, fmt.Errorf("%s map-body payload state must have 4 slots, got %d", protocolName, stateLength)
 	}
 	outcome, err := reader.readString()
 	if err != nil {
@@ -278,18 +270,12 @@ func payloadFieldsFromPairs(protocolName string, payloadBytes []byte) (map[strin
 			fields[optional.key] = optional.value
 		}
 	}
-	pairCount, err := reader.readTypeAndLength(4)
+	bodyLength, err := reader.readTypeAndLength(5)
 	if err != nil {
 		return nil, err
 	}
-	for pairIndex := uint64(0); pairIndex < pairCount; pairIndex++ {
-		pairLength, pairLengthErr := reader.readTypeAndLength(4)
-		if pairLengthErr != nil {
-			return nil, pairLengthErr
-		}
-		if pairLength != 2 {
-			return nil, fmt.Errorf("%s pair payload entry must have 2 slots, got %d", protocolName, pairLength)
-		}
+	seenBodyKeys := make(map[string]bool, bodyLength)
+	for bodyIndex := uint64(0); bodyIndex < bodyLength; bodyIndex++ {
 		key, keyErr := reader.readString()
 		if keyErr != nil {
 			return nil, keyErr
@@ -298,12 +284,19 @@ func payloadFieldsFromPairs(protocolName string, payloadBytes []byte) (map[strin
 		if valueErr != nil {
 			return nil, valueErr
 		}
+		if mapBodyPayloadReservedKey(key) {
+			return nil, fmt.Errorf("%s map-body key %q is reserved for core promise fields", protocolName, key)
+		}
+		if seenBodyKeys[key] {
+			return nil, fmt.Errorf("%s map-body key %q is duplicated", protocolName, key)
+		}
+		seenBodyKeys[key] = true
 		if key != "" && value != "" {
-			fields[""+key] = value
+			fields[key] = value
 		}
 	}
 	if reader.offset != len(reader.data) {
-		return nil, fmt.Errorf("trailing cbor bytes in %s pair payload: %d", protocolName, len(reader.data)-reader.offset)
+		return nil, fmt.Errorf("trailing cbor bytes in %s map-body payload: %d", protocolName, len(reader.data)-reader.offset)
 	}
 	return fields, nil
 }

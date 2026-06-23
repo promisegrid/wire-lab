@@ -130,6 +130,15 @@ Intent: Clean-run shutdown closes many app, parser, inbound-peer, and outbound-p
 Constraints: Do not weaken analyzer terminal-session gates; preserve exactly one terminal record per persistent session; still attempt underlying TCP close; keep deferred-close records as transport lifecycle accounting, not peer trust evidence; do not add observer-volume coordination or global monitoring semantics.
 Affects: implementations/poc16-secure-tokens-maps-encrypted-payloads/transport/persistent_session.go; protocols/wire-lab.d/TODO/TODO-zugok-poc16-secure-tokens-maps-encrypted-payloads.md.
 
+ID: DI-mapah
+Date: 2026-06-23 11:12:52 PDT
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Replace POC16 flexible array-of-pairs body payloads with nested CBOR map bodies, without backwards parsing for old pair-list bodies.
+Intent: If a flexible body already carries text keys, an array of `[key, value]` pairs has little benefit over a CBOR map and creates a design hazard by encouraging flattened Go projections where body keys can overwrite core promise fields such as `from`, `to`, `promise_about`, or derived `payload_protocol`. Flexible pCID-owned protocols should keep core promise slots positional while putting keyed details in a separate nested CBOR map namespace. Constrained protocols that need compactness should use pCID-specific positional body arrays instead.
+Constraints: Preserve `grid([42(pCID), ...])`; preserve pCID-owned payload semantics; do not parse historical pair-list bodies; reject reserved/core body-map keys even though the body is nested; keep runtime compatibility projections local to parser/runtime edges; update POC16 protocol specs and the POC17 handoff TODO so future constrained-device work does not copy the old pair-list shape.
+Affects: implementations/poc16-secure-tokens-maps-encrypted-payloads/protocol/; implementations/poc16-secure-tokens-maps-encrypted-payloads/docs/protocols/; protocols/wire-lab.d/TODO/TODO-zugok-poc16-secure-tokens-maps-encrypted-payloads.md; protocols/wire-lab.d/TODO/TODO-komon-poc17-m4-lora-runtime.md.
+
 ## Scope
 
 - POC16 is executable design evidence, not production software and not a final
@@ -476,3 +485,4 @@ Affects: implementations/poc16-secure-tokens-maps-encrypted-payloads/transport/p
 - [x] zugok.34 Preserve all POC15 executable functionality in the POC16 clean run or document a scoped non-superset DI exception.
 - [x] zugok.35 Add analyzer gates for POC15 named-agent, agent-role, and executable-function preservation.
 - [x] zugok.36 Document the POC15 agent/function baseline in the POC16 README before adding new POC16-specific behavior.
+- [x] zugok.37 Replace flexible pair-list payload bodies with nested CBOR map bodies and update the affected POC16/POC17 documentation.

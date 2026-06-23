@@ -22,7 +22,7 @@ The active POC16 shape is:
 grid([42(pCID), payload, proof])
 ```
 
-This pCID's payload is a relationship-style pair payload because it describes
+This pCID's payload is a relationship-style map-body payload because it describes
 local runtime promises and diagnostics rather than business data.
 
 ## Promise Theory model
@@ -34,7 +34,7 @@ or builder promises whether it can help with that pCID and exact byte shape.
 
 ## Payload grammar
 
-The payload is the pCID-owned pair-payload profile:
+The payload is the pCID-owned map-body profile:
 
 ```text
 payload = [
@@ -42,13 +42,14 @@ payload = [
   promisee: text,
   promise_about: text,
   state: [outcome: text, promise_text: text, reason: text, turn: text],
-  details: [[key: text, value: text], ...]
+  body: {detail_key: text => detail_value: text, ...}
 ]
 ```
 
-All core slots are REQUIRED. `details` contains protocol-owned text key/value
-pairs. A parser MUST reject non-arrays, wrong array lengths, non-text core
-fields, malformed detail pairs, or trailing CBOR bytes.
+All core slots are REQUIRED. `body` contains protocol-owned text key/value
+details in a nested CBOR map namespace. A parser MUST reject non-arrays, wrong
+array lengths, non-text core fields, non-map bodies, duplicate body keys,
+reserved/core body keys, non-text body keys or values, or trailing CBOR bytes.
 
 Typical `promise_about` values are `parser_role_available`,
 `builder_role_available`, `app_receive_promise`, `parsed_delivery`,
@@ -110,7 +111,7 @@ grid([42(pCID),
   ["parser-a", "alice-app", "app_receive_promise",
     ["kept", "I promise to deliver relationship_v1 envelopes to Alice's local app.",
      "local app registered", "startup"],
-    [["pcid_name", "relationship_v1"], ["app_name", "alice-app"]]
+    {"pcid_name": "relationship_v1", "app_name": "alice-app"}
   ], proof
 ])
 ```

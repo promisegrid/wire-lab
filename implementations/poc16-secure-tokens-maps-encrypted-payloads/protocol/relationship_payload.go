@@ -1,18 +1,18 @@
 package protocol
 
 // MarshalRelationshipPayloadFields encodes relationship_v1 as a pCID-owned CBOR
-// array with an extensible promise-body pair list.
-// Intent: Live LLM relationship promises need flexible body details, but fresh
-// wire bytes should still be arrays owned by relationship_v1 rather than a
-// generic map. Source: DI-dirat
+// array with an extensible nested promise-body map.
+// Intent: Live LLM relationship promises need flexible body details, but keyed
+// details belong in a nested map namespace instead of a pair list that can be
+// flattened into core promise fields. Source: DI-mapah
 func MarshalRelationshipPayloadFields(fields map[string]string) ([]byte, error) {
-	return marshalPairPayload(protocolRelationshipV1, fields)
+	return marshalMapBodyPayload(protocolRelationshipV1, fields)
 }
 
 // RelationshipPayloadFields projects relationship_v1 arrays back into runtime
 // compatibility fields for existing local trust handlers and analyzer counters.
 func RelationshipPayloadFields(payloadBytes []byte) (map[string]string, error) {
-	return payloadFieldsFromPairs(protocolRelationshipV1, payloadBytes)
+	return payloadFieldsFromMapBody(protocolRelationshipV1, payloadBytes)
 }
 
 // MarshalKernelReceivePayloadFields encodes kernel_receive_v1 app registration
@@ -24,13 +24,13 @@ func MarshalKernelReceivePayloadFields(fields map[string]string) ([]byte, error)
 	if fields["promise_about"] == "" {
 		fields["promise_about"] = "receive_pcid"
 	}
-	return marshalPairPayload(protocolKernelReceiveV1, fields)
+	return marshalMapBodyPayload(protocolKernelReceiveV1, fields)
 }
 
 // KernelReceivePayloadFields projects kernel_receive_v1 arrays into local
 // compatibility fields used by the kernel receive-promise table.
 func KernelReceivePayloadFields(payloadBytes []byte) (map[string]string, error) {
-	return payloadFieldsFromPairs(protocolKernelReceiveV1, payloadBytes)
+	return payloadFieldsFromMapBody(protocolKernelReceiveV1, payloadBytes)
 }
 
 // MarshalKernelTransportPayloadFields encodes kernel_transport_v1 parser/kernel
@@ -42,25 +42,25 @@ func MarshalKernelTransportPayloadFields(fields map[string]string) ([]byte, erro
 	if fields["promise_about"] == "" {
 		fields["promise_about"] = "kernel_transport"
 	}
-	return marshalPairPayload(protocolKernelTransportV1, fields)
+	return marshalMapBodyPayload(protocolKernelTransportV1, fields)
 }
 
 // KernelTransportPayloadFields projects kernel_transport_v1 arrays into local
 // compatibility fields used only by the parser-role/transport-kernel interface.
 func KernelTransportPayloadFields(payloadBytes []byte) (map[string]string, error) {
-	return payloadFieldsFromPairs(protocolKernelTransportV1, payloadBytes)
+	return payloadFieldsFromMapBody(protocolKernelTransportV1, payloadBytes)
 }
 
 // MarshalRoutePayloadFields encodes route_v1 as a pCID-owned array payload.
 // Intent: Route setup and forwarding are promise meanings owned by route_v1,
 // not a new top-level action or a reusable command vocabulary. Source: DI-lihir
 func MarshalRoutePayloadFields(fields map[string]string) ([]byte, error) {
-	return marshalPairPayload(protocolRouteV1, fields)
+	return marshalMapBodyPayload(protocolRouteV1, fields)
 }
 
 // RoutePayloadFields projects route_v1 arrays into local compatibility fields
 // so POC16 can keep the kernel/app routing scaffold while the wire bytes stay
 // pCID-owned arrays.
 func RoutePayloadFields(payloadBytes []byte) (map[string]string, error) {
-	return payloadFieldsFromPairs(protocolRouteV1, payloadBytes)
+	return payloadFieldsFromMapBody(protocolRouteV1, payloadBytes)
 }

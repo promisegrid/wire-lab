@@ -40,7 +40,7 @@ state; it is not a global fact and it does not require Bob to behave differently
 
 ## Payload grammar
 
-The payload is a pCID-owned CBOR array using the POC16 pair-payload profile:
+The payload is a pCID-owned CBOR array using the POC16 map-body profile:
 
 ```text
 payload = [
@@ -48,14 +48,16 @@ payload = [
   promisee: text,
   promise_about: text,
   state: [outcome: text, promise_text: text, reason: text, turn: text],
-  details: [[key: text, value: text], ...]
+  body: {detail_key: text => detail_value: text, ...}
 ]
 ```
 
 Core slots are positional and REQUIRED. `promise_about` defaults to
 `local_observation` only in compatibility builders that are given no value; new
-senders SHOULD set it explicitly. `details` is sorted by key in current POC16
-encoders, but receivers MUST NOT infer semantic priority from sort order. Common
+senders SHOULD set it explicitly. `body` is a nested CBOR map whose keys are
+relationship-local detail names; body keys MUST NOT reuse core names such as
+`from`, `to`, `promiser`, `promisee`, `promise_about`, `payload_protocol`,
+`outcome`, `promise`, `reason`, or `turn`. Common
 `promise_about` values include `trust_update`, `peer_introduction`,
 `repair_promise`, `local_event`, `route_preference`, and
 `relationship_summary`; the protocol permits other relationship-local values as
@@ -71,12 +73,12 @@ that agent.
 
 ## Receiver and parser behavior
 
-A parser MUST verify the outer grid/proof, decode the pair-payload slots, and
-reject malformed arrays, non-text core fields, details entries that are not
-2-slot text pairs, or trailing CBOR bytes. A receiver MAY update local trust, keep
-an event, ignore the message, or answer with a local promise. Unsupported
-`promise_about` values are not protocol errors; they are relationship meanings
-the receiver may decline to use.
+A parser MUST verify the outer grid/proof, decode the map-body slots, and reject
+malformed arrays, non-text core fields, non-map bodies, duplicate body keys,
+reserved/core body keys, non-text body keys or values, or trailing CBOR bytes. A
+receiver MAY update local trust, keep an event, ignore the message, or answer
+with a local promise. Unsupported `promise_about` values are not protocol errors;
+they are relationship meanings the receiver may decline to use.
 
 ## Protocol state machine
 
@@ -115,10 +117,12 @@ policy-enforcement commands.
 
 ## Interoperability notes
 
-The pair-payload profile is intentionally array-based for constrained devices
-while preserving extensibility through `details`. A production implementation can
-translate `details` into local structs, maps, or database rows, but the wire
-payload remains the positional CBOR array above.
+The map-body profile keeps core promise attribution positional while using a
+nested CBOR map for flexible keyed details. A production implementation can
+translate `body` into local structs, maps, or database rows, but it MUST preserve
+the separate namespace between core slots and body details. Constrained protocols
+that need byte savings should choose pCID-specific positional body arrays instead
+of keyed pair lists.
 
 ## Examples
 
@@ -127,11 +131,11 @@ grid([42(pCID),
   ["alice", "alice", "trust_update",
     ["kept", "I promise my local trust in Bob increased after he returned the promised bytes.",
      "Bob kept a storage promise", "turn-0042"],
-    [["subject", "bob"], ["delta", "+3"], ["parent_exact_sha256", "abc123..."]]
+    {"subject": "bob", "delta": "+3", "parent_exact_sha256": "abc123..."}
   ],
   proof
 ])
 ```
 
-A malformed example is a details entry like `["subject"]`; receivers MUST reject
-it because every detail entry is a two-slot `[key, value]` pair.
+A malformed example is body key `"from"`; receivers MUST reject it because body
+details cannot override or impersonate core promise attribution.
