@@ -60,6 +60,14 @@ Intent: POC17 implementation work may proceed only after the bootstrap constrain
 Constraints: This acknowledgment does not approve scaffolding paths, package names, command names, runtime-generated paths, or remaining implementation details; those still belong to later DF/DI work, especially `komon.3` and `komon.4`.
 Affects: protocols/wire-lab.d/TODO/TODO-komon-poc17-m4-lora-runtime.md; future implementations/poc17-m4-lora-runtime/.
 
+ID: DI-pobir
+Date: 2026-06-23 14:05:00 PDT
+Status: active
+Decision: Start POC17 implementation now with POC16 lessons continuing as inputs, scaffold `implementations/poc17-m4-lora-runtime/` as a Go behavior simulator, and use conservative configurable radio budgets until bintags LoRa frame-budget claims are verified.
+Intent: POC16 is mostly done and should not block POC17, but POC17 must preserve the current executable lessons: parser/builder ownership, exact CBOR artifacts, pCID-owned payloads, sparse CAS, parent links, local non-commitments, and honest analyzer language. The first POC17 slice needs a clean, deterministic Go simulator before Rust/Renode fidelity work. The bintags frame-budget note gives useful pressure, but its regulatory, driver, and hardware claims must not become hard acceptance gates yet.
+Constraints: Approved root path `implementations/poc17-m4-lora-runtime/`; approved Go module `promisegrid.dev/wire-lab/implementations/poc17-m4-lora-runtime`; approved commands `poc17-sim`, `poc17-analyze`, and `poc17-cbor-diag`; approved packages `protocol`, `radio`, `device`, `sim`, `artifact`, `state`, and `analyzer`; approved runtime artifact root pattern `/tmp/wire-lab-poc17/<run_id>/`; use Go behavior evidence only and do not claim exact Feather M4 Express, SAMD51, SPI, RFM95W/RFM95, CircuitPython runtime, radio-driver, packet, memory, energy, regulatory, or production-device fidelity.
+Affects: protocols/wire-lab.d/TODO/TODO-komon-poc17-m4-lora-runtime.md; implementations/poc17-m4-lora-runtime/; docs/research/DN-zaraz-bintags-lora-frame-budget.md.
+
 ## Scope
 
 - Treat POC17 as executable design evidence for constrained embedded
@@ -318,35 +326,51 @@ This section is the starting context for the next Codex operator. Complete
   and long-term migration. Completed by
   `docs/thought-experiments/TE-topam-m4-agent-language-source.md`; resulting
   decision status: locked by `DI-libis`.
-- [ ] komon.1 Decide whether POC16 must land first and what POC16 contributes
-  that POC17 should inherit.
+- [x] komon.1 Decide whether POC16 must land first and what POC16 contributes
+  that POC17 should inherit. POC16 is mostly done and does not block POC17;
+  ongoing POC16 lessons continue to feed POC17. Locked by `DI-pobir`.
 - [x] komon.2 Run a TE for M4/LoRa runtime alternatives: Renode custom platform,
   QEMU MPS2 plus external radio model, Wokwi/custom chips, hardware-in-loop, and
   pure Go radio simulation. Completed by
   `docs/thought-experiments/TE-juzif-poc17-simulator-choice-and-timing.md`;
   resulting decision status: locked by `DI-libis`.
-- [ ] komon.3 Lock simulator choice, fidelity target, and naming decisions via
-  DI before creating `implementations/poc17-m4-lora-runtime/`.
-- [ ] komon.4 Scaffold the POC17 directory only after DF approval for paths,
+- [x] komon.3 Lock simulator choice, fidelity target, and naming decisions via
+  DI before creating `implementations/poc17-m4-lora-runtime/`. Locked by
+  `DI-libis` and `DI-pobir`.
+- [x] komon.4 Scaffold the POC17 directory only after DF approval for paths,
   package names, command names, firmware language, and runtime-generated paths.
-- [ ] komon.16 Review `docs/research/DN-zaraz-bintags-lora-frame-budget.md`
+  Path/name/runtime approvals are recorded in `DI-pobir`.
+- [x] komon.16 Review `docs/research/DN-zaraz-bintags-lora-frame-budget.md`
   before locking radio MTU, fragmentation, ACK/retry, store-forward, proof-size,
   and radio-profile assumptions; verify all regulatory, driver, hardware,
   packet-header, region, and timing claims before using them as acceptance
-  criteria.
-- [ ] komon.5 Build the smallest firmware agent that can parse one
+  criteria. Reviewed for design pressure; `DI-pobir` keeps values
+  configurable and non-normative for the first Go simulator.
+- [x] komon.5 Build the smallest firmware agent that can parse one
   `grid([42(pCID), payload])` or `grid([42(pCID), payload, proof])` profile from
-  radio bytes.
-- [ ] komon.6 Add the RFM95/SX127x-shaped SPI radio model or chosen equivalent
-  and make it the only protocol message path for the M4 firmware.
-- [ ] komon.7 Add one non-M4 peer that can exchange PromiseGrid envelopes with
+  radio bytes. First Go behavior-simulator slice implemented under
+  `implementations/poc17-m4-lora-runtime/`; this is behavior evidence, not
+  firmware fidelity proof. Source: `DI-pobir`.
+- [x] komon.6 Add the RFM95/SX127x-shaped SPI radio model or chosen equivalent
+  and make it the only protocol message path for the M4 firmware. First slice
+  uses a Go RFM95/SX127x-shaped packet-path behavior model with radio-only
+  analyzer gates. Source: `DI-pobir`.
+- [x] komon.7 Add one non-M4 peer that can exchange PromiseGrid envelopes with
   the simulated radio endpoint without acting as a hidden reliable bridge.
-- [ ] komon.8 Add small-device pCID specs and compact payload shapes for link,
-  status, and one useful device promise.
-- [ ] komon.9 Add bounded retry, packet-loss, MTU, duplicate, replay,
+  Implemented as `gateway-bob` in the Go simulator. Source: `DI-pobir`.
+- [x] komon.8 Add small-device pCID specs and compact payload shapes for link,
+  status, and one useful device promise. First slice covers `device_status_v1`,
+  `lora_link_v1`, and `peer_storage_v1` with compact positional payloads.
+  Source: `DI-pobir`.
+- [x] komon.9 Add bounded retry, packet-loss, MTU, duplicate, replay,
   malformed-frame, energy-pressure, and asymmetric-link scenarios.
-- [ ] komon.10 Add tiny sparse CAS, parent-link retention, peer-storage promises,
-  and local GC behavior for the M4 agent.
+  Implemented in the deterministic Go simulator; energy pressure is represented
+  by explicit battery/retry/local-budget evidence, not hardware energy modeling.
+  Source: `DI-pobir`.
+- [x] komon.10 Add tiny sparse CAS, parent-link retention, peer-storage promises,
+  and local GC behavior for the M4 agent. Implemented as bounded local CAS,
+  missing-parent evidence, peer-storage promise evidence, and GC analyzer gates.
+  Source: `DI-pobir`.
 - [ ] komon.11 Add analyzer gates proving radio-only transport, exact CBOR
   artifacts, pCID-owned payloads, sparse CAS behavior, failure handling, and
   no authority drift.

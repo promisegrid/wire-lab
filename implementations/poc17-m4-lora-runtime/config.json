@@ -1,0 +1,7 @@
+{
+  "run_id": "poc17-demo",
+  "run_root": "/tmp/wire-lab-poc17",
+  "radio_mtu_bytes": 96,
+  "retry_budget": 2,
+  "local_cas_limit": 4
+}
