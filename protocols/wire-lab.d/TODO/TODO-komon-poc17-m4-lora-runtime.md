@@ -44,6 +44,14 @@ Intent: The key first POC17 question is whether a constrained-device-shaped agen
 Constraints: The Go simulator must be labeled as behavior evidence, not Feather M4 Express/RFM95W firmware proof; preserve the no-UART/no-host-bridge transport rule; keep `bintags` as prior-art vocabulary, not a wire format or runtime dependency; plan Rust/Renode as a follow-on fidelity lane, not as a blocker for the first POC17 clean run; do not claim production device readiness until a later fidelity lane proves hardware, SPI, radio-driver, memory, energy, and packet-semantics constraints.
 Affects: protocols/wire-lab.d/TODO/TODO-komon-poc17-m4-lora-runtime.md; docs/thought-experiments/TE-topam-m4-agent-language-source.md; docs/thought-experiments/TE-juzif-poc17-simulator-choice-and-timing.md; future implementations/poc17-m4-lora-runtime/.
 
+ID: DI-govat
+Date: 2026-06-23 13:48:45 PDT
+Status: active
+Decision: Store the bintags LoRa frame-budget note as `docs/research/DN-zaraz-bintags-lora-frame-budget.md` and make POC17 read it before locking radio MTU, fragmentation, ACK/retry, store-forward, and proof-size assumptions.
+Intent: The bintags radio note is broader than POC17 implementation code because its MTU, bandwidth, dwell-time, RFM9x driver, and store-forward constraints will also affect later constrained-radio POCs. Keeping it as a repo-wide design note avoids burying it inside one proof-of-concept while still giving POC17 concrete pressure from the Feather M4/RFM9x prior art.
+Constraints: Treat the DN as research/design pressure, not as a normative protocol spec; verify regulatory, radio-driver, hardware, region, simulator, packet-header, and timing claims before using them as acceptance criteria; preserve the POC17 no-UART/no-host-bridge transport rule and honest simulator-fidelity caveats.
+Affects: docs/research/DN-zaraz-bintags-lora-frame-budget.md; protocols/wire-lab.d/TODO/TODO-komon-poc17-m4-lora-runtime.md; future implementations/poc17-m4-lora-runtime/.
+
 ## Scope
 
 - Treat POC17 as executable design evidence for constrained embedded
@@ -164,6 +172,11 @@ Affects: protocols/wire-lab.d/TODO/TODO-komon-poc17-m4-lora-runtime.md; docs/tho
   simulator/timing pass. `DI-libis` locks the resulting sequence: use
   CircuitPython-shaped `bintags` behavior as the M4 agent language source, build
   the first simulator in Go, and pursue Rust/Renode later for fidelity.
+- Read `docs/research/DN-zaraz-bintags-lora-frame-budget.md` before locking
+  POC17 radio MTU, fragmentation, ACK/retry, store-forward, proof-size, and
+  radio-profile assumptions. Treat it as design pressure that still requires
+  hardware, driver, regional, and simulator-fidelity verification. Source:
+  `DI-govat`.
 
 ## Locked POC17 Simulator Sequence
 
@@ -307,6 +320,11 @@ This section is the starting context for the next Codex operator. Complete
   DI before creating `implementations/poc17-m4-lora-runtime/`.
 - [ ] komon.4 Scaffold the POC17 directory only after DF approval for paths,
   package names, command names, firmware language, and runtime-generated paths.
+- [ ] komon.16 Review `docs/research/DN-zaraz-bintags-lora-frame-budget.md`
+  before locking radio MTU, fragmentation, ACK/retry, store-forward, proof-size,
+  and radio-profile assumptions; verify all regulatory, driver, hardware,
+  packet-header, region, and timing claims before using them as acceptance
+  criteria.
 - [ ] komon.5 Build the smallest firmware agent that can parse one
   `grid([42(pCID), payload])` or `grid([42(pCID), payload, proof])` profile from
   radio bytes.

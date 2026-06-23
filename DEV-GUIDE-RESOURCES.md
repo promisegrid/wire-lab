@@ -1451,6 +1451,11 @@ section.
 - `docs/research/DN-nuras-poc13-cas-compute-functions.md` defines POC13
   pressure for decentralized CAS storage promises and CID-named compute
   promises; it is not a frozen storage or compute API. Source: `DI-bibom`.
+- `docs/research/DN-zaraz-bintags-lora-frame-budget.md` records bintags-derived
+  LoRa frame-budget, RFM9x driver, store-forward, and constrained-radio pressure
+  for POC17 and later radio POCs; it is design pressure requiring hardware,
+  driver, regional, and simulator-fidelity verification before normative use.
+  Source: `DI-govat`.
 - `protocols/wire-lab.d/TODO/TODO-binag-promisegrid-kernel-design-resolution.md`
   tracks the active resolution packet and the focused canary review required
   before `DR-davod` can close.
