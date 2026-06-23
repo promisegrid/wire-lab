@@ -28,6 +28,14 @@ Intent: POC17 needs POC16's executable lessons and session-only operating habits
 Constraints: Do not scaffold or implement POC17 as part of the handoff; do not move POC16 cleanup into POC17; keep this handoff as TODO-local coordination, not a second source of protocol truth; preserve no-UART/no-host-bridge transport, Promise Theory vocabulary, pCID-as-protocol-spec, `grid([42(pCID), ...])`, passive harness/analyzer semantics, and honest simulator-fidelity claims.
 Affects: protocols/wire-lab.d/TODO/TODO-komon-poc17-m4-lora-runtime.md; protocols/wire-lab.d/TODO/TODO.md; future implementations/poc17-m4-lora-runtime/.
 
+ID: DI-solih
+Date: 2026-06-22 17:14:57 PDT
+Status: active
+Decision: Treat `/home/angela/lab/bintags` as POC17 prior art and require a language-source thought experiment before choosing how to model the simulated M4 agent.
+Intent: `bintags` gives POC17 a concrete Feather M4/RFM9x LoRa reference system with CircuitPython device behavior, a Raspberry Pi LoRa gateway, and a Go host, but POC17 still needs to decide whether its simulated M4 agent should follow the CircuitPython shape, native firmware, or a Go-only simulator model. The TE keeps that choice explicit instead of silently inheriting the prior project's language or wire format.
+Constraints: Use `bintags` for behavior, vocabulary, hardware pressure, ACK/retry examples, display/button constraints, and role boundaries; do not inherit its CSV-like text packet format, MQTT bridge semantics, or host-mediated control model as PromiseGrid protocol design; do not edit `/home/angela/lab/bintags` as part of POC17 planning; preserve the radio-only POC17 transport rule.
+Affects: protocols/wire-lab.d/TODO/TODO-komon-poc17-m4-lora-runtime.md; /home/angela/lab/bintags/README.md; /home/angela/lab/bintags/devices/m4/m4.py; /home/angela/lab/bintags/devices/pi/pi.py; /home/angela/lab/bintags/application/bt/main.go; future POC17 TE and implementation decisions.
+
 ## Scope
 
 - Treat POC17 as executable design evidence for constrained embedded
@@ -131,6 +139,24 @@ Affects: protocols/wire-lab.d/TODO/TODO-komon-poc17-m4-lora-runtime.md; protocol
   modeled behavior, diagnostics-only behavior, and not-yet-modeled hardware
   behavior.
 
+## Bintags Prior Art
+
+- Treat `/home/angela/lab/bintags` as concrete prior art for a Feather
+  M4/RFM9x-style LoRa device, a Raspberry Pi radio gateway, and a Go host.
+  Source: `DI-solih`.
+- Use the `bintags` M4 code as behavior evidence for button-driven status
+  changes, display refresh pressure, radio send/receive loops, ACK/retry
+  behavior, and small object vocabulary such as `Button`, `Display`, `Radio`,
+  `Message`, and `Order`. Source: `DI-solih`.
+- Do not carry over the `bintags` CSV-like text packet format, MQTT bridge
+  semantics, or host-mediated control model as PromiseGrid protocol design.
+  POC17 still needs pCID-owned CBOR payloads, radio-only M4 traffic, local
+  agent judgment, and passive harness evidence. Source: `DI-solih`.
+- Run a TE before choosing the simulated M4 agent language source. The TE must
+  compare CircuitPython-shaped behavior from `bintags`, native firmware in C/C++
+  or Rust, and a Go-only simulation under the same simulator, radio-fidelity,
+  memory, parser/builder, testing, and migration scenarios. Source: `DI-solih`.
+
 ## Codex Handoff Bootstrap
 
 This section is the starting context for the next Codex operator. Complete
@@ -146,6 +172,10 @@ This section is the starting context for the next Codex operator. Complete
   `implementations/poc16-secure-tokens-maps-encrypted-payloads/README.md`,
   `implementations/poc16-secure-tokens-maps-encrypted-payloads/docs/KERNEL-ROLES.md`,
   and `implementations/poc16-secure-tokens-maps-encrypted-payloads/docs/MESSAGE-SHAPES.md`.
+- Read `bintags` prior art:
+  `/home/angela/lab/bintags/README.md`, `/home/angela/lab/bintags/devices/m4/m4.py`,
+  `/home/angela/lab/bintags/devices/pi/pi.py`, and
+  `/home/angela/lab/bintags/application/bt/main.go`.
 - Read `DEV-GUIDE-RESOURCES.md` for current cross-POC design state, but treat
   POC evidence as pressure and lessons, not final PromiseGrid APIs.
 
@@ -227,6 +257,11 @@ This section is the starting context for the next Codex operator. Complete
 
 - [ ] komon.14 Read and acknowledge the Codex handoff bootstrap before any POC17
   implementation work.
+- [ ] komon.15 Run a TE on simulated M4 agent language sources: CircuitPython-shaped
+  behavior from `bintags`, native firmware in C/C++ or Rust, and Go-only
+  simulation. Compare each option under simulator support, LoRa/radio fidelity,
+  constrained-memory behavior, PromiseGrid parser/builder coverage, testability,
+  and long-term migration.
 - [ ] komon.1 Decide whether POC16 must land first and what POC16 contributes
   that POC17 should inherit.
 - [ ] komon.2 Run a TE for M4/LoRa runtime alternatives: Renode custom platform,
