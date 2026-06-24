@@ -6,7 +6,6 @@ import (
 	"crypto/cipher"
 	"crypto/sha256"
 	"encoding/binary"
-	"encoding/hex"
 	"errors"
 	"fmt"
 	"os"
@@ -487,7 +486,7 @@ func (node *Node) agentCASStorageProfileForAgent(agentName string) string {
 		agentCASStorageProfileTypedExtension,
 		agentCASStorageProfileCBORWrapper,
 	}
-	rankedNames := node.agentNamesRankedByRunHash()
+	rankedNames := node.agentNamesRankedDeterministically()
 	for rankIndex, rankedAgentName := range rankedNames {
 		if rankedAgentName == agentName {
 			return profiles[rankIndex%len(profiles)]
@@ -508,7 +507,7 @@ func (node *Node) agentCASWrapperModeFor() string {
 		agentCASWrapperModeDualKey,
 	}
 	wrapperNames := make([]string, 0)
-	for _, agentName := range node.agentNamesRankedByRunHash() {
+	for _, agentName := range node.agentNamesRankedDeterministically() {
 		if node.agentCASStorageProfileForAgent(agentName) == agentCASStorageProfileCBORWrapper {
 			wrapperNames = append(wrapperNames, agentName)
 		}
@@ -521,7 +520,7 @@ func (node *Node) agentCASWrapperModeFor() string {
 	return agentCASWrapperModeOriginalKey
 }
 
-func (node *Node) agentNamesRankedByRunHash() []string {
+func (node *Node) agentNamesRankedDeterministically() []string {
 	agentNames := make([]string, 0, len(node.Config.Agents))
 	for _, agentConfig := range node.Config.Agents {
 		agentNames = append(agentNames, agentConfig.Name)
@@ -842,14 +841,14 @@ func parentCIDsFromFields(fields map[string]string) []string {
 	if fields == nil {
 		return nil
 	}
-	parentHashes := []string{
-		fields["envelope_parent_exact_sha256"],
-		fields["payload_parent_exact_sha256"],
-		fields["parent_exact_sha256"],
+	parentCandidates := []string{
+		fields["envelope_parent_cid"],
+		fields["payload_parent_cid"],
+		fields["parent_cid"],
 	}
-	parentCIDs := make([]string, 0, len(parentHashes))
-	for _, parentHash := range parentHashes {
-		parentCID := exactHashToContentCID(parentHash)
+	parentCIDs := make([]string, 0, len(parentCandidates))
+	for _, parentCandidate := range parentCandidates {
+		parentCID := canonicalContentCID(parentCandidate)
 		if parentCID != "" {
 			parentCIDs = append(parentCIDs, parentCID)
 		}
@@ -857,15 +856,15 @@ func parentCIDsFromFields(fields map[string]string) []string {
 	return uniqueStrings(parentCIDs)
 }
 
-func exactHashToContentCID(exactHash string) string {
-	cleanHash := strings.TrimSpace(exactHash)
-	if len(cleanHash) != sha256.Size*2 {
+func canonicalContentCID(contentCID string) string {
+	cleanCID := strings.TrimSpace(contentCID)
+	if cleanCID == "" {
 		return ""
 	}
-	if _, decodeErr := hex.DecodeString(cleanHash); decodeErr != nil {
+	if _, parseErr := protocol.ParseCIDText(cleanCID); parseErr != nil {
 		return ""
 	}
-	return "cidv1-raw-sha2-256:" + cleanHash
+	return cleanCID
 }
 
 func uniqueStrings(values []string) []string {

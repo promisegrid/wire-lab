@@ -39,7 +39,7 @@ func TestEnvelopeWithParentSlotsVerifies(t *testing.T) {
 	if err != nil {
 		t.Fatalf("payload: %v", err)
 	}
-	parentExact := HashExactBytes([]byte("prior exact envelope"))
+	parentExact := CIDForExactBytes([]byte("prior exact envelope"))
 	envelope, err := NewEnvelopeFromPayloadWithParents(protocolCID, payloadBytes, []string{parentExact}, "alice")
 	if err != nil {
 		t.Fatalf("new envelope: %v", err)
@@ -52,8 +52,8 @@ func TestEnvelopeWithParentSlotsVerifies(t *testing.T) {
 	if err != nil {
 		t.Fatalf("parse envelope: %v", err)
 	}
-	if len(parsed.ParentExactSHA256s) != 1 || parsed.ParentExactSHA256s[0] != parentExact {
-		t.Fatalf("parents = %#v want %s", parsed.ParentExactSHA256s, parentExact)
+	if len(parsed.ParentCIDs) != 1 || parsed.ParentCIDs[0] != parentExact {
+		t.Fatalf("parents = %#v want %s", parsed.ParentCIDs, parentExact)
 	}
 	if err := VerifyEnvelope(parsed); err != nil {
 		t.Fatalf("verify envelope: %v", err)
@@ -141,6 +141,11 @@ func TestKnownPayloadsUseArrayShape(t *testing.T) {
 	// Intent: Fresh POC16 wire payloads are pCID-owned arrays; local routing
 	// field names are only runtime compatibility projections for existing handlers. Source:
 	// DI-gahuh; DI-dirat
+	relationshipCID := CIDForExactBytes([]byte("relationship"))
+	contentCID := CIDForExactBytes([]byte("abc"))
+	functionCID := CIDForExactBytes([]byte("function"))
+	inputCID := CIDForExactBytes([]byte("input"))
+	contextCID := CIDForExactBytes([]byte("context"))
 	testCases := []struct {
 		name         string
 		protocolName string
@@ -168,7 +173,7 @@ func TestKnownPayloadsUseArrayShape(t *testing.T) {
 				"to":       "kernel",
 				"app":      "alice",
 				"pcid":     "relationship_v1",
-				"pcid_cid": "cidv1-raw-sha2-256:relationship",
+				"pcid_cid": relationshipCID,
 			},
 			wantField: "app",
 		},
@@ -191,7 +196,7 @@ func TestKnownPayloadsUseArrayShape(t *testing.T) {
 				"to":              "accounting",
 				"promise_about":   "shipment_update",
 				"order_id":        "ORDER-1001",
-				"tracking_number": "1Z71051733616616",
+				"tracking_number": "bafkreieqq5sjxsrsb64q5chm44rsznxckr2oqk3ax2zo6uiuh4wekj2l64",
 				"cost_cents":      "860",
 			},
 			wantField: "tracking_number",
@@ -230,7 +235,7 @@ func TestKnownPayloadsUseArrayShape(t *testing.T) {
 				"from":          "alice",
 				"to":            "bob",
 				"promise_about": "store_content",
-				"content_cid":   "cidv1-raw-sha2-256:abc",
+				"content_cid":   contentCID,
 				"content_b64":   "YWJj",
 				"credit_offer":  "3",
 				"units":         "1",
@@ -244,11 +249,11 @@ func TestKnownPayloadsUseArrayShape(t *testing.T) {
 				"from":           "alice",
 				"to":             "carol",
 				"promise_about":  "execute_function",
-				"function_cid":   "cidv1-raw-sha2-256:function",
+				"function_cid":   functionCID,
 				"function_b64":   "ZnVuY3Rpb24=",
-				"input_cid":      "cidv1-raw-sha2-256:input",
+				"input_cid":      inputCID,
 				"input_b64":      "aW5wdXQ=",
-				"context_cid":    "cidv1-raw-sha2-256:context",
+				"context_cid":    contextCID,
 				"context_b64":    "Y29udGV4dA==",
 				"credit_offer":   "5",
 				"units":          "2",

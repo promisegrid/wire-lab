@@ -25,7 +25,7 @@ func TestCollectorListenAddressUsesConfiguredPort(t *testing.T) {
 
 func TestRecordMessageArtifactWritesBinaryCASAndIndex(t *testing.T) {
 	rawEnvelope := []byte{0xd9, 0x67, 0x72, 0x69, 0x64, 0x83, 0x01, 0x02, 0x03}
-	exactHash := protocol.HashExactBytes(rawEnvelope)
+	exactCID := protocol.CIDForExactBytes(rawEnvelope)
 	runCollector := &collector{
 		cfg: config.Config{
 			RunRoot: t.TempDir(),
@@ -37,13 +37,13 @@ func TestRecordMessageArtifactWritesBinaryCASAndIndex(t *testing.T) {
 		Direction:           "sent",
 		Peer:                "bob",
 		Protocol:            "route_v1",
-		ExactSHA256:         exactHash,
+		ExactCID:            exactCID,
 		EnvelopeBytesBase64: base64.StdEncoding.EncodeToString(rawEnvelope),
 	}
 	if err := runCollector.recordMessageArtifact("alice/agent:alice/stdout", artifact); err != nil {
 		t.Fatalf("record message artifact: %v", err)
 	}
-	artifactPath := filepath.Join(runCollector.cfg.RunRoot, runCollector.cfg.RunID, "message-cas", exactHash+".cbor")
+	artifactPath := filepath.Join(runCollector.cfg.RunRoot, runCollector.cfg.RunID, "message-cas", exactCID+".cbor")
 	storedBytes, readErr := os.ReadFile(artifactPath)
 	if readErr != nil {
 		t.Fatalf("read artifact: %v", readErr)
@@ -55,7 +55,7 @@ func TestRecordMessageArtifactWritesBinaryCASAndIndex(t *testing.T) {
 	if readIndexErr != nil {
 		t.Fatalf("read index: %v", readIndexErr)
 	}
-	if !strings.Contains(string(indexBytes), `"path":"message-cas/`+exactHash+`.cbor"`) {
+	if !strings.Contains(string(indexBytes), `"path":"message-cas/`+exactCID+`.cbor"`) {
 		t.Fatalf("index does not name artifact path: %s", string(indexBytes))
 	}
 }
@@ -84,7 +84,7 @@ func TestCompactMonitorEventsBoundsInputAndPreservesCriticalSignals(t *testing.T
 		Observer: "alice",
 		Event:    "raw_message_artifact_emitted",
 		Outcome:  "kept",
-		Detail:   "direction=app_to_parser pcid=relationship_v1 exact_sha256=abc",
+		Detail:   "direction=app_to_parser pcid=relationship_v1 exact_cid=abc",
 	}
 	events[400] = decision.Event{
 		Observer: "bob",

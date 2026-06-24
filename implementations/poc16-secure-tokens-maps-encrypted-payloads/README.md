@@ -34,10 +34,10 @@ current parser-role correction makes the TE-ritig flow executable: local apps
 talk to a container-local parser role, parser roles talk to the transport kernel
 with `kernel_transport_v1`, and peer kernels forward exact envelopes to parser
 roles that promised the matching pCID. The transport kernel inspects the grid
-tag, slot-0 pCID, parent links, exact hash, proof, and kernel-transport control
+tag, slot-0 pCID, parent links, exact CID, proof, and kernel-transport control
 payloads; it does not parse normal application payload fields such as `to` to
 choose app behavior. Replies are correlated by ACK/response envelope parent
-links to exact request message hashes, not by RPC request IDs, so the same
+links to exact request message CIDs, not by RPC request IDs, so the same
 raw-message DAG used for operator review also supports session demux. Source:
 `DI-lutuv`; `DI-lihir`; `DI-kohuj`; `DI-tuhop`; `DI-mosat`; `DI-vopab`;
 `DI-vulit`; `DI-gazin`.
@@ -135,8 +135,8 @@ exception:
     promises paid through credits or bearer storage tokens.
 11. **Persistent multiplexed TCP sessions.** App/kernel and kernel/kernel TCP
     paths should stay open during a run and carry many exact envelopes. A local
-    pending map uses the request message hash as the key, and generated ACKs
-    parent-link that hash so no payload-level RPC request ID is needed.
+    pending map uses the request message CID as the key, and generated ACKs
+    parent-link that CID so no payload-level RPC request ID is needed.
 12. **Signed capability-token bytes.** CAS storage and bearer tokens should be
     signed issuer promises carried as normal pCID-owned payload fields, with
     replay/expiry/scope checks performed by the issuer's local state.
@@ -174,11 +174,11 @@ Apps do not mount or read the observer volume; instead, each app emits a one-way
 `message_artifact` record to stdout, the local supervisor forwards it to the
 observer-only collector, and the collector writes:
 
-- `/run/poc16/<run_id>/message-cas/<exact_sha256>.cbor` — binary CBOR envelope
+- `/run/poc16/<run_id>/message-cas/<exact_cid>.cbor` — binary CBOR envelope
   bytes exactly as sent, received, or acknowledged.
 - `/run/poc16/<run_id>/message-dag.jsonl` — one JSON index row per artifact,
-  including observer, direction, peer, pCID name, exact hash, optional parent
-  exact hash, promise meaning, and relative artifact path.
+  including observer, direction, peer, pCID name, exact CID, optional parent
+  exact CID, promise meaning, and relative artifact path.
 
 `poc16-analyze` validates the index by reading each `.cbor` artifact and
 recomputing its exact SHA-256 before the clean regression can pass. It traverses
@@ -191,11 +191,11 @@ the retained artifacts:
 
 ```sh
 docker compose run --rm --entrypoint /usr/local/bin/poc16-cbor-diag \
-  event-collector -hash <exact_sha256>
+  event-collector -cid <exact_cid>
 ```
 
 The tool reads `message-dag.jsonl`, opens the matching
-`message-cas/<exact_sha256>.cbor` artifact, and prints CBOR diagnostic notation
+`message-cas/<exact_cid>.cbor` artifact, and prints CBOR diagnostic notation
 with nested payload/proof byte strings expanded when they contain valid CBOR.
 It is read-only and does not affect app, parser-role, or transport-kernel
 behavior. Source: `DI-bapif`.
@@ -400,7 +400,7 @@ stream. Each parser role opens one parser/kernel control stream using
 `kernel_transport_v1`, and kernels keep reusable peer-kernel sessions per
 endpoint. Fresh inbound frames are handled as ordinary signed PromiseGrid
 envelopes; replies are matched to pending requests only when their envelope
-parent links include the exact request hash.
+parent links include the exact request CID.
 
 This is intentionally not an RPC channel. There is no universal method name,
 request number, route authority, or kernel-owned trust judgment. The kernel owns
@@ -468,4 +468,4 @@ Remaining analyzer targets are:
   records the TE that motivates the POC16 design.
 - `../../docs/thought-experiments/TE-lubid-poc16-persistent-multiplexed-sessions.md`
   records the TE for persistent multiplexed app/kernel and kernel/kernel
-  sessions keyed by exact request message hashes.
+  sessions keyed by exact request message CIDs.

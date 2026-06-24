@@ -77,7 +77,7 @@ func (node *Node) runRoutePromiseWorkflow() error {
 	node.record("route_reachability_confirmed", "kept", "dave", "pcid="+pcid.RouteV1+" route_id="+primaryRoute.ID+" status=reachable")
 	node.record("route_durability_promised", "kept", "bob", "pcid="+pcid.RouteV1+" route_id="+primaryRoute.ID+" ttl_messages="+primaryRoute.TTLMessages)
 	node.record("route_asymmetric_response_path_promised", "kept", "dave", "pcid="+pcid.RouteV1+" route_id="+primaryRoute.ID+" response_path="+primaryRoute.ResponsePath)
-	carriedFields := routeHopFieldsForSpec(primaryRoute, node.Agent.Name, "bob", production.PromiseRouteForward, routeMessageKindCarried, setupAck.ExactHash)
+	carriedFields := routeHopFieldsForSpec(primaryRoute, node.Agent.Name, "bob", production.PromiseRouteForward, routeMessageKindCarried, setupAck.ExactCID)
 	carriedFields["carried_pcid"] = pcid.RelationshipV1
 	carriedFields["carried_promise"] = "Alice promises to send one bounded relationship_v1 payload only after route reachability was confirmed."
 	node.record("route_carried_message_sent", "kept", "bob", "pcid="+pcid.RouteV1+" route_id="+primaryRoute.ID+" carried_pcid="+pcid.RelationshipV1)
@@ -89,10 +89,10 @@ func (node *Node) runRoutePromiseWorkflow() error {
 		return fmt.Errorf("route carried status %q", carriedAck.Fields["route_status"])
 	}
 	node.record("route_carried_message_delivered", "kept", "dave", "pcid="+pcid.RouteV1+" route_id="+primaryRoute.ID+" carried_pcid="+pcid.RelationshipV1)
-	reusedFields := routePayloadParentHopFieldsForSpec(primaryRoute, node.Agent.Name, "bob", production.PromiseRouteForward, routeMessageKindCarried, carriedAck.ExactHash)
+	reusedFields := routePayloadParentHopFieldsForSpec(primaryRoute, node.Agent.Name, "bob", production.PromiseRouteForward, routeMessageKindCarried, carriedAck.ExactCID)
 	reusedFields["carried_pcid"] = pcid.RelationshipV1
 	reusedFields["carried_promise"] = "Alice promises to reuse the previously confirmed route for a second bounded relationship_v1 payload within the explicit route lifetime."
-	node.record("route_reused_message_sent", "kept", "bob", "pcid="+pcid.RouteV1+" route_id="+primaryRoute.ID+" payload_parent="+carriedAck.ExactHash)
+	node.record("route_reused_message_sent", "kept", "bob", "pcid="+pcid.RouteV1+" route_id="+primaryRoute.ID+" payload_parent="+carriedAck.ExactCID)
 	reusedAck, reusedErr := node.sendAndReceive("bob", reusedFields)
 	if reusedErr != nil {
 		return fmt.Errorf("route reused message: %w", reusedErr)
@@ -108,8 +108,8 @@ func (node *Node) runRoutePromiseWorkflow() error {
 	// Source: DI-mapop
 	node.record("route_lifetime_exhausted", "kept", "bob", "pcid="+pcid.RouteV1+" route_id="+primaryRoute.ID+" ttl_messages="+primaryRoute.TTLMessages+" used_messages=2")
 	node.record("route_expired_message_not_sent", "non_commitment", "bob", "pcid="+pcid.RouteV1+" route_id="+primaryRoute.ID+" Alice does not send a third carried message after local route expiry")
-	renewalFields := routeHopFieldsForSpec(primaryRoute, node.Agent.Name, "bob", production.PromiseRouteSetup, routeMessageKindSetup, reusedAck.ExactHash)
-	node.record("route_renewal_requested", "kept", "bob", "pcid="+pcid.RouteV1+" route_id="+primaryRoute.ID+" parent="+reusedAck.ExactHash)
+	renewalFields := routeHopFieldsForSpec(primaryRoute, node.Agent.Name, "bob", production.PromiseRouteSetup, routeMessageKindSetup, reusedAck.ExactCID)
+	node.record("route_renewal_requested", "kept", "bob", "pcid="+pcid.RouteV1+" route_id="+primaryRoute.ID+" parent="+reusedAck.ExactCID)
 	renewalAck, renewalErr := node.sendAndReceive("bob", renewalFields)
 	if renewalErr != nil {
 		return fmt.Errorf("route renewal: %w", renewalErr)
@@ -126,7 +126,7 @@ func (node *Node) runRoutePromiseWorkflow() error {
 
 // handleRoutePromise handles one route_v1 hop from the local app's own vantage.
 // Intent: Every hop signs a fresh pCID-owned route_v1 promise and references the
-// previous exact envelope hash as parent context; no hop claims authority over
+// previous exact envelope CID as parent context; no hop claims authority over
 // downstream peers or final delivery beyond its own observed next-hop outcome.
 // Source: DI-lihir
 func (node *Node) handleRoutePromise(message parsedMessage) (map[string]string, error) {
@@ -145,17 +145,17 @@ func (node *Node) handleRoutePromise(message parsedMessage) (map[string]string, 
 		node.record("route_payment_promised", "kept", fields["from"], "pcid="+pcid.RouteV1+" route_id="+fields["route_id"]+" payment="+fields["route_payment"])
 		node.record("route_credit_earned", "kept", fields["from"], "pcid="+pcid.RouteV1+" route_id="+fields["route_id"]+" credit="+fields["route_payment"])
 	}
-	if len(message.ParentExactSHA256s) > 0 {
-		node.record("route_multiarity_parent_slot_received", "kept", fields["from"], "pcid="+pcid.RouteV1+" route_id="+fields["route_id"]+" parent="+message.ParentExactSHA256s[0])
+	if len(message.ParentCIDs) > 0 {
+		node.record("route_multiarity_parent_slot_received", "kept", fields["from"], "pcid="+pcid.RouteV1+" route_id="+fields["route_id"]+" parent="+message.ParentCIDs[0])
 	}
-	if fields["payload_parent_exact_sha256"] != "" {
-		node.record("route_payload_parent_link_received", "kept", fields["from"], "pcid="+pcid.RouteV1+" route_id="+fields["route_id"]+" payload_parent="+fields["payload_parent_exact_sha256"])
+	if fields["payload_parent_cid"] != "" {
+		node.record("route_payload_parent_link_received", "kept", fields["from"], "pcid="+pcid.RouteV1+" route_id="+fields["route_id"]+" payload_parent="+fields["payload_parent_cid"])
 	}
-	forwardFields := routeHopFieldsForSpec(routeSpecFromFields(fields), node.Agent.Name, nextHop, production.PromiseRouteForward, fields["route_message_kind"], message.ExactHash)
-	for _, key := range []string{"carried_pcid", "carried_promise", "carried_envelope_b64", "payload_parent_exact_sha256", "route_setup_parent", "route_response_path"} {
+	forwardFields := routeHopFieldsForSpec(routeSpecFromFields(fields), node.Agent.Name, nextHop, production.PromiseRouteForward, fields["route_message_kind"], message.ExactCID)
+	for _, key := range []string{"carried_pcid", "carried_promise", "carried_envelope_b64", "payload_parent_cid", "route_setup_parent", "route_response_path"} {
 		forwardFields[key] = fields[key]
 	}
-	if fields["payload_parent_exact_sha256"] != "" {
+	if fields["payload_parent_cid"] != "" {
 		forwardFields["parent_link_location"] = "payload"
 	}
 	downstreamAck, downstreamErr := node.sendAndReceive(nextHop, forwardFields)
@@ -170,28 +170,28 @@ func (node *Node) handleRoutePromise(message parsedMessage) (map[string]string, 
 	}
 	node.record("route_forward_promise_kept", "kept", nextHop, "pcid="+pcid.RouteV1+" route_id="+fields["route_id"]+" downstream_status="+downstreamAck.Fields["route_status"])
 	return map[string]string{
-		"promise_about":           production.PromiseRouteReachability,
-		"route_id":                fields["route_id"],
-		"route_path":              fields["route_path"],
-		"route_status":            downstreamAck.Fields["route_status"],
-		"route_final":             fields["route_final"],
-		"route_parent_exact_hash": message.ExactHash,
-		"route_final_ack_hash":    downstreamAck.ExactHash,
-		"route_message_kind":      fields["route_message_kind"],
+		"promise_about":       production.PromiseRouteReachability,
+		"route_id":            fields["route_id"],
+		"route_path":          fields["route_path"],
+		"route_status":        downstreamAck.Fields["route_status"],
+		"route_final":         fields["route_final"],
+		"route_parent_cid":    message.ExactCID,
+		"route_final_ack_cid": downstreamAck.ExactCID,
+		"route_message_kind":  fields["route_message_kind"],
 	}, nil
 }
 
 func (node *Node) handleFinalRouteHop(message parsedMessage) (map[string]string, error) {
 	fields := message.Fields
-	if len(message.ParentExactSHA256s) > 0 {
-		node.record("route_multiarity_parent_slot_received", "kept", fields["from"], "pcid="+pcid.RouteV1+" route_id="+fields["route_id"]+" parent="+message.ParentExactSHA256s[0])
+	if len(message.ParentCIDs) > 0 {
+		node.record("route_multiarity_parent_slot_received", "kept", fields["from"], "pcid="+pcid.RouteV1+" route_id="+fields["route_id"]+" parent="+message.ParentCIDs[0])
 	}
-	if fields["payload_parent_exact_sha256"] != "" {
-		node.record("route_payload_parent_link_received", "kept", fields["from"], "pcid="+pcid.RouteV1+" route_id="+fields["route_id"]+" payload_parent="+fields["payload_parent_exact_sha256"])
+	if fields["payload_parent_cid"] != "" {
+		node.record("route_payload_parent_link_received", "kept", fields["from"], "pcid="+pcid.RouteV1+" route_id="+fields["route_id"]+" payload_parent="+fields["payload_parent_cid"])
 	}
 	if fields["route_message_kind"] == routeMessageKindCarried {
 		node.record("route_carried_message_received", "kept", fields["from"], "pcid="+pcid.RouteV1+" route_id="+fields["route_id"]+" carried_pcid="+fields["carried_pcid"])
-		carriedAckHash, carriedErr := node.handleRouteCarriedEnvelope(fields)
+		carriedAckCID, carriedErr := node.handleRouteCarriedEnvelope(fields)
 		if carriedErr != nil {
 			return nil, carriedErr
 		}
@@ -199,15 +199,15 @@ func (node *Node) handleFinalRouteHop(message parsedMessage) (map[string]string,
 			node.record("route_asymmetric_response_path_handled", "kept", fields["from"], "pcid="+pcid.RouteV1+" route_id="+fields["route_id"]+" response_path="+fields["route_response_path"])
 		}
 		return map[string]string{
-			"promise_about":           production.PromiseRouteReachability,
-			"route_id":                fields["route_id"],
-			"route_path":              fields["route_path"],
-			"route_status":            "delivered",
-			"route_final":             node.Agent.Name,
-			"route_parent_exact_hash": message.ExactHash,
-			"route_message_kind":      routeMessageKindCarried,
-			"carried_pcid":            fields["carried_pcid"],
-			"carried_ack_exact_hash":  carriedAckHash,
+			"promise_about":      production.PromiseRouteReachability,
+			"route_id":           fields["route_id"],
+			"route_path":         fields["route_path"],
+			"route_status":       "delivered",
+			"route_final":        node.Agent.Name,
+			"route_parent_cid":   message.ExactCID,
+			"route_message_kind": routeMessageKindCarried,
+			"carried_pcid":       fields["carried_pcid"],
+			"carried_ack_cid":    carriedAckCID,
 		}, nil
 	}
 	node.record("route_reachability_promised", "kept", fields["from"], "pcid="+pcid.RouteV1+" route_id="+fields["route_id"]+" final="+node.Agent.Name)
@@ -215,13 +215,13 @@ func (node *Node) handleFinalRouteHop(message parsedMessage) (map[string]string,
 		node.record("route_asymmetric_response_path_promised", "kept", fields["from"], "pcid="+pcid.RouteV1+" route_id="+fields["route_id"]+" response_path="+fields["route_response_path"])
 	}
 	return map[string]string{
-		"promise_about":           production.PromiseRouteReachability,
-		"route_id":                fields["route_id"],
-		"route_path":              fields["route_path"],
-		"route_status":            "reachable",
-		"route_final":             node.Agent.Name,
-		"route_parent_exact_hash": message.ExactHash,
-		"route_message_kind":      routeMessageKindSetup,
+		"promise_about":      production.PromiseRouteReachability,
+		"route_id":           fields["route_id"],
+		"route_path":         fields["route_path"],
+		"route_status":       "reachable",
+		"route_final":        node.Agent.Name,
+		"route_parent_cid":   message.ExactCID,
+		"route_message_kind": routeMessageKindSetup,
 	}, nil
 }
 
@@ -238,7 +238,7 @@ func (node *Node) handleRouteCarriedEnvelope(fields map[string]string) (string, 
 		return "", parseErr
 	}
 	node.emitMessageArtifact("route_carried_received", carriedMessage.Fields["from"], carriedMessage.ProtocolName, carriedBytes, carriedMessage.Fields)
-	node.record("route_carried_envelope_validated", "kept", carriedMessage.Fields["from"], "pcid="+carriedMessage.ProtocolName+" route_id="+fields["route_id"]+" exact_sha256="+carriedMessage.ExactHash)
+	node.record("route_carried_envelope_validated", "kept", carriedMessage.Fields["from"], "pcid="+carriedMessage.ProtocolName+" route_id="+fields["route_id"]+" exact_cid="+carriedMessage.ExactCID)
 	if carriedMessage.ProtocolName != fields["carried_pcid"] {
 		return "", fmt.Errorf("carried envelope pCID %s does not match route field %s", carriedMessage.ProtocolName, fields["carried_pcid"])
 	}
@@ -252,7 +252,7 @@ func (node *Node) handleRouteCarriedEnvelope(fields map[string]string) (string, 
 	ackBytes := handlerResult.AckBytes
 	ackFields := handlerResult.Fields
 	if len(ackBytes) == 0 {
-		builtAck, buildErr := node.newRouteCarriedAckBytes(carriedMessage.Fields["from"], carriedMessage.ProtocolCID, carriedMessage.ExactHash, ackFields)
+		builtAck, buildErr := node.newRouteCarriedAckBytes(carriedMessage.Fields["from"], carriedMessage.ProtocolCID, carriedMessage.ExactCID, ackFields)
 		if buildErr != nil {
 			return "", buildErr
 		}
@@ -269,10 +269,10 @@ func (node *Node) handleRouteCarriedEnvelope(fields map[string]string) (string, 
 	case "stdio_agent":
 		node.record("stdio_routed_compute_result_verified", "kept", fields["from"], "pcid="+pcid.CIDComputeV1+" route_id="+fields["route_id"]+" result_cid="+ackMessage.Fields["result_cid"])
 	}
-	return ackMessage.ExactHash, nil
+	return ackMessage.ExactCID, nil
 }
 
-func (node *Node) newRouteCarriedAckBytes(target string, protocolCID protocol.ProtocolCID, parentExactSHA256 string, extraFields map[string]string) ([]byte, error) {
+func (node *Node) newRouteCarriedAckBytes(target string, protocolCID protocol.ProtocolCID, parentCID string, extraFields map[string]string) ([]byte, error) {
 	ackFields := map[string]string{
 		"act":     decision.ActPromise,
 		"from":    node.Agent.Name,
@@ -292,7 +292,7 @@ func (node *Node) newRouteCarriedAckBytes(target string, protocolCID protocol.Pr
 	// envelope parent link names the exact carried request so the message DAG can
 	// correlate it over persistent sessions without an RPC request ID. Source:
 	// DI-vopab
-	ackEnvelope, _, buildErr := node.buildEnvelopeFromFieldsWithParents(protocolName, protocolCID, ackFields, []string{parentExactSHA256})
+	ackEnvelope, _, buildErr := node.buildEnvelopeFromFieldsWithParents(protocolName, protocolCID, ackFields, []string{parentCID})
 	if buildErr != nil {
 		return nil, buildErr
 	}
@@ -356,15 +356,15 @@ func (node *Node) runRoutedRuntimeComputeWorkflow(target string, spec routeSpec)
 	if ack.Fields["route_status"] != "delivered" {
 		return fmt.Errorf("routed %s compute status %q", target, ack.Fields["route_status"])
 	}
-	node.record("route_runtime_compute_message_delivered", "kept", target, "pcid="+pcid.RouteV1+" route_id="+spec.ID+" carried_ack="+ack.Fields["carried_ack_exact_hash"])
+	node.record("route_runtime_compute_message_delivered", "kept", target, "pcid="+pcid.RouteV1+" route_id="+spec.ID+" carried_ack="+ack.Fields["carried_ack_cid"])
 	return nil
 }
 
-func routeHopFields(fromAgent, toAgent, promiseAbout, messageKind, parentExactHash string) map[string]string {
-	return routeHopFieldsForSpec(primaryRouteSpec(), fromAgent, toAgent, promiseAbout, messageKind, parentExactHash)
+func routeHopFields(fromAgent, toAgent, promiseAbout, messageKind, parentCID string) map[string]string {
+	return routeHopFieldsForSpec(primaryRouteSpec(), fromAgent, toAgent, promiseAbout, messageKind, parentCID)
 }
 
-func routeHopFieldsForSpec(spec routeSpec, fromAgent, toAgent, promiseAbout, messageKind, parentExactHash string) map[string]string {
+func routeHopFieldsForSpec(spec routeSpec, fromAgent, toAgent, promiseAbout, messageKind, parentCID string) map[string]string {
 	fields := map[string]string{
 		"act":                decision.ActPromise,
 		"from":               fromAgent,
@@ -385,19 +385,19 @@ func routeHopFieldsForSpec(spec routeSpec, fromAgent, toAgent, promiseAbout, mes
 	if spec.ResponsePath != "" {
 		fields["route_response_path"] = spec.ResponsePath
 	}
-	if parentExactHash == "" {
+	if parentCID == "" {
 		return fields
 	}
-	fields["envelope_parent_exact_sha256"] = parentExactHash
-	fields["parent_exact_sha256"] = parentExactHash
+	fields["envelope_parent_cid"] = parentCID
+	fields["parent_cid"] = parentCID
 	fields["parent_link_location"] = "envelope"
 	return fields
 }
 
-func routePayloadParentHopFieldsForSpec(spec routeSpec, fromAgent, toAgent, promiseAbout, messageKind, parentExactHash string) map[string]string {
+func routePayloadParentHopFieldsForSpec(spec routeSpec, fromAgent, toAgent, promiseAbout, messageKind, parentCID string) map[string]string {
 	fields := routeHopFieldsForSpec(spec, fromAgent, toAgent, promiseAbout, messageKind, "")
-	fields["payload_parent_exact_sha256"] = parentExactHash
-	fields["parent_exact_sha256"] = parentExactHash
+	fields["payload_parent_cid"] = parentCID
+	fields["parent_cid"] = parentCID
 	fields["parent_link_location"] = "payload"
 	return fields
 }

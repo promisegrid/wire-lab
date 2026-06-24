@@ -21,7 +21,7 @@ func TestAnalyzeRunSummarizesEventsAndMonitorReport(t *testing.T) {
 		`{"observer":"alice","event":"direct_peer_unchanged","outcome":"kept","peer":"bob","detail":"outcome=non_commitment trust=0"}`+"\n"+
 		`{"observer":"alice","event":"wasm_module_instantiated","outcome":"kept","peer":"victor","detail":"runtime=wazero"}`+"\n"+
 		`{"observer":"alice","event":"wasm_adapter_ack_received","outcome":"kept","peer":"victor","detail":"pcid=relationship_v1"}`+"\n"+
-		`{"observer":"alice","event":"stdio_cbor_ack_event","outcome":"kept","peer":"victor","detail":"exact_sha256=test"}`+"\n"+
+		`{"observer":"alice","event":"stdio_cbor_ack_event","outcome":"kept","peer":"victor","detail":"exact_cid=test"}`+"\n"+
 		`{"observer":"alice","event":"bearer_token_exchange_rate_observed","outcome":"kept","peer":"grace","detail":"local market signal"}`+"\n"+
 		`{"observer":"alice","event":"mixed_version_successor_pcid_selected","outcome":"kept","peer":"bob","detail":"current pCID"}`+"\n"+
 		`{"observer":"alice","event":"run_internal_restart_recovery_observed","outcome":"kept","peer":"victor","detail":"same-run recovery"}`+"\n")
@@ -77,6 +77,28 @@ func TestAnalyzeRunSummarizesEventsAndMonitorReport(t *testing.T) {
 	}
 	if summary.RestartCounts["run_internal_restart_recovery_observed"] != 1 {
 		t.Fatalf("restart counts not summarized: %#v", summary.RestartCounts)
+	}
+}
+
+func TestRPCDriftIgnoresCIDText(t *testing.T) {
+	cidOnlyEvent := decision.Event{
+		Observer: "grace",
+		Event:    "agent_cas_object_stored",
+		Outcome:  "kept",
+		Detail:   "cid=bafkreiawdkzmmtubglnqbzlm3bqitmbrbnct6bgpsrshnhbl43b3x73deu stored_cid=bafkreifa5lmqgriw2u2mxp4sck6ldm2wy3rpc7d3bahgggaf3g63gqz6sa",
+	}
+	if isRPCDrift(cidOnlyEvent) {
+		t.Fatalf("CID text containing rpc substring should not count as RPC drift")
+	}
+
+	driftEvent := decision.Event{
+		Observer: "alice",
+		Event:    "promise_sent",
+		Outcome:  "kept",
+		Detail:   "Alice promises an RPC method command surface.",
+	}
+	if !isRPCDrift(driftEvent) {
+		t.Fatalf("explicit RPC command vocabulary should count as RPC drift")
 	}
 }
 
@@ -241,15 +263,15 @@ func TestValidateSummaryRejectsMissingArrayPayloadProtocol(t *testing.T) {
 func TestAnalyzeRunSummarizesRawMessageArtifacts(t *testing.T) {
 	runDir := t.TempDir()
 	rawEnvelope := []byte{0xd9, 0x67, 0x72, 0x69, 0x64, 0x83, 0x01, 0x02, 0x03}
-	exactHash := protocol.HashExactBytes(rawEnvelope)
-	writeFile(t, filepath.Join(runDir, "alice.jsonl"), `{"observer":"alice","event":"raw_message_artifact_emitted","outcome":"kept","peer":"bob","detail":"direction=sent pcid=route_v1 exact_sha256=`+exactHash+`"}`+"\n")
+	exactCID := protocol.CIDForExactBytes(rawEnvelope)
+	writeFile(t, filepath.Join(runDir, "alice.jsonl"), `{"observer":"alice","event":"raw_message_artifact_emitted","outcome":"kept","peer":"bob","detail":"direction=sent pcid=route_v1 exact_cid=`+exactCID+`"}`+"\n")
 	writeFile(t, filepath.Join(runDir, "monitor-report.json"), `{"promise_theory_fit":5,"autonomy":5,"protocol_validity":5,"local_trust_correctness":5,"imposition_avoidance":5,"summary":"clean","concerns":[]}`)
 	messageCASDir := filepath.Join(runDir, "message-cas")
 	if err := os.Mkdir(messageCASDir, 0o755); err != nil {
 		t.Fatalf("make message CAS dir: %v", err)
 	}
-	writeBytes(t, filepath.Join(messageCASDir, exactHash+".cbor"), rawEnvelope)
-	writeFile(t, filepath.Join(runDir, "message-dag.jsonl"), `{"source":"alice/agent:alice/stdout","observer":"alice","direction":"sent","peer":"bob","protocol":"route_v1","exact_sha256":"`+exactHash+`","path":"message-cas/`+exactHash+`.cbor"}`+"\n")
+	writeBytes(t, filepath.Join(messageCASDir, exactCID+".cbor"), rawEnvelope)
+	writeFile(t, filepath.Join(runDir, "message-dag.jsonl"), `{"source":"alice/agent:alice/stdout","observer":"alice","direction":"sent","peer":"bob","protocol":"route_v1","exact_cid":"`+exactCID+`","path":"message-cas/`+exactCID+`.cbor"}`+"\n")
 
 	summary, err := analyzeRun(runDir)
 	if err != nil {
@@ -273,16 +295,16 @@ func TestAnalyzeRunCountsBadPayloadPrefixInRawMessageArtifacts(t *testing.T) {
 	runDir := t.TempDir()
 	rawEnvelope := []byte{0xd9, 0x67, 0x72, 0x69, 0x64, 0x83, 0x01, 0x02, 0x03}
 	rawEnvelope = append(rawEnvelope, obsoletePayloadPrefixBytes()...)
-	exactHash := protocol.HashExactBytes(rawEnvelope)
-	writeFile(t, filepath.Join(runDir, "alice.jsonl"), `{"observer":"alice","event":"raw_message_artifact_emitted","outcome":"kept","peer":"bob","detail":"direction=sent pcid=route_v1 exact_sha256=`+exactHash+`"}`+"\n")
+	exactCID := protocol.CIDForExactBytes(rawEnvelope)
+	writeFile(t, filepath.Join(runDir, "alice.jsonl"), `{"observer":"alice","event":"raw_message_artifact_emitted","outcome":"kept","peer":"bob","detail":"direction=sent pcid=route_v1 exact_cid=`+exactCID+`"}`+"\n")
 	writeFile(t, filepath.Join(runDir, "monitor-report.json"), `{"promise_theory_fit":5,"autonomy":5,"protocol_validity":5,"local_trust_correctness":5,"imposition_avoidance":5,"summary":"clean","concerns":[]}`)
 	messageCASDir := filepath.Join(runDir, "message-cas")
 	if err := os.Mkdir(messageCASDir, 0o755); err != nil {
 		t.Fatalf("make message CAS dir: %v", err)
 	}
-	artifactPath := filepath.Join(messageCASDir, exactHash+".cbor")
+	artifactPath := filepath.Join(messageCASDir, exactCID+".cbor")
 	writeBytes(t, artifactPath, rawEnvelope)
-	writeFile(t, filepath.Join(runDir, "message-dag.jsonl"), `{"cid":"cid://message","path":"message-cas/`+exactHash+`.cbor","exact_sha256":"`+exactHash+`","direction":"sent","protocol":"`+pcid.RouteV1+`","parents":[]}`+"\n")
+	writeFile(t, filepath.Join(runDir, "message-dag.jsonl"), `{"cid":"cid://message","path":"message-cas/`+exactCID+`.cbor","exact_cid":"`+exactCID+`","direction":"sent","protocol":"`+pcid.RouteV1+`","parents":[]}`+"\n")
 
 	summary, err := analyzeRun(runDir)
 	if err != nil {

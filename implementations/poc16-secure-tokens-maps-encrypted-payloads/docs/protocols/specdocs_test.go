@@ -7,10 +7,10 @@ import (
 
 // TestEmbeddedSpecsAreRFCComplete guards the pCID input documents from drifting
 // back into short notes.
-// Intent: Every embedded specdoc is hashed into its pCID and supplied to
-// LLM-backed agents as implementation context, so missing protocol sections are
-// runtime-relevant regressions, not merely documentation style issues. Source:
-// DI-bitug
+// Intent: Every embedded specdoc is content-addressed into its pCID and
+// supplied to LLM-backed agents as implementation context, so missing protocol
+// sections are runtime-relevant regressions, not merely documentation style
+// issues. Source: DI-bitug; DI-sazip
 func TestEmbeddedSpecsAreRFCComplete(t *testing.T) {
 	requiredSections := []string{
 		"## Status",

@@ -1,12 +1,12 @@
 package specdocs
 
 import (
-	"crypto/sha256"
 	"embed"
-	"encoding/hex"
 	"fmt"
 	"sort"
 	"strings"
+
+	"promisegrid.dev/wire-lab/implementations/poc16-secure-tokens-maps-encrypted-payloads/protocol"
 )
 
 // docs embeds the implementation-local POC16 protocol specs used for pCID
@@ -18,7 +18,7 @@ import (
 // docs/protocols path so root docs do not become a stale competing authority.
 // Source: DI-vulit; DI-magug
 //
-//go:embed *.md
+//go:embed accounting-v1.md cas-storage-v1.md cid-compute-v1.md encrypted-payload-v1.md identity-key-v1.md kernel-receive-v1.md kernel-transport-v1.md map-payload-profile-v1.md message-shape-cose-payload-v1.md message-shape-cose-proof-v1.md message-shape-envelope-parents-v1.md message-shape-native-proof-v1.md message-shape-payload-parents-v1.md message-shape-transport-v1.md parser-builder-role-v1.md postal-scale-v1.md printer-port-v1.md production-shipping-v1.md relationship-v1.md route-v1.md secure-capability-v1.md ups-label-v1.md
 var docs embed.FS
 
 var protocolFiles = map[string]string{
@@ -46,6 +46,22 @@ var protocolFiles = map[string]string{
 	"ups_label_v1":                      "ups-label-v1.md",
 }
 
+// Names returns every local protocol label in deterministic order.
+func Names() []string {
+	names := make([]string, 0, len(protocolFiles))
+	for name := range protocolFiles {
+		names = append(names, name)
+	}
+	sort.Strings(names)
+	return names
+}
+
+// FileFor returns the canonical human-readable spec filename for a protocol.
+func FileFor(protocolName string) (string, bool) {
+	fileName, ok := protocolFiles[protocolName]
+	return fileName, ok
+}
+
 // BytesFor returns the exact embedded spec bytes for one protocol name.
 func BytesFor(protocolName string) ([]byte, error) {
 	fileName, ok := protocolFiles[protocolName]
@@ -61,11 +77,11 @@ func BytesFor(protocolName string) ([]byte, error) {
 	return copiedBytes, nil
 }
 
-// SpecContext is one embedded spec excerpt plus a content hash of the embedded
-// bytes supplied to an agent.
+// SpecContext is one embedded spec excerpt plus the pCID of the embedded bytes
+// supplied to an agent.
 type SpecContext struct {
 	Name    string
-	SHA256  string
+	CID     string
 	Excerpt string
 }
 
@@ -90,14 +106,13 @@ func ContextFor(protocolName string, maxExcerptBytes int) (SpecContext, error) {
 	if bytesErr != nil {
 		return SpecContext{}, bytesErr
 	}
-	digest := sha256.Sum256(specBytes)
 	excerpt := strings.TrimSpace(string(specBytes))
 	if maxExcerptBytes > 0 && len(excerpt) > maxExcerptBytes {
 		excerpt = excerpt[:maxExcerptBytes] + "\n..."
 	}
 	return SpecContext{
 		Name:    protocolName,
-		SHA256:  hex.EncodeToString(digest[:]),
+		CID:     protocol.CIDForExactBytes(specBytes),
 		Excerpt: excerpt,
 	}, nil
 }

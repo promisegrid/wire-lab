@@ -133,7 +133,7 @@ type ProductionFitnessReport struct {
 }
 
 // messageDAGRecord mirrors the collector's run-scoped message DAG index.
-// Intent: The analyzer validates actual binary `.cbor` artifacts by hash so a
+// Intent: The analyzer validates actual binary `.cbor` artifacts by CID so a
 // clean run cannot pass by logging message-like events without retaining the
 // messages themselves. Source: DI-tuhop
 type messageDAGRecord struct {
@@ -142,8 +142,8 @@ type messageDAGRecord struct {
 	Direction          string `json:"direction"`
 	Peer               string `json:"peer"`
 	Protocol           string `json:"protocol"`
-	ExactSHA256        string `json:"exact_sha256"`
-	ParentExactSHA256  string `json:"parent_exact_sha256,omitempty"`
+	ExactCID           string `json:"exact_cid"`
+	ParentCID          string `json:"parent_cid,omitempty"`
 	ParentLinkLocation string `json:"parent_link_location,omitempty"`
 	PromiseAbout       string `json:"promise_about,omitempty"`
 	SourceEvent        string `json:"source_event,omitempty"`
@@ -491,7 +491,7 @@ func monitorScoreFailures(report decision.MonitorReport, minimum int) []string {
 // message DAG index for one run.
 // Intent: POC16 should fail loudly if it only records summaries about messages.
 // The analyzer reads the collector-owned index, validates each binary `.cbor`
-// artifact by exact hash, and counts directions/protocols without mutating run
+// artifact by exact CID, and counts directions/protocols without mutating run
 // state or treating the artifacts as authority over any agent. Source: DI-tuhop
 func summarizeMessageArtifacts(runDir string, summary *RunSummary) error {
 	indexPath := filepath.Join(runDir, "message-dag.jsonl")
@@ -509,7 +509,7 @@ func summarizeMessageArtifacts(runDir string, summary *RunSummary) error {
 		}
 	}()
 	casObjects := make(map[string]bool)
-	recordsByHash := make(map[string]messageDAGRecord)
+	recordsByCID := make(map[string]messageDAGRecord)
 	scanner := bufio.NewScanner(indexFile)
 	lineNumber := 0
 	for scanner.Scan() {
@@ -526,15 +526,15 @@ func summarizeMessageArtifacts(runDir string, summary *RunSummary) error {
 		if readErr != nil {
 			return fmt.Errorf("%s:%d: read %s: %w", indexPath, lineNumber, artifactPath, readErr)
 		}
-		actualHash := protocol.HashExactBytes(artifactBytes)
-		if actualHash != record.ExactSHA256 {
-			return fmt.Errorf("%s:%d: artifact hash mismatch record=%s actual=%s", indexPath, lineNumber, record.ExactSHA256, actualHash)
+		actualCID := protocol.CIDForExactBytes(artifactBytes)
+		if actualCID != record.ExactCID {
+			return fmt.Errorf("%s:%d: artifact cid mismatch record=%s actual=%s", indexPath, lineNumber, record.ExactCID, actualCID)
 		}
 		if bytes.Contains(artifactBytes, obsoletePayloadPrefixBytes()) {
 			summary.MessageArtifactBadPrefixCount++
 		}
 		summary.MessageDAGRecordCount++
-		if record.ParentExactSHA256 != "" {
+		if record.ParentCID != "" {
 			summary.MessageDAGParentLinkCount++
 			summary.MessageDAGParentLocationCounts[firstNonEmpty(record.ParentLinkLocation, "unspecified")]++
 		} else if isAckArtifactDirection(record.Direction) {
@@ -542,13 +542,13 @@ func summarizeMessageArtifacts(runDir string, summary *RunSummary) error {
 		}
 		summary.MessageArtifactDirectionCounts[record.Direction]++
 		summary.MessageArtifactProtocolCounts[record.Protocol]++
-		casObjects[record.ExactSHA256] = true
-		recordsByHash[record.ExactSHA256] = record
+		casObjects[record.ExactCID] = true
+		recordsByCID[record.ExactCID] = record
 	}
 	if scanErr := scanner.Err(); scanErr != nil {
 		return scanErr
 	}
-	summarizeMessageDAGTraversal(recordsByHash, summary)
+	summarizeMessageDAGTraversal(recordsByCID, summary)
 	summary.MessageArtifactCount = summary.MessageDAGRecordCount
 	summary.MessageCASObjectCount = len(casObjects)
 	return nil
@@ -561,15 +561,15 @@ func summarizeMessageArtifacts(runDir string, summary *RunSummary) error {
 // not only counted as independent files. Missing parents or cycles are POC
 // failures because they make later message-history review unreliable. Source:
 // DI-kohuj
-func summarizeMessageDAGTraversal(recordsByHash map[string]messageDAGRecord, summary *RunSummary) {
-	summary.MessageDAGNodeCount = len(recordsByHash)
-	depthMemo := make(map[string]int, len(recordsByHash))
-	visiting := make(map[string]bool, len(recordsByHash))
-	for exactHash, record := range recordsByHash {
-		if record.ParentExactSHA256 == "" {
+func summarizeMessageDAGTraversal(recordsByCID map[string]messageDAGRecord, summary *RunSummary) {
+	summary.MessageDAGNodeCount = len(recordsByCID)
+	depthMemo := make(map[string]int, len(recordsByCID))
+	visiting := make(map[string]bool, len(recordsByCID))
+	for exactCID, record := range recordsByCID {
+		if record.ParentCID == "" {
 			summary.MessageDAGRootCount++
 		}
-		depth, ok := messageDAGDepth(exactHash, recordsByHash, depthMemo, visiting)
+		depth, ok := messageDAGDepth(exactCID, recordsByCID, depthMemo, visiting)
 		if ok {
 			summary.MessageDAGReachableCount++
 			if depth > summary.MessageDAGMaxDepth {
@@ -581,29 +581,29 @@ func summarizeMessageDAGTraversal(recordsByHash map[string]messageDAGRecord, sum
 	}
 }
 
-func messageDAGDepth(exactHash string, recordsByHash map[string]messageDAGRecord, depthMemo map[string]int, visiting map[string]bool) (int, bool) {
-	if depth, ok := depthMemo[exactHash]; ok {
+func messageDAGDepth(exactCID string, recordsByCID map[string]messageDAGRecord, depthMemo map[string]int, visiting map[string]bool) (int, bool) {
+	if depth, ok := depthMemo[exactCID]; ok {
 		return depth, true
 	}
-	record, ok := recordsByHash[exactHash]
+	record, ok := recordsByCID[exactCID]
 	if !ok {
 		return 0, false
 	}
-	if record.ParentExactSHA256 == "" {
-		depthMemo[exactHash] = 1
+	if record.ParentCID == "" {
+		depthMemo[exactCID] = 1
 		return 1, true
 	}
-	if visiting[exactHash] {
+	if visiting[exactCID] {
 		return 0, false
 	}
-	visiting[exactHash] = true
-	parentDepth, parentOK := messageDAGDepth(record.ParentExactSHA256, recordsByHash, depthMemo, visiting)
-	delete(visiting, exactHash)
+	visiting[exactCID] = true
+	parentDepth, parentOK := messageDAGDepth(record.ParentCID, recordsByCID, depthMemo, visiting)
+	delete(visiting, exactCID)
 	if !parentOK {
 		return 0, false
 	}
 	depth := parentDepth + 1
-	depthMemo[exactHash] = depth
+	depthMemo[exactCID] = depth
 	return depth, true
 }
 
@@ -1092,13 +1092,13 @@ func summarizeLog(logPath string, summary *RunSummary) error {
 		}
 		if isPersistentSessionEvent(event.Event) {
 			summary.PersistentSessionCounts[event.Event]++
-			sessionID := detailValue(event.Detail, "session_id")
-			if sessionID != "" {
+			sessionKey := persistentSessionLifecycleKey(event)
+			if sessionKey != "" {
 				if event.Event == "persistent_session_opened" {
-					summary.PersistentSessionOpenCounts[sessionID]++
+					summary.PersistentSessionOpenCounts[sessionKey]++
 				}
 				if event.Event == "persistent_session_terminal" {
-					summary.PersistentSessionTerminalCounts[sessionID]++
+					summary.PersistentSessionTerminalCounts[sessionKey]++
 					reason := firstNonEmpty(detailValue(event.Detail, "reason"), "unspecified")
 					summary.PersistentSessionTerminalReasonCounts[reason]++
 				}
@@ -1120,6 +1120,22 @@ func summarizeLog(logPath string, summary *RunSummary) error {
 		return err
 	}
 	return nil
+}
+
+func persistentSessionLifecycleKey(event decision.Event) string {
+	// Intent: POC16 session IDs are local runtime counters, not content hashes.
+	// Analyzer lifecycle accounting therefore keys by the event observer and
+	// transport session name before adding the local ID, avoiding false leaks
+	// when different agents each emit session-000001. Source: DI-sazip
+	sessionID := detailValue(event.Detail, "session_id")
+	if sessionID == "" {
+		return ""
+	}
+	sessionName := detailValue(event.Detail, "session")
+	if sessionName == "" {
+		sessionName = firstNonEmpty(event.Peer, "unknown-peer")
+	}
+	return event.Observer + "|" + sessionName + "|" + sessionID
 }
 
 func finalizePersistentSessionLifecycle(summary *RunSummary) {
@@ -1582,13 +1598,43 @@ func addScore(score *int, kept bool) {
 }
 
 func isRPCDrift(event decision.Event) bool {
-	text := strings.ToLower(event.Event + " " + event.Detail)
-	for _, badTerm := range []string{"rpc", "rpc method", "command", "permission", "authorization", "conformance", "enforce", "pcid-as-address", "pcid as address", "service registry", "service-registry"} {
-		if strings.Contains(text, badTerm) {
+	text := normalizedVocabularyText(event.Event + " " + event.Detail)
+	paddedText := " " + text + " "
+	for _, badPhrase := range []string{"rpc method", "pcid as address", "service registry"} {
+		if strings.Contains(paddedText, " "+badPhrase+" ") {
+			return true
+		}
+	}
+	for _, word := range strings.Fields(text) {
+		switch word {
+		case "rpc", "command", "commands", "permission", "permissions", "authorization", "authorizations", "conformance", "enforce", "enforced", "enforcement":
 			return true
 		}
 	}
 	return false
+}
+
+func normalizedVocabularyText(text string) string {
+	// Intent: Analyzer anti-RPC gates should catch human vocabulary, not the
+	// accidental appearance of words such as "rpc" inside CIDv1 base32 strings.
+	// Source: DI-sazip
+	replacer := strings.NewReplacer(
+		"_", " ",
+		"-", " ",
+		":", " ",
+		"=", " ",
+		"/", " ",
+		".", " ",
+		",", " ",
+		";", " ",
+		"(", " ",
+		")", " ",
+		"[", " ",
+		"]", " ",
+		"{", " ",
+		"}", " ",
+	)
+	return strings.Join(strings.Fields(replacer.Replace(strings.ToLower(text))), " ")
 }
 
 func isShippingEvent(eventName string) bool {

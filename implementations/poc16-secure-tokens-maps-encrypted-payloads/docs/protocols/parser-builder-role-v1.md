@@ -54,7 +54,7 @@ reserved/core body keys, non-text body keys or values, or trailing CBOR bytes.
 Typical `promise_about` values are `parser_role_available`,
 `builder_role_available`, `app_receive_promise`, `parsed_delivery`,
 `builder_non_commitment`, and `malformed_payload`. Detail keys SHOULD include
-`pcid_name`, `pcid_cid`, `app_name`, `exact_sha256`, `parent_exact_sha256`, and
+`pcid_name`, `pcid_cid`, `app_name`, `exact_cid`, `parent_cid`, and
 `reason` when applicable.
 
 ## Sender behavior

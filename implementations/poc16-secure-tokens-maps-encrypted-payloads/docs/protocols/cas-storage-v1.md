@@ -111,7 +111,7 @@ grid([42(pCID),
   ["bob", "alice", "store_content",
     ["kept", "I promise to store this object for this run in exchange for Alice storage credits.",
      "capacity available"],
-    ["stored", "cas-44", "cidv1-raw-sha2-256:...", "SGVsbG8=", "alice-credit:2",
+    ["stored", "cas-44", "bafkrei...", "SGVsbG8=", "alice-credit:2",
      "2", "", "", "", "frank", "replica-token-b64"]
   ], proof
 ])

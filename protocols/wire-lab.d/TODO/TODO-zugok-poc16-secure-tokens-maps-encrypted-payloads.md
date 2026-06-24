@@ -130,6 +130,15 @@ Intent: Clean-run shutdown closes many app, parser, inbound-peer, and outbound-p
 Constraints: Do not weaken analyzer terminal-session gates; preserve exactly one terminal record per persistent session; still attempt underlying TCP close; keep deferred-close records as transport lifecycle accounting, not peer trust evidence; do not add observer-volume coordination or global monitoring semantics.
 Affects: implementations/poc16-secure-tokens-maps-encrypted-payloads/transport/persistent_session.go; protocols/wire-lab.d/TODO/TODO-zugok-poc16-secure-tokens-maps-encrypted-payloads.md.
 
+ID: DI-gupiz
+Date: 2026-06-24 14:00:47 PDT
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: POC16 parser roles and transport kernels must emit terminal lifecycle records for their long-lived control and peer sessions before waiting on late handler drain during shutdown.
+Intent: Clean-run validation exposed a shutdown race where a busy parser role could wait on app-facing handler drain before closing its parser/kernel control session, and a busy transport kernel could spend shutdown time on app/control cleanup before recording peer-session terminal states. These are local transport lifecycle records, not peer trust facts, and they need to be emitted as early as possible once shutdown starts so supervisor kill boundaries and late handler drain cannot hide them.
+Constraints: Do not weaken analyzer terminal-session gates; preserve process-per-role architecture; keep shutdown bounded; do not add observer-volume coordination; keep app ACK handling best-effort during shutdown; continue treating session lifecycle accounting as local runtime health, not PromiseGrid authority or peer trust evidence.
+Affects: implementations/poc16-secure-tokens-maps-encrypted-payloads/parserrole/parserrole.go; implementations/poc16-secure-tokens-maps-encrypted-payloads/kernel/kernel.go; implementations/poc16-secure-tokens-maps-encrypted-payloads/cmd/poc16-analyze/main.go; protocols/wire-lab.d/TODO/TODO-zugok-poc16-secure-tokens-maps-encrypted-payloads.md.
+
 ID: DI-mapah
 Date: 2026-06-23 11:12:52 PDT
 Status: active
@@ -138,6 +147,34 @@ Decision: Replace POC16 flexible array-of-pairs body payloads with nested CBOR m
 Intent: If a flexible body already carries text keys, an array of `[key, value]` pairs has little benefit over a CBOR map and creates a design hazard by encouraging flattened Go projections where body keys can overwrite core promise fields such as `from`, `to`, `promise_about`, or derived `payload_protocol`. Flexible pCID-owned protocols should keep core promise slots positional while putting keyed details in a separate nested CBOR map namespace. Constrained protocols that need compactness should use pCID-specific positional body arrays instead.
 Constraints: Preserve `grid([42(pCID), ...])`; preserve pCID-owned payload semantics; do not parse historical pair-list bodies; reject reserved/core body-map keys even though the body is nested; keep runtime compatibility projections local to parser/runtime edges; update POC16 protocol specs and the POC17 handoff TODO so future constrained-device work does not copy the old pair-list shape.
 Affects: implementations/poc16-secure-tokens-maps-encrypted-payloads/protocol/; implementations/poc16-secure-tokens-maps-encrypted-payloads/docs/protocols/; protocols/wire-lab.d/TODO/TODO-zugok-poc16-secure-tokens-maps-encrypted-payloads.md; protocols/wire-lab.d/TODO/TODO-komon-poc17-m4-lora-runtime.md.
+
+ID: DI-sazip
+Date: 2026-06-24 12:54:43 PDT
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Treat every hash-like protocol, storage, parent, artifact, and registry identifier in POC16 as a CID: binary CID bytes on the wire and canonical CIDv1 base32 text wherever printable.
+Intent: PromiseGrid is intentionally interoperating with the IPFS/IPLD/Bluesky ecosystem. Bare SHA-256 hex strings and POC-local pseudo-CID strings create unnecessary translation points, invite digest-only dispatch bugs, and hide whether a value is a real CID. POC16 should use a well-known Go CID library, hardcode authoritative base32 pCID constants in code, keep human-readable protocol names as comments/metadata only, name CAS objects by base32 CIDs, and expose message parent/artifact identities as CIDs rather than bare hashes.
+Constraints: Preserve `grid([42(pCID), ...])`; preserve pCID-as-protocol-spec, not address or operation; use binary CIDs in CBOR/tag-42 slots; render CIDs as CIDv1 base32 with multibase `b` prefix in filenames, JSON, logs, diagnostic CBOR annotations, registry keys, and docs; keep SHA-256 only as an internal digest used by CID construction or cryptographic verification; update POC17 instructions so constrained-radio work starts from the same CID-first rule.
+Affects: implementations/poc16-secure-tokens-maps-encrypted-payloads/; implementations/poc16-secure-tokens-maps-encrypted-payloads/docs/protocols/; protocols/wire-lab.d/TODO/TODO-zugok-poc16-secure-tokens-maps-encrypted-payloads.md; protocols/wire-lab.d/TODO/TODO-komon-poc17-m4-lora-runtime.md; DEV-GUIDE-RESOURCES.md.
+
+ID: DI-katom
+Date: 2026-06-24 14:18:17 PDT
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: POC16 parser-role shutdown must emit the parser/kernel control-session terminal record before app-facing parser sessions can stall cleanup.
+Intent: The clean-run analyzer caught containers where a busy app-facing parser stream prevented the parser/kernel control stream from ever reaching a terminal lifecycle record. The control stream is the parser role's own promise to the transport kernel; its local terminal accounting must not depend on every app-facing stream closing first. App-facing streams should still be closed during the same shutdown pass, but after the control terminal is recorded.
+Constraints: Do not weaken analyzer terminal-session gates; do not treat lifecycle events as peer trust evidence; keep shutdown bounded by `shutdown_grace_millis`; preserve the process-per-role parser/builder architecture and pCID-owned app semantics; supersede only the ordering part of `DI-pajih`.
+Affects: implementations/poc16-secure-tokens-maps-encrypted-payloads/parserrole/parserrole.go; protocols/wire-lab.d/TODO/TODO-zugok-poc16-secure-tokens-maps-encrypted-payloads.md.
+Supersedes: DI-pajih
+
+ID: DI-rudiv
+Date: 2026-06-24 14:19:34 PDT
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: POC16 app runtimes must close their local app/kernel persistent session immediately when the run context is canceled, even if the app has not reached normal runtime completion.
+Intent: Clean-run validation showed that an app can be canceled while inside a turn, external model call, or shutdown grace path and never reach the normal end-of-run cleanup that closes its app/kernel session. The session is a local runtime promise and must produce terminal lifecycle accounting as soon as the process knows it is shutting down.
+Constraints: Do not weaken analyzer terminal-session gates; do not make the app/kernel close a peer trust update; keep normal end-of-run cleanup idempotent; preserve app autonomy and pCID-owned protocol semantics; do not add observer-volume coordination.
+Affects: implementations/poc16-secure-tokens-maps-encrypted-payloads/runtime/node.go; protocols/wire-lab.d/TODO/TODO-zugok-poc16-secure-tokens-maps-encrypted-payloads.md.
 
 ## Scope
 
@@ -272,8 +309,8 @@ Affects: implementations/poc16-secure-tokens-maps-encrypted-payloads/protocol/; 
   the agent promises to send, receive, redeem, verify, store, compute, or route.
 - Record, in run logs, which spec CIDs were supplied to each LLM agent context
   so the analyzer and later human review can verify prompt provenance.
-- Validate that embedded spec bytes hash to the expected pCID before an LLM
-  agent is allowed to rely on that context.
+- Validate that embedded spec bytes produce the expected CIDv1 base32 pCID
+  before an LLM agent is allowed to rely on that context.
 - Keep deterministic handlers code-driven, but tie their tests and comments to
   the same spec docs so deterministic and LLM behavior share one pCID source.
 

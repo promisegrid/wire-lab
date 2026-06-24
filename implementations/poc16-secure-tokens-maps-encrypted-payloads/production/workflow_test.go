@@ -50,7 +50,7 @@ func TestPrintCapabilityTokenAndLocalPrintEvent(t *testing.T) {
 	}
 	labelBytes, labelErr := LabelBytesForShipment(map[string]string{
 		"package_id":      "PKG-1001",
-		"tracking_number": "1Z71051733616616",
+		"tracking_number": ContentCID([]byte("test-label-tracking")),
 		"cost_cents":      "860",
 	})
 	if labelErr != nil {

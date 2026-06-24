@@ -1,10 +1,6 @@
 package protocol
 
-import (
-	"crypto/sha256"
-	"encoding/hex"
-	"fmt"
-)
+import "fmt"
 
 // GridSlot is one already-encoded CBOR item after slot 0 in a PromiseGrid grid
 // message.
@@ -121,18 +117,11 @@ func ParseGridMessage(messageBytes []byte) (GridMessage, error) {
 	if reader.offset != len(reader.data) {
 		return GridMessage{}, fmt.Errorf("trailing cbor bytes in grid message: %d", len(reader.data)-reader.offset)
 	}
-	return GridMessage{ProtocolCID: NewProtocolCIDFromBytes(tagBytes[1:]), Slots: slots}, nil
-}
-
-// RawCIDV1SHA256Bytes returns the CIDv1 raw sha2-256 bytes for any exact object
-// bytes. This is intentionally not a ProtocolCID; parent links name message
-// objects, while pCID names protocol specs.
-func RawCIDV1SHA256Bytes(content []byte) []byte {
-	digest := sha256.Sum256(content)
-	cidBytes := make([]byte, 0, 36)
-	cidBytes = append(cidBytes, 0x01, 0x55, 0x12, 0x20)
-	cidBytes = append(cidBytes, digest[:]...)
-	return cidBytes
+	protocolCID, cidErr := ParseProtocolCIDFromBytes(tagBytes[1:])
+	if cidErr != nil {
+		return GridMessage{}, fmt.Errorf("slot 0 pCID: %w", cidErr)
+	}
+	return GridMessage{ProtocolCID: protocolCID, Slots: slots}, nil
 }
 
 // EncodeTag42LinkArray writes a CBOR array of DAG-CBOR tag-42 links.
@@ -193,16 +182,4 @@ func DecodeTag42LinkArray(arrayBytes []byte) ([][]byte, error) {
 		return nil, fmt.Errorf("trailing cbor bytes in tag42 link array: %d", len(reader.data)-reader.offset)
 	}
 	return cidValues, nil
-}
-
-// ExactSHA256FromRawCIDV1 returns the hex digest when a POC raw CIDv1 sha2-256
-// link names exact message bytes retained in the run CAS.
-// Intent: Parent links should name exact retained message bytes, not payload
-// bytes or protocol CIDs, so the analyzer can traverse byte-faithful history.
-// Source: DI-kohuj
-func ExactSHA256FromRawCIDV1(cidBytes []byte) (string, bool) {
-	if len(cidBytes) != 36 || cidBytes[0] != 0x01 || cidBytes[1] != 0x55 || cidBytes[2] != 0x12 || cidBytes[3] != 0x20 {
-		return "", false
-	}
-	return hex.EncodeToString(cidBytes[4:]), true
 }

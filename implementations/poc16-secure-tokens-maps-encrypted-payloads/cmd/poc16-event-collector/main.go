@@ -40,7 +40,7 @@ type collector struct {
 }
 
 // messageDAGRecord is the operator-facing index row for one raw envelope file.
-// Intent: The index names the exact `.cbor` artifact and optional parent hash
+// Intent: The index names the exact `.cbor` artifact and optional parent CID
 // without embedding raw bytes, so humans and follow-on tools can review the
 // message DAG after a run without treating the event log as the message itself.
 // Source: DI-tuhop
@@ -50,8 +50,8 @@ type messageDAGRecord struct {
 	Direction          string `json:"direction"`
 	Peer               string `json:"peer"`
 	Protocol           string `json:"protocol"`
-	ExactSHA256        string `json:"exact_sha256"`
-	ParentExactSHA256  string `json:"parent_exact_sha256,omitempty"`
+	ExactCID           string `json:"exact_cid"`
+	ParentCID          string `json:"parent_cid,omitempty"`
 	ParentLinkLocation string `json:"parent_link_location,omitempty"`
 	PromiseAbout       string `json:"promise_about,omitempty"`
 	SourceEvent        string `json:"source_event,omitempty"`
@@ -215,19 +215,19 @@ func (runCollector *collector) recordMessageArtifact(source string, artifact eve
 	if decodeErr != nil {
 		return fmt.Errorf("decode message artifact from %s: %w", source, decodeErr)
 	}
-	if artifact.ExactSHA256 == "" {
-		return fmt.Errorf("message artifact from %s missing exact_sha256", source)
+	if artifact.ExactCID == "" {
+		return fmt.Errorf("message artifact from %s missing exact_cid", source)
 	}
-	actualHash := protocol.HashExactBytes(rawBytes)
-	if actualHash != artifact.ExactSHA256 {
-		return fmt.Errorf("message artifact from %s hash mismatch: record=%s actual=%s", source, artifact.ExactSHA256, actualHash)
+	actualCID := protocol.CIDForExactBytes(rawBytes)
+	if actualCID != artifact.ExactCID {
+		return fmt.Errorf("message artifact from %s cid mismatch: record=%s actual=%s", source, artifact.ExactCID, actualCID)
 	}
 	runDir := filepath.Join(runCollector.cfg.RunRoot, runCollector.cfg.RunID)
 	casDir := filepath.Join(runDir, "message-cas")
 	if mkdirErr := os.MkdirAll(casDir, 0o755); mkdirErr != nil {
 		return mkdirErr
 	}
-	artifactPath := filepath.Join(casDir, artifact.ExactSHA256+".cbor")
+	artifactPath := filepath.Join(casDir, artifact.ExactCID+".cbor")
 	indexPath := filepath.Join(runDir, "message-dag.jsonl")
 	indexRecord := messageDAGRecord{
 		Source:             source,
@@ -235,12 +235,12 @@ func (runCollector *collector) recordMessageArtifact(source string, artifact eve
 		Direction:          artifact.Direction,
 		Peer:               artifact.Peer,
 		Protocol:           artifact.Protocol,
-		ExactSHA256:        artifact.ExactSHA256,
-		ParentExactSHA256:  artifact.ParentExactSHA256,
+		ExactCID:           artifact.ExactCID,
+		ParentCID:          artifact.ParentCID,
 		ParentLinkLocation: artifact.ParentLinkLocation,
 		PromiseAbout:       artifact.PromiseAbout,
 		SourceEvent:        artifact.SourceEvent,
-		Path:               filepath.ToSlash(filepath.Join("message-cas", artifact.ExactSHA256+".cbor")),
+		Path:               filepath.ToSlash(filepath.Join("message-cas", artifact.ExactCID+".cbor")),
 	}
 	indexBytes, marshalErr := json.Marshal(indexRecord)
 	if marshalErr != nil {

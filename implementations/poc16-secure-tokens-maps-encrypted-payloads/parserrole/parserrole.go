@@ -56,7 +56,7 @@ type ProtocolParser struct {
 // ParsedMessage is the parser role's local projection of one exact envelope.
 type ParsedMessage struct {
 	Fields       map[string]string
-	ExactHash    string
+	ExactCID     string
 	ProtocolCID  protocol.ProtocolCID
 	ProtocolName string
 }
@@ -182,7 +182,7 @@ func (role *ParserRole) dialKernel(ctx context.Context, kernelAddress string) (*
 	session := transport.NewPersistentSession(
 		"parser-kernel:"+role.ContainerName,
 		frameConn,
-		frameParentExactSHA256s,
+		frameParentCIDs,
 		role.frameIsResponse,
 		func(frameBytes []byte) ([]byte, error) {
 			<-sessionReady
@@ -232,7 +232,7 @@ func (role *ParserRole) handleAppConn(conn net.Conn) {
 	session = transport.NewPersistentSession(
 		"app-parser:"+role.ContainerName+":"+conn.RemoteAddr().String(),
 		frameConn,
-		frameParentExactSHA256s,
+		frameParentCIDs,
 		role.frameIsResponse,
 		func(frameBytes []byte) ([]byte, error) {
 			<-sessionReady
@@ -255,7 +255,7 @@ func (role *ParserRole) handleAppFrame(session *transport.PersistentSession, fra
 		role.record("parser_role_malformed_payload_rejected", "malformed", "", parseErr.Error())
 		return nil, parseErr
 	}
-	role.record("parser_role_payload_parsed", "kept", message.Fields["from"], "direction=app_to_parser pcid="+message.ProtocolName+" exact_sha256="+message.ExactHash)
+	role.record("parser_role_payload_parsed", "kept", message.Fields["from"], "direction=app_to_parser pcid="+message.ProtocolName+" exact_cid="+message.ExactCID)
 	role.emitMessageArtifact("app_to_parser", message.Fields["from"], message.ProtocolName, frameBytes, message.Fields)
 	if message.ProtocolName == pcid.KernelTransportV1 && message.Fields["transport_action"] == "app_receive_promise" {
 		return nil, role.registerAppReceiver(session, message)
@@ -270,9 +270,9 @@ func (role *ParserRole) handleKernelFrame(frameBytes []byte) ([]byte, error) {
 		role.record("parser_role_malformed_payload_rejected", "malformed", "kernel", parseErr.Error())
 		return nil, parseErr
 	}
-	role.record("parser_role_payload_parsed", "kept", message.Fields["from"], "direction=kernel_to_parser pcid="+message.ProtocolName+" exact_sha256="+message.ExactHash)
+	role.record("parser_role_payload_parsed", "kept", message.Fields["from"], "direction=kernel_to_parser pcid="+message.ProtocolName+" exact_cid="+message.ExactCID)
 	role.emitMessageArtifact("kernel_to_parser", "kernel", message.ProtocolName, frameBytes, message.Fields)
-	role.record("parser_role_inbound_from_kernel", "kept", message.Fields["from"], "pcid="+message.ProtocolName+" exact_sha256="+message.ExactHash)
+	role.record("parser_role_inbound_from_kernel", "kept", message.Fields["from"], "pcid="+message.ProtocolName+" exact_cid="+message.ExactCID)
 	ackBytes := role.deliverToLocalApp(frameBytes, message)
 	role.emitParsedMessageArtifact("parser_to_kernel_ack", "kernel", ackBytes)
 	return ackBytes, nil
@@ -308,7 +308,7 @@ func (role *ParserRole) routeOutboundAppEnvelope(frameBytes []byte, message Pars
 	if targetContainer == role.ContainerName {
 		return role.deliverToLocalApp(frameBytes, message), nil
 	}
-	role.record("parser_role_outbound_to_kernel", "kept", target, "pcid="+message.ProtocolName+" exact_sha256="+message.ExactHash)
+	role.record("parser_role_outbound_to_kernel", "kept", target, "pcid="+message.ProtocolName+" exact_cid="+message.ExactCID)
 	return role.kernelClient.CarryExactEnvelope(context.Background(), target, message.ProtocolName, frameBytes)
 }
 
@@ -336,7 +336,7 @@ func (role *ParserRole) deliverToLocalApp(frameBytes []byte, message ParsedMessa
 	role.emitMessageArtifact("parser_to_app", target, message.ProtocolName, frameBytes, message.Fields)
 	ctx, cancel := context.WithTimeout(context.Background(), parserRoleTimeout)
 	defer cancel()
-	ackBytes, readErr := receiver.session.RoundTrip(ctx, message.ExactHash, frameBytes)
+	ackBytes, readErr := receiver.session.RoundTrip(ctx, message.ExactCID, frameBytes)
 	if readErr != nil {
 		role.record("parser_role_app_ack_failed", "broken", target, readErr.Error())
 		ackBytes, ackErr := role.notPromisedAck(message, "I promise local parser-role delivery failed while waiting for the app ACK.")
@@ -349,7 +349,7 @@ func (role *ParserRole) deliverToLocalApp(frameBytes []byte, message ParsedMessa
 	}
 	role.record("parser_role_local_ack_promised", "kept", target, "pcid="+message.ProtocolName+" outcome=app_ack")
 	role.emitParsedMessageArtifact("app_to_parser_ack", target, ackBytes)
-	role.record("parser_role_app_delivered", "kept", target, "pcid="+message.ProtocolName+" exact_sha256="+message.ExactHash)
+	role.record("parser_role_app_delivered", "kept", target, "pcid="+message.ProtocolName+" exact_cid="+message.ExactCID)
 	return ackBytes
 }
 
@@ -382,19 +382,19 @@ func (client *KernelTransportClient) RegisterPCID(ctx context.Context, protocolN
 func (client *KernelTransportClient) CarryExactEnvelope(ctx context.Context, target, protocolName string, envelopeBytes []byte) ([]byte, error) {
 	roundTripCtx, cancel := context.WithTimeout(ctx, parserRoleTimeout)
 	defer cancel()
-	exactHash := protocol.HashExactBytes(envelopeBytes)
+	exactCID := protocol.CIDForExactBytes(envelopeBytes)
 	fields := map[string]string{
-		"act":                 decision.ActPromise,
-		"from":                client.parserName,
-		"to":                  "kernel:" + client.containerName,
-		"target":              target,
-		"embedded_pcid":       protocolName,
-		"embedded_exact_hash": exactHash,
-		"envelope_b64":        base64.StdEncoding.EncodeToString(envelopeBytes),
-		"promise_about":       "carry_exact_envelope",
-		"transport_action":    "carry_exact_envelope",
-		"promise":             "I promise these exact envelope bytes should be carried toward the named target agent; the target was parsed by this parser role from the pCID-owned payload.",
-		"reason":              "parser role exact-envelope transport request",
+		"act":                decision.ActPromise,
+		"from":               client.parserName,
+		"to":                 "kernel:" + client.containerName,
+		"target":             target,
+		"embedded_pcid":      protocolName,
+		"embedded_exact_cid": exactCID,
+		"envelope_b64":       base64.StdEncoding.EncodeToString(envelopeBytes),
+		"promise_about":      "carry_exact_envelope",
+		"transport_action":   "carry_exact_envelope",
+		"promise":            "I promise these exact envelope bytes should be carried toward the named target agent; the target was parsed by this parser role from the pCID-owned payload.",
+		"reason":             "parser role exact-envelope transport request",
 	}
 	controlBytes, buildErr := client.controlEnvelopeBytes(fields)
 	if buildErr != nil {
@@ -403,8 +403,8 @@ func (client *KernelTransportClient) CarryExactEnvelope(ctx context.Context, tar
 	if client.emitArtifact != nil {
 		client.emitArtifact("parser_to_kernel_carry", target, pcid.KernelTransportV1, controlBytes, fields)
 	}
-	client.record("parser_role_kernel_carry_requested", "kept", target, "pcid="+protocolName+" exact_sha256="+exactHash)
-	return client.session.RoundTrip(roundTripCtx, exactHash, controlBytes)
+	client.record("parser_role_kernel_carry_requested", "kept", target, "pcid="+protocolName+" exact_cid="+exactCID)
+	return client.session.RoundTrip(roundTripCtx, exactCID, controlBytes)
 }
 
 func (client *KernelTransportClient) controlEnvelopeBytes(fields map[string]string) ([]byte, error) {
@@ -455,12 +455,12 @@ func (parser ProtocolParser) Parse(frameBytes []byte) (ParsedMessage, error) {
 		return ParsedMessage{}, fieldsErr
 	}
 	fields["protocol"] = protocolName
-	if len(envelope.ParentExactSHA256s) > 0 && fields["parent_exact_sha256"] == "" {
-		fields["parent_exact_sha256"] = envelope.ParentExactSHA256s[0]
+	if len(envelope.ParentCIDs) > 0 && fields["parent_cid"] == "" {
+		fields["parent_cid"] = envelope.ParentCIDs[0]
 	}
 	return ParsedMessage{
 		Fields:       fields,
-		ExactHash:    protocol.HashExactBytes(frameBytes),
+		ExactCID:     protocol.CIDForExactBytes(frameBytes),
 		ProtocolCID:  envelope.ProtocolCID,
 		ProtocolName: protocolName,
 	}, nil
@@ -471,7 +471,7 @@ func (role *ParserRole) frameIsResponse(frameBytes []byte) (bool, error) {
 	if envelopeErr != nil {
 		return false, envelopeErr
 	}
-	if len(envelope.ParentExactSHA256s) == 0 {
+	if len(envelope.ParentCIDs) == 0 {
 		return false, nil
 	}
 	message, parseErr := role.Parser.Parse(frameBytes)
@@ -481,12 +481,12 @@ func (role *ParserRole) frameIsResponse(frameBytes []byte) (bool, error) {
 	return strings.TrimSpace(message.Fields["outcome"]) != "", nil
 }
 
-func frameParentExactSHA256s(frameBytes []byte) ([]string, error) {
+func frameParentCIDs(frameBytes []byte) ([]string, error) {
 	envelope, parseErr := protocol.ParseEnvelope(frameBytes)
 	if parseErr != nil {
 		return nil, parseErr
 	}
-	return append([]string(nil), envelope.ParentExactSHA256s...), nil
+	return append([]string(nil), envelope.ParentCIDs...), nil
 }
 
 func (role *ParserRole) notPromisedAck(message ParsedMessage, promiseText string) ([]byte, error) {
@@ -505,13 +505,13 @@ func (role *ParserRole) notPromisedAck(message ParsedMessage, promiseText string
 	}
 	payloadBytes, arrayPayload, payloadErr := protocol.MarshalKnownArrayPayload(message.ProtocolName, ackFields)
 	if payloadErr == nil && arrayPayload {
-		ack, ackErr := protocol.NewEnvelopeFromPayloadWithParents(message.ProtocolCID, payloadBytes, []string{message.ExactHash}, role.parserName())
+		ack, ackErr := protocol.NewEnvelopeFromPayloadWithParents(message.ProtocolCID, payloadBytes, []string{message.ExactCID}, role.parserName())
 		if ackErr != nil {
 			return nil, ackErr
 		}
 		return ack.Bytes()
 	}
-	ack, ackErr := protocol.NewEnvelopeWithParents(message.ProtocolCID, ackFields, []string{message.ExactHash}, role.parserName())
+	ack, ackErr := protocol.NewEnvelopeWithParents(message.ProtocolCID, ackFields, []string{message.ExactCID}, role.parserName())
 	if ackErr != nil {
 		return nil, ackErr
 	}
@@ -524,17 +524,17 @@ func (role *ParserRole) stop() {
 			role.record("parser_role_listener_close_failed", "broken", "", closeErr.Error())
 		}
 	}
-	// Intent: App-facing parser sessions can still be producing ACKs or
-	// non-commitments that traverse the parser/kernel control stream. Close and
-	// drain those local sessions first so parser/kernel terminal accounting is
-	// emitted after app-side parser activity has quiesced. Source: DI-pajih
-	role.closeAppSessions()
-	role.active.Wait()
+	// Intent: The parser/kernel control stream is the parser role's own local
+	// promise to the transport kernel. Record that terminal state before closing
+	// app-facing parser streams so one busy app stream cannot hide the control
+	// session from clean-run lifecycle accounting. Source: DI-katom
 	if role.kernelClient != nil && role.kernelClient.session != nil {
 		if closeErr := role.kernelClient.session.CloseWithReason(transport.SessionTerminalReasonProcessShutdown); closeErr != nil {
 			role.record("parser_kernel_session_close_failed", "broken", "kernel", closeErr.Error())
 		}
 	}
+	role.closeAppSessions()
+	role.active.Wait()
 }
 
 func (role *ParserRole) trackAppSession(session *transport.PersistentSession, remoteAddress string) {
@@ -636,17 +636,17 @@ func (role *ParserRole) emitMessageArtifact(direction, peer, protocolName string
 		Direction:           direction,
 		Peer:                peer,
 		Protocol:            artifactProtocol,
-		ExactSHA256:         protocol.HashExactBytes(envelopeBytes),
+		ExactCID:            protocol.CIDForExactBytes(envelopeBytes),
 		EnvelopeBytesBase64: base64.StdEncoding.EncodeToString(envelopeBytes),
 		SourceEvent:         "parserrole." + direction,
 	}
 	if fields != nil {
-		artifact.ParentExactSHA256 = firstField(fields, "envelope_parent_exact_sha256", "payload_parent_exact_sha256", "parent_exact_sha256")
+		artifact.ParentCID = firstField(fields, "envelope_parent_cid", "payload_parent_cid", "parent_cid")
 		artifact.ParentLinkLocation = parserParentLinkLocationFromFields(fields)
 		artifact.PromiseAbout = fields["promise_about"]
 	}
-	if envelope, parseErr := protocol.ParseEnvelope(envelopeBytes); parseErr == nil && len(envelope.ParentExactSHA256s) > 0 {
-		artifact.ParentExactSHA256 = envelope.ParentExactSHA256s[0]
+	if envelope, parseErr := protocol.ParseEnvelope(envelopeBytes); parseErr == nil && len(envelope.ParentCIDs) > 0 {
+		artifact.ParentCID = envelope.ParentCIDs[0]
 		artifact.ParentLinkLocation = "envelope"
 	}
 	record := eventstream.Record{
@@ -662,17 +662,17 @@ func (role *ParserRole) emitMessageArtifact(direction, peer, protocolName string
 	role.stdoutMu.Lock()
 	fmt.Println(string(recordBytes))
 	role.stdoutMu.Unlock()
-	role.record("raw_message_artifact_emitted", "kept", peer, "direction="+direction+" pcid="+artifactProtocol+" exact_sha256="+artifact.ExactSHA256)
+	role.record("raw_message_artifact_emitted", "kept", peer, "direction="+direction+" pcid="+artifactProtocol+" exact_cid="+artifact.ExactCID)
 }
 
 func parserParentLinkLocationFromFields(fields map[string]string) string {
-	if fields["envelope_parent_exact_sha256"] != "" {
+	if fields["envelope_parent_cid"] != "" {
 		return "envelope"
 	}
-	if fields["payload_parent_exact_sha256"] != "" {
+	if fields["payload_parent_cid"] != "" {
 		return "payload"
 	}
-	if fields["parent_exact_sha256"] != "" {
+	if fields["parent_cid"] != "" {
 		return "payload"
 	}
 	return ""

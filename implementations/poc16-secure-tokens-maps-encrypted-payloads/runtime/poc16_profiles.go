@@ -18,19 +18,19 @@ func (node *Node) runPOC16ProtocolProfileWorkflow(contentCID string) error {
 	if err := node.recordPOC16SpecContextEvents(); err != nil {
 		return err
 	}
-	mapExactHash, mapErr := node.recordMapPayloadProfile()
+	mapExactCID, mapErr := node.recordMapPayloadProfile()
 	if mapErr != nil {
 		return mapErr
 	}
-	tokenExactHash, tokenErr := node.recordSecureCapabilityProfile(contentCID, mapExactHash)
+	tokenExactCID, tokenErr := node.recordSecureCapabilityProfile(contentCID, mapExactCID)
 	if tokenErr != nil {
 		return tokenErr
 	}
-	encryptedExactHash, encryptedErr := node.recordEncryptedPayloadProfile(contentCID, tokenExactHash)
+	encryptedExactCID, encryptedErr := node.recordEncryptedPayloadProfile(contentCID, tokenExactCID)
 	if encryptedErr != nil {
 		return encryptedErr
 	}
-	return node.recordParserBuilderRoleProfile(encryptedExactHash)
+	return node.recordParserBuilderRoleProfile(encryptedExactCID)
 }
 
 func (node *Node) recordPOC15SupersetAgentSet() {
@@ -62,7 +62,7 @@ func (node *Node) recordPOC16SpecContextEvents() error {
 		if !ok {
 			return fmt.Errorf("spec context has unknown pCID name %s", context.Name)
 		}
-		node.record("poc16_protocol_spec_doc_recorded", "kept", "", "pcid="+context.Name+" spec_pcid="+protocolCID.String()+" spec_sha256="+context.SHA256)
+		node.record("poc16_protocol_spec_doc_recorded", "kept", "", "pcid="+context.Name+" spec_pcid="+protocolCID.String()+" spec_cid="+context.CID)
 		node.record("llm_spec_context_embedded", "kept", "", "pcid="+context.Name+" spec_pcid="+protocolCID.String()+" excerpt_bytes="+fmt.Sprintf("%d", len(context.Excerpt)))
 		node.record("llm_spec_context_cid_recorded", "kept", "", "pcid="+context.Name+" spec_pcid="+protocolCID.String())
 	}
@@ -92,13 +92,13 @@ func (node *Node) recordMapPayloadProfile() (string, error) {
 	if _, parseErr := node.parseEnvelope(envelopeBytes); parseErr != nil {
 		return "", parseErr
 	}
-	exactHash := protocol.HashExactBytes(envelopeBytes)
-	node.record("poc16_map_payload_specimen_emitted", "kept", "bob", "pcid="+pcid.MapPayloadProfileV1+" exact_sha256="+exactHash)
+	exactCID := protocol.CIDForExactBytes(envelopeBytes)
+	node.record("poc16_map_payload_specimen_emitted", "kept", "bob", "pcid="+pcid.MapPayloadProfileV1+" exact_cid="+exactCID)
 	node.record("poc16_map_payload_parsed", "kept", "bob", "pcid="+pcid.MapPayloadProfileV1+" parser=slot0-selected")
-	return exactHash, nil
+	return exactCID, nil
 }
 
-func (node *Node) recordSecureCapabilityProfile(contentCID, parentExactHash string) (string, error) {
+func (node *Node) recordSecureCapabilityProfile(contentCID, parentCID string) (string, error) {
 	now := time.Now().UTC()
 	token := protocol.CWTCapabilityToken{
 		Issuer:        node.Agent.Name,
@@ -124,7 +124,7 @@ func (node *Node) recordSecureCapabilityProfile(contentCID, parentExactHash stri
 	fields["promise"] = "Alice promises that this bearer token can be redeemed for the bounded storage behavior described by its signed claims."
 	fields["reason"] = "the issuer promise is signed; redemption still depends on Bob's local judgment"
 	fields["token_b64"] = tokenText
-	envelope, _, buildErr := node.buildEnvelopeFromFieldsWithParents(pcid.SecureCapabilityV1, node.Protocols.MustCID(pcid.SecureCapabilityV1), fields, []string{parentExactHash})
+	envelope, _, buildErr := node.buildEnvelopeFromFieldsWithParents(pcid.SecureCapabilityV1, node.Protocols.MustCID(pcid.SecureCapabilityV1), fields, []string{parentCID})
 	if buildErr != nil {
 		return "", buildErr
 	}
@@ -173,12 +173,12 @@ func (node *Node) recordSecureCapabilityProfile(contentCID, parentExactHash stri
 	if _, expiredVerifyErr := protocol.VerifyCWTCapabilityToken(expiredText, node.Agent.Name, "bob", now); expiredVerifyErr != nil {
 		node.record("cwt_capability_token_expired_rejected", "non_commitment", "bob", "pcid="+pcid.SecureCapabilityV1+" token_id="+expiredToken.TokenID)
 	}
-	exactHash := protocol.HashExactBytes(envelopeBytes)
-	node.record("poc16_secure_capability_specimen_emitted", "kept", "bob", "pcid="+pcid.SecureCapabilityV1+" exact_sha256="+exactHash)
-	return exactHash, nil
+	exactCID := protocol.CIDForExactBytes(envelopeBytes)
+	node.record("poc16_secure_capability_specimen_emitted", "kept", "bob", "pcid="+pcid.SecureCapabilityV1+" exact_cid="+exactCID)
+	return exactCID, nil
 }
 
-func (node *Node) recordEncryptedPayloadProfile(contentCID, parentExactHash string) (string, error) {
+func (node *Node) recordEncryptedPayloadProfile(contentCID, parentCID string) (string, error) {
 	plaintext := []byte("alice-private-storage-promise:" + contentCID)
 	encryptedPayload, encryptErr := protocol.EncryptPayloadForRecipient(node.Agent.Name, "bob", pcid.CASStorageV1, plaintext)
 	if encryptErr != nil {
@@ -188,7 +188,7 @@ func (node *Node) recordEncryptedPayloadProfile(contentCID, parentExactHash stri
 	if payloadErr != nil {
 		return "", payloadErr
 	}
-	envelope, envelopeErr := protocol.NewEnvelopeFromPayloadWithParents(node.Protocols.MustCID(pcid.EncryptedPayloadV1), payloadBytes, []string{parentExactHash}, node.Agent.Name)
+	envelope, envelopeErr := protocol.NewEnvelopeFromPayloadWithParents(node.Protocols.MustCID(pcid.EncryptedPayloadV1), payloadBytes, []string{parentCID}, node.Agent.Name)
 	if envelopeErr != nil {
 		return "", envelopeErr
 	}
@@ -198,7 +198,7 @@ func (node *Node) recordEncryptedPayloadProfile(contentCID, parentExactHash stri
 	}
 	fields := encryptedPayload.StringFields()
 	fields["promise_about"] = "encrypted_payload"
-	fields["parent_exact_sha256"] = parentExactHash
+	fields["parent_cid"] = parentCID
 	fields["parent_link_location"] = "envelope"
 	node.emitMessageArtifact("poc16_profile", "bob", pcid.EncryptedPayloadV1, envelopeBytes, fields)
 	node.record("poc16_key_discovery_profile_recorded", "kept", "bob", "pcid="+pcid.IdentityKeyV1+" key_profile=poc16-local-derived-demo-key")
@@ -222,20 +222,20 @@ func (node *Node) recordEncryptedPayloadProfile(contentCID, parentExactHash stri
 	if _, tamperErr := protocol.DecryptPayloadForRecipient(tamperedPayload, "bob"); tamperErr != nil {
 		node.record("encrypted_payload_tamper_rejected", "malformed", "bob", "pcid="+pcid.EncryptedPayloadV1+" context="+decodedPayload.Context)
 	}
-	ciphertextCID := protocol.HashExactBytes(payloadBytes)
+	ciphertextCID := protocol.CIDForExactBytes(payloadBytes)
 	node.record("encrypted_payload_e2e_promised", "kept", "bob", "pcid="+pcid.EncryptedPayloadV1+" context="+decodedPayload.Context)
 	node.record("encrypted_payload_ciphertext_stored", "kept", "bob", "pcid="+pcid.EncryptedPayloadV1+" ciphertext_cid="+ciphertextCID)
-	node.record("encrypted_payload_decrypted", "kept", "bob", "pcid="+pcid.EncryptedPayloadV1+" plaintext_cid="+protocol.HashExactBytes(decryptedBytes))
-	node.record("encrypted_payload_visible_parent_recorded", "kept", "bob", "pcid="+pcid.EncryptedPayloadV1+" parent="+parentExactHash)
-	node.record("encrypted_payload_hidden_parent_recorded", "kept", "bob", "pcid="+pcid.EncryptedPayloadV1+" hidden_parent_commitment="+protocol.HashExactBytes([]byte(parentExactHash+":"+ciphertextCID)))
+	node.record("encrypted_payload_decrypted", "kept", "bob", "pcid="+pcid.EncryptedPayloadV1+" plaintext_cid="+protocol.CIDForExactBytes(decryptedBytes))
+	node.record("encrypted_payload_visible_parent_recorded", "kept", "bob", "pcid="+pcid.EncryptedPayloadV1+" parent="+parentCID)
+	node.record("encrypted_payload_hidden_parent_recorded", "kept", "bob", "pcid="+pcid.EncryptedPayloadV1+" hidden_parent_commitment="+protocol.CIDForExactBytes([]byte(parentCID+":"+ciphertextCID)))
 	node.record("encrypted_payload_relay_non_inspection_promised", "kept", "frank", "pcid="+pcid.EncryptedPayloadV1+" relay promises forwarding without reading plaintext")
 	node.record("encrypted_payload_unsupported_pcid_not_promised", "non_commitment", "bob", "pcid="+pcid.EncryptedPayloadV1+" unsupported_inner_pcid=unknown-encrypted-profile")
-	exactHash := protocol.HashExactBytes(envelopeBytes)
-	node.record("poc16_encrypted_payload_specimen_emitted", "kept", "bob", "pcid="+pcid.EncryptedPayloadV1+" exact_sha256="+exactHash)
-	return exactHash, nil
+	exactCID := protocol.CIDForExactBytes(envelopeBytes)
+	node.record("poc16_encrypted_payload_specimen_emitted", "kept", "bob", "pcid="+pcid.EncryptedPayloadV1+" exact_cid="+exactCID)
+	return exactCID, nil
 }
 
-func (node *Node) recordParserBuilderRoleProfile(parentExactHash string) error {
+func (node *Node) recordParserBuilderRoleProfile(parentCID string) error {
 	fields := map[string]string{
 		"act":           "promise",
 		"from":          node.Agent.Name,
@@ -245,7 +245,7 @@ func (node *Node) recordParserBuilderRoleProfile(parentExactHash string) error {
 		"reason":        "payload routing information belongs to pCID-owned payload semantics, not to slot 0",
 		"role":          "parser-builder",
 	}
-	envelope, _, buildErr := node.buildEnvelopeFromFieldsWithParents(pcid.ParserBuilderRoleV1, node.Protocols.MustCID(pcid.ParserBuilderRoleV1), fields, []string{parentExactHash})
+	envelope, _, buildErr := node.buildEnvelopeFromFieldsWithParents(pcid.ParserBuilderRoleV1, node.Protocols.MustCID(pcid.ParserBuilderRoleV1), fields, []string{parentCID})
 	if buildErr != nil {
 		return buildErr
 	}
@@ -271,8 +271,8 @@ func (node *Node) recordParserBuilderRoleProfile(parentExactHash string) error {
 	node.record("pcid_slot0_selected_parser", "kept", "bob", "pcid="+pcid.ParserBuilderRoleV1+" parser=local-role")
 	node.record("pcid_only_dispatch_recorded", "kept", "bob", "pcid="+pcid.ParserBuilderRoleV1+" dispatch=slot0-pcid-only")
 	node.record("pcid_address_separation_recorded", "kept", "bob", "pcid="+pcid.ParserBuilderRoleV1+" address_semantics=payload-owned")
-	node.record("builder_role_payload_built", "kept", "bob", "pcid="+pcid.ParserBuilderRoleV1+" exact_sha256="+protocol.HashExactBytes(envelopeBytes))
-	node.record("parser_role_payload_parsed", "kept", "bob", "pcid="+pcid.ParserBuilderRoleV1+" parent="+parentExactHash)
+	node.record("builder_role_payload_built", "kept", "bob", "pcid="+pcid.ParserBuilderRoleV1+" exact_cid="+protocol.CIDForExactBytes(envelopeBytes))
+	node.record("parser_role_payload_parsed", "kept", "bob", "pcid="+pcid.ParserBuilderRoleV1+" parent="+parentCID)
 	node.record("parser_role_local_ack_promised", "kept", "bob", "pcid="+pcid.ParserBuilderRoleV1+" ack_scope=local-parser-event")
 	node.record("parser_role_backpressure_promised", "kept", "bob", "pcid="+pcid.ParserBuilderRoleV1+" capacity=bounded-parser-queue")
 	return nil

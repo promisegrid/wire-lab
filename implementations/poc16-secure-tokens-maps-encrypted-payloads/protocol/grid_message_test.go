@@ -14,7 +14,7 @@ func TestGridMessageParsesVariableArity(t *testing.T) {
 	if err != nil {
 		t.Fatalf("payload slot: %v", err)
 	}
-	parentLinks, err := EncodeTag42LinkArray(RawCIDV1SHA256Bytes([]byte("parent envelope")))
+	parentLinks, err := EncodeTag42LinkArray(CIDBytesForExactBytes([]byte("parent envelope")))
 	if err != nil {
 		t.Fatalf("parent link array: %v", err)
 	}

@@ -600,7 +600,7 @@ func TestRunScopedStatePersistsWithinRun(t *testing.T) {
 	bob.nonCommitmentJournal["nc-1"] = nonCommitmentRecord{Key: "nc-1", Peer: "alice", ProtocolName: pcid.CASStorageV1, PromiseAbout: production.PromiseStoreContent}
 	bob.checkpointJournal["cp-1"] = checkpointRecord{Key: "cp-1", ProtocolName: pcid.CASStorageV1, PromiseAbout: production.PromiseStoreContent}
 	bob.promiseJournal["pr-1"] = promiseRecord{Key: "pr-1", Peer: "alice", ProtocolName: pcid.CASStorageV1, Status: promiseStatusOutstanding}
-	bob.replayJournal["hash-1"] = "alice|" + pcid.CASStorageV1
+	bob.replayJournal["cid-1"] = "alice|" + pcid.CASStorageV1
 	if err := bob.saveRunScopedState(); err != nil {
 		t.Fatalf("save run-scoped state: %v", err)
 	}
@@ -626,7 +626,7 @@ func TestRunScopedStatePersistsWithinRun(t *testing.T) {
 	if reloadedBob.computeCache["compute-1"]["result_cid"] != "result-1" {
 		t.Fatalf("reloaded compute cache mismatch: %#v", reloadedBob.computeCache)
 	}
-	if reloadedBob.promiseJournal["pr-1"].Status != promiseStatusOutstanding || reloadedBob.replayJournal["hash-1"] == "" {
+	if reloadedBob.promiseJournal["pr-1"].Status != promiseStatusOutstanding || reloadedBob.replayJournal["cid-1"] == "" {
 		t.Fatalf("reloaded journals mismatch promises=%#v replay=%#v", reloadedBob.promiseJournal, reloadedBob.replayJournal)
 	}
 	if !hasEvent(reloadedBob.events, "run_scoped_store_loaded") {
@@ -1313,7 +1313,7 @@ func signedAccountingUpdateFrame(t *testing.T, node *Node, exchangeID string) []
 		"exchange_id":     exchangeID,
 		"promise_about":   production.PromiseShipmentUpdate,
 		"order_id":        fulfillmentOrderID,
-		"tracking_number": "1Z999AA10123456784",
+		"tracking_number": production.ContentCID([]byte("test-accounting-update-tracking")),
 		"cost_cents":      "1776",
 	}
 	payloadBytes, _, payloadErr := protocol.MarshalKnownArrayPayload(pcid.ProductionShippingV1, fields)

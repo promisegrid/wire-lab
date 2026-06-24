@@ -106,7 +106,7 @@ func TestStdioCBORMessagesRoundTrip(t *testing.T) {
 	if !bytes.Equal(ack.EnvelopeBytes, []byte{0x01, 0x02, 0x03}) {
 		t.Fatalf("unexpected ack bytes: %x", ack.EnvelopeBytes)
 	}
-	eventBytes, err := MarshalStdioCBOREvent(StdioCBOREvent{Type: "ack_event", Outcome: "kept", ExactSHA256: "abc123"})
+	eventBytes, err := MarshalStdioCBOREvent(StdioCBOREvent{Type: "ack_event", Outcome: "kept", ExactCID: "abc123"})
 	if err != nil {
 		t.Fatalf("marshal event: %v", err)
 	}
@@ -114,7 +114,7 @@ func TestStdioCBORMessagesRoundTrip(t *testing.T) {
 	if err != nil {
 		t.Fatalf("parse event: %v", err)
 	}
-	if event.Outcome != "kept" || event.ExactSHA256 != "abc123" {
+	if event.Outcome != "kept" || event.ExactCID != "abc123" {
 		t.Fatalf("unexpected event: %#v", event)
 	}
 }

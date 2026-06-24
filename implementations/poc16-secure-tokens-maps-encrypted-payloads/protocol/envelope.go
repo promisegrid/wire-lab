@@ -1,7 +1,6 @@
 package protocol
 
 import (
-	"bytes"
 	"crypto/ed25519"
 	"crypto/sha256"
 	"encoding/hex"
@@ -15,60 +14,6 @@ const (
 	dagCBORLinkTag = uint64(42)
 )
 
-// ProtocolCID identifies the protocol spec document that defines every slot
-// after slot 0. It is not a payload CID.
-// Intent: Keep POC16 aligned with grid([42(pCID), ...protocol-defined-slots])
-// while testing LLM-directed behavior above the envelope layer. Source: DI-timah
-type ProtocolCID struct {
-	cidBytes []byte
-	digest   [32]byte
-}
-
-// NewProtocolCID hashes spec bytes into the POC CIDv1 raw sha2-256 form.
-func NewProtocolCID(specBytes []byte) ProtocolCID {
-	digest := sha256.Sum256(specBytes)
-	cidBytes := make([]byte, 0, 36)
-	cidBytes = append(cidBytes, 0x01, 0x55, 0x12, 0x20)
-	cidBytes = append(cidBytes, digest[:]...)
-	return ProtocolCID{cidBytes: cidBytes, digest: digest}
-}
-
-// NewProtocolCIDFromBytes rebuilds a POC pCID from binary CIDv1 bytes.
-func NewProtocolCIDFromBytes(cidBytes []byte) ProtocolCID {
-	copiedBytes := make([]byte, len(cidBytes))
-	copy(copiedBytes, cidBytes)
-	var digest [32]byte
-	if len(copiedBytes) >= 36 {
-		copy(digest[:], copiedBytes[len(copiedBytes)-32:])
-	}
-	return ProtocolCID{cidBytes: copiedBytes, digest: digest}
-}
-
-// Bytes returns binary CIDv1 bytes without the tag-42 sentinel.
-func (protocolCID ProtocolCID) Bytes() []byte {
-	cidBytes := make([]byte, len(protocolCID.cidBytes))
-	copy(cidBytes, protocolCID.cidBytes)
-	return cidBytes
-}
-
-// Tag42Bytes returns the DAG-CBOR tag-42 byte string payload.
-func (protocolCID ProtocolCID) Tag42Bytes() []byte {
-	tagBytes := make([]byte, 0, len(protocolCID.cidBytes)+1)
-	tagBytes = append(tagBytes, 0x00)
-	tagBytes = append(tagBytes, protocolCID.cidBytes...)
-	return tagBytes
-}
-
-// String renders a stable debug form for event records.
-func (protocolCID ProtocolCID) String() string {
-	return "cidv1-raw-sha2-256:" + hex.EncodeToString(protocolCID.digest[:])
-}
-
-// Equal reports whether two pCIDs name the same protocol bytes.
-func (protocolCID ProtocolCID) Equal(other ProtocolCID) bool {
-	return bytes.Equal(protocolCID.cidBytes, other.cidBytes)
-}
-
 // Proof is an Ed25519 proof over the envelope's pCID-defined signable view.
 type Proof struct {
 	Signer    string
@@ -80,10 +25,10 @@ type Proof struct {
 // Intent: The LLM can influence payload semantics, but Go owns the CBOR grid
 // envelope and exact-byte signature mechanics. Source: DI-timah
 type Envelope struct {
-	ProtocolCID        ProtocolCID
-	Payload            []byte
-	Proof              Proof
-	ParentExactSHA256s []string
+	ProtocolCID ProtocolCID
+	Payload     []byte
+	Proof       Proof
+	ParentCIDs  []string
 }
 
 // NewEnvelope builds an older generic map payload and signs the envelope's two-slot
@@ -100,12 +45,12 @@ func NewEnvelope(protocolCID ProtocolCID, fields map[string]string, signer strin
 // Intent: POC16 ACKs must be able to parent-link the request message CID even
 // when a not-yet-migrated pCID still uses the generic map scaffold. Source:
 // DI-vopab
-func NewEnvelopeWithParents(protocolCID ProtocolCID, fields map[string]string, parentExactSHA256s []string, signer string) (Envelope, error) {
+func NewEnvelopeWithParents(protocolCID ProtocolCID, fields map[string]string, parentCIDs []string, signer string) (Envelope, error) {
 	payloadBytes, marshalErr := MarshalStringMap(fields)
 	if marshalErr != nil {
 		return Envelope{}, marshalErr
 	}
-	return NewEnvelopeFromPayloadWithParents(protocolCID, payloadBytes, parentExactSHA256s, signer)
+	return NewEnvelopeFromPayloadWithParents(protocolCID, payloadBytes, parentCIDs, signer)
 }
 
 // NewEnvelopeFromPayload signs an already-encoded pCID-owned payload.
@@ -119,12 +64,12 @@ func NewEnvelopeFromPayload(protocolCID ProtocolCID, payloadBytes []byte, signer
 // with optional envelope-parent links.
 // Intent: DI-kohuj moves route_v1 parent-link pressure into ordinary traffic
 // while keeping parent slots pCID-owned rather than universal. Source: DI-kohuj
-func NewEnvelopeFromPayloadWithParents(protocolCID ProtocolCID, payloadBytes []byte, parentExactSHA256s []string, signer string) (Envelope, error) {
+func NewEnvelopeFromPayloadWithParents(protocolCID ProtocolCID, payloadBytes []byte, parentCIDs []string, signer string) (Envelope, error) {
 	copiedPayload := make([]byte, len(payloadBytes))
 	copy(copiedPayload, payloadBytes)
-	copiedParents := make([]string, len(parentExactSHA256s))
-	copy(copiedParents, parentExactSHA256s)
-	envelope := Envelope{ProtocolCID: protocolCID, Payload: copiedPayload, ParentExactSHA256s: copiedParents}
+	copiedParents := make([]string, len(parentCIDs))
+	copy(copiedParents, parentCIDs)
+	envelope := Envelope{ProtocolCID: protocolCID, Payload: copiedPayload, ParentCIDs: copiedParents}
 	proof, proofErr := SignEnvelope(envelope, signer)
 	if proofErr != nil {
 		return Envelope{}, proofErr
@@ -141,29 +86,24 @@ func (envelope Envelope) SignableBytes() ([]byte, error) {
 	if payloadSlotErr != nil {
 		return nil, payloadSlotErr
 	}
-	if len(envelope.ParentExactSHA256s) == 0 {
+	if len(envelope.ParentCIDs) == 0 {
 		return EncodeGridMessage(envelope.ProtocolCID, payloadSlot)
 	}
-	parentSlot, parentSlotErr := parentExactSHA256GridSlot(envelope.ParentExactSHA256s)
+	parentSlot, parentSlotErr := parentCIDGridSlot(envelope.ParentCIDs)
 	if parentSlotErr != nil {
 		return nil, parentSlotErr
 	}
 	return EncodeGridMessage(envelope.ProtocolCID, parentSlot, payloadSlot)
 }
 
-func parentExactSHA256GridSlot(parentExactSHA256s []string) (GridSlot, error) {
-	parentCIDs := make([][]byte, 0, len(parentExactSHA256s))
-	for _, parentExactSHA256 := range parentExactSHA256s {
-		parentDigest, decodeErr := hex.DecodeString(parentExactSHA256)
-		if decodeErr != nil {
-			return GridSlot{}, decodeErr
+func parentCIDGridSlot(parentCIDTexts []string) (GridSlot, error) {
+	parentCIDs := make([][]byte, 0, len(parentCIDTexts))
+	for _, parentCIDText := range parentCIDTexts {
+		parsedCID, parseErr := ParseCIDText(parentCIDText)
+		if parseErr != nil {
+			return GridSlot{}, parseErr
 		}
-		if len(parentDigest) != sha256.Size {
-			return GridSlot{}, fmt.Errorf("parent exact sha256 must be %d bytes, got %d", sha256.Size, len(parentDigest))
-		}
-		cidBytes := make([]byte, 0, 36)
-		cidBytes = append(cidBytes, 0x01, 0x55, 0x12, 0x20)
-		cidBytes = append(cidBytes, parentDigest...)
+		cidBytes := parsedCID.Bytes()
 		parentCIDs = append(parentCIDs, cidBytes)
 	}
 	parentArrayBytes, parentArrayErr := EncodeTag42LinkArray(parentCIDs...)
@@ -173,20 +113,20 @@ func parentExactSHA256GridSlot(parentExactSHA256s []string) (GridSlot, error) {
 	return RawCBORGridSlot(parentArrayBytes), nil
 }
 
-func decodeParentExactSHA256s(slot GridSlot) ([]string, error) {
+func decodeParentCIDs(slot GridSlot) ([]string, error) {
 	parentCIDs, parentErr := DecodeTag42LinkArray(slot.RawCBOR)
 	if parentErr != nil {
 		return nil, parentErr
 	}
-	parentExactSHA256s := make([]string, 0, len(parentCIDs))
+	parentCIDTexts := make([]string, 0, len(parentCIDs))
 	for _, parentCID := range parentCIDs {
-		parentExactSHA256, ok := ExactSHA256FromRawCIDV1(parentCID)
-		if !ok {
-			return nil, fmt.Errorf("parent link must be CIDv1 raw sha2-256")
+		parentCIDText, textErr := CIDTextFromBytes(parentCID)
+		if textErr != nil {
+			return nil, fmt.Errorf("parent link must be CIDv1 raw sha2-256: %w", textErr)
 		}
-		parentExactSHA256s = append(parentExactSHA256s, parentExactSHA256)
+		parentCIDTexts = append(parentCIDTexts, parentCIDText)
 	}
-	return parentExactSHA256s, nil
+	return parentCIDTexts, nil
 }
 
 func proofBytesForEnvelope(envelope Envelope) ([]byte, error) {
@@ -242,7 +182,7 @@ func envelopeFromGridMessage(gridMessage GridMessage) (Envelope, error) {
 		}
 		return Envelope{ProtocolCID: gridMessage.ProtocolCID, Payload: payloadBytes, Proof: proof}, nil
 	case 3:
-		parentExactSHA256s, parentErr := decodeParentExactSHA256s(gridMessage.Slots[0])
+		parentCIDs, parentErr := decodeParentCIDs(gridMessage.Slots[0])
 		if parentErr != nil {
 			return Envelope{}, parentErr
 		}
@@ -258,7 +198,7 @@ func envelopeFromGridMessage(gridMessage GridMessage) (Envelope, error) {
 		if decodeErr != nil {
 			return Envelope{}, decodeErr
 		}
-		return Envelope{ProtocolCID: gridMessage.ProtocolCID, Payload: payloadBytes, Proof: proof, ParentExactSHA256s: parentExactSHA256s}, nil
+		return Envelope{ProtocolCID: gridMessage.ProtocolCID, Payload: payloadBytes, Proof: proof, ParentCIDs: parentCIDs}, nil
 	default:
 		return Envelope{}, fmt.Errorf("poc16 envelope must have payload/proof or parents/payload/proof slots, got %d protocol-defined slots", len(gridMessage.Slots))
 	}
@@ -283,10 +223,10 @@ func (envelope Envelope) Bytes() ([]byte, error) {
 	if proofSlotErr != nil {
 		return nil, proofSlotErr
 	}
-	if len(envelope.ParentExactSHA256s) == 0 {
+	if len(envelope.ParentCIDs) == 0 {
 		return EncodeGridMessage(envelope.ProtocolCID, payloadSlot, proofSlot)
 	}
-	parentSlot, parentSlotErr := parentExactSHA256GridSlot(envelope.ParentExactSHA256s)
+	parentSlot, parentSlotErr := parentCIDGridSlot(envelope.ParentCIDs)
 	if parentSlotErr != nil {
 		return nil, parentSlotErr
 	}
@@ -401,13 +341,4 @@ func DeterministicPrivateKey(seedText string) ed25519.PrivateKey {
 // DeterministicPublicKey returns the POC public key for a named local agent.
 func DeterministicPublicKey(seedText string) ed25519.PublicKey {
 	return DeterministicPrivateKey(seedText).Public().(ed25519.PublicKey)
-}
-
-// HashExactBytes returns a sha256 hex digest for correlating local event records.
-func HashExactBytes(exactBytes []byte) string {
-	if len(exactBytes) == 0 {
-		return ""
-	}
-	digest := sha256.Sum256(exactBytes)
-	return hex.EncodeToString(digest[:])
 }

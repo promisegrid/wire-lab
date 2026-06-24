@@ -1,12 +1,13 @@
 package production
 
 import (
-	"crypto/sha256"
 	"encoding/base64"
 	"encoding/hex"
 	"fmt"
 	"strconv"
 	"strings"
+
+	"promisegrid.dev/wire-lab/implementations/poc16-secure-tokens-maps-encrypted-payloads/protocol"
 )
 
 // These promise-about names are payload-level meanings used inside pCID-owned
@@ -86,8 +87,7 @@ func LabelForShipment(packageID, address string, weightOunces int) (string, int,
 	if weightOunces <= 0 {
 		return "", 0, fmt.Errorf("positive weight_ounces is required")
 	}
-	digest := sha256.Sum256([]byte(packageID + "|" + address + "|" + strconv.Itoa(weightOunces)))
-	trackingNumber := "1Z" + strings.ToUpper(hex.EncodeToString(digest[:]))[:14]
+	trackingNumber := ContentCID([]byte("poc16-tracking|" + packageID + "|" + address + "|" + strconv.Itoa(weightOunces)))
 	costCents := 700 + weightOunces*4
 	return trackingNumber, costCents, nil
 }
@@ -120,8 +120,7 @@ func IssuePrintCapabilityToken(fields map[string]string) (string, error) {
 	if scope != PrintCapabilityScope {
 		return "", fmt.Errorf("print capability scope %q is not supported", scope)
 	}
-	printEvent := sha256.Sum256([]byte("printer_port|" + token + "|" + tokenID + "|" + scope + "|" + maxBytes))
-	token = "pcap1:" + hex.EncodeToString(printEvent[:])
+	token = "pcap1:" + ContentCID([]byte("printer_port|"+token+"|"+tokenID+"|"+scope+"|"+maxBytes))
 	return token, nil
 }
 
@@ -208,8 +207,7 @@ func PrintLabelToLocalDevice(fields map[string]string) (string, error) {
 	if decodeErr != nil {
 		return "", fmt.Errorf("label bytes are not valid hex: %w", decodeErr)
 	}
-	printEvent := sha256.Sum256(labelBytes)
-	spoolID := "spool-" + hex.EncodeToString(printEvent[:])[:16]
+	spoolID := "spool:" + ContentCID(labelBytes)
 	return spoolID, nil
 }
 
@@ -219,8 +217,7 @@ func PrintLabelToLocalDevice(fields map[string]string) (string, error) {
 // payload-level CIDs while making CAS and compute event records exact-byte checkable.
 // Source: DI-sinur
 func ContentCID(content []byte) string {
-	digest := sha256.Sum256(content)
-	return "cidv1-raw-sha2-256:" + hex.EncodeToString(digest[:])
+	return protocol.CIDForExactBytes(content)
 }
 
 // VerifyContentCID checks that a byte string matches the payload-level CID an
@@ -414,7 +411,7 @@ func fibonacci(n int) int {
 
 // BadComputeResultBytes produces bytes that have their own valid CID but fail
 // the promised function/input/context semantics.
-// Intent: Verifiers must detect semantic breakage, not just malformed hashes.
+// Intent: Verifiers must detect semantic breakage, not just malformed bytes.
 // Source: DI-sinur
 func BadComputeResultBytes(correctResultBytes []byte) []byte {
 	return append(append([]byte(nil), correctResultBytes...), []byte(";bad-poc16-result")...)
@@ -439,8 +436,8 @@ func ValidateAccountingUpdate(orderID, trackingNumber string, costCents int) err
 	if strings.TrimSpace(orderID) == "" {
 		return fmt.Errorf("order_id is required")
 	}
-	if !strings.HasPrefix(strings.TrimSpace(trackingNumber), "1Z") {
-		return fmt.Errorf("tracking_number must start with 1Z")
+	if _, cidErr := protocol.ParseCIDText(strings.TrimSpace(trackingNumber)); cidErr != nil {
+		return fmt.Errorf("tracking_number must be a CIDv1 base32 identifier: %w", cidErr)
 	}
 	if costCents <= 0 {
 		return fmt.Errorf("positive shipping cost_cents is required")

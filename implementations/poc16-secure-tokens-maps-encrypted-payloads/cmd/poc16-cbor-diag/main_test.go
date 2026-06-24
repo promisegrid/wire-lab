@@ -44,15 +44,15 @@ func TestDiagnosticDecoderRendersNestedEnvelopeCBOR(t *testing.T) {
 	}
 }
 
-func TestRunFindsMessageByHashInRunRoot(t *testing.T) {
+func TestRunFindsMessageByCIDInRunRoot(t *testing.T) {
 	runRoot := t.TempDir()
 	messageCASDir := filepath.Join(runRoot, "message-cas")
 	if mkdirErr := os.MkdirAll(messageCASDir, 0o755); mkdirErr != nil {
 		t.Fatalf("MkdirAll: %v", mkdirErr)
 	}
 	rawEnvelope := []byte{0x83, 0x01, 0x02, 0x03}
-	exactHash := protocol.HashExactBytes(rawEnvelope)
-	artifactPath := filepath.Join(messageCASDir, exactHash+".cbor")
+	exactCID := protocol.CIDForExactBytes(rawEnvelope)
+	artifactPath := filepath.Join(messageCASDir, exactCID+".cbor")
 	if writeErr := os.WriteFile(artifactPath, rawEnvelope, 0o644); writeErr != nil {
 		t.Fatalf("WriteFile artifact: %v", writeErr)
 	}
@@ -62,10 +62,10 @@ func TestRunFindsMessageByHashInRunRoot(t *testing.T) {
 		Direction:    "sent",
 		Peer:         "bob",
 		Protocol:     "relationship_v1",
-		ExactSHA256:  exactHash,
+		ExactCID:     exactCID,
 		PromiseAbout: "diagnostic_review",
 		SourceEvent:  "runtime.sent",
-		Path:         filepath.Join("message-cas", exactHash+".cbor"),
+		Path:         filepath.Join("message-cas", exactCID+".cbor"),
 	}
 	recordBytes, marshalErr := json.Marshal(record)
 	if marshalErr != nil {
@@ -75,7 +75,7 @@ func TestRunFindsMessageByHashInRunRoot(t *testing.T) {
 		t.Fatalf("WriteFile index: %v", writeErr)
 	}
 	var output bytes.Buffer
-	if runErr := run([]string{"-run-root", runRoot, "-hash", exactHash}, &output); runErr != nil {
+	if runErr := run([]string{"-run-root", runRoot, "-cid", exactCID}, &output); runErr != nil {
 		t.Fatalf("run: %v", runErr)
 	}
 	rendered := output.String()

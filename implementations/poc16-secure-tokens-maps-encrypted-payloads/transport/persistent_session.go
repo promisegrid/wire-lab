@@ -2,8 +2,6 @@ package transport
 
 import (
 	"context"
-	"crypto/sha256"
-	"encoding/hex"
 	"errors"
 	"fmt"
 	"io"
@@ -12,8 +10,8 @@ import (
 	"time"
 )
 
-// ParentExtractor returns exact request hashes named by an incoming frame. The
-// transport package treats those hashes as opaque message IDs so PromiseGrid
+// ParentExtractor returns exact request CIDs named by an incoming frame. The
+// transport package treats those CIDs as opaque message IDs so PromiseGrid
 // message CIDs remain the only correlation layer.
 type ParentExtractor func(frameBytes []byte) ([]string, error)
 
@@ -441,12 +439,11 @@ func (session *PersistentSession) detailString(extra string) string {
 
 func newSessionID(name string) string {
 	// Intent: Session IDs are local log correlation names only. The counter
-	// disambiguates reconnects with the same endpoint name, while the hash keeps
-	// logs compact and avoids leaking raw network addresses into analyzer keys.
-	// Source: DI-mapop
+	// disambiguates reconnects with the same endpoint name without creating a
+	// second hash-like printable identifier outside the PromiseGrid CID rules.
+	// Source: DI-mapop; DI-sazip
 	sequence := atomic.AddUint64(&persistentSessionCounter, 1)
-	sum := sha256.Sum256([]byte(fmt.Sprintf("%s|%d", name, sequence)))
-	return hex.EncodeToString(sum[:8])
+	return fmt.Sprintf("session-%06d", sequence)
 }
 
 func isGracefulSessionClose(err error) bool {

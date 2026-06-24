@@ -12,6 +12,8 @@ import (
 	"path/filepath"
 	"strings"
 	"unicode/utf8"
+
+	"promisegrid.dev/wire-lab/implementations/poc16-secure-tokens-maps-encrypted-payloads/protocol"
 )
 
 const defaultRunRoot = "/run/poc16/poc16-demo"
@@ -322,6 +324,11 @@ func (value diagnosticValue) renderAt(indent int, options diagnosticOptions) str
 	case "map":
 		return renderList("{", "}", value.renderedMapItems(indent, options), indent)
 	case "tag":
+		if value.tag == 42 && value.tagValue != nil && value.tagValue.kind == "bytes" && len(value.tagValue.bytes) > 1 && value.tagValue.bytes[0] == 0x00 {
+			if cidText, cidErr := protocol.CIDTextFromBytes(value.tagValue.bytes[1:]); cidErr == nil {
+				return fmt.Sprintf("%d(%s / cid %s /)", value.tag, value.tagValue.renderAt(indent, options), cidText)
+			}
+		}
 		return fmt.Sprintf("%d(%s)", value.tag, value.tagValue.renderAt(indent, options))
 	case "simple":
 		return renderSimple(value.simple)
@@ -411,31 +418,31 @@ type messageDAGRecord struct {
 	Direction          string `json:"direction"`
 	Peer               string `json:"peer"`
 	Protocol           string `json:"protocol"`
-	ExactSHA256        string `json:"exact_sha256"`
-	ParentExactSHA256  string `json:"parent_exact_sha256,omitempty"`
+	ExactCID           string `json:"exact_cid"`
+	ParentCID          string `json:"parent_cid,omitempty"`
 	ParentLinkLocation string `json:"parent_link_location,omitempty"`
 	PromiseAbout       string `json:"promise_about"`
 	SourceEvent        string `json:"source_event"`
 	Path               string `json:"path"`
 }
 
-type hashList []string
+type cidList []string
 
-func (hashes *hashList) String() string {
-	return strings.Join(*hashes, ",")
+func (cids *cidList) String() string {
+	return strings.Join(*cids, ",")
 }
 
-func (hashes *hashList) Set(value string) error {
+func (cids *cidList) Set(value string) error {
 	if value == "" {
-		return fmt.Errorf("hash cannot be empty")
+		return fmt.Errorf("cid cannot be empty")
 	}
-	*hashes = append(*hashes, value)
+	*cids = append(*cids, value)
 	return nil
 }
 
 type cliConfig struct {
 	runRoot     string
-	hashes      hashList
+	cids        cidList
 	expandBytes bool
 	maxBytes    int
 }
@@ -457,7 +464,7 @@ func run(arguments []string, output io.Writer) error {
 		return selectErr
 	}
 	if len(selectedPaths) == 0 {
-		return errors.New("provide one or more paths or -hash values")
+		return errors.New("provide one or more paths or -cid values")
 	}
 	options := diagnosticOptions{expandBytes: config.expandBytes, maxBytes: config.maxBytes}
 	for pathIndex, path := range selectedPaths {
@@ -478,7 +485,7 @@ func parseCLI(arguments []string) (cliConfig, []string, error) {
 	flagSet := flag.NewFlagSet("poc16-cbor-diag", flag.ContinueOnError)
 	flagSet.SetOutput(io.Discard)
 	flagSet.StringVar(&config.runRoot, "run-root", config.runRoot, "POC16 run root containing message-dag.jsonl and message-cas/")
-	flagSet.Var(&config.hashes, "hash", "exact_sha256 of a retained message artifact; may be repeated")
+	flagSet.Var(&config.cids, "cid", "exact_cid of a retained message artifact; may be repeated")
 	flagSet.BoolVar(&config.expandBytes, "expand-bytes", config.expandBytes, "render nested CBOR byte strings as diagnostic notation")
 	flagSet.IntVar(&config.maxBytes, "max-bytes", config.maxBytes, "maximum raw byte-string length to show before truncation; zero disables truncation")
 	if err := flagSet.Parse(arguments); err != nil {
@@ -489,8 +496,8 @@ func parseCLI(arguments []string) (cliConfig, []string, error) {
 
 func selectInputPaths(config cliConfig, directPaths []string) ([]string, error) {
 	var selectedPaths []string
-	for _, hashValue := range config.hashes {
-		artifactPath, pathErr := pathForHash(config.runRoot, hashValue)
+	for _, cidValue := range config.cids {
+		artifactPath, pathErr := pathForCID(config.runRoot, cidValue)
 		if pathErr != nil {
 			return nil, pathErr
 		}
@@ -500,15 +507,15 @@ func selectInputPaths(config cliConfig, directPaths []string) ([]string, error) 
 	return selectedPaths, nil
 }
 
-func pathForHash(runRoot, hashValue string) (string, error) {
-	record, recordErr := findMessageDAGRecord(runRoot, hashValue)
+func pathForCID(runRoot, cidValue string) (string, error) {
+	record, recordErr := findMessageDAGRecord(runRoot, cidValue)
 	if recordErr != nil {
 		return "", recordErr
 	}
 	return filepath.Join(runRoot, record.Path), nil
 }
 
-func findMessageDAGRecord(runRoot, hashValue string) (messageDAGRecord, error) {
+func findMessageDAGRecord(runRoot, cidValue string) (messageDAGRecord, error) {
 	indexPath := filepath.Join(runRoot, "message-dag.jsonl")
 	indexFile, openErr := os.Open(indexPath)
 	if openErr != nil {
@@ -526,14 +533,14 @@ func findMessageDAGRecord(runRoot, hashValue string) (messageDAGRecord, error) {
 		if unmarshalErr := json.Unmarshal(scanner.Bytes(), &record); unmarshalErr != nil {
 			return messageDAGRecord{}, unmarshalErr
 		}
-		if record.ExactSHA256 == hashValue {
+		if record.ExactCID == cidValue {
 			return record, nil
 		}
 	}
 	if scanErr := scanner.Err(); scanErr != nil {
 		return messageDAGRecord{}, scanErr
 	}
-	return messageDAGRecord{}, fmt.Errorf("hash %s not found in %s", hashValue, indexPath)
+	return messageDAGRecord{}, fmt.Errorf("cid %s not found in %s", cidValue, indexPath)
 }
 
 func renderPath(path, runRoot string, options diagnosticOptions, output io.Writer) error {
@@ -616,11 +623,11 @@ func formatMessageDAGRecord(record messageDAGRecord) string {
 		"direction=" + record.Direction,
 		"peer=" + record.Peer,
 		"protocol=" + record.Protocol,
-		"exact_sha256=" + record.ExactSHA256,
+		"exact_cid=" + record.ExactCID,
 		"promise_about=" + record.PromiseAbout,
 	}
-	if record.ParentExactSHA256 != "" {
-		fields = append(fields, "parent_exact_sha256="+record.ParentExactSHA256)
+	if record.ParentCID != "" {
+		fields = append(fields, "parent_cid="+record.ParentCID)
 	}
 	if record.ParentLinkLocation != "" {
 		fields = append(fields, "parent_link_location="+record.ParentLinkLocation)

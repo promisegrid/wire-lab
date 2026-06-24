@@ -77,12 +77,12 @@ type Node struct {
 }
 
 type parsedMessage struct {
-	Fields             map[string]string
-	ExactHash          string
-	RawBytes           []byte
-	ProtocolCID        protocol.ProtocolCID
-	ProtocolName       string
-	ParentExactSHA256s []string
+	Fields       map[string]string
+	ExactCID     string
+	RawBytes     []byte
+	ProtocolCID  protocol.ProtocolCID
+	ProtocolName string
+	ParentCIDs   []string
 }
 
 // protocolHandlerResult is the app-local handler result for one inbound
@@ -122,7 +122,7 @@ type promiseRecord struct {
 	Fingerprint   string
 	Peer          string
 	ProtocolName  string
-	ExactHash     string
+	ExactCID      string
 	PromiseAbout  string
 	PromiseText   string
 	ExpectedEvent string
@@ -229,6 +229,15 @@ func (node *Node) Run(ctx context.Context) error {
 		return err
 	}
 	node.record("runtime_readiness_promised", "kept", "", "app receive promises registered with local kernel")
+	// Intent: Normal runtime completion still closes receive promises below, but
+	// cancellation can arrive while an app is in an LLM turn, a long workflow, or a
+	// grace wait. Close the local app/kernel stream immediately on context
+	// cancellation so local lifecycle accounting cannot be hidden by late app
+	// cleanup. Source: DI-rudiv
+	go func() {
+		<-ctx.Done()
+		node.closeReceivePromises()
+	}()
 	defer node.closeReceivePromises()
 	time.Sleep(node.Config.StartupDelay())
 	node.record("peer_readiness_observed", "kept", "", "startup delay elapsed after local receive promises")
@@ -946,7 +955,7 @@ func (node *Node) registerReceivePromises(ctx context.Context) error {
 	session := transport.NewPersistentSession(
 		"app-kernel:"+node.Agent.Name,
 		frameConn,
-		frameParentExactSHA256s,
+		frameParentCIDs,
 		node.frameIsResponse,
 		node.handleAppSessionFrame,
 		func(eventName, outcome, detail string) {
@@ -1007,7 +1016,7 @@ func (node *Node) registerReceivePromise(ctx context.Context, session *transport
 	if writeErr := session.Send(ctx, envelopeBytes); writeErr != nil {
 		return writeErr
 	}
-	node.record("pcid_owned_array_payload_sent", "kept", "parser", "pcid="+pcid.KernelTransportV1+" promise_about="+fields["promise_about"]+" exact_sha256="+protocol.HashExactBytes(envelopeBytes))
+	node.record("pcid_owned_array_payload_sent", "kept", "parser", "pcid="+pcid.KernelTransportV1+" promise_about="+fields["promise_about"]+" exact_cid="+protocol.CIDForExactBytes(envelopeBytes))
 	node.record("app_receive_promise_sent", "kept", "parser", "pcid="+protocolName+" parser="+kernelAddress)
 	node.record("app_kernel_backpressure_promised", "kept", "parser", "pcid="+protocolName+" app promises bounded receive buffering through the local parser role")
 	node.record("app_kernel_rate_limit_promised", "kept", "parser", "pcid="+protocolName+" app promises to treat local parser-role throughput as a bounded promise")
@@ -1033,37 +1042,37 @@ func (node *Node) handleFrame(frameBytes []byte) ([]byte, error) {
 		return nil, parseErr
 	}
 	node.emitMessageArtifact("received", parsed.Fields["from"], parsed.ProtocolName, frameBytes, parsed.Fields)
-	node.record("promise_envelope_validated", "kept", parsed.Fields["from"], "pcid="+parsed.ProtocolName+" exact_sha256="+parsed.ExactHash)
-	node.record("tcp_message_received", "kept", parsed.Fields["from"], "pcid="+parsed.ProtocolName+" exact_sha256="+parsed.ExactHash)
+	node.record("promise_envelope_validated", "kept", parsed.Fields["from"], "pcid="+parsed.ProtocolName+" exact_cid="+parsed.ExactCID)
+	node.record("tcp_message_received", "kept", parsed.Fields["from"], "pcid="+parsed.ProtocolName+" exact_cid="+parsed.ExactCID)
 	fields := parsed.Fields
 	fromAgent := fields["from"]
 	if isPcidOwnedArrayPayload(fields) {
-		node.record("pcid_owned_array_payload_received", "kept", fromAgent, "pcid="+parsed.ProtocolName+" promise_about="+fields["promise_about"]+" exact_sha256="+parsed.ExactHash)
+		node.record("pcid_owned_array_payload_received", "kept", fromAgent, "pcid="+parsed.ProtocolName+" promise_about="+fields["promise_about"]+" exact_cid="+parsed.ExactCID)
 	}
-	if node.rememberReplayEnvelope(fromAgent, parsed.ProtocolName, parsed.ExactHash) {
-		return node.newAckBytes(fromAgent, "not_promised", "I promise to remember that I already saw this exact envelope and will not treat the replay as fresh promise event.", parsed.ProtocolCID, parsed.ExactHash, map[string]string{"replay_status": "not_promised"})
+	if node.rememberReplayEnvelope(fromAgent, parsed.ProtocolName, parsed.ExactCID) {
+		return node.newAckBytes(fromAgent, "not_promised", "I promise to remember that I already saw this exact envelope and will not treat the replay as fresh promise event.", parsed.ProtocolCID, parsed.ExactCID, map[string]string{"replay_status": "not_promised"})
 	}
 	if !node.supportsProtocol(parsed.ProtocolName) {
 		node.record("unsupported_pcid", "non_commitment", fromAgent, "no local app receive promise for "+parsed.ProtocolName)
-		return node.newAckBytes(fromAgent, "not_promised", "I promise to remember that I did not promise to handle this pCID.", parsed.ProtocolCID, parsed.ExactHash, nil)
+		return node.newAckBytes(fromAgent, "not_promised", "I promise to remember that I did not promise to handle this pCID.", parsed.ProtocolCID, parsed.ExactCID, nil)
 	}
 	if fields["act"] != decision.ActPromise {
 		node.observeOutcome(fromAgent, relationship.OutcomeMalformed)
 		node.record("message_rejected", "malformed", fromAgent, "message act is not promise")
-		return node.newAckBytes(fromAgent, "malformed", "I promise I rejected this non-promise message.", parsed.ProtocolCID, parsed.ExactHash, nil)
+		return node.newAckBytes(fromAgent, "malformed", "I promise I rejected this non-promise message.", parsed.ProtocolCID, parsed.ExactCID, nil)
 	}
 	if !node.canAcceptFrom(fromAgent, fields) {
 		node.record("message_not_promised", "non_commitment", fromAgent, "no current local promise to accept direct TCP exchange")
-		return node.newAckBytes(fromAgent, "not_promised", "I promise to remember that I did not currently promise this direct exchange.", parsed.ProtocolCID, parsed.ExactHash, nil)
+		return node.newAckBytes(fromAgent, "not_promised", "I promise to remember that I did not currently promise this direct exchange.", parsed.ProtocolCID, parsed.ExactCID, nil)
 	}
 	node.recordInboundPressurePromises(fromAgent, parsed.ProtocolName, fields)
-	promiseID := node.rememberOutstandingPromise(fromAgent, parsed.ProtocolName, parsed.ExactHash, fields)
+	promiseID := node.rememberOutstandingPromise(fromAgent, parsed.ProtocolName, parsed.ExactCID, fields)
 	if resourceErr := node.checkIncomingResourcePromise(fields); resourceErr != nil {
 		node.resolveOutstandingPromise(promiseID, promiseStatusBroken, resourceErr.Error())
 		node.observeOutcome(fromAgent, relationship.OutcomeBroken)
 		node.applyBrokenPromiseCost(fromAgent, fields, resourceErr.Error())
 		node.record("resource_promise_rejected", "broken", fromAgent, resourceErr.Error())
-		return node.newAckBytes(fromAgent, "broken", "I promise I rejected this resource promise because local checks failed.", parsed.ProtocolCID, parsed.ExactHash, nil)
+		return node.newAckBytes(fromAgent, "broken", "I promise I rejected this resource promise because local checks failed.", parsed.ProtocolCID, parsed.ExactCID, nil)
 	}
 	handlerResult, handlerErr := node.handleProtocolPromise(parsed)
 	if handlerErr != nil {
@@ -1071,7 +1080,7 @@ func (node *Node) handleFrame(frameBytes []byte) ([]byte, error) {
 		node.observeOutcome(fromAgent, relationship.OutcomeBroken)
 		node.applyBrokenPromiseCost(fromAgent, fields, handlerErr.Error())
 		node.record("protocol_handler_rejected", "broken", fromAgent, handlerErr.Error())
-		return node.newAckBytes(fromAgent, "broken", "I promise I rejected this protocol promise because local app checks failed.", parsed.ProtocolCID, parsed.ExactHash, nil)
+		return node.newAckBytes(fromAgent, "broken", "I promise I rejected this protocol promise because local app checks failed.", parsed.ProtocolCID, parsed.ExactCID, nil)
 	}
 	ackFields := handlerResult.Fields
 	ackBytes := handlerResult.AckBytes
@@ -1082,7 +1091,7 @@ func (node *Node) handleFrame(frameBytes []byte) ([]byte, error) {
 			node.observeOutcome(fromAgent, relationship.OutcomeBroken)
 			node.applyBrokenPromiseCost(fromAgent, fields, parseErr.Error())
 			node.record("protocol_handler_rejected", "broken", fromAgent, parseErr.Error())
-			return node.newAckBytes(fromAgent, "broken", "I promise I rejected this protocol promise because local app checks failed.", parsed.ProtocolCID, parsed.ExactHash, nil)
+			return node.newAckBytes(fromAgent, "broken", "I promise I rejected this protocol promise because local app checks failed.", parsed.ProtocolCID, parsed.ExactCID, nil)
 		}
 		ackFields = ackMessage.Fields
 		node.emitMessageArtifact("ack_sent", fromAgent, ackMessage.ProtocolName, ackBytes, ackFields)
@@ -1099,14 +1108,14 @@ func (node *Node) handleFrame(frameBytes []byte) ([]byte, error) {
 	if acceptedAsCandidate {
 		eventName = "candidate_message_received"
 	}
-	node.record(eventName, "kept", fromAgent, "received "+parsed.ProtocolName+" signed promise exact_sha256="+parsed.ExactHash)
+	node.record(eventName, "kept", fromAgent, "received "+parsed.ProtocolName+" signed promise exact_cid="+parsed.ExactCID)
 	if len(ackBytes) > 0 {
 		return ackBytes, nil
 	}
-	return node.newAckBytes(fromAgent, "kept", "I promise I received and recorded your signed promise message.", parsed.ProtocolCID, parsed.ExactHash, ackFields)
+	return node.newAckBytes(fromAgent, "kept", "I promise I received and recorded your signed promise message.", parsed.ProtocolCID, parsed.ExactCID, ackFields)
 }
 
-func (node *Node) newAckBytes(target, outcome, promiseText string, protocolCID protocol.ProtocolCID, parentExactSHA256 string, extraFields map[string]string) ([]byte, error) {
+func (node *Node) newAckBytes(target, outcome, promiseText string, protocolCID protocol.ProtocolCID, parentCID string, extraFields map[string]string) ([]byte, error) {
 	ackFields := map[string]string{
 		"act":     decision.ActPromise,
 		"from":    node.Agent.Name,
@@ -1143,7 +1152,7 @@ func (node *Node) newAckBytes(target, outcome, promiseText string, protocolCID p
 			node.record("ack_sign_failed", "broken", target, payloadErr.Error())
 			return nil, payloadErr
 		}
-		ack, ackErr := protocol.NewEnvelopeFromPayloadWithParents(protocolCID, payloadBytes, []string{parentExactSHA256}, node.Agent.Name)
+		ack, ackErr := protocol.NewEnvelopeFromPayloadWithParents(protocolCID, payloadBytes, []string{parentCID}, node.Agent.Name)
 		if ackErr != nil {
 			node.record("ack_sign_failed", "broken", target, ackErr.Error())
 			return nil, ackErr
@@ -1162,7 +1171,7 @@ func (node *Node) newAckBytes(target, outcome, promiseText string, protocolCID p
 		if ackFields["promise_about"] == "" && (protocolName == pcid.RelationshipV1 || protocolName == pcid.KernelReceiveV1 || protocolName == pcid.KernelTransportV1) {
 			ackFields["promise_about"] = "local_observation"
 		}
-		ack, arrayPayload, ackErr := node.buildEnvelopeFromFieldsWithParents(protocolName, protocolCID, ackFields, []string{parentExactSHA256})
+		ack, arrayPayload, ackErr := node.buildEnvelopeFromFieldsWithParents(protocolName, protocolCID, ackFields, []string{parentCID})
 		if ackErr == nil && arrayPayload {
 			// Intent: Migrated pCIDs must keep ACKs in the same pCID-owned
 			// positional payload family as their requests, rather than falling
@@ -1178,7 +1187,7 @@ func (node *Node) newAckBytes(target, outcome, promiseText string, protocolCID p
 			return ackBytes, nil
 		}
 	}
-	ack, ackErr := protocol.NewEnvelopeWithParents(protocolCID, ackFields, []string{parentExactSHA256}, node.Agent.Name)
+	ack, ackErr := protocol.NewEnvelopeWithParents(protocolCID, ackFields, []string{parentCID}, node.Agent.Name)
 	if ackErr != nil {
 		node.record("ack_sign_failed", "broken", target, ackErr.Error())
 		return nil, ackErr
@@ -1230,9 +1239,9 @@ func (node *Node) sendAndReceive(target string, fields map[string]string) (parse
 	if bytesErr != nil {
 		return parsedMessage{}, bytesErr
 	}
-	exactHash := protocol.HashExactBytes(envelopeBytes)
+	exactCID := protocol.CIDForExactBytes(envelopeBytes)
 	node.recordOutboundPressurePromises(target, protocolName, fields)
-	promiseID := node.rememberOutstandingPromise(target, protocolName, exactHash, fields)
+	promiseID := node.rememberOutstandingPromise(target, protocolName, exactCID, fields)
 	session := node.appKernelSession()
 	if session == nil {
 		node.resolveOutstandingPromise(promiseID, promiseStatusLocalFailure, "missing local persistent app-kernel session")
@@ -1240,12 +1249,12 @@ func (node *Node) sendAndReceive(target string, fields map[string]string) (parse
 	}
 	node.emitMessageArtifact("sent", target, protocolName, envelopeBytes, fields)
 	if arrayPayload {
-		node.record("pcid_owned_array_payload_sent", "kept", target, "pcid="+protocolName+" promise_about="+fields["promise_about"]+" exact_sha256="+exactHash)
+		node.record("pcid_owned_array_payload_sent", "kept", target, "pcid="+protocolName+" promise_about="+fields["promise_about"]+" exact_cid="+exactCID)
 	}
-	node.record("tcp_message_sent", "kept", target, "pcid="+protocolName+" exact_sha256="+exactHash)
+	node.record("tcp_message_sent", "kept", target, "pcid="+protocolName+" exact_cid="+exactCID)
 	roundTripCtx, cancel := context.WithTimeout(context.Background(), sendTimeout)
 	defer cancel()
-	ackBytes, readErr := session.RoundTrip(roundTripCtx, exactHash, envelopeBytes)
+	ackBytes, readErr := session.RoundTrip(roundTripCtx, exactCID, envelopeBytes)
 	if readErr != nil {
 		node.resolveOutstandingPromise(promiseID, promiseStatusLocalFailure, readErr.Error())
 		return parsedMessage{}, readErr
@@ -1267,7 +1276,7 @@ func (node *Node) sendAndReceive(target string, fields map[string]string) (parse
 		return parsedMessage{}, ackOutcomeError{outcome: ackFields["outcome"]}
 	}
 	if isPcidOwnedArrayPayload(ackFields) {
-		node.record("pcid_owned_array_ack_received", "kept", target, "pcid="+ackMessage.ProtocolName+" promise_about="+ackFields["promise_about"]+" exact_sha256="+ackMessage.ExactHash)
+		node.record("pcid_owned_array_ack_received", "kept", target, "pcid="+ackMessage.ProtocolName+" promise_about="+ackFields["promise_about"]+" exact_cid="+ackMessage.ExactCID)
 	}
 	node.recordAckEvent(target, ackMessage)
 	if eventUpdatesTrust(ackFields) {
@@ -1290,12 +1299,12 @@ func (node *Node) buildEnvelopeFromFields(protocolName string, protocolCID proto
 	return node.buildEnvelopeFromFieldsWithParents(protocolName, protocolCID, fields, nil)
 }
 
-func (node *Node) buildEnvelopeFromFieldsWithParents(protocolName string, protocolCID protocol.ProtocolCID, fields map[string]string, parentExactSHA256s []string) (protocol.Envelope, bool, error) {
+func (node *Node) buildEnvelopeFromFieldsWithParents(protocolName string, protocolCID protocol.ProtocolCID, fields map[string]string, parentCIDs []string) (protocol.Envelope, bool, error) {
 	payloadBytes, arrayPayload, payloadErr := protocol.MarshalKnownArrayPayload(protocolName, fields)
 	if payloadErr != nil {
 		return protocol.Envelope{}, false, payloadErr
 	}
-	mergedParents := mergeParentExactSHA256s(parentExactSHA256s, envelopeParentExactSHA256sForFields(protocolName, fields))
+	mergedParents := mergeParentCIDs(parentCIDs, envelopeParentCIDsForFields(protocolName, fields))
 	if arrayPayload {
 		// Intent: ACKs and route-carried messages both use envelope parent links,
 		// but ACK parents come from the exact request CID while route parents can
@@ -1308,31 +1317,31 @@ func (node *Node) buildEnvelopeFromFieldsWithParents(protocolName string, protoc
 	return envelope, false, envelopeErr
 }
 
-func mergeParentExactSHA256s(parentLists ...[]string) []string {
+func mergeParentCIDs(parentLists ...[]string) []string {
 	seenParents := make(map[string]bool)
 	mergedParents := make([]string, 0)
 	for _, parentList := range parentLists {
-		for _, parentExactSHA256 := range parentList {
-			parentExactSHA256 = strings.TrimSpace(parentExactSHA256)
-			if parentExactSHA256 == "" || seenParents[parentExactSHA256] {
+		for _, parentCID := range parentList {
+			parentCID = strings.TrimSpace(parentCID)
+			if parentCID == "" || seenParents[parentCID] {
 				continue
 			}
-			seenParents[parentExactSHA256] = true
-			mergedParents = append(mergedParents, parentExactSHA256)
+			seenParents[parentCID] = true
+			mergedParents = append(mergedParents, parentCID)
 		}
 	}
 	return mergedParents
 }
 
-func envelopeParentExactSHA256sForFields(protocolName string, fields map[string]string) []string {
+func envelopeParentCIDsForFields(protocolName string, fields map[string]string) []string {
 	if protocolName != pcid.RouteV1 {
 		return nil
 	}
-	parentExactSHA256 := strings.TrimSpace(fields["envelope_parent_exact_sha256"])
-	if parentExactSHA256 == "" {
+	parentCID := strings.TrimSpace(fields["envelope_parent_cid"])
+	if parentCID == "" {
 		return nil
 	}
-	return []string{parentExactSHA256}
+	return []string{parentCID}
 }
 
 // sendUnknownProtocolPromise sends a syntactically valid envelope whose pCID is
@@ -1473,15 +1482,15 @@ func (node *Node) sendRawEnvelopeBytes(target, protocolName string, envelopeByte
 	if sentMessage, parseErr := node.parseEnvelope(envelopeBytes); parseErr == nil {
 		node.emitMessageArtifact("sent", target, sentMessage.ProtocolName, envelopeBytes, sentMessage.Fields)
 		if isPcidOwnedArrayPayload(sentMessage.Fields) {
-			node.record("pcid_owned_array_payload_sent", "kept", target, "pcid="+sentMessage.ProtocolName+" promise_about="+sentMessage.Fields["promise_about"]+" exact_sha256="+sentMessage.ExactHash)
+			node.record("pcid_owned_array_payload_sent", "kept", target, "pcid="+sentMessage.ProtocolName+" promise_about="+sentMessage.Fields["promise_about"]+" exact_cid="+sentMessage.ExactCID)
 		}
 	} else {
 		node.emitMessageArtifact("sent_malformed", target, protocolName, envelopeBytes, nil)
 	}
-	node.record("tcp_message_sent", "kept", target, "pcid="+protocolName+" exact_sha256="+protocol.HashExactBytes(envelopeBytes))
+	node.record("tcp_message_sent", "kept", target, "pcid="+protocolName+" exact_cid="+protocol.CIDForExactBytes(envelopeBytes))
 	roundTripCtx, cancel := context.WithTimeout(context.Background(), sendTimeout)
 	defer cancel()
-	ackBytes, readErr := session.RoundTrip(roundTripCtx, protocol.HashExactBytes(envelopeBytes), envelopeBytes)
+	ackBytes, readErr := session.RoundTrip(roundTripCtx, protocol.CIDForExactBytes(envelopeBytes), envelopeBytes)
 	if readErr != nil {
 		return parsedMessage{}, nil, readErr
 	}
@@ -1492,7 +1501,7 @@ func (node *Node) sendRawEnvelopeBytes(target, protocolName string, envelopeByte
 	}
 	node.emitMessageArtifact("ack_received", target, message.ProtocolName, ackBytes, message.Fields)
 	if isPcidOwnedArrayPayload(message.Fields) {
-		node.record("pcid_owned_array_ack_received", "kept", target, "pcid="+message.ProtocolName+" promise_about="+message.Fields["promise_about"]+" exact_sha256="+message.ExactHash)
+		node.record("pcid_owned_array_ack_received", "kept", target, "pcid="+message.ProtocolName+" promise_about="+message.Fields["promise_about"]+" exact_cid="+message.ExactCID)
 	}
 	return message, ackBytes, nil
 }
@@ -1520,22 +1529,22 @@ func (node *Node) parseEnvelope(frameBytes []byte) (parsedMessage, error) {
 	// the parser attaches the locally known protocol name for handlers that still
 	// compare event records across legacy and migrated payloads. Source: DI-gahuh
 	fields["protocol"] = protocolName
-	if len(envelope.ParentExactSHA256s) > 0 {
-		fields["envelope_parent_exact_sha256"] = envelope.ParentExactSHA256s[0]
-		if fields["parent_exact_sha256"] == "" {
-			fields["parent_exact_sha256"] = envelope.ParentExactSHA256s[0]
+	if len(envelope.ParentCIDs) > 0 {
+		fields["envelope_parent_cid"] = envelope.ParentCIDs[0]
+		if fields["parent_cid"] == "" {
+			fields["parent_cid"] = envelope.ParentCIDs[0]
 		}
 		if fields["parent_link_location"] == "" {
 			fields["parent_link_location"] = "envelope"
 		}
 	}
 	return parsedMessage{
-		Fields:             fields,
-		ExactHash:          protocol.HashExactBytes(frameBytes),
-		RawBytes:           append([]byte(nil), frameBytes...),
-		ProtocolCID:        envelope.ProtocolCID,
-		ProtocolName:       protocolName,
-		ParentExactSHA256s: append([]string(nil), envelope.ParentExactSHA256s...),
+		Fields:       fields,
+		ExactCID:     protocol.CIDForExactBytes(frameBytes),
+		RawBytes:     append([]byte(nil), frameBytes...),
+		ProtocolCID:  envelope.ProtocolCID,
+		ProtocolName: protocolName,
+		ParentCIDs:   append([]string(nil), envelope.ParentCIDs...),
 	}, nil
 }
 
@@ -1553,12 +1562,12 @@ func fieldsForEnvelopeProtocol(envelope protocol.Envelope, protocolName string, 
 	return envelope.PayloadFields()
 }
 
-func frameParentExactSHA256s(frameBytes []byte) ([]string, error) {
+func frameParentCIDs(frameBytes []byte) ([]string, error) {
 	envelope, parseErr := protocol.ParseEnvelope(frameBytes)
 	if parseErr != nil {
 		return nil, parseErr
 	}
-	return append([]string(nil), envelope.ParentExactSHA256s...), nil
+	return append([]string(nil), envelope.ParentCIDs...), nil
 }
 
 func (node *Node) frameIsResponse(frameBytes []byte) (bool, error) {
@@ -1571,7 +1580,7 @@ func (node *Node) frameIsResponse(frameBytes []byte) (bool, error) {
 	if parseErr != nil {
 		return false, parseErr
 	}
-	if len(envelope.ParentExactSHA256s) == 0 {
+	if len(envelope.ParentCIDs) == 0 {
 		return false, nil
 	}
 	protocolName, known := node.Protocols.Name(envelope.ProtocolCID)
@@ -1612,7 +1621,7 @@ func (node *Node) recordMalformedFrameEvent(frameBytes []byte, cause error) {
 	if fromAgent == "" {
 		return
 	}
-	node.record("malformed_proof_observed", "malformed", fromAgent, "pcid="+protocolName+" exact_sha256="+protocol.HashExactBytes(frameBytes)+" error="+cause.Error())
+	node.record("malformed_proof_observed", "malformed", fromAgent, "pcid="+protocolName+" exact_cid="+protocol.CIDForExactBytes(frameBytes)+" error="+cause.Error())
 	node.observeOutcome(fromAgent, relationship.OutcomeMalformed)
 }
 
@@ -2360,7 +2369,7 @@ func (node *Node) handleCIDComputePromise(message parsedMessage) (protocolHandle
 			return protocolHandlerResult{Fields: production.ExecuteComputePromiseFields(fields, resultBytes)}, nil
 		}
 		badResultBytes := production.BadComputeResultBytes(resultBytes)
-		node.record("compute_bad_result_promised", "malformed", fields["from"], "pcid="+pcid.CIDComputeV1+" hash-valid but semantically wrong result_cid="+production.ContentCID(badResultBytes))
+		node.record("compute_bad_result_promised", "malformed", fields["from"], "pcid="+pcid.CIDComputeV1+" CID-valid but semantically wrong result_cid="+production.ContentCID(badResultBytes))
 		return protocolHandlerResult{Fields: map[string]string{
 			"promise_about":  production.PromiseExecuteFunction,
 			"function_cid":   fields["function_cid"],
@@ -2447,8 +2456,8 @@ func (node *Node) executeComputeFunction(fields map[string]string) ([]byte, erro
 	if production.ContentCID(resultBytes) != production.ContentCID(expectedBytes) {
 		return nil, fmt.Errorf("WASM compute result CID mismatch")
 	}
-	moduleHash := protocol.HashExactBytes(runtimeadapter.MinimalWASMModule)
-	node.record("wasm_compute_request_received", "kept", fields["from"], "pcid="+pcid.CIDComputeV1+" module_sha256="+moduleHash+" input_n="+fmt.Sprintf("%d", n))
+	moduleCID := protocol.CIDForExactBytes(runtimeadapter.MinimalWASMModule)
+	node.record("wasm_compute_request_received", "kept", fields["from"], "pcid="+pcid.CIDComputeV1+" module_cid="+moduleCID+" input_n="+fmt.Sprintf("%d", n))
 	node.record("wasm_compute_function_executed", "kept", fields["from"], "pcid="+pcid.CIDComputeV1+" export="+result.ExportName+" value="+fmt.Sprintf("%d", result.ExportValue))
 	node.record("wasm_compute_result_promised", "kept", fields["from"], "pcid="+pcid.CIDComputeV1+" result_cid="+production.ContentCID(resultBytes))
 	return resultBytes, nil
@@ -2841,7 +2850,7 @@ func (node *Node) protocolSpecContexts() []decision.ProtocolSpecContext {
 		observationContexts = append(observationContexts, decision.ProtocolSpecContext{
 			Name:    context.Name,
 			PCID:    protocolCID.String(),
-			SHA256:  context.SHA256,
+			SpecCID: context.CID,
 			Excerpt: context.Excerpt,
 		})
 	}
@@ -2994,14 +3003,14 @@ func (node *Node) observeOutcome(peerName string, outcome relationship.Outcome) 
 // Intent: Trust changes should be explainable from a local promise-event
 // record rather than from transport success, kernel routing, or local resource
 // pressure alone. Source: DI-vujob
-func (node *Node) rememberOutstandingPromise(peerName, protocolName, exactHash string, fields map[string]string) string {
+func (node *Node) rememberOutstandingPromise(peerName, protocolName, exactCID string, fields map[string]string) string {
 	fingerprint := promiseRecordKey(peerName, protocolName, "", fields)
 	record := promiseRecord{
-		Key:           promiseRecordKey(peerName, protocolName, exactHash, fields),
+		Key:           promiseRecordKey(peerName, protocolName, exactCID, fields),
 		Fingerprint:   fingerprint,
 		Peer:          peerName,
 		ProtocolName:  protocolName,
-		ExactHash:     exactHash,
+		ExactCID:      exactCID,
 		PromiseAbout:  fields["promise_about"],
 		PromiseText:   fields["promise"],
 		ExpectedEvent: fields["reason"],
@@ -3010,7 +3019,7 @@ func (node *Node) rememberOutstandingPromise(peerName, protocolName, exactHash s
 	node.mu.Lock()
 	node.promiseJournal[record.Key] = record
 	node.mu.Unlock()
-	node.record("promise_outstanding", "kept", peerName, fmt.Sprintf("status=%s protocol=%s exact_sha256=%s promise_about=%s", record.Status, record.ProtocolName, record.ExactHash, record.PromiseAbout))
+	node.record("promise_outstanding", "kept", peerName, fmt.Sprintf("status=%s protocol=%s exact_cid=%s promise_about=%s", record.Status, record.ProtocolName, record.ExactCID, record.PromiseAbout))
 	return record.Key
 }
 
@@ -3034,7 +3043,7 @@ func (node *Node) resolveOutstandingPromise(recordKey string, status promiseStat
 		node.record("promise_resolution_unmatched", promiseStatusOutcome(status), "", "status="+string(status)+" detail="+detail)
 		return
 	}
-	node.record("promise_resolved", promiseStatusOutcome(status), record.Peer, fmt.Sprintf("status=%s protocol=%s exact_sha256=%s promise_about=%s detail=%s", status, record.ProtocolName, record.ExactHash, record.PromiseAbout, detail))
+	node.record("promise_resolved", promiseStatusOutcome(status), record.Peer, fmt.Sprintf("status=%s protocol=%s exact_cid=%s promise_about=%s detail=%s", status, record.ProtocolName, record.ExactCID, record.PromiseAbout, detail))
 }
 
 // recordLocalResourceExhaustion records this app's own inability or refusal to
@@ -3216,9 +3225,9 @@ func eventUpdatesTrust(fields map[string]string) bool {
 // Intent: POC16 needs exact-byte promise accounting for real sends while still
 // detecting repeated live-agent promise intent before sending again. Source:
 // DI-vujob
-func promiseRecordKey(peerName, protocolName, exactHash string, fields map[string]string) string {
-	if exactHash != "" {
-		return peerName + "|" + protocolName + "|" + exactHash
+func promiseRecordKey(peerName, protocolName, exactCID string, fields map[string]string) string {
+	if exactCID != "" {
+		return peerName + "|" + protocolName + "|" + exactCID
 	}
 	return peerName + "|" + protocolName + "|" + fields["promise_about"] + "|" + fields["promise"]
 }
@@ -3538,21 +3547,21 @@ func (node *Node) emitMessageArtifact(direction, peer, protocolName string, enve
 		Direction:           direction,
 		Peer:                peer,
 		Protocol:            artifactProtocol,
-		ExactSHA256:         protocol.HashExactBytes(envelopeBytes),
+		ExactCID:            protocol.CIDForExactBytes(envelopeBytes),
 		EnvelopeBytesBase64: base64.StdEncoding.EncodeToString(envelopeBytes),
 		SourceEvent:         "runtime." + direction,
 	}
 	if fields != nil {
-		artifact.ParentExactSHA256 = firstNonEmpty(fields["envelope_parent_exact_sha256"], fields["payload_parent_exact_sha256"], fields["parent_exact_sha256"])
+		artifact.ParentCID = firstNonEmpty(fields["envelope_parent_cid"], fields["payload_parent_cid"], fields["parent_cid"])
 		artifact.ParentLinkLocation = firstNonEmpty(fields["parent_link_location"], parentLinkLocationFromFields(fields))
 		artifact.PromiseAbout = fields["promise_about"]
 	}
-	if envelope, parseErr := protocol.ParseEnvelope(envelopeBytes); parseErr == nil && len(envelope.ParentExactSHA256s) > 0 {
+	if envelope, parseErr := protocol.ParseEnvelope(envelopeBytes); parseErr == nil && len(envelope.ParentCIDs) > 0 {
 		// Intent: ACK artifact records should derive envelope parent links from
 		// the signed bytes themselves, not only from caller-supplied compatibility
 		// fields. This keeps raw-message DAG review aligned with the demux data
 		// that persistent sessions actually use. Source: DI-vopab
-		artifact.ParentExactSHA256 = envelope.ParentExactSHA256s[0]
+		artifact.ParentCID = envelope.ParentCIDs[0]
 		artifact.ParentLinkLocation = "envelope"
 	}
 	record := eventstream.Record{
@@ -3568,17 +3577,17 @@ func (node *Node) emitMessageArtifact(direction, peer, protocolName string, enve
 	node.stdoutMu.Lock()
 	fmt.Println(string(recordBytes))
 	node.stdoutMu.Unlock()
-	node.record("raw_message_artifact_emitted", "kept", peer, "direction="+direction+" pcid="+artifactProtocol+" exact_sha256="+artifact.ExactSHA256)
+	node.record("raw_message_artifact_emitted", "kept", peer, "direction="+direction+" pcid="+artifactProtocol+" exact_cid="+artifact.ExactCID)
 }
 
 func parentLinkLocationFromFields(fields map[string]string) string {
-	if fields["envelope_parent_exact_sha256"] != "" {
+	if fields["envelope_parent_cid"] != "" {
 		return "envelope"
 	}
-	if fields["payload_parent_exact_sha256"] != "" {
+	if fields["payload_parent_cid"] != "" {
 		return "payload"
 	}
-	if fields["parent_exact_sha256"] != "" {
+	if fields["parent_cid"] != "" {
 		return "payload"
 	}
 	return ""
@@ -3824,19 +3833,19 @@ func (node *Node) recordRetentionPromiseBroken(subject, detail string) {
 // envelopes. Intent: Replays are not commands to punish a peer globally; they are
 // local event records that the same exact promise bytes should not be counted as fresh
 // promise event records again. Source: DI-sunuf
-func (node *Node) rememberReplayEnvelope(peerName, protocolName, exactHash string) bool {
+func (node *Node) rememberReplayEnvelope(peerName, protocolName, exactCID string) bool {
 	node.recordReplayWindowPromise(protocolName)
 	node.mu.Lock()
-	priorEvent, replayed := node.replayJournal[exactHash]
+	priorEvent, replayed := node.replayJournal[exactCID]
 	if !replayed {
-		node.replayJournal[exactHash] = peerName + "|" + protocolName
+		node.replayJournal[exactCID] = peerName + "|" + protocolName
 	}
 	node.mu.Unlock()
 	if replayed {
-		node.record("replay_envelope_rejected", "non_commitment", peerName, "pcid="+protocolName+" exact_sha256="+exactHash+" prior="+priorEvent)
+		node.record("replay_envelope_rejected", "non_commitment", peerName, "pcid="+protocolName+" exact_cid="+exactCID+" prior="+priorEvent)
 		return true
 	}
-	node.record("replay_envelope_recorded", "kept", peerName, "pcid="+protocolName+" exact_sha256="+exactHash)
+	node.record("replay_envelope_recorded", "kept", peerName, "pcid="+protocolName+" exact_cid="+exactCID)
 	return false
 }
 
@@ -3851,7 +3860,7 @@ func (node *Node) recordReplayWindowPromise(protocolName string) {
 	}) {
 		return
 	}
-	node.record("replay_window_promised", "kept", "", "pcid="+protocolName+" exact envelope hashes are remembered only inside this run")
+	node.record("replay_window_promised", "kept", "", "pcid="+protocolName+" exact envelope CIDs are remembered only inside this run")
 }
 
 // recordOutboundPressurePromises records sender-side rate promises before bytes

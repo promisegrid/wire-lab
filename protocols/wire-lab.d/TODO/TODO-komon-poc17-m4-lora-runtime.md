@@ -264,6 +264,13 @@ This section is the starting context for the next Codex operator. Complete
   message kind, route target, service name, or universal dispatch key.
 - Preserve the outer message invariant `grid([42(pCID), ...])`; every slot after
   slot 0 is defined by the pCID spec.
+- Treat every hash-like protocol, storage, parent, artifact, and registry
+  identifier as a CID. Use binary CID bytes on the wire and CIDv1 base32 text
+  with the multibase `b` prefix anywhere printable. Source: `DI-sazip` in
+  `TODO-zugok`.
+- Hardcode authoritative base32 pCID constants in code. Human-readable protocol
+  names and spec filenames are comments/metadata near those constants, not
+  registry authority. Source: `DI-sazip` in `TODO-zugok`.
 - Keep the top-level semantic action minimal: ordinary protocol behavior should
   be voluntary `promise` payload semantics, not new action kinds.
 - Do not claim exact Feather M4 Express plus RFM95W simulation fidelity until pin
@@ -286,8 +293,12 @@ This section is the starting context for the next Codex operator. Complete
   selection, and event retention.
 - Treat radio delivery as transport only. The radio medium may lose, duplicate,
   delay, or bound packets; it must not judge promises or mutate trust.
-- Keep ACK/reply correlation based on exact request message hashes and parent
+- Keep ACK/reply correlation based on exact request message CIDs and parent
   links, not payload-level RPC request IDs.
+- Keep CAS paths, parent links, diagnostic CBOR annotations, analyzer indexes,
+  runtime logs, and pCID registry keys CID-first: binary CID bytes in CBOR,
+  base32 CID text in filenames and JSON, and no bare SHA-256 hex as an external
+  identifier. Source: `DI-sazip` in `TODO-zugok`.
 - Keep local scarcity separate from peer promise-breaking. Battery, RAM, flash,
   MTU, retry-budget, and airtime pressure can justify local non-commitment, but
   must not automatically lower trust in a peer.
@@ -299,9 +310,9 @@ This section is the starting context for the next Codex operator. Complete
 
 ### POC16 Cleanup Still Relevant To POC17
 
-- POC16 still needs implementation-local CID-named spec aliases under its
-  `docs/protocols/` directory; POC17 should plan CID-named spec aliases from the
-  start once its spec docs exist.
+- POC16 now uses implementation-local CID-named spec aliases under its
+  `docs/protocols/` directory; POC17 should create `<base32_pCID>.md` symlinks
+  from the start for every spec doc it introduces.
 - POC16 still needs a guard preventing stale root `docs/protocols/` POC mirrors;
   POC17 should not reintroduce a root-level protocol mirror.
 - POC16 analyzer wording around "production-candidate" needs tightening; POC17
@@ -313,6 +324,10 @@ This section is the starting context for the next Codex operator. Complete
   include diagnostic renderings for every small-device pCID it introduces.
 - POC16 pCID inventory needs auditing against spec docs, parser, builder, and
   runtime use; POC17 should keep that inventory explicit from the beginning.
+- POC17 should use a well-known CID library rather than hand-rolled CID parsing
+  or assembly. The POC-local code may wrap the library, but the wrapper must
+  reject malformed CIDs and must render canonical CIDv1 base32 whenever text is
+  needed. Source: `DI-sazip` in `TODO-zugok`.
 
 ### Session-Only Operating Habits
 

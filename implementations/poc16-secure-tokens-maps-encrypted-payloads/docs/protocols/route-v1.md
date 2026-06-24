@@ -52,7 +52,7 @@ reserved/core body keys, non-text body keys or values, or trailing CBOR bytes.
 Common `promise_about` values are `route_probe`, `forward_if_next_promises`,
 `route_confirmation`, `route_use`, `route_renewal`, `route_failure`, and
 `route_exclusion`. Common details are `route_id`, `next_peer`, `final_peer`,
-`ttl_turns`, `max_hops`, `credit_offer`, `credit_token`, `parent_exact_sha256`,
+`ttl_turns`, `max_hops`, `credit_offer`, `credit_token`, `parent_cid`,
 `excluded_peer`, and `failure_reason`.
 
 ## Sender behavior

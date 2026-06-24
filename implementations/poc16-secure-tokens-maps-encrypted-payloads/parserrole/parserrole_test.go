@@ -46,8 +46,8 @@ func TestFrameIsResponseRequiresParentLink(t *testing.T) {
 	if freshIsResponse {
 		t.Fatalf("fresh outcome-bearing promise was misclassified as a response")
 	}
-	parentHash := protocol.HashExactBytes([]byte("parent promise"))
-	responseEnvelope, responseErr := protocol.NewEnvelopeFromPayloadWithParents(role.Protocols.MustCID(pcid.RelationshipV1), payloadBytes, []string{parentHash}, "alice")
+	parentCID := protocol.CIDForExactBytes([]byte("parent promise"))
+	responseEnvelope, responseErr := protocol.NewEnvelopeFromPayloadWithParents(role.Protocols.MustCID(pcid.RelationshipV1), payloadBytes, []string{parentCID}, "alice")
 	if responseErr != nil {
 		t.Fatalf("build response envelope: %v", responseErr)
 	}
@@ -142,8 +142,8 @@ func TestDeliverToLocalAppReturnsNotPromisedWhenNoReceiver(t *testing.T) {
 	if ackMessage.Fields["outcome"] != "not_promised" {
 		t.Fatalf("ack outcome = %q, want not_promised", ackMessage.Fields["outcome"])
 	}
-	if ackMessage.Fields["parent_exact_sha256"] != message.ExactHash {
-		t.Fatalf("ack parent = %q, want %q", ackMessage.Fields["parent_exact_sha256"], message.ExactHash)
+	if ackMessage.Fields["parent_cid"] != message.ExactCID {
+		t.Fatalf("ack parent = %q, want %q", ackMessage.Fields["parent_cid"], message.ExactCID)
 	}
 }
 
@@ -156,7 +156,7 @@ func TestDeliverToLocalAppReturnsAppAck(t *testing.T) {
 	appSession := transport.NewPersistentSession(
 		"test-app",
 		transport.NewFrameConn(appConn),
-		frameParentExactSHA256s,
+		frameParentCIDs,
 		role.frameIsResponse,
 		func(frameBytes []byte) ([]byte, error) {
 			incoming, parseErr := role.Parser.Parse(frameBytes)
@@ -176,7 +176,7 @@ func TestDeliverToLocalAppReturnsAppAck(t *testing.T) {
 			if payloadErr != nil {
 				return nil, payloadErr
 			}
-			ackEnvelope, ackErr := protocol.NewEnvelopeFromPayloadWithParents(role.Protocols.MustCID(pcid.ProductionShippingV1), payloadBytes, []string{incoming.ExactHash}, "fulfillment")
+			ackEnvelope, ackErr := protocol.NewEnvelopeFromPayloadWithParents(role.Protocols.MustCID(pcid.ProductionShippingV1), payloadBytes, []string{incoming.ExactCID}, "fulfillment")
 			if ackErr != nil {
 				return nil, ackErr
 			}
@@ -187,7 +187,7 @@ func TestDeliverToLocalAppReturnsAppAck(t *testing.T) {
 	parserSession := transport.NewPersistentSession(
 		"test-parser",
 		transport.NewFrameConn(parserConn),
-		frameParentExactSHA256s,
+		frameParentCIDs,
 		role.frameIsResponse,
 		nil,
 		func(eventName, outcome, detail string) {},
@@ -207,8 +207,8 @@ func TestDeliverToLocalAppReturnsAppAck(t *testing.T) {
 	if ackMessage.Fields["outcome"] != "kept" {
 		t.Fatalf("app ACK outcome = %q, want kept", ackMessage.Fields["outcome"])
 	}
-	if ackMessage.Fields["parent_exact_sha256"] != message.ExactHash {
-		t.Fatalf("app ACK parent = %q, want %q", ackMessage.Fields["parent_exact_sha256"], message.ExactHash)
+	if ackMessage.Fields["parent_cid"] != message.ExactCID {
+		t.Fatalf("app ACK parent = %q, want %q", ackMessage.Fields["parent_cid"], message.ExactCID)
 	}
 }
 

@@ -27,9 +27,9 @@ func (node *Node) runWASMAdapterWorkflow(ctx context.Context) error {
 	if !targetFound {
 		target = "victor"
 	}
-	moduleHash := protocol.HashExactBytes(runtimeadapter.MinimalWASMModule)
-	node.record("wasm_process_agent_started", "kept", "", "agent="+node.Agent.Name+" module_sha256="+moduleHash)
-	node.record("wasm_module_instantiated", "kept", "", "module_sha256="+moduleHash+" runtime=wazero")
+	moduleCID := protocol.CIDForExactBytes(runtimeadapter.MinimalWASMModule)
+	node.record("wasm_process_agent_started", "kept", "", "agent="+node.Agent.Name+" module_cid="+moduleCID)
+	node.record("wasm_module_instantiated", "kept", "", "module_cid="+moduleCID+" runtime=wazero")
 	node.record("wasm_export_called", "kept", "", "export="+result.ExportName)
 	node.record("wasm_export_result_observed", "kept", "", fmt.Sprintf("export=%s input=%d value=%d", result.ExportName, result.InputValue, result.ExportValue))
 	fields := runtimeadapter.PromiseFields(
@@ -38,14 +38,14 @@ func (node *Node) runWASMAdapterWorkflow(ctx context.Context) error {
 		runtimeadapter.PromiseAboutWASMAdapter,
 		"Peggy promises that her local WASM-adapter process executed an embedded wazero module and will exchange only pCID-defined PromiseGrid envelopes.",
 	)
-	fields["wasm_module_sha256"] = moduleHash
+	fields["wasm_module_cid"] = moduleCID
 	fields["wasm_export"] = result.ExportName
 	fields["wasm_export_value"] = fmt.Sprintf("%d", result.ExportValue)
 	fields["protocol"] = pcid.RelationshipV1
 	if _, err := node.sendAndReceive(target, fields); err != nil {
 		return fmt.Errorf("wasm adapter promise: %w", err)
 	}
-	node.record("wasm_adapter_promise_sent", "kept", target, "pcid="+pcid.RelationshipV1+" module_sha256="+moduleHash)
+	node.record("wasm_adapter_promise_sent", "kept", target, "pcid="+pcid.RelationshipV1+" module_cid="+moduleCID)
 	node.record("wasm_adapter_ack_received", "kept", target, "pcid="+pcid.RelationshipV1+" stdio peer accepted WASM-adapter event as a local promise")
 	usefulTarget := "dave"
 	usefulFields := runtimeadapter.PromiseFields(
@@ -54,7 +54,7 @@ func (node *Node) runWASMAdapterWorkflow(ctx context.Context) error {
 		runtimeadapter.PromiseAboutWASMModuleUse,
 		"Peggy promises Dave a reusable WASM module-execution event: these module bytes were compiled, instantiated, and called with wazero, returning the expected deterministic value.",
 	)
-	usefulFields["wasm_module_sha256"] = moduleHash
+	usefulFields["wasm_module_cid"] = moduleCID
 	usefulFields["wasm_export"] = result.ExportName
 	usefulFields["wasm_input_value"] = fmt.Sprintf("%d", result.InputValue)
 	usefulFields["wasm_export_value"] = fmt.Sprintf("%d", result.ExportValue)
@@ -64,7 +64,7 @@ func (node *Node) runWASMAdapterWorkflow(ctx context.Context) error {
 	}
 	// Intent: Peggy's WASM process should do useful PromiseGrid work, not merely
 	// prove that a sandbox interface exists. Source: DI-pamob
-	node.record("wasm_useful_work_promised", "kept", usefulTarget, "pcid="+pcid.RelationshipV1+" module_sha256="+moduleHash)
+	node.record("wasm_useful_work_promised", "kept", usefulTarget, "pcid="+pcid.RelationshipV1+" module_cid="+moduleCID)
 	node.record("wasm_useful_work_ack_received", "kept", usefulTarget, "pcid="+pcid.RelationshipV1+" Dave received reusable module-execution event")
 	return nil
 }
@@ -103,7 +103,7 @@ func (node *Node) runStdioComputeWorker(message parsedMessage) ([]byte, error) {
 	if err := runtimeadapter.WriteCBORFrame(stdin, requestBytes); err != nil {
 		return nil, node.finishStdioWorker(command, stdin, fmt.Errorf("write stdio compute request: %w", err))
 	}
-	node.record("stdio_compute_request_forwarded", "kept", target, "pcid="+message.ProtocolName+" exact_sha256="+message.ExactHash)
+	node.record("stdio_compute_request_forwarded", "kept", target, "pcid="+message.ProtocolName+" exact_cid="+message.ExactCID)
 	ackFrameBytes, err := runtimeadapter.ReadCBORFrame(stdout)
 	if err != nil {
 		return nil, node.finishStdioWorker(command, stdin, fmt.Errorf("read stdio compute ack: %w", err))
@@ -120,7 +120,7 @@ func (node *Node) runStdioComputeWorker(message parsedMessage) ([]byte, error) {
 		return nil, node.finishStdioWorker(command, stdin, parseErr)
 	}
 	node.record("stdio_compute_worker_executed", "kept", target, "pcid="+ackMessage.ProtocolName+" result_cid="+ackMessage.Fields["result_cid"])
-	node.record("stdio_compute_ack_received", "kept", target, "pcid="+ackMessage.ProtocolName+" exact_sha256="+ackMessage.ExactHash)
+	node.record("stdio_compute_ack_received", "kept", target, "pcid="+ackMessage.ProtocolName+" exact_cid="+ackMessage.ExactCID)
 	if finishErr := node.finishStdioWorker(command, stdin, nil); finishErr != nil {
 		return nil, finishErr
 	}
@@ -165,8 +165,8 @@ func (node *Node) runStdioAdapterWorkflow(ctx context.Context) error {
 		return node.finishStdioWorker(command, stdin, outboundErr)
 	}
 	envelopeBytes := outbound.EnvelopeBytes
-	node.record("stdio_worker_envelope_received", "kept", target, "protocol="+outbound.Protocol+" exact_sha256="+protocol.HashExactBytes(envelopeBytes))
-	node.record("stdio_cbor_envelope_received", "kept", target, "protocol="+outbound.Protocol+" exact_sha256="+protocol.HashExactBytes(envelopeBytes))
+	node.record("stdio_worker_envelope_received", "kept", target, "protocol="+outbound.Protocol+" exact_cid="+protocol.CIDForExactBytes(envelopeBytes))
+	node.record("stdio_cbor_envelope_received", "kept", target, "protocol="+outbound.Protocol+" exact_cid="+protocol.CIDForExactBytes(envelopeBytes))
 	_, ackBytes, sendErr := node.sendRawEnvelopeBytes(outbound.To, outbound.Protocol, envelopeBytes)
 	if sendErr != nil {
 		return node.finishStdioWorker(command, stdin, fmt.Errorf("stdio envelope forward: %w", sendErr))
@@ -179,13 +179,13 @@ func (node *Node) runStdioAdapterWorkflow(ctx context.Context) error {
 	if err := runtimeadapter.WriteCBORFrame(stdin, ackFrameBytes); err != nil {
 		return node.finishStdioWorker(command, stdin, fmt.Errorf("write stdio ack: %w", err))
 	}
-	node.record("stdio_cbor_ack_sent", "kept", target, "exact_sha256="+protocol.HashExactBytes(ackBytes))
+	node.record("stdio_cbor_ack_sent", "kept", target, "exact_cid="+protocol.CIDForExactBytes(ackBytes))
 	observed, observedErr := readStdioEvent(stdout)
 	if observedErr != nil {
 		return node.finishStdioWorker(command, stdin, observedErr)
 	}
-	node.record("stdio_worker_ack_event", observed.Outcome, target, "exact_sha256="+observed.ExactSHA256)
-	node.record("stdio_cbor_ack_event", observed.Outcome, target, "exact_sha256="+observed.ExactSHA256)
+	node.record("stdio_worker_ack_event", observed.Outcome, target, "exact_cid="+observed.ExactCID)
+	node.record("stdio_cbor_ack_event", observed.Outcome, target, "exact_cid="+observed.ExactCID)
 	usefulTarget := "dave"
 	usefulFields := runtimeadapter.PromiseFields(
 		node.Agent.Name,
@@ -193,7 +193,7 @@ func (node *Node) runStdioAdapterWorkflow(ctx context.Context) error {
 		runtimeadapter.PromiseAboutStdioWorkerUse,
 		"Victor promises Dave that a stdio-only subprocess round-tripped an exact signed PromiseGrid envelope and observed the peer ACK bytes without direct network access.",
 	)
-	usefulFields["ack_exact_sha256"] = observed.ExactSHA256
+	usefulFields["ack_exact_cid"] = observed.ExactCID
 	usefulFields["protocol"] = pcid.RelationshipV1
 	if _, err := node.sendAndReceive(usefulTarget, usefulFields); err != nil {
 		return node.finishStdioWorker(command, stdin, fmt.Errorf("stdio useful-work promise: %w", err))
@@ -201,7 +201,7 @@ func (node *Node) runStdioAdapterWorkflow(ctx context.Context) error {
 	// Intent: Victor's stdio worker should produce reusable relationship event records
 	// about subprocess messaging, not only adapter plumbing logs. Source:
 	// DI-pamob
-	node.record("stdio_useful_work_promised", "kept", usefulTarget, "pcid="+pcid.RelationshipV1+" ack_exact_sha256="+observed.ExactSHA256)
+	node.record("stdio_useful_work_promised", "kept", usefulTarget, "pcid="+pcid.RelationshipV1+" ack_exact_cid="+observed.ExactCID)
 	node.record("stdio_useful_work_ack_received", "kept", usefulTarget, "pcid="+pcid.RelationshipV1+" Dave received stdio subprocess round-trip event")
 	return node.finishStdioWorker(command, stdin, nil)
 }
@@ -236,7 +236,7 @@ func readStdioEvent(reader io.Reader) (runtimeadapter.StdioCBOREvent, error) {
 	if observed.Type != "ack_event" {
 		return runtimeadapter.StdioCBOREvent{}, fmt.Errorf("stdio worker message type %q, want ack_event", observed.Type)
 	}
-	if observed.Outcome == "" || observed.ExactSHA256 == "" {
+	if observed.Outcome == "" || observed.ExactCID == "" {
 		return runtimeadapter.StdioCBOREvent{}, fmt.Errorf("stdio worker ack observation is incomplete")
 	}
 	return observed, nil

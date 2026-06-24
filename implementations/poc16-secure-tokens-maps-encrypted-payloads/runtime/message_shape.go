@@ -18,7 +18,7 @@ type MessageShapeSpecimen struct {
 	Name               string
 	ProtocolName       string
 	EnvelopeBytes      []byte
-	ParentExactSHA256  string
+	ParentCID          string
 	ParentLinkLocation string
 }
 
@@ -36,12 +36,12 @@ func (node *Node) runMessageShapeSpecimenWorkflow() error {
 		fields := map[string]string{
 			"promise_about": "message_shape_specimen",
 		}
-		if specimen.ParentExactSHA256 != "" {
-			fields["parent_exact_sha256"] = specimen.ParentExactSHA256
+		if specimen.ParentCID != "" {
+			fields["parent_cid"] = specimen.ParentCID
 			fields["parent_link_location"] = specimen.ParentLinkLocation
 		}
 		node.emitMessageArtifact("shape_specimen", specimen.Name, specimen.ProtocolName, specimen.EnvelopeBytes, fields)
-		node.record("message_shape_specimen_emitted", "kept", specimen.Name, "pcid="+specimen.ProtocolName+" shape="+specimen.Name+" exact_sha256="+protocol.HashExactBytes(specimen.EnvelopeBytes))
+		node.record("message_shape_specimen_emitted", "kept", specimen.Name, "pcid="+specimen.ProtocolName+" shape="+specimen.Name+" exact_cid="+protocol.CIDForExactBytes(specimen.EnvelopeBytes))
 	}
 	return nil
 }
@@ -76,7 +76,7 @@ func (node *Node) messageShapeSpecimens() ([]MessageShapeSpecimen, error) {
 	if nativeBytesErr != nil {
 		return nil, nativeBytesErr
 	}
-	parentCIDBytes := protocol.RawCIDV1SHA256Bytes(nativeBytes)
+	parentCIDBytes := protocol.CIDBytesForExactBytes(nativeBytes)
 	parentLinks, parentErr := protocol.EncodeTag42LinkArray(parentCIDBytes)
 	if parentErr != nil {
 		return nil, parentErr
@@ -131,9 +131,9 @@ func (node *Node) messageShapeSpecimens() ([]MessageShapeSpecimen, error) {
 	if coseProofMessageErr != nil {
 		return nil, coseProofMessageErr
 	}
-	parentExactHash := protocol.HashExactBytes(nativeBytes)
+	parentCID := protocol.CIDForExactBytes(nativeBytes)
 	node.record("message_shape_multiarity_specimens_promised", "kept", "operator", "pcid="+pcid.MessageShapeTransportV1+" pCID owns arity and slot meaning")
-	node.record("message_shape_parent_link_specimens_promised", "kept", "operator", "pcid="+pcid.MessageShapeEnvelopeParentsV1+" parent_exact_sha256="+parentExactHash)
+	node.record("message_shape_parent_link_specimens_promised", "kept", "operator", "pcid="+pcid.MessageShapeEnvelopeParentsV1+" parent_cid="+parentCID)
 	node.record("message_shape_cose_specimens_promised", "kept", "operator", "pcid="+pcid.MessageShapeCOSEPayloadV1+" "+pcid.MessageShapeCOSEProofV1)
 	node.record("message_shape_native_proof_specimen_emitted", "kept", "operator", "pcid="+pcid.MessageShapeNativeProofV1+" proof_style=native")
 	node.record("message_shape_transport_specimen_emitted", "kept", "operator", "pcid="+pcid.MessageShapeTransportV1+" slot_count=2")
@@ -144,8 +144,8 @@ func (node *Node) messageShapeSpecimens() ([]MessageShapeSpecimen, error) {
 	return []MessageShapeSpecimen{
 		{Name: "transport_payload_only", ProtocolName: pcid.MessageShapeTransportV1, EnvelopeBytes: transportBytes},
 		{Name: "native_payload_proof", ProtocolName: pcid.MessageShapeNativeProofV1, EnvelopeBytes: nativeBytes},
-		{Name: "envelope_parents_payload_proof", ProtocolName: pcid.MessageShapeEnvelopeParentsV1, EnvelopeBytes: envelopeParentBytes, ParentExactSHA256: parentExactHash, ParentLinkLocation: "envelope"},
-		{Name: "payload_parents_proof", ProtocolName: pcid.MessageShapePayloadParentsV1, EnvelopeBytes: payloadParentBytes, ParentExactSHA256: parentExactHash, ParentLinkLocation: "payload"},
+		{Name: "envelope_parents_payload_proof", ProtocolName: pcid.MessageShapeEnvelopeParentsV1, EnvelopeBytes: envelopeParentBytes, ParentCID: parentCID, ParentLinkLocation: "envelope"},
+		{Name: "payload_parents_proof", ProtocolName: pcid.MessageShapePayloadParentsV1, EnvelopeBytes: payloadParentBytes, ParentCID: parentCID, ParentLinkLocation: "payload"},
 		{Name: "cose_as_payload", ProtocolName: pcid.MessageShapeCOSEPayloadV1, EnvelopeBytes: cosePayloadBytes},
 		{Name: "cose_as_proof", ProtocolName: pcid.MessageShapeCOSEProofV1, EnvelopeBytes: coseProofBytes},
 	}, nil

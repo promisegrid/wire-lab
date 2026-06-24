@@ -67,7 +67,7 @@ type receiver struct {
 type parsedEnvelope struct {
 	fields       map[string]string
 	payload      []byte
-	exactHash    string
+	exactCID     string
 	protocolCID  protocol.ProtocolCID
 	protocolName string
 	signer       string
@@ -98,10 +98,10 @@ func (kernel *Kernel) Run(ctx context.Context) error {
 	}
 	<-ctx.Done()
 	kernel.closeListeners()
-	kernel.closeReceivers()
-	kernel.closeAppSessions()
 	kernel.closePeerSessions()
 	kernel.closeInboundPeerSessions()
+	kernel.closeReceivers()
+	kernel.closeAppSessions()
 	kernel.drainHandlers()
 	return nil
 }
@@ -173,7 +173,7 @@ func (kernel *Kernel) handleAppConn(conn net.Conn) {
 	session = transport.NewPersistentSession(
 		"kernel-app:"+kernel.ContainerName+":"+conn.RemoteAddr().String(),
 		frameConn,
-		kernel.frameParentExactSHA256s,
+		kernel.frameParentCIDs,
 		kernel.frameIsResponse,
 		func(frameBytes []byte) ([]byte, error) {
 			<-sessionReady
@@ -185,7 +185,22 @@ func (kernel *Kernel) handleAppConn(conn net.Conn) {
 	)
 	close(sessionReady)
 	kernel.trackAppSession(session, conn.RemoteAddr().String())
-	defer kernel.untrackAppSession(session)
+	defer func() {
+		kernel.untrackAppSession(session)
+		kernel.mu.Lock()
+		remainingAppSessions := len(kernel.appSessions)
+		kernel.mu.Unlock()
+		if remainingAppSessions == 0 {
+			// Intent: POC16 has one parser-role control stream per container. If
+			// that stream ends before the supervisor's SIGTERM reaches this
+			// process, the transport kernel can no longer deliver peer promises to
+			// local apps. Close peer sessions immediately so terminal lifecycle
+			// records are not hidden behind shutdown ordering. Source: DI-gupiz
+			kernel.closeReceivers()
+			kernel.closePeerSessions()
+			kernel.closeInboundPeerSessions()
+		}
+	}()
 	if kernel.isStopping() {
 		if closeErr := session.CloseWithReason(transport.SessionTerminalReasonProcessShutdown); closeErr != nil {
 			kernel.record("kernel_app_session_close_failed", "broken", conn.RemoteAddr().String(), closeErr.Error())
@@ -211,7 +226,7 @@ func (kernel *Kernel) handlePeerConn(conn net.Conn) {
 	session := transport.NewPersistentSession(
 		"kernel-peer-in:"+kernel.ContainerName+":"+conn.RemoteAddr().String(),
 		frameConn,
-		kernel.frameParentExactSHA256s,
+		kernel.frameParentCIDs,
 		kernel.frameIsResponse,
 		kernel.handlePeerSessionFrame,
 		func(eventName, outcome, detail string) {
@@ -320,11 +335,11 @@ func (kernel *Kernel) routeParserCarriedEnvelope(controlMessage parsedEnvelope) 
 		kernel.record("kernel_transport_embedded_parse_failed", "broken", controlMessage.signer, parseErr.Error())
 		return kernel.notPromisedAck(controlMessage, "I promise the transport kernel could not parse the parser-supplied exact envelope bytes."), nil
 	}
-	if expectedHash := controlMessage.fields["embedded_exact_hash"]; expectedHash != "" && expectedHash != embeddedMessage.exactHash {
-		kernel.record("kernel_transport_embedded_hash_mismatch", "broken", controlMessage.signer, "expected="+expectedHash+" actual="+embeddedMessage.exactHash)
-		return kernel.notPromisedAck(controlMessage, "I promise the transport kernel could not carry an exact envelope whose bytes did not match the parser-supplied hash."), nil
+	if expectedCID := controlMessage.fields["embedded_exact_cid"]; expectedCID != "" && expectedCID != embeddedMessage.exactCID {
+		kernel.record("kernel_transport_embedded_cid_mismatch", "broken", controlMessage.signer, "expected="+expectedCID+" actual="+embeddedMessage.exactCID)
+		return kernel.notPromisedAck(controlMessage, "I promise the transport kernel could not carry an exact envelope whose bytes did not match the parser-supplied CID."), nil
 	}
-	kernel.record("kernel_transport_carry_requested", "kept", target, "pcid="+embeddedMessage.protocolName+" exact_sha256="+embeddedMessage.exactHash)
+	kernel.record("kernel_transport_carry_requested", "kept", target, "pcid="+embeddedMessage.protocolName+" exact_cid="+embeddedMessage.exactCID)
 	targetContainer, containerFound := kernel.Config.ContainerForAgent(target)
 	if !containerFound {
 		return kernel.notPromisedAck(embeddedMessage, "I promise I could not route this parser-carried envelope because the target app is unknown."), nil
@@ -347,7 +362,7 @@ func (kernel *Kernel) forwardToPeerKernel(target string, frameBytes []byte) ([]b
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), peerSendTimeout)
 	defer cancel()
-	ackBytes, readErr := session.RoundTrip(ctx, protocol.HashExactBytes(frameBytes), frameBytes)
+	ackBytes, readErr := session.RoundTrip(ctx, protocol.CIDForExactBytes(frameBytes), frameBytes)
 	if readErr != nil {
 		kernel.removePeerSession(endpoint, session, target)
 		return nil, readErr
@@ -379,7 +394,7 @@ func (kernel *Kernel) peerSessionForEndpoint(endpoint, target string) (*transpor
 	session := transport.NewPersistentSession(
 		"kernel-peer-out:"+kernel.ContainerName+":"+endpoint,
 		frameConn,
-		kernel.frameParentExactSHA256s,
+		kernel.frameParentCIDs,
 		kernel.frameIsResponse,
 		kernel.handlePeerSessionFrame,
 		func(eventName, outcome, detail string) {
@@ -510,12 +525,12 @@ func (kernel *Kernel) deliverToLocalParser(frameBytes []byte, message parsedEnve
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), peerSendTimeout)
 	defer cancel()
-	ackBytes, readErr := receiver.session.RoundTrip(ctx, message.exactHash, frameBytes)
+	ackBytes, readErr := receiver.session.RoundTrip(ctx, message.exactCID, frameBytes)
 	if readErr != nil {
 		kernel.record("kernel_parser_ack_read_failed", "broken", parserName, readErr.Error())
 		return kernel.notPromisedAck(message, "I promise local parser-role delivery failed while waiting for its ACK.")
 	}
-	kernel.record("kernel_parser_delivered", "kept", parserName, "pcid="+message.protocolName+" exact_sha256="+message.exactHash)
+	kernel.record("kernel_parser_delivered", "kept", parserName, "pcid="+message.protocolName+" exact_cid="+message.exactCID)
 	return ackBytes
 }
 
@@ -538,7 +553,7 @@ func (kernel *Kernel) parseTransportEnvelope(frameBytes []byte) (parsedEnvelope,
 	return parsedEnvelope{
 		fields:       map[string]string{},
 		payload:      append([]byte(nil), envelope.Payload...),
-		exactHash:    protocol.HashExactBytes(frameBytes),
+		exactCID:     protocol.CIDForExactBytes(frameBytes),
 		protocolCID:  envelope.ProtocolCID,
 		protocolName: protocolName,
 		signer:       envelope.Proof.Signer,
@@ -557,7 +572,7 @@ func (kernel *Kernel) kernelTransportFields(message parsedEnvelope) (map[string]
 	return fields, nil
 }
 
-func (kernel *Kernel) frameParentExactSHA256s(frameBytes []byte) ([]string, error) {
+func (kernel *Kernel) frameParentCIDs(frameBytes []byte) ([]string, error) {
 	// Intent: Persistent-session demux reads parent links from the signed
 	// envelope itself, keeping correlation in the message DAG instead of a
 	// separate transport header. Source: DI-vopab
@@ -565,7 +580,7 @@ func (kernel *Kernel) frameParentExactSHA256s(frameBytes []byte) ([]string, erro
 	if parseErr != nil {
 		return nil, parseErr
 	}
-	return append([]string(nil), envelope.ParentExactSHA256s...), nil
+	return append([]string(nil), envelope.ParentCIDs...), nil
 }
 
 func (kernel *Kernel) frameIsResponse(frameBytes []byte) (bool, error) {
@@ -580,7 +595,7 @@ func (kernel *Kernel) frameIsResponse(frameBytes []byte) (bool, error) {
 	if parseErr != nil {
 		return false, parseErr
 	}
-	if len(envelope.ParentExactSHA256s) == 0 {
+	if len(envelope.ParentCIDs) == 0 {
 		return false, nil
 	}
 	if verifyErr := protocol.VerifyEnvelope(envelope); verifyErr != nil {
@@ -641,13 +656,13 @@ func (kernel *Kernel) notPromisedAck(message parsedEnvelope, promiseText string)
 func (kernel *Kernel) newAckEnvelope(message parsedEnvelope, ackFields map[string]string) (protocol.Envelope, error) {
 	// Intent: Kernel ACKs are transport non-commitment promises, but their payload
 	// still belongs to the original pCID when that pCID has a migrated array
-	// encoder. Persistent-session ACKs also parent-link the request exact hash so
+	// encoder. Persistent-session ACKs also parent-link the request exact CID so
 	// peers can correlate responses by message DAG rather than RPC IDs. Source:
 	// DI-dirat; DI-vopab
 	if payloadBytes, arrayPayload, payloadErr := protocol.MarshalKnownArrayPayload(message.protocolName, ackFields); payloadErr == nil && arrayPayload {
-		return protocol.NewEnvelopeFromPayloadWithParents(message.protocolCID, payloadBytes, []string{message.exactHash}, "kernel:"+kernel.ContainerName)
+		return protocol.NewEnvelopeFromPayloadWithParents(message.protocolCID, payloadBytes, []string{message.exactCID}, "kernel:"+kernel.ContainerName)
 	}
-	return protocol.NewEnvelopeWithParents(message.protocolCID, ackFields, []string{message.exactHash}, "kernel:"+kernel.ContainerName)
+	return protocol.NewEnvelopeWithParents(message.protocolCID, ackFields, []string{message.exactCID}, "kernel:"+kernel.ContainerName)
 }
 
 func firstField(fields map[string]string, keys ...string) string {
@@ -766,7 +781,9 @@ func (kernel *Kernel) closeAppSessions() {
 func (kernel *Kernel) closePeerSessions() {
 	// Intent: Peer-kernel sessions are run-scoped transport promises; closing
 	// them at shutdown prevents durable TCP state from leaking into later POC
-	// runs. Source: DI-vopab
+	// runs. Peer terminal records are emitted before app/control stream cleanup
+	// so busy local app shutdown cannot hide already-open peer sessions. Source:
+	// DI-vopab; DI-gupiz
 	kernel.mu.Lock()
 	peerSessions := make(map[string]*transport.PersistentSession, len(kernel.peerSessions))
 	for endpoint, session := range kernel.peerSessions {
@@ -788,7 +805,9 @@ func (kernel *Kernel) closeInboundPeerSessions() {
 	// Intent: Inbound peer-kernel sessions are the accepted side of the same
 	// run-scoped transport promise as outbound peer sessions. Closing them during
 	// kernel shutdown makes terminal accounting symmetric without changing app
-	// trust or routing decisions. Source: DI-fobuv
+	// trust or routing decisions, and doing this before app/control stream cleanup
+	// keeps inbound peer terminal records from being lost behind late local
+	// handler drain. Source: DI-fobuv; DI-gupiz
 	kernel.mu.Lock()
 	inboundPeerSessions := make(map[*transport.PersistentSession]string, len(kernel.inboundPeerSessions))
 	for session, remoteAddress := range kernel.inboundPeerSessions {

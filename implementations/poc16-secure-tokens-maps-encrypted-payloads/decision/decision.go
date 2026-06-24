@@ -42,7 +42,7 @@ type Observation struct {
 type ProtocolSpecContext struct {
 	Name    string `json:"name"`
 	PCID    string `json:"pcid"`
-	SHA256  string `json:"sha256"`
+	SpecCID string `json:"spec_cid"`
 	Excerpt string `json:"excerpt"`
 }
 

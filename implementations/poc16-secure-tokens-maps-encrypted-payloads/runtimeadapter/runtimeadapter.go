@@ -151,9 +151,9 @@ type StdioCBORAck struct {
 // StdioCBOREvent is the worker's final stdout event after it parses the ACK
 // envelope locally.
 type StdioCBOREvent struct {
-	Type        string
-	Outcome     string
-	ExactSHA256 string
+	Type     string
+	Outcome  string
+	ExactCID string
 }
 
 // WriteCBORFrame writes one bounded length-prefixed CBOR control frame.
@@ -308,20 +308,20 @@ func ParseStdioCBORAck(frameBytes []byte) (StdioCBORAck, error) {
 }
 
 // MarshalStdioCBOREvent encodes a worker event as CBOR array
-// [type, outcome, exact_sha256].
+// [type, outcome, exact_cid].
 func MarshalStdioCBOREvent(message StdioCBOREvent) ([]byte, error) {
-	if message.Type == "" || message.Outcome == "" || message.ExactSHA256 == "" {
+	if message.Type == "" || message.Outcome == "" || message.ExactCID == "" {
 		return nil, fmt.Errorf("stdio cbor event is incomplete")
 	}
 	return marshalStdioCBORArray(
 		stdioCBORString(message.Type),
 		stdioCBORString(message.Outcome),
-		stdioCBORString(message.ExactSHA256),
+		stdioCBORString(message.ExactCID),
 	)
 }
 
 // ParseStdioCBOREvent decodes a worker event from CBOR array
-// [type, outcome, exact_sha256].
+// [type, outcome, exact_cid].
 func ParseStdioCBOREvent(frameBytes []byte) (StdioCBOREvent, error) {
 	reader, err := newStdioCBORArrayReader(frameBytes, 3)
 	if err != nil {
@@ -334,13 +334,13 @@ func ParseStdioCBOREvent(frameBytes []byte) (StdioCBOREvent, error) {
 	if message.Outcome, err = reader.readString(); err != nil {
 		return StdioCBOREvent{}, err
 	}
-	if message.ExactSHA256, err = reader.readString(); err != nil {
+	if message.ExactCID, err = reader.readString(); err != nil {
 		return StdioCBOREvent{}, err
 	}
 	if err := reader.finish(); err != nil {
 		return StdioCBOREvent{}, err
 	}
-	if message.Type == "" || message.Outcome == "" || message.ExactSHA256 == "" {
+	if message.Type == "" || message.Outcome == "" || message.ExactCID == "" {
 		return StdioCBOREvent{}, fmt.Errorf("stdio cbor event is incomplete")
 	}
 	return message, nil

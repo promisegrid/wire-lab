@@ -132,7 +132,7 @@ count, reachable count, maximum depth, missing-parent count, parent-link count,
 and parent-link location counts. Missing parents, non-reachable records, and
 loss of either envelope or payload parent-link coverage fail the clean
 regression. Duplicate observations of the same exact envelope are retained as
-artifact rows, but DAG reachability is judged over unique exact-message hashes
+artifact rows, but DAG reachability is judged over unique exact-message CIDs
 so retransmits and sender/receiver observations do not look like missing graph
 nodes. Raw artifact counts by every POC artifact kind remain a planned
 follow-up gate. Source: `DI-kohuj`.

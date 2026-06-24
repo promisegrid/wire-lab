@@ -26,7 +26,7 @@ grid([42(pCID), payload, proof])
 The payload belongs to this protocol, so the transport kernel MAY decode it. If
 the payload embeds an application envelope, the transport kernel MUST treat that
 embedded envelope as exact bytes except for generic envelope checks: grid tag,
-slot-0 pCID, parent links, exact message hash, and proof validity.
+slot-0 pCID, parent links, exact message CID, and proof validity.
 
 ## Promise Theory model
 
@@ -59,7 +59,7 @@ reserved/core body keys, non-text body keys or values, or trailing CBOR bytes.
 | promise_about | Required detail keys | Meaning |
 |---|---|---|
 | `receive_pcid` | `app_name`, `pcid_name`, `pcid_cid`, `transport_action` | Parser promises it can receive exact envelopes for the named application pCID and forward them only to matching local app receivers. |
-| `carry_exact_envelope` | `target`, `target_protocol`, `target_exact_sha256`, `envelope_b64`, `transport_action` | Parser asks the kernel to carry the exact base64 envelope bytes toward the named target. |
+| `carry_exact_envelope` | `target`, `target_protocol`, `target_exact_cid`, `envelope_b64`, `transport_action` | Parser asks the kernel to carry the exact base64 envelope bytes toward the named target. |
 
 `transport_action` MUST match `promise_about` for these two actions. Empty
 `target` or `envelope_b64` values make `carry_exact_envelope` not promised.
@@ -76,7 +76,7 @@ payloads.
 ## Receiver and parser behavior
 
 The kernel MUST reject malformed control payloads, undecodable base64, embedded
-envelopes whose exact hash does not match `target_exact_sha256`, unknown targets,
+envelopes whose exact CID does not match `target_exact_cid`, unknown targets,
 and missing peer endpoints. The kernel MAY respond with a not-promised ACK linked
 to the parent message. The kernel MUST NOT decode embedded application payloads
 to discover application semantics.
@@ -106,7 +106,7 @@ relationship trust.
 ## Security considerations
 
 The base64 envelope is untrusted until parsed, verified, and hash-checked. A
-parser that lies about `target_exact_sha256` receives local non-commitment. The
+parser that lies about `target_exact_cid` receives local non-commitment. The
 kernel must avoid becoming an authority-like payload router; only the parser role
 understands application payload addressing.
 
@@ -125,7 +125,7 @@ grid([42(pCID),
     ["kept", "I promise these exact bytes should be carried toward Bob.",
      "parser found Bob in production_shipping_v1 payload", "turn-010"],
     {"target": "bob", "target_protocol": "production_shipping_v1",
-     "target_exact_sha256": "9a...", "envelope_b64": "2GRncmlk...",
+     "target_exact_cid": "9a...", "envelope_b64": "2GRncmlk...",
      "transport_action": "carry_exact_envelope"}
   ], proof
 ])

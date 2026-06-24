@@ -102,9 +102,9 @@ func runWithIO(input io.Reader, output io.Writer) error {
 		return fieldsErr
 	}
 	eventFrameBytes, err := runtimeadapter.MarshalStdioCBOREvent(runtimeadapter.StdioCBOREvent{
-		Type:        "ack_event",
-		Outcome:     ackFields["outcome"],
-		ExactSHA256: protocol.HashExactBytes(ack.EnvelopeBytes),
+		Type:     "ack_event",
+		Outcome:  ackFields["outcome"],
+		ExactCID: protocol.CIDForExactBytes(ack.EnvelopeBytes),
 	})
 	if err != nil {
 		return fmt.Errorf("marshal ack event: %w", err)
@@ -162,7 +162,7 @@ func runComputeRequest(request runtimeadapter.StdioCBOREnvelope, output io.Write
 	// to the exact request bytes it received, preserving persistent-session DAG
 	// correlation without extending the local stdio frame shape. Source:
 	// DI-vopab
-	ackEnvelope, envelopeErr := protocol.NewEnvelopeFromPayloadWithParents(registry.MustCID(pcid.CIDComputeV1), payloadBytes, []string{protocol.HashExactBytes(request.EnvelopeBytes)}, request.To)
+	ackEnvelope, envelopeErr := protocol.NewEnvelopeFromPayloadWithParents(registry.MustCID(pcid.CIDComputeV1), payloadBytes, []string{protocol.CIDForExactBytes(request.EnvelopeBytes)}, request.To)
 	if envelopeErr != nil {
 		return envelopeErr
 	}

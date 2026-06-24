@@ -111,7 +111,7 @@ POC16 pressure model for readability and transition.
 ```text
 grid([42(pCID),
   {"issuer":"bob", "subject":"alice", "audience":"bob", "scope":"serve-once",
-   "content_cid":"cidv1-raw-sha2-256:...", "token_id":"tok-7",
+   "content_cid":"bafkrei...", "token_id":"tok-7",
    "transferable":"false", "confirmation":"alice-key", "exp":"1800000000"},
   proof
 ])

@@ -45,8 +45,8 @@ type MessageArtifact struct {
 	Direction           string `json:"direction"`
 	Peer                string `json:"peer"`
 	Protocol            string `json:"protocol"`
-	ExactSHA256         string `json:"exact_sha256"`
-	ParentExactSHA256   string `json:"parent_exact_sha256,omitempty"`
+	ExactCID            string `json:"exact_cid"`
+	ParentCID           string `json:"parent_cid,omitempty"`
 	ParentLinkLocation  string `json:"parent_link_location,omitempty"`
 	PromiseAbout        string `json:"promise_about,omitempty"`
 	SourceEvent         string `json:"source_event,omitempty"`

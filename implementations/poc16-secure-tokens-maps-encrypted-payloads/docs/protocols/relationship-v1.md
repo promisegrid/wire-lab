@@ -131,7 +131,7 @@ grid([42(pCID),
   ["alice", "alice", "trust_update",
     ["kept", "I promise my local trust in Bob increased after he returned the promised bytes.",
      "Bob kept a storage promise", "turn-0042"],
-    {"subject": "bob", "delta": "+3", "parent_exact_sha256": "abc123..."}
+    {"subject": "bob", "delta": "+3", "parent_cid": "abc123..."}
   ],
   proof
 ])
