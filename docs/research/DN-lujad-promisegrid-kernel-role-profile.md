@@ -90,6 +90,33 @@ own transport evidence; it does not become a USB authority, permission server,
 business workflow engine, or trust oracle. Source: `DI-pohaj`; `DI-vutok`;
 `DI-punuf`.
 
+## Lifecycle and resource protection
+
+A local lifecycle supervisor is a kernel role when it promises process lifetime,
+CPU, RAM, socket, device, storage, shutdown, or quota behavior. It should be
+described as a lifecycle/resource role, not as a ruler over apps. Source:
+`TE-ragin`; `DI-vuruz`.
+
+The preferred vocabulary is **conditional capability promise**. A local resource
+token or capability is the kernel role's promise to provide access to a resource
+under stated terms, usually in return for an app's reciprocal promise of bounded
+use, quiescence, drain, or other lifecycle cooperation. If the app breaks that
+reciprocal promise, or if the kernel's local resource budget changes, the kernel
+role may narrow, revoke, throttle, pause, close, or terminate access to keep its
+own resource-protection promises.
+
+That action is not authorization enforcement, punishment, or command authority.
+It is the local resource promiser changing what it promises about resources it
+controls. In Docker this may look like `SIGTERM` or `SIGKILL`; in WASM it may be
+fuel or memory denial; in stdio it may be pipe closure; in a browser it may be
+worker termination; on an MCU it may be refusing a buffer, resetting a
+peripheral, or not scheduling a loop.
+
+The app remains an autonomous promiser. The kernel role can ask, impose, or
+request quiescence, but it cannot make the app promise or keep a promise. It can
+only record the local keep/break result, update local trust or resource policy,
+and protect the node by changing its own resource promises.
+
 ## How to read the current packet
 
 The current kernel evidence packet has three distinct roles:

@@ -10,6 +10,8 @@ import (
 
 	"promisegrid.dev/wire-lab/implementations/poc16-secure-tokens-maps-encrypted-payloads/config"
 	"promisegrid.dev/wire-lab/implementations/poc16-secure-tokens-maps-encrypted-payloads/kernel"
+	"promisegrid.dev/wire-lab/implementations/poc16-secure-tokens-maps-encrypted-payloads/lifecycle"
+	"promisegrid.dev/wire-lab/implementations/poc16-secure-tokens-maps-encrypted-payloads/pcid"
 )
 
 func main() {
@@ -39,5 +41,6 @@ func run() error {
 	localKernel := kernel.New(cfg, *containerName)
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
-	return localKernel.Run(ctx)
+	options := lifecycle.OptionsFromEnv("supervisor:"+*containerName, "kernel:"+*containerName, lifecycle.RoleKindKernel, cfg.RunID, pcid.NewRegistry().MustCID(pcid.LocalLifecycleV1), cfg.ShutdownGrace(), false, os.Stdin)
+	return lifecycle.RunManaged(ctx, options, localKernel.Run)
 }

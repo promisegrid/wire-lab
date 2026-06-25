@@ -9,7 +9,9 @@ import (
 	"syscall"
 
 	"promisegrid.dev/wire-lab/implementations/poc16-secure-tokens-maps-encrypted-payloads/config"
+	"promisegrid.dev/wire-lab/implementations/poc16-secure-tokens-maps-encrypted-payloads/lifecycle"
 	"promisegrid.dev/wire-lab/implementations/poc16-secure-tokens-maps-encrypted-payloads/parserrole"
+	"promisegrid.dev/wire-lab/implementations/poc16-secure-tokens-maps-encrypted-payloads/pcid"
 )
 
 func main() {
@@ -37,5 +39,15 @@ func run() error {
 	defer stop()
 	// Intent: The parser role is an independent local kernel role, not a helper
 	// function hidden inside app or transport-kernel code. Source: DI-gazin
-	return parserrole.New(cfg, *containerName).Run(ctx)
+	options := lifecycle.OptionsFromEnv("supervisor:"+*containerName, "parser:"+*containerName, lifecycle.RoleKindParser, cfg.RunID, pcid.NewRegistry().MustCID(pcid.LocalLifecycleV1), cfg.ShutdownGrace(), false, os.Stdin)
+	if options.Address == "" {
+		return parserrole.New(cfg, *containerName).Run(ctx)
+	}
+	managedRole, lifecycleErr := lifecycle.NewManagedRole(options)
+	if lifecycleErr != nil {
+		return lifecycleErr
+	}
+	role := parserrole.New(cfg, *containerName)
+	role.LifecycleHandler = managedRole.HandleInvocationFrame
+	return managedRole.Run(ctx, role.Run)
 }

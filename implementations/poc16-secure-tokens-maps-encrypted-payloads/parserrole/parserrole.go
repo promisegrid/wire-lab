@@ -30,11 +30,12 @@ const parserRoleTimeout = 5 * time.Second
 // `to`. The parser role may decode pCID-owned app payloads, but it promises only
 // its own parsing, delivery, ACK, and non-commitment behavior. Source: DI-gazin
 type ParserRole struct {
-	Config        config.Config
-	ContainerName string
-	Protocols     pcid.Registry
-	Parser        ProtocolParser
-	Receivers     *AppReceiverRegistry
+	Config           config.Config
+	ContainerName    string
+	Protocols        pcid.Registry
+	Parser           ProtocolParser
+	Receivers        *AppReceiverRegistry
+	LifecycleHandler func([]byte) ([]byte, error)
 
 	kernelClient *KernelTransportClient
 	appListener  net.Listener
@@ -249,6 +250,9 @@ func (role *ParserRole) handleAppConn(conn net.Conn) {
 }
 
 func (role *ParserRole) handleAppFrame(session *transport.PersistentSession, frameBytes []byte) ([]byte, error) {
+	if handled, responseBytes, lifecycleErr := role.handleLifecycleAppFrame(frameBytes); handled {
+		return responseBytes, lifecycleErr
+	}
 	message, parseErr := role.Parser.Parse(frameBytes)
 	if parseErr != nil {
 		role.record("parser_role_app_frame_parse_failed", "broken", "", parseErr.Error())
@@ -261,6 +265,30 @@ func (role *ParserRole) handleAppFrame(session *transport.PersistentSession, fra
 		return nil, role.registerAppReceiver(session, message)
 	}
 	return role.routeOutboundAppEnvelope(frameBytes, message)
+}
+
+func (role *ParserRole) handleLifecycleAppFrame(frameBytes []byte) (bool, []byte, error) {
+	// Intent: local_lifecycle_v1 deliberately uses
+	// grid([42(local_lifecycle_v1_pCID), payload]) with COSE/CWT proof inside the
+	// payload token, so parser-path lifecycle invocation must bypass the older
+	// generic payload/proof envelope parser. Source: DI-jafoj
+	lifecycleCID, cidFound := role.Protocols.CID(pcid.LocalLifecycleV1)
+	if !cidFound {
+		return false, nil, nil
+	}
+	gridMessage, gridErr := protocol.ParseGridMessage(frameBytes)
+	if gridErr != nil {
+		return false, nil, nil
+	}
+	if !gridMessage.ProtocolCID.Equal(lifecycleCID) {
+		return false, nil, nil
+	}
+	if role.LifecycleHandler == nil {
+		return true, nil, fmt.Errorf("parser role has no lifecycle handler")
+	}
+	role.record("parser_role_lifecycle_frame_received", "kept", "supervisor", "pcid="+pcid.LocalLifecycleV1+" exact_cid="+protocol.CIDForExactBytes(frameBytes))
+	responseBytes, handlerErr := role.LifecycleHandler(frameBytes)
+	return true, responseBytes, handlerErr
 }
 
 func (role *ParserRole) handleKernelFrame(frameBytes []byte) ([]byte, error) {
@@ -467,6 +495,9 @@ func (parser ProtocolParser) Parse(frameBytes []byte) (ParsedMessage, error) {
 }
 
 func (role *ParserRole) frameIsResponse(frameBytes []byte) (bool, error) {
+	if role.isLifecycleFrame(frameBytes) {
+		return false, nil
+	}
 	envelope, envelopeErr := protocol.ParseEnvelope(frameBytes)
 	if envelopeErr != nil {
 		return false, envelopeErr
@@ -479,6 +510,15 @@ func (role *ParserRole) frameIsResponse(frameBytes []byte) (bool, error) {
 		return false, parseErr
 	}
 	return strings.TrimSpace(message.Fields["outcome"]) != "", nil
+}
+
+func (role *ParserRole) isLifecycleFrame(frameBytes []byte) bool {
+	lifecycleCID, cidFound := role.Protocols.CID(pcid.LocalLifecycleV1)
+	if !cidFound {
+		return false
+	}
+	gridMessage, gridErr := protocol.ParseGridMessage(frameBytes)
+	return gridErr == nil && gridMessage.ProtocolCID.Equal(lifecycleCID)
 }
 
 func frameParentCIDs(frameBytes []byte) ([]string, error) {

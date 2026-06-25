@@ -87,6 +87,24 @@ voluntary, bearer storage tokens can compensate a holder for retrieving bytes
 from the issuer, and local GC retains paid/pinned/encrypted objects while
 removing pressure-tagged temporary objects. Source: `DI-manul`; `DI-fagog`.
 
+The current parser/listener/app separation matches `TE-ritig` model 3 for
+runtime routing: local apps send exact envelopes to the parser role, the parser
+role uses `kernel_transport_v1` to ask the transport kernel to carry exact bytes,
+peer kernels dispatch by slot-0 pCID to parser roles that promised that pCID, and
+parser roles deliver only to local apps that made matching receive promises. The
+transport kernel does not use normal application payload fields such as `to`,
+`promise_about`, DID, CID-rooted path, or route terms to choose app behavior.
+There is one bounded implementation-local demux exception: persistent sessions
+may inspect a pCID-owned `outcome` projection only to classify parent-linked
+ACK-like responses; that projection is not a route decision, not a PromiseGrid
+API, and not deployment readiness. Source: `DI-rapuk`; `DI-gazin`; `TE-ritig`.
+
+Analyzer success is also intentionally scoped. The POC16 analyzer now reports
+`poc_scope_fitness.poc_scope_complete` rather than a deployment-readiness flag. A
+passing clean run means the current POC acceptance surface was covered;
+production use still requires separate design, reliability, security, operations,
+and API stability review. Source: `DI-rapuk`.
+
 ## Superset Requirement
 
 POC16 should preserve POC15 unless a later DI explicitly authorizes a scoped

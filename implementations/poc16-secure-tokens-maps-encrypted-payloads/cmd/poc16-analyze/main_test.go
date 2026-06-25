@@ -379,6 +379,13 @@ func cleanRegressionSummary() RunSummary {
 		"message_shape_cose_proof_verified":              1,
 		"message_shape_cose_tamper_rejected":             1,
 		"kernel_role_profile_recorded":                   1,
+		"local_lifecycle_token_issued":                   1,
+		"local_lifecycle_ready":                          1,
+		"local_lifecycle_token_invoked":                  1,
+		"local_lifecycle_token_verified":                 1,
+		"local_lifecycle_role_summary":                   1,
+		"local_lifecycle_token_fulfilled":                1,
+		"parser_role_lifecycle_frame_received":           1,
 	}
 	for _, eventName := range requiredRegressionEvents() {
 		eventCounts[eventName] = 1
@@ -464,7 +471,19 @@ func cleanRegressionSummary() RunSummary {
 		ForbiddenVocabularyCounts:    map[string]int{},
 		CASRetrievalCounts:           map[string]int{},
 		TokenSecurityCounts:          map[string]int{},
-		PersistentSessionCounts:      map[string]int{},
+		LifecycleCounts: map[string]int{
+			"local_lifecycle_token_issued":                           1,
+			"local_lifecycle_ready":                                  1,
+			"local_lifecycle_token_invoked":                          1,
+			"local_lifecycle_token_verified":                         1,
+			"local_lifecycle_role_summary":                           1,
+			"local_lifecycle_token_fulfilled":                        1,
+			"parser_role_lifecycle_frame_received":                   1,
+			"channel_profile:" + protocol.LifecycleChannelTCP:        1,
+			"channel_profile:" + protocol.LifecycleChannelParserPath: 1,
+			"channel_profile:" + protocol.LifecycleChannelStdio:      1,
+		},
+		PersistentSessionCounts: map[string]int{},
 		PersistentSessionOpenCounts: map[string]int{
 			"test-session": 1,
 		},

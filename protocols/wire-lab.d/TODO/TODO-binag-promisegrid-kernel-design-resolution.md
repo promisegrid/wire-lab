@@ -98,6 +98,34 @@ Affects: `docs/research/DN-lujad-promisegrid-kernel-role-profile.md`;
 `protocols/wire-lab.d/TODO/TODO-binag-promisegrid-kernel-design-resolution.md`;
 `protocols/wire-lab.d/TODO/TODO.md`.
 
+### DI-vuruz
+
+ID: DI-vuruz
+Date: 2026-06-25 10:10:05
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Treat local lifecycle/resource supervisors as kernel roles that issue
+conditional capability promises for local resources and may withdraw, throttle,
+or terminate access when reciprocal resource-use or lifecycle promises are
+broken.
+Intent: Resource protection must remain Promise-Theory-compatible. A kernel role
+does not command an app or promise on the app's behalf; it promises what it will
+do with CPU, RAM, sockets, process lifetime, devices, storage, and other local
+resources it controls. Capability tokens or local resource capabilities are
+issuer promises of access under terms, usually in return for the app promising
+bounded use, quiescence, drain, or other lifecycle cooperation.
+Constraints: Use "conditional capability promise" as the preferred vocabulary.
+Do not describe kernel resource protection as authorization, permission,
+compliance, policy enforcement, punishment, or global trust authority. Keep
+shutdown/throttle/kill as host mechanisms for withdrawing or narrowing local
+resource promises. Do not edit active embedded POC16 pCID specdocs in this docs
+pass because their bytes derive pCIDs.
+Affects: `docs/thought-experiments/TE-ragin-kernel-resource-protection-capability-promises.md`;
+`docs/research/DN-lujad-promisegrid-kernel-role-profile.md`;
+`implementations/poc16-secure-tokens-maps-encrypted-payloads/docs/KERNEL-ROLES.md`;
+`DEV-GUIDE-RESOURCES.md`;
+`protocols/wire-lab.d/TODO/TODO-binag-promisegrid-kernel-design-resolution.md`.
+
 ## Basic principles to preserve
 
 - Everything useful is a promise.
@@ -116,6 +144,10 @@ Affects: `docs/research/DN-lujad-promisegrid-kernel-role-profile.md`;
   chunk, or peer promises only what it can plausibly keep or embody.
 - Kernel is a role set, not a ruler. "Kernel" means local infrastructure roles
   that help an agent speak pCID-selected protocols, not a privileged authority.
+- Local resource protection is a promise. A lifecycle/resource kernel role may
+  issue conditional capability promises for CPU, RAM, sockets, process lifetime,
+  devices, storage, and other local resources, then withdraw, throttle, or
+  terminate access when reciprocal use promises break.
 - The stable interface is pCID discipline. A pCID names the protocol spec; the
   spec defines payload shape, canonical bytes, proof/signature encoding, and
   interpretation.

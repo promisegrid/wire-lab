@@ -18,7 +18,7 @@ import (
 // docs/protocols path so root docs do not become a stale competing authority.
 // Source: DI-vulit; DI-magug
 //
-//go:embed accounting-v1.md cas-storage-v1.md cid-compute-v1.md encrypted-payload-v1.md identity-key-v1.md kernel-receive-v1.md kernel-transport-v1.md map-payload-profile-v1.md message-shape-cose-payload-v1.md message-shape-cose-proof-v1.md message-shape-envelope-parents-v1.md message-shape-native-proof-v1.md message-shape-payload-parents-v1.md message-shape-transport-v1.md parser-builder-role-v1.md postal-scale-v1.md printer-port-v1.md production-shipping-v1.md relationship-v1.md route-v1.md secure-capability-v1.md ups-label-v1.md
+//go:embed accounting-v1.md cas-storage-v1.md cid-compute-v1.md encrypted-payload-v1.md identity-key-v1.md kernel-receive-v1.md kernel-transport-v1.md local-lifecycle-v1.md map-payload-profile-v1.md message-shape-cose-payload-v1.md message-shape-cose-proof-v1.md message-shape-envelope-parents-v1.md message-shape-native-proof-v1.md message-shape-payload-parents-v1.md message-shape-transport-v1.md parser-builder-role-v1.md postal-scale-v1.md printer-port-v1.md production-shipping-v1.md relationship-v1.md route-v1.md secure-capability-v1.md ups-label-v1.md
 var docs embed.FS
 
 var protocolFiles = map[string]string{
@@ -29,6 +29,7 @@ var protocolFiles = map[string]string{
 	"identity_key_v1":                   "identity-key-v1.md",
 	"kernel_receive_v1":                 "kernel-receive-v1.md",
 	"kernel_transport_v1":               "kernel-transport-v1.md",
+	"local_lifecycle_v1":                "local-lifecycle-v1.md",
 	"map_payload_profile_v1":            "map-payload-profile-v1.md",
 	"message_shape_cose_payload_v1":     "message-shape-cose-payload-v1.md",
 	"message_shape_cose_proof_v1":       "message-shape-cose-proof-v1.md",

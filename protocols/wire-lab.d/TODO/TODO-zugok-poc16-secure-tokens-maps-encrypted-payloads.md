@@ -176,6 +176,24 @@ Intent: Clean-run validation showed that an app can be canceled while inside a t
 Constraints: Do not weaken analyzer terminal-session gates; do not make the app/kernel close a peer trust update; keep normal end-of-run cleanup idempotent; preserve app autonomy and pCID-owned protocol semantics; do not add observer-volume coordination.
 Affects: implementations/poc16-secure-tokens-maps-encrypted-payloads/runtime/node.go; protocols/wire-lab.d/TODO/TODO-zugok-poc16-secure-tokens-maps-encrypted-payloads.md.
 
+ID: DI-rapuk
+Date: 2026-06-24 23:47:00 PDT
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: POC16 analyzer and guide wording must describe clean-run success as POC-scope event coverage, not production readiness, and must keep the TE-ritig parser/listener/app split explicit.
+Intent: A successful POC16 clean run is strong executable evidence for the current POC scope, but it is not a deployment certification, final API commitment, or production-readiness claim. The wording should also preserve the actual POC16 architecture: app-facing pCID semantics live in parser/builder roles, the transport kernel carries exact envelopes and handles only `kernel_transport_v1` control payloads, and any remaining response-demux payload projection is implementation-local pressure rather than a routing authority.
+Constraints: Do not weaken POC16 analyzer gates; do not claim production readiness from passing POC tests; preserve `grid([42(pCID), ...protocol-defined-slots])`; preserve pCID-as-protocol-selector, not address or RPC method; reserve "evidence" for wire-lab/POC provenance and prefer "event" or "local event record" for production-shaped runtime records.
+Affects: implementations/poc16-secure-tokens-maps-encrypted-payloads/cmd/poc16-analyze/main.go; implementations/poc16-secure-tokens-maps-encrypted-payloads/README.md; DEV-GUIDE-RESOURCES.md; protocols/wire-lab.d/TODO/TODO-zugok-poc16-secure-tokens-maps-encrypted-payloads.md.
+
+ID: DI-jafoj
+Date: 2026-06-25 13:22:14 PDT
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Add POC16 `local_lifecycle_v1` as a protocol-owned lifecycle token profile where roles issue signed CWT/COSE shutdown capability tokens at startup, supervisors later present those exact tokens over TCP, parser-path, or stdio lifecycle channels, and `grid([42(local_lifecycle_v1_pCID), payload])` carries no generic outer proof slot.
+Intent: POC16 shutdown should stop looking like a supervisor command and instead demonstrate PromiseGrid-local lifecycle promises. An app, parser role, or kernel role promises its own quiesce/drain/flush/summary/exit behavior by signing a CWT inside COSE_Sign1. The supervisor stores that promise token and later presents it back under the token terms. SIGTERM/SIGKILL remains available only as local resource withdrawal after a broken or timed-out promise. The lifecycle pCID owns its one payload slot, and the COSE signature inside the token is the proof for the token promise, so a universal envelope proof would be redundant here.
+Constraints: Use a well-known COSE library for lifecycle token COSE_Sign1/Ed25519; keep CWT standard "claim" wording out of PromiseGrid-facing prose except when naming the external standard; reject invalid, expired, wrong-audience, wrong-run, wrong-pCID, and replayed tokens as non-promises; keep the collector passive; do not turn lifecycle tokens into global authorization; preserve POC15/POC16 superset behavior; audit existing POC16 tokens for custom-vs-library CWT/COSE usage before claiming token convergence.
+Affects: implementations/poc16-secure-tokens-maps-encrypted-payloads/; implementations/poc16-secure-tokens-maps-encrypted-payloads/docs/protocols/; protocols/wire-lab.d/TODO/TODO-zugok-poc16-secure-tokens-maps-encrypted-payloads.md; DEV-GUIDE-RESOURCES.md.
+
 ## Scope
 
 - POC16 is executable design evidence, not production software and not a final
@@ -523,3 +541,5 @@ Affects: implementations/poc16-secure-tokens-maps-encrypted-payloads/runtime/nod
 - [x] zugok.35 Add analyzer gates for POC15 named-agent, agent-role, and executable-function preservation.
 - [x] zugok.36 Document the POC15 agent/function baseline in the POC16 README before adding new POC16-specific behavior.
 - [x] zugok.37 Replace flexible pair-list payload bodies with nested CBOR map bodies and update the affected POC16/POC17 documentation.
+- [x] zugok.38 Add `local_lifecycle_v1` signed CWT/COSE lifecycle tokens, token invocation shutdown, and analyzer gates.
+- [ ] zugok.39 Audit every other POC16 token path and report how many are CWT, how many use COSE, how many still use custom code, how many use a well-known library, and which should be refactored toward the `local_lifecycle_v1` CWT/COSE library profile.

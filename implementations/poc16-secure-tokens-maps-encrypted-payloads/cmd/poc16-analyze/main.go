@@ -52,6 +52,7 @@ type RunSummary struct {
 	EncryptedPayloadCounts                  map[string]int          `json:"encrypted_payload_counts"`
 	ParserBuilderCounts                     map[string]int          `json:"parser_builder_counts"`
 	POC16ProfileCounts                      map[string]int          `json:"poc16_profile_counts"`
+	LifecycleCounts                         map[string]int          `json:"lifecycle_counts"`
 	PersistentSessionCounts                 map[string]int          `json:"persistent_session_counts"`
 	PersistentSessionOpenCounts             map[string]int          `json:"persistent_session_open_counts"`
 	PersistentSessionTerminalCounts         map[string]int          `json:"persistent_session_terminal_counts"`
@@ -80,7 +81,7 @@ type RunSummary struct {
 	RestartCounts                           map[string]int          `json:"restart_counts"`
 	ForbiddenVocabularyCounts               map[string]int          `json:"forbidden_vocabulary_counts,omitempty"`
 	ScoreReport                             ScoreReport             `json:"score_report"`
-	ProductionFitness                       ProductionFitnessReport `json:"production_fitness"`
+	POCScopeFitness                         POCScopeFitnessReport   `json:"poc_scope_fitness"`
 	MissingRequiredEventNames               []string                `json:"missing_required_event_names,omitempty"`
 	MonitorReport                           *decision.MonitorReport `json:"monitor_report,omitempty"`
 }
@@ -120,16 +121,16 @@ type ScoreReport struct {
 	Concerns       []string `json:"concerns,omitempty"`
 }
 
-// ProductionFitnessReport states the current POC-to-production gap in terms an
-// operator can compare across clean runs.
-// Intent: POC16 should produce a concise production-fitness summary from
-// analyzer and monitor event records without pretending a successful POC run is
-// production readiness. Source: DI-sihuz
-type ProductionFitnessReport struct {
-	Baseline           string   `json:"baseline"`
-	ReadyForProduction bool     `json:"ready_for_production"`
-	Verdict            string   `json:"verdict"`
-	BlockingGaps       []string `json:"blocking_gaps,omitempty"`
+// POCScopeFitnessReport states whether this run covered the current POC16
+// acceptance surface in terms an operator can compare across clean runs.
+// Intent: POC16 should report executable POC-scope coverage without implying
+// deployment readiness, final API stability, or production certification.
+// Source: DI-rapuk
+type POCScopeFitnessReport struct {
+	Baseline         string   `json:"baseline"`
+	POCScopeComplete bool     `json:"poc_scope_complete"`
+	Verdict          string   `json:"verdict"`
+	BlockingGaps     []string `json:"blocking_gaps,omitempty"`
 }
 
 // messageDAGRecord mirrors the collector's run-scoped message DAG index.
@@ -181,6 +182,7 @@ type AcceptanceCriteria struct {
 	RequireParserRoleProcess          bool
 	RequireOpaqueTransportKernel      bool
 	RequireConsolidatedShippingPCID   bool
+	RequireLocalLifecycleTokens       bool
 	MaxActiveRuntimeProtocols         int
 	MinScoreOverall                   int
 }
@@ -248,6 +250,7 @@ func analyzeRun(runDir string) (RunSummary, error) {
 		EncryptedPayloadCounts:                make(map[string]int),
 		ParserBuilderCounts:                   make(map[string]int),
 		POC16ProfileCounts:                    make(map[string]int),
+		LifecycleCounts:                       make(map[string]int),
 		PersistentSessionCounts:               make(map[string]int),
 		PersistentSessionOpenCounts:           make(map[string]int),
 		PersistentSessionTerminalCounts:       make(map[string]int),
@@ -281,7 +284,7 @@ func analyzeRun(runDir string) (RunSummary, error) {
 	countMonitorVocabulary(report, &summary)
 	summary.MissingRequiredEventNames = missingRequiredEvents(summary)
 	summary.ScoreReport = computeScores(summary)
-	summary.ProductionFitness = computeProductionFitness(summary)
+	summary.POCScopeFitness = computePOCScopeFitness(summary)
 	return summary, nil
 }
 
@@ -347,6 +350,7 @@ func cleanRegressionCriteria() AcceptanceCriteria {
 		RequireParserRoleProcess:          true,
 		RequireOpaqueTransportKernel:      true,
 		RequireConsolidatedShippingPCID:   true,
+		RequireLocalLifecycleTokens:       true,
 		MaxActiveRuntimeProtocols:         10,
 		MinScoreOverall:                   4,
 	}
@@ -448,6 +452,9 @@ func validateSummary(summary RunSummary, criteria AcceptanceCriteria) error {
 	}
 	if criteria.RequireConsolidatedShippingPCID {
 		failures = append(failures, consolidatedShippingPCIDFailures(summary)...)
+	}
+	if criteria.RequireLocalLifecycleTokens {
+		failures = append(failures, localLifecycleFailures(summary)...)
 	}
 	if criteria.MaxActiveRuntimeProtocols > 0 && summary.ActiveRuntimeProtocolCount > criteria.MaxActiveRuntimeProtocols {
 		failures = append(failures, fmt.Sprintf("active_runtime_protocol_count=%d exceeds max %d protocols=%s", summary.ActiveRuntimeProtocolCount, criteria.MaxActiveRuntimeProtocols, strings.Join(summary.ActiveRuntimeProtocols, ",")))
@@ -743,6 +750,38 @@ func persistentSessionFailures(summary RunSummary) []string {
 	}
 	if summary.AckMessageMissingParentCount != 0 {
 		failures = append(failures, fmt.Sprintf("ack_message_missing_parent_count=%d want 0", summary.AckMessageMissingParentCount))
+	}
+	return failures
+}
+
+func localLifecycleFailures(summary RunSummary) []string {
+	// Intent: Normal POC16 shutdown should prove app/parser/kernel lifecycle
+	// promises with signed CWT/COSE tokens. SIGTERM/SIGKILL is allowed only as
+	// recorded fallback after token failure, not as the clean-run path. Source:
+	// DI-jafoj
+	var failures []string
+	for _, eventName := range []string{
+		"local_lifecycle_token_issued",
+		"local_lifecycle_ready",
+		"local_lifecycle_token_invoked",
+		"local_lifecycle_token_verified",
+		"local_lifecycle_role_summary",
+		"local_lifecycle_token_fulfilled",
+	} {
+		if summary.LifecycleCounts[eventName] == 0 {
+			failures = append(failures, eventName+"=0 want >0")
+		}
+	}
+	for _, profile := range []string{protocol.LifecycleChannelTCP, protocol.LifecycleChannelParserPath, protocol.LifecycleChannelStdio} {
+		if summary.LifecycleCounts["channel_profile:"+profile] == 0 {
+			failures = append(failures, "local lifecycle channel profile missing: "+profile)
+		}
+	}
+	if summary.EventCounts["parser_role_lifecycle_frame_received"] == 0 {
+		failures = append(failures, "parser-path lifecycle invocation missing")
+	}
+	if summary.EventCounts["local_lifecycle_sigterm_fallback_used"] != 0 {
+		failures = append(failures, fmt.Sprintf("local_lifecycle_sigterm_fallback_used=%d want 0", summary.EventCounts["local_lifecycle_sigterm_fallback_used"]))
 	}
 	return failures
 }
@@ -1089,6 +1128,12 @@ func summarizeLog(logPath string, summary *RunSummary) error {
 		}
 		if isPOC16ProfileEvent(event.Event) {
 			summary.POC16ProfileCounts[event.Event]++
+		}
+		if isLocalLifecycleEvent(event.Event) {
+			summary.LifecycleCounts[event.Event]++
+			if profile := detailValue(event.Detail, "channel_profile"); profile != "" {
+				summary.LifecycleCounts["channel_profile:"+profile]++
+			}
 		}
 		if isPersistentSessionEvent(event.Event) {
 			summary.PersistentSessionCounts[event.Event]++
@@ -1560,10 +1605,10 @@ func computeScores(summary RunSummary) ScoreReport {
 	return scores
 }
 
-func computeProductionFitness(summary RunSummary) ProductionFitnessReport {
-	report := ProductionFitnessReport{
+func computePOCScopeFitness(summary RunSummary) POCScopeFitnessReport {
+	report := POCScopeFitnessReport{
 		Baseline: "POC16 regression baseline for POC16; not production software",
-		Verdict:  "fit for continued POC work, not production deployment",
+		Verdict:  "POC-scope event coverage incomplete",
 	}
 	if summary.ScoreReport.Overall < 5 {
 		report.BlockingGaps = append(report.BlockingGaps, fmt.Sprintf("score_report.overall=%d below 5", summary.ScoreReport.Overall))
@@ -1582,9 +1627,9 @@ func computeProductionFitness(summary RunSummary) ProductionFitnessReport {
 		report.BlockingGaps = append(report.BlockingGaps, "RPC drift terms detected")
 	}
 	report.BlockingGaps = append(report.BlockingGaps, rawMessageArtifactFailures(summary)...)
-	report.ReadyForProduction = len(report.BlockingGaps) == 0
-	if report.ReadyForProduction {
-		report.Verdict = "production-candidate event complete for current POC scope"
+	report.POCScopeComplete = len(report.BlockingGaps) == 0
+	if report.POCScopeComplete {
+		report.Verdict = "POC-scope event coverage complete; production readiness requires separate design, reliability, security, and operations review"
 	}
 	return report
 }
@@ -1716,7 +1761,7 @@ func isCASRetrievalEvent(eventName string) bool {
 }
 
 func isTokenSecurityEvent(eventName string) bool {
-	return strings.Contains(eventName, "cose_token") || strings.HasPrefix(eventName, "cwt_capability_token_") || strings.Contains(eventName, "capability_token_signature") || eventName == "capability_token_signed" || eventName == "capability_token_expiry_checked"
+	return strings.Contains(eventName, "cose_token") || strings.HasPrefix(eventName, "cwt_capability_token_") || strings.HasPrefix(eventName, "local_lifecycle_token_") || strings.Contains(eventName, "capability_token_signature") || eventName == "capability_token_signed" || eventName == "capability_token_expiry_checked"
 }
 
 func isEncryptedPayloadEvent(eventName string) bool {
@@ -1728,7 +1773,11 @@ func isParserBuilderEvent(eventName string) bool {
 }
 
 func isPOC16ProfileEvent(eventName string) bool {
-	return strings.HasPrefix(eventName, "poc16_") || strings.HasPrefix(eventName, "llm_spec_context_") || eventName == "poc15_superset_named_agent_preserved"
+	return strings.HasPrefix(eventName, "poc16_") || strings.HasPrefix(eventName, "llm_spec_context_") || strings.HasPrefix(eventName, "local_lifecycle_") || eventName == "poc15_superset_named_agent_preserved"
+}
+
+func isLocalLifecycleEvent(eventName string) bool {
+	return strings.HasPrefix(eventName, "local_lifecycle_") || eventName == "parser_role_lifecycle_frame_received"
 }
 
 func isPersistentSessionEvent(eventName string) bool {

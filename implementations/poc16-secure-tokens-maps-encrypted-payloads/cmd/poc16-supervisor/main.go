@@ -8,9 +8,11 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"net"
 	"os"
 	"os/exec"
 	"os/signal"
+	"strings"
 	"sync"
 	"syscall"
 	"time"
@@ -18,6 +20,9 @@ import (
 	"promisegrid.dev/wire-lab/implementations/poc16-secure-tokens-maps-encrypted-payloads/config"
 	"promisegrid.dev/wire-lab/implementations/poc16-secure-tokens-maps-encrypted-payloads/decision"
 	"promisegrid.dev/wire-lab/implementations/poc16-secure-tokens-maps-encrypted-payloads/eventstream"
+	"promisegrid.dev/wire-lab/implementations/poc16-secure-tokens-maps-encrypted-payloads/lifecycle"
+	"promisegrid.dev/wire-lab/implementations/poc16-secure-tokens-maps-encrypted-payloads/pcid"
+	"promisegrid.dev/wire-lab/implementations/poc16-secure-tokens-maps-encrypted-payloads/protocol"
 )
 
 func main() {
@@ -74,9 +79,17 @@ func runContainerProcesses(ctx context.Context, cfg config.Config, kernelBinary,
 	defer closeCollectorClient(collectorClient)
 	forwarder := newProcessForwarder(container.Name, collectorClient)
 	defer forwarder.sendDone("container supervisor exited")
+	lifecycleSupervisor, lifecycleErr := lifecycle.NewSupervisor("supervisor:"+container.Name, cfg.RunID, pcid.NewRegistry().MustCID(pcid.LocalLifecycleV1), shutdownGrace, func(event decision.Event) {
+		forwarder.sendEvent("supervisor/lifecycle", event)
+	})
+	if lifecycleErr != nil {
+		return lifecycleErr
+	}
+	defer closeLifecycleSupervisor(lifecycleSupervisor)
 	kernelErrs := make(chan error, 1)
+	kernelRoleID := "kernel:" + container.Name
 	go func() {
-		kernelErrs <- runKernelProcess(kernelCtx, forwarder, shutdownGrace, kernelBinary, configPath, container.Name)
+		kernelErrs <- runKernelProcess(kernelCtx, forwarder, shutdownGrace, kernelBinary, configPath, container.Name, lifecycleSupervisor.EnvFor(protocol.LifecycleChannelTCP), nil)
 	}()
 	select {
 	case kernelErr := <-kernelErrs:
@@ -89,8 +102,9 @@ func runContainerProcesses(ctx context.Context, cfg config.Config, kernelBinary,
 		return lifecycleCtx.Err()
 	}
 	parserErrs := make(chan error, 1)
+	parserRoleID := "parser:" + container.Name
 	go func() {
-		parserErrs <- runParserRoleProcess(parserCtx, forwarder, shutdownGrace, parserRoleBinary, configPath, container.Name)
+		parserErrs <- runParserRoleProcess(parserCtx, forwarder, shutdownGrace, parserRoleBinary, configPath, container.Name, lifecycleSupervisor.EnvFor(protocol.LifecycleChannelParserPath), nil)
 	}()
 	select {
 	case parserErr := <-parserErrs:
@@ -118,6 +132,7 @@ func runContainerProcesses(ctx context.Context, cfg config.Config, kernelBinary,
 	}
 	errs := make(chan error, len(container.Agents))
 	var waitGroup sync.WaitGroup
+	appRoleIDs := make([]string, 0, len(container.Agents))
 	for _, agentName := range container.Agents {
 		agentBinary, binaryErr := appBinaryForAgent(cfg, agentName)
 		if binaryErr != nil {
@@ -126,16 +141,52 @@ func runContainerProcesses(ctx context.Context, cfg config.Config, kernelBinary,
 			<-kernelErrs
 			return binaryErr
 		}
+		agent, agentFound := cfg.Agent(agentName)
+		if !agentFound {
+			cancelAll()
+			<-parserErrs
+			<-kernelErrs
+			return fmt.Errorf("unknown agent %q", agentName)
+		}
+		roleID := "agent:" + agentName
+		appRoleIDs = append(appRoleIDs, roleID)
+		channelProfile := lifecycleProfileForAgent(agent)
 		waitGroup.Add(1)
-		go func(localAgentName, localAgentBinary string) {
+		go func(localAgentName, localAgentBinary, localRoleID, localChannelProfile string) {
 			defer waitGroup.Done()
-			errs <- runAgentProcess(agentCtx, forwarder, shutdownGrace, localAgentBinary, configPath, localAgentName)
-		}(agentName, agentBinary)
+			errs <- runAgentProcess(agentCtx, forwarder, shutdownGrace, localAgentBinary, configPath, localAgentName, lifecycleSupervisor.EnvFor(localChannelProfile), func(stdin io.WriteCloser) {
+				if localChannelProfile == protocol.LifecycleChannelStdio {
+					lifecycleSupervisor.RegisterStdin(localRoleID, stdin)
+				}
+			})
+		}(agentName, agentBinary, roleID, channelProfile)
 	}
 	go func() {
 		waitGroup.Wait()
 		close(errs)
 	}()
+	readyCtx, readyCancel := context.WithTimeout(lifecycleCtx, cfg.MonitorWaitTimeout())
+	defer readyCancel()
+	if readyErr := lifecycleSupervisor.WaitReady(readyCtx, append([]string{kernelRoleID, parserRoleID}, appRoleIDs...)); readyErr != nil {
+		forwarder.sendEvent("supervisor/lifecycle", decision.Event{Observer: "supervisor:" + container.Name, Event: "local_lifecycle_sigterm_fallback_used", Outcome: "broken", Detail: readyErr.Error()})
+		cancelAll()
+		<-parserErrs
+		<-kernelErrs
+		return readyErr
+	}
+	appInvokeCtx, appInvokeCancel := context.WithTimeout(lifecycleCtx, shutdownGrace)
+	defer appInvokeCancel()
+	for _, roleID := range appRoleIDs {
+		if invokeErr := lifecycleSupervisor.Invoke(appInvokeCtx, roleID, "run_complete", ""); invokeErr != nil {
+			forwarder.sendEvent("supervisor/lifecycle", decision.Event{Observer: "supervisor:" + container.Name, Event: "local_lifecycle_sigterm_fallback_used", Outcome: "broken", Peer: roleID, Detail: invokeErr.Error()})
+			cancelAgents()
+			break
+		}
+	}
+	if fulfillErr := lifecycleSupervisor.WaitFulfilled(appInvokeCtx, appRoleIDs); fulfillErr != nil {
+		forwarder.sendEvent("supervisor/lifecycle", decision.Event{Observer: "supervisor:" + container.Name, Event: "local_lifecycle_sigterm_fallback_used", Outcome: "broken", Detail: fulfillErr.Error()})
+		cancelAgents()
+	}
 	var firstErr error
 	for agentErr := range errs {
 		if agentErr != nil && firstErr == nil {
@@ -148,12 +199,46 @@ func runContainerProcesses(ctx context.Context, cfg config.Config, kernelBinary,
 	// control stream. Shutting the parser down before the transport kernel lets
 	// it close those local streams and emit terminal records before the kernel
 	// closes peer transport sessions. Source: DI-vazoz
-	cancelParser()
+	parserAddress, parserAddressFound := parserRoleAddress(cfg, container.Name)
+	parserInvokeCtx, parserInvokeCancel := context.WithTimeout(lifecycleCtx, shutdownGrace)
+	defer parserInvokeCancel()
+	if !parserAddressFound {
+		if firstErr == nil {
+			firstErr = fmt.Errorf("no parser lifecycle address for container %s", container.Name)
+		}
+		cancelParser()
+	} else if invokeErr := lifecycleSupervisor.Invoke(parserInvokeCtx, parserRoleID, "apps_complete", parserAddress); invokeErr != nil {
+		forwarder.sendEvent("supervisor/lifecycle", decision.Event{Observer: "supervisor:" + container.Name, Event: "local_lifecycle_sigterm_fallback_used", Outcome: "broken", Peer: parserRoleID, Detail: invokeErr.Error()})
+		if firstErr == nil {
+			firstErr = invokeErr
+		}
+		cancelParser()
+	} else if fulfillErr := lifecycleSupervisor.WaitFulfilled(parserInvokeCtx, []string{parserRoleID}); fulfillErr != nil {
+		forwarder.sendEvent("supervisor/lifecycle", decision.Event{Observer: "supervisor:" + container.Name, Event: "local_lifecycle_sigterm_fallback_used", Outcome: "broken", Peer: parserRoleID, Detail: fulfillErr.Error()})
+		if firstErr == nil {
+			firstErr = fulfillErr
+		}
+		cancelParser()
+	}
 	parserErr := <-parserErrs
 	if firstErr == nil && parserErr != nil {
 		firstErr = parserErr
 	}
-	cancelKernel()
+	kernelInvokeCtx, kernelInvokeCancel := context.WithTimeout(lifecycleCtx, shutdownGrace)
+	defer kernelInvokeCancel()
+	if invokeErr := lifecycleSupervisor.Invoke(kernelInvokeCtx, kernelRoleID, "parser_complete", ""); invokeErr != nil {
+		forwarder.sendEvent("supervisor/lifecycle", decision.Event{Observer: "supervisor:" + container.Name, Event: "local_lifecycle_sigterm_fallback_used", Outcome: "broken", Peer: kernelRoleID, Detail: invokeErr.Error()})
+		if firstErr == nil {
+			firstErr = invokeErr
+		}
+		cancelKernel()
+	} else if fulfillErr := lifecycleSupervisor.WaitFulfilled(kernelInvokeCtx, []string{kernelRoleID}); fulfillErr != nil {
+		forwarder.sendEvent("supervisor/lifecycle", decision.Event{Observer: "supervisor:" + container.Name, Event: "local_lifecycle_sigterm_fallback_used", Outcome: "broken", Peer: kernelRoleID, Detail: fulfillErr.Error()})
+		if firstErr == nil {
+			firstErr = fulfillErr
+		}
+		cancelKernel()
+	}
 	kernelErr := <-kernelErrs
 	if firstErr == nil && kernelErr != nil {
 		firstErr = kernelErr
@@ -164,32 +249,37 @@ func runContainerProcesses(ctx context.Context, cfg config.Config, kernelBinary,
 	return firstErr
 }
 
-func runKernelProcess(ctx context.Context, forwarder *processForwarder, shutdownGrace time.Duration, kernelBinary, configPath, containerName string) error {
+func runKernelProcess(ctx context.Context, forwarder *processForwarder, shutdownGrace time.Duration, kernelBinary, configPath, containerName string, extraEnv []string, stdinSink func(io.WriteCloser)) error {
 	// Intent: Start exactly one local kernel per container. It is transport
 	// plumbing for app promises, not a trust authority or workflow owner.
 	// Source: DI-galin
-	return runProcess(ctx, forwarder, "kernel:"+containerName, shutdownGrace, kernelBinary, "-config", configPath, "-container", containerName)
+	return runProcess(ctx, forwarder, "kernel:"+containerName, shutdownGrace, kernelBinary, extraEnv, stdinSink, "-config", configPath, "-container", containerName)
 }
 
-func runParserRoleProcess(ctx context.Context, forwarder *processForwarder, shutdownGrace time.Duration, parserRoleBinary, configPath, containerName string) error {
+func runParserRoleProcess(ctx context.Context, forwarder *processForwarder, shutdownGrace time.Duration, parserRoleBinary, configPath, containerName string, extraEnv []string, stdinSink func(io.WriteCloser)) error {
 	// Intent: Start one local parser/builder role per container between apps and
 	// the transport kernel so pCID-owned payload semantics stay out of the
 	// transport kernel. Source: DI-gazin
-	return runProcess(ctx, forwarder, "parser:"+containerName, shutdownGrace, parserRoleBinary, "-config", configPath, "-container", containerName)
+	return runProcess(ctx, forwarder, "parser:"+containerName, shutdownGrace, parserRoleBinary, extraEnv, stdinSink, "-config", configPath, "-container", containerName)
 }
 
-func runAgentProcess(ctx context.Context, forwarder *processForwarder, shutdownGrace time.Duration, agentBinary, configPath, agentName string) error {
+func runAgentProcess(ctx context.Context, forwarder *processForwarder, shutdownGrace time.Duration, agentBinary, configPath, agentName string, extraEnv []string, stdinSink func(io.WriteCloser)) error {
 	// Intent: A container supervisor starts independent local app processes
 	// without sharing decision state; stdout/stderr pass through so the run log
 	// remains auditable from Docker output. Source: DI-galin
-	return runProcess(ctx, forwarder, "agent:"+agentName, shutdownGrace, agentBinary, "-config", configPath, "-node", agentName)
+	return runProcess(ctx, forwarder, "agent:"+agentName, shutdownGrace, agentBinary, extraEnv, stdinSink, "-config", configPath, "-node", agentName)
 }
 
-func runProcess(ctx context.Context, forwarder *processForwarder, roleName string, shutdownGrace time.Duration, binary string, args ...string) error {
+func runProcess(ctx context.Context, forwarder *processForwarder, roleName string, shutdownGrace time.Duration, binary string, extraEnv []string, stdinSink func(io.WriteCloser), args ...string) error {
 	// Intent: Child processes still write ordinary stdout/stderr, but the
 	// supervisor copies JSON event records to the observer-only collector instead
 	// of relying on a Docker volume visible to agents. Source: DI-dirat
 	command := exec.Command(binary, args...)
+	command.Env = append(os.Environ(), extraEnv...)
+	stdin, stdinErr := command.StdinPipe()
+	if stdinErr != nil {
+		return stdinErr
+	}
 	stdout, stdoutErr := command.StdoutPipe()
 	if stdoutErr != nil {
 		return stdoutErr
@@ -200,6 +290,9 @@ func runProcess(ctx context.Context, forwarder *processForwarder, roleName strin
 	}
 	if startErr := command.Start(); startErr != nil {
 		return startErr
+	}
+	if stdinSink != nil {
+		stdinSink(stdin)
 	}
 	var waitGroup sync.WaitGroup
 	waitGroup.Add(2)
@@ -212,6 +305,7 @@ func runProcess(ctx context.Context, forwarder *processForwarder, roleName strin
 	select {
 	case waitErr := <-waitDone:
 		waitGroup.Wait()
+		closeProcessStdin(forwarder, roleName, stdin)
 		if waitErr != nil {
 			if ctx.Err() != nil {
 				return nil
@@ -241,7 +335,50 @@ func runProcess(ctx context.Context, forwarder *processForwarder, roleName strin
 			<-waitDone
 		}
 		waitGroup.Wait()
+		closeProcessStdin(forwarder, roleName, stdin)
 		return nil
+	}
+}
+
+func closeProcessStdin(forwarder *processForwarder, roleName string, stdin io.Closer) {
+	// Intent: Victor's stdio lifecycle profile receives the supervisor's signed
+	// shutdown token over stdin, then exits and may close its pipe before the
+	// supervisor performs generic process cleanup. That is successful lifecycle
+	// fulfillment, not a broken process promise. Source: DI-jafoj
+	if closeErr := stdin.Close(); closeErr != nil && !isExpectedClosedStdin(closeErr) {
+		forwarder.rememberErr(fmt.Errorf("close stdin for %s: %w", roleName, closeErr))
+	}
+}
+
+func isExpectedClosedStdin(closeErr error) bool {
+	if errors.Is(closeErr, os.ErrClosed) {
+		return true
+	}
+	return strings.Contains(closeErr.Error(), "file already closed")
+}
+
+func lifecycleProfileForAgent(agent config.AgentConfig) string {
+	// Intent: POC16 proves all three local_lifecycle_v1 transport profiles in one
+	// clean run: ordinary roles use dedicated lifecycle TCP, parser roles are
+	// invoked through their parser path, and Victor's stdio adapter receives
+	// lifecycle invocation through stdin. Source: DI-jafoj
+	if agent.Kind == "stdio_agent" {
+		return protocol.LifecycleChannelStdio
+	}
+	return protocol.LifecycleChannelTCP
+}
+
+func parserRoleAddress(cfg config.Config, containerName string) (string, bool) {
+	port, ok := cfg.ParserRoleAppPortForContainer(containerName)
+	if !ok {
+		return "", false
+	}
+	return fmt.Sprintf("127.0.0.1:%d", port), true
+}
+
+func closeLifecycleSupervisor(supervisor *lifecycle.Supervisor) {
+	if closeErr := supervisor.Close(); closeErr != nil && !errors.Is(closeErr, net.ErrClosed) {
+		fmt.Fprintf(os.Stderr, "close lifecycle supervisor: %v\n", closeErr)
 	}
 }
 
@@ -304,6 +441,17 @@ func (forwarder *processForwarder) forwardEventLine(roleName, streamName, line s
 	sendErr := forwarder.client.Send(eventstream.Record{
 		Kind:   eventstream.KindEvent,
 		Source: forwarder.containerName + "/" + roleName + "/" + streamName,
+		Event:  &event,
+	})
+	if sendErr != nil {
+		forwarder.rememberErr(sendErr)
+	}
+}
+
+func (forwarder *processForwarder) sendEvent(sourceSuffix string, event decision.Event) {
+	sendErr := forwarder.client.Send(eventstream.Record{
+		Kind:   eventstream.KindEvent,
+		Source: forwarder.containerName + "/" + sourceSuffix,
 		Event:  &event,
 	})
 	if sendErr != nil {

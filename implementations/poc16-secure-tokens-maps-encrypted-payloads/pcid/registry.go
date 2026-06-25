@@ -15,6 +15,7 @@ const (
 	PrinterPortV1        = "printer_port_v1"
 	KernelReceiveV1      = "kernel_receive_v1"
 	KernelTransportV1    = "kernel_transport_v1"
+	LocalLifecycleV1     = "local_lifecycle_v1"
 	ProductionShippingV1 = "production_shipping_v1"
 	CASStorageV1         = "cas_storage_v1"
 	CIDComputeV1         = "cid_compute_v1"
@@ -54,6 +55,8 @@ var protocolRecords = []protocolRecord{
 	{name: KernelReceiveV1, pcid: "bafkreie5ss65n2tovlzgobrt3wummlk5schbbrd5t36igl2ydpwrgktiym"},
 	// kernel_transport_v1; spec: kernel-transport-v1.md
 	{name: KernelTransportV1, pcid: "bafkreiac2quvapsjlqlpmggz2fyamairzemn6jepmdzdrhaohubvhgwsvi"},
+	// local_lifecycle_v1; spec: local-lifecycle-v1.md
+	{name: LocalLifecycleV1, pcid: "bafkreidamxalqxl2depjwlzhwdvglpda57fkqy5hvnwiz6jow6tapungeu"},
 	// map_payload_profile_v1; spec: map-payload-profile-v1.md
 	{name: MapPayloadProfileV1, pcid: "bafkreiccyr5tf5xxmjkypsv6776rrk43iulnf64fhvcsi6skosm5decugq"},
 	// message_shape_cose_payload_v1; spec: message-shape-cose-payload-v1.md

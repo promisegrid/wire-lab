@@ -10,6 +10,8 @@ import (
 
 	"promisegrid.dev/wire-lab/implementations/poc16-secure-tokens-maps-encrypted-payloads/config"
 	"promisegrid.dev/wire-lab/implementations/poc16-secure-tokens-maps-encrypted-payloads/decision"
+	"promisegrid.dev/wire-lab/implementations/poc16-secure-tokens-maps-encrypted-payloads/lifecycle"
+	"promisegrid.dev/wire-lab/implementations/poc16-secure-tokens-maps-encrypted-payloads/pcid"
 	"promisegrid.dev/wire-lab/implementations/poc16-secure-tokens-maps-encrypted-payloads/runtime"
 )
 
@@ -53,5 +55,10 @@ func run() error {
 	node := runtime.NewNode(cfg, agent, liveClient, liveClient)
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
-	return node.Run(ctx)
+	return lifecycle.RunManaged(ctx, appLifecycleOptions(cfg, agent.Name), node.Run)
+}
+
+func appLifecycleOptions(cfg config.Config, agentName string) lifecycle.RoleOptions {
+	containerName, _ := cfg.ContainerForAgent(agentName)
+	return lifecycle.OptionsFromEnv("supervisor:"+containerName, "agent:"+agentName, lifecycle.RoleKindApp, cfg.RunID, pcid.NewRegistry().MustCID(pcid.LocalLifecycleV1), cfg.ShutdownGrace(), true, os.Stdin)
 }

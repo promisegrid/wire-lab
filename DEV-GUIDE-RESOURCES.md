@@ -40,7 +40,7 @@ firmware-fidelity claim. Source: `DI-mokit`; `DI-dutah`.
 | Slot 0 | Tagged CBOR protocol selector; tag `42` is the current standard instance | Aligns with the CID / DAG-CBOR ecosystem while keeping the selector rule explicit and bounded. |
 | Slot 1 | Example primary payload/body anchor, unless the pCID spec explicitly defines and justifies another role | Preserves the simple common profile without turning it into a misleading universal law. |
 | Slots 1..N | Slot count, order, roles, signable view, validation, and failure behavior are defined by the protocol named by `pCID` | Avoids freezing a universal proof/header map or payload wrapper too early. |
-| Unsupported `pCID` | Preserve exact bytes only as uninterpreted carriage/evidence if local policy allows; do not semantically accept | Carriage is not promise acceptance. |
+| Unsupported `pCID` | Preserve exact bytes only as uninterpreted carriage or local event material if local policy allows; do not semantically accept | Carriage is not promise acceptance. |
 | Protocol specs | POC16 executable specs live only under `implementations/poc16-secure-tokens-maps-encrypted-payloads/docs/protocols/` and are embedded into the POC16 binary for pCID derivation and LLM prompt context | Keeps POC16 protocol meaning implementation-local, prevents stale root-level duplicates, and preserves pCID-as-content identity without implying a central registry. |
 | CID rendering | Binary CID bytes travel in CBOR/tag-42 slots; CIDv1 base32 text with the multibase `b` prefix is used for printable pCIDs, parent links, CAS object names, registry keys, diagnostic output, JSON logs, and protocol-spec aliases | Avoids pseudo-CIDs and bare hash identifiers, keeps IPFS/IPLD/Bluesky-compatible rendering, and makes the base32 pCID the authoritative code constant while human-readable names remain comments or metadata. |
 | Kernel parser/builder role | POC16 now treats slot 0 as a protocol-family selector that chooses a pCID-specific parser or builder role; payloads or nested payloads carry app, operation, destination, route, and local-addressing semantics | Prevents pCID from drifting into an app address, RPC method, message kind, service registry entry, or universal routing key. |
@@ -70,7 +70,7 @@ promises**, not a universal daemon, microkernel, RPC authority, service registry
 or conformance certificate. A PromiseGrid implementation promises only its own
 behavior to local apps/operators: supported pCIDs, unsupported behavior,
 app-facing storage / compute / send / receive / key / lifecycle / dispatch /
-evidence promises, host assumptions, adapter mappings, voluntary
+local event records, host assumptions, adapter mappings, voluntary
 namespace/reference behavior, and local events about its own actions. Local
 APIs may be ergonomic adapters, but the PromiseGrid boundary remains
 pCID-selected `grid([42(pCID), ...protocol-defined-slots])` messages when an
@@ -90,6 +90,17 @@ later sensitive data to Bob, chooses Dave instead, and judges Dave's promise
 kept. That trust change stays in Alice's app-local state; the kernel and relays
 only carry bytes and record their own observations. Source: `DI-fidot`;
 `DI-ripuz`; `DI-horak`; `DI-ponor`; `DI-fofik`.
+
+The local supervisor should be described as a lifecycle/resource kernel role
+when it owns process lifetime, CPU, RAM, sockets, device, storage, shutdown, or
+quota behavior. The Promise-Theory-compatible model is a **conditional capability
+promise**: the kernel role promises bounded local resource access, usually in
+return for the app promising bounded use, quiescence, drain, or other lifecycle
+cooperation. If that reciprocal promise breaks, the kernel role may withdraw,
+throttle, pause, close, or terminate local resource access to keep its own
+resource-protection promise. That is not authorization, permission, compliance,
+punishment, or policy enforcement over the app; it is local promise withdrawal
+for resources the kernel role controls. Source: `TE-ragin`; `DI-vuruz`.
 
 POC16 now separates pCID selection from app or network addressing in executable
 form: slot 0 selects a pCID-specific parser/builder role, while the pCID-defined
@@ -128,8 +139,14 @@ semantics, state-machine diagrams where meaningful, security notes,
 interoperability notes, and examples. Because POC16 pCIDs are derived from these
 spec bytes and LLM-backed agents receive these docs as prompt context, guide
 writers should treat the docs as the executable source of POC16 protocol
-meaning, not as short labels or informal notes. Source: `DI-rigup`; `DI-vulit`;
-`DI-gazin`; `DI-bitug`.
+meaning, not as short labels or informal notes. The analyzer reports this as
+`poc_scope_fitness.poc_scope_complete`: a clean run means the current POC16
+acceptance surface was covered, not that PromiseGrid has deployment readiness
+or that these profiles are final APIs. The verified separation still has one
+bounded implementation-local caveat: persistent-session demux may inspect a
+pCID-owned `outcome` projection to classify parent-linked ACK-like responses,
+but it does not use normal payload fields to route app behavior. Source:
+`DI-rigup`; `DI-vulit`; `DI-gazin`; `DI-bitug`; `DI-rapuk`.
 
 `poc12` now adds explicit executable pressure on the process boundary:
 each Docker container starts one local `poc12-kernel` process plus separate app
@@ -328,7 +345,7 @@ score dimensions at `5`, empty `rpc_drift_counts`, nonzero array-payload
 coverage for all known POC15 pCIDs, and monitor scores of `5` for
 promise-theory fit, autonomy, protocol validity, local-trust correctness, and
 imposition avoidance. The clean-run result is POC-scope completeness, not proof
-of production readiness: the POC is still a bounded local scaffold, not a
+of deployment readiness: the POC is still a bounded local scaffold, not a
 production network with independent legal-entity nodes, adversarial operators,
 or durable cross-run stores. POC15 now also emits run-local exact CBOR specimens
 for
@@ -1635,12 +1652,23 @@ section.
   that may become porting targets.
 - Use promise-accounting wording for peer-local relationship records. Do not
   describe a global or harness-owned accounting ledger.
+- Reserve "evidence" for wire-lab/POC provenance and use "event", "local event",
+  or "local event record" for production-shaped runtime records. Avoid stale
+  terms such as "bindings", "claims", "authorization", and "permission" in guide
+  prose unless the term is a standards-specific term of art such as CWT claims,
+  a historical title, or an explicitly rejected anti-pattern. Source:
+  `DI-rapuk`.
+- Describe lifecycle/resource supervisors as kernel roles that make conditional
+  capability promises for local resources. Throttle, kill, quota denial, pipe
+  closure, WASM fuel exhaustion, and similar mechanisms are ways of withdrawing
+  or narrowing local resource promises, not proof that the kernel commands an
+  app. Source: `TE-ragin`; `DI-vuruz`.
 - Do not tell kernel developers to implement every wire-lab draft artifact.
   Frozen pCID specs and implementation promise records are the relevant
   authority path once they exist.
 - The current porting target is a pCID-selected protocol stack plus explicit
   implementation promises, not the wire-lab harness. A port implements the
-  frozen binding/session/message specs it promises to implement, and records
+  frozen protocol/session/message specs it promises to implement, and records
   those promises in an implementation `CHANGELOG.md`. Source: `DI-zalak`;
   `DI-pagin`.
 - TE-jimar narrows the current kernel/runtime answer toward a portable local
