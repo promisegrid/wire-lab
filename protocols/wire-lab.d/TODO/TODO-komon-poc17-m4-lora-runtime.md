@@ -7,8 +7,8 @@ concept, targeted after POC16. POC17 should add a constrained Cortex-M4/LoRa
 runtime agent without using a UART or host bridge as the PromiseGrid message
 transport. POC16 planning now lives in
 `TODO-zugok-poc16-secure-tokens-maps-encrypted-payloads.md` and should feed the
-constrained-device token, encryption, and payload-shape decisions here. Source:
-`DI-lazal`; `DI-ruvot`.
+constrained-device token, supervisor, lifecycle, encryption, and payload-shape
+decisions here. Source: `DI-lazal`; `DI-ruvot`; `DI-fohop`.
 
 ## Decision Intent Log
 
@@ -84,6 +84,15 @@ Intent: POC17 should stop using readable placeholder pCID strings on the wire. T
 Constraints: The embedded specs are POC17-local behavior specs, not frozen PromiseGrid APIs; editing a spec intentionally changes its CID; keep CID bytes in slot 0 and keep readable names only for local dispatch/logging; do not claim exact hardware, radio-driver, regulatory, or firmware fidelity; keep MTU refusal coverage by sending an intentionally oversized frame.
 Affects: implementations/poc17-m4-lora-runtime/docs/protocols/; implementations/poc17-m4-lora-runtime/protocol/; implementations/poc17-m4-lora-runtime/config.json; implementations/poc17-m4-lora-runtime/config/; protocols/wire-lab.d/TODO/TODO-komon-poc17-m4-lora-runtime.md.
 
+ID: DI-fohop
+Date: 2026-06-25 14:46:55 PDT
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: POC17 must inherit the POC16 supervisor/resource-protection model and CWT/COSE lifecycle-token discipline unless a later scoped DI explicitly exempts a constrained M4/LoRa path.
+Intent: The POC16 shutdown fix reframed local process control as PromiseGrid lifecycle promises instead of supervisor command/control. POC17 should not regress by using hidden SIGTERM-first behavior, custom opaque token shortcuts, or authority-like supervisor language. A local supervisor or resource allocator may protect local CPU, RAM, process lifetime, radio, flash, and energy resources, but it does so as a local kernel role that promises bounded access and later withdraws local access if an app or role breaks its reciprocal promise.
+Constraints: Treat the supervisor as local, not global; do not let supervisor events become peer-trust authority; use signed CWT payloads protected by COSE_Sign1 for lifecycle/resource tokens where practical; use a well-known COSE/CWT library for host-side token creation and verification; if a constrained M4/LoRa path cannot afford full CWT/COSE bytes or verification, record a separate DR/DI for a constrained profile instead of silently falling back to opaque custom tokens; keep COSE token signatures inside the token rather than adding a redundant universal envelope proof slot; preserve binary CID bytes on wire and base32 CID text when printable; coordinate with `zugok.39` before claiming token convergence.
+Affects: protocols/wire-lab.d/TODO/TODO-komon-poc17-m4-lora-runtime.md; protocols/wire-lab.d/TODO/TODO-zugok-poc16-secure-tokens-maps-encrypted-payloads.md; implementations/poc17-m4-lora-runtime/; implementations/poc16-secure-tokens-maps-encrypted-payloads/docs/protocols/local-lifecycle-v1.md; docs/thought-experiments/TE-ragin-kernel-resource-protection-capability-promises.md; docs/research/DN-lujad-promisegrid-kernel-role-profile.md.
+
 ## Scope
 
 - Treat POC17 as executable design evidence for constrained embedded
@@ -103,6 +112,10 @@ Affects: implementations/poc17-m4-lora-runtime/docs/protocols/; implementations/
 - Treat POC16's map, secure-token, CWT-shaped, and encrypted-payload work as
   design pressure that constrained M4/LoRa agents may profile down rather than
   silently omit.
+- Treat POC16's `local_lifecycle_v1` work as required inheritance pressure:
+  POC17 must decide explicitly which supervisor/resource lifecycle tokens stay
+  local to the host simulator, which are visible to the M4/LoRa agent, and which
+  require a constrained token profile. Source: `DI-fohop`.
 
 ## Architecture Targets
 
@@ -118,6 +131,10 @@ Affects: implementations/poc17-m4-lora-runtime/docs/protocols/; implementations/
 - Host harness owns build/run/reset/artifact collection only. It may observe
   radio events and retained message artifacts, but it must not relay protocol
   messages for the M4 agent.
+- A local supervisor may own process lifetime, runtime budgets, radio access,
+  flash/RAM/CPU quotas, and clean shutdown as a kernel role. It must obtain
+  voluntary lifecycle or resource promises from local roles rather than
+  commanding independent agents. Source: `TE-ragin`; `DN-lujad`; `DI-fohop`.
 - Existing Go/Docker agents may participate as non-M4 peers through an adapter
   that behaves as another radio endpoint, not as a hidden reliable bridge for
   the M4 firmware.
@@ -138,6 +155,12 @@ Affects: implementations/poc17-m4-lora-runtime/docs/protocols/; implementations/
 - Decide whether the M4 slice can afford native Ed25519, a smaller proof
   profile, delegated transport proof, or unsigned local-link specimens; document
   the consequence as a PromiseGrid design pressure rather than hiding it.
+- Add a `local_lifecycle_v1`-derived or POC17-specific lifecycle/resource token
+  profile only after deciding whether the token bytes travel on the constrained
+  radio path or remain on host-local lifecycle channels. Host-local lifecycle
+  tokens should be signed CWT/COSE tokens; radio-visible lifecycle tokens require
+  explicit frame-budget analysis before implementation. Source: `DI-fohop`;
+  `DN-zaraz`.
 
 ## CAS And State Targets
 
@@ -186,6 +209,11 @@ Affects: implementations/poc17-m4-lora-runtime/docs/protocols/; implementations/
 - Gate simulator honesty: distinguish exact modeled behavior, approximate
   modeled behavior, diagnostics-only behavior, and not-yet-modeled hardware
   behavior.
+- Gate lifecycle/resource-token behavior: every clean shutdown path should show
+  token issuance, exact-token invocation, verification, fulfillment, and no
+  SIGTERM/SIGKILL fallback; every fallback should be recorded as local resource
+  withdrawal after a broken or timed-out local promise, not as supervisor
+  authority over a peer. Source: `DI-fohop`.
 
 ## Bintags Prior Art
 
@@ -244,7 +272,11 @@ This section is the starting context for the next Codex operator. Complete
 - Read POC16 executable design notes:
   `implementations/poc16-secure-tokens-maps-encrypted-payloads/README.md`,
   `implementations/poc16-secure-tokens-maps-encrypted-payloads/docs/KERNEL-ROLES.md`,
-  and `implementations/poc16-secure-tokens-maps-encrypted-payloads/docs/MESSAGE-SHAPES.md`.
+  `implementations/poc16-secure-tokens-maps-encrypted-payloads/docs/MESSAGE-SHAPES.md`,
+  and `implementations/poc16-secure-tokens-maps-encrypted-payloads/docs/protocols/local-lifecycle-v1.md`.
+- Read the supervisor/resource-protection context:
+  `docs/thought-experiments/TE-ragin-kernel-resource-protection-capability-promises.md`
+  and `docs/research/DN-lujad-promisegrid-kernel-role-profile.md`.
 - Read `bintags` prior art:
   `/home/angela/lab/bintags/README.md`, `/home/angela/lab/bintags/devices/m4/m4.py`,
   `/home/angela/lab/bintags/devices/pi/pi.py`, and
@@ -260,6 +292,11 @@ This section is the starting context for the next Codex operator. Complete
 - No component may become a global monitor, trust authority, CAS authority,
   route authority, registry authority, permission service, authorization service,
   conformance authority, or RPC controller.
+- A local supervisor is a kernel role for local resource protection and
+  lifecycle coordination, not an authority over independent peers. It may
+  withdraw local CPU/process/radio/resource access after a broken or timed-out
+  local promise; it must not pretend to command another agent or mutate peer
+  trust as a global fact. Source: `TE-ragin`; `DN-lujad`; `DI-fohop`.
 - pCID is a protocol-spec selector, not an address, app name, operation code,
   message kind, route target, service name, or universal dispatch key.
 - Preserve the outer message invariant `grid([42(pCID), ...])`; every slot after
@@ -273,6 +310,11 @@ This section is the starting context for the next Codex operator. Complete
   registry authority. Source: `DI-sazip` in `TODO-zugok`.
 - Keep the top-level semantic action minimal: ordinary protocol behavior should
   be voluntary `promise` payload semantics, not new action kinds.
+- Lifecycle and resource tokens are promises. At startup or registration, the
+  local role issues a signed token promising what it will do when that token is
+  later presented. At shutdown or resource withdrawal, the supervisor presents
+  that exact token; SIGTERM/SIGKILL is only a fallback after token fulfillment
+  fails or times out. Source: `DI-jafoj`; `DI-fohop`.
 - Do not claim exact Feather M4 Express plus RFM95W simulation fidelity until pin
   mappings, SAMD51 peripherals, SPI behavior, radio-driver behavior, and packet
   semantics are explicitly modeled and gated.
@@ -307,6 +349,15 @@ This section is the starting context for the next Codex operator. Complete
   protocol behavior.
 - Preserve honest analyzer language. Passing gates means "POC evidence complete"
   or "candidate for the current POC scope", not production readiness.
+- Inherit the POC16 `DI-jafoj` lifecycle-token correction: roles issue signed
+  CWT/COSE shutdown tokens at startup, supervisors later present those same
+  tokens over an approved lifecycle channel, and `grid([42(local_lifecycle_v1_pCID), payload])`
+  does not need a generic outer proof slot because the COSE signature is already
+  inside the token.
+- Coordinate POC17 token choices with `zugok.39`: do not claim token convergence
+  until POC16 custom-vs-CWT/COSE token paths are audited and POC17's constrained
+  profile has an explicit compatibility or exception decision. Source:
+  `DI-fohop`.
 
 ### POC16 Cleanup Still Relevant To POC17
 
@@ -328,6 +379,11 @@ This section is the starting context for the next Codex operator. Complete
   or assembly. The POC-local code may wrap the library, but the wrapper must
   reject malformed CIDs and must render canonical CIDv1 base32 whenever text is
   needed. Source: `DI-sazip` in `TODO-zugok`.
+- POC16 now has `local_lifecycle_v1` signed CWT/COSE lifecycle tokens, but still
+  has an open token-audit task (`zugok.39`). POC17 must either reuse that
+  lifecycle profile for host-local roles or record why the constrained M4/LoRa
+  radio path needs a different pCID-specific profile. Source: `DI-jafoj`;
+  `DI-fohop`.
 
 ### Session-Only Operating Habits
 
@@ -407,6 +463,34 @@ This section is the starting context for the next Codex operator. Complete
   multibase `b` prefix in logs, filenames, diagnostics, JSON, and operator-visible
   output, and no bare SHA-256 hex or pseudo-CID strings as external identifiers.
   Source: `DI-sazip` in `TODO-zugok`; `DI-dutah`.
+- [ ] komon.18 Review POC16 `local_lifecycle_v1`, `TE-ragin`, `DN-lujad`, and
+  `zugok.39` before changing POC17 supervisor, lifecycle, resource, or token
+  behavior. Record whether POC17 reuses the POC16 lifecycle profile unchanged,
+  profiles it down for constrained radio, or keeps it host-local only. Source:
+  `DI-fohop`.
+- [ ] komon.19 Decide the POC17 supervisor/resource role split before coding:
+  host-local simulator supervisor only, M4-visible lifecycle/resource role, or
+  split host/device roles. The decision must state which role promises process
+  lifetime, radio access, CPU/RAM/flash/energy budgets, clean shutdown, and
+  artifact flush. Source: `DI-fohop`.
+- [ ] komon.20 Add CWT/COSE lifecycle/resource token support for every POC17
+  local role that needs clean shutdown or resource withdrawal. Each role should
+  issue a signed token at startup or registration, and the supervisor should
+  later invoke that exact token rather than sending command-like shutdown text.
+  Source: `DI-jafoj`; `DI-fohop`.
+- [ ] komon.21 Analyze whether any lifecycle/resource tokens cross the simulated
+  LoRa path. If yes, measure the exact frame-budget impact and either adopt a
+  constrained CWT/COSE-compatible profile or file a DR/DI explaining the
+  exception. If no, document that lifecycle tokens are host-local and not radio
+  protocol traffic. Source: `DI-fohop`; `DN-zaraz`.
+- [ ] komon.22 Add analyzer gates for lifecycle/resource tokens: token issued,
+  token CID recorded, token invoked, COSE verified, CWT terms checked, token
+  fulfilled, malformed/expired/replayed/wrong-run/wrong-pCID token rejected, and
+  no SIGTERM/SIGKILL fallback on the clean path. Source: `DI-fohop`.
+- [ ] komon.23 Add resource-protection cases where a local kernel role withdraws
+  CPU/process/radio/flash/RAM/energy access after a broken or timed-out local
+  promise without treating that local withdrawal as command authority or global
+  peer-trust evidence. Source: `TE-ragin`; `DN-lujad`; `DI-fohop`.
 - [ ] komon.11 Add analyzer gates proving radio-only transport, exact CBOR
   artifacts, pCID-owned payloads, sparse CAS behavior, failure handling, and
   no authority drift.
