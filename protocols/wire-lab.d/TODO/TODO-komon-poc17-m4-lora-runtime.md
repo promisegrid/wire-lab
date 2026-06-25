@@ -402,6 +402,11 @@ This section is the starting context for the next Codex operator. Complete
   and local GC behavior for the M4 agent. Implemented as bounded local CAS,
   missing-parent evidence, peer-storage promise evidence, and GC analyzer gates.
   Source: `DI-pobir`.
+- [ ] komon.17 Verify POC17 handles every pCID and CID with the CID-first rule:
+  binary CID bytes on the radio/wire path, canonical CIDv1 base32 text with
+  multibase `b` prefix in logs, filenames, diagnostics, JSON, and operator-visible
+  output, and no bare SHA-256 hex or pseudo-CID strings as external identifiers.
+  Source: `DI-sazip` in `TODO-zugok`; `DI-dutah`.
 - [ ] komon.11 Add analyzer gates proving radio-only transport, exact CBOR
   artifacts, pCID-owned payloads, sparse CAS behavior, failure handling, and
   no authority drift.
