@@ -154,17 +154,20 @@ interoperability notes, and examples. Because POC16 pCIDs are derived from these
 spec bytes and LLM-backed agents receive these docs as prompt context, guide
 writers should treat the docs as the executable source of POC16 protocol
 meaning, not as short labels or informal notes. `local_lifecycle_v1` adds signed
-CWT/COSE lifecycle tokens and token-invocation shutdown gates, but `zugok.39`
-remains open: guide prose should not claim full token convergence until other
-POC16 token paths are audited for CWT/COSE/library/custom usage. The analyzer
-reports this as `poc_scope_fitness.poc_scope_complete`: a clean run means the
-current POC16 acceptance surface was covered, not that PromiseGrid has deployment
-readiness or that these profiles are final APIs. The verified separation still
-has one bounded implementation-local caveat: persistent-session demux may inspect
-a pCID-owned `outcome` projection to classify parent-linked ACK-like responses,
+CWT/COSE lifecycle tokens and token-invocation shutdown gates. The `zugok.39`
+audit found three POC16 token families: all use COSE, two are CWT-shaped, and
+only `local_lifecycle_v1` currently uses a well-known COSE library rather than
+POC16's custom local COSE subset. Guide prose should therefore describe
+CWT/COSE as the direction and lifecycle tokens as the best executable example,
+not claim full token convergence yet. The analyzer reports clean runs as
+`poc_scope_fitness.poc_scope_complete`: a clean run means the current POC16
+acceptance surface was covered, not that PromiseGrid has deployment readiness or
+that these profiles are final APIs. The verified separation still has one
+bounded implementation-local caveat: persistent-session demux may inspect a
+pCID-owned `outcome` projection to classify parent-linked ACK-like responses,
 but it does not use normal payload fields to route app behavior. Source:
 `DI-rigup`; `DI-vulit`; `DI-gazin`; `DI-bitug`; `DI-rapuk`; `DI-mapah`;
-`DI-jafoj`.
+`DI-jafoj`; `TODO-zugok`.
 
 `poc12` now adds explicit executable pressure on the process boundary:
 each Docker container starts one local `poc12-kernel` process plus separate app
@@ -1662,9 +1665,11 @@ section.
   `local_lifecycle_v1` signed CWT/COSE shutdown-token issuance/invocation/
   verification/fulfillment. It should be cited as POC evidence only, not as a
   final token, encryption, key agreement, parser-module, payload-map, lifecycle,
-  or supervisor API standard. `zugok.39` remains open for the token-path audit,
-  so guide writers should describe CWT/COSE as the current POC16 direction and
-  executable lifecycle-token evidence, not as final token convergence.
+  or supervisor API standard. The `zugok.39` audit found that lifecycle tokens
+  are the only POC16 token family currently using the preferred well-known
+  CWT/COSE library profile; CAS storage tokens and the secure-capability
+  specimen path still use custom local COSE/CWT-support code and should be
+  refactored before anyone claims final token convergence.
   Source: `DI-vulit`; `DI-magug`; `DI-sazip`; `DI-mapah`; `DI-jafoj`;
   `TODO-zugok`; `TE-ritig`.
 	- `protocols/wire-lab.d/archive/migrations/SIM-piloh-turns-149-208-recovery/archive/transports/README.md`

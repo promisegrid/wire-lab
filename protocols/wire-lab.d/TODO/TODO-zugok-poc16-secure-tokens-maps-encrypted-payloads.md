@@ -378,6 +378,58 @@ Affects: implementations/poc16-secure-tokens-maps-encrypted-payloads/; implement
   authorization, or command authority; it is a signed promise artifact whose
   usefulness depends on the redeemer's and issuer's local judgments.
 
+## Token Path Audit
+
+Audit date: 2026-06-26. Source: `DI-jafoj`; `zugok.39`.
+
+POC16 currently has three token implementation families:
+
+1. `SignedCapabilityToken` in
+   `implementations/poc16-secure-tokens-maps-encrypted-payloads/protocol/capability_token.go`.
+   It is used by normal CAS storage serve-once and bearer-storage flows in
+   `runtime/node.go`. It is not CWT-shaped: it signs a deterministic CBOR string
+   map with fields such as `issuer`, `subject`, `scope`, `content_cid`,
+   `expires_unix`, `nonce`, and `transferable`. It does use COSE_Sign1, but via
+   POC16's custom local COSE subset in `protocol/cose.go`, not a well-known COSE
+   library.
+2. `CWTCapabilityToken` in
+   `implementations/poc16-secure-tokens-maps-encrypted-payloads/protocol/cwt_capability.go`.
+   It is used by the `secure_capability_v1` profile/specimen path in
+   `runtime/poc16_profiles.go`. It is CWT-shaped and COSE-wrapped, but both the
+   CWT claim-map codec and COSE_Sign1 handling are custom local code.
+3. `LifecycleToken` in
+   `implementations/poc16-secure-tokens-maps-encrypted-payloads/protocol/lifecycle_token.go`.
+   It is used by the `local_lifecycle_v1` supervisor/role runtime path in
+   `lifecycle/lifecycle.go`. It is the strongest current profile: a CWT payload
+   protected by COSE_Sign1/Ed25519 using `github.com/veraison/go-cose`, with
+   canonical CBOR from `github.com/fxamacker/cbor/v2`.
+
+Audit totals:
+
+- Token families audited: 3.
+- CWT-shaped token families: 2 (`CWTCapabilityToken`, `LifecycleToken`).
+- Non-CWT token families: 1 (`SignedCapabilityToken`).
+- COSE-wrapped token families: 3.
+- Custom COSE implementations still used: 2 token families
+  (`SignedCapabilityToken`, `CWTCapabilityToken`).
+- Well-known COSE-library implementations used: 1 token family
+  (`LifecycleToken`).
+- Normal runtime token flows still using the custom/non-CWT path: CAS
+  serve-once and bearer-storage tokens.
+- Profile/specimen token flows using the custom CWT path:
+  `secure_capability_v1`.
+- Lifecycle token flows using the preferred CWT/COSE library path:
+  `local_lifecycle_v1`.
+
+Conclusion: `local_lifecycle_v1` proves the preferred CWT/COSE library profile,
+but POC16 token convergence is not complete. Future token refactoring should
+move the CAS storage tokens and `secure_capability_v1` specimen path toward the
+`local_lifecycle_v1` pattern: CWT payloads, COSE_Sign1 through a well-known
+library, binary CIDs inside signed terms where appropriate, and base32 CID text
+only for printable diagnostics. Until that refactor is done, guide prose should
+say that CWT/COSE is the current direction and that lifecycle tokens are the
+best executable example, not that every POC16 token path has converged.
+
 ## Encrypted Payload Targets
 
 - Add pCID specs whose envelope slot or payload slot carries encrypted payload
@@ -542,4 +594,4 @@ Affects: implementations/poc16-secure-tokens-maps-encrypted-payloads/; implement
 - [x] zugok.36 Document the POC15 agent/function baseline in the POC16 README before adding new POC16-specific behavior.
 - [x] zugok.37 Replace flexible pair-list payload bodies with nested CBOR map bodies and update the affected POC16/POC17 documentation.
 - [x] zugok.38 Add `local_lifecycle_v1` signed CWT/COSE lifecycle tokens, token invocation shutdown, and analyzer gates.
-- [ ] zugok.39 Audit every other POC16 token path and report how many are CWT, how many use COSE, how many still use custom code, how many use a well-known library, and which should be refactored toward the `local_lifecycle_v1` CWT/COSE library profile.
+- [x] zugok.39 Audit every other POC16 token path and report how many are CWT, how many use COSE, how many still use custom code, how many use a well-known library, and which should be refactored toward the `local_lifecycle_v1` CWT/COSE library profile.
