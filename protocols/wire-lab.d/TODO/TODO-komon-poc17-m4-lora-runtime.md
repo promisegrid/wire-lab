@@ -84,6 +84,14 @@ Intent: POC17 should stop using readable placeholder pCID strings on the wire. T
 Constraints: The embedded specs are POC17-local behavior specs, not frozen PromiseGrid APIs; editing a spec intentionally changes its CID; keep CID bytes in slot 0 and keep readable names only for local dispatch/logging; do not claim exact hardware, radio-driver, regulatory, or firmware fidelity; keep MTU refusal coverage by sending an intentionally oversized frame.
 Affects: implementations/poc17-m4-lora-runtime/docs/protocols/; implementations/poc17-m4-lora-runtime/protocol/; implementations/poc17-m4-lora-runtime/config.json; implementations/poc17-m4-lora-runtime/config/; protocols/wire-lab.d/TODO/TODO-komon-poc17-m4-lora-runtime.md.
 
+ID: DI-nopiv
+Date: 2026-06-26 14:38:52 PDT
+Status: active
+Decision: Complete the POC17 CID-first cleanup for external artifacts, event fields, CAS identifiers, parent links, and protocol-spec aliases.
+Intent: POC17 already used binary CID bytes in slot 0, but still leaked bare SHA-256 hex through artifact filenames, event `hash` fields, CAS IDs, and example parent links. `DI-sazip` requires every printable protocol, storage, parent, artifact, and registry identifier to be canonical CIDv1 base32 text, with SHA-256 remaining only as an internal digest inside CID construction.
+Constraints: Preserve exact CBOR message artifacts and malformed byte artifacts; keep payload hex in diagnostic CBOR output because it is byte rendering, not an external identifier; keep protocol display names as comments/metadata only; use the same Go CID/multihash libraries as the repo spec tool; keep pCID alias symlinks out of the embedded spec-byte corpus.
+Affects: implementations/poc17-m4-lora-runtime/artifact/; implementations/poc17-m4-lora-runtime/state/; implementations/poc17-m4-lora-runtime/protocol/; implementations/poc17-m4-lora-runtime/docs/protocols/; implementations/poc17-m4-lora-runtime/analyzer/; implementations/poc17-m4-lora-runtime/sim/; protocols/wire-lab.d/TODO/TODO-komon-poc17-m4-lora-runtime.md.
+
 ID: DI-fohop
 Date: 2026-06-25 14:46:55 PDT
 Status: active
@@ -458,11 +466,13 @@ This section is the starting context for the next Codex operator. Complete
   and local GC behavior for the M4 agent. Implemented as bounded local CAS,
   missing-parent evidence, peer-storage promise evidence, and GC analyzer gates.
   Source: `DI-pobir`.
-- [ ] komon.17 Verify POC17 handles every pCID and CID with the CID-first rule:
+- [x] komon.17 Verify POC17 handles every pCID and CID with the CID-first rule:
   binary CID bytes on the radio/wire path, canonical CIDv1 base32 text with
   multibase `b` prefix in logs, filenames, diagnostics, JSON, and operator-visible
   output, and no bare SHA-256 hex or pseudo-CID strings as external identifiers.
-  Source: `DI-sazip` in `TODO-zugok`; `DI-dutah`.
+  Implemented by converting artifact names, CAS IDs, parent links, event fields,
+  and spec aliases to CID text; guarded by generated-run tests. Source:
+  `DI-sazip` in `TODO-zugok`; `DI-dutah`; `DI-nopiv`.
 - [ ] komon.18 Review POC16 `local_lifecycle_v1`, `TE-ragin`, `DN-lujad`, and
   `zugok.39` before changing POC17 supervisor, lifecycle, resource, or token
   behavior. Record whether POC17 reuses the POC16 lifecycle profile unchanged,

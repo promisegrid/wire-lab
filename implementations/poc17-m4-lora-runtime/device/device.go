@@ -27,7 +27,7 @@ type Agent struct {
 func (a *Agent) ReceiveRadio(packet radio.Packet) error {
 	msg, err := protocol.Parse(packet.Bytes)
 	if err != nil {
-		hash, path, writeErr := a.Writer.RecordMalformed(packet.Bytes, "m4")
+		contentCID, path, writeErr := a.Writer.RecordMalformed(packet.Bytes, "m4")
 		if writeErr != nil {
 			return writeErr
 		}
@@ -35,32 +35,32 @@ func (a *Agent) ReceiveRadio(packet radio.Packet) error {
 			Type:      "malformed_rejected",
 			Actor:     a.Name,
 			Peer:      packet.From,
-			Hash:      hash,
+			CID:       contentCID,
 			Path:      path,
 			Transport: "simulated_lora",
 			Outcome:   "local_non_commitment",
 			Details:   map[string]any{"error": err.Error()},
 		})
 	}
-	hash, rel, err := a.Writer.RecordMessage(packet.Bytes)
+	artifactCID, rel, err := a.Writer.RecordMessage(packet.Bytes)
 	if err != nil {
 		return err
 	}
-	localHash, evicted := a.CAS.Put(packet.Bytes)
+	localCID, evicted := a.CAS.Put(packet.Bytes)
 	if err := a.Writer.WriteEvent(artifact.Event{
 		Type:      "cas_store",
 		Actor:     a.Name,
 		PCID:      msg.PCID,
-		Hash:      localHash,
+		CID:       localCID,
 		Path:      rel,
 		Transport: "simulated_lora",
 		Outcome:   "stored",
-		Details:   map[string]any{"retained": a.CAS.Count(), "artifact_hash": hash},
+		Details:   map[string]any{"retained": a.CAS.Count(), "artifact_cid": artifactCID},
 	}); err != nil {
 		return err
 	}
 	for _, old := range evicted {
-		if err := a.Writer.WriteEvent(artifact.Event{Type: "cas_gc", Actor: a.Name, Hash: old, Outcome: "removed"}); err != nil {
+		if err := a.Writer.WriteEvent(artifact.Event{Type: "cas_gc", Actor: a.Name, CID: old, Outcome: "removed"}); err != nil {
 			return err
 		}
 	}
@@ -72,15 +72,15 @@ func (a *Agent) ReceiveRadio(packet radio.Packet) error {
 		}
 		for _, parent := range parents {
 			if !a.CAS.Has(parent) {
-				if err := a.Writer.WriteEvent(artifact.Event{Type: "missing_parent", Actor: a.Name, Hash: parent, Outcome: "sparse_store_normal"}); err != nil {
+				if err := a.Writer.WriteEvent(artifact.Event{Type: "missing_parent", Actor: a.Name, CID: parent, Outcome: "sparse_store_normal"}); err != nil {
 					return err
 				}
 			}
 		}
 		a.Status = status
-		return a.promiseStatus(localHash)
+		return a.promiseStatus(localCID)
 	case protocol.ProtocolOrderStatus:
-		return a.receiveOrderStatus(msg.Payload, localHash)
+		return a.receiveOrderStatus(msg.Payload, localCID)
 	case protocol.ProtocolLoRaLink:
 		return a.Writer.WriteEvent(artifact.Event{Type: "lora_link_promise", Actor: a.Name, PCID: msg.PCID, Outcome: "accepted", Transport: "simulated_lora"})
 	default:
@@ -88,14 +88,14 @@ func (a *Agent) ReceiveRadio(packet radio.Packet) error {
 			Type:      "unknown_pcid_non_commitment",
 			Actor:     a.Name,
 			PCID:      msg.PCID,
-			Hash:      localHash,
+			CID:       localCID,
 			Transport: "simulated_lora",
 			Outcome:   "local_non_commitment",
 		})
 	}
 }
 
-func (a *Agent) receiveOrderStatus(data []byte, hash string) error {
+func (a *Agent) receiveOrderStatus(data []byte, contentCID string) error {
 	payload, err := protocol.ParseOrderStatusPayload(data)
 	if err != nil {
 		return fmt.Errorf("parse order status payload: %w", err)
@@ -103,7 +103,7 @@ func (a *Agent) receiveOrderStatus(data []byte, hash string) error {
 	switch payload.Type {
 	case "MSG":
 		if payload.Dest != a.Name {
-			return a.Writer.WriteEvent(artifact.Event{Type: "order_status_ignored", Actor: a.Name, Peer: payload.Source, PCID: protocol.MustPCIDForName(protocol.ProtocolOrderStatus), Hash: hash, Outcome: "wrong_destination"})
+			return a.Writer.WriteEvent(artifact.Event{Type: "order_status_ignored", Actor: a.Name, Peer: payload.Source, PCID: protocol.MustPCIDForName(protocol.ProtocolOrderStatus), CID: contentCID, Outcome: "wrong_destination"})
 		}
 		a.OrderNumber = payload.OrderNumber
 		a.Status = payload.Status
@@ -112,7 +112,7 @@ func (a *Agent) receiveOrderStatus(data []byte, hash string) error {
 			Actor:     a.Name,
 			Peer:      payload.Source,
 			PCID:      protocol.MustPCIDForName(protocol.ProtocolOrderStatus),
-			Hash:      hash,
+			CID:       contentCID,
 			Transport: "simulated_lora",
 			Outcome:   "display_update_promised",
 			Details: map[string]any{
@@ -130,7 +130,7 @@ func (a *Agent) receiveOrderStatus(data []byte, hash string) error {
 			Actor:     a.Name,
 			Peer:      payload.Source,
 			PCID:      protocol.MustPCIDForName(protocol.ProtocolOrderStatus),
-			Hash:      hash,
+			CID:       contentCID,
 			Transport: "simulated_lora",
 			Outcome:   "acknowledged",
 			Details: map[string]any{
@@ -140,7 +140,7 @@ func (a *Agent) receiveOrderStatus(data []byte, hash string) error {
 			},
 		})
 	default:
-		return a.Writer.WriteEvent(artifact.Event{Type: "order_status_non_commitment", Actor: a.Name, PCID: protocol.MustPCIDForName(protocol.ProtocolOrderStatus), Hash: hash, Transport: "simulated_lora", Outcome: "unknown_order_message_type"})
+		return a.Writer.WriteEvent(artifact.Event{Type: "order_status_non_commitment", Actor: a.Name, PCID: protocol.MustPCIDForName(protocol.ProtocolOrderStatus), CID: contentCID, Transport: "simulated_lora", Outcome: "unknown_order_message_type"})
 	}
 }
 
@@ -229,13 +229,13 @@ func (a *Agent) promiseStatus(parent string) error {
 }
 
 // PromisePeerStorage records that a constrained device asks a stronger peer for storage.
-func (a *Agent) PromisePeerStorage(contentHash string) error {
+func (a *Agent) PromisePeerStorage(contentCID string) error {
 	return a.Writer.WriteEvent(artifact.Event{
 		Type:    "peer_storage_promise",
 		Actor:   a.Name,
 		Peer:    a.Peer,
 		PCID:    protocol.MustPCIDForName(protocol.ProtocolPeerStorage),
-		Hash:    contentHash,
+		CID:     contentCID,
 		Outcome: "requested",
 	})
 }

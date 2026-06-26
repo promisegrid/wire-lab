@@ -1,12 +1,12 @@
 package specdocs
 
 import (
-	"crypto/sha256"
 	"embed"
-	"encoding/base32"
 	"fmt"
 	"sort"
-	"strings"
+
+	cidlib "github.com/ipfs/go-cid"
+	mh "github.com/multiformats/go-multihash"
 )
 
 const (
@@ -17,13 +17,21 @@ const (
 	UnknownProbeV1 = "unknown_probe_v1"
 )
 
+const (
+	DeviceStatusV1PCID = "bafkreihmlpwkc5ke2zbfvur4mylrikkainqlq4zr5lkwacjys5bgreekhu"
+	LoRaLinkV1PCID     = "bafkreifwrfaveh4d2pkizq7pfidflk7cf2gtvfxkcroklizftudiav4r6i"
+	OrderStatusV1PCID  = "bafkreidv6zmcfrdopsdpbomlwt75fklmbittdgyztzkaofndw7biorgqne"
+	PeerStorageV1PCID  = "bafkreiblomxdawqalqqwdbwh6hlorzdejpkwfmrmt64kxbirohk75vp6dq"
+	UnknownProbeV1PCID = "bafkreibtn5h2wf4lz2gbn5tbsjujfxpnadhsoda6x4uq7ok5pnqfuqqdya"
+)
+
 // docs embeds the exact POC17 protocol specs used to derive pCIDs.
 //
 // Intent: POC17 slot 0 must carry actual content-derived protocol CIDs, not
 // readable placeholder names, while retaining local names for diagnostics and
 // handler dispatch. Source: DI-dutah
 //
-//go:embed *.md
+//go:embed device-status-v1.md lora-link-v1.md order-status-v1.md peer-storage-v1.md unknown-probe-v1.md
 var docs embed.FS
 
 var protocolFiles = map[string]string{
@@ -34,24 +42,33 @@ var protocolFiles = map[string]string{
 	UnknownProbeV1: "unknown-probe-v1.md",
 }
 
+var protocolPCIDs = map[string]string{
+	DeviceStatusV1: DeviceStatusV1PCID,
+	LoRaLinkV1:     LoRaLinkV1PCID,
+	OrderStatusV1:  OrderStatusV1PCID,
+	PeerStorageV1:  PeerStorageV1PCID,
+	UnknownProbeV1: UnknownProbeV1PCID,
+}
+
 // CID identifies one protocol spec as CIDv1 raw sha2-256.
 type CID struct {
 	name      string
-	digest    [32]byte
-	cidBytes  []byte
+	text      string
+	parsed    cidlib.Cid
 	tag42Data []byte
 }
 
 // NewCID derives the POC17 protocol CID from exact spec bytes.
-func NewCID(name string, specBytes []byte) CID {
-	digest := sha256.Sum256(specBytes)
-	cidBytes := make([]byte, 0, 36)
-	cidBytes = append(cidBytes, 0x01, 0x55, 0x12, 0x20)
-	cidBytes = append(cidBytes, digest[:]...)
-	tag42Data := make([]byte, 0, len(cidBytes)+1)
+func NewCID(name string, specBytes []byte) (CID, error) {
+	hash, err := mh.Sum(specBytes, mh.SHA2_256, -1)
+	if err != nil {
+		return CID{}, fmt.Errorf("multihash spec bytes: %w", err)
+	}
+	parsed := cidlib.NewCidV1(cidlib.Raw, hash)
+	tag42Data := make([]byte, 0, len(parsed.Bytes())+1)
 	tag42Data = append(tag42Data, 0x00)
-	tag42Data = append(tag42Data, cidBytes...)
-	return CID{name: name, digest: digest, cidBytes: cidBytes, tag42Data: tag42Data}
+	tag42Data = append(tag42Data, parsed.Bytes()...)
+	return CID{name: name, text: parsed.String(), parsed: parsed, tag42Data: tag42Data}, nil
 }
 
 // Name returns the local readable protocol name.
@@ -61,7 +78,7 @@ func (cid CID) Name() string {
 
 // Bytes returns the binary CIDv1 bytes without the DAG-CBOR tag-42 sentinel.
 func (cid CID) Bytes() []byte {
-	return append([]byte(nil), cid.cidBytes...)
+	return append([]byte(nil), cid.parsed.Bytes()...)
 }
 
 // Tag42Data returns the DAG-CBOR tag-42 byte-string body for this CID.
@@ -71,8 +88,7 @@ func (cid CID) Tag42Data() []byte {
 
 // String returns the canonical CIDv1 base32 text form.
 func (cid CID) String() string {
-	encoded := base32.StdEncoding.WithPadding(base32.NoPadding).EncodeToString(cid.cidBytes)
-	return "b" + strings.ToLower(encoded)
+	return cid.text
 }
 
 // Registry maps local protocol names to content-derived pCIDs.
@@ -92,7 +108,13 @@ func NewRegistry() (Registry, error) {
 		if err != nil {
 			return Registry{}, err
 		}
-		cid := NewCID(name, specBytes)
+		cid, err := NewCID(name, specBytes)
+		if err != nil {
+			return Registry{}, err
+		}
+		if expected := protocolPCIDs[name]; expected != cid.String() {
+			return Registry{}, fmt.Errorf("%s pCID drift: got %s want %s", name, cid.String(), expected)
+		}
 		registry.byName[name] = cid
 		registry.byText[cid.String()] = name
 	}

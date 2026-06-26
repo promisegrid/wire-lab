@@ -1,13 +1,13 @@
 package artifact
 
 import (
-	"crypto/sha256"
-	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
 	"time"
+
+	"promisegrid.dev/wire-lab/implementations/poc17-m4-lora-runtime/protocol"
 )
 
 // Event is the durable simulator/analyzer evidence row.
@@ -18,7 +18,7 @@ type Event struct {
 	Peer      string         `json:"peer,omitempty"`
 	Direction string         `json:"direction,omitempty"`
 	PCID      string         `json:"pcid,omitempty"`
-	Hash      string         `json:"hash,omitempty"`
+	CID       string         `json:"cid,omitempty"`
 	Path      string         `json:"path,omitempty"`
 	Transport string         `json:"transport,omitempty"`
 	Outcome   string         `json:"outcome,omitempty"`
@@ -45,24 +45,28 @@ func (w *Writer) RunDir() string { return w.runDir }
 
 // RecordMessage keeps exact message bytes in the run-scoped CAS.
 func (w *Writer) RecordMessage(raw []byte) (string, string, error) {
-	hashBytes := sha256.Sum256(raw)
-	hash := hex.EncodeToString(hashBytes[:])
-	rel := filepath.Join("message-cas", hash+".cbor")
+	cid, err := protocol.CIDForBytes(raw)
+	if err != nil {
+		return "", "", err
+	}
+	rel := filepath.Join("message-cas", cid+".cbor")
 	if err := os.WriteFile(filepath.Join(w.runDir, rel), raw, 0o644); err != nil {
 		return "", "", fmt.Errorf("write message artifact: %w", err)
 	}
-	return hash, rel, nil
+	return cid, rel, nil
 }
 
 // RecordMalformed stores malformed radio bytes for review.
 func (w *Writer) RecordMalformed(raw []byte, label string) (string, string, error) {
-	hashBytes := sha256.Sum256(raw)
-	hash := hex.EncodeToString(hashBytes[:])
-	rel := filepath.Join("malformed", label+"-"+hash+".bin")
+	cid, err := protocol.CIDForBytes(raw)
+	if err != nil {
+		return "", "", err
+	}
+	rel := filepath.Join("malformed", label+"-"+cid+".bin")
 	if err := os.WriteFile(filepath.Join(w.runDir, rel), raw, 0o644); err != nil {
 		return "", "", fmt.Errorf("write malformed artifact: %w", err)
 	}
-	return hash, rel, nil
+	return cid, rel, nil
 }
 
 // WriteEvent appends one JSON evidence row.

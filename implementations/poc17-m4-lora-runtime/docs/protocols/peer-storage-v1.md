@@ -49,5 +49,5 @@ to local policy.
 ## Examples
 
 ```text
-payload = ["m4-ivan", "gateway-bob", "missing-parent-cid", "local CAS pressure"]
+payload = ["m4-ivan", "gateway-bob", "bafkreid56qdzdvph2auwjicgnsiofpwk6vib7rdpmuiayqb4foyd7ru7ly", "local CAS pressure"]
 ```

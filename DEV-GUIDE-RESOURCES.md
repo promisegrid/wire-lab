@@ -1502,9 +1502,11 @@ section.
 - `implementations/poc17-m4-lora-runtime/` is first-slice Go behavior evidence
   for a radio-only constrained device exchange. It now includes bintags-shaped
   order status traffic under a spec-derived `order_status_v1` pCID and uses a
-  200-byte simulated LoRa application MTU, but it remains simulator evidence
-  rather than Feather M4, CircuitPython, RFM95, or production-device proof.
-  Source: `DI-libis`; `DI-pobir`; `DI-mokit`; `DI-dutah`.
+  200-byte simulated LoRa application MTU. Printable artifacts, CAS IDs, parent
+  links, JSON events, diagnostics, and spec aliases now use canonical CID text,
+  but the implementation remains simulator evidence rather than Feather M4,
+  CircuitPython, RFM95, or production-device proof. Source: `DI-libis`;
+  `DI-pobir`; `DI-mokit`; `DI-dutah`; `DI-nopiv`.
 - `protocols/wire-lab.d/TODO/TODO-binag-promisegrid-kernel-design-resolution.md`
   tracks the active resolution packet and the focused canary review required
   before `DR-davod` can close.

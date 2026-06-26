@@ -37,9 +37,8 @@ The payload byte string MUST decode to this positional CBOR array:
 ]
 ```
 
-`parents` contains locally known or missing parent CIDs as text evidence labels
-inside this POC. A production successor should use real CID bytes for those
-links.
+`parents` contains locally known or missing parent CIDs as canonical CIDv1
+base32 text with the multibase `b` prefix.
 
 ## Sender behavior
 
@@ -55,5 +54,5 @@ parents, or ignore the message. A malformed payload is a local non-commitment.
 
 ```text
 grid([42(pCID), h'...'])
-payload = ["m4-ivan", "ready", 87, ["missing-parent-cid"]]
+payload = ["m4-ivan", "ready", 87, ["bafkreid56qdzdvph2auwjicgnsiofpwk6vib7rdpmuiayqb4foyd7ru7ly"]]
 ```
