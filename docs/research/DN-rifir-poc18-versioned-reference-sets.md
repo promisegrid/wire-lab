@@ -7,9 +7,10 @@ PromiseGrid CAS as a Git/GitHub replacement substrate. Source: `DI-zuruj`.
 
 ## Short version
 
-POC18 should not treat tags as optional metadata like Git's `--tags` behavior.
-It should treat **versioned reference sets** as the primary way agents discover
-and fetch anything.
+POC18 should not treat tags as optional metadata like Git's `--tags` behavior,
+and it should not treat `push` and `pull` as the native collaboration model. It
+should treat **versioned reference sets** as the primary way agents discover,
+sync, and fetch anything. Source: `DI-zuruj`; `DI-dibut`.
 
 A versioned reference set is:
 
@@ -32,6 +33,8 @@ In Git:
 - a branch is a moving ref to a commit;
 - a tag is usually a separate ref to an object;
 - tags are often fetched as optional extras;
+- collaboration is typically expressed as explicit `push` and `pull` operations
+  against named remotes;
 - a tree maps filenames to blobs/subtrees;
 - rename history is inferred from snapshots rather than stored as a first-class
   identity relationship.
@@ -137,23 +140,30 @@ accessible by CID.
 This is stronger than a Git branch ref because the movement itself is a signed,
 versioned PromiseGrid object.
 
-## Tags are fetch entrypoints
+## Reference sets are sync entrypoints
 
 In POC18, tags/reference sets are not a secondary thing to fetch after commits.
-They are the way Alice starts fetching.
+They are the way Alice starts synchronizing.
 
 The flow is:
 
 ```text
-Alice asks Bob for a reference-set promise.
-Alice verifies or locally judges the promise.
+Alice and Bob continuously exchange reference-set promises.
+Alice locally judges which promises she trusts.
 Alice decides which labeled target CIDs she wants.
-Alice asks peers for those target CIDs and their parent-linked CAS objects.
+Alice asks peers for target CIDs and parent-linked CAS objects she is missing.
+Alice advertises the reference sets and CAS objects she is willing to share.
 ```
 
 This works for branches, directories, releases, logical changes, reviews, and
 workspaces. It also fits sparse CAS: Alice may know a reference set before she
 has all target objects.
+
+Native POC18 sync is therefore not "Alice pushes to Bob" or "Bob pulls from
+Alice." It is continuous peer DAG reconciliation among agents who each decide
+what to advertise, request, verify, retain, forward, or ignore. Git-style
+`push`/`pull` can remain as compatibility UI for import/export, but it should not
+be the PromiseGrid-native mental model. Source: `DI-dibut`.
 
 ## Logical changes replace change IDs
 
@@ -209,6 +219,36 @@ The exported Git commit hashes do not need to match original hashes unless the
 objects are byte-identical and the implementation can preserve them naturally.
 The important first target is content and DAG fidelity.
 
+Git roundtrip is compatibility work. It should not force POC18 to preserve Git's
+remote-centric push/pull model internally. Source: `DI-dibut`.
+
+## Tangled prior-art question
+
+POC18 should review Tangled as adjacent prior art before implementation locks
+its collaboration details. Tangled matters because it is a contemporary
+decentralized code-hosting project with Git compatibility, self-hosted
+infrastructure, social coding goals, AT Protocol identity, round-based pull
+request ideas, and Jujutsu change-ID influence.
+
+The question for POC18 is not "should PromiseGrid copy Tangled?" The question is:
+
+> What lessons, if any, should POC18 learn from Tangled's split between hosted
+> Git repositories, self-hosted infrastructure, social/appview aggregation,
+> identity, review workflow, and Jujutsu-compatible change tracking?
+
+Initial expectations:
+
+- Tangled may teach useful lessons about migration from existing Git workflows.
+- Tangled may teach useful lessons about social-code UX and round-based reviews.
+- Tangled's knots/appview split may be useful contrast for PromiseGrid's local
+  trust and no-global-authority model.
+- Tangled's continued SSH/Git push/pull compatibility is likely compatibility
+  pressure, not the native PromiseGrid sync model.
+- Tangled's Jujutsu change-ID use should be compared against POC18 logical-change
+  reference sets.
+
+Source: `DI-dibut`.
+
 ## Chunking
 
 POC18 should use restic's content-defined chunker library for file content, but
@@ -253,7 +293,9 @@ the group namespace enough to use it.
 - Treat `branch`, `directory`, `release`, `logical_change`, `review_thread`, and
   `workspace` as roles.
 - Let roles define validation. Same primitive does not mean same rules.
-- Fetch starts from reference-set promises.
+- Sync starts from reference-set promises.
+- Native collaboration is continuous peer DAG synchronization, not Git-style
+  push/pull.
 - Filenames are directory/reference-set labels.
 - Logical-change reference sets replace Jujutsu-style intrinsic change IDs.
 - File history owns content lineage, not names.
@@ -264,4 +306,5 @@ the group namespace enough to use it.
 
 - TODO: `protocols/wire-lab.d/TODO/TODO-nahop-poc18-cas-git-replacement.md`
 - Decision: `DI-zuruj`
+- Sync/prior-art decision: `DI-dibut`
 - Prior decision refined by this note: `DI-vilum`

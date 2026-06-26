@@ -35,6 +35,15 @@ Constraints: Supersedes `DI-vilum` where it names branch/ref promises as the roo
 Affects: protocols/wire-lab.d/TODO/TODO-nahop-poc18-cas-git-replacement.md; docs/research/DN-rifir-poc18-versioned-reference-sets.md; protocols/wire-lab.d/TODO/TODO.md; future implementations/poc18-cas-git-replacement/; future implementation-local POC18 protocol specs.
 Supersedes: DI-vilum
 
+ID: DI-dibut
+Date: 2026-06-26 11:53:59 PDT
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Add Tangled as a POC18 prior-art question and replace explicit Git-style push/pull operations with continuous peer DAG sync.
+Intent: POC18 should learn from adjacent decentralized code-collaboration systems without copying Git's push/pull mental model. Tangled is relevant prior art because it combines decentralized Git hosting, self-hosted infrastructure, social coding, AT Protocol identity, round-based pull-request ideas, and Jujutsu change IDs. PromiseGrid should compare those ideas against versioned reference sets, local trust, and sparse CAS. Separately, POC18 should treat collaboration as continuous DAG synchronization among trusted peers: agents exchange reference-set promises, object availability promises, parent-linked CAS objects, and missing-object requests continuously rather than waiting for explicit `git push` or `git pull` commands.
+Constraints: Do not adopt Tangled concepts without a focused review; do not reintroduce a global forge, appview, role-based access authority, or Git remote as the PromiseGrid authority model; preserve POC18's versioned reference-set root abstraction; continuous sync must remain voluntary and peer-relative, with each agent deciding what to advertise, request, retain, forward, verify, and trust; Git import/export remains compatibility work, not the native synchronization model.
+Affects: protocols/wire-lab.d/TODO/TODO-nahop-poc18-cas-git-replacement.md; docs/research/DN-rifir-poc18-versioned-reference-sets.md; future implementations/poc18-cas-git-replacement/; future POC18 analyzer gates.
+
 ## Core Hypothesis
 
 POC18 should test this hypothesis:
@@ -87,10 +96,10 @@ role-specific validation is not.
   receipts.
 
 Tags are not optional side objects. A tag/reference-set promise is what Alice
-fetches first when she wants a branch, release, logical change, directory,
-review, or workspace. She then recursively asks peers for target CIDs, parent
-reference-set versions, and parent-linked CAS objects she decides to retrieve.
-Source: `DI-zuruj`.
+syncs from peers when she wants a branch, release, logical change, directory,
+review, or workspace. She then continuously reconciles target CIDs, parent
+reference-set versions, and parent-linked CAS objects with peers she locally
+trusts. Source: `DI-zuruj`; `DI-dibut`.
 
 ## Git And Jujutsu Concepts To Preserve And Reframe
 
@@ -115,9 +124,11 @@ Source: `DI-zuruj`.
 - **Pull request/review:** Reframe as review-thread reference sets and signed
   review/test/adoption promises. There is no forge authority; each participant
   locally decides what review promises affect trust and adoption.
-- **Clone/fetch/push:** Reframe as reference-set promise exchange plus CAS object
-  exchange. Peers promise which reference sets and CAS objects they have, what
-  they are willing to retain or forward, and under what local constraints.
+- **Clone/fetch/push:** Reframe as continuous peer DAG synchronization. Explicit
+  Git-style commands may exist only as compatibility UI; natively, peers
+  continuously promise which reference sets and CAS objects they have, what they
+  are willing to retain or forward, which parent-linked objects they are missing,
+  and under what local constraints. Source: `DI-dibut`.
 
 ## Architecture Targets
 
@@ -140,6 +151,11 @@ Source: `DI-zuruj`.
 - Preserve pCID discipline. pCID selects the protocol parser/builder and slot
   semantics; names, roles, labels, paths, authors, repositories, and destinations
   live in pCID-defined payloads where needed.
+- Replace Git-style push/pull with continuous peer DAG sync. Each agent's local
+  sync role periodically or opportunistically compares reference-set heads,
+  parent links, object availability, retention promises, and missing-object
+  requests with selected peers, then locally decides what to advertise, request,
+  store, verify, forward, or ignore. Source: `DI-dibut`.
 - Preserve POC superset discipline by inheriting POC16 protocol/CAS/kernel
   lessons. POC18 does not inherit POC17's M4/LoRa runtime scope. Source:
   `DI-zuruj`.
@@ -170,6 +186,10 @@ Source: `DI-zuruj`.
 - Define Git import/export requirements. POC18 starts PromiseGrid-native but is
   not complete until it can import and export a real Git repo while preserving
   content, directory structure, branch/tag targets, and parent DAG semantics.
+- Define continuous-sync payloads before implementation. The main version-control
+  pCID should cover reference-set advertisements, object-availability promises,
+  missing-object requests, retention/forwarding offers, and local non-commitments
+  without treating any peer as a remote authority. Source: `DI-dibut`.
 
 ## CAS And Chunking Targets
 
@@ -234,6 +254,10 @@ Source: `DI-zuruj`.
 - **Git roundtrip:** Alice imports a real Git repo, maps Git branches/tags into
   reference-set promises, exports back to Git, and verifies content, directory
   structure, branch/tag targets, and DAG semantics.
+- **Continuous peer sync:** Alice and Bob do not run `push` or `pull`. Their
+  local sync roles repeatedly exchange reference-set heads, object availability,
+  missing-object requests, and retention promises. Each agent decides locally
+  which parts of the DAG to fetch, verify, retain, forward, or ignore.
 - **Forge replacement:** Alice and Bob collaborate without GitHub. Their local
   agents exchange reference-set promises, review promises, CAS objects, and trust
   updates directly or through chosen peers.
@@ -262,6 +286,9 @@ Source: `DI-zuruj`.
   object and at least one locally dropped unpromised object.
 - Verify Git roundtrip behavior by importing/exporting a real Git repo and
   checking content, directories, branch/tag targets, and DAG semantics.
+- Verify continuous peer DAG sync by requiring at least one useful update to
+  propagate without an explicit push/pull command and without any global remote
+  authority. Source: `DI-dibut`.
 - Verify anti-RPC and Promise Theory vocabulary: no permission, authorization,
   conformance, command/control, or policy-enforcement framing unless explicitly
   reframed as local promises and local trust.
@@ -290,12 +317,18 @@ Locked:
 - Use a Go Git library for import/export. Source: `DI-zuruj`.
 - Use Files + Snapshots: per-file lineage plus snapshot/change-set envelopes.
   Source: `DI-zuruj`.
+- Native synchronization is continuous peer DAG sync, not explicit Git-style
+  push/pull. Source: `DI-dibut`.
 
 Remaining:
 
 - Lock implementation paths, command names, package names, runtime artifact
   paths, and generated CAS path patterns before scaffolding code.
 - Choose the exact Go libraries for Git import/export and restic chunking.
+- Review Tangled as prior art and decide what, if anything, POC18 should learn
+  from its decentralized Git hosting, self-hosted knots, appview, AT Protocol
+  identity, round-based pull-request flow, and Jujutsu change-ID usage. Source:
+  `DI-dibut`.
 - Decide whether LLM agents participate in the first implementation slice or
   whether POC18 begins deterministic and adds LLM-scale collaboration later.
 
@@ -338,13 +371,21 @@ Remaining:
   library.
 - [ ] nahop.17 Add promise-based retention and GC behavior for selected reference
   sets, release objects, paid storage, and unpromised objects under pressure.
-- [ ] nahop.18 Add analyzer gates for CID correctness, sparse CAS, parent-chain
+- [ ] nahop.18 Review Tangled as prior art and record whether POC18 should adopt,
+  reject, or explicitly differ from Tangled's self-hosted knots, appview,
+  AT Protocol identity, round-based PR flow, SSH/Git compatibility, and Jujutsu
+  change-ID use. Source: `DI-dibut`.
+- [ ] nahop.19 Implement continuous peer DAG sync so agents exchange
+  reference-set heads, object-availability promises, missing-object requests, and
+  retention/forwarding promises without explicit native push/pull commands.
+  Source: `DI-dibut`.
+- [ ] nahop.20 Add analyzer gates for CID correctness, sparse CAS, parent-chain
   integrity, reference-set signatures, multi-target labels, directory labels,
-  logical-change reference sets, Git roundtrip, GC behavior, and anti-authority
-  vocabulary.
-- [ ] nahop.19 Add diagnostic rendering of representative raw CBOR messages for
+  logical-change reference sets, continuous sync, Git roundtrip, GC behavior, and
+  anti-authority vocabulary.
+- [ ] nahop.21 Add diagnostic rendering of representative raw CBOR messages for
   reference-set, file-version, directory, snapshot, review, merge,
   materialization, and peer-fetch flows.
-- [ ] nahop.20 Run a clean deterministic POC18 scenario and archive exact commands,
+- [ ] nahop.22 Run a clean deterministic POC18 scenario and archive exact commands,
   CAS object examples, reference-set walks, parent-chain walks, Git roundtrip
   output, and analyzer output.
