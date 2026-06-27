@@ -25,11 +25,11 @@ document. Slot 1 MUST be a CBOR byte string.
 ## Payload grammar
 
 The payload byte string is protocol-owned opaque bytes. In the current POC17
-scenario those bytes are UTF-8 labels such as `link-budget-1`.
+scenario those bytes are UTF-8 labels such as `link-margin-1`.
 
 ## Sender behavior
 
-The sender promises it is reporting a local link observation or link-budget
+The sender promises it is reporting a local link observation or link-margin
 sample. It does not promise delivery quality beyond its local vantage.
 
 ## Receiver behavior
@@ -40,6 +40,6 @@ message bytes, or ignore it.
 ## Examples
 
 ```text
-grid([42(pCID), h'6c696e6b2d6275646765742d31'])
-payload bytes = "link-budget-1"
+grid([42(pCID), h'6c696e6b2d6d617267696e2d31'])
+payload bytes = "link-margin-1"
 ```

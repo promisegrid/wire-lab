@@ -20,7 +20,6 @@ func TestAnalyzeCleanRun(t *testing.T) {
 	cfg := config.Default()
 	cfg.RunRoot = root
 	cfg.RunID = "test-run"
-	cfg.RadioMTUBytes = 96
 	if err := sim.Run(cfg); err != nil {
 		t.Fatal(err)
 	}
@@ -28,7 +27,7 @@ func TestAnalyzeCleanRun(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if summary.RadioSends == 0 || summary.MessageArtifacts == 0 || summary.PeerStorage == 0 || summary.OrderStatusEvents == 0 || summary.LifecycleIssued == 0 || summary.ResourceWithdrawals == 0 {
+	if summary.RadioSends == 0 || summary.MessageArtifacts == 0 || summary.PeerStorageGrants == 0 || summary.PeerStorageGets == 0 || summary.DeviceRecoveries == 0 || summary.OrderStatusEvents == 0 || summary.LifecycleIssued == 0 || summary.ResourceWithdrawals == 0 {
 		t.Fatalf("incomplete summary: %+v", summary)
 	}
 	if _, err := os.Stat(cfg.RunDir()); err != nil {
