@@ -7,3 +7,7 @@
 - Add RFC-like embedded protocol specs and derive slot-0 pCIDs from their exact
   bytes.
 - Raise the simulated LoRa application MTU to 200 bytes.
+- Convert printable artifact, CAS, parent-link, event, and spec-alias
+  identifiers to canonical CID text.
+- Add host-local `local_lifecycle_v1` CWT/COSE lifecycle tokens and resource
+  withdrawal evidence without sending token bytes over LoRa.

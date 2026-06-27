@@ -44,10 +44,18 @@ func Run(cfg config.Config) error {
 		Peer:        "gateway-bob",
 	}
 	peer := &device.Peer{Name: "gateway-bob", Writer: writer, Medium: medium}
+	lifecycle := newLifecycleSupervisor(cfg.RunID, writer)
+	if err := lifecycle.start("agent:"+m4.Name, "peer:"+peer.Name); err != nil {
+		return err
+	}
 	medium.Register(m4.Name, m4)
 	medium.Register(peer.Name, peer)
 	medium.SetReachable(peer.Name, m4.Name, true)
 	medium.SetReachable(m4.Name, peer.Name, true)
+	missingParentCID, err := protocol.CIDForBytes([]byte("poc17 missing parent fixture"))
+	if err != nil {
+		return err
+	}
 
 	// Intent: Use bintags' order-number/status workflow as production-like traffic while retaining PromiseGrid CBOR envelopes. Source: DI-mokit
 	orderPayload, err := protocol.BuildOrderStatusPayload(protocol.OrderStatusPayload{
@@ -73,7 +81,7 @@ func Run(cfg config.Config) error {
 			return err
 		}
 	}
-	statusPayload, err := protocol.BuildStatusPayload(m4.Name, "ready", 87, []string{"missing-parent-cid"})
+	statusPayload, err := protocol.BuildStatusPayload(m4.Name, "ready", 87, []string{missingParentCID})
 	if err != nil {
 		return err
 	}
@@ -114,5 +122,8 @@ func Run(cfg config.Config) error {
 	if err := medium.Send(radio.Packet{From: m4.Name, To: peer.Name, Bytes: statusFrame, Label: "asymmetric"}); err != nil {
 		return err
 	}
-	return m4.PromisePeerStorage("missing-parent-cid")
+	if err := m4.PromisePeerStorage(missingParentCID); err != nil {
+		return err
+	}
+	return lifecycle.finish()
 }

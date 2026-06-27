@@ -1,9 +1,7 @@
 package protocol
 
 import (
-	"encoding/base32"
 	"fmt"
-	"strings"
 
 	specdocs "promisegrid.dev/wire-lab/implementations/poc17-m4-lora-runtime/docs/protocols"
 )
@@ -123,15 +121,7 @@ func protocolCIDForMessage(msg Message) (specdocs.CID, bool) {
 }
 
 func cidTextFromTag42Data(data []byte) (string, error) {
-	if len(data) != 37 || data[0] != 0x00 {
-		return "", fmt.Errorf("slot 0 tag 42 data must be DAG-CBOR CID bytes")
-	}
-	return cidTextFromBinaryCID(data[1:]), nil
-}
-
-func cidTextFromBinaryCID(data []byte) string {
-	encoded := base32.StdEncoding.WithPadding(base32.NoPadding).EncodeToString(data)
-	return "b" + strings.ToLower(encoded)
+	return CIDTextFromTag42Data(data)
 }
 
 // BuildStatusPayload keeps the small-device payload positional and compact.

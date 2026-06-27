@@ -17,17 +17,17 @@ type Peer struct {
 func (p *Peer) ReceiveRadio(packet radio.Packet) error {
 	msg, err := protocol.Parse(packet.Bytes)
 	if err != nil {
-		hash, path, writeErr := p.Writer.RecordMalformed(packet.Bytes, "peer")
+		contentCID, path, writeErr := p.Writer.RecordMalformed(packet.Bytes, "peer")
 		if writeErr != nil {
 			return writeErr
 		}
-		return p.Writer.WriteEvent(artifact.Event{Type: "peer_malformed_received", Actor: p.Name, Peer: packet.From, Hash: hash, Path: path, Transport: "simulated_lora", Outcome: "review_only", Details: map[string]any{"error": err.Error()}})
+		return p.Writer.WriteEvent(artifact.Event{Type: "peer_malformed_received", Actor: p.Name, Peer: packet.From, CID: contentCID, Path: path, Transport: "simulated_lora", Outcome: "review_only", Details: map[string]any{"error": err.Error()}})
 	}
-	hash, rel, err := p.Writer.RecordMessage(packet.Bytes)
+	contentCID, rel, err := p.Writer.RecordMessage(packet.Bytes)
 	if err != nil {
 		return err
 	}
-	if err := p.Writer.WriteEvent(artifact.Event{Type: "peer_envelope_received", Actor: p.Name, Peer: packet.From, PCID: msg.PCID, Hash: hash, Path: rel, Transport: "simulated_lora", Outcome: "received"}); err != nil {
+	if err := p.Writer.WriteEvent(artifact.Event{Type: "peer_envelope_received", Actor: p.Name, Peer: packet.From, PCID: msg.PCID, CID: contentCID, Path: rel, Transport: "simulated_lora", Outcome: "received"}); err != nil {
 		return err
 	}
 	if msg.ProtocolName != protocol.ProtocolOrderStatus {
@@ -44,7 +44,7 @@ func (p *Peer) ReceiveRadio(packet radio.Packet) error {
 			Actor:     p.Name,
 			Peer:      payload.Source,
 			PCID:      protocol.MustPCIDForName(protocol.ProtocolOrderStatus),
-			Hash:      hash,
+			CID:       contentCID,
 			Transport: "simulated_lora",
 			Outcome:   "database_update_promised",
 			Details: map[string]any{
@@ -62,7 +62,7 @@ func (p *Peer) ReceiveRadio(packet radio.Packet) error {
 			Actor:     p.Name,
 			Peer:      payload.Source,
 			PCID:      protocol.MustPCIDForName(protocol.ProtocolOrderStatus),
-			Hash:      hash,
+			CID:       contentCID,
 			Transport: "simulated_lora",
 			Outcome:   "acknowledged",
 			Details: map[string]any{
@@ -72,7 +72,7 @@ func (p *Peer) ReceiveRadio(packet radio.Packet) error {
 			},
 		})
 	default:
-		return p.Writer.WriteEvent(artifact.Event{Type: "peer_order_status_non_commitment", Actor: p.Name, PCID: protocol.MustPCIDForName(protocol.ProtocolOrderStatus), Hash: hash, Transport: "simulated_lora", Outcome: "unknown_order_message_type"})
+		return p.Writer.WriteEvent(artifact.Event{Type: "peer_order_status_non_commitment", Actor: p.Name, PCID: protocol.MustPCIDForName(protocol.ProtocolOrderStatus), CID: contentCID, Transport: "simulated_lora", Outcome: "unknown_order_message_type"})
 	}
 }
 

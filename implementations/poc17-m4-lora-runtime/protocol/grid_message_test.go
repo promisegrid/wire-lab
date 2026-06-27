@@ -3,7 +3,11 @@ package protocol
 import "testing"
 
 func TestBuildParseGridMessage(t *testing.T) {
-	payload, err := BuildStatusPayload("m4-ivan", "ready", 87, []string{"missing-parent"})
+	parentCID, err := CIDForBytes([]byte("poc17 missing parent fixture"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	payload, err := BuildStatusPayload("m4-ivan", "ready", 87, []string{parentCID})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -22,7 +26,7 @@ func TestBuildParseGridMessage(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if device != "m4-ivan" || status != "ready" || battery != 87 || len(parents) != 1 || parents[0] != "missing-parent" {
+	if device != "m4-ivan" || status != "ready" || battery != 87 || len(parents) != 1 || parents[0] != parentCID {
 		t.Fatalf("unexpected payload %q %q %d %#v", device, status, battery, parents)
 	}
 }
@@ -48,6 +52,15 @@ func TestBuildUsesCIDBytesInSlotZero(t *testing.T) {
 func TestParseRejectsBrokenGrid(t *testing.T) {
 	if _, err := Parse([]byte{0xff, 0x01}); err == nil {
 		t.Fatal("expected malformed CBOR rejection")
+	}
+}
+
+func TestValidateCIDTextRejectsHexDigest(t *testing.T) {
+	if err := ValidateCIDText("aeb977a9a7cf9076107dc7cb3a901d7e0c4e37f6e785a73e6658e702da275068"); err == nil {
+		t.Fatal("expected bare hex digest rejection")
+	}
+	if err := ValidateCIDText(MustPCIDForName(ProtocolOrderStatus)); err != nil {
+		t.Fatal(err)
 	}
 }
 
