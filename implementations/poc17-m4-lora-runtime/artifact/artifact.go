@@ -32,7 +32,7 @@ type Writer struct {
 
 // NewWriter resets nothing; callers own cleanup before constructing it.
 func NewWriter(runDir string) (*Writer, error) {
-	for _, dir := range []string{"message-cas", "malformed"} {
+	for _, dir := range []string{"message-cas", "malformed", "lifecycle-cas"} {
 		if err := os.MkdirAll(filepath.Join(runDir, dir), 0o755); err != nil {
 			return nil, fmt.Errorf("create artifact dir %s: %w", dir, err)
 		}
@@ -52,6 +52,20 @@ func (w *Writer) RecordMessage(raw []byte) (string, string, error) {
 	rel := filepath.Join("message-cas", cid+".cbor")
 	if err := os.WriteFile(filepath.Join(w.runDir, rel), raw, 0o644); err != nil {
 		return "", "", fmt.Errorf("write message artifact: %w", err)
+	}
+	return cid, rel, nil
+}
+
+// RecordLifecycle keeps exact host-local lifecycle frame bytes separate from
+// radio message artifacts.
+func (w *Writer) RecordLifecycle(raw []byte) (string, string, error) {
+	cid, err := protocol.CIDForBytes(raw)
+	if err != nil {
+		return "", "", err
+	}
+	rel := filepath.Join("lifecycle-cas", cid+".cbor")
+	if err := os.WriteFile(filepath.Join(w.runDir, rel), raw, 0o644); err != nil {
+		return "", "", fmt.Errorf("write lifecycle artifact: %w", err)
 	}
 	return cid, rel, nil
 }

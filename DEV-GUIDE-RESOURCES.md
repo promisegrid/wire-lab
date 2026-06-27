@@ -1503,10 +1503,12 @@ section.
   for a radio-only constrained device exchange. It now includes bintags-shaped
   order status traffic under a spec-derived `order_status_v1` pCID and uses a
   200-byte simulated LoRa application MTU. Printable artifacts, CAS IDs, parent
-  links, JSON events, diagnostics, and spec aliases now use canonical CID text,
-  but the implementation remains simulator evidence rather than Feather M4,
+  links, JSON events, diagnostics, and spec aliases now use canonical CID text.
+  Host-local lifecycle/resource evidence reuses POC16-shaped `local_lifecycle_v1`
+  CWT/COSE tokens without putting token bytes on the simulated LoRa path, but
+  the implementation remains simulator evidence rather than Feather M4,
   CircuitPython, RFM95, or production-device proof. Source: `DI-libis`;
-  `DI-pobir`; `DI-mokit`; `DI-dutah`; `DI-nopiv`.
+  `DI-pobir`; `DI-mokit`; `DI-dutah`; `DI-nopiv`; `DI-zopub`.
 - `protocols/wire-lab.d/TODO/TODO-binag-promisegrid-kernel-design-resolution.md`
   tracks the active resolution packet and the focused canary review required
   before `DR-davod` can close.

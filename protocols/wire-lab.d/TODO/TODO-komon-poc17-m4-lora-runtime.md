@@ -101,6 +101,15 @@ Intent: The POC16 shutdown fix reframed local process control as PromiseGrid lif
 Constraints: Treat the supervisor as local, not global; do not let supervisor events become peer-trust authority; use signed CWT payloads protected by COSE_Sign1 for lifecycle/resource tokens where practical; use a well-known COSE/CWT library for host-side token creation and verification; if a constrained M4/LoRa path cannot afford full CWT/COSE bytes or verification, record a separate DR/DI for a constrained profile instead of silently falling back to opaque custom tokens; keep COSE token signatures inside the token rather than adding a redundant universal envelope proof slot; preserve binary CID bytes on wire and base32 CID text when printable; coordinate with `zugok.39` before claiming token convergence.
 Affects: protocols/wire-lab.d/TODO/TODO-komon-poc17-m4-lora-runtime.md; protocols/wire-lab.d/TODO/TODO-zugok-poc16-secure-tokens-maps-encrypted-payloads.md; implementations/poc17-m4-lora-runtime/; implementations/poc16-secure-tokens-maps-encrypted-payloads/docs/protocols/local-lifecycle-v1.md; docs/thought-experiments/TE-ragin-kernel-resource-protection-capability-promises.md; docs/research/DN-lujad-promisegrid-kernel-role-profile.md.
 
+ID: DI-zopub
+Date: 2026-06-26 17:04:13 PDT
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Implement POC17 `komon.18` through `komon.23` as host-local lifecycle/resource-token evidence only, reusing the POC16 `local_lifecycle_v1` CWT/COSE discipline without sending lifecycle token bytes over the simulated LoRa path.
+Intent: POC17 must inherit the POC16 shutdown/resource model without making large CWT/COSE lifecycle tokens part of the 200-byte constrained radio contract. Keeping the first slice host-local proves promise-shaped supervisor/resource behavior while preserving the M4/LoRa wire path for compact device protocols.
+Constraints: Use the POC16 `local_lifecycle_v1` pCID for lifecycle evidence; use well-known COSE/CWT libraries for token creation and verification; store exact lifecycle frames separately from radio message artifacts; reject malformed, expired, replayed, wrong-run, and wrong-pCID tokens; record resource withdrawal as local resource-protection promise evidence, not command authority or global peer-trust evidence; require a later DR/DI before making lifecycle tokens LoRa-visible.
+Affects: implementations/poc17-m4-lora-runtime/protocol/; implementations/poc17-m4-lora-runtime/sim/; implementations/poc17-m4-lora-runtime/artifact/; implementations/poc17-m4-lora-runtime/analyzer/; implementations/poc17-m4-lora-runtime/README.md; implementations/poc17-m4-lora-runtime/CHANGELOG.md; DEV-GUIDE-RESOURCES.md; protocols/wire-lab.d/TODO/TODO-komon-poc17-m4-lora-runtime.md.
+
 ## Scope
 
 - Treat POC17 as executable design evidence for constrained embedded
@@ -473,34 +482,44 @@ This section is the starting context for the next Codex operator. Complete
   Implemented by converting artifact names, CAS IDs, parent links, event fields,
   and spec aliases to CID text; guarded by generated-run tests. Source:
   `DI-sazip` in `TODO-zugok`; `DI-dutah`; `DI-nopiv`.
-- [ ] komon.18 Review POC16 `local_lifecycle_v1`, `TE-ragin`, `DN-lujad`, and
+- [x] komon.18 Review POC16 `local_lifecycle_v1`, `TE-ragin`, `DN-lujad`, and
   `zugok.39` before changing POC17 supervisor, lifecycle, resource, or token
   behavior. Record whether POC17 reuses the POC16 lifecycle profile unchanged,
   profiles it down for constrained radio, or keeps it host-local only. Source:
-  `DI-fohop`.
-- [ ] komon.19 Decide the POC17 supervisor/resource role split before coding:
+  `DI-fohop`. Reviewed and locked as host-local for this slice; lifecycle tokens
+  are not radio protocol traffic. Source: `DI-zopub`.
+- [x] komon.19 Decide the POC17 supervisor/resource role split before coding:
   host-local simulator supervisor only, M4-visible lifecycle/resource role, or
   split host/device roles. The decision must state which role promises process
   lifetime, radio access, CPU/RAM/flash/energy budgets, clean shutdown, and
-  artifact flush. Source: `DI-fohop`.
-- [ ] komon.20 Add CWT/COSE lifecycle/resource token support for every POC17
+  artifact flush. Source: `DI-fohop`. Implemented as `supervisor:harness`
+  promising host-local process, CPU, RAM, radio, flash, energy, and lifecycle
+  access for `agent:m4-ivan` and `peer:gateway-bob`. Source: `DI-zopub`.
+- [x] komon.20 Add CWT/COSE lifecycle/resource token support for every POC17
   local role that needs clean shutdown or resource withdrawal. Each role should
   issue a signed token at startup or registration, and the supervisor should
   later invoke that exact token rather than sending command-like shutdown text.
-  Source: `DI-jafoj`; `DI-fohop`.
-- [ ] komon.21 Analyze whether any lifecycle/resource tokens cross the simulated
+  Source: `DI-jafoj`; `DI-fohop`. Implemented with COSE_Sign1 CWT-style tokens,
+  exact token CIDs, lifecycle frames, invocation, verification, and fulfillment.
+  Source: `DI-zopub`.
+- [x] komon.21 Analyze whether any lifecycle/resource tokens cross the simulated
   LoRa path. If yes, measure the exact frame-budget impact and either adopt a
   constrained CWT/COSE-compatible profile or file a DR/DI explaining the
   exception. If no, document that lifecycle tokens are host-local and not radio
-  protocol traffic. Source: `DI-fohop`; `DN-zaraz`.
-- [ ] komon.22 Add analyzer gates for lifecycle/resource tokens: token issued,
+  protocol traffic. Source: `DI-fohop`; `DN-zaraz`. Analyzer gates reject
+  `local_lifecycle_v1` on `simulated_lora`; lifecycle artifacts are stored under
+  `lifecycle-cas/`, not `message-cas/`. Source: `DI-zopub`.
+- [x] komon.22 Add analyzer gates for lifecycle/resource tokens: token issued,
   token CID recorded, token invoked, COSE verified, CWT terms checked, token
   fulfilled, malformed/expired/replayed/wrong-run/wrong-pCID token rejected, and
-  no SIGTERM/SIGKILL fallback on the clean path. Source: `DI-fohop`.
-- [ ] komon.23 Add resource-protection cases where a local kernel role withdraws
+  no SIGTERM/SIGKILL fallback on the clean path. Source: `DI-fohop`. Implemented
+  in protocol tests and clean-run analyzer gates. Source: `DI-zopub`.
+- [x] komon.23 Add resource-protection cases where a local kernel role withdraws
   CPU/process/radio/flash/RAM/energy access after a broken or timed-out local
   promise without treating that local withdrawal as command authority or global
-  peer-trust evidence. Source: `TE-ragin`; `DN-lujad`; `DI-fohop`.
+  peer-trust evidence. Source: `TE-ragin`; `DN-lujad`; `DI-fohop`. Implemented
+  as host-local resource withdrawal evidence with explicit non-authority and
+  non-peer-trust markers. Source: `DI-zopub`.
 - [ ] komon.11 Add analyzer gates proving radio-only transport, exact CBOR
   artifacts, pCID-owned payloads, sparse CAS behavior, failure handling, and
   no authority drift.

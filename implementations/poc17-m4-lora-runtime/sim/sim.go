@@ -44,6 +44,10 @@ func Run(cfg config.Config) error {
 		Peer:        "gateway-bob",
 	}
 	peer := &device.Peer{Name: "gateway-bob", Writer: writer, Medium: medium}
+	lifecycle := newLifecycleSupervisor(cfg.RunID, writer)
+	if err := lifecycle.start("agent:"+m4.Name, "peer:"+peer.Name); err != nil {
+		return err
+	}
 	medium.Register(m4.Name, m4)
 	medium.Register(peer.Name, peer)
 	medium.SetReachable(peer.Name, m4.Name, true)
@@ -118,5 +122,8 @@ func Run(cfg config.Config) error {
 	if err := medium.Send(radio.Packet{From: m4.Name, To: peer.Name, Bytes: statusFrame, Label: "asymmetric"}); err != nil {
 		return err
 	}
-	return m4.PromisePeerStorage(missingParentCID)
+	if err := m4.PromisePeerStorage(missingParentCID); err != nil {
+		return err
+	}
+	return lifecycle.finish()
 }

@@ -28,7 +28,7 @@ func TestAnalyzeCleanRun(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if summary.RadioSends == 0 || summary.MessageArtifacts == 0 || summary.PeerStorage == 0 || summary.OrderStatusEvents == 0 {
+	if summary.RadioSends == 0 || summary.MessageArtifacts == 0 || summary.PeerStorage == 0 || summary.OrderStatusEvents == 0 || summary.LifecycleIssued == 0 || summary.ResourceWithdrawals == 0 {
 		t.Fatalf("incomplete summary: %+v", summary)
 	}
 	if _, err := os.Stat(cfg.RunDir()); err != nil {
@@ -45,7 +45,7 @@ func TestCleanRunUsesCIDFirstOutput(t *testing.T) {
 		t.Fatal(err)
 	}
 	hexDigest := regexp.MustCompile(`^[a-f0-9]{64}$`)
-	for _, dir := range []string{"message-cas", "malformed"} {
+	for _, dir := range []string{"message-cas", "malformed", "lifecycle-cas"} {
 		entries, err := os.ReadDir(filepath.Join(cfg.RunDir(), dir))
 		if err != nil {
 			t.Fatal(err)

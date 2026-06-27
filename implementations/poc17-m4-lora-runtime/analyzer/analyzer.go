@@ -6,24 +6,33 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"promisegrid.dev/wire-lab/implementations/poc17-m4-lora-runtime/artifact"
+	"promisegrid.dev/wire-lab/implementations/poc17-m4-lora-runtime/protocol"
 )
 
 // Summary is the analyzer's gate report.
 type Summary struct {
-	Events             int `json:"events"`
-	RadioSends         int `json:"radio_sends"`
-	RadioReceives      int `json:"radio_receives"`
-	MessageArtifacts   int `json:"message_artifacts"`
-	MalformedArtifacts int `json:"malformed_artifacts"`
-	MTURefusals        int `json:"mtu_refusals"`
-	NonCommitments     int `json:"non_commitments"`
-	CASStores          int `json:"cas_stores"`
-	CASGC              int `json:"cas_gc"`
-	PeerStorage        int `json:"peer_storage"`
-	FidelityNotices    int `json:"fidelity_notices"`
-	OrderStatusEvents  int `json:"order_status_events"`
+	Events              int `json:"events"`
+	RadioSends          int `json:"radio_sends"`
+	RadioReceives       int `json:"radio_receives"`
+	MessageArtifacts    int `json:"message_artifacts"`
+	MalformedArtifacts  int `json:"malformed_artifacts"`
+	MTURefusals         int `json:"mtu_refusals"`
+	NonCommitments      int `json:"non_commitments"`
+	CASStores           int `json:"cas_stores"`
+	CASGC               int `json:"cas_gc"`
+	PeerStorage         int `json:"peer_storage"`
+	FidelityNotices     int `json:"fidelity_notices"`
+	OrderStatusEvents   int `json:"order_status_events"`
+	LifecycleIssued     int `json:"lifecycle_issued"`
+	LifecycleInvoked    int `json:"lifecycle_invoked"`
+	LifecycleFulfilled  int `json:"lifecycle_fulfilled"`
+	LifecycleRejected   int `json:"lifecycle_rejected"`
+	LifecycleArtifacts  int `json:"lifecycle_artifacts"`
+	ResourcePromises    int `json:"resource_promises"`
+	ResourceWithdrawals int `json:"resource_withdrawals"`
 }
 
 // Analyze checks the first POC17 behavior evidence gates.
@@ -35,6 +44,12 @@ func Analyze(runDir string) (Summary, error) {
 	var summary Summary
 	for _, event := range events {
 		summary.Events++
+		if event.PCID == protocol.LocalLifecycleV1PCID && event.Transport == "simulated_lora" {
+			return Summary{}, fmt.Errorf("local lifecycle token appeared on simulated LoRa path")
+		}
+		if strings.Contains(strings.ToLower(fmt.Sprint(event.Details)), "sigterm") || strings.Contains(strings.ToLower(fmt.Sprint(event.Details)), "sigkill") {
+			return Summary{}, fmt.Errorf("clean lifecycle path used signal fallback")
+		}
 		switch event.Type {
 		case "radio_send":
 			summary.RadioSends++
@@ -84,6 +99,42 @@ func Analyze(runDir string) (Summary, error) {
 			summary.FidelityNotices++
 		case "order_status_received", "order_status_promise", "order_ack_received", "peer_order_status_received", "peer_order_ack_received":
 			summary.OrderStatusEvents++
+		case "lifecycle_token_issued":
+			summary.LifecycleIssued++
+			if err := checkLifecycleArtifact(runDir, event); err != nil {
+				return Summary{}, err
+			}
+			summary.LifecycleArtifacts++
+			if detailString(event, "token_cid") == "" {
+				return Summary{}, fmt.Errorf("lifecycle token issue missing token CID")
+			}
+		case "lifecycle_token_invoked":
+			summary.LifecycleInvoked++
+			if err := checkLifecycleArtifact(runDir, event); err != nil {
+				return Summary{}, err
+			}
+			summary.LifecycleArtifacts++
+		case "lifecycle_token_fulfilled":
+			summary.LifecycleFulfilled++
+			if err := checkLifecycleArtifact(runDir, event); err != nil {
+				return Summary{}, err
+			}
+			summary.LifecycleArtifacts++
+		case "lifecycle_token_rejected":
+			summary.LifecycleRejected++
+			if detailString(event, "reason") == "" {
+				return Summary{}, fmt.Errorf("lifecycle rejection missing reason")
+			}
+		case "resource_access_promised":
+			summary.ResourcePromises++
+		case "resource_access_withdrawn":
+			summary.ResourceWithdrawals++
+			if detailString(event, "scope") != "host_local" {
+				return Summary{}, fmt.Errorf("resource withdrawal missing host-local scope")
+			}
+			if event.Details["not_command_authority"] != true || event.Details["not_peer_trust_evidence"] != true {
+				return Summary{}, fmt.Errorf("resource withdrawal drifted into authority or peer-trust evidence")
+			}
 		}
 	}
 	if summary.RadioSends == 0 || summary.RadioReceives == 0 {
@@ -107,7 +158,47 @@ func Analyze(runDir string) (Summary, error) {
 	if summary.OrderStatusEvents < 4 {
 		return summary, fmt.Errorf("missing production-like order status evidence")
 	}
+	if summary.LifecycleIssued < 2 || summary.LifecycleInvoked < 2 || summary.LifecycleFulfilled < 2 {
+		return summary, fmt.Errorf("missing host-local lifecycle token evidence")
+	}
+	if summary.LifecycleRejected < 5 {
+		return summary, fmt.Errorf("missing lifecycle token rejection evidence")
+	}
+	if summary.ResourcePromises < 2 || summary.ResourceWithdrawals == 0 {
+		return summary, fmt.Errorf("missing resource promise or withdrawal evidence")
+	}
 	return summary, nil
+}
+
+func checkLifecycleArtifact(runDir string, event artifact.Event) error {
+	if event.Path == "" || !strings.HasPrefix(event.Path, "lifecycle-cas/") {
+		return fmt.Errorf("lifecycle event missing lifecycle artifact path")
+	}
+	if _, err := os.Stat(filepath.Join(runDir, event.Path)); err != nil {
+		return fmt.Errorf("missing lifecycle artifact %s: %w", event.Path, err)
+	}
+	if detailString(event, "host_local_only") != "true" {
+		return fmt.Errorf("lifecycle event missing host-local marker")
+	}
+	return nil
+}
+
+func detailString(event artifact.Event, key string) string {
+	value, ok := event.Details[key]
+	if !ok || value == nil {
+		return ""
+	}
+	switch typed := value.(type) {
+	case string:
+		return typed
+	case bool:
+		if typed {
+			return "true"
+		}
+		return "false"
+	default:
+		return fmt.Sprint(typed)
+	}
 }
 
 func readEvents(path string) ([]artifact.Event, error) {
