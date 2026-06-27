@@ -69,12 +69,14 @@ every persistent session now carries a local `session_id`, frame/request/respons
 counters, and exactly one terminal event with a close reason. Alice's local
 trust-change scenario closes and later reopens the active app/kernel session so
 the run proves an existing stream is not silently reused after local distrust.
-CAS capability tokens are now signed CBOR/COSE_Sign1 issuer promises with scope,
-subject, content CID, expiry, nonce, and transferability claims. This is not a
-full CWT adoption claim; it is executable pressure for signed promise tokens
-before a later pCID decides the final token profile. The route workflow also
-records peer transit-exclusion promises, explicit route lifetime exhaustion,
-local non-send after expiry, and route renewal before reuse. Source: `DI-mapop`.
+CAS capability tokens are now CWT-style CBOR payloads protected by the same
+well-known COSE_Sign1/Ed25519 library pattern as `local_lifecycle_v1`, with
+issuer, subject, scope, content CID, expiry, nonce, and transferability terms.
+This is still executable POC pressure rather than a final token standard, but it
+removes the older custom string-map token body from normal storage-token traffic.
+The route workflow also records peer transit-exclusion promises, explicit route
+lifetime exhaustion, local non-send after expiry, and route renewal before reuse.
+Source: `DI-mapop`; `DI-lurov`.
 
 The current CAS/DAG slice now also gives each app its own local sparse CAS view.
 Agents may store exact messages, local state bytes, encrypted blobs named by

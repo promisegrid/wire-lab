@@ -34,20 +34,13 @@ where the issuer decides whether the token terms match a still-live promise.
 
 ## Payload grammar
 
-POC16 has two compatible token encodings:
+POC16 has two compatible CWT-style token encodings:
 
 ```text
-signed_capability_token_v1 = base64(COSE_Sign1(CBOR string map claims))
-claims = {
-  "type": "signed_capability_token_v1",
-  "issuer": text,
-  "subject": text,
-  "scope": text,
-  "content_cid": text,
-  "expires_unix": text integer,
-  "nonce": text,
-  "transferable": "true" / "false"
-}
+signed_capability_token_v1 = base64(COSE_Sign1(CWT-style CBOR claim map))
+CWT labels: 1 issuer, 2 subject, 4 exp, 7 token_id,
+-70000 capability="cas-storage-token", -70001 scope,
+-70002 content_cid, -70003 transferable.
 
 cwt_capability_token_v1 = base64(COSE_Sign1(CWT-style CBOR claim map))
 CWT labels: 1 issuer, 2 subject, 3 audience, 4 exp, 5 nbf, 7 token_id,
@@ -57,6 +50,9 @@ CWT labels: 1 issuer, 2 subject, 3 audience, 4 exp, 5 nbf, 7 token_id,
 
 COSE_Sign1 MUST use tag 18, protected header `{1: -8}` for EdDSA, empty
 unprotected header, embedded payload, and an Ed25519 signature in POC16.
+`signed_capability_token_v1` uses the same well-known COSE library pattern as
+`local_lifecycle_v1`; `cwt_capability_token_v1` remains the broader specimen
+path until a later slice converges that code too.
 
 ## Sender behavior
 
@@ -103,8 +99,9 @@ are the primary threats. POC16 deterministic keys are not production keys.
 ## Interoperability notes
 
 CWT is recommended for production successors because it has compact numeric
-claims and established COSE composition. The string-map signed token remains a
-POC16 pressure model for readability and transition.
+terms and established COSE composition. The older string-map signed token is
+historical POC16 transition pressure; current CAS/storage tokens use CWT-style
+numeric labels and library-backed COSE verification.
 
 ## Examples
 

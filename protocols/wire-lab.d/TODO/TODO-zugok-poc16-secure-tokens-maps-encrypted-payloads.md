@@ -194,6 +194,60 @@ Intent: POC16 shutdown should stop looking like a supervisor command and instead
 Constraints: Use a well-known COSE library for lifecycle token COSE_Sign1/Ed25519; keep CWT standard "claim" wording out of PromiseGrid-facing prose except when naming the external standard; reject invalid, expired, wrong-audience, wrong-run, wrong-pCID, and replayed tokens as non-promises; keep the collector passive; do not turn lifecycle tokens into global authorization; preserve POC15/POC16 superset behavior; audit existing POC16 tokens for custom-vs-library CWT/COSE usage before claiming token convergence.
 Affects: implementations/poc16-secure-tokens-maps-encrypted-payloads/; implementations/poc16-secure-tokens-maps-encrypted-payloads/docs/protocols/; protocols/wire-lab.d/TODO/TODO-zugok-poc16-secure-tokens-maps-encrypted-payloads.md; DEV-GUIDE-RESOURCES.md.
 
+ID: DI-lurov
+Date: 2026-06-26 16:52:17 PDT
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Refactor POC16 CAS/storage capability tokens to CWT-style payload maps protected with the same well-known COSE library pattern used by `local_lifecycle_v1`, while preserving the existing `SignedCapabilityToken` API and runtime token semantics.
+Intent: CAS/storage tokens are normal runtime promise tokens, not merely specimens. They should therefore converge with the strongest POC16 token implementation by using CWT-style numeric labels and `go-cose` COSE_Sign1/Ed25519 verification instead of POC16's older custom string-map COSE subset. Keeping the public codec names stable lets the storage, replica, bearer-token, and economics flows improve without changing their promise meaning.
+Constraints: Preserve issuer-local non-authority semantics; preserve non-transferable `serve-once` and transferable `bearer-storage` scopes; keep token strings base64-encoded for existing payload fields; keep `ContentCID` printable as CIDv1 base32 text inside the token terms; use canonical CBOR for the CWT-style payload; do not refactor the separate `secure_capability_v1` specimen path in this slice; update docs/audit wording; run Go tests, `errcheck`, and a full POC16 clean regression.
+Affects: implementations/poc16-secure-tokens-maps-encrypted-payloads/protocol/capability_token.go; implementations/poc16-secure-tokens-maps-encrypted-payloads/protocol/capability_token_test.go; implementations/poc16-secure-tokens-maps-encrypted-payloads/docs/protocols/secure-capability-v1.md; implementations/poc16-secure-tokens-maps-encrypted-payloads/README.md; DEV-GUIDE-RESOURCES.md; protocols/wire-lab.d/TODO/TODO-zugok-poc16-secure-tokens-maps-encrypted-payloads.md.
+
+ID: DI-ladof
+Date: 2026-06-26 17:25:02 PDT
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: POC16 parser-role shutdown must be idempotent, must mark shutdown before closing listeners and session snapshots, and must close late app/parser sessions immediately so lifecycle invocation races cannot leave opened parser sessions without terminal records.
+Intent: The parser-path lifecycle invocation opens an app-facing parser session late in shutdown. If that session is accepted after the shutdown snapshot, or if parser shutdown is entered more than once, the process can exit after observing remote EOF but before recording a local terminal event. Clean-run validation should fail real leaks, not local accounting races. Parser roles therefore need an explicit stopping state and one-shot shutdown path that rejects or terminal-closes late sessions while preserving the parser role as the owner of pCID payload semantics.
+Constraints: Do not weaken analyzer terminal-session gates; keep the collector passive; do not add observer-volume coordination; keep shutdown bounded by the existing supervisor grace; preserve parser/kernel and app/parser persistent-session semantics; treat these records as local runtime lifecycle events, not peer trust evidence.
+Affects: implementations/poc16-secure-tokens-maps-encrypted-payloads/parserrole/parserrole.go; protocols/wire-lab.d/TODO/TODO-zugok-poc16-secure-tokens-maps-encrypted-payloads.md.
+
+ID: DI-pozad
+Date: 2026-06-26 17:35:01 -0700
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: A valid POC16 parser-path lifecycle invocation must immediately mark the parser role as stopping and terminal-close its parser/kernel persistent session before relying on the managed-role work-context cancellation path.
+Intent: The lifecycle token is the parser role's own signed promise to stop. The parser should therefore record the parser/kernel stream's terminal state as soon as it has verified that token, not only after the asynchronous managed-role cancellation path unwinds. This preserves strict terminal-session accounting when a busy app/parser stream closes at the same time as parser lifecycle invocation.
+Constraints: Do not weaken analyzer terminal-session gates; do not treat transport closure as peer trust evidence; do not close or kill apps from the parser role; preserve parser-path lifecycle token verification before shutdown side effects; keep shutdown idempotent through existing persistent-session close-once behavior.
+Affects: implementations/poc16-secure-tokens-maps-encrypted-payloads/parserrole/parserrole.go; protocols/wire-lab.d/TODO/TODO-zugok-poc16-secure-tokens-maps-encrypted-payloads.md.
+
+ID: DI-bakoz
+Date: 2026-06-26 17:44:01 -0700
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: POC16 child processes must serialize all stdout JSON event and artifact lines through one shared process-wide writer instead of separate package-local stdout mutexes.
+Intent: The supervisor forwards child stdout line-by-line to the passive collector. Parser roles, lifecycle code, runtime apps, and kernels can emit terminal and lifecycle records concurrently during shutdown. Separate package-local stdout locks allow JSON lines to interleave or be dropped by the collector scanner, creating false clean-regression failures for missing terminal records. A shared writer keeps observer records intact without giving agents any shared coordination channel.
+Constraints: Preserve collector passivity; preserve ordinary stdout forwarding; do not expose observer storage to agents; do not weaken analyzer gates; keep this as harness/process I/O serialization, not PromiseGrid wire protocol.
+Affects: implementations/poc16-secure-tokens-maps-encrypted-payloads/eventstream/eventstream.go; implementations/poc16-secure-tokens-maps-encrypted-payloads/lifecycle/lifecycle.go; implementations/poc16-secure-tokens-maps-encrypted-payloads/parserrole/parserrole.go; implementations/poc16-secure-tokens-maps-encrypted-payloads/runtime/node.go; implementations/poc16-secure-tokens-maps-encrypted-payloads/kernel/kernel.go; protocols/wire-lab.d/TODO/TODO-zugok-poc16-secure-tokens-maps-encrypted-payloads.md.
+
+ID: DI-zatub
+Date: 2026-06-26 17:55:28 -0700
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: The POC16 event collector must close its listener after the final supervisor-done record and then wait a bounded drain interval for already-accepted supervisor event-stream connections to finish before writing the monitor report.
+Intent: Supervisor-done means a container supervisor has finished its own lifecycle, but records already accepted by the collector may still be draining through per-connection handler goroutines. Writing the monitor report immediately can omit terminal parser/kernel session records that were already emitted by a child process and forwarded by its supervisor. A bounded drain keeps the collector passive while making the clean regression analyze the complete accepted event stream.
+Constraints: Do not let agents read collector state; do not wait unbounded; do not weaken analyzer terminal-session gates; keep supervisor-done as the run-completion signal, not a trust authority or protocol message.
+Affects: implementations/poc16-secure-tokens-maps-encrypted-payloads/cmd/poc16-event-collector/main.go; protocols/wire-lab.d/TODO/TODO-zugok-poc16-secure-tokens-maps-encrypted-payloads.md.
+
+ID: DI-zupaz
+Date: 2026-06-26 18:06:17 PDT
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: POC16 supervisors must replay each child process's local event log after that child exits, sending only decision events that the supervisor did not already forward from stdout.
+Intent: Clean regression showed that late parser shutdown events can appear in a child process's local event log but not in the passive collector log, even though the child writes stdout before the local log. The supervisor already owns local process lifecycle and can read same-container child logs after process exit without creating inter-agent coordination. Replaying only unforwarded events preserves passive observation, avoids duplicate analyzer evidence, and makes shutdown accounting depend on durable child event records rather than best-effort stdout timing.
+Constraints: Do not expose collector files or observer volumes to agents; do not use replay as a protocol message or trust signal; do not weaken analyzer terminal-session gates; replay only valid `decision.Event` JSON from the expected same-container child log path; keep supervisor-done after replay so the collector still has a clear run-completion signal.
+Affects: implementations/poc16-secure-tokens-maps-encrypted-payloads/cmd/poc16-supervisor/main.go; protocols/wire-lab.d/TODO/TODO-zugok-poc16-secure-tokens-maps-encrypted-payloads.md.
+
 ## Scope
 
 - POC16 is executable design evidence, not production software and not a final
@@ -380,18 +434,20 @@ Affects: implementations/poc16-secure-tokens-maps-encrypted-payloads/; implement
 
 ## Token Path Audit
 
-Audit date: 2026-06-26. Source: `DI-jafoj`; `zugok.39`.
+Audit date: 2026-06-26. Updated by `DI-lurov` / `zugok.40`.
+Source: `DI-jafoj`; `DI-lurov`; `zugok.39`; `zugok.40`.
 
 POC16 currently has three token implementation families:
 
 1. `SignedCapabilityToken` in
    `implementations/poc16-secure-tokens-maps-encrypted-payloads/protocol/capability_token.go`.
    It is used by normal CAS storage serve-once and bearer-storage flows in
-   `runtime/node.go`. It is not CWT-shaped: it signs a deterministic CBOR string
-   map with fields such as `issuer`, `subject`, `scope`, `content_cid`,
-   `expires_unix`, `nonce`, and `transferable`. It does use COSE_Sign1, but via
-   POC16's custom local COSE subset in `protocol/cose.go`, not a well-known COSE
-   library.
+   `runtime/node.go`. After `DI-lurov`, it is CWT-shaped: it signs a canonical
+   CBOR numeric-label term map containing issuer, subject, scope, content CID,
+   expiry, token ID, transferability, and the `cas-storage-token` capability
+   marker. It uses COSE_Sign1 through `github.com/veraison/go-cose`, matching the
+   `local_lifecycle_v1` library pattern while preserving existing storage-token
+   semantics.
 2. `CWTCapabilityToken` in
    `implementations/poc16-secure-tokens-maps-encrypted-payloads/protocol/cwt_capability.go`.
    It is used by the `secure_capability_v1` profile/specimen path in
@@ -407,28 +463,29 @@ POC16 currently has three token implementation families:
 Audit totals:
 
 - Token families audited: 3.
-- CWT-shaped token families: 2 (`CWTCapabilityToken`, `LifecycleToken`).
-- Non-CWT token families: 1 (`SignedCapabilityToken`).
+- CWT-shaped token families: 3 (`SignedCapabilityToken`, `CWTCapabilityToken`,
+  `LifecycleToken`).
+- Non-CWT token families: 0.
 - COSE-wrapped token families: 3.
-- Custom COSE implementations still used: 2 token families
-  (`SignedCapabilityToken`, `CWTCapabilityToken`).
-- Well-known COSE-library implementations used: 1 token family
-  (`LifecycleToken`).
-- Normal runtime token flows still using the custom/non-CWT path: CAS
-  serve-once and bearer-storage tokens.
+- Custom COSE implementations still used: 1 token family (`CWTCapabilityToken`).
+- Well-known COSE-library implementations used: 2 token families
+  (`SignedCapabilityToken`, `LifecycleToken`).
+- Normal runtime token flows still using the custom/non-CWT path: none known
+  after `DI-lurov`.
 - Profile/specimen token flows using the custom CWT path:
   `secure_capability_v1`.
 - Lifecycle token flows using the preferred CWT/COSE library path:
   `local_lifecycle_v1`.
 
-Conclusion: `local_lifecycle_v1` proves the preferred CWT/COSE library profile,
-but POC16 token convergence is not complete. Future token refactoring should
-move the CAS storage tokens and `secure_capability_v1` specimen path toward the
-`local_lifecycle_v1` pattern: CWT payloads, COSE_Sign1 through a well-known
-library, binary CIDs inside signed terms where appropriate, and base32 CID text
-only for printable diagnostics. Until that refactor is done, guide prose should
-say that CWT/COSE is the current direction and that lifecycle tokens are the
-best executable example, not that every POC16 token path has converged.
+Conclusion: `local_lifecycle_v1` proved the preferred CWT/COSE library profile,
+and `SignedCapabilityToken` now follows that pattern for normal CAS/storage
+traffic. POC16 token convergence is still not complete because the separate
+`secure_capability_v1` specimen path still uses custom CWT/COSE-support code.
+Future token refactoring should move that specimen path toward the same library
+pattern, use binary CIDs inside signed terms where appropriate, and keep base32
+CID text only for printable diagnostics. Until that refactor is done, guide prose
+should say that normal runtime storage tokens and lifecycle tokens have
+converged, but the broad specimen profile has not.
 
 ## Encrypted Payload Targets
 
@@ -595,3 +652,9 @@ best executable example, not that every POC16 token path has converged.
 - [x] zugok.37 Replace flexible pair-list payload bodies with nested CBOR map bodies and update the affected POC16/POC17 documentation.
 - [x] zugok.38 Add `local_lifecycle_v1` signed CWT/COSE lifecycle tokens, token invocation shutdown, and analyzer gates.
 - [x] zugok.39 Audit every other POC16 token path and report how many are CWT, how many use COSE, how many still use custom code, how many use a well-known library, and which should be refactored toward the `local_lifecycle_v1` CWT/COSE library profile.
+- [x] zugok.40 Refactor CAS/storage capability tokens to the `local_lifecycle_v1` CWT/COSE library pattern while preserving existing storage and bearer-token semantics.
+- [x] zugok.41 Make parser-role shutdown idempotent and race-safe for late lifecycle parser-path sessions.
+- [x] zugok.42 Close parser/kernel session synchronously after valid parser-path lifecycle invocation.
+- [x] zugok.43 Serialize child-process stdout event/artifact lines through one shared writer.
+- [x] zugok.44 Drain accepted collector event-stream connections before writing the monitor report.
+- [x] zugok.45 Replay unforwarded child local event-log records before supervisor-done.

@@ -155,11 +155,12 @@ spec bytes and LLM-backed agents receive these docs as prompt context, guide
 writers should treat the docs as the executable source of POC16 protocol
 meaning, not as short labels or informal notes. `local_lifecycle_v1` adds signed
 CWT/COSE lifecycle tokens and token-invocation shutdown gates. The `zugok.39`
-audit found three POC16 token families: all use COSE, two are CWT-shaped, and
-only `local_lifecycle_v1` currently uses a well-known COSE library rather than
-POC16's custom local COSE subset. Guide prose should therefore describe
-CWT/COSE as the direction and lifecycle tokens as the best executable example,
-not claim full token convergence yet. The analyzer reports clean runs as
+audit plus `zugok.40` refactor leave three POC16 token families: all use COSE,
+the normal CAS/storage tokens and lifecycle tokens now use CWT-style payloads
+with a well-known COSE library, and only the separate `secure_capability_v1`
+specimen path still uses POC16's custom local COSE/CWT-support code. Guide prose
+should therefore describe CWT/COSE convergence as active but not final token
+standardization yet. The analyzer reports clean runs as
 `poc_scope_fitness.poc_scope_complete`: a clean run means the current POC16
 acceptance surface was covered, not that PromiseGrid has deployment readiness or
 that these profiles are final APIs. The verified separation still has one
@@ -1665,13 +1666,13 @@ section.
   `local_lifecycle_v1` signed CWT/COSE shutdown-token issuance/invocation/
   verification/fulfillment. It should be cited as POC evidence only, not as a
   final token, encryption, key agreement, parser-module, payload-map, lifecycle,
-  or supervisor API standard. The `zugok.39` audit found that lifecycle tokens
-  are the only POC16 token family currently using the preferred well-known
-  CWT/COSE library profile; CAS storage tokens and the secure-capability
-  specimen path still use custom local COSE/CWT-support code and should be
-  refactored before anyone claims final token convergence.
+  or supervisor API standard. The `zugok.39` audit and `zugok.40` refactor found
+  three token families: normal CAS/storage tokens and local lifecycle tokens now
+  use CWT-style payloads with the preferred well-known COSE library profile,
+  while the secure-capability specimen path still uses custom local COSE/CWT
+  support and should be refactored before anyone claims final token convergence.
   Source: `DI-vulit`; `DI-magug`; `DI-sazip`; `DI-mapah`; `DI-jafoj`;
-  `TODO-zugok`; `TE-ritig`.
+  `DI-lurov`; `TODO-zugok`; `TE-ritig`.
 	- `protocols/wire-lab.d/archive/migrations/SIM-piloh-turns-149-208-recovery/archive/transports/README.md`
 	  preserves the old root transport design surface as historical evidence.
 

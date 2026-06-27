@@ -37,6 +37,7 @@ type collector struct {
 	logFile     *os.File
 	done        chan struct{}
 	doneOnce    sync.Once
+	active      sync.WaitGroup
 }
 
 // messageDAGRecord is the operator-facing index row for one raw envelope file.
@@ -60,6 +61,7 @@ type messageDAGRecord struct {
 
 const monitorEventLimit = 240
 const monitorDetailLimit = 160
+const collectorConnectionDrainTimeout = 2 * time.Second
 
 func main() {
 	if err := run(); err != nil {
@@ -101,6 +103,9 @@ func run() error {
 		return fmt.Errorf("timed out waiting for %d supervisor completions", len(cfg.Containers))
 	}
 	closeListener(listener)
+	if drainErr := runCollector.waitAcceptedConnections(collectorConnectionDrainTimeout); drainErr != nil {
+		return drainErr
+	}
 	return runCollector.writeMonitorReport(context.Background())
 }
 
@@ -148,7 +153,32 @@ func (runCollector *collector) acceptLoop(listener net.Listener) {
 			fmt.Fprintf(os.Stderr, "collector accept: %v\n", acceptErr)
 			return
 		}
-		go runCollector.handleConn(transport.NewFrameConn(conn))
+		runCollector.active.Add(1)
+		go func() {
+			defer runCollector.active.Done()
+			runCollector.handleConn(transport.NewFrameConn(conn))
+		}()
+	}
+}
+
+func (runCollector *collector) waitAcceptedConnections(timeout time.Duration) error {
+	// Intent: The final supervisor-done record closes the run, but accepted
+	// event-stream connection handlers can still be writing records already
+	// emitted by child processes. Drain those handlers before the monitor report
+	// snapshots the log, without giving agents any observer-side feedback channel.
+	// Source: DI-zatub
+	done := make(chan struct{})
+	go func() {
+		runCollector.active.Wait()
+		close(done)
+	}()
+	timer := time.NewTimer(timeout)
+	defer timer.Stop()
+	select {
+	case <-done:
+		return nil
+	case <-timer.C:
+		return fmt.Errorf("collector accepted connection drain exceeded %s", timeout)
 	}
 }
 

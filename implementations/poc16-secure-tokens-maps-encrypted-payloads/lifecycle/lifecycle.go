@@ -3,7 +3,6 @@ package lifecycle
 import (
 	"context"
 	"encoding/binary"
-	"encoding/json"
 	"fmt"
 	"io"
 	"net"
@@ -13,6 +12,7 @@ import (
 	"time"
 
 	"promisegrid.dev/wire-lab/implementations/poc16-secure-tokens-maps-encrypted-payloads/decision"
+	"promisegrid.dev/wire-lab/implementations/poc16-secure-tokens-maps-encrypted-payloads/eventstream"
 	"promisegrid.dev/wire-lab/implementations/poc16-secure-tokens-maps-encrypted-payloads/protocol"
 	"promisegrid.dev/wire-lab/implementations/poc16-secure-tokens-maps-encrypted-payloads/transport"
 )
@@ -27,8 +27,6 @@ const (
 )
 
 const lifecycleWaitPoll = 25 * time.Millisecond
-
-var stdoutMu sync.Mutex
 
 // RoleOptions describe one local role's lifecycle promise surface.
 //
@@ -646,14 +644,9 @@ func recordEvent(observer, eventName, outcome, peer, detail string) {
 		Peer:     peer,
 		Detail:   detail,
 	}
-	encoded, err := json.Marshal(event)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "marshal lifecycle event: %v\n", err)
-		return
+	if _, err := eventstream.WriteStdoutJSON(event); err != nil {
+		fmt.Fprintf(os.Stderr, "lifecycle event stdout write failed: %v\n", err)
 	}
-	stdoutMu.Lock()
-	fmt.Println(string(encoded))
-	stdoutMu.Unlock()
 }
 
 func notify(channel chan<- struct{}) {

@@ -1,18 +1,24 @@
 package protocol
 
 import (
+	"crypto/rand"
 	"encoding/base64"
 	"fmt"
-	"strconv"
 	"time"
+
+	"github.com/fxamacker/cbor/v2"
+	cose "github.com/veraison/go-cose"
 )
+
+const signedCapabilityTokenCapability = "cas-storage-token"
 
 // SignedCapabilityToken is POC16's signed-CBOR pressure model for capability
 // promise tokens.
 // Intent: Tokens are issuer promises encoded as signed bytes, not authority
-// objects. POC16 uses the existing COSE_Sign1/Ed25519 subset to make replay,
-// expiry, scope, and transferability concrete while deferring full CWT adoption
-// to a later pCID decision. Source: DI-mapop
+// objects. CAS/storage tokens now use the same CWT-style numeric term map and
+// well-known COSE_Sign1/Ed25519 library pattern as local lifecycle tokens, while
+// preserving the issuer-local serve-once and bearer-storage semantics already
+// exercised by the storage workflows. Source: DI-lurov
 type SignedCapabilityToken struct {
 	Issuer       string
 	Subject      string
@@ -23,17 +29,28 @@ type SignedCapabilityToken struct {
 	Transferable bool
 }
 
-// EncodeSignedCapabilityToken encodes token claims as deterministic CBOR and
-// signs them with the issuer's deterministic Ed25519 key.
+// EncodeSignedCapabilityToken encodes token terms as canonical CWT-style CBOR
+// and signs them with the issuer's deterministic POC16 Ed25519 key through the
+// same COSE library used by local_lifecycle_v1.
 func EncodeSignedCapabilityToken(token SignedCapabilityToken) (string, error) {
-	if token.Issuer == "" || token.Subject == "" || token.Scope == "" || token.ContentCID == "" || token.Nonce == "" {
-		return "", fmt.Errorf("signed capability token needs issuer, subject, scope, content CID, and nonce")
+	if err := validateSignedCapabilityToken(token); err != nil {
+		return "", err
 	}
-	payloadBytes, payloadErr := MarshalStringMap(signedCapabilityTokenClaims(token))
+	payloadBytes, payloadErr := signedCapabilityTokenClaims(token)
 	if payloadErr != nil {
 		return "", payloadErr
 	}
-	coseBytes, coseErr := EncodeCOSESign1(payloadBytes, token.Issuer, false)
+	signer, signerErr := cose.NewSigner(cose.AlgorithmEdDSA, DeterministicPrivateKey(token.Issuer))
+	if signerErr != nil {
+		return "", signerErr
+	}
+	headers := cose.Headers{
+		Protected: cose.ProtectedHeader{
+			cose.HeaderLabelAlgorithm: cose.AlgorithmEdDSA,
+		},
+		Unprotected: cose.UnprotectedHeader{},
+	}
+	coseBytes, coseErr := cose.Sign1(rand.Reader, signer, headers, payloadBytes, nil)
 	if coseErr != nil {
 		return "", coseErr
 	}
@@ -47,18 +64,18 @@ func VerifySignedCapabilityToken(tokenText, expectedIssuer string, now time.Time
 	if decodeErr != nil {
 		return SignedCapabilityToken{}, decodeErr
 	}
-	if verifyErr := VerifyCOSESign1(coseBytes, nil, expectedIssuer); verifyErr != nil {
+	var message cose.Sign1Message
+	if unmarshalErr := message.UnmarshalCBOR(coseBytes); unmarshalErr != nil {
+		return SignedCapabilityToken{}, unmarshalErr
+	}
+	verifier, verifierErr := cose.NewVerifier(cose.AlgorithmEdDSA, DeterministicPublicKey(expectedIssuer))
+	if verifierErr != nil {
+		return SignedCapabilityToken{}, verifierErr
+	}
+	if verifyErr := message.Verify(nil, verifier); verifyErr != nil {
 		return SignedCapabilityToken{}, verifyErr
 	}
-	coseSign1, parseErr := parseCOSESign1(coseBytes)
-	if parseErr != nil {
-		return SignedCapabilityToken{}, parseErr
-	}
-	fields, fieldsErr := UnmarshalStringMap(coseSign1.Payload)
-	if fieldsErr != nil {
-		return SignedCapabilityToken{}, fieldsErr
-	}
-	token, tokenErr := signedCapabilityTokenFromClaims(fields)
+	token, tokenErr := signedCapabilityTokenFromClaims(message.Payload)
 	if tokenErr != nil {
 		return SignedCapabilityToken{}, tokenErr
 	}
@@ -90,38 +107,72 @@ func RedeemSignedCapabilityToken(tokenText, expectedIssuer, expectedSubject, exp
 	return token, nil
 }
 
-func signedCapabilityTokenClaims(token SignedCapabilityToken) map[string]string {
-	return map[string]string{
-		"content_cid":  token.ContentCID,
-		"expires_unix": strconv.FormatInt(token.ExpiresUnix, 10),
-		"issuer":       token.Issuer,
-		"nonce":        token.Nonce,
-		"scope":        token.Scope,
-		"subject":      token.Subject,
-		"transferable": strconv.FormatBool(token.Transferable),
-		"type":         "signed_capability_token_v1",
+// validateSignedCapabilityToken keeps the local promise-token terms explicit so
+// malformed issuer promises fail before signing or after decoding.
+func validateSignedCapabilityToken(token SignedCapabilityToken) error {
+	if token.Issuer == "" || token.Subject == "" || token.Scope == "" || token.ContentCID == "" || token.Nonce == "" {
+		return fmt.Errorf("signed capability token needs issuer, subject, scope, content CID, and nonce")
 	}
+	if token.ExpiresUnix == 0 {
+		return fmt.Errorf("signed capability token needs exp")
+	}
+	return nil
 }
 
-func signedCapabilityTokenFromClaims(fields map[string]string) (SignedCapabilityToken, error) {
-	expiresUnix, expiresErr := strconv.ParseInt(fields["expires_unix"], 10, 64)
-	if expiresErr != nil {
-		return SignedCapabilityToken{}, expiresErr
+// signedCapabilityTokenClaims is the CAS/storage token's CWT-style term map.
+// Intent: Reuse the same numeric CWT labels as the broader capability-token
+// specimen wherever they fit, while keeping this runtime token's promise terms
+// narrow: issuer, subject, scope, content CID, expiry, nonce, and transferability.
+// Source: DI-lurov
+func signedCapabilityTokenClaims(token SignedCapabilityToken) ([]byte, error) {
+	terms := map[any]any{
+		cose.CWTClaimIssuer:         token.Issuer,
+		cose.CWTClaimSubject:        token.Subject,
+		cose.CWTClaimExpirationTime: token.ExpiresUnix,
+		cose.CWTClaimCWTID:          []byte(token.Nonce),
+		cwtClaimCapability:          signedCapabilityTokenCapability,
+		cwtClaimScope:               token.Scope,
+		cwtClaimContentCID:          token.ContentCID,
+		cwtClaimTransferable:        token.Transferable,
 	}
-	transferable, transferableErr := strconv.ParseBool(fields["transferable"])
+	return lifecycleCBOREncMode.Marshal(terms)
+}
+
+func signedCapabilityTokenFromClaims(payloadBytes []byte) (SignedCapabilityToken, error) {
+	var terms map[any]any
+	if err := cbor.Unmarshal(payloadBytes, &terms); err != nil {
+		return SignedCapabilityToken{}, err
+	}
+	nonce, nonceErr := bytesTextTerm(cwtValue(terms, cose.CWTClaimCWTID))
+	if nonceErr != nil {
+		return SignedCapabilityToken{}, nonceErr
+	}
+	transferable, transferableErr := boolTerm(cwtValue(terms, cwtClaimTransferable))
 	if transferableErr != nil {
 		return SignedCapabilityToken{}, transferableErr
 	}
-	if fields["type"] != "signed_capability_token_v1" {
-		return SignedCapabilityToken{}, fmt.Errorf("signed capability token type=%q", fields["type"])
+	if stringTerm(cwtValue(terms, cwtClaimCapability)) != signedCapabilityTokenCapability {
+		return SignedCapabilityToken{}, fmt.Errorf("signed capability token capability mismatch")
 	}
-	return SignedCapabilityToken{
-		Issuer:       fields["issuer"],
-		Subject:      fields["subject"],
-		Scope:        fields["scope"],
-		ContentCID:   fields["content_cid"],
-		ExpiresUnix:  expiresUnix,
-		Nonce:        fields["nonce"],
+	token := SignedCapabilityToken{
+		Issuer:       stringTerm(cwtValue(terms, cose.CWTClaimIssuer)),
+		Subject:      stringTerm(cwtValue(terms, cose.CWTClaimSubject)),
+		Scope:        stringTerm(cwtValue(terms, cwtClaimScope)),
+		ContentCID:   stringTerm(cwtValue(terms, cwtClaimContentCID)),
+		ExpiresUnix:  int64Term(cwtValue(terms, cose.CWTClaimExpirationTime)),
+		Nonce:        nonce,
 		Transferable: transferable,
-	}, nil
+	}
+	if err := validateSignedCapabilityToken(token); err != nil {
+		return SignedCapabilityToken{}, err
+	}
+	return token, nil
+}
+
+func boolTerm(value any) (bool, error) {
+	boolValue, ok := value.(bool)
+	if !ok {
+		return false, fmt.Errorf("expected bool")
+	}
+	return boolValue, nil
 }

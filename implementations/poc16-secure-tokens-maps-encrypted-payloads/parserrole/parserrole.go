@@ -3,7 +3,6 @@ package parserrole
 import (
 	"context"
 	"encoding/base64"
-	"encoding/json"
 	"fmt"
 	"net"
 	"os"
@@ -43,7 +42,8 @@ type ParserRole struct {
 	active       sync.WaitGroup
 	mu           sync.Mutex
 	appSessions  map[*transport.PersistentSession]string
-	stdoutMu     sync.Mutex
+	stopping     bool
+	stopOnce     sync.Once
 }
 
 // ProtocolParser decodes exact envelopes according to the pCID in slot 0.
@@ -126,8 +126,8 @@ func (role *ParserRole) Run(ctx context.Context) error {
 	if err := role.start(ctx); err != nil {
 		return err
 	}
+	defer role.stop()
 	<-ctx.Done()
-	role.stop()
 	return nil
 }
 
@@ -244,7 +244,16 @@ func (role *ParserRole) handleAppConn(conn net.Conn) {
 		},
 	)
 	close(sessionReady)
-	role.trackAppSession(session, conn.RemoteAddr().String())
+	if !role.trackAppSession(session, conn.RemoteAddr().String()) {
+		// Intent: Parser-path lifecycle shutdown can race with an already-accepted
+		// app/parser TCP stream. Once shutdown has started, this parser role no
+		// longer promises to process new app-facing frames, but it still records the
+		// local terminal state for the accepted session before the process exits.
+		// Source: DI-ladof
+		if closeErr := session.CloseWithReason(transport.SessionTerminalReasonProcessShutdown); closeErr != nil {
+			role.record("parser_app_session_close_failed", "broken", conn.RemoteAddr().String(), closeErr.Error())
+		}
+	}
 	defer role.untrackAppSession(session)
 	<-session.Done()
 }
@@ -288,6 +297,19 @@ func (role *ParserRole) handleLifecycleAppFrame(frameBytes []byte) (bool, []byte
 	}
 	role.record("parser_role_lifecycle_frame_received", "kept", "supervisor", "pcid="+pcid.LocalLifecycleV1+" exact_cid="+protocol.CIDForExactBytes(frameBytes))
 	responseBytes, handlerErr := role.LifecycleHandler(frameBytes)
+	if handlerErr == nil {
+		// Intent: The parser-path lifecycle token is the parser role's own signed
+		// shutdown promise. Once verified, record the parser/kernel stream's local
+		// terminal state immediately instead of depending only on asynchronous
+		// managed-role context cancellation to reach defer-based shutdown.
+		// Source: DI-pozad
+		role.markStopping()
+		if role.kernelClient != nil && role.kernelClient.session != nil {
+			if closeErr := role.kernelClient.session.CloseWithReason(transport.SessionTerminalReasonProcessShutdown); closeErr != nil {
+				role.record("parser_kernel_session_close_failed", "broken", "kernel", closeErr.Error())
+			}
+		}
+	}
 	return true, responseBytes, handlerErr
 }
 
@@ -559,32 +581,51 @@ func (role *ParserRole) notPromisedAck(message ParsedMessage, promiseText string
 }
 
 func (role *ParserRole) stop() {
-	if role.appListener != nil {
-		if closeErr := role.appListener.Close(); closeErr != nil {
-			role.record("parser_role_listener_close_failed", "broken", "", closeErr.Error())
+	role.stopOnce.Do(func() {
+		role.markStopping()
+		if role.appListener != nil {
+			if closeErr := role.appListener.Close(); closeErr != nil {
+				role.record("parser_role_listener_close_failed", "broken", "", closeErr.Error())
+			}
 		}
-	}
-	// Intent: The parser/kernel control stream is the parser role's own local
-	// promise to the transport kernel. Record that terminal state before closing
-	// app-facing parser streams so one busy app stream cannot hide the control
-	// session from clean-run lifecycle accounting. Source: DI-katom
-	if role.kernelClient != nil && role.kernelClient.session != nil {
-		if closeErr := role.kernelClient.session.CloseWithReason(transport.SessionTerminalReasonProcessShutdown); closeErr != nil {
-			role.record("parser_kernel_session_close_failed", "broken", "kernel", closeErr.Error())
+		// Intent: The parser/kernel control stream is the parser role's own local
+		// promise to the transport kernel. Record that terminal state before waiting
+		// for late app-facing parser streams so one busy lifecycle/parser stream
+		// cannot hide the control session from clean-run lifecycle accounting.
+		// Source: DI-gupiz; DI-ladof
+		if role.kernelClient != nil && role.kernelClient.session != nil {
+			if closeErr := role.kernelClient.session.CloseWithReason(transport.SessionTerminalReasonProcessShutdown); closeErr != nil {
+				role.record("parser_kernel_session_close_failed", "broken", "kernel", closeErr.Error())
+			}
 		}
-	}
-	role.closeAppSessions()
-	role.active.Wait()
+		role.closeAppSessions()
+		role.active.Wait()
+	})
 }
 
-func (role *ParserRole) trackAppSession(session *transport.PersistentSession, remoteAddress string) {
+func (role *ParserRole) markStopping() {
+	// Intent: Mark shutdown before listener and session snapshots so any accepted
+	// but not-yet-tracked app/parser stream is closed immediately by its handler
+	// instead of escaping analyzer terminal-session accounting. Source: DI-ladof
+	role.mu.Lock()
+	role.stopping = true
+	role.mu.Unlock()
+}
+
+func (role *ParserRole) trackAppSession(session *transport.PersistentSession, remoteAddress string) bool {
 	// Intent: Parser roles own local app streams for lifecycle accounting even
 	// when app receive promises are routing state. Shutdown closes these streams
 	// explicitly so the analyzer can distinguish clean process exit from leaked
-	// sessions. Source: DI-gazin
+	// sessions. A session accepted after shutdown starts is not tracked because
+	// its handler closes it immediately with a local terminal record. Source:
+	// DI-gazin; DI-ladof
 	role.mu.Lock()
+	defer role.mu.Unlock()
+	if role.stopping {
+		return false
+	}
 	role.appSessions[session] = remoteAddress
-	role.mu.Unlock()
+	return true
 }
 
 func (role *ParserRole) untrackAppSession(session *transport.PersistentSession) {
@@ -635,14 +676,11 @@ func (role *ParserRole) record(eventName, outcome, peer, detail string) {
 		Peer:     peer,
 		Detail:   detail,
 	}
-	encoded, err := json.Marshal(event)
+	encoded, err := eventstream.WriteStdoutJSON(event)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "marshal parser role event: %v\n", err)
+		fmt.Fprintf(os.Stderr, "write parser role event: %v\n", err)
 		return
 	}
-	role.stdoutMu.Lock()
-	fmt.Println(string(encoded))
-	role.stdoutMu.Unlock()
 	if role.logFile != nil {
 		if _, writeErr := role.logFile.Write(append(encoded, '\n')); writeErr != nil {
 			fmt.Fprintf(os.Stderr, "write parser role event: %v\n", writeErr)
@@ -694,14 +732,11 @@ func (role *ParserRole) emitMessageArtifact(direction, peer, protocolName string
 		Source:          "parser:" + role.ContainerName,
 		MessageArtifact: &artifact,
 	}
-	recordBytes, marshalErr := json.Marshal(record)
+	_, marshalErr := eventstream.WriteStdoutJSON(record)
 	if marshalErr != nil {
 		role.record("parser_role_artifact_emit_failed", "broken", peer, marshalErr.Error())
 		return
 	}
-	role.stdoutMu.Lock()
-	fmt.Println(string(recordBytes))
-	role.stdoutMu.Unlock()
 	role.record("raw_message_artifact_emitted", "kept", peer, "direction="+direction+" pcid="+artifactProtocol+" exact_cid="+artifact.ExactCID)
 }
 

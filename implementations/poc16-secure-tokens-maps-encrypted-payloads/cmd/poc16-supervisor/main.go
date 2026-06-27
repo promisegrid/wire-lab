@@ -12,6 +12,7 @@ import (
 	"os"
 	"os/exec"
 	"os/signal"
+	"path/filepath"
 	"strings"
 	"sync"
 	"syscall"
@@ -89,7 +90,7 @@ func runContainerProcesses(ctx context.Context, cfg config.Config, kernelBinary,
 	kernelErrs := make(chan error, 1)
 	kernelRoleID := "kernel:" + container.Name
 	go func() {
-		kernelErrs <- runKernelProcess(kernelCtx, forwarder, shutdownGrace, kernelBinary, configPath, container.Name, lifecycleSupervisor.EnvFor(protocol.LifecycleChannelTCP), nil)
+		kernelErrs <- runKernelProcess(kernelCtx, forwarder, cfg, shutdownGrace, kernelBinary, configPath, container.Name, lifecycleSupervisor.EnvFor(protocol.LifecycleChannelTCP), nil)
 	}()
 	select {
 	case kernelErr := <-kernelErrs:
@@ -104,7 +105,7 @@ func runContainerProcesses(ctx context.Context, cfg config.Config, kernelBinary,
 	parserErrs := make(chan error, 1)
 	parserRoleID := "parser:" + container.Name
 	go func() {
-		parserErrs <- runParserRoleProcess(parserCtx, forwarder, shutdownGrace, parserRoleBinary, configPath, container.Name, lifecycleSupervisor.EnvFor(protocol.LifecycleChannelParserPath), nil)
+		parserErrs <- runParserRoleProcess(parserCtx, forwarder, cfg, shutdownGrace, parserRoleBinary, configPath, container.Name, lifecycleSupervisor.EnvFor(protocol.LifecycleChannelParserPath), nil)
 	}()
 	select {
 	case parserErr := <-parserErrs:
@@ -154,7 +155,7 @@ func runContainerProcesses(ctx context.Context, cfg config.Config, kernelBinary,
 		waitGroup.Add(1)
 		go func(localAgentName, localAgentBinary, localRoleID, localChannelProfile string) {
 			defer waitGroup.Done()
-			errs <- runAgentProcess(agentCtx, forwarder, shutdownGrace, localAgentBinary, configPath, localAgentName, lifecycleSupervisor.EnvFor(localChannelProfile), func(stdin io.WriteCloser) {
+			errs <- runAgentProcess(agentCtx, forwarder, cfg, shutdownGrace, localAgentBinary, configPath, localAgentName, lifecycleSupervisor.EnvFor(localChannelProfile), func(stdin io.WriteCloser) {
 				if localChannelProfile == protocol.LifecycleChannelStdio {
 					lifecycleSupervisor.RegisterStdin(localRoleID, stdin)
 				}
@@ -249,28 +250,31 @@ func runContainerProcesses(ctx context.Context, cfg config.Config, kernelBinary,
 	return firstErr
 }
 
-func runKernelProcess(ctx context.Context, forwarder *processForwarder, shutdownGrace time.Duration, kernelBinary, configPath, containerName string, extraEnv []string, stdinSink func(io.WriteCloser)) error {
+func runKernelProcess(ctx context.Context, forwarder *processForwarder, cfg config.Config, shutdownGrace time.Duration, kernelBinary, configPath, containerName string, extraEnv []string, stdinSink func(io.WriteCloser)) error {
 	// Intent: Start exactly one local kernel per container. It is transport
 	// plumbing for app promises, not a trust authority or workflow owner.
 	// Source: DI-galin
-	return runProcess(ctx, forwarder, "kernel:"+containerName, shutdownGrace, kernelBinary, extraEnv, stdinSink, "-config", configPath, "-container", containerName)
+	roleName := "kernel:" + containerName
+	return runProcess(ctx, forwarder, roleName, childEventLogPath(cfg, roleName), shutdownGrace, kernelBinary, extraEnv, stdinSink, "-config", configPath, "-container", containerName)
 }
 
-func runParserRoleProcess(ctx context.Context, forwarder *processForwarder, shutdownGrace time.Duration, parserRoleBinary, configPath, containerName string, extraEnv []string, stdinSink func(io.WriteCloser)) error {
+func runParserRoleProcess(ctx context.Context, forwarder *processForwarder, cfg config.Config, shutdownGrace time.Duration, parserRoleBinary, configPath, containerName string, extraEnv []string, stdinSink func(io.WriteCloser)) error {
 	// Intent: Start one local parser/builder role per container between apps and
 	// the transport kernel so pCID-owned payload semantics stay out of the
 	// transport kernel. Source: DI-gazin
-	return runProcess(ctx, forwarder, "parser:"+containerName, shutdownGrace, parserRoleBinary, extraEnv, stdinSink, "-config", configPath, "-container", containerName)
+	roleName := "parser:" + containerName
+	return runProcess(ctx, forwarder, roleName, childEventLogPath(cfg, roleName), shutdownGrace, parserRoleBinary, extraEnv, stdinSink, "-config", configPath, "-container", containerName)
 }
 
-func runAgentProcess(ctx context.Context, forwarder *processForwarder, shutdownGrace time.Duration, agentBinary, configPath, agentName string, extraEnv []string, stdinSink func(io.WriteCloser)) error {
+func runAgentProcess(ctx context.Context, forwarder *processForwarder, cfg config.Config, shutdownGrace time.Duration, agentBinary, configPath, agentName string, extraEnv []string, stdinSink func(io.WriteCloser)) error {
 	// Intent: A container supervisor starts independent local app processes
 	// without sharing decision state; stdout/stderr pass through so the run log
 	// remains auditable from Docker output. Source: DI-galin
-	return runProcess(ctx, forwarder, "agent:"+agentName, shutdownGrace, agentBinary, extraEnv, stdinSink, "-config", configPath, "-node", agentName)
+	roleName := "agent:" + agentName
+	return runProcess(ctx, forwarder, roleName, childEventLogPath(cfg, roleName), shutdownGrace, agentBinary, extraEnv, stdinSink, "-config", configPath, "-node", agentName)
 }
 
-func runProcess(ctx context.Context, forwarder *processForwarder, roleName string, shutdownGrace time.Duration, binary string, extraEnv []string, stdinSink func(io.WriteCloser), args ...string) error {
+func runProcess(ctx context.Context, forwarder *processForwarder, roleName, eventLogPath string, shutdownGrace time.Duration, binary string, extraEnv []string, stdinSink func(io.WriteCloser), args ...string) error {
 	// Intent: Child processes still write ordinary stdout/stderr, but the
 	// supervisor copies JSON event records to the observer-only collector instead
 	// of relying on a Docker volume visible to agents. Source: DI-dirat
@@ -306,6 +310,7 @@ func runProcess(ctx context.Context, forwarder *processForwarder, roleName strin
 	case waitErr := <-waitDone:
 		waitGroup.Wait()
 		closeProcessStdin(forwarder, roleName, stdin)
+		forwarder.replayLocalEventLog(roleName, eventLogPath)
 		if waitErr != nil {
 			if ctx.Err() != nil {
 				return nil
@@ -336,7 +341,26 @@ func runProcess(ctx context.Context, forwarder *processForwarder, roleName strin
 		}
 		waitGroup.Wait()
 		closeProcessStdin(forwarder, roleName, stdin)
+		forwarder.replayLocalEventLog(roleName, eventLogPath)
 		return nil
+	}
+}
+
+func childEventLogPath(cfg config.Config, roleName string) string {
+	// Intent: The supervisor owns child process lifecycle and may read the
+	// same-container event log after that child exits to replay shutdown records
+	// that stdout forwarding missed. This is harness-local evidence recovery, not
+	// an inter-agent storage or coordination channel. Source: DI-zupaz
+	runDir := filepath.Join(cfg.RunRoot, cfg.RunID)
+	switch {
+	case strings.HasPrefix(roleName, "kernel:"):
+		return filepath.Join(runDir, "kernel-"+strings.TrimPrefix(roleName, "kernel:")+".jsonl")
+	case strings.HasPrefix(roleName, "parser:"):
+		return filepath.Join(runDir, "parser-"+strings.TrimPrefix(roleName, "parser:")+".jsonl")
+	case strings.HasPrefix(roleName, "agent:"):
+		return filepath.Join(runDir, strings.TrimPrefix(roleName, "agent:")+".jsonl")
+	default:
+		return ""
 	}
 }
 
@@ -389,10 +413,11 @@ type processForwarder struct {
 	mu       sync.Mutex
 	firstErr error
 	doneSent bool
+	sent     map[string]bool
 }
 
 func newProcessForwarder(containerName string, client *eventstream.Client) *processForwarder {
-	return &processForwarder{containerName: containerName, client: client}
+	return &processForwarder{containerName: containerName, client: client, sent: make(map[string]bool)}
 }
 
 func (forwarder *processForwarder) copyOutput(waitGroup *sync.WaitGroup, roleName, streamName string, reader io.Reader, writer io.Writer) {
@@ -438,12 +463,7 @@ func (forwarder *processForwarder) forwardEventLine(roleName, streamName, line s
 	if event.Observer == "" || event.Event == "" {
 		return
 	}
-	sendErr := forwarder.client.Send(eventstream.Record{
-		Kind:   eventstream.KindEvent,
-		Source: forwarder.containerName + "/" + roleName + "/" + streamName,
-		Event:  &event,
-	})
-	if sendErr != nil {
+	if sendErr := forwarder.sendDecisionEvent(forwarder.containerName+"/"+roleName+"/"+streamName, event); sendErr != nil {
 		forwarder.rememberErr(sendErr)
 	}
 }
@@ -457,6 +477,89 @@ func (forwarder *processForwarder) sendEvent(sourceSuffix string, event decision
 	if sendErr != nil {
 		forwarder.rememberErr(sendErr)
 	}
+}
+
+func (forwarder *processForwarder) replayLocalEventLog(roleName, logPath string) {
+	if logPath == "" {
+		return
+	}
+	logFile, openErr := os.Open(logPath)
+	if openErr != nil {
+		if errors.Is(openErr, os.ErrNotExist) {
+			return
+		}
+		forwarder.rememberErr(fmt.Errorf("open local event log for %s: %w", roleName, openErr))
+		return
+	}
+	defer closeReplayLog(forwarder, roleName, logFile)
+	scanner := bufio.NewScanner(logFile)
+	scanner.Buffer(make([]byte, 0, 64*1024), 2*1024*1024)
+	for scanner.Scan() {
+		var event decision.Event
+		if unmarshalErr := json.Unmarshal(scanner.Bytes(), &event); unmarshalErr != nil {
+			continue
+		}
+		if event.Observer == "" || event.Event == "" || forwarder.wasDecisionEventSent(event) {
+			continue
+		}
+		// Intent: Replay is limited to events not already forwarded from stdout.
+		// The collector remains passive, while the analyzer sees terminal
+		// shutdown records that the child durably wrote before process exit.
+		// Source: DI-zupaz
+		if sendErr := forwarder.sendDecisionEvent(forwarder.containerName+"/"+roleName+"/local-log", event); sendErr != nil {
+			forwarder.rememberErr(sendErr)
+		}
+	}
+	if scanErr := scanner.Err(); scanErr != nil {
+		forwarder.rememberErr(fmt.Errorf("scan local event log for %s: %w", roleName, scanErr))
+	}
+}
+
+func closeReplayLog(forwarder *processForwarder, roleName string, logFile *os.File) {
+	if closeErr := logFile.Close(); closeErr != nil {
+		forwarder.rememberErr(fmt.Errorf("close local event log for %s: %w", roleName, closeErr))
+	}
+}
+
+func (forwarder *processForwarder) sendDecisionEvent(source string, event decision.Event) error {
+	sendErr := forwarder.client.Send(eventstream.Record{
+		Kind:   eventstream.KindEvent,
+		Source: source,
+		Event:  &event,
+	})
+	if sendErr != nil {
+		return sendErr
+	}
+	forwarder.markDecisionEventSent(event)
+	return nil
+}
+
+func (forwarder *processForwarder) markDecisionEventSent(event decision.Event) {
+	key, ok := decisionEventKey(event)
+	if !ok {
+		return
+	}
+	forwarder.mu.Lock()
+	forwarder.sent[key] = true
+	forwarder.mu.Unlock()
+}
+
+func (forwarder *processForwarder) wasDecisionEventSent(event decision.Event) bool {
+	key, ok := decisionEventKey(event)
+	if !ok {
+		return false
+	}
+	forwarder.mu.Lock()
+	defer forwarder.mu.Unlock()
+	return forwarder.sent[key]
+}
+
+func decisionEventKey(event decision.Event) (string, bool) {
+	encoded, marshalErr := json.Marshal(event)
+	if marshalErr != nil {
+		return "", false
+	}
+	return string(encoded), true
 }
 
 func (forwarder *processForwarder) sendDone(detail string) {
