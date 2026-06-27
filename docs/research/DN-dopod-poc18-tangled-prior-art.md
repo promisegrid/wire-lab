@@ -68,9 +68,9 @@ a set of pressure points:
 - Tangled appview proves that a consolidated social/code view is important for
   user experience, but POC18 must not let an appview become a PromiseGrid
   authority.
-- Tangled's SSH/Git compatibility proves that migration paths matter, but POC18
-  should keep Git push/pull as compatibility UI rather than native protocol
-  semantics.
+- Tangled's SSH/Git compatibility proves that migration paths matter, including
+  ordinary Git push and pull. POC18 should support those operations through a
+  Git bridge while keeping them separate from native PromiseGrid sync.
 - Tangled's round-based review model proves that immutable review submissions,
   interdiffs, and author-chosen resubmission points are useful.
 - Tangled's Jujutsu support confirms the need for stable logical change identity
@@ -91,7 +91,7 @@ versioned promise object.
 | Consolidated appview | Explicitly differ | A PromiseGrid appview may be a read model or discovery peer, but it must not decide global truth, global access, global merge status, or global repository identity. |
 | AT Protocol identity | Adopt as interop pressure | POC18 can learn from DID/handle usability and future AT/Bluesky interop, but identity remains input to local trust, not a global trust authority. |
 | Role-based access control | Reject as PromiseGrid vocabulary | POC18 should express collaboration as promises, capability tokens, local retention, local sharing, and local trust updates, not permission/conformance language. |
-| SSH/Git push-pull | Adopt only for import/export compatibility | Native POC18 sync is continuous peer DAG reconciliation: agents advertise, request, verify, retain, forward, or ignore reference-set and CAS promises. |
+| SSH/Git push-pull | Adopt as required Git bridge compatibility | POC18 should push to and pull from ordinary Git repositories through shared bridge code, while native POC18 sync remains continuous peer DAG reconciliation: agents advertise, request, verify, retain, forward, or ignore reference-set and CAS promises. |
 | Git branches/tags | Differ | POC18 uses versioned reference sets as the common abstraction for branches, tags, releases, directories, review threads, logical changes, and workspaces. |
 | Hidden tracking refs for fork PRs | Learn from the problem, not the mechanism | POC18 still needs comparable-target materialization, but it should model those targets as reference-set promises rather than hidden Git refs. |
 | Round-based reviews | Adopt the idea | POC18 review threads should preserve immutable submissions, explicit resubmissions, interdiffs, and review comments attached to exact versions. |
@@ -104,7 +104,8 @@ Tangled is useful because it is Git-compatible and user-friendly while moving
 some hosting and identity concerns out of a traditional forge. Its limits are
 equally useful: a Git-first product retains Git remotes, refs, SSH, branch
 operations, repository-local hidden refs, and role-based access vocabulary.
-PromiseGrid should not inherit those as native concepts.
+PromiseGrid should bridge to those Git concepts for interoperability but should
+not inherit them as native concepts.
 
 For POC18, the native collaboration loop should stay promise-first:
 
@@ -129,8 +130,9 @@ POC18 should include these requirements before implementation locks:
   versions, review comments, tests, acceptance promises, and interdiff material.
 - A logical-change reference-set role that gives evolving work stable identity
   without copying Jujutsu's exact change-ID field as a primitive.
-- A Git import/export path that preserves content and DAG semantics, while
-  treating Git remotes, branches, tags, and pushes as compatibility artifacts.
+- A Git bridge path that preserves content and DAG semantics for import, export,
+  push, and pull, while treating Git remotes, branches, tags, and pushes as
+  compatibility artifacts.
 - A discovery/read-model story that can look appview-like for users but is still
   local, sparse, and promise-relative.
 - Analyzer gates that reject authority drift: no global forge, appview, role
@@ -142,12 +144,15 @@ POC18 should include these requirements before implementation locks:
 ## Decision status
 
 `nahop.18` is complete. Tangled should influence POC18's self-hosting,
-migration, social-code UX, review rounds, and stable logical-change identity.
-POC18 should explicitly differ from Tangled by keeping Git/SSH push-pull,
-appview aggregation, role-based access control, hidden Git refs, and raw
+migration, social-code UX, review rounds, stable logical-change identity, and
+conventional Git push/pull bridge requirements. POC18 should explicitly differ
+from Tangled by keeping Git/SSH push-pull out of the native sync model and by
+keeping appview aggregation, role-based access control, hidden Git refs, and raw
 Jujutsu change IDs out of the native PromiseGrid model unless a later TE/DI
 narrows one of those choices.
 
-The existing POC18 DIs remain sufficient for this conclusion: `DI-zuruj` locks
-versioned reference sets and the POC16 baseline, and `DI-dibut` locks the
-Tangled prior-art review plus continuous peer DAG sync direction.
+The existing POC18 DIs remain sufficient for the original Tangled conclusion:
+`DI-zuruj` locks versioned reference sets and the POC16 baseline, and `DI-dibut`
+locks the Tangled prior-art review plus continuous peer DAG sync direction.
+`DI-dofoj` refines the Git compatibility result by requiring a shared Git bridge
+for import, export, push, and pull.

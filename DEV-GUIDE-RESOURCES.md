@@ -24,7 +24,8 @@ remain review evidence until promoted. Source: `DI-baral`; `DI-sisak`;
 `DI-sinur`; `DI-punib`; `DI-sunuf`; `DI-vahan`; `DI-fijov`; `DI-kinaf`;
 `DI-dubih`; `DI-dirat`; `DI-lihir`; `DI-darur`; `DI-daruf`; `DI-mubul`;
 `DI-nogij`; `DI-rigup`; `DI-vulit`; `DI-gazin`; `DI-bitug`; `DI-magug`;
-`DI-sazip`; `DI-mapah`; `DI-jafoj`; `DI-rapuk`; `DI-zuruj`; `DI-dibut`.
+`DI-sazip`; `DI-mapah`; `DI-jafoj`; `DI-rapuk`; `DI-zuruj`; `DI-dibut`;
+`DI-dofoj`.
 Constrained-radio POC17 adds behavior evidence that production-like app
 messages can stay pCID-selected and compact: bintags-shaped order status
 traffic uses `grid([42(pCID), payload])` with actual CID bytes for slot 0, while
@@ -34,12 +35,17 @@ firmware-fidelity claim. Source: `DI-mokit`; `DI-dutah`.
 POC18 is planned as a POC16-superset CAS/code-collaboration experiment, not as a
 POC17 runtime continuation: it should test versioned reference-set promises as
 the common abstraction for directories, filenames, branches, tags, releases,
-review threads, logical changes, and workspace roots. The Tangled prior-art
+review threads, logical changes, and workspace roots. It should use Rabin
+content-defined chunking for all file content so large files are native in-band
+CAS objects, and it should provide a conventional Git bridge covering import,
+export, push, and pull through shared conversion code. The Tangled prior-art
 review says POC18 should learn from self-hosting, migration, social-code UX,
-round-based review, and stable logical-change identity, while explicitly keeping
-Git/SSH push-pull, appview aggregation, role-based access control, hidden Git
-refs, and raw Jujutsu change IDs out of the native PromiseGrid model unless a
-later TE/DI narrows that choice. Source: `DI-zuruj`; `DI-dibut`; `DN-dopod`.
+round-based review, stable logical-change identity, and Git/SSH interoperability
+pressure, while explicitly keeping Git/SSH push-pull out of the native
+PromiseGrid sync model and keeping appview aggregation, role-based access
+control, hidden Git refs, and raw Jujutsu change IDs out of the native model
+unless a later TE/DI narrows that choice. Source: `DI-zuruj`; `DI-dibut`;
+`DI-dofoj`; `DN-dopod`.
 
 ### Current Wire Direction
 
@@ -1514,10 +1520,11 @@ section.
   Source: `DI-govat`; `DI-mokit`.
 - `docs/research/DN-dopod-poc18-tangled-prior-art.md` records the Tangled
   prior-art review for POC18. It says to learn from self-hosted infrastructure,
-  migration pressure, social-code UX, review rounds, and stable logical-change
-  identity while keeping Git/SSH push-pull, appview aggregation, RBAC, hidden
-  Git refs, and raw Jujutsu change IDs out of the native PromiseGrid model.
-  Source: `DI-dibut`.
+  migration pressure, social-code UX, review rounds, stable logical-change
+  identity, and conventional Git/SSH interoperability while keeping Git/SSH
+  push-pull out of the native sync model and keeping appview aggregation, RBAC,
+  hidden Git refs, and raw Jujutsu change IDs out of the native PromiseGrid
+  model. Source: `DI-dibut`; `DI-dofoj`.
 - `implementations/poc17-m4-lora-runtime/` is first-slice Go behavior evidence
   for a radio-only constrained device exchange. It now includes bintags-shaped
   order status traffic under a spec-derived `order_status_v1` pCID and uses a
