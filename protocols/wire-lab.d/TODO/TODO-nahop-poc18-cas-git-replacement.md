@@ -319,16 +319,17 @@ Locked:
   Source: `DI-zuruj`.
 - Native synchronization is continuous peer DAG sync, not explicit Git-style
   push/pull. Source: `DI-dibut`.
+- Tangled should influence POC18's self-hosting, migration, social-code UX,
+  review-round, and stable-logical-change requirements, but POC18 should
+  explicitly differ from Tangled's Git/SSH push-pull, appview aggregation,
+  role-based access control, hidden Git refs, and raw Jujutsu change-ID
+  mechanisms as native protocol concepts. Source: `DI-dibut`; `DN-dopod`.
 
 Remaining:
 
 - Lock implementation paths, command names, package names, runtime artifact
   paths, and generated CAS path patterns before scaffolding code.
 - Choose the exact Go libraries for Git import/export and restic chunking.
-- Review Tangled as prior art and decide what, if anything, POC18 should learn
-  from its decentralized Git hosting, self-hosted knots, appview, AT Protocol
-  identity, round-based pull-request flow, and Jujutsu change-ID usage. Source:
-  `DI-dibut`.
 - Decide whether LLM agents participate in the first implementation slice or
   whether POC18 begins deterministic and adds LLM-scale collaboration later.
 
@@ -371,10 +372,11 @@ Remaining:
   library.
 - [ ] nahop.17 Add promise-based retention and GC behavior for selected reference
   sets, release objects, paid storage, and unpromised objects under pressure.
-- [ ] nahop.18 Review Tangled as prior art and record whether POC18 should adopt,
+- [x] nahop.18 Review Tangled as prior art and record whether POC18 should adopt,
   reject, or explicitly differ from Tangled's self-hosted knots, appview,
   AT Protocol identity, round-based PR flow, SSH/Git compatibility, and Jujutsu
-  change-ID use. Source: `DI-dibut`.
+  change-ID use. Completed by
+  `docs/research/DN-dopod-poc18-tangled-prior-art.md`. Source: `DI-dibut`.
 - [ ] nahop.19 Implement continuous peer DAG sync so agents exchange
   reference-set heads, object-availability promises, missing-object requests, and
   retention/forwarding promises without explicit native push/pull commands.

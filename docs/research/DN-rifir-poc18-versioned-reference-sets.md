@@ -224,11 +224,11 @@ remote-centric push/pull model internally. Source: `DI-dibut`.
 
 ## Tangled prior-art question
 
-POC18 should review Tangled as adjacent prior art before implementation locks
-its collaboration details. Tangled matters because it is a contemporary
-decentralized code-hosting project with Git compatibility, self-hosted
-infrastructure, social coding goals, AT Protocol identity, round-based pull
-request ideas, and Jujutsu change-ID influence.
+POC18 reviewed Tangled as adjacent prior art in
+`docs/research/DN-dopod-poc18-tangled-prior-art.md`. Tangled matters because it
+is a contemporary decentralized code-hosting project with Git compatibility,
+self-hosted infrastructure, social coding goals, AT Protocol identity,
+round-based pull-request ideas, and Jujutsu change-ID influence.
 
 The question for POC18 is not "should PromiseGrid copy Tangled?" The question is:
 
@@ -236,18 +236,14 @@ The question for POC18 is not "should PromiseGrid copy Tangled?" The question is
 > Git repositories, self-hosted infrastructure, social/appview aggregation,
 > identity, review workflow, and Jujutsu-compatible change tracking?
 
-Initial expectations:
+The review conclusion is: POC18 should learn from Tangled's self-hosting,
+migration, social-code UX, review rounds, and stable logical-change identity
+pressure, but explicitly differ from Tangled by keeping Git/SSH push-pull,
+appview aggregation, role-based access control, hidden Git refs, and raw
+Jujutsu change IDs out of the native PromiseGrid model unless a later TE/DI
+narrows one of those choices.
 
-- Tangled may teach useful lessons about migration from existing Git workflows.
-- Tangled may teach useful lessons about social-code UX and round-based reviews.
-- Tangled's knots/appview split may be useful contrast for PromiseGrid's local
-  trust and no-global-authority model.
-- Tangled's continued SSH/Git push/pull compatibility is likely compatibility
-  pressure, not the native PromiseGrid sync model.
-- Tangled's Jujutsu change-ID use should be compared against POC18 logical-change
-  reference sets.
-
-Source: `DI-dibut`.
+Source: `DI-dibut`; `DN-dopod`.
 
 ## Chunking
 
