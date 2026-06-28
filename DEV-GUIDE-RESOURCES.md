@@ -25,7 +25,7 @@ remain review evidence until promoted. Source: `DI-baral`; `DI-sisak`;
 `DI-dubih`; `DI-dirat`; `DI-lihir`; `DI-darur`; `DI-daruf`; `DI-mubul`;
 `DI-nogij`; `DI-rigup`; `DI-vulit`; `DI-gazin`; `DI-bitug`; `DI-magug`;
 `DI-sazip`; `DI-mapah`; `DI-jafoj`; `DI-rapuk`; `DI-zuruj`; `DI-dibut`;
-`DI-dofoj`.
+`DI-dofoj`; `DI-radaj`.
 Constrained-radio POC17 adds behavior evidence that production-like app
 messages can stay pCID-selected and compact: bintags-shaped order status
 traffic uses `grid([42(pCID), payload])` with actual CID bytes for slot 0, while
@@ -37,15 +37,18 @@ POC17 runtime continuation: it should test versioned reference-set promises as
 the common abstraction for directories, filenames, branches, tags, releases,
 review threads, logical changes, and workspace roots. It should use Rabin
 content-defined chunking for all file content so large files are native in-band
-CAS objects, and it should provide a conventional Git bridge covering import,
-export, push, and pull through shared conversion code. The Tangled prior-art
-review says POC18 should learn from self-hosting, migration, social-code UX,
-round-based review, stable logical-change identity, and Git/SSH interoperability
-pressure, while explicitly keeping Git/SSH push-pull out of the native
-PromiseGrid sync model and keeping appview aggregation, role-based access
-control, hidden Git refs, and raw Jujutsu change IDs out of the native model
-unless a later TE/DI narrows that choice. Source: `DI-zuruj`; `DI-dibut`;
-`DI-dofoj`; `DN-dopod`.
+CAS objects, and it should represent all POSIX inode types: regular file,
+directory, symbolic link, hard link, character device, block device, FIFO, and
+socket. It should provide a conventional Git bridge covering import, export,
+push, and pull through shared conversion code, while explicitly recording
+mapping, loss, refusal, or local non-commitment for node types Git cannot
+represent. The Tangled prior-art review says POC18 should learn from
+self-hosting, migration, social-code UX, round-based review, stable
+logical-change identity, and Git/SSH interoperability pressure, while explicitly
+keeping Git/SSH push-pull out of the native PromiseGrid sync model and keeping
+appview aggregation, role-based access control, hidden Git refs, and raw
+Jujutsu change IDs out of the native model unless a later TE/DI narrows that
+choice. Source: `DI-zuruj`; `DI-dibut`; `DI-dofoj`; `DI-radaj`; `DN-dopod`.
 
 ### Current Wire Direction
 

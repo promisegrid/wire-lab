@@ -54,6 +54,16 @@ Constraints: Use Rabin chunking as the design requirement for all files; verify 
 Affects: protocols/wire-lab.d/TODO/TODO-nahop-poc18-cas-git-replacement.md; docs/research/DN-rifir-poc18-versioned-reference-sets.md; docs/research/DN-dopod-poc18-tangled-prior-art.md; DEV-GUIDE-RESOURCES.md; protocols/wire-lab.d/TODO/TODO.md; future implementations/poc18-cas-git-replacement/.
 Supersedes: DI-zuruj and DI-dibut only where they limit required Git compatibility wording to import/export or imply conventional Git push/pull is not a required bridge surface.
 
+ID: DI-radaj
+Date: 2026-06-27 14:59:56 PDT
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Refine POC18 filesystem modeling to support every POSIX inode type: regular file, directory, symbolic link, hard link, character device, block device, FIFO, and socket.
+Intent: POC18 should be a serious filesystem/versioning substrate, not only a text-file source-control demo. A PromiseGrid workspace needs to preserve enough filesystem meaning to version, sync, review, and materialize real POSIX trees. Regular files keep Rabin-chunked content manifests. Directories remain versioned reference sets. Symbolic links are node promises whose payload preserves link target bytes. Hard links are represented by multiple directory labels pointing at the same node identity or link-group target rather than by duplicated file contents. Character devices, block devices, FIFOs, and sockets are metadata-bearing node promises; POC18 records the promised node type and materialization constraints, not live kernel state or stream contents. Local materialization may refuse or adapt nodes the host cannot safely create.
+Constraints: Do not collapse every POSIX object into a regular file blob; do not claim conventional Git can preserve inode types it cannot represent; Git bridge import/export/push/pull must preserve supported Git modes and must record explicit mapping, loss, refusal, or local non-commitment for POSIX inode types outside Git's normal tree model; device and socket materialization remains local capability/resource behavior, not global authority.
+Affects: protocols/wire-lab.d/TODO/TODO-nahop-poc18-cas-git-replacement.md; docs/research/DN-rifir-poc18-versioned-reference-sets.md; DEV-GUIDE-RESOURCES.md; protocols/wire-lab.d/TODO/TODO.md; future implementations/poc18-cas-git-replacement/.
+Supersedes: DI-zuruj only where it implies POC18's filesystem model is limited to regular file and directory versions.
+
 ## Core Hypothesis
 
 POC18 should test this hypothesis:
@@ -90,7 +100,7 @@ threads, releases, workspaces, and logical changes. The mechanism is shared; the
 role-specific validation is not.
 
 - A **directory** is a reference set with role `directory`. Its labels are
-  filename/path-component dirents and its targets are file-version or
+  filename/path-component dirents and its targets are POSIX node-version or
   directory-version CIDs.
 - A **branch** is a reference set with role `branch`. It usually has a label such
   as `head` pointing at a snapshot/change-set CID.
@@ -121,6 +131,11 @@ trusts. Source: `DI-zuruj`; `DI-dibut`.
   Filenames are labels/dirents inside the directory's history, like Unix
   directory entries pointing at inodes. A file's logical history does not own one
   canonical path.
+- **POSIX inode types:** Reframe filesystem entries as POSIX node promises.
+  POC18 must preserve regular files, directories, symbolic links, hard links,
+  character devices, block devices, FIFOs, and sockets. Device, FIFO, and socket
+  objects preserve node metadata and local materialization constraints, not live
+  kernel state or stream contents. Source: `DI-radaj`.
 - **Commit/snapshot:** Reframe as a snapshot/change-set envelope that points at a
   root directory reference-set CID and carries parent snapshot links,
   author/promiser intent, local constraints, and review or merge context.
@@ -160,7 +175,8 @@ trusts. Source: `DI-zuruj`; `DI-dibut`.
   her own local checks; no global merge or forge authority exists.
 - Keep materialization separate from storage. Checking out a workspace means a
   local role promises to materialize a root directory reference-set CID into
-  files, directories, devices, or other local resources under local constraints.
+  files, directories, links, devices, FIFOs, sockets, or other local resources
+  under local constraints. Source: `DI-radaj`.
 - Preserve pCID discipline. pCID selects the protocol parser/builder and slot
   semantics; names, roles, labels, paths, authors, repositories, and destinations
   live in pCID-defined payloads where needed.
@@ -191,9 +207,14 @@ trusts. Source: `DI-zuruj`; `DI-dibut`.
   sets may be append-only or locally immutable by promise; logical-change sets
   should point at current, prior, review, test, and superseded versions where
   useful.
+- Define POSIX node types explicitly. Regular files point at Rabin chunk
+  manifests; directories are reference sets; symbolic links preserve target
+  bytes; hard links preserve shared node identity or link-group target;
+  character/block devices preserve type plus major/minor metadata; FIFOs and
+  sockets preserve node type and materialization constraints. Source: `DI-radaj`.
 - Define parent-link slot rules explicitly. POC18 should prefer envelope-level
   parent links for version graph edges, with typed parent roles such as
-  previous-file-version, previous-reference-set-version, previous-snapshot,
+  previous-node-version, previous-reference-set-version, previous-snapshot,
   merge-parent, review-parent, and supersedes.
 - Define signature/proof placement explicitly. Reference-set, release, review,
   and adoption promises should be signed by the promiser. COSE or other proof
@@ -204,7 +225,9 @@ trusts. Source: `DI-zuruj`; `DI-dibut`.
   parent DAG semantics. Import/export local filesystem edges and push/pull remote
   transport edges should share one conversion core between Git refs/objects and
   PromiseGrid reference sets, snapshots, manifests, chunks, and mapping records.
-  Source: `DI-dofoj`.
+  Git bridge behavior must also record explicit mapping, loss, refusal, or local
+  non-commitment for POSIX node types conventional Git cannot represent. Source:
+  `DI-dofoj`; `DI-radaj`.
 - Define continuous-sync payloads before implementation. The main version-control
   pCID should cover reference-set advertisements, object-availability promises,
   missing-object requests, retention/forwarding offers, and local non-commitments
@@ -222,7 +245,8 @@ trusts. Source: `DI-zuruj`; `DI-dibut`.
 - Support at least these object classes:
   - raw chunks;
   - PromiseGrid Merkle manifests over chunk CIDs;
-  - file-version envelopes;
+  - POSIX node-version envelopes for regular files, symbolic links, hard links,
+    character devices, block devices, FIFOs, and sockets;
   - directory/reference-set envelopes;
   - snapshot/change-set envelopes;
   - logical-change, branch, release, workspace, and review reference sets;
@@ -243,11 +267,16 @@ trusts. Source: `DI-zuruj`; `DI-dibut`.
 ## Scenarios
 
 - **Single-author edit:** Alice edits `README.md`, Rabin-chunks its content,
-  stores chunks and a Merkle manifest in CAS, emits a file-version envelope, then
-  emits a snapshot/change-set envelope pointing at a root directory reference set.
+  stores chunks and a Merkle manifest in CAS, emits a regular-file node-version
+  envelope, then emits a snapshot/change-set envelope pointing at a root
+  directory reference set.
 - **Rename with history:** Alice renames `README.md` to `docs/intro.md`. The file
   version keeps its logical file lineage; the directory reference-set history
   changes the filename/dirent labels.
+- **POSIX node tree:** Alice versions a workspace containing a regular file,
+  directory, symbolic link, hard link, character device, block device, FIFO, and
+  socket node. The CAS preserves each node promise, and local materialization
+  records which nodes were created, adapted, or refused under host constraints.
 - **Branch fetch:** Bob asks Alice for a branch-role reference set such as
   `main`. He retrieves its `head` target, then recursively asks for the snapshot,
   root directory, file versions, chunk manifests, and chunks he decides to trust.
@@ -291,6 +320,8 @@ trusts. Source: `DI-zuruj`; `DI-dibut`.
   change, review thread, and workspace roles.
 - Verify filenames are labels inside directory reference sets, not file-history
   identity fields.
+- Verify all POSIX inode types are represented: regular file, directory,
+  symbolic link, hard link, character device, block device, FIFO, and socket.
 - Verify logical-change reference sets replace Jujutsu-style intrinsic change IDs
   in the POC18 protocol model.
 - Verify grid-envelope parent links form the expected file, reference-set,
@@ -307,7 +338,8 @@ trusts. Source: `DI-zuruj`; `DI-dibut`.
   object and at least one locally dropped unpromised object.
 - Verify Git bridge behavior by importing/exporting and pulling/pushing a real
   Git repo while checking content, directories, branch/tag targets, and DAG
-  semantics.
+  semantics, plus explicit loss/refusal records for inode types Git cannot
+  represent.
 - Verify continuous peer DAG sync by requiring at least one useful update to
   propagate without an explicit push/pull command and without any global remote
   authority. Source: `DI-dibut`.
@@ -328,6 +360,9 @@ Locked:
   `--tags`. Source: `DI-zuruj`.
 - Filenames belong to directory/reference-set history, not file-history identity.
   Source: `DI-zuruj`.
+- POC18 must support all POSIX inode types: regular file, directory, symbolic
+  link, hard link, character device, block device, FIFO, and socket. Source:
+  `DI-radaj`.
 - Logical-change reference sets replace Jujutsu-style intrinsic change IDs for
   POC18. Source: `DI-zuruj`.
 - Use one main version-control pCID unless a later TE/DI proves a truly separate
@@ -338,8 +373,8 @@ Locked:
   Git bridge roundtrip works for import, export, push, and pull. Source:
   `DI-dofoj`.
 - Use a Go Git library for the Git bridge. Source: `DI-zuruj`; `DI-dofoj`.
-- Use Files + Snapshots: per-file lineage plus snapshot/change-set envelopes.
-  Source: `DI-zuruj`.
+- Use POSIX nodes + snapshots: per-node lineage plus snapshot/change-set
+  envelopes. Source: `DI-zuruj`; `DI-radaj`.
 - Native synchronization is continuous peer DAG sync, not explicit Git-style
   push/pull. Source: `DI-dibut`.
 - Tangled should influence POC18's self-hosting, migration, social-code UX,
@@ -373,10 +408,11 @@ Remaining:
   printable paths and binary CID values inside CBOR.
 - [ ] nahop.5 Integrate Rabin content-defined chunking and PromiseGrid Merkle
   manifests for all file content storage, including large in-band files.
-- [ ] nahop.6 Implement file-version envelopes with logical file identity, content
-  root CIDs, and parent file-version links.
+- [ ] nahop.6 Implement POSIX node-version envelopes with logical node identity,
+  node type, content or metadata payload, and parent node-version links.
 - [ ] nahop.7 Implement directory reference sets where filename labels point at
-  file-version or directory-version CIDs.
+  POSIX node-version or directory-version CIDs, including hard-link labels that
+  intentionally share a node identity.
 - [ ] nahop.8 Implement branch, release, logical-change, review-thread, and
   workspace reference-set roles without global authority.
 - [ ] nahop.9 Implement snapshot/change-set envelopes that compose root directory
@@ -385,7 +421,7 @@ Remaining:
   reference set into a local workspace directory with explicit local promises.
 - [ ] nahop.11 Implement peer fetch/retrieval of reference sets and missing CAS
   objects, including voluntary storage/forwarding promises and token incentives.
-- [ ] nahop.12 Implement rename/copy scenarios that preserve file lineage while
+- [ ] nahop.12 Implement rename/copy scenarios that preserve node lineage while
   changing directory labels.
 - [ ] nahop.13 Implement divergent branch/logical-change and multi-parent merge
   scenarios, including conflict-resolution promises.
@@ -407,11 +443,11 @@ Remaining:
   Source: `DI-dibut`.
 - [ ] nahop.20 Add analyzer gates for CID correctness, sparse CAS, parent-chain
   integrity, reference-set signatures, multi-target labels, directory labels,
-  logical-change reference sets, continuous sync, Rabin chunking for large
-  in-band files, Git bridge roundtrip, GC behavior, and anti-authority
-  vocabulary.
+  logical-change reference sets, POSIX inode type coverage, continuous sync,
+  Rabin chunking for large in-band files, Git bridge roundtrip, GC behavior, and
+  anti-authority vocabulary.
 - [ ] nahop.21 Add diagnostic rendering of representative raw CBOR messages for
-  reference-set, file-version, directory, snapshot, review, merge,
+  reference-set, node-version, directory, snapshot, review, merge,
   materialization, and peer-fetch flows.
 - [ ] nahop.22 Run a clean deterministic POC18 scenario and archive exact commands,
   CAS object examples, reference-set walks, parent-chain walks, Git bridge

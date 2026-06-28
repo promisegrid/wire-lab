@@ -64,9 +64,10 @@ The key observation is that a multi-target tag with labels is directory-shaped.
 A directory is:
 
 ```text
-"README.md" -> file-version CID
+"README.md" -> regular-file node-version CID
 "src"       -> directory-version CID
-"LICENSE"  -> file-version CID
+"LICENSE"  -> regular-file node-version CID
+"latest"   -> symbolic-link node-version CID
 ```
 
 A rich tag or reference bundle is:
@@ -96,19 +97,20 @@ A file's name should not be a property of file history. It should be a property
 of directory/reference-set history.
 
 The Unix analogy is useful: a directory entry maps a filename to an inode-like
-target. POC18 maps a filename label to a file-version or directory-version CID.
+target. POC18 maps a filename label to a POSIX node-version or
+directory-version CID.
 
 This matters for renames:
 
 ```text
 old directory:
-  "README.md" -> file-version F1
+  "README.md" -> regular-file node-version F1
 
 new directory:
   "docs" -> directory D2
 
 D2:
-  "intro.md" -> file-version F1 or F2
+  "intro.md" -> regular-file node-version F1 or F2
 ```
 
 If the content also changed, `intro.md` points to `F2`, and `F2` has parent
@@ -117,7 +119,27 @@ If the content also changed, `intro.md` points to `F2`, and `F2` has parent
 This avoids saying a file "is named README.md." More precisely:
 
 > A directory reference-set promise says that the label `README.md` currently
-> points at this file-version or directory-version CID.
+> points at this POSIX node-version or directory-version CID.
+
+## POSIX node types
+
+POC18 should support every POSIX inode type: regular file, directory, symbolic
+link, hard link, character device, block device, FIFO, and socket. Source:
+`DI-radaj`.
+
+Regular files carry Rabin chunk manifests. Directories are reference sets.
+Symbolic links are node promises whose payload preserves the link target bytes.
+Hard links are multiple directory labels pointing at the same node identity or
+link-group target, not duplicated content. Character devices and block devices
+preserve type plus major/minor metadata. FIFOs and sockets preserve node type
+and materialization constraints; POC18 does not pretend to store live stream
+contents or kernel socket state in CAS.
+
+Materialization is local. Alice may promise to materialize a device, FIFO, or
+socket node on her machine only if local capabilities and policy allow it. If a
+host cannot or should not create a node, it should record an explicit local
+non-commitment, adaptation, or refusal rather than silently degrading the object
+to a regular file.
 
 ## Branches are reference-set roles
 
@@ -190,13 +212,14 @@ does not provide by itself:
 - the logical change can be signed and judged locally;
 - divergent current targets can be represented honestly.
 
-## Files and snapshots
+## POSIX nodes and snapshots
 
-POC18 should use both file lineage and snapshot/change-set lineage.
+POC18 should use both POSIX node lineage and snapshot/change-set lineage.
 
-File-version envelopes preserve logical file identity across edits, renames, and
-copies. Snapshot/change-set envelopes preserve Git-like project history, atomic
-multi-file changes, merge parents, branch targets, and exportability to Git.
+Node-version envelopes preserve logical node identity across edits, renames, hard
+links, metadata changes, and copies. Snapshot/change-set envelopes preserve
+Git-like project history, atomic multi-node changes, merge parents, branch
+targets, and exportability to Git where Git can represent the node types.
 
 This gives POC18:
 
@@ -214,6 +237,8 @@ preserving:
 
 - file content;
 - directory structure;
+- supported POSIX node types, with explicit mapping or loss records when Git
+  cannot represent a node type;
 - branch and tag targets;
 - parent DAG semantics.
 
@@ -268,7 +293,7 @@ The CAS should contain PromiseGrid objects:
 
 - raw chunks;
 - Merkle manifests over chunk CIDs;
-- file-version envelopes;
+- POSIX node-version envelopes;
 - directory/reference-set envelopes;
 - snapshot/change-set envelopes;
 - review/release/logical-change/workspace reference sets.
@@ -294,7 +319,7 @@ release is authoritative.
 This same framing applies to directories:
 
 > I currently treat the label `README.md` in this directory context as pointing
-> at this file-version CID.
+> at this POSIX node-version CID.
 
 That promise is useful only to agents that recognize and trust the promiser or
 the group namespace enough to use it.
@@ -309,6 +334,8 @@ the group namespace enough to use it.
 - Native collaboration is continuous peer DAG synchronization, not Git-style
   push/pull; conventional Git push/pull still exists through the Git bridge.
 - Filenames are directory/reference-set labels.
+- POC18 supports all POSIX inode types as node-version or directory/reference-set
+  promises.
 - Logical-change reference sets replace Jujutsu-style intrinsic change IDs.
 - File history owns content lineage, not names.
 - Snapshot/change-set history owns atomic project state.
@@ -321,4 +348,5 @@ the group namespace enough to use it.
 - Decision: `DI-zuruj`
 - Sync/prior-art decision: `DI-dibut`
 - Git bridge/chunking refinement: `DI-dofoj`
+- POSIX inode type refinement: `DI-radaj`
 - Prior decision refined by this note: `DI-vilum`
