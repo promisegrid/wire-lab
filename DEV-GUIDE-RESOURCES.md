@@ -57,7 +57,10 @@ logical-change identity, and Git/SSH interoperability pressure, while explicitly
 keeping Git/SSH push-pull out of the native PromiseGrid sync model and keeping
 appview aggregation, role-based access control, hidden Git refs, and raw
 Jujutsu change IDs out of the native model unless a later TE/DI narrows that
-choice. Source: `DI-zuruj`; `DI-dibut`; `DI-dofoj`; `DI-radaj`; `DN-dopod`.
+choice. TE-kopap confirms the implementation architecture should be hybrid:
+PromiseGrid-native reference sets and sparse CAS are canonical, while Git
+import/export/push/pull are required bridge adapters. Source: `DI-zuruj`;
+`DI-dibut`; `DI-dofoj`; `DI-radaj`; `DN-dopod`; `TE-kopap`.
 
 ### Current Wire Direction
 
@@ -1537,6 +1540,12 @@ section.
   push-pull out of the native sync model and keeping appview aggregation, RBAC,
   hidden Git refs, and raw Jujutsu change IDs out of the native PromiseGrid
   model. Source: `DI-dibut`; `DI-dofoj`.
+- `docs/thought-experiments/TE-kopap-poc18-git-bridge-vs-native-cas.md`
+  compares Git-first, PromiseGrid-native-only, and hybrid POC18 architectures.
+  It rejects Git-first and native-only as complete baselines and recommends the
+  hybrid already implied by `DI-zuruj`, `DI-dibut`, `DI-dofoj`, and `DI-radaj`:
+  native reference sets and sparse CAS as the source of truth, with Git
+  import/export/push/pull as required bridge adapter behavior.
 - `implementations/poc17-m4-lora-runtime/` is first-slice Go behavior evidence
   for a radio-only constrained device exchange. It now includes bintags-shaped
   order status traffic under a spec-derived `order_status_v1` pCID and uses a

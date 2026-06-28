@@ -382,6 +382,11 @@ Locked:
   explicitly differ from Tangled's Git/SSH push-pull, appview aggregation,
   role-based access control, hidden Git refs, and raw Jujutsu change-ID
   mechanisms as native protocol concepts. Source: `DI-dibut`; `DN-dopod`.
+- TE-kopap rejects a Git-first architecture baseline and a native-only
+  architecture baseline. POC18's architecture baseline is a PromiseGrid-native
+  reference-set/CAS core with required Git bridge import/export/push/pull as an
+  adapter, not as the native authority model. Source: `TE-kopap`; `DI-zuruj`;
+  `DI-dofoj`.
 
 Remaining:
 
@@ -396,9 +401,10 @@ Remaining:
 - [x] nahop.16 Create `docs/research/DN-rifir-poc18-versioned-reference-sets.md`
   describing the tag/reference-set decisions, the discussion that led to them,
   and the Git/Jujutsu reasoning behind them. Completed by `DN-rifir`.
-- [ ] nahop.1 Run a TE comparing three designs: Git bridge compatibility,
+- [x] nahop.1 Run a TE comparing three designs: Git bridge compatibility,
   PromiseGrid-native CAS/version graph only, and hybrid Git bridge with
-  PromiseGrid-native reference-set promises.
+  PromiseGrid-native reference-set promises. Completed by
+  `docs/thought-experiments/TE-kopap-poc18-git-bridge-vs-native-cas.md`.
 - [ ] nahop.2 Lock implementation paths, command names, package names, runtime
   artifact paths, and generated CAS path patterns before scaffolding
   `implementations/poc18-cas-git-replacement/`.
