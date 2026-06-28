@@ -64,6 +64,15 @@ Constraints: Do not collapse every POSIX object into a regular file blob; do not
 Affects: protocols/wire-lab.d/TODO/TODO-nahop-poc18-cas-git-replacement.md; docs/research/DN-rifir-poc18-versioned-reference-sets.md; DEV-GUIDE-RESOURCES.md; protocols/wire-lab.d/TODO/TODO.md; future implementations/poc18-cas-git-replacement/.
 Supersedes: DI-zuruj only where it implies POC18's filesystem model is limited to regular file and directory versions.
 
+ID: DI-lidaj
+Date: 2026-06-27 21:54:56 PDT
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Implement `nahop.3` as one normative implementation-local POC18 version-control protocol spec at `implementations/poc18-cas-git-replacement/docs/protocols/version-control.md`; do not use `-v1` or `_v1` because the pCID of the exact spec bytes is the version; create a same-directory CIDv1 base32 alias symlink after the spec bytes are finalized; use svgbob-safe ASCII diagrams; and document `grid([42(pCID), parents, payload, proof])` plus annotated examples as the POC18 version-control message shape.
+Intent: POC18 needs an RFC-like pCID spec before code can safely use a version-control pCID. The spec must be comprehensive enough for a developer to implement from the document, must encompass the related design notes and thought experiments, and must avoid stale version-number vocabulary by treating the pCID as the version. Keeping the spec under the implementation-local `docs/protocols/` tree follows the POC16 pattern and prevents root docs from becoming a stale competing protocol authority.
+Constraints: The spec is the single normative POC18 version-control pCID unless a later TE/DI proves a distinct protocol boundary; pCID remains a protocol selector, not a branch name, operation code, address, repository name, or message type; diagrams must be plain ASCII suitable for svgbob-style conversion; examples must annotate message slots and payload fields; Git import/export/push/pull remain bridge adapter behavior rather than native synchronization; native synchronization remains continuous peer DAG sync; the spec itself must not embed its own final pCID because the pCID is derived externally from exact bytes.
+Affects: protocols/wire-lab.d/TODO/TODO-nahop-poc18-cas-git-replacement.md; implementations/poc18-cas-git-replacement/docs/protocols/version-control.md; implementations/poc18-cas-git-replacement/docs/protocols/<base32-pCID>.md; DEV-GUIDE-RESOURCES.md.
+
 ## Core Hypothesis
 
 POC18 should test this hypothesis:
@@ -387,6 +396,15 @@ Locked:
   reference-set/CAS core with required Git bridge import/export/push/pull as an
   adapter, not as the native authority model. Source: `TE-kopap`; `DI-zuruj`;
   `DI-dofoj`.
+- The POC18 version-control protocol spec is
+  `implementations/poc18-cas-git-replacement/docs/protocols/version-control.md`,
+  with pCID alias
+  `bafkreicrikn3oqfumjnuvruw67h5ffvu6dyy7inz7h2rtm6s4qgwgz7oxu.md`. The
+  filename intentionally has no `-v1` or `_v1` suffix because the pCID is the
+  protocol version. Recompute it from the repo root with `cd tools/spec`, then
+  `go run . cid ../../implementations/poc18-cas-git-replacement/docs/protocols/version-control.md`;
+  in read-only Go-cache sandboxes, set `GOCACHE` and `GOMODCACHE` under `/tmp`.
+  Source: `DI-lidaj`.
 
 Remaining:
 
@@ -408,8 +426,11 @@ Remaining:
 - [ ] nahop.2 Lock implementation paths, command names, package names, runtime
   artifact paths, and generated CAS path patterns before scaffolding
   `implementations/poc18-cas-git-replacement/`.
-- [ ] nahop.3 Write RFC-like spec docs for the POC18 version-control pCID before
-  using its pCID in code.
+- [x] nahop.3 Write RFC-like spec docs for the POC18 version-control pCID before
+  using its pCID in code. Completed by
+  `implementations/poc18-cas-git-replacement/docs/protocols/version-control.md`;
+  pCID alias
+  `implementations/poc18-cas-git-replacement/docs/protocols/bafkreicrikn3oqfumjnuvruw67h5ffvu6dyy7inz7h2rtm6s4qgwgz7oxu.md`.
 - [ ] nahop.4 Implement per-agent sparse CAS object stores with CIDv1 base32
   printable paths and binary CID values inside CBOR.
 - [ ] nahop.5 Integrate Rabin content-defined chunking and PromiseGrid Merkle

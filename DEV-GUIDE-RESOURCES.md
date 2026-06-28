@@ -59,8 +59,12 @@ appview aggregation, role-based access control, hidden Git refs, and raw
 Jujutsu change IDs out of the native model unless a later TE/DI narrows that
 choice. TE-kopap confirms the implementation architecture should be hybrid:
 PromiseGrid-native reference sets and sparse CAS are canonical, while Git
-import/export/push/pull are required bridge adapters. Source: `DI-zuruj`;
-`DI-dibut`; `DI-dofoj`; `DI-radaj`; `DN-dopod`; `TE-kopap`.
+import/export/push/pull are required bridge adapters. The implementation-local
+POC18 protocol spec is now `version-control.md`, intentionally without a
+version suffix because its CID is the version; its current pCID alias is
+`bafkreicrikn3oqfumjnuvruw67h5ffvu6dyy7inz7h2rtm6s4qgwgz7oxu.md`. Source:
+`DI-zuruj`; `DI-dibut`; `DI-dofoj`; `DI-radaj`; `DI-lidaj`; `DN-dopod`;
+`TE-kopap`.
 
 ### Current Wire Direction
 
@@ -1546,6 +1550,14 @@ section.
   hybrid already implied by `DI-zuruj`, `DI-dibut`, `DI-dofoj`, and `DI-radaj`:
   native reference sets and sparse CAS as the source of truth, with Git
   import/export/push/pull as required bridge adapter behavior.
+- `implementations/poc18-cas-git-replacement/docs/protocols/version-control.md`
+  is the RFC-like POC18 version-control protocol spec. It defines
+  `grid([42(pCID), parents, payload, proof])`, versioned reference sets, POSIX
+  node versions, Rabin chunk manifests, snapshots, review statements, Git bridge
+  mappings, sync-interest promises, retention promises, annotated examples, and
+  svgbob-safe ASCII diagrams. Its current pCID alias is
+  `implementations/poc18-cas-git-replacement/docs/protocols/bafkreicrikn3oqfumjnuvruw67h5ffvu6dyy7inz7h2rtm6s4qgwgz7oxu.md`.
+  Source: `DI-lidaj`.
 - `implementations/poc17-m4-lora-runtime/` is first-slice Go behavior evidence
   for a radio-only constrained device exchange. It now includes bintags-shaped
   order status traffic under a spec-derived `order_status_v1` pCID and uses a
