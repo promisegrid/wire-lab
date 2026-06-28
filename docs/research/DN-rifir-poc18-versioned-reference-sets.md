@@ -162,8 +162,8 @@ has all target objects.
 Native POC18 sync is therefore not "Alice pushes to Bob" or "Bob pulls from
 Alice." It is continuous peer DAG reconciliation among agents who each decide
 what to advertise, request, verify, retain, forward, or ignore. Git-style
-`push`/`pull` can remain as compatibility UI for import/export, but it should not
-be the PromiseGrid-native mental model. Source: `DI-dibut`.
+`push`/`pull` remains required Git bridge behavior, but it should not be the
+PromiseGrid-native mental model. Source: `DI-dibut`; `DI-dofoj`.
 
 ## Logical changes replace change IDs
 
@@ -205,30 +205,41 @@ This gives POC18:
 - a clear place for review and test promises;
 - a clear place for local adoption decisions.
 
-## Git roundtrip
+## Git bridge
 
-POC18 should start PromiseGrid-native, but it is not complete until it can import
-and export a real Git repository while preserving:
+POC18 should start PromiseGrid-native, but it is not complete until it can
+bridge to conventional Git repositories in both local and remote directions. It
+must import from, export to, pull from, and push to real Git repositories while
+preserving:
 
 - file content;
 - directory structure;
 - branch and tag targets;
 - parent DAG semantics.
 
-The exported Git commit hashes do not need to match original hashes unless the
-objects are byte-identical and the implementation can preserve them naturally.
-The important first target is content and DAG fidelity.
+The Git bridge should share one conversion core. Import and pull both read Git
+refs and objects into PromiseGrid reference sets, snapshots, manifests, chunks,
+and mapping records; export and push both materialize selected PromiseGrid
+reference sets and CAS objects back into Git refs and objects. Import/export are
+local filesystem edges. Push/pull add Git remote, auth, and transport edges.
 
-Git roundtrip is compatibility work. It should not force POC18 to preserve Git's
-remote-centric push/pull model internally. Source: `DI-dibut`.
+The exported or pushed Git commit hashes do not need to match original hashes
+unless the objects are byte-identical and the implementation can preserve them
+naturally. The important first target is content and DAG fidelity.
+
+Git bridge behavior is compatibility work. It should not force POC18 to preserve
+Git's remote-centric push/pull model internally. Native PromiseGrid
+collaboration remains continuous peer DAG synchronization over local promises,
+reference-set advertisements, object-availability promises, and missing-object
+requests. Source: `DI-dibut`; `DI-dofoj`.
 
 ## Tangled prior-art question
 
-POC18 should review Tangled as adjacent prior art before implementation locks
-its collaboration details. Tangled matters because it is a contemporary
-decentralized code-hosting project with Git compatibility, self-hosted
-infrastructure, social coding goals, AT Protocol identity, round-based pull
-request ideas, and Jujutsu change-ID influence.
+POC18 reviewed Tangled as adjacent prior art in
+`docs/research/DN-dopod-poc18-tangled-prior-art.md`. Tangled matters because it
+is a contemporary decentralized code-hosting project with Git compatibility,
+self-hosted infrastructure, social coding goals, AT Protocol identity,
+round-based pull-request ideas, and Jujutsu change-ID influence.
 
 The question for POC18 is not "should PromiseGrid copy Tangled?" The question is:
 
@@ -236,23 +247,22 @@ The question for POC18 is not "should PromiseGrid copy Tangled?" The question is
 > Git repositories, self-hosted infrastructure, social/appview aggregation,
 > identity, review workflow, and Jujutsu-compatible change tracking?
 
-Initial expectations:
+The review conclusion is: POC18 should learn from Tangled's self-hosting,
+migration, social-code UX, review rounds, stable logical-change identity, and
+conventional Git/SSH interoperability pressure, but explicitly differ from
+Tangled by keeping Git push/pull as bridge behavior rather than the native sync
+model, and by keeping appview aggregation, role-based access control, hidden Git
+refs, and raw Jujutsu change IDs out of the native PromiseGrid model unless a
+later TE/DI narrows one of those choices.
 
-- Tangled may teach useful lessons about migration from existing Git workflows.
-- Tangled may teach useful lessons about social-code UX and round-based reviews.
-- Tangled's knots/appview split may be useful contrast for PromiseGrid's local
-  trust and no-global-authority model.
-- Tangled's continued SSH/Git push/pull compatibility is likely compatibility
-  pressure, not the native PromiseGrid sync model.
-- Tangled's Jujutsu change-ID use should be compared against POC18 logical-change
-  reference sets.
-
-Source: `DI-dibut`.
+Source: `DI-dibut`; `DI-dofoj`; `DN-dopod`.
 
 ## Chunking
 
-POC18 should use restic's content-defined chunker library for file content, but
-not adopt restic's repository format as the CAS backend.
+POC18 should use Rabin content-defined chunking for all file content, but not
+adopt restic's repository format as the CAS backend. A restic-derived Go chunker
+is acceptable only if the implementation lock verifies it satisfies the Rabin
+chunking requirement.
 
 The CAS should contain PromiseGrid objects:
 
@@ -263,8 +273,10 @@ The CAS should contain PromiseGrid objects:
 - snapshot/change-set envelopes;
 - review/release/logical-change/workspace reference sets.
 
-This keeps restic as a proven chunking component while preserving PromiseGrid's
-CID, pCID, CBOR, parent-link, and promise semantics.
+This keeps restic as a possible proven chunking component while preserving
+PromiseGrid's CID, pCID, CBOR, parent-link, and promise semantics. It also means
+large files are native in-band CAS content, not a special out-of-band path.
+Source: `DI-dofoj`.
 
 ## Promise Theory interpretation
 
@@ -295,16 +307,18 @@ the group namespace enough to use it.
 - Let roles define validation. Same primitive does not mean same rules.
 - Sync starts from reference-set promises.
 - Native collaboration is continuous peer DAG synchronization, not Git-style
-  push/pull.
+  push/pull; conventional Git push/pull still exists through the Git bridge.
 - Filenames are directory/reference-set labels.
 - Logical-change reference sets replace Jujutsu-style intrinsic change IDs.
 - File history owns content lineage, not names.
 - Snapshot/change-set history owns atomic project state.
-- CAS stores exact bytes and exact promise objects by CID.
+- CAS stores exact bytes and exact promise objects by CID; all file content uses
+  Rabin chunks plus PromiseGrid manifests.
 
 ## Links
 
 - TODO: `protocols/wire-lab.d/TODO/TODO-nahop-poc18-cas-git-replacement.md`
 - Decision: `DI-zuruj`
 - Sync/prior-art decision: `DI-dibut`
+- Git bridge/chunking refinement: `DI-dofoj`
 - Prior decision refined by this note: `DI-vilum`

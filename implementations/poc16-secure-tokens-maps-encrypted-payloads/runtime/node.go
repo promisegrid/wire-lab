@@ -46,12 +46,7 @@ type Node struct {
 	Decider   decision.Decider
 	Monitor   decision.Monitor
 
-	mu sync.Mutex
-	// stdoutMu keeps event and artifact JSON lines from interleaving when
-	// receive loops emit large base64 artifact records concurrently. Intent:
-	// Supervisors parse stdout line-by-line, so each line must remain intact as
-	// observer-only harness input. Source: DI-tuhop
-	stdoutMu  sync.Mutex
+	mu        sync.Mutex
 	events    []decision.Event
 	ledger    *relationship.Ledger
 	evaluator economy.Evaluator
@@ -3512,14 +3507,11 @@ func (node *Node) record(eventName, outcome, peer, detail string) {
 	}
 	node.eventOutcomeCounts[outcome]++
 	node.mu.Unlock()
-	encoded, err := json.Marshal(event)
+	encoded, err := eventstream.WriteStdoutJSON(event)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "marshal event: %v\n", err)
+		fmt.Fprintf(os.Stderr, "write event: %v\n", err)
 		return
 	}
-	node.stdoutMu.Lock()
-	fmt.Println(string(encoded))
-	node.stdoutMu.Unlock()
 	if node.logFile != nil {
 		if _, writeErr := node.logFile.Write(append(encoded, '\n')); writeErr != nil {
 			fmt.Fprintf(os.Stderr, "write event: %v\n", writeErr)
@@ -3569,14 +3561,11 @@ func (node *Node) emitMessageArtifact(direction, peer, protocolName string, enve
 		Source:          "agent:" + node.Agent.Name,
 		MessageArtifact: &artifact,
 	}
-	recordBytes, marshalErr := json.Marshal(record)
+	_, marshalErr := eventstream.WriteStdoutJSON(record)
 	if marshalErr != nil {
 		node.record("raw_message_artifact_emit_failed", "broken", peer, marshalErr.Error())
 		return
 	}
-	node.stdoutMu.Lock()
-	fmt.Println(string(recordBytes))
-	node.stdoutMu.Unlock()
 	node.record("raw_message_artifact_emitted", "kept", peer, "direction="+direction+" pcid="+artifactProtocol+" exact_cid="+artifact.ExactCID)
 }
 

@@ -84,7 +84,7 @@ var protocolRecords = []protocolRecord{
 	// route_v1; spec: route-v1.md
 	{name: RouteV1, pcid: "bafkreibfb23ds7h45wtwbs3lj4lynyii3gbwfnxdqjtpikzyuw5iwispo4"},
 	// secure_capability_v1; spec: secure-capability-v1.md
-	{name: SecureCapabilityV1, pcid: "bafkreiayxbi6a2qtn6rs54ksnmukzsln3ctvms5h5cdj734zwb6muqamwm"},
+	{name: SecureCapabilityV1, pcid: "bafkreif6e2tmwg62bjtgljuvido7kk5qcpjn5ryhgh6b6yjfetrqy7z4ve"},
 	// ups_label_v1; spec: ups-label-v1.md
 	{name: UPSLabelV1, pcid: "bafkreic6cju5snsuak6p6jweku2dicg24jfly2zt7v73fekksdrr4pqunq"},
 }

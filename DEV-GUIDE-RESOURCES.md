@@ -24,7 +24,8 @@ remain review evidence until promoted. Source: `DI-baral`; `DI-sisak`;
 `DI-sinur`; `DI-punib`; `DI-sunuf`; `DI-vahan`; `DI-fijov`; `DI-kinaf`;
 `DI-dubih`; `DI-dirat`; `DI-lihir`; `DI-darur`; `DI-daruf`; `DI-mubul`;
 `DI-nogij`; `DI-rigup`; `DI-vulit`; `DI-gazin`; `DI-bitug`; `DI-magug`;
-`DI-sazip`; `DI-mapah`; `DI-jafoj`; `DI-rapuk`; `DI-gidul`.
+`DI-sazip`; `DI-mapah`; `DI-jafoj`; `DI-rapuk`; `DI-gidul`; `DI-zopub`;
+`DI-rujod`; `DI-zuruj`; `DI-dibut`; `DI-dofoj`.
 Constrained-radio POC17 adds behavior evidence that production-like app
 messages can stay pCID-selected and compact: bintags-shaped order status
 traffic uses `grid([42(pCID), payload])` with actual CID bytes for slot 0, while
@@ -39,6 +40,21 @@ CWT/COSE lifecycle tokens remain host-local in this slice. POC17 reports
 configured resource limits, but does not report resource activity unless that
 activity is actually measured by the simulator. Source: `DI-gidul`; `DI-zopub`;
 `DI-rujod`.
+
+POC18 is planned as a POC16-superset CAS/code-collaboration experiment, not as a
+POC17 runtime continuation: it should test versioned reference-set promises as
+the common abstraction for directories, filenames, branches, tags, releases,
+review threads, logical changes, and workspace roots. It should use Rabin
+content-defined chunking for all file content so large files are native in-band
+CAS objects, and it should provide a conventional Git bridge covering import,
+export, push, and pull through shared conversion code. The Tangled prior-art
+review says POC18 should learn from self-hosting, migration, social-code UX,
+round-based review, stable logical-change identity, and Git/SSH interoperability
+pressure, while explicitly keeping Git/SSH push-pull out of the native
+PromiseGrid sync model and keeping appview aggregation, role-based access
+control, hidden Git refs, and raw Jujutsu change IDs out of the native model
+unless a later TE/DI narrows that choice. Source: `DI-zuruj`; `DI-dibut`;
+`DI-dofoj`; `DN-dopod`.
 
 ### Current Wire Direction
 
@@ -162,17 +178,21 @@ interoperability notes, and examples. Because POC16 pCIDs are derived from these
 spec bytes and LLM-backed agents receive these docs as prompt context, guide
 writers should treat the docs as the executable source of POC16 protocol
 meaning, not as short labels or informal notes. `local_lifecycle_v1` adds signed
-CWT/COSE lifecycle tokens and token-invocation shutdown gates, but `zugok.39`
-remains open: guide prose should not claim full token convergence until other
-POC16 token paths are audited for CWT/COSE/library/custom usage. The analyzer
-reports this as `poc_scope_fitness.poc_scope_complete`: a clean run means the
-current POC16 acceptance surface was covered, not that PromiseGrid has deployment
-readiness or that these profiles are final APIs. The verified separation still
-has one bounded implementation-local caveat: persistent-session demux may inspect
-a pCID-owned `outcome` projection to classify parent-linked ACK-like responses,
+CWT/COSE lifecycle tokens and token-invocation shutdown gates. The `zugok.39`
+audit plus `zugok.40` refactor leave three POC16 token families: all use COSE,
+the normal CAS/storage tokens and lifecycle tokens now use CWT-style payloads
+with a well-known COSE library, and only the separate `secure_capability_v1`
+specimen path still uses POC16's custom local COSE/CWT-support code. Guide prose
+should therefore describe CWT/COSE convergence as active but not final token
+standardization yet. The analyzer reports clean runs as
+`poc_scope_fitness.poc_scope_complete`: a clean run means the current POC16
+acceptance surface was covered, not that PromiseGrid has deployment readiness or
+that these profiles are final APIs. The verified separation still has one
+bounded implementation-local caveat: persistent-session demux may inspect a
+pCID-owned `outcome` projection to classify parent-linked ACK-like responses,
 but it does not use normal payload fields to route app behavior. Source:
 `DI-rigup`; `DI-vulit`; `DI-gazin`; `DI-bitug`; `DI-rapuk`; `DI-mapah`;
-`DI-jafoj`.
+`DI-jafoj`; `TODO-zugok`.
 
 `poc12` now adds explicit executable pressure on the process boundary:
 each Docker container starts one local `poc12-kernel` process plus separate app
@@ -1507,6 +1527,13 @@ section.
   for POC17 and later radio POCs; it is design pressure requiring hardware,
   driver, regional, and simulator-fidelity verification before normative use.
   Source: `DI-govat`; `DI-mokit`.
+- `docs/research/DN-dopod-poc18-tangled-prior-art.md` records the Tangled
+  prior-art review for POC18. It says to learn from self-hosted infrastructure,
+  migration pressure, social-code UX, review rounds, stable logical-change
+  identity, and conventional Git/SSH interoperability while keeping Git/SSH
+  push-pull out of the native sync model and keeping appview aggregation, RBAC,
+  hidden Git refs, and raw Jujutsu change IDs out of the native PromiseGrid
+  model. Source: `DI-dibut`; `DI-dofoj`.
 - `implementations/poc17-m4-lora-runtime/` is first-slice Go behavior evidence
   for a radio-only constrained device exchange. It now includes bintags-shaped
   order status traffic under a spec-derived `order_status_v1` pCID and uses a
@@ -1674,11 +1701,13 @@ section.
   `local_lifecycle_v1` signed CWT/COSE shutdown-token issuance/invocation/
   verification/fulfillment. It should be cited as POC evidence only, not as a
   final token, encryption, key agreement, parser-module, payload-map, lifecycle,
-  or supervisor API standard. `zugok.39` remains open for the token-path audit,
-  so guide writers should describe CWT/COSE as the current POC16 direction and
-  executable lifecycle-token evidence, not as final token convergence.
+  or supervisor API standard. The `zugok.39` audit and `zugok.40` refactor found
+  three token families: normal CAS/storage tokens and local lifecycle tokens now
+  use CWT-style payloads with the preferred well-known COSE library profile,
+  while the secure-capability specimen path still uses custom local COSE/CWT
+  support and should be refactored before anyone claims final token convergence.
   Source: `DI-vulit`; `DI-magug`; `DI-sazip`; `DI-mapah`; `DI-jafoj`;
-  `TODO-zugok`; `TE-ritig`.
+  `DI-lurov`; `TODO-zugok`; `TE-ritig`.
 	- `protocols/wire-lab.d/archive/migrations/SIM-piloh-turns-149-208-recovery/archive/transports/README.md`
 	  preserves the old root transport design surface as historical evidence.
 

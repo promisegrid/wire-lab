@@ -3,7 +3,6 @@ package kernel
 import (
 	"context"
 	"encoding/base64"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net"
@@ -16,6 +15,7 @@ import (
 
 	"promisegrid.dev/wire-lab/implementations/poc16-secure-tokens-maps-encrypted-payloads/config"
 	"promisegrid.dev/wire-lab/implementations/poc16-secure-tokens-maps-encrypted-payloads/decision"
+	"promisegrid.dev/wire-lab/implementations/poc16-secure-tokens-maps-encrypted-payloads/eventstream"
 	"promisegrid.dev/wire-lab/implementations/poc16-secure-tokens-maps-encrypted-payloads/pcid"
 	"promisegrid.dev/wire-lab/implementations/poc16-secure-tokens-maps-encrypted-payloads/protocol"
 	"promisegrid.dev/wire-lab/implementations/poc16-secure-tokens-maps-encrypted-payloads/transport"
@@ -682,12 +682,11 @@ func (kernel *Kernel) record(eventName, outcome, peer, detail string) {
 		Peer:     peer,
 		Detail:   detail,
 	}
-	encoded, err := json.Marshal(event)
+	encoded, err := eventstream.WriteStdoutJSON(event)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "marshal kernel event: %v\n", err)
+		fmt.Fprintf(os.Stderr, "write kernel event: %v\n", err)
 		return
 	}
-	fmt.Println(string(encoded))
 	if kernel.logFile != nil {
 		if _, writeErr := kernel.logFile.Write(append(encoded, '\n')); writeErr != nil {
 			fmt.Fprintf(os.Stderr, "write kernel event: %v\n", writeErr)

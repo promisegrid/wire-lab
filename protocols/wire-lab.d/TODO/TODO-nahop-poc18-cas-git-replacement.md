@@ -44,6 +44,16 @@ Intent: POC18 should learn from adjacent decentralized code-collaboration system
 Constraints: Do not adopt Tangled concepts without a focused review; do not reintroduce a global forge, appview, role-based access authority, or Git remote as the PromiseGrid authority model; preserve POC18's versioned reference-set root abstraction; continuous sync must remain voluntary and peer-relative, with each agent deciding what to advertise, request, retain, forward, verify, and trust; Git import/export remains compatibility work, not the native synchronization model.
 Affects: protocols/wire-lab.d/TODO/TODO-nahop-poc18-cas-git-replacement.md; docs/research/DN-rifir-poc18-versioned-reference-sets.md; future implementations/poc18-cas-git-replacement/; future POC18 analyzer gates.
 
+ID: DI-dofoj
+Date: 2026-06-27 14:50:16 PDT
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Refine POC18 to use Rabin chunking for all file content and require a conventional Git bridge covering import, export, push, and pull.
+Intent: POC18 should differ from Git by natively handling large files in-band: every file becomes Rabin content-defined chunks plus PromiseGrid Merkle/index manifests in CAS, instead of treating large files as an out-of-band special case. POC18 should also interoperate with conventional Git in both directions. Import/export and push/pull should share the same conversion core between Git refs/objects and PromiseGrid reference sets, snapshots, manifests, chunks, and mapping records. Git push/pull remains a compatibility bridge to Git remotes; native PromiseGrid collaboration remains continuous peer DAG synchronization over local promises, sparse CAS, reference-set advertisements, object-availability promises, and missing-object requests.
+Constraints: Use Rabin chunking as the design requirement for all files; verify any chosen Go library provides the required Rabin-style content-defined chunking before implementation lock; do not use Git LFS-style out-of-band large-file handling as the native POC18 model; do not make a Git remote, forge, appview, or push/pull endpoint the native PromiseGrid authority; keep Git push/pull bridge code separate from native peer DAG sync while sharing the Git-to-PromiseGrid and PromiseGrid-to-Git conversion core with import/export.
+Affects: protocols/wire-lab.d/TODO/TODO-nahop-poc18-cas-git-replacement.md; docs/research/DN-rifir-poc18-versioned-reference-sets.md; docs/research/DN-dopod-poc18-tangled-prior-art.md; DEV-GUIDE-RESOURCES.md; protocols/wire-lab.d/TODO/TODO.md; future implementations/poc18-cas-git-replacement/.
+Supersedes: DI-zuruj and DI-dibut only where they limit required Git compatibility wording to import/export or imply conventional Git push/pull is not a required bridge surface.
+
 ## Core Hypothesis
 
 POC18 should test this hypothesis:
@@ -103,9 +113,10 @@ trusts. Source: `DI-zuruj`; `DI-dibut`.
 
 ## Git And Jujutsu Concepts To Preserve And Reframe
 
-- **Blob/content:** Store bytes in CAS using restic's content-defined chunker.
+- **Blob/content:** Store every file in CAS using Rabin content-defined chunks.
   The normal file content root is a PromiseGrid Merkle manifest CID over chunk
-  CIDs, not a restic repository object.
+  CIDs, not a restic repository object, Git blob special case, or out-of-band
+  large-file artifact. Source: `DI-dofoj`.
 - **Tree/directory:** Reframe as a reference set with role `directory`.
   Filenames are labels/dirents inside the directory's history, like Unix
   directory entries pointing at inodes. A file's logical history does not own one
@@ -124,11 +135,13 @@ trusts. Source: `DI-zuruj`; `DI-dibut`.
 - **Pull request/review:** Reframe as review-thread reference sets and signed
   review/test/adoption promises. There is no forge authority; each participant
   locally decides what review promises affect trust and adoption.
-- **Clone/fetch/push:** Reframe as continuous peer DAG synchronization. Explicit
-  Git-style commands may exist only as compatibility UI; natively, peers
-  continuously promise which reference sets and CAS objects they have, what they
-  are willing to retain or forward, which parent-linked objects they are missing,
-  and under what local constraints. Source: `DI-dibut`.
+- **Clone/fetch/push:** Reframe native PromiseGrid collaboration as continuous
+  peer DAG synchronization. Conventional Git clone/fetch/push/pull still must
+  exist as a compatibility bridge to ordinary Git repositories and should share
+  conversion code with import/export; natively, peers continuously promise which
+  reference sets and CAS objects they have, what they are willing to retain or
+  forward, which parent-linked objects they are missing, and under what local
+  constraints. Source: `DI-dibut`; `DI-dofoj`.
 
 ## Architecture Targets
 
@@ -151,11 +164,13 @@ trusts. Source: `DI-zuruj`; `DI-dibut`.
 - Preserve pCID discipline. pCID selects the protocol parser/builder and slot
   semantics; names, roles, labels, paths, authors, repositories, and destinations
   live in pCID-defined payloads where needed.
-- Replace Git-style push/pull with continuous peer DAG sync. Each agent's local
-  sync role periodically or opportunistically compares reference-set heads,
-  parent links, object availability, retention promises, and missing-object
-  requests with selected peers, then locally decides what to advertise, request,
-  store, verify, forward, or ignore. Source: `DI-dibut`.
+- Replace Git-style push/pull as the native collaboration model with continuous
+  peer DAG sync. Each agent's local sync role periodically or opportunistically
+  compares reference-set heads, parent links, object availability, retention
+  promises, and missing-object requests with selected peers, then locally decides
+  what to advertise, request, store, verify, forward, or ignore. Conventional Git
+  push/pull remains required bridge behavior, not native authority. Source:
+  `DI-dibut`; `DI-dofoj`.
 - Preserve POC superset discipline by inheriting POC16 protocol/CAS/kernel
   lessons. POC18 does not inherit POC17's M4/LoRa runtime scope. Source:
   `DI-zuruj`.
@@ -183,9 +198,13 @@ trusts. Source: `DI-zuruj`; `DI-dibut`.
 - Define signature/proof placement explicitly. Reference-set, release, review,
   and adoption promises should be signed by the promiser. COSE or other proof
   shapes must be selected by the pCID spec rather than assumed globally.
-- Define Git import/export requirements. POC18 starts PromiseGrid-native but is
-  not complete until it can import and export a real Git repo while preserving
-  content, directory structure, branch/tag targets, and parent DAG semantics.
+- Define Git bridge requirements. POC18 starts PromiseGrid-native but is not
+  complete until it can import from, export to, pull from, and push to a real Git
+  repo while preserving content, directory structure, branch/tag targets, and
+  parent DAG semantics. Import/export local filesystem edges and push/pull remote
+  transport edges should share one conversion core between Git refs/objects and
+  PromiseGrid reference sets, snapshots, manifests, chunks, and mapping records.
+  Source: `DI-dofoj`.
 - Define continuous-sync payloads before implementation. The main version-control
   pCID should cover reference-set advertisements, object-availability promises,
   missing-object requests, retention/forwarding offers, and local non-commitments
@@ -195,7 +214,9 @@ trusts. Source: `DI-zuruj`; `DI-dibut`.
 
 - Store exact bytes under CID-derived paths using CIDv1 base32 text when
   printable. No bare SHA-256 hex strings should appear as object identities.
-- Use restic's content-defined chunker library for normal file content.
+- Use Rabin content-defined chunking for all file content, including small text
+  files and large binary files. Large files are native in-band CAS objects, not
+  a special out-of-band transport or Git LFS-style exception. Source: `DI-dofoj`.
 - Store chunks and Merkle/index manifests in PromiseGrid CAS formats, not restic
   repository format.
 - Support at least these object classes:
@@ -206,7 +227,7 @@ trusts. Source: `DI-zuruj`; `DI-dibut`.
   - snapshot/change-set envelopes;
   - logical-change, branch, release, workspace, and review reference sets;
   - review/test/materialization promise envelopes;
-  - optional Git import/export mapping records.
+  - optional Git bridge mapping records for import, export, push, and pull.
 - Keep object type discoverable from CID codec, pCID, or object bytes. Do not
   rely on filename extensions as authority.
 - Support sparse retrieval. A fetched reference set may point at target CIDs
@@ -221,7 +242,7 @@ trusts. Source: `DI-zuruj`; `DI-dibut`.
 
 ## Scenarios
 
-- **Single-author edit:** Alice edits `README.md`, restic-chunks its content,
+- **Single-author edit:** Alice edits `README.md`, Rabin-chunks its content,
   stores chunks and a Merkle manifest in CAS, emits a file-version envelope, then
   emits a snapshot/change-set envelope pointing at a root directory reference set.
 - **Rename with history:** Alice renames `README.md` to `docs/intro.md`. The file
@@ -251,9 +272,9 @@ trusts. Source: `DI-zuruj`; `DI-dibut`.
 - **Malformed or malicious object:** Mallory sends bytes claiming to match a CID
   or publishes a misleading reference set. The recipient rejects mismatched bytes
   or distrusts Mallory locally without needing a global authority.
-- **Git roundtrip:** Alice imports a real Git repo, maps Git branches/tags into
-  reference-set promises, exports back to Git, and verifies content, directory
-  structure, branch/tag targets, and DAG semantics.
+- **Git bridge roundtrip:** Alice imports or pulls a real Git repo, maps Git
+  branches/tags into reference-set promises, exports or pushes back to Git, and
+  verifies content, directory structure, branch/tag targets, and DAG semantics.
 - **Continuous peer sync:** Alice and Bob do not run `push` or `pull`. Their
   local sync roles repeatedly exchange reference-set heads, object availability,
   missing-object requests, and retention promises. Each agent decides locally
@@ -284,8 +305,9 @@ trusts. Source: `DI-zuruj`; `DI-dibut`.
   local adoption decision without acting as a global approval.
 - Verify GC and retention behavior by requiring at least one promised-retained
   object and at least one locally dropped unpromised object.
-- Verify Git roundtrip behavior by importing/exporting a real Git repo and
-  checking content, directories, branch/tag targets, and DAG semantics.
+- Verify Git bridge behavior by importing/exporting and pulling/pushing a real
+  Git repo while checking content, directories, branch/tag targets, and DAG
+  semantics.
 - Verify continuous peer DAG sync by requiring at least one useful update to
   propagate without an explicit push/pull command and without any global remote
   authority. Source: `DI-dibut`.
@@ -310,25 +332,27 @@ Locked:
   POC18. Source: `DI-zuruj`.
 - Use one main version-control pCID unless a later TE/DI proves a truly separate
   protocol boundary. Source: `DI-zuruj`.
-- Use restic's content-defined chunker library, but store chunks and Merkle
-  manifests in PromiseGrid CAS formats. Source: `DI-zuruj`.
+- Use Rabin content-defined chunking for all files, and store chunks and Merkle
+  manifests in PromiseGrid CAS formats. Source: `DI-dofoj`.
 - Build PromiseGrid-native first, but POC18 is not complete until content and DAG
-  Git import/export roundtrip works. Source: `DI-zuruj`.
-- Use a Go Git library for import/export. Source: `DI-zuruj`.
+  Git bridge roundtrip works for import, export, push, and pull. Source:
+  `DI-dofoj`.
+- Use a Go Git library for the Git bridge. Source: `DI-zuruj`; `DI-dofoj`.
 - Use Files + Snapshots: per-file lineage plus snapshot/change-set envelopes.
   Source: `DI-zuruj`.
 - Native synchronization is continuous peer DAG sync, not explicit Git-style
   push/pull. Source: `DI-dibut`.
+- Tangled should influence POC18's self-hosting, migration, social-code UX,
+  review-round, and stable-logical-change requirements, but POC18 should
+  explicitly differ from Tangled's Git/SSH push-pull, appview aggregation,
+  role-based access control, hidden Git refs, and raw Jujutsu change-ID
+  mechanisms as native protocol concepts. Source: `DI-dibut`; `DN-dopod`.
 
 Remaining:
 
 - Lock implementation paths, command names, package names, runtime artifact
   paths, and generated CAS path patterns before scaffolding code.
-- Choose the exact Go libraries for Git import/export and restic chunking.
-- Review Tangled as prior art and decide what, if anything, POC18 should learn
-  from its decentralized Git hosting, self-hosted knots, appview, AT Protocol
-  identity, round-based pull-request flow, and Jujutsu change-ID usage. Source:
-  `DI-dibut`.
+- Choose the exact Go libraries for the Git bridge and Rabin chunking.
 - Decide whether LLM agents participate in the first implementation slice or
   whether POC18 begins deterministic and adds LLM-scale collaboration later.
 
@@ -337,8 +361,8 @@ Remaining:
 - [x] nahop.16 Create `docs/research/DN-rifir-poc18-versioned-reference-sets.md`
   describing the tag/reference-set decisions, the discussion that led to them,
   and the Git/Jujutsu reasoning behind them. Completed by `DN-rifir`.
-- [ ] nahop.1 Run a TE comparing three designs: Git-compatible object import/export,
-  PromiseGrid-native CAS/version graph only, and hybrid Git-import with
+- [ ] nahop.1 Run a TE comparing three designs: Git bridge compatibility,
+  PromiseGrid-native CAS/version graph only, and hybrid Git bridge with
   PromiseGrid-native reference-set promises.
 - [ ] nahop.2 Lock implementation paths, command names, package names, runtime
   artifact paths, and generated CAS path patterns before scaffolding
@@ -347,8 +371,8 @@ Remaining:
   using its pCID in code.
 - [ ] nahop.4 Implement per-agent sparse CAS object stores with CIDv1 base32
   printable paths and binary CID values inside CBOR.
-- [ ] nahop.5 Integrate restic content-defined chunking and PromiseGrid Merkle
-  manifests for file content storage.
+- [ ] nahop.5 Integrate Rabin content-defined chunking and PromiseGrid Merkle
+  manifests for all file content storage, including large in-band files.
 - [ ] nahop.6 Implement file-version envelopes with logical file identity, content
   root CIDs, and parent file-version links.
 - [ ] nahop.7 Implement directory reference sets where filename labels point at
@@ -367,25 +391,28 @@ Remaining:
   scenarios, including conflict-resolution promises.
 - [ ] nahop.14 Implement review/test-result promises and local adoption decisions
   that can replace a GitHub pull-request approval flow without forge authority.
-- [ ] nahop.15 Implement Git import/export content-and-DAG roundtrip with a Go Git
-  library.
+- [ ] nahop.15 Implement the Git bridge content-and-DAG roundtrip with a Go Git
+  library, covering import, export, push, and pull through shared conversion
+  paths.
 - [ ] nahop.17 Add promise-based retention and GC behavior for selected reference
   sets, release objects, paid storage, and unpromised objects under pressure.
-- [ ] nahop.18 Review Tangled as prior art and record whether POC18 should adopt,
+- [x] nahop.18 Review Tangled as prior art and record whether POC18 should adopt,
   reject, or explicitly differ from Tangled's self-hosted knots, appview,
   AT Protocol identity, round-based PR flow, SSH/Git compatibility, and Jujutsu
-  change-ID use. Source: `DI-dibut`.
+  change-ID use. Completed by
+  `docs/research/DN-dopod-poc18-tangled-prior-art.md`. Source: `DI-dibut`.
 - [ ] nahop.19 Implement continuous peer DAG sync so agents exchange
   reference-set heads, object-availability promises, missing-object requests, and
   retention/forwarding promises without explicit native push/pull commands.
   Source: `DI-dibut`.
 - [ ] nahop.20 Add analyzer gates for CID correctness, sparse CAS, parent-chain
   integrity, reference-set signatures, multi-target labels, directory labels,
-  logical-change reference sets, continuous sync, Git roundtrip, GC behavior, and
-  anti-authority vocabulary.
+  logical-change reference sets, continuous sync, Rabin chunking for large
+  in-band files, Git bridge roundtrip, GC behavior, and anti-authority
+  vocabulary.
 - [ ] nahop.21 Add diagnostic rendering of representative raw CBOR messages for
   reference-set, file-version, directory, snapshot, review, merge,
   materialization, and peer-fetch flows.
 - [ ] nahop.22 Run a clean deterministic POC18 scenario and archive exact commands,
-  CAS object examples, reference-set walks, parent-chain walks, Git roundtrip
+  CAS object examples, reference-set walks, parent-chain walks, Git bridge
   output, and analyzer output.

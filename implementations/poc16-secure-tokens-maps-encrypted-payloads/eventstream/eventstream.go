@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net"
+	"os"
 	"sync"
 	"time"
 
@@ -20,6 +21,8 @@ const (
 )
 
 const dialRetryDelay = 250 * time.Millisecond
+
+var stdoutMu sync.Mutex
 
 // Record is the observer-only event stream between a container supervisor and
 // the POC collector. Intent: This stream is not PromiseGrid traffic and cannot
@@ -51,6 +54,27 @@ type MessageArtifact struct {
 	PromiseAbout        string `json:"promise_about,omitempty"`
 	SourceEvent         string `json:"source_event,omitempty"`
 	EnvelopeBytesBase64 string `json:"envelope_bytes_b64"`
+}
+
+// WriteStdoutJSON writes one complete JSON record to stdout under a
+// process-wide lock.
+// Intent: Child processes may emit lifecycle, parser-role, kernel, app, and raw
+// message-artifact records from different packages and goroutines during
+// shutdown. The supervisor consumes stdout line-by-line, so all packages in the
+// process must share one stdout serializer instead of using independent mutexes
+// that can still interleave JSON lines. Source: DI-bakoz
+func WriteStdoutJSON(value any) ([]byte, error) {
+	encoded, marshalErr := json.Marshal(value)
+	if marshalErr != nil {
+		return nil, marshalErr
+	}
+	stdoutMu.Lock()
+	_, writeErr := fmt.Fprintln(os.Stdout, string(encoded))
+	stdoutMu.Unlock()
+	if writeErr != nil {
+		return nil, writeErr
+	}
+	return encoded, nil
 }
 
 // Client is one supervisor's long-lived connection to the observer-only
