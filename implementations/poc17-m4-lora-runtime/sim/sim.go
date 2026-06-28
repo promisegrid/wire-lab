@@ -34,16 +34,16 @@ func Run(cfg config.Config) error {
 	}
 	medium := radio.NewMedium(cfg.RadioMTUBytes, writer)
 	m4 := &device.Agent{
-		Name:        "m4-ivan",
-		Status:      "idle",
-		Battery:     87,
-		RetryBudget: cfg.RetryBudget,
-		CAS:         state.NewCAS(cfg.LocalCASLimit),
-		Writer:      writer,
-		Medium:      medium,
-		Peer:        "gateway-bob",
+		Name:       "m4-ivan",
+		Status:     "idle",
+		Battery:    87,
+		RetryLimit: cfg.RetryLimit,
+		CAS:        state.NewCAS(cfg.LocalCASLimit),
+		Writer:     writer,
+		Medium:     medium,
+		Peer:       "gateway-bob",
 	}
-	peer := &device.Peer{Name: "gateway-bob", Writer: writer, Medium: medium}
+	peer := &device.Peer{Name: "gateway-bob", Writer: writer, Medium: medium, Storage: state.NewCAS(2)}
 	lifecycle := newLifecycleSupervisor(cfg.RunID, writer)
 	if err := lifecycle.start("agent:"+m4.Name, "peer:"+peer.Name); err != nil {
 		return err
@@ -52,8 +52,29 @@ func Run(cfg config.Config) error {
 	medium.Register(peer.Name, peer)
 	medium.SetReachable(peer.Name, m4.Name, true)
 	medium.SetReachable(m4.Name, peer.Name, true)
-	missingParentCID, err := protocol.CIDForBytes([]byte("poc17 missing parent fixture"))
+	// Intent: Resource-limit configuration is analyzer-visible, but POC17 does
+	// not report activity usage unless the simulator actually measures it.
+	// Source: DI-gidul; DI-rujod
+	if err := device.EmitResourceLimitEvidence(writer, m4.Name, device.ResourceLimits{
+		RAMBytes:          cfg.RAMByteLimit,
+		FlashBytes:        cfg.FlashByteLimit,
+		EnergyUnits:       cfg.EnergyUnitLimit,
+		RadioAirtimeBytes: cfg.RadioAirtimeByteLimit,
+		RetryCount:        uint64(cfg.RetryLimit),
+		CASObjects:        uint64(cfg.LocalCASLimit),
+	}); err != nil {
+		return err
+	}
+	missingParentBytes := []byte("poc17 peer storage parent fixture")
+	missingParentCID, err := protocol.CIDForBytes(missingParentBytes)
 	if err != nil {
+		return err
+	}
+	m4.MissingCIDs = append(m4.MissingCIDs, missingParentCID)
+	if err := peer.GrantPeerStorage(m4.Name, 96, 2); err != nil {
+		return err
+	}
+	if err := m4.PutPeerStorage(missingParentBytes, "cas_retention_limit"); err != nil {
 		return err
 	}
 
@@ -100,7 +121,7 @@ func Run(cfg config.Config) error {
 		return err
 	}
 	for i := 1; i <= 4; i++ {
-		linkFrame, err := protocol.Build(protocol.Message{ProtocolName: protocol.ProtocolLoRaLink, Payload: []byte(fmt.Sprintf("link-budget-%d", i))})
+		linkFrame, err := protocol.Build(protocol.Message{ProtocolName: protocol.ProtocolLoRaLink, Payload: []byte(fmt.Sprintf("link-margin-%d", i))})
 		if err != nil {
 			return err
 		}
@@ -122,7 +143,23 @@ func Run(cfg config.Config) error {
 	if err := medium.Send(radio.Packet{From: m4.Name, To: peer.Name, Bytes: statusFrame, Label: "asymmetric"}); err != nil {
 		return err
 	}
-	if err := m4.PromisePeerStorage(missingParentCID); err != nil {
+	snapshot := m4.Snapshot()
+	if err := writer.WriteEvent(artifact.Event{Type: "device_restart_started", Actor: m4.Name, Outcome: "fresh_agent_requested", Details: map[string]any{"retained_cids": snapshot.RetainedCIDs, "missing_cids": snapshot.MissingCIDs}}); err != nil {
+		return err
+	}
+	m4 = device.NewAgentFromSnapshot(snapshot, cfg.LocalCASLimit, writer, medium)
+	medium.Register(m4.Name, m4)
+	if err := writer.WriteEvent(artifact.Event{Type: "device_recovery_loaded", Actor: m4.Name, Outcome: "token_and_missing_cids_loaded", Details: map[string]any{"token_cid": m4.Token.CID, "missing_cids": m4.MissingCIDs}}); err != nil {
+		return err
+	}
+	medium.SetReachable(m4.Name, peer.Name, true)
+	if err := m4.GetPeerStorage(missingParentCID, "missing_parent_after_restart"); err != nil {
+		return err
+	}
+	if !m4.CAS.Has(missingParentCID) {
+		return fmt.Errorf("fresh agent did not recover missing parent %s", missingParentCID)
+	}
+	if err := writer.WriteEvent(artifact.Event{Type: "device_recovery_verified", Actor: m4.Name, CID: missingParentCID, Outcome: "content_available_after_restart"}); err != nil {
 		return err
 	}
 	return lifecycle.finish()

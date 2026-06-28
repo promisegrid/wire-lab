@@ -10,7 +10,7 @@ const (
 	ProtocolDeviceStatus = specdocs.DeviceStatusV1
 	ProtocolLoRaLink     = specdocs.LoRaLinkV1
 	ProtocolOrderStatus  = specdocs.OrderStatusV1
-	ProtocolPeerStorage  = specdocs.PeerStorageV1
+	ProtocolPeerStorage  = specdocs.PeerStorage
 	ProtocolUnknownProbe = specdocs.UnknownProbeV1
 )
 

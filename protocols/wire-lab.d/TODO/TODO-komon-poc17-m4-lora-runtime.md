@@ -104,11 +104,29 @@ Affects: protocols/wire-lab.d/TODO/TODO-komon-poc17-m4-lora-runtime.md; protocol
 ID: DI-zopub
 Date: 2026-06-26 17:04:13 PDT
 Status: active
-Author: stevegt@t7a.org (Steve Traugott)
+Author: angela@t7a.org (Angela Traugott)
 Decision: Implement POC17 `komon.18` through `komon.23` as host-local lifecycle/resource-token evidence only, reusing the POC16 `local_lifecycle_v1` CWT/COSE discipline without sending lifecycle token bytes over the simulated LoRa path.
 Intent: POC17 must inherit the POC16 shutdown/resource model without making large CWT/COSE lifecycle tokens part of the 200-byte constrained radio contract. Keeping the first slice host-local proves promise-shaped supervisor/resource behavior while preserving the M4/LoRa wire path for compact device protocols.
 Constraints: Use the POC16 `local_lifecycle_v1` pCID for lifecycle evidence; use well-known COSE/CWT libraries for token creation and verification; store exact lifecycle frames separately from radio message artifacts; reject malformed, expired, replayed, wrong-run, and wrong-pCID tokens; record resource withdrawal as local resource-protection promise evidence, not command authority or global peer-trust evidence; require a later DR/DI before making lifecycle tokens LoRa-visible.
 Affects: implementations/poc17-m4-lora-runtime/protocol/; implementations/poc17-m4-lora-runtime/sim/; implementations/poc17-m4-lora-runtime/artifact/; implementations/poc17-m4-lora-runtime/analyzer/; implementations/poc17-m4-lora-runtime/README.md; implementations/poc17-m4-lora-runtime/CHANGELOG.md; DEV-GUIDE-RESOURCES.md; protocols/wire-lab.d/TODO/TODO-komon-poc17-m4-lora-runtime.md.
+
+ID: DI-gidul
+Date: 2026-06-27 16:08:54 PDT
+Status: active
+Author: angela@t7a.org (Angela Traugott)
+Decision: Extend POC17 with config-driven resource limits, fresh-agent restart recovery, and radio-visible unversioned `peer_storage` put/get promises that use Bob-issued compact capability tokens.
+Intent: POC17 should show useful constrained-device behavior beyond event-only peer-storage requests. Ivan must receive a storage capability from Bob before asking Bob to retain or return bytes, and every peer-storage message should be interpreted as a sender promise under the pCID rather than a command or RPC. Resource wording should use explicit limits, not budget or pressure language.
+Constraints: Replace touched `budget` wording with `limit`; use `put` and `get` rather than store/fetch; remove redundant payload action slots because `peer_storage` pCID defines promise semantics; keep compact radio-visible peer-storage tokens scoped to this POC17 slice while leaving full CWT/COSE radio-visible tokens to a later constrained-token decision; use exact message CIDs for correlation; verify returned bytes against requested CIDs before accepting them.
+Affects: implementations/poc17-m4-lora-runtime/config/; implementations/poc17-m4-lora-runtime/config.json; implementations/poc17-m4-lora-runtime/protocol/; implementations/poc17-m4-lora-runtime/docs/protocols/; implementations/poc17-m4-lora-runtime/device/; implementations/poc17-m4-lora-runtime/state/; implementations/poc17-m4-lora-runtime/sim/; implementations/poc17-m4-lora-runtime/analyzer/; implementations/poc17-m4-lora-runtime/README.md; implementations/poc17-m4-lora-runtime/CHANGELOG.md; DEV-GUIDE-RESOURCES.md; protocols/wire-lab.d/TODO/TODO-komon-poc17-m4-lora-runtime.md.
+
+ID: DI-rujod
+Date: 2026-06-27 16:34:45 PDT
+Status: active
+Author: angela@t7a.org (Angela Traugott)
+Decision: POC17 must not emit resource-activity usage values unless the simulator actually measures that activity.
+Intent: Synthetic near-limit values for RAM, flash, energy, radio airtime, retry use, or retained CAS objects can mislead readers into thinking the run measured real activity. The simulator may still report configured limits, and it may later report usage when that value is derived from actual simulator counters.
+Constraints: Remove fake `used` and `remaining` resource events; keep limit snapshots separate from activity; analyzer gates must not require synthetic resource-condition events; future activity fields must name the actual counter source.
+Affects: implementations/poc17-m4-lora-runtime/device/resources.go; implementations/poc17-m4-lora-runtime/sim/sim.go; implementations/poc17-m4-lora-runtime/analyzer/analyzer.go; implementations/poc17-m4-lora-runtime/README.md; protocols/wire-lab.d/TODO/TODO-komon-poc17-m4-lora-runtime.md.
 
 ## Scope
 
@@ -464,17 +482,17 @@ This section is the starting context for the next Codex operator. Complete
   Implemented as `gateway-bob` in the Go simulator. Source: `DI-pobir`.
 - [x] komon.8 Add small-device pCID specs and compact payload shapes for link,
   status, and one useful device promise. First slice covers `device_status_v1`,
-  `lora_link_v1`, and `peer_storage_v1` with compact positional payloads.
-  Source: `DI-pobir`.
+  `lora_link_v1`, and unversioned `peer_storage` with compact positional
+  payloads. Source: `DI-pobir`; updated by `DI-gidul`.
 - [x] komon.9 Add bounded retry, packet-loss, MTU, duplicate, replay,
-  malformed-frame, energy-pressure, and asymmetric-link scenarios.
-  Implemented in the deterministic Go simulator; energy pressure is represented
-  by explicit battery/retry/local-budget evidence, not hardware energy modeling.
-  Source: `DI-pobir`.
+  malformed-frame, energy-limit, and asymmetric-link scenarios. Implemented in
+  the deterministic Go simulator; energy behavior is represented by explicit
+  battery, retry-limit, and resource-limit evidence, not hardware energy
+  modeling. Source: `DI-pobir`; updated by `DI-gidul`.
 - [x] komon.10 Add tiny sparse CAS, parent-link retention, peer-storage promises,
   and local GC behavior for the M4 agent. Implemented as bounded local CAS,
-  missing-parent evidence, peer-storage promise evidence, and GC analyzer gates.
-  Source: `DI-pobir`.
+  missing-parent evidence, peer-storage grant/put/get evidence, fresh-agent
+  recovery, and GC analyzer gates. Source: `DI-pobir`; updated by `DI-gidul`.
 - [x] komon.17 Verify POC17 handles every pCID and CID with the CID-first rule:
   binary CID bytes on the radio/wire path, canonical CIDv1 base32 text with
   multibase `b` prefix in logs, filenames, diagnostics, JSON, and operator-visible
@@ -520,6 +538,12 @@ This section is the starting context for the next Codex operator. Complete
   peer-trust evidence. Source: `TE-ragin`; `DN-lujad`; `DI-fohop`. Implemented
   as host-local resource withdrawal evidence with explicit non-authority and
   non-peer-trust markers. Source: `DI-zopub`.
+- [x] komon.24 Add explicit resource-limit snapshots, fresh-agent restart
+  recovery, and radio-visible `peer_storage` put/get promises with Bob-issued
+  compact capability tokens. Implemented by `DI-gidul`: Bob grants Ivan a token,
+  Ivan presents it on put/get, Bob retains and returns exact bytes, and Ivan
+  verifies returned bytes by CID after restart. Updated by `DI-rujod`: resource
+  activity usage is not reported unless it is actually measured.
 - [ ] komon.11 Add analyzer gates proving radio-only transport, exact CBOR
   artifacts, pCID-owned payloads, sparse CAS behavior, failure handling, and
   no authority drift.

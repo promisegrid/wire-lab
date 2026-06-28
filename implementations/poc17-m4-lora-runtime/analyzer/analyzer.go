@@ -23,7 +23,11 @@ type Summary struct {
 	NonCommitments      int `json:"non_commitments"`
 	CASStores           int `json:"cas_stores"`
 	CASGC               int `json:"cas_gc"`
-	PeerStorage         int `json:"peer_storage"`
+	PeerStorageGrants   int `json:"peer_storage_grants"`
+	PeerStoragePuts     int `json:"peer_storage_puts"`
+	PeerStoragePutAcks  int `json:"peer_storage_put_acks"`
+	PeerStorageGets     int `json:"peer_storage_gets"`
+	PeerStorageGetAcks  int `json:"peer_storage_get_acks"`
 	FidelityNotices     int `json:"fidelity_notices"`
 	OrderStatusEvents   int `json:"order_status_events"`
 	LifecycleIssued     int `json:"lifecycle_issued"`
@@ -33,6 +37,9 @@ type Summary struct {
 	LifecycleArtifacts  int `json:"lifecycle_artifacts"`
 	ResourcePromises    int `json:"resource_promises"`
 	ResourceWithdrawals int `json:"resource_withdrawals"`
+	ResourceSnapshots   int `json:"resource_snapshots"`
+	DeviceRestarts      int `json:"device_restarts"`
+	DeviceRecoveries    int `json:"device_recoveries"`
 }
 
 // Analyze checks the first POC17 behavior evidence gates.
@@ -49,6 +56,10 @@ func Analyze(runDir string) (Summary, error) {
 		}
 		if strings.Contains(strings.ToLower(fmt.Sprint(event.Details)), "sigterm") || strings.Contains(strings.ToLower(fmt.Sprint(event.Details)), "sigkill") {
 			return Summary{}, fmt.Errorf("clean lifecycle path used signal fallback")
+		}
+		legacyLimitWord := "bud" + "get"
+		if strings.Contains(strings.ToLower(fmt.Sprint(event.Details)), legacyLimitWord) || strings.Contains(strings.ToLower(event.Outcome), legacyLimitWord) {
+			return Summary{}, fmt.Errorf("event %s used legacy limit wording", event.Type)
 		}
 		switch event.Type {
 		case "radio_send":
@@ -93,8 +104,31 @@ func Analyze(runDir string) (Summary, error) {
 			}
 		case "cas_gc":
 			summary.CASGC++
-		case "peer_storage_promise":
-			summary.PeerStorage++
+		case "peer_storage_grant_sent", "peer_storage_grant_received":
+			summary.PeerStorageGrants++
+			if event.PCID != protocol.MustPCIDForName(protocol.ProtocolPeerStorage) {
+				return Summary{}, fmt.Errorf("peer storage grant missing peer_storage pCID")
+			}
+		case "peer_storage_put_promised", "peer_storage_put_received":
+			summary.PeerStoragePuts++
+			if event.PCID != protocol.MustPCIDForName(protocol.ProtocolPeerStorage) {
+				return Summary{}, fmt.Errorf("peer storage put missing peer_storage pCID")
+			}
+		case "peer_storage_put_accepted", "peer_storage_put_refused":
+			summary.PeerStoragePutAcks++
+			if event.PCID != protocol.MustPCIDForName(protocol.ProtocolPeerStorage) {
+				return Summary{}, fmt.Errorf("peer storage put result missing peer_storage pCID")
+			}
+		case "peer_storage_get_promised", "peer_storage_get_received":
+			summary.PeerStorageGets++
+			if event.PCID != protocol.MustPCIDForName(protocol.ProtocolPeerStorage) {
+				return Summary{}, fmt.Errorf("peer storage get missing peer_storage pCID")
+			}
+		case "peer_storage_get_fulfilled", "peer_storage_get_refused":
+			summary.PeerStorageGetAcks++
+			if event.PCID != protocol.MustPCIDForName(protocol.ProtocolPeerStorage) {
+				return Summary{}, fmt.Errorf("peer storage get result missing peer_storage pCID")
+			}
 		case "simulator_fidelity_notice":
 			summary.FidelityNotices++
 		case "order_status_received", "order_status_promise", "order_ack_received", "peer_order_status_received", "peer_order_ack_received":
@@ -135,6 +169,12 @@ func Analyze(runDir string) (Summary, error) {
 			if event.Details["not_command_authority"] != true || event.Details["not_peer_trust_evidence"] != true {
 				return Summary{}, fmt.Errorf("resource withdrawal drifted into authority or peer-trust evidence")
 			}
+		case "resource_limit_snapshot":
+			summary.ResourceSnapshots++
+		case "device_restart_started":
+			summary.DeviceRestarts++
+		case "device_recovery_loaded", "device_recovery_verified":
+			summary.DeviceRecoveries++
 		}
 	}
 	if summary.RadioSends == 0 || summary.RadioReceives == 0 {
@@ -146,8 +186,8 @@ func Analyze(runDir string) (Summary, error) {
 	if summary.MalformedArtifacts == 0 || summary.MTURefusals == 0 || summary.NonCommitments == 0 {
 		return summary, fmt.Errorf("missing failure-path evidence")
 	}
-	if summary.PeerStorage == 0 {
-		return summary, fmt.Errorf("missing peer-storage promise evidence")
+	if summary.PeerStorageGrants < 2 || summary.PeerStoragePuts < 2 || summary.PeerStoragePutAcks < 2 || summary.PeerStorageGets < 2 || summary.PeerStorageGetAcks == 0 {
+		return summary, fmt.Errorf("missing peer-storage grant/put/get evidence")
 	}
 	if summary.CASGC == 0 {
 		return summary, fmt.Errorf("missing local CAS GC evidence")
@@ -166,6 +206,12 @@ func Analyze(runDir string) (Summary, error) {
 	}
 	if summary.ResourcePromises < 2 || summary.ResourceWithdrawals == 0 {
 		return summary, fmt.Errorf("missing resource promise or withdrawal evidence")
+	}
+	if summary.ResourceSnapshots == 0 {
+		return summary, fmt.Errorf("missing resource limit evidence")
+	}
+	if summary.DeviceRestarts == 0 || summary.DeviceRecoveries < 2 {
+		return summary, fmt.Errorf("missing fresh-agent restart recovery evidence")
 	}
 	return summary, nil
 }

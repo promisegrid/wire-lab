@@ -13,15 +13,15 @@ const (
 	DeviceStatusV1 = "device_status_v1"
 	LoRaLinkV1     = "lora_link_v1"
 	OrderStatusV1  = "order_status_v1"
-	PeerStorageV1  = "peer_storage_v1"
+	PeerStorage    = "peer_storage"
 	UnknownProbeV1 = "unknown_probe_v1"
 )
 
 const (
 	DeviceStatusV1PCID = "bafkreihmlpwkc5ke2zbfvur4mylrikkainqlq4zr5lkwacjys5bgreekhu"
-	LoRaLinkV1PCID     = "bafkreifwrfaveh4d2pkizq7pfidflk7cf2gtvfxkcroklizftudiav4r6i"
+	LoRaLinkV1PCID     = "bafkreidkjwel2vvaqhdwjl6udpw62uxhhrmz5myyoumvwixl7rwaefioby"
 	OrderStatusV1PCID  = "bafkreidv6zmcfrdopsdpbomlwt75fklmbittdgyztzkaofndw7biorgqne"
-	PeerStorageV1PCID  = "bafkreiblomxdawqalqqwdbwh6hlorzdejpkwfmrmt64kxbirohk75vp6dq"
+	PeerStoragePCID    = "bafkreihbt6i6g4bmdinikr4l7vtoqki4nsyxn3eob5lz42bdnhghnrnula"
 	UnknownProbeV1PCID = "bafkreibtn5h2wf4lz2gbn5tbsjujfxpnadhsoda6x4uq7ok5pnqfuqqdya"
 )
 
@@ -31,14 +31,14 @@ const (
 // readable placeholder names, while retaining local names for diagnostics and
 // handler dispatch. Source: DI-dutah
 //
-//go:embed device-status-v1.md lora-link-v1.md order-status-v1.md peer-storage-v1.md unknown-probe-v1.md
+//go:embed device-status-v1.md lora-link-v1.md order-status-v1.md peer-storage.md unknown-probe-v1.md
 var docs embed.FS
 
 var protocolFiles = map[string]string{
 	DeviceStatusV1: "device-status-v1.md",
 	LoRaLinkV1:     "lora-link-v1.md",
 	OrderStatusV1:  "order-status-v1.md",
-	PeerStorageV1:  "peer-storage-v1.md",
+	PeerStorage:    "peer-storage.md",
 	UnknownProbeV1: "unknown-probe-v1.md",
 }
 
@@ -46,7 +46,7 @@ var protocolPCIDs = map[string]string{
 	DeviceStatusV1: DeviceStatusV1PCID,
 	LoRaLinkV1:     LoRaLinkV1PCID,
 	OrderStatusV1:  OrderStatusV1PCID,
-	PeerStorageV1:  PeerStorageV1PCID,
+	PeerStorage:    PeerStoragePCID,
 	UnknownProbeV1: UnknownProbeV1PCID,
 }
 

@@ -84,3 +84,40 @@ func TestBuildParseOrderStatusPayload(t *testing.T) {
 		t.Fatalf("unexpected order payload: %+v", decoded)
 	}
 }
+
+func TestBuildParsePeerStoragePayloadsUseShape(t *testing.T) {
+	content := []byte("parent fixture")
+	contentCID, err := CIDForBytes(content)
+	if err != nil {
+		t.Fatal(err)
+	}
+	token := []byte("compact-token")
+	put, err := BuildPeerStoragePut(PeerStoragePayload{
+		Holder:     "m4-ivan",
+		Issuer:     "gateway-bob",
+		Token:      token,
+		ContentCID: contentCID,
+		Content:    content,
+		Reason:     "cas_retention_limit",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	item, err := Decode(put)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(item.Array) != 6 {
+		t.Fatalf("put payload should not include a redundant kind slot: %#v", item.Array)
+	}
+	if item.Array[3].Tag == nil || item.Array[3].Tag.Number != CIDTag {
+		t.Fatalf("content CID must use tag 42, got %#v", item.Array[3])
+	}
+	decoded, err := ParsePeerStoragePayload(put)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if decoded.Kind != PeerStoragePut || decoded.ContentCID != contentCID || string(decoded.Content) != string(content) {
+		t.Fatalf("unexpected peer_storage put payload: %+v", decoded)
+	}
+}

@@ -2,6 +2,10 @@
   "run_id": "poc17-demo",
   "run_root": "/tmp/wire-lab-poc17",
   "radio_mtu_bytes": 200,
-  "retry_budget": 2,
-  "local_cas_limit": 4
+  "retry_limit": 2,
+  "local_cas_limit": 4,
+  "ram_byte_limit": 4096,
+  "flash_byte_limit": 16384,
+  "energy_unit_limit": 100,
+  "radio_airtime_byte_limit": 800
 }

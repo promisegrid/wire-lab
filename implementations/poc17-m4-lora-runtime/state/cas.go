@@ -4,7 +4,7 @@ import (
 	"promisegrid.dev/wire-lab/implementations/poc17-m4-lora-runtime/protocol"
 )
 
-// CAS is a tiny sparse store with pressure-driven GC.
+// CAS is a tiny sparse store with limit-driven GC.
 type CAS struct {
 	limit   int
 	order   []string
@@ -35,10 +35,24 @@ func (c *CAS) Put(data []byte) (contentCID string, evicted []string) {
 	return contentCID, evicted
 }
 
+// Get returns exact retained bytes for a CID.
+func (c *CAS) Get(contentCID string) ([]byte, bool) {
+	data, ok := c.objects[contentCID]
+	if !ok {
+		return nil, false
+	}
+	return append([]byte(nil), data...), true
+}
+
 // Has reports whether exact bytes are still locally retained.
 func (c *CAS) Has(contentCID string) bool {
 	_, ok := c.objects[contentCID]
 	return ok
+}
+
+// CIDs returns retained object CIDs in retention order.
+func (c *CAS) CIDs() []string {
+	return append([]string(nil), c.order...)
 }
 
 // Count returns the retained object count.

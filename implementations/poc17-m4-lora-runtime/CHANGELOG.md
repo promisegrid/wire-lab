@@ -11,3 +11,8 @@
   identifiers to canonical CID text.
 - Add host-local `local_lifecycle_v1` CWT/COSE lifecycle tokens and resource
   withdrawal evidence without sending token bytes over LoRa.
+- Add config-driven resource-limit snapshots, fresh-agent restart recovery, and
+  radio-visible `peer_storage` grant/put/get promises using Bob-issued compact
+  capability tokens.
+- Remove synthetic resource-activity usage values from POC17 evidence; only
+  configured limits are reported until activity is actually measured.
