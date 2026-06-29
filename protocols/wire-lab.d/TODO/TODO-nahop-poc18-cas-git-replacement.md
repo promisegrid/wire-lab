@@ -13,6 +13,12 @@ CWT/COSE token, encrypted-payload, lifecycle-token, raw-message, and analyzer
 lessons. It does not inherit POC17's M4/LoRa runtime scope. Source: `DI-vilum`;
 `DI-zuruj`.
 
+`TE-vahoj` is the hard-gate POC18 superset architecture TE before code
+scaffolding. It extends `TE-kopap` with today's session-log requirements:
+sparse shared CAS, background chunk pulling, promise-shaped retrieval and
+capability-token economics, UI/backend library boundaries, in-band
+collaboration, and DevOps ordered replay. Source: `DI-fusir`.
+
 ## Decision Intent Log
 
 ID: DI-vilum
@@ -72,6 +78,15 @@ Decision: Implement `nahop.3` as one normative implementation-local POC18 versio
 Intent: POC18 needs an RFC-like pCID spec before code can safely use a version-control pCID. The spec must be comprehensive enough for a developer to implement from the document, must encompass the related design notes and thought experiments, and must avoid stale version-number vocabulary by treating the pCID as the version. Keeping the spec under the implementation-local `docs/protocols/` tree follows the POC16 pattern and prevents root docs from becoming a stale competing protocol authority.
 Constraints: The spec is the single normative POC18 version-control pCID unless a later TE/DI proves a distinct protocol boundary; pCID remains a protocol selector, not a branch name, operation code, address, repository name, or message type; diagrams must be plain ASCII suitable for svgbob-style conversion; examples must annotate message slots and payload fields; Git import/export/push/pull remain bridge adapter behavior rather than native synchronization; native synchronization remains continuous peer DAG sync; the spec itself must not embed its own final pCID because the pCID is derived externally from exact bytes.
 Affects: protocols/wire-lab.d/TODO/TODO-nahop-poc18-cas-git-replacement.md; implementations/poc18-cas-git-replacement/docs/protocols/version-control.md; implementations/poc18-cas-git-replacement/docs/protocols/<base32-pCID>.md; DEV-GUIDE-RESOURCES.md.
+
+ID: DI-fusir
+Date: 2026-06-28 19:38:10 PDT
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Add `TE-vahoj` as the hard-gate POC18 superset architecture TE before `nahop.2` code-scaffolding decisions.
+Intent: The POC18 plan grew beyond the earlier Git/native architecture TE. Today's session added implementation-sequencing risk, sparse shared CAS, active background chunk pulling, promise-based inter-agent retrieval, capability-token economics, UI/backend library boundaries, possible local `grid()` messages, in-band GitHub replacement surfaces, and DevOps ordered replay based on `implementations/poc18-cas-git-replacement/docs/turing-equiv.html`. These requirements must be tested together before code starts so POC18 does not drift into a local-only, Git-shaped, or RPC-shaped blind path.
+Constraints: Keep `TE-kopap`, `DN-rifir`, `DN-dopod`, and the current POC18 spec as inputs; do not use the new TE to rewrite history or relax existing DIs; do not scaffold POC18 code until the TE's remaining DF questions are answered and locked; preserve pCID discipline, CID rendering rules, Promise Theory vocabulary, and POC16-superset scope.
+Affects: docs/thought-experiments/TE-vahoj-poc18-superset-architecture.md; docs/thought-experiments/README.md; protocols/wire-lab.d/TODO/TODO-nahop-poc18-cas-git-replacement.md; protocols/wire-lab.d/TODO/TODO.md; protocols/wire-lab.d/specs/harness-spec-draft.md; DEV-GUIDE-RESOURCES.md; implementations/poc18-cas-git-replacement/docs/turing-equiv.html; future implementations/poc18-cas-git-replacement/.
 
 ## Core Hypothesis
 
@@ -396,6 +411,12 @@ Locked:
   reference-set/CAS core with required Git bridge import/export/push/pull as an
   adapter, not as the native authority model. Source: `TE-kopap`; `DI-zuruj`;
   `DI-dofoj`.
+- TE-vahoj adds the post-TE-kopap hard-gate architecture and implementation
+  sequencing analysis. Its recommended surviving path is deterministic local
+  core first, but forced by tests and interfaces to preserve sparse multi-agent
+  CAS assumptions from day one, with repo-like views over shared CAS and
+  versioned reference sets. Its remaining DF questions must be answered before
+  POC18 code scaffolding. Source: `TE-vahoj`; `DI-fusir`.
 - The POC18 version-control protocol spec is
   `implementations/poc18-cas-git-replacement/docs/protocols/version-control.md`,
   with pCID alias
@@ -479,3 +500,9 @@ Remaining:
 - [ ] nahop.22 Run a clean deterministic POC18 scenario and archive exact commands,
   CAS object examples, reference-set walks, parent-chain walks, Git bridge
   output, and analyzer output.
+- [x] nahop.23 Run the hard-gate POC18 superset architecture TE covering today's
+  full planning thread, sparse shared CAS, promise-shaped retrieval, UI/backend
+  boundaries, in-band collaboration, DevOps ordered replay, and first-slice
+  sequencing. Completed by
+  `docs/thought-experiments/TE-vahoj-poc18-superset-architecture.md`. Source:
+  `DI-fusir`.
