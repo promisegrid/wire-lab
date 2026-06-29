@@ -439,6 +439,12 @@ Locked:
   terminology with PromiseGrid-native CAS, promise, and reference-set semantics;
   use `CLI/core` as the implementation split; use `poc-*` only for
   non-production deterministic fixtures. Source: `TE-hikar`; `DI-harih`.
+- TE-givul analyzes whether POC18 chunks should remain raw `.bin` byte objects
+  or move to CBOR `.cbor` objects. It recommends raw public chunk identity for
+  deduplication, IPFS-like raw-block interop, and simple sparse retrieval, while
+  keeping CBOR/grid messages responsible for manifests, promises, retention, and
+  interpretation. It keeps encrypted/ciphertext chunk identity as a future
+  explicit profile and leaves final DF open. Source: `TE-givul`; `DI-dofoj`.
 - POC18 code scaffolding uses layer packages `store`, `graph`, `workspace`,
   `sync`, and `bridge`; generated first-slice runtime state lives only under
   `/tmp/wire-lab-poc18-*`; DevOps/root-filesystem tests are container-only and
@@ -554,3 +560,11 @@ Remaining:
   CAS, and reference-set semantics before locking first-slice `grid` verbs.
   Completed by `docs/thought-experiments/TE-hikar-poc18-grid-cli-command-model.md`.
   Source: `DI-harih`.
+- [x] nahop.25 Run a chunk storage identity TE comparing raw chunks, CBOR
+  chunks, grid-wrapped chunk promises, encrypted chunks, IPFS/IPLD, Git, Ceph,
+  and related storage systems. Completed by
+  `docs/thought-experiments/TE-givul-poc18-chunk-storage-identity.md`.
+- [ ] nahop.26 Lock the follow-up DF from `TE-givul`: whether public/plain chunk
+  CIDs name raw bytes, whether raw chunks remain under `chunks/*.bin` or move
+  under `objects/`, whether encrypted chunks use ciphertext CIDs, and whether
+  standalone manifest objects remain distinct from `chunk_manifest` messages.

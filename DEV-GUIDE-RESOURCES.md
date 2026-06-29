@@ -74,13 +74,18 @@ locks the first `grid` CLI balance: `grid` is the user-facing CLI, `poc-*`
 commands are deterministic non-production fixtures, docs use `CLI/core`, and the
 first command set avoids Git's native staging and push/pull assumptions while
 still exposing familiar `init`, `ingest`, `snapshot`, `checkout`, `refs`, and
-`diag` operations. The first POC18 code slice now implements sparse filesystem
-CAS, Rabin chunk manifests, POSIX node messages, directory/branch/release/
-logical-change/review/workspace reference sets, snapshot messages, checkout, a
-promise-shaped sync seam, Git bridge stubs, diagnostic CBOR rendering, and a
-clean `/tmp/wire-lab-poc18-*` fixture run. Source: `DI-zuruj`; `DI-dibut`;
-`DI-dofoj`; `DI-radaj`; `DI-lidaj`; `DI-fusir`; `DI-jifuj`; `DI-harih`;
-`DN-dopod`; `TE-kopap`; `TE-vahoj`; `TE-hikar`.
+`diag` operations. TE-givul now flags chunk object identity as an explicit
+follow-up DF: the current implementation stores public/plain Rabin chunks as raw
+`.bin` byte objects and points at them from CBOR/grid manifests; the TE
+recommends preserving raw-byte chunk identity for public chunks while treating
+encrypted/ciphertext chunk identity as a later explicit profile. The first POC18
+code slice now implements sparse filesystem CAS, Rabin chunk manifests, POSIX
+node messages, directory/branch/release/logical-change/review/workspace
+reference sets, snapshot messages, checkout, a promise-shaped sync seam, Git
+bridge stubs, diagnostic CBOR rendering, and a clean `/tmp/wire-lab-poc18-*`
+fixture run. Source: `DI-zuruj`; `DI-dibut`; `DI-dofoj`; `DI-radaj`;
+`DI-lidaj`; `DI-fusir`; `DI-jifuj`; `DI-harih`; `DN-dopod`; `TE-kopap`;
+`TE-vahoj`; `TE-hikar`; `TE-givul`.
 
 ### Current Wire Direction
 
