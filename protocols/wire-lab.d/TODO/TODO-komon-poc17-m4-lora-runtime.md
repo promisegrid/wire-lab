@@ -550,7 +550,9 @@ This section is the starting context for the next Codex operator. Complete
   peripheral model, the M4/RFM95/CircuitPython behavior that must be modeled or
   explicitly excluded, and fidelity gates for SPI, radio-driver behavior, packet
   semantics, memory, energy, and hardware assumptions. This remains non-blocking
-  for the current Go POC17 clean run. Source: `DI-libis`.
+  for the current Go POC17 clean run. Source: `DI-libis`. TE completed as
+  `docs/thought-experiments/TE-juhah-poc17-rust-renode-fidelity-roadmap.md`;
+  decision status: needs DF.
 - [x] komon.11 Add analyzer gates proving radio-only transport, exact CBOR
   artifacts, pCID-owned payloads, sparse CAS behavior, failure handling, and
   no authority drift. Implemented as cross-event gates for simulated-LoRa-only
