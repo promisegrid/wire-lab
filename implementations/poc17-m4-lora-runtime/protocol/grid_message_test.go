@@ -91,6 +91,14 @@ func TestBuildParsePeerStoragePayloadsUseShape(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	requestCID, err := CIDForBytes([]byte("peer_storage request"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	tokenCID, err := CIDForBytes([]byte("compact-token"))
+	if err != nil {
+		t.Fatal(err)
+	}
 	token := []byte("compact-token")
 	put, err := BuildPeerStoragePut(PeerStoragePayload{
 		Holder:     "m4-ivan",
@@ -119,5 +127,42 @@ func TestBuildParsePeerStoragePayloadsUseShape(t *testing.T) {
 	}
 	if decoded.Kind != PeerStoragePut || decoded.ContentCID != contentCID || string(decoded.Content) != string(content) {
 		t.Fatalf("unexpected peer_storage put payload: %+v", decoded)
+	}
+	putResult, err := BuildPeerStoragePutResult(PeerStoragePayload{
+		Issuer:            "gateway-bob",
+		Holder:            "m4-ivan",
+		TokenCID:          tokenCID,
+		RelatedMessageCID: requestCID,
+		ContentCID:        contentCID,
+		Accepted:          true,
+		Reason:            "retain_until_replaced",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	decodedPutResult, err := ParsePeerStoragePayload(putResult)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if decodedPutResult.Kind != PeerStoragePutResult || decodedPutResult.RelatedMessageCID != requestCID || !decodedPutResult.Accepted {
+		t.Fatalf("unexpected peer_storage put result payload: %+v", decodedPutResult)
+	}
+	getResult, err := BuildPeerStorageGetResult(PeerStoragePayload{
+		Issuer:            "gateway-bob",
+		Holder:            "m4-ivan",
+		TokenCID:          tokenCID,
+		RelatedMessageCID: requestCID,
+		ContentCID:        contentCID,
+		Content:           content,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	decodedGetResult, err := ParsePeerStoragePayload(getResult)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if decodedGetResult.Kind != PeerStorageGetResult || decodedGetResult.RelatedMessageCID != requestCID || string(decodedGetResult.Content) != string(content) {
+		t.Fatalf("unexpected peer_storage get result payload: %+v", decodedGetResult)
 	}
 }

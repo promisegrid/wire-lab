@@ -60,7 +60,7 @@ Bob reports whether he accepted a put promise:
 [
   issuer: text,
   holder: text,
-  42(token_cid),
+  42(related_message_cid),
   42(content_cid),
   accepted: uint,
   note: text
@@ -85,7 +85,7 @@ Bob fulfills a get promise only by returning exact bytes:
 [
   issuer: text,
   holder: text,
-  42(token_cid),
+  42(related_message_cid),
   42(content_cid),
   content: bytes
 ]
@@ -97,7 +97,7 @@ Bob refuses a get promise:
 [
   issuer: text,
   holder: text,
-  42(token_cid),
+  42(related_message_cid),
   42(content_cid),
   reason: text
 ]
@@ -114,8 +114,13 @@ is asking for bytes under that same token.
 ## Receiver behavior
 
 Bob verifies token bytes, holder, allowed kind, content size, object count, and
-content CID before accepting a put or fulfilling a get. Ivan verifies every
-returned content byte string by recomputing its CID before retaining it locally.
+content CID before accepting a put or fulfilling a get. Result messages carry
+the related request message CID instead of repeating the token CID; the related
+request already contains the presented token, and omitting the duplicate token
+CID keeps the response inside the 200-byte MTU. Ivan uses the related request
+CID to distinguish a put acknowledgement from a later get fulfillment, and
+verifies every returned content byte string by recomputing its CID before
+retaining it locally.
 
 ## Security considerations
 

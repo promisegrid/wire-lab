@@ -61,7 +61,10 @@ func BuildPeerStoragePut(payload PeerStoragePayload) ([]byte, error) {
 
 // BuildPeerStoragePutResult creates Bob's acceptance or refusal of a put.
 func BuildPeerStoragePutResult(payload PeerStoragePayload) ([]byte, error) {
-	tokenCID, err := cidItem(payload.TokenCID)
+	// Intent: Result tuples carry the related request CID for correlation but
+	// omit the token CID because the related request already contains the token;
+	// this keeps the response inside the 200-byte POC17 MTU. Source: DI-gidul
+	relatedMessageCID, err := cidItem(payload.RelatedMessageCID)
 	if err != nil {
 		return nil, err
 	}
@@ -76,7 +79,7 @@ func BuildPeerStoragePutResult(payload PeerStoragePayload) ([]byte, error) {
 	return Encode(ArrayItem(
 		TextItem(payload.Issuer),
 		TextItem(payload.Holder),
-		tokenCID,
+		relatedMessageCID,
 		contentCID,
 		UintItem(accepted),
 		TextItem(payload.Reason),
@@ -100,7 +103,7 @@ func BuildPeerStorageGet(payload PeerStoragePayload) ([]byte, error) {
 
 // BuildPeerStorageGetResult creates Bob's fulfillment with exact bytes.
 func BuildPeerStorageGetResult(payload PeerStoragePayload) ([]byte, error) {
-	tokenCID, err := cidItem(payload.TokenCID)
+	relatedMessageCID, err := cidItem(payload.RelatedMessageCID)
 	if err != nil {
 		return nil, err
 	}
@@ -111,7 +114,7 @@ func BuildPeerStorageGetResult(payload PeerStoragePayload) ([]byte, error) {
 	return Encode(ArrayItem(
 		TextItem(payload.Issuer),
 		TextItem(payload.Holder),
-		tokenCID,
+		relatedMessageCID,
 		contentCID,
 		BytesItem(payload.Content),
 	))
@@ -119,7 +122,7 @@ func BuildPeerStorageGetResult(payload PeerStoragePayload) ([]byte, error) {
 
 // BuildPeerStorageGetRefusal creates Bob's refusal to return bytes.
 func BuildPeerStorageGetRefusal(payload PeerStoragePayload) ([]byte, error) {
-	tokenCID, err := cidItem(payload.TokenCID)
+	relatedMessageCID, err := cidItem(payload.RelatedMessageCID)
 	if err != nil {
 		return nil, err
 	}
@@ -130,7 +133,7 @@ func BuildPeerStorageGetRefusal(payload PeerStoragePayload) ([]byte, error) {
 	return Encode(ArrayItem(
 		TextItem(payload.Issuer),
 		TextItem(payload.Holder),
-		tokenCID,
+		relatedMessageCID,
 		contentCID,
 		TextItem(payload.Reason),
 	))
@@ -167,8 +170,8 @@ func parsePeerStorageFiveSlot(slots []Item) (PeerStoragePayload, error) {
 		}
 		return PeerStoragePayload{Kind: PeerStorageGet, Holder: *slots[0].Text, Issuer: *slots[1].Text, Token: append([]byte(nil), slots[2].Bytes...), ContentCID: contentCID, Reason: *slots[4].Text}, nil
 	}
-	if slots[2].Tag != nil {
-		tokenCID, err := cidText(slots[2])
+	if slots[2].Tag != nil && slots[3].Tag != nil {
+		relatedMessageCID, err := cidText(slots[2])
 		if err != nil {
 			return PeerStoragePayload{}, err
 		}
@@ -176,7 +179,7 @@ func parsePeerStorageFiveSlot(slots []Item) (PeerStoragePayload, error) {
 		if err != nil {
 			return PeerStoragePayload{}, err
 		}
-		payload := PeerStoragePayload{Issuer: *slots[0].Text, Holder: *slots[1].Text, TokenCID: tokenCID, ContentCID: contentCID}
+		payload := PeerStoragePayload{Issuer: *slots[0].Text, Holder: *slots[1].Text, RelatedMessageCID: relatedMessageCID, ContentCID: contentCID}
 		if slots[4].Bytes != nil {
 			payload.Kind = PeerStorageGetResult
 			payload.Content = append([]byte(nil), slots[4].Bytes...)
@@ -211,7 +214,7 @@ func parsePeerStorageSixSlot(slots []Item) (PeerStoragePayload, error) {
 		}, nil
 	}
 	if slots[2].Tag != nil && slots[3].Tag != nil && slots[4].Uint != nil && slots[5].Text != nil {
-		tokenCID, err := cidText(slots[2])
+		relatedMessageCID, err := cidText(slots[2])
 		if err != nil {
 			return PeerStoragePayload{}, err
 		}
@@ -219,14 +222,17 @@ func parsePeerStorageSixSlot(slots []Item) (PeerStoragePayload, error) {
 		if err != nil {
 			return PeerStoragePayload{}, err
 		}
-		return PeerStoragePayload{Kind: PeerStoragePutResult, Issuer: *slots[0].Text, Holder: *slots[1].Text, TokenCID: tokenCID, ContentCID: contentCID, Accepted: *slots[4].Uint == 1, Reason: *slots[5].Text}, nil
+		return PeerStoragePayload{Kind: PeerStoragePutResult, Issuer: *slots[0].Text, Holder: *slots[1].Text, RelatedMessageCID: relatedMessageCID, ContentCID: contentCID, Accepted: *slots[4].Uint == 1, Reason: *slots[5].Text}, nil
 	}
 	return PeerStoragePayload{}, fmt.Errorf("invalid six-slot peer_storage payload")
 }
 
 func parsePeerStorageSevenSlot(slots []Item) (PeerStoragePayload, error) {
-	if slots[0].Text == nil || slots[1].Text == nil || slots[2].Bytes == nil || slots[4].Uint == nil || slots[5].Uint == nil || slots[6].Text == nil {
+	if slots[0].Text == nil || slots[1].Text == nil {
 		return PeerStoragePayload{}, fmt.Errorf("invalid seven-slot peer_storage payload")
+	}
+	if slots[2].Bytes == nil || slots[4].Uint == nil || slots[5].Uint == nil || slots[6].Text == nil {
+		return PeerStoragePayload{}, fmt.Errorf("invalid seven-slot peer_storage grant")
 	}
 	allowed, err := parseTextArray(slots[3])
 	if err != nil {

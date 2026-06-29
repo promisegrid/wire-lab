@@ -21,7 +21,7 @@ const (
 	DeviceStatusV1PCID = "bafkreihmlpwkc5ke2zbfvur4mylrikkainqlq4zr5lkwacjys5bgreekhu"
 	LoRaLinkV1PCID     = "bafkreidkjwel2vvaqhdwjl6udpw62uxhhrmz5myyoumvwixl7rwaefioby"
 	OrderStatusV1PCID  = "bafkreidv6zmcfrdopsdpbomlwt75fklmbittdgyztzkaofndw7biorgqne"
-	PeerStoragePCID    = "bafkreihbt6i6g4bmdinikr4l7vtoqki4nsyxn3eob5lz42bdnhghnrnula"
+	PeerStoragePCID    = "bafkreib3wwvq34fkn2oodmp7j4im36mcqrjplhfvzythgji5szqvdphzwa"
 	UnknownProbeV1PCID = "bafkreibtn5h2wf4lz2gbn5tbsjujfxpnadhsoda6x4uq7ok5pnqfuqqdya"
 )
 

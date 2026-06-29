@@ -544,9 +544,20 @@ This section is the starting context for the next Codex operator. Complete
   Ivan presents it on put/get, Bob retains and returns exact bytes, and Ivan
   verifies returned bytes by CID after restart. Updated by `DI-rujod`: resource
   activity usage is not reported unless it is actually measured.
-- [ ] komon.11 Add analyzer gates proving radio-only transport, exact CBOR
+- [ ] komon.25 Plan the Rust/Renode fidelity lane after the Go behavior
+  simulator passes clean radio-only and artifact gates. Define the threshold for
+  leaving the Go-only slice, the Rust firmware shape, the Renode platform and
+  peripheral model, the M4/RFM95/CircuitPython behavior that must be modeled or
+  explicitly excluded, and fidelity gates for SPI, radio-driver behavior, packet
+  semantics, memory, energy, and hardware assumptions. This remains non-blocking
+  for the current Go POC17 clean run. Source: `DI-libis`.
+- [x] komon.11 Add analyzer gates proving radio-only transport, exact CBOR
   artifacts, pCID-owned payloads, sparse CAS behavior, failure handling, and
-  no authority drift.
+  no authority drift. Implemented as cross-event gates for simulated-LoRa-only
+  send/receive paths, exact artifact CID and binary slot-0 pCID validation,
+  bintags-shaped order-status MSG/ACK flow, peer_storage grant/put/ack/get/
+  fulfillment correlation, expected refusal/loss/asymmetric evidence, and
+  authority-drift wording checks.
 - [ ] komon.12 Document simulator fidelity limits honestly in the README and
   DEV guide resources before any clean-run result is cited.
 - [ ] komon.13 Run deterministic tests and a clean container/simulator run after
