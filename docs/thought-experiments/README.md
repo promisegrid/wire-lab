@@ -81,6 +81,7 @@ The proquint handle replaces both the integer alias (TE-1, TE-2, ...) and the ti
 | [TE-ritig](TE-ritig-pcid-cardinality-parser-builder-kernel-roles.md) | 2026-06-19 | pCID cardinality and parser/builder kernel roles |  |
 | [TE-ragin](TE-ragin-kernel-resource-protection-capability-promises.md) | 2026-06-25 | Kernel resource protection by conditional capability promises |  |
 | [TE-vahoj](TE-vahoj-poc18-superset-architecture.md) | 2026-06-28 | POC18 superset architecture |  |
+| [TE-hikar](TE-hikar-poc18-grid-cli-command-model.md) | 2026-06-28 | POC18 grid CLI command model |  |
 
 The proquint handle is **both** the stable identifier and the display nickname. It is collision-free at mint time, fork-stable across branches (each fork mints its own handles; collisions at merge time are handled by re-minting), and short enough to use directly in prose ("per TE-titur S5"). DF / DI / DR descendant numbering still uses the handle root: DF-titur.1, DI-titur-..., DR-009 (DR has its own numbering scheme). Backward citations to integer aliases (e.g., "per TE-25 S5") remain valid; readers may consult the cited file's `## Prior aliases` section or the `Prior alias` column above to recover the integer.
 

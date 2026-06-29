@@ -88,6 +88,24 @@ Intent: The POC18 plan grew beyond the earlier Git/native architecture TE. Today
 Constraints: Keep `TE-kopap`, `DN-rifir`, `DN-dopod`, and the current POC18 spec as inputs; do not use the new TE to rewrite history or relax existing DIs; do not scaffold POC18 code until the TE's remaining DF questions are answered and locked; preserve pCID discipline, CID rendering rules, Promise Theory vocabulary, and POC16-superset scope.
 Affects: docs/thought-experiments/TE-vahoj-poc18-superset-architecture.md; docs/thought-experiments/README.md; protocols/wire-lab.d/TODO/TODO-nahop-poc18-cas-git-replacement.md; protocols/wire-lab.d/TODO/TODO.md; protocols/wire-lab.d/specs/harness-spec-draft.md; DEV-GUIDE-RESOURCES.md; implementations/poc18-cas-git-replacement/docs/turing-equiv.html; future implementations/poc18-cas-git-replacement/.
 
+ID: DI-jifuj
+Date: 2026-06-28 20:42:49 PDT
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Lock POC18's first implementation slice as Vahoj Alt-D plus Alt-G: build a deterministic local core first, but force sparse multi-agent CAS assumptions through interfaces, tests, and runtime paths from day one.
+Intent: POC18 should not start as a local-only Git clone or as an overlarge multi-agent runtime. The useful first step is a core graph that can create, store, walk, diagnose, and materialize native PromiseGrid version-control objects while preserving sparse-CAS, missing-object, and peer-promise seams for the next slice. This lets implementation begin without forgetting the long-term decentralized sync model.
+Constraints: Use `grid` for the user-facing CLI; use `poc-*` for non-production deterministic fixtures; use `grid-*` for production-shaped daemons and backend processes when they appear; use `/tmp/wire-lab-poc18-*` for generated runtime state in tests and clean runs; never run DevOps/root-filesystem tests on the host; keep DevOps replay tests container-only; keep pCID as protocol selector, not address, operation, path, repository, or branch name; keep native sync promise-shaped and peer-relative; do not implement real peer transport in the first slice.
+Affects: implementations/poc18-cas-git-replacement/; protocols/wire-lab.d/TODO/TODO-nahop-poc18-cas-git-replacement.md; docs/thought-experiments/TE-vahoj-poc18-superset-architecture.md; future POC18 run scripts and tests.
+
+ID: DI-harih
+Date: 2026-06-28 20:42:49 PDT
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Lock the POC18 CLI/core split after `TE-hikar`: documentation and code comments use `CLI/core`; package architecture uses layer packages `store`, `graph`, `workspace`, `sync`, and `bridge`; the first `grid` CLI balances familiar VCS words with PromiseGrid-native objects through `init`, `ingest`, `snapshot`, `checkout`, `refs`, and `diag`.
+Intent: Vahoj settled the object model but not the command language. The follow-up CLI TE chooses commands that do not copy Git's staging or native push/pull assumptions, while still being learnable for developers familiar with Git, Jujutsu, Mercurial, SVN, and CVS. Layer packages better match implementation boundaries than one package per object type: `store` owns CIDs/CAS/chunks, `graph` owns protocol objects and envelopes, `workspace` owns scan/materialize, `sync` owns sparse retrieval promises, and `bridge` owns Git compatibility seams.
+Constraints: Mention porcelain/plumbing only as a Git analogy; do not introduce a raw Jujutsu-style change-ID field; keep Git import/export/push/pull under bridge behavior, not native sync; keep all interagent communication promise-shaped; use exact CIDs as identities, binary on wire and CIDv1 base32 when printable; first-slice `grid` commands may be intentionally narrow but must route through the same core library as fixtures.
+Affects: docs/thought-experiments/TE-hikar-poc18-grid-cli-command-model.md; implementations/poc18-cas-git-replacement/; protocols/wire-lab.d/TODO/TODO-nahop-poc18-cas-git-replacement.md; future POC18 CLI docs.
+
 ## Core Hypothesis
 
 POC18 should test this hypothesis:
@@ -417,6 +435,14 @@ Locked:
   CAS assumptions from day one, with repo-like views over shared CAS and
   versioned reference sets. Its remaining DF questions must be answered before
   POC18 code scaffolding. Source: `TE-vahoj`; `DI-fusir`.
+- TE-hikar locks the first `grid` CLI command model: balance familiar VCS
+  terminology with PromiseGrid-native CAS, promise, and reference-set semantics;
+  use `CLI/core` as the implementation split; use `poc-*` only for
+  non-production deterministic fixtures. Source: `TE-hikar`; `DI-harih`.
+- POC18 code scaffolding uses layer packages `store`, `graph`, `workspace`,
+  `sync`, and `bridge`; generated first-slice runtime state lives only under
+  `/tmp/wire-lab-poc18-*`; DevOps/root-filesystem tests are container-only and
+  not part of the host first slice. Source: `DI-jifuj`; `DI-harih`.
 - The POC18 version-control protocol spec is
   `implementations/poc18-cas-git-replacement/docs/protocols/version-control.md`,
   with pCID alias
@@ -429,8 +455,8 @@ Locked:
 
 Remaining:
 
-- Lock implementation paths, command names, package names, runtime artifact
-  paths, and generated CAS path patterns before scaffolding code.
+- Implement the first core graph slice under the locked `DI-jifuj` and
+  `DI-harih` path, command, package, runtime, and CLI/core decisions.
 - Choose the exact Go libraries for the Git bridge and Rabin chunking.
 - Decide whether LLM agents participate in the first implementation slice or
   whether POC18 begins deterministic and adds LLM-scale collaboration later.
@@ -444,29 +470,46 @@ Remaining:
   PromiseGrid-native CAS/version graph only, and hybrid Git bridge with
   PromiseGrid-native reference-set promises. Completed by
   `docs/thought-experiments/TE-kopap-poc18-git-bridge-vs-native-cas.md`.
-- [ ] nahop.2 Lock implementation paths, command names, package names, runtime
+- [x] nahop.2 Lock implementation paths, command names, package names, runtime
   artifact paths, and generated CAS path patterns before scaffolding
-  `implementations/poc18-cas-git-replacement/`.
+  `implementations/poc18-cas-git-replacement/`. Completed by `TE-hikar`,
+  `DI-jifuj`, and `DI-harih`.
 - [x] nahop.3 Write RFC-like spec docs for the POC18 version-control pCID before
   using its pCID in code. Completed by
   `implementations/poc18-cas-git-replacement/docs/protocols/version-control.md`;
   pCID alias
   `implementations/poc18-cas-git-replacement/docs/protocols/bafkreicrikn3oqfumjnuvruw67h5ffvu6dyy7inz7h2rtm6s4qgwgz7oxu.md`.
-- [ ] nahop.4 Implement per-agent sparse CAS object stores with CIDv1 base32
-  printable paths and binary CID values inside CBOR.
-- [ ] nahop.5 Integrate Rabin content-defined chunking and PromiseGrid Merkle
-  manifests for all file content storage, including large in-band files.
-- [ ] nahop.6 Implement POSIX node-version envelopes with logical node identity,
-  node type, content or metadata payload, and parent node-version links.
-- [ ] nahop.7 Implement directory reference sets where filename labels point at
+- [x] nahop.4 Implement per-agent sparse CAS object stores with CIDv1 base32
+  printable paths and binary CID values inside CBOR. First slice completed by
+  `implementations/poc18-cas-git-replacement/store/`. Source: `DI-jifuj`;
+  `DI-harih`.
+- [x] nahop.5 Integrate Rabin content-defined chunking and PromiseGrid Merkle
+  manifests for all file content storage, including large in-band files. First
+  slice completed by `implementations/poc18-cas-git-replacement/chunk/`.
+  Source: `DI-dofoj`; `DI-jifuj`.
+- [x] nahop.6 Implement POSIX node-version envelopes with logical node identity,
+  node type, content or metadata payload, and parent node-version links. First
+  slice completed by `implementations/poc18-cas-git-replacement/workspace/` and
+  `implementations/poc18-cas-git-replacement/graph/`. Source: `DI-radaj`;
+  `DI-harih`.
+- [x] nahop.7 Implement directory reference sets where filename labels point at
   POSIX node-version or directory-version CIDs, including hard-link labels that
-  intentionally share a node identity.
-- [ ] nahop.8 Implement branch, release, logical-change, review-thread, and
-  workspace reference-set roles without global authority.
-- [ ] nahop.9 Implement snapshot/change-set envelopes that compose root directory
-  reference sets and parent snapshot links.
-- [ ] nahop.10 Implement checkout/materialization from a workspace or snapshot
+  intentionally share a node identity. First slice completed by
+  `implementations/poc18-cas-git-replacement/workspace/`. Source: `DI-zuruj`;
+  `DI-harih`.
+- [x] nahop.8 Implement branch, release, logical-change, review-thread, and
+  workspace reference-set roles without global authority. First slice completed
+  by `implementations/poc18-cas-git-replacement/workspace/`. Source:
+  `DI-zuruj`; `DI-harih`.
+- [x] nahop.9 Implement snapshot/change-set envelopes that compose root directory
+  reference sets and parent snapshot links. First slice completed by
+  `implementations/poc18-cas-git-replacement/graph/` and
+  `implementations/poc18-cas-git-replacement/workspace/`. Source: `DI-zuruj`;
+  `DI-harih`.
+- [x] nahop.10 Implement checkout/materialization from a workspace or snapshot
   reference set into a local workspace directory with explicit local promises.
+  First slice completed by `implementations/poc18-cas-git-replacement/workspace/`.
+  Source: `DI-radaj`; `DI-jifuj`.
 - [ ] nahop.11 Implement peer fetch/retrieval of reference sets and missing CAS
   objects, including voluntary storage/forwarding promises and token incentives.
 - [ ] nahop.12 Implement rename/copy scenarios that preserve node lineage while
@@ -506,3 +549,8 @@ Remaining:
   sequencing. Completed by
   `docs/thought-experiments/TE-vahoj-poc18-superset-architecture.md`. Source:
   `DI-fusir`.
+- [x] nahop.24 Run a follow-up CLI TE to balance Git/Jujutsu/Tangled/Mercurial/
+  SVN/CVS familiarity against PromiseGrid-native grid messages, promises, sparse
+  CAS, and reference-set semantics before locking first-slice `grid` verbs.
+  Completed by `docs/thought-experiments/TE-hikar-poc18-grid-cli-command-model.md`.
+  Source: `DI-harih`.

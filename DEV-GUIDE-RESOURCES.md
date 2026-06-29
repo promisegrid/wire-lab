@@ -69,9 +69,18 @@ user-facing view over shared CAS/reference sets rather than a native storage
 authority. The implementation-local POC18 protocol spec is now
 `version-control.md`, intentionally without a version suffix because its CID is
 the version; its current pCID alias is
-`bafkreicrikn3oqfumjnuvruw67h5ffvu6dyy7inz7h2rtm6s4qgwgz7oxu.md`. Source:
-`DI-zuruj`; `DI-dibut`; `DI-dofoj`; `DI-radaj`; `DI-lidaj`; `DI-fusir`;
-`DN-dopod`; `TE-kopap`; `TE-vahoj`.
+`bafkreicrikn3oqfumjnuvruw67h5ffvu6dyy7inz7h2rtm6s4qgwgz7oxu.md`. TE-hikar
+locks the first `grid` CLI balance: `grid` is the user-facing CLI, `poc-*`
+commands are deterministic non-production fixtures, docs use `CLI/core`, and the
+first command set avoids Git's native staging and push/pull assumptions while
+still exposing familiar `init`, `ingest`, `snapshot`, `checkout`, `refs`, and
+`diag` operations. The first POC18 code slice now implements sparse filesystem
+CAS, Rabin chunk manifests, POSIX node messages, directory/branch/release/
+logical-change/review/workspace reference sets, snapshot messages, checkout, a
+promise-shaped sync seam, Git bridge stubs, diagnostic CBOR rendering, and a
+clean `/tmp/wire-lab-poc18-*` fixture run. Source: `DI-zuruj`; `DI-dibut`;
+`DI-dofoj`; `DI-radaj`; `DI-lidaj`; `DI-fusir`; `DI-jifuj`; `DI-harih`;
+`DN-dopod`; `TE-kopap`; `TE-vahoj`; `TE-hikar`.
 
 ### Current Wire Direction
 
@@ -1557,6 +1566,11 @@ section.
   hybrid already implied by `DI-zuruj`, `DI-dibut`, `DI-dofoj`, and `DI-radaj`:
   native reference sets and sparse CAS as the source of truth, with Git
   import/export/push/pull as required bridge adapter behavior.
+- `docs/thought-experiments/TE-hikar-poc18-grid-cli-command-model.md` locks the
+  first POC18 `grid` CLI balance after TE-vahoj: use `CLI/core`, keep `poc-*`
+  commands as deterministic fixtures, avoid Git's native staging and push/pull
+  assumptions, and start with `init`, `ingest`, `snapshot`, `checkout`, `refs`,
+  and `diag`. Source: `DI-harih`.
 - `implementations/poc18-cas-git-replacement/docs/protocols/version-control.md`
   is the RFC-like POC18 version-control protocol spec. It defines
   `grid([42(pCID), parents, payload, proof])`, versioned reference sets, POSIX
@@ -1565,6 +1579,12 @@ section.
   svgbob-safe ASCII diagrams. Its current pCID alias is
   `implementations/poc18-cas-git-replacement/docs/protocols/bafkreicrikn3oqfumjnuvruw67h5ffvu6dyy7inz7h2rtm6s4qgwgz7oxu.md`.
   Source: `DI-lidaj`.
+- `implementations/poc18-cas-git-replacement/` now contains the first executable
+  POC18 core slice: layer packages `store`, `chunk`, `graph`, `workspace`,
+  `sync`, and `bridge`; the `grid` CLI; deterministic `poc-*` fixture commands;
+  a clean `/tmp/wire-lab-poc18-*` run script; unit tests; and diagnostic CBOR
+  rendering of real `grid([42(pCID), parents, payload, proof])` messages.
+  Source: `DI-jifuj`; `DI-harih`.
 - `implementations/poc17-m4-lora-runtime/` is first-slice Go behavior evidence
   for a radio-only constrained device exchange. It now includes bintags-shaped
   order status traffic under a spec-derived `order_status_v1` pCID and uses a
