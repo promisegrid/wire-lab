@@ -411,6 +411,9 @@ become truth. A Git/SSH endpoint can be a bridge; it does not become native
 sync. ATProto identity can inform local trust and interop; it does not become a
 global trust authority.
 
+XXX Also would like to be able to interact with Tangled, BlueSky, and
+other ATProto-based services.
+
 ### Scenario 9: Conventional Git import/export/push/pull
 
 Alice imports an existing Git repository with branches, tags, symlinks, merges,
@@ -457,6 +460,10 @@ change log tells "how this state was reached". A DevOps mode must support:
 - local validation promises;
 - local refusal if a change is unsafe or a required capability token is absent;
 - exact replay of the same ordered sequence on another host.
+
+XXX Needs to include some sort of state machine with prereq trees for
+sequencing, triggers, etc. in order to support DevOps workflows.  see
+https://en.wikipedia.org/wiki/ISconf for inspiration.
 
 ### Scenario 11: Root-filesystem scale
 
@@ -516,6 +523,12 @@ The likely recommendation is to document both: use "user surface" and "core
 library" in PromiseGrid-native docs, and mention "porcelain/plumbing" only as a
 Git-user analogy.
 
+XXX First version will be in Go, but we should consider a
+language-neutral interface for future multi-language support. This
+might be a WebAssembly interface, or a language-neutral IDL similar to
+Cap'n Proto, FlatBuffers, or gRPC -- consider how PromiseGrid and
+grid() messages might be used as an IDL for multi-language support.
+
 ### Scenario 14: Local `grid()` messages between UI and core
 
 Judy's local GUI wants to ask a local backend to create a reference set. Ken's
@@ -538,6 +551,15 @@ The surviving shape should likely be layered:
 
 This avoids Git's automation split while preserving future remote UI control.
 
+XXX This would help support collabrative editing of a workspace view,
+where a remote UI can operate on a headless node, or a shared UI can
+operate on a local repo on one user's laptop. 
+
+XXX This would help support live syncing of a workspace view between
+two nodes, where each node can have a local repo, but each operation
+is serialized and sent to the other node for replay. This is similar
+to the requirements needed for devops.
+
 ### Scenario 15: Promise economics for storage and forwarding
 
 Mallory asks Bob to store a large release artifact. Bob has little disk. Carol
@@ -557,6 +579,12 @@ Agents locally price these promises. Exchange rates, willingness to accept
 tokens, and trust in token issuers are local. There is no central exchange or
 global storage market. The token is evidence of the issuer's promise, not a
 permission slip from an authority.
+
+XXX This depends on bearer tokens, which can act as currency; the most
+likely use of bearer tokens is similar to "gift cards" or "prepaid
+storage credits" that can be exchanged for more specific tokens.  This
+is similar to "ticket-granting" in Kerberos, where a ticket can be
+exchanged for a more specific token.  
 
 ### Scenario 16: Retention and garbage collection
 
