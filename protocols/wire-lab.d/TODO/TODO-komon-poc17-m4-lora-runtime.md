@@ -577,14 +577,19 @@ This section is the starting context for the next Codex operator. Complete
   `/tmp/wire-lab-renode-smoke/03-monitor-server-rerun.log`, and
   `/tmp/wire-lab-renode-smoke/03-monitor-client.log`. The smoke test changed no
   repo files before this TODO update.
-- [ ] komon.27 Plan and implement the first Renode M4 platform viability slice
+- [x] komon.27 Plan and implement the first Renode M4 platform viability slice
   before any LoRa radio seam or full POC17 scenario port. Acceptance gates:
   Renode runs in the container; the slice creates or loads a minimal M4-like
   machine; a tiny firmware loop starts deterministically; reset/panic behavior
   is observable; diagnostics are extracted without becoming PromiseGrid
   transport; memory layout and unmodeled platform gaps are documented; and the
   result does not claim RFM95/SX127x, SPI, packet timing, energy, regulatory, or
-  hardware readiness. Source: `DI-pokin`; `TE-juhah`.
+  hardware readiness. Implemented as `scripts/run-renode-m4-smoke.sh` with a
+  Rust `no_std` `thumbv7em-none-eabihf` firmware ELF loaded into Renode's
+  ATSAMD51 Cortex-M4F platform. The run starts and pauses the machine with
+  PC/SP initialized from the firmware vector table; radio, SPI, packet timing,
+  energy, regulatory, CircuitPython, and production hardware claims remain
+  out of scope. Source: `DI-pokin`; `TE-juhah`.
 - [x] komon.11 Add analyzer gates proving radio-only transport, exact CBOR
   artifacts, pCID-owned payloads, sparse CAS behavior, failure handling, and
   no authority drift. Implemented as cross-event gates for simulated-LoRa-only

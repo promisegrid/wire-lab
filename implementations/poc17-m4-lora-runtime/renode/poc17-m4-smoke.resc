@@ -1,0 +1,20 @@
+:name: POC17 ATSAMD51 M4 platform smoke
+:description: Loads the minimal POC17 M4F firmware on Renode's ATSAMD51 platform.
+
+using sysbus
+$name?="poc17_m4_smoke"
+$bin?=@firmware/renode-m4-smoke/target/thumbv7em-none-eabihf/release/poc17-renode-m4-smoke
+
+mach create $name
+machine LoadPlatformDescription @platforms/cpus/atsamd51g19a.repl
+
+macro reset
+"""
+    sysbus LoadELF $bin
+"""
+
+runMacro $reset
+peripherals
+start
+pause
+quit

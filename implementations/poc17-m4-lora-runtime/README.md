@@ -16,6 +16,20 @@ go test ./...
 ./scripts/run-clean.sh
 ```
 
+The first Renode M4 platform smoke slice uses containers for both the Rust
+cross-build and Renode execution:
+
+```sh
+./scripts/run-renode-m4-smoke.sh
+```
+
+This builds a tiny Rust `no_std` firmware ELF for `thumbv7em-none-eabihf` and
+loads it on Renode's ATSAMD51 Cortex-M4F platform. It proves only that the
+containerized build path, platform load, reset vector, start, pause, and
+diagnostic output work. It does not prove RFM95/SX127x, SPI, packet timing,
+energy, regulatory, CircuitPython, or production hardware readiness. Source:
+`DI-pokin`.
+
 The clean run writes artifacts under `/tmp/wire-lab-poc17/poc17-demo/`:
 
 - `events.jsonl` records simulator and analyzer events.
