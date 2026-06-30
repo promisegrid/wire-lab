@@ -30,6 +30,13 @@ diagnostic output work. It does not prove RFM95/SX127x, SPI, packet timing,
 energy, regulatory, CircuitPython, or production hardware readiness. Source:
 `DI-pokin`.
 
+The next Renode risk to retire is the radio seam. The next slice should prove
+that firmware-visible packet bytes can move through an RFM95/SX127x-shaped
+SPI/FIFO/IRQ path without using UART, host callbacks, shared files, or any other
+hidden PromiseGrid message bridge. Full order-status, peer-storage, restart,
+and failure-scenario parity should wait until that radio path is credible.
+Source: `DI-togag`.
+
 The clean run writes artifacts under `/tmp/wire-lab-poc17/poc17-demo/`:
 
 - `events.jsonl` records simulator and analyzer events.

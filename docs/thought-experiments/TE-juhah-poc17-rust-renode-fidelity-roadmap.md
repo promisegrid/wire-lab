@@ -16,7 +16,7 @@ TE-juhah
 
 ## Status
 
-decided
+decided, refined
 
 ## Prior aliases
 
@@ -396,3 +396,23 @@ needs, and the LoRa seam follows M4 viability rather than outranking it.
   remains the behavior oracle while M4/Renode work begins.
 - `DEV-GUIDE-RESOURCES.md` must not cite POC17 as hardware-ready until M4,
   radio, resource, packet, and hardware validation gates exist and pass.
+
+## Refinements
+
+### 2026-06-29 — Radio seam is the next risk-retirement slice
+
+The first Alt D Renode M4 platform smoke milestone has landed: a minimal
+Rust `no_std` firmware ELF builds in a container, loads on Renode's ATSAMD51
+Cortex-M4F platform, and starts with PC/SP initialized from the vector table.
+That result retires only the first boot/platform-control risk. It does not prove
+RFM95/SX127x, SPI, packet timing, energy, regulatory, CircuitPython, or
+production hardware readiness.
+
+Per `DI-togag`, the next POC17 fidelity task should now follow Alt E and retire
+radio-path risk. The next slice should prove firmware-visible packet bytes move
+through an RFM95/SX127x-shaped SPI/FIFO/IRQ path without UART, host callbacks,
+shared files, or any other hidden PromiseGrid message bridge. Full order-status,
+peer-storage, restart, and failure-scenario parity should wait until that radio
+path is credible. This is a Cat-4 resolved-implication forward pointer: the TE
+body above remains historical, Alt D's first milestone is complete, and Alt E is
+now the next planned step.

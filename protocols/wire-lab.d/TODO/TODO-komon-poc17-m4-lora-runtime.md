@@ -137,6 +137,15 @@ Intent: POC17's main purpose is to prove that a PromiseGrid node can run on Cort
 Constraints: Keep the Go simulator as the behavior oracle and fast regression lane; do not claim hardware readiness from Go or Renode alone; do not put protocol parity ahead of M4 viability; add the LoRa radio seam after the M4 platform is credible; report resource usage only when actually measured; preserve the no-UART/no-host-bridge transport rule for PromiseGrid messages.
 Affects: docs/thought-experiments/TE-juhah-poc17-rust-renode-fidelity-roadmap.md; implementations/poc17-m4-lora-runtime/; future Rust/Renode POC17 files; protocols/wire-lab.d/TODO/TODO-komon-poc17-m4-lora-runtime.md; DEV-GUIDE-RESOURCES.md.
 
+ID: DI-togag
+Date: 2026-06-29 18:52:15 PDT
+Status: active
+Author: angela@t7a.org (Angela Traugott)
+Decision: Make the Renode RFM95/SX127x-style radio seam the next POC17 fidelity task after the minimal Renode M4 smoke slice.
+Intent: POC17 has now retired the first M4 boot risk narrowly enough to move to the next major unknown: whether packet bytes can cross an M4-facing LoRa-style SPI/FIFO/IRQ path without a UART, host callback, or hidden bridge. Retiring that radio risk is more useful than extending the boot smoke slice or porting the full Go behavior scenario before the transport path is credible.
+Constraints: Keep the Go simulator as the behavior oracle; keep the current Renode M4 smoke result scoped to boot/platform evidence; make the next slice radio-seam evidence only, not full production LoRa, packet timing, energy, regulatory, CircuitPython, or hardware readiness; do not let diagnostics become PromiseGrid transport; preserve the no-UART/no-host-bridge rule for agent-visible messages; port full order-status, peer-storage, restart, and failure behavior only after packet bytes move through the modeled radio seam.
+Affects: docs/thought-experiments/TE-juhah-poc17-rust-renode-fidelity-roadmap.md; implementations/poc17-m4-lora-runtime/README.md; implementations/poc17-m4-lora-runtime/renode/; implementations/poc17-m4-lora-runtime/firmware/; future Renode radio-seam code; protocols/wire-lab.d/TODO/TODO-komon-poc17-m4-lora-runtime.md.
+
 ## Scope
 
 - Treat POC17 as executable design evidence for constrained embedded
@@ -590,6 +599,15 @@ This section is the starting context for the next Codex operator. Complete
   PC/SP initialized from the firmware vector table; radio, SPI, packet timing,
   energy, regulatory, CircuitPython, and production hardware claims remain
   out of scope. Source: `DI-pokin`; `TE-juhah`.
+- [ ] komon.28 Implement the next Renode fidelity slice as a minimal
+  RFM95/SX127x-shaped radio seam. Acceptance gates: firmware-visible packet
+  bytes move through modeled SPI/FIFO/IRQ behavior; diagnostics prove no UART,
+  host callback, shared file, or hidden bridge carried PromiseGrid messages;
+  transmit and receive paths are observable; MTU/refusal evidence exists for
+  the modeled seam; the Go simulator remains the behavior oracle; and the
+  result is documented as radio-seam evidence only, not production LoRa,
+  packet-timing, energy, regulatory, CircuitPython, or hardware readiness.
+  Source: `DI-togag`; `TE-juhah`.
 - [x] komon.11 Add analyzer gates proving radio-only transport, exact CBOR
   artifacts, pCID-owned payloads, sparse CAS behavior, failure handling, and
   no authority drift. Implemented as cross-event gates for simulated-LoRa-only
