@@ -564,6 +564,27 @@ This section is the starting context for the next Codex operator. Complete
   rewritten in place by user direction as an M4-first roadmap. Decision locked
   by `DI-pokin`: start the post-Go fidelity lane with Renode M4 platform
   viability before the LoRa radio seam or full protocol scenario port.
+- [x] komon.26 Record the Renode container smoke-test result before starting
+  tracked Renode work. The official `antmicro/renode:latest` Docker image pulled
+  and ran on 2026-06-29. `renode --version` reported `Renode v1.16.1.16973`
+  build `d66b0c2a-202602160923` with `.NET 8.0.25`; headless console control
+  worked with `renode --disable-gui --console -e "help" -e "quit"`; monitor
+  control worked through `renode --disable-gui -P 3334` plus a telnet-aware
+  Python client sending `help` and `quit`. Plain `nc` was not reliable because
+  Renode exposes the monitor in telnet mode. Logs are in
+  `/tmp/wire-lab-renode-smoke/01-version.log`,
+  `/tmp/wire-lab-renode-smoke/02-headless-console.log`,
+  `/tmp/wire-lab-renode-smoke/03-monitor-server-rerun.log`, and
+  `/tmp/wire-lab-renode-smoke/03-monitor-client.log`. The smoke test changed no
+  repo files before this TODO update.
+- [ ] komon.27 Plan and implement the first Renode M4 platform viability slice
+  before any LoRa radio seam or full POC17 scenario port. Acceptance gates:
+  Renode runs in the container; the slice creates or loads a minimal M4-like
+  machine; a tiny firmware loop starts deterministically; reset/panic behavior
+  is observable; diagnostics are extracted without becoming PromiseGrid
+  transport; memory layout and unmodeled platform gaps are documented; and the
+  result does not claim RFM95/SX127x, SPI, packet timing, energy, regulatory, or
+  hardware readiness. Source: `DI-pokin`; `TE-juhah`.
 - [x] komon.11 Add analyzer gates proving radio-only transport, exact CBOR
   artifacts, pCID-owned payloads, sparse CAS behavior, failure handling, and
   no authority drift. Implemented as cross-event gates for simulated-LoRa-only
