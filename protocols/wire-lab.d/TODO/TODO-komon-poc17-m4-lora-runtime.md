@@ -128,6 +128,15 @@ Intent: Synthetic near-limit values for RAM, flash, energy, radio airtime, retry
 Constraints: Remove fake `used` and `remaining` resource events; keep limit snapshots separate from activity; analyzer gates must not require synthetic resource-condition events; future activity fields must name the actual counter source.
 Affects: implementations/poc17-m4-lora-runtime/device/resources.go; implementations/poc17-m4-lora-runtime/sim/sim.go; implementations/poc17-m4-lora-runtime/analyzer/analyzer.go; implementations/poc17-m4-lora-runtime/README.md; protocols/wire-lab.d/TODO/TODO-komon-poc17-m4-lora-runtime.md.
 
+ID: DI-pokin
+Date: 2026-06-29 17:27:39 PDT
+Status: active
+Author: angela@t7a.org (Angela Traugott)
+Decision: Choose `TE-juhah` Alt D, Renode M4 platform first, as the first post-Go POC17 fidelity lane.
+Intent: POC17's main purpose is to prove that a PromiseGrid node can run on Cortex-M4 plus LoRa-class hardware. The next lane should therefore prove firmware boot, reset/panic behavior, memory layout, diagnostic extraction, and deterministic M4-shaped execution before spending effort on the RFM95/SX127x radio seam or a full protocol scenario port.
+Constraints: Keep the Go simulator as the behavior oracle and fast regression lane; do not claim hardware readiness from Go or Renode alone; do not put protocol parity ahead of M4 viability; add the LoRa radio seam after the M4 platform is credible; report resource usage only when actually measured; preserve the no-UART/no-host-bridge transport rule for PromiseGrid messages.
+Affects: docs/thought-experiments/TE-juhah-poc17-rust-renode-fidelity-roadmap.md; implementations/poc17-m4-lora-runtime/; future Rust/Renode POC17 files; protocols/wire-lab.d/TODO/TODO-komon-poc17-m4-lora-runtime.md; DEV-GUIDE-RESOURCES.md.
+
 ## Scope
 
 - Treat POC17 as executable design evidence for constrained embedded
@@ -544,15 +553,17 @@ This section is the starting context for the next Codex operator. Complete
   Ivan presents it on put/get, Bob retains and returns exact bytes, and Ivan
   verifies returned bytes by CID after restart. Updated by `DI-rujod`: resource
   activity usage is not reported unless it is actually measured.
-- [ ] komon.25 Plan the Rust/Renode fidelity lane after the Go behavior
+- [x] komon.25 Plan the Rust/Renode fidelity lane after the Go behavior
   simulator passes clean radio-only and artifact gates. Define the threshold for
   leaving the Go-only slice, the Rust firmware shape, the Renode platform and
   peripheral model, the M4/RFM95/CircuitPython behavior that must be modeled or
   explicitly excluded, and fidelity gates for SPI, radio-driver behavior, packet
   semantics, memory, energy, and hardware assumptions. This remains non-blocking
-  for the current Go POC17 clean run. Source: `DI-libis`. TE completed as
-  `docs/thought-experiments/TE-juhah-poc17-rust-renode-fidelity-roadmap.md`;
-  decision status: needs DF.
+  for the current Go POC17 clean run. Source: `DI-libis`. Current TE is
+  `docs/thought-experiments/TE-juhah-poc17-rust-renode-fidelity-roadmap.md`,
+  rewritten in place by user direction as an M4-first roadmap. Decision locked
+  by `DI-pokin`: start the post-Go fidelity lane with Renode M4 platform
+  viability before the LoRa radio seam or full protocol scenario port.
 - [x] komon.11 Add analyzer gates proving radio-only transport, exact CBOR
   artifacts, pCID-owned payloads, sparse CAS behavior, failure handling, and
   no authority drift. Implemented as cross-event gates for simulated-LoRa-only
