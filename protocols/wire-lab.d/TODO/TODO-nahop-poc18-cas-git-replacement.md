@@ -445,6 +445,14 @@ Locked:
   keeping CBOR/grid messages responsible for manifests, promises, retention, and
   interpretation. It keeps encrypted/ciphertext chunk identity as a future
   explicit profile and leaves final DF open. Source: `TE-givul`; `DI-dofoj`.
+- TE-nozal analyzes the repo's current CBOR/DAG-CBOR mix. It finds that POC6 is
+  true DAG-CBOR, while POC15/16/18 mostly use PromiseGrid-CBOR envelopes with
+  tag-42 links and raw CIDs. It recommends a hybrid next step: keep
+  `grid([42(pCID), ...])` as the wire/app/kernel envelope, keep raw chunks and
+  Markdown specs as raw CIDs, and move durable POC18 graph objects such as
+  manifests, reference sets, snapshots, reviews, and mapping records toward
+  CIDv1 `dag-cbor` where IPLD traversal and tooling help. Source: `TE-nozal`;
+  `TE-givul`; `DI-harih`.
 - POC18 code scaffolding uses layer packages `store`, `graph`, `workspace`,
   `sync`, and `bridge`; generated first-slice runtime state lives only under
   `/tmp/wire-lab-poc18-*`; DevOps/root-filesystem tests are container-only and
@@ -568,3 +576,11 @@ Remaining:
   CIDs name raw bytes, whether raw chunks remain under `chunks/*.bin` or move
   under `objects/`, whether encrypted chunks use ciphertext CIDs, and whether
   standalone manifest objects remain distinct from `chunk_manifest` messages.
+- [x] nahop.27 Run a DAG-CBOR role TE covering DAG-CBOR benefits, sacrifices,
+  current repo usage, future PromiseGrid use, and where the `grid()` tag goes if
+  everything becomes DAG-CBOR. Completed by
+  `docs/thought-experiments/TE-nozal-dag-cbor-role-in-promisegrid.md`.
+- [ ] nahop.28 Lock the follow-up DF from `TE-nozal`: whether POC18 durable
+  graph objects should become CIDv1 `dag-cbor`, whether wire envelopes remain
+  PromiseGrid-CBOR with a custom `grid` tag, and whether the store should support
+  at least `raw` and `dag-cbor` CID profiles.

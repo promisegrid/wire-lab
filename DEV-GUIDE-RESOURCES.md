@@ -78,14 +78,20 @@ still exposing familiar `init`, `ingest`, `snapshot`, `checkout`, `refs`, and
 follow-up DF: the current implementation stores public/plain Rabin chunks as raw
 `.bin` byte objects and points at them from CBOR/grid manifests; the TE
 recommends preserving raw-byte chunk identity for public chunks while treating
-encrypted/ciphertext chunk identity as a later explicit profile. The first POC18
-code slice now implements sparse filesystem CAS, Rabin chunk manifests, POSIX
-node messages, directory/branch/release/logical-change/review/workspace
-reference sets, snapshot messages, checkout, a promise-shaped sync seam, Git
-bridge stubs, diagnostic CBOR rendering, and a clean `/tmp/wire-lab-poc18-*`
-fixture run. Source: `DI-zuruj`; `DI-dibut`; `DI-dofoj`; `DI-radaj`;
-`DI-lidaj`; `DI-fusir`; `DI-jifuj`; `DI-harih`; `DN-dopod`; `TE-kopap`;
-`TE-vahoj`; `TE-hikar`; `TE-givul`.
+encrypted/ciphertext chunk identity as a later explicit profile. TE-nozal
+clarifies that POC6 is true DAG-CBOR, while POC15/16/18 mostly use
+PromiseGrid-CBOR envelopes with tag-42 links and raw CIDs. Its recommended next
+step is hybrid: keep `grid([42(pCID), ...])` as the wire/app/kernel envelope,
+keep raw chunks and Markdown specs as raw CIDs, and consider CIDv1 `dag-cbor` for
+durable POC18 graph objects such as manifests, reference sets, snapshots,
+reviews, and mapping records. The first POC18 code slice now implements sparse
+filesystem CAS, Rabin chunk manifests, POSIX node messages,
+directory/branch/release/logical-change/review/workspace reference sets,
+snapshot messages, checkout, a promise-shaped sync seam, Git bridge stubs,
+diagnostic CBOR rendering, and a clean `/tmp/wire-lab-poc18-*` fixture run.
+Source: `DI-zuruj`; `DI-dibut`; `DI-dofoj`; `DI-radaj`; `DI-lidaj`;
+`DI-fusir`; `DI-jifuj`; `DI-harih`; `DN-dopod`; `TE-kopap`; `TE-vahoj`;
+`TE-hikar`; `TE-givul`; `TE-nozal`.
 
 ### Current Wire Direction
 
