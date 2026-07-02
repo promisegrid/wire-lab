@@ -106,6 +106,15 @@ Intent: Vahoj settled the object model but not the command language. The follow-
 Constraints: Mention porcelain/plumbing only as a Git analogy; do not introduce a raw Jujutsu-style change-ID field; keep Git import/export/push/pull under bridge behavior, not native sync; keep all interagent communication promise-shaped; use exact CIDs as identities, binary on wire and CIDv1 base32 when printable; first-slice `grid` commands may be intentionally narrow but must route through the same core library as fixtures.
 Affects: docs/thought-experiments/TE-hikar-poc18-grid-cli-command-model.md; implementations/poc18-cas-git-replacement/; protocols/wire-lab.d/TODO/TODO-nahop-poc18-cas-git-replacement.md; future POC18 CLI docs.
 
+ID: DI-gozov
+Date: 2026-07-01 16:42:36 -0700
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Implement `nahop.11` as a deterministic local peer-retrieval slice in the existing `sync` package: Bob plans missing CIDs, Alice promises object availability under local terms, Bob offers storage-credit style reciprocal terms, and Bob copies only exact CID-verified bytes from Alice's sparse CAS into Bob's sparse CAS.
+Intent: This advances POC18 from an interest-planning seam to a concrete peer-relative retrieval behavior without pretending that a global repository, global monitor, RPC service, or real transport already exists. The slice must prove that a fetched reference set can be incomplete locally, that the receiver can ask a chosen peer for missing graph/CAS objects, that the serving peer remains free not to promise service, and that copied bytes are verified against the requested CID before Bob retains them.
+Constraints: No real network transport in this slice; no Git push/pull vocabulary for native sync; no pCID-as-address behavior; no global authority; no trusted-copy shortcut that skips CID verification; no cross-agent shared CAS directory; token incentives are deterministic promise terms, not spendable production currency; generated runtime state remains under the approved `/tmp/wire-lab-poc18-*` pattern.
+Affects: implementations/poc18-cas-git-replacement/sync/; implementations/poc18-cas-git-replacement/cmd/poc-sim/; implementations/poc18-cas-git-replacement/cmd/poc-analyze/; implementations/poc18-cas-git-replacement/scripts/run-clean.sh; protocols/wire-lab.d/TODO/TODO-nahop-poc18-cas-git-replacement.md.
+
 ## Core Hypothesis
 
 POC18 should test this hypothesis:
@@ -457,6 +466,11 @@ Locked:
   `sync`, and `bridge`; generated first-slice runtime state lives only under
   `/tmp/wire-lab-poc18-*`; DevOps/root-filesystem tests are container-only and
   not part of the host first slice. Source: `DI-jifuj`; `DI-harih`.
+- POC18 implements deterministic local peer retrieval for `nahop.11`: Bob plans
+  missing CIDs, emits a `sync_interest` promise, Alice emits an
+  `object_availability` promise, and Bob retains only exact CID-verified bytes
+  copied from Alice's sparse CAS into Bob's separate sparse CAS. Source:
+  `DI-gozov`.
 - The POC18 version-control protocol spec is
   `implementations/poc18-cas-git-replacement/docs/protocols/version-control.md`,
   with pCID alias
@@ -524,7 +538,7 @@ Remaining:
   reference set into a local workspace directory with explicit local promises.
   First slice completed by `implementations/poc18-cas-git-replacement/workspace/`.
   Source: `DI-radaj`; `DI-jifuj`.
-- [ ] nahop.11 Implement peer fetch/retrieval of reference sets and missing CAS
+- [x] nahop.11 Implement peer fetch/retrieval of reference sets and missing CAS
   objects, including voluntary storage/forwarding promises and token incentives.
 - [ ] nahop.12 Implement rename/copy scenarios that preserve node lineage while
   changing directory labels.

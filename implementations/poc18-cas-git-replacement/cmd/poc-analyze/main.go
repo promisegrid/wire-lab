@@ -12,15 +12,33 @@ import (
 	"path/filepath"
 
 	"promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/store"
+	pocsync "promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/sync"
 	"promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/workspace"
 )
 
+// fixtureResult mirrors poc-sim output so analyzer checks stay tied to the same
+// deterministic fixture rather than becoming a production monitor.
+//
+// Intent: Check nahop.11 as local fixture evidence: separate peer CAS roots,
+// complete CID-verified retrieval, and Bob's checkout from Bob's own CAS.
+// Source: DI-gozov
+type fixtureResult struct {
+	workspace.IngestResult
+	AliceStoreRoot string                  `json:"alice_store_root"`
+	BobStoreRoot   string                  `json:"bob_store_root"`
+	Retrieval      pocsync.RetrievalReport `json:"retrieval"`
+}
+
 // Report records local fixture checks.
 type Report struct {
-	RunRoot string            `json:"run_root"`
-	Pass    bool              `json:"pass"`
-	Checks  map[string]string `json:"checks"`
-	Objects int               `json:"objects"`
+	RunRoot      string            `json:"run_root"`
+	Pass         bool              `json:"pass"`
+	Checks       map[string]string `json:"checks"`
+	Objects      int               `json:"objects"`
+	AliceObjects int               `json:"alice_objects"`
+	BobObjects   int               `json:"bob_objects"`
+	Retrieved    int               `json:"retrieved"`
+	Missing      int               `json:"missing"`
 }
 
 func main() {
@@ -52,19 +70,19 @@ func run() error {
 	return nil
 }
 
-func readResult(path string) (workspace.IngestResult, error) {
-	var result workspace.IngestResult
+func readResult(path string) (fixtureResult, error) {
+	var result fixtureResult
 	content, readErr := os.ReadFile(path)
 	if readErr != nil {
-		return workspace.IngestResult{}, readErr
+		return fixtureResult{}, readErr
 	}
 	if err := json.Unmarshal(content, &result); err != nil {
-		return workspace.IngestResult{}, err
+		return fixtureResult{}, err
 	}
 	return result, nil
 }
 
-func analyze(runRoot string, result workspace.IngestResult) (Report, error) {
+func analyze(runRoot string, result fixtureResult) (Report, error) {
 	checks := map[string]string{}
 	requiredCounts := []string{
 		"chunk",
@@ -103,15 +121,102 @@ func analyze(runRoot string, result workspace.IngestResult) (Report, error) {
 		checks["checkout_symlink"] = "missing"
 		pass = false
 	}
-	cas, openErr := store.Open(result.StoreRoot)
-	if openErr != nil {
-		return Report{}, openErr
+	if result.AliceStoreRoot != "" && result.BobStoreRoot != "" && result.AliceStoreRoot != result.BobStoreRoot {
+		checks["separate_sparse_peer_cas"] = "kept"
+	} else {
+		checks["separate_sparse_peer_cas"] = "missing"
+		pass = false
 	}
-	entries, listErr := cas.List()
-	if listErr != nil {
-		return Report{}, listErr
+	if len(result.Retrieval.Retrieved) > 0 {
+		checks["peer_retrieval"] = "kept"
+	} else {
+		checks["peer_retrieval"] = "missing"
+		pass = false
 	}
-	return Report{RunRoot: runRoot, Pass: pass, Checks: checks, Objects: len(entries)}, nil
+	if len(result.Retrieval.Missing) == 0 {
+		checks["peer_retrieval_complete"] = "kept"
+	} else {
+		checks["peer_retrieval_complete"] = "missing"
+		pass = false
+	}
+	if result.Retrieval.InterestMessageCID != "" && result.Retrieval.AvailabilityMessageCID != "" {
+		checks["sync_promise_messages"] = "kept"
+	} else {
+		checks["sync_promise_messages"] = "missing"
+		pass = false
+	}
+	aliceCAS, aliceOpenErr := store.Open(result.AliceStoreRoot)
+	if aliceOpenErr != nil {
+		return Report{}, aliceOpenErr
+	}
+	aliceEntries, aliceListErr := aliceCAS.List()
+	if aliceListErr != nil {
+		return Report{}, aliceListErr
+	}
+	bobCAS, bobOpenErr := store.Open(result.BobStoreRoot)
+	if bobOpenErr != nil {
+		return Report{}, bobOpenErr
+	}
+	bobEntries, bobListErr := bobCAS.List()
+	if bobListErr != nil {
+		return Report{}, bobListErr
+	}
+	snapshotCID, snapshotErr := store.ParseCIDText(result.SnapshotCID)
+	if snapshotErr != nil {
+		return Report{}, snapshotErr
+	}
+	if bobCAS.Has(snapshotCID) {
+		checks["bob_has_snapshot"] = "kept"
+	} else {
+		checks["bob_has_snapshot"] = "missing"
+		pass = false
+	}
+	if result.Retrieval.InterestMessageCID != "" {
+		interestCID, interestErr := store.ParseCIDText(result.Retrieval.InterestMessageCID)
+		if interestErr != nil {
+			return Report{}, interestErr
+		}
+		if bobCAS.Has(interestCID) {
+			checks["bob_has_sync_interest"] = "kept"
+		} else {
+			checks["bob_has_sync_interest"] = "missing"
+			pass = false
+		}
+		if aliceCAS.Has(interestCID) {
+			checks["alice_has_received_sync_interest"] = "kept"
+		} else {
+			checks["alice_has_received_sync_interest"] = "missing"
+			pass = false
+		}
+	}
+	if result.Retrieval.AvailabilityMessageCID != "" {
+		availabilityCID, availabilityErr := store.ParseCIDText(result.Retrieval.AvailabilityMessageCID)
+		if availabilityErr != nil {
+			return Report{}, availabilityErr
+		}
+		if bobCAS.Has(availabilityCID) {
+			checks["bob_has_object_availability"] = "kept"
+		} else {
+			checks["bob_has_object_availability"] = "missing"
+			pass = false
+		}
+		if aliceCAS.Has(availabilityCID) {
+			checks["alice_has_object_availability"] = "kept"
+		} else {
+			checks["alice_has_object_availability"] = "missing"
+			pass = false
+		}
+	}
+	return Report{
+		RunRoot:      runRoot,
+		Pass:         pass,
+		Checks:       checks,
+		Objects:      len(bobEntries),
+		AliceObjects: len(aliceEntries),
+		BobObjects:   len(bobEntries),
+		Retrieved:    len(result.Retrieval.Retrieved),
+		Missing:      len(result.Retrieval.Missing),
+	}, nil
 }
 
 func writeJSON(path string, value any) error {

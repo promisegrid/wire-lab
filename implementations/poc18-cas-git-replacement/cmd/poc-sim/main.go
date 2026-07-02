@@ -12,9 +12,24 @@ import (
 	"path/filepath"
 	"syscall"
 
+	cidlib "github.com/ipfs/go-cid"
+
 	"promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/store"
+	pocsync "promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/sync"
 	"promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/workspace"
 )
+
+// fixtureResult records the deterministic multi-agent fixture state.
+//
+// Intent: The fixture must prove Bob's checkout comes from Bob's sparse CAS
+// after CID-verified retrieval from Alice, not from a shared store shortcut.
+// Source: DI-gozov
+type fixtureResult struct {
+	workspace.IngestResult
+	AliceStoreRoot string                  `json:"alice_store_root"`
+	BobStoreRoot   string                  `json:"bob_store_root"`
+	Retrieval      pocsync.RetrievalReport `json:"retrieval"`
+}
 
 func main() {
 	if err := run(); err != nil {
@@ -30,35 +45,61 @@ func run() error {
 		return err
 	}
 	sourceRoot := filepath.Join(*runRoot, "alice-workspace")
-	storeRoot := filepath.Join(*runRoot, "alice-cas")
+	aliceStoreRoot := filepath.Join(*runRoot, "alice-cas")
+	bobStoreRoot := filepath.Join(*runRoot, "bob-cas")
 	checkoutRoot := filepath.Join(*runRoot, "bob-checkout")
 	if err := createFixture(sourceRoot); err != nil {
 		return err
 	}
-	cas, openErr := store.Open(storeRoot)
-	if openErr != nil {
-		return openErr
+	aliceCAS, aliceOpenErr := store.Open(aliceStoreRoot)
+	if aliceOpenErr != nil {
+		return aliceOpenErr
 	}
-	result, ingestErr := workspace.NewScanner(cas, "alice", "bob").Ingest(sourceRoot)
+	result, ingestErr := workspace.NewScanner(aliceCAS, "alice", "bob").Ingest(sourceRoot)
 	if ingestErr != nil {
 		return ingestErr
+	}
+	bobCAS, bobOpenErr := store.Open(bobStoreRoot)
+	if bobOpenErr != nil {
+		return bobOpenErr
+	}
+	branchCID, branchErr := store.ParseCIDText(result.BranchRefSetCID)
+	if branchErr != nil {
+		return branchErr
+	}
+	retrieval, retrieveErr := pocsync.RetrieveGraph(
+		pocsync.Peer{Agent: "bob", CAS: bobCAS},
+		pocsync.Peer{Agent: "alice", CAS: aliceCAS},
+		map[string]cidlib.Cid{"branch": branchCID},
+		"storage_credit:2",
+	)
+	if retrieveErr != nil {
+		return retrieveErr
 	}
 	snapshotCID, parseErr := store.ParseCIDText(result.SnapshotCID)
 	if parseErr != nil {
 		return parseErr
 	}
-	if err := workspace.MaterializeSnapshot(cas, snapshotCID, checkoutRoot); err != nil {
+	if err := workspace.MaterializeSnapshot(bobCAS, snapshotCID, checkoutRoot); err != nil {
 		return err
 	}
 	result.CheckoutRoot = checkoutRoot
+	combined := fixtureResult{
+		IngestResult:   result,
+		AliceStoreRoot: aliceStoreRoot,
+		BobStoreRoot:   bobStoreRoot,
+		Retrieval:      retrieval,
+	}
 	resultPath := filepath.Join(*runRoot, "result.json")
-	if err := writeJSON(resultPath, result); err != nil {
+	if err := writeJSON(resultPath, combined); err != nil {
 		return err
 	}
 	fmt.Printf("run_root=%s\n", *runRoot)
-	fmt.Printf("store=%s\n", storeRoot)
+	fmt.Printf("alice_store=%s\n", aliceStoreRoot)
+	fmt.Printf("bob_store=%s\n", bobStoreRoot)
 	fmt.Printf("snapshot=%s\n", result.SnapshotCID)
 	fmt.Printf("diagnostic_message=%s\n", result.DiagnosticMessageCID)
+	fmt.Printf("retrieved_objects=%d missing_objects=%d\n", len(retrieval.Retrieved), len(retrieval.Missing))
 	return nil
 }
 

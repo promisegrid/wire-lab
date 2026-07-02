@@ -247,6 +247,38 @@ func SnapshotBody(identity string, rootDirectoryCID cidlib.Cid, parentSnapshots 
 	return []any{identity, store.LinkTag(rootDirectoryCID), parents, summary, terms}
 }
 
+// ObjectRow returns one availability or interest row naming a CID.
+func ObjectRow(role string, objectCID cidlib.Cid, extra ...any) []any {
+	row := []any{role, store.LinkTag(objectCID)}
+	return append(row, extra...)
+}
+
+// ObjectAvailabilityBody returns the promise body for object_availability.
+//
+// Intent: Keep peer retrieval as an explicit promise that selected object CIDs
+// are locally available, serveable, forwardable, missing, or not promised.
+// Source: DI-gozov
+func ObjectAvailabilityBody(scope string, objects []any, serviceTerms any) []any {
+	if serviceTerms == nil {
+		serviceTerms = []any{}
+	}
+	return []any{scope, objects, serviceTerms}
+}
+
+// SyncInterestBody returns the promise body for sync_interest.
+//
+// Intent: Keep missing-object retrieval as Bob's voluntary promise to receive
+// selected CIDs under local constraints and reciprocal terms. Source: DI-gozov
+func SyncInterestBody(scope string, wantedObjects []any, offerTerms any, refusalTerms any) []any {
+	if offerTerms == nil {
+		offerTerms = []any{}
+	}
+	if refusalTerms == nil {
+		refusalTerms = []any{}
+	}
+	return []any{scope, wantedObjects, offerTerms, refusalTerms}
+}
+
 // EnvelopeView is a parsed POC18 message shape used by checkout and diagnostics.
 type EnvelopeView struct {
 	ProtocolCID cidlib.Cid

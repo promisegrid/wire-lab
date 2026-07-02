@@ -87,11 +87,13 @@ durable POC18 graph objects such as manifests, reference sets, snapshots,
 reviews, and mapping records. The first POC18 code slice now implements sparse
 filesystem CAS, Rabin chunk manifests, POSIX node messages,
 directory/branch/release/logical-change/review/workspace reference sets,
-snapshot messages, checkout, a promise-shaped sync seam, Git bridge stubs,
-diagnostic CBOR rendering, and a clean `/tmp/wire-lab-poc18-*` fixture run.
-Source: `DI-zuruj`; `DI-dibut`; `DI-dofoj`; `DI-radaj`; `DI-lidaj`;
-`DI-fusir`; `DI-jifuj`; `DI-harih`; `DN-dopod`; `TE-kopap`; `TE-vahoj`;
-`TE-hikar`; `TE-givul`; `TE-nozal`.
+snapshot messages, checkout, deterministic peer retrieval with `sync_interest`
+and `object_availability` promises between separate Alice/Bob sparse CAS roots,
+Git bridge stubs, diagnostic CBOR rendering, and a clean
+`/tmp/wire-lab-poc18-*` fixture run. Source: `DI-zuruj`; `DI-dibut`;
+`DI-dofoj`; `DI-radaj`; `DI-lidaj`; `DI-fusir`; `DI-jifuj`; `DI-harih`;
+`DI-gozov`; `DN-dopod`; `TE-kopap`; `TE-vahoj`; `TE-hikar`; `TE-givul`;
+`TE-nozal`.
 
 ### Current Wire Direction
 
