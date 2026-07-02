@@ -115,6 +115,15 @@ Intent: This advances POC18 from an interest-planning seam to a concrete peer-re
 Constraints: No real network transport in this slice; no Git push/pull vocabulary for native sync; no pCID-as-address behavior; no global authority; no trusted-copy shortcut that skips CID verification; no cross-agent shared CAS directory; token incentives are deterministic promise terms, not spendable production currency; generated runtime state remains under the approved `/tmp/wire-lab-poc18-*` pattern.
 Affects: implementations/poc18-cas-git-replacement/sync/; implementations/poc18-cas-git-replacement/cmd/poc-sim/; implementations/poc18-cas-git-replacement/cmd/poc-analyze/; implementations/poc18-cas-git-replacement/scripts/run-clean.sh; protocols/wire-lab.d/TODO/TODO-nahop-poc18-cas-git-replacement.md.
 
+ID: DI-guban
+Date: 2026-07-01 18:07:10 -0700
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Implement `nahop.12`, `nahop.13`, and `nahop.14` as deterministic POC18 scenario extensions under a new `implementations/poc18-cas-git-replacement/scenario/` package, with the existing `poc-sim` fixture generating rename/copy lineage, divergent logical-change snapshots, a multi-parent merge snapshot, review/test statements, and a local adoption promise.
+Intent: The next POC18 slice should prove the version-control model can express GitHub-like collaboration without a forge authority. Filenames remain directory reference-set labels, not file identity. Divergence is explicit in logical-change reference sets and branch heads. A merge is a signed promise with multiple snapshot parents and conflict-resolution terms. Reviews, tests, and adoption are local promises by agents, never global approvals.
+Constraints: Use the existing version-control pCID and `grid([42(pCID), parents, payload, proof])` shape; keep all behavior deterministic and local to the POC18 fixture; do not add real network transport, Git bridge behavior, or global merge/review authority; generated runtime state remains under `/tmp/wire-lab-poc18-*`; analyzer checks remain non-production local fixture checks; preserve CIDv1 base32 printable rendering and binary CID/tag42 link semantics.
+Affects: implementations/poc18-cas-git-replacement/scenario/; implementations/poc18-cas-git-replacement/graph/; implementations/poc18-cas-git-replacement/cmd/poc-sim/; implementations/poc18-cas-git-replacement/cmd/poc-analyze/; DEV-GUIDE-RESOURCES.md; protocols/wire-lab.d/TODO/TODO-nahop-poc18-cas-git-replacement.md.
+
 ## Core Hypothesis
 
 POC18 should test this hypothesis:
@@ -471,6 +480,11 @@ Locked:
   `object_availability` promise, and Bob retains only exact CID-verified bytes
   copied from Alice's sparse CAS into Bob's separate sparse CAS. Source:
   `DI-gozov`.
+- POC18 implements deterministic collaboration scenarios for `nahop.12` through
+  `nahop.14`: rename/copy lineage keeps the same POSIX node CID under changed
+  directory labels, divergent Alice/Bob snapshots are explicit, Dave's merge is
+  a multi-parent snapshot promise, and Ellen/Dave publish local test and adoption
+  review promises without forge authority. Source: `DI-guban`.
 - The POC18 version-control protocol spec is
   `implementations/poc18-cas-git-replacement/docs/protocols/version-control.md`,
   with pCID alias
@@ -540,11 +554,11 @@ Remaining:
   Source: `DI-radaj`; `DI-jifuj`.
 - [x] nahop.11 Implement peer fetch/retrieval of reference sets and missing CAS
   objects, including voluntary storage/forwarding promises and token incentives.
-- [ ] nahop.12 Implement rename/copy scenarios that preserve node lineage while
+- [x] nahop.12 Implement rename/copy scenarios that preserve node lineage while
   changing directory labels.
-- [ ] nahop.13 Implement divergent branch/logical-change and multi-parent merge
+- [x] nahop.13 Implement divergent branch/logical-change and multi-parent merge
   scenarios, including conflict-resolution promises.
-- [ ] nahop.14 Implement review/test-result promises and local adoption decisions
+- [x] nahop.14 Implement review/test-result promises and local adoption decisions
   that can replace a GitHub pull-request approval flow without forge authority.
 - [ ] nahop.15 Implement the Git bridge content-and-DAG roundtrip with a Go Git
   library, covering import, export, push, and pull through shared conversion

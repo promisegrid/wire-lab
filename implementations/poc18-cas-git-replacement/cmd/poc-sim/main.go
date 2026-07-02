@@ -14,6 +14,7 @@ import (
 
 	cidlib "github.com/ipfs/go-cid"
 
+	"promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/scenario"
 	"promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/store"
 	pocsync "promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/sync"
 	"promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/workspace"
@@ -28,6 +29,7 @@ type fixtureResult struct {
 	workspace.IngestResult
 	AliceStoreRoot string                  `json:"alice_store_root"`
 	BobStoreRoot   string                  `json:"bob_store_root"`
+	Scenario       scenario.Result         `json:"scenario"`
 	Retrieval      pocsync.RetrievalReport `json:"retrieval"`
 }
 
@@ -59,28 +61,45 @@ func run() error {
 	if ingestErr != nil {
 		return ingestErr
 	}
+	scenarioResult, scenarioErr := scenario.NewBuilder(aliceCAS).Build(result)
+	if scenarioErr != nil {
+		return scenarioErr
+	}
+	mergeSnapshotCID, mergeSnapshotErr := store.ParseCIDText(scenarioResult.MergeSnapshotCID)
+	if mergeSnapshotErr != nil {
+		return mergeSnapshotErr
+	}
+	mergeBranchCID, mergeBranchErr := store.ParseCIDText(scenarioResult.MergeBranchRefSetCID)
+	if mergeBranchErr != nil {
+		return mergeBranchErr
+	}
+	reviewThreadCID, reviewThreadErr := store.ParseCIDText(scenarioResult.ReviewThreadRefSetCID)
+	if reviewThreadErr != nil {
+		return reviewThreadErr
+	}
+	result.SnapshotCID = scenarioResult.MergeSnapshotCID
+	result.RootReferenceSetCID = scenarioResult.MergeRootRefSetCID
+	result.BranchRefSetCID = scenarioResult.MergeBranchRefSetCID
+	result.LogicalChangeCID = scenarioResult.LogicalChangeRefSetCID
+	result.ReviewThreadCID = scenarioResult.ReviewThreadRefSetCID
+	result.DiagnosticMessageCID = scenarioResult.MergeSnapshotCID
+	for countName, countValue := range scenarioResult.Counts {
+		result.Counts[countName] += countValue
+	}
 	bobCAS, bobOpenErr := store.Open(bobStoreRoot)
 	if bobOpenErr != nil {
 		return bobOpenErr
 	}
-	branchCID, branchErr := store.ParseCIDText(result.BranchRefSetCID)
-	if branchErr != nil {
-		return branchErr
-	}
 	retrieval, retrieveErr := pocsync.RetrieveGraph(
 		pocsync.Peer{Agent: "bob", CAS: bobCAS},
 		pocsync.Peer{Agent: "alice", CAS: aliceCAS},
-		map[string]cidlib.Cid{"branch": branchCID},
+		map[string]cidlib.Cid{"branch": mergeBranchCID, "review_thread": reviewThreadCID},
 		"storage_credit:2",
 	)
 	if retrieveErr != nil {
 		return retrieveErr
 	}
-	snapshotCID, parseErr := store.ParseCIDText(result.SnapshotCID)
-	if parseErr != nil {
-		return parseErr
-	}
-	if err := workspace.MaterializeSnapshot(bobCAS, snapshotCID, checkoutRoot); err != nil {
+	if err := workspace.MaterializeSnapshot(bobCAS, mergeSnapshotCID, checkoutRoot); err != nil {
 		return err
 	}
 	result.CheckoutRoot = checkoutRoot
@@ -88,6 +107,7 @@ func run() error {
 		IngestResult:   result,
 		AliceStoreRoot: aliceStoreRoot,
 		BobStoreRoot:   bobStoreRoot,
+		Scenario:       scenarioResult,
 		Retrieval:      retrieval,
 	}
 	resultPath := filepath.Join(*runRoot, "result.json")

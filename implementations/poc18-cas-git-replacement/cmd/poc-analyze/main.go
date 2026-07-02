@@ -11,6 +11,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/scenario"
 	"promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/store"
 	pocsync "promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/sync"
 	"promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/workspace"
@@ -26,6 +27,7 @@ type fixtureResult struct {
 	workspace.IngestResult
 	AliceStoreRoot string                  `json:"alice_store_root"`
 	BobStoreRoot   string                  `json:"bob_store_root"`
+	Scenario       scenario.Result         `json:"scenario"`
 	Retrieval      pocsync.RetrievalReport `json:"retrieval"`
 }
 
@@ -109,10 +111,19 @@ func analyze(runRoot string, result fixtureResult) (Report, error) {
 		checks[countName] = "missing"
 		pass = false
 	}
-	if _, err := os.Stat(filepath.Join(result.CheckoutRoot, "README.md")); err == nil {
-		checks["checkout_readme"] = "kept"
+	// Intent: The merged scenario intentionally moves README.md to docs/intro.md
+	// and keeps a root copy label, so checkout validation follows labels rather
+	// than treating the old filename as file identity. Source: DI-guban
+	if _, err := os.Stat(filepath.Join(result.CheckoutRoot, "docs", "intro.md")); err == nil {
+		checks["checkout_renamed_intro"] = "kept"
 	} else {
-		checks["checkout_readme"] = "missing"
+		checks["checkout_renamed_intro"] = "missing"
+		pass = false
+	}
+	if _, err := os.Stat(filepath.Join(result.CheckoutRoot, "README-copy.md")); err == nil {
+		checks["checkout_root_copy"] = "kept"
+	} else {
+		checks["checkout_root_copy"] = "missing"
 		pass = false
 	}
 	if _, err := os.Lstat(filepath.Join(result.CheckoutRoot, "README-link.md")); err == nil {
@@ -143,6 +154,30 @@ func analyze(runRoot string, result fixtureResult) (Report, error) {
 		checks["sync_promise_messages"] = "kept"
 	} else {
 		checks["sync_promise_messages"] = "missing"
+		pass = false
+	}
+	if result.Scenario.LineageNodeCID != "" && result.Scenario.LineageNodeCID == result.Scenario.RenameLabelNodeCID && result.Scenario.LineageNodeCID == result.Scenario.CopyLabelNodeCID {
+		checks["rename_copy_preserves_node_lineage"] = "kept"
+	} else {
+		checks["rename_copy_preserves_node_lineage"] = "missing"
+		pass = false
+	}
+	if result.Scenario.BobDivergentSnapshotCID != "" && result.Scenario.RenameCopySnapshotCID != "" && result.Scenario.BobDivergentSnapshotCID != result.Scenario.RenameCopySnapshotCID {
+		checks["divergent_snapshots"] = "kept"
+	} else {
+		checks["divergent_snapshots"] = "missing"
+		pass = false
+	}
+	if len(result.Scenario.MergeParentSnapshotCIDs) == 2 && result.Scenario.MergeSnapshotCID != "" {
+		checks["multi_parent_merge"] = "kept"
+	} else {
+		checks["multi_parent_merge"] = "missing"
+		pass = false
+	}
+	if result.Scenario.TestStatementCID != "" && result.Scenario.AdoptionStatementCID != "" && result.Scenario.ReviewAdoptionResult == "accepted_locally" {
+		checks["review_test_local_adoption"] = "kept"
+	} else {
+		checks["review_test_local_adoption"] = "missing"
 		pass = false
 	}
 	aliceCAS, aliceOpenErr := store.Open(result.AliceStoreRoot)
@@ -204,6 +239,30 @@ func analyze(runRoot string, result fixtureResult) (Report, error) {
 			checks["alice_has_object_availability"] = "kept"
 		} else {
 			checks["alice_has_object_availability"] = "missing"
+			pass = false
+		}
+	}
+	for checkName, cidText := range map[string]string{
+		"bob_has_rename_copy_snapshot":   result.Scenario.RenameCopySnapshotCID,
+		"bob_has_bob_divergent_snapshot": result.Scenario.BobDivergentSnapshotCID,
+		"bob_has_merge_snapshot":         result.Scenario.MergeSnapshotCID,
+		"bob_has_test_statement":         result.Scenario.TestStatementCID,
+		"bob_has_adoption_statement":     result.Scenario.AdoptionStatementCID,
+		"bob_has_review_thread":          result.Scenario.ReviewThreadRefSetCID,
+	} {
+		if cidText == "" {
+			checks[checkName] = "missing"
+			pass = false
+			continue
+		}
+		objectCID, objectErr := store.ParseCIDText(cidText)
+		if objectErr != nil {
+			return Report{}, objectErr
+		}
+		if bobCAS.Has(objectCID) {
+			checks[checkName] = "kept"
+		} else {
+			checks[checkName] = "missing"
 			pass = false
 		}
 	}

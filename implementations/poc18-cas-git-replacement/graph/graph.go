@@ -279,6 +279,18 @@ func SyncInterestBody(scope string, wantedObjects []any, offerTerms any, refusal
 	return []any{scope, wantedObjects, offerTerms, refusalTerms}
 }
 
+// ReviewStatementBody returns the promise body for review_statement.
+//
+// Intent: Reviews, tests, and adoptions are local promises about exact target
+// CIDs. They do not approve work globally or command another agent. Source:
+// DI-guban
+func ReviewStatementBody(reviewRole string, targets []any, statement string, result string, supportingObjects any) []any {
+	if supportingObjects == nil {
+		supportingObjects = []any{}
+	}
+	return []any{reviewRole, targets, statement, result, supportingObjects}
+}
+
 // EnvelopeView is a parsed POC18 message shape used by checkout and diagnostics.
 type EnvelopeView struct {
 	ProtocolCID cidlib.Cid
