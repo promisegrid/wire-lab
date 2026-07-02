@@ -133,6 +133,15 @@ Intent: POC18 needs real Git interoperability without letting Git remotes become
 Constraints: Git bridge operations are compatibility adapters only; do not reintroduce Git push/pull as native PromiseGrid synchronization; do not create a forge authority, global branch authority, or Git-specific object identity inside native graph objects; keep generated bridge fixtures under `/tmp/wire-lab-poc18-*`; use CIDv1 base32 text for printable CIDs; preserve existing `bridge.Operation`, `bridge.Mapping`, and CLI/core package naming where possible.
 Affects: implementations/poc18-cas-git-replacement/bridge/; implementations/poc18-cas-git-replacement/cmd/grid/; implementations/poc18-cas-git-replacement/cmd/poc-sim/; implementations/poc18-cas-git-replacement/cmd/poc-analyze/; implementations/poc18-cas-git-replacement/scripts/run-clean.sh; implementations/poc18-cas-git-replacement/go.mod; implementations/poc18-cas-git-replacement/go.sum; protocols/wire-lab.d/TODO/TODO-nahop-poc18-cas-git-replacement.md.
 
+ID: DI-pahor
+Date: 2026-07-01 21:48:36 -0700
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Add a repo-local `.grid/config.json` control file discovered by walking upward from the current directory; make the config point at a typed CAS locator with default `{ "type": "file", "path": ".grid/cas" }`; keep `--store` as an explicit file-CAS override for tests, scripts, and unusual workflows.
+Intent: Normal `grid` commands should work from a repo root or subdirectory without repeating `--store`, while preserving the fact that the CAS may later be outside `.grid/`, managed by a local daemon, or remote. `.grid/` is repo control state, not necessarily the CAS itself.
+Constraints: Do not add `.grid/` to `.gitignore` in this change; implement only file CAS locators now; leave daemon/remote locators as future config values; commands with explicit `--store` keep existing behavior; commands without `--store` fail clearly when no `.grid/config.json` is discoverable; generated runtime fixture paths remain under `/tmp/wire-lab-poc18-*`.
+Affects: implementations/poc18-cas-git-replacement/repo/; implementations/poc18-cas-git-replacement/cmd/grid/; protocols/wire-lab.d/TODO/TODO-nahop-poc18-cas-git-replacement.md; DEV-GUIDE-RESOURCES.md.
+
 ## Core Hypothesis
 
 POC18 should test this hypothesis:
@@ -623,3 +632,6 @@ Remaining:
   graph objects should become CIDv1 `dag-cbor`, whether wire envelopes remain
   PromiseGrid-CBOR with a custom `grid` tag, and whether the store should support
   at least `raw` and `dag-cbor` CID profiles.
+- [ ] nahop.29 Decide whether future `grid init` should default to a local
+  daemon-managed CAS locator instead of the current local file CAS
+  `.grid/cas`. Source: `DI-pahor`.

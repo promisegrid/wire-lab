@@ -95,11 +95,15 @@ local review/test/adoption promises with no forge authority. The POC18 Git
 bridge now uses go-git for real compatibility-adapter import, export, push, and
 pull flows through shared conversion code and records `git_bridge_mapping`
 promises so conventional Git remotes remain bridge inputs/outputs rather than
-native PromiseGrid authorities. Diagnostic CBOR rendering and a clean
-`/tmp/wire-lab-poc18-*` fixture run are also present. Source: `DI-zuruj`;
-`DI-dibut`; `DI-dofoj`; `DI-radaj`; `DI-lidaj`; `DI-fusir`; `DI-jifuj`;
-`DI-harih`; `DI-gozov`; `DI-guban`; `DI-fimap`; `DN-dopod`; `TE-kopap`;
-`TE-vahoj`; `TE-hikar`; `TE-givul`; `TE-nozal`.
+native PromiseGrid authorities. Normal `grid` commands now discover repo-local
+`.grid/config.json` by walking upward from the current directory; the config
+contains a typed CAS locator that defaults to local file CAS `.grid/cas` while
+preserving room for daemon or remote CAS locators later. Diagnostic CBOR
+rendering and a clean `/tmp/wire-lab-poc18-*` fixture run are also present.
+Source: `DI-zuruj`; `DI-dibut`; `DI-dofoj`; `DI-radaj`; `DI-lidaj`;
+`DI-fusir`; `DI-jifuj`; `DI-harih`; `DI-gozov`; `DI-guban`; `DI-fimap`;
+`DI-pahor`; `DN-dopod`; `TE-kopap`; `TE-vahoj`; `TE-hikar`; `TE-givul`;
+`TE-nozal`.
 
 ### Current Wire Direction
 

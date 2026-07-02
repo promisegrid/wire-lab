@@ -12,6 +12,7 @@ import (
 
 	"promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/bridge"
 	"promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/graph"
+	pgrepo "promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/repo"
 	"promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/store"
 	"promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/workspace"
 )
@@ -48,10 +49,10 @@ func run(args []string) error {
 }
 
 func usage() {
-	fmt.Println("usage: grid <init|ingest|snapshot|checkout|refs|diag> [options]")
+	fmt.Println("usage: grid <init|ingest|snapshot|checkout|refs|diag|git> [options]")
 	fmt.Println()
 	fmt.Println("first-slice commands:")
-	fmt.Println("  init     - create a sparse local CAS")
+	fmt.Println("  init     - create .grid/config.json and the configured sparse local CAS")
 	fmt.Println("  ingest   - scan a workspace and store graph objects")
 	fmt.Println("  snapshot - first-slice alias for ingest while persistent workspace config is absent")
 	fmt.Println("  checkout - materialize a snapshot from local CAS")
@@ -62,48 +63,98 @@ func usage() {
 
 func initStore(args []string) error {
 	flags := flag.NewFlagSet("init", flag.ContinueOnError)
-	storeRoot := flags.String("store", "", "CAS store root")
+	rootPath := flags.String("root", ".", "repo root for .grid/config.json")
+	storeRoot := flags.String("store", "", "legacy file CAS path to write into .grid/config.json")
+	casPath := flags.String("cas-path", "", "file CAS path to write into .grid/config.json")
 	if err := flags.Parse(args); err != nil {
 		return err
 	}
-	if *storeRoot == "" {
-		return fmt.Errorf("-store is required")
+	if *storeRoot != "" && *casPath != "" {
+		return fmt.Errorf("-store and -cas-path cannot both be set")
 	}
-	if _, err := store.Open(*storeRoot); err != nil {
-		return err
+	selectedCASPath := *casPath
+	if selectedCASPath == "" {
+		selectedCASPath = *storeRoot
 	}
-	fmt.Printf("initialized store=%s\n", *storeRoot)
+	repository, initErr := pgrepo.Init(*rootPath, selectedCASPath)
+	if initErr != nil {
+		return initErr
+	}
+	casPathText := repository.ResolvePath(repository.Config.CAS.Path)
+	fmt.Printf("initialized repo=%s config=%s cas=%s\n", repository.Root, repository.ConfigPath, casPathText)
+	return nil
+}
+
+func openCLIStore(storeRoot string) (*store.FileStore, pgrepo.Repository, bool, error) {
+	if storeRoot != "" {
+		cas, openErr := store.Open(storeRoot)
+		return cas, pgrepo.Repository{}, false, openErr
+	}
+	// Intent: Normal grid commands discover repo-local control state from the
+	// current directory upward, while `--store` remains an explicit override for
+	// tests and unusual workflows. Source: DI-pahor
+	repository, discoverErr := pgrepo.Discover(".")
+	if discoverErr != nil {
+		return nil, pgrepo.Repository{}, false, discoverErr
+	}
+	cas, openErr := repository.OpenFileCAS()
+	if openErr != nil {
+		return nil, pgrepo.Repository{}, false, openErr
+	}
+	return cas, repository, true, nil
+}
+
+func openGitBridgeStore(storeRoot string) (*store.FileStore, error) {
+	cas, _, _, openErr := openCLIStore(storeRoot)
+	return cas, openErr
+}
+
+func workspaceDefault(storeRoot string, workspaceRoot string, repository pgrepo.Repository, foundRepository bool) (string, error) {
+	if workspaceRoot != "" {
+		return workspaceRoot, nil
+	}
+	if foundRepository {
+		return repository.Root, nil
+	}
+	if storeRoot != "" {
+		return "", fmt.Errorf("-workspace is required when -store overrides repo discovery")
+	}
+	return "", fmt.Errorf("-workspace is required")
+}
+
+func writeIngestResult(result workspace.IngestResult, outPath string) error {
+	if outPath != "" {
+		if err := writeJSON(outPath, result); err != nil {
+			return err
+		}
+	}
+	fmt.Printf("snapshot=%s root_refset=%s store=%s\n", result.SnapshotCID, result.RootReferenceSetCID, result.StoreRoot)
 	return nil
 }
 
 func ingest(command string, args []string) error {
 	flags := flag.NewFlagSet(command, flag.ContinueOnError)
 	storeRoot := flags.String("store", "", "CAS store root")
-	workspaceRoot := flags.String("workspace", "", "workspace path to scan")
+	workspaceRoot := flags.String("workspace", "", "workspace path to scan; defaults to discovered repo root")
 	outPath := flags.String("out", "", "optional JSON result path")
 	promiser := flags.String("promiser", "alice", "local promiser")
 	promisee := flags.String("promisee", "bob", "local promisee")
 	if err := flags.Parse(args); err != nil {
 		return err
 	}
-	if *storeRoot == "" || *workspaceRoot == "" {
-		return fmt.Errorf("-store and -workspace are required")
-	}
-	cas, openErr := store.Open(*storeRoot)
+	cas, repository, foundRepository, openErr := openCLIStore(*storeRoot)
 	if openErr != nil {
 		return openErr
 	}
-	result, ingestErr := workspace.NewScanner(cas, *promiser, *promisee).Ingest(*workspaceRoot)
+	selectedWorkspace, workspaceErr := workspaceDefault(*storeRoot, *workspaceRoot, repository, foundRepository)
+	if workspaceErr != nil {
+		return workspaceErr
+	}
+	result, ingestErr := workspace.NewScanner(cas, *promiser, *promisee).Ingest(selectedWorkspace)
 	if ingestErr != nil {
 		return ingestErr
 	}
-	if *outPath != "" {
-		if err := writeJSON(*outPath, result); err != nil {
-			return err
-		}
-	}
-	fmt.Printf("snapshot=%s root_refset=%s store=%s\n", result.SnapshotCID, result.RootReferenceSetCID, result.StoreRoot)
-	return nil
+	return writeIngestResult(result, *outPath)
 }
 
 func checkout(args []string) error {
@@ -114,10 +165,10 @@ func checkout(args []string) error {
 	if err := flags.Parse(args); err != nil {
 		return err
 	}
-	if *storeRoot == "" || *snapshotText == "" || *outPath == "" {
-		return fmt.Errorf("-store, -snapshot, and -out are required")
+	if *snapshotText == "" || *outPath == "" {
+		return fmt.Errorf("-snapshot and -out are required")
 	}
-	cas, openErr := store.Open(*storeRoot)
+	cas, _, _, openErr := openCLIStore(*storeRoot)
 	if openErr != nil {
 		return openErr
 	}
@@ -156,10 +207,10 @@ func loadDiagnosticBytes(storeRoot, cidText, filePath string) ([]byte, error) {
 	if filePath != "" {
 		return os.ReadFile(filePath)
 	}
-	if storeRoot == "" || cidText == "" {
-		return nil, fmt.Errorf("either -file or both -store and -cid are required")
+	if cidText == "" {
+		return nil, fmt.Errorf("either -file or -cid is required")
 	}
-	cas, openErr := store.Open(storeRoot)
+	cas, _, _, openErr := openCLIStore(storeRoot)
 	if openErr != nil {
 		return nil, openErr
 	}
@@ -199,10 +250,10 @@ func gitImport(args []string) error {
 	if err := flags.Parse(args); err != nil {
 		return err
 	}
-	if *storeRoot == "" || *repositoryPath == "" {
-		return fmt.Errorf("-store and -repo are required")
+	if *repositoryPath == "" {
+		return fmt.Errorf("-repo is required")
 	}
-	cas, openErr := store.Open(*storeRoot)
+	cas, openErr := openGitBridgeStore(*storeRoot)
 	if openErr != nil {
 		return openErr
 	}
@@ -227,10 +278,10 @@ func gitExport(args []string) error {
 	if err := flags.Parse(args); err != nil {
 		return err
 	}
-	if *storeRoot == "" || *snapshotText == "" || *repositoryPath == "" {
-		return fmt.Errorf("-store, -snapshot, and -repo are required")
+	if *snapshotText == "" || *repositoryPath == "" {
+		return fmt.Errorf("-snapshot and -repo are required")
 	}
-	cas, openErr := store.Open(*storeRoot)
+	cas, openErr := openGitBridgeStore(*storeRoot)
 	if openErr != nil {
 		return openErr
 	}
@@ -256,10 +307,10 @@ func gitPull(args []string) error {
 	if err := flags.Parse(args); err != nil {
 		return err
 	}
-	if *storeRoot == "" || *remoteURL == "" || *worktreePath == "" {
-		return fmt.Errorf("-store, -remote, and -worktree are required")
+	if *remoteURL == "" || *worktreePath == "" {
+		return fmt.Errorf("-remote and -worktree are required")
 	}
-	cas, openErr := store.Open(*storeRoot)
+	cas, openErr := openGitBridgeStore(*storeRoot)
 	if openErr != nil {
 		return openErr
 	}
@@ -282,10 +333,10 @@ func gitPush(args []string) error {
 	if err := flags.Parse(args); err != nil {
 		return err
 	}
-	if *storeRoot == "" || *snapshotText == "" || *remoteURL == "" || *worktreePath == "" {
-		return fmt.Errorf("-store, -snapshot, -remote, and -worktree are required")
+	if *snapshotText == "" || *remoteURL == "" || *worktreePath == "" {
+		return fmt.Errorf("-snapshot, -remote, and -worktree are required")
 	}
-	cas, openErr := store.Open(*storeRoot)
+	cas, openErr := openGitBridgeStore(*storeRoot)
 	if openErr != nil {
 		return openErr
 	}

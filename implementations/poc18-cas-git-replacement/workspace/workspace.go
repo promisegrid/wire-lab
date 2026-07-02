@@ -147,6 +147,12 @@ func (scanner *Scanner) scanDirectory(absPath, relPath string) (cidlib.Cid, cidl
 	})
 	referenceEntries := []any{}
 	for _, dirEntry := range dirEntries {
+		// Intent: `.grid` is repo-local control state. Default repo-root scans must
+		// not snapshot local config, CAS bytes, or future daemon/remote locators as
+		// versioned workspace content. Source: DI-pahor
+		if dirEntry.Name() == ".grid" {
+			continue
+		}
 		childAbs := filepath.Join(absPath, dirEntry.Name())
 		childRel := filepath.Join(relPath, dirEntry.Name())
 		info, infoErr := os.Lstat(childAbs)
