@@ -291,6 +291,24 @@ func ReviewStatementBody(reviewRole string, targets []any, statement string, res
 	return []any{reviewRole, targets, statement, result, supportingObjects}
 }
 
+// GitBridgeMappingBody returns the promise body for git_bridge_mapping.
+//
+// Intent: Git compatibility records must describe a local adapter mapping without
+// letting Git remotes, refs, or hosts become PromiseGrid's native authority.
+// Source: DI-fimap
+func GitBridgeMappingBody(bridgeDirection string, gitContext string, mappings any, lossRecords any, bridgeTerms any) []any {
+	if mappings == nil {
+		mappings = []any{}
+	}
+	if lossRecords == nil {
+		lossRecords = []any{}
+	}
+	if bridgeTerms == nil {
+		bridgeTerms = []any{}
+	}
+	return []any{bridgeDirection, gitContext, mappings, lossRecords, bridgeTerms}
+}
+
 // EnvelopeView is a parsed POC18 message shape used by checkout and diagnostics.
 type EnvelopeView struct {
 	ProtocolCID cidlib.Cid

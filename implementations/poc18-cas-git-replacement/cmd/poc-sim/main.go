@@ -12,8 +12,11 @@ import (
 	"path/filepath"
 	"syscall"
 
+	git "github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5/plumbing"
 	cidlib "github.com/ipfs/go-cid"
 
+	"promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/bridge"
 	"promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/scenario"
 	"promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/store"
 	pocsync "promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/sync"
@@ -30,7 +33,15 @@ type fixtureResult struct {
 	AliceStoreRoot string                  `json:"alice_store_root"`
 	BobStoreRoot   string                  `json:"bob_store_root"`
 	Scenario       scenario.Result         `json:"scenario"`
+	Bridge         bridgeFixtureResult     `json:"bridge"`
 	Retrieval      pocsync.RetrievalReport `json:"retrieval"`
+}
+
+type bridgeFixtureResult struct {
+	Export bridge.Result `json:"export"`
+	Import bridge.Result `json:"import"`
+	Push   bridge.Result `json:"push"`
+	Pull   bridge.Result `json:"pull"`
 }
 
 func main() {
@@ -90,6 +101,10 @@ func run() error {
 	if bobOpenErr != nil {
 		return bobOpenErr
 	}
+	bridgeResult, bridgeErr := runGitBridgeFixture(*runRoot, aliceCAS, bobCAS)
+	if bridgeErr != nil {
+		return bridgeErr
+	}
 	retrieval, retrieveErr := pocsync.RetrieveGraph(
 		pocsync.Peer{Agent: "bob", CAS: bobCAS},
 		pocsync.Peer{Agent: "alice", CAS: aliceCAS},
@@ -108,6 +123,7 @@ func run() error {
 		AliceStoreRoot: aliceStoreRoot,
 		BobStoreRoot:   bobStoreRoot,
 		Scenario:       scenarioResult,
+		Bridge:         bridgeResult,
 		Retrieval:      retrieval,
 	}
 	resultPath := filepath.Join(*runRoot, "result.json")
@@ -121,6 +137,64 @@ func run() error {
 	fmt.Printf("diagnostic_message=%s\n", result.DiagnosticMessageCID)
 	fmt.Printf("retrieved_objects=%d missing_objects=%d\n", len(retrieval.Retrieved), len(retrieval.Missing))
 	return nil
+}
+
+func runGitBridgeFixture(runRoot string, aliceCAS *store.FileStore, bobCAS *store.FileStore) (bridgeFixtureResult, error) {
+	// Intent: The deterministic fixture covers Git bridge import/export/push/pull
+	// as adapter behavior while native peer sync remains the separate retrieval
+	// promise path. Source: DI-fimap
+	gitWorkspace := filepath.Join(runRoot, "git-workspace")
+	if err := createGitBridgeFixture(gitWorkspace); err != nil {
+		return bridgeFixtureResult{}, err
+	}
+	gitIngest, ingestErr := workspace.NewScanner(aliceCAS, "alice", "bob").Ingest(gitWorkspace)
+	if ingestErr != nil {
+		return bridgeFixtureResult{}, ingestErr
+	}
+	gitSnapshotCID, parseErr := store.ParseCIDText(gitIngest.SnapshotCID)
+	if parseErr != nil {
+		return bridgeFixtureResult{}, parseErr
+	}
+	aliceBridge := bridge.NewAdapter(aliceCAS, "alice", "bob")
+	exportResult, exportErr := aliceBridge.ExportSnapshot(gitSnapshotCID, filepath.Join(runRoot, "git-export"))
+	if exportErr != nil {
+		return bridgeFixtureResult{}, exportErr
+	}
+	importResult, importErr := aliceBridge.ImportRepository(exportResult.RepositoryPath)
+	if importErr != nil {
+		return bridgeFixtureResult{}, importErr
+	}
+	remotePath := filepath.Join(runRoot, "git-remote.git")
+	if err := initBareMainRepository(remotePath); err != nil {
+		return bridgeFixtureResult{}, err
+	}
+	pushResult, pushErr := aliceBridge.PushSnapshot(gitSnapshotCID, remotePath, filepath.Join(runRoot, "git-push-worktree"))
+	if pushErr != nil {
+		return bridgeFixtureResult{}, pushErr
+	}
+	pullResult, pullErr := bridge.NewAdapter(bobCAS, "bob", "alice").PullRepository(remotePath, filepath.Join(runRoot, "git-pull-worktree"))
+	if pullErr != nil {
+		return bridgeFixtureResult{}, pullErr
+	}
+	return bridgeFixtureResult{Export: exportResult, Import: importResult, Push: pushResult, Pull: pullResult}, nil
+}
+
+func createGitBridgeFixture(root string) error {
+	if err := os.MkdirAll(filepath.Join(root, "docs"), 0o755); err != nil {
+		return err
+	}
+	if err := os.WriteFile(filepath.Join(root, "README.md"), []byte("POC18 Git bridge fixture\n"), 0o644); err != nil {
+		return err
+	}
+	return os.WriteFile(filepath.Join(root, "docs", "bridge.txt"), []byte("export import push pull\n"), 0o644)
+}
+
+func initBareMainRepository(path string) error {
+	repository, initErr := git.PlainInit(path, true)
+	if initErr != nil {
+		return initErr
+	}
+	return repository.Storer.SetReference(plumbing.NewSymbolicReference(plumbing.HEAD, plumbing.NewBranchReferenceName("main")))
 }
 
 func resetRunRoot(runRoot string) error {

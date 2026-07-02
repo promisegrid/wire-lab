@@ -124,6 +124,15 @@ Intent: The next POC18 slice should prove the version-control model can express 
 Constraints: Use the existing version-control pCID and `grid([42(pCID), parents, payload, proof])` shape; keep all behavior deterministic and local to the POC18 fixture; do not add real network transport, Git bridge behavior, or global merge/review authority; generated runtime state remains under `/tmp/wire-lab-poc18-*`; analyzer checks remain non-production local fixture checks; preserve CIDv1 base32 printable rendering and binary CID/tag42 link semantics.
 Affects: implementations/poc18-cas-git-replacement/scenario/; implementations/poc18-cas-git-replacement/graph/; implementations/poc18-cas-git-replacement/cmd/poc-sim/; implementations/poc18-cas-git-replacement/cmd/poc-analyze/; DEV-GUIDE-RESOURCES.md; protocols/wire-lab.d/TODO/TODO-nahop-poc18-cas-git-replacement.md.
 
+ID: DI-fimap
+Date: 2026-07-01 18:49:07 -0700
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Implement `nahop.15` Git bridge import/export/push/pull with the well-known `github.com/go-git/go-git/v5` library, keep all Git compatibility behavior in `implementations/poc18-cas-git-replacement/bridge/`, expose it through `grid git import`, `grid git export`, `grid git pull`, and `grid git push`, and route all four operations through shared conversion helpers rather than per-command copies.
+Intent: POC18 needs real Git interoperability without letting Git remotes become the native PromiseGrid authority model. Import/export and push/pull should prove the same content-and-DAG conversion seam works for local repositories and conventional Git remotes while native PromiseGrid synchronization remains continuous peer DAG sync.
+Constraints: Git bridge operations are compatibility adapters only; do not reintroduce Git push/pull as native PromiseGrid synchronization; do not create a forge authority, global branch authority, or Git-specific object identity inside native graph objects; keep generated bridge fixtures under `/tmp/wire-lab-poc18-*`; use CIDv1 base32 text for printable CIDs; preserve existing `bridge.Operation`, `bridge.Mapping`, and CLI/core package naming where possible.
+Affects: implementations/poc18-cas-git-replacement/bridge/; implementations/poc18-cas-git-replacement/cmd/grid/; implementations/poc18-cas-git-replacement/cmd/poc-sim/; implementations/poc18-cas-git-replacement/cmd/poc-analyze/; implementations/poc18-cas-git-replacement/scripts/run-clean.sh; implementations/poc18-cas-git-replacement/go.mod; implementations/poc18-cas-git-replacement/go.sum; protocols/wire-lab.d/TODO/TODO-nahop-poc18-cas-git-replacement.md.
+
 ## Core Hypothesis
 
 POC18 should test this hypothesis:
@@ -560,9 +569,11 @@ Remaining:
   scenarios, including conflict-resolution promises.
 - [x] nahop.14 Implement review/test-result promises and local adoption decisions
   that can replace a GitHub pull-request approval flow without forge authority.
-- [ ] nahop.15 Implement the Git bridge content-and-DAG roundtrip with a Go Git
+- [x] nahop.15 Implement the Git bridge content-and-DAG roundtrip with a Go Git
   library, covering import, export, push, and pull through shared conversion
-  paths.
+  paths. First slice completed with go-git bridge adapter code, `grid git`
+  commands, deterministic fixture coverage, and local bare-remote tests. Source:
+  `DI-fimap`.
 - [ ] nahop.17 Add promise-based retention and GC behavior for selected reference
   sets, release objects, paid storage, and unpromised objects under pressure.
 - [x] nahop.18 Review Tangled as prior art and record whether POC18 should adopt,

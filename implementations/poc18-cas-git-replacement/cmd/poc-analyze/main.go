@@ -11,6 +11,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/bridge"
 	"promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/scenario"
 	"promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/store"
 	pocsync "promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/sync"
@@ -28,7 +29,15 @@ type fixtureResult struct {
 	AliceStoreRoot string                  `json:"alice_store_root"`
 	BobStoreRoot   string                  `json:"bob_store_root"`
 	Scenario       scenario.Result         `json:"scenario"`
+	Bridge         bridgeFixtureResult     `json:"bridge"`
 	Retrieval      pocsync.RetrievalReport `json:"retrieval"`
+}
+
+type bridgeFixtureResult struct {
+	Export bridge.Result `json:"export"`
+	Import bridge.Result `json:"import"`
+	Push   bridge.Result `json:"push"`
+	Pull   bridge.Result `json:"pull"`
 }
 
 // Report records local fixture checks.
@@ -180,6 +189,15 @@ func analyze(runRoot string, result fixtureResult) (Report, error) {
 		checks["review_test_local_adoption"] = "missing"
 		pass = false
 	}
+	// Intent: The bridge fixture proves conventional Git import/export/push/pull
+	// remain adapter operations with explicit mapping promises, not native sync or
+	// forge authority. Source: DI-fimap
+	if bridgeResultComplete(result.Bridge.Export) && bridgeResultComplete(result.Bridge.Import) && bridgeResultComplete(result.Bridge.Push) && bridgeResultComplete(result.Bridge.Pull) {
+		checks["git_bridge_import_export_push_pull"] = "kept"
+	} else {
+		checks["git_bridge_import_export_push_pull"] = "missing"
+		pass = false
+	}
 	aliceCAS, aliceOpenErr := store.Open(result.AliceStoreRoot)
 	if aliceOpenErr != nil {
 		return Report{}, aliceOpenErr
@@ -243,6 +261,33 @@ func analyze(runRoot string, result fixtureResult) (Report, error) {
 		}
 	}
 	for checkName, cidText := range map[string]string{
+		"alice_has_git_export_mapping": result.Bridge.Export.MappingMessageCID,
+		"alice_has_git_import_mapping": result.Bridge.Import.MappingMessageCID,
+		"alice_has_git_push_mapping":   result.Bridge.Push.MappingMessageCID,
+		"bob_has_git_pull_mapping":     result.Bridge.Pull.MappingMessageCID,
+		"bob_has_git_pull_snapshot":    result.Bridge.Pull.HeadSnapshotCID,
+	} {
+		if cidText == "" {
+			checks[checkName] = "missing"
+			pass = false
+			continue
+		}
+		objectCID, objectErr := store.ParseCIDText(cidText)
+		if objectErr != nil {
+			return Report{}, objectErr
+		}
+		targetCAS := aliceCAS
+		if checkName == "bob_has_git_pull_mapping" || checkName == "bob_has_git_pull_snapshot" {
+			targetCAS = bobCAS
+		}
+		if targetCAS.Has(objectCID) {
+			checks[checkName] = "kept"
+		} else {
+			checks[checkName] = "missing"
+			pass = false
+		}
+	}
+	for checkName, cidText := range map[string]string{
 		"bob_has_rename_copy_snapshot":   result.Scenario.RenameCopySnapshotCID,
 		"bob_has_bob_divergent_snapshot": result.Scenario.BobDivergentSnapshotCID,
 		"bob_has_merge_snapshot":         result.Scenario.MergeSnapshotCID,
@@ -276,6 +321,13 @@ func analyze(runRoot string, result fixtureResult) (Report, error) {
 		Retrieved:    len(result.Retrieval.Retrieved),
 		Missing:      len(result.Retrieval.Missing),
 	}, nil
+}
+
+func bridgeResultComplete(result bridge.Result) bool {
+	return result.HeadSnapshotCID != "" &&
+		result.HeadGitHash != "" &&
+		result.MappingMessageCID != "" &&
+		len(result.Mappings) > 0
 }
 
 func writeJSON(path string, value any) error {

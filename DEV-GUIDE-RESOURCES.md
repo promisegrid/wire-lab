@@ -91,11 +91,15 @@ snapshot messages, checkout, deterministic peer retrieval with `sync_interest`
 and `object_availability` promises between separate Alice/Bob sparse CAS roots,
 rename/copy lineage where filenames are directory labels rather than file
 identity, divergent logical-change snapshots, a multi-parent merge snapshot, and
-local review/test/adoption promises with no forge authority. Git bridge stubs,
-diagnostic CBOR rendering, and a clean `/tmp/wire-lab-poc18-*` fixture run are
-also present. Source: `DI-zuruj`; `DI-dibut`; `DI-dofoj`; `DI-radaj`;
-`DI-lidaj`; `DI-fusir`; `DI-jifuj`; `DI-harih`; `DI-gozov`; `DI-guban`;
-`DN-dopod`; `TE-kopap`; `TE-vahoj`; `TE-hikar`; `TE-givul`; `TE-nozal`.
+local review/test/adoption promises with no forge authority. The POC18 Git
+bridge now uses go-git for real compatibility-adapter import, export, push, and
+pull flows through shared conversion code and records `git_bridge_mapping`
+promises so conventional Git remotes remain bridge inputs/outputs rather than
+native PromiseGrid authorities. Diagnostic CBOR rendering and a clean
+`/tmp/wire-lab-poc18-*` fixture run are also present. Source: `DI-zuruj`;
+`DI-dibut`; `DI-dofoj`; `DI-radaj`; `DI-lidaj`; `DI-fusir`; `DI-jifuj`;
+`DI-harih`; `DI-gozov`; `DI-guban`; `DI-fimap`; `DN-dopod`; `TE-kopap`;
+`TE-vahoj`; `TE-hikar`; `TE-givul`; `TE-nozal`.
 
 ### Current Wire Direction
 

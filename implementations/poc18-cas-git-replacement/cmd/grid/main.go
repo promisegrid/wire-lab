@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"os"
 
+	"promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/bridge"
 	"promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/graph"
 	"promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/store"
 	"promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/workspace"
@@ -36,6 +37,8 @@ func run(args []string) error {
 		return checkout(args[1:])
 	case "refs", "diag":
 		return diag(args[1:])
+	case "git":
+		return gitBridge(args[1:])
 	case "help":
 		usage()
 		return nil
@@ -54,6 +57,7 @@ func usage() {
 	fmt.Println("  checkout - materialize a snapshot from local CAS")
 	fmt.Println("  refs     - render one retained reference/message object")
 	fmt.Println("  diag     - render exact CBOR from a CAS CID or file")
+	fmt.Println("  git      - run conventional Git bridge adapters: import, export, pull, push")
 }
 
 func initStore(args []string) error {
@@ -165,6 +169,145 @@ func loadDiagnosticBytes(storeRoot, cidText, filePath string) ([]byte, error) {
 	}
 	content, _, getErr := cas.Get(objectCID)
 	return content, getErr
+}
+
+func gitBridge(args []string) error {
+	if len(args) == 0 {
+		return fmt.Errorf("git bridge command is required: import, export, pull, or push")
+	}
+	switch args[0] {
+	case "import":
+		return gitImport(args[1:])
+	case "export":
+		return gitExport(args[1:])
+	case "pull":
+		return gitPull(args[1:])
+	case "push":
+		return gitPush(args[1:])
+	default:
+		return fmt.Errorf("unknown git bridge command %q", args[0])
+	}
+}
+
+func gitImport(args []string) error {
+	flags := flag.NewFlagSet("git import", flag.ContinueOnError)
+	storeRoot := flags.String("store", "", "CAS store root")
+	repositoryPath := flags.String("repo", "", "Git repository path to import")
+	outPath := flags.String("out", "", "optional JSON result path")
+	promiser := flags.String("promiser", "alice", "local bridge promiser")
+	promisee := flags.String("promisee", "bob", "local bridge promisee")
+	if err := flags.Parse(args); err != nil {
+		return err
+	}
+	if *storeRoot == "" || *repositoryPath == "" {
+		return fmt.Errorf("-store and -repo are required")
+	}
+	cas, openErr := store.Open(*storeRoot)
+	if openErr != nil {
+		return openErr
+	}
+	// Intent: `grid git import` is a compatibility adapter over the shared bridge
+	// package, not a separate CLI implementation of Git-to-grid conversion.
+	// Source: DI-fimap
+	result, importErr := bridge.NewAdapter(cas, *promiser, *promisee).ImportRepository(*repositoryPath)
+	if importErr != nil {
+		return importErr
+	}
+	return writeBridgeResult(result, *outPath)
+}
+
+func gitExport(args []string) error {
+	flags := flag.NewFlagSet("git export", flag.ContinueOnError)
+	storeRoot := flags.String("store", "", "CAS store root")
+	snapshotText := flags.String("snapshot", "", "snapshot CID to export")
+	repositoryPath := flags.String("repo", "", "Git repository path to write")
+	outPath := flags.String("out", "", "optional JSON result path")
+	promiser := flags.String("promiser", "alice", "local bridge promiser")
+	promisee := flags.String("promisee", "bob", "local bridge promisee")
+	if err := flags.Parse(args); err != nil {
+		return err
+	}
+	if *storeRoot == "" || *snapshotText == "" || *repositoryPath == "" {
+		return fmt.Errorf("-store, -snapshot, and -repo are required")
+	}
+	cas, openErr := store.Open(*storeRoot)
+	if openErr != nil {
+		return openErr
+	}
+	snapshotCID, parseErr := store.ParseCIDText(*snapshotText)
+	if parseErr != nil {
+		return parseErr
+	}
+	result, exportErr := bridge.NewAdapter(cas, *promiser, *promisee).ExportSnapshot(snapshotCID, *repositoryPath)
+	if exportErr != nil {
+		return exportErr
+	}
+	return writeBridgeResult(result, *outPath)
+}
+
+func gitPull(args []string) error {
+	flags := flag.NewFlagSet("git pull", flag.ContinueOnError)
+	storeRoot := flags.String("store", "", "CAS store root")
+	remoteURL := flags.String("remote", "", "Git remote URL or local path")
+	worktreePath := flags.String("worktree", "", "temporary local clone path")
+	outPath := flags.String("out", "", "optional JSON result path")
+	promiser := flags.String("promiser", "alice", "local bridge promiser")
+	promisee := flags.String("promisee", "bob", "local bridge promisee")
+	if err := flags.Parse(args); err != nil {
+		return err
+	}
+	if *storeRoot == "" || *remoteURL == "" || *worktreePath == "" {
+		return fmt.Errorf("-store, -remote, and -worktree are required")
+	}
+	cas, openErr := store.Open(*storeRoot)
+	if openErr != nil {
+		return openErr
+	}
+	result, pullErr := bridge.NewAdapter(cas, *promiser, *promisee).PullRepository(*remoteURL, *worktreePath)
+	if pullErr != nil {
+		return pullErr
+	}
+	return writeBridgeResult(result, *outPath)
+}
+
+func gitPush(args []string) error {
+	flags := flag.NewFlagSet("git push", flag.ContinueOnError)
+	storeRoot := flags.String("store", "", "CAS store root")
+	snapshotText := flags.String("snapshot", "", "snapshot CID to push")
+	remoteURL := flags.String("remote", "", "Git remote URL or local path")
+	worktreePath := flags.String("worktree", "", "temporary local export path")
+	outPath := flags.String("out", "", "optional JSON result path")
+	promiser := flags.String("promiser", "alice", "local bridge promiser")
+	promisee := flags.String("promisee", "bob", "local bridge promisee")
+	if err := flags.Parse(args); err != nil {
+		return err
+	}
+	if *storeRoot == "" || *snapshotText == "" || *remoteURL == "" || *worktreePath == "" {
+		return fmt.Errorf("-store, -snapshot, -remote, and -worktree are required")
+	}
+	cas, openErr := store.Open(*storeRoot)
+	if openErr != nil {
+		return openErr
+	}
+	snapshotCID, parseErr := store.ParseCIDText(*snapshotText)
+	if parseErr != nil {
+		return parseErr
+	}
+	result, pushErr := bridge.NewAdapter(cas, *promiser, *promisee).PushSnapshot(snapshotCID, *remoteURL, *worktreePath)
+	if pushErr != nil {
+		return pushErr
+	}
+	return writeBridgeResult(result, *outPath)
+}
+
+func writeBridgeResult(result bridge.Result, outPath string) error {
+	if outPath != "" {
+		if err := writeJSON(outPath, result); err != nil {
+			return err
+		}
+	}
+	fmt.Printf("git_%s head_snapshot=%s head_git=%s mapping=%s\n", result.Operation, result.HeadSnapshotCID, result.HeadGitHash, result.MappingMessageCID)
+	return nil
 }
 
 func writeJSON(path string, value any) error {
