@@ -41,11 +41,12 @@ type IngestResult struct {
 
 // Scanner owns one local scan using one local promiser identity.
 type Scanner struct {
-	CAS      *store.FileStore
-	Promiser string
-	Promisee string
-	counts   map[string]int
-	hardlink map[string]cidlib.Cid
+	CAS        *store.FileStore
+	Promiser   string
+	Promisee   string
+	exclusions pathExclusionSet
+	counts     map[string]int
+	hardlink   map[string]cidlib.Cid
 }
 
 // NewScanner returns a scanner with deterministic POC defaults.
@@ -57,6 +58,17 @@ func NewScanner(cas *store.FileStore, promiser, promisee string) *Scanner {
 		counts:   map[string]int{},
 		hardlink: map[string]cidlib.Cid{},
 	}
+}
+
+// WithExcludedPaths returns scanner after installing repo-relative paths that
+// should be omitted from this scan.
+//
+// Intent: Track/untrack is local path policy over the scanner, not a change to
+// the CAS graph model. Excluded paths never become snapshot children during a
+// repo-local `grid snapshot`. Source: DI-jokav
+func (scanner *Scanner) WithExcludedPaths(paths []string) *Scanner {
+	scanner.exclusions = newPathExclusionSet(paths)
+	return scanner
 }
 
 // Ingest scans root and writes POC18 graph messages into the sparse CAS.
@@ -155,6 +167,10 @@ func (scanner *Scanner) scanDirectory(absPath, relPath string) (cidlib.Cid, cidl
 		}
 		childAbs := filepath.Join(absPath, dirEntry.Name())
 		childRel := filepath.Join(relPath, dirEntry.Name())
+		childRel = filepath.ToSlash(childRel)
+		if scanner.exclusions.excludes(childRel) {
+			continue
+		}
 		info, infoErr := os.Lstat(childAbs)
 		if infoErr != nil {
 			return cidlib.Undef, cidlib.Undef, infoErr

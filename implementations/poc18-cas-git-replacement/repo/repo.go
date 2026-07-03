@@ -19,6 +19,8 @@ const (
 	GridDirName = ".grid"
 	// ConfigFileName is the human-editable repo config file inside `.grid`.
 	ConfigFileName = "config.json"
+	// StateFileName is the mutable local CLI state file inside `.grid`.
+	StateFileName = "state.json"
 	// DefaultCASPath is the first POC18 file-CAS locator written by `grid init`.
 	DefaultCASPath = ".grid/cas"
 	// FileCASType is the only CAS locator type implemented in this POC18 slice.
@@ -81,6 +83,9 @@ func Init(root string, casPath string) (Repository, error) {
 	content = append(content, '\n')
 	if writeErr := os.WriteFile(repository.ConfigPath, content, 0o644); writeErr != nil {
 		return Repository{}, writeErr
+	}
+	if stateErr := repository.SaveState(defaultState()); stateErr != nil {
+		return Repository{}, stateErr
 	}
 	return repository, nil
 }

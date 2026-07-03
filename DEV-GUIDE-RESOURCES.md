@@ -98,12 +98,25 @@ promises so conventional Git remotes remain bridge inputs/outputs rather than
 native PromiseGrid authorities. Normal `grid` commands now discover repo-local
 `.grid/config.json` by walking upward from the current directory; the config
 contains a typed CAS locator that defaults to local file CAS `.grid/cas` while
-preserving room for daemon or remote CAS locators later. Diagnostic CBOR
-rendering and a clean `/tmp/wire-lab-poc18-*` fixture run are also present.
+preserving room for daemon or remote CAS locators later. POC18 now keeps mutable
+local CLI state in `.grid/state.json`: `grid snapshot` records the current local
+snapshot/refset pointers, `grid status` compares the workspace against that
+snapshot without writing CAS objects, and `grid log` walks snapshot parent links
+from that local head. `grid track` and `grid untrack` now mutate repo-local
+path exclusions in `.grid/state.json`; this is not Git staging and not peer
+policy, because default POC18 behavior remains "track every non-`.grid`
+workspace path unless this local repo excludes it." `grid tag` remains
+explicitly deferred until the tag/reference-set UX is separately locked. The
+deterministic `poc-sim` fixture now initializes `alice-workspace` as a real grid
+repo, with `.grid/config.json` pointing at sibling `../alice-cas` and
+`.grid/state.json` recording Alice's current scenario merge head after
+materializing that head back into the workspace so repo-local `grid status` is
+clean. Diagnostic CBOR rendering and a clean `/tmp/wire-lab-poc18-*` fixture run
+are also present.
 Source: `DI-zuruj`; `DI-dibut`; `DI-dofoj`; `DI-radaj`; `DI-lidaj`;
 `DI-fusir`; `DI-jifuj`; `DI-harih`; `DI-gozov`; `DI-guban`; `DI-fimap`;
-`DI-pahor`; `DN-dopod`; `TE-kopap`; `TE-vahoj`; `TE-hikar`; `TE-givul`;
-`TE-nozal`.
+`DI-pahor`; `DI-bikif`; `DI-kiram`; `DI-bamum`; `DI-jokav`; `DN-dopod`;
+`TE-kopap`; `TE-vahoj`; `TE-hikar`; `TE-givul`; `TE-nozal`.
 
 ### Current Wire Direction
 

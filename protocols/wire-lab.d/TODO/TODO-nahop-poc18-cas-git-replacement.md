@@ -142,6 +142,42 @@ Intent: Normal `grid` commands should work from a repo root or subdirectory with
 Constraints: Do not add `.grid/` to `.gitignore` in this change; implement only file CAS locators now; leave daemon/remote locators as future config values; commands with explicit `--store` keep existing behavior; commands without `--store` fail clearly when no `.grid/config.json` is discoverable; generated runtime fixture paths remain under `/tmp/wire-lab-poc18-*`.
 Affects: implementations/poc18-cas-git-replacement/repo/; implementations/poc18-cas-git-replacement/cmd/grid/; protocols/wire-lab.d/TODO/TODO-nahop-poc18-cas-git-replacement.md; DEV-GUIDE-RESOURCES.md.
 
+ID: DI-bikif
+Date: 2026-07-01 22:11:49 -0700
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Implement the next native POC18 CLI slice as `grid status` and `grid log`, backed by local mutable `.grid/state.json`; update `grid snapshot` to record the current local snapshot; defer `grid tag` until tag/reference-set UX is separately locked.
+Intent: `grid status` and `grid log` should make the native CAS/version graph usable without requiring repeated `--store` and `--snapshot` flags, but local state must remain a local convenience rather than a PromiseGrid authority. Deferring `grid tag` avoids inventing tag semantics before the reference-set UX is decision-complete.
+Constraints: Keep `.grid/config.json` stable configuration and `.grid/state.json` mutable local state; default the current branch label to `main`; make `status` read-only and skip `.grid`; make `log` walk exact snapshot parent links from the current recorded snapshot or an explicit `-snapshot`; do not implement `grid tag` in this slice; preserve `--store` overrides for unusual workflows and tests; generated runtime fixture paths remain under `/tmp/wire-lab-poc18-*`.
+Affects: implementations/poc18-cas-git-replacement/repo/; implementations/poc18-cas-git-replacement/workspace/; implementations/poc18-cas-git-replacement/cmd/grid/; implementations/poc18-cas-git-replacement/scripts/run-clean.sh; protocols/wire-lab.d/TODO/TODO-nahop-poc18-cas-git-replacement.md; DEV-GUIDE-RESOURCES.md.
+
+ID: DI-kiram
+Date: 2026-07-02 09:43:10 -0700
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Refactor the deterministic POC18 fixture so `alice-workspace` is initialized as a real grid repo using `.grid/config.json`, `.grid/state.json`, and an explicit file-CAS locator pointing at sibling `../alice-cas`; record the final scenario merge snapshot into Alice's local state.
+Intent: The fixture should exercise the same repo-control core that normal CLI users rely on, not only lower-level CAS/workspace packages. Keeping Alice's CAS as a sibling directory preserves the readable multi-agent fixture layout while making `alice-workspace` an actual grid repo with inspectable `.grid` control state.
+Constraints: Do not make `.grid/state.json` a global authority; keep Bob's retrieved sparse CAS and checkout behavior unchanged in this slice; do not route the fixture through shelling out to the CLI; use the core `repo` package directly; keep generated runtime state under `/tmp/wire-lab-poc18-*`; preserve CID verification and sparse-CAS behavior.
+Affects: implementations/poc18-cas-git-replacement/cmd/poc-sim/; implementations/poc18-cas-git-replacement/cmd/poc-analyze/; implementations/poc18-cas-git-replacement/scripts/run-clean.sh; protocols/wire-lab.d/TODO/TODO-nahop-poc18-cas-git-replacement.md; DEV-GUIDE-RESOURCES.md.
+
+ID: DI-bamum
+Date: 2026-07-02 10:14:03 -0700
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: After building the deterministic POC18 final scenario head, refresh `alice-workspace` by preserving `.grid` control state, removing stale non-control workspace entries, and materializing the final merge snapshot into the workspace before recording state.
+Intent: A real grid repo should be internally coherent after the clean fixture run: `alice-workspace/.grid/state.json` should point at a snapshot whose labels match the files visible in `alice-workspace`, so `grid status` is clean immediately after `run-clean.sh`. Preserving `.grid` keeps repo identity and CAS locator state intact while replacing only versioned workspace content.
+Constraints: Never delete `.grid` during workspace refresh; do not use shell commands for destructive cleanup; reject empty/root workspace paths; keep Bob sparse retrieval and checkout behavior separate; materialization remains a local operation, not a global authority; generated runtime state remains under `/tmp/wire-lab-poc18-*`.
+Affects: implementations/poc18-cas-git-replacement/cmd/poc-sim/; implementations/poc18-cas-git-replacement/cmd/poc-analyze/; protocols/wire-lab.d/TODO/TODO-nahop-poc18-cas-git-replacement.md; DEV-GUIDE-RESOURCES.md.
+
+ID: DI-jokav
+Date: 2026-07-02 16:33:47 -0700
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Add `grid track` and `grid untrack` as repo-local path policy over `.grid/state.json`; preserve the default POC18 behavior that all non-`.grid` workspace paths are tracked unless explicitly excluded.
+Intent: POC18 needs a simple way to omit local files from snapshots and status without inventing Git staging, a central ignore authority, or a second porcelain/plumbing path. `untrack` records local exclusions; `track` removes those exclusions so paths re-enter normal snapshot/status handling.
+Constraints: Store slash-clean repo-relative path exclusions in `.grid/state.json`; reject absolute, parent-escaping, empty, `.`, and `.grid` paths; apply exclusions to repo-local `snapshot` and `status` only when the selected workspace is the discovered repo root; preserve `--store` and explicit external `-workspace` behavior; generated runtime state remains under `/tmp/wire-lab-poc18-*`.
+Affects: implementations/poc18-cas-git-replacement/repo/; implementations/poc18-cas-git-replacement/workspace/; implementations/poc18-cas-git-replacement/cmd/grid/; implementations/poc18-cas-git-replacement/scripts/run-clean.sh; protocols/wire-lab.d/TODO/TODO-nahop-poc18-cas-git-replacement.md; DEV-GUIDE-RESOURCES.md.
+
 ## Core Hypothesis
 
 POC18 should test this hypothesis:
@@ -635,3 +671,28 @@ Remaining:
 - [ ] nahop.29 Decide whether future `grid init` should default to a local
   daemon-managed CAS locator instead of the current local file CAS
   `.grid/cas`. Source: `DI-pahor`.
+- [x] nahop.30 Add native `grid status` and `grid log` backed by local
+  `.grid/state.json`, while explicitly deferring `grid tag` semantics. Source:
+  `DI-bikif`.
+  - [x] nahop.30.1 Add repo-local mutable state load/save/record helpers.
+  - [x] nahop.30.2 Make `grid snapshot` update current local snapshot state.
+  - [x] nahop.30.3 Add read-only workspace-vs-snapshot `grid status`.
+  - [x] nahop.30.4 Add snapshot parent-chain `grid log`.
+  - [x] nahop.30.5 Add tests, clean-run coverage, and guide updates.
+  - [x] nahop.30.6 Defer `grid tag` until tag/reference-set UX is separately
+    locked.
+- [x] nahop.31 Refactor `poc-sim` so `alice-workspace` is a real grid repo with
+  `.grid/config.json`, `.grid/state.json`, and sibling `../alice-cas` locator.
+  Source: `DI-kiram`.
+- [x] nahop.32 Refresh `alice-workspace` to the final scenario head while
+  preserving `.grid`, so `grid status` is clean after `run-clean.sh`. Source:
+  `DI-bamum`.
+- [x] nahop.33 Add `grid track` and `grid untrack` as repo-local path exclusion
+  policy in `.grid/state.json`, preserving default all-non-control tracking.
+  Source: `DI-jokav`.
+  - [x] nahop.33.1 Add state helpers for validating and mutating untracked
+    repo-relative paths.
+  - [x] nahop.33.2 Apply exclusions to repo-local `snapshot` scans and
+    read-only `status` comparisons.
+  - [x] nahop.33.3 Add CLI commands, unit tests, clean-run coverage, and guide
+    notes.

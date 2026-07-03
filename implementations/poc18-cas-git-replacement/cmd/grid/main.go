@@ -9,6 +9,10 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"path/filepath"
+	"strings"
+
+	cidlib "github.com/ipfs/go-cid"
 
 	"promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/bridge"
 	"promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/graph"
@@ -34,6 +38,14 @@ func run(args []string) error {
 		return initStore(args[1:])
 	case "ingest", "snapshot":
 		return ingest(args[0], args[1:])
+	case "status":
+		return status(args[1:])
+	case "log":
+		return logHistory(args[1:])
+	case "track":
+		return updateTracking("track", args[1:])
+	case "untrack":
+		return updateTracking("untrack", args[1:])
 	case "checkout":
 		return checkout(args[1:])
 	case "refs", "diag":
@@ -49,12 +61,16 @@ func run(args []string) error {
 }
 
 func usage() {
-	fmt.Println("usage: grid <init|ingest|snapshot|checkout|refs|diag|git> [options]")
+	fmt.Println("usage: grid <init|ingest|snapshot|status|log|track|untrack|checkout|refs|diag|git> [options]")
 	fmt.Println()
 	fmt.Println("first-slice commands:")
 	fmt.Println("  init     - create .grid/config.json and the configured sparse local CAS")
 	fmt.Println("  ingest   - scan a workspace and store graph objects")
-	fmt.Println("  snapshot - first-slice alias for ingest while persistent workspace config is absent")
+	fmt.Println("  snapshot - scan a workspace, store graph objects, and record local state")
+	fmt.Println("  status   - compare the current workspace with the recorded snapshot")
+	fmt.Println("  log      - walk snapshot parent links from the recorded snapshot")
+	fmt.Println("  track    - re-include repo paths in future snapshot/status handling")
+	fmt.Println("  untrack  - exclude repo paths from future snapshot/status handling")
 	fmt.Println("  checkout - materialize a snapshot from local CAS")
 	fmt.Println("  refs     - render one retained reference/message object")
 	fmt.Println("  diag     - render exact CBOR from a CAS CID or file")
@@ -150,11 +166,396 @@ func ingest(command string, args []string) error {
 	if workspaceErr != nil {
 		return workspaceErr
 	}
-	result, ingestErr := workspace.NewScanner(cas, *promiser, *promisee).Ingest(selectedWorkspace)
+	scanner := workspace.NewScanner(cas, *promiser, *promisee)
+	if command == "snapshot" {
+		excludedPaths, exclusionErr := repoLocalExcludedPaths(repository, foundRepository, selectedWorkspace)
+		if exclusionErr != nil {
+			return exclusionErr
+		}
+		scanner.WithExcludedPaths(excludedPaths)
+	}
+	result, ingestErr := scanner.Ingest(selectedWorkspace)
 	if ingestErr != nil {
 		return ingestErr
 	}
+	if command == "snapshot" && foundRepository {
+		if recordErr := recordRepoSnapshot(repository, selectedWorkspace, result); recordErr != nil {
+			return recordErr
+		}
+	}
 	return writeIngestResult(result, *outPath)
+}
+
+func recordRepoSnapshot(repository pgrepo.Repository, selectedWorkspace string, result workspace.IngestResult) error {
+	absWorkspace, absErr := filepath.Abs(selectedWorkspace)
+	if absErr != nil {
+		return absErr
+	}
+	if absWorkspace != repository.Root {
+		return nil
+	}
+	// Intent: A repo-local `grid snapshot` advances only this repo's local
+	// convenience state. It does not claim global branch authority or update
+	// state for an explicitly selected external workspace. Source: DI-bikif
+	_, recordErr := repository.RecordSnapshot(result.SnapshotCID, result.BranchRefSetCID, result.WorkspaceRefSetCID)
+	return recordErr
+}
+
+func status(args []string) error {
+	flags := flag.NewFlagSet("status", flag.ContinueOnError)
+	storeRoot := flags.String("store", "", "CAS store root")
+	workspaceRoot := flags.String("workspace", "", "workspace path to compare; defaults to discovered repo root")
+	snapshotText := flags.String("snapshot", "", "snapshot CID; defaults to .grid/state.json current snapshot")
+	outPath := flags.String("out", "", "optional JSON result path")
+	if err := flags.Parse(args); err != nil {
+		return err
+	}
+	cas, repository, foundRepository, openErr := openCLIStore(*storeRoot)
+	if openErr != nil {
+		return openErr
+	}
+	selectedWorkspace, workspaceErr := workspaceDefault(*storeRoot, *workspaceRoot, repository, foundRepository)
+	if workspaceErr != nil {
+		return workspaceErr
+	}
+	selectedSnapshot, snapshotErr := snapshotDefault(*snapshotText, repository, foundRepository)
+	if snapshotErr != nil {
+		return snapshotErr
+	}
+	snapshotCID, parseErr := store.ParseCIDText(selectedSnapshot)
+	if parseErr != nil {
+		return parseErr
+	}
+	// Intent: `grid status` is a read-only local comparison against the recorded
+	// snapshot; it must not create new promise objects just to answer whether the
+	// workspace differs from the current local head. Source: DI-bikif
+	excludedPaths, exclusionErr := repoLocalExcludedPaths(repository, foundRepository, selectedWorkspace)
+	if exclusionErr != nil {
+		return exclusionErr
+	}
+	report, compareErr := workspace.CompareSnapshotWithExcludedPaths(cas, snapshotCID, selectedWorkspace, excludedPaths)
+	if compareErr != nil {
+		return compareErr
+	}
+	return writeStatus(report, *outPath)
+}
+
+func repoLocalExcludedPaths(repository pgrepo.Repository, foundRepository bool, selectedWorkspace string) ([]string, error) {
+	if !foundRepository {
+		return nil, nil
+	}
+	sameWorkspace, pathErr := sameAbsPath(selectedWorkspace, repository.Root)
+	if pathErr != nil {
+		return nil, pathErr
+	}
+	if !sameWorkspace {
+		return nil, nil
+	}
+	// Intent: Track/untrack exclusions are local repo convenience state. They
+	// apply only when commands operate on this repo root, not when the user asks
+	// to scan an unrelated workspace through an explicit override. Source: DI-jokav
+	state, stateErr := repository.LoadState()
+	if stateErr != nil {
+		return nil, stateErr
+	}
+	return state.UntrackedPaths, nil
+}
+
+func snapshotDefault(snapshotText string, repository pgrepo.Repository, foundRepository bool) (string, error) {
+	if snapshotText != "" {
+		return snapshotText, nil
+	}
+	if !foundRepository {
+		return "", fmt.Errorf("-snapshot is required when -store overrides repo discovery")
+	}
+	state, stateErr := repository.LoadState()
+	if stateErr != nil {
+		return "", stateErr
+	}
+	if state.CurrentSnapshotCID == "" {
+		return "", fmt.Errorf("no current snapshot recorded; run grid snapshot or pass -snapshot")
+	}
+	return state.CurrentSnapshotCID, nil
+}
+
+func writeStatus(report workspace.StatusReport, outPath string) error {
+	if outPath != "" {
+		if err := writeJSON(outPath, report); err != nil {
+			return err
+		}
+	}
+	if report.Clean {
+		fmt.Printf("clean snapshot=%s workspace=%s\n", report.SnapshotCID, report.SourceRoot)
+		return nil
+	}
+	fmt.Printf("changed snapshot=%s workspace=%s entries=%d\n", report.SnapshotCID, report.SourceRoot, len(report.Entries))
+	for _, entry := range report.Entries {
+		fmt.Printf("%s\t%s\t%s\n", entry.Status, entry.Type, entry.Path)
+	}
+	return nil
+}
+
+func updateTracking(command string, args []string) error {
+	flags := flag.NewFlagSet(command, flag.ContinueOnError)
+	if err := flags.Parse(args); err != nil {
+		return err
+	}
+	if flags.NArg() == 0 {
+		return fmt.Errorf("%s requires at least one path", command)
+	}
+	repository, discoverErr := pgrepo.Discover(".")
+	if discoverErr != nil {
+		return discoverErr
+	}
+	paths, pathErr := repoRelativeCLIPaths(repository, flags.Args())
+	if pathErr != nil {
+		return pathErr
+	}
+	var state pgrepo.State
+	var updateErr error
+	verb := "tracked"
+	switch command {
+	case "track":
+		state, updateErr = repository.TrackPaths(paths)
+	case "untrack":
+		verb = "untracked"
+		state, updateErr = repository.UntrackPaths(paths)
+	default:
+		return fmt.Errorf("unknown tracking command %q", command)
+	}
+	if updateErr != nil {
+		return updateErr
+	}
+	for _, path := range paths {
+		fmt.Printf("%s %s\n", verb, path)
+	}
+	fmt.Printf("state=%s untracked_paths=%d\n", filepath.Join(repository.GridDir, pgrepo.StateFileName), len(state.UntrackedPaths))
+	return nil
+}
+
+func repoRelativeCLIPaths(repository pgrepo.Repository, inputs []string) ([]string, error) {
+	cwd, cwdErr := os.Getwd()
+	if cwdErr != nil {
+		return nil, cwdErr
+	}
+	paths := make([]string, 0, len(inputs))
+	for _, input := range inputs {
+		path, pathErr := repoRelativeCLIPath(repository, cwd, input)
+		if pathErr != nil {
+			return nil, pathErr
+		}
+		paths = append(paths, path)
+	}
+	return paths, nil
+}
+
+func repoRelativeCLIPath(repository pgrepo.Repository, cwd string, input string) (string, error) {
+	if input == "" {
+		return "", fmt.Errorf("path is required")
+	}
+	target := input
+	if !filepath.IsAbs(target) {
+		target = filepath.Join(cwd, target)
+	}
+	absTarget, absErr := filepath.Abs(target)
+	if absErr != nil {
+		return "", absErr
+	}
+	relPath, relErr := filepath.Rel(repository.Root, absTarget)
+	if relErr != nil {
+		return "", relErr
+	}
+	slashPath := filepath.ToSlash(relPath)
+	if filepath.IsAbs(relPath) || slashPath == ".." || strings.HasPrefix(slashPath, "../") {
+		return "", fmt.Errorf("path must stay inside repo root %s: %s", repository.Root, input)
+	}
+	return pgrepo.NormalizeStatePath(relPath)
+}
+
+func sameAbsPath(left string, right string) (bool, error) {
+	absLeft, leftErr := filepath.Abs(left)
+	if leftErr != nil {
+		return false, leftErr
+	}
+	absRight, rightErr := filepath.Abs(right)
+	if rightErr != nil {
+		return false, rightErr
+	}
+	return filepath.Clean(absLeft) == filepath.Clean(absRight), nil
+}
+
+type logReport struct {
+	StartSnapshotCID string     `json:"start_snapshot_cid"`
+	Entries          []logEntry `json:"entries"`
+}
+
+type logEntry struct {
+	SnapshotCID         string   `json:"snapshot_cid"`
+	Promiser            string   `json:"promiser"`
+	Promisee            string   `json:"promisee"`
+	Summary             string   `json:"summary"`
+	RootReferenceSetCID string   `json:"root_reference_set_cid"`
+	ParentSnapshotCIDs  []string `json:"parent_snapshot_cids"`
+}
+
+func logHistory(args []string) error {
+	flags := flag.NewFlagSet("log", flag.ContinueOnError)
+	storeRoot := flags.String("store", "", "CAS store root")
+	snapshotText := flags.String("snapshot", "", "snapshot CID; defaults to .grid/state.json current snapshot")
+	limit := flags.Int("limit", 20, "maximum snapshots to print; 0 means unlimited")
+	outPath := flags.String("out", "", "optional JSON result path")
+	if err := flags.Parse(args); err != nil {
+		return err
+	}
+	if *limit < 0 {
+		return fmt.Errorf("-limit cannot be negative")
+	}
+	cas, repository, foundRepository, openErr := openCLIStore(*storeRoot)
+	if openErr != nil {
+		return openErr
+	}
+	selectedSnapshot, snapshotErr := snapshotDefault(*snapshotText, repository, foundRepository)
+	if snapshotErr != nil {
+		return snapshotErr
+	}
+	snapshotCID, parseErr := store.ParseCIDText(selectedSnapshot)
+	if parseErr != nil {
+		return parseErr
+	}
+	// Intent: `grid log` walks exact snapshot parent links from local state or an
+	// explicit snapshot override. This keeps history inspection local and
+	// CID-grounded without adding a global branch/log authority. Source: DI-bikif
+	report, logErr := snapshotLog(cas, snapshotCID, *limit)
+	if logErr != nil {
+		return logErr
+	}
+	return writeLog(report, *outPath)
+}
+
+func snapshotLog(cas *store.FileStore, startSnapshot cidlib.Cid, limit int) (logReport, error) {
+	report := logReport{StartSnapshotCID: store.CIDText(startSnapshot)}
+	queue := []cidlib.Cid{startSnapshot}
+	visited := map[string]bool{}
+	for len(queue) > 0 {
+		if limit > 0 && len(report.Entries) >= limit {
+			break
+		}
+		next := queue[0]
+		queue = queue[1:]
+		nextText := store.CIDText(next)
+		if visited[nextText] {
+			continue
+		}
+		visited[nextText] = true
+		entry, parents, entryErr := snapshotLogEntry(cas, next)
+		if entryErr != nil {
+			return logReport{}, entryErr
+		}
+		report.Entries = append(report.Entries, entry)
+		queue = append(queue, parents...)
+	}
+	return report, nil
+}
+
+func snapshotLogEntry(cas *store.FileStore, snapshotCID cidlib.Cid) (logEntry, []cidlib.Cid, error) {
+	content, _, getErr := cas.Get(snapshotCID)
+	if getErr != nil {
+		return logEntry{}, nil, getErr
+	}
+	view, parseErr := graph.ParseEnvelope(content)
+	if parseErr != nil {
+		return logEntry{}, nil, parseErr
+	}
+	kind, kindErr := view.PayloadKind()
+	if kindErr != nil {
+		return logEntry{}, nil, kindErr
+	}
+	if kind != "snapshot" {
+		return logEntry{}, nil, fmt.Errorf("expected snapshot message, got %s", kind)
+	}
+	body, bodyErr := view.PayloadBody()
+	if bodyErr != nil {
+		return logEntry{}, nil, bodyErr
+	}
+	if len(body) != 5 {
+		return logEntry{}, nil, fmt.Errorf("snapshot body must have five slots")
+	}
+	rootRefCID, rootErr := store.CIDFromLinkTag(body[1])
+	if rootErr != nil {
+		return logEntry{}, nil, rootErr
+	}
+	summary, summaryOK := body[3].(string)
+	if !summaryOK {
+		return logEntry{}, nil, fmt.Errorf("snapshot summary must be text")
+	}
+	parents, parentErr := snapshotParentCIDs(view, body)
+	if parentErr != nil {
+		return logEntry{}, nil, parentErr
+	}
+	entry := logEntry{
+		SnapshotCID:         store.CIDText(snapshotCID),
+		Promiser:            fmt.Sprint(view.Payload[0]),
+		Promisee:            fmt.Sprint(view.Payload[1]),
+		Summary:             summary,
+		RootReferenceSetCID: store.CIDText(rootRefCID),
+		ParentSnapshotCIDs:  cidTexts(parents),
+	}
+	return entry, parents, nil
+}
+
+func snapshotParentCIDs(view graph.EnvelopeView, body []any) ([]cidlib.Cid, error) {
+	parents := []cidlib.Cid{}
+	seen := map[string]bool{}
+	payloadParents, ok := body[2].([]any)
+	if !ok {
+		return nil, fmt.Errorf("snapshot parent list must be array")
+	}
+	for _, parentValue := range payloadParents {
+		parentCID, cidErr := store.CIDFromLinkTag(parentValue)
+		if cidErr != nil {
+			return nil, cidErr
+		}
+		parentText := store.CIDText(parentCID)
+		if !seen[parentText] {
+			parents = append(parents, parentCID)
+			seen[parentText] = true
+		}
+	}
+	for _, parent := range view.Parents {
+		if parent.Role != "previous_snapshot" {
+			continue
+		}
+		parentText := store.CIDText(parent.CID)
+		if !seen[parentText] {
+			parents = append(parents, parent.CID)
+			seen[parentText] = true
+		}
+	}
+	return parents, nil
+}
+
+func cidTexts(cids []cidlib.Cid) []string {
+	texts := make([]string, 0, len(cids))
+	for _, value := range cids {
+		texts = append(texts, store.CIDText(value))
+	}
+	return texts
+}
+
+func writeLog(report logReport, outPath string) error {
+	if outPath != "" {
+		if err := writeJSON(outPath, report); err != nil {
+			return err
+		}
+	}
+	for _, entry := range report.Entries {
+		fmt.Printf("%s %s\n", entry.SnapshotCID, entry.Summary)
+		fmt.Printf("  promiser=%s promisee=%s root_refset=%s\n", entry.Promiser, entry.Promisee, entry.RootReferenceSetCID)
+		if len(entry.ParentSnapshotCIDs) > 0 {
+			fmt.Printf("  parents=%v\n", entry.ParentSnapshotCIDs)
+		}
+	}
+	return nil
 }
 
 func checkout(args []string) error {

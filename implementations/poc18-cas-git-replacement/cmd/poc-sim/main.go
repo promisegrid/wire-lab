@@ -17,6 +17,7 @@ import (
 	cidlib "github.com/ipfs/go-cid"
 
 	"promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/bridge"
+	pgrepo "promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/repo"
 	"promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/scenario"
 	"promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/store"
 	pocsync "promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/sync"
@@ -64,7 +65,11 @@ func run() error {
 	if err := createFixture(sourceRoot); err != nil {
 		return err
 	}
-	aliceCAS, aliceOpenErr := store.Open(aliceStoreRoot)
+	aliceRepository, repoErr := pgrepo.Init(sourceRoot, filepath.Join("..", "alice-cas"))
+	if repoErr != nil {
+		return repoErr
+	}
+	aliceCAS, aliceOpenErr := aliceRepository.OpenFileCAS()
 	if aliceOpenErr != nil {
 		return aliceOpenErr
 	}
@@ -96,6 +101,16 @@ func run() error {
 	result.DiagnosticMessageCID = scenarioResult.MergeSnapshotCID
 	for countName, countValue := range scenarioResult.Counts {
 		result.Counts[countName] += countValue
+	}
+	if materializeErr := refreshWorkspaceToSnapshot(aliceCAS, mergeSnapshotCID, sourceRoot); materializeErr != nil {
+		return materializeErr
+	}
+	// Intent: The deterministic fixture should leave Alice's workspace in the
+	// same repo-local shape that normal `grid` users inspect: config points at the
+	// selected sparse CAS, and state records Alice's current local head without
+	// making it a global branch authority. Source: DI-kiram
+	if _, recordErr := aliceRepository.RecordSnapshot(result.SnapshotCID, result.BranchRefSetCID, result.WorkspaceRefSetCID); recordErr != nil {
+		return recordErr
 	}
 	bobCAS, bobOpenErr := store.Open(bobStoreRoot)
 	if bobOpenErr != nil {
@@ -187,6 +202,30 @@ func createGitBridgeFixture(root string) error {
 		return err
 	}
 	return os.WriteFile(filepath.Join(root, "docs", "bridge.txt"), []byte("export import push pull\n"), 0o644)
+}
+
+func refreshWorkspaceToSnapshot(cas *store.FileStore, snapshotCID cidlib.Cid, workspaceRoot string) error {
+	if workspaceRoot == "" || filepath.Clean(workspaceRoot) == "/" {
+		return fmt.Errorf("unsafe workspace root")
+	}
+	entries, readErr := os.ReadDir(workspaceRoot)
+	if readErr != nil {
+		return readErr
+	}
+	for _, entry := range entries {
+		if entry.Name() == pgrepo.GridDirName {
+			continue
+		}
+		// Intent: Alice's fixture workspace should match the local snapshot state
+		// while preserving `.grid` repo-control files. Removing only non-control
+		// entries prevents stale initial fixture labels from appearing as
+		// untracked files after the final scenario head is recorded. Source:
+		// DI-bamum
+		if removeErr := os.RemoveAll(filepath.Join(workspaceRoot, entry.Name())); removeErr != nil {
+			return removeErr
+		}
+	}
+	return workspace.MaterializeSnapshot(cas, snapshotCID, workspaceRoot)
 }
 
 func initBareMainRepository(path string) error {

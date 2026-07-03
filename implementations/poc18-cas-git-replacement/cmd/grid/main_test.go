@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	pgrepo "promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/repo"
 	"promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/workspace"
 )
 
@@ -82,6 +83,103 @@ func TestGridStoreOverrideStillRequiresWorkspace(t *testing.T) {
 	}
 }
 
+func TestGridSnapshotRecordsStateStatusAndLog(t *testing.T) {
+	root := t.TempDir()
+	t.Chdir(root)
+	if err := run([]string{"init"}); err != nil {
+		t.Fatalf("run(init) error = %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(root, "README.md"), []byte("state-backed commands\n"), 0o644); err != nil {
+		t.Fatalf("WriteFile(README) error = %v", err)
+	}
+	outputRoot := t.TempDir()
+	if err := run([]string{"snapshot", "-out", filepath.Join(outputRoot, "snapshot.json")}); err != nil {
+		t.Fatalf("run(snapshot) error = %v", err)
+	}
+	state := readRepoState(t, filepath.Join(root, ".grid", "state.json"))
+	if state.CurrentSnapshotCID == "" || state.CurrentBranchRefSetCID == "" || state.CurrentWorkspaceRefSetCID == "" {
+		t.Fatalf("state after snapshot = %#v", state)
+	}
+	statusOut := filepath.Join(outputRoot, "status.json")
+	if err := run([]string{"status", "-out", statusOut}); err != nil {
+		t.Fatalf("run(status clean) error = %v", err)
+	}
+	statusReport := readStatusReport(t, statusOut)
+	if !statusReport.Clean {
+		t.Fatalf("status report = %#v, want clean", statusReport)
+	}
+	if err := os.WriteFile(filepath.Join(root, "README.md"), []byte("changed\n"), 0o644); err != nil {
+		t.Fatalf("WriteFile(README changed) error = %v", err)
+	}
+	changedOut := filepath.Join(outputRoot, "status-changed.json")
+	if err := run([]string{"status", "-out", changedOut}); err != nil {
+		t.Fatalf("run(status changed) error = %v", err)
+	}
+	changedReport := readStatusReport(t, changedOut)
+	assertCLIStatusEntry(t, changedReport, "README.md", workspace.StatusModified)
+	logOut := filepath.Join(outputRoot, "log.json")
+	if err := run([]string{"log", "-out", logOut}); err != nil {
+		t.Fatalf("run(log) error = %v", err)
+	}
+	logged := readLogReport(t, logOut)
+	if len(logged.Entries) != 1 || logged.Entries[0].SnapshotCID != state.CurrentSnapshotCID {
+		t.Fatalf("log report = %#v, want current snapshot %s", logged, state.CurrentSnapshotCID)
+	}
+}
+
+func TestGridStatusRequiresRecordedSnapshot(t *testing.T) {
+	root := t.TempDir()
+	t.Chdir(root)
+	if err := run([]string{"init"}); err != nil {
+		t.Fatalf("run(init) error = %v", err)
+	}
+	if err := run([]string{"status"}); err == nil {
+		t.Fatalf("status without recorded snapshot succeeded")
+	}
+}
+
+func TestGridTrackAndUntrackPathPolicy(t *testing.T) {
+	root := t.TempDir()
+	t.Chdir(root)
+	if err := run([]string{"init"}); err != nil {
+		t.Fatalf("run(init) error = %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(root, "README.md"), []byte("tracked\n"), 0o644); err != nil {
+		t.Fatalf("WriteFile(README) error = %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(root, "local.log"), []byte("local-only\n"), 0o644); err != nil {
+		t.Fatalf("WriteFile(local.log) error = %v", err)
+	}
+	if err := run([]string{"untrack", "local.log"}); err != nil {
+		t.Fatalf("run(untrack) error = %v", err)
+	}
+	state := readRepoState(t, filepath.Join(root, ".grid", "state.json"))
+	if len(state.UntrackedPaths) != 1 || state.UntrackedPaths[0] != "local.log" {
+		t.Fatalf("state after untrack = %#v", state.UntrackedPaths)
+	}
+	outputRoot := t.TempDir()
+	if err := run([]string{"snapshot", "-out", filepath.Join(outputRoot, "snapshot.json")}); err != nil {
+		t.Fatalf("run(snapshot) error = %v", err)
+	}
+	statusOut := filepath.Join(outputRoot, "status.json")
+	if err := run([]string{"status", "-out", statusOut}); err != nil {
+		t.Fatalf("run(status clean) error = %v", err)
+	}
+	statusReport := readStatusReport(t, statusOut)
+	if !statusReport.Clean {
+		t.Fatalf("status with untracked local file = %#v, want clean", statusReport)
+	}
+	if err := run([]string{"track", "local.log"}); err != nil {
+		t.Fatalf("run(track) error = %v", err)
+	}
+	trackedOut := filepath.Join(outputRoot, "status-tracked.json")
+	if err := run([]string{"status", "-out", trackedOut}); err != nil {
+		t.Fatalf("run(status after track) error = %v", err)
+	}
+	trackedReport := readStatusReport(t, trackedOut)
+	assertCLIStatusEntry(t, trackedReport, "local.log", workspace.StatusUntracked)
+}
+
 func readIngestResult(t *testing.T, path string) workspace.IngestResult {
 	t.Helper()
 	content, readErr := os.ReadFile(path)
@@ -93,4 +191,53 @@ func readIngestResult(t *testing.T, path string) workspace.IngestResult {
 		t.Fatalf("Unmarshal(%s) error = %v", path, err)
 	}
 	return result
+}
+
+func readRepoState(t *testing.T, path string) pgrepo.State {
+	t.Helper()
+	content, readErr := os.ReadFile(path)
+	if readErr != nil {
+		t.Fatalf("ReadFile(%s) error = %v", path, readErr)
+	}
+	var state pgrepo.State
+	if err := json.Unmarshal(content, &state); err != nil {
+		t.Fatalf("Unmarshal(%s) error = %v", path, err)
+	}
+	return state
+}
+
+func readStatusReport(t *testing.T, path string) workspace.StatusReport {
+	t.Helper()
+	content, readErr := os.ReadFile(path)
+	if readErr != nil {
+		t.Fatalf("ReadFile(%s) error = %v", path, readErr)
+	}
+	var report workspace.StatusReport
+	if err := json.Unmarshal(content, &report); err != nil {
+		t.Fatalf("Unmarshal(%s) error = %v", path, err)
+	}
+	return report
+}
+
+func readLogReport(t *testing.T, path string) logReport {
+	t.Helper()
+	content, readErr := os.ReadFile(path)
+	if readErr != nil {
+		t.Fatalf("ReadFile(%s) error = %v", path, readErr)
+	}
+	var report logReport
+	if err := json.Unmarshal(content, &report); err != nil {
+		t.Fatalf("Unmarshal(%s) error = %v", path, err)
+	}
+	return report
+}
+
+func assertCLIStatusEntry(t *testing.T, report workspace.StatusReport, path string, status string) {
+	t.Helper()
+	for _, entry := range report.Entries {
+		if entry.Path == path && entry.Status == status {
+			return
+		}
+	}
+	t.Fatalf("status entry %s/%s not found in %#v", path, status, report.Entries)
 }

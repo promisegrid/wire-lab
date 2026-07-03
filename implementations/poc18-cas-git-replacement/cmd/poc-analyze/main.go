@@ -12,6 +12,7 @@ import (
 	"path/filepath"
 
 	"promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/bridge"
+	pgrepo "promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/repo"
 	"promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/scenario"
 	"promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/store"
 	pocsync "promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/sync"
@@ -145,6 +146,14 @@ func analyze(runRoot string, result fixtureResult) (Report, error) {
 		checks["separate_sparse_peer_cas"] = "kept"
 	} else {
 		checks["separate_sparse_peer_cas"] = "missing"
+		pass = false
+	}
+	// Intent: The deterministic fixture must now prove that Alice's workspace is
+	// a real repo-local grid workspace, not only a plain fixture directory passed
+	// to lower-level scanner code. Source: DI-kiram
+	if repoPass, repoErr := checkAliceGridRepo(result, checks); repoErr != nil {
+		return Report{}, repoErr
+	} else if !repoPass {
 		pass = false
 	}
 	if len(result.Retrieval.Retrieved) > 0 {
@@ -321,6 +330,60 @@ func analyze(runRoot string, result fixtureResult) (Report, error) {
 		Retrieved:    len(result.Retrieval.Retrieved),
 		Missing:      len(result.Retrieval.Missing),
 	}, nil
+}
+
+func checkAliceGridRepo(result fixtureResult, checks map[string]string) (bool, error) {
+	pass := true
+	repository, discoverErr := pgrepo.Discover(result.SourceRoot)
+	if discoverErr != nil {
+		checks["alice_grid_repo_discovery"] = "missing"
+		return false, nil
+	}
+	checks["alice_grid_repo_discovery"] = "kept"
+	if filepath.Clean(repository.ResolvePath(repository.Config.CAS.Path)) == filepath.Clean(result.AliceStoreRoot) {
+		checks["alice_grid_repo_cas_locator"] = "kept"
+	} else {
+		checks["alice_grid_repo_cas_locator"] = "missing"
+		pass = false
+	}
+	state, stateErr := repository.LoadState()
+	if stateErr != nil {
+		return false, stateErr
+	}
+	if state.CurrentSnapshotCID == result.SnapshotCID {
+		checks["alice_grid_state_snapshot"] = "kept"
+	} else {
+		checks["alice_grid_state_snapshot"] = "missing"
+		pass = false
+	}
+	if state.CurrentBranchRefSetCID == result.BranchRefSetCID {
+		checks["alice_grid_state_branch"] = "kept"
+	} else {
+		checks["alice_grid_state_branch"] = "missing"
+		pass = false
+	}
+	cas, casErr := repository.OpenFileCAS()
+	if casErr != nil {
+		return false, casErr
+	}
+	snapshotCID, snapshotErr := store.ParseCIDText(state.CurrentSnapshotCID)
+	if snapshotErr != nil {
+		return false, snapshotErr
+	}
+	// Intent: Analyzer coverage should catch the fixture mismatch where Alice's
+	// state names a final snapshot but her filesystem still contains stale initial
+	// fixture labels. Source: DI-bamum
+	statusReport, statusErr := workspace.CompareSnapshot(cas, snapshotCID, result.SourceRoot)
+	if statusErr != nil {
+		return false, statusErr
+	}
+	if statusReport.Clean {
+		checks["alice_grid_workspace_clean"] = "kept"
+	} else {
+		checks["alice_grid_workspace_clean"] = "missing"
+		pass = false
+	}
+	return pass, nil
 }
 
 func bridgeResultComplete(result bridge.Result) bool {
