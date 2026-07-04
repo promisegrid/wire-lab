@@ -21,23 +21,33 @@ const (
 	StatusMissing     = "missing"
 	StatusUntracked   = "untracked"
 	StatusTypeChanged = "type_changed"
+	// StatusTrackingAdded means local policy currently tracks a path absent from
+	// the latest recorded snapshot.
+	StatusTrackingAdded = "tracking_added"
+	// StatusTrackingRemoved means local policy currently excludes a path present
+	// in the latest recorded snapshot.
+	StatusTrackingRemoved = "tracking_removed"
 )
 
 // StatusReport summarizes a read-only comparison between a workspace and a
 // retained snapshot.
 type StatusReport struct {
-	SourceRoot  string        `json:"source_root"`
-	SnapshotCID string        `json:"snapshot_cid"`
-	Clean       bool          `json:"clean"`
-	Entries     []StatusEntry `json:"entries"`
+	SourceRoot        string        `json:"source_root"`
+	SnapshotCID       string        `json:"snapshot_cid"`
+	Clean             bool          `json:"clean"`
+	ContentDiff       bool          `json:"content_diff"`
+	TrackedStatusDiff bool          `json:"tracked_status_diff"`
+	Entries           []StatusEntry `json:"entries"`
 }
 
 // StatusEntry names one path whose current local state differs from a snapshot.
 type StatusEntry struct {
-	Path   string `json:"path"`
-	Status string `json:"status"`
-	Type   string `json:"type,omitempty"`
-	Detail string `json:"detail,omitempty"`
+	Path              string `json:"path"`
+	Status            string `json:"status"`
+	Type              string `json:"type,omitempty"`
+	ContentDiff       bool   `json:"content_diff"`
+	TrackedStatusDiff bool   `json:"tracked_status_diff"`
+	Detail            string `json:"detail,omitempty"`
 }
 
 type expectedNode struct {
@@ -60,13 +70,13 @@ func CompareSnapshot(cas *store.FileStore, snapshotCID cidlib.Cid, root string) 
 	return CompareSnapshotWithExcludedPaths(cas, snapshotCID, root, nil)
 }
 
-// CompareSnapshotWithExcludedPaths compares a workspace while ignoring
+// CompareSnapshotWithExcludedPaths compares a workspace while applying
 // repo-relative paths that local state excludes.
 //
-// Intent: `grid status` must respect the same local track/untrack policy as
-// `grid snapshot`; otherwise excluded paths would keep appearing as missing,
-// modified, or untracked after the user intentionally made them local-only.
-// Source: DI-jokav
+// Intent: `grid status` reports content drift separately from local tracking
+// policy drift. `track` and `untrack` therefore become visible immediately
+// without mutating the CAS or waiting for a new snapshot. Source: DI-jokav;
+// DI-tuhoj
 func CompareSnapshotWithExcludedPaths(cas *store.FileStore, snapshotCID cidlib.Cid, root string, excludedPaths []string) (StatusReport, error) {
 	absRoot, absErr := filepath.Abs(root)
 	if absErr != nil {
@@ -77,17 +87,19 @@ func CompareSnapshotWithExcludedPaths(cas *store.FileStore, snapshotCID cidlib.C
 		return StatusReport{}, expectedErr
 	}
 	exclusions := newPathExclusionSet(excludedPaths)
-	filterExpectedNodes(expected, exclusions)
-	current, currentErr := scanCurrentWorkspaceWithExcludedPaths(absRoot, exclusions)
+	current, currentErr := scanCurrentWorkspace(absRoot)
 	if currentErr != nil {
 		return StatusReport{}, currentErr
 	}
-	entries := compareNodes(expected, current)
+	entries := compareNodes(expected, current, exclusions)
+	contentDiff, trackedStatusDiff := summarizeStatusEntries(entries)
 	return StatusReport{
-		SourceRoot:  absRoot,
-		SnapshotCID: store.CIDText(snapshotCID),
-		Clean:       len(entries) == 0,
-		Entries:     entries,
+		SourceRoot:        absRoot,
+		SnapshotCID:       store.CIDText(snapshotCID),
+		Clean:             len(entries) == 0,
+		ContentDiff:       contentDiff,
+		TrackedStatusDiff: trackedStatusDiff,
+		Entries:           entries,
 	}, nil
 }
 
@@ -249,10 +261,6 @@ func loadExpectedNode(cas *store.FileStore, nodeCID cidlib.Cid, relPath string, 
 }
 
 func scanCurrentWorkspace(root string) (map[string]currentNode, error) {
-	return scanCurrentWorkspaceWithExcludedPaths(root, newPathExclusionSet(nil))
-}
-
-func scanCurrentWorkspaceWithExcludedPaths(root string, exclusions pathExclusionSet) (map[string]currentNode, error) {
 	current := map[string]currentNode{}
 	walkErr := filepath.WalkDir(root, func(path string, dirEntry os.DirEntry, walkErr error) error {
 		if walkErr != nil {
@@ -267,12 +275,6 @@ func scanCurrentWorkspaceWithExcludedPaths(root string, exclusions pathExclusion
 		}
 		relPath = filepath.ToSlash(relPath)
 		if relPath == ".grid" || strings.HasPrefix(relPath, ".grid/") {
-			if dirEntry.IsDir() {
-				return filepath.SkipDir
-			}
-			return nil
-		}
-		if exclusions.excludes(relPath) {
 			if dirEntry.IsDir() {
 				return filepath.SkipDir
 			}
@@ -304,39 +306,88 @@ func scanCurrentWorkspaceWithExcludedPaths(root string, exclusions pathExclusion
 	return current, walkErr
 }
 
-func filterExpectedNodes(expected map[string]expectedNode, exclusions pathExclusionSet) {
-	for relPath := range expected {
-		if exclusions.excludes(relPath) {
-			delete(expected, relPath)
-		}
-	}
-}
-
-func compareNodes(expected map[string]expectedNode, current map[string]currentNode) []StatusEntry {
+func compareNodes(expected map[string]expectedNode, current map[string]currentNode, exclusions pathExclusionSet) []StatusEntry {
 	entries := []StatusEntry{}
 	for relPath, expectedNode := range expected {
+		if exclusions.excludes(relPath) {
+			continue
+		}
 		currentNode, found := current[relPath]
 		if !found {
-			entries = append(entries, StatusEntry{Path: relPath, Status: StatusMissing, Type: expectedNode.nodeType})
+			entries = append(entries, StatusEntry{Path: relPath, Status: StatusMissing, Type: expectedNode.nodeType, ContentDiff: true})
 			continue
 		}
 		if currentNode.nodeType != expectedNode.nodeType {
-			entries = append(entries, StatusEntry{Path: relPath, Status: StatusTypeChanged, Type: currentNode.nodeType, Detail: "snapshot type " + expectedNode.nodeType})
+			entries = append(entries, StatusEntry{Path: relPath, Status: StatusTypeChanged, Type: currentNode.nodeType, ContentDiff: true, Detail: "snapshot type " + expectedNode.nodeType})
 			continue
 		}
 		if !bytes.Equal(currentNode.content, expectedNode.content) {
-			entries = append(entries, StatusEntry{Path: relPath, Status: StatusModified, Type: currentNode.nodeType})
+			entries = append(entries, StatusEntry{Path: relPath, Status: StatusModified, Type: currentNode.nodeType, ContentDiff: true})
 		}
 	}
 	for relPath, currentNode := range current {
+		if exclusions.excludes(relPath) {
+			continue
+		}
 		if _, found := expected[relPath]; !found {
-			entries = append(entries, StatusEntry{Path: relPath, Status: StatusUntracked, Type: currentNode.nodeType})
+			entries = append(entries, StatusEntry{Path: relPath, Status: StatusTrackingAdded, Type: currentNode.nodeType, TrackedStatusDiff: true, Detail: "local policy tracks path absent from snapshot"})
 		}
 	}
+	entries = append(entries, trackingRemovedEntries(expected, exclusions)...)
 	sort.Slice(entries, func(left, right int) bool {
 		return entries[left].Path < entries[right].Path
 	})
 	return entries
+}
+
+// trackingRemovedEntries reports local exclusions that remove paths still
+// present in the latest snapshot.
+//
+// Intent: `untrack` must be visible immediately as a tracked-status difference,
+// but excluded bytes are not content drift because local policy says the next
+// snapshot should omit them. Source: DI-tuhoj
+func trackingRemovedEntries(expected map[string]expectedNode, exclusions pathExclusionSet) []StatusEntry {
+	entries := []StatusEntry{}
+	for excluded := range exclusions.paths {
+		if exclusions.excludedByOtherPath(excluded) {
+			continue
+		}
+		if node, found := expected[excluded]; found {
+			entries = append(entries, StatusEntry{Path: excluded, Status: StatusTrackingRemoved, Type: node.nodeType, TrackedStatusDiff: true, Detail: "local policy excludes path present in snapshot"})
+			continue
+		}
+		if snapshotHasDescendant(expected, excluded) {
+			entries = append(entries, StatusEntry{Path: excluded, Status: StatusTrackingRemoved, Type: "directory", TrackedStatusDiff: true, Detail: "local policy excludes snapshot descendants"})
+		}
+	}
+	return entries
+}
+
+// snapshotHasDescendant lets a directory exclusion report one parent-level
+// tracked-status difference instead of one entry for every excluded child.
+func snapshotHasDescendant(expected map[string]expectedNode, relPath string) bool {
+	prefix := relPath + "/"
+	for expectedPath := range expected {
+		if strings.HasPrefix(expectedPath, prefix) {
+			return true
+		}
+	}
+	return false
+}
+
+// summarizeStatusEntries sets aggregate status flags from per-entry flags.
+func summarizeStatusEntries(entries []StatusEntry) (bool, bool) {
+	contentDiff := false
+	trackedStatusDiff := false
+	for _, entry := range entries {
+		if entry.ContentDiff {
+			contentDiff = true
+		}
+		if entry.TrackedStatusDiff {
+			trackedStatusDiff = true
+		}
+	}
+	return contentDiff, trackedStatusDiff
 }
 
 func statusTypeForInfo(info os.FileInfo) string {
@@ -391,6 +442,20 @@ func (set pathExclusionSet) excludes(relPath string) bool {
 	}
 	for excluded := range set.paths {
 		if cleaned == excluded || strings.HasPrefix(cleaned, excluded+"/") {
+			return true
+		}
+	}
+	return false
+}
+
+// excludedByOtherPath suppresses duplicate tracking removals when both a parent
+// path and one of its descendants are excluded.
+func (set pathExclusionSet) excludedByOtherPath(relPath string) bool {
+	for excluded := range set.paths {
+		if excluded == relPath {
+			continue
+		}
+		if strings.HasPrefix(relPath, excluded+"/") {
 			return true
 		}
 	}

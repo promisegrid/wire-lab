@@ -105,8 +105,11 @@ snapshot without writing CAS objects, and `grid log` walks snapshot parent links
 from that local head. `grid track` and `grid untrack` now mutate repo-local
 path exclusions in `.grid/state.json`; this is not Git staging and not peer
 policy, because default POC18 behavior remains "track every non-`.grid`
-workspace path unless this local repo excludes it." `grid tag` remains
-explicitly deferred until the tag/reference-set UX is separately locked. The
+workspace path unless this local repo excludes it." `grid status` reports those
+tracking-policy changes immediately with separate `content_diff` and
+`tracked_status_diff` flags, so users can distinguish byte/type drift from
+membership drift before the next snapshot records the new policy. `grid tag`
+remains explicitly deferred until the tag/reference-set UX is separately locked. The
 deterministic `poc-sim` fixture now initializes `alice-workspace` as a real grid
 repo, with `.grid/config.json` pointing at sibling `../alice-cas` and
 `.grid/state.json` recording Alice's current scenario merge head after
@@ -115,8 +118,8 @@ clean. Diagnostic CBOR rendering and a clean `/tmp/wire-lab-poc18-*` fixture run
 are also present.
 Source: `DI-zuruj`; `DI-dibut`; `DI-dofoj`; `DI-radaj`; `DI-lidaj`;
 `DI-fusir`; `DI-jifuj`; `DI-harih`; `DI-gozov`; `DI-guban`; `DI-fimap`;
-`DI-pahor`; `DI-bikif`; `DI-kiram`; `DI-bamum`; `DI-jokav`; `DN-dopod`;
-`TE-kopap`; `TE-vahoj`; `TE-hikar`; `TE-givul`; `TE-nozal`.
+`DI-pahor`; `DI-bikif`; `DI-kiram`; `DI-bamum`; `DI-jokav`; `DI-tuhoj`;
+`DN-dopod`; `TE-kopap`; `TE-vahoj`; `TE-hikar`; `TE-givul`; `TE-nozal`.
 
 ### Current Wire Direction
 

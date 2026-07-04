@@ -31,11 +31,14 @@ printf 'local-only smoke data\n' > "$grid_repo/local.log"
 (
   cd "$grid_repo"
   "$run_root/grid" init
+  "$run_root/grid" snapshot -out "$run_root/grid-snapshot-initial.json"
   "$run_root/grid" untrack local.log
+  "$run_root/grid" status -out "$run_root/grid-status-tracking-removed.json"
   "$run_root/grid" snapshot -out "$run_root/grid-snapshot.json"
   "$run_root/grid" status -out "$run_root/grid-status.json"
   "$run_root/grid" log -out "$run_root/grid-log.json"
   "$run_root/grid" track local.log
+  "$run_root/grid" status -out "$run_root/grid-status-tracking-added.json"
   "$run_root/grid" snapshot -out "$run_root/grid-snapshot-tracked.json"
   "$run_root/grid" status -out "$run_root/grid-status-tracked.json"
 )

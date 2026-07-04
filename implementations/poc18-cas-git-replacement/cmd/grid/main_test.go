@@ -150,6 +150,10 @@ func TestGridTrackAndUntrackPathPolicy(t *testing.T) {
 	if err := os.WriteFile(filepath.Join(root, "local.log"), []byte("local-only\n"), 0o644); err != nil {
 		t.Fatalf("WriteFile(local.log) error = %v", err)
 	}
+	outputRoot := t.TempDir()
+	if err := run([]string{"snapshot", "-out", filepath.Join(outputRoot, "snapshot-initial.json")}); err != nil {
+		t.Fatalf("run(initial snapshot) error = %v", err)
+	}
 	if err := run([]string{"untrack", "local.log"}); err != nil {
 		t.Fatalf("run(untrack) error = %v", err)
 	}
@@ -157,7 +161,13 @@ func TestGridTrackAndUntrackPathPolicy(t *testing.T) {
 	if len(state.UntrackedPaths) != 1 || state.UntrackedPaths[0] != "local.log" {
 		t.Fatalf("state after untrack = %#v", state.UntrackedPaths)
 	}
-	outputRoot := t.TempDir()
+	untrackedOut := filepath.Join(outputRoot, "status-untracked.json")
+	if err := run([]string{"status", "-out", untrackedOut}); err != nil {
+		t.Fatalf("run(status after untrack) error = %v", err)
+	}
+	untrackedReport := readStatusReport(t, untrackedOut)
+	assertCLIStatusEntry(t, untrackedReport, "local.log", workspace.StatusTrackingRemoved)
+	assertCLIStatusFlags(t, untrackedReport, false, true)
 	if err := run([]string{"snapshot", "-out", filepath.Join(outputRoot, "snapshot.json")}); err != nil {
 		t.Fatalf("run(snapshot) error = %v", err)
 	}
@@ -177,7 +187,8 @@ func TestGridTrackAndUntrackPathPolicy(t *testing.T) {
 		t.Fatalf("run(status after track) error = %v", err)
 	}
 	trackedReport := readStatusReport(t, trackedOut)
-	assertCLIStatusEntry(t, trackedReport, "local.log", workspace.StatusUntracked)
+	assertCLIStatusEntry(t, trackedReport, "local.log", workspace.StatusTrackingAdded)
+	assertCLIStatusFlags(t, trackedReport, false, true)
 }
 
 func readIngestResult(t *testing.T, path string) workspace.IngestResult {
@@ -240,4 +251,11 @@ func assertCLIStatusEntry(t *testing.T, report workspace.StatusReport, path stri
 		}
 	}
 	t.Fatalf("status entry %s/%s not found in %#v", path, status, report.Entries)
+}
+
+func assertCLIStatusFlags(t *testing.T, report workspace.StatusReport, contentDiff bool, trackedStatusDiff bool) {
+	t.Helper()
+	if report.ContentDiff != contentDiff || report.TrackedStatusDiff != trackedStatusDiff {
+		t.Fatalf("report flags = content:%t tracking:%t, want content:%t tracking:%t", report.ContentDiff, report.TrackedStatusDiff, contentDiff, trackedStatusDiff)
+	}
 }

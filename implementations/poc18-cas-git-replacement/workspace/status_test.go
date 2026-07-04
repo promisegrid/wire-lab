@@ -38,7 +38,8 @@ func TestCompareSnapshotReportsModifiedMissingAndUntracked(t *testing.T) {
 	}
 	assertStatusEntry(t, report, "README.md", StatusModified)
 	assertStatusEntry(t, report, "docs/guide.md", StatusMissing)
-	assertStatusEntry(t, report, "extra.txt", StatusUntracked)
+	assertStatusEntry(t, report, "extra.txt", StatusTrackingAdded)
+	assertStatusFlags(t, report, true, true)
 }
 
 func TestCompareSnapshotReportsTypeChanged(t *testing.T) {
@@ -57,21 +58,28 @@ func TestCompareSnapshotReportsTypeChanged(t *testing.T) {
 	assertStatusEntry(t, report, "README.md", StatusTypeChanged)
 }
 
-func TestCompareSnapshotWithExcludedPathsIgnoresExpectedAndCurrentPaths(t *testing.T) {
+func TestCompareSnapshotWithExcludedPathsIgnoresExcludedLocalOnlyPath(t *testing.T) {
 	root, cas, snapshotCID := createStatusFixture(t)
-	if removeErr := os.Remove(filepath.Join(root, "docs", "guide.md")); removeErr != nil {
-		t.Fatalf("Remove(guide) error = %v", removeErr)
-	}
 	if writeErr := os.WriteFile(filepath.Join(root, "local.log"), []byte("local-only\n"), 0o644); writeErr != nil {
 		t.Fatalf("WriteFile(local.log) error = %v", writeErr)
 	}
-	report, compareErr := CompareSnapshotWithExcludedPaths(cas, snapshotCID, root, []string{"docs", "local.log"})
+	report, compareErr := CompareSnapshotWithExcludedPaths(cas, snapshotCID, root, []string{"local.log"})
 	if compareErr != nil {
 		t.Fatalf("CompareSnapshotWithExcludedPaths() error = %v", compareErr)
 	}
 	if !report.Clean {
 		t.Fatalf("report = %#v, want clean after exclusions", report)
 	}
+}
+
+func TestCompareSnapshotWithExcludedPathsReportsTrackingRemoved(t *testing.T) {
+	root, cas, snapshotCID := createStatusFixture(t)
+	report, compareErr := CompareSnapshotWithExcludedPaths(cas, snapshotCID, root, []string{"docs"})
+	if compareErr != nil {
+		t.Fatalf("CompareSnapshotWithExcludedPaths() error = %v", compareErr)
+	}
+	assertStatusEntry(t, report, "docs", StatusTrackingRemoved)
+	assertStatusFlags(t, report, false, true)
 }
 
 func createStatusFixture(t *testing.T) (string, *store.FileStore, cidlib.Cid) {
@@ -109,4 +117,11 @@ func assertStatusEntry(t *testing.T, report StatusReport, path string, status st
 		}
 	}
 	t.Fatalf("status entry %s/%s not found in %#v", path, status, report.Entries)
+}
+
+func assertStatusFlags(t *testing.T, report StatusReport, contentDiff bool, trackedStatusDiff bool) {
+	t.Helper()
+	if report.ContentDiff != contentDiff || report.TrackedStatusDiff != trackedStatusDiff {
+		t.Fatalf("report flags = content:%t tracking:%t, want content:%t tracking:%t", report.ContentDiff, report.TrackedStatusDiff, contentDiff, trackedStatusDiff)
+	}
 }

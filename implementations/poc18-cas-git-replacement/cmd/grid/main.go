@@ -284,13 +284,16 @@ func writeStatus(report workspace.StatusReport, outPath string) error {
 			return err
 		}
 	}
+	// Intent: Surface content drift and tracked-status drift as separate facts
+	// in human output, matching the JSON report shape used by tests and future
+	// porcelain. Source: DI-tuhoj
 	if report.Clean {
-		fmt.Printf("clean snapshot=%s workspace=%s\n", report.SnapshotCID, report.SourceRoot)
+		fmt.Printf("clean snapshot=%s workspace=%s content_diff=%t tracked_status_diff=%t\n", report.SnapshotCID, report.SourceRoot, report.ContentDiff, report.TrackedStatusDiff)
 		return nil
 	}
-	fmt.Printf("changed snapshot=%s workspace=%s entries=%d\n", report.SnapshotCID, report.SourceRoot, len(report.Entries))
+	fmt.Printf("changed snapshot=%s workspace=%s entries=%d content_diff=%t tracked_status_diff=%t\n", report.SnapshotCID, report.SourceRoot, len(report.Entries), report.ContentDiff, report.TrackedStatusDiff)
 	for _, entry := range report.Entries {
-		fmt.Printf("%s\t%s\t%s\n", entry.Status, entry.Type, entry.Path)
+		fmt.Printf("%s\t%s\t%s\tcontent_diff=%t\ttracked_status_diff=%t\n", entry.Status, entry.Type, entry.Path, entry.ContentDiff, entry.TrackedStatusDiff)
 	}
 	return nil
 }

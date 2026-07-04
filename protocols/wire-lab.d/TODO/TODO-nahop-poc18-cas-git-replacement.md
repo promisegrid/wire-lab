@@ -178,6 +178,15 @@ Intent: POC18 needs a simple way to omit local files from snapshots and status w
 Constraints: Store slash-clean repo-relative path exclusions in `.grid/state.json`; reject absolute, parent-escaping, empty, `.`, and `.grid` paths; apply exclusions to repo-local `snapshot` and `status` only when the selected workspace is the discovered repo root; preserve `--store` and explicit external `-workspace` behavior; generated runtime state remains under `/tmp/wire-lab-poc18-*`.
 Affects: implementations/poc18-cas-git-replacement/repo/; implementations/poc18-cas-git-replacement/workspace/; implementations/poc18-cas-git-replacement/cmd/grid/; implementations/poc18-cas-git-replacement/scripts/run-clean.sh; protocols/wire-lab.d/TODO/TODO-nahop-poc18-cas-git-replacement.md; DEV-GUIDE-RESOURCES.md.
 
+ID: DI-tuhoj
+Date: 2026-07-03 05:40:15 -0700
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Refine `grid status` so local tracking policy changes are visible immediately after `grid track` or `grid untrack`; report separate aggregate and per-entry flags for content differences and tracked-status differences relative to the latest recorded snapshot.
+Intent: Users need `status` to answer two distinct questions without waiting for another snapshot: whether bytes/types differ from the current snapshot, and whether local tracking membership differs from the current snapshot. A path re-included by `track` should show a tracked-status addition until the next snapshot records it; a path excluded by `untrack` should show a tracked-status removal until the next snapshot omits it.
+Constraints: Preserve repo-local path policy from `DI-jokav`; do not mutate CAS or `.grid/state.json` from `status`; keep excluded local-only files absent from status when they were not tracked in the snapshot; do not compare excluded file bytes as content drift; keep generated runtime state under `/tmp/wire-lab-poc18-*`.
+Affects: implementations/poc18-cas-git-replacement/workspace/status.go; implementations/poc18-cas-git-replacement/workspace/status_test.go; implementations/poc18-cas-git-replacement/cmd/grid/main.go; implementations/poc18-cas-git-replacement/cmd/grid/main_test.go; implementations/poc18-cas-git-replacement/scripts/run-clean.sh; DEV-GUIDE-RESOURCES.md; protocols/wire-lab.d/TODO/TODO-nahop-poc18-cas-git-replacement.md.
+
 ## Core Hypothesis
 
 POC18 should test this hypothesis:
@@ -696,3 +705,6 @@ Remaining:
     read-only `status` comparisons.
   - [x] nahop.33.3 Add CLI commands, unit tests, clean-run coverage, and guide
     notes.
+  - [x] nahop.33.4 Refine `grid status` so tracking policy changes appear
+    immediately with separate content and tracked-status difference flags.
+    Source: `DI-tuhoj`.
