@@ -21,7 +21,7 @@ import (
 
 const (
 	GridTagNumber          = uint64(0x67726964)
-	VersionControlPCIDText = "bafkreicrikn3oqfumjnuvruw67h5ffvu6dyy7inz7h2rtm6s4qgwgz7oxu"
+	VersionControlPCIDText = "bafkreibi574zavmkqmafchb3mnn5kfj3uns7ymuwanjrdtkrijfxnyc6mu"
 )
 
 // Parent names one typed parent edge in the envelope parent slot.
@@ -278,6 +278,24 @@ func ObjectRetentionBody(scope string, objects []any, retainUntil string, collec
 		reciprocalEvidence = []any{}
 	}
 	return []any{scope, objects, retainUntil, collectionTerms, reciprocalEvidence}
+}
+
+// StoragePaymentRedemptionBody returns the promise body for one local
+// storage-payment token redemption.
+//
+// Intent: Token redemption is a promise/economics event tied to exact token and
+// object CIDs. It records Frank's local consumption of Alice's signed token
+// without introducing global balances or authorization. Source: DI-bidum
+func StoragePaymentRedemptionBody(tokenCID cidlib.Cid, objectCID cidlib.Cid, scope string, value int64, unit string, redeemedAt string, transferable bool) []any {
+	return []any{
+		store.LinkTag(tokenCID),
+		store.LinkTag(objectCID),
+		scope,
+		value,
+		unit,
+		redeemedAt,
+		transferable,
+	}
 }
 
 // SyncInterestBody returns the promise body for sync_interest.

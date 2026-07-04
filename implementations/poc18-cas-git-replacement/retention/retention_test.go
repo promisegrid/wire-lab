@@ -32,7 +32,7 @@ func TestPromiseAndCollectKeepsPromisedObjectsAndCollectsUnpromised(t *testing.T
 		Targets:              []Target{{Role: "release", CID: store.CIDText(promisedMessage.CID)}},
 		RetainUntil:          "2026-07-31T00:00:00Z",
 		CollectionTerms:      []string{"collect unpromised under pressure"},
-		ReciprocalEvidence:   []string{"paid_storage_credit:1"},
+		ReciprocalEvidence:   []any{"paid_storage_credit:1"},
 		LocalConstraintTerms: []string{"local-only test"},
 	}, 0)
 	if retentionErr != nil {

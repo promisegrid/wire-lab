@@ -12,6 +12,7 @@ import (
 	"path/filepath"
 
 	"promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/bridge"
+	"promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/economy"
 	pgrepo "promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/repo"
 	"promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/retention"
 	"promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/scenario"
@@ -28,13 +29,14 @@ import (
 // Source: DI-gozov
 type fixtureResult struct {
 	workspace.IngestResult
-	AliceStoreRoot string                  `json:"alice_store_root"`
-	BobStoreRoot   string                  `json:"bob_store_root"`
-	FrankStoreRoot string                  `json:"frank_store_root"`
-	Scenario       scenario.Result         `json:"scenario"`
-	Bridge         bridgeFixtureResult     `json:"bridge"`
-	Retrieval      pocsync.RetrievalReport `json:"retrieval"`
-	Retention      retention.Report        `json:"retention"`
+	AliceStoreRoot   string                   `json:"alice_store_root"`
+	BobStoreRoot     string                   `json:"bob_store_root"`
+	FrankStoreRoot   string                   `json:"frank_store_root"`
+	Scenario         scenario.Result          `json:"scenario"`
+	Bridge           bridgeFixtureResult      `json:"bridge"`
+	Retrieval        pocsync.RetrievalReport  `json:"retrieval"`
+	Retention        retention.Report         `json:"retention"`
+	RetentionPayment economy.RedemptionReport `json:"retention_payment"`
 }
 
 type bridgeFixtureResult struct {
@@ -240,6 +242,11 @@ func analyze(runRoot string, result fixtureResult) (Report, error) {
 	} else if !retentionPass {
 		pass = false
 	}
+	if paymentPass, paymentErr := checkRetentionPayment(result, aliceCAS, frankCAS, checks); paymentErr != nil {
+		return Report{}, paymentErr
+	} else if !paymentPass {
+		pass = false
+	}
 	snapshotCID, snapshotErr := store.ParseCIDText(result.SnapshotCID)
 	if snapshotErr != nil {
 		return Report{}, snapshotErr
@@ -411,6 +418,74 @@ func checkRetentionGC(result fixtureResult, frankCAS *store.FileStore, checks ma
 		}
 	}
 	return pass, nil
+}
+
+func checkRetentionPayment(result fixtureResult, aliceCAS *store.FileStore, frankCAS *store.FileStore, checks map[string]string) (bool, error) {
+	// Intent: The clean run must prove retention economics are now signed,
+	// spendable token promises. These checks remain local fixture gates, not a
+	// global monitor or payment authority. Source: DI-bidum
+	pass := true
+	payment := result.RetentionPayment
+	if payment.Issued && payment.SignatureVerified && payment.Transferable && payment.Value == 5 && payment.Unit == "storage_credit" && payment.ObjectCID == result.ReleaseRefSetCID {
+		checks["retention_payment_token_signed"] = "kept"
+	} else {
+		checks["retention_payment_token_signed"] = "missing"
+		pass = false
+	}
+	if payment.Redeemed && payment.TokenStoredByRedeemer {
+		checks["retention_payment_token_redeemed"] = "kept"
+	} else {
+		checks["retention_payment_token_redeemed"] = "missing"
+		pass = false
+	}
+	if payment.ReplayRejected {
+		checks["retention_payment_replay_rejected"] = "kept"
+	} else {
+		checks["retention_payment_replay_rejected"] = "missing"
+		pass = false
+	}
+	tokenCID, tokenErr := store.ParseCIDText(payment.TokenCID)
+	if tokenErr != nil {
+		return false, tokenErr
+	}
+	if payment.TokenStoredByIssuer && aliceCAS.Has(tokenCID) {
+		checks["retention_payment_token_in_alice_cas"] = "kept"
+	} else {
+		checks["retention_payment_token_in_alice_cas"] = "missing"
+		pass = false
+	}
+	if frankCAS.Has(tokenCID) {
+		checks["retention_payment_token_in_frank_cas"] = "kept"
+	} else {
+		checks["retention_payment_token_in_frank_cas"] = "missing"
+		pass = false
+	}
+	redemptionCID, redemptionErr := store.ParseCIDText(payment.RedemptionMessageCID)
+	if redemptionErr != nil {
+		return false, redemptionErr
+	}
+	if frankCAS.Has(redemptionCID) {
+		checks["retention_payment_redemption_message_kept"] = "kept"
+	} else {
+		checks["retention_payment_redemption_message_kept"] = "missing"
+		pass = false
+	}
+	if cidListContains(result.Retention.ProtectedCIDs, payment.TokenCID) && cidListContains(result.Retention.ProtectedCIDs, payment.RedemptionMessageCID) {
+		checks["retention_payment_protected_by_gc"] = "kept"
+	} else {
+		checks["retention_payment_protected_by_gc"] = "missing"
+		pass = false
+	}
+	return pass, nil
+}
+
+func cidListContains(values []string, wanted string) bool {
+	for _, value := range values {
+		if value == wanted {
+			return true
+		}
+	}
+	return false
 }
 
 func checkAliceGridRepo(result fixtureResult, checks map[string]string) (bool, error) {

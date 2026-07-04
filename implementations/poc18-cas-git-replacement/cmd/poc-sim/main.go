@@ -11,12 +11,15 @@ import (
 	"os"
 	"path/filepath"
 	"syscall"
+	"time"
 
 	git "github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
 	cidlib "github.com/ipfs/go-cid"
 
 	"promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/bridge"
+	"promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/economy"
+	"promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/graph"
 	pgrepo "promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/repo"
 	"promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/retention"
 	"promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/scenario"
@@ -32,13 +35,14 @@ import (
 // Source: DI-gozov
 type fixtureResult struct {
 	workspace.IngestResult
-	AliceStoreRoot string                  `json:"alice_store_root"`
-	BobStoreRoot   string                  `json:"bob_store_root"`
-	FrankStoreRoot string                  `json:"frank_store_root"`
-	Scenario       scenario.Result         `json:"scenario"`
-	Bridge         bridgeFixtureResult     `json:"bridge"`
-	Retrieval      pocsync.RetrievalReport `json:"retrieval"`
-	Retention      retention.Report        `json:"retention"`
+	AliceStoreRoot   string                   `json:"alice_store_root"`
+	BobStoreRoot     string                   `json:"bob_store_root"`
+	FrankStoreRoot   string                   `json:"frank_store_root"`
+	Scenario         scenario.Result          `json:"scenario"`
+	Bridge           bridgeFixtureResult      `json:"bridge"`
+	Retrieval        pocsync.RetrievalReport  `json:"retrieval"`
+	Retention        retention.Report         `json:"retention"`
+	RetentionPayment economy.RedemptionReport `json:"retention_payment"`
 }
 
 type bridgeFixtureResult struct {
@@ -136,20 +140,21 @@ func run() error {
 	if err := workspace.MaterializeSnapshot(bobCAS, mergeSnapshotCID, checkoutRoot); err != nil {
 		return err
 	}
-	retentionReport, retentionErr := runRetentionFixture(aliceCAS, frankStoreRoot, result, scenarioResult)
+	retentionReport, retentionPayment, retentionErr := runRetentionFixture(aliceCAS, frankStoreRoot, result, scenarioResult)
 	if retentionErr != nil {
 		return retentionErr
 	}
 	result.CheckoutRoot = checkoutRoot
 	combined := fixtureResult{
-		IngestResult:   result,
-		AliceStoreRoot: aliceStoreRoot,
-		BobStoreRoot:   bobStoreRoot,
-		FrankStoreRoot: frankStoreRoot,
-		Scenario:       scenarioResult,
-		Bridge:         bridgeResult,
-		Retrieval:      retrieval,
-		Retention:      retentionReport,
+		IngestResult:     result,
+		AliceStoreRoot:   aliceStoreRoot,
+		BobStoreRoot:     bobStoreRoot,
+		FrankStoreRoot:   frankStoreRoot,
+		Scenario:         scenarioResult,
+		Bridge:           bridgeResult,
+		Retrieval:        retrieval,
+		Retention:        retentionReport,
+		RetentionPayment: retentionPayment,
 	}
 	resultPath := filepath.Join(*runRoot, "result.json")
 	if err := writeJSON(resultPath, combined); err != nil {
@@ -163,33 +168,50 @@ func run() error {
 	fmt.Printf("diagnostic_message=%s\n", result.DiagnosticMessageCID)
 	fmt.Printf("retrieved_objects=%d missing_objects=%d\n", len(retrieval.Retrieved), len(retrieval.Missing))
 	fmt.Printf("retention_collected=%d protected_objects=%d\n", retentionReport.CollectedObjects, retentionReport.ProtectedObjects)
+	fmt.Printf("retention_payment_token=%s redeemed=%t replay_rejected=%t\n", retentionPayment.TokenCID, retentionPayment.Redeemed, retentionPayment.ReplayRejected)
 	return nil
 }
 
-func runRetentionFixture(aliceCAS *store.FileStore, frankStoreRoot string, result workspace.IngestResult, scenarioResult scenario.Result) (retention.Report, error) {
+func runRetentionFixture(aliceCAS *store.FileStore, frankStoreRoot string, result workspace.IngestResult, scenarioResult scenario.Result) (retention.Report, economy.RedemptionReport, error) {
 	frankCAS, frankOpenErr := store.Open(frankStoreRoot)
 	if frankOpenErr != nil {
-		return retention.Report{}, frankOpenErr
+		return retention.Report{}, economy.RedemptionReport{}, frankOpenErr
 	}
 	releaseCID, releaseErr := store.ParseCIDText(result.ReleaseRefSetCID)
 	if releaseErr != nil {
-		return retention.Report{}, releaseErr
+		return retention.Report{}, economy.RedemptionReport{}, releaseErr
 	}
 	mergeBranchCID, branchErr := store.ParseCIDText(scenarioResult.MergeBranchRefSetCID)
 	if branchErr != nil {
-		return retention.Report{}, branchErr
+		return retention.Report{}, economy.RedemptionReport{}, branchErr
 	}
 	reviewThreadCID, reviewErr := store.ParseCIDText(scenarioResult.ReviewThreadRefSetCID)
 	if reviewErr != nil {
-		return retention.Report{}, reviewErr
+		return retention.Report{}, economy.RedemptionReport{}, reviewErr
 	}
 	mergeSnapshotCID, snapshotErr := store.ParseCIDText(scenarioResult.MergeSnapshotCID)
 	if snapshotErr != nil {
-		return retention.Report{}, snapshotErr
+		return retention.Report{}, economy.RedemptionReport{}, snapshotErr
+	}
+	tokenNow := time.Date(2026, 7, 4, 12, 0, 0, 0, time.UTC)
+	issuedPayment, issueErr := economy.IssueStoragePaymentToken(aliceCAS, economy.StoragePaymentToken{
+		Issuer:       "alice",
+		Subject:      "frank",
+		Scope:        "poc18-release-retention",
+		ObjectCID:    result.ReleaseRefSetCID,
+		Value:        5,
+		Unit:         "storage_credit",
+		ExpiresUnix:  time.Date(2026, 7, 31, 0, 0, 0, 0, time.UTC).Unix(),
+		Nonce:        "poc18-release-retention-payment-1",
+		Transferable: true,
+	})
+	if issueErr != nil {
+		return retention.Report{}, economy.RedemptionReport{}, issueErr
 	}
 	// Intent: Frank's fixture store is separate from Alice and Bob. Frank first
-	// retrieves exact bytes from Alice, then makes Frank's own retention promise
-	// about selected roots in return for paid storage terms. Source: DI-mivur
+	// retrieves exact bytes from Alice, then verifies and redeems Alice's signed
+	// storage-payment token before Frank promises to retain selected roots. Source:
+	// DI-mivur; DI-bidum
 	if _, retrieveErr := pocsync.RetrieveGraph(
 		pocsync.Peer{Agent: "frank", CAS: frankCAS},
 		pocsync.Peer{Agent: "alice", CAS: aliceCAS},
@@ -199,13 +221,51 @@ func runRetentionFixture(aliceCAS *store.FileStore, frankStoreRoot string, resul
 			"review_thread": reviewThreadCID,
 			"snapshot":      mergeSnapshotCID,
 		},
-		"paid_storage_credit:5",
+		"storage_payment_token:"+issuedPayment.CID,
 	); retrieveErr != nil {
-		return retention.Report{}, retrieveErr
+		return retention.Report{}, economy.RedemptionReport{}, retrieveErr
 	}
 	tempEntry, tempErr := frankCAS.Put("chunk", []byte("temporary unpromised pressure bytes\n"))
 	if tempErr != nil {
-		return retention.Report{}, tempErr
+		return retention.Report{}, economy.RedemptionReport{}, tempErr
+	}
+	paymentLedger := economy.NewLedger()
+	paymentRedemption, redeemErr := paymentLedger.RedeemStoragePaymentToken(frankCAS, issuedPayment.Bytes, economy.ExpectedStoragePayment{
+		Issuer:    "alice",
+		Subject:   "frank",
+		Scope:     "poc18-release-retention",
+		ObjectCID: result.ReleaseRefSetCID,
+		Value:     5,
+		Unit:      "storage_credit",
+	}, "frank", tokenNow)
+	if redeemErr != nil {
+		return retention.Report{}, economy.RedemptionReport{}, redeemErr
+	}
+	issuedTokenCID, tokenCIDErr := store.ParseCIDText(issuedPayment.CID)
+	if tokenCIDErr != nil {
+		return retention.Report{}, economy.RedemptionReport{}, tokenCIDErr
+	}
+	paymentRedemption.TokenStoredByIssuer = aliceCAS.Has(issuedTokenCID)
+	redemptionMessage, redemptionMessageErr := economy.StoreRedemptionMessage(frankCAS, paymentRedemption, "2026-07-04T12:00:00Z")
+	if redemptionMessageErr != nil {
+		return retention.Report{}, economy.RedemptionReport{}, redemptionMessageErr
+	}
+	paymentRedemption.RedemptionMessageCID = store.CIDText(redemptionMessage.CID)
+	if _, replayErr := paymentLedger.RedeemStoragePaymentToken(frankCAS, issuedPayment.Bytes, economy.ExpectedStoragePayment{
+		Issuer:    "alice",
+		Subject:   "frank",
+		Scope:     "poc18-release-retention",
+		ObjectCID: result.ReleaseRefSetCID,
+		Value:     5,
+		Unit:      "storage_credit",
+	}, "frank", tokenNow); replayErr != nil {
+		paymentRedemption.ReplayRejected = true
+	} else {
+		return retention.Report{}, economy.RedemptionReport{}, fmt.Errorf("storage payment token replay was accepted")
+	}
+	redemptionCID, redemptionCIDErr := store.ParseCIDText(paymentRedemption.RedemptionMessageCID)
+	if redemptionCIDErr != nil {
+		return retention.Report{}, economy.RedemptionReport{}, redemptionCIDErr
 	}
 	report, retentionErr := retention.PromiseAndCollect(frankCAS, retention.Promise{
 		Promiser:    "frank",
@@ -218,15 +278,19 @@ func runRetentionFixture(aliceCAS *store.FileStore, frankStoreRoot string, resul
 			{Role: "review_thread", CID: scenarioResult.ReviewThreadRefSetCID},
 			{Role: "snapshot", CID: scenarioResult.MergeSnapshotCID},
 		},
-		CollectionTerms:      []string{"collect unpromised objects under local pressure"},
-		ReciprocalEvidence:   []string{"paid_storage_credit:5"},
+		Parents:         []graph.Parent{{Role: "paid_by", CID: redemptionCID}},
+		CollectionTerms: []string{"collect unpromised objects under local pressure after paid retention promise"},
+		ReciprocalEvidence: []any{
+			graph.ObjectRow("storage_payment_token", issuedTokenCID, "redeemed"),
+			graph.ObjectRow("storage_payment_redemption", redemptionCID, "accepted_locally"),
+		},
 		LocalConstraintTerms: []string{"Frank judges retention locally; no global pin authority"},
 	}, 0)
 	if retentionErr != nil {
-		return retention.Report{}, retentionErr
+		return retention.Report{}, economy.RedemptionReport{}, retentionErr
 	}
 	report.TemporaryObjectCID = tempEntry.CID
-	return report, nil
+	return report, paymentRedemption, nil
 }
 
 func runGitBridgeFixture(runRoot string, aliceCAS *store.FileStore, bobCAS *store.FileStore) (bridgeFixtureResult, error) {

@@ -23,13 +23,17 @@ type Target struct {
 
 // Promise is the deterministic fixture shape for one object_retention promise.
 type Promise struct {
-	Promiser             string   `json:"promiser"`
-	Promisee             string   `json:"promisee"`
-	Scope                string   `json:"scope"`
-	Targets              []Target `json:"targets"`
-	RetainUntil          string   `json:"retain_until"`
+	Promiser    string   `json:"promiser"`
+	Promisee    string   `json:"promisee"`
+	Scope       string   `json:"scope"`
+	Targets     []Target `json:"targets"`
+	RetainUntil string   `json:"retain_until"`
+	// Parents lets the retention promise preserve payment-redemption context in
+	// the same message DAG as the retained objects. Intent: paid retention should
+	// be auditable through CIDs rather than hidden fixture state. Source: DI-bidum
+	Parents              []graph.Parent
 	CollectionTerms      []string `json:"collection_terms"`
-	ReciprocalEvidence   []string `json:"reciprocal_evidence"`
+	ReciprocalEvidence   []any    `json:"reciprocal_evidence"`
 	LocalConstraintTerms []string `json:"local_constraint_terms"`
 }
 
@@ -123,12 +127,12 @@ func StorePromise(cas *store.FileStore, promise Promise) (graph.StoredMessage, e
 			rows,
 			promise.RetainUntil,
 			stringRows(promise.CollectionTerms),
-			stringRows(promise.ReciprocalEvidence),
+			anyRows(promise.ReciprocalEvidence),
 		),
-		ReciprocalPromise: stringRows(promise.ReciprocalEvidence),
+		ReciprocalPromise: anyRows(promise.ReciprocalEvidence),
 		LocalConstraints:  stringRows(promise.LocalConstraintTerms),
 	}
-	return graph.StoreMessage(cas, nil, payload)
+	return graph.StoreMessage(cas, promise.Parents, payload)
 }
 
 func targetRows(targets []Target) ([]any, error) {
@@ -149,6 +153,13 @@ func stringRows(values []string) []any {
 		rows = append(rows, value)
 	}
 	return rows
+}
+
+func anyRows(values []any) []any {
+	if values == nil {
+		return []any{}
+	}
+	return append([]any(nil), values...)
 }
 
 func promisedClosure(cas *store.FileStore, roots []Target) (map[string]bool, []Target, error) {

@@ -104,6 +104,7 @@ that says otherwise.
 | Review thread | Versioned reference set that groups submissions, comments, tests, acceptance promises, and requested-change promises. |
 | Git bridge | Adapter that maps Git refs/objects to and from native PromiseGrid objects. |
 | Native sync | Continuous peer DAG synchronization of promises and missing objects, not Git push/pull. |
+| Storage-payment token | Exact COSE_Sign1 bytes containing CWT-style CBOR claims. The token is an issuer promise that a bearer may redeem under stated local storage terms. |
 
 ## Payload grammar
 
@@ -154,6 +155,8 @@ parents = [
 | `responds_to` | Message this message answers or narrows. |
 | `review_of` | Message or object being reviewed. |
 | `git_bridge_source` | Git mapping object or imported Git object that informed this promise. |
+| `redeems_token` | Exact storage-payment token bytes consumed by a redemption promise. |
+| `paid_by` | Storage-payment redemption promise used as reciprocal economics for a retention promise. |
 
 Receivers MUST treat missing parents as sparse-DAG state, not proof of bad
 faith. A receiver MAY request missing parents through `sync_interest`.
@@ -318,6 +321,30 @@ promise_body = [
 Retention is local. Garbage collection is promise-based: an agent SHOULD publish
 what it is willing to retain or collect instead of silently deleting objects it
 previously promised to retain.
+
+### `storage_payment_redemption`
+
+Promises local redemption of a storage-payment bearer token.
+
+```text
+promise_body = [
+  42(storage_payment_token_cid),
+  42(paid_object_cid),
+  payment_scope,
+  payment_value,
+  payment_unit,
+  redeemed_at,
+  transferable
+]
+```
+
+The `storage_payment_token_cid` names exact COSE_Sign1 bytes stored in CAS. Those
+bytes contain CWT-style CBOR claims, including issuer, subject, expiration time,
+token id, capability marker, scope, paid object CID, value, unit, and
+transferability. A receiver MUST verify the issuer signature before treating the
+token as reciprocal economics, and SHOULD reject token replay using its own local
+spent-token ledger. This is not a global balance, currency, authorization, or
+settlement authority.
 
 ### `review_statement`
 
@@ -845,7 +872,9 @@ Alice remains free not to serve them.
 
 ```text
 grid([42(pCID),
-  [],
+  [
+    ["paid_by", 42(bafkreiredemptioncid...)]
+  ],
   [
     "frank",
     "alice",
@@ -858,17 +887,26 @@ grid([42(pCID),
       ],
       "2026-07-31T00:00:00Z",
       ["I may collect unlisted chunks under local disk pressure."],
-      ["accepted bearer storage token bafkrei..."]
+      [
+        ["storage_payment_token", 42(bafkreitokencid...), "redeemed"],
+        ["storage_payment_redemption", 42(bafkreiredemptioncid...), "accepted_locally"]
+      ]
     ],
-    ["storage_token", 42(bafkreitokencid...)],
-    {"store": "frank-local-cas"}
+    [
+      ["storage_payment_token", 42(bafkreitokencid...), "redeemed"],
+      ["storage_payment_redemption", 42(bafkreiredemptioncid...), "accepted_locally"]
+    ],
+    ["store=frank-local-cas"]
   ],
   proof
 ])
 ```
 
 Frank promises retention for selected objects and states collection pressure for
-unlisted objects. Alice judges Frank's future keep/break history locally.
+unlisted objects. The `paid_by` parent points at Frank's
+`storage_payment_redemption` promise, which in turn has a `redeems_token` parent
+to Alice's exact signed storage-payment token bytes. Alice judges Frank's future
+keep/break history locally.
 
 ## Implementation requirements
 

@@ -9,6 +9,7 @@ require (
 	github.com/multiformats/go-multibase v0.3.0
 	github.com/multiformats/go-multihash v0.2.3
 	github.com/restic/chunker v0.5.0
+	github.com/veraison/go-cose v1.3.0
 )
 
 require (

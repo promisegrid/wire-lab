@@ -196,6 +196,15 @@ Intent: POC18 should demonstrate retention and garbage collection as local promi
 Constraints: Keep all generated runtime state under `/tmp/wire-lab-poc18-*`; do not delete promised objects; do not claim peer-wide or global completeness; do not collect by default without an explicit pressure target; record GC output as local fixture evidence; preserve exact CID verification and sparse-CAS separation between Alice and Bob.
 Affects: implementations/poc18-cas-git-replacement/retention/; implementations/poc18-cas-git-replacement/graph/; implementations/poc18-cas-git-replacement/store/; implementations/poc18-cas-git-replacement/cmd/poc-sim/; implementations/poc18-cas-git-replacement/cmd/poc-analyze/; implementations/poc18-cas-git-replacement/scripts/run-clean.sh; protocols/wire-lab.d/TODO/TODO-nahop-poc18-cas-git-replacement.md; DEV-GUIDE-RESOURCES.md.
 
+ID: DI-bidum
+Date: 2026-07-04 11:48:24 PDT
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Replace POC18 retention-payment text credits with POC18-local spendable storage-payment bearer tokens: Alice issues CWT-style CBOR claim bytes signed as COSE_Sign1/Ed25519, Frank verifies and redeems one token before accepting paid object-retention terms, and the analyzer gates issuance, signature verification, redemption, and replay rejection.
+Intent: Retention economics should exercise a real cryptographic promise token instead of a descriptive string. The token remains an issuer promise and local economic artifact, not currency, global authorization, or payment authority. This directly inherits the POC16 CWT/COSE token lesson while keeping POC18's version-control protocol scope local to the POC.
+Constraints: Keep the token implementation POC18-local; use the well-known `github.com/veraison/go-cose` COSE library if available; use deterministic POC Ed25519 keys already used by POC18 graph proofs; treat bearer transferability as a signed claim; store exact token bytes/CID references in promise payloads; reject expired, wrong-issuer, wrong-subject, wrong-scope, wrong-object, and replayed tokens; do not introduce RPC, authorization, global balances, or production settlement.
+Affects: implementations/poc18-cas-git-replacement/economy/; implementations/poc18-cas-git-replacement/retention/; implementations/poc18-cas-git-replacement/cmd/poc-sim/; implementations/poc18-cas-git-replacement/cmd/poc-analyze/; implementations/poc18-cas-git-replacement/go.mod; implementations/poc18-cas-git-replacement/go.sum; DEV-GUIDE-RESOURCES.md; protocols/wire-lab.d/TODO/TODO-nahop-poc18-cas-git-replacement.md.
+
 ## Core Hypothesis
 
 POC18 should test this hypothesis:
@@ -552,6 +561,12 @@ Locked:
   `object_availability` promise, and Bob retains only exact CID-verified bytes
   copied from Alice's sparse CAS into Bob's separate sparse CAS. Source:
   `DI-gozov`.
+- POC18 implements deterministic spendable retention-payment tokens for
+  `nahop.17.6`: Alice issues exact CWT-style CBOR claim bytes signed as
+  COSE_Sign1/Ed25519, Frank stores and redeems the bearer token once before
+  promising object retention, Frank records a `storage_payment_redemption`
+  message, and analyzer gates signature verification plus replay rejection.
+  Source: `DI-bidum`.
 - POC18 implements deterministic collaboration scenarios for `nahop.12` through
   `nahop.14`: rename/copy lineage keeps the same POSIX node CID under changed
   directory labels, divergent Alice/Bob snapshots are explicit, Dave's merge is
@@ -560,7 +575,7 @@ Locked:
 - The POC18 version-control protocol spec is
   `implementations/poc18-cas-git-replacement/docs/protocols/version-control.md`,
   with pCID alias
-  `bafkreicrikn3oqfumjnuvruw67h5ffvu6dyy7inz7h2rtm6s4qgwgz7oxu.md`. The
+  `bafkreibi574zavmkqmafchb3mnn5kfj3uns7ymuwanjrdtkrijfxnyc6mu.md`. The
   filename intentionally has no `-v1` or `_v1` suffix because the pCID is the
   protocol version. Recompute it from the repo root with `cd tools/spec`, then
   `go run . cid ../../implementations/poc18-cas-git-replacement/docs/protocols/version-control.md`;
@@ -592,7 +607,7 @@ Remaining:
   using its pCID in code. Completed by
   `implementations/poc18-cas-git-replacement/docs/protocols/version-control.md`;
   pCID alias
-  `implementations/poc18-cas-git-replacement/docs/protocols/bafkreicrikn3oqfumjnuvruw67h5ffvu6dyy7inz7h2rtm6s4qgwgz7oxu.md`.
+  `implementations/poc18-cas-git-replacement/docs/protocols/bafkreibi574zavmkqmafchb3mnn5kfj3uns7ymuwanjrdtkrijfxnyc6mu.md`.
 - [x] nahop.4 Implement per-agent sparse CAS object stores with CIDv1 base32
   printable paths and binary CID values inside CBOR. First slice completed by
   `implementations/poc18-cas-git-replacement/store/`. Source: `DI-jifuj`;
@@ -649,6 +664,9 @@ Remaining:
     retention promises and one pressure-created temporary object.
   - [x] nahop.17.5 Add analyzer gates proving promised objects remain and
     unpromised pressure objects are collected.
+  - [x] nahop.17.6 Replace retention-payment text credits with spendable
+    CWT/COSE bearer storage-payment tokens, and gate issuance, redemption, and
+    replay rejection. Source: `DI-bidum`.
 - [x] nahop.18 Review Tangled as prior art and record whether POC18 should adopt,
   reject, or explicitly differ from Tangled's self-hosted knots, appview,
   AT Protocol identity, round-based PR flow, SSH/Git compatibility, and Jujutsu

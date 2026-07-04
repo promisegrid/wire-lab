@@ -69,7 +69,7 @@ user-facing view over shared CAS/reference sets rather than a native storage
 authority. The implementation-local POC18 protocol spec is now
 `version-control.md`, intentionally without a version suffix because its CID is
 the version; its current pCID alias is
-`bafkreicrikn3oqfumjnuvruw67h5ffvu6dyy7inz7h2rtm6s4qgwgz7oxu.md`. TE-hikar
+`bafkreibi574zavmkqmafchb3mnn5kfj3uns7ymuwanjrdtkrijfxnyc6mu.md`. TE-hikar
 locks the first `grid` CLI balance: `grid` is the user-facing CLI, `poc-*`
 commands are deterministic non-production fixtures, docs use `CLI/core`, and the
 first command set avoids Git's native staging and push/pull assumptions while
@@ -98,8 +98,11 @@ promises so conventional Git remotes remain bridge inputs/outputs rather than
 native PromiseGrid authorities. POC18 now also exercises promise-based retention
 and local pressure GC: Frank keeps a separate sparse CAS, retrieves selected
 release/snapshot/review roots from Alice, stores a signed `object_retention`
-promise in return for paid-storage terms, protects the promised closure, and
-collects only locally unpromised pressure objects. Normal `grid` commands now
+promise in return for Alice's signed CWT/COSE bearer storage-payment token,
+stores exact token bytes in CAS, records a `storage_payment_redemption` promise,
+rejects token replay through Frank's local spent-token ledger, protects the
+promised closure including payment objects, and collects only locally unpromised
+pressure objects. Normal `grid` commands now
 discover repo-local `.grid/config.json` by walking upward from the current directory; the config
 contains a typed CAS locator that defaults to local file CAS `.grid/cas` while
 preserving room for daemon or remote CAS locators later. POC18 now keeps mutable
@@ -123,8 +126,8 @@ are also present.
 Source: `DI-zuruj`; `DI-dibut`; `DI-dofoj`; `DI-radaj`; `DI-lidaj`;
 `DI-fusir`; `DI-jifuj`; `DI-harih`; `DI-gozov`; `DI-guban`; `DI-fimap`;
 `DI-pahor`; `DI-bikif`; `DI-kiram`; `DI-bamum`; `DI-jokav`; `DI-tuhoj`;
-`DI-mivur`; `DN-dopod`; `TE-kopap`; `TE-vahoj`; `TE-hikar`; `TE-givul`;
-`TE-nozal`.
+`DI-mivur`; `DI-bidum`; `DN-dopod`; `TE-kopap`; `TE-vahoj`; `TE-hikar`;
+`TE-givul`; `TE-nozal`.
 
 ### Current Wire Direction
 
@@ -1621,7 +1624,7 @@ section.
   node versions, Rabin chunk manifests, snapshots, review statements, Git bridge
   mappings, sync-interest promises, retention promises, annotated examples, and
   svgbob-safe ASCII diagrams. Its current pCID alias is
-  `implementations/poc18-cas-git-replacement/docs/protocols/bafkreicrikn3oqfumjnuvruw67h5ffvu6dyy7inz7h2rtm6s4qgwgz7oxu.md`.
+  `implementations/poc18-cas-git-replacement/docs/protocols/bafkreibi574zavmkqmafchb3mnn5kfj3uns7ymuwanjrdtkrijfxnyc6mu.md`.
   Source: `DI-lidaj`.
 - `implementations/poc18-cas-git-replacement/` now contains the first executable
   POC18 core slice: layer packages `store`, `chunk`, `graph`, `workspace`,
