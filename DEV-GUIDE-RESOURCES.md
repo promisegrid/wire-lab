@@ -95,8 +95,12 @@ local review/test/adoption promises with no forge authority. The POC18 Git
 bridge now uses go-git for real compatibility-adapter import, export, push, and
 pull flows through shared conversion code and records `git_bridge_mapping`
 promises so conventional Git remotes remain bridge inputs/outputs rather than
-native PromiseGrid authorities. Normal `grid` commands now discover repo-local
-`.grid/config.json` by walking upward from the current directory; the config
+native PromiseGrid authorities. POC18 now also exercises promise-based retention
+and local pressure GC: Frank keeps a separate sparse CAS, retrieves selected
+release/snapshot/review roots from Alice, stores a signed `object_retention`
+promise in return for paid-storage terms, protects the promised closure, and
+collects only locally unpromised pressure objects. Normal `grid` commands now
+discover repo-local `.grid/config.json` by walking upward from the current directory; the config
 contains a typed CAS locator that defaults to local file CAS `.grid/cas` while
 preserving room for daemon or remote CAS locators later. POC18 now keeps mutable
 local CLI state in `.grid/state.json`: `grid snapshot` records the current local
@@ -119,7 +123,8 @@ are also present.
 Source: `DI-zuruj`; `DI-dibut`; `DI-dofoj`; `DI-radaj`; `DI-lidaj`;
 `DI-fusir`; `DI-jifuj`; `DI-harih`; `DI-gozov`; `DI-guban`; `DI-fimap`;
 `DI-pahor`; `DI-bikif`; `DI-kiram`; `DI-bamum`; `DI-jokav`; `DI-tuhoj`;
-`DN-dopod`; `TE-kopap`; `TE-vahoj`; `TE-hikar`; `TE-givul`; `TE-nozal`.
+`DI-mivur`; `DN-dopod`; `TE-kopap`; `TE-vahoj`; `TE-hikar`; `TE-givul`;
+`TE-nozal`.
 
 ### Current Wire Direction
 

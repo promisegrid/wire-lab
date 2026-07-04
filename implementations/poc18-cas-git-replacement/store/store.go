@@ -270,6 +270,50 @@ func (fileStore *FileStore) List() ([]Entry, error) {
 	return entries, nil
 }
 
+// Delete removes one locally retained CAS object by CID.
+//
+// Intent: POC18 retention and GC are local resource decisions. Deleting from one
+// sparse file store never asserts that the object should disappear from any peer
+// store or from the global DAG. Source: DI-mivur
+func (fileStore *FileStore) Delete(objectCID cidlib.Cid) (Entry, error) {
+	cidText := CIDText(objectCID)
+	index, indexErr := fileStore.loadIndex()
+	if indexErr != nil {
+		return Entry{}, indexErr
+	}
+	entry, found := index[cidText]
+	if !found {
+		for _, path := range fileStore.probePaths(cidText) {
+			if _, statErr := os.Stat(path); statErr == nil {
+				entry = Entry{CID: cidText, Kind: kindFromPath(path), Path: path}
+				found = true
+				break
+			} else if !os.IsNotExist(statErr) {
+				return Entry{}, statErr
+			}
+		}
+	}
+	if !found {
+		return Entry{}, fmt.Errorf("missing local CAS object %s", cidText)
+	}
+	if readContent, readErr := os.ReadFile(entry.Path); readErr == nil {
+		if !CIDForBytes(readContent).Equals(objectCID) {
+			return Entry{}, fmt.Errorf("CAS path %s does not match CID %s", entry.Path, cidText)
+		}
+		entry.Size = int64(len(readContent))
+	} else if !os.IsNotExist(readErr) {
+		return Entry{}, readErr
+	}
+	if removeErr := os.Remove(entry.Path); removeErr != nil && !os.IsNotExist(removeErr) {
+		return Entry{}, removeErr
+	}
+	delete(index, cidText)
+	if saveErr := fileStore.saveIndex(index); saveErr != nil {
+		return Entry{}, saveErr
+	}
+	return entry, nil
+}
+
 func (fileStore *FileStore) recordEntry(cidText, kind, path string, size int64) (Entry, error) {
 	index, indexErr := fileStore.loadIndex()
 	if indexErr != nil {

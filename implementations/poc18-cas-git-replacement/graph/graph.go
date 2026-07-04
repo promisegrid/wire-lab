@@ -265,6 +265,21 @@ func ObjectAvailabilityBody(scope string, objects []any, serviceTerms any) []any
 	return []any{scope, objects, serviceTerms}
 }
 
+// ObjectRetentionBody returns the promise body for object_retention.
+//
+// Intent: Retention is a promiser-local promise to keep selected object CIDs
+// under stated terms. It is not a global pin, deletion command, permission, or
+// repository-completeness claim. Source: DI-mivur
+func ObjectRetentionBody(scope string, objects []any, retainUntil string, collectionTerms any, reciprocalEvidence any) []any {
+	if collectionTerms == nil {
+		collectionTerms = []any{}
+	}
+	if reciprocalEvidence == nil {
+		reciprocalEvidence = []any{}
+	}
+	return []any{scope, objects, retainUntil, collectionTerms, reciprocalEvidence}
+}
+
 // SyncInterestBody returns the promise body for sync_interest.
 //
 // Intent: Keep missing-object retrieval as Bob's voluntary promise to receive

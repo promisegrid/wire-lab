@@ -47,3 +47,31 @@ func TestLinkTagRoundTrip(t *testing.T) {
 		t.Fatalf("decoded CID = %s, want %s", CIDText(decoded), CIDText(value))
 	}
 }
+
+func TestFileStoreDeleteRemovesLocalEntryOnly(t *testing.T) {
+	cas, openErr := Open(t.TempDir())
+	if openErr != nil {
+		t.Fatalf("Open() error = %v", openErr)
+	}
+	entry, putErr := cas.Put("chunk", []byte("pressure bytes"))
+	if putErr != nil {
+		t.Fatalf("Put() error = %v", putErr)
+	}
+	objectCID, parseErr := ParseCIDText(entry.CID)
+	if parseErr != nil {
+		t.Fatalf("ParseCIDText() error = %v", parseErr)
+	}
+	deleted, deleteErr := cas.Delete(objectCID)
+	if deleteErr != nil {
+		t.Fatalf("Delete() error = %v", deleteErr)
+	}
+	if deleted.CID != entry.CID {
+		t.Fatalf("deleted CID = %s, want %s", deleted.CID, entry.CID)
+	}
+	if _, statErr := os.Stat(entry.Path); !os.IsNotExist(statErr) {
+		t.Fatalf("deleted path stat error = %v, want not exist", statErr)
+	}
+	if cas.Has(objectCID) {
+		t.Fatalf("Has(%s) = true after delete", entry.CID)
+	}
+}

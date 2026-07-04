@@ -18,6 +18,7 @@ import (
 
 	"promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/bridge"
 	pgrepo "promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/repo"
+	"promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/retention"
 	"promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/scenario"
 	"promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/store"
 	pocsync "promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/sync"
@@ -33,9 +34,11 @@ type fixtureResult struct {
 	workspace.IngestResult
 	AliceStoreRoot string                  `json:"alice_store_root"`
 	BobStoreRoot   string                  `json:"bob_store_root"`
+	FrankStoreRoot string                  `json:"frank_store_root"`
 	Scenario       scenario.Result         `json:"scenario"`
 	Bridge         bridgeFixtureResult     `json:"bridge"`
 	Retrieval      pocsync.RetrievalReport `json:"retrieval"`
+	Retention      retention.Report        `json:"retention"`
 }
 
 type bridgeFixtureResult struct {
@@ -61,6 +64,7 @@ func run() error {
 	sourceRoot := filepath.Join(*runRoot, "alice-workspace")
 	aliceStoreRoot := filepath.Join(*runRoot, "alice-cas")
 	bobStoreRoot := filepath.Join(*runRoot, "bob-cas")
+	frankStoreRoot := filepath.Join(*runRoot, "frank-cas")
 	checkoutRoot := filepath.Join(*runRoot, "bob-checkout")
 	if err := createFixture(sourceRoot); err != nil {
 		return err
@@ -132,14 +136,20 @@ func run() error {
 	if err := workspace.MaterializeSnapshot(bobCAS, mergeSnapshotCID, checkoutRoot); err != nil {
 		return err
 	}
+	retentionReport, retentionErr := runRetentionFixture(aliceCAS, frankStoreRoot, result, scenarioResult)
+	if retentionErr != nil {
+		return retentionErr
+	}
 	result.CheckoutRoot = checkoutRoot
 	combined := fixtureResult{
 		IngestResult:   result,
 		AliceStoreRoot: aliceStoreRoot,
 		BobStoreRoot:   bobStoreRoot,
+		FrankStoreRoot: frankStoreRoot,
 		Scenario:       scenarioResult,
 		Bridge:         bridgeResult,
 		Retrieval:      retrieval,
+		Retention:      retentionReport,
 	}
 	resultPath := filepath.Join(*runRoot, "result.json")
 	if err := writeJSON(resultPath, combined); err != nil {
@@ -148,10 +158,75 @@ func run() error {
 	fmt.Printf("run_root=%s\n", *runRoot)
 	fmt.Printf("alice_store=%s\n", aliceStoreRoot)
 	fmt.Printf("bob_store=%s\n", bobStoreRoot)
+	fmt.Printf("frank_store=%s\n", frankStoreRoot)
 	fmt.Printf("snapshot=%s\n", result.SnapshotCID)
 	fmt.Printf("diagnostic_message=%s\n", result.DiagnosticMessageCID)
 	fmt.Printf("retrieved_objects=%d missing_objects=%d\n", len(retrieval.Retrieved), len(retrieval.Missing))
+	fmt.Printf("retention_collected=%d protected_objects=%d\n", retentionReport.CollectedObjects, retentionReport.ProtectedObjects)
 	return nil
+}
+
+func runRetentionFixture(aliceCAS *store.FileStore, frankStoreRoot string, result workspace.IngestResult, scenarioResult scenario.Result) (retention.Report, error) {
+	frankCAS, frankOpenErr := store.Open(frankStoreRoot)
+	if frankOpenErr != nil {
+		return retention.Report{}, frankOpenErr
+	}
+	releaseCID, releaseErr := store.ParseCIDText(result.ReleaseRefSetCID)
+	if releaseErr != nil {
+		return retention.Report{}, releaseErr
+	}
+	mergeBranchCID, branchErr := store.ParseCIDText(scenarioResult.MergeBranchRefSetCID)
+	if branchErr != nil {
+		return retention.Report{}, branchErr
+	}
+	reviewThreadCID, reviewErr := store.ParseCIDText(scenarioResult.ReviewThreadRefSetCID)
+	if reviewErr != nil {
+		return retention.Report{}, reviewErr
+	}
+	mergeSnapshotCID, snapshotErr := store.ParseCIDText(scenarioResult.MergeSnapshotCID)
+	if snapshotErr != nil {
+		return retention.Report{}, snapshotErr
+	}
+	// Intent: Frank's fixture store is separate from Alice and Bob. Frank first
+	// retrieves exact bytes from Alice, then makes Frank's own retention promise
+	// about selected roots in return for paid storage terms. Source: DI-mivur
+	if _, retrieveErr := pocsync.RetrieveGraph(
+		pocsync.Peer{Agent: "frank", CAS: frankCAS},
+		pocsync.Peer{Agent: "alice", CAS: aliceCAS},
+		map[string]cidlib.Cid{
+			"release":       releaseCID,
+			"merge_branch":  mergeBranchCID,
+			"review_thread": reviewThreadCID,
+			"snapshot":      mergeSnapshotCID,
+		},
+		"paid_storage_credit:5",
+	); retrieveErr != nil {
+		return retention.Report{}, retrieveErr
+	}
+	tempEntry, tempErr := frankCAS.Put("chunk", []byte("temporary unpromised pressure bytes\n"))
+	if tempErr != nil {
+		return retention.Report{}, tempErr
+	}
+	report, retentionErr := retention.PromiseAndCollect(frankCAS, retention.Promise{
+		Promiser:    "frank",
+		Promisee:    "alice",
+		Scope:       "poc18-release-retention",
+		RetainUntil: "2026-07-31T00:00:00Z",
+		Targets: []retention.Target{
+			{Role: "release", CID: result.ReleaseRefSetCID},
+			{Role: "merge_branch", CID: scenarioResult.MergeBranchRefSetCID},
+			{Role: "review_thread", CID: scenarioResult.ReviewThreadRefSetCID},
+			{Role: "snapshot", CID: scenarioResult.MergeSnapshotCID},
+		},
+		CollectionTerms:      []string{"collect unpromised objects under local pressure"},
+		ReciprocalEvidence:   []string{"paid_storage_credit:5"},
+		LocalConstraintTerms: []string{"Frank judges retention locally; no global pin authority"},
+	}, 0)
+	if retentionErr != nil {
+		return retention.Report{}, retentionErr
+	}
+	report.TemporaryObjectCID = tempEntry.CID
+	return report, nil
 }
 
 func runGitBridgeFixture(runRoot string, aliceCAS *store.FileStore, bobCAS *store.FileStore) (bridgeFixtureResult, error) {

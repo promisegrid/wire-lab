@@ -187,6 +187,15 @@ Intent: Users need `status` to answer two distinct questions without waiting for
 Constraints: Preserve repo-local path policy from `DI-jokav`; do not mutate CAS or `.grid/state.json` from `status`; keep excluded local-only files absent from status when they were not tracked in the snapshot; do not compare excluded file bytes as content drift; keep generated runtime state under `/tmp/wire-lab-poc18-*`.
 Affects: implementations/poc18-cas-git-replacement/workspace/status.go; implementations/poc18-cas-git-replacement/workspace/status_test.go; implementations/poc18-cas-git-replacement/cmd/grid/main.go; implementations/poc18-cas-git-replacement/cmd/grid/main_test.go; implementations/poc18-cas-git-replacement/scripts/run-clean.sh; DEV-GUIDE-RESOURCES.md; protocols/wire-lab.d/TODO/TODO-nahop-poc18-cas-git-replacement.md.
 
+ID: DI-mivur
+Date: 2026-07-04 11:34:17 -0700
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Implement `nahop.17` as deterministic local retention promises plus local pressure GC: agents store signed `object_retention` messages naming selected CIDs and terms, compute a promised keep set from those messages, always protect retained message bytes for matching retention promises, and collect only locally unpromised objects when a caller supplies a pressure target.
+Intent: POC18 should demonstrate retention and garbage collection as local promises and local resource decisions, not as global deletion, permissions, or a complete repository. This first slice proves release/snapshot/reference-set retention, paid storage terms, and pressure collection without implementing continuous peer sync or production economics.
+Constraints: Keep all generated runtime state under `/tmp/wire-lab-poc18-*`; do not delete promised objects; do not claim peer-wide or global completeness; do not collect by default without an explicit pressure target; record GC output as local fixture evidence; preserve exact CID verification and sparse-CAS separation between Alice and Bob.
+Affects: implementations/poc18-cas-git-replacement/retention/; implementations/poc18-cas-git-replacement/graph/; implementations/poc18-cas-git-replacement/store/; implementations/poc18-cas-git-replacement/cmd/poc-sim/; implementations/poc18-cas-git-replacement/cmd/poc-analyze/; implementations/poc18-cas-git-replacement/scripts/run-clean.sh; protocols/wire-lab.d/TODO/TODO-nahop-poc18-cas-git-replacement.md; DEV-GUIDE-RESOURCES.md.
+
 ## Core Hypothesis
 
 POC18 should test this hypothesis:
@@ -628,8 +637,18 @@ Remaining:
   paths. First slice completed with go-git bridge adapter code, `grid git`
   commands, deterministic fixture coverage, and local bare-remote tests. Source:
   `DI-fimap`.
-- [ ] nahop.17 Add promise-based retention and GC behavior for selected reference
+- [x] nahop.17 Add promise-based retention and GC behavior for selected reference
   sets, release objects, paid storage, and unpromised objects under pressure.
+  Source: `DI-mivur`.
+  - [x] nahop.17.1 Add `object_retention` promise-body helpers and deterministic
+    retention report types.
+  - [x] nahop.17.2 Add local CAS delete/list support needed for pressure GC.
+  - [x] nahop.17.3 Add retention planner and collector logic that keeps promised
+    CIDs and collects only unpromised objects.
+  - [x] nahop.17.4 Extend `poc-sim` with release/snapshot/paid-storage
+    retention promises and one pressure-created temporary object.
+  - [x] nahop.17.5 Add analyzer gates proving promised objects remain and
+    unpromised pressure objects are collected.
 - [x] nahop.18 Review Tangled as prior art and record whether POC18 should adopt,
   reject, or explicitly differ from Tangled's self-hosted knots, appview,
   AT Protocol identity, round-based PR flow, SSH/Git compatibility, and Jujutsu

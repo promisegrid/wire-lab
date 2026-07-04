@@ -13,6 +13,7 @@ import (
 
 	"promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/bridge"
 	pgrepo "promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/repo"
+	"promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/retention"
 	"promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/scenario"
 	"promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/store"
 	pocsync "promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/sync"
@@ -29,9 +30,11 @@ type fixtureResult struct {
 	workspace.IngestResult
 	AliceStoreRoot string                  `json:"alice_store_root"`
 	BobStoreRoot   string                  `json:"bob_store_root"`
+	FrankStoreRoot string                  `json:"frank_store_root"`
 	Scenario       scenario.Result         `json:"scenario"`
 	Bridge         bridgeFixtureResult     `json:"bridge"`
 	Retrieval      pocsync.RetrievalReport `json:"retrieval"`
+	Retention      retention.Report        `json:"retention"`
 }
 
 type bridgeFixtureResult struct {
@@ -49,6 +52,7 @@ type Report struct {
 	Objects      int               `json:"objects"`
 	AliceObjects int               `json:"alice_objects"`
 	BobObjects   int               `json:"bob_objects"`
+	FrankObjects int               `json:"frank_objects"`
 	Retrieved    int               `json:"retrieved"`
 	Missing      int               `json:"missing"`
 }
@@ -223,6 +227,19 @@ func analyze(runRoot string, result fixtureResult) (Report, error) {
 	if bobListErr != nil {
 		return Report{}, bobListErr
 	}
+	frankCAS, frankOpenErr := store.Open(result.FrankStoreRoot)
+	if frankOpenErr != nil {
+		return Report{}, frankOpenErr
+	}
+	frankEntries, frankListErr := frankCAS.List()
+	if frankListErr != nil {
+		return Report{}, frankListErr
+	}
+	if retentionPass, retentionErr := checkRetentionGC(result, frankCAS, checks); retentionErr != nil {
+		return Report{}, retentionErr
+	} else if !retentionPass {
+		pass = false
+	}
 	snapshotCID, snapshotErr := store.ParseCIDText(result.SnapshotCID)
 	if snapshotErr != nil {
 		return Report{}, snapshotErr
@@ -327,9 +344,73 @@ func analyze(runRoot string, result fixtureResult) (Report, error) {
 		Objects:      len(bobEntries),
 		AliceObjects: len(aliceEntries),
 		BobObjects:   len(bobEntries),
+		FrankObjects: len(frankEntries),
 		Retrieved:    len(result.Retrieval.Retrieved),
 		Missing:      len(result.Retrieval.Missing),
 	}, nil
+}
+
+func checkRetentionGC(result fixtureResult, frankCAS *store.FileStore, checks map[string]string) (bool, error) {
+	pass := true
+	if result.FrankStoreRoot != "" && result.FrankStoreRoot != result.AliceStoreRoot && result.FrankStoreRoot != result.BobStoreRoot {
+		checks["retention_separate_frank_cas"] = "kept"
+	} else {
+		checks["retention_separate_frank_cas"] = "missing"
+		pass = false
+	}
+	if result.Retention.RetentionMessageCID != "" {
+		retentionCID, retentionErr := store.ParseCIDText(result.Retention.RetentionMessageCID)
+		if retentionErr != nil {
+			return false, retentionErr
+		}
+		if frankCAS.Has(retentionCID) {
+			checks["retention_message_kept"] = "kept"
+		} else {
+			checks["retention_message_kept"] = "missing"
+			pass = false
+		}
+	} else {
+		checks["retention_message_kept"] = "missing"
+		pass = false
+	}
+	if len(result.Retention.MissingProtectedCIDs) == 0 {
+		checks["retention_promised_closure_available"] = "kept"
+	} else {
+		checks["retention_promised_closure_available"] = "missing"
+		pass = false
+	}
+	for _, target := range result.Retention.Targets {
+		targetCID, targetErr := store.ParseCIDText(target.CID)
+		if targetErr != nil {
+			return false, targetErr
+		}
+		checkName := "retention_kept_" + target.Role
+		if frankCAS.Has(targetCID) {
+			checks[checkName] = "kept"
+		} else {
+			checks[checkName] = "missing"
+			pass = false
+		}
+	}
+	if result.Retention.CollectedObjects > 0 {
+		checks["retention_collected_unpromised"] = "kept"
+	} else {
+		checks["retention_collected_unpromised"] = "missing"
+		pass = false
+	}
+	if result.Retention.TemporaryObjectCID != "" {
+		tempCID, tempErr := store.ParseCIDText(result.Retention.TemporaryObjectCID)
+		if tempErr != nil {
+			return false, tempErr
+		}
+		if !frankCAS.Has(tempCID) {
+			checks["retention_temp_pressure_object_collected"] = "kept"
+		} else {
+			checks["retention_temp_pressure_object_collected"] = "missing"
+			pass = false
+		}
+	}
+	return pass, nil
 }
 
 func checkAliceGridRepo(result fixtureResult, checks map[string]string) (bool, error) {
