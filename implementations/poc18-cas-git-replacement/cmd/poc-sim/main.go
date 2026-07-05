@@ -35,14 +35,16 @@ import (
 // Source: DI-gozov
 type fixtureResult struct {
 	workspace.IngestResult
-	AliceStoreRoot   string                   `json:"alice_store_root"`
-	BobStoreRoot     string                   `json:"bob_store_root"`
-	FrankStoreRoot   string                   `json:"frank_store_root"`
-	Scenario         scenario.Result          `json:"scenario"`
-	Bridge           bridgeFixtureResult      `json:"bridge"`
-	Retrieval        pocsync.RetrievalReport  `json:"retrieval"`
-	Retention        retention.Report         `json:"retention"`
-	RetentionPayment economy.RedemptionReport `json:"retention_payment"`
+	AliceStoreRoot   string                       `json:"alice_store_root"`
+	BobStoreRoot     string                       `json:"bob_store_root"`
+	CarolStoreRoot   string                       `json:"carol_store_root"`
+	FrankStoreRoot   string                       `json:"frank_store_root"`
+	Scenario         scenario.Result              `json:"scenario"`
+	Bridge           bridgeFixtureResult          `json:"bridge"`
+	Retrieval        pocsync.RetrievalReport      `json:"retrieval"`
+	ContinuousSync   pocsync.ContinuousSyncReport `json:"continuous_sync"`
+	Retention        retention.Report             `json:"retention"`
+	RetentionPayment economy.RedemptionReport     `json:"retention_payment"`
 }
 
 type bridgeFixtureResult struct {
@@ -68,6 +70,7 @@ func run() error {
 	sourceRoot := filepath.Join(*runRoot, "alice-workspace")
 	aliceStoreRoot := filepath.Join(*runRoot, "alice-cas")
 	bobStoreRoot := filepath.Join(*runRoot, "bob-cas")
+	carolStoreRoot := filepath.Join(*runRoot, "carol-cas")
 	frankStoreRoot := filepath.Join(*runRoot, "frank-cas")
 	checkoutRoot := filepath.Join(*runRoot, "bob-checkout")
 	if err := createFixture(sourceRoot); err != nil {
@@ -140,6 +143,24 @@ func run() error {
 	if err := workspace.MaterializeSnapshot(bobCAS, mergeSnapshotCID, checkoutRoot); err != nil {
 		return err
 	}
+	carolCAS, carolOpenErr := store.Open(carolStoreRoot)
+	if carolOpenErr != nil {
+		return carolOpenErr
+	}
+	// Intent: Carol learns Bob's current useful heads through repeated
+	// peer-relative promises. The second deterministic round proves the model
+	// settles without native Git push/pull once Carol already has the advertised
+	// DAG. Source: DI-rudos
+	continuousSync, continuousErr := pocsync.RunContinuousDAGSync(
+		pocsync.Peer{Agent: "bob", CAS: bobCAS},
+		pocsync.Peer{Agent: "carol", CAS: carolCAS},
+		map[string]cidlib.Cid{"merge_branch": mergeBranchCID, "review_thread": reviewThreadCID},
+		nil,
+		pocsync.ContinuousSyncConfig{Rounds: 2, Offer: "continuous_storage_credit:1", RetainUntil: "2026-07-31T00:00:00Z"},
+	)
+	if continuousErr != nil {
+		return continuousErr
+	}
 	retentionReport, retentionPayment, retentionErr := runRetentionFixture(aliceCAS, frankStoreRoot, result, scenarioResult)
 	if retentionErr != nil {
 		return retentionErr
@@ -149,10 +170,12 @@ func run() error {
 		IngestResult:     result,
 		AliceStoreRoot:   aliceStoreRoot,
 		BobStoreRoot:     bobStoreRoot,
+		CarolStoreRoot:   carolStoreRoot,
 		FrankStoreRoot:   frankStoreRoot,
 		Scenario:         scenarioResult,
 		Bridge:           bridgeResult,
 		Retrieval:        retrieval,
+		ContinuousSync:   continuousSync,
 		Retention:        retentionReport,
 		RetentionPayment: retentionPayment,
 	}
@@ -163,10 +186,12 @@ func run() error {
 	fmt.Printf("run_root=%s\n", *runRoot)
 	fmt.Printf("alice_store=%s\n", aliceStoreRoot)
 	fmt.Printf("bob_store=%s\n", bobStoreRoot)
+	fmt.Printf("carol_store=%s\n", carolStoreRoot)
 	fmt.Printf("frank_store=%s\n", frankStoreRoot)
 	fmt.Printf("snapshot=%s\n", result.SnapshotCID)
 	fmt.Printf("diagnostic_message=%s\n", result.DiagnosticMessageCID)
 	fmt.Printf("retrieved_objects=%d missing_objects=%d\n", len(retrieval.Retrieved), len(retrieval.Missing))
+	fmt.Printf("continuous_sync_updates=%d continuous_sync_missing=%d\n", continuousSync.UsefulUpdates, continuousSync.MissingObjects)
 	fmt.Printf("retention_collected=%d protected_objects=%d\n", retentionReport.CollectedObjects, retentionReport.ProtectedObjects)
 	fmt.Printf("retention_payment_token=%s redeemed=%t replay_rejected=%t\n", retentionPayment.TokenCID, retentionPayment.Redeemed, retentionPayment.ReplayRejected)
 	return nil

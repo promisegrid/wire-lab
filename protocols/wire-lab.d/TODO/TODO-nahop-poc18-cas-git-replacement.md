@@ -205,6 +205,15 @@ Intent: Retention economics should exercise a real cryptographic promise token i
 Constraints: Keep the token implementation POC18-local; use the well-known `github.com/veraison/go-cose` COSE library if available; use deterministic POC Ed25519 keys already used by POC18 graph proofs; treat bearer transferability as a signed claim; store exact token bytes/CID references in promise payloads; reject expired, wrong-issuer, wrong-subject, wrong-scope, wrong-object, and replayed tokens; do not introduce RPC, authorization, global balances, or production settlement.
 Affects: implementations/poc18-cas-git-replacement/economy/; implementations/poc18-cas-git-replacement/retention/; implementations/poc18-cas-git-replacement/cmd/poc-sim/; implementations/poc18-cas-git-replacement/cmd/poc-analyze/; implementations/poc18-cas-git-replacement/go.mod; implementations/poc18-cas-git-replacement/go.sum; DEV-GUIDE-RESOURCES.md; protocols/wire-lab.d/TODO/TODO-nahop-poc18-cas-git-replacement.md.
 
+ID: DI-rudos
+Date: 2026-07-04 12:07:07 PDT
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Implement `nahop.19` as deterministic local continuous peer DAG sync rounds in the existing `sync` package: selected peers advertise current reference-set head CIDs, receivers decide locally which heads to fetch, missing graph objects move through existing `sync_interest` and `object_availability` promises, receivers record `object_retention` promises for useful updates, and a second round proves idempotent no-op behavior without explicit native push/pull.
+Intent: POC18 needs executable pressure for continuous collaboration, not only one manual retrieval. The first continuous-sync slice should prove the native model can propagate a useful update from one sparse CAS to another through voluntary promises and exact CID verification while preserving the Git bridge as compatibility-only behavior.
+Constraints: Reuse the existing version-control pCID and promise kinds; do not add a new pCID, network daemon, transport protocol, global remote, global monitor, branch authority, or push/pull command; keep generated runtime state under `/tmp/wire-lab-poc18-*`; keep the implementation deterministic and local; preserve sparse-CAS separation and exact CID verification; do not use pCID as peer address or operation code.
+Affects: implementations/poc18-cas-git-replacement/sync/; implementations/poc18-cas-git-replacement/cmd/poc-sim/; implementations/poc18-cas-git-replacement/cmd/poc-analyze/; implementations/poc18-cas-git-replacement/docs/protocols/version-control.md; DEV-GUIDE-RESOURCES.md; protocols/wire-lab.d/TODO/TODO-nahop-poc18-cas-git-replacement.md.
+
 ## Core Hypothesis
 
 POC18 should test this hypothesis:
@@ -567,6 +576,13 @@ Locked:
   promising object retention, Frank records a `storage_payment_redemption`
   message, and analyzer gates signature verification plus replay rejection.
   Source: `DI-bidum`.
+- POC18 implements deterministic continuous peer DAG sync for `nahop.19`: Bob
+  advertises selected merge/review reference-set heads, Carol decides locally
+  which heads to fetch, existing `sync_interest` and `object_availability`
+  promises move exact CID-verified graph objects into Carol's separate sparse CAS,
+  Carol records an `object_retention` promise after a useful update, and the next
+  round proves idempotent no-op convergence without native Git push/pull. Source:
+  `DI-rudos`.
 - POC18 implements deterministic collaboration scenarios for `nahop.12` through
   `nahop.14`: rename/copy lineage keeps the same POSIX node CID under changed
   directory labels, divergent Alice/Bob snapshots are explicit, Dave's merge is
@@ -672,10 +688,10 @@ Remaining:
   AT Protocol identity, round-based PR flow, SSH/Git compatibility, and Jujutsu
   change-ID use. Completed by
   `docs/research/DN-dopod-poc18-tangled-prior-art.md`. Source: `DI-dibut`.
-- [ ] nahop.19 Implement continuous peer DAG sync so agents exchange
+- [x] nahop.19 Implement continuous peer DAG sync so agents exchange
   reference-set heads, object-availability promises, missing-object requests, and
   retention/forwarding promises without explicit native push/pull commands.
-  Source: `DI-dibut`.
+  Source: `DI-dibut`; `DI-rudos`.
 - [ ] nahop.20 Add analyzer gates for CID correctness, sparse CAS, parent-chain
   integrity, reference-set signatures, multi-target labels, directory labels,
   logical-change reference sets, POSIX inode type coverage, continuous sync,

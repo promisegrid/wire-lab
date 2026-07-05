@@ -70,6 +70,33 @@ type RetrievalReport struct {
 	Offer                  string              `json:"offer"`
 }
 
+// ContinuousSyncConfig controls one deterministic local peer-sync fixture.
+type ContinuousSyncConfig struct {
+	Rounds      int    `json:"rounds"`
+	Offer       string `json:"offer"`
+	RetainUntil string `json:"retain_until"`
+}
+
+// ContinuousSyncReport records repeated peer DAG-sync rounds without treating
+// the exchange as Git-style push/pull.
+type ContinuousSyncReport struct {
+	Rounds         int                             `json:"rounds"`
+	UsefulUpdates  int                             `json:"useful_updates"`
+	MissingObjects int                             `json:"missing_objects"`
+	Directions     []ContinuousDirectionSyncReport `json:"directions"`
+}
+
+// ContinuousDirectionSyncReport records one provider-to-receiver round.
+type ContinuousDirectionSyncReport struct {
+	Round               int             `json:"round"`
+	Provider            string          `json:"provider"`
+	Receiver            string          `json:"receiver"`
+	AdvertisedHeads     []MissingObject `json:"advertised_heads"`
+	Retrieval           RetrievalReport `json:"retrieval"`
+	RetentionMessageCID string          `json:"retention_message_cid"`
+	UsefulUpdate        bool            `json:"useful_update"`
+}
+
 // PlanInterest returns the missing-object interest for wanted CIDs.
 func PlanInterest(cas *store.FileStore, promiser, promisee string, wanted map[string]cidlib.Cid) Interest {
 	missing := []MissingObject{}
@@ -176,6 +203,127 @@ func RetrieveGraph(requester Peer, provider Peer, wanted map[string]cidlib.Cid, 
 		return RetrievalReport{}, putErr
 	}
 	return report, nil
+}
+
+// RunContinuousDAGSync runs deterministic repeated sparse-DAG sync rounds
+// between two peers using existing sync_interest, object_availability, and
+// object_retention promises.
+//
+// Intent: POC18 continuous sync must prove that useful updates propagate through
+// voluntary promises and exact CID verification without adding native push/pull,
+// global remotes, or a central branch authority. Source: DI-rudos
+func RunContinuousDAGSync(left Peer, right Peer, leftHeads map[string]cidlib.Cid, rightHeads map[string]cidlib.Cid, config ContinuousSyncConfig) (ContinuousSyncReport, error) {
+	if left.Agent == "" || right.Agent == "" {
+		return ContinuousSyncReport{}, fmt.Errorf("left and right peer agent names are required")
+	}
+	if left.CAS == nil || right.CAS == nil {
+		return ContinuousSyncReport{}, fmt.Errorf("left and right peer CAS stores are required")
+	}
+	if config.Rounds < 0 {
+		return ContinuousSyncReport{}, fmt.Errorf("continuous sync rounds cannot be negative")
+	}
+	rounds := config.Rounds
+	if rounds == 0 {
+		rounds = 2
+	}
+	offer := config.Offer
+	if offer == "" {
+		offer = "continuous_storage_credit:1"
+	}
+	retainUntil := config.RetainUntil
+	if retainUntil == "" {
+		retainUntil = "2026-07-31T00:00:00Z"
+	}
+	report := ContinuousSyncReport{Rounds: rounds}
+	for round := 1; round <= rounds; round++ {
+		if len(leftHeads) > 0 {
+			direction, directionErr := runContinuousDirection(round, left, right, leftHeads, offer, retainUntil)
+			if directionErr != nil {
+				return ContinuousSyncReport{}, directionErr
+			}
+			report.Directions = append(report.Directions, direction)
+			report.MissingObjects += len(direction.Retrieval.Missing)
+			if direction.UsefulUpdate {
+				report.UsefulUpdates++
+			}
+		}
+		if len(rightHeads) > 0 {
+			direction, directionErr := runContinuousDirection(round, right, left, rightHeads, offer, retainUntil)
+			if directionErr != nil {
+				return ContinuousSyncReport{}, directionErr
+			}
+			report.Directions = append(report.Directions, direction)
+			report.MissingObjects += len(direction.Retrieval.Missing)
+			if direction.UsefulUpdate {
+				report.UsefulUpdates++
+			}
+		}
+	}
+	return report, nil
+}
+
+func runContinuousDirection(round int, provider Peer, receiver Peer, heads map[string]cidlib.Cid, offer string, retainUntil string) (ContinuousDirectionSyncReport, error) {
+	advertisedHeads := initialQueue(heads)
+	retrieval, retrieveErr := RetrieveGraph(receiver, provider, heads, offer)
+	if retrieveErr != nil {
+		return ContinuousDirectionSyncReport{}, retrieveErr
+	}
+	direction := ContinuousDirectionSyncReport{
+		Round:           round,
+		Provider:        provider.Agent,
+		Receiver:        receiver.Agent,
+		AdvertisedHeads: advertisedHeads,
+		Retrieval:       retrieval,
+		UsefulUpdate:    len(retrieval.Retrieved) > 0,
+	}
+	if direction.UsefulUpdate {
+		retentionMessage, retentionErr := storeContinuousRetentionMessage(receiver, provider, advertisedHeads, retainUntil, retrieval)
+		if retentionErr != nil {
+			return ContinuousDirectionSyncReport{}, retentionErr
+		}
+		direction.RetentionMessageCID = store.CIDText(retentionMessage.CID)
+	}
+	return direction, nil
+}
+
+func storeContinuousRetentionMessage(receiver Peer, provider Peer, advertisedHeads []MissingObject, retainUntil string, retrieval RetrievalReport) (graph.StoredMessage, error) {
+	headRows, rowsErr := interestRows(advertisedHeads)
+	if rowsErr != nil {
+		return graph.StoredMessage{}, rowsErr
+	}
+	parents := []graph.Parent{}
+	if retrieval.AvailabilityMessageCID != "" {
+		availabilityCID, parseErr := store.ParseCIDText(retrieval.AvailabilityMessageCID)
+		if parseErr != nil {
+			return graph.StoredMessage{}, parseErr
+		}
+		parents = append(parents, graph.Parent{Role: "responds_to", CID: availabilityCID})
+	}
+	payload := graph.Payload{
+		Promiser:    receiver.Agent,
+		Promisee:    provider.Agent,
+		PromiseKind: "object_retention",
+		PromiseBody: graph.ObjectRetentionBody(
+			"continuous_sync:"+provider.Agent+"->"+receiver.Agent,
+			headRows,
+			retainUntil,
+			[]any{"retain selected heads and locally available dependencies while useful"},
+			[]any{"received via continuous peer DAG sync", retrieval.Offer},
+		),
+		ReciprocalPromise: []any{"continued peer availability is judged locally"},
+		LocalConstraints:  []any{"local sparse CAS only", "may collect unpromised objects under local pressure"},
+	}
+	retentionMessage, retentionErr := graph.StoreMessage(receiver.CAS, parents, payload)
+	if retentionErr != nil {
+		return graph.StoredMessage{}, retentionErr
+	}
+	// Intent: The provider receives the receiver's retention promise as another
+	// peer-held DAG object, proving the promise exchange is bi-directional without
+	// giving either side global repository authority. Source: DI-rudos
+	if _, putErr := provider.CAS.Put("message", retentionMessage.Bytes); putErr != nil {
+		return graph.StoredMessage{}, putErr
+	}
+	return retentionMessage, nil
 }
 
 func sortedRoles(wanted map[string]cidlib.Cid) []string {

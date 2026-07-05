@@ -29,14 +29,16 @@ import (
 // Source: DI-gozov
 type fixtureResult struct {
 	workspace.IngestResult
-	AliceStoreRoot   string                   `json:"alice_store_root"`
-	BobStoreRoot     string                   `json:"bob_store_root"`
-	FrankStoreRoot   string                   `json:"frank_store_root"`
-	Scenario         scenario.Result          `json:"scenario"`
-	Bridge           bridgeFixtureResult      `json:"bridge"`
-	Retrieval        pocsync.RetrievalReport  `json:"retrieval"`
-	Retention        retention.Report         `json:"retention"`
-	RetentionPayment economy.RedemptionReport `json:"retention_payment"`
+	AliceStoreRoot   string                       `json:"alice_store_root"`
+	BobStoreRoot     string                       `json:"bob_store_root"`
+	CarolStoreRoot   string                       `json:"carol_store_root"`
+	FrankStoreRoot   string                       `json:"frank_store_root"`
+	Scenario         scenario.Result              `json:"scenario"`
+	Bridge           bridgeFixtureResult          `json:"bridge"`
+	Retrieval        pocsync.RetrievalReport      `json:"retrieval"`
+	ContinuousSync   pocsync.ContinuousSyncReport `json:"continuous_sync"`
+	Retention        retention.Report             `json:"retention"`
+	RetentionPayment economy.RedemptionReport     `json:"retention_payment"`
 }
 
 type bridgeFixtureResult struct {
@@ -54,6 +56,7 @@ type Report struct {
 	Objects      int               `json:"objects"`
 	AliceObjects int               `json:"alice_objects"`
 	BobObjects   int               `json:"bob_objects"`
+	CarolObjects int               `json:"carol_objects"`
 	FrankObjects int               `json:"frank_objects"`
 	Retrieved    int               `json:"retrieved"`
 	Missing      int               `json:"missing"`
@@ -229,6 +232,14 @@ func analyze(runRoot string, result fixtureResult) (Report, error) {
 	if bobListErr != nil {
 		return Report{}, bobListErr
 	}
+	carolCAS, carolOpenErr := store.Open(result.CarolStoreRoot)
+	if carolOpenErr != nil {
+		return Report{}, carolOpenErr
+	}
+	carolEntries, carolListErr := carolCAS.List()
+	if carolListErr != nil {
+		return Report{}, carolListErr
+	}
 	frankCAS, frankOpenErr := store.Open(result.FrankStoreRoot)
 	if frankOpenErr != nil {
 		return Report{}, frankOpenErr
@@ -245,6 +256,11 @@ func analyze(runRoot string, result fixtureResult) (Report, error) {
 	if paymentPass, paymentErr := checkRetentionPayment(result, aliceCAS, frankCAS, checks); paymentErr != nil {
 		return Report{}, paymentErr
 	} else if !paymentPass {
+		pass = false
+	}
+	if continuousPass, continuousErr := checkContinuousSync(result, bobCAS, carolCAS, checks); continuousErr != nil {
+		return Report{}, continuousErr
+	} else if !continuousPass {
 		pass = false
 	}
 	snapshotCID, snapshotErr := store.ParseCIDText(result.SnapshotCID)
@@ -351,10 +367,90 @@ func analyze(runRoot string, result fixtureResult) (Report, error) {
 		Objects:      len(bobEntries),
 		AliceObjects: len(aliceEntries),
 		BobObjects:   len(bobEntries),
+		CarolObjects: len(carolEntries),
 		FrankObjects: len(frankEntries),
 		Retrieved:    len(result.Retrieval.Retrieved),
 		Missing:      len(result.Retrieval.Missing),
 	}, nil
+}
+
+func checkContinuousSync(result fixtureResult, bobCAS *store.FileStore, carolCAS *store.FileStore, checks map[string]string) (bool, error) {
+	// Intent: Continuous sync checks prove repeated peer DAG exchange converges
+	// through promise messages and sparse CAS verification. They are local fixture
+	// gates only, not production-wide monitoring. Source: DI-rudos
+	pass := true
+	if result.CarolStoreRoot != "" && result.CarolStoreRoot != result.AliceStoreRoot && result.CarolStoreRoot != result.BobStoreRoot && result.CarolStoreRoot != result.FrankStoreRoot {
+		checks["continuous_sync_separate_carol_cas"] = "kept"
+	} else {
+		checks["continuous_sync_separate_carol_cas"] = "missing"
+		pass = false
+	}
+	if result.ContinuousSync.UsefulUpdates > 0 {
+		checks["continuous_sync_useful_update"] = "kept"
+	} else {
+		checks["continuous_sync_useful_update"] = "missing"
+		pass = false
+	}
+	if result.ContinuousSync.MissingObjects == 0 {
+		checks["continuous_sync_no_missing"] = "kept"
+	} else {
+		checks["continuous_sync_no_missing"] = "missing"
+		pass = false
+	}
+	if continuousSecondRoundIsIdempotent(result.ContinuousSync) {
+		checks["continuous_sync_second_round_idempotent"] = "kept"
+	} else {
+		checks["continuous_sync_second_round_idempotent"] = "missing"
+		pass = false
+	}
+	if continuousRetentionExchanged(result.ContinuousSync, bobCAS, carolCAS) {
+		checks["continuous_sync_retention_message_exchanged"] = "kept"
+	} else {
+		checks["continuous_sync_retention_message_exchanged"] = "missing"
+		pass = false
+	}
+	for checkName, cidText := range map[string]string{
+		"carol_has_merge_branch":   result.Scenario.MergeBranchRefSetCID,
+		"carol_has_review_thread":  result.Scenario.ReviewThreadRefSetCID,
+		"carol_has_merge_snapshot": result.Scenario.MergeSnapshotCID,
+	} {
+		objectCID, objectErr := store.ParseCIDText(cidText)
+		if objectErr != nil {
+			return false, objectErr
+		}
+		if carolCAS.Has(objectCID) {
+			checks[checkName] = "kept"
+		} else {
+			checks[checkName] = "missing"
+			pass = false
+		}
+	}
+	return pass, nil
+}
+
+func continuousSecondRoundIsIdempotent(report pocsync.ContinuousSyncReport) bool {
+	for _, direction := range report.Directions {
+		if direction.Round == 2 && !direction.UsefulUpdate && len(direction.Retrieval.Retrieved) == 0 && len(direction.Retrieval.AlreadyLocal) > 0 {
+			return true
+		}
+	}
+	return false
+}
+
+func continuousRetentionExchanged(report pocsync.ContinuousSyncReport, bobCAS *store.FileStore, carolCAS *store.FileStore) bool {
+	for _, direction := range report.Directions {
+		if direction.RetentionMessageCID == "" {
+			continue
+		}
+		retentionCID, retentionErr := store.ParseCIDText(direction.RetentionMessageCID)
+		if retentionErr != nil {
+			return false
+		}
+		if direction.Provider == "bob" && direction.Receiver == "carol" && bobCAS.Has(retentionCID) && carolCAS.Has(retentionCID) {
+			return true
+		}
+	}
+	return false
 }
 
 func checkRetentionGC(result fixtureResult, frankCAS *store.FileStore, checks map[string]string) (bool, error) {
