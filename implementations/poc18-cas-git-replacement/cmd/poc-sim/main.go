@@ -35,16 +35,20 @@ import (
 // Source: DI-gozov
 type fixtureResult struct {
 	workspace.IngestResult
-	AliceStoreRoot   string                       `json:"alice_store_root"`
-	BobStoreRoot     string                       `json:"bob_store_root"`
-	CarolStoreRoot   string                       `json:"carol_store_root"`
-	FrankStoreRoot   string                       `json:"frank_store_root"`
-	Scenario         scenario.Result              `json:"scenario"`
-	Bridge           bridgeFixtureResult          `json:"bridge"`
-	Retrieval        pocsync.RetrievalReport      `json:"retrieval"`
-	ContinuousSync   pocsync.ContinuousSyncReport `json:"continuous_sync"`
-	Retention        retention.Report             `json:"retention"`
-	RetentionPayment economy.RedemptionReport     `json:"retention_payment"`
+	AliceStoreRoot     string                       `json:"alice_store_root"`
+	BobStoreRoot       string                       `json:"bob_store_root"`
+	CarolStoreRoot     string                       `json:"carol_store_root"`
+	FrankStoreRoot     string                       `json:"frank_store_root"`
+	MalloryStoreRoot   string                       `json:"mallory_store_root"`
+	CarolSyncStatePath string                       `json:"carol_sync_state_path"`
+	Scenario           scenario.Result              `json:"scenario"`
+	Bridge             bridgeFixtureResult          `json:"bridge"`
+	Retrieval          pocsync.RetrievalReport      `json:"retrieval"`
+	ContinuousSync     pocsync.ContinuousSyncReport `json:"continuous_sync"`
+	ScheduledSync      pocsync.SchedulerReport      `json:"scheduled_sync"`
+	SyncAgentState     pocsync.AgentState           `json:"sync_agent_state"`
+	Retention          retention.Report             `json:"retention"`
+	RetentionPayment   economy.RedemptionReport     `json:"retention_payment"`
 }
 
 type bridgeFixtureResult struct {
@@ -72,6 +76,8 @@ func run() error {
 	bobStoreRoot := filepath.Join(*runRoot, "bob-cas")
 	carolStoreRoot := filepath.Join(*runRoot, "carol-cas")
 	frankStoreRoot := filepath.Join(*runRoot, "frank-cas")
+	malloryStoreRoot := filepath.Join(*runRoot, "mallory-cas")
+	carolSyncStatePath := filepath.Join(*runRoot, "carol-sync", "state.json")
 	checkoutRoot := filepath.Join(*runRoot, "bob-checkout")
 	if err := createFixture(sourceRoot); err != nil {
 		return err
@@ -161,23 +167,31 @@ func run() error {
 	if continuousErr != nil {
 		return continuousErr
 	}
+	syncAgentState, scheduledSync, scheduledErr := runScheduledSyncFixture(carolCAS, bobCAS, malloryStoreRoot, carolSyncStatePath, mergeBranchCID, reviewThreadCID, scenarioResult)
+	if scheduledErr != nil {
+		return scheduledErr
+	}
 	retentionReport, retentionPayment, retentionErr := runRetentionFixture(aliceCAS, frankStoreRoot, result, scenarioResult)
 	if retentionErr != nil {
 		return retentionErr
 	}
 	result.CheckoutRoot = checkoutRoot
 	combined := fixtureResult{
-		IngestResult:     result,
-		AliceStoreRoot:   aliceStoreRoot,
-		BobStoreRoot:     bobStoreRoot,
-		CarolStoreRoot:   carolStoreRoot,
-		FrankStoreRoot:   frankStoreRoot,
-		Scenario:         scenarioResult,
-		Bridge:           bridgeResult,
-		Retrieval:        retrieval,
-		ContinuousSync:   continuousSync,
-		Retention:        retentionReport,
-		RetentionPayment: retentionPayment,
+		IngestResult:       result,
+		AliceStoreRoot:     aliceStoreRoot,
+		BobStoreRoot:       bobStoreRoot,
+		CarolStoreRoot:     carolStoreRoot,
+		FrankStoreRoot:     frankStoreRoot,
+		MalloryStoreRoot:   malloryStoreRoot,
+		CarolSyncStatePath: carolSyncStatePath,
+		Scenario:           scenarioResult,
+		Bridge:             bridgeResult,
+		Retrieval:          retrieval,
+		ContinuousSync:     continuousSync,
+		ScheduledSync:      scheduledSync,
+		SyncAgentState:     syncAgentState,
+		Retention:          retentionReport,
+		RetentionPayment:   retentionPayment,
 	}
 	resultPath := filepath.Join(*runRoot, "result.json")
 	if err := writeJSON(resultPath, combined); err != nil {
@@ -188,13 +202,73 @@ func run() error {
 	fmt.Printf("bob_store=%s\n", bobStoreRoot)
 	fmt.Printf("carol_store=%s\n", carolStoreRoot)
 	fmt.Printf("frank_store=%s\n", frankStoreRoot)
+	fmt.Printf("mallory_store=%s\n", malloryStoreRoot)
 	fmt.Printf("snapshot=%s\n", result.SnapshotCID)
 	fmt.Printf("diagnostic_message=%s\n", result.DiagnosticMessageCID)
 	fmt.Printf("retrieved_objects=%d missing_objects=%d\n", len(retrieval.Retrieved), len(retrieval.Missing))
 	fmt.Printf("continuous_sync_updates=%d continuous_sync_missing=%d\n", continuousSync.UsefulUpdates, continuousSync.MissingObjects)
+	fmt.Printf("scheduled_sync_chosen=%s redemptions=%d\n", scheduledSync.ChosenPeer, len(scheduledSync.CapabilityRedemptions))
 	fmt.Printf("retention_collected=%d protected_objects=%d\n", retentionReport.CollectedObjects, retentionReport.ProtectedObjects)
 	fmt.Printf("retention_payment_token=%s redeemed=%t replay_rejected=%t\n", retentionPayment.TokenCID, retentionPayment.Redeemed, retentionPayment.ReplayRejected)
 	return nil
+}
+
+func runScheduledSyncFixture(carolCAS *store.FileStore, bobCAS *store.FileStore, malloryStoreRoot string, syncStatePath string, mergeBranchCID cidlib.Cid, reviewThreadCID cidlib.Cid, scenarioResult scenario.Result) (pocsync.AgentState, pocsync.SchedulerReport, error) {
+	malloryCAS, malloryOpenErr := store.Open(malloryStoreRoot)
+	if malloryOpenErr != nil {
+		return pocsync.AgentState{}, pocsync.SchedulerReport{}, malloryOpenErr
+	}
+	now := time.Date(2026, 7, 4, 12, 0, 0, 0, time.UTC)
+	issuedBearer, issueErr := economy.IssueBearerToken(carolCAS, economy.BearerToken{
+		Issuer:                 "carol",
+		Scope:                  "poc18-scheduled-sync",
+		ObjectCID:              scenarioResult.MergeBranchRefSetCID,
+		Value:                  3,
+		Unit:                   "carol_credit",
+		ExpiresUnix:            time.Date(2026, 7, 31, 0, 0, 0, 0, time.UTC).Unix(),
+		Nonce:                  "poc18-scheduled-sync-bearer-1",
+		Transferable:           true,
+		RedeemableCapabilities: []string{"storage", "forwarding"},
+	})
+	if issueErr != nil {
+		return pocsync.AgentState{}, pocsync.SchedulerReport{}, issueErr
+	}
+	// Intent: Carol's local sync-agent checkpoint starts from retained graph
+	// evidence, not from a global trust service. Mallory has only a market signal,
+	// so Bob should win if Carol's retained Bob promise history is enough. Source:
+	// DI-fakop
+	state := pocsync.DefaultAgentState("carol")
+	nextState, report, syncErr := pocsync.RunScheduledSync(
+		pocsync.Peer{Agent: "carol", CAS: carolCAS},
+		[]pocsync.CandidatePeer{
+			{
+				Peer:             pocsync.Peer{Agent: "bob", CAS: bobCAS},
+				Heads:            map[string]cidlib.Cid{"merge_branch": mergeBranchCID, "review_thread": reviewThreadCID},
+				MarketSignal:     1,
+				BearerTokenBytes: issuedBearer.Bytes,
+				BearerIssuer:     "carol",
+				PaymentScope:     "poc18-scheduled-sync",
+				PaymentObjectCID: scenarioResult.MergeBranchRefSetCID,
+				PaymentValue:     3,
+				PaymentUnit:      "carol_credit",
+				Capability:       "storage",
+			},
+			{
+				Peer:         pocsync.Peer{Agent: "mallory", CAS: malloryCAS},
+				Heads:        map[string]cidlib.Cid{"merge_branch": mergeBranchCID},
+				MarketSignal: 2,
+			},
+		},
+		state,
+		pocsync.SchedulerConfig{Rounds: 1, RetainUntil: "2026-07-31T00:00:00Z", Now: now},
+	)
+	if syncErr != nil {
+		return pocsync.AgentState{}, pocsync.SchedulerReport{}, syncErr
+	}
+	if saveErr := pocsync.SaveAgentState(syncStatePath, nextState); saveErr != nil {
+		return pocsync.AgentState{}, pocsync.SchedulerReport{}, saveErr
+	}
+	return nextState, report, nil
 }
 
 func runRetentionFixture(aliceCAS *store.FileStore, frankStoreRoot string, result workspace.IngestResult, scenarioResult scenario.Result) (retention.Report, economy.RedemptionReport, error) {

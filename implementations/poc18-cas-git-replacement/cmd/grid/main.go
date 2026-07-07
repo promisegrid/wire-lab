@@ -8,9 +8,12 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
+	"time"
 
 	cidlib "github.com/ipfs/go-cid"
 
@@ -18,6 +21,7 @@ import (
 	"promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/graph"
 	pgrepo "promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/repo"
 	"promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/store"
+	pocsync "promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/sync"
 	"promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/workspace"
 )
 
@@ -52,6 +56,8 @@ func run(args []string) error {
 		return diag(args[1:])
 	case "git":
 		return gitBridge(args[1:])
+	case "sync":
+		return syncCommand(args[1:])
 	case "help":
 		usage()
 		return nil
@@ -61,7 +67,7 @@ func run(args []string) error {
 }
 
 func usage() {
-	fmt.Println("usage: grid <init|ingest|snapshot|status|log|track|untrack|checkout|refs|diag|git> [options]")
+	fmt.Println("usage: grid <init|ingest|snapshot|status|log|track|untrack|checkout|refs|diag|git|sync> [options]")
 	fmt.Println()
 	fmt.Println("first-slice commands:")
 	fmt.Println("  init     - create .grid/config.json and the configured sparse local CAS")
@@ -75,6 +81,7 @@ func usage() {
 	fmt.Println("  refs     - render one retained reference/message object")
 	fmt.Println("  diag     - render exact CBOR from a CAS CID or file")
 	fmt.Println("  git      - run conventional Git bridge adapters: import, export, pull, push")
+	fmt.Println("  sync     - inspect or run local sync-agent scheduling")
 }
 
 func initStore(args []string) error {
@@ -642,6 +649,209 @@ func gitBridge(args []string) error {
 	default:
 		return fmt.Errorf("unknown git bridge command %q", args[0])
 	}
+}
+
+func syncCommand(args []string) error {
+	if len(args) == 0 {
+		return fmt.Errorf("sync command is required: status or once")
+	}
+	switch args[0] {
+	case "status":
+		return syncStatus(args[1:])
+	case "once":
+		return syncOnce(args[1:])
+	default:
+		return fmt.Errorf("unknown sync command %q", args[0])
+	}
+}
+
+func syncStatus(args []string) error {
+	flags := flag.NewFlagSet("sync status", flag.ContinueOnError)
+	agent := flags.String("agent", "alice", "local sync-agent name")
+	outPath := flags.String("out", "", "optional JSON result path")
+	if err := flags.Parse(args); err != nil {
+		return err
+	}
+	repository, discoverErr := pgrepo.Discover(".")
+	if discoverErr != nil {
+		return discoverErr
+	}
+	// Intent: `grid sync status` may inspect an absent local sync-agent checkpoint
+	// but must not create `.grid/sync` just to answer. Source: DI-fakop
+	state, loadErr := pocsync.LoadAgentState(syncAgentStatePath(repository), *agent)
+	if loadErr != nil {
+		return loadErr
+	}
+	if *outPath != "" {
+		if err := writeJSON(*outPath, state); err != nil {
+			return err
+		}
+	}
+	chosen := ""
+	if state.LastReport != nil {
+		chosen = state.LastReport.ChosenPeer
+	}
+	fmt.Printf("sync_agent_state=%s agent=%s trusted_peers=%d last_chosen=%s\n", syncAgentStatePath(repository), state.Agent, len(state.Trust), chosen)
+	return nil
+}
+
+func syncOnce(args []string) error {
+	flags := flag.NewFlagSet("sync once", flag.ContinueOnError)
+	agent := flags.String("agent", "alice", "local sync-agent name")
+	peerName := flags.String("peer", "", "candidate peer agent name")
+	peerStore := flags.String("peer-store", "", "candidate peer CAS root")
+	marketSignal := flags.Int("market-signal", 0, "fallback market signal when local graph evidence is absent")
+	bearerTokenFile := flags.String("bearer-token-file", "", "optional bearer token bytes to redeem for sync capability")
+	bearerIssuer := flags.String("bearer-issuer", "", "issuer expected for bearer token verification")
+	paymentScope := flags.String("payment-scope", "", "expected bearer-token scope")
+	paymentObjectCID := flags.String("payment-object", "", "expected bearer-token object CID; defaults to first advertised head")
+	paymentValue := flags.Int64("payment-value", 1, "expected bearer-token value")
+	paymentUnit := flags.String("payment-unit", "sync_credit", "expected bearer-token unit")
+	capability := flags.String("capability", "storage", "capability requested from selected peer")
+	rounds := flags.Int("rounds", 1, "continuous sync rounds to run")
+	outPath := flags.String("out", "", "optional JSON report path")
+	var heads headFlags
+	flags.Var(&heads, "head", "advertised head in role=cid form; may repeat")
+	if err := flags.Parse(args); err != nil {
+		return err
+	}
+	cas, repository, foundRepository, openErr := openCLIStore("")
+	if openErr != nil {
+		return openErr
+	}
+	if !foundRepository {
+		return fmt.Errorf("grid sync once requires a discovered repo")
+	}
+	statePath := syncAgentStatePath(repository)
+	state, stateErr := pocsync.LoadAgentState(statePath, *agent)
+	if stateErr != nil {
+		return stateErr
+	}
+	local := pocsync.Peer{Agent: *agent, CAS: cas}
+	candidates, candidatesErr := syncCandidatesFromFlags(*peerName, *peerStore, heads, *marketSignal, *bearerTokenFile, *bearerIssuer, *paymentScope, *paymentObjectCID, *paymentValue, *paymentUnit, *capability)
+	if candidatesErr != nil {
+		return candidatesErr
+	}
+	nextState, report, runErr := pocsync.RunScheduledSync(local, candidates, state, pocsync.SchedulerConfig{Rounds: *rounds, Now: time.Date(2026, 7, 4, 12, 0, 0, 0, time.UTC)})
+	if runErr != nil {
+		return runErr
+	}
+	if saveErr := pocsync.SaveAgentState(statePath, nextState); saveErr != nil {
+		return saveErr
+	}
+	if *outPath != "" {
+		if err := writeJSON(*outPath, report); err != nil {
+			return err
+		}
+	}
+	fmt.Printf("sync_once_state=%s chosen=%s decisions=%d redeemed=%d missing=%d\n", statePath, report.ChosenPeer, len(report.Decisions), len(report.CapabilityRedemptions), report.ContinuousSync.MissingObjects)
+	return nil
+}
+
+type headFlags map[string]cidlib.Cid
+
+func (flags *headFlags) String() string {
+	if flags == nil || len(*flags) == 0 {
+		return ""
+	}
+	roles := make([]string, 0, len(*flags))
+	for role := range *flags {
+		roles = append(roles, role)
+	}
+	sort.Strings(roles)
+	parts := make([]string, 0, len(roles))
+	for _, role := range roles {
+		parts = append(parts, role+"="+store.CIDText((*flags)[role]))
+	}
+	return strings.Join(parts, ",")
+}
+
+func (flags *headFlags) Set(value string) error {
+	if *flags == nil {
+		*flags = headFlags{}
+	}
+	role, cidText, found := strings.Cut(value, "=")
+	if !found || role == "" || cidText == "" {
+		return fmt.Errorf("-head must be role=cid")
+	}
+	objectCID, parseErr := store.ParseCIDText(cidText)
+	if parseErr != nil {
+		return parseErr
+	}
+	(*flags)[role] = objectCID
+	return nil
+}
+
+func syncCandidatesFromFlags(peerName string, peerStore string, heads headFlags, marketSignal int, bearerTokenFile string, bearerIssuer string, paymentScope string, paymentObjectCID string, paymentValue int64, paymentUnit string, capability string) ([]pocsync.CandidatePeer, error) {
+	if peerName == "" && peerStore == "" && len(heads) == 0 {
+		return nil, nil
+	}
+	if peerName == "" || peerStore == "" || len(heads) == 0 {
+		return nil, fmt.Errorf("-peer, -peer-store, and at least one -head are required together")
+	}
+	peerCAS, peerErr := store.Open(peerStore)
+	if peerErr != nil {
+		return nil, peerErr
+	}
+	bearerBytes, bearerErr := readOptionalFile(bearerTokenFile)
+	if bearerErr != nil {
+		return nil, bearerErr
+	}
+	if len(bearerBytes) > 0 {
+		if bearerIssuer == "" {
+			return nil, fmt.Errorf("-bearer-issuer is required with -bearer-token-file")
+		}
+		if paymentScope == "" {
+			paymentScope = "grid-sync:" + peerName
+		}
+		if paymentObjectCID == "" {
+			paymentObjectCID = firstHeadCID(heads)
+		}
+	}
+	return []pocsync.CandidatePeer{{
+		Peer:             pocsync.Peer{Agent: peerName, CAS: peerCAS},
+		Heads:            map[string]cidlib.Cid(heads),
+		MarketSignal:     marketSignal,
+		BearerTokenBytes: bearerBytes,
+		BearerIssuer:     bearerIssuer,
+		PaymentScope:     paymentScope,
+		PaymentObjectCID: paymentObjectCID,
+		PaymentValue:     paymentValue,
+		PaymentUnit:      paymentUnit,
+		Capability:       capability,
+	}}, nil
+}
+
+func readOptionalFile(path string) ([]byte, error) {
+	if path == "" {
+		return nil, nil
+	}
+	file, openErr := os.Open(path)
+	if openErr != nil {
+		return nil, openErr
+	}
+	deferErr := file.Close
+	content, readErr := io.ReadAll(file)
+	if closeErr := deferErr(); closeErr != nil && readErr == nil {
+		return nil, closeErr
+	}
+	return content, readErr
+}
+
+func firstHeadCID(heads headFlags) string {
+	roles := make([]string, 0, len(heads))
+	for role := range heads {
+		roles = append(roles, role)
+	}
+	sort.Strings(roles)
+	if len(roles) == 0 {
+		return ""
+	}
+	return store.CIDText(heads[roles[0]])
+}
+
+func syncAgentStatePath(repository pgrepo.Repository) string {
+	return filepath.Join(repository.GridDir, "sync", "state.json")
 }
 
 func gitImport(args []string) error {

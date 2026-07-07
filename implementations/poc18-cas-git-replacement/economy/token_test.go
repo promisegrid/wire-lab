@@ -102,3 +102,69 @@ func TestStoragePaymentTokenRejectsWrongSubject(t *testing.T) {
 		t.Fatalf("wrong subject should be rejected, got %v", redeemErr)
 	}
 }
+
+func TestBearerTokenRedeemsForNonTransferableCapability(t *testing.T) {
+	carolCAS, carolErr := store.Open(t.TempDir())
+	if carolErr != nil {
+		t.Fatalf("open carol CAS: %v", carolErr)
+	}
+	bobCAS, bobErr := store.Open(t.TempDir())
+	if bobErr != nil {
+		t.Fatalf("open bob CAS: %v", bobErr)
+	}
+	objectCID := store.CIDText(store.CIDForBytes([]byte("sync head")))
+	now := time.Date(2026, 7, 4, 12, 0, 0, 0, time.UTC)
+	issued, issueErr := IssueBearerToken(carolCAS, BearerToken{
+		Issuer:                 "carol",
+		Scope:                  "poc18-scheduled-sync",
+		ObjectCID:              objectCID,
+		Value:                  3,
+		Unit:                   "carol_credit",
+		ExpiresUnix:            now.Add(time.Hour).Unix(),
+		Nonce:                  "poc18-bearer-token-1",
+		Transferable:           true,
+		RedeemableCapabilities: []string{"storage", "forwarding"},
+	})
+	if issueErr != nil {
+		t.Fatalf("issue bearer token: %v", issueErr)
+	}
+	ledger := NewLedger()
+	redemption, redeemErr := ledger.RedeemBearerForCapability(bobCAS, issued.Bytes, ExpectedBearerPayment{
+		Issuer:     "carol",
+		Scope:      "poc18-scheduled-sync",
+		ObjectCID:  objectCID,
+		Value:      3,
+		Unit:       "carol_credit",
+		Capability: "storage",
+	}, "bob", "carol", now)
+	if redeemErr != nil {
+		t.Fatalf("redeem bearer token: %v", redeemErr)
+	}
+	if !redemption.Redeemed || !redemption.SignatureVerified || redemption.Capability != "storage" {
+		t.Fatalf("unexpected capability redemption: %#v", redemption)
+	}
+	bearerCID, bearerErr := store.ParseCIDText(redemption.BearerTokenCID)
+	if bearerErr != nil {
+		t.Fatalf("parse bearer CID: %v", bearerErr)
+	}
+	capabilityCID, capabilityErr := store.ParseCIDText(redemption.CapabilityTokenCID)
+	if capabilityErr != nil {
+		t.Fatalf("parse capability CID: %v", capabilityErr)
+	}
+	if !carolCAS.Has(bearerCID) || !bobCAS.Has(bearerCID) {
+		t.Fatalf("bearer token not retained by issuer and redeemer")
+	}
+	if !bobCAS.Has(capabilityCID) {
+		t.Fatalf("capability token not retained by issuer")
+	}
+	if _, replayErr := ledger.RedeemBearerForCapability(bobCAS, issued.Bytes, ExpectedBearerPayment{
+		Issuer:     "carol",
+		Scope:      "poc18-scheduled-sync",
+		ObjectCID:  objectCID,
+		Value:      3,
+		Unit:       "carol_credit",
+		Capability: "storage",
+	}, "bob", "carol", now); replayErr == nil || !strings.Contains(replayErr.Error(), "already redeemed") {
+		t.Fatalf("bearer replay should be rejected, got %v", replayErr)
+	}
+}

@@ -214,6 +214,15 @@ Intent: POC18 needs executable pressure for continuous collaboration, not only o
 Constraints: Reuse the existing version-control pCID and promise kinds; do not add a new pCID, network daemon, transport protocol, global remote, global monitor, branch authority, or push/pull command; keep generated runtime state under `/tmp/wire-lab-poc18-*`; keep the implementation deterministic and local; preserve sparse-CAS separation and exact CID verification; do not use pCID as peer address or operation code.
 Affects: implementations/poc18-cas-git-replacement/sync/; implementations/poc18-cas-git-replacement/cmd/poc-sim/; implementations/poc18-cas-git-replacement/cmd/poc-analyze/; implementations/poc18-cas-git-replacement/docs/protocols/version-control.md; DEV-GUIDE-RESOURCES.md; protocols/wire-lab.d/TODO/TODO-nahop-poc18-cas-git-replacement.md.
 
+ID: DI-fakop
+Date: 2026-07-04 23:14:07 PDT
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Implement `nahop.34` as a gpg-agent-like POC18 local sync-agent slice: only explicit `grid sync ...` commands create or update local sync-agent state; normal read-only commands remain side-effect-free; the scheduler chooses peers from local retained promise/event graph evidence with checkpointing for performance; market/exchange-rate signals may be used only when local evidence is insufficient; generic transferable bearer tokens can be redeemed for non-transferable storage or forwarding capability tokens before paid sync service is accepted.
+Intent: POC18 needs to move beyond a hand-called fixture loop without prematurely claiming a production daemon. The next slice should establish the local-agent boundaries that a later socket/listener process can use, while preserving Promise Theory: every service is a voluntary promise, trust remains local, and economics are capability-token exchanges rather than permission, RPC, or global currency.
+Constraints: Do not start sync behavior from `grid status`, `grid log`, `grid diag`, or other non-sync commands; do not implement a real OS daemon, socket listener, global trust service, push/pull remote, branch authority, RPC endpoint, or global exchange in this slice; use deterministic local state and fixture inputs; store sync-agent checkpoints under `.grid/sync/state.json` for CLI tests and under `/tmp/wire-lab-poc18-*` for fixture runs; keep token claims COSE/CWT-style and exact-CID-addressed; preserve CIDv1 base32 printable rendering; keep pCID as protocol selector only.
+Affects: implementations/poc18-cas-git-replacement/sync/; implementations/poc18-cas-git-replacement/economy/; implementations/poc18-cas-git-replacement/cmd/grid/; implementations/poc18-cas-git-replacement/cmd/poc-sim/; implementations/poc18-cas-git-replacement/cmd/poc-analyze/; implementations/poc18-cas-git-replacement/repo/; DEV-GUIDE-RESOURCES.md; protocols/wire-lab.d/TODO/TODO-nahop-poc18-cas-git-replacement.md.
+
 ## Core Hypothesis
 
 POC18 should test this hypothesis:
@@ -583,6 +592,13 @@ Locked:
   Carol records an `object_retention` promise after a useful update, and the next
   round proves idempotent no-op convergence without native Git push/pull. Source:
   `DI-rudos`.
+- POC18 implements the first local sync-agent scheduler slice for `nahop.34`:
+  `grid sync status` reads local sync state without creating it, `grid sync once`
+  creates/updates `.grid/sync/state.json`, scheduler peer choice is computed from
+  retained local promise graph evidence with market-signal fallback only when
+  local evidence is absent, and transferable bearer tokens can be redeemed for
+  non-transferable storage/forwarding capability tokens before paid sync service.
+  Source: `DI-fakop`.
 - POC18 implements deterministic collaboration scenarios for `nahop.12` through
   `nahop.14`: rename/copy lineage keeps the same POSIX node CID under changed
   directory labels, divergent Alice/Bob snapshots are explicit, Dave's merge is
@@ -692,6 +708,11 @@ Remaining:
   reference-set heads, object-availability promises, missing-object requests, and
   retention/forwarding promises without explicit native push/pull commands.
   Source: `DI-dibut`; `DI-rudos`.
+- [x] nahop.34 Implement gpg-agent-like local sync-agent scheduling: explicit
+  `grid sync ...` commands own sync state creation, peer choice is based on local
+  graph trust evidence with market fallback only when needed, and bearer tokens
+  redeem into non-transferable storage/forwarding capability tokens. Source:
+  `DI-fakop`.
 - [ ] nahop.20 Add analyzer gates for CID correctness, sparse CAS, parent-chain
   integrity, reference-set signatures, multi-target labels, directory labels,
   logical-change reference sets, POSIX inode type coverage, continuous sync,

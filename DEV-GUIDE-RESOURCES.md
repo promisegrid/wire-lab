@@ -26,7 +26,7 @@ remain review evidence until promoted. Source: `DI-baral`; `DI-sisak`;
 `DI-nogij`; `DI-rigup`; `DI-vulit`; `DI-gazin`; `DI-bitug`; `DI-magug`;
 `DI-sazip`; `DI-mapah`; `DI-jafoj`; `DI-rapuk`; `DI-gidul`; `DI-zopub`;
 `DI-rujod`; `DI-zuruj`; `DI-dibut`; `DI-dofoj`; `DI-radaj`; `DI-fusir`;
-`DI-rudos`.
+`DI-rudos`; `DI-fakop`.
 Constrained-radio POC17 adds behavior evidence that production-like app
 messages can stay pCID-selected and compact: bintags-shaped order status
 traffic uses `grid([42(pCID), payload])` with actual CID bytes for slot 0, while
@@ -108,8 +108,14 @@ and Carol: Bob advertises selected merge/review reference-set heads, Carol
 decides locally to fetch, existing `sync_interest` and `object_availability`
 promises move exact CID-verified graph objects into Carol's separate sparse CAS,
 Carol records an `object_retention` promise for useful updates, and a second
-deterministic round converges with no newly retrieved objects. Normal `grid`
-commands now discover repo-local `.grid/config.json` by walking upward from the current directory; the config
+deterministic round converges with no newly retrieved objects. The first local
+sync-agent scheduler slice follows a gpg-agent-like boundary: `grid sync status`
+can inspect absent or present local sync state without creating it, `grid sync
+once` creates/updates `.grid/sync/state.json`, peer choice comes from retained
+local promise graph evidence with market/exchange-rate signal fallback only when
+local evidence is absent, and transferable bearer tokens can be redeemed for
+non-transferable storage/forwarding capability tokens before paid sync service.
+Normal `grid` commands now discover repo-local `.grid/config.json` by walking upward from the current directory; the config
 contains a typed CAS locator that defaults to local file CAS `.grid/cas` while
 preserving room for daemon or remote CAS locators later. POC18 now keeps mutable
 local CLI state in `.grid/state.json`: `grid snapshot` records the current local
@@ -132,7 +138,7 @@ are also present.
 Source: `DI-zuruj`; `DI-dibut`; `DI-dofoj`; `DI-radaj`; `DI-lidaj`;
 `DI-fusir`; `DI-jifuj`; `DI-harih`; `DI-gozov`; `DI-guban`; `DI-fimap`;
 `DI-pahor`; `DI-bikif`; `DI-kiram`; `DI-bamum`; `DI-jokav`; `DI-tuhoj`;
-`DI-mivur`; `DI-bidum`; `DI-rudos`; `DN-dopod`; `TE-kopap`; `TE-vahoj`; `TE-hikar`;
+`DI-mivur`; `DI-bidum`; `DI-rudos`; `DI-fakop`; `DN-dopod`; `TE-kopap`; `TE-vahoj`; `TE-hikar`;
 `TE-givul`; `TE-nozal`.
 
 ### Current Wire Direction

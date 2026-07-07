@@ -29,16 +29,20 @@ import (
 // Source: DI-gozov
 type fixtureResult struct {
 	workspace.IngestResult
-	AliceStoreRoot   string                       `json:"alice_store_root"`
-	BobStoreRoot     string                       `json:"bob_store_root"`
-	CarolStoreRoot   string                       `json:"carol_store_root"`
-	FrankStoreRoot   string                       `json:"frank_store_root"`
-	Scenario         scenario.Result              `json:"scenario"`
-	Bridge           bridgeFixtureResult          `json:"bridge"`
-	Retrieval        pocsync.RetrievalReport      `json:"retrieval"`
-	ContinuousSync   pocsync.ContinuousSyncReport `json:"continuous_sync"`
-	Retention        retention.Report             `json:"retention"`
-	RetentionPayment economy.RedemptionReport     `json:"retention_payment"`
+	AliceStoreRoot     string                       `json:"alice_store_root"`
+	BobStoreRoot       string                       `json:"bob_store_root"`
+	CarolStoreRoot     string                       `json:"carol_store_root"`
+	FrankStoreRoot     string                       `json:"frank_store_root"`
+	MalloryStoreRoot   string                       `json:"mallory_store_root"`
+	CarolSyncStatePath string                       `json:"carol_sync_state_path"`
+	Scenario           scenario.Result              `json:"scenario"`
+	Bridge             bridgeFixtureResult          `json:"bridge"`
+	Retrieval          pocsync.RetrievalReport      `json:"retrieval"`
+	ContinuousSync     pocsync.ContinuousSyncReport `json:"continuous_sync"`
+	ScheduledSync      pocsync.SchedulerReport      `json:"scheduled_sync"`
+	SyncAgentState     pocsync.AgentState           `json:"sync_agent_state"`
+	Retention          retention.Report             `json:"retention"`
+	RetentionPayment   economy.RedemptionReport     `json:"retention_payment"`
 }
 
 type bridgeFixtureResult struct {
@@ -50,16 +54,17 @@ type bridgeFixtureResult struct {
 
 // Report records local fixture checks.
 type Report struct {
-	RunRoot      string            `json:"run_root"`
-	Pass         bool              `json:"pass"`
-	Checks       map[string]string `json:"checks"`
-	Objects      int               `json:"objects"`
-	AliceObjects int               `json:"alice_objects"`
-	BobObjects   int               `json:"bob_objects"`
-	CarolObjects int               `json:"carol_objects"`
-	FrankObjects int               `json:"frank_objects"`
-	Retrieved    int               `json:"retrieved"`
-	Missing      int               `json:"missing"`
+	RunRoot        string            `json:"run_root"`
+	Pass           bool              `json:"pass"`
+	Checks         map[string]string `json:"checks"`
+	Objects        int               `json:"objects"`
+	AliceObjects   int               `json:"alice_objects"`
+	BobObjects     int               `json:"bob_objects"`
+	CarolObjects   int               `json:"carol_objects"`
+	FrankObjects   int               `json:"frank_objects"`
+	MalloryObjects int               `json:"mallory_objects"`
+	Retrieved      int               `json:"retrieved"`
+	Missing        int               `json:"missing"`
 }
 
 func main() {
@@ -248,6 +253,14 @@ func analyze(runRoot string, result fixtureResult) (Report, error) {
 	if frankListErr != nil {
 		return Report{}, frankListErr
 	}
+	malloryCAS, malloryOpenErr := store.Open(result.MalloryStoreRoot)
+	if malloryOpenErr != nil {
+		return Report{}, malloryOpenErr
+	}
+	malloryEntries, malloryListErr := malloryCAS.List()
+	if malloryListErr != nil {
+		return Report{}, malloryListErr
+	}
 	if retentionPass, retentionErr := checkRetentionGC(result, frankCAS, checks); retentionErr != nil {
 		return Report{}, retentionErr
 	} else if !retentionPass {
@@ -261,6 +274,11 @@ func analyze(runRoot string, result fixtureResult) (Report, error) {
 	if continuousPass, continuousErr := checkContinuousSync(result, bobCAS, carolCAS, checks); continuousErr != nil {
 		return Report{}, continuousErr
 	} else if !continuousPass {
+		pass = false
+	}
+	if scheduledPass, scheduledErr := checkScheduledSync(result, bobCAS, carolCAS, checks); scheduledErr != nil {
+		return Report{}, scheduledErr
+	} else if !scheduledPass {
 		pass = false
 	}
 	snapshotCID, snapshotErr := store.ParseCIDText(result.SnapshotCID)
@@ -361,17 +379,111 @@ func analyze(runRoot string, result fixtureResult) (Report, error) {
 		}
 	}
 	return Report{
-		RunRoot:      runRoot,
-		Pass:         pass,
-		Checks:       checks,
-		Objects:      len(bobEntries),
-		AliceObjects: len(aliceEntries),
-		BobObjects:   len(bobEntries),
-		CarolObjects: len(carolEntries),
-		FrankObjects: len(frankEntries),
-		Retrieved:    len(result.Retrieval.Retrieved),
-		Missing:      len(result.Retrieval.Missing),
+		RunRoot:        runRoot,
+		Pass:           pass,
+		Checks:         checks,
+		Objects:        len(bobEntries),
+		AliceObjects:   len(aliceEntries),
+		BobObjects:     len(bobEntries),
+		CarolObjects:   len(carolEntries),
+		FrankObjects:   len(frankEntries),
+		MalloryObjects: len(malloryEntries),
+		Retrieved:      len(result.Retrieval.Retrieved),
+		Missing:        len(result.Retrieval.Missing),
 	}, nil
+}
+
+func checkScheduledSync(result fixtureResult, bobCAS *store.FileStore, carolCAS *store.FileStore, checks map[string]string) (bool, error) {
+	// Intent: The scheduler gate verifies local sync-agent behavior, not a global
+	// scheduler. Bob should win from Carol's retained graph evidence, while Mallory
+	// remains only market-signal evidence. Source: DI-fakop
+	pass := true
+	if result.ScheduledSync.ChosenPeer == "bob" {
+		checks["scheduled_sync_chose_bob"] = "kept"
+	} else {
+		checks["scheduled_sync_chose_bob"] = "missing"
+		pass = false
+	}
+	if scheduledDecisionHasLocalGraph(result.ScheduledSync, "bob") {
+		checks["scheduled_sync_bob_from_local_graph"] = "kept"
+	} else {
+		checks["scheduled_sync_bob_from_local_graph"] = "missing"
+		pass = false
+	}
+	if scheduledDecisionUsedMarketFallback(result.ScheduledSync, "mallory") {
+		checks["scheduled_sync_market_fallback_for_mallory"] = "kept"
+	} else {
+		checks["scheduled_sync_market_fallback_for_mallory"] = "missing"
+		pass = false
+	}
+	if len(result.ScheduledSync.CapabilityRedemptions) > 0 && result.ScheduledSync.CapabilityRedemptions[0].Redeemed && result.ScheduledSync.CapabilityRedemptions[0].Capability == "storage" {
+		checks["scheduled_sync_capability_redeemed"] = "kept"
+	} else {
+		checks["scheduled_sync_capability_redeemed"] = "missing"
+		pass = false
+	}
+	if len(result.ScheduledSync.CapabilityRedemptions) > 0 {
+		redemption := result.ScheduledSync.CapabilityRedemptions[0]
+		bearerCID, bearerErr := store.ParseCIDText(redemption.BearerTokenCID)
+		if bearerErr != nil {
+			return false, bearerErr
+		}
+		capabilityCID, capabilityErr := store.ParseCIDText(redemption.CapabilityTokenCID)
+		if capabilityErr != nil {
+			return false, capabilityErr
+		}
+		if bobCAS.Has(bearerCID) && carolCAS.Has(bearerCID) {
+			checks["scheduled_sync_bearer_token_exchanged"] = "kept"
+		} else {
+			checks["scheduled_sync_bearer_token_exchanged"] = "missing"
+			pass = false
+		}
+		if bobCAS.Has(capabilityCID) && carolCAS.Has(capabilityCID) {
+			checks["scheduled_sync_capability_token_exchanged"] = "kept"
+		} else {
+			checks["scheduled_sync_capability_token_exchanged"] = "missing"
+			pass = false
+		}
+	}
+	if result.SyncAgentState.LastReport != nil && result.SyncAgentState.LastReport.ChosenPeer == "bob" && len(result.SyncAgentState.RedeemedBearerTokenCIDs) > 0 {
+		checks["scheduled_sync_state_checkpointed"] = "kept"
+	} else {
+		checks["scheduled_sync_state_checkpointed"] = "missing"
+		pass = false
+	}
+	if result.CarolSyncStatePath != "" {
+		if _, statErr := os.Stat(result.CarolSyncStatePath); statErr == nil {
+			checks["scheduled_sync_state_file_written"] = "kept"
+		} else {
+			checks["scheduled_sync_state_file_written"] = "missing"
+			pass = false
+		}
+	}
+	if result.ScheduledSync.ContinuousSync.MissingObjects == 0 {
+		checks["scheduled_sync_no_missing"] = "kept"
+	} else {
+		checks["scheduled_sync_no_missing"] = "missing"
+		pass = false
+	}
+	return pass, nil
+}
+
+func scheduledDecisionHasLocalGraph(report pocsync.SchedulerReport, peer string) bool {
+	for _, decision := range report.Decisions {
+		if decision.Peer == peer && decision.Result == "chosen" && decision.Trust.KeptPromises > 0 && !decision.Trust.MarketSignalUsed {
+			return true
+		}
+	}
+	return false
+}
+
+func scheduledDecisionUsedMarketFallback(report pocsync.SchedulerReport, peer string) bool {
+	for _, decision := range report.Decisions {
+		if decision.Peer == peer && decision.Trust.MarketSignalUsed {
+			return true
+		}
+	}
+	return false
 }
 
 func checkContinuousSync(result fixtureResult, bobCAS *store.FileStore, carolCAS *store.FileStore, checks map[string]string) (bool, error) {

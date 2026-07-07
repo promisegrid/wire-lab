@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	pgrepo "promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/repo"
+	pocsync "promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/sync"
 	"promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/workspace"
 )
 
@@ -191,6 +192,45 @@ func TestGridTrackAndUntrackPathPolicy(t *testing.T) {
 	assertCLIStatusFlags(t, trackedReport, false, true)
 }
 
+func TestGridSyncStateStartsOnlyFromSyncCommands(t *testing.T) {
+	root := t.TempDir()
+	t.Chdir(root)
+	if err := run([]string{"init"}); err != nil {
+		t.Fatalf("run(init) error = %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(root, "README.md"), []byte("sync agent boundary\n"), 0o644); err != nil {
+		t.Fatalf("WriteFile(README) error = %v", err)
+	}
+	outputRoot := t.TempDir()
+	if err := run([]string{"snapshot", "-out", filepath.Join(outputRoot, "snapshot.json")}); err != nil {
+		t.Fatalf("run(snapshot) error = %v", err)
+	}
+	if err := run([]string{"status", "-out", filepath.Join(outputRoot, "status.json")}); err != nil {
+		t.Fatalf("run(status) error = %v", err)
+	}
+	syncStatePath := filepath.Join(root, ".grid", "sync", "state.json")
+	if _, statErr := os.Stat(syncStatePath); !os.IsNotExist(statErr) {
+		t.Fatalf("status created sync-agent state: %v", statErr)
+	}
+	if err := run([]string{"sync", "status", "-out", filepath.Join(outputRoot, "sync-status.json")}); err != nil {
+		t.Fatalf("run(sync status) error = %v", err)
+	}
+	if _, statErr := os.Stat(syncStatePath); !os.IsNotExist(statErr) {
+		t.Fatalf("sync status created sync-agent state: %v", statErr)
+	}
+	syncOnceOut := filepath.Join(outputRoot, "sync-once.json")
+	if err := run([]string{"sync", "once", "-out", syncOnceOut}); err != nil {
+		t.Fatalf("run(sync once) error = %v", err)
+	}
+	if _, statErr := os.Stat(syncStatePath); statErr != nil {
+		t.Fatalf("sync once did not create sync-agent state: %v", statErr)
+	}
+	state := readSyncAgentState(t, syncStatePath)
+	if state.Agent != "alice" || state.LastReport == nil || state.LastReport.IdleReason != "no candidate peers" {
+		t.Fatalf("sync-agent state = %#v", state)
+	}
+}
+
 func readIngestResult(t *testing.T, path string) workspace.IngestResult {
 	t.Helper()
 	content, readErr := os.ReadFile(path)
@@ -241,6 +281,19 @@ func readLogReport(t *testing.T, path string) logReport {
 		t.Fatalf("Unmarshal(%s) error = %v", path, err)
 	}
 	return report
+}
+
+func readSyncAgentState(t *testing.T, path string) pocsync.AgentState {
+	t.Helper()
+	content, readErr := os.ReadFile(path)
+	if readErr != nil {
+		t.Fatalf("ReadFile(%s) error = %v", path, readErr)
+	}
+	var state pocsync.AgentState
+	if err := json.Unmarshal(content, &state); err != nil {
+		t.Fatalf("Unmarshal(%s) error = %v", path, err)
+	}
+	return state
 }
 
 func assertCLIStatusEntry(t *testing.T, report workspace.StatusReport, path string, status string) {

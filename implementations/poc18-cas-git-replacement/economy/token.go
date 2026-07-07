@@ -96,6 +96,23 @@ func NewLedger() *Ledger {
 	return &Ledger{spent: map[string]bool{}}
 }
 
+// NewLedgerWithSpent returns a local spent-token ledger seeded from a checkpoint.
+//
+// Intent: Scheduler checkpoints are performance state, not global settlement.
+// Seeding a local ledger from previously accepted token CIDs lets a restarted
+// local agent reject replay without treating any peer's ledger as authoritative.
+// Source: DI-fakop
+func NewLedgerWithSpent(tokenCIDs []string) (*Ledger, error) {
+	ledger := NewLedger()
+	for _, tokenCID := range tokenCIDs {
+		if _, parseErr := store.ParseCIDText(tokenCID); parseErr != nil {
+			return nil, parseErr
+		}
+		ledger.spent[tokenCID] = true
+	}
+	return ledger, nil
+}
+
 // IssueStoragePaymentToken signs token claims as COSE_Sign1 and stores the exact
 // token bytes in the issuer's CAS.
 //

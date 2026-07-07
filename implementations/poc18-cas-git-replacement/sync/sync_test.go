@@ -4,9 +4,11 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+	"time"
 
 	cidlib "github.com/ipfs/go-cid"
 
+	"promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/economy"
 	"promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/store"
 	pocsync "promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/sync"
 	"promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/workspace"
@@ -166,5 +168,117 @@ func TestRunContinuousDAGSyncPropagatesThenIdempotentlyRepeats(t *testing.T) {
 	}
 	if !bobCAS.Has(snapshotCID) {
 		t.Fatalf("bob CAS does not contain continuously synced snapshot %s", result.SnapshotCID)
+	}
+}
+
+// TestRunScheduledSyncChoosesLocalTrustAndRedeemsCapability proves the next
+// sync-agent slice: local graph evidence beats weaker market fallback, and a
+// transferable bearer token becomes a non-transferable service capability token.
+func TestRunScheduledSyncChoosesLocalTrustAndRedeemsCapability(t *testing.T) {
+	root := t.TempDir()
+	source := filepath.Join(root, "alice-workspace")
+	if err := os.MkdirAll(source, 0o755); err != nil {
+		t.Fatalf("MkdirAll() error = %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(source, "README.md"), []byte("scheduled sync from alice\n"), 0o644); err != nil {
+		t.Fatalf("WriteFile() error = %v", err)
+	}
+	aliceCAS, aliceErr := store.Open(filepath.Join(root, "alice-cas"))
+	if aliceErr != nil {
+		t.Fatalf("Open(alice) error = %v", aliceErr)
+	}
+	bobCAS, bobErr := store.Open(filepath.Join(root, "bob-cas"))
+	if bobErr != nil {
+		t.Fatalf("Open(bob) error = %v", bobErr)
+	}
+	carolCAS, carolErr := store.Open(filepath.Join(root, "carol-cas"))
+	if carolErr != nil {
+		t.Fatalf("Open(carol) error = %v", carolErr)
+	}
+	malloryCAS, malloryErr := store.Open(filepath.Join(root, "mallory-cas"))
+	if malloryErr != nil {
+		t.Fatalf("Open(mallory) error = %v", malloryErr)
+	}
+	result, ingestErr := workspace.NewScanner(aliceCAS, "alice", "bob").Ingest(source)
+	if ingestErr != nil {
+		t.Fatalf("Ingest() error = %v", ingestErr)
+	}
+	branchCID, branchErr := store.ParseCIDText(result.BranchRefSetCID)
+	if branchErr != nil {
+		t.Fatalf("ParseCIDText(branch) error = %v", branchErr)
+	}
+	if _, retrieveErr := pocsync.RetrieveGraph(
+		pocsync.Peer{Agent: "bob", CAS: bobCAS},
+		pocsync.Peer{Agent: "alice", CAS: aliceCAS},
+		map[string]cidlib.Cid{"branch": branchCID},
+		"storage_credit:2",
+	); retrieveErr != nil {
+		t.Fatalf("RetrieveGraph() error = %v", retrieveErr)
+	}
+	if _, continuousErr := pocsync.RunContinuousDAGSync(
+		pocsync.Peer{Agent: "bob", CAS: bobCAS},
+		pocsync.Peer{Agent: "carol", CAS: carolCAS},
+		map[string]cidlib.Cid{"branch": branchCID},
+		nil,
+		pocsync.ContinuousSyncConfig{Rounds: 1, Offer: "continuous_storage_credit:1", RetainUntil: "2026-07-31T00:00:00Z"},
+	); continuousErr != nil {
+		t.Fatalf("RunContinuousDAGSync() error = %v", continuousErr)
+	}
+	now := time.Date(2026, 7, 4, 12, 0, 0, 0, time.UTC)
+	issuedBearer, issueErr := economy.IssueBearerToken(carolCAS, economy.BearerToken{
+		Issuer:                 "carol",
+		Scope:                  "poc18-scheduled-sync",
+		ObjectCID:              result.BranchRefSetCID,
+		Value:                  3,
+		Unit:                   "carol_credit",
+		ExpiresUnix:            now.Add(time.Hour).Unix(),
+		Nonce:                  "poc18-scheduled-sync-test",
+		Transferable:           true,
+		RedeemableCapabilities: []string{"storage", "forwarding"},
+	})
+	if issueErr != nil {
+		t.Fatalf("IssueBearerToken() error = %v", issueErr)
+	}
+	state, report, scheduleErr := pocsync.RunScheduledSync(
+		pocsync.Peer{Agent: "carol", CAS: carolCAS},
+		[]pocsync.CandidatePeer{
+			{
+				Peer:             pocsync.Peer{Agent: "bob", CAS: bobCAS},
+				Heads:            map[string]cidlib.Cid{"branch": branchCID},
+				MarketSignal:     1,
+				BearerTokenBytes: issuedBearer.Bytes,
+				BearerIssuer:     "carol",
+				PaymentScope:     "poc18-scheduled-sync",
+				PaymentObjectCID: result.BranchRefSetCID,
+				PaymentValue:     3,
+				PaymentUnit:      "carol_credit",
+				Capability:       "storage",
+			},
+			{Peer: pocsync.Peer{Agent: "mallory", CAS: malloryCAS}, Heads: map[string]cidlib.Cid{"branch": branchCID}, MarketSignal: 2},
+		},
+		pocsync.DefaultAgentState("carol"),
+		pocsync.SchedulerConfig{Rounds: 1, RetainUntil: "2026-07-31T00:00:00Z", Now: now},
+	)
+	if scheduleErr != nil {
+		t.Fatalf("RunScheduledSync() error = %v", scheduleErr)
+	}
+	if report.ChosenPeer != "bob" {
+		t.Fatalf("ChosenPeer = %s, want bob: %#v", report.ChosenPeer, report.Decisions)
+	}
+	if state.Trust["bob"].KeptPromises == 0 || state.Trust["bob"].MarketSignalUsed {
+		t.Fatalf("bob trust checkpoint = %#v, want local graph evidence", state.Trust["bob"])
+	}
+	if !state.Trust["mallory"].MarketSignalUsed {
+		t.Fatalf("mallory trust checkpoint = %#v, want market fallback", state.Trust["mallory"])
+	}
+	if len(report.CapabilityRedemptions) != 1 || !report.CapabilityRedemptions[0].Redeemed {
+		t.Fatalf("capability redemption = %#v", report.CapabilityRedemptions)
+	}
+	capabilityCID, capabilityErr := store.ParseCIDText(report.CapabilityRedemptions[0].CapabilityTokenCID)
+	if capabilityErr != nil {
+		t.Fatalf("ParseCIDText(capability) error = %v", capabilityErr)
+	}
+	if !bobCAS.Has(capabilityCID) || !carolCAS.Has(capabilityCID) {
+		t.Fatalf("capability token %s not retained by bob and carol", report.CapabilityRedemptions[0].CapabilityTokenCID)
 	}
 }
