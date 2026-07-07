@@ -241,6 +241,29 @@ Intent: The first Docker/TCP remediation proved that agents could exchange promi
 Constraints: Preserve `DI-koriz`'s no-shared-CAS rule; keep observer data one-way and non-authoritative; use `Session` and `ExchangeID` naming for persistent/multiplexed TCP behavior; do not introduce native Git push/pull as PromiseGrid sync; do not treat pCID as an address or operation code; keep all runtime artifacts under `/tmp/wire-lab-poc18-run` and Docker-local agent CAS paths; use `github.com/ipld/go-car/v2` only for CAR validation, not as an authority over PromiseGrid message semantics; keep this slice in one final commit.
 Affects: README.md; DEV-GUIDE-RESOURCES.md; implementations/poc18-cas-git-replacement/agent/; implementations/poc18-cas-git-replacement/carbundle/; implementations/poc18-cas-git-replacement/cmd/poc-analyze/; implementations/poc18-cas-git-replacement/cmd/poc-event-collector/; implementations/poc18-cas-git-replacement/eventstream/; implementations/poc18-cas-git-replacement/economy/; implementations/poc18-cas-git-replacement/scripts/run-clean.sh; implementations/poc18-cas-git-replacement/go.mod; implementations/poc18-cas-git-replacement/go.sum; protocols/wire-lab.d/TODO/TODO-nahop-poc18-cas-git-replacement.md.
 
+ID: DI-basan
+Date: 2026-07-07 15:34:50 -0700
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Implement `nahop.21` by extending `poc-cbor-diag` with a deterministic
+diagnostic-report mode that renders selected exact POC18 CBOR objects and
+observer-collected TCP messages into `/tmp/wire-lab-poc18-run/poc18-diagnostics/`.
+Intent: POC18 reviewers need stable, human-readable diagnostic artifacts for the
+actual CBOR `grid([42(pCID), parents, payload, proof])` bytes behind reference
+sets, node versions, directory entries, snapshots, review promises, merge
+snapshots, materialization-related objects, and peer-fetch promises. The report
+must make those bytes inspectable without changing the wire format, CAS identity,
+or agent communication path.
+Constraints: Keep diagnostics read-only and run-scoped; preserve existing single
+message diagnostic behavior; restore the deterministic `poc-sim` fixture in
+`run-clean.sh` before Docker/TCP execution so scenario result CIDs exist for the
+report; select peer-fetch examples from observer `message-dag.jsonl`; fail the
+clean run if any required diagnostic is missing or empty; keep runtime artifacts
+under `/tmp/wire-lab-poc18-run`.
+Affects: implementations/poc18-cas-git-replacement/cmd/poc-cbor-diag/;
+implementations/poc18-cas-git-replacement/scripts/run-clean.sh;
+protocols/wire-lab.d/TODO/TODO-nahop-poc18-cas-git-replacement.md.
+
 ## Core Hypothesis
 
 POC18 should test this hypothesis:
@@ -736,9 +759,10 @@ Remaining:
   logical-change reference sets, POSIX inode type coverage, continuous sync,
   Rabin chunking for large in-band files, Git bridge roundtrip, GC behavior, and
   voluntary-cooperation and promise-based local-trust vocabulary.
-- [ ] nahop.21 Add diagnostic rendering of representative raw CBOR messages for
+- [x] nahop.21 Add diagnostic rendering of representative raw CBOR messages for
   reference-set, node-version, directory, snapshot, review, merge,
-  materialization, and peer-fetch flows.
+  materialization, and peer-fetch flows. Implemented by `poc-cbor-diag
+  -diagnostic-report` and clean-run artifact checks under `DI-basan`.
 - [ ] nahop.22 Run a clean deterministic POC18 scenario and archive exact commands,
   CAS object examples, reference-set walks, parent-chain walks, Git bridge
   output, and analyzer output.

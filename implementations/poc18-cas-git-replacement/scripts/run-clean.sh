@@ -37,10 +37,17 @@ if [ -d "$run_root" ]; then
 else
   printf 'run root did not exist: %s\n' "$run_root"
 fi
-mkdir -p "$run_root/observer"
 
 echo "== test POC18 packages =="
 go test ./...
+
+echo "== run deterministic POC18 fixture =="
+# Intent: Restore the deterministic fixture after package tests so later
+# diagnostics can render stable reference-set, snapshot, review, merge, and
+# materialization CAS objects before the Docker/TCP phase appends live run
+# artifacts. Source: DI-basan
+go run ./cmd/poc-sim -run-root "$run_root"
+mkdir -p "$run_root/observer"
 
 echo "== reset POC18 docker runtime state =="
 if POC18_RUN_ROOT="$run_root" POC18_UID="$POC18_UID" POC18_GID="$POC18_GID" docker compose down -v --remove-orphans; then
@@ -75,6 +82,26 @@ if [ -z "$first_message" ]; then
   exit 1
 fi
 go run ./cmd/poc-cbor-diag -file "$first_message" > "$run_root/poc18-first-message.diag.txt"
+diagnostic_dir="$run_root/poc18-diagnostics"
+# Intent: Produce curated exact-CBOR diagnostic renderings for representative
+# POC18 flows so protocol reviews do not depend on hand-picked or paraphrased
+# examples. Source: DI-basan
+go run ./cmd/poc-cbor-diag -diagnostic-report -run-root "$run_root" -out-dir "$diagnostic_dir"
+for diagnostic_flow in reference-set node-version snapshot review-statement merge-snapshot directory-node materialization-object sync-interest object-availability object-retrieval-redemption; do
+  diagnostic_path="$diagnostic_dir/${diagnostic_flow}.diag.txt"
+  if [ -s "$diagnostic_path" ]; then
+    printf 'diagnostic ready: %s\n' "$diagnostic_path"
+  else
+    echo "missing or empty diagnostic: $diagnostic_path" >&2
+    exit 1
+  fi
+done
+if [ -s "$diagnostic_dir/index.json" ]; then
+  printf 'diagnostic index ready: %s\n' "$diagnostic_dir/index.json"
+else
+  echo "missing or empty diagnostic index: $diagnostic_dir/index.json" >&2
+  exit 1
+fi
 
 go build -o "$run_root/grid" ./cmd/grid
 # Intent: Exercise the normal repo-local CLI path so `.grid/state.json`,
