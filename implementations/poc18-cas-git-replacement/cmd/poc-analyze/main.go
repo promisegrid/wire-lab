@@ -5,14 +5,18 @@
 package main
 
 import (
+	"bufio"
 	"encoding/json"
 	"flag"
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/bridge"
+	"promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/carbundle"
 	"promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/economy"
+	"promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/graph"
 	pgrepo "promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/repo"
 	"promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/retention"
 	"promisegrid.dev/wire-lab/implementations/poc18-cas-git-replacement/scenario"
@@ -54,17 +58,50 @@ type bridgeFixtureResult struct {
 
 // Report records local fixture checks.
 type Report struct {
-	RunRoot        string            `json:"run_root"`
-	Pass           bool              `json:"pass"`
-	Checks         map[string]string `json:"checks"`
-	Objects        int               `json:"objects"`
-	AliceObjects   int               `json:"alice_objects"`
-	BobObjects     int               `json:"bob_objects"`
-	CarolObjects   int               `json:"carol_objects"`
-	FrankObjects   int               `json:"frank_objects"`
-	MalloryObjects int               `json:"mallory_objects"`
-	Retrieved      int               `json:"retrieved"`
-	Missing        int               `json:"missing"`
+	RunRoot           string            `json:"run_root"`
+	Pass              bool              `json:"pass"`
+	Checks            map[string]string `json:"checks"`
+	Objects           int               `json:"objects"`
+	AliceObjects      int               `json:"alice_objects,omitempty"`
+	BobObjects        int               `json:"bob_objects,omitempty"`
+	CarolObjects      int               `json:"carol_objects,omitempty"`
+	FrankObjects      int               `json:"frank_objects,omitempty"`
+	MalloryObjects    int               `json:"mallory_objects,omitempty"`
+	Retrieved         int               `json:"retrieved,omitempty"`
+	Missing           int               `json:"missing,omitempty"`
+	CollectorEvents   int               `json:"collector_events,omitempty"`
+	CollectorMessages int               `json:"collector_messages,omitempty"`
+	CollectorCARs     int               `json:"collector_cars,omitempty"`
+}
+
+type collectorEvent struct {
+	Observer string `json:"observer"`
+	Event    string `json:"event"`
+	Outcome  string `json:"outcome"`
+	Peer     string `json:"peer,omitempty"`
+	Detail   string `json:"detail,omitempty"`
+}
+
+type collectorMessageRecord struct {
+	Source      string `json:"source"`
+	Observer    string `json:"observer"`
+	Direction   string `json:"direction"`
+	Peer        string `json:"peer"`
+	Protocol    string `json:"protocol"`
+	PromiseKind string `json:"promise_kind"`
+	ExactCID    string `json:"exact_cid"`
+	Path        string `json:"path"`
+}
+
+type collectorCARRecord struct {
+	Source     string   `json:"source"`
+	Observer   string   `json:"observer"`
+	Direction  string   `json:"direction"`
+	Peer       string   `json:"peer"`
+	MessageCID string   `json:"message_cid"`
+	CARCID     string   `json:"car_cid"`
+	BlockCIDs  []string `json:"block_cids"`
+	Path       string   `json:"path"`
 }
 
 func main() {
@@ -77,11 +114,7 @@ func main() {
 func run() error {
 	runRoot := flag.String("run-root", "/tmp/wire-lab-poc18-run", "approved POC18 runtime root")
 	flag.Parse()
-	result, resultErr := readResult(filepath.Join(*runRoot, "result.json"))
-	if resultErr != nil {
-		return resultErr
-	}
-	report, analyzeErr := analyze(*runRoot, result)
+	report, analyzeErr := analyzeRunRoot(*runRoot)
 	if analyzeErr != nil {
 		return analyzeErr
 	}
@@ -94,6 +127,23 @@ func run() error {
 		return fmt.Errorf("analysis failed")
 	}
 	return nil
+}
+
+func analyzeRunRoot(runRoot string) (Report, error) {
+	resultPath := filepath.Join(runRoot, "result.json")
+	if _, statErr := os.Stat(resultPath); statErr == nil {
+		result, resultErr := readResult(resultPath)
+		if resultErr != nil {
+			return Report{}, resultErr
+		}
+		return analyze(runRoot, result)
+	} else if !os.IsNotExist(statErr) {
+		return Report{}, statErr
+	}
+	// Intent: The same analyzer command now validates the Docker/TCP remediation
+	// path by reading only observer-collected artifacts. No agent can read this
+	// collector output during the run. Source: DI-koriz
+	return analyzeCollector(runRoot)
 }
 
 func readResult(path string) (fixtureResult, error) {
@@ -309,6 +359,7 @@ func analyze(runRoot string, result fixtureResult) (Report, error) {
 			pass = false
 		}
 	}
+
 	if result.Retrieval.AvailabilityMessageCID != "" {
 		availabilityCID, availabilityErr := store.ParseCIDText(result.Retrieval.AvailabilityMessageCID)
 		if availabilityErr != nil {
@@ -391,6 +442,250 @@ func analyze(runRoot string, result fixtureResult) (Report, error) {
 		Retrieved:      len(result.Retrieval.Retrieved),
 		Missing:        len(result.Retrieval.Missing),
 	}, nil
+}
+
+func analyzeCollector(runRoot string) (Report, error) {
+	checks := map[string]string{}
+	pass := true
+	events, eventsErr := readJSONL[collectorEvent](filepath.Join(runRoot, "events.jsonl"))
+	if eventsErr != nil {
+		return Report{}, eventsErr
+	}
+	messages, messagesErr := readJSONL[collectorMessageRecord](filepath.Join(runRoot, "message-dag.jsonl"))
+	if messagesErr != nil {
+		return Report{}, messagesErr
+	}
+	cars, carsErr := readJSONL[collectorCARRecord](filepath.Join(runRoot, "car-dag.jsonl"))
+	if carsErr != nil {
+		return Report{}, carsErr
+	}
+	if len(events) > 0 {
+		checks["collector_events"] = "kept"
+	} else {
+		checks["collector_events"] = "missing"
+		pass = false
+	}
+	if len(messages) > 0 {
+		checks["collector_message_artifacts"] = "kept"
+	} else {
+		checks["collector_message_artifacts"] = "missing"
+		pass = false
+	}
+	if len(cars) > 0 {
+		checks["collector_car_artifacts"] = "kept"
+	} else {
+		checks["collector_car_artifacts"] = "missing"
+		pass = false
+	}
+	// Intent: The collector-mode analyzer now checks the runtime signals that
+	// prove POC18's remediation is real TCP session behavior, not fixture-only
+	// object copying. These checks remain post-run diagnostics and do not become
+	// a production monitor. Source: DI-biruf
+	if requiredEventsPresent(events, checks, []string{
+		"session_opened",
+		"session_closed",
+		"exchange_started",
+		"exchange_completed",
+		"scheduler_tcp_sync",
+		"storage_payment_token_issued",
+		"storage_payment_redemption",
+		"storage_capability_token_issued",
+		"dag_closure_missing",
+		"dag_repair_completed",
+		"trust_peer_choice",
+		"workspace_scenario_rich",
+	}) {
+		checks["collector_runtime_remediation_events"] = "kept"
+	} else {
+		checks["collector_runtime_remediation_events"] = "missing"
+		pass = false
+	}
+	completedAgents := map[string]bool{}
+	agentFailures := []string{}
+	for _, event := range events {
+		if event.Event == "agent_completed" && event.Outcome == "kept" {
+			completedAgents[event.Observer] = true
+		}
+		if event.Event == "agent_failed" {
+			agentFailures = append(agentFailures, event.Observer)
+		}
+	}
+	for _, agentName := range []string{"alice", "bob", "carol", "dave", "ellen", "frank", "mallory"} {
+		checkName := "agent_completed_" + agentName
+		if completedAgents[agentName] {
+			checks[checkName] = "kept"
+		} else {
+			checks[checkName] = "missing"
+			pass = false
+		}
+	}
+	if len(agentFailures) == 0 {
+		checks["no_agent_failed_events"] = "kept"
+	} else {
+		checks["no_agent_failed_events"] = strings.Join(agentFailures, ",")
+		pass = false
+	}
+	if collectorPromiseKindsPresent(messages, checks) {
+		checks["tcp_promise_flow"] = "kept"
+	} else {
+		checks["tcp_promise_flow"] = "missing"
+		pass = false
+	}
+	if collectorDirectionsPresent(messages) {
+		checks["sent_and_received_artifacts"] = "kept"
+	} else {
+		checks["sent_and_received_artifacts"] = "missing"
+		pass = false
+	}
+	if messagesPass, verifyErr := verifyMessageArtifacts(runRoot, messages, checks); verifyErr != nil {
+		return Report{}, verifyErr
+	} else if !messagesPass {
+		pass = false
+	}
+	if carsPass, verifyErr := verifyCARArtifacts(runRoot, cars, checks); verifyErr != nil {
+		return Report{}, verifyErr
+	} else if !carsPass {
+		pass = false
+	}
+	return Report{
+		RunRoot:           runRoot,
+		Pass:              pass,
+		Checks:            checks,
+		Objects:           len(messages),
+		CollectorEvents:   len(events),
+		CollectorMessages: len(messages),
+		CollectorCARs:     len(cars),
+	}, nil
+}
+
+func requiredEventsPresent(events []collectorEvent, checks map[string]string, required []string) bool {
+	present := map[string]bool{}
+	for _, event := range events {
+		if event.Outcome == "kept" {
+			present[event.Event] = true
+		}
+	}
+	pass := true
+	for _, eventName := range required {
+		checkName := "event_" + eventName
+		if present[eventName] {
+			checks[checkName] = "kept"
+			continue
+		}
+		checks[checkName] = "missing"
+		pass = false
+	}
+	return pass
+}
+
+func collectorPromiseKindsPresent(messages []collectorMessageRecord, checks map[string]string) bool {
+	present := map[string]bool{}
+	for _, message := range messages {
+		present[message.PromiseKind] = true
+	}
+	pass := true
+	for _, promiseKind := range []string{"sync_interest", "object_availability", "object_retrieval_redemption", "object_bytes"} {
+		checkName := "promise_kind_" + promiseKind
+		if present[promiseKind] {
+			checks[checkName] = "kept"
+		} else {
+			checks[checkName] = "missing"
+			pass = false
+		}
+	}
+	return pass
+}
+
+func collectorDirectionsPresent(messages []collectorMessageRecord) bool {
+	directions := map[string]bool{}
+	for _, message := range messages {
+		directions[message.Direction] = true
+	}
+	return directions["sent"] && directions["received"]
+}
+
+func verifyMessageArtifacts(runRoot string, messages []collectorMessageRecord, checks map[string]string) (bool, error) {
+	pass := true
+	for _, message := range messages {
+		content, readErr := os.ReadFile(filepath.Join(runRoot, filepath.FromSlash(message.Path)))
+		if readErr != nil {
+			return false, readErr
+		}
+		actualCID := store.CIDText(store.CIDForBytes(content))
+		if actualCID != message.ExactCID {
+			checks["message_cid_match_"+message.ExactCID] = "missing"
+			pass = false
+			continue
+		}
+		if _, parseErr := graph.ParseEnvelope(content); parseErr != nil {
+			checks["message_parse_"+message.ExactCID] = "missing"
+			pass = false
+			continue
+		}
+		checks["message_cid_match_"+message.ExactCID] = "kept"
+	}
+	return pass, nil
+}
+
+func verifyCARArtifacts(runRoot string, cars []collectorCARRecord, checks map[string]string) (bool, error) {
+	pass := true
+	for _, carRecord := range cars {
+		content, readErr := os.ReadFile(filepath.Join(runRoot, filepath.FromSlash(carRecord.Path)))
+		if readErr != nil {
+			return false, readErr
+		}
+		actualCID := store.CIDText(store.CIDForBytes(content))
+		if actualCID != carRecord.CARCID {
+			checks["car_cid_match_"+carRecord.CARCID] = "missing"
+			pass = false
+			continue
+		}
+		if len(carRecord.BlockCIDs) == 0 {
+			checks["car_blocks_"+carRecord.CARCID] = "missing"
+			pass = false
+			continue
+		}
+		if verifyErr := carbundle.VerifyStandard(content, carRecord.BlockCIDs, carRecord.BlockCIDs); verifyErr != nil {
+			checks["car_standard_"+carRecord.CARCID] = "missing"
+			pass = false
+			continue
+		}
+		checks["car_cid_match_"+carRecord.CARCID] = "kept"
+		checks["car_standard_"+carRecord.CARCID] = "kept"
+	}
+	return pass, nil
+}
+
+func readJSONL[T any](path string) ([]T, error) {
+	file, openErr := os.Open(path)
+	if openErr != nil {
+		return nil, openErr
+	}
+	defer closeReadFile(file, path)
+	scanner := bufio.NewScanner(file)
+	scanner.Buffer(make([]byte, 1024), 32*1024*1024)
+	values := []T{}
+	for scanner.Scan() {
+		line := strings.TrimSpace(scanner.Text())
+		if line == "" {
+			continue
+		}
+		var value T
+		if unmarshalErr := json.Unmarshal([]byte(line), &value); unmarshalErr != nil {
+			return nil, unmarshalErr
+		}
+		values = append(values, value)
+	}
+	if scanErr := scanner.Err(); scanErr != nil {
+		return nil, scanErr
+	}
+	return values, nil
+}
+
+func closeReadFile(file *os.File, path string) {
+	if closeErr := file.Close(); closeErr != nil {
+		fmt.Fprintf(os.Stderr, "close %s: %v\n", path, closeErr)
+	}
 }
 
 func checkScheduledSync(result fixtureResult, bobCAS *store.FileStore, carolCAS *store.FileStore, checks map[string]string) (bool, error) {

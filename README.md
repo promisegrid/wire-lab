@@ -1,33 +1,70 @@
 # PromiseGrid Wire Lab
 
-A simulation harness for discovering the wire formats, ingress models, and trust mechanics that let [PromiseGrid](https://github.com/promisegrid/promisegrid) survive and evolve as an open, decentralized community of free agents and humans across multiple human generations.
+Wire Lab is the experimental workspace where PromiseGrid protocol, kernel,
+runtime, and application ideas are tested before they are written as guide or
+production material.
 
-The harness exists to **discover** the right design, not to validate a predetermined one. Every choice is an experimental knob the simulator can change between runs.
+PromiseGrid is a decentralized computing model based on promises between
+agents. Agents do not command each other. They make local promises, exchange
+messages, keep or break those promises, and update local trust from their own
+observations. Wire Lab exists to find the message formats and runtime patterns
+that make that practical across machines, organizations, legal entities, and
+long periods of time.
 
-## Where to read
+## Current Status
 
-At the moment, the ppx/main branch is the active development branch,
-and the main branch is a review branch. The ppx/main branch contains
-the latest code and documentation.
+The design is still provisional. The strongest current direction is:
 
-PromiseGrid Development Guide writers should start with
-[`DEV-GUIDE-RESOURCES.md`](DEV-GUIDE-RESOURCES.md). Per `DI-nunut`, the
-guide is about PromiseGrid; wire-lab is experimental design provenance,
-not the guide itself.
+- messages use compact CBOR `grid(...)` envelopes;
+- slot 0 carries `42(pCID)`, where the protocol CID identifies the protocol spec;
+- each pCID-defined spec owns the remaining slots and payload shape;
+- pCID is a protocol selector, not a peer address, message type, or operation
+  code;
+- protocol objects help agents make, recognize, remember, and evaluate promises;
+- trust is local and relationship-specific, not global;
+- CAS and parent-linked message DAGs are becoming the durable substrate for
+  storage, synchronization, collaboration, and version control.
 
-## Status
+The most recent proof-of-concept work has moved from simple message exchange to
+containerized agents communicating over TCP with exact `grid()` CBOR messages,
+signed CWT/COSE capability tokens, sparse per-agent CAS stores, CAR payloads for
+object transfer, and observer-collected raw artifacts for later review.
 
-Provisional. Almost everything in the harness-spec is an experimental knob, not a commitment.
+## What This Repo Contains
 
-## How to contribute
+- `simulations/` contains generated and hand-curated protocol experiments.
+- `implementations/` contains executable POCs that pressure-test the design.
+- `docs/` contains thought experiments, research notes, and design notes.
+- `protocols/` contains TODOs, decision records, and protocol-level planning.
+- `DEV-GUIDE-RESOURCES.md` is the source map for people writing the PromiseGrid
+  Development Guide.
 
-Current inter-agent and interpersonal communication evidence lives in the
-`wire-lab-devs` lineage at
-`simulations/SIM-ludut-wire-lab-devs/world/transports/wire-lab-devs-draft/`.
-Earlier mixed-simulation and root-path records are preserved under rooted
-archive/provenance paths; use `DEV-GUIDE-RESOURCES.md` for the current
-guide-writer source map.
+## Lessons From The POCs
+
+The POCs have repeatedly pushed the design away from RPC and command/control
+systems. The durable pattern is promise-first:
+
+- an agent promises what it is willing to do;
+- another agent decides locally whether to rely on that promise;
+- exact message bytes and CIDs make the promise auditable later;
+- capability tokens are signed promises, not permissions from a central
+  authority;
+- sparse CAS stores let each agent retain only the objects it chooses to retain;
+- observer and analyzer tools are test machinery, not production monitors or
+  trust authorities.
+
+POC18 is currently exploring whether PromiseGrid CAS, parent-linked grid
+messages, reference-set promises, and continuous peer sync can become a
+Git/GitHub replacement that also works for large files, issue/review flows,
+DevOps-style filesystem management, and future LLM-scale collaboration.
+
+## Where To Read Next
+
+Start with `DEV-GUIDE-RESOURCES.md` for the current design state and links to
+the relevant DIs, TEs, TODOs, design notes, and POC outputs. Detailed technical
+material belongs there and in the linked docs; this README is only the plain
+English orientation.
 
 ## License
 
-GPL-3.0, matching the rest of [PromiseGrid](https://github.com/promisegrid/promisegrid).
+GPL-3.0, matching the rest of PromiseGrid.

@@ -223,6 +223,24 @@ Intent: POC18 needs to move beyond a hand-called fixture loop without prematurel
 Constraints: Do not start sync behavior from `grid status`, `grid log`, `grid diag`, or other non-sync commands; do not implement a real OS daemon, socket listener, global trust service, push/pull remote, branch authority, RPC endpoint, or global exchange in this slice; use deterministic local state and fixture inputs; store sync-agent checkpoints under `.grid/sync/state.json` for CLI tests and under `/tmp/wire-lab-poc18-*` for fixture runs; keep token claims COSE/CWT-style and exact-CID-addressed; preserve CIDv1 base32 printable rendering; keep pCID as protocol selector only.
 Affects: implementations/poc18-cas-git-replacement/sync/; implementations/poc18-cas-git-replacement/economy/; implementations/poc18-cas-git-replacement/cmd/grid/; implementations/poc18-cas-git-replacement/cmd/poc-sim/; implementations/poc18-cas-git-replacement/cmd/poc-analyze/; implementations/poc18-cas-git-replacement/repo/; DEV-GUIDE-RESOURCES.md; protocols/wire-lab.d/TODO/TODO-nahop-poc18-cas-git-replacement.md.
 
+ID: DI-koriz
+Date: 2026-07-06 18:28:19 PDT
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Retrofit POC18 so all inter-agent communication in claimed agent flows occurs as promise-shaped `grid()` CBOR messages over TCP between Docker agent containers. POC18 must adopt a POC16-style microkernel/supervisor runtime and observer collector architecture: each agent has its own container-local CAS and runtime, the observer receives only out-of-band message artifacts from supervisors, and the collector/analyzer must preserve exact grid messages and embedded CAR payload artifacts for review.
+Intent: The prior POC18 fixture incorrectly simulated agent communication by passing peer CAS handles inside one process. That is not acceptable for PromiseGrid work: agents must exchange voluntary promises over TCP, and no container may gain peer objects through shared fixture state. The observer architecture should improve reviewability without becoming part of the PromiseGrid communication path.
+Constraints: Commit the existing scheduler/economy checkpoint before remediation; retrofit POC18 rather than deferring to POC19; use Docker agent containers; local seeding is allowed only for an agent's own workspace/CAS; all cross-agent objects must arrive through TCP-carried promise messages; use signed CWT/COSE `object_retrieval_capability` tokens; represent object delivery as Bob's `object_bytes` promise carrying CARv1 bytes after Carol redeems the retrieval capability and satisfies local conditions; keep existing `cmd/poc-analyze` and `cmd/poc-cbor-diag` names while adding `cmd/poc-agent` and `cmd/poc-event-collector`; fail analyzer gates when cross-agent CAS bypass remains.
+Affects: implementations/poc18-cas-git-replacement/transport/; implementations/poc18-cas-git-replacement/eventstream/; implementations/poc18-cas-git-replacement/agent/; implementations/poc18-cas-git-replacement/sync/; implementations/poc18-cas-git-replacement/cmd/poc-agent/; implementations/poc18-cas-git-replacement/cmd/poc-event-collector/; implementations/poc18-cas-git-replacement/cmd/poc-analyze/; implementations/poc18-cas-git-replacement/cmd/poc-sim/; implementations/poc18-cas-git-replacement/compose.yaml; implementations/poc18-cas-git-replacement/scripts/run-clean.sh; DEV-GUIDE-RESOURCES.md; protocols/wire-lab.d/TODO/TODO-nahop-poc18-cas-git-replacement.md.
+
+ID: DI-biruf
+Date: 2026-07-07 12:10:19 PDT
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Complete the current POC18 TCP remediation follow-up as one commit: update the root README to current plain-English project status; replace stale collector analyzer fields with collector-native metrics and gates; explicitly verify CAR payloads with the Go CAR library; make TCP sessions persistent and multiplex multiple named exchanges on one connection; move scheduler-style peer sync into the TCP agent flow; carry signed CWT/COSE storage/forwarding payment tokens over TCP; repair missing parent DAG objects over TCP; choose peers from local trust evidence; and enrich the workspace object graph enough for review.
+Intent: The first Docker/TCP remediation proved that agents could exchange promise-shaped messages over TCP, but the next slice must close the main credibility gaps before committing it as the new POC18 baseline. The run needs to prove that the collector sees exact artifacts through the observer path, that CAR bytes are standard-readable, that persistent connections can carry more than one promise exchange, that economics and missing-object repair occur over TCP rather than fixture shortcuts, and that the public README no longer points readers at obsolete branch/process information.
+Constraints: Preserve `DI-koriz`'s no-shared-CAS rule; keep observer data one-way and non-authoritative; use `Session` and `ExchangeID` naming for persistent/multiplexed TCP behavior; do not introduce native Git push/pull as PromiseGrid sync; do not treat pCID as an address or operation code; keep all runtime artifacts under `/tmp/wire-lab-poc18-run` and Docker-local agent CAS paths; use `github.com/ipld/go-car/v2` only for CAR validation, not as an authority over PromiseGrid message semantics; keep this slice in one final commit.
+Affects: README.md; DEV-GUIDE-RESOURCES.md; implementations/poc18-cas-git-replacement/agent/; implementations/poc18-cas-git-replacement/carbundle/; implementations/poc18-cas-git-replacement/cmd/poc-analyze/; implementations/poc18-cas-git-replacement/cmd/poc-event-collector/; implementations/poc18-cas-git-replacement/eventstream/; implementations/poc18-cas-git-replacement/economy/; implementations/poc18-cas-git-replacement/scripts/run-clean.sh; implementations/poc18-cas-git-replacement/go.mod; implementations/poc18-cas-git-replacement/go.sum; protocols/wire-lab.d/TODO/TODO-nahop-poc18-cas-git-replacement.md.
+
 ## Core Hypothesis
 
 POC18 should test this hypothesis:
@@ -782,3 +800,50 @@ Remaining:
   - [x] nahop.33.4 Refine `grid status` so tracking policy changes appear
     immediately with separate content and tracked-status difference flags.
     Source: `DI-tuhoj`.
+- [x] nahop.35 Retrofit POC18 inter-agent flows onto Docker TCP agents and
+  observer-collected raw artifacts. Source: `DI-koriz`.
+  Completed by the Docker TCP remediation slice: Alice seeds and serves her own
+  CAS; Bob retrieves Alice's latest snapshot over TCP; Carol retrieves Bob's
+  latest snapshot over TCP; Dave retrieves from Bob and records a local
+  `merge_snapshot`; Ellen retrieves from Dave and records a local
+  `review_statement`; Frank retrieves from Alice and records paid retention;
+  Mallory remains idle and never receives cross-agent CAS state. Each
+  cross-agent retrieval uses `sync_interest`, `object_availability` plus a
+  signed retrieval capability, `object_retrieval_redemption`, and `object_bytes`
+  carrying a CARv1 bundle. The observer receives exact artifacts out-of-band
+  from supervisors only; analyzer gates require those artifacts and reject
+  missing TCP provenance.
+  - [x] nahop.35.1 Add POC18-local framed TCP transport and observer eventstream.
+  - [x] nahop.35.2 Add Docker agent and event collector commands.
+  - [x] nahop.35.3 Replace cross-agent CAS fixture transfer with TCP-carried
+    `object_availability`, `object_retrieval_capability`,
+    `object_retrieval_redemption`, and `object_bytes` promises.
+  - [x] nahop.35.4 Carry object bytes in CARv1 payloads and verify exact CIDs
+    before local CAS storage.
+  - [x] nahop.35.5 Preserve exact grid message and CAR artifacts through the
+    observer-only collector.
+  - [x] nahop.35.6 Add analyzer gates that fail on cross-agent CAS bypass and
+    missing TCP artifact provenance.
+  - [x] nahop.35.7 Run Docker clean regression and document the resulting
+    agent-to-agent message sequence.
+- [x] nahop.36 Complete the POC18 TCP remediation follow-up as one final commit.
+  Source: `DI-biruf`.
+  - [x] nahop.36.1 Update `README.md` to current plain-English project status
+    and remove obsolete branch/process references.
+  - [x] nahop.36.2 Replace stale collector analyzer fields with
+    collector-native message, CAR, event, and sequence gates.
+  - [x] nahop.36.3 Verify collected CAR payloads with `github.com/ipld/go-car/v2`
+    in addition to POC18's exact-CID checks.
+  - [x] nahop.36.4 Add persistent TCP `Session` behavior with named
+    multiplexed `ExchangeID` conversations.
+  - [x] nahop.36.5 Move scheduler-style continuous sync into real TCP exchanges
+    and prove local trust-based peer choice.
+  - [x] nahop.36.6 Carry signed CWT/COSE storage/forwarding economics through
+    TCP promise messages and redeem them locally.
+  - [x] nahop.36.7 Detect missing parent links from received graph messages and
+    repair the DAG by requesting missing parent objects over TCP.
+  - [x] nahop.36.8 Enrich Alice's workspace seed graph so the TCP run transfers
+    more than a trivial snapshot.
+  - [x] nahop.36.9 Run `go test ./...`, `errcheck ./...`, and
+    `./scripts/run-clean.sh`; archive diagnostic output under the approved
+    `/tmp/wire-lab-poc18-run` pattern.

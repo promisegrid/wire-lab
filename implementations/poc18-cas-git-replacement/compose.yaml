@@ -1,0 +1,218 @@
+x-poc18-runtime-user: &poc18-runtime-user
+  user: "${POC18_UID:-1000}:${POC18_GID:-1000}"
+
+services:
+  event-collector:
+    <<: *poc18-runtime-user
+    build: .
+    entrypoint: ["/usr/local/bin/poc-event-collector"]
+    command: ["-listen", ":9200", "-run-root", "/run/poc18", "-run-id", "poc18-demo", "-expected", "7", "-timeout", "45s"]
+    networks: [poc18]
+    volumes:
+      - ${POC18_RUN_ROOT:-/tmp/wire-lab-poc18-run}/observer:/run/poc18
+
+  alice:
+    <<: *poc18-runtime-user
+    build: .
+    command:
+      - "-agent"
+      - "alice"
+      - "-listen"
+      - ":9101"
+      - "-cas"
+      - "/tmp/poc18/alice-cas"
+      - "-collector"
+      - "event-collector:9200"
+      - "-peer"
+      - "alice=alice:9101"
+      - "-peer"
+      - "bob=bob:9102"
+      - "-peer"
+      - "carol=carol:9103"
+      - "-peer"
+      - "dave=dave:9104"
+      - "-peer"
+      - "ellen=ellen:9105"
+      - "-peer"
+      - "frank=frank:9106"
+      - "-peer"
+      - "mallory=mallory:9107"
+    depends_on: [event-collector]
+    networks: [poc18]
+
+  bob:
+    <<: *poc18-runtime-user
+    build: .
+    command:
+      - "-agent"
+      - "bob"
+      - "-listen"
+      - ":9102"
+      - "-cas"
+      - "/tmp/poc18/bob-cas"
+      - "-collector"
+      - "event-collector:9200"
+      - "-peer"
+      - "alice=alice:9101"
+      - "-peer"
+      - "bob=bob:9102"
+      - "-peer"
+      - "carol=carol:9103"
+      - "-peer"
+      - "dave=dave:9104"
+      - "-peer"
+      - "ellen=ellen:9105"
+      - "-peer"
+      - "frank=frank:9106"
+      - "-peer"
+      - "mallory=mallory:9107"
+    depends_on: [event-collector, alice]
+    networks: [poc18]
+
+  carol:
+    <<: *poc18-runtime-user
+    build: .
+    command:
+      - "-agent"
+      - "carol"
+      - "-listen"
+      - ":9103"
+      - "-cas"
+      - "/tmp/poc18/carol-cas"
+      - "-collector"
+      - "event-collector:9200"
+      - "-peer"
+      - "alice=alice:9101"
+      - "-peer"
+      - "bob=bob:9102"
+      - "-peer"
+      - "carol=carol:9103"
+      - "-peer"
+      - "dave=dave:9104"
+      - "-peer"
+      - "ellen=ellen:9105"
+      - "-peer"
+      - "frank=frank:9106"
+      - "-peer"
+      - "mallory=mallory:9107"
+    depends_on: [event-collector, bob]
+    networks: [poc18]
+
+  dave:
+    <<: *poc18-runtime-user
+    build: .
+    command:
+      - "-agent"
+      - "dave"
+      - "-listen"
+      - ":9104"
+      - "-cas"
+      - "/tmp/poc18/dave-cas"
+      - "-collector"
+      - "event-collector:9200"
+      - "-peer"
+      - "alice=alice:9101"
+      - "-peer"
+      - "bob=bob:9102"
+      - "-peer"
+      - "carol=carol:9103"
+      - "-peer"
+      - "dave=dave:9104"
+      - "-peer"
+      - "ellen=ellen:9105"
+      - "-peer"
+      - "frank=frank:9106"
+      - "-peer"
+      - "mallory=mallory:9107"
+    depends_on: [event-collector, bob]
+    networks: [poc18]
+
+  ellen:
+    <<: *poc18-runtime-user
+    build: .
+    command:
+      - "-agent"
+      - "ellen"
+      - "-listen"
+      - ":9105"
+      - "-cas"
+      - "/tmp/poc18/ellen-cas"
+      - "-collector"
+      - "event-collector:9200"
+      - "-peer"
+      - "alice=alice:9101"
+      - "-peer"
+      - "bob=bob:9102"
+      - "-peer"
+      - "carol=carol:9103"
+      - "-peer"
+      - "dave=dave:9104"
+      - "-peer"
+      - "ellen=ellen:9105"
+      - "-peer"
+      - "frank=frank:9106"
+      - "-peer"
+      - "mallory=mallory:9107"
+    depends_on: [event-collector, dave]
+    networks: [poc18]
+
+  frank:
+    <<: *poc18-runtime-user
+    build: .
+    command:
+      - "-agent"
+      - "frank"
+      - "-listen"
+      - ":9106"
+      - "-cas"
+      - "/tmp/poc18/frank-cas"
+      - "-collector"
+      - "event-collector:9200"
+      - "-peer"
+      - "alice=alice:9101"
+      - "-peer"
+      - "bob=bob:9102"
+      - "-peer"
+      - "carol=carol:9103"
+      - "-peer"
+      - "dave=dave:9104"
+      - "-peer"
+      - "ellen=ellen:9105"
+      - "-peer"
+      - "frank=frank:9106"
+      - "-peer"
+      - "mallory=mallory:9107"
+    depends_on: [event-collector, alice]
+    networks: [poc18]
+
+  mallory:
+    <<: *poc18-runtime-user
+    build: .
+    command:
+      - "-agent"
+      - "mallory"
+      - "-listen"
+      - ":9107"
+      - "-cas"
+      - "/tmp/poc18/mallory-cas"
+      - "-collector"
+      - "event-collector:9200"
+      - "-peer"
+      - "alice=alice:9101"
+      - "-peer"
+      - "bob=bob:9102"
+      - "-peer"
+      - "carol=carol:9103"
+      - "-peer"
+      - "dave=dave:9104"
+      - "-peer"
+      - "ellen=ellen:9105"
+      - "-peer"
+      - "frank=frank:9106"
+      - "-peer"
+      - "mallory=mallory:9107"
+    depends_on: [event-collector]
+    networks: [poc18]
+
+networks:
+  poc18:
