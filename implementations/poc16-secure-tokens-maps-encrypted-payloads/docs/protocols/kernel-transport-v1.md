@@ -107,8 +107,8 @@ relationship trust.
 
 The base64 envelope is untrusted until parsed, verified, and hash-checked. A
 parser that lies about `target_exact_cid` receives local non-commitment. The
-kernel must avoid becoming an authority-like payload router; only the parser role
-understands application payload addressing.
+kernel preserves voluntary local-promise routing by delegating application
+payload addressing to the parser role.
 
 ## Interoperability notes
 

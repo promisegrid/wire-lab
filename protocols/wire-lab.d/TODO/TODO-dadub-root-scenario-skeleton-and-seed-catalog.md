@@ -340,8 +340,9 @@ Affects: `scenarios/atproto-repo-car-interop/atproto-repo-car-interop.md`;
   root `scenarios/` and `results/` skeletons exist, so readers know where
   cross-sim scenario matrices and run evidence live. Done under `DI-dimas`.
 - [x] dadub.9 Validate that every root scenario entry preserves provenance,
-  avoids direct design authority claims, has a stable kebab-case entry ID, and
-  addresses the overarching PromiseGrid goal checks from `DI-botup`. Done for
+  avoids treating a design as able to command other agents, has a stable
+  kebab-case entry ID, and addresses the overarching PromiseGrid goal checks from
+  `DI-botup`. Done for
   mined entries under `DI-nanih` and application seed entries under `DI-midif`.
 - [x] dadub.10 Run stale-layout checks for old one-file-per-cell result paths and
   run `git diff --check`. Done for the scenario population passes under

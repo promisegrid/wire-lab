@@ -58,7 +58,7 @@ func Analyze(runDir string) (Summary, error) {
 		if event.PCID == protocol.LocalLifecycleV1PCID && event.Transport == "simulated_lora" {
 			return Summary{}, fmt.Errorf("local lifecycle token appeared on simulated LoRa path")
 		}
-		if err := gates.checkNoAuthorityDrift(event); err != nil {
+		if err := gates.checkVoluntaryPromiseFraming(event); err != nil {
 			return Summary{}, err
 		}
 		if strings.Contains(strings.ToLower(fmt.Sprint(event.Details)), "sigterm") || strings.Contains(strings.ToLower(fmt.Sprint(event.Details)), "sigkill") {
@@ -444,7 +444,11 @@ func (g *gateState) notePeerStorage(event artifact.Event, index int) error {
 	return nil
 }
 
-func (g *gateState) checkNoAuthorityDrift(event artifact.Event) error {
+// checkVoluntaryPromiseFraming keeps analyzer diagnostics aligned with the
+// positive PromiseGrid vocabulary: voluntary cooperation, local trust, and
+// decentralized resilience. Intent: Reject command/control wording without
+// framing PromiseGrid itself around what it opposes. Source: DI-ruhin
+func (g *gateState) checkVoluntaryPromiseFraming(event artifact.Event) error {
 	if event.Transport != "" && event.Transport != "simulated_lora" {
 		if event.Transport != "host_local" {
 			return fmt.Errorf("unexpected transport %q on %s", event.Transport, event.Type)
@@ -452,9 +456,9 @@ func (g *gateState) checkNoAuthorityDrift(event artifact.Event) error {
 	}
 	for _, text := range eventStrings(event) {
 		lower := strings.ToLower(text)
-		for _, forbidden := range []string{"host bridge", "global trust", "authorization service", "permission service", "command authority", "monitor authority", "rpc controller"} {
+		for _, forbidden := range []string{"host bridge", "global trust", "authorization service", "permission service", "command controller", "monitor controller", "rpc controller"} {
 			if strings.Contains(lower, forbidden) {
-				return fmt.Errorf("authority-drift wording %q in %s", forbidden, event.Type)
+				return fmt.Errorf("voluntary-promise framing violation %q in %s", forbidden, event.Type)
 			}
 		}
 	}

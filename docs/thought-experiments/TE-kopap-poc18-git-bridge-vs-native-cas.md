@@ -1,5 +1,13 @@
 # TE-kopap: POC18 Git bridge versus native CAS architecture
 
+## Cat-2 Vocabulary Update
+
+2026-07-07 vocabulary update per `DI-ruhin`: replace negative shorthand with
+positive PromiseGrid language about voluntary cooperation, promise-based local
+trust, decentralization, resilience, and community-scale interoperability. The
+following DIs in this file are unchanged in meaning: `DI-dibut`, `DI-dofoj`,
+`DI-radaj`, `DI-zuruj`.
+
 ## TE ID
 
 TE-kopap
@@ -188,7 +196,8 @@ CAS objects. Grace has some chunks, Bob has the snapshot object, and Alice has
 the root reference set.
 
 - Alt A naturally asks a Git remote for missing objects, which re-centers the
-  remote as an authority-like source.
+  remote as the source of truth rather than one peer in a voluntary sync
+  community.
 - Alt B naturally lets Frank ask peers for missing CIDs and retain only what he
   locally chooses to keep.
 - Alt C uses the native sparse CAS behavior for PromiseGrid peers and uses Git

@@ -198,6 +198,29 @@ Affects: `protocols/wire-lab.d/TODO/TODO-lugag-promise-theory-ga-prompt-scenario
 `simulations/SIM-lurip-capability-promise-token-payload/`
 Supersedes: DI-gobul for the narrower hadit/jogoh follow-up only.
 
+ID: DI-ruhin
+Date: 2026-07-07 14:21:23
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Replace negative shorthand about rejected control models with
+positive PromiseGrid vocabulary: voluntary cooperation, promise-based local
+trust, decentralization, resilience, and community-scale interoperability.
+Intent: Future docs, TODOs, prompts, analyzers, and examples should describe
+what PromiseGrid is building rather than centering language around what it
+opposes. The positive framing is more accurate: agents cooperate voluntarily,
+trust remains local and relationship-specific, communities can converge on
+shared practices without global control, and resilient systems emerge from
+promises that agents can keep, break, remember, and locally evaluate.
+Constraints: Do not rewrite generated result evidence in place. Do not erase
+legitimate historical discussion of legal, organizational, or decision
+authority where that is the subject under analysis. Active docs, TODOs, code
+comments, diagnostics, and prompt text should avoid the old negative shorthand
+and use constructive PromiseGrid vocabulary instead.
+Affects: `protocols/wire-lab.d/TODO/TODO-lugag-promise-theory-ga-prompt-scenario-and-rescore-correction.md`;
+active `docs/`; active `protocols/wire-lab.d/TODO/`; active
+`implementations/`; active `tools/ga-runner/`; `DEV-GUIDE-RESOURCES.md`;
+`simulations/README.md`.
+
 ## Scope
 
 This TODO covers:
@@ -247,9 +270,9 @@ thinking.
   storage, computation, result return, refusal, and trust updates.
 - The TODO does not yet explicitly elevate Burgess's basic PT rules into a
   canonical checklist for GA prompts, rubrics, and later code.
-- The current plan is suspicious of authority-style language, but does not yet
-  say clearly enough that impositions, conformance claims, and other
-  non-voluntary cooperation patterns should score poorly unless decomposed into
+- The current plan is suspicious of non-voluntary cooperation language, but does
+  not yet say clearly enough that impositions, conformance claims, and other
+  command/control cooperation patterns should score poorly unless decomposed into
   autonomous promises and local assessments.
 - The culled `hadit` and `jogoh` children preserved useful signed-refusal,
   exact-byte evidence, freeze, transfer, and capability pressure, but encoded
@@ -307,8 +330,8 @@ thinking.
 - [ ] lugag.6 Harden the scorer rubric and penalties. Make
   `promise_vocabulary` close to a correctness axis rather than a soft style
   preference; make high `promisegrid_alignment` impossible unless the PT gate is
-  clean; severely penalize external-authority language unless the scorer
-  explains the local-promise interpretation; and penalize designs that treat
+  clean; severely penalize command/control language unless the scorer explains
+  the local-promise interpretation; and penalize designs that treat
   storage or computation as neutral service calls rather than promises between
   agents with local trust consequences. Add concise references to Burgess's PT
   writings in the rubric so the scoring model is reminded of the governing

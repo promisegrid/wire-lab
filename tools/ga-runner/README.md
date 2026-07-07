@@ -121,7 +121,7 @@ metadata after each cell. New score runs write
 and adds `envelope_discipline`, `kernel_implementation_promises`, and
 `app_protocol_promise_semantics` for layer-aware scoring. The V4 scorer also
 penalizes RPC dispatcher, service-registry, capability-table, dispatch
-authorization, kernel-conformance-authority framing, and spurious
+authorization, kernel-conformance-as-control framing, and spurious
 workflow-specific action kinds unless the design recasts that machinery as
 voluntary local promises with pCID-defined payload semantics. Observation is a
 promise about local observation; refusal is promise absence or a promise about

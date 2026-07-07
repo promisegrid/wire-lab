@@ -222,7 +222,8 @@ Affects: `docs/thought-experiments/TE-ragin-kernel-resource-protection-capabilit
   at `DN-lujad` and remains evidence rather than final PromiseGrid API.
 - [ ] binag.13 Validate after canary review and DR decision: search for stale
   unresolved `needs DF` language in kernel docs, run `git diff --check`, search
-  for authority drift, and verify no deleted false-split reference IDs remain.
+  for drift away from voluntary local promises, and verify no deleted
+  false-split reference IDs remain.
 - [ ] binag.14 Commit with explicit file staging and an AGENTS-compliant body
   after final validation.
 - [x] binag.15 Fold POC12 printer-port evidence into the non-monolithic

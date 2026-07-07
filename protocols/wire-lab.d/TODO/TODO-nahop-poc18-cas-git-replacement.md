@@ -735,7 +735,7 @@ Remaining:
   integrity, reference-set signatures, multi-target labels, directory labels,
   logical-change reference sets, POSIX inode type coverage, continuous sync,
   Rabin chunking for large in-band files, Git bridge roundtrip, GC behavior, and
-  anti-authority vocabulary.
+  voluntary-cooperation and promise-based local-trust vocabulary.
 - [ ] nahop.21 Add diagnostic rendering of representative raw CBOR messages for
   reference-set, node-version, directory, snapshot, review, merge,
   materialization, and peer-fetch flows.

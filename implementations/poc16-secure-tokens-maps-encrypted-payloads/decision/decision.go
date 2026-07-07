@@ -90,8 +90,8 @@ type Monitor interface {
 
 // ValidatePromiseDecision normalizes one live or fake LLM decision.
 // Intent: POC16 tests autonomy without letting the model expand the protocol
-// action vocabulary back into authority-like verbs or authority claims. Source:
-// DI-timah; DI-punib
+// action vocabulary back into command/control verbs or centralized-trust claims.
+// Source: DI-timah; DI-punib; DI-ruhin
 func ValidatePromiseDecision(decision PromiseDecision, directPeers []string) (PromiseDecision, error) {
 	return ValidateObservedPromiseDecision(decision, Observation{DirectPeers: directPeers})
 }
@@ -124,15 +124,15 @@ func ValidateObservedPromiseDecision(decision PromiseDecision, observation Obser
 		return PromiseDecision{}, fmt.Errorf("promise text is required")
 	}
 	if containsForbiddenIntent(decision) {
-		return PromiseDecision{}, fmt.Errorf("decision contains authority-like, byte-forging, or prompt-injection wording")
+		return PromiseDecision{}, fmt.Errorf("decision contains command/control, byte-forging, or prompt-injection wording")
 	}
 	return decision, nil
 }
 
 // RepairPromiseDecision makes one bounded local repair attempt for common live
 // LLM formatting mistakes. Intent: Improve POC16 protocol hygiene without
-// broadening the single top-level promise action or accepting authority-like
-// wording. Source: DI-timah; DI-punib
+// broadening the single top-level promise action or accepting command/control
+// wording. Source: DI-timah; DI-punib; DI-ruhin
 func RepairPromiseDecision(rawDecision PromiseDecision, observation Observation, validationErr error) (PromiseDecision, bool, error) {
 	repairedDecision := rawDecision
 	if repairedDecision.Fields == nil {

@@ -65,7 +65,7 @@ evidence without silently re-entering default GA parent selection.
 | Predecessor | Successor simulation | PT-clean rewrite focus |
 |---|---|---|
 | `SIM-gibut-conditional-release-group-session-local/` | `SIM-fonom-conditional-release-selective-send-onward-promises/` | Replace session-local policy framing with selective sending plus onward-handling promises |
-| `SIM-savak-scoped-claim-card-audit-ledger/` | `SIM-vuliv-scoped-promise-evidence-records/` | Replace claim-card authority framing with scoped promise/evidence records |
+| `SIM-savak-scoped-claim-card-audit-ledger/` | `SIM-vuliv-scoped-promise-evidence-records/` | Replace claim-card control framing with scoped promise/evidence records |
 | `SIM-tizad-scoped-conformance-citation-ledger/` | `SIM-konit-pcid-promise-evidence-index/` | Replace conformance-ledger framing with pCID-scoped promise/evidence indexing |
 | `SIM-janov-grid-envelope-layer-pcid-nested-signed-payload/` | `SIM-pobod-grid-envelope-outer-promise-nested-signed-payload/` | Make the outer-layer promise explicit in the nested signed-payload envelope |
 | `SIM-sajar-grid-envelope-variable-arity-pcid-defined-fields/` | `SIM-dutam-grid-envelope-fixed-header-variable-body/` | Replace fully variable outer arity with a fixed header plus variable body |

@@ -135,9 +135,9 @@ POC18 should include these requirements before implementation locks:
   compatibility artifacts.
 - A discovery/read-model story that can look appview-like for users but is still
   local, sparse, and promise-relative.
-- Analyzer gates that reject authority drift: no global forge, appview, role
-  permission service, merge authority, branch authority, tag authority, or Git
-  remote as the PromiseGrid source of truth.
+- Analyzer gates that preserve voluntary, decentralized collaboration: no
+  global forge, appview, role permission service, merge controller, branch
+  controller, tag controller, or Git remote as the PromiseGrid source of truth.
 - Scenario coverage for Alice, Bob, Carol, and Dave collaborating through sparse
   CAS peers where they do not all share the same complete repository view.
 

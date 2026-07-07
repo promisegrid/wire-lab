@@ -32,14 +32,14 @@ func TestValidatePromiseDecisionRejectsSpuriousActionKind(t *testing.T) {
 	}
 }
 
-func TestValidatePromiseDecisionRejectsAuthorityLanguage(t *testing.T) {
+func TestValidatePromiseDecisionRejectsCommandControlLanguage(t *testing.T) {
 	_, err := ValidatePromiseDecision(PromiseDecision{
 		Act:     ActPromise,
 		Target:  "bob",
 		Promise: "Alice promises to authorize Bob's access.",
 	}, []string{"bob"})
 	if err == nil {
-		t.Fatalf("authority language should be rejected")
+		t.Fatalf("command/control language should be rejected")
 	}
 }
 

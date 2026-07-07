@@ -56,7 +56,7 @@ ID: DI-zidaf
 Date: 2026-06-23 13:56:45 PDT
 Status: active
 Decision: Steve acknowledged the POC17 Codex handoff bootstrap and authorized marking `komon.14` complete.
-Intent: POC17 implementation work may proceed only after the bootstrap constraints are acknowledged. The acknowledgment confirms the next POC17 operator must preserve radio-only transport for the simulated M4 agent, passive harness behavior, no hidden host bridge, no authority drift, `bintags` as prior-art vocabulary rather than runtime or wire format, and the Go-first/Rust-Renode-later simulator sequence.
+Intent: POC17 implementation work may proceed only after the bootstrap constraints are acknowledged. The acknowledgment confirms the next POC17 operator must preserve radio-only transport for the simulated M4 agent, passive harness behavior, no hidden host bridge, voluntary local-promise framing, `bintags` as prior-art vocabulary rather than runtime or wire format, and the Go-first/Rust-Renode-later simulator sequence.
 Constraints: This acknowledgment does not approve scaffolding paths, package names, command names, runtime-generated paths, or remaining implementation details; those still belong to later DF/DI work, especially `komon.3` and `komon.4`.
 Affects: protocols/wire-lab.d/TODO/TODO-komon-poc17-m4-lora-runtime.md; future implementations/poc17-m4-lora-runtime/.
 
@@ -97,7 +97,7 @@ Date: 2026-06-25 14:46:55 PDT
 Status: active
 Author: stevegt@t7a.org (Steve Traugott)
 Decision: POC17 must inherit the POC16 supervisor/resource-protection model and CWT/COSE lifecycle-token discipline unless a later scoped DI explicitly exempts a constrained M4/LoRa path.
-Intent: The POC16 shutdown fix reframed local process control as PromiseGrid lifecycle promises instead of supervisor command/control. POC17 should not regress by using hidden SIGTERM-first behavior, custom opaque token shortcuts, or authority-like supervisor language. A local supervisor or resource allocator may protect local CPU, RAM, process lifetime, radio, flash, and energy resources, but it does so as a local kernel role that promises bounded access and later withdraws local access if an app or role breaks its reciprocal promise.
+Intent: The POC16 shutdown fix reframed local process control as PromiseGrid lifecycle promises instead of supervisor command/control. POC17 should not regress by using hidden SIGTERM-first behavior, custom opaque token shortcuts, or supervisor language that obscures voluntary local lifecycle promises. A local supervisor or resource allocator may protect local CPU, RAM, process lifetime, radio, flash, and energy resources, but it does so as a local kernel role that promises bounded access and later withdraws local access if an app or role breaks its reciprocal promise.
 Constraints: Treat the supervisor as local, not global; do not let supervisor events become peer-trust authority; use signed CWT payloads protected by COSE_Sign1 for lifecycle/resource tokens where practical; use a well-known COSE/CWT library for host-side token creation and verification; if a constrained M4/LoRa path cannot afford full CWT/COSE bytes or verification, record a separate DR/DI for a constrained profile instead of silently falling back to opaque custom tokens; keep COSE token signatures inside the token rather than adding a redundant universal envelope proof slot; preserve binary CID bytes on wire and base32 CID text when printable; coordinate with `zugok.39` before claiming token convergence.
 Affects: protocols/wire-lab.d/TODO/TODO-komon-poc17-m4-lora-runtime.md; protocols/wire-lab.d/TODO/TODO-zugok-poc16-secure-tokens-maps-encrypted-payloads.md; implementations/poc17-m4-lora-runtime/; implementations/poc16-secure-tokens-maps-encrypted-payloads/docs/protocols/local-lifecycle-v1.md; docs/thought-experiments/TE-ragin-kernel-resource-protection-capability-promises.md; docs/research/DN-lujad-promisegrid-kernel-role-profile.md.
 
@@ -257,8 +257,9 @@ Affects: docs/thought-experiments/TE-juhah-poc17-rust-renode-fidelity-roadmap.md
 - Count pCID-owned payload coverage for the small-device protocols.
 - Count local sparse CAS stores, missing parents, retained objects, and GC
   removals.
-- Gate against authority drift: no command/control, permission, authorization,
-  global trust, global registry, or monitor-as-authority language.
+- Gate for voluntary cooperation and local trust: no command/control,
+  permission, authorization, global trust, global registry, or monitor language
+  that implies a global judge.
 - Gate simulator honesty: distinguish exact modeled behavior, approximate
   modeled behavior, diagnostics-only behavior, and not-yet-modeled hardware
   behavior.
@@ -552,10 +553,10 @@ This section is the starting context for the next Codex operator. Complete
   in protocol tests and clean-run analyzer gates. Source: `DI-zopub`.
 - [x] komon.23 Add resource-protection cases where a local kernel role withdraws
   CPU/process/radio/flash/RAM/energy access after a broken or timed-out local
-  promise without treating that local withdrawal as command authority or global
-  peer-trust evidence. Source: `TE-ragin`; `DN-lujad`; `DI-fohop`. Implemented
-  as host-local resource withdrawal evidence with explicit non-authority and
-  non-peer-trust markers. Source: `DI-zopub`.
+  promise without treating that local withdrawal as peer command/control or
+  global peer-trust evidence. Source: `TE-ragin`; `DN-lujad`; `DI-fohop`.
+  Implemented as host-local resource withdrawal evidence with explicit local
+  promise and non-peer-trust markers. Source: `DI-zopub`.
 - [x] komon.24 Add explicit resource-limit snapshots, fresh-agent restart
   recovery, and radio-visible `peer_storage` put/get promises with Bob-issued
   compact capability tokens. Implemented by `DI-gidul`: Bob grants Ivan a token,
@@ -610,11 +611,12 @@ This section is the starting context for the next Codex operator. Complete
   Source: `DI-togag`; `TE-juhah`.
 - [x] komon.11 Add analyzer gates proving radio-only transport, exact CBOR
   artifacts, pCID-owned payloads, sparse CAS behavior, failure handling, and
-  no authority drift. Implemented as cross-event gates for simulated-LoRa-only
+  voluntary local-promise framing. Implemented as cross-event gates for
+  simulated-LoRa-only
   send/receive paths, exact artifact CID and binary slot-0 pCID validation,
   bintags-shaped order-status MSG/ACK flow, peer_storage grant/put/ack/get/
   fulfillment correlation, expected refusal/loss/asymmetric evidence, and
-  authority-drift wording checks.
+  voluntary-promise wording checks.
 - [ ] komon.12 Document simulator fidelity limits honestly in the README and
   DEV guide resources before any clean-run result is cited.
 - [ ] komon.13 Run deterministic tests and a clean container/simulator run after

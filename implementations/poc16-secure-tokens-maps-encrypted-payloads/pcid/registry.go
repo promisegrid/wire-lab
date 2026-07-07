@@ -54,7 +54,7 @@ var protocolRecords = []protocolRecord{
 	// kernel_receive_v1; spec: kernel-receive-v1.md
 	{name: KernelReceiveV1, pcid: "bafkreie5ss65n2tovlzgobrt3wummlk5schbbrd5t36igl2ydpwrgktiym"},
 	// kernel_transport_v1; spec: kernel-transport-v1.md
-	{name: KernelTransportV1, pcid: "bafkreiac2quvapsjlqlpmggz2fyamairzemn6jepmdzdrhaohubvhgwsvi"},
+	{name: KernelTransportV1, pcid: "bafkreict6shy7n7jrjqkqv56kfjkr3oyzeqxhudp56ioxe6tincj5x3n5i"},
 	// local_lifecycle_v1; spec: local-lifecycle-v1.md
 	{name: LocalLifecycleV1, pcid: "bafkreidamxalqxl2depjwlzhwdvglpda57fkqy5hvnwiz6jow6tapungeu"},
 	// map_payload_profile_v1; spec: map-payload-profile-v1.md

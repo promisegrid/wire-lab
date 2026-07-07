@@ -2,6 +2,13 @@
 
 *Thought experiment, part of the [PromiseGrid Wire Lab](../../protocols/wire-lab.d/specs/harness-spec-draft.md). This file is content-addressable; its hash is its pCID.*
 
+## Cat-2 Vocabulary Update
+
+2026-07-07 vocabulary update per `DI-ruhin`: replace negative shorthand with
+positive PromiseGrid language about voluntary cooperation, promise-based local
+trust, decentralization, resilience, and community-scale interoperability. The
+following DIs in this file are unchanged in meaning: `DI-pokin`, `DI-togag`.
+
 ## Rewrite note
 
 This TE was substantively rewritten in place on 2026-06-29 by explicit user
@@ -49,8 +56,8 @@ This decision affects `komon.25` in
   behavior oracle.
 - The current Go lane proved radio-only simulated transport, exact CBOR
   artifacts, binary pCID CIDs in slot 0, bintags-shaped order-status messages,
-  peer-storage capability tokens, restart recovery, expected refusals, and no
-  authority drift.
+  peer-storage capability tokens, restart recovery, expected refusals, and
+  continued voluntary local-promise framing.
 - The Go lane did not prove M4 fit, firmware viability, SAMD51 behavior,
   RFM95W/RFM95 behavior, SPI/FIFO/IRQ behavior, CircuitPython runtime behavior,
   measured memory, measured energy, packet timing, regulatory behavior, or
@@ -77,7 +84,7 @@ can support eventual deployment. Ellen needs the roadmap to remain readable
 after multiple POCs. Frank needs peer-storage and gateway behavior to stay
 PromiseGrid-shaped across implementations. Mallory tests for hidden host
 bridges, overclaimed hardware fidelity, malformed frames, stale tokens, memory
-growth, and authority drift.
+growth, and drift away from voluntary local promises and decentralized trust.
 
 ## Alternatives
 

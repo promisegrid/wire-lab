@@ -76,7 +76,8 @@ type Monitor interface {
 
 // ValidatePromiseDecision normalizes one live or fake LLM decision.
 // Intent: POC12 tests autonomy without letting the model expand the protocol
-// action vocabulary back into RPC verbs or authority claims. Source: DI-timah
+// action vocabulary back into RPC verbs or command/control claims. Source:
+// DI-timah; DI-ruhin
 func ValidatePromiseDecision(decision PromiseDecision, directPeers []string) (PromiseDecision, error) {
 	return ValidateObservedPromiseDecision(decision, Observation{DirectPeers: directPeers})
 }

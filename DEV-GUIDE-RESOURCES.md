@@ -254,9 +254,10 @@ that promised the matching pCID. The transport listener should not parse
 arbitrary application payloads to find a universal `to` field, should not treat
 pCID as a service registry entry or RPC method, and should not turn malformed or
 unsupported input into global conformance judgment. Analyzer tripwires now catch
-pCID-as-address, service-registry, RPC-method, authority-like regressions, missing
-parser-role ACK/backpressure behavior, missing parser-flow raw artifacts, and
-retired active pCID leakage in fresh POC16 run events. Source: `DI-mubul`;
+pCID-as-address, service-registry, RPC-method, regressions away from voluntary
+local-promise routing, missing parser-role ACK/backpressure behavior, missing
+parser-flow raw artifacts, and retired active pCID leakage in fresh POC16 run
+events. Source: `DI-mubul`; `DI-ruhin`.
 `DI-nogij`; `DI-vulit`; `DI-gazin`.
 
 POC16 is implemented as a strict POC15 superset in concrete agents and analyzer
