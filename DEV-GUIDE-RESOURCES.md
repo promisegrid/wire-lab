@@ -8,7 +8,7 @@ PromiseGrid design choices are derived, tested, and recorded. Source:
 
 ## Current Design State
 
-Snapshot refreshed by Codex on 2026-07-07 12:10 PDT. This is a
+Snapshot refreshed by Codex on 2026-07-07 20:18 PDT. This is a
 developer-facing protocol-design snapshot, not a frozen PromiseGrid API. It
 reflects the currently locked outer-envelope direction plus consensus across
 near-contender simulations and root `results/` JSON evidence; proposal children
@@ -26,7 +26,7 @@ remain review evidence until promoted. Source: `DI-baral`; `DI-sisak`;
 `DI-nogij`; `DI-rigup`; `DI-vulit`; `DI-gazin`; `DI-bitug`; `DI-magug`;
 `DI-sazip`; `DI-mapah`; `DI-jafoj`; `DI-rapuk`; `DI-gidul`; `DI-zopub`;
 `DI-rujod`; `DI-zuruj`; `DI-dibut`; `DI-dofoj`; `DI-radaj`; `DI-fusir`;
-`DI-rudos`; `DI-fakop`; `DI-koriz`; `DI-biruf`.
+`DI-rudos`; `DI-fakop`; `DI-koriz`; `DI-biruf`; `DI-lumir`.
 Constrained-radio POC17 adds behavior evidence that production-like app
 messages can stay pCID-selected and compact: bintags-shaped order status
 traffic uses `grid([42(pCID), payload])` with actual CID bytes for slot 0, while
@@ -155,10 +155,19 @@ child messages trigger TCP repair requests for missing parent DAG objects, and
 the analyzer validates collected CAR payloads with the Go CAR library in
 addition to exact CID checks. These are still POC-local runtime and analyzer
 facts, not production APIs. Source: `DI-biruf`.
+POC19 is now planned as the production-shape design pass that turns the POC18
+CAS/VCS/TCP pieces plus POC16/POC17 runtime lessons into a deployable-node shape:
+one binary named `grid`, `grid daemon` as the local PromiseGrid
+daemon/microkernel role set, `grid run` for VCS/CAS-backed app execution,
+WASI-first runtime support, app installation by signed `app` reference sets, and
+equal TCP/WebSocket transports carrying the same exact `grid()` CBOR messages.
+This is currently a design artifact, not an executable implementation. Source:
+`DI-lumir`; `TODO-vumas`.
 Source: `DI-zuruj`; `DI-dibut`; `DI-dofoj`; `DI-radaj`; `DI-lidaj`;
 `DI-fusir`; `DI-jifuj`; `DI-harih`; `DI-gozov`; `DI-guban`; `DI-fimap`;
 `DI-pahor`; `DI-bikif`; `DI-kiram`; `DI-bamum`; `DI-jokav`; `DI-tuhoj`;
-`DI-mivur`; `DI-bidum`; `DI-rudos`; `DI-fakop`; `DI-koriz`; `DI-biruf`; `DN-dopod`; `TE-kopap`; `TE-vahoj`; `TE-hikar`;
+`DI-mivur`; `DI-bidum`; `DI-rudos`; `DI-fakop`; `DI-koriz`; `DI-biruf`;
+`DI-lumir`; `DN-dopod`; `TE-kopap`; `TE-vahoj`; `TE-hikar`;
 `TE-givul`; `TE-nozal`.
 
 ### Current Wire Direction
