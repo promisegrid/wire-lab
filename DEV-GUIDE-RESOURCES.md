@@ -8,7 +8,7 @@ PromiseGrid design choices are derived, tested, and recorded. Source:
 
 ## Current Design State
 
-Snapshot refreshed by Codex on 2026-07-08 17:56 PDT. This is a
+Snapshot refreshed by Codex on 2026-07-09 12:17 PDT. This is a
 developer-facing protocol-design snapshot, not a frozen PromiseGrid API. It
 reflects the currently locked outer-envelope direction plus consensus across
 near-contender simulations and root `results/` JSON evidence; proposal children
@@ -26,8 +26,8 @@ remain review evidence until promoted. Source: `DI-baral`; `DI-sisak`;
 `DI-nogij`; `DI-rigup`; `DI-vulit`; `DI-gazin`; `DI-bitug`; `DI-magug`;
 `DI-sazip`; `DI-mapah`; `DI-jafoj`; `DI-rapuk`; `DI-gidul`; `DI-zopub`;
 `DI-rujod`; `DI-zuruj`; `DI-dibut`; `DI-dofoj`; `DI-radaj`; `DI-fusir`;
-`DI-rudos`; `DI-fakop`; `DI-koriz`; `DI-biruf`; `DI-lumir`; `DI-minol`;
-`DI-gapav`.
+`DI-rudos`; `DI-fakop`; `DI-koriz`; `DI-biruf`; `DI-lumir`; `DI-topab`;
+`DI-kakos`; `DI-minol`; `DI-gapav`.
 The root `README.md` is now the first-stop returning-member primer: it gives a
 clean narrative from simulations and GA design search through the grouped POC
 journey, ending with the current envelope, pCID, CBOR/CID, sparse-CAS,
@@ -173,14 +173,27 @@ one binary named `grid`, `grid daemon` as the local PromiseGrid
 daemon/microkernel role set, `grid run` for VCS/CAS-backed app execution,
 WASI-first runtime support, app installation by signed `app` reference sets, and
 equal TCP/WebSocket transports carrying the same exact `grid()` CBOR messages.
-This is currently a design artifact, not an executable implementation. Source:
-`DI-lumir`; `TODO-vumas`.
+The POC19 design now includes an inheritance matrix that checks POC16 pCID,
+parser/builder, CWT/COSE token, encrypted-payload, kernel-role, sparse-CAS, and
+exact-CBOR lessons; POC17 constrained-device binary-CID and compact-payload
+lessons; and POC18 CAS/VCS, reference-set, Git bridge, continuous TCP sync,
+tokenized retrieval, CAR transfer, and diagnostics lessons. It also flags the
+storage object profile and pCID inventory as pre-code follow-ups. This is
+currently a design artifact, not an executable implementation. Source:
+`DI-lumir`; `DI-topab`; `TODO-vumas`.
+POC20 is now planned as a parallel semantic-model track, not a POC19 blocker.
+TE-lodom frames promises as timeline assertions, agents as deterministic
+pure-function servers over explicit context CIDs, decentralized CAS branches as
+local or group timelines, and capability-token double-spend as visible branch
+evidence that receivers may merge, reject, compensate, or remember locally. The
+recommended TE survivor is durable CAS timelines with local ledgers treated as
+derived indexes. Source: `DI-kakos`; `TE-lodom`; `TODO-nudav`.
 Source: `DI-zuruj`; `DI-dibut`; `DI-dofoj`; `DI-radaj`; `DI-lidaj`;
 `DI-fusir`; `DI-jifuj`; `DI-harih`; `DI-gozov`; `DI-guban`; `DI-fimap`;
 `DI-pahor`; `DI-bikif`; `DI-kiram`; `DI-bamum`; `DI-jokav`; `DI-tuhoj`;
 `DI-mivur`; `DI-bidum`; `DI-rudos`; `DI-fakop`; `DI-koriz`; `DI-biruf`;
-`DI-lumir`; `DI-minol`; `DI-gapav`; `DN-dopod`; `TE-kopap`; `TE-vahoj`; `TE-hikar`;
-`TE-givul`; `TE-nozal`.
+`DI-lumir`; `DI-topab`; `DI-kakos`; `DI-minol`; `DI-gapav`; `DN-dopod`;
+`TE-kopap`; `TE-vahoj`; `TE-hikar`; `TE-givul`; `TE-nozal`; `TE-lodom`.
 
 ### Current Wire Direction
 

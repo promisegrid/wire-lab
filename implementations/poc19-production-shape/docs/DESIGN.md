@@ -25,31 +25,45 @@ POC19 is not a rewrite of PromiseGrid as a conventional package manager,
 orchestration engine, command endpoint, central gatekeeper, or forge. It is a
 production-shaped composition of lessons already tested in earlier POCs.
 
+POC20 now owns a parallel semantic-model track for promises as timeline
+assertions, deterministic pure-function agents, CAS-backed local/group
+timelines, and branch-aware capability-token double-spend behavior. POC19 should
+continue as the production-shaped plumbing path, but it should avoid choices
+that would make POC20's visible branch histories impossible. Source: `DI-kakos`;
+`TE-lodom`.
+
 ## Inheritance from earlier POCs
 
 POC19 should be a strict successor to POC18 unless a later scoped DI explicitly
-records a non-superset exception. The executable implementation should preserve
-the useful POC18 behavior: sparse CAS, Rabin chunks, POSIX node promises,
-reference sets, snapshots, Git bridge adapters, parent-linked exact messages,
-TCP-carried object retrieval, CAR payloads, signed CWT/COSE tokens, diagnostic
-CBOR rendering, and local sync-agent scheduling.
+records a non-superset exception. This inheritance review is part of the POC19
+implementation contract: code generation should not begin until each inherited
+lesson is either covered by this design or assigned to a later POC19 task.
+Source: `DI-lumir`; `DI-topab`.
 
-POC19 also inherits specific lessons from POC16 and POC17:
+Reviewed anchors: POC16 `README.md`, `docs/MESSAGE-SHAPES.md`,
+`docs/KERNEL-ROLES.md`, `docs/ROUTE-PROMISES.md`, and protocol specs; POC17
+`README.md`, `CHANGELOG.md`, and protocol specs; POC18
+`docs/protocols/version-control.md`, `cmd/grid`, `cmd/poc-sim`,
+`cmd/poc-agent`, `cmd/poc-analyze`, and `protocols/wire-lab.d/TODO/TODO-nahop-poc18-cas-git-replacement.md`.
 
-- From POC16: pCID owns arity, slot meaning, signable view, proof location, and
-  payload interpretation. Parser/builder roles are local kernel roles, not
-  global registries. Capability tokens are signed promises. Kernel roles are
-  local promise surfaces for transport, lifecycle, storage, compute, device,
-  key, app-interface, and resource-protection behavior.
-- From POC17: constrained agents still use real pCID bytes in slot 0, binary CIDs
-  on wire, CIDv1 base32 text when printable, compact payloads where the pCID
-  spec permits them, and explicit resource limits. Small agents do not need
-  heavy JSON-style self-description in every payload.
-- From POC18: CAS/VCS state is the durable substrate; reference sets name
-  directories, tags, branches, releases, logical changes, review threads,
-  workspace roots, and app installations. Native collaboration is continuous
-  peer DAG sync, not Git-style push/pull as the root model. Git import/export,
-  push, and pull remain bridge adapters.
+| Source | Inherited lesson | POC19 coverage | Gap status | Pre-code follow-up |
+| --- | --- | --- | --- | --- |
+| POC16 | pCID owns envelope arity, slot meaning, signable view, proof location, and payload interpretation; pCID is not a peer address, app address, operation, route, repository name, or message type. | Core design keeps `grid([42(pCID), ...protocol-defined-slots])` and puts route/app/operation semantics inside pCID-defined payloads. | covered | Preserve this as a regression check in `vumas.9`. |
+| POC16 | Parser/builder roles are local kernel roles that receive exact slot-0 pCID bytes and deliver parsed protocol messages to apps. | Local daemon roles include a pCID parser/builder role separate from transport and app interface roles. | partially covered | `vumas.4` must lock whether this role is factored from POC18 code or implemented in a new shared core before `vumas.5` scaffolding. |
+| POC16 | Protocol specs are first-class; printable pCIDs are CIDv1 base32 text and wire pCIDs are binary CID bytes. | App reference sets include pCID specs; object identity section preserves binary-on-wire/base32-printable discipline. | partially covered | `vumas.4` must produce the POC19 pCID inventory before code generation. |
+| POC16 | Capability tokens are signed promises; local lifecycle, resource access, storage, and retrieval tokens use the CWT/COSE pattern rather than custom unsigned fields. | Design names CWT/COSE capability tokens for retrieval, storage, and runtime resources. | partially covered | `vumas.8` must define the app/runtime token profile before `grid run` executes fetched code. |
+| POC16 | Encrypted payloads and COSE payload/proof variants are pCID-owned message shapes, not universal envelope rules. | Design preserves pCID-owned slot semantics but does not yet enumerate encrypted app-data profiles. | partially covered | Assign encrypted app-input and app-output profiles to `vumas.8`; keep any proof slot pCID-defined. |
+| POC16 | Kernel roles are non-monolithic local promise surfaces for transport, lifecycle, storage, compute, device, key, app-interface, and resource-protection behavior. | Local daemon roles explicitly separate transport, parser/builder, CAS/VCS, app interface, execution runtime, local event journal, and key/token behavior. | covered | Keep role boundaries visible in `vumas.5` scaffold and `vumas.9` gates. |
+| POC16 | Exact raw CBOR messages and sparse per-agent CAS are reviewable after a run. | Design keeps exact `grid()` bytes as durable boundary objects and requires diagnostics for raw CBOR/CAS objects. | covered | Preserve exact-message retention in `vumas.9`. |
+| POC17 | Constrained agents use compact pCID-selected payloads, real pCID bytes in slot 0, binary CIDs on wire, and base32 CIDs when printable. | Design keeps compact pCID-owned payloads and the CID discipline across transports and app reference sets. | covered | Add a constrained-message fixture to `vumas.9` even if POC19's first runtime is not LoRa. |
+| POC17 | Small agents should not need JSON-style self-description in every payload; the pCID spec carries the shared grammar. | Design avoids universal self-describing payload maps and keeps payload shape pCID-defined. | covered | Reject new generic map envelopes unless a pCID spec requires them. |
+| POC17 | Radio and embedded slices expose real resource limits and incomplete peer storage; no peer is assumed to hold the full DAG. | Storage model states that CAS stores are partial and peer-relative. | covered | Include missing-object and partial-CAS cases in `vumas.9`. |
+| POC18 | CAS/VCS is the durable substrate: Rabin chunks, POSIX node promises, reference sets, tags, snapshots, logical changes, review statements, and parent-linked exact messages. | Design makes apps and user data VCS/CAS objects and preserves POC18 command surface. | covered | Keep POC18 VCS behavior in `vumas.9` superset gates. |
+| POC18 | `.grid` repo state remains the user-facing local repository shape while allowing a daemon-owned node CAS. | Storage model preserves `.grid/config.json`, `.grid/state.json`, and a configurable CAS locator. | covered | Implement in `vumas.6`. |
+| POC18 | Native collaboration is continuous peer DAG sync over promise-shaped TCP messages; Git import/export, push, and pull are bridge adapters. | Network model keeps native fetching as peer DAG sync and treats Git push/pull as interoperability. | covered | Preserve no-sideband inter-agent transfer checks in `vumas.9`. |
+| POC18 | Object retrieval uses signed CWT/COSE capability tokens and may transfer CAR payloads when a peer redeems a retrieval promise. | Design names retrieval/storage tokens and object transfer but has not frozen the durable object layout. | partially covered | Resolve token and object-transfer details under `vumas.8` and regression checks under `vumas.9`. |
+| POC18 | Raw chunks, DAG-CBOR, GRID-CBOR, CAR files, and local store layout remain open storage-profile decisions. | Storage model explicitly calls this unresolved. | pre-code blocker | Resolve the object storage profile during `vumas.4` before durable POC19 stores are scaffolded. |
+| POC18 | CLI commands must use shared core behavior rather than a parallel automation path. | Command surface and daemon/client sections require a shared core and daemon-backed normal operation. | covered | `vumas.4` must choose the factoring path that prevents CLI/core duplication. |
 
 ## Core design principles
 
@@ -479,6 +493,10 @@ resource judgments.
   made by the local resource owner.
 - **Observer/analyzer assumptions leaking into production.** Mitigation: POC19
   uses a local event journal; any analyzer remains regression machinery.
+- **POC19 hiding semantic timeline state.** Mitigation: keep token ledgers,
+  app-run records, parent links, and CAS object transfers explainable as durable
+  objects so POC20 can later test branch-based timeline semantics without
+  undoing POC19 storage and runtime choices. Source: `DI-kakos`; `TE-lodom`.
 
 ## Acceptance criteria for the future executable POC19
 

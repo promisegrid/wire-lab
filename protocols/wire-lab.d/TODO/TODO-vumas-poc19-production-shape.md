@@ -12,6 +12,13 @@ VCS/CLI surface, fetch code and data from peers over TCP or WebSocket, and run
 fetched apps from VCS/CAS state under local promise and capability-token
 constraints. Source: `DI-lumir`.
 
+POC20 is now the parallel semantic-model track for promises as timeline
+assertions, pure-function agents, CAS branches, local/group timelines, and
+branch-aware token double-spend behavior. POC19 remains the production-shaped
+plumbing path, but should avoid hidden token or app-run state that would prevent
+future visible branch histories. Source: `DI-kakos`; `TE-lodom`;
+`TODO-nudav`.
+
 ## Decision Intent Log
 
 ID: DI-lumir
@@ -51,13 +58,33 @@ Affects: `protocols/wire-lab.d/TODO/TODO-vumas-poc19-production-shape.md`;
 `implementations/poc19-production-shape/docs/DESIGN.md`;
 `implementations/README.md`; `DEV-GUIDE-RESOURCES.md`.
 
+ID: DI-topab
+Date: 2026-07-08 21:53:59 PDT
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Complete the `vumas.3` POC19 inheritance review inside the existing
+POC19 design document instead of creating a separate artifact.
+Intent: POC19 code generation should begin only after the design explicitly
+checks that POC16, POC17, and POC18 lessons are preserved or assigned to later
+POC19 tasks. Keeping the review in the design document makes it part of the
+implementation contract rather than a side note.
+Constraints: Do not start code generation; review only inherited behavior,
+architecture lessons, and acceptance gaps. Treat unresolved implementation
+choices as follow-ups for `vumas.4` or later tasks. Keep PromiseGrid vocabulary
+promise-first and do not use pCID as an address, operation, route, app name, or
+message type.
+Affects: `implementations/poc19-production-shape/docs/DESIGN.md`;
+`protocols/wire-lab.d/TODO/TODO-vumas-poc19-production-shape.md`;
+`DEV-GUIDE-RESOURCES.md`.
+
 ## Tasks
 
 - [x] vumas.1 Lock the POC19 design-doc-first decision in `DI-lumir`.
 - [x] vumas.2 Write the first POC19 production-shape design document at
   `implementations/poc19-production-shape/docs/DESIGN.md`.
-- [ ] vumas.3 Review the POC19 design against POC16, POC17, and POC18 to ensure
-  inherited lessons are not lost.
+- [x] vumas.3 Review the POC19 design against POC16, POC17, and POC18 to ensure
+  inherited lessons are not lost. The inheritance matrix is now in
+  `implementations/poc19-production-shape/docs/DESIGN.md`. Source: `DI-topab`.
 - [ ] vumas.4 Decide whether POC19 implementation starts by copying POC18
   packages or by factoring shared packages into a new production-shaped module.
 - [ ] vumas.5 Scaffold `implementations/poc19-production-shape/` with one
