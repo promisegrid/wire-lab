@@ -8,7 +8,7 @@ PromiseGrid design choices are derived, tested, and recorded. Source:
 
 ## Current Design State
 
-Snapshot refreshed by Codex on 2026-07-07 20:18 PDT. This is a
+Snapshot refreshed by Codex on 2026-07-08 17:56 PDT. This is a
 developer-facing protocol-design snapshot, not a frozen PromiseGrid API. It
 reflects the currently locked outer-envelope direction plus consensus across
 near-contender simulations and root `results/` JSON evidence; proposal children
@@ -26,7 +26,19 @@ remain review evidence until promoted. Source: `DI-baral`; `DI-sisak`;
 `DI-nogij`; `DI-rigup`; `DI-vulit`; `DI-gazin`; `DI-bitug`; `DI-magug`;
 `DI-sazip`; `DI-mapah`; `DI-jafoj`; `DI-rapuk`; `DI-gidul`; `DI-zopub`;
 `DI-rujod`; `DI-zuruj`; `DI-dibut`; `DI-dofoj`; `DI-radaj`; `DI-fusir`;
-`DI-rudos`; `DI-fakop`; `DI-koriz`; `DI-biruf`; `DI-lumir`.
+`DI-rudos`; `DI-fakop`; `DI-koriz`; `DI-biruf`; `DI-lumir`; `DI-minol`;
+`DI-gapav`.
+The root `README.md` is now the first-stop returning-member primer: it gives a
+clean narrative from simulations and GA design search through the grouped POC
+journey, ending with the current envelope, pCID, CBOR/CID, sparse-CAS,
+parent-link, CWT/COSE token, local-trust, and POC19 production-shape model. Keep
+this file as the detailed source map rather than duplicating the README's
+onboarding prose. Source: `DI-minol`; `TODO-kurot`.
+Future new or touched prose should avoid vague use of the word "pressure" when a
+clearer term fits, preferring "design search," "comparison," "scenario,"
+"constraint," "requirement," "risk," "tradeoff," or "evidence gathering" as
+appropriate. This is forward guidance, not a historical sweep requirement.
+Source: `DI-gapav`; `TODO-kurot`.
 Constrained-radio POC17 adds behavior evidence that production-like app
 messages can stay pCID-selected and compact: bintags-shaped order status
 traffic uses `grid([42(pCID), payload])` with actual CID bytes for slot 0, while
@@ -167,7 +179,7 @@ Source: `DI-zuruj`; `DI-dibut`; `DI-dofoj`; `DI-radaj`; `DI-lidaj`;
 `DI-fusir`; `DI-jifuj`; `DI-harih`; `DI-gozov`; `DI-guban`; `DI-fimap`;
 `DI-pahor`; `DI-bikif`; `DI-kiram`; `DI-bamum`; `DI-jokav`; `DI-tuhoj`;
 `DI-mivur`; `DI-bidum`; `DI-rudos`; `DI-fakop`; `DI-koriz`; `DI-biruf`;
-`DI-lumir`; `DN-dopod`; `TE-kopap`; `TE-vahoj`; `TE-hikar`;
+`DI-lumir`; `DI-minol`; `DI-gapav`; `DN-dopod`; `TE-kopap`; `TE-vahoj`; `TE-hikar`;
 `TE-givul`; `TE-nozal`.
 
 ### Current Wire Direction
