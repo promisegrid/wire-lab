@@ -3,7 +3,7 @@
 ## Status
 
 Design draft. This is the first POC19 artifact. It is not executable code, not a
-frozen protocol spec, and not a production API. Source: `DI-lumir`.
+frozen protocol spec, and not a production API. Source: `DI-lumir`; `DI-kodob`.
 
 ## Purpose
 
@@ -18,6 +18,8 @@ that can:
 - store everything in sparse CAS and VCS/reference-set state;
 - execute fetched code with fetched data under local promises and capability
   tokens;
+- act as the minimum microkernel binary, so app, agent, runtime executable, spec,
+  and data changes are fetched by CID rather than shipped as binary updates;
 - keep the Promise Theory model visible: agents cooperate by making promises,
   remembering results, and deciding locally whom to trust.
 
@@ -97,6 +99,26 @@ can split those roles into separate processes, browser workers, mobile
 sandboxes, firmware functions, or hosted services without changing the
 PromiseGrid message model.
 
+### Minimum microkernel bootstrap
+
+The installed `grid` binary is the minimum microkernel, not the application
+distribution unit. A person should be able to install one simple binary on a
+laptop, Raspberry Pi, server, or similar device, then receive app, agent,
+runtime executable, protocol-spec, and data changes as CID-addressed CAS/VCS
+objects fetched from peers.
+
+First run or local config may provide one bootstrap root CID. That root names a
+Merkle/CAS object graph containing app reference sets, runtime profiles,
+protocol specs, executable objects, data roots, and update metadata. The daemon
+fetches the graph from peers, verifies exact CIDs, and asks for local operator
+approval before adopting it as a local root. A later code or data update is a new
+root CID plus a local approval promise, not a replacement of the `grid` binary.
+
+The binary may still change for true substrate changes: transport support,
+storage-profile changes, security fixes, parser/loader bugs, or other
+microkernel behavior. Normal app, agent, runtime, and data changes should move
+through CAS roots. Source: `DI-kodob`.
+
 ### Daemon/client shape
 
 The long-running role is `grid daemon`. It owns the local node identity, local
@@ -143,6 +165,11 @@ An app reference set is a normal PromiseGrid reference set with role `app`. It
 labels the app's code, runtime profile, input data roots, pCID specs, entrypoint
 metadata, resource profile, and expected reciprocal promises.
 
+App reference sets are usually reachable from an operator-adopted root CID. The
+root is a convenience and update anchor, not a global authority. Alice may adopt
+one root, Bob may adopt another, and a group may voluntarily converge on a shared
+root by making reciprocal promises to track it. Source: `DI-kodob`.
+
 Example labels in an app reference set:
 
 ```text
@@ -175,6 +202,7 @@ The daemon should make these local promises explicit:
 | pCID parser/builder | Route exact slot-0 pCID bytes to local protocol parsers/builders without treating pCID as a destination or operation. |
 | CAS/VCS | Store, retrieve, verify, retain, garbage-collect, and materialize sparse CAS/VCS objects. |
 | Sync | Advertise selected reference sets, request missing parents, redeem retrieval tokens, and exchange CAR/object bytes. |
+| Bootstrap/root adoption | Fetch root CID closures, verify exact CIDs, present adoption choices to the operator, and remember local root-adoption promises. |
 | App interface | Resolve app reference sets, prepare local runtime inputs, deliver pCID-selected messages to local app processes or modules. |
 | Execution runtime | Run WASI modules first; later run OCI containers and native binaries under stronger local resource promises. |
 | Lifecycle/resource protection | Issue, narrow, revoke, or stop local CPU, memory, socket, storage, process, device, and time promises. |
@@ -201,13 +229,14 @@ POC19 should define three execution profiles but implement them in risk order.
    storing and syncing the object graph.
 
 The design goal is that all profiles use the same install, fetch, promise, CAS,
-and local-trust model. They differ only in the local runtime promises needed to
-execute them safely.
+operator-adopted root, and local-trust model. They differ only in the local
+runtime promises needed to execute them safely.
 
 ### `grid run`
 
 `grid run <app-ref>` means: ask the local daemon to evaluate whether it currently
-promises to execute the app named by `<app-ref>`. The daemon may promise,
+promises to execute the app named by `<app-ref>`. The app reference may be named
+directly or found through an operator-adopted root CID. The daemon may promise,
 decline, delay, or request missing objects from peers. If it runs the app, the
 result is another CAS/VCS object or reference set, not a hidden local side
 effect.
@@ -319,6 +348,7 @@ Alice CLI            Alice daemon             Bob daemon              WASI modul
    | grid run app_ref     |                       |                       |
    |--------------------->|                       |                       |
    | local run promise    |                       |                       |
+   |                      | resolve adopted root  |                       |
    |                      | missing module/data   |                       |
    |                      | sync_interest         |                       |
    |                      |---------------------->|                       |
@@ -343,15 +373,23 @@ Important properties:
 - Bob never promises Alice's code is safe to run. Bob only promises object
   availability and exact bytes under his local terms.
 - Alice decides locally whether Bob is trusted enough as a source.
+- Alice's adopted root identifies which app graph she is willing to consider,
+  but it does not force execution.
 - Alice's daemon decides locally whether to execute the WASI module under its
   resource promises.
 - The module's outputs are CAS objects and local event records, not hidden
   daemon state.
 
-### Flow 2: installing an app through VCS/CAS
+### Flow 2: adopting an app/runtime root through VCS/CAS
 
 ```text
 Carol creates:
+
+  update root reference_set
+    -> app reference_set
+    -> runtime profile
+    -> pCID specs
+    -> update notes
 
   app reference_set
     -> runtime profile
@@ -361,20 +399,23 @@ Carol creates:
     -> entrypoint record
     -> resource profile
 
-Carol signs that reference_set promise.
+Carol signs the root and app reference-set promises.
 
 Alice receives it through normal peer sync.
 Alice may:
   - retain it;
   - inspect it;
+  - approve it as her local adopted root;
   - run it;
   - map it into her local namespace;
   - refuse to run it;
   - ask peers for missing objects.
 ```
 
-There is no separate installation root of truth. Installation is local adoption
-of a signed app reference set and its reachable CAS closure.
+There is no global installation root of truth. Installation is local adoption of
+a signed root or app reference set and its reachable CAS closure. Operator
+approval is a local promise by Alice, not a command to other nodes. Source:
+`DI-kodob`.
 
 ### Flow 3: WebSocket peer
 
@@ -398,7 +439,7 @@ POC19 should preserve and extend the POC18 `grid` surface:
 | Command | Production-shaped meaning |
 |---|---|
 | `grid daemon` | Start the local long-running PromiseGrid role set. |
-| `grid init` | Create repo-local `.grid` config and choose a file or daemon CAS locator. |
+| `grid init` | Create repo-local `.grid` config, choose a file or daemon CAS locator, and optionally record a bootstrap root CID. |
 | `grid snapshot` | Record workspace state as CAS/VCS promises. |
 | `grid status` | Compare workspace state against local recorded VCS state. |
 | `grid log` | Walk local parent-linked snapshot history. |
@@ -426,6 +467,8 @@ Examples:
 - Alice may run a WASI app but refuse a native-binary profile for the same app.
 - Alice may keep an app installed but decline to map it into a convenient local
   namespace.
+- Alice may approve a new app/runtime root CID for future runs or keep the old
+  root if the new root's source, terms, or closure look weak.
 - Alice may revoke a runtime capability if an app exceeds CPU, memory, socket,
   time, or storage terms.
 
@@ -439,6 +482,7 @@ resource judgments.
 - One `grid` binary with daemon and client modes.
 - Real TCP and WebSocket transport adapters.
 - Real sparse CAS shared across repos/apps on one node.
+- Real bootstrap from an operator-provided root CID.
 - Real app reference-set resolution from VCS/CAS.
 - Real WASI execution from fetched module bytes.
 - Real CWT/COSE capability tokens for retrieval, storage, and local runtime
@@ -465,15 +509,17 @@ resource judgments.
    `grid daemon`, with CLI commands using the daemon for normal operation.
 3. **Transport parity.** Add WebSocket adapter that carries the same exact
    `grid()` bytes as TCP and proves parity in a clean run.
-4. **App reference sets.** Add role `app` reference sets and resolve app code,
+4. **Bootstrap roots.** Add config/first-run support for an operator-provided
+   root CID and local root-adoption promise records.
+5. **App reference sets.** Add role `app` reference sets and resolve app code,
    data, pCID specs, runtime profile, and entrypoint labels from CAS.
-5. **WASI run.** Implement `grid run` for a fetched WASI module with CID-verified
+6. **WASI run.** Implement `grid run` for a fetched WASI module with CID-verified
    inputs and CAS-recorded outputs.
-6. **Capability promises.** Add local runtime capability tokens for CPU, memory,
+7. **Capability promises.** Add local runtime capability tokens for CPU, memory,
    time, storage, network, and host-function promises.
-7. **Container/native profiles.** Store and verify OCI image graphs and native
+8. **Container/native profiles.** Store and verify OCI image graphs and native
    binaries, then execute only under explicit local runtime promises.
-8. **Regression gates.** Prove POC18 superset behavior, promise-shaped
+9. **Regression gates.** Prove POC18 superset behavior, promise-shaped
    inter-agent traffic, TCP/WebSocket parity, exact-CBOR diagnostics, and local
    event records.
 
@@ -486,6 +532,9 @@ resource judgments.
   reads.
 - **Execution drifting into package-manager behavior.** Mitigation: apps are
   reference sets in VCS/CAS; all code/data objects are CID-addressed.
+- **Minimum binary drifting into app bundle.** Mitigation: regression gates should
+  prove app/runtime updates change adopted root CIDs and CAS objects, not the
+  installed `grid` binary.
 - **Transport drifting into app semantics.** Mitigation: TCP/WebSocket adapters
   carry exact bytes; pCID parser/builder roles interpret protocol semantics.
 - **Resource protection vocabulary drifting back to control language.**
@@ -506,6 +555,9 @@ shows:
 - one `grid` binary starts a daemon and serves CLI commands;
 - app code and data are fetched from peer CAS over TCP and WebSocket using exact
   PromiseGrid messages;
+- first run or config can name a bootstrap root CID, and later app/runtime
+  updates are adopted by operator-approved root CIDs without replacing the
+  `grid` binary;
 - at least one WASI app is installed through an app reference set and run from
   VCS/CAS;
 - outputs are CAS objects with CIDs returned to the user;

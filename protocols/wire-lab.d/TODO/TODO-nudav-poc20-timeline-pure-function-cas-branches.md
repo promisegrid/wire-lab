@@ -5,7 +5,8 @@
 Planned. Owns a parallel POC20 track for PromiseGrid timeline semantics,
 pure-function agents, CAS object-chain branches, and branch-aware
 capability-token double-spend behavior. POC20 is parallel to POC19, not a POC19
-code-generation blocker. Source: `DI-kakos`; `DI-mokaz`; `TE-lodom`.
+code-generation blocker. Source: `DI-kakos`; `DI-mokaz`; `DI-lamaz`;
+`DI-lulog`; `TE-lodom`.
 
 ## Decision Intent Log
 
@@ -76,6 +77,58 @@ Affects: `docs/thought-experiments/TE-lodom-promise-timeline-pure-function-cas-b
 Supersedes: `DI-bibah` derived-projection terminology only; `DI-bibah` remains active
 for the implementation-local design-document placement decision.
 
+ID: DI-lamaz
+Date: 2026-07-09 19:00:56 PDT
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Complete the POC20 pre-code lock for items 2-10: commit the prior CAS
+event-source work first; use a hybrid of POC16 runtime/pCID/parser/proof/TCP
+lessons and POC18 CAS/graph/sync lessons; make the first executable slice a
+single unified scenario; use three hashable protocol-family spec docs; use CBOR
+map payloads for the first semantic slice; and keep `DESIGN.md` as the single
+human-readable design entrypoint.
+Intent: POC20 code generation should start from locked semantics rather than
+reopening runtime, pCID, payload, scenario, path, projection, double-spend, or
+analyzer-gate choices. The pCID docs must be standalone because a pCID names a
+whole spec document, while `DESIGN.md` remains the developer handoff document.
+Constraints: No POC20 code generation in this batch. Cross-agent communication
+in future code must use promise-shaped grid CBOR over TCP, not simulated
+in-process transfer. Do not fragment into pCID-per-message-kind; message
+variants are payload semantics under three protocol families. All future runtime
+state remains rebuildable from local CAS unless a later DI explicitly narrows
+the exception.
+Affects: `implementations/poc20-timeline-pure-function-cas-branches/docs/DESIGN.md`;
+`implementations/poc20-timeline-pure-function-cas-branches/docs/protocols/timeline-v1.md`;
+`implementations/poc20-timeline-pure-function-cas-branches/docs/protocols/pure-function-v1.md`;
+`implementations/poc20-timeline-pure-function-cas-branches/docs/protocols/capability-token-v1.md`;
+`protocols/wire-lab.d/TODO/TODO-nudav-poc20-timeline-pure-function-cas-branches.md`;
+`DEV-GUIDE-RESOURCES.md`.
+
+ID: DI-lulog
+Date: 2026-07-09 19:19:00 PDT
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Model bootstrap Merkle/root CIDs, app/runtime root adoption, and
+operator-approved root updates as POC20 timeline promises. Runtime and app root
+CIDs that influence computation must be explicit context for pure-function
+results.
+Intent: POC19's minimum microkernel rule needs a matching semantic model: the
+installed binary fetches executable roots, but local adoption of those roots is a
+promise event in the agent's CAS timeline. Alice, Bob, or a voluntary group can
+adopt different roots, later converge, fork, or reject updates without treating
+any root as globally authoritative.
+Constraints: Adoption is local and voluntary. A root CID names bytes, not trust,
+obligation, or access by itself. Operator approval is a local promise and can be
+revoked or superseded by a later timeline event. Changing the POC20 protocol
+specs changes their pCIDs, so CID aliases must be recomputed after this DI is
+implemented.
+Affects: `implementations/poc20-timeline-pure-function-cas-branches/docs/DESIGN.md`;
+`implementations/poc20-timeline-pure-function-cas-branches/docs/protocols/timeline-v1.md`;
+`implementations/poc20-timeline-pure-function-cas-branches/docs/protocols/pure-function-v1.md`;
+`implementations/poc20-timeline-pure-function-cas-branches/docs/protocols/capability-token-v1.md`;
+`protocols/wire-lab.d/TODO/TODO-nudav-poc20-timeline-pure-function-cas-branches.md`;
+`DEV-GUIDE-RESOURCES.md`; `README.md`.
+
 ## Tasks
 
 - [x] nudav.1 Write `TE-lodom` covering promise timeline assertions,
@@ -88,11 +141,13 @@ for the implementation-local design-document placement decision.
 - [x] nudav.4 Review `TE-lodom` and decide whether Alternative C is accepted:
   durable local CAS event streams with derived local projections and indexes.
   Source: `DI-mokaz`.
-- [ ] nudav.5 Lock the first executable POC20 slice with DF before code
-  generation.
-- [ ] nudav.6 Plan POC20 protocol specs for promise assertions, pure-function
+- [x] nudav.5 Lock the first executable POC20 slice with DF before code
+  generation: one unified scenario with Alice, Bob, Carol, Dave, Ellen, and
+  Mallory exercising timeline, pure-function, token double-spend, projection
+  rebuild, and CAS shareability behavior. Source: `DI-lamaz`.
+- [x] nudav.6 Plan POC20 protocol specs for promise assertions, pure-function
   result promises, timeline branches, group timeline agreements, token issue,
-  token redemption, and branch merge/non-merge records.
+  token redemption, and branch merge/non-merge records. Source: `DI-lamaz`.
 - [ ] nudav.7 Implement a small POC20 run with Alice, Bob, Carol, Dave, Ellen,
   and Mallory exercising local timelines, group timelines, deterministic
   function results, and double-spend branches.
@@ -105,6 +160,23 @@ for the implementation-local design-document placement decision.
   truth; all local indexes, caches, and projections are rebuildable from local
   CAS; and object sharing is a separate local promise decision. Source:
   `DI-mokaz`.
+- [x] nudav.11 Lock future POC20 runtime architecture as POC16 runtime/pCID/parser
+  lessons plus POC18 CAS/graph/sync lessons. Source: `DI-lamaz`.
+- [x] nudav.12 Lock three protocol-family pCIDs for POC20: timeline,
+  pure-function, and capability-token. Source: `DI-lamaz`.
+- [x] nudav.13 Lock CBOR map payloads for the first semantic POC20 slice. Source:
+  `DI-lamaz`.
+- [x] nudav.14 Lock CAS object profiles and derived projection rebuild rules in
+  the implementation-local design. Source: `DI-lamaz`.
+- [x] nudav.15 Lock double-spend and pure-function scenario details before code
+  generation. Source: `DI-lamaz`.
+- [x] nudav.16 Lock future package, command, runtime path, and diagnostic path
+  names for code generation. Source: `DI-lamaz`.
+- [x] nudav.17 Define analyzer gates before code generation while leaving their
+  implementation in `nudav.8`. Source: `DI-lamaz`.
+- [x] nudav.18 Lock bootstrap root adoption and root update semantics as local
+  timeline promises, with runtime/app roots included in pure-function context
+  when they affect computation. Source: `DI-lulog`.
 
 ## Acceptance criteria for the future executable POC20
 
@@ -128,3 +200,13 @@ for the implementation-local design-document placement decision.
 - Local CAS objects can be private, encrypted-shareable, or plain-shareable, and
   the existence of an object in CAS never implies that the agent promises to send
   it.
+- Three standalone hashable spec docs exist for the first protocol families, and
+  each has a CIDv1 base32 symlink alias under the POC20 `docs/protocols/`
+  directory.
+- Future cross-agent communication uses promise-shaped grid CBOR over TCP rather
+  than in-process simulated transfer.
+- Bootstrap roots and app/runtime update roots are adopted by local promise
+  events. A root CID names a Merkle/CAS object graph; it does not by itself
+  create trust, authority, or an obligation to execute.
+- Pure-function result records include the relevant app/runtime root CIDs in
+  explicit context when executable code or runtime behavior affects the result.

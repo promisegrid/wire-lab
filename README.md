@@ -35,8 +35,9 @@ containerized agents exchanging exact `grid()` CBOR messages over TCP, signed
 CWT/COSE capability tokens, sparse per-agent CAS stores, CAR payloads for object
 transfer, and diagnostic raw artifacts for later review. POC18 applies those
 ideas to a CAS-backed version-control system. POC19 is now planned as the first
-production-shaped pass: one `grid` binary with daemon/client modes, VCS/CAS
-apps, WASI-first execution, and equal TCP/WebSocket message transports.
+production-shaped pass: one `grid` binary as the minimum microkernel, with
+daemon/client modes, VCS/CAS apps, WASI-first execution, CID-rooted app/runtime
+updates, and equal TCP/WebSocket message transports. Source: `DI-kodob`.
 
 The design is still provisional. The POCs are executable evidence and current
 direction, not frozen public APIs.
@@ -198,12 +199,15 @@ objects.
 code. Its goal is to turn POC18's CAS/VCS/TCP work plus POC16/POC17 runtime
 lessons into a deployable-node shape.
 
-The planned target is one binary named `grid`. The same binary should be able to
-run as `grid daemon`, expose CLI commands, act as a VCS, fetch non-kernel code
-and data from peers over TCP or WebSocket, and execute fetched apps from VCS/CAS.
-The first execution profile is WASI. OCI container images and native binaries
-are later, higher-risk profiles that require stronger local lifecycle and
-resource promises.
+The planned target is one binary named `grid`. That installed binary is the
+minimum microkernel and local loader, not the app distribution package. The same
+binary should be able to run as `grid daemon`, expose CLI commands, act as a VCS,
+fetch non-kernel code and data from peers over TCP or WebSocket, and execute
+fetched apps from VCS/CAS. First run or local config may name a bootstrap Merkle
+root CID; later app/runtime root changes are fetched as exact CAS graphs and
+adopted only after local operator approval. The first execution profile is WASI.
+OCI container images and native binaries are later, higher-risk profiles that
+require stronger local lifecycle and resource promises. Source: `DI-kodob`.
 
 A grid app is installed by checking a signed app reference set into VCS/CAS.
 `grid run` asks the local daemon whether it currently promises to execute that

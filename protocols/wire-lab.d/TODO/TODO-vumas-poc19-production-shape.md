@@ -4,13 +4,15 @@
 
 Planned. Owns the production-shaped successor to POC18 under
 `implementations/poc19-production-shape/`. The first artifact is a design
-document, not executable code. Source: `DI-lumir`.
+document, not executable code. Source: `DI-lumir`; `DI-kodob`.
 
 POC19 should turn the lessons from POC16, POC17, and POC18 into a single
 `grid` binary that can run as a local PromiseGrid daemon/microkernel, expose the
 VCS/CLI surface, fetch code and data from peers over TCP or WebSocket, and run
 fetched apps from VCS/CAS state under local promise and capability-token
-constraints. Source: `DI-lumir`.
+constraints. The installed binary is the minimum microkernel: app, agent,
+runtime executable, and data changes are adopted by CID-addressed CAS roots, not
+by replacing the binary. Source: `DI-lumir`; `DI-kodob`.
 
 POC20 is now the parallel semantic-model track for promises as timeline
 assertions, pure-function agents, CAS branches, local/group timelines, and
@@ -77,6 +79,30 @@ Affects: `implementations/poc19-production-shape/docs/DESIGN.md`;
 `protocols/wire-lab.d/TODO/TODO-vumas-poc19-production-shape.md`;
 `DEV-GUIDE-RESOURCES.md`.
 
+ID: DI-kodob
+Date: 2026-07-09 19:19:00 PDT
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Lock POC19's installed `grid` binary as the minimum microkernel. The
+binary provides bootstrap, transport, local CAS verification, pCID parser
+dispatch, local config, operator approval, runtime launch, and local
+resource/capability roles. App code, agent code, runtime executable objects,
+container/WASI/native artifacts, specs, and data are fetched by CID from
+CAS/peers from an operator-adopted Merkle/root CID.
+Intent: A person should install one simple binary on a laptop, Raspberry Pi,
+server, or similar device and should not need to update that binary whenever app
+or agent code changes. Code changes should be PromiseGrid data: a new root CID
+is proposed, fetched, verified, and adopted only by local operator promise.
+Constraints: Do not embed changing app/agent/runtime executables in the binary.
+First-run config may name a bootstrap root CID; later root updates require local
+operator approval and should be recorded as promise-shaped local state. The
+binary may still evolve for true microkernel/protocol substrate changes, but not
+for normal app/runtime updates.
+Affects: `implementations/poc19-production-shape/docs/DESIGN.md`;
+`protocols/wire-lab.d/TODO/TODO-vumas-poc19-production-shape.md`;
+`implementations/poc20-timeline-pure-function-cas-branches/docs/DESIGN.md`;
+`DEV-GUIDE-RESOURCES.md`; `README.md`.
+
 ## Tasks
 
 - [x] vumas.1 Lock the POC19 design-doc-first decision in `DI-lumir`.
@@ -99,3 +125,7 @@ Affects: `implementations/poc19-production-shape/docs/DESIGN.md`;
   exact-message retention, TCP/WebSocket parity, and promise-first vocabulary.
 - [ ] vumas.10 Run and archive a clean POC19 regression after implementation
   begins.
+- [x] vumas.11 Lock the minimum-microkernel rule: one installed `grid` binary
+  bootstraps from operator-adopted root CIDs, while app, agent, runtime
+  executable, spec, and data changes are fetched from CAS/peers without replacing
+  the binary. Source: `DI-kodob`.
