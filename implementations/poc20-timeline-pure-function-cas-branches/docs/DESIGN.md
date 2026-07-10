@@ -5,7 +5,8 @@
 Design draft. This is the first implementation-local POC20 artifact. It is not
 executable code, not a frozen protocol spec, and not a production API. The
 canonical thought experiment remains `TE-lodom`, and the canonical task record
-remains `TODO-nudav`. Source: `DI-kakos`; `DI-bibah`; `TE-lodom`; `TODO-nudav`.
+remains `TODO-nudav`. Source: `DI-kakos`; `DI-bibah`; `DI-mokaz`; `TE-lodom`;
+`TODO-nudav`.
 
 ## Purpose
 
@@ -25,8 +26,15 @@ code-generation blocker. Source: `DI-kakos`.
 ## Core model
 
 Every important POC20 event should be represented as a promise-shaped CAS object
-with parent links. Local runtime indexes may exist later, but they are derived
-views. The durable explanation is the visible CAS timeline.
+with parent links. An agent's local CAS is the chronological event source and
+source of truth. Local runtime indexes, projections, caches, JSON files, SQLite
+tables, or in-memory summaries may exist later, but they are disposable views
+rebuilt from local CAS. If a projection and local CAS disagree, local CAS wins.
+
+Local CAS is not automatically public. Some local CAS objects may remain private
+forever, some may be sent only after encryption, and some may be plain-shareable.
+Sending, withholding, or encrypting a CAS object is a separate local promise
+decision. Source: `DI-mokaz`.
 
 The first POC20 model uses these rules:
 
@@ -41,7 +49,7 @@ The first POC20 model uses these rules:
 - A group timeline is a reference-set-like branch that multiple agents
   voluntarily promise to maintain or interpret together.
 - A token issue, transfer, redemption, double-spend, or merge decision is a
-  pCID-defined promise object, not hidden ledger mutation.
+  pCID-defined promise object, not hidden mutable projection-only state.
 - A double-spend can appear on parallel branches. Receivers decide locally
   whether to keep, reject, merge, compensate, or leave branches unmerged.
 
@@ -61,13 +69,13 @@ Mallory:
   compensation promise without acting as a global authority.
 
 The run is successful only if the double-spend is visible as branch evidence in
-CAS and can be explained without a hidden mutable spent-token table as the source
-of truth.
+CAS and can be explained without a hidden mutable spent-token table or
+projection-only table as the source of truth.
 
 ## Non-goals
 
-- No global ledger, global branch authority, global trust authority, or global
-  monitor.
+- No global ledger, global branch authority, global trust authority, global
+  monitor, or local projection treated as a source of truth.
 - No claim that every production token pCID must use the same double-spend
   semantics.
 - No final PromiseGrid token API, app API, or storage profile.
@@ -87,7 +95,12 @@ shows:
 - token issue, transfer, redemption, double-spend, and merge/non-merge as
   promise-shaped CAS objects;
 - a double-spend represented as branch conflict rather than hidden mutable
-  ledger state;
+  projection-only state;
+- proof that non-CAS projections can be deleted and rebuilt from local CAS event
+  objects;
+- examples of private, encrypted-shareable, and plain-shareable local CAS
+  objects, with sendability controlled by local promises rather than object
+  existence;
 - local receiver decisions that can keep, reject, merge, compensate, or leave
   branches unmerged without commanding other agents;
 - diagnostics that render the relevant raw CBOR/CAS objects for review.

@@ -4,7 +4,11 @@ TE ID: TE-lodom
 
 ## Status
 
-needs DF
+decided, refined
+
+Cat-2 / decision-refinement update per `TODO-nudav` / `DI-mokaz`: "local
+ledger" wording is replaced by "derived local projection/index/cache" wording
+where it describes the current recommendation. No DIs live in this file.
 
 ## Decision under test
 
@@ -25,6 +29,12 @@ locally?
   resource retention, and observed peer behavior.
 - CAS object identity names exact bytes. A CID does not by itself promise
   availability, correctness, or trustworthiness; those are separate promises.
+- An agent's local CAS is its chronological event source and source of truth for
+  POC20. Current state is a derived projection from local CAS event objects, not
+  a separate authority.
+- Local CAS is not automatically public. Some local CAS objects may remain
+  private forever, some may be sent only after encryption, and some may be
+  plain-shareable. Sending or withholding an object is a local promise decision.
 - POC18 already models CAS/VCS parent-linked object chains, reference sets,
   tags, branches, snapshots, logical changes, and continuous peer sync. POC20
   should reuse those lessons rather than inventing a second graph model.
@@ -47,12 +57,13 @@ observation, correction, and merge decision is a parent-linked CAS object. A
 branch is an ordinary local or group timeline. Token double-spend is represented
 as conflicting redemption branches rather than hidden mutable state.
 
-### Alternative C: Split operational ledgers from semantic timelines
+### Alternative C: Derive local projections from CAS event timelines
 
-Fast local ledgers may exist for efficiency, but the durable semantic record is
-the CAS timeline. The local ledger is only a cache or index over promise objects.
-If the ledger and CAS timeline disagree, the receiver's durable promise graph is
-the source used for explanation, replay, merge, and trust review.
+Fast local projections, caches, indexes, JSON files, SQLite tables, or in-memory
+summaries may exist for efficiency, but the durable semantic record is the local
+CAS event timeline. If a derived projection and the CAS timeline disagree, the
+receiver's durable promise graph is the source used for explanation, replay,
+merge, and trust review.
 
 ## Scenario analysis
 
@@ -113,7 +124,7 @@ branch differently.
 
 Alternative A cannot explain this cleanly if token state lives only in mutable
 spent-token tables. Alternative B makes branches first-class. Alternative C
-permits local indexes while keeping branch facts explainable.
+permits local projections while keeping branch facts explainable from CAS.
 
 ### Scenario 4: Agreed group timeline
 
@@ -130,14 +141,14 @@ or create a new group branch with different membership promises.
 
 Alternative B gives the clearest expression of "agreed portion of the timeline."
 Alternative C is acceptable if implementations maintain local materialized views
-of group branches as indexes.
+of group branches as derived indexes over CAS objects.
 
 ### Scenario 5: Double-spend as branch conflict
 
 Mallory receives a bearer token issued by Alice. Mallory presents it to Bob on
-one branch and to Carol on another branch. In a single-ledger model, Bob or Carol
-tries to decide whether the token is already spent by consulting local state or
-the issuer. In a branch model, both redemptions can exist as promises on
+one branch and to Carol on another branch. In a hidden mutable-index model, Bob
+or Carol tries to decide whether the token is already spent by consulting local
+state or the issuer. In a branch model, both redemptions can exist as promises on
 parallel branches.
 
 The important question is not whether the universe allows the bytes to appear
@@ -155,8 +166,8 @@ compensated, or the branch family as unmergeable under that token protocol.
 
 Alternative A is simpler but hides branch structure and may recreate a central
 ledger instinct. Alternative B tests the strongest PromiseGrid-native model.
-Alternative C is likely implementation-practical: fast local replay caches plus
-durable branch conflict objects.
+Alternative C is likely implementation-practical: fast local replay projections
+plus durable branch conflict objects.
 
 ### Scenario 6: Merge or non-merge after double-spend
 
@@ -181,24 +192,27 @@ They are Carol's local promises and local trust updates.
 
 Alternative C is the recommended next path. It preserves the semantic clarity of
 Alternative B while admitting that production implementations will need indexes,
-caches, and fast local ledgers. The durable model should be: promises live in
-parent-linked CAS timelines; mutable ledgers are derived views unless a pCID
-explicitly defines them as promise objects.
+caches, and fast local projections. The durable model should be: promises live in
+parent-linked local CAS timelines; mutable projections are derived views unless a
+pCID explicitly defines an additional promise object.
 
 POC20 should therefore test:
 
 - promise objects as timeline assertions;
 - pure-function service promises over explicit context objects;
 - local branches and group-agreed branches over CAS objects;
+- private, encrypted-shareable, and plain-shareable local CAS objects, with
+  sharing treated as a separate local promise decision;
 - token issue, transfer, redemption, double-spend, and merge/non-merge behavior
   as branchable promise history;
 - local trust decisions based on branch evidence without a global ledger or
   global monitor.
 
 POC19 should not be blocked, but POC19 should avoid choices that would prevent
-POC20's model. In particular, POC19 should keep token ledgers explainable by CAS
+POC20's model. In particular, POC19 should keep token state explainable by CAS
 objects, keep parent links visible, keep pCID-defined token semantics explicit,
-and avoid hiding important state in unreviewable daemon internals.
+and avoid hiding important state in unreviewable daemon internals or
+non-rebuildable local projections.
 
 ## Implications for open TODOs and pending DIs
 
@@ -216,7 +230,8 @@ and avoid hiding important state in unreviewable daemon internals.
 
 ## Decision status
 
-needs DF. The recommended surviving alternative is Alternative C: use CAS
-timelines as the durable semantic model while permitting local ledgers as
-derived implementation indexes. The next decision is whether POC20 should make
-that model executable before or after the first POC19 scaffold lands.
+decided by `DI-mokaz`. POC20 should use local CAS timelines as the durable
+semantic model while permitting derived local projections, indexes, caches, JSON
+files, SQLite tables, or in-memory summaries only when they are rebuildable from
+local CAS. The follow-up DF still needs to lock the first executable POC20 slice
+before code generation.
