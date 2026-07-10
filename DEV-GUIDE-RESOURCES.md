@@ -8,7 +8,7 @@ PromiseGrid design choices are derived, tested, and recorded. Source:
 
 ## Current Design State
 
-Snapshot refreshed by Codex on 2026-07-09 12:17 PDT. This is a
+Snapshot refreshed by Codex on 2026-07-09 15:13 PDT. This is a
 developer-facing protocol-design snapshot, not a frozen PromiseGrid API. It
 reflects the currently locked outer-envelope direction plus consensus across
 near-contender simulations and root `results/` JSON evidence; proposal children
@@ -27,7 +27,7 @@ remain review evidence until promoted. Source: `DI-baral`; `DI-sisak`;
 `DI-sazip`; `DI-mapah`; `DI-jafoj`; `DI-rapuk`; `DI-gidul`; `DI-zopub`;
 `DI-rujod`; `DI-zuruj`; `DI-dibut`; `DI-dofoj`; `DI-radaj`; `DI-fusir`;
 `DI-rudos`; `DI-fakop`; `DI-koriz`; `DI-biruf`; `DI-lumir`; `DI-topab`;
-`DI-kakos`; `DI-minol`; `DI-gapav`.
+`DI-kakos`; `DI-bibah`; `DI-minol`; `DI-gapav`.
 The root `README.md` is now the first-stop returning-member primer: it gives a
 clean narrative from simulations and GA design search through the grouped POC
 journey, ending with the current envelope, pCID, CBOR/CID, sparse-CAS,
@@ -154,9 +154,14 @@ Frank retrieves from Alice and records paid retention. Each cross-agent object
 transfer is carried as promise-shaped `grid()` CBOR messages:
 `sync_interest`, `object_availability` with a signed CWT/COSE retrieval
 capability, `object_retrieval_redemption`, and `object_bytes` carrying a CARv1
-bundle. The observer collector is outside the PromiseGrid path; it stores exact
-message and CAR artifacts for review and analyzer gates, not as a routing or
-trust authority.
+bundle. In POC18, a CAR file is a Content Addressable aRchive transfer package:
+it groups one or more CID-addressed CAS blocks so a peer can send a requested
+object closure as exact bytes after a retrieval token is redeemed. It is not the
+base PromiseGrid wire envelope, not the native local CAS layout, and not a
+global store format; it is the POC18 transfer bundle carried inside the
+pCID-defined `object_bytes` payload. The observer collector is outside the
+PromiseGrid path; it stores exact message and CAR artifacts for review and
+analyzer gates, not as a routing or trust authority.
 The current POC18 TCP follow-up extends that baseline: Bob now proves one
 persistent TCP session can carry multiple named exchanges, Carol chooses Bob
 over Mallory from local trust evidence before syncing, Alice can include a
@@ -187,13 +192,18 @@ pure-function servers over explicit context CIDs, decentralized CAS branches as
 local or group timelines, and capability-token double-spend as visible branch
 evidence that receivers may merge, reject, compensate, or remember locally. The
 recommended TE survivor is durable CAS timelines with local ledgers treated as
-derived indexes. Source: `DI-kakos`; `TE-lodom`; `TODO-nudav`.
+derived indexes. The implementation-local POC20 design entrypoint is
+`implementations/poc20-timeline-pure-function-cas-branches/docs/DESIGN.md`,
+which summarizes the executable target while leaving `TE-lodom` and
+`TODO-nudav` as the canonical global records. Source: `DI-kakos`; `DI-bibah`;
+`TE-lodom`; `TODO-nudav`.
 Source: `DI-zuruj`; `DI-dibut`; `DI-dofoj`; `DI-radaj`; `DI-lidaj`;
 `DI-fusir`; `DI-jifuj`; `DI-harih`; `DI-gozov`; `DI-guban`; `DI-fimap`;
 `DI-pahor`; `DI-bikif`; `DI-kiram`; `DI-bamum`; `DI-jokav`; `DI-tuhoj`;
 `DI-mivur`; `DI-bidum`; `DI-rudos`; `DI-fakop`; `DI-koriz`; `DI-biruf`;
-`DI-lumir`; `DI-topab`; `DI-kakos`; `DI-minol`; `DI-gapav`; `DN-dopod`;
-`TE-kopap`; `TE-vahoj`; `TE-hikar`; `TE-givul`; `TE-nozal`; `TE-lodom`.
+`DI-lumir`; `DI-topab`; `DI-kakos`; `DI-bibah`; `DI-minol`; `DI-gapav`;
+`DN-dopod`; `TE-kopap`; `TE-vahoj`; `TE-hikar`; `TE-givul`; `TE-nozal`;
+`TE-lodom`.
 
 ### Current Wire Direction
 

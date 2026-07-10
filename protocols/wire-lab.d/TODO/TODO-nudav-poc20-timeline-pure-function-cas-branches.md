@@ -32,6 +32,25 @@ Affects: `docs/thought-experiments/TE-lodom-promise-timeline-pure-function-cas-b
 `implementations/poc19-production-shape/docs/DESIGN.md`;
 `DEV-GUIDE-RESOURCES.md`.
 
+ID: DI-bibah
+Date: 2026-07-09 15:13:53 PDT
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Add an implementation-local POC20 design document at
+`implementations/poc20-timeline-pure-function-cas-branches/docs/DESIGN.md`
+while keeping `TE-lodom` and `TODO-nudav` in their canonical global locations.
+Intent: The POC20 implementation directory should have a local design entrypoint
+before any code generation starts, but the cross-cutting TE and TODO should
+remain discoverable through the global TE corpus and harness TODO queue.
+Constraints: The design document is not executable code, not a frozen protocol
+spec, and not a POC19 blocker. It must point back to `TE-lodom`, `TODO-nudav`,
+and `DI-kakos`; it must preserve the durable-CAS-timeline model with local
+ledgers as derived indexes; it must not define a global ledger or global branch
+authority.
+Affects: `implementations/poc20-timeline-pure-function-cas-branches/docs/DESIGN.md`;
+`protocols/wire-lab.d/TODO/TODO-nudav-poc20-timeline-pure-function-cas-branches.md`;
+`DEV-GUIDE-RESOURCES.md`.
+
 ## Tasks
 
 - [x] nudav.1 Write `TE-lodom` covering promise timeline assertions,
@@ -53,6 +72,9 @@ Affects: `docs/thought-experiments/TE-lodom-promise-timeline-pure-function-cas-b
   function results, and double-spend branches.
 - [ ] nudav.8 Add analyzer/regression gates proving that token double-spend is
   represented as visible branch evidence rather than hidden mutable state.
+- [x] nudav.9 Add an implementation-local POC20 design document at
+  `implementations/poc20-timeline-pure-function-cas-branches/docs/DESIGN.md`.
+  Source: `DI-bibah`.
 
 ## Acceptance criteria for the future executable POC20
 
