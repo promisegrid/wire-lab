@@ -101,27 +101,47 @@ functions, or hosted services without changing the PromiseGrid message model.
 
 ### Stable `grid` binary as the minimum microkernel
 
-The installed `grid` binary is the stable bootstrap seed for the minimum
-microkernel, not the whole microkernel and not the application distribution unit.
-It should contain very little functionality and change rarely. Its first promise
-is to provide just enough local identity/config handling, CID verification,
-minimal PromiseGrid `grid()` message handling, peer fetch, local approval
-recording, and restart handoff to bootstrap everything else.
+The 'grid' executable is the stable bootstrap seed for the minimum
+PromiseGrid microkernel. It contains just enough code to fetch,
+verify, and start the rest of the locally system.  Analogies to this
+method can be found in the GRUB, isconf, and decomk systems, mentioned
+in more detail below.
 
-On startup, the stable binary may detect a candidate new version of itself from
-locally trusted peers. If an owning agent or human locally approves that
-self-update, `grid` fetches the new binary by CID, verifies the exact bytes and
-local signer trust criteria, installs the approved version, and restarts. After
-restart, it fetches the remaining modules that make up the minimum microkernel:
-transport adapters, pCID parser/builders, CAS/VCS, sync, app interface,
-execution runtime, lifecycle/resource protection, host-capability, secret
-service, key/token, local event journal, and trust-policy modules.
+In all cases, the goal is to make updates easy and self-managed. 
 
-Application-specific modules come after that microkernel bootstrap. App, agent,
-runtime executable, protocol-spec, and data changes are CID-addressed CAS/VCS
-objects fetched from peers through PromiseGrid `grid()` messages and the CIDs
-they name, rather than shipped as ordinary binary updates. The app bytes
-themselves remain exact CAS objects. Source: `DI-zitap`; `DI-kodob`.
+We use a `stage*` vocabulary to describe the components of the
+process. In POC19, stage0 is the installed `grid` binary itself.
+Stage0 is the stable bootstrap seed for the minimum microkernel, not
+the whole microkernel and not the application distribution unit. It
+should contain very little functionality and change rarely. Its first
+promise is to provide just enough local identity/config handling, CID
+verification, minimal PromiseGrid `grid()` message handling, peer
+fetch, local approval recording, and restart handoff to find, verify,
+and start the rest of the locally approved system.
+
+Stage1 is the rest of the minimum microkernel modules as a CID-named executable
+object closure. The stage1 closure contains transport adapters, pCID
+parser/builders, CAS/VCS, sync, app interface, execution runtime,
+lifecycle/resource protection, host-capability, secret service, key/token, local
+event journal, and trust-policy modules. Stage0 may fetch stage1 objects from
+locally trusted peers, verify exact CIDs and local signer trust criteria, record
+local approval, and start those modules. Stage1 modules are exact CAS/VCS
+objects named by approved CIDs, not hidden side loads.
+
+Stage0 itself may still self-update, but that is a special replacement of the
+installed bootstrap seed, not the definition of stage1. On startup, stage0 may
+detect a candidate new stage0 binary from locally trusted peers. If an owning
+agent or human locally approves that self-update, `grid` fetches the new binary
+as a CAS object by CID, verifies the exact bytes and local signer trust criteria,
+writes the approved version to disk, and restarts.
+
+Application-specific modules come after the stage1 microkernel bootstrap. Those
+objects might later be called stage2 if that vocabulary becomes useful, but
+POC19 does not need to lock a stage2 label here. App, agent, runtime executable,
+protocol-spec, and data changes are CID-addressed CAS/VCS objects fetched from
+peers through PromiseGrid `grid()` messages and the CIDs they name, rather than
+shipped as ordinary binary updates. The app bytes themselves remain exact CAS
+objects. Source: `DI-zitap`; `DI-kodob`.
 
 First run or local config may provide one bootstrap root CID. That root names a
 Merkle/CAS object graph containing app reference sets, runtime profiles,
@@ -134,6 +154,22 @@ The binary may still change for true substrate changes: transport support,
 storage-profile changes, security fixes, parser/loader bugs, or other
 microkernel behavior. Normal app, agent, runtime, and data changes should move
 through CAS roots. Source: `DI-kodob`.
+
+The GRUB analogy is useful here. GRUB is not a full operating system
+and does not need to be a full general-purpose filesystem stack, but
+it has enough filesystem knowledge to read its own configuration from
+disk and load the modules needed to continue booting. The stable
+`grid` binary should be analogous: it is not the whole microkernel,
+but it has enough CAS, CID, minimal `grid()` message, peer-fetch,
+local-approval, and restart-handoff behavior to fetch and start the
+rest of the locally approved system.
+
+The technique also follows a project lineage from `isconf` `stage*`
+self-updates in the 1990s through `decomk` now: keep the first
+installed program small, staged, inspectable, and able to replace or
+extend itself. The PromiseGrid version should preserve that discipline
+while moving the objects being fetched and verified into
+content-addressed CAS/VCS roots. Source: `DI-zitap`; `DI-kodob`.
 
 ### Operator-visible root adoption
 
