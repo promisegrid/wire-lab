@@ -35,10 +35,10 @@ containerized agents exchanging exact `grid()` CBOR messages over TCP, signed
 CWT/COSE capability tokens, sparse per-agent CAS stores, CAR payloads for object
 transfer, and diagnostic raw artifacts for later review. POC18 applies those
 ideas to a CAS-backed version-control system. POC19 is now planned as the first
-production-shaped pass: one `grid` binary as the minimum microkernel, with
-daemon/client modes, VCS/CAS apps, WASI-first execution, CID-rooted app/runtime
-updates, operator-visible root adoption, local host-capability promises, and
-equal TCP/WebSocket message transports. Source: `DI-kodob`; `DI-guhil`.
+production-shaped pass: one stable `grid` bootstrap binary, fetched microkernel
+modules, VCS/CAS apps, WASI-first execution, CID-rooted app/runtime updates,
+operator-visible root adoption, local host-capability promises, and equal
+TCP/WebSocket message transports. Source: `DI-kodob`; `DI-guhil`; `DI-zitap`.
 
 The design is still provisional. The POCs are executable evidence and current
 direction, not frozen public APIs.
@@ -200,13 +200,15 @@ objects.
 code. Its goal is to turn POC18's CAS/VCS/TCP work plus POC16/POC17 runtime
 lessons into a deployable-node shape.
 
-The planned target is one binary named `grid`. That installed binary is the
-minimum microkernel and local loader, not the app distribution package. The same
-binary should be able to run as `grid daemon`, expose CLI commands, act as a VCS,
-fetch non-kernel code and data from peers over TCP or WebSocket, and execute
-fetched apps from VCS/CAS. First run or local config may name a bootstrap Merkle
-root CID; later app/runtime root changes are fetched as exact CAS graphs and
-adopted only after local operator approval. The first execution profile is WASI.
+The planned target starts with one stable binary named `grid`. That installed
+binary is only the bootstrap seed for the minimum microkernel, not the whole
+microkernel and not the app distribution package. It should contain just enough
+functionality to detect and fetch an approved new version of itself from locally
+trusted peers, restart, fetch the remaining microkernel modules, and only then
+fetch application-specific modules. First run or local config may name a
+bootstrap Merkle root CID; later app/runtime root changes are fetched as exact
+CAS graphs and adopted only after local operator approval. The first execution
+profile is WASI.
 OCI container images and native binaries are later, higher-risk profiles that
 require stronger local lifecycle and resource promises. Candidate root adoption
 is planned as a visible local flow with closure verification, local signer trust

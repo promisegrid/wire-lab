@@ -10,9 +10,11 @@ POC19 should turn the lessons from POC16, POC17, and POC18 into a single
 `grid` binary that can run as a local PromiseGrid daemon/microkernel, expose the
 VCS/CLI surface, fetch code and data from peers over TCP or WebSocket, and run
 fetched apps from VCS/CAS state under local promise and capability-token
-constraints. The installed binary is the minimum microkernel: app, agent,
-runtime executable, and data changes are adopted by CID-addressed CAS roots, not
-by replacing the binary. Source: `DI-lumir`; `DI-kodob`.
+constraints. The stable installed binary is a small bootstrap seed for the
+minimum microkernel: it self-updates only after local owner approval, then
+fetches remaining microkernel modules before any app-specific modules. App,
+agent, runtime executable, and data changes are adopted by CID-addressed CAS
+roots, not by replacing the binary. Source: `DI-lumir`; `DI-kodob`; `DI-zitap`.
 
 POC20 is now the parallel semantic-model track for promises as timeline
 assertions, pure-function agents, CAS branches, local/group timelines, and
@@ -129,6 +131,32 @@ Affects: `protocols/wire-lab.d/TODO/TODO-vumas-poc19-production-shape.md`;
 `implementations/poc20-timeline-pure-function-cas-branches/docs/DESIGN.md`;
 `DEV-GUIDE-RESOURCES.md`; `README.md`.
 
+ID: DI-zitap
+Date: 2026-07-11 12:12:01 PDT
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Narrow the stable installed `grid` binary to a small bootstrap seed for
+the minimum microkernel. The stable binary contains only enough functionality to
+detect a candidate new version of itself, fetch it by CID from locally trusted
+peers using minimal PromiseGrid message handling, verify the exact bytes, ask an
+owning agent or human for local approval, restart into the approved version, then
+fetch the remaining modules that make up the minimum microkernel before fetching
+application-specific modules.
+Intent: The installed binary should be stable, small, and rarely changed. Normal
+microkernel role changes, app changes, agent changes, runtime changes, protocol
+spec changes, and data changes should travel as CID-addressed CAS modules or
+roots instead of forcing binary replacement.
+Constraints: Peer trust is local and relationship-relative. Self-update approval
+is a local promise by an owning agent or human. Remaining microkernel modules are
+fetched before app-specific modules. Do not treat any peer, root, or signer as a
+global update role.
+Affects: `protocols/wire-lab.d/TODO/TODO-vumas-poc19-production-shape.md`;
+`implementations/poc19-production-shape/docs/DESIGN.md`; `README.md`;
+`DEV-GUIDE-RESOURCES.md`; `protocols/wire-lab.d/TODO/TODO.md`.
+Supersedes: `DI-kodob` only where it implied the stable installed binary itself
+contains all local daemon/microkernel roles. `DI-kodob` remains active for the
+operator-adopted CID-root update model.
+
 ## Tasks
 
 - [x] vumas.1 Lock the POC19 design-doc-first decision in `DI-lumir`.
@@ -139,8 +167,8 @@ Affects: `protocols/wire-lab.d/TODO/TODO-vumas-poc19-production-shape.md`;
   `implementations/poc19-production-shape/docs/DESIGN.md`. Source: `DI-topab`.
 - [ ] vumas.4 Decide whether POC19 implementation starts by copying POC18
   packages or by factoring shared packages into a new production-shaped module.
-- [ ] vumas.5 Scaffold `implementations/poc19-production-shape/` with one
-  `grid` binary that has daemon/client modes.
+- [ ] vumas.5 Scaffold `implementations/poc19-production-shape/` with one stable
+  `grid` bootstrap binary plus fetched daemon/client microkernel modules.
 - [ ] vumas.6 Implement daemon-managed local CAS and VCS config discovery with
   POC18-compatible `.grid` repo state.
 - [ ] vumas.7 Implement TCP and WebSocket transport adapters over the same exact
@@ -165,3 +193,7 @@ Affects: `protocols/wire-lab.d/TODO/TODO-vumas-poc19-production-shape.md`;
   callers request narrow signing, unwrap, mint, rotate, revoke, or denial records;
   plaintext secrets do not become ordinary CAS/config/log/prompt/UI payloads.
   Source: `DI-guhil`.
+- [x] vumas.15 Narrow the stable installed `grid` binary to a small bootstrap seed
+  that can self-update with local owner approval, restart, fetch remaining
+  microkernel modules, and only then fetch application-specific modules. Source:
+  `DI-zitap`.

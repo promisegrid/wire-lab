@@ -4,7 +4,7 @@
 
 Design draft. This is the first POC19 artifact. It is not executable code, not a
 frozen protocol spec, and not a production API. Source: `DI-lumir`; `DI-kodob`;
-`DI-guhil`.
+`DI-guhil`; `DI-zitap`.
 
 ## Purpose
 
@@ -19,8 +19,9 @@ that can:
 - store everything in sparse CAS and VCS/reference-set state;
 - execute fetched code with fetched data under local promises and capability
   tokens;
-- act as the minimum microkernel binary, so app, agent, runtime executable, spec,
-  and data changes are fetched by CID rather than shipped as binary updates;
+- act as the stable bootstrap seed for the minimum microkernel, so microkernel
+  role modules, app modules, agent modules, runtime executables, specs, and data
+  are fetched by CID rather than shipped as ordinary binary updates;
 - keep the Promise Theory model visible: agents cooperate by making promises,
   remembering results, and deciding locally whom to trust.
 
@@ -75,41 +76,52 @@ Reviewed anchors: POC16 `README.md`, `docs/MESSAGE-SHAPES.md`,
 The `grid` binary should contain both daemon and client behavior:
 
 ```text
-                         same executable: grid
+                  stable installed executable: grid bootstrap seed
 
       +----------------------------------------------------------+
       |                                                          |
-      |  CLI client modes              daemon/microkernel mode   |
-      |  ----------------              -----------------------   |
-      |  grid init                     grid daemon               |
-      |  grid status                   transport roles           |
-      |  grid snapshot                 pCID parser/builder roles |
-      |  grid log                      CAS/VCS roles             |
-      |  grid sync                     app runtime roles         |
-      |  grid run                      lifecycle/resource roles  |
-      |  grid git                      key/token roles           |
-      |  grid diag                     local event journal       |
+      |  built in:                    fetched microkernel modules|
+      |  ---------                    ---------------------------|
+      |  local config                 CLI/daemon surfaces        |
+      |  CID verification             transport roles            |
+      |  minimal grid() fetch         pCID parser/builder roles  |
+      |  owner approval record        CAS/VCS and sync roles     |
+      |  self-update restart          runtime/resource roles     |
+      |                               key/token/event/trust roles|
       |                                                          |
       +----------------------------------------------------------+
 ```
 
 This does not mean the kernel is monolithic. A PromiseGrid kernel remains a
 local role/profile set. The production-shaped improvement is packaging: one
-binary can start the roles needed on a normal machine, while future deployments
-can split those roles into separate processes, browser workers, mobile
-sandboxes, firmware functions, or hosted services without changing the
-PromiseGrid message model.
+binary can bootstrap the roles needed on a normal machine by fetching the
+microkernel modules named by approved CIDs, while future deployments can split
+those roles into separate processes, browser workers, mobile sandboxes, firmware
+functions, or hosted services without changing the PromiseGrid message model.
 
 ### Stable `grid` binary as the minimum microkernel
 
-The installed `grid` binary is the minimum microkernel, not the application
-distribution unit. It should be stable and change rarely. A person should be
-able to install one simple binary on a laptop, Raspberry Pi, server, or similar
-device, then receive app, agent, runtime executable, protocol-spec, and data
-changes as CID-addressed CAS/VCS objects fetched from peers rather than shipped
-as binary updates. The fetch, adoption, and update flow uses PromiseGrid
-`grid()` messages and the CIDs they name; the app bytes themselves remain exact
-CAS objects.
+The installed `grid` binary is the stable bootstrap seed for the minimum
+microkernel, not the whole microkernel and not the application distribution unit.
+It should contain very little functionality and change rarely. Its first promise
+is to provide just enough local identity/config handling, CID verification,
+minimal PromiseGrid `grid()` message handling, peer fetch, local approval
+recording, and restart handoff to bootstrap everything else.
+
+On startup, the stable binary may detect a candidate new version of itself from
+locally trusted peers. If an owning agent or human locally approves that
+self-update, `grid` fetches the new binary by CID, verifies the exact bytes and
+local signer trust criteria, installs the approved version, and restarts. After
+restart, it fetches the remaining modules that make up the minimum microkernel:
+transport adapters, pCID parser/builders, CAS/VCS, sync, app interface,
+execution runtime, lifecycle/resource protection, host-capability, secret
+service, key/token, local event journal, and trust-policy modules.
+
+Application-specific modules come after that microkernel bootstrap. App, agent,
+runtime executable, protocol-spec, and data changes are CID-addressed CAS/VCS
+objects fetched from peers through PromiseGrid `grid()` messages and the CIDs
+they name, rather than shipped as ordinary binary updates. The app bytes
+themselves remain exact CAS objects. Source: `DI-zitap`; `DI-kodob`.
 
 First run or local config may provide one bootstrap root CID. That root names a
 Merkle/CAS object graph containing app reference sets, runtime profiles,
@@ -150,12 +162,13 @@ CAS, repo/config discovery, peer connections, TCP/WebSocket listeners, app
 runtime supervision, token redemption, local event journal, and local trust
 state.
 
-The CLI side is the same binary. When a daemon is running, CLI commands use the
-same PromiseGrid message discipline over a local control stream. The first
-implementation can use loopback TCP for that control stream because it is
-portable and exercises the same framing as peer connections. Later Unix-socket,
-Windows-named-pipe, browser, or mobile adapters are allowed if they preserve the
-same pCID-selected message semantics.
+The user still invokes `grid`, but the stable bootstrap binary may load or fetch
+the CLI and daemon microkernel modules before those surfaces are available. When
+a daemon module is running, CLI commands use the same PromiseGrid message
+discipline over a local control stream. The first implementation can use loopback
+TCP for that control stream because it is portable and exercises the same framing
+as peer connections. Later Unix-socket, Windows-named-pipe, browser, or mobile
+adapters are allowed if they preserve the same pCID-selected message semantics.
 
 The CLI should not grow a parallel implementation of graph, CAS, sync, or app
 execution behavior. It should call the shared core directly only for bootstrap
@@ -551,9 +564,9 @@ resource judgments.
 
 ## Implementation phases after this design
 
-1. **Scaffold.** Create `implementations/poc19-production-shape/` with one
-   `grid` binary and shared packages. Keep POC18 code available as the source
-   baseline.
+1. **Scaffold.** Create `implementations/poc19-production-shape/` with one stable
+   `grid` bootstrap binary, a fetched microkernel-module set, and shared
+   packages. Keep POC18 code available as the source baseline.
 2. **Daemon baseline.** Move POC18 local CAS/VCS and TCP agent behavior behind
    `grid daemon`, with CLI commands using the daemon for normal operation.
 3. **Transport parity.** Add WebSocket adapter that carries the same exact
@@ -616,7 +629,8 @@ resource judgments.
 The future implementation should not be considered complete until a clean run
 shows:
 
-- one `grid` binary starts a daemon and serves CLI commands;
+- one stable `grid` bootstrap binary can fetch microkernel modules, then start a
+  daemon module and serve CLI commands;
 - app code and data are fetched from peer CAS over TCP and WebSocket using exact
   PromiseGrid messages;
 - first run or config can name a bootstrap root CID, and later app/runtime

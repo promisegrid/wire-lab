@@ -175,15 +175,18 @@ addition to exact CID checks. These are still POC-local runtime and analyzer
 facts, not production APIs. Source: `DI-biruf`.
 POC19 is now planned as the production-shape design pass that turns the POC18
 CAS/VCS/TCP pieces plus POC16/POC17 runtime lessons into a deployable-node shape:
-one binary named `grid`, `grid daemon` as the local PromiseGrid
-daemon/microkernel role set, `grid run` for VCS/CAS-backed app execution,
-WASI-first runtime support, app installation by signed `app` reference sets, and
-equal TCP/WebSocket transports carrying the same exact `grid()` CBOR messages.
-The `grid` binary is the minimum microkernel and local loader, not the app
-distribution unit: app, agent, runtime, protocol-spec, executable, and data
-changes should arrive as CID-addressed CAS roots fetched from peers. First run or
-local config may name a bootstrap root CID; later root changes require local
-operator approval before the node adopts them. POC19 now also requires
+one stable binary named `grid` as a small bootstrap seed, fetched microkernel
+modules for the local PromiseGrid daemon/microkernel role set, `grid run` for
+VCS/CAS-backed app execution, WASI-first runtime support, app installation by
+signed `app` reference sets, and equal TCP/WebSocket transports carrying the same
+exact `grid()` CBOR messages. The stable `grid` binary is not the whole
+microkernel and not the app distribution unit: it contains just enough
+functionality to detect and fetch an approved new version of itself from locally
+trusted peers, restart, then fetch remaining microkernel modules before
+application-specific modules. App, agent, runtime, protocol-spec, executable, and
+data changes should arrive as CID-addressed CAS roots fetched from peers. First
+run or local config may name a bootstrap root CID; later root changes require
+local operator approval before the node adopts them. POC19 now also requires
 operator-visible candidate-root adoption: closure verification, local signer
 trust criteria, requested host-capability review, impact summary CID, explicit
 local approval, rollback root, and original-root replay context. Host resources
@@ -196,7 +199,7 @@ POC18 CAS/VCS, reference-set, Git bridge, continuous TCP sync, tokenized
 retrieval, CAR transfer, and diagnostics lessons. It also flags the storage
 object profile and pCID inventory as pre-code follow-ups. This is currently a
 design artifact, not an executable implementation. Source: `DI-lumir`;
-`DI-topab`; `DI-kodob`; `DI-guhil`; `TODO-vumas`.
+`DI-topab`; `DI-kodob`; `DI-guhil`; `DI-zitap`; `TODO-vumas`.
 POC20 is now planned as a parallel semantic-model track, not a POC19 blocker.
 TE-lodom frames promises as timeline assertions, agents as deterministic
 pure-function servers over explicit context CIDs, decentralized CAS branches as
