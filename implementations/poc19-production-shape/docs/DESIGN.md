@@ -171,6 +171,56 @@ extend itself. The PromiseGrid version should preserve that discipline
 while moving the objects being fetched and verified into
 content-addressed CAS/VCS roots. Source: `DI-zitap`; `DI-kodob`.
 
+### Executable and module descriptors
+
+POC19 code generation should start by proving that the stage0 `grid` binary can
+fetch, verify, and start a CID-named stage1 module. This is the smallest useful
+proof of the staged bootstrap model: stage0 reads a configured or bootstrap root
+CID, fetches a stage1 descriptor and the executable objects it names from local
+CAS or a simple trusted peer fixture, verifies exact CIDs, starts one stage1
+module, and receives a readiness result from that module. Full sync, trust
+economics, app orchestration, and rich runtime management should come later.
+
+The descriptor work in `~/lab/grid-poc/x/descriptors/` is useful lineage for
+this idea. It explored CBOR executable descriptors and memory-backed execution,
+but POC19 should adopt only the production-shaped principle: a descriptor is a
+self-describing manifest for an executable object or executable object set. It
+is not the current PromiseGrid wire envelope, not a pCID-addressing scheme, and
+not a requirement to embed executable bytes inside the descriptor.
+
+POC19 descriptors should reference executable bytes by CID. That keeps executable
+objects shareable across roots, repos, apps, and sparse CAS stores, and it lets a
+node fetch only the missing objects it needs. Embedded executable bytes may still
+be useful for later constrained fixtures, but the default production-shaped path
+is descriptor-as-manifest plus executable-by-CID.
+
+The descriptor bridges app reference sets and runtime execution. An app
+reference set names descriptor CIDs. A descriptor names executable byte CIDs,
+runtime expectations, entrypoint details, required local capability promises, and
+the pCIDs the module expects to provide or consume. The daemon or stage0
+bootstrapper may then decide locally whether it promises to fetch, verify, and
+run the described object set.
+
+Minimum descriptor meaning for the first code-generation slice:
+
+```text
+descriptor kind       microkernel module, app module, runtime helper, CLI role, or daemon role
+runtime kind          WASI first; OCI and native binaries later
+target constraints    OS, arch, ABI, or runtime constraints when relevant
+executable objects    one executable CID or a CID-named closure of module objects
+entrypoint            function, command, WASI export, or process entrypoint
+runtime defaults      argv, environment references, input roots, and output promises
+capability promises   CPU, memory, filesystem, network, device, secret service, time, process count
+pCID surface          pCIDs provided, consumed, parsed, or built by the module
+lifecycle promises    readiness, shutdown, restart, and failure-reporting expectations
+```
+
+The first descriptor implementation does not need final field names, final schema
+syntax, or every runtime profile. It needs enough structure for stage0 to verify
+exact bytes, decide whether local resource promises are satisfied, start one
+stage1 module, and record the resulting local event and readiness CIDs. Source:
+`DI-zitap`; `DI-kodob`; `DI-guhil`.
+
 ### Operator-visible root adoption
 
 Root adoption is an explicit local operator flow, not an implied daemon side
