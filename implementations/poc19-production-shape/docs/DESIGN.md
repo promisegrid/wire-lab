@@ -9,11 +9,12 @@ frozen protocol spec, and not a production API. Source: `DI-lumir`; `DI-kodob`;
 ## Purpose
 
 POC19 should make PromiseGrid feel less like a harness and more like something a
-developer could drop onto a machine. The target is a single binary named `grid`
-that can:
+developer could drop onto a machine. The target is one installed executable name,
+`grid`, whose stage0 binary is only the stable bootstrap seed. Through fetched
+stage1 modules, `grid` can:
 
-- run as a local PromiseGrid daemon/microkernel;
-- expose the user-facing VCS and app CLI;
+- start local PromiseGrid daemon/microkernel roles;
+- expose the user-facing VCS and app CLI surfaces;
 - fetch apps, modules, binaries, container images, and data from peers over TCP
   or WebSocket;
 - store everything in sparse CAS and VCS/reference-set state;
@@ -71,9 +72,10 @@ Reviewed anchors: POC16 `README.md`, `docs/MESSAGE-SHAPES.md`,
 
 ## Core design principles
 
-### One binary, multiple local roles
+### One entrypoint, multiple local roles
 
-The `grid` binary should contain both daemon and client behavior:
+The installed `grid` stage0 binary should provide one user-facing entrypoint,
+not permanently contain every daemon and client role:
 
 ```text
                   stable installed executable: grid bootstrap seed
@@ -94,16 +96,17 @@ The `grid` binary should contain both daemon and client behavior:
 
 This does not mean the kernel is monolithic. A PromiseGrid kernel remains a
 local role/profile set. The production-shaped improvement is packaging: one
-binary can bootstrap the roles needed on a normal machine by fetching the
-microkernel modules named by approved CIDs, while future deployments can split
-those roles into separate processes, browser workers, mobile sandboxes, firmware
-functions, or hosted services without changing the PromiseGrid message model.
+installed stage0 entrypoint can bootstrap the roles needed on a normal machine
+by fetching the microkernel modules named by approved CIDs, while future
+deployments can split those roles into separate processes, browser workers,
+mobile sandboxes, firmware functions, or hosted services without changing the
+PromiseGrid message model.
 
 ### Stable `grid` binary as the minimum microkernel
 
 The 'grid' executable is the stable bootstrap seed for the minimum
 PromiseGrid microkernel. It contains just enough code to fetch,
-verify, and start the rest of the locally system.  Analogies to this
+verify, and start the rest of the local system.  Analogies to this
 method can be found in the GRUB, isconf, and decomk systems, mentioned
 in more detail below.
 
@@ -285,13 +288,15 @@ signed app reference set into VCS/CAS. There is no separate package-manager root
 model for POC19.
 
 An app reference set is a normal PromiseGrid reference set with role `app`. It
-labels the app's code, runtime profile, input data roots, pCID specs, entrypoint
-metadata, resource profile, and expected reciprocal promises.
+labels the app's descriptor CIDs, input data roots, pCID specs, and expected
+reciprocal promises. Descriptors then name executable byte CIDs, runtime
+profiles, entrypoint metadata, resource/capability expectations, lifecycle
+promises, and the pCID surface the app provides or consumes.
 
 App reference sets are usually reachable from an operator-adopted root CID. The
-root is a convenience and update anchor, not a global authority. Alice may adopt
-one root, Bob may adopt another, and a group may voluntarily converge on a shared
-root by making reciprocal promises to track it. Source: `DI-kodob`.
+root is a convenience and update anchor, not a universal source of truth. Alice
+may adopt one root, Bob may adopt another, and a group may voluntarily converge
+on a shared root by making reciprocal promises to track it. Source: `DI-kodob`.
 
 Example labels in an app reference set:
 
@@ -300,18 +305,17 @@ reference_set role: app
 
 label                  target role             target
 -----                  -----------             ------
-runtime                runtime_profile         42(wasi_profile_cid)
-module/main            executable_code         42(wasm_module_cid)
-module/helper          executable_code         42(wasm_module_cid)
+descriptor/default     executable_descriptor   42(app_descriptor_cid)
+descriptor/helper      executable_descriptor   42(helper_descriptor_cid)
 data/default           input_data_root         42(snapshot_or_refset_cid)
 protocols/app          protocol_spec           42(app_protocol_pcid)
-resources/requested    resource_profile        42(resource_profile_cid)
-entrypoint/default     entrypoint_record       42(entrypoint_record_cid)
+terms/reciprocal       promise_terms           42(reciprocal_terms_cid)
 ```
 
-The reference set is the install object. A later design may add app-manifest
-objects if they prove useful, but POC19 should not require a second app package
-format before the reference-set model has been tested.
+The reference set is the install object. A descriptor is not a second package
+root; it is one of the CAS objects named by the reference set so stage0, stage1,
+or the daemon can decide locally whether to fetch and run the described object
+set.
 
 ## Runtime architecture
 
@@ -497,7 +501,9 @@ Alice CLI            Alice daemon             Bob daemon              WASI modul
    |--------------------->|                       |                       |
    | local run promise    |                       |                       |
    |                      | resolve adopted root  |                       |
-   |                      | missing module/data   |                       |
+   |                      | read app reference set|                       |
+   |                      | resolve descriptor    |                       |
+   |                      | missing descriptor/module/data                 |
    |                      | sync_interest         |                       |
    |                      |---------------------->|                       |
    |                      | object_availability   |                       |
@@ -507,6 +513,7 @@ Alice CLI            Alice daemon             Bob daemon              WASI modul
    |                      | object_bytes          |                       |
    |                      |<----------------------|                       |
    |                      | verify CIDs/proofs    |                       |
+   |                      | evaluate descriptor terms                      |
    |                      | issue local runtime capability promises        |
    |                      |---------------------------------------------->|
    |                      | execute with CAS inputs                         |
@@ -535,19 +542,23 @@ Carol creates:
 
   update root reference_set
     -> app reference_set
-    -> runtime profile
+    -> descriptor objects
     -> pCID specs
     -> update notes
 
   app reference_set
-    -> runtime profile
-    -> module CIDs
+    -> descriptor CIDs
     -> data root CIDs
     -> pCID specs
-    -> entrypoint record
-    -> resource profile
 
-Carol signs the root and app reference-set promises.
+  descriptor object
+    -> runtime profile
+    -> executable module CIDs
+    -> entrypoint record
+    -> resource/capability profile
+    -> provided/consumed pCIDs
+
+Carol signs the root, app reference-set, and descriptor promises she makes.
 
 Alice receives it through normal peer sync.
 Alice may:
@@ -627,12 +638,13 @@ resource judgments.
 
 ### What should become real in POC19
 
-- One `grid` binary with daemon and client modes.
+- One installed stage0 `grid` entrypoint with fetched stage1 daemon/client
+  modules.
 - Real TCP and WebSocket transport adapters.
 - Real sparse CAS shared across repos/apps on one node.
 - Real bootstrap from an operator-provided root CID.
-- Real app reference-set resolution from VCS/CAS.
-- Real WASI execution from fetched module bytes.
+- Real app reference-set and descriptor resolution from VCS/CAS.
+- Real WASI execution from descriptor-named module bytes.
 - Real CWT/COSE capability tokens for retrieval, storage, and local runtime
   resources.
 - Real exact-message retention and diagnostic rendering.
@@ -650,37 +662,52 @@ resource judgments.
 
 ## Implementation phases after this design
 
-1. **Scaffold.** Create `implementations/poc19-production-shape/` with one stable
-   `grid` bootstrap binary, a fetched microkernel-module set, and shared
-   packages. Keep POC18 code available as the source baseline.
-2. **Daemon baseline.** Move POC18 local CAS/VCS and TCP agent behavior behind
-   `grid daemon`, with CLI commands using the daemon for normal operation.
-3. **Transport parity.** Add WebSocket adapter that carries the same exact
+First-slice proof:
+
+1. **Stage0 scaffold.** Create the installed `grid` stage0 entrypoint with local
+   config, CID verification, minimal CAS fetch, local approval recording, and
+   restart/start handoff.
+2. **Descriptor fixture.** Add one CID-named stage1 descriptor and one
+   executable stage1 module object to a local CAS fixture.
+3. **Stage1 readiness.** Have stage0 fetch the descriptor and executable object,
+   verify exact CIDs, start the stage1 module, and record a local readiness
+   result.
+
+Full POC19 after the first proof:
+
+4. **Shared baseline.** Keep POC18 code available as the source baseline while
+   factoring shared packages so stage1 modules do not duplicate CLI, CAS, VCS, or
+   transport logic.
+5. **Daemon baseline.** Move POC18 local CAS/VCS and TCP agent behavior behind a
+   fetched `grid daemon` stage1 module, with CLI commands using the daemon for
+   normal operation.
+6. **Transport parity.** Add WebSocket adapter that carries the same exact
    `grid()` bytes as TCP and proves parity in a clean run.
-4. **Bootstrap roots.** Add config/first-run support for an operator-provided
+7. **Bootstrap roots.** Add config/first-run support for an operator-provided
    root CID, candidate-root closure verification, impact summaries, local
    approval promises, rollback roots, and replay context.
-5. **App reference sets.** Add role `app` reference sets and resolve app code,
-   data, pCID specs, runtime profile, and entrypoint labels from CAS.
-6. **WASI run.** Implement `grid run` for a fetched WASI module with CID-verified
-   inputs and CAS-recorded outputs.
-7. **Capability promises.** Add local runtime capability tokens for CPU, memory,
+8. **App reference sets.** Add role `app` reference sets and resolve descriptor
+   CIDs, data roots, pCID specs, and reciprocal terms from CAS.
+9. **WASI run.** Implement `grid run` for a descriptor-named WASI module with
+   CID-verified inputs and CAS-recorded outputs.
+10. **Capability promises.** Add local runtime capability tokens for CPU, memory,
    time, storage, network, filesystem, device, secret-reference, and host-function
    promises.
-8. **Secret service.** Add operation-scoped local secret service promises for
+11. **Secret service.** Add operation-scoped local secret service promises for
    signing, unwrap, short-lived credential minting, rotation, revocation, and
    denial events without placing plaintext secrets in broad CAS/log/prompt/UI
    paths.
-9. **Container/native profiles.** Store and verify OCI image graphs and native
+12. **Container/native profiles.** Store and verify OCI image graphs and native
    binaries, then execute only under explicit local runtime promises.
-10. **Regression gates.** Prove POC18 superset behavior, promise-shaped
+13. **Regression gates.** Prove POC18 superset behavior, promise-shaped
    inter-agent traffic, TCP/WebSocket parity, exact-CBOR diagnostics, and local
    event records.
 
 ## Design risks
 
-- **Single binary becoming monolithic.** Mitigation: keep local roles explicit
-  and testable even when packaged together.
+- **Stage0 becoming monolithic.** Mitigation: keep built-in stage0 behavior
+  small, and keep stage1 local roles explicit and testable even when packaged
+  together for a host profile.
 - **CLI reimplementing core logic.** Mitigation: one shared core library;
   daemon-backed normal operation; direct CLI logic only for bootstrap/offline
   reads.
@@ -712,11 +739,22 @@ resource judgments.
 
 ## Acceptance criteria for the future executable POC19
 
-The future implementation should not be considered complete until a clean run
-shows:
+The first code-generation slice should not be considered complete until a clean
+run shows:
 
-- one stable `grid` bootstrap binary can fetch microkernel modules, then start a
-  daemon module and serve CLI commands;
+- one installed `grid` stage0 binary reads a configured or bootstrap root CID;
+- stage0 fetches a CID-named stage1 descriptor and executable object from CAS;
+- stage0 verifies exact CIDs before starting the stage1 module;
+- the stage1 module produces a readiness result that stage0 records as local
+  event/CID output;
+- replacing app or stage1 fixture bytes changes CAS/root CIDs, not the installed
+  stage0 binary.
+
+The full future implementation should not be considered complete until a clean
+run also shows:
+
+- one stable `grid` bootstrap binary can fetch descriptor-named stage1
+  microkernel modules, then start daemon/client modules that serve CLI commands;
 - app code and data are fetched from peer CAS over TCP and WebSocket using exact
   PromiseGrid messages;
 - first run or config can name a bootstrap root CID, and later app/runtime
@@ -730,8 +768,8 @@ shows:
   produced them;
 - plaintext secrets do not appear in config, CAS, diagnostics, logs, prompts, or
   UI output;
-- at least one WASI app is installed through an app reference set and run from
-  VCS/CAS;
+- at least one WASI app is installed through an app reference set, resolved
+  through an executable descriptor, and run from VCS/CAS;
 - outputs are CAS objects with CIDs returned to the user;
 - local runtime capability promises are issued and checked;
 - sparse CAS remains partial and peer-relative;
