@@ -122,6 +122,14 @@ verification, minimal PromiseGrid `grid()` message handling, peer
 fetch, local approval recording, and restart handoff to find, verify,
 and start the rest of the locally approved system.
 
+Stage0 owns the minimal local trust base needed to verify stage1: configured
+bootstrap roots, pinned public keys or other local trust anchors, exact CID
+verification, local approval recording, and enough PromiseGrid message handling
+to fetch the stage1 closure. Richer trust-policy modules may live in stage1, but
+stage0 cannot require unverified stage1 trust-policy code to decide whether
+stage1 is authentic. That would make the bootstrap chain circular. Source:
+`DI-zitap`; `DI-guhil`.
+
 Stage1 is the rest of the minimum microkernel modules as a CID-named executable
 object closure. The stage1 closure contains transport adapters, pCID
 parser/builders, CAS/VCS, sync, app interface, execution runtime,
@@ -132,11 +140,15 @@ local approval, and start those modules. Stage1 modules are exact CAS/VCS
 objects named by approved CIDs, not hidden side loads.
 
 Stage0 itself may still self-update, but that is a special replacement of the
-installed bootstrap seed, not the definition of stage1. On startup, stage0 may
-detect a candidate new stage0 binary from locally trusted peers. If an owning
-agent or human locally approves that self-update, `grid` fetches the new binary
-as a CAS object by CID, verifies the exact bytes and local signer trust criteria,
-writes the approved version to disk, and restarts.
+installed bootstrap seed, not the definition of stage1 and not ordinary root
+adoption. On startup, stage0 may detect a candidate new stage0 binary from
+locally trusted peers or from a locally adopted root. If an owning agent or human
+locally approves that self-update, `grid` fetches the new binary as a CAS object
+by CID, verifies the exact bytes, platform constraints, local signer trust
+criteria, and local approval, writes the approved version beside the current
+binary, switches atomically where the host allows it, retains the previous binary
+and rollback metadata, records a self-update event, and restarts. Source:
+`DI-zitap`; `DI-guhil`.
 
 Application-specific modules come after the stage1 microkernel bootstrap. Those
 objects might later be called stage2 if that vocabulary becomes useful, but
@@ -223,6 +235,13 @@ syntax, or every runtime profile. It needs enough structure for stage0 to verify
 exact bytes, decide whether local resource promises are satisfied, start one
 stage1 module, and record the resulting local event and readiness CIDs. Source:
 `DI-zitap`; `DI-kodob`; `DI-guhil`.
+
+The first stage1 runtime remains an explicit code-generation decision. A
+native/static stage1 bootstrap module keeps stage0 smaller because stage0 does
+not need a WASI loader. A WASI stage1 module proves WASI earlier, but requires
+stage0 to contain enough WASI runtime support to start stage1. POC19 should keep
+both choices visible until the implementation decision is locked. Source:
+`DI-zitap`.
 
 ### Operator-visible root adoption
 
@@ -744,7 +763,11 @@ run shows:
 
 - one installed `grid` stage0 binary reads a configured or bootstrap root CID;
 - stage0 fetches a CID-named stage1 descriptor and executable object from CAS;
+- stage0 verifies stage1 without depending on unverified stage1 trust-policy
+  code;
 - stage0 verifies exact CIDs before starting the stage1 module;
+- the run documents whether the first stage1 module is native/static or WASI,
+  and why stage0 does or does not contain a WASI loader;
 - the stage1 module produces a readiness result that stage0 records as local
   event/CID output;
 - replacing app or stage1 fixture bytes changes CAS/root CIDs, not the installed
@@ -764,6 +787,10 @@ run also shows:
   unapproved requested host capabilities do not become active roots silently;
 - root adoption produces an impact summary CID and rollback root, and rollback
   returns to the prior root without replacing the installed binary;
+- stage0 self-update writes the candidate beside the current binary, verifies
+  it, switches atomically where possible, and retains rollback metadata;
+- stage0 self-update events are recorded separately from ordinary runtime-root
+  adoption events;
 - retained artifacts can be replayed with the runtime root that originally
   produced them;
 - plaintext secrets do not appear in config, CAS, diagnostics, logs, prompts, or
