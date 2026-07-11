@@ -28,7 +28,8 @@ remain review evidence until promoted. Source: `DI-baral`; `DI-sisak`;
 `DI-rujod`; `DI-zuruj`; `DI-dibut`; `DI-dofoj`; `DI-radaj`; `DI-fusir`;
 `DI-rudos`; `DI-fakop`; `DI-koriz`; `DI-biruf`; `DI-lumir`; `DI-topab`;
 `DI-kakos`; `DI-bibah`; `DI-mokaz`; `DI-lamaz`; `DI-kodob`; `DI-lulog`;
-`DI-guhil`; `DI-ruvum`; `DI-minol`; `DI-gapav`.
+`DI-guhil`; `DI-ruvum`; `DI-minol`; `DI-gapav`; `DI-zosol`; `DI-tanov`;
+`DI-dahaj`; `DI-moson`.
 The root `README.md` is now the first-stop returning-member primer: it gives a
 clean narrative from simulations and GA design search through the grouped POC
 journey, ending with the current envelope, pCID, CBOR/CID, sparse-CAS,
@@ -185,13 +186,13 @@ functionality to detect and fetch an approved new version of itself from locally
 trusted peers, restart, then fetch remaining microkernel modules before
 application-specific modules. App, agent, runtime, protocol-spec, executable, and
 data changes should arrive as CID-addressed CAS roots fetched from peers. First
-run or local config may name a bootstrap root CID; later root changes require
+run or local config may name a bootstrap Merkle/CAS root CID; later root changes require
 local operator approval before the node adopts them. POC19 now also requires
 operator-visible candidate-root adoption: closure verification, local signer
 trust criteria, requested host-capability review, impact summary CID, explicit
-local approval, rollback root, and original-root replay context. Host resources
-are narrow local capability promises, and secrets stay behind operation-scoped
-local services rather than ordinary CAS/config/log/prompt/UI payloads. The POC19
+local approval, prior/corrective Merkle/CAS root CIDs, and original-root replay
+context. Host resources are narrow local capability promises, and secrets stay
+behind operation-scoped local services rather than ordinary CAS/config/log/prompt/UI payloads. The POC19
 design now includes an inheritance matrix that checks POC16 pCID, parser/builder,
 CWT/COSE token, encrypted-payload, kernel-role, sparse-CAS, and exact-CBOR
 lessons; POC17 constrained-device binary-CID and compact-payload lessons; and
@@ -231,12 +232,25 @@ hashable spec set has three protocol families: `timeline-v1`
 (`bafkreie4prt2erwwwjyjltwm273oydhu7z22gbwixvnfdtrtaosegaeg6i.md`). Source:
 `DI-kakos`; `DI-bibah`; `DI-mokaz`; `DI-lamaz`; `DI-kodob`; `DI-lulog`;
 `DI-ruvum`; `TE-lodom`; `TODO-nudav`.
+POC21 is now planned as the DevOps application of the recent line: POC18's
+CAS/VCS and sparse sync, POC19's stage0/stage1 bootstrap, and POC20's
+CAS-backed timeline/replay semantics. It lives under
+`implementations/poc21-grid-devops/` and remains separate from POC20. The first
+target is a disposable container running `grid` as root, not host-root mutation.
+The first proof is actual stage0 self-update from CAS; the second is ordered
+machine-change replay with triggers, validation, and duplicate-target replay; the
+third is package/container-image-style artifact distribution through in-band
+CAS/VCS objects. POC21 follows the infrastructures.org/isconf/Turing-equivalence
+lesson that machine updates must preserve ordered journals because changing a
+machine changes the machine that runs later changes. Source: `DI-zosol`;
+`DI-tanov`; `DI-dahaj`; `DI-moson`; `TODO-kifok`.
 Source: `DI-zuruj`; `DI-dibut`; `DI-dofoj`; `DI-radaj`; `DI-lidaj`;
 `DI-fusir`; `DI-jifuj`; `DI-harih`; `DI-gozov`; `DI-guban`; `DI-fimap`;
 `DI-pahor`; `DI-bikif`; `DI-kiram`; `DI-bamum`; `DI-jokav`; `DI-tuhoj`;
 `DI-mivur`; `DI-bidum`; `DI-rudos`; `DI-fakop`; `DI-koriz`; `DI-biruf`;
 `DI-lumir`; `DI-topab`; `DI-kakos`; `DI-bibah`; `DI-mokaz`; `DI-lamaz`;
 `DI-kodob`; `DI-lulog`; `DI-guhil`; `DI-ruvum`; `DI-minol`; `DI-gapav`;
+`DI-zosol`; `DI-tanov`; `DI-dahaj`; `DI-moson`;
 `DN-dopod`; `TE-kopap`; `TE-vahoj`; `TE-hikar`; `TE-givul`; `TE-nozal`;
 `TE-lodom`.
 

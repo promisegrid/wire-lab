@@ -7,7 +7,7 @@ design entrypoint, but protocol pCIDs require standalone hashable spec documents
 under `docs/protocols/`. This document is not executable code and not a
 production API. The canonical task record remains `TODO-nudav`. Source:
 `DI-kakos`; `DI-bibah`; `DI-mokaz`; `DI-lamaz`; `DI-lulog`; `DI-kodob`;
-`DI-ruvum`; `TE-lodom`; `TODO-nudav`.
+`DI-ruvum`; `DI-moson`; `TE-lodom`; `TODO-nudav`; `TODO-kifok`.
 
 ## Locked direction
 
@@ -17,6 +17,13 @@ deterministic pure-function servers over explicit content-addressed context,
 decentralized CAS object chains as local or group timelines, and
 capability-token double-spend as visible branch history rather than hidden
 mutable projection state.
+
+POC20 must also preserve enough CAS event-source, branch, root-decision, and
+projection-replay semantics for POC21's DevOps use case: pull-based machine
+administration, stage0 self-update, ordered change journals, trigger results,
+duplicate-target replay, and corrective roll-forward. POC20 does not execute
+machine mutation itself; that operational scope belongs to
+`implementations/poc21-grid-devops/`. Source: `DI-moson`; `TODO-kifok`.
 
 The first executable POC20 implementation must be a hybrid:
 
