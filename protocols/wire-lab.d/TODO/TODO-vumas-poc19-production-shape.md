@@ -103,6 +103,32 @@ Affects: `implementations/poc19-production-shape/docs/DESIGN.md`;
 `implementations/poc20-timeline-pure-function-cas-branches/docs/DESIGN.md`;
 `DEV-GUIDE-RESOURCES.md`; `README.md`.
 
+ID: DI-guhil
+Date: 2026-07-10 14:26:37 PDT
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Extend POC19 root adoption into an operator-visible local flow with
+candidate-root fetch, closure verification, local signer trust criteria,
+requested host-capability review, impact summary, explicit local approval,
+rollback root retention, and replay context. Treat every bridge to a local host
+resource as a narrow capability promise made by the local node, and keep secrets
+behind operation-scoped local services rather than ordinary CAS payloads.
+Intent: POC19 should prove that app, agent, runtime, protocol, fixture, UI, or
+policy changes are adopted as CID-addressed roots without silently widening local
+resource promises or leaking secrets into config, CAS, diagnostics, logs, prompts,
+or UI output.
+Constraints: Use positive PromiseGrid vocabulary: local approval, local
+capability promise, local signer trust criteria, local event, rollback root, and
+replayable context. Do not add production UI scope, any globally privileged
+update or signer role, secret plaintext in CAS, or sideband package-manager
+semantics. This remains pre-code planning until `vumas.4` and implementation
+tasks are separately started.
+Affects: `protocols/wire-lab.d/TODO/TODO-vumas-poc19-production-shape.md`;
+`implementations/poc19-production-shape/docs/DESIGN.md`;
+`protocols/wire-lab.d/TODO/TODO-nudav-poc20-timeline-pure-function-cas-branches.md`;
+`implementations/poc20-timeline-pure-function-cas-branches/docs/DESIGN.md`;
+`DEV-GUIDE-RESOURCES.md`; `README.md`.
+
 ## Tasks
 
 - [x] vumas.1 Lock the POC19 design-doc-first decision in `DI-lumir`.
@@ -129,3 +155,13 @@ Affects: `implementations/poc19-production-shape/docs/DESIGN.md`;
   bootstraps from operator-adopted root CIDs, while app, agent, runtime
   executable, spec, and data changes are fetched from CAS/peers without replacing
   the binary. Source: `DI-kodob`.
+- [x] vumas.12 Lock the operator-visible root-adoption flow: candidate-root fetch,
+  closure/signature/spec/capability review, impact summary, explicit local
+  approval, rollback root retention, and replay context. Source: `DI-guhil`.
+- [x] vumas.13 Lock host capabilities as narrow local promises covering network,
+  filesystem, device, host-function, secret-reference, execution-resource, and
+  storage access. Source: `DI-guhil`.
+- [x] vumas.14 Lock operation-scoped secret services as the POC19 direction:
+  callers request narrow signing, unwrap, mint, rotate, revoke, or denial records;
+  plaintext secrets do not become ordinary CAS/config/log/prompt/UI payloads.
+  Source: `DI-guhil`.

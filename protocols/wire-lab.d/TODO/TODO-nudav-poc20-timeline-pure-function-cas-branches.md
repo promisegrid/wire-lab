@@ -129,6 +129,31 @@ Affects: `implementations/poc20-timeline-pure-function-cas-branches/docs/DESIGN.
 `protocols/wire-lab.d/TODO/TODO-nudav-poc20-timeline-pure-function-cas-branches.md`;
 `DEV-GUIDE-RESOURCES.md`; `README.md`.
 
+ID: DI-ruvum
+Date: 2026-07-10 14:26:37 PDT
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Extend POC20 timeline semantics with replayable root-decision details,
+structured projection-conflict records, source-key plus action-hash replay rules,
+explicit projection rebuild proof obligations, and sensitive-data shareability
+rules for private, encrypted-shareable, and plain-shareable CAS content.
+Intent: POC20 should test operational timeline behavior where local decisions can
+be replayed from CAS without hidden mutable projection state, without silently
+overwriting reviewed values, and without embedding unnecessary secrets or
+sensitive personal payloads in broadly replicated trees.
+Constraints: Keep all decisions local and voluntary. Use local event language
+rather than production monitor language. A source key must come from a stable
+upstream fact, root event, or timeline event; generated action hashes are
+secondary guards, not primary identity. Sensitive payloads may be private,
+encrypted, referenced by opaque handle, or represented by keyed commitment; avoid
+plain hashes of guessable sensitive data.
+Affects: `protocols/wire-lab.d/TODO/TODO-nudav-poc20-timeline-pure-function-cas-branches.md`;
+`implementations/poc20-timeline-pure-function-cas-branches/docs/DESIGN.md`;
+`implementations/poc20-timeline-pure-function-cas-branches/docs/protocols/timeline-v1.md`;
+`implementations/poc20-timeline-pure-function-cas-branches/docs/protocols/pure-function-v1.md`;
+`implementations/poc20-timeline-pure-function-cas-branches/docs/protocols/capability-token-v1.md`;
+`DEV-GUIDE-RESOURCES.md`; `README.md`.
+
 ## Tasks
 
 - [x] nudav.1 Write `TE-lodom` covering promise timeline assertions,
@@ -177,6 +202,17 @@ Affects: `implementations/poc20-timeline-pure-function-cas-branches/docs/DESIGN.
 - [x] nudav.18 Lock bootstrap root adoption and root update semantics as local
   timeline promises, with runtime/app roots included in pure-function context
   when they affect computation. Source: `DI-lulog`.
+- [x] nudav.19 Lock replayable root-decision detail: adopted, rejected,
+  superseded, rollback, still-evaluating, approving role, impact summary CID,
+  capability-change summary, local reason, and rollback root. Source: `DI-ruvum`.
+- [x] nudav.20 Lock structured projection-conflict and replay semantics: conflicts
+  are local timeline records, source keys are stable upstream/timeline facts, and
+  generated action hashes are secondary guards requiring new local decisions when
+  they change. Source: `DI-ruvum`.
+- [x] nudav.21 Lock privacy-compatible storage requirements: sensitive payloads use
+  private or encrypted CAS namespaces, opaque handles, encrypted-object CIDs, or
+  keyed commitments; broad summaries must avoid plaintext secrets and unnecessary
+  sensitive personal payloads. Source: `DI-ruvum`.
 
 ## Acceptance criteria for the future executable POC20
 
@@ -210,3 +246,13 @@ Affects: `implementations/poc20-timeline-pure-function-cas-branches/docs/DESIGN.
   create trust, authority, or an obligation to execute.
 - Pure-function result records include the relevant app/runtime root CIDs in
   explicit context when executable code or runtime behavior affects the result.
+- Root-decision records include local decision state, approving role, impact
+  summary CID, capability-change summary, local reason, and rollback root where
+  applicable.
+- Projection conflicts are represented as local timeline records that can be
+  replayed from CAS and do not silently overwrite reviewed values or stale
+  projections.
+- Replay keys use stable source facts, root events, or timeline events as primary
+  identity and generated action hashes only as secondary same-action guards.
+- Sensitive examples prove that broad replicated summaries avoid plaintext
+  secrets and unnecessary sensitive personal payloads.

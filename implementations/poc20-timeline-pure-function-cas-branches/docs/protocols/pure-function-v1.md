@@ -6,8 +6,8 @@ POC20 pre-code protocol specification. This document is intentionally standalone
 so its exact bytes can be named by a pCID. The pCID is the CID of this document,
 not the CID of any function, input, output, message, or payload.
 
-Source: `DI-lamaz`; `DI-mokaz`; `DI-lulog`; `DI-kodob`; `TODO-nudav`;
-`TE-lodom`.
+Source: `DI-lamaz`; `DI-mokaz`; `DI-lulog`; `DI-kodob`; `DI-ruvum`;
+`TODO-nudav`; `TE-lodom`.
 
 ## Purpose
 
@@ -75,6 +75,12 @@ the same `result`. Any clock reads, random values, sensor samples, exchange-rate
 quotes, peer promises, model versions, runtime versions, app root CIDs, runtime
 root CIDs, protocol-spec CIDs, data root CIDs, or hardware-specific facts that
 affect output must be represented inside `context`.
+
+Replay source keys and generated action hashes are not hidden compute inputs. If
+they affect the function result, retry behavior, or downstream action being
+promised, they must appear in `context` as ordinary CAS objects. A changed action
+hash for the same source key is a different replay situation unless a later local
+timeline record proves a correction or explicit sequence extension.
 
 If Bob returns two different result CIDs for the same tuple, receivers do not
 need a central judge. Each receiver can retain both records and make a local
@@ -145,6 +151,8 @@ objects that the promiser does not currently promise to send.
 - A context object that names unavailable app/runtime roots is incomplete. A
   receiver may request those roots, retain the record as partial, or decline to
   verify the tuple.
+- A context object that omits a replay source key or action hash that affected
+  the promised result is incomplete for deterministic replay.
 - A verification record is local to the verifier. It is not a global verdict.
 
 ## Security and privacy
@@ -164,4 +172,6 @@ A POC20 implementation of this protocol must demonstrate:
 - no ambient timestamp, randomness, sensor, model, peer quote, or exchange-rate
   input outside the context object;
 - at least one result whose context explicitly names the app/runtime root CIDs
-  used to produce or verify the result.
+  used to produce or verify the result;
+- at least one result whose context names a replay source key and generated
+  action hash when those facts affect retry or downstream-action behavior.

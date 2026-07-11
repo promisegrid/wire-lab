@@ -8,7 +8,7 @@ PromiseGrid design choices are derived, tested, and recorded. Source:
 
 ## Current Design State
 
-Snapshot refreshed by Codex on 2026-07-09 19:19 PDT. This is a
+Snapshot refreshed by Codex on 2026-07-10 14:26 PDT. This is a
 developer-facing protocol-design snapshot, not a frozen PromiseGrid API. It
 reflects the currently locked outer-envelope direction plus consensus across
 near-contender simulations and root `results/` JSON evidence; proposal children
@@ -28,7 +28,7 @@ remain review evidence until promoted. Source: `DI-baral`; `DI-sisak`;
 `DI-rujod`; `DI-zuruj`; `DI-dibut`; `DI-dofoj`; `DI-radaj`; `DI-fusir`;
 `DI-rudos`; `DI-fakop`; `DI-koriz`; `DI-biruf`; `DI-lumir`; `DI-topab`;
 `DI-kakos`; `DI-bibah`; `DI-mokaz`; `DI-lamaz`; `DI-kodob`; `DI-lulog`;
-`DI-minol`; `DI-gapav`.
+`DI-guhil`; `DI-ruvum`; `DI-minol`; `DI-gapav`.
 The root `README.md` is now the first-stop returning-member primer: it gives a
 clean narrative from simulations and GA design search through the grouped POC
 journey, ending with the current envelope, pCID, CBOR/CID, sparse-CAS,
@@ -183,15 +183,20 @@ The `grid` binary is the minimum microkernel and local loader, not the app
 distribution unit: app, agent, runtime, protocol-spec, executable, and data
 changes should arrive as CID-addressed CAS roots fetched from peers. First run or
 local config may name a bootstrap root CID; later root changes require local
-operator approval before the node adopts them. The POC19 design now includes an
-inheritance matrix that checks POC16 pCID, parser/builder, CWT/COSE token,
-encrypted-payload, kernel-role, sparse-CAS, and exact-CBOR lessons; POC17
-constrained-device binary-CID and compact-payload lessons; and POC18 CAS/VCS,
-reference-set, Git bridge, continuous TCP sync, tokenized retrieval, CAR
-transfer, and diagnostics lessons. It also flags the storage object profile and
-pCID inventory as pre-code follow-ups. This is currently a design artifact, not
-an executable implementation. Source: `DI-lumir`; `DI-topab`; `DI-kodob`;
-`TODO-vumas`.
+operator approval before the node adopts them. POC19 now also requires
+operator-visible candidate-root adoption: closure verification, local signer
+trust criteria, requested host-capability review, impact summary CID, explicit
+local approval, rollback root, and original-root replay context. Host resources
+are narrow local capability promises, and secrets stay behind operation-scoped
+local services rather than ordinary CAS/config/log/prompt/UI payloads. The POC19
+design now includes an inheritance matrix that checks POC16 pCID, parser/builder,
+CWT/COSE token, encrypted-payload, kernel-role, sparse-CAS, and exact-CBOR
+lessons; POC17 constrained-device binary-CID and compact-payload lessons; and
+POC18 CAS/VCS, reference-set, Git bridge, continuous TCP sync, tokenized
+retrieval, CAR transfer, and diagnostics lessons. It also flags the storage
+object profile and pCID inventory as pre-code follow-ups. This is currently a
+design artifact, not an executable implementation. Source: `DI-lumir`;
+`DI-topab`; `DI-kodob`; `DI-guhil`; `TODO-vumas`.
 POC20 is now planned as a parallel semantic-model track, not a POC19 blocker.
 TE-lodom frames promises as timeline assertions, agents as deterministic
 pure-function servers over explicit context CIDs, decentralized CAS branches as
@@ -207,24 +212,28 @@ local timeline promises: a root CID names a Merkle/CAS graph of app refs,
 runtime profiles, executable objects, specs, data roots, and update metadata,
 but it does not by itself name trust or obligation. When fetched app/runtime/spec
 roots affect a pure-function result, those root CIDs are part of the explicit
-context for that result. The implementation-local POC20 design entrypoint is
+context for that result. POC20 now also requires root-decision details,
+projection-conflict records, source-key plus action-hash replay decisions,
+projection rebuild proof obligations, and sensitive-data shareability rules so
+local decisions remain replayable from CAS without broad plaintext sensitive
+payloads. The implementation-local POC20 design entrypoint is
 `implementations/poc20-timeline-pure-function-cas-branches/docs/DESIGN.md`,
 which now locks the first executable scenario as a hybrid of POC16 runtime,
 pCID/parser/proof/TCP lessons and POC18 CAS/graph/sync lessons. POC20's first
 hashable spec set has three protocol families: `timeline-v1`
-(`bafkreiet7vsxvtkjgd2vibxhfuev2fge7jn26r7ok25ngrsy65gm2jtmu4.md`),
+(`bafkreihfdasban663gaabn7rtbxionkz7pnenf6t5uro27jd3hij5npqam.md`),
 `pure-function-v1`
-(`bafkreift5irohogmykf35prbxuyb34k444rvf3glc2mzedgkr3fotki7sy.md`), and
+(`bafkreigk2w2frnyh5dftaaftbarjdnl2gofzlepm5kfzmppe6cchui2l6i.md`), and
 `capability-token-v1`
-(`bafkreibnfrb5t5qvc77hhss4q3bbqvyrfkk4bdn2xvpaqg7pmpsjn5tiui.md`). Source:
+(`bafkreie4prt2erwwwjyjltwm273oydhu7z22gbwixvnfdtrtaosegaeg6i.md`). Source:
 `DI-kakos`; `DI-bibah`; `DI-mokaz`; `DI-lamaz`; `DI-kodob`; `DI-lulog`;
-`TE-lodom`; `TODO-nudav`.
+`DI-ruvum`; `TE-lodom`; `TODO-nudav`.
 Source: `DI-zuruj`; `DI-dibut`; `DI-dofoj`; `DI-radaj`; `DI-lidaj`;
 `DI-fusir`; `DI-jifuj`; `DI-harih`; `DI-gozov`; `DI-guban`; `DI-fimap`;
 `DI-pahor`; `DI-bikif`; `DI-kiram`; `DI-bamum`; `DI-jokav`; `DI-tuhoj`;
 `DI-mivur`; `DI-bidum`; `DI-rudos`; `DI-fakop`; `DI-koriz`; `DI-biruf`;
 `DI-lumir`; `DI-topab`; `DI-kakos`; `DI-bibah`; `DI-mokaz`; `DI-lamaz`;
-`DI-kodob`; `DI-lulog`; `DI-minol`; `DI-gapav`;
+`DI-kodob`; `DI-lulog`; `DI-guhil`; `DI-ruvum`; `DI-minol`; `DI-gapav`;
 `DN-dopod`; `TE-kopap`; `TE-vahoj`; `TE-hikar`; `TE-givul`; `TE-nozal`;
 `TE-lodom`.
 

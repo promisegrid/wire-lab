@@ -37,7 +37,8 @@ transfer, and diagnostic raw artifacts for later review. POC18 applies those
 ideas to a CAS-backed version-control system. POC19 is now planned as the first
 production-shaped pass: one `grid` binary as the minimum microkernel, with
 daemon/client modes, VCS/CAS apps, WASI-first execution, CID-rooted app/runtime
-updates, and equal TCP/WebSocket message transports. Source: `DI-kodob`.
+updates, operator-visible root adoption, local host-capability promises, and
+equal TCP/WebSocket message transports. Source: `DI-kodob`; `DI-guhil`.
 
 The design is still provisional. The POCs are executable evidence and current
 direction, not frozen public APIs.
@@ -207,7 +208,12 @@ fetched apps from VCS/CAS. First run or local config may name a bootstrap Merkle
 root CID; later app/runtime root changes are fetched as exact CAS graphs and
 adopted only after local operator approval. The first execution profile is WASI.
 OCI container images and native binaries are later, higher-risk profiles that
-require stronger local lifecycle and resource promises. Source: `DI-kodob`.
+require stronger local lifecycle and resource promises. Candidate root adoption
+is planned as a visible local flow with closure verification, local signer trust
+criteria, host-capability review, impact summary, rollback root, and replay
+context. Plaintext secrets stay behind operation-scoped local services rather
+than ordinary CAS, config, log, prompt, diagnostic, or UI payloads. Source:
+`DI-kodob`; `DI-guhil`.
 
 A grid app is installed by checking a signed app reference set into VCS/CAS.
 `grid run` asks the local daemon whether it currently promises to execute that
@@ -273,6 +279,7 @@ The following are still active design areas:
 - the final SDK and stable app/kernel boundary;
 - the final production pCID set;
 - the exact POC19 daemon/client implementation shape;
+- the POC19 operator root-adoption and host-capability UI shape;
 - the durable object-store profile for raw chunks, DAG-CBOR, GRID-CBOR, and CAR
   storage;
 - the final WASI host ABI and runtime token shape;

@@ -6,17 +6,18 @@ POC20 pre-code protocol specification. This document is intentionally standalone
 so its exact bytes can be named by a pCID. The pCID is the CID of this document,
 not the CID of any message or payload.
 
-Source: `DI-lamaz`; `DI-mokaz`; `DI-lulog`; `DI-kodob`; `TODO-nudav`;
-`TE-lodom`.
+Source: `DI-lamaz`; `DI-mokaz`; `DI-lulog`; `DI-kodob`; `DI-ruvum`;
+`TODO-nudav`; `TE-lodom`.
 
 ## Purpose
 
 `timeline-v1` defines promise-shaped records for local timelines, group
 timeline agreements, branch heads, merge decisions, shareability decisions,
-bootstrap root adoption, root updates, and projection checkpoints. It exists so
-POC20 can test the rule that local CAS is the chronological event source and
-source of truth, while every JSON file, SQLite table, in-memory map, or other
-local view is only a rebuildable projection.
+bootstrap root adoption, root updates, projection conflicts, replay decisions,
+sensitive-data handling, and projection checkpoints. It exists so POC20 can test
+the rule that local CAS is the chronological event source and source of truth,
+while every JSON file, SQLite table, in-memory map, or other local view is only a
+rebuildable projection.
 
 This protocol does not define global truth, global branch authority, global
 trust, or global monitoring. Every record is a promise by its promiser from that
@@ -79,6 +80,14 @@ Record types:
   purpose.
 - `root_update`: a local promise that a later root CID supersedes, narrows,
   forks, or is rejected relative to an earlier adopted root.
+- `projection_conflict`: a local promise that a derived projection conflicts with
+  reviewed local state, source observations, later external facts, or another
+  projection.
+- `replay_decision`: a local promise about whether an action with a stable source
+  key and generated action hash is new, same-action replay, correction, or
+  sequence extension.
+- `erasure_event`: a local promise that a private or encrypted payload was
+  deleted, redacted, tombstoned, or cryptographically erased under local policy.
 - `projection_checkpoint`: a promise that a derived local projection was rebuilt
   from a named CAS head at a named time.
 
@@ -108,6 +117,31 @@ forks, narrows, or is still evaluating the candidate root. Operator approval is
 represented as a local promise by the operator or local node role. No update
 record commands another agent to adopt the same root.
 
+The body of a root decision must be replayable from local CAS. It should include
+the current root, candidate root, rollback root, closure summary CID, signer
+summary CID, impact summary CID, accepted or rejected capability changes,
+approving local role, local decision state, and local reason whenever those facts
+exist. Missing optional facts should be explicit rather than hidden in a
+projection.
+
+## Projection conflicts and replay decisions
+
+A `projection_conflict` record preserves local conflict context without requiring
+a central judge. Its body names the source system or peer, field or field group,
+current promiser if known, observed value, reviewed value if one exists,
+projected value if one exists, raw supporting CIDs, local decision, local reason,
+and resulting projection or action. The default behavior is warn-and-decide:
+retain the conflict, do not silently overwrite a reviewed value or stale
+projection, and let later local promises resolve, compensate, or leave the
+conflict open.
+
+A `replay_decision` record distinguishes the source key from the generated action
+hash. The source key comes from a stable upstream fact, root event, or timeline
+event. The generated action hash is only a secondary guard that a retry is
+attempting the same approved action. If the same source key appears with a
+different action hash, the promiser must record a correction, new local approval,
+or explicit sequence key rather than silently replaying an old action.
+
 ## Behavior
 
 An agent that receives a valid `timeline-v1` message may store the exact envelope
@@ -123,6 +157,13 @@ history before deciding what to keep, merge, or ignore.
 Projection checkpoints are diagnostic promises about rebuildable local views.
 They do not create source-of-truth state. If a projection checkpoint conflicts
 with replayed local CAS, local CAS wins.
+
+Sensitive payloads should not be copied into broad timeline summaries unless the
+promiser explicitly chooses that exposure. Broad records should prefer opaque
+handles, encrypted-object CIDs, or keyed commitments for sensitive personal,
+credential, or operational data. Avoid plain hashes of guessable sensitive data.
+Private or encrypted namespaces can carry narrower retention and sharing
+promises than the main timeline.
 
 ## State machine
 
@@ -168,13 +209,20 @@ with replayed local CAS, local CAS wins.
   request missing objects, retain only the root record, or decline adoption.
 - A branch conflict is represented by parent-linked records, not by hidden
   mutation of a spent-token table or other projection.
+- A projection conflict must not silently overwrite a reviewed value. The receiver
+  may retain the conflict, request missing supporting CIDs, record a local
+  decision, or leave the conflict unresolved.
+- A replay decision with the same source key and a changed action hash requires a
+  correction, new local approval, or explicit sequence key.
 
 ## Security and privacy
 
 The proof authenticates the promiser's message bytes under this protocol. It does
 not prove that the promise is true, useful, current, complete, or globally
 accepted. Privacy is local: an agent may retain private CAS objects forever and
-may refuse to send objects it does not currently promise to share.
+may refuse to send objects it does not currently promise to share. Tombstone,
+redaction, or cryptographic-erasure events are local promises about local
+retention behavior; they do not delete another agent's CAS.
 
 ## POC20 acceptance requirements
 
@@ -183,6 +231,14 @@ A POC20 implementation of this protocol must demonstrate:
 - at least one local timeline per participating agent;
 - at least one voluntary group timeline promise;
 - at least one local root-adoption record and one local root-update record;
+- root-decision records carrying local decision state, impact summary CID,
+  capability-change summary, approving role, local reason, and rollback root
+  where applicable;
+- at least one projection conflict and local conflict decision rebuilt from CAS;
+- at least one replay decision that distinguishes source key from generated
+  action hash;
 - at least one branch conflict and local merge/non-merge decision;
 - at least one private, encrypted-shareable, and plain-shareable CAS object;
-- deletion and rebuild of at least one projection from local CAS.
+- deletion and rebuild of at least one projection from local CAS;
+- one sensitive-data example where broad timeline summaries avoid plaintext
+  secrets and unnecessary sensitive personal payloads.

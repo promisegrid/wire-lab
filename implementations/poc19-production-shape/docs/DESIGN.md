@@ -3,7 +3,8 @@
 ## Status
 
 Design draft. This is the first POC19 artifact. It is not executable code, not a
-frozen protocol spec, and not a production API. Source: `DI-lumir`; `DI-kodob`.
+frozen protocol spec, and not a production API. Source: `DI-lumir`; `DI-kodob`;
+`DI-guhil`.
 
 ## Purpose
 
@@ -99,13 +100,16 @@ can split those roles into separate processes, browser workers, mobile
 sandboxes, firmware functions, or hosted services without changing the
 PromiseGrid message model.
 
-### Minimum microkernel bootstrap
+### Stable `grid` binary as the minimum microkernel
 
 The installed `grid` binary is the minimum microkernel, not the application
-distribution unit. A person should be able to install one simple binary on a
-laptop, Raspberry Pi, server, or similar device, then receive app, agent,
-runtime executable, protocol-spec, and data changes as CID-addressed CAS/VCS
-objects fetched from peers.
+distribution unit. It should be stable and change rarely. A person should be
+able to install one simple binary on a laptop, Raspberry Pi, server, or similar
+device, then receive app, agent, runtime executable, protocol-spec, and data
+changes as CID-addressed CAS/VCS objects fetched from peers rather than shipped
+as binary updates. The fetch, adoption, and update flow uses PromiseGrid
+`grid()` messages and the CIDs they name; the app bytes themselves remain exact
+CAS objects.
 
 First run or local config may provide one bootstrap root CID. That root names a
 Merkle/CAS object graph containing app reference sets, runtime profiles,
@@ -118,6 +122,26 @@ The binary may still change for true substrate changes: transport support,
 storage-profile changes, security fixes, parser/loader bugs, or other
 microkernel behavior. Normal app, agent, runtime, and data changes should move
 through CAS roots. Source: `DI-kodob`.
+
+### Operator-visible root adoption
+
+Root adoption is an explicit local operator flow, not an implied daemon side
+effect. A candidate root is fetched by CID from configured peers, then evaluated
+before it becomes the local adopted root. The evaluation must verify the
+candidate closure, exact CIDs, local signer trust criteria, protocol/spec CIDs,
+and requested host capabilities.
+
+Before adoption, the daemon must produce a concise impact summary as a CAS object:
+changed apps, agents, runtime profiles, protocol specs, policy bundles, signers,
+current root, candidate root, requested capability changes, and rollback root.
+The operator or local approving role then makes a local approval promise, local
+rejection promise, or local still-evaluating promise. A later rollback is another
+local root-adoption promise that returns to a retained prior root without
+replacing the installed `grid` binary.
+
+Replay must be able to identify which adopted runtime root originally produced a
+retained artifact, even if that artifact is later displayed or interpreted
+through a newer root. Source: `DI-guhil`.
 
 ### Daemon/client shape
 
@@ -206,9 +230,34 @@ The daemon should make these local promises explicit:
 | App interface | Resolve app reference sets, prepare local runtime inputs, deliver pCID-selected messages to local app processes or modules. |
 | Execution runtime | Run WASI modules first; later run OCI containers and native binaries under stronger local resource promises. |
 | Lifecycle/resource protection | Issue, narrow, revoke, or stop local CPU, memory, socket, storage, process, device, and time promises. |
+| Host capability | Promise narrow access to local network targets, files, directories, devices, host functions, secret references, execution resources, and storage only when local terms are satisfied. |
+| Secret service | Sign bytes, unwrap scoped keys, mint short-lived credentials, rotate or revoke material, and record denied attempts without exposing plaintext secrets as ordinary CAS payloads. |
 | Key/token | Sign local promises, verify peer promises, issue CWT/COSE capability tokens, redeem local tokens, and reject replay locally. |
 | Event journal | Record local events and exact artifact CIDs for later review without becoming a global monitor. |
 | Trust policy | Choose peers, retention, forwarding, and execution willingness from local make/break history. |
+
+### Host capability promises and secret services
+
+Fetched code does not widen local resource promises by naming a dependency,
+policy object, or requested adapter. Every bridge to a local resource is a narrow
+capability promise made by the local node. POC19 should model at least these
+classes: named local network access, file or directory access, device access,
+host-function access, secret-reference use, CPU, memory, time, sockets, process
+count, and storage.
+
+If a candidate root requests a capability that the local node has not already
+promised, adoption must pause, fail locally, or require a separate local approval
+promise before that root can become active. The root may still be retained in CAS
+as a candidate without being adopted.
+
+Secrets are not ordinary CAS payload. Config, CAS, diagnostics, logs, prompts,
+and UI output may contain secret references, public key material, fingerprints,
+policy CIDs, revocation events, and non-secret local events, but not plaintext
+private keys, passphrases, API tokens, unwrapped data keys, or break-glass
+credentials. A local secret service can promise scoped operations such as signing
+bytes, unwrapping a scoped data key, minting a short-lived credential, rotating
+material, revoking material, or recording a denied attempt. The response contains
+only the narrow result needed for the operation. Source: `DI-guhil`.
 
 ### App execution profiles
 
@@ -510,16 +559,22 @@ resource judgments.
 3. **Transport parity.** Add WebSocket adapter that carries the same exact
    `grid()` bytes as TCP and proves parity in a clean run.
 4. **Bootstrap roots.** Add config/first-run support for an operator-provided
-   root CID and local root-adoption promise records.
+   root CID, candidate-root closure verification, impact summaries, local
+   approval promises, rollback roots, and replay context.
 5. **App reference sets.** Add role `app` reference sets and resolve app code,
    data, pCID specs, runtime profile, and entrypoint labels from CAS.
 6. **WASI run.** Implement `grid run` for a fetched WASI module with CID-verified
    inputs and CAS-recorded outputs.
 7. **Capability promises.** Add local runtime capability tokens for CPU, memory,
-   time, storage, network, and host-function promises.
-8. **Container/native profiles.** Store and verify OCI image graphs and native
+   time, storage, network, filesystem, device, secret-reference, and host-function
+   promises.
+8. **Secret service.** Add operation-scoped local secret service promises for
+   signing, unwrap, short-lived credential minting, rotation, revocation, and
+   denial events without placing plaintext secrets in broad CAS/log/prompt/UI
+   paths.
+9. **Container/native profiles.** Store and verify OCI image graphs and native
    binaries, then execute only under explicit local runtime promises.
-9. **Regression gates.** Prove POC18 superset behavior, promise-shaped
+10. **Regression gates.** Prove POC18 superset behavior, promise-shaped
    inter-agent traffic, TCP/WebSocket parity, exact-CBOR diagnostics, and local
    event records.
 
@@ -535,6 +590,15 @@ resource judgments.
 - **Minimum binary drifting into app bundle.** Mitigation: regression gates should
   prove app/runtime updates change adopted root CIDs and CAS objects, not the
   installed `grid` binary.
+- **Root adoption becoming invisible.** Mitigation: root updates must produce
+  candidate-root impact summaries, explicit local approval events, retained
+  rollback roots, and replayable original-root context.
+- **Fetched code widening local resources.** Mitigation: every local bridge is a
+  narrow host-capability promise, and new requested capabilities pause, fail, or
+  require separate local approval before adoption.
+- **Secrets leaking into CAS or diagnostics.** Mitigation: use operation-scoped
+  secret services and keep plaintext secrets out of config, CAS, logs, prompts,
+  diagnostics, and UI output.
 - **Transport drifting into app semantics.** Mitigation: TCP/WebSocket adapters
   carry exact bytes; pCID parser/builder roles interpret protocol semantics.
 - **Resource protection vocabulary drifting back to control language.**
@@ -558,6 +622,14 @@ shows:
 - first run or config can name a bootstrap root CID, and later app/runtime
   updates are adopted by operator-approved root CIDs without replacing the
   `grid` binary;
+- candidate roots with incomplete closures, locally untrusted signatures, or
+  unapproved requested host capabilities do not become active roots silently;
+- root adoption produces an impact summary CID and rollback root, and rollback
+  returns to the prior root without replacing the installed binary;
+- retained artifacts can be replayed with the runtime root that originally
+  produced them;
+- plaintext secrets do not appear in config, CAS, diagnostics, logs, prompts, or
+  UI output;
 - at least one WASI app is installed through an app reference set and run from
   VCS/CAS;
 - outputs are CAS objects with CIDs returned to the user;

@@ -7,7 +7,7 @@ design entrypoint, but protocol pCIDs require standalone hashable spec documents
 under `docs/protocols/`. This document is not executable code and not a
 production API. The canonical task record remains `TODO-nudav`. Source:
 `DI-kakos`; `DI-bibah`; `DI-mokaz`; `DI-lamaz`; `DI-lulog`; `DI-kodob`;
-`TE-lodom`; `TODO-nudav`.
+`DI-ruvum`; `TE-lodom`; `TODO-nudav`.
 
 ## Locked direction
 
@@ -36,9 +36,9 @@ not separate pCIDs.
 
 | family | slug spec | pCID alias | purpose |
 | --- | --- | --- | --- |
-| timeline | `docs/protocols/timeline-v1.md` | `bafkreiet7vsxvtkjgd2vibxhfuev2fge7jn26r7ok25ngrsy65gm2jtmu4.md` | local/group timelines, branch heads, merge/non-merge, shareability, root adoption/update, projection checkpoints |
-| pure function | `docs/protocols/pure-function-v1.md` | `bafkreift5irohogmykf35prbxuyb34k444rvf3glc2mzedgkr3fotki7sy.md` | deterministic function/input/context/result promises, app/runtime root context, verification, disagreement, correction |
-| capability token | `docs/protocols/capability-token-v1.md` | `bafkreibnfrb5t5qvc77hhss4q3bbqvyrfkk4bdn2xvpaqg7pmpsjn5tiui.md` | CWT/COSE token issue, transfer, redemption, root fetch/execution access, local status, branch-visible double-spend |
+| timeline | `docs/protocols/timeline-v1.md` | `bafkreihfdasban663gaabn7rtbxionkz7pnenf6t5uro27jd3hij5npqam.md` | local/group timelines, branch heads, merge/non-merge, shareability, root adoption/update, projection checkpoints, projection conflicts, replay decisions |
+| pure function | `docs/protocols/pure-function-v1.md` | `bafkreigk2w2frnyh5dftaaftbarjdnl2gofzlepm5kfzmppe6cchui2l6i.md` | deterministic function/input/context/result promises, app/runtime root context, verification, disagreement, correction |
+| capability token | `docs/protocols/capability-token-v1.md` | `bafkreie4prt2erwwwjyjltwm273oydhu7z22gbwixvnfdtrtaosegaeg6i.md` | CWT/COSE token issue, transfer, redemption, root fetch/execution access, local status, branch-visible double-spend |
 
 All three use `grid([42(pCID), payload, proof])` for the first slice. Payloads
 are CBOR maps because POC20 is testing semantic clarity more than constrained
@@ -74,13 +74,47 @@ If a pure-function result depends on fetched app code, runtime behavior, protoco
 specs, model bytes, or data roots, the relevant root CIDs must be explicit in
 the pure-function context object. Source: `DI-lulog`; `DI-kodob`.
 
+Root decision bodies must preserve enough local context for replay: current root,
+candidate root, rollback root, closure summary CID, signer summary CID, impact
+summary CID, accepted or rejected capability changes, approving local role, local
+decision state, and local reason. The record is still only a local promise. It
+does not make the root safe for another agent or require another agent to adopt
+it. Source: `DI-ruvum`.
+
+## Projection conflicts, replay keys, and sensitive data
+
+Projection conflicts are local timeline records, not hidden projection-only
+state. A conflict record names the source system or peer, field or field group,
+current promiser if known, observed value, reviewed value if one exists,
+projected value if one exists, raw supporting CIDs, local decision, local reason,
+and resulting projection or action. The default posture is warn-and-decide:
+retain the conflict, avoid silent overwrite, and let a local promise resolve or
+leave the conflict open. Source: `DI-ruvum`.
+
+Replay identity uses stable upstream facts, root events, or timeline events as
+primary source keys. A generated action payload hash is only a secondary guard
+that a retry is attempting the same approved action. If the same source key
+appears with a different action hash, POC20 must require a correction event, new
+local approval, or explicit sequence key instead of silently replaying the old
+write. Source: `DI-ruvum`.
+
+Sensitive payloads should not be embedded unnecessarily in broad replicated
+timeline records. Ordinary non-sensitive facts may live in the main timeline.
+Sensitive payloads should live in private or encrypted CAS namespaces with
+narrower retention and sharing promises, and broad summaries should refer to
+opaque handles, encrypted-object CIDs, or keyed commitments. Avoid plain hashes
+of guessable sensitive data. Local deletion, redaction, or cryptographic erasure
+is represented by tombstone or erasure local events when policy requires it.
+Source: `DI-ruvum`.
+
 ## First executable scenario
 
 The first executable slice is one unified run with Alice, Bob, Carol, Dave,
 Ellen, and Mallory:
 
 - Alice first adopts bootstrap root `A`, then later considers an update root `A2`
-  after fetching and verifying the CAS closure.
+  after fetching and verifying the CAS closure; she records an impact summary,
+  local decision reason, and rollback root.
 - Alice issues a signed bearer capability token as a CAS object and records an
   `issue_promise` on her local timeline.
 - Bob offers a pure-function service and promises a result for explicit function,
@@ -94,6 +128,12 @@ Ellen, and Mallory:
   one to Carol.
 - Ellen receives both branches and records a local merge, non-merge, or
   compensation promise without acting as a global authority.
+- Ellen rebuilds a review projection from CAS, detects a conflict between a
+  reviewed value and a projected value, and records a local conflict decision
+  without silently overwriting either value.
+- At least one sensitive payload is stored only as private or encrypted CAS data,
+  while the broad timeline records carry only an opaque handle,
+  encrypted-object CID, or keyed commitment.
 
 The run succeeds only if the token conflict is visible as branch history in CAS
 and can be explained without a hidden mutable spent-token table or
@@ -146,11 +186,22 @@ The future `poc20-analyze` must fail the run unless it proves:
 - every branch head can be reached by following parent CIDs in local CAS;
 - at least one bootstrap root adoption and one root update consideration are
   represented as local timeline promises;
+- root-decision records include current root, candidate root, rollback root,
+  closure summary, signer summary, impact summary, capability changes, approving
+  role, decision state, and local reason;
 - the non-CAS projection directory can be deleted and rebuilt from local CAS;
 - the rebuilt projection reports the same token conflict and pure-function tuple
   outcomes as the original projection;
+- at least one projection conflict record is rebuilt from CAS and preserves the
+  reviewed value, projected value, raw supporting CIDs, local decision, and local
+  reason;
+- replay checks distinguish a stable source key from a generated action hash and
+  require a new local decision when the action hash changes for the same source
+  key;
 - at least one private, encrypted-shareable, and plain-shareable CAS object is
   represented by `timeline-v1` shareability promises;
+- broad timeline summaries avoid plaintext secrets and unnecessary sensitive
+  personal payloads;
 - double-spend appears as two branch records for the same token family, not as
   hidden mutation of a spent-token table;
 - no analyzer result requires a global trust authority, global branch authority,

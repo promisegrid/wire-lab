@@ -6,8 +6,8 @@ POC20 pre-code protocol specification. This document is intentionally standalone
 so its exact bytes can be named by a pCID. The pCID is the CID of this document,
 not the CID of any token, message, or payload.
 
-Source: `DI-lamaz`; `DI-mokaz`; `DI-lulog`; `DI-kodob`; `TODO-nudav`;
-`TE-lodom`.
+Source: `DI-lamaz`; `DI-mokaz`; `DI-lulog`; `DI-kodob`; `DI-guhil`;
+`DI-ruvum`; `TODO-nudav`; `TE-lodom`.
 
 ## Purpose
 
@@ -16,7 +16,9 @@ locally interpreting capability tokens as CAS timeline objects. It specifically
 tests whether double-spend can be represented as branch-visible promise history
 rather than hidden mutable projection state. It also provides the token vocabulary
 for local promises to fetch, retain, decrypt, or execute objects from an
-operator-adopted app/runtime root.
+operator-adopted app/runtime root. It also covers local host-capability and
+secret-reference token subjects when a root asks a node to bridge to local
+resources.
 
 Tokens are issuer promises. A token does not command a resource owner. A token
 gives a receiver bytes that an issuer promised to honor under pCID-defined terms,
@@ -47,6 +49,11 @@ For app/runtime roots, `subject` may name a root CID, app reference-set CID,
 runtime profile CID, executable object CID, data root CID, or protocol-spec CID.
 The token still does not command execution. It only records what the issuer
 promises to honor when the token is presented.
+
+For local host capabilities, `subject` may name a network target, filesystem
+path, device reference, host-function family, secret reference, execution-resource
+class, or storage root. Terms must narrow scope, quantity, expiry, and reciprocal
+promises enough that redemption can be judged locally from the issuer's vantage.
 
 ## Envelope
 
@@ -100,13 +107,18 @@ Record types:
 ## Fetch and execution capabilities
 
 A token may promise access to root-graph retrieval, encrypted-object decryption,
-storage/retention, or local runtime resources. Examples include:
+storage/retention, local runtime resources, host resources, or operation-scoped
+secret service behavior. Examples include:
 
 - Alice promises Bob may fetch a selected app root closure from Alice's CAS.
 - Alice promises a local runtime role may execute a selected WASI module under
   bounded CPU, memory, time, host-function, and network terms.
 - Bob promises to retain a runtime root for Alice in return for a reciprocal
   payment or future service promise.
+- Carol promises to sign selected bytes with a named local key reference without
+  exposing the private key bytes.
+- Dave promises bounded access to a local printer device or network endpoint in
+  return for a reciprocal promise.
 
 These are promises by the issuer about resources the issuer controls. They are
 not globally granted access rights and not instructions to a runtime or peer.
@@ -166,6 +178,8 @@ not need to lower trust in Alice merely because a bearer token was copied.
   affect trust in the presenter, not necessarily the issuer.
 - Revocation is an issuer promise about issuer-local future behavior. It is not a
   global command to other agents.
+- Secret-reference tokens do not carry plaintext private keys, passphrases, API
+  tokens, unwrapped data keys, or break-glass credentials.
 
 ## Security and privacy
 
@@ -181,6 +195,8 @@ A POC20 implementation of this protocol must demonstrate:
 - one signed CWT/COSE token object retained in local CAS;
 - one token whose subject is an app/runtime/root object used by the first
   executable slice;
+- one token whose subject is a host capability or secret reference and whose
+  terms narrow local redemption scope;
 - one bearer transfer;
 - two redemption promises on parallel branches;
 - one local merge or non-merge decision after conflict discovery;
