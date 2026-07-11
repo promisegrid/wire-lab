@@ -57,12 +57,14 @@ forever, some may be sent only after encryption, and some may be plain-shareable
 Sending, withholding, or encrypting a CAS object is a separate local promise
 decision. Source: `DI-mokaz`.
 
-## Bootstrap roots and operator adoption
+## Merkle/CAS bootstrap roots and operator adoption
 
-POC19's minimum microkernel rule has a POC20 timeline meaning. A bootstrap root
-CID is a CID for a Merkle/CAS object graph containing app reference sets,
-runtime profiles, executable objects, protocol specs, data roots, and update
-metadata. The CID names bytes, not trust or authority.
+POC19's minimum microkernel rule has a POC20 timeline meaning. A bootstrap
+Merkle/CAS root CID is a CID used as an entry point into a reachable CAS graph
+containing app reference sets, runtime profiles, executable objects, protocol
+specs, data roots, and update metadata. It is not the first commit of a VCS
+history unless a specific pCID-defined object says so. The CID names bytes, not
+trust or authority.
 
 Adopting a root is a local timeline promise. Alice may adopt root `A`, Bob may
 adopt root `B`, and Carol and Dave may voluntarily promise to track root `C` as a
@@ -71,16 +73,32 @@ the earlier adoption event from the local promiser's vantage. No root adoption
 event makes a promise on behalf of another agent.
 
 If a pure-function result depends on fetched app code, runtime behavior, protocol
-specs, model bytes, or data roots, the relevant root CIDs must be explicit in
-the pure-function context object. Source: `DI-lulog`; `DI-kodob`.
+specs, model bytes, or data roots, the relevant Merkle/CAS root CIDs must be
+explicit in the pure-function context object. Source: `DI-lulog`; `DI-kodob`.
 
 Root decision bodies must preserve enough local context for replay: decision kind
-such as adopted, rejected, superseded, rollback, or still-evaluating; current
-root; candidate root; rollback root; closure summary CID; signer summary CID;
-impact summary CID; accepted or rejected capability changes; approving local
-identity or role; local decision state; and local reason. The record is still
-only a local promise. It does not make the root safe for another agent or require
-another agent to adopt it. Source: `DI-ruvum`.
+such as adopted, rejected, superseded, prior-root-retained,
+corrective-root-adopted, full-state-restore-attempted,
+full-state-restore-performed, or still-evaluating; current Merkle/CAS root CID;
+candidate Merkle/CAS root CID; prior Merkle/CAS root CID if one exists; any
+corrective Merkle/CAS root CID; closure summary CID; signer summary CID; impact
+summary CID; accepted or rejected capability changes; approving local identity or
+role; local decision state; and local reason. The record is still only a local
+promise. It does not make the root safe for another agent or require another
+agent to adopt it. Source: `DI-ruvum`; `DI-kakos`.
+
+Timeline recovery is append-only. Once newer code has touched data, binaries,
+local devices, peer-visible messages, or external outputs, true rollback is not
+available in the general case because the affected program-and-data state and
+side effects may not be restorable. A prior Merkle/CAS root CID can be retained
+for replay and analysis; a corrective Merkle/CAS root CID can be adopted; and a
+full-state restore can be attempted only when the affected program-and-data state
+is actually available. Even then, network messages, physical effects, peer
+observations, and thermodynamic entropy cannot be undone. The timeline model
+therefore follows the accounting rule that accountants do not use erasers:
+preserve the original event and add corrective events rather than mutating
+history. Corrective roll-forward is usually more feasible than rollback, but it
+is not guaranteed. Source: `DI-ruvum`; `DI-kakos`; `TE-lodom`.
 
 ## Projection conflicts, replay keys, and sensitive data
 
@@ -107,6 +125,12 @@ projection examples include review queues, root adoption status, conflict
 summaries, token status, prior-action warnings, and replay indexes. Source:
 `DI-ruvum`.
 
+Projection and replay rules must preserve previous events and add new corrective
+events instead of overwriting or deleting history. A projection may mark a prior
+root as superseded, rejected, retained for replay, or followed by a corrective
+root, but it must keep the original and corrective records visible from the local
+CAS event stream. Source: `DI-ruvum`; `DI-kakos`.
+
 Sensitive payloads should not be embedded unnecessarily in broad replicated
 timeline records. Ordinary non-sensitive facts may live in the main timeline.
 Sensitive payloads should live in private or encrypted CAS namespaces with
@@ -123,7 +147,8 @@ Ellen, and Mallory:
 
 - Alice first adopts bootstrap root `A`, then later considers an update root `A2`
   after fetching and verifying the CAS closure; she records an impact summary,
-  local decision reason, and rollback root.
+  local decision reason, prior Merkle/CAS root CID, and any corrective
+  Merkle/CAS root CID.
 - Alice issues a signed bearer capability token as a CAS object and records an
   `issue_promise` on her local timeline.
 - Bob offers a pure-function service and promises a result for explicit function,
@@ -196,8 +221,12 @@ The future `poc20-analyze` must fail the run unless it proves:
 - at least one bootstrap root adoption and one root update consideration are
   represented as local timeline promises;
 - root-decision records include decision kind, current root, candidate root,
-  rollback root, closure summary, signer summary, impact summary, capability
-  changes, approving identity or role, decision state, and local reason;
+  prior Merkle/CAS root CID, any corrective Merkle/CAS root CID, closure summary,
+  signer summary, impact summary, capability changes, approving identity or role,
+  decision state, and local reason;
+- recovery and correction records are replayable from local CAS, keep original
+  and corrective events visible, and do not assume erased history or guaranteed
+  prior-state restoration;
 - the non-CAS projection directory can be deleted and rebuilt from local CAS;
 - the rebuilt projection reports the same root decisions, approvals, conflict
   summaries, token status, replay indexes, prior-action warnings, replayable
@@ -224,5 +253,6 @@ The future `poc20-analyze` must fail the run unless it proves:
   registry.
 - No requirement that POC19 wait for POC20.
 - No pCID-per-message-kind fragmentation.
-- No global app store, package registry, update authority, or root authority.
+- No shared app store, package registry, update decision maker, or root decision
+  maker that can replace an agent's local adoption promise.
 - No code generation until `TODO-nudav` records this pre-code plan as complete.

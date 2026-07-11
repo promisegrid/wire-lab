@@ -147,8 +147,12 @@ locally approves that self-update, `grid` fetches the new binary as a CAS object
 by CID, verifies the exact bytes, platform constraints, local signer trust
 criteria, and local approval, writes the approved version beside the current
 binary, switches atomically where the host allows it, retains the previous binary
-and rollback metadata, records a self-update event, and restarts. Source:
-`DI-zitap`; `DI-guhil`.
+and previous-binary recovery metadata for analysis or explicit
+operator-directed recovery, records a self-update event, and restarts. Retaining
+the previous binary does not promise safe prior-state restoration after the new
+binary has touched data, other binaries, devices, peers, or external outputs.
+Source:
+`DI-zitap`; `DI-guhil`; `DI-kakos`.
 
 Application-specific modules come after the stage1 microkernel bootstrap. Those
 objects might later be called stage2 if that vocabulary becomes useful, but
@@ -158,12 +162,15 @@ peers through PromiseGrid `grid()` messages and the CIDs they name, rather than
 shipped as ordinary binary updates. The app bytes themselves remain exact CAS
 objects. Source: `DI-zitap`; `DI-kodob`.
 
-First run or local config may provide one bootstrap root CID. That root names a
-Merkle/CAS object graph containing app reference sets, runtime profiles,
-protocol specs, executable objects, data roots, and update metadata. The daemon
-fetches the graph from peers, verifies exact CIDs, and asks for local operator
-approval before adopting it as a local root. A later code or data update is a new
-root CID plus a local approval promise, not a replacement of the `grid` binary.
+First run or local config may provide one bootstrap Merkle/CAS root CID. In this
+document, a Merkle/CAS root CID is a CID used as an entry point into a reachable
+CAS graph. It is not the first commit of a VCS history unless a specific
+pCID-defined object says so. The root names a Merkle/CAS object graph containing
+app reference sets, runtime profiles, protocol specs, executable objects, data
+roots, and update metadata. The daemon fetches the graph from peers, verifies
+exact CIDs, and asks for local operator approval before adopting it as a local
+root. A later code or data update is a new Merkle/CAS root CID plus a local
+approval promise, not a replacement of the `grid` binary.
 
 The binary may still change for true substrate changes: transport support,
 storage-profile changes, security fixes, parser/loader bugs, or other
@@ -243,21 +250,39 @@ stage0 to contain enough WASI runtime support to start stage1. POC19 should keep
 both choices visible until the implementation decision is locked. Source:
 `DI-zitap`.
 
-### Operator-visible root adoption
+### Operator-visible Merkle/CAS root adoption
 
 Root adoption is an explicit local operator flow, not an implied daemon side
-effect. A candidate root is fetched by CID from configured peers, then evaluated
-before it becomes the local adopted root. The evaluation must verify the
-candidate closure, exact CIDs, local signer trust criteria, protocol/spec CIDs,
-and requested host capabilities.
+effect. Root adoption means a local promise to use a candidate Merkle/CAS root
+CID as the active graph entry point for resolving app, runtime, spec, data, and
+module objects. Root rejection means a local promise not to adopt a candidate
+Merkle/CAS root CID now, while retaining local reason and event context when that
+is useful. A candidate root is fetched by CID from configured peers, then
+evaluated before it becomes the local adopted root. The evaluation must verify
+the candidate closure, exact CIDs, local signer trust criteria, protocol/spec
+CIDs, and requested host capabilities.
 
 Before adoption, the daemon must produce a concise impact summary as a CAS object:
 changed apps, agents, runtime profiles, protocol specs, policy bundles, signers,
-current root, candidate root, requested capability changes, and rollback root.
-The operator or local approving role then makes a local approval promise, local
-rejection promise, or local still-evaluating promise. A later rollback is another
-local root-adoption promise that returns to a retained prior root without
-replacing the installed `grid` binary.
+current Merkle/CAS root CID, candidate Merkle/CAS root CID, requested capability
+changes, prior Merkle/CAS root CID if one exists, and any proposed corrective
+Merkle/CAS root CID. The operator or local approving role then makes a local
+approval promise, local rejection promise, or local still-evaluating promise. A
+later recovery is another local root-decision promise: it may retain a prior
+Merkle/CAS root CID for replay, adopt a corrective Merkle/CAS root CID, or
+perform an explicit full-state restore if a complete affected program-and-data
+state is available.
+
+True rollback is not available in the general case after newer code has touched
+data, binaries, local devices, peer-visible messages, or external outputs. A node
+may attempt to restore a prior binary or root, but it cannot promise that the
+universe has returned to its exact prior state; network messages, physical
+effects, peer observations, and thermodynamic entropy have already happened. The
+safer default is accounting-style history: accountants do not use erasers, so the
+system preserves prior events and adds corrective Merkle/CAS root events instead
+of pretending the earlier event never occurred. Corrective roll-forward is
+usually more feasible than rollback, but it is not guaranteed. Source:
+`DI-guhil`; `DI-kakos`; `TE-lodom`.
 
 Replay must be able to identify which adopted runtime root originally produced a
 retained artifact, even if that artifact is later displayed or interpreted
@@ -355,7 +380,7 @@ The daemon should make these local promises explicit:
 | Host capability | Promise narrow access to local network targets, files, directories, devices, host functions, secret references, execution resources, and storage only when local terms are satisfied. |
 | Secret service | Sign bytes, unwrap scoped keys, mint short-lived credentials, rotate or revoke material, and record denied attempts without exposing plaintext secrets as ordinary CAS payloads. |
 | Key/token | Sign local promises, verify peer promises, issue CWT/COSE capability tokens, redeem local tokens, and reject replay locally. |
-| Event journal | Record local events and exact artifact CIDs for later review without becoming a global monitor. |
+| Event journal | Record local events as CAS-compatible records with exact artifact CIDs for later review without becoming a global monitor. |
 | Trust policy | Choose peers, retention, forwarding, and execution willingness from local make/break history. |
 
 ### Host capability promises and secret services
@@ -636,6 +661,9 @@ PromiseGrid-native.
 The daemon keeps local records of promises made, promises relied on, results,
 unavailable peers, broken reciprocal terms, token redemption, replay rejection,
 and resource exhaustion. These records are local inputs to future decisions.
+Durable event journals, daemon records, `.grid/state.json`, indexes, caches, and
+diagnostics are convenience views unless their source facts are backed by CAS
+objects that can be replayed. Source: `DI-mokaz`; `DI-kakos`.
 
 Examples:
 
@@ -703,8 +731,9 @@ Full POC19 after the first proof:
 6. **Transport parity.** Add WebSocket adapter that carries the same exact
    `grid()` bytes as TCP and proves parity in a clean run.
 7. **Bootstrap roots.** Add config/first-run support for an operator-provided
-   root CID, candidate-root closure verification, impact summaries, local
-   approval promises, rollback roots, and replay context.
+   Merkle/CAS root CID, candidate-root closure verification, impact summaries,
+   local approval promises, prior/corrective Merkle/CAS root CIDs, and replay
+   context.
 8. **App reference sets.** Add role `app` reference sets and resolve descriptor
    CIDs, data roots, pCID specs, and reciprocal terms from CAS.
 9. **WASI run.** Implement `grid run` for a descriptor-named WASI module with
@@ -737,7 +766,8 @@ Full POC19 after the first proof:
   installed `grid` binary.
 - **Root adoption becoming invisible.** Mitigation: root updates must produce
   candidate-root impact summaries, explicit local approval events, retained
-  rollback roots, and replayable original-root context.
+  prior Merkle/CAS root CIDs, any corrective Merkle/CAS root CIDs, and replayable
+  original-root context.
 - **Fetched code widening local resources.** Mitigation: every local bridge is a
   narrow host-capability promise, and new requested capabilities pause, fail, or
   require separate local approval before adoption.
@@ -780,17 +810,21 @@ run also shows:
   microkernel modules, then start daemon/client modules that serve CLI commands;
 - app code and data are fetched from peer CAS over TCP and WebSocket using exact
   PromiseGrid messages;
-- first run or config can name a bootstrap root CID, and later app/runtime
-  updates are adopted by operator-approved root CIDs without replacing the
-  `grid` binary;
+- first run or config can name a bootstrap Merkle/CAS root CID, and later
+  app/runtime updates are adopted by operator-approved Merkle/CAS root CIDs
+  without replacing the `grid` binary;
 - candidate roots with incomplete closures, locally untrusted signatures, or
   unapproved requested host capabilities do not become active roots silently;
-- root adoption produces an impact summary CID and rollback root, and rollback
-  returns to the prior root without replacing the installed binary;
+- root adoption produces an impact summary CID and records current, candidate,
+  adopted or rejected, prior, and corrective Merkle/CAS root CIDs without
+  implying that a prior root or prior binary can restore the previous universe;
 - stage0 self-update writes the candidate beside the current binary, verifies
-  it, switches atomically where possible, and retains rollback metadata;
+  it, switches atomically where possible, and retains previous-binary recovery
+  metadata for analysis or explicit operator-directed recovery;
 - stage0 self-update events are recorded separately from ordinary runtime-root
   adoption events;
+- recovery and correction records are replayable from CAS-compatible source
+  events and do not erase the original adoption or self-update events;
 - retained artifacts can be replayed with the runtime root that originally
   produced them;
 - plaintext secrets do not appear in config, CAS, diagnostics, logs, prompts, or
