@@ -1,4 +1,4 @@
-# PromiseGrid POC20 pure-function protocol v1
+# PromiseGrid POC20 pure-function protocol
 
 ## Status
 
@@ -11,7 +11,7 @@ Source: `DI-lamaz`; `DI-mokaz`; `DI-lulog`; `DI-kodob`; `DI-ruvum`;
 
 ## Purpose
 
-`pure-function-v1` defines promises about deterministic computation over explicit
+`pure-function` defines promises about deterministic computation over explicit
 content-addressed inputs. It lets an agent promise that for a function CID,
 input CID, and context CID, it will return or did return a result CID. It also
 defines local verification, disagreement, correction, and non-commitment records

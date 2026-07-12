@@ -33,9 +33,12 @@ machine. Source: `DI-tanov`.
    CID-named CAS object. Bob pulls it over exact PromiseGrid `grid()` CBOR over
    TCP, verifies CID/proof/local trust criteria, records a local approval or
    rejection promise, writes the approved binary beside the current binary,
-   switches atomically where the container filesystem supports it, restarts, and
-   records previous-binary recovery metadata. Retaining the previous binary is not
-   a safe rollback promise.
+   switches atomically where the container filesystem supports it, and restarts
+   into the approved bytes. The local CAS-backed machine-change journal records
+   only the minimum replay facts needed for this proof: current running stage0 CID
+   if known, candidate stage0 CID, local decision state, and post-restart running
+   CID/outcome. Local reason, impact summary CID, and recovery notes are optional
+   when useful. Source: `DI-nafat`.
 2. **Ordered configuration replay.** Bob pulls an ordered machine-change journal:
    prerequisites, file changes, executable changes, trigger promises, validation
    promises, parent links, and resulting events. Bob applies changes in tested
@@ -88,8 +91,8 @@ The future `poc21-analyze` must fail unless it proves:
 - root execution happened only inside disposable target containers;
 - every inter-agent message was exact promise-shaped `grid()` CBOR over TCP;
 - no inter-agent payload was transferred through a shared Docker volume;
-- stage0 self-update executed the replacement binary inside the target container;
-- previous-binary recovery metadata was recorded without claiming safe rollback;
+- stage0 self-update executed the replacement binary inside the target container
+  and recorded the minimum replay facts in target-local CAS;
 - ordered change journals, triggers, validations, and results are replayable from
   target-local CAS events;
 - a duplicate target can replay the same journal to matching materialized state

@@ -98,9 +98,9 @@ variants are payload semantics under three protocol families. All future runtime
 state remains rebuildable from local CAS unless a later DI explicitly narrows
 the exception.
 Affects: `implementations/poc20-timeline-pure-function-cas-branches/docs/DESIGN.md`;
-`implementations/poc20-timeline-pure-function-cas-branches/docs/protocols/timeline-v1.md`;
-`implementations/poc20-timeline-pure-function-cas-branches/docs/protocols/pure-function-v1.md`;
-`implementations/poc20-timeline-pure-function-cas-branches/docs/protocols/capability-token-v1.md`;
+`implementations/poc20-timeline-pure-function-cas-branches/docs/protocols/timeline.md`;
+`implementations/poc20-timeline-pure-function-cas-branches/docs/protocols/pure-function.md`;
+`implementations/poc20-timeline-pure-function-cas-branches/docs/protocols/capability-token.md`;
 `protocols/wire-lab.d/TODO/TODO-nudav-poc20-timeline-pure-function-cas-branches.md`;
 `DEV-GUIDE-RESOURCES.md`.
 
@@ -123,9 +123,9 @@ revoked or superseded by a later timeline event. Changing the POC20 protocol
 specs changes their pCIDs, so CID aliases must be recomputed after this DI is
 implemented.
 Affects: `implementations/poc20-timeline-pure-function-cas-branches/docs/DESIGN.md`;
-`implementations/poc20-timeline-pure-function-cas-branches/docs/protocols/timeline-v1.md`;
-`implementations/poc20-timeline-pure-function-cas-branches/docs/protocols/pure-function-v1.md`;
-`implementations/poc20-timeline-pure-function-cas-branches/docs/protocols/capability-token-v1.md`;
+`implementations/poc20-timeline-pure-function-cas-branches/docs/protocols/timeline.md`;
+`implementations/poc20-timeline-pure-function-cas-branches/docs/protocols/pure-function.md`;
+`implementations/poc20-timeline-pure-function-cas-branches/docs/protocols/capability-token.md`;
 `protocols/wire-lab.d/TODO/TODO-nudav-poc20-timeline-pure-function-cas-branches.md`;
 `DEV-GUIDE-RESOURCES.md`; `README.md`.
 
@@ -149,10 +149,34 @@ encrypted, referenced by opaque handle, or represented by keyed commitment; avoi
 plain hashes of guessable sensitive data.
 Affects: `protocols/wire-lab.d/TODO/TODO-nudav-poc20-timeline-pure-function-cas-branches.md`;
 `implementations/poc20-timeline-pure-function-cas-branches/docs/DESIGN.md`;
-`implementations/poc20-timeline-pure-function-cas-branches/docs/protocols/timeline-v1.md`;
-`implementations/poc20-timeline-pure-function-cas-branches/docs/protocols/pure-function-v1.md`;
-`implementations/poc20-timeline-pure-function-cas-branches/docs/protocols/capability-token-v1.md`;
+`implementations/poc20-timeline-pure-function-cas-branches/docs/protocols/timeline.md`;
+`implementations/poc20-timeline-pure-function-cas-branches/docs/protocols/pure-function.md`;
+`implementations/poc20-timeline-pure-function-cas-branches/docs/protocols/capability-token.md`;
 `DEV-GUIDE-RESOURCES.md`; `README.md`.
+
+ID: DI-zizab
+Date: 2026-07-11 18:15:37 PDT
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Remove `-v1` from current POC20 protocol-family spec names and
+supersede rollback-root wording with prior/corrective Merkle/CAS root wording.
+The current POC20 protocol specs are `timeline.md`, `pure-function.md`, and
+`capability-token.md`; their pCID symlinks are recomputed after content changes.
+Intent: A pCID already versions a protocol by content identity, so a manual `v1`
+suffix is redundant and misleading. POC20 root-decision records should align with
+POC19 and POC21 by preserving prior/corrective root history instead of implying
+rollback safety.
+Constraints: Do not rewrite historical DI bodies. Current prose, acceptance
+criteria, spec paths, and pCID aliases must use unsuffixed protocol-family names.
+Changing spec bytes requires recomputing the CIDv1 base32 symlink aliases.
+Affects: `protocols/wire-lab.d/TODO/TODO-nudav-poc20-timeline-pure-function-cas-branches.md`;
+`implementations/poc20-timeline-pure-function-cas-branches/docs/DESIGN.md`;
+`implementations/poc20-timeline-pure-function-cas-branches/docs/protocols/timeline.md`;
+`implementations/poc20-timeline-pure-function-cas-branches/docs/protocols/pure-function.md`;
+`implementations/poc20-timeline-pure-function-cas-branches/docs/protocols/capability-token.md`;
+`README.md`; `DEV-GUIDE-RESOURCES.md`.
+Supersedes: `DI-lamaz` spec-path naming only; `DI-lulog` Merkle/root wording
+only; `DI-ruvum` rollback-root wording only.
 
 ## Tasks
 
@@ -203,8 +227,10 @@ Affects: `protocols/wire-lab.d/TODO/TODO-nudav-poc20-timeline-pure-function-cas-
   timeline promises, with runtime/app roots included in pure-function context
   when they affect computation. Source: `DI-lulog`.
 - [x] nudav.19 Lock replayable root-decision detail: adopted, rejected,
-  superseded, rollback, still-evaluating, approving role, impact summary CID,
-  capability-change summary, local reason, and rollback root. Source: `DI-ruvum`.
+  superseded, prior-root-retained, corrective-root-adopted,
+  full-state-restore-attempted, full-state-restore-performed, still-evaluating,
+  approving role, impact summary CID, capability-change summary, local reason,
+  and prior/corrective Merkle/CAS root CIDs. Source: `DI-ruvum`; `DI-zizab`.
 - [x] nudav.20 Lock structured projection-conflict and replay semantics: conflicts
   are local timeline records, source keys are stable upstream/timeline facts, and
   generated action hashes are secondary guards requiring new local decisions when
@@ -213,6 +239,8 @@ Affects: `protocols/wire-lab.d/TODO/TODO-nudav-poc20-timeline-pure-function-cas-
   private or encrypted CAS namespaces, opaque handles, encrypted-object CIDs, or
   keyed commitments; broad summaries must avoid plaintext secrets and unnecessary
   sensitive personal payloads. Source: `DI-ruvum`.
+- [x] nudav.22 Remove redundant `-v1` suffixes from current POC20 protocol-family
+  spec names and recompute their pCID symlink aliases. Source: `DI-zizab`.
 
 ## Acceptance criteria for the future executable POC20
 
@@ -247,8 +275,9 @@ Affects: `protocols/wire-lab.d/TODO/TODO-nudav-poc20-timeline-pure-function-cas-
 - Pure-function result records include the relevant app/runtime root CIDs in
   explicit context when executable code or runtime behavior affects the result.
 - Root-decision records include local decision state, approving role, impact
-  summary CID, capability-change summary, local reason, and rollback root where
-  applicable.
+  summary CID, capability-change summary, local reason, prior Merkle/CAS root CID
+  when one exists, any corrective Merkle/CAS root CID, and explicit
+  full-state-restore attempts where applicable.
 - Projection conflicts are represented as local timeline records that can be
   replayed from CAS and do not silently overwrite reviewed values or stale
   projections.

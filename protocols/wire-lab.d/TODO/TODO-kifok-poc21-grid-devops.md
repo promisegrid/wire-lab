@@ -85,6 +85,26 @@ rollback claims and use corrective roll-forward/history-preserving language.
 Affects: `implementations/poc20-timeline-pure-function-cas-branches/docs/DESIGN.md`;
 `implementations/poc21-grid-devops/docs/DESIGN.md`; `DEV-GUIDE-RESOURCES.md`.
 
+ID: DI-nafat
+Date: 2026-07-11 18:15:37 PDT
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Simplify POC21 self-update replay requirements. Future POC21 should
+record minimum replay facts in local CAS-backed machine-change journals rather
+than locking a large universal field list: current running stage0 CID if known,
+candidate stage0 CID, local decision state, and post-restart running CID/outcome.
+Local reason, impact summary CID, and recovery notes are optional when useful.
+Intent: The earlier field list over-specified a protocol that does not exist yet
+and risked turning a local DevOps journal into a universal schema. POC21 needs
+enough facts to replay and explain a self-update, but the exact payload shape
+belongs to the future POC21 pCID, not the outer grid envelope or every protocol.
+Constraints: Keep actual container self-update as the first POC21 proof. Do not
+make previous-binary recovery metadata mandatory. Do not imply a safe rollback
+promise; prior binaries and notes are recovery inputs when present.
+Affects: `protocols/wire-lab.d/TODO/TODO-kifok-poc21-grid-devops.md`;
+`implementations/poc21-grid-devops/docs/DESIGN.md`; `DEV-GUIDE-RESOURCES.md`.
+Supersedes: `DI-dahaj` previous-binary recovery-metadata requirement only.
+
 ## Completed planning tasks
 
 - [x] kifok.1 Create the POC21 planning artifact set.

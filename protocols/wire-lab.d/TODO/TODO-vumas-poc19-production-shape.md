@@ -131,6 +131,28 @@ Affects: `protocols/wire-lab.d/TODO/TODO-vumas-poc19-production-shape.md`;
 `implementations/poc20-timeline-pure-function-cas-branches/docs/DESIGN.md`;
 `DEV-GUIDE-RESOURCES.md`; `README.md`.
 
+ID: DI-romak
+Date: 2026-07-11 18:15:37 PDT
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Supersede POC19 root and recovery wording so current planning uses
+`Merkle/CAS root CID`, `prior Merkle/CAS root CID`, `corrective Merkle/CAS root
+CID`, and explicit full-state restore attempts rather than `Merkle/root CID` or
+`rollback root`.
+Intent: POC19 should not imply that returning to a prior binary or root can undo
+machine, peer, network, or physical side effects. The correct model is
+history-preserving recovery: retain prior roots for replay, adopt corrective
+roots when useful, and treat full-state restore as a narrow explicit operation
+only when the affected program-and-data state is available.
+Constraints: Do not rewrite historical DI bodies. Use this DI for current tasks,
+README, guide prose, and downstream POC20/POC21 consistency. Retaining previous
+binary or root material is recovery input, not a safe rollback promise.
+Affects: `protocols/wire-lab.d/TODO/TODO-vumas-poc19-production-shape.md`;
+`implementations/poc19-production-shape/docs/DESIGN.md`; `README.md`;
+`DEV-GUIDE-RESOURCES.md`.
+Supersedes: `DI-kodob` root-name wording only; `DI-guhil` rollback-root wording
+only.
+
 ID: DI-zitap
 Date: 2026-07-11 12:12:01 PDT
 Status: active
@@ -180,12 +202,13 @@ operator-adopted CID-root update model.
 - [ ] vumas.10 Run and archive a clean POC19 regression after implementation
   begins.
 - [x] vumas.11 Lock the minimum-microkernel rule: one installed `grid` binary
-  bootstraps from operator-adopted root CIDs, while app, agent, runtime
+  bootstraps from operator-adopted Merkle/CAS root CIDs, while app, agent, runtime
   executable, spec, and data changes are fetched from CAS/peers without replacing
-  the binary. Source: `DI-kodob`.
+  the binary. Source: `DI-kodob`; `DI-romak`.
 - [x] vumas.12 Lock the operator-visible root-adoption flow: candidate-root fetch,
   closure/signature/spec/capability review, impact summary, explicit local
-  approval, rollback root retention, and replay context. Source: `DI-guhil`.
+  approval, prior/corrective Merkle/CAS root CIDs, and replay context. Source:
+  `DI-guhil`; `DI-romak`.
 - [x] vumas.13 Lock host capabilities as narrow local promises covering network,
   filesystem, device, host-function, secret-reference, execution-resource, and
   storage access. Source: `DI-guhil`.

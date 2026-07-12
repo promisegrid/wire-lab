@@ -206,16 +206,16 @@ microkernel and not the app distribution package. It should contain just enough
 functionality to detect and fetch an approved new version of itself from locally
 trusted peers, restart, fetch the remaining microkernel modules, and only then
 fetch application-specific modules. First run or local config may name a
-bootstrap Merkle root CID; later app/runtime root changes are fetched as exact
-CAS graphs and adopted only after local operator approval. The first execution
-profile is WASI.
+bootstrap Merkle/CAS root CID; later app/runtime root changes are fetched as
+exact CAS graphs and adopted only after local operator approval. The first
+execution profile is WASI.
 OCI container images and native binaries are later, higher-risk profiles that
 require stronger local lifecycle and resource promises. Candidate root adoption
 is planned as a visible local flow with closure verification, local signer trust
-criteria, host-capability review, impact summary, rollback root, and replay
-context. Plaintext secrets stay behind operation-scoped local services rather
-than ordinary CAS, config, log, prompt, diagnostic, or UI payloads. Source:
-`DI-kodob`; `DI-guhil`.
+criteria, host-capability review, impact summary, prior/corrective Merkle/CAS
+root CIDs, and replay context. Plaintext secrets stay behind operation-scoped
+local services rather than ordinary CAS, config, log, prompt, diagnostic, or UI
+payloads. Source: `DI-kodob`; `DI-guhil`; `DI-romak`.
 
 A grid app is installed by checking a signed app reference set into VCS/CAS.
 `grid run` asks the local daemon whether it currently promises to execute that

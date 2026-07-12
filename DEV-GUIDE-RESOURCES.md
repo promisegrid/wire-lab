@@ -8,7 +8,7 @@ PromiseGrid design choices are derived, tested, and recorded. Source:
 
 ## Current Design State
 
-Snapshot refreshed by Codex on 2026-07-10 14:26 PDT. This is a
+Snapshot refreshed by Codex on 2026-07-12 12:22 PDT. This is a
 developer-facing protocol-design snapshot, not a frozen PromiseGrid API. It
 reflects the currently locked outer-envelope direction plus consensus across
 near-contender simulations and root `results/` JSON evidence; proposal children
@@ -29,7 +29,7 @@ remain review evidence until promoted. Source: `DI-baral`; `DI-sisak`;
 `DI-rudos`; `DI-fakop`; `DI-koriz`; `DI-biruf`; `DI-lumir`; `DI-topab`;
 `DI-kakos`; `DI-bibah`; `DI-mokaz`; `DI-lamaz`; `DI-kodob`; `DI-lulog`;
 `DI-guhil`; `DI-ruvum`; `DI-minol`; `DI-gapav`; `DI-zosol`; `DI-tanov`;
-`DI-dahaj`; `DI-moson`.
+`DI-dahaj`; `DI-moson`; `DI-romak`; `DI-zizab`; `DI-nafat`.
 The root `README.md` is now the first-stop returning-member primer: it gives a
 clean narrative from simulations and GA design search through the grouped POC
 journey, ending with the current envelope, pCID, CBOR/CID, sparse-CAS,
@@ -68,7 +68,7 @@ push, and pull through shared conversion code, while explicitly recording
 mapping, loss, refusal, or local non-commitment for node types Git cannot
 represent. The Tangled prior-art review says POC18 should learn from
 self-hosting, migration, social-code UX, round-based review, stable
-logical-change identity, and Git/SSH interoperability pressure, while explicitly
+logical-change identity, and Git/SSH interoperability constraints, while explicitly
 keeping Git/SSH push-pull out of the native PromiseGrid sync model and keeping
 appview aggregation, role-based access control, hidden Git refs, and raw
 Jujutsu change IDs out of the native model unless a later TE/DI narrows that
@@ -111,13 +111,13 @@ bridge now uses go-git for real compatibility-adapter import, export, push, and
 pull flows through shared conversion code and records `git_bridge_mapping`
 promises so conventional Git remotes remain bridge inputs/outputs rather than
 native PromiseGrid authorities. POC18 now also exercises promise-based retention
-and local pressure GC: Frank keeps a separate sparse CAS, retrieves selected
+and GC under local capacity constraints: Frank keeps a separate sparse CAS, retrieves selected
 release/snapshot/review roots from Alice, stores a signed `object_retention`
 promise in return for Alice's signed CWT/COSE bearer storage-payment token,
 stores exact token bytes in CAS, records a `storage_payment_redemption` promise,
 rejects token replay through Frank's local spent-token ledger, protects the
 promised closure including payment objects, and collects only locally unpromised
-pressure objects. Native continuous peer DAG sync is now exercised between Bob
+temporary objects. Native continuous peer DAG sync is now exercised between Bob
 and Carol: Bob advertises selected merge/review reference-set heads, Carol
 decides locally to fetch, existing `sync_interest` and `object_availability`
 promises move exact CID-verified graph objects into Carol's separate sparse CAS,
@@ -224,12 +224,12 @@ payloads. The implementation-local POC20 design entrypoint is
 `implementations/poc20-timeline-pure-function-cas-branches/docs/DESIGN.md`,
 which now locks the first executable scenario as a hybrid of POC16 runtime,
 pCID/parser/proof/TCP lessons and POC18 CAS/graph/sync lessons. POC20's first
-hashable spec set has three protocol families: `timeline-v1`
-(`bafkreihfdasban663gaabn7rtbxionkz7pnenf6t5uro27jd3hij5npqam.md`),
-`pure-function-v1`
-(`bafkreigk2w2frnyh5dftaaftbarjdnl2gofzlepm5kfzmppe6cchui2l6i.md`), and
-`capability-token-v1`
-(`bafkreie4prt2erwwwjyjltwm273oydhu7z22gbwixvnfdtrtaosegaeg6i.md`). Source:
+hashable spec set has three protocol families: `timeline`
+(`bafkreicgfdapce66xa77zvf3ragxqiopcdgn6w2amlv4u66hd3clf2xomm.md`),
+`pure-function`
+(`bafkreidikvbjfadivn77s2qw3phoulz4rtazpgopbf65rdlfj5r6jj5qiu.md`), and
+`capability-token`
+(`bafkreie73cxz5zme35tajinbg2p5uozrpjit4flid6whmhnchrt4og5uee.md`). Source:
 `DI-kakos`; `DI-bibah`; `DI-mokaz`; `DI-lamaz`; `DI-kodob`; `DI-lulog`;
 `DI-ruvum`; `TE-lodom`; `TODO-nudav`.
 POC21 is now planned as the DevOps application of the recent line: POC18's

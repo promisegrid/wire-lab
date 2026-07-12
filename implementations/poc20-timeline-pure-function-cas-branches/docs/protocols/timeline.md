@@ -1,4 +1,4 @@
-# PromiseGrid POC20 timeline protocol v1
+# PromiseGrid POC20 timeline protocol
 
 ## Status
 
@@ -11,7 +11,7 @@ Source: `DI-lamaz`; `DI-mokaz`; `DI-lulog`; `DI-kodob`; `DI-ruvum`;
 
 ## Purpose
 
-`timeline-v1` defines promise-shaped records for local timelines, group
+`timeline` defines promise-shaped records for local timelines, group
 timeline agreements, branch heads, merge decisions, shareability decisions,
 bootstrap root adoption, root updates, projection conflicts, replay decisions,
 sensitive-data handling, and projection checkpoints. It exists so POC20 can test
@@ -76,9 +76,9 @@ Record types:
 - `shareability_promise`: a local promise classifying one CAS object or branch
   as `private`, `encrypted_shareable`, or `plain_shareable`.
 - `root_adoption`: a local promise that the promiser currently adopts a
-  bootstrap, app, agent, runtime, protocol-spec, or data root CID for some local
-  purpose.
-- `root_update`: a local promise that a later root CID supersedes, narrows,
+  bootstrap, app, agent, runtime, protocol-spec, or data Merkle/CAS root CID for
+  some local purpose.
+- `root_update`: a local promise that a later Merkle/CAS root CID supersedes, narrows,
   forks, or is rejected relative to an earlier adopted root.
 - `projection_conflict`: a local promise that a derived projection conflicts with
   reviewed local state, source observations, later external facts, or another
@@ -105,11 +105,12 @@ The existence of an object in local CAS never implies sendability.
 
 ## Bootstrap roots and updates
 
-A root CID names a Merkle/CAS object graph. It does not by itself promise trust,
-safe execution, compatibility, freshness, or authority. A `root_adoption` record
-is the promiser's local promise that the named root is the root the promiser is
-currently willing to use for a stated purpose, such as app discovery, runtime
-profile lookup, protocol-spec lookup, or default data roots.
+A Merkle/CAS root CID names an entry point into a Merkle/CAS object graph. It
+does not by itself promise trust, safe execution, compatibility, freshness, or
+authority. A `root_adoption` record is the promiser's local promise that the
+named root is the root the promiser is currently willing to use for a stated
+purpose, such as app discovery, runtime profile lookup, protocol-spec lookup, or
+default data roots.
 
 A `root_update` record links a prior adopted root to a later candidate or adopted
 root. The update body states whether the promiser locally accepts, rejects,
@@ -118,11 +119,13 @@ represented as a local promise by the operator or local node role. No update
 record commands another agent to adopt the same root.
 
 The body of a root decision must be replayable from local CAS. It should include
-the current root, candidate root, rollback root, closure summary CID, signer
-summary CID, impact summary CID, accepted or rejected capability changes,
+the current Merkle/CAS root CID, candidate Merkle/CAS root CID, prior Merkle/CAS
+root CID if one exists, any corrective Merkle/CAS root CID, closure summary CID,
+signer summary CID, impact summary CID, accepted or rejected capability changes,
 approving local role, local decision state, and local reason whenever those facts
-exist. Missing optional facts should be explicit rather than hidden in a
-projection.
+exist. If a full-state restore is attempted or performed, that state is recorded
+as an explicit local decision fact rather than implied by a prior root. Missing
+optional facts should be explicit rather than hidden in a projection.
 
 ## Projection conflicts and replay decisions
 
@@ -144,7 +147,7 @@ or explicit sequence key rather than silently replaying an old action.
 
 ## Behavior
 
-An agent that receives a valid `timeline-v1` message may store the exact envelope
+An agent that receives a valid `timeline` message may store the exact envelope
 bytes in local CAS, store the payload object in local CAS, or ignore the message.
 Keeping a record does not mean accepting it as truth. It means the receiver has
 retained a promise made by the promiser.
@@ -232,8 +235,9 @@ A POC20 implementation of this protocol must demonstrate:
 - at least one voluntary group timeline promise;
 - at least one local root-adoption record and one local root-update record;
 - root-decision records carrying local decision state, impact summary CID,
-  capability-change summary, approving role, local reason, and rollback root
-  where applicable;
+  capability-change summary, approving role, local reason, prior Merkle/CAS root
+  CID when one exists, any corrective Merkle/CAS root CID, and any explicit
+  full-state-restore attempt where applicable;
 - at least one projection conflict and local conflict decision rebuilt from CAS;
 - at least one replay decision that distinguishes source key from generated
   action hash;

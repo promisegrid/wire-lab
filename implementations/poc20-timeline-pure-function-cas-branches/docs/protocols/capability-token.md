@@ -1,4 +1,4 @@
-# PromiseGrid POC20 capability-token protocol v1
+# PromiseGrid POC20 capability-token protocol
 
 ## Status
 
@@ -11,7 +11,7 @@ Source: `DI-lamaz`; `DI-mokaz`; `DI-lulog`; `DI-kodob`; `DI-guhil`;
 
 ## Purpose
 
-`capability-token-v1` defines promises for issuing, transferring, redeeming, and
+`capability-token` defines promises for issuing, transferring, redeeming, and
 locally interpreting capability tokens as CAS timeline objects. It specifically
 tests whether double-spend can be represented as branch-visible promise history
 rather than hidden mutable projection state. It also provides the token vocabulary

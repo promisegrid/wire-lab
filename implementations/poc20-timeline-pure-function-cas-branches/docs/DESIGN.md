@@ -43,9 +43,9 @@ not separate pCIDs.
 
 | family | slug spec | pCID alias | purpose |
 | --- | --- | --- | --- |
-| timeline | `docs/protocols/timeline-v1.md` | `bafkreihfdasban663gaabn7rtbxionkz7pnenf6t5uro27jd3hij5npqam.md` | local/group timelines, branch heads, merge/non-merge, shareability, root adoption/update, projection checkpoints, projection conflicts, replay decisions |
-| pure function | `docs/protocols/pure-function-v1.md` | `bafkreigk2w2frnyh5dftaaftbarjdnl2gofzlepm5kfzmppe6cchui2l6i.md` | deterministic function/input/context/result promises, app/runtime root context, verification, disagreement, correction |
-| capability token | `docs/protocols/capability-token-v1.md` | `bafkreie4prt2erwwwjyjltwm273oydhu7z22gbwixvnfdtrtaosegaeg6i.md` | CWT/COSE token issue, transfer, redemption, root fetch/execution access, local status, branch-visible double-spend |
+| timeline | `docs/protocols/timeline.md` | `bafkreicgfdapce66xa77zvf3ragxqiopcdgn6w2amlv4u66hd3clf2xomm.md` | local/group timelines, branch heads, merge/non-merge, shareability, root adoption/update, projection checkpoints, projection conflicts, replay decisions |
+| pure function | `docs/protocols/pure-function.md` | `bafkreidikvbjfadivn77s2qw3phoulz4rtazpgopbf65rdlfj5r6jj5qiu.md` | deterministic function/input/context/result promises, app/runtime root context, verification, disagreement, correction |
+| capability token | `docs/protocols/capability-token.md` | `bafkreie73cxz5zme35tajinbg2p5uozrpjit4flid6whmhnchrt4og5uee.md` | CWT/COSE token issue, transfer, redemption, root fetch/execution access, local status, branch-visible double-spend |
 
 All three use `grid([42(pCID), payload, proof])` for the first slice. Payloads
 are CBOR maps because POC20 is testing semantic clarity more than constrained
@@ -246,7 +246,7 @@ The future `poc20-analyze` must fail the run unless it proves:
   require a new local decision when the action hash changes for the same source
   key;
 - at least one private, encrypted-shareable, and plain-shareable CAS object is
-  represented by `timeline-v1` shareability promises;
+  represented by `timeline` shareability promises;
 - broad timeline summaries avoid plaintext secrets and unnecessary sensitive
   personal payloads;
 - double-spend appears as two branch records for the same token family, not as
