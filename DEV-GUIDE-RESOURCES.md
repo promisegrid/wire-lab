@@ -8,7 +8,7 @@ PromiseGrid design choices are derived, tested, and recorded. Source:
 
 ## Current Design State
 
-Snapshot refreshed by Codex on 2026-07-13 14:52 PDT. This is a
+Snapshot refreshed by Codex on 2026-07-13 16:14 PDT. This is a
 developer-facing protocol-design snapshot, not a frozen PromiseGrid API. It
 reflects the currently locked outer-envelope direction plus consensus across
 near-contender simulations and root `results/` JSON evidence; proposal children
@@ -29,7 +29,8 @@ remain review evidence until promoted. Source: `DI-baral`; `DI-sisak`;
 `DI-rudos`; `DI-fakop`; `DI-koriz`; `DI-biruf`; `DI-lumir`; `DI-topab`;
 `DI-kakos`; `DI-bibah`; `DI-mokaz`; `DI-lamaz`; `DI-kodob`; `DI-lulog`;
 `DI-guhil`; `DI-ruvum`; `DI-minol`; `DI-gapav`; `DI-zosol`; `DI-tanov`;
-`DI-dahaj`; `DI-moson`; `DI-romak`; `DI-zizab`; `DI-nafat`; `DI-nupag`.
+`DI-dahaj`; `DI-moson`; `DI-romak`; `DI-zizab`; `DI-nafat`; `DI-nupag`;
+`DI-hofaz`.
 The root `README.md` is now the first-stop returning-member primer: it gives a
 clean narrative from simulations and GA design search through the grouped POC
 journey, ending with the current envelope, pCID, CBOR/CID, sparse-CAS,
@@ -198,14 +199,22 @@ CWT/COSE token, encrypted-payload, kernel-role, sparse-CAS, and exact-CBOR
 lessons; POC17 constrained-device binary-CID and compact-payload lessons; and
 POC18 CAS/VCS, reference-set, Git bridge, continuous TCP sync, tokenized
 retrieval, CAR transfer, and diagnostics lessons. It also flags the storage
-object profile and pCID inventory as pre-code follow-ups. `TE-vurok` / `DI-nupag`
-locks the code-start strategy as hybrid staged extraction: fresh stage0 scaffold,
-POC18 as CAS/VCS source baseline and regression oracle, POC16 as parser/builder,
-embedded-spec, CWT/COSE-token, encrypted-payload, and lifecycle-role baseline,
-and only reviewed behavior slices factored into production-shaped stage1 roles.
+object profile and pCID inventory as pre-code follow-ups; the storage profile is
+now locked, while the pCID inventory remains open. `TE-lirum` / `DI-hofaz` locks
+the POC19 storage profile: one CID-keyed CAS namespace is
+source of truth; raw Rabin chunks remain CIDv1 `raw`; true durable graph objects
+may use CIDv1 `dag-cbor`; exact `grid()` messages, Markdown specs, executables,
+encrypted bytes, and CAR artifacts remain exact byte objects under their own
+CIDs; and profile views are rebuildable projections. `TE-vurok` / `DI-nupag`
+locks the code-start strategy as hybrid staged extraction: fresh stage0
+scaffold, POC18 as CAS/VCS source baseline and regression oracle, POC16 as
+parser/builder, embedded-spec, CWT/COSE-token, encrypted-payload, and
+lifecycle-role baseline, and only reviewed behavior slices factored into
+production-shaped stage1 roles.
 This is currently a
 design artifact, not an executable implementation. Source: `DI-lumir`;
-`DI-topab`; `DI-kodob`; `DI-guhil`; `DI-zitap`; `DI-nupag`; `TODO-vumas`.
+`DI-topab`; `DI-kodob`; `DI-guhil`; `DI-zitap`; `DI-nupag`; `DI-hofaz`;
+`TODO-vumas`.
 POC20 is now planned as a parallel semantic-model track, not a POC19 blocker.
 TE-lodom frames promises as timeline assertions, agents as deterministic
 pure-function servers over explicit context CIDs, decentralized CAS branches as

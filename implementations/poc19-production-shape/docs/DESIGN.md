@@ -67,7 +67,7 @@ Reviewed anchors: POC16 `README.md`, `docs/MESSAGE-SHAPES.md`,
 | POC18 | `.grid` repo state remains the user-facing local repository shape while allowing a daemon-owned node CAS. | Storage model preserves `.grid/config.json`, `.grid/state.json`, and a configurable CAS locator. | covered | Implement in `vumas.6`. |
 | POC18 | Native collaboration is continuous peer DAG sync over promise-shaped TCP messages; Git import/export, push, and pull are bridge adapters. | Network model keeps native fetching as peer DAG sync and treats Git push/pull as interoperability. | covered | Preserve no-sideband inter-agent transfer checks in `vumas.9`. |
 | POC18 | Object retrieval uses signed CWT/COSE capability tokens and may transfer CAR payloads when a peer redeems a retrieval promise. | Design names retrieval/storage tokens and object transfer but has not frozen the durable object layout. | partially covered | Resolve token and object-transfer details under `vumas.8` and regression checks under `vumas.9`. |
-| POC18 | Raw chunks, DAG-CBOR, GRID-CBOR, CAR files, and local store layout remain open storage-profile decisions. | Storage model explicitly calls this unresolved. | pre-code blocker | Resolve the object storage profile in `vumas.17` before durable POC19 stores are scaffolded. |
+| POC18 | Raw chunks, DAG-CBOR, GRID-CBOR, CAR files, and local store layout remain open storage-profile decisions. | Storage model now locks one CID-keyed CAS namespace as source of truth with profile views rebuilt from CAS. | covered | Preserve the `DI-hofaz` profile in `vumas.5` and `vumas.6`. |
 | POC18 | CLI commands must use shared core behavior rather than a parallel automation path. | Command surface and daemon/client sections require a shared core and daemon-backed normal operation. | covered | `vumas.4` locks the factoring path that prevents CLI/core duplication. Source: `DI-nupag`. |
 
 ## Core design principles
@@ -534,10 +534,30 @@ POC19 should retain the current CID discipline:
 - CID-addressed app code, WASI modules, container layers, native binaries, data
   objects, app reference sets, run records, and result objects.
 
-Open POC18 decisions about raw chunks, DAG-CBOR, GRID-CBOR, CAR files, and store
-layout should be resolved before POC19 implementation freezes durable object
-profiles. The POC19 design can proceed now because those decisions affect storage
-layout, not the high-level production-shaped architecture.
+POC19 durable storage uses one CID-keyed CAS namespace as the source of truth.
+The local store retains exact bytes by CID. It may maintain derived views such as
+chunks, messages, DAG-CBOR graph objects, CAR receipts, executable objects, or
+encrypted ciphertext, but those views are rebuildable projections rather than
+authoritative source-of-truth directories.
+
+The locked profile is:
+
+- raw Rabin chunks remain CIDv1 `raw` objects naming exact chunk bytes;
+- durable graph objects may use CIDv1 `dag-cbor` when they are true DAG-CBOR and
+  benefit from IPLD traversal, selectors, CAR tooling, or typed links;
+- exact `grid()` messages are retained by exact message bytes and message CIDs;
+- Markdown protocol specs may remain CIDv1 `raw` pCID objects until a later
+  protocol-spec-bundle decision changes that;
+- executable bytes, container layers, encrypted bytes, and other opaque artifacts
+  remain exact byte objects under their own CIDs;
+- CAR files are transfer/archive packages and review artifacts; when retained,
+  the CAR bytes may have their own artifact CID, but contained objects are still
+  verified and retained by their own CIDs.
+
+When POC19 factors POC18 storage behavior, old `chunks/*.bin` and
+`objects/*.cbor` entries must be verified by CID before retention in the POC19
+store. The `.cbor` suffix must not be treated as proof that the object CID uses
+the CIDv1 `dag-cbor` multicodec. Source: `TE-lirum`; `DI-hofaz`.
 
 ## Example flows
 

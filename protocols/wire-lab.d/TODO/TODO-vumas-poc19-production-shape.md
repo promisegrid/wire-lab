@@ -205,6 +205,30 @@ Affects: `protocols/wire-lab.d/TODO/TODO-vumas-poc19-production-shape.md`;
 `docs/thought-experiments/TE-vurok-poc19-code-start-strategy.md`;
 `implementations/poc19-production-shape/docs/DESIGN.md`.
 
+ID: DI-hofaz
+Date: 2026-07-13 16:14:50 PDT
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: POC19 durable storage uses one CID-keyed CAS namespace as the source of
+truth. Raw Rabin chunks remain CIDv1 `raw` exact-byte objects; true durable graph
+objects may use CIDv1 `dag-cbor`; exact `grid()` messages, Markdown specs,
+executables, encrypted bytes, and CAR artifacts remain exact byte objects under
+their own CIDs. `chunks`, `messages`, `dag-cbor`, `car`, and similar views are
+rebuildable projections, not authoritative source-of-truth directories.
+Intent: Stage0 should be able to fetch and verify exact bytes by CID without
+knowing every durable object profile. Stage1 can provide richer diagnostics,
+DAG-CBOR validation, CAR import/export, and derived browsing views while keeping
+CAS itself simple, sparse, and replayable from exact object bytes.
+Constraints: Do not treat POC18's `chunks/*.bin` and `objects/*.cbor` layout as
+the POC19 canonical store. Do not imply that a `.cbor` filename means a CIDv1
+`dag-cbor` object. CAR files are transfer/archive packages and review artifacts,
+not the authority over contained object identity. Local indexes and profile views
+must be rebuildable from CAS-resident facts.
+Affects: `protocols/wire-lab.d/TODO/TODO-vumas-poc19-production-shape.md`;
+`docs/thought-experiments/TE-lirum-poc19-storage-object-profile.md`;
+`implementations/poc19-production-shape/docs/DESIGN.md`;
+`DEV-GUIDE-RESOURCES.md`.
+
 ## Tasks
 
 - [x] vumas.1 Lock the POC19 design-doc-first decision in `DI-lumir`.
@@ -252,6 +276,9 @@ Affects: `protocols/wire-lab.d/TODO/TODO-vumas-poc19-production-shape.md`;
   reference-set execution proceeds beyond the stage0 bootstrap proof. Include
   POC16 parser/builder and protocol-spec lessons, not only POC18 VCS/CAS pCIDs.
   Source: `DI-nupag`.
-- [ ] vumas.17 Resolve the POC19 storage object profile for raw chunks,
+- [x] vumas.17 Resolve the POC19 storage object profile for raw chunks,
   DAG-CBOR, GRID-CBOR, CAR files, and local store layout before durable POC19
-  stores are scaffolded. Source: `DI-nupag`.
+  stores are scaffolded. `TE-lirum` locks one CID-keyed CAS namespace as source
+  of truth, with raw chunks as CIDv1 `raw`, true graph objects optionally
+  CIDv1 `dag-cbor`, CAR as transfer/archive packaging, and profile views as
+  rebuildable projections. Source: `TE-lirum`; `DI-hofaz`.
