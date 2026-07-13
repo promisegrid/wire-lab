@@ -179,6 +179,32 @@ Supersedes: `DI-kodob` only where it implied the stable installed binary itself
 contains all local daemon/microkernel roles. `DI-kodob` remains active for the
 operator-adopted CID-root update model.
 
+ID: DI-nupag
+Date: 2026-07-13 14:52:09 PDT
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Start POC19 implementation with hybrid staged extraction: create a
+fresh stage0 `grid` scaffold, treat POC18 as the source baseline and regression
+oracle, and factor or copy only reviewed POC18 behavior slices into
+production-shaped POC19 stage1 roles.
+Intent: POC19 must preserve POC18 CAS/VCS, sync, transport, Git-bridge, token,
+diagnostic, and CLI/core lessons without copying POC18's POC-only harness shape
+as the production architecture. It must also preserve POC16's runtime lessons
+around pCID-selected parser/builder roles, embedded protocol specs, CWT/COSE
+tokens, encrypted payloads, and local lifecycle shutdown. A fresh stage0 keeps
+the installed binary small; targeted extraction preserves the working behavior
+that proves the superset.
+Constraints: Do not use long-term imports from
+`implementations/poc18-cas-git-replacement/...` as the POC19 architecture. Do not
+copy `poc-sim`, `poc-agent`, `poc-analyze`, or collector command shapes as the
+production surface. Keep CLI behavior on the same shared core or daemon-backed
+path as automation. Treat POC16 as the source baseline for parser/builder,
+protocol-spec, CWT/COSE token, encrypted-payload, and lifecycle role boundaries.
+Preserve POC18-superset regression gates before declaring POC19 complete.
+Affects: `protocols/wire-lab.d/TODO/TODO-vumas-poc19-production-shape.md`;
+`docs/thought-experiments/TE-vurok-poc19-code-start-strategy.md`;
+`implementations/poc19-production-shape/docs/DESIGN.md`.
+
 ## Tasks
 
 - [x] vumas.1 Lock the POC19 design-doc-first decision in `DI-lumir`.
@@ -187,8 +213,10 @@ operator-adopted CID-root update model.
 - [x] vumas.3 Review the POC19 design against POC16, POC17, and POC18 to ensure
   inherited lessons are not lost. The inheritance matrix is now in
   `implementations/poc19-production-shape/docs/DESIGN.md`. Source: `DI-topab`.
-- [ ] vumas.4 Decide whether POC19 implementation starts by copying POC18
+- [x] vumas.4 Decide whether POC19 implementation starts by copying POC18
   packages or by factoring shared packages into a new production-shaped module.
+  `TE-vurok` rejects both wholesale copy and fresh rewrite; POC19 starts with
+  hybrid staged extraction. Source: `TE-vurok`; `DI-nupag`.
 - [ ] vumas.5 Scaffold `implementations/poc19-production-shape/` with one stable
   `grid` bootstrap binary plus fetched daemon/client microkernel modules.
 - [ ] vumas.6 Implement daemon-managed local CAS and VCS config discovery with
@@ -220,3 +248,10 @@ operator-adopted CID-root update model.
   that can self-update with local owner approval, restart, fetch remaining
   microkernel modules, and only then fetch application-specific modules. Source:
   `DI-zitap`.
+- [ ] vumas.16 Produce the POC19 pCID inventory before parser scaffolding or app
+  reference-set execution proceeds beyond the stage0 bootstrap proof. Include
+  POC16 parser/builder and protocol-spec lessons, not only POC18 VCS/CAS pCIDs.
+  Source: `DI-nupag`.
+- [ ] vumas.17 Resolve the POC19 storage object profile for raw chunks,
+  DAG-CBOR, GRID-CBOR, CAR files, and local store layout before durable POC19
+  stores are scaffolded. Source: `DI-nupag`.

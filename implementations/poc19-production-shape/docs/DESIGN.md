@@ -54,8 +54,8 @@ Reviewed anchors: POC16 `README.md`, `docs/MESSAGE-SHAPES.md`,
 | Source | Inherited lesson | POC19 coverage | Gap status | Pre-code follow-up |
 | --- | --- | --- | --- | --- |
 | POC16 | pCID owns envelope arity, slot meaning, signable view, proof location, and payload interpretation; pCID is not a peer address, app address, operation, route, repository name, or message type. | Core design keeps `grid([42(pCID), ...protocol-defined-slots])` and puts route/app/operation semantics inside pCID-defined payloads. | covered | Preserve this as a regression check in `vumas.9`. |
-| POC16 | Parser/builder roles are local kernel roles that receive exact slot-0 pCID bytes and deliver parsed protocol messages to apps. | Local daemon roles include a pCID parser/builder role separate from transport and app interface roles. | partially covered | `vumas.4` must lock whether this role is factored from POC18 code or implemented in a new shared core before `vumas.5` scaffolding. |
-| POC16 | Protocol specs are first-class; printable pCIDs are CIDv1 base32 text and wire pCIDs are binary CID bytes. | App reference sets include pCID specs; object identity section preserves binary-on-wire/base32-printable discipline. | partially covered | `vumas.4` must produce the POC19 pCID inventory before code generation. |
+| POC16 | Parser/builder roles are local kernel roles that receive exact slot-0 pCID bytes and deliver parsed protocol messages to apps. | Local daemon roles include a pCID parser/builder role separate from transport and app interface roles. | partially covered | `vumas.4` locks hybrid staged extraction; `vumas.16` must produce the POC19 pCID inventory before parser scaffolding. Source: `DI-nupag`. |
+| POC16 | Protocol specs are first-class; printable pCIDs are CIDv1 base32 text and wire pCIDs are binary CID bytes. | App reference sets include pCID specs; object identity section preserves binary-on-wire/base32-printable discipline. | partially covered | `vumas.16` must produce the POC19 pCID inventory before code generation proceeds beyond stage0 bootstrap. |
 | POC16 | Capability tokens are signed promises; local lifecycle, resource access, storage, and retrieval tokens use the CWT/COSE pattern rather than custom unsigned fields. | Design names CWT/COSE capability tokens for retrieval, storage, and runtime resources. | partially covered | `vumas.8` must define the app/runtime token profile before `grid run` executes fetched code. |
 | POC16 | Encrypted payloads and COSE payload/proof variants are pCID-owned message shapes, not universal envelope rules. | Design preserves pCID-owned slot semantics but does not yet enumerate encrypted app-data profiles. | partially covered | Assign encrypted app-input and app-output profiles to `vumas.8`; keep any proof slot pCID-defined. |
 | POC16 | Kernel roles are non-monolithic local promise surfaces for transport, lifecycle, storage, compute, device, key, app-interface, and resource-protection behavior. | Local daemon roles explicitly separate transport, parser/builder, CAS/VCS, app interface, execution runtime, local event journal, and key/token behavior. | covered | Keep role boundaries visible in `vumas.5` scaffold and `vumas.9` gates. |
@@ -67,8 +67,8 @@ Reviewed anchors: POC16 `README.md`, `docs/MESSAGE-SHAPES.md`,
 | POC18 | `.grid` repo state remains the user-facing local repository shape while allowing a daemon-owned node CAS. | Storage model preserves `.grid/config.json`, `.grid/state.json`, and a configurable CAS locator. | covered | Implement in `vumas.6`. |
 | POC18 | Native collaboration is continuous peer DAG sync over promise-shaped TCP messages; Git import/export, push, and pull are bridge adapters. | Network model keeps native fetching as peer DAG sync and treats Git push/pull as interoperability. | covered | Preserve no-sideband inter-agent transfer checks in `vumas.9`. |
 | POC18 | Object retrieval uses signed CWT/COSE capability tokens and may transfer CAR payloads when a peer redeems a retrieval promise. | Design names retrieval/storage tokens and object transfer but has not frozen the durable object layout. | partially covered | Resolve token and object-transfer details under `vumas.8` and regression checks under `vumas.9`. |
-| POC18 | Raw chunks, DAG-CBOR, GRID-CBOR, CAR files, and local store layout remain open storage-profile decisions. | Storage model explicitly calls this unresolved. | pre-code blocker | Resolve the object storage profile during `vumas.4` before durable POC19 stores are scaffolded. |
-| POC18 | CLI commands must use shared core behavior rather than a parallel automation path. | Command surface and daemon/client sections require a shared core and daemon-backed normal operation. | covered | `vumas.4` must choose the factoring path that prevents CLI/core duplication. |
+| POC18 | Raw chunks, DAG-CBOR, GRID-CBOR, CAR files, and local store layout remain open storage-profile decisions. | Storage model explicitly calls this unresolved. | pre-code blocker | Resolve the object storage profile in `vumas.17` before durable POC19 stores are scaffolded. |
+| POC18 | CLI commands must use shared core behavior rather than a parallel automation path. | Command surface and daemon/client sections require a shared core and daemon-backed normal operation. | covered | `vumas.4` locks the factoring path that prevents CLI/core duplication. Source: `DI-nupag`. |
 
 ## Core design principles
 
@@ -202,6 +202,11 @@ CID, fetches a stage1 descriptor and the executable objects it names from local
 CAS or a simple trusted peer fixture, verifies exact CIDs, starts one stage1
 module, and receives a readiness result from that module. Full sync, trust
 economics, app orchestration, and rich runtime management should come later.
+POC19 should use hybrid staged extraction: start with a fresh stage0 scaffold,
+keep POC18 as the CAS/VCS source baseline and regression oracle, carry POC16's
+pCID parser/builder, CWT/COSE token, embedded-spec, encrypted-payload, and
+lifecycle role lessons into the stage0/stage1 seams, and factor only reviewed
+behavior slices into production-shaped stage1 roles. Source: `DI-nupag`.
 
 The descriptor work in `~/lab/grid-poc/x/descriptors/` is useful lineage for
 this idea. It explored CBOR executable descriptors and memory-backed execution,
@@ -724,7 +729,7 @@ Full POC19 after the first proof:
 
 4. **Shared baseline.** Keep POC18 code available as the source baseline while
    factoring shared packages so stage1 modules do not duplicate CLI, CAS, VCS, or
-   transport logic.
+   transport logic. Source: `DI-nupag`.
 5. **Daemon baseline.** Move POC18 local CAS/VCS and TCP agent behavior behind a
    fetched `grid daemon` stage1 module, with CLI commands using the daemon for
    normal operation.
