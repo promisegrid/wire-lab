@@ -4,7 +4,8 @@
 
 Design draft. This is the first POC19 artifact. It is not executable code, not a
 frozen protocol spec, and not a production API. Source: `DI-lumir`; `DI-kodob`;
-`DI-guhil`; `DI-zitap`; `DI-nupag`; `DI-hofaz`; `DI-topiv`; `DI-bugik`.
+`DI-guhil`; `DI-zitap`; `DI-nupag`; `DI-hofaz`; `DI-topiv`; `DI-bugik`;
+`DI-tuvub`.
 
 ## Purpose
 
@@ -206,13 +207,16 @@ fetch, verify, and start a CID-named stage1 module. This is the smallest useful
 proof of the staged bootstrap model: stage0 reads a configured or bootstrap root
 CID, fetches a stage1 descriptor and the executable objects it names from local
 CAS or a simple trusted peer fixture, verifies exact CIDs, starts one stage1
-module, and receives a readiness result from that module. Full sync, trust
-economics, app orchestration, and rich runtime management should come later.
+module, and records a launch-attempt local event. Readiness is optional
+supplemental information if the stage1 process reports it before timeout. Full
+sync, trust economics, app orchestration, and rich runtime management should
+come later.
 POC19 should use hybrid staged extraction: start with a fresh stage0 scaffold,
 keep POC18 as the CAS/VCS source baseline and regression oracle, carry POC16's
 pCID parser/builder, CWT/COSE token, embedded-spec, encrypted-payload, and
 lifecycle role lessons into the stage0/stage1 seams, and factor only reviewed
-behavior slices into production-shaped stage1 roles. Source: `DI-nupag`.
+behavior slices into production-shaped stage1 roles. Source: `DI-nupag`;
+`DI-tuvub`.
 
 The descriptor work in `~/lab/grid-poc/x/descriptors/` is useful lineage for
 this idea. It explored CBOR executable descriptors and memory-backed execution,
@@ -245,25 +249,31 @@ entrypoint            function, command, WASI export, or process entrypoint
 runtime defaults      argv, environment references, input roots, and output promises
 capability promises   CPU, memory, filesystem, network, device, secret service, time, process count
 pCID surface          pCIDs provided, consumed, parsed, or built by the module
-lifecycle promises    readiness, shutdown, restart, and failure-reporting expectations
+lifecycle promises    launch-attempt, optional readiness, shutdown, restart, and failure-reporting expectations
 ```
 
 The first descriptor implementation does not need final field names, final schema
 syntax, or every runtime profile. It needs enough structure for stage0 to verify
 exact bytes, decide whether local resource promises are satisfied, start one
-stage1 module, and record the resulting local event and readiness CIDs. Source:
-`DI-zitap`; `DI-kodob`; `DI-guhil`.
+stage1 module, and record the launch-attempt local-event CID plus any optional
+readiness CID reported before timeout. Source: `DI-zitap`; `DI-kodob`;
+`DI-guhil`; `DI-tuvub`.
 
 The first stage1 runtime is now locked as native/static. Stage0 reads local
 config, configured peers, trust anchors, and the bootstrap or adopted root CID;
 fetches the descriptor and executable object by CID; verifies exact bytes,
 signer or local trust criteria, platform constraints, and local capability
 requirements; materializes a runnable file into a grid-owned execution cache;
-starts stage1 with the host process mechanism such as `execve`, `CreateProcess`,
-or Go `os/exec`; passes minimal bootstrap facts such as descriptor CID, adopted
-root CID, config path, state directory, and a local control endpoint; and records
-stage1 readiness as a local event. WASI/WASM support belongs under stage1 for
-portable app/runtime modules. Source: `TE-sunag`; `DI-topiv`.
+starts stage1 with a portable host process mechanism such as Go `os/exec`, which
+maps to `CreateProcess`-style behavior on Windows and normal process launch on
+Unix without requiring Unix same-PID `execve`; passes minimal bootstrap facts
+such as descriptor CID, adopted root CID, config path, state directory, and an
+optional local control endpoint; and records a launch-attempt local event with
+descriptor CID, executable CID, adopted Merkle/CAS root CID when present,
+execution-cache path, platform, approval or rejection outcome, and process-launch
+outcome. Readiness remains optional supplemental information if stage1 reports it
+before timeout. WASI/WASM support belongs under stage1 for portable app/runtime
+modules. Source: `TE-sunag`; `DI-topiv`; `DI-tuvub`.
 
 Platform and package-manager boundaries are part of this decision. Linux,
 Windows, and macOS can be normal fetched native/static stage1 targets when stage0
@@ -799,10 +809,11 @@ First-slice proof:
    restart/start handoff.
 2. **Descriptor fixture.** Add one CID-named stage1 descriptor and one
    native/static executable stage1 module object to a local CAS fixture.
-3. **Stage1 readiness.** Have stage0 fetch the descriptor and executable object,
-   verify exact CIDs and local trust criteria, materialize stage1 into an
-   execution cache, start the stage1 module through the host process mechanism,
-   and record a local readiness result.
+3. **Stage1 launch attempt.** Have stage0 fetch the descriptor and executable
+   object, verify exact CIDs and local trust criteria, materialize stage1 into an
+   execution cache, start the stage1 module through a portable host process
+   mechanism, and record a launch-attempt local event. Record readiness only as
+   optional supplemental information if stage1 reports it before timeout.
 
 Full POC19 after the first proof:
 
@@ -888,8 +899,11 @@ run shows:
 - the first stage1 module is native/static, is materialized into a grid-owned
   execution cache, and is launched through the host process mechanism;
 - stage0 does not contain a WASI loader for the first proof;
-- the stage1 module produces a readiness result that stage0 records as local
-  event/CID output;
+- stage0 records a launch-attempt local event with descriptor CID, executable
+  CID, adopted Merkle/CAS root CID when present, execution-cache path, platform,
+  approval or rejection outcome, and process-launch outcome;
+- stage1 readiness is optional supplemental information if reported before
+  timeout, not a prerequisite for first-proof success;
 - replacing app or stage1 fixture bytes changes CAS/root CIDs, not the installed
   stage0 binary.
 

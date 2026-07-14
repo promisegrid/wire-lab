@@ -6,7 +6,7 @@ TE-sunag
 
 ## Status
 
-decided
+decided, refined
 
 ## Decision under test
 
@@ -224,3 +224,15 @@ should itself be WASI.
 
 Locked by `DI-topiv` in
 `protocols/wire-lab.d/TODO/TODO-vumas-poc19-production-shape.md`.
+
+## Refinements
+
+### 2026-07-13 — Launch-attempt first proof refinement
+
+`DI-tuvub` supersedes only the readiness-required launch-record wording in
+`DI-topiv` and in this TE's implementation implications. The native/static
+stage1 conclusion remains locked. The first POC19 proof now requires stage0 to
+record a launch-attempt local event with descriptor CID, executable CID, adopted
+Merkle/CAS root CID when present, execution-cache path, platform, approval or
+rejection outcome, and process-launch outcome. Readiness is optional supplemental
+information if the stage1 process reports it before timeout.

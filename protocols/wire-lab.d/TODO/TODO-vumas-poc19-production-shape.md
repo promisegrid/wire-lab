@@ -281,6 +281,34 @@ Affects: `protocols/wire-lab.d/TODO/TODO-vumas-poc19-production-shape.md`;
 `implementations/poc19-production-shape/docs/DESIGN.md`;
 `DEV-GUIDE-RESOURCES.md`.
 
+ID: DI-tuvub
+Date: 2026-07-13 17:27:53 PDT
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: POC19's first native/static stage1 proof requires a launch-attempt
+local event, not a mandatory readiness result. Stage0 fetches a descriptor and
+executable object by CID, verifies exact bytes and local capability/trust
+criteria, materializes the executable into an execution cache, starts it through
+a portable host process launch mechanism, and records descriptor CID, executable
+CID, adopted Merkle/CAS root CID when present, execution-cache path, platform,
+approval or rejection outcome, and process-launch outcome. Readiness is optional
+supplemental information if the stage1 process reports it before timeout.
+Intent: The first proof should show that stage0 can perform a narrow
+CID-verified launch handoff to fetched native/static stage1 code without forcing
+a stage1 control protocol or readiness handshake into the minimum bootstrap
+binary.
+Constraints: Use portable process spawn semantics such as Go `os/exec`, mapping
+to `CreateProcess`-style behavior on Windows and normal process launch on Unix;
+do not require Unix same-PID `execve`. Do not add a WASI loader, broad
+trust-policy engine, device/process adapter layer, or app-specific runtime logic
+to stage0 for this proof. Do not treat missing readiness as failure when the
+launch-attempt local event records the process-launch outcome.
+Affects: `protocols/wire-lab.d/TODO/TODO-vumas-poc19-production-shape.md`;
+`docs/thought-experiments/TE-sunag-poc19-native-stage1-bootstrap.md`;
+`implementations/poc19-production-shape/docs/DESIGN.md`;
+`DEV-GUIDE-RESOURCES.md`.
+Supersedes: `DI-topiv` launch-record/readiness-required wording only.
+
 ## Tasks
 
 - [x] vumas.1 Lock the POC19 design-doc-first decision in `DI-lumir`.
@@ -297,8 +325,9 @@ Affects: `protocols/wire-lab.d/TODO/TODO-vumas-poc19-production-shape.md`;
   `grid` stage0 bootstrap binary plus a fetched native/static stage1 descriptor
   and executable proof. Stage0 must verify exact CIDs, local trust criteria,
   platform constraints, and local capability requirements before materializing
-  stage1 into an execution cache and launching it. Source: `TE-sunag`;
-  `DI-topiv`.
+  stage1 into an execution cache, launching it through a portable host process
+  mechanism, and recording a launch-attempt local event. Source: `TE-sunag`;
+  `DI-topiv`; `DI-tuvub`.
 - [ ] vumas.6 Implement daemon-managed local CAS and VCS config discovery with
   POC18-compatible `.grid` repo state.
 - [ ] vumas.7 Implement TCP and WebSocket transport adapters over the same exact
@@ -310,8 +339,9 @@ Affects: `protocols/wire-lab.d/TODO/TODO-vumas-poc19-production-shape.md`;
   exact-message retention, TCP/WebSocket parity, promise-first vocabulary,
   native/static stage1 launch from an execution cache, no dependency on
   unverified stage1 trust-policy code, platform/package-manager separation,
-  stage0 self-update separation, and no true rollback claim. Source:
-  `TE-sunag`; `DI-topiv`.
+  stage0 self-update separation, required launch-attempt local-event fields,
+  optional readiness if reported before timeout, failure reporting, and no true
+  rollback claim. Source: `TE-sunag`; `DI-topiv`; `DI-tuvub`.
 - [ ] vumas.10 Run and archive a clean POC19 regression after implementation
   begins.
 - [x] vumas.11 Lock the minimum-microkernel rule: one installed `grid` binary

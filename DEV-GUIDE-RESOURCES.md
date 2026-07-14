@@ -8,7 +8,7 @@ PromiseGrid design choices are derived, tested, and recorded. Source:
 
 ## Current Design State
 
-Snapshot refreshed by Codex on 2026-07-13 17:13 PDT. This is a
+Snapshot refreshed by Codex on 2026-07-13 17:27 PDT. This is a
 developer-facing protocol-design snapshot, not a frozen PromiseGrid API. It
 reflects the currently locked outer-envelope direction plus consensus across
 near-contender simulations and root `results/` JSON evidence; proposal children
@@ -30,7 +30,7 @@ remain review evidence until promoted. Source: `DI-baral`; `DI-sisak`;
 `DI-kakos`; `DI-bibah`; `DI-mokaz`; `DI-lamaz`; `DI-kodob`; `DI-lulog`;
 `DI-guhil`; `DI-ruvum`; `DI-minol`; `DI-gapav`; `DI-zosol`; `DI-tanov`;
 `DI-dahaj`; `DI-moson`; `DI-romak`; `DI-zizab`; `DI-nafat`; `DI-nupag`;
-`DI-hofaz`; `DI-topiv`; `DI-bugik`.
+`DI-hofaz`; `DI-topiv`; `DI-bugik`; `DI-tuvub`.
 The root `README.md` is now the first-stop returning-member primer: it gives a
 clean narrative from simulations and GA design search through the grouped POC
 journey, ending with the current envelope, pCID, CBOR/CID, sparse-CAS,
@@ -188,8 +188,10 @@ version of itself from locally trusted peers, restart, then fetch remaining
 microkernel modules before application-specific modules. `TE-sunag` / `DI-topiv`
 locks the first stage1 bootstrap proof as a native/static executable object
 fetched by CID, verified by stage0, materialized into a grid-owned execution
-cache, launched through the host process mechanism, and recorded as a local
-readiness event; stage0 does not need a WASI loader for that first proof. App,
+cache, and launched through a portable host process mechanism; `DI-tuvub`
+clarifies that the required first-proof record is a launch-attempt local event,
+while readiness is optional if reported before timeout. Stage0 does not need a
+WASI loader for that first proof. App,
 agent, runtime, protocol-spec, executable, and data changes should arrive as
 CID-addressed CAS roots fetched from peers. First run or local config may name a
 bootstrap Merkle/CAS root CID; later root changes require
@@ -221,7 +223,7 @@ factored into production-shaped stage1 roles.
 This is currently a
 design artifact, not an executable implementation. Source: `DI-lumir`;
 `DI-topab`; `DI-kodob`; `DI-guhil`; `DI-zitap`; `DI-nupag`; `DI-hofaz`;
-`DI-topiv`; `DI-bugik`; `TODO-vumas`.
+`DI-topiv`; `DI-bugik`; `DI-tuvub`; `TODO-vumas`.
 POC20 is now planned as a parallel semantic-model track, not a POC19 blocker.
 TE-lodom frames promises as timeline assertions, agents as deterministic
 pure-function servers over explicit context CIDs, decentralized CAS branches as
@@ -238,9 +240,10 @@ runtime profiles, executable objects, specs, data roots, and update metadata,
 but it does not by itself name trust or obligation. When fetched app/runtime/spec
 roots affect a pure-function result, those root CIDs are part of the explicit
 context for that result. POC20 aligns with POC19 by treating stage0 self-update,
-native stage1 descriptor adoption, execution-cache materialization, stage1
-readiness, and later WASI/WASM app execution as local timeline promises when
-they affect runtime roots. POC20 now also requires root-decision details,
+native stage1 descriptor adoption, execution-cache materialization, the required
+stage1 launch-attempt event, optional readiness, and later WASI/WASM app
+execution as local timeline promises when they affect runtime roots. POC20 now
+also requires root-decision details,
 projection-conflict records, source-key plus action-hash replay decisions,
 projection rebuild proof obligations, and sensitive-data shareability rules so
 local decisions remain replayable from CAS without broad plaintext sensitive
