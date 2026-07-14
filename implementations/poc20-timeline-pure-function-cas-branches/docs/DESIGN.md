@@ -120,10 +120,10 @@ is not guaranteed. Source: `DI-ruvum`; `DI-kakos`; `TE-lodom`.
 Projection conflicts are local timeline records, not hidden projection-only
 state. A conflict record names the source system or peer, field or field group,
 current owner or promiser if known, observed value, reviewed value if one exists,
-projected value if one exists, raw supporting evidence CID or CIDs, local
-decision, local reason, and resulting projection or action. The default posture
-is warn-and-decide: retain the conflict, avoid silent overwrite, and let a local
-promise resolve or leave the conflict open. Source: `DI-ruvum`.
+projected value if one exists, supporting source-object CID or event CID
+references, local decision, local reason, and resulting projection or action. The
+default posture is warn-and-decide: retain the conflict, avoid silent overwrite,
+and let a local promise resolve or leave the conflict open. Source: `DI-ruvum`.
 
 Replay identity uses stable upstream facts, root events, or timeline events as
 primary source keys. A generated action payload hash is only a secondary guard
@@ -247,9 +247,9 @@ The future `poc20-analyze` must fail the run unless it proves:
   summaries, token status, replay indexes, prior-action warnings, replayable
   actions, and pure-function tuple outcomes as the original projection;
 - at least one projection conflict record is rebuilt from CAS and preserves the
-  source or peer, field group, reviewed value, projected value, raw supporting
-  evidence CIDs, local decision, local reason, and resulting projection or
-  action;
+  source or peer, field group, reviewed value, projected value, supporting
+  source-object CIDs or event CIDs, local decision, local reason, and resulting
+  projection or action;
 - replay checks distinguish a stable source key from a generated action hash and
   require a new local decision when the action hash changes for the same source
   key;

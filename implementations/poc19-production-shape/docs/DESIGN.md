@@ -4,7 +4,7 @@
 
 Design draft. This is the first POC19 artifact. It is not executable code, not a
 frozen protocol spec, and not a production API. Source: `DI-lumir`; `DI-kodob`;
-`DI-guhil`; `DI-zitap`.
+`DI-guhil`; `DI-zitap`; `DI-nupag`; `DI-hofaz`; `DI-topiv`; `DI-bugik`.
 
 ## Purpose
 
@@ -54,8 +54,8 @@ Reviewed anchors: POC16 `README.md`, `docs/MESSAGE-SHAPES.md`,
 | Source | Inherited lesson | POC19 coverage | Gap status | Pre-code follow-up |
 | --- | --- | --- | --- | --- |
 | POC16 | pCID owns envelope arity, slot meaning, signable view, proof location, and payload interpretation; pCID is not a peer address, app address, operation, route, repository name, or message type. | Core design keeps `grid([42(pCID), ...protocol-defined-slots])` and puts route/app/operation semantics inside pCID-defined payloads. | covered | Preserve this as a regression check in `vumas.9`. |
-| POC16 | Parser/builder roles are local kernel roles that receive exact slot-0 pCID bytes and deliver parsed protocol messages to apps. | Local daemon roles include a pCID parser/builder role separate from transport and app interface roles. | partially covered | `vumas.4` locks hybrid staged extraction; `vumas.16` must produce the POC19 pCID inventory before parser scaffolding. Source: `DI-nupag`. |
-| POC16 | Protocol specs are first-class; printable pCIDs are CIDv1 base32 text and wire pCIDs are binary CID bytes. | App reference sets include pCID specs; object identity section preserves binary-on-wire/base32-printable discipline. | partially covered | `vumas.16` must produce the POC19 pCID inventory before code generation proceeds beyond stage0 bootstrap. |
+| POC16 | Parser/builder roles are local kernel roles that receive exact slot-0 pCID bytes and deliver parsed protocol messages to apps. | Local daemon roles include a pCID parser/builder role separate from transport and app interface roles, and the POC19 pCID handler inventory now locks handler families. | covered | Preserve pCID-to-handler dispatch in `vumas.5` and `vumas.9`. Source: `DI-nupag`; `DI-bugik`. |
+| POC16 | Protocol specs are first-class; printable pCIDs are CIDv1 base32 text and wire pCIDs are binary CID bytes. | App reference sets include pCID specs; object identity section preserves binary-on-wire/base32-printable discipline; active POC19 handlers require standalone spec docs and base32 pCID aliases. | covered | Create exact POC19 spec docs before each handler becomes active code. Source: `DI-bugik`. |
 | POC16 | Capability tokens are signed promises; local lifecycle, resource access, storage, and retrieval tokens use the CWT/COSE pattern rather than custom unsigned fields. | Design names CWT/COSE capability tokens for retrieval, storage, and runtime resources. | partially covered | `vumas.8` must define the app/runtime token profile before `grid run` executes fetched code. |
 | POC16 | Encrypted payloads and COSE payload/proof variants are pCID-owned message shapes, not universal envelope rules. | Design preserves pCID-owned slot semantics but does not yet enumerate encrypted app-data profiles. | partially covered | Assign encrypted app-input and app-output profiles to `vumas.8`; keep any proof slot pCID-defined. |
 | POC16 | Kernel roles are non-monolithic local promise surfaces for transport, lifecycle, storage, compute, device, key, app-interface, and resource-protection behavior. | Local daemon roles explicitly separate transport, parser/builder, CAS/VCS, app interface, execution runtime, local event journal, and key/token behavior. | covered | Keep role boundaries visible in `vumas.5` scaffold and `vumas.9` gates. |
@@ -66,7 +66,7 @@ Reviewed anchors: POC16 `README.md`, `docs/MESSAGE-SHAPES.md`,
 | POC18 | CAS/VCS is the durable substrate: Rabin chunks, POSIX node promises, reference sets, tags, snapshots, logical changes, review statements, and parent-linked exact messages. | Design makes apps and user data VCS/CAS objects and preserves POC18 command surface. | covered | Keep POC18 VCS behavior in `vumas.9` superset gates. |
 | POC18 | `.grid` repo state remains the user-facing local repository shape while allowing a daemon-owned node CAS. | Storage model preserves `.grid/config.json`, `.grid/state.json`, and a configurable CAS locator. | covered | Implement in `vumas.6`. |
 | POC18 | Native collaboration is continuous peer DAG sync over promise-shaped TCP messages; Git import/export, push, and pull are bridge adapters. | Network model keeps native fetching as peer DAG sync and treats Git push/pull as interoperability. | covered | Preserve no-sideband inter-agent transfer checks in `vumas.9`. |
-| POC18 | Object retrieval uses signed CWT/COSE capability tokens and may transfer CAR payloads when a peer redeems a retrieval promise. | Design names retrieval/storage tokens and object transfer but has not frozen the durable object layout. | partially covered | Resolve token and object-transfer details under `vumas.8` and regression checks under `vumas.9`. |
+| POC18 | Object retrieval uses signed CWT/COSE capability tokens and may transfer CAR payloads when a peer redeems a retrieval promise. | Design locks the durable store profile and keeps retrieval/storage tokens plus CAR transfer as handler/profile work. | partially covered | Resolve token and object-transfer details under `vumas.8` and regression checks under `vumas.9`. |
 | POC18 | Raw chunks, DAG-CBOR, GRID-CBOR, CAR files, and local store layout remain open storage-profile decisions. | Storage model now locks one CID-keyed CAS namespace as source of truth with profile views rebuilt from CAS. | covered | Preserve the `DI-hofaz` profile in `vumas.5` and `vumas.6`. |
 | POC18 | CLI commands must use shared core behavior rather than a parallel automation path. | Command surface and daemon/client sections require a shared core and daemon-backed normal operation. | covered | `vumas.4` locks the factoring path that prevents CLI/core duplication. Source: `DI-nupag`. |
 
@@ -344,13 +344,49 @@ grid([42(pCID), ...protocol-defined-slots])
 ```
 
 Slot 0 is a protocol CID. It is not an agent address, app address, file path,
-route, operation, command name, repository name, or message type. The pCID
-chooses the protocol parser and slot grammar. Payloads or nested payloads carry
-the local routing, app, resource, or VCS meaning defined by that protocol.
+route, operation, command name, repository name, RPC method, or message type. The
+local kernel or stage1 transport/parser role uses pCID as the protocol selector
+for routing exact message bytes to registered handler(s) that promise to parse or
+build that pCID. Those handler(s) know the slot grammar. Payloads or nested
+payloads carry the local destination, app, resource, route, operation, repository,
+or VCS meaning defined by that protocol. Source: `DI-bugik`.
 
 An implementation may expose ergonomic local methods, but those methods are
 adapters. The durable boundary object is the exact `grid()` message and any CAS
 objects it names.
+
+### POC19 pCID handler inventory
+
+POC19 code generation must start from a handler inventory rather than from
+ad-hoc message-kind dispatch. A handler is a local stage0 or stage1 role that has
+promised to receive exact bytes for one pCID, parse the pCID-defined slots, and
+deliver only the parsed promise meaning that the handler understands. More than
+one local handler may register for the same pCID when their promises are
+different, such as validation plus local app delivery, but the pCID still names
+one protocol specification.
+
+The first POC19 inventory is:
+
+| Handler family | Runtime owner | Active before codegen? | Purpose |
+| --- | --- | --- | --- |
+| Stage0 bootstrap/fetch/self-update | stage0 minimal handler | planned minimal surface only | Fetch descriptor/root/stage1 objects, verify exact CIDs, record local approval, and launch native/static stage1 without understanding broad app semantics. |
+| Stage1 local control | native/static stage1 handler | required before CLI/daemon work | Carry local CLI-to-daemon and stage0-to-stage1 promises over a local control stream without duplicating core behavior in CLI code. |
+| Parser/builder registration | native/static stage1 handler | required before parser scaffolding | Let local apps or modules promise which pCIDs they handle; dispatch exact `grid()` bytes by pCID to those registered handlers. |
+| Version-control / CAS sync | native/static stage1 handler | required before POC18 superset checks | Preserve POC18 reference sets, object availability, object retention, storage-payment redemption, and sync-interest promises under one version-control protocol family. |
+| App reference-set / executable descriptor | native/static stage1 handler | required before `grid run` | Resolve app reference sets, descriptor objects, executable objects, pCID specs, runtime inputs, and reciprocal local execution terms. |
+| CWT/COSE capability-token profile | native/static stage1 handler | required before retrieval/storage/runtime tokens | Verify signed promise tokens for storage, retrieval, local runtime resources, and lifecycle/resource capability promises. |
+| Local lifecycle/resource/host capability | native/static stage1 handler | required before app execution | Express local CPU, memory, process, device, file, network, secret-reference, time, socket, and storage promises as narrow local capability promises. |
+| WASI/WASM app message profile | app/runtime handler under stage1 | required before WASI/WASM app run | Deliver pCID-selected app messages to WASI/WASM modules hosted by stage1; app payloads carry app-local addressing and operation meaning. |
+| Encrypted app input/output profile | app/runtime handler under stage1 | required before encrypted app data | Keep encryption and COSE proof placement pCID-owned rather than universal envelope behavior. |
+| TCP and WebSocket carrier profiles | transport adapters plus stage1 parser | required before transport parity checks | Preserve exact `grid()` bytes across TCP and WebSocket; transport chooses reachability and framing while pCID handlers parse semantics. |
+| Git import/export bridge | bridge handler under stage1 | later interoperability work | Convert between PromiseGrid reference sets and conventional Git push/pull/import/export without making Git the native sync model. |
+
+Before any handler in this table becomes an active POC19 runtime handler, POC19
+must have a standalone protocol spec document whose exact bytes derive the pCID
+and whose printable alias is the CIDv1 base32 pCID. The implementation may use
+human-readable names in comments and logs, but the authoritative handler key is
+the base32 pCID and the wire key is the binary CID bytes in slot 0. Source:
+`DI-bugik`.
 
 ### Apps are VCS/CAS objects
 
@@ -554,7 +590,7 @@ POC19 should retain the current CID discipline:
 - binary CIDs on wire;
 - CIDv1 base32 text with `b` prefix when printable;
 - exact message CIDs for parent-linked messages;
-- CID-addressed app code, WASI modules, container layers, native binaries, data
+- CID-addressed app code, WASI/WASM modules, container layers, native binaries, data
   objects, app reference sets, run records, and result objects.
 
 POC19 durable storage uses one CID-keyed CAS namespace as the source of truth.
@@ -584,35 +620,35 @@ the CIDv1 `dag-cbor` multicodec. Source: `TE-lirum`; `DI-hofaz`.
 
 ## Example flows
 
-### Flow 1: `grid run` fetches and runs a WASI app
+### Flow 1: `grid run` fetches and runs a WASI/WASM app under stage1
 
 ```text
-Alice CLI            Alice daemon             Bob daemon              WASI module
-   |                      |                       |                       |
-   | grid run app_ref     |                       |                       |
-   |--------------------->|                       |                       |
-   | local run promise    |                       |                       |
-   |                      | resolve adopted root  |                       |
-   |                      | read app reference set|                       |
-   |                      | resolve descriptor    |                       |
-   |                      | missing descriptor/module/data                 |
-   |                      | sync_interest         |                       |
-   |                      |---------------------->|                       |
-   |                      | object_availability   |                       |
-   |                      |<----------------------|                       |
-   |                      | redemption            |                       |
-   |                      |---------------------->|                       |
-   |                      | object_bytes          |                       |
-   |                      |<----------------------|                       |
-   |                      | verify CIDs/proofs    |                       |
-   |                      | evaluate descriptor terms                      |
-   |                      | issue local runtime capability promises        |
-   |                      |---------------------------------------------->|
-   |                      | execute with CAS inputs                         |
-   |                      |<----------------------------------------------|
-   |                      | store result/run-record CIDs                   |
-   | run_record/result    |                       |                       |
-   |<---------------------|                       |                       |
+Alice CLI       Alice native stage1       Bob stage1 peer       WASI/WASM module
+   |                    |                       |                         |
+   | grid run app_ref   |                       |                         |
+   |------------------->|                       |                         |
+   | local run promise  |                       |                         |
+   |                    | resolve adopted root  |                         |
+   |                    | read app reference set|                         |
+   |                    | resolve descriptor    |                         |
+   |                    | missing descriptor/module/data                  |
+   |                    | sync_interest         |                         |
+   |                    |---------------------->|                         |
+   |                    | object_availability   |                         |
+   |                    |<----------------------|                         |
+   |                    | redemption            |                         |
+   |                    |---------------------->|                         |
+   |                    | object_bytes          |                         |
+   |                    |<----------------------|                         |
+   |                    | verify CIDs/proofs    |                         |
+   |                    | evaluate descriptor terms                       |
+   |                    | issue local runtime capability promises         |
+   |                    |----------------------------------------------->|
+   |                    | execute with CAS inputs                         |
+   |                    |<-----------------------------------------------|
+   |                    | store result/run-record CIDs                    |
+   | run_record/result  |                       |                         |
+   |<-------------------|                       |                         |
 ```
 
 Important properties:
@@ -622,8 +658,8 @@ Important properties:
 - Alice decides locally whether Bob is trusted enough as a source.
 - Alice's adopted root identifies which app graph she is willing to consider,
   but it does not force execution.
-- Alice's daemon decides locally whether to execute the WASI module under its
-  resource promises.
+- Alice's native/static stage1 decides locally whether to host the WASI/WASM
+  module under its resource promises.
 - The module's outputs are CAS objects and local event records, not hidden
   daemon state.
 
@@ -718,7 +754,8 @@ Examples:
 - Alice may fetch app objects from Bob because Bob has kept storage promises.
 - Alice may avoid Mallory because Mallory has repeatedly advertised unavailable
   objects.
-- Alice may run a WASI app but refuse a native-binary profile for the same app.
+- Alice may run a WASI/WASM app under stage1 but refuse a native-binary app
+  profile for the same app.
 - Alice may keep an app installed but decline to map it into a convenient local
   namespace.
 - Alice may approve a new app/runtime root CID for future runs or keep the old
@@ -882,8 +919,8 @@ run also shows:
   produced them;
 - plaintext secrets do not appear in config, CAS, diagnostics, logs, prompts, or
   UI output;
-- at least one WASI app is installed through an app reference set, resolved
-  through an executable descriptor, and run from VCS/CAS;
+- at least one WASI/WASM app is installed through an app reference set, resolved
+  through an executable descriptor, and run from VCS/CAS under stage1;
 - outputs are CAS objects with CIDs returned to the user;
 - local runtime capability promises are issued and checked;
 - sparse CAS remains partial and peer-relative;

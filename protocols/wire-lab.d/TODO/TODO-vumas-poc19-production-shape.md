@@ -259,6 +259,28 @@ Affects: `protocols/wire-lab.d/TODO/TODO-vumas-poc19-production-shape.md`;
 `implementations/poc20-timeline-pure-function-cas-branches/docs/DESIGN.md`;
 `DEV-GUIDE-RESOURCES.md`.
 
+ID: DI-bugik
+Date: 2026-07-13 17:13:56 PDT
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: POC19 uses pCID as the local kernel/stage1 protocol selector for
+routing exact `grid([42(pCID), ...])` messages to registered handler(s) that
+promise to parse or build that pCID. A pCID is still not a peer address, app
+address, route, operation, command name, repository name, RPC method, or message
+kind. Handler-owned parsing interprets the remaining slots and any payload-local
+destination, app, route, operation, repository, or VCS semantics.
+Intent: POC19 code generation needs a concrete handler inventory before parser
+scaffolding so stage0 and native/static stage1 can stay small and deterministic
+without regressing into pCID-as-address or pCID-per-message-kind designs.
+Constraints: Stage0 recognizes only the minimal bootstrap/fetch/self-update
+surface needed to fetch and launch native/static stage1. Native/static stage1
+owns the main handler registry. Protocol families should stay coarse enough that
+payload variants remain payload semantics. Standalone spec docs and base32 pCID
+aliases are required before a handler becomes an active POC19 runtime handler.
+Affects: `protocols/wire-lab.d/TODO/TODO-vumas-poc19-production-shape.md`;
+`implementations/poc19-production-shape/docs/DESIGN.md`;
+`DEV-GUIDE-RESOURCES.md`.
+
 ## Tasks
 
 - [x] vumas.1 Lock the POC19 design-doc-first decision in `DI-lumir`.
@@ -311,10 +333,12 @@ Affects: `protocols/wire-lab.d/TODO/TODO-vumas-poc19-production-shape.md`;
   that can self-update with local owner approval, restart, fetch remaining
   microkernel modules, and only then fetch application-specific modules. Source:
   `DI-zitap`.
-- [ ] vumas.16 Produce the POC19 pCID inventory before parser scaffolding or app
-  reference-set execution proceeds beyond the stage0 bootstrap proof. Include
-  POC16 parser/builder and protocol-spec lessons, not only POC18 VCS/CAS pCIDs.
-  Source: `DI-nupag`.
+- [x] vumas.16 Produce the POC19 pCID inventory before parser scaffolding or app
+  reference-set execution proceeds beyond the stage0 bootstrap proof. The POC19
+  design now inventories stage0-minimal, native stage1/kernel-role, app/runtime,
+  and bridge/interoperability handler families, and requires standalone spec docs
+  plus base32 pCID aliases before a handler becomes active. Source: `DI-nupag`;
+  `DI-bugik`.
 - [x] vumas.17 Resolve the POC19 storage object profile for raw chunks,
   DAG-CBOR, GRID-CBOR, CAR files, and local store layout before durable POC19
   stores are scaffolded. `TE-lirum` locks one CID-keyed CAS namespace as source

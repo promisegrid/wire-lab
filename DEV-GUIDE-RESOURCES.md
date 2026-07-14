@@ -8,7 +8,7 @@ PromiseGrid design choices are derived, tested, and recorded. Source:
 
 ## Current Design State
 
-Snapshot refreshed by Codex on 2026-07-13 16:44 PDT. This is a
+Snapshot refreshed by Codex on 2026-07-13 17:13 PDT. This is a
 developer-facing protocol-design snapshot, not a frozen PromiseGrid API. It
 reflects the currently locked outer-envelope direction plus consensus across
 near-contender simulations and root `results/` JSON evidence; proposal children
@@ -30,7 +30,7 @@ remain review evidence until promoted. Source: `DI-baral`; `DI-sisak`;
 `DI-kakos`; `DI-bibah`; `DI-mokaz`; `DI-lamaz`; `DI-kodob`; `DI-lulog`;
 `DI-guhil`; `DI-ruvum`; `DI-minol`; `DI-gapav`; `DI-zosol`; `DI-tanov`;
 `DI-dahaj`; `DI-moson`; `DI-romak`; `DI-zizab`; `DI-nafat`; `DI-nupag`;
-`DI-hofaz`; `DI-topiv`.
+`DI-hofaz`; `DI-topiv`; `DI-bugik`.
 The root `README.md` is now the first-stop returning-member primer: it gives a
 clean narrative from simulations and GA design search through the grouped POC
 journey, ending with the current envelope, pCID, CBOR/CID, sparse-CAS,
@@ -203,23 +203,25 @@ design now includes an inheritance matrix that checks POC16 pCID, parser/builder
 CWT/COSE token, encrypted-payload, kernel-role, sparse-CAS, and exact-CBOR
 lessons; POC17 constrained-device binary-CID and compact-payload lessons; and
 POC18 CAS/VCS, reference-set, Git bridge, continuous TCP sync, tokenized
-retrieval, CAR transfer, and diagnostics lessons. It also flags the storage
-object profile and pCID inventory as pre-code follow-ups; the storage profile is
-now locked, while the pCID inventory remains open. `TE-lirum` / `DI-hofaz` locks
+retrieval, CAR transfer, and diagnostics lessons. `TE-lirum` / `DI-hofaz` locks
 the POC19 storage profile: one CID-keyed CAS namespace is
 source of truth; raw Rabin chunks remain CIDv1 `raw`; true durable graph objects
 may use CIDv1 `dag-cbor`; exact `grid()` messages, Markdown specs, executables,
 encrypted bytes, and CAR artifacts remain exact byte objects under their own
-CIDs; and profile views are rebuildable projections. `TE-vurok` / `DI-nupag`
-locks the code-start strategy as hybrid staged extraction: fresh stage0
-scaffold, POC18 as CAS/VCS source baseline and regression oracle, POC16 as
-parser/builder, embedded-spec, CWT/COSE-token, encrypted-payload, and
-lifecycle-role baseline, and only reviewed behavior slices factored into
-production-shaped stage1 roles.
+CIDs; and profile views are rebuildable projections. `DI-bugik` locks the POC19
+pCID handler inventory: the kernel/stage1 role uses pCID as the protocol
+selector that routes exact message bytes to registered handler(s), while payloads
+or nested payloads carry destination, app, route, operation, repository, and VCS
+meaning. Active POC19 handlers require standalone spec docs and base32 pCID
+aliases before codegen. `TE-vurok` / `DI-nupag` locks the code-start strategy as
+hybrid staged extraction: fresh stage0 scaffold, POC18 as CAS/VCS source baseline
+and regression oracle, POC16 as parser/builder, embedded-spec, CWT/COSE-token,
+encrypted-payload, and lifecycle-role baseline, and only reviewed behavior slices
+factored into production-shaped stage1 roles.
 This is currently a
 design artifact, not an executable implementation. Source: `DI-lumir`;
 `DI-topab`; `DI-kodob`; `DI-guhil`; `DI-zitap`; `DI-nupag`; `DI-hofaz`;
-`DI-topiv`; `TODO-vumas`.
+`DI-topiv`; `DI-bugik`; `TODO-vumas`.
 POC20 is now planned as a parallel semantic-model track, not a POC19 blocker.
 TE-lodom frames promises as timeline assertions, agents as deterministic
 pure-function servers over explicit context CIDs, decentralized CAS branches as
@@ -287,7 +289,7 @@ Source: `DI-zuruj`; `DI-dibut`; `DI-dofoj`; `DI-radaj`; `DI-lidaj`;
 | Unsupported `pCID` | Preserve exact bytes only as uninterpreted carriage or local event material if local policy allows; do not semantically accept | Carriage is not promise acceptance. |
 | Protocol specs | POC16 executable specs live only under `implementations/poc16-secure-tokens-maps-encrypted-payloads/docs/protocols/` and are embedded into the POC16 binary for pCID derivation and LLM prompt context | Keeps POC16 protocol meaning implementation-local, prevents stale root-level duplicates, and preserves pCID-as-content identity without implying a central registry. |
 | CID rendering | Binary CID bytes travel in CBOR/tag-42 slots; CIDv1 base32 text with the multibase `b` prefix is used for printable pCIDs, parent links, CAS object names, registry keys, diagnostic output, JSON logs, and protocol-spec aliases | Avoids pseudo-CIDs and bare hash identifiers, keeps IPFS/IPLD/Bluesky-compatible rendering, and makes the base32 pCID the authoritative code constant while human-readable names remain comments or metadata. |
-| Kernel parser/builder role | POC16 now treats slot 0 as a protocol-family selector that chooses a pCID-specific parser or builder role; payloads or nested payloads carry app, operation, destination, route, and local-addressing semantics | Prevents pCID from drifting into an app address, RPC method, message kind, service registry entry, or universal routing key. |
+| Kernel parser/builder role | POC16 and POC19 treat slot 0 as a protocol-family selector that routes exact bytes to registered pCID-specific handler(s); payloads or nested payloads carry app, operation, destination, route, and local-addressing semantics | Preserves pCID as kernel handler-dispatch key while preventing pCID from drifting into an app address, RPC method, message kind, service registry entry, or universal destination key. |
 | LLM spec context | POC16 embeds exact relevant spec prose with `go:embed` and records the supplied spec CIDs for pCIDs an LLM-backed agent promises to send, receive, redeem, verify, store, compute, or route | Prompt-driven agents need the same pCID-owned protocol source that deterministic handlers are written against. |
 | Flexible payload bodies | Flexible keyed POC16 protocols use positional core promise fields plus a nested CBOR map body; old array-of-`[key,value]` pair bodies are retired and not parsed for backwards compatibility | Keeps body keys from overwriting core promise fields such as `from`, `to`, `promise_about`, or derived local projections, while still allowing compact pCID-specific arrays for constrained protocols. |
 | Local lifecycle tokens | `local_lifecycle_v1` uses `grid([42(local_lifecycle_v1_pCID), payload])`; roles issue signed CWT payloads protected by COSE_Sign1 at startup, and supervisors later present the exact token over TCP, parser-path, or stdio lifecycle channels | Shows lifecycle/shutdown as a local promise/token flow rather than supervisor command/control; the COSE signature inside the token is the proof, so this pCID does not require a generic outer proof slot. |
