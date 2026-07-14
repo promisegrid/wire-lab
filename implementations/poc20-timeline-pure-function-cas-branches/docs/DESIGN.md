@@ -83,6 +83,14 @@ If a pure-function result depends on fetched app code, runtime behavior, protoco
 specs, model bytes, or data roots, the relevant Merkle/CAS root CIDs must be
 explicit in the pure-function context object. Source: `DI-lulog`; `DI-kodob`.
 
+POC19's native/static stage1 decision is also timeline-relevant. Stage0
+self-update, native stage1 descriptor adoption, execution-cache materialization,
+stage1 readiness, and later WASI/WASM app execution should be represented as
+local timeline promises when POC20 models runtime roots. Stage0 should not need a
+WASI loader to prove the first stage1 bootstrap, and a package manager that
+installed stage0 is not the authority for later fetched stage1 CIDs. Source:
+`DI-topiv`.
+
 Root decision bodies must preserve enough local context for replay: decision kind
 such as adopted, rejected, superseded, prior-root-retained,
 corrective-root-adopted, full-state-restore-attempted,

@@ -8,7 +8,7 @@ PromiseGrid design choices are derived, tested, and recorded. Source:
 
 ## Current Design State
 
-Snapshot refreshed by Codex on 2026-07-13 16:14 PDT. This is a
+Snapshot refreshed by Codex on 2026-07-13 16:44 PDT. This is a
 developer-facing protocol-design snapshot, not a frozen PromiseGrid API. It
 reflects the currently locked outer-envelope direction plus consensus across
 near-contender simulations and root `results/` JSON evidence; proposal children
@@ -30,7 +30,7 @@ remain review evidence until promoted. Source: `DI-baral`; `DI-sisak`;
 `DI-kakos`; `DI-bibah`; `DI-mokaz`; `DI-lamaz`; `DI-kodob`; `DI-lulog`;
 `DI-guhil`; `DI-ruvum`; `DI-minol`; `DI-gapav`; `DI-zosol`; `DI-tanov`;
 `DI-dahaj`; `DI-moson`; `DI-romak`; `DI-zizab`; `DI-nafat`; `DI-nupag`;
-`DI-hofaz`.
+`DI-hofaz`; `DI-topiv`.
 The root `README.md` is now the first-stop returning-member primer: it gives a
 clean narrative from simulations and GA design search through the grouped POC
 journey, ending with the current envelope, pCID, CBOR/CID, sparse-CAS,
@@ -179,15 +179,20 @@ POC19 is now planned as the production-shape design pass that turns the POC18
 CAS/VCS/TCP pieces plus POC16/POC17 runtime lessons into a deployable-node shape:
 one stable binary named `grid` as a small bootstrap seed, fetched microkernel
 modules for the local PromiseGrid daemon/microkernel role set, `grid run` for
-VCS/CAS-backed app execution, WASI-first runtime support, app installation by
-signed `app` reference sets, and equal TCP/WebSocket transports carrying the same
-exact `grid()` CBOR messages. The stable `grid` binary is not the whole
-microkernel and not the app distribution unit: it contains just enough
-functionality to detect and fetch an approved new version of itself from locally
-trusted peers, restart, then fetch remaining microkernel modules before
-application-specific modules. App, agent, runtime, protocol-spec, executable, and
-data changes should arrive as CID-addressed CAS roots fetched from peers. First
-run or local config may name a bootstrap Merkle/CAS root CID; later root changes require
+VCS/CAS-backed app execution, native/static stage1 first, WASI/WASM app/runtime
+support under stage1, app installation by signed `app` reference sets, and equal
+TCP/WebSocket transports carrying the same exact `grid()` CBOR messages. The
+stable `grid` binary is not the whole microkernel and not the app distribution
+unit: it contains just enough functionality to detect and fetch an approved new
+version of itself from locally trusted peers, restart, then fetch remaining
+microkernel modules before application-specific modules. `TE-sunag` / `DI-topiv`
+locks the first stage1 bootstrap proof as a native/static executable object
+fetched by CID, verified by stage0, materialized into a grid-owned execution
+cache, launched through the host process mechanism, and recorded as a local
+readiness event; stage0 does not need a WASI loader for that first proof. App,
+agent, runtime, protocol-spec, executable, and data changes should arrive as
+CID-addressed CAS roots fetched from peers. First run or local config may name a
+bootstrap Merkle/CAS root CID; later root changes require
 local operator approval before the node adopts them. POC19 now also requires
 operator-visible candidate-root adoption: closure verification, local signer
 trust criteria, requested host-capability review, impact summary CID, explicit
@@ -214,7 +219,7 @@ production-shaped stage1 roles.
 This is currently a
 design artifact, not an executable implementation. Source: `DI-lumir`;
 `DI-topab`; `DI-kodob`; `DI-guhil`; `DI-zitap`; `DI-nupag`; `DI-hofaz`;
-`TODO-vumas`.
+`DI-topiv`; `TODO-vumas`.
 POC20 is now planned as a parallel semantic-model track, not a POC19 blocker.
 TE-lodom frames promises as timeline assertions, agents as deterministic
 pure-function servers over explicit context CIDs, decentralized CAS branches as
@@ -230,7 +235,10 @@ local timeline promises: a root CID names a Merkle/CAS graph of app refs,
 runtime profiles, executable objects, specs, data roots, and update metadata,
 but it does not by itself name trust or obligation. When fetched app/runtime/spec
 roots affect a pure-function result, those root CIDs are part of the explicit
-context for that result. POC20 now also requires root-decision details,
+context for that result. POC20 aligns with POC19 by treating stage0 self-update,
+native stage1 descriptor adoption, execution-cache materialization, stage1
+readiness, and later WASI/WASM app execution as local timeline promises when
+they affect runtime roots. POC20 now also requires root-decision details,
 projection-conflict records, source-key plus action-hash replay decisions,
 projection rebuild proof obligations, and sensitive-data shareability rules so
 local decisions remain replayable from CAS without broad plaintext sensitive

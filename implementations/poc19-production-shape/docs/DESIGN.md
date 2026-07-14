@@ -131,13 +131,19 @@ stage1 is authentic. That would make the bootstrap chain circular. Source:
 `DI-zitap`; `DI-guhil`.
 
 Stage1 is the rest of the minimum microkernel modules as a CID-named executable
-object closure. The stage1 closure contains transport adapters, pCID
-parser/builders, CAS/VCS, sync, app interface, execution runtime,
+object closure. The first stage1 bootstrap proof uses a native/static executable
+object so stage1 can mediate USB, serial/device access, process monitoring and
+control, platform execution checks, and host capability promises without moving
+those hostful roles into stage0. The stage1 closure contains transport adapters,
+pCID parser/builders, CAS/VCS, sync, app interface, execution runtime,
 lifecycle/resource protection, host-capability, secret service, key/token, local
 event journal, and trust-policy modules. Stage0 may fetch stage1 objects from
 locally trusted peers, verify exact CIDs and local signer trust criteria, record
-local approval, and start those modules. Stage1 modules are exact CAS/VCS
-objects named by approved CIDs, not hidden side loads.
+local approval, materialize a runnable copy into an execution cache, and start
+stage1. Stage1 modules are exact CAS/VCS objects named by approved CIDs, not
+hidden side loads. WASI/WASM remains a first-class portable app/runtime profile
+under stage1, not a requirement that stage0 contain a WASI loader for the first
+proof. Source: `DI-zitap`; `DI-guhil`; `DI-topiv`.
 
 Stage0 itself may still self-update, but that is a special replacement of the
 installed bootstrap seed, not the definition of stage1 and not ordinary root
@@ -232,7 +238,7 @@ Minimum descriptor meaning for the first code-generation slice:
 
 ```text
 descriptor kind       microkernel module, app module, runtime helper, CLI role, or daemon role
-runtime kind          WASI first; OCI and native binaries later
+runtime kind          native/static stage1 first; WASI/WASM, OCI, and native app profiles under stage1
 target constraints    OS, arch, ABI, or runtime constraints when relevant
 executable objects    one executable CID or a CID-named closure of module objects
 entrypoint            function, command, WASI export, or process entrypoint
@@ -248,12 +254,28 @@ exact bytes, decide whether local resource promises are satisfied, start one
 stage1 module, and record the resulting local event and readiness CIDs. Source:
 `DI-zitap`; `DI-kodob`; `DI-guhil`.
 
-The first stage1 runtime remains an explicit code-generation decision. A
-native/static stage1 bootstrap module keeps stage0 smaller because stage0 does
-not need a WASI loader. A WASI stage1 module proves WASI earlier, but requires
-stage0 to contain enough WASI runtime support to start stage1. POC19 should keep
-both choices visible until the implementation decision is locked. Source:
-`DI-zitap`.
+The first stage1 runtime is now locked as native/static. Stage0 reads local
+config, configured peers, trust anchors, and the bootstrap or adopted root CID;
+fetches the descriptor and executable object by CID; verifies exact bytes,
+signer or local trust criteria, platform constraints, and local capability
+requirements; materializes a runnable file into a grid-owned execution cache;
+starts stage1 with the host process mechanism such as `execve`, `CreateProcess`,
+or Go `os/exec`; passes minimal bootstrap facts such as descriptor CID, adopted
+root CID, config path, state directory, and a local control endpoint; and records
+stage1 readiness as a local event. WASI/WASM support belongs under stage1 for
+portable app/runtime modules. Source: `TE-sunag`; `DI-topiv`.
+
+Platform and package-manager boundaries are part of this decision. Linux,
+Windows, and macOS can be normal fetched native/static stage1 targets when stage0
+keeps CAS identity separate from runnable materialization. Homebrew, signed
+installers, MDM, or app distribution channels may install or update stage0, but
+they do not approve fetched stage1 CIDs. Stage0 still applies exact CID
+verification, signer or local trust checks, operator approval, and platform
+checks such as codesign, notarization, executable permissions, or Windows launch
+constraints where those are relevant. iOS and iPadOS are bundled clients or
+control surfaces unless a later signed-app distribution path is explicitly
+designed; WASM does not by itself make them ordinary fetched-stage1 execution
+targets. Source: `TE-sunag`; `DI-topiv`.
 
 ### Operator-visible Merkle/CAS root adoption
 
@@ -380,7 +402,7 @@ The daemon should make these local promises explicit:
 | Sync | Advertise selected reference sets, request missing parents, redeem retrieval tokens, and exchange CAR/object bytes. |
 | Bootstrap/root adoption | Fetch root CID closures, verify exact CIDs, present adoption choices to the operator, and remember local root-adoption promises. |
 | App interface | Resolve app reference sets, prepare local runtime inputs, deliver pCID-selected messages to local app processes or modules. |
-| Execution runtime | Run WASI modules first; later run OCI containers and native binaries under stronger local resource promises. |
+| Execution runtime | Launch native/static stage1 first, then run WASI/WASM app modules, OCI containers, and native binaries under explicit local resource promises. |
 | Lifecycle/resource protection | Issue, narrow, revoke, or stop local CPU, memory, socket, storage, process, device, and time promises. |
 | Host capability | Promise narrow access to local network targets, files, directories, devices, host functions, secret references, execution resources, and storage only when local terms are satisfied. |
 | Secret service | Sign bytes, unwrap scoped keys, mint short-lived credentials, rotate or revoke material, and record denied attempts without exposing plaintext secrets as ordinary CAS payloads. |
@@ -413,13 +435,14 @@ only the narrow result needed for the operation. Source: `DI-guhil`.
 
 ### App execution profiles
 
-POC19 should define three execution profiles but implement them in risk order.
+POC19 should define three app execution profiles under native/static stage1 and
+implement them in risk order.
 
-1. **WASI profile.** First executable profile. Code is a WASM module stored by
-   CID. Inputs are CAS objects, scalar arguments, or pCID-defined streams. The
-   daemon provides only promised host functions: read named CAS inputs, write
-   result objects, emit app messages, and use bounded clock/randomness if those
-   are explicit context promises.
+1. **WASI/WASM profile.** First portable app/runtime profile. Code is a WASM
+   module stored by CID. Inputs are CAS objects, scalar arguments, or
+   pCID-defined streams. Native/static stage1 provides only promised host
+   functions: read named CAS inputs, write result objects, emit app messages, and
+   use bounded clock/randomness if those are explicit context promises.
 2. **OCI/container profile.** Code is an image or image-layer graph stored in
    CAS. Execution requires stronger local lifecycle/resource promises for CPU,
    memory, filesystem view, network, devices, and cleanup. Image layers are CAS
@@ -711,12 +734,12 @@ resource judgments.
 ### What should become real in POC19
 
 - One installed stage0 `grid` entrypoint with fetched stage1 daemon/client
-  modules.
+  modules, starting with a native/static stage1 bootstrap proof.
 - Real TCP and WebSocket transport adapters.
 - Real sparse CAS shared across repos/apps on one node.
 - Real bootstrap from an operator-provided root CID.
 - Real app reference-set and descriptor resolution from VCS/CAS.
-- Real WASI execution from descriptor-named module bytes.
+- Real WASI/WASM execution from descriptor-named module bytes under stage1.
 - Real CWT/COSE capability tokens for retrieval, storage, and local runtime
   resources.
 - Real exact-message retention and diagnostic rendering.
@@ -725,9 +748,7 @@ resource judgments.
 ### What remains POC-local or later
 
 - Production key management and identity recovery.
-- Full OCI/native sandboxing hardening.
-- Final store profile choices for DAG-CBOR, GRID-CBOR, raw chunks, and CAR
-  storage.
+- Full OCI/native app sandboxing hardening.
 - Cross-platform service installation.
 - Rich UI, app marketplace, or group namespace UX.
 - Final external PromiseGrid Development Guide prose.
@@ -740,10 +761,11 @@ First-slice proof:
    config, CID verification, minimal CAS fetch, local approval recording, and
    restart/start handoff.
 2. **Descriptor fixture.** Add one CID-named stage1 descriptor and one
-   executable stage1 module object to a local CAS fixture.
+   native/static executable stage1 module object to a local CAS fixture.
 3. **Stage1 readiness.** Have stage0 fetch the descriptor and executable object,
-   verify exact CIDs, start the stage1 module, and record a local readiness
-   result.
+   verify exact CIDs and local trust criteria, materialize stage1 into an
+   execution cache, start the stage1 module through the host process mechanism,
+   and record a local readiness result.
 
 Full POC19 after the first proof:
 
@@ -761,8 +783,8 @@ Full POC19 after the first proof:
    context.
 8. **App reference sets.** Add role `app` reference sets and resolve descriptor
    CIDs, data roots, pCID specs, and reciprocal terms from CAS.
-9. **WASI run.** Implement `grid run` for a descriptor-named WASI module with
-   CID-verified inputs and CAS-recorded outputs.
+9. **WASI/WASM run.** Implement `grid run` for a descriptor-named WASI/WASM
+   module hosted by stage1 with CID-verified inputs and CAS-recorded outputs.
 10. **Capability promises.** Add local runtime capability tokens for CPU, memory,
    time, storage, network, filesystem, device, secret-reference, and host-function
    promises.
@@ -779,8 +801,12 @@ Full POC19 after the first proof:
 ## Design risks
 
 - **Stage0 becoming monolithic.** Mitigation: keep built-in stage0 behavior
-  small, and keep stage1 local roles explicit and testable even when packaged
-  together for a host profile.
+   small, and keep stage1 local roles explicit and testable even when packaged
+   together for a host profile.
+- **Stage1 decision drifting back to WASI-first.** Mitigation: gate the first
+  proof on native/static stage1 launch from an execution cache while keeping
+  WASI/WASM as a portable app/runtime profile under stage1. Source: `TE-sunag`;
+  `DI-topiv`.
 - **CLI reimplementing core logic.** Mitigation: one shared core library;
   daemon-backed normal operation; direct CLI logic only for bootstrap/offline
   reads.
@@ -820,9 +846,11 @@ run shows:
 - stage0 fetches a CID-named stage1 descriptor and executable object from CAS;
 - stage0 verifies stage1 without depending on unverified stage1 trust-policy
   code;
-- stage0 verifies exact CIDs before starting the stage1 module;
-- the run documents whether the first stage1 module is native/static or WASI,
-  and why stage0 does or does not contain a WASI loader;
+- stage0 verifies exact CIDs, local trust criteria, platform constraints, and
+  local capability requirements before starting the stage1 module;
+- the first stage1 module is native/static, is materialized into a grid-owned
+  execution cache, and is launched through the host process mechanism;
+- stage0 does not contain a WASI loader for the first proof;
 - the stage1 module produces a readiness result that stage0 records as local
   event/CID output;
 - replacing app or stage1 fixture bytes changes CAS/root CIDs, not the installed
@@ -832,7 +860,7 @@ The full future implementation should not be considered complete until a clean
 run also shows:
 
 - one stable `grid` bootstrap binary can fetch descriptor-named stage1
-  microkernel modules, then start daemon/client modules that serve CLI commands;
+   microkernel modules, then start daemon/client modules that serve CLI commands;
 - app code and data are fetched from peer CAS over TCP and WebSocket using exact
   PromiseGrid messages;
 - first run or config can name a bootstrap Merkle/CAS root CID, and later
@@ -847,7 +875,7 @@ run also shows:
   it, switches atomically where possible, and retains previous-binary recovery
   metadata for analysis or explicit operator-directed recovery;
 - stage0 self-update events are recorded separately from ordinary runtime-root
-  adoption events;
+   adoption events;
 - recovery and correction records are replayable from CAS-compatible source
   events and do not erase the original adoption or self-update events;
 - retained artifacts can be replayed with the runtime root that originally

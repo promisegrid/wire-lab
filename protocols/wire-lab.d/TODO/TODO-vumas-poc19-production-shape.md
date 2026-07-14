@@ -229,6 +229,36 @@ Affects: `protocols/wire-lab.d/TODO/TODO-vumas-poc19-production-shape.md`;
 `implementations/poc19-production-shape/docs/DESIGN.md`;
 `DEV-GUIDE-RESOURCES.md`.
 
+ID: DI-topiv
+Date: 2026-07-13 16:44:39 PDT
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: POC19's first stage1 bootstrap proof uses a native/static executable
+object, not a WASI stage1 module. Stage0 remains a small bootstrap seed that
+fetches a descriptor and native/static stage1 executable by CID, verifies exact
+bytes, signer or local trust criteria, platform constraints, and local capability
+requirements, materializes a runnable copy into a grid-owned execution cache,
+starts stage1 through the host process mechanism, passes minimal bootstrap facts,
+and records readiness as a local event. WASI/WASM remains a first-class portable
+app/runtime profile under stage1.
+Intent: Hostful nodes need USB, serial/device access, process monitoring and
+control, platform execution checks, and local host capability mediation before
+portable app modules can be useful. Putting those roles in native/static stage1
+keeps stage0 small while avoiding a circular dependency on unverified stage1
+trust-policy code or a premature WASI loader in stage0.
+Constraints: Do not require stage0 to contain a WASI loader for the first proof.
+Do not move ordinary host adapters, device access, or process supervision into
+stage0. Homebrew, signed installers, and other package managers may distribute
+stage0, but they do not approve fetched stage1 CIDs. iOS and iPadOS are bundled
+clients or control surfaces unless a later signed-app distribution path is
+explicitly designed. Stage0 self-update remains separate from runtime-root
+adoption, and retaining prior binaries or roots must not imply true rollback.
+Affects: `protocols/wire-lab.d/TODO/TODO-vumas-poc19-production-shape.md`;
+`docs/thought-experiments/TE-sunag-poc19-native-stage1-bootstrap.md`;
+`implementations/poc19-production-shape/docs/DESIGN.md`;
+`implementations/poc20-timeline-pure-function-cas-branches/docs/DESIGN.md`;
+`DEV-GUIDE-RESOURCES.md`.
+
 ## Tasks
 
 - [x] vumas.1 Lock the POC19 design-doc-first decision in `DI-lumir`.
@@ -242,15 +272,24 @@ Affects: `protocols/wire-lab.d/TODO/TODO-vumas-poc19-production-shape.md`;
   `TE-vurok` rejects both wholesale copy and fresh rewrite; POC19 starts with
   hybrid staged extraction. Source: `TE-vurok`; `DI-nupag`.
 - [ ] vumas.5 Scaffold `implementations/poc19-production-shape/` with one stable
-  `grid` bootstrap binary plus fetched daemon/client microkernel modules.
+  `grid` stage0 bootstrap binary plus a fetched native/static stage1 descriptor
+  and executable proof. Stage0 must verify exact CIDs, local trust criteria,
+  platform constraints, and local capability requirements before materializing
+  stage1 into an execution cache and launching it. Source: `TE-sunag`;
+  `DI-topiv`.
 - [ ] vumas.6 Implement daemon-managed local CAS and VCS config discovery with
   POC18-compatible `.grid` repo state.
 - [ ] vumas.7 Implement TCP and WebSocket transport adapters over the same exact
   PromiseGrid message framing.
-- [ ] vumas.8 Implement signed app reference-set install and `grid run` WASI
-  execution from VCS/CAS.
+- [ ] vumas.8 Implement signed app reference-set install and `grid run` WASI/WASM
+  execution from VCS/CAS under native/static stage1. Stage0 must not need a WASI
+  loader for the first proof. Source: `TE-sunag`; `DI-topiv`.
 - [ ] vumas.9 Add analyzer/regression gates proving POC18 superset behavior,
-  exact-message retention, TCP/WebSocket parity, and promise-first vocabulary.
+  exact-message retention, TCP/WebSocket parity, promise-first vocabulary,
+  native/static stage1 launch from an execution cache, no dependency on
+  unverified stage1 trust-policy code, platform/package-manager separation,
+  stage0 self-update separation, and no true rollback claim. Source:
+  `TE-sunag`; `DI-topiv`.
 - [ ] vumas.10 Run and archive a clean POC19 regression after implementation
   begins.
 - [x] vumas.11 Lock the minimum-microkernel rule: one installed `grid` binary
@@ -282,3 +321,9 @@ Affects: `protocols/wire-lab.d/TODO/TODO-vumas-poc19-production-shape.md`;
   of truth, with raw chunks as CIDv1 `raw`, true graph objects optionally
   CIDv1 `dag-cbor`, CAR as transfer/archive packaging, and profile views as
   rebuildable projections. Source: `TE-lirum`; `DI-hofaz`.
+- [x] vumas.18 Lock native/static stage1 bootstrap as the first POC19 runtime
+  proof. `TE-sunag` rejects WASI-first stage1 for the first proof because
+  hostful nodes need USB/device, process monitoring/control, platform checks, and
+  host capability mediation in fetched stage1 rather than in stage0. WASI/WASM
+  remains a portable app/runtime profile under stage1. Source: `TE-sunag`;
+  `DI-topiv`.

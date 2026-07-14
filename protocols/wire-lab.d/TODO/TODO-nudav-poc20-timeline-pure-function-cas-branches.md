@@ -241,6 +241,11 @@ only; `DI-ruvum` rollback-root wording only.
   sensitive personal payloads. Source: `DI-ruvum`.
 - [x] nudav.22 Remove redundant `-v1` suffixes from current POC20 protocol-family
   spec names and recompute their pCID symlink aliases. Source: `DI-zizab`.
+- [x] nudav.23 Align POC20 runtime-root timeline semantics with the POC19
+  native/static stage1 decision: stage0 self-update, native stage1 descriptor
+  adoption, execution-cache materialization, stage1 readiness, and later
+  WASI/WASM app execution are local timeline promises when they affect runtime
+  roots. Source: `DI-topiv`.
 
 ## Acceptance criteria for the future executable POC20
 
@@ -274,6 +279,10 @@ only; `DI-ruvum` rollback-root wording only.
   create trust, authority, or an obligation to execute.
 - Pure-function result records include the relevant app/runtime root CIDs in
   explicit context when executable code or runtime behavior affects the result.
+- Runtime-root records can represent native/static stage1 descriptor adoption,
+  execution-cache materialization, readiness, and later WASI/WASM app execution
+  without treating a package manager as the approval authority for fetched stage1
+  CIDs.
 - Root-decision records include local decision state, approving role, impact
   summary CID, capability-change summary, local reason, prior Merkle/CAS root CID
   when one exists, any corrective Merkle/CAS root CID, and explicit
