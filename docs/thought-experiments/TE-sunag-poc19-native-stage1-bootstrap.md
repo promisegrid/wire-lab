@@ -236,3 +236,14 @@ record a launch-attempt local event with descriptor CID, executable CID, adopted
 Merkle/CAS root CID when present, execution-cache path, platform, approval or
 rejection outcome, and process-launch outcome. Readiness is optional supplemental
 information if the stage1 process reports it before timeout.
+
+### 2026-07-19 — Container-execution boundary refinement
+
+`DI-rufot` clarifies the execution boundary for generated POC19 code in wire-lab
+runs. The native/static stage1 conclusion remains locked, but the executable POC
+must follow the POC16 container discipline: the host invokes Docker Compose or a
+wrapper, stage0 runs inside a container, and stage0 launches native/static stage1
+as a same-container process from a container-local execution cache. Native/static
+therefore describes the stage1 executable format and process model inside the POC
+container; it does not permit direct host-native execution of generated POC19
+code on the developer machine.

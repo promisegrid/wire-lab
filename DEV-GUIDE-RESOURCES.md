@@ -8,7 +8,7 @@ PromiseGrid design choices are derived, tested, and recorded. Source:
 
 ## Current Design State
 
-Snapshot refreshed by Codex on 2026-07-13 17:27 PDT. This is a
+Snapshot refreshed by Codex on 2026-07-19 20:33 PDT. This is a
 developer-facing protocol-design snapshot, not a frozen PromiseGrid API. It
 reflects the currently locked outer-envelope direction plus consensus across
 near-contender simulations and root `results/` JSON evidence; proposal children
@@ -30,7 +30,7 @@ remain review evidence until promoted. Source: `DI-baral`; `DI-sisak`;
 `DI-kakos`; `DI-bibah`; `DI-mokaz`; `DI-lamaz`; `DI-kodob`; `DI-lulog`;
 `DI-guhil`; `DI-ruvum`; `DI-minol`; `DI-gapav`; `DI-zosol`; `DI-tanov`;
 `DI-dahaj`; `DI-moson`; `DI-romak`; `DI-zizab`; `DI-nafat`; `DI-nupag`;
-`DI-hofaz`; `DI-topiv`; `DI-bugik`; `DI-tuvub`.
+`DI-hofaz`; `DI-topiv`; `DI-bugik`; `DI-tuvub`; `DI-rufot`.
 The root `README.md` is now the first-stop returning-member primer: it gives a
 clean narrative from simulations and GA design search through the grouped POC
 journey, ending with the current envelope, pCID, CBOR/CID, sparse-CAS,
@@ -190,8 +190,13 @@ locks the first stage1 bootstrap proof as a native/static executable object
 fetched by CID, verified by stage0, materialized into a grid-owned execution
 cache, and launched through a portable host process mechanism; `DI-tuvub`
 clarifies that the required first-proof record is a launch-attempt local event,
-while readiness is optional if reported before timeout. Stage0 does not need a
-WASI loader for that first proof. App,
+while readiness is optional if reported before timeout. `DI-rufot` clarifies the
+POC19 container-execution boundary: in wire-lab executable runs, the host invokes
+Docker Compose or a wrapper, and generated POC19 code including stage0, fetched
+stage1, agents, analyzers, and POC binaries runs inside containers. Native/static
+stage1 is still the first proof, but it is launched as a same-container process
+inside the stage0 container, not directly on the developer host. Stage0 does not
+need a WASI loader for that first proof. App,
 agent, runtime, protocol-spec, executable, and data changes should arrive as
 CID-addressed CAS roots fetched from peers. First run or local config may name a
 bootstrap Merkle/CAS root CID; later root changes require
@@ -223,7 +228,7 @@ factored into production-shaped stage1 roles.
 This is currently a
 design artifact, not an executable implementation. Source: `DI-lumir`;
 `DI-topab`; `DI-kodob`; `DI-guhil`; `DI-zitap`; `DI-nupag`; `DI-hofaz`;
-`DI-topiv`; `DI-bugik`; `DI-tuvub`; `TODO-vumas`.
+`DI-topiv`; `DI-bugik`; `DI-tuvub`; `DI-rufot`; `TODO-vumas`.
 POC20 is now planned as a parallel semantic-model track, not a POC19 blocker.
 TE-lodom frames promises as timeline assertions, agents as deterministic
 pure-function servers over explicit context CIDs, decentralized CAS branches as

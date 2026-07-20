@@ -5,7 +5,7 @@
 Design draft. This is the first POC19 artifact. It is not executable code, not a
 frozen protocol spec, and not a production API. Source: `DI-lumir`; `DI-kodob`;
 `DI-guhil`; `DI-zitap`; `DI-nupag`; `DI-hofaz`; `DI-topiv`; `DI-bugik`;
-`DI-tuvub`.
+`DI-tuvub`; `DI-rufot`.
 
 ## Purpose
 
@@ -30,6 +30,12 @@ stage1 modules, `grid` can:
 POC19 is not a rewrite of PromiseGrid as a conventional package manager,
 orchestration engine, command endpoint, central gatekeeper, or forge. It is a
 production-shaped composition of lessons already tested in earlier POCs.
+
+For executable POC19 work in this repository, generated POC19 code must follow
+the POC16 container discipline: the host invokes Docker Compose or wrapper
+scripts, while stage0, fetched stage1, agents, analyzers, and other generated POC
+binaries run inside containers. This is a POC run boundary, not a claim that
+future production deployments must be Docker-only. Source: `DI-rufot`.
 
 POC20 now owns a parallel semantic-model track for promises as timeline
 assertions, deterministic pure-function agents, CAS-backed local/group
@@ -141,10 +147,14 @@ lifecycle/resource protection, host-capability, secret service, key/token, local
 event journal, and trust-policy modules. Stage0 may fetch stage1 objects from
 locally trusted peers, verify exact CIDs and local signer trust criteria, record
 local approval, materialize a runnable copy into an execution cache, and start
-stage1. Stage1 modules are exact CAS/VCS objects named by approved CIDs, not
-hidden side loads. WASI/WASM remains a first-class portable app/runtime profile
-under stage1, not a requirement that stage0 contain a WASI loader for the first
-proof. Source: `DI-zitap`; `DI-guhil`; `DI-topiv`.
+stage1. In the wire-lab POC19 executable run, stage0 itself runs inside a Docker
+container and launches native/static stage1 as a same-container process from a
+container-local execution cache; `native/static` does not mean direct execution
+on the developer host. Stage1 modules are exact CAS/VCS objects named by
+approved CIDs, not hidden side loads. WASI/WASM remains a first-class portable
+app/runtime profile under stage1, not a requirement that stage0 contain a WASI
+loader for the first proof. Source: `DI-zitap`; `DI-guhil`; `DI-topiv`;
+`DI-rufot`.
 
 Stage0 itself may still self-update, but that is a special replacement of the
 installed bootstrap seed, not the definition of stage1 and not ordinary root
@@ -206,17 +216,17 @@ POC19 code generation should start by proving that the stage0 `grid` binary can
 fetch, verify, and start a CID-named stage1 module. This is the smallest useful
 proof of the staged bootstrap model: stage0 reads a configured or bootstrap root
 CID, fetches a stage1 descriptor and the executable objects it names from local
-CAS or a simple trusted peer fixture, verifies exact CIDs, starts one stage1
-module, and records a launch-attempt local event. Readiness is optional
-supplemental information if the stage1 process reports it before timeout. Full
-sync, trust economics, app orchestration, and rich runtime management should
-come later.
+container CAS or a simple trusted peer fixture in the Compose network, verifies
+exact CIDs, starts one same-container stage1 process, and records a
+launch-attempt local event. Readiness is optional supplemental information if the
+stage1 process reports it before timeout. Full sync, trust economics, app
+orchestration, and rich runtime management should come later.
 POC19 should use hybrid staged extraction: start with a fresh stage0 scaffold,
 keep POC18 as the CAS/VCS source baseline and regression oracle, carry POC16's
 pCID parser/builder, CWT/COSE token, embedded-spec, encrypted-payload, and
 lifecycle role lessons into the stage0/stage1 seams, and factor only reviewed
 behavior slices into production-shaped stage1 roles. Source: `DI-nupag`;
-`DI-tuvub`.
+`DI-tuvub`; `DI-rufot`.
 
 The descriptor work in `~/lab/grid-poc/x/descriptors/` is useful lineage for
 this idea. It explored CBOR executable descriptors and memory-backed execution,
@@ -242,7 +252,7 @@ Minimum descriptor meaning for the first code-generation slice:
 
 ```text
 descriptor kind       microkernel module, app module, runtime helper, CLI role, or daemon role
-runtime kind          native/static stage1 first; WASI/WASM, OCI, and native app profiles under stage1
+runtime kind          native/static stage1 inside the stage0 container first; WASI/WASM, OCI, and native app profiles under stage1
 target constraints    OS, arch, ABI, or runtime constraints when relevant
 executable objects    one executable CID or a CID-named closure of module objects
 entrypoint            function, command, WASI export, or process entrypoint
@@ -263,17 +273,16 @@ The first stage1 runtime is now locked as native/static. Stage0 reads local
 config, configured peers, trust anchors, and the bootstrap or adopted root CID;
 fetches the descriptor and executable object by CID; verifies exact bytes,
 signer or local trust criteria, platform constraints, and local capability
-requirements; materializes a runnable file into a grid-owned execution cache;
-starts stage1 with a portable host process mechanism such as Go `os/exec`, which
-maps to `CreateProcess`-style behavior on Windows and normal process launch on
-Unix without requiring Unix same-PID `execve`; passes minimal bootstrap facts
-such as descriptor CID, adopted root CID, config path, state directory, and an
-optional local control endpoint; and records a launch-attempt local event with
-descriptor CID, executable CID, adopted Merkle/CAS root CID when present,
-execution-cache path, platform, approval or rejection outcome, and process-launch
-outcome. Readiness remains optional supplemental information if stage1 reports it
-before timeout. WASI/WASM support belongs under stage1 for portable app/runtime
-modules. Source: `TE-sunag`; `DI-topiv`; `DI-tuvub`.
+requirements; materializes a runnable file into a container-local grid-owned
+execution cache; starts stage1 inside the stage0 container with a portable
+process mechanism such as Go `os/exec`; passes minimal bootstrap facts such as
+descriptor CID, adopted root CID, config path, state directory, and an optional
+local control endpoint; and records a launch-attempt local event with descriptor
+CID, executable CID, adopted Merkle/CAS root CID when present, execution-cache
+path, platform, approval or rejection outcome, and process-launch outcome.
+Readiness remains optional supplemental information if stage1 reports it before
+timeout. WASI/WASM support belongs under stage1 for portable app/runtime modules.
+Source: `TE-sunag`; `DI-topiv`; `DI-tuvub`; `DI-rufot`.
 
 Platform and package-manager boundaries are part of this decision. Linux,
 Windows, and macOS can be normal fetched native/static stage1 targets when stage0
@@ -285,7 +294,10 @@ checks such as codesign, notarization, executable permissions, or Windows launch
 constraints where those are relevant. iOS and iPadOS are bundled clients or
 control surfaces unless a later signed-app distribution path is explicitly
 designed; WASM does not by itself make them ordinary fetched-stage1 execution
-targets. Source: `TE-sunag`; `DI-topiv`.
+targets. The local wire-lab POC19 run is narrower than this production target:
+generated POC code executes inside Docker containers, and host-specific platform
+checks are modeled or scoped through the container harness until a later POC
+explicitly tests host installation. Source: `TE-sunag`; `DI-topiv`; `DI-rufot`.
 
 ### Operator-visible Merkle/CAS root adoption
 
@@ -448,7 +460,7 @@ The daemon should make these local promises explicit:
 | Sync | Advertise selected reference sets, request missing parents, redeem retrieval tokens, and exchange CAR/object bytes. |
 | Bootstrap/root adoption | Fetch root CID closures, verify exact CIDs, present adoption choices to the operator, and remember local root-adoption promises. |
 | App interface | Resolve app reference sets, prepare local runtime inputs, deliver pCID-selected messages to local app processes or modules. |
-| Execution runtime | Launch native/static stage1 first, then run WASI/WASM app modules, OCI containers, and native binaries under explicit local resource promises. |
+| Execution runtime | Launch container-local native/static stage1 first for the POC run, then run WASI/WASM app modules, OCI containers, and native binaries under explicit local resource promises. |
 | Lifecycle/resource protection | Issue, narrow, revoke, or stop local CPU, memory, socket, storage, process, device, and time promises. |
 | Host capability | Promise narrow access to local network targets, files, directories, devices, host functions, secret references, execution resources, and storage only when local terms are satisfied. |
 | Secret service | Sign bytes, unwrap scoped keys, mint short-lived credentials, rotate or revoke material, and record denied attempts without exposing plaintext secrets as ordinary CAS payloads. |
@@ -804,45 +816,49 @@ resource judgments.
 
 First-slice proof:
 
-1. **Stage0 scaffold.** Create the installed `grid` stage0 entrypoint with local
-   config, CID verification, minimal CAS fetch, local approval recording, and
-   restart/start handoff.
-2. **Descriptor fixture.** Add one CID-named stage1 descriptor and one
-   native/static executable stage1 module object to a local CAS fixture.
-3. **Stage1 launch attempt.** Have stage0 fetch the descriptor and executable
+1. **Container harness.** Add Dockerfile, Compose file, and clean-run wrapper so
+   the host invokes only Docker or the wrapper while generated POC19 binaries run
+   inside containers.
+2. **Stage0 scaffold.** Create the container-executed `grid` stage0 entrypoint
+   with local config, CID verification, minimal CAS fetch, local approval
+   recording, and restart/start handoff.
+3. **Descriptor fixture.** Add one CID-named stage1 descriptor and one
+   native/static executable stage1 module object to a container-local CAS
+   fixture.
+4. **Stage1 launch attempt.** Have stage0 fetch the descriptor and executable
    object, verify exact CIDs and local trust criteria, materialize stage1 into an
-   execution cache, start the stage1 module through a portable host process
-   mechanism, and record a launch-attempt local event. Record readiness only as
+   execution cache, start the stage1 module as a same-container native/static
+   process, and record a launch-attempt local event. Record readiness only as
    optional supplemental information if stage1 reports it before timeout.
 
 Full POC19 after the first proof:
 
-4. **Shared baseline.** Keep POC18 code available as the source baseline while
+5. **Shared baseline.** Keep POC18 code available as the source baseline while
    factoring shared packages so stage1 modules do not duplicate CLI, CAS, VCS, or
    transport logic. Source: `DI-nupag`.
-5. **Daemon baseline.** Move POC18 local CAS/VCS and TCP agent behavior behind a
+6. **Daemon baseline.** Move POC18 local CAS/VCS and TCP agent behavior behind a
    fetched `grid daemon` stage1 module, with CLI commands using the daemon for
    normal operation.
-6. **Transport parity.** Add WebSocket adapter that carries the same exact
+7. **Transport parity.** Add WebSocket adapter that carries the same exact
    `grid()` bytes as TCP and proves parity in a clean run.
-7. **Bootstrap roots.** Add config/first-run support for an operator-provided
+8. **Bootstrap roots.** Add config/first-run support for an operator-provided
    Merkle/CAS root CID, candidate-root closure verification, impact summaries,
    local approval promises, prior/corrective Merkle/CAS root CIDs, and replay
    context.
-8. **App reference sets.** Add role `app` reference sets and resolve descriptor
+9. **App reference sets.** Add role `app` reference sets and resolve descriptor
    CIDs, data roots, pCID specs, and reciprocal terms from CAS.
-9. **WASI/WASM run.** Implement `grid run` for a descriptor-named WASI/WASM
+10. **WASI/WASM run.** Implement `grid run` for a descriptor-named WASI/WASM
    module hosted by stage1 with CID-verified inputs and CAS-recorded outputs.
-10. **Capability promises.** Add local runtime capability tokens for CPU, memory,
+11. **Capability promises.** Add local runtime capability tokens for CPU, memory,
    time, storage, network, filesystem, device, secret-reference, and host-function
    promises.
-11. **Secret service.** Add operation-scoped local secret service promises for
+12. **Secret service.** Add operation-scoped local secret service promises for
    signing, unwrap, short-lived credential minting, rotation, revocation, and
    denial events without placing plaintext secrets in broad CAS/log/prompt/UI
    paths.
-12. **Container/native profiles.** Store and verify OCI image graphs and native
+13. **Container/native profiles.** Store and verify OCI image graphs and native
    binaries, then execute only under explicit local runtime promises.
-13. **Regression gates.** Prove POC18 superset behavior, promise-shaped
+14. **Regression gates.** Prove POC18 superset behavior, promise-shaped
    inter-agent traffic, TCP/WebSocket parity, exact-CBOR diagnostics, and local
    event records.
 
@@ -855,6 +871,10 @@ Full POC19 after the first proof:
   proof on native/static stage1 launch from an execution cache while keeping
   WASI/WASM as a portable app/runtime profile under stage1. Source: `TE-sunag`;
   `DI-topiv`.
+- **POC19 generated code drifting into host-native execution.** Mitigation: keep
+  the executable POC19 run behind Docker Compose or an approved wrapper; stage0,
+  stage1, agents, analyzers, and generated POC binaries execute inside
+  containers. Source: `DI-rufot`.
 - **CLI reimplementing core logic.** Mitigation: one shared core library;
   daemon-backed normal operation; direct CLI logic only for bootstrap/offline
   reads.
@@ -890,14 +910,19 @@ Full POC19 after the first proof:
 The first code-generation slice should not be considered complete until a clean
 run shows:
 
-- one installed `grid` stage0 binary reads a configured or bootstrap root CID;
+- the host invokes only Docker Compose or an approved wrapper for generated POC19
+  execution, following the POC16 run pattern;
+- stage0, fetched stage1, agents, analyzers, and other generated POC19 binaries
+  run inside containers rather than directly on the developer host;
+- one container-executed `grid` stage0 binary reads a configured or bootstrap
+  root CID;
 - stage0 fetches a CID-named stage1 descriptor and executable object from CAS;
 - stage0 verifies stage1 without depending on unverified stage1 trust-policy
   code;
 - stage0 verifies exact CIDs, local trust criteria, platform constraints, and
   local capability requirements before starting the stage1 module;
 - the first stage1 module is native/static, is materialized into a grid-owned
-  execution cache, and is launched through the host process mechanism;
+  container-local execution cache, and is launched as a same-container process;
 - stage0 does not contain a WASI loader for the first proof;
 - stage0 records a launch-attempt local event with descriptor CID, executable
   CID, adopted Merkle/CAS root CID when present, execution-cache path, platform,

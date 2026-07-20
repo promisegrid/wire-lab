@@ -14,7 +14,10 @@ constraints. The stable installed binary is a small bootstrap seed for the
 minimum microkernel: it self-updates only after local owner approval, then
 fetches remaining microkernel modules before any app-specific modules. App,
 agent, runtime executable, and data changes are adopted by CID-addressed CAS
-roots, not by replacing the binary. Source: `DI-lumir`; `DI-kodob`; `DI-zitap`.
+roots, not by replacing the binary. The executable POC19 run in this repository
+must follow the POC16 pattern: the host invokes Docker Compose or wrapper
+scripts, while generated POC19 code runs inside containers. Source: `DI-lumir`;
+`DI-kodob`; `DI-zitap`; `DI-rufot`.
 
 POC20 is now the parallel semantic-model track for promises as timeline
 assertions, pure-function agents, CAS branches, local/group timelines, and
@@ -309,6 +312,37 @@ Affects: `protocols/wire-lab.d/TODO/TODO-vumas-poc19-production-shape.md`;
 `DEV-GUIDE-RESOURCES.md`.
 Supersedes: `DI-topiv` launch-record/readiness-required wording only.
 
+ID: DI-rufot
+Date: 2026-07-19 20:33:09 PDT
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: POC19 generated/runtime code must execute inside containers during
+wire-lab POC runs. The host may invoke Docker Compose or wrapper scripts, but
+stage0, fetched native/static stage1, agents, analyzers, and other generated
+POC19 binaries must run inside containers. The first stage1 proof launches the
+native/static stage1 executable as a same-container process from a
+container-local execution cache; `native/static` means the executable format and
+process model inside the POC container, not host-native execution on the
+developer machine.
+Intent: POC19 should preserve the POC16 safety and reproducibility discipline:
+generated POC code is isolated from the developer host, while the design can
+still prove a native/static stage1 bootstrap. This keeps container execution a
+POC run boundary rather than a claim that every future production deployment is
+itself Docker-only.
+Constraints: Do not run generated POC19 binaries directly on the host during
+clean regressions. Do not require Docker-in-Docker or a separate stage1
+container for the first proof. Host-side commands may run Docker Compose,
+wrapper scripts, `git`, documentation checks, and non-POC inspection commands.
+If later POC19 code introduces build/test/analyzer commands, the commands that
+execute generated POC binaries must do so through the container harness.
+Affects: `protocols/wire-lab.d/TODO/TODO-vumas-poc19-production-shape.md`;
+`docs/thought-experiments/TE-sunag-poc19-native-stage1-bootstrap.md`;
+`implementations/poc19-production-shape/docs/DESIGN.md`;
+`DEV-GUIDE-RESOURCES.md`.
+Supersedes: `DI-tuvub` only where its portable host process wording could be
+read as permission to execute generated POC19 code natively on the developer
+host. `DI-tuvub` remains active for launch-attempt event semantics.
+
 ## Tasks
 
 - [x] vumas.1 Lock the POC19 design-doc-first decision in `DI-lumir`.
@@ -322,12 +356,14 @@ Supersedes: `DI-topiv` launch-record/readiness-required wording only.
   `TE-vurok` rejects both wholesale copy and fresh rewrite; POC19 starts with
   hybrid staged extraction. Source: `TE-vurok`; `DI-nupag`.
 - [ ] vumas.5 Scaffold `implementations/poc19-production-shape/` with one stable
-  `grid` stage0 bootstrap binary plus a fetched native/static stage1 descriptor
-  and executable proof. Stage0 must verify exact CIDs, local trust criteria,
+  `grid` stage0 bootstrap binary plus a fetched native/static stage1 descriptor,
+  executable proof, Dockerfile, Compose file, and clean-run wrapper. The host
+  may invoke Docker Compose or the wrapper, but stage0 and stage1 must execute
+  inside containers. Stage0 must verify exact CIDs, local trust criteria,
   platform constraints, and local capability requirements before materializing
-  stage1 into an execution cache, launching it through a portable host process
-  mechanism, and recording a launch-attempt local event. Source: `TE-sunag`;
-  `DI-topiv`; `DI-tuvub`.
+  stage1 into a container-local execution cache, launching it as a same-container
+  native/static process, and recording a launch-attempt local event. Source:
+  `TE-sunag`; `DI-topiv`; `DI-tuvub`; `DI-rufot`.
 - [ ] vumas.6 Implement daemon-managed local CAS and VCS config discovery with
   POC18-compatible `.grid` repo state.
 - [ ] vumas.7 Implement TCP and WebSocket transport adapters over the same exact
@@ -340,10 +376,13 @@ Supersedes: `DI-topiv` launch-record/readiness-required wording only.
   native/static stage1 launch from an execution cache, no dependency on
   unverified stage1 trust-policy code, platform/package-manager separation,
   stage0 self-update separation, required launch-attempt local-event fields,
-  optional readiness if reported before timeout, failure reporting, and no true
-  rollback claim. Source: `TE-sunag`; `DI-topiv`; `DI-tuvub`.
+  optional readiness if reported before timeout, failure reporting, no true
+  rollback claim, and no direct host-native execution of generated POC19
+  binaries during clean regressions. Source: `TE-sunag`; `DI-topiv`;
+  `DI-tuvub`; `DI-rufot`.
 - [ ] vumas.10 Run and archive a clean POC19 regression after implementation
-  begins.
+  begins. The clean regression must run through the container harness, following
+  the POC16 pattern. Source: `DI-rufot`.
 - [x] vumas.11 Lock the minimum-microkernel rule: one installed `grid` binary
   bootstraps from operator-adopted Merkle/CAS root CIDs, while app, agent, runtime
   executable, spec, and data changes are fetched from CAS/peers without replacing
@@ -379,5 +418,6 @@ Supersedes: `DI-topiv` launch-record/readiness-required wording only.
   proof. `TE-sunag` rejects WASI-first stage1 for the first proof because
   hostful nodes need USB/device, process monitoring/control, platform checks, and
   host capability mediation in fetched stage1 rather than in stage0. WASI/WASM
-  remains a portable app/runtime profile under stage1. Source: `TE-sunag`;
-  `DI-topiv`.
+  remains a portable app/runtime profile under stage1. For wire-lab POC19 runs,
+  the native/static stage1 process is launched inside the stage0 container, not
+  natively on the developer host. Source: `TE-sunag`; `DI-topiv`; `DI-rufot`.
