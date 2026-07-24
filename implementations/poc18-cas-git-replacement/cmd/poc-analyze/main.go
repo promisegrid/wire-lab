@@ -311,6 +311,20 @@ func analyze(runRoot string, result fixtureResult) (Report, error) {
 	if malloryListErr != nil {
 		return Report{}, malloryListErr
 	}
+	casByAgent := map[string]*store.FileStore{
+		"alice":   aliceCAS,
+		"bob":     bobCAS,
+		"carol":   carolCAS,
+		"frank":   frankCAS,
+		"mallory": malloryCAS,
+	}
+	entriesByAgent := map[string][]store.Entry{
+		"alice":   aliceEntries,
+		"bob":     bobEntries,
+		"carol":   carolEntries,
+		"frank":   frankEntries,
+		"mallory": malloryEntries,
+	}
 	if retentionPass, retentionErr := checkRetentionGC(result, frankCAS, checks); retentionErr != nil {
 		return Report{}, retentionErr
 	} else if !retentionPass {
@@ -429,6 +443,37 @@ func analyze(runRoot string, result fixtureResult) (Report, error) {
 			pass = false
 		}
 	}
+	if cidPass, cidErr := checkCIDCorrectness(result, casByAgent, entriesByAgent, checks); cidErr != nil {
+		return Report{}, cidErr
+	} else if !cidPass {
+		pass = false
+	}
+	if sparsePass := checkSparseCAS(result, entriesByAgent, checks); !sparsePass {
+		pass = false
+	}
+	if parentPass, parentErr := checkParentChainIntegrity(casByAgent, entriesByAgent, checks); parentErr != nil {
+		return Report{}, parentErr
+	} else if !parentPass {
+		pass = false
+	}
+	if referencePass, referenceErr := checkReferenceSetSemantics(result, aliceCAS, checks); referenceErr != nil {
+		return Report{}, referenceErr
+	} else if !referencePass {
+		pass = false
+	}
+	if posixPass := checkPOSIXInodeCoverage(result, checks); !posixPass {
+		pass = false
+	}
+	if rabinPass, rabinErr := checkRabinChunking(aliceCAS, aliceEntries, checks); rabinErr != nil {
+		return Report{}, rabinErr
+	} else if !rabinPass {
+		pass = false
+	}
+	if vocabularyPass, vocabularyErr := checkPromiseVocabulary(casByAgent, entriesByAgent, checks); vocabularyErr != nil {
+		return Report{}, vocabularyErr
+	} else if !vocabularyPass {
+		pass = false
+	}
 	return Report{
 		RunRoot:        runRoot,
 		Pass:           pass,
@@ -442,6 +487,456 @@ func analyze(runRoot string, result fixtureResult) (Report, error) {
 		Retrieved:      len(result.Retrieval.Retrieved),
 		Missing:        len(result.Retrieval.Missing),
 	}, nil
+}
+
+func checkCIDCorrectness(result fixtureResult, casByAgent map[string]*store.FileStore, entriesByAgent map[string][]store.Entry, checks map[string]string) (bool, error) {
+	// Intent: `nahop.20` requires one aggregate CID-correctness gate over the
+	// fixture result and sparse CAS files. Printable CIDs must be canonical CIDv1
+	// base32, and retained bytes must hash back to the CID rendered in indexes and
+	// paths. Source: DI-bovaf
+	pass := true
+	cidTexts := []string{
+		result.SnapshotCID,
+		result.RootReferenceSetCID,
+		result.WorkspaceRefSetCID,
+		result.BranchRefSetCID,
+		result.LogicalChangeCID,
+		result.ReviewThreadCID,
+		result.ReleaseRefSetCID,
+		result.DiagnosticMessageCID,
+		result.Scenario.InitialSnapshotCID,
+		result.Scenario.InitialRootReferenceSetCID,
+		result.Scenario.LineageNodeCID,
+		result.Scenario.RenameLabelNodeCID,
+		result.Scenario.CopyLabelNodeCID,
+		result.Scenario.RenameCopyDocsRefSetCID,
+		result.Scenario.RenameCopyRootRefSetCID,
+		result.Scenario.RenameCopySnapshotCID,
+		result.Scenario.BobDivergentRootRefSetCID,
+		result.Scenario.BobDivergentSnapshotCID,
+		result.Scenario.MergeRootRefSetCID,
+		result.Scenario.MergeSnapshotCID,
+		result.Scenario.MergeBranchRefSetCID,
+		result.Scenario.LogicalChangeRefSetCID,
+		result.Scenario.TestStatementCID,
+		result.Scenario.AdoptionStatementCID,
+		result.Scenario.ReviewThreadRefSetCID,
+		result.Retrieval.InterestMessageCID,
+		result.Retrieval.AvailabilityMessageCID,
+		result.Retention.RetentionMessageCID,
+		result.Retention.TemporaryObjectCID,
+		result.RetentionPayment.ObjectCID,
+		result.RetentionPayment.TokenCID,
+		result.RetentionPayment.RedemptionMessageCID,
+	}
+	cidTexts = append(cidTexts, result.Scenario.MergeParentSnapshotCIDs...)
+	for _, cidText := range result.Scenario.LineageLabels {
+		cidTexts = append(cidTexts, cidText)
+	}
+	for _, retrievedObject := range result.Retrieval.Retrieved {
+		cidTexts = append(cidTexts, retrievedObject.CID)
+	}
+	for _, missingObject := range result.Retrieval.AlreadyLocal {
+		cidTexts = append(cidTexts, missingObject.CID)
+	}
+	for _, target := range result.Retention.Targets {
+		cidTexts = append(cidTexts, target.CID)
+	}
+	cidTexts = append(cidTexts, result.Retention.ProtectedCIDs...)
+	for _, redemption := range result.ScheduledSync.CapabilityRedemptions {
+		cidTexts = append(cidTexts, redemption.BearerTokenCID, redemption.CapabilityTokenCID, redemption.ObjectCID)
+	}
+	cidTexts = append(cidTexts, result.SyncAgentState.RedeemedBearerTokenCIDs...)
+	if checkCIDTextValues("cid_text_canonical", cidTexts, checks) == false {
+		pass = false
+	}
+	entryBytesPass := true
+	pathPass := true
+	messageProtocolPass := true
+	messageCount := 0
+	for agentName, entries := range entriesByAgent {
+		agentCAS := casByAgent[agentName]
+		for _, entry := range entries {
+			entryCID, parseErr := store.ParseCIDText(entry.CID)
+			if parseErr != nil {
+				return false, parseErr
+			}
+			if _, _, getErr := agentCAS.Get(entryCID); getErr != nil {
+				entryBytesPass = false
+			}
+			if !casEntryPathMatchesCID(entry) {
+				pathPass = false
+			}
+			if entry.Kind != "message" {
+				continue
+			}
+			messageCount++
+			content, _, getErr := agentCAS.Get(entryCID)
+			if getErr != nil {
+				return false, getErr
+			}
+			envelopeView, parseErr := graph.ParseEnvelope(content)
+			if parseErr != nil {
+				messageProtocolPass = false
+				continue
+			}
+			if store.CIDText(envelopeView.ProtocolCID) != graph.VersionControlPCIDText {
+				messageProtocolPass = false
+			}
+		}
+	}
+	recordCheck(checks, "cas_entry_cids_match_bytes", entryBytesPass)
+	recordCheck(checks, "cas_entry_paths_use_cid_base32", pathPass)
+	recordCheck(checks, "message_pcid_is_version_control", messageProtocolPass && messageCount > 0)
+	return pass && entryBytesPass && pathPass && messageProtocolPass && messageCount > 0, nil
+}
+
+func checkCIDTextValues(checkName string, cidTexts []string, checks map[string]string) bool {
+	pass := true
+	checked := 0
+	for _, cidText := range cidTexts {
+		if cidText == "" {
+			continue
+		}
+		checked++
+		if _, parseErr := store.ParseCIDText(cidText); parseErr != nil {
+			pass = false
+		}
+	}
+	recordCheck(checks, checkName, pass && checked > 0)
+	return pass && checked > 0
+}
+
+func casEntryPathMatchesCID(entry store.Entry) bool {
+	expectedSuffix := entry.CID + ".cbor"
+	if entry.Kind == "chunk" {
+		expectedSuffix = entry.CID + ".bin"
+	}
+	return filepath.Base(entry.Path) == expectedSuffix
+}
+
+func checkSparseCAS(result fixtureResult, entriesByAgent map[string][]store.Entry, checks map[string]string) bool {
+	// Intent: Sparse CAS means each agent keeps its own partial local object set.
+	// The analyzer checks root separation and uneven retained-object counts rather
+	// than asserting any peer has a complete repository. Source: DI-bovaf
+	roots := []string{result.AliceStoreRoot, result.BobStoreRoot, result.CarolStoreRoot, result.FrankStoreRoot, result.MalloryStoreRoot}
+	distinctRoots := map[string]bool{}
+	for _, root := range roots {
+		if root != "" {
+			distinctRoots[filepath.Clean(root)] = true
+		}
+	}
+	rootPass := len(distinctRoots) == len(roots)
+	nonEmptyPeerStores := len(entriesByAgent["alice"]) > 0 && len(entriesByAgent["bob"]) > 0 && len(entriesByAgent["carol"]) > 0 && len(entriesByAgent["frank"]) > 0
+	unevenCounts := len(entriesByAgent["alice"]) != len(entriesByAgent["bob"]) ||
+		len(entriesByAgent["bob"]) != len(entriesByAgent["carol"]) ||
+		len(entriesByAgent["carol"]) != len(entriesByAgent["frank"]) ||
+		len(entriesByAgent["frank"]) != len(entriesByAgent["mallory"])
+	recordCheck(checks, "sparse_cas_roots_distinct", rootPass)
+	recordCheck(checks, "sparse_cas_peer_stores_nonempty", nonEmptyPeerStores)
+	recordCheck(checks, "sparse_cas_partial_counts", unevenCounts)
+	return rootPass && nonEmptyPeerStores && unevenCounts
+}
+
+func checkParentChainIntegrity(casByAgent map[string]*store.FileStore, entriesByAgent map[string][]store.Entry, checks map[string]string) (bool, error) {
+	// Intent: POC18 parent links are useful only if retained message DAGs can be
+	// walked from local CAS. This gate checks every parsed message parent against
+	// the same agent's local sparse store, not a shared fixture store. Source:
+	// DI-bovaf
+	pass := true
+	parentCount := 0
+	for agentName, entries := range entriesByAgent {
+		agentCAS := casByAgent[agentName]
+		for _, entry := range entries {
+			if entry.Kind != "message" {
+				continue
+			}
+			entryCID, parseErr := store.ParseCIDText(entry.CID)
+			if parseErr != nil {
+				return false, parseErr
+			}
+			content, _, getErr := agentCAS.Get(entryCID)
+			if getErr != nil {
+				return false, getErr
+			}
+			envelopeView, parseErr := graph.ParseEnvelope(content)
+			if parseErr != nil {
+				return false, parseErr
+			}
+			for _, parent := range envelopeView.Parents {
+				parentCount++
+				if !agentCAS.Has(parent.CID) {
+					pass = false
+				}
+			}
+		}
+	}
+	recordCheck(checks, "parent_chain_integrity", pass && parentCount > 0)
+	return pass && parentCount > 0, nil
+}
+
+func checkReferenceSetSemantics(result fixtureResult, aliceCAS *store.FileStore, checks map[string]string) (bool, error) {
+	// Intent: `nahop.20` treats directories, branches, releases, reviews, and
+	// logical changes as versioned reference-set promises. This gate checks the
+	// concrete scenario labels and targets instead of accepting count-only evidence.
+	// Source: DI-bovaf
+	pass := true
+	docsTargets, docsErr := referenceSetTargetsByLabel(aliceCAS, result.Scenario.RenameCopyDocsRefSetCID)
+	if docsErr != nil {
+		return false, docsErr
+	}
+	introTargets := docsTargets["intro.md"]
+	copyTargets := docsTargets["README-copy.md"]
+	renameCopyPass := len(introTargets) == 1 && len(copyTargets) == 1 && introTargets[0] == result.Scenario.LineageNodeCID && copyTargets[0] == result.Scenario.LineageNodeCID
+	recordCheck(checks, "reference_set_rename_copy_labels_preserve_node", renameCopyPass)
+	if !renameCopyPass {
+		pass = false
+	}
+	rootTargets, rootErr := referenceSetTargetsByLabel(aliceCAS, result.Scenario.MergeRootRefSetCID)
+	if rootErr != nil {
+		return false, rootErr
+	}
+	directoryLabelsPass := labelsPresent(rootTargets, []string{"README-copy.md", "README-link.md", "build.pipe", "docs"})
+	recordCheck(checks, "reference_set_directory_labels", directoryLabelsPass)
+	if !directoryLabelsPass {
+		pass = false
+	}
+	logicalTargets, logicalErr := referenceSetTargetsByLabel(aliceCAS, result.Scenario.LogicalChangeRefSetCID)
+	if logicalErr != nil {
+		return false, logicalErr
+	}
+	logicalPass := labelsPresent(logicalTargets, []string{"alice-round", "bob-round", "merged"})
+	recordCheck(checks, "reference_set_logical_change_labels", logicalPass)
+	if !logicalPass {
+		pass = false
+	}
+	reviewTargets, reviewErr := referenceSetTargetsByLabel(aliceCAS, result.Scenario.ReviewThreadRefSetCID)
+	if reviewErr != nil {
+		return false, reviewErr
+	}
+	reviewPass := labelsPresent(reviewTargets, []string{"subject", "test", "adoption"})
+	recordCheck(checks, "reference_set_review_thread_labels", reviewPass)
+	if !reviewPass {
+		pass = false
+	}
+	roleCountsPass := result.Counts["reference_set:directory"] > 0 &&
+		result.Counts["reference_set:branch"] > 0 &&
+		result.Counts["reference_set:workspace"] > 0 &&
+		result.Counts["reference_set:logical_change"] > 0 &&
+		result.Counts["reference_set:review_thread"] > 0 &&
+		result.Counts["reference_set:release"] > 0
+	recordCheck(checks, "reference_set_role_counts", roleCountsPass)
+	return pass && roleCountsPass, nil
+}
+
+func referenceSetTargetsByLabel(cas *store.FileStore, cidText string) (map[string][]string, error) {
+	objectCID, parseErr := store.ParseCIDText(cidText)
+	if parseErr != nil {
+		return nil, parseErr
+	}
+	content, _, getErr := cas.Get(objectCID)
+	if getErr != nil {
+		return nil, getErr
+	}
+	envelopeView, parseErr := graph.ParseEnvelope(content)
+	if parseErr != nil {
+		return nil, parseErr
+	}
+	promiseKind, kindErr := envelopeView.PayloadKind()
+	if kindErr != nil {
+		return nil, kindErr
+	}
+	if promiseKind != "reference_set" {
+		return nil, fmt.Errorf("%s is %s, not reference_set", cidText, promiseKind)
+	}
+	body, bodyErr := envelopeView.PayloadBody()
+	if bodyErr != nil {
+		return nil, bodyErr
+	}
+	if len(body) != 5 {
+		return nil, fmt.Errorf("reference_set body must have five slots")
+	}
+	rows, ok := body[3].([]any)
+	if !ok {
+		return nil, fmt.Errorf("reference_set entries must be array")
+	}
+	targetsByLabel := map[string][]string{}
+	for _, rowValue := range rows {
+		row, rowOK := rowValue.([]any)
+		if !rowOK || len(row) != 3 {
+			return nil, fmt.Errorf("reference_set row must have three slots")
+		}
+		label, labelOK := row[0].(string)
+		if !labelOK {
+			return nil, fmt.Errorf("reference_set label must be text")
+		}
+		targetRows, targetRowsOK := row[1].([]any)
+		if !targetRowsOK {
+			return nil, fmt.Errorf("reference_set targets must be array")
+		}
+		for _, targetValue := range targetRows {
+			targetRow, targetOK := targetValue.([]any)
+			if !targetOK || len(targetRow) != 2 {
+				return nil, fmt.Errorf("reference_set target row must have two slots")
+			}
+			targetCID, targetErr := store.CIDFromLinkTag(targetRow[1])
+			if targetErr != nil {
+				return nil, targetErr
+			}
+			targetsByLabel[label] = append(targetsByLabel[label], store.CIDText(targetCID))
+		}
+	}
+	return targetsByLabel, nil
+}
+
+func labelsPresent(targetsByLabel map[string][]string, labels []string) bool {
+	for _, label := range labels {
+		if len(targetsByLabel[label]) == 0 {
+			return false
+		}
+	}
+	return true
+}
+
+func checkPOSIXInodeCoverage(result fixtureResult, checks map[string]string) bool {
+	// Intent: The current unprivileged fixture must at least prove regular files,
+	// directories, symlinks, FIFOs, and hard-link labels. More privileged device and
+	// socket fixtures remain separate future work, but this gate prevents regression
+	// of the POSIX coverage POC18 already exercises. Source: DI-bovaf
+	pass := result.Counts["posix_node:regular"] > 0 &&
+		result.Counts["posix_node:directory"] > 0 &&
+		result.Counts["posix_node:symlink"] > 0 &&
+		result.Counts["posix_node:fifo"] > 0 &&
+		result.Counts["hardlink_label"] > 0
+	recordCheck(checks, "posix_inode_unprivileged_fixture_coverage", pass)
+	return pass
+}
+
+func checkRabinChunking(aliceCAS *store.FileStore, aliceEntries []store.Entry, checks map[string]string) (bool, error) {
+	// Intent: POC18's Git-replacement path must keep large file content in-band as
+	// chunk manifests and chunks. This gate checks the stored manifest promises for
+	// the current Rabin profile rather than accepting only file-count evidence.
+	// Source: DI-bovaf
+	manifestCount := 0
+	chunkRowsPresent := false
+	rabinOnly := true
+	for _, entry := range aliceEntries {
+		if entry.Kind != "message" {
+			continue
+		}
+		entryCID, parseErr := store.ParseCIDText(entry.CID)
+		if parseErr != nil {
+			return false, parseErr
+		}
+		content, _, getErr := aliceCAS.Get(entryCID)
+		if getErr != nil {
+			return false, getErr
+		}
+		envelopeView, parseErr := graph.ParseEnvelope(content)
+		if parseErr != nil {
+			return false, parseErr
+		}
+		promiseKind, kindErr := envelopeView.PayloadKind()
+		if kindErr != nil {
+			return false, kindErr
+		}
+		if promiseKind != "chunk_manifest" {
+			continue
+		}
+		manifestCount++
+		body, bodyErr := envelopeView.PayloadBody()
+		if bodyErr != nil {
+			return false, bodyErr
+		}
+		if len(body) != 6 {
+			return false, fmt.Errorf("chunk_manifest body must have six slots")
+		}
+		if fmt.Sprint(body[2]) != "rabin" {
+			rabinOnly = false
+		}
+		chunkRows, ok := body[4].([]any)
+		if ok && len(chunkRows) > 0 {
+			chunkRowsPresent = true
+		}
+	}
+	recordCheck(checks, "rabin_chunk_manifest_profile", manifestCount > 0 && rabinOnly)
+	recordCheck(checks, "rabin_chunk_rows_present", chunkRowsPresent)
+	return manifestCount > 0 && rabinOnly && chunkRowsPresent, nil
+}
+
+func checkPromiseVocabulary(casByAgent map[string]*store.FileStore, entriesByAgent map[string][]store.Entry, checks map[string]string) (bool, error) {
+	// Intent: Analyzer gates should reinforce positive PromiseGrid vocabulary:
+	// messages are promises made by local agents, not external permission,
+	// authorization, conformance, or enforcement records. Source: DI-bovaf
+	pass := true
+	promiseCount := 0
+	for agentName, entries := range entriesByAgent {
+		agentCAS := casByAgent[agentName]
+		for _, entry := range entries {
+			if entry.Kind != "message" {
+				continue
+			}
+			entryCID, parseErr := store.ParseCIDText(entry.CID)
+			if parseErr != nil {
+				return false, parseErr
+			}
+			content, _, getErr := agentCAS.Get(entryCID)
+			if getErr != nil {
+				return false, getErr
+			}
+			envelopeView, parseErr := graph.ParseEnvelope(content)
+			if parseErr != nil {
+				return false, parseErr
+			}
+			promiseKind, kindErr := envelopeView.PayloadKind()
+			if kindErr != nil {
+				return false, kindErr
+			}
+			if promiseKind == "" || messageTextContainsProhibitedTerms(envelopeView) {
+				pass = false
+			}
+			promiseCount++
+		}
+	}
+	recordCheck(checks, "promise_vocabulary_local_voluntary", pass && promiseCount > 0)
+	return pass && promiseCount > 0, nil
+}
+
+func messageTextContainsProhibitedTerms(envelopeView graph.EnvelopeView) bool {
+	return valueTextContainsProhibitedTerms(envelopeView.Payload) || valueTextContainsProhibitedTerms(envelopeView.Proof)
+}
+
+func valueTextContainsProhibitedTerms(value any) bool {
+	switch typed := value.(type) {
+	case string:
+		lowerText := strings.ToLower(typed)
+		for _, prohibitedTerm := range []string{"authorization", "permission", "conformance", "policy enforcement"} {
+			if strings.Contains(lowerText, prohibitedTerm) {
+				return true
+			}
+		}
+	case []any:
+		for _, child := range typed {
+			if valueTextContainsProhibitedTerms(child) {
+				return true
+			}
+		}
+	case map[any]any:
+		for key, child := range typed {
+			if valueTextContainsProhibitedTerms(key) || valueTextContainsProhibitedTerms(child) {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func recordCheck(checks map[string]string, checkName string, pass bool) {
+	if pass {
+		checks[checkName] = "kept"
+		return
+	}
+	checks[checkName] = "missing"
 }
 
 func analyzeCollector(runRoot string) (Report, error) {
@@ -547,6 +1042,11 @@ func analyzeCollector(runRoot string) (Report, error) {
 	} else if !carsPass {
 		pass = false
 	}
+	if collectorPass, collectorErr := checkCollectorContract(runRoot, messages, cars, events, checks); collectorErr != nil {
+		return Report{}, collectorErr
+	} else if !collectorPass {
+		pass = false
+	}
 	return Report{
 		RunRoot:           runRoot,
 		Pass:              pass,
@@ -602,6 +1102,142 @@ func collectorDirectionsPresent(messages []collectorMessageRecord) bool {
 		directions[message.Direction] = true
 	}
 	return directions["sent"] && directions["received"]
+}
+
+func checkCollectorContract(runRoot string, messages []collectorMessageRecord, cars []collectorCARRecord, events []collectorEvent, checks map[string]string) (bool, error) {
+	// Intent: Collector-mode analysis is the Docker/TCP half of `nahop.20`: it
+	// validates exact observed grid messages, CAR bundles, parent references, and
+	// promise vocabulary after the run without giving agents any global monitor.
+	// Source: DI-bovaf
+	pass := true
+	messageCIDSet := map[string]bool{}
+	for _, message := range messages {
+		messageCIDSet[message.ExactCID] = true
+	}
+	if collectorCIDPass := checkCollectorCIDCorrectness(messages, cars, checks); !collectorCIDPass {
+		pass = false
+	}
+	if collectorParentPass, parentErr := checkCollectorParentChain(runRoot, messages, messageCIDSet, checks); parentErr != nil {
+		return false, parentErr
+	} else if !collectorParentPass {
+		pass = false
+	}
+	if carLinkPass := checkCollectorCARLinks(cars, messageCIDSet, checks); !carLinkPass {
+		pass = false
+	}
+	if tokenPass := checkCollectorTokenEconomics(events, messages, checks); !tokenPass {
+		pass = false
+	}
+	if multiplexPass := checkCollectorSessionMultiplexing(events, checks); !multiplexPass {
+		pass = false
+	}
+	if vocabularyPass := checkCollectorPromiseVocabulary(events, messages, checks); !vocabularyPass {
+		pass = false
+	}
+	return pass, nil
+}
+
+func checkCollectorCIDCorrectness(messages []collectorMessageRecord, cars []collectorCARRecord, checks map[string]string) bool {
+	cidTexts := []string{}
+	protocolPass := true
+	for _, message := range messages {
+		cidTexts = append(cidTexts, message.ExactCID)
+		if message.Protocol != graph.VersionControlPCIDText {
+			protocolPass = false
+		}
+	}
+	for _, carRecord := range cars {
+		cidTexts = append(cidTexts, carRecord.MessageCID, carRecord.CARCID)
+		cidTexts = append(cidTexts, carRecord.BlockCIDs...)
+	}
+	cidPass := checkCIDTextValues("collector_cid_text_canonical", cidTexts, checks)
+	recordCheck(checks, "collector_pcid_protocol_selector", protocolPass && len(messages) > 0)
+	return cidPass && protocolPass && len(messages) > 0
+}
+
+func checkCollectorParentChain(runRoot string, messages []collectorMessageRecord, messageCIDSet map[string]bool, checks map[string]string) (bool, error) {
+	pass := true
+	parentCount := 0
+	for _, message := range messages {
+		content, readErr := os.ReadFile(filepath.Join(runRoot, filepath.FromSlash(message.Path)))
+		if readErr != nil {
+			return false, readErr
+		}
+		envelopeView, parseErr := graph.ParseEnvelope(content)
+		if parseErr != nil {
+			return false, parseErr
+		}
+		for _, parent := range envelopeView.Parents {
+			parentCount++
+			if !messageCIDSet[store.CIDText(parent.CID)] {
+				pass = false
+			}
+		}
+		if message.ExactCID == "" || !messageCIDSet[message.ExactCID] {
+			pass = false
+		}
+	}
+	recordCheck(checks, "collector_parent_chain_indexed", pass && parentCount > 0)
+	return pass && parentCount > 0, nil
+}
+
+func checkCollectorCARLinks(cars []collectorCARRecord, messageCIDSet map[string]bool, checks map[string]string) bool {
+	pass := true
+	for _, carRecord := range cars {
+		if carRecord.MessageCID == "" || !messageCIDSet[carRecord.MessageCID] || len(carRecord.BlockCIDs) == 0 {
+			pass = false
+		}
+	}
+	recordCheck(checks, "collector_car_message_links", pass && len(cars) > 0)
+	return pass && len(cars) > 0
+}
+
+func checkCollectorTokenEconomics(events []collectorEvent, messages []collectorMessageRecord, checks map[string]string) bool {
+	eventNames := map[string]bool{}
+	for _, event := range events {
+		if event.Outcome == "kept" {
+			eventNames[event.Event] = true
+		}
+	}
+	promiseKinds := map[string]bool{}
+	for _, message := range messages {
+		promiseKinds[message.PromiseKind] = true
+	}
+	pass := eventNames["retrieval_capability_issued"] &&
+		eventNames["storage_payment_token_issued"] &&
+		eventNames["storage_payment_redemption"] &&
+		eventNames["storage_capability_token_issued"] &&
+		promiseKinds["object_retrieval_redemption"]
+	recordCheck(checks, "collector_tokenized_retrieval_and_storage", pass)
+	return pass
+}
+
+func checkCollectorSessionMultiplexing(events []collectorEvent, checks map[string]string) bool {
+	pass := false
+	for _, event := range events {
+		if event.Event == "session_closed" && event.Outcome == "kept" && strings.Contains(event.Detail, "exchanges=2") {
+			pass = true
+			break
+		}
+	}
+	recordCheck(checks, "collector_persistent_session_multiplexing", pass)
+	return pass
+}
+
+func checkCollectorPromiseVocabulary(events []collectorEvent, messages []collectorMessageRecord, checks map[string]string) bool {
+	pass := true
+	for _, event := range events {
+		if valueTextContainsProhibitedTerms([]any{event.Event, event.Outcome, event.Peer, event.Detail}) {
+			pass = false
+		}
+	}
+	for _, message := range messages {
+		if message.PromiseKind == "" || message.Protocol == "" || valueTextContainsProhibitedTerms([]any{message.Protocol, message.PromiseKind}) {
+			pass = false
+		}
+	}
+	recordCheck(checks, "collector_promise_vocabulary_local_voluntary", pass && len(messages) > 0)
+	return pass && len(messages) > 0
 }
 
 func verifyMessageArtifacts(runRoot string, messages []collectorMessageRecord, checks map[string]string) (bool, error) {

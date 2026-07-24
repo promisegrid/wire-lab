@@ -6,6 +6,7 @@
 package graph
 
 import (
+	"bytes"
 	"crypto/ed25519"
 	"crypto/sha256"
 	"encoding/hex"
@@ -23,6 +24,18 @@ const (
 	GridTagNumber          = uint64(0x67726964)
 	VersionControlPCIDText = "bafkreibi574zavmkqmafchb3mnn5kfj3uns7ymuwanjrdtkrijfxnyc6mu"
 )
+
+type envelopeHeaderBreakdown struct {
+	headerBytes           []byte
+	gridTagBytes          []byte
+	arrayHeaderByte       byte
+	tag42Bytes            []byte
+	byteStringHeaderBytes []byte
+	cidSentinelByte       byte
+	cidBytes              []byte
+	digestBytes           []byte
+	protocolCID           cidlib.Cid
+}
 
 // Parent names one typed parent edge in the envelope parent slot.
 type Parent struct {
@@ -432,9 +445,133 @@ func Diagnostic(content []byte) (string, error) {
 		return "", err
 	}
 	var builder strings.Builder
+	if renderHeaderHexBreakdown(&builder, content) {
+		builder.WriteByte('\n')
+	}
 	renderValue(&builder, raw, 0)
 	builder.WriteByte('\n')
 	return builder.String(), nil
+}
+
+func renderHeaderHexBreakdown(builder *strings.Builder, content []byte) bool {
+	header, ok := parseEnvelopeHeader(content)
+	if !ok {
+		return false
+	}
+	// Intent: Keep byte-level pCID review next to the readable diagnostic so
+	// reviewers can verify the current `grid([42(pCID), ...])` interoperability
+	// contract without changing the message bytes. Source: DI-zukap
+	builder.WriteString("header_hex:\n")
+	builder.WriteString(fmt.Sprintf("  %-47s # CBOR tag 1735551332: grid\n", formatHexBytes(header.gridTagBytes)))
+	builder.WriteString(fmt.Sprintf("  %-47s # array(4): [pCID, parents, payload, proof]\n", formatHexBytes([]byte{header.arrayHeaderByte})))
+	builder.WriteString(fmt.Sprintf("  %-47s # CBOR tag 42\n", formatHexBytes(header.tag42Bytes)))
+	builder.WriteString(fmt.Sprintf("  %-47s # byte string length %d\n", formatHexBytes(header.byteStringHeaderBytes), len(header.cidBytes)+1))
+	builder.WriteString(fmt.Sprintf("  %-47s # DAG-CBOR CID sentinel\n", formatHexBytes([]byte{header.cidSentinelByte})))
+	builder.WriteString(fmt.Sprintf("  %-47s # CID version 1\n", formatHexBytes(header.cidBytes[0:1])))
+	builder.WriteString(fmt.Sprintf("  %-47s # multicodec raw\n", formatHexBytes(header.cidBytes[1:2])))
+	builder.WriteString(fmt.Sprintf("  %-47s # multihash sha2-256\n", formatHexBytes(header.cidBytes[2:3])))
+	builder.WriteString(fmt.Sprintf("  %-47s # digest length %d\n", formatHexBytes(header.cidBytes[3:4]), len(header.digestBytes)))
+	builder.WriteString(fmt.Sprintf("  %-47s # pCID digest\n", formatHexBytes(header.digestBytes)))
+	builder.WriteString("  pCID: ")
+	builder.WriteString(store.CIDText(header.protocolCID))
+	builder.WriteByte('\n')
+	builder.WriteString("  slot0: ")
+	builder.WriteString(formatHexBytes(header.headerBytes[6:]))
+	builder.WriteByte('\n')
+	return true
+}
+
+func parseEnvelopeHeader(content []byte) (envelopeHeaderBreakdown, bool) {
+	var parsed envelopeHeaderBreakdown
+	if len(content) < 10 {
+		return parsed, false
+	}
+	// The diagnostic breakdown is intentionally based on the original byte slice
+	// rather than decoded/re-encoded CBOR. That keeps the report honest about the
+	// exact artifact bytes stored in the message CAS.
+	gridTagBytes := []byte{0xda, 0x67, 0x72, 0x69, 0x64}
+	if !bytes.Equal(content[0:len(gridTagBytes)], gridTagBytes) {
+		return parsed, false
+	}
+	parsed.gridTagBytes = append([]byte(nil), content[0:len(gridTagBytes)]...)
+	offset := len(gridTagBytes)
+	parsed.arrayHeaderByte = content[offset]
+	if parsed.arrayHeaderByte != 0x84 {
+		return parsed, false
+	}
+	offset++
+	if offset+2 > len(content) {
+		return parsed, false
+	}
+	tag42Bytes := []byte{0xd8, 0x2a}
+	if !bytes.Equal(content[offset:offset+len(tag42Bytes)], tag42Bytes) {
+		return parsed, false
+	}
+	parsed.tag42Bytes = append([]byte(nil), content[offset:offset+len(tag42Bytes)]...)
+	offset += len(tag42Bytes)
+	if offset >= len(content) {
+		return parsed, false
+	}
+	var byteStringLength int
+	// Current POC18 pCIDs are short CIDv1 values, so their tag-42 byte strings
+	// are encoded either as a small direct byte string or as one-byte length
+	// byte string `58 NN`. Unsupported encodings fall back to the ordinary
+	// readable diagnostic instead of failing the whole render.
+	switch {
+	case content[offset] >= 0x40 && content[offset] <= 0x57:
+		byteStringLength = int(content[offset] - 0x40)
+		parsed.byteStringHeaderBytes = append([]byte(nil), content[offset:offset+1]...)
+		offset++
+	case content[offset] == 0x58:
+		if offset+2 > len(content) {
+			return parsed, false
+		}
+		byteStringLength = int(content[offset+1])
+		parsed.byteStringHeaderBytes = append([]byte(nil), content[offset:offset+2]...)
+		offset += 2
+	default:
+		return parsed, false
+	}
+	if byteStringLength < 2 || offset+byteStringLength > len(content) {
+		return parsed, false
+	}
+	cidSentinelByte := content[offset]
+	if cidSentinelByte != 0x00 {
+		return parsed, false
+	}
+	parsed.cidSentinelByte = cidSentinelByte
+	cidBytes := content[offset+1 : offset+byteStringLength]
+	protocolCID, parseErr := store.ParseCIDBytes(cidBytes)
+	if parseErr != nil {
+		return parsed, false
+	}
+	// POC18 pCID diagnostics currently target CIDv1 raw/sha2-256 links. If a
+	// future pCID profile uses a different CID header, this function will simply
+	// omit the header breakdown until that profile has its own DI-backed update.
+	if len(cidBytes) < 4 || cidBytes[0] != 0x01 || cidBytes[1] != 0x55 || cidBytes[2] != 0x12 {
+		return parsed, false
+	}
+	digestLength := int(cidBytes[3])
+	if len(cidBytes[4:]) != digestLength {
+		return parsed, false
+	}
+	parsed.cidBytes = append([]byte(nil), cidBytes...)
+	parsed.digestBytes = append([]byte(nil), cidBytes[4:]...)
+	parsed.protocolCID = protocolCID
+	parsed.headerBytes = append([]byte(nil), content[:offset+byteStringLength]...)
+	return parsed, true
+}
+
+// formatHexBytes keeps diagnostic byte groups stable and readable.
+func formatHexBytes(value []byte) string {
+	var builder strings.Builder
+	for index, item := range value {
+		if index > 0 {
+			builder.WriteByte(' ')
+		}
+		builder.WriteString(fmt.Sprintf("%02x", item))
+	}
+	return builder.String()
 }
 
 func renderValue(builder *strings.Builder, value any, indent int) {

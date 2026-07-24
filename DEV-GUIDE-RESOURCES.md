@@ -173,8 +173,13 @@ signed transferable CWT/COSE storage/forwarding payment token in an
 into a non-transferable service capability before recording retention, received
 child messages trigger TCP repair requests for missing parent DAG objects, and
 the analyzer validates collected CAR payloads with the Go CAR library in
-addition to exact CID checks. These are still POC-local runtime and analyzer
-facts, not production APIs. Source: `DI-biruf`.
+addition to exact CID checks. The clean run now also invokes analyzer gates for
+the deterministic fixture before Docker and for collector artifacts after Docker:
+CID correctness, sparse CAS roots, parent-chain integrity, reference-set
+semantics, unprivileged POSIX fixture coverage, Rabin chunk manifests, Git bridge
+behavior, continuous sync, local token economics, retention/GC behavior, and
+voluntary promise vocabulary. These are still POC-local runtime and analyzer
+facts, not production APIs. Source: `DI-biruf`; `DI-bovaf`.
 POC19 is now planned as the production-shape design pass that turns the POC18
 CAS/VCS/TCP pieces plus POC16/POC17 runtime lessons into a deployable-node shape:
 one stable binary named `grid` as a small bootstrap seed, fetched microkernel
@@ -1791,8 +1796,9 @@ section.
   length-framed TCP; an observer-only event collector that stores exact message
   and CAR artifacts; a clean `/tmp/wire-lab-poc18-*` run script; unit tests; and
   diagnostic CBOR rendering of real `grid([42(pCID), parents, payload, proof])`
-  messages.
-  Source: `DI-jifuj`; `DI-harih`; `DI-koriz`.
+  messages. Its analyzer now runs as a two-pass clean-run contract over both
+  deterministic fixture state and Docker/TCP collector artifacts. Source:
+  `DI-jifuj`; `DI-harih`; `DI-koriz`; `DI-bovaf`.
 - `implementations/poc17-m4-lora-runtime/` is first-slice Go behavior evidence
   for a radio-only constrained device exchange. It now includes bintags-shaped
   order status traffic under a spec-derived `order_status_v1` pCID and uses a

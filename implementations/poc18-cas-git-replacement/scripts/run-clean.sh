@@ -47,6 +47,14 @@ echo "== run deterministic POC18 fixture =="
 # materialization CAS objects before the Docker/TCP phase appends live run
 # artifacts. Source: DI-basan
 go run ./cmd/poc-sim -run-root "$run_root"
+
+echo "== analyze deterministic POC18 fixture =="
+# Intent: `nahop.20` requires the clean regression to fail before Docker if the
+# deterministic CAS/VCS fixture no longer proves CID correctness, sparse CAS,
+# parent-chain integrity, reference-set semantics, Rabin chunking, Git bridge,
+# retention, token economics, and promise vocabulary. Source: DI-bovaf
+go run ./cmd/poc-analyze -run-root "$run_root"
+
 mkdir -p "$run_root/observer"
 
 echo "== reset POC18 docker runtime state =="

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	cidlib "github.com/ipfs/go-cid"
@@ -70,6 +71,9 @@ func TestDiagnosticReportWritesRepresentativeFlows(t *testing.T) {
 		}
 		if len(content) == 0 {
 			t.Fatalf("%s diagnostic is empty", flow)
+		}
+		if !strings.Contains(string(content), "header_hex:") {
+			t.Fatalf("%s diagnostic missing header hex breakdown: %s", flow, string(content))
 		}
 	}
 	if _, statErr := os.Stat(filepath.Join(outDir, "index.json")); statErr != nil {

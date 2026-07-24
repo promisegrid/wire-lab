@@ -21,6 +21,15 @@ collaboration, and DevOps ordered replay. Source: `DI-fusir`.
 
 ## Decision Intent Log
 
+ID: DI-bovaf
+Date: 2026-07-22 19:18:34 PDT
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Implement `nahop.20` as a full analyzer contract for POC18 deterministic fixture evidence and Docker/TCP collector evidence.
+Intent: POC18 has accumulated enough behavior that a clean run must fail when the claimed CAS/VCS contract is no longer evidenced. The analyzer should gate CID correctness, sparse peer CAS behavior, parent-chain integrity, reference-set semantics, POSIX fixture coverage, Rabin chunking, Git bridge behavior, continuous sync, local token economics, retention/GC behavior, and voluntary promise-based vocabulary. These gates are post-run diagnostics only; they do not create a global monitor, authority, conformance service, or trust service.
+Constraints: Preserve the existing `analysis.json` report shape by adding stable `checks` keys rather than new top-level schema fields; run both deterministic and collector analyzer passes from `scripts/run-clean.sh`; keep checks grounded in retained CAS objects, exact collected grid messages, CAR artifacts, and fixture result fields; do not widen scope to `nahop.22`, `nahop.26`, `nahop.28`, or `nahop.29`.
+Affects: implementations/poc18-cas-git-replacement/cmd/poc-analyze/main.go; implementations/poc18-cas-git-replacement/cmd/poc-analyze/main_test.go; implementations/poc18-cas-git-replacement/scripts/run-clean.sh; DEV-GUIDE-RESOURCES.md; protocols/wire-lab.d/TODO/TODO-nahop-poc18-cas-git-replacement.md.
+
 ID: DI-vilum
 Date: 2026-06-25 14:56:03 PDT
 Status: superseded
@@ -263,6 +272,15 @@ under `/tmp/wire-lab-poc18-run`.
 Affects: implementations/poc18-cas-git-replacement/cmd/poc-cbor-diag/;
 implementations/poc18-cas-git-replacement/scripts/run-clean.sh;
 protocols/wire-lab.d/TODO/TODO-nahop-poc18-cas-git-replacement.md.
+
+ID: DI-zukap
+Date: 2026-07-24 12:56:31 PDT
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Extend the shared POC18 CBOR diagnostic renderer so every rendered `grid()` message includes an exact hex breakdown of the top-level header: the `grid` tag, array arity, slot-0 tag 42, byte-string header, DAG-CBOR CID sentinel, CIDv1 prefix bytes, and pCID digest bytes.
+Intent: Reviewers need the diagnostic tool to show both the readable `grid([42(pCID), ...])` shape and the exact bytes that make the pCID interoperable with IPLD-style tag 42 links. The breakdown is diagnostic-only and must not change message bytes, CAS identity, TCP behavior, pCID selection, proof semantics, or analyzer authority.
+Constraints: Keep scope to the top-level header, not every nested link; implement in the shared `graph.Diagnostic` renderer so one-off `poc-cbor-diag` output and generated diagnostic reports stay consistent; omit the header section for non-`grid([42(pCID), ...])` CBOR instead of making generic diagnostics fail; preserve existing uncommitted analyzer work.
+Affects: implementations/poc18-cas-git-replacement/graph/graph.go; implementations/poc18-cas-git-replacement/graph/graph_test.go; implementations/poc18-cas-git-replacement/cmd/poc-cbor-diag/main_test.go; protocols/wire-lab.d/TODO/TODO-nahop-poc18-cas-git-replacement.md.
 
 ## Core Hypothesis
 
@@ -754,15 +772,20 @@ Remaining:
   graph trust evidence with market fallback only when needed, and bearer tokens
   redeem into non-transferable storage/forwarding capability tokens. Source:
   `DI-fakop`.
-- [ ] nahop.20 Add analyzer gates for CID correctness, sparse CAS, parent-chain
+- [x] nahop.20 Add analyzer gates for CID correctness, sparse CAS, parent-chain
   integrity, reference-set signatures, multi-target labels, directory labels,
   logical-change reference sets, POSIX inode type coverage, continuous sync,
   Rabin chunking for large in-band files, Git bridge roundtrip, GC behavior, and
-  voluntary-cooperation and promise-based local-trust vocabulary.
+  voluntary-cooperation and promise-based local-trust vocabulary. Implemented as
+  deterministic and Docker/TCP collector analyzer gates in `poc-analyze` and
+  `scripts/run-clean.sh`. Source: `DI-bovaf`.
 - [x] nahop.21 Add diagnostic rendering of representative raw CBOR messages for
   reference-set, node-version, directory, snapshot, review, merge,
   materialization, and peer-fetch flows. Implemented by `poc-cbor-diag
-  -diagnostic-report` and clean-run artifact checks under `DI-basan`.
+  -diagnostic-report` and clean-run artifact checks under `DI-basan`. Enhanced
+  under `DI-zukap` so each rendered `grid()` message includes the exact slot-0
+  header hex breakdown for the `grid` tag, tag 42 pCID link, CID prefix bytes,
+  and pCID digest.
 - [ ] nahop.22 Run a clean deterministic POC18 scenario and archive exact commands,
   CAS object examples, reference-set walks, parent-chain walks, Git bridge
   output, and analyzer output.
