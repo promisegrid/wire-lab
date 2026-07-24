@@ -8,7 +8,7 @@ PromiseGrid design choices are derived, tested, and recorded. Source:
 
 ## Current Design State
 
-Snapshot refreshed by Codex on 2026-07-19 20:33 PDT. This is a
+Snapshot refreshed by Codex on 2026-07-24 15:32 PDT. This is a
 developer-facing protocol-design snapshot, not a frozen PromiseGrid API. It
 reflects the currently locked outer-envelope direction plus consensus across
 near-contender simulations and root `results/` JSON evidence; proposal children
@@ -30,13 +30,19 @@ remain review evidence until promoted. Source: `DI-baral`; `DI-sisak`;
 `DI-kakos`; `DI-bibah`; `DI-mokaz`; `DI-lamaz`; `DI-kodob`; `DI-lulog`;
 `DI-guhil`; `DI-ruvum`; `DI-minol`; `DI-gapav`; `DI-zosol`; `DI-tanov`;
 `DI-dahaj`; `DI-moson`; `DI-romak`; `DI-zizab`; `DI-nafat`; `DI-nupag`;
-`DI-hofaz`; `DI-topiv`; `DI-bugik`; `DI-tuvub`; `DI-rufot`.
+`DI-hofaz`; `DI-topiv`; `DI-bugik`; `DI-tuvub`; `DI-rufot`; `DI-vofih`.
 The root `README.md` is now the first-stop returning-member primer: it gives a
 clean narrative from simulations and GA design search through the grouped POC
 journey, ending with the current envelope, pCID, CBOR/CID, sparse-CAS,
 parent-link, CWT/COSE token, local-trust, and POC19 production-shape model. Keep
 this file as the detailed source map rather than duplicating the README's
 onboarding prose. Source: `DI-minol`; `TODO-kurot`.
+`GOOD-PRACTICES.md` is now the concise repo-level pitfall guide for kernel,
+app, protocol, and POC developers, while `docs/kernel-app-relationship.md`
+expands the kernel/app role model without turning it into a frozen protocol
+spec. Guide writers should cite those documents as practical orientation and
+still cite frozen pCID specs, DIs, and DRs for normative claims. Source:
+`DI-vofih`.
 Future new or touched prose should avoid vague use of the word "pressure" when a
 clearer term fits, preferring "design search," "comparison," "scenario,"
 "constraint," "requirement," "risk," "tradeoff," or "evidence gathering" as
@@ -1575,6 +1581,14 @@ Use this section for the guide's App Devs / How to write a grid app section.
 
 ### Current sources
 
+- `GOOD-PRACTICES.md` provides concise practical guidance for app developers on
+  pCID usage, payload ownership, CBOR/CID conventions, Promise Theory
+  vocabulary, capability tokens, CAS, transport, and common POC-to-production
+  pitfalls. Source: `DI-vofih`.
+- `docs/kernel-app-relationship.md` explains how app agents promise accepted
+  pCIDs, how local routing agents promise delivery, and how parser/builder roles
+  can sit between pCID routing and app code without becoming a global authority.
+  Source: `DI-vofih`.
 - `docs/thought-experiments/TE-nibar-spec-doc-as-promise.md` explains the
   spec-doc-as-promise model.
 - `docs/thought-experiments/TE-lozip-congruence-convergence-duality-and-pcid-framing.md`
@@ -1729,6 +1743,14 @@ section.
 
 ### Current sources
 
+- `GOOD-PRACTICES.md` provides concise practical guidance for kernel developers
+  on pCID routing, parser roles, exact-byte transport, local resource promises,
+  lifecycle tokens, CAS source-of-truth rules, diagnostics, and POC discipline.
+  Source: `DI-vofih`.
+- `docs/kernel-app-relationship.md` is the practical kernel/app role guide:
+  kernel is a set of local roles served by agents, routing is one role,
+  parser/builder agents are optional patterns, and app registration is
+  promise-shaped rather than service-registry authority. Source: `DI-vofih`.
 - `docs/thought-experiments/TE-havib-apparatus-vs-specimen-carve-out.md`
   separates wire-lab apparatus from candidate protocol specimens.
 - `docs/thought-experiments/TE-jikaf-kernel-as-handler-vs-classical-kernel.md`

@@ -14,7 +14,10 @@ Protocol specs must be RFC-like: complete message shapes, slot meanings, expecte
 
 If a protocol spec changes, its CID changes. Avoid `_v1` or `-v1` naming as the primary versioning mechanism when the pCID already identifies the exact protocol text.
 
-Keep pCID counts low unless there is a real protocol-boundary reason. A pCID is closer to an TCP port number than a per-message operation code.  Also see "kernel/app relationship" section.
+Keep pCID counts low unless there is a real protocol-boundary reason.
+A pCID is an indicator for routing a message to the right agent,
+similar in spirit to a TCP port being an indicator for routing a
+packet to the right application.
 
 Do not use universal payload schemas. Each pCID defines its own payload shape, including whether payloads are arrays, maps, nested CBOR, COSE objects, encrypted bytes, or something else.
 
@@ -27,7 +30,24 @@ The kernel should route exact message bytes by pCID to registered parser or hand
 
 A pCID-specific parser or builder can be a kernel role, kernel module, sidecar process, or local adapter. It does not have to be compiled into one monolithic kernel.
 
-Apps should usually be native processes or WASM/WASI modules. Network-facing behavior belongs to transport, listener, sender, and local kernel roles, not directly to arbitrary app code.  But this is a fuzzy line -- there is nothing fundamentally wrong with a "app" taking on a kernel role for a particular network or data transport; it's just assuming a kernel role in that case.
+The PromiseGrid kernel is best understood as a set of roles served by one or more agents, not as one mandatory process. Message routing is one kernel role; resource ownership, parsing, supervision, storage, and transport may be separate roles.
+
+Apps are agents, usually implemented as native processes or WASM/WASI modules. An app may also assume a kernel role for a local resource or transport.
+
+A local routing agent should receive promises from apps about which pCIDs they accept, and make conditional promises about delivering messages. 
+
+For complex payloads, a routing agent may forward pCID-selected bytes to a parser agent that understands that pCID and then forwards to the correct app agents. 
+
+A single protocol spec may define multiple payload message types under one pCID. Put operation or message-type fields in the payload by default; do not add an envelope-level message type without an explicit pCID/spec decision.
+
+Choose pCID granularity by protocol coherence, not by trying to minimize or maximize count. Too many pCIDs fragment specs and startup receive promises; too few pCIDs make for large spec docs and force agents to parse irrelevant messages, creating higher CPU load. 
+
+Spec docs and pCIDs should evolve organically by adding new frozen specs and handlers rather than mutating old specs. 
+
+When possible, load agent executables or modules from CAS.  Keep
+agents small and focused on one role.  Avoid monolithic agents that try to do everything.
+
+See `docs/kernel-app-relationship.md` for the longer explanation of kernel roles, app agents, parser roles, pCID routing promises, and pCID granularity tradeoffs. 
 
 Do not silently acknowledge work a node did not actually promise or perform.
 Unknown pCIDs, unsupported arities, unsupported operations, and wrong
@@ -80,7 +100,7 @@ asking the issuer to keep that promise under the token's terms.
 
 Bearer tokens are bearer promises and might be redeemable for more
 specific tokens by anyone who holds them.  Bearer tokens might be
-traded for other bearer tokens issues by other agents.  The relative
+traded for other bearer tokens issued by other agents.  The relative
 exchange rate of bearer tokens might be indicative of relative trust
 between agents, but it is not a global trust score, and the perception
 of relative value is local to the perceiving agent.
@@ -109,14 +129,14 @@ request shutdown within a local resource promise.
 Do not assume rollback is safe. Once newer code or data has produced
 side effects, corrective roll-forward is more realistic than
 pretending the universe can be restored.  For example, an upgrade
-agent that produces undesireable results cannot be assumed to be
+agent that produces undesirable results cannot be assumed to be
 safely reverted by simply rolling back to an older version.
-Perticularly in the case of side effects such as network messages,
+Particularly in the case of side effects such as network messages,
 file writes, or database updates, rollback is not a safe assumption.
 
 The stable `grid` binary should be treated as minimal stage0 bootstrap
 code. It should fetch stage1 microkernel modules and app or runtime
-code from CAS by CID with direct or indirect approval from the loca
+code from CAS by CID with direct or indirect approval from the local
 resource owner.
 
 CAS is the source of truth. SQLite, JSON state files, indexes, and
@@ -177,9 +197,9 @@ A protocol spec document might be markdown, JSON, IPLD DAG-CBOR, or
 other formats.  Self-documenting formats should be preferred.
 Consideration should be given to avoiding proliferation of format
 parsers unless the application requires an unusual format.  The
-Multicodec Identifier in the pCID MUST specify the format of the spec
-document.  For spec docs in markdown format, the 'raw' multicodec
-(0x55) should be used.  
+multicodec in the pCID identifies the content codec of the spec
+document bytes, not the hash encoding. For spec docs in markdown
+format, the `raw` multicodec (0x55) should be used.
 
 Use well-known libraries for CID, multicodec, COSE, CWT, CAR, and
 cryptography where practical. 
@@ -187,7 +207,7 @@ cryptography where practical.
 Spec docs should be pre-hashed and referenced by pCID.  Adding a
 symlink to the spec doc is preferred, where the symlink name contains
 the CIDv1 base32 rendering of the pCID.  The base32 rendering of the
-pCID should be hardcoded in protocol code, rather that re-gerenating
+pCID should be hardcoded in protocol code, rather than re-generating
 the pCID at startup.  Yes, this is contrary to the usual "don't
 hardcode" advice in software engineering, but prevents the possibility
 of a spec doc being changed, either accidentally or maliciously, which
@@ -242,7 +262,7 @@ and repair should all be modeled as promises, not commands.
 For an agent representing or managing access to devices or hardware,
 hardware access should be represented as a local resource promise,
 often mediated by capability tokens.  This agent is serving in a
-kernel role and might best be thought of as being similiar to a server
+kernel role and might best be thought of as being similar to a server
 process managing access to hardware in a microkernel OS.  
 
 Incorporate local security policy into local protocol design.  Improve
@@ -303,44 +323,3 @@ library as each other.
 UI communication to backend or business-logic agents should also use
 grid messages, because that enables local and remote UI control
 through the same protocol model.
-
-# Kernel and App Relationship
-
-  * "kernel" is actually a set of roles served by multiple agents  
-  * one of these roles in message routing  
-  * the routing agent routes messages to other agents based on pCID  
-  * apps are agents  
-  * when an agent starts up, it sends a message to the routing agent listing the pCIDs that it wants:    
-    * Alice app agent: "I promise to accept messages with these pCIDs", with optional conditions  
-    * Ron routing agent: "I promise to send you those messages", with optional conditions  
-  * optional refinement from one of the POCs, for more complex payloads:  
-    * routing agent routes to a parser agent that knows how to parse the payload for one or more pCIDs (POC16)  
-    * parser agent then forwards to the correct app agent  
-    * variations like this and others are likely to be normal  
-    * remember, there's nothing that says agents can't send messages directly to each other without going through the routing agent (the routing agent is just another agent, and there might even be more than one of them on a given node)  
-    * there's probably a "design patterns" book about all of these variations that someone will write at some point  
-  * pCIDs are simply the addresses (in hash space) of protocol spec docs  
-  * it's normal and expected for a protocol spec to describe multiple message types within the same protocol  
-  * which means there will usually be some sort of "message type" field in the payload (which is what the POCs use)  
-    * but there could be a "message type" field as a grid envelope slot   
-      * but none of the POCs have experimented with this \-- raises a lot of questions  
-  * there is a balance to be sought between "a few complex protocol spec docs that each describe a lot of message types" vs "a lot of simple spec docs which each describe one type"  
-  * what all this means is that we don't choose how many pCIDs we want directly  
-  * instead, we first think through the protocol spec docs that we need, while considering:  
-    * too many different protocols means:  
-      * spec doc fragmentation, duplication of concepts across multiple docs  
-      * each agent has to list a bunch of pCIDs in that startup message  
-    * too few protocols means:  
-      * each spec doc gets overloaded with the complexity of handling multiple message types  
-      * because routing is based on pCID, each agent is likely to receive a lot of messages it doesn't need, but that it will have to parse in order to check the message type to see it it's interesting before throwing the message away  
-  * summary: so it's really all about avoiding developer cognitive load vs CPU load   
-    * few spec docs tends to increase CPU load as agent process messages they don't need  
-    * many spec docs decreases CPU load at the cost of higher developer cognitive load  
-  * in reality, spec docs are likely to grow organically:  
-    * we can't think of all possible message types in a problem domain (cognitive load)  
-    * we create spec docs describing the message types we can think of as needed  
-    * we write independent agents that send and receive those message types as needed  
-    * as we learn more, we add more spec docs (and pCIDs) rather than edit existing ones  
-    * and we add agents to handle those new pCIDs rather than edit existing ones  
-    * BUT we tend to load agents from CAS anyway, which means that we can replace existing agents as needed  
-  * the goal is to be able to support this organic, flexible growth and change in an organized, self-documented way (as opposed to what usually happens in organizations and IT systems)  

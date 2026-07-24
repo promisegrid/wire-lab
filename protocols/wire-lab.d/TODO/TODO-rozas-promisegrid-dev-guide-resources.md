@@ -340,6 +340,30 @@ Affects: `docs/thought-experiments/TE-jimar-kernel-runtime-portability-boundary.
 `DR/DR-davod-promisegrid-kernel-dev-porting-boundary.md`;
 `protocols/wire-lab.d/TODO/TODO-rozas-promisegrid-dev-guide-resources.md`.
 
+### DI-vofih
+
+ID: DI-vofih
+Date: 2026-07-24 15:32:54
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Keep `GOOD-PRACTICES.md` as a concise, one-practice-per-paragraph
+developer guide while moving the detailed kernel/app relationship notes into
+`docs/kernel-app-relationship.md` and indexing both documents from
+`DEV-GUIDE-RESOURCES.md`.
+Intent: PromiseGrid kernel and app developers need practical guidance that
+keeps recurring pitfalls visible without turning the good-practices guide into
+a long design note. The kernel/app relationship has enough nuance around
+kernel roles, app agents, pCID routing promises, parser roles, and pCID
+granularity tradeoffs to deserve a separate explanatory document.
+Constraints: Do not treat either document as a frozen protocol spec. Preserve
+the one-item-per-paragraph shape of `GOOD-PRACTICES.md`. Keep
+`DEV-GUIDE-RESOURCES.md` as a source map and writer note index, not a duplicate
+copy of either guide. Keep existing DRs about settled app and kernel guide
+contracts open.
+Affects: `GOOD-PRACTICES.md`; `docs/kernel-app-relationship.md`;
+`DEV-GUIDE-RESOURCES.md`;
+`protocols/wire-lab.d/TODO/TODO-rozas-promisegrid-dev-guide-resources.md`.
+
 ## Context
 
 The PromiseGrid Development Guide currently has three locked audiences:
