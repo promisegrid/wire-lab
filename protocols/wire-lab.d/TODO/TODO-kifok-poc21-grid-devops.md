@@ -105,6 +105,55 @@ Affects: `protocols/wire-lab.d/TODO/TODO-kifok-poc21-grid-devops.md`;
 `implementations/poc21-grid-devops/docs/DESIGN.md`; `DEV-GUIDE-RESOURCES.md`.
 Supersedes: `DI-dahaj` previous-binary recovery-metadata requirement only.
 
+ID: DI-rigob
+Date: 2026-07-29 11:40:39 PDT
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: POC21 will implement one shared Grid language family with a common
+data/declaration layer, a finite Gridfile journal profile, and a Turing-complete
+`*.grid` program profile. Gridfile remains statically expandable and cannot turn
+itself into the program profile through a local pragma. The general program
+profile is part of POC21 rather than being deferred to another POC.
+Intent: Configuration, ordered machine journals, agents, applications, parsers,
+builders, planners, and pure-function services should share CID-native values,
+imports, types, descriptors, and tooling without sacrificing the human-readable
+and replayable properties that make Gridfile useful as a machine lifetime
+journal.
+Constraints: The common data layer must not perform effects. Gridfile must keep
+finite ordered execution visible before machine mutation. General Grid programs
+may be computationally universal, but their local and inter-agent effects remain
+mediated by explicit kernel-role and capability promises. `DR-junaz` owns the
+still-open canonical syntax, typing, and effect-system decision. `DR-lupiz` owns
+the still-open source-header identity decision.
+Affects: `protocols/wire-lab.d/TODO/TODO-kifok-poc21-grid-devops.md`;
+`implementations/poc21-grid-devops/docs/DESIGN.md`;
+`docs/research/DN-gagog-grid-language-profiles-and-runtime-descriptors.md`;
+`DR/DR-junaz-canonical-grid-language-design.md`;
+`DR/DR-lupiz-grid-source-shebang-identity.md`.
+
+ID: DI-bigap
+Date: 2026-07-29 11:40:39 PDT
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: POC21's installed stage0 `grid` binary will read only the common
+effect-free data/declaration subset needed for bootstrap configuration. The
+first full `*.grid` execution engine will be a Go AST interpreter fetched as a
+stage1 module. Grid language semantics will be specified independently of that
+engine so later bytecode, WASM, native, or constrained-device implementations
+can execute the same language without redefining it.
+Intent: Stage0 must remain small enough to establish local identity, owner
+anchors, bootstrap roots, peers, and stage1 retrieval without executing
+arbitrary configuration code. An AST interpreter is the least expensive route
+to a real Turing-complete proof while keeping future runtime portability open.
+Constraints: Stage0 configuration cannot loop, recurse, perform I/O, send
+messages, or request local resources. Practical program execution may be bounded
+by CPU, memory, time, and message capability promises even though the abstract
+program profile is Turing complete. Exact language and runtime identity remain
+open under `DR-lupiz`; canonical syntax and typing remain open under `DR-junaz`.
+Affects: `protocols/wire-lab.d/TODO/TODO-kifok-poc21-grid-devops.md`;
+`implementations/poc21-grid-devops/docs/DESIGN.md`;
+`docs/research/DN-gagog-grid-language-profiles-and-runtime-descriptors.md`.
+
 ## Completed planning tasks
 
 - [x] kifok.1 Create the POC21 planning artifact set.
@@ -121,6 +170,13 @@ Supersedes: `DI-dahaj` previous-binary recovery-metadata requirement only.
   inter-agent communication, CAS rebuildability, and corrective-history language.
 - [x] kifok.8 Update guide resources so POC21 is discoverable as the DevOps
   continuation of POC18, POC19, and POC20.
+- [x] kifok.16 Record the shared Grid language family, finite Gridfile profile,
+  Turing-complete `*.grid` profile, stage0 data subset, and first AST interpreter
+  in `DN-gagog`. Source: `DI-rigob`; `DI-bigap`.
+- [x] kifok.17 Run `TE-fakof` across pCID, ordinary language-spec CID, raw
+  executable CID, runtime-descriptor CID, dual-CID, and separate-execution-object
+  alternatives. The TE recommends a separate exact execution descriptor and
+  remains `needs DF` under `DR-lupiz`.
 
 ## Future implementation tasks
 
@@ -137,3 +193,19 @@ Supersedes: `DI-dahaj` previous-binary recovery-metadata requirement only.
   in-band CAS/VCS objects.
 - [ ] kifok.15 Implement analyzer gates for safety, TCP-only communication,
   CAS rebuildability, and corrective-history language.
+- [ ] kifok.18 Resolve `DR-lupiz` through the DF questions in `TE-fakof`, then
+  record the selected source and execution identity model in a new DI before
+  freezing source-header syntax.
+- [ ] kifok.19 Run a dedicated TE for `DR-junaz` covering canonical syntax,
+  static typing, effect/capability typing, evaluation order, content-addressed
+  definitions, and the Gridfile/program shared grammar.
+- [ ] kifok.20 Implement the common effect-free data/declaration reader in
+  stage0 after the canonical grammar and source-header identity are locked.
+- [ ] kifok.21 Implement the fetched stage1 AST interpreter for the full
+  Turing-complete `*.grid` profile.
+- [ ] kifok.22 Implement the finite Gridfile journal profile over the shared
+  value, CID, descriptor, diagnostic, and import machinery; reject program-only
+  constructs before machine mutation begins.
+- [ ] kifok.23 Add analyzer gates for stage0 bootstrap safety, static Gridfile
+  expansion, program-profile Turing-completeness proof, explicit resource
+  bounds, source/runtime identity retention, and no pCID-as-language regression.

@@ -8,7 +8,7 @@ PromiseGrid design choices are derived, tested, and recorded. Source:
 
 ## Current Design State
 
-Snapshot refreshed by Codex on 2026-07-24 15:32 PDT. This is a
+Snapshot refreshed by Codex on 2026-07-29 11:46 PDT. This is a
 developer-facing protocol-design snapshot, not a frozen PromiseGrid API. It
 reflects the currently locked outer-envelope direction plus consensus across
 near-contender simulations and root `results/` JSON evidence; proposal children
@@ -30,7 +30,8 @@ remain review evidence until promoted. Source: `DI-baral`; `DI-sisak`;
 `DI-kakos`; `DI-bibah`; `DI-mokaz`; `DI-lamaz`; `DI-kodob`; `DI-lulog`;
 `DI-guhil`; `DI-ruvum`; `DI-minol`; `DI-gapav`; `DI-zosol`; `DI-tanov`;
 `DI-dahaj`; `DI-moson`; `DI-romak`; `DI-zizab`; `DI-nafat`; `DI-nupag`;
-`DI-hofaz`; `DI-topiv`; `DI-bugik`; `DI-tuvub`; `DI-rufot`; `DI-vofih`.
+`DI-hofaz`; `DI-topiv`; `DI-bugik`; `DI-tuvub`; `DI-rufot`; `DI-vofih`;
+`DI-rigob`; `DI-bigap`.
 The root `README.md` is now the first-stop returning-member primer: it gives a
 clean narrative from simulations and GA design search through the grouped POC
 journey, ending with the current envelope, pCID, CBOR/CID, sparse-CAS,
@@ -285,17 +286,28 @@ machine-change replay with triggers, validation, and duplicate-target replay; th
 third is package/container-image-style artifact distribution through in-band
 CAS/VCS objects. POC21 follows the infrastructures.org/isconf/Turing-equivalence
 lesson that machine updates must preserve ordered journals because changing a
-machine changes the machine that runs later changes. Source: `DI-zosol`;
-`DI-tanov`; `DI-dahaj`; `DI-moson`; `TODO-kifok`.
+machine changes the machine that runs later changes. POC21 now also locks one
+Grid language family with a common effect-free data/declaration layer, a finite
+and reviewable Gridfile journal profile, and a Turing-complete `*.grid` program
+profile. Stage0 parses only the bounded data subset; the first full-language
+engine is a fetched stage1 Go AST interpreter so language semantics need not be
+frozen to that engine. The exact syntax, type/effect system, and source-header
+identity remain open under `DR-junaz` and `DR-lupiz`. `DN-gagog` records the
+language-family synthesis, while `TE-fakof` recommends identifying source by an
+ordinary language-spec CID and recording the exact runtime separately in an
+execution descriptor; that recommendation still needs DF and is not a final
+source format. These planning additions do not change the current scored
+outer-envelope or pCID-routing consensus. Source: `DI-zosol`; `DI-tanov`;
+`DI-dahaj`; `DI-moson`; `DI-rigob`; `DI-bigap`; `TODO-kifok`.
 Source: `DI-zuruj`; `DI-dibut`; `DI-dofoj`; `DI-radaj`; `DI-lidaj`;
 `DI-fusir`; `DI-jifuj`; `DI-harih`; `DI-gozov`; `DI-guban`; `DI-fimap`;
 `DI-pahor`; `DI-bikif`; `DI-kiram`; `DI-bamum`; `DI-jokav`; `DI-tuhoj`;
 `DI-mivur`; `DI-bidum`; `DI-rudos`; `DI-fakop`; `DI-koriz`; `DI-biruf`;
 `DI-lumir`; `DI-topab`; `DI-kakos`; `DI-bibah`; `DI-mokaz`; `DI-lamaz`;
 `DI-kodob`; `DI-lulog`; `DI-guhil`; `DI-ruvum`; `DI-minol`; `DI-gapav`;
-`DI-zosol`; `DI-tanov`; `DI-dahaj`; `DI-moson`;
+`DI-zosol`; `DI-tanov`; `DI-dahaj`; `DI-moson`; `DI-rigob`; `DI-bigap`;
 `DN-dopod`; `TE-kopap`; `TE-vahoj`; `TE-hikar`; `TE-givul`; `TE-nozal`;
-`TE-lodom`.
+`TE-lodom`; `DN-gagog`; `TE-fakof`.
 
 ### Current Wire Direction
 
@@ -1581,6 +1593,16 @@ Use this section for the guide's App Devs / How to write a grid app section.
 
 ### Current sources
 
+- `docs/research/DN-gagog-grid-language-profiles-and-runtime-descriptors.md`
+  records the POC21 Grid language-family direction: one common data layer, a
+  finite Gridfile journal profile, a Turing-complete `*.grid` program profile,
+  and runtime descriptors that keep source meaning separate from a selected
+  executable artifact. The canonical syntax and type/effect system remain open
+  under `DR-junaz`. Source: `DI-rigob`; `DI-bigap`.
+- `docs/thought-experiments/TE-fakof-grid-source-shebang-identity.md` compares
+  pCID, ordinary CID, executable CID, runtime-descriptor CID, and split
+  source/execution identity. Its split-identity recommendation remains open
+  under `DR-lupiz`; do not present it as a settled `*.grid` header format.
 - `GOOD-PRACTICES.md` provides concise practical guidance for app developers on
   pCID usage, payload ownership, CBOR/CID conventions, Promise Theory
   vocabulary, capability tokens, CAS, transport, and common POC-to-production
@@ -1743,6 +1765,15 @@ section.
 
 ### Current sources
 
+- `docs/research/DN-gagog-grid-language-profiles-and-runtime-descriptors.md`
+  explains why stage0 should parse only an effect-free config subset while a
+  fetched stage1 engine evaluates the full language, and why finite machine
+  journals and Turing-complete programs remain distinct profiles of one family.
+  Source: `DI-rigob`; `DI-bigap`.
+- `docs/thought-experiments/TE-fakof-grid-source-shebang-identity.md` is the
+  current source/runtime identity analysis for fetched interpreters, compiled
+  artifacts, constrained nodes, mixed versions, and long-horizon replay. Its
+  recommendation is provisional pending `DR-lupiz`.
 - `GOOD-PRACTICES.md` provides concise practical guidance for kernel developers
   on pCID routing, parser roles, exact-byte transport, local resource promises,
   lifecycle tokens, CAS source-of-truth rules, diagnostics, and POC discipline.
@@ -2123,6 +2154,10 @@ final normative references. Source: `DI-zalak`.
 
 ## Open DRs that block settled guide prose
 
+- `DR-lupiz` — decides whether `*.grid` source names a language-spec CID or
+  pCID and how exact runtime selection is recorded separately or in-band.
+- `DR-junaz` — decides the canonical Grid syntax, typing, effect model,
+  evaluation rules, and content-addressed definition semantics.
 - `DR-napum` — decides which layperson-facing PromiseGrid claims are stable
   enough for settled Intro and Goals prose.
 - `DR-tuhaz` — decides the stable app-developer contract or provisional

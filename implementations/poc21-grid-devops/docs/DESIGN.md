@@ -83,6 +83,53 @@ with preserved history; prior binaries, prior Merkle/CAS roots, and prior
 materialized trees are recovery inputs, not promises that the prior universe can
 be restored. Source: `DI-moson`.
 
+## Grid language family
+
+POC21 also owns the first complete Grid language implementation. This is one
+language family with a shared data/declaration layer and two executable
+profiles:
+
+- **Gridfile journal profile:** finite, ordered, statically expandable, and
+  human-readable. It describes the machine's lifetime journal and cannot enable
+  unrestricted program constructs through a local pragma.
+- **`*.grid` program profile:** Turing complete in the abstract and suitable for
+  agents, applications, parsers, builders, planners, and pure-function services.
+  Practical runs remain bounded by local CPU, memory, time, storage, and message
+  capability promises.
+
+The common data layer supplies typed values, finite collections, CIDs, local
+symbols, descriptors, and CID-pinned imports without loops or effects. Stage0
+uses only that layer for bootstrap configuration. The first full program engine
+is a Go AST interpreter fetched as stage1; language semantics remain independent
+of that engine so later bytecode, WASM, native, and constrained-device runtimes
+can implement the same specification. Source: `DI-rigob`; `DI-bigap`.
+
+`DN-gagog` records the current design synthesis and candidate language
+influences. Canonical syntax, typing, effects, evaluation strategy, and
+content-addressed definition semantics remain open in `DR-junaz`; POC21 must run
+the corresponding TE before parser or interpreter code generation.
+
+## Grid source and exact execution identity
+
+A tiny fixed source prelude is required before the loader knows how to interpret
+the remaining source bytes. What that prelude identifies remains open under
+`DR-lupiz` and `TE-fakof`.
+
+The TE tests a language-spec pCID, an ordinary language-spec CID, a raw
+interpreter/compiler CID, a runtime-descriptor CID, a dual-CID header, and a
+separate exact execution descriptor. Its current recommendation is:
+
+```text
+portable source -> ordinary language-spec CID
+exact execution -> source CID + runtime-descriptor CID
+                + selected platform-artifact CID + input/context CIDs
+```
+
+This keeps pCID focused on `grid()` wire-protocol parser selection and keeps the
+source CID stable when a compiler is repaired, another platform is added, or an
+independent verifier chooses another implementation. It is not locked until the
+DF questions in `TE-fakof` are answered and a DI closes `DR-lupiz`.
+
 ## Future acceptance gates
 
 The future `poc21-analyze` must fail unless it proves:
@@ -101,6 +148,17 @@ The future `poc21-analyze` must fail unless it proves:
   objects;
 - derived indexes, diagnostics, and summaries can be deleted and rebuilt from
   CAS-backed source events.
+- stage0 configuration is accepted only through the finite effect-free common
+  data subset;
+- Gridfile source expands to a finite ordered plan and rejects program-profile
+  constructs before target mutation;
+- at least one fetched stage1 `*.grid` program demonstrates the general
+  recursive/iterative language profile while local resource promises bound the
+  actual invocation;
+- source, language, runtime descriptor, selected artifact, input/context, and
+  result identities remain reviewable as separate CID-addressed facts;
+- no language-spec identifier is treated as a pCID unless `DR-lupiz` is later
+  decided that way through a superseding DI.
 
 ## Non-goals
 
