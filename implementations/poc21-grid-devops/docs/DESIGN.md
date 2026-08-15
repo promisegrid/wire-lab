@@ -109,6 +109,25 @@ influences. Canonical syntax, typing, effects, evaluation strategy, and
 content-addressed definition semantics remain open in `DR-junaz`; POC21 must run
 the corresponding TE before parser or interpreter code generation.
 
+The retained Grid-language discussion handoff is
+`docs/discussion/grid-language-handoff-20260813.md`. It preserves illustrative
+syntax, the stage0 dependency tree, the limited `gcloud` component analogy, and
+organization-specific command ideas without treating them as canonical. Source:
+`DI-rulub`.
+
+Three additional DRs own distinctions exposed by that discussion:
+
+- `DR-lotir` owns the intended Gridfile plan versus executed CAS-history
+  distinction, run-once and recurring invocation identity, and final
+  terminology; `DR-junaz` owns eventual source syntax.
+- `DR-toras` owns the relationship between stage0 bootstrap data and canonical
+  Grid syntax; it must resolve before `kifok.20` sequencing changes.
+- `DR-lotur` owns whether organization command reference sets become a POC21
+  extension mechanism and how namespaces, precedence, and collisions work.
+
+The full Grid-language scope remains in POC21 under `DI-rigob`; these open
+questions do not reopen that decision. Source: `DI-rulub`.
+
 ## Grid source and exact execution identity
 
 A tiny fixed source prelude is required before the loader knows how to interpret

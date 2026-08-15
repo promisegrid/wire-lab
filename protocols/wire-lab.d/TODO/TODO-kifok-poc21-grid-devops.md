@@ -154,6 +154,30 @@ Affects: `protocols/wire-lab.d/TODO/TODO-kifok-poc21-grid-devops.md`;
 `implementations/poc21-grid-devops/docs/DESIGN.md`;
 `docs/research/DN-gagog-grid-language-profiles-and-runtime-descriptors.md`.
 
+ID: DI-rulub
+Date: 2026-08-13 19:35:34 PDT
+Status: active
+Author: stevegt@t7a.org (Steve Traugott)
+Decision: Retain the moved Grid-language handoff as a POC21 discussion document,
+label post-milestone ideas `DISCUSSION-ONLY`, and assign every unresolved
+architectural question to an append-only DR without treating discussion examples
+or recommendations as settled interfaces.
+Intent: The language, stage0, Gridfile, machine-history, and extensible-command
+discussion must survive the chat session in a form another engineer can use,
+while DR/DI records remain the source of truth and active DIs remain authoritative.
+Constraints: Keep the handoff at its user-selected POC21 path. Keep the full
+Grid-language scope in POC21 under `DI-rigob`. Do not change `kifok.20` before
+`DR-toras` receives a TE, DF, and DI. Do not implement organizational command
+roots before `DR-lotur` is decided. Do not edit `TE-fakof` during this persistence
+pass.
+Affects: `implementations/poc21-grid-devops/docs/discussion/grid-language-handoff-20260813.md`;
+`implementations/poc21-grid-devops/docs/DESIGN.md`;
+`protocols/wire-lab.d/TODO/TODO-kifok-poc21-grid-devops.md`;
+`protocols/wire-lab.d/TODO/TODO.md`; `DR/DR-lotir-gridfile-plan-and-machine-event-history.md`;
+`DR/DR-toras-stage0-bootstrap-format-relationship.md`;
+`DR/DR-lotur-organizational-command-reference-sets.md`;
+`DEV-GUIDE-RESOURCES.md`.
+
 ## Completed planning tasks
 
 - [x] kifok.1 Create the POC21 planning artifact set.
@@ -177,6 +201,9 @@ Affects: `protocols/wire-lab.d/TODO/TODO-kifok-poc21-grid-devops.md`;
   executable CID, runtime-descriptor CID, dual-CID, and separate-execution-object
   alternatives. The TE recommends a separate exact execution descriptor and
   remains `needs DF` under `DR-lupiz`.
+- [x] kifok.24 Retain the Grid-language session handoff, distinguish persisted
+  discussion from locked decisions, and map every pending topic to a DI or DR.
+  Source: `DI-rulub`.
 
 ## Future implementation tasks
 
@@ -209,3 +236,13 @@ Affects: `protocols/wire-lab.d/TODO/TODO-kifok-poc21-grid-devops.md`;
 - [ ] kifok.23 Add analyzer gates for stage0 bootstrap safety, static Gridfile
   expansion, program-profile Turing-completeness proof, explicit resource
   bounds, source/runtime identity retention, and no pCID-as-language regression.
+- [ ] kifok.25 Run a dedicated TE for `DR-lotir` to distinguish the intended
+  Gridfile plan from executed CAS history, model start/completion and
+  indeterminate invocation identity, preserve recurring external entrypoints
+  over one finite graph, and narrow stable terminology before DF and DI.
+- [ ] kifok.26 Run a dedicated TE for `DR-toras` comparing a strict canonical
+  Grid subset, a separate fixed bootstrap format, and descriptor-selected data
+  languages; only then reconsider `kifok.20` sequencing through DF and DI.
+- [ ] kifok.27 Run a dedicated TE for `DR-lotur` comparing command reference-set
+  adoption, namespaces, overlay precedence, and collision handling before any
+  organizational command-root implementation.
